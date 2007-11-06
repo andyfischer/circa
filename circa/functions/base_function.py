@@ -1,6 +1,6 @@
 
 
-class Function(object):
+class BaseFunction(object):
   def __init__(m):
     
     # default options
@@ -15,15 +15,6 @@ class Function(object):
     return None
 
   
-class Add(Function):
-
-  def evaluate(m, term):
-    sum = 0
-    
-    for input in term.inputs:
-      sum += input.value
-
-    term.value = sum
 
 
 struct_branch = Function()
