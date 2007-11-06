@@ -1,4 +1,4 @@
-import circa.functions
+import functions, branch
 import unittest
 
 class Term(object):
@@ -50,7 +50,7 @@ def create(func, branch, inputs=[], initial_state=None):
 
   term = Term()
 
-  term.func = func
+  term.function = func
 
   # set state
   if initial_state:
@@ -68,25 +68,14 @@ def create(func, branch, inputs=[], initial_state=None):
   return term
 
 def createConstant(value, branch):
-  term = createTerm(functions.constant, branch)
+  term = create(functions.constant, branch)
   term.value = value
   return term
 
 def createVariable(value, branch):
-  term = createTerm(functions.variable, branch)
+  term = create(functions.variable, branch)
   term.value = value
   return term
 
 
-class TestTermCase(unittest.TestCase):
-  def testSimple(m):
-    br = branch.branch()
 
-
-    one = term.createConstant(1, br)
-    two = term.createConstant(2, br)
-    three = term.create(functions.builtin.add, br, [one,two])
-
-    br.evaluate()
-
-    assert three.value == 3

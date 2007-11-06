@@ -1,2 +1,2 @@
 
-__all__ = ['term']
+__all__ = ['terms', 'functions', 'branch', 'module']

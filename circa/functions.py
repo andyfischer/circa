@@ -8,7 +8,6 @@ class Function(object):
     m.numBranches = 0
     m.numTermPointers = 0
 
-
   def evaluate(m, term):
     pass
 
