@@ -1,4 +1,3 @@
-import functions, branch
 import unittest
 
 class Term(object):
@@ -18,10 +17,12 @@ class Term(object):
 
     # add to user lists
     for input in m.inputs:
+      if not input: continue
       input.users.add(m)
 
     # prune old list
     for input in old_inputs:
+      if not input: continue
       input.pruneUsers()
 
   def setInput(m, index, term):
@@ -43,9 +44,36 @@ class Term(object):
       if not user.inputsContain(m):
         m.users.remove(user)
 
+  def changeFunction(m, new_func, initial_state=None):
+    m.function = new_func
+
+    if not initial_state:
+      m.state = m.function.makeState()
+    else:
+      m.state = initial_state
+
+  def evaluate(m):
+    m.function.evaluate(m)
+
+from branch import Branch
+
+class TermState(object):
+  def __init__(m, num_branches=0):
+
+    if num_branches > 0:
+      for i in range(num_branches): m.addBranch()
 
 
-def create(func, branch, inputs=[], initial_state=None):
+  def addBranch(m):
+    if not hasattr(m, 'branches'):
+      m.branches = []
+
+    branch = Branch()
+    m.branches.append(branch)
+    return branch
+
+
+def create(func, branch=None, inputs=[], initial_state=None):
   # todo: specialize function
 
   term = Term()
@@ -66,6 +94,8 @@ def create(func, branch, inputs=[], initial_state=None):
     branch.append(term)
 
   return term
+
+import functions
 
 def createConstant(value, branch):
   term = create(functions.constant, branch)
