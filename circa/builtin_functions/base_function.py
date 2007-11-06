@@ -1,4 +1,5 @@
 
+import circa.types as types
 
 class BaseFunction(object):
   def __init__(m):
@@ -7,6 +8,14 @@ class BaseFunction(object):
     m.pureFunction = False
     m.numBranches = 0
     m.numTermPointers = 0
+    m.inputType = types.NONE
+    m.outputType = types.NONE
+
+
+    m.init()
+
+  def init(m):
+    pass
 
   def evaluate(m, term):
     pass
@@ -14,12 +23,4 @@ class BaseFunction(object):
   def makeState(m):
     return None
 
-  
-
-
-struct_branch = Function()
-
-constant = Function()
-variable = Function()
-add = Add()
 
