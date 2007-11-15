@@ -8,35 +8,23 @@
 
 /* Begin PBXFileReference section */
 		B61BE5F20CEA910400E5C3B0 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = __init__.py; path = src/circa/__init__.py; sourceTree = "<group>"; };
-		B61BE5F30CEA910400E5C3B0 /* __init__.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = __init__.pyc; path = src/circa/__init__.pyc; sourceTree = "<group>"; };
 		B61BE5F40CEA910400E5C3B0 /* branch.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = branch.py; path = src/circa/branch.py; sourceTree = "<group>"; };
-		B61BE5F50CEA910400E5C3B0 /* branch.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = branch.pyc; path = src/circa/branch.pyc; sourceTree = "<group>"; };
 		B61BE5F60CEA910400E5C3B0 /* builder_shorthand.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = builder_shorthand.py; path = src/circa/builder_shorthand.py; sourceTree = "<group>"; };
 		B61BE5F70CEA910400E5C3B0 /* builder.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = builder.py; path = src/circa/builder.py; sourceTree = "<group>"; };
-		B61BE5F80CEA910400E5C3B0 /* builder.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = builder.pyc; path = src/circa/builder.pyc; sourceTree = "<group>"; };
-		B61BE5FA0CEA910400E5C3B0 /* .__init__.py.swp */ = {isa = PBXFileReference; lastKnownFileType = file; path = .__init__.py.swp; sourceTree = "<group>"; };
 		B61BE5FB0CEA910400E5C3B0 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
-		B61BE5FC0CEA910400E5C3B0 /* __init__.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = __init__.pyc; sourceTree = "<group>"; };
 		B61BE5FD0CEA910400E5C3B0 /* base_function.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = base_function.py; sourceTree = "<group>"; };
-		B61BE5FE0CEA910400E5C3B0 /* base_function.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = base_function.pyc; sourceTree = "<group>"; };
 		B61BE5FF0CEA910400E5C3B0 /* cond_branch.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = cond_branch.py; sourceTree = "<group>"; };
 		B61BE6000CEA910400E5C3B0 /* logic.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = logic.py; sourceTree = "<group>"; };
-		B61BE6010CEA910400E5C3B0 /* logic.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = logic.pyc; sourceTree = "<group>"; };
 		B61BE6020CEA910400E5C3B0 /* math.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = math.py; sourceTree = "<group>"; };
-		B61BE6030CEA910400E5C3B0 /* math.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = math.pyc; sourceTree = "<group>"; };
 		B61BE6040CEA910400E5C3B0 /* misc.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = misc.py; sourceTree = "<group>"; };
 		B61BE6050CEA910400E5C3B0 /* value.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = value.py; sourceTree = "<group>"; };
 		B61BE6060CEA910400E5C3B0 /* datatypes.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = datatypes.py; path = src/circa/datatypes.py; sourceTree = "<group>"; };
 		B61BE6070CEA910400E5C3B0 /* functions.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = functions.py; path = src/circa/functions.py; sourceTree = "<group>"; };
-		B61BE6080CEA910400E5C3B0 /* functions.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = functions.pyc; path = src/circa/functions.pyc; sourceTree = "<group>"; };
 		B61BE6090CEA910400E5C3B0 /* module.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = module.py; path = src/circa/module.py; sourceTree = "<group>"; };
-		B61BE60A0CEA910400E5C3B0 /* module.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = module.pyc; path = src/circa/module.pyc; sourceTree = "<group>"; };
 		B61BE60D0CEA910400E5C3B0 /* tokenizer.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = tokenizer.py; sourceTree = "<group>"; };
 		B61BE60E0CEA910400E5C3B0 /* tokens.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = tokens.py; sourceTree = "<group>"; };
 		B61BE60F0CEA910400E5C3B0 /* subroutine.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = subroutine.py; path = src/circa/subroutine.py; sourceTree = "<group>"; };
-		B61BE6100CEA910400E5C3B0 /* subroutine.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = subroutine.pyc; path = src/circa/subroutine.pyc; sourceTree = "<group>"; };
 		B61BE6110CEA910400E5C3B0 /* terms.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = terms.py; path = src/circa/terms.py; sourceTree = "<group>"; };
-		B61BE6120CEA910400E5C3B0 /* terms.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; name = terms.pyc; path = src/circa/terms.pyc; sourceTree = "<group>"; };
 		B61BE6140CEA910400E5C3B0 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
 		B61BE6150CEA910400E5C3B0 /* simple.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = simple.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -46,23 +34,16 @@
 			isa = PBXGroup;
 			children = (
 				B61BE5F20CEA910400E5C3B0 /* __init__.py */,
-				B61BE5F30CEA910400E5C3B0 /* __init__.pyc */,
 				B61BE5F40CEA910400E5C3B0 /* branch.py */,
-				B61BE5F50CEA910400E5C3B0 /* branch.pyc */,
 				B61BE5F60CEA910400E5C3B0 /* builder_shorthand.py */,
 				B61BE5F70CEA910400E5C3B0 /* builder.py */,
-				B61BE5F80CEA910400E5C3B0 /* builder.pyc */,
 				B61BE5F90CEA910400E5C3B0 /* builtin_functions */,
 				B61BE6060CEA910400E5C3B0 /* datatypes.py */,
 				B61BE6070CEA910400E5C3B0 /* functions.py */,
-				B61BE6080CEA910400E5C3B0 /* functions.pyc */,
 				B61BE6090CEA910400E5C3B0 /* module.py */,
-				B61BE60A0CEA910400E5C3B0 /* module.pyc */,
 				B61BE60B0CEA910400E5C3B0 /* parser */,
 				B61BE60F0CEA910400E5C3B0 /* subroutine.py */,
-				B61BE6100CEA910400E5C3B0 /* subroutine.pyc */,
 				B61BE6110CEA910400E5C3B0 /* terms.py */,
-				B61BE6120CEA910400E5C3B0 /* terms.pyc */,
 				B61BE6130CEA910400E5C3B0 /* tests */,
 			);
 			sourceTree = "<group>";
@@ -70,16 +51,11 @@
 		B61BE5F90CEA910400E5C3B0 /* builtin_functions */ = {
 			isa = PBXGroup;
 			children = (
-				B61BE5FA0CEA910400E5C3B0 /* .__init__.py.swp */,
 				B61BE5FB0CEA910400E5C3B0 /* __init__.py */,
-				B61BE5FC0CEA910400E5C3B0 /* __init__.pyc */,
 				B61BE5FD0CEA910400E5C3B0 /* base_function.py */,
-				B61BE5FE0CEA910400E5C3B0 /* base_function.pyc */,
 				B61BE5FF0CEA910400E5C3B0 /* cond_branch.py */,
 				B61BE6000CEA910400E5C3B0 /* logic.py */,
-				B61BE6010CEA910400E5C3B0 /* logic.pyc */,
 				B61BE6020CEA910400E5C3B0 /* math.py */,
-				B61BE6030CEA910400E5C3B0 /* math.pyc */,
 				B61BE6040CEA910400E5C3B0 /* misc.py */,
 				B61BE6050CEA910400E5C3B0 /* value.py */,
 			);
@@ -113,9 +89,11 @@
 		B61BE59E0CEA88CA00E5C3B0 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = B61BE59F0CEA88CA00E5C3B0 /* Build configuration list for PBXProject "circa" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 0;
 			mainGroup = B61BE59C0CEA88CA00E5C3B0;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 			);
 		};

@@ -1,6 +1,7 @@
 // !$*UTF8*$!
 {
 	B61BE59E0CEA88CA00E5C3B0 /* Project object */ = {
+		activeArchitecture = i386;
 		activeBuildConfigurationName = Debug;
 		addToTargets = (
 		);
@@ -66,8 +67,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 216697034;
-			PBXWorkspaceStateSaveDate = 216697034;
+			PBXPerProjectTemplateStateSaveDate = 216849324;
+			PBXWorkspaceStateSaveDate = 216849324;
 		};
 		sourceControlManager = B61BE5A20CEA88CA00E5C3B0 /* Source Control */;
 		userBuildSettings = {
