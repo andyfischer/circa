@@ -26,7 +26,7 @@ add = wrap(functions.add)
 
 
 class Test(unittest.TestCase):
-  def testWrap(m):
+  def testAdd(m):
 
     three = add(1,2)
 

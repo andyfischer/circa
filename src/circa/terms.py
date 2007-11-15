@@ -10,6 +10,9 @@ class Term(object):
 
     m.setInputs(initial_inputs)
 
+  def input(m, index):
+    return m.inputs[index].value
+
   def setInputs(m, list):
     old_inputs = m.inputs
 
