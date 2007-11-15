@@ -4,6 +4,7 @@ import circa.types as types
 
 class And(BaseFunction):
   def init(m):
+    m.name = "and"
     m.inputType = types.BOOL
     m.outputType = types.BOOL
 
@@ -17,6 +18,7 @@ class And(BaseFunction):
 
 class Or(BaseFunction):
   def init(m):
+    m.name = "or"
     m.inputType = types.BOOL
     m.outputType = types.BOOL
 
@@ -29,6 +31,8 @@ class Or(BaseFunction):
     return
 
 class ConditionalExpression(BaseFunction):
+  def init(m):
+    m.name = "if"
 
   def evaluate(m, term):
     if term.input[0].value:
