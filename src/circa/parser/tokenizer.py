@@ -1,18 +1,50 @@
 
 import tokens
 
-
 class Token(object):
-  def matches(m, match):
-    return m.match == match
+  def __init__(m, match, string, line, column):
+    m.match = match
+    m.string = string
+    m.line = line
+    m.column = column
+
+  def length(m):
+    return len(m.string)
+
+  def __str__(m):
+    return m.string
 
 
-text = ""
-currentIndex = 0
-currentToken = None
-output = []
+def tokenize(string):
+  currentIndex = 0
+  currentLine = 0
+  currentCol = 0
+  output = []
 
-currentLine = 0
-currentCol = 0
+  def makeToken(token_def, length):
+    return Token(token_def, string[currentIndex : currentIndex+length], currentLine, currentCol)
 
+  def testList(token_def_list):
+    for token_def in token_def_list:
+      match = token_def.pattern.match(string, currentIndex)
+      if match:
+        return makeToken(token_def, match.end() - match.start())
+
+    return None
+
+  while currentIndex < len(string):
+
+    token = testList(tokens.unkeyed_by_char)
+
+    if not token:
+      token = testList(tokens.by_first_char[string[currentIndex]])
+
+    if not token:
+      token = makeToken(tokens.UNRECOGNIZED, 1)
+
+    currentIndex += token.length()
+    currentCol += token.length()
+    output.append(token)
+
+  return output
 

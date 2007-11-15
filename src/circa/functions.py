@@ -27,7 +27,7 @@ builtin = {}
 def registerFuncsInModule(module):
   for name in dir(module):
     obj = getattr(module, name)
-    if type(obj) == types.ClassType and issubclass(obj, BaseFunction);
+    if type(obj) == types.ClassType and issubclass(obj, BaseFunction):
       print "found func:" + str(obj)
       func = obj()
       global builtin
