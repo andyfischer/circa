@@ -1,6 +1,6 @@
 
 from base_function import BaseFunction
-import circa.types as types
+import circa.data_types as data_types
 
 class And(BaseFunction):
   def init(m):
@@ -19,8 +19,8 @@ class And(BaseFunction):
 class Or(BaseFunction):
   def init(m):
     m.name = "or"
-    m.inputType = types.BOOL
-    m.outputType = types.BOOL
+    m.inputType = data_types.BOOL
+    m.outputType = data_types.BOOL
 
   def evaluate(m, term):
     for input in term.inputs:

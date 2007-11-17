@@ -27,6 +27,9 @@
 		B61BE6110CEA910400E5C3B0 /* terms.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = terms.py; path = src/circa/terms.py; sourceTree = "<group>"; };
 		B61BE6140CEA910400E5C3B0 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
 		B61BE6150CEA910400E5C3B0 /* simple.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = simple.py; sourceTree = "<group>"; };
+		B6776B200CEE7CE9004B2B13 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
+		B6776B210CEE7CE9004B2B13 /* blocks.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = blocks.py; sourceTree = "<group>"; };
+		B6776B220CEE7CE9004B2B13 /* parser.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = parser.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -66,6 +69,9 @@
 		B61BE60B0CEA910400E5C3B0 /* parser */ = {
 			isa = PBXGroup;
 			children = (
+				B6776B200CEE7CE9004B2B13 /* __init__.py */,
+				B6776B210CEE7CE9004B2B13 /* blocks.py */,
+				B6776B220CEE7CE9004B2B13 /* parser.py */,
 				B61BE60D0CEA910400E5C3B0 /* tokenizer.py */,
 				B61BE60E0CEA910400E5C3B0 /* tokens.py */,
 			);
@@ -89,7 +95,6 @@
 		B61BE59E0CEA88CA00E5C3B0 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = B61BE59F0CEA88CA00E5C3B0 /* Build configuration list for PBXProject "circa" */;
-			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 0;
 			mainGroup = B61BE59C0CEA88CA00E5C3B0;
 			projectDirPath = "";

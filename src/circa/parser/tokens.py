@@ -1,6 +1,6 @@
 import re
 
-all = []
+ALL = []
 
 token_to_name = {}
 
@@ -34,7 +34,10 @@ class TokenDef(object):
     else:
       m.pattern = None
 
-    all.append(m)
+    ALL.append(m)
+
+  def __str__(m):
+    return m.name
 
 
 # symbols
