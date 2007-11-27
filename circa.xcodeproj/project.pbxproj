@@ -22,11 +22,13 @@
 		B61BE6070CEA910400E5C3B0 /* functions.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = functions.py; path = src/circa/functions.py; sourceTree = "<group>"; };
 		B61BE6090CEA910400E5C3B0 /* module.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = module.py; path = src/circa/module.py; sourceTree = "<group>"; };
 		B61BE60D0CEA910400E5C3B0 /* tokenizer.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = tokenizer.py; sourceTree = "<group>"; };
-		B61BE60E0CEA910400E5C3B0 /* tokens.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = tokens.py; sourceTree = "<group>"; };
 		B61BE60F0CEA910400E5C3B0 /* subroutine.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = subroutine.py; path = src/circa/subroutine.py; sourceTree = "<group>"; };
 		B61BE6110CEA910400E5C3B0 /* terms.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = terms.py; path = src/circa/terms.py; sourceTree = "<group>"; };
 		B61BE6140CEA910400E5C3B0 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
 		B61BE6150CEA910400E5C3B0 /* simple.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = simple.py; sourceTree = "<group>"; };
+		B66BBE4F0CFB6376004DCAB6 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
+		B66BBE500CFB6376004DCAB6 /* token_definitions.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = token_definitions.py; sourceTree = "<group>"; };
+		B66BBE510CFB6472004DCAB6 /* builder.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = builder.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -66,8 +68,9 @@
 		B61BE60B0CEA910400E5C3B0 /* parser */ = {
 			isa = PBXGroup;
 			children = (
+				B66BBE4F0CFB6376004DCAB6 /* __init__.py */,
+				B66BBE500CFB6376004DCAB6 /* token_definitions.py */,
 				B61BE60D0CEA910400E5C3B0 /* tokenizer.py */,
-				B61BE60E0CEA910400E5C3B0 /* tokens.py */,
 			);
 			name = parser;
 			path = src/circa/parser;
@@ -78,6 +81,7 @@
 			children = (
 				B61BE6140CEA910400E5C3B0 /* __init__.py */,
 				B61BE6150CEA910400E5C3B0 /* simple.py */,
+				B66BBE510CFB6472004DCAB6 /* builder.py */,
 			);
 			name = tests;
 			path = src/circa/tests;

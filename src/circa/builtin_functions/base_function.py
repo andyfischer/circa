@@ -1,5 +1,5 @@
 
-import circa.types as types
+import circa.datatypes as datatypes
 
 class BaseFunction(object):
   def __init__(m):
@@ -8,8 +8,8 @@ class BaseFunction(object):
     m.pureFunction = False
     m.numBranches = 0
     m.numTermPointers = 0
-    m.inputType = types.NONE
-    m.outputType = types.NONE
+    m.inputType = datatypes.NONE
+    m.outputType = datatypes.NONE
 
 
     m.init()
