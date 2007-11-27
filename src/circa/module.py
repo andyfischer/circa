@@ -6,8 +6,9 @@ class Module(object):
     m.global_term = terms.create(functions.subroutine)
     m.env = environment
 
-  def run(m):
+    assert m.global_term.state != None
 
+  def run(m):
     m.global_term.evaluate()
 
 
