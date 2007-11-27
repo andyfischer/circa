@@ -9,7 +9,6 @@ class Builder(object):
 
     m.blockStack = []
     
-
     sbip = SubroutineBlockInProgress(m, m.module.global_term.state)
     m.startBlock(sbip)
 
@@ -47,6 +46,8 @@ class BlockInProgress(object):
 class SubroutineBlockInProgress(BlockInProgress):
   def __init__(m, builder, sub_state):
     BlockInProgress.__init__(m,builder)
+
+    assert sub_state != None
 
     m.subroutine_state = sub_state
 
