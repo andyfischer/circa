@@ -2,17 +2,17 @@
 import token_definitions
 
 class Token(object):
-  def __init__(m, match, string, line, column):
+  def __init__(m, match, text, line, column):
     m.match = match
-    m.string = string
+    m.text = text
     m.line = line
     m.column = column
 
   def length(m):
-    return len(m.string)
+    return len(m.text)
 
   def __str__(m):
-    return m.string
+    return m.text
 
 
 def tokenize(string):
