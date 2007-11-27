@@ -1,5 +1,5 @@
 
-import tokens
+import token_definitions
 
 class Token(object):
   def __init__(m, match, string, line, column):
@@ -34,13 +34,13 @@ def tokenize(string):
 
   while currentIndex < len(string):
 
-    token = testList(tokens.unkeyed_by_char)
+    token = testList(token_definitions.unkeyed_by_char)
 
     if not token:
-      token = testList(tokens.by_first_char[string[currentIndex]])
+      token = testList(token_definitions.by_first_char[string[currentIndex]])
 
     if not token:
-      token = makeToken(tokens.UNRECOGNIZED, 1)
+      token = makeToken(token_definitions.UNRECOGNIZED, 1)
 
     currentIndex += token.length()
     currentCol += token.length()

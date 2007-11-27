@@ -20,6 +20,11 @@ class Builder(object):
     m.blockStack.append(block)
     block.onStart()
 
+  def finishBlock(m):
+    block = m.blockStack[-1]
+    block.onFinish()
+    m.blockStack.pop()
+
   def createTerm(m, function, **kwargs):
     return terms.create(function, m.currentBranch(), **kwargs)
 
