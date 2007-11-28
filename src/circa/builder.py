@@ -1,11 +1,11 @@
-import functions, terms, module
+import builtin_functions, terms, compilation_unit
 
 
 class Builder(object):
   def __init__(m, module=None):
 
     if module: m.module = module
-    else: m.module = globals()['module'].Module()
+    else: m.module = compilation_unit.CompilationUnit()
 
     m.blockStack = []
     
