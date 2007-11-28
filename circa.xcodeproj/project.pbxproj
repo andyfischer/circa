@@ -9,10 +9,7 @@
 /* Begin PBXFileReference section */
 		B61BE5F20CEA910400E5C3B0 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = __init__.py; path = src/circa/__init__.py; sourceTree = "<group>"; };
 		B61BE5F40CEA910400E5C3B0 /* branch.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = branch.py; path = src/circa/branch.py; sourceTree = "<group>"; };
-		B61BE5F60CEA910400E5C3B0 /* builder_shorthand.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = builder_shorthand.py; path = src/circa/builder_shorthand.py; sourceTree = "<group>"; };
 		B61BE5F70CEA910400E5C3B0 /* builder.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = builder.py; path = src/circa/builder.py; sourceTree = "<group>"; };
-		B61BE6060CEA910400E5C3B0 /* datatypes.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = datatypes.py; path = src/circa/datatypes.py; sourceTree = "<group>"; };
-		B61BE6090CEA910400E5C3B0 /* module.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = module.py; path = src/circa/module.py; sourceTree = "<group>"; };
 		B61BE60D0CEA910400E5C3B0 /* tokenizer.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = tokenizer.py; sourceTree = "<group>"; };
 		B61BE60F0CEA910400E5C3B0 /* subroutine.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = subroutine.py; path = src/circa/subroutine.py; sourceTree = "<group>"; };
 		B61BE6110CEA910400E5C3B0 /* terms.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = terms.py; path = src/circa/terms.py; sourceTree = "<group>"; };
@@ -30,10 +27,7 @@
 				B6F9EAB60CFCDF8E00099815 /* builder_test.py */,
 				B6F9EAB70CFCDF8E00099815 /* builtin_functions.py */,
 				B61BE5F40CEA910400E5C3B0 /* branch.py */,
-				B61BE5F60CEA910400E5C3B0 /* builder_shorthand.py */,
 				B61BE5F70CEA910400E5C3B0 /* builder.py */,
-				B61BE6060CEA910400E5C3B0 /* datatypes.py */,
-				B61BE6090CEA910400E5C3B0 /* module.py */,
 				B61BE60B0CEA910400E5C3B0 /* parser */,
 				B61BE60F0CEA910400E5C3B0 /* subroutine.py */,
 				B61BE6110CEA910400E5C3B0 /* terms.py */,

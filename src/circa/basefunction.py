@@ -1,4 +1,3 @@
-import datatypes
 
 class BaseFunction(object):
   def __init__(m):
@@ -7,8 +6,8 @@ class BaseFunction(object):
     m.pureFunction = False
     m.numBranches = 0
     m.numTermPointers = 0
-    m.inputType = datatypes.NONE
-    m.outputType = datatypes.NONE
+    m.inputType = None
+    m.outputType = None
 
     m.init()
 

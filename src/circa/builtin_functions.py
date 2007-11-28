@@ -1,4 +1,4 @@
-import datatypes, terms
+import terms
 from basefunction import BaseFunction
 
 
@@ -18,8 +18,8 @@ class CondBranch(BaseFunction):
 class And(BaseFunction):
   def init(m):
     m.name = "and"
-    m.inputType = datatypes.BOOL
-    m.outputType = datatypes.BOOL
+    m.inputType = bool
+    m.outputType = bool
 
   def evaluate(m, term):
     for input in term.inputs:
@@ -32,8 +32,8 @@ class And(BaseFunction):
 class Or(BaseFunction):
   def init(m):
     m.name = "or"
-    m.inputType = datatypes.BOOL
-    m.outputType = datatypes.BOOL
+    m.inputType = bool
+    m.outputType = bool
 
   def evaluate(m, term):
     for input in term.inputs:
@@ -56,6 +56,8 @@ class ConditionalExpression(BaseFunction):
 class Add(BaseFunction):
   def init(m):
     m.name = "add"
+    m.inputType = float
+    m.outputType = float
 
   def evaluate(m, term):
     term.value = float(term.inputs[0]) + float(term.inputs[1])
@@ -63,6 +65,8 @@ class Add(BaseFunction):
 class Sub(BaseFunction):
   def init(m):
     m.name = "sub"
+    m.inputType = float
+    m.outputType = float
 
   def evaluate(m, term):
     term.value = float(term.inputs[0]) - float(term.inputs[1])
@@ -70,6 +74,8 @@ class Sub(BaseFunction):
 class Mult(BaseFunction):
   def init(m):
     m.name = "mult"
+    m.inputType = float
+    m.outputType = float
 
   def evaluate(m, term):
     term.value = float(term.inputs[0]) * float(term.inputs[1])
@@ -77,6 +83,8 @@ class Mult(BaseFunction):
 class Div(BaseFunction):
   def init(m):
     m.name = "div"
+    m.inputType = float
+    m.outputType = float
 
   def evaluate(m, term):
     term.value = float(term.inputs[0]) / float(term.inputs[1])
@@ -84,6 +92,8 @@ class Div(BaseFunction):
 class Blend(BaseFunction):
   def init(m):
     m.name = "blend"
+    m.inputType = float
+    m.outputType = float
 
   def evaluate(m, term):
     blend_value = float(term.inputs[2])
