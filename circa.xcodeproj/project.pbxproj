@@ -1,0 +1,99 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXFileReference section */
+		B61BE5F20CEA910400E5C3B0 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = __init__.py; path = src/circa/__init__.py; sourceTree = "<group>"; };
+		B61BE5F40CEA910400E5C3B0 /* branch.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = branch.py; path = src/circa/branch.py; sourceTree = "<group>"; };
+		B61BE5F60CEA910400E5C3B0 /* builder_shorthand.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = builder_shorthand.py; path = src/circa/builder_shorthand.py; sourceTree = "<group>"; };
+		B61BE5F70CEA910400E5C3B0 /* builder.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = builder.py; path = src/circa/builder.py; sourceTree = "<group>"; };
+		B61BE6060CEA910400E5C3B0 /* datatypes.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = datatypes.py; path = src/circa/datatypes.py; sourceTree = "<group>"; };
+		B61BE6090CEA910400E5C3B0 /* module.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = module.py; path = src/circa/module.py; sourceTree = "<group>"; };
+		B61BE60D0CEA910400E5C3B0 /* tokenizer.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = tokenizer.py; sourceTree = "<group>"; };
+		B61BE60F0CEA910400E5C3B0 /* subroutine.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = subroutine.py; path = src/circa/subroutine.py; sourceTree = "<group>"; };
+		B61BE6110CEA910400E5C3B0 /* terms.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = terms.py; path = src/circa/terms.py; sourceTree = "<group>"; };
+		B6776B200CEE7CE9004B2B13 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
+		B6776B210CEE7CE9004B2B13 /* blocks.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = blocks.py; sourceTree = "<group>"; };
+		B6F9EAB60CFCDF8E00099815 /* builder_test.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = builder_test.py; path = src/circa/builder_test.py; sourceTree = "<group>"; };
+		B6F9EAB70CFCDF8E00099815 /* builtin_functions.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = builtin_functions.py; path = src/circa/builtin_functions.py; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		B61BE59C0CEA88CA00E5C3B0 = {
+			isa = PBXGroup;
+			children = (
+				B61BE5F20CEA910400E5C3B0 /* __init__.py */,
+				B6F9EAB60CFCDF8E00099815 /* builder_test.py */,
+				B6F9EAB70CFCDF8E00099815 /* builtin_functions.py */,
+				B61BE5F40CEA910400E5C3B0 /* branch.py */,
+				B61BE5F60CEA910400E5C3B0 /* builder_shorthand.py */,
+				B61BE5F70CEA910400E5C3B0 /* builder.py */,
+				B61BE6060CEA910400E5C3B0 /* datatypes.py */,
+				B61BE6090CEA910400E5C3B0 /* module.py */,
+				B61BE60B0CEA910400E5C3B0 /* parser */,
+				B61BE60F0CEA910400E5C3B0 /* subroutine.py */,
+				B61BE6110CEA910400E5C3B0 /* terms.py */,
+			);
+			sourceTree = "<group>";
+		};
+		B61BE60B0CEA910400E5C3B0 /* parser */ = {
+			isa = PBXGroup;
+			children = (
+				B6776B200CEE7CE9004B2B13 /* __init__.py */,
+				B6776B210CEE7CE9004B2B13 /* blocks.py */,
+				B61BE60D0CEA910400E5C3B0 /* tokenizer.py */,
+			);
+			name = parser;
+			path = src/circa/parser;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		B61BE59E0CEA88CA00E5C3B0 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = B61BE59F0CEA88CA00E5C3B0 /* Build configuration list for PBXProject "circa" */;
+			hasScannedForEncodings = 0;
+			mainGroup = B61BE59C0CEA88CA00E5C3B0;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		B61BE5A00CEA88CA00E5C3B0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Debug;
+		};
+		B61BE5A10CEA88CA00E5C3B0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B61BE59F0CEA88CA00E5C3B0 /* Build configuration list for PBXProject "circa" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B61BE5A00CEA88CA00E5C3B0 /* Debug */,
+				B61BE5A10CEA88CA00E5C3B0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B61BE59E0CEA88CA00E5C3B0 /* Project object */;
+}

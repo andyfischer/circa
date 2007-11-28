@@ -58,7 +58,12 @@ class Term(object):
   def evaluate(m):
     m.function.evaluate(m)
 
+  # value accessors
+  def __int__(m): return int(m.value)
+  def __float__(m): return float(m.value)
+
 from branch import Branch
+from basefunction import BaseFunction
 
 class TermState(object):
   def __init__(m, num_branches=0):
@@ -77,6 +82,8 @@ class TermState(object):
 
 
 def create(func, branch=None, inputs=[], initial_state=None):
+  assert isinstance(func, BaseFunction)
+
   # todo: specialize function
 
   term = Term()
@@ -98,15 +105,15 @@ def create(func, branch=None, inputs=[], initial_state=None):
 
   return term
 
-import functions
+import builtin_functions
 
 def createConstant(value, branch):
-  term = create(functions.constant, branch)
+  term = create(builtin_functions.constant, branch)
   term.value = value
   return term
 
 def createVariable(value, branch):
-  term = create(functions.variable, branch)
+  term = create(builtin_functions.variable, branch)
   term.value = value
   return term
 

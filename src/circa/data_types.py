@@ -1,5 +1,0 @@
-
-NONE = 0
-INT = 1
-FLOAT = 2
-BOOL = 3

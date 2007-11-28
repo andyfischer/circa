@@ -1,9 +1,9 @@
-import terms, functions
+import terms, builtin_functions
 
-class Module(object):
+class CompilationUnit(object):
   def __init__(m, environment=None):
 
-    m.global_term = terms.create(functions.subroutine)
+    m.global_term = terms.create(builtin_functions.subroutine)
     m.env = environment
 
     assert m.global_term.state != None
