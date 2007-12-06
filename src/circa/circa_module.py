@@ -1,6 +1,6 @@
 import terms, builtin_functions
 
-class CompilationUnit(object):
+class CircaModule(object):
   def __init__(m, environment=None):
 
     m.global_term = terms.create(builtin_functions.subroutine)

@@ -1,9 +1,12 @@
 
 
-import terms, functions
+import terms
 import unittest
+from basefunction import BaseFunction
 
-class SubroutineFunc(functions.BaseFunction):
+class SubroutineFunc(BaseFunction):
+  def init(m):
+    m.name = "subroutine"
 
   def evaluate(m, term):
     term.state.branches[0].evaluate()
@@ -26,7 +29,6 @@ class SubroutineDefinition(object):
     return term
 
 
-
 class SubroutineState(terms.TermState):
   def __init__(m):
     m.locals = {}
@@ -39,10 +41,11 @@ class SubroutineState(terms.TermState):
     m.locals[name] = term
 
   def getLocal(m, name):
-    return m.locals[name]
+    if not name in m.locals:
+      return None
+    else:
+      return m.locals[name]
 
-
-    
 
 class Test(unittest.TestCase):
   def test1(m):
