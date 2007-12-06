@@ -1,4 +1,4 @@
-import terms
+import terms, subroutine
 from basefunction import BaseFunction
 
 
@@ -111,24 +111,14 @@ class Variable(BaseFunction):
   def init(m):
     m.name = "variable"
 
-class Subroutine(BaseFunction):
-  def init(m):
-    m.name = "subroutine"
-
-  def makeState(m):
-    return terms.TermState(num_branches=1)
-
-  def evaluate(m, term):
-    term.state.branches[0].evaluate()
-
 # global function instances
 
-add = Add()
-sub = Sub()
-mult = Mult()
-div = Div()
-blend = Blend()
-constant = Constant()
-variable = Variable()
-subroutine = Subroutine()
+ADD = Add()
+SUB = Sub()
+MULT = Mult()
+DIV = Div()
+BLEND = Blend()
+CONSTANT = Constant()
+VARIABLE = Variable()
+SUBROUTINE = subroutine.SubroutineFunc()
 

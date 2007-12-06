@@ -1,11 +1,11 @@
-import builtin_functions, terms, compilation_unit
+import builtin_functions, terms, circa_module
 
 
 class Builder(object):
   def __init__(m, module=None):
 
     if module: m.module = module
-    else: m.module = compilation_unit.CompilationUnit()
+    else: m.module = circa_module.CircaModule()
 
     m.blockStack = []
     
@@ -14,6 +14,12 @@ class Builder(object):
 
   def currentBlock(m): return m.blockStack[-1]
   def currentBranch(m): return m.currentBlock().currentBranch()
+
+  def getLocal(m, name):
+    return m.currentBlock().getLocal(name)
+
+  def bindLocal(m, name, term):
+    return m.currentBlock().bindLocal(name, term)
 
   def startBlock(m, block):
     m.blockStack.append(block)
@@ -29,6 +35,8 @@ class Builder(object):
 
   def createConstant(m, value):
     return terms.createConstant(value, m.currentBranch())
+
+
 
 
 class BlockInProgress(object):

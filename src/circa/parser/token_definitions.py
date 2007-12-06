@@ -9,35 +9,35 @@ unkeyed_by_char = []
 
 
 class TokenDef(object):
-  def __init__(m, id, name, raw=None, pattern=None):
-    m.id = id
-    m.name = name
-    m.raw_string = None
+  def __init__(self, id, name, raw=None, pattern=None):
+    self.id = id
+    self.name = name
+    self.raw_string = None
 
     if raw:
-      m.pattern = re.compile( re.escape(raw) )
-      m.raw_string = raw
+      self.pattern = re.compile( re.escape(raw) )
+      self.raw_string = raw
 
       # add to by_first_char map
       global by_first_char
       if not raw[0] in by_first_char:
         by_first_char[raw[0]] = []
-      by_first_char[raw[0]].append(m)
+      by_first_char[raw[0]].append(self)
 
     elif pattern:
 
-      m.pattern = re.compile( pattern )
+      self.pattern = re.compile( pattern )
 
       global unkeyed_by_char
-      unkeyed_by_char.append(m)
+      unkeyed_by_char.append(self)
 
     else:
-      m.pattern = None
+      self.pattern = None
 
-    ALL.append(m)
+    ALL.append(self)
 
-  def __str__(m):
-    return m.name
+  def __str__(self):
+    return self.name
 
 
 # symbols
@@ -92,8 +92,8 @@ AND = TokenDef(55, 'and', 'and')
 OR = TokenDef(56, 'or', 'or')
 
 # other types
-INTEGER = TokenDef(70, 'integer', pattern=r"[1-9]+[0-9]*")
-FLOAT = TokenDef(71, 'float', pattern=r"[0-9]*\.[0-9]*")
+FLOAT = TokenDef(70, 'float', pattern=r"[0-9]*\.[0-9]*")
+INTEGER = TokenDef(71, 'integer', pattern=r"[1-9]+[0-9]*")
 IDENT = TokenDef(72, 'ident', pattern=r"[a-zA-Z_\-]+[a-zA-Z0-9_\-]*")
 WHITESPACE = TokenDef(75, 'whitespace', pattern=r"\s+")
 
