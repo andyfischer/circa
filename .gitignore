@@ -3,3 +3,4 @@ build
 *.pyc
 build/*
 .DS_Store
+circa.xcodeproj/andyfischer.*
