@@ -1,7 +1,8 @@
 
 
-import terms
+import term
 import unittest
+from term_state import TermState
 from basefunction import BaseFunction
 
 class SubroutineFunc(BaseFunction):
@@ -18,18 +19,18 @@ class SubroutineFunc(BaseFunction):
 class SubroutineDefinition(object):
   def __init__(m):
     m.input_placeholders = []
-    m.this_placeholder = terms.create(functions.placeholder)
+    m.this_placeholder = term.create(functions.placeholder)
     m.state = SubroutineState()
 
 
   def addInput(m, name):
-    term = terms.create(functions.placeholder)
+    term = term.create(functions.placeholder)
     m.state.putLocal(name, term)
     m.input_placeholders.append(term)
     return term
 
 
-class SubroutineState(terms.TermState):
+class SubroutineState(term.TermState):
   def __init__(m):
     m.locals = {}
     m.main_branch = m.addBranch()

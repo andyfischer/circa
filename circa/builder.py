@@ -1,104 +1,294 @@
-import builtin_functions, terms, circa_module
+import builtin_functions, term, circa_module
+from branch import Branch
+import pdb, unittest
+
+
 
 
 class Builder(object):
-  def __init__(m, module=None):
+  def __init__(self, module=None):
 
-    if module: m.module = module
-    else: m.module = circa_module.CircaModule()
+    if module: self.module = module
+    else: self.module = circa_module.CircaModule()
 
-    m.blockStack = []
+    self.blockStack = []
     
-    sbip = SubroutineBlockInProgress(m, m.module.global_term.state)
-    m.startBlock(sbip)
+    self.startBlock(SubroutineBlock,
+      subroutine_state=self.module.global_term.state)
 
-  def currentBlock(m): return m.blockStack[-1]
-  def currentBranch(m): return m.currentBlock().currentBranch()
+  def currentBlock(self):
+    try: return self.blockStack[-1]
+    except IndexError: return None
 
-  def getLocal(m, name):
-    return m.currentBlock().getLocal(name)
+  def aboveBlock(self):
+    try: return self.blockStack[-2]
+    except IndexError: return None
 
-  def bindLocal(m, name, term):
-    return m.currentBlock().bindLocal(name, term)
+  def upwardsBlockIter(self):
+    index = len(self.blockStack) - 1
+    while index >= 0:
+      yield self.blockStack[index]
+      index -= 1
+  
+  def currentBranch(self): return self.currentBlock().getBranch()
 
-  def startBlock(m, block):
-    m.blockStack.append(block)
-    block.onStart()
+  def findCurrentSubroutine(self):
+    index = len(self.blockStack) -1
 
-  def finishBlock(m):
-    block = m.blockStack[-1]
-    block.onFinish()
-    m.blockStack.pop()
+    while not isinstance(self.blockStack[index], SubroutineBlock):
+      index -= 1
 
-  def createTerm(m, function, **kwargs):
-    return terms.create(function, m.currentBranch(), **kwargs)
+    return self.blockStack[index]
 
-  def createConstant(m, value):
-    return terms.createConstant(value, m.currentBranch())
+  def getNamed(self, name):
+    for block in self.upwardsBlockIter():
+      term = block.getLocal(name)
+      if term: return term
+    return None
+
+  def findDefiningBlock(self, name):
+    for block in self.upwardsBlockIter():
+      term = block.getLocal(name)
+      if term: return block
+    return None
+
+  def bind(self, name, term):
+    defining_block = self.findDefiningBlock(name)
+    block = defining_block if defining_block else self.currentBlock()
+    return block.bindLocal(name, term)
+
+  def startBlock(self, block_class, **kwargs):
+    new_block = block_class(self, **kwargs)
+    self.blockStack.append(new_block)
+    new_block.onStart()
+    return new_block
+
+  def startPlainBlock(self):
+    return self.startBlock(PlainBlock)
+
+  def startConditionalBlock(self, **kwargs):
+    return self.startBlock(ConditionalBlock, **kwargs)
+
+  def closeBlock(self):
+    current_block = self.blockStack[-1]
+    current_block.onFinish()
+    self.blockStack.pop()
+    current_block.afterFinish()
+
+  def createTerm(self, function, name=None, **kwargs):
+    new_term = term.create(function, self.currentBranch(), **kwargs)
+    if name: self.bind(name, new_term)
+    return new_term
+
+  def createConstant(self, value, name=None):
+    new_term = term.createConstant(value, self.currentBranch())
+    if name: self.bind(name, new_term)
+    return new_term
+
+  def createVariable(self, value, name=None):
+    new_term = term.createVariable(value, self.currentBranch())
+    if name: self.bind(name, new_term)
+    return new_term
 
 
+class RebindInfo(object):
+  def __init__(self, name, original, head):
+    self.name = name
+    self.original = original
+    self.head = head
 
 
-class BlockInProgress(object):
-  def __init__(m, builder):
-    m.builder = builder
+class Block(object):
+  def __init__(self, builder):
+    self.builder = builder
+    self.parent = builder.currentBlock()
+    self.term_namespace = {}
+    self.rebinds = []
+    self.external_rebinds = []
 
-  def onStart(m): pass
-  def onFinish(m): pass
+  # virtual functions
+  def onStart(self): pass
+  def onFinish(self): pass
+  def afterFinish(self): pass
+  def onBind(self, name, term): pass
+  def getBranch(self): raise "Need to override"
 
-  def currentBranch(m): return None
+  def parentBlocks(self):
+    block = self.parent
+    while block:
+      yield block
+      block = block.parent
 
-  def getLocal(m, name): return None
+  def findNameInParents(self, name):
+    for block in self.parentBlocks():
+      if block.getLocal(name):
+        return block
+
+  def bindLocal(self, name, term):
+
+    # check if this is already defined locally
+    existing_local_term = self.getLocal(name)
+
+    if existing_local_term:
+      self.rebindLocal(name, term)
+
+    defining_block = self.findNameInParents(name)
+
+    if defining_block:
+
+    if existing_term:
+      if name in self.rebinds:
+        # rebind info exists already
+        self.rebinds[name].head = term
+      else:
+        # create rebind info
+        self.rebinds[name] = RebindInfo(name, existing_term, term)
+
+    self.term_namespace[name] = term
+
+    self.onBind(name, term)
+
+  def rebindLocal(self...
+
+  def getLocal(self, name):
+    try: return self.term_namespace[name]
+    except KeyError: return None
+
+  def findParentSubroutine(self):
+    block = self
+    while not isinstance(block, SubroutineBlock):
+      block = block.parent
+    return block
 
 
-class SubroutineBlockInProgress(BlockInProgress):
-  def __init__(m, builder, sub_state):
-    BlockInProgress.__init__(m,builder)
+class PlainBlock(Block):
+  def getBranch(self):
+    return self.parent.getBranch()
 
-    assert sub_state != None
 
-    m.subroutine_state = sub_state
+class SubroutineBlock(Block):
+  def __init__(self, builder, subroutine_state=None):
+    Block.__init__(self, builder)
 
-    m.statefulTermInfos = {}
+    assert subroutine_state != None
 
-  def currentBranch(m):
-    return m.subroutine_state.branches[0]
+    self.subroutine_state = subroutine_state
 
-  def newStatefulTerm(m, name, initial_value):
-    if m.getLocal(name) != None:
+    self.statefulTermInfos = {}
+
+  def getBranch(self):
+    return self.subroutine_state.branches[0]
+
+  def newStatefulTerm(self, name, initial_value):
+    if self.getLocal(name) != None:
       raise "Term already exists"
 
     class StatefulTermInfo(object): pass
 
     stinfo = StatefulTermInfo()
 
-    stinfo.base = terms.createVariable(initial_value, m.getCurrentBranch())
+    stinfo.base = term.createVariable(initial_value, self.getCurrentBranch())
     stinfo.head = stinfo.base
     stinfo.initial_value = initial_value
 
-    m.statefulTermInfos[name] = stinfo
+    self.statefulTermInfos[name] = stinfo
 
-    m.subroutine_state.putLocal(name, stinfo.base)
+    self.subroutine_state.putLocal(name, stinfo.base)
 
-  def getLocal(m, name):
-    return m.subroutine_state.getLocal(name)
+  def onBind(self, name, term):
+    self.subroutine_state
 
-  def onFinish(m):
+  def onFinish(self):
     # wrap up stateful terms with assign() terms
-    for stinfo in m.statefulTermInfos.values():
+    for stinfo in self.statefulTermInfos.values():
       
       # skip stateful terms that didn't get rebound
       if stinfo.base == stinfo.head:
         continue
 
-      m.builder.createTerm(functions.assign, inputs=[stinfo.base, stinfo.head])
+      self.builder.createTerm(functions.assign, inputs=[stinfo.base, stinfo.head])
+
+class ConditionalBlock(Block):
+  def __init__(self, builder, condition):
+    Block.__init__(self, builder)
+    self.branch = Branch()
+    self.condition_term = condition
+
+  def getBranch(self): return self.branch
+
+  def afterFinish(self):
+    # create a conditional term for any rebinds
+    for rebind_info in self.rebinds.values():
+      cond_term = self.builder.createTerm(builtin_functions.if_expr,
+                    inputs=[ self.condition_term, rebind_info.head, rebind_info.original ])
+      builder.bind(rebind_info.name, cond_term)
+
+def testSimple():
+  b = builder.Builder()
+
+  constant1 = b.createConstant(1)
+  constant2 = b.createConstant(2)
+
+  add = b.createTerm(builtin_functions.add, inputs=[constant1, constant2])
+
+  mod = b.module
+
+  mod.run()
+
+  self.assertTrue(add.value == 3.0 or add.value == 3)
 
 
+class Test(unittest.TestCase):
+  def runTest(self): pass
+
+  def testLocalVars(self):
+    bldr = Builder()
+
+    class FakeTerm(object): pass
+
+    a = FakeTerm()
+    a_alt = FakeTerm()
+    b = FakeTerm()
+
+    bldr.bind("a", a)
+
+    assert bldr.getNamed("a") == a
+
+    bldr.startPlainBlock()
+
+    bldr.bind("a", a_alt)
+    bldr.bind("b", b)
+
+    assert bldr.getNamed("a") == a_alt
+    assert bldr.getNamed("b") == b
+
+    bldr.closeBlock()
+    
+    assert bldr.getNamed("a") == a
+    assert bldr.getNamed("b") == None
+
+  def testConditional(self):
+    bldr = Builder()
+
+    bldr.createConstant(1, name="a")
+    cond = bldr.createConstant(True)
+    bldr.startConditionalBlock(condition=cond)
+    bldr.createConstant(2, name="a")
+    bldr.closeBlock()
+
+    assert int( bldr.getNamed("a") ) == 2
+
+  def testConditional2(self):
+    bldr = Builder()
+
+    bldr.createConstant(1, name="a")
+    cond = bldr.createConstant(False)
+    bldr.startConditionalBlock(condition=cond)
+    bldr.createConstant(2, name="a")
+    bldr.closeBlock()
+
+    assert int( bldr.getNamed("a") ) == 1
 
 
-
-
-
-
-# function shortcuts
-
+if __name__ == '__main__':
+  unittest.main()

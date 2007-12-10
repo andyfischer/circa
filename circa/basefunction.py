@@ -1,22 +1,31 @@
 
+
+
 class BaseFunction(object):
-  def __init__(m):
+  def __init__(self):
     
     # default options
-    m.pureFunction = False
-    m.numBranches = 0
-    m.numTermPointers = 0
-    m.inputType = None
-    m.outputType = None
+    self.name = "undefined"
+    self.pureFunction = False
+    self.numBranches = 0
+    self.numTermPointers = 0
+    self.inputType = None
+    self.outputType = None
 
-    m.init()
+    global nextStaticID
+    self.staticID = nextStaticID
+    nextStaticID += 1
 
-  def init(m):
+    self.init()
+
+  def init(self):
     pass
 
-  def evaluate(m, term):
+  def evaluate(self, term):
     pass
 
-  def makeState(m):
+  def makeState(self):
     return None
 
+
+nextStaticID = 1

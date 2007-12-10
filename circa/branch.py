@@ -1,13 +1,13 @@
 
 
 class Branch(object):
-  def __init__(m):
-    m.terms = []
+  def __init__(self):
+    self.terms = []
 
-  def evaluate(m):
-    for term in m.terms:
+  def evaluate(self):
+    for term in self.terms:
       if term.function:
         term.function.evaluate(term)
 
-  def append(m, term):
-    m.terms.append(term)
+  def append(self, term):
+    self.terms.append(term)

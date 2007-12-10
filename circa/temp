@@ -1,0 +1,4 @@
+import builder
+test = builder.Test()
+
+test.testConditional()

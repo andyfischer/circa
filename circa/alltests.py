@@ -6,9 +6,7 @@ import sys
 sys.path.append('unittests')
 
 modules_to_test = (
-'fooTest',
-'barTest',
-'bazTest',
+'parser',
 )
 
 def suite():

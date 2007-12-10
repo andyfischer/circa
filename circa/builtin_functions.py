@@ -1,4 +1,5 @@
-import terms, subroutine
+import subroutine
+from term_state import TermState
 from basefunction import BaseFunction
 
 
@@ -13,7 +14,7 @@ class CondBranch(BaseFunction):
       term.state.branches[1].evaluate()
 
   def makeState():
-    return terms.TermState(num_branches=2)
+    return TermState(num_branches=2)
 
 class And(BaseFunction):
   def init(m):
@@ -48,10 +49,10 @@ class ConditionalExpression(BaseFunction):
     m.name = "if"
 
   def evaluate(m, term):
-    if term.input[0].value:
-      term.value = term.input[1]
+    if term.inputs[0].value:
+      term.value = term.inputs[1]
     else:
-      term.value = term.input[2]
+      term.value = term.inputs[2]
 
 class Add(BaseFunction):
   def init(m):
@@ -113,12 +114,13 @@ class Variable(BaseFunction):
 
 # global function instances
 
-ADD = Add()
-SUB = Sub()
-MULT = Mult()
-DIV = Div()
-BLEND = Blend()
-CONSTANT = Constant()
-VARIABLE = Variable()
-SUBROUTINE = subroutine.SubroutineFunc()
+add = Add()
+sub = Sub()
+mult = Mult()
+div = Div()
+blend = Blend()
+constant = Constant()
+variable = Variable()
+if_expr = ConditionalExpression()
+subroutine = subroutine.SubroutineFunc()
 
