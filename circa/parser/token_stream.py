@@ -1,4 +1,5 @@
 import token_definitions
+from circa.parser import ParseError
 import types
 
 def defaultSkipFunction(token):
@@ -45,23 +46,23 @@ class TokenStream(object):
     except IndexError:
       return None
 
-  def nextIs(m, match, lookahead=0):
-    next = m.next(lookahead)
+  def nextIs(self, match, lookahead=0):
+    next = self.next(lookahead)
     if not next: return False
     return next.match == match
 
-  def nextIn(m, match, lookahead=0):
-    next = m.next(lookahead)
+  def nextIn(self, match, lookahead=0):
+    next = self.next(lookahead)
     if not next: return False
-    return m.next(lookahead).match in match
+    return self.next(lookahead).match in match
 
-  def consume(m, match=None):
-    token = m.next()
+  def consume(self, match=None):
+    token = self.next()
     if match and token.match != match:
       raise ParseError("Expected: " + str(match), token)
 
     # advance current index
-    m.currentIndex = m.advance(m.currentIndex)
+    self.currentIndex = self.advance(self.currentIndex)
 
     return token
     
