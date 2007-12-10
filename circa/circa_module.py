@@ -11,4 +11,3 @@ class CircaModule(object):
   def run(m):
     m.global_term.evaluate()
 
-

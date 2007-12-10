@@ -1,11 +1,12 @@
 from token_definitions import *
-from token import Token
+from token import Token, toTokenStream
 from token_stream import TokenStream
+from circa.parser import ParseError
 import circa.builtin_functions as builtin_functions
 
-import pdb
+import unittest, pdb
 
-DEBUG_LEVEL = 3
+DEBUG_LEVEL = 0
 
 # AST Classes
 
@@ -18,9 +19,6 @@ class Infix(Node):
     assert isinstance(left, Node)
     assert isinstance(right, Node)
 
-    if not function_token.match in infix_token_to_function:
-      raise "Couldn't find a function for: " + function_token.text
-
     self.token = function_token
     self.left = left
     self.right = right
@@ -29,15 +27,18 @@ class Infix(Node):
 
     # evaluate as a function?
     if self.token.match in infix_token_to_function:
-      return builder.createTerm(self.function, self.left.eval(), self.right.eval())
+      function = infix_token_to_function[self.token.match]
+      return builder.createTerm(function, [self.left.eval(builder), self.right.eval(builder)] )
 
     # evaluate as an assignment?
     if self.token.match == EQUALS:
-      return builder.bindLocal(self.left.name, self.right.eval())
+      return builder.bindLocal(self.left.name, self.right.eval(builder))
 
     # evaluate as a function + assign?
     if self.token.match in infix_token_to_assign_function:
       pass # todo
+
+    raise "Unable to evaluate token: " + self.token.text
 
   def __str__(self):
     return self.function.text + "(" + str(self.left) + "," + str(self.right) + ")"
@@ -46,18 +47,18 @@ class Infix(Node):
 
 # Infix token-to-function map
 infix_token_to_function = {
-    PLUS: builtin_functions.ADD,
-    MINUS: builtin_functions.SUB,
-    STAR: builtin_functions.MULT,
-    SLASH: builtin_functions.DIV
+    PLUS: builtin_functions.add,
+    MINUS: builtin_functions.sub,
+    STAR: builtin_functions.mult,
+    SLASH: builtin_functions.div
 }
 
 # Infix token-to-stateful-function
 infix_token_to_assign_function = {
-    PLUS_EQUALS: builtin_functions.ADD,
-    MINUS_EQUALS: builtin_functions.SUB,
-    STAR_EQUALS: builtin_functions.MULT,
-    SLASH_EQUALS: builtin_functions.DIV
+    PLUS_EQUALS: builtin_functions.add,
+    MINUS_EQUALS: builtin_functions.sub,
+    STAR_EQUALS: builtin_functions.mult,
+    SLASH_EQUALS: builtin_functions.div
 }
 
 
@@ -103,6 +104,9 @@ class Ident(Node):
   def __init__(self, name):
     self.name = name
 
+  def eval(self, builder):
+    return builder.getLocal(self.name)
+
   def __str__(self):
     return self.name
 
@@ -111,19 +115,25 @@ class Unary(Node):
     self.function_token = function_token
     self.right = right
 
-  def eval(m, builder):
+  def eval(self, builder):
     return builder.createTerm(builtin_functions.mult,
                               builder.createConstant(-1),
-                              m.right.eval(builder))
+                              self.right.eval(builder))
 
-  def __str__(m):
-    return m.function.text + "(" + str(m.right) + ")"
+  def __str__(self):
+    return self.function_token.text + "(" + str(self.right) + ")"
+
+class FunctionCall(Node):
+  def __init__(self, function_name, args):
+    self.function_name = function_name
+    self.args = args
 
 
-
+class MatchFailed(Exception):
+  pass
 
 # Expression parsing
-def expression(tokens):
+def parseExpression(tokens):
   return infix_expression(tokens, 0)
 
 def infix_expression(tokens, precedence):
@@ -157,7 +167,7 @@ def atom(tokens):
 
   # function call
   if tokens.nextIs(IDENT) and tokens.nextIs(LPAREN, lookahead=1):
-    return m.function_call()
+    return function_call(tokens)
 
   # literal
   if tokens.nextIn((FLOAT, INTEGER, TRUE, FALSE)):
@@ -166,17 +176,58 @@ def atom(tokens):
 
   # identifier
   if tokens.nextIs(IDENT):
-    pdb.set_trace()
     token = tokens.consume()
     return Ident(token.text)
 
   # parenthesized expression
   if tokens.nextIs(LPAREN):
     tokens.consume(LPAREN)
-    expr = expression(tokens)
+    expr = infix_expression(tokens, 0)
     tokens.consume(RPAREN)
     return expr
-  
-  if DEBUG_LEVEL > 3:
-    print str(tokens.next()) + " is not an atom"
  
+  raise MatchFailed()
+ 
+def function_call(tokens):
+  function_name = tokens.consume(IDENT)
+  tokens.consume(LPAREN)
+
+  args = []
+  args.append( infix_expression(tokens, 0) )
+
+  while tokens.nextIs(COMMA):
+    tokens.consume(COMMA)
+    args.append( infix_expression(tokens, 0) )
+
+  return FunctionCall(function_name, args)
+
+ 
+class Test(unittest.TestCase):
+
+  def testTokenizer(self):
+    tokens = toTokenStream("1 2.0")
+
+    self.assertTrue( tokens.next().match == INTEGER )
+    self.assertTrue( tokens.next(1).match == FLOAT )
+
+    self.assertTrue( tokens.consume().match == INTEGER )
+
+    self.assertTrue( tokens.next().match == FLOAT )
+    self.assertTrue( tokens.consume().match == FLOAT )
+
+  def testAst(self):
+    def parse_to_ast(string):
+      tokens = toTokenStream(string)
+      return parseExpression(tokens)
+
+    node = parse_to_ast("1")
+    self.assertTrue( type(node) == Literal )
+    self.assertTrue( node.value == 1 )
+
+    node = parse_to_ast("1 + 2")
+    self.assertTrue( type(node) == Infix )
+    self.assertTrue( node.token.match == PLUS )
+    
+if __name__ == '__main__':
+  unittest.main()
+

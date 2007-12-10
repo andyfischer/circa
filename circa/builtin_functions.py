@@ -1,4 +1,5 @@
-import terms, subroutine
+import terms
+from subroutine import SubroutineFunc
 from basefunction import BaseFunction
 
 
@@ -113,12 +114,12 @@ class Variable(BaseFunction):
 
 # global function instances
 
-ADD = Add()
-SUB = Sub()
-MULT = Mult()
-DIV = Div()
-BLEND = Blend()
-CONSTANT = Constant()
-VARIABLE = Variable()
-SUBROUTINE = subroutine.SubroutineFunc()
+add = Add()
+sub = Sub()
+mult = Mult()
+div = Div()
+blend = Blend()
+constant = Constant()
+variable = Variable()
+subroutine = SubroutineFunc()
 

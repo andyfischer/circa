@@ -2,103 +2,120 @@ import builtin_functions, terms, circa_module
 
 
 class Builder(object):
-  def __init__(m, module=None):
+  def __init__(self, module=None):
 
-    if module: m.module = module
-    else: m.module = circa_module.CircaModule()
+    if module: self.module = module
+    else: self.module = circa_module.CircaModule()
 
-    m.blockStack = []
+    self.blockStack = []
     
-    sbip = SubroutineBlockInProgress(m, m.module.global_term.state)
-    m.startBlock(sbip)
+    sbip = SubroutineBlock(self, None, self.module.global_term.state)
+    self.startBlock(sbip)
 
-  def currentBlock(m): return m.blockStack[-1]
-  def currentBranch(m): return m.currentBlock().currentBranch()
+  def currentBlock(self): return self.blockStack[-1]
+  def currentBranch(self): return self.currentBlock().currentBranch()
 
-  def getLocal(m, name):
-    return m.currentBlock().getLocal(name)
+  def getLocal(self, name):
+    return self.currentBlock().getLocal(name)
 
-  def bindLocal(m, name, term):
-    return m.currentBlock().bindLocal(name, term)
+  def bindLocal(self, name, term):
+    return self.currentBlock().bindLocal(name, term)
 
-  def startBlock(m, block):
-    m.blockStack.append(block)
+  def startBlock(self, block):
+    self.blockStack.append(block)
     block.onStart()
 
-  def finishBlock(m):
-    block = m.blockStack[-1]
+  def finishBlock(self):
+    block = self.blockStack[-1]
     block.onFinish()
-    m.blockStack.pop()
+    self.blockStack.pop()
 
-  def createTerm(m, function, **kwargs):
-    return terms.create(function, m.currentBranch(), **kwargs)
+  def createTerm(self, function, inputs=None, **kwargs):
+    return terms.create(function, self.currentBranch(), inputs=inputs, **kwargs)
 
-  def createConstant(m, value):
-    return terms.createConstant(value, m.currentBranch())
-
-
+  def createConstant(self, value):
+    return terms.createConstant(value, self.currentBranch())
 
 
-class BlockInProgress(object):
-  def __init__(m, builder):
-    m.builder = builder
+class Block(object):
+  def __init__(self, builder, parent):
+    self.builder = builder
+    self.parent = parent
 
-  def onStart(m): pass
-  def onFinish(m): pass
+  def onStart(self): pass
+  def onFinish(self): pass
+  def currentBranch(self): raise "Need to implement"
+  def getLocal(self, name): raise "Need to implement"
 
-  def currentBranch(m): return None
+  def findParentSubroutine(self):
+    block = self.parent
 
-  def getLocal(m, name): return None
+    while not isinstance(block, SubroutineBlock):
+      block = block.parent
+
+    return block
+
+  def bindLocal(self, name, term):
+    self.findParentSubroutine().bindLocal(name, term)
 
 
-class SubroutineBlockInProgress(BlockInProgress):
-  def __init__(m, builder, sub_state):
-    BlockInProgress.__init__(m,builder)
+class SubroutineBlock(Block):
+  def __init__(self, parent, builder, sub_state):
+    Block.__init__(self, parent, builder)
 
     assert sub_state != None
 
-    m.subroutine_state = sub_state
+    self.subroutine_state = sub_state
 
-    m.statefulTermInfos = {}
+    self.statefulTermInfos = {}
 
-  def currentBranch(m):
-    return m.subroutine_state.branches[0]
+  def currentBranch(self):
+    return self.subroutine_state.branches[0]
 
-  def newStatefulTerm(m, name, initial_value):
-    if m.getLocal(name) != None:
+  def newStatefulTerm(self, name, initial_value):
+    if self.getLocal(name) != None:
       raise "Term already exists"
 
     class StatefulTermInfo(object): pass
 
     stinfo = StatefulTermInfo()
 
-    stinfo.base = terms.createVariable(initial_value, m.getCurrentBranch())
+    stinfo.base = terms.createVariable(initial_value, self.getCurrentBranch())
     stinfo.head = stinfo.base
     stinfo.initial_value = initial_value
 
-    m.statefulTermInfos[name] = stinfo
+    self.statefulTermInfos[name] = stinfo
 
-    m.subroutine_state.putLocal(name, stinfo.base)
+    self.subroutine_state.putLocal(name, stinfo.base)
 
-  def getLocal(m, name):
-    return m.subroutine_state.getLocal(name)
+  def getLocal(self, name):
+    return self.subroutine_state.getLocal(name)
 
-  def onFinish(m):
+  def bindLocal(self, name, term):
+    self.subroutine_state.putLocal(name, term)
+
+  def onFinish(self):
     # wrap up stateful terms with assign() terms
-    for stinfo in m.statefulTermInfos.values():
+    for stinfo in self.statefulTermInfos.values():
       
       # skip stateful terms that didn't get rebound
       if stinfo.base == stinfo.head:
         continue
 
-      m.builder.createTerm(functions.assign, inputs=[stinfo.base, stinfo.head])
+      self.builder.createTerm(functions.assign, inputs=[stinfo.base, stinfo.head])
+
+class ConditionalBlock(Block):
+  def __init__(self, parent, builder):
+    Block.__init__(self, parent, builder)
+   
+    self.branches = [ Branch(), Branch() ]
+    self.currentIndex = 0
+
+  def currentBranch(self):
+    return self.branches[self.currentIndex]
 
 
-
-
-
-
-
-
-# function shortcuts
+class Test(unittest.TestCase):
+  def test1():
+    builder = Builder()
 
