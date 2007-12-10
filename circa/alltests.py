@@ -1,12 +1,13 @@
-
 #!/usr/bin/env python2
 
 import unittest
 import sys
-sys.path.append('unittests')
+# sys.path.append('unittests')
 
 modules_to_test = (
 'parser',
+'parser.expression',
+'builtin_functions_test',
 )
 
 def suite():

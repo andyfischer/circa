@@ -105,7 +105,6 @@ class Block(object):
     self.term_namespace = {}
     self.rebinds = []
     self.external_rebinds = []
-
   # virtual functions
   def onStart(self): pass
   def onFinish(self): pass
@@ -125,10 +124,8 @@ class Block(object):
         return block
 
   def bindLocal(self, name, term):
-
     # check if this is already defined locally
     existing_local_term = self.getLocal(name)
-
     if existing_local_term:
       self.rebindLocal(name, term)
 
@@ -145,7 +142,6 @@ class Block(object):
         self.rebinds[name] = RebindInfo(name, existing_term, term)
 
     self.term_namespace[name] = term
-
     self.onBind(name, term)
 
   def rebindLocal(self...

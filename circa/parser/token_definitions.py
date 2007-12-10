@@ -39,6 +39,17 @@ class TokenDef(object):
   def __str__(self):
     return self.name
 
+  def __eq__(self, other):
+    try:
+      return self.id == other.id
+    except: return False
+
+  def __ne__(self, other):
+    try:
+      return self.id != other.id
+    except: return False
+      
+
 
 # symbols
 LPAREN = TokenDef(1, 'lparen', '(')

@@ -26,4 +26,3 @@ class CircaModule(object):
             stack.append(term)
 
 
-    
