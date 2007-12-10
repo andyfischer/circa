@@ -3,17 +3,17 @@ import token_definitions
 from token_stream import TokenStream
 
 class Token(object):
-  def __init__(m, match, text, line, column):
-    m.match = match
-    m.text = text
-    m.line = line
-    m.column = column
+  def __init__(self, match, text, line, column):
+    self.match = match
+    self.text = text
+    self.line = line
+    self.column = column
 
-  def length(m):
-    return len(m.text)
+  def length(self):
+    return len(self.text)
 
-  def __str__(m):
-    return m.text
+  def __str__(self):
+    return self.text
 
 
 def tokenize(string):
@@ -49,5 +49,5 @@ def tokenize(string):
 
   return output_list
 
-def token_stream(string):
+def toTokenStream(string):
   return TokenStream( tokenize(string) )
