@@ -1,14 +1,29 @@
-import terms, builtin_functions
+import term, builtin_functions, utils.indent_printer
 
 class CircaModule(object):
-  def __init__(m, environment=None):
+  def __init__(self, environment=None):
 
-    m.global_term = terms.create(builtin_functions.subroutine)
-    m.env = environment
+    self.global_term = term.create(builtin_functions.subroutine)
+    self.env = environment
 
-    assert m.global_term.state != None
+    assert self.global_term.state != None
 
-  def run(m):
-    m.global_term.evaluate()
+  def run(self):
+    self.global_term.evaluate()
+
+  def printTerms(self):
+    stack = [ self.global_term ]
+    printer = indent_printer.IndentPrinter()
+
+    while stack:
+      term = stack.pop(0)
+      term.printExtended(printer)
+
+      # add next terms to stack
+      if term.state:
+        for branch in term.state.branches:
+          for term in branch.terms:
+            stack.append(term)
 
 
+    

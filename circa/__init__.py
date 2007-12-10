@@ -1,2 +1,3 @@
 
-__all__ = ['terms', 'functions', 'branch', 'module']
+__all__ = ['branch', 'builtin_functions', 'terms', 'functions', 'module']
+
