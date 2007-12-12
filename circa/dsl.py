@@ -3,6 +3,7 @@ import builtin_functions
 from term import Term
 from basefunction import BaseFunction
 from builder import Builder
+import string
 
 global_builder = Builder()
 
@@ -29,6 +30,7 @@ __all__ = []
 # add it to this module
 for name in dir(builtin_functions):
   obj = getattr(builtin_functions, name)
+  name = string.lower(name)   # lower-case the name
   if isinstance(obj, BaseFunction):
     globals()[name] = wrap(obj)
     __all__.append(name)

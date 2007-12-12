@@ -1,4 +1,12 @@
 
+class ParseError(Exception):
+  def __init__(m, str, token_location):
+    m.str = str
+    m.location = token_location
+
+  def __str__(m): return m.str
+
+
 from token_definitions import *
 import token, expression
 from token_stream import TokenStream
@@ -13,12 +21,6 @@ def parseText(text):
   return parser.module
 
 
-class ParseError(Exception):
-  def __init__(m, str, token_location):
-    m.str = str
-    m.location = token_location
-
-  def __str__(m): return m.str
 
 class Parser(object):
   def __init__(m, module, tokens):

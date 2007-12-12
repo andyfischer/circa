@@ -7,42 +7,60 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		B61BE5F20CEA910400E5C3B0 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = __init__.py; path = src/circa/__init__.py; sourceTree = "<group>"; };
-		B61BE5F40CEA910400E5C3B0 /* branch.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = branch.py; path = src/circa/branch.py; sourceTree = "<group>"; };
-		B61BE5F70CEA910400E5C3B0 /* builder.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = builder.py; path = src/circa/builder.py; sourceTree = "<group>"; };
-		B61BE60D0CEA910400E5C3B0 /* tokenizer.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = tokenizer.py; sourceTree = "<group>"; };
-		B61BE60F0CEA910400E5C3B0 /* subroutine.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = subroutine.py; path = src/circa/subroutine.py; sourceTree = "<group>"; };
-		B61BE6110CEA910400E5C3B0 /* terms.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = terms.py; path = src/circa/terms.py; sourceTree = "<group>"; };
-		B6776B200CEE7CE9004B2B13 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
-		B6776B210CEE7CE9004B2B13 /* blocks.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; path = blocks.py; sourceTree = "<group>"; };
-		B6F9EAB60CFCDF8E00099815 /* builder_test.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = builder_test.py; path = src/circa/builder_test.py; sourceTree = "<group>"; };
-		B6F9EAB70CFCDF8E00099815 /* builtin_functions.py */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.python; name = builtin_functions.py; path = src/circa/builtin_functions.py; sourceTree = "<group>"; };
+		B604BA700D1050D300BA9EB9 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = __init__.py; path = circa/__init__.py; sourceTree = "<group>"; };
+		B604BA720D1050D300BA9EB9 /* alltests.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = alltests.py; path = circa/alltests.py; sourceTree = "<group>"; };
+		B604BA730D1050D300BA9EB9 /* basefunction.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = basefunction.py; path = circa/basefunction.py; sourceTree = "<group>"; };
+		B604BA750D1050D300BA9EB9 /* branch.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = branch.py; path = circa/branch.py; sourceTree = "<group>"; };
+		B604BA770D1050D300BA9EB9 /* builder.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = builder.py; path = circa/builder.py; sourceTree = "<group>"; };
+		B604BA790D1050D300BA9EB9 /* builtin_functions.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = builtin_functions.py; path = circa/builtin_functions.py; sourceTree = "<group>"; };
+		B604BA7B0D1050D300BA9EB9 /* builtin_functions_test.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = builtin_functions_test.py; path = circa/builtin_functions_test.py; sourceTree = "<group>"; };
+		B604BA7C0D1050D300BA9EB9 /* circa_module.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = circa_module.py; path = circa/circa_module.py; sourceTree = "<group>"; };
+		B604BA7E0D1050D300BA9EB9 /* dsl.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = dsl.py; path = circa/dsl.py; sourceTree = "<group>"; };
+		B604BA800D1050D300BA9EB9 /* dsl_test.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = dsl_test.py; path = circa/dsl_test.py; sourceTree = "<group>"; };
+		B604BA8E0D1050D300BA9EB9 /* parser_test.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = parser_test.py; path = circa/parser_test.py; sourceTree = "<group>"; };
+		B604BA8F0D1050D300BA9EB9 /* subroutine.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = subroutine.py; path = circa/subroutine.py; sourceTree = "<group>"; };
+		B604BA910D1050D300BA9EB9 /* temp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = temp; path = circa/temp; sourceTree = "<group>"; };
+		B604BA920D1050D300BA9EB9 /* term.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = term.py; path = circa/term.py; sourceTree = "<group>"; };
+		B604BA940D1050D300BA9EB9 /* term_state.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = term_state.py; path = circa/term_state.py; sourceTree = "<group>"; };
+		B604BA970D1050D300BA9EB9 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
+		B604BA980D1050D300BA9EB9 /* __init__.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = __init__.pyc; sourceTree = "<group>"; };
+		B604BA990D1050D300BA9EB9 /* indent_printer.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = indent_printer.py; sourceTree = "<group>"; };
+		B604BA9A0D1050D300BA9EB9 /* indent_printer.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = indent_printer.pyc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		B604BA960D1050D300BA9EB9 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				B604BA970D1050D300BA9EB9 /* __init__.py */,
+				B604BA980D1050D300BA9EB9 /* __init__.pyc */,
+				B604BA990D1050D300BA9EB9 /* indent_printer.py */,
+				B604BA9A0D1050D300BA9EB9 /* indent_printer.pyc */,
+			);
+			name = utils;
+			path = circa/utils;
+			sourceTree = "<group>";
+		};
 		B61BE59C0CEA88CA00E5C3B0 = {
 			isa = PBXGroup;
 			children = (
-				B61BE5F20CEA910400E5C3B0 /* __init__.py */,
-				B6F9EAB60CFCDF8E00099815 /* builder_test.py */,
-				B6F9EAB70CFCDF8E00099815 /* builtin_functions.py */,
-				B61BE5F40CEA910400E5C3B0 /* branch.py */,
-				B61BE5F70CEA910400E5C3B0 /* builder.py */,
-				B61BE60B0CEA910400E5C3B0 /* parser */,
-				B61BE60F0CEA910400E5C3B0 /* subroutine.py */,
-				B61BE6110CEA910400E5C3B0 /* terms.py */,
+				B604BA700D1050D300BA9EB9 /* __init__.py */,
+				B604BA720D1050D300BA9EB9 /* alltests.py */,
+				B604BA730D1050D300BA9EB9 /* basefunction.py */,
+				B604BA750D1050D300BA9EB9 /* branch.py */,
+				B604BA770D1050D300BA9EB9 /* builder.py */,
+				B604BA790D1050D300BA9EB9 /* builtin_functions.py */,
+				B604BA7B0D1050D300BA9EB9 /* builtin_functions_test.py */,
+				B604BA7C0D1050D300BA9EB9 /* circa_module.py */,
+				B604BA7E0D1050D300BA9EB9 /* dsl.py */,
+				B604BA800D1050D300BA9EB9 /* dsl_test.py */,
+				B604BA8E0D1050D300BA9EB9 /* parser_test.py */,
+				B604BA8F0D1050D300BA9EB9 /* subroutine.py */,
+				B604BA910D1050D300BA9EB9 /* temp */,
+				B604BA920D1050D300BA9EB9 /* term.py */,
+				B604BA940D1050D300BA9EB9 /* term_state.py */,
+				B604BA960D1050D300BA9EB9 /* utils */,
 			);
-			sourceTree = "<group>";
-		};
-		B61BE60B0CEA910400E5C3B0 /* parser */ = {
-			isa = PBXGroup;
-			children = (
-				B6776B200CEE7CE9004B2B13 /* __init__.py */,
-				B6776B210CEE7CE9004B2B13 /* blocks.py */,
-				B61BE60D0CEA910400E5C3B0 /* tokenizer.py */,
-			);
-			name = parser;
-			path = src/circa/parser;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -51,6 +69,7 @@
 		B61BE59E0CEA88CA00E5C3B0 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = B61BE59F0CEA88CA00E5C3B0 /* Build configuration list for PBXProject "circa" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 0;
 			mainGroup = B61BE59C0CEA88CA00E5C3B0;
 			projectDirPath = "";

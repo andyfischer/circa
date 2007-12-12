@@ -42,13 +42,13 @@ class Builder(object):
 
   def getNamed(self, name):
     for block in self.upwardsBlockIter():
-      term = block.getLocal(name)
+      term = block.getLocalName(name)
       if term: return term
     return None
 
   def findDefiningBlock(self, name):
     for block in self.upwardsBlockIter():
-      term = block.getLocal(name)
+      term = block.getLocalName(name)
       if term: return block
     return None
 
@@ -120,22 +120,17 @@ class Block(object):
 
   def findNameInParents(self, name):
     for block in self.parentBlocks():
-      if block.getLocal(name):
+      if block.getLocalName(name):
         return block
 
   def bindLocal(self, name, term):
-    # check if this is already defined locally
-    existing_local_term = self.getLocal(name)
-    if existing_local_term:
-      self.rebindLocal(name, term)
+    # check if this is already defined
 
-    defining_block = self.findNameInParents(name)
-
-    if defining_block:
+    existing_term = self.getName(name)
 
     if existing_term:
       if name in self.rebinds:
-        # rebind info exists already
+        # rebind info exists already, update it
         self.rebinds[name].head = term
       else:
         # create rebind info
@@ -144,9 +139,13 @@ class Block(object):
     self.term_namespace[name] = term
     self.onBind(name, term)
 
-  def rebindLocal(self...
+  def getName(self, name):
+    term = self.getLocalName(name)
+    if term: return term
+    if self.parent: return self.parent.getName(name)
+    return None
 
-  def getLocal(self, name):
+  def getLocalName(self, name):
     try: return self.term_namespace[name]
     except KeyError: return None
 
@@ -176,7 +175,7 @@ class SubroutineBlock(Block):
     return self.subroutine_state.branches[0]
 
   def newStatefulTerm(self, name, initial_value):
-    if self.getLocal(name) != None:
+    if self.getLocalName(name) != None:
       raise "Term already exists"
 
     class StatefulTermInfo(object): pass
@@ -214,8 +213,8 @@ class ConditionalBlock(Block):
 
   def afterFinish(self):
     # create a conditional term for any rebinds
-    for rebind_info in self.rebinds.values():
-      cond_term = self.builder.createTerm(builtin_functions.if_expr,
+    for rebind_info in self.rebinds:
+      cond_term = self.builder.createTerm(builtin_functions.IF_EXPR,
                     inputs=[ self.condition_term, rebind_info.head, rebind_info.original ])
       builder.bind(rebind_info.name, cond_term)
 
@@ -225,7 +224,7 @@ def testSimple():
   constant1 = b.createConstant(1)
   constant2 = b.createConstant(2)
 
-  add = b.createTerm(builtin_functions.add, inputs=[constant1, constant2])
+  add = b.createTerm(builtin_functions.ADD, inputs=[constant1, constant2])
 
   mod = b.module
 
