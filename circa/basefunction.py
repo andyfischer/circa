@@ -12,9 +12,6 @@ class BaseFunction(object):
     self.inputType = None
     self.outputType = None
 
-    global nextStaticID
-    self.staticID = nextStaticID
-    nextStaticID += 1
 
     self.init()
 
@@ -28,4 +25,3 @@ class BaseFunction(object):
     return None
 
 
-nextStaticID = 1

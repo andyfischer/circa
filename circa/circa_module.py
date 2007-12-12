@@ -1,9 +1,11 @@
 import term, builtin_functions, utils.indent_printer
 
+from utils.indent_printer import IndentPrinter
+
 class CircaModule(object):
   def __init__(self, environment=None):
 
-    self.global_term = term.create(builtin_functions.subroutine)
+    self.global_term = term.create(builtin_functions.SUBROUTINE)
     self.env = environment
 
     assert self.global_term.state != None
@@ -13,16 +15,9 @@ class CircaModule(object):
 
   def printTerms(self):
     stack = [ self.global_term ]
-    printer = indent_printer.IndentPrinter()
+    printer = IndentPrinter()
 
-    while stack:
-      term = stack.pop(0)
-      term.printExtended(printer)
-
-      # add next terms to stack
-      if term.state:
-        for branch in term.state.branches:
-          for term in branch.terms:
-            stack.append(term)
+    term = stack.pop(0)
+    term.printExtended(printer)
 
 

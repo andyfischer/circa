@@ -114,13 +114,13 @@ class Variable(BaseFunction):
 
 # global function instances
 
-add = Add()
-sub = Sub()
-mult = Mult()
-div = Div()
-blend = Blend()
-constant = Constant()
-variable = Variable()
-if_expr = ConditionalExpression()
-subroutine = subroutine.SubroutineFunc()
+ADD = Add()
+SUB = Sub()
+MULT = Mult()
+DIV = Div()
+BLEND = Blend()
+CONSTANT = Constant()
+VARIABLE = Variable()
+IF_EXPR = ConditionalExpression()
+SUBROUTINE = subroutine.SubroutineFunc()
 

@@ -1,6 +1,9 @@
 import unittest
 from term_state import TermState
 
+nextStaticID = 1
+
+
 class Term(object):
   def __init__(self, initial_inputs=[]):
 
@@ -9,6 +12,10 @@ class Term(object):
     self.users = set()
     self.value = None
     self.state = None
+
+    global nextStaticID
+    self.staticID = nextStaticID
+    nextStaticID += 1
 
     self.setInputs(initial_inputs)
 
@@ -61,7 +68,28 @@ class Term(object):
     self.function.evaluate(self)
 
   def printExtended(self, printer):
-    printer.write(self.function.name + ": " + str(self.value))
+    printer.println("%i: %s %s" % (self.staticID, self.function.name, str(self.value)))
+    if self.state:
+      label_branches = len(self.state.branches) > 1
+      branch_index = -1
+
+      for branch in self.state.branches:
+        branch_index += 1
+
+        # (maybe) label the branch index
+        if label_branches:
+          printer.indent(1)
+          printer.println('Branch %i:' % branch_index)
+          printer.indent(1)
+        else:
+          printer.indent(2)
+
+        # print inner terms
+        for term in branch.terms:
+          term.printExtended(printer)
+
+        printer.unindent(2)
+
 
   # value accessors
   def __int__(self): return int(self.value)
@@ -101,12 +129,12 @@ def create(func, branch=None, inputs=[], initial_state=None):
 import builtin_functions
 
 def createConstant(value, branch):
-  term = create(builtin_functions.constant, branch)
+  term = create(builtin_functions.CONSTANT, branch)
   term.value = value
   return term
 
 def createVariable(value, branch):
-  term = create(builtin_functions.variable, branch)
+  term = create(builtin_functions.VARIABLE, branch)
   term.value = value
   return term
 
