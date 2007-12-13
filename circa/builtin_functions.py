@@ -52,9 +52,9 @@ class ConditionalExpression(BaseFunction):
 
   def evaluate(self, term):
     if term.inputs[0].value:
-      term.value = term.inputs[1]
+      term.value = term.inputs[1].value
     else:
-      term.value = term.inputs[2]
+      term.value = term.inputs[2].value
 
 class Add(BaseFunction):
   def init(self):
