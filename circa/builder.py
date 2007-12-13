@@ -54,9 +54,10 @@ class Builder(object):
     return None
 
   def bind(self, name, term):
-    defining_block = self.findDefiningBlock(name)
-    block = defining_block if defining_block else self.currentBlock()
-    return block.bindLocal(name, term)
+    #defining_block = self.findDefiningBlock(name)
+    #block = defining_block if defining_block else self.currentBlock()
+    #return block.bindLocal(name, term)
+    self.currentBlock().bindLocal(name, term)
 
   def startBlock(self, block_class, **kwargs):
     new_block = block_class(self, **kwargs)
@@ -93,10 +94,11 @@ class Builder(object):
 
 
 class RebindInfo(object):
-  def __init__(self, name, original, head):
+  def __init__(self, name, original, head, defined_outside):
     self.name = name
     self.original = original
     self.head = head
+    self.defined_outside = defined_outside
 
 
 class Block(object):
@@ -104,8 +106,8 @@ class Block(object):
     self.builder = builder
     self.parent = builder.currentBlock()
     self.term_namespace = {}
-    self.rebinds = []
-    self.external_rebinds = []
+    self.rebinds = {}    # keyed by term name
+
   # virtual functions
   def onStart(self): pass
   def onFinish(self): pass
@@ -128,6 +130,9 @@ class Block(object):
     # check if this is already defined
 
     existing_term = self.getName(name)
+    defined_outside = bool(self.getOutsideName(name))
+
+    # pdb.set_trace()
 
     if existing_term:
       if name in self.rebinds:
@@ -135,7 +140,7 @@ class Block(object):
         self.rebinds[name].head = term
       else:
         # create rebind info
-        self.rebinds[name] = RebindInfo(name, existing_term, term)
+        self.rebinds[name] = RebindInfo(name, existing_term, term, defined_outside)
 
     self.term_namespace[name] = term
     self.onBind(name, term)
@@ -143,12 +148,15 @@ class Block(object):
   def getName(self, name):
     term = self.getLocalName(name)
     if term: return term
-    if self.parent: return self.parent.getName(name)
-    return None
+    return self.getOutsideName(name)
 
   def getLocalName(self, name):
     try: return self.term_namespace[name]
     except KeyError: return None
+
+  def getOutsideName(self, name):
+    if not self.parent: return None
+    return self.parent.getName(name)
 
   def findParentSubroutine(self):
     block = self
@@ -213,11 +221,14 @@ class ConditionalBlock(Block):
   def getBranch(self): return self.branch_term.state.branches[0]
 
   def afterFinish(self):
+    # pdb.set_trace()
     # create a conditional term for any rebinds
-    for rebind_info in self.rebinds:
+    for rebind_info in self.rebinds.values():
+      if not rebind_info.defined_outside: continue
+
       cond_term = self.builder.createTerm(IF_EXPR,
                     inputs=[ self.condition_term, rebind_info.head, rebind_info.original ])
-      builder.bind(rebind_info.name, cond_term)
+      self.builder.bind(rebind_info.name, cond_term)
 
 def testSimple():
   b = builder.Builder()
