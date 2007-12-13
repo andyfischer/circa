@@ -1,9 +1,9 @@
+
+import pdb, unittest
+
 import term, circa_module
 from builtin_functions import *
 from branch import Branch
-import pdb, unittest
-
-
 
 
 class Builder(object):
@@ -230,72 +230,3 @@ class ConditionalBlock(Block):
                     inputs=[ self.condition_term, rebind_info.head, rebind_info.original ])
       self.builder.bind(rebind_info.name, cond_term)
 
-def testSimple():
-  b = builder.Builder()
-
-  constant1 = b.createConstant(1)
-  constant2 = b.createConstant(2)
-
-  add = b.createTerm(ADD, inputs=[constant1, constant2])
-
-  mod = b.module
-
-  mod.run()
-
-  self.assertTrue(add.value == 3.0 or add.value == 3)
-
-
-class Test(unittest.TestCase):
-  def runTest(self): pass
-
-  def testLocalVars(self):
-    bldr = Builder()
-
-    class FakeTerm(object): pass
-
-    a = FakeTerm()
-    a_alt = FakeTerm()
-    b = FakeTerm()
-
-    bldr.bind("a", a)
-
-    assert bldr.getNamed("a") == a
-
-    bldr.startPlainBlock()
-
-    bldr.bind("a", a_alt)
-    bldr.bind("b", b)
-
-    assert bldr.getNamed("a") == a_alt
-    assert bldr.getNamed("b") == b
-
-    bldr.closeBlock()
-    
-    assert bldr.getNamed("a") == a
-    assert bldr.getNamed("b") == None
-
-  def testConditional(self):
-    bldr = Builder()
-
-    bldr.createConstant(1, name="a")
-    cond = bldr.createConstant(True)
-    bldr.startConditionalBlock(condition=cond)
-    bldr.createConstant(2, name="a")
-    bldr.closeBlock()
-
-    assert int( bldr.getNamed("a") ) == 2
-
-  def testConditional2(self):
-    bldr = Builder()
-
-    bldr.createConstant(1, name="a")
-    cond = bldr.createConstant(False)
-    bldr.startConditionalBlock(condition=cond)
-    bldr.createConstant(2, name="a")
-    bldr.closeBlock()
-
-    assert int( bldr.getNamed("a") ) == 1
-
-
-if __name__ == '__main__':
-  unittest.main()

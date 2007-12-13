@@ -13,6 +13,9 @@ bldr.startConditionalBlock(condition=cond)
 new_a = bldr.createTerm(ADD, name='a', inputs=[a,b])
 
 bldr.closeBlock()
-bldr.closeBlock()
 
-bldr.module.printTerms()
+wrapped_a = bldr.getNamed('a')
+
+print wrapped_a
+print wrapped_a.function
+
