@@ -1,4 +1,5 @@
-import builtin_functions, term, circa_module
+import term, circa_module
+from builtin_functions import *
 from branch import Branch
 import pdb, unittest
 
@@ -206,15 +207,15 @@ class SubroutineBlock(Block):
 class ConditionalBlock(Block):
   def __init__(self, builder, condition):
     Block.__init__(self, builder)
-    self.branch = Branch()
     self.condition_term = condition
+    self.branch_term = builder.createTerm(COND_BRANCH, inputs=[self.condition_term])
 
-  def getBranch(self): return self.branch
+  def getBranch(self): return self.branch_term.state.branches[0]
 
   def afterFinish(self):
     # create a conditional term for any rebinds
     for rebind_info in self.rebinds:
-      cond_term = self.builder.createTerm(builtin_functions.IF_EXPR,
+      cond_term = self.builder.createTerm(IF_EXPR,
                     inputs=[ self.condition_term, rebind_info.head, rebind_info.original ])
       builder.bind(rebind_info.name, cond_term)
 
@@ -224,7 +225,7 @@ def testSimple():
   constant1 = b.createConstant(1)
   constant2 = b.createConstant(2)
 
-  add = b.createTerm(builtin_functions.ADD, inputs=[constant1, constant2])
+  add = b.createTerm(ADD, inputs=[constant1, constant2])
 
   mod = b.module
 

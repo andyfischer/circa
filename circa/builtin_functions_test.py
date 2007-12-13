@@ -1,6 +1,7 @@
 
 from basefunction import BaseFunction
-import builtin_functions, builder
+from builder import Builder
+import builtin_functions
 import unittest
 
 

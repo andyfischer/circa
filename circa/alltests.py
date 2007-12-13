@@ -6,7 +6,8 @@ import sys
 
 modules_to_test = (
 'parser',
-'parser.expression',
+'parser_test',
+'expression',
 'builtin_functions_test',
 )
 

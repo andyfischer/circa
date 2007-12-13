@@ -47,18 +47,18 @@ class Infix(Node):
 
 # Infix token-to-function map
 infix_token_to_function = {
-    PLUS: builtin_functions.add,
-    MINUS: builtin_functions.sub,
-    STAR: builtin_functions.mult,
-    SLASH: builtin_functions.div
+    PLUS: builtin_functions.ADD,
+    MINUS: builtin_functions.SUB,
+    STAR: builtin_functions.MULT,
+    SLASH: builtin_functions.DIV
 }
 
 # Infix token-to-stateful-function
 infix_token_to_assign_function = {
-    PLUS_EQUALS: builtin_functions.add,
-    MINUS_EQUALS: builtin_functions.sub,
-    STAR_EQUALS: builtin_functions.mult,
-    SLASH_EQUALS: builtin_functions.div
+    PLUS_EQUALS: builtin_functions.ADD,
+    MINUS_EQUALS: builtin_functions.SUB,
+    STAR_EQUALS: builtin_functions.MULT,
+    SLASH_EQUALS: builtin_functions.DIV
 }
 
 
@@ -116,7 +116,7 @@ class Unary(Node):
     self.right = right
 
   def eval(self, builder):
-    return builder.createTerm(builtin_functions.mult,
+    return builder.createTerm(builtin_functions.MULT,
                               builder.createConstant(-1),
                               self.right.eval(builder))
 

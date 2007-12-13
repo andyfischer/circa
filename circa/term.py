@@ -68,7 +68,22 @@ class Term(object):
     self.function.evaluate(self)
 
   def printExtended(self, printer):
-    printer.println("%i: %s %s" % (self.staticID, self.function.name, str(self.value)))
+    printer.prints("%i: %s" % (self.staticID, self.function.name))
+
+    if self.value:
+      printer.prints(" " + str(self.value))
+
+    printer.prints(" [")
+
+    first_item = True
+    for input in self.inputs:
+      if not first_item: printer.prints(",")
+      printer.prints(input.staticID)
+      first_item = False
+    printer.prints("]")
+
+    printer.println()
+
     if self.state:
       label_branches = len(self.state.branches) > 1
       branch_index = -1
@@ -85,11 +100,13 @@ class Term(object):
           printer.indent(2)
 
         # print inner terms
-        for term in branch.terms:
-          term.printExtended(printer)
+        if branch.terms:
+          for term in branch.terms:
+            term.printExtended(printer)
+        else:
+          printer.println("(empty)")
 
         printer.unindent(2)
-
 
   # value accessors
   def __int__(self): return int(self.value)
