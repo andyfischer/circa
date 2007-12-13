@@ -6,23 +6,25 @@ from basefunction import BaseFunction
 
 # class definitions
 class CondBranch(BaseFunction):
+  def init(self):
+    self.name = "cond_branch"
 
-  def evaluate(m, term):
-    if term.input[0].value:
+  def evaluate(self, term):
+    if term.inputs[0].value:
       term.state.branches[0].evaluate()
     else:
       term.state.branches[1].evaluate()
 
-  def makeState():
+  def makeState(self):
     return TermState(num_branches=2)
 
 class And(BaseFunction):
-  def init(m):
-    m.name = "and"
-    m.inputType = bool
-    m.outputType = bool
+  def init(self):
+    self.name = "and"
+    self.inputType = bool
+    self.outputType = bool
 
-  def evaluate(m, term):
+  def evaluate(self, term):
     for input in term.inputs:
       if not input.value:
         term.value = False
@@ -31,12 +33,12 @@ class And(BaseFunction):
     return
 
 class Or(BaseFunction):
-  def init(m):
-    m.name = "or"
-    m.inputType = bool
-    m.outputType = bool
+  def init(self):
+    self.name = "or"
+    self.inputType = bool
+    self.outputType = bool
 
-  def evaluate(m, term):
+  def evaluate(self, term):
     for input in term.inputs:
       if input.value:
         term.value = True
@@ -45,72 +47,72 @@ class Or(BaseFunction):
     return
 
 class ConditionalExpression(BaseFunction):
-  def init(m):
-    m.name = "if"
+  def init(self):
+    self.name = "if"
 
-  def evaluate(m, term):
+  def evaluate(self, term):
     if term.inputs[0].value:
       term.value = term.inputs[1]
     else:
       term.value = term.inputs[2]
 
 class Add(BaseFunction):
-  def init(m):
-    m.name = "add"
-    m.inputType = float
-    m.outputType = float
+  def init(self):
+    self.name = "add"
+    self.inputType = float
+    self.outputType = float
 
-  def evaluate(m, term):
+  def evaluate(self, term):
     term.value = float(term.inputs[0]) + float(term.inputs[1])
 
 class Sub(BaseFunction):
-  def init(m):
-    m.name = "sub"
-    m.inputType = float
-    m.outputType = float
+  def init(self):
+    self.name = "sub"
+    self.inputType = float
+    self.outputType = float
 
-  def evaluate(m, term):
+  def evaluate(self, term):
     term.value = float(term.inputs[0]) - float(term.inputs[1])
 
 class Mult(BaseFunction):
-  def init(m):
-    m.name = "mult"
-    m.inputType = float
-    m.outputType = float
+  def init(self):
+    self.name = "mult"
+    self.inputType = float
+    self.outputType = float
 
-  def evaluate(m, term):
+  def evaluate(self, term):
     term.value = float(term.inputs[0]) * float(term.inputs[1])
 
 class Div(BaseFunction):
-  def init(m):
-    m.name = "div"
-    m.inputType = float
-    m.outputType = float
+  def init(self):
+    self.name = "div"
+    self.inputType = float
+    self.outputType = float
 
-  def evaluate(m, term):
+  def evaluate(self, term):
     term.value = float(term.inputs[0]) / float(term.inputs[1])
     
 class Blend(BaseFunction):
-  def init(m):
-    m.name = "blend"
-    m.inputType = float
-    m.outputType = float
+  def init(self):
+    self.name = "blend"
+    self.inputType = float
+    self.outputType = float
 
-  def evaluate(m, term):
+  def evaluate(self, term):
     blend_value = float(term.inputs[2])
     term.value = float(term.inputs[0]) * (1 - blend_value) + float(term.inputs[1]) * blend_value
 
 class Placeholder(BaseFunction):
-  def init(m):
-    m.name = "placeholder"
+  def init(self):
+    self.name = "placeholder"
 
 class Constant(BaseFunction):
-  def init(m):
-    m.name = "constant"
+  def init(self):
+    self.name = "constant"
 
 class Variable(BaseFunction):
-  def init(m):
-    m.name = "variable"
+  def init(self):
+    self.name = "variable"
 
 # global function instances
 
@@ -123,4 +125,5 @@ CONSTANT = Constant()
 VARIABLE = Variable()
 IF_EXPR = ConditionalExpression()
 SUBROUTINE = subroutine.SubroutineFunc()
+COND_BRANCH = CondBranch()
 

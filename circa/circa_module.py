@@ -19,5 +19,6 @@ class CircaModule(object):
 
     term = stack.pop(0)
     term.printExtended(printer)
+    printer.println()
 
 
