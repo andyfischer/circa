@@ -5,10 +5,11 @@ import sys
 # sys.path.append('unittests')
 
 modules_to_test = (
-'parser',
-'parser_test',
-'expression',
-'builtin_functions_test',
+  'builtin_functions_test',
+  'builder_test',
+  'expression',
+  'parser_test',
+  'token_test',
 )
 
 def suite():

@@ -39,22 +39,15 @@ def tokenize(string):
   def makeToken(token_def, length):
     return Token(token_def, string[currentIndex : currentIndex+length], currentLine, currentCol)
 
-  def testList(token_def_list):
-    for token_def in token_def_list:
-      match = token_def.pattern.match(string, currentIndex)
-      if match:
-        return makeToken(token_def, match.end() - match.start())
-
-    return None
-
   while currentIndex < len(string):
+    token = None
 
-    # test for tokens that are not keyed by first character
-    token = testList(token_definitions.unkeyed_by_char)
-
-    # test for tokens that *are* keyed
-    if not token:
-      token = testList(token_definitions.by_first_char[string[currentIndex]])
+    # find a matching token
+    for tdef in token_definitions.ALL:
+      match = tdef.pattern.match(string, currentIndex)
+      if match:
+        token = makeToken(tdef, match.end() - match.start())
+        break
 
     # if we didn't find anything, count this character as unrecognized
     if not token:

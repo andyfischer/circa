@@ -8,18 +8,18 @@ class Test(unittest.TestCase):
 
     a = mod['a']
 
-    self.assertTrue(a)
+    self.assertTrue(a != None)
     self.assertTrue(a.function == ADD)
     self.assertTrue(a.value == 3 or a.value == 3.0)
 
   def testConditional(self):
     mod = parser.parseText( """
-      a = True
-      b = 1
-      if (a)
-      {
-        b = 2
-      }
+a = True
+b = 1
+if (a)
+{
+  b = 2
+}
     """)
 
     a = mod['a']
