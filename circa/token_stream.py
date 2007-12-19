@@ -1,3 +1,4 @@
+
 import token_definitions
 from circa.parser import ParseError
 import types
@@ -65,9 +66,3 @@ class TokenStream(object):
     self.currentIndex = self.advance(self.currentIndex)
 
     return token
-    
-    
-
-
-
-

@@ -21,4 +21,10 @@ class CircaModule(object):
     term.printExtended(printer)
     printer.println()
 
+  def getTerm(self, name):
+    return self.global_term.__getitem__(name)
+
+  def __getitem__(self, name):
+    return self.getTerm(name)
+
 
