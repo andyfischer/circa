@@ -60,25 +60,31 @@ class Parser(object):
     # paths[STATE] = self.state_block
     # paths[FOR] = self.for_block
     paths[RBRACE] = self.close_block
+    paths[NEWLINE] = self.new_line
 
-    if self.tokens.next() in paths:
-      paths[self.tokens.next()]()
+    next_token = self.tokens.next()
+
+    if next_token.match in paths:
+      paths[next_token.match]()
       return
 
     # default, parse as expression
     expr = expression.parseExpression(self.tokens)
 
     if not expr:
-      raise ParseError("Could not understand: " + str(self.tokens.next().match), self.tokens.next())
+      #pdb.set_trace()
+      raise ParseError("Couldn't understand (as statement): " + str(next_token.match) + "(" + next_token.match.name + ")", next_token)
 
   def if_statement(self):
     self.tokens.consume(IF)
+    self.tokens.startSkipping(NEWLINE)
+
     self.tokens.consume(LPAREN)
     condition_term = expression.parseExpression(self.tokens)
     cond_block = blocks.ConditionBlock(self, condition_term)
     self.tokens.consume(RPAREN)
 
-    startBlock(cond_block)
+    self.builder.startBlock(cond_block)
 
     self.block_body()
 
@@ -117,8 +123,6 @@ class Parser(object):
 
     self.bind(Terms.RETURN_REF_NAME, expr.eval())
 
-
-
   def for_block(self):
     self.tokens.consume(FOR)
     iterator = self.tokens.consume(IDENT)
@@ -127,6 +131,19 @@ class Parser(object):
     startBlock(blocks.ForBlock(self, iterator.text, list_expression.eval()))
     self.block_body()
 
+  def block_body(self):
+
+    # check for a block bounded with {}s
+    if (self.tokens.nextIs(LBRACKET)):
+      self.tokens.consume(LBRACKET)
+      self.stopSkipping(NEWLINE)
+
+      # when the } comes up, it will trigger closeBlock
+    else:
+      # parse a one-liner with no {}s
+      self.statement()
+      self.closeBlock()
+
   def close_block(self):
     current_block = self.block_stack[-1]
     current_block.onFinish()
@@ -134,7 +151,8 @@ class Parser(object):
     current_block.afterFinish()
     self.previous_block = current_block
 
-
+  def new_line(self):
+    self.tokens.consume(NEWLINE)
 
   
 

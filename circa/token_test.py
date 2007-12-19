@@ -2,6 +2,12 @@
 import token
 import unittest
 from token_definitions import *
+import pdb
+
+def one_token(string):
+  tlist = token.tokenize(string)
+  assert len(tlist) == 1
+  return tlist[0]
 
 class Test(unittest.TestCase):
 
@@ -36,6 +42,10 @@ class Test(unittest.TestCase):
 
   def testFloatFormats(self):
     tokens = token.tokenize("1. .1 2.3 .9999")
+    self.assertEquals(one_token("1.").match, FLOAT)
+    self.assertEquals(one_token(".1").match, FLOAT)
+    self.assertEquals(one_token("2.3").match, FLOAT)
+    self.assertEquals(one_token(".9999").match, FLOAT)
 
     for t in tokens:
       self.assertTrue(t.match == FLOAT or t.match == WHITESPACE)
@@ -43,12 +53,31 @@ class Test(unittest.TestCase):
   def testMultipleLines(self):
     tokens = token.tokenize("1 \n2\n\n   4")
 
-    print map(lambda x: x.match.name, tokens)
-
     for t in tokens:
       if t.match == INTEGER:
         value = int(t.text)
         self.assertEquals(value, t.line)
+
+  def testKeywords(self):
+    tokens = token.tokenize("function state type var if else true false this global for null return and or")
+
+    self.assertEquals(tokens[0].match, FUNCTION)
+    self.assertEquals(tokens[2].match, STATE)
+    self.assertEquals(tokens[4].match, TYPE)
+    self.assertEquals(tokens[6].match, VAR)
+    self.assertEquals(tokens[8].match, IF)
+    self.assertEquals(tokens[10].match, ELSE)
+    self.assertEquals(tokens[12].match, TRUE)
+    self.assertEquals(tokens[14].match, FALSE)
+    self.assertEquals(tokens[16].match, THIS)
+    self.assertEquals(tokens[18].match, GLOBAL)
+    self.assertEquals(tokens[20].match, FOR)
+    self.assertEquals(tokens[22].match, NULL)
+    self.assertEquals(tokens[24].match, RETURN)
+    self.assertEquals(tokens[26].match, AND)
+    self.assertEquals(tokens[28].match, OR)
+    
+
 
 
 if __name__ == '__main__':

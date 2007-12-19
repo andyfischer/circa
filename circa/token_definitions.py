@@ -4,9 +4,6 @@ ALL = []
 
 token_to_name = {}
 
-by_first_char = {}
-unkeyed_by_char = []
-
 
 class TokenDef(object):
   def __init__(self, id, name, raw=None, pattern=None):
@@ -18,18 +15,8 @@ class TokenDef(object):
       self.pattern = re.compile( re.escape(raw) )
       self.raw_string = raw
 
-      # add to by_first_char map
-      global by_first_char
-      if not raw[0] in by_first_char:
-        by_first_char[raw[0]] = []
-      by_first_char[raw[0]].append(self)
-
     elif pattern:
-
       self.pattern = re.compile( pattern )
-
-      global unkeyed_by_char
-      unkeyed_by_char.append(self)
 
     else:
       self.pattern = None
@@ -78,7 +65,6 @@ DOUBLE_EQUALS = TokenDef(23, 'double_equals', '==')
 NOT_EQUALS = TokenDef(24, 'not_equals', '!=')
 EQUALS = TokenDef(25, 'equals', '=')
 COMMA = TokenDef(26, 'comma', ',')
-DOT = TokenDef(27, 'dot', '.')
 QUESTION = TokenDef(28, 'question', '?')
 SEMICOLON = TokenDef(29, 'semicolon', ';')
 POUND = TokenDef(30, 'pound', '#')
@@ -103,10 +89,14 @@ AND = TokenDef(55, 'and', 'and')
 OR = TokenDef(56, 'or', 'or')
 
 # other types
-FLOAT = TokenDef(70, 'float', pattern=r"[0-9]*\.[0-9]*")
+FLOAT = TokenDef(70, 'float',
+    pattern=r"([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)")
 INTEGER = TokenDef(71, 'integer', pattern=r"[1-9]+[0-9]*")
 IDENT = TokenDef(72, 'ident', pattern=r"[a-zA-Z_\-]+[a-zA-Z0-9_\-]*")
 WHITESPACE = TokenDef(75, 'whitespace', pattern=r"[ \t]+")
+
+# this needs to be below FLOAT
+DOT = TokenDef(27, 'dot', '.')
 
 # meta types
 UNRECOGNIZED = TokenDef(74, 'unrecognized', '')

@@ -134,12 +134,14 @@ class MatchFailed(Exception):
 
 # Expression parsing
 def parseExpression(tokens):
+  start_loc = tokens.markLocation()
+
   try:
     return infix_expression(tokens, 0)
   except MatchFailed, e:
-    next_token = tokens.next()
-    token_text = (next_token.text if next_token else "")
-    raise ParseError("Couldn't understand: " + token_text, next_token)
+    # backtrack if we didn't match
+    tokens.restoreMark(start_loc)
+    return None
 
 
 def infix_expression(tokens, precedence):
