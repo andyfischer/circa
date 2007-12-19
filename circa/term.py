@@ -113,6 +113,10 @@ class Term(object):
   def __float__(self): return float(self.value)
   def __str__(self): return str(self.value)
 
+  # member accessor
+  def __getitem__(self, name):
+    return self.state.getLocal(name)
+
 from branch import Branch
 from basefunction import BaseFunction
 

@@ -83,7 +83,7 @@ QUESTION = TokenDef(28, 'question', '?')
 SEMICOLON = TokenDef(29, 'semicolon', ';')
 POUND = TokenDef(30, 'pound', '#')
 EXCLAIMATION = TokenDef(31, 'exclaimation', '!')
-NEWLINE = TokenDef(32, 'newline', '\n')
+NEWLINE = TokenDef(32, 'newline', '\n', pattern=r"\n")
 
 # keywords
 FUNCTION = TokenDef(40, 'function', 'function')
@@ -106,7 +106,7 @@ OR = TokenDef(56, 'or', 'or')
 FLOAT = TokenDef(70, 'float', pattern=r"[0-9]*\.[0-9]*")
 INTEGER = TokenDef(71, 'integer', pattern=r"[1-9]+[0-9]*")
 IDENT = TokenDef(72, 'ident', pattern=r"[a-zA-Z_\-]+[a-zA-Z0-9_\-]*")
-WHITESPACE = TokenDef(75, 'whitespace', pattern=r"\s+")
+WHITESPACE = TokenDef(75, 'whitespace', pattern=r"[ \t]+")
 
 # meta types
 UNRECOGNIZED = TokenDef(74, 'unrecognized', '')

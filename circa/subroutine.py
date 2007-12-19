@@ -36,9 +36,6 @@ class SubroutineState(term.TermState):
     m.main_branch = m.addBranch()
 
   def putLocal(m, name, term):
-    if name in m.locals:
-      raise "Local with name " + str(name) + " already exists"
-
     m.locals[name] = term
 
   def getLocal(m, name):

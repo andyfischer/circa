@@ -1,10 +1,14 @@
 
 class ParseError(Exception):
-  def __init__(self, str, token_location):
-    self.str = str
+  def __init__(self, text, token_location):
+    self.text = str(text)
     self.location = token_location
 
-  def __str__(self): return self.str
+  def fullDescription(self):
+    return "(line " + str(self.location.line) + ", col " + \
+        str(self.location.column) + ") " + self.text
+
+  def __str__(self): return self.text
 
 
 from token_definitions import *
@@ -12,6 +16,7 @@ import token, expression
 from token_stream import TokenStream
 from circa.circa_module import CircaModule
 from circa.builder import Builder
+import pdb
 
 DEBUG_LEVEL = 4
 
@@ -19,7 +24,6 @@ def parseText(text):
   tokens = token.toTokenStream(text)
   parser = Parser(CircaModule(), tokens)
   return parser.module
-
 
 
 class Parser(object):
@@ -35,9 +39,9 @@ class Parser(object):
     while not self.tokens.finished():
       try:
         self.statement()
-      except ParseError, err:
-        self.parse_errors.append(err)
-        print "[parse error] " + str(err)
+      except ParseError, e:
+        self.parse_errors.append(e)
+        print "[parse error] " + e.fullDescription()
         self.tokens.consume()
 
   def bind(self, name, term):
@@ -45,7 +49,6 @@ class Parser(object):
     self.currentBlock().putReference(name, term)
     if existing:
       self.currentBlock().handleRebind(name, existing, term)
-
 
   def statement(self):
     paths = {}
@@ -71,7 +74,7 @@ class Parser(object):
   def if_statement(self):
     self.tokens.consume(IF)
     self.tokens.consume(LPAREN)
-    condition_term = self.expression().eval()
+    condition_term = expression.parseExpression(self.tokens)
     cond_block = blocks.ConditionBlock(self, condition_term)
     self.tokens.consume(RPAREN)
 

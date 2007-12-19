@@ -1,7 +1,7 @@
 from token_definitions import *
 from token import Token, toTokenStream
 from token_stream import TokenStream
-from circa.parser import ParseError
+from parser import ParseError
 import circa.builtin_functions as builtin_functions
 
 import unittest, pdb
@@ -134,7 +134,13 @@ class MatchFailed(Exception):
 
 # Expression parsing
 def parseExpression(tokens):
-  return infix_expression(tokens, 0)
+  try:
+    return infix_expression(tokens, 0)
+  except MatchFailed, e:
+    next_token = tokens.next()
+    token_text = (next_token.text if next_token else "")
+    raise ParseError("Couldn't understand: " + token_text, next_token)
+
 
 def infix_expression(tokens, precedence):
   if (precedence > HIGHEST_INFIX_PRECEDENCE):

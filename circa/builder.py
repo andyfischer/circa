@@ -200,7 +200,7 @@ class SubroutineBlock(Block):
     self.subroutine_state.putLocal(name, stinfo.base)
 
   def onBind(self, name, term):
-    self.subroutine_state
+    self.subroutine_state.putLocal(name, term)
 
   def onFinish(self):
     # wrap up stateful terms with assign() terms
