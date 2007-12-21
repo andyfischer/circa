@@ -1,12 +1,24 @@
 
-import pdb, unittest
+import pdb
+import unittest
 
-import term, circa_module
+import circa_module
+import parser
+import term
 from builtin_functions import *
 from branch import Branch
+from term import Term
 
 
 class Builder(object):
+  """
+  The Builder class has several helper methods to create terms
+  on a CircaModule.
+
+  This class retains some information about the current context,
+  including nested blocks.
+  """
+
   def __init__(self, module=None):
 
     if module: self.module = module
@@ -17,40 +29,13 @@ class Builder(object):
     self.startBlock(SubroutineBlock,
       subroutine_state=self.module.global_term.state)
 
-  def currentBlock(self):
-    try: return self.blockStack[-1]
-    except IndexError: return None
-
-  def aboveBlock(self):
-    try: return self.blockStack[-2]
-    except IndexError: return None
-
-  def upwardsBlockIter(self):
-    index = len(self.blockStack) - 1
-    while index >= 0:
-      yield self.blockStack[index]
-      index -= 1
-  
-  def currentBranch(self): return self.currentBlock().getBranch()
-
-  def findCurrentSubroutine(self):
-    index = len(self.blockStack) -1
-
-    while not isinstance(self.blockStack[index], SubroutineBlock):
-      index -= 1
-
-    return self.blockStack[index]
+  def eval(self, source):
+    parser.parse(self, source)
 
   def getNamed(self, name):
     for block in self.upwardsBlockIter():
       term = block.getLocalName(name)
       if term: return term
-    return None
-
-  def findDefiningBlock(self, name):
-    for block in self.upwardsBlockIter():
-      term = block.getLocalName(name)
-      if term: return block
     return None
 
   def bind(self, name, term):
@@ -91,6 +76,37 @@ class Builder(object):
     new_term = term.createVariable(value, self.currentBranch())
     if name: self.bind(name, new_term)
     return new_term
+    
+  def currentBlock(self):
+    try: return self.blockStack[-1]
+    except IndexError: return None
+
+  def aboveBlock(self):
+    try: return self.blockStack[-2]
+    except IndexError: return None
+
+  def upwardsBlockIter(self):
+    index = len(self.blockStack) - 1
+    while index >= 0:
+      yield self.blockStack[index]
+      index -= 1
+  
+  def currentBranch(self): return self.currentBlock().getBranch()
+
+  def findCurrentSubroutine(self):
+    index = len(self.blockStack) -1
+
+    while not isinstance(self.blockStack[index], SubroutineBlock):
+      index -= 1
+
+    return self.blockStack[index]
+
+  def findDefiningBlock(self, name):
+    for block in self.upwardsBlockIter():
+      term = block.getLocalName(name)
+      if term: return block
+    return None
+
 
 
 class RebindInfo(object):
@@ -131,8 +147,6 @@ class Block(object):
 
     existing_term = self.getName(name)
     defined_outside = bool(self.getOutsideName(name))
-
-    # pdb.set_trace()
 
     if existing_term:
       if name in self.rebinds:
@@ -215,6 +229,9 @@ class SubroutineBlock(Block):
 class ConditionalBlock(Block):
   def __init__(self, builder, condition):
     Block.__init__(self, builder)
+
+    assert isinstance(condition, Term)
+
     self.condition_term = condition
     self.branch_term = builder.createTerm(COND_BRANCH, inputs=[self.condition_term])
 

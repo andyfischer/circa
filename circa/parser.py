@@ -1,41 +1,36 @@
 
-class ParseError(Exception):
-  def __init__(self, text, token_location):
-    self.text = str(text)
-    self.location = token_location
-
-  def fullDescription(self):
-    return "(line " + str(self.location.line) + ", col " + \
-        str(self.location.column) + ") " + self.text
-
-  def __str__(self): return self.text
-
+import pdb
 
 from token_definitions import *
 import token, expression
+from term import Term
+import token_stream
 from token_stream import TokenStream
-from circa.circa_module import CircaModule
-from circa.builder import Builder
-import pdb
+from circa_module import CircaModule
+from parse_error import ParseError
 
 DEBUG_LEVEL = 4
 
-def parseText(text):
-  tokens = token.toTokenStream(text)
-  parser = Parser(CircaModule(), tokens)
-  return parser.module
-
+def parse(builder, source):
+  tokens = token_stream.asTokenStream(source)
+  parser = Parser(builder, tokens)
+  parser.run()
 
 class Parser(object):
-  def __init__(self, module, tokens):
-    self.module = module
-    self.builder = Builder(module)
-    self.tokens = tokens
+  def __init__(self, builder, tokens):
+    self.builder = builder
     self.block_stack = []
     self.parse_errors = []
     self.raise_errors = False
     self.previous_block = None
+
+    # convert 'tokens' into a TokenStream
+    if not isinstance(tokens, TokenStream):
+      tokens = TokenStream(tokens)
+
+    self.tokens = tokens
     
+  def run(self):
     while not self.tokens.finished():
       try:
         self.statement()
@@ -80,8 +75,16 @@ class Parser(object):
     self.tokens.startSkipping(NEWLINE)
 
     self.tokens.consume(LPAREN)
-    condition_term = expression.parseExpression(self.tokens)
-    cond_block = blocks.ConditionBlock(self, condition_term)
+
+    # parse the condition expression
+    first_condition_token = self.tokens.next()
+    condition_expr = expression.parseExpression(self.tokens)
+    condition_term = condition_expr.eval(self.builder)
+
+    if condition_term == None:
+      raise ParseError("Expected expression", first_condition_token)
+    
+    cond_block = self.builder.startConditionalBlock(condition=condition_term)
     self.tokens.consume(RPAREN)
 
     self.builder.startBlock(cond_block)
@@ -121,7 +124,7 @@ class Parser(object):
     if not expr:
       raise ParseError("Expected expression", return_token)
 
-    self.bind(Terms.RETURN_REF_NAME, expr.eval())
+    self.bind(Term.RETURN_REF_NAME, expr.eval())
 
   def for_block(self):
     self.tokens.consume(FOR)

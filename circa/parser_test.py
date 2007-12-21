@@ -1,10 +1,11 @@
 import parser
 import unittest
+import circa_module
 from builtin_functions import *
 
 class Test(unittest.TestCase):
   def testSimple(self):
-    mod = parser.parseText("a = 1 + 2")
+    mod = circa_module.fromSource("a = 1 + 2")
 
     a = mod['a']
 
@@ -13,7 +14,7 @@ class Test(unittest.TestCase):
     self.assertTrue(a.value == 3 or a.value == 3.0)
 
   def testConditional(self):
-    mod = parser.parseText( """
+    mod = circa_module.fromSource( """
 a = True
 b = 1
 if (a)

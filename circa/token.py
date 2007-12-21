@@ -1,6 +1,5 @@
 
 import token_definitions
-from token_stream import TokenStream
 
 class Token(object):
   """
@@ -65,6 +64,3 @@ def tokenize(string):
 
 
   return output_list
-
-def toTokenStream(string):
-  return TokenStream( tokenize(string) )

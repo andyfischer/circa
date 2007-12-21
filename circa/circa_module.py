@@ -1,4 +1,7 @@
-import term, builtin_functions, utils.indent_printer
+import builder
+import builtin_functions
+import term
+import utils.indent_printer
 
 from utils.indent_printer import IndentPrinter
 
@@ -9,6 +12,9 @@ class CircaModule(object):
     self.env = environment
 
     assert self.global_term.state != None
+
+  def startBuilder(self):
+    return builder.Builder(self)
 
   def run(self):
     self.global_term.evaluate()
@@ -27,4 +33,7 @@ class CircaModule(object):
   def __getitem__(self, name):
     return self.getTerm(name)
 
-
+def fromSource(source):
+  module = CircaModule()
+  builder = module.startBuilder()
+  builder.eval(source)
