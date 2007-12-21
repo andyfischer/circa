@@ -1,15 +1,34 @@
-from token_definitions import *
-from token import Token, toTokenStream
-from token_stream import TokenStream
-from parser import ParseError
-import circa.builtin_functions as builtin_functions
+import unittest
+import pdb
 
-import unittest, pdb
+import builtin_functions
+from token_definitions import *
+from token import Token
+from token_stream import TokenStream
+from parse_error import ParseError
 
 DEBUG_LEVEL = 0
 
-# AST Classes
+# Expression parsing
+def parseExpression(tokens):
+  # If 'tokens' is not a TokenStream then try to convert it
+  if not isinstance(tokens, TokenStream):
+    tokens = TokenStream(tokens)
 
+  # Mark the start location for backtracking
+  start_loc = tokens.markLocation()
+
+  try:
+    return infix_expression(tokens, 0)
+  except MatchFailed, e:
+    # Backtrack if we didn't match
+    tokens.restoreMark(start_loc)
+    return None
+
+# Alias for parseExpression
+parse = parseExpression
+
+# AST Classes
 class Node(object):
   pass
 
@@ -105,7 +124,7 @@ class Ident(Node):
     self.name = name
 
   def eval(self, builder):
-    return builder.getLocal(self.name)
+    return builder.getNamed(self.name)
 
   def __str__(self):
     return self.name
@@ -131,17 +150,6 @@ class FunctionCall(Node):
 
 class MatchFailed(Exception):
   pass
-
-# Expression parsing
-def parseExpression(tokens):
-  start_loc = tokens.markLocation()
-
-  try:
-    return infix_expression(tokens, 0)
-  except MatchFailed, e:
-    # backtrack if we didn't match
-    tokens.restoreMark(start_loc)
-    return None
 
 
 def infix_expression(tokens, precedence):
@@ -210,32 +218,4 @@ def function_call(tokens):
   return FunctionCall(function_name, args)
 
  
-class Test(unittest.TestCase):
-
-  def testTokenizer(self):
-    tokens = toTokenStream("1 2.0")
-
-    self.assertTrue( tokens.next().match == INTEGER )
-    self.assertTrue( tokens.next(1).match == FLOAT )
-
-    self.assertTrue( tokens.consume().match == INTEGER )
-
-    self.assertTrue( tokens.next().match == FLOAT )
-    self.assertTrue( tokens.consume().match == FLOAT )
-
-  def testAst(self):
-    def parse_to_ast(string):
-      tokens = toTokenStream(string)
-      return parseExpression(tokens)
-
-    node = parse_to_ast("1")
-    self.assertTrue( type(node) == Literal )
-    self.assertTrue( node.value == 1 )
-
-    node = parse_to_ast("1 + 2")
-    self.assertTrue( type(node) == Infix )
-    self.assertTrue( node.token.match == PLUS )
-    
-if __name__ == '__main__':
-  unittest.main()
 

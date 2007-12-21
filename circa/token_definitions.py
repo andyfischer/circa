@@ -4,7 +4,6 @@ ALL = []
 
 token_to_name = {}
 
-
 class TokenDef(object):
   def __init__(self, id, name, raw=None, pattern=None):
     self.id = id
@@ -35,7 +34,8 @@ class TokenDef(object):
     try:
       return self.id != other.id
     except: return False
-      
+ 
+# All the token definitions
 
 
 # symbols
