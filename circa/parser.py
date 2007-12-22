@@ -63,12 +63,14 @@ class Parser(object):
       paths[next_token.match]()
       return
 
-    # default, parse as expression
+    # otherwise, parse as expression
     expr = expression.parseExpression(self.tokens)
+    if expr:
+      expr.eval(self.builder)
+      return
 
-    if not expr:
-      #pdb.set_trace()
-      raise ParseError("Couldn't understand (as statement): " + str(next_token.match) + "(" + next_token.match.name + ")", next_token)
+    # if we got this far then we don't know what the hell to do
+    raise ParseError("Couldn't understand (as statement): " + str(next_token.match) + "(" + next_token.match.name + ")", next_token)
 
   def if_statement(self):
     self.tokens.consume(IF)
