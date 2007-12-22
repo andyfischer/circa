@@ -1,7 +1,6 @@
 
 import pdb
 import unittest
-
 import circa_module
 import parser
 import term
@@ -106,7 +105,6 @@ class Builder(object):
       term = block.getLocalName(name)
       if term: return block
     return None
-
 
 
 class RebindInfo(object):

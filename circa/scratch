@@ -1,0 +1,18 @@
+import pdb
+from utils.spy_object import SpyObject
+from builder import Builder
+import parser
+import utils.spy as spy
+
+bldr = Builder()
+fakebldr = SpyObject(bldr)
+
+parser.parse(fakebldr, "1+2")
+
+class Test(object):
+  def return1(self):
+    return 1
+
+
+test = Test()
+spy.printCall(test, 'return1')
