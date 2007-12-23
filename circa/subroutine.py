@@ -1,7 +1,4 @@
-
-
 import term
-import unittest
 from term_state import TermState
 from basefunction import BaseFunction
 
@@ -45,11 +42,3 @@ class SubroutineState(term.TermState):
       return m.locals[name]
 
 
-class Test(unittest.TestCase):
-  def test1(m):
-    f = SubroutineFunc()
-    s = SubroutineState()
-    d = SubroutineDefinition()
-
-if __name__ == '__main__':
-    unittest.main()

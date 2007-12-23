@@ -1,7 +1,8 @@
 
 import pdb, unittest
 
-import term, circa_module
+import term
+import circa_module
 from builder import Builder
 from builtin_functions import *
 from branch import Branch
@@ -25,7 +26,7 @@ class Test(unittest.TestCase):
   def testLocalVars(self):
     bldr = Builder()
 
-    class FakeTerm(object): pass
+    class FakeTerm(term.Term): pass
 
     a = FakeTerm()
     a_alt = FakeTerm()

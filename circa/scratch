@@ -5,14 +5,8 @@ import parser
 import utils.spy as spy
 
 bldr = Builder()
-fakebldr = SpyObject(bldr)
+spy.printAllCalls(bldr)
 
-parser.parse(fakebldr, "1+2")
+bldr.getNamed('name')
 
-class Test(object):
-  def return1(self):
-    return 1
-
-
-test = Test()
-spy.printCall(test, 'return1')
+parser.parse(bldr, "1+2")

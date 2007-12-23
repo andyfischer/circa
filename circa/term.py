@@ -1,4 +1,3 @@
-import unittest
 from term_state import TermState
 
 nextStaticID = 1

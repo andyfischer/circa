@@ -7,7 +7,8 @@ import sys
 modules_to_test = (
   'builtin_functions_test',
   'builder_test',
-  'expression',
+  'dsl_test',
+  'expression_test',
   'parser_test',
   'token_test',
 )

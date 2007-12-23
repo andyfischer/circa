@@ -1,13 +1,12 @@
 
 from expression import *
 import unittest
-
-def t
+import token_stream
 
 class Test(unittest.TestCase):
   def testAst(self):
     def parse_to_ast(string):
-      tokens = toTokenStream(string)
+      tokens = token_stream.asTokenStream(string)
       return parseExpression(tokens)
 
     node = parse_to_ast("1")
@@ -19,3 +18,5 @@ class Test(unittest.TestCase):
     self.assertTrue( node.token.match == PLUS )
     
 
+if __name__ == '__main__':
+    unittest.main()

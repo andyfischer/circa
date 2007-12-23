@@ -22,7 +22,7 @@ def wrap(func):
     term.evaluate()
     return term
 
-  return apply
+  return wrapped_circa_func
 
 __all__ = []
 

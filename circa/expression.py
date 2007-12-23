@@ -1,4 +1,3 @@
-import unittest
 import pdb
 
 import builtin_functions
@@ -47,11 +46,11 @@ class Infix(Node):
     # evaluate as a function?
     if self.token.match in infix_token_to_function:
       function = infix_token_to_function[self.token.match]
-      return builder.createTerm(function, [self.left.eval(builder), self.right.eval(builder)] )
+      return builder.createTerm(function, inputs=[self.left.eval(builder), self.right.eval(builder)] )
 
     # evaluate as an assignment?
     if self.token.match == EQUALS:
-      return builder.bindLocal(self.left.name, self.right.eval(builder))
+      return builder.bind(self.left.name, self.right.eval(builder))
 
     # evaluate as a function + assign?
     if self.token.match in infix_token_to_assign_function:
