@@ -6,7 +6,6 @@ import token, expression
 from term import Term
 import token_stream
 from token_stream import TokenStream
-from circa_module import CircaModule
 from parse_error import ParseError
 
 DEBUG_LEVEL = 4

@@ -1,5 +1,5 @@
 
-from quick_builder import *
+from dsl import *
 import unittest
 
 class Test(unittest.TestCase):

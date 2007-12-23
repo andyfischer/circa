@@ -1,6 +1,5 @@
 
 import pdb
-import unittest
 import circa_module
 import parser
 import term
@@ -38,9 +37,9 @@ class Builder(object):
     return None
 
   def bind(self, name, term):
-    #defining_block = self.findDefiningBlock(name)
-    #block = defining_block if defining_block else self.currentBlock()
-    #return block.bindLocal(name, term)
+    assert isinstance(name, str)
+    assert isinstance(term, Term)
+
     self.currentBlock().bindLocal(name, term)
 
   def startBlock(self, block_class, **kwargs):
@@ -63,7 +62,11 @@ class Builder(object):
 
   def createTerm(self, function, name=None, **kwargs):
     new_term = term.create(function, self.currentBranch(), **kwargs)
-    if name: self.bind(name, new_term)
+
+    if name:
+      assert isinstance(name, str)
+      self.bind(name, new_term)
+
     return new_term
 
   def createConstant(self, value, name=None):
@@ -141,6 +144,9 @@ class Block(object):
         return block
 
   def bindLocal(self, name, term):
+    assert isinstance(name, str)
+    assert isinstance(term, Term)
+
     # check if this is already defined
 
     existing_term = self.getName(name)

@@ -1,13 +1,16 @@
+import pdb
+import circa_types
+import function_signature
 import subroutine
 from term_state import TermState
 from basefunction import BaseFunction
-
 
 
 # class definitions
 class CondBranch(BaseFunction):
   def init(self):
     self.name = "cond_branch"
+    self.signature = function_signature.specific(bool)
 
   def evaluate(self, term):
     if term.inputs[0].value:
@@ -30,7 +33,6 @@ class And(BaseFunction):
         term.value = False
         return
     term.value = True
-    return
 
 class Or(BaseFunction):
   def init(self):
@@ -44,7 +46,6 @@ class Or(BaseFunction):
         term.value = True
         return
     term.value = False
-    return
 
 class ConditionalExpression(BaseFunction):
   def init(self):
