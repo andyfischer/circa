@@ -1,6 +1,6 @@
 import pdb
-
 import builtin_functions
+import term
 from token_definitions import *
 from token import Token
 from token_stream import TokenStream
@@ -29,7 +29,11 @@ parse = parseExpression
 
 # AST Classes
 class Node(object):
-  pass
+  def eval(self, builder):
+    raise "Need to implement this"
+
+  def getFirstToken(self):
+    raise "Need to implement this"
 
 class Infix(Node):
   def __init__(self, function_token, left, right):
@@ -50,13 +54,20 @@ class Infix(Node):
 
     # evaluate as an assignment?
     if self.token.match == EQUALS:
-      return builder.bind(self.left.name, self.right.eval(builder))
+      right_term = self.right.eval(builder)
+      if not isinstance(right_term, term.Term):
+        pdb.set_trace()
+        raise ParseError("Expression did not evaluate to a term: " + str(self.right), self.getFirstToken())
+      return builder.bind(self.left.getName(), right_term)
 
     # evaluate as a function + assign?
     if self.token.match in infix_token_to_assign_function:
       pass # todo
 
     raise "Unable to evaluate token: " + self.token.text
+
+  def getFirstToken(self):
+    return self.left.getFirstToken()
 
   def __str__(self):
     return self.function.text + "(" + str(self.left) + "," + str(self.right) + ")"
@@ -100,6 +111,7 @@ def getInfixPrecedence(token):
 
 class Literal(Node):
   def __init__(self, token):
+    self.token = token
 
     if token.match == FLOAT:
       self.value = float(token.text)
@@ -115,18 +127,32 @@ class Literal(Node):
   def eval(self, builder):
     return builder.createConstant(self.value)
 
+  def getFirstToken(self):
+    return self.token
+
   def __str__(self):
     return str(self.value)
 
 class Ident(Node):
-  def __init__(self, name):
-    self.name = name
+  def __init__(self, token):
+    self.token = token
 
   def eval(self, builder):
-    return builder.getNamed(self.name)
+    term = builder.getNamed(self.token.text)
+
+    if not term:
+      raise ParseError("Identifier not found: " + str(self.token.text), self.token)
+
+    return builder.getNamed(self.token.text)
+
+  def getFirstToken(self):
+    return self.token
+
+  def getName(self):
+    return self.token.text
 
   def __str__(self):
-    return self.name
+    return self.token.text
 
 class Unary(Node):
   def __init__(self, function_token, right):
@@ -138,6 +164,9 @@ class Unary(Node):
                               builder.createConstant(-1),
                               self.right.eval(builder))
 
+  def getFirstToken(self):
+    return self.function_token;
+
   def __str__(self):
     return self.function_token.text + "(" + str(self.right) + ")"
 
@@ -146,6 +175,8 @@ class FunctionCall(Node):
     self.function_name = function_name
     self.args = args
 
+  def getFirstToken(self):
+    return self.function_name;
 
 class MatchFailed(Exception):
   pass
@@ -192,7 +223,7 @@ def atom(tokens):
   # identifier
   if tokens.nextIs(IDENT):
     token = tokens.consume()
-    return Ident(token.text)
+    return Ident(token)
 
   # parenthesized expression
   if tokens.nextIs(LPAREN):

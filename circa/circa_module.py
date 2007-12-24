@@ -37,3 +37,4 @@ def fromSource(source):
   module = CircaModule()
   builder = module.startBuilder()
   builder.eval(source)
+  return module

@@ -7,6 +7,7 @@ import sys
 modules_to_test = (
   'builtin_functions_test',
   'builder_test',
+  'circa_module_test',
   'dsl_test',
   'expression_test',
   'parser_test',
