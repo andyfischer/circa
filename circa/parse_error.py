@@ -5,9 +5,10 @@ class ParseError(Exception):
     self.location = token_location
 
   def fullDescription(self):
-    return "(line " + str(self.location.line) + ", col " + \
-        str(self.location.column) + ") " + self.text
+    return str(self)
 
-  def __str__(self): return self.text
+  def __str__(self):
+    return "(line " + str(self.location.line) + ":" + \
+        str(self.location.column) + ") " + self.text
 
 

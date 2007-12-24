@@ -23,6 +23,7 @@ class Builder(object):
     else: self.module = circa_module.CircaModule()
 
     self.blockStack = []
+    self.previousBlock = None
     
     self.startBlock(SubroutineBlock,
       subroutine_state=self.module.global_term.state)
@@ -33,7 +34,9 @@ class Builder(object):
   def getNamed(self, name):
     for block in self.upwardsBlockIter():
       term = block.getLocalName(name)
-      if term: return term
+
+      if term: 
+        return term
     return None
 
   def bind(self, name, term):
@@ -59,6 +62,10 @@ class Builder(object):
     current_block.onFinish()
     self.blockStack.pop()
     current_block.afterFinish()
+    self.previousBlock = current_block
+
+  def blockDepth(self):
+    return len(self.blockStack)
 
   def createTerm(self, function, name=None, **kwargs):
     new_term = term.create(function, self.currentBranch(), **kwargs)
@@ -169,8 +176,10 @@ class Block(object):
     return self.getOutsideName(name)
 
   def getLocalName(self, name):
-    try: return self.term_namespace[name]
-    except KeyError: return None
+    try:
+      return self.term_namespace[name]
+    except KeyError:
+      return None
 
   def getOutsideName(self, name):
     if not self.parent: return None

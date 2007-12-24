@@ -4,6 +4,9 @@ import circa_module
 from builtin_functions import *
 
 class Test(unittest.TestCase):
+  def testAssign(self):
+    pass
+
   def testSimple(self):
     mod = circa_module.fromSource("a = 1 + 2")
 
@@ -13,9 +16,12 @@ class Test(unittest.TestCase):
     self.assertTrue(a.function == ADD)
     self.assertTrue(a.value == 3 or a.value == 3.0)
 
+  def testAssigns(self):
+    mod = circa_module.fromSource("a=true \n b=1")
+
   def testConditional(self):
     mod = circa_module.fromSource( """
-a = True
+a = true
 b = 1
 if (a)
 {

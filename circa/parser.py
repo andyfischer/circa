@@ -12,15 +12,14 @@ DEBUG_LEVEL = 4
 
 def parse(builder, source):
   tokens = token_stream.asTokenStream(source)
-  parser = Parser(builder, tokens)
+  parser = Parser(builder, tokens, raise_errors=True)
   parser.run()
 
 class Parser(object):
-  def __init__(self, builder, tokens):
+  def __init__(self, builder, tokens, raise_errors=True):
     self.builder = builder
-    self.block_stack = []
     self.parse_errors = []
-    self.raise_errors = False
+    self.raise_errors = raise_errors
     self.previous_block = None
 
     # convert 'tokens' into a TokenStream
@@ -34,6 +33,9 @@ class Parser(object):
       try:
         self.statement()
       except ParseError, e:
+        if self.raise_errors:
+          raise
+
         self.parse_errors.append(e)
         print "[parse error] " + e.fullDescription()
         self.tokens.consume()
@@ -53,7 +55,7 @@ class Parser(object):
     # paths[VAR] = self.var_statement
     # paths[STATE] = self.state_block
     # paths[FOR] = self.for_block
-    paths[RBRACE] = self.close_block
+    paths[RBRACKET] = self.right_bracket
     paths[NEWLINE] = self.new_line
 
     next_token = self.tokens.next()
@@ -69,6 +71,7 @@ class Parser(object):
       return
 
     # if we got this far then we don't know what the hell to do
+    pdb.set_trace()
     raise ParseError("Couldn't understand (as statement): " + str(next_token.match) + "(" + next_token.match.name + ")", next_token)
 
   def if_statement(self):
@@ -85,10 +88,9 @@ class Parser(object):
     if condition_term == None:
       raise ParseError("Expected expression", first_condition_token)
     
-    cond_block = self.builder.startConditionalBlock(condition=condition_term)
     self.tokens.consume(RPAREN)
 
-    self.builder.startBlock(cond_block)
+    cond_block = self.builder.startConditionalBlock(condition=condition_term)
 
     self.block_body()
 
@@ -140,20 +142,20 @@ class Parser(object):
     # check for a block bounded with {}s
     if (self.tokens.nextIs(LBRACKET)):
       self.tokens.consume(LBRACKET)
-      self.stopSkipping(NEWLINE)
+      self.tokens.stopSkipping(NEWLINE)
 
       # when the } comes up, it will trigger closeBlock
     else:
       # parse a one-liner with no {}s
       self.statement()
-      self.closeBlock()
+      self.builder.closeBlock()
 
-  def close_block(self):
-    current_block = self.block_stack[-1]
-    current_block.onFinish()
-    self.block_stack.pop()
-    current_block.afterFinish()
-    self.previous_block = current_block
+  def right_bracket(self):
+    token = self.tokens.consume(RBRACKET)
+    if self.builder.blockDepth() < 1:
+      raise ParseError("Found } without a matching {", token)
+
+    self.builder.closeBlock()
 
   def new_line(self):
     self.tokens.consume(NEWLINE)

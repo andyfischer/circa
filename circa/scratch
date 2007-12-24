@@ -1,12 +1,13 @@
 import pdb
 from utils.spy_object import SpyObject
 from builder import Builder
+from circa_module import CircaModule
 import parser
 import utils.spy as spy
 
-bldr = Builder()
+mod = CircaModule()
+bldr = Builder(mod)
 spy.printAllCalls(bldr)
 
-bldr.getNamed('name')
 
-parser.parse(bldr, "1+2")
+parser.parse(bldr, "a=1")
