@@ -58,6 +58,7 @@ class Builder(object):
     return self.startBlock(ConditionalBlock, **kwargs)
 
   def closeBlock(self):
+    "Close the current block"
     current_block = self.blockStack[-1]
     current_block.onFinish()
     self.blockStack.pop()
@@ -68,7 +69,7 @@ class Builder(object):
     return len(self.blockStack)
 
   def createTerm(self, function, name=None, **kwargs):
-    new_term = term.create(function, self.currentBranch(), **kwargs)
+    new_term = Term(function, branch=self.currentBranch(), **kwargs)
 
     if name:
       assert isinstance(name, str)
@@ -77,12 +78,12 @@ class Builder(object):
     return new_term
 
   def createConstant(self, value, name=None):
-    new_term = term.createConstant(value, self.currentBranch())
+    new_term = Term.createConstant(value, branch=self.currentBranch())
     if name: self.bind(name, new_term)
     return new_term
 
   def createVariable(self, value, name=None):
-    new_term = term.createVariable(value, self.currentBranch())
+    new_term = Term.createVariable(value, branch=self.currentBranch())
     if name: self.bind(name, new_term)
     return new_term
     
@@ -100,7 +101,8 @@ class Builder(object):
       yield self.blockStack[index]
       index -= 1
   
-  def currentBranch(self): return self.currentBlock().getBranch()
+  def currentBranch(self):
+    return self.currentBlock().getBranch()
 
   def findCurrentSubroutine(self):
     index = len(self.blockStack) -1
@@ -137,7 +139,7 @@ class Block(object):
   def onFinish(self): pass
   def afterFinish(self): pass
   def onBind(self, name, term): pass
-  def getBranch(self): raise "Need to override"
+  def getBranch(self): raise Exception("Need to override")
 
   def parentBlocks(self):
     block = self.parent
@@ -251,7 +253,6 @@ class ConditionalBlock(Block):
   def getBranch(self): return self.branch_term.state.branches[0]
 
   def afterFinish(self):
-    # pdb.set_trace()
     # create a conditional term for any rebinds
     for rebind_info in self.rebinds.values():
       if not rebind_info.defined_outside: continue
