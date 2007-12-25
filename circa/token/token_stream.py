@@ -1,6 +1,6 @@
 import token
-import token_definitions
-from parse_error import ParseError
+import definitions
+import parse_errors
 import types
 
 def asTokenStream(source):
@@ -30,7 +30,7 @@ class TokenStream(object):
 
     self.tokens = tokens
     self.currentIndex = 0
-    self.skipSet = set([token_definitions.WHITESPACE])
+    self.skipSet = set([definitions.WHITESPACE])
 
     # currentIndex should always rest on a non-skip token,
     # so advance past any skip tokens that are at the start
@@ -86,13 +86,13 @@ class TokenStream(object):
   def consume(self, match=None):
     """
     Return the next token and advance our pointer to the next
-    non-skip token. Throws a ParseError if a 'match' is given and
+    non-skip token. Throws an error if a 'match' is specified and
     the next token didn't use that match.
     """
 
     token = self.next()
     if match and token.match != match:
-      raise ParseError("Expected: " + str(match), token)
+      raise parse_errors.TokenStreamExpected(match, token)
 
     # advance current index
     self.currentIndex = self.advance(self.currentIndex)

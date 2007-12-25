@@ -1,8 +1,9 @@
 
+import pdb
+
 import token
 import unittest
-from token_definitions import *
-import pdb
+from definitions import *
 
 def one_token(string):
   tlist = token.tokenize(string)
@@ -78,6 +79,15 @@ class Test(unittest.TestCase):
     self.assertEquals(tokens[28].match, OR)
     
 
+  def testNoErrors(self):
+    "Make sure that tokenize does not return errors, even for awful inputs"
+
+    self.assertTrue( token.tokenize("%$#@%") )
+    self.assertTrue( token.tokenize("********") )
+    self.assertTrue( token.tokenize("!@#$%^&*()';\":<>-=") )
+    self.assertTrue( token.tokenize(r"\\\\") )
+    self.assertTrue( token.tokenize("") == [] )
+    self.assertTrue( token.tokenize("\n\n\n\n\n\n") )
 
 
 if __name__ == '__main__':

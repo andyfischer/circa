@@ -1,18 +1,17 @@
 import pdb
 import builtin_functions
+import parse_errors
 import term
-from token_definitions import *
+import token
+from token.definitions import *
 from token import Token
-from token_stream import TokenStream
-from parse_error import ParseError
 
 DEBUG_LEVEL = 0
 
 # Expression parsing
 def parseExpression(tokens):
-  # If 'tokens' is not a TokenStream then try to convert it
-  if not isinstance(tokens, TokenStream):
-    tokens = TokenStream(tokens)
+  # Coerce 'tokens' into a token stream
+  tokens = token.asTokenStream(tokens)
 
   # Mark the start location for backtracking
   start_loc = tokens.markLocation()
@@ -37,7 +36,7 @@ class Node(object):
 
 class Infix(Node):
   def __init__(self, function_token, left, right):
-    assert isinstance(function_token, Token)
+    assert isinstance(function_token, token.Token)
     assert isinstance(left, Node)
     assert isinstance(right, Node)
 
@@ -141,7 +140,7 @@ class Ident(Node):
     term = builder.getNamed(self.token.text)
 
     if not term:
-      raise ParseError("Identifier not found: " + str(self.token.text), self.token)
+      raise parse_errors.IdentifierNotFound(self.token)
 
     return builder.getNamed(self.token.text)
 
@@ -196,7 +195,7 @@ def infix_expression(tokens, precedence):
     right_expr = infix_expression(tokens, precedence + 1)
 
     if not right_expr:
-      raise ParseError("Unknown parse error", first_righthand_token)
+      raise parse_errors.InteralError(first_righthand_token)
 
     expr = Infix(operator, expr, right_expr)
 

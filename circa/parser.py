@@ -1,32 +1,28 @@
 
 import pdb
 
-from token_definitions import *
-import token, expression
+import expression
+import parse_errors
+import token
+from token.definitions import *
 from term import Term
-import token_stream
-from token_stream import TokenStream
-from parse_error import ParseError
 
 DEBUG_LEVEL = 4
 
 def parse(builder, source):
-  tokens = token_stream.asTokenStream(source)
+  tokens = token.asTokenStream(source)
   parser = Parser(builder, tokens, raise_errors=True)
   parser.run()
 
 class Parser(object):
-  def __init__(self, builder, tokens, raise_errors=True):
+  def __init__(self, builder, token_source, raise_errors=True):
     self.builder = builder
     self.parse_errors = []
     self.raise_errors = raise_errors
     self.previous_block = None
 
-    # convert 'tokens' into a TokenStream
-    if not isinstance(tokens, TokenStream):
-      tokens = TokenStream(tokens)
-
-    self.tokens = tokens
+    # make sure 'tokens' is a token stream
+    self.tokens = token.asTokenStream(token_source)
     
   def run(self):
     while not self.tokens.finished():
@@ -37,7 +33,7 @@ class Parser(object):
           raise
 
         self.parse_errors.append(e)
-        print "[parse error] " + e.fullDescription()
+        print "[parse error] " + str(e)
         self.tokens.consume()
 
   def bind(self, name, term):
@@ -72,7 +68,7 @@ class Parser(object):
 
     # if we got this far then we don't know what the hell to do
     pdb.set_trace()
-    raise ParseError("Couldn't understand (as statement): " + str(next_token.match) + "(" + next_token.match.name + ")", next_token)
+    raise parse_errors.NotAStatement(next_token)
 
   def if_statement(self):
     self.tokens.consume(IF)
@@ -86,7 +82,7 @@ class Parser(object):
     condition_term = condition_expr.eval(self.builder)
 
     if condition_term == None:
-      raise ParseError("Expected expression", first_condition_token)
+      raise parse_errors.ExpectedExpression(first_condition_token)
     
     self.tokens.consume(RPAREN)
 
@@ -125,7 +121,7 @@ class Parser(object):
     return_token = tokens.consume(RETURN)
     expr = self.expression()
     if not expr:
-      raise ParseError("Expected expression", return_token)
+      raise parse_errors.ExpectedExpression(return_token)
 
     self.bind(Term.RETURN_REF_NAME, expr.eval())
 
@@ -153,7 +149,7 @@ class Parser(object):
   def right_bracket(self):
     token = self.tokens.consume(RBRACKET)
     if self.builder.blockDepth() < 1:
-      raise ParseError("Found } without a matching {", token)
+      raise parse_errors.DanglingRightBracket(token)
 
     self.builder.closeBlock()
 

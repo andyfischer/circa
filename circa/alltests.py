@@ -2,6 +2,8 @@
 
 import unittest
 import sys
+import token
+
 # sys.path.append('unittests')
 
 modules_to_test = (
@@ -11,7 +13,8 @@ modules_to_test = (
   'dsl_test',
   'expression_test',
   'parser_test',
-  'token_test',
+  'subroutine_test',
+  'token.test',
 )
 
 def suite():
