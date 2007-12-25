@@ -1,5 +1,6 @@
 import term
 import builtin_functions
+from term import Term
 from term_state import TermState
 from basefunction import BaseFunction
 
@@ -17,12 +18,12 @@ class SubroutineFunc(BaseFunction):
 class SubroutineDefinition(object):
   def __init__(m):
     m.input_placeholders = []
-    m.this_placeholder = term.create(builtin_functions.PLACEHOLDER)
+    m.this_placeholder = Term(builtin_functions.PLACEHOLDER)
     m.state = SubroutineState()
 
 
   def addInput(m, name):
-    term = term.create(builtin_functions.PLACEHOLDER)
+    term = Term(builtin_functions.PLACEHOLDER)
     m.state.putLocal(name, term)
     m.input_placeholders.append(term)
     return term

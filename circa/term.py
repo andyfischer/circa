@@ -1,22 +1,54 @@
+import basefunction
+import builtin_functions
 from term_state import TermState
 
-nextStaticID = 1
+nextGlobalID = 1
 
 
 class Term(object):
-  def __init__(self, initial_inputs=[]):
+  def __init__(self, function, inputs=[], branch=None, initial_state=None, source_token=None):
+    assert isinstance(function, basefunction.BaseFunction)
 
-    self.function = None
+    # initialize
+    self.function = function
     self.inputs = []
     self.users = set()
     self.value = None
     self.state = None
+    self.source_token = source_token
 
-    global nextStaticID
-    self.staticID = nextStaticID
-    nextStaticID += 1
+    # set inputs
+    if inputs:
+      self.setInputs(inputs)
 
-    self.setInputs(initial_inputs)
+    # set state
+    if initial_state:
+      self.state = initial_state
+    else:
+      self.state = function.makeState()
+
+    # assign a global ID
+    global nextGlobalID
+    self.globalID = nextGlobalID
+    nextGlobalID += 1
+
+    # add to a branch
+    if branch:
+      branch.append(self)
+
+    # evaluate immediately
+    self.evaluate()
+      
+  @classmethod
+  def createConstant(cls, value, **kwargs):
+    term = Term(builtin_functions.CONSTANT, **kwargs)
+    term.value = value
+    return term
+
+  def createVariable(cls, value, **kwargs):
+    term = Term(builtin_functions.VARIABLE, **kwargs)
+    term.value = value
+    return term
 
   def input(self, index):
     return self.inputs[index].value
@@ -45,17 +77,23 @@ class Term(object):
     old_input.pruneUsers()
 
   def inputsContain(self, term):
+    "Returns True if our inputs contain the term"
     for input in self.inputs:
       if input == term: return True
     return false
 
   # pruneUsers: Removes any terms from our user list that are not really using us
   def pruneUsers(self):
+    """
+    Go through this term's user list, remove anything there that is no longer
+    using us.
+    """
     for user in self.users:
       if not user.inputsContain(self):
         self.users.remove(user)
 
   def changeFunction(self, new_func, initial_state=None):
+    "Change this term's function"
     self.function = new_func
 
     if not initial_state:
@@ -67,7 +105,7 @@ class Term(object):
     self.function.evaluate(self)
 
   def printExtended(self, printer):
-    printer.prints("%i: %s" % (self.staticID, self.function.name))
+    printer.prints("%i: %s" % (self.globalID, self.function.name))
 
     if self.value:
       printer.prints(" " + str(self.value))
@@ -77,7 +115,7 @@ class Term(object):
     first_item = True
     for input in self.inputs:
       if not first_item: printer.prints(",")
-      printer.prints(input.staticID)
+      printer.prints(input.globalID)
       first_item = False
     printer.prints("]")
 
@@ -115,46 +153,4 @@ class Term(object):
   # member accessor
   def __getitem__(self, name):
     return self.state.getLocal(name)
-
-from branch import Branch
-from basefunction import BaseFunction
-
-def create(func, branch=None, inputs=[], initial_state=None):
-  assert isinstance(func, BaseFunction)
-
-  # todo: specialize function
-
-  term = Term()
-
-  term.function = func
-
-  # set state
-  if initial_state:
-    term.state = initial_state
-  else:
-    term.state = func.makeState()
-
-  # set inputs
-  if inputs: term.setInputs(inputs)
-
-  # add to branch
-  if branch:
-    branch.append(term)
-
-  # evaluate
-  term.evaluate()
-
-  return term
-
-import builtin_functions
-
-def createConstant(value, branch):
-  term = create(builtin_functions.CONSTANT, branch)
-  term.value = value
-  return term
-
-def createVariable(value, branch):
-  term = create(builtin_functions.VARIABLE, branch)
-  term.value = value
-  return term
 

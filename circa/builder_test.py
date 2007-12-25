@@ -26,7 +26,9 @@ class Test(unittest.TestCase):
   def testLocalVars(self):
     bldr = Builder()
 
-    class FakeTerm(term.Term): pass
+    class FakeTerm(term.Term):
+      def __init__(self):
+        pass
 
     a = FakeTerm()
     a_alt = FakeTerm()

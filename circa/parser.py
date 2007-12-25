@@ -28,7 +28,7 @@ class Parser(object):
     while not self.tokens.finished():
       try:
         self.statement()
-      except ParseError, e:
+      except parse_errors.ParseError, e:
         if self.raise_errors:
           raise
 
