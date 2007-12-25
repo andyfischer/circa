@@ -3,7 +3,7 @@
 import sys
 
 def print_usage():
-  print "Usage..."
+  print "Usage (todo)"
 
 
 def main():
@@ -34,6 +34,11 @@ def main():
     args.pop(0)
 
   print "Running files: " + str(files)
+
+  for filename in files:
+    if filename.endswith(".cr"):
+      file = open(filename, "r")
+
 
 
 if __name__ == '__main__':

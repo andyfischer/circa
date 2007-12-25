@@ -1,6 +1,6 @@
 import parser
 import unittest
-import circa_module
+from circa_module import CircaModule
 from builtin_functions import *
 
 class Test(unittest.TestCase):
@@ -8,7 +8,7 @@ class Test(unittest.TestCase):
     pass
 
   def testSimple(self):
-    mod = circa_module.fromSource("a = 1 + 2")
+    mod = CircaModule.fromText("a = 1 + 2")
 
     a = mod['a']
 
@@ -17,10 +17,10 @@ class Test(unittest.TestCase):
     self.assertTrue(a.value == 3 or a.value == 3.0)
 
   def testAssigns(self):
-    mod = circa_module.fromSource("a=true \n b=1")
+    mod = CircaModule.fromText("a=true \n b=1")
 
   def testConditional(self):
-    mod = circa_module.fromSource( """
+    mod = CircaModule.fromText( """
 a = true
 b = 1
 if (a)

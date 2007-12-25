@@ -35,8 +35,7 @@ class TokenDef(object):
       return self.id != other.id
     except: return False
  
-# All the token definitions
-
+# Token definitions
 
 # symbols
 LPAREN = TokenDef(1, 'lparen', '(')
