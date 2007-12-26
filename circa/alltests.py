@@ -1,9 +1,6 @@
 #!/usr/bin/env python2
 
 import unittest
-import sys
-
-# sys.path.append('unittests')
 
 modules_to_test = (
   'builtin_functions_test',

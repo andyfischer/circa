@@ -1,4 +1,4 @@
-from branch import Branch
+import branch
 
 class TermState(object):
   def __init__(self, num_branches=0):
@@ -11,6 +11,6 @@ class TermState(object):
     if not hasattr(self, 'branches'):
       self.branches = []
 
-    branch = Branch()
-    self.branches.append(branch)
-    return branch
+    new_branch = branch.Branch()
+    self.branches.append(new_branch)
+    return new_branch
