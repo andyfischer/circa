@@ -79,7 +79,7 @@ class Test(unittest.TestCase):
     self.assertEquals(tokens[28].match, OR)
     
 
-  def testNoErrors(self):
+  def testNoTokenizeErrors(self):
     "Make sure that tokenize does not return errors, even for awful inputs"
 
     self.assertTrue( token.tokenize("%$#@%") )
@@ -89,6 +89,17 @@ class Test(unittest.TestCase):
     self.assertTrue( token.tokenize("") == [] )
     self.assertTrue( token.tokenize("\n\n\n\n\n\n") )
 
+  def testBackToString(self):
+    "Test the backToString function"
+
+    def test(source_str):
+      token_stream = token.asTokenStream(source_str)
+      back_str = token_stream.backToString()
+      self.assertEquals(source_str, back_str)
+
+    test("a b c")
+    test("1.44+7575")
+    test("and or if")
 
 if __name__ == '__main__':
   unittest.main()

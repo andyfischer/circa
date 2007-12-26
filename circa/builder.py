@@ -77,13 +77,13 @@ class Builder(object):
 
     return new_term
 
-  def createConstant(self, value, name=None):
-    new_term = Term.createConstant(value, branch=self.currentBranch())
+  def createConstant(self, value, name=None, **kwargs):
+    new_term = Term.createConstant(value, branch=self.currentBranch(), **kwargs)
     if name: self.bind(name, new_term)
     return new_term
 
-  def createVariable(self, value, name=None):
-    new_term = Term.createVariable(value, branch=self.currentBranch())
+  def createVariable(self, value, name=None, **kwargs):
+    new_term = Term.createVariable(value, branch=self.currentBranch(), **kwargs)
     if name: self.bind(name, new_term)
     return new_term
     

@@ -29,10 +29,10 @@ parse = parseExpression
 # AST Classes
 class Node(object):
   def eval(self, builder):
-    raise "Need to implement this"
+    raise Exception("Need to implement this")
 
   def getFirstToken(self):
-    raise "Need to implement this"
+    raise Exception("Need to implement this")
 
 class Infix(Node):
   def __init__(self, function_token, left, right):
@@ -124,7 +124,7 @@ class Literal(Node):
       raise "Couldn't recognize token: " + str(token)
 
   def eval(self, builder):
-    return builder.createConstant(self.value)
+    return builder.createConstant(self.value, source_token=self.token)
 
   def getFirstToken(self):
     return self.token
