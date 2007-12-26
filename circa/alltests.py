@@ -2,7 +2,6 @@
 
 import unittest
 import sys
-import token
 
 # sys.path.append('unittests')
 
@@ -14,13 +13,14 @@ modules_to_test = (
   'expression_test',
   'parser_test',
   'subroutine_test',
-  'token.test',
+  'token',
 )
 
 def suite():
     alltests = unittest.TestSuite()
     for module in map(__import__, modules_to_test):
-        alltests.addTest(unittest.findTestCases(module))
+        test_cases = unittest.findTestCases(module)
+        alltests.addTests(test_cases)
     return alltests
 
 if __name__ == '__main__':

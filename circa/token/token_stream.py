@@ -37,6 +37,8 @@ class TokenStream(object):
     while not self.finished() and self.shouldSkip(self.tokens[self.currentIndex]):
       self.currentIndex += 1
 
+
+
   def __str__(self):
     return str(map(str, self.tokens))
 
@@ -109,3 +111,10 @@ class TokenStream(object):
 
   def restoreMark(self, mark):
     self.currentIndex = mark
+
+  def backToString(self):
+    # todo: use a stringbuffer or whatever
+    text = ""
+    for token in self.tokens:
+      text += token.text
+    return text
