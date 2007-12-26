@@ -5,7 +5,6 @@ import term
 import circa_module
 from builder import Builder
 from builtin_functions import *
-from branch import Branch
 
 class Test(unittest.TestCase):
   def testSimple(self):
