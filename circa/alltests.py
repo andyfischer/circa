@@ -10,6 +10,8 @@ modules_to_test = (
   'expression_test',
   'parser_test',
   'subroutine_test',
+  'term_iterator_test',
+  'term_test',
   'token',
 )
 

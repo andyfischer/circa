@@ -1,3 +1,5 @@
+import pdb
+
 import basefunction
 import builtin_functions
 from term_state import TermState
@@ -6,8 +8,9 @@ nextGlobalID = 1
 
 
 class Term(object):
-  def __init__(self, function, inputs=[], branch=None, initial_state=None, source_token=None):
+  def __init__(self, function, inputs=[], branch="unspecified", initial_state=None, source_token=None):
     assert isinstance(function, basefunction.BaseFunction)
+    assert branch != "unspecified"
 
     # initialize
     self.function = function
@@ -27,17 +30,21 @@ class Term(object):
     else:
       self.state = function.makeState()
 
+    if self.state and function.pureFunction:
+      raise UsageError("Found state object when using a pure function")
+
     # assign a global ID
     global nextGlobalID
     self.globalID = nextGlobalID
     nextGlobalID += 1
 
     # add to a branch
-    if branch:
+    if branch != None:
       branch.append(self)
 
     # evaluate immediately
-    self.evaluate()
+    if function.pureFunction:
+      self.evaluate()
       
   @classmethod
   def createConstant(cls, value, **kwargs):
@@ -145,6 +152,13 @@ class Term(object):
 
         printer.unindent(2)
 
+  def iterator(self, forwards=True):
+    yield self
+    if self.state:
+      for branch in self.branches:
+        for term in branch:
+          yield term
+
   # value accessors
   def __int__(self): return int(self.value)
   def __float__(self): return float(self.value)
@@ -153,4 +167,5 @@ class Term(object):
   # member accessor
   def __getitem__(self, name):
     return self.state.getLocal(name)
+
 
