@@ -8,7 +8,7 @@ from utils.indent_printer import IndentPrinter
 class CircaModule(object):
   def __init__(self, environment=None):
 
-    self.global_term = term.Term(builtin_functions.SUBROUTINE)
+    self.global_term = term.Term(builtin_functions.SUBROUTINE, branch=None)
     self.env = environment
 
     self.file_reference = None

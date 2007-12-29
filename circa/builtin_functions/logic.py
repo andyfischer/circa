@@ -4,6 +4,7 @@ from basefunction import BaseFunction
 class And(BaseFunction):
   def init(self):
     self.name = "and"
+    self.pureFunction = True
     self.inputType = bool
     self.outputType = bool
 
@@ -17,6 +18,7 @@ class And(BaseFunction):
 class Or(BaseFunction):
   def init(self):
     self.name = "or"
+    self.pureFunction = True
     self.inputType = bool
     self.outputType = bool
 
@@ -30,6 +32,7 @@ class Or(BaseFunction):
 class ConditionalExpression(BaseFunction):
   def init(self):
     self.name = "if"
+    self.pureFunction = True
 
   def evaluate(self, term):
     if term.inputs[0].value:

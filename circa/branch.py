@@ -5,7 +5,3 @@ class Branch(list):
     self = list.__new__(cls, [])
     return self
 
-  def evaluate(self):
-    for term in self:
-      if term.function:
-        term.function.evaluate(term)

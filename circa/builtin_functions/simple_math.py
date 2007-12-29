@@ -3,6 +3,7 @@ from basefunction import BaseFunction
 class Add(BaseFunction):
   def init(self):
     self.name = "add"
+    self.pureFunction = True
     self.inputType = float
     self.outputType = float
 
@@ -12,6 +13,7 @@ class Add(BaseFunction):
 class Sub(BaseFunction):
   def init(self):
     self.name = "sub"
+    self.pureFunction = True
     self.inputType = float
     self.outputType = float
 
@@ -21,6 +23,7 @@ class Sub(BaseFunction):
 class Mult(BaseFunction):
   def init(self):
     self.name = "mult"
+    self.pureFunction = True
     self.inputType = float
     self.outputType = float
 
@@ -30,6 +33,7 @@ class Mult(BaseFunction):
 class Div(BaseFunction):
   def init(self):
     self.name = "div"
+    self.pureFunction = True
     self.inputType = float
     self.outputType = float
 
@@ -39,6 +43,7 @@ class Div(BaseFunction):
 class Blend(BaseFunction):
   def init(self):
     self.name = "blend"
+    self.pureFunction = True
     self.inputType = float
     self.outputType = float
 

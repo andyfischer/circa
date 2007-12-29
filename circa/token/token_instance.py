@@ -4,7 +4,7 @@ class TokenInstance(object):
   """
   An object representing an occurance of a token
 
-  match : the TokenDef object (from definitions) that we matched as
+  match : the TokenDef object (from definitions) that we matched
   text : the actual source text
   line : the line that this token was located at (starting at 1)
   column : the column that this token starts at (starting at 1)

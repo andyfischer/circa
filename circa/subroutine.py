@@ -17,16 +17,14 @@ class SubroutineFunc(BaseFunction):
 class SubroutineDefinition(object):
   def __init__(m):
     m.input_placeholders = []
-    m.this_placeholder = term.Term(builtin_functions.PLACEHOLDER)
+    m.this_placeholder = term.Term(builtin_functions.PLACEHOLDER, branch=None)
     m.state = SubroutineState()
-
 
   def addInput(m, name):
     term = term.Term(builtin_functions.PLACEHOLDER)
     m.state.putLocal(name, term)
     m.input_placeholders.append(term)
     return term
-
 
 class SubroutineState(TermState):
   def __init__(m):

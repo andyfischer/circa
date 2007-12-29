@@ -24,10 +24,10 @@ def tokenize(string):
   while currentIndex < len(string):
     token = None
 
-    # find a matching token
+    # Find a matching token
     for tdef in definitions.ALL:
 
-      # skip meta definitions that have no pattern
+      # Skip meta definitions that have no pattern
       if not tdef.pattern: continue
 
       match = tdef.pattern.match(string, currentIndex)
@@ -35,20 +35,19 @@ def tokenize(string):
         token = makeToken(tdef, match.end() - match.start())
         break
 
-    # if we didn't find anything, count this character as unrecognized
+    # If we didn't find anything, count this character as unrecognized
     if not token:
       token = makeToken(definitions.UNRECOGNIZED, 1)
 
-    # store this token
+    # Store this token
     currentIndex += token.length()
     currentCol += token.length()
     output_list.append(token)
 
-    # check to advance a line
+    # Check to advance a line
     if token.match == definitions.NEWLINE:
       currentCol = 1
       currentLine += 1
-
 
   return output_list
 
