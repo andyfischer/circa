@@ -4,41 +4,38 @@ from term_state import TermState
 import basefunction
 
 class SubroutineFunc(basefunction.BaseFunction):
-  def init(m):
-    m.name = "subroutine"
+  def init(self):
+    self.name = "subroutine"
 
-  def evaluate(m, term):
-    term.state.branches[0].evaluate()
-
-  def makeState(m):
+  def makeState(self):
     return SubroutineState()
 
 
 class SubroutineDefinition(object):
-  def __init__(m):
-    m.input_placeholders = []
-    m.this_placeholder = term.Term(builtin_functions.PLACEHOLDER, branch=None)
-    m.state = SubroutineState()
+  def __init__(self):
+    self.input_placeholders = []
+    self.this_placeholder = term.Term(builtin_functions.PLACEHOLDER, branch=None)
+    self.state = SubroutineState()
 
-  def addInput(m, name):
+  def addInput(self, name):
     term = term.Term(builtin_functions.PLACEHOLDER)
-    m.state.putLocal(name, term)
-    m.input_placeholders.append(term)
+    self.state.putLocal(name, term)
+    self.input_placeholders.append(term)
     return term
 
 class SubroutineState(TermState):
-  def __init__(m):
-    m.locals = {}
-    m.main_branch = m.addBranch()
+  def __init__(self):
+    TermState.__init__(self, has_branch=True)
+    self.locals = {}
 
-  def putLocal(m, name, term):
-    m.locals[name] = term
+  def putLocal(self, name, term):
+    self.locals[name] = term
 
-  def getLocal(m, name):
-    if not name in m.locals:
+  def getLocal(self, name):
+    if not name in self.locals:
       return None
     else:
-      return m.locals[name]
+      return self.locals[name]
 
 
 SUBROUTINE = SubroutineFunc()

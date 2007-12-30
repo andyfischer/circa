@@ -14,7 +14,7 @@ class CondBranch(basefunction.BaseFunction):
       term.state.branches[1].evaluate()
 
   def makeState(self):
-    return term_state.TermState(num_branches=2)
+    return term_state.TermState(has_branch=True)
 
 
 COND_BRANCH = CondBranch()
