@@ -1,9 +1,9 @@
 import term
 import builtin_functions
 from term_state import TermState
-from basefunction import BaseFunction
+import basefunction
 
-class SubroutineFunc(BaseFunction):
+class SubroutineFunc(basefunction.BaseFunction):
   def init(m):
     m.name = "subroutine"
 
@@ -41,3 +41,4 @@ class SubroutineState(TermState):
       return m.locals[name]
 
 
+SUBROUTINE = SubroutineFunc()
