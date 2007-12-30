@@ -210,7 +210,7 @@ class SubroutineBlock(Block):
     self.statefulTermInfos = {}
 
   def getBranch(self):
-    return self.subroutine_state.branches[0]
+    return self.subroutine_state.branch
 
   def newStatefulTerm(self, name, initial_value):
     if self.getLocalName(name) != None:
@@ -250,7 +250,7 @@ class ConditionalBlock(Block):
     self.condition_term = condition
     self.branch_term = builder.createTerm(COND_BRANCH, inputs=[self.condition_term])
 
-  def getBranch(self): return self.branch_term.state.branches[0]
+  def getBranch(self): return self.branch_term.state.branch
 
   def afterFinish(self):
     # create a conditional term for any rebinds
