@@ -1,6 +1,7 @@
 
 import builder
 import builtin_functions
+import emulator
 import term
 import token
 from utils.indent_printer import IndentPrinter
@@ -46,7 +47,7 @@ class CircaModule(object):
     return builder.Builder(self)
 
   def run(self):
-    self.global_term.evaluate()
+    emulator.evaluateBranch(self.global_term)
 
   def printTerms(self):
     "Print the contents of this module, for debugging purposes"
