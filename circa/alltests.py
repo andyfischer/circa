@@ -9,7 +9,6 @@ modules_to_test = (
   'dsl_test',
   'expression_test',
   'parser_test',
-  'term_iterator_test',
   'term_test',
   'token',
 )
