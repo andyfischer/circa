@@ -1,5 +1,5 @@
 #!/usr/bin/python
 
-import circa
+import circa.command_line
 
-circa.command_line()
+circa.command_line.main()

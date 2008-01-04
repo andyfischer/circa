@@ -1,87 +1,68 @@
 import pdb
 
-import basefunction
-import builtin_functions
-from term_state import TermState
+import circa_function
 
 nextGlobalID = 1
 
-
 class Term(object):
-  def __init__(self, function, inputs=[], branch="unspecified", initial_state=None, source_token=None):
-    assert isinstance(function, basefunction.BaseFunction)
-    assert branch != "unspecified"
+  __slots__ = ['function', 'inputs', 'users', 'state', 'source_token', 'outputType']
+
+  def __init__(self, options):
 
     # initialize
-    self.function = function
+    self.function = options.function
     self.inputs = []
+    self.source_token = options.source_token
+
+    # make state, or use one that was passed
+    if options.state:
+      self.state = options.state
+    else:
+      self.state = self.function.makeState()
+
+    self.setInputs(options.inputs)
+
+    self.outputType = None
+    self.outputTypeOutOfDate = True
     self.users = set()
     self.value = None
-    self.state = None
-    self.source_token = source_token
-
-    # set inputs
-    if inputs:
-      self.setInputs(inputs)
-
-    # set state
-    if initial_state:
-      self.state = initial_state
-    else:
-      self.state = function.makeState()
-
-    if self.state and function.pureFunction:
-      raise UsageError("Found state object when using a pure function")
 
     # assign a global ID
     global nextGlobalID
     self.globalID = nextGlobalID
     nextGlobalID += 1
 
-    # add to a branch
-    if branch != None:
-      branch.append(self)
-
-    # evaluate immediately
+    # evaluate immediately, if this is a pure function
     if function.pureFunction:
       self.evaluate()
       
+      """
   @classmethod
   def createConstant(cls, value, **kwargs):
+    import builtin_functions
     term = Term(builtin_functions.CONSTANT, **kwargs)
     term.value = value
     return term
 
+  @classmethod
   def createVariable(cls, value, **kwargs):
+    import builtin_functions
     term = Term(builtin_functions.VARIABLE, **kwargs)
     term.value = value
     return term
+    """
 
   def input(self, index):
     return self.inputs[index].value
 
-  def setInputs(self, list):
-    old_inputs = self.inputs
+  def getType(self):
+    "Returns this term's output type"
+    
+    if self.outputTypeOutOfDate:
+      self.outputType = self.function.getOutputType(self)
 
-    self.inputs = list[:]
+    return self.outputType
 
-    # add to user lists
-    for input in self.inputs:
-      if not input: continue
-      input.users.add(self)
-
-    # prune old list
-    for input in old_inputs:
-      if not input: continue
-      input.pruneUsers()
-
-  def setInput(self, index, term):
-    old_input = self.inputs[input]
-    self.inputs[input] = term
-
-    if term != None: term.users.add(self)
-
-    old_input.pruneUsers()
 
   def inputsContain(self, term):
     "Returns True if our inputs contain the term"

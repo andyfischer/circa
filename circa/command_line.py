@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sys
+from circa_module import CircaModule
 
 def print_usage():
   print "Usage (todo)"
@@ -37,9 +38,8 @@ def main():
 
   for filename in files:
     if filename.endswith(".cr"):
-      file = open(filename, "r")
-
-
+      module = CircaModule.fromFile(filename)
+      module.run()
 
 if __name__ == '__main__':
   main()

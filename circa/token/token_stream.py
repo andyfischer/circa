@@ -1,6 +1,6 @@
 import token
 import definitions
-import parse_errors
+import circa.parse_errors as parse_errors
 import types
 
 def asTokenStream(source):

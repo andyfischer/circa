@@ -1,14 +1,10 @@
 import pdb
-from builder import Builder
-from circa_module import CircaModule
-import parser
+import dsl
+from signature import *
 
-module = CircaModule()
-bldr = module.makeBuilder()
 
-values = [1,2,3,4,'tell','me','that','you','love','me','more']
+pretend_term = dsl.placeholder
 
-for value in values:
-  bldr.createConstant(value)
+sig = specific(int, float, str)
 
-print module.global_term
+sig.satisfies(pretend_term(1,1.0,'hi'))

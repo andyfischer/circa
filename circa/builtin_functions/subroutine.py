@@ -1,9 +1,9 @@
-import term
+import circa_function
 import builtin_functions
-from term_state import TermState
-import basefunction
+import term
+import term_state
 
-class SubroutineFunc(basefunction.BaseFunction):
+class SubroutineFunc(circa_function.BaseFunction):
   def init(self):
     self.name = "subroutine"
 
@@ -23,9 +23,9 @@ class SubroutineDefinition(object):
     self.input_placeholders.append(term)
     return term
 
-class SubroutineState(TermState):
+class SubroutineState(term_state.TermState):
   def __init__(self):
-    TermState.__init__(self, has_branch=True)
+    term_state.TermState.__init__(self, has_branch=True)
     self.locals = {}
 
   def putLocal(self, name, term):

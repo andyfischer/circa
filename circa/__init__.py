@@ -1,5 +1,5 @@
 
-
-import command_line as command_line_module
-command_line = command_line_module.main
+__all__ = ['builtin_functions', 'token', 'utils', 'basefunction', 'branch', 'builder',
+    'circa_module', 'circa_types', 'command_line', 'dsl', 'emulator', 'evaluation',
+    'signature', 'term', 'term_state']
 

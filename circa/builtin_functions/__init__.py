@@ -1,4 +1,9 @@
-from subroutine_test import SubroutineTest
+# from subroutine_test import SubroutineTest
+
+import circa_function
+import signature
+import term
+import term_state
 
 from branching import *
 from debug import *
