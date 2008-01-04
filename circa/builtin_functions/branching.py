@@ -1,11 +1,11 @@
 import basefunction
-import function_signature
+import signature
 import term_state
 
 class CondBranch(basefunction.BaseFunction):
   def init(self):
     self.name = "cond_branch"
-    self.signature = function_signature.specific(bool)
+    self.signature = signature.specific(bool)
 
   def evaluate(self, term):
     if term.inputs[0].value:

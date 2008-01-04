@@ -35,7 +35,7 @@ for name in dir(builtin_functions):
     globals()[name] = wrap(obj)
     __all__.append(name)
 
-# replace 'constant' function with a version that makes sense
+# replace 'constant' and 'variable' functions with versions that makes sense
 def constant(value):
   return global_builder.createConstant(value)
 def variable(value):

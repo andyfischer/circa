@@ -1,7 +1,7 @@
 
-from basefunction import BaseFunction
+import circa_function
 
-class Print(BaseFunction):
+class Print(circa_function.BaseFunction):
   def init(self):
     self.name = "print"
     

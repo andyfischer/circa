@@ -1,6 +1,6 @@
-from basefunction import BaseFunction
+import circa_function
 
-class Add(BaseFunction):
+class Add(circa_function.BaseFunction):
   def init(self):
     self.name = "add"
     self.pureFunction = True
@@ -10,7 +10,7 @@ class Add(BaseFunction):
   def evaluate(self, term):
     term.value = float(term.inputs[0]) + float(term.inputs[1])
 
-class Sub(BaseFunction):
+class Sub(circa_function.BaseFunction):
   def init(self):
     self.name = "sub"
     self.pureFunction = True
@@ -20,7 +20,7 @@ class Sub(BaseFunction):
   def evaluate(self, term):
     term.value = float(term.inputs[0]) - float(term.inputs[1])
 
-class Mult(BaseFunction):
+class Mult(circa_function.BaseFunction):
   def init(self):
     self.name = "mult"
     self.pureFunction = True
@@ -30,7 +30,7 @@ class Mult(BaseFunction):
   def evaluate(self, term):
     term.value = float(term.inputs[0]) * float(term.inputs[1])
 
-class Div(BaseFunction):
+class Div(circa_function.BaseFunction):
   def init(self):
     self.name = "div"
     self.pureFunction = True
@@ -40,7 +40,7 @@ class Div(BaseFunction):
   def evaluate(self, term):
     term.value = float(term.inputs[0]) / float(term.inputs[1])
     
-class Blend(BaseFunction):
+class Blend(circa_function.BaseFunction):
   def init(self):
     self.name = "blend"
     self.pureFunction = True

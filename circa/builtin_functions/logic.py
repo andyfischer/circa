@@ -1,7 +1,7 @@
 
-from basefunction import BaseFunction
+import circa_function
 
-class And(BaseFunction):
+class And(circa_function.BaseFunction):
   def init(self):
     self.name = "and"
     self.pureFunction = True
@@ -15,7 +15,7 @@ class And(BaseFunction):
         return
     term.value = True
 
-class Or(BaseFunction):
+class Or(circa_function.BaseFunction):
   def init(self):
     self.name = "or"
     self.pureFunction = True
@@ -29,7 +29,7 @@ class Or(BaseFunction):
         return
     term.value = False
 
-class ConditionalExpression(BaseFunction):
+class ConditionalExpression(circa_function.BaseFunction):
   def init(self):
     self.name = "if"
     self.pureFunction = True
