@@ -5,6 +5,7 @@ import term_creation_options
 class CodeUnit(object):
   def __init__(self):
     self.all_terms = []
+    self.term_namespace = {}
 
   def appendNewTerm(self, term_creation_options):
     assert isinstance(term_creation_options, TermCreationOptions)
@@ -19,7 +20,7 @@ class CodeUnit(object):
     self.setTermInputs(new_term, term_creation_options.inputs)
 
   def setTermInputs(self, target_term, new_inputs):
-    "Assigns the term's inputs to the given list"
+    "Assigns the term's inputs"
 
     old_inputs = target_term.inputs
 
@@ -40,10 +41,11 @@ class CodeUnit(object):
     for t in newly_removed:
       t.users.remove(target_term)
 
-  def onTermInputsChanged(self, target_term):
-    pass
-
   def getOutputType(self, target_term):
+    return target_term.outputType
 
-    
+  def getNamedTerm(self, name):
+    return self.term_namespace[name]
+
+  __getitem__ = getNamedTerm
 

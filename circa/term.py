@@ -1,26 +1,29 @@
 import pdb
-
 import circa_function
 
 nextGlobalID = 1
 
+
+def placeholder():
+  "Returns a new placeholder term"
+  return Term(builtin_functions.PLACEHOLDER)
+
 class Term(object):
   __slots__ = ['function', 'inputs', 'users', 'state', 'source_token', 'outputType']
 
-  def __init__(self, options):
+  def __init__(self, function, inputs=[], state=None, source_token=None):
 
     # initialize
-    self.function = options.function
+    self.function = function
     self.inputs = []
-    self.source_token = options.source_token
+    self.source_token = source_token
 
     # make state, or use one that was passed
-    if options.state:
-      self.state = options.state
-    else:
-      self.state = self.function.makeState()
+    if not state:
+      state = self.function.makeState()
+    self.state = state
 
-    self.setInputs(options.inputs)
+    self.setInputs(inputs)
 
     self.outputType = None
     self.outputTypeOutOfDate = True

@@ -4,14 +4,14 @@ import unittest
 
 modules_to_test = (
   'builtin_functions',
-  'builder_test',
-  'circa_module_test',
-  'dsl_test',
-  'expression_test',
-  'parser_test',
-  'signature_test',
-  'term_test',
-  'token',
+  'test_builder',
+  'test_circa_module',
+  'test_dsl',
+  'test_expression',
+  'test_parser',
+  'test_signature',
+  'test_term',
+  'test_token',
 )
 
 def suite():

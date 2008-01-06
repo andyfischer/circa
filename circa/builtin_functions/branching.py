@@ -1,8 +1,8 @@
-import basefunction
+import circa_function
 import signature
 import term_state
 
-class CondBranch(basefunction.BaseFunction):
+class CondBranch(circa_function.BaseFunction):
   def init(self):
     self.name = "cond_branch"
     self.signature = signature.specific(bool)

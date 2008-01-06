@@ -1,11 +1,10 @@
+import circa_function
 
-import basefunction
-
-class Constant(basefunction.BaseFunction):
+class Constant(circa_function.BaseFunction):
   def init(self):
     self.name = "constant"
 
-class Variable(basefunction.BaseFunction):
+class Variable(circa_function.BaseFunction):
   def init(self):
     self.name = "variable"
 
