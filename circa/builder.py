@@ -1,32 +1,26 @@
 
 import pdb
 import circa_module
+import code_unit
 import parser
 import term
 from builtin_functions import *
-from branch import Branch
-from term import Term
 
 
-class Builder(object):
+class SubroutineBuilder(object):
   """
-  The Builder class has several helper methods to create terms
-  on a CircaModule.
-
-  This class retains some information about the current context,
-  including nested blocks.
+  This class makes it easy to create a SubroutineDefinition
   """
 
-  def __init__(self, module=None):
+  def __init__(self, target=None):
 
-    if module: self.module = module
-    else: self.module = circa_module.CircaModule()
+    if target: self.sub_def = target
+    else: self.sub_def = subroutine_def.SubroutineDefinition()
 
     self.blockStack = []
     self.previousBlock = None
     
-    self.startBlock(SubroutineBlock,
-      subroutine_state=self.module.global_term.state)
+    self.startBlock(SubroutineBlock, subroutine=self.sub_def)
 
   def eval(self, source):
     parser.parse(self, source)
@@ -200,17 +194,17 @@ class PlainBlock(Block):
 
 
 class SubroutineBlock(Block):
-  def __init__(self, builder, subroutine_state=None):
+  def __init__(self, builder, subroutine=None):
     Block.__init__(self, builder)
 
-    assert subroutine_state != None
+    assert subroutine != None
 
-    self.subroutine_state = subroutine_state
+    self.subroutine = subroutine
 
     self.statefulTermInfos = {}
 
   def getBranch(self):
-    return self.subroutine_state.branch
+    return self.subroutine.branch
 
   def newStatefulTerm(self, name, initial_value):
     if self.getLocalName(name) != None:

@@ -1,7 +1,7 @@
 
 import builder
 import builtin_functions
-import emulator
+import code_unit
 import term
 import token
 from utils.indent_printer import IndentPrinter
@@ -9,13 +9,11 @@ from utils.indent_printer import IndentPrinter
 class CircaModule(object):
   def __init__(self, environment=None):
 
-    self.global_term = term.Term(builtin_functions.SUBROUTINE, branch=None)
+    self.global_code_unit = code_unit.CodeUnit()
     self.env = environment
 
     self.file_reference = None
     self.source_tokens = None
-
-    assert self.global_term.state != None
 
   @classmethod
   def fromText(cls, text):
@@ -47,20 +45,22 @@ class CircaModule(object):
     return builder.Builder(self)
 
   def run(self):
-    emulator.evaluateBranch(self.global_term)
+    self.global_code_unit.evaluate()
 
   def printTerms(self):
     "Print the contents of this module, for debugging purposes"
+    self.global_code_unit.printTerms()
+    """
     stack = [ self.global_term ]
     printer = IndentPrinter()
 
     term = stack.pop(0)
     term.printExtended(printer)
     printer.println()
+    """
 
   def getTerm(self, name):
-    return self.global_term[name]
+    return self.global_code_unit.getNamedTerm(name)
 
-  def __getitem__(self, name):
-    return self.getTerm(name)
+  __getitem__ = getTerm
 
