@@ -4,42 +4,24 @@ import circa_function
 nextGlobalID = 1
 
 
-def placeholder():
-  "Returns a new placeholder term"
-  return Term(builtin_functions.PLACEHOLDER)
-
 class Term(object):
-  __slots__ = ['function', 'inputs', 'users', 'state', 'source_token', 'outputType']
-
-  def __init__(self, function, inputs=[], state=None, source_token=None):
+  def __init__(self, function, source_token=None):
 
     # initialize
-    self.function = function
     self.inputs = []
+    self.function = function
     self.source_token = source_token
-
-    # make state, or use one that was passed
-    if not state:
-      state = self.function.makeState()
-    self.state = state
-
-    self.setInputs(inputs)
-
-    self.outputType = None
-    self.outputTypeOutOfDate = True
     self.users = set()
     self.value = None
+
+    # make state
+    state = self.function.makeState()
 
     # assign a global ID
     global nextGlobalID
     self.globalID = nextGlobalID
     nextGlobalID += 1
 
-    # evaluate immediately, if this is a pure function
-    if function.pureFunction:
-      self.evaluate()
-      
-      """
   @classmethod
   def createConstant(cls, value, **kwargs):
     import builtin_functions
@@ -53,18 +35,10 @@ class Term(object):
     term = Term(builtin_functions.VARIABLE, **kwargs)
     term.value = value
     return term
-    """
-
-  def input(self, index):
-    return self.inputs[index].value
 
   def getType(self):
     "Returns this term's output type"
-    
-    if self.outputTypeOutOfDate:
-      self.outputType = self.function.getOutputType(self)
-
-    return self.outputType
+    return self.function.outputType
 
 
   def inputsContain(self, term):
@@ -152,4 +126,9 @@ class Term(object):
   def __getitem__(self, name):
     return self.state.getLocal(name)
 
+import builtin_functions
+
+def placeholder():
+  "Returns a new placeholder term"
+  return Term(builtin_functions.PLACEHOLDER)
 

@@ -1,28 +1,43 @@
+"""
+This object contains a single 'unit' of code.
+
+Generally, one unit of code corresponds with one subroutine definition, but the user is
+free to do it differently.
+
+All structure-changing operations should be performed on this object
+(rather than on the terms. (which is how things were done before)
+"""
 
 import term
-import term_creation_options
+from common_errors import UsageError
 
 class CodeUnit(object):
   def __init__(self):
     self.all_terms = []
+    self.main_branch = []
     self.term_namespace = {}
 
-  def appendNewTerm(self, term_creation_options):
-    assert isinstance(term_creation_options, TermCreationOptions)
+  def addTerm(self, term, name=None):
+    "Add a new term"
+    self.all_terms.append(term)
+    if name:
+      self.setTermName(term, name)
 
-    # Create the term
-    new_term = term.Term(term_creation_options)
+  def setTermName(self, term, name, allow_rename=False):
+    assert isinstance(name, str)
 
-    # Append it to our list
-    self.all_terms.append(new_term)
+    if (not allow_rename) and (name in self.term_namespace):
+      raise UsageError("A term with name \""+str(name)+"\" already exists." +
+                       " (Use 'allow_rename' if you want to allow this)")
 
-    # Initialize inputs
-    self.setTermInputs(new_term, term_creation_options.inputs)
+    self.term_namespace[name] = term
+
 
   def setTermInputs(self, target_term, new_inputs):
     "Assigns the term's inputs"
 
     old_inputs = target_term.inputs
+    target_term.inputs = new_inputs
 
     # find which terms were just added
     newly_added = new_inputs - old_inputs
@@ -40,9 +55,6 @@ class CodeUnit(object):
     # remove ourselves from old user lists
     for t in newly_removed:
       t.users.remove(target_term)
-
-  def getOutputType(self, target_term):
-    return target_term.outputType
 
   def getNamedTerm(self, name):
     return self.term_namespace[name]
