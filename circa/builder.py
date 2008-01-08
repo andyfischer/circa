@@ -3,24 +3,23 @@ import pdb
 import circa_module
 import code_unit
 import parser
+import subroutine_def
 import term
 from builtin_functions import *
 
-
-class SubroutineBuilder(object):
-  """
-  This class makes it easy to create a SubroutineDefinition
-  """
+class Builder(object):
 
   def __init__(self, target=None):
 
-    if target: self.sub_def = target
-    else: self.sub_def = subroutine_def.SubroutineDefinition()
+    assert not target or isinstance(target, code_unit.CodeUnit)
+
+    if target: self.code_unit = target
+    else: self.code_unit = code_unit.CodeUnit()
 
     self.blockStack = []
     self.previousBlock = None
     
-    self.startBlock(SubroutineBlock, subroutine=self.sub_def)
+    self.startBlock(CodeUnitBlock, code_unit=self.code_unit)
 
   def eval(self, source):
     parser.parse(self, source)
@@ -33,11 +32,11 @@ class SubroutineBuilder(object):
         return term
     return None
 
-  def bind(self, name, term):
+  def bind(self, name, target_term):
     assert isinstance(name, str)
-    assert isinstance(term, Term)
+    assert isinstance(target_term, term.Term)
 
-    self.currentBlock().bindLocal(name, term)
+    self.currentBlock().bindLocal(name, target_term)
 
   def startBlock(self, block_class, **kwargs):
     new_block = block_class(self, **kwargs)
@@ -62,8 +61,12 @@ class SubroutineBuilder(object):
   def blockDepth(self):
     return len(self.blockStack)
 
-  def createTerm(self, function, name=None, **kwargs):
-    new_term = Term(function, branch=self.currentBranch(), **kwargs)
+  def createTerm(self, function, name=None, inputs=None):
+    new_term = term.Term(function)
+    self.code_unit.addTerm(new_term)
+
+    if inputs:
+      self.code_unit.setTermInputs(new_term, inputs)
 
     if name:
       assert isinstance(name, str)
@@ -72,12 +75,12 @@ class SubroutineBuilder(object):
     return new_term
 
   def createConstant(self, value, name=None, **kwargs):
-    new_term = Term.createConstant(value, branch=self.currentBranch(), **kwargs)
+    new_term = term.Term.createConstant(value, **kwargs)
     if name: self.bind(name, new_term)
     return new_term
 
   def createVariable(self, value, name=None, **kwargs):
-    new_term = Term.createVariable(value, branch=self.currentBranch(), **kwargs)
+    new_term = term.Term.createVariable(value, **kwargs)
     if name: self.bind(name, new_term)
     return new_term
     
@@ -98,7 +101,7 @@ class SubroutineBuilder(object):
   def currentBranch(self):
     return self.currentBlock().getBranch()
 
-  def findCurrentSubroutine(self):
+  def findCurrentCodeUnit(self):
     index = len(self.blockStack) -1
 
     while not isinstance(self.blockStack[index], SubroutineBlock):
@@ -147,9 +150,6 @@ class Block(object):
         return block
 
   def bindLocal(self, name, term):
-    assert isinstance(name, str)
-    assert isinstance(term, Term)
-
     # check if this is already defined
 
     existing_term = self.getName(name)
@@ -193,18 +193,18 @@ class PlainBlock(Block):
     return self.parent.getBranch()
 
 
-class SubroutineBlock(Block):
-  def __init__(self, builder, subroutine=None):
+class CodeUnitBlock(Block):
+  def __init__(self, builder, code_unit=None):
     Block.__init__(self, builder)
 
-    assert subroutine != None
+    assert code_unit != None
 
-    self.subroutine = subroutine
+    self.code_unit = code_unit
 
     self.statefulTermInfos = {}
 
   def getBranch(self):
-    return self.subroutine.branch
+    return self.code_unit.main_branch
 
   def newStatefulTerm(self, name, initial_value):
     if self.getLocalName(name) != None:
@@ -220,10 +220,10 @@ class SubroutineBlock(Block):
 
     self.statefulTermInfos[name] = stinfo
 
-    self.subroutine_state.putLocal(name, stinfo.base)
+    self.code_unit.addTerm(term, name=stinfo.base)
 
   def onBind(self, name, term):
-    self.subroutine_state.putLocal(name, term)
+    self.code_unit.setTermName(term, name, allow_rename=True)
 
   def onFinish(self):
     # wrap up stateful terms with assign() terms
@@ -239,7 +239,7 @@ class ConditionalBlock(Block):
   def __init__(self, builder, condition):
     Block.__init__(self, builder)
 
-    assert isinstance(condition, Term)
+    assert isinstance(condition, term.Term)
 
     self.condition_term = condition
     self.branch_term = builder.createTerm(COND_BRANCH, inputs=[self.condition_term])

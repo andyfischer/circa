@@ -42,7 +42,7 @@ class CircaModule(object):
 
   def makeBuilder(self):
     "Create a new Builder object that manipulates this module"
-    return builder.Builder(self)
+    return builder.Builder(self.global_code_unit)
 
   def run(self):
     self.global_code_unit.evaluate()

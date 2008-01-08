@@ -1,11 +1,11 @@
 
 import builtin_functions
 import circa_function
-from term import Term
-from builder import Builder
+import builder
+import term
 import string
 
-global_builder = Builder()
+global_builder = builder.Builder()
 
 def wrap(func):
   def wrapped_circa_func(*args):
@@ -15,12 +15,12 @@ def wrap(func):
     for i in range(len(args)):
       arg = args[i]
 
-      if not isinstance(arg, Term):
+      if not isinstance(arg, term.Term):
         args[i] = global_builder.createConstant(arg)
 
-    term = global_builder.createTerm(func, inputs=args)
-    term.evaluate()
-    return term
+    new_term = global_builder.createTerm(func, inputs=args)
+    new_term.evaluate()
+    return new_term
 
   return wrapped_circa_func
 
