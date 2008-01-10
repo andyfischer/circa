@@ -5,7 +5,7 @@ import term_state
 class CondBranch(circa_function.BaseFunction):
   def init(self):
     self.name = "cond_branch"
-    self.signature = signature.specific(bool)
+    self.signature = signature.fixed(bool)
 
   def evaluate(self, term):
     if term.inputs[0].value:

@@ -3,9 +3,9 @@ import circa_types
 
 VERBOSE_DEBUGGING = 1
 
-def specific(*args):
+def fixed(*args):
   """
-  Returns a signature that specifically requires the given list of types
+  Returns a fixed-size signature
   """
   return FixedSizeSignature(map(SpecificTypeArg, args))
 
@@ -14,6 +14,9 @@ def varargs(type):
   Returns a signature that accepts a variable number of the given type
   """
   return VariableSizeSignature(type)
+
+def empty():
+  return FixedSizeSignature([])
 
 class Signature(object):
   pass
@@ -26,8 +29,7 @@ class FixedSizeSignature(Signature):
 
     self.arg_list = arg_list
 
-  def satisfies(self, term):
-    pdb.set_trace()
+  def satisfiedBy(self, term):
     if len(self.arg_list) != len(term.inputs):
       return False
 
@@ -37,7 +39,7 @@ class VariableSizeSignature(Signature):
   def __init__(self, repeat):
     self.repeat_arg = SpecificTypeArg(repeat)
 
-  def satisfies(self, term):
+  def satisfiedBy(self, term):
     return all( [self.repeat_arg.accepts(input) for input in term.inputs] )
 
 class SignatureArg(object):

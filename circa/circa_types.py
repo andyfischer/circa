@@ -1,7 +1,7 @@
 
-SUPPORTED_TYPES = set((int, float, str, bool))
+ALL_TYPES = set((int, float, str, bool))
 
 def assertSupported(type):
-  if not type in SUPPORTED_TYPES:
+  if not type in ALL_TYPES:
     raise Exception("Unsupported type: " + str(type))
 

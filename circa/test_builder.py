@@ -15,12 +15,7 @@ class Test(unittest.TestCase):
 
     add = b.createTerm(ADD, inputs=[constant1, constant2])
 
-    mod = b.module
-
-    mod.run()
-
     self.assertTrue(add.value == 3.0 or add.value == 3)
-  
 
   def testLocalVars(self):
     bldr = Builder()

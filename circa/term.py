@@ -25,14 +25,16 @@ class Term(object):
   @classmethod
   def createConstant(cls, value, **kwargs):
     import builtin_functions
-    term = Term(builtin_functions.CONSTANT, **kwargs)
+    func = builtin_functions.Constant.fromType(type(value))
+    term = Term(func, **kwargs)
     term.value = value
     return term
 
   @classmethod
   def createVariable(cls, value, **kwargs):
     import builtin_functions
-    term = Term(builtin_functions.VARIABLE, **kwargs)
+    func = builtin_functions.Variable.fromType(type(value))
+    term = Term(func, **kwargs)
     term.value = value
     return term
 
