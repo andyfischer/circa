@@ -39,11 +39,15 @@ class CodeUnit(object):
     old_inputs = target_term.inputs
     target_term.inputs = new_inputs
 
+    # if this is a pure function then re-evaluate it
+    if target_term.function.pureFunction:
+      target_term.evaluate()
+
     # find which terms were just added
-    newly_added = new_inputs - old_inputs
+    newly_added = set(new_inputs) - set(old_inputs)
 
     # find which terms were just removed
-    newly_removed = old_inputs - new_inputs
+    newly_removed = set(old_inputs) - set(new_inputs)
 
     if not newly_added and not newly_removed:
       return
