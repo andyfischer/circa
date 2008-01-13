@@ -32,7 +32,6 @@ for name in dir(builtin_functions):
   obj = getattr(builtin_functions, name)
   name = string.lower(name)   # lower-case the name
   if isinstance(obj, ca_function.BaseFunction):
-    print "wrapping " + name
     globals()[name] = wrap(obj)
     __all__.append(name)
 
