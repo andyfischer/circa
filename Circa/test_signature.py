@@ -4,7 +4,6 @@ import unittest
 import signature
 import term
 
-print dir(dsl)
 pretend_term = dsl.placeholder
 
 class Test(unittest.TestCase):
