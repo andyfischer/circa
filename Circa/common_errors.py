@@ -1,0 +1,4 @@
+
+
+class UsageError(Exception):
+  pass
