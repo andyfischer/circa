@@ -1,5 +1,5 @@
 
-import builtin_functions
+import builtin_function_defs
 import ca_function
 import builder
 import term
@@ -10,7 +10,7 @@ global_builder = builder.Builder()
 def wrap(func):
   def wrapped_circa_func(*args):
 
-    # if they use any non-term args, convert them to Circa terms
+    # if they use any non-term args, convert them to Circa constants
     args = list(args)
     for i in range(len(args)):
       arg = args[i]
@@ -26,10 +26,10 @@ def wrap(func):
 
 __all__ = []
 
-# go through builtin_functions, wrap anything that's a function,
+# go through builtin_function_defs, wrap anything that's a function,
 # add it to this module
-for name in dir(builtin_functions):
-  obj = getattr(builtin_functions, name)
+for name in dir(builtin_function_defs):
+  obj = getattr(builtin_function_defs, name)
   name = string.lower(name)   # lower-case the name
   if isinstance(obj, ca_function.BaseFunction):
     globals()[name] = wrap(obj)

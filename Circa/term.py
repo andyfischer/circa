@@ -23,16 +23,16 @@ class Term(object):
 
   @classmethod
   def createConstant(cls, value, **kwargs):
-    import builtin_functions
-    func = builtin_functions.Constant.fromType(type(value))
+    import builtin_function_defs
+    func = builtin_function_defs.Constant.fromType(type(value))
     term = Term(func, **kwargs)
     term.value = value
     return term
 
   @classmethod
   def createVariable(cls, value, **kwargs):
-    import builtin_functions
-    func = builtin_functions.Variable.fromType(type(value))
+    import builtin_function_defs
+    func = builtin_function_defs.Variable.fromType(type(value))
     term = Term(func, **kwargs)
     term.value = value
     return term
@@ -127,9 +127,9 @@ class Term(object):
   def __getitem__(self, name):
     return self.state.getLocal(name)
 
-import builtin_functions
+import builtin_function_defs
 
 def placeholder():
   "Returns a new placeholder term"
-  return Term(builtin_functions.PLACEHOLDER)
+  return Term(builtin_function_defs.PLACEHOLDER)
 
