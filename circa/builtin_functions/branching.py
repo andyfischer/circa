@@ -17,5 +17,4 @@ class CondBranch(ca_function.BaseFunction):
     return term_state.TermState(has_branch=True)
 
 
-COND_BRANCH = CondBranch()
 
