@@ -169,12 +169,12 @@ class Unary(Node):
   def __str__(self):
     return self.function_token.text + "(" + str(self.right) + ")"
 
-class FunctionCall(Node):
+class Function(Node):
   def __init__(self, function_name, args):
     self.function_name = function_name
     self.args = args
 
-  def eval(self, builder):
+  #def eval(self, builder):
 
   def getFirstToken(self):
     return self.function_name;
@@ -246,7 +246,7 @@ def function_call(tokens):
     tokens.consume(COMMA)
     args.append( infix_expression(tokens, 0) )
 
-  return FunctionCall(function_name, args)
+  return Function(function_name, args)
 
  
 
