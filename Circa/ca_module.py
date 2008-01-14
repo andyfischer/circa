@@ -1,6 +1,6 @@
 
 import builder
-import builtin_functions
+import builtin_function_defs
 import code_unit
 import term
 import token

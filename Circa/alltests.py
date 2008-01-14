@@ -3,10 +3,10 @@
 import unittest
 
 modules_to_test = (
-  'builtin_functions',
+  'builtin_function_defs',
   'token',
   'test_builder',
-  'test_builtin_functions',
+  'test_builtin_function_defs',
   'test_circa_module',
   'test_dsl',
   'test_expression',

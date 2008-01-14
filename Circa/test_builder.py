@@ -3,7 +3,7 @@ import pdb, unittest
 
 import term
 from builder import Builder
-from builtin_functions import *
+from builtin_function_defs import *
 
 class Test(unittest.TestCase):
   def testSimple(self):

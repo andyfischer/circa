@@ -1,7 +1,7 @@
 import parser
 import unittest
 from ca_module import CircaModule
-from builtin_functions import *
+from builtin_function_defs import *
 
 class Test(unittest.TestCase):
   def testAssign(self):

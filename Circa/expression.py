@@ -1,5 +1,5 @@
 import pdb
-import builtin_functions
+import builtin_function_defs
 import parse_errors
 import term
 import token
@@ -75,18 +75,18 @@ class Infix(Node):
 
 # Infix token-to-function map
 infix_token_to_function = {
-    PLUS: builtin_functions.ADD,
-    MINUS: builtin_functions.SUB,
-    STAR: builtin_functions.MULT,
-    SLASH: builtin_functions.DIV
+    PLUS: builtin_function_defs.ADD,
+    MINUS: builtin_function_defs.SUB,
+    STAR: builtin_function_defs.MULT,
+    SLASH: builtin_function_defs.DIV
 }
 
 # Infix token-to-stateful-function
 infix_token_to_assign_function = {
-    PLUS_EQUALS: builtin_functions.ADD,
-    MINUS_EQUALS: builtin_functions.SUB,
-    STAR_EQUALS: builtin_functions.MULT,
-    SLASH_EQUALS: builtin_functions.DIV
+    PLUS_EQUALS: builtin_function_defs.ADD,
+    MINUS_EQUALS: builtin_function_defs.SUB,
+    STAR_EQUALS: builtin_function_defs.MULT,
+    SLASH_EQUALS: builtin_function_defs.DIV
 }
 
 
@@ -159,7 +159,7 @@ class Unary(Node):
     self.right = right
 
   def eval(self, builder):
-    return builder.createTerm(builtin_functions.MULT,
+    return builder.createTerm(builtin_function_defs.MULT,
                               builder.createConstant(-1),
                               self.right.eval(builder))
 
