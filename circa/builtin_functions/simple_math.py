@@ -51,9 +51,4 @@ class Blend(ca_function.BaseFunction):
     blend_value = float(term.inputs[2])
     term.value = float(term.inputs[0]) * (1 - blend_value) + float(term.inputs[1]) * blend_value
 
-ADD = Add()
-SUB = Sub()
-MULT = Mult()
-DIV = Div()
-BLEND = Blend()
 

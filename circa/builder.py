@@ -250,7 +250,7 @@ class ConditionalBlock(Block):
     for rebind_info in self.rebinds.values():
       if not rebind_info.defined_outside: continue
 
-      cond_term = self.builder.createTerm(IF_EXPR,
+      cond_term = self.builder.createTerm(COND_EXPR,
                     inputs=[ self.condition_term, rebind_info.head, rebind_info.original ])
       self.builder.bind(rebind_info.name, cond_term)
 

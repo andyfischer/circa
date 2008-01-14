@@ -40,6 +40,3 @@ class ConditionalExpression(ca_function.BaseFunction):
     else:
       term.value = term.inputs[2].value
 
-AND = And()
-OR = Or()
-IF_EXPR = ConditionalExpression()

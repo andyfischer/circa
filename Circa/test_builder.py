@@ -81,7 +81,7 @@ class Test(unittest.TestCase):
     wrapped_a = bldr.getNamed('a')
 
     self.assertEquals(wrapped_a.value, 3.0)
-    self.assertTrue(wrapped_a.function == IF_EXPR)
+    self.assertTrue(wrapped_a.function == COND_EXPR)
     self.assertTrue(wrapped_a.inputs[1] == new_a)
     self.assertTrue(wrapped_a.inputs[2] == a)
 

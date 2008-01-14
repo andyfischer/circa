@@ -7,3 +7,4 @@ class Print(ca_function.BaseFunction):
     
   def evaluate(self, term):
     print str(term.inputs[0])
+

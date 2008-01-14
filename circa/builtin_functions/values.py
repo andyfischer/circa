@@ -25,5 +25,3 @@ class Variable(ca_function.BaseFunction):
     self.signature = signature.empty()
 
 
-CONSTANT = Constant()
-VARIABLE = Variable()
