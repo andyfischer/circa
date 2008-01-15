@@ -1,10 +1,11 @@
 
 import pdb
+import builtins
+import builtin_function_defs
 import code_unit
 import parser
 import subroutine_def
 import term
-from builtin_function_defs import *
 
 class Builder(object):
 
@@ -24,11 +25,19 @@ class Builder(object):
     parser.parse(self, source)
 
   def getNamed(self, name):
+    "Returns the term with the given name"
+
+    # Check locals; start with the current block and move upwards
     for block in self.upwardsBlockIter():
       term = block.getLocalName(name)
 
       if term: 
         return term
+
+    # Check builtins
+    if name in builtins.ALL_SYMBOLS:
+      return builtins.ALL_SYMBOLS
+
     return None
 
   def bind(self, name, target_term):
@@ -74,12 +83,12 @@ class Builder(object):
     return new_term
 
   def createConstant(self, value, name=None, **kwargs):
-    new_term = term.Term.createConstant(value, **kwargs)
+    new_term = term.createConstant(value, **kwargs)
     if name: self.bind(name, new_term)
     return new_term
 
   def createVariable(self, value, name=None, **kwargs):
-    new_term = term.Term.createVariable(value, **kwargs)
+    new_term = term.createVariable(value, **kwargs)
     if name: self.bind(name, new_term)
     return new_term
     
@@ -241,7 +250,8 @@ class ConditionalBlock(Block):
     assert isinstance(condition, term.Term)
 
     self.condition_term = condition
-    self.branch_term = builder.createTerm(COND_BRANCH, inputs=[self.condition_term])
+    self.branch_term = builder.createTerm(builtin_function_defs.COND_BRANCH,
+                                          inputs=[self.condition_term])
 
   def getBranch(self): return self.branch_term.state.branch
 
@@ -250,7 +260,9 @@ class ConditionalBlock(Block):
     for rebind_info in self.rebinds.values():
       if not rebind_info.defined_outside: continue
 
-      cond_term = self.builder.createTerm(COND_EXPR,
-                    inputs=[ self.condition_term, rebind_info.head, rebind_info.original ])
+      cond_term = self.builder.createTerm(builtin_function_defs.COND_EXPR,
+                                          inputs=[ self.condition_term,
+                                                   rebind_info.head,
+                                                   rebind_info.original ])
       self.builder.bind(rebind_info.name, cond_term)
 

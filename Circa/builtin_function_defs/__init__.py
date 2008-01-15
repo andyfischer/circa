@@ -1,5 +1,5 @@
 
-import branching, debug, logic, misc, simple_math, subroutine, values
+import branching, debug, logic, misc, simple_math, subroutine
 
 COND_BRANCH = branching.CondBranch()
 
@@ -18,6 +18,3 @@ SUB = simple_math.Sub()
 MULT = simple_math.Mult()
 DIV = simple_math.Div()
 BLEND = simple_math.Blend()
-
-Constant = values.Constant
-Variable = values.Variable

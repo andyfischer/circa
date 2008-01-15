@@ -1,4 +1,6 @@
 
+import pdb
+
 import dsl
 import unittest
 import signature
@@ -7,9 +9,13 @@ import term
 pretend_term = dsl.placeholder
 
 class Test(unittest.TestCase):
+  def testSimple(self):
+    sig = signature.fixed(int)
+    self.assertTrue(sig.satisfiedBy(pretend_term(1)))
+
   def testSpecific(self):
     sig = signature.fixed(int, float, str)
-    self.assertTrue(sig)
+    self.assertTrue(sig.satisfiedBy(pretend_term(1, 3.4, 'blah')))
     self.assertTrue(sig.satisfiedBy(pretend_term(1, 3.4, 'blah')))
     self.assertFalse(sig.satisfiedBy(pretend_term(1.0, 3.4, 'blah')))
     self.assertFalse(sig.satisfiedBy(pretend_term(1, 3, 'blah')))
