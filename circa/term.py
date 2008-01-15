@@ -4,14 +4,14 @@ nextGlobalID = 1
 
 
 class Term(object):
-  def __init__(self, function, source_token=None):
+  def __init__(self, function, source_token=None, initial_value=None):
 
     # initialize
     self.inputs = []
     self.function = function
     self.source_token = source_token
     self.users = set()
-    self.value = None
+    self.value = initial_value
 
     # make state
     state = self.function.makeState()
@@ -20,22 +20,6 @@ class Term(object):
     global nextGlobalID
     self.globalID = nextGlobalID
     nextGlobalID += 1
-
-  @classmethod
-  def createConstant(cls, value, **kwargs):
-    import builtin_function_defs
-    func = builtin_function_defs.Constant.fromType(type(value))
-    term = Term(func, **kwargs)
-    term.value = value
-    return term
-
-  @classmethod
-  def createVariable(cls, value, **kwargs):
-    import builtin_function_defs
-    func = builtin_function_defs.Variable.fromType(type(value))
-    term = Term(func, **kwargs)
-    term.value = value
-    return term
 
   def getType(self):
     "Returns this term's output type"
@@ -128,8 +112,18 @@ class Term(object):
     return self.state.getLocal(name)
 
 import builtin_function_defs
+import values
 
 def placeholder():
   "Returns a new placeholder term"
   return Term(builtin_function_defs.PLACEHOLDER)
 
+def constant(value, **term_options):
+  "Returns a constant term with the given value"
+  return Term(values.Constant.fromType(type(value)), initial_value=value, **term_options)
+createConstant = constant
+
+def variable(value):
+  "Returns a variable term with the given value"
+  return Term(values.Variable.fromType(type(value)), initial_value=value)
+createVariable = variable
