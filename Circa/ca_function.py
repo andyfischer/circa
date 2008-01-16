@@ -10,10 +10,8 @@ class BaseFunction(object):
     self.outputType = None
 
     # init function, defined by implementors
-    self.init()
-
-    # make sure they specified a name
-    assert self.name != None
+    if hasattr(self, 'init'):
+      self.init()
 
   def evaluate(self, term):
     pass

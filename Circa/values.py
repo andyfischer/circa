@@ -3,6 +3,9 @@ import pdb
 import ca_function
 import signature
 
+def isConstant(term):
+  return isinstance(term.function, Constant)
+
 class Constant(ca_function.BaseFunction):
   def init(self):
     self.name = "constant"

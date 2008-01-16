@@ -17,7 +17,8 @@ for name in dir(builtin_function_defs):
   obj = getattr(builtin_function_defs, name)
   name = string.lower(name)   # lower-case the name
   if isinstance(obj, ca_function.BaseFunction):
-    FUNCTIONS[name] = obj
+    # Wrap into a constant term
+    FUNCTIONS[name] = term.constant(obj)
 
 # Build dict of constants
 CONSTANTS = {}

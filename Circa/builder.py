@@ -2,10 +2,12 @@
 import pdb
 import builtins
 import builtin_function_defs
+import ca_function
 import code_unit
 import parser
 import subroutine_def
 import term
+import unknown_func
 
 class Builder(object):
 
@@ -40,11 +42,33 @@ class Builder(object):
 
     return None
 
+  getLocal = getNamed
+
   def bind(self, name, target_term):
     assert isinstance(name, str)
     assert isinstance(target_term, term.Term)
 
     self.currentBlock().bindLocal(name, target_term)
+
+  def getLocalFunction(self, name):
+    """
+    Returns a function with the given name.
+    This function will always return a valid function. If the name is not
+    found, this will return an instance of UnknownFunction
+    """
+    term = self.getNamed(name)
+
+    if not term:
+      return unknown_func.UnknownFunction(name, cause=unknown_func.NAME_NOT_FOUND)
+
+    if values.isConstant(term):
+      if not isinstance(term.outputType, ca_function.BaseFunction):
+        return unknown.UnknownFunction.fromName(name, cause=unknown.NAME_NOT_A_FUNCTION)
+
+      return term.value
+      
+    raise NotYetImplemented("functions from non-constant terms")
+
 
   def startBlock(self, block_class, **kwargs):
     new_block = block_class(self, **kwargs)

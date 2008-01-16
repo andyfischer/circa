@@ -26,29 +26,18 @@ class IdentifierNotFound(ParseError):
     return "Identifier not found: " + identifier_token.text
 
 class DanglingRightBracket(ParseError):
-  def __init__(self, location):
-    ParseError.__init__(self, location)
   def message(self):
     return "Found } without a corresponding {"
 
 class NotAStatement(ParseError):
-  def __init__(self, location):
-    ParseError.__init__(self, location)
   def message(self):
     return "Not a statement"
 
 class ExpectedExpression(ParseError):
-  def __init__(self, location):
-    ParseError.__init__(self, location)
   def message(self):
     return "Expected a valid expression"
 
-
-
 class InternalError(ParseError):
-  def __init__(self, location):
-    ParseError.__init__(self, location)
-
   def message(self):
     return "Internal error"
 
