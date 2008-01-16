@@ -4,6 +4,7 @@ import pdb, unittest
 import term
 from builder import Builder
 from builtin_function_defs import *
+import unknown_func
 
 class Test(unittest.TestCase):
   def testSimple(self):
@@ -84,6 +85,13 @@ class Test(unittest.TestCase):
     self.assertTrue(wrapped_a.function == COND_EXPR)
     self.assertTrue(wrapped_a.inputs[1] == new_a)
     self.assertTrue(wrapped_a.inputs[2] == a)
+
+  def testUnknownFunction(self):
+    bldr = Builder()
+
+    non_function = bldr.getLocalFunction("totally-fake")
+
+    self.assertTrue(isinstance(non_function, unknown_func.UnknownFunction))
 
 
 if __name__ == '__main__':

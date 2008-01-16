@@ -160,8 +160,8 @@ class Unary(Node):
 
   def eval(self, builder):
     return builder.createTerm(builtin_function_defs.MULT,
-                              builder.createConstant(-1),
-                              self.right.eval(builder))
+                              inputs = [builder.createConstant(-1),
+                                        self.right.eval(builder)])
 
   def getFirstToken(self):
     return self.function_token;
@@ -174,7 +174,10 @@ class Function(Node):
     self.function_name = function_name
     self.args = args
 
-  #def eval(self, builder):
+  def eval(self, builder):
+    arg_terms = [t.eval(self, builder) for t in self.args]
+    func = builder.getLocalFunction(self.function_name.text)
+    return builder.createTerm(func, inputs=arg_terms)
 
   def getFirstToken(self):
     return self.function_name;
