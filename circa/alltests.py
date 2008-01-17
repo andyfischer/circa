@@ -10,6 +10,7 @@ modules_to_test = (
   'test_circa_module',
   'test_dsl',
   'test_expression',
+  'test_full_program',
   'test_parser',
   'test_signature',
 )

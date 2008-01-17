@@ -4,7 +4,6 @@ import pdb
 import dsl
 import unittest
 import signature
-import term
 
 pretend_term = dsl.placeholder
 

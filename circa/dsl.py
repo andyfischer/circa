@@ -2,7 +2,7 @@
 import builtin_function_defs
 import ca_function
 import builder
-import term
+import terms
 import string
 
 global_builder = builder.Builder()
@@ -15,7 +15,7 @@ def wrap(func):
     for i in range(len(args)):
       arg = args[i]
 
-      if not isinstance(arg, term.Term):
+      if not isinstance(arg, terms.Term):
         args[i] = global_builder.createConstant(arg)
 
     new_term = global_builder.createTerm(func, inputs=args)

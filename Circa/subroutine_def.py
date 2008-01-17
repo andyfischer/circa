@@ -1,6 +1,6 @@
 
 import code_unit
-import term
+import terms
 
 
 class SubroutineDefinition(object):
@@ -9,9 +9,9 @@ class SubroutineDefinition(object):
 
     # Set up placeholders
     self.input_placeholders = []
-    self.this_placeholder = term.placeholder()
+    self.this_placeholder = terms.placeholder()
 
   def createInput(self, input_name):
-    new_term = term.placeholder()
+    new_term = terms.placeholder()
     return new_term
 
