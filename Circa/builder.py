@@ -6,8 +6,9 @@ import ca_function
 import code_unit
 import parser
 import subroutine_def
-import term
+import terms
 import unknown_func
+import values
 
 class Builder(object):
 
@@ -34,11 +35,14 @@ class Builder(object):
       term = block.getLocalName(name)
 
       if term: 
+        assert isinstance(term, terms.Term)
         return term
 
     # Check builtins
     if name in builtins.ALL_SYMBOLS:
-      return builtins.ALL_SYMBOLS
+      term = builtins.ALL_SYMBOLS[name]
+      assert isinstance(term, terms.Term)
+      return term
 
     return None
 
@@ -46,7 +50,7 @@ class Builder(object):
 
   def bind(self, name, target_term):
     assert isinstance(name, str)
-    assert isinstance(target_term, term.Term)
+    assert isinstance(target_term, terms.Term)
 
     self.currentBlock().bindLocal(name, target_term)
 
@@ -61,9 +65,11 @@ class Builder(object):
     if not term:
       return unknown_func.UnknownFunction(name, cause=unknown_func.NAME_NOT_FOUND)
 
+    assert isinstance(term, terms.Term)
+
     if values.isConstant(term):
-      if not isinstance(term.outputType, ca_function.BaseFunction):
-        return unknown.UnknownFunction.fromName(name, cause=unknown.NAME_NOT_A_FUNCTION)
+      if not isinstance(term.function.outputType, ca_function.BaseFunction):
+        return unknown_func.nameNotAFunction(name)
 
       return term.value
       
@@ -94,7 +100,7 @@ class Builder(object):
     return len(self.blockStack)
 
   def createTerm(self, function, name=None, inputs=None):
-    new_term = term.Term(function)
+    new_term = terms.Term(function)
     self.code_unit.addTerm(new_term)
 
     if inputs:
@@ -107,12 +113,12 @@ class Builder(object):
     return new_term
 
   def createConstant(self, value, name=None, **kwargs):
-    new_term = term.createConstant(value, **kwargs)
+    new_term = terms.createConstant(value, **kwargs)
     if name: self.bind(name, new_term)
     return new_term
 
   def createVariable(self, value, name=None, **kwargs):
-    new_term = term.createVariable(value, **kwargs)
+    new_term = terms.createVariable(value, **kwargs)
     if name: self.bind(name, new_term)
     return new_term
     
@@ -246,7 +252,7 @@ class CodeUnitBlock(Block):
 
     stinfo = StatefulTermInfo()
 
-    stinfo.base = term.createVariable(initial_value, self.getCurrentBranch())
+    stinfo.base = terms.createVariable(initial_value, self.getCurrentBranch())
     stinfo.head = stinfo.base
     stinfo.initial_value = initial_value
 
@@ -271,7 +277,7 @@ class ConditionalBlock(Block):
   def __init__(self, builder, condition):
     Block.__init__(self, builder)
 
-    assert isinstance(condition, term.Term)
+    assert isinstance(condition, terms.Term)
 
     self.condition_term = condition
     self.branch_term = builder.createTerm(builtin_function_defs.COND_BRANCH,

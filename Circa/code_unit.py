@@ -4,11 +4,11 @@ This object contains a single 'unit' of code.
 Generally, one unit of code corresponds with one subroutine definition, but the user is
 free to do it differently.
 
-All structure-changing operations should be performed on this object
-(rather than on the terms. (which is how things were done before)
+All structure-changing operations should be performed on this object,
+rather than on the terms themselves.
 """
 
-import term
+import terms
 from common_errors import UsageError
 
 class CodeUnit(object):

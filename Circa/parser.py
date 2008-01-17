@@ -5,7 +5,7 @@ import expression
 import parse_errors
 import token
 from token.definitions import *
-from term import Term
+import terms
 
 DEBUG_LEVEL = 4
 
@@ -123,7 +123,7 @@ class Parser(object):
     if not expr:
       raise parse_errors.ExpectedExpression(return_token)
 
-    self.bind(Term.RETURN_REF_NAME, expr.eval())
+    self.bind(terms.Term.RETURN_REF_NAME, expr.eval())
 
   def for_block(self):
     self.tokens.consume(FOR)

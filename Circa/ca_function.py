@@ -13,7 +13,7 @@ class BaseFunction(object):
     if hasattr(self, 'init'):
       self.init()
 
-  def evaluate(self, term):
+  def evaluate(self, terms):
     pass
 
   def makeState(self):
@@ -30,9 +30,9 @@ class Unspecialized(object):
 
     self.signature_function_pairs.append((sig,func))
 
-  def specialize(self, term):
+  def specialize(self, terms):
     for (sig,func) in self.signature_function_pairs:
-      if sig.satisfiedBy(term):
+      if sig.satisfiedBy(terms):
         return func
 
     return None

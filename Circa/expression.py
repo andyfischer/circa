@@ -1,7 +1,7 @@
 import pdb
 import builtin_function_defs
 import parse_errors
-import term
+import terms
 import token
 from token.definitions import *
 from token import Token
@@ -54,7 +54,7 @@ class Infix(Node):
     # evaluate as an assignment?
     if self.token.match == EQUALS:
       right_term = self.right.eval(builder)
-      if not isinstance(right_term, term.Term):
+      if not isinstance(right_term, terms.Term):
         pdb.set_trace()
         raise ParseError("Expression did not evaluate to a term: " + str(self.right), self.getFirstToken())
       return builder.bind(self.left.getName(), right_term)
@@ -175,7 +175,7 @@ class Function(Node):
     self.args = args
 
   def eval(self, builder):
-    arg_terms = [t.eval(self, builder) for t in self.args]
+    arg_terms = [t.eval(builder) for t in self.args]
     func = builder.getLocalFunction(self.function_name.text)
     return builder.createTerm(func, inputs=arg_terms)
 
@@ -248,6 +248,8 @@ def function_call(tokens):
   while tokens.nextIs(COMMA):
     tokens.consume(COMMA)
     args.append( infix_expression(tokens, 0) )
+
+  tokens.consume(RPAREN)
 
   return Function(function_name, args)
 

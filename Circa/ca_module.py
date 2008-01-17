@@ -2,7 +2,7 @@
 import builder
 import builtin_function_defs
 import code_unit
-import term
+import terms
 import token
 from utils.indent_printer import IndentPrinter
 
@@ -54,8 +54,8 @@ class CircaModule(object):
     stack = [ self.global_term ]
     printer = IndentPrinter()
 
-    term = stack.pop(0)
-    term.printExtended(printer)
+    terms = stack.pop(0)
+    terms.printExtended(printer)
     printer.println()
     """
 

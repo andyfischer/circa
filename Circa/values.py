@@ -2,6 +2,7 @@ import pdb
 
 import ca_function
 import signature
+import terms
 
 def isConstant(term):
   return isinstance(term.function, Constant)

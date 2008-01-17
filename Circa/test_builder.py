@@ -1,7 +1,7 @@
 
 import pdb, unittest
 
-import term
+import terms
 from builder import Builder
 from builtin_function_defs import *
 import unknown_func
@@ -20,7 +20,7 @@ class Test(unittest.TestCase):
   def testLocalVars(self):
     bldr = Builder()
 
-    class FakeTerm(term.Term):
+    class FakeTerm(terms.Term):
       def __init__(self):
         pass
 
