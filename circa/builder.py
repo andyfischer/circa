@@ -3,6 +3,7 @@ import pdb
 import builtins
 import builtin_function_defs
 import ca_function
+import ca_types
 import code_unit
 import parser
 import subroutine_def
@@ -10,11 +11,14 @@ import terms
 import unknown_func
 import values
 
+VERBOSE_DEBUGGING = False
+
 class Builder(object):
 
   def __init__(self, target=None):
 
-    assert not target or isinstance(target, code_unit.CodeUnit)
+    if VERBOSE_DEBUGGING:
+      print "Builder.init, target = " + str(target)
 
     if target: self.code_unit = target
     else: self.code_unit = code_unit.CodeUnit()
@@ -68,13 +72,13 @@ class Builder(object):
     assert isinstance(term, terms.Term)
 
     if values.isConstant(term):
-      if not isinstance(term.function.outputType, ca_function.BaseFunction):
+      if not term.function.outputType == ca_types.FUNC:
+        pdb.set_trace()
         return unknown_func.nameNotAFunction(name)
 
       return term.value
       
     raise NotYetImplemented("functions from non-constant terms")
-
 
   def startBlock(self, block_class, **kwargs):
     new_block = block_class(self, **kwargs)
@@ -85,8 +89,9 @@ class Builder(object):
   def startPlainBlock(self):
     return self.startBlock(PlainBlock)
 
-  def startConditionalBlock(self, **kwargs):
-    return self.startBlock(ConditionalBlock, **kwargs)
+  def startConditionalBlock(self, condition):
+    "Start a condtional block."
+    return self.startBlock(ConditionalBlock, condition=condition)
 
   def closeBlock(self):
     "Close the current block"
@@ -96,31 +101,46 @@ class Builder(object):
     current_block.afterFinish()
     self.previousBlock = current_block
 
+  finishBlock = closeBlock
+
   def blockDepth(self):
     return len(self.blockStack)
 
   def createTerm(self, function, name=None, inputs=None):
+
+    # Allocate term
     new_term = terms.Term(function)
-    self.code_unit.addTerm(new_term)
 
     if inputs:
+      # If they use any non-term args, convert them to constants
+      inputs = map(terms.wrapNonTerm, inputs)
       self.code_unit.setTermInputs(new_term, inputs)
+
+    self.registerNewTerm(new_term, name)
+
+    return new_term
+
+  def registerNewTerm(self, term, name=None):
+    self.code_unit.addTerm(term)
+    self.currentBranch().append(term)
 
     if name:
       assert isinstance(name, str)
-      self.bind(name, new_term)
-
-    return new_term
+      self.bind(name, term)
 
   def createConstant(self, value, name=None, **kwargs):
     new_term = terms.createConstant(value, **kwargs)
-    if name: self.bind(name, new_term)
+    self.registerNewTerm(new_term, name)
     return new_term
+
+  constant = createConstant
 
   def createVariable(self, value, name=None, **kwargs):
     new_term = terms.createVariable(value, **kwargs)
-    if name: self.bind(name, new_term)
+    self.registerNewTerm(new_term, name)
     return new_term
+
+  variable = createVariable
     
   def currentBlock(self):
     try: return self.blockStack[-1]
@@ -153,6 +173,8 @@ class Builder(object):
       if term: return block
     return None
 
+  def evaluate(self):
+    self.code_unit.evaluate()
 
 class RebindInfo(object):
   def __init__(self, name, original, head, defined_outside):
@@ -279,11 +301,20 @@ class ConditionalBlock(Block):
 
     assert isinstance(condition, terms.Term)
 
+    self.step = 0
     self.condition_term = condition
-    self.branch_term = builder.createTerm(builtin_function_defs.COND_BRANCH,
+    self.cond_branch_term = builder.createTerm(builtin_function_defs.COND_BRANCH,
                                           inputs=[self.condition_term])
 
-  def getBranch(self): return self.branch_term.state.branch
+    for n in range(2):
+      self.cond_branch_term.state.branch.append(
+          builder.createTerm(builtin_function_defs.SIMPLE_BRANCH))
+
+  def getBranch(self):
+    return self.cond_branch_term.state.branch[self.step].state.branch
+
+  def setStep(self, step):
+    self.step = step
 
   def afterFinish(self):
     # create a conditional term for any rebinds

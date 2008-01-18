@@ -2,6 +2,7 @@
 import branching, debug, logic, misc, simple_math, subroutine
 
 COND_BRANCH = branching.CondBranch()
+SIMPLE_BRANCH = branching.SimpleBranch()
 
 PRINT = debug.Print()
 

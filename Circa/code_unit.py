@@ -11,6 +11,8 @@ rather than on the terms themselves.
 import terms
 from common_errors import UsageError
 
+VERBOSE_DEBUGGING = False
+
 class CodeUnit(object):
   def __init__(self):
     self.all_terms = []
@@ -31,7 +33,6 @@ class CodeUnit(object):
                        " (Use 'allow_rename' if you want to allow this)")
 
     self.term_namespace[name] = term
-
 
   def setTermInputs(self, target_term, new_inputs):
     "Assigns the term's inputs"
@@ -62,6 +63,13 @@ class CodeUnit(object):
 
   def getNamedTerm(self, name):
     return self.term_namespace[name]
+
+  def evaluate(self):
+    if VERBOSE_DEBUGGING: print "code_unit.evaluate"
+
+    for term in self.main_branch:
+      if VERBOSE_DEBUGGING: print "Calling evaluate on " + str(term)
+      term.evaluate()
 
   __getitem__ = getNamedTerm
 

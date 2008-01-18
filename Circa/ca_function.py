@@ -13,27 +13,9 @@ class BaseFunction(object):
     if hasattr(self, 'init'):
       self.init()
 
-  def evaluate(self, terms):
+  def evaluate(self, term):
     pass
 
   def makeState(self):
-    return None
-
-class Unspecialized(object):
-  def __init__(self):
-    self.name = None
-    self.signature_function_pairs = []
-
-  def addEntry(self, sig, func):
-    assert isinstance(sig, signature.Signature)
-    assert isinstance(func, circa_function.BaseFunction)
-
-    self.signature_function_pairs.append((sig,func))
-
-  def specialize(self, terms):
-    for (sig,func) in self.signature_function_pairs:
-      if sig.satisfiedBy(terms):
-        return func
-
     return None
 

@@ -1,3 +1,4 @@
+import ca_types
 import pdb
 
 nextGlobalID = 1
@@ -14,7 +15,7 @@ class Term(object):
     self.value = initial_value
 
     # make state
-    state = self.function.makeState()
+    self.state = self.function.makeState()
 
     # assign a global ID
     global nextGlobalID
@@ -114,16 +115,24 @@ class Term(object):
 import builtin_function_defs
 import values
 
+def wrapNonTerm(obj):
+  if not isinstance(obj, Term):
+    return constant(obj)
+  else:
+    return obj
+
 def placeholder():
   "Returns a new placeholder term"
   return Term(builtin_function_defs.PLACEHOLDER)
 
 def constant(value, **term_options):
   "Returns a constant term with the given value"
-  return Term(values.Constant.fromType(type(value)), initial_value=value, **term_options)
+  return Term(values.Constant.fromType(ca_types.getType(value)),
+              initial_value=value, **term_options)
 createConstant = constant
 
 def variable(value):
   "Returns a variable term with the given value"
-  return Term(values.Variable.fromType(type(value)), initial_value=value)
+  return Term(values.Variable.fromType(ca_types.getType(value)),
+              initial_value=value)
 createVariable = variable
