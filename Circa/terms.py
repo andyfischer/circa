@@ -15,7 +15,11 @@ class Term(object):
     self.value = initial_value
 
     # make state
-    self.state = self.function.makeState()
+    self.state = function.makeState()
+
+    # possibly create a branch
+    if function.hasBranch:
+      self.branch = []
 
     # assign a global ID
     global nextGlobalID

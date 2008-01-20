@@ -8,6 +8,7 @@ class BaseFunction(object):
     self.pureFunction = False
     self.signature = None
     self.outputType = None
+    self.hasBranch = False
 
     # init function, defined by implementors
     if hasattr(self, 'init'):

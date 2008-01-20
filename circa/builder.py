@@ -307,11 +307,11 @@ class ConditionalBlock(Block):
                                           inputs=[self.condition_term])
 
     for n in range(2):
-      self.cond_branch_term.state.branch.append(
+      self.cond_branch_term.branch.append(
           builder.createTerm(builtin_function_defs.SIMPLE_BRANCH))
 
   def getBranch(self):
-    return self.cond_branch_term.state.branch[self.step].state.branch
+    return self.cond_branch_term.branch[self.step].branch
 
   def setStep(self, step):
     self.step = step
