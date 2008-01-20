@@ -117,7 +117,7 @@ class Term(object):
     return self.state.getLocal(name)
 
 import builtin_function_defs
-import values
+import constant_term
 
 def wrapNonTerm(obj):
   if not isinstance(obj, Term):
@@ -131,12 +131,12 @@ def placeholder():
 
 def constant(value, **term_options):
   "Returns a constant term with the given value"
-  return Term(values.Constant.fromType(ca_types.getType(value)),
+  return Term(constant_term.fromType(ca_types.getType(value)),
               initial_value=value, **term_options)
 createConstant = constant
 
 def variable(value):
   "Returns a variable term with the given value"
-  return Term(values.Variable.fromType(ca_types.getType(value)),
+  return Term(variable_term.fromType(ca_types.getType(value)),
               initial_value=value)
 createVariable = variable
