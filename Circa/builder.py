@@ -9,7 +9,7 @@ import parser
 import subroutine_def
 import terms
 import unknown_func
-import values
+import constant_term
 
 VERBOSE_DEBUGGING = False
 
@@ -71,7 +71,7 @@ class Builder(object):
 
     assert isinstance(term, terms.Term)
 
-    if values.isConstant(term):
+    if constant_term.isConstant(term):
       if not term.function.outputType == ca_types.FUNC:
         pdb.set_trace()
         return unknown_func.nameNotAFunction(name)
