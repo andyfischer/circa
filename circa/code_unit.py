@@ -18,6 +18,7 @@ class CodeUnit(object):
     self.all_terms = []
     self.main_branch = []
     self.term_namespace = {}
+    self.change_listeners = []
 
   def addTerm(self, term, name=None):
     "Add a new term"
@@ -72,4 +73,12 @@ class CodeUnit(object):
       term.evaluate()
 
   __getitem__ = getNamedTerm
+
+# Event enumeration
+(TERM_APPENDED) = range(1)
+
+class ChangeEvent(object):
+  def __init__(self):
+    self.changes = []
+
 

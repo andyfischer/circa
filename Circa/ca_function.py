@@ -9,6 +9,7 @@ class BaseFunction(object):
     self.signature = None
     self.outputType = None
     self.hasBranch = False
+    self.trainingType = None
 
     # init function, defined by implementors
     if hasattr(self, 'init'):

@@ -1,12 +1,13 @@
 import pdb
 import ca_function
+import ca_types
 import signature
 import term_state
 
 class CondBranch(ca_function.BaseFunction):
   def init(self):
     self.name = "cond_branch"
-    self.signature = signature.fixed(bool)
+    self.signature = signature.fixed(ca_types.BOOL)
     self.hasBranch = True
 
   def evaluate(self, term):

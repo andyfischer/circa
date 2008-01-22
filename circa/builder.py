@@ -128,15 +128,15 @@ class Builder(object):
       assert isinstance(name, str)
       self.bind(name, term)
 
-  def createConstant(self, value, name=None, **kwargs):
-    new_term = terms.createConstant(value, **kwargs)
+  def createConstant(self, value, name=None, **term_options):
+    new_term = terms.createConstant(value, term_options)
     self.registerNewTerm(new_term, name)
     return new_term
 
   constant = createConstant
 
-  def createVariable(self, value, name=None, **kwargs):
-    new_term = terms.createVariable(value, **kwargs)
+  def createVariable(self, value, name=None, **term_options):
+    new_term = terms.createVariable(value, term_options)
     self.registerNewTerm(new_term, name)
     return new_term
 

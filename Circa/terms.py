@@ -13,6 +13,7 @@ class Term(object):
     self.source_token = source_token
     self.users = set()
     self.value = initial_value
+    self.training_info = None
 
     # make state
     self.state = function.makeState()
@@ -36,16 +37,6 @@ class Term(object):
     for input in self.inputs:
       if input == term: return True
     return false
-
-  # pruneUsers: Removes any terms from our user list that are not really using us
-  def pruneUsers(self):
-    """
-    Go through this term's user list, remove anything there that is no longer
-    using us.
-    """
-    for user in self.users:
-      if not user.inputsContain(self):
-        self.users.remove(user)
 
   def changeFunction(self, new_func, initial_state=None):
     "Change this term's function"
@@ -129,14 +120,14 @@ def placeholder():
   "Returns a new placeholder term"
   return Term(builtin_function_defs.PLACEHOLDER)
 
-def constant(value, **term_options):
+def constant(value, options={}):
   "Returns a constant term with the given value"
-  return Term(constant_term.fromType(ca_types.getType(value)),
-              initial_value=value, **term_options)
+  type = ca_types.getTypeOfPythonObj(value)
+  return Term(constant_term.fromType(type), initial_value=value, **options)
 createConstant = constant
 
-def variable(value):
+def variable(value, options={}):
   "Returns a variable term with the given value"
-  return Term(variable_term.fromType(ca_types.getType(value)),
-              initial_value=value)
+  type = ca_types.getTypeOfPythonObj(value)
+  return Term(variable_term.fromType(type), initial_value=value, **options)
 createVariable = variable

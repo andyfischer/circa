@@ -1,12 +1,13 @@
 
 import ca_function
+import ca_types
 
 class And(ca_function.BaseFunction):
   def init(self):
     self.name = "and"
     self.pureFunction = True
-    self.inputType = bool
-    self.outputType = bool
+    self.inputType = ca_types.BOOL
+    self.outputType = ca_types.BOOL
 
   def evaluate(self, term):
     for input in term.inputs:
@@ -19,8 +20,8 @@ class Or(ca_function.BaseFunction):
   def init(self):
     self.name = "or"
     self.pureFunction = True
-    self.inputType = bool
-    self.outputType = bool
+    self.inputType = ca_types.BOOL
+    self.outputType = ca_types.BOOL
 
   def evaluate(self, term):
     for input in term.inputs:
