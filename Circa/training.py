@@ -1,32 +1,18 @@
+import numerical_training
 
 def fullUpdate(code):
   assert isinstance(code, code_unit.CodeUnit)
 
-  
-
-def updateTrainingInfo(self, term):
-
-  # check term's inputs for any training info
-  should_have = False
-  for input in term.inputs:
-    if not input.training_info:
-      continue
-
-    if isinstance(input.training_info, NumericalTrainingInfo):
-      should_have = True
-      break
-
-  # if this term shouldn't have numerical training then stop
-  if not should_have:
-    return
-
-  # check if we need to create it
-  if should_have and not term.training_info:
-    term.training_info = NumericalTrainingInfo()
-
-  # update
+  for term in code.iterate():
+    if term.trainingInfo:
+      term.trainingInfo.update(term)
 
 
-class NumericalTraining(object):
-  def __init__(self):
-    self.input_blame = []
+class TrainingInfo(object):
+  def update(self):
+    raise Exception("Need to override this")
+
+
+# Training types
+NumericalDerived = numerical_training.NumericalDerivedInfo
+NumericalSource = numerical_training.NumericalSourceInfo
