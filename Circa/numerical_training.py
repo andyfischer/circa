@@ -1,4 +1,5 @@
 import itertools
+from base_training_info import BaseTrainingInfo
 
 def isTrainingDerived(term):
   return term.trainingInfo and isinstance(term.trainingInfo, NumericalDerivedInfo)
@@ -6,13 +7,20 @@ def isTrainingDerived(term):
 def isTrainingSource(term):
   return term.trainingInfo and isinstance(term.trainingInfo, NumericalSourceInfo)
 
-class NumericalSourceInfo(object):
+class NumericalTrainingState(object):
+  def __init__(self):
+    self.total_feedback = 0
+    self.weight_of_feedback = 0
+
+class NumericalSourceInfo(BaseTrainingInfo):
   pass
 
-class NumericalDerivedInfo(object):
+class NumericalDerivedInfo(BaseTrainingInfo):
   def __init__(self):
     self.trainable_sources = set()
     self.input_blame = set()
+
+  stateType = NumericalTrainingState
 
   def update(self, term):
     # Get a blame value for each input
@@ -38,3 +46,8 @@ class NumericalDerivedInfo(object):
     def union(x,y): return x.union(y)
 
     self.trainable_sources = reduce(union, map(getTrainableSources, term.inputs))
+
+  def runTrainingPass(self, term):
+#todo
+    pass
+

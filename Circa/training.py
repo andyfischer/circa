@@ -8,9 +8,6 @@ def fullUpdate(code):
       term.trainingInfo.update(term)
 
 
-class TrainingInfo(object):
-  def update(self):
-    raise Exception("Need to override this")
 
 
 # Training types

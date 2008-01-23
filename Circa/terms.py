@@ -13,14 +13,19 @@ class Term(object):
     self.source_token = source_token
     self.users = set()
     self.value = initial_value
-    self.training_info = None
 
-    # make state
+    # possibly make state
     self.state = function.makeState()
 
     # possibly create a branch
     if function.hasBranch:
       self.branch = []
+
+    # possibly make training info
+    if function.trainingType:
+      self.training_info = function.trainingType()
+    else: 
+      self.training_info = None
 
     # assign a global ID
     global nextGlobalID
@@ -30,7 +35,6 @@ class Term(object):
   def getType(self):
     "Returns this term's output type"
     return self.function.outputType
-
 
   def inputsContain(self, term):
     "Returns True if our inputs contain the term"

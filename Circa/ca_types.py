@@ -1,25 +1,23 @@
 import ca_function
+import training
 
-class CircaType(object):
-  pass
+class BaseType(object):
+  trainingTypeAsSource = None
 
-class CircaInt(CircaType):
-  def makePythonObject(self):
-    return int()
+class CircaInt(BaseType):
+  pythonType = int
 
-class CircaFloat(CircaType):
-  def makePythonObject(self):
-    return float()
+class CircaFloat(BaseType):
+  pythonType = float
+  trainingTypeAsSource = training.NumericalSource
 
-class CircaString(CircaType):
-  def makePythonObject(self):
-    return str()
+class CircaString(BaseType):
+  pythonType = str
 
-class CircaBool(CircaType):
-  def makePythonObject(self):
-    return bool()
+class CircaBool(BaseType):
+  pythonType = bool
 
-class CircaFunction(CircaType):
+class CircaFunction(BaseType):
   pass
 
 INT = CircaInt

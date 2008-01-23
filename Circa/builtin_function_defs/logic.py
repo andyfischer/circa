@@ -3,11 +3,10 @@ import ca_function
 import ca_types
 
 class And(ca_function.BaseFunction):
-  def init(self):
-    self.name = "and"
-    self.pureFunction = True
-    self.inputType = ca_types.BOOL
-    self.outputType = ca_types.BOOL
+  name = "and"
+  pureFunction = True
+  inputType = ca_types.BOOL
+  outputType = ca_types.BOOL
 
   def evaluate(self, term):
     for input in term.inputs:
@@ -17,11 +16,10 @@ class And(ca_function.BaseFunction):
     term.value = True
 
 class Or(ca_function.BaseFunction):
-  def init(self):
-    self.name = "or"
-    self.pureFunction = True
-    self.inputType = ca_types.BOOL
-    self.outputType = ca_types.BOOL
+  name = "or"
+  pureFunction = True
+  inputType = ca_types.BOOL
+  outputType = ca_types.BOOL
 
   def evaluate(self, term):
     for input in term.inputs:
@@ -31,9 +29,8 @@ class Or(ca_function.BaseFunction):
     term.value = False
 
 class ConditionalExpression(ca_function.BaseFunction):
-  def init(self):
-    self.name = "if"
-    self.pureFunction = True
+  name = "if"
+  pureFunction = True
 
   def evaluate(self, term):
     if term.inputs[0].value:

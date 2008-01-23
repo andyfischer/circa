@@ -1,19 +1,13 @@
 
 
 class BaseFunction(object):
-  def __init__(self):
-    
-    # default options
-    self.name = None
-    self.pureFunction = False
-    self.signature = None
-    self.outputType = None
-    self.hasBranch = False
-    self.trainingType = None
-
-    # init function, defined by implementors
-    if hasattr(self, 'init'):
-      self.init()
+  # Default options
+  name = None
+  pureFunction = False
+  signature = None
+  outputType = None
+  hasBranch = False
+  trainingType = None
 
   def evaluate(self, term):
     pass
