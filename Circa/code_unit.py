@@ -74,6 +74,9 @@ class CodeUnit(object):
 
   __getitem__ = getNamedTerm
 
+  def iterate(self):
+    todo
+
 # Event enumeration
 (TERM_APPENDED) = range(1)
 
