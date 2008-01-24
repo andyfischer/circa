@@ -3,9 +3,9 @@ import pdb
 
 import expression
 import parse_errors
+import terms
 import token
 from token.definitions import *
-import terms
 
 def parse(builder, source):
   tokens = token.asTokenStream(source)

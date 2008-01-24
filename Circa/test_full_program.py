@@ -8,7 +8,7 @@ def run(text):
 
 class Test(unittest.TestCase):
   def testPrint(self):
-    run("print(1)")
+    run("print('test')")
 
 if __name__ == '__main__':
   unittest.main()
