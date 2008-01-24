@@ -1,6 +1,7 @@
 
 
 class BaseFunction(object):
+
   # Default options
   name = None
   pureFunction = False

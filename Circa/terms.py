@@ -5,14 +5,14 @@ nextGlobalID = 1
 
 
 class Term(object):
-  def __init__(self, function, source_token=None, initial_value=None):
+  def __init__(self, function, source_token=None):
 
     # initialize
     self.inputs = []
     self.function = function
     self.source_token = source_token
     self.users = set()
-    self.value = initial_value
+    self.value = None
 
     # possibly make state
     self.state = function.makeState()
@@ -127,11 +127,17 @@ def placeholder():
 def constant(value, options={}):
   "Returns a constant term with the given value"
   type = ca_types.getTypeOfPythonObj(value)
-  return Term(constant_term.fromType(type), initial_value=value, **options)
+  term = Term(constant_term.fromType(type), **options)
+  term.value = value
+  return term
+
 createConstant = constant
 
 def variable(value, options={}):
   "Returns a variable term with the given value"
   type = ca_types.getTypeOfPythonObj(value)
-  return Term(variable_term.fromType(type), initial_value=value, **options)
+  term = Term(variable_term.fromType(type), **options)
+  variable_term.setValue(term, value)
+  return term
+
 createVariable = variable

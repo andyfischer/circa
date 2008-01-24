@@ -23,5 +23,8 @@ def fromType(type):
   type_to_function_instance[type] = inst
   return inst
 
+def getValue(term):
+  return term.state
 
-    
+def setValue(term, value):
+  term.state = value
