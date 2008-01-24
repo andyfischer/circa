@@ -7,8 +7,6 @@ import token
 from token.definitions import *
 import terms
 
-DEBUG_LEVEL = 4
-
 def parse(builder, source):
   tokens = token.asTokenStream(source)
   parser = Parser(builder, tokens, raise_errors=True)
