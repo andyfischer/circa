@@ -116,6 +116,8 @@ class Literal(Node):
       self.value = float(token.text)
     elif token.match == INTEGER:
       self.value = int(token.text)
+    elif token.match == STRING:
+      self.value = parseStringLiteral(token.text)
     elif token.match == TRUE:
       self.value = True
     elif token.match == FALSE:
@@ -220,7 +222,7 @@ def atom(tokens):
     return function_call(tokens)
 
   # literal
-  if tokens.nextIn((FLOAT, INTEGER, TRUE, FALSE)):
+  if tokens.nextIn((FLOAT, INTEGER, STRING, TRUE, FALSE)):
     token = tokens.consume()
     return Literal(token)
 
@@ -252,6 +254,7 @@ def function_call(tokens):
   tokens.consume(RPAREN)
 
   return Function(function_name, args)
-
  
-
+def parseStringLiteral(text):
+  # the literal should have ' marks on either side, strip these
+  return text.strip("'\"")

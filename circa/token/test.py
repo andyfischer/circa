@@ -51,6 +51,10 @@ class Test(unittest.TestCase):
     for t in tokens:
       self.assertTrue(t.match == FLOAT or t.match == WHITESPACE)
 
+  def testStringLiteral(self):
+    tokens = token.tokenize("'hello'")
+    self.assertEquals(tokens[0].match, STRING)
+
   def testMultipleLines(self):
     tokens = token.tokenize("1 \n2\n\n   4")
 
