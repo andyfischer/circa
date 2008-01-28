@@ -10,7 +10,6 @@ class CondBranch(ca_function.BaseFunction):
   hasBranch = True
 
   def evaluate(self, term):
-    pdb.set_trace()
     if term.inputs[0].value:
       term.branch[0].evaluate()
     else:
