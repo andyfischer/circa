@@ -1,12 +1,12 @@
 
 from expression import *
 import unittest
-import token
+import ca_token
 
 class Test(unittest.TestCase):
   def testAst(self):
     def parse_to_ast(string):
-      tokens = token.asTokenStream(string)
+      tokens = ca_token.asTokenStream(string)
       return parseExpression(tokens)
 
     node = parse_to_ast("1")

@@ -3,7 +3,7 @@ import builder
 import builtin_function_defs
 import code_unit
 import terms
-import token
+import ca_token
 from utils.indent_printer import IndentPrinter
 
 class CircaModule(object):
@@ -20,7 +20,7 @@ class CircaModule(object):
     "Create a CircaModule from the given text."
 
     module = CircaModule()
-    module.source_tokens = token.tokenize(text)
+    module.source_tokens = ca_token.tokenize(text)
     builder = module.makeBuilder()
     builder.eval(module.source_tokens)
     return module

@@ -1,6 +1,7 @@
 import ca_function
 import ca_types
 import training
+from builtin_function_defs import *
 
 class Add(ca_function.BaseFunction):
   name = "add"
@@ -11,6 +12,27 @@ class Add(ca_function.BaseFunction):
 
   def evaluate(self, term):
     term.value = float(term.inputs[0]) + float(term.inputs[1])
+
+  def generateTraining(self, term, context, training_code):
+    term.training_info.update()
+
+    incoming_signal = context.incomingSignal(term)
+
+    # count trainable inputs
+    num_trainable_inputs = sum(map(lambda x: x > 0, term.training_info.input_blame))
+
+    if num_trainable_inputs == 0: return
+
+    for index in range(len(term.inputs)):
+
+      # Normalize each input
+      # (Todo: make sure there is an optimization that strips multiplication with 1)
+      scalar = training_code.appendConstant(term.training_info.input_blame[index])
+      product = training_code.append(MULT, inputs[incoming_signal, scalar])
+      context.sendTrainingSignal(term.inputs[index], product)
+
+
+
 
 class Sub(ca_function.BaseFunction):
   name = "sub"

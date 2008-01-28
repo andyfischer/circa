@@ -24,6 +24,7 @@ class Term(object):
     # possibly make training info
     if function.trainingType:
       self.training_info = function.trainingType()
+      self.training_info.update(self)
     else: 
       self.training_info = None
 

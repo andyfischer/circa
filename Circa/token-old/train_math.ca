@@ -1,0 +1,12 @@
+
+
+training(add) =
+function(term)
+{
+  for index in (0, len(inputs(term)))
+  {
+    scalar = input_blame(term, index)
+    training_signal(term) = incoming_signal(term) * scalar
+    # todo: this method of blame does not handle multiple signals for one term
+  }
+}

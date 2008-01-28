@@ -36,8 +36,6 @@ class TokenStream(object):
     while not self.finished() and self.shouldSkip(self.tokens[self.currentIndex]):
       self.currentIndex += 1
 
-
-
   def __str__(self):
     return str(map(str, self.tokens))
 
@@ -105,7 +103,6 @@ class TokenStream(object):
     Returns a mark object that represents the current location,
     suitable for a call to restoreLocation
     """
-
     return self.currentIndex
 
   def restoreMark(self, mark):

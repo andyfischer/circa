@@ -1,5 +1,7 @@
 import itertools
-from base_training_info import BaseTrainingInfo
+
+class BaseTrainingInfo(object):
+  pass
 
 def isTrainingDerived(term):
   return term.trainingInfo and isinstance(term.trainingInfo, NumericalDerivedInfo)
@@ -23,6 +25,7 @@ class NumericalDerivedInfo(BaseTrainingInfo):
   stateType = NumericalTrainingState
 
   def update(self, term):
+
     # Get a blame value for each input
     def getBlameValueTotal(term):
       if isTrainingSource(term):
@@ -33,6 +36,14 @@ class NumericalDerivedInfo(BaseTrainingInfo):
         return 0
 
     self.input_blame = map(getBlameValueTotal, term.inputs)
+
+    overall_total_blame = sum(self.input_blame)
+
+    # Normalize blame
+    def norm(value):
+      return value / overall_total_blame
+
+    self.input_blame = map(norm, self.input_blame)
     
     # Get a set of trainable sources
     def getTrainableSources(term):
@@ -45,9 +56,18 @@ class NumericalDerivedInfo(BaseTrainingInfo):
 
     def union(x,y): return x.union(y)
 
-    self.trainable_sources = reduce(union, map(getTrainableSources, term.inputs))
+    self.trainable_sources = reduce(union, map(getTrainableSources, term.inputs), set())
 
   def runTrainingPass(self, term):
-#todo
-    pass
+    term.function.doTraining(desired = term.trainingState.total_feedback, term = term)
+
+def doTrainingUsingDerivative(derivative):
+  def doTrainingUsingDerivativeBody(desired, term):
+    delta = desired - term.value
+
+    for input_index in range(len(term.inputs)):
+      input_blame = term.trainingInfo.input_blame[input_index]
+      input_delta = delta * input_blame
+
+
 
