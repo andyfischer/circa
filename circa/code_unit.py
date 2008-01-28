@@ -15,16 +15,28 @@ VERBOSE_DEBUGGING = False
 
 class CodeUnit(object):
   def __init__(self):
-    self.all_terms = []
     self.main_branch = []
     self.term_namespace = {}
     self.change_listeners = []
 
-  def addTerm(self, term, name=None):
-    "Add a new term"
-    self.all_terms.append(term)
+  def appendNewTerm(self, function, name=None, inputs=None, branch=None):
+    new_term = terms.Term(function)
+
+    if inputs:
+      # If they use any non-term args, convert them to constants
+      inputs = map(terms.wrapNonTerm, inputs)
+      self.code_unit.setTermInputs(new_term, inputs)
+
+    if branch:
+      branch.append(new_term)
+    else:
+      self.main_branch.append(new_term)
+
     if name:
-      self.setTermName(term, name)
+      self.setTermName(new_term, name)
+
+  append = appendNewTerm
+
 
   def setTermName(self, term, name, allow_rename=False):
     assert isinstance(name, str)

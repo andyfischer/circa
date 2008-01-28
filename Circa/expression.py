@@ -2,9 +2,8 @@ import pdb
 import builtin_function_defs
 import parse_errors
 import terms
-import token
-from token.definitions import *
-from token import Token
+import ca_token
+from ca_token import *
 
 DEBUG_LEVEL = 0
 

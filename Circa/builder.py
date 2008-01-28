@@ -107,6 +107,7 @@ class Builder(object):
     return len(self.blockStack)
 
   def createTerm(self, function, name=None, inputs=None):
+    # This method is deprecated in favor of CodeUnit.appendNewTerm
 
     # Allocate term
     new_term = terms.Term(function)
@@ -121,7 +122,6 @@ class Builder(object):
     return new_term
 
   def registerNewTerm(self, term, name=None):
-    self.code_unit.addTerm(term)
     self.currentBranch().append(term)
 
     if name:

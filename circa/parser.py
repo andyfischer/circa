@@ -4,11 +4,11 @@ import pdb
 import expression
 import parse_errors
 import terms
-import token
-from token.definitions import *
+import ca_token
+from ca_token import *
 
 def parse(builder, source):
-  tokens = token.asTokenStream(source)
+  tokens = ca_token.asTokenStream(source)
   parser = Parser(builder, tokens, raise_errors=True)
   parser.run()
 
@@ -20,7 +20,7 @@ class Parser(object):
     self.previous_block = None
 
     # make sure 'tokens' is a token stream
-    self.tokens = token.asTokenStream(token_source)
+    self.tokens = ca_token.asTokenStream(token_source)
     
   def run(self):
     while not self.tokens.finished():
@@ -116,7 +116,7 @@ class Parser(object):
     self.bind(subroutine_name.text, function_term)
 
   def return_statement(self):
-    return_token = tokens.consume(RETURN)
+    return_token = self.tokens.consume(RETURN)
     expr = self.expression()
     if not expr:
       raise parse_errors.ExpectedExpression(return_token)

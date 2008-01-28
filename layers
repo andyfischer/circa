@@ -1,0 +1,23 @@
+
+High-level overview of what is happening:
+
+Bottom layer:
+
+Executable dataflow graph
+Can be compiled into LLVM and then run with no help from the host
+
+Next layer:
+
+Operations that read/modify the dataflow graph.
+
+In certain instances, this must happen at run-time.  We must provide built-ins
+so that these operations are possible from code.
+
+We must do what we can to:
+a) reduce how often this must happen
+b) minimize how much recalculation must be done when one of these changes occur.
+
+Next layer:
+
+Wholesale reading/modification of code. Here there is no restriction on the scope of
+the changes we are allowed to perform.
