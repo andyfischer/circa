@@ -1,7 +1,6 @@
 
 
-training(add) =
-function(term)
+define training(add)
 {
   idea1:
   ...
