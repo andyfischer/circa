@@ -1,0 +1,13 @@
+
+Need a way to 'override' a function call. This can be used to create things that
+act like members.
+
+This requires:
+a) A mechanism for declaring a function as overridable
+b) Handling the actual override of a function (with equals notation)
+c) A way to specify the default of a function
+d) A way for the code to intelligently figure out what needs to be reevaluated,
+when an override occurs.
+
+Right now this is looking like a layer B operation. Is there a way to do the same thing
+in layer A?

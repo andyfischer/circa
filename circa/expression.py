@@ -3,14 +3,14 @@ import builtin_function_defs
 import parse_errors
 import terms
 import ca_token
-from ca_token import *
+from ca_token.definitions import *
 
 DEBUG_LEVEL = 0
 
 # Expression parsing
 def parseExpression(tokens):
   # Coerce 'tokens' into a token stream
-  tokens = token.asTokenStream(tokens)
+  tokens = ca_token.asTokenStream(tokens)
 
   # Mark the start location for backtracking
   start_loc = tokens.markLocation()
@@ -35,7 +35,7 @@ class Node(object):
 
 class Infix(Node):
   def __init__(self, function_token, left, right):
-    assert isinstance(function_token, token.Token)
+    assert isinstance(function_token, ca_token.Token)
     assert isinstance(left, Node)
     assert isinstance(right, Node)
 

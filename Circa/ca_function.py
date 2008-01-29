@@ -10,6 +10,10 @@ class BaseFunction(object):
   hasBranch = False
   trainingType = None
 
+  @classmethod
+  def shouldReuseExisting(cls):
+    return pureFunction
+
   def evaluate(self, term):
     pass
 

@@ -142,3 +142,32 @@ def variable(value, options={}):
   return term
 
 createVariable = variable
+
+def findExisting(function, inputs=[]):
+  """
+  Assuming you want a term that has the given function and inputs, this function
+  returns such a function if it exists and if it makes sense (according to the function's
+  definition) to allow people to reuse a function.
+  """
+  if function.shouldReuseExisting():
+    # Try to find an existing term
+    for input in inputs:
+      for user_of_input in input.users:
+        # Check if they are using the same function
+        if user_of_input.function != function: continue
+
+        # Check if all the inputs are the same
+        inputs_match = all(apply(lambda a,b: a.equals(b), zip(inputs, user_of_input.inputs)))
+
+        # Todo: allow for functions that don't care what the function order is
+
+        if not inputs_match: continue
+
+        # Looks like this term is the same as what they want
+        return user_of_input
+
+  return None
+
+        
+
+

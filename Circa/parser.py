@@ -5,7 +5,7 @@ import expression
 import parse_errors
 import terms
 import ca_token
-from ca_token import *
+from ca_token.definitions import *
 
 def parse(builder, source):
   tokens = ca_token.asTokenStream(source)

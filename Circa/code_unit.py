@@ -20,6 +20,9 @@ class CodeUnit(object):
     self.change_listeners = []
 
   def appendNewTerm(self, function, name=None, inputs=None, branch=None):
+    existing_term = terms.findExisting(function,inputs)
+    if existing_term: return existing_term
+
     new_term = terms.Term(function)
 
     if inputs:

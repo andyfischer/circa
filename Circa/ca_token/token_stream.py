@@ -1,6 +1,6 @@
-import token
-import definitions
+import ca_token
 import parse_errors
+from definitions import *
 
 def asTokenStream(source):
   """
@@ -23,13 +23,13 @@ class TokenStream(object):
     """
 
     if isinstance(tokens, str):
-      tokens = token.tokenize(tokens)
+      tokens = ca_token.tokenize(tokens)
 
     assert isinstance(tokens, list)
 
     self.tokens = tokens
     self.currentIndex = 0
-    self.skipSet = set([definitions.WHITESPACE])
+    self.skipSet = set([WHITESPACE])
 
     # currentIndex should always rest on a non-skip token,
     # so advance past any skip tokens that are at the start
