@@ -1,0 +1,17 @@
+
+
+training(add) =
+function(term)
+{
+  idea1:
+  ...
+  incoming_signal_sum = sum(training_signal(users(term)))
+  ...
+  training_signal(term) = 
+  for index in (0, len(inputs(term)))
+  {
+    scalar = input_blame(term, index)
+    training_signal(term) = incoming_signal(term) * scalar
+    # todo: this method of blame does not handle multiple signals for one term
+  }
+}
