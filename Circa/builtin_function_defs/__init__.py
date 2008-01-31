@@ -5,6 +5,7 @@ COND_BRANCH = branching.CondBranch()
 SIMPLE_BRANCH = branching.SimpleBranch()
 
 PRINT = debug.Print()
+GET_INPUT = debug.GetInput()
 
 SUBROUTINE = subroutine.Subroutine()
 

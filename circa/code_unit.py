@@ -8,7 +8,10 @@ All structure-changing operations should be performed on this object,
 rather than on the terms themselves.
 """
 
-import terms
+from Circa import (
+  terms
+)
+
 from common_errors import UsageError
 
 VERBOSE_DEBUGGING = False

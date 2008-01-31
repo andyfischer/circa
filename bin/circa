@@ -1,0 +1,3 @@
+#!/bin/sh
+
+python -c "import Circa.command_line; Circa.command_line.main()" $*

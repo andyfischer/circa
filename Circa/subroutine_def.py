@@ -1,6 +1,8 @@
 
-import code_unit
-import terms
+from Circa import (
+  code_unit,
+  terms
+)
 
 
 class SubroutineDefinition(object):

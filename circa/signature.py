@@ -1,5 +1,8 @@
 import pdb
-import ca_types
+
+from Circa import (
+  ca_types
+)
 
 VERBOSE_DEBUGGING = 1
 

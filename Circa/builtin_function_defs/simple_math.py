@@ -1,7 +1,11 @@
-import ca_function
-import ca_types
-import training
-from builtin_function_defs import *
+from Circa import (
+  ca_function,
+  ca_types, 
+  signature, 
+  term_state,
+  training
+)
+
 
 class Add(ca_function.BaseFunction):
   name = "add"

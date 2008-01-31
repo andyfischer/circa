@@ -1,4 +1,4 @@
-from term_visitor import TermVisitor
+from Circa.term_visitor import TermVisitor
 
 class EvaluationVisitor(TermVisitor):
 

@@ -1,6 +1,11 @@
 
+from Circa import (
+  ca_function,
+  ca_types, 
+  signature, 
+  term_state
+)
 
-import ca_function, ca_types, signature
 
 class Concatenate(ca_function.BaseFunction):
   name = "concat"

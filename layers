@@ -22,3 +22,17 @@ b) minimize how much recalculation must be done when one of these changes occur.
 
 Wholesale reading/modification of code. Here there is no restriction on the scope of
 the changes we are allowed to perform.
+
+
+* Specific operations *
+
+- Layer A -
+
+Execution
+New function call? (requires an allocation and a pointer reassignment)
+
+- Layer B -
+
+Append new term
+Function definition / override
+

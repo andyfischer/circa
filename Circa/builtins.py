@@ -1,8 +1,10 @@
 
 import string
 
-import ca_function
-import terms
+from Circa import (
+  ca_function,
+  terms
+)
 
 
 # Build dict of functions

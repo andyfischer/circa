@@ -1,5 +1,8 @@
-import ca_function
-import training
+
+from Circa import (
+  ca_function,
+  training
+)
 
 class BaseType(object):
   trainingTypeAsSource = None

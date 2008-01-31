@@ -1,15 +1,17 @@
 
 import pdb
-import builtins
-import builtin_function_defs
-import ca_function
-import ca_types
-import code_unit
-import parser
-import subroutine_def
-import terms
-import unknown_func
-import constant_term
+
+from Circa import (
+  builtins,
+  builtin_function_defs,
+  ca_function,
+  ca_types,
+  code_unit,
+  parser,
+  subroutine_def,
+  terms,
+  unknown_func
+)
 
 VERBOSE_DEBUGGING = False
 
@@ -71,7 +73,7 @@ class Builder(object):
 
     assert isinstance(term, terms.Term)
 
-    if constant_term.isConstant(term):
+    if terms.Constant.isConstant(term):
       if not term.function.outputType == ca_types.FUNC:
         pdb.set_trace()
         return unknown_func.nameNotAFunction(name)

@@ -1,6 +1,8 @@
 import unittest
 
-import ca_module
+from Circa import (
+  ca_module
+)
 
 def run(text):
   mod = ca_module.CircaModule.fromText(text)

@@ -1,9 +1,11 @@
 
 import pdb
 
-import token
-import unittest
-from definitions import *
+from Circa import (
+  ca_token
+)
+
+from Circa.ca_token.definitions import *
 
 def one_token(string):
   tlist = token.tokenize(string)

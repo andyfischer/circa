@@ -1,4 +1,7 @@
-import numerical_training
+
+from Circa import (
+  numerical_training
+)
 
 def fullUpdate(code):
   assert isinstance(code, code_unit.CodeUnit)

@@ -1,6 +1,8 @@
 
-import ca_function
-import signature
+from Circa import (
+  ca_function,
+  signature
+)
 
 # Causes
 (NAME_NOT_FOUND, NAME_NOT_A_FUNCTION) = range(2)

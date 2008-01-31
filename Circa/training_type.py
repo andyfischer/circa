@@ -1,5 +1,7 @@
 
-import ca_types
+from Circa import (
+  ca_types
+)
 
 def derived(type):
   return TrainingType(type, True)

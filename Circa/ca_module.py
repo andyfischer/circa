@@ -1,9 +1,12 @@
 
-import builder
-import builtin_function_defs
-import code_unit
-import terms
-import ca_token
+from Circa import (
+  builder,
+  builtin_function_defs,
+  code_unit,
+  terms,
+  ca_token,
+)
+
 from utils.indent_printer import IndentPrinter
 
 class CircaModule(object):

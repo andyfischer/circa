@@ -1,5 +1,9 @@
-import ca_types
 import pdb
+
+from Circa import (
+  ca_types,
+  ca_function
+)
 
 nextGlobalID = 1
 
@@ -113,7 +117,6 @@ class Term(object):
     return self.state.getLocal(name)
 
 import builtin_function_defs
-import constant_term
 
 def wrapNonTerm(obj):
   if not isinstance(obj, Term):
@@ -128,7 +131,7 @@ def placeholder():
 def constant(value, options={}):
   "Returns a constant term with the given value"
   type = ca_types.getTypeOfPythonObj(value)
-  term = Term(constant_term.fromType(type), **options)
+  term = Term(Constant.fromType(type), **options)
   term.value = value
   return term
 
@@ -137,8 +140,8 @@ createConstant = constant
 def variable(value, options={}):
   "Returns a variable term with the given value"
   type = ca_types.getTypeOfPythonObj(value)
-  term = Term(variable_term.fromType(type), **options)
-  variable_term.setValue(term, value)
+  term = Term(Variable.fromType(type), **options)
+  Variable.setValue(term, value)
   return term
 
 createVariable = variable
@@ -168,6 +171,64 @@ def findExisting(function, inputs=[]):
 
   return None
 
-        
+ 
+# Constant terms
 
+
+
+class Constant(ca_function.BaseFunction):
+  type_to_function_instance = {}
+
+  def init(self):
+    self.name = "constant"
+    self.signature = signature.empty()
+
+  @classmethod
+  def fromType(cls, type):
+    global type_to_function_instance
+
+    "Returns a function instance that matches the given type"
+    if type in Constant.type_to_function_instance:
+      return Constant.type_to_function_instance[type]
+
+    # make a new instance
+    inst = Constant()
+    inst.outputType = type
+    Constant.type_to_function_instance[type] = inst
+    return inst
+
+  @classmethod
+  def isConstant(cls, term):
+    "Returns True if the term is a constant term"
+    return isinstance(term.function, Constant)
+  
+class Variable(ca_function.BaseFunction):
+  type_to_function_instance = {}
+
+  def init(self):
+    self.name = "variable"
+    self.signature = signature.empty()
+
+  @classmethod
+  def fromType(cls, type):
+    global type_to_function_instance
+
+    "Returns a function instance that matches the given type"
+    if type in Variable.type_to_function_instance:
+      return Variable.type_to_function_instance[type]
+
+    # make a new instance
+    inst = Variable()
+    inst.outputType = type
+    inst.trainingType = type.trainingTypeAsSource
+    Variable.type_to_function_instance[type] = inst
+    return inst
+
+  @classmethod
+  def getValue(cls, term):
+    return term.state
+
+  @classmethod
+  def setValue(cls, term, value):
+    term.state = value
 

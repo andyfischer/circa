@@ -1,6 +1,6 @@
 import unittest
 
-from subroutine import *
+from Circa.subroutine import *
 
 class SubroutineTest(unittest.TestCase):
   def test1(m):

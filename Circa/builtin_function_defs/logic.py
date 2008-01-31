@@ -1,6 +1,11 @@
 
-import ca_function
-import ca_types
+from Circa import (
+  ca_function,
+  ca_types, 
+  signature, 
+  term_state
+)
+
 
 class And(ca_function.BaseFunction):
   name = "and"

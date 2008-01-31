@@ -1,10 +1,13 @@
 
 import pdb, unittest
 
-import terms
-from builder import Builder
-from builtin_function_defs import *
-import unknown_func
+from Circa import (
+  terms,
+  unknown_func
+)
+
+from Circa.builder import Builder
+from Circa.builtin_function_defs import *
 
 class Test(unittest.TestCase):
   def testSimple(self):

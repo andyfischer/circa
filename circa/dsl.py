@@ -1,9 +1,12 @@
 
-import builtin_function_defs
-import ca_function
-import builder
-import terms
 import string
+
+from Circa import (
+  builtin_function_defs,
+  ca_function,
+  builder,
+  terms
+)
 
 global_builder = builder.Builder()
 

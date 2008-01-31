@@ -1,11 +1,13 @@
 
 import pdb
 
-import expression
-import parse_errors
-import terms
-import ca_token
-from ca_token.definitions import *
+from Circa import (
+  expression,
+  parse_errors,
+  terms,
+  ca_token,
+)
+from Circa.ca_token.definitions import *
 
 def parse(builder, source):
   tokens = ca_token.asTokenStream(source)

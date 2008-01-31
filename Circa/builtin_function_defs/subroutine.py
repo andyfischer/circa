@@ -1,5 +1,11 @@
-import ca_function
-import term_state
+
+from Circa import (
+  ca_function,
+  ca_types, 
+  signature, 
+  term_state
+)
+
 
 class Subroutine(ca_function.BaseFunction):
   name = "subroutine"

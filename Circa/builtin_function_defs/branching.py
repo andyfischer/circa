@@ -1,8 +1,11 @@
 import pdb
-import ca_function
-import ca_types
-import signature
-import term_state
+
+from Circa import (
+  ca_function,
+  ca_types, 
+  signature, 
+  term_state
+)
 
 class CondBranch(ca_function.BaseFunction):
   name = "cond_branch"

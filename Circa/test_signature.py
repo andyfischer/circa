@@ -1,10 +1,11 @@
 
-import pdb
+import pdb, unittest
 
-import ca_types
-import dsl
-import unittest
-import signature
+from Circa import (
+  ca_types,
+  dsl,
+  signature
+)
 
 INT = ca_types.INT
 FLOAT = ca_types.FLOAT

@@ -1,8 +1,11 @@
 
 from builder import Builder
-import ca_function
-import dsl
-import unittest
+
+from Circa import (
+  ca_function,
+  dsl,
+  unittest
+)
 
 class FakeFunction_DontCall(ca_function.BaseFunction):
   def evaluate(self, term):
