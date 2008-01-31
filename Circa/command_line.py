@@ -1,11 +1,16 @@
 #!/usr/bin/python
 
 import sys
-import ca_module
+
+from Circa import (
+  ca_module
+)
+
+VERBOSE_DEBUGGING = False
+
 
 def print_usage():
   print "Usage (todo)"
-
 
 def main():
 
@@ -15,6 +20,7 @@ def main():
   command_arg = args.pop(0)
 
   if not args:
+    print "No files specified"
     print_usage()
     return
 
@@ -34,10 +40,11 @@ def main():
 
     args.pop(0)
 
-  print "Running files: " + str(files)
+  if VERBOSE_DEBUGGING:
+    print "Running files: " + str(files)
 
   for filename in files:
-    if filename.endswith(".cr"):
+    if filename.endswith(".cr") or filename.endswith(".ca"):
       module = ca_module.CircaModule.fromFile(filename)
       module.run()
 

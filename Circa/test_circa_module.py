@@ -1,5 +1,8 @@
 import unittest
-import ca_module
+
+from Circa import (
+  ca_module
+)
 
 class Test(unittest.TestCase):
   def destFromSource(self):

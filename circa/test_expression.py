@@ -1,7 +1,10 @@
 
-from expression import *
 import unittest
-import ca_token
+
+from Circa import (
+  ca_token
+)
+from Circa.expression import *
 
 class Test(unittest.TestCase):
   def testAst(self):

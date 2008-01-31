@@ -1,9 +1,13 @@
 import pdb
-import builtin_function_defs
-import parse_errors
-import terms
-import ca_token
-from ca_token.definitions import *
+
+from Circa import (
+  builtin_function_defs,
+  parse_errors,
+  terms,
+  ca_token,
+)
+
+from Circa.ca_token.definitions import *
 
 DEBUG_LEVEL = 0
 

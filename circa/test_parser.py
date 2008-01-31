@@ -1,7 +1,11 @@
-import parser
 import unittest
-from ca_module import CircaModule
-from builtin_function_defs import *
+
+from Circa import (
+  parser
+)
+
+from Circa.ca_module import CircaModule
+from Circa.builtin_function_defs import *
 
 class Test(unittest.TestCase):
   def testAssign(self):
