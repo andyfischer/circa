@@ -1,21 +1,19 @@
 
-import pdb
+import pdb, unittest
 
-from Circa import (
-  ca_token
-)
-
-from Circa.ca_token.definitions import *
+import tokenize
+import token_stream
+from definitions import *
 
 def one_token(string):
-  tlist = token.tokenize(string)
+  tlist = tokenize.tokenize(string)
   assert len(tlist) == 1
   return tlist[0]
 
 class Test(unittest.TestCase):
 
   def testSimple(self):
-    tokens = token.tokenize("1 3.14 > word")
+    tokens = tokenize.tokenize("1 3.14 > word")
 
     self.assertEquals(tokens[0].match, INTEGER)
     self.assertEquals(tokens[0].text, "1")
@@ -44,7 +42,7 @@ class Test(unittest.TestCase):
     self.assertEquals(tokens[6].column, 10)
 
   def testFloatFormats(self):
-    tokens = token.tokenize("1. .1 2.3 .9999")
+    tokens = tokenize.tokenize("1. .1 2.3 .9999")
     self.assertEquals(one_token("1.").match, FLOAT)
     self.assertEquals(one_token(".1").match, FLOAT)
     self.assertEquals(one_token("2.3").match, FLOAT)
@@ -54,11 +52,11 @@ class Test(unittest.TestCase):
       self.assertTrue(t.match == FLOAT or t.match == WHITESPACE)
 
   def testStringLiteral(self):
-    tokens = token.tokenize("'hello'")
+    tokens = tokenize.tokenize("'hello'")
     self.assertEquals(tokens[0].match, STRING)
 
   def testMultipleLines(self):
-    tokens = token.tokenize("1 \n2\n\n   4")
+    tokens = tokenize.tokenize("1 \n2\n\n   4")
 
     for t in tokens:
       if t.match == INTEGER:
@@ -66,7 +64,7 @@ class Test(unittest.TestCase):
         self.assertEquals(value, t.line)
 
   def testKeywords(self):
-    tokens = token.tokenize("function state type var if else true false this global for null return and or")
+    tokens = tokenize.tokenize("function state type var if else true false this global for null return and or")
 
     self.assertEquals(tokens[0].match, FUNCTION)
     self.assertEquals(tokens[2].match, STATE)
@@ -88,19 +86,20 @@ class Test(unittest.TestCase):
   def testNoTokenizeErrors(self):
     "Make sure that tokenize does not return errors, even for awful inputs"
 
-    self.assertTrue( token.tokenize("%$#@%") )
-    self.assertTrue( token.tokenize("********") )
-    self.assertTrue( token.tokenize("!@#$%^&*()';\":<>-=") )
-    self.assertTrue( token.tokenize(r"\\\\") )
-    self.assertTrue( token.tokenize("") == [] )
-    self.assertTrue( token.tokenize("\n\n\n\n\n\n") )
+    self.assertTrue( tokenize.tokenize("%$#@%") )
+    self.assertTrue( tokenize.tokenize("********") )
+    self.assertTrue( tokenize.tokenize("!@#$%^&*()';\":<>-=") )
+    self.assertTrue( tokenize.tokenize(r"\\\\") )
+    self.assertTrue( tokenize.tokenize("") == [] )
+    self.assertTrue( tokenize.tokenize("\n\n\n\n\n\n") )
 
   def testBackToString(self):
     "Test the backToString function"
 
     def test(source_str):
-      token_stream = token.asTokenStream(source_str)
-      back_str = token_stream.backToString()
+      tokens = tokenize.tokenize(source_str)
+      stream = token_stream.TokenStream(tokens)
+      back_str = stream.backToString()
       self.assertEquals(source_str, back_str)
 
     test("a b c")

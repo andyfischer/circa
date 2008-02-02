@@ -8,8 +8,8 @@ class TokenInstance(object):
 
   match : the TokenDef object (from definitions) that we matched
   text : the actual source text
-  line : the line that this token was located at (starting at 1)
-  column : the column that this token starts at (starting at 1)
+  line : the line where this token was located (starting at 1)
+  column : the column where this token was located (starting at 1)
   """
 
   def __init__(self, match, text, line, column):
@@ -27,7 +27,7 @@ class TokenInstance(object):
 
 def tokenize(string):
   """
-  Returns a list of Token instances that fully represents the given string.
+  Returns a list of TokenInstances that fully represents the given string.
   All characters are included, including whitespace and newlines.
 
   No errors are thrown here, but there may be occurences of the special
@@ -74,3 +74,9 @@ def tokenize(string):
 
   return output_list
 
+def untokenize(token_list):
+  """
+  Returns a string created from the given list of TokenInstances.
+  """
+
+  return "".join(map(lambda t: t.text, token_list))

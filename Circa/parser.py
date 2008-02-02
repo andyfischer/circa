@@ -10,12 +10,11 @@ from Circa import (
 from Circa.ca_token.definitions import *
 
 def parse(builder, source):
-  tokens = ca_token.asTokenStream(source)
-  parser = Parser(builder, tokens, raise_errors=True)
+  parser = Parser(builder, source, raise_errors=False)
   parser.run()
 
 class Parser(object):
-  def __init__(self, builder, token_source, raise_errors=True):
+  def __init__(self, builder, token_source, raise_errors):
     self.builder = builder
     self.parse_errors = []
     self.raise_errors = raise_errors
@@ -67,7 +66,6 @@ class Parser(object):
       return
 
     # if we got this far then we don't know what the hell to do
-    pdb.set_trace()
     raise parse_errors.NotAStatement(next_token)
 
   def if_statement(self):

@@ -5,6 +5,7 @@ from Circa import (
   code_unit,
   terms,
   ca_token,
+  parser
 )
 
 from utils.indent_printer import IndentPrinter
@@ -24,6 +25,7 @@ class CircaModule(object):
 
     module = CircaModule()
     module.source_tokens = ca_token.tokenize(text)
+
     builder = module.makeBuilder()
     builder.eval(module.source_tokens)
     return module
@@ -38,9 +40,16 @@ class CircaModule(object):
     file.close()
     del file
 
-    # create module using fromText
-    module = CircaModule.fromText(file_contents)
+    # tokenize
+    tokens = ca_token.tokenize(file_contents)
+
+    module = CircaModule()
+    module.source_tokens = tokens
     module.file_reference = file_name
+
+    builder = module.makeBuilder()
+    parser.parse(builder, module.source_tokens)
+    
     return module
 
   def makeBuilder(self):
@@ -64,6 +73,5 @@ class CircaModule(object):
 
   def getTerm(self, name):
     return self.global_code_unit.getNamedTerm(name)
-
   __getitem__ = getTerm
 

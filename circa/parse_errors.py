@@ -23,7 +23,7 @@ class IdentifierNotFound(ParseError):
     ParseError.__init__(self, identifier_token)
     self.identifier_token = identifier_token
   def message(self):
-    return "Identifier not found: " + identifier_token.text
+    return "Identifier not found: " + self.identifier_token.text
 
 class DanglingRightBracket(ParseError):
   def message(self):

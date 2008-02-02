@@ -1,7 +1,9 @@
 
 
-import tokenize as tokenize_module
 import token_stream
+import tokenize as tokenize_module
+
+from test import *
 
 tokenize = tokenize_module.tokenize
 Token = tokenize_module.TokenInstance

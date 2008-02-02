@@ -2,9 +2,8 @@ from Circa import (
   parse_errors
 )
 
-from Circa.ca_token.definitions import *
-
-
+import tokenize
+from definitions import *
 
 class TokenStream(object):
   def __init__(self, tokens):
@@ -96,8 +95,5 @@ class TokenStream(object):
     self.currentIndex = mark
 
   def backToString(self):
-    # todo: use a stringbuffer or whatever
-    text = ""
-    for token in self.tokens:
-      text += token.text
-    return text
+    return tokenize.untokenize(self.tokens)
+  untokenize = backToString 
