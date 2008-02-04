@@ -5,7 +5,7 @@ from Circa import (
   ca_module
 )
 
-from Circa.builtin_function_defs import *
+from Circa.builtin_functions import *
 
 def parse(text):
   return ca_module.CircaModule.fromText(text)

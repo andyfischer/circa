@@ -3,7 +3,7 @@
 import unittest
 
 modules_to_test = (
-  'builtin_function_defs',
+  'builtin_functions',
   'ca_token',
   'test_builder',
   'test_circa_module',

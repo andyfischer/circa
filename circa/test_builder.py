@@ -2,12 +2,12 @@
 import pdb, unittest
 
 from Circa import (
-  terms,
-  unknown_func
+  builtin_functions,
+  terms
 )
 
 from Circa.builder import Builder
-from Circa.builtin_function_defs import *
+from Circa.builtin_functions import *
 
 class Test(unittest.TestCase):
   def testSimple(self):
@@ -94,7 +94,7 @@ class Test(unittest.TestCase):
 
     non_function = bldr.getLocalFunction("totally-fake")
 
-    self.assertTrue(isinstance(non_function, unknown_func.UnknownFunction))
+    self.assertTrue(isinstance(non_function, builtin_functions.unknown.UnknownFunction))
 
 
 if __name__ == '__main__':
