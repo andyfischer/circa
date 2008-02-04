@@ -2,14 +2,14 @@
 import unittest
 
 from Circa import (
-  ca_token
+  token
 )
 from Circa.expression import *
 
 class Test(unittest.TestCase):
   def testAst(self):
     def parse_to_ast(string):
-      tokens = ca_token.asTokenStream(string)
+      tokens = token.asTokenStream(string)
       return parseExpression(tokens)
 
     node = parse_to_ast("1")

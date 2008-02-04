@@ -4,7 +4,7 @@ import unittest
 
 modules_to_test = (
   'builtin_functions',
-  'ca_token',
+  'token',
   'test_builder',
   'test_circa_module',
   'test_dsl',

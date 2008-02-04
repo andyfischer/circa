@@ -4,15 +4,15 @@ from Circa import (
   builtin_functions,
   parse_errors,
   terms,
-  ca_token,
+  token,
 )
 
-from Circa.ca_token.definitions import *
+from Circa.token.definitions import *
 
 # Expression parsing
 def parseExpression(tokens):
   # Coerce 'tokens' into a token stream
-  tokens = ca_token.asTokenStream(tokens)
+  tokens = token.asTokenStream(tokens)
 
   # Mark the start location for backtracking
   start_loc = tokens.markLocation()
@@ -37,7 +37,7 @@ class Node(object):
 
 class Infix(Node):
   def __init__(self, function_token, left, right):
-    assert isinstance(function_token, ca_token.Token)
+    assert isinstance(function_token, token.Token)
     assert isinstance(left, Node)
     assert isinstance(right, Node)
 
