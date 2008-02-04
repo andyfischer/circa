@@ -116,7 +116,7 @@ class Term(object):
   def __getitem__(self, name):
     return self.state.getLocal(name)
 
-import builtin_function_defs
+import builtin_functions
 
 def wrapNonTerm(obj):
   if not isinstance(obj, Term):
@@ -126,7 +126,7 @@ def wrapNonTerm(obj):
 
 def placeholder():
   "Returns a new placeholder term"
-  return Term(builtin_function_defs.PLACEHOLDER)
+  return Term(builtin_functions.PLACEHOLDER)
 
 def constant(value, options={}):
   "Returns a constant term with the given value"

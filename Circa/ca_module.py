@@ -1,7 +1,7 @@
 
 from Circa import (
   builder,
-  builtin_function_defs,
+  builtin_functions,
   code_unit,
   terms,
   ca_token,

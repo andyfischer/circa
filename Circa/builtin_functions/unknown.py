@@ -10,6 +10,9 @@ from Circa import (
 def nameNotAFunction(name):
   return UnknownFunction(name, NAME_NOT_A_FUNCTION)
 
+def nameNotFound(name):
+  return UnknownFunction(name, NAME_NOT_FOUND)
+
 class UnknownFunction(ca_function.BaseFunction):
   def __init__(self, given_name, cause):
     ca_function.BaseFunction.__init__(self)

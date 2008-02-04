@@ -1,15 +1,13 @@
 import pdb
 
 from Circa import (
-  builtin_function_defs,
+  builtin_functions,
   parse_errors,
   terms,
   ca_token,
 )
 
 from Circa.ca_token.definitions import *
-
-DEBUG_LEVEL = 0
 
 # Expression parsing
 def parseExpression(tokens):
@@ -75,35 +73,34 @@ class Infix(Node):
     return self.function.text + "(" + str(self.left) + "," + str(self.right) + ")"
 
 
-
 # Infix token-to-function map
 infix_token_to_function = {
-    PLUS: builtin_function_defs.ADD,
-    MINUS: builtin_function_defs.SUB,
-    STAR: builtin_function_defs.MULT,
-    SLASH: builtin_function_defs.DIV
+    PLUS: builtin_functions.ADD,
+    MINUS: builtin_functions.SUB,
+    STAR: builtin_functions.MULT,
+    SLASH: builtin_functions.DIV
 }
 
 # Infix token-to-stateful-function
 infix_token_to_assign_function = {
-    PLUS_EQUALS: builtin_function_defs.ADD,
-    MINUS_EQUALS: builtin_function_defs.SUB,
-    STAR_EQUALS: builtin_function_defs.MULT,
-    SLASH_EQUALS: builtin_function_defs.DIV
+    PLUS_EQUALS: builtin_functions.ADD,
+    MINUS_EQUALS: builtin_functions.SUB,
+    STAR_EQUALS: builtin_functions.MULT,
+    SLASH_EQUALS: builtin_functions.DIV
 }
 
 
 # Infix precedence
 HIGHEST_INFIX_PRECEDENCE = 6
-infixPrecedence = {}
-for t in [DOT]: infixPrecedence[t] = 6
-for t in [STAR, SLASH]: infixPrecedence[t] = 5
-for t in [PLUS, MINUS]: infixPrecedence[t] = 4
-for t in [LTHAN, LTHANEQ, GTHAN, GTHANEQ, DOUBLE_EQUALS, NOT_EQUALS]:
-  infixPrecedence[t] = 3
-for t in [AND, OR]: infixPrecedence[t] = 2
-for t in [EQUALS, PLUS_EQUALS, MINUS_EQUALS, STAR_EQUALS, SLASH_EQUALS, COLON_EQUALS]:
-  infixPrecedence[t] = 1
+infixPrecedence = {
+    DOT: 6,
+    STAR: 5, SLASH: 5,
+    PLUS: 4, MINUS: 4,
+    LTHAN: 3, LTHANEQ: 3, GTHAN: 3, GTHANEQ: 3, DOUBLE_EQUALS: 3, NOT_EQUALS: 3,
+    AND: 2, OR: 2,
+    EQUALS: 1, PLUS_EQUALS: 1, MINUS_EQUALS: 1, STAR_EQUALS: 1, SLASH_EQUALS: 1,
+      COLON_EQUALS: 1
+}
 
 def getInfixPrecedence(token):
   if token and token.match in infixPrecedence:
@@ -164,7 +161,7 @@ class Unary(Node):
     self.right = right
 
   def eval(self, builder):
-    return builder.createTerm(builtin_function_defs.MULT,
+    return builder.createTerm(builtin_functions.MULT,
                               inputs = [builder.createConstant(-1),
                                         self.right.eval(builder)])
 
@@ -241,6 +238,7 @@ def atom(tokens):
     tokens.consume(RPAREN)
     return expr
  
+  # failed to match
   raise MatchFailed()
  
 def function_call(tokens):

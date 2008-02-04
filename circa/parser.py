@@ -154,5 +154,3 @@ class Parser(object):
   def new_line(self):
     self.tokens.consume(NEWLINE)
 
-  
-

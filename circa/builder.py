@@ -3,15 +3,16 @@ import pdb
 
 from Circa import (
   builtins,
-  builtin_function_defs,
+  builtin_functions,
   ca_function,
   ca_types,
   code_unit,
   parser,
   subroutine_def,
-  terms,
-  unknown_func
+  terms
 )
+
+import Circa.builtin_functions.unknown
 
 VERBOSE_DEBUGGING = False
 
@@ -69,14 +70,14 @@ class Builder(object):
     term = self.getNamed(name)
 
     if not term:
-      return unknown_func.UnknownFunction(name, cause=unknown_func.NAME_NOT_FOUND)
+      return builtin_functions.unknown.nameNotFound(name)
 
     assert isinstance(term, terms.Term)
 
     if terms.Constant.isConstant(term):
       if not term.function.outputType == ca_types.FUNC:
         pdb.set_trace()
-        return unknown_func.nameNotAFunction(name)
+        return builtin_functions.unknown.nameNotAFunction(name)
 
       return term.value
       
@@ -305,12 +306,12 @@ class ConditionalBlock(Block):
 
     self.step = 0
     self.condition_term = condition
-    self.cond_branch_term = builder.createTerm(builtin_function_defs.COND_BRANCH,
+    self.cond_branch_term = builder.createTerm(builtin_functions.COND_BRANCH,
                                           inputs=[self.condition_term])
 
     for n in range(2):
       self.cond_branch_term.branch.append(
-          builder.createTerm(builtin_function_defs.SIMPLE_BRANCH))
+          builder.createTerm(builtin_functions.SIMPLE_BRANCH))
 
   def getBranch(self):
     return self.cond_branch_term.branch[self.step].branch
@@ -323,7 +324,7 @@ class ConditionalBlock(Block):
     for rebind_info in self.rebinds.values():
       if not rebind_info.defined_outside: continue
 
-      cond_term = self.builder.createTerm(builtin_function_defs.COND_EXPR,
+      cond_term = self.builder.createTerm(builtin_functions.COND_EXPR,
                                           inputs=[ self.condition_term,
                                                    rebind_info.head,
                                                    rebind_info.original ])

@@ -11,12 +11,12 @@ from Circa import (
 
 FUNCTIONS = {}
 
-# Import all functions from builtin_function_defs
+# Import all functions from builtin_functions
 
-import builtin_function_defs
+import builtin_functions
 
-for name in dir(builtin_function_defs):
-  obj = getattr(builtin_function_defs, name)
+for name in dir(builtin_functions):
+  obj = getattr(builtin_functions, name)
   name = string.lower(name)   # lower-case the name
   if isinstance(obj, ca_function.BaseFunction):
     # Wrap into a constant term
