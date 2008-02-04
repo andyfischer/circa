@@ -5,9 +5,9 @@ from Circa import (
   expression,
   parse_errors,
   terms,
-  ca_token,
+  token,
 )
-from Circa.ca_token.definitions import *
+from Circa.token.definitions import *
 
 def parse(builder, source):
   parser = Parser(builder, source, raise_errors=False)
@@ -21,7 +21,7 @@ class Parser(object):
     self.previous_block = None
 
     # make sure 'tokens' is a token stream
-    self.tokens = ca_token.asTokenStream(token_source)
+    self.tokens = token.asTokenStream(token_source)
     
   def run(self):
     while not self.tokens.finished():

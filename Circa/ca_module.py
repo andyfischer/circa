@@ -4,7 +4,7 @@ from Circa import (
   builtin_functions,
   code_unit,
   terms,
-  ca_token,
+  token,
   parser
 )
 
@@ -24,7 +24,7 @@ class CircaModule(object):
     "Create a CircaModule from the given text."
 
     module = CircaModule()
-    module.source_tokens = ca_token.tokenize(text)
+    module.source_tokens = token.tokenize(text)
 
     builder = module.makeBuilder()
     builder.eval(module.source_tokens)
@@ -41,7 +41,7 @@ class CircaModule(object):
     del file
 
     # tokenize
-    tokens = ca_token.tokenize(file_contents)
+    tokens = token.tokenize(file_contents)
 
     module = CircaModule()
     module.source_tokens = tokens
