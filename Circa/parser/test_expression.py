@@ -4,7 +4,7 @@ import unittest
 from Circa import (
   token
 )
-from Circa.expression import *
+from Circa.parser.expression import *
 
 class Test(unittest.TestCase):
   def testAst(self):

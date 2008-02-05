@@ -94,6 +94,7 @@ TYPE =          TokenDef(52, 'type', 'type')
 TRUE =          TokenDef(53, 'true', 'true')
 THIS =          TokenDef(54, 'this', 'this')
 VAR =           TokenDef(55, 'var', 'var')
+PATCH =         TokenDef(55, 'patch', 'patch')
 
 # other types
 FLOAT =         TokenDef(70, 'float', pattern=r"([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)")

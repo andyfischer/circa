@@ -8,8 +8,8 @@ modules_to_test = (
   'test_builder',
   'test_circa_module',
   'test_dsl',
-  'test_expression',
-  'test_parser',
+  'parser.test_expression',
+  'parser.test_parser',
   'test_signature',
 )
 

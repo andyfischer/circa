@@ -2,13 +2,14 @@
 import pdb
 
 from Circa import (
-  expression,
-  parse_errors,
   terms,
-  token,
+  token
 )
 
+from Circa.parser import expression
 from Circa.token.definitions import *
+
+import parse_errors
 
 VERBOSE_DEBUGGING = True
 

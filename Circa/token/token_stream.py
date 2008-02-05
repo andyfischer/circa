@@ -1,8 +1,5 @@
-from Circa import (
-  parse_errors
-)
-
 import tokenize
+from Circa.parser import parse_errors
 from definitions import *
 
 class TokenStream(object):

@@ -1,7 +1,6 @@
 import unittest
 
 from Circa import (
-  parser,
   ca_module
 )
 
