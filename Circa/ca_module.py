@@ -20,14 +20,14 @@ class CircaModule(object):
     self.source_tokens = None
 
   @classmethod
-  def fromText(cls, text):
+  def fromText(cls, text, raise_errors=False):
     "Create a CircaModule from the given text."
 
     module = CircaModule()
     module.source_tokens = token.tokenize(text)
 
     builder = module.makeBuilder()
-    builder.eval(module.source_tokens)
+    parser.parse(builder, module.source_tokens, raise_errors)
     return module
     
   @classmethod

@@ -7,10 +7,13 @@ from Circa import (
   terms,
   token,
 )
+
 from Circa.token.definitions import *
 
-def parse(builder, source):
-  parser = Parser(builder, source, raise_errors=False)
+VERBOSE_DEBUGGING = True
+
+def parse(builder, source, raise_errors=False):
+  parser = Parser(builder, source, raise_errors)
   parser.run()
 
 class Parser(object):
@@ -47,9 +50,6 @@ class Parser(object):
     paths[ELSE] = self.else_statement
     paths[FUNCTION] = self.subroutine_decl
     paths[RETURN] = self.return_statement
-    # paths[VAR] = self.var_statement
-    # paths[STATE] = self.state_block
-    # paths[FOR] = self.for_block
     paths[RBRACKET] = self.right_bracket
     paths[NEWLINE] = self.new_line
 

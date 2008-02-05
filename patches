@@ -1,0 +1,20 @@
+
+Idea: patches
+
+A 'patch' is similar to a function, except it is allowed to make structure-changing operations.
+Functions can not.
+
+Patches create new terms for every time they are called. Functions create terms only once.
+
+Functions can be compiled so that they are fully layer A. Patches are layer B or C.
+
+Functions can not contain patches. At the lowest level, everything is a function. At the highest
+level, everything is a patch.
+
+Patches should be used for things that occur at build-time. Patches should not be called often
+at run-time (perhaps they should be altogether impossible at run time?)
+
+Patches can use this syntax:
+[source_term] -> [dest_term]
+
+

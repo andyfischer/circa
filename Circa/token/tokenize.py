@@ -21,6 +21,9 @@ class TokenInstance(object):
   def length(self):
     return len(self.text)
 
+  def name(self):
+    return self.match.name
+
   def __str__(self):
     return self.text
 

@@ -8,7 +8,7 @@ from Circa import (
 from Circa.builtin_functions import *
 
 def parse(text):
-  return ca_module.CircaModule.fromText(text)
+  return ca_module.CircaModule.fromText(text, raise_errors=True)
 
 class Test(unittest.TestCase):
   def testAssign(self):
@@ -40,11 +40,8 @@ if (a)
     b = mod['b']
     self.assertTrue(int(b) == 2)
 
-  def testOther(self):
-    parse("""
-print("Enter the first number:")
-a = get_input()
-""")
+  def testFunctionCall(self):
+    parse("a = some_function()")
 
         
 
