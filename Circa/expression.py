@@ -9,6 +9,8 @@ from Circa import (
 
 from Circa.token.definitions import *
 
+VERBOSE_DEBUGGING = True
+
 # Expression parsing
 def parseExpression(tokens):
   # Coerce 'tokens' into a token stream
@@ -217,6 +219,9 @@ def unary_expression(tokens):
 
 def atom(tokens):
 
+  if VERBOSE_DEBUGGING:
+    print "atom, next = " + tokens.next().name()
+
   # function call
   if tokens.nextIs(IDENT) and tokens.nextIs(LPAREN, lookahead=1):
     return function_call(tokens)
@@ -239,6 +244,9 @@ def atom(tokens):
     return expr
  
   # failed to match
+  if VERBOSE_DEBUGGING:
+    print "atom failed to match"
+
   raise MatchFailed()
  
 def function_call(tokens):
