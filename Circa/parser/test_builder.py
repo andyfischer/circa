@@ -6,10 +6,11 @@ from Circa import (
   terms
 )
 
-from Circa.builder import Builder
+from Circa.parser.builder import Builder
 from Circa.builtin_functions import *
 
 class Test(unittest.TestCase):
+
   def testSimple(self):
     b = Builder()
 

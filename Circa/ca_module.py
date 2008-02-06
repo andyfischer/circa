@@ -1,12 +1,13 @@
 
 from Circa import (
-  builder,
   builtin_functions,
   code_unit,
   terms,
   token,
   parser
 )
+
+from Circa.parser import builder
 
 from utils.indent_printer import IndentPrinter
 

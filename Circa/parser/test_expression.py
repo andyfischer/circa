@@ -4,12 +4,15 @@ import unittest
 from Circa import (
   token
 )
+
+from Circa.token import token_stream
 from Circa.parser.expression import *
 
 class Test(unittest.TestCase):
   def testAst(self):
     def parse_to_ast(string):
-      tokens = token.asTokenStream(string)
+      assert isinstance(string, str)
+      tokens = token_stream.asTokenStream(string)
       return parseExpression(tokens)
 
     node = parse_to_ast("1")
@@ -29,3 +32,4 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+

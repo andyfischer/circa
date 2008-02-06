@@ -4,9 +4,11 @@ import string
 from Circa import (
   builtin_functions,
   ca_function,
-  builder,
+  parser,
   terms
 )
+
+from Circa.parser import builder
 
 global_builder = builder.Builder()
 

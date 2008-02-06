@@ -1,9 +1,11 @@
+Recent:
+
+Make tests under parser work again
+
+-------
+
+Old:
 
 Function definitions:
 We need some way to specify attributes.
-
-Can we specify a function as "repeat all calls"? That way code can specify multiple
-instances of a function call for one term, and then another part of code can collect
-all those usages.
-
 

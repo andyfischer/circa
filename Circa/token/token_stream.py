@@ -2,6 +2,24 @@ import tokenize
 from Circa.parser import parse_errors
 from definitions import *
 
+def asTokenStream(source):
+  """
+  Convert 'source' into a TokenStream. Accepts a string, a list
+  of tokens, or an existing TokenStream.
+
+  If 'source' is already a TokenStream, this method returns the
+  original object without modification.
+  """
+
+  if isinstance(source, TokenStream):
+    return source
+
+  if isinstance(source, str):
+    source = tokenize.tokenize(source)
+  
+  return TokenStream(source)
+
+
 class TokenStream(object):
   def __init__(self, tokens):
     """

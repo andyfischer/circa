@@ -7,6 +7,7 @@ from Circa import (
 )
 
 from Circa.token.definitions import *
+from Circa.token import token_stream
 
 import parse_errors
 
@@ -15,7 +16,7 @@ VERBOSE_DEBUGGING = True
 # Expression parsing
 def parseExpression(tokens):
   # Coerce 'tokens' into a token stream
-  tokens = token.asTokenStream(tokens)
+  tokens = token_stream.asTokenStream(tokens)
 
   # Mark the start location for backtracking
   start_loc = tokens.markLocation()
@@ -255,11 +256,13 @@ def function_call(tokens):
   tokens.consume(LPAREN)
 
   args = []
-  args.append( infix_expression(tokens, 0) )
 
-  while tokens.nextIs(COMMA):
-    tokens.consume(COMMA)
+  if not tokens.nextIs(RPAREN):
     args.append( infix_expression(tokens, 0) )
+
+    while tokens.nextIs(COMMA):
+      tokens.consume(COMMA)
+      args.append( infix_expression(tokens, 0) )
 
   tokens.consume(RPAREN)
 

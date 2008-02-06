@@ -7,6 +7,7 @@ from Circa import (
 )
 
 from Circa.parser import expression
+from Circa.token import token_stream
 from Circa.token.definitions import *
 
 import parse_errors
@@ -25,7 +26,7 @@ class Parser(object):
     self.previous_block = None
 
     # make sure 'tokens' is a token stream
-    self.tokens = token.asTokenStream(token_source)
+    self.tokens = token_stream.asTokenStream(token_source)
     
   def run(self):
     while not self.tokens.finished():

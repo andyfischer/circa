@@ -1,23 +1,30 @@
-#!/usr/bin/env python2
 
-import unittest
+import unittest, types
 
 modules_to_test = (
-  'builtin_functions',
-  'token',
-  'test_builder',
   'test_circa_module',
   'test_dsl',
-  'parser.test_expression',
-  'parser.test_parser',
-  'test_signature',
+  'test_full_program',
+  'test_signature'
 )
 
 def suite():
     alltests = unittest.TestSuite()
-    for module in map(__import__, modules_to_test):
-        test_cases = unittest.findTestCases(module)
-        alltests.addTests(test_cases)
+
+    add_tests = lambda module: alltests.addTests(unittest.findTestCases(module))
+
+    map(add_tests, map(__import__, modules_to_test))
+
+    from token import test
+
+    add_tests(test)
+
+    from parser import test_builder, test_expression, test_parser
+
+    add_tests(test_builder)
+    add_tests(test_expression)
+    add_tests(test_parser)
+
     return alltests
 
 if __name__ == '__main__':
