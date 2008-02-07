@@ -6,11 +6,14 @@ from Circa import (
   ca_module
 )
 
-VERBOSE_DEBUGGING = False
-
+VERBOSE_DEBUGGING = True
 
 def print_usage():
   print "Usage (todo)"
+
+
+class UserOptions(object):
+  pass
 
 def main():
 
@@ -24,29 +27,34 @@ def main():
     print_usage()
     return
 
-  files = []
+  # User options
+  options = UserOptions()
+  options.files = []
+  options.onlyPrintCode = False
 
-  while args:
+  def shortOption(character):
+    if character == 'p':
+      options.onlyPrintCode = True
 
-    arg = args[0]
-
+  for arg in args:
     if arg[0] == '-':
-      option_str = arg[1:]
-
-      print "Unrecognized option: " + str(option_str)
-      return
-
-    files.append(arg)
-
-    args.pop(0)
+      for c in arg[1:]:
+        shortOption(c)
+    else:
+      options.files.append(arg)
 
   if VERBOSE_DEBUGGING:
-    print "Running files: " + str(files)
+    print "Options = " + str(options.__dict__)
 
-  for filename in files:
+  for filename in options.files:
     if filename.endswith(".cr") or filename.endswith(".ca"):
       module = ca_module.CircaModule.fromFile(filename)
-      module.run()
+
+      if options.onlyPrintCode:
+        module.printTerms()
+
+      else:
+        module.run()
 
 if __name__ == '__main__':
   main()

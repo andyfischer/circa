@@ -17,6 +17,8 @@ class GetInput(ca_function.BaseFunction):
   name = "input"
   signature = signature.empty()
   outputType = ca_types.STRING
+  pureFunction = False
 
   def evaluate(self, term):
+    print "calling getinput evaluate!"
     term.value = raw_input("> ")

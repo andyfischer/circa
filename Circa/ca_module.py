@@ -9,8 +9,6 @@ from Circa import (
 
 from Circa.parser import builder
 
-from utils.indent_printer import IndentPrinter
-
 class CircaModule(object):
   def __init__(self, environment=None):
 
@@ -63,14 +61,6 @@ class CircaModule(object):
   def printTerms(self):
     "Print the contents of this module, for debugging purposes"
     self.global_code_unit.printTerms()
-    """
-    stack = [ self.global_term ]
-    printer = IndentPrinter()
-
-    terms = stack.pop(0)
-    terms.printExtended(printer)
-    printer.println()
-    """
 
   def getTerm(self, name):
     return self.global_code_unit.getNamedTerm(name)

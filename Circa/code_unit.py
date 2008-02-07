@@ -9,10 +9,11 @@ rather than on the terms themselves.
 """
 
 from Circa import (
-  terms
+  terms,
+  common_errors
 )
 
-from common_errors import UsageError
+from Circa.utils import indent_printer
 
 VERBOSE_DEBUGGING = False
 
@@ -20,7 +21,7 @@ class CodeUnit(object):
   def __init__(self):
     self.main_branch = []
     self.term_namespace = {}
-    self.change_listeners = []
+    # self.change_listeners = []
 
   def appendNewTerm(self, function, name=None, inputs=None, branch=None):
     existing_term = terms.findExisting(function,inputs)
@@ -48,7 +49,7 @@ class CodeUnit(object):
     assert isinstance(name, str)
 
     if (not allow_rename) and (name in self.term_namespace):
-      raise UsageError("A term with name \""+str(name)+"\" already exists." +
+      raise common_errors.UsageError("A term with name \""+str(name)+"\" already exists." +
                        " (Use 'allow_rename' if you want to allow this)")
 
     self.term_namespace[name] = term
@@ -90,6 +91,9 @@ class CodeUnit(object):
       if VERBOSE_DEBUGGING: print "Calling evaluate on " + str(term)
       term.evaluate()
 
+  def printTerms(self):
+    printTermsFormatted(self.main_branch, indent_printer.IndentPrinter())
+
   __getitem__ = getNamedTerm
 
   def iterate(self):
@@ -102,4 +106,18 @@ class ChangeEvent(object):
   def __init__(self):
     self.changes = []
 
+def printTermsFormatted(branch, printer):
+  for term in branch:
+    text = str(term.globalID) + ": " + term.function.name
 
+    if term.inputs:
+      text += " ("
+      text += ",".join(map(lambda i: str(i.globalID), term.inputs))
+      text += ")"
+
+    printer.println(text)
+
+    if term.branch:
+      printer.indent()
+      printTermsFormatted(term.branch, printer)
+      printer.unindent()

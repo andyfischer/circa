@@ -11,7 +11,7 @@ from Circa.token import token_stream
 
 import parse_errors
 
-VERBOSE_DEBUGGING = True
+VERBOSE_DEBUGGING = False
 
 # Expression parsing
 def parseExpression(tokens):

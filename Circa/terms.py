@@ -22,8 +22,7 @@ class Term(object):
     self.state = function.makeState()
 
     # possibly create a branch
-    if function.hasBranch:
-      self.branch = []
+    self.branch = [] if function.hasBranch else None
 
     # possibly make training info
     if function.trainingType:
@@ -108,9 +107,17 @@ class Term(object):
           yield term
 
   # value accessors
-  def __int__(self): return int(self.value)
-  def __float__(self): return float(self.value)
-  def __str__(self): return str(self.value)
+  def __int__(self):
+    try: return int(self.value)
+    except: return 0
+
+  def __float__(self):
+    try: return float(self.value)
+    except: return 0.0
+
+  def __str__(self):
+    try: return str(self.value)
+    except: return ""
 
   # member accessor
   def __getitem__(self, name):
