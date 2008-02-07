@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys
+import os, sys
 
 from Circa import (
   ca_module
@@ -47,14 +47,23 @@ def main():
     print "Options = " + str(options.__dict__)
 
   for filename in options.files:
-    if filename.endswith(".cr") or filename.endswith(".ca"):
-      module = ca_module.CircaModule.fromFile(filename)
+    file = findSourceFile(filename)
 
-      if options.onlyPrintCode:
-        module.printTerms()
+    module = ca_module.CircaModule.fromFile(file)
 
-      else:
-        module.run()
+    if options.onlyPrintCode:
+      module.printTerms()
+
+    else:
+      module.run()
+
+def findSourceFile(filename):
+  if not os.path.exists(filename):
+    if not filename.endswith(".ca"):
+      filename += ".ca"
+
+  return filename
 
 if __name__ == '__main__':
   main()
+

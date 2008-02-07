@@ -20,5 +20,4 @@ class GetInput(ca_function.BaseFunction):
   pureFunction = False
 
   def evaluate(self, term):
-    print "calling getinput evaluate!"
     term.value = raw_input("> ")
