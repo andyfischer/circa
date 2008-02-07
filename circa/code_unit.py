@@ -94,6 +94,9 @@ class CodeUnit(object):
   def printTerms(self):
     printTermsFormatted(self.main_branch, indent_printer.IndentPrinter())
 
+  def getSomeNameForTerm(self, term):
+    ...
+
   __getitem__ = getNamedTerm
 
   def iterate(self):
@@ -112,7 +115,7 @@ def printTermsFormatted(branch, printer):
 
     if term.inputs:
       text += " ("
-      text += ",".join(map(lambda in: in.globalID, term.inputs))
+      text += ",".join(map(lambda i: str(i.globalID), term.inputs))
       text += ")"
 
     printer.println(text)

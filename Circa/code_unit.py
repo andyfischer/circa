@@ -94,6 +94,9 @@ class CodeUnit(object):
   def printTerms(self):
     printTermsFormatted(self.main_branch, indent_printer.IndentPrinter())
 
+  def getSomeNameForTerm(self, term):
+    ...
+
   __getitem__ = getNamedTerm
 
   def iterate(self):
