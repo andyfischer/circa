@@ -92,10 +92,12 @@ class CodeUnit(object):
       term.evaluate()
 
   def printTerms(self):
-    printTermsFormatted(self.main_branch, indent_printer.IndentPrinter())
+    term_names = {}
 
-  def getSomeNameForTerm(self, term):
-    ...
+    for (name,term) in self.term_namespace.items():
+      term_names[term] = name
+
+    printTermsFormatted(self.main_branch, indent_printer.IndentPrinter(), term_names)
 
   __getitem__ = getNamedTerm
 
@@ -109,9 +111,11 @@ class ChangeEvent(object):
   def __init__(self):
     self.changes = []
 
-def printTermsFormatted(branch, printer):
+def printTermsFormatted(branch, printer, term_names):
   for term in branch:
-    text = str(term.globalID) + ": " + term.function.name
+    name = term_names[term]
+    if not name: name = str(term.globalID)
+    text = name + ": " + term.function.name
 
     if term.inputs:
       text += " ("
@@ -122,5 +126,5 @@ def printTermsFormatted(branch, printer):
 
     if term.branch:
       printer.indent()
-      printTermsFormatted(term.branch, printer)
+      printTermsFormatted(term.branch, printer, term_names)
       printer.unindent()
