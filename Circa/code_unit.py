@@ -62,7 +62,7 @@ class CodeUnit(object):
 
     # if this is a pure function then re-evaluate it
     if target_term.function.pureFunction:
-      target_term.evaluate()
+      target_term.evaluateEmulated()
 
     # find which terms were just added
     newly_added = set(new_inputs) - set(old_inputs)
@@ -89,7 +89,7 @@ class CodeUnit(object):
 
     for term in self.main_branch:
       if VERBOSE_DEBUGGING: print "Calling evaluate on " + str(term)
-      term.evaluate()
+      term.evaluateEmulated()
 
   def printTerms(self):
     term_names = {}

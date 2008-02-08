@@ -24,7 +24,7 @@ def wrap(func):
         args[i] = global_builder.createConstant(arg)
 
     new_term = global_builder.createTerm(func, inputs=args)
-    new_term.evaluate()
+    new_term.evaluateEmulated()
     return new_term
 
   return wrapped_circa_func
