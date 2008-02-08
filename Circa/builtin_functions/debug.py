@@ -6,11 +6,10 @@ from Circa import (
   term_state
 )
 
-
 class Print(ca_function.BaseFunction):
   name = "print"
     
-  def evaluate(self, term):
+  def evaluateEmulated(self, term):
     print str(term.inputs[0])
 
 class GetInput(ca_function.BaseFunction):
@@ -19,5 +18,15 @@ class GetInput(ca_function.BaseFunction):
   outputType = ca_types.STRING
   pureFunction = False
 
-  def evaluate(self, term):
-    term.value = raw_input("> ")
+  def evaluateEmulated(self, term):
+    term.pythonValue = raw_input("> ")
+
+class Assert(ca_function.BaseFunction):
+  name = "assert"
+  signature = signature.fixed(ca_types.BOOL)
+  outputType = None
+  pureFunction = False
+
+  def evaluateEmulated(self, term):
+    if not term.pythonValue:
+      raise AssertionError()

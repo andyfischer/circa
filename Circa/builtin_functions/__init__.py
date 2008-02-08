@@ -1,5 +1,5 @@
 
-import branching, debug, logic, misc, simple_math, subroutine
+import branching, comparison, debug, logic, misc, simple_math, subroutine
 
 COND_BRANCH = branching.CondBranch()
 SIMPLE_BRANCH = branching.SimpleBranch()
@@ -20,3 +20,6 @@ SUB = simple_math.Sub()
 MULT = simple_math.Mult()
 DIV = simple_math.Div()
 BLEND = simple_math.Blend()
+
+EQUAL = comparison.Equal()
+NOT_EQUAL = comparison.Equal()

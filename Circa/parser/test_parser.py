@@ -20,7 +20,7 @@ class Test(unittest.TestCase):
 
     self.assertTrue(a != None)
     self.assertTrue(a.function == ADD)
-    self.assertTrue(a.value == 3 or a.value == 3.0)
+    self.assertTrue(int(a) == 3)
 
   def testAssigns(self):
     mod = parse("a=true \n b=1")

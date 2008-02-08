@@ -6,19 +6,18 @@ from Circa import (
   term_state
 )
 
-
 class And(ca_function.BaseFunction):
   name = "and"
   pureFunction = True
   inputType = ca_types.BOOL
   outputType = ca_types.BOOL
 
-  def evaluate(self, term):
+  def evaluateEmulated(self, term):
     for input in term.inputs:
-      if not input.value:
-        term.value = False
+      if not input.pythonValue:
+        term.pythonValue = False
         return
-    term.value = True
+    term.pythonValue = True
 
 class Or(ca_function.BaseFunction):
   name = "or"
@@ -26,20 +25,20 @@ class Or(ca_function.BaseFunction):
   inputType = ca_types.BOOL
   outputType = ca_types.BOOL
 
-  def evaluate(self, term):
+  def evaluateEmulated(self, term):
     for input in term.inputs:
-      if input.value:
-        term.value = True
+      if input.pythonValue:
+        term.pythonValue = True
         return
-    term.value = False
+    term.pythonValue = False
 
 class ConditionalExpression(ca_function.BaseFunction):
   name = "if"
   pureFunction = True
 
-  def evaluate(self, term):
-    if term.inputs[0].value:
-      term.value = term.inputs[1].value
+  def evaluateEmulated(self, term):
+    if term.inputs[0].pythonValue:
+      term.pythonValue = term.inputs[1].pythonValue
     else:
-      term.value = term.inputs[2].value
+      term.pythonValue = term.inputs[2].pythonValue
 

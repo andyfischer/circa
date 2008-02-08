@@ -19,7 +19,7 @@ class CircaModule(object):
     self.source_tokens = None
 
   @classmethod
-  def fromText(cls, text, raise_errors=False):
+  def fromText(cls, text, raise_errors=True):
     "Create a CircaModule from the given text."
 
     module = CircaModule()

@@ -1,44 +1,39 @@
 
 class ParseError(Exception):
-  def __init__(self, location):
+  def __init__(self, location, message=None):
     self.location = location
+    self.message = message
 
   def __str__(self):
     return "(line " + str(self.location.line) + ":" + \
-        str(self.location.column) + ") " + self.message()
-
-  def message(self):
-    pass
+        str(self.location.column) + ") " + self.message
 
 class TokenStreamExpected(ParseError):
   def __init__(self, expected, location):
-    ParseError.__init__(self, location)
-    self.expected = expected
-
-  def message(self):
-    return "Expected: " + self.expected.text
+    message = "Expected: " + expected.text
+    ParseError.__init__(self, location, message)
 
 class IdentifierNotFound(ParseError):
   def __init__(self, identifier_token):
-    ParseError.__init__(self, identifier_token)
-    self.identifier_token = identifier_token
-  def message(self):
-    return "Identifier not found: " + self.identifier_token.text
+    message = "Identifier not found: " + identifier_token.text
+    ParseError.__init__(self, identifier_token, message)
 
 class DanglingRightBracket(ParseError):
-  def message(self):
-    return "Found } without a corresponding {"
+  def __init__(self, token):
+    ParseError.__init__(self, identifier_token, "Found } without a corresponding {")
 
 class NotAStatement(ParseError):
-  def message(self):
-    return "Not a statement"
+  def __init__(self, token):
+    ParseError.__init__(self, identifier_token, "Not a statement")
 
 class ExpectedExpression(ParseError):
-  def message(self):
-    return "Expected a valid expression"
+  def __init__(self, token):
+    ParseError.__init__(self, identifier_token, "Expected a valid expression")
 
 class InternalError(ParseError):
-  def message(self):
-    return "Internal error"
+  def __init__(self, token, details=None):
+    message = "Internal error"
+    if details: message += ": " + details
+    ParseError.__init__(self, token, message)
 
 

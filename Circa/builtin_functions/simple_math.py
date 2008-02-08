@@ -14,8 +14,8 @@ class Add(ca_function.BaseFunction):
   outputType = ca_types.FLOAT
   trainingType = training.NumericalDerived
 
-  def evaluate(self, term):
-    term.value = float(term.inputs[0]) + float(term.inputs[1])
+  def evaluateEmulated(self, term):
+    term.pythonValue = float(term.inputs[0]) + float(term.inputs[1])
 
   def generateTraining(self, term, context, training_code):
     term.training_info.update()
@@ -45,8 +45,8 @@ class Sub(ca_function.BaseFunction):
   outputType = ca_types.FLOAT
   trainingType = training.NumericalDerived
 
-  def evaluate(self, term):
-    term.value = float(term.inputs[0]) - float(term.inputs[1])
+  def evaluateEmulated(self, term):
+    term.pythonValue = float(term.inputs[0]) - float(term.inputs[1])
 
 class Mult(ca_function.BaseFunction):
   name = "mult"
@@ -55,8 +55,8 @@ class Mult(ca_function.BaseFunction):
   outputType = ca_types.FLOAT
   trainingType = training.NumericalDerived
 
-  def evaluate(self, term):
-    term.value = float(term.inputs[0]) * float(term.inputs[1])
+  def evaluateEmulated(self, term):
+    term.pythonValue = float(term.inputs[0]) * float(term.inputs[1])
 
 class Div(ca_function.BaseFunction):
   name = "div"
@@ -65,8 +65,8 @@ class Div(ca_function.BaseFunction):
   outputType = ca_types.FLOAT
   trainingType = training.NumericalDerived
 
-  def evaluate(self, term):
-    term.value = float(term.inputs[0]) / float(term.inputs[1])
+  def evaluateEmulated(self, term):
+    term.pythonValue = float(term.inputs[0]) / float(term.inputs[1])
     
 class Blend(ca_function.BaseFunction):
   name = "blend"
@@ -75,8 +75,8 @@ class Blend(ca_function.BaseFunction):
   outputType = ca_types.FLOAT
   trainingType = training.NumericalDerived
 
-  def evaluate(self, term):
-    blend_value = float(term.inputs[2])
-    term.value = float(term.inputs[0]) * (1 - blend_value) + float(term.inputs[1]) * blend_value
+  def evaluateEmulated(self, term):
+    blend_emulatedValue = float(term.inputs[2])
+    term.pythonValue = float(term.inputs[0]) * (1 - blend_emulatedValue) + float(term.inputs[1]) * blend_emulatedValue
 
 

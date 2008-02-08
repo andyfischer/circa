@@ -79,7 +79,7 @@ class Builder(object):
         pdb.set_trace()
         return builtin_functions.unknown.nameNotAFunction(name)
 
-      return term.value
+      return term.pythonValue
       
     raise NotYetImplemented("functions from non-constant terms")
 

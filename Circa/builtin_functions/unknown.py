@@ -22,5 +22,5 @@ class UnknownFunction(ca_function.BaseFunction):
     self.signature = signature.anything()
     self.outputType = None
 
-  def evaluate(self, term):
+  def evaluateEmulated(self, term):
     print "Warning: tried to evaluate unknown function: " + str(self.name)

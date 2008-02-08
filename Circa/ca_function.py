@@ -14,7 +14,7 @@ class BaseFunction(object):
   def shouldReuseExisting(cls):
     return pureFunction
 
-  def evaluate(self, term):
+  def evaluateEmulated(self, term):
     pass
 
   def makeState(self):

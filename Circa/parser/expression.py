@@ -82,7 +82,9 @@ infix_token_to_function = {
     PLUS: builtin_functions.ADD,
     MINUS: builtin_functions.SUB,
     STAR: builtin_functions.MULT,
-    SLASH: builtin_functions.DIV
+    SLASH: builtin_functions.DIV,
+    DOUBLE_EQUALS: builtin_functions.EQUAL,
+    NOT_EQUALS: builtin_functions.NOT_EQUAL
 }
 
 # Infix token-to-stateful-function
@@ -183,6 +185,11 @@ class Function(Node):
   def eval(self, builder):
     arg_terms = [t.eval(builder) for t in self.args]
     func = builder.getLocalFunction(self.function_name.text)
+
+    if func is None:
+      raise parse_errors.InternalError(self.function_name,
+          "Function " + self.function_name.text + " not found.")
+
     return builder.createTerm(func, inputs=arg_terms)
 
   def getFirstToken(self):
@@ -206,7 +213,7 @@ def infix_expression(tokens, precedence):
     right_expr = infix_expression(tokens, precedence + 1)
 
     if not right_expr:
-      raise parse_errors.InteralError(first_righthand_token)
+      raise parse_errors.InternalError(first_righthand_token)
 
     expr = Infix(operator, expr, right_expr)
 

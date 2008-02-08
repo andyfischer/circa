@@ -6,6 +6,7 @@ from Circa import (
   terms
 )
 
+VERBOSE_DEBUGGING = True
 
 # Build dict of functions
 
@@ -19,6 +20,10 @@ for name in dir(builtin_functions):
   obj = getattr(builtin_functions, name)
   name = string.lower(name)   # lower-case the name
   if isinstance(obj, ca_function.BaseFunction):
+
+    if VERBOSE_DEBUGGING:
+      print "Adding builtin function " + name
+
     # Wrap into a constant term
     FUNCTIONS[name] = terms.constant(obj)
 

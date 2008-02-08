@@ -12,17 +12,17 @@ class CondBranch(ca_function.BaseFunction):
   signature = signature.fixed(ca_types.BOOL)
   hasBranch = True
 
-  def evaluate(self, term):
-    if term.inputs[0].value:
-      term.branch[0].evaluate()
+  def evaluateEmulated(self, term):
+    if term.inputs[0].pythonValue:
+      term.branch[0].evaluateEmulated()
     else:
-      term.branch[1].evaluate()
+      term.branch[1].evaluateEmulated()
 
 class SimpleBranch(ca_function.BaseFunction):
   name = "simple_branch"
   signature = signature.empty()
   hasBranch = True
 
-  def evaluate(self, term):
+  def evaluateEmulated(self, term):
     for t in term.state.branch:
-      t.evaluate()
+      t.evaluateEmulated()

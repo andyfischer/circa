@@ -55,14 +55,14 @@ class Term(object):
     else:
       self.state = initial_state
 
-  def evaluate(self):
-    self.function.evaluate(self)
+  def evaluateEmulated(self):
+    self.function.evaluateEmulated(self)
 
   def printExtended(self, printer):
     printer.prints("%i: %s" % (self.globalID, self.function.name))
 
-    if self.value:
-      printer.prints(" " + str(self.value))
+    if self.pythonValue:
+      printer.prints(" " + str(self.pythonValue))
 
     printer.prints(" [")
 
@@ -108,15 +108,15 @@ class Term(object):
 
   # value accessors
   def __int__(self):
-    try: return int(self.value)
+    try: return int(self.pythonValue)
     except: return 0
 
   def __float__(self):
-    try: return float(self.value)
+    try: return float(self.pythonValue)
     except: return 0.0
 
   def __str__(self):
-    try: return str(self.value)
+    try: return str(self.pythonValue)
     except: return ""
 
   # member accessor
@@ -139,7 +139,7 @@ def constant(value, options={}):
   "Returns a constant term with the given value"
   type = ca_types.getTypeOfPythonObj(value)
   term = Term(Constant.fromType(type), **options)
-  term.value = value
+  term.pythonValue = value
   return term
 
 createConstant = constant

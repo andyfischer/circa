@@ -1,0 +1,14 @@
+
+
+three = 1 + 2
+assert(three != 2)
+assert(three == 3)
+assert(three != 4)
+
+six = 2 * 3
+assert(six != 5)
+assert(six == 6)
+assert(six != 7)
+
+two = 8 / 4
+assert(two == 2)

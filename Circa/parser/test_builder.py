@@ -19,7 +19,7 @@ class Test(unittest.TestCase):
 
     add = b.createTerm(ADD, inputs=[constant1, constant2])
 
-    self.assertTrue(add.value == 3.0 or add.value == 3)
+    self.assertTrue(float(add) == 3.0)
 
   def testLocalVars(self):
     bldr = Builder()
@@ -85,7 +85,7 @@ class Test(unittest.TestCase):
     
     wrapped_a = bldr.getNamed('a')
 
-    self.assertEquals(wrapped_a.value, 3.0)
+    self.assertEquals(float(wrapped_a), 3.0)
     self.assertTrue(wrapped_a.function == COND_EXPR)
     self.assertTrue(wrapped_a.inputs[1] == new_a)
     self.assertTrue(wrapped_a.inputs[2] == a)
