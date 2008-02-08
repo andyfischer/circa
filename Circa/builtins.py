@@ -6,7 +6,7 @@ from Circa import (
   terms
 )
 
-VERBOSE_DEBUGGING = True
+VERBOSE_DEBUGGING = False
 
 # Build dict of functions
 

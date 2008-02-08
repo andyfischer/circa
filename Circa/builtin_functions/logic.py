@@ -12,7 +12,7 @@ class And(ca_function.BaseFunction):
   inputType = ca_types.BOOL
   outputType = ca_types.BOOL
 
-  def evaluateEmulated(self, term):
+  def pythonEvaluate(self, term):
     for input in term.inputs:
       if not input.pythonValue:
         term.pythonValue = False
@@ -25,7 +25,7 @@ class Or(ca_function.BaseFunction):
   inputType = ca_types.BOOL
   outputType = ca_types.BOOL
 
-  def evaluateEmulated(self, term):
+  def pythonEvaluate(self, term):
     for input in term.inputs:
       if input.pythonValue:
         term.pythonValue = True
@@ -36,7 +36,7 @@ class ConditionalExpression(ca_function.BaseFunction):
   name = "if"
   pureFunction = True
 
-  def evaluateEmulated(self, term):
+  def pythonEvaluate(self, term):
     if term.inputs[0].pythonValue:
       term.pythonValue = term.inputs[1].pythonValue
     else:

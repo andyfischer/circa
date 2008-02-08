@@ -55,8 +55,8 @@ class Term(object):
     else:
       self.state = initial_state
 
-  def evaluateEmulated(self):
-    self.function.evaluateEmulated(self)
+  def pythonEvaluate(self):
+    self.function.pythonEvaluate(self)
 
   def printExtended(self, printer):
     printer.prints("%i: %s" % (self.globalID, self.function.name))

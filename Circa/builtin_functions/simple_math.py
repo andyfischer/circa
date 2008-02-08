@@ -14,7 +14,7 @@ class Add(ca_function.BaseFunction):
   outputType = ca_types.FLOAT
   trainingType = training.NumericalDerived
 
-  def evaluateEmulated(self, term):
+  def pythonEvaluate(self, term):
     term.pythonValue = float(term.inputs[0]) + float(term.inputs[1])
 
   def generateTraining(self, term, context, training_code):
@@ -45,7 +45,7 @@ class Sub(ca_function.BaseFunction):
   outputType = ca_types.FLOAT
   trainingType = training.NumericalDerived
 
-  def evaluateEmulated(self, term):
+  def pythonEvaluate(self, term):
     term.pythonValue = float(term.inputs[0]) - float(term.inputs[1])
 
 class Mult(ca_function.BaseFunction):
@@ -55,7 +55,7 @@ class Mult(ca_function.BaseFunction):
   outputType = ca_types.FLOAT
   trainingType = training.NumericalDerived
 
-  def evaluateEmulated(self, term):
+  def pythonEvaluate(self, term):
     term.pythonValue = float(term.inputs[0]) * float(term.inputs[1])
 
 class Div(ca_function.BaseFunction):
@@ -65,7 +65,7 @@ class Div(ca_function.BaseFunction):
   outputType = ca_types.FLOAT
   trainingType = training.NumericalDerived
 
-  def evaluateEmulated(self, term):
+  def pythonEvaluate(self, term):
     term.pythonValue = float(term.inputs[0]) / float(term.inputs[1])
     
 class Blend(ca_function.BaseFunction):
@@ -75,7 +75,7 @@ class Blend(ca_function.BaseFunction):
   outputType = ca_types.FLOAT
   trainingType = training.NumericalDerived
 
-  def evaluateEmulated(self, term):
+  def pythonEvaluate(self, term):
     blend_emulatedValue = float(term.inputs[2])
     term.pythonValue = float(term.inputs[0]) * (1 - blend_emulatedValue) + float(term.inputs[1]) * blend_emulatedValue
 
