@@ -113,8 +113,10 @@ class ChangeEvent(object):
 
 def printTermsFormatted(branch, printer, term_names):
   for term in branch:
-    name = term_names[term]
-    if not name: name = str(term.globalID)
+    if term in term_names:
+      name = term_names[term]
+    else:
+      name = str(term.globalID)
     text = name + ": " + term.function.name
 
     if term.inputs:

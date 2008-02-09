@@ -6,7 +6,7 @@ from Circa import (
   ca_module
 )
 
-VERBOSE_DEBUGGING = True
+VERBOSE_DEBUGGING = False
 
 def print_usage():
   print "Usage (todo)"
