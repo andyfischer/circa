@@ -6,6 +6,7 @@ SIMPLE_BRANCH = branching.SimpleBranch()
 
 PRINT = debug.Print()
 GET_INPUT = debug.GetInput()
+ASSERT = debug.Assert() 
 
 SUBROUTINE = subroutine.Subroutine()
 
@@ -22,4 +23,5 @@ DIV = simple_math.Div()
 BLEND = simple_math.Blend()
 
 EQUAL = comparison.Equal()
-NOT_EQUAL = comparison.Equal()
+NOT_EQUAL = comparison.NotEqual()
+

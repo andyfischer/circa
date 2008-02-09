@@ -10,7 +10,7 @@ from Circa import (
 class Add(ca_function.BaseFunction):
   name = "add"
   pureFunction = True
-  inputType = ca_types.FLOAT
+  input = ca_types.FLOAT
   outputType = ca_types.FLOAT
   trainingType = training.NumericalDerived
 

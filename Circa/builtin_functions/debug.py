@@ -1,3 +1,4 @@
+import pdb
 
 from Circa import (
   ca_function,
@@ -14,7 +15,7 @@ class Print(ca_function.BaseFunction):
 
 class GetInput(ca_function.BaseFunction):
   name = "input"
-  signature = signature.empty()
+  input = signature.empty()
   outputType = ca_types.STRING
   pureFunction = False
 
@@ -23,10 +24,10 @@ class GetInput(ca_function.BaseFunction):
 
 class Assert(ca_function.BaseFunction):
   name = "assert"
-  signature = signature.fixed(ca_types.BOOL)
+  input = signature.fixed(ca_types.BOOL)
   outputType = None
   pureFunction = False
 
   def pythonEvaluate(self, term):
-    if not term.pythonValue:
-      raise AssertionError()
+    if not term.inputs[0].pythonValue:
+      print "Assertion failure for term: " + str(term.globalID)

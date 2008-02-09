@@ -74,7 +74,7 @@ class Builder(object):
 
     assert isinstance(term, terms.Term)
 
-    if terms.Constant.isConstant(term):
+    if builtin_functions.values.Constant.isConstant(term):
       if not term.function.outputType == ca_types.FUNC:
         pdb.set_trace()
         return builtin_functions.unknown.nameNotAFunction(name)
