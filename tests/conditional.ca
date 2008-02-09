@@ -1,0 +1,19 @@
+
+x = 0
+
+if (true) {
+  x = 1
+} else {
+  assert(false);
+}
+
+assert(x == 1)
+
+if (false) {
+  assert(false)
+} else {
+  x = 2
+}
+
+assert(x == 2)
+assert(x != 1)

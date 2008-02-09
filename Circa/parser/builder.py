@@ -299,7 +299,14 @@ class CodeUnitBlock(Block):
       self.builder.createTerm(functions.assign, inputs=[stinfo.base, stinfo.head])
 
 class ConditionalBlock(Block):
-  def __init__(self, builder, condition):
+  def __init__(self, builder, condition, branch_term):
+    """
+    condition is a term that outputs true/false
+    branch_term is the term that contains the true/false branches
+    if branch_term is None, a new branch term will be created
+    """
+
+    #...
     Block.__init__(self, builder)
 
     assert isinstance(condition, terms.Term)

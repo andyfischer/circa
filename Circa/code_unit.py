@@ -10,7 +10,8 @@ rather than on the terms themselves.
 
 from Circa import (
   terms,
-  common_errors
+  common_errors,
+  constants
 )
 
 from Circa.utils import indent_printer
@@ -113,6 +114,11 @@ class ChangeEvent(object):
 
 def printTermsFormatted(branch, printer, term_names):
   for term in branch:
+
+    # Skip constants
+    if constants.isConstant(term):
+      continue
+
     if term in term_names:
       name = term_names[term]
     else:
@@ -121,7 +127,20 @@ def printTermsFormatted(branch, printer, term_names):
 
     if term.inputs:
       text += " ("
-      text += ",".join(map(lambda i: str(i.globalID), term.inputs))
+
+      def getTermLabel(term):
+        if term in term_names:
+          return term_names[term]
+
+        # For constant terms, just write their value
+        elif constants.isConstant(term):
+          return str(term.pythonValue)
+
+        else:
+          return 't:' + str(term.globalID)
+
+
+      text += ",".join(map(getTermLabel, term.inputs))
       text += ")"
 
     printer.println(text)

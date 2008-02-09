@@ -53,7 +53,8 @@ class TokenStream(object):
     self.skipSet.add(token_def)
 
   def stopSkipping(self, token_def):
-    self.skipSet.remove(token_def)
+    if token_def in self.skipSet:
+      self.skipSet.remove(token_def)
 
   def advance(self, index):
     index += 1

@@ -92,6 +92,7 @@ class Parser(object):
 
   def else_statement(self):
     self.tokens.consume(ELSE)
+    self.tokens.startSkipping(NEWLINE)
 
      # todo : reopen previous conditional block
 
@@ -124,14 +125,6 @@ class Parser(object):
       raise parse_errors.ExpectedExpression(return_token)
 
     self.bind(terms.Term.RETURN_REF_NAME, expr.eval())
-
-  def for_block(self):
-    self.tokens.consume(FOR)
-    iterator = self.tokens.consume(IDENT)
-    self.tokens.consume(COLON)
-    list_expression = self.expression()
-    startBlock(blocks.ForBlock(self, iterator.text, list_expression.eval()))
-    self.block_body()
 
   def block_body(self):
 

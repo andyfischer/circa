@@ -20,15 +20,15 @@ class IdentifierNotFound(ParseError):
 
 class DanglingRightBracket(ParseError):
   def __init__(self, token):
-    ParseError.__init__(self, identifier_token, "Found } without a corresponding {")
+    ParseError.__init__(self, token, "Found } without a corresponding {")
 
 class NotAStatement(ParseError):
   def __init__(self, token):
-    ParseError.__init__(self, identifier_token, "Not a statement")
+    ParseError.__init__(self, token, "Not a statement")
 
 class ExpectedExpression(ParseError):
   def __init__(self, token):
-    ParseError.__init__(self, identifier_token, "Expected a valid expression")
+    ParseError.__init__(self, token, "Expected a valid expression")
 
 class InternalError(ParseError):
   def __init__(self, token, details=None):
