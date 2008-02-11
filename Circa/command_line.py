@@ -31,10 +31,13 @@ def main():
   options = UserOptions()
   options.files = []
   options.onlyPrintCode = False
+  options.interactiveMode = False
 
   def shortOption(character):
     if character == 'p':
       options.onlyPrintCode = True
+    elif character == 'i':
+      options.interactiveMode = True
 
   for arg in args:
     if arg[0] == '-':
@@ -56,6 +59,13 @@ def main():
 
     else:
       module.run()
+
+def interactiveMode():
+  while True:
+
+    command = raw_input("> ")
+
+    
 
 def findSourceFile(filename):
   if not os.path.exists(filename):
