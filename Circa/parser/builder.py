@@ -298,42 +298,88 @@ class CodeUnitBlock(Block):
 
       self.builder.createTerm(functions.assign, inputs=[stinfo.base, stinfo.head])
 
+class ConditionalGroup(object):
+  def __init__(self, builder, condition_term):
+
+    self.condition_term = condition_term
+
+    # Create enclosing branch
+    self.enclosing_branch = builder.createTerm(builtin_functions.COND_BRANCH,
+                                          inputs=[self.condition_term])
+
+    self.blocks = []
+
+  def afterFinish(self):
+    # In this function, we need to find any terms that were rebound (in any
+    # of our blocks), and merge them into newly-created conditional terms.
+    # If this is confusing, think of it like train tracks.
+
+    # First collect all the term names that need merging
+    # 'needs_merge' maps term names to original terms
+    needs_merge = {}
+
+    for block in self.blocks:
+      for rebind_info in block.rebinds.values():
+        if rebind_info.defined_outside:
+          needs_merge[rebind_info.name] = rebind_info.original
+
+    # Now collect information for every term needing merge
+
+    class TermMergeInfo:
+      def __init__(self):
+        self.original = None
+        self.heads = []
+
+    # Make a list of TermMergeInfo objects
+    merge_infos = []
+
+    for (name,original) in needs_merge.items():
+      info = TermMergeInfo()
+      merge_infos.append(info)
+
+      for block in self.blocks:
+
+        # Check if this term is rebound in this block
+        if name in block.rebinds:
+          rebind_info = block.rebinds[name]
+
+          # Use the rebind head as the head
+          info.heads.append(rebind_info.head)
+
+        else:
+          # Use the original as the head
+          info.heads.append(original)
+
+
+      needs_merge.add(rebind_info.name)
+
+    # Now use this information and finally create some terms
+    # (this is one part of code that needs to change if we support "else if")
+    for merge_info in merge_infos:
+      new_cond_term = self.builder.createTerm(builtin_functions.COND_EXPR,
+                                          inputs=[ self.condition_term,
+                                                   merge_info.heads[0],
+                                                   merge_info.heads[1]])
+      self.builder.bind(rebind_info.name, new_cond_term)
+
+
 class ConditionalBlock(Block):
-  def __init__(self, builder, condition, branch_term):
+  def __init__(self, builder, condition, group):
     """
-    condition is a term that outputs true/false
-    branch_term is the term that contains the true/false branches
-    if branch_term is None, a new branch term will be created
+    'condition' is a term that outputs true/false
+    'enclosing_branch' is the term that contains the true/false branches
+    if enclosing_branch is None, a new one will be created
     """
 
-    #...
     Block.__init__(self, builder)
 
     assert isinstance(condition, terms.Term)
 
-    self.step = 0
     self.condition_term = condition
-    self.cond_branch_term = builder.createTerm(builtin_functions.COND_BRANCH,
-                                          inputs=[self.condition_term])
 
-    for n in range(2):
-      self.cond_branch_term.branch.append(
-          builder.createTerm(builtin_functions.SIMPLE_BRANCH))
+    self.branch = builder.createTerm(builtin_functions.SIMPLE_BRANCH)
+    group.blocks.append(self)
 
   def getBranch(self):
-    return self.cond_branch_term.branch[self.step].branch
-
-  def setStep(self, step):
-    self.step = step
-
-  def afterFinish(self):
-    # create a conditional term for any rebinds
-    for rebind_info in self.rebinds.values():
-      if not rebind_info.defined_outside: continue
-
-      cond_term = self.builder.createTerm(builtin_functions.COND_EXPR,
-                                          inputs=[ self.condition_term,
-                                                   rebind_info.head,
-                                                   rebind_info.original ])
-      self.builder.bind(rebind_info.name, cond_term)
+    return self.branch
 
