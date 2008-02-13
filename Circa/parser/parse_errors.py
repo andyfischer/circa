@@ -5,6 +5,9 @@ class ParseError(Exception):
     self.message = message
 
   def __str__(self):
+    return self.description()
+
+  def description(self):
     return "(line " + str(self.location.line) + ":" + \
         str(self.location.column) + ") " + self.message
 
@@ -24,7 +27,7 @@ class DanglingRightBracket(ParseError):
 
 class NotAStatement(ParseError):
   def __init__(self, token):
-    ParseError.__init__(self, token, "Not a statement")
+    ParseError.__init__(self, token, "Not a statement: " + token.detailsStr())
 
 class ExpectedExpression(ParseError):
   def __init__(self, token):

@@ -1,4 +1,4 @@
-import unittest
+import pdb, unittest
 
 from Circa import (
   ca_module
@@ -42,6 +42,9 @@ if (a)
   def testFunctionCall(self):
     parse("a = some_function()")
 
+
+  def testAssign2(self):
+    mod = parse("\nx = 0\n")
         
 
 if __name__ == '__main__':

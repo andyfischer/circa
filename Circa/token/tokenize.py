@@ -27,6 +27,9 @@ class TokenInstance(object):
   def __str__(self):
     return self.text
 
+  def detailsStr(self):
+    return "(%i:%i %s,%s)" % (self.line, self.column, self.text, self.match)
+
 
 def tokenize(string):
   """

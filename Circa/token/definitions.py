@@ -98,7 +98,7 @@ PATCH =         TokenDef(55, 'patch', 'patch')
 
 # other types
 FLOAT =         TokenDef(70, 'float', pattern=r"([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)")
-INTEGER =       TokenDef(71, 'integer', pattern=r"[1-9]+[0-9]*")
+INTEGER =       TokenDef(71, 'integer', pattern=r"([1-9]+[0-9]*)|0")
 IDENT =         TokenDef(72, 'ident', pattern=r"[a-zA-Z_\-]+[a-zA-Z0-9_\-]*")
 STRING =        TokenDef(73, 'string', pattern=group(r"'[^']*'", r"\"[^\"]*\""))
 WHITESPACE =    TokenDef(75, 'whitespace', pattern=r"[ \t]+")

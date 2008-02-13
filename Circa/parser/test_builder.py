@@ -49,47 +49,6 @@ class Test(unittest.TestCase):
     assert bldr.getNamed("a") == a
     assert bldr.getNamed("b") == None
 
-  def testConditional(self):
-    bldr = Builder()
-
-    bldr.createConstant(1, name="a")
-    cond = bldr.createConstant(True)
-    bldr.startConditionalBlock(condition=cond)
-    bldr.createConstant(2, name="a")
-    bldr.closeBlock()
-
-    assert int( bldr.getNamed("a") ) == 2
-
-  def testConditional2(self):
-    bldr = Builder()
-
-    bldr.createConstant(1, name="a")
-    cond = bldr.createConstant(False)
-    bldr.startConditionalBlock(condition=cond)
-    bldr.createConstant(2, name="a")
-    bldr.closeBlock()
-
-    assert int( bldr.getNamed("a") ) == 1
-
-  def testConditionalRebind(self):
-    bldr = Builder()
-
-    a = bldr.createConstant(1, name='a')
-    b = bldr.createConstant(2, name='b')
-    cond = bldr.createConstant(True, name='cond')
-    bldr.startConditionalBlock(condition=cond)
-
-    new_a = bldr.createTerm(ADD, name='a', inputs=[a,b])
-
-    bldr.closeBlock()
-    
-    wrapped_a = bldr.getNamed('a')
-
-    self.assertEquals(float(wrapped_a), 3.0)
-    self.assertTrue(wrapped_a.function == COND_EXPR)
-    self.assertTrue(wrapped_a.inputs[1] == new_a)
-    self.assertTrue(wrapped_a.inputs[2] == a)
-
   def testUnknownFunction(self):
     bldr = Builder()
 

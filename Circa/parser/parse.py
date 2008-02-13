@@ -12,7 +12,7 @@ from Circa.token.definitions import *
 
 import parse_errors
 
-VERBOSE_DEBUGGING = True
+VERBOSE_DEBUGGING = False
 
 def parse(builder, source, raise_errors=False):
   parser = Parser(builder, source, raise_errors)
@@ -37,7 +37,7 @@ class Parser(object):
           raise
 
         self.parse_errors.append(e)
-        print "[parse error] " + str(e)
+        print "[parse error] " + e.description()
         self.tokens.consume()
 
   def bind(self, name, term):
@@ -47,9 +47,10 @@ class Parser(object):
       self.currentBlock().handleRebind(name, existing, term)
 
   def statement(self):
+    if VERBOSE_DEBUGGING: print "Parsing statement"
+
     paths = {}
     paths[IF] = self.if_statement
-    paths[ELSE] = self.else_statement
     paths[FUNCTION] = self.subroutine_decl
     paths[RETURN] = self.return_statement
     paths[RBRACKET] = self.right_bracket
@@ -57,20 +58,26 @@ class Parser(object):
 
     next_token = self.tokens.next()
 
+    # If we have this token in our paths, parse that
     if next_token.match in paths:
       paths[next_token.match]()
       return
 
     # otherwise, parse as expression
     expr = expression.parseExpression(self.tokens)
+
     if expr:
       expr.eval(self.builder)
       return
+    else:
+      if VERBOSE_DEBUGGING: print "parseExpression failed on " + next_token.detailsStr()
 
     # if we got this far then we don't know what the hell to do
     raise parse_errors.NotAStatement(next_token)
 
   def if_statement(self):
+    if VERBOSE_DEBUGGING: print "Parsing if_statement"
+
     self.tokens.consume(IF)
     self.tokens.startSkipping(NEWLINE)
 
@@ -86,17 +93,22 @@ class Parser(object):
     
     self.tokens.consume(RPAREN)
 
-    cond_block = self.builder.startConditionalBlock(condition=condition_term)
+    # create a group & block
+    cond_group = self.builder.newConditionalGroup(condition_term)
+
+    cond_block = self.builder.startConditionalBlock(group=cond_group)
 
     self.block_body()
 
-  def else_statement(self):
-    self.tokens.consume(ELSE)
-    self.tokens.startSkipping(NEWLINE)
+    if self.tokens.nextIs(ELSE):
+      self.tokens.startSkipping(NEWLINE)
+      self.tokens.consume(ELSE)
 
-     # todo : reopen previous conditional block
+      else_block = self.builder.startConditionalBlock(group=cond_group)
 
-    self.block_body()
+      self.block_body()
+
+    cond_group.finish()
 
   def subroutine_decl(self):
     self.tokens.consume(FUNCTION)
@@ -127,6 +139,7 @@ class Parser(object):
     self.bind(terms.Term.RETURN_REF_NAME, expr.eval())
 
   def block_body(self):
+    if VERBOSE_DEBUGGING: print "Parsing block_body"
 
     # check for a block bounded with {}s
     if (self.tokens.nextIs(LBRACKET)):
@@ -147,5 +160,7 @@ class Parser(object):
     self.builder.closeBlock()
 
   def new_line(self):
+    if VERBOSE_DEBUGGING: print "Parsing new_line"
+
     self.tokens.consume(NEWLINE)
 
