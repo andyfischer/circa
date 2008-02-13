@@ -92,9 +92,12 @@ class Builder(object):
   def startPlainBlock(self):
     return self.startBlock(PlainBlock)
 
-  def startConditionalBlock(self, condition):
+  def startConditionalBlock(self, **kwargs):
     "Start a condtional block."
-    return self.startBlock(ConditionalBlock, condition=condition)
+    return self.startBlock(ConditionalBlock, **kwargs)
+
+  def newConditionalGroup(self, condition):
+    return ConditionalGroup(self, condition)
 
   def closeBlock(self):
     "Close the current block"
@@ -309,7 +312,7 @@ class ConditionalGroup(object):
 
     self.blocks = []
 
-  def afterFinish(self):
+  def finish(self):
     # In this function, we need to find any terms that were rebound (in any
     # of our blocks), and merge them into newly-created conditional terms.
     # If this is confusing, think of it like train tracks.
@@ -364,22 +367,12 @@ class ConditionalGroup(object):
 
 
 class ConditionalBlock(Block):
-  def __init__(self, builder, condition, group):
-    """
-    'condition' is a term that outputs true/false
-    'enclosing_branch' is the term that contains the true/false branches
-    if enclosing_branch is None, a new one will be created
-    """
-
+  def __init__(self, builder, group):
     Block.__init__(self, builder)
 
-    assert isinstance(condition, terms.Term)
-
-    self.condition_term = condition
-
-    self.branch = builder.createTerm(builtin_functions.SIMPLE_BRANCH)
+    self.branch_term = builder.createTerm(builtin_functions.SIMPLE_BRANCH)
     group.blocks.append(self)
 
   def getBranch(self):
-    return self.branch
+    return self.branch_term.branch
 

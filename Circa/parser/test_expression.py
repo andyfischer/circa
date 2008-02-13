@@ -8,12 +8,13 @@ from Circa import (
 from Circa.token import token_stream
 from Circa.parser.expression import *
 
+def parse_to_ast(string):
+  assert isinstance(string, str)
+  tokens = token_stream.asTokenStream(string)
+  return parseExpression(tokens)
+
 class Test(unittest.TestCase):
   def testAst(self):
-    def parse_to_ast(string):
-      assert isinstance(string, str)
-      tokens = token_stream.asTokenStream(string)
-      return parseExpression(tokens)
 
     node = parse_to_ast("1")
     self.assertTrue( type(node) == Literal )
@@ -28,6 +29,11 @@ class Test(unittest.TestCase):
     self.assertTrue( type(node.args[0]) == Literal )
     self.assertTrue( node.args[0].value == 1 )
     self.assertTrue( node.args[1].value == 2 )
+
+  def testAssignAst(self):
+    node = parse_to_ast("x = 1")
+    self.assertTrue(node != None)
+
     
 
 if __name__ == '__main__':
