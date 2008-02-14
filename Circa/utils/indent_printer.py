@@ -22,5 +22,5 @@ class IndentPrinter(object):
   def indent(self, spaces=2):
     self.indent_spaces += spaces
 
-  def unindent(self, spaces):
+  def unindent(self, spaces=2):
     self.indent_spaces = max(0, self.indent_spaces-spaces)

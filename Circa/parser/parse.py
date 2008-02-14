@@ -23,7 +23,6 @@ class Parser(object):
     self.builder = builder
     self.parse_errors = []
     self.raise_errors = raise_errors
-    self.previous_block = None
 
     # make sure 'tokens' is a token stream
     self.tokens = token_stream.asTokenStream(token_source)
@@ -95,18 +94,22 @@ class Parser(object):
 
     # create a group & block
     cond_group = self.builder.newConditionalGroup(condition_term)
+    cond_block = cond_group.newBlock()
+    assert cond_block is not None
 
-    cond_block = self.builder.startConditionalBlock(group=cond_group)
+    self.block(cond_block)
 
-    self.block_body()
+    if VERBOSE_DEBUGGING:
+      print "Finished if block, next token is: " + str(self.tokens.next())
 
     if self.tokens.nextIs(ELSE):
+      if VERBOSE_DEBUGGING: print "Parsing else block"
       self.tokens.startSkipping(NEWLINE)
       self.tokens.consume(ELSE)
 
-      else_block = self.builder.startConditionalBlock(group=cond_group)
+      else_block = cond_group.newBlock(isDefault = True)
 
-      self.block_body()
+      self.block(else_block)
 
     cond_group.finish()
 
@@ -138,7 +141,32 @@ class Parser(object):
 
     self.bind(terms.Term.RETURN_REF_NAME, expr.eval())
 
+  def block(self, blockToStart):
+    if VERBOSE_DEBUGGING: print "Parsing block"
+
+    if blockToStart:
+      self.builder.startBlock(blockToStart)
+
+    # check for a block bounded with {}s
+    if (self.tokens.nextIs(LBRACKET)):
+      self.tokens.consume(LBRACKET)
+      self.tokens.stopSkipping(NEWLINE)
+
+      while not self.tokens.nextIs(RBRACKET):
+        self.statement()
+
+      self.tokens.consume(RBRACKET)
+
+    # parse a one-liner with no {}s
+    else:
+      self.statement()
+
+    if blockToStart:
+      self.builder.closeBlock()
+
+
   def block_body(self):
+    # Depcrecated function 
     if VERBOSE_DEBUGGING: print "Parsing block_body"
 
     # check for a block bounded with {}s

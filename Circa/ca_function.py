@@ -12,7 +12,7 @@ class BaseFunction(object):
 
   @classmethod
   def shouldReuseExisting(cls):
-    return pureFunction
+    return cls.pureFunction
 
   def pythonEvaluate(self, term):
     pass

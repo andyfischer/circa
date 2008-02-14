@@ -24,5 +24,5 @@ class SimpleBranch(ca_function.BaseFunction):
   hasBranch = True
 
   def pythonEvaluate(self, term):
-    for t in term.state.branch:
+    for t in term.branch:
       t.pythonEvaluate()

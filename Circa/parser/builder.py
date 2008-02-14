@@ -27,9 +27,8 @@ class Builder(object):
     else: self.code_unit = code_unit.CodeUnit()
 
     self.blockStack = []
-    self.previousBlock = None
     
-    self.startBlock(CodeUnitBlock, code_unit=self.code_unit)
+    self.startBlock(CodeUnitBlock(self, self.code_unit), code_unit=self.code_unit)
 
   def eval(self, source):
     parser.parse(self, source)
@@ -83,18 +82,8 @@ class Builder(object):
       
     raise NotYetImplemented("functions from non-constant terms")
 
-  def startBlock(self, block_class, **kwargs):
-    new_block = block_class(self, **kwargs)
-    self.blockStack.append(new_block)
-    new_block.onStart()
-    return new_block
-
-  def startPlainBlock(self):
-    return self.startBlock(PlainBlock)
-
-  def startConditionalBlock(self, **kwargs):
-    "Start a condtional block."
-    return self.startBlock(ConditionalBlock, **kwargs)
+  def startBlock(self, block, **kwargs):
+    self.blockStack.append(block)
 
   def newConditionalGroup(self, condition):
     return ConditionalGroup(self, condition)
@@ -102,34 +91,28 @@ class Builder(object):
   def closeBlock(self):
     "Close the current block"
     current_block = self.blockStack[-1]
-    current_block.onFinish()
     self.blockStack.pop()
-    current_block.afterFinish()
-    self.previousBlock = current_block
 
   finishBlock = closeBlock
 
   def blockDepth(self):
     return len(self.blockStack)
 
-  def createTerm(self, function, name=None, inputs=None):
-    # This method is deprecated in favor of CodeUnit.appendNewTerm
+  def createTerm(self, function, name=None, inputs=None, branch=None):
 
-    # Allocate term
-    new_term = terms.Term(function)
+    if branch is None:
+      branch = self.currentBlock().branch
 
-    if inputs:
-      # If they use any non-term args, convert them to constants
-      inputs = map(terms.wrapNonTerm, inputs)
-      self.code_unit.setTermInputs(new_term, inputs)
+    new_term = self.code_unit.appendNewTerm(function, name=name, inputs=inputs,
+        branch=branch)
+
+    assert(new_term != None)
 
     self.registerNewTerm(new_term, name)
 
     return new_term
 
   def registerNewTerm(self, term, name=None):
-    self.currentBranch().append(term)
-
     if name:
       assert isinstance(name, str)
       self.bind(name, term)
@@ -163,7 +146,7 @@ class Builder(object):
       index -= 1
   
   def currentBranch(self):
-    return self.currentBlock().getBranch()
+    return self.currentBlock().branch
 
   def findCurrentCodeUnit(self):
     index = len(self.blockStack) -1
@@ -191,18 +174,12 @@ class RebindInfo(object):
 
 
 class Block(object):
-  def __init__(self, builder):
+  def __init__(self, builder, branch=None):
     self.builder = builder
     self.parent = builder.currentBlock()
     self.term_namespace = {}
     self.rebinds = {}    # keyed by term name
-
-  # virtual functions
-  def onStart(self): pass
-  def onFinish(self): pass
-  def afterFinish(self): pass
-  def onBind(self, name, term): pass
-  def getBranch(self): raise Exception("Need to override")
+    self.branch = branch
 
   def parentBlocks(self):
     block = self.parent
@@ -253,24 +230,20 @@ class Block(object):
       block = block.parent
     return block
 
-
-class PlainBlock(Block):
-  def getBranch(self):
-    return self.parent.getBranch()
+  # Virtual functions
+  def onBind(self, name, term):
+    pass
 
 
 class CodeUnitBlock(Block):
-  def __init__(self, builder, code_unit=None):
-    Block.__init__(self, builder)
+  def __init__(self, builder, code_unit):
+    Block.__init__(self, builder, branch=code_unit.main_branch)
 
     assert code_unit != None
 
     self.code_unit = code_unit
 
     self.statefulTermInfos = {}
-
-  def getBranch(self):
-    return self.code_unit.main_branch
 
   def newStatefulTerm(self, name, initial_value):
     if self.getLocalName(name) != None:
@@ -292,6 +265,7 @@ class CodeUnitBlock(Block):
     self.code_unit.setTermName(term, name, allow_rename=True)
 
   def onFinish(self):
+    # Todo: this needs to get called
     # wrap up stateful terms with assign() terms
     for stinfo in self.statefulTermInfos.values():
       
@@ -305,19 +279,29 @@ class ConditionalGroup(object):
   def __init__(self, builder, condition_term):
 
     self.condition_term = condition_term
+    self.builder = builder
 
     # Create enclosing branch
-    self.enclosing_branch = builder.createTerm(builtin_functions.COND_BRANCH,
-                                          inputs=[self.condition_term])
+    self.enclosingBranchTerm = self.builder.createTerm(
+        builtin_functions.COND_BRANCH, inputs=[self.condition_term])
 
     self.blocks = []
+
+  def newBlock(self, **kwargs):
+    block = ConditionalBlock(self.builder, self, **kwargs)
+    self.blocks.append(block)
+    return block
 
   def finish(self):
     # In this function, we need to find any terms that were rebound (in any
     # of our blocks), and merge them into newly-created conditional terms.
     # If this is confusing, think of it like train tracks.
 
-    # First collect all the term names that need merging
+    # First check if we are lacking a default branch. Add one if needed
+    if not any(map(lambda b: b.isDefault, self.blocks)):
+      self.newBlock(isDefault=True)
+
+    # Collect all the term names that need merging
     # 'needs_merge' maps term names to original terms
     needs_merge = {}
 
@@ -342,19 +326,20 @@ class ConditionalGroup(object):
 
       for block in self.blocks:
 
+        head = None
+
         # Check if this term is rebound in this block
         if name in block.rebinds:
           rebind_info = block.rebinds[name]
 
           # Use the rebind head as the head
-          info.heads.append(rebind_info.head)
+          head = rebind_info.head
 
         else:
           # Use the original as the head
-          info.heads.append(original)
+          head = original
 
-
-      needs_merge.add(rebind_info.name)
+        info.heads.append(head)
 
     # Now use this information and finally create some terms
     # (this is one part of code that needs to change if we support "else if")
@@ -367,12 +352,14 @@ class ConditionalGroup(object):
 
 
 class ConditionalBlock(Block):
-  def __init__(self, builder, group):
-    Block.__init__(self, builder)
+  def __init__(self, builder, group, isDefault=False):
+    
+    assert group.enclosingBranchTerm.branch is not None
 
-    self.branch_term = builder.createTerm(builtin_functions.SIMPLE_BRANCH)
-    group.blocks.append(self)
+    self.branchTerm = builder.createTerm(builtin_functions.SIMPLE_BRANCH,
+        branch=group.enclosingBranchTerm.branch)
 
-  def getBranch(self):
-    return self.branch_term.branch
+    Block.__init__(self, builder, branch = self.branchTerm.branch)
+
+    self.isDefault = isDefault
 
