@@ -33,15 +33,17 @@ class CodeUnit(object):
     if inputs:
       # If they use any non-term args, convert them to constants
       inputs = map(terms.wrapNonTerm, inputs)
-      self.code_unit.setTermInputs(new_term, inputs)
+      self.setTermInputs(new_term, inputs)
 
-    if branch:
+    if branch is not None:
       branch.append(new_term)
     else:
       self.main_branch.append(new_term)
 
     if name:
       self.setTermName(new_term, name)
+
+    return new_term
 
   append = appendNewTerm
 

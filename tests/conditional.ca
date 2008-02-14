@@ -4,7 +4,7 @@ x = 0
 if (true) {
   x = 1
 } else {
-  assert(false);
+  assert(false)
 }
 
 assert(x == 1)
@@ -17,3 +17,19 @@ if (false) {
 
 assert(x == 2)
 assert(x != 1)
+
+if (true) {
+  x = 3
+}
+
+assert(x == 3)
+
+if (false) {
+  x = 4
+  assert(false)
+}
+
+assert(x == 3)
+assert(x != 4)
+assert(true)
+

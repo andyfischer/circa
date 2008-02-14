@@ -60,6 +60,9 @@ class Term(object):
   def pythonEvaluate(self):
     self.function.pythonEvaluate(self)
 
+  def getIdentifier(self):
+    return str(self.globalID)
+
   def printExtended(self, printer):
     printer.prints("%i: %s" % (self.globalID, self.function.name))
 
