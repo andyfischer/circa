@@ -33,3 +33,9 @@ assert(x == 3)
 assert(x != 4)
 assert(true)
 
+if (true)
+  x = 5
+else
+  assert(false)
+
+assert(x == 5)
