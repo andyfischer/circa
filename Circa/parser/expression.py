@@ -54,19 +54,30 @@ class Infix(Node):
     # evaluate as a function?
     if self.token.match in infix_token_to_function:
       function = infix_token_to_function[self.token.match]
-      return builder.createTerm(function, inputs=[self.left.eval(builder), self.right.eval(builder)] )
+      return builder.createTerm(function,
+          inputs=[self.left.eval(builder), self.right.eval(builder)] )
 
     # evaluate as an assignment?
     if self.token.match == EQUALS:
       right_term = self.right.eval(builder)
       if not isinstance(right_term, terms.Term):
-        pdb.set_trace()
         raise ParseError("Expression did not evaluate to a term: " + str(self.right), self.getFirstToken())
       return builder.bind(self.left.getName(), right_term)
 
     # evaluate as a function + assign?
     if self.token.match in infix_token_to_assign_function:
-      pass # todo
+
+      # create a term that's the result of the operation
+      function = infix_token_to_assign_function[self.token.match]
+      result_term = builder.createTerm(function,
+          inputs=[self.left.eval(builder), self.right.eval(builder)])
+
+      # bind the name to this result
+      return builder.bind(self.left.getName(), result_term)
+
+    # evaluate as stateful assign?
+    if self.token.match is COLON_EQUALS:
+
 
     raise "Unable to evaluate token: " + self.token.text
 
@@ -87,13 +98,6 @@ infix_token_to_function = {
     NOT_EQUALS: builtin_functions.NOT_EQUAL
 }
 
-# Infix token-to-stateful-function
-infix_token_to_assign_function = {
-    PLUS_EQUALS: builtin_functions.ADD,
-    MINUS_EQUALS: builtin_functions.SUB,
-    STAR_EQUALS: builtin_functions.MULT,
-    SLASH_EQUALS: builtin_functions.DIV
-}
 
 
 # Infix precedence
