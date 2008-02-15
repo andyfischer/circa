@@ -106,6 +106,18 @@ class Test(unittest.TestCase):
     test("1.44+7575")
     test("and or if")
 
+  def testCommenting(self):
+
+    tokens = tokenize.tokenize("1 2 # 5 6 7\n8 9")
+    stream = token_stream.TokenStream(tokens)
+    stream.stopSkipping(NEWLINE)
+
+    matches = [INTEGER, INTEGER, NEWLINE, INTEGER, INTEGER]
+
+    for match in matches:
+      self.assertEquals(match, stream.consume().match)
+
+
 if __name__ == '__main__':
   unittest.main()
 

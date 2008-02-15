@@ -31,6 +31,15 @@ def parseExpression(tokens):
 # Alias for parseExpression
 parse = parseExpression
 
+# Infix token-to-stateful-function map
+INFIX_TOKEN_TO_ASSIGN_FUNCTION = {
+    PLUS_EQUALS: builtin_functions.ADD,
+    MINUS_EQUALS: builtin_functions.SUB,
+    STAR_EQUALS: builtin_functions.MULT,
+    SLASH_EQUALS: builtin_functions.DIV
+}
+
+
 # AST Classes
 class Node(object):
   def eval(self, builder):
@@ -65,10 +74,10 @@ class Infix(Node):
       return builder.bind(self.left.getName(), right_term)
 
     # evaluate as a function + assign?
-    if self.token.match in infix_token_to_assign_function:
+    if self.token.match in INFIX_TOKEN_TO_ASSIGN_FUNCTION:
 
       # create a term that's the result of the operation
-      function = infix_token_to_assign_function[self.token.match]
+      function = INFIX_TOKEN_TO_ASSIGN_FUNCTION[self.token.match]
       result_term = builder.createTerm(function,
           inputs=[self.left.eval(builder), self.right.eval(builder)])
 
@@ -77,6 +86,8 @@ class Infix(Node):
 
     # evaluate as stateful assign?
     if self.token.match is COLON_EQUALS:
+      return builder.createTerm(builtin_functions.ASSIGN,
+          inputs=[self.left.eval(builder), self.right.eval(builder)])
 
 
     raise "Unable to evaluate token: " + self.token.text
