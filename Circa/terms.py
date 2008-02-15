@@ -111,6 +111,10 @@ class Term(object):
         for term in branch:
           yield term
 
+  def equals(self, term):
+    assert isinstance(term, Term)
+    return self.pythonValue == term.pythonValue
+
   # value accessors
   def __int__(self):
     try: return int(self.pythonValue)
@@ -172,7 +176,10 @@ def findExisting(function, inputs=[]):
         if user_of_input.function != function: continue
 
         # Check if all the inputs are the same
-        inputs_match = all(apply(lambda a,b: a.equals(b), zip(inputs, user_of_input.inputs)))
+        def matches(pair):
+          return pair[0].equals(pair[1])
+
+        inputs_match = all(map(matches, zip(inputs, user_of_input.inputs)))
 
         # Todo: allow for functions that don't care what the function order is
 

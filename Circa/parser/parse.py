@@ -15,13 +15,6 @@ import parse_errors
 
 VERBOSE_DEBUGGING = False
 
-# Infix token-to-stateful-function map
-TOKEN_TO_ASSIGN_FUNCTION = {
-    PLUS_EQUALS: builtin_functions.ADD,
-    MINUS_EQUALS: builtin_functions.SUB,
-    STAR_EQUALS: builtin_functions.MULT,
-    SLASH_EQUALS: builtin_functions.DIV
-}
 
 def parse(builder, source, raise_errors=False):
   parser = Parser(builder, source, raise_errors)
@@ -82,46 +75,6 @@ class Parser(object):
 
     # if we got this far then we don't know what the hell to do
     raise parse_errors.NotAStatement(next_token)
-
-  def assign_statement(self):
-    "Try to parse an assign statement. Returns True if we succeed."
-    if VERBOSE_DEBUGGING: print "Parsing assign_statement"
-
-    # Require first term is an identifier
-    if not self.tokens.nextIs(IDENT):
-      return False
-
-    token_after_ident = self.tokens.next(lookahead=1)
-
-    # Check if = operator is used
-    if token_after_ident == EQUALS:
-      name_token = self.tokens.consume(IDENT)
-      self.tokens.consume(EQUALS)
-
-      expr = self.expression()
-
-      if not expr:
-        raise parse_errors.ExpectedExpression(self.tokens.next())
-
-      # Bind result to this name
-      expr_result = expr.eval(self.builder)
-      self.builder.bind(name_token.getName(), expr_result)
-      
-      return True
-
-    # Check if one of the operators +=, -=, *=, /= is used
-    if token_after_ident in TOKEN_TO_ASSIGN_FUNCTION:
-      function = TOKEN_TO_ASSIGN_FUNCTION[token_after_ident]
-
-      expr = self.expression()
-
-      if not expr:
-        raise parse_errors.ExpectedExpression(self.tokens.next())
-
-      # create a term that's the result of the operation
-      return builder.createTerm(function,
-          inputs=[self.left.eval(builder), self.right.eval(builder)] )
-    
 
   def if_statement(self):
     if VERBOSE_DEBUGGING: print "Parsing if_statement"

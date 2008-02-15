@@ -29,13 +29,11 @@ class TokenStream(object):
     assert isinstance(tokens, list)
 
     self.tokens = tokens
-    self.currentIndex = 0
     self.skipSet = set([WHITESPACE])
 
     # currentIndex should always rest on a non-skip token,
     # so advance past any skip tokens that are at the start
-    while not self.finished() and self.shouldSkip(self.tokens[self.currentIndex]):
-      self.currentIndex += 1
+    self.currentIndex = self.indexAfterSkipping(0)
 
   def __str__(self):
     return str(map(str, self.tokens))
@@ -45,6 +43,51 @@ class TokenStream(object):
 
   def reset(self):
     self.currentIndex = 0
+
+  def indexAfterSkipping(self, index):
+    """
+    Returns the index after skipping. If the token at 'index' is not skippable,
+    this function will just return 'index'.
+
+    There are currently two cases that we skip: 1) individual tokens that are
+    in skipSet (which includes WHITESPACE and sometimes NEWLINE), and 2) when we
+    encounter a POUND we skip up to NEWLINE
+
+    In the process of skipping, this function may reach the end of the stream
+    Callers should probably check for that.
+    """
+
+    currentlyInComment = False
+
+    while True:
+      # Finish if we reach the end of the stream
+      if index >= len(self.tokens):
+        return index
+
+      token = self.tokens[index]
+
+      # Check to start a comment
+      if token.match is POUND:
+        currentlyInComment = True
+
+      # Check to finish comment
+      elif token.match is NEWLINE:
+        currentlyInComment = False
+
+      # Check for a skippable token
+      if token.match in self.skipSet:
+        pass
+
+      # Continue a comment
+      elif currentlyInComment:
+        pass
+
+      # Otherwise finish and return
+      else:
+        return index
+
+      # Iterate
+      index += 1
 
   def shouldSkip(self, token):
     return token.match in self.skipSet
@@ -56,17 +99,11 @@ class TokenStream(object):
     if token_def in self.skipSet:
       self.skipSet.remove(token_def)
 
-  def advance(self, index):
-    index += 1
-    while index < len(self.tokens) and self.shouldSkip(self.tokens[index]):
-      index += 1
-    return index
-
   def next(self, lookahead=0):
     index = self.currentIndex
 
     while lookahead > 0:
-      index = self.advance(index)
+      index = self.indexAfterSkipping(index + 1)
       lookahead -= 1
 
     try:
@@ -96,7 +133,7 @@ class TokenStream(object):
       raise parse_errors.TokenStreamExpected(match, token)
 
     # advance current index
-    self.currentIndex = self.advance(self.currentIndex)
+    self.currentIndex = self.indexAfterSkipping(self.currentIndex + 1)
 
     return token
 

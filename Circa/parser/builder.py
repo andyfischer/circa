@@ -88,6 +88,9 @@ class Builder(object):
   def newConditionalGroup(self, condition):
     return ConditionalGroup(self, condition)
 
+  def startPlainBlock(self):
+    self.blockStack.append(Block(self))
+
   def closeBlock(self):
     "Close the current block"
     current_block = self.blockStack[-1]
