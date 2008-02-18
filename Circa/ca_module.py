@@ -1,7 +1,7 @@
 
 from Circa import (
   builtin_functions,
-  code_unit,
+  code,
   terms,
   token,
   parser
@@ -12,7 +12,7 @@ from Circa.parser import builder
 class CircaModule(object):
   def __init__(self, environment=None):
 
-    self.global_code_unit = code_unit.CodeUnit()
+    self.global_code_unit = code.CodeUnit()
     self.env = environment
 
     self.file_reference = None

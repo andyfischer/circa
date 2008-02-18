@@ -9,6 +9,8 @@ class BaseFunction(object):
   outputType = None
   hasBranch = False
   trainingType = None
+  onCreate = None
+  onDestroy = None
 
   @classmethod
   def shouldReuseExisting(cls):

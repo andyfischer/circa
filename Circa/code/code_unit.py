@@ -22,12 +22,15 @@ class CodeUnit(object):
   def __init__(self):
     self.main_branch = []
     self.term_namespace = {}
-    # self.change_listeners = []
 
-  def appendNewTerm(self, function, name=None, inputs=None, branch=None):
+  def appendNewTerm(self, function, inputs=None, branch=None):
+
+    # Check to find an equivalent existing term
     existing_term = terms.findExisting(function,inputs)
-    if existing_term: return existing_term
+    if existing_term:
+      return existing_term
 
+    # Create a new term
     new_term = terms.Term(function)
 
     if inputs:
@@ -35,20 +38,16 @@ class CodeUnit(object):
       inputs = map(terms.wrapNonTerm, inputs)
       self.setTermInputs(new_term, inputs)
 
-    if branch is not None:
-      branch.append(new_term)
-    else:
-      self.main_branch.append(new_term)
+    if branch is None:
+      branch = self.main_branch
 
-    if name:
-      self.setTermName(new_term, name)
+    branch.append(new_term)
 
     return new_term
 
-  append = appendNewTerm
-
-
   def setTermName(self, term, name, allow_rename=False):
+    "Set a term's name"
+
     assert isinstance(name, str)
 
     if (not allow_rename) and (name in self.term_namespace):
@@ -63,18 +62,11 @@ class CodeUnit(object):
     old_inputs = target_term.inputs
     target_term.inputs = new_inputs
 
-    # if this is a pure function then re-evaluate it
-    if target_term.function.pureFunction:
-      target_term.pythonEvaluate()
-
     # find which terms were just added
     newly_added = set(new_inputs) - set(old_inputs)
 
     # find which terms were just removed
     newly_removed = set(old_inputs) - set(new_inputs)
-
-    if not newly_added and not newly_removed:
-      return
 
     # add ourselves to new user lists
     for t in newly_added:
@@ -83,6 +75,29 @@ class CodeUnit(object):
     # remove ourselves from old user lists
     for t in newly_removed:
       t.users.remove(target_term)
+
+    self.onInputsChanged(target_term)
+
+  def appendToInput(self, target_term, new_input):
+    "Append a term to the inputs of 'target_term'"
+
+    # check if this input is newly added
+    is_newly_added = new_input not in target_term.inputs
+
+    target_term.inputs.append(new_input)
+
+    # add to new user list
+    if is_newly_added:
+      target_term.users.add(new_input)
+
+    self.onInputsChanged(target_term)
+  
+# Change events
+  
+  def onInputsChanged(self, term):
+    # if this is a pure function then re-evaluate it
+    if term.function.pureFunction:
+      term.pythonEvaluate()
 
   def getNamedTerm(self, name):
     return self.term_namespace[name]
@@ -93,26 +108,23 @@ class CodeUnit(object):
     for term in self.main_branch:
       if VERBOSE_DEBUGGING: print "Calling evaluate on " + str(term)
       term.pythonEvaluate()
-
+ 
   def printTerms(self):
     term_names = {}
-
+ 
     for (name,term) in self.term_namespace.items():
-      term_names[term] = name
-
+       term_names[term] = name
+ 
     printTermsFormatted(self.main_branch, indent_printer.IndentPrinter(), term_names)
-
-  __getitem__ = getNamedTerm
-
+  
+    __getitem__ = getNamedTerm
+  
   def iterate(self):
-    todo
+    for term in self.main_branch:
+      yield term
 
-# Event enumeration
-(TERM_APPENDED) = range(1)
+      # iterate subbranches
 
-class ChangeEvent(object):
-  def __init__(self):
-    self.changes = []
 
 def printTermsFormatted(branch, printer, term_names):
   for term in branch:
@@ -131,23 +143,23 @@ def printTermsFormatted(branch, printer, term_names):
       text += " ("
 
       def getTermLabel(term):
-        if term in term_names:
-          return term_names[term]
-
-        # For constant terms, just write their value
-        elif constants.isConstant(term):
-          return str(term.pythonValue)
-
-        else:
-          return 't:' + str(term.globalID)
-
-
+          if term in term_names:
+             return term_names[term]
+  
+          # For constant terms, just write their value
+          elif constants.isConstant(term):
+             return str(term.pythonValue)
+  
+          else:
+             return 't:' + str(term.globalID)
+ 
+ 
       text += ",".join(map(getTermLabel, term.inputs))
       text += ")"
-
+ 
     printer.println(text)
-
+ 
     if term.branch:
-      printer.indent()
-      printTermsFormatted(term.branch, printer, term_names)
-      printer.unindent()
+       printer.indent()
+       printTermsFormatted(term.branch, printer, term_names)
+       printer.unindent()

@@ -1,13 +1,13 @@
 
 from Circa import (
-  code_unit,
+  code,
   terms
 )
 
 
 class SubroutineDefinition(object):
   def __init__(self):
-    self.code_unit = code_unit.CodeUnit()
+    self.code_unit = code.CodeUnit()
 
     # Set up placeholders
     self.input_placeholders = []
