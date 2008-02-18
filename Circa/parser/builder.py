@@ -6,7 +6,7 @@ from Circa import (
   builtin_functions,
   ca_function,
   ca_types,
-  code_unit,
+  code,
   parser,
   subroutine_def,
   terms
@@ -24,7 +24,7 @@ class Builder(object):
       print "Builder.init, target = " + str(target)
 
     if target: self.code_unit = target
-    else: self.code_unit = code_unit.CodeUnit()
+    else: self.code_unit = code.CodeUnit()
 
     self.blockStack = []
     
@@ -106,8 +106,10 @@ class Builder(object):
     if branch is None:
       branch = self.currentBlock().branch
 
-    new_term = self.code_unit.appendNewTerm(function, name=name, inputs=inputs,
-        branch=branch)
+    new_term = self.code_unit.appendNewTerm(function, inputs=inputs, branch=branch)
+
+    if name:
+      self.code_unit.setTermName(new_term, name)
 
     assert(new_term != None)
 

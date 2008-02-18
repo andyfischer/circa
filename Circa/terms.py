@@ -19,6 +19,7 @@ class Term(object):
     self.source_token = source_token
     self.users = set()
     self.pythonValue = None
+    self.codeUnit = None
 
     # possibly make state
     self.state = function.makeState()
