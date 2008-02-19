@@ -30,7 +30,7 @@ class CircaModule(object):
     return module
     
   @classmethod
-  def fromFile(cls, file_name):
+  def fromFile(cls, file_name, raise_errors=False):
     "Create a CircaModule from the given file."
 
     # get file contents
@@ -47,7 +47,7 @@ class CircaModule(object):
     module.file_reference = file_name
 
     builder = module.makeBuilder()
-    parser.parse(builder, module.source_tokens)
+    parser.parse(builder, module.source_tokens, raise_errors)
     
     return module
 

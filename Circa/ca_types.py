@@ -23,13 +23,17 @@ class CircaBool(BaseType):
 class CircaFunction(BaseType):
   pass
 
+class CircaSubroutine(BaseType):
+  pass
+
 INT = CircaInt
 FLOAT = CircaFloat
 STRING = CircaString
 BOOL = CircaBool
 FUNC = CircaFunction
+SUBROUTINE = CircaSubroutine
 
-ALL_TYPES = set((CircaInt, CircaFloat, CircaString, CircaBool, CircaFunction))
+ALL_TYPES = set((CircaInt, CircaFloat, CircaString, CircaBool, CircaFunction, CircaSubroutine))
 
 def assertSupported(type):
   if not type in ALL_TYPES:
@@ -46,6 +50,8 @@ def getTypeOfPythonObj(obj):
   elif isinstance(obj, str):
     return CircaString
   elif isinstance(obj, bool):
+    return CircaBool
+  elif isinstance(obj, ):
     return CircaBool
 
   raise Exception("Not recognized")

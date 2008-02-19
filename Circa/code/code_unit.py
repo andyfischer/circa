@@ -26,12 +26,13 @@ class CodeUnit(object):
   def appendNewTerm(self, function, inputs=None, branch=None):
 
     # Check to find an equivalent existing term
-    existing_term = terms.findExisting(function,inputs)
-    if existing_term:
-      return existing_term
+    if inputs is not None:
+      existing_term = terms.findExisting(function, inputs)
+      if existing_term:
+        return existing_term
 
     # Create a new term
-    new_term = terms.Term(function)
+    new_term = terms.Term(function, code_unit=self)
 
     if inputs:
       # If they use any non-term args, convert them to constants
@@ -119,11 +120,11 @@ class CodeUnit(object):
   
     __getitem__ = getNamedTerm
   
-  def iterate(self):
+  def iterateTerms(self):
     for term in self.main_branch:
       yield term
 
-      # iterate subbranches
+      # todo: iterate subbranches
 
 
 def printTermsFormatted(branch, printer, term_names):

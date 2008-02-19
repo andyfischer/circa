@@ -9,7 +9,7 @@ from Circa.code import (
 )
 
 class Test(unittest.TestCase):
-  def simple(self):
+  def testSimple(self):
     code = code_unit.CodeUnit()
 
     code.appendNewTerm(builtin_functions.ADD)
@@ -17,3 +17,5 @@ class Test(unittest.TestCase):
 
     sanity.check(code)
 
+if __name__ == '__main__':
+  unittest.main()
