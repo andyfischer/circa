@@ -13,7 +13,7 @@ class ParseError(Exception):
 
 class TokenStreamExpected(ParseError):
   def __init__(self, expected, location):
-    message = "Expected: " + expected.text
+    message = "Expected: " + expected.name + ", found: " + location.text
     ParseError.__init__(self, location, message)
 
 class IdentifierNotFound(ParseError):

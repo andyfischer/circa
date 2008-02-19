@@ -11,7 +11,7 @@ nextGlobalID = 1
 
 
 class Term(object):
-  def __init__(self, function, source_token=None):
+  def __init__(self, function, code_unit=None, source_token=None):
 
     # initialize
     self.inputs = []
@@ -19,7 +19,7 @@ class Term(object):
     self.source_token = source_token
     self.users = set()
     self.pythonValue = None
-    self.codeUnit = None
+    self.codeUnit = code_unit
 
     # possibly make state
     self.state = function.makeState()

@@ -3,18 +3,21 @@ import pdb
 
 from Circa import (
   builtin_functions,
+  subroutine,
   terms,
   token
 )
 
-from Circa.parser import expression
+from Circa.parser import expression as expression_module
 from Circa.token import token_stream
 from Circa.token.definitions import *
 
-import parse_errors
+# Local modules
+import parse_errors, blocks
+
+SPECIAL_NAME_FOR_RETURNS = "#return"
 
 VERBOSE_DEBUGGING = False
-
 
 def parse(builder, source, raise_errors=False):
   parser = Parser(builder, source, raise_errors)
@@ -47,6 +50,10 @@ class Parser(object):
     if existing:
       self.currentBlock().handleRebind(name, existing, term)
 
+  def expression(self):
+    # Parse an expression using the 'expression' package
+    return expression_module.parseExpression(self.tokens)
+
   def statement(self):
     if VERBOSE_DEBUGGING: print "Parsing statement"
 
@@ -65,7 +72,7 @@ class Parser(object):
       return
 
     # otherwise, parse as expression
-    expr = expression.parseExpression(self.tokens)
+    expr = self.expression()
 
     if expr:
       expr.eval(self.builder)
@@ -86,7 +93,7 @@ class Parser(object):
 
     # parse the condition expression
     first_condition_token = self.tokens.next()
-    condition_expr = expression.parseExpression(self.tokens)
+    condition_expr = self.expression()
     condition_term = condition_expr.eval(self.builder)
 
     if condition_term == None:
@@ -120,20 +127,29 @@ class Parser(object):
     subroutine_name = self.tokens.consume(IDENT)
     self.tokens.consume(LPAREN)
 
-    # tokens.consume arguments
+    # collect arguments
     args = []
     if self.tokens.nextIs(IDENT):
       args.append( self.tokens.consume(IDENT) )
 
     while self.tokens.nextIs(COMMA):
+      self.tokens.consume(COMMA)
       args.append( self.tokens.consume(IDENT) )
 
     self.tokens.consume(RPAREN)
 
-    subBlock = SubroutineBlock(self, subroutine_name.text)
+    arg_names = map(lambda a: a.text, args)
 
-    subroutine_term = self.builder.createConstant(subBlock.subroutine, self.currentBlock())
-    self.bind(subroutine_name.text, function_term)
+    # create a new subroutine object
+    sub = subroutine.SubroutineDefinition(input_names=arg_names)
+
+    # open a block
+    code_block = blocks.CodeUnitBlock(self.builder, sub.code_unit)
+    self.block(code_block)
+
+    # store this guy in a constant term
+    subroutine_constant = self.builder.createConstant(value=sub, name=subroutine_name.text)
+
 
   def return_statement(self):
     return_token = self.tokens.consume(RETURN)
@@ -141,7 +157,7 @@ class Parser(object):
     if not expr:
       raise parse_errors.ExpectedExpression(return_token)
 
-    self.bind(terms.Term.RETURN_REF_NAME, expr.eval())
+    self.bind(SPECIAL_NAME_FOR_RETURNS, expr.eval(self.builder))
 
   def block(self, blockToStart):
     if VERBOSE_DEBUGGING: print "Parsing block"
@@ -154,6 +170,7 @@ class Parser(object):
       self.tokens.consume(LBRACKET)
       self.tokens.stopSkipping(NEWLINE)
 
+      # parse contents
       while not self.tokens.nextIs(RBRACKET):
         self.statement()
 
@@ -164,22 +181,6 @@ class Parser(object):
       self.statement()
 
     if blockToStart:
-      self.builder.closeBlock()
-
-
-  def block_body(self):
-    # Depcrecated function 
-    if VERBOSE_DEBUGGING: print "Parsing block_body"
-
-    # check for a block bounded with {}s
-    if (self.tokens.nextIs(LBRACKET)):
-      self.tokens.consume(LBRACKET)
-      self.tokens.stopSkipping(NEWLINE)
-
-      # when the } comes up, it will trigger closeBlock
-    else:
-      # parse a one-liner with no {}s
-      self.statement()
       self.builder.closeBlock()
 
   def right_bracket(self):

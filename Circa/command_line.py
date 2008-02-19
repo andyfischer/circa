@@ -32,12 +32,15 @@ def main():
   options.files = []
   options.onlyPrintCode = False
   options.interactiveMode = False
+  options.debugMode = False
 
   def shortOption(character):
     if character == 'p':
       options.onlyPrintCode = True
     elif character == 'i':
       options.interactiveMode = True
+    elif character == 'd':
+      options.debugMode = True
 
   for arg in args:
     if arg[0] == '-':
@@ -52,7 +55,7 @@ def main():
   for filename in options.files:
     file = findSourceFile(filename)
 
-    module = ca_module.CircaModule.fromFile(file)
+    module = ca_module.CircaModule.fromFile(file, raise_errors = options.debugMode)
 
     if options.onlyPrintCode:
       module.printTerms()
