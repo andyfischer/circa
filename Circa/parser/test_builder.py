@@ -6,13 +6,13 @@ from Circa import (
   terms
 )
 
-from Circa.parser.builder import Builder
+from Circa.parser import (blocks, builder)
 from Circa.builtin_functions import *
 
 class Test(unittest.TestCase):
 
   def testSimple(self):
-    b = Builder()
+    b = builder.Builder()
 
     constant1 = b.createConstant(1)
     constant2 = b.createConstant(2)
@@ -22,7 +22,7 @@ class Test(unittest.TestCase):
     self.assertTrue(float(add) == 3.0)
 
   def testLocalVars(self):
-    bldr = Builder()
+    bldr = builder.Builder()
 
     class FakeTerm(terms.Term):
       def __init__(self):
@@ -32,14 +32,14 @@ class Test(unittest.TestCase):
     a_alt = FakeTerm()
     b = FakeTerm()
 
-    bldr.bind("a", a)
+    bldr.bindName("a", a)
 
     assert bldr.getNamed("a") == a
 
-    bldr.startPlainBlock()
+    bldr.startBlock(blocks.Block)
 
-    bldr.bind("a", a_alt)
-    bldr.bind("b", b)
+    bldr.bindName("a", a_alt)
+    bldr.bindName("b", b)
 
     assert bldr.getNamed("a") == a_alt
     assert bldr.getNamed("b") == b
@@ -50,7 +50,7 @@ class Test(unittest.TestCase):
     assert bldr.getNamed("b") == None
 
   def testUnknownFunction(self):
-    bldr = Builder()
+    bldr = builder.Builder()
 
     non_function = bldr.getLocalFunction("totally-fake")
 

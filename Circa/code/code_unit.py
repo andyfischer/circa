@@ -9,9 +9,10 @@ rather than on the terms themselves.
 """
 
 from Circa import (
+  ca_types,
   terms,
   common_errors,
-  constants
+  values
 )
 
 from Circa.utils import indent_printer
@@ -23,28 +24,35 @@ class CodeUnit(object):
     self.main_branch = []
     self.term_namespace = {}
 
-  def appendNewTerm(self, function, inputs=None, branch=None):
+  def createTerm(self, function, inputs=None, branch=None, **term_options):
 
-    # Check to find an equivalent existing term
-    if inputs is not None:
-      existing_term = terms.findExisting(function, inputs)
-      if existing_term:
-        return existing_term
+    # Check to use an equivalent existing term
+    existing_term = terms.findExisting(function, inputs)
+    if existing_term:
+      return existing_term
 
     # Create a new term
-    new_term = terms.Term(function, code_unit=self)
+    new_term = terms.Term(function, code_unit=self, **term_options)
 
     if inputs:
       # If they use any non-term args, convert them to constants
       inputs = map(terms.wrapNonTerm, inputs)
       self.setTermInputs(new_term, inputs)
 
-    if branch is None:
-      branch = self.main_branch
-
+    if branch is None: branch = self.main_branch
     branch.append(new_term)
 
     return new_term
+
+  def createConstant(self, value=None, name=None, branch=None, source_token=None):
+    type = ca_types.getTypeOfPythonObj(value)
+    term = self.createTerm(values.constFunctionFromType(type), initial_value=value, 
+        branch=branch, source_token=source_token)
+
+    if name:
+      self.setTermName(term, name)
+
+    return term
 
   def setTermName(self, term, name, allow_rename=False):
     "Set a term's name"
@@ -56,6 +64,10 @@ class CodeUnit(object):
                        " (Use 'allow_rename' if you want to allow this)")
 
     self.term_namespace[name] = term
+
+  def getNamedTerm(self, name):
+    if name not in self.term_namespace: return None
+    return self.term_namespace[name]
 
   def setTermInputs(self, target_term, new_inputs):
     "Assigns the term's inputs"
@@ -94,14 +106,11 @@ class CodeUnit(object):
     self.onInputsChanged(target_term)
   
 # Change events
-  
   def onInputsChanged(self, term):
     # if this is a pure function then re-evaluate it
     if term.function.pureFunction:
       term.pythonEvaluate()
 
-  def getNamedTerm(self, name):
-    return self.term_namespace[name]
 
   def evaluate(self):
     if VERBOSE_DEBUGGING: print "code_unit.evaluate"
@@ -131,7 +140,7 @@ def printTermsFormatted(branch, printer, term_names):
   for term in branch:
 
     # Skip constants
-    if constants.isConstant(term):
+    if values.isConstant(term):
       continue
 
     if term in term_names:
@@ -148,7 +157,7 @@ def printTermsFormatted(branch, printer, term_names):
              return term_names[term]
   
           # For constant terms, just write their value
-          elif constants.isConstant(term):
+          elif values.isConstant(term):
              return str(term.pythonValue)
   
           else:
