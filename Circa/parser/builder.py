@@ -8,7 +8,8 @@ from Circa import (
   ca_types,
   code,
   parser,
-  terms
+  terms,
+  values
 )
 
 import Circa.builtin_functions.unknown
@@ -46,9 +47,9 @@ class Builder(object):
         assert isinstance(term, terms.Term)
         return term
 
-    # Check builtins
-    if name in builtins.ALL_SYMBOLS:
-      term = builtins.ALL_SYMBOLS[name]
+    # Check builtin module
+    if builtins.CODE_UNIT.getNamedTerm(name) is not None:
+      term = builtins.CODE_UNIT.getNamedTerm(name)
       assert isinstance(term, terms.Term)
       return term
 
@@ -75,16 +76,20 @@ class Builder(object):
 
     assert isinstance(term, terms.Term)
 
-    if builtin_functions.values.Constant.isConstant(term):
+    if values.isConstant(term):
       if not term.function.outputType == ca_types.FUNC:
         pdb.set_trace()
         return builtin_functions.unknown.nameNotAFunction(name)
 
       return term.pythonValue
       
-    raise NotYetImplemented("functions from non-constant terms")
+    raise parse_errors.NotYetImplemented("functions from non-constant terms")
 
   def startBlock(self, block):
+    # 'block' can be a type, if so, instantiate it here
+    if isinstance(block, type):
+      block = block(self)
+
     self.blockStack.append(block)
 
   def closeBlock(self):
@@ -97,12 +102,12 @@ class Builder(object):
   def blockDepth(self):
     return len(self.blockStack)
 
-  def createTerm(self, function, name=None, inputs=None, branch=None):
+  def createTerm(self, function, name=None, branch=None, **options):
 
     if branch is None:
       branch = self.currentBlock().branch
 
-    new_term = self.code_unit.appendNewTerm(function, inputs=inputs, branch=branch)
+    new_term = self.code_unit.createTerm(function, **options)
     assert(new_term != None)
 
     if name:
@@ -110,8 +115,11 @@ class Builder(object):
 
     return new_term
 
-  def createConstant(self, value, name=None, **term_options):
-    new_term = terms.createConstant(value, term_options)
+  def createConstant(self, value, name=None, branch=None, **options):
+    if branch is None:
+      branch = self.currentBlock().branch
+
+    new_term = self.code_unit.createConstant(value, name=name, **options)
     if name: self.bindName(name, new_term)
     return new_term
 
@@ -159,9 +167,3 @@ class Builder(object):
     self.code_unit.evaluate()
 
 
-class RebindInfo(object):
-  def __init__(self, name, original, head, defined_outside):
-    self.name = name
-    self.original = original
-    self.head = head
-    self.defined_outside = defined_outside

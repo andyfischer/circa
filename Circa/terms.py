@@ -1,24 +1,21 @@
 import pdb
 
 from Circa import (
-  ca_types,
   ca_function
 )
-
-from Circa.builtin_functions import values
 
 nextGlobalID = 1
 
 
 class Term(object):
-  def __init__(self, function, code_unit=None, source_token=None):
+  def __init__(self, function, initial_value=None, code_unit=None, source_token=None):
 
     # initialize
     self.inputs = []
     self.function = function
     self.source_token = source_token
     self.users = set()
-    self.pythonValue = None
+    self.pythonValue = initial_value
     self.codeUnit = code_unit
 
     # possibly make state
@@ -145,10 +142,11 @@ def placeholder():
   "Returns a new placeholder term"
   return Term(builtin_functions.PLACEHOLDER)
 
+"""
 def constant(value, options={}):
   "Returns a constant term with the given value"
   type = ca_types.getTypeOfPythonObj(value)
-  term = Term(values.Constant.fromType(type), **options)
+  term = Term(values.constFunctionFromType(type), **options)
   term.pythonValue = value
   return term
 
@@ -157,11 +155,12 @@ createConstant = constant
 def variable(value, options={}):
   "Returns a variable term with the given value"
   type = ca_types.getTypeOfPythonObj(value)
-  term = Term(values.Variable.fromType(type), **options)
+  term = Term(values.variableFunctionfromType(type), **options)
   Variable.setValue(term, value)
   return term
 
 createVariable = variable
+"""
 
 def findExisting(function, inputs=[]):
   """
@@ -169,6 +168,9 @@ def findExisting(function, inputs=[]):
   returns such a function if it exists and if it makes sense (according to the function's
   definition) to allow people to reuse a function.
   """
+  if inputs is None:
+    return None
+
   if function.shouldReuseExisting():
     # Try to find an existing term
     for input in inputs:

@@ -12,8 +12,8 @@ class Test(unittest.TestCase):
   def testSimple(self):
     code = code_unit.CodeUnit()
 
-    code.appendNewTerm(builtin_functions.ADD)
-    code.appendNewTerm(builtin_functions.SUB)
+    code.createTerm(builtin_functions.ADD)
+    code.createTerm(builtin_functions.SUB)
 
     sanity.check(code)
 

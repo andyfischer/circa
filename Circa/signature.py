@@ -1,9 +1,5 @@
 import pdb
 
-from Circa import (
-  ca_types
-)
-
 VERBOSE_DEBUGGING = 1
 
 def fixed(*args):
@@ -53,7 +49,6 @@ class SignatureArg(object):
 
 class SpecificTypeArg(SignatureArg):
   def __init__(self, type):
-    ca_types.assertSupported(type)
     self.type = type
 
   def accepts(self, input):

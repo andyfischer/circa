@@ -71,7 +71,7 @@ class Infix(Node):
       right_term = self.right.eval(builder)
       if not isinstance(right_term, terms.Term):
         raise ParseError("Expression did not evaluate to a term: " + str(self.right), self.getFirstToken())
-      return builder.bind(self.left.getName(), right_term)
+      return builder.bindName(self.left.getName(), right_term)
 
     # evaluate as a function + assign?
     if self.token.match in INFIX_TOKEN_TO_ASSIGN_FUNCTION:
@@ -82,7 +82,7 @@ class Infix(Node):
           inputs=[self.left.eval(builder), self.right.eval(builder)])
 
       # bind the name to this result
-      return builder.bind(self.left.getName(), result_term)
+      return builder.bindName(self.left.getName(), result_term)
 
     # evaluate as stateful assign?
     if self.token.match is COLON_EQUALS:

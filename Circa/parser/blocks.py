@@ -182,7 +182,7 @@ class ConditionalGroup(object):
                                           inputs=[ self.condition_term,
                                                    merge_info.heads[0],
                                                    merge_info.heads[1]])
-      self.builder.bind(rebind_info.name, new_cond_term)
+      self.builder.bindName(rebind_info.name, new_cond_term)
 
 
 class ConditionalBlock(Block):
@@ -196,4 +196,11 @@ class ConditionalBlock(Block):
     Block.__init__(self, builder, branch = self.branchTerm.branch)
 
     self.isDefault = isDefault
+
+class RebindInfo(object):
+  def __init__(self, name, original, head, defined_outside):
+    self.name = name
+    self.original = original
+    self.head = head
+    self.defined_outside = defined_outside
 

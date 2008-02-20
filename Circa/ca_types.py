@@ -51,7 +51,7 @@ def getTypeOfPythonObj(obj):
     return CircaString
   elif isinstance(obj, bool):
     return CircaBool
-  elif isinstance(obj, ):
+  elif isinstance(obj, subroutine.SubroutineDefinition):
     return CircaBool
 
   raise Exception("Not recognized")

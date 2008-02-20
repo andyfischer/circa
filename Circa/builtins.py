@@ -2,15 +2,13 @@
 import string
 
 from Circa import (
-  ca_function,
-  terms
+  code,
+  ca_function
 )
 
 VERBOSE_DEBUGGING = False
 
-# Build dict of functions
-
-FUNCTIONS = {}
+CODE_UNIT = code.CodeUnit()
 
 # Import all functions from builtin_functions
 
@@ -25,30 +23,12 @@ for name in dir(builtin_functions):
       print "Adding builtin function " + name
 
     # Wrap into a constant term
-    FUNCTIONS[name] = terms.constant(obj)
+    CODE_UNIT.createConstant(value=obj, name=name)
 
-# Build dict of constants
-CONSTANTS = {}
-
-CONSTANTS['true'] = terms.constant(True)
-CONSTANTS['false'] = terms.constant(False)
+# Import some constants
+CODE_UNIT.createConstant(value=True, name='true')
+CODE_UNIT.createConstant(value=False, name='false')
 
 
-# Combine symbols
-ALL_SYMBOLS = {}
-
-for name in FUNCTIONS:
-  ALL_SYMBOLS[name] = FUNCTIONS[name]
-
-for name in CONSTANTS:
-  ALL_SYMBOLS[name] = CONSTANTS[name]
-
-# Make sure that ALL_SYMBOLS has types String -> Term
-for name in ALL_SYMBOLS:
-  if not isinstance(name, str):
-    raise AssertionError("Not a string: " + str(name))
-  obj = ALL_SYMBOLS[name]
-  if not isinstance(obj, terms.Term):
-    raise AssertionError("Not a term: " + str(obj))
 
 
