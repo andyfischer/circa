@@ -127,13 +127,12 @@ class CodeUnit(object):
  
     printTermsFormatted(self.main_branch, indent_printer.IndentPrinter(), term_names)
   
-    __getitem__ = getNamedTerm
+  __getitem__ = getNamedTerm
   
   def iterateTerms(self):
     for term in self.main_branch:
-      yield term
-
-      # todo: iterate subbranches
+      for t in term.iterate():
+        yield t
 
 
 def printTermsFormatted(branch, printer, term_names):

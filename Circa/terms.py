@@ -102,12 +102,11 @@ class Term(object):
 
         printer.unindent(2)
 
-  def iterator(self, forwards=True):
+  def iterate(self, forwards=True):
     yield self
-    if self.state:
-      for branch in self.branches:
-        for term in branch:
-          yield term
+    if self.branch:
+      for term in self.branch:
+        yield term
 
   def equals(self, term):
     assert isinstance(term, Term)
