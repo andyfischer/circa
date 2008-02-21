@@ -107,19 +107,17 @@ class Builder(object):
     if branch is None:
       branch = self.currentBlock().branch
 
-    new_term = self.code_unit.createTerm(function, **options)
+    new_term = self.code_unit.createTerm(function, branch=branch, **options)
     assert(new_term != None)
-
-    if name:
-      self.bindName(name, new_term)
-
+    if name: self.bindName(name, new_term)
     return new_term
 
   def createConstant(self, value, name=None, branch=None, **options):
     if branch is None:
       branch = self.currentBlock().branch
 
-    new_term = self.code_unit.createConstant(value, name=name, **options)
+    new_term = self.code_unit.createConstant(value, branch=branch, **options)
+    assert(new_term != None)
     if name: self.bindName(name, new_term)
     return new_term
 
