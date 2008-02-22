@@ -48,8 +48,8 @@ class Builder(object):
         return term
 
     # Check builtin module
-    if builtins.CODE_UNIT.getNamedTerm(name) is not None:
-      term = builtins.CODE_UNIT.getNamedTerm(name)
+    if builtins.BUILTINS.getNamedTerm(name) is not None:
+      term = builtins.BUILTINS.getNamedTerm(name)
       assert isinstance(term, terms.Term)
       return term
 

@@ -2,14 +2,14 @@ import pdb
 
 from Circa import (
   ca_function,
-  ca_types, 
+  builtins, 
   signature, 
   term_state
 )
 
 class CondBranch(ca_function.BaseFunction):
   name = "cond_branch"
-  signature = signature.fixed(ca_types.BOOL)
+  signature = signature.fixed(builtins.BOOL_TYPE)
   hasBranch = True
 
   def pythonEvaluate(self, term):

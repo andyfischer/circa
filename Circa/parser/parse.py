@@ -3,6 +3,8 @@ import pdb
 
 from Circa import (
   builtin_functions,
+  ca_function,
+  signature,
   subroutine,
   terms,
   token
@@ -59,7 +61,7 @@ class Parser(object):
 
     paths = {}
     paths[IF] = self.if_statement
-    paths[FUNCTION] = self.subroutine_decl
+    paths[FUNCTION] = self.function_decl
     paths[RETURN] = self.return_statement
     paths[RBRACKET] = self.right_bracket
     paths[NEWLINE] = self.new_line
@@ -122,23 +124,60 @@ class Parser(object):
 
     cond_group.finish()
 
-  def subroutine_decl(self):
+  # Returns instance of Argument
+  def function_argument(self):
+    arg = Argument()
+    arg.type = self.tokens.consume(IDENT)
+    if self.tokens.nextIs(IDENT):
+      arg.id = self.tokens.consume(IDENT)
+    return arg
+
+  def function_decl(self):
     self.tokens.consume(FUNCTION)
-    subroutine_name = self.tokens.consume(IDENT)
+    function_id = self.tokens.consume(IDENT)
     self.tokens.consume(LPAREN)
 
     # collect arguments
+
     args = []
     if self.tokens.nextIs(IDENT):
-      args.append( self.tokens.consume(IDENT) )
+      args.append(self.function_argument())
 
     while self.tokens.nextIs(COMMA):
       self.tokens.consume(COMMA)
-      args.append( self.tokens.consume(IDENT) )
+      args.append(self.function_argument())
+
+    # check for output type
+    outputType = None
+    if self.tokens.nextIs(RIGHT_ARROW):
+      self.tokens.consume(RIGHT_ARROW)
+      self.tokens.outputType = self.tokens.consume(IDENT)
 
     self.tokens.consume(RPAREN)
 
-    arg_names = map(lambda a: a.text, args)
+    # check for attributes
+    attributes = []
+    while self.tokens.nextIs(COLON):
+      self.tokens.consume(COLON)
+      attributes.append( self.tokens.consume(IDENT) )
+
+    arg_names = map(lambda arg: arg.id.text, args)
+    attribute_names = map(lambda a: a.text, attributes)
+
+    # Check for 'builtin' attribute
+    if 'builtin' in attribute_names:
+      # Create a builtin function
+      func = ca_function.BaseFunction()
+      func.name = function_id.text
+
+      type_arr = map(lambda arg: self.builder.getNamed(arg.type.text), args) 
+      func.signature = signature.fixed(type_arr)
+
+      if outputType:
+        func.outputType = self.builder.getNamed(outputType.text)
+
+      self.builder.createConstant(value=func, name=func.name)
+      return
 
     # create a new subroutine object
     sub = subroutine.SubroutineDefinition(input_names=arg_names)
@@ -148,7 +187,7 @@ class Parser(object):
     self.block(code_block)
 
     # store this guy in a constant term
-    subroutine_constant = self.builder.createConstant(value=sub, name=subroutine_name.text)
+    subroutine_constant = self.builder.createConstant(value=sub, name=function_id.text)
 
 
   def return_statement(self):
@@ -194,4 +233,9 @@ class Parser(object):
     if VERBOSE_DEBUGGING: print "Parsing new_line"
 
     self.tokens.consume(NEWLINE)
+
+class Argument(object):
+  def __init__(self):
+    self.type = None
+    self.id = None
 

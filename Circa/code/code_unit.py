@@ -9,7 +9,7 @@ rather than on the terms themselves.
 """
 
 from Circa import (
-  ca_types,
+  pythonTypes,
   terms,
   common_errors,
   values
@@ -45,7 +45,7 @@ class CodeUnit(object):
     return new_term
 
   def createConstant(self, value=None, name=None, branch=None, source_token=None):
-    type = ca_types.getTypeOfPythonObj(value)
+    type = pythonTypes.typeOfPythonObj(value)
     term = self.createTerm(values.constFunctionFromType(type), initial_value=value, 
         branch=branch, source_token=source_token)
 
