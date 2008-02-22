@@ -141,25 +141,6 @@ def placeholder():
   "Returns a new placeholder term"
   return Term(builtin_functions.PLACEHOLDER)
 
-"""
-def constant(value, options={}):
-  "Returns a constant term with the given value"
-  type = ca_types.getTypeOfPythonObj(value)
-  term = Term(values.constFunctionFromType(type), **options)
-  term.pythonValue = value
-  return term
-
-createConstant = constant
-
-def variable(value, options={}):
-  "Returns a variable term with the given value"
-  type = ca_types.getTypeOfPythonObj(value)
-  term = Term(values.variableFunctionfromType(type), **options)
-  Variable.setValue(term, value)
-  return term
-
-createVariable = variable
-"""
 
 def findExisting(function, inputs=[]):
   """

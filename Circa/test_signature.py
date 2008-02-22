@@ -2,14 +2,14 @@
 import pdb, unittest
 
 from Circa import (
-  ca_types,
+  builtins,
   dsl,
   signature
 )
 
-INT = ca_types.INT
-FLOAT = ca_types.FLOAT
-STRING = ca_types.STRING
+INT = builtins.INT_TYPE
+FLOAT = builtins.FLOAT_TYPE
+STRING = builtins.STR_TYPE
 
 pretend_term = dsl.placeholder
 

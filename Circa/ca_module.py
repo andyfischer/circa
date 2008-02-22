@@ -1,6 +1,5 @@
 
 from Circa import (
-  builtin_functions,
   code,
   terms,
   token,
