@@ -1,5 +1,16 @@
 
+class Function(object):
+  def __init__(self):
+    self.inputTypes = []
+    self.outputTypes = []
 
+
+def createFunction(inputs, outputs):
+  f = Function()
+  f.inputTypes = inputTypes
+  f.outputTypes = outputTypes
+
+# Deprecated:
 class BaseFunction(object):
 
   # Default options
