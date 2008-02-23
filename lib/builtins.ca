@@ -39,3 +39,16 @@ function subroutine() :builtin
 # Values
 function constant() :builtin
 function variable() :builtin
+
+# Metaprogramming functions
+function token(str -> Token) :builtin
+attribute operator(Token -> Function)
+
+# Operators
+operator(token('+')) := add
+operator(token('-')) := sub
+operator(token('*')) := mult
+operator(token('/')) := div
+operator(token('==')) := equals
+operator(token('!=')) := not_equals
+

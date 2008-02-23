@@ -129,17 +129,6 @@ class Term(object):
   def __getitem__(self, name):
     return self.state.getLocal(name)
 
-import builtin_functions
-
-def wrapNonTerm(obj):
-  if not isinstance(obj, Term):
-    return constant(obj)
-  else:
-    return obj
-
-def placeholder():
-  "Returns a new placeholder term"
-  return Term(builtin_functions.PLACEHOLDER)
 
 
 def findExisting(function, inputs=[]):

@@ -1,4 +1,3 @@
-from Circa.builtin_functions import value
 
 def isConstant(term):
   return isinstance(term.function, value.Constant)

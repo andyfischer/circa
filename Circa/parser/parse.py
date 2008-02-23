@@ -2,7 +2,6 @@
 import pdb
 
 from Circa import (
-  builtin_functions,
   ca_function,
   signature,
   subroutine,

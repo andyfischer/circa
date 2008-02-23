@@ -1,7 +1,7 @@
 import pdb
 
 from Circa import (
-  builtin_functions,
+  builtins,
   terms,
   token,
 )
@@ -33,10 +33,10 @@ parse = parseExpression
 
 # Infix token-to-stateful-function map
 INFIX_TOKEN_TO_ASSIGN_FUNCTION = {
-    PLUS_EQUALS: builtin_functions.ADD,
-    MINUS_EQUALS: builtin_functions.SUB,
-    STAR_EQUALS: builtin_functions.MULT,
-    SLASH_EQUALS: builtin_functions.DIV
+    PLUS_EQUALS: builtins.ADD,
+    MINUS_EQUALS: builtins.SUB,
+    STAR_EQUALS: builtins.MULT,
+    SLASH_EQUALS: builtins.DIV
 }
 
 
@@ -86,7 +86,7 @@ class Infix(Node):
 
     # evaluate as stateful assign?
     if self.token.match is COLON_EQUALS:
-      return builder.createTerm(builtin_functions.ASSIGN,
+      return builder.createTerm(builtins.ASSIGN,
           inputs=[self.left.eval(builder), self.right.eval(builder)])
 
 
@@ -101,12 +101,12 @@ class Infix(Node):
 
 # Infix token-to-function map
 infix_token_to_function = {
-    PLUS: builtin_functions.ADD,
-    MINUS: builtin_functions.SUB,
-    STAR: builtin_functions.MULT,
-    SLASH: builtin_functions.DIV,
-    DOUBLE_EQUALS: builtin_functions.EQUAL,
-    NOT_EQUALS: builtin_functions.NOT_EQUAL
+    PLUS: builtins.ADD,
+    MINUS: builtins.SUB,
+    STAR: builtins.MULT,
+    SLASH: builtins.DIV,
+    DOUBLE_EQUALS: builtins.EQUAL,
+    NOT_EQUALS: builtins.NOT_EQUAL
 }
 
 
@@ -182,7 +182,7 @@ class Unary(Node):
     self.right = right
 
   def eval(self, builder):
-    return builder.createTerm(builtin_functions.MULT,
+    return builder.createTerm(builtins.MULT,
                               inputs = [builder.createConstant(-1),
                                         self.right.eval(builder)])
 
