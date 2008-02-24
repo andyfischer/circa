@@ -24,29 +24,43 @@ class CodeUnit(object):
     self.main_branch = []
     self.term_namespace = {}
 
-  def createTerm(self, function, inputs=None, branch=None, **term_options):
+  def createTerm(self, functionTerm, inputs=None, branch=None, name=None, **term_options):
 
     # Check to use an equivalent existing term
-    existing_term = terms.findExisting(function, inputs)
+    existing_term = terms.findExisting(functionTerm, inputs)
     if existing_term:
       return existing_term
 
     # Create a new term
-    new_term = terms.Term(function, code_unit=self, **term_options)
+    new_term = terms.Term(functionTerm, code_unit=self, **term_options)
 
     if inputs:
       # If they use any non-term args, convert them to constants
       inputs = map(terms.wrapNonTerm, inputs)
       self.setTermInputs(new_term, inputs)
 
+    if name:
+      self.setTermName(new_term, name)
+
     if branch is None: branch = self.main_branch
     branch.append(new_term)
 
     return new_term
 
-  def createConstant(self, value=None, name=None, branch=None, source_token=None):
-    type = pythonTypes.typeOfPythonObj(value)
-    term = self.createTerm(values.constFunctionFromType(type), initial_value=value, 
+  # Alias, 'createTerm' can also be thought of as 'getTerm', since the function may
+  # re-use an existing term
+  getTerm = createTerm
+
+  def createConstant(self, value=None, name=None, branch=None,
+        source_token=None, type=None):
+
+    if type is None:
+      type = pythonTypes.typeOfPythonObj(value)
+
+    # Get constant function for this type
+    constFunc = builtins.BUILTINS.getTerm(builtins.CONST_FUNC, inputs=[type])
+
+    term = self.createTerm(constFunc, initial_value=value, 
         branch=branch, source_token=source_token)
 
     if name:
@@ -108,7 +122,7 @@ class CodeUnit(object):
 # Change events
   def onInputsChanged(self, term):
     # if this is a pure function then re-evaluate it
-    if term.function.pureFunction:
+    if term.functionTerm.pureFunction:
       term.pythonEvaluate()
 
 
@@ -146,7 +160,7 @@ def printTermsFormatted(branch, printer, term_names):
       name = term_names[term]
     else:
       name = str(term.globalID)
-    text = name + ": " + term.function.name
+    text = name + ": " + term.functionTerm.name
 
     if term.inputs:
       text += " ("

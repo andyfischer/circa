@@ -1,6 +1,6 @@
 
 from Circa import (
-  builtin_functions,
+  builtins,
   code
 )
 
@@ -117,7 +117,7 @@ class ConditionalGroup(object):
 
     # Create enclosing branch
     self.enclosingBranchTerm = self.builder.createTerm(
-        builtin_functions.COND_BRANCH, inputs=[self.condition_term])
+        builtins.COND_BRANCH, inputs=[self.condition_term])
 
     self.blocks = []
 
@@ -178,7 +178,7 @@ class ConditionalGroup(object):
     # Now use this information and finally create some terms
     # (this is one part of code that needs to change if we support "else if")
     for merge_info in merge_infos:
-      new_cond_term = self.builder.createTerm(builtin_functions.COND_EXPR,
+      new_cond_term = self.builder.createTerm(builtins.COND_EXPR,
                                           inputs=[ self.condition_term,
                                                    merge_info.heads[0],
                                                    merge_info.heads[1]])
@@ -190,7 +190,7 @@ class ConditionalBlock(Block):
 
     assert group.enclosingBranchTerm.branch is not None
 
-    self.branchTerm = builder.createTerm(builtin_functions.SIMPLE_BRANCH,
+    self.branchTerm = builder.createTerm(builtins.SIMPLE_BRANCH,
         branch=group.enclosingBranchTerm.branch)
 
     Block.__init__(self, builder, branch = self.branchTerm.branch)

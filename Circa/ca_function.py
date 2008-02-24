@@ -4,6 +4,9 @@ class Function(object):
     self.inputTypes = []
     self.outputTypes = []
 
+  def makeState(self):
+    return None
+
 
 def createFunction(inputs, outputs):
   f = Function()
