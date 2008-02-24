@@ -8,28 +8,35 @@ nextGlobalID = 1
 
 
 class Term(object):
-  def __init__(self, function, initial_value=None, code_unit=None, source_token=None):
+  def __init__(self, functionTerm, initial_value=None, code_unit=None, source_token=None):
+
+    assert isinstance(functionTerm, Term) or functionTerm is None
 
     # initialize
     self.inputs = []
-    self.function = function
+    self.functionTerm = functionTerm
     self.source_token = source_token
     self.users = set()
     self.pythonValue = initial_value
     self.codeUnit = code_unit
+    self.state = None
+    self.branch = None
 
-    # possibly make state
-    self.state = function.makeState()
+    if functionTerm is not None:
+      self.state = functionTerm.value.makeState()
 
-    # possibly create a branch
-    self.branch = [] if function.hasBranch else None
+      # possibly create a branch
+      if functionTerm.value.hasBranch:
+        self.branch = []
 
+    """
     # possibly make training info
-    if function.trainingType:
-      self.training_info = function.trainingType()
+    if functionTerm.trainingType:
+      self.training_info = functionTerm.trainingType()
       self.training_info.update(self)
     else: 
       self.training_info = None
+      """
 
     # assign a global ID
     global nextGlobalID
@@ -38,7 +45,7 @@ class Term(object):
 
   def getType(self):
     "Returns this term's output type"
-    return self.function.outputType
+    return self.functionTerm.value.outputType
 
   def inputsContain(self, term):
     "Returns True if our inputs contain the term"
@@ -46,23 +53,25 @@ class Term(object):
       if input == term: return True
     return false
 
+  """
   def changeFunction(self, new_func, initial_state=None):
     "Change this term's function"
-    self.function = new_func
+    self.functionTerm = new_func
 
     if not initial_state:
-      self.state = self.function.makeState()
+      self.state = self.functionTerm.makeState()
     else:
       self.state = initial_state
+      """
 
   def pythonEvaluate(self):
-    self.function.pythonEvaluate(self)
+    self.functionTerm.value.pythonEvaluate(self)
 
   def getIdentifier(self):
     return str(self.globalID)
 
   def printExtended(self, printer):
-    printer.prints("%i: %s" % (self.globalID, self.function.name))
+    printer.prints("%i: %s" % (self.globalID, self.functionTerm.value.name))
 
     if self.pythonValue:
       printer.prints(" " + str(self.pythonValue))
@@ -131,7 +140,7 @@ class Term(object):
 
 
 
-def findExisting(function, inputs=[]):
+def findExisting(functionTerm, inputs=[]):
   """
   Assuming you want a term that has the given function and inputs, this function
   returns such a function if it exists and if it makes sense (according to the function's
@@ -140,12 +149,15 @@ def findExisting(function, inputs=[]):
   if inputs is None:
     return None
 
+  function = functionTerm.value
+
+  pdb.set_trace()
   if function.shouldReuseExisting():
     # Try to find an existing term
     for input in inputs:
       for user_of_input in input.users:
         # Check if they are using the same function
-        if user_of_input.function != function: continue
+        if user_of_input.functionTerm != functionTerm: continue
 
         # Check if all the inputs are the same
         def matches(pair):
@@ -161,5 +173,4 @@ def findExisting(function, inputs=[]):
         return user_of_input
 
   return None
-
  

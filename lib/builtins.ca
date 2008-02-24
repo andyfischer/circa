@@ -1,50 +1,36 @@
 
+# Metaprogramming functions
+function token(str -> Token) :builtin
+function operator(Token -> Function) :builtin
+function constant(Type -> Function) :builtin
+function variable(Type -> Function) :builtin
 
-# Branching
+# Functions
 function cond_branch(bool condition) :builtin
 function simple_branch() :builtin
-
-# Comparison
 function equals(-> bool) :builtin
 function not_equals(-> bool) :builtin
-
-# Debugging
 function print() :builtin
 function input(-> string) :builtin
 function assert(bool) :builtin
-
-# Logical
 function and(bool, bool -> bool) :builtin
 function or(bool, bool -> bool) :builtin
 function if(bool, any, any -> any) :builtin
-
-# Misc
 function placeholder() :builtin
-
-# Math
 function add(float, float -> float) :builtin
 function sub(float, float -> float) :builtin
 function mult(float, float -> float) :builtin
 function div(float, float -> float) :builtin
-
-# Stateful
 function assign(any, any) :builtin
-
-# String
 function concat(str, str ->str) :builtin
-
-# Subroutine
 function subroutine() :builtin
-
-# Values
 function constant() :builtin
 function variable() :builtin
 
-# Metaprogramming functions
-function token(str -> Token) :builtin
-attribute operator(Token -> Function)
+# Bind the := operator so that we can start using it
+assign(operator(token(':=')), assign)
 
-# Operators
+# Bind operators
 operator(token('+')) := add
 operator(token('-')) := sub
 operator(token('*')) := mult
@@ -52,3 +38,8 @@ operator(token('/')) := div
 operator(token('==')) := equals
 operator(token('!=')) := not_equals
 
+# Bind assign operators
+assign_operator(token('+=')) := add
+assign_operator(token('-=')) := sub
+assign_operator(token('*=')) := mult
+assign_operator(token('/=')) := div

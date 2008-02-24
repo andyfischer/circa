@@ -31,15 +31,6 @@ def parseExpression(tokens):
 # Alias for parseExpression
 parse = parseExpression
 
-# Infix token-to-stateful-function map
-INFIX_TOKEN_TO_ASSIGN_FUNCTION = {
-    PLUS_EQUALS: builtins.ADD,
-    MINUS_EQUALS: builtins.SUB,
-    STAR_EQUALS: builtins.MULT,
-    SLASH_EQUALS: builtins.DIV
-}
-
-
 # AST Classes
 class Node(object):
   def eval(self, builder):
@@ -61,9 +52,9 @@ class Infix(Node):
   def eval(self, builder):
 
     # evaluate as a function?
-    if self.token.match in infix_token_to_function:
-      function = infix_token_to_function[self.token.match]
-      return builder.createTerm(function,
+    normalFunction = getOperatorFunction(self.token.match)
+    if normalFunction:
+      return builder.createTerm(normalFunction,
           inputs=[self.left.eval(builder), self.right.eval(builder)] )
 
     # evaluate as an assignment?
@@ -74,11 +65,10 @@ class Infix(Node):
       return builder.bindName(self.left.getName(), right_term)
 
     # evaluate as a function + assign?
-    if self.token.match in INFIX_TOKEN_TO_ASSIGN_FUNCTION:
-
+    assignFunction = getAssignOperatorFunction(self.token.match)
+    if assignFunction:
       # create a term that's the result of the operation
-      function = INFIX_TOKEN_TO_ASSIGN_FUNCTION[self.token.match]
-      result_term = builder.createTerm(function,
+      result_term = builder.createTerm(assignFunction,
           inputs=[self.left.eval(builder), self.right.eval(builder)])
 
       # bind the name to this result
@@ -97,19 +87,6 @@ class Infix(Node):
 
   def __str__(self):
     return self.function.text + "(" + str(self.left) + "," + str(self.right) + ")"
-
-
-# Infix token-to-function map
-infix_token_to_function = {
-    PLUS: builtins.ADD,
-    MINUS: builtins.SUB,
-    STAR: builtins.MULT,
-    SLASH: builtins.DIV,
-    DOUBLE_EQUALS: builtins.EQUAL,
-    NOT_EQUALS: builtins.NOT_EQUAL
-}
-
-
 
 # Infix precedence
 HIGHEST_INFIX_PRECEDENCE = 6
@@ -293,3 +270,11 @@ def function_call(tokens):
 def parseStringLiteral(text):
   # the literal should have ' marks on either side, strip these
   return text.strip("'\"")
+
+def getOperatorFunction(token):
+  # todo
+  return None
+
+def getAssignOperatorFunction(token):
+  # todo
+  return None

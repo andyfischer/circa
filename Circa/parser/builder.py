@@ -3,16 +3,13 @@ import pdb
 
 from Circa import (
   builtins,
-  builtin_functions,
   ca_function,
-  ca_types,
   code,
   parser,
   terms,
   values
 )
 
-import Circa.builtin_functions.unknown
 
 # Local packages
 import blocks
@@ -72,14 +69,14 @@ class Builder(object):
     term = self.getNamed(name)
 
     if not term:
-      return builtin_functions.unknown.nameNotFound(name)
+      return unknown_func.nameNotFound(name)
 
     assert isinstance(term, terms.Term)
 
     if values.isConstant(term):
-      if not term.function.outputType == ca_types.FUNC:
+      if not term.function.outputType == builtins.FUNC_TYPE:
         pdb.set_trace()
-        return builtin_functions.unknown.nameNotAFunction(name)
+        return unknown_func.nameNotAFunction(name)
 
       return term.pythonValue
       

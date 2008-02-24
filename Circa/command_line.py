@@ -17,6 +17,9 @@ class UserOptions(object):
 
 def main():
 
+  # bootstrap
+  import bootstrap
+
   # parse the command-line arguments
   args = sys.argv[:]
 
