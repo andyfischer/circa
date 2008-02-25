@@ -9,10 +9,11 @@ rather than on the terms themselves.
 """
 
 from Circa import (
-  pythonTypes,
-  terms,
+  builtins,
+  ca_function,
   common_errors,
-  values
+  pythonTypes,
+  terms
 )
 
 from Circa.utils import indent_printer
@@ -24,19 +25,26 @@ class CodeUnit(object):
     self.main_branch = []
     self.term_namespace = {}
 
-  def createTerm(self, functionTerm, inputs=None, branch=None, name=None, **term_options):
+  def getTerm(self, functionTerm, inputs, **term_options):
 
-    # Check to use an equivalent existing term
     existing_term = terms.findExisting(functionTerm, inputs)
     if existing_term:
       return existing_term
 
+    return self.createTerm(functionTerm, inputs, **term_options)
+
+  def createTerm(self, functionTerm, inputs=None, branch=None, name=None,
+      initialValue=None, **term_options):
+
     # Create a new term
-    new_term = terms.Term(functionTerm, code_unit=self, **term_options)
+    new_term = terms.createTerm(functionTerm, code_unit=self, **term_options)
+    assert new_term is not None
+
+    if initialValue is not None:
+      new_term.initialValue = initialValue
 
     if inputs:
       # If they use any non-term args, convert them to constants
-      inputs = map(terms.wrapNonTerm, inputs)
       self.setTermInputs(new_term, inputs)
 
     if name:
@@ -47,18 +55,27 @@ class CodeUnit(object):
 
     return new_term
 
-  # Alias, 'createTerm' can also be thought of as 'getTerm', since the function may
-  # re-use an existing term
-  getTerm = createTerm
 
-  def createConstant(self, value=None, name=None, branch=None,
+  def createConstant(self, value, name=None, branch=None,
         source_token=None, type=None):
+
+    if type is None and value is None:
+      raise Exception("Either type or value needs to be not-None")
 
     if type is None:
       type = pythonTypes.typeOfPythonObj(value)
 
+    if type is None:
+      raise Exception("Couldn't find a type for value: " + str(value))
+
     # Get constant function for this type
-    constFunc = builtins.BUILTINS.getTerm(builtins.CONST_FUNC, inputs=[type])
+    constFunc = terms.findExisting(builtins.CONST_FUNC, inputs=[type])
+
+    # Create a constant function if it wasn't found
+    if constFunc is None:
+      funcValue = ca_function.createFunction(inputs=[], outputs=[type])
+      constFunc = self.createTerm(builtins.CONST_FUNC, inputs=[type],
+          initialValue=funcValue)
 
     term = self.createTerm(constFunc, initial_value=value, 
         branch=branch, source_token=source_token)
@@ -119,10 +136,10 @@ class CodeUnit(object):
 
     self.onInputsChanged(target_term)
   
-# Change events
+  # Change events
   def onInputsChanged(self, term):
     # if this is a pure function then re-evaluate it
-    if term.functionTerm.pureFunction:
+    if term.functionTerm.pythonValue.pureFunction:
       term.pythonEvaluate()
 
 
@@ -153,8 +170,8 @@ def printTermsFormatted(branch, printer, term_names):
   for term in branch:
 
     # Skip constants
-    if values.isConstant(term):
-      continue
+    #if values.isConstant(term):
+      #continue
 
     if term in term_names:
       name = term_names[term]
@@ -170,8 +187,8 @@ def printTermsFormatted(branch, printer, term_names):
              return term_names[term]
   
           # For constant terms, just write their value
-          elif values.isConstant(term):
-             return str(term.pythonValue)
+          #elif values.isConstant(term):
+             #return str(term.pythonValue)
   
           else:
              return 't:' + str(term.globalID)

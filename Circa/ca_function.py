@@ -3,15 +3,18 @@ class Function(object):
   def __init__(self):
     self.inputTypes = []
     self.outputTypes = []
+    self.hasBranch = False
+    self.pureFunction = True
 
-  def makeState(self):
-    return None
+  def pythonEvaluate(self, term):
+    pass
 
 
 def createFunction(inputs, outputs):
   f = Function()
-  f.inputTypes = inputTypes
-  f.outputTypes = outputTypes
+  f.inputTypes = inputs
+  f.outputTypes = outputs
+  return f
 
 # Deprecated:
 class BaseFunction(object):
