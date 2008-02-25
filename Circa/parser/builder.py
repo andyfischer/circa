@@ -6,8 +6,7 @@ from Circa import (
   ca_function,
   code,
   parser,
-  terms,
-  values
+  terms
 )
 
 
@@ -73,14 +72,13 @@ class Builder(object):
 
     assert isinstance(term, terms.Term)
 
-    if values.isConstant(term):
-      if not term.function.outputType == builtins.FUNC_TYPE:
-        pdb.set_trace()
-        return unknown_func.nameNotAFunction(name)
+    # todo: make sure the term is constant?
+    if not term.function.outputType == builtins.FUNC_TYPE:
+      pdb.set_trace()
+      return unknown_func.nameNotAFunction(name)
 
-      return term.pythonValue
+    return term.pythonValue
       
-    raise parse_errors.NotYetImplemented("functions from non-constant terms")
 
   def startBlock(self, block):
     # 'block' can be a type, if so, instantiate it here

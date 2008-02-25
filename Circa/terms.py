@@ -6,46 +6,78 @@ from Circa import (
 
 nextGlobalID = 1
 
+def createTerm(functionTerm, initial_value=None, code_unit=None, source_token=None):
+
+  assert isinstance(functionTerm, Term) or functionTerm is None
+
+  term = Term()
+
+  # initialize
+  term.inputs = []
+  term.functionTerm = functionTerm
+  term.source_token = source_token
+  term.users = set()
+  term.pythonValue = initial_value
+  term.codeUnit = code_unit
+  term.branch = None
+
+  if functionTerm is not None:
+    #term.state = functionTerm.pythonValue.makeState()
+
+    # possibly create a branch
+    if functionTerm.pythonValue.hasBranch:
+      term.branch = []
+
+  # assign a global ID
+  global nextGlobalID
+  term.globalID = nextGlobalID
+  nextGlobalID += 1
+
+  return term
+
+def findExisting(functionTerm, inputs=[]):
+  """
+  This function finds an existing term that uses the given function, and has the given
+  inputs. Returns None if none found.
+  """
+  if inputs is None:
+    return None
+
+  assert isinstance(functionTerm, Term)
+  assert isinstance(functionTerm.pythonValue, ca_function.Function)
+
+  function = functionTerm.pythonValue
+
+  # Try to find an existing term
+  for input in inputs:
+    assert input is not None
+
+    for user_of_input in input.users:
+      # Check if they are using the same function
+      if user_of_input.functionTerm != functionTerm: continue
+
+      # Check if all the inputs are the same
+      def matches(pair):
+        return pair[0].equals(pair[1])
+
+      inputs_match = all(map(matches, zip(inputs, user_of_input.inputs)))
+
+      # Todo: allow for functions that don't care what the function order is
+
+      if not inputs_match: continue
+
+      # Looks like this term is the same as what they want
+      return user_of_input
+
+  return None
+ 
+  
 
 class Term(object):
-  def __init__(self, functionTerm, initial_value=None, code_unit=None, source_token=None):
-
-    assert isinstance(functionTerm, Term) or functionTerm is None
-
-    # initialize
-    self.inputs = []
-    self.functionTerm = functionTerm
-    self.source_token = source_token
-    self.users = set()
-    self.pythonValue = initial_value
-    self.codeUnit = code_unit
-    self.state = None
-    self.branch = None
-
-    if functionTerm is not None:
-      self.state = functionTerm.value.makeState()
-
-      # possibly create a branch
-      if functionTerm.value.hasBranch:
-        self.branch = []
-
-    """
-    # possibly make training info
-    if functionTerm.trainingType:
-      self.training_info = functionTerm.trainingType()
-      self.training_info.update(self)
-    else: 
-      self.training_info = None
-      """
-
-    # assign a global ID
-    global nextGlobalID
-    self.globalID = nextGlobalID
-    nextGlobalID += 1
 
   def getType(self):
     "Returns this term's output type"
-    return self.functionTerm.value.outputType
+    return self.functionTerm.pythonValue.outputType
 
   def inputsContain(self, term):
     "Returns True if our inputs contain the term"
@@ -65,13 +97,13 @@ class Term(object):
       """
 
   def pythonEvaluate(self):
-    self.functionTerm.value.pythonEvaluate(self)
+    self.functionTerm.pythonValue.pythonEvaluate(self)
 
   def getIdentifier(self):
     return str(self.globalID)
 
   def printExtended(self, printer):
-    printer.prints("%i: %s" % (self.globalID, self.functionTerm.value.name))
+    printer.prints("%i: %s" % (self.globalID, self.functionTerm.pythonValue.name))
 
     if self.pythonValue:
       printer.prints(" " + str(self.pythonValue))
@@ -140,37 +172,3 @@ class Term(object):
 
 
 
-def findExisting(functionTerm, inputs=[]):
-  """
-  Assuming you want a term that has the given function and inputs, this function
-  returns such a function if it exists and if it makes sense (according to the function's
-  definition) to allow people to reuse a function.
-  """
-  if inputs is None:
-    return None
-
-  function = functionTerm.value
-
-  pdb.set_trace()
-  if function.shouldReuseExisting():
-    # Try to find an existing term
-    for input in inputs:
-      for user_of_input in input.users:
-        # Check if they are using the same function
-        if user_of_input.functionTerm != functionTerm: continue
-
-        # Check if all the inputs are the same
-        def matches(pair):
-          return pair[0].equals(pair[1])
-
-        inputs_match = all(map(matches, zip(inputs, user_of_input.inputs)))
-
-        # Todo: allow for functions that don't care what the function order is
-
-        if not inputs_match: continue
-
-        # Looks like this term is the same as what they want
-        return user_of_input
-
-  return None
- 
