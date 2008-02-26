@@ -68,14 +68,15 @@ class Builder(object):
     term = self.getNamed(name)
 
     if not term:
-      return unknown_func.nameNotFound(name)
+      raise Exception("Couldn't find function named: " + name)
+      #return ca_function.createUnknownFunction(name)
 
     assert isinstance(term, terms.Term)
 
     # todo: make sure the term is constant?
     if not term.function.outputType == builtins.FUNC_TYPE:
-      pdb.set_trace()
-      return unknown_func.nameNotAFunction(name)
+      raise Exception("Term is not a function: " + name)
+      #return ca_function.createUnknownFunction(name)
 
     return term.pythonValue
       

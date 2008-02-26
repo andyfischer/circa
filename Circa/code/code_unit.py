@@ -8,6 +8,8 @@ All structure-changing operations should be performed on this object,
 rather than on the terms themselves.
 """
 
+import pdb
+
 from Circa import (
   builtins,
   ca_function,
@@ -36,12 +38,13 @@ class CodeUnit(object):
   def createTerm(self, functionTerm, inputs=None, branch=None, name=None,
       initialValue=None, **term_options):
 
+
     # Create a new term
     new_term = terms.createTerm(functionTerm, code_unit=self, **term_options)
     assert new_term is not None
 
     if initialValue is not None:
-      new_term.initialValue = initialValue
+      new_term.pythonValue = initialValue
 
     if inputs:
       # If they use any non-term args, convert them to constants
@@ -76,6 +79,7 @@ class CodeUnit(object):
       funcValue = ca_function.createFunction(inputs=[], outputs=[type])
       constFunc = self.createTerm(builtins.CONST_FUNC, inputs=[type],
           initialValue=funcValue)
+      assert constFunc.pythonValue is not None
 
     term = self.createTerm(constFunc, initial_value=value, 
         branch=branch, source_token=source_token)

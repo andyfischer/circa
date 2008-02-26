@@ -16,6 +16,11 @@ def createFunction(inputs, outputs):
   f.outputTypes = outputs
   return f
 
+def createUnknownFunction(name):
+  f = Function()
+  f.name = name
+  return f
+
 # Deprecated:
 class BaseFunction(object):
 

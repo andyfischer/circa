@@ -1,5 +1,5 @@
 
-import pdb
+import pdb, sys, traceback
 
 from Circa import (
   ca_function,
@@ -43,7 +43,16 @@ class Parser(object):
 
         self.parse_errors.append(e)
         print "[parse error] " + e.description()
+
+        # Drop this token
         self.tokens.consume()
+
+        # Drop the rest of the line
+        self.tokens.dropUntil(NEWLINE)
+      except Exception, e:
+        print "Internal error on token: " + self.tokens.next().detailsStr()
+        print e
+        traceback.print_tb(sys.exc_traceback)
 
   def bind(self, name, term):
     existing = self.currentBlock().getReference(name)
@@ -160,7 +169,7 @@ class Parser(object):
       self.tokens.consume(COLON)
       attributes.append( self.tokens.consume(IDENT) )
 
-    arg_names = map(lambda arg: arg.id.text, args)
+    arg_names = map(Argument.getNameStr, args)
     attribute_names = map(lambda a: a.text, attributes)
 
     # Check for 'builtin' attribute
@@ -178,7 +187,7 @@ class Parser(object):
       self.builder.createConstant(value=func, name=func.name)
       return
 
-    # create a new subroutine object
+    # Create a new subroutine object
     sub = subroutine.SubroutineDefinition(input_names=arg_names)
 
     # open a block
@@ -237,4 +246,8 @@ class Argument(object):
   def __init__(self):
     self.type = None
     self.id = None
+
+  def getNameStr(self):
+    if self.id is None: return None
+    return self.id.text
 
