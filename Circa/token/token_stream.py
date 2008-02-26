@@ -137,6 +137,16 @@ class TokenStream(object):
 
     return token
 
+  def dropUntil(self, match):
+    """
+    Drop all tokens until we find a token with 'match'. We also drop the
+    matching token.
+    """
+    while True:
+      token = self.consume()
+      if token.match == match: break
+      if self.finished(): break
+
   def markLocation(self):
     """
     Returns a mark object that represents the current location,

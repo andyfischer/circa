@@ -15,7 +15,7 @@ function input(-> string) :builtin
 function assert(bool) :builtin
 function and(bool, bool -> bool) :builtin
 function or(bool, bool -> bool) :builtin
-function if(bool, any, any -> any) :builtin
+function if_expr(bool, any, any -> any) :builtin
 function placeholder() :builtin
 function add(float, float -> float) :builtin
 function sub(float, float -> float) :builtin

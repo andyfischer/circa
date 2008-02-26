@@ -74,10 +74,18 @@ class Infix(Node):
       # bind the name to this result
       return builder.bindName(self.left.getName(), result_term)
 
+    # evaluate as initialize?
+    if self.token.match is COLON_EQUALS:
+      left_term = self.left.eval(builder)
+      right_term = self.right.eval(builder)
+      left_term.pythonValue = right_term.pythonValue
+
+    """
     # evaluate as stateful assign?
     if self.token.match is COLON_EQUALS:
-      return builder.createTerm(builtins.ASSIGN,
+      return builder.createTerm(builtins.ASSIGN_FUNC,
           inputs=[self.left.eval(builder), self.right.eval(builder)])
+    """
 
 
     raise "Unable to evaluate token: " + self.token.text
@@ -95,7 +103,7 @@ infixPrecedence = {
     STAR: 5, SLASH: 5,
     PLUS: 4, MINUS: 4,
     LTHAN: 3, LTHANEQ: 3, GTHAN: 3, GTHANEQ: 3, DOUBLE_EQUALS: 3, NOT_EQUALS: 3,
-    AND: 2, OR: 2,
+    #AND: 2, OR: 2,
     EQUALS: 1, PLUS_EQUALS: 1, MINUS_EQUALS: 1, STAR_EQUALS: 1, SLASH_EQUALS: 1,
       COLON_EQUALS: 1
 }
@@ -228,7 +236,7 @@ def atom(tokens):
     return function_call(tokens)
 
   # literal
-  if tokens.nextIn((FLOAT, INTEGER, STRING, TRUE, FALSE)):
+  if tokens.nextIn((FLOAT, INTEGER, STRING)):
     token = tokens.consume()
     return Literal(token)
 

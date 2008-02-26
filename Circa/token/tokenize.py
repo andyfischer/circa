@@ -28,7 +28,13 @@ class TokenInstance(object):
     return self.text
 
   def detailsStr(self):
-    return "(%i:%i %s,%s)" % (self.line, self.column, self.text, self.match)
+    text = self.text
+
+    # for certain characters, don't display them literally
+    if text == "\n":
+      text = "<newline>"
+
+    return "(%i:%i %s,%s)" % (self.line, self.column, text, self.match)
 
 
 def tokenize(string):
