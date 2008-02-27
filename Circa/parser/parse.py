@@ -3,7 +3,6 @@ import pdb, sys, traceback
 
 from Circa import (
   ca_function,
-  signature,
   subroutine,
   terms,
   token
@@ -174,15 +173,15 @@ class Parser(object):
 
     # Check for 'builtin' attribute
     if 'builtin' in attribute_names:
+
       # Create a builtin function
-      func = ca_function.BaseFunction()
-      func.name = function_id.text
-
-      type_arr = map(lambda arg: self.builder.getNamed(arg.type.text), args) 
-      func.signature = signature.fixed(type_arr)
-
+      inputTypeArr = map(lambda arg: self.builder.getNamed(arg.type.text), args) 
+      outputTypeArr = []
       if outputType:
-        func.outputType = self.builder.getNamed(outputType.text)
+        outputTypeArr = [self.builder.getNamed(outputType.text)]
+
+      func = ca_function.createFunction(inputTypeArr,outputTypeArr)
+      func.name = function_id.text
 
       self.builder.createConstant(value=func, name=func.name)
       return

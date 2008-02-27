@@ -59,28 +59,6 @@ class Builder(object):
 
     self.currentBlock().bindLocal(name, target_term)
 
-  def getLocalFunction(self, name):
-    """
-    Returns a function with the given name.
-    This function will always return a valid function. If the name is not
-    found, this will return an instance of UnknownFunction
-    """
-    term = self.getNamed(name)
-
-    if not term:
-      raise Exception("Couldn't find function named: " + name)
-      #return ca_function.createUnknownFunction(name)
-
-    assert isinstance(term, terms.Term)
-
-    # todo: make sure the term is constant?
-    if not term.function.outputType == builtins.FUNC_TYPE:
-      raise Exception("Term is not a function: " + name)
-      #return ca_function.createUnknownFunction(name)
-
-    return term.pythonValue
-      
-
   def startBlock(self, block):
     # 'block' can be a type, if so, instantiate it here
     if isinstance(block, type):

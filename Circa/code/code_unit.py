@@ -181,7 +181,7 @@ def printTermsFormatted(branch, printer, term_names):
       name = term_names[term]
     else:
       name = str(term.globalID)
-    text = name + ": " + term.functionTerm.name
+    text = name + ": " + term.getFunction().name
 
     if term.inputs:
       text += " ("

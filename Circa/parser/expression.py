@@ -79,6 +79,7 @@ class Infix(Node):
       left_term = self.left.eval(builder)
       right_term = self.right.eval(builder)
       left_term.pythonValue = right_term.pythonValue
+      return None
 
     """
     # evaluate as stateful assign?
@@ -88,7 +89,7 @@ class Infix(Node):
     """
 
 
-    raise "Unable to evaluate token: " + self.token.text
+    raise Exception("Unable to evaluate token: " + self.token.text)
 
   def getFirstToken(self):
     return self.left.getFirstToken()
@@ -184,11 +185,15 @@ class Function(Node):
 
   def eval(self, builder):
     arg_terms = [t.eval(builder) for t in self.args]
-    func = builder.getLocalFunction(self.function_name.text)
+    func = builder.getNamed(self.function_name.text)
 
     if func is None:
       raise parse_errors.InternalError(self.function_name,
           "Function " + self.function_name.text + " not found.")
+
+    elif func.getType() != builtins.FUNC_TYPE:
+      raise parse_errors.InternalError(self.function_name,
+          "Term " + self.function_name.text + " is not a function.")
 
     return builder.createTerm(func, inputs=arg_terms)
 

@@ -67,6 +67,7 @@ pythonTypes.PYTHON_TO_CIRCA[int] = builtins.INT_TYPE
 pythonTypes.PYTHON_TO_CIRCA[float] = builtins.FLOAT_TYPE
 pythonTypes.PYTHON_TO_CIRCA[str] = builtins.STR_TYPE
 pythonTypes.PYTHON_TO_CIRCA[bool] = builtins.BOOL_TYPE
+pythonTypes.PYTHON_TO_CIRCA[ca_function.Function] = builtins.FUNC_TYPE
 
 # Create basic constants
 builtins.BUILTINS.createConstant(name='true', value=True, type=builtins.BOOL_TYPE)
