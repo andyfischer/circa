@@ -70,14 +70,22 @@ def findExisting(functionTerm, inputs=[]):
       return user_of_input
 
   return None
- 
   
 
 class Term(object):
 
   def getType(self):
     "Returns this term's output type"
-    return self.functionTerm.pythonValue.outputType
+    # todo, needs to be rewritten to handle multiple outputs
+    return self.functionTerm.pythonValue.outputTypes[0]
+
+  def getFunction(self):
+    "Returns this term's Function"
+    return self.functionTerm.pythonValue
+
+  def getIdentifier(self):
+    "Returns some unique identifier. The format may change"
+    return str(self.globalID)
 
   def inputsContain(self, term):
     "Returns True if our inputs contain the term"
@@ -97,10 +105,7 @@ class Term(object):
       """
 
   def pythonEvaluate(self):
-    self.functionTerm.pythonValue.pythonEvaluate(self)
-
-  def getIdentifier(self):
-    return str(self.globalID)
+    self.getFunction().pythonEvaluate(self)
 
   def printExtended(self, printer):
     printer.prints("%i: %s" % (self.globalID, self.functionTerm.pythonValue.name))

@@ -1,10 +1,10 @@
 import pdb, unittest
 
 from Circa import (
-  ca_module
+    builtins,
+    ca_module
 )
 
-from Circa.builtin_functions import *
 
 def parse(text):
   return ca_module.CircaModule.fromText(text, raise_errors=True)
@@ -19,7 +19,7 @@ class Test(unittest.TestCase):
     a = mod['a']
 
     self.assertTrue(a != None)
-    self.assertTrue(a.function == ADD)
+    self.assertTrue(a.function == builtins.ADD)
     self.assertTrue(int(a) == 3)
 
   def testAssigns(self):

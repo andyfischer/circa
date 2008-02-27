@@ -3,9 +3,9 @@ import unittest, types
 
 modules_to_test = (
   'test_circa_module',
-  'test_dsl',
+  #'test_dsl',
   'test_full_program',
-  'test_signature'
+  #'test_signature'
 )
 
 def suite():

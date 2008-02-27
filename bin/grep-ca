@@ -1,0 +1,1 @@
+grep $* ~/code/circa/Circa/*.py ~/code/circa/Circa/*/*.py ~/code/circa/lib/*.ca

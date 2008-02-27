@@ -39,6 +39,13 @@ class TokenDef(object):
 def group(*choices): return '(' + '|'.join(choices) + ')'
 def any(*choices): return group(*choices) + '*'
 def maybe(*choices): return group(*choices) + '?'
+alpha = r"[a-zA-Z_\-]"
+alphanumeric = r"[a-zA-Z0-9_\-]"
+
+# todo:
+# non-alphanumeric char follows word
+# but following character is not included in match
+# or, word can come just before end of file
 
 # Token definitions
 
@@ -89,13 +96,13 @@ RETURN =        TokenDef(50, 'return', 'return')
 STATE =         TokenDef(51, 'state', 'state')
 TYPE =          TokenDef(52, 'type', 'type')
 THIS =          TokenDef(54, 'this', 'this')
-VAR =           TokenDef(55, 'var', 'var')
 PATCH =         TokenDef(55, 'patch', 'patch')
 
 # other types
 FLOAT =         TokenDef(70, 'float', pattern=r"([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)")
 INTEGER =       TokenDef(71, 'integer', pattern=r"([1-9]+[0-9]*)|0")
-IDENT =         TokenDef(72, 'ident', pattern=r"[a-zA-Z_\-]+[a-zA-Z0-9_\-]*")
+IDENT =         TokenDef(72, 'ident',
+    pattern= alpha + "+" + alphanumeric + "*(?!"+alphanumeric+")")
 STRING =        TokenDef(73, 'string', pattern=group(r"'[^']*'", r"\"[^\"]*\""))
 WHITESPACE =    TokenDef(75, 'whitespace', pattern=r"[ \t]+")
 
