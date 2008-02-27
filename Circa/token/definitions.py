@@ -41,6 +41,7 @@ def any(*choices): return group(*choices) + '*'
 def maybe(*choices): return group(*choices) + '?'
 alpha = r"[a-zA-Z_\-]"
 alphanumeric = r"[a-zA-Z0-9_\-]"
+def word(pattern): return pattern + "(?!" + alphanumeric + ")"
 
 # todo:
 # non-alphanumeric char follows word
@@ -85,24 +86,23 @@ EXCLAIMATION =  TokenDef(31, 'exclaimation', '!')
 NEWLINE =       TokenDef(32, 'newline', '\n', pattern=r"\n")
 
 # keywords
-DEFINE =        TokenDef(41, 'define', 'define')
-ELSE =          TokenDef(42, 'else', 'else')
-FOR =           TokenDef(44, 'for', 'for')
-FUNCTION =      TokenDef(45, 'function', 'function')
-GLOBAL =        TokenDef(46, 'global', 'global')
-IF =            TokenDef(47, 'if', 'if')
-NULL =          TokenDef(48, 'null', 'null')
-RETURN =        TokenDef(50, 'return', 'return')
-STATE =         TokenDef(51, 'state', 'state')
-TYPE =          TokenDef(52, 'type', 'type')
-THIS =          TokenDef(54, 'this', 'this')
-PATCH =         TokenDef(55, 'patch', 'patch')
+DEFINE =        TokenDef(41, 'define', pattern=word('define'))
+ELSE =          TokenDef(42, 'else', pattern=word('else'))
+FOR =           TokenDef(44, 'for', pattern=word('for'))
+FUNCTION =      TokenDef(45, 'function', pattern=word('function'))
+GLOBAL =        TokenDef(46, 'global', pattern=word('global'))
+IF =            TokenDef(47, 'if', pattern=word('if'))
+NULL =          TokenDef(48, 'null', pattern=word('null'))
+RETURN =        TokenDef(50, 'return', pattern=word('return'))
+STATE =         TokenDef(51, 'state', pattern=word('state'))
+TYPE =          TokenDef(52, 'type', pattern=word('type'))
+THIS =          TokenDef(54, 'this', pattern=word('this'))
+PATCH =         TokenDef(55, 'patch', pattern=word('patch'))
 
 # other types
 FLOAT =         TokenDef(70, 'float', pattern=r"([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)")
 INTEGER =       TokenDef(71, 'integer', pattern=r"([1-9]+[0-9]*)|0")
-IDENT =         TokenDef(72, 'ident',
-    pattern= alpha + "+" + alphanumeric + "*(?!"+alphanumeric+")")
+IDENT =         TokenDef(72, 'ident', pattern= alpha + "+" + alphanumeric)
 STRING =        TokenDef(73, 'string', pattern=group(r"'[^']*'", r"\"[^\"]*\""))
 WHITESPACE =    TokenDef(75, 'whitespace', pattern=r"[ \t]+")
 

@@ -59,6 +59,8 @@ class Builder(object):
 
     self.currentBlock().bindLocal(name, target_term)
 
+    target_term.givenName = name
+
   def startBlock(self, block):
     # 'block' can be a type, if so, instantiate it here
     if isinstance(block, type):

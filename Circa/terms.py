@@ -20,6 +20,8 @@ def createTerm(functionTerm, initial_value=None, code_unit=None, source_token=No
   term.pythonValue = initial_value
   term.codeUnit = code_unit
   term.branch = None
+  term.givenName = None
+  term.debugName = None
 
   if functionTerm is not None:
     #term.state = functionTerm.pythonValue.makeState()
@@ -83,9 +85,17 @@ class Term(object):
     "Returns this term's Function"
     return self.functionTerm.pythonValue
 
-  def getIdentifier(self):
-    "Returns some unique identifier. The format may change"
-    return str(self.globalID)
+  def getSomeName(self):
+    """
+    Returns some unique identifier. There are a few values we may use here.
+    No guarantees are made as to the format.
+    """
+    if self.givenName:
+        return self.givenName
+    elif self.debugName:
+        return self.debugName
+    else:
+        return 't' + str(self.globalID)
 
   def inputsContain(self, term):
     "Returns True if our inputs contain the term"

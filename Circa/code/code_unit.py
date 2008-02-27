@@ -79,6 +79,7 @@ class CodeUnit(object):
       funcValue = ca_function.createFunction(inputs=[], outputs=[type])
       constFunc = self.createTerm(builtins.CONST_FUNC, inputs=[type],
           initialValue=funcValue)
+      constFunc.debugName = "constant-" + type.getSomeName()
       assert constFunc.pythonValue is not None
 
     term = self.createTerm(constFunc, initial_value=value, 
@@ -98,7 +99,13 @@ class CodeUnit(object):
       raise common_errors.UsageError("A term with name \""+str(name)+"\" already exists." +
                        " (Use 'allow_rename' if you want to allow this)")
 
+    if name in self.term_namespace:
+      self.term_namespace[name].givenName = None
+      # TODO, currently the 'givenName' variable will not behave if a term is given
+      # more than one name
+
     self.term_namespace[name] = term
+    term.givenName = name
 
   def getNamedTerm(self, name):
     if name not in self.term_namespace: return None
@@ -177,28 +184,11 @@ def printTermsFormatted(branch, printer, term_names):
     #if values.isConstant(term):
       #continue
 
-    if term in term_names:
-      name = term_names[term]
-    else:
-      name = str(term.globalID)
-    text = name + ": " + term.getFunction().name
+    text = term.getSomeName() + ": " + term.functionTerm.getSomeName()
 
     if term.inputs:
       text += " ("
-
-      def getTermLabel(term):
-          if term in term_names:
-             return term_names[term]
-  
-          # For constant terms, just write their value
-          #elif values.isConstant(term):
-             #return str(term.pythonValue)
-  
-          else:
-             return 't:' + str(term.globalID)
- 
- 
-      text += ",".join(map(getTermLabel, term.inputs))
+      text += ",".join(map(terms.Term.getSomeName, term.inputs))
       text += ")"
  
     printer.println(text)
