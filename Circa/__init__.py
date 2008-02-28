@@ -1,5 +1,9 @@
 
-__all__ = ['builtin_functions', 'token', 'utils', 'basefunction', 'branch', 'builder',
-    'circa_module', 'circa_types', 'command_line', 'dsl', 'emulator', 'evaluation',
-    'signature', 'term', 'term_state']
+import ca_module
+
+def initialize():
+    import bootstrap
+
+def loadModule(file, **options):
+    return ca_module.CircaModule.fromFile(file, **options)
 

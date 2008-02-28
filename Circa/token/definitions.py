@@ -2,7 +2,7 @@ import re
 
 ALL = []
 
-token_to_name = {}
+STRING_TO_TOKEN = {}
 
 class TokenDef(object):
   def __init__(self, id, name, raw=None, pattern=None):
@@ -13,6 +13,7 @@ class TokenDef(object):
     if raw:
       self.pattern = re.compile( re.escape(raw) )
       self.raw_string = raw
+      STRING_TO_TOKEN[raw] = self
 
     elif pattern:
       self.pattern = re.compile( pattern )

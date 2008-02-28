@@ -2,9 +2,7 @@
 
 import os, sys
 
-from Circa import (
-  ca_module
-)
+import Circa
 
 VERBOSE_DEBUGGING = False
 
@@ -17,8 +15,8 @@ class UserOptions(object):
 
 def main():
 
-  # bootstrap
-  import bootstrap
+  # Initialize the environment
+  Circa.initialize()
 
   # parse the command-line arguments
   args = sys.argv[:]
@@ -58,7 +56,7 @@ def main():
   for filename in options.files:
     file = findSourceFile(filename)
 
-    module = ca_module.CircaModule.fromFile(file, raise_errors = options.debugMode)
+    module = Circa.loadModule(file, raise_errors = options.debugMode)
 
     if options.onlyPrintCode:
       module.printTerms()

@@ -38,7 +38,6 @@ class CodeUnit(object):
   def createTerm(self, functionTerm, inputs=None, branch=None, name=None,
       initialValue=None, **term_options):
 
-
     # Create a new term
     new_term = terms.createTerm(functionTerm, code_unit=self, **term_options)
     assert new_term is not None

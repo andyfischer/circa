@@ -1,16 +1,20 @@
 
-import string
+import string, os
 
 from Circa import (
-  builtins,
-  code,
-  ca_type,
-  ca_function,
-  pythonTypes,
-  signature,
-  terms
+    builtins,
+    code,
+    ca_type,
+    ca_function,
+    parser,
+    pythonTypes,
+    signature,
+    terms,
+    token
 )
 
+# todo
+CIRCA_HOME = "/Users/andyfischer/code/circa"
 
 VERBOSE_DEBUGGING = False
 
@@ -38,15 +42,12 @@ builtins.FUNC_TYPE = builtins.BUILTINS.createConstant(name = 'Function',
     value = ca_type.Type(),
     type=builtins.TYPE_TYPE)
 
-
 # Implant types into 'constant' function
 builtins.CONST_FUNC.pythonValue.inputTypes = [builtins.TYPE_TYPE]
 builtins.CONST_FUNC.pythonValue.outputTypes = [builtins.FUNC_TYPE]
 
-
 # Create basic types
-builtins.INT_TYPE = builtins.BUILTINS.createConstant(
-    name = 'int',
+builtins.INT_TYPE = builtins.BUILTINS.createConstant(name = 'int',
     value = ca_type.Type(),
     type=builtins.TYPE_TYPE)
 builtins.FLOAT_TYPE = builtins.BUILTINS.createConstant(name = 'float',
@@ -73,3 +74,36 @@ pythonTypes.PYTHON_TO_CIRCA[ca_function.Function] = builtins.FUNC_TYPE
 builtins.BUILTINS.createConstant(name='true', value=True, type=builtins.BOOL_TYPE)
 builtins.BUILTINS.createConstant(name='false', value=False, type=builtins.BOOL_TYPE)
 
+# Load builtins.ca file into this code unit
+def installLibFile(filename):
+    file = open(os.path.join(CIRCA_HOME, "lib", filename), 'r')
+    file_contents = file.read()
+    file.close()
+    del file
+    parser.parse(parser.builder.Builder(target=builtins.BUILTINS),
+            token.tokenize(file_contents), raise_errors=True)
+installLibFile("builtins.ca")
+
+# Access some objects that need to be used in Python code
+builtins.OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
+builtins.ASSIGN_OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
+
+# Fill in definitions for all builtin functions
+def wrap(func):
+    def funcForCirca(term):
+        term.pythonValue = func(*map(lambda t:t.pythonValue, term.inputs))
+    return funcForCirca
+
+def installFunc(name, func):
+    builtins.BUILTINS.getNamedTerm(name).pythonValue = wrap(func)
+
+def tokenEvaluate(s):
+    return token.definitions.STRING_TO_TOKEN[s]
+installFunc("token", tokenEvaluate)
+
+
+
+# todo.. other tokens
+
+# Read in parsing.ca
+installLibFile("parsing.ca")
