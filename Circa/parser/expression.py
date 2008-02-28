@@ -51,7 +51,8 @@ class Infix(Node):
 
   def eval(self, builder):
 
-    # evaluate as a function?
+    # normal function?
+    # try to find a defined operator
     normalFunction = getOperatorFunction(self.token.match)
     if normalFunction:
       return builder.createTerm(normalFunction,
@@ -281,13 +282,13 @@ def function_call(tokens):
   return Function(function_name, args)
  
 def parseStringLiteral(text):
-  # the literal should have ' marks on either side, strip these
+  # the literal should have ' or " marks on either side, strip these
   return text.strip("'\"")
 
 def getOperatorFunction(token):
-  # todo
-  return None
+  return terms.findExisting(builtins.OPERATOR_FUNC,
+          inputs=[token.getBuiltinObject()])
 
 def getAssignOperatorFunction(token):
-  # todo
-  return None
+  return terms.findExisting(builtins.ASSIGN_OPERATOR_FUNC,
+          inputs=[token.getBuiltinObject()])
