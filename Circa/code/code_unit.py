@@ -42,6 +42,9 @@ class CodeUnit(object):
     new_term = terms.createTerm(functionTerm, code_unit=self, **term_options)
     assert new_term is not None
 
+    # Add term to function's users
+    functionTerm.users.add(new_term)
+
     if initialValue is not None:
       new_term.pythonValue = initialValue
 
@@ -81,8 +84,15 @@ class CodeUnit(object):
       constFunc.debugName = "constant-" + type.getSomeName()
       assert constFunc.pythonValue is not None
 
-    term = self.createTerm(constFunc, initial_value=value, 
-        branch=branch, source_token=source_token)
+    # Look for an existing term
+    existingTerm = terms.findExistingConstant(constFunc, value)
+
+    term = None
+    if existingTerm is None:
+        term = self.createTerm(constFunc, initial_value=value, 
+            branch=branch, source_token=source_token)
+    else:
+        term = existingTerm
 
     if name:
       self.setTermName(term, name)

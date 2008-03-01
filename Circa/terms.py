@@ -4,31 +4,25 @@ from Circa import (
   ca_function
 )
 
-nextGlobalID = 1
+nextGlobalID = 2
 
 def createTerm(functionTerm, initial_value=None, code_unit=None, source_token=None):
 
-  assert isinstance(functionTerm, Term) or functionTerm is None
+  assert isinstance(functionTerm, Term)
 
   term = Term()
 
   # initialize
-  term.inputs = []
   term.functionTerm = functionTerm
   term.source_token = source_token
-  term.users = set()
   term.pythonValue = initial_value
   term.codeUnit = code_unit
-  term.branch = None
-  term.givenName = None
-  term.debugName = None
 
-  if functionTerm is not None:
-    #term.state = functionTerm.pythonValue.makeState()
+  #term.state = functionTerm.pythonValue.makeState()
 
-    # possibly create a branch
-    if functionTerm.pythonValue.hasBranch:
-      term.branch = []
+  # possibly create a branch
+  if functionTerm.pythonValue.hasBranch:
+    term.branch = []
 
   # assign a global ID
   global nextGlobalID
@@ -54,27 +48,52 @@ def findExisting(functionTerm, inputs=[]):
   for input in inputs:
     assert input is not None
 
-    for user_of_input in input.users:
+    for potentialMatch in input.users:
       # Check if they are using the same function
-      if user_of_input.functionTerm != functionTerm: continue
+      if potentialMatch.functionTerm != functionTerm: continue
 
       # Check if all the inputs are the same
       def matches(pair):
         return pair[0].equals(pair[1])
 
-      inputs_match = all(map(matches, zip(inputs, user_of_input.inputs)))
+      inputs_match = all(map(matches, zip(inputs, potentialMatch.inputs)))
 
       # Todo: allow for functions that don't care what the function order is
 
       if not inputs_match: continue
 
       # Looks like this term is the same as what they want
-      return user_of_input
+      return potentialMatch
 
   return None
-  
+
+def findExistingConstant(constantFunction, value):
+    """
+    This helper term attempts to find a constant with the given constant-func.
+    """
+
+    for possibleMatch in constantFunction.users:
+        
+        if possibleMatch.functionTerm != constantFunction:
+            continue
+
+        if possibleMatch.pythonValue == value:
+            return possibleMatch
+
+    return None
 
 class Term(object):
+  def __init__(self):
+    "Use 'createTerm'. This constructor should be called by almost nobody."
+
+    self.inputs = []
+    self.functionTerm = None
+    self.users = set()
+    self.pythonValue = None
+    self.codeUnit = None
+    self.branch = None
+    self.givenName = None
+    self.debugName = None
 
   def getType(self):
     "Returns this term's output type"
