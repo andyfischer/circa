@@ -20,9 +20,12 @@ VERBOSE_DEBUGGING = False
 
 builtins.BUILTINS = code.CodeUnit()
 
-# Create 'constant' function
-builtins.CONST_FUNC = builtins.BUILTINS.createTerm(functionTerm=None, name='constant')
-builtins.CONST_FUNC.function = builtins.CONST_FUNC
+# Create 'constant' function, which temporarily does not have a function
+builtins.CONST_FUNC = terms.Term()
+builtins.CONST_FUNC.codeUnit = builtins.BUILTINS
+builtins.CONST_FUNC.functionTerm = builtins.CONST_FUNC
+builtins.BUILTINS.setTermName(builtins.CONST_FUNC, "constant")
+builtins.CONST_FUNC.globalID = 1
 builtins.CONST_FUNC.pythonValue = ca_function.createFunction(inputs=[], outputs=[])
 
 # Create 'constant-Type' function
@@ -100,8 +103,6 @@ def installFunc(name, func):
 def tokenEvaluate(s):
     return token.definitions.STRING_TO_TOKEN[s]
 installFunc("token", tokenEvaluate)
-
-
 
 # todo.. other tokens
 
