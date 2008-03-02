@@ -22,7 +22,7 @@ def createTerm(functionTerm, initial_value=None, code_unit=None, source_token=No
 
   # possibly create a branch
   if functionTerm.pythonValue.hasBranch:
-    term.branch = []
+      term.branch = []
 
   # assign a global ID
   global nextGlobalID
