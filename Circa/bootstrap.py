@@ -88,6 +88,7 @@ def installLibFile(filename):
 installLibFile("builtins.ca")
 
 # Access some objects that need to be used in Python code
+builtins.TOKEN_FUNC = builtins.BUILTINS.getNamedTerm("token")
 builtins.OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
 builtins.ASSIGN_OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
 
@@ -98,7 +99,9 @@ def wrap(func):
     return funcForCirca
 
 def installFunc(name, func):
-    builtins.BUILTINS.getNamedTerm(name).pythonValue = wrap(func)
+    circaFunc = ca_function.Function()
+    circaFunc.evaluate = wrap(func)
+    builtins.BUILTINS.getNamedTerm(name).pythonValue = circaFunc
 
 def tokenEvaluate(s):
     return token.definitions.STRING_TO_TOKEN[s]

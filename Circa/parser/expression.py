@@ -51,12 +51,12 @@ class Infix(Node):
 
   def eval(self, builder):
 
-    # normal function?
-    # try to find a defined operator
-    normalFunction = getOperatorFunction(self.token.match)
-    if normalFunction:
-      return builder.createTerm(normalFunction,
-          inputs=[self.left.eval(builder), self.right.eval(builder)] )
+    # evaluate as initialize?
+    if self.token.match is COLON_EQUALS:
+      left_term = self.left.eval(builder)
+      right_term = self.right.eval(builder)
+      left_term.pythonValue = right_term.pythonValue
+      return None
 
     # evaluate as an assignment?
     if self.token.match == EQUALS:
@@ -64,6 +64,14 @@ class Infix(Node):
       if not isinstance(right_term, terms.Term):
         raise ParseError("Expression did not evaluate to a term: " + str(self.right), self.getFirstToken())
       return builder.bindName(self.left.getName(), right_term)
+
+    # normal function?
+    # try to find a defined operator
+    normalFunction = getOperatorFunction(self.token.match)
+    if normalFunction:
+      return builder.createTerm(normalFunction,
+          inputs=[self.left.eval(builder), self.right.eval(builder)] )
+
 
     # evaluate as a function + assign?
     assignFunction = getAssignOperatorFunction(self.token.match)
@@ -75,12 +83,6 @@ class Infix(Node):
       # bind the name to this result
       return builder.bindName(self.left.getName(), result_term)
 
-    # evaluate as initialize?
-    if self.token.match is COLON_EQUALS:
-      left_term = self.left.eval(builder)
-      right_term = self.right.eval(builder)
-      left_term.pythonValue = right_term.pythonValue
-      return None
 
     """
     # evaluate as stateful assign?
@@ -287,8 +289,12 @@ def parseStringLiteral(text):
 
 def getOperatorFunction(token):
   return terms.findExisting(builtins.OPERATOR_FUNC,
-          inputs=[token.getBuiltinObject()])
+          inputs=[pythonTokenToBuiltin(token)])
 
 def getAssignOperatorFunction(token):
   return terms.findExisting(builtins.ASSIGN_OPERATOR_FUNC,
-          inputs=[token.getBuiltinObject()])
+          inputs=[pythonTokenToBuiltin(token)])
+
+def pythonTokenToBuiltin(token):
+    #pdb.set_trace()
+    return terms.findExistingConstant(builtins.TOKEN_FUNC, token.raw_string)
