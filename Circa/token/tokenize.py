@@ -68,20 +68,20 @@ def tokenize(string):
             if match:
                 token = makeToken(tdef, match.end() - match.start())
                 break
-    
+
         # If we didn't find anything, count this character as unrecognized
         if not token:
             token = makeToken(UNRECOGNIZED, 1)
-    
+
         # Store this token
         currentIndex += token.length()
         currentCol += token.length()
         output_list.append(token)
   
-    # Check to advance a line
-    if token.match == NEWLINE:
-      currentCol = 1
-      currentLine += 1
+        # Check to advance a line
+        if token.match == NEWLINE:
+            currentCol = 1
+            currentLine += 1
 
     return output_list
 
