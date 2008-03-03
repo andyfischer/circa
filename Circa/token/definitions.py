@@ -82,7 +82,6 @@ EQUALS =        TokenDef(25, 'equals', '=')
 COMMA =         TokenDef(26, 'comma', ',')
 QUESTION =      TokenDef(28, 'question', '?')
 SEMICOLON =     TokenDef(29, 'semicolon', ';')
-POUND =         TokenDef(30, 'pound', '#')
 EXCLAIMATION =  TokenDef(31, 'exclaimation', '!')
 NEWLINE =       TokenDef(32, 'newline', '\n', pattern=r"\n")
 
@@ -106,9 +105,13 @@ INTEGER =       TokenDef(71, 'integer', pattern=r"([1-9]+[0-9]*)|0")
 IDENT =         TokenDef(72, 'ident', pattern= alpha + "+" + alphanumeric)
 STRING =        TokenDef(73, 'string', pattern=group(r"'[^']*'", r"\"[^\"]*\""))
 WHITESPACE =    TokenDef(75, 'whitespace', pattern=r"[ \t]+")
+POUND_IDENT =   TokenDef(75, 'pound_ident', pattern="#" + word(alphanumeric+'*'))
 
 # this needs to be below FLOAT
 DOT =           TokenDef(27, 'dot', '.')
+
+# this needs to be below POUND_IDENT
+POUND =         TokenDef(30, 'pound', '#')
 
 # meta types
 UNRECOGNIZED =  TokenDef(74, 'unrecognized', '')
