@@ -1,5 +1,5 @@
 
-import string, os
+import string, os, pdb
 
 from Circa import (
     builtins,
@@ -107,7 +107,7 @@ def tokenEvaluate(s):
     return token.definitions.STRING_TO_TOKEN[s]
 installFunc("token", tokenEvaluate)
 
-# todo.. other tokens
-
 # Read in parsing.ca
 installLibFile("parsing.ca")
+
+# pdb.set_trace()

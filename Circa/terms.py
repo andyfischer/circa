@@ -24,6 +24,9 @@ def createTerm(functionTerm, initial_value=None, code_unit=None, source_token=No
   if functionTerm.pythonValue.hasBranch:
       term.branch = []
 
+  # evaluate immediately
+  term.pythonEvaluate()
+
   # assign a global ID
   global nextGlobalID
   term.globalID = nextGlobalID
