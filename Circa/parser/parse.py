@@ -72,6 +72,7 @@ class Parser(object):
     paths[RETURN] = self.return_statement
     paths[RBRACKET] = self.right_bracket
     paths[NEWLINE] = self.new_line
+    paths[POUND_IDENT] = self.immediateCommand
 
     next_token = self.tokens.next()
 
@@ -240,6 +241,9 @@ class Parser(object):
     if VERBOSE_DEBUGGING: print "Parsing new_line"
 
     self.tokens.consume(NEWLINE)
+
+  def immediateCommand(self):
+      ...
 
 class Argument(object):
   def __init__(self):
