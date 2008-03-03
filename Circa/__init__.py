@@ -1,5 +1,5 @@
 
-import ca_module
+import ca_module, builtins
 
 def initialize():
     import bootstrap

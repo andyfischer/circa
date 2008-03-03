@@ -68,10 +68,9 @@ class Infix(Node):
     # normal function?
     # try to find a defined operator
     normalFunction = getOperatorFunction(self.token.match)
-    if normalFunction:
-      return builder.createTerm(normalFunction,
+    if normalFunction is not None:
+        return builder.createTerm(normalFunction,
           inputs=[self.left.eval(builder), self.right.eval(builder)] )
-
 
     # evaluate as a function + assign?
     assignFunction = getAssignOperatorFunction(self.token.match)
@@ -288,13 +287,21 @@ def parseStringLiteral(text):
   return text.strip("'\"")
 
 def getOperatorFunction(token):
-  return terms.findExisting(builtins.OPERATOR_FUNC,
+    circaObj = pythonTokenToBuiltin(token)
+
+    if circaObj is None:
+        print "Notice: couldn't find an operator func for " + token.raw_string
+        return None
+
+    return terms.findExisting(builtins.OPERATOR_FUNC,
           inputs=[pythonTokenToBuiltin(token)])
 
 def getAssignOperatorFunction(token):
-  return terms.findExisting(builtins.ASSIGN_OPERATOR_FUNC,
+    circaObj = pythonTokenToBuiltin(token)
+    if circaObj is None:
+        return None
+    return terms.findExisting(builtins.ASSIGN_OPERATOR_FUNC,
           inputs=[pythonTokenToBuiltin(token)])
 
 def pythonTokenToBuiltin(token):
-    #pdb.set_trace()
     return terms.findExistingConstant(builtins.TOKEN_FUNC, token.raw_string)
