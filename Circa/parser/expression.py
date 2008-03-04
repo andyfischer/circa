@@ -304,4 +304,5 @@ def getAssignOperatorFunction(token):
           inputs=[pythonTokenToBuiltin(token)])
 
 def pythonTokenToBuiltin(token):
-    return code.findExistingConstant(builtins.TOKEN_FUNC, token.raw_string)
+    token_string = builtins.BUILTINS.createConstant(token.raw_string)
+    return builtins.BUILTINS.getTerm(builtins.TOKEN_FUNC, inputs=[token_string])

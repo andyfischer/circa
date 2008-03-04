@@ -8,7 +8,6 @@ from Circa import (
     ca_function,
     parser,
     python_bridge,
-    pythonTypes,
     signature,
     token
 )
@@ -66,12 +65,12 @@ builtins.SUBROUTINE_TYPE = builtins.BUILTINS.createConstant(name = 'Subroutine',
     value = ca_type.Type(),
     type=builtins.TYPE_TYPE)
 
-# Register these with the pythonTypes module
-pythonTypes.PYTHON_TO_CIRCA[int] = builtins.INT_TYPE
-pythonTypes.PYTHON_TO_CIRCA[float] = builtins.FLOAT_TYPE
-pythonTypes.PYTHON_TO_CIRCA[str] = builtins.STR_TYPE
-pythonTypes.PYTHON_TO_CIRCA[bool] = builtins.BOOL_TYPE
-pythonTypes.PYTHON_TO_CIRCA[ca_function.Function] = builtins.FUNC_TYPE
+# Register these types
+python_bridge.PYTHON_TYPE_TO_CIRCA[int] = builtins.INT_TYPE
+python_bridge.PYTHON_TYPE_TO_CIRCA[float] = builtins.FLOAT_TYPE
+python_bridge.PYTHON_TYPE_TO_CIRCA[str] = builtins.STR_TYPE
+python_bridge.PYTHON_TYPE_TO_CIRCA[bool] = builtins.BOOL_TYPE
+python_bridge.PYTHON_TYPE_TO_CIRCA[ca_function.Function] = builtins.FUNC_TYPE
 
 # Create basic constants
 builtins.BUILTINS.createConstant(name='true', value=True, type=builtins.BOOL_TYPE)
@@ -87,19 +86,28 @@ def installLibFile(filename):
             token.tokenize(file_contents), raise_errors=True)
 installLibFile("builtins.ca")
 
-# Access some objects that need to be used in Python code
+# Access some objects were created in builtins.ca (and which need to be made available
+# to Python code)
 builtins.TOKEN_FUNC = builtins.BUILTINS.getNamedTerm("token")
 builtins.OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
 builtins.ASSIGN_OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
 
 # Fill in definitions for all builtin functions
-
 def installFunc(name, func):
     builtins.BUILTINS.getNamedTerm(name).pythonValue = python_bridge.wrapPythonFunction(func)
 
 def tokenEvaluate(s):
     return token.definitions.STRING_TO_TOKEN[s]
 installFunc("token", tokenEvaluate)
+
+def addEvaluate(a,b): return a + b
+def subEvaluate(a,b): return a - b
+def multEvaluate(a,b): return a * b
+def divEvaluate(a,b): return a / b
+installFunc("add", addEvaluate)
+installFunc("sub", subEvaluate)
+installFunc("mult", multEvaluate)
+installFunc("div", divEvaluate)
 
 # Read in parsing.ca
 installLibFile("parsing.ca")
