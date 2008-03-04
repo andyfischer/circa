@@ -51,10 +51,6 @@ class CodeUnit(object):
     if functionTerm.pythonValue.hasBranch:
         term.branch = []
 
-    # Evaluate immiately (in some cases)
-    if initialValue is None:
-        term.pythonEvaluate()
-
     # Add term to function's users
     functionTerm.users.add(term)
 
@@ -64,6 +60,10 @@ class CodeUnit(object):
 
     if name:
       self.setTermName(term, name)
+
+    # Evaluate immiately (in some cases)
+    if initialValue is None:
+        term.pythonEvaluate()
 
     if branch is None: branch = self.main_branch
     branch.append(term)
@@ -202,6 +202,8 @@ def printTermsFormatted(branch, printer, term_names):
     # Skip constants
     #if values.isConstant(term):
       #continue
+
+    pdb.set_trace()
 
     text = term.getSomeName() + ": " + term.functionTerm.getSomeName()
 
