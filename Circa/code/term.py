@@ -4,7 +4,7 @@ from Circa import (
   ca_function
 )
 
-nextGlobalID = 2
+nextGlobalID = 1
 
 
 
@@ -20,7 +20,10 @@ class Term(object):
     self.branch = None
     self.givenName = None
     self.debugName = None
-    self.globalID = 0
+
+    global nextGlobalID
+    self.globalID = nextGlobalID
+    nextGlobalID += 1
 
   def getType(self):
     "Returns this term's output type"

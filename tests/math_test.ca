@@ -4,7 +4,7 @@ three = 1 + 2
 assert(three != 2)
 assert(three == 3)
 assert(three != 4)
-print three
+print(three)
 
 six = 2 * 3
 assert(six != 5)

@@ -100,10 +100,16 @@ def tokenEvaluate(s):
     return token.definitions.STRING_TO_TOKEN[s]
 installFunc("token", tokenEvaluate)
 
+def printEvaluate(s): print s
+def equalsEvaluate(a,b): return a == b
+def nequalsEvaluate(a,b): return a != b
 def addEvaluate(a,b): return a + b
 def subEvaluate(a,b): return a - b
 def multEvaluate(a,b): return a * b
 def divEvaluate(a,b): return a / b
+installFunc("print", printEvaluate)
+installFunc("equals", equalsEvaluate)
+installFunc("not_equals", nequalsEvaluate)
 installFunc("add", addEvaluate)
 installFunc("sub", subEvaluate)
 installFunc("mult", multEvaluate)
@@ -112,4 +118,4 @@ installFunc("div", divEvaluate)
 # Read in parsing.ca
 installLibFile("parsing.ca")
 
-# pdb.set_trace()
+#pdb.set_trace()
