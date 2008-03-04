@@ -1,7 +1,6 @@
 
 from Circa import (
   code,
-  terms,
   token,
   parser
 )

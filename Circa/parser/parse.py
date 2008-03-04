@@ -4,7 +4,6 @@ import pdb, sys, traceback
 from Circa import (
   ca_function,
   subroutine,
-  terms,
   token
 )
 
@@ -72,7 +71,7 @@ class Parser(object):
     paths[RETURN] = self.return_statement
     paths[RBRACKET] = self.right_bracket
     paths[NEWLINE] = self.new_line
-    paths[POUND_IDENT] = self.immediateCommand
+    #paths[POUND_IDENT] = self.immediateCommand
 
     next_token = self.tokens.next()
 
@@ -243,7 +242,7 @@ class Parser(object):
     self.tokens.consume(NEWLINE)
 
   def immediateCommand(self):
-      ...
+      pass
 
 class Argument(object):
   def __init__(self):

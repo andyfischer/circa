@@ -1,7 +1,9 @@
 
 import code_unit
+import term as term_module
 
 CodeUnit = code_unit.CodeUnit
+Term = term_module.Term
 
 def appendFile(code, file_name):
     # get file contents
