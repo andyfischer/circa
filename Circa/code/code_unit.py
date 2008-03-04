@@ -17,7 +17,7 @@ from Circa import (
   builtins,
   ca_function,
   common_errors,
-  pythonTypes
+  python_bridge
 )
 
 from Circa.utils import indent_printer
@@ -78,7 +78,7 @@ class CodeUnit(object):
       raise Exception("Either type or value needs to be not-None")
 
     if type is None:
-      type = pythonTypes.typeOfPythonObj(value)
+      type = python_bridge.typeOfPythonObj(value)
 
     if type is None:
       raise Exception("Couldn't find a type for value: " + str(value))
