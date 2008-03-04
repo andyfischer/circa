@@ -10,12 +10,14 @@ rather than on the terms themselves.
 
 import pdb
 
+import term_utils
+import term as term_module
+
 from Circa import (
   builtins,
   ca_function,
   common_errors,
-  pythonTypes,
-  terms
+  pythonTypes
 )
 
 from Circa.utils import indent_printer
@@ -29,40 +31,48 @@ class CodeUnit(object):
 
   def getTerm(self, functionTerm, inputs, **term_options):
 
-    existing_term = terms.findExisting(functionTerm, inputs)
+    existing_term = term_utils.findExisting(functionTerm, inputs)
     if existing_term:
       return existing_term
 
     return self.createTerm(functionTerm, inputs, **term_options)
 
   def createTerm(self, functionTerm, inputs=None, branch=None, name=None,
-      initialValue=None, **term_options):
+      initialValue=None, sourceToken=None):
 
     # Create a new term
-    new_term = terms.createTerm(functionTerm, code_unit=self, **term_options)
-    assert new_term is not None
+    term = term_module.Term()
+    term.functionTerm = functionTerm
+    term.sourceToken = sourceToken
+    term.pythonValue = initialValue
+    term.codeUnit = self
+
+    # Check to create a branch
+    if functionTerm.pythonValue.hasBranch:
+        term.branch = []
+
+    # Evaluate immiately (in some cases)
+    if initialValue is None:
+        term.pythonEvaluate()
 
     # Add term to function's users
-    functionTerm.users.add(new_term)
-
-    if initialValue is not None:
-      new_term.pythonValue = initialValue
+    functionTerm.users.add(term)
 
     if inputs:
       # If they use any non-term args, convert them to constants
-      self.setTermInputs(new_term, inputs)
+      self.setTermInputs(term, inputs)
 
     if name:
-      self.setTermName(new_term, name)
+      self.setTermName(term, name)
 
     if branch is None: branch = self.main_branch
-    branch.append(new_term)
+    branch.append(term)
 
-    return new_term
+    return term
 
 
   def createConstant(self, value, name=None, branch=None,
-        source_token=None, type=None):
+        sourceToken=None, type=None):
 
     if type is None and value is None:
       raise Exception("Either type or value needs to be not-None")
@@ -74,7 +84,7 @@ class CodeUnit(object):
       raise Exception("Couldn't find a type for value: " + str(value))
 
     # Get constant function for this type
-    constFunc = terms.findExisting(builtins.CONST_FUNC, inputs=[type])
+    constFunc = term_utils.findExisting(builtins.CONST_FUNC, inputs=[type])
 
     # Create a constant function if it wasn't found
     if constFunc is None:
@@ -85,12 +95,12 @@ class CodeUnit(object):
       assert constFunc.pythonValue is not None
 
     # Look for an existing term
-    existingTerm = terms.findExistingConstant(constFunc, value)
+    existingTerm = term_utils.findExistingConstant(constFunc, value)
 
     term = None
     if existingTerm is None:
-        term = self.createTerm(constFunc, initial_value=value, 
-            branch=branch, source_token=source_token)
+        term = self.createTerm(constFunc, initialValue=value, 
+            branch=branch, sourceToken=sourceToken)
     else:
         term = existingTerm
 
@@ -197,7 +207,7 @@ def printTermsFormatted(branch, printer, term_names):
 
     if term.inputs:
       text += " ("
-      text += ",".join(map(terms.Term.getSomeName, term.inputs))
+      text += ",".join(map(term_module.Term.getSomeName, term.inputs))
       text += ")"
  
     printer.println(text)

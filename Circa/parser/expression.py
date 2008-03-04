@@ -2,7 +2,7 @@ import pdb
 
 from Circa import (
   builtins,
-  terms,
+  code,
   token,
 )
 
@@ -61,7 +61,7 @@ class Infix(Node):
     # evaluate as an assignment?
     if self.token.match == EQUALS:
       right_term = self.right.eval(builder)
-      if not isinstance(right_term, terms.Term):
+      if not isinstance(right_term, code.Term):
         raise ParseError("Expression did not evaluate to a term: " + str(self.right), self.getFirstToken())
       return builder.bindName(self.left.getName(), right_term)
 
@@ -135,7 +135,7 @@ class Literal(Node):
       raise "Couldn't recognize token: " + str(token)
 
   def eval(self, builder):
-    return builder.createConstant(self.value, source_token=self.token)
+    return builder.createConstant(self.value, sourceToken=self.token)
 
   def getFirstToken(self):
     return self.token
@@ -293,15 +293,15 @@ def getOperatorFunction(token):
         print "Notice: couldn't find an operator func for " + token.raw_string
         return None
 
-    return terms.findExisting(builtins.OPERATOR_FUNC,
+    return code.findExisting(builtins.OPERATOR_FUNC,
           inputs=[pythonTokenToBuiltin(token)])
 
 def getAssignOperatorFunction(token):
     circaObj = pythonTokenToBuiltin(token)
     if circaObj is None:
         return None
-    return terms.findExisting(builtins.ASSIGN_OPERATOR_FUNC,
+    return code.findExisting(builtins.ASSIGN_OPERATOR_FUNC,
           inputs=[pythonTokenToBuiltin(token)])
 
 def pythonTokenToBuiltin(token):
-    return terms.findExistingConstant(builtins.TOKEN_FUNC, token.raw_string)
+    return code.findExistingConstant(builtins.TOKEN_FUNC, token.raw_string)

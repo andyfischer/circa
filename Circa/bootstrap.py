@@ -7,9 +7,9 @@ from Circa import (
     ca_type,
     ca_function,
     parser,
+    python_bridge,
     pythonTypes,
     signature,
-    terms,
     token
 )
 
@@ -21,7 +21,7 @@ VERBOSE_DEBUGGING = False
 builtins.BUILTINS = code.CodeUnit()
 
 # Create 'constant' function, which temporarily does not have a function
-builtins.CONST_FUNC = terms.Term()
+builtins.CONST_FUNC = code.Term()
 builtins.CONST_FUNC.codeUnit = builtins.BUILTINS
 builtins.CONST_FUNC.functionTerm = builtins.CONST_FUNC
 builtins.BUILTINS.setTermName(builtins.CONST_FUNC, "constant")
@@ -93,15 +93,9 @@ builtins.OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
 builtins.ASSIGN_OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
 
 # Fill in definitions for all builtin functions
-def wrap(func):
-    def funcForCirca(term):
-        term.pythonValue = func(*map(lambda t:t.pythonValue, term.inputs))
-    return funcForCirca
 
 def installFunc(name, func):
-    circaFunc = ca_function.Function()
-    circaFunc.evaluate = wrap(func)
-    builtins.BUILTINS.getNamedTerm(name).pythonValue = circaFunc
+    builtins.BUILTINS.getNamedTerm(name).pythonValue = python_bridge.wrapPythonFunction(func)
 
 def tokenEvaluate(s):
     return token.definitions.STRING_TO_TOKEN[s]

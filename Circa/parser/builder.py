@@ -5,8 +5,7 @@ from Circa import (
   builtins,
   ca_function,
   code,
-  parser,
-  terms
+  parser
 )
 
 
@@ -40,13 +39,13 @@ class Builder(object):
       term = block.getLocalName(name)
 
       if term: 
-        assert isinstance(term, terms.Term)
+        assert isinstance(term, code.Term)
         return term
 
     # Check builtin module
     if builtins.BUILTINS.getNamedTerm(name) is not None:
       term = builtins.BUILTINS.getNamedTerm(name)
-      assert isinstance(term, terms.Term)
+      assert isinstance(term, code.Term)
       return term
 
     return None
@@ -55,7 +54,7 @@ class Builder(object):
 
   def bindName(self, name, target_term):
     assert isinstance(name, str)
-    assert isinstance(target_term, terms.Term)
+    assert isinstance(target_term, code.Term)
 
     self.currentBlock().bindLocal(name, target_term)
 
@@ -100,7 +99,7 @@ class Builder(object):
   constant = createConstant
 
   def createVariable(self, value, name=None, **term_options):
-    new_term = terms.createVariable(value, term_options)
+    new_term = self.code_unit.createVariable(value, term_options)
     self.bindName(name, new_term)
     return new_term
 
