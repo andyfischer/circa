@@ -55,7 +55,7 @@ builtins.INT_TYPE = builtins.BUILTINS.createConstant(name = 'int',
 builtins.FLOAT_TYPE = builtins.BUILTINS.createConstant(name = 'float',
     value = ca_type.Type(),
     type=builtins.TYPE_TYPE)
-builtins.STR_TYPE = builtins.BUILTINS.createConstant(name = 'str',
+builtins.STR_TYPE = builtins.BUILTINS.createConstant(name = 'string',
     value = ca_type.Type(),
     type=builtins.TYPE_TYPE)
 builtins.BOOL_TYPE = builtins.BUILTINS.createConstant(name = 'bool',
@@ -95,14 +95,24 @@ builtins.ASSIGN_OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("assign_operator"
 # Fill in definitions for all builtin functions
 def installFunc(name, func, **funcOptions):
     wrappedFunc = python_bridge.wrapPythonFunction(func, **funcOptions)
+    targetTerm = builtins.BUILTINS.getNamedTerm(name)
+
+    # Make sure nothing else has been installed
+    if targetTerm.pythonValue.pythonEvaluate is not parser.PLACEHOLDER_FUNC_FOR_BUILTINS:
+        raise Exception("Term " + name + " already has a builtin function installed")
+
     builtins.BUILTINS.getNamedTerm(name).pythonValue = wrappedFunc
 
 def tokenEvaluate(s):
     return token.definitions.STRING_TO_TOKEN[s]
 installFunc("token", tokenEvaluate)
 
-def printEvaluate(s):
-    print s
+def printEvaluate(s): print s
+def getInputEvaluate():
+    return raw_input("> ")
+def assertEvaluate(b): 
+    if not b:
+        print "Assertion failure!"
 def equalsEvaluate(a,b): return a == b
 def nequalsEvaluate(a,b): return a != b
 def addEvaluate(a,b): return a + b
@@ -111,6 +121,8 @@ def multEvaluate(a,b): return a * b
 def divEvaluate(a,b): return a / b
 def breakEvaluate(a,b): pdb.set_trace()
 installFunc("print", printEvaluate, pureFunction=False)
+installFunc("get_input", getInputEvaluate, pureFunction=False)
+installFunc("assert", assertEvaluate, pureFunction=False)
 installFunc("equals", equalsEvaluate)
 installFunc("not_equals", nequalsEvaluate)
 installFunc("add", addEvaluate)

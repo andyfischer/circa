@@ -16,6 +16,9 @@ import parse_errors, blocks
 
 SPECIAL_NAME_FOR_RETURNS = "#return"
 
+def PLACEHOLDER_FUNC_FOR_BUILTINS(term):
+    print "Warning: builtin function " + term.functionTerm.getSomeName() + " does not have a body."
+
 VERBOSE_DEBUGGING = False
 
 def parse(builder, source, raise_errors=False):
@@ -182,6 +185,7 @@ class Parser(object):
 
       func = ca_function.createFunction(inputTypeArr,outputTypeArr)
       func.name = function_id.text
+      func.pythonEvaluate = PLACEHOLDER_FUNC_FOR_BUILTINS
 
       self.builder.createConstant(value=func, name=func.name)
       return
