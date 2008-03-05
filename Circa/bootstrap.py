@@ -93,29 +93,32 @@ builtins.OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
 builtins.ASSIGN_OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
 
 # Fill in definitions for all builtin functions
-def installFunc(name, func):
-    builtins.BUILTINS.getNamedTerm(name).pythonValue = python_bridge.wrapPythonFunction(func)
+def installFunc(name, func, **funcOptions):
+    wrappedFunc = python_bridge.wrapPythonFunction(func, **funcOptions)
+    builtins.BUILTINS.getNamedTerm(name).pythonValue = wrappedFunc
 
 def tokenEvaluate(s):
     return token.definitions.STRING_TO_TOKEN[s]
 installFunc("token", tokenEvaluate)
 
-def printEvaluate(s): print s
+def printEvaluate(s):
+    print s
 def equalsEvaluate(a,b): return a == b
 def nequalsEvaluate(a,b): return a != b
 def addEvaluate(a,b): return a + b
 def subEvaluate(a,b): return a - b
 def multEvaluate(a,b): return a * b
 def divEvaluate(a,b): return a / b
-installFunc("print", printEvaluate)
+def breakEvaluate(a,b): pdb.set_trace()
+installFunc("print", printEvaluate, pureFunction=False)
 installFunc("equals", equalsEvaluate)
 installFunc("not_equals", nequalsEvaluate)
 installFunc("add", addEvaluate)
 installFunc("sub", subEvaluate)
 installFunc("mult", multEvaluate)
 installFunc("div", divEvaluate)
+installFunc("break", breakEvaluate)
 
 # Read in parsing.ca
 installLibFile("parsing.ca")
 
-#pdb.set_trace()

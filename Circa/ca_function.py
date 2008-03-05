@@ -1,10 +1,10 @@
 
 class Function(object):
-  def __init__(self):
+  def __init__(self, pureFunction=True):
     self.inputTypes = []
     self.outputTypes = []
     self.hasBranch = False
-    self.pureFunction = True
+    self.pureFunction = pureFunction
     self.forceUnique = False
 
   def pythonEvaluate(self, term):
