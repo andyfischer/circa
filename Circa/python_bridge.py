@@ -1,8 +1,8 @@
 
 import ca_function
 
-def wrapPythonFunction(func):
-    circaFunc = ca_function.Function()
+def wrapPythonFunction(func, **options):
+    circaFunc = ca_function.Function(**options)
     def funcForCirca(term):
         term.pythonValue = func(*map(lambda t:t.pythonValue, term.inputs))
     circaFunc.pythonEvaluate = funcForCirca

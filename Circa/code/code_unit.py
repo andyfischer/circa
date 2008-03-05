@@ -47,8 +47,10 @@ class CodeUnit(object):
     term.pythonValue = initialValue
     term.codeUnit = self
 
+    circaFunction = functionTerm.pythonValue
+
     # Check to create a branch
-    if functionTerm.pythonValue.hasBranch:
+    if circaFunction.hasBranch:
         term.branch = []
 
     # Add term to function's users
@@ -61,8 +63,8 @@ class CodeUnit(object):
     if name:
       self.setTermName(term, name)
 
-    # Evaluate immiately (in some cases)
-    if initialValue is None:
+    # Evaluate immediately (in some cases)
+    if (initialValue is None) and (circaFunction.pureFunction):
         term.pythonEvaluate()
 
     if branch is None: branch = self.main_branch
@@ -168,10 +170,9 @@ class CodeUnit(object):
   
   # Change events
   def onInputsChanged(self, term):
-    # if this is a pure function then re-evaluate it
-    if term.functionTerm.pythonValue.pureFunction:
-      term.pythonEvaluate()
-
+     # if this is a pure function then re-evaluate it
+     if term.functionTerm.pythonValue.pureFunction:
+        term.pythonEvaluate()
 
   def evaluate(self):
     if VERBOSE_DEBUGGING: print "code_unit.evaluate"

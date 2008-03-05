@@ -7,7 +7,7 @@ function cond_branch(bool condition) :builtin
 function simple_branch() :builtin
 function equals(-> bool) :builtin
 function not_equals(-> bool) :builtin
-function print() :builtin
+function print(any) :builtin
 function input(-> string) :builtin
 function assert(bool) :builtin
 function and(bool, bool -> bool) :builtin
@@ -23,6 +23,7 @@ function concat(str, str ->str) :builtin
 function subroutine() :builtin
 function constant() :builtin
 function variable() :builtin
+function break() :builtin
 
 // Metaprogramming functions
 function token(str -> Token) :builtin
