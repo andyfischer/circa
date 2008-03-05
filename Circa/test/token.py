@@ -13,7 +13,15 @@ def one_token(string):
   assert len(tlist) == 1
   return tlist[0]
 
+
 class Test(unittest.TestCase):
+
+  def assertMatches(self, tokenString, matchTextPairs):
+    tokens = tokenize(tokenString)
+
+    for (token, pair) in zip(tokens, matchTextPairs):
+      self.assertEquals(token.match, pair[0])
+      self.assertEquals(token.text, pair[1])
 
   def testSimple(self):
     tokens = tokenize("1 3.14 > word")
@@ -43,6 +51,15 @@ class Test(unittest.TestCase):
     self.assertEquals(tokens[6].text, "word")
     self.assertEquals(tokens[6].line, 1)
     self.assertEquals(tokens[6].column, 10)
+
+  def testIdentifier(self):
+      self.assertMatches("abc", [[IDENT, "abc"]])
+      self.assertMatches("x", [[IDENT, "x"]])
+      self.assertMatches("abc x _a",
+        ((IDENT, "abc"), (WHITESPACE, " "),
+         (IDENT, "x"), (WHITESPACE, " "),
+         (IDENT, "_a")))
+
 
   def testFloatFormats(self):
     tokens = tokenize("1. .1 2.3 .9999")
