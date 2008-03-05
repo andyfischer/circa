@@ -74,7 +74,7 @@ class Infix(Node):
 
     # evaluate as a function + assign?
     assignFunction = getAssignOperatorFunction(self.token.match)
-    if assignFunction:
+    if assignFunction is not None:
       # create a term that's the result of the operation
       result_term = builder.createTerm(assignFunction,
           inputs=[self.left.eval(builder), self.right.eval(builder)])
@@ -299,6 +299,7 @@ def getOperatorFunction(token):
 def getAssignOperatorFunction(token):
     circaObj = pythonTokenToBuiltin(token)
     if circaObj is None:
+        print "Notice: couldn't find an assign operator func for " + token.raw_string
         return None
     return code.findExisting(builtins.ASSIGN_OPERATOR_FUNC,
           inputs=[pythonTokenToBuiltin(token)])

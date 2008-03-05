@@ -90,7 +90,7 @@ installLibFile("builtins.ca")
 # to Python code)
 builtins.TOKEN_FUNC = builtins.BUILTINS.getNamedTerm("token")
 builtins.OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
-builtins.ASSIGN_OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
+builtins.ASSIGN_OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("assign_operator")
 
 # Fill in definitions for all builtin functions
 def installFunc(name, func, **funcOptions):

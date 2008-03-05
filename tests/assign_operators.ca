@@ -19,7 +19,7 @@ x /= 3
 assert(x == 4)
 
 
-# test stateful operators
+// test stateful operators
 x = 4
 y = x
 
