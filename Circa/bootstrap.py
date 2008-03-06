@@ -71,6 +71,7 @@ python_bridge.PYTHON_TYPE_TO_CIRCA[float] = builtins.FLOAT_TYPE
 python_bridge.PYTHON_TYPE_TO_CIRCA[str] = builtins.STR_TYPE
 python_bridge.PYTHON_TYPE_TO_CIRCA[bool] = builtins.BOOL_TYPE
 python_bridge.PYTHON_TYPE_TO_CIRCA[ca_function.Function] = builtins.FUNC_TYPE
+python_bridge.PYTHON_TYPE_TO_CIRCA[code.SubroutineDefinition] = builtins.SUBROUTINE_TYPE
 
 # Create basic constants
 builtins.BUILTINS.createConstant(name='true', value=True, type=builtins.BOOL_TYPE)
@@ -93,15 +94,15 @@ builtins.OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
 builtins.ASSIGN_OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("assign_operator")
 
 # Fill in definitions for all builtin functions
-def installFunc(name, func, **funcOptions):
-    wrappedFunc = python_bridge.wrapPythonFunction(func, **funcOptions)
+def installFunc(name, func):
+    wrappedFunc = python_bridge.wrapPythonFuncToEvaluate(func)
     targetTerm = builtins.BUILTINS.getNamedTerm(name)
 
     # Make sure nothing else has been installed
     if targetTerm.pythonValue.pythonEvaluate is not parser.PLACEHOLDER_FUNC_FOR_BUILTINS:
         raise Exception("Term " + name + " already has a builtin function installed")
 
-    builtins.BUILTINS.getNamedTerm(name).pythonValue = wrappedFunc
+    targetTerm.pythonValue.pythonEvaluate = wrappedFunc
 
 def tokenEvaluate(s):
     return token.definitions.STRING_TO_TOKEN[s]
@@ -120,9 +121,9 @@ def subEvaluate(a,b): return a - b
 def multEvaluate(a,b): return a * b
 def divEvaluate(a,b): return a / b
 def breakEvaluate(a,b): pdb.set_trace()
-installFunc("print", printEvaluate, pureFunction=False)
-installFunc("get_input", getInputEvaluate, pureFunction=False)
-installFunc("assert", assertEvaluate, pureFunction=False)
+installFunc("print", printEvaluate)
+installFunc("get_input", getInputEvaluate)
+installFunc("assert", assertEvaluate)
 installFunc("equals", equalsEvaluate)
 installFunc("not_equals", nequalsEvaluate)
 installFunc("add", addEvaluate)

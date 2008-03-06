@@ -135,4 +135,8 @@ class Term(object):
     return self.state.getLocal(name)
 
 
+def createPlaceholder():
+    term = Term()
+    term.debugName = "Placeholder"
+    return term
 
