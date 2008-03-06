@@ -106,7 +106,6 @@ infixPrecedence = {
     STAR: 5, SLASH: 5,
     PLUS: 4, MINUS: 4,
     LTHAN: 3, LTHANEQ: 3, GTHAN: 3, GTHANEQ: 3, DOUBLE_EQUALS: 3, NOT_EQUALS: 3,
-    #AND: 2, OR: 2,
     EQUALS: 1, PLUS_EQUALS: 1, MINUS_EQUALS: 1, STAR_EQUALS: 1, SLASH_EQUALS: 1,
       COLON_EQUALS: 1
 }
@@ -193,7 +192,9 @@ class Function(Node):
       raise parse_errors.InternalError(self.function_name,
           "Function " + self.function_name.text + " not found.")
 
-    elif func.getType() != builtins.FUNC_TYPE:
+    # Currently use dynamic typing to check if something can be a function.
+    # This should be reworked to use a static type check (when we have it)
+    elif not hasattr(func.pythonValue, "pythonEvaluate"):
       raise parse_errors.InternalError(self.function_name,
           "Term " + self.function_name.text + " is not a function.")
 

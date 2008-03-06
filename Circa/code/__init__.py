@@ -1,9 +1,11 @@
 
 import code_unit, term_utils
 import term as term_module
+import subroutine as subroutine_module
 
 CodeUnit = code_unit.CodeUnit
 Term = term_module.Term
+SubroutineDefinition = subroutine_module.SubroutineDefinition
 findExisting = term_utils.findExisting
 
 def appendFile(code, file_name):

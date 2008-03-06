@@ -14,7 +14,7 @@ def findExisting(functionTerm, inputs=[]):
     return None
 
   assert isinstance(functionTerm, term_module.Term)
-  assert isinstance(functionTerm.pythonValue, ca_function.Function)
+  #assert isinstance(functionTerm.pythonValue, ca_function.Function)
 
   function = functionTerm.pythonValue
 

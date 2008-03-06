@@ -3,7 +3,7 @@ import pdb, sys, traceback
 
 from Circa import (
   ca_function,
-  subroutine,
+  code,
   token
 )
 
@@ -191,7 +191,7 @@ class Parser(object):
       return
 
     # Create a new subroutine object
-    sub = subroutine.SubroutineDefinition(input_names=arg_names)
+    sub = code.SubroutineDefinition(input_names=arg_names)
 
     # open a block
     code_block = blocks.CodeUnitBlock(self.builder, sub.code_unit)
