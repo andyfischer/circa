@@ -34,6 +34,7 @@ def main():
   options.onlyPrintCode = False
   options.interactiveMode = False
   options.debugMode = False
+  options.printTokens = False
 
   def shortOption(character):
     if character == 'p':
@@ -42,6 +43,8 @@ def main():
       options.interactiveMode = True
     elif character == 'd':
       options.debugMode = True
+    elif character == 't':
+      options.onlyPrintTokens = True
 
   for arg in args:
     if arg[0] == '-':
@@ -56,6 +59,14 @@ def main():
   for filename in options.files:
     file = findSourceFile(filename)
 
+    if options.onlyPrintTokens:
+       f = open(file, 'r')
+       tokens = Circa.tokenize(f.read())
+       f.close()
+
+       print ','.join(map(lambda t:t.match.name, tokens))
+       continue
+
     module = Circa.loadModule(file, raise_errors = options.debugMode)
 
     if options.onlyPrintCode:
@@ -68,7 +79,6 @@ def interactiveMode():
   while True:
 
     command = raw_input("> ")
-
     
 
 def findSourceFile(filename):
