@@ -12,14 +12,14 @@ class SubroutineDefinition(object):
     if input_names is not None:
       map(self.createInput, input_names)
 
-
   def createInput(self, input_name):
     # input_name is either a string or None
     new_term = term.createPlaceholder()
     self.input_placeholders.append(new_term)
     return new_term
 
-  def pythonEvaluate(self):
-    # Temp
-    pass
+def getSubroutineEvaluate(sub_def):
+   def subroutineEvaluate():
+      sub_def.code_unit.evaluate()
+      
 
