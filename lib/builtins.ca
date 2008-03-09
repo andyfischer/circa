@@ -2,6 +2,8 @@
 function constant(Type -> Function) :builtin
 function variable(Type -> Function) :builtin
 
+function invokeSubroutine() :builtin
+
 // Functions
 function cond_branch(bool condition) :builtin
 function simple_branch() :builtin

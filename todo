@@ -1,11 +1,9 @@
-Recent:
 
-Make tests under parser work again
-
--------
-
-Old:
-
-Function definitions:
-We need some way to specify attributes.
+- 'type' command
+- 'attribute'
+- Function overriding
+- Subroutine invoke
+- Backtrack code generation
+- Lists
+- Looping
 

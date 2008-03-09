@@ -192,13 +192,19 @@ class Function(Node):
       raise parse_errors.InternalError(self.function_name,
           "Function " + self.function_name.text + " not found.")
 
-    # Currently use dynamic typing to check if something can be a function.
-    # This should be reworked to use a static type check (when we have it)
-    elif not hasattr(func.pythonValue, "pythonEvaluate"):
-      raise parse_errors.InternalError(self.function_name,
-          "Term " + self.function_name.text + " is not a function.")
+    # Check for Function
+    if func.getType() is builtins.FUNC_TYPE:
+      return builder.createTerm(func, inputs=arg_terms)
 
-    return builder.createTerm(func, inputs=arg_terms)
+    # Check for Subroutine
+    elif func.getType() is builtins.SUBROUTINE_TYPE:
+
+       # Todo: special behavior for invoking subroutines
+       return builder.createTerm(builtins.INVOKE_SUB_FUNC)
+
+    else:
+       raise parse_errors.InternalError(self.function_name,
+          "Term " + self.function_name.text + " is not a function.")
 
   def getFirstToken(self):
     return self.function_name;

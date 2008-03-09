@@ -34,7 +34,7 @@ def main():
   options.onlyPrintCode = False
   options.interactiveMode = False
   options.debugMode = False
-  options.printTokens = False
+  options.onlyPrintTokens = False
 
   def shortOption(character):
     if character == 'p':
