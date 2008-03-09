@@ -12,7 +12,7 @@ from Circa.token import token_stream
 from Circa.token.definitions import *
 
 # Local modules
-import parse_errors, blocks
+import parse_errors, blocks, syntax
 
 SPECIAL_NAME_FOR_RETURNS = "#return"
 
@@ -45,11 +45,10 @@ class Parser(object):
         self.parse_errors.append(e)
         print "[parse error] " + e.description()
 
-        # Drop this token
+        # Drop this token, and the rest of the line
         self.tokens.consume()
-
-        # Drop the rest of the line
         self.tokens.dropUntil(NEWLINE)
+
       except Exception, e:
         print "Internal error on token: " + self.tokens.next().detailsStr()
         print e
@@ -69,6 +68,7 @@ class Parser(object):
     if VERBOSE_DEBUGGING: print "Parsing statement"
 
     paths = {}
+    paths[TYPE] = self.type_decl
     paths[IF] = self.if_statement
     paths[FUNCTION] = self.function_decl
     paths[RETURN] = self.return_statement
@@ -94,6 +94,11 @@ class Parser(object):
 
     # if we got this far then we don't know what the hell to do
     raise parse_errors.NotAStatement(next_token)
+
+  def type_decl(self):
+     parsedDecl = syntax.type_decl(self.tokens)
+
+     # todo
 
   def if_statement(self):
     if VERBOSE_DEBUGGING: print "Parsing if_statement"
@@ -199,7 +204,6 @@ class Parser(object):
 
     # store this guy in a constant term
     subroutine_constant = self.builder.createConstant(value=sub, name=function_id.text)
-
 
   def return_statement(self):
     return_token = self.tokens.consume(RETURN)

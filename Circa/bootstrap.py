@@ -92,6 +92,7 @@ installLibFile("builtins.ca")
 builtins.TOKEN_FUNC = builtins.BUILTINS.getNamedTerm("token")
 builtins.OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
 builtins.ASSIGN_OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("assign_operator")
+builtins.INVOKE_SUB_FUNC = builtins.BUILTINS.getNamedTerm("invokeSubroutine")
 
 # Fill in definitions for all builtin functions
 def installFunc(name, func):
@@ -121,6 +122,7 @@ def subEvaluate(a,b): return a - b
 def multEvaluate(a,b): return a * b
 def divEvaluate(a,b): return a / b
 def breakEvaluate(a,b): pdb.set_trace()
+def emptyFunc(): pass
 installFunc("print", printEvaluate)
 installFunc("get_input", getInputEvaluate)
 installFunc("assert", assertEvaluate)
@@ -131,6 +133,7 @@ installFunc("sub", subEvaluate)
 installFunc("mult", multEvaluate)
 installFunc("div", divEvaluate)
 installFunc("break", breakEvaluate)
+installFunc("invokeSubroutine", emptyFunc)
 
 # Read in parsing.ca
 installLibFile("parsing.ca")

@@ -7,7 +7,6 @@ from Circa import (
 nextGlobalID = 1
 
 
-
 class Term(object):
   def __init__(self):
     "Use 'createTerm'. This constructor should be called by almost nobody."
@@ -26,24 +25,23 @@ class Term(object):
     nextGlobalID += 1
 
   def getType(self):
-    "Returns this term's output type"
-    # todo, needs to be rewritten to handle multiple outputs
-    return self.functionTerm.pythonValue.outputTypes[0]
+     "Returns this term's output type"
+     return self.functionTerm.pythonValue.outputTypes[0]
 
   def getFunction(self):
-    "Returns this term's Function"
-    return self.functionTerm.pythonValue
+     "Returns this term's Function"
+     return self.functionTerm.pythonValue
 
   def getSomeName(self):
-    """
-    Returns some unique identifier. There are a few values we may use here.
-    No guarantees are made as to the format.
-    """
-    if self.givenName:
+     """
+     Returns some unique identifier. There are a few values we may use here.
+     No guarantees are made as to the format.
+     """
+     if self.givenName:
         return self.givenName
-    elif self.debugName:
+     elif self.debugName:
         return self.debugName
-    else:
+     else:
         return 't' + str(self.globalID)
 
   def inputsContain(self, term):

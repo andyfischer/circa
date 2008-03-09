@@ -1,0 +1,17 @@
+
+type ArrayIndex = int
+type unsafe_string = string
+type vector { int x, int y }
+
+type MyClass {
+  int a,
+  int b,
+  string name,
+  float distance
+}
+
+type Composite {
+  MyClass myClass,
+  MyClass myClass2,
+  string name,
+}
