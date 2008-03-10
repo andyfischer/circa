@@ -9,20 +9,6 @@ c) A way to specify the default of a function
 d) A way for the code to intelligently figure out what needs to be reevaluated,
 when an override occurs.
 
-This is a layer B operation.
-
-What are the alternatives to do this instead in layer A?
-
-
-Syntax notes:
-
-Create a new syntax structure 'define' that looks like:
-
-define function_name(inputs)
-{
-
-}
-
-Should we reuse existing syntax for a function-definition operation?
+This is a layer B operation. What are the alternatives to do this instead in layer A?
 
 
