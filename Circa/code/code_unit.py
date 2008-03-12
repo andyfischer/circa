@@ -90,7 +90,7 @@ class CodeUnit(object):
 
     # Create a constant function if it wasn't found
     if constFunc is None:
-      funcValue = ca_function.createFunction(inputs=[], outputs=[type])
+      funcValue = ca_function.createFunction(inputs=[], output=type)
       constFunc = self.createTerm(builtins.CONST_FUNC, inputs=[type],
           initialValue=funcValue)
       constFunc.debugName = "constant-" + type.getSomeName()
@@ -203,8 +203,6 @@ def printTermsFormatted(branch, printer, term_names):
     # Skip constants
     #if values.isConstant(term):
       #continue
-
-    pdb.set_trace()
 
     text = term.getSomeName() + ": " + term.functionTerm.getSomeName()
 

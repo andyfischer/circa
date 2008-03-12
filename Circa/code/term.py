@@ -26,7 +26,7 @@ class Term(object):
 
   def getType(self):
      "Returns this term's output type"
-     return self.functionTerm.pythonValue.outputTypes[0]
+     return self.functionTerm.pythonValue.outputType
 
   def getFunction(self):
      "Returns this term's Function"

@@ -25,19 +25,20 @@ builtins.CONST_FUNC.codeUnit = builtins.BUILTINS
 builtins.CONST_FUNC.functionTerm = builtins.CONST_FUNC
 builtins.BUILTINS.setTermName(builtins.CONST_FUNC, "constant")
 builtins.CONST_FUNC.globalID = 1
-builtins.CONST_FUNC.pythonValue = ca_function.createFunction(inputs=[], outputs=[])
+builtins.CONST_FUNC.pythonValue = ca_function.createFunction(inputs=[], output=None)
 
 # Create 'constant-Type' function
 builtins.CONST_TYPE_FUNC = builtins.BUILTINS.createTerm(functionTerm=builtins.CONST_FUNC)
-builtins.CONST_TYPE_FUNC.pythonValue = ca_function.createFunction(inputs=[], outputs=[])
+builtins.CONST_TYPE_FUNC.pythonValue = ca_function.createFunction(inputs=[], output=None)
 
 # Create Type type
 builtins.TYPE_TYPE = builtins.BUILTINS.createTerm(functionTerm=builtins.CONST_TYPE_FUNC,
     name = 'Type', initialValue = ca_type.Type())
+builtins.TYPE_TYPE.pythonValue.outputType=builtins.TYPE_TYPE
 
 # Implant the Type type
 builtins.CONST_FUNC.pythonValue.inputs=[builtins.TYPE_TYPE]
-builtins.CONST_TYPE_FUNC.pythonValue.outputs=[builtins.TYPE_TYPE]
+builtins.CONST_TYPE_FUNC.pythonValue.outputType=builtins.TYPE_TYPE
 
 # Create Function type
 builtins.FUNC_TYPE = builtins.BUILTINS.createConstant(name = 'Function',
@@ -46,7 +47,7 @@ builtins.FUNC_TYPE = builtins.BUILTINS.createConstant(name = 'Function',
 
 # Implant types into 'constant' function
 builtins.CONST_FUNC.pythonValue.inputTypes = [builtins.TYPE_TYPE]
-builtins.CONST_FUNC.pythonValue.outputTypes = [builtins.FUNC_TYPE]
+builtins.CONST_FUNC.pythonValue.outputType = builtins.FUNC_TYPE
 
 # Create basic types
 builtins.INT_TYPE = builtins.BUILTINS.createConstant(name = 'int',
@@ -59,6 +60,9 @@ builtins.STR_TYPE = builtins.BUILTINS.createConstant(name = 'string',
     value = ca_type.Type(),
     type=builtins.TYPE_TYPE)
 builtins.BOOL_TYPE = builtins.BUILTINS.createConstant(name = 'bool',
+    value = ca_type.Type(),
+    type=builtins.TYPE_TYPE)
+builtins.ANY_TYPE = builtins.BUILTINS.createConstant(name = 'any',
     value = ca_type.Type(),
     type=builtins.TYPE_TYPE)
 builtins.SUBROUTINE_TYPE = builtins.BUILTINS.createConstant(name = 'Subroutine',

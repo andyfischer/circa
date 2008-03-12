@@ -1,51 +1,97 @@
 from Circa.token.definitions import *
 
-
-class CompositeTypeDecl:
-   class Member:
-      def __init__(self, type, name):
-         self.type = type
-         self.name = name
-
-   def __init__(self, name):
-      self.name = name
-      self.members = []
-
-class SpecializeTypeDelc:
-   def __init__(self, name, baseType):
-      self.name = name
-      self.baseType = baseType
+class TypeDecl(object):
+   def __init__(self):
+      self.id = None
+      self.baseType = None
+      self.compositeMembers = []
+      self.annotations = []
 
 def type_decl(tokens):
    tokens.consume(TYPE)
    tokens.startSkipping(NEWLINE)
 
-   typeName = tokens.consume(IDENT)
+   decl = TypeDecl()
 
-   parsedDecl = None
+   decl.id = tokens.consume(IDENT)
 
    # Check to parse composite type
    if tokens.nextIs(LBRACKET):
-      parsedDecl = CompositeTypeDecl(typeName)
 
       tokens.consume(LBRACKET)
       while not tokens.nextIs(RBRACKET):
          memberType = tokens.consume(IDENT)
          memberName = tokens.consume(IDENT)
-         parsedDecl.members.append(CompositeTypeDecl.Member(memberType, memberName))
+         decl.compositeMembers.append([memberType, memberName])
 
          if not tokens.nextIs(RBRACKET):
             tokens.consume(COMMA)
       tokens.consume(RBRACKET)
 
    # Parse a type specialization
-   else:
+   elif tokens.nextIs(EQUALS):
       tokens.consume(EQUALS)
-      baseType = tokens.consume(IDENT)
+      decl.baseType = tokens.consume(IDENT)
 
-      parsedDecl = SpecializeTypeDelc(typeName, baseType)
+   # Parse annotations
+   while tokens.nextIs(COLON):
+      tokens.consume(COLON)
+      decl.annotations.append(tokens.consume(IDENT))
 
    tokens.stopSkipping(NEWLINE)
 
-   return parsedDecl
+   return decl
+
+class FunctionDecl(object):
+   def __init__(self):
+      self.id = None
+      self.args = []
+      self.annotations = []
+      self.outputType = None
+
+class FunctionArgument(object):
+  def __init__(self):
+    self.type = None
+    self.id = None
+    self.outputType = None
+
+  def getNameStr(self):
+    if self.id is None: return None
+    return self.id.text
+      
+
+def function_decl(tokens):
+   tokens.consume(FUNCTION)
+   decl = FunctionDecl()
+   decl.id = tokens.consume(IDENT)
+   tokens.consume(LPAREN)
+
+   # Check for input arguments
+   if tokens.nextIs(IDENT):
+      decl.args.append(function_argument(tokens))
+   while tokens.nextIs(COMMA):
+      tokens.consume(COMMA)
+      decl.args.append(function_argument(tokens))
+
+   # Check for an output
+   if tokens.nextIs(RIGHT_ARROW):
+      tokens.consume(RIGHT_ARROW)
+      decl.outputType = tokens.consume(IDENT)
+
+   tokens.consume(RPAREN)
+
+   # Check for annotations
+   while tokens.nextIs(COLON):
+      tokens.consume(COLON)
+      decl.annotations.append(tokens.consume(IDENT))
+      
+   return decl
+
+# Returns instance of FunctionArgument
+def function_argument(tokens):
+   arg = FunctionArgument()
+   arg.type = tokens.consume(IDENT)
+   if tokens.nextIs(IDENT):
+      arg.id = tokens.consume(IDENT)
+   return arg
 
