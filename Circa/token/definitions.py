@@ -98,6 +98,7 @@ STATE =         TokenDef(51, 'state', pattern=word('state'))
 TYPE =          TokenDef(52, 'type', pattern=word('type'))
 THIS =          TokenDef(54, 'this', pattern=word('this'))
 PATCH =         TokenDef(55, 'patch', pattern=word('patch'))
+ATTRIBUTE =     TokenDef(56, 'attribute', pattern=word('attribute'))
 
 # other types
 FLOAT =         TokenDef(70, 'float', pattern=r"([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)")
