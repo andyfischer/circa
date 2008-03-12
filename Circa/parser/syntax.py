@@ -6,6 +6,8 @@ class TypeDecl(object):
       self.baseType = None
       self.compositeMembers = []
       self.annotations = []
+   def annotationStrings(self):
+      return map(lambda a: a.text, self.annotations)
 
 def type_decl(tokens):
    tokens.consume(TYPE)
@@ -43,35 +45,38 @@ def type_decl(tokens):
    return decl
 
 class FunctionDecl(object):
+
    def __init__(self):
       self.id = None
-      self.args = []
+      self.inputArgs = []
       self.annotations = []
       self.outputType = None
 
-class FunctionArgument(object):
-  def __init__(self):
-    self.type = None
-    self.id = None
-    self.outputType = None
+   def appendInput(self, type, name):
+      class FunctionArgument(object): pass
+      input = FunctionArgument()
+      input.type = type
+      input.name = name
+      self.inputArgs.append(input)
 
-  def getNameStr(self):
-    if self.id is None: return None
-    return self.id.text
-      
+   def inputTypes(self):
+      return map(lambda a: a.type, self.inputArgs)
+   def inputNames(self):
+      return map(lambda a: a.name, self.inputArgs)
+   def annotationStrings(self):
+      return map(lambda a: a.text, self.annotations)
 
 def function_decl(tokens):
-   tokens.consume(FUNCTION)
    decl = FunctionDecl()
    decl.id = tokens.consume(IDENT)
    tokens.consume(LPAREN)
 
    # Check for input arguments
    if tokens.nextIs(IDENT):
-      decl.args.append(function_argument(tokens))
+      decl.appendInput(*function_argument(tokens))
    while tokens.nextIs(COMMA):
       tokens.consume(COMMA)
-      decl.args.append(function_argument(tokens))
+      decl.appendInput(*function_argument(tokens))
 
    # Check for an output
    if tokens.nextIs(RIGHT_ARROW):
@@ -87,11 +92,12 @@ def function_decl(tokens):
       
    return decl
 
-# Returns instance of FunctionArgument
+# Parses a function argument and returns a pair (type, name).
+# 'name' may be None
 def function_argument(tokens):
-   arg = FunctionArgument()
-   arg.type = tokens.consume(IDENT)
+   type = tokens.consume(IDENT)
+   id = None
    if tokens.nextIs(IDENT):
-      arg.id = tokens.consume(IDENT)
-   return arg
+      id = tokens.consume(IDENT)
+   return (type,id)
 

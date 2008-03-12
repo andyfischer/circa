@@ -18,7 +18,11 @@ import parse_errors, blocks, syntax
 SPECIAL_NAME_FOR_RETURNS = "#return"
 
 def PLACEHOLDER_FUNC_FOR_BUILTINS(term):
-    print "Warning: builtin function " + term.functionTerm.getSomeName() + " does not have a body."
+   print "Warning: builtin function " + term.functionTerm.getSomeName() + " does not have a body."
+
+def PLACEHOLDER_FUNC_FOR_ATTRIBUTES(term):
+   # Do nothing
+   pass
 
 VERBOSE_DEBUGGING = False
 
@@ -101,10 +105,9 @@ class Parser(object):
      decl = syntax.type_decl(self.tokens)
 
      name = decl.id.text
-     annotationNames = map(lambda a: a.text, decl.annotations)
 
      # Handle a built-in type
-     if "builtin" in annotationNames:
+     if "builtin" in decl.annotationStrings():
         return self.builder.createConstant(value=None, name = name, type=builtins.TYPE_TYPE)
 
      # Handle composite type
@@ -153,39 +156,29 @@ class Parser(object):
      cond_group.finish()
 
   def function_decl(self):
+     self.tokens.consume(FUNCTION)
      decl = syntax.function_decl(self.tokens)
 
      def getArgName(arg): return arg.getNameStr()
-     arg_names = map(getArgName, decl.args)
-     annotationNames = map(lambda a: a.text, decl.annotations)
 
      # Get a list of input types
-     def getInputType(arg):
-        typeName = arg.type
-
-        typeTerm = self.builder.getNamed(typeName.text)
-
-        if typeTerm is None:
-           raise parse_errors.IdentifierNotFound(typeName)
-
-        if typeTerm.getType() is not builtins.TYPE_TYPE:
-           raise parse_errors.IdentifierIsNotAType(typeName)
-
-     inputTypeArr = map(getInputType, decl.args)
+     inputTypes = map(self.getTypeFromToken, decl.inputTypes())
+     outputType = (None if decl.outputType is None
+                        else self.getTypeFromToken(decl.outputType))
 
      # Check for 'builtin' annotation
-     if 'builtin' in annotationNames:
+     if 'builtin' in decl.annotationStrings():
 
         # Create a builtin function
-        func = ca_function.createFunction(inputTypeArr,decl.outputType)
+        func = ca_function.createFunction(inputTypes, outputType)
         func.name = decl.id.text
         func.pythonEvaluate = PLACEHOLDER_FUNC_FOR_BUILTINS
 
-        self.builder.createConstant(value=func, name=func.name)
+        self.builder.createConstant(value=func, name=decl.id.text)
         return
 
      # Create a new subroutine object
-     sub = code.SubroutineDefinition(input_names=arg_names)
+     sub = code.SubroutineDefinition(input_names=decl.inputNames())
 
      # open a block
      code_block = blocks.CodeUnitBlock(self.builder, sub.code_unit)
@@ -193,6 +186,18 @@ class Parser(object):
 
      # store this guy in a constant term
      subroutine_constant = self.builder.createConstant(value=sub, name=decl.id.text)
+
+  def attribute_decl(self):
+     self.tokens.consume(ATTRIBUTE)
+     decl = syntax.function_decl(self.tokens)
+
+     inputTypes = map(self.getTypeFromToken, decl.inputTypes())
+     outputType = self.getTypeFromToken(decl.outputType)
+
+     funcObject = ca_function.createFunction(inputTypes, outputType)
+     funcObject.name = decl.id.text
+     funcObject.pythonEvaluate = PLACEHOLDER_FUNC_FOR_ATTRIBUTES
+     self.builder.createConstant(value=funcObject, name=decl.id.text)
 
   def return_statement(self):
      return_token = self.tokens.consume(RETURN)
@@ -240,5 +245,18 @@ class Parser(object):
 
   def immediateCommand(self):
       pass
+
+  def getTypeFromToken(self, token):
+
+     typeTerm = self.builder.getNamed(token.text)
+
+     if typeTerm is None:
+        raise parse_errors.IdentifierNotFound(token)
+
+     if typeTerm.getType() is not builtins.TYPE_TYPE:
+        raise parse_errors.IdentifierIsNotAType(token)
+
+     return typeTerm
+      
 
 
