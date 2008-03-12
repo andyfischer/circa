@@ -1,0 +1,14 @@
+
+Attribute functions are essentially hashtables
+
+They are declared like this
+
+attribute myAttribute(type -> type)
+
+They can have default values (not sure of syntax)
+
+Specific values are overridden, like so:
+
+myAttribute(input) := value
+
+Both "input" and "value" can be complex expressions (we use whatever the result terms are)

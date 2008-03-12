@@ -2,9 +2,10 @@
 import pdb, sys, traceback
 
 from Circa import (
-  ca_function,
-  code,
-  token
+   builtins,
+   ca_function,
+   code,
+   token
 )
 
 from Circa.parser import expression as expression_module
@@ -70,6 +71,7 @@ class Parser(object):
     paths = {}
     paths[TYPE] = self.type_decl
     paths[IF] = self.if_statement
+    paths[ATTRIBUTE] = self.attribute_decl
     paths[FUNCTION] = self.function_decl
     paths[RETURN] = self.return_statement
     paths[RBRACKET] = self.right_bracket
@@ -96,122 +98,109 @@ class Parser(object):
     raise parse_errors.NotAStatement(next_token)
 
   def type_decl(self):
-     parsedDecl = syntax.type_decl(self.tokens)
+     decl = syntax.type_decl(self.tokens)
 
+     name = decl.id.text
+     annotationNames = map(lambda a: a.text, decl.annotations)
+
+     # Handle a built-in type
+     if "builtin" in annotationNames:
+        return self.builder.createConstant(value=None, name = name, type=builtins.TYPE_TYPE)
+
+     # Handle composite type
+     # todo
+
+     # Handle specialize type
      # todo
 
   def if_statement(self):
-    if VERBOSE_DEBUGGING: print "Parsing if_statement"
+     if VERBOSE_DEBUGGING: print "Parsing if_statement"
 
-    self.tokens.consume(IF)
-    self.tokens.startSkipping(NEWLINE)
+     self.tokens.consume(IF)
+     self.tokens.startSkipping(NEWLINE)
 
-    self.tokens.consume(LPAREN)
+     self.tokens.consume(LPAREN)
 
-    # parse the condition expression
-    first_condition_token = self.tokens.next()
-    condition_expr = self.expression()
-    condition_term = condition_expr.eval(self.builder)
+     # parse the condition expression
+     first_condition_token = self.tokens.next()
+     condition_expr = self.expression()
+     condition_term = condition_expr.eval(self.builder)
 
-    if condition_term == None:
-      raise parse_errors.ExpectedExpression(first_condition_token)
+     if condition_term == None:
+       raise parse_errors.ExpectedExpression(first_condition_token)
     
-    self.tokens.consume(RPAREN)
+     self.tokens.consume(RPAREN)
 
-    # create a group & block
-    cond_group = self.builder.newConditionalGroup(condition_term)
-    cond_block = cond_group.newBlock()
-    assert cond_block is not None
+     # create a group & block
+     cond_group = self.builder.newConditionalGroup(condition_term)
+     cond_block = cond_group.newBlock()
+     assert cond_block is not None
 
-    self.block(cond_block)
+     self.block(cond_block)
 
-    if VERBOSE_DEBUGGING:
-      print "Finished if block, next token is: " + str(self.tokens.next())
+     if VERBOSE_DEBUGGING:
+        print "Finished if block, next token is: " + str(self.tokens.next())
 
-    if self.tokens.nextIs(ELSE):
-      if VERBOSE_DEBUGGING: print "Parsing else block"
-      self.tokens.startSkipping(NEWLINE)
-      self.tokens.consume(ELSE)
+     if self.tokens.nextIs(ELSE):
+        if VERBOSE_DEBUGGING: print "Parsing else block"
+        self.tokens.startSkipping(NEWLINE)
+        self.tokens.consume(ELSE)
 
-      else_block = cond_group.newBlock(isDefault = True)
+        else_block = cond_group.newBlock(isDefault = True)
 
-      self.block(else_block)
+        self.block(else_block)
 
-    cond_group.finish()
-
-  # Returns instance of Argument
-  def function_argument(self):
-    arg = Argument()
-    arg.type = self.tokens.consume(IDENT)
-    if self.tokens.nextIs(IDENT):
-      arg.id = self.tokens.consume(IDENT)
-    return arg
+     cond_group.finish()
 
   def function_decl(self):
-    self.tokens.consume(FUNCTION)
-    function_id = self.tokens.consume(IDENT)
-    self.tokens.consume(LPAREN)
+     decl = syntax.function_decl(self.tokens)
 
-    # collect arguments
+     def getArgName(arg): return arg.getNameStr()
+     arg_names = map(getArgName, decl.args)
+     annotationNames = map(lambda a: a.text, decl.annotations)
 
-    args = []
-    if self.tokens.nextIs(IDENT):
-      args.append(self.function_argument())
+     # Get a list of input types
+     def getInputType(arg):
+        typeName = arg.type
 
-    while self.tokens.nextIs(COMMA):
-      self.tokens.consume(COMMA)
-      args.append(self.function_argument())
+        typeTerm = self.builder.getNamed(typeName.text)
 
-    # check for output type
-    outputType = None
-    if self.tokens.nextIs(RIGHT_ARROW):
-      self.tokens.consume(RIGHT_ARROW)
-      self.tokens.outputType = self.tokens.consume(IDENT)
+        if typeTerm is None:
+           raise parse_errors.IdentifierNotFound(typeName)
 
-    self.tokens.consume(RPAREN)
+        if typeTerm.getType() is not builtins.TYPE_TYPE:
+           raise parse_errors.IdentifierIsNotAType(typeName)
 
-    # check for attributes
-    attributes = []
-    while self.tokens.nextIs(COLON):
-      self.tokens.consume(COLON)
-      attributes.append( self.tokens.consume(IDENT) )
+     inputTypeArr = map(getInputType, decl.args)
 
-    arg_names = map(Argument.getNameStr, args)
-    attribute_names = map(lambda a: a.text, attributes)
+     # Check for 'builtin' annotation
+     if 'builtin' in annotationNames:
 
-    # Check for 'builtin' attribute
-    if 'builtin' in attribute_names:
+        # Create a builtin function
+        func = ca_function.createFunction(inputTypeArr,decl.outputType)
+        func.name = decl.id.text
+        func.pythonEvaluate = PLACEHOLDER_FUNC_FOR_BUILTINS
 
-      # Create a builtin function
-      inputTypeArr = map(lambda arg: self.builder.getNamed(arg.type.text), args) 
-      outputTypeArr = []
-      if outputType:
-        outputTypeArr = [self.builder.getNamed(outputType.text)]
+        self.builder.createConstant(value=func, name=func.name)
+        return
 
-      func = ca_function.createFunction(inputTypeArr,outputTypeArr)
-      func.name = function_id.text
-      func.pythonEvaluate = PLACEHOLDER_FUNC_FOR_BUILTINS
+     # Create a new subroutine object
+     sub = code.SubroutineDefinition(input_names=arg_names)
 
-      self.builder.createConstant(value=func, name=func.name)
-      return
+     # open a block
+     code_block = blocks.CodeUnitBlock(self.builder, sub.code_unit)
+     self.block(code_block)
 
-    # Create a new subroutine object
-    sub = code.SubroutineDefinition(input_names=arg_names)
-
-    # open a block
-    code_block = blocks.CodeUnitBlock(self.builder, sub.code_unit)
-    self.block(code_block)
-
-    # store this guy in a constant term
-    subroutine_constant = self.builder.createConstant(value=sub, name=function_id.text)
+     # store this guy in a constant term
+     subroutine_constant = self.builder.createConstant(value=sub, name=decl.id.text)
 
   def return_statement(self):
-    return_token = self.tokens.consume(RETURN)
-    expr = self.expression()
-    if not expr:
-      raise parse_errors.ExpectedExpression(return_token)
+     return_token = self.tokens.consume(RETURN)
+     expr = self.expression()
+     if not expr:
+        raise parse_errors.ExpectedExpression(return_token)
 
-    self.bind(SPECIAL_NAME_FOR_RETURNS, expr.eval(self.builder))
+     self.bind(SPECIAL_NAME_FOR_RETURNS, expr.eval(self.builder))
 
   def block(self, blockToStart):
     if VERBOSE_DEBUGGING: print "Parsing block"
@@ -252,12 +241,4 @@ class Parser(object):
   def immediateCommand(self):
       pass
 
-class Argument(object):
-  def __init__(self):
-    self.type = None
-    self.id = None
-
-  def getNameStr(self):
-    if self.id is None: return None
-    return self.id.text
 

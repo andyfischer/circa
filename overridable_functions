@@ -1,14 +1,13 @@
 
-Need a way to 'override' a function call. This can be used to create things that
-act like members.
+= Overriding Functions =
 
-This requires:
-a) A mechanism for declaring a function as overridable
-b) Handling the actual override of a function (with equals notation)
-c) A way to specify the default of a function
-d) A way for the code to intelligently figure out what needs to be reevaluated,
-when an override occurs.
+If a user only has a function name, this gives them an UnspecializedFunction object
 
-This is a layer B operation. What are the alternatives to do this instead in layer A?
+By providing the input signature, the UnspecializedFunction can give them a specific function (or it can fail).
+
+* Add code for pattern matching?
+* Want to allow room for the specialization function to be defined by the user. Then they can do whatever they want.
+
+When the user defines a new function for a different set of types, this is added to the UnspecializedFunction object.
 
 
