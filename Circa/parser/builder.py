@@ -96,15 +96,11 @@ class Builder(object):
     if name: self.bindName(name, new_term)
     return new_term
 
-  constant = createConstant
-
   def createVariable(self, value, name=None, **term_options):
     new_term = self.code_unit.createVariable(value, term_options)
     self.bindName(name, new_term)
     return new_term
 
-  variable = createVariable
-    
   def currentBlock(self):
     try: return self.blockStack[-1]
     except IndexError: return None

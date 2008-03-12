@@ -198,17 +198,24 @@ class CodeUnit(object):
 
 
 def printTermsFormatted(branch, printer, term_names):
-  for term in branch:
+
+   def getTermLabel(term):
+      if term.isConstant():
+         return "[constant] " + str(term.pythonValue)
+      else:
+         return term.getSomeName()
+   
+   for term in branch:
 
     # Skip constants
-    #if values.isConstant(term):
-      #continue
+    if term.isConstant():
+      continue
 
     text = term.getSomeName() + ": " + term.functionTerm.getSomeName()
 
     if term.inputs:
       text += " ("
-      text += ",".join(map(term_module.Term.getSomeName, term.inputs))
+      text += ", ".join(map(getTermLabel, term.inputs))
       text += ")"
  
     printer.println(text)
