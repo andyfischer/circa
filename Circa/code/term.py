@@ -1,6 +1,7 @@
 import pdb
 
 from Circa import (
+  builtins,
   ca_function
 )
 
@@ -9,7 +10,7 @@ nextGlobalID = 1
 
 class Term(object):
   def __init__(self):
-    "Use 'createTerm'. This constructor should be called by almost nobody."
+    "Use 'createTerm' instead of calling this constructor"
 
     self.inputs = []
     self.functionTerm = None
@@ -114,6 +115,12 @@ class Term(object):
   def equals(self, term):
     assert isinstance(term, Term)
     return self.pythonValue == term.pythonValue
+
+  def isConstant(self):
+     return self.functionTerm.isConstantFunction()
+
+  def isConstantFunction(self):
+     return self.functionTerm is builtins.CONST_FUNC
 
   # value accessors
   def __int__(self):

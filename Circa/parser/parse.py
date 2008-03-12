@@ -174,8 +174,7 @@ class Parser(object):
         func.name = decl.id.text
         func.pythonEvaluate = PLACEHOLDER_FUNC_FOR_BUILTINS
 
-        self.builder.createConstant(value=func, name=decl.id.text)
-        return
+        return self.builder.createConstant(value=func, name=decl.id.text)
 
      # Create a new subroutine object
      sub = code.SubroutineDefinition(input_names=decl.inputNames())
@@ -185,7 +184,7 @@ class Parser(object):
      self.block(code_block)
 
      # store this guy in a constant term
-     subroutine_constant = self.builder.createConstant(value=sub, name=decl.id.text)
+     return self.builder.createConstant(value=sub, name=decl.id.text)
 
   def attribute_decl(self):
      self.tokens.consume(ATTRIBUTE)
