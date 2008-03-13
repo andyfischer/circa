@@ -69,7 +69,7 @@ class Infix(Node):
     # try to find a defined operator
     normalFunction = getOperatorFunction(self.token.match)
     if normalFunction is not None:
-        return builder.createTerm(normalFunction,
+       return builder.createTerm(normalFunction,
           inputs=[self.left.eval(builder), self.right.eval(builder)] )
 
     # evaluate as a function + assign?
@@ -207,110 +207,110 @@ class Function(Node):
           "Term " + self.function_name.text + " is not a function.")
 
   def getFirstToken(self):
-    return self.function_name;
+     return self.function_name;
 
 class MatchFailed(Exception):
-  pass
+   pass
 
 
 def infix_expression(tokens, precedence):
-  if (precedence > HIGHEST_INFIX_PRECEDENCE):
-    return unary_expression(tokens)
+   if (precedence > HIGHEST_INFIX_PRECEDENCE):
+      return unary_expression(tokens)
 
-  expr = infix_expression(tokens, precedence + 1)
-  if not expr: return None
+   expr = infix_expression(tokens, precedence + 1)
+   if not expr: return None
 
-  while getInfixPrecedence(tokens.next()) == precedence:
-    operator = tokens.consume()
+   while getInfixPrecedence(tokens.next()) == precedence:
+      operator = tokens.consume()
 
-    first_righthand_token = tokens.next()
-    right_expr = infix_expression(tokens, precedence + 1)
+      first_righthand_token = tokens.next()
+      right_expr = infix_expression(tokens, precedence + 1)
 
-    if not right_expr:
-      raise parse_errors.InternalError(first_righthand_token)
+      if not right_expr:
+         raise parse_errors.InternalError(first_righthand_token)
 
-    expr = Infix(operator, expr, right_expr)
+      expr = Infix(operator, expr, right_expr)
 
-  return expr
+   return expr
 
 def unary_expression(tokens):
-  if tokens.nextIs(MINUS):
-    minus = tokens.consume(MINUS)
-    return Unary(minus, atom(tokens))
-  else:
-    return atom(tokens)
+   if tokens.nextIs(MINUS):
+      minus = tokens.consume(MINUS)
+      return Unary(minus, atom(tokens))
+   else:
+      return atom(tokens)
 
 def atom(tokens):
 
-  if VERBOSE_DEBUGGING:
-    print "atom, next = " + tokens.next().name()
+   if VERBOSE_DEBUGGING:
+      print "atom, next = " + tokens.next().name()
 
-  # function call
-  if tokens.nextIs(IDENT) and tokens.nextIs(LPAREN, lookahead=1):
-    return function_call(tokens)
+   # function call
+   if tokens.nextIs(IDENT) and tokens.nextIs(LPAREN, lookahead=1):
+      return function_call(tokens)
 
-  # literal
-  if tokens.nextIn((FLOAT, INTEGER, STRING)):
-    token = tokens.consume()
-    return Literal(token)
+   # literal
+   if tokens.nextIn((FLOAT, INTEGER, STRING)):
+      token = tokens.consume()
+      return Literal(token)
 
-  # identifier
-  if tokens.nextIs(IDENT):
-    token = tokens.consume()
-    return Ident(token)
+   # identifier
+   if tokens.nextIs(IDENT):
+      token = tokens.consume()
+      return Ident(token)
 
-  # parenthesized expression
-  if tokens.nextIs(LPAREN):
-    tokens.consume(LPAREN)
-    expr = infix_expression(tokens, 0)
-    tokens.consume(RPAREN)
-    return expr
+   # parenthesized expression
+   if tokens.nextIs(LPAREN):
+      tokens.consume(LPAREN)
+      expr = infix_expression(tokens, 0)
+      tokens.consume(RPAREN)
+      return expr
  
-  # failed to match
-  if VERBOSE_DEBUGGING:
-    print "atom failed to match"
+   # failed to match
+   if VERBOSE_DEBUGGING:
+      print "atom failed to match"
 
-  raise MatchFailed()
+   raise MatchFailed()
  
 def function_call(tokens):
-  function_name = tokens.consume(IDENT)
-  tokens.consume(LPAREN)
+   function_name = tokens.consume(IDENT)
+   tokens.consume(LPAREN)
 
-  args = []
+   args = []
 
-  if not tokens.nextIs(RPAREN):
-    args.append( infix_expression(tokens, 0) )
-
-    while tokens.nextIs(COMMA):
-      tokens.consume(COMMA)
+   if not tokens.nextIs(RPAREN):
       args.append( infix_expression(tokens, 0) )
 
-  tokens.consume(RPAREN)
+      while tokens.nextIs(COMMA):
+         tokens.consume(COMMA)
+         args.append( infix_expression(tokens, 0) )
 
-  return Function(function_name, args)
+   tokens.consume(RPAREN)
+
+   return Function(function_name, args)
  
 def parseStringLiteral(text):
-  # the literal should have ' or " marks on either side, strip these
-  return text.strip("'\"")
+   # the literal should have ' or " marks on either side, strip these
+   return text.strip("'\"")
 
 def getOperatorFunction(token):
-    circaObj = pythonTokenToBuiltin(token)
+   circaObj = pythonTokenToBuiltin(token)
 
-    if circaObj is None:
-        print "Notice: couldn't find an operator func for " + token.raw_string
-        return None
+   if circaObj is None:
+       print "Notice: couldn't find an operator func for " + token.raw_string
+       return None
 
-    return code.findExisting(builtins.OPERATOR_FUNC,
-          inputs=[pythonTokenToBuiltin(token)])
+   return code.findExisting(builtins.OPERATOR_FUNC,
+         inputs=[pythonTokenToBuiltin(token)])
 
 def getAssignOperatorFunction(token):
-    circaObj = pythonTokenToBuiltin(token)
-    if circaObj is None:
-        print "Notice: couldn't find an assign operator func for " + token.raw_string
-        return None
-    return code.findExisting(builtins.ASSIGN_OPERATOR_FUNC,
-          inputs=[pythonTokenToBuiltin(token)])
+   circaObj = pythonTokenToBuiltin(token)
+   if circaObj is None:
+       print "Notice: couldn't find an assign operator func for " + token.raw_string
+       return None
+   return code.findExisting(builtins.ASSIGN_OPERATOR_FUNC,
+         inputs=[pythonTokenToBuiltin(token)])
 
 def pythonTokenToBuiltin(token):
-    token_string = builtins.BUILTINS.createConstant(token.raw_string)
-    return builtins.BUILTINS.getTerm(builtins.TOKEN_FUNC, inputs=[token_string])
+   token_string = builtins.BUILTINS.createConstant(token.raw_string)
+   return builtins.BUILTINS.getTerm(builtins.TOKEN_FUNC, inputs=[token_string])

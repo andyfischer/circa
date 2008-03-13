@@ -58,7 +58,8 @@ class Builder(object):
 
     self.currentBlock().bindLocal(name, target_term)
 
-    target_term.givenName = name
+    if name is not None:
+       target_term.givenName = name
 
   def startBlock(self, block):
     # 'block' can be a type, if so, instantiate it here
@@ -82,7 +83,7 @@ class Builder(object):
     if branch is None:
       branch = self.currentBlock().branch
 
-    new_term = self.code_unit.createTerm(function, branch=branch, **options)
+    new_term = self.code_unit.createTerm(function, branch=branch, name=name, **options)
     assert(new_term != None)
     if name: self.bindName(name, new_term)
     return new_term
