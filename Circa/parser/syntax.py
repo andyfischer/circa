@@ -36,9 +36,7 @@ def type_decl(tokens):
       decl.baseType = tokens.consume(IDENT)
 
    # Parse annotations
-   while tokens.nextIs(COLON):
-      tokens.consume(COLON)
-      decl.annotations.append(tokens.consume(IDENT))
+   decl.annotations = annotation_list(tokens)
 
    tokens.stopSkipping(NEWLINE)
 
@@ -86,9 +84,7 @@ def function_decl(tokens):
    tokens.consume(RPAREN)
 
    # Check for annotations
-   while tokens.nextIs(COLON):
-      tokens.consume(COLON)
-      decl.annotations.append(tokens.consume(IDENT))
+   decl.annotations = annotation_list(tokens)
       
    return decl
 
@@ -101,3 +97,17 @@ def function_argument(tokens):
       id = tokens.consume(IDENT)
    return (type,id)
 
+# Parse a list of annotations surrounded by []s
+# Returns an empty list if none are found
+def annotation_list(tokens):
+   if not tokens.nextIs(LBRACE):
+      return []
+
+   tokens.consume(LBRACE)
+   annotationList = []
+
+   while not tokens.nextIs(RBRACE):
+      annotationList.append(tokens.consume(IDENT))
+
+   tokens.consume(RBRACE)
+   return annotationList
