@@ -41,29 +41,29 @@ class Node(object):
 
 class Infix(Node):
   def __init__(self, function_token, left, right):
-    assert isinstance(function_token, token.Token)
-    assert isinstance(left, Node)
-    assert isinstance(right, Node)
+     assert isinstance(function_token, token.Token)
+     assert isinstance(left, Node)
+     assert isinstance(right, Node)
 
-    self.token = function_token
-    self.left = left
-    self.right = right
+     self.token = function_token
+     self.left = left
+     self.right = right
 
   def eval(self, builder):
 
     # evaluate as initialize?
     if self.token.match is COLON_EQUALS:
-      left_term = self.left.eval(builder)
-      right_term = self.right.eval(builder)
-      left_term.pythonValue = right_term.pythonValue
-      return None
+       left_term = self.left.eval(builder)
+       right_term = self.right.eval(builder)
+       left_term.pythonValue = right_term.pythonValue
+       return None
 
     # evaluate as an assignment?
     if self.token.match == EQUALS:
-      right_term = self.right.eval(builder)
-      if not isinstance(right_term, code.Term):
-        raise ParseError("Expression did not evaluate to a term: " + str(self.right), self.getFirstToken())
-      return builder.bindName(self.left.getName(), right_term)
+       right_term = self.right.eval(builder)
+       if not isinstance(right_term, code.Term):
+          raise ParseError("Expression did not evaluate to a term: " + str(self.right), self.getFirstToken())
+       return builder.bindName(self.left.getName(), right_term)
 
     # normal function?
     # try to find a defined operator
@@ -75,12 +75,12 @@ class Infix(Node):
     # evaluate as a function + assign?
     assignFunction = getAssignOperatorFunction(self.token.match)
     if assignFunction is not None:
-      # create a term that's the result of the operation
-      result_term = builder.createTerm(assignFunction,
+       # create a term that's the result of the operation
+       result_term = builder.createTerm(assignFunction,
           inputs=[self.left.eval(builder), self.right.eval(builder)])
 
-      # bind the name to this result
-      return builder.bindName(self.left.getName(), result_term)
+       # bind the name to this result
+       return builder.bindName(self.left.getName(), result_term)
 
 
     """
