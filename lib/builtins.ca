@@ -1,3 +1,5 @@
+type Ref [builtin]
+type Token [builtin]
 
 function constant(Type -> Function) [builtin]
 function variable(Type -> Function) [builtin]
@@ -15,13 +17,13 @@ function input(-> string) [builtin]
 function assert(bool) [builtin]
 function and(bool, bool -> bool) [builtin]
 function or(bool, bool -> bool) [builtin]
-function if_expr(bool, any, any -> any) [builtin]
+function if_expr(bool, Ref, Ref -> Ref) [builtin]
 function placeholder() [builtin]
 function add(float, float -> float) [builtin]
 function sub(float, float -> float) [builtin]
 function mult(float, float -> float) [builtin]
 function div(float, float -> float) [builtin]
-function assign(any, any) [builtin]
+function assign(Ref, Ref) [builtin]
 function concat(string, string ->string) [builtin]
 function subroutine() [builtin]
 function constant() [builtin]
@@ -29,7 +31,6 @@ function variable() [builtin]
 function break() [builtin]
 
 // Metaprogramming functions
-type Token [builtin]
 function token(string -> Token) [builtin]
 attribute operator(Token -> Function)
 attribute assign_operator(Token -> Function)

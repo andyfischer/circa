@@ -111,7 +111,6 @@ def installFunc(name, func):
 
 def tokenEvaluate(s):
     return token.definitions.STRING_TO_TOKEN[s]
-installFunc("token", tokenEvaluate)
 
 def printEvaluate(s): print s
 def getInputEvaluate():
@@ -127,6 +126,7 @@ def multEvaluate(a,b): return a * b
 def divEvaluate(a,b): return a / b
 def breakEvaluate(a,b): pdb.set_trace()
 def emptyFunc(): pass
+installFunc("token", tokenEvaluate)
 installFunc("print", printEvaluate)
 installFunc("get_input", getInputEvaluate)
 installFunc("assert", assertEvaluate)
@@ -139,6 +139,7 @@ installFunc("div", divEvaluate)
 installFunc("break", breakEvaluate)
 installFunc("invokeSubroutine", emptyFunc)
 
-# Read in parsing.ca
+# Install builtin libraries
 installLibFile("parsing.ca")
+installLibFile("containers.ca")
 
