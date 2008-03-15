@@ -2,7 +2,8 @@ import tokenize
 from Circa.parser import parse_errors
 from definitions import *
 
-COMMENT_START = DOUBLE_SLASH
+def isCommentStart(token):
+   return token.match == DOUBLE_SLASH or token.match == POUND
 
 def asTokenStream(source):
   """
@@ -69,7 +70,7 @@ class TokenStream(object):
       token = self.tokens[index]
 
       # Check to start a comment
-      if token.match is COMMENT_START:
+      if isCommentStart(token):
         currentlyInComment = True
 
       # Check to finish comment

@@ -31,11 +31,15 @@ class CodeUnit(object):
 
   def getTerm(self, functionTerm, inputs, **term_options):
 
-    existing_term = term_utils.findExisting(functionTerm, inputs)
-    if existing_term:
-      return existing_term
+     resultFromFunction = functionTerm.pythonValue.pythonFindExisting(inputs)
+     if resultFromFunction is not None:
+        return resultFromFunction
 
-    return self.createTerm(functionTerm, inputs, **term_options)
+     equivalentExisting = term_utils.findExisting(functionTerm, inputs)
+     if equivalentExisting:
+        return equivalentExisting
+
+     return self.createTerm(functionTerm, inputs, **term_options)
 
   def createTerm(self, functionTerm, inputs=None, branch=None, name=None,
       initialValue=None, sourceToken=None):
