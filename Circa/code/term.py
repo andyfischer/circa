@@ -69,15 +69,15 @@ class Term(object):
       printer.prints("%i: %s" % (self.globalID, self.functionTerm.pythonValue.name))
   
       if self.pythonValue:
-        printer.prints(" " + str(self.pythonValue))
+         printer.prints(" " + str(self.pythonValue))
   
       printer.prints(" [")
   
       first_item = True
       for input in self.inputs:
-        if not first_item: printer.prints(",")
-        printer.prints(input.globalID)
-        first_item = False
+         if not first_item: printer.prints(",")
+         printer.prints(input.globalID)
+         first_item = False
       printer.prints("]")
   
       printer.println()
@@ -91,26 +91,26 @@ class Term(object):
   
           # (maybe) label the branch index
           if label_branches:
-            printer.indent(1)
-            printer.println('Branch %i:' % branch_index)
-            printer.indent(1)
+             printer.indent(1)
+             printer.println('Branch %i:' % branch_index)
+             printer.indent(1)
           else:
-            printer.indent(2)
+             printer.indent(2)
   
           # print inner terms
           if branch.terms:
-            for term in branch.terms:
-              term.printExtended(printer)
+             for term in branch.terms:
+                term.printExtended(printer)
           else:
-            printer.println("(empty)")
+             printer.println("(empty)")
   
           printer.unindent(2)
  
    def iterate(self, forwards=True):
       yield self
       if self.branch:
-        for term in self.branch:
-          yield term
+         for term in self.branch:
+            yield term
   
    def equals(self, term):
       assert isinstance(term, Term)
