@@ -1,4 +1,4 @@
 
 
 class Type(object):
-  pass
+   pass

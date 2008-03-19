@@ -102,24 +102,24 @@ builtins.TRAINING_FUNC = ...
 
 # Fill in definitions for all builtin functions
 def installFunc(name, func):
-    wrappedFunc = python_bridge.wrapPythonFuncToEvaluate(func)
-    targetTerm = builtins.BUILTINS.getNamedTerm(name)
+   wrappedFunc = python_bridge.wrapPythonFuncToEvaluate(func)
+   targetTerm = builtins.BUILTINS.getNamedTerm(name)
 
-    # Make sure nothing else has been installed
-    if targetTerm.pythonValue.pythonEvaluate is not parser.PLACEHOLDER_FUNC_FOR_BUILTINS:
-        raise Exception("Term " + name + " already has a builtin function installed")
+   # Make sure nothing else has been installed
+   if targetTerm.pythonValue.pythonEvaluate is not parser.PLACEHOLDER_FUNC_FOR_BUILTINS:
+      raise Exception("Term " + name + " already has a builtin function installed")
 
-    targetTerm.pythonValue.pythonEvaluate = wrappedFunc
+   targetTerm.pythonValue.pythonEvaluate = wrappedFunc
 
 def tokenEvaluate(s):
-    return token.definitions.STRING_TO_TOKEN[s]
+   return token.definitions.STRING_TO_TOKEN[s]
 
 def printEvaluate(s): print s
 def getInputEvaluate():
-    return raw_input("> ")
+   return raw_input("> ")
 def assertEvaluate(b): 
-    if not b:
-        print "Assertion failure!"
+   if not b:
+      print "Assertion failure!"
 def equalsEvaluate(a,b): return a == b
 def nequalsEvaluate(a,b): return a != b
 def addEvaluate(a,b): return a + b
