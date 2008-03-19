@@ -5,7 +5,7 @@ class Function(object):
       self.outputType = None
       self.hasBranch = False
       self.pureFunction = pureFunction
-      self.forceUnique = False
+      self.isGenerator = False
 
    # pythonFindExisting is called right before term creation would occur.
    # If this function returns not-None, then the builder will use the
@@ -13,8 +13,12 @@ class Function(object):
    # in situations where we are looking for an existing term but not 
    # planning on creating one.
 
-   def pythonFindExisting(inputs):
+   def pythonFindExisting(self, inputs):
       return None
+
+   # pythonInit is called once per term, right after the term is created
+   def pythonInit(self, term):
+      pass
 
    def pythonEvaluate(self, term):
       pass

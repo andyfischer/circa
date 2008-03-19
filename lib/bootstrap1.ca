@@ -1,0 +1,34 @@
+type Ref [builtin]
+type Token [builtin]
+
+function constant(Type -> Function) [builtin]
+function variable(Type -> Function) [builtin]
+
+function map(Type inputType, Type outputType -> Function) [builtin, generator]
+
+function invokeSubroutine() [builtin]
+
+// Functions
+function cond_branch(bool condition) [builtin]
+function simple_branch() [builtin]
+function equals(-> bool) [builtin]
+function not_equals(-> bool) [builtin]
+function print(string) [builtin]
+function get_input(-> string) [builtin]
+function input(-> string) [builtin]
+function assert(bool) [builtin]
+function and(bool, bool -> bool) [builtin]
+function or(bool, bool -> bool) [builtin]
+function if_expr(bool, Ref, Ref -> Ref) [builtin]
+function placeholder() [builtin]
+function add(float, float -> float) [builtin]
+function sub(float, float -> float) [builtin]
+function mult(float, float -> float) [builtin]
+function div(float, float -> float) [builtin]
+function assign(Ref, Ref) [builtin]
+function concat(string, string ->string) [builtin]
+function subroutine() [builtin]
+function constant() [builtin]
+function variable() [builtin]
+function break() [builtin]
+
