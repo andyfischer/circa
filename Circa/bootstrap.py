@@ -97,6 +97,8 @@ builtins.TOKEN_FUNC = builtins.BUILTINS.getNamedTerm("token")
 builtins.OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
 builtins.ASSIGN_OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("assign_operator")
 builtins.INVOKE_SUB_FUNC = builtins.BUILTINS.getNamedTerm("invokeSubroutine")
+builtins.REF_TYPE = builtins.BUILTINS.getNamedTerm("Ref")
+builtins.TRAINING_FUNC = ...
 
 # Fill in definitions for all builtin functions
 def installFunc(name, func):
@@ -141,5 +143,4 @@ installFunc("invokeSubroutine", emptyFunc)
 
 # Install builtin libraries
 installLibFile("parsing.ca")
-installLibFile("containers.ca")
 

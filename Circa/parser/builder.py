@@ -92,7 +92,7 @@ class Builder(object):
     if branch is None:
       branch = self.currentBlock().branch
 
-    new_term = self.code_unit.createConstant(value, branch=branch, **options)
+    new_term = self.code_unit.createConstant(value, branch=branch, name=name, **options)
     assert(new_term != None)
     if name: self.bindName(name, new_term)
     return new_term
@@ -101,6 +101,12 @@ class Builder(object):
     new_term = self.code_unit.createVariable(value, term_options)
     self.bindName(name, new_term)
     return new_term
+
+  def createTrainingTerm(self, function, inputs):
+     assert function is not None
+     trainingFunc = self.code_unit.getTerm(builtins.TRAINING_FUNC, inputs=[function])
+     return self.code_unit.createTerm(trainingFunc, inputs=inputs,
+                                      branch = self.currentBlock().branch)
 
   def currentBlock(self):
     try: return self.blockStack[-1]

@@ -16,10 +16,6 @@ class Function(object):
   def pythonFindExisting(inputs):
      return None
 
-  # pythonInit is called once, immediately after a term is created.
-  def pythonInit(self, term):
-     pass
-
   def pythonEvaluate(self, term):
      pass
  

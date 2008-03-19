@@ -109,5 +109,8 @@ def annotation_list(tokens):
    while not tokens.nextIs(RBRACE):
       annotationList.append(tokens.consume(IDENT))
 
+      if tokens.nextIs(COMMA):
+         tokens.consume(COMMA)
+
    tokens.consume(RBRACE)
    return annotationList
