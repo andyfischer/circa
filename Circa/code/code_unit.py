@@ -14,10 +14,10 @@ import term_utils
 import term as term_module
 
 from Circa import (
-  builtins,
-  ca_function,
-  common_errors,
-  python_bridge
+   builtins,
+   ca_function,
+   common_errors,
+   python_bridge
 )
 
 from Circa.utils import indent_printer
@@ -25,80 +25,80 @@ from Circa.utils import indent_printer
 VERBOSE_DEBUGGING = False
 
 class CodeUnit(object):
-  def __init__(self):
-    self.main_branch = []
-    self.term_namespace = {}
-
-  def getTerm(self, functionTerm, inputs, **term_options):
-
-     resultFromFunction = functionTerm.pythonValue.pythonFindExisting(inputs)
-     if resultFromFunction is not None:
-        return resultFromFunction
-
-     equivalentExisting = term_utils.findExisting(functionTerm, inputs)
-     if equivalentExisting:
-        return equivalentExisting
-
-     return self.createTerm(functionTerm, inputs, **term_options)
-
-  def createTerm(self, functionTerm, inputs=None, branch=None, name=None,
-      initialValue=None, sourceToken=None):
-
-    # Create a new term
-    term = term_module.Term()
-    term.functionTerm = functionTerm
-    term.sourceToken = sourceToken
-    term.pythonValue = initialValue
-    term.codeUnit = self
-
-    circaFunction = functionTerm.pythonValue
-
-    # Check to create a branch
-    if circaFunction.hasBranch:
-        term.branch = []
-
-    # Add term to function's users
-    functionTerm.users.add(term)
-
-    if inputs:
-      # If they use any non-term args, convert them to constants
-      self.setTermInputs(term, inputs)
-
-    if name:
-      self.setTermName(term, name)
-
-    # Evaluate immediately (in some cases)
-    if (initialValue is None) and (circaFunction.pureFunction):
-        term.pythonEvaluate()
-
-    if branch is None: branch = self.main_branch
-    branch.append(term)
-
-    return term
+   def __init__(self):
+      self.main_branch = []
+      self.term_namespace = {}
+ 
+   def getTerm(self, functionTerm, inputs, **term_options):
+ 
+      resultFromFunction = functionTerm.pythonValue.pythonFindExisting(inputs)
+      if resultFromFunction is not None:
+         return resultFromFunction
+ 
+      equivalentExisting = term_utils.findExisting(functionTerm, inputs)
+      if equivalentExisting:
+         return equivalentExisting
+ 
+      return self.createTerm(functionTerm, inputs, **term_options)
+ 
+   def createTerm(self, functionTerm, inputs=None, branch=None, name=None,
+       initialValue=None, sourceToken=None):
+ 
+     # Create a new term
+     term = term_module.Term()
+     term.functionTerm = functionTerm
+     term.sourceToken = sourceToken
+     term.pythonValue = initialValue
+     term.codeUnit = self
+ 
+     circaFunction = functionTerm.pythonValue
+ 
+     # Check to create a branch
+     if circaFunction.hasBranch:
+         term.branch = []
+ 
+     # Add term to function's users
+     functionTerm.users.add(term)
+ 
+     if inputs:
+        # If they use any non-term args, convert them to constants
+        self.setTermInputs(term, inputs)
+ 
+     if name:
+        self.setTermName(term, name)
+ 
+     # Evaluate immediately (in some cases)
+     if (initialValue is None) and (circaFunction.pureFunction):
+         term.pythonEvaluate()
+ 
+     if branch is None: branch = self.main_branch
+     branch.append(term)
+ 
+     return term
 
 
   def createConstant(self, value, name=None, branch=None,
         sourceToken=None, type=None):
 
     if type is None and value is None:
-      raise Exception("Either type or value needs to be not-None")
+       raise Exception("Either type or value needs to be not-None")
 
     if type is None:
-      type = python_bridge.typeOfPythonObj(value)
+       type = python_bridge.typeOfPythonObj(value)
 
     if type is None:
-      raise Exception("Couldn't find a type for value: " + str(value))
+       raise Exception("Couldn't find a type for value: " + str(value))
 
     # Get constant function for this type
     constFunc = term_utils.findExisting(builtins.CONST_FUNC, inputs=[type])
 
     # Create a constant function if it wasn't found
     if constFunc is None:
-      funcValue = ca_function.createFunction(inputs=[], output=type)
-      constFunc = self.createTerm(builtins.CONST_FUNC, inputs=[type],
-          initialValue=funcValue)
-      constFunc.debugName = "constant-" + type.getSomeName()
-      assert constFunc.pythonValue is not None
+       funcValue = ca_function.createFunction(inputs=[], output=type)
+       constFunc = self.createTerm(builtins.CONST_FUNC, inputs=[type],
+           initialValue=funcValue)
+       constFunc.debugName = "constant-" + type.getSomeName()
+       assert constFunc.pythonValue is not None
 
     # Look for an existing term
     existingTerm = term_utils.findExistingConstant(constFunc, value)
@@ -111,7 +111,7 @@ class CodeUnit(object):
         term = existingTerm
 
     if name:
-      self.setTermName(term, name)
+       self.setTermName(term, name)
 
     return term
 
@@ -121,13 +121,13 @@ class CodeUnit(object):
     assert isinstance(name, str)
 
     if (not allow_rename) and (name in self.term_namespace):
-      raise common_errors.UsageError("A term with name \""+str(name)+"\" already exists." +
+       raise common_errors.UsageError("A term with name \""+str(name)+"\" already exists." +
                        " (Use 'allow_rename' if you want to allow this)")
 
     if name in self.term_namespace:
-      self.term_namespace[name].givenName = None
-      # TODO, currently the 'givenName' variable will not behave if a term is given
-      # more than one name
+       self.term_namespace[name].givenName = None
+       # TODO, currently the 'givenName' variable will not behave if a term is given
+       # more than one name
 
     self.term_namespace[name] = term
     term.givenName = name
@@ -154,7 +154,7 @@ class CodeUnit(object):
 
     # remove ourselves from old user lists
     for t in newly_removed:
-      t.users.remove(target_term)
+       t.users.remove(target_term)
 
     self.onInputsChanged(target_term)
 
@@ -168,7 +168,7 @@ class CodeUnit(object):
 
     # add to new user list
     if is_newly_added:
-      target_term.users.add(new_input)
+       target_term.users.add(new_input)
 
     self.onInputsChanged(target_term)
   
@@ -182,8 +182,8 @@ class CodeUnit(object):
     if VERBOSE_DEBUGGING: print "code_unit.evaluate"
 
     for term in self.main_branch:
-      if VERBOSE_DEBUGGING: print "Calling evaluate on " + str(term)
-      term.pythonEvaluate()
+       if VERBOSE_DEBUGGING: print "Calling evaluate on " + str(term)
+       term.pythonEvaluate()
  
   def printTerms(self):
     term_names = {}
@@ -196,9 +196,9 @@ class CodeUnit(object):
   __getitem__ = getNamedTerm
   
   def iterateTerms(self):
-    for term in self.main_branch:
-      for t in term.iterate():
-        yield t
+     for term in self.main_branch:
+        for t in term.iterate():
+           yield t
 
 
 def printTermsFormatted(branch, printer, term_names):
@@ -213,14 +213,14 @@ def printTermsFormatted(branch, printer, term_names):
 
     # Skip constants
     if term.isConstant():
-      continue
+       continue
 
     text = term.getSomeName() + ": " + term.functionTerm.getSomeName()
 
     if term.inputs:
-      text += " ("
-      text += ", ".join(map(getTermLabel, term.inputs))
-      text += ")"
+       text += " ("
+       text += ", ".join(map(getTermLabel, term.inputs))
+       text += ")"
  
     printer.println(text)
  

@@ -83,22 +83,21 @@ builtins.BUILTINS.createConstant(name='false', value=False, type=builtins.BOOL_T
 
 # Load builtins.ca file into this code unit
 def installLibFile(filename):
-    file = open(os.path.join(CIRCA_HOME, "lib", filename), 'r')
-    file_contents = file.read()
-    file.close()
-    del file
-    parser.parse(parser.builder.Builder(target=builtins.BUILTINS),
+   file = open(os.path.join(CIRCA_HOME, "lib", filename), 'r')
+   file_contents = file.read()
+   file.close()
+   del file
+   parser.parse(parser.builder.Builder(target=builtins.BUILTINS),
             token.tokenize(file_contents), raise_errors=True)
-installLibFile("builtins.ca")
+installLibFile("bootstrap1.ca")
 
-# Access some objects were created in builtins.ca (and which need to be made available
+# Access some objects were created in Circa code (and which need to be made available
 # to Python code)
 builtins.TOKEN_FUNC = builtins.BUILTINS.getNamedTerm("token")
 builtins.OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("operator")
 builtins.ASSIGN_OPERATOR_FUNC = builtins.BUILTINS.getNamedTerm("assign_operator")
 builtins.INVOKE_SUB_FUNC = builtins.BUILTINS.getNamedTerm("invokeSubroutine")
 builtins.REF_TYPE = builtins.BUILTINS.getNamedTerm("Ref")
-builtins.TRAINING_FUNC = ...
 
 # Fill in definitions for all builtin functions
 def installFunc(name, func):
