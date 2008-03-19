@@ -1,7 +1,7 @@
 
 
 class UsageError(Exception):
-  pass
+   pass
 
 class NotYetImplemented(Exception):
-  pass
+   pass
