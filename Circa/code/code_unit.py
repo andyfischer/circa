@@ -30,14 +30,18 @@ class CodeUnit(object):
       self.term_namespace = {}
  
    def getTerm(self, functionTerm, inputs, **term_options):
+
+      # First, check to reuse an existing term
+      shouldTryToReuse = True
  
-      resultFromFunction = functionTerm.pythonValue.pythonFindExisting(inputs)
-      if resultFromFunction is not None:
-         return resultFromFunction
- 
-      equivalentExisting = term_utils.findExisting(functionTerm, inputs)
-      if equivalentExisting:
-         return equivalentExisting
+      # If the function was defined as 'generator', then don't reuse
+      if functionTerm.pythonValue.isGenerator:
+         shouldTryToReuse = False
+
+      if shouldTryToReuse:
+         equivalentExisting = term_utils.findExisting(functionTerm, inputs)
+         if equivalentExisting:
+            return equivalentExisting
  
       return self.createTerm(functionTerm, inputs, **term_options)
  
