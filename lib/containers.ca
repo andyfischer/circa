@@ -1,4 +1,0 @@
-type Hashtable [builtin]
-
-function hashtable_insert(Hashtable, Ref) [builtin]
-function hashtable_access(Hashtable, Ref -> Ref) [builtin]

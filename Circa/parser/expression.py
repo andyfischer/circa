@@ -31,6 +31,11 @@ def parseExpression(tokens):
 # Alias for parseExpression
 parse = parseExpression
 
+class UncreatedTerm(object):
+   def __init__(self, functionTerm, inputs):
+      self.functionTerm = functionTerm
+      self.inputs = inputs
+
 # AST Classes
 class Node(object):
   def eval(self, builder):
@@ -49,21 +54,37 @@ class Infix(Node):
      self.left = left
      self.right = right
 
+  def getUncreatedTerm(self, builder):
+    normalFunction = getOperatorFunction(self.token.match)
+    if normalFunction is not None:
+       return UncreatedTerm(normalFunction, 
+                            [self.left.eval(builder), self.right.eval(builder)] )
+
   def eval(self, builder):
 
+    """
     # evaluate as initialize?
     if self.token.match is COLON_EQUALS:
        left_term = self.left.eval(builder)
        right_term = self.right.eval(builder)
        left_term.pythonValue = right_term.pythonValue
        return None
+       """
 
     # evaluate as an assignment?
     if self.token.match == EQUALS:
        right_term = self.right.eval(builder)
        if not isinstance(right_term, code.Term):
-          raise ParseError("Expression did not evaluate to a term: " + str(self.right), self.getFirstToken())
+          raise ParseError("Expression did not evaluate to a term: " + str(self.right),
+                           self.getFirstToken())
        return builder.bindName(self.left.getName(), right_term)
+
+    # evaluate as backprop assign?
+    if self.token.match is COLON_EQUALS:
+       leftSide = self.left.getUncreatedTerm(builder)
+
+       return builder.createTrainingTerm(leftSide.functionTerm,
+          inputs=leftSide.inputs + [self.right.eval(builder)])
 
     # normal function?
     # try to find a defined operator
@@ -81,15 +102,6 @@ class Infix(Node):
 
        # bind the name to this result
        return builder.bindName(self.left.getName(), result_term)
-
-
-    """
-    # evaluate as stateful assign?
-    if self.token.match is COLON_EQUALS:
-      return builder.createTerm(builtins.ASSIGN_FUNC,
-          inputs=[self.left.eval(builder), self.right.eval(builder)])
-    """
-
 
     raise Exception("Unable to evaluate token: " + self.token.text)
 
@@ -111,9 +123,9 @@ infixPrecedence = {
 }
 
 def getInfixPrecedence(token):
-  if token and token.match in infixPrecedence:
-    return infixPrecedence[token.match]
-  else: return -1
+   if token and token.match in infixPrecedence:
+      return infixPrecedence[token.match]
+   else: return -1
   
 
 class Literal(Node):
@@ -183,6 +195,11 @@ class Function(Node):
   def __init__(self, function_name, args):
     self.function_name = function_name
     self.args = args
+
+  def getUncreatedTerm(self, builder):
+    arg_terms = [t.eval(builder) for t in self.args]
+    func = builder.getNamed(self.function_name.text)
+    return UncreatedTerm(func, arg_terms)
 
   def eval(self, builder):
     arg_terms = [t.eval(builder) for t in self.args]
