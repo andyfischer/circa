@@ -1,8 +1,11 @@
+import pdb
 
 class Function(object):
-   def __init__(self, pureFunction=True):
-      self.inputTypes = []
-      self.outputType = None
+   def __init__(self, inputs=None, output=None, pureFunction=True):
+      if inputs is None: inputs = []
+
+      self.inputTypes = inputs
+      self.outputType = output
       self.hasBranch = False
       self.pureFunction = pureFunction
       self.isGenerator = False
@@ -24,10 +27,9 @@ class Function(object):
       pass
  
 
+# Deprecated
 def createFunction(inputs, output):
-   f = Function()
-   f.inputTypes = inputs
-   f.outputType = output
+   f = Function(inputs=inputs, output=output)
    return f
 
 def createUnknownFunction(name):

@@ -1,4 +1,5 @@
 
+namespace: parsing
 
 // Bind operators to functions
 operator(token('+')) := add
@@ -13,3 +14,4 @@ assign_operator(token('+=')) := add
 assign_operator(token('-=')) := sub
 assign_operator(token('*=')) := mult
 assign_operator(token('/=')) := div
+

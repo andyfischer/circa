@@ -147,8 +147,9 @@ class TokenStream(object):
     """
     while True:
       token = self.consume()
-      if token.match == match: break
+      if token is None: break
       if self.finished(): break
+      if token.match == match: break
 
   def markLocation(self):
     """

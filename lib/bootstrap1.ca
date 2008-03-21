@@ -1,7 +1,7 @@
 type Ref [builtin]
 type Token [builtin]
 
-function constant(Type -> Function) [builtin]
+# function constant(Type -> Function) [builtin]
 function variable(Type -> Function) [builtin]
 
 function map(Type inputType, Type outputType -> Function) [builtin, generator]
@@ -28,7 +28,5 @@ function div(float, float -> float) [builtin]
 function assign(Ref, Ref) [builtin]
 function concat(string, string ->string) [builtin]
 function subroutine() [builtin]
-function constant() [builtin]
-function variable() [builtin]
 function break() [builtin]
 

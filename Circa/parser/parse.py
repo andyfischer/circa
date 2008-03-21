@@ -27,47 +27,50 @@ def PLACEHOLDER_FUNC_FOR_ATTRIBUTES(term):
 VERBOSE_DEBUGGING = False
 
 def parse(builder, source, raise_errors=False):
-  parser = Parser(builder, source, raise_errors)
-  parser.run()
+   parser = Parser(builder, source, raise_errors)
+   parser.run()
 
 class Parser(object):
   def __init__(self, builder, token_source, raise_errors):
-    self.builder = builder
-    self.parse_errors = []
-    self.raise_errors = raise_errors
+     self.builder = builder
+     self.parse_errors = []
+     self.raise_errors = raise_errors
 
-    # make sure 'tokens' is a token stream
-    self.tokens = token_stream.asTokenStream(token_source)
+     # make sure 'tokens' is a token stream
+     self.tokens = token_stream.asTokenStream(token_source)
     
   def run(self):
-    while not self.tokens.finished():
-      try:
-        self.statement()
-      except parse_errors.ParseError, e:
-        if self.raise_errors:
-          raise
+     while not self.tokens.finished():
+        try:
+           self.statement()
+        except parse_errors.ParseError, e:
+           if self.raise_errors:
+              raise
 
-        self.parse_errors.append(e)
-        print "[parse error] " + e.description()
+           self.parse_errors.append(e)
+           print "[parse error] " + e.description()
 
-        # Drop this token, and the rest of the line
-        self.tokens.consume()
-        self.tokens.dropUntil(NEWLINE)
+           # Drop this token, and the rest of the line
+           self.tokens.consume()
+           self.tokens.dropUntil(NEWLINE)
 
-      except Exception, e:
-        print "Internal error on token: " + self.tokens.next().detailsStr()
-        print e
-        traceback.print_tb(sys.exc_traceback)
+        except Exception, e:
+           if self.raise_errors:
+              raise
+
+           print "Internal error on token: " + self.tokens.next().detailsStr()
+           print e
+           traceback.print_tb(sys.exc_traceback)
 
   def bind(self, name, term):
-    existing = self.currentBlock().getReference(name)
-    self.currentBlock().putReference(name, term)
-    if existing:
-      self.currentBlock().handleRebind(name, existing, term)
+     existing = self.currentBlock().getReference(name)
+     self.currentBlock().putReference(name, term)
+     if existing:
+        self.currentBlock().handleRebind(name, existing, term)
 
   def expression(self):
-    # Parse an expression using the 'expression' package
-    return expression_module.parseExpression(self.tokens)
+     # Parse an expression using the 'expression' package
+     return expression_module.parseExpression(self.tokens)
 
   def statement(self):
     if VERBOSE_DEBUGGING: print "Parsing statement"
@@ -80,23 +83,26 @@ class Parser(object):
     paths[RETURN] = self.return_statement
     paths[RBRACKET] = self.right_bracket
     paths[NEWLINE] = self.new_line
-    #paths[POUND_IDENT] = self.immediateCommand
 
     next_token = self.tokens.next()
 
     # If we have this token in our paths, parse that
     if next_token.match in paths:
-      paths[next_token.match]()
-      return
+       paths[next_token.match]()
+       return
+
+    # Check to parse a property
+    if self.tokens.nextIs(IDENT) and self.tokens.nextIs(COLON,lookahead=1):
+       self.property_statement()
 
     # otherwise, parse as expression
     expr = self.expression()
 
     if expr:
-      expr.eval(self.builder)
-      return
+       expr.eval(self.builder)
+       return
     else:
-      if VERBOSE_DEBUGGING: print "parseExpression failed on " + next_token.detailsStr()
+       if VERBOSE_DEBUGGING: print "parseExpression failed on " + next_token.detailsStr()
 
     # if we got this far then we don't know what the hell to do
     raise parse_errors.NotAStatement(next_token)
@@ -108,7 +114,7 @@ class Parser(object):
 
      # Handle a built-in type
      if "builtin" in decl.annotationStrings():
-        return self.builder.createConstant(value=None, name = name, type=builtins.TYPE_TYPE)
+        return self.builder.createConstant(value=None, name = name, constType=builtins.TYPE_TYPE)
 
      # Handle composite type
      # todo
@@ -237,13 +243,16 @@ class Parser(object):
 
     self.builder.closeBlock()
 
+  def property_statement(self):
+     property = self.consume(IDENT)
+     self.consume(COLON)
+     # todo
+
   def new_line(self):
     if VERBOSE_DEBUGGING: print "Parsing new_line"
 
     self.tokens.consume(NEWLINE)
 
-  def immediateCommand(self):
-      pass
 
   def getTypeFromToken(self, token):
 

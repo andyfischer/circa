@@ -1,16 +1,21 @@
 
-from Circa import ca_function
+from Circa import (
+   ca_function,
+   python_bridge
+)
 
 def mapGeneratorEvaluate(keyType, valueType):
 
-   # Note: type checking should go somewhere huh?
-
-   mapFuncObj = ca_function.Function()
+   mapFuncObj = ca_function.createFunction(inputs=[keyType], output=valueType)
    mapFuncObj.hashtable = {}
 
-   def mapEvaluate(self, term):
+   def mapEvaluate(term):
       key = term.inputs[0]
-      term.pythonValue = self.hashtable[key]
+      if key in mapFuncObj.hashtable:
+         term.pythonValue = mapFuncObj.hashtable[key]
+      else:
+         term.pythonValue = None
    mapFuncObj.pythonEvaluate = mapEvaluate
 
+   return mapFuncObj
 
