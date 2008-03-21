@@ -1,0 +1,6 @@
+
+mapFunc = map(int, int)
+
+mapFunc(1) := 2
+
+assert mapFunc(1) == 3

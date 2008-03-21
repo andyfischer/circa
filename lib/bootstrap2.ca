@@ -19,4 +19,3 @@ function set_insert(Set, Ref) [builtin]
 function set_remove(Set, Ref) [builtin]
 function set_membership(Set, Ref -> bool) [builtin]
 
-

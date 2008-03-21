@@ -7,7 +7,6 @@ from Circa import (
 
 nextGlobalID = 1
 
-
 class Term(object):
    def __init__(self):
       "Use 'createTerm' instead of calling this constructor"
@@ -42,7 +41,10 @@ class Term(object):
          return self.givenName
       elif self.debugName:
          return self.debugName
+      elif self.getType() is builtins.FUNC_TYPE:
+         return self.pythonValue.name
       else:
+         #pdb.set_trace()
          return 't' + str(self.globalID)
  
    def inputsContain(self, term):

@@ -79,12 +79,15 @@ class Infix(Node):
                            self.getFirstToken())
        return builder.bindName(self.left.getName(), right_term)
 
-    # evaluate as backprop assign?
+    # evaluate as an implant?
     if self.token.match is COLON_EQUALS:
        leftSide = self.left.getUncreatedTerm(builder)
 
-       return builder.createTrainingTerm(leftSide.functionTerm,
-          inputs=leftSide.inputs + [self.right.eval(builder)])
+       if leftSide.functionTerm.pythonValue is None:
+          pdb.set_trace()
+
+       return builder.handleImplant(leftSide.functionTerm,
+          leftSide.inputs, self.right.eval(builder))
 
     # normal function?
     # try to find a defined operator
@@ -199,6 +202,10 @@ class Function(Node):
   def getUncreatedTerm(self, builder):
     arg_terms = [t.eval(builder) for t in self.args]
     func = builder.getNamed(self.function_name.text)
+
+    if func.pythonValue is None:
+       pdb.set_trace()
+
     return UncreatedTerm(func, arg_terms)
 
   def eval(self, builder):
