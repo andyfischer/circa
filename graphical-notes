@@ -1,0 +1,67 @@
+
+## Main Window ##
+
+Connected animated view of all terms
+
+# View Features #
+Choose different visual organization methods
+Filter
+Zoom
+Pan
+Multiple views
+
+# Editing Operations #
+ * Append new term
+ * Insert-after
+     Pick a term as 'target'.
+     New term uses 'target' as input, all existing users of target are switched to
+     instead use the new term.
+ * Insert-before
+     Pick a term as 'target'.
+     New term uses target's inputs as input, target's inputs are switched to new term.
+
+Delete
+Jump to source
+Etc
+
+# Graph view details #
+
+Each node has:
+  * Name
+  * Lines to inputs
+  * Function
+ 
+# To create a new term:
+
+1) Pick a function, perhaps by typing it, or by clicking an existing one.
+   Editor now enters a 'create-term' mode where this function is displayed.
+2) Pick inputs, perhaps by clicking on them in order.
+
+# Specifying location: by default, a new term is placed immediately after its
+  latest input. Could also have some way to specify location.
+
+# View idea:
+    Organize terms to look just like source code, but superimpose boxes & lines, to
+    highlight graph structure.
+
+
+---
+
+Code organization:
+
+Type 'Node'
+Each node has:
+ - pointer to term
+ - Current location on screen
+
+Type 'Edge'
+Contains:
+ - start node
+ - end node
+ - path
+
+function drawNode(Node node)
+ - draws a box & name at node.position
+
+function nodeShow(Node node)
+ - 

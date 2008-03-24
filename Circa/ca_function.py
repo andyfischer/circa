@@ -10,30 +10,36 @@ class Function(object):
       self.pureFunction = pureFunction
       self.isGenerator = False
 
-   # pythonFindExisting is called right before term creation would occur.
-   # If this function returns not-None, then the builder will use the
-   # result instead of creating a new term. This function may also be called
-   # in situations where we are looking for an existing term but not 
-   # planning on creating one.
-
-   def pythonFindExisting(self, inputs):
-      return None
-
    # pythonInit is called once per term, right after the term is created
    def pythonInit(self, term):
       pass
 
+   # This funciton is called whenever evaluation is needed. The function should
+   # probably take values out of 'term's inputs, and stick some result in
+   # term.pythonValue.
    def pythonEvaluate(self, term):
       pass
  
+def wrapPythonFunction(pythonFunc):
+   """
+   This function wraps a Python function so that it is suitable to be used
+   as the 'pythonEvaluate' portion of an existing Function. The values of
+   all the arguments of the Circa term are copied as arguments to the Python
+   function, and the returned result of the Python function is used as the
+   'pythonValue' of the Circa term.
+   """
 
-# Deprecated
-def createFunction(inputs, output):
-   f = Function(inputs=inputs, output=output)
-   return f
+   def funcForCirca(term):
+       term.pythonValue = pythonFunc(*map(lambda t:t.pythonValue, term.inputs))
+   return funcForCirca
 
-def createUnknownFunction(name):
-   f = Function()
-   f.name = name
-   return f
+def createFunctionFromPython(func, **initOptions):
+   """
+   This function returns an instance of Function, with 'func' implanted as its
+   evaluation function. 'initOptions' are passed to the constructor of Function.
+   """
+   circaFunc = Function(**initOptions)
+   circaFunc.pythonEvaluate = wrapPythonFunction(func)
+   return circaFunc
+
 
