@@ -1,47 +1,43 @@
 import pdb
 
 class ParseError(Exception):
-   def __init__(self, location, message=None):
-      self.location = location
-      self.message = message
+   def __init__(self, errorDetails, file_name):
+      self.location = errorDetails[0]
+      self.message = errorDetails[1]
 
-   def __str__(self):
-      return self.description()
-
-   def description(self):
-      return "(line " + str(self.location.line) + ":" + \
+      self.description = "(line " + str(self.location.line) + ":" + \
          str(self.location.column) + ") " + self.message
 
-class TokenStreamExpected(ParseError):
-   def __init__(self, expected, location):
-      message = "Expected: " + expected.name + ", found: " + location.text
-      ParseError.__init__(self, location, message)
+      if file_name is not None:
+         self.description = "File: " + file_name + ", " + self.description
 
-class IdentifierNotFound(ParseError):
-   def __init__(self, identifier_token):
-      message = "Identifier not found: " + identifier_token.text
-      ParseError.__init__(self, identifier_token, message)
+   def __str__(self):
+      return self.description
 
-class IdentifierIsNotAType(ParseError):
-   def __init__(self, token):
-      ParseError.__init__(self, token, "Not a valid type: " + token.text)
+def TokenStreamExpected(expected, location):
+   return (location, "Expected: " + expected.name + ", found: " + location.text)
 
-class DanglingRightBracket(ParseError):
-   def __init__(self, token):
-      ParseError.__init__(self, token, "Found } without a corresponding {")
+def IdentifierNotFound(identifier):
+   return (identifier, "Identifier not found: " + identifier.text)
 
-class NotAStatement(ParseError):
-   def __init__(self, token):
-      ParseError.__init__(self, token, "Not a statement: " + token.detailsStr())
+def IdentifierIsNotAType(ident):
+   return (ident, "Not a valid type: " + ident.text)
 
-class ExpectedExpression(ParseError):
-   def __init__(self, token):
-      ParseError.__init__(self, token, "Expected a valid expression")
+def DanglingRightBracket(token):
+   return (token, "Found } without a corresponding {")
 
-class InternalError(ParseError):
-   def __init__(self, token, details=None):
-      message = "Internal error"
-      if details: message += ": " + details
-      ParseError.__init__(self, token, message)
+def NotAStatement(token):
+   return (token, "Not a statement: " + token.detailsStr())
+
+def ExpectedExpression(token):
+   return (token, "Expected a valid expression")
+
+def UnrecognizedProperty(property):
+   return (property, "Unrecognized property: " + property.text)
+
+def InternalError(token, details=None):
+   message = "Internal error"
+   if details is not None: message += ": " + details
+   return (token, message)
 
 
