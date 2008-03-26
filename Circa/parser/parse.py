@@ -13,7 +13,7 @@ from Circa.token import token_stream
 from Circa.token.definitions import *
 
 # Local modules
-import parse_errors, syntax
+import parse_errors
 
 SPECIAL_NAME_FOR_RETURNS = "#return"
 
@@ -113,12 +113,12 @@ class Parser(object):
      self.expression_statement()
 
   def type_decl(self):
-     decl = syntax.type_decl(self.tokens)
+     decl = type_decl(self.tokens)
 
      name = decl.id.text
 
      # Handle a built-in type
-     if "builtin" in decl.annotationStrings():
+     if "builtin" in decl.getAnnotationStrings():
         return self.builder.createConstant(value=None, name = name, constType=builtins.TYPE_TYPE)
 
      # Handle composite type
@@ -168,24 +168,23 @@ class Parser(object):
 
   def function_decl(self):
      self.tokens.consume(FUNCTION)
-     decl = syntax.function_decl(self.tokens)
+     decl = function_decl(self.tokens)
 
      def getArgName(arg): return arg.getNameStr()
 
      # Get a list of input types
-     inputTypes = map(self.getTypeFromToken, decl.inputTypes())
+     inputTypes = map(self.getTypeFromToken, decl.getInputTypes())
      outputType = (None if decl.outputType is None
                         else self.getTypeFromToken(decl.outputType))
 
      # Check for 'builtin' annotation
-     if 'builtin' in decl.annotationStrings():
+     if 'builtin' in decl.getAnnotationStrings():
 
         # Create a builtin function
-        func = ca_function.Function(inputTypes, outputType)
-        func.name = decl.id.text
-        func.pythonEvaluate = PLACEHOLDER_EVALUATE_FOR_BUILTINS
+        obj = ca_function.Function(inputTypes, outputType, name=decl.id.text,
+              evaluate=PLACEHOLDER_FUNC_FOR_ATTRIBUTES)
 
-        return self.builder.createConstant(value=func, name=decl.id.text)
+        return self.builder.createConstant(value=obj, name=decl.id.text)
 
      # Create a new subroutine object
      sub = code.SubroutineDefinition(input_names=decl.inputNames())
@@ -266,9 +265,7 @@ class Parser(object):
 
   def new_line(self):
      if VERBOSE_DEBUGGING: print "Parsing new_line"
-
      self.tokens.consume(NEWLINE)
-
 
   def getTypeFromToken(self, token):
 
@@ -281,6 +278,131 @@ class Parser(object):
         raise parse_errors.IdentifierIsNotAType(token)
 
      return typeTerm
+     
+class ParsedFunctionDecl(object):
+   def getAnnotationStrings(self):
+      return map(lambda a: a.text, self.annotations)
+
+   def getInputTypes(self):
+      return map(lambda a: a.type, self.inputArgs)
+
+   def getInputNames(self):
+      return map(lambda a: a.name, self.inputArgs)
+
+class ParsedFunctionArg(object):
+   pass
+
+def function_decl(tokens):
+   """
+   Parse a function declaration, and returns an object of type
+   ParsedFunctionDecl. This object contains:
+     .id = the function's name (token)
+     .inputArgs = a list of arguments. Each object in this list contains:
+        .type = the type name (token)
+        .name = the identifier (token). May be None
+     .annotations = a list of annotations (tokens)
+     .outputType = the return type name (token). May be None
+   """
+   result = ParsedFunctionDecl()
+   result.id = tokens.consume(IDENT)
+   tokens.consume(LPAREN)
+
+   # Check for input arguments
+   result.inputArgs = []
+   if tokens.nextIs(IDENT):
+      result.inputArgs.append(function_argument(tokens))
+   while tokens.nextIs(COMMA):
+      tokens.consume(COMMA)
+      result.inputArgs.append(function_argument(tokens))
+
+   result.outputType = None
+   if tokens.nextIs(RIGHT_ARROW):
+      tokens.consume(RIGHT_ARROW)
+      result.outputType = tokens.consume(IDENT)
+
+   tokens.consume(RPAREN)
+
+   # Check for annotations
+   result.annotations = annotation_list(tokens)
       
+   return result
+
+def function_argument(tokens):
+   """
+   Parses a function argument and returns an object of type ParsedFunctionArg.
+   This object contains:
+      .name = the argument's name (token). May be None
+      .type = the argument's type (token)
+   """
+   result = ParsedFunctionArg()
+   result.type = tokens.consume(IDENT)
+   result.name = None
+   if tokens.nextIs(IDENT):
+      result.name = tokens.consume(IDENT)
+   return result
+
+class ParsedTypeDecl(object):
+   def getAnnotationStrings(self):
+      return map(lambda a: a.text, self.annotations)
+
+def type_decl(tokens):
+   """
+   Parses a type declaration and returns an object of type ParsedTypeDecl.
+   This object contains:
+      .id = the type's name (token)
+      .annotations = a list of annotations
+   """
+
+   result = ParsedTypeDecl()
+
+   tokens.consume(TYPE)
+   tokens.startSkipping(NEWLINE)
+
+   result.id = tokens.consume(IDENT)
+
+   # Check to parse composite type
+   if tokens.nextIs(LBRACKET):
+
+      result.compositeMembers = []
+
+      tokens.consume(LBRACKET)
+      while not tokens.nextIs(RBRACKET):
+         memberType = tokens.consume(IDENT)
+         memberName = tokens.consume(IDENT)
+         decl.compositeMembers.append([memberType, memberName])
+
+         if not tokens.nextIs(RBRACKET):
+            tokens.consume(COMMA)
+      tokens.consume(RBRACKET)
+
+   # Parse a type specialization
+   elif tokens.nextIs(EQUALS):
+      tokens.consume(EQUALS)
+      result.baseType = tokens.consume(IDENT)
+
+   # Parse annotations
+   result.annotations = annotation_list(tokens)
+
+   tokens.stopSkipping(NEWLINE)
+
+   return result
+
+# Parse a list of annotations surrounded by []s
+# Returns an empty list if none are found
+def annotation_list(tokens):
+   if not tokens.nextIs(LBRACE):
+      return []
+
+   tokens.consume(LBRACE)
+   annotationList = []
+
+   while not tokens.nextIs(RBRACE):
+      annotationList.append(tokens.consume(IDENT))
+
+      if tokens.nextIs(COMMA):
+         tokens.consume(COMMA)
+
+   tokens.consume(RBRACE)
+   return annotationList
 
 

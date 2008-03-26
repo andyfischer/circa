@@ -1,7 +1,8 @@
 import pdb
 
 class Function(object):
-   def __init__(self, inputs=None, output=None, pureFunction=True):
+   def __init__(self, inputs=None, output=None, pureFunction=True,
+         name=None, evaluate=None):
       if inputs is None: inputs = []
 
       self.inputTypes = inputs
@@ -9,6 +10,10 @@ class Function(object):
       self.hasBranch = False
       self.pureFunction = pureFunction
       self.isGenerator = False
+      self.name = name
+      
+      if evaluate is not None:
+         self.pythonEvaluate = evaluate
 
    # pythonInit is called once per term, right after the term is created
    def pythonInit(self, term):

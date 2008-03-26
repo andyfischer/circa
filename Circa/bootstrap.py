@@ -34,7 +34,8 @@ builtins.CONST_TYPE_FUNC = builtins.BUILTINS.createTerm(functionTerm=builtins.CO
 builtins.CONST_TYPE_FUNC.pythonValue = ca_function.Function(inputs=[], output=None)
 
 # Create Type type
-builtins.TYPE_TYPE = builtins.BUILTINS.createTerm(functionTerm=builtins.CONST_TYPE_FUNC,
+builtins.TYPE_TYPE = builtins.BUILTINS.createTerm(
+    functionTerm=builtins.CONST_TYPE_FUNC,
     name = 'Type', initialValue = ca_type.Type())
 builtins.TYPE_TYPE.pythonValue.outputType=builtins.TYPE_TYPE
 
@@ -89,12 +90,6 @@ def installLibFile(filename):
    parser.parseFile(parser.builder.Builder(target=builtins.BUILTINS),
             filename, raise_errors=True)
 
-# Retrieve a term that was defined in Circa code
-def getCircaDefined(name):
-   obj = builtins.BUILTINS.getNamedTerm(name)
-   if obj is None: raise Exception("Couldn't find term named: " + name)
-   return obj
-
 installLibFile("builtins.ca")
 
 # Install builtin libraries
@@ -102,6 +97,12 @@ installLibFile("parsing.ca")
 
 # Expose some objects that were created in Circa code so that they may be accessed
 # from Python code
+
+def getCircaDefined(name):
+   obj = builtins.BUILTINS.getNamedTerm(name)
+   if obj is None: raise Exception("Couldn't find term named: " + name)
+   return obj
+
 builtins.TOKEN_FUNC = getCircaDefined("token")
 builtins.OPERATOR_FUNC = getCircaDefined("operator")
 builtins.ASSIGN_OPERATOR_FUNC = getCircaDefined("assign_operator")
