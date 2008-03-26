@@ -70,9 +70,6 @@ class Parser(object):
            print e
            traceback.print_tb(sys.exc_traceback)
 
-  def raiseError(self, errorDetails):
-     raise parse_errors.ParseError(errorDetails, file_name=self.file_name)
-
   def bind(self, name, term):
      existing = self.currentBlock().getReference(name)
      self.currentBlock().putReference(name, term)
@@ -84,7 +81,7 @@ class Parser(object):
      exprResult = expression_module.parseExpression(self.tokens)
 
      if exprResult is None:
-        self.raiseError(parse_errors.NotAStatement(self.tokens.next()))
+        raise parse_errors.NotAStatement(self.tokens.next())
 
      exprResult.eval(self.builder)
 
@@ -144,7 +141,7 @@ class Parser(object):
      condition_term = condition_expr.eval(self.builder)
 
      if condition_term == None:
-       raiseError(parse_errors.ExpectedExpression(first_condition_token))
+        raise parse_errors.ExpectedExpression(first_condition_token)
     
      self.tokens.consume(RPAREN)
 
@@ -216,40 +213,40 @@ class Parser(object):
      return_token = self.tokens.consume(RETURN)
      expr = self.expression()
      if not expr:
-        raiseError(parse_errors.ExpectedExpression(return_token))
+        raise parse_errors.ExpectedExpression(return_token)
 
      self.bind(SPECIAL_NAME_FOR_RETURNS, expr.eval(self.builder))
 
   def block(self, blockToStart):
-    if VERBOSE_DEBUGGING: print "Parsing block"
+     if VERBOSE_DEBUGGING: print "Parsing block"
 
-    if blockToStart:
-      self.builder.startBlock(blockToStart)
+     if blockToStart:
+       self.builder.startBlock(blockToStart)
 
-    # check for a block bounded with {}s
-    if (self.tokens.nextIs(LBRACKET)):
-      self.tokens.consume(LBRACKET)
-      self.tokens.stopSkipping(NEWLINE)
+     # check for a block bounded with {}s
+     if (self.tokens.nextIs(LBRACKET)):
+       self.tokens.consume(LBRACKET)
+       self.tokens.stopSkipping(NEWLINE)
 
-      # parse contents
-      while not self.tokens.nextIs(RBRACKET):
-        self.statement()
+       # parse contents
+       while not self.tokens.nextIs(RBRACKET):
+         self.statement()
 
-      self.tokens.consume(RBRACKET)
+       self.tokens.consume(RBRACKET)
 
-    # parse a one-liner with no {}s
-    else:
-      self.statement()
+     # parse a one-liner with no {}s
+     else:
+       self.statement()
 
-    if blockToStart:
-      self.builder.closeBlock()
+     if blockToStart:
+       self.builder.closeBlock()
 
   def right_bracket(self):
-    token = self.tokens.consume(RBRACKET)
-    if self.builder.blockDepth() < 1:
-      raiseError(parse_errors.DanglingRightBracket(token))
+     token = self.tokens.consume(RBRACKET)
+     if self.builder.blockDepth() < 1:
+       raise parse_errors.DanglingRightBracket(token)
 
-    self.builder.closeBlock()
+     self.builder.closeBlock()
 
   def property_statement(self):
      property = self.tokens.consume(IDENT)
@@ -265,12 +262,12 @@ class Parser(object):
         self.builder.startNamespace(namespace.text)
 
      else:
-        raiseError(parse_errors.UnrecognizedProperty(property))
+        raise parse_errors.UnrecognizedProperty(property)
 
   def new_line(self):
-    if VERBOSE_DEBUGGING: print "Parsing new_line"
+     if VERBOSE_DEBUGGING: print "Parsing new_line"
 
-    self.tokens.consume(NEWLINE)
+     self.tokens.consume(NEWLINE)
 
 
   def getTypeFromToken(self, token):
@@ -278,10 +275,10 @@ class Parser(object):
      typeTerm = self.builder.getNamed(token.text)
 
      if typeTerm is None:
-        raiseError(parse_errors.IdentifierNotFound(token))
+        raise parse_errors.IdentifierNotFound(token)
 
      if typeTerm.getType() is not builtins.TYPE_TYPE:
-        raiseError(parse_errors.IdentifierIsNotAType(token))
+        raise parse_errors.IdentifierIsNotAType(token)
 
      return typeTerm
       

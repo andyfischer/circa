@@ -42,17 +42,24 @@ def findExisting(functionTerm, inputs=[]):
    return None
 
 def findExistingConstant(constantFunction, value):
-    """
-    This helper term attempts to find a constant with the given constant-func.
-    """
+   """
+   This helper term attempts to find a constant with the given constant-func.
+   """
 
-    for possibleMatch in constantFunction.users:
-        
-        if possibleMatch.functionTerm != constantFunction:
-            continue
+   for possibleMatch in constantFunction.users:
+       
+       if possibleMatch.functionTerm != constantFunction:
+           continue
 
-        if possibleMatch.pythonValue == value:
-            return possibleMatch
+       if possibleMatch.pythonValue == value:
+           return possibleMatch
 
-    return None
+   return None
+
+def findTrainingFunction(function):
+   trainingFunc = findExisting(builtins.TRAINING_FUNC, function)
+   if trainingFunc is not None:
+      return trainingFunc
+
+
 

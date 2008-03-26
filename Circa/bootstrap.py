@@ -89,16 +89,16 @@ def installLibFile(filename):
    parser.parseFile(parser.builder.Builder(target=builtins.BUILTINS),
             filename, raise_errors=True)
 
-
 # Retrieve a term that was defined in Circa code
 def getCircaDefined(name):
    obj = builtins.BUILTINS.getNamedTerm(name)
    if obj is None: raise Exception("Couldn't find term named: " + name)
    return obj
-   
-installLibFile("bootstrap1.ca")
 
-installLibFile("bootstrap2.ca")
+installLibFile("builtins.ca")
+
+# Install builtin libraries
+installLibFile("parsing.ca")
 
 # Expose some objects that were created in Circa code so that they may be accessed
 # from Python code
@@ -110,7 +110,6 @@ builtins.REF_TYPE = getCircaDefined("Ref")
 builtins.TRAINING_FUNC = getCircaDefined("trainingFunction")
 
 # Install builtin functions into pre-existing Circa objects
-# Fill in definitions for all builtin functions
 def installFunc(name, value):
    targetTerm = builtins.BUILTINS.getNamedTerm(name)
 
@@ -122,9 +121,5 @@ def installFunc(name, value):
    targetTerm.pythonValue.pythonEvaluate = value.pythonEvaluate
 
 for (name,func) in builtin_functions.NAME_TO_FUNC.items():
-   installFunc(name, func)
-
-
-# Install builtin libraries
-installLibFile("parsing.ca")
+   builtins.BUILTINS.portBuiltinValue(name, func)
 

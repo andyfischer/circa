@@ -1,0 +1,52 @@
+type Ref [builtin]
+type Token [builtin]
+
+# function constant(Type -> Function) [builtin]
+function variable(Type -> Function) [builtin]
+
+function map(Type inputType, Type outputType -> Function) [builtin, generator]
+
+function invokeSubroutine() [builtin]
+
+// Functions
+function cond_branch(bool condition) [builtin]
+function simple_branch() [builtin]
+function equals(-> bool) [builtin]
+function not_equals(-> bool) [builtin]
+function print(string) [builtin]
+function get_input(-> string) [builtin]
+function input(-> string) [builtin]
+function assert(bool) [builtin]
+function and(bool, bool -> bool) [builtin]
+function or(bool, bool -> bool) [builtin]
+function if_expr(bool, Ref, Ref -> Ref) [builtin]
+function placeholder() [builtin]
+function add(float, float -> float) [builtin]
+function sub(float, float -> float) [builtin]
+function mult(float, float -> float) [builtin]
+function div(float, float -> float) [builtin]
+function assign(Ref, Ref) [builtin]
+function concat(string, string ->string) [builtin]
+function subroutine() [builtin]
+function break() [builtin]
+
+// Metaprogramming functions
+function token(string -> Token) [builtin]
+operator = map(Token, Function)
+assign_operator = map(Token, Function)
+assignFunction = map(Type, Function)
+trainingFunction = map(Function, Function)
+
+// Containers
+type Hashtable [builtin]
+function hashtable_insert(Hashtable, Ref) [builtin]
+function hashtable_access(Hashtable, Ref -> Ref) [builtin]
+
+type List [builtin]
+function list_append(List, Ref) [builtin]
+
+type Set [builtin]
+function set_insert(Set, Ref) [builtin]
+function set_remove(Set, Ref) [builtin]
+function set_membership(Set, Ref -> bool) [builtin]
+
