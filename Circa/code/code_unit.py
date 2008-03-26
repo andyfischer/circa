@@ -48,36 +48,36 @@ class CodeUnit(object):
    def createTerm(self, functionTerm, inputs=None, branch=None, name=None,
        initialValue=None, sourceToken=None):
  
-     # Create a new term
-     term = term_module.Term()
-     term.functionTerm = functionTerm
-     term.sourceToken = sourceToken
-     term.pythonValue = initialValue
-     term.codeUnit = self
- 
-     circaFunction = functionTerm.pythonValue
- 
-     # Check to create a branch
-     if circaFunction.hasBranch:
-         term.branch = []
- 
-     # Add term to function's users
-     functionTerm.users.add(term)
- 
-     if inputs:
-        self.setTermInputs(term, inputs)
- 
-     if name:
-        self.setTermName(term, name)
- 
-     # Evaluate immediately (in some cases)
-     if (initialValue is None) and (circaFunction.pureFunction):
-         term.pythonEvaluate()
- 
-     if branch is None: branch = self.main_branch
-     branch.append(term)
- 
-     return term
+      # Create a new term
+      term = term_module.Term()
+      term.functionTerm = functionTerm
+      term.sourceToken = sourceToken
+      term.pythonValue = initialValue
+      term.codeUnit = self
+  
+      circaFunction = functionTerm.pythonValue
+  
+      # Check to create a branch
+      if circaFunction.hasBranch:
+          term.branch = []
+  
+      # Add term to function's users
+      functionTerm.users.add(term)
+  
+      if inputs:
+         self.setTermInputs(term, inputs)
+  
+      if name:
+         self.setTermName(term, name)
+
+      # Evaluate immediately (in some cases)
+      if (initialValue is None) and (circaFunction.pureFunction):
+          term.pythonEvaluate()
+  
+      if branch is None: branch = self.main_branch
+      branch.append(term)
+  
+      return term
 
 
    def createConstant(self, value, name=None, branch=None,

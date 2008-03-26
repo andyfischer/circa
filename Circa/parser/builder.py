@@ -106,12 +106,14 @@ class Builder(object):
       return new_term
 
    def handleImplant(self, function, inputs, output):
+      # Find the training function for this function
+      trainingFunction = term_utils.findTrainingFunction(function)
 
-      # Current behavior: create a term that has the given function & inputs,
-      # and use value from 'output' as the pythonValue
+      if trainingFunction is None:
+         raise CouldntFindTrainingFunction()
 
-      newTerm = self.code_unit.getTerm(function, inputs)
-      newTerm.pythonValue = output.pythonValue
+      # Create a training term
+      newTerm = self.code_unit.getTerm(trainingFunction, inputs)
 
    def createTrainingTerm(self, function, inputs):
       assert function is not None
@@ -354,4 +356,6 @@ class RebindInfo(object):
       self.head = head
       self.defined_outside = defined_outside
 
+class CouldntFindTrainingFunction(Exception):
+   pass
 
