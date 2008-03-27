@@ -30,6 +30,9 @@ def DanglingRightBracket(token):
 def NotAStatement(token):
    return ParseError(token, "Not a statement: " + token.detailsStr())
 
+def NotImplemented(token):
+   return ParseError(token, "Feature is not implemented yet")
+
 def ExpectedExpression(token):
    return ParseError(token, "Expected a valid expression")
 
@@ -38,6 +41,12 @@ def UnrecognizedProperty(property):
 
 def CouldntFindTrainingFunction(token):
    return ParseError(token, "Couldn't find a training function: " + token.text)
+
+def NoPythonSourceProvided(token):
+   return ParseError(token, "No python-object source was provided")
+
+def PythonObjectNotFound(token):
+   return ParseError(token, "Python object was not found: " + token.text)
 
 def InternalError(token, details=None):
    message = "Internal error"

@@ -28,26 +28,27 @@ VERBOSE_DEBUGGING = False
 
 def parse(builder, source, **parser_options):
    parser = Parser(builder, source, **parser_options)
-   parser.run()
 
-def parseFile(builder, sourceFile, raise_errors=False):
+def parseFile(builder, sourceFile, **parser_options):
    file = open(sourceFile, 'r')
    file_contents = file.read()
    file.close()
    del file
-   parse(builder, file_contents, raise_errors=raise_errors, file_name=sourceFile)
+   parser = Parser(builder, file_contents, fileName=sourceFile, **parser_options)
 
 class Parser(object):
-  def __init__(self, builder, token_source, raise_errors=False, file_name=None):
+  def __init__(self, builder, token_source, raise_errors=False, fileName=None,
+        pythonObjectSource=None):
      self.builder = builder
      self.parse_errors = []
      self.raise_errors = raise_errors
-     self.file_name = file_name
+     self.fileName = fileName
+     self.pythonObjectSource = pythonObjectSource
 
      # Make sure 'tokens' is a token stream
      self.tokens = token_stream.asTokenStream(token_source)
     
-  def run(self):
+     # Evaluate token source
      while not self.tokens.finished():
         try:
            self.statement()
@@ -118,7 +119,7 @@ class Parser(object):
      name = decl.id.text
 
      # Handle a built-in type
-     if "builtin" in decl.getAnnotationStrings():
+     if 'python' in decl.getAnnotationStrings():
         return self.builder.createConstant(value=None, name = name, constType=builtins.TYPE_TYPE)
 
      # Handle composite type
@@ -126,6 +127,8 @@ class Parser(object):
 
      # Handle specialize type
      # todo
+
+     raise parse_errors.NotImplemented(name)
 
   def if_statement(self):
      if VERBOSE_DEBUGGING: print "Parsing if_statement"
@@ -177,17 +180,28 @@ class Parser(object):
      outputType = (None if decl.outputType is None
                         else self.getTypeFromToken(decl.outputType))
 
-     # Check for 'builtin' annotation
-     if 'builtin' in decl.getAnnotationStrings():
+     # Check for 'python' annotation
+     if 'python' in decl.getAnnotationStrings():
 
-        # Create a builtin function
-        obj = ca_function.Function(inputTypes, outputType, name=decl.id.text,
-              evaluate=PLACEHOLDER_FUNC_FOR_ATTRIBUTES)
+        if self.pythonObjectSource is None:
+           raise parse_errors.NoPythonSourceProvided(decl.findAnnotation('python'))
 
-        return self.builder.createConstant(value=obj, name=decl.id.text)
+        name = decl.id.text
+
+        if name not in self.pythonObjectSource:
+           raise parse_errors.PythonObjectNotFound(decl.id)
+
+        # Fetch the python-based function
+        obj = self.pythonObjectSource[name]
+
+        # Overwrite type information with declared
+        obj.inputTypes = inputTypes
+        obj.outputType = outputType
+
+        return self.builder.createConstant(value=obj, name=name)
 
      # Create a new subroutine object
-     sub = code.SubroutineDefinition(input_names=decl.inputNames())
+     sub = code.SubroutineDefinition(input_names=decl.getInputNames())
 
      # open a block
      code_block = builder.FunctionBlock(self.builder, sub.code_unit)

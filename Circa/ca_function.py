@@ -11,6 +11,7 @@ class Function(object):
       self.pureFunction = pureFunction
       self.isGenerator = False
       self.name = name
+      self.trainingFunction = None
       
       if evaluate is not None:
          self.pythonEvaluate = evaluate
@@ -19,8 +20,8 @@ class Function(object):
    def pythonInit(self, term):
       pass
 
-   # This funciton is called whenever evaluation is needed. The function should
-   # probably take values out of 'term's inputs, and stick some result in
+   # This funciton is called whenever evaluation is needed. The function is
+   # suppossed to take values out of 'term's inputs, and stick some result in
    # term.pythonValue.
    def pythonEvaluate(self, term):
       pass

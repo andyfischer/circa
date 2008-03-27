@@ -69,7 +69,7 @@ class Infix(Node):
          right_term = self.right.eval(builder)
          left_term.pythonValue = right_term.pythonValue
          return None
-         """
+      """
 
       # evaluate as an assignment?
       if self.token.match == EQUALS:
@@ -89,8 +89,8 @@ class Infix(Node):
          try:
             return builder.handleImplant(leftSide.functionTerm,
                leftSide.inputs, self.right.eval(builder))
-         except builder.CouldntFindTrainingFunction:
-            raise parse_errors.CouldntFindTrainingFunction(self.left)
+         except:
+            raise parse_errors.CouldntFindTrainingFunction(self.token)
 
       # normal function?
       # try to find a defined operator
