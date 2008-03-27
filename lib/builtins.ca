@@ -1,52 +1,58 @@
-type Ref [builtin]
-type Token [builtin]
+type Ref [python]
+type Token [python]
 
-# function constant(Type -> Function) [builtin]
-function variable(Type -> Function) [builtin]
-
-function map(Type inputType, Type outputType -> Function) [builtin, generator]
-
-function invokeSubroutine() [builtin]
+function map(Type inputType, Type outputType -> Function) [python, generator]
 
 // Functions
-function cond_branch(bool condition) [builtin]
-function simple_branch() [builtin]
-function equals(-> bool) [builtin]
-function not_equals(-> bool) [builtin]
-function print(string) [builtin]
-function get_input(-> string) [builtin]
-function input(-> string) [builtin]
-function assert(bool) [builtin]
-function and(bool, bool -> bool) [builtin]
-function or(bool, bool -> bool) [builtin]
-function if_expr(bool, Ref, Ref -> Ref) [builtin]
-function placeholder() [builtin]
-function add(float, float -> float) [builtin]
-function sub(float, float -> float) [builtin]
-function mult(float, float -> float) [builtin]
-function div(float, float -> float) [builtin]
-function assign(Ref, Ref) [builtin]
-function concat(string, string ->string) [builtin]
-function subroutine() [builtin]
-function break() [builtin]
+function cond_branch(bool condition) [python]
+function simple_branch() [python]
+function equals(-> bool) [python]
+function not_equals(-> bool) [python]
+function print(string) [python]
+function input(-> string) [python]
+function assert(bool) [python]
+function and(bool, bool -> bool) [python]
+function or(bool, bool -> bool) [python]
+function if_expr(bool, Ref, Ref -> Ref) [python]
+function add(float, float -> float) [python]
+function sub(float, float -> float) [python]
+function mult(float, float -> float) [python]
+function div(float, float -> float) [python]
+function assign(Ref, Ref) [python]
+function concat(string, string ->string) [python]
+function break() [python]
 
 // Metaprogramming functions
-function token(string -> Token) [builtin]
+function token(string -> Token) [python]
 operator = map(Token, Function)
 assign_operator = map(Token, Function)
 assignFunction = map(Type, Function)
 trainingFunction = map(Function, Function)
 
-// Containers
-type Hashtable [builtin]
-function hashtable_insert(Hashtable, Ref) [builtin]
-function hashtable_access(Hashtable, Ref -> Ref) [builtin]
+# Containers
+# type Hashtable [python]
+# function hashtable_insert(Hashtable, Ref) [python]
+# function hashtable_access(Hashtable, Ref -> Ref) [python]
 
-type List [builtin]
-function list_append(List, Ref) [builtin]
+# type List [python]
+# function list_append(List, Ref) [python]
 
-type Set [builtin]
-function set_insert(Set, Ref) [builtin]
-function set_remove(Set, Ref) [builtin]
-function set_membership(Set, Ref -> bool) [builtin]
+# type Set [python]
+# function set_insert(Set, Ref) [python]
+# function set_remove(Set, Ref) [python]
+# function set_membership(Set, Ref -> bool) [python]
+
+// Bind operators to functions
+operator(token('+')) := add
+operator(token('-')) := sub
+operator(token('*')) := mult
+operator(token('/')) := div
+operator(token('==')) := equals
+operator(token('!=')) := not_equals
+
+// Bind assign operators to functions
+assign_operator(token('+=')) := add
+assign_operator(token('-=')) := sub
+assign_operator(token('*=')) := mult
+assign_operator(token('/=')) := div
 
