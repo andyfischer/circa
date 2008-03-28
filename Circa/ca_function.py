@@ -1,17 +1,17 @@
 import pdb
 
 class Function(object):
-   def __init__(self, inputs=None, output=None, pureFunction=True,
+   def __init__(self, inputs=None, output=None, pureFunction=True, isGenerator=False,
          name=None, evaluate=None):
       if inputs is None: inputs = []
 
       self.inputTypes = inputs
       self.outputType = output
+      self.trainingFunc = None
       self.hasBranch = False
       self.pureFunction = pureFunction
       self.isGenerator = False
       self.name = name
-      self.trainingFunction = None
       
       if evaluate is not None:
          self.pythonEvaluate = evaluate

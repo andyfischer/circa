@@ -7,6 +7,7 @@ CodeUnit = code_unit.CodeUnit
 Term = term_module.Term
 SubroutineDefinition = subroutine_module.SubroutineDefinition
 findExisting = term_utils.findExisting
+findTrainingFunction = term_utils.findTrainingFunction
 
 def appendFile(code, file_name):
     # get file contents

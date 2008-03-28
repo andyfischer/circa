@@ -47,6 +47,7 @@ builtins.CONST_TYPE_FUNC.pythonValue.outputType=builtins.TYPE_TYPE
 builtins.FUNC_TYPE = builtins.BUILTINS.createConstant(name = 'Function',
     value = ca_type.Type(),
     constType=builtins.TYPE_TYPE)
+python_bridge.PYTHON_TYPE_TO_CIRCA[ca_function.Function] = builtins.FUNC_TYPE
 
 # Implant types into 'constant' function
 builtins.CONST_FUNC.pythonValue.inputTypes = [builtins.TYPE_TYPE]
@@ -73,10 +74,9 @@ builtins.BOOL_TYPE = builtins.BUILTINS.createConstant(name = 'bool',
     constType=builtins.TYPE_TYPE)
 python_bridge.PYTHON_TYPE_TO_CIRCA[bool] = builtins.BOOL_TYPE
 
-builtins.ANY_TYPE = builtins.BUILTINS.createConstant(name = 'any',
+builtins.REF_TYPE = builtins.BUILTINS.createConstant(name = 'Ref',
     value = ca_type.Type(),
     constType=builtins.TYPE_TYPE)
-python_bridge.PYTHON_TYPE_TO_CIRCA[ca_function.Function] = builtins.FUNC_TYPE
 
 builtins.SUBROUTINE_TYPE = builtins.BUILTINS.createConstant(name = 'Subroutine',
     value = ca_type.Type(),
@@ -86,6 +86,22 @@ python_bridge.PYTHON_TYPE_TO_CIRCA[code.SubroutineDefinition] = builtins.SUBROUT
 # Create basic constants
 builtins.BUILTINS.createConstant(name='true', value=True, constType=builtins.BOOL_TYPE)
 builtins.BUILTINS.createConstant(name='false', value=False, constType=builtins.BOOL_TYPE)
+
+# Create Map function
+mapFunctionObj = ca_function.Function(
+    inputs=[builtins.TYPE_TYPE, builtins.TYPE_TYPE],
+    output=[builtins.FUNC_TYPE],
+    evaluate = builtin_functions.mapGenerator,
+    isGenerator=True)
+builtins.MAP_GENERATOR = builtins.BUILTINS.createConstant(name = 'map', value=mapFunctionObj)
+
+mapTrainingObj = ca_function.Function(
+      inputs=[builtins.FUNC_TYPE, builtins.REF_TYPE, builtins.REF_TYPE],
+      output=None, pureFunction=False,
+      evaluate = builtin_functions.mapTraining)
+builtins.MAP_TRAINING_FUNC = builtins.BUILTINS.createConstant(value=mapTrainingObj)
+mapFunctionObj.trainingFunc = builtins.MAP_TRAINING_FUNC
+
 
 # Load builtins.ca file into this code unit
 builtinsFilename = os.path.join(CIRCA_HOME, "lib", "builtins.ca")
@@ -104,9 +120,6 @@ def getCircaDefined(name):
 builtins.TOKEN_FUNC = getCircaDefined("token")
 builtins.OPERATOR_FUNC = getCircaDefined("operator")
 builtins.ASSIGN_OPERATOR_FUNC = getCircaDefined("assign_operator")
-builtins.INVOKE_SUB_FUNC = getCircaDefined("invokeSubroutine")
-builtins.REF_TYPE = getCircaDefined("Ref")
-builtins.TRAINING_FUNC = getCircaDefined("trainingFunction")
 
 # Install builtin functions into pre-existing Circa objects
 def installFunc(name, value):
@@ -119,6 +132,4 @@ def installFunc(name, value):
    targetTerm.pythonValue.pythonInit = value.pythonInit
    targetTerm.pythonValue.pythonEvaluate = value.pythonEvaluate
 
-for (name,func) in builtin_functions.NAME_TO_FUNC.items():
-   builtins.BUILTINS.portBuiltinValue(name, func)
 

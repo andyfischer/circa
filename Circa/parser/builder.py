@@ -4,9 +4,10 @@ import pdb
 from Circa import (
   builtins,
   ca_function,
-  code,
-  parser
+  code
 )
+
+import parse_errors
 
 VERBOSE_DEBUGGING = False
 
@@ -24,9 +25,6 @@ class Builder(object):
       self.currentNamespace = "global"
      
       self.startBlock(TopLevelBlock(self, self.code_unit))
-
-   def eval(self, source):
-      parser.parse(self, source)
 
    def startNamespace(self, namespaceName):
       """Start defining terms in the given namespace. All top-level terms will
@@ -107,13 +105,13 @@ class Builder(object):
 
    def handleImplant(self, function, inputs, output):
       # Find the training function for this function
-      trainingFunction = term_utils.findTrainingFunction(function)
+      trainingFunction = code.findTrainingFunction(function)
 
       if trainingFunction is None:
          raise CouldntFindTrainingFunction()
 
       # Create a training term
-      newTerm = self.code_unit.getTerm(trainingFunction, inputs)
+      newTerm = self.code_unit.getTerm(trainingFunction, [function] + inputs + [output])
 
    def createTrainingTerm(self, function, inputs):
       assert function is not None

@@ -1,6 +1,7 @@
 import pdb
 
 from Circa import (
+   builtins,
    ca_function,
    token
 )
@@ -93,23 +94,31 @@ def breakEvaluate(a,b):
 def emptyFunc():
    pass
 
-@register('map')
-@wrapAsCirca
-def mapGeneratorEvaluate(keyType, valueType):
+def mapGenerator(term):
+   keyType = term.inputs[0]
+   valueType = term.inputs[1]
+
+   if term.state is None:
+      term.state = {}
 
    mapFuncObj = ca_function.Function(inputs=[keyType], output=valueType)
-   mapFuncObj.hashtable = {}
 
    def mapEvaluate(term):
       key = term.inputs[0]
-      if key in mapFuncObj.hashtable:
-         term.pythonValue = mapFuncObj.hashtable[key]
+      if key in term.state:
+         term.pythonValue = term.state[key]
       else:
          term.pythonValue = None
    mapFuncObj.pythonEvaluate = mapEvaluate
+   mapFuncObj.trainingFunc = builtins.MAP_TRAINING_FUNC
 
-   return mapFuncObj
+   term.pythonValue = mapFuncObj
 
+def mapTraining(term):
+   targetFunction = term.inputs[0]
+   input = term.inputs[1].pythonValue
+   output = term.inputs[2].pythonValue
+   targetFunction.state[input] = output
 
 # TODO:
 NAME_TO_FUNC['cond_branch'] = wrapAsCirca(emptyFunc)
