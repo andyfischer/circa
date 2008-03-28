@@ -2,7 +2,8 @@ import pdb
 
 class Function(object):
    def __init__(self, inputs=None, output=None, pureFunction=True, isGenerator=False,
-         name=None, evaluate=None):
+         hasState=False,
+         name="", init=None, evaluate=None):
       if inputs is None: inputs = []
 
       self.inputTypes = inputs
@@ -10,8 +11,12 @@ class Function(object):
       self.trainingFunc = None
       self.hasBranch = False
       self.pureFunction = pureFunction
+      self.hasState = hasState
       self.isGenerator = False
       self.name = name
+
+      if init is not None:
+         self.pythonInit = init
       
       if evaluate is not None:
          self.pythonEvaluate = evaluate

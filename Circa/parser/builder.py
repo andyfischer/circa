@@ -81,6 +81,8 @@ class Builder(object):
 
    def createTerm(self, function, name=None, branch=None, **options):
 
+      assert function.pythonValue is not None
+
       if branch is None:
          branch = self.currentBlock().branch
 

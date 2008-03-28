@@ -2,7 +2,9 @@ import pdb
 
 from Circa import (
   builtins,
+  ca_function,
   code,
+  debug,
   token,
 )
 
@@ -98,6 +100,9 @@ class Infix(Node):
       # try to find a defined operator
       normalFunction = getOperatorFunction(self.token.match)
       if normalFunction is not None:
+
+         assert normalFunction.pythonValue is not None
+
          return builder.createTerm(normalFunction,
             inputs=[self.left.eval(builder), self.right.eval(builder)] )
 
@@ -231,6 +236,10 @@ class Function(Node):
          # Todo: special behavior for invoking subroutines
          return builder.createTerm(builtins.INVOKE_SUB_FUNC)
 
+      # Temp: Use a Python dynamic type check to see if this is a function
+      elif isinstance(func.pythonValue, ca_function.Function):
+        return builder.createTerm(func, inputs=arg_terms)
+
       else:
          raise parse_errors.InternalError(self.function_name,
             "Term " + self.function_name.text + " is not a function.")
@@ -329,16 +338,20 @@ def getOperatorFunction(token):
        print "Notice: couldn't find an operator func for " + token.raw_string
        return None
 
-# fix this: get result of operator() which is a map
-   return code.findExisting(builtins.OPERATOR_FUNC,
+   result = builtins.BUILTINS.getTerm(builtins.OPERATOR_FUNC,
          inputs=[pythonTokenToBuiltin(token)])
+
+   debug.Assert(result is not None)
+   debug.Assert(result.pythonValue is not None)
+
+   return result
 
 def getAssignOperatorFunction(token):
    circaObj = pythonTokenToBuiltin(token)
    if circaObj is None:
        print "Notice: couldn't find an assign operator func for " + token.raw_string
        return None
-   return code.findExisting(builtins.ASSIGN_OPERATOR_FUNC,
+   return builtins.BUILTINS.getTerm(builtins.ASSIGN_OPERATOR_FUNC,
          inputs=[pythonTokenToBuiltin(token)])
 
 def pythonTokenToBuiltin(token):

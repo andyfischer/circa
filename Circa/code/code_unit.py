@@ -38,6 +38,10 @@ class CodeUnit(object):
       if functionTerm.pythonValue.isGenerator:
          shouldTryToReuse = False
 
+      # If the funciton has state, don't reuse
+      if functionTerm.pythonValue.hasState:
+         shouldTryToReuse = False
+
       if shouldTryToReuse:
          equivalentExisting = term_utils.findExisting(functionTerm, inputs)
          if equivalentExisting:
@@ -47,6 +51,8 @@ class CodeUnit(object):
  
    def createTerm(self, functionTerm, inputs=None, branch=None, name=None,
        initialValue=None, sourceToken=None):
+
+      assert functionTerm.pythonValue is not None
  
       # Create a new term
       term = term_module.Term()
@@ -65,10 +71,13 @@ class CodeUnit(object):
       functionTerm.users.add(term)
   
       if inputs:
-         self.setTermInputs(term, inputs)
+         self.setTermInputs(term, inputs, suppressChangeEvent=True)
   
       if name:
          self.setTermName(term, name)
+
+      # Initialize
+      functionTerm.pythonValue.pythonInit(term)
 
       # Evaluate immediately (in some cases)
       if (initialValue is None) and (circaFunction.pureFunction):
@@ -141,7 +150,7 @@ class CodeUnit(object):
      if name not in self.term_namespace: return None
      return self.term_namespace[name]
  
-   def setTermInputs(self, target_term, new_inputs):
+   def setTermInputs(self, target_term, new_inputs, suppressChangeEvent=False):
      "Assigns the term's inputs"
  
      old_inputs = target_term.inputs
@@ -161,7 +170,8 @@ class CodeUnit(object):
      for t in newly_removed:
         t.users.remove(target_term)
  
-     self.onInputsChanged(target_term)
+     if not suppressChangeEvent:
+        self.onInputsChanged(target_term)
  
    def appendToInput(self, target_term, new_input):
      "Append a term to the inputs of 'target_term'"

@@ -57,7 +57,7 @@ class Parser(object):
               raise
 
            self.parse_errors.append(e)
-           print "[parse error] " + e.description()
+           print "[parse error] " + str(e)
 
            # Drop this token, and the rest of the line
            self.tokens.consume()
