@@ -11,6 +11,7 @@ NAME_TO_FUNC = {}
 def register(name):
    def decorator(func):
       NAME_TO_FUNC[name] = func
+      func.name = name
       return func
    return decorator
 
@@ -94,25 +95,33 @@ def breakEvaluate(a,b):
 def emptyFunc():
    pass
 
-def mapGenerator(term):
-   keyType = term.inputs[0]
-   valueType = term.inputs[1]
-
+def mapGeneratorInit(term):
+   #print "init called on " + term.getUniqueName()
    if term.state is None:
       term.state = {}
 
-   mapFuncObj = ca_function.Function(inputs=[keyType], output=valueType)
+def mapGeneratorEval(term):
+   #print "generator-eval called on " + term.getUniqueName()
 
-   def mapEvaluate(term):
-      key = term.inputs[0]
-      if key in term.state:
-         term.pythonValue = term.state[key]
+   keyType = term.inputs[0]
+   valueType = term.inputs[1]
+
+   if term.pythonValue is None:
+      term.pythonValue = ca_function.Function(inputs=[keyType], output=valueType)
+
+   def mapAccessEval(term):
+      #print "access-eval called on " + term.getUniqueName()
+      key = term.inputs[0].pythonValue
+
+      hashtable = term.functionTerm.state
+      
+      if key in hashtable:
+         term.pythonValue = hashtable[key]
       else:
          term.pythonValue = None
-   mapFuncObj.pythonEvaluate = mapEvaluate
-   mapFuncObj.trainingFunc = builtins.MAP_TRAINING_FUNC
+   term.pythonValue.pythonEvaluate = mapAccessEval
+   term.pythonValue.trainingFunc = builtins.MAP_TRAINING_FUNC
 
-   term.pythonValue = mapFuncObj
 
 def mapTraining(term):
    targetFunction = term.inputs[0]

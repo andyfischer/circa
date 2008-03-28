@@ -91,13 +91,14 @@ builtins.BUILTINS.createConstant(name='false', value=False, constType=builtins.B
 mapFunctionObj = ca_function.Function(
     inputs=[builtins.TYPE_TYPE, builtins.TYPE_TYPE],
     output=[builtins.FUNC_TYPE],
-    evaluate = builtin_functions.mapGenerator,
-    isGenerator=True)
+    init = builtin_functions.mapGeneratorInit,
+    evaluate = builtin_functions.mapGeneratorEval,
+    hasState=True)
 builtins.MAP_GENERATOR = builtins.BUILTINS.createConstant(name = 'map', value=mapFunctionObj)
 
 mapTrainingObj = ca_function.Function(
       inputs=[builtins.FUNC_TYPE, builtins.REF_TYPE, builtins.REF_TYPE],
-      output=None, pureFunction=False,
+      output=None, # pureFunction=False,
       evaluate = builtin_functions.mapTraining)
 builtins.MAP_TRAINING_FUNC = builtins.BUILTINS.createConstant(value=mapTrainingObj)
 mapFunctionObj.trainingFunc = builtins.MAP_TRAINING_FUNC

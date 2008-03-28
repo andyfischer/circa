@@ -38,15 +38,17 @@ class Term(object):
       Returns some unique identifier. There are a few values we may use here.
       No guarantees are made as to the format.
       """
-      if self.givenName:
+      if self.givenName is not None:
          return self.givenName
-      elif self.debugName:
+      elif self.debugName is not None:
          return self.debugName
       elif self.getType() is builtins.FUNC_TYPE:
          return self.pythonValue.name
       else:
-         #pdb.set_trace()
-         return 't' + str(self.globalID)
+         return self.getUniqueName()
+
+   def getUniqueName(self):
+      return 't' + str(self.globalID)
  
    def inputsContain(self, term):
       "Returns True if our inputs contain the term"
