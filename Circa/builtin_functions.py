@@ -37,6 +37,7 @@ def getInput():
 def assertEvaluate(b):
    if not b:
       print "Assertion failure!"
+NAME_TO_FUNC['assert'].pureFunction = False
 
 @register('equals')
 @wrapAsCirca
