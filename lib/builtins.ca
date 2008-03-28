@@ -1,13 +1,11 @@
-type Ref [python]
 type Token [python]
 
-function map(Type inputType, Type outputType -> Function) [python, generator]
 
-// Functions
+# Functions
 function cond_branch(bool condition) [python]
 function simple_branch() [python]
-function equals(-> bool) [python]
-function not_equals(-> bool) [python]
+function equals(Ref, Ref -> bool) [python]
+function not_equals(Ref, Ref -> bool) [python]
 function print(string) [python]
 function input(-> string) [python]
 function assert(bool) [python]

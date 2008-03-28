@@ -45,7 +45,7 @@ class CircaModule(object):
       module.file_reference = file_name
   
       builder = module.makeBuilder()
-      parser.parse(builder, module.source_tokens, raise_errors)
+      parser.parse(builder, module.source_tokens, raise_errors=raise_errors)
       
       return module
 

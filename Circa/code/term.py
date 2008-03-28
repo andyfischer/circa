@@ -15,6 +15,7 @@ class Term(object):
       self.functionTerm = None
       self.users = set()
       self.pythonValue = None
+      self.state = None
       self.codeUnit = None
       self.branch = None
       self.givenName = None

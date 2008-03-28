@@ -11,6 +11,8 @@ from Circa.token import token_stream
 
 import parse_errors
 
+import builder as builder_module
+
 VERBOSE_DEBUGGING = False
 
 # Expression parsing
@@ -89,7 +91,7 @@ class Infix(Node):
          try:
             return builder.handleImplant(leftSide.functionTerm,
                leftSide.inputs, self.right.eval(builder))
-         except:
+         except builder_module.CouldntFindTrainingFunction:
             raise parse_errors.CouldntFindTrainingFunction(self.token)
 
       # normal function?
@@ -327,6 +329,7 @@ def getOperatorFunction(token):
        print "Notice: couldn't find an operator func for " + token.raw_string
        return None
 
+# fix this: get result of operator() which is a map
    return code.findExisting(builtins.OPERATOR_FUNC,
          inputs=[pythonTokenToBuiltin(token)])
 

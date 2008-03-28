@@ -1,4 +1,6 @@
 
+import pdb
+
 from Circa import (
     ca_function
 )
@@ -57,9 +59,4 @@ def findExistingConstant(constantFunction, value):
    return None
 
 def findTrainingFunction(function):
-   trainingFunc = findExisting(builtins.TRAINING_FUNC, function)
-   if trainingFunc is not None:
-      return trainingFunc
-
-
-
+   return function.pythonValue.trainingFunc
