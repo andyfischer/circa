@@ -105,7 +105,7 @@ class Builder(object):
       self.bindName(name, new_term)
       return new_term
 
-   def handleImplant(self, function, inputs, output):
+   def handleImplant(self, function, inputs, target):
       # Find the training function for this function
       trainingFunction = code.findTrainingFunction(function)
 
@@ -113,7 +113,7 @@ class Builder(object):
          raise CouldntFindTrainingFunction()
 
       # Create a training term
-      newTerm = self.code_unit.getTerm(trainingFunction, [function] + inputs + [output])
+      newTerm = self.code_unit.getTerm(trainingFunction, [function] + inputs + [target])
 
    def createTrainingTerm(self, function, inputs):
       assert function is not None
