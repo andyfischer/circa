@@ -35,45 +35,42 @@ def parseExpression(tokens):
 # Alias for parseExpression
 parse = parseExpression
 
-class UncreatedTerm(object):
+class TermToCreate(object):
    def __init__(self, functionTerm, inputs):
       self.functionTerm = functionTerm
       self.inputs = inputs
 
+   def create(self, builder):
+      return builder.createTerm(functionTerm, inputs)
+
 # AST Classes
-class Node(object):
+class ASTNode(object):
    def eval(self, builder):
+      raise Exception("Need to implement this")
+
+   def handleImplant(self, builder, target):
       raise Exception("Need to implement this")
 
    def getFirstToken(self):
       raise Exception("Need to implement this")
 
-class Infix(Node):
+class Infix(ASTNode):
    def __init__(self, function_token, left, right):
       assert isinstance(function_token, token.Token)
-      assert isinstance(left, Node)
-      assert isinstance(right, Node)
+      assert isinstance(left, ASTNode)
+      assert isinstance(right, ASTNode)
 
       self.token = function_token
       self.left = left
       self.right = right
 
-   def getUncreatedTerm(self, builder):
+   def getTermToCreate(self, builder):
       normalFunction = getOperatorFunction(self.token.match)
       if normalFunction is not None:
-         return UncreatedTerm(normalFunction, 
+         return TermToCreate(normalFunction, 
                               [self.left.eval(builder), self.right.eval(builder)] )
 
    def eval(self, builder):
-
-      """
-      # evaluate as initialize?
-      if self.token.match is COLON_EQUALS:
-         left_term = self.left.eval(builder)
-         right_term = self.right.eval(builder)
-         left_term.pythonValue = right_term.pythonValue
-         return None
-      """
 
       # evaluate as an assignment?
       if self.token.match == EQUALS:
@@ -85,14 +82,22 @@ class Infix(Node):
 
       # evaluate as an implant?
       if self.token.match is COLON_EQUALS:
-         leftSide = self.left.getUncreatedTerm(builder)
-
-         if leftSide.functionTerm.pythonValue is None:
-            pdb.set_trace()
 
          try:
-            return builder.handleImplant(leftSide.functionTerm,
-               leftSide.inputs, self.right.eval(builder))
+            target = self.right.eval(builder)
+
+            # First find out if the left side will give us a TermToCreate object.
+            # Note that we don't actually create it.
+            leftTermToCreate = self.left.getTermToCreate(builder)
+
+            # If that succeeded, use this data to handle implant.
+            if leftTermToCreate is not None:
+               return builder.handleImplant(leftTermToCreate.functionTerm,
+                     inputs=leftTermToCreate.inputs, target=target)
+
+            # Otherwise, allow the ASTNode to handle the implant itself
+            return self.left.handleImplant(builder, target=target)
+
          except builder_module.CouldntFindTrainingFunction:
             raise parse_errors.CouldntFindTrainingFunction(self.token)
 
@@ -107,6 +112,7 @@ class Infix(Node):
             inputs=[self.left.eval(builder), self.right.eval(builder)] )
 
       # evaluate as a function + assign?
+      # try to find an assign operator
       assignFunction = getAssignOperatorFunction(self.token.match)
       if assignFunction is not None:
          # create a term that's the result of the operation
@@ -117,6 +123,9 @@ class Infix(Node):
          return builder.bindName(self.left.getName(), result_term)
 
       raise Exception("Unable to evaluate token: " + self.token.text)
+
+   def handleImplant(self, builder, target):
+      return builder.handleImplant(functionTerm, inputs, target)
 
    def getFirstToken(self):
       return self.left.getFirstToken()
@@ -139,9 +148,8 @@ def getInfixPrecedence(token):
    if token and token.match in infixPrecedence:
       return infixPrecedence[token.match]
    else: return -1
-  
 
-class Literal(Node):
+class Literal(ASTNode):
    def __init__(self, token):
       self.token = token
 
@@ -151,15 +159,14 @@ class Literal(Node):
          self.value = int(token.text)
       elif token.match == STRING:
          self.value = parseStringLiteral(token.text)
-      elif token.match == TRUE:
-         self.value = True
-      elif token.match == FALSE:
-         self.value = False
       else:
-         raise "Couldn't recognize token: " + str(token)
+         raise parse_errors.InternalError("Couldn't recognize token: " + str(token))
 
    def eval(self, builder):
       return builder.createConstant(self.value, sourceToken=self.token)
+
+   def handleImplant(self, builder, target):
+      raise parse_errors.CantUseImplantOperatorOnLiteral(self.token)
 
    def getFirstToken(self):
       return self.token
@@ -167,7 +174,7 @@ class Literal(Node):
    def __str__(self):
       return str(self.value)
 
-class Ident(Node):
+class Ident(ASTNode):
    def __init__(self, token):
       self.token = token
 
@@ -179,8 +186,14 @@ class Ident(Node):
 
       return builder.getNamed(self.token.text)
 
+   def getTermToCreate(self, builder):
+      return None
+
    def getFirstToken(self):
       return self.token
+
+   def handleImplant(self, builder, target):
+      print "need to implement: handleImplant in Ident"
 
    def getName(self):
       return self.token.text
@@ -188,15 +201,18 @@ class Ident(Node):
    def __str__(self):
       return self.token.text
 
-class Unary(Node):
+class Unary(ASTNode):
    def __init__(self, function_token, right):
       self.function_token = function_token
       self.right = right
 
    def eval(self, builder):
-      return builder.createTerm(builtins.MULT,
+      return self.getTermToCreate(builder).create(builder)
+
+   def getTermToCreate(self, builder):
+      return TermToCreate(builtins.MULT,
                                 inputs = [builder.createConstant(-1),
-                                        self.right.eval(builder)])
+                                self.right.eval(builder)])
 
    def getFirstToken(self):
       return self.function_token;
@@ -204,19 +220,23 @@ class Unary(Node):
    def __str__(self):
       return self.function_token.text + "(" + str(self.right) + ")"
 
-class Function(Node):
+class Function(ASTNode):
    def __init__(self, function_name, args):
       self.function_name = function_name
       self.args = args
 
-   def getUncreatedTerm(self, builder):
+   def eval(self, builder):
+      return self.getTermToCreate(builder).create(builder)
+
+   def getTermToCreate(self, builder):
       arg_terms = [t.eval(builder) for t in self.args]
       func = builder.getNamed(self.function_name.text)
  
-      if func.pythonValue is None:
-         pdb.set_trace()
+      if func is None or func.pythonValue is None:
+         raise parse_errors.InternalError(self.function_name,
+            "Function " + self.function_name.text + " not found.")
 
-      return UncreatedTerm(func, arg_terms)
+      return TermToCreate(func, arg_terms)
 
    def eval(self, builder):
       arg_terms = [t.eval(builder) for t in self.args]
@@ -341,8 +361,8 @@ def getOperatorFunction(token):
    result = builtins.BUILTINS.getTerm(builtins.OPERATOR_FUNC,
          inputs=[pythonTokenToBuiltin(token)])
 
-   debug.Assert(result is not None)
-   debug.Assert(result.pythonValue is not None)
+   if result.pythonValue is None:
+      return None
 
    return result
 
@@ -351,8 +371,13 @@ def getAssignOperatorFunction(token):
    if circaObj is None:
        print "Notice: couldn't find an assign operator func for " + token.raw_string
        return None
-   return builtins.BUILTINS.getTerm(builtins.ASSIGN_OPERATOR_FUNC,
+   result = builtins.BUILTINS.getTerm(builtins.ASSIGN_OPERATOR_FUNC,
          inputs=[pythonTokenToBuiltin(token)])
+
+   if result.pythonValue is None:
+      return None
+
+   return result
 
 def pythonTokenToBuiltin(token):
    token_string = builtins.BUILTINS.createConstant(token.raw_string)

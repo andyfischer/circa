@@ -48,6 +48,9 @@ def NoPythonSourceProvided(token):
 def PythonObjectNotFound(token):
    return ParseError(token, "Python object was not found: " + token.text)
 
+def CantUseImplantOperatorOnLiteral(token):
+   return ParseError(token, "Can't have a literal on the left side of the := operator")
+
 def InternalError(token, details=None):
    message = "Internal error"
    if details is not None: message += ": " + details
