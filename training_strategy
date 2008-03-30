@@ -1,0 +1,35 @@
+
+Notes:
+
+Overall goal to support training:
+
+Generate some network of terms that, when evaluated, causes training signals to be propagated upwards. Allow for each function to specify how its piece of the network is created.
+
+Should this be a seperate code unit? Probably
+
+
+Variable X
+  |
+  V
+Function A
+  |
+  V
+Function B
+  |
+  V
+Implant (with target)
+
+
+Results in:
+
+Literal, equal to 'target'
+  |
+  V
+passTrainingSignal of Function B
+  |
+  V
+passTrainingSignal of Function A
+  |
+  V
+assign to X
+ 
