@@ -1,0 +1,12 @@
+
+two = 1?
+
+two := 2
+
+print two
+
+
+three = 5?
+four = three + 1
+four := 4
+print three

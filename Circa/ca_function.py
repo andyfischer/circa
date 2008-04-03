@@ -53,4 +53,14 @@ def createFunctionFromPython(func, **initOptions):
    circaFunc.pythonEvaluate = wrapPythonFunction(func)
    return circaFunc
 
+def createMetaFunctionFromPython(func, **initOptions):
+   """
+   This function returns an instance of Function, with 'func' implanted as its
+   evaluation function. Unlike createFunctionFromPython, this does not pass 'func'
+   through wrapPythonFunction. So, 'func' should accept a single term as input, and
+   return nothing.
+   """
+   circaFunc = Function(**initOptions)
+   circaFunc.pythonEvaluate = func
+   return circaFunc
 
