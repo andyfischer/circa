@@ -5,36 +5,36 @@ ALL = []
 STRING_TO_TOKEN = {}
 
 class TokenDef(object):
-  def __init__(self, id, name, raw=None, pattern=None):
-    self.id = id
-    self.name = name
-    self.raw_string = None
+   def __init__(self, id, name, raw=None, pattern=None):
+      self.id = id
+      self.name = name
+      self.raw_string = None
 
-    if raw:
-      self.pattern = re.compile( re.escape(raw) )
-      self.raw_string = raw
-      STRING_TO_TOKEN[raw] = self
+      if raw:
+         self.pattern = re.compile( re.escape(raw) )
+         self.raw_string = raw
+         STRING_TO_TOKEN[raw] = self
 
-    elif pattern:
-      self.pattern = re.compile( pattern )
+      elif pattern:
+         self.pattern = re.compile( pattern )
 
-    else:
-      self.pattern = None
+      else:
+         self.pattern = None
 
-    ALL.append(self)
+      ALL.append(self)
 
-  def __str__(self):
-    return self.name
+   def __str__(self):
+      return self.name
 
-  def __eq__(self, other):
-    try:
-      return self.id == other.id
-    except: return False
+   def __eq__(self, other):
+      try:
+         return self.id == other.id
+      except: return False
 
-  def __ne__(self, other):
-    try:
-      return self.id != other.id
-    except: return False
+   def __ne__(self, other):
+      try:
+         return self.id != other.id
+      except: return False
 
 # RE helper functions
 def group(*choices): return '(' + '|'.join(choices) + ')'
@@ -43,11 +43,6 @@ def maybe(*choices): return group(*choices) + '?'
 alpha = r"[a-zA-Z_\-]"
 alphanumeric = r"[a-zA-Z0-9_\-]"
 def word(pattern): return pattern + "(?!" + alphanumeric + ")"
-
-# todo:
-# non-alphanumeric char follows word
-# but following character is not included in match
-# or, word can come just before end of file
 
 # Token definitions
 
