@@ -130,25 +130,25 @@ class CodeUnit(object):
      return term
  
    def setTermName(self, term, name, allow_rename=False):
-     "Set a term's name"
+      "Set a term's name"
  
-     assert isinstance(name, str)
+      assert isinstance(name, str)
  
-     if (not allow_rename) and (name in self.term_namespace):
-        raise common_errors.UsageError("A term with name \""+str(name)+"\" already exists." +
+      if (not allow_rename) and (name in self.term_namespace):
+         raise common_errors.UsageError("A term with name \""+str(name)+"\" already exists." +
                         " (Use 'allow_rename' if you want to allow this)")
  
-     if name in self.term_namespace:
-        self.term_namespace[name].givenName = None
-        # TODO, currently the 'givenName' variable will not behave if a term is given
-        # more than one name
+      if name in self.term_namespace:
+         self.term_namespace[name].givenName = None
+         # TODO, currently the 'givenName' variable will not behave if a term is given
+         # more than one name
  
-     self.term_namespace[name] = term
-     term.givenName = name
+      self.term_namespace[name] = term
+      term.givenName = name
  
    def getNamedTerm(self, name):
-     if name not in self.term_namespace: return None
-     return self.term_namespace[name]
+      if name not in self.term_namespace: return None
+      return self.term_namespace[name]
  
    def setTermInputs(self, target_term, new_inputs, suppressChangeEvent=False):
      "Assigns the term's inputs"

@@ -37,265 +37,273 @@ def parseFile(builder, sourceFile, **parser_options):
    parser = Parser(builder, file_contents, fileName=sourceFile, **parser_options)
 
 class Parser(object):
-  def __init__(self, builder, token_source, raise_errors=False, fileName=None,
-        pythonObjectSource=None):
-     self.builder = builder
-     self.parse_errors = []
-     self.raise_errors = raise_errors
-     self.fileName = fileName
-     self.pythonObjectSource = pythonObjectSource
-
-     # Make sure 'tokens' is a token stream
-     self.tokens = token_stream.asTokenStream(token_source)
-    
-     # Evaluate token source
-     while not self.tokens.finished():
-        try:
-           self.statement()
-        except parse_errors.ParseError, e:
-           if self.raise_errors:
-              raise
-
-           self.parse_errors.append(e)
-           print "[parse error] " + str(e)
-
-           # Drop this token, and the rest of the line
-           self.tokens.consume()
-           self.tokens.dropUntil(NEWLINE)
-
-        except Exception, e:
-           if self.raise_errors:
-              raise
-
-           print "Internal error on token: " + self.tokens.next().detailsStr()
-           print e
-           traceback.print_tb(sys.exc_traceback)
-
-  def bind(self, name, term):
-     existing = self.currentBlock().getReference(name)
-     self.currentBlock().putReference(name, term)
-     if existing:
-        self.currentBlock().handleRebind(name, existing, term)
+   def __init__(self, builder, token_source, raise_errors=False, fileName=None,
+         pythonObjectSource=None):
+      self.builder = builder
+      self.parse_errors = []
+      self.raise_errors = raise_errors
+      self.fileName = fileName
+      self.pythonObjectSource = pythonObjectSource
+
+      # Make sure 'tokens' is a token stream
+      self.tokens = token_stream.asTokenStream(token_source)
+     
+      # Evaluate token source
+      while not self.tokens.finished():
+         try:
+            self.statement()
+         except parse_errors.ParseError, e:
+            if self.raise_errors:
+               raise
+
+            self.parse_errors.append(e)
+            print "[parse error] " + str(e)
+
+            # Drop this token, and the rest of the line
+            self.tokens.consume()
+            self.tokens.dropUntil(NEWLINE)
+
+         except Exception, e:
+            if self.raise_errors:
+               raise
+
+            print "Internal error on token: " + self.tokens.next().detailsStr()
+            print e
+            traceback.print_tb(sys.exc_traceback)
+
+   def bind(self, name, term):
+      existing = self.currentBlock().getReference(name)
+      self.currentBlock().putReference(name, term)
+      if existing:
+         self.currentBlock().handleRebind(name, existing, term)
 
-  def expression_statement(self):
-     # Parse an expression using the 'expression' package
-     exprResult = expression_module.parseExpression(self.tokens)
+   def expression_statement(self):
+      # Parse an expression using the 'expression' package
+      exprResult = expression_module.parseExpression(self.tokens)
 
-     if exprResult is None:
-        raise parse_errors.NotAStatement(self.tokens.next())
+      if exprResult is None:
+         raise parse_errors.NotAStatement(self.tokens.next())
 
-     exprResult.eval(self.builder)
+      exprResult.eval(self.builder)
 
-  def statement(self):
-     if VERBOSE_DEBUGGING: print "Parsing statement"
+   def statement(self):
+      if VERBOSE_DEBUGGING: print "Parsing statement"
 
-     paths = {}
-     paths[TYPE] = self.type_decl
-     paths[IF] = self.if_statement
-     paths[ATTRIBUTE] = self.attribute_decl
-     paths[FUNCTION] = self.function_decl
-     paths[RETURN] = self.return_statement
-     paths[RBRACKET] = self.right_bracket
-     paths[NEWLINE] = self.new_line
- 
-     next_token = self.tokens.next()
+      paths = {}
+      paths[TYPE] = self.type_decl
+      paths[IF] = self.if_statement
+      paths[ATTRIBUTE] = self.attribute_decl
+      paths[FUNCTION] = self.function_decl
+      paths[RETURN] = self.return_statement
+      paths[RBRACKET] = self.right_bracket
+      paths[NEWLINE] = self.new_line
+  
+      next_token = self.tokens.next()
 
-     # If we have this token in our paths, parse that
-     if next_token.match in paths:
-        paths[next_token.match]()
-        return
+      # If we have this token in our paths, parse that
+      if next_token.match in paths:
+         paths[next_token.match]()
+         return
 
-     # Check to parse a property
-     if self.tokens.nextIs(IDENT) and self.tokens.nextIs(COLON,lookahead=1):
-        self.property_statement()
-        return
+      # Check to parse a property
+      if self.tokens.nextIs(IDENT) and self.tokens.nextIs(COLON,lookahead=1):
+         self.property_statement()
+         return
 
-     # Otherwise, parse as expression
-     self.expression_statement()
+      # Otherwise, parse as expression
+      self.expression_statement()
 
-  def type_decl(self):
-     decl = type_decl(self.tokens)
+   def type_decl(self):
+      decl = type_decl(self.tokens)
 
-     name = decl.id.text
+      name = decl.id.text
 
-     # Handle a built-in type
-     if 'python' in decl.getAnnotationStrings():
-        return self.builder.createConstant(value=None, name = name, constType=builtins.TYPE_TYPE)
+      # Handle a built-in type
+      if 'python' in decl.getAnnotationFlagStrings():
+         return self.builder.createConstant(value=None, name = name, constType=builtins.TYPE_TYPE)
 
-     # Handle composite type
-     # todo
+      # Handle composite type
+      # todo
 
-     # Handle specialize type
-     # todo
+      # Handle specialize type
+      # todo
 
-     raise parse_errors.NotImplemented(name)
+      raise parse_errors.NotImplemented(name)
 
-  def if_statement(self):
-     if VERBOSE_DEBUGGING: print "Parsing if_statement"
+   def if_statement(self):
+      if VERBOSE_DEBUGGING: print "Parsing if_statement"
 
-     self.tokens.consume(IF)
-     self.tokens.startSkipping(NEWLINE)
+      self.tokens.consume(IF)
+      self.tokens.startSkipping(NEWLINE)
 
-     self.tokens.consume(LPAREN)
+      self.tokens.consume(LPAREN)
 
-     # parse the condition expression
-     first_condition_token = self.tokens.next()
-     condition_expr = self.expression()
-     condition_term = condition_expr.eval(self.builder)
+      # parse the condition expression
+      first_condition_token = self.tokens.next()
+      condition_expr = self.expression()
+      condition_term = condition_expr.eval(self.builder)
 
-     if condition_term == None:
-        raise parse_errors.ExpectedExpression(first_condition_token)
-    
-     self.tokens.consume(RPAREN)
+      if condition_term == None:
+         raise parse_errors.ExpectedExpression(first_condition_token)
+     
+      self.tokens.consume(RPAREN)
 
-     # create a group & block
-     cond_group = self.builder.newConditionalGroup(condition_term)
-     cond_block = cond_group.newBlock()
-     assert cond_block is not None
+      # create a group & block
+      cond_group = self.builder.newConditionalGroup(condition_term)
+      cond_block = cond_group.newBlock()
+      assert cond_block is not None
 
-     self.block(cond_block)
+      self.block(cond_block)
 
-     if VERBOSE_DEBUGGING:
-        print "Finished if block, next token is: " + str(self.tokens.next())
+      if VERBOSE_DEBUGGING:
+         print "Finished if block, next token is: " + str(self.tokens.next())
 
-     if self.tokens.nextIs(ELSE):
-        if VERBOSE_DEBUGGING: print "Parsing else block"
-        self.tokens.startSkipping(NEWLINE)
-        self.tokens.consume(ELSE)
+      if self.tokens.nextIs(ELSE):
+         if VERBOSE_DEBUGGING: print "Parsing else block"
+         self.tokens.startSkipping(NEWLINE)
+         self.tokens.consume(ELSE)
 
-        else_block = cond_group.newBlock(isDefault = True)
+         else_block = cond_group.newBlock(isDefault = True)
 
-        self.block(else_block)
+         self.block(else_block)
 
-     cond_group.finish()
+      cond_group.finish()
 
-  def function_decl(self):
-     self.tokens.consume(FUNCTION)
-     decl = function_decl(self.tokens)
+   def function_decl(self):
+      self.tokens.consume(FUNCTION)
+      decl = function_decl(self.tokens)
 
-     def getArgName(arg): return arg.getNameStr()
+      def getArgName(arg): return arg.getNameStr()
 
-     # Get a list of input types
-     inputTypes = map(self.getTypeFromToken, decl.getInputTypes())
-     outputType = (None if decl.outputType is None
-                        else self.getTypeFromToken(decl.outputType))
+      # Get a list of input types
+      inputTypes = map(self.getTypeFromToken, decl.getInputTypes())
+      outputType = (None if decl.outputType is None
+                         else self.getTypeFromToken(decl.outputType))
 
-     # Check for 'python' annotation
-     if 'python' in decl.getAnnotationStrings():
+      name = decl.id.text
+      funcObj = None
 
-        if self.pythonObjectSource is None:
-           raise parse_errors.NoPythonSourceProvided(decl.findAnnotation('python'))
+      # Check for 'python' annotation
+      if 'python' in decl.getAnnotationFlagStrings():
 
-        name = decl.id.text
+         if self.pythonObjectSource is None:
+            raise parse_errors.NoPythonSourceProvided(decl.findAnnotation('python'))
 
-        if name not in self.pythonObjectSource:
-           raise parse_errors.PythonObjectNotFound(decl.id)
+         if name not in self.pythonObjectSource:
+            raise parse_errors.PythonObjectNotFound(decl.id)
 
-        # Fetch the python-based function
-        obj = self.pythonObjectSource[name]
+         # Fetch the python-based function
+         funcObj = self.pythonObjectSource[name]
 
-        # Overwrite type information with declared
-        obj.inputTypes = inputTypes
-        obj.outputType = outputType
+         # Overwrite type information with declared types
+         funcObj.inputTypes = inputTypes
+         funcObj.outputType = outputType
 
-        return self.builder.createConstant(value=obj, name=name)
+      else:
 
-     # Create a new subroutine object
-     sub = code.SubroutineDefinition(input_names=decl.getInputNames())
+         raise parse_errors.NotImplemented(tokens.next())
 
-     # open a block
-     code_block = builder.FunctionBlock(self.builder, sub.code_unit)
-     self.block(code_block)
+         # Create a new subroutine object
+         sub = code.SubroutineDefinition(input_names=decl.getInputNames())
 
-     # store this guy in a constant term
-     return self.builder.createConstant(value=sub, name=decl.id.text)
+         # Open a block
+         code_block = builder.FunctionBlock(self.builder, sub.code_unit)
+         self.block(code_block)
 
-  def attribute_decl(self):
-     self.tokens.consume(ATTRIBUTE)
-     decl = syntax.function_decl(self.tokens)
+      # Check for 'training' annotation
 
-     inputTypes = map(self.getTypeFromToken, decl.inputTypes())
-     outputType = self.getTypeFromToken(decl.outputType)
 
-     funcObject = ca_function.Function(inputTypes, outputType)
-     funcObject.name = decl.id.text
-     funcObject.pythonEvaluate = PLACEHOLDER_FUNC_FOR_ATTRIBUTES
-     self.builder.createConstant(value=funcObject, name=decl.id.text)
+      # Store result in a constant term
+      return self.builder.createConstant(value=funcObj, name=name)
 
-  def return_statement(self):
-     return_token = self.tokens.consume(RETURN)
-     expr = self.expression()
-     if not expr:
-        raise parse_errors.ExpectedExpression(return_token)
+   """
+   def attribute_decl(self):
+      self.tokens.consume(ATTRIBUTE)
+      decl = syntax.function_decl(self.tokens)
 
-     self.bind(SPECIAL_NAME_FOR_RETURNS, expr.eval(self.builder))
+      inputTypes = map(self.getTypeFromToken, decl.inputTypes())
+      outputType = self.getTypeFromToken(decl.outputType)
 
-  def block(self, blockToStart):
-     if VERBOSE_DEBUGGING: print "Parsing block"
+      funcObject = ca_function.Function(inputTypes, outputType)
+      funcObject.name = decl.id.text
+      funcObject.pythonEvaluate = PLACEHOLDER_FUNC_FOR_ATTRIBUTES
+      self.builder.createConstant(value=funcObject, name=decl.id.text)
+   """
 
-     if blockToStart:
-       self.builder.startBlock(blockToStart)
+   def return_statement(self):
+      return_token = self.tokens.consume(RETURN)
+      expr = self.expression()
+      if not expr:
+         raise parse_errors.ExpectedExpression(return_token)
 
-     # check for a block bounded with {}s
-     if (self.tokens.nextIs(LBRACKET)):
-       self.tokens.consume(LBRACKET)
-       self.tokens.stopSkipping(NEWLINE)
+      self.bind(SPECIAL_NAME_FOR_RETURNS, expr.eval(self.builder))
 
-       # parse contents
-       while not self.tokens.nextIs(RBRACKET):
-         self.statement()
+   def block(self, blockToStart):
+      if VERBOSE_DEBUGGING: print "Parsing block"
 
-       self.tokens.consume(RBRACKET)
+      if blockToStart:
+        self.builder.startBlock(blockToStart)
 
-     # parse a one-liner with no {}s
-     else:
-       self.statement()
+      # check for a block bounded with {}s
+      if (self.tokens.nextIs(LBRACKET)):
+        self.tokens.consume(LBRACKET)
+        self.tokens.stopSkipping(NEWLINE)
 
-     if blockToStart:
-       self.builder.closeBlock()
+        # parse contents
+        while not self.tokens.nextIs(RBRACKET):
+          self.statement()
 
-  def right_bracket(self):
-     token = self.tokens.consume(RBRACKET)
-     if self.builder.blockDepth() < 1:
-       raise parse_errors.DanglingRightBracket(token)
+        self.tokens.consume(RBRACKET)
 
-     self.builder.closeBlock()
+      # parse a one-liner with no {}s
+      else:
+        self.statement()
 
-  def property_statement(self):
-     property = self.tokens.consume(IDENT)
-     self.tokens.consume(COLON)
+      if blockToStart:
+        self.builder.closeBlock()
 
-     # Handle specific property
-     if property.text == "namespace":
-        # Parse namespace
-        namespace = self.tokens.consume(IDENT)
+   def right_bracket(self):
+      token = self.tokens.consume(RBRACKET)
+      if self.builder.blockDepth() < 1:
+        raise parse_errors.DanglingRightBracket(token)
 
-        # TODO: accept namespaces of the form blah.whatever.something
+      self.builder.closeBlock()
 
-        self.builder.startNamespace(namespace.text)
+   def property_statement(self):
+      property = self.tokens.consume(IDENT)
+      self.tokens.consume(COLON)
 
-     else:
-        raise parse_errors.UnrecognizedProperty(property)
+      # Handle specific property
+      if property.text == "namespace":
+         # Parse namespace
+         namespace = self.tokens.consume(IDENT)
 
-  def new_line(self):
-     if VERBOSE_DEBUGGING: print "Parsing new_line"
-     self.tokens.consume(NEWLINE)
+         # TODO: accept namespaces of the form blah.whatever.something
 
-  def getTypeFromToken(self, token):
+         self.builder.startNamespace(namespace.text)
 
-     typeTerm = self.builder.getNamed(token.text)
+      else:
+         raise parse_errors.UnrecognizedProperty(property)
 
-     if typeTerm is None:
-        raise parse_errors.IdentifierNotFound(token)
+   def new_line(self):
+      if VERBOSE_DEBUGGING: print "Parsing new_line"
+      self.tokens.consume(NEWLINE)
 
-     if typeTerm.getType() is not builtins.TYPE_TYPE:
-        raise parse_errors.IdentifierIsNotAType(token)
+   def getTypeFromToken(self, token):
 
-     return typeTerm
+      typeTerm = self.builder.getNamed(token.text)
+
+      if typeTerm is None:
+         raise parse_errors.IdentifierNotFound(token)
+
+      if typeTerm.getType() is not builtins.TYPE_TYPE:
+         raise parse_errors.IdentifierIsNotAType(token)
+
+      return typeTerm
      
 class ParsedFunctionDecl(object):
-   def getAnnotationStrings(self):
-      return map(lambda a: a.text, self.annotations)
+   def getAnnotationFlagStrings(self):
+      return map(lambda a: a.text, self.annotations.flags)
 
    def getInputTypes(self):
       return map(lambda a: a.type, self.inputArgs)
@@ -356,8 +364,8 @@ def function_argument(tokens):
    return result
 
 class ParsedTypeDecl(object):
-   def getAnnotationStrings(self):
-      return map(lambda a: a.text, self.annotations)
+   def getAnnotationFlagStrings(self):
+      return map(lambda a: a.text, self.annotations.flags)
 
 def type_decl(tokens):
    """
@@ -401,17 +409,28 @@ def type_decl(tokens):
 
    return result
 
+class AnnotationList(object):
+   def __init__(self):
+      self.flags = []
+      self.associative = {}
+
 # Parse a list of annotations surrounded by []s
 # Returns an empty list if none are found
 def annotation_list(tokens):
    if not tokens.nextIs(LBRACE):
-      return []
+      return None
 
    tokens.consume(LBRACE)
-   annotationList = []
+   annotationList = AnnotationList()
 
    while not tokens.nextIs(RBRACE):
-      annotationList.append(tokens.consume(IDENT))
+      annotationName = tokens.consume(IDENT)
+      
+      if tokens.nextIs(EQUALS):
+         tokens.consume(EQUALS)
+         annotationList.associative[annotationName] = tokens.consume(IDENT)
+      else:
+         annotationName.flags.append[annotationName]
 
       if tokens.nextIs(COMMA):
          tokens.consume(COMMA)
