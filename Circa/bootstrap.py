@@ -103,7 +103,6 @@ mapTrainingObj = ca_function.Function(
 builtins.MAP_TRAINING_FUNC = builtins.BUILTINS.createConstant(value=mapTrainingObj)
 mapFunctionObj.trainingFunc = builtins.MAP_TRAINING_FUNC
 
-
 # Load builtins.ca file into this code unit
 builtinsFilename = os.path.join(CIRCA_HOME, "lib", "builtins.ca")
 parser.parseFile(parser.builder.Builder(target=builtins.BUILTINS),

@@ -51,6 +51,34 @@ def notEquals(a,b): return a != b
 @wrapAsCirca
 def add(a,b): return a + b
 
+@register('add-training')
+def addTrainSignal(term):
+   targetTerm = term.inputs[0]
+
+   numberOfIncomingSignals = 0
+
+   signalSum = 0
+
+   for input in targetTerm.inputs:
+
+      trainingSignal = term.code_unit.getTerm(builtins.TRAINING_FUNC, inputs=[targetTerm])
+
+      if trainingSignal.pythonValue is None:
+         continue
+
+      numberOfIncomingSignals += 1
+
+      signalSum += trainingSignal.pythonValue
+
+   if numberOfIncomingSignals == 0:
+      term.pythonValue = None
+      return
+
+   term.pythonValue = signalSum / numberOfIncomingSignals
+
+
+@registerTraining
+
 @register('sub')
 @wrapAsCirca
 def sub(a,b): return a - b

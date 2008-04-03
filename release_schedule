@@ -1,0 +1,15 @@
+
+
+0.1
+  - Training functionality
+  - Save-to-source
+  - Interface with 3rd party library (pyglet or pygame)
+  - Demo that shows:
+    1) Simple drawing 
+    2) Mouse picking & dragging
+    3) Save modified version back to source code
+
+0.2
+  - Subroutines
+  - Meta functions
+  - Able to write a training function in pure Circa
