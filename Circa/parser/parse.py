@@ -92,7 +92,6 @@ class Parser(object):
       paths = {}
       paths[TYPE] = self.type_decl
       paths[IF] = self.if_statement
-      paths[ATTRIBUTE] = self.attribute_decl
       paths[FUNCTION] = self.function_decl
       paths[RETURN] = self.return_statement
       paths[RBRACKET] = self.right_bracket
@@ -430,7 +429,7 @@ def annotation_list(tokens):
          tokens.consume(EQUALS)
          annotationList.associative[annotationName] = tokens.consume(IDENT)
       else:
-         annotationName.flags.append[annotationName]
+         annotationList.flags.append(annotationName)
 
       if tokens.nextIs(COMMA):
          tokens.consume(COMMA)

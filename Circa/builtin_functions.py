@@ -16,6 +16,7 @@ def register(name):
    return decorator
 
 wrapAsCirca = ca_function.createFunctionFromPython
+wrapAsCircaMeta = ca_function.createMetaFunctionFromPython
 
 @register('token')
 @wrapAsCirca
@@ -51,7 +52,8 @@ def notEquals(a,b): return a != b
 @wrapAsCirca
 def add(a,b): return a + b
 
-@register('add-training')
+@register('add_training')
+@wrapAsCircaMeta
 def addTrainSignal(term):
    targetTerm = term.inputs[0]
 
@@ -75,9 +77,6 @@ def addTrainSignal(term):
       return
 
    term.pythonValue = signalSum / numberOfIncomingSignals
-
-
-@registerTraining
 
 @register('sub')
 @wrapAsCirca
@@ -125,13 +124,10 @@ def emptyFunc():
    pass
 
 def mapGeneratorInit(term):
-   #print "init called on " + term.getUniqueName()
    if term.state is None:
       term.state = {}
 
 def mapGeneratorEval(term):
-   #print "generator-eval called on " + term.getUniqueName()
-
    keyType = term.inputs[0]
    valueType = term.inputs[1]
 
