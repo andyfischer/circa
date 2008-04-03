@@ -14,7 +14,14 @@ class Term(object):
       self.inputs = []
       self.functionTerm = None
       self.users = set()
+
+      # The output value of this term
       self.pythonValue = None
+
+      # True if 'pythonValue' is available. False if this function has not
+      # been evaluated, or cannot be evaluated.
+      self.outputAvail = False
+
       self.state = None
       self.codeUnit = None
       self.branch = None
@@ -56,19 +63,8 @@ class Term(object):
          if input == term: return True
       return false
  
-   """
-   def changeFunction(self, new_func, initial_state=None):
-     "Change this term's function"
-     self.functionTerm = new_func
- 
-     if not initial_state:
-       self.state = self.functionTerm.makeState()
-     else:
-       self.state = initial_state
-       """
- 
    def pythonEvaluate(self):
-       self.getFunction().pythonEvaluate(self)
+      self.getFunction().pythonEvaluate(self)
  
    def printExtended(self, printer):
       printer.prints("%i: %s" % (self.globalID, self.functionTerm.pythonValue.name))
@@ -88,28 +84,28 @@ class Term(object):
       printer.println()
   
       if self.state:
-        label_branches = len(self.state.branches) > 1
-        branch_index = -1
-  
-        for branch in self.state.branches:
-          branch_index += 1
-  
-          # (maybe) label the branch index
-          if label_branches:
-             printer.indent(1)
-             printer.println('Branch %i:' % branch_index)
-             printer.indent(1)
-          else:
-             printer.indent(2)
-  
-          # print inner terms
-          if branch.terms:
-             for term in branch.terms:
-                term.printExtended(printer)
-          else:
-             printer.println("(empty)")
-  
-          printer.unindent(2)
+         label_branches = len(self.state.branches) > 1
+         branch_index = -1
+   
+         for branch in self.state.branches:
+            branch_index += 1
+    
+            # (maybe) label the branch index
+            if label_branches:
+               printer.indent(1)
+               printer.println('Branch %i:' % branch_index)
+               printer.indent(1)
+            else:
+               printer.indent(2)
+    
+            # print inner terms
+            if branch.terms:
+               for term in branch.terms:
+                  term.printExtended(printer)
+            else:
+               printer.println("(empty)")
+    
+            printer.unindent(2)
  
    def iterate(self, forwards=True):
       yield self

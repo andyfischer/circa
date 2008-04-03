@@ -9,26 +9,26 @@ modules_to_test = (
 )
 
 def suite():
-    alltests = unittest.TestSuite()
+   alltests = unittest.TestSuite()
 
-    add_tests = lambda module: alltests.addTests(unittest.findTestCases(module))
+   add_tests = lambda module: alltests.addTests(unittest.findTestCases(module))
 
-    map(add_tests, map(__import__, modules_to_test))
+   map(add_tests, map(__import__, modules_to_test))
 
-    from token import tests
+   from token import tests
 
-    add_tests(tests)
+   add_tests(tests)
 
-    from parser import test_builder, test_expression, test_parser
+   from parser import test_builder, test_expression, test_parser
 
-    add_tests(test_builder)
-    add_tests(test_expression)
-    add_tests(test_parser)
+   add_tests(test_builder)
+   add_tests(test_expression)
+   add_tests(test_parser)
 
-    from code import tests
-    add_tests(tests)
+   from code import tests
+   add_tests(tests)
 
-    return alltests
+   return alltests
 
 if __name__ == '__main__':
-    unittest.main(defaultTest='suite')
+   unittest.main(defaultTest='suite')
