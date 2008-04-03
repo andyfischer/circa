@@ -30,7 +30,7 @@ def findExisting(functionTerm, inputs=[]):
    
          # Check if all the inputs are the same
          def matches(pair):
-           return pair[0].equals(pair[1])
+            return pair[0].equals(pair[1])
    
          inputs_match = all(map(matches, zip(inputs, potentialMatch.inputs)))
    
@@ -50,11 +50,11 @@ def findExistingConstant(constantFunction, value):
 
    for possibleMatch in constantFunction.users:
        
-       if possibleMatch.functionTerm != constantFunction:
-           continue
+      if possibleMatch.functionTerm != constantFunction:
+         continue
 
-       if possibleMatch.pythonValue == value:
-           return possibleMatch
+      if possibleMatch.pythonValue == value:
+         return possibleMatch
 
    return None
 
