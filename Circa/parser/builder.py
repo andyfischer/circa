@@ -104,14 +104,14 @@ class Builder(object):
       return new_term
 
    def createFeedback(self, term, target):
-      # Find the training function for this function
-      trainingFunction = code.findFeedbackFunction(term.functionTerm)
+      # Find the feedback function for this function
+      feedbackFunction = code.findFeedbackFunction(term.functionTerm)
 
-      if trainingFunction is None:
+      if feedbackFunction is None:
          raise CouldntFindFeedbackFunction()
 
       # Create a training term
-      newTerm = self.code_unit.getTerm(trainingFunction, [term, target])
+      newTerm = self.code_unit.getTerm(feedbackFunction, [term, target])
 
    def currentBlock(self):
       try: return self.blockStack[-1]
@@ -167,21 +167,21 @@ class Block(object):
             return block
 
    def bindLocal(self, name, term):
-    # Check if this is already defined
+      # Check if this is already defined
 
-    existing_term = self.getName(name)
-    defined_outside = bool(self.getOutsideName(name))
+      existing_term = self.getName(name)
+      defined_outside = bool(self.getOutsideName(name))
 
-    if existing_term:
-      if name in self.rebinds:
-        # rebind info exists already, update it
-        self.rebinds[name].head = term
-      else:
-        # create rebind info
-        self.rebinds[name] = RebindInfo(name, existing_term, term, defined_outside)
+      if existing_term:
+         if name in self.rebinds:
+            # rebind info exists already, update it
+            self.rebinds[name].head = term
+         else:
+            # create rebind info
+            self.rebinds[name] = RebindInfo(name, existing_term, term, defined_outside)
 
-    self.term_namespace[name] = term
-    self.onBind(name, term)
+      self.term_namespace[name] = term
+      self.onBind(name, term)
 
    def getName(self, name):
       term = self.getLocalName(name)
@@ -189,10 +189,10 @@ class Block(object):
       return self.getOutsideName(name)
 
    def getLocalName(self, name):
-    try:
-      return self.term_namespace[name]
-    except KeyError:
-      return None
+      try:
+         return self.term_namespace[name]
+      except KeyError:
+         return None
 
    def getOutsideName(self, name):
       if not self.parent: return None
@@ -242,15 +242,15 @@ class TopLevelBlock(Block):
       self.code_unit.setTermName(term, name, allow_rename=True)
 
    def onFinish(self):
-     # Todo: this needs to get called
-     # wrap up stateful terms with assign() terms
-     for stinfo in self.statefulTermInfos.values():
+      # TODO: this needs to get called
+      # wrap up stateful terms with assign() terms
+      for stinfo in self.statefulTermInfos.values():
 
-        # skip stateful terms that didn't get rebound
-        if stinfo.base == stinfo.head:
-           continue
+         # skip stateful terms that didn't get rebound
+         if stinfo.base == stinfo.head:
+            continue
 
-        self.builder.createTerm(functions.assign, inputs=[stinfo.base, stinfo.head])
+         self.builder.createTerm(functions.assign, inputs=[stinfo.base, stinfo.head])
 
 class ConditionalGroup(object):
    def __init__(self, builder, condition_term):
