@@ -46,7 +46,7 @@ builtins.CONST_TYPE_FUNC.pythonValue.outputType=builtins.TYPE_TYPE
 # Create Function type
 builtins.FUNC_TYPE = builtins.BUILTINS.createConstant(name = 'Function',
     value = ca_type.Type(),
-    constType=builtins.TYPE_TYPE)
+    valueType=builtins.TYPE_TYPE)
 python_bridge.PYTHON_TYPE_TO_CIRCA[ca_function.Function] = builtins.FUNC_TYPE
 
 # Implant types into 'constant' function
@@ -56,36 +56,36 @@ builtins.CONST_FUNC.pythonValue.outputType = builtins.FUNC_TYPE
 # Create and register primitive types
 builtins.INT_TYPE = builtins.BUILTINS.createConstant(name = 'int',
     value = ca_type.Type(),
-    constType=builtins.TYPE_TYPE)
+    valueType=builtins.TYPE_TYPE)
 python_bridge.PYTHON_TYPE_TO_CIRCA[int] = builtins.INT_TYPE
 
 builtins.FLOAT_TYPE = builtins.BUILTINS.createConstant(name = 'float',
     value = ca_type.Type(),
-    constType=builtins.TYPE_TYPE)
+    valueType=builtins.TYPE_TYPE)
 python_bridge.PYTHON_TYPE_TO_CIRCA[float] = builtins.FLOAT_TYPE
 
 builtins.STR_TYPE = builtins.BUILTINS.createConstant(name = 'string',
     value = ca_type.Type(),
-    constType=builtins.TYPE_TYPE)
+    valueType=builtins.TYPE_TYPE)
 python_bridge.PYTHON_TYPE_TO_CIRCA[str] = builtins.STR_TYPE
 
 builtins.BOOL_TYPE = builtins.BUILTINS.createConstant(name = 'bool',
     value = ca_type.Type(),
-    constType=builtins.TYPE_TYPE)
+    valueType=builtins.TYPE_TYPE)
 python_bridge.PYTHON_TYPE_TO_CIRCA[bool] = builtins.BOOL_TYPE
 
 builtins.REF_TYPE = builtins.BUILTINS.createConstant(name = 'Ref',
     value = ca_type.Type(),
-    constType=builtins.TYPE_TYPE)
+    valueType=builtins.TYPE_TYPE)
 
 builtins.SUBROUTINE_TYPE = builtins.BUILTINS.createConstant(name = 'Subroutine',
     value = ca_type.Type(),
-    constType=builtins.TYPE_TYPE)
+    valueType=builtins.TYPE_TYPE)
 python_bridge.PYTHON_TYPE_TO_CIRCA[code.SubroutineDefinition] = builtins.SUBROUTINE_TYPE
 
 # Create basic constants
-builtins.BUILTINS.createConstant(name='true', value=True, constType=builtins.BOOL_TYPE)
-builtins.BUILTINS.createConstant(name='false', value=False, constType=builtins.BOOL_TYPE)
+builtins.BUILTINS.createConstant(name='true', value=True, valueType=builtins.BOOL_TYPE)
+builtins.BUILTINS.createConstant(name='false', value=False, valueType=builtins.BOOL_TYPE)
 
 # Create Map function
 mapFunctionObj = ca_function.Function(

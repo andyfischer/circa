@@ -119,7 +119,7 @@ class Parser(object):
 
       # Handle a built-in type
       if 'python' in decl.getAnnotationFlagStrings():
-         return self.builder.createConstant(value=None, name = name, constType=builtins.TYPE_TYPE)
+         return self.builder.createConstant(value=None, name = name, valueType=builtins.TYPE_TYPE)
 
       # Handle composite type
       # todo

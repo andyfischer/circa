@@ -46,7 +46,7 @@ def word(pattern): return pattern + "(?!" + alphanumeric + ")"
 
 # Token definitions
 
-# symbols
+# Symbols
 LPAREN =        TokenDef(1, 'lparen', '(')
 RPAREN =        TokenDef(2, 'rparen', ')')
 LBRACE =        TokenDef(3, 'lbrace', '[')
@@ -80,7 +80,7 @@ SEMICOLON =     TokenDef(29, 'semicolon', ';')
 EXCLAIMATION =  TokenDef(31, 'exclaimation', '!')
 NEWLINE =       TokenDef(32, 'newline', '\n', pattern=r"\n")
 
-# keywords
+# Keywords
 DEFINE =        TokenDef(41, 'define', pattern=word('define'))
 ELSE =          TokenDef(42, 'else', pattern=word('else'))
 FOR =           TokenDef(44, 'for', pattern=word('for'))
@@ -95,7 +95,7 @@ THIS =          TokenDef(54, 'this', pattern=word('this'))
 PATCH =         TokenDef(55, 'patch', pattern=word('patch'))
 ATTRIBUTE =     TokenDef(56, 'attribute', pattern=word('attribute'))
 
-# other types
+# Other tokens
 FLOAT =         TokenDef(70, 'float', pattern=r"([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)")
 INTEGER =       TokenDef(71, 'integer', pattern=r"([1-9]+[0-9]*)|0")
 IDENT =         TokenDef(72, 'ident', pattern=r"[a-zA-Z_\-][a-zA-Z0-9_\-]*")
@@ -109,6 +109,6 @@ DOT =           TokenDef(27, 'dot', '.')
 # this needs to be below POUND_IDENT
 POUND =         TokenDef(30, 'pound', '#')
 
-# meta types
-UNRECOGNIZED =  TokenDef(74, 'unrecognized', '')
+# Meta types
+UNRECOGNIZED =  TokenDef(80, 'unrecognized', '')
 
