@@ -58,5 +58,5 @@ def findExistingConstant(constantFunction, value):
 
    return None
 
-def findTrainingFunction(function):
+def findFeedbackFunction(function):
    return function.pythonValue.trainingFunc

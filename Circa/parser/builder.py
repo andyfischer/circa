@@ -103,22 +103,15 @@ class Builder(object):
       if name: self.bindName(name, new_term)
       return new_term
 
-   def createTraining(self, term, target):
+   def createFeedback(self, term, target):
       # Find the training function for this function
-      trainingFunction = code.findTrainingFunction(term.functionTerm)
+      trainingFunction = code.findFeedbackFunction(term.functionTerm)
 
       if trainingFunction is None:
-         raise CouldntFindTrainingFunction()
+         raise CouldntFindFeedbackFunction()
 
       # Create a training term
       newTerm = self.code_unit.getTerm(trainingFunction, [term, target])
-
-   def createTrainingTerm(self, function, inputs):
-      assert function is not None
-      trainingFunc = self.code_unit.getTerm(builtins.TRAINING_FUNC, inputs=[function])
-      assert trainingFunc.pythonValue is not None
-      return self.code_unit.createTerm(trainingFunc, inputs=inputs,
-                                       branch = self.currentBlock().branch)
 
    def currentBlock(self):
       try: return self.blockStack[-1]
@@ -354,6 +347,6 @@ class RebindInfo(object):
       self.head = head
       self.defined_outside = defined_outside
 
-class CouldntFindTrainingFunction(Exception):
+class CouldntFindFeedbackFunction(Exception):
    pass
 
