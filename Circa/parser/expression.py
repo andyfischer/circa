@@ -150,8 +150,9 @@ def getInfixPrecedence(token):
    else: return -1
 
 class Literal(ASTNode):
-   def __init__(self, token):
+   def __init__(self, token, hasQuestionMark=False):
       self.token = token
+      self.hasQuestionMark = hasQuestionMark
 
       if token.match == FLOAT:
          self.value = float(token.text)
@@ -163,7 +164,10 @@ class Literal(ASTNode):
          raise parse_errors.InternalError("Couldn't recognize token: " + str(token))
 
    def eval(self, builder):
-      return builder.createConstant(self.value, sourceToken=self.token)
+      if self.hasQuestionMark:
+         return builder.createVariable(self.value, sourceToken=self.token)
+      else:
+         return builder.createConstant(self.value, sourceToken=self.token)
 
    def handleImplant(self, builder, target):
       raise parse_errors.CantUseImplantOperatorOnLiteral(self.token)
@@ -307,10 +311,14 @@ def atom(tokens):
    if tokens.nextIs(IDENT) and tokens.nextIs(LPAREN, lookahead=1):
       return function_call(tokens)
 
-   # literal
+   # Literal value
    if tokens.nextIn((FLOAT, INTEGER, STRING)):
       token = tokens.consume()
-      return Literal(token)
+      questionMark = False
+      if tokens.nextIs(QUESTION):
+         tokens.consume(QUESTION)
+         questionMark = True
+      return Literal(token, hasQuestionMark=questionMark)
 
    # identifier
    if tokens.nextIs(IDENT):

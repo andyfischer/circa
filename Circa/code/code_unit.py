@@ -90,44 +90,53 @@ class CodeUnit(object):
 
 
    def createConstant(self, value, name=None, branch=None,
-         sourceToken=None, constType=None):
+         sourceToken=None, valueType=None):
 
-     assert str(type(constType)) != "Type"
- 
-     if constType is None and value is None:
-        raise Exception("Either type or value needs to be not-None")
- 
-     if constType is None:
-        constType = python_bridge.typeOfPythonObj(value)
- 
-     if constType is None:
-        raise Exception("Couldn't find a type for value: " + str(value))
- 
-     # Get constant function for this type
-     constFunc = term_utils.findExisting(builtins.CONST_FUNC, inputs=[constType])
- 
-     # Create a constant function if it wasn't found
-     if constFunc is None:
-        funcValue = ca_function.Function(inputs=[], output=constType)
-        constFunc = self.createTerm(builtins.CONST_FUNC, inputs=[constType],
-            initialValue=funcValue)
-        constFunc.debugName = "constant-" + constType.getSomeName()
-        assert constFunc.pythonValue is not None
- 
-     # Look for an existing term
-     existingTerm = term_utils.findExistingConstant(constFunc, value)
- 
-     term = None
-     if existingTerm is None:
-         term = self.createTerm(constFunc, initialValue=value, 
-             branch=branch, sourceToken=sourceToken)
-     else:
-         term = existingTerm
- 
-     if name:
-        self.setTermName(term, name)
- 
-     return term
+      assert str(type(valueType)) != "Type"
+  
+      if valueType is None and value is None:
+         raise Exception("Either type or value needs to be not-None")
+  
+      if valueType is None:
+         valueType = python_bridge.typeOfPythonObj(value)
+  
+      if valueType is None:
+         raise Exception("Couldn't find a type for value: " + str(value))
+  
+      # Get constant function for this type
+      constFunc = term_utils.findExisting(builtins.CONST_FUNC, inputs=[valueType])
+  
+      # Create a constant function if it wasn't found
+      if constFunc is None:
+         funcValue = ca_function.Function(inputs=[], output=valueType)
+         constFunc = self.createTerm(builtins.CONST_FUNC, inputs=[valueType],
+             initialValue=funcValue)
+         constFunc.debugName = "constant-" + valueType.getSomeName()
+         assert constFunc.pythonValue is not None
+  
+      # Look for an existing term
+      existingTerm = term_utils.findExistingConstant(constFunc, value)
+  
+      term = None
+      if existingTerm is None:
+          term = self.createTerm(constFunc, initialValue=value, 
+              branch=branch, sourceToken=sourceToken)
+      else:
+          term = existingTerm
+  
+      if name:
+         self.setTermName(term, name)
+  
+      return term
+
+   def createVariable(self, value, name=None, branch=None, sourceToken=None,
+       valueType=None):
+
+      if valueType is None and value is None:
+         raise Exception("Either type or value needs to be not-None")
+      
+      if valueType is None:
+         valueType = python_bridge.typeOfPythonObj(value)
  
    def setTermName(self, term, name, allow_rename=False):
       "Set a term's name"
@@ -151,41 +160,41 @@ class CodeUnit(object):
       return self.term_namespace[name]
  
    def setTermInputs(self, target_term, new_inputs, suppressChangeEvent=False):
-     "Assigns the term's inputs"
- 
-     old_inputs = target_term.inputs
-     target_term.inputs = new_inputs
- 
-     # find which terms were just added
-     newly_added = set(new_inputs) - set(old_inputs)
- 
-     # find which terms were just removed
-     newly_removed = set(old_inputs) - set(new_inputs)
- 
-     # add ourselves to new user lists
-     for t in newly_added:
-       t.users.add(target_term)
- 
-     # remove ourselves from old user lists
-     for t in newly_removed:
-        t.users.remove(target_term)
- 
-     if not suppressChangeEvent:
-        self.onInputsChanged(target_term)
+      "Assigns the term's inputs"
+  
+      old_inputs = target_term.inputs
+      target_term.inputs = new_inputs
+  
+      # find which terms were just added
+      newly_added = set(new_inputs) - set(old_inputs)
+  
+      # find which terms were just removed
+      newly_removed = set(old_inputs) - set(new_inputs)
+  
+      # add ourselves to new user lists
+      for t in newly_added:
+         t.users.add(target_term)
+  
+      # remove ourselves from old user lists
+      for t in newly_removed:
+         t.users.remove(target_term)
+  
+      if not suppressChangeEvent:
+         self.onInputsChanged(target_term)
  
    def appendToInput(self, target_term, new_input):
-     "Append a term to the inputs of 'target_term'"
- 
-     # check if this input is newly added
-     is_newly_added = new_input not in target_term.inputs
- 
-     target_term.inputs.append(new_input)
- 
-     # add to new user list
-     if is_newly_added:
-        target_term.users.add(new_input)
- 
-     self.onInputsChanged(target_term)
+      "Append a term to the inputs of 'target_term'"
+  
+      # check if this input is newly added
+      is_newly_added = new_input not in target_term.inputs
+  
+      target_term.inputs.append(new_input)
+  
+      # add to new user list
+      if is_newly_added:
+         target_term.users.add(new_input)
+  
+      self.onInputsChanged(target_term)
    
    # Change events
    def onInputsChanged(self, term):
@@ -194,20 +203,20 @@ class CodeUnit(object):
          term.pythonEvaluate()
  
    def evaluate(self):
-     if VERBOSE_DEBUGGING: print "code_unit.evaluate"
- 
-     for term in self.main_branch:
-        if VERBOSE_DEBUGGING: print "Calling evaluate on " + str(term)
-        term.pythonEvaluate()
+      if VERBOSE_DEBUGGING: print "code_unit.evaluate"
+  
+      for term in self.main_branch:
+         if VERBOSE_DEBUGGING: print "Calling evaluate on " + str(term)
+         term.pythonEvaluate()
   
    def printTerms(self):
-     term_names = {}
-  
-     for (name,term) in self.term_namespace.items():
-        term_names[term] = name
-  
-     printTermsFormatted(self.main_branch, indent_printer.IndentPrinter(), term_names)
+      term_names = {}
    
+      for (name,term) in self.term_namespace.items():
+         term_names[term] = name
+   
+      printTermsFormatted(self.main_branch, indent_printer.IndentPrinter(), term_names)
+    
    __getitem__ = getNamedTerm
    
    def iterateTerms(self):
