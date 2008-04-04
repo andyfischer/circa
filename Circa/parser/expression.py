@@ -48,8 +48,10 @@ class ASTNode(object):
    def eval(self, builder):
       raise Exception("Need to implement this")
 
+   """
    def handleImplant(self, builder, target):
       raise Exception("Need to implement this")
+   """
 
    def getFirstToken(self):
       raise Exception("Need to implement this")
@@ -76,27 +78,20 @@ class Infix(ASTNode):
       if self.token.match == EQUALS:
          right_term = self.right.eval(builder)
          if not isinstance(right_term, code.Term):
-            raise ParseError("Expression did not evaluate to a term: " + str(self.right),
-                             self.getFirstToken())
+            raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
          return builder.bindName(self.left.getName(), right_term)
 
-      # evaluate as an implant?
+      # evaluate as a training?
       if self.token.match is COLON_EQUALS:
 
          try:
             target = self.right.eval(builder)
 
-            # First find out if the left side will give us a TermToCreate object.
-            # Note that we don't actually create it.
-            leftTermToCreate = self.left.getTermToCreate(builder)
+            # TODO: Allow the function to somehow pre-empt term creation
 
-            # If that succeeded, use this data to handle implant.
-            if leftTermToCreate is not None:
-               return builder.handleImplant(leftTermToCreate.functionTerm,
-                     inputs=leftTermToCreate.inputs, target=target)
+            trainedTerm = self.left.eval(builder)
 
-            # Otherwise, allow the ASTNode to handle the implant itself
-            return self.left.handleImplant(builder, target=target)
+            return builder.createTraining(trainedTerm, target=target)
 
          except builder_module.CouldntFindTrainingFunction:
             raise parse_errors.CouldntFindTrainingFunction(self.token)
@@ -124,8 +119,10 @@ class Infix(ASTNode):
 
       raise Exception("Unable to evaluate token: " + self.token.text)
 
+   """
    def handleImplant(self, builder, target):
       return builder.handleImplant(functionTerm, inputs, target)
+   """
 
    def getFirstToken(self):
       return self.left.getFirstToken()
@@ -169,8 +166,10 @@ class Literal(ASTNode):
       else:
          return builder.createConstant(self.value, sourceToken=self.token)
 
+   """
    def handleImplant(self, builder, target):
       raise parse_errors.CantUseImplantOperatorOnLiteral(self.token)
+   """
 
    def getFirstToken(self):
       return self.token
@@ -196,8 +195,10 @@ class Ident(ASTNode):
    def getFirstToken(self):
       return self.token
 
+   """
    def handleImplant(self, builder, target):
       print "need to implement: handleImplant in Ident"
+   """
 
    def getName(self):
       return self.token.text

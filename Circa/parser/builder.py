@@ -4,7 +4,8 @@ import pdb
 from Circa import (
   builtins,
   ca_function,
-  code
+  code,
+  debug
 )
 
 import parse_errors
@@ -54,8 +55,8 @@ class Builder(object):
 
    def bindName(self, name, target_term):
       "Binds name to the given term"
-      assert isinstance(name, str)
-      assert isinstance(target_term, code.Term)
+      debug.Assert(isinstance(name, str))
+      debug.Assert(isinstance(target_term, code.Term))
 
       self.currentBlock().bindLocal(name, target_term)
 
@@ -80,40 +81,37 @@ class Builder(object):
       return len(self.blockStack)
 
    def createTerm(self, function, name=None, branch=None, **options):
+      debug.Assert(function.pythonValue is not None)
 
-      assert function.pythonValue is not None
-
-      if branch is None:
-         branch = self.currentBlock().branch
-
+      if branch is None: branch = self.currentBlock().branch
       new_term = self.code_unit.createTerm(function, branch=branch, name=name, **options)
-      assert(new_term != None)
+      debug.Assert(new_term != None)
       if name: self.bindName(name, new_term)
       return new_term
 
    def createConstant(self, value, name=None, branch=None, **options):
-      if branch is None:
-         branch = self.currentBlock().branch
-
+      if branch is None: branch = self.currentBlock().branch
       new_term = self.code_unit.createConstant(value, branch=branch, name=name, **options)
-      assert(new_term != None)
+      debug.Assert(new_term is not None)
       if name: self.bindName(name, new_term)
       return new_term
 
-   def createVariable(self, value, name=None, **term_options):
-      new_term = self.code_unit.createVariable(value, term_options)
-      self.bindName(name, new_term)
+   def createVariable(self, value, name=None, branch=None, **options):
+      if branch is None: branch = self.currentBlock().branch
+      new_term = self.code_unit.createVariable(value, options)
+      debug.Assert(new_term is not None)
+      if name: self.bindName(name, new_term)
       return new_term
 
-   def handleImplant(self, function, inputs, target):
+   def createTraining(self, term, target):
       # Find the training function for this function
-      trainingFunction = code.findTrainingFunction(function)
+      trainingFunction = code.findTrainingFunction(term.functionTerm)
 
       if trainingFunction is None:
          raise CouldntFindTrainingFunction()
 
       # Create a training term
-      newTerm = self.code_unit.getTerm(trainingFunction, [function] + inputs + [target])
+      newTerm = self.code_unit.getTerm(trainingFunction, [term, target])
 
    def createTrainingTerm(self, function, inputs):
       assert function is not None

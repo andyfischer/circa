@@ -137,6 +137,19 @@ class CodeUnit(object):
       
       if valueType is None:
          valueType = python_bridge.typeOfPythonObj(value)
+
+      # Get variable function for this type
+      variableFunc = term_utils.findExisting(builtins.VARIABLE_FUNC, inputs=[valueType])
+
+      # Create a variable function if it wasn't found
+      if variableFunc is None:
+         funcValue = ca_function.Function(inputs=[], output=valueType)
+         variableFunc = self.createTerm(builtins.VARIABLE_FUNC, inputs=[valueType],
+             initialValue=funcValue)
+         variableFunc.debugName = "variable-" + valueType.getSomeName()
+         assert variableFunc.pythonValue is not None
+
+      return self.getTerm(variableFunc, inputs=[], initialValue=value)
  
    def setTermName(self, term, name, allow_rename=False):
       "Set a term's name"

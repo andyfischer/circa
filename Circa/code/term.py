@@ -63,8 +63,11 @@ class Term(object):
          if input == term: return True
       return false
  
-   def pythonEvaluate(self):
+   def evaluate(self):
       self.getFunction().pythonEvaluate(self)
+
+   # Obsolete alias
+   pythonEvaluate = evaluate
  
    def printExtended(self, printer):
       printer.prints("%i: %s" % (self.globalID, self.functionTerm.pythonValue.name))
