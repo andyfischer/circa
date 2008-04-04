@@ -149,10 +149,13 @@ def mapGeneratorEval(term):
 
 
 def mapTraining(term):
-   targetFunction = term.inputs[0]
-   input = term.inputs[1].pythonValue
-   output = term.inputs[2].pythonValue
-   targetFunction.state[input] = output
+   trainedTerm = term.inputs[0]
+   targetTerm = term.inputs[1]
+   key = trainedTerm.inputs[0].pythonValue
+   value = targetTerm.pythonValue
+   trainedTerm.functionTerm.state[key] = value
+
+   trainedTerm.evaluate()
 
 # TODO:
 NAME_TO_FUNC['cond_branch'] = wrapAsCirca(emptyFunc)

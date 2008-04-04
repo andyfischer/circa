@@ -87,6 +87,10 @@ python_bridge.PYTHON_TYPE_TO_CIRCA[code.SubroutineDefinition] = builtins.SUBROUT
 builtins.BUILTINS.createConstant(name='true', value=True, valueType=builtins.BOOL_TYPE)
 builtins.BUILTINS.createConstant(name='false', value=False, valueType=builtins.BOOL_TYPE)
 
+# Create Variable function
+builtins.VARIABLE_FUNC = builtins.BUILTINS.createConstant(valueType=builtins.CONST_FUNC,
+      value = ca_function.Function(inputs=[], output=builtins.FUNC_TYPE))
+
 # Create Map function
 mapFunctionObj = ca_function.Function(
     inputs=[builtins.TYPE_TYPE, builtins.TYPE_TYPE],

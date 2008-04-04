@@ -51,6 +51,9 @@ def PythonObjectNotFound(token):
 def CantUseImplantOperatorOnLiteral(token):
    return ParseError(token, "Can't have a literal on the left side of the := operator")
 
+def ExpressionDidNotEvaluateToATerm(token):
+   return ParseError(token, "Expression did not evaluate to a term")
+
 def InternalError(token, details=None):
    message = "Internal error"
    if details is not None: message += ": " + details
