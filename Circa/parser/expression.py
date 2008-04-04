@@ -81,7 +81,7 @@ class Infix(ASTNode):
             raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
          return builder.bindName(self.left.getName(), right_term)
 
-      # evaluate as a training?
+      # Evaluate as a feedback?
       if self.token.match is COLON_EQUALS:
 
          try:
@@ -91,10 +91,10 @@ class Infix(ASTNode):
 
             trainedTerm = self.left.eval(builder)
 
-            return builder.createTraining(trainedTerm, target=target)
+            return builder.createFeedback(trainedTerm, target=target)
 
-         except builder_module.CouldntFindTrainingFunction:
-            raise parse_errors.CouldntFindTrainingFunction(self.token)
+         except builder_module.CouldntFindFeedbackFunction:
+            raise parse_errors.CouldntFindFeedbackFunction(self.left.getFirstToken())
 
       # normal function?
       # try to find a defined operator
