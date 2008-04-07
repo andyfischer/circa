@@ -8,7 +8,7 @@ from Circa import (
    token
 )
 
-from Circa.parser import expression as expression_module
+from Circa.parser import expression as _expression
 from Circa.token import token_stream
 from Circa.token.definitions import *
 
@@ -79,7 +79,7 @@ class Parser(object):
 
    def expression_statement(self):
       # Parse an expression using the 'expression' package
-      exprResult = expression_module.parseExpression(self.tokens)
+      exprResult = _expression.parseExpression(self.tokens)
 
       if exprResult is None:
          raise parse_errors.NotAStatement(self.tokens.next())
@@ -118,7 +118,7 @@ class Parser(object):
       name = decl.id.text
 
       # Handle a built-in type
-      if 'python' in decl.getAnnotationFlagStrings():
+      if 'python' in decl.annotations.flags:
          return self.builder.createConstant(value=None, name = name, valueType=builtins.TYPE_TYPE)
 
       # Handle composite type
@@ -170,7 +170,7 @@ class Parser(object):
 
    def function_decl(self):
       self.tokens.consume(FUNCTION)
-      decl = function_decl(self.tokens)
+      decl = self.function_header()
 
       def getArgName(arg): return arg.getNameStr()
 
@@ -183,8 +183,8 @@ class Parser(object):
       funcObj = None
 
       # Check for 'python' annotation
-      if 'python' in decl.getAnnotationFlagStrings():
-
+      if 'python' in decl.annotations.flags:
+         # Find the python-defined function
          if self.pythonObjectSource is None:
             raise parse_errors.NoPythonSourceProvided(decl.findAnnotation('python'))
 
@@ -199,7 +199,7 @@ class Parser(object):
          funcObj.outputType = outputType
 
       else:
-
+         # Start a subroutine block
          raise parse_errors.NotImplemented(tokens.next())
 
          # Create a new subroutine object
@@ -209,25 +209,13 @@ class Parser(object):
          code_block = builder.FunctionBlock(self.builder, sub.code_unit)
          self.block(code_block)
 
-      # Check for 'training' annotation
-
+      # Check for 'feedback' annotation
+      if 'feedback' in decl.annotations.pairs:
+         feedbackFunc = decl.annotations.pairs['feedback'].eval(self.builder)
+         funcObj.feedbackFunc = feedbackFunc
 
       # Store result in a constant term
       return self.builder.createConstant(value=funcObj, name=name)
-
-   """
-   def attribute_decl(self):
-      self.tokens.consume(ATTRIBUTE)
-      decl = syntax.function_decl(self.tokens)
-
-      inputTypes = map(self.getTypeFromToken, decl.inputTypes())
-      outputType = self.getTypeFromToken(decl.outputType)
-
-      funcObject = ca_function.Function(inputTypes, outputType)
-      funcObject.name = decl.id.text
-      funcObject.pythonEvaluate = PLACEHOLDER_FUNC_FOR_ATTRIBUTES
-      self.builder.createConstant(value=funcObject, name=decl.id.text)
-   """
 
    def return_statement(self):
       return_token = self.tokens.consume(RETURN)
@@ -268,6 +256,42 @@ class Parser(object):
 
       self.builder.closeBlock()
 
+   def function_header(self):
+      """
+      Parse a function declaration header, and returns an object of type
+      ParsedFunctionDecl. This object contains:
+        .id = the function's name (token)
+        .inputArgs = a list of arguments. Each object in this list contains:
+           .type = the type name (token)
+           .name = the identifier (token). May be None
+        .annotations = a list of annotations (AnnotationList)
+        .outputType = the return type name (token). May be None
+      """
+      result = ParsedFunctionDecl()
+      result.id = self.tokens.consume(IDENT)
+      self.tokens.consume(LPAREN)
+
+      # Check for input arguments
+      result.inputArgs = []
+      if self.tokens.nextIs(IDENT):
+         result.inputArgs.append(function_argument(self.tokens))
+      while self.tokens.nextIs(COMMA):
+         self.tokens.consume(COMMA)
+         result.inputArgs.append(function_argument(self.tokens))
+
+      result.outputType = None
+      if self.tokens.nextIs(RIGHT_ARROW):
+         self.tokens.consume(RIGHT_ARROW)
+         result.outputType = self.tokens.consume(IDENT)
+
+      self.tokens.consume(RPAREN)
+
+      # Check for annotations
+      result.annotations = annotation_list(self.tokens)
+         
+      return result
+   
+
    def property_statement(self):
       property = self.tokens.consume(IDENT)
       self.tokens.consume(COLON)
@@ -296,75 +320,10 @@ class Parser(object):
          raise parse_errors.IdentifierNotFound(token)
 
       if typeTerm.getType() is not builtins.TYPE_TYPE:
+         # pdb.set_trace()
          raise parse_errors.IdentifierIsNotAType(token)
 
       return typeTerm
-     
-class ParsedFunctionDecl(object):
-   def getAnnotationFlagStrings(self):
-      return map(lambda a: a.text, self.annotations.flags)
-
-   def getInputTypes(self):
-      return map(lambda a: a.type, self.inputArgs)
-
-   def getInputNames(self):
-      return map(lambda a: a.name, self.inputArgs)
-
-class ParsedFunctionArg(object):
-   pass
-
-def function_decl(tokens):
-   """
-   Parse a function declaration, and returns an object of type
-   ParsedFunctionDecl. This object contains:
-     .id = the function's name (token)
-     .inputArgs = a list of arguments. Each object in this list contains:
-        .type = the type name (token)
-        .name = the identifier (token). May be None
-     .annotations = a list of annotations (tokens)
-     .outputType = the return type name (token). May be None
-   """
-   result = ParsedFunctionDecl()
-   result.id = tokens.consume(IDENT)
-   tokens.consume(LPAREN)
-
-   # Check for input arguments
-   result.inputArgs = []
-   if tokens.nextIs(IDENT):
-      result.inputArgs.append(function_argument(tokens))
-   while tokens.nextIs(COMMA):
-      tokens.consume(COMMA)
-      result.inputArgs.append(function_argument(tokens))
-
-   result.outputType = None
-   if tokens.nextIs(RIGHT_ARROW):
-      tokens.consume(RIGHT_ARROW)
-      result.outputType = tokens.consume(IDENT)
-
-   tokens.consume(RPAREN)
-
-   # Check for annotations
-   result.annotations = annotation_list(tokens)
-      
-   return result
-
-def function_argument(tokens):
-   """
-   Parses a function argument and returns an object of type ParsedFunctionArg.
-   This object contains:
-      .name = the argument's name (token). May be None
-      .type = the argument's type (token)
-   """
-   result = ParsedFunctionArg()
-   result.type = tokens.consume(IDENT)
-   result.name = None
-   if tokens.nextIs(IDENT):
-      result.name = tokens.consume(IDENT)
-   return result
-
-class ParsedTypeDecl(object):
-   def getAnnotationFlagStrings(self):
-      return map(lambda a: a.text, self.annotations.flags)
 
 def type_decl(tokens):
    """
@@ -407,15 +366,17 @@ def type_decl(tokens):
    tokens.stopSkipping(NEWLINE)
 
    return result
+   
 
-class AnnotationList(object):
-   def __init__(self):
-      self.flags = []
-      self.associative = {}
-
-# Parse a list of annotations surrounded by []s
-# Returns an empty list if none are found
 def annotation_list(tokens):
+   """
+   Parse a list of annotations surrounded by []s.
+   This list can include flags (identifiers with no value), or
+   key-value pairs. Anything on the right-hand side of a key-value
+   pair is parsed as an expression.
+   Returns None if no annotation list is found.
+   """
+   
    if not tokens.nextIs(LBRACE):
       return None
 
@@ -427,14 +388,53 @@ def annotation_list(tokens):
       
       if tokens.nextIs(EQUALS):
          tokens.consume(EQUALS)
-         annotationList.associative[annotationName] = tokens.consume(IDENT)
+         rightExpr = _expression.parseExpression(tokens)
+         assert rightExpr is not None
+         annotationList.pairs[annotationName.text] = rightExpr
       else:
-         annotationList.flags.append(annotationName)
+         annotationList.flags.append(annotationName.text)
 
       if tokens.nextIs(COMMA):
          tokens.consume(COMMA)
 
    tokens.consume(RBRACE)
    return annotationList
+
+
+class AnnotationList(object):
+   def __init__(self):
+      self.flags = [] # List of strings
+      self.pairs = {} # Map of (string -> ASTNode)
+     
+class ParsedFunctionDecl(object):
+   def getInputTypes(self):
+      return map(lambda a: a.type, self.inputArgs)
+
+   def getInputNames(self):
+      return map(lambda a: a.name, self.inputArgs)
+
+class ParsedFunctionArg(object):
+   pass
+
+
+def function_argument(tokens):
+   """
+   Parses a function argument and returns an object of type ParsedFunctionArg.
+   This object contains:
+      .name = the argument's name (token). May be None
+      .type = the argument's type (token)
+   """
+   result = ParsedFunctionArg()
+   result.type = tokens.consume(IDENT)
+   result.name = None
+   if tokens.nextIs(IDENT):
+      result.name = tokens.consume(IDENT)
+   return result
+
+class ParsedTypeDecl(object):
+   pass
+
+
+
 
 

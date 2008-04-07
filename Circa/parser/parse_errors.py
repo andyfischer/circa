@@ -39,8 +39,8 @@ def ExpectedExpression(token):
 def UnrecognizedProperty(property):
    return ParseError(property, "Unrecognized property: " + property.text)
 
-def CouldntFindFeedbackFunction(token):
-   return ParseError(token, "Couldn't find a feedback function: " + token.text)
+def CouldntFindFeedbackFunction(token, functionName):
+   return ParseError(token, "Couldn't find a feedback function for function: " + functionName)
 
 def NoPythonSourceProvided(token):
    return ParseError(token, "No python-object source was provided")

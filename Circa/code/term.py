@@ -34,7 +34,7 @@ class Term(object):
  
    def getType(self):
       "Returns this term's output type"
-      return self.functionTerm.pythonValue.outputType
+      return ca_function.getOutputType(self.functionTerm)
  
    def getFunction(self):
       "Returns this term's Function"

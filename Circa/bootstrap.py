@@ -21,37 +21,48 @@ VERBOSE_DEBUGGING = False
 
 builtins.BUILTINS = code.CodeUnit()
 
-# Create 'constant' function, which temporarily does not have a function
-builtins.CONST_FUNC = code.Term()
-builtins.CONST_FUNC.codeUnit = builtins.BUILTINS
-builtins.CONST_FUNC.functionTerm = builtins.CONST_FUNC
-builtins.BUILTINS.setTermName(builtins.CONST_FUNC, "constant")
-builtins.CONST_FUNC.globalID = 1
-builtins.CONST_FUNC.pythonValue = ca_function.Function(inputs=[], output=None)
+# Aliases for creating terms on builtins.BUILTINS
+createTerm = builtins.BUILTINS.createTerm
+createConstant = builtins.BUILTINS.createConstant
+
+# Create constant-generator function, a function which spits out constant functions.
+# This term is termporarily incomplete, since he requires a few circular references.
+builtins.CONST_FUNC_GENERATOR = code.Term()
+builtins.CONST_FUNC_GENERATOR.codeUnit = builtins.BUILTINS
+builtins.CONST_FUNC_GENERATOR.functionTerm = builtins.CONST_FUNC_GENERATOR
+builtins.CONST_FUNC_GENERATOR.globalID = 1
+ca_function.setValue(builtins.CONST_FUNC_GENERATOR, name="constant-generator")
 
 # Create 'constant-Type' function
-builtins.CONST_TYPE_FUNC = builtins.BUILTINS.createTerm(functionTerm=builtins.CONST_FUNC)
-builtins.CONST_TYPE_FUNC.pythonValue = ca_function.Function(inputs=[], output=None)
+builtins.CONST_TYPE_FUNC = createTerm(functionTerm=builtins.CONST_FUNC_GENERATOR)
+ca_function.setValue(builtins.CONST_TYPE_FUNC)
 
 # Create Type type
-builtins.TYPE_TYPE = builtins.BUILTINS.createTerm(
-    functionTerm=builtins.CONST_TYPE_FUNC,
+builtins.TYPE_TYPE = createTerm(functionTerm=builtins.CONST_TYPE_FUNC,
     name = 'Type', initialValue = ca_type.Type())
-builtins.TYPE_TYPE.pythonValue.outputType=builtins.TYPE_TYPE
 
 # Implant the Type type
-builtins.CONST_FUNC.pythonValue.inputs=[builtins.TYPE_TYPE]
-builtins.CONST_TYPE_FUNC.pythonValue.outputType=builtins.TYPE_TYPE
+ca_function.setValue(builtins.CONST_FUNC_GENERATOR, inputs=[builtins.TYPE_TYPE])
+ca_function.setValue(builtins.CONST_TYPE_FUNC, output=builtins.TYPE_TYPE)
+
+# Create 'constant-Function' function
+builtins.CONST_FUNC_FUNC = createTerm(functionTerm=builtins.CONST_FUNC_GENERATOR)
+ca_function.setValue(builtins.CONST_FUNC_FUNC)
 
 # Create Function type
-builtins.FUNC_TYPE = builtins.BUILTINS.createConstant(name = 'Function',
-    value = ca_type.Type(),
-    valueType=builtins.TYPE_TYPE)
-python_bridge.PYTHON_TYPE_TO_CIRCA[ca_function.Function] = builtins.FUNC_TYPE
+builtins.FUNC_TYPE = createTerm(builtins.CONST_FUNC_FUNC, name = 'Function')
 
-# Implant types into 'constant' function
-builtins.CONST_FUNC.pythonValue.inputTypes = [builtins.TYPE_TYPE]
-builtins.CONST_FUNC.pythonValue.outputType = builtins.FUNC_TYPE
+# Map Python type to this type
+python_bridge.PYTHON_TYPE_TO_CIRCA[ca_function._Function] = builtins.FUNC_TYPE
+
+# Implant types into 'constant' function, finish defining it
+def constFuncGeneratorEval(term):
+   type = term.inputs[0]
+   debugName = "constant-" + type.getSomeName()
+   ca_function.setValue(term, inputs=[], output=type, name=debugName)
+
+ca_function.setValue(builtins.CONST_FUNC_GENERATOR, inputs= [builtins.TYPE_TYPE],
+   output= builtins.FUNC_TYPE, evaluateFunc=constFuncGeneratorEval)
 
 # Create and register primitive types
 builtins.INT_TYPE = builtins.BUILTINS.createConstant(name = 'int',
@@ -87,25 +98,39 @@ python_bridge.PYTHON_TYPE_TO_CIRCA[code.SubroutineDefinition] = builtins.SUBROUT
 builtins.BUILTINS.createConstant(name='true', value=True, valueType=builtins.BOOL_TYPE)
 builtins.BUILTINS.createConstant(name='false', value=False, valueType=builtins.BOOL_TYPE)
 
-# Create Variable function
-builtins.VARIABLE_FUNC = builtins.BUILTINS.createConstant(valueType=builtins.CONST_FUNC,
-      value = ca_function.Function(inputs=[], output=builtins.FUNC_TYPE))
-
 # Create Map function
-mapFunctionObj = ca_function.Function(
+builtins.MAP_GENERATOR = builtins.BUILTINS.createConstant(name = 'map',
+      valueType=builtins.FUNC_TYPE)
+ca_function.setValue(builtins.MAP_GENERATOR,
     inputs=[builtins.TYPE_TYPE, builtins.TYPE_TYPE],
-    output=[builtins.FUNC_TYPE],
-    init = builtin_functions.mapGeneratorInit,
-    evaluate = builtin_functions.mapGeneratorEval,
+    output=builtins.FUNC_TYPE,
+    initFunc = builtin_functions.mapGeneratorInit,
+    evaluateFunc = builtin_functions.mapGeneratorEval,
     hasState=True)
-builtins.MAP_GENERATOR = builtins.BUILTINS.createConstant(name = 'map', value=mapFunctionObj)
 
-mapTrainingObj = ca_function.Function(
-      inputs=[builtins.FUNC_TYPE, builtins.REF_TYPE, builtins.REF_TYPE],
-      output=None, # pureFunction=False,
-      evaluate = builtin_functions.mapTraining)
-builtins.MAP_TRAINING_FUNC = builtins.BUILTINS.createConstant(value=mapTrainingObj)
-mapFunctionObj.trainingFunc = builtins.MAP_TRAINING_FUNC
+builtins.MAP_TRAINING_FUNC = builtins.BUILTINS.createConstant(valueType=builtins.FUNC_TYPE)
+ca_function.setValue(builtins.MAP_TRAINING_FUNC,
+         inputs=[builtins.FUNC_TYPE, builtins.REF_TYPE, builtins.REF_TYPE],
+         output=None, # pureFunction=False,
+         evaluateFunc = builtin_functions.mapTraining,
+         name="map-training")
+
+ca_function.setValue(builtins.MAP_GENERATOR, feedbackFunc=builtins.MAP_TRAINING_FUNC)
+
+# Create Variable generator function
+builtins.VARIABLE_FUNC = builtins.BUILTINS.createConstant(valueType=builtins.FUNC_TYPE)
+ca_function.setValue(builtins.VARIABLE_FUNC,
+         inputs=[builtins.TYPE_TYPE], output=builtins.FUNC_TYPE,
+         evaluateFunc = builtin_functions.variableGenerator,
+         name="variable-generator")
+
+# Create variable feedback function
+builtins.VARIABLE_FEEDBACK_FUNC = builtins.BUILTINS.createConstant(
+      valueType=builtins.FUNC_TYPE)
+ca_function.setValue(builtins.VARIABLE_FEEDBACK_FUNC,
+         inputs=[builtins.REF_TYPE], output=builtins.REF_TYPE,
+         evaluateFunc = builtin_functions.variableFeedback,
+         name="variable-feedback")
 
 # Load builtins.ca file into this code unit
 builtinsFilename = os.path.join(CIRCA_HOME, "lib", "builtins.ca")
