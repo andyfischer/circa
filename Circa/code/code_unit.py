@@ -17,6 +17,7 @@ from Circa import (
    builtins,
    ca_function,
    common_errors,
+   debug,
    python_bridge
 )
 
@@ -34,10 +35,6 @@ class CodeUnit(object):
       # First, check to reuse an existing term
       shouldTryToReuse = True
 
-      # If the function was defined as 'generator', then don't reuse
-      if functionTerm.pythonValue.isGenerator:
-         shouldTryToReuse = False
-
       # If the funciton has state, don't reuse
       if functionTerm.pythonValue.hasState:
          shouldTryToReuse = False
@@ -52,7 +49,7 @@ class CodeUnit(object):
    def createTerm(self, functionTerm, inputs=None, branch=None, name=None,
        initialValue=None, sourceToken=None):
 
-      assert functionTerm.pythonValue is not None
+      debug.Assert(functionTerm.pythonValue is not None)
  
       # Create a new term
       term = term_module.Term()
@@ -89,10 +86,8 @@ class CodeUnit(object):
       return term
 
 
-   def createConstant(self, value, name=None, branch=None,
+   def createConstant(self, value=None, name=None, branch=None,
          sourceToken=None, valueType=None):
-
-      assert str(type(valueType)) != "Type"
   
       if valueType is None and value is None:
          raise Exception("Either type or value needs to be not-None")
@@ -104,15 +99,7 @@ class CodeUnit(object):
          raise Exception("Couldn't find a type for value: " + str(value))
   
       # Get constant function for this type
-      constFunc = term_utils.findExisting(builtins.CONST_FUNC, inputs=[valueType])
-  
-      # Create a constant function if it wasn't found
-      if constFunc is None:
-         funcValue = ca_function.Function(inputs=[], output=valueType)
-         constFunc = self.createTerm(builtins.CONST_FUNC, inputs=[valueType],
-             initialValue=funcValue)
-         constFunc.debugName = "constant-" + valueType.getSomeName()
-         assert constFunc.pythonValue is not None
+      constFunc = self.getTerm(builtins.CONST_FUNC_GENERATOR, inputs=[valueType])
   
       # Look for an existing term
       existingTerm = term_utils.findExistingConstant(constFunc, value)

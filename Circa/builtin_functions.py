@@ -3,6 +3,7 @@ import pdb
 from Circa import (
    builtins,
    ca_function,
+   code,
    token
 )
 
@@ -48,11 +49,24 @@ def equals(a,b): return a == b
 @wrapAsCirca
 def notEquals(a,b): return a != b
 
+def variableGenerator(term):
+   type = term.inputs[0].pythonValue
+   debug.Assert(builtins.VARIABLE_FEEDBACK_FUNC is not None)
+
+   ca_function.setValue(term, output=type,
+         feedback=builtins.VARIABLE_FEEDBACK_FUNC,
+         name="variable-" + type.getSomeName())
+
+def variableFeedback(term):
+   target = term.inputs[0]
+   desired = term.inputs[1]
+   target.pythonValue = desired.pythonValue
+
 @register('add')
 @wrapAsCirca
 def add(a,b): return a + b
 
-@register('add_training')
+@register('add_feedback')
 @wrapAsCircaMeta
 def addTrainSignal(term):
    targetTerm = term.inputs[0]
@@ -63,7 +77,7 @@ def addTrainSignal(term):
 
    for input in targetTerm.inputs:
 
-      trainingSignal = term.code_unit.getTerm(builtins.TRAINING_FUNC, inputs=[targetTerm])
+      trainingSignal = code.findFeedbackFunction(targetTerm.functionTerm)
 
       if trainingSignal.pythonValue is None:
          continue
@@ -119,10 +133,6 @@ def concat(a,b):
 def breakEvaluate(a,b):
    pdb.set_trace()
 
-
-def emptyFunc():
-   pass
-
 def mapGeneratorInit(term):
    if term.state is None:
       term.state = {}
@@ -130,9 +140,6 @@ def mapGeneratorInit(term):
 def mapGeneratorEval(term):
    keyType = term.inputs[0]
    valueType = term.inputs[1]
-
-   if term.pythonValue is None:
-      term.pythonValue = ca_function.Function(inputs=[keyType], output=valueType)
 
    def mapAccessEval(term):
       #print "access-eval called on " + term.getUniqueName()
@@ -144,9 +151,9 @@ def mapGeneratorEval(term):
          term.pythonValue = hashtable[key]
       else:
          term.pythonValue = None
-   term.pythonValue.pythonEvaluate = mapAccessEval
-   term.pythonValue.trainingFunc = builtins.MAP_TRAINING_FUNC
 
+   ca_function.setValue(term, inputs=[keyType], output=valueType,
+         evaluateFunc=mapAccessEval, feedbackFunc=builtins.MAP_TRAINING_FUNC)
 
 def mapTraining(term):
    trainedTerm = term.inputs[0]
@@ -157,8 +164,10 @@ def mapTraining(term):
 
    trainedTerm.evaluate()
 
+def emptyFunc():
+   pass
+
 # TODO:
 NAME_TO_FUNC['cond_branch'] = wrapAsCirca(emptyFunc)
 NAME_TO_FUNC['simple_branch'] = wrapAsCirca(emptyFunc)
-
 

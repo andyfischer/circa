@@ -1,56 +1,70 @@
 import pdb
 
-class Function(object):
-   def __init__(self, inputs=None, output=None, pureFunction=True, isGenerator=False,
-         hasState=False,
-         name="", init=None, evaluate=None):
-      if inputs is None: inputs = []
+from Circa import (
+      python_bridge
+)
 
-      self.inputTypes = inputs
-      self.outputType = output
-      self.trainingFunc = None
+class _Function(object):
+   def __init__(self):
+
+      self.inputTypes = []
+      self.outputType = None
+      self.feedbackFunc = None
       self.hasBranch = False
-      self.pureFunction = pureFunction
-      self.hasState = hasState
-      self.isGenerator = False
-      self.name = name
-
-      if init is not None:
-         self.pythonInit = init
-      
-      if evaluate is not None:
-         self.pythonEvaluate = evaluate
+      self.pureFunction = True
+      self.hasState = False
+      self.name = ""
 
    # pythonInit is called once per term, right after the term is created
    def pythonInit(self, term):
       pass
 
-   # This funciton is called whenever evaluation is needed. The function is
+   # This function is called whenever evaluation is needed. The function is
    # suppossed to take values out of 'term's inputs, and stick some result in
    # term.pythonValue.
    def pythonEvaluate(self, term):
       pass
- 
-def wrapPythonFunction(pythonFunc):
-   """
-   This function wraps a Python function so that it is suitable to be used
-   as the 'pythonEvaluate' portion of an existing Function. The values of
-   all the arguments of the Circa term are copied as arguments to the Python
-   function, and the returned result of the Python function is used as the
-   'pythonValue' of the Circa term.
-   """
 
-   def funcForCirca(term):
-       term.pythonValue = pythonFunc(*map(lambda t:t.pythonValue, term.inputs))
-   return funcForCirca
+def setValue(term, inputs=None, output=None, pureFunction=None, 
+      hasState=None, name=None, initFunc=None, evaluateFunc=None, feedbackFunc=None):
+
+   # Make sure term has a _Function object
+   if term.pythonValue is None:
+      term.pythonValue = _Function()
+
+   if inputs is not None: term.pythonValue.inputs = inputs
+   if output is not None: term.pythonValue.outputType = output
+   if pureFunction is not None: term.pythonValue.pureFunction = pureFunction
+   if hasState is not None: term.pythonValue.hasState = hasState
+   if name is not None: term.pythonValue.name = name
+   if initFunc is not None: term.pythonValue.pythonInit = initFunc
+   if evaluateFunc is not None: term.pythonValue.pythonEvaluate = evaluateFunc
+   if feedbackFunc is not None: term.pythonValue.feedbackFunc = feedbackFunc
+ 
+def getInputTypes(term):
+   return term.pythonValue.inputTypes
+def getOutputType(term):
+   return term.pythonValue.outputType
+def getPureFunction(term):
+   return term.pythonValue.pureFunction
+def getHasState(term):
+   return term.pythonValue.hasState
+def getName(term):
+   return term.pythonValue.name
+def getInitFunc(term):
+   return term.pythonValue.pythonInit
+def getEvaluateFunc(term):
+   return term.pythonValue.pythonEvaluate
+def getFeedbackFunc(term):
+   return term.pythonValue.feedbackFunc
 
 def createFunctionFromPython(func, **initOptions):
    """
    This function returns an instance of Function, with 'func' implanted as its
    evaluation function. 'initOptions' are passed to the constructor of Function.
    """
-   circaFunc = Function(**initOptions)
-   circaFunc.pythonEvaluate = wrapPythonFunction(func)
+   circaFunc = _Function(**initOptions)
+   circaFunc.pythonEvaluate = python_bridge.wrapPythonFunction(func)
    return circaFunc
 
 def createMetaFunctionFromPython(func, **initOptions):
@@ -60,7 +74,7 @@ def createMetaFunctionFromPython(func, **initOptions):
    through wrapPythonFunction. So, 'func' should accept a single term as input, and
    return nothing.
    """
-   circaFunc = Function(**initOptions)
+   circaFunc = _Function(**initOptions)
    circaFunc.pythonEvaluate = func
    return circaFunc
 

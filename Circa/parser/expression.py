@@ -94,7 +94,8 @@ class Infix(ASTNode):
             return builder.createFeedback(trainedTerm, target=target)
 
          except builder_module.CouldntFindFeedbackFunction:
-            raise parse_errors.CouldntFindFeedbackFunction(self.left.getFirstToken())
+            raise parse_errors.CouldntFindFeedbackFunction(self.left.getFirstToken(),
+                  trainedTerm.functionTerm.getSomeName())
 
       # normal function?
       # try to find a defined operator
