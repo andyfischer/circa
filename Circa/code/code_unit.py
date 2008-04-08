@@ -21,6 +21,7 @@ from Circa import (
    python_bridge
 )
 
+import term as _term
 from Circa.utils import indent_printer
 
 VERBOSE_DEBUGGING = False
@@ -31,6 +32,12 @@ class CodeUnit(object):
       self.term_namespace = {}
  
    def getTerm(self, functionTerm, inputs, **term_options):
+
+      # Make sure function and inputs are Terms
+      debug.Assert(isinstance(functionTerm, _term.Term))
+      for input in inputs:
+         debug.Assert(isinstance(input, _term.Term))
+      debug.Assert(functionTerm.pythonValue is not None)
 
       # First, check to reuse an existing term
       shouldTryToReuse = True
@@ -46,22 +53,20 @@ class CodeUnit(object):
  
       return self.createTerm(functionTerm, inputs, **term_options)
  
-   def createTerm(self, functionTerm, inputs=None, branch=None, name=None,
-       initialValue=None, sourceToken=None):
+   def createTerm(self, functionTerm, inputs=None, branch=None,
+         name=None, sourceToken=None):
 
+      debug.Assert(isinstance(functionTerm, _term.Term))
       debug.Assert(functionTerm.pythonValue is not None)
  
       # Create a new term
       term = term_module.Term()
       term.functionTerm = functionTerm
       term.sourceToken = sourceToken
-      term.pythonValue = initialValue
       term.codeUnit = self
   
-      circaFunction = functionTerm.pythonValue
-  
       # Check to create a branch
-      if circaFunction.hasBranch:
+      if ca_function.hasBranch(functionTerm):
           term.branch = []
   
       # Add term to function's users
@@ -77,7 +82,7 @@ class CodeUnit(object):
       functionTerm.pythonValue.pythonInit(term)
 
       # Evaluate immediately (in some cases)
-      if (initialValue is None) and (circaFunction.pureFunction):
+      if (ca_function.pureFunction(functionTerm)):
           term.pythonEvaluate()
   
       if branch is None: branch = self.main_branch
@@ -106,8 +111,8 @@ class CodeUnit(object):
   
       term = None
       if existingTerm is None:
-          term = self.createTerm(constFunc, initialValue=value, 
-              branch=branch, sourceToken=sourceToken)
+          term = self.createTerm(constFunc, branch=branch, sourceToken=sourceToken)
+          term.pythonValue = value
       else:
           term = existingTerm
   
@@ -116,27 +121,16 @@ class CodeUnit(object):
   
       return term
 
-   def createVariable(self, value, name=None, branch=None, sourceToken=None,
+   def createVariable(self, name=None, branch=None, sourceToken=None,
        valueType=None):
 
-      if valueType is None and value is None:
-         raise Exception("Either type or value needs to be not-None")
-      
-      if valueType is None:
-         valueType = python_bridge.typeOfPythonObj(value)
+      debug.Assert(name is None or isinstance(name,str))
+      debug.Assert(isinstance(valueType, _term.Term))
 
       # Get variable function for this type
-      variableFunc = term_utils.findExisting(builtins.VARIABLE_FUNC, inputs=[valueType])
+      variableFunc = self.getTerm(builtins.VARIABLE_FUNC_GENERATOR, inputs=[valueType])
 
-      # Create a variable function if it wasn't found
-      if variableFunc is None:
-         funcValue = ca_function.Function(inputs=[], output=valueType)
-         variableFunc = self.createTerm(builtins.VARIABLE_FUNC, inputs=[valueType],
-             initialValue=funcValue)
-         variableFunc.debugName = "variable-" + valueType.getSomeName()
-         assert variableFunc.pythonValue is not None
-
-      return self.getTerm(variableFunc, inputs=[], initialValue=value)
+      return self.getTerm(variableFunc, inputs=[])
  
    def setTermName(self, term, name, allow_rename=False):
       "Set a term's name"

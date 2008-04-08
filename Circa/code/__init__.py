@@ -1,11 +1,11 @@
 
 import code_unit, term_utils
-import term as term_module
-import subroutine as subroutine_module
+import term as _term
+import subroutine as _subroutine
 
 CodeUnit = code_unit.CodeUnit
-Term = term_module.Term
-SubroutineDefinition = subroutine_module.SubroutineDefinition
+Term = _term.Term
+SubroutineDefinition = _subroutine.SubroutineDefinition
 findExisting = term_utils.findExisting
 findFeedbackFunction = term_utils.findFeedbackFunction
 

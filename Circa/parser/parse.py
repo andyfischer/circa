@@ -5,6 +5,7 @@ from Circa import (
    builtins,
    ca_function,
    code,
+   debug,
    token
 )
 

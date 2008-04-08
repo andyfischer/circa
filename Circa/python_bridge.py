@@ -1,10 +1,13 @@
 
 
-PYTHON_TYPE_TO_CIRCA = {}
+_PYTHON_TYPE_TO_CIRCA = {}
+
+def registerType(pythonType, circaType):
+   _PYTHON_TYPE_TO_CIRCA[pythonType] = circaType
 
 def pythonTypeToCirca(type):
-   if type in PYTHON_TYPE_TO_CIRCA:
-      return PYTHON_TYPE_TO_CIRCA[type]
+   if type in _PYTHON_TYPE_TO_CIRCA:
+      return _PYTHON_TYPE_TO_CIRCA[type]
    else:
       return None
 
