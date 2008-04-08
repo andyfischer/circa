@@ -1,3 +1,4 @@
+# Types
 type Token [python]
 
 # Functions
@@ -20,26 +21,13 @@ function assign(Ref, Ref) [python]
 function concat(string, string ->string) [python]
 function break() [python]
 
-// Metaprogramming functions
+# Metaprogramming functions
 function token(string -> Token) [python]
 operator = map(Token, Function)
 assign_operator = map(Token, Function)
 assignFunction = map(Type, Function)
 
-# Containers
-# type Hashtable [python]
-# function hashtable_insert(Hashtable, Ref) [python]
-# function hashtable_access(Hashtable, Ref -> Ref) [python]
-
-# type List [python]
-# function list_append(List, Ref) [python]
-
-# type Set [python]
-# function set_insert(Set, Ref) [python]
-# function set_remove(Set, Ref) [python]
-# function set_membership(Set, Ref -> bool) [python]
-
-// Bind operators to functions
+# Bind operators to functions
 operator(token('+')) := add
 operator(token('-')) := sub
 operator(token('*')) := mult
@@ -47,9 +35,8 @@ operator(token('/')) := div
 operator(token('==')) := equals
 operator(token('!=')) := not_equals
 
-// Bind assign operators to functions
+# Bind assign operators to functions
 assign_operator(token('+=')) := add
 assign_operator(token('-=')) := sub
 assign_operator(token('*=')) := mult
 assign_operator(token('/=')) := div
-
