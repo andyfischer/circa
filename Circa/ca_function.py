@@ -41,21 +41,24 @@ def setValue(term, inputs=None, output=None, pureFunction=None,
    if evaluateFunc is not None: term.pythonValue.pythonEvaluate = evaluateFunc
    if feedbackFunc is not None: term.pythonValue.feedbackFunc = feedbackFunc
  
-def getInputTypes(term):
+def inputTypes(term):
    return term.pythonValue.inputTypes
-def getOutputType(term):
+def outputType(term):
    return term.pythonValue.outputType
-def getPureFunction(term):
+def pureFunction(term):
    return term.pythonValue.pureFunction
-def getHasState(term):
+def hasState(term):
    return term.pythonValue.hasState
+def hasBranch(term):
+   # Not implemented
+   return False
 def getName(term):
    return term.pythonValue.name
 def getInitFunc(term):
    return term.pythonValue.pythonInit
 def getEvaluateFunc(term):
    return term.pythonValue.pythonEvaluate
-def getFeedbackFunc(term):
+def feedbackFunc(term):
    return term.pythonValue.feedbackFunc
 
 def createFunctionFromPython(func, **initOptions):

@@ -34,7 +34,7 @@ class Term(object):
  
    def getType(self):
       "Returns this term's output type"
-      return ca_function.getOutputType(self.functionTerm)
+      return ca_function.outputType(self.functionTerm)
  
    def getFunction(self):
       "Returns this term's Function"
@@ -124,7 +124,7 @@ class Term(object):
       return self.functionTerm.isConstantFunction()
  
    def isConstantFunction(self):
-      return self.functionTerm is builtins.CONST_FUNC
+      return self.functionTerm is builtins.CONST_FUNC_GENERATOR
  
    # value accessors
    def __int__(self):

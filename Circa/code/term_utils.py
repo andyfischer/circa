@@ -58,7 +58,13 @@ def findExistingConstant(constantFunction, value):
 
    return None
 
-def findFeedbackFunction(function):
-   if function.pythonValue.feedbackFunc is None:
-      pdb.set_trace()
-   return function.pythonValue.feedbackFunc
+def findFeedbackFunction(term):
+   return ca_function.feedbackFunc(term)
+
+"""
+def getFeedback(term):
+   # Get feedback function
+   feedbackFunc = findFeedbackFunction(term.functionTerm)
+   return term.codeUnit.getTerm(feedbackFunc, inputs=[term])
+"""
+

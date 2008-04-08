@@ -8,6 +8,7 @@ from Circa import (
     code,
     ca_type,
     ca_function,
+    debug,
     parser,
     python_bridge,
     signature,
@@ -38,8 +39,7 @@ builtins.CONST_TYPE_FUNC = createTerm(functionTerm=builtins.CONST_FUNC_GENERATOR
 ca_function.setValue(builtins.CONST_TYPE_FUNC)
 
 # Create Type type
-builtins.TYPE_TYPE = createTerm(functionTerm=builtins.CONST_TYPE_FUNC,
-    name = 'Type', initialValue = ca_type.Type())
+builtins.TYPE_TYPE = createTerm(functionTerm=builtins.CONST_TYPE_FUNC, name = 'Type')
 
 # Implant the Type type
 ca_function.setValue(builtins.CONST_FUNC_GENERATOR, inputs=[builtins.TYPE_TYPE])
@@ -53,7 +53,7 @@ ca_function.setValue(builtins.CONST_FUNC_FUNC)
 builtins.FUNC_TYPE = createTerm(builtins.CONST_FUNC_FUNC, name = 'Function')
 
 # Map Python type to this type
-python_bridge.PYTHON_TYPE_TO_CIRCA[ca_function._Function] = builtins.FUNC_TYPE
+python_bridge.registerType(ca_function._Function, builtins.FUNC_TYPE)
 
 # Implant types into 'constant' function, finish defining it
 def constFuncGeneratorEval(term):
@@ -68,22 +68,22 @@ ca_function.setValue(builtins.CONST_FUNC_GENERATOR, inputs= [builtins.TYPE_TYPE]
 builtins.INT_TYPE = builtins.BUILTINS.createConstant(name = 'int',
     value = ca_type.Type(),
     valueType=builtins.TYPE_TYPE)
-python_bridge.PYTHON_TYPE_TO_CIRCA[int] = builtins.INT_TYPE
+python_bridge.registerType(int, builtins.INT_TYPE)
 
 builtins.FLOAT_TYPE = builtins.BUILTINS.createConstant(name = 'float',
     value = ca_type.Type(),
     valueType=builtins.TYPE_TYPE)
-python_bridge.PYTHON_TYPE_TO_CIRCA[float] = builtins.FLOAT_TYPE
+python_bridge.registerType(float, builtins.FLOAT_TYPE)
 
 builtins.STR_TYPE = builtins.BUILTINS.createConstant(name = 'string',
     value = ca_type.Type(),
     valueType=builtins.TYPE_TYPE)
-python_bridge.PYTHON_TYPE_TO_CIRCA[str] = builtins.STR_TYPE
+python_bridge.registerType(str, builtins.STR_TYPE)
 
 builtins.BOOL_TYPE = builtins.BUILTINS.createConstant(name = 'bool',
     value = ca_type.Type(),
     valueType=builtins.TYPE_TYPE)
-python_bridge.PYTHON_TYPE_TO_CIRCA[bool] = builtins.BOOL_TYPE
+python_bridge.registerType(bool, builtins.BOOL_TYPE)
 
 builtins.REF_TYPE = builtins.BUILTINS.createConstant(name = 'Ref',
     value = ca_type.Type(),
@@ -92,7 +92,7 @@ builtins.REF_TYPE = builtins.BUILTINS.createConstant(name = 'Ref',
 builtins.SUBROUTINE_TYPE = builtins.BUILTINS.createConstant(name = 'Subroutine',
     value = ca_type.Type(),
     valueType=builtins.TYPE_TYPE)
-python_bridge.PYTHON_TYPE_TO_CIRCA[code.SubroutineDefinition] = builtins.SUBROUTINE_TYPE
+python_bridge.registerType(code.SubroutineDefinition, builtins.SUBROUTINE_TYPE)
 
 # Create basic constants
 builtins.BUILTINS.createConstant(name='true', value=True, valueType=builtins.BOOL_TYPE)
@@ -118,19 +118,32 @@ ca_function.setValue(builtins.MAP_TRAINING_FUNC,
 ca_function.setValue(builtins.MAP_GENERATOR, feedbackFunc=builtins.MAP_TRAINING_FUNC)
 
 # Create Variable generator function
-builtins.VARIABLE_FUNC = builtins.BUILTINS.createConstant(valueType=builtins.FUNC_TYPE)
-ca_function.setValue(builtins.VARIABLE_FUNC,
+builtins.VARIABLE_FUNC_GENERATOR = builtins.BUILTINS.createConstant(
+      valueType=builtins.FUNC_TYPE)
+
+def _variableGenerator(term):
+   type = term.inputs[0]
+   ca_function.setValue(term, output=type,
+         feedbackFunc=builtins.VARIABLE_FEEDBACK_FUNC,
+         name="variable-" + type.getSomeName())
+
+ca_function.setValue(builtins.VARIABLE_FUNC_GENERATOR,
          inputs=[builtins.TYPE_TYPE], output=builtins.FUNC_TYPE,
-         evaluateFunc = builtin_functions.variableGenerator,
+         evaluateFunc = _variableGenerator,
          name="variable-generator")
 
 # Create variable feedback function
+def _variableFeedback(term):
+   target = term.inputs[0]
+   desired = term.inputs[1]
+   target.pythonValue = desired.pythonValue
+
 builtins.VARIABLE_FEEDBACK_FUNC = builtins.BUILTINS.createConstant(
       valueType=builtins.FUNC_TYPE)
 ca_function.setValue(builtins.VARIABLE_FEEDBACK_FUNC,
          inputs=[builtins.REF_TYPE], output=builtins.REF_TYPE,
-         evaluateFunc = builtin_functions.variableFeedback,
-         name="variable-feedback")
+         evaluateFunc = _variableFeedback,
+         name="feedback-variable")
 
 # Load builtins.ca file into this code unit
 builtinsFilename = os.path.join(CIRCA_HOME, "lib", "builtins.ca")

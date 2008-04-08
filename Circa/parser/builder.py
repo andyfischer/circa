@@ -5,7 +5,8 @@ from Circa import (
   builtins,
   ca_function,
   code,
-  debug
+  debug,
+  python_bridge
 )
 
 import parse_errors
@@ -98,7 +99,9 @@ class Builder(object):
 
    def createVariable(self, value, name=None, branch=None, **options):
       if branch is None: branch = self.currentBlock().branch
-      new_term = self.code_unit.createVariable(value, options)
+      typeTerm = python_bridge.typeOfPythonObj(value)
+      new_term = self.code_unit.createVariable(valueType=typeTerm, **options)
+      new_term.pythonValue = value
       debug.Assert(new_term is not None)
       if name: self.bindName(name, new_term)
       return new_term

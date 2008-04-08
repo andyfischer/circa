@@ -49,26 +49,14 @@ def equals(a,b): return a == b
 @wrapAsCirca
 def notEquals(a,b): return a != b
 
-def variableGenerator(term):
-   type = term.inputs[0].pythonValue
-   debug.Assert(builtins.VARIABLE_FEEDBACK_FUNC is not None)
-
-   ca_function.setValue(term, output=type,
-         feedback=builtins.VARIABLE_FEEDBACK_FUNC,
-         name="variable-" + type.getSomeName())
-
-def variableFeedback(term):
-   target = term.inputs[0]
-   desired = term.inputs[1]
-   target.pythonValue = desired.pythonValue
-
 @register('add')
 @wrapAsCirca
 def add(a,b): return a + b
 
-@register('add_feedback')
+@register('feedback-add')
 @wrapAsCircaMeta
 def addTrainSignal(term):
+   """
    targetTerm = term.inputs[0]
 
    numberOfIncomingSignals = 0
@@ -77,7 +65,7 @@ def addTrainSignal(term):
 
    for input in targetTerm.inputs:
 
-      trainingSignal = code.findFeedbackFunction(targetTerm.functionTerm)
+      trainingSignal = code.getFeedback(input)
 
       if trainingSignal.pythonValue is None:
          continue
@@ -91,6 +79,7 @@ def addTrainSignal(term):
       return
 
    term.pythonValue = signalSum / numberOfIncomingSignals
+   """
 
 @register('sub')
 @wrapAsCirca
