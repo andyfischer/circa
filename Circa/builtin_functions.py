@@ -28,11 +28,13 @@ def stringToToken(s):
 @wrapAsCirca
 def printEvaluate(s):
    print s
+printEvaluate.pureFunction = False
 
 @register('input')
 @wrapAsCirca
 def getInput():
    return raw_input("> ")
+getInput.pureFunction = False
 
 @register('assert')
 @wrapAsCirca
@@ -111,6 +113,7 @@ def ifEval(a,b,c):
 @wrapAsCirca
 def assignEval(a,b):
    print "Warning: 'assign' is not implemented"
+assignEval.pureFunction=False
 
 @register('concat')
 @wrapAsCirca
@@ -121,6 +124,7 @@ def concat(a,b):
 @wrapAsCirca
 def breakEvaluate(a,b):
    pdb.set_trace()
+breakEvaluate.pureFunction=False
 
 def mapGeneratorInit(term):
    if term.state is None:
