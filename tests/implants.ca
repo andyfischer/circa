@@ -3,4 +3,6 @@ mapFunc = map(int, int)
 
 mapFunc(1) := 2
 
+print
+
 assert (mapFunc(1) == 2)

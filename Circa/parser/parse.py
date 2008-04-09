@@ -82,6 +82,11 @@ class Parser(object):
       # Parse an expression using the 'expression' package
       exprResult = _expression.parseExpression(self.tokens)
 
+      if not self.tokens.nextIs(NEWLINE):
+         raise parse_errors.FoundMultipleExpressionsOnLine(self.tokens.next())
+
+      self.tokens.consume(NEWLINE)
+
       if exprResult is None:
          raise parse_errors.NotAStatement(self.tokens.next())
 
