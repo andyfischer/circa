@@ -124,20 +124,8 @@ ca_function.setValue(builtins.VARIABLE_FUNC_GENERATOR,
          evaluateFunc = _variableGenerator,
          name="variable-generator")
 
-# Create feedback functino
+# Create feedback function
 
-# Create variable feedback function
-def _variableFeedback(term):
-   target = term.inputs[0]
-   desired = term.inputs[1]
-   target.pythonValue = desired.pythonValue
-
-builtins.VARIABLE_FEEDBACK_FUNC = builtins.BUILTINS.createConstant(
-      valueType=builtins.FUNC_TYPE)
-ca_function.setValue(builtins.VARIABLE_FEEDBACK_FUNC,
-         inputs=[builtins.REF_TYPE], output=builtins.REF_TYPE,
-         evaluateFunc = _variableFeedback,
-         name="feedback-variable")
 
 # Load builtins.ca file into this code unit
 builtinsFilename = os.path.join(CIRCA_HOME, "lib", "builtins.ca")
