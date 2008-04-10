@@ -108,29 +108,23 @@ ca_function.setValue(builtins.MAP_GENERATOR,
     evaluateFunc = builtin_functions.mapGeneratorEval,
     hasState=True)
 
-builtins.MAP_TRAINING_FUNC = builtins.BUILTINS.createConstant(valueType=builtins.FUNC_TYPE)
-ca_function.setValue(builtins.MAP_TRAINING_FUNC,
-         inputs=[builtins.FUNC_TYPE, builtins.REF_TYPE, builtins.REF_TYPE],
-         output=None, # pureFunction=False,
-         evaluateFunc = builtin_functions.mapTraining,
-         name="map-training")
-
-ca_function.setValue(builtins.MAP_GENERATOR, feedbackFunc=builtins.MAP_TRAINING_FUNC)
-
 # Create Variable generator function
 builtins.VARIABLE_FUNC_GENERATOR = builtins.BUILTINS.createConstant(
       valueType=builtins.FUNC_TYPE)
 
+
 def _variableGenerator(term):
    type = term.inputs[0]
    ca_function.setValue(term, output=type,
-         feedbackFunc=builtins.VARIABLE_FEEDBACK_FUNC,
+         feedbackFunc=builtin_functions.variableFeedbackFunc,
          name="variable-" + type.getSomeName())
 
 ca_function.setValue(builtins.VARIABLE_FUNC_GENERATOR,
          inputs=[builtins.TYPE_TYPE], output=builtins.FUNC_TYPE,
          evaluateFunc = _variableGenerator,
          name="variable-generator")
+
+# Create feedback functino
 
 # Create variable feedback function
 def _variableFeedback(term):
@@ -162,6 +156,10 @@ def getCircaDefined(name):
 builtins.TOKEN_FUNC = getCircaDefined("token")
 builtins.OPERATOR_FUNC = getCircaDefined("operator")
 builtins.ASSIGN_OPERATOR_FUNC = getCircaDefined("assign_operator")
+builtins.ASSIGN_FUNC = getCircaDefined("assign")
+builtins.ADD_FUNC = getCircaDefined("add")
+builtins.SUBTRACT_FUNC = getCircaDefined("sub")
+builtins.MULTIPLY_FUNC = getCircaDefined("mult")
 
 # Install builtin functions into pre-existing Circa objects
 def installFunc(name, value):

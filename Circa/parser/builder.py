@@ -20,13 +20,13 @@ class Builder(object):
       if VERBOSE_DEBUGGING:
          print "Builder.init, target = " + str(target)
 
-      if target: self.code_unit = target
-      else: self.code_unit = code.CodeUnit()
+      if target: self.codeUnit = target
+      else: self.codeUnit = code.CodeUnit()
 
       self.blockStack = []
       self.currentNamespace = "global"
      
-      self.startBlock(TopLevelBlock(self, self.code_unit))
+      self.startBlock(TopLevelBlock(self, self.codeUnit))
 
    def startNamespace(self, namespaceName):
       """Start defining terms in the given namespace. All top-level terms will
@@ -85,14 +85,14 @@ class Builder(object):
       debug.Assert(function.pythonValue is not None)
 
       if branch is None: branch = self.currentBlock().branch
-      new_term = self.code_unit.createTerm(function, branch=branch, name=name, **options)
+      new_term = self.codeUnit.createTerm(function, branch=branch, name=name, **options)
       debug.Assert(new_term != None)
       if name: self.bindName(name, new_term)
       return new_term
 
    def createConstant(self, value, name=None, branch=None, **options):
       if branch is None: branch = self.currentBlock().branch
-      new_term = self.code_unit.createConstant(value, branch=branch, name=name, **options)
+      new_term = self.codeUnit.createConstant(value, branch=branch, name=name, **options)
       debug.Assert(new_term is not None)
       if name: self.bindName(name, new_term)
       return new_term
@@ -100,7 +100,7 @@ class Builder(object):
    def createVariable(self, value, name=None, branch=None, **options):
       if branch is None: branch = self.currentBlock().branch
       typeTerm = python_bridge.typeOfPythonObj(value)
-      new_term = self.code_unit.createVariable(valueType=typeTerm, **options)
+      new_term = self.codeUnit.createVariable(valueType=typeTerm, **options)
       new_term.pythonValue = value
       debug.Assert(new_term is not None)
       if name: self.bindName(name, new_term)
@@ -114,7 +114,7 @@ class Builder(object):
          raise CouldntFindFeedbackFunction()
 
       # Create a training term
-      newTerm = self.code_unit.getTerm(feedbackFunction, [term, target])
+      newTerm = self.codeUnit.getTerm(feedbackFunction, [term, target])
 
    def currentBlock(self):
       try: return self.blockStack[-1]
@@ -148,7 +148,7 @@ class Builder(object):
       return None
 
    def evaluate(self):
-      self.code_unit.evaluate()
+      self.codeUnit.evaluate()
 
 class Block(object):
    def __init__(self, builder, branch=None):
@@ -213,15 +213,15 @@ class Block(object):
 
 
 class TopLevelBlock(Block):
-   def __init__(self, builder, code_unit=None):
-      if code_unit is None:
-         code_unit = code.CodeUnit()
+   def __init__(self, builder, codeUnit=None):
+      if codeUnit is None:
+         codeUnit = code.CodeUnit()
 
-      Block.__init__(self, builder, branch=code_unit.main_branch)
+      Block.__init__(self, builder, branch=codeUnit.main_branch)
 
-      assert code_unit != None
+      assert codeUnit != None
 
-      self.code_unit = code_unit
+      self.codeUnit = codeUnit
 
       self.statefulTermInfos = {}
 
@@ -239,10 +239,10 @@ class TopLevelBlock(Block):
 
       self.statefulTermInfos[name] = stinfo
 
-      self.code_unit.addTerm(term, name=stinfo.base)
+      self.codeUnit.addTerm(term, name=stinfo.base)
 
    def onBind(self, name, term):
-      self.code_unit.setTermName(term, name, allow_rename=True)
+      self.codeUnit.setTermName(term, name, allow_rename=True)
 
    def onFinish(self):
       # TODO: this needs to get called

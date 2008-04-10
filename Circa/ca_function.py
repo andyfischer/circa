@@ -9,10 +9,10 @@ class _Function(object):
 
       self.inputTypes = []
       self.outputType = None
-      self.feedbackFunc = None
       self.hasBranch = False
       self.pureFunction = True
       self.hasState = False
+      self.feedbackAccumulateFunction = None
       self.name = ""
 
    # pythonInit is called once per term, right after the term is created
@@ -25,8 +25,12 @@ class _Function(object):
    def pythonEvaluate(self, term):
       pass
 
+   def pythonHandleFeedback(self, subject, feedback):
+      pass
+
 def setValue(term, inputs=None, output=None, pureFunction=None, 
-      hasState=None, name=None, initFunc=None, evaluateFunc=None, feedbackFunc=None):
+      hasState=None, name=None, initFunc=None, evaluateFunc=None,
+      feedbackFunc=None):
 
    # Make sure term has a _Function object
    if term.pythonValue is None:
@@ -39,7 +43,7 @@ def setValue(term, inputs=None, output=None, pureFunction=None,
    if name is not None: term.pythonValue.name = name
    if initFunc is not None: term.pythonValue.pythonInit = initFunc
    if evaluateFunc is not None: term.pythonValue.pythonEvaluate = evaluateFunc
-   if feedbackFunc is not None: term.pythonValue.feedbackFunc = feedbackFunc
+   if feedbackFunc is not None: term.pythonValue.pythonHandleFeedback = feedbackFunc
  
 def inputTypes(term):
    return term.pythonValue.inputTypes
@@ -58,8 +62,10 @@ def getInitFunc(term):
    return term.pythonValue.pythonInit
 def getEvaluateFunc(term):
    return term.pythonValue.pythonEvaluate
-def feedbackFunc(term):
-   return term.pythonValue.feedbackFunc
+def feedbackAccumulateFunction(term):
+   return term.pythonValue.feedbackAccumulateFunction
+def handleFeedback(term):
+   return term.pythonValue.pythonHandleFeedback
 
 def createFunctionFromPython(func, **initOptions):
    """

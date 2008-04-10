@@ -2,6 +2,7 @@
 import pdb
 
 from Circa import (
+    ca_term,
     ca_function
 )
 
@@ -58,13 +59,7 @@ def findExistingConstant(constantFunction, value):
 
    return None
 
-def findFeedbackFunction(term):
-   return ca_function.feedbackFunc(term)
-
-"""
-def getFeedback(term):
-   # Get feedback function
-   feedbackFunc = findFeedbackFunction(term.functionTerm)
-   return term.codeUnit.getTerm(feedbackFunc, inputs=[term])
-"""
+def callFeedbackFunc(target, desired):
+   feedbackFunc = ca_function.handleFeedback(ca_term.function(target))
+   feedbackFunc(target,desired)
 

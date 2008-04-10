@@ -27,6 +27,7 @@ class Term(object):
       self.branch = None
       self.givenName = None
       self.debugName = None
+      self.feedbackAccumulator = None
  
       global nextGlobalID
       self.globalID = nextGlobalID

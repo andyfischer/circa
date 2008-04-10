@@ -83,19 +83,12 @@ class Infix(ASTNode):
 
       # Evaluate as a feedback?
       if self.token.match is COLON_EQUALS:
+         subject = self.left.eval(builder)
+         desired = self.right.eval(builder)
 
-         try:
-            target = self.right.eval(builder)
+         code.putFeedbackOnTerm(builder.codeUnit, subject, desired)
 
-            # TODO: Allow the function to somehow pre-empt term creation
-
-            trainedTerm = self.left.eval(builder)
-
-            return builder.createFeedback(trainedTerm, target=target)
-
-         except builder_module.CouldntFindFeedbackFunction:
-            raise parse_errors.CouldntFindFeedbackFunction(self.left.getFirstToken(),
-                  trainedTerm.functionTerm.getSomeName())
+         return None
 
       # normal function?
       # try to find a defined operator
