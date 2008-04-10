@@ -55,33 +55,17 @@ def notEquals(a,b): return a != b
 @wrapAsCirca
 def add(a,b): return a + b
 
-@register('feedback-add')
-@wrapAsCircaMeta
-def addTrainSignal(term):
-   """
-   targetTerm = term.inputs[0]
+def addFeedback(target, desired):
+   codeUnit = target.codeUnit
+   difference = codeUnit.getTerm(builtins.SUBTRACT_FUNC, inputs=[desired,target])
+   one_half = codeUnit.createConstant(0.5)
+   halfDifference = codeUnit.getTerm(builtins.MULTIPLY_FUNC, inputs=[difference,one_half])
 
-   numberOfIncomingSignals = 0
-
-   signalSum = 0
-
-   for input in targetTerm.inputs:
-
-      trainingSignal = code.getFeedback(input)
-
-      if trainingSignal.pythonValue is None:
-         continue
-
-      numberOfIncomingSignals += 1
-
-      signalSum += trainingSignal.pythonValue
-
-   if numberOfIncomingSignals == 0:
-      term.pythonValue = None
-      return
-
-   term.pythonValue = signalSum / numberOfIncomingSignals
-   """
+   for input in target.inputs:
+      inputDesired = codeUnit.getTerm(builtins.ADD_FUNC, inputs=[input,halfDifference])
+      code.callFeedbackFunc(input, inputDesired)
+      code.callFeedbackFunc(input, inputDesired)
+add.pythonHandleFeedback=addFeedback
 
 @register('sub')
 @wrapAsCirca
@@ -110,9 +94,9 @@ def ifEval(a,b,c):
    else: return c
 
 @register('assign')
-@wrapAsCirca
-def assignEval(a,b):
-   print "Warning: 'assign' is not implemented"
+@wrapAsCircaMeta
+def assignEval(term):
+   term.inputs[0].pythonValue = term.inputs[1].pythonValue
 assignEval.pureFunction=False
 
 @register('concat')
@@ -146,16 +130,18 @@ def mapGeneratorEval(term):
          term.pythonValue = None
 
    ca_function.setValue(term, inputs=[keyType], output=valueType,
-         evaluateFunc=mapAccessEval, feedbackFunc=builtins.MAP_TRAINING_FUNC)
+         evaluateFunc=mapAccessEval,
+         feedbackFunc=mapAccessFeedback)
 
-def mapTraining(term):
-   trainedTerm = term.inputs[0]
-   targetTerm = term.inputs[1]
-   key = trainedTerm.inputs[0].pythonValue
-   value = targetTerm.pythonValue
-   trainedTerm.functionTerm.state[key] = value
+def mapAccessFeedback(target, desired):
+   key = target.inputs[0].pythonValue
+   value = desired.pythonValue
+   target.functionTerm.state[key] = value
+   target.evaluate()
 
-   trainedTerm.evaluate()
+def variableFeedbackFunc(target, desired):
+   # Create a term that assigns desired to target
+   desired.codeUnit.createTerm(builtins.ASSIGN_FUNC, inputs=[target,desired])
 
 def emptyFunc():
    pass

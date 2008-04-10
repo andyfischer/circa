@@ -32,4 +32,30 @@ passTrainingSignal of Function A
   |
   V
 assign to X
- 
+
+Two ways to do it:
+1) Each term pushes its training signal result to inputs <--
+2) Each term pulls its training signal result from users
+
+---
+
+In the case of feedback to a variable:
+
+When the parser encounters := operator, it calls putFeedbackFunc(subject, desired)
+
+putFeebackFunc:
+  finds the feedbackFunc of subject (creating if it exists)
+  adds 'desired' to the inputs of feedbackFunc
+
+In the case of multiplication:
+
+putFeedbackFunc:
+  uses the inputs of 'subject' to calculate the 'desired' for each input
+  calls putFeedbackFunc(each_input, desired)
+
+---
+
+Every function has the following things defined:
+
+- An accumulation function
+- A distribution function ("putFeedback")

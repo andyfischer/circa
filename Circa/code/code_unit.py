@@ -90,7 +90,6 @@ class CodeUnit(object):
   
       return term
 
-
    def createConstant(self, value=None, name=None, branch=None,
          sourceToken=None, valueType=None):
   
@@ -193,7 +192,7 @@ class CodeUnit(object):
    # Change events
    def onInputsChanged(self, term):
       # if this is a pure function then re-evaluate it
-      if term.functionTerm.pythonValue.pureFunction:
+      if ca_function.pureFunction(term):
          term.pythonEvaluate()
  
    def evaluate(self):

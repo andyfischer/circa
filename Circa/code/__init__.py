@@ -2,12 +2,14 @@
 import code_unit, term_utils
 import term as _term
 import subroutine as _subroutine
+import feedback as _feedback
 
 CodeUnit = code_unit.CodeUnit
 Term = _term.Term
 SubroutineDefinition = _subroutine.SubroutineDefinition
 findExisting = term_utils.findExisting
-findFeedbackFunction = term_utils.findFeedbackFunction
+putFeedbackOnTerm = _feedback.putFeedbackOnTerm
+callFeedbackFunc = term_utils.callFeedbackFunc
 
 def appendFile(code, file_name):
     # get file contents
