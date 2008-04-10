@@ -1,7 +1,7 @@
 
 
 0.1
-  - Training functionality
+  x Training functionality
   - Interface with 3rd party library (pyglet or pygame)
   - Demo that shows:
     1) Simple drawing 

@@ -141,7 +141,7 @@ def mapAccessFeedback(target, desired):
 
 def variableFeedbackFunc(target, desired):
    # Create a term that assigns desired to target
-   desired.codeUnit.createTerm(builtins.ASSIGN_FUNC, inputs=[target,desired])
+   desired.codeUnit.getTerm(builtins.ASSIGN_FUNC, inputs=[target,desired])
 
 def emptyFunc():
    pass
