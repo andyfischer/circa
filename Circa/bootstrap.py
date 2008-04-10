@@ -112,7 +112,6 @@ ca_function.setValue(builtins.MAP_GENERATOR,
 builtins.VARIABLE_FUNC_GENERATOR = builtins.BUILTINS.createConstant(
       valueType=builtins.FUNC_TYPE)
 
-
 def _variableGenerator(term):
    type = term.inputs[0]
    ca_function.setValue(term, output=type,
@@ -125,7 +124,17 @@ ca_function.setValue(builtins.VARIABLE_FUNC_GENERATOR,
          name="variable-generator")
 
 # Create feedback function
+builtins.FEEDBACK_FUNC = builtins.BUILTINS.createConstant(name="feedback",
+      valueType=builtins.FUNC_TYPE)
 
+def _feedbackInit(term):
+   subject = term.inputs[0]
+   desired = term.inputs[1]
+   code.putFeedbackOnTerm(subject.codeUnit, subject, desired)
+ 
+ca_function.setValue(builtins.FEEDBACK_FUNC,
+      inputs=[builtins.REF_TYPE, builtins.REF_TYPE], output=None,
+      initFunc=_feedbackInit, name="feedback")
 
 # Load builtins.ca file into this code unit
 builtinsFilename = os.path.join(CIRCA_HOME, "lib", "builtins.ca")

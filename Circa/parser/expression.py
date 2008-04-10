@@ -82,6 +82,7 @@ class Infix(ASTNode):
          return builder.bindName(self.left.getName(), right_term)
 
       # Evaluate as a feedback?
+      """
       if self.token.match is COLON_EQUALS:
          subject = self.left.eval(builder)
          desired = self.right.eval(builder)
@@ -89,6 +90,7 @@ class Infix(ASTNode):
          code.putFeedbackOnTerm(builder.codeUnit, subject, desired)
 
          return None
+      """
 
       # normal function?
       # try to find a defined operator
@@ -355,6 +357,10 @@ def parseStringLiteral(text):
    return text.strip("'\"")
 
 def getOperatorFunction(token):
+   # Special case: := operator
+   if token == COLON_EQUALS:
+      return builtins.FEEDBACK_FUNC
+
    circaObj = pythonTokenToBuiltin(token)
 
    if circaObj is None:
