@@ -15,6 +15,20 @@ class ParseError(Exception):
 
       return description
 
+class SimpleErrorListener(object):
+   def __init__(self):
+      self.errors = []
+      self.raiseError = False
+
+   def postError(self, error):
+      self.errors.append(error)
+
+      if self.raiseError:
+         raise error
+
+      print "[parse error] " + str(e)
+      
+
 def TokenStreamExpected(expected, location):
    return ParseError(location, "Expected: " + expected.name + ", found: " + location.text)
 

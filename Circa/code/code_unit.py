@@ -1,17 +1,12 @@
 """
-This object contains a single 'unit' of code.
-
-Generally, one unit of code corresponds with one subroutine definition, but the user is
-free to do it differently.
+This object contains a single 'unit' of code. There is not currently any rule as to what
+one 'unit' corresponds to. Currently there is one of these for every subroutine.
 
 All structure-changing operations should be performed on this object,
 rather than on the terms themselves.
 """
 
 import pdb
-
-import term_utils
-import term as term_module
 
 from Circa import (
    builtins,
@@ -21,6 +16,7 @@ from Circa import (
    python_bridge
 )
 
+import term_utils
 import term as _term
 from Circa.utils import indent_printer
 
@@ -60,7 +56,7 @@ class CodeUnit(object):
       debug.Assert(functionTerm.pythonValue is not None)
  
       # Create a new term
-      term = term_module.Term()
+      term = _term.Term()
       term.functionTerm = functionTerm
       term.sourceToken = sourceToken
       term.codeUnit = self

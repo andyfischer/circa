@@ -14,7 +14,7 @@ from Circa.token import token_stream
 from Circa.token.definitions import *
 
 # Local modules
-import parse_errors
+import builder,parse_errors
 
 SPECIAL_NAME_FOR_RETURNS = "#return"
 
@@ -27,38 +27,33 @@ def PLACEHOLDER_FUNC_FOR_ATTRIBUTES(term):
 
 VERBOSE_DEBUGGING = False
 
-def parse(builder, source, **parser_options):
-   parser = Parser(builder, source, **parser_options)
-
-def parseFile(builder, sourceFile, **parser_options):
+def parseFile(module, sourceFile, raise_errors=False, pythonObjectSource=None):
    file = open(sourceFile, 'r')
    file_contents = file.read()
    file.close()
    del file
-   parser = Parser(builder, file_contents, fileName=sourceFile, **parser_options)
+
+   errorListener = parse_errors.SimpleErrorListener()
+   tokenStream = token_stream.asTokenStream(file_contents)
+
+   parser = Parser(module, tokenStream, errorListener, pythonObjectSource)
 
 class Parser(object):
-   def __init__(self, builder, token_source, raise_errors=False, fileName=None,
-         pythonObjectSource=None):
-      self.builder = builder
-      self.parse_errors = []
-      self.raise_errors = raise_errors
-      self.fileName = fileName
+   def __init__(self, module, tokenStream, errorListener, pythonObjectSource=None):
+
+      self.builder = builder.Builder(target = module.global_code_unit)
       self.pythonObjectSource = pythonObjectSource
+      self.errorListener = errorListener
 
       # Make sure 'tokens' is a token stream
-      self.tokens = token_stream.asTokenStream(token_source)
+      self.tokens = tokenStream
      
       # Evaluate token source
       while not self.tokens.finished():
          try:
             self.statement()
          except parse_errors.ParseError, e:
-            if self.raise_errors:
-               raise
-
-            self.parse_errors.append(e)
-            print "[parse error] " + str(e)
+            self.errorListener.postError(e)
 
             # Drop this token, and the rest of the line
             self.tokens.consume()
@@ -72,16 +67,11 @@ class Parser(object):
             print e
             traceback.print_tb(sys.exc_traceback)
 
-   def bind(self, name, term):
-      existing = self.currentBlock().getReference(name)
-      self.currentBlock().putReference(name, term)
-      if existing:
-         self.currentBlock().handleRebind(name, existing, term)
-
    def expression_statement(self):
-      # Parse an expression using the 'expression' package
+      # Parse an expression
       exprResult = _expression.parseExpression(self.tokens)
 
+      # Make sure there is nothing else on this line
       if not self.tokens.nextIs(NEWLINE):
          raise parse_errors.FoundMultipleExpressionsOnLine(self.tokens.next())
 

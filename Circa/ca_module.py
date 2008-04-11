@@ -23,6 +23,7 @@ class CircaModule(object):
       module = CircaModule()
       module.source_tokens = token.tokenize(text)
   
+      # Obsolete:
       builder = module.makeBuilder()
       parser.parse(builder, module.source_tokens, raise_errors)
       return module
@@ -31,27 +32,12 @@ class CircaModule(object):
    def fromFile(cls, file_name, raise_errors=False):
       "Create a CircaModule from the given file."
   
-      # get file contents
-      file = open(file_name, 'r')
-      file_contents = file.read()
-      file.close()
-      del file
-  
-      # tokenize
-      tokens = token.tokenize(file_contents)
-  
       module = CircaModule()
-      module.source_tokens = tokens
       module.file_reference = file_name
-  
-      builder = module.makeBuilder()
-      parser.parse(builder, module.source_tokens, raise_errors=raise_errors)
-      
-      return module
+ 
+      parser.parseFile(module, file_name, raise_errors=raise_errors)
 
-   def makeBuilder(self):
-      "Create a new Builder object that manipulates this module"
-      return builder.Builder(target=self.global_code_unit)
+      return module
  
    def run(self):
       self.global_code_unit.evaluate()
