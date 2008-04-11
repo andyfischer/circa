@@ -9,7 +9,6 @@ VERBOSE_DEBUGGING = False
 def print_usage():
    print "Usage (todo)"
 
-
 class UserOptions(object):
    pass
 

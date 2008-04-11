@@ -6,8 +6,9 @@ from Circa import (
     builtin_functions,
     containers,
     code,
-    ca_type,
     ca_function,
+    ca_module,
+    ca_type,
     debug,
     parser,
     python_bridge,
@@ -20,7 +21,9 @@ CIRCA_HOME = "/Users/andyfischer/code/circa"
 
 VERBOSE_DEBUGGING = False
 
-builtins.BUILTINS = code.CodeUnit()
+BUILTIN_MODULE = ca_module.CircaModule()
+
+builtins.BUILTINS = BUILTIN_MODULE.global_code_unit
 
 # Aliases for creating terms on builtins.BUILTINS
 createTerm = builtins.BUILTINS.createTerm
@@ -138,7 +141,7 @@ ca_function.setValue(builtins.FEEDBACK_FUNC,
 
 # Load builtins.ca file into this code unit
 builtinsFilename = os.path.join(CIRCA_HOME, "lib", "builtins.ca")
-parser.parseFile(parser.builder.Builder(target=builtins.BUILTINS),
+parser.parseFile(BUILTIN_MODULE,
          builtinsFilename, raise_errors=True,
          pythonObjectSource=builtin_functions.NAME_TO_FUNC)
 

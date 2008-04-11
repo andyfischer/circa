@@ -14,7 +14,6 @@ import parse_errors
 VERBOSE_DEBUGGING = False
 
 class Builder(object):
-
    def __init__(self, target=None):
  
       if VERBOSE_DEBUGGING:
