@@ -60,12 +60,12 @@ class Parser(object):
             self.tokens.dropUntil(NEWLINE)
 
          except Exception, e:
-            if self.raise_errors:
-               raise
-
-            print "Internal error on token: " + self.tokens.next().detailsStr()
-            print e
-            traceback.print_tb(sys.exc_traceback)
+            internalError = Exception("Internal error on token: "
+                  + self.tokens.next().detailsStr()
+                  + ". Details:\n" + str(e) + "\n"
+                  + "".join(traceback.format_tb(sys.exc_traceback)))
+            self.errorListener.postError(internalError)
+            #traceback.print_tb(sys.exc_traceback)
 
    def expression_statement(self):
       # Parse an expression

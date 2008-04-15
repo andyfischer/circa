@@ -75,11 +75,11 @@ class CodeUnit(object):
          self.setTermName(term, name)
 
       # Initialize
-      functionTerm.pythonValue.pythonInit(term)
+      ca_function.callInit(functionTerm, term)
 
       # Evaluate immediately (in some cases)
       if (ca_function.pureFunction(functionTerm)):
-          term.pythonEvaluate()
+          term.evaluate()
   
       if branch is None: branch = self.main_branch
       branch.append(term)
@@ -189,14 +189,14 @@ class CodeUnit(object):
    def onInputsChanged(self, term):
       # if this is a pure function then re-evaluate it
       if ca_function.pureFunction(term):
-         term.pythonEvaluate()
+         term.evaluate()
  
    def evaluate(self):
       if VERBOSE_DEBUGGING: print "code_unit.evaluate"
   
       for term in self.main_branch:
          if VERBOSE_DEBUGGING: print "Calling evaluate on " + str(term)
-         term.pythonEvaluate()
+         term.evaluate()
   
    def printTerms(self):
       term_names = {}
