@@ -60,6 +60,4 @@ def findExistingConstant(constantFunction, value):
    return None
 
 def callFeedbackFunc(target, desired):
-   feedbackFunc = ca_function.handleFeedback(ca_term.function(target))
-   feedbackFunc(target,desired)
-
+   ca_function.callHandleFeedback(target.functionTerm, target, desired)

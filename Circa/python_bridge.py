@@ -1,5 +1,4 @@
 
-
 _PYTHON_TYPE_TO_CIRCA = {}
 
 def registerType(pythonType, circaType):
@@ -26,4 +25,12 @@ def wrapPythonFunction(pythonFunc):
    def funcForCirca(term):
        term.pythonValue = pythonFunc(*map(lambda t:t.pythonValue, term.inputs))
    return funcForCirca
+
+class PythonFunction(object):
+   def initialize(term):
+      pass
+   def evaluate(term):
+      pass
+   def handleFeedback(subject, feedback):
+      pass
 

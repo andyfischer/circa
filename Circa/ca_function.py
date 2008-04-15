@@ -1,12 +1,11 @@
 import pdb
 
 from Circa import (
-      python_bridge
+   python_bridge
 )
 
 class _Function(object):
    def __init__(self):
-
       self.inputTypes = []
       self.outputType = None
       self.hasBranch = False
@@ -15,18 +14,13 @@ class _Function(object):
       self.feedbackAccumulateFunction = None
       self.name = ""
 
-   # pythonInit is called once per term, right after the term is created
-   def pythonInit(self, term):
-      pass
+      # pythonInit is called once per term, right after the term is created
+      self.pythonInit = None
 
-   # This function is called whenever evaluation is needed. The function is
-   # suppossed to take values out of 'term's inputs, and stick some result in
-   # term.pythonValue.
-   def pythonEvaluate(self, term):
-      pass
+      # This function is called whenever evaluation is needed
+      self.pythonEvaluate = None
 
-   def pythonHandleFeedback(self, subject, feedback):
-      pass
+      self.pythonHandleFeedback = None
 
 def setValue(term, inputs=None, output=None, pureFunction=None, 
       hasState=None, name=None, initFunc=None, evaluateFunc=None,
@@ -58,6 +52,19 @@ def hasBranch(term):
    return False
 def getName(term):
    return term.pythonValue.name
+
+def callInit(func, term):
+   if func.pythonValue.pythonInit is not None:
+      func.pythonValue.pythonInit(term)
+
+def callEvaluate(func, term):
+   if func.pythonValue.pythonEvaluate is not None:
+      func.pythonValue.pythonEvaluate(term)
+
+def callHandleFeedback(func, subject, target):
+   if func.pythonValue.pythonHandleFeedback is not None:
+      func.pythonValue.pythonHandleFeedback(subject, target)
+
 def getInitFunc(term):
    return term.pythonValue.pythonInit
 def getEvaluateFunc(term):

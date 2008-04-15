@@ -65,10 +65,7 @@ class Term(object):
       return false
  
    def evaluate(self):
-      self.getFunction().pythonEvaluate(self)
-
-   # Obsolete alias
-   pythonEvaluate = evaluate
+      ca_function.callEvaluate(self.functionTerm, self)
  
    def printExtended(self, printer):
       printer.prints("%i: %s" % (self.globalID, self.functionTerm.pythonValue.name))

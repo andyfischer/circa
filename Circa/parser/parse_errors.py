@@ -26,7 +26,7 @@ class SimpleErrorListener(object):
       if self.raiseError:
          raise error
 
-      print "[parse error] " + str(e)
+      print "[parse error] " + str(error)
       
 
 def TokenStreamExpected(expected, location):
