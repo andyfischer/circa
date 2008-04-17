@@ -27,7 +27,7 @@ def PLACEHOLDER_FUNC_FOR_ATTRIBUTES(term):
 
 VERBOSE_DEBUGGING = False
 
-def parseFile(module, sourceFile, raise_errors=False, pythonObjectSource=None):
+def parseFile(module, sourceFile, raise_errors=False, pythonFunctionSource=None):
    file = open(sourceFile, 'r')
    file_contents = file.read()
    file.close()
@@ -36,13 +36,13 @@ def parseFile(module, sourceFile, raise_errors=False, pythonObjectSource=None):
    errorListener = parse_errors.SimpleErrorListener()
    tokenStream = token_stream.asTokenStream(file_contents)
 
-   parser = Parser(module, tokenStream, errorListener, pythonObjectSource)
+   parser = Parser(module, tokenStream, errorListener, pythonFunctionSource)
 
 class Parser(object):
-   def __init__(self, module, tokenStream, errorListener, pythonObjectSource=None):
+   def __init__(self, module, tokenStream, errorListener, pythonFunctionSource=None):
 
       self.builder = builder.Builder(target = module.global_code_unit)
-      self.pythonObjectSource = pythonObjectSource
+      self.pythonFunctionSource = pythonFunctionSource
       self.errorListener = errorListener
 
       # Make sure 'tokens' is a token stream
@@ -176,23 +176,24 @@ class Parser(object):
                          else self.getTypeFromToken(decl.outputType))
 
       name = decl.id.text
-      funcObj = None
+
+      # Create a constant term
+      functionTerm = self.builder.createConstant(valueType=builtins.FUNC_TYPE, name=name)
 
       # Check for 'python' annotation
       if 'python' in decl.annotations.flags:
          # Find the python-defined function
-         if self.pythonObjectSource is None:
+         if self.pythonFunctionSource is None:
             raise parse_errors.NoPythonSourceProvided(decl.findAnnotation('python'))
 
-         if name not in self.pythonObjectSource:
+         if name not in self.pythonFunctionSource:
             raise parse_errors.PythonObjectNotFound(decl.id)
 
-         # Fetch the python-based function
-         funcObj = self.pythonObjectSource[name]
+         # Assign the python-based function
+         ca_function.setFromPythonFunction(functionTerm, self.pythonFunctionSource[name])
 
          # Overwrite type information with declared types
-         funcObj.inputTypes = inputTypes
-         funcObj.outputType = outputType
+         ca_function.setValue(functionTerm, inputs=inputTypes, output=outputType)
 
       else:
          # Start a subroutine block
@@ -208,10 +209,10 @@ class Parser(object):
       # Check for 'feedback' annotation
       if 'feedback' in decl.annotations.pairs:
          feedbackFunc = decl.annotations.pairs['feedback'].eval(self.builder)
-         funcObj.feedbackFunc = feedbackFunc
+         ca_function.setValue(funcitonTerm, feedbackFunc=feedbackFunc)
 
-      # Store result in a constant term
-      return self.builder.createConstant(value=funcObj, name=name)
+      # Return the new term
+      return functionTerm
 
    def return_statement(self):
       return_token = self.tokens.consume(RETURN)

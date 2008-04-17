@@ -27,10 +27,19 @@ def wrapPythonFunction(pythonFunc):
    return funcForCirca
 
 class PythonFunction(object):
+   inputs = []
+   output = None
+   pureFunction = True
+   hasState = False
+   name = "undefined"
+
+   @staticmethod
    def initialize(term):
       pass
+   @staticmethod
    def evaluate(term):
       pass
+   @staticmethod
    def handleFeedback(subject, feedback):
       pass
 
