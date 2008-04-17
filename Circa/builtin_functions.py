@@ -4,122 +4,188 @@ from Circa import (
    builtins,
    ca_function,
    code,
+   python_bridge,
    token
 )
 
+# This maps from String -> PythonFunction
 NAME_TO_FUNC = {}
 
-def register(name):
-   def decorator(func):
-      NAME_TO_FUNC[name] = func
-      func.name = name
-      return func
-   return decorator
+def registerFunc(pythonFunc):
+   NAME_TO_FUNC[pythonFunc.name] = pythonFunc
 
-wrapAsCirca = ca_function.createFunctionFromPython
-wrapAsCircaMeta = ca_function.createMetaFunctionFromPython
+wrapEval = python_bridge.wrapPythonFunction
 
-@register('token')
-@wrapAsCirca
-def stringToToken(s):
-   return token.definitions.STRING_TO_TOKEN[s]
+class Token(python_bridge.PythonFunction):
+   name = "token"
+   @staticmethod
+   @wrapEval
+   def evaluate(s):
+      return token.definitions.STRING_TO_TOKEN[s]
+registerFunc(Token)
 
-@register('print')
-@wrapAsCirca
-def printEvaluate(s):
-   print s
-printEvaluate.pureFunction = False
+class Print(python_bridge.PythonFunction):
+   pureFunction = False
+   name = "print"
 
-@register('input')
-@wrapAsCirca
-def getInput():
-   return raw_input("> ")
-getInput.pureFunction = False
+   @staticmethod
+   @wrapEval
+   def evaluate(s):
+      print s
+registerFunc(Print)
 
-@register('assert')
-@wrapAsCirca
-def assertEvaluate(b):
-   if not b:
-      print "Assertion failure!"
-NAME_TO_FUNC['assert'].pureFunction = False
+class GetInput(python_bridge.PythonFunction):
+   pureFunction = False
+   name = "input"
 
-@register('equals')
-@wrapAsCirca
-def equals(a,b): return a == b
+   @staticmethod
+   @wrapEval
+   def evaluate():
+      return raw_input("> ")
+registerFunc(GetInput)
 
-@register('not_equals')
-@wrapAsCirca
-def notEquals(a,b): return a != b
+class Assert(python_bridge.PythonFunction):
+   pureFunction = False
+   name = "assert"
 
-@register('add')
-@wrapAsCirca
-def add(a,b): return a + b
+   @staticmethod
+   @wrapEval
+   def evaluate(b):
+      if not b:
+         print "Assertion failure!"
+registerFunc(Assert)
 
-def addFeedback(target, desired):
-   codeUnit = target.codeUnit
-   difference = codeUnit.getTerm(builtins.SUBTRACT_FUNC, inputs=[desired,target])
-   one_half = codeUnit.createConstant(0.5)
-   halfDifference = codeUnit.getTerm(builtins.MULTIPLY_FUNC, inputs=[difference,one_half])
+class Equals(python_bridge.PythonFunction):
+   name = "equals"
 
-   for input in target.inputs:
-      inputDesired = codeUnit.getTerm(builtins.ADD_FUNC, inputs=[input,halfDifference])
-      code.callFeedbackFunc(input, inputDesired)
-      code.callFeedbackFunc(input, inputDesired)
-add.pythonHandleFeedback=addFeedback
+   @staticmethod
+   @wrapEval
+   def evaluate(a,b):
+      return a == b
+registerFunc(Equals)
 
-@register('sub')
-@wrapAsCirca
-def sub(a,b): return a - b
+class NotEquals(python_bridge.PythonFunction):
+   name = "not_equals"
 
-@register('mult')
-@wrapAsCirca
-def mult(a,b): return a * b
+   @staticmethod
+   @wrapEval
+   def evaluate(a,b):
+      return a != b
+registerFunc(NotEquals)
 
-@register('div')
-@wrapAsCirca
-def div(a,b): return a / b
+class Add(python_bridge.PythonFunction):
+   name = "add"
 
-@register('and')
-@wrapAsCirca
-def andEval(a,b): return a and b
+   @staticmethod
+   @wrapEval
+   def evaluate(a,b):
+      return a + b
 
-@register('or')
-@wrapAsCirca
-def orEval(a,b): return a or b
+   @staticmethod
+   def handleFeedback(target, desired):
+      codeUnit = target.codeUnit
+      difference = codeUnit.getTerm(builtins.SUBTRACT_FUNC, inputs=[desired,target])
+      one_half = codeUnit.createConstant(0.5)
+      halfDifference = codeUnit.getTerm(builtins.MULTIPLY_FUNC, inputs=[difference,one_half])
 
-@register('if_expr')
-@wrapAsCirca
-def ifEval(a,b,c):
-   if a: return b
-   else: return c
+      for input in target.inputs:
+         inputDesired = codeUnit.getTerm(builtins.ADD_FUNC, inputs=[input,halfDifference])
+         code.callFeedbackFunc(input, inputDesired)
+         code.callFeedbackFunc(input, inputDesired)
+registerFunc(Add)
 
-@register('assign')
-@wrapAsCircaMeta
-def assignEval(term):
-   term.inputs[0].pythonValue = term.inputs[1].pythonValue
-assignEval.pureFunction=False
+class Sub(python_bridge.PythonFunction):
+   name = "sub"
 
-@register('concat')
-@wrapAsCirca
-def concat(a,b):
-   return a + b
+   @staticmethod
+   @wrapEval
+   def evaluate(a,b):
+      return a - b
+registerFunc(Sub)
 
-@register('break')
-@wrapAsCirca
-def breakEvaluate(a,b):
-   pdb.set_trace()
-breakEvaluate.pureFunction=False
+class Mult(python_bridge.PythonFunction):
+   name = "mult"
 
-def mapGeneratorInit(term):
-   if term.state is None:
-      term.state = {}
+   @staticmethod
+   @wrapEval
+   def evaluate(a,b):
+      return a * b
+registerFunc(Mult)
 
-def mapGeneratorEval(term):
-   keyType = term.inputs[0]
-   valueType = term.inputs[1]
+class Div(python_bridge.PythonFunction):
+   name = "div"
 
-   def mapAccessEval(term):
-      #print "access-eval called on " + term.getUniqueName()
+   @staticmethod
+   @wrapEval
+   def evaluate(a,b):
+      return a / b
+registerFunc(Div)
+
+class And(python_bridge.PythonFunction):
+   name = "and"
+
+   @staticmethod
+   @wrapEval
+   def evaluate(a,b):
+      return a and b
+registerFunc(And)
+
+class Or(python_bridge.PythonFunction):
+   name = "or"
+
+   @staticmethod
+   @wrapEval
+   def evaluate(a,b):
+      return a or b
+registerFunc(Or)
+
+class IfExpr(python_bridge.PythonFunction):
+   name = "if_expr"
+
+   @staticmethod
+   @wrapEval
+   def evaluate(a,b,c):
+      if a: return b
+      else: return c
+registerFunc(IfExpr)
+
+class Concat(python_bridge.PythonFunction):
+   name = "concat"
+
+   @staticmethod
+   def evaluate(a,b):
+      return str(a) + str(b)
+registerFunc(Concat)
+
+class Assign(python_bridge.PythonFunction):
+   name = "assign"
+   pureFunction = False
+
+   @staticmethod
+   def evaluate(term):
+      term.inputs[0].pythonValue = term.inputs[1].pythonValue
+registerFunc(Assign)
+
+class Break(python_bridge.PythonFunction):
+   name = "break"
+   pureFunction = False
+   @staticmethod
+   def evaluate(term):
+      pdb.set_trace()
+registerFunc(Break)
+
+class CondBranch(python_bridge.PythonFunction):
+   name = "cond_branch"
+   # not implemented
+registerFunc(CondBranch)
+class SimpleBranch(python_bridge.PythonFunction):
+   name = "simple_branch"
+   # not implemented
+registerFunc(SimpleBranch)
+
+class MapAccess(python_bridge.PythonFunction):
+   @staticmethod
+   def evaluate(term):
       key = term.inputs[0].pythonValue
 
       hashtable = term.functionTerm.state
@@ -129,24 +195,43 @@ def mapGeneratorEval(term):
       else:
          term.pythonValue = None
 
-   ca_function.setValue(term, inputs=[keyType], output=valueType,
-         evaluateFunc=mapAccessEval,
-         feedbackFunc=mapAccessFeedback)
+   @staticmethod
+   def handleFeedback(target, desired):
+      key = target.inputs[0].pythonValue
+      value = desired.pythonValue
+      target.functionTerm.state[key] = value
+      target.evaluate()
+      
+class MapGenerator(python_bridge.PythonFunction):
+   inputs=[builtins.TYPE_TYPE, builtins.TYPE_TYPE],
+   output=builtins.FUNC_TYPE,
+   hasState = True
 
-def mapAccessFeedback(target, desired):
-   key = target.inputs[0].pythonValue
-   value = desired.pythonValue
-   target.functionTerm.state[key] = value
-   target.evaluate()
+   @staticmethod
+   def initialize(term):
+      if term.state is None:
+         term.state = {}
 
-def variableFeedbackFunc(target, desired):
-   # Create a term that assigns desired to target
-   desired.codeUnit.getTerm(builtins.ASSIGN_FUNC, inputs=[target,desired])
+   @staticmethod
+   def evaluate(term):
+      keyType = term.inputs[0]
+      valueType = term.inputs[1]
 
-def emptyFunc():
-   pass
+      ca_function.setFromPythonFunction(term, MapAccess)
+      ca_function.setValue(term, inputs=[keyType], output=valueType)
 
-# TODO:
-NAME_TO_FUNC['cond_branch'] = wrapAsCirca(emptyFunc)
-NAME_TO_FUNC['simple_branch'] = wrapAsCirca(emptyFunc)
+class VariableGenerator(python_bridge.PythonFunction):
+   inputs=[builtins.TYPE_TYPE]
+   output=builtins.FUNC_TYPE
+   name="variable-generator"
+   @staticmethod
+   def evaluate(term):
+      type = term.inputs[0]
+      ca_function.setFromPythonFunction(term, VariableFeedback)
+      ca_function.setValue(term, output=type, name="variable-" + type.getSomeName())
 
+class VariableFeedback(python_bridge.PythonFunction):
+   @staticmethod
+   def handleFeedback(target, desired):
+      # Create a term that assigns desired to target
+      desired.codeUnit.getTerm(builtins.ASSIGN_FUNC, inputs=[target,desired])

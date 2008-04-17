@@ -3,7 +3,6 @@ import string, os, pdb
 
 from Circa import (
     builtins,
-    builtin_functions,
     containers,
     code,
     ca_function,
@@ -59,13 +58,16 @@ builtins.FUNC_TYPE = createTerm(builtins.CONST_FUNC_FUNC, name = 'Function')
 python_bridge.registerType(ca_function._Function, builtins.FUNC_TYPE)
 
 # Implant types into 'constant' function, finish defining it
-def constFuncGeneratorEval(term):
-   type = term.inputs[0]
-   debugName = "constant-" + type.getSomeName()
-   ca_function.setValue(term, inputs=[], output=type, name=debugName)
+class ConstFuncGenerator(python_bridge.PythonFunction):
+   inputs= [builtins.TYPE_TYPE]
+   output= builtins.FUNC_TYPE
+   @staticmethod
+   def evaluate(term):
+      type = term.inputs[0]
+      debugName = "constant-" + type.getSomeName()
+      ca_function.setValue(term, inputs=[], output=type, name=debugName)
 
-ca_function.setValue(builtins.CONST_FUNC_GENERATOR, inputs= [builtins.TYPE_TYPE],
-   output= builtins.FUNC_TYPE, evaluateFunc=constFuncGeneratorEval)
+ca_function.setFromPythonFunction(builtins.CONST_FUNC_GENERATOR, ConstFuncGenerator)
 
 # Create and register primitive types
 builtins.INT_TYPE = builtins.BUILTINS.createConstant(name = 'int',
@@ -101,49 +103,43 @@ python_bridge.registerType(code.SubroutineDefinition, builtins.SUBROUTINE_TYPE)
 builtins.BUILTINS.createConstant(name='true', value=True, valueType=builtins.BOOL_TYPE)
 builtins.BUILTINS.createConstant(name='false', value=False, valueType=builtins.BOOL_TYPE)
 
+# Import builtin_functions.py
+from Circa import builtin_functions
+
 # Create Map function
 builtins.MAP_GENERATOR = builtins.BUILTINS.createConstant(name = 'map',
       valueType=builtins.FUNC_TYPE)
-ca_function.setValue(builtins.MAP_GENERATOR,
-    inputs=[builtins.TYPE_TYPE, builtins.TYPE_TYPE],
-    output=builtins.FUNC_TYPE,
-    initFunc = builtin_functions.mapGeneratorInit,
-    evaluateFunc = builtin_functions.mapGeneratorEval,
-    hasState=True)
+
+ca_function.setFromPythonFunction(builtins.MAP_GENERATOR, builtin_functions.MapGenerator)
 
 # Create Variable generator function
 builtins.VARIABLE_FUNC_GENERATOR = builtins.BUILTINS.createConstant(
       valueType=builtins.FUNC_TYPE)
 
-def _variableGenerator(term):
-   type = term.inputs[0]
-   ca_function.setValue(term, output=type,
-         feedbackFunc=builtin_functions.variableFeedbackFunc,
-         name="variable-" + type.getSomeName())
-
-ca_function.setValue(builtins.VARIABLE_FUNC_GENERATOR,
-         inputs=[builtins.TYPE_TYPE], output=builtins.FUNC_TYPE,
-         evaluateFunc = _variableGenerator,
-         name="variable-generator")
+ca_function.setFromPythonFunction(builtins.VARIABLE_FUNC_GENERATOR,
+      builtin_functions.VariableGenerator)
 
 # Create feedback function
 builtins.FEEDBACK_FUNC = builtins.BUILTINS.createConstant(name="feedback",
       valueType=builtins.FUNC_TYPE)
 
-def _feedbackInit(term):
-   subject = term.inputs[0]
-   desired = term.inputs[1]
-   code.putFeedbackOnTerm(subject.codeUnit, subject, desired)
+class Feedback(python_bridge.PythonFunction):
+   inputs=[builtins.REF_TYPE, builtins.REF_TYPE]
+   output=None
+   name="feedback"
+   @staticmethod
+   def initialize(term):
+      subject = term.inputs[0]
+      desired = term.inputs[1]
+      code.putFeedbackOnTerm(subject.codeUnit, subject, desired)
  
-ca_function.setValue(builtins.FEEDBACK_FUNC,
-      inputs=[builtins.REF_TYPE, builtins.REF_TYPE], output=None,
-      initFunc=_feedbackInit, name="feedback")
+ca_function.setFromPythonFunction(builtins.FEEDBACK_FUNC, Feedback)
 
 # Load builtins.ca file into this code unit
 builtinsFilename = os.path.join(CIRCA_HOME, "lib", "builtins.ca")
 parser.parseFile(BUILTIN_MODULE,
          builtinsFilename, raise_errors=True,
-         pythonObjectSource=builtin_functions.NAME_TO_FUNC)
+         pythonFunctionSource=builtin_functions.NAME_TO_FUNC)
 
 # Expose some objects that were created in Circa code so that they may be accessed
 # from Python code
@@ -171,5 +167,4 @@ def installFunc(name, value):
 
    targetTerm.pythonValue.pythonInit = value.pythonInit
    targetTerm.pythonValue.pythonEvaluate = value.pythonEvaluate
-
 

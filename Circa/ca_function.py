@@ -26,7 +26,7 @@ def setValue(term, inputs=None, output=None, pureFunction=None,
       hasState=None, name=None, initFunc=None, evaluateFunc=None,
       feedbackFunc=None):
 
-   # Make sure term has a _Function object
+   # If 'term' doesn't have a _Function object, then create one
    if term.pythonValue is None:
       term.pythonValue = _Function()
 
@@ -38,7 +38,12 @@ def setValue(term, inputs=None, output=None, pureFunction=None,
    if initFunc is not None: term.pythonValue.pythonInit = initFunc
    if evaluateFunc is not None: term.pythonValue.pythonEvaluate = evaluateFunc
    if feedbackFunc is not None: term.pythonValue.pythonHandleFeedback = feedbackFunc
- 
+
+def setFromPythonFunction(term, pythonFunc):
+   setValue(term, pythonFunc.inputs, pythonFunc.output, pythonFunc.pureFunction,
+      pythonFunc.hasState, pythonFunc.name, pythonFunc.initialize, pythonFunc.evaluate,
+      pythonFunc.handleFeedback)
+
 def inputTypes(term):
    return term.pythonValue.inputTypes
 def outputType(term):

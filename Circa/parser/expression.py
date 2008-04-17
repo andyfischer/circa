@@ -258,7 +258,7 @@ class Function(ASTNode):
          return builder.createTerm(builtins.INVOKE_SUB_FUNC)
 
       # Temp: Use a Python dynamic type check to see if this is a function
-      elif isinstance(func.pythonValue, ca_function.Function):
+      elif isinstance(func.pythonValue, ca_function._Function):
         return builder.createTerm(func, inputs=arg_terms)
 
       else:
