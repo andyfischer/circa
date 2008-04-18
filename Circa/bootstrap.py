@@ -54,9 +54,6 @@ ca_function.setValue(builtins.CONST_FUNC_FUNC)
 # Create Function type
 builtins.FUNC_TYPE = createTerm(builtins.CONST_FUNC_FUNC, name = 'Function')
 
-# Map Python type to this type
-python_bridge.registerType(ca_function._Function, builtins.FUNC_TYPE)
-
 # Implant types into 'constant' function, finish defining it
 class ConstFuncGenerator(python_bridge.PythonFunction):
    inputs= [builtins.TYPE_TYPE]
@@ -70,70 +67,60 @@ class ConstFuncGenerator(python_bridge.PythonFunction):
 ca_function.setFromPythonFunction(builtins.CONST_FUNC_GENERATOR, ConstFuncGenerator)
 
 # Create and register primitive types
-builtins.INT_TYPE = builtins.BUILTINS.createConstant(name = 'int',
+builtins.INT_TYPE = createConstant(name = 'int', value = ca_type.Type(),
+    valueType=builtins.TYPE_TYPE)
+
+builtins.FLOAT_TYPE = createConstant(name = 'float', value = ca_type.Type(),
+    valueType=builtins.TYPE_TYPE)
+
+builtins.STR_TYPE = createConstant(name = 'string', value = ca_type.Type(),
+    valueType=builtins.TYPE_TYPE)
+
+builtins.BOOL_TYPE = createConstant(name = 'bool', value = ca_type.Type(),
+    valueType=builtins.TYPE_TYPE)
+
+builtins.REF_TYPE = createConstant(name = 'Ref', value = ca_type.Type(),
+    valueType=builtins.TYPE_TYPE)
+
+builtins.SUBROUTINE_TYPE = createConstant(name = 'Subroutine',
     value = ca_type.Type(),
     valueType=builtins.TYPE_TYPE)
+
+python_bridge.registerType(ca_function._Function, builtins.FUNC_TYPE)
 python_bridge.registerType(int, builtins.INT_TYPE)
-
-builtins.FLOAT_TYPE = builtins.BUILTINS.createConstant(name = 'float',
-    value = ca_type.Type(),
-    valueType=builtins.TYPE_TYPE)
 python_bridge.registerType(float, builtins.FLOAT_TYPE)
-
-builtins.STR_TYPE = builtins.BUILTINS.createConstant(name = 'string',
-    value = ca_type.Type(),
-    valueType=builtins.TYPE_TYPE)
 python_bridge.registerType(str, builtins.STR_TYPE)
-
-builtins.BOOL_TYPE = builtins.BUILTINS.createConstant(name = 'bool',
-    value = ca_type.Type(),
-    valueType=builtins.TYPE_TYPE)
 python_bridge.registerType(bool, builtins.BOOL_TYPE)
-
-builtins.REF_TYPE = builtins.BUILTINS.createConstant(name = 'Ref',
-    value = ca_type.Type(),
-    valueType=builtins.TYPE_TYPE)
-
-builtins.SUBROUTINE_TYPE = builtins.BUILTINS.createConstant(name = 'Subroutine',
-    value = ca_type.Type(),
-    valueType=builtins.TYPE_TYPE)
 python_bridge.registerType(code.SubroutineDefinition, builtins.SUBROUTINE_TYPE)
 
 # Create basic constants
-builtins.BUILTINS.createConstant(name='true', value=True, valueType=builtins.BOOL_TYPE)
-builtins.BUILTINS.createConstant(name='false', value=False, valueType=builtins.BOOL_TYPE)
+createConstant(name='true', value=True, valueType=builtins.BOOL_TYPE)
+createConstant(name='false', value=False, valueType=builtins.BOOL_TYPE)
 
-# Import builtin_functions.py
+# Import builtin_functions.py . Can't do this sooner because it requires a bunch
+# of symbols that we just defined.
 from Circa import builtin_functions
 
 # Create Map function
-builtins.MAP_GENERATOR = builtins.BUILTINS.createConstant(name = 'map',
+builtins.MAP_GENERATOR = createConstant(name = 'map',
       valueType=builtins.FUNC_TYPE)
 
 ca_function.setFromPythonFunction(builtins.MAP_GENERATOR, builtin_functions.MapGenerator)
 
 # Create Variable generator function
-builtins.VARIABLE_FUNC_GENERATOR = builtins.BUILTINS.createConstant(
-      valueType=builtins.FUNC_TYPE)
-
+builtins.VARIABLE_FUNC_GENERATOR = createConstant(valueType=builtins.FUNC_TYPE) 
 ca_function.setFromPythonFunction(builtins.VARIABLE_FUNC_GENERATOR,
       builtin_functions.VariableGenerator)
 
 # Create feedback function
-builtins.FEEDBACK_FUNC = builtins.BUILTINS.createConstant(name="feedback",
-      valueType=builtins.FUNC_TYPE)
+builtins.FEEDBACK_FUNC = createConstant(name="feedback", valueType=builtins.FUNC_TYPE)
 
-class Feedback(python_bridge.PythonFunction):
-   inputs=[builtins.REF_TYPE, builtins.REF_TYPE]
-   output=None
-   name="feedback"
-   @staticmethod
-   def initialize(term):
-      subject = term.inputs[0]
-      desired = term.inputs[1]
-      code.putFeedbackOnTerm(subject.codeUnit, subject, desired)
- 
-ca_function.setFromPythonFunction(builtins.FEEDBACK_FUNC, Feedback)
+ca_function.setFromPythonFunction(builtins.FEEDBACK_FUNC, builtin_functions.Feedback)
+
+# Create Unknown function generator
+builtins.UNKNOWN_FUNC_GENERATOR = createConstant(valueType=builtins.FUNC_TYPE)
+ca_function.setFromPythonFunction(builtins.UNKNOWN_FUNC_GENERATOR,
+      builtin_functions.UnknownFunctionGenerator)
 
 # Load builtins.ca file into this code unit
 builtinsFilename = os.path.join(CIRCA_HOME, "lib", "builtins.ca")
@@ -156,15 +143,4 @@ builtins.ASSIGN_FUNC = getCircaDefined("assign")
 builtins.ADD_FUNC = getCircaDefined("add")
 builtins.SUBTRACT_FUNC = getCircaDefined("sub")
 builtins.MULTIPLY_FUNC = getCircaDefined("mult")
-
-# Install builtin functions into pre-existing Circa objects
-def installFunc(name, value):
-   targetTerm = builtins.BUILTINS.getNamedTerm(name)
-
-   # Make sure nothing else has been installed
-   if targetTerm.pythonValue.pythonEvaluate is not parser.PLACEHOLDER_EVALUATE_FOR_BUILTINS:
-      raise Exception("Term " + name + " already has a builtin function installed")
-
-   targetTerm.pythonValue.pythonInit = value.pythonInit
-   targetTerm.pythonValue.pythonEvaluate = value.pythonEvaluate
 
