@@ -183,6 +183,17 @@ class SimpleBranch(python_bridge.PythonFunction):
    # not implemented
 registerFunc(SimpleBranch)
 
+class Feedback(python_bridge.PythonFunction):
+   inputs=[builtins.REF_TYPE, builtins.REF_TYPE]
+   output=None
+   name="feedback"
+   @staticmethod
+   def initialize(term):
+      subject = term.inputs[0]
+      desired = term.inputs[1]
+      code.putFeedbackOnTerm(subject.codeUnit, subject, desired)
+
+
 class MapAccess(python_bridge.PythonFunction):
    @staticmethod
    def evaluate(term):
@@ -235,3 +246,13 @@ class VariableFeedback(python_bridge.PythonFunction):
    def handleFeedback(target, desired):
       # Create a term that assigns desired to target
       desired.codeUnit.getTerm(builtins.ASSIGN_FUNC, inputs=[target,desired])
+
+class UnknownFunctionGenerator(python_bridge.PythonFunction):
+   inputs=[builtins.STR_TYPE, builtins.TYPE_TYPE, builtins.TYPE_TYPE]
+   output=builtins.FUNC_TYPE
+   name="unknown-generator"
+
+   @staticmethod
+   def evaluate(term):
+      name = str(term.inputs[0])
+      ca_function.setValue(term, name = name)
