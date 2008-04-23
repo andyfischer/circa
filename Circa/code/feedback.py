@@ -25,10 +25,13 @@ def putFeedbackOnTerm(code_unit, subject, desired):
       else:
          # If this term does not have a feedback accumulator, just pass on
          # 'desired'. Note that if you pass multiple feedbacks to a term with
-         # no accumulator, all but one will be overwritten
+         # no accumulator, all but the last one will be overwritten
          feedback = desired
 
       # Distribute this feedback
       distributePythonFunc = ca_function.handleFeedback(ca_term.function(subject))
-      distributePythonFunc(subject, feedback)
+      if distributePythonFunc is None:
+         print "Warning: no handle-feedback function for " + ca_term.function(subject).getSomeName()
+      else:
+         distributePythonFunc(subject, feedback)
 

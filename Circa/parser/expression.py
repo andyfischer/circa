@@ -113,6 +113,7 @@ class Infix(ASTNode):
          # bind the name to this result
          return builder.bindName(self.left.getName(), result_term)
 
+      pdb.set_trace()
       raise Exception("Unable to evaluate token: " + self.token.text)
 
    """
@@ -360,6 +361,8 @@ def getOperatorFunction(token):
    # Special case: := operator
    if token == COLON_EQUALS:
       return builtins.FEEDBACK_FUNC
+
+   pdb.set_trace()
 
    circaObj = pythonTokenToBuiltin(token)
 

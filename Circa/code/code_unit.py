@@ -133,12 +133,13 @@ class CodeUnit(object):
       assert isinstance(name, str)
  
       if (not allow_rename) and (name in self.term_namespace):
-         raise common_errors.UsageError("A term with name \""+str(name)+"\" already exists." +
-                        " (Use 'allow_rename' if you want to allow this)")
+         raise common_errors.UsageError(
+               "A term with name \""+str(name)+"\" already exists." +
+               " (Use 'allow_rename' if you want to allow this)")
  
       if name in self.term_namespace:
          self.term_namespace[name].givenName = None
-         # TODO, currently the 'givenName' variable will not behave if a term is given
+         # Warning, currently the 'givenName' variable will not behave if a term is given
          # more than one name
  
       self.term_namespace[name] = term
@@ -197,6 +198,8 @@ class CodeUnit(object):
       for term in self.main_branch:
          if VERBOSE_DEBUGGING: print "Calling evaluate on " + str(term)
          term.evaluate()
+
+   reevaluate = evaluate
   
    def printTerms(self):
       term_names = {}
@@ -218,26 +221,29 @@ def printTermsFormatted(branch, printer, term_names):
 
    def getTermLabel(term):
       if term.isConstant():
-         return "[constant] " + str(term.pythonValue)
+         realName = term.getName()
+         if realName: return realName
+         else: return str(term.pythonValue)
       else:
          return term.getSomeName()
    
    for term in branch:
+      # Skip constants
+      if term.isConstant():
+         continue
 
-    # Skip constants
-    if term.isConstant():
-       continue
+      text = term.getSomeName() + ": " + term.functionTerm.getSomeName()
 
-    text = term.getSomeName() + ": " + term.functionTerm.getSomeName()
+      if term.inputs:
+         text += " ("
+         text += ", ".join(map(getTermLabel, term.inputs))
+         text += ")"
 
-    if term.inputs:
-       text += " ("
-       text += ", ".join(map(getTermLabel, term.inputs))
-       text += ")"
- 
-    printer.println(text)
- 
-    if term.branch:
-       printer.indent()
-       printTermsFormatted(term.branch, printer, term_names)
-       printer.unindent()
+      text += ", value = " + str(term.pythonValue)
+   
+      printer.println(text)
+   
+      if term.branch:
+         printer.indent()
+         printTermsFormatted(term.branch, printer, term_names)
+         printer.unindent()

@@ -18,8 +18,8 @@ import builder,parse_errors
 
 SPECIAL_NAME_FOR_RETURNS = "#return"
 
-def PLACEHOLDER_EVALUATE_FOR_BUILTINS(term):
-   print "Warning: builtin function " + term.functionTerm.getSomeName() + " does not have a body."
+def PLACEHOLDER_EVALUATE(term):
+   print "Warning: function " + term.functionTerm.getSomeName() + " does not have a body."
 
 def PLACEHOLDER_FUNC_FOR_ATTRIBUTES(term):
    # Do nothing
@@ -27,7 +27,7 @@ def PLACEHOLDER_FUNC_FOR_ATTRIBUTES(term):
 
 VERBOSE_DEBUGGING = False
 
-def parseFile(module, sourceFile, raise_errors=False, pythonFunctionSource=None):
+def parseFile(module, sourceFile, raise_errors=False):
    file = open(sourceFile, 'r')
    file_contents = file.read()
    file.close()
@@ -36,13 +36,12 @@ def parseFile(module, sourceFile, raise_errors=False, pythonFunctionSource=None)
    errorListener = parse_errors.SimpleErrorListener()
    tokenStream = token_stream.asTokenStream(file_contents)
 
-   parser = Parser(module, tokenStream, errorListener, pythonFunctionSource)
+   parser = Parser(module, tokenStream, errorListener)
 
 class Parser(object):
-   def __init__(self, module, tokenStream, errorListener, pythonFunctionSource=None):
+   def __init__(self, module, tokenStream, errorListener):
 
       self.builder = builder.Builder(target = module.global_code_unit)
-      self.pythonFunctionSource = pythonFunctionSource
       self.errorListener = errorListener
 
       # Make sure 'tokens' is a token stream
@@ -180,21 +179,14 @@ class Parser(object):
       # Create a constant term
       functionTerm = self.builder.createConstant(valueType=builtins.FUNC_TYPE, name=name)
 
+      # Set type information
+      ca_function.setValue(functionTerm, inputs=inputTypes, output=outputType)
+
       # Check for 'python' annotation
       if 'python' in decl.annotations.flags:
-         # Find the python-defined function
-         if self.pythonFunctionSource is None:
-            raise parse_errors.NoPythonSourceProvided(decl.findAnnotation('python'))
-
-         if name not in self.pythonFunctionSource:
-            raise parse_errors.PythonObjectNotFound(decl.id)
-
-         # Assign the python-based function
-         ca_function.setFromPythonFunction(functionTerm, self.pythonFunctionSource[name])
-
-         # Overwrite type information with declared types
-         ca_function.setValue(functionTerm, inputs=inputTypes, output=outputType)
-
+         # Give this function some stub code. Hopefully they will overwrite this later
+         ca_function.setValue(functionTerm, pureFunction=False,
+               evaluateFunc=PLACEHOLDER_EVALUATE)
       else:
          # Start a subroutine block
          raise parse_errors.NotImplemented(tokens.next())

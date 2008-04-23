@@ -21,7 +21,9 @@ class Token(python_bridge.PythonFunction):
    @staticmethod
    @wrapEval
    def evaluate(s):
+      #pdb.set_trace()
       return token.definitions.STRING_TO_TOKEN[s]
+
 registerFunc(Token)
 
 class Print(python_bridge.PythonFunction):
@@ -189,16 +191,22 @@ class Feedback(python_bridge.PythonFunction):
    name="feedback"
    @staticmethod
    def initialize(term):
+      #pdb.set_trace()
       subject = term.inputs[0]
       desired = term.inputs[1]
       code.putFeedbackOnTerm(subject.codeUnit, subject, desired)
 
-
 class MapAccess(python_bridge.PythonFunction):
+   name="map-access"
+
+   @staticmethod
+   def initialize(term):
+      pass
+      #pdb.set_trace()
+
    @staticmethod
    def evaluate(term):
       key = term.inputs[0].pythonValue
-
       hashtable = term.functionTerm.state
       
       if key in hashtable:
@@ -217,6 +225,7 @@ class MapGenerator(python_bridge.PythonFunction):
    inputs=[builtins.TYPE_TYPE, builtins.TYPE_TYPE],
    output=builtins.FUNC_TYPE,
    hasState = True
+   name="map-generator"
 
    @staticmethod
    def initialize(term):
@@ -242,6 +251,7 @@ class VariableGenerator(python_bridge.PythonFunction):
       ca_function.setValue(term, output=type, name="variable-" + type.getSomeName())
 
 class VariableFeedback(python_bridge.PythonFunction):
+   name="variable-feedback"
    @staticmethod
    def handleFeedback(target, desired):
       # Create a term that assigns desired to target

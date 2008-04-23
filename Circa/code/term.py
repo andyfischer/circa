@@ -2,12 +2,24 @@ import pdb
 
 from Circa import (
    builtins,
-   ca_function
+   ca_function,
+   debug
 )
 
 nextGlobalID = 1
 
 class Term(object):
+
+   # Type checks
+   def __setattr__(self, attr_name, value):
+      if attr_name == "functionTerm":
+         debug.Assert(value is None or isinstance(value, Term))
+      else:
+         pass
+
+      self.__dict__[attr_name] = value
+
+
    def __init__(self):
       "Use 'createTerm' instead of calling this constructor"
  
@@ -40,23 +52,41 @@ class Term(object):
    def getFunction(self):
       "Returns this term's Function"
       return self.functionTerm.pythonValue
- 
+
+   def getName(self):
+      if self.givenName is not None:
+         return self.givenName
+      elif self.debugName is not None:
+         return self.debugName
+      elif self.getType() is builtins.FUNC_TYPE and self.pythonValue is not None:
+         return self.pythonValue.name
+      else:
+         return None
+
    def getSomeName(self):
       """
       Returns some unique identifier. There are a few values we may use here.
       No guarantees are made as to the format.
       """
-      if self.givenName is not None:
-         return self.givenName
-      elif self.debugName is not None:
-         return self.debugName
-      elif self.getType() is builtins.FUNC_TYPE:
-         return self.pythonValue.name
+      realName = self.getName()
+      if realName:
+         return realName
       else:
          return self.getUniqueName()
 
    def getUniqueName(self):
       return 't' + str(self.globalID)
+
+   def shallowDesc(self):
+      if self.isConstant():
+         return str(self.pythonValue)
+      else:
+         return self.getSomeName()
+
+   def desc(self):
+      return ('[' + self.shallowDesc() + '] '
+               + self.functionTerm.shallowDesc() + '('
+               + ','.join(map(Term.shallowDesc, self.inputs))) + ')'
  
    def inputsContain(self, term):
       "Returns True if our inputs contain the term"
