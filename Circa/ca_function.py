@@ -1,6 +1,7 @@
 import pdb
 
 from Circa import (
+   debug,
    python_bridge
 )
 
@@ -12,7 +13,7 @@ class _Function(object):
       self.pureFunction = True
       self.hasState = False
       self.feedbackAccumulateFunction = None
-      self.name = ""
+      self.name = "undefined"
 
       # pythonInit is called once per term, right after the term is created
       self.pythonInit = None
@@ -21,6 +22,9 @@ class _Function(object):
       self.pythonEvaluate = None
 
       self.pythonHandleFeedback = None
+
+   def __str__(self):
+      return "<Function " + self.name + ">"
 
 def setValue(term, inputs=None, output=None, pureFunction=None, 
       hasState=None, name=None, initFunc=None, evaluateFunc=None,
@@ -40,6 +44,9 @@ def setValue(term, inputs=None, output=None, pureFunction=None,
    if feedbackFunc is not None: term.pythonValue.pythonHandleFeedback = feedbackFunc
 
 def setFromPythonFunction(term, pythonFunc):
+   # Make sure name is defined
+   debug.Assert(pythonFunc.name)
+
    setValue(term, pythonFunc.inputs, pythonFunc.output, pythonFunc.pureFunction,
       pythonFunc.hasState, pythonFunc.name, pythonFunc.initialize, pythonFunc.evaluate,
       pythonFunc.handleFeedback)
@@ -66,10 +73,6 @@ def callEvaluate(func, term):
    if func.pythonValue.pythonEvaluate is not None:
       func.pythonValue.pythonEvaluate(term)
 
-def callHandleFeedback(func, subject, target):
-   if func.pythonValue.pythonHandleFeedback is not None:
-      func.pythonValue.pythonHandleFeedback(subject, target)
-
 def getInitFunc(term):
    return term.pythonValue.pythonInit
 def getEvaluateFunc(term):
@@ -78,24 +81,3 @@ def feedbackAccumulateFunction(term):
    return term.pythonValue.feedbackAccumulateFunction
 def handleFeedback(term):
    return term.pythonValue.pythonHandleFeedback
-
-def createFunctionFromPython(func, **initOptions):
-   """
-   This function returns an instance of Function, with 'func' implanted as its
-   evaluation function. 'initOptions' are passed to the constructor of Function.
-   """
-   circaFunc = _Function(**initOptions)
-   circaFunc.pythonEvaluate = python_bridge.wrapPythonFunction(func)
-   return circaFunc
-
-def createMetaFunctionFromPython(func, **initOptions):
-   """
-   This function returns an instance of Function, with 'func' implanted as its
-   evaluation function. Unlike createFunctionFromPython, this does not pass 'func'
-   through wrapPythonFunction. So, 'func' should accept a single term as input, and
-   return nothing.
-   """
-   circaFunc = _Function(**initOptions)
-   circaFunc.pythonEvaluate = func
-   return circaFunc
-
