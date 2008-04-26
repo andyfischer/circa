@@ -91,10 +91,10 @@ builtinsFilename = os.path.join(CIRCA_HOME, "lib", "builtins.ca")
 parser.parseFile(builtins.BUILTIN_MODULE, builtinsFilename, raise_errors=True)
 
 # Go through objects defined in bulitins.ca, and fill in definitions
-for (name,obj) in builtins.BUILTINS.term_namespace.items():
+for (name,term) in builtins.BUILTINS.term_namespace.items():
    if name in builtin_functions.NAME_TO_FUNC:
-      ca_function.setFromPythonFunction(obj, builtin_functions.NAME_TO_FUNC[name])
-      obj.evaluate()
+      ca_function.setFromPythonFunction(term, builtin_functions.NAME_TO_FUNC[name])
+      term.evaluate()
 
 builtins.BUILTINS.reevaluate()
 
@@ -102,9 +102,9 @@ builtins.BUILTINS.reevaluate()
 # from Python code
 
 def getCircaDefined(name):
-   obj = builtins.BUILTINS.getNamedTerm(name)
-   if obj is None: raise Exception("Couldn't find term named: " + name)
-   return obj
+   term = builtins.BUILTINS.getNamedTerm(name)
+   if term is None: raise Exception("Couldn't find term named: " + name)
+   return term
 
 builtins.TOKEN_FUNC = getCircaDefined("token")
 builtins.OPERATOR_FUNC = getCircaDefined("operator")

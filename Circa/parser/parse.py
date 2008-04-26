@@ -59,12 +59,14 @@ class Parser(object):
             self.tokens.dropUntil(NEWLINE)
 
          except Exception, e:
-            internalError = Exception("Internal error on token: "
-                  + self.tokens.next().detailsStr()
+
+            nextToken = self.tokens.next()
+            locationDesc = nextToken.detailsStr() if nextToken else "end of file"
+
+            internalError = Exception("Internal error at " + locationDesc
                   + ". Details:\n" + str(e) + "\n"
                   + "".join(traceback.format_tb(sys.exc_traceback)))
             self.errorListener.postError(internalError)
-            #traceback.print_tb(sys.exc_traceback)
 
    def expression_statement(self):
       # Parse an expression
@@ -189,7 +191,7 @@ class Parser(object):
                evaluateFunc=PLACEHOLDER_EVALUATE)
       else:
          # Start a subroutine block
-         raise parse_errors.NotImplemented(tokens.next())
+         raise parse_errors.NotImplemented(self.tokens.next())
 
          # Create a new subroutine object
          sub = code.SubroutineDefinition(input_names=decl.getInputNames())
@@ -208,11 +210,11 @@ class Parser(object):
 
    def return_statement(self):
       return_token = self.tokens.consume(RETURN)
-      expr = self.expression()
+      expr = _expression.parseExpression(self.tokens)
       if not expr:
          raise parse_errors.ExpectedExpression(return_token)
 
-      self.bind(SPECIAL_NAME_FOR_RETURNS, expr.eval(self.builder))
+      self.builder.bindName(SPECIAL_NAME_FOR_RETURNS, expr.eval(self.builder))
 
    def block(self, blockToStart):
       if VERBOSE_DEBUGGING: print "Parsing block"
@@ -366,11 +368,12 @@ def annotation_list(tokens):
    Returns None if no annotation list is found.
    """
    
+   annotationList = AnnotationList()
+
    if not tokens.nextIs(LBRACE):
-      return None
+      return annotationList
 
    tokens.consume(LBRACE)
-   annotationList = AnnotationList()
 
    while not tokens.nextIs(RBRACE):
       annotationName = tokens.consume(IDENT)

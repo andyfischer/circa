@@ -4,6 +4,7 @@ from Circa import (
    builtins,
    ca_function,
    code,
+   debug,
    python_bridge,
    token
 )
@@ -216,7 +217,9 @@ class MapAccess(python_bridge.PythonFunction):
 
    @staticmethod
    def handleFeedback(target, desired):
+      # Problem: this gets called before target.inputs[0] has a real function
       key = target.inputs[0].pythonValue
+      #debug.Assert(key is not None)
       value = desired.pythonValue
       target.functionTerm.state[key] = value
       target.evaluate()
@@ -265,4 +268,5 @@ class UnknownFunctionGenerator(python_bridge.PythonFunction):
    @staticmethod
    def evaluate(term):
       name = str(term.inputs[0])
-      ca_function.setValue(term, name = name)
+      ca_function.setValue(term, name = "generated-unknown-function")
+
