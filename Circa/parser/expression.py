@@ -66,20 +66,21 @@ class Infix(ASTNode):
       self.left = left
       self.right = right
 
-   def getTermToCreate(self, builder):
-      normalFunction = getOperatorFunction(self.token.match)
-      if normalFunction is not None:
-         return TermToCreate(normalFunction, 
-                              [self.left.eval(builder), self.right.eval(builder)] )
-
    def eval(self, builder):
 
-      # evaluate as an assignment?
+      # Evaluate as an assignment?
       if self.token.match == EQUALS:
          right_term = self.right.eval(builder)
          if not isinstance(right_term, code.Term):
             raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
          return builder.bindName(self.left.getName(), right_term)
+
+      # Evaluate as a right-arrow?
+      if self.token.match == RIGHT_ARROW:
+         left_inputs = self.left.eval(builder)
+         right_func = self.right.eval(builder)
+
+         return builder.createTerm(right_func, inputs=[left_inputs])
 
       # Evaluate as a feedback?
       """
@@ -96,7 +97,6 @@ class Infix(ASTNode):
       # try to find a defined operator
       normalFunction = getOperatorFunction(self.token.match)
       if normalFunction is not None:
-
          assert normalFunction.pythonValue is not None
 
          return builder.createTerm(normalFunction,
@@ -128,14 +128,15 @@ class Infix(ASTNode):
       return self.function.text + "(" + str(self.left) + "," + str(self.right) + ")"
 
 # Infix precedence
-HIGHEST_INFIX_PRECEDENCE = 6
+HIGHEST_INFIX_PRECEDENCE = 7
 infixPrecedence = {
-    DOT: 6,
-    STAR: 5, SLASH: 5,
-    PLUS: 4, MINUS: 4,
-    LTHAN: 3, LTHANEQ: 3, GTHAN: 3, GTHANEQ: 3, DOUBLE_EQUALS: 3, NOT_EQUALS: 3,
-    EQUALS: 1, PLUS_EQUALS: 1, MINUS_EQUALS: 1, STAR_EQUALS: 1, SLASH_EQUALS: 1,
-      COLON_EQUALS: 1
+    DOT: 7,
+    STAR: 6, SLASH: 6,
+    PLUS: 5, MINUS: 5,
+    LTHAN: 2, LTHANEQ: 2, GTHAN: 2, GTHANEQ: 2, DOUBLE_EQUALS: 2, NOT_EQUALS: 2,
+    EQUALS: 2, PLUS_EQUALS: 2, MINUS_EQUALS: 2, STAR_EQUALS: 2, SLASH_EQUALS: 2,
+      COLON_EQUALS: 2,
+    RIGHT_ARROW: 1 
 }
 
 def getInfixPrecedence(token):
@@ -271,7 +272,6 @@ class Function(ASTNode):
 
 class MatchFailed(Exception):
    pass
-
 
 def infix_expression(tokens, precedence):
    if (precedence > HIGHEST_INFIX_PRECEDENCE):

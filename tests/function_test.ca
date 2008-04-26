@@ -1,0 +1,7 @@
+
+function do_some_math(int a)
+{
+  return a * 2 + 3
+}
+
+do_some_math(2) -> print

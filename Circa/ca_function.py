@@ -62,7 +62,7 @@ def hasState(term):
 def hasBranch(term):
    # Not implemented
    return False
-def getName(term):
+def name(term):
    return term.pythonValue.name
 
 def callInit(func, term):
