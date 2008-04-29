@@ -1,0 +1,10 @@
+
+
+
+from glob import glob
+
+# Get source files
+
+source_files = list(glob("*.cpp"))
+
+StaticLibrary('circa', source_files)
