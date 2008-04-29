@@ -11,7 +11,7 @@ namespace codeunit {
 
 struct CodeUnit
 {
-   vector<Term> _allTerms;
+   TermList _allTerms;
    Branch _mainBranch;
    TermNamespace _namespace;
 };

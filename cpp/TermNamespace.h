@@ -8,7 +8,7 @@ class Term;
 class TermNamespace
 {
 public:
-   //operator[]();
+   Term*& operator[](const string& str);
 
 private:
    map<string, Term*> _map;
