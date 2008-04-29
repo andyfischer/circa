@@ -26,14 +26,12 @@ void set_input(CodeUnit* code, Term* term, int index, Term* input)
 
 void bind_name(CodeUnit* code, Term* term, string name)
 {
-   // code->_namespace[name] = term;
+   code->_namespace[name] = term;
 }
 
 Term* _new_term(CodeUnit* code)
 {
-   Term new_term;
-   code->_allTerms.push_back(new_term);
-   return &_allTerms[_allTerms.size() - 1];
+   return &code->_allTerms.addTerm();
 }
 
 } // namespace codeunit

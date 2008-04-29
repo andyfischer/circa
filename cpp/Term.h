@@ -7,13 +7,11 @@
 
 struct Term
 {
-private:
     Term() :
         _data(NULL),
         _function(NULL)
     {}
 
-public:
     void* _data;
     TermList _inputs;
     Term* _function;
