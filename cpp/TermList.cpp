@@ -1,18 +1,24 @@
 
+#include "Term.h"
 #include "TermList.h"
 
+
+void TermList::set(int index, Term* term)
+{
+   // Check if we need to add empty elements
+   while (index >= _vector.size()) {
+      _vector.push_back(NULL);
+   }
+
+   _vector[index] = term;
+}
 
 Term*& TermList::operator[](int index)
 {
    // Check if we need to add empty elements
-   if (index >= _vector.size())
-      _vector.assign(_vector.size() - index + 1);
-   return &_vector[index];
-}
-
-TermList::add_term()
-{
-   Term new_term;
-   _vector.push_back(new_term);
-   return _vector[_vector.size() - 1];
+   while (index >= _vector.size()) {
+      _vector.push_back(NULL);
+   }
+   
+   return _vector[index];
 }

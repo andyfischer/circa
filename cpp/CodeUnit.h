@@ -11,9 +11,9 @@ namespace codeunit {
 
 struct CodeUnit
 {
-   TermList _allTerms;
-   Branch _mainBranch;
-   TermNamespace _namespace;
+   vector<Term*> all_terms;
+   Branch main_branch;
+   TermNamespace term_namespace;
 };
 
 Term* bootstrap_empty_term(CodeUnit* code);
