@@ -9,26 +9,32 @@ namespace function {
 
 struct Function
 {
-   TermList _inputTypes;
-   Term* _outputType;
-   bool _pureFunction;
-   bool _hasState;
-   string _name;
+   // Term pointers
+   TermList input_types;
+   Term* output_type;
+
+   // Attributes
+   bool pure_function;
+   bool has_state;
+   string name;
+
+   // Code
+   void (*evaluate)(Term*);
 
 public:
    Function() :
-      _pureFunction(false),
-      _hasState(false)
-   {
-      _name = "undefined";
-      _outputType = NULL;
-   }
+      pure_function(false),
+      has_state(false),
+      output_type(NULL),
+      name("undefined")
+   {}
 };
 
 void initialize_data(Term* func);
 void set_name(Term* func, string name);
 void set_input_type(Term* func, int index, Term* type);
 void set_output_type(Term* func, Term* type);
+Term* output_type(Term* func);
 
 } // namespace function
 

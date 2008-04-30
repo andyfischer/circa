@@ -8,9 +8,8 @@ class Term;
 class TermList
 {
 public:
+   void set(int index, Term* term);
    Term*& operator[](int index);
-
-   Term& addTerm();
 
 private:
    vector<Term*> _vector;

@@ -8,13 +8,13 @@
 struct Term
 {
     Term() :
-        _data(NULL),
-        _function(NULL)
+        data(NULL),
+        function(NULL)
     {}
 
-    void* _data;
-    TermList _inputs;
-    Term* _function;
+    void* data;
+    TermList inputs;
+    Term* function;
 };
 
 #endif
