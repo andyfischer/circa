@@ -8,6 +8,12 @@ class Term;
 class TermList
 {
 public:
+   TermList() {}
+   TermList(Term* term1)
+   {
+      _vector.push_back(term1);
+   }
+
    void set(int index, Term* term);
    Term*& operator[](int index);
 
