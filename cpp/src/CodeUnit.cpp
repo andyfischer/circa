@@ -1,4 +1,5 @@
 
+#include "Builtins.h"
 #include "CodeUnit.h"
 #include "Function.h"
 #include "Type.h"
@@ -12,10 +13,23 @@ Term* bootstrap_empty_term(CodeUnit* code)
    return _new_term(code);
 }
 
+Term* get_term(CodeUnit* code, Term* func, const TermList& inputs)
+{
+   // todo: check to reuse an existing term
+   return create_term(code, func, inputs);
+}
+
+// Convenience function for creating a term with no inputs
 Term* create_term(CodeUnit* code, Term* func)
+{
+   return create_term(code, func, TermList());
+}
+
+Term* create_term(CodeUnit* code, Term* func, const TermList& inputs)
 {
    Term* new_term = _new_term(code);
    new_term->function = func;
+   set_inputs(code, new_term, inputs);
 
    assert(func != NULL);
    assert(function::output_type(func) != NULL);
@@ -25,9 +39,22 @@ Term* create_term(CodeUnit* code, Term* func)
    return new_term;
 }
 
+Term* create_constant(CodeUnit* code, Term* type)
+{
+   // Fetch the constant-function for this type
+   Term* constFunc = get_term(code, builtins::CONST_GENERATOR, TermList(type));
+
+   return create_term(code, constFunc, TermList());
+}
+
 void set_input(CodeUnit* code, Term* term, int index, Term* input)
 {
    term->inputs.set(index, input);
+}
+
+void set_inputs(CodeUnit* code, Term* term, const TermList& inputs)
+{
+   term->inputs = inputs;
 }
 
 void bind_name(CodeUnit* code, Term* term, string name)

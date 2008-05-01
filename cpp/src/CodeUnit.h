@@ -18,7 +18,10 @@ struct CodeUnit
 
 Term* bootstrap_empty_term(CodeUnit* code);
 Term* get_term(CodeUnit* code, Term* func, const TermList& inputs);
+
+// Convenience function for creating a term with no inputs
 Term* create_term(CodeUnit* code, Term* function);
+
 Term* create_term(CodeUnit* code, Term* func, const TermList& inputs);
 Term* create_constant(CodeUnit* code, Term* type);
 void set_input(CodeUnit* code, Term* term, int index, Term* input);

@@ -77,7 +77,7 @@ void bootstrap_builtins()
     // Create string type
     STRING_TYPE = codeunit::create_term(BUILTINS, CONST_GENERATOR, TermList(TYPE_TYPE));
     type::set_initialize_data_func(STRING_TYPE, string_type::initialize_data);
-    type::set_to_string_func(STRINGINT_TYPE, string_type::to_string);
+    type::set_to_string_func(STRING_TYPE, string_type::to_string);
 
 }
 
