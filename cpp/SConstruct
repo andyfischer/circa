@@ -7,9 +7,10 @@ from glob import glob
 
 
 source_files = list(glob("src/*.cpp"))
+source_files.remove('src/test1.cpp')
 
 circa_lib = StaticLibrary('circa', source_files, CPPFLAGS=['-ggdb'], 
     CPPDEFINES=['DEBUG'])
 
 
-Program('test1', ['test1.cpp'], LIBS = [circa_lib])
+Program('test1', ['src/test1.cpp'], LIBS = [circa_lib])
