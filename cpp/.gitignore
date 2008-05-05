@@ -3,4 +3,8 @@
 *.obj
 *.lib
 *.exe
+*.ilk
+*.exe.manifest
+*.pdb
+*.suo
 .sconsign.dblite
