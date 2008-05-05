@@ -10,6 +10,13 @@ void initialize_data(Term* func)
    func->data = new Function();
 }
 
+string to_string(Term* func)
+{
+    std::stringstream sstream;
+    sstream << "<Function " << FUNC(func)->name << ">";
+    return sstream.str();
+}
+
 void set_name(Term* func, string name)
 {
    FUNC(func)->name = name;

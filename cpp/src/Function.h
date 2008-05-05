@@ -31,6 +31,7 @@ public:
 };
 
 void initialize_data(Term* func);
+string to_string(Term* func);
 void set_name(Term* func, string name);
 void set_input_type(Term* func, int index, Term* type);
 void set_output_type(Term* func, Term* type);
