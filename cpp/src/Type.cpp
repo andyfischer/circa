@@ -6,12 +6,18 @@
 
 namespace type {
 
-#define TYPE(t) (reinterpret_cast<Type*>((t)->data))
+#define TYPE(term) (reinterpret_cast<Type*>((term)->data))
 
 void call_initialize_data(Term* type, Term* target)
 {
-   assert(TYPE(type)->initialize_data != NULL);
-   TYPE(type)->initialize_data(target);
+   Type* t = TYPE(type);
+
+   if (t->initialize_data == NULL) {
+      printf("ERROR: type %s is incomplete (no initialize_data).\n",
+            t->name.c_str());
+      return;
+   }
+   t->initialize_data(target);
 }
 
 void set_initialize_data_func(Term* target, void(*func)(Term*))
@@ -26,11 +32,10 @@ void set_to_string_func(Term* target, string(*func)(Term*))
 
 void initialize_data_for_types(Term* term)
 {
-   assert(term->data == NULL);
    term->data = new Type;
 }
 
-std::string to_string(Term* type)
+string to_string(Term* type)
 {
    return TYPE(type)->name;
 }

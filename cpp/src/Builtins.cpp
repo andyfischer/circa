@@ -24,6 +24,7 @@ void bootstrap_kernel()
    // input, and gives a Function as output.
    CONST_GENERATOR = codeunit::bootstrap_empty_term(KERNEL);
    function::initialize_data(CONST_GENERATOR);
+   CONST_GENERATOR->function = CONST_GENERATOR;
    function::set_name(CONST_GENERATOR, "constant-generator");
    
    // Create constant-Type function. This function outputs a Type.
@@ -67,6 +68,11 @@ void bootstrap_kernel()
 
 void bootstrap_builtins()
 {
+    cout << CONST_GENERATOR->to_string() << endl;
+    cout << TYPE_TYPE->to_string() << endl;
+
+    BUILTINS = new codeunit::CodeUnit;
+
     // Create primitives
 
     // Create int type

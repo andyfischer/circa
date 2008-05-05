@@ -34,6 +34,7 @@ void initialize_data(Term* func);
 void set_name(Term* func, string name);
 void set_input_type(Term* func, int index, Term* type);
 void set_output_type(Term* func, Term* type);
+string name(Term* func);
 Term* output_type(Term* func);
 
 } // namespace function
