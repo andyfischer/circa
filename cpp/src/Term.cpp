@@ -27,5 +27,5 @@ string Term::to_string() const
       return "";
    }
 
-   return type::to_string(this->get_type());
+   return type::call_to_string(this->get_type(), (Term*) this);
 }

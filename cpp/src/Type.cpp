@@ -10,14 +10,27 @@ namespace type {
 
 void call_initialize_data(Term* type, Term* target)
 {
-   Type* t = TYPE(type);
+   Type* type_data = TYPE(type);
 
-   if (t->initialize_data == NULL) {
+   if (type_data->initialize_data == NULL) {
       printf("ERROR: type %s is incomplete (no initialize_data).\n",
-            t->name.c_str());
+            type_data->name.c_str());
       return;
    }
-   t->initialize_data(target);
+
+   type_data->initialize_data(target);
+}
+
+string call_to_string(Term* type, Term* target)
+{
+   Type* type_data = TYPE(type);
+   if (type_data->to_string == NULL) {
+      printf("ERROR: type %s is incomplete (no to_string).\n",
+            type_data->name.c_str());
+      return "";
+   }
+
+   return type_data->to_string(target);
 }
 
 void set_initialize_data_func(Term* target, void(*func)(Term*))
@@ -37,7 +50,14 @@ void initialize_data_for_types(Term* term)
 
 string to_string(Term* type)
 {
-   return TYPE(type)->name;
+    std::stringstream sstream;
+    sstream << "<Type " << TYPE(type)->name << ">";
+    return sstream.str();
+}
+
+void set_name(Term* type, const string& name)
+{
+    TYPE(type)->name = name;
 }
 
 } // namespace type
