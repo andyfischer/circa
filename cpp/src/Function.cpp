@@ -13,6 +13,7 @@ void initialize_data(Term* func)
 void set_name(Term* func, string name)
 {
    FUNC(func)->name = name;
+   func->debug_name = name;
 }
 
 void set_input_type(Term* func, int index, Term* type)
@@ -24,6 +25,11 @@ void set_input_type(Term* func, int index, Term* type)
 void set_output_type(Term* func, Term* type)
 {
    FUNC(func)->output_type = type;
+}
+
+string name(Term* func)
+{
+   return FUNC(func)->name;
 }
 
 Term* output_type(Term* func)

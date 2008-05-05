@@ -1,6 +1,7 @@
 
 #include "Builtins.h"
 #include "CodeUnit.h"
+#include "CommonHeaders.h"
 #include "Function.h"
 #include "Type.h"
 
@@ -31,9 +32,6 @@ Term* create_term(CodeUnit* code, Term* func, const TermList& inputs)
    new_term->function = func;
    set_inputs(code, new_term, inputs);
 
-   assert(func != NULL);
-   assert(function::output_type(func) != NULL);
-
    type::call_initialize_data(function::output_type(func), new_term);
 
    return new_term;
@@ -43,6 +41,10 @@ Term* create_constant(CodeUnit* code, Term* type)
 {
    // Fetch the constant-function for this type
    Term* constFunc = get_term(code, builtins::CONST_GENERATOR, TermList(type));
+
+   if (constFunc == NULL) {
+      throw std::exception();
+   }
 
    return create_term(code, constFunc, TermList());
 }
