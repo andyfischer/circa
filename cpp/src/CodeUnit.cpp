@@ -81,7 +81,7 @@ void set_inputs(CodeUnit* code, Term* term, const TermList& inputs)
 
 void bind_name(CodeUnit* code, Term* term, string name)
 {
-    code->term_namespace[name] = term;
+    //code->term_namespace[name] = term;
 }
 
 Term* _new_term(CodeUnit* code)

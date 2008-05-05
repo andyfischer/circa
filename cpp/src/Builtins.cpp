@@ -74,8 +74,11 @@ void bootstrap_kernel()
 
 void bootstrap_builtins()
 {
+    cout << "check1\n";
     cout << CONST_GENERATOR->to_string() << endl;
+    cout << "check2\n";
     cout << TYPE_TYPE->to_string() << endl;
+    cout << "check3\n";
 
     BUILTINS = new codeunit::CodeUnit;
 
