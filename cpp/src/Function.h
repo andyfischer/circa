@@ -32,11 +32,21 @@ public:
 
 void initialize_data(Term* func);
 string to_string(Term* func);
+
+// Setters
 void set_name(Term* func, string name);
 void set_input_type(Term* func, int index, Term* type);
 void set_output_type(Term* func, Term* type);
-string name(Term* func);
+void set_evaluate_func(Term* func, void(*evaluate)(Term*));
+
+// Accessors
 Term* output_type(Term* func);
+bool pure_function(Term* func);
+bool has_state(Term* func);
+string name(Term* func);
+void (*evaluate_func(Term* func))(Term*);
+
+// Functions
 
 } // namespace function
 

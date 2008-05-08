@@ -22,3 +22,14 @@ Term*& TermList::operator[](int index)
    
    return _vector[index];
 }
+
+bool TermList::any_need_update() const
+{
+    for (size_t i=0; i < _vector.size(); i++) {
+        if (_vector[i]->needs_update) {
+            return true;
+        }
+    }
+    return false;
+}
+

@@ -10,16 +10,23 @@ struct Term
     Term() :
         data(NULL),
         function(NULL),
-        debug_name("undefined")
+        needs_update(true),
+        debug_name("")
     {}
 
     void* data;
     TermList inputs;
     Term* function;
+    bool needs_update;
     string debug_name;
 
+    // Accessors
+    Term* input(int index);
     Term* get_type() const;
     string to_string() const;
+    string debug_identifier() const;
+
+    void evaluate();
 };
 
 #endif

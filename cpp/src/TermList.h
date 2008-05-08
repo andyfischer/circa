@@ -17,6 +17,8 @@ public:
    void set(int index, Term* term);
    Term*& operator[](int index);
 
+   bool any_need_update() const;
+
 private:
    vector<Term*> _vector;
 
