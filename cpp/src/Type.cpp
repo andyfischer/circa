@@ -30,7 +30,7 @@ string call_to_string(Term* type, Term* target)
       return "";
    }
 
-   return type_data->to_string(target);
+   return type_data->to_string((Term*) target);
 }
 
 void set_initialize_data_func(Term* target, void(*func)(Term*))

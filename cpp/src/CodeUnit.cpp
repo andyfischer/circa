@@ -2,6 +2,7 @@
 #include "Builtins.h"
 #include "CodeUnit.h"
 #include "CommonHeaders.h"
+#include "Errors.h"
 #include "Function.h"
 #include "Type.h"
 
@@ -28,15 +29,12 @@ Term* create_term(CodeUnit* code, Term* func)
 
 Term* create_term(CodeUnit* code, Term* func, const TermList& inputs)
 {
-    printf("create_term enter\n");
     if (code == NULL) {
-        printf("ERROR: create_term called with code == NULL\n");
-        return NULL;
+        INTERNAL_ERROR("create_term called with code == NULL\n");
     }
 
     if (func == NULL) {
-        printf("ERROR: create_term called with func == NULL\n");
-        return NULL;
+        INTERNAL_ERROR("create_term called with func == NULL\n");
     }
 
     Term* new_term = _new_term(code);
@@ -46,13 +44,16 @@ Term* create_term(CodeUnit* code, Term* func, const TermList& inputs)
     Term* new_terms_type = function::output_type(func);
 
     if (new_terms_type == NULL) {
-        printf("ERROR: function %s has null type\n", func->to_string().c_str());
-        return NULL;
+        INTERNAL_ERROR(string("ERROR: function")+func->to_string().c_str()+ "has null type");
     }
 
+    // Initialize data
     type::call_initialize_data(function::output_type(func), new_term);
 
-    printf("create_term exit\n");
+    // In some situations, call evaluate immediately
+    if (function::pure_function(func) && !inputs.any_need_update()) {
+        new_term->evaluate();
+    }
 
     return new_term;
 }
@@ -63,19 +64,26 @@ Term* create_constant(CodeUnit* code, Term* type)
     Term* constFunc = get_term(code, builtins::CONST_GENERATOR, TermList(type));
 
     if (constFunc == NULL) {
-       throw std::exception();
+        INTERNAL_ERROR("constFunc is NULL");
     }
+
+    constFunc->evaluate();
 
     return create_term(code, constFunc, TermList());
 }
 
 void set_input(CodeUnit* code, Term* term, int index, Term* input)
 {
+    if (code == NULL) INTERNAL_ERROR("code is NULL");
+    if (term == NULL) INTERNAL_ERROR("term is NULL");
+    
     term->inputs.set(index, input);
 }
 
 void set_inputs(CodeUnit* code, Term* term, const TermList& inputs)
 {
+    if (code == NULL) INTERNAL_ERROR("code is NULL");
+    if (term == NULL) INTERNAL_ERROR("term is NULL");
     term->inputs = inputs;
 }
 
@@ -86,7 +94,8 @@ void bind_name(CodeUnit* code, Term* term, string name)
 
 Term* _new_term(CodeUnit* code)
 {
-    Term* term = new Term;
+    if (code == NULL) INTERNAL_ERROR("code is NULL");
+    Term* term = new Term();
     code->all_terms.push_back(term);
     return term;
 }
