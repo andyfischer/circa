@@ -17,6 +17,7 @@ struct Term
     void* data;
     TermList inputs;
     Term* function;
+    TermList users;
     bool needs_update;
     string debug_name;
 

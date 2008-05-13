@@ -1,4 +1,6 @@
 
+#include <Python.h>
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>
@@ -14,7 +16,6 @@
 #include <vector>
 
 using std::cout;
-using std::endl;
 using std::map;
 using std::string;
 using std::vector;
