@@ -1,0 +1,30 @@
+
+
+We need more constructs do to complex stuff
+
+One thing that would help a ton is a State Machine, or DFA. This would be appropriate because graphs are composable and modifyable.
+
+So:
+  StateMachine term
+    contains:
+      A list of Node terms
+      'Head' (the current state, a pointer to a node)
+      A function that evaluates which node should come next
+      Functions that may return side effects for any transition
+
+
+The process of creating a state machine for a regular expression:
+
+1) Text format, a*bcd+
+2) After normalization, states are a,b,c,d1,d2
+
+next(a,input) := if(input == 'a')
+                   a
+                 elif(input == 'b')
+                   b
+                 else
+                   fail
+next(b,input) := if (input == 'c')
+                   c
+                 else
+                   fail

@@ -14,13 +14,13 @@ struct Type
    {}
 
    string name;
-      
+
    // Code
    void (*initialize_data)(Term*);
    string (*to_string)(Term*);
-
+   void (*get_size_func)(Term*);
+   void (*assign_func)(Term*,Term*);
 };
-
 
 void call_initialize_data(Term* type, Term* target);
 string call_to_string(Term* type, Term* target);
@@ -32,6 +32,5 @@ string to_string(Term* type);
 void set_name(Term* type, const string& name);
 
 }
-
 
 #endif
