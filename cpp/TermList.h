@@ -16,10 +16,12 @@ public:
    }
 
    void set(int index, Term* term);
-   Term* get(int index);
+   Term* get(int index) const;
    Term*& operator[](int index);
+   int count() const;
 
    bool any_need_update() const;
+   bool equals(const TermList& list) const;
 
 private:
    vector<Term*> _vector;

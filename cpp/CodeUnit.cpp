@@ -1,7 +1,8 @@
 
+#include "CommonHeaders.h"
+
 #include "Builtins.h"
 #include "CodeUnit.h"
-#include "CommonHeaders.h"
 #include "Errors.h"
 #include "Function.h"
 #include "Type.h"
@@ -15,9 +16,40 @@ Term* bootstrap_empty_term(CodeUnit* code)
     return _new_term(code);
 }
 
+Term* find_equivalent(CodeUnit* code, Term* func, const TermList& inputs)
+{
+    // If this is a stateful function, then we aren't allowed to reuse
+    // an existing term.
+    if (function::has_state(func)) {
+        return NULL;
+    }
+
+    for (int input_index=0; input_index < inputs.count(); input_index++)
+    {
+        Term* input = inputs.get(input_index);
+        for (int user_of_input_index=0;
+             user_of_input_index < input->users.count();
+             user_of_input_index++)
+        {
+            Term* user_of_input = input->users.get(user_of_input_index);
+
+            // Disqualify this term if it uses a different function
+            if (user_of_input->function != func) {
+                continue;
+            }
+
+            // Disqualify if any inputs do not match
+            if (!inputs.equals(user_of_input->inputs));
+
+            // Success
+            return user_of_input;
+        }
+    }
+}
+
 Term* get_term(CodeUnit* code, Term* func, const TermList& inputs)
 {
-    // todo: check to reuse an existing term
+    // Check to reuse an existing equivalent term
     return create_term(code, func, inputs);
 }
 
@@ -99,5 +131,16 @@ Term* _new_term(CodeUnit* code)
     code->all_terms.push_back(term);
     return term;
 }
+
+// Python bindings
+
+PyObject* py_create_term(PyObject* self, PyObject* args)
+{
+    return NULL;
+}
+
+
+
+
 
 } // namespace codeunit

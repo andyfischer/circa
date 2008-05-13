@@ -13,12 +13,11 @@ void TermList::set(int index, Term* term)
     _vector[index] = term;
 }
 
-Term* TermList::get(int index)
+Term* TermList::get(int index) const
 {
-    // Check if we need to add empty elements
-    while (index >= _vector.size())
-        _vector.push_back(NULL);
-    
+    if (index >= _vector.size()) {
+        return NULL;
+    }
     return _vector[index];
 }
 
@@ -31,6 +30,12 @@ Term*& TermList::operator[](int index)
     return _vector[index];
 }
 
+int TermList::count() const
+{
+    return (int) _vector.size();
+}
+
+
 bool TermList::any_need_update() const
 {
     for (size_t i=0; i < _vector.size(); i++) {
@@ -40,6 +45,20 @@ bool TermList::any_need_update() const
     }
     return false;
 }
+
+bool TermList::equals(const TermList& list) const
+{
+    if (_vector.size() != list._vector.size()) {
+        return false;
+    }
+    for (size_t i=0; i < _vector.size(); i++) {
+        if (_vector[i] != list._vector[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 
 namespace term_list {
 

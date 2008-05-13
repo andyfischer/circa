@@ -2,7 +2,9 @@
 *.pyc
 .DS_Store
 *.o
+*.os
 *.a
+*.dylib
 *.obj
 *.lib
 *.exe
