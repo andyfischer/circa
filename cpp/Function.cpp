@@ -34,6 +34,11 @@ void set_output_type(Term* func, Term* type)
    FUNC_DATA(func)->output_type = type;
 }
 
+void set_feedback_function(Term* func, Term* feedback)
+{
+   FUNC_DATA(func)->feedback_function = feedback;
+}
+
 void set_evaluate_func(Term* func, void(*evaluate)(Term*))
 {
    FUNC_DATA(func)->evaluate = evaluate;
