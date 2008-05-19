@@ -12,6 +12,7 @@ struct Function
    // Term pointers
    TermList input_types;
    Term* output_type;
+   Term* feedback_function;
 
    // Attributes
    bool pure_function;
@@ -26,6 +27,7 @@ public:
       pure_function(false),
       has_state(false),
       output_type(NULL),
+      feedback_function(NULL),
       name("undefined")
    {}
 };
@@ -37,6 +39,7 @@ string to_string(Term* func);
 void set_name(Term* func, string name);
 void set_input_type(Term* func, int index, Term* type);
 void set_output_type(Term* func, Term* type);
+void set_feedback_function(Term* func, Term* feedback);
 void set_evaluate_func(Term* func, void(*evaluate)(Term*));
 
 // Accessors

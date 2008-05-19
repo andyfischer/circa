@@ -134,9 +134,53 @@ Term* _new_term(CodeUnit* code)
 
 // Python bindings
 
-PyObject* py_create_term(PyObject* self, PyObject* args)
+// py_get_term(function_term, input_terms[], force_create?) -> term
+PyObject* py_get_term(PyObject* self, PyObject* args)
 {
-    return NULL;
+    Term* functionTerm = NULL;
+    TermList inputs;
+
+    PyObject* inputTerms = PyTuple_GetItem(args, 0);
+    INCREF(inputTerms);
+
+    bool forceCreate = PyTuple_GetItem(args, 1) == Py_True;
+
+    int numInputs = PyTuple_GetSize(inputTerms);
+
+    for (int i=0; i < numInputs; i++)
+    {
+        PyObject* termObj = PyTuple_GetItem(inputTerms, i);
+        INCREF(termObj);
+        PyCObject_Check(termObj);
+        Term* term = reinterpret_cast<Term*>(PyCObject_AsVoidPtr(termObj));
+        inputs.set(i, term);
+        DECREF(termObj);
+    }
+    
+    DECREF(inputTerms);
+
+    Term* result = builtins::BUILTINS.getTerm(functionTerm, inputs)
+
+    return PyCObject_FromVoidPtr(result);
+}
+
+PyMODINIT_FUNC
+initializePythonBindings()
+{
+    PyObject *m;
+    static void PyCirca_API[PyCirca_API_pointers];
+    PyObject *c_api_object;
+
+    m = Py_InitModule("Circa", CircaMethods);
+
+    /* Initialize the C API pointer array */
+    PyCirca_API[PyCirca_GetItem_NUM] = (void*) PyCirca_System;
+
+    /* Create a CObject containing the API pointer array's address */
+    c_api_object = PyCObject_FromVoidPtr((void *)PyCirca_API, NULL);
+
+    if (c_api_object != NULL)
+        PyModule_AddObject(m, "_C_API", c_api_object);
 }
 
 
