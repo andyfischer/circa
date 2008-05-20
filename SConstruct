@@ -5,16 +5,10 @@ from glob import glob
 env = Environment()
 
 DEBUG_BUILD = True
-
-
-# Get source files
-source_files = list(glob("cpp/*.cpp"))
+SOURCE_DIRECTORY = "cpp"
 
 env.Append(CPPDEFINES = ["_DEBUG"])
 env.Append(CPPDEFINES = ["DEBUG"])
-
-# Python support
-env.Append(CPPPATH = ["/System/Library/Frameworks/Python.framework/Versions/2.5/Headers"])
 
 if sys.platform == 'win32':
     env.Append(CPPFLAGS=['/EHsc'])
@@ -28,12 +22,33 @@ if sys.platform == 'win32':
         env.Append(CCFLAGS = ['/Od'])        # Disable optimizations
         env.Append(CCFLAGS = ['/Z7'])
         
-        
-else:
+else: # Mac build
+    # Python support
+    env.Append(CPPPATH = ["/System/Library/Frameworks/Python.framework/Versions/2.5/Headers"])
     if DEBUG_BUILD:
         env.Append(CPPFLAGS=['-ggdb'])
 
-circa_lib = env.SharedLibrary('circa', source_files)
 
 
-env.Program('test1', ['cpp/Main.cpp'], LIBS = [circa_lib])
+def getDirectories(basepath):
+    for filename in os.listdir(basepath):
+        path = os.path.join(basepath, filename)
+        if os.isdir(path):
+            yield (filename, path)
+
+# Loop through source directory and build everything
+
+for (dir_name, dir_path) in getDirectories(SOURCE_DIRECTORY):
+    
+    # Get all the source files in this directory
+    source_files = list(os.glob(dir_path + '/*.cpp')
+
+    # If this directory contains a "Main.cpp" then consider it a program
+    is_program = any(lambda f: f.endswith("Main.cpp"), source_files)
+
+    if is_program:
+        prog = env.Program(dir_name, source_files)
+    else:
+        lib = env.SharedLibrary(dir_name, source_files)
+    
+
