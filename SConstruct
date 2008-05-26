@@ -1,7 +1,6 @@
 
 
-import os,sys
-from glob import glob
+import os,sys, glob
 env = Environment()
 
 DEBUG_BUILD = True
@@ -33,18 +32,24 @@ else: # Mac build
 def getDirectories(basepath):
     for filename in os.listdir(basepath):
         path = os.path.join(basepath, filename)
-        if os.isdir(path):
+        if os.path.isdir(path):
             yield (filename, path)
 
 # Loop through source directory and build everything
 
+import platform
+print platform.python_version()
+
 for (dir_name, dir_path) in getDirectories(SOURCE_DIRECTORY):
     
     # Get all the source files in this directory
-    source_files = list(os.glob(dir_path + '/*.cpp')
+    source_files = list(glob.glob(dir_path + '/*.cpp'))
 
     # If this directory contains a "Main.cpp" then consider it a program
-    is_program = any(lambda f: f.endswith("Main.cpp"), source_files)
+    is_program = False
+
+    for b in map(lambda f: f.endswith("Main.cpp"), source_files): # no 'any' function
+        if b: is_program = True
 
     if is_program:
         prog = env.Program(dir_name, source_files)
