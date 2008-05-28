@@ -5,36 +5,41 @@ ALL = []
 STRING_TO_TOKEN = {}
 
 class TokenDef(object):
-   def __init__(self, id, name, raw=None, pattern=None):
-      self.id = id
-      self.name = name
-      self.raw_string = None
+    """
+    Defines a type of Token.
+    Includes a regular expression for matching this token.
+    """
 
-      if raw:
-         self.pattern = re.compile( re.escape(raw) )
-         self.raw_string = raw
-         STRING_TO_TOKEN[raw] = self
+    def __init__(self, id, name, raw=None, pattern=None):
+        self.id = id
+        self.name = name
+        self.raw_string = None
 
-      elif pattern:
-         self.pattern = re.compile( pattern )
+        if raw:
+            self.pattern = re.compile( re.escape(raw) )
+            self.raw_string = raw
+            STRING_TO_TOKEN[raw] = self
 
-      else:
-         self.pattern = None
+        elif pattern:
+            self.pattern = re.compile( pattern )
 
-      ALL.append(self)
+        else:
+            self.pattern = None
 
-   def __str__(self):
-      return self.name
+        ALL.append(self)
 
-   def __eq__(self, other):
-      try:
-         return self.id == other.id
-      except: return False
+    def __str__(self):
+        return self.name
 
-   def __ne__(self, other):
-      try:
-         return self.id != other.id
-      except: return False
+    def __eq__(self, other):
+        try:
+            return self.id == other.id
+        except: return False
+
+    def __ne__(self, other):
+        try:
+            return self.id != other.id
+        except: return False
 
 # RE helper functions
 def group(*choices): return '(' + '|'.join(choices) + ')'

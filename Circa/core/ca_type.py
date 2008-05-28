@@ -1,0 +1,18 @@
+
+
+class CircaType(object):
+    def __init__(self):
+        self.name = None
+        self.initializeFunc = None
+        self.toStringFunc = None
+
+def initializeTerm(term):
+    term.cachedValue = CircaType()
+
+# Setters
+def setName(term, name):
+    term.cachedValue.name = name
+def setInitializeFunc(term, func):
+    term.cachedValue.initializeFunc = func
+def setToStringFunc(term, func):
+    term.cachedValue.toStringFunc = func
