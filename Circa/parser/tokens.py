@@ -2,6 +2,7 @@
 # Code for turning a string into a list of tokens
 
 import re
+from Circa import debug
 
 _ALL_TOKEN_DEFS = []
 
@@ -87,10 +88,10 @@ class TokenStream(object):
         # Default comment character is pound
         self.commentSet = set([POUND])
 
-        self.currentIndex = self.indexAfterSkipping(0)
+        self.currentIndex = 0
 
     def next(self, lookahead=0):
-        index = self.currentIndex
+        index = self.indexAfterSkipping(self.currentIndex)
 
         while lookahead > 0:
             index = self.indexAfterSkipping(index + 1)
@@ -100,6 +101,23 @@ class TokenStream(object):
             return self.tokens[index]
         except IndexError:
             return None
+
+    def consume(self, match=None):
+        """
+        Return the next token and advance our pointer to the next
+        non-skip token. Throws an error if a 'match' is specified and
+        the next token didn't use that match.
+        """
+
+        token = self.next()
+        if match and token.match != match:
+            raise ExpectedToken(match, token)
+
+        # Advance current index
+        self.currentIndex = self.indexAfterSkipping(
+                self.indexAfterSkipping(self.currentIndex) + 1)
+
+        return token
 
     def finished(self):
         return self.currentIndex >= len(self.tokens)
@@ -174,22 +192,6 @@ class TokenStream(object):
         next = self.next(lookahead)
         if not next: return False
         return self.next(lookahead).match in match
-
-    def consume(self, match=None):
-        """
-        Return the next token and advance our pointer to the next
-        non-skip token. Throws an error if a 'match' is specified and
-        the next token didn't use that match.
-        """
-
-        token = self.next()
-        if match and token.match != match:
-            raise ExpectedToken(match, token)
-
-        # Advance current index
-        self.currentIndex = self.indexAfterSkipping(self.currentIndex + 1)
-
-        return token
 
     def dropUntil(self, match):
         """
@@ -372,10 +374,25 @@ def tokenStreamTest():
     strm.consume(THIS)
     strm.consume(LPAREN)
 
-def mainTest():
-    pass
+def tokenizeTest():
+    strm = tokenize('{x = 1+2}')
+    strm.consume('LBRACKET')
+    strm.consume('IDENT')
+    debug.Assert(not strm.finished())
+    strm.consume('EQUALS')
+    strm.consume('INTEGER')
+    strm.consume('PLUS')
+    strm.consume('INTEGER')
+
+def commentTest():
+    strm = tokenize('{x #= 1+2}')
+    strm.consume('LBRACKET')
+    strm.consume('IDENT')
+    debug.Assert(strm.finished())
+    
 
 if __name__ == "__main__":
     tokenStreamTest()
-    mainTest()
+    tokenizeTest()
+    commentTest()
 
