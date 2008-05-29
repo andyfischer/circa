@@ -39,8 +39,11 @@ class CodeUnit(object):
 
         return newTerm
 
-    def bindName(self, name, term):
-        # Todo: warn if this name is already bound
+    def bindName(self, name, term, allowOverwrite=False):
+        if not allowOverwrite and name in self.mainNamespace:
+            raise Exception("The name "+name+" is already bound. (to allow "
+                + "this, you can use the allowOverwrite parameter)")
+
         self.mainNamespace[name] = term
 
     def setInput(self, term, inputIndex, newInput):

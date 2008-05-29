@@ -5,6 +5,8 @@
 # Inputs: token stream
 # Outputs: AST
 
+import ast
+
 # Infix precedence
 HIGHEST_INFIX_PRECEDENCE = 7
 infixPrecedence = {
@@ -38,7 +40,7 @@ def infix_expression(tokens, precedence):
         if not right_expr:
             raise parse_errors.InternalError(first_righthand_token)
 
-        expr = Infix(operator, expr, right_expr)
+        expr = ast.Infix(operator, expr, right_expr)
 
     return expr
 
@@ -61,12 +63,12 @@ def atom(tokens):
         if tokens.nextIs(QUESTION):
             tokens.consume(QUESTION)
             questionMark = True
-        return Literal(token, hasQuestionMark=questionMark)
+        return ast.Literal(token, hasQuestionMark=questionMark)
 
     # Identifier
     if tokens.nextIs(IDENT):
         token = tokens.consume()
-        return Ident(token)
+        return ast.Ident(token)
 
     # Parenthesized expression
     if tokens.nextIs(LPAREN):
@@ -93,7 +95,7 @@ def function_call(tokens):
 
     tokens.consume(RPAREN)
 
-    return Function(function_name, args)
+    return ast.Function(function_name, args)
  
 def parseStringLiteral(text):
     # the literal should have ' or " marks on either side, strip these

@@ -3,6 +3,8 @@
 
 import re
 
+_ALL_TOKEN_DEFS = []
+
 class TokenDef(object):
     """
     Defines a type of Token.
@@ -23,7 +25,7 @@ class TokenDef(object):
         else:
             self.pattern = None
 
-        ALL.append(self)
+        _ALL_TOKEN_DEFS.append(self)
     def __str__(self):
         return self.name
     def __eq__(self, other):
@@ -79,15 +81,25 @@ class TokenStream(object):
 
         self.tokens = tokens
 
-        # Default is to skip whitespace (change this)
+        # Default is to skip whitespace
         self.skipSet = set([WHITESPACE])
 
-        # currentIndex should always rest on a non-skip token,
-        # so advance past any skip tokens that are at the start
+        # Default comment character is pound
+        self.commentSet = set([POUND])
+
         self.currentIndex = self.indexAfterSkipping(0)
 
-    def __str__(self):
-        return str(map(str, self.tokens))
+    def next(self, lookahead=0):
+        index = self.currentIndex
+
+        while lookahead > 0:
+            index = self.indexAfterSkipping(index + 1)
+            lookahead -= 1
+
+        try:
+            return self.tokens[index]
+        except IndexError:
+            return None
 
     def finished(self):
         return self.currentIndex >= len(self.tokens)
@@ -118,7 +130,7 @@ class TokenStream(object):
             token = self.tokens[index]
 
             # Check to start a comment
-            if isCommentStart(token):
+            if token.match in self.commentSet:
                 currentlyInComment = True
 
             # Check to finish comment
@@ -150,17 +162,8 @@ class TokenStream(object):
         if token_def in self.skipSet:
             self.skipSet.remove(token_def)
 
-    def next(self, lookahead=0):
-        index = self.currentIndex
-
-        while lookahead > 0:
-            index = self.indexAfterSkipping(index + 1)
-            lookahead -= 1
-
-        try:
-            return self.tokens[index]
-        except IndexError:
-            return None
+    def stopSkippingEverything(self):
+        self.skipSet = set()
 
     def nextIs(self, match, lookahead=0):
         next = self.next(lookahead)
@@ -181,9 +184,9 @@ class TokenStream(object):
 
         token = self.next()
         if match and token.match != match:
-          raise parse_errors.TokenStreamExpected(match, token)
+            raise ExpectedToken(match, token)
 
-        # advance current index
+        # Advance current index
         self.currentIndex = self.indexAfterSkipping(self.currentIndex + 1)
 
         return token
@@ -209,10 +212,21 @@ class TokenStream(object):
     def restoreMark(self, mark):
         self.currentIndex = mark
 
+    def __str__(self):
+        return str(map(str, self.tokens))
+
     def backToString(self):
         return tokenize.untokenize(self.tokens)
     untokenize = backToString 
 
+class ExpectedToken(Exception):
+    def __init__(self, expected, found):
+        self.expected = expected
+        self.found = found
+        Exception.__init__(self, str(self))
+
+    def __str__(self):
+        return "Expected: " + self.expected.name + ", found: " + self.found.text
 
 # Regular expression helper functions
 def group(*choices): return '(' + '|'.join(choices) + ')'
@@ -303,15 +317,15 @@ def tokenize(string):
     currentCol = 1
     output_list = []
   
-    def makeToken(token_def, length):
-        return TokenInstance(token_def, string[currentIndex : currentIndex+length],
+    def makeToken(tokenDef, length):
+        return TokenInstance(tokenDef, string[currentIndex : currentIndex+length],
                              currentLine, currentCol)
   
     while currentIndex < len(string):
         token = None
     
         # Find a matching token
-        for tdef in ALL:
+        for tdef in _ALL_TOKEN_DEFS:
     
             # Skip meta definitions that have no pattern
             if not tdef.pattern: continue
@@ -338,23 +352,30 @@ def tokenize(string):
     # Return this list wrapped in a TokenStream
     return TokenStream(output_list)
 
-def untokenize(token_list):
-    """
-    Returns a string created from the given list of TokenInstances.
-    """
+def tokenStreamTest():
+    def fakeToken(tdef):
+        return TokenInstance(tdef, "", 0, 0)
+    strm = TokenStream(map(fakeToken, [WHITESPACE, IF, WHITESPACE, THIS,
+        LPAREN]))
 
-    return "".join(map(lambda t: t.text, token_list))
+    # Try with whitespace skipping
+    strm.consume(IF)
+    strm.consume(THIS)
+    strm.consume(LPAREN)
 
-def run_test():
-    tokens = tokenize("ifblah")
-    assert tokens[0].match == IDENT
+    # Now try without whitespace skipping
+    strm.reset()
+    strm.stopSkippingEverything()
+    strm.consume(WHITESPACE)
+    strm.consume(IF)
+    strm.consume(WHITESPACE)
+    strm.consume(THIS)
+    strm.consume(LPAREN)
 
-    tokens = tokenize("if ")
-    assert tokens[0].match == IF
-
-    tokens = tokenize("function ")
-    assert tokens[0].match == FUNCTION
+def mainTest():
+    pass
 
 if __name__ == "__main__":
-    run_test()
+    tokenStreamTest()
+    mainTest()
 
