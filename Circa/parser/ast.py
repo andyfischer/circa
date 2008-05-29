@@ -6,6 +6,7 @@
 import parse_errors
 import tokens
 from Circa.core.term import Term
+from Circa.debug.spy_object import SpyObject
 from Circa import debug
 
 class Node(object):
@@ -23,14 +24,14 @@ class Infix(Node):
     def eval(self, builder):
 
         # Evaluate as an assignment?
-        if self.token.match == EQUALS:
+        if self.token.match == tokens.EQUALS:
             right_term = self.right.eval(builder)
             if not isinstance(right_term, Term):
                 raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
             return builder.bindName(str(self.left), right_term)
 
         # Evaluate as a right-arrow?
-        if self.token.match == RIGHT_ARROW:
+        if self.token.match == tokens.RIGHT_ARROW:
             left_inputs = self.left.eval(builder)
             right_func = self.right.eval(builder)
 
@@ -69,11 +70,11 @@ class Literal(Node):
         self.token = token
         self.hasQuestionMark = hasQuestionMark
 
-        if token.match == FLOAT:
+        if token.match == tokens.FLOAT:
             self.value = float(token.text)
-        elif token.match == INTEGER:
+        elif token.match == tokens.INTEGER:
             self.value = int(token.text)
-        elif token.match == STRING:
+        elif token.match == tokens.STRING:
             self.value = parseStringLiteral(token.text)
         else:
             raise parse_errors.InternalError("Couldn't recognize token: " + str(token))
@@ -160,3 +161,23 @@ class FunctionCall(Node):
 
     def __str__(self):
         return self.function_name + '(' + ','.join(map(str,self.args)) + ')'
+
+def testInfix():
+    oneToken = tokens.TokenInstance(tokens.INTEGER, "1", 0, 0)
+    twoToken = tokens.TokenInstance(tokens.INTEGER, "2", 0, 0)
+    sumToken = tokens.TokenInstance(tokens.IDENT, "sum", 0, 0)
+    expr = FunctionCall(sumToken, [Literal(oneToken), Literal(twoToken)])
+    fakeSumFunc = Term()
+
+    fakeBuilder = SpyObject()
+
+    fakeBuilder.expectCall('createConstant', 1, sourceToken='1')
+    fakeBuilder.expectCall('createConstant', 2, sourceToken='2')
+    fakeBuilder.expectCall('getNamed', 'sum')
+    fakeBuilder.addReturnValue(fakeSumFunc)
+    fakeBuilder.expectCall('createTerm', inputs=('1','2'))
+    
+    expr.eval(fakeBuilder)
+
+if __name__ == "__main__":
+    testInfix()
