@@ -3,20 +3,20 @@
 #
 # Defines classes for an abstract syntax tree
 
-class Node(object):
-    def eval(self, builder):
-        raise Exception("Need to implement this")
+import parse_errors
+import tokens
+from Circa.core.term import Term
+from Circa import debug
 
-    def getFirstToken(self):
-        raise Exception("Need to implement this")
+class Node(object):
+    pass
 
 class Infix(Node):
-    def __init__(self, function_token, left, right):
-        assert isinstance(function_token, token.Token)
+    def __init__(self, functionToken, left, right):
         assert isinstance(left, Node)
         assert isinstance(right, Node)
 
-        self.token = function_token
+        self.token = functionToken
         self.left = left
         self.right = right
 
@@ -25,16 +25,16 @@ class Infix(Node):
         # Evaluate as an assignment?
         if self.token.match == EQUALS:
             right_term = self.right.eval(builder)
-            if not isinstance(right_term, code.Term):
-               raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
-            return builder.bindName(self.left.getName(), right_term)
+            if not isinstance(right_term, Term):
+                raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
+            return builder.bindName(str(self.left), right_term)
 
         # Evaluate as a right-arrow?
         if self.token.match == RIGHT_ARROW:
             left_inputs = self.left.eval(builder)
             right_func = self.right.eval(builder)
 
-           return builder.createTerm(right_func, inputs=[left_inputs])
+            return builder.createTerm(right_func, inputs=[left_inputs])
 
         # Normal function?
         # Try to find a defined operator
@@ -43,7 +43,7 @@ class Infix(Node):
             assert normalFunction.pythonValue is not None
 
             return builder.createTerm(normalFunction,
-               inputs=[self.left.eval(builder), self.right.eval(builder)] )
+                inputs=[self.left.eval(builder), self.right.eval(builder)] )
 
         # Evaluate as a function + assign?
         # Try to find an assign operator
@@ -54,10 +54,9 @@ class Infix(Node):
                inputs=[self.left.eval(builder), self.right.eval(builder)])
 
             # bind the name to this result
-            return builder.bindName(self.left.getName(), result_term)
+            return builder.bindName(str(self.left), result_term)
 
-        pdb.set_trace()
-        raise Exception("Unable to evaluate token: " + self.token.text)
+        debug.fail("Unable to evaluate token: " + self.token.text)
 
     def getFirstToken(self):
         return self.left.getFirstToken()
@@ -106,15 +105,12 @@ class Ident(Node):
     def getFirstToken(self):
         return self.token
 
-    def getName(self):
-       return self.token.text
-
     def __str__(self):
        return self.token.text
 
 class Unary(Node):
-    def __init__(self, function_token, right):
-        self.function_token = function_token
+    def __init__(self, functionToken, right):
+        self.functionToken = functionToken
         self.right = right
 
     def eval(self, builder):
@@ -123,10 +119,10 @@ class Unary(Node):
                                          self.right.eval(builder)])
 
     def getFirstToken(self):
-        return self.function_token;
+        return self.functionToken;
 
     def __str__(self):
-        return self.function_token.text + "(" + str(self.right) + ")"
+        return self.functionToken.text + "(" + str(self.right) + ")"
 
 class FunctionCall(Node):
     def __init__(self, function_name, args):
@@ -161,3 +157,6 @@ class FunctionCall(Node):
 
     def getFirstToken(self):
         return self.function_name;
+
+    def __str__(self):
+        return self.function_name + '(' + ','.join(map(str,self.args)) + ')'

@@ -42,7 +42,7 @@ Term* CONST_TYPE_FUNC = NULL;
       (empty)   -> ( CONST_TYPE_FUNC ) -> FUNCTION_TYPE
       (empty)   -> ( CONST_TYPE_FUNC ) ->   TYPE_TYPE
 
- */
+*/
 
 void const_generator_evaluate(Term* term)
 {
