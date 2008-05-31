@@ -23,6 +23,7 @@ import builtins, ca_codeunit, ca_function, ca_type
 
 def bootstrapKernel():
     kernel = ca_codeunit.CodeUnit()
+    kernel.name = "Kernel"
 
     # Create constant-generator function
     constGenerator = kernel._bootstrapEmptyTerm()
