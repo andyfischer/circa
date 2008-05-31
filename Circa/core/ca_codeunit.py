@@ -46,6 +46,15 @@ class CodeUnit(object):
 
         self.mainNamespace[name] = term
 
+    def getIdentifier(self, term):
+        # Try to find this term in mainNamespace
+        for (name,t) in self.mainNamespace.items():
+            if t is term:
+                return name
+
+        # Otherwise, use the default identifier
+        return '#' + term.globalID
+
     def setInput(self, term, inputIndex, newInput):
         # Grow input array if necessary
         if newInput >= len(term.inputs):

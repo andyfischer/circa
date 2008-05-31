@@ -3,11 +3,11 @@
 #
 # Defines classes for an abstract syntax tree
 
-import parse_errors
-import tokens
+import parse_errors, tokens
+from Circa import debug
+from Circa.core import builtins
 from Circa.core.term import Term
 from Circa.debug.spy_object import SpyObject
-from Circa import debug
 
 class Node(object):
     pass
@@ -135,26 +135,26 @@ class FunctionCall(Node):
         func = builder.getNamed(self.function_name.text)
 
         if func is None:
-          raise parse_errors.InternalError(self.function_name,
+            raise parse_errors.InternalError(self.function_name,
               "Function " + self.function_name.text + " not found.")
 
         # Check for Function
-        if func.getType() is builtins.FUNC_TYPE:
-          return builder.createTerm(func, inputs=arg_terms)
+        if func.getType() is builtins.FUNCTION_TYPE:
+            return builder.createTerm(func, inputs=arg_terms)
 
         # Check for Subroutine
         elif func.getType() is builtins.SUBROUTINE_TYPE:
 
-           # Todo: special behavior for invoking subroutines
-           return builder.createTerm(builtins.INVOKE_SUB_FUNC)
+            # Todo: special behavior for invoking subroutines
+            return builder.createTerm(builtins.INVOKE_SUB_FUNC)
 
         # Temp: Use a Python dynamic type check to see if this is a function
         elif isinstance(func.pythonValue, ca_function._Function):
-          return builder.createTerm(func, inputs=arg_terms)
+            return builder.createTerm(func, inputs=arg_terms)
 
         else:
-           raise parse_errors.InternalError(self.function_name,
-              "Term " + self.function_name.text + " is not a function.")
+            raise parse_errors.InternalError(self.function_name,
+               "Term " + self.function_name.text + " is not a function.")
 
     def getFirstToken(self):
         return self.function_name;
@@ -167,15 +167,18 @@ def testInfix():
     twoToken = tokens.TokenInstance(tokens.INTEGER, "2", 0, 0)
     sumToken = tokens.TokenInstance(tokens.IDENT, "sum", 0, 0)
     expr = FunctionCall(sumToken, [Literal(oneToken), Literal(twoToken)])
+
     fakeSumFunc = Term()
+    def fakeGetType():
+        return None
+    fakeSumFunc.getType = fakeGetType
 
     fakeBuilder = SpyObject()
 
-    fakeBuilder.expectCall('createConstant', 1, sourceToken='1')
-    fakeBuilder.expectCall('createConstant', 2, sourceToken='2')
-    fakeBuilder.expectCall('getNamed', 'sum')
-    fakeBuilder.addReturnValue(fakeSumFunc)
-    fakeBuilder.expectCall('createTerm', inputs=('1','2'))
+    fakeBuilder.expectCall('createConstant(1,sourceToken=1)')
+    fakeBuilder.expectCall('createConstant(2,sourceToken=2)')
+    fakeBuilder.expectCall('getNamed(sum)', returnVal = fakeSumFunc)
+    fakeBuilder.expectCall('createTerm(1,2)')
     
     expr.eval(fakeBuilder)
 

@@ -6,6 +6,8 @@
 # When possible, code for manimulating or comparing terms should be placed elsewhere,
 # such as in CodeUnit
 
+import ca_function
+
 nextGlobalID = 1
 
 class Term(object):
