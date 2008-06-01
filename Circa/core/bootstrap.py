@@ -1,5 +1,5 @@
 
-import builtins, ca_codeunit, ca_function, ca_type
+import builtins, ca_codeunit, ca_function, ca_type, builtin_types
 
 """
   constant-generator = 
@@ -21,9 +21,7 @@ import builtins, ca_codeunit, ca_function, ca_type
 
 """
 
-def bootstrapKernel():
-    kernel = ca_codeunit.CodeUnit()
-    kernel.name = "Kernel"
+def bootstrapKernel(kernel):
 
     # Create constant-generator function
     constGenerator = kernel._bootstrapEmptyTerm()
@@ -54,8 +52,8 @@ def bootstrapKernel():
 
     # Implant the Type type into constant-Type
     kernel.setInput(constTypeFunc, 0, typeType)
-    ca_function.setInputType(constGenerator, 0, typeType)
-    ca_function.setInputType(constGenerator, 0, typeType)
+    ca_function.setInputTypes(constGenerator, [typeType])
+    ca_function.setInputTypes(constGenerator, [typeType])
 
     # Create constant-Function function
     constFuncFunc = kernel._bootstrapEmptyTerm()
@@ -94,7 +92,6 @@ def bootstrapKernel():
     kernel.updateAll()
 
     # Export public symbols
-    builtins.KERNEL = kernel
     builtins.CONST_GENERATOR = constGenerator
     builtins.CONST_FUNC_FUNC = constFuncFunc
     builtins.CONST_TYPE_FUNC = constTypeFunc
@@ -102,4 +99,11 @@ def bootstrapKernel():
     builtins.TYPE_TYPE = typeType
 
 
-bootstrapKernel()
+# Create Kernel code unit
+kernel = ca_codeunit.CodeUnit()
+kernel.name = "Kernel"
+builtins.KERNEL = kernel
+
+bootstrapKernel(kernel)
+
+builtin_types.createBuiltinTypes(kernel)

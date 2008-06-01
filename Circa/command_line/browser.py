@@ -1,6 +1,6 @@
 
 from string import Template
-from Circa.core import (builtins, ca_type)
+from Circa.core import (builtins, ca_type, ca_function)
 
 
 class Browser(object):
@@ -9,7 +9,7 @@ class Browser(object):
     def doCommand(self, cmd):
         if cmd == 'list':
             for term in self.codeUnit.allTerms:
-                print self.describeTerm(term, "$id: $func_id($input_ids) = $value")
+                print self.describeTerm(term, "$id: $func_name($input_ids) = $value")
         else:
             print "Unrecognized command"
     def getIdentifier(self, term):
@@ -26,6 +26,7 @@ class Browser(object):
         return Template(template).safe_substitute(
                   { 'id': self.getIdentifier(term),
                     'func_id': self.getIdentifier(term.functionTerm),
+                    'func_name': ca_function.name(term.functionTerm),
                     'input_ids': ','.join(map(self.getIdentifier,term.inputs)),
                     'value': str(term),
                     'type': ca_type.name(term.getType()) })

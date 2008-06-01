@@ -25,6 +25,8 @@ def toString(term):
     return "<Function %s>" % term.cachedValue.name
 
 # Accessors
+def name(term):
+    return term.cachedValue.name
 def inputTypes(term):
     return term.cachedValue.inputTypes
 def outputType(term):
@@ -38,9 +40,13 @@ def feedbackFunction(term):
 # Setters
 def setName(term, name):
     term.cachedValue.name = name
-def setInputType(term, index, type):
-    term.cachedValue.inputTypes = type
+def setInputTypes(term, types):
+    term.cachedValue.inputTypes = types
 def setOutputType(term, type):
     term.cachedValue.outputType = type
+def setPureFunction(term, pure):
+    term.cachedValue.pureFunction = pure
+def setHasState(term, hasState):
+    term.cachedValue.hasState = hasState
 def setEvaluateFunc(term, func):
     term.cachedValue.evaluateFunc = func
