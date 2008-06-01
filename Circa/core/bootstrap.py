@@ -1,4 +1,6 @@
 
+import pdb
+
 import builtins, ca_codeunit, ca_function, ca_type, builtin_types
 
 """
@@ -27,8 +29,9 @@ def bootstrapKernel(kernel):
     constGenerator = kernel._bootstrapEmptyTerm()
     ca_function.initializeTerm(constGenerator)
     ca_function.setName(constGenerator, "constant-generator")
+    ca_function.setHasState(constGenerator, False)
+    ca_function.setPureFunction(constGenerator, True)
     kernel.bindName(constGenerator, "_constant-generator")
-    constGenerator.functionTerm = constGenerator
 
     def emptyFunction(term):
         pass
@@ -39,6 +42,7 @@ def bootstrapKernel(kernel):
     ca_function.initializeTerm(constTypeFunc)
     kernel.bindName(constTypeFunc, "_constant-Type")
     ca_function.setName(constTypeFunc, "constant-Type")
+    ca_function.setPureFunction(constTypeFunc, True)
     ca_function.setEvaluateFunc(constTypeFunc, emptyFunction)
 
     # Create Type type
@@ -50,46 +54,53 @@ def bootstrapKernel(kernel):
     ca_type.setToStringFunc(typeType, ca_type.typeToString)
     kernel.bindName(typeType, "Type")
 
-    # Implant the Type type into constant-Type
+    # Implant the Type type
     kernel.setInput(constTypeFunc, 0, typeType)
     ca_function.setInputTypes(constGenerator, [typeType])
-    ca_function.setInputTypes(constGenerator, [typeType])
+    ca_function.setOutputType(constTypeFunc, typeType)
 
     # Create constant-Function function
     constFuncFunc = kernel._bootstrapEmptyTerm()
     constFuncFunc.functionTerm = constGenerator
     ca_function.initializeTerm(constFuncFunc)
-    kernel.bindName(constFuncFunc, "_constant-Function")
     ca_function.setName(constFuncFunc, "constant-Function")
+    ca_function.setPureFunction(constFuncFunc, True)
     ca_function.setEvaluateFunc(constFuncFunc, emptyFunction)
+    kernel.bindName(constFuncFunc, "_constant-Function")
+
+    # Implant constant-Function
+    constGenerator.functionTerm = constFuncFunc
 
     # Create Function type
     functionType = kernel._bootstrapEmptyTerm()
-    functionType.functionTerm = constFuncFunc
+    functionType.functionTerm = constTypeFunc
     ca_type.initializeTerm(functionType)
     ca_type.setName(functionType, "Function")
     ca_type.setInitializeFunc(functionType, ca_function.initializeTerm)
     ca_type.setToStringFunc(functionType, ca_function.toString)
     kernel.bindName(functionType, "Function")
 
-    # Implant Function type into various places
+    # Implant Function type
     kernel.setInput(constGenerator, 0, functionType)
     kernel.setInput(constFuncFunc, 0, functionType)
     ca_function.setOutputType(constGenerator, functionType)
-
-    # Implant Type
-    ca_function.setOutputType(constFuncFunc, typeType)
-    ca_function.setOutputType(constTypeFunc, typeType)
+    ca_function.setOutputType(constFuncFunc, functionType)
 
     # Define a function for constant-generator
     def constGeneratorEvaluate(term):
         inputType = term.getInput(0)
         ca_function.setOutputType(term, inputType)
         ca_function.setEvaluateFunc(term, emptyFunction)
+        ca_function.setHasState(term, True)
+
+    # Define an evaluate function for constant functions
+    #def constFuncEvaluate
+
     ca_function.setEvaluateFunc(constGenerator, constGeneratorEvaluate)
 
     # All done, re-evaluate everything
     kernel.updateAll()
+    kernel._recalculateAllUserSets()
 
     # Export public symbols
     builtins.CONST_GENERATOR = constGenerator
@@ -105,5 +116,9 @@ kernel.name = "Kernel"
 builtins.KERNEL = kernel
 
 bootstrapKernel(kernel)
+
+# temp: attempt to create something
+#x = kernel.createTerm(builtins.CONST_GENERATOR, [builtins.FUNCTION_TYPE])
+#print "created: " + kernel.getIdentifier(x)
 
 builtin_types.createBuiltinTypes(kernel)
