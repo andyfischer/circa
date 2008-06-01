@@ -1,8 +1,9 @@
 """
 Define the CodeUnit class
 """
-import itertools
+import itertools, pdb
 
+import builtins, ca_function, ca_type
 from Circa import debug
 from term import Term
 
@@ -31,10 +32,25 @@ class CodeUnit(object):
         """
         return self._newTerm()
 
-    def createTerm(self, function, inputs, forceCreate=False):
+    def createTerm(self, function, inputs):
+        """
+        Create a term with the given function and inputs.
+        This call may reuse an existing term, if it's correct to do so.
+        """
 
-        # Check if we can reuse an existing term
-        if not forceCreate and not ca_function.hasState(function):
+        debug._assert(isinstance(function, Term))
+
+        # Check if they have provided the correct number of arguments
+        if len(inputs) != len(ca_function.inputTypes(function)):
+            raise Exception("%s() takes %n arguments (%n given)"
+                    % (ca_function.name(function),
+                       len(ca_function.inputTypes(function)),
+                       len(inputs)))
+
+        # Todo: Check if types match
+
+        # Try to reuse an existing term
+        if not ca_function.hasState(function):
             existing = findExistingEquivalent(function, inputs)
             if existing:
                 return existing
@@ -43,7 +59,11 @@ class CodeUnit(object):
         newTerm.functionTerm = function
         newTerm.inputs = list(inputs)
 
-        # Todo: more stuff here
+        # Initialize cachedData
+        debug._assert(ca_function.outputType(function) is not None)
+        ca_type.initializeFunc(ca_function.outputType(function))(newTerm)
+
+        newTerm.update()
 
         return newTerm
 
@@ -54,7 +74,7 @@ class CodeUnit(object):
         constantFunc = self.createTerm(builtins.CONST_GENERATOR, [type])
 
         # Create the term
-        return self.createTerm(constantFunc, [], forceCreate=True)
+        return self.createTerm(constantFunc, [])
 
     def bindName(self, term, name, allowOverwrite=False):
         debug._assert(isinstance(name, str))
@@ -86,6 +106,14 @@ class CodeUnit(object):
         for term in self.allTerms:
             term.update()
 
+    def _recalculateAllUserSets(self):
+        for term in self.allTerms:
+            term.users = set()
+
+        for term in self.allTerms:
+            for input in term.inputs:
+                input.users.add(term)
+
 def findExistingEquivalent(function, inputs):
     """
     This function finds an existing term that uses the given function,
@@ -103,22 +131,21 @@ def findExistingEquivalent(function, inputs):
     
         for potentialMatch in input.users:
             # Disqualify if they aren't using the same function
-            if potentialMatch.functionTerm != functionTerm:
+            if potentialMatch.functionTerm is not function:
                 continue
       
             # Disqualify if inputs don't match
-            ...
-            def matches(pair):
-               return pair[0].equals(pair[1])
-      
-            inputs_match = all(map(matches, zip(inputs, potentialMatch.inputs)))
-      
-            # Todo: allow for functions that don't care what the function order is
-      
-            if not inputs_match: continue
-      
-            # Looks like this term is the same as what they want
+            inputsMatch = True
+            for inputIndex in range(len(inputs)):
+                if inputs[inputIndex] is not potentialMatch.getInput(inputIndex):
+                    inputsMatch = False
+
+            if not inputsMatch:
+                continue
+                    
+            # Accept
             return potentialMatch
    
+    # None found
     return None
      

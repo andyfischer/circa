@@ -12,7 +12,7 @@ class CircaFunction(object):
         # feedbackFunction: Term
         self.feedbackFunction = None
 
-        self.pureFunction = False
+        self.pureFunction = True
         self.hasState = False
         self.name = None
 
@@ -22,7 +22,9 @@ class CircaFunction(object):
 def initializeTerm(term):
     term.cachedValue = CircaFunction()
 def toString(term):
-    return "<Function %s>" % term.cachedValue.name
+    return ("<Function %s, pure=%s, state=%s>"
+        % (term.cachedValue.name, term.cachedValue.pureFunction, 
+            term.cachedValue.hasState))
 
 # Accessors
 def name(term):
@@ -31,6 +33,10 @@ def inputTypes(term):
     return term.cachedValue.inputTypes
 def outputType(term):
     return term.cachedValue.outputType
+def hasState(term):
+    return term.cachedValue.hasState
+def pureFunction(term):
+    return term.cachedValue.pureFunction
 def evaluateFunc(term):
     debug._assert(term.cachedValue.evaluateFunc is not None)
     return term.cachedValue.evaluateFunc
