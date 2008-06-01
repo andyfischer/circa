@@ -1,5 +1,5 @@
 
-import builtins
+import builtins, ca_type, ca_function
 
 def intInitialize(term):
     term.cachedValue = 0
@@ -24,7 +24,7 @@ def createBuiltinTypes(kernel):
     stringType = kernel.createConstant(builtins.TYPE_TYPE)
     ca_type.setName(stringType, 'String')
     ca_type.setInitializeFunc(stringType, stringInitialize)
-    ca_type.setToStringFunc(stringInitialize, stringToString)
+    ca_type.setToStringFunc(stringType, stringToString)
     kernel.bindName(stringType, 'String')
 
     boolType = kernel.createConstant(builtins.TYPE_TYPE)
