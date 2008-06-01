@@ -39,7 +39,9 @@ class CodeUnit(object):
 
         return newTerm
 
-    def bindName(self, name, term, allowOverwrite=False):
+    def bindName(self, term, name, allowOverwrite=False):
+        assert isinstance(name, str)
+        assert isinstance(term, Term)
         if not allowOverwrite and name in self.mainNamespace:
             raise Exception("The name "+name+" is already bound. (to allow "
                 + "this, you can use the allowOverwrite parameter)")
@@ -47,13 +49,14 @@ class CodeUnit(object):
         self.mainNamespace[name] = term
 
     def getIdentifier(self, term):
+        assert isinstance(term, Term)
         # Try to find this term in mainNamespace
         for (name,t) in self.mainNamespace.items():
             if t is term:
                 return name
 
         # Otherwise, use the default identifier
-        return '#' + term.globalID
+        return '#' + str(term.globalID)
 
     def setInput(self, term, inputIndex, newInput):
         # Grow input array if necessary
