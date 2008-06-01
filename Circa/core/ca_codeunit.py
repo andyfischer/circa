@@ -3,6 +3,7 @@ Define the CodeUnit class
 """
 import itertools
 
+from Circa import debug
 from term import Term
 
 class CodeUnit(object):
@@ -30,18 +31,34 @@ class CodeUnit(object):
         """
         return self._newTerm()
 
-    def createTerm(self, function, inputs):
-        # Todo: check if we can reuse an existing term
+    def createTerm(self, function, inputs, forceCreate=False):
+
+        # Check if we can reuse an existing term
+        if not forceCreate and not ca_function.hasState(function):
+            existing = findExistingEquivalent(function, inputs)
+            if existing:
+                return existing
+
         newTerm = self._newTerm()
         newTerm.functionTerm = function
+        newTerm.inputs = list(inputs)
 
-        # Todo
+        # Todo: more stuff here
 
         return newTerm
 
+    def createConstant(self, type):
+        debug._assert(isinstance(type, Term))
+
+        # Fetch the constant function for this type
+        constantFunc = self.createTerm(builtins.CONST_GENERATOR, [type])
+
+        # Create the term
+        return self.createTerm(constantFunc, [], forceCreate=True)
+
     def bindName(self, term, name, allowOverwrite=False):
-        assert isinstance(name, str)
-        assert isinstance(term, Term)
+        debug._assert(isinstance(name, str))
+        debug._assert(isinstance(term, Term))
         if not allowOverwrite and name in self.mainNamespace:
             raise Exception("The name "+name+" is already bound. (to allow "
                 + "this, you can use the allowOverwrite parameter)")
@@ -49,7 +66,7 @@ class CodeUnit(object):
         self.mainNamespace[name] = term
 
     def getIdentifier(self, term):
-        assert isinstance(term, Term)
+        debug._assert(isinstance(term, Term))
         # Try to find this term in mainNamespace
         for (name,t) in self.mainNamespace.items():
             if t is term:
@@ -68,3 +85,40 @@ class CodeUnit(object):
     def updateAll(self):
         for term in self.allTerms:
             term.update()
+
+def findExistingEquivalent(function, inputs):
+    """
+    This function finds an existing term that uses the given function,
+    and has the given inputs. Returns None if none found.
+    """
+
+    if inputs is None:
+        return None
+  
+    debug._assert(isinstance(function, Term))
+  
+    # Try to find an existing term
+    for input in inputs:
+        debug._assert(isinstance(input,Term))
+    
+        for potentialMatch in input.users:
+            # Disqualify if they aren't using the same function
+            if potentialMatch.functionTerm != functionTerm:
+                continue
+      
+            # Disqualify if inputs don't match
+            ...
+            def matches(pair):
+               return pair[0].equals(pair[1])
+      
+            inputs_match = all(map(matches, zip(inputs, potentialMatch.inputs)))
+      
+            # Todo: allow for functions that don't care what the function order is
+      
+            if not inputs_match: continue
+      
+            # Looks like this term is the same as what they want
+            return potentialMatch
+   
+    return None
+     
