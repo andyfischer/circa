@@ -28,7 +28,7 @@ class Infix(Node):
             right_term = self.right.eval(builder)
             if not isinstance(right_term, Term):
                 raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
-            return builder.bindName(str(self.left), right_term)
+            return builder.bindName(right_term, str(self.left))
 
         # Evaluate as a right-arrow?
         if self.token.match == tokens.RIGHT_ARROW:
@@ -55,7 +55,7 @@ class Infix(Node):
                inputs=[self.left.eval(builder), self.right.eval(builder)])
 
             # bind the name to this result
-            return builder.bindName(str(self.left), result_term)
+            return builder.bindName(result_term, str(self.left))
 
         debug.fail("Unable to evaluate token: " + self.token.text)
 

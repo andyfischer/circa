@@ -6,7 +6,7 @@
 # When possible, code for manimulating or comparing terms should be placed elsewhere,
 # such as in CodeUnit
 
-import ca_function
+import ca_function, ca_type
 
 nextGlobalID = 1
 
@@ -34,6 +34,10 @@ class Term(object):
         global nextGlobalID
         self.globalID = nextGlobalID
         nextGlobalID += 1
+
+    def getInput(self, inputIndex):
+        "Return an input term"
+        return self.inputs[inputIndex]
   
     def getType(self):
         "Returns this term's output type"
@@ -42,7 +46,7 @@ class Term(object):
     def update(self):
         if not self.needsUpdate:
             return
-        ca_function.callEvaluate(self.functionTerm, self)
+        ca_function.evaluateFunc(self.functionTerm)(self)
         self.needsUpdate = False
 
     def execute(self):
@@ -59,6 +63,4 @@ class Term(object):
         except: return 0.0
   
     def __str__(self):
-        try: return str(self.pythonValue)
-        except: return ""
-
+        return ca_type.toStringFunc(self.getType())(self)

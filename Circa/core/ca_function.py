@@ -1,4 +1,6 @@
 
+from Circa import debug
+
 class CircaFunction(object):
     def __init__(self):
         # inputTypes: list of Terms
@@ -27,6 +29,9 @@ def inputTypes(term):
     return term.cachedValue.inputTypes
 def outputType(term):
     return term.cachedValue.outputType
+def evaluateFunc(term):
+    debug._assert(term.cachedValue.evaluateFunc is not None)
+    return term.cachedValue.evaluateFunc
 def feedbackFunction(term):
     return term.cachedValue.feedbackFunction
     

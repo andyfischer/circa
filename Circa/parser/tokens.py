@@ -378,7 +378,7 @@ def tokenizeTest():
     strm = tokenize('{x = 1+2}')
     strm.consume('LBRACKET')
     strm.consume('IDENT')
-    debug.Assert(not strm.finished())
+    debug._assert(not strm.finished())
     strm.consume('EQUALS')
     strm.consume('INTEGER')
     strm.consume('PLUS')
@@ -388,7 +388,7 @@ def commentTest():
     strm = tokenize('{x #= 1+2}')
     strm.consume('LBRACKET')
     strm.consume('IDENT')
-    debug.Assert(strm.finished())
+    debug._assert(strm.finished())
     
 
 if __name__ == "__main__":

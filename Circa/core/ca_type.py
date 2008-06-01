@@ -8,6 +8,16 @@ class CircaType(object):
 
 def initializeTerm(term):
     term.cachedValue = CircaType()
+def typeToString(term):
+    return '<Type ' + term.cachedValue.name + '>' 
+
+# Accessors
+def name(term):
+    return term.cachedValue.name
+def initializeFunc(term):
+    return term.cachedValue.initializeFunc
+def toStringFunc(term):
+    return term.cachedValue.toStringFunc
 
 # Setters
 def setName(term, name):
