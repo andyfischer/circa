@@ -123,3 +123,9 @@ bootstrapKernel(kernel)
 #print "created: " + kernel.getIdentifier(x)
 
 builtin_types.createBuiltinTypes(kernel)
+
+# Create stdlib
+# future: move this to a separate code unit
+
+from Circa import stdlib
+stdlib.createFunctions(kernel)

@@ -1,15 +1,19 @@
 # Expression.py
 #
-# Code for parsing a Circa expression
+# Code for parsing a Circa expression from a token stream
 # 
-# Inputs: token stream
-# Outputs: AST
 
 import ast
+from tokens import *
+
+
+def parseExpression(token):
+    "Parse an expression from the token stream, and return an AST"
+    return infix_expression(token, 0)
 
 # Infix precedence
 HIGHEST_INFIX_PRECEDENCE = 7
-infixPrecedence = {
+_infixPrecedence = {
     DOT: 7,
     STAR: 6, SLASH: 6,
     PLUS: 5, MINUS: 5,
@@ -19,10 +23,11 @@ infixPrecedence = {
     RIGHT_ARROW: 1 
 }
 
-def getInfixPrecedence(token):
-    if token and token.match in infixPrecedence:
-        return infixPrecedence[token.match]
-    else: return -1
+def _getInfixPrecedence(token):
+    try:
+        _infixPrecedence[token]
+    except KeyError:
+        return -1
 
 def infix_expression(tokens, precedence):
     if (precedence > HIGHEST_INFIX_PRECEDENCE):
@@ -31,7 +36,7 @@ def infix_expression(tokens, precedence):
     expr = infix_expression(tokens, precedence + 1)
     if not expr: return None
 
-    while getInfixPrecedence(tokens.next()) == precedence:
+    while _getInfixPrecedence(tokens.next()) == precedence:
         operator = tokens.consume()
 
         first_righthand_token = tokens.next()

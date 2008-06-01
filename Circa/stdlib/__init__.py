@@ -4,3 +4,11 @@
 # Includes:
 #   Basic math functions
 #   Debugging functions
+
+import boolean, comparison, simple_math
+
+def createFunctions(codeunit):
+    boolean.createFunctions(codeunit)
+    simple_math.createFunctions(codeunit)
+    comparison.createFunctions(codeunit)
+
