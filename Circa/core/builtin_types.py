@@ -32,4 +32,8 @@ def createBuiltinTypes(kernel):
     ca_type.setInitializeFunc(boolType, boolInitialize)
     ca_type.setToStringFunc(boolType, boolToString)
     kernel.bindName(boolType, 'Bool')
-    
+
+    # Export objects
+    builtins.INT_TYPE = intType
+    builtins.STRING_TYPE = stringType
+    builtins.BOOL_TYPE = boolType

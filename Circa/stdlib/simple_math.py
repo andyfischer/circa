@@ -17,3 +17,10 @@ class Mult(function_builder.BaseFunction):
     @staticmethod
     def evaluate(a,b):
         return a * b
+
+functionDefs = [Add, Mult]
+
+def createFunctions(codeUnit):
+    for functionDef in functionDefs:
+        function_builder.createFunction(codeUnit, functionDef)
+

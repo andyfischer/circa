@@ -22,3 +22,9 @@ class Or(function_builder.BaseFunction):
     def evaluate(a, b):
         return a or b
 
+functionDefs = [And, Or]
+
+def createFunctions(codeUnit):
+    for functionDef in functionDefs:
+        function_builder.createFunction(codeUnit, functionDef)
+

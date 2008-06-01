@@ -1,12 +1,16 @@
 
-from Circa.core import builtins
+from Circa.core import (builtins, ca_function)
 
 
 # This class allows Python code to create a function in a convenient
 # way. Then, the function 'createFunction' can be used to make a
 # Circa-based function out of one of these classes.
 class BaseFunction(object):
-    pass
+    pureFunction = False
+    hasState = False
+    inputTypes = []
+    outputType = None
+    
     """
     Should have these members:
        pureFunction (bool)
@@ -25,3 +29,5 @@ def createFunction(codeUnit, functionDef):
     ca_function.setPureFunction(term, functionDef.pureFunction)
     ca_function.setHasState(term, functionDef.hasState)
     ca_function.setEvaluateFunc(term, functionDef.evaluate)
+    codeUnit.bindName(term, functionDef.name)
+    return term

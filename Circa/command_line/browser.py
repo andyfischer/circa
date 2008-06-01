@@ -1,14 +1,14 @@
 
 from string import Template
 from Circa.core import (builtins, ca_type, ca_function)
-from Circa import debug
+from Circa import (debug, parser)
 
 
 class Browser(object):
     def __init__(self, codeUnit=None):
         self.codeUnit = codeUnit
     def doCommand(self, cmd, args):
-        if cmd == 'list':
+        if cmd == 'list' or cmd == 'l':
             for term in self.codeUnit.allTerms:
                 print self.describeTerm(term, "$id: $func_name($input_ids)")
 
@@ -18,6 +18,11 @@ class Browser(object):
                 print "Couldn't find '%s'" % args[0]
 
             print self.describeTerm(term, "$id: $func_name($input_ids) = $value")
+
+        elif cmd == 'create' or cmd == 'c':
+            ast = parser.parseExpression(args)
+            print ast
+            ast.eval(self.codeUnit)
 
         else:
             print "Unrecognized command: " + cmd
@@ -57,6 +62,17 @@ class Browser(object):
                     'value': str(term),
                     'type': ca_type.name(term.getType()) })
 
+def parseCommand(string):
+    """
+    Parse a string into a command, followed by a space, followed by
+    whatever else. Returns tuple (command, whatever_else)
+    """
+
+    first_space = string.find(' ')
+    if first_space == -1:
+        return (string, "")
+    else:
+        return (string[:first_space], string[first_space+1:])
 
 def main():
     import Circa.core.bootstrap
@@ -64,16 +80,16 @@ def main():
     browser = Browser(builtins.KERNEL)
     while True:
         try:
-            cmd = raw_input('> ')
+            userInput = raw_input('> ')
         except KeyboardInterrupt:
             print ""
             return
 
-        if cmd == 'exit':
+        if userInput == 'exit':
             return
 
-        splitCommand = cmd.split(' ')
-        browser.doCommand(splitCommand[0], splitCommand[1:])
+        (command, options) = parseCommand(userInput)
+        browser.doCommand(command, options)
 
 if __name__ == "__main__":
     main()
