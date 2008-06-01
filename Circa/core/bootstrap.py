@@ -28,10 +28,10 @@ def bootstrapKernel(kernel):
     # Create constant-generator function
     constGenerator = kernel._bootstrapEmptyTerm()
     ca_function.initializeTerm(constGenerator)
-    ca_function.setName(constGenerator, "constant-generator")
+    ca_function.setName(constGenerator, "const-generator")
     ca_function.setHasState(constGenerator, False)
     ca_function.setPureFunction(constGenerator, True)
-    kernel.bindName(constGenerator, "_constant-generator")
+    kernel.bindName(constGenerator, "_const-generator")
 
     def emptyFunction(term):
         pass
@@ -40,8 +40,8 @@ def bootstrapKernel(kernel):
     constTypeFunc = kernel._bootstrapEmptyTerm()
     constTypeFunc.functionTerm = constGenerator
     ca_function.initializeTerm(constTypeFunc)
-    kernel.bindName(constTypeFunc, "_constant-Type")
-    ca_function.setName(constTypeFunc, "constant-Type")
+    kernel.bindName(constTypeFunc, "_const-Type")
+    ca_function.setName(constTypeFunc, "const-Type")
     ca_function.setPureFunction(constTypeFunc, True)
     ca_function.setEvaluateFunc(constTypeFunc, emptyFunction)
 
@@ -63,10 +63,10 @@ def bootstrapKernel(kernel):
     constFuncFunc = kernel._bootstrapEmptyTerm()
     constFuncFunc.functionTerm = constGenerator
     ca_function.initializeTerm(constFuncFunc)
-    ca_function.setName(constFuncFunc, "constant-Function")
+    ca_function.setName(constFuncFunc, "const-Function")
     ca_function.setPureFunction(constFuncFunc, True)
     ca_function.setEvaluateFunc(constFuncFunc, emptyFunction)
-    kernel.bindName(constFuncFunc, "_constant-Function")
+    kernel.bindName(constFuncFunc, "_const-Function")
 
     # Implant constant-Function
     constGenerator.functionTerm = constFuncFunc
@@ -92,6 +92,7 @@ def bootstrapKernel(kernel):
         ca_function.setOutputType(term, inputType)
         ca_function.setEvaluateFunc(term, emptyFunction)
         ca_function.setHasState(term, True)
+        ca_function.setName(term, 'const-' + ca_type.name(inputType))
 
     # Define an evaluate function for constant functions
     #def constFuncEvaluate
