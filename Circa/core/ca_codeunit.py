@@ -42,7 +42,7 @@ class CodeUnit(object):
 
         # Check if they have provided the correct number of arguments
         if len(inputs) != len(ca_function.inputTypes(function)):
-            raise Exception("%s() takes %n arguments (%n given)"
+            raise Exception("%s() takes %d arguments (%d given)"
                     % (ca_function.name(function),
                        len(ca_function.inputTypes(function)),
                        len(inputs)))
@@ -84,6 +84,14 @@ class CodeUnit(object):
                 + "this, you can use the allowOverwrite parameter)")
 
         self.mainNamespace[name] = term
+
+    def getNamed(self, name):
+        debug._assert(isinstance(name,str))
+
+        try:
+            return self.mainNamespace[name]
+        except KeyError:
+            return None
 
     def getIdentifier(self, term):
         debug._assert(isinstance(term, Term))
