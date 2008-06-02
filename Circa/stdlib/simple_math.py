@@ -6,6 +6,8 @@ from Circa.core import builtins
 
 class Add(function_builder.BaseFunction):
     name = 'add'
+    inputTypes = [builtins.INT_TYPE, builtins.INT_TYPE]
+    outputType = builtins.INT_TYPE
 
     @staticmethod
     def evaluate(a,b):
@@ -13,6 +15,8 @@ class Add(function_builder.BaseFunction):
 
 class Mult(function_builder.BaseFunction):
     name = 'mult'
+    inputTypes = [builtins.INT_TYPE, builtins.INT_TYPE]
+    outputType = builtins.INT_TYPE
 
     @staticmethod
     def evaluate(a,b):

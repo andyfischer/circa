@@ -22,7 +22,8 @@ class Browser(object):
         elif cmd == 'create' or cmd == 'c':
             ast = parser.parseExpression(args)
             print ast
-            ast.eval(self.codeUnit)
+            result = ast.eval(self.codeUnit)
+            print str(result)
 
         else:
             print "Unrecognized command: " + cmd
@@ -65,7 +66,7 @@ class Browser(object):
 def parseCommand(string):
     """
     Parse a string into a command, followed by a space, followed by
-    whatever else. Returns tuple (command, whatever_else)
+    whatever else. Returns tuple of (command, whatever_else).
     """
 
     first_space = string.find(' ')

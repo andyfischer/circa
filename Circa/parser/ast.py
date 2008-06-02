@@ -72,18 +72,28 @@ class Literal(Node):
 
         if token.match == tokens.FLOAT:
             self.value = float(token.text)
+            self.circaType = builtins.FLOAT_TYPE
         elif token.match == tokens.INTEGER:
             self.value = int(token.text)
+            self.circaType = builtins.INT_TYPE
         elif token.match == tokens.STRING:
             self.value = parseStringLiteral(token.text)
+            self.circaType = builtins.STRING_TYPE
         else:
             raise parse_errors.InternalError("Couldn't recognize token: " + str(token))
 
     def eval(self, builder):
+        # Create a term
         if self.hasQuestionMark:
-            return builder.createVariable(self.value, sourceToken=self.token)
+            newTerm = builder.createVariable(self.circaType)
         else:
-            return builder.createConstant(self.value, sourceToken=self.token)
+            newTerm = builder.createConstant(self.circaType)
+
+        # Assign value
+        # Future: do this in a more typesafe way
+        newTerm.cachedValue = self.value
+
+        return newTerm
 
     def getFirstToken(self):
         return self.token
@@ -131,7 +141,7 @@ class FunctionCall(Node):
         self.args = args
 
     def eval(self, builder):
-        arg_terms = [t.eval(builder) for t in self.args]
+        arg_terms = [term.eval(builder) for term in self.args]
         func = builder.getNamed(self.function_name.text)
 
         if func is None:
@@ -160,7 +170,11 @@ class FunctionCall(Node):
         return self.function_name;
 
     def __str__(self):
-        return self.function_name + '(' + ','.join(map(str,self.args)) + ')'
+        return str(self.function_name) + '(' + ','.join(map(str,self.args)) + ')'
+
+def parseStringLiteral(text):
+    # the literal should have ' or " marks on either side, strip these
+    return text.strip("'\"")
 
 def testInfix():
     oneToken = tokens.TokenInstance(tokens.INTEGER, "1", 0, 0)
@@ -175,8 +189,8 @@ def testInfix():
 
     fakeBuilder = SpyObject()
 
-    fakeBuilder.expectCall('createConstant(1,sourceToken=1)')
-    fakeBuilder.expectCall('createConstant(2,sourceToken=2)')
+    fakeBuilder.expectCall('createConstant(1)')
+    fakeBuilder.expectCall('createConstant(2)')
     fakeBuilder.expectCall('getNamed(sum)', returnVal = fakeSumFunc)
     fakeBuilder.expectCall('createTerm(1,2)')
     

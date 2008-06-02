@@ -28,6 +28,12 @@ def createFunction(codeUnit, functionDef):
     ca_function.setOutputType(term, functionDef.outputType)
     ca_function.setPureFunction(term, functionDef.pureFunction)
     ca_function.setHasState(term, functionDef.hasState)
-    ca_function.setEvaluateFunc(term, functionDef.evaluate)
+    ca_function.setEvaluateFunc(term,
+            convertPythonFuncToCircaEvaluate(functionDef.evaluate))
     codeUnit.bindName(term, functionDef.name)
     return term
+
+def convertPythonFuncToCircaEvaluate(pythonFunc):
+   def funcForCirca(term):
+       term.cachedValue = pythonFunc(*map(lambda t:t.cachedValue, term.inputs))
+   return funcForCirca

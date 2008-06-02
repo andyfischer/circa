@@ -100,11 +100,8 @@ def function_call(tokens):
 
     tokens.consume(RPAREN)
 
-    return ast.Function(function_name, args)
+    return ast.FunctionCall(function_name, args)
  
-def parseStringLiteral(text):
-    # the literal should have ' or " marks on either side, strip these
-    return text.strip("'\"")
 
 def getOperatorFunction(token):
     # Special case: := operator

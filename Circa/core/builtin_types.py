@@ -13,6 +13,10 @@ def boolInitialize(term):
     term.cachedValue = False
 def boolToString(term):
     return str(term.cachedValue)
+def floatInitialize(term):
+    term.cachedValue = 0.0
+def floatToString(term):
+    return str(term.cachedValue)
 
 def createBuiltinTypes(kernel):
     intType = kernel.createConstant(builtins.TYPE_TYPE)
@@ -33,7 +37,14 @@ def createBuiltinTypes(kernel):
     ca_type.setToStringFunc(boolType, boolToString)
     kernel.bindName(boolType, 'Bool')
 
+    floatType = kernel.createConstant(builtins.TYPE_TYPE)
+    ca_type.setName(floatType, 'Float')
+    ca_type.setInitializeFunc(floatType, floatInitialize)
+    ca_type.setToStringFunc(floatType, floatToString)
+    kernel.bindName(floatType, 'Float')
+    
     # Export objects
     builtins.INT_TYPE = intType
     builtins.STRING_TYPE = stringType
     builtins.BOOL_TYPE = boolType
+    builtins.FLOAT_TYPE = floatType
