@@ -33,6 +33,13 @@ def NotAStatement(token):
 def NotImplemented(token):
    return ParseError(token, "Feature is not implemented yet")
 
+def ExpectedToken(found, expected):
+    """
+    'found' is a TokenInstance.
+    'expected' is a TokenDef.
+    """
+    return ParseError(found, "Expected: "+ expected.name +", found: " + found.text)
+
 def ExpectedExpression(token):
    return ParseError(token, "Expected a valid expression")
 

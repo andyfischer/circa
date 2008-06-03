@@ -4,9 +4,15 @@
 
 # Includes: expression parsing, high-level parsing, AST objects, tokenizer, token definitions
 
-import expression, tokens
+import pdb
+
+import expression as _expression_module
+import tokens as _tokens_module
+import parser as _parser_module
 
 def parseExpression(string):
     "Parse the string as an expression, and return an AST"
-    token_stream = tokens.tokenize(string)
-    return expression.parseExpression(token_stream)
+    token_stream = _tokens_module.tokenize(string)
+    return _expression_module.parseExpression(token_stream)
+
+parseFile = _parser_module.parseFile
