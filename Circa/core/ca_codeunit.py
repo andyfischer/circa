@@ -65,6 +65,11 @@ class CodeUnit(object):
 
         newTerm.update()
 
+        # Add ourselves to .users of all our inputs and function
+        function.users.add(newTerm)
+        for input in inputs:
+            input.users.add(newTerm)
+
         return newTerm
 
     def createConstant(self, type):
@@ -119,6 +124,7 @@ class CodeUnit(object):
             term.users = set()
 
         for term in self.allTerms:
+            term.functionTerm.users.add(term)
             for input in term.inputs:
                 input.users.add(term)
 
@@ -127,12 +133,9 @@ def findExistingEquivalent(function, inputs):
     This function finds an existing term that uses the given function,
     and has the given inputs. Returns None if none found.
     """
-
-    if inputs is None:
-        return None
   
     debug._assert(isinstance(function, Term))
-  
+
     # Try to find an existing term
     for input in inputs:
         debug._assert(isinstance(input,Term))
