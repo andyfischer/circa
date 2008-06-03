@@ -3,6 +3,7 @@
 
 import re
 from Circa import debug
+import parse_errors
 
 _ALL_TOKEN_DEFS = []
 
@@ -111,7 +112,7 @@ class TokenStream(object):
 
         token = self.next()
         if match and token.match != match:
-            raise ExpectedToken(match, token)
+            raise parse_errors.ExpectedToken(token, match)
 
         # Advance current index
         self.currentIndex = self.indexAfterSkipping(
@@ -220,15 +221,6 @@ class TokenStream(object):
     def backToString(self):
         return tokenize.untokenize(self.tokens)
     untokenize = backToString 
-
-class ExpectedToken(Exception):
-    def __init__(self, expected, found):
-        self.expected = expected
-        self.found = found
-        Exception.__init__(self, str(self))
-
-    def __str__(self):
-        return "Expected: " + self.expected.name + ", found: " + self.found.text
 
 # Regular expression helper functions
 def group(*choices): return '(' + '|'.join(choices) + ')'

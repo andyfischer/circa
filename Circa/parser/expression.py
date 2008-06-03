@@ -11,6 +11,10 @@ def parseExpression(token):
     "Parse an expression from the token stream, and return an AST"
     return infix_expression(token, 0)
 
+
+class MatchFailed(Exception):
+    pass
+
 # Infix precedence
 HIGHEST_INFIX_PRECEDENCE = 7
 _infixPrecedence = {

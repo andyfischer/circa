@@ -7,7 +7,9 @@
 
 from Circa.core import ca_codeunit
 import expression as _expression_module
-
+import tokens as _tokens_module
+from tokens import *
+import parse_errors
 
 def parseFile(filename):
     """
@@ -25,7 +27,7 @@ def parseFile(filename):
 
     # Todo: check for UNRECOGNIZED_TOKEN
 
-    pstate = ParserState(tokens, CodeUnit())
+    pstate = ParserState(tokens, ca_codeunit.CodeUnit())
 
     compilation_unit(pstate)
 
@@ -45,6 +47,10 @@ def compilation_unit(pstate):
             statement(pstate)
         except parse_errors.ParseError, e:
             pstate.errors.append(e)
+
+            # Drop this token, and the rest of this line
+            pstate.tokens.consume()
+            pstate.tokens.dropUntil(NEWLINE)
 
 def statement(pstate):
 
@@ -67,7 +73,12 @@ def statement(pstate):
         expression_statement(pstate)
 
 def expression_statement(pstate):
-    result = _expression_module.parseExpression(pstate.tokens)
+    try:
+        mark = pstate.tokens.markLocation()
+        result = _expression_module.parseExpression(pstate.tokens)
+    except _expression_module.MatchFailed, e:
+        pstate.tokens.restoreMark(mark)
+        raise parse_errors.ExpectedExpression(pstate.tokens.next())
 
 def new_line(pstate):
     # Ignore NEWLINE

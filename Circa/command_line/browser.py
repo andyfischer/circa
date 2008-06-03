@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import os,sys
 from string import Template
 from Circa.core import (builtins, ca_type, ca_function)
 from Circa import (debug, parser)
@@ -8,6 +9,21 @@ from Circa import (debug, parser)
 class Browser(object):
     def __init__(self, codeUnit=None):
         self.codeUnit = codeUnit
+
+    def doInputLoop(self):
+        while True:
+            try:
+                userInput = raw_input('> ')
+            except KeyboardInterrupt:
+                print ""
+                return
+
+            if userInput == 'exit':
+                return
+
+            (command, options) = parseCommand(userInput)
+            self.doCommand(command, options)
+        
     def doCommand(self, cmd, args):
         if cmd == 'list' or cmd == 'l':
             options = args.split(' ')
@@ -86,22 +102,53 @@ def parseCommand(string):
     else:
         return (string[:first_space], string[first_space+1:])
 
+def findUsersFilename(filename):
+    """
+    Take as input a filename specified by the user, and returns the
+    filename that they probably meant. Specifically, if the exact
+    file is not found, we will try appending '.ca' (if it is missing).
+    """
+    if filename.endswith('.ca'):
+        possibilities = [filename]
+    else:
+        possibilities = [filename, filename + '.ca']
+
+    for possibility in possibilities:
+        if os.path.exists(possibility):
+            return possibility
+
+    return None
+    
+
 def main():
     import Circa.core.bootstrap
 
-    browser = Browser(builtins.KERNEL)
-    while True:
-        try:
-            userInput = raw_input('> ')
-        except KeyboardInterrupt:
-            print ""
+    targetCodeUnit = None
+
+    # Read command-line args
+    if len(sys.argv) < 2:
+        print "No file specified, examining Kernel"
+        targetCodeUnit = builtins.KERNEL
+    else:
+        filename = findUsersFilename(sys.argv[1])
+        if filename is None:
+            print "File not found: " + filename
             return
 
-        if userInput == 'exit':
+        print "Reading file " + filename + "..."
+
+        (errors, codeUnit) = parser.parseFile(filename)
+
+        if errors:
+            print len(errors), "parsing errors occured"
+            for error in errors:
+                print str(error)
             return
 
-        (command, options) = parseCommand(userInput)
-        browser.doCommand(command, options)
+        targetCodeUnit = codeUnit
+
+    browser = Browser(targetCodeUnit)
+    browser.doInputLoop()
 
 if __name__ == "__main__":
     main()
