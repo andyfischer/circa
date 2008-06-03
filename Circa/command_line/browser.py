@@ -1,3 +1,4 @@
+#!/usr/bin/python
 
 from string import Template
 from Circa.core import (builtins, ca_type, ca_function)
