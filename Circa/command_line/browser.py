@@ -9,13 +9,18 @@ class Browser(object):
         self.codeUnit = codeUnit
     def doCommand(self, cmd, args):
         if cmd == 'list' or cmd == 'l':
+            options = args.split(' ')
+            template = "$id: $func_name($input_ids)"
+
+            if '-v' in options:
+                template += " = $value"
             for term in self.codeUnit.allTerms:
-                print self.describeTerm(term, "$id: $func_name($input_ids)")
+                print self.describeTerm(term, template)
 
         elif cmd == 'details':
-            term = self.getTermFromIdentifier(args[0])
+            term = self.getTermFromIdentifier(args)
             if term is None:
-                print "Couldn't find '%s'" % args[0]
+                print "Couldn't find '%s'" % args
 
             print self.describeTerm(term, "$id: $func_name($input_ids) = $value")
 
@@ -24,6 +29,11 @@ class Browser(object):
             print ast
             result = ast.eval(self.codeUnit)
             print str(result)
+
+        elif cmd == 'users':
+            term = self.getTermFromIdentifier(args)
+
+            print map(lambda term: self.describeTerm(term, "$id"), term.users)
 
         else:
             print "Unrecognized command: " + cmd
