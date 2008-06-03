@@ -159,4 +159,3 @@ def findExistingEquivalent(function, inputs):
    
     # None found
     return None
-     

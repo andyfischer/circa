@@ -102,7 +102,6 @@ def function_call(tokens):
 
     return ast.FunctionCall(function_name, args)
  
-
 def getOperatorFunction(token):
     # Special case: := operator
     if token == COLON_EQUALS:
