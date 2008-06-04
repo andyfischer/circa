@@ -5,7 +5,7 @@
 
 import parse_errors, tokens
 from Circa import debug
-from Circa.core import builtins
+from Circa.core import (builtins, ca_string)
 from Circa.core.term import Term
 from Circa.debug.spy_object import SpyObject
 from token_definitions import *
@@ -22,42 +22,41 @@ class Infix(Node):
         self.left = left
         self.right = right
 
-    def eval(self, builder):
+    def eval(self, codeUnit):
 
         # Evaluate as an assignment?
         if self.token.match == EQUALS:
-            right_term = self.right.eval(builder)
+            right_term = self.right.eval(codeUnit)
             if not isinstance(right_term, Term):
                 raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
-            builder.bindName(right_term, str(self.left))
+            codeUnit.bindName(right_term, str(self.left))
             return right_term
 
         # Evaluate as a right-arrow?
         if self.token.match == RIGHT_ARROW:
-            left_inputs = self.left.eval(builder)
-            right_func = self.right.eval(builder)
+            left_inputs = self.left.eval(codeUnit)
+            right_func = self.right.eval(codeUnit)
 
-            return builder.createTerm(right_func, inputs=[left_inputs])
+            return codeUnit.createTerm(right_func, inputs=[left_inputs])
 
         # Normal function?
         # Try to find a defined operator
         normalFunction = getOperatorFunction(self.token.match)
         if normalFunction is not None:
-            assert normalFunction.pythonValue is not None
 
-            return builder.createTerm(normalFunction,
-                inputs=[self.left.eval(builder), self.right.eval(builder)] )
+            return codeUnit.createTerm(normalFunction,
+                inputs=[self.left.eval(codeUnit), self.right.eval(codeUnit)] )
 
         # Evaluate as a function + assign?
         # Try to find an assign operator
         assignFunction = getAssignOperatorFunction(self.token.match)
         if assignFunction is not None:
             # create a term that's the result of the operation
-            result_term = builder.createTerm(assignFunction,
-               inputs=[self.left.eval(builder), self.right.eval(builder)])
+            result_term = codeUnit.createTerm(assignFunction,
+               inputs=[self.left.eval(codeUnit), self.right.eval(codeUnit)])
 
             # bind the name to this result
-            builder.bindName(result_term, str(self.left))
+            codeUnit.bindName(result_term, str(self.left))
             return result_term
 
         debug.fail("Unable to evaluate token: " + self.token.text)
@@ -179,24 +178,22 @@ def parseStringLiteral(text):
     # the literal should have ' or " marks on either side, strip these
     return text.strip("'\"")
 
-def getOperatorFunction(token):
+def getOperatorFunction(codeUnit, token):
     # Special case: := operator
     if token == COLON_EQUALS:
         return builtins.FEEDBACK_FUNC
 
-    circaObj = pythonTokenToBuiltin(token)
+    # Turn the token's text into a Circa string
+    tokenAsString = codeUnit.createConstant(builtins.STRING_TYPE)
+    ca_string.set(tokenAsString, token.text)
 
-    if circaObj is None:
-        print "Notice: couldn't find an operator func for " + token.raw_string
-        return None
+    # Find _operator function
+    operatorFunc = codeUnit.getNamed('_operator')
 
-    result = builtins.BUILTINS.getTerm(builtins.OPERATOR_FUNC,
-          inputs=[pythonTokenToBuiltin(token)])
+    # Access the operator function
+    operatorAccessor = codeUnit.createTerm(operatorFunc, [tokenAsString])
 
-    if result.pythonValue is None:
-        return None
-
-    return result
+    return operatorAccessor
 
 def getAssignOperatorFunction(token):
     circaObj = pythonTokenToBuiltin(token)

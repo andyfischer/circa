@@ -21,12 +21,12 @@ class Browser(object):
             if userInput == 'exit':
                 return
 
-            (command, options) = parseCommand(userInput)
-            self.doCommand(command, options)
+            self.doCommand(userInput)
         
-    def doCommand(self, cmd, args):
-        if cmd == 'list' or cmd == 'l':
-            options = args.split(' ')
+    def doCommand(self, inputStr):
+        (command, commandArgs) = parseCommand(inputStr)
+        if command == 'list' or command == 'l':
+            options = commandArgs.split(' ')
             template = "$id: $func_name($input_ids)"
 
             if '-v' in options:
@@ -34,28 +34,32 @@ class Browser(object):
             for term in self.codeUnit.allTerms:
                 print self.describeTerm(term, template)
 
-        elif cmd == 'details':
-            term = self.getTermFromIdentifier(args)
+        elif command == 'details':
+            term = self.getTermFromIdentifier(commandArgs)
             if term is None:
-                print "Couldn't find '%s'" % args
+                print "Couldn't find '%s'" % commandArgs
 
             print self.describeTerm(term, "$id: $func_name($input_ids) = $value")
 
-        elif cmd == 'create' or cmd == 'c':
-            ast = parser.parseExpression(args)
+        elif command == 'create' or command == 'c':
+            ast = parser.parseExpression(commandArgs)
             print ast
             result = ast.eval(self.codeUnit)
             print str(result)
-
             result.execute()
 
-        elif cmd == 'users':
-            term = self.getTermFromIdentifier(args)
+        elif command == 'users':
+            term = self.getTermFromIdentifier(commandArgs)
 
             print map(lambda term: self.describeTerm(term, "$id"), term.users)
 
         else:
-            print "Unrecognized command: " + cmd
+            # Interpret as a Circa expression
+            ast = parser.parseExpression(inputStr)
+            print ast
+            result = ast.eval(self.codeUnit)
+            print str(result)
+            result.execute()
 
     def getIdentifier(self, term):
         return self.codeUnit.getIdentifier(term)
