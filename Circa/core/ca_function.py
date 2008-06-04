@@ -17,9 +17,15 @@ class CircaFunction(object):
         self.initializeFunc = None
 
         # void evaluateFunc(Term)
+        # The evaluate function should probably look at Term's inputs,
+        # do something, and then put some result into Term.cachedValue.
+        # If the function has 'pureFunction' set to False, then it is
+        # welcome to do other things too.
         self.evaluateFunc = None
 
         # void feedbackFunc(Term)
+        # feedbackFunc should return a Function term. This function should
+        # take inputs: (desired, target)
         self.feedbackFunc = None
 
 def initializeTerm(term):

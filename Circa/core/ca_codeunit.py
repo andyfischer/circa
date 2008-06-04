@@ -63,6 +63,10 @@ class CodeUnit(object):
         debug._assert(ca_function.outputType(function) is not None)
         ca_type.initializeFunc(ca_function.outputType(function))(newTerm)
 
+        # Initialize the term, if this function has an initializeFunc
+        if ca_function.initializeFunc(function):
+            ca_function.initializeFunc(function)(newTerm)
+
         newTerm.update()
 
         # Add ourselves to .users of all our inputs and function

@@ -1,16 +1,14 @@
 # Expression.py
 #
 # Code for parsing a Circa expression from a token stream
-# 
+ 
 
 import ast
-from tokens import *
-
+from token_definitions import *
 
 def parseExpression(token):
     "Parse an expression from the token stream, and return an AST"
     return infix_expression(token, 0)
-
 
 class MatchFailed(Exception):
     pass
@@ -29,7 +27,7 @@ _infixPrecedence = {
 
 def _getInfixPrecedence(token):
     try:
-        _infixPrecedence[token]
+        return _infixPrecedence[token.match]
     except KeyError:
         return -1
 
@@ -40,7 +38,7 @@ def infix_expression(tokens, precedence):
     expr = infix_expression(tokens, precedence + 1)
     if not expr: return None
 
-    while _getInfixPrecedence(tokens.next()) == precedence:
+    while tokens.next() and _getInfixPrecedence(tokens.next()) == precedence:
         operator = tokens.consume()
 
         first_righthand_token = tokens.next()
@@ -105,37 +103,11 @@ def function_call(tokens):
     tokens.consume(RPAREN)
 
     return ast.FunctionCall(function_name, args)
- 
-def getOperatorFunction(token):
-    # Special case: := operator
-    if token == COLON_EQUALS:
-        return builtins.FEEDBACK_FUNC
 
-    pdb.set_trace()
+def testEquals():
+    import tokens
+    ts = tokens.tokenize("a = 1")
+    print infix_expression(ts, 0)
 
-    circaObj = pythonTokenToBuiltin(token)
-
-    if circaObj is None:
-        print "Notice: couldn't find an operator func for " + token.raw_string
-        return None
-
-    result = builtins.BUILTINS.getTerm(builtins.OPERATOR_FUNC,
-          inputs=[pythonTokenToBuiltin(token)])
-
-    if result.pythonValue is None:
-        return None
-
-    return result
-
-def getAssignOperatorFunction(token):
-    circaObj = pythonTokenToBuiltin(token)
-    if circaObj is None:
-        print "Notice: couldn't find an assign operator func for " + token.raw_string
-        return None
-    result = builtins.BUILTINS.getTerm(builtins.ASSIGN_OPERATOR_FUNC,
-          inputs=[pythonTokenToBuiltin(token)])
-
-    if result.pythonValue is None:
-       return None
-
-    return result
+if __name__ == '__main__':
+    testEquals()

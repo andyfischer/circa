@@ -47,6 +47,8 @@ class Browser(object):
             result = ast.eval(self.codeUnit)
             print str(result)
 
+            result.execute()
+
         elif cmd == 'users':
             term = self.getTermFromIdentifier(args)
 
@@ -54,6 +56,7 @@ class Browser(object):
 
         else:
             print "Unrecognized command: " + cmd
+
     def getIdentifier(self, term):
         return self.codeUnit.getIdentifier(term)
 
