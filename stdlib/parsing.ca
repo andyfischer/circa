@@ -1,0 +1,20 @@
+
+# Metaprogramming functions
+# function token(string -> Token) [python]
+operator = map(Token, Function)
+assign_operator = map(Token, Function)
+assignFunction = map(Type, Function)
+
+# Bind operators to functions
+operator(token('+')) := add
+operator(token('-')) := sub
+operator(token('*')) := mult
+operator(token('/')) := div
+operator(token('==')) := equals
+operator(token('!=')) := not_equals
+
+# Bind assign operators to functions
+assign_operator(token('+=')) := add
+assign_operator(token('-=')) := sub
+assign_operator(token('*=')) := mult
+assign_operator(token('/=')) := div

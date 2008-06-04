@@ -9,15 +9,18 @@ class CircaFunction(object):
         # outputType: Term
         self.outputType = None
 
-        # feedbackFunction: Term
-        self.feedbackFunction = None
-
         self.pureFunction = True
         self.hasState = False
         self.name = None
 
-        # evaluateFunc: function that takes a Term
+        # void initializeFunc(Term)
+        self.initializeFunc = None
+
+        # void evaluateFunc(Term)
         self.evaluateFunc = None
+
+        # void feedbackFunc(Term)
+        self.feedbackFunc = None
 
 def initializeTerm(term):
     term.cachedValue = CircaFunction()
@@ -37,11 +40,13 @@ def hasState(term):
     return term.cachedValue.hasState
 def pureFunction(term):
     return term.cachedValue.pureFunction
+def initializeFunc(term):
+    return term.cachedValue.initializeFunc
 def evaluateFunc(term):
     debug._assert(term.cachedValue.evaluateFunc is not None)
     return term.cachedValue.evaluateFunc
-def feedbackFunction(term):
-    return term.cachedValue.feedbackFunction
+def feedbackFunc(term):
+    return term.cachedValue.feedbackFunc
     
 # Setters
 def setName(term, name):
@@ -54,5 +59,7 @@ def setPureFunction(term, pure):
     term.cachedValue.pureFunction = pure
 def setHasState(term, hasState):
     term.cachedValue.hasState = hasState
+def setInitializeFunc(term, func):
+    term.cachedValue.initializeFunc = func
 def setEvaluateFunc(term, func):
     term.cachedValue.evaluateFunc = func

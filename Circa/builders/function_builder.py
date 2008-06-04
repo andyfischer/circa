@@ -10,6 +10,7 @@ class BaseFunction(object):
     hasState = False
     inputTypes = []
     outputType = None
+    initialize = None
     
     """
     Should have these members:
@@ -28,6 +29,7 @@ def createFunction(codeUnit, functionDef):
     ca_function.setOutputType(term, functionDef.outputType)
     ca_function.setPureFunction(term, functionDef.pureFunction)
     ca_function.setHasState(term, functionDef.hasState)
+    ca_function.setInitializeFunc(term, functionDef.initialize)
     ca_function.setEvaluateFunc(term,
             convertPythonFuncToCircaEvaluate(functionDef.evaluate))
     codeUnit.bindName(term, functionDef.name)
@@ -35,5 +37,9 @@ def createFunction(codeUnit, functionDef):
 
 def convertPythonFuncToCircaEvaluate(pythonFunc):
    def funcForCirca(term):
-       term.cachedValue = pythonFunc(*map(lambda t:t.cachedValue, term.inputs))
+       inputs = [term]
+       inputs.extend(map(lambda t:t.cachedValue, term.inputs))
+       result = pythonFunc(*inputs)
+       if result is not None:
+           term.cachedValue = result
    return funcForCirca

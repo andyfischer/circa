@@ -10,7 +10,7 @@ class Add(function_builder.BaseFunction):
     outputType = builtins.INT_TYPE
 
     @staticmethod
-    def evaluate(a,b):
+    def evaluate(term,a,b):
         return a + b
 
 class Mult(function_builder.BaseFunction):
@@ -19,7 +19,7 @@ class Mult(function_builder.BaseFunction):
     outputType = builtins.INT_TYPE
 
     @staticmethod
-    def evaluate(a,b):
+    def evaluate(term,a,b):
         return a * b
 
 functionDefs = [Add, Mult]
