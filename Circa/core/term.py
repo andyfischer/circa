@@ -46,12 +46,19 @@ class Term(object):
     def update(self):
         if not self.needsUpdate:
             return
-        ca_function.evaluateFunc(self.functionTerm)(self)
+
+        # Functions with side effects should not run during an
+        # update() call. <<update
+        if ca_function.pureFunction(self.functionTerm):
+            ca_function.evaluateFunc(self.functionTerm)(self)
+
         self.needsUpdate = False
 
     def execute(self):
-        # todo
-        pass
+        if not self.needsUpdate:
+            return
+        ca_function.evaluateFunc(self.functionTerm)(self)
+        self.needsUpdate = False
   
     # value accessors
     def __int__(self):
