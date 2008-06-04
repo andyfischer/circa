@@ -11,7 +11,7 @@ class Feedback(function_builder.BaseFunction):
     pureFunction = False
 
     @staticmethod
-    def evaluate(term):
+    def evaluate(term, targetVal, desiredVal):
         target = term.getInput(0)
         desired = term.getInput(1)
 

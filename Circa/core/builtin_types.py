@@ -1,4 +1,5 @@
 
+from Circa import debug
 import builtins, ca_type, ca_function
 
 def intInitialize(term):
@@ -13,11 +14,16 @@ def boolInitialize(term):
     term.cachedValue = False
 def boolToString(term):
     return str(term.cachedValue)
+
 def floatInitialize(term):
     term.cachedValue = 0.0
 def floatToString(term):
     return str(term.cachedValue)
 
+def voidInitialize(term):
+    term.cachedValue = None
+def voidToString(term):
+    return "<void>"
 
 def createBuiltinTypes(kernel):
     intType = kernel.createConstant(builtins.TYPE_TYPE)
@@ -49,8 +55,10 @@ def createBuiltinTypes(kernel):
     kernel.bindName(referenceType, 'ref')
 
     voidType = kernel.createConstant(builtins.TYPE_TYPE)
-    ca_type.setName(referenceType, 'void')
-    kernel.bindName(referenceType, 'void')
+    ca_type.setName(voidType, 'void')
+    ca_type.setInitializeFunc(voidType, voidInitialize)
+    ca_type.setToStringFunc(voidType, voidToString)
+    kernel.bindName(voidType, 'void')
     
     # Export objects
     builtins.INT_TYPE = intType
