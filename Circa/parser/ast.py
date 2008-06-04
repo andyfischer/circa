@@ -41,7 +41,7 @@ class Infix(Node):
 
         # Normal function?
         # Try to find a defined operator
-        normalFunction = getOperatorFunction(self.token.match)
+        normalFunction = getOperatorFunction(codeUnit, self.token.match)
         if normalFunction is not None:
 
             return codeUnit.createTerm(normalFunction,

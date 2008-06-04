@@ -43,9 +43,19 @@ def createBuiltinTypes(kernel):
     ca_type.setInitializeFunc(floatType, floatInitialize)
     ca_type.setToStringFunc(floatType, floatToString)
     kernel.bindName(floatType, 'float')
+
+    referenceType = kernel.createConstant(builtins.TYPE_TYPE)
+    ca_type.setName(referenceType, 'ref')
+    kernel.bindName(referenceType, 'ref')
+
+    voidType = kernel.createConstant(builtins.TYPE_TYPE)
+    ca_type.setName(referenceType, 'void')
+    kernel.bindName(referenceType, 'void')
     
     # Export objects
     builtins.INT_TYPE = intType
     builtins.STRING_TYPE = stringType
     builtins.BOOL_TYPE = boolType
     builtins.FLOAT_TYPE = floatType
+    builtins.REFERENCE_TYPE = referenceType
+    builtins.VOID_TYPE = voidType
