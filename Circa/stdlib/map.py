@@ -21,12 +21,24 @@ class MapConstructor(function_builder.BaseFunction):
         ca_function.setName(term, 'map-' + keyType.name + '-to-'
                 + valueType.name)
         ca_function.setInputTypes(term, [keyType])
-        ca_function.setOutputType(term, [valueType])
+        ca_function.setOutputType(term, valueType)
         ca_function.setHasState(term, False)
-        ca_function.setEvaluateFunc(term, evaluate_MapAccess)
+        ca_function.setEvaluateFunc(term, MapAccess_evaluate)
+        ca_function.setFeedbackFunc(term, MapAccess_feedback)
 
-def evaluate_MapAccess(term):
-    term.cachedValue = term.functionTerm.state[term.getInput(0)]
+def MapAccess_evaluate(term):
+    hashtable = term.functionTerm.state
+    key = term.getInput(0).cachedValue
+    try:
+        return hashtable[key]
+    except KeyError:
+        return None
+
+def MapAccess_feedback(target, desired):
+    # Goal here is to change target's function so that it outputs desired
+    hashtable = target.functionTerm.state
+    key = target.getInput(0).cachedValue
+    hashtable[key] = desired.cachedValue
 
 def createFunctions(codeUnit):
     function_builder.createFunction(codeUnit, MapConstructor)

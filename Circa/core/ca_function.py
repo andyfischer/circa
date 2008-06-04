@@ -1,5 +1,7 @@
 
 from Circa import debug
+from Circa.core.term import Term
+import Circa.debug
 
 class CircaFunction(object):
     def __init__(self):
@@ -57,15 +59,28 @@ def feedbackFunc(term):
 # Setters
 def setName(term, name):
     term.cachedValue.name = name
+
 def setInputTypes(term, types):
+    debug._assert(isinstance(types,list))
     term.cachedValue.inputTypes = types
+
 def setOutputType(term, type):
+    debug._assert(isinstance(type,Term))
     term.cachedValue.outputType = type
+
 def setPureFunction(term, pure):
+    debug._assert(isinstance(pure,bool))
     term.cachedValue.pureFunction = pure
+
 def setHasState(term, hasState):
+    debug._assert(isinstance(hasState,bool))
     term.cachedValue.hasState = hasState
+
 def setInitializeFunc(term, func):
     term.cachedValue.initializeFunc = func
+
 def setEvaluateFunc(term, func):
     term.cachedValue.evaluateFunc = func
+
+def setFeedbackFunc(term, func):
+    term.cachedValue.feedbackFunc = func
