@@ -8,6 +8,7 @@ from Circa import debug
 from Circa.core import builtins
 from Circa.core.term import Term
 from Circa.debug.spy_object import SpyObject
+from token_definitions import *
 
 class Node(object):
     pass
@@ -24,14 +25,15 @@ class Infix(Node):
     def eval(self, builder):
 
         # Evaluate as an assignment?
-        if self.token.match == tokens.EQUALS:
+        if self.token.match == EQUALS:
             right_term = self.right.eval(builder)
             if not isinstance(right_term, Term):
                 raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
-            return builder.bindName(right_term, str(self.left))
+            builder.bindName(right_term, str(self.left))
+            return right_term
 
         # Evaluate as a right-arrow?
-        if self.token.match == tokens.RIGHT_ARROW:
+        if self.token.match == RIGHT_ARROW:
             left_inputs = self.left.eval(builder)
             right_func = self.right.eval(builder)
 
@@ -55,7 +57,8 @@ class Infix(Node):
                inputs=[self.left.eval(builder), self.right.eval(builder)])
 
             # bind the name to this result
-            return builder.bindName(result_term, str(self.left))
+            builder.bindName(result_term, str(self.left))
+            return result_term
 
         debug.fail("Unable to evaluate token: " + self.token.text)
 
@@ -63,20 +66,20 @@ class Infix(Node):
         return self.left.getFirstToken()
 
     def __str__(self):
-        return self.function.text + "(" + str(self.left) + "," + str(self.right) + ")"
+        return self.token.text + "(" + str(self.left) + "," + str(self.right) + ")"
 
 class Literal(Node):
     def __init__(self, token, hasQuestionMark=False):
         self.token = token
         self.hasQuestionMark = hasQuestionMark
 
-        if token.match == tokens.FLOAT:
+        if token.match == FLOAT:
             self.value = float(token.text)
             self.circaType = builtins.FLOAT_TYPE
-        elif token.match == tokens.INTEGER:
+        elif token.match == INTEGER:
             self.value = int(token.text)
             self.circaType = builtins.INT_TYPE
-        elif token.match == tokens.STRING:
+        elif token.match == STRING:
             self.value = parseStringLiteral(token.text)
             self.circaType = builtins.STRING_TYPE
         else:
@@ -176,10 +179,44 @@ def parseStringLiteral(text):
     # the literal should have ' or " marks on either side, strip these
     return text.strip("'\"")
 
+def getOperatorFunction(token):
+    # Special case: := operator
+    if token == COLON_EQUALS:
+        return builtins.FEEDBACK_FUNC
+
+    circaObj = pythonTokenToBuiltin(token)
+
+    if circaObj is None:
+        print "Notice: couldn't find an operator func for " + token.raw_string
+        return None
+
+    result = builtins.BUILTINS.getTerm(builtins.OPERATOR_FUNC,
+          inputs=[pythonTokenToBuiltin(token)])
+
+    if result.pythonValue is None:
+        return None
+
+    return result
+
+def getAssignOperatorFunction(token):
+    circaObj = pythonTokenToBuiltin(token)
+    if circaObj is None:
+        print "Notice: couldn't find an assign operator func for " + token.raw_string
+        return None
+    result = builtins.BUILTINS.getTerm(builtins.ASSIGN_OPERATOR_FUNC,
+          inputs=[pythonTokenToBuiltin(token)])
+
+    if result.pythonValue is None:
+       return None
+
+    return result
+
+
+
 def testInfix():
-    oneToken = tokens.TokenInstance(tokens.INTEGER, "1", 0, 0)
-    twoToken = tokens.TokenInstance(tokens.INTEGER, "2", 0, 0)
-    sumToken = tokens.TokenInstance(tokens.IDENT, "sum", 0, 0)
+    oneToken = tokens.TokenInstance(INTEGER, "1", 0, 0)
+    twoToken = tokens.TokenInstance(INTEGER, "2", 0, 0)
+    sumToken = tokens.TokenInstance(IDENT, "sum", 0, 0)
     expr = FunctionCall(sumToken, [Literal(oneToken), Literal(twoToken)])
 
     fakeSumFunc = Term()

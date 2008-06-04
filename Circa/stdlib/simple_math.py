@@ -8,6 +8,7 @@ class Add(function_builder.BaseFunction):
     name = 'add'
     inputTypes = [builtins.INT_TYPE, builtins.INT_TYPE]
     outputType = builtins.INT_TYPE
+    pureFunction = True
 
     @staticmethod
     def evaluate(term,a,b):
@@ -17,6 +18,7 @@ class Mult(function_builder.BaseFunction):
     name = 'mult'
     inputTypes = [builtins.INT_TYPE, builtins.INT_TYPE]
     outputType = builtins.INT_TYPE
+    pureFunction = True
 
     @staticmethod
     def evaluate(term,a,b):

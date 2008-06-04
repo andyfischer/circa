@@ -48,9 +48,11 @@ class Term(object):
             return
 
         # Functions with side effects should not run during an
-        # update() call. <<update
-        if ca_function.pureFunction(self.functionTerm):
-            ca_function.evaluateFunc(self.functionTerm)(self)
+        # update() call.
+        if not ca_function.pureFunction(self.functionTerm):
+            return
+
+        ca_function.evaluateFunc(self.functionTerm)(self)
 
         self.needsUpdate = False
 
