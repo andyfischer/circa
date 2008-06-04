@@ -17,9 +17,12 @@ class MapConstructor(function_builder.BaseFunction):
         term.state = {}
 
     @staticmethod
-    def evaluate(term, keyType, valueType):
-        ca_function.setName(term, 'map-' + keyType.name + '-to-'
-                + valueType.name)
+    def evaluate(term, in0, in1):
+        keyType = term.getInput(0)
+        valueType = term.getInput(1)
+        ca_function.setName(term, 'map-' + 
+                ca_type.name(keyType) + '-to-'
+                + ca_type.name(valueType))
         ca_function.setInputTypes(term, [keyType])
         ca_function.setOutputType(term, valueType)
         ca_function.setHasState(term, False)

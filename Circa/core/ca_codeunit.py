@@ -59,9 +59,16 @@ class CodeUnit(object):
         newTerm.functionTerm = function
         newTerm.inputs = list(inputs)
 
+        outputType = ca_function.outputType(function)
+
         # Initialize cachedData
-        debug._assert(ca_function.outputType(function) is not None)
-        ca_type.initializeFunc(ca_function.outputType(function))(newTerm)
+        debug._assert(outputType is not None)
+
+        initializeFunc = ca_type.initializeFunc(outputType)
+
+        debug._assert(initializeFunc is not None)
+
+        initializeFunc(newTerm)
 
         # Initialize the term, if this function has an initializeFunc
         if ca_function.initializeFunc(function):
