@@ -52,8 +52,8 @@ def compilation_unit(pstate):
             pstate.tokens.consume()
             pstate.tokens.dropUntil(NEWLINE)
 
-def statement(pstate):
 
+def statement(pstate):
     # Dispatch based on next token
     next_token = pstate.tokens.next()
 
@@ -76,6 +76,7 @@ def expression_statement(pstate):
     try:
         mark = pstate.tokens.markLocation()
         result = _expression_module.parseExpression(pstate.tokens)
+        result.eval(pstate.codeUnit)
     except _expression_module.MatchFailed, e:
         pstate.tokens.restoreMark(mark)
         raise parse_errors.ExpectedExpression(pstate.tokens.next())

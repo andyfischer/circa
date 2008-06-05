@@ -26,6 +26,7 @@ class MapConstructor(function_builder.BaseFunction):
         ca_function.setInputTypes(term, [keyType])
         ca_function.setOutputType(term, valueType)
         ca_function.setHasState(term, False)
+        ca_function.setPureFunction(term, True)
         ca_function.setEvaluateFunc(term, MapAccess_evaluate)
         ca_function.setFeedbackFunc(term, MapAccess_feedback)
 
@@ -33,9 +34,9 @@ def MapAccess_evaluate(term):
     hashtable = term.functionTerm.state
     key = term.getInput(0).cachedValue
     try:
-        return hashtable[key]
+        term.cachedValue = hashtable[key]
     except KeyError:
-        return None
+        term.cachedValue = None
 
 def MapAccess_feedback(target, desired):
     # Goal here is to change target's function so that it outputs desired
