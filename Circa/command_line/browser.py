@@ -50,8 +50,11 @@ class Browser(object):
 
         elif command == 'users':
             term = self.getTermFromIdentifier(commandArgs)
-
             print map(lambda term: self.describeTerm(term, "$id"), term.users)
+
+        elif command == 'state':
+            term = self.getTermFromIdentifier(commandArgs)
+            print term.state
 
         else:
             # Interpret as a Circa expression
