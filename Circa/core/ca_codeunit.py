@@ -104,10 +104,12 @@ class CodeUnit(object):
     def getNamed(self, name):
         debug._assert(isinstance(name,str))
 
-        try:
+        if name in self.mainNamespace:
             return self.mainNamespace[name]
-        except KeyError:
-            return None
+
+        # Check builtins, if this isn't the builtins object
+        if self is not builtins.KERNEL:
+            return builtins.KERNEL.getNamed(name)
 
     def getIdentifier(self, term):
         debug._assert(isinstance(term, Term))
