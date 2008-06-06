@@ -33,6 +33,9 @@ class CircaFunction(object):
 def initializeTerm(term):
     term.cachedValue = CircaFunction()
 def toString(term):
+    if term.cachedValue is None:
+        return "<undefined Function>"
+
     return ("<Function %s, pure=%s, state=%s>"
         % (term.cachedValue.name, term.cachedValue.pureFunction, 
             term.cachedValue.hasState))

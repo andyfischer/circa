@@ -76,7 +76,8 @@ def expression_statement(pstate):
     try:
         mark = pstate.tokens.markLocation()
         result = _expression_module.parseExpression(pstate.tokens)
-        result.eval(pstate.codeUnit)
+        term = result.eval(pstate.codeUnit)
+
     except _expression_module.MatchFailed, e:
         pstate.tokens.restoreMark(mark)
         raise parse_errors.ExpectedExpression(pstate.tokens.next())

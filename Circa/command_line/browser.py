@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os,sys
+import os,sys,pdb
 from string import Template
 from Circa.core import (builtins, ca_type, ca_function)
 from Circa import (debug, parser)
@@ -19,6 +19,7 @@ class Browser(object):
                 return
 
             if userInput == 'exit':
+                raise Exception()
                 return
 
             self.doCommand(userInput)
@@ -158,7 +159,9 @@ def main():
         targetCodeUnit = codeUnit
 
     browser = Browser(targetCodeUnit)
+
     browser.doInputLoop()
+
 
 if __name__ == "__main__":
     main()
