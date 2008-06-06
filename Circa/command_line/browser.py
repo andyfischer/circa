@@ -19,7 +19,6 @@ class Browser(object):
                 return
 
             if userInput == 'exit':
-                raise Exception()
                 return
 
             self.doCommand(userInput)
