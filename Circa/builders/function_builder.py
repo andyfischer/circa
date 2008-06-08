@@ -1,4 +1,5 @@
 
+from Circa import debug
 from Circa.core import (builtins, ca_function)
 from Circa.core.term import Term
 
@@ -25,10 +26,8 @@ class BaseFunction(object):
 
 def createFunction(codeUnit, functionDef):
     # Do some type checks
-    if not isinstance(functionDef.inputTypes, list):
-        raise Exception("In %s, inputTypes is not a list" % functionDef.__name__)
-    if not isinstance(functionDef.outputType, Term):
-        raise Exception("In %s, outputType is not a Term" % functionDef.__name__)
+    debug.assertType(functionDef.inputTypes, list, functionDef.__name__+'.inputTypes')
+    debug.assertType(functionDef.outputType, Term, functionDef.__name__+'.outputType')
 
     term = codeUnit.createConstant(builtins.FUNCTION_TYPE)
     ca_function.setName(term, functionDef.name)
