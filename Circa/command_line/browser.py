@@ -2,7 +2,8 @@
 
 import os,sys,pdb
 from string import Template
-from Circa import (debug, parser)
+from Circa import parser
+from Circa.common import debug
 from Circa.core import (builtins, ca_type, ca_function)
 from Circa.services import to_source
 

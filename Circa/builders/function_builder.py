@@ -1,5 +1,5 @@
 
-from Circa import debug
+from Circa.common import debug
 from Circa.core import (builtins, ca_function)
 from Circa.core.term import Term
 
