@@ -31,7 +31,7 @@ class Term(object):
         self.branch = None
         self.givenName = None
         self.debugName = None
-        self.feedbackAccumulator = None
+        self.ast = None
 
         self.executionContext = TermExecutionContext(self)
    
