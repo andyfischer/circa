@@ -7,15 +7,23 @@ import parse_errors, tokens
 from Circa import debug
 from Circa.core import (builtins, ca_string, ca_function, ca_type)
 from Circa.core.term import Term
+from Circa.common import errors
 from Circa.debug.spy_object import SpyObject
 from token_definitions import *
 
 class Node(object):
-    pass
+    def createTerms(self, codeUnit):
+        raise errors.PureVirtualMethodFail(self, 'createTerms')
+    def renderSource(self):
+        raise errors.PureVirtualMethodFail(self, 'renderSource')
+    def getFirstToken(self):
+        raise errors.PureVirtualMethodFail(self, 'getFirstToken')
+    def __str__(self):
+        return self.renderSource()
 
-class AssignStatement(Node):
-    def __init__(self, leftToken, rightAst):
-        pass
+class BlankLine(Node):
+    def __str__(self):
+        return "\n"
 
 class Infix(Node):
     def __init__(self, functionToken, left, right):
@@ -84,8 +92,9 @@ class Infix(Node):
     def getFirstToken(self):
         return self.left.getFirstToken()
 
-    def __str__(self):
-        return self.token.text + "(" + str(self.left) + "," + str(self.right) + ")"
+    def renderSource(self):
+        return (self.left.renderSource() + ' ' + self.token.text + ' '
+            + self.right.renderSource())
 
 class Literal(Node):
     def __init__(self, token, hasQuestionMark=False):
@@ -122,8 +131,11 @@ class Literal(Node):
     def getFirstToken(self):
         return self.token
 
-    def __str__(self):
-        return str(self.value)
+    def renderSource(self):
+        if (self.token.match == STRING):
+            return "'" + self.value + "'"
+        else:
+            return str(self.value)
 
 class Ident(Node):
     def __init__(self, token):
@@ -140,8 +152,8 @@ class Ident(Node):
     def getFirstToken(self):
         return self.token
 
-    def __str__(self):
-       return self.token.text
+    def renderSource(self):
+        return self.token.text
 
 class Unary(Node):
     def __init__(self, functionToken, right):
@@ -156,8 +168,8 @@ class Unary(Node):
     def getFirstToken(self):
         return self.functionToken;
 
-    def __str__(self):
-        return self.functionToken.text + "(" + str(self.right) + ")"
+    def renderSource(self):
+        return '-' + self.right.renderSource()
 
 class FunctionCall(Node):
     def __init__(self, function_name, args):
@@ -195,7 +207,7 @@ class FunctionCall(Node):
     def getFirstToken(self):
         return self.function_name;
 
-    def __str__(self):
+    def renderSource(self):
         return str(self.function_name) + '(' + ','.join(map(str,self.args)) + ')'
 
 def parseStringLiteral(text):

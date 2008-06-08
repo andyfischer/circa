@@ -6,6 +6,7 @@
 # Depends on expression.py for expression parsing
 
 from Circa.core import ca_codeunit
+from Circa.parser import ast
 import expression as _expression_module
 import tokens as _tokens_module
 from tokens import *
@@ -78,6 +79,8 @@ def expression_statement(pstate):
         resultAst = _expression_module.parseExpression(pstate.tokens)
         term = resultAst.createTerms(pstate.codeUnit)
 
+        pstate.codeUnit.statementAsts.append(resultAst)
+
     except _expression_module.MatchFailed, e:
         pstate.tokens.restoreMark(mark)
         raise parse_errors.ExpectedExpression(pstate.tokens.next())
@@ -85,4 +88,6 @@ def expression_statement(pstate):
 def new_line(pstate):
     # Ignore NEWLINE
     pstate.tokens.consume(NEWLINE)
+
+    # pstate.codeUnit.statementAsts.append(ast.BlankLine())
 
