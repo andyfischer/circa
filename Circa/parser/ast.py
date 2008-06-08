@@ -13,6 +13,10 @@ from token_definitions import *
 class Node(object):
     pass
 
+class AssignStatement(Node):
+    def __init__(self, leftToken, rightAst):
+        pass
+
 class Infix(Node):
     def __init__(self, functionToken, left, right):
         assert isinstance(left, Node)
@@ -43,19 +47,25 @@ class Infix(Node):
             return codeUnit.createTerm(trainingFunc, [leftTerm, rightTerm])
 
         # Evaluate as a right-arrow?
+        # (Not supported yet)
+        """
         if self.token.match == RIGHT_ARROW:
             left_inputs = self.left.createTerms(codeUnit)
             right_func = self.right.createTerms(codeUnit)
 
             return codeUnit.createTerm(right_func, inputs=[left_inputs])
+        """
 
         # Normal function?
         # Try to find a defined operator
         normalFunction = getOperatorFunction(codeUnit, self.token)
         if normalFunction is not None:
 
-            return codeUnit.createTerm(normalFunction,
-                inputs=[self.left.createTerms(codeUnit), self.right.createTerms(codeUnit)] )
+            newTerm = codeUnit.createTerm(normalFunction,
+                inputs=[self.left.createTerms(codeUnit),
+                        self.right.createTerms(codeUnit)])
+            newTerm.ast = self
+            return newTerm
 
         # Evaluate as a function + assign?
         # Try to find an assign operator
@@ -101,6 +111,8 @@ class Literal(Node):
         else:
             newTerm = builder.createConstant(self.circaType)
 
+        newTerm.ast = self
+
         # Assign value
         # Future: do this in a more typesafe way
         newTerm.cachedValue = self.value
@@ -137,7 +149,7 @@ class Unary(Node):
         self.right = right
 
     def createTerms(self, builder):
-        return builder.getTerm(builtins.MULT,
+        return builder.createTerm(builtins.MULT,
                                inputs = [builder.createConstant(-1),
                                          self.right.createTerms(builder)])
 
@@ -162,7 +174,9 @@ class FunctionCall(Node):
 
         # Check for Function
         if func.getType() is builtins.FUNCTION_TYPE:
-            return builder.createTerm(func, inputs=arg_terms)
+            newTerm = builder.createTerm(func, inputs=arg_terms)
+            newTerm.ast = self
+            return newTerm
 
         # Check for Subroutine
         elif func.getType() is builtins.SUBROUTINE_TYPE:

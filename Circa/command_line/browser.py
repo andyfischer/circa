@@ -2,8 +2,9 @@
 
 import os,sys,pdb
 from string import Template
-from Circa.core import (builtins, ca_type, ca_function)
 from Circa import (debug, parser)
+from Circa.core import (builtins, ca_type, ca_function)
+from Circa.services import to_source
 
 loaded_modules = {}
 
@@ -79,6 +80,9 @@ class Browser(object):
         elif command == 'trace' or command == 'tr':
             term = self.getTermFromIdentifier(commandArgs)
             term.execute_trace()
+
+        elif command == 'render' or command == "ren":
+            print (to_source.codeToSource(self.codeUnit))
 
         elif command == 'switch' or command == 'sw':
             module_name = commandArgs.strip()

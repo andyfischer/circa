@@ -6,8 +6,8 @@ from Circa.builders import function_builder
 from Circa.core import (builtins, ca_function, ca_type)
 from Circa import debug
 
-class Whitespace(function_builder.BaseFunction):
-    name = "_whitespace"
+class Syntax(function_builder.BaseFunction):
+    name = "_syntax"
     inputTypes = [builtins.VOID_TYPE]
     outputType = builtins.VOID_TYPE
 
@@ -15,9 +15,5 @@ class Whitespace(function_builder.BaseFunction):
     def evaluate(cxt):
         pass
 
-
-functionDefs = [Whitespace]
-
 def createFunctions(codeUnit):
-    for functionDef in functionDefs:
-        function_builder.createFunction(codeUnit, functionDef)
+    builtins.SYNTAX_FUNC = function_builder.createFunction(codeUnit, Syntax)
