@@ -11,8 +11,8 @@ class Equals(function_builder.BaseFunction):
     pureFunction = True
 
     @staticmethod
-    def evaluate(term,a,b):
-        return a == b
+    def evaluate(context):
+        return context.input(0) == context.input(1)
 
 class NotEquals(function_builder.BaseFunction):
     name = 'not_equals'
@@ -21,8 +21,8 @@ class NotEquals(function_builder.BaseFunction):
     pureFunction = True
 
     @staticmethod
-    def evaluate(term,a,b):
-        return a != b
+    def evaluate(context):
+        return context.input(0) != context.input(1)
 
 functionDefs = [Equals, NotEquals]
 

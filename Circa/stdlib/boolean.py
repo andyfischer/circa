@@ -10,8 +10,8 @@ class And(function_builder.BaseFunction):
     outputType = builtins.BOOL_TYPE
 
     @staticmethod
-    def evaluate(a, b):
-        return a and b
+    def evaluate(context):
+        return context.input(0) and context.input(1)
 
 class Or(function_builder.BaseFunction):
     name = "or"
@@ -19,8 +19,8 @@ class Or(function_builder.BaseFunction):
     outputType = builtins.BOOL_TYPE
 
     @staticmethod
-    def evaluate(a, b):
-        return a or b
+    def evaluate(context):
+        return context.input(0) or context.input(1)
 
 functionDefs = [And, Or]
 

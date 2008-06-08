@@ -5,6 +5,7 @@ from string import Template
 from Circa.core import (builtins, ca_type, ca_function)
 from Circa import (debug, parser)
 
+loaded_modules = {}
 
 class Browser(object):
     def __init__(self, codeUnit=None):
@@ -34,12 +35,13 @@ class Browser(object):
             for term in self.codeUnit.allTerms:
                 print self.describeTerm(term, template)
 
-        elif command == 'details':
+        elif command == 'details' or command == 'd':
             term = self.getTermFromIdentifier(commandArgs)
             if term is None:
                 print "Couldn't find '%s'" % commandArgs
+                return
 
-            print self.describeTerm(term, "$id: $func_name($input_ids) = $value")
+            print self.describeTerm(term, "$id: $func_id($input_ids) = $value")
 
         elif command == 'create' or command == 'c':
             ast = parser.parseExpression(commandArgs)
@@ -48,21 +50,58 @@ class Browser(object):
             print str(result)
             result.execute()
 
+        elif command == 'update' or command == 'up':
+            term = self.getTermFromIdentifier(commandArgs)
+            term.update()
+            print str(term)
+
+        elif command == 'exec' or command == 'e':
+            term = self.getTermFromIdentifier(commandArgs)
+            term.execute()
+            print str(term)
+
+        elif command == 'func' or command == 'f':
+            term = self.getTermFromIdentifier(commandArgs)
+            print self.describeTerm(term.functionTerm)
+
+        elif command == 'inputs' or command == 'i':
+            term = self.getTermFromIdentifier(commandArgs)
+            print map(lambda term: self.describeTerm(term, "$id"), term.inputs)
+
         elif command == 'users':
             term = self.getTermFromIdentifier(commandArgs)
             print map(lambda term: self.describeTerm(term, "$id"), term.users)
 
-        elif command == 'state':
+        elif command == 'state' or command == 'st':
             term = self.getTermFromIdentifier(commandArgs)
             print term.state
 
+        elif command == 'trace' or command == 'tr':
+            term = self.getTermFromIdentifier(commandArgs)
+            term.execute_trace()
+
+        elif command == 'switch' or command == 'sw':
+            module_name = commandArgs.strip()
+            if module_name not in loaded_modules:
+                print "Couldn't find module: " + module_name
+                return
+
+            self.codeUnit = loaded_modules[module_name]
+            print "Switched to: " + module_name
+
+        elif command == "":
+            return
+
         else:
             # Interpret as a Circa expression
-            ast = parser.parseExpression(inputStr)
-            print ast
-            result = ast.eval(self.codeUnit)
-            print str(result)
-            result.execute()
+            try:
+                ast = parser.parseExpression(inputStr)
+                print ast
+                result = ast.eval(self.codeUnit)
+                print str(result)
+                result.execute()
+            except Exception,e:
+                print e
 
     def getIdentifier(self, term):
         return self.codeUnit.getIdentifier(term)
@@ -128,10 +167,16 @@ def findUsersFilename(filename):
             return possibility
 
     return None
-    
+
+def removeFilePrefix(filename):
+    if filename.endswith('.ca'):
+        return filename[:-3]
 
 def main():
     import Circa.core.bootstrap
+
+    global loaded_modules
+    loaded_modules['kernel'] = builtins.KERNEL
 
     targetCodeUnit = None
 
@@ -155,7 +200,11 @@ def main():
                 print str(error)
             return
 
+        loaded_modules[removeFilePrefix(filename)] = codeUnit
+
         targetCodeUnit = codeUnit
+        targetCodeUnit.execute()
+        targetCodeUnit.updateAll()
 
     browser = Browser(targetCodeUnit)
 

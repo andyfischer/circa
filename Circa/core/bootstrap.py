@@ -87,12 +87,12 @@ def bootstrapKernel(kernel):
     ca_function.setOutputType(constFuncFunc, functionType)
 
     # Define a function for constant-generator
-    def constGeneratorEvaluate(term):
-        inputType = term.getInput(0)
-        ca_function.setOutputType(term, inputType)
-        ca_function.setEvaluateFunc(term, emptyFunction)
-        ca_function.setHasState(term, True)
-        ca_function.setName(term, 'const-' + ca_type.name(inputType))
+    def constGeneratorEvaluate(cxt):
+        inputType = cxt.inputTerm(0)
+        ca_function.setOutputType(cxt.caller(), inputType)
+        ca_function.setEvaluateFunc(cxt.caller(), emptyFunction)
+        ca_function.setHasState(cxt.caller(), True)
+        ca_function.setName(cxt.caller(), 'const-' + ca_type.name(inputType))
 
     # Define an evaluate function for constant functions
     #def constFuncEvaluate
@@ -118,10 +118,6 @@ builtins.KERNEL = kernel
 
 bootstrapKernel(kernel)
 
-# temp: attempt to create something
-#x = kernel.createTerm(builtins.CONST_GENERATOR, [builtins.FUNCTION_TYPE])
-#print "created: " + kernel.getIdentifier(x)
-
 builtin_types.createBuiltinTypes(kernel)
 
 # Create stdlib
@@ -129,3 +125,5 @@ builtin_types.createBuiltinTypes(kernel)
 
 from Circa import stdlib
 stdlib.createFunctions(kernel)
+
+builtins.KERNEL_LOADED = True

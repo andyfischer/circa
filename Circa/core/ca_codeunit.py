@@ -132,6 +132,10 @@ class CodeUnit(object):
         for term in self.allTerms:
             term.update()
 
+    def execute(self):
+        for term in self.allTerms:
+            term.execute()
+
     def _recalculateAllUserSets(self):
         for term in self.allTerms:
             term.users = set()

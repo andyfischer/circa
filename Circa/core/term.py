@@ -6,6 +6,8 @@
 # When possible, code for manimulating or comparing terms should be placed elsewhere,
 # such as in CodeUnit
 
+import pdb
+
 import ca_function, ca_type
 
 nextGlobalID = 1
@@ -30,6 +32,8 @@ class Term(object):
         self.givenName = None
         self.debugName = None
         self.feedbackAccumulator = None
+
+        self.executionContext = TermExecutionContext(self)
    
         global nextGlobalID
         self.globalID = nextGlobalID
@@ -44,22 +48,23 @@ class Term(object):
         return ca_function.outputType(self.functionTerm)
   
     def update(self):
-        if not self.needsUpdate:
-            return
+        #if not self.needsUpdate:
+            #return
 
         # Functions with side effects should not run during an
         # update() call.
         if not ca_function.pureFunction(self.functionTerm):
             return
 
-        ca_function.evaluateFunc(self.functionTerm)(self)
-
+        ca_function.evaluateFunc(self.functionTerm)(self.executionContext)
         self.needsUpdate = False
 
     def execute(self):
-        if not self.needsUpdate:
-            return
-        ca_function.evaluateFunc(self.functionTerm)(self)
+        ca_function.evaluateFunc(self.functionTerm)(self.executionContext)
+        self.needsUpdate = False
+
+    def execute_trace(self):
+        pdb.runcall(ca_function.evaluateFunc(self.functionTerm), self.executionContext)
         self.needsUpdate = False
   
     # value accessors
@@ -73,3 +78,17 @@ class Term(object):
   
     def __str__(self):
         return ca_type.toStringFunc(self.getType())(self)
+
+class TermExecutionContext(object):
+    """
+    This object is provided to evaluate functions when updating.
+    """
+    
+    def __init__(self, term):
+        self.targetTerm = term
+    def inputTerm(self, index):
+        return self.targetTerm.getInput(index)
+    def input(self, index):
+        return self.targetTerm.getInput(index).cachedValue
+    def caller(self):
+        return self.targetTerm
