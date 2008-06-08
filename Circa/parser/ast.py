@@ -4,11 +4,10 @@
 # Defines classes for an abstract syntax tree
 
 import parse_errors, tokens
-from Circa import debug
 from Circa.core import (builtins, ca_string, ca_function, ca_type)
 from Circa.core.term import Term
-from Circa.common import errors
-from Circa.debug.spy_object import SpyObject
+from Circa.common import (debug, errors)
+from Circa.utils.spy_object import SpyObject
 from token_definitions import *
 
 class Node(object):

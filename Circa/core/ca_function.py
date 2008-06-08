@@ -1,7 +1,6 @@
 
-from Circa import debug
+from Circa.common import debug
 from Circa.core.term import Term
-import Circa.debug
 
 class CircaFunction(object):
     def __init__(self):

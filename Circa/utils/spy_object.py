@@ -41,4 +41,3 @@ class SpyObject(object):
 
     def expectCall(self, call, returnVal=None):
         self.expectedCalls.append([call,returnVal]) 
-#print '1:',digestFunctionCall('createConstant', [], kwargs={'sourceToken':'1'})

@@ -1,5 +1,5 @@
 
-from Circa import debug
+from Circa.common import debug
 import builtins, ca_type, ca_function
 
 def intInitialize(term):

@@ -3,8 +3,8 @@ Define the CodeUnit class
 """
 import itertools, pdb
 
+from Circa.common import debug
 import builtins, ca_function, ca_type
-from Circa import debug
 from term import Term
 
 class CodeUnit(object):

@@ -2,7 +2,7 @@
 # Code for turning a string into a list of tokens
 
 import pdb, re
-from Circa import debug
+from Circa.common import debug
 import parse_errors
 from token_definitions import *
 
