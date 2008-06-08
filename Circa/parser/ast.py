@@ -22,11 +22,11 @@ class Infix(Node):
         self.left = left
         self.right = right
 
-    def eval(self, codeUnit):
+    def createTerms(self, codeUnit):
 
         # Evaluate as an assignment?
         if self.token.match == EQUALS:
-            right_term = self.right.eval(codeUnit)
+            right_term = self.right.createTerms(codeUnit)
             if not isinstance(right_term, Term):
                 raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
             codeUnit.bindName(right_term, str(self.left))
@@ -34,8 +34,8 @@ class Infix(Node):
 
         # Evaluate as feedback?
         if self.token.match == COLON_EQUALS:
-            leftTerm = self.left.eval(codeUnit)
-            rightTerm = self.right.eval(codeUnit)
+            leftTerm = self.left.createTerms(codeUnit)
+            rightTerm = self.right.createTerms(codeUnit)
             trainingFunc = ca_function.feedbackFunc(leftTerm.functionTerm)
 
             debug._assert(leftTerm is not None)
@@ -44,8 +44,8 @@ class Infix(Node):
 
         # Evaluate as a right-arrow?
         if self.token.match == RIGHT_ARROW:
-            left_inputs = self.left.eval(codeUnit)
-            right_func = self.right.eval(codeUnit)
+            left_inputs = self.left.createTerms(codeUnit)
+            right_func = self.right.createTerms(codeUnit)
 
             return codeUnit.createTerm(right_func, inputs=[left_inputs])
 
@@ -55,7 +55,7 @@ class Infix(Node):
         if normalFunction is not None:
 
             return codeUnit.createTerm(normalFunction,
-                inputs=[self.left.eval(codeUnit), self.right.eval(codeUnit)] )
+                inputs=[self.left.createTerms(codeUnit), self.right.createTerms(codeUnit)] )
 
         # Evaluate as a function + assign?
         # Try to find an assign operator
@@ -63,7 +63,7 @@ class Infix(Node):
         if assignFunction is not None:
             # create a term that's the result of the operation
             result_term = codeUnit.createTerm(assignFunction,
-               inputs=[self.left.eval(codeUnit), self.right.eval(codeUnit)])
+               inputs=[self.left.createTerms(codeUnit), self.right.createTerms(codeUnit)])
 
             # bind the name to this result
             codeUnit.bindName(result_term, str(self.left))
@@ -94,7 +94,7 @@ class Literal(Node):
         else:
             raise parse_errors.InternalError("Couldn't recognize token: " + str(token))
 
-    def eval(self, builder):
+    def createTerms(self, builder):
         # Create a term
         if self.hasQuestionMark:
             newTerm = builder.createVariable(self.circaType)
@@ -117,7 +117,7 @@ class Ident(Node):
     def __init__(self, token):
         self.token = token
 
-    def eval(self, builder):
+    def createTerms(self, builder):
         term = builder.getNamed(self.token.text)
 
         if not term:
@@ -136,10 +136,10 @@ class Unary(Node):
         self.functionToken = functionToken
         self.right = right
 
-    def eval(self, builder):
+    def createTerms(self, builder):
         return builder.getTerm(builtins.MULT,
                                inputs = [builder.createConstant(-1),
-                                         self.right.eval(builder)])
+                                         self.right.createTerms(builder)])
 
     def getFirstToken(self):
         return self.functionToken;
@@ -152,8 +152,8 @@ class FunctionCall(Node):
         self.function_name = function_name
         self.args = args
 
-    def eval(self, builder):
-        arg_terms = [term.eval(builder) for term in self.args]
+    def createTerms(self, builder):
+        arg_terms = [term.createTerms(builder) for term in self.args]
         func = builder.getNamed(self.function_name.text)
 
         if func is None:
@@ -243,7 +243,7 @@ def testInfix():
     fakeBuilder.expectCall('getNamed(sum)', returnVal = fakeSumFunc)
     fakeBuilder.expectCall('createTerm(1,2)')
     
-    expr.eval(fakeBuilder)
+    expr.createTerms(fakeBuilder)
 
 if __name__ == "__main__":
     testInfix()
