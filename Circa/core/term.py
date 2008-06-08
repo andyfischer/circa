@@ -48,9 +48,6 @@ class Term(object):
         return ca_function.outputType(self.functionTerm)
   
     def update(self):
-        #if not self.needsUpdate:
-            #return
-
         # Functions with side effects should not run during an
         # update() call.
         if not ca_function.pureFunction(self.functionTerm):

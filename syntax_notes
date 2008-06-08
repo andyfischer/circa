@@ -1,0 +1,10 @@
+
+Example:
+
+Identifier term, needs to have the name used
+
+Question:
+
+How to handle different occurances of a term? Using identifiers allows us to
+reference the same term in different ways. Where do we store these different
+versions?
