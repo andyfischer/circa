@@ -11,8 +11,8 @@ class Add(function_builder.BaseFunction):
     pureFunction = True
 
     @staticmethod
-    def evaluate(term,a,b):
-        return a + b
+    def evaluate(cxt):
+        return cxt.input(0) + cxt.input(1)
 
 class Subtract(function_builder.BaseFunction):
     name = 'sub'
@@ -21,8 +21,8 @@ class Subtract(function_builder.BaseFunction):
     pureFunction = True
 
     @staticmethod
-    def evaluate(term,a,b):
-        return a - b
+    def evaluate(cxt):
+        return cxt.input(0) - cxt.input(1)
 
 class Mult(function_builder.BaseFunction):
     name = 'mult'
@@ -31,8 +31,8 @@ class Mult(function_builder.BaseFunction):
     pureFunction = True
 
     @staticmethod
-    def evaluate(term,a,b):
-        return a * b
+    def evaluate(cxt):
+        return cxt.input(0) * cxt.input(1)
 
 class Divide(function_builder.BaseFunction):
     name = 'div'
@@ -41,8 +41,8 @@ class Divide(function_builder.BaseFunction):
     pureFunction = True
 
     @staticmethod
-    def evaluate(term,a,b):
-        return a / b
+    def evaluate(cxt):
+        return cxt.input(0) / cxt.input(1)
     
 
 functionDefs = [Add, Subtract, Mult, Divide]

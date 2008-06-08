@@ -5,7 +5,7 @@
 
 import parse_errors, tokens
 from Circa import debug
-from Circa.core import (builtins, ca_string)
+from Circa.core import (builtins, ca_string, ca_function, ca_type)
 from Circa.core.term import Term
 from Circa.debug.spy_object import SpyObject
 from token_definitions import *
@@ -32,6 +32,16 @@ class Infix(Node):
             codeUnit.bindName(right_term, str(self.left))
             return right_term
 
+        # Evaluate as feedback?
+        if self.token.match == COLON_EQUALS:
+            leftTerm = self.left.eval(codeUnit)
+            rightTerm = self.right.eval(codeUnit)
+            trainingFunc = ca_function.feedbackFunc(leftTerm.functionTerm)
+
+            debug._assert(leftTerm is not None)
+            debug._assert(rightTerm is not None)
+            return codeUnit.createTerm(trainingFunc, [leftTerm, rightTerm])
+
         # Evaluate as a right-arrow?
         if self.token.match == RIGHT_ARROW:
             left_inputs = self.left.eval(codeUnit)
@@ -41,7 +51,7 @@ class Infix(Node):
 
         # Normal function?
         # Try to find a defined operator
-        normalFunction = getOperatorFunction(codeUnit, self.token.match)
+        normalFunction = getOperatorFunction(codeUnit, self.token)
         if normalFunction is not None:
 
             return codeUnit.createTerm(normalFunction,
@@ -179,16 +189,21 @@ def parseStringLiteral(text):
     return text.strip("'\"")
 
 def getOperatorFunction(codeUnit, token):
+    """
     # Special case: := operator
     if token == COLON_EQUALS:
         return builtins.FEEDBACK_FUNC
+        """
 
     # Turn the token's text into a Circa string
     tokenAsString = codeUnit.createConstant(builtins.STRING_TYPE)
-    ca_string.set(tokenAsString, token.text)
+    ca_string.setValue(tokenAsString, token.text)
 
     # Find _operator function
     operatorFunc = codeUnit.getNamed('_operator')
+
+    if operatorFunc is None:
+        raise parse_errors.NoFunctionForOperator(token)
 
     # Access the operator function
     operatorAccessor = codeUnit.createTerm(operatorFunc, [tokenAsString])

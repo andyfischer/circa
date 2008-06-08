@@ -30,8 +30,7 @@ def createFunction(codeUnit, functionDef):
     ca_function.setPureFunction(term, functionDef.pureFunction)
     ca_function.setHasState(term, functionDef.hasState)
     ca_function.setInitializeFunc(term, functionDef.initialize)
-    ca_function.setEvaluateFunc(term,
-            convertPythonFuncToCircaEvaluate(functionDef.evaluate))
+    ca_function.setEvaluateFunc(term, functionDef.evaluate)
     codeUnit.bindName(term, functionDef.name)
     return term
 

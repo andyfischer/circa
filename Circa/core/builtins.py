@@ -1,3 +1,4 @@
 
 
+KERNEL_LOADED = False
 

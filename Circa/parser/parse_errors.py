@@ -64,6 +64,9 @@ def ExpressionDidNotEvaluateToATerm(token):
 def FoundMultipleExpressionsOnLine(token):
    return ParseError(token, "Found multiple expressions on a single line. Seperate these with ; or newlines")
 
+def NoFunctionForOperator(token):
+    return ParseError(token, "No function defined for operator: " + token.text)
+
 def InternalError(token, details=None):
    message = "Internal error"
    if details is not None: message += ": " + details
