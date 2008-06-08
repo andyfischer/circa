@@ -8,7 +8,7 @@ from Circa import debug
 
 class Whitespace(function_builder.BaseFunction):
     name = "_whitespace"
-    inputTypes = builtins.VOID_TYPE
+    inputTypes = [builtins.VOID_TYPE]
     outputType = builtins.VOID_TYPE
 
     @staticmethod

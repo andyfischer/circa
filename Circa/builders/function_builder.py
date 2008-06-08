@@ -1,5 +1,6 @@
 
 from Circa.core import (builtins, ca_function)
+from Circa.core.term import Term
 
 
 # This class allows Python code to create a function in a convenient
@@ -23,6 +24,12 @@ class BaseFunction(object):
     """
 
 def createFunction(codeUnit, functionDef):
+    # Do some type checks
+    if not isinstance(functionDef.inputTypes, list):
+        raise Exception("In %s, inputTypes is not a list" % functionDef.__name__)
+    if not isinstance(functionDef.outputType, Term):
+        raise Exception("In %s, outputType is not a Term" % functionDef.__name__)
+
     term = codeUnit.createConstant(builtins.FUNCTION_TYPE)
     ca_function.setName(term, functionDef.name)
     ca_function.setInputTypes(term, functionDef.inputTypes)
