@@ -53,11 +53,6 @@ class TokenStream(object):
         # Default is to skip whitespace
         self.skipSet = set([WHITESPACE])
 
-        # Default comment character is pound
-        # Disabled, comments are returned as tokens
-        # self.commentSet = set([POUND])
-        self.commentSet = set()
-
         self.currentIndex = 0
 
     def next(self, lookahead=0):
@@ -100,15 +95,9 @@ class TokenStream(object):
         Returns the index after skipping. If the token at 'index' is not skippable,
         this function will just return 'index'.
 
-        There are currently two cases that we skip: 1) individual tokens that are
-        in skipSet (which includes WHITESPACE and sometimes NEWLINE), and 2) when we
-        encounter a POUND we skip up to NEWLINE
-
         In the process of skipping, this function may reach the end of the stream
         Callers should probably check for that.
         """
-
-        currentlyInComment = False
 
         while True:
             # Finish if we reach the end of the stream
@@ -117,20 +106,8 @@ class TokenStream(object):
 
             token = self.tokens[index]
 
-            # Check to start a comment
-            if token.match in self.commentSet:
-                currentlyInComment = True
-
-            # Check to finish comment
-            elif token.match is NEWLINE:
-                currentlyInComment = False
-
             # Check for a skippable token
             if token.match in self.skipSet:
-                pass
-
-            # Continue a comment
-            elif currentlyInComment:
                 pass
 
             # Otherwise finish and return
