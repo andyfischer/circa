@@ -20,9 +20,11 @@ class Node(object):
     def __str__(self):
         return self.renderSource()
 
-class BlankLine(Node):
-    def __str__(self):
-        return "\n"
+class IgnoredSyntax(Node):
+    def __init__(self, token):
+        self.token = token
+    def renderSource(self):
+        return self.token.text
 
 class Infix(Node):
     def __init__(self, functionToken, left, right):
