@@ -70,6 +70,8 @@ def statement(pstate):
         close_block(pstate)
     elif next_token.match == NEWLINE:
         new_line(pstate)
+    elif next_token.match == COMMENT_LINE:
+        comment_line(pstate)
     else:
         expression_statement(pstate)
 
@@ -91,3 +93,6 @@ def new_line(pstate):
 
     # pstate.codeUnit.statementAsts.append(ast.BlankLine())
 
+def comment_line(pstate):
+    comment = pstate.tokens.consume(COMMENT_LINE)
+    pstate.codeUnit.statementAsts.append(ast.IgnoredSyntax(comment))

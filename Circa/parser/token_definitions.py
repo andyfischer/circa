@@ -18,7 +18,7 @@ class TokenDef(object):
             self.raw_string = raw
 
         elif pattern:
-            self.pattern = re.compile( pattern )
+            self.pattern = re.compile( pattern, re.MULTILINE )
 
         else:
             self.pattern = None
@@ -101,13 +101,10 @@ INTEGER =       TokenDef(71, 'integer', pattern=r"([1-9]+[0-9]*)|0")
 IDENT =         TokenDef(72, 'ident', pattern=r"[a-zA-Z_\-][a-zA-Z0-9_\-]*")
 STRING =        TokenDef(73, 'string', pattern=group(r"'[^']*'", r"\"[^\"]*\""))
 WHITESPACE =    TokenDef(75, 'whitespace', pattern=r"[ \t]+")
-#POUND_IDENT =   TokenDef(75, 'pound_ident', pattern="#" + word(alphanumeric+'*'))
+COMMENT_LINE =  TokenDef(76, 'comment_line', pattern=r"#.*$")
 
 # this needs to be below FLOAT
 DOT =           TokenDef(27, 'dot', '.')
-
-# this needs to be below POUND_IDENT
-POUND =         TokenDef(30, 'pound', '#')
 
 # Meta types
 UNRECOGNIZED =  TokenDef(80, 'unrecognized', '')

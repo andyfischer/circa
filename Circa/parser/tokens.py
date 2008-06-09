@@ -54,7 +54,9 @@ class TokenStream(object):
         self.skipSet = set([WHITESPACE])
 
         # Default comment character is pound
-        self.commentSet = set([POUND])
+        # Disabled, comments are returned as tokens
+        # self.commentSet = set([POUND])
+        self.commentSet = set()
 
         self.currentIndex = 0
 
@@ -272,7 +274,12 @@ def commentTest():
     strm = tokenize('{x #= 1+2}')
     strm.consume('LBRACKET')
     strm.consume('IDENT')
+    strm.consume('COMMENT_LINE')
     debug._assert(strm.finished())
+
+def commentLineTest():
+    strm = tokenize('1 2 3\n# commented line\n  1 # more comments')
+
     
 if __name__ == "__main__":
     tokenStreamTest()
