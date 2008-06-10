@@ -66,4 +66,5 @@ def createBuiltinTypes(kernel):
     builtins.BOOL_TYPE = boolType
     builtins.FLOAT_TYPE = floatType
     builtins.REFERENCE_TYPE = referenceType
+    builtins.REF_TYPE = builtins.REFERENCE_TYPE
     builtins.VOID_TYPE = voidType

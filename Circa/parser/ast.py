@@ -49,11 +49,9 @@ class Infix(Node):
         if self.token.match == COLON_EQUALS:
             leftTerm = self.left.createTerms(codeUnit)
             rightTerm = self.right.createTerms(codeUnit)
-            trainingFunc = ca_function.feedbackFunc(leftTerm.functionTerm)
-
             debug._assert(leftTerm is not None)
             debug._assert(rightTerm is not None)
-            return codeUnit.createTerm(trainingFunc, [leftTerm, rightTerm])
+            return codeUnit.createTerm(builtins.FEEDBACK_FUNC, [leftTerm, rightTerm])
 
         # Evaluate as a right-arrow?
         # (Not supported yet)

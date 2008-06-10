@@ -24,10 +24,9 @@ class CircaFunction(object):
         # welcome to do other things too.
         self.evaluateFunc = None
 
-        # void feedbackFunc(Term)
-        # feedbackFunc should return a Function term. This function should
-        # take inputs: (desired, target)
-        self.feedbackFunc = None
+        self.feedbackAccumulator = None
+
+        self.feedbackPropagator = None
 
 def initializeTerm(term):
     term.cachedValue = CircaFunction()
@@ -55,8 +54,10 @@ def initializeFunc(term):
 def evaluateFunc(term):
     debug._assert(term.cachedValue.evaluateFunc is not None)
     return term.cachedValue.evaluateFunc
-def feedbackFunc(term):
-    return term.cachedValue.feedbackFunc
+def feedbackAccumulator(term):
+    return term.cachedValue.feedbackAccumulator
+def feedbackPropagator(term):
+    return term.cachedValue.feedbackPropagator
     
 # Setters
 def setName(term, name):
@@ -84,5 +85,7 @@ def setInitializeFunc(term, func):
 def setEvaluateFunc(term, func):
     term.cachedValue.evaluateFunc = func
 
-def setFeedbackFunc(term, func):
-    term.cachedValue.feedbackFunc = func
+def setFeedbackAccumulator(term, func):
+    term.cachedValue.feedbackAccumulator = func
+def setFeedbackPropagator(term, func):
+    term.cachedValue.feedbackPropagator = func

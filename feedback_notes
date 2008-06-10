@@ -1,0 +1,38 @@
+
+
+Some functions have a feedback accumulator
+
+When we create a feedback term:
+
+ Check if the function has a feedback accumulator
+ If yes:
+    Find an existing instance of the accumulator.
+    If none found, create a new one
+    Add the 'desired' term as an input to the accumulator
+    Use accumulator as 'desired'
+ If no:
+    Just use 'desired'
+
+ (Things that might have feedback-accumulators: most functions
+  involving numbers)
+
+ Find the function's feedback-assigner (if any)
+ Create an instance of feedback-assigner, use the original term
+ and 'desired' as inputs.
+ (Things that might have feedback-assigners: variables or 
+  variable accessors)
+
+ Find the function's feedback-propogator (if any)
+ Use original term and 'desired' as inputs.
+ This function should produce feedback terms for all
+ of original's inputs.
+
+ (Observation: no need to distinguish between feedback-assigner
+  and feedback-propogator?)
+ 
+
+
+Note that many of these operations depend on the items being constant.
+If they are not constant, this code will have to be modifid to handle
+the situation where they change.
+    
