@@ -1,6 +1,5 @@
 
 import pdb
-
 from Circa.builders import function_builder
 from Circa.core import (builtins, ca_function, ca_type)
 from Circa.common import debug
@@ -29,7 +28,7 @@ class MapConstructor(function_builder.BaseFunction):
         ca_function.setHasState(cxt.caller(), False)
         ca_function.setPureFunction(cxt.caller(), True)
         ca_function.setEvaluateFunc(cxt.caller(), MapAccess_evaluate)
-        ca_function.setFeedbackFunc(cxt.caller(), MAP_FEEDBACK)
+        ca_function.setFeedbackPropagator(cxt.caller(), MAP_FEEDBACK)
 
 def MapAccess_evaluate(cxt):
     hashtable = cxt.caller().functionTerm.state
@@ -41,7 +40,7 @@ def MapAccess_evaluate(cxt):
 
 class MapFeedback(function_builder.BaseFunction):
     name = 'map-feedback'
-    inputTypes = [builtins.FUNCTION_TYPE, builtins.REFERENCE_TYPE]
+    inputTypes = [builtins.REFERENCE_TYPE, builtins.REFERENCE_TYPE]
     outputType = builtins.VOID_TYPE
     hasState = False
     pureFunction = False

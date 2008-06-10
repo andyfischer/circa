@@ -1,0 +1,7 @@
+
+
+Every term should have access a term called 'Execution condition'
+This represents the condition of the enclosing if-statement (if any)
+Or all the if statements.
+Usually this will just be True
+

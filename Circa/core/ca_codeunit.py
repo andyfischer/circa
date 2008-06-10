@@ -24,6 +24,7 @@ class CodeUnit(object):
     def _newTerm(self):
         "Internal method. Returns a new Term object."
         new_term = Term()
+        new_term.codeUnit = self
         self.allTerms.append(new_term)
         return new_term
 
