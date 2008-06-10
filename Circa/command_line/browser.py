@@ -48,7 +48,7 @@ class Browser(object):
         elif command == 'create' or command == 'c':
             ast = parser.parseExpression(commandArgs)
             print ast
-            result = ast.eval(self.codeUnit)
+            result = ast.createTerms(self.codeUnit)
             print str(result)
             result.execute()
 
@@ -102,7 +102,7 @@ class Browser(object):
             try:
                 ast = parser.parseExpression(inputStr)
                 print ast
-                result = ast.eval(self.codeUnit)
+                result = ast.createTerms(self.codeUnit)
                 print str(result)
                 result.execute()
             except Exception,e:
