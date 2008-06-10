@@ -26,13 +26,9 @@ When we create a feedback term:
  Use original term and 'desired' as inputs.
  This function should produce feedback terms for all
  of original's inputs.
-
- (Observation: no need to distinguish between feedback-assigner
-  and feedback-propogator?)
- 
+ (Future: return a list instead of actually attaching things?)
 
 
 Note that many of these operations depend on the items being constant.
 If they are not constant, this code will have to be modifid to handle
 the situation where they change.
-    

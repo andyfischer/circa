@@ -21,6 +21,10 @@ class Feedback(function_builder.BaseFunction):
 
         # Todo: send desired through an accumulator.
 
+        if feedbackPropagator is None:
+            print "Error: no feedback propagator for", ca_function.name(target.functionTerm)
+            return
+
         cxt.codeUnit().createTerm(feedbackPropagator, [target, desired])
 
 def createFunctions(codeUnit):
