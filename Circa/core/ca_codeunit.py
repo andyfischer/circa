@@ -149,6 +149,7 @@ class CodeUnit(object):
             for input in term.inputs:
                 input.users.add(term)
 
+
 def findExistingEquivalent(function, inputs):
     """
     This function finds an existing term that uses the given function,

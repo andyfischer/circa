@@ -71,7 +71,7 @@ class Infix(Node):
 
         # Normal function?
         # Try to find a defined operator
-        normalFunction = getOperatorFunction(context.compilationCU, self.token)
+        normalFunction = getOperatorFunction(context.resultCU, self.token)
         if normalFunction is not None:
 
             newTerm = context.resultCU.createTerm(normalFunction,
@@ -183,7 +183,7 @@ class FunctionCall(Node):
 
     def createTerms(self, context):
         arg_terms = [term.createTerms(context) for term in self.args]
-        func = context.compilationCU.getNamed(self.function_name.text)
+        func = context.resultCU.getNamed(self.function_name.text)
 
         if func is None:
             raise parse_errors.InternalError(self.function_name,
@@ -191,7 +191,7 @@ class FunctionCall(Node):
 
         # Check for Function
         if func.getType() is builtins.FUNCTION_TYPE:
-            newTerm = context.compilationCU.createTerm(func, inputs=arg_terms)
+            newTerm = context.resultCU.createTerm(func, inputs=arg_terms)
             newTerm.ast = self
             return newTerm
 
@@ -199,11 +199,11 @@ class FunctionCall(Node):
         elif func.getType() is builtins.SUBROUTINE_TYPE:
 
             # Todo: special behavior for invoking subroutines
-            return context.compilationCU.createTerm(builtins.INVOKE_SUB_FUNC)
+            return context.resultCU.createTerm(builtins.INVOKE_SUB_FUNC)
 
         # Temp: Use a Python dynamic type check to see if this is a function
         elif isinstance(func.pythonValue, ca_function._Function):
-            return context.compilationCU.createTerm(func, inputs=arg_terms)
+            return context.resultCU.createTerm(func, inputs=arg_terms)
 
         else:
             raise parse_errors.InternalError(self.function_name,
