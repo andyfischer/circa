@@ -5,10 +5,10 @@ from string import Template
 from Circa import parser
 from Circa.common import debug
 from Circa.core import (builtins, ca_codeunit, ca_type, ca_function)
-from Circa.services import to_source
+from Circa.services import (code_builder, to_source)
 
 LOADED_MODULES = {}
-IN_PROGRESS_CU = None
+COMPILATION_CU = None
 
 class Browser(object):
     def __init__(self, codeUnit=None):
@@ -95,6 +95,11 @@ class Browser(object):
             self.codeUnit = LOADED_MODULES[module_name]
             print "Switched to: " + module_name
 
+        elif command == 'dir':
+            for (name, module) in LOADED_MODULES.items():
+                prefix = "* " if module is self.codeUnit else "  "
+                print prefix + name
+
         elif command == "":
             return
 
@@ -179,8 +184,10 @@ def removeFileSuffix(filename):
         return filename[:-3]
 
 def loadStandardModule(name):
+    code_builder.appendLineComment(COMPILATION_CU, "Loading module " + name + "...")
+
     filename = os.path.join(os.environ['CIRCA_HOME'], 'stdlib', 'parsing.ca')
-    (errors, codeUnit) = parser.parseFile(filename, compilationCU=IN_PROGRESS_CU)
+    (errors, codeUnit) = parser.parseFile(filename, compilationCU=COMPILATION_CU)
 
     if errors:
         print "Errors in %s module:" % name
@@ -196,11 +203,13 @@ def loadStandardModule(name):
 def main():
     import Circa.core.bootstrap
 
-    # create in-progress codeUnit
-    inProgressCU = ca_codeunit.CodeUnit()
-
     global LOADED_MODULES
     LOADED_MODULES['kernel'] = builtins.KERNEL
+
+    # create compilation codeUnit
+    global COMPILATION_CU
+    COMPILATION_CU = ca_codeunit.CodeUnit()
+    LOADED_MODULES['compilation'] = COMPILATION_CU
 
     loadStandardModule('parsing')
 
@@ -218,7 +227,7 @@ def main():
 
         print "Reading file " + filename + "..."
 
-        (errors, codeUnit) = parser.parseFile(filename, compilationCU = IN_PROGRESS_CU)
+        (errors, codeUnit) = parser.parseFile(filename, compilationCU = COMPILATION_CU)
 
         if errors:
             print len(errors), "parsing errors occured"
