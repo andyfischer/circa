@@ -12,7 +12,7 @@ import tokens as _tokens_module
 from tokens import *
 import parse_errors
 
-def parseFile(filename):
+def parseFile(filename, compilationCU=None):
     """
     Parse the given file.
     Returns tuple: (errors, CodeUnit)
@@ -28,7 +28,8 @@ def parseFile(filename):
 
     # Todo: check for UNRECOGNIZED_TOKEN
 
-    pstate = ParserState(tokens, ca_codeunit.CodeUnit())
+    pstate = ParserState(tokens, ca_codeunit.CodeUnit(),
+            compilationCU=compilationCU)
 
     compilation_unit(pstate)
 
@@ -36,10 +37,16 @@ def parseFile(filename):
 
 
 class ParserState(object):
-    def __init__(self, tokenSource, codeUnit):
+    def __init__(self, tokenSource, resultCodeUnit, compilationCU=None):
         self.tokens = tokenSource
         self.errors = []
-        self.codeUnit = codeUnit
+        self.codeUnit = resultCodeUnit
+
+        if compilationCU is None:
+            self.compilationCU = resultCodeUnit
+        else:
+            self.compilationCU = compilationCU
+
 
 def compilation_unit(pstate):
 
@@ -79,7 +86,8 @@ def expression_statement(pstate):
     try:
         mark = pstate.tokens.markLocation()
         resultAst = _expression_module.parseExpression(pstate.tokens)
-        term = resultAst.createTerms(pstate.codeUnit)
+        term = resultAst.createTerms(
+            ast.CompilationContext(pstate.codeUnit, pstate.compilationCU))
 
         pstate.codeUnit.statementAsts.append(resultAst)
 

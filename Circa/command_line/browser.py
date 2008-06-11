@@ -4,10 +4,11 @@ import os,sys,pdb
 from string import Template
 from Circa import parser
 from Circa.common import debug
-from Circa.core import (builtins, ca_type, ca_function)
+from Circa.core import (builtins, ca_codeunit, ca_type, ca_function)
 from Circa.services import to_source
 
-loaded_modules = {}
+LOADED_MODULES = {}
+IN_PROGRESS_CU = None
 
 class Browser(object):
     def __init__(self, codeUnit=None):
@@ -87,11 +88,11 @@ class Browser(object):
 
         elif command == 'switch' or command == 'sw':
             module_name = commandArgs.strip()
-            if module_name not in loaded_modules:
+            if module_name not in LOADED_MODULES:
                 print "Couldn't find module: " + module_name
                 return
 
-            self.codeUnit = loaded_modules[module_name]
+            self.codeUnit = LOADED_MODULES[module_name]
             print "Switched to: " + module_name
 
         elif command == "":
@@ -173,15 +174,35 @@ def findUsersFilename(filename):
 
     return None
 
-def removeFilePrefix(filename):
+def removeFileSuffix(filename):
     if filename.endswith('.ca'):
         return filename[:-3]
+
+def loadStandardModule(name):
+    filename = os.path.join(os.environ['CIRCA_HOME'], 'stdlib', 'parsing.ca')
+    (errors, codeUnit) = parser.parseFile(filename, compilationCU=IN_PROGRESS_CU)
+
+    if errors:
+        print "Errors in %s module:" % name
+        print "\n".join(map(str,errors))
+        return
+
+    codeUnit.updateAll()
+    codeUnit.execute()
+
+    global LOADED_MODULES
+    LOADED_MODULES[name] = codeUnit
 
 def main():
     import Circa.core.bootstrap
 
-    global loaded_modules
-    loaded_modules['kernel'] = builtins.KERNEL
+    # create in-progress codeUnit
+    inProgressCU = ca_codeunit.CodeUnit()
+
+    global LOADED_MODULES
+    LOADED_MODULES['kernel'] = builtins.KERNEL
+
+    loadStandardModule('parsing')
 
     targetCodeUnit = None
 
@@ -197,7 +218,7 @@ def main():
 
         print "Reading file " + filename + "..."
 
-        (errors, codeUnit) = parser.parseFile(filename)
+        (errors, codeUnit) = parser.parseFile(filename, compilationCU = IN_PROGRESS_CU)
 
         if errors:
             print len(errors), "parsing errors occured"
@@ -205,7 +226,7 @@ def main():
                 print str(error)
             return
 
-        loaded_modules[removeFilePrefix(filename)] = codeUnit
+        LOADED_MODULES[removeFileSuffix(filename)] = codeUnit
 
         targetCodeUnit = codeUnit
         targetCodeUnit.execute()

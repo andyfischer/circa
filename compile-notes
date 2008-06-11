@@ -1,0 +1,9 @@
+
+It's great that we are taking stuff that used to be Python code and making it Circa
+code. Such as Feedback.
+
+But these terms shouldn't go in with the output codeunit. They are part of a process
+which *creates* the codeunit.
+
+Need to create a seperate 'in-progress' codeunit that is used to produce the actual
+codeunit. This could be thrown away once compilation is done.
