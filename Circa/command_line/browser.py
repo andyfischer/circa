@@ -3,9 +3,8 @@
 import os,sys,pdb
 from string import Template
 from Circa import parser
-from Circa.common import (debug, errors)
+from Circa.common import (debug, errors, codeunit_utils)
 from Circa.core import (builtins, ca_codeunit, ca_type, ca_function)
-from Circa.services import (code_builder, to_source)
 from Circa.parser import ast as ast_module
 
 COMPILATION_CU = None
@@ -84,7 +83,7 @@ class Browser(object):
             term.execute_trace()
 
         elif command == 'render' or command == "ren":
-            print (to_source.codeToSource(self.codeUnit))
+            print (codeunit_utils.codeToSource(self.codeUnit))
 
         elif command == 'switch' or command == 'sw':
             module_name = commandArgs.strip()
@@ -191,7 +190,7 @@ def removeFileSuffix(filename):
         return filename[:-3]
 
 def loadStandardModule(name):
-    code_builder.appendLineComment(COMPILATION_CU, "Loading module " + name + "...")
+    codeunit_utils.appendLineComment(COMPILATION_CU, "Loading module " + name + "...")
 
     filename = os.path.join(os.environ['CIRCA_HOME'], 'stdlib', 'parsing.ca')
     (errors, codeUnit) = parser.parseFile(filename, compilationCU=COMPILATION_CU)

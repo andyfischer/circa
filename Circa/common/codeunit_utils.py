@@ -12,3 +12,10 @@ def appendLineComment(codeUnit, comment):
         codeUnit.ast = ast.StatementList()
 
     codeUnit.ast.statements.append(ast.IgnoredSyntax(fakeToken))
+
+def codeToSource(codeUnit):
+    buffer = StringBuffer()
+    buffer.writeln(codeUnit.ast.renderSource())
+
+    return str(buffer)
+    
