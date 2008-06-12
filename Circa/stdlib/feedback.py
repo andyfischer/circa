@@ -1,8 +1,7 @@
 
 import os, pdb
-from Circa.builders import function_builder
 from Circa.core import (builtins, ca_function, ca_type)
-from Circa.common import debug
+from Circa.common import (debug, function_builder)
 
 class Feedback(function_builder.BaseFunction):
     name = 'feedback'

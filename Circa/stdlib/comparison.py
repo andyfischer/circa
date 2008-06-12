@@ -1,7 +1,7 @@
 
 # Defines Circa functions for numeric comparison and equality checking
 
-from Circa.builders import function_builder
+from Circa.common import function_builder
 from Circa.core import builtins
 
 class Equals(function_builder.BaseFunction):
