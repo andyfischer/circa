@@ -194,9 +194,6 @@ def loadStandardModule(name):
         print "\n".join(map(str,errors))
         return
 
-    codeUnit.updateAll()
-    codeUnit.execute()
-
     global LOADED_MODULES
     LOADED_MODULES[name] = codeUnit
 
@@ -214,6 +211,10 @@ def main():
     loadStandardModule('parsing')
 
     COMPILATION_CU.execute()
+
+    for module in LOADED_MODULES.values():
+        module.updateAll()
+        module.execute()
 
     targetCodeUnit = None
 
