@@ -12,7 +12,7 @@ class Add(function_builder.BaseFunction):
 
     @staticmethod
     def evaluate(cxt):
-        return cxt.input(0) + cxt.input(1)
+        cxt.setResult(cxt.input(0) + cxt.input(1))
 
 class AddFeedback(function_builder.BaseFunction):
     name = '_add-feedback'
@@ -42,7 +42,7 @@ class Subtract(function_builder.BaseFunction):
 
     @staticmethod
     def evaluate(cxt):
-        return cxt.input(0) - cxt.input(1)
+        cxt.setResult( cxt.input(0) - cxt.input(1) )
 
 class Mult(function_builder.BaseFunction):
     name = 'mult'
@@ -52,7 +52,7 @@ class Mult(function_builder.BaseFunction):
 
     @staticmethod
     def evaluate(cxt):
-        return cxt.input(0) * cxt.input(1)
+        cxt.setResult( cxt.input(0) * cxt.input(1) )
 
 class Divide(function_builder.BaseFunction):
     name = 'div'
@@ -62,7 +62,7 @@ class Divide(function_builder.BaseFunction):
 
     @staticmethod
     def evaluate(cxt):
-        return cxt.input(0) / cxt.input(1)
+        cxt.setResult( cxt.input(0) / cxt.input(1) )
 
 class Average(function_builder.BaseFunction):
     name = 'average'
@@ -73,12 +73,13 @@ class Average(function_builder.BaseFunction):
     @staticmethod
     def evaluate(cxt):
         if cxt.numInputs() == 0:
-            return 0
+            cxt.setResult(0)
+            return
 
         sum = 0
         for i in range(cxt.numInputs()):
             sum += cxt.input(i)
-        return sum / cxt.numInputs()
+        cxt.setResult( sum / cxt.numInputs() )
     
 
 functionDefs = [Subtract, Mult, Divide, Average]
