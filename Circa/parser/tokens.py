@@ -75,6 +75,10 @@ class TokenStream(object):
         """
 
         token = self.next()
+
+        if token is None:
+            raise parse_errors.UnexpectedEOF()
+
         if match and token.match != match:
             raise parse_errors.ExpectedToken(token, match)
 

@@ -113,8 +113,11 @@ class Browser(object):
             try:
                 ast = parser.parseStatement(inputStr)
                 result = ast.createTerms(ast_module.CompilationContext(self.codeUnit))
-                print str(result)
-                result.execute()
+                if result is None:
+                    print "(void)"
+                else:
+                    print str(result)
+                    result.execute()
             except errors.CircaError, e:
                 print e
             except Exception,e:
