@@ -23,6 +23,9 @@ import builtins, ca_codeunit, ca_function, ca_type, builtin_types
 
 """
 
+def emptyFunction(term):
+    pass
+
 def bootstrapKernel(kernel):
 
     # Create constant-generator function
@@ -33,8 +36,6 @@ def bootstrapKernel(kernel):
     ca_function.setPureFunction(constGenerator, True)
     kernel.bindName(constGenerator, "_const-generator")
 
-    def emptyFunction(term):
-        pass
 
     # Create constant-Type function
     constTypeFunc = kernel._bootstrapEmptyTerm()
