@@ -14,6 +14,9 @@ class CircaFunction(object):
         self.hasState = False
         self.name = None
 
+        # True if this function will accept a variable number of arguments
+        self.variableArgs = False
+
         # void initializeFunc(Term)
         self.initializeFunc = None
 
@@ -49,6 +52,8 @@ def hasState(term):
     return term.cachedValue.hasState
 def pureFunction(term):
     return term.cachedValue.pureFunction
+def variableArgs(term):
+    return term.cachedValue.variableArgs
 def initializeFunc(term):
     return term.cachedValue.initializeFunc
 def evaluateFunc(term):
@@ -78,7 +83,9 @@ def setPureFunction(term, pure):
 def setHasState(term, hasState):
     debug._assert(isinstance(hasState,bool))
     term.cachedValue.hasState = hasState
-
+def setVariableArgs(term, variableArgs):
+    debug._assert(isinstance(variableArgs,bool))
+    term.cachedValue.variableArgs = variableArgs
 def setInitializeFunc(term, func):
     term.cachedValue.initializeFunc = func
 

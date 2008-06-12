@@ -66,9 +66,10 @@ class Divide(function_builder.BaseFunction):
 
 class Average(function_builder.BaseFunction):
     name = 'average'
-    inputTypes = [builtins.INT_TYPE]
-    outputType = builtins.INT_TYPE
+    inputTypes = [builtins.FLOAT_TYPE]
+    outputType = builtins.FLOAT_TYPE
     pureFunction = True
+    variableArgs = True
 
     @staticmethod
     def evaluate(cxt):
@@ -76,7 +77,7 @@ class Average(function_builder.BaseFunction):
             cxt.setResult(0)
             return
 
-        sum = 0
+        sum = 0.0
         for i in range(cxt.numInputs()):
             sum += cxt.input(i)
         cxt.setResult( sum / cxt.numInputs() )
