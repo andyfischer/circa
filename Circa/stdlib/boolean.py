@@ -1,7 +1,7 @@
 
 # Defines various binary functions
 
-from Circa.builders import function_builder
+from Circa.common import function_builder
 from Circa.core import builtins
 
 class And(function_builder.BaseFunction):

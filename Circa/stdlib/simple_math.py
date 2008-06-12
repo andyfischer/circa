@@ -1,7 +1,7 @@
 #
 # Defines Circa funcitons for arithmetic
 
-from Circa.builders import function_builder
+from Circa.common import function_builder
 from Circa.core import (builtins, ca_float, ca_function)
 
 class Add(function_builder.BaseFunction):

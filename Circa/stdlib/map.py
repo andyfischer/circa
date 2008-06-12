@@ -1,8 +1,7 @@
 
 import pdb
-from Circa.builders import function_builder
 from Circa.core import (builtins, ca_function, ca_type)
-from Circa.common import debug
+from Circa.common import (debug, function_builder)
 
 # Create Map functions
 class MapConstructor(function_builder.BaseFunction):
