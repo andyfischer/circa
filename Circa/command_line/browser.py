@@ -46,7 +46,7 @@ class Browser(object):
 
             print self.describeTerm(term, "$id: $func_id($input_ids) = $value")
 
-        elif command == 'create' or command == 'c':
+        elif command == 'eval' or command == 'e':
             ast = parser.parseExpression(commandArgs)
             print ast
             result = ast.createTerms(ast_module.CompilationContext(self.codeUnit))
@@ -58,7 +58,7 @@ class Browser(object):
             term.update()
             print str(term)
 
-        elif command == 'exec' or command == 'e':
+        elif command == 'exec' or command == 'ex':
             term = self.getTermFromIdentifier(commandArgs)
             term.execute()
             print str(term)
@@ -94,6 +94,12 @@ class Browser(object):
 
             self.codeUnit = builtins.LOADED_MODULES[module_name]
             print "Switched to: " + module_name
+
+        elif command == 'create':
+            module_name = commandArgs.strip()
+            newModule = ca_codeunit.CodeUnit()
+            builtins.LOADED_MODULES[module_name] = newModule
+            self.codeUnit = newModule
 
         elif command == 'dir':
             for (name, module) in builtins.LOADED_MODULES.items():
