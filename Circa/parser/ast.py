@@ -262,7 +262,7 @@ def getOperatorFunction(codeUnit, token):
     ca_string.setValue(tokenAsString, token.text)
 
     # Find _operator function
-    operatorFunc = codeUnit.getNamed('_operator')
+    operatorFunc = codeUnit.getNamed('operator')
 
     if operatorFunc is None:
         raise parse_errors.NoFunctionForOperator(token)
