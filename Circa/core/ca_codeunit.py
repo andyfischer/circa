@@ -95,6 +95,15 @@ class CodeUnit(object):
         # Create the term
         return self.createTerm(constantFunc, [])
 
+    def createVariable(self, type):
+        debug._assert(isinstance(type, Term))
+
+        # Fetch the variable function for this type
+        variableFunc = self.createTerm(builtins.VARIABLE_GENERATOR, [type])
+
+        # Create the term
+        return self.createTerm(variableFunc, [])
+
     def bindName(self, term, name, allowOverwrite=False):
         debug._assert(isinstance(name, str))
         debug._assert(isinstance(term, Term))
