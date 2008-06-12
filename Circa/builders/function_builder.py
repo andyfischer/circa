@@ -10,6 +10,7 @@ from Circa.core.term import Term
 class BaseFunction(object):
     pureFunction = False
     hasState = False
+    variableArgs = False
     inputTypes = []
     outputType = None
     initialize = None
@@ -35,6 +36,7 @@ def createFunction(codeUnit, functionDef):
     ca_function.setOutputType(term, functionDef.outputType)
     ca_function.setPureFunction(term, functionDef.pureFunction)
     ca_function.setHasState(term, functionDef.hasState)
+    ca_function.setVariableArgs(term, functionDef.variableArgs)
     ca_function.setInitializeFunc(term, functionDef.initialize)
     ca_function.setEvaluateFunc(term, functionDef.evaluate)
     codeUnit.bindName(term, functionDef.name)

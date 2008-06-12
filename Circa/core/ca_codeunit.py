@@ -3,7 +3,7 @@ Define the CodeUnit class
 """
 import itertools, pdb
 
-from Circa.common import debug
+from Circa.common import (debug, errors)
 import builtins, ca_function, ca_type
 from term import Term
 
@@ -45,11 +45,10 @@ class CodeUnit(object):
         debug._assert(isinstance(function, Term))
 
         # Check if they have provided the correct number of arguments
-        if len(inputs) != len(ca_function.inputTypes(function)):
-            raise Exception("%s() takes %d arguments (%d given)"
-                    % (ca_function.name(function),
-                       len(ca_function.inputTypes(function)),
-                       len(inputs)))
+        if not ca_function.variableArgs(function):
+            if len(inputs) != len(ca_function.inputTypes(function)):
+                raise errors.WrongNumberOfArguments(ca_function.name(function),
+                       len(ca_function.inputTypes(function)), len(inputs))
 
         # Todo: Check if types match
 

@@ -9,3 +9,7 @@ def PureVirtualMethodFail(instance, functionName):
 def TypeCheckFail(argumentName, expectedType):
     return CircaError("Type error; expected "+expectedType.__name__+
             " for \""+argumentName+"\"")
+
+def WrongNumberOfArguments(functionName, expectedNumArgs, givenNumArgs):
+    return CircaError("%s() takes %d arguments (%d given)"
+                    % (functionName, expectedNumArgs, givenNumArgs))
