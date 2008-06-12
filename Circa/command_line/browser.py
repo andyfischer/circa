@@ -3,7 +3,7 @@
 import os,sys,pdb
 from string import Template
 from Circa import parser
-from Circa.common import debug
+from Circa.common import (debug, errors)
 from Circa.core import (builtins, ca_codeunit, ca_type, ca_function)
 from Circa.services import (code_builder, to_source)
 from Circa.parser import ast as ast_module
@@ -47,7 +47,7 @@ class Browser(object):
             print self.describeTerm(term, "$id: $func_id($input_ids) = $value")
 
         elif command == 'eval' or command == 'e':
-            ast = parser.parseExpression(commandArgs)
+            ast = parser.parseStatement(commandArgs)
             print ast
             result = ast.createTerms(ast_module.CompilationContext(self.codeUnit))
             print str(result)
@@ -112,13 +112,14 @@ class Browser(object):
         else:
             # Interpret as a Circa expression
             try:
-                ast = parser.parseExpression(inputStr)
-                print ast
+                ast = parser.parseStatement(inputStr)
                 result = ast.createTerms(ast_module.CompilationContext(self.codeUnit))
                 print str(result)
                 result.execute()
-            except Exception,e:
+            except errors.CircaError, e:
                 print e
+            except Exception,e:
+                raise
 
     def getIdentifier(self, term):
         return self.codeUnit.getIdentifier(term)

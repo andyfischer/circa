@@ -1,19 +1,26 @@
 import pdb
 
-class ParseError(Exception):
-   def __init__(self, location, message):
-      self.location = location
-      self.message = message
-      self.fileName = None
+from Circa.common.errors import CircaError
 
-   def __str__(self):
-      description = "(line " + str(self.location.line) + ":" + \
-         str(self.location.column) + ") " + self.message
+class ParseError(CircaError):
+    def __init__(self, location, message):
+        self.location = location
+        self.message = message
+        self.fileName = None
 
-      if self.fileName is not None:
-         description = "in file " + self.fileName + ", " + description
+    def __str__(self):
+        description = ""
+        
+        if self.location is not None:
+            description += ("(line " + str(self.location.line) + ":"
+                            + str(self.location.column) + ") ")
 
-      return description
+        description += self.message
+
+        if self.fileName is not None:
+           description = "in file " + self.fileName + ", " + description
+
+        return description
 
 def TokenStreamExpected(expected, location):
    return ParseError(location, "Expected: " + expected.name + ", found: " + location.text)
@@ -66,6 +73,12 @@ def FoundMultipleExpressionsOnLine(token):
 
 def NoFunctionForOperator(token):
     return ParseError(token, "No function defined for operator: " + token.text)
+
+def UnexpectedEOF():
+    return ParseError(None, "Unexpected end of file")
+
+def UnexpectedToken(token):
+    return ParseError(token, "Unexpected token: " + token.text)
 
 def InternalError(token, details=None):
    message = "Internal error"

@@ -245,6 +245,9 @@ class FunctionDecl(Node):
     def getFirstToken(self):
         return self.functionKeyword
 
+    def createTerms(self, context):
+        pass
+
     def renderSource(self):
         return ("function " + self.functionName.text + "(" +
             ", ".join(map(str,self.inputArgs)) + ")")

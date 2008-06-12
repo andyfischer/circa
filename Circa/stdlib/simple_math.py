@@ -27,7 +27,7 @@ class AddFeedback(function_builder.BaseFunction):
         desired = cxt.input(1)
         delta = targetsValue - desired
         halfDelta = cxt.codeUnit().createConstant(builtins.FLOAT_TYPE)
-        ca_float.setvalue(halfDelta, delta / 2.0)
+        ca_float.setValue(halfDelta, delta / 2.0)
 
         cxt.codeUnit().createTerm(builtins.FEEDBACK_FUNC,
             inputs=[target.getInput(0), halfDelta])
