@@ -6,6 +6,7 @@ from Circa import parser
 from Circa.common import debug
 from Circa.core import (builtins, ca_codeunit, ca_type, ca_function)
 from Circa.services import (code_builder, to_source)
+from Circa.parser import ast as ast_module
 
 LOADED_MODULES = {}
 COMPILATION_CU = None
@@ -49,7 +50,7 @@ class Browser(object):
         elif command == 'create' or command == 'c':
             ast = parser.parseExpression(commandArgs)
             print ast
-            result = ast.createTerms(self.codeUnit)
+            result = ast.createTerms(ast_module.CompilationContext(self.codeUnit))
             print str(result)
             result.execute()
 
@@ -108,7 +109,7 @@ class Browser(object):
             try:
                 ast = parser.parseExpression(inputStr)
                 print ast
-                result = ast.createTerms(self.codeUnit)
+                result = ast.createTerms(ast_module.CompilationContext(self.codeUnit))
                 print str(result)
                 result.execute()
             except Exception,e:
