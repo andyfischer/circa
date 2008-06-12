@@ -11,9 +11,12 @@ from Circa.utils.spy_object import SpyObject
 from token_definitions import *
 
 class CompilationContext(object):
-    def __init__(self, resultCU, compilationCU):
+    def __init__(self, resultCU, compilationCU=None):
         self.resultCU = resultCU
-        self.compilationCU = compilationCU
+        if not compilationCU:
+            self.compilationCU = resultCU
+        else:
+            self.compilationCU = compilationCU
 
 class Node(object):
     def createTerms(self, context):
