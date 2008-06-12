@@ -233,12 +233,20 @@ class FunctionCall(Node):
 
 class FunctionDecl(Node):
     """
-    Members:
-      functionKeyword
+    Fields:
       functionName
       inputArgs
       outputType
+      statementList
+
+    Syntax fields:
+      functionKeyword
+      openParen
+      closeParen
+      openBracket
+      closeBracket
     """
+
     def __init__(self):
         self.inputArgs = []
 

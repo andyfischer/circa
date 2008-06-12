@@ -149,6 +149,12 @@ def function_decl(tokens):
         result.outputType = tokens.consume(IDENT)
     else:
         result.outputType = None
+
+    result.openBracket = tokens.consume(LBRACKET)
+
+    result.statementList = statement_list(tokens)
+
+    result.closeBracket = tokens.consume(RBRACKET)
     
     return result
 
