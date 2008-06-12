@@ -98,7 +98,7 @@ ATTRIBUTE =     TokenDef(56, 'attribute', pattern=word('attribute'))
 # Other tokens
 FLOAT =         TokenDef(70, 'float', pattern=r"([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)")
 INTEGER =       TokenDef(71, 'integer', pattern=r"([1-9]+[0-9]*)|0")
-IDENT =         TokenDef(72, 'ident', pattern=r"[a-zA-Z_\-][a-zA-Z0-9_\-]*")
+IDENT =         TokenDef(72, 'identifier', pattern=r"[a-zA-Z_\-][a-zA-Z0-9_\-]*")
 STRING =        TokenDef(73, 'string', pattern=group(r"'[^']*'", r"\"[^\"]*\""))
 WHITESPACE =    TokenDef(75, 'whitespace', pattern=r"[ \t]+")
 COMMENT_LINE =  TokenDef(76, 'comment_line', pattern=r"#.*$")

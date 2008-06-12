@@ -3,15 +3,8 @@
 # Code for parsing a Circa expression from a token stream
  
 
-import ast
+import ast, parse_errors
 from token_definitions import *
-
-def parseExpression(token):
-    "Parse an expression from the token stream, and return an AST"
-    return infix_expression(token, 0)
-
-class MatchFailed(Exception):
-    pass
 
 def statement_list(tokens):
     """
@@ -109,7 +102,10 @@ def atom(tokens):
         return expr
   
     # Failed to match
-    raise MatchFailed()
+    if tokens.finished():
+        raise parse_errors.UnexpectedEOF()
+
+    raise parse_errors.UnexpectedToken(tokens.next())
  
 def function_call(tokens):
     function_name = tokens.consume(IDENT)
@@ -131,25 +127,26 @@ def function_call(tokens):
 def function_decl(tokens):
     result = ast.FunctionDecl()
 
-    result.functionKeyword = pstate.tokens.consume(FUNCTION)
-    result.functionName = pstate.tokens.consume(IDENT)
-    result.openParen = pstate.tokens.consume(LPAREN)
+    result.functionKeyword = tokens.consume(FUNCTION)
 
-    while not pstate.tokens.nextIs(RPAREN):
-        argType = pstate.tokens.consume(IDENT)
-        argName = pstate.tokens.consume(IDENT)
+    result.functionName = tokens.consume(IDENT)
+    result.openParen = tokens.consume(LPAREN)
+
+    while not tokens.nextIs(RPAREN):
+        argType = tokens.consume(IDENT)
+        argName = tokens.consume(IDENT)
         result.inputArgs.append( (argType, argName) )
 
-        if not pstate.tokens.nextIs(COMMA):
+        if not tokens.nextIs(COMMA):
             break
         else:
-            pstate.tokens.consume(COMMA)
+            tokens.consume(COMMA)
 
-    result.closeParen = pstate.tokens.consume(RPAREN)
+    result.closeParen = tokens.consume(RPAREN)
 
-    if pstate.tokens.nextIs(RIGHT_ARROW):
-        pstate.tokens.consume(RIGHT_ARROW)
-        result.outputType = pstate.tokens.consume(IDENT)
+    if tokens.nextIs(RIGHT_ARROW):
+        tokens.consume(RIGHT_ARROW)
+        result.outputType = tokens.consume(IDENT)
     else:
         result.outputType = None
     
