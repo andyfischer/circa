@@ -213,6 +213,8 @@ def main():
 
     loadStandardModule('parsing')
 
+    COMPILATION_CU.execute()
+
     targetCodeUnit = None
 
     # Read command-line args

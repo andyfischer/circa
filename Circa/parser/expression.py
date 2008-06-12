@@ -13,6 +13,30 @@ def parseExpression(token):
 class MatchFailed(Exception):
     pass
 
+def statement_list(tokens):
+    """
+    Parses a list of statements. Stops when we encounter a } or reach the
+    end of the stream.
+    """
+
+    result = ast.StatementList()
+
+    while not tokens.nextIs(RBRACKET) and not tokens.finished():
+        result.statements.append(statement(tokens))
+
+    return result
+
+def statement(tokens):
+    if tokens.nextIs(FUNCTION):
+        return function_decl(tokens)
+    elif tokens.nextIs(COMMENT_LINE):
+        return ast.IgnoredSyntax(tokens.consume(COMMENT_LINE))
+    elif tokens.nextIs(NEWLINE):
+        return ast.IgnoredSyntax(tokens.consume(NEWLINE))
+    else:
+        return infix_expression(tokens, 0)
+
+
 # Infix precedence
 HIGHEST_INFIX_PRECEDENCE = 7
 _infixPrecedence = {
@@ -103,6 +127,33 @@ def function_call(tokens):
     tokens.consume(RPAREN)
 
     return ast.FunctionCall(function_name, args)
+
+def function_decl(tokens):
+    result = ast.FunctionDecl()
+
+    result.functionKeyword = pstate.tokens.consume(FUNCTION)
+    result.functionName = pstate.tokens.consume(IDENT)
+    result.openParen = pstate.tokens.consume(LPAREN)
+
+    while not pstate.tokens.nextIs(RPAREN):
+        argType = pstate.tokens.consume(IDENT)
+        argName = pstate.tokens.consume(IDENT)
+        result.inputArgs.append( (argType, argName) )
+
+        if not pstate.tokens.nextIs(COMMA):
+            break
+        else:
+            pstate.tokens.consume(COMMA)
+
+    result.closeParen = pstate.tokens.consume(RPAREN)
+
+    if pstate.tokens.nextIs(RIGHT_ARROW):
+        pstate.tokens.consume(RIGHT_ARROW)
+        result.outputType = pstate.tokens.consume(IDENT)
+    else:
+        result.outputType = None
+    
+    return result
 
 def testEquals():
     import tokens

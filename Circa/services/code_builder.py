@@ -7,4 +7,8 @@ def appendLineComment(codeUnit, comment):
         pass
     fakeToken = FakeToken()
     fakeToken.text = "# " + comment
-    codeUnit.statementAsts.append(ast.IgnoredSyntax(fakeToken))
+
+    if codeUnit.ast is None:
+        codeUnit.ast = ast.StatementList()
+
+    codeUnit.ast.statements.append(ast.IgnoredSyntax(fakeToken))
