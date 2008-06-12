@@ -18,8 +18,8 @@ class CodeUnit(object):
         # mainNamespace maps from strings to Terms
         self.mainNamespace = {}
 
-        # statementAsts is a list of AST objects
-        self.statementAsts = []
+        # an AST object that describes this code
+        self.ast = None
 
     def _newTerm(self):
         "Internal method. Returns a new Term object."

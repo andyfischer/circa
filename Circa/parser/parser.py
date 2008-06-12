@@ -50,15 +50,15 @@ class ParserState(object):
 
 def compilation_unit(pstate):
 
-    while not pstate.tokens.finished():
-        try:
-            statement(pstate)
-        except parse_errors.ParseError, e:
-            pstate.errors.append(e)
+    try:
+        resultAst = _expression_module.statement_list(pstate.tokens)
+        resultAst.createTerms(
+            ast.CompilationContext(pstate.codeUnit, pstate.compilationCU))
 
-            # Drop this token, and the rest of this line
-            pstate.tokens.consume()
-            pstate.tokens.dropUntil(NEWLINE)
+        pstate.codeUnit.ast = resultAst
+
+    except parse_errors.ParseError, e:
+        pstate.errors.append(e)
 
 
 def statement(pstate):
@@ -69,8 +69,9 @@ def statement(pstate):
         type_decl(pstate)
     elif next_token.match == IF:
         if_statement(pstate)
-    elif next_token.match == FUNCTION:
-        function_decl(pstate)
+    # Function decls are now parsed as expressions
+    # elif next_token.match == FUNCTION:
+    #   function_decl(pstate)
     elif next_token.match == RETURN:
         return_statement(pstate)
     elif next_token.match == RBRACKET:
@@ -104,3 +105,4 @@ def new_line(pstate):
 def comment_line(pstate):
     comment = pstate.tokens.consume(COMMENT_LINE)
     pstate.codeUnit.statementAsts.append(ast.IgnoredSyntax(comment))
+

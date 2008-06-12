@@ -25,9 +25,22 @@ class Node(object):
     def __str__(self):
         return self.renderSource()
 
+class StatementList(object):
+    def __init__(self):
+        self.statements = []
+    def createTerms(self, context):
+        for statement in self.statements:
+            statement.createTerms(context)
+    def getFirstToken(self):
+        return self.statements[0].getFirstToken()
+    def renderSource(self):
+        return "".join([statement.renderSource() for statement in self.statements])
+
 class IgnoredSyntax(Node):
     def __init__(self, token):
         self.token = token
+    def createTerms(self, context):
+        pass
     def renderSource(self):
         return self.token.text
 
@@ -214,6 +227,26 @@ class FunctionCall(Node):
 
     def renderSource(self):
         return str(self.function_name) + '(' + ','.join(map(str,self.args)) + ')'
+
+class FunctionDecl(Node):
+    """
+    Members:
+      functionKeyword
+      functionName
+      inputArgs
+      outputType
+    """
+    def __init__(self):
+        self.inputArgs = []
+
+    def getFirstToken(self):
+        return self.functionKeyword
+
+    def renderSource(self):
+        return ("function " + self.functionName.text + "(" +
+            ", ".join(map(str,self.inputArgs)) + ")")
+
+
 
 def parseStringLiteral(text):
     # the literal should have ' or " marks on either side, strip these
