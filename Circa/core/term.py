@@ -46,6 +46,9 @@ class Term(object):
     def getType(self):
         "Returns this term's output type"
         return ca_function.outputType(self.functionTerm)
+
+    def getIdentifier(self):
+        return self.codeUnit.getIdentifier(self)
   
     def update(self):
         # Functions with side effects should not run during an
@@ -80,7 +83,6 @@ class TermExecutionContext(object):
     """
     This object is provided to evaluate functions when updating.
     """
-    
     def __init__(self, term):
         self.targetTerm = term
     def inputTerm(self, index):

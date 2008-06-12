@@ -13,8 +13,7 @@ class Assert(function_builder.BaseFunction):
     @staticmethod
     def evaluate(cxt):
         if not cxt.input(0):
-            # An assert failed
-            debug._assert(False)
+            print "Assert failed on term " + cxt.caller().getIdentifier()
 
 def createFunctions(codeUnit):
     function_builder.createFunction(codeUnit, Assert)

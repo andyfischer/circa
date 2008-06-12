@@ -8,7 +8,6 @@ from Circa.core import (builtins, ca_codeunit, ca_type, ca_function)
 from Circa.services import (code_builder, to_source)
 from Circa.parser import ast as ast_module
 
-LOADED_MODULES = {}
 COMPILATION_CU = None
 
 class Browser(object):
@@ -89,15 +88,15 @@ class Browser(object):
 
         elif command == 'switch' or command == 'sw':
             module_name = commandArgs.strip()
-            if module_name not in LOADED_MODULES:
+            if module_name not in builtins.LOADED_MODULES:
                 print "Couldn't find module: " + module_name
                 return
 
-            self.codeUnit = LOADED_MODULES[module_name]
+            self.codeUnit = builtins.LOADED_MODULES[module_name]
             print "Switched to: " + module_name
 
         elif command == 'dir':
-            for (name, module) in LOADED_MODULES.items():
+            for (name, module) in builtins.LOADED_MODULES.items():
                 prefix = "* " if module is self.codeUnit else "  "
                 print prefix + name
 
@@ -195,25 +194,23 @@ def loadStandardModule(name):
         print "\n".join(map(str,errors))
         return
 
-    global LOADED_MODULES
-    LOADED_MODULES[name] = codeUnit
+    builtins.LOADED_MODULES[name] = codeUnit
 
 def main():
     import Circa.core.bootstrap
 
-    global LOADED_MODULES
-    LOADED_MODULES['kernel'] = builtins.KERNEL
+    builtins.LOADED_MODULES['kernel'] = builtins.KERNEL
 
     # create compilation codeUnit
     global COMPILATION_CU
     COMPILATION_CU = ca_codeunit.CodeUnit()
-    LOADED_MODULES['compilation'] = COMPILATION_CU
+    builtins.LOADED_MODULES['compilation'] = COMPILATION_CU
 
     loadStandardModule('parsing')
 
     COMPILATION_CU.execute()
 
-    for module in LOADED_MODULES.values():
+    for module in builtins.LOADED_MODULES.values():
         module.updateAll()
         module.execute()
 
@@ -239,7 +236,7 @@ def main():
                 print str(error)
             return
 
-        LOADED_MODULES[removeFileSuffix(filename)] = codeUnit
+        builtins.LOADED_MODULES[removeFileSuffix(filename)] = codeUnit
 
         targetCodeUnit = codeUnit
         targetCodeUnit.execute()

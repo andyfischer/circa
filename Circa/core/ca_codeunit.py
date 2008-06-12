@@ -105,15 +105,18 @@ class CodeUnit(object):
 
         self.mainNamespace[name] = term
 
+    def definesName(self, name):
+        "Returns True if this codeunit defines the given name"
+        return name in self.mainNamespace
+
     def getNamed(self, name):
         debug._assert(isinstance(name,str))
 
         if name in self.mainNamespace:
             return self.mainNamespace[name]
 
-        # Check builtins, if this isn't the builtins object
-        if self is not builtins.KERNEL:
-            return builtins.KERNEL.getNamed(name)
+        # Get a globally-defined term
+        return builtins.getGlobal(name)
 
     def getIdentifier(self, term):
         debug._assert(isinstance(term, Term))
