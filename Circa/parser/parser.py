@@ -9,7 +9,7 @@ from Circa.core import ca_codeunit
 from Circa.parser import ast
 import expression as _expression_module
 import tokens as _tokens_module
-from tokens import *
+from token_definitions import *
 import parse_errors
 
 def parseFile(filename, compilationCU=None):
@@ -26,7 +26,15 @@ def parseFile(filename, compilationCU=None):
 
     tokens = _tokens_module.tokenize(fileContents)
 
-    # Todo: check for UNRECOGNIZED_TOKEN
+    # Scan the token stream for an instance of UNRECOGNIZED token
+    # If found, immediately return with this error
+    while not tokens.finished():
+        token = tokens.consume()
+        if token.match == UNRECOGNIZED:
+            return ([parse_errors.UnrecognizedToken(token)], None)
+
+    # Reset token stream
+    tokens.reset()
 
     pstate = ParserState(tokens, ca_codeunit.CodeUnit(),
             compilationCU=compilationCU)
