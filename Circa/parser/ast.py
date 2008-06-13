@@ -4,17 +4,17 @@
 # Defines classes for an abstract syntax tree
 
 import parse_errors, tokens
-from Circa.core import (builtins, ca_string, ca_function, ca_type)
+from Circa.core import (builtins, ca_string, ca_subroutine, ca_function, ca_type)
 from Circa.core.term import Term
 from Circa.common import (debug, errors)
 from Circa.utils.spy_object import SpyObject
 from token_definitions import *
 
 class CompilationContext(object):
-    def __init__(self, resultCU, compilationCU=None):
-        self.resultCU = resultCU
+    def __init__(self, codeUnit, compilationCU=None):
+        self.codeUnit = codeUnit
         if not compilationCU:
-            self.compilationCU = resultCU
+            self.compilationCU = codeUnit
         else:
             self.compilationCU = compilationCU
 
@@ -63,7 +63,7 @@ class Infix(Node):
             right_term = self.right.createTerms(context)
             if not isinstance(right_term, Term):
                 raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
-            context.resultCU.bindName(right_term, str(self.left))
+            context.codeUnit.bindName(right_term, str(self.left))
             return right_term
 
         # Evaluate as feedback?
@@ -87,10 +87,10 @@ class Infix(Node):
 
         # Normal function?
         # Try to find a defined operator
-        normalFunction = getOperatorFunction(context.resultCU, self.token)
+        normalFunction = getOperatorFunction(context.codeUnit, self.token)
         if normalFunction is not None:
 
-            newTerm = context.resultCU.createTerm(normalFunction,
+            newTerm = context.codeUnit.createTerm(normalFunction,
                 inputs=[self.left.createTerms(context),
                         self.right.createTerms(context)])
             newTerm.ast = self
@@ -101,11 +101,11 @@ class Infix(Node):
         assignFunction = getAssignOperatorFunction(self.token.match)
         if assignFunction is not None:
             # create a term that's the result of the operation
-            result_term = context.resultCU.createTerm(assignFunction,
+            result_term = context.codeUnit.createTerm(assignFunction,
                inputs=[self.left.createTerms(context), self.right.createTerms(context)])
 
             # bind the name to this result
-            context.resultCU.bindName(result_term, str(self.left))
+            context.codeUnit.bindName(result_term, str(self.left))
             return result_term
 
         debug.fail("Unable to evaluate token: " + self.token.text)
@@ -129,7 +129,8 @@ class Literal(Node):
             self.value = int(token.text)
             self.circaType = builtins.INT_TYPE
         elif token.match == STRING:
-            self.value = parseStringLiteral(token.text)
+            # the literal should have ' or " marks on either side, strip these
+            self.value = token.text.strip("'\"")
             self.circaType = builtins.STRING_TYPE
         else:
             raise parse_errors.InternalError("Couldn't recognize token: " + str(token))
@@ -137,9 +138,9 @@ class Literal(Node):
     def createTerms(self, context):
         # Create a term
         if self.hasQuestionMark:
-            newTerm = context.resultCU.createVariable(self.circaType)
+            newTerm = context.codeUnit.createVariable(self.circaType)
         else:
-            newTerm = context.resultCU.createConstant(self.circaType)
+            newTerm = context.codeUnit.createConstant(self.circaType)
 
         newTerm.ast = self
 
@@ -163,12 +164,12 @@ class Ident(Node):
         self.token = token
 
     def createTerms(self, context):
-        term = context.resultCU.getNamed(self.token.text)
+        term = context.codeUnit.getNamed(self.token.text)
 
         if not term:
             raise parse_errors.IdentifierNotFound(self.token)
 
-        return context.resultCU.getNamed(self.token.text)
+        return context.codeUnit.getNamed(self.token.text)
 
     def getFirstToken(self):
         return self.token
@@ -182,8 +183,8 @@ class Unary(Node):
         self.right = right
 
     def createTerms(self, context):
-        return context.resultCU.createTerm(builtins.MULT,
-                   inputs = [context.resultCU.createConstant(-1),
+        return context.codeUnit.createTerm(builtins.MULT,
+                   inputs = [context.codeUnit.createConstant(-1),
                              self.right.createTerms(context)])
 
     def getFirstToken(self):
@@ -199,15 +200,15 @@ class FunctionCall(Node):
 
     def createTerms(self, context):
         arg_terms = [term.createTerms(context) for term in self.args]
-        func = context.resultCU.getNamed(self.function_name.text)
+        func = context.codeUnit.getNamed(self.function_name.text)
 
         if func is None:
             raise parse_errors.InternalError(self.function_name,
-              "Function " + self.function_name.text + " not found.")
+                "Function " + self.function_name.text + " not found.")
 
         # Check for Function
         if func.getType() is builtins.FUNCTION_TYPE:
-            newTerm = context.resultCU.createTerm(func, inputs=arg_terms)
+            newTerm = context.codeUnit.createTerm(func, inputs=arg_terms)
             newTerm.ast = self
             return newTerm
 
@@ -215,11 +216,11 @@ class FunctionCall(Node):
         elif func.getType() is builtins.SUBROUTINE_TYPE:
 
             # Todo: special behavior for invoking subroutines
-            return context.resultCU.createTerm(builtins.INVOKE_SUB_FUNC)
+            return context.codeUnit.createTerm(builtins.INVOKE_SUB_FUNC)
 
         # Temp: Use a Python dynamic type check to see if this is a function
         elif isinstance(func.pythonValue, ca_function._Function):
-            return context.resultCU.createTerm(func, inputs=arg_terms)
+            return context.codeUnit.createTerm(func, inputs=arg_terms)
 
         else:
             raise parse_errors.InternalError(self.function_name,
@@ -236,7 +237,7 @@ class FunctionDecl(Node):
     Fields:
       functionName
       inputArgs
-      outputType
+      outputTypeIdent
       statementList
 
     Syntax fields:
@@ -254,17 +255,22 @@ class FunctionDecl(Node):
         return self.functionKeyword
 
     def createTerms(self, context):
-        pass
+
+        # Resolve types
+        inputTypes = [context.codeUnit.getNamed(arg.type.text)
+            for arg in self.inputArgs ]
+        outputType = context.codeUnit.getNamed(self.outputType.text)
+
+        subroutineTerm = context.codeUnit.createConstant(builtins.SUBROUTINE_TYPE)
+
+        ca_subroutine.setName(subroutineTerm, self.functionName.text)
+        ca_subroutine.setInputTypes(subroutineTerm, inputTypes)
+        ca_subroutine.setOutputType(subroutineTerm, outputType)
 
     def renderSource(self):
         return ("function " + self.functionName.text + "(" +
             ", ".join(map(str,self.inputArgs)) + ")")
 
-
-
-def parseStringLiteral(text):
-    # the literal should have ' or " marks on either side, strip these
-    return text.strip("'\"")
 
 def getOperatorFunction(codeUnit, token):
 

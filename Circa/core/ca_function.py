@@ -20,7 +20,6 @@ class CircaFunction(object):
         # void initializeFunc(Term)
         self.initializeFunc = None
 
-        # void evaluateFunc(Term)
         # The evaluate function should probably look at Term's inputs,
         # do something, and then put some result into Term.cachedValue.
         # If the function has 'pureFunction' set to False, then it is

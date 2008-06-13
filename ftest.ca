@@ -1,0 +1,4 @@
+hello = 1
+function gthan(int a, int b) -> bool {
+  result = a > b
+}

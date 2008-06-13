@@ -232,7 +232,7 @@ def main():
     else:
         filename = findUsersFilename(sys.argv[1])
         if filename is None:
-            print "File not found: " + filename
+            print "File not found: " + sys.argv[1]
             return
 
         print "Reading file " + filename + "..."
