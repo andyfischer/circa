@@ -1,4 +1,6 @@
 hello = 1
-function gthan(int a, int b) -> bool {
+function test_function(int a, int b) -> bool {
   result = a > b
+  print('hello')
+  assert(true)
 }

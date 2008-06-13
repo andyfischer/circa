@@ -39,7 +39,15 @@ def parseFile(filename, compilationCU=None):
     pstate = ParserState(tokens, ca_codeunit.CodeUnit(),
             compilationCU=compilationCU)
 
-    compilation_unit(pstate)
+    compilationContext = ast.CompilationContext(pstate.codeUnit, pstate.compilationCU)
+
+    try:
+        resultAst = _expression_module.statement_list(pstate.tokens)
+        resultAst.createTerms(compilationContext)
+        pstate.codeUnit.ast = resultAst
+
+    except parse_errors.ParseError, e:
+        pstate.errors.append(e)
 
     return (pstate.errors, pstate.codeUnit)
 
@@ -54,19 +62,6 @@ class ParserState(object):
             self.compilationCU = resultCodeUnit
         else:
             self.compilationCU = compilationCU
-
-
-def compilation_unit(pstate):
-
-    try:
-        resultAst = _expression_module.statement_list(pstate.tokens)
-        resultAst.createTerms(
-            ast.CompilationContext(pstate.codeUnit, pstate.compilationCU))
-
-        pstate.codeUnit.ast = resultAst
-
-    except parse_errors.ParseError, e:
-        pstate.errors.append(e)
 
 
 def expression_statement(pstate):
