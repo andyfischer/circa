@@ -5,7 +5,7 @@ from Circa.core import (ca_codeunit, term)
 class CircaSubroutine(object):
     def __init__(self):
         self.name = "undefined"
-        self.code = ca_codeunit.CodeUnit()
+        self.codeUnit = ca_codeunit.CodeUnit()
         self.inputTypes = []
         self.outputType = None
 
@@ -39,4 +39,5 @@ def field(fieldName):
 (outputType, setOutputType) = field('outputType')
 (inputPlaceholders, setInputPlaceholders) = field('inputPlaceholders')
 (outputPlaceholder, setOutputPlaceholder) = field('outputPlaceholder')
+(codeUnit, _) = field('codeUnit')
 

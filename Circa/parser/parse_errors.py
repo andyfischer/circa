@@ -80,6 +80,9 @@ def UnexpectedEOF():
 def UnexpectedToken(token):
     return ParseError(token, "Unexpected token: " + token.text)
 
+def UnrecognizedToken(token):
+    return ParseError(token, "Unrecognized token: " + token.text)
+
 def InternalError(token, details=None):
    message = "Internal error"
    if details is not None: message += ": " + details
