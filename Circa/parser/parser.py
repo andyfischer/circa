@@ -69,28 +69,6 @@ def compilation_unit(pstate):
         pstate.errors.append(e)
 
 
-def statement(pstate):
-    # Dispatch based on next token
-    next_token = pstate.tokens.next()
-
-    if next_token.match == TYPE:
-        type_decl(pstate)
-    elif next_token.match == IF:
-        if_statement(pstate)
-    # Function decls are now parsed as expressions
-    # elif next_token.match == FUNCTION:
-    #   function_decl(pstate)
-    elif next_token.match == RETURN:
-        return_statement(pstate)
-    elif next_token.match == RBRACKET:
-        close_block(pstate)
-    elif next_token.match == NEWLINE:
-        new_line(pstate)
-    elif next_token.match == COMMENT_LINE:
-        comment_line(pstate)
-    else:
-        expression_statement(pstate)
-
 def expression_statement(pstate):
     try:
         mark = pstate.tokens.markLocation()
@@ -103,14 +81,4 @@ def expression_statement(pstate):
     except _expression_module.MatchFailed, e:
         pstate.tokens.restoreMark(mark)
         raise parse_errors.ExpectedExpression(pstate.tokens.next())
-
-def new_line(pstate):
-    # Ignore NEWLINE
-    pstate.tokens.consume(NEWLINE)
-
-    # pstate.codeUnit.statementAsts.append(ast.BlankLine())
-
-def comment_line(pstate):
-    comment = pstate.tokens.consume(COMMENT_LINE)
-    pstate.codeUnit.statementAsts.append(ast.IgnoredSyntax(comment))
 
