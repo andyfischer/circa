@@ -132,10 +132,15 @@ def function_decl(tokens):
     result.functionName = tokens.consume(IDENT)
     result.openParen = tokens.consume(LPAREN)
 
+    class FunctionArg(object):
+        def __init__(self, type, name):
+            self.type = type
+            self.name = name
+
     while not tokens.nextIs(RPAREN):
         argType = tokens.consume(IDENT)
         argName = tokens.consume(IDENT)
-        result.inputArgs.append( (argType, argName) )
+        result.inputArgs.append( FunctionArg(argType, argName) )
 
         if not tokens.nextIs(COMMA):
             break

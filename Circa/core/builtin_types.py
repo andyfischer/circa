@@ -1,6 +1,6 @@
 
 from Circa.common import debug
-import builtins, ca_type, ca_function
+import builtins, ca_type, ca_function, ca_subroutine
 
 def intInitialize(term):
     term.cachedValue = 0
@@ -59,6 +59,12 @@ def createBuiltinTypes(kernel):
     ca_type.setInitializeFunc(voidType, voidInitialize)
     ca_type.setToStringFunc(voidType, voidToString)
     kernel.bindName(voidType, 'void')
+
+    subroutineType = kernel.createConstant(builtins.TYPE_TYPE)
+    ca_type.setName(subroutineType, 'Subroutine')
+    ca_type.setInitializeFunc(subroutineType, ca_subroutine.initializeTerm)
+    ca_type.setToStringFunc(subroutineType, ca_subroutine.toString)
+    kernel.bindName(subroutineType, 'Subroutine')
     
     # Export objects
     builtins.INT_TYPE = intType
@@ -66,5 +72,6 @@ def createBuiltinTypes(kernel):
     builtins.BOOL_TYPE = boolType
     builtins.FLOAT_TYPE = floatType
     builtins.REFERENCE_TYPE = referenceType
-    builtins.REF_TYPE = builtins.REFERENCE_TYPE
+    builtins.REF_TYPE = referenceType # Alias
     builtins.VOID_TYPE = voidType
+    builtins.SUBROUTINE_TYPE = subroutineType
