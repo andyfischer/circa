@@ -219,19 +219,14 @@ class FunctionCall(Node):
                 "Function " + self.function_name.text + " not found.")
 
         # Check for Function
-        if func.getType() is builtins.FUNCTION_TYPE:
+        if func.getType() in (builtins.FUNCTION_TYPE, builtins.SUBROUTINE_TYPE):
             newTerm = context.codeUnit.createTerm(func, inputs=arg_terms)
             newTerm.ast = self
             return newTerm
 
-        # Check for Subroutine
-        elif func.getType() is builtins.SUBROUTINE_TYPE:
-
-            # Todo: special behavior for invoking subroutines
-            return context.codeUnit.createTerm(builtins.INVOKE_SUB_FUNC)
-
         # Temp: Use a Python dynamic type check to see if this is a function
         elif isinstance(func.pythonValue, ca_function._Function):
+            print 'FunctionCall - deprecated stuff'
             return context.codeUnit.createTerm(func, inputs=arg_terms)
 
         else:
@@ -306,7 +301,7 @@ class FunctionDecl(Node):
             placeholderTerm = subroutineCodeUnit.createVariable(typeTerm)
             inputPlaceholders.append(placeholderTerm)
             subroutineCodeUnit.bindName(placeholderTerm, name)
-            
+        ca_subroutine.setInputPlaceholders(subroutineTerm, inputPlaceholders)
 
         # Create terms for the body of the subroutine
         innerCompilationContext = CompilationContext(
@@ -316,6 +311,7 @@ class FunctionDecl(Node):
         for statement in self.statementList:
             statement.createTerms(innerCompilationContext)
 
+        context.codeUnit.bindName(subroutineTerm, self.functionName.text)
         return subroutineTerm
 
     def renderSource(self, output):
@@ -342,7 +338,7 @@ def getOperatorFunction(codeUnit, token):
     tokenAsString = codeUnit.createConstant(builtins.STRING_TYPE)
     ca_string.setValue(tokenAsString, token.text)
 
-    # Find _operator function
+    # Find operator function
     operatorFunc = codeUnit.getNamed('operator')
 
     if operatorFunc is None:
