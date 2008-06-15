@@ -28,6 +28,13 @@ def subroutineEvaluateFunc(cxt):
     # Execute
     subroutine.codeUnit.execute()
 
+    # Copy output placeholder to this term's output
+    if subroutine.outputPlaceholder:
+        cxt.setResult(subroutine.outputPlaceholder.cachedValue)
+    else:
+        cxt.setResult(None)
+
+
 # Functions for our ca_type object #
 def initializeTerm(term):
     term.cachedValue = CircaSubroutine()
