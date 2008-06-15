@@ -11,22 +11,28 @@ class StringBuffer(object):
         self.indent_level = 0
         self.needsIndent = True
 
+    def _writeIndent(self):
+        for n in range(self.indent_level):
+            self.str_list.extend(self.indent_str)
+        self.needsIndent = False
+
     def write(self, s):
         lines = s.split('\n')
 
         first_line = lines[0]
 
         if self.needsIndent:
-            for n in range(self.indent_level):
-                self.str_list.extend(self.indent_str)
-            self.needsIndent = False
+            self._writeIndent()
 
         self.str_list.extend(first_line)
 
         for line in lines[1:]:
             self.str_list.extend('\n')
-            for n in range(self.indent_level):
-                self.str_list.extend(self.indent_str)
+
+            if line == "":
+                self.needsIndent = True
+            else:
+                self._writeIndent()
             self.str_list.extend(line)
 
     def writeln(self, s = ""):
