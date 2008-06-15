@@ -5,40 +5,68 @@
 import itertools
 
 class StringBuffer(object):
-   def __init__(self):
-      self.str_list = []
-      self.indent_str = "    "
-      self.indent_level = 0
+    def __init__(self):
+        self.str_list = []
+        self.indent_str = "    "
+        self.indent_level = 0
+        self.needsIndent = True
 
-   def writeln(self, s = ""):
-      for line in s.split('\s'):
-          self.str_list.extend(itertools.repeat(self.indent_str, self.indent_level))
-          self.str_list.extend(line)
-          self.str_list.extend('\n')
+    def write(self, s):
+        lines = s.split('\n')
 
-   def indent(self):
-      self.indent_level += 1
+        first_line = lines[0]
 
-   def unindent(self):
-      self.indent_level -= 1
-      if (self.indent_level < 0): raise Exception()
+        if self.needsIndent:
+            for n in range(self.indent_level):
+                self.str_list.extend(self.indent_str)
+            self.needsIndent = False
 
-   def __str__(self):
-      return "".join(self.str_list)
+        self.str_list.extend(first_line)
+
+        for line in lines[1:]:
+            self.str_list.extend('\n')
+            for n in range(self.indent_level):
+                self.str_list.extend(self.indent_str)
+            self.str_list.extend(line)
+
+    def writeln(self, s = ""):
+        self.write(s)
+        self.str_list.extend('\n')
+        self.needsIndent = True
+
+    def indent(self):
+        self.indent_level += 1
+
+    def unindent(self):
+        self.indent_level -= 1
+        if (self.indent_level < 0): raise Exception()
+
+    def __str__(self):
+        return "".join(self.str_list)
 
 def test():
-   buf = StringBuffer()
-   buf.writeln('hi')
-   buf.writeln("hello")
-   buf.indent()
-   buf.writeln(" 4")
-   buf.indent()
-   buf.writeln("indented more")
-   buf.unindent()
-   buf.writeln("unindented")
-   buf.unindent()
-   buf.writeln("no more indent")
-   print buf.as_string()
+    buf = StringBuffer()
+    buf.write('hi')
+    buf.writeln(" hello")
+    buf.indent()
+    buf.writeln(" 4")
+    buf.indent()
+    buf.writeln("indented more")
+    buf.unindent()
+    buf.writeln("unindented")
+    buf.unindent()
+    buf.writeln("no more indent")
+
+    buf.writeln("multline 1\nmultiline 2\nmultiline 3")
+    buf.indent()
+    buf.writeln("indent1\nindent2\nindent3")
+    buf.indent()
+    buf.write("finally, ")
+    buf.write("line 1\nline 2")
+    buf.writeln(", the end")
+    buf.unindent()
+    buf.unindent()
+    print str(buf)
 
 if __name__ == "__main__":
-   test()
+    test()
