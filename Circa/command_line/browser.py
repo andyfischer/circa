@@ -62,6 +62,9 @@ class Browser(object):
             term.execute()
             print str(term)
 
+        elif command == 'run':
+            self.codeUnit.execute()
+
         elif command == 'func' or command == 'f':
             term = self.getTermFromIdentifier(commandArgs)
             print self.describeTerm(term.functionTerm)

@@ -1,6 +1,6 @@
 hello = 1
 function test_function(int a, int b) -> bool {
-  result = a > b
-  print('hello')
-  assert(true)
+  print(a+b)
 }
+
+test_function(5,4)
