@@ -105,6 +105,10 @@ class CodeUnit(object):
         return self.createTerm(variableFunc, [])
 
     def bindName(self, term, name, allowOverwrite=False):
+        """
+        Bind the name to the given term. If allowOverwrite is false, an
+        error will be thrown if this name is already bound.
+        """
         debug._assert(isinstance(name, str))
         debug._assert(isinstance(term, Term))
         if not allowOverwrite and name in self.mainNamespace:

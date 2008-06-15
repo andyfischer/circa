@@ -11,12 +11,14 @@ from Circa.utils.spy_object import SpyObject
 from token_definitions import *
 
 class CompilationContext(object):
-    def __init__(self, codeUnit, compilationCU=None):
+    def __init__(self, codeUnit, compilationCU=None, parent=None):
         self.codeUnit = codeUnit
-        if not compilationCU:
-            self.compilationCU = codeUnit
-        else:
-            self.compilationCU = compilationCU
+        self.parent = None
+
+        if compilationCU is None:
+            compilationCU = codeUnit
+
+        self.compilationCU = compilationCU
 
 class Node(object):
     def createTerms(self, context):
@@ -38,6 +40,9 @@ class StatementList(object):
         return self.statements[0].getFirstToken()
     def renderSource(self):
         return "".join([statement.renderSource() for statement in self.statements])
+    def __iter__(self):
+        for statement in self.statements:
+            yield statement
 
 class IgnoredSyntax(Node):
     def __init__(self, token):
@@ -89,6 +94,7 @@ class Infix(Node):
         # Try to find a defined operator
         normalFunction = getOperatorFunction(context.codeUnit, self.token)
         if normalFunction is not None:
+            debug._assert(normalFunction.cachedValue is not None)
 
             newTerm = context.codeUnit.createTerm(normalFunction,
                 inputs=[self.left.createTerms(context),
@@ -232,6 +238,14 @@ class FunctionCall(Node):
     def renderSource(self):
         return str(self.function_name) + '(' + ','.join(map(str,self.args)) + ')'
 
+class FunctionDeclArg(Node):
+    def __init__(self, type, name):
+        self.type = type
+        self.name = name
+
+    def renderSource(self):
+        return self.type.text + ' ' + self.name.text
+
 class FunctionDecl(Node):
     """
     Fields:
@@ -256,20 +270,52 @@ class FunctionDecl(Node):
 
     def createTerms(self, context):
 
-        # Resolve types
-        inputTypes = [context.codeUnit.getNamed(arg.type.text)
-            for arg in self.inputArgs ]
-        outputType = context.codeUnit.getNamed(self.outputType.text)
+        # For each input arg, resolve the type
+        inputTypeTerms = []
+        for arg in self.inputArgs:
+            typeTerm = context.codeUnit.getNamed(arg.type.text)
+            if typeTerm is None:
+                raise IdentifierNotFound(arg.type)
+            inputTypeTerms.append(typeTerm)
 
+        # Resolve output type
+        outputTypeTerm = context.codeUnit.getNamed(self.outputType.text)
+        if outputTypeTerm is None:
+            raise IdentifierNotFound(self.outputType)
+
+        # Create a subroutine term
         subroutineTerm = context.codeUnit.createConstant(builtins.SUBROUTINE_TYPE)
 
         ca_subroutine.setName(subroutineTerm, self.functionName.text)
-        ca_subroutine.setInputTypes(subroutineTerm, inputTypes)
-        ca_subroutine.setOutputType(subroutineTerm, outputType)
+        ca_subroutine.setInputTypes(subroutineTerm, inputTypeTerms)
+        ca_subroutine.setOutputType(subroutineTerm, outputTypeTerm)
+
+        subroutineCodeUnit = ca_subroutine.codeUnit(subroutineTerm)
+
+        # Create placeholder terms for all inputs
+        inputPlaceholders = []
+        for index in range(len(self.inputArgs)):
+            name = self.inputArgs[index].name.text
+            typeTerm = inputTypeTerms[index]
+            placeholderTerm = subroutineCodeUnit.createVariable(typeTerm)
+            inputPlaceholders.append(placeholderTerm)
+            subroutineCodeUnit.bindName(placeholderTerm, name)
+            
+
+        # Create terms for the body of the subroutine
+        innerCompilationContext = CompilationContext(
+                ca_subroutine.codeUnit(subroutineTerm),
+                parent = context.codeUnit)
+
+        for statement in self.statementList:
+            statement.createTerms(innerCompilationContext)
+
+        return subroutineTerm
 
     def renderSource(self):
-        return ("function " + self.functionName.text + "(" +
-            ", ".join(map(str,self.inputArgs)) + ")")
+        args = ', '.join([arg.renderSource() for arg in self.inputArgs])
+        output = "function " + self.functionName.text + "(" + args + ") {"
+        return output
 
 
 def getOperatorFunction(codeUnit, token):

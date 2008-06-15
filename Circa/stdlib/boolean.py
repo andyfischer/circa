@@ -28,3 +28,11 @@ def createFunctions(codeUnit):
     for functionDef in functionDefs:
         function_builder.createFunction(codeUnit, functionDef)
 
+    # Create 'true' and 'false' constants
+    true = codeUnit.createConstant(builtins.BOOL_TYPE)
+    true.cachedValue = True
+    codeUnit.bindName(true, 'true')
+
+    false = codeUnit.createConstant(builtins.BOOL_TYPE)
+    false.cachedValue = False
+    codeUnit.bindName(false, 'false')
