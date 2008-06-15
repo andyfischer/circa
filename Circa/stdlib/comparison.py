@@ -24,7 +24,28 @@ class NotEquals(function_builder.BaseFunction):
     def evaluate(cxt):
         cxt.setResult( cxt.input(0) != cxt.input(1) )
 
-functionDefs = [Equals, NotEquals]
+class LessThan(function_builder.BaseFunction):
+    name = 'less_than'
+    inputTypes = [builtins.FLOAT_TYPE, builtins.FLOAT_TYPE]
+    outputType = builtins.BOOL_TYPE
+    pureFunction = True
+
+    @staticmethod
+    def evaluate(cxt):
+        cxt.setResult( cxt.input(0) < cxt.input(1) )
+
+class GreaterThan(function_builder.BaseFunction):
+    name = 'greater_than'
+    inputTypes = [builtins.FLOAT_TYPE, builtins.FLOAT_TYPE]
+    outputType = builtins.BOOL_TYPE
+    pureFunction = True
+
+    @staticmethod
+    def evaluate(cxt):
+        cxt.setResult( cxt.input(0) > cxt.input(1) )
+
+
+functionDefs = [Equals, NotEquals, LessThan, GreaterThan]
 
 def createFunctions(codeUnit):
     for functionDef in functionDefs:

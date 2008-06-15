@@ -10,6 +10,8 @@ operator('*') := mult
 operator('/') := div
 operator('==') := equals
 operator('!=') := not_equals
+operator('<') := less_than
+operator('>') := greater_than
 
 # Bind assign operators to functions
 assign_operator('+=') := add

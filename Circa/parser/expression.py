@@ -36,7 +36,7 @@ _infixPrecedence = {
     DOT: 7,
     STAR: 6, SLASH: 6,
     PLUS: 5, MINUS: 5,
-    LTHAN: 2, LTHANEQ: 2, GTHAN: 2, GTHANEQ: 2, DOUBLE_EQUALS: 2, NOT_EQUALS: 2,
+    LTHAN: 3, LTHANEQ: 3, GTHAN: 3, GTHANEQ: 3, DOUBLE_EQUALS: 3, NOT_EQUALS: 3,
     EQUALS: 2, PLUS_EQUALS: 2, MINUS_EQUALS: 2, STAR_EQUALS: 2, SLASH_EQUALS: 2,
       COLON_EQUALS: 2,
     RIGHT_ARROW: 1 
@@ -132,15 +132,10 @@ def function_decl(tokens):
     result.functionName = tokens.consume(IDENT)
     result.openParen = tokens.consume(LPAREN)
 
-    class FunctionArg(object):
-        def __init__(self, type, name):
-            self.type = type
-            self.name = name
-
     while not tokens.nextIs(RPAREN):
         argType = tokens.consume(IDENT)
         argName = tokens.consume(IDENT)
-        result.inputArgs.append( FunctionArg(argType, argName) )
+        result.inputArgs.append( ast.FunctionDeclArg(argType, argName) )
 
         if not tokens.nextIs(COMMA):
             break

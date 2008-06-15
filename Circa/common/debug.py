@@ -4,8 +4,8 @@ import pdb
 from Circa.common import errors
 
 def _assert(condition):
-   if not condition:
-      pdb.set_trace() # An assertion has failed
+    if not condition:
+        pdb.set_trace() # An assertion has failed
 
 def fail(message):
     print 'Debug.fail:', message
