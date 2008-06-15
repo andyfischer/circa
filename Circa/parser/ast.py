@@ -8,6 +8,7 @@ from Circa.core import (builtins, ca_string, ca_subroutine, ca_function, ca_type
 from Circa.core.term import Term
 from Circa.common import (debug, errors)
 from Circa.utils.spy_object import SpyObject
+from Circa.utils.string_buffer import StringBuffer
 from token_definitions import *
 
 class CompilationContext(object):
@@ -28,7 +29,9 @@ class Node(object):
     def getFirstToken(self):
         raise errors.PureVirtualMethodFail(self, 'getFirstToken')
     def __str__(self):
-        return self.renderSource()
+        output = StringBuffer()
+        self.renderSource(output)
+        return str(output)
 
 class StatementList(object):
     def __init__(self):
@@ -38,8 +41,9 @@ class StatementList(object):
             statement.createTerms(context)
     def getFirstToken(self):
         return self.statements[0].getFirstToken()
-    def renderSource(self):
-        return "".join([statement.renderSource() for statement in self.statements])
+    def renderSource(self, output):
+        for statement in self.statements:
+            statement.renderSource(output)
     def __iter__(self):
         for statement in self.statements:
             yield statement
@@ -49,8 +53,8 @@ class IgnoredSyntax(Node):
         self.token = token
     def createTerms(self, context):
         pass
-    def renderSource(self):
-        return self.token.text
+    def renderSource(self, output):
+        output.write(self.token.text)
 
 class Infix(Node):
     def __init__(self, functionToken, left, right):
@@ -119,9 +123,10 @@ class Infix(Node):
     def getFirstToken(self):
         return self.left.getFirstToken()
 
-    def renderSource(self):
-        return (self.left.renderSource() + ' ' + self.token.text + ' '
-            + self.right.renderSource())
+    def renderSource(self, output):
+        self.left.renderSource(output)
+        output.write(' ' + self.token.text + ' ')
+        self.right.renderSource(output)
 
 class Literal(Node):
     def __init__(self, token, hasQuestionMark=False):
@@ -159,11 +164,11 @@ class Literal(Node):
     def getFirstToken(self):
         return self.token
 
-    def renderSource(self):
+    def renderSource(self, output):
         if (self.token.match == STRING):
-            return "'" + self.value + "'"
+            output.write("'" + self.value + "'")
         else:
-            return str(self.value)
+            output.write(str(self.value))
 
 class Ident(Node):
     def __init__(self, token):
@@ -180,8 +185,8 @@ class Ident(Node):
     def getFirstToken(self):
         return self.token
 
-    def renderSource(self):
-        return self.token.text
+    def renderSource(self, output):
+        output.write(self.token.text)
 
 class Unary(Node):
     def __init__(self, functionToken, right):
@@ -196,8 +201,9 @@ class Unary(Node):
     def getFirstToken(self):
         return self.functionToken;
 
-    def renderSource(self):
-        return '-' + self.right.renderSource()
+    def renderSource(self, output):
+        output.write('-')
+        self.right.renderSource(output)
 
 class FunctionCall(Node):
     def __init__(self, function_name, args):
@@ -235,16 +241,16 @@ class FunctionCall(Node):
     def getFirstToken(self):
         return self.function_name;
 
-    def renderSource(self):
-        return str(self.function_name) + '(' + ','.join(map(str,self.args)) + ')'
+    def renderSource(self, output):
+        output.write(str(self.function_name) + '(' + ','.join(map(str,self.args)) + ')')
 
 class FunctionDeclArg(Node):
     def __init__(self, type, name):
         self.type = type
         self.name = name
 
-    def renderSource(self):
-        return self.type.text + ' ' + self.name.text
+    def renderSource(self, output):
+        output.write(self.type.text + ' ' + self.name.text)
 
 class FunctionDecl(Node):
     """
@@ -312,10 +318,22 @@ class FunctionDecl(Node):
 
         return subroutineTerm
 
-    def renderSource(self):
-        args = ', '.join([arg.renderSource() for arg in self.inputArgs])
-        output = "function " + self.functionName.text + "(" + args + ") {"
-        return output
+    def renderSource(self, output):
+        output.write("function " + self.functionName.text + "(")
+        firstArg = True
+        for arg in self.inputArgs:
+            if not firstArg:
+                output.write(', ')
+            firstArg = False
+            arg.renderSource(output)
+        output.write(") {")
+
+        output.indent()
+        for statement in self.statementList:
+            statement.renderSource(output)
+        output.unindent()
+
+        output.write("}")
 
 
 def getOperatorFunction(codeUnit, token):

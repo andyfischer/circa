@@ -16,7 +16,5 @@ def appendLineComment(codeUnit, comment):
 
 def codeToSource(codeUnit):
     buffer = StringBuffer()
-    buffer.writeln(codeUnit.ast.renderSource())
-
+    codeUnit.ast.renderSource(buffer)
     return str(buffer)
-    
