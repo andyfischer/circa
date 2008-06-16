@@ -65,7 +65,11 @@ def createBuiltinTypes(kernel):
     ca_type.setInitializeFunc(subroutineType, ca_subroutine.initializeTerm)
     ca_type.setToStringFunc(subroutineType, ca_subroutine.toString)
     kernel.bindName(subroutineType, 'Subroutine')
-    
+
+    # Make constant-generator terms for all new functions
+    for type in (intType, stringType, boolType, floatType, subroutineType):
+        kernel.createTerm(builtins.CONST_GENERATOR, [type])
+
     # Export objects
     builtins.INT_TYPE = intType
     builtins.STRING_TYPE = stringType
