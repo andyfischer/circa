@@ -311,6 +311,7 @@ class FunctionDecl(Node):
         for statement in self.statementList:
             statement.createTerms(innerCompilationContext)
 
+        # Bind the subroutine's name
         context.codeUnit.bindName(subroutineTerm, self.functionName.text)
         return subroutineTerm
 
@@ -331,6 +332,19 @@ class FunctionDecl(Node):
 
         output.write("}")
 
+class ReturnStatement(Node):
+    """
+      returnKeyword
+      expr
+    """
+    def getFirstToken(self):
+        return self.returnKeyword
+    def createTerms(self, context):
+        result = self.expr.createTerms(context)
+        context.codeUnit.bindName(result, "#return_val")
+    def renderSource(self, output):
+        output.write('return ')
+        self.expr.renderSource(output)
 
 def getOperatorFunction(codeUnit, token):
 

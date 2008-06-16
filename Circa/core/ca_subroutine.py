@@ -11,7 +11,6 @@ class CircaSubroutine(ca_function.CircaFunction):
 
         self.codeUnit = ca_codeunit.CodeUnit()
         self.inputPlaceholders = []
-        self.outputPlaceholder = None
 
         self.evaluateFunc = subroutineEvaluateFunc
 
@@ -28,9 +27,12 @@ def subroutineEvaluateFunc(cxt):
     # Execute
     subroutine.codeUnit.execute()
 
+    # Find output placeholder
+    outputPlaceholder = subroutine.codeUnit.getNamed("#return_val")
+
     # Copy output placeholder to this term's output
-    if subroutine.outputPlaceholder:
-        cxt.setResult(subroutine.outputPlaceholder.cachedValue)
+    if outputPlaceholder:
+        cxt.setResult(outputPlaceholder.cachedValue)
     else:
         cxt.setResult(None)
 
