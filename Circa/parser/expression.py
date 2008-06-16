@@ -26,6 +26,8 @@ def statement(tokens):
         return ast.IgnoredSyntax(tokens.consume(COMMENT_LINE))
     elif tokens.nextIs(NEWLINE):
         return ast.IgnoredSyntax(tokens.consume(NEWLINE))
+    elif tokens.nextIs(RETURN):
+        return return_statement(tokens)
     else:
         return infix_expression(tokens, 0)
 
@@ -157,6 +159,12 @@ def function_decl(tokens):
     result.closeBracket = tokens.consume(RBRACKET)
     
     return result
+
+def return_statement(tokens):
+    returnStmt = ast.ReturnStatement()
+    returnStmt.returnKeyword = tokens.consume(RETURN)
+    returnStmt.expr = infix_expression(tokens, 0)
+    return returnStmt
 
 def testEquals():
     import tokens

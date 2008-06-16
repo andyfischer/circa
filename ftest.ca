@@ -1,6 +1,8 @@
 hello = 1
 function test_function(int a, int b) -> bool {
   print(a+b)
+  return a*b
 }
 
-test_function(5,4)
+five_times_four = test_function(5,4)
+one_times_one = test_function(1,1)
