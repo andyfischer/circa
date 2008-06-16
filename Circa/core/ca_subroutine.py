@@ -10,7 +10,6 @@ class CircaSubroutine(ca_function.CircaFunction):
         self.pureFunction = False
 
         self.codeUnit = ca_codeunit.CodeUnit()
-        self.inputPlaceholders = []
 
         self.evaluateFunc = subroutineEvaluateFunc
 
@@ -18,11 +17,12 @@ class CircaSubroutine(ca_function.CircaFunction):
 def subroutineEvaluateFunc(cxt):
     subroutine = cxt.caller().functionTerm.cachedValue
 
-    debug._assert(len(subroutine.inputPlaceholders) == cxt.numInputs())
-
     # Copy inputs to subroutine's input placeholders
     for index in range(cxt.numInputs()):
-        subroutine.inputPlaceholders[index].cachedValue = cxt.input(index)
+        inputPlaceholderName = "#input_placeholder" + str(index)
+        inputPlaceholder = subroutine.codeUnit.getNamed(inputPlaceholderName)
+        debug._assert(inputPlaceholder is not None)
+        inputPlaceholder.cachedValue = cxt.input(index)
 
     # Execute
     subroutine.codeUnit.execute()
@@ -62,8 +62,6 @@ def field(fieldName):
 (name, setName) = field('name')
 (inputTypes, setInputTypes) = field('inputTypes')
 (outputType, setOutputType) = field('outputType')
-(inputPlaceholders, setInputPlaceholders) = field('inputPlaceholders')
-(outputPlaceholder, setOutputPlaceholder) = field('outputPlaceholder')
 (codeUnit, _) = field('codeUnit')
 
 
