@@ -294,14 +294,13 @@ class FunctionDecl(Node):
         subroutineCodeUnit = ca_subroutine.codeUnit(subroutineTerm)
 
         # Create placeholder terms for all inputs
-        inputPlaceholders = []
         for index in range(len(self.inputArgs)):
             name = self.inputArgs[index].name.text
             typeTerm = inputTypeTerms[index]
             placeholderTerm = subroutineCodeUnit.createVariable(typeTerm)
-            inputPlaceholders.append(placeholderTerm)
+            inputPlaceholderName = "#input_placeholder" + str(index)
+            subroutineCodeUnit.bindName(placeholderTerm, inputPlaceholderName)
             subroutineCodeUnit.bindName(placeholderTerm, name)
-        ca_subroutine.setInputPlaceholders(subroutineTerm, inputPlaceholders)
 
         # Create terms for the body of the subroutine
         innerCompilationContext = CompilationContext(
