@@ -5,7 +5,7 @@
 #   Basic math functions
 #   Debugging functions
 
-import boolean, comparison, debugging, feedback, simple_math, map, meta, variables
+import boolean, comparison, debugging, feedback, python, simple_math, map, meta, variables
 
 def createFunctions(codeUnit):
     boolean.createFunctions(codeUnit)
@@ -14,5 +14,6 @@ def createFunctions(codeUnit):
     feedback.createFunctions(codeUnit)
     map.createFunctions(codeUnit)
     meta.createFunctions(codeUnit)
+    python.createFunctions(codeUnit)
     simple_math.createFunctions(codeUnit)
     variables.createFunctions(codeUnit)
