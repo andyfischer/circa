@@ -12,14 +12,9 @@ from Circa.utils.string_buffer import StringBuffer
 from token_definitions import *
 
 class CompilationContext(object):
-    def __init__(self, codeUnit, compilationCU=None, parent=None):
+    def __init__(self, codeUnit, parent=None):
         self.codeUnit = codeUnit
-        self.parent = None
-
-        if compilationCU is None:
-            compilationCU = codeUnit
-
-        self.compilationCU = compilationCU
+        self.parent = parent
 
 class Node(object):
     def createTerms(self, context):
@@ -81,8 +76,10 @@ class Infix(Node):
             rightTerm = self.right.createTerms(context)
             debug._assert(leftTerm is not None)
             debug._assert(rightTerm is not None)
-            return context.compilationCU.createTerm(
+            newTerm = context.codeUnit.createTerm(
                     builtins.FEEDBACK_FUNC, [leftTerm, rightTerm])
+            newTerm.execute()
+            return newTerm
 
         # Evaluate as a right-arrow?
         # (Not supported yet)
