@@ -7,8 +7,6 @@ from Circa.common import (debug, errors, codeunit_utils)
 from Circa.core import (builtins, ca_codeunit, ca_type, ca_function)
 from Circa.parser import ast as ast_module
 
-COMPILATION_CU = None
-
 class Browser(object):
     def __init__(self, codeUnit=None):
         self.codeUnit = codeUnit
@@ -196,10 +194,8 @@ def removeFileSuffix(filename):
         return filename[:-3]
 
 def loadStandardModule(name):
-    codeunit_utils.appendLineComment(COMPILATION_CU, "Loading module " + name + "...")
-
     filename = os.path.join(os.environ['CIRCA_HOME'], 'stdlib', 'parsing.ca')
-    (errors, codeUnit) = parser.parseFile(filename, compilationCU=COMPILATION_CU)
+    (errors, codeUnit) = parser.parseFile(filename)
 
     if errors:
         print "Errors in %s module:" % name
@@ -213,14 +209,7 @@ def main():
 
     builtins.LOADED_MODULES['kernel'] = builtins.KERNEL
 
-    # create compilation codeUnit
-    global COMPILATION_CU
-    COMPILATION_CU = ca_codeunit.CodeUnit()
-    builtins.LOADED_MODULES['compilation'] = COMPILATION_CU
-
     loadStandardModule('parsing')
-
-    COMPILATION_CU.execute()
 
     for module in builtins.LOADED_MODULES.values():
         module.updateAll()
@@ -240,7 +229,7 @@ def main():
 
         print "Reading file " + filename + "..."
 
-        (errors, codeUnit) = parser.parseFile(filename, compilationCU = COMPILATION_CU)
+        (errors, codeUnit) = parser.parseFile(filename)
 
         if errors:
             print len(errors), "parsing errors occured"
