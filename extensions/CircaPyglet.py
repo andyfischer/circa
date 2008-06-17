@@ -11,16 +11,19 @@ class Draggable(Circa.PythonFunction):
 import Circa.core.bootstrap
 from Circa.core import builtins
 from Circa.common import function_builder
-
 import pyglet, pyglet.window, pyglet.font
 
+print str(builtins)
+
 class Window(function_builder.BaseFunction):
+    name = 'pyglet_window'
     pureFunction = False
-    inputTypes = builtins.VOID_TYPE
+    inputTypes = [builtins.VOID_TYPE]
     outputType = builtins.VOID_TYPE
 
     @staticmethod
     def initialize(cxt):
+        import pyglet.window
         cxt.caller().state = pyglet.window.Window()
 
     @staticmethod
