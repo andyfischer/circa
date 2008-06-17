@@ -152,7 +152,7 @@ def atom(tokens):
         return function_call(tokens)
 
     # Literal value
-    if tokens.nextIn((FLOAT, INTEGER, STRING)):
+    if tokens.nextIn((FLOAT, INTEGER, STRING, MULTILINE_STR)):
         token = tokens.consume()
         questionMark = False
         if tokens.nextIs(QUESTION):
