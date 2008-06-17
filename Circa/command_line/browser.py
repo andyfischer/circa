@@ -251,8 +251,8 @@ def main():
         builtins.LOADED_MODULES[removeFileSuffix(filename)] = codeUnit
 
         targetCodeUnit = codeUnit
-        targetCodeUnit.execute()
-        targetCodeUnit.updateAll()
+        #targetCodeUnit.execute()
+        #targetCodeUnit.updateAll()
 
     browser = Browser(targetCodeUnit)
 

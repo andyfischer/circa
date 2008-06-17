@@ -222,6 +222,7 @@ class FunctionCall(Node):
         if func.getType() in (builtins.FUNCTION_TYPE, builtins.SUBROUTINE_TYPE):
             newTerm = context.codeUnit.createTerm(func, inputs=arg_terms)
             newTerm.ast = self
+            newTerm.execute()
             return newTerm
 
         # Temp: Use a Python dynamic type check to see if this is a function
