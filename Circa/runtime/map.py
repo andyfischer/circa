@@ -12,8 +12,8 @@ class MapConstructor(function_builder.BaseFunction):
     pureFunction = True
 
     @staticmethod
-    def initialize(term):
-        term.state = {}
+    def initialize(cxt):
+        cxt.caller().state = {}
 
     @staticmethod
     def evaluate(cxt):

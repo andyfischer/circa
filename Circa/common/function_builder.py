@@ -50,3 +50,4 @@ def convertPythonFuncToCircaEvaluate(pythonFunc):
        if result is not None:
            term.cachedValue = result
    return funcForCirca
+

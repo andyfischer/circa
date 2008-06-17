@@ -77,7 +77,7 @@ class CodeUnit(object):
 
         # Initialize the term, if this function has an initializeFunc
         if ca_function.initializeFunc(function):
-            ca_function.initializeFunc(function)(newTerm)
+            ca_function.initializeFunc(function)(newTerm.executionContext)
 
         newTerm.update()
 
