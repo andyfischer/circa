@@ -121,10 +121,10 @@ bootstrapKernel(kernel)
 
 builtin_types.createBuiltinTypes(kernel)
 
-# Create stdlib
+# Create runtime terms
 # future: move this to a separate code unit?
 
-from Circa import stdlib
-stdlib.createFunctions(kernel)
+from Circa import runtime
+runtime.createFunctions(kernel)
 
 builtins.KERNEL_LOADED = True
