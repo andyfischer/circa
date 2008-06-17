@@ -18,7 +18,7 @@ print str(builtins)
 class Window(function_builder.BaseFunction):
     name = 'pyglet_window'
     pureFunction = False
-    inputTypes = [builtins.VOID_TYPE]
+    inputTypes = []
     outputType = builtins.VOID_TYPE
 
     @staticmethod
