@@ -143,6 +143,9 @@ class Literal(Node):
             # the literal should have ' or " marks on either side, strip these
             self.value = token.text.strip("'\"")
             self.circaType = builtins.STRING_TYPE
+        elif token.match == MULTILINE_STR:
+            self.value = token.text[3:-3]
+            self.circaType = builtins.STRING_TYPE
         else:
             raise parse_errors.InternalError("Couldn't recognize token: " + str(token))
 

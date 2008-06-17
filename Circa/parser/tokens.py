@@ -261,9 +261,14 @@ def commentTest():
 def commentLineTest():
     strm = tokenize('1 2 3\n# commented line\n  1 # more comments')
 
+def multilineStringTest():
+    strm = tokenize('"""hi"""')
+    strm.consume('MULTILINE_STR')
     
 if __name__ == "__main__":
     tokenStreamTest()
     tokenizeTest()
     commentTest()
+    commentLineTest()
+    multilineStringTest()
 
