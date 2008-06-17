@@ -21,11 +21,15 @@ class CodeUnit(object):
         # an AST object that describes this code
         self.ast = None
 
-    def _newTerm(self):
+    def _newTerm(self, branch = None):
         "Internal method. Returns a new Term object."
         new_term = Term()
         new_term.codeUnit = self
-        self.allTerms.append(new_term)
+
+        if branch:
+            branch.append(new_term)
+        else:
+            self.allTerms.append(new_term)
         return new_term
 
     def _bootstrapEmptyTerm(self):
@@ -36,10 +40,13 @@ class CodeUnit(object):
         """
         return self._newTerm()
 
-    def createTerm(self, function, inputs):
+    def createTerm(self, function, inputs, branch=None):
         """
         Create a term with the given function and inputs.
         This call may reuse an existing term, if it's correct to do so.
+
+        If 'branch' is specified, create the term inside that branch.
+        Otherwise, the term is created in the main branch.
         """
 
         debug._assert(isinstance(function, Term))
@@ -60,7 +67,7 @@ class CodeUnit(object):
             if existing:
                 return existing
 
-        newTerm = self._newTerm()
+        newTerm = self._newTerm(branch)
         newTerm.functionTerm = function
         newTerm.inputs = list(inputs)
 
@@ -105,6 +112,20 @@ class CodeUnit(object):
 
         # Create the term
         return self.createTerm(variableFunc, [])
+
+    def deleteTerm(self, term):
+        """
+        Removes all external references to 'term', so that it will be garbage
+        collected. This function does not remove 'term' from its branch, the
+        caller should probably do that as well.
+        """
+        debug._assert(isinstance(term, Term))
+
+        term.functionTerm.users.remove(term)
+        for input in term.inputs:
+            input.users.remove(term)
+
+        term.deleted = True
 
     def bindName(self, term, name, allowOverwrite=False):
         """
