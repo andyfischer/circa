@@ -45,10 +45,12 @@ class CodeUnit(object):
         debug._assert(isinstance(function, Term))
 
         # Check if they have provided the correct number of arguments
+        requiredArgCount = len(ca_function.inputTypes(function))
+
         if not ca_function.variableArgs(function):
-            if len(inputs) != len(ca_function.inputTypes(function)):
+            if len(inputs) != requiredArgCount:
                 raise errors.WrongNumberOfArguments(ca_function.name(function),
-                       len(ca_function.inputTypes(function)), len(inputs))
+                       requiredArgCount, len(inputs))
 
         # Todo: Check if types match
 
