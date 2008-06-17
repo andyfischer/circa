@@ -95,6 +95,7 @@ class TermExecutionContext(object):
         return len(self.targetTerm.inputs)
     def codeUnit(self):
         return self.targetTerm.codeUnit
-
+    def branch(self):
+        return self.targetTerm.branch
     def setResult(self, value):
         self.targetTerm.cachedValue = value
