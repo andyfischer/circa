@@ -6,13 +6,12 @@
 
 import pdb
 
-import expression as _expression_module
 import tokens as _tokens_module
 import parser as _parser_module
 
 def parseStatement(string):
     "Parse the string as a statement, and return an AST"
     token_stream = _tokens_module.tokenize(string)
-    return _expression_module.statement(token_stream)
+    return _parser_module.statement(token_stream)
 
 parseFile = _parser_module.parseFile
