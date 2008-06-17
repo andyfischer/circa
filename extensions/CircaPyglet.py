@@ -28,7 +28,10 @@ class Window(function_builder.BaseFunction):
 
     @staticmethod
     def evaluate(cxt):
-        pass
+        cxt.caller().state.dispatch_events()
+        cxt.caller().state.clear()
+        cxt.caller().state.draw()
+        cxt.caller().state.flip()
 
 class HelloWorldWindow(pyglet.window.Window):
     def __init__(self):
