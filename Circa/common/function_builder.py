@@ -54,6 +54,7 @@ def importPythonFunction(codeUnit, pythonClass, instanceBased = False):
     """
 
     debug._assert(isinstance(pythonClass, type))
+    debug.assertType(pythonClass.inputs, list, 'pythonClass.inputs')
 
     def findType(typeName):
         type = codeUnit.getNamed(typeName)
@@ -85,7 +86,6 @@ def importPythonFunction(codeUnit, pythonClass, instanceBased = False):
 
     ca_function.setInitializeFunc(functionTerm, initializeFunc)
     ca_function.setEvaluateFunc(functionTerm, evaluateFunc)
-
 
     pureFunction = True
     if hasattr(pythonClass, 'pure'):

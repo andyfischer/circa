@@ -1,37 +1,25 @@
 
-"""
 import Circa
-
-demo_ca = Circa.loadFile("demo.ca")
-
-class Draggable(Circa.PythonFunction):
-   pureFunction=False
-"""
-
-import Circa.core.bootstrap
-from Circa.core import builtins
-from Circa.common import function_builder
 import pyglet, pyglet.window, pyglet.font
 
-print str(builtins)
+Circa.initialize()
 
-class Window(function_builder.BaseFunction):
+class Window(object):
     name = 'pyglet_window'
-    pureFunction = False
-    inputTypes = []
-    outputType = builtins.VOID_TYPE
+    pure = False
+    inputs = []
+    output = 'void'
 
-    @staticmethod
-    def initialize(cxt):
-        import pyglet.window
-        cxt.caller().state = pyglet.window.Window()
+    def initialize(self):
+        self.window = pyglet.window.Window()
 
-    @staticmethod
-    def evaluate(cxt):
-        cxt.caller().state.dispatch_events()
-        cxt.caller().state.clear()
-        cxt.caller().state.draw()
-        cxt.caller().state.flip()
+    def evaluate(self):
+        self.window.dispatch_events()
+        self.window.clear()
+        self.window.draw()
+        self.window.flip()
+
+Circa.importFunction(Window)
 
 class HelloWorldWindow(pyglet.window.Window):
     def __init__(self):
