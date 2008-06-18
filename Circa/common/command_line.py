@@ -198,17 +198,12 @@ def removeFileSuffix(filename):
 def main():
     Circa.initialize()
 
-
-    for module in Circa.LOADED_MODULES.values():
-        module.updateAll()
-        module.execute()
-
     targetCodeUnit = None
 
     # Read command-line args
     if len(sys.argv) < 2:
-        print "No file specified, examining Kernel"
-        targetCodeUnit = builtins.KERNEL
+        print "No file specified, examining main"
+        targetCodeUnit = Circa.LOADED_MODULES['main']
     else:
         filename = findUsersFilename(sys.argv[1])
         if filename is None:
@@ -231,9 +226,8 @@ def main():
         #targetCodeUnit.execute()
         #targetCodeUnit.updateAll()
 
-    browser = CommandLine(targetCodeUnit)
-
-    browser.doInputLoop()
+    command_line = CommandLine(targetCodeUnit)
+    command_line.doInputLoop()
 
 if __name__ == "__main__":
     main()

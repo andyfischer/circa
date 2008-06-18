@@ -11,16 +11,18 @@ class Window(object):
     output = 'void'
 
     def initialize(self):
+        print "initialze called"
         self.window = pyglet.window.Window()
 
     def evaluate(self):
         self.window.dispatch_events()
         self.window.clear()
-        self.window.draw()
+        #self.window.draw()
         self.window.flip()
 
 Circa.importFunction(Window)
 
+"""
 class HelloWorldWindow(pyglet.window.Window):
     def __init__(self):
         super(HelloWorldWindow, self).__init__()
@@ -38,6 +40,6 @@ class HelloWorldWindow(pyglet.window.Window):
             self.clear()
             self.draw()
             self.flip()
+"""
 
-if __name__ == '__main__':
-    HelloWorldWindow().run()
+Circa.startReplLoop()
