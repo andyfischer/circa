@@ -1,10 +1,45 @@
 
+import os
+
+LOADED_MODULES = {}
+
 def initialize():
+    from Circa.core import builtins
     import Circa.core.bootstrap
 
+    global LOADED_MODULES
+    LOADED_MODULES['kernel'] = builtins.KERNEL
+
+    _loadStandardModule('parsing')
 
 def importFunction(functionDef):
     from Circa.core import builtins
     from Circa.common import function_builder
     function_builder.importPythonFunction(builtins.KERNEL, functionDef,
             instanceBased=True)
+
+def getGlobal(name):
+    from Circa.core import builtins
+    if builtins.KERNEL.definesName(name):
+        return builtins.KERNEL.getNamed(name)
+
+    for module in LOADED_MODULES.values():
+        if module.definesName(name):
+            return module.getNamed(name)
+
+    return None
+    
+def _loadStandardModule(name):
+    from Circa import parser
+
+    filename = os.path.join(os.environ['CIRCA_HOME'], 'stdlib', 'parsing.ca')
+    (errors, codeUnit) = parser.parseFile(filename)
+
+    if errors:
+        print "Errors in %s module:" % name
+        print "\n".join(map(str,errors))
+        return
+
+    global LOADED_MODULES
+    LOADED_MODULES[name] = codeUnit
+

@@ -2,6 +2,7 @@
 
 import os,sys,pdb
 from string import Template
+import Circa
 from Circa import parser
 from Circa.common import (debug, errors, codeunit_utils)
 from Circa.core import (builtins, ca_codeunit, ca_type, ca_function)
@@ -88,21 +89,21 @@ class CommandLine(object):
 
         elif command == 'switch' or command == 'sw':
             module_name = commandArgs.strip()
-            if module_name not in builtins.LOADED_MODULES:
+            if module_name not in Circa.LOADED_MODULES:
                 print "Couldn't find module: " + module_name
                 return
 
-            self.codeUnit = builtins.LOADED_MODULES[module_name]
+            self.codeUnit = Circa.LOADED_MODULES[module_name]
             print "Switched to: " + module_name
 
         elif command == 'create':
             module_name = commandArgs.strip()
             newModule = ca_codeunit.CodeUnit()
-            builtins.LOADED_MODULES[module_name] = newModule
+            Circa.LOADED_MODULES[module_name] = newModule
             self.codeUnit = newModule
 
         elif command == 'dir':
-            for (name, module) in builtins.LOADED_MODULES.items():
+            for (name, module) in Circa.LOADED_MODULES.items():
                 prefix = "* " if module is self.codeUnit else "  "
                 print prefix + name
 
@@ -193,25 +194,12 @@ def removeFileSuffix(filename):
     if filename.endswith('.ca'):
         return filename[:-3]
 
-def loadStandardModule(name):
-    filename = os.path.join(os.environ['CIRCA_HOME'], 'stdlib', 'parsing.ca')
-    (errors, codeUnit) = parser.parseFile(filename)
-
-    if errors:
-        print "Errors in %s module:" % name
-        print "\n".join(map(str,errors))
-        return
-
-    builtins.LOADED_MODULES[name] = codeUnit
 
 def main():
-    import Circa.core.bootstrap
+    Circa.initialize()
 
-    builtins.LOADED_MODULES['kernel'] = builtins.KERNEL
 
-    loadStandardModule('parsing')
-
-    for module in builtins.LOADED_MODULES.values():
+    for module in Circa.LOADED_MODULES.values():
         module.updateAll()
         module.execute()
 
@@ -237,7 +225,7 @@ def main():
                 print str(error)
             return
 
-        builtins.LOADED_MODULES[removeFileSuffix(filename)] = codeUnit
+        Circa.LOADED_MODULES[removeFileSuffix(filename)] = codeUnit
 
         targetCodeUnit = codeUnit
         #targetCodeUnit.execute()
