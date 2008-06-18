@@ -4,7 +4,7 @@ import os
 LOADED_MODULES = {}
 
 def initialize():
-    from Circa.core import builtins
+    from Circa.core import (builtins, ca_codeunit)
     import Circa.core.bootstrap
 
     global LOADED_MODULES
@@ -12,10 +12,12 @@ def initialize():
 
     _loadStandardModule('parsing')
 
+    LOADED_MODULES['main'] = ca_codeunit.CodeUnit()
+
 def importFunction(functionDef):
     from Circa.core import builtins
     from Circa.common import function_builder
-    function_builder.importPythonFunction(builtins.KERNEL, functionDef,
+    function_builder.importPythonFunction(LOADED_MODULES['main'], functionDef,
             instanceBased=True)
 
 def getGlobal(name):
@@ -28,6 +30,11 @@ def getGlobal(name):
             return module.getNamed(name)
 
     return None
+
+def startReplLoop():
+    from Circa.common import command_line
+    cl = command_line.CommandLine(LOADED_MODULES['main'])
+    cl.doInputLoop()
     
 def _loadStandardModule(name):
     from Circa import parser

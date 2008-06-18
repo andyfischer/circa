@@ -78,10 +78,11 @@ def importPythonFunction(codeUnit, pythonClass, instanceBased = False):
     else:
         def initializeFunc(cxt):
             cxt.caller().state = pythonClass()
+            cxt.caller().state.initialize()
 
         def evaluateFunc(cxt):
             inputs = [cxt.input(n) for n in range(cxt.numInputs())]
-            result = cxt.caller().state(*inputs)
+            result = cxt.caller().state.evaluate(*inputs)
             cxt.setResult(result)
 
     ca_function.setInitializeFunc(functionTerm, initializeFunc)
