@@ -42,7 +42,7 @@ def createFunction(codeUnit, functionDef):
     codeUnit.bindName(term, functionDef.name)
     return term
 
-def importPurePythonFunction(codeUnit, pythonClass):
+def importPythonFunction(codeUnit, pythonClass, instanceBased = False):
     """
     Create a Circa function out of the specially-formed Python class.
     This class must have the following fields defined:
@@ -55,56 +55,48 @@ def importPurePythonFunction(codeUnit, pythonClass):
 
     debug._assert(isinstance(pythonClass, type))
 
-    def initializeFunc(cxt):
-        pass
-    def evaluateFunc(cxt):
-        inputs = [cxt.input(n) for n in range(cxt.numInputs())]
-        result = pythonClass.evaluate(*inputs)
-        cxt.setResult(result)
-
-    functionTerm = codeUnit.createConstant(builtins.FUNCTION_TYPE)
-    ca_function.setName(functionTerm, pythonClass.name)
-
     def findType(typeName):
         type = codeUnit.getNamed(typeName)
         if type is None:
             raise Exception("Type not found: " + typeName)
         return type
 
-    ca_function.setInputTypes(functionTerm, map(findType, pythonClass.inputs))
-    ca_function.setOutputType(functionTerm, findType(pythonClass.output))
-    ca_function.setPureFunction(functionTerm, True)
-    ca_function.setHasState(functionTerm, False)
-    ca_function.setInitializeFunc(functionTerm, initializeFunc)
-    ca_function.setEvaluateFunc(functionTerm, evaluateFunc)
-    codeUnit.bindName(functionTerm, pythonClass.name)
-    return functionTerm
-
-def importStatefulPythonFunction(codeUnit, pythonClass):
-    debug._assert(isinstance(pythonClass, type))
-
-    def initializeFunc(cxt):
-        cxt.caller().state = pythonClass()
-
-    def evaluateFunc(cxt):
-        inputs = [cxt.input(n) for n in range(cxt.numInputs())]
-        result = cxt.caller().state(*inputs)
-        cxt.setResult(result)
-
     functionTerm = codeUnit.createConstant(builtins.FUNCTION_TYPE)
     ca_function.setName(functionTerm, pythonClass.name)
-    
-    def findType(typeName):
-        type = codeUnit.getNamed(typeName)
-        if type is None:
-            raise Exception("Type not found: " + typeName)
-        return type
-
     ca_function.setInputTypes(functionTerm, map(findType, pythonClass.inputs))
     ca_function.setOutputType(functionTerm, findType(pythonClass.output))
-    ca_function.setPureFunction(functionTerm, False)
-    ca_function.setHasState(functionTerm, True)
+    ca_function.setHasState(functionTerm, instanceBased)
+
+    if not instanceBased:
+        def initializeFunc(cxt):
+            pass
+        def evaluateFunc(cxt):
+            inputs = [cxt.input(n) for n in range(cxt.numInputs())]
+            result = pythonClass.evaluate(*inputs)
+            cxt.setResult(result)
+    else:
+        def initializeFunc(cxt):
+            cxt.caller().state = pythonClass()
+
+        def evaluateFunc(cxt):
+            inputs = [cxt.input(n) for n in range(cxt.numInputs())]
+            result = cxt.caller().state(*inputs)
+            cxt.setResult(result)
+
     ca_function.setInitializeFunc(functionTerm, initializeFunc)
     ca_function.setEvaluateFunc(functionTerm, evaluateFunc)
+
+
+    pureFunction = True
+    if hasattr(pythonClass, 'pure'):
+        pureFunction = pythonClass.pure
+    ca_function.setPureFunction(functionTerm, pureFunction)
+
+    variableArgs = False
+    if hasattr(pythonClass, 'variableArgs'):
+        variableArgs = pythonClass.variableArgs
+    ca_function.setVariableArgs(functionTerm, variableArgs)
+
     codeUnit.bindName(functionTerm, pythonClass.name)
     return functionTerm
+

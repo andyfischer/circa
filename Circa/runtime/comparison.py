@@ -43,6 +43,6 @@ class GreaterThan(object):
 
 def createFunctions(codeUnit):
     for functionDef in (Equals, NotEquals, LessThan, GreaterThan):
-        function_builder.importPurePythonFunction(codeUnit, functionDef)
+        function_builder.importPythonFunction(codeUnit, functionDef)
 
 
