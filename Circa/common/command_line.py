@@ -7,7 +7,7 @@ from Circa.common import (debug, errors, codeunit_utils)
 from Circa.core import (builtins, ca_codeunit, ca_type, ca_function)
 from Circa.parser import ast as ast_module
 
-class Browser(object):
+class CommandLine(object):
     def __init__(self, codeUnit=None):
         self.codeUnit = codeUnit
 
@@ -243,7 +243,7 @@ def main():
         #targetCodeUnit.execute()
         #targetCodeUnit.updateAll()
 
-    browser = Browser(targetCodeUnit)
+    browser = CommandLine(targetCodeUnit)
 
     browser.doInputLoop()
 
