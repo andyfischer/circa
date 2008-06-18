@@ -3,6 +3,7 @@ Define the CodeUnit class
 """
 import itertools, pdb
 
+import Circa
 from Circa.common import (debug, errors)
 import builtins, ca_function, ca_type
 from term import Term
@@ -151,7 +152,7 @@ class CodeUnit(object):
             return self.mainNamespace[name]
 
         # Get a globally-defined term
-        return builtins.getGlobal(name)
+        return Circa.getGlobal(name)
 
     def getIdentifier(self, term):
         debug._assert(isinstance(term, Term))
