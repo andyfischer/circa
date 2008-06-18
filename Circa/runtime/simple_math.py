@@ -79,11 +79,11 @@ class Average(object):
 
 
 def createFunctions(codeUnit):
-    add = function_builder.importPurePythonFunction(codeUnit, Add)
+    add = function_builder.importPythonFunction(codeUnit, Add)
     ca_function.setFeedbackPropagator(add,
             function_builder.createFunction(codeUnit, AddFeedback))
 
 
     for functionDef in (Subtract,Multiply,Divide,Average):
-        function_builder.importPurePythonFunction(codeUnit, functionDef)
+        function_builder.importPythonFunction(codeUnit, functionDef)
 

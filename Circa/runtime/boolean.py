@@ -24,8 +24,8 @@ class Or(object):
 
 
 def createFunctions(codeUnit):
-    function_builder.importPurePythonFunction(codeUnit, And)
-    function_builder.importPurePythonFunction(codeUnit, Or)
+    function_builder.importPythonFunction(codeUnit, And)
+    function_builder.importPythonFunction(codeUnit, Or)
 
     # Create 'true' and 'false' constants
     true = codeUnit.createConstant(builtins.BOOL_TYPE)
