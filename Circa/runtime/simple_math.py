@@ -4,15 +4,14 @@
 from Circa.common import function_builder
 from Circa.core import (builtins, ca_float, ca_function)
 
-class Add(function_builder.BaseFunction):
+class Add(object):
     name = 'add'
-    inputTypes = [builtins.INT_TYPE, builtins.INT_TYPE]
-    outputType = builtins.INT_TYPE
-    pureFunction = True
+    inputs = ['float','float']
+    output = 'float'
 
     @staticmethod
-    def evaluate(cxt):
-        cxt.setResult(cxt.input(0) + cxt.input(1))
+    def evaluate(a,b):
+        return a + b
 
 class AddFeedback(function_builder.BaseFunction):
     name = '_add-feedback'
@@ -34,62 +33,57 @@ class AddFeedback(function_builder.BaseFunction):
         cxt.codeUnit().createTerm(builtins.FEEDBACK_FUNC,
             inputs=[target.getInput(1), halfDelta])
 
-class Subtract(function_builder.BaseFunction):
+class Subtract(object):
     name = 'sub'
-    inputTypes = [builtins.INT_TYPE, builtins.INT_TYPE]
-    outputType = builtins.INT_TYPE
-    pureFunction = True
+    inputs = ['float','float']
+    output = 'float'
 
     @staticmethod
-    def evaluate(cxt):
-        cxt.setResult( cxt.input(0) - cxt.input(1) )
+    def evaluate(a,b):
+        return a - b
 
-class Mult(function_builder.BaseFunction):
+class Multiply(object):
     name = 'mult'
-    inputTypes = [builtins.INT_TYPE, builtins.INT_TYPE]
-    outputType = builtins.INT_TYPE
-    pureFunction = True
+    inputs = ['float','float']
+    output = 'float'
 
     @staticmethod
-    def evaluate(cxt):
-        cxt.setResult( cxt.input(0) * cxt.input(1) )
+    def evaluate(a,b):
+        return a * b
 
-class Divide(function_builder.BaseFunction):
+class Divide(object):
     name = 'div'
-    inputTypes = [builtins.INT_TYPE, builtins.INT_TYPE]
-    outputType = builtins.INT_TYPE
-    pureFunction = True
+    inputs = ['float','float']
+    output = 'float'
 
     @staticmethod
-    def evaluate(cxt):
-        cxt.setResult( cxt.input(0) / cxt.input(1) )
+    def evaluate(a,b):
+        return a / b
 
-class Average(function_builder.BaseFunction):
+class Average(object):
     name = 'average'
-    inputTypes = [builtins.FLOAT_TYPE]
-    outputType = builtins.FLOAT_TYPE
-    pureFunction = True
+    inputs = ['float']
+    output = 'float'
     variableArgs = True
 
     @staticmethod
-    def evaluate(cxt):
-        if cxt.numInputs() == 0:
-            cxt.setResult(0)
-            return
+    def evaluate(*inputs):
+        count = len(inputs)
+        if count == 0:
+            return 0
 
         sum = 0.0
-        for i in range(cxt.numInputs()):
-            sum += cxt.input(i)
-        cxt.setResult( sum / cxt.numInputs() )
-    
+        for i in range(count):
+            sum += inputs[i]
+        return sum/count
 
-functionDefs = [Subtract, Mult, Divide, Average]
 
 def createFunctions(codeUnit):
-    add = function_builder.createFunction(codeUnit, Add)
+    add = function_builder.importPurePythonFunction(codeUnit, Add)
     ca_function.setFeedbackPropagator(add,
             function_builder.createFunction(codeUnit, AddFeedback))
 
-    for functionDef in functionDefs:
-        function_builder.createFunction(codeUnit, functionDef)
+
+    for functionDef in (Subtract,Multiply,Divide,Average):
+        function_builder.importPurePythonFunction(codeUnit, functionDef)
 

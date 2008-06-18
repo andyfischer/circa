@@ -13,7 +13,7 @@ class And(object):
     def evaluate(a,b):
         return a and b
 
-class Or(function_builder.BaseFunction):
+class Or(object):
     name = "or"
     inputs = ['bool', 'bool']
     output = 'bool'

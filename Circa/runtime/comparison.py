@@ -4,51 +4,45 @@
 from Circa.common import function_builder
 from Circa.core import builtins
 
-class Equals(function_builder.BaseFunction):
+class Equals(object):
     name = 'equals'
-    inputTypes = [builtins.INT_TYPE, builtins.INT_TYPE]
-    outputType = builtins.BOOL_TYPE
-    pureFunction = True
+    inputs = ['int', 'int']
+    output = 'bool'
 
     @staticmethod
-    def evaluate(cxt):
-        cxt.setResult( cxt.input(0) == cxt.input(1) )
+    def evaluate(a,b):
+        return a == b
 
-class NotEquals(function_builder.BaseFunction):
+class NotEquals(object):
     name = 'not_equals'
-    inputTypes = [builtins.INT_TYPE, builtins.INT_TYPE]
-    outputType = builtins.BOOL_TYPE
-    pureFunction = True
+    inputs = ['int', 'int']
+    output = 'bool'
 
     @staticmethod
-    def evaluate(cxt):
-        cxt.setResult( cxt.input(0) != cxt.input(1) )
+    def evaluate(a,b):
+        return a != b
 
-class LessThan(function_builder.BaseFunction):
+class LessThan(object):
     name = 'less_than'
-    inputTypes = [builtins.FLOAT_TYPE, builtins.FLOAT_TYPE]
-    outputType = builtins.BOOL_TYPE
-    pureFunction = True
+    inputs = ['float', 'float']
+    output = 'bool'
 
     @staticmethod
-    def evaluate(cxt):
-        cxt.setResult( cxt.input(0) < cxt.input(1) )
+    def evaluate(a,b):
+        return a < b
 
-class GreaterThan(function_builder.BaseFunction):
+class GreaterThan(object):
     name = 'greater_than'
-    inputTypes = [builtins.FLOAT_TYPE, builtins.FLOAT_TYPE]
-    outputType = builtins.BOOL_TYPE
-    pureFunction = True
+    inputs = ['float', 'float']
+    output = 'bool'
 
     @staticmethod
-    def evaluate(cxt):
-        cxt.setResult( cxt.input(0) > cxt.input(1) )
+    def evaluate(a,b):
+        return a > b
 
-
-functionDefs = [Equals, NotEquals, LessThan, GreaterThan]
 
 def createFunctions(codeUnit):
-    for functionDef in functionDefs:
-        function_builder.createFunction(codeUnit, functionDef)
+    for functionDef in (Equals, NotEquals, LessThan, GreaterThan):
+        function_builder.importPurePythonFunction(codeUnit, functionDef)
 
 
