@@ -220,11 +220,9 @@ def main():
                 print str(error)
             return
 
+        codeUnit.execute()
         Circa.LOADED_MODULES[removeFileSuffix(filename)] = codeUnit
-
         targetCodeUnit = codeUnit
-        #targetCodeUnit.execute()
-        #targetCodeUnit.updateAll()
 
     command_line = CommandLine(targetCodeUnit)
     command_line.doInputLoop()
