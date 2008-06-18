@@ -1,0 +1,18 @@
+
+test = map(int,int)
+
+test(4) := 3
+assert(test(4) != 4)
+assert(test(4) == 3)
+
+test(4) := 1
+assert(test(4) != 3)
+assert(test(4) == 1)
+
+string_map = map(string,int)
+string_map('hello') := 5
+assert(string_map('hello') == 5)
+
+i2s = map(int,string)
+i2s(1) := 'test'
+print(i2s(1))
