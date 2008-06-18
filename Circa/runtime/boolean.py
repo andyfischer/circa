@@ -4,29 +4,28 @@
 from Circa.common import function_builder
 from Circa.core import builtins
 
-class And(function_builder.BaseFunction):
+class And(object):
     name = "and"
-    inputTypes = [builtins.BOOL_TYPE, builtins.BOOL_TYPE]
-    outputType = builtins.BOOL_TYPE
+    inputs = ['bool', 'bool']
+    output = 'bool'
 
     @staticmethod
-    def evaluate(cxt):
-        cxt.setResult( cxt.input(0) and cxt.input(1) )
+    def evaluate(a,b):
+        return a and b
 
 class Or(function_builder.BaseFunction):
     name = "or"
-    inputTypes = [builtins.BOOL_TYPE, builtins.BOOL_TYPE]
-    outputType = builtins.BOOL_TYPE
+    inputs = ['bool', 'bool']
+    output = 'bool'
 
     @staticmethod
-    def evaluate(cxt):
-        cxt.setResult( cxt.input(0) or cxt.input(1) )
+    def evaluate(a,b):
+        return a or b
 
-functionDefs = [And, Or]
 
 def createFunctions(codeUnit):
-    for functionDef in functionDefs:
-        function_builder.createFunction(codeUnit, functionDef)
+    function_builder.importPurePythonFunction(codeUnit, And)
+    function_builder.importPurePythonFunction(codeUnit, Or)
 
     # Create 'true' and 'false' constants
     true = codeUnit.createConstant(builtins.BOOL_TYPE)

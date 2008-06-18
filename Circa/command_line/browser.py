@@ -247,6 +247,5 @@ def main():
 
     browser.doInputLoop()
 
-
 if __name__ == "__main__":
     main()
