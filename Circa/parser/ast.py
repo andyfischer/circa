@@ -9,6 +9,7 @@ from Circa.core.term import Term
 from Circa.common import (debug, errors)
 from Circa.utils.spy_object import SpyObject
 from Circa.utils.string_buffer import StringBuffer
+from Circa.runtime import variables
 from token_definitions import *
 
 class CompilationContext(object):
@@ -148,17 +149,11 @@ class Literal(Node):
 
     def createTerms(self, context):
         # Create a term
-        if self.hasQuestionMark:
-            newTerm = context.codeUnit.createVariable(self.circaType)
-        else:
-            newTerm = context.codeUnit.createConstant(self.circaType)
-
+        newTerm = context.codeUnit.createVariable(self.circaType)
         newTerm.ast = self
 
         # Assign value
-        # Future: do this in a more typesafe way
-        newTerm.cachedValue = self.value
-
+        variables.assignVariable(newTerm, self.value)
         return newTerm
 
     def getFirstToken(self):

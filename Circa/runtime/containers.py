@@ -42,7 +42,7 @@ class MapFeedback(function_builder.BaseFunction):
     inputs = ['ref','ref']
     output = 'void'
     hasState = False
-    pureFunction = False
+    pure = False
 
     @staticmethod
     def evaluate(context):
