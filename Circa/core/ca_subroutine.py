@@ -36,7 +36,6 @@ def subroutineEvaluateFunc(cxt):
     else:
         cxt.setResult(None)
 
-
 # Functions for our ca_type object #
 def initializeTerm(term):
     term.cachedValue = CircaSubroutine()
