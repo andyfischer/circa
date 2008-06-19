@@ -14,10 +14,10 @@ class Add(object):
         return a + b
 
 class AddFeedback(function_builder.BaseFunction):
-    name = '_add-feedback'
+    name = 'add-feedback'
     inputs = ['ref','ref']
     output = 'void'
-    pureFunction = False
+    pure = False
 
     @staticmethod
     def evaluate(cxt):
