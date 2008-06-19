@@ -89,6 +89,8 @@ class TermExecutionContext(object):
         return self.targetTerm.getInput(index)
     def input(self, index):
         return self.targetTerm.getInput(index).cachedValue
+    def state(self):
+        return self.targetTerm.state
     def caller(self):
         return self.targetTerm
     def numInputs(self):
