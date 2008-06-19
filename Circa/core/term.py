@@ -102,33 +102,12 @@ class Term(object):
   
     # value accessors
     def __int__(self):
-        """
-        Access our value as an integer. Throws a TypeError if this term does
-        not output an integer. This call does no coersion.
-        """
-        if self.getType() != builtins.INT_TYPE:
-            raise TypeError()
-
         return int(self.cachedValue)
   
     def __float__(self):
-        """
-        Access our value as a float. Throws a TypeError if this term does
-        not output a float. This call does no coersion.
-        """
-        if self.getType() != builtins.FLOAT_TYPE:
-            raise TypeError()
-
         return float(self.cachedValue)
   
     def __str__(self):
-        """
-        Access our value as a string. Throws a TypeError if this term does
-        not output a string. This call does no coersion.
-        """
-        if self.getType() != builtins.STRING_TYPE:
-            raise TypeError()
-
         return str(self.cachedValue)
 
 class TermExecutionContext(object):
