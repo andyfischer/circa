@@ -164,6 +164,18 @@ class CodeUnit(object):
         # Otherwise, use the default identifier
         return '#' + str(term.globalID)
 
+    def getNames(self, term):
+        """
+        Returns a set of strings, for all the names that this term has.
+        If the term is anonymous, returns an empty set.
+        """
+        debug._assert(isinstance(term, Term))
+        result = set()
+        for (name,t) in self.mainNamespace.items():
+            if t is term:
+                result.add(name)
+        return result
+
     def setInput(self, term, inputIndex, newInput):
         # Grow input array if necessary
         if newInput >= len(term.inputs):

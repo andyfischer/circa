@@ -4,7 +4,7 @@ import os,sys,pdb
 from string import Template
 import Circa
 from Circa import parser
-from Circa.common import (debug, errors, codeunit_utils)
+from Circa.common import (debug, errors, codeunit_utils, pretty_print)
 from Circa.core import (builtins, ca_codeunit, ca_type, ca_function)
 from Circa.parser import ast as ast_module
 
@@ -35,6 +35,9 @@ class CommandLine(object):
                 template += " = $value"
             for term in self.codeUnit.allTerms:
                 print self.describeTerm(term, template)
+
+        elif command == 'pp':
+            print pretty_print.printCodeUnit(self.codeUnit)
 
         elif command == 'details' or command == 'd':
             term = self.getTermFromIdentifier(commandArgs)

@@ -8,7 +8,7 @@
 
 import pdb
 
-import ca_function, ca_type
+import builtins, ca_function, ca_type
 
 nextGlobalID = 1
 
@@ -64,6 +64,17 @@ class Term(object):
 
     def getIdentifier(self):
         return self.codeUnit.getIdentifier(self)
+
+    def getNames(self):
+        return self.codeUnit.getNames(self)
+
+    def isConstant(self):
+        "Returns true if this term is a constant term"
+        return self.functionTerm.functionTerm is builtins.CONST_GENERATOR
+
+    def isVariable(self):
+        "Returns true if this term is a variable term"
+        return self.functionTerm.functionTerm is builtins.VARIABLE_GENERATOR
   
     def update(self):
         """
