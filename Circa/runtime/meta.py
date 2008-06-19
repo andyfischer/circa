@@ -7,8 +7,8 @@ from Circa.common import (debug, function_builder)
 
 class Syntax(function_builder.BaseFunction):
     name = "_syntax"
-    inputTypes = [builtins.VOID_TYPE]
-    outputType = builtins.VOID_TYPE
+    inputs = ['void']
+    output = 'void'
 
     @staticmethod
     def evaluate(cxt):

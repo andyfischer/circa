@@ -5,8 +5,8 @@ import pdb
 
 class Import(function_builder.BaseFunction):
     name = 'python_import'
-    inputTypes = [builtins.STRING_TYPE]
-    outputType = builtins.VOID_TYPE
+    inputs = ['string']
+    output = 'void'
     pureFunction = False
 
     @staticmethod
@@ -15,8 +15,8 @@ class Import(function_builder.BaseFunction):
 
 class ImportFunctions(function_builder.BaseFunction):
     name = 'python_import_functions'
-    inputTypes = [builtins.STRING_TYPE]
-    outputType = builtins.VOID_TYPE
+    inputs = ['string']
+    output = 'void'
     pureFunction = False
 
     @staticmethod

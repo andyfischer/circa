@@ -5,8 +5,8 @@ from Circa.common import (debug, function_builder)
 
 class Feedback(function_builder.BaseFunction):
     name = 'apply-feedback'
-    inputTypes = [builtins.REF_TYPE, builtins.REF_TYPE]
-    outputType = builtins.VOID_TYPE
+    inputs = ['ref','ref']
+    output = 'void'
     hasState = False
     pureFunction = False
 

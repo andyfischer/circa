@@ -53,7 +53,7 @@ def bootstrapKernel(kernel):
     ca_type.setName(typeType, "Type")
     ca_type.setInitializeFunc(typeType, ca_type.initializeTerm)
     ca_type.setToStringFunc(typeType, ca_type.typeToString)
-    kernel.bindName(typeType, "Type")
+    kernel.bindName(typeType, "type")
 
     # Implant the Type type
     kernel.setInput(constTypeFunc, 0, typeType)

@@ -1,7 +1,0 @@
-Feedback function should be a thing that has its own branch.
-
-Branch is updated on execute.
-
-Results of feedback show up in branch.
-
-Perhaps rename to apply-feedback

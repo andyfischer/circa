@@ -15,8 +15,8 @@ class Add(object):
 
 class AddFeedback(function_builder.BaseFunction):
     name = '_add-feedback'
-    inputTypes = [builtins.REF_TYPE, builtins.REF_TYPE]
-    outputType = builtins.VOID_TYPE
+    inputs = ['ref','ref']
+    output = 'void'
     pureFunction = False
 
     @staticmethod
