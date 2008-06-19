@@ -11,8 +11,8 @@ class BaseFunction(object):
     pureFunction = False
     hasState = False
     variableArgs = False
-    inputTypes = []
-    outputType = None
+    inputs = []
+    output = 'void'
     initialize = None
     
     """
@@ -27,13 +27,19 @@ class BaseFunction(object):
 
 def createFunction(codeUnit, functionDef):
     # Do some type checks
-    debug.assertType(functionDef.inputTypes, list, functionDef.__name__+'.inputTypes')
-    debug.assertType(functionDef.outputType, Term, functionDef.__name__+'.outputType')
+    debug.assertType(functionDef.inputs, list, functionDef.__name__+'.inputs')
+    debug.assertType(functionDef.output, str, functionDef.__name__+'.output')
+
+    def findType(typeName):
+        type = codeUnit.getNamed(typeName)
+        if type is None:
+            raise Exception("Type not found: " + typeName)
+        return type
 
     term = codeUnit.createConstant(builtins.FUNCTION_TYPE)
     ca_function.setName(term, functionDef.name)
-    ca_function.setInputTypes(term, functionDef.inputTypes)
-    ca_function.setOutputType(term, functionDef.outputType)
+    ca_function.setInputTypes(term, map(findType, functionDef.inputs))
+    ca_function.setOutputType(term, findType(functionDef.output))
     ca_function.setPureFunction(term, functionDef.pureFunction)
     ca_function.setHasState(term, functionDef.hasState)
     ca_function.setVariableArgs(term, functionDef.variableArgs)

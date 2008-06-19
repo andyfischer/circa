@@ -6,8 +6,8 @@ from Circa.common import (debug, function_builder)
 # Create Map functions
 class MapConstructor(function_builder.BaseFunction):
     name = 'map'
-    inputTypes = [builtins.TYPE_TYPE, builtins.TYPE_TYPE]
-    outputType = builtins.FUNCTION_TYPE
+    inputs = ['type','type']
+    output = 'Function'
     hasState = True
     pureFunction = True
 
@@ -39,8 +39,8 @@ def MapAccess_evaluate(cxt):
 
 class MapFeedback(function_builder.BaseFunction):
     name = 'map-feedback'
-    inputTypes = [builtins.REFERENCE_TYPE, builtins.REFERENCE_TYPE]
-    outputType = builtins.VOID_TYPE
+    inputs = ['ref','ref']
+    output = 'void'
     hasState = False
     pureFunction = False
 

@@ -8,8 +8,8 @@ def emptyFunction(term):
 class VariableGenerator(function_builder.BaseFunction):
     name = '_variable-generator'
     pureFunction = True
-    inputTypes = [builtins.TYPE_TYPE]
-    outputType = builtins.FUNCTION_TYPE
+    inputs = ['type']
+    output = 'Function'
 
     @staticmethod
     def evaluate(cxt):
@@ -19,6 +19,11 @@ class VariableGenerator(function_builder.BaseFunction):
         ca_function.setHasState(cxt.caller(), True)
         ca_function.setName(cxt.caller(), 'variable-' + ca_type.name(type))
         ca_function.setEvaluateFunc(cxt.caller(), emptyFunction)
+
+class VariableFeedbackPropagator(function_builder.BaseFunction):
+    name = '_variable-feedback-prop'
+    pureFunction = False
+    
 
 def createFunctions(codeUnit):
     builtins.VARIABLE_GENERATOR = (

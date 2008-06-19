@@ -1,0 +1,12 @@
+
+
+a = 0
+b = 10
+
+while (b > 0) {
+  a = a + 1
+  b = b - 1
+}
+
+assert(a == 10)
+assert(b == 0)
