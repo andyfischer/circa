@@ -104,6 +104,14 @@ def importPythonFunction(codeUnit, pythonClass, instanceBased = False):
         variableArgs = pythonClass.variableArgs
     ca_function.setVariableArgs(functionTerm, variableArgs)
 
+    # Feedback handler
+    if hasattr(pythonClass, 'feedbackHandler'):
+        fhName = pythonClass.feedbackHandler
+        fhTerm = codeUnit.getNamed(fhName)
+        if fhTerm is None:
+            raise Exception("Couldn't find term: " + fhName)
+        ca_function.setFeedbackPropagator(functionTerm, fhTerm)
+
     codeUnit.bindName(functionTerm, pythonClass.name)
     return functionTerm
 

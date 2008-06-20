@@ -1,6 +1,8 @@
 
+import pdb
+
 from Circa.common import (debug, function_builder)
-from Circa.core import (ca_codeunit, term)
+from Circa.core import (ca_codeunit, ca_variable, term)
 import ca_function
 
 class CircaSubroutine(ca_function.CircaFunction):
@@ -22,7 +24,7 @@ def subroutineEvaluateFunc(cxt):
         inputPlaceholderName = "#input_placeholder" + str(index)
         inputPlaceholder = subroutine.codeUnit.getNamed(inputPlaceholderName)
         debug._assert(inputPlaceholder is not None)
-        inputPlaceholder.cachedValue = cxt.input(index)
+        ca_variable.setValue(inputPlaceholder, cxt.input(index))
 
     # Execute
     subroutine.codeUnit.execute()

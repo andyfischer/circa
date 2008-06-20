@@ -84,6 +84,11 @@ class Term(object):
         if not ca_function.pureFunction(self.functionTerm):
             return
 
+        # Don't update if not all our inputs are ready
+        for input in self.inputs:
+            if input.cachedValue is None:
+                return
+
         ca_function.evaluateFunc(self.functionTerm)(self.executionContext)
         self.needsUpdate = False
 

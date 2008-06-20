@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os,sys,pdb
+import os,sys,pdb,traceback
 from string import Template
 import Circa
 from Circa import parser
@@ -58,6 +58,14 @@ class CommandLine(object):
             term = self.getTermFromIdentifier(commandArgs)
             term.update()
             print str(term)
+
+        elif command == 'inspect' or command == 'ins':
+            termName = commandArgs
+            term = self.getTermFromIdentifier(commandArgs)
+
+            print "Opening a scope with %s as 'term'" % termName
+            locals = {'term':term}
+            replLoop(locals, termName + "> ")
 
         elif command == 'exec' or command == 'ex':
             term = self.getTermFromIdentifier(commandArgs)
@@ -229,6 +237,20 @@ def main():
 
     command_line = CommandLine(targetCodeUnit)
     command_line.doInputLoop()
+
+def replLoop(locals, prompt):
+    print "Press Control-C to exit"
+
+    while True:
+        try:
+            input = raw_input(prompt)
+            print eval(input, None, locals)
+            return
+        except KeyboardInterrupt:
+            print ""
+            return
+        except Exception, e:
+            traceback.print_exc()
 
 if __name__ == "__main__":
     main()

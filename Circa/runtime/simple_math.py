@@ -1,16 +1,18 @@
 #
 # Defines Circa funcitons for arithmetic
 
-from Circa.common import function_builder
+from Circa.common import (debug, function_builder)
 from Circa.core import (builtins, ca_float, ca_function)
 
 class Add(object):
     name = 'add'
     inputs = ['float','float']
     output = 'float'
+    feedbackHandler = 'add-feedback'
 
     @staticmethod
     def evaluate(a,b):
+        debug._assert(a is not None)
         return a + b
 
 class AddFeedback(function_builder.BaseFunction):
@@ -79,10 +81,8 @@ class Average(object):
 
 
 def createFunctions(codeUnit):
+    function_builder.createFunction(codeUnit, AddFeedback)
     add = function_builder.importPythonFunction(codeUnit, Add)
-    ca_function.setFeedbackPropagator(add,
-            function_builder.createFunction(codeUnit, AddFeedback))
-
 
     for functionDef in (Subtract,Multiply,Divide,Average):
         function_builder.importPythonFunction(codeUnit, functionDef)
