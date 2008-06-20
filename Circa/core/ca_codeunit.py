@@ -77,7 +77,7 @@ class CodeUnit(object):
         # Initialize cachedData
         debug._assert(outputType is not None)
 
-        initializeFunc = ca_type.initializeFunc(outputType)
+        initializeFunc = ca_type.initialize(outputType)
 
         debug._assert(initializeFunc is not None)
 

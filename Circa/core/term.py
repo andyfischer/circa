@@ -35,10 +35,6 @@ class Term(object):
         # Persistent state.
         self.state = None
 
-        # If we have an internal branch, this is a list of terms.
-        # Considered to be part of our state.
-        self.branch = None
-
         # The CodeUnit object that owns us
         self.codeUnit = None
         
