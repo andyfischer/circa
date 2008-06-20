@@ -79,6 +79,7 @@ class Infix(Node):
             debug._assert(rightTerm is not None)
             newTerm = context.codeUnit.createTerm(
                     builtins.FEEDBACK_FUNC, [leftTerm, rightTerm])
+            newTerm.ast = self
             newTerm.execute()
             return newTerm
 
@@ -189,9 +190,11 @@ class Unary(Node):
         self.right = right
 
     def createTerms(self, context):
-        return context.codeUnit.createTerm(builtins.MULT,
+        newTerm = context.codeUnit.createTerm(builtins.MULT,
                    inputs = [context.codeUnit.createConstant(-1),
                              self.right.createTerms(context)])
+        newTerm.ast = self
+        return newTerm
 
     def getFirstToken(self):
         return self.functionToken;

@@ -1,7 +1,7 @@
 
 import pdb
 
-from Circa.core import (ca_function, ca_type)
+from Circa.core import (builtins, ca_function, ca_subroutine, ca_type)
 from Circa.utils import string_buffer
 
 class PrettyPrintContext(object):
@@ -27,11 +27,20 @@ def _printTerm(cxt, term):
     functionName = ca_function.name(term.functionTerm)
 
     if term.isConstant():
-        cxt.out.writeln(functionName + " " + str(term.cachedValue))
+        _printTermValue(cxt, term)
     elif term.isVariable():
         cxt.out.writeln(functionName + " " + str(term.cachedValue))
     else:
-        pdb.set_trace()
         cxt.out.writeln(functionName + "(...)")
 
+def _printTermValue(cxt, term):
+    if term.getType() is builtins.SUBROUTINE_TYPE:
+        cxt.out.write("subroutine " + ca_function.name(term))
+        cxt.out.indent()
+        for term in term.branch:
+            _printTerm(cxt,term)
+        cxt.out.unindent()
 
+    else:
+        functionName = ca_function.name(term.functionTerm)
+        cxt.out.writeln(functionName + " " + str(term.cachedValue))

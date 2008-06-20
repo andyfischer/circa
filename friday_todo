@@ -1,0 +1,4 @@
+* Functions can specify their feedback functions using names
+* Add some way to iterate over a term's branch
+* Remove 'branch' field, it's not one-size-fits-all
+
