@@ -28,26 +28,26 @@ def voidToString(term):
 def createBuiltinTypes(kernel):
     intType = kernel.createConstant(builtins.TYPE_TYPE)
     ca_type.setName(intType, 'int')
-    ca_type.setInitializeFunc(intType, intInitialize)
-    ca_type.setToStringFunc(intType, intToString)
+    ca_type.setInitialize(intType, intInitialize)
+    ca_type.setToShortString(intType, intToString)
     kernel.bindName(intType, 'int')
 
     stringType = kernel.createConstant(builtins.TYPE_TYPE)
     ca_type.setName(stringType, 'string')
-    ca_type.setInitializeFunc(stringType, stringInitialize)
-    ca_type.setToStringFunc(stringType, stringToString)
+    ca_type.setInitialize(stringType, stringInitialize)
+    ca_type.setToShortString(stringType, stringToString)
     kernel.bindName(stringType, 'string')
 
     boolType = kernel.createConstant(builtins.TYPE_TYPE)
     ca_type.setName(boolType, 'bool')
-    ca_type.setInitializeFunc(boolType, boolInitialize)
-    ca_type.setToStringFunc(boolType, boolToString)
+    ca_type.setInitialize(boolType, boolInitialize)
+    ca_type.setToShortString(boolType, boolToString)
     kernel.bindName(boolType, 'bool')
 
     floatType = kernel.createConstant(builtins.TYPE_TYPE)
     ca_type.setName(floatType, 'float')
-    ca_type.setInitializeFunc(floatType, floatInitialize)
-    ca_type.setToStringFunc(floatType, floatToString)
+    ca_type.setInitialize(floatType, floatInitialize)
+    ca_type.setToShortString(floatType, floatToString)
     kernel.bindName(floatType, 'float')
 
     referenceType = kernel.createConstant(builtins.TYPE_TYPE)
@@ -56,14 +56,14 @@ def createBuiltinTypes(kernel):
 
     voidType = kernel.createConstant(builtins.TYPE_TYPE)
     ca_type.setName(voidType, 'void')
-    ca_type.setInitializeFunc(voidType, voidInitialize)
-    ca_type.setToStringFunc(voidType, voidToString)
+    ca_type.setInitialize(voidType, voidInitialize)
+    ca_type.setToShortString(voidType, voidToString)
     kernel.bindName(voidType, 'void')
 
     subroutineType = kernel.createConstant(builtins.TYPE_TYPE)
     ca_type.setName(subroutineType, 'Subroutine')
-    ca_type.setInitializeFunc(subroutineType, ca_subroutine.initializeTerm)
-    ca_type.setToStringFunc(subroutineType, ca_subroutine.toString)
+    ca_type.setInitialize(subroutineType, ca_subroutine.initializeTerm)
+    ca_type.setToShortString(subroutineType, ca_subroutine.toString)
     kernel.bindName(subroutineType, 'Subroutine')
 
     # Make constant-generator terms for all new functions

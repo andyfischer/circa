@@ -49,10 +49,10 @@ def bootstrapKernel(kernel):
     # Create Type type
     typeType = kernel._bootstrapEmptyTerm()
     typeType.functionTerm = constTypeFunc
-    ca_type.initializeTerm(typeType)
+    ca_type.CircaType_initializeTerm(typeType)
     ca_type.setName(typeType, "Type")
-    ca_type.setInitializeFunc(typeType, ca_type.initializeTerm)
-    ca_type.setToStringFunc(typeType, ca_type.typeToString)
+    ca_type.setInitialize(typeType, ca_type.CircaType_initializeTerm)
+    # ca_type.setToString(typeType, ca_type.typeToString)
     kernel.bindName(typeType, "type")
 
     # Implant the Type type
@@ -75,10 +75,10 @@ def bootstrapKernel(kernel):
     # Create Function type
     functionType = kernel._bootstrapEmptyTerm()
     functionType.functionTerm = constTypeFunc
-    ca_type.initializeTerm(functionType)
+    ca_type.CircaType_initializeTerm(functionType)
     ca_type.setName(functionType, "Function")
-    ca_type.setInitializeFunc(functionType, ca_function.initializeTerm)
-    ca_type.setToStringFunc(functionType, ca_function.toString)
+    ca_type.setInitialize(functionType, ca_function.initializeTerm)
+    #ca_type.setToStringFunc(functionType, ca_function.toString)
     kernel.bindName(functionType, "Function")
 
     # Implant Function type
