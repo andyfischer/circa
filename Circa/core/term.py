@@ -71,6 +71,12 @@ class Term(object):
     def isVariable(self):
         "Returns true if this term is a variable term"
         return self.functionTerm.functionTerm is builtins.VARIABLE_GENERATOR
+
+    def toShortString(self):
+        return ca_type.toShortString(self.getType())(self)
+
+    def iterateInnerTerms(self):
+        return ca_type.iterateInnerTerms(self.getType())(self)
   
     def update(self):
         """

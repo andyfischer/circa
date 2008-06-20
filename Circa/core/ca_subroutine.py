@@ -6,14 +6,17 @@ from Circa.core import (ca_codeunit, ca_variable, term)
 import ca_function
 
 class CircaSubroutine(ca_function.CircaFunction):
+    name = 'Subroutine'
+
     def __init__(self):
         ca_function.CircaFunction.__init__(self)
-
         self.pureFunction = False
-
         self.codeUnit = ca_codeunit.CodeUnit()
-
         self.evaluateFunc = subroutineEvaluateFunc
+
+    def iterateInnerTerms(self):
+        for term in self.codeUnit.allTerms:
+            yield term
 
 
 def subroutineEvaluateFunc(cxt):
@@ -37,10 +40,6 @@ def subroutineEvaluateFunc(cxt):
         cxt.setResult(outputPlaceholder.cachedValue)
     else:
         cxt.setResult(None)
-
-# Functions for our ca_type object #
-def initializeTerm(term):
-    term.cachedValue = CircaSubroutine()
 
 def toString(term):
     if term.cachedValue is None:

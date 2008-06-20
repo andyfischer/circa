@@ -1,5 +1,5 @@
 
-from Circa.common import debug
+from Circa.common import (debug, type_builder)
 import builtins, ca_type, ca_function, ca_subroutine
 
 def intInitialize(term):
@@ -60,11 +60,14 @@ def createBuiltinTypes(kernel):
     ca_type.setToShortString(voidType, voidToString)
     kernel.bindName(voidType, 'void')
 
+    """
     subroutineType = kernel.createConstant(builtins.TYPE_TYPE)
     ca_type.setName(subroutineType, 'Subroutine')
     ca_type.setInitialize(subroutineType, ca_subroutine.initializeTerm)
     ca_type.setToShortString(subroutineType, ca_subroutine.toString)
     kernel.bindName(subroutineType, 'Subroutine')
+    """
+    subroutineType = type_builder.importPythonType(kernel, ca_subroutine.CircaSubroutine)
 
     # Make constant-generator terms for all new functions
     for type in (intType, stringType, boolType, floatType, subroutineType):

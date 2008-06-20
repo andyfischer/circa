@@ -10,9 +10,9 @@ class CircaType(object):
         self.initialize = None
         self.toShortString = None
 
-    @staticmethod
-    def iterateInnerTerms(term):
-        return []
+        def iterateInnerTerms(term):
+            return []
+        self.iterateInnerTerms = iterateInnerTerms
 
 def CircaType_initializeTerm(term):
     term.cachedValue = CircaType()
@@ -31,4 +31,4 @@ def field(fieldName):
 (name, setName) = field('name')
 (initialize, setInitialize) = field('initialize')
 (toShortString, setToShortString) = field('toShortString')
-(iterateInnerTerms, setIterateInnerTerms) = field('iterateInnerTemrs')
+(iterateInnerTerms, setIterateInnerTerms) = field('iterateInnerTerms')
