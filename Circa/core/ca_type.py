@@ -1,11 +1,18 @@
 
 from Circa.common import debug
 
+def emptyFunction(term):
+    pass
+
 class CircaType(object):
     def __init__(self):
         self.name = None
         self.initialize = None
         self.toShortString = None
+
+    @staticmethod
+    def iterateInnerTerms(term):
+        return []
 
 def CircaType_initializeTerm(term):
     term.cachedValue = CircaType()
