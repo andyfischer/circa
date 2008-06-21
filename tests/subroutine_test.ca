@@ -4,7 +4,7 @@ function square(int a) -> int {
 }
 
 function dist(int a,int b) -> float {
-    return sqrt(square(a) + square(b))
+    --return sqrt(square(a) + square(b))
 }
 
 function three_a_plus_two_b(int a,int b) -> int {

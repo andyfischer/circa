@@ -1,9 +1,9 @@
 
-# Metaprogramming functions
+-- Metaprogramming functions
 operator = map(string, Function)
 assign_operator = map(string, Function)
 
-# Bind operators to functions
+-- Bind operators to functions
 operator('+') := add
 operator('-') := sub
 operator('*') := mult
@@ -13,7 +13,7 @@ operator('!=') := not_equals
 operator('<') := less_than
 operator('>') := greater_than
 
-# Bind assign operators to functions
+-- Bind assign operators to functions
 assign_operator('+=') := add
 assign_operator('-=') := sub
 assign_operator('*=') := mult
