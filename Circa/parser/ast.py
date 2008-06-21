@@ -18,8 +18,8 @@ class CompilationContext(object):
         self.parent = parent
 
 class Node(object):
-    def createTerms(self, context):
-        raise errors.PureVirtualMethodFail(self, 'createTerms')
+    def create(self, context):
+        raise errors.PureVirtualMethodFail(self, 'create')
     def renderSource(self):
         raise errors.PureVirtualMethodFail(self, 'renderSource')
     def getFirstToken(self):
@@ -29,12 +29,12 @@ class Node(object):
         self.renderSource(output)
         return str(output)
 
-class StatementList(object):
+class StatementList(Node):
     def __init__(self):
         self.statements = []
-    def createTerms(self, context):
+    def create(self, context):
         for statement in self.statements:
-            statement.createTerms(context)
+            statement.create(context)
     def getFirstToken(self):
         return self.statements[0].getFirstToken()
     def renderSource(self, output):
@@ -47,195 +47,13 @@ class StatementList(object):
 class IgnoredSyntax(Node):
     def __init__(self, token):
         self.token = token
-    def createTerms(self, context):
+    def create(self, context):
         pass
     def renderSource(self, output):
         output.write(self.token.text)
 
-class Infix(Node):
-    def __init__(self, functionToken, left, right):
-        assert isinstance(left, Node)
-        assert isinstance(right, Node)
-
-        self.token = functionToken
-        self.left = left
-        self.right = right
-
-    def createTerms(self, context):
-
-        # Evaluate as an assignment?
-        if self.token.match == EQUALS:
-            right_term = self.right.createTerms(context)
-            if not isinstance(right_term, Term):
-                raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
-            context.codeUnit.bindName(right_term, str(self.left))
-            return right_term
-
-        # Evaluate as feedback?
-        if self.token.match == COLON_EQUALS:
-            leftTerm = self.left.createTerms(context)
-            rightTerm = self.right.createTerms(context)
-            debug._assert(leftTerm is not None)
-            debug._assert(rightTerm is not None)
-            newTerm = context.codeUnit.createTerm(
-                    builtins.FEEDBACK_FUNC, [leftTerm, rightTerm])
-            newTerm.ast = self
-            newTerm.execute()
-            return newTerm
-
-        # Evaluate as a right-arrow?
-        # (Not supported yet)
-        """
-        if self.token.match == RIGHT_ARROW:
-            left_inputs = self.left.createTerms(context)
-            right_func = self.right.createTerms(context)
-
-            return context.createTerm(right_func, inputs=[left_inputs])
-        """
-
-        # Normal function?
-        # Try to find a defined operator
-        normalFunction = getOperatorFunction(context.codeUnit, self.token)
-        if normalFunction is not None:
-            debug._assert(normalFunction.cachedValue is not None)
-
-            newTerm = context.codeUnit.createTerm(normalFunction,
-                inputs=[self.left.createTerms(context),
-                        self.right.createTerms(context)])
-            newTerm.ast = self
-            return newTerm
-
-        # Evaluate as a function + assign?
-        # Try to find an assign operator
-        assignFunction = getAssignOperatorFunction(self.token.match)
-        if assignFunction is not None:
-            # create a term that's the result of the operation
-            result_term = context.codeUnit.createTerm(assignFunction,
-               inputs=[self.left.createTerms(context), self.right.createTerms(context)])
-
-            # bind the name to this result
-            context.codeUnit.bindName(result_term, str(self.left))
-            return result_term
-
-        debug.fail("Unable to evaluate token: " + self.token.text)
-
-    def getFirstToken(self):
-        return self.left.getFirstToken()
-
-    def renderSource(self, output):
-        self.left.renderSource(output)
-        output.write(' ' + self.token.text + ' ')
-        self.right.renderSource(output)
-
-class Literal(Node):
-    def __init__(self, token, hasQuestionMark=False):
-        self.token = token
-        self.hasQuestionMark = hasQuestionMark
-
-        if token.match == FLOAT:
-            self.value = float(token.text)
-            self.circaType = builtins.FLOAT_TYPE
-        elif token.match == INTEGER:
-            self.value = int(token.text)
-            self.circaType = builtins.INT_TYPE
-        elif token.match == STRING:
-            # the literal should have ' or " marks on either side, strip these
-            self.value = token.text.strip("'\"")
-            self.circaType = builtins.STRING_TYPE
-        elif token.match == MULTILINE_STR:
-            self.value = token.text[3:-3]
-            self.circaType = builtins.STRING_TYPE
-        else:
-            raise parse_errors.InternalError("Couldn't recognize token: " + str(token))
-
-    def createTerms(self, context):
-        # Create a term
-        newTerm = context.codeUnit.createVariable(self.circaType)
-        newTerm.ast = self
-
-        # Assign value
-        variables.assignVariable(newTerm, self.value)
-        return newTerm
-
-    def getFirstToken(self):
-        return self.token
-
-    def renderSource(self, output):
-        if (self.token.match == STRING):
-            output.write("'" + self.value + "'")
-        else:
-            output.write(str(self.value))
-
-class Ident(Node):
-    def __init__(self, token):
-        self.token = token
-
-    def createTerms(self, context):
-        term = context.codeUnit.getNamed(self.token.text)
-
-        if not term:
-            raise parse_errors.IdentifierNotFound(self.token)
-
-        return context.codeUnit.getNamed(self.token.text)
-
-    def getFirstToken(self):
-        return self.token
-
-    def renderSource(self, output):
-        output.write(self.token.text)
-
-class Unary(Node):
-    def __init__(self, functionToken, right):
-        self.functionToken = functionToken
-        self.right = right
-
-    def createTerms(self, context):
-        newTerm = context.codeUnit.createTerm(builtins.MULT,
-                   inputs = [context.codeUnit.createConstant(-1),
-                             self.right.createTerms(context)])
-        newTerm.ast = self
-        return newTerm
-
-    def getFirstToken(self):
-        return self.functionToken;
-
-    def renderSource(self, output):
-        output.write('-')
-        self.right.renderSource(output)
-
-class FunctionCall(Node):
-    def __init__(self, function_name, args):
-        self.function_name = function_name
-        self.args = args
-
-    def createTerms(self, context):
-        arg_terms = [term.createTerms(context) for term in self.args]
-        func = context.codeUnit.getNamed(self.function_name.text)
-
-        if func is None:
-            raise parse_errors.InternalError(self.function_name,
-                "Function " + self.function_name.text + " not found.")
-
-        # Check for Function
-        if func.getType() in (builtins.FUNCTION_TYPE, builtins.SUBROUTINE_TYPE):
-            newTerm = context.codeUnit.createTerm(func, inputs=arg_terms)
-            newTerm.ast = self
-            return newTerm
-
-        # Temp: Use a Python dynamic type check to see if this is a function
-        elif isinstance(func.pythonValue, ca_function._Function):
-            print 'FunctionCall - deprecated stuff'
-            return context.codeUnit.createTerm(func, inputs=arg_terms)
-
-        else:
-            raise parse_errors.InternalError(self.function_name,
-               "Term " + self.function_name.text + " is not a function.")
-
-    def getFirstToken(self):
-        return self.function_name;
-
-    def renderSource(self, output):
-        output.write(str(self.function_name) + '(' + ','.join(map(str,self.args)) + ')')
+class Statement(Node):
+    pass
 
 class FunctionDeclArg(Node):
     def __init__(self, type, name):
@@ -245,7 +63,7 @@ class FunctionDeclArg(Node):
     def renderSource(self, output):
         output.write(self.type.text + ' ' + self.name.text)
 
-class FunctionDecl(Node):
+class FunctionDecl(Statement):
     """
     Fields:
       functionName
@@ -267,7 +85,7 @@ class FunctionDecl(Node):
     def getFirstToken(self):
         return self.functionKeyword
 
-    def createTerms(self, context):
+    def create(self, context):
 
         # For each input arg, resolve the type
         inputTypeTerms = []
@@ -306,7 +124,7 @@ class FunctionDecl(Node):
                 parent = context.codeUnit)
 
         for statement in self.statementList:
-            statement.createTerms(innerCompilationContext)
+            statement.create(innerCompilationContext)
 
         # Bind the subroutine's name
         context.codeUnit.bindName(subroutineTerm, self.functionName.text)
@@ -329,19 +147,212 @@ class FunctionDecl(Node):
 
         output.write("}")
 
-class ReturnStatement(Node):
+class ReturnStatement(Statement):
     """
       returnKeyword
       expr
     """
     def getFirstToken(self):
         return self.returnKeyword
-    def createTerms(self, context):
-        result = self.expr.createTerms(context)
+    def create(self, context):
+        result = self.expr.getTerm(context)
         context.codeUnit.bindName(result, "#return_val")
     def renderSource(self, output):
         output.write('return ')
         self.expr.renderSource(output)
+
+
+class Expression(Statement):
+    def create(self, context):
+        self.getTerm(context)
+
+class Infix(Expression):
+    def __init__(self, functionToken, left, right):
+        assert isinstance(left, Expression)
+        assert isinstance(right, Expression)
+
+        self.token = functionToken
+        self.left = left
+        self.right = right
+
+    def getTerm(self, context):
+
+        # Evaluate as an assignment?
+        if self.token.match == EQUALS:
+            right_term = self.right.getTerm(context)
+            if not isinstance(right_term, Term):
+                raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
+            context.codeUnit.bindName(right_term, str(self.left))
+            return right_term
+
+        # Evaluate as feedback?
+        if self.token.match == COLON_EQUALS:
+            leftTerm = self.left.getTerm(context)
+            rightTerm = self.right.getTerm(context)
+            debug._assert(leftTerm is not None)
+            debug._assert(rightTerm is not None)
+            newTerm = context.codeUnit.createTerm(
+                    builtins.FEEDBACK_FUNC, [leftTerm, rightTerm])
+            newTerm.ast = self
+            newTerm.execute()
+            return newTerm
+
+        # Evaluate as a right-arrow?
+        # (Not supported yet)
+        """
+        if self.token.match == RIGHT_ARROW:
+            left_inputs = self.left.getTerm(context)
+            right_func = self.right.getTerm(context)
+
+            return context.getTerm(right_func, inputs=[left_inputs])
+        """
+
+        # Normal function?
+        # Try to find a defined operator
+        normalFunction = getOperatorFunction(context.codeUnit, self.token)
+        if normalFunction is not None:
+            debug._assert(normalFunction.cachedValue is not None)
+
+            newTerm = context.codeUnit.createTerm(normalFunction,
+                inputs=[self.left.getTerm(context),
+                        self.right.getTerm(context)])
+            newTerm.ast = self
+            return newTerm
+
+        # Evaluate as a function + assign?
+        # Try to find an assign operator
+        assignFunction = getAssignOperatorFunction(self.token.match)
+        if assignFunction is not None:
+            # create a term that's the result of the operation
+            result_term = context.codeUnit.createTerm(assignFunction,
+               inputs=[self.left.getTerm(context), self.right.getTerm(context)])
+
+            # bind the name to this result
+            context.codeUnit.bindName(result_term, str(self.left))
+            return result_term
+
+        debug.fail("Unable to evaluate token: " + self.token.text)
+
+    def getFirstToken(self):
+        return self.left.getFirstToken()
+
+    def renderSource(self, output):
+        self.left.renderSource(output)
+        output.write(' ' + self.token.text + ' ')
+        self.right.renderSource(output)
+
+class Literal(Expression):
+    def __init__(self, token, hasQuestionMark=False):
+        self.token = token
+        self.hasQuestionMark = hasQuestionMark
+
+        if token.match == FLOAT:
+            self.value = float(token.text)
+            self.circaType = builtins.FLOAT_TYPE
+        elif token.match == INTEGER:
+            self.value = int(token.text)
+            self.circaType = builtins.INT_TYPE
+        elif token.match == STRING:
+            # the literal should have ' or " marks on either side, strip these
+            self.value = token.text.strip("'\"")
+            self.circaType = builtins.STRING_TYPE
+        elif token.match == MULTILINE_STR:
+            self.value = token.text[3:-3]
+            self.circaType = builtins.STRING_TYPE
+        else:
+            raise parse_errors.InternalError("Couldn't recognize token: " + str(token))
+
+    def getTerm(self, context):
+        # Create a term
+        newTerm = context.codeUnit.createVariable(self.circaType)
+        newTerm.ast = self
+
+        # Assign value
+        variables.assignVariable(newTerm, self.value)
+        return newTerm
+
+    def getFirstToken(self):
+        return self.token
+
+    def renderSource(self, output):
+        if (self.token.match == STRING):
+            output.write("'" + self.value + "'")
+        else:
+            output.write(str(self.value))
+
+class Ident(Expression):
+    def __init__(self, token):
+        self.token = token
+
+    def getTerm(self, context):
+        term = context.codeUnit.getNamed(self.token.text)
+
+        if not term:
+            raise parse_errors.IdentifierNotFound(self.token)
+
+        return context.codeUnit.getNamed(self.token.text)
+
+    def getFirstToken(self):
+        return self.token
+
+    def renderSource(self, output):
+        output.write(self.token.text)
+
+class Unary(Expression):
+    def __init__(self, functionToken, right):
+        debug._assert(isinstance(right, Expression))
+
+        self.functionToken = functionToken
+        self.right = right
+
+    def getTerm(self, context):
+        newTerm = context.codeUnit.getTerm(builtins.MULT,
+                   inputs = [context.codeUnit.createConstant(-1),
+                             self.right.getTerm(context)])
+        newTerm.ast = self
+        return newTerm
+
+    def getFirstToken(self):
+        return self.functionToken;
+
+    def renderSource(self, output):
+        output.write('-')
+        self.right.renderSource(output)
+
+class FunctionCall(Expression):
+    def __init__(self, function_name, args):
+        self.function_name = function_name
+        self.args = args
+
+    def getTerm(self, context):
+        arg_terms = [term.getTerm(context) for term in self.args]
+        func = context.codeUnit.getNamed(self.function_name.text)
+
+        if func is None:
+            raise parse_errors.InternalError(self.function_name,
+                "Function " + self.function_name.text + " not found.")
+
+        # Check for Function
+        if func.getType() in (builtins.FUNCTION_TYPE, builtins.SUBROUTINE_TYPE):
+            newTerm = context.codeUnit.createTerm(func, inputs=arg_terms)
+            newTerm.ast = self
+            return newTerm
+
+        # Temp: Use a Python dynamic type check to see if this is a function
+        elif isinstance(func.pythonValue, ca_function._Function):
+            print 'FunctionCall - deprecated stuff'
+            return context.codeUnit.createTerm(func, inputs=arg_terms)
+
+        else:
+            raise parse_errors.InternalError(self.function_name,
+               "Term " + self.function_name.text + " is not a function.")
+
+    def getFirstToken(self):
+        return self.function_name;
+
+    def renderSource(self, output):
+        output.write(str(self.function_name) + '(' + ','.join(map(str,self.args)) + ')')
+
 
 def getOperatorFunction(codeUnit, token):
 
@@ -393,7 +404,7 @@ def testInfix():
     fakeBuilder.expectCall('getNamed(sum)', returnVal = fakeSumFunc)
     fakeBuilder.expectCall('createTerm(1,2)')
     
-    expr.createTerms(fakeBuilder)
+    expr.create(fakeBuilder)
 
 if __name__ == "__main__":
     testInfix()
