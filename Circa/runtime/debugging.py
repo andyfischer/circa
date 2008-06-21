@@ -6,8 +6,8 @@ from Circa.common import (debug, function_builder)
 
 class Assert(function_builder.BaseFunction):
     name = "assert"
-    inputTypes = ['bool']
-    outputType = 'void'
+    inputs = ['bool']
+    output = 'void'
 
     @staticmethod
     def evaluate(cxt):

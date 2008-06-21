@@ -4,7 +4,8 @@
 # Defines classes for an abstract syntax tree
 
 import parse_errors, tokens
-from Circa.core import (builtins, ca_string, ca_subroutine, ca_function, ca_type)
+from Circa.core import (builtins, ca_variable, ca_string, 
+        ca_subroutine, ca_function, ca_type)
 from Circa.core.term import Term
 from Circa.common import (debug, errors)
 from Circa.utils.spy_object import SpyObject
@@ -320,9 +321,11 @@ class Unary(Expression):
         yield self.right
 
     def getTerm(self, context):
-        newTerm = context.codeUnit.getTerm(builtins.MULT,
-                   inputs = [context.codeUnit.createConstant(-1),
-                             self.right.getTerm(context)])
+        mult = context.codeUnit.getNamed('mult')
+        negative_one = context.codeUnit.createConstant(builtins.INT_TYPE)
+        ca_variable.setValue(negative_one, -1)
+        newTerm = context.codeUnit.createTerm(mult,
+                   inputs = [negative_one, self.right.getTerm(context)])
         newTerm.ast = self
         return newTerm
 

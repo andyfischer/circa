@@ -1,11 +1,8 @@
 
 # Contains standard Circa symbols
 #
-# Includes:
-#   Basic math functions
-#   Debugging functions
 
-import boolean, comparison, containers, debugging, feedback, python, math, meta, variables
+import boolean, comparison, containers, debugging, feedback, python, ca_math, meta, variables
 
 def createFunctions(codeUnit):
     boolean.createFunctions(codeUnit)
@@ -15,5 +12,5 @@ def createFunctions(codeUnit):
     feedback.createFunctions(codeUnit)
     meta.createFunctions(codeUnit)
     python.createFunctions(codeUnit)
-    math.createFunctions(codeUnit)
+    ca_math.createFunctions(codeUnit)
     variables.createFunctions(codeUnit)

@@ -142,7 +142,7 @@ def infix_expression(tokens, precedence):
 def unary_expression(tokens):
     if tokens.nextIs(MINUS):
         minus = tokens.consume(MINUS)
-        return Unary(minus, atom(tokens))
+        return ast.Unary(minus, atom(tokens))
     else:
         return atom(tokens)
 
