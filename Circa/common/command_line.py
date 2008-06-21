@@ -205,20 +205,35 @@ def removeFileSuffix(filename):
     if filename.endswith('.ca'):
         return filename[:-3]
 
+def parseCommandLineArgs(args):
+    single_options = []
+    actual_args = []
+    for word in args:
+        if word[0] == '-':
+            for c in word[1:]:
+                single_options.append(c)
+        else:
+            actual_args.append(word)
+
+    return (single_options, actual_args)
 
 def main():
     Circa.initialize()
 
+    (single_options, actual_args) = parseCommandLineArgs(sys.argv[1:])
+
     targetCodeUnit = None
 
-    # Read command-line args
-    if len(sys.argv) < 2:
+    # Was a file name specified?
+    if len(actual_args) == 0:
         print "No file specified, examining main"
         targetCodeUnit = Circa.LOADED_MODULES['main']
+
+    # Load the given filename
     else:
-        filename = findUsersFilename(sys.argv[1])
+        filename = findUsersFilename(actual_args[0])
         if filename is None:
-            print "File not found: " + sys.argv[1]
+            print "File not found: " + actual_args[0]
             return
 
         print "Reading file " + filename + "..."
@@ -235,8 +250,11 @@ def main():
         Circa.LOADED_MODULES[removeFileSuffix(filename)] = codeUnit
         targetCodeUnit = codeUnit
 
-    command_line = CommandLine(targetCodeUnit)
-    command_line.doInputLoop()
+    # Start interactive mode?
+    if 'i' in single_options:
+        print "Starting interactive mode..."
+        command_line = CommandLine(targetCodeUnit)
+        command_line.doInputLoop()
 
 def replLoop(locals, prompt):
     print "Press Control-C to exit"
