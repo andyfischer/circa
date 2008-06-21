@@ -1,14 +1,16 @@
 
-
+-- addition
 three = 1 + 2
 assert(three != 2)
 assert(three == 3)
 assert(three != 4)
 
+-- subtraction
 assert(4 - 2 == 2)
 assert(1 - 2 == -1)
 assert(5 - -1 == 6)
 
+-- multiplication
 six = 2 * 3
 assert(six != 5)
 assert(six == 6)

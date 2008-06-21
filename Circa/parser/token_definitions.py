@@ -46,6 +46,9 @@ def word(pattern): return pattern + "(?!" + alphanumeric + ")"
 
 ### Token definitions ###
 
+# This needs to be above MINUS
+COMMENT_LINE =  TokenDef(76, 'comment_line', pattern=r"--.*$")
+
 # Symbols
 LPAREN =        TokenDef(1, 'lparen', '(')
 RPAREN =        TokenDef(2, 'rparen', ')')
@@ -102,7 +105,6 @@ IDENT =         TokenDef(72, 'identifier', pattern=r"[a-zA-Z_\-][a-zA-Z0-9_\-]*"
 MULTILINE_STR = TokenDef(74, 'multiline_string', pattern=r"\"\"\"(.|\n)*?\"\"\"")
 STRING =        TokenDef(73, 'string', pattern=group(r"'[^']*'", r"\"[^\"]*\""))
 WHITESPACE =    TokenDef(75, 'whitespace', pattern=r"[ \t]+")
-COMMENT_LINE =  TokenDef(76, 'comment_line', pattern=r"#.*$")
 
 # this needs to be below FLOAT
 DOT =           TokenDef(27, 'dot', '.')
