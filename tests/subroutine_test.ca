@@ -1,13 +1,13 @@
 
-function square(a) {
+function square(int a) -> int {
     return a*a
 }
 
-function dist(a,b) {
+function dist(int a,int b) -> float {
     return sqrt(square(a) + square(b))
 }
 
-function three_a_plus_two_b(a,b) {
+function three_a_plus_two_b(int a,int b) -> int {
   return 3 * a + 2 * b
 }
 
