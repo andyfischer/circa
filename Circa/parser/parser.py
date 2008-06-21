@@ -232,7 +232,7 @@ def function_decl(tokens):
 def return_statement(tokens):
     returnStmt = ast.ReturnStatement()
     returnStmt.returnKeyword = tokens.consume(RETURN)
-    returnStmt.expr = infix_expression(tokens, 0)
+    returnStmt.right = infix_expression(tokens, 0)
     return returnStmt
 
 def testEquals():

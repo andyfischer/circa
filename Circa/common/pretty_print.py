@@ -35,11 +35,12 @@ def _printTerm(cxt, term):
 
 def _printTermValue(cxt, term):
     if term.getType() is builtins.SUBROUTINE_TYPE:
-        cxt.out.writeln("subroutine " + ca_function.name(term))
+        cxt.out.writeln("subroutine " + ca_function.name(term) + ' {')
         cxt.out.indent()
         for term in term.iterateInnerTerms():
             _printTerm(cxt,term)
         cxt.out.unindent()
+        cxt.out.writeln('}')
 
     else:
         functionName = ca_function.name(term.functionTerm)
