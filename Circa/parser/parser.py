@@ -230,10 +230,9 @@ def function_decl(tokens):
     return result
 
 def return_statement(tokens):
-    returnStmt = ast.ReturnStatement()
-    returnStmt.returnKeyword = tokens.consume(RETURN)
-    returnStmt.right = infix_expression(tokens, 0)
-    return returnStmt
+    returnKeyword = tokens.consume(RETURN)
+    right = infix_expression(tokens, 0)
+    return ast.ReturnStatement(returnKeyword, right)
 
 def testEquals():
     import tokens

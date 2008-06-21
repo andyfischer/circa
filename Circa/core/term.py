@@ -50,6 +50,9 @@ class Term(object):
         self.globalID = nextGlobalID
         nextGlobalID += 1
 
+    def numInputs(self):
+        return len(self.inputs)
+
     def getInput(self, inputIndex):
         "Return an input term"
         return self.inputs[inputIndex]

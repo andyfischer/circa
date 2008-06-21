@@ -148,23 +148,24 @@ class FunctionDecl(Statement):
         output.write("}")
 
 class ReturnStatement(Statement):
-    """
-      returnKeyword
-      expr
-    """
+    def __init__(self, returnKeyword, right):
+        self.returnKeyword = returnKeyword
+        self.right = right
     def getFirstToken(self):
         return self.returnKeyword
     def create(self, context):
-        result = self.expr.getTerm(context)
+        result = self.right.getTerm(context)
         context.codeUnit.bindName(result, "#return_val")
     def renderSource(self, output):
         output.write('return ')
-        self.expr.renderSource(output)
-
+        self.right.renderSource(output)
 
 class Expression(Statement):
     def create(self, context):
         self.getTerm(context)
+    def inputs(self):
+        "Returns an iterable of our inputs"
+        raise errors.PureVirtualMethodFail(self, 'inputs')
 
 class Infix(Expression):
     def __init__(self, functionToken, left, right):
@@ -174,6 +175,10 @@ class Infix(Expression):
         self.token = functionToken
         self.left = left
         self.right = right
+
+    def inputs(self):
+        yield self.left
+        yield self.right
 
     def getTerm(self, context):
 
@@ -262,6 +267,9 @@ class Literal(Expression):
         else:
             raise parse_errors.InternalError("Couldn't recognize token: " + str(token))
 
+    def inputs(self):
+        return []
+
     def getTerm(self, context):
         # Create a term
         newTerm = context.codeUnit.createVariable(self.circaType)
@@ -284,6 +292,9 @@ class Ident(Expression):
     def __init__(self, token):
         self.token = token
 
+    def inputs(self):
+        return []
+
     def getTerm(self, context):
         term = context.codeUnit.getNamed(self.token.text)
 
@@ -305,6 +316,9 @@ class Unary(Expression):
         self.functionToken = functionToken
         self.right = right
 
+    def inputs(self):
+        yield self.right
+
     def getTerm(self, context):
         newTerm = context.codeUnit.getTerm(builtins.MULT,
                    inputs = [context.codeUnit.createConstant(-1),
@@ -321,11 +335,18 @@ class Unary(Expression):
 
 class FunctionCall(Expression):
     def __init__(self, function_name, args):
+        for arg in args:
+            debug._assert(isinstance(arg,Expression))
+
         self.function_name = function_name
         self.args = args
 
+    def inputs(self):
+        for arg in self.args:
+            yield arg
+
     def getTerm(self, context):
-        arg_terms = [term.getTerm(context) for term in self.args]
+        arg_terms = [expr.getTerm(context) for expr in self.args]
         func = context.codeUnit.getNamed(self.function_name.text)
 
         if func is None:
