@@ -45,3 +45,14 @@ def _printTermValue(cxt, term):
     else:
         functionName = ca_function.name(term.functionTerm)
         cxt.out.writeln(functionName + " " + str(term.cachedValue))
+
+def getInputsAsWritten(term):
+    """
+    Returns a list of strings for each input in term. We attempt (by checking
+    the AST) to replicate how each input was originally specified in source.
+    """
+    for index in term.numInputs():
+        inputTerm = term.getInput(index)
+        inputExpr = term.ast
+        yield str(inputExpr)
+
