@@ -50,7 +50,7 @@ class CommandLine(object):
         elif command == 'eval' or command == 'e':
             ast = parser.parseStatement(commandArgs)
             print ast
-            result = ast.createTerms(ast_module.CompilationContext(self.codeUnit))
+            result = ast.create(ast_module.CompilationContext(self.codeUnit))
             print str(result)
             result.execute()
 
@@ -125,7 +125,7 @@ class CommandLine(object):
             # Interpret as a Circa expression
             try:
                 ast = parser.parseStatement(inputStr)
-                result = ast.createTerms(ast_module.CompilationContext(self.codeUnit))
+                result = ast.create(ast_module.CompilationContext(self.codeUnit))
                 if result is None:
                     print "(void)"
                 else:

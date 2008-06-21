@@ -1,6 +1,8 @@
 #
 # Defines Circa funcitons for arithmetic
 
+import math
+
 from Circa.common import (debug, function_builder)
 from Circa.core import (builtins, ca_float, ca_function)
 
@@ -79,11 +81,21 @@ class Average(object):
             sum += inputs[i]
         return sum/count
 
+class SquareRoot(object):
+    name = 'sqrt'
+    inputs = ['float']
+    output = 'float'
+
+    @staticmethod
+    def evaluate(a):
+        return math.sqrt(a)
+
+
 
 def createFunctions(codeUnit):
     function_builder.createFunction(codeUnit, AddFeedback)
     add = function_builder.importPythonFunction(codeUnit, Add)
 
-    for functionDef in (Subtract,Multiply,Divide,Average):
+    for functionDef in (Subtract,Multiply,Divide,Average,SquareRoot):
         function_builder.importPythonFunction(codeUnit, functionDef)
 
