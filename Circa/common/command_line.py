@@ -122,15 +122,15 @@ class CommandLine(object):
             return
 
         else:
-            # Interpret as a Circa expression
+            # Interpret as a Circa statement
             try:
                 ast = parser.parseStatement(inputStr)
                 result = ast.create(ast_module.CompilationContext(self.codeUnit))
                 if result is None:
                     print "(void)"
                 else:
-                    print str(result)
                     result.execute()
+                    print str(result)
             except errors.CircaError, e:
                 print e
             except Exception,e:

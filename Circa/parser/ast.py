@@ -163,7 +163,7 @@ class ReturnStatement(Statement):
 
 class Expression(Statement):
     def create(self, context):
-        self.getTerm(context)
+        return self.getTerm(context)
     def inputs(self):
         "Returns an iterable of our inputs"
         raise errors.PureVirtualMethodFail(self, 'inputs')
@@ -247,6 +247,27 @@ class Infix(Expression):
         output.write(' ' + self.token.text + ' ')
         self.right.renderSource(output)
 
+class LiteralString(Expression):
+    def __init__(self, token):
+        self.token = token
+        self.hasQuestionMark = False
+
+    def inputs(self):
+        return []
+
+    def getTerm(self, context):
+        term = context.codeUnit.createVariable(builtins.STRING_TYPE)
+        term.ast = self
+        # Strip quotation marks
+        value = self.token.text.strip("'\"")
+        # Convert \n to newline
+        value = value.replace("\\n","\n")
+        ca_variable.setValue(term, value)
+        return term
+
+    def renderSource(self,output):
+        output.write(self.token.text)
+
 class Literal(Expression):
     def __init__(self, token, hasQuestionMark=False):
         self.token = token
@@ -258,10 +279,12 @@ class Literal(Expression):
         elif token.match == INTEGER:
             self.value = int(token.text)
             self.circaType = builtins.INT_TYPE
+            """
         elif token.match == STRING:
             # the literal should have ' or " marks on either side, strip these
             self.value = token.text.strip("'\"")
             self.circaType = builtins.STRING_TYPE
+            """
         elif token.match == MULTILINE_STR:
             self.value = token.text[3:-3]
             self.circaType = builtins.STRING_TYPE
@@ -277,7 +300,7 @@ class Literal(Expression):
         newTerm.ast = self
 
         # Assign value
-        variables.assignVariable(newTerm, self.value)
+        ca_variable.setValue(newTerm, self.value)
         return newTerm
 
     def getFirstToken(self):
