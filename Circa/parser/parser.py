@@ -151,14 +151,17 @@ def atom(tokens):
     if tokens.nextIs(IDENT) and tokens.nextIs(LPAREN, lookahead=1):
         return function_call(tokens)
 
+    # Literal string
+    if tokens.nextIs(STRING):
+        token = tokens.consume()
+        questionMark = optional_question_mark(tokens)
+        return ast.LiteralString(token)
+
     # Literal value
     if tokens.nextIn((FLOAT, INTEGER, STRING, MULTILINE_STR)):
         token = tokens.consume()
-        questionMark = False
-        if tokens.nextIs(QUESTION):
-            tokens.consume(QUESTION)
-            questionMark = True
-        return ast.Literal(token, hasQuestionMark=questionMark)
+        questionMark = optional_question_mark(tokens)
+        return ast.Literal(token)
 
     # Identifier
     if tokens.nextIs(IDENT):
@@ -177,6 +180,15 @@ def atom(tokens):
         raise parse_errors.UnexpectedEOF()
 
     raise parse_errors.UnexpectedToken(tokens.next())
+
+def optional_question_mark(tokens):
+    """
+    This function checks if the next token is a question mark. If so,
+    consume and return it. If not, returns None.
+    """
+    if tokens.nextIs(QUESTION):
+        return tokens.consume(QUESTION)
+    return None
  
 def function_call(tokens):
     function_name = tokens.consume(IDENT)
