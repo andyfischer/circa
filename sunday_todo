@@ -1,0 +1,6 @@
+
+Add file operations: read_text_file, write_text_file
+Create a 'module' type
+Add 'master' or 'image' module:
+  contains a list of loaded global modules
+  contains top-level stuff
