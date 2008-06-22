@@ -27,10 +27,11 @@ class CodeUnit(object):
         new_term = Term()
         new_term.codeUnit = self
 
-        if branch:
-            branch.append(new_term)
-        else:
-            self.allTerms.append(new_term)
+        if branch is None:
+            branch = self.mainBranch
+
+        branch.append(new_term)
+        self.allTerms.append(new_term)
         return new_term
 
     def _bootstrapEmptyTerm(self):
