@@ -158,7 +158,7 @@ def atom(tokens):
         return ast.LiteralString(token)
 
     # Literal value
-    if tokens.nextIn((FLOAT, INTEGER, STRING, MULTILINE_STR)):
+    if tokens.nextIn((FLOAT, INTEGER, MULTILINE_STR)):
         token = tokens.consume()
         questionMark = optional_question_mark(tokens)
         return ast.Literal(token)
