@@ -7,6 +7,7 @@ import Circa
 from Circa.common import (debug, errors)
 import builtins, ca_function, ca_type
 from term import Term
+from branch import Branch
 
 class CodeUnit(object):
     def __init__(self):
@@ -14,10 +15,7 @@ class CodeUnit(object):
         self.allTerms = []
 
         # mainBranch is a list of Terms
-        self.mainBranch = []
-
-        # mainNamespace maps from strings to Terms
-        self.mainNamespace = {}
+        self.mainBranch = Branch(None)
 
         # an AST object that describes this code
         self.ast = None
@@ -130,35 +128,26 @@ class CodeUnit(object):
         term.deleted = True
 
     def bindName(self, term, name, allowOverwrite=False):
-        """
-        Bind the name to the given term. If allowOverwrite is false, an
-        error will be thrown if this name is already bound.
-        """
-        debug._assert(isinstance(name, str))
-        debug._assert(isinstance(term, Term))
-        if not allowOverwrite and name in self.mainNamespace:
-            raise Exception("The name "+name+" is already bound. (to allow "
-                + "this, you can use the allowOverwrite parameter)")
-
-        self.mainNamespace[name] = term
+        return self.mainBranch.bindName(term,name,allowOverwrite)
 
     def definesName(self, name):
         "Returns True if this codeunit defines the given name"
-        return name in self.mainNamespace
+        return self.mainBranch.containsName(name)
 
     def getNamed(self, name):
         debug._assert(isinstance(name,str))
 
-        if name in self.mainNamespace:
-            return self.mainNamespace[name]
+        if self.mainBranch.containsName(name):
+            return self.mainBranch.getNamed(name)
 
         # Get a globally-defined term
         return Circa.getGlobal(name)
 
     def getIdentifier(self, term):
         debug._assert(isinstance(term, Term))
-        # Try to find this term in mainNamespace
-        for (name,t) in self.mainNamespace.items():
+
+        # Try to find this term in main namespace
+        for (name,t) in self.mainBranch.iterateNamespace():
             if t is term:
                 return name
 
@@ -172,7 +161,7 @@ class CodeUnit(object):
         """
         debug._assert(isinstance(term, Term))
         result = set()
-        for (name,t) in self.mainNamespace.items():
+        for (name,t) in self.mainBranch.iterateNamespace():
             if t is term:
                 result.add(name)
         return result

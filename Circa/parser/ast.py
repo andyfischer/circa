@@ -31,30 +31,33 @@ class Node(object):
 
 class StatementList(Node):
     def __init__(self):
-        self.statements = []
+        self._statements = []
     def create(self, context):
-        for statement in self.statements:
+        for statement in self._statements:
             statement.create(context)
     def getFirstToken(self):
-        return self.statements[0].getFirstToken()
+        return self._statements[0].getFirstToken()
     def renderSource(self, output):
-        for statement in self.statements:
+        for statement in self._statements:
             statement.renderSource(output)
     def __iter__(self):
-        for statement in self.statements:
+        for statement in self._statements:
             yield statement
 
+    def append(self, statement):
+        debug._assert(isinstance(statement, Statement))
+        self._statements.append(statement)
 
-class IgnoredSyntax(Node):
+class Statement(Node):
+    pass
+
+class IgnoredSyntax(Statement):
     def __init__(self, token):
         self.token = token
     def create(self, context):
         pass
     def renderSource(self, output):
         output.write(self.token.text)
-
-class Statement(Node):
-    pass
 
 class FunctionDeclArg(Node):
     def __init__(self, type, name):
@@ -163,7 +166,8 @@ class ReturnStatement(Statement):
 
 class IfBlock(Statement):
     def __init__(self):
-        pass
+        self.mainBlock = None
+        self.elseBlock = None
     def create(self, context):
         pass
         
