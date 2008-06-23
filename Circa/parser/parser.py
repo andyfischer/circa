@@ -84,7 +84,7 @@ def statement_list(tokens):
     result = ast.StatementList()
 
     while not tokens.nextIs(RBRACKET) and not tokens.finished():
-        result.statements.append(statement(tokens))
+        result.append(statement(tokens))
 
     return result
 
@@ -249,21 +249,37 @@ def return_statement(tokens):
     return ast.ReturnStatement(returnKeyword, right)
 
 def if_statement(tokens):
+    result = ast.IfBlock()
+
     ifKeyword = tokens.consume(IF)
     tokens.consume(LPAREN)
     conditionExpression = infix_expression(tokens)
     tokens.consume(RPAREN)
-    tokens.consume(LBRACKET)
-    while not tokens.nextIs(RBRACKET):
-        stmt = statement(tokens)
-    tokens.consume(RBRACKET)
+
+    mainBlock = bracketed_statement_list(tokens)
 
     if tokens.nextIs(ELSE):
         elseKeyword = tokens.consume(ELSE)
+        result.elseBlock = bracketed_statement_list(tokens)
+
+    return result
+
+def bracketed_statement_list(tokens):
+    """
+    Accepts either a series of statements, surrounded by {}s, or a
+    single statement.
+    Returns a StatementList either way.
+    """
+    stmtList = ast.StatementList()
+
+    if tokens.nextIs(LBRACKET):
         tokens.consume(LBRACKET)
         while not tokens.nextIs(RBRACKET):
-            stmt = statement(tokens)
+            stmtList.append(statement(tokens))
         tokens.consume(RBRACKET)
+    else:
+        stmtList.append(statement(tokens))
+    return stmtList
 
 def testEquals():
     import tokens
