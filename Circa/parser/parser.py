@@ -97,8 +97,10 @@ def statement(tokens):
         return ast.IgnoredSyntax(tokens.consume(NEWLINE))
     elif tokens.nextIs(RETURN):
         return return_statement(tokens)
+    elif tokens.nextIs(IF):
+        return if_statement(tokens)
     else:
-        return infix_expression(tokens, 0)
+        return infix_expression(tokens)
 
 
 # Infix precedence
@@ -119,7 +121,7 @@ def _getInfixPrecedence(token):
     except KeyError:
         return -1
 
-def infix_expression(tokens, precedence):
+def infix_expression(tokens, precedence=0):
     if (precedence > HIGHEST_INFIX_PRECEDENCE):
        return unary_expression(tokens)
 
@@ -171,7 +173,7 @@ def atom(tokens):
     # Parenthesized expression
     if tokens.nextIs(LPAREN):
         tokens.consume(LPAREN)
-        expr = infix_expression(tokens, 0)
+        expr = infix_expression(tokens)
         tokens.consume(RPAREN)
         return expr
   
@@ -197,11 +199,11 @@ def function_call(tokens):
     args = []
 
     if not tokens.nextIs(RPAREN):
-        args.append( infix_expression(tokens, 0) )
+        args.append( infix_expression(tokens) )
 
         while tokens.nextIs(COMMA):
             tokens.consume(COMMA)
-            args.append( infix_expression(tokens, 0) )
+            args.append( infix_expression(tokens) )
 
     tokens.consume(RPAREN)
 
@@ -243,13 +245,30 @@ def function_decl(tokens):
 
 def return_statement(tokens):
     returnKeyword = tokens.consume(RETURN)
-    right = infix_expression(tokens, 0)
+    right = infix_expression(tokens)
     return ast.ReturnStatement(returnKeyword, right)
+
+def if_statement(tokens):
+    ifKeyword = tokens.consume(IF)
+    tokens.consume(LPAREN)
+    conditionExpression = infix_expression(tokens)
+    tokens.consume(RPAREN)
+    tokens.consume(LBRACKET)
+    while not tokens.nextIs(RBRACKET):
+        stmt = statement(tokens)
+    tokens.consume(RBRACKET)
+
+    if tokens.nextIs(ELSE):
+        elseKeyword = tokens.consume(ELSE)
+        tokens.consume(LBRACKET)
+        while not tokens.nextIs(RBRACKET):
+            stmt = statement(tokens)
+        tokens.consume(RBRACKET)
 
 def testEquals():
     import tokens
     ts = tokens.tokenize("a = 1")
-    print infix_expression(ts, 0)
+    print infix_expression(ts)
 
 if __name__ == '__main__':
     testEquals()

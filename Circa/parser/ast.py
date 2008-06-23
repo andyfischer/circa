@@ -44,6 +44,7 @@ class StatementList(Node):
         for statement in self.statements:
             yield statement
 
+
 class IgnoredSyntax(Node):
     def __init__(self, token):
         self.token = token
@@ -159,6 +160,13 @@ class ReturnStatement(Statement):
     def renderSource(self, output):
         output.write('return ')
         self.right.renderSource(output)
+
+class IfBlock(Statement):
+    def __init__(self):
+        pass
+    def create(self, context):
+        pass
+        
 
 class Expression(Statement):
     def create(self, context):

@@ -40,7 +40,7 @@ class LoadModule(object):
 
         return Module(name, codeUnit)
 
-class ExecuteModule(object):
+class ExecModule(object):
     name = 'exec-module'
     inputs = ['Module']
     inputNames = ['module']
@@ -54,5 +54,5 @@ class ExecuteModule(object):
 def createTerms(codeUnit):
     function_builder.importPythonType(codeUnit, Module)
     function_builder.importPythonFunction(codeUnit, LoadModule)
-    function_builder.importPythonFunction(codeUnit, ExecuteModule)
+    function_builder.importPythonFunction(codeUnit, ExecModule)
 

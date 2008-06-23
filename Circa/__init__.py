@@ -11,6 +11,7 @@ def initialize():
     LOADED_MODULES['kernel'] = builtins.KERNEL
 
     _loadStandardModule('parsing')
+    _loadStandardModule('master')
 
     LOADED_MODULES['main'] = ca_codeunit.CodeUnit()
 
@@ -39,7 +40,7 @@ def startReplLoop():
 def _loadStandardModule(name):
     from Circa import parser
 
-    filename = os.path.join(os.environ['CIRCA_HOME'], 'stdlib', 'parsing.ca')
+    filename = os.path.join(os.environ['CIRCA_HOME'], 'stdlib', name + '.ca')
     (errors, codeUnit) = parser.parseFile(filename)
 
     if errors:
