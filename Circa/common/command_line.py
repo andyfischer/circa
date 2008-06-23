@@ -130,7 +130,8 @@ class CommandLine(object):
                     print "(void)"
                 else:
                     result.execute()
-                    print str(result)
+                    if result.getType is not builtins.VOID_TYPE:
+                        print str(result)
             except errors.CircaError, e:
                 print e
             except Exception,e:

@@ -3,10 +3,12 @@
 #
 
 import boolean, comparison, containers, debugging
+import ca_module
 import feedback, files, python, ca_math, meta, variables
 
 def createFunctions(codeUnit):
     boolean.createFunctions(codeUnit)
+    ca_module.createTerms(codeUnit)
     comparison.createFunctions(codeUnit)
     containers.createFunctions(codeUnit)
     debugging.createFunctions(codeUnit)
