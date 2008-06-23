@@ -27,6 +27,8 @@ class CodeUnit(object):
 
         if branch is None:
             branch = self.mainBranch
+        else:
+            debug._assert(isinstance(branch,Branch))
 
         branch.append(new_term)
         self.allTerms.append(new_term)
@@ -50,6 +52,8 @@ class CodeUnit(object):
         """
 
         debug._assert(isinstance(function, Term))
+        debug._assert(isinstance(inputs, list))
+        debug._assert(branch is None or isinstance(branch,Branch))
 
         # Check if they have provided the correct number of arguments
         requiredArgCount = len(ca_function.inputTypes(function))

@@ -10,7 +10,7 @@ import tokens as _tokens_module
 from token_definitions import *
 import parse_errors
 
-def parseFile(filename, compilationCU=None):
+def parseFile(filename):
     """
     Parse the given file.
     Returns tuple: (errors, CodeUnit)
@@ -34,10 +34,11 @@ def parseFile(filename, compilationCU=None):
     # Reset token stream
     tokens.reset()
 
-    pstate = ParserState(tokens, ca_codeunit.CodeUnit(),
-            compilationCU=compilationCU)
+    pstate = ParserState(tokens, ca_codeunit.CodeUnit())
+            
 
-    compilationContext = ast.CompilationContext(pstate.codeUnit, pstate.compilationCU)
+    compilationContext = ast.CompilationContext(
+            pstate.codeUnit, pstate.codeUnit.mainBranch)
 
     try:
         resultAst = statement_list(pstate.tokens)
@@ -51,15 +52,10 @@ def parseFile(filename, compilationCU=None):
 
 
 class ParserState(object):
-    def __init__(self, tokenSource, resultCodeUnit, compilationCU=None):
+    def __init__(self, tokenSource, resultCodeUnit):
         self.tokens = tokenSource
         self.errors = []
         self.codeUnit = resultCodeUnit
-
-        if compilationCU is None:
-            self.compilationCU = resultCodeUnit
-        else:
-            self.compilationCU = compilationCU
 
 
 def expression_statement(pstate):
@@ -67,7 +63,7 @@ def expression_statement(pstate):
         mark = pstate.tokens.markLocation()
         resultAst = parseExpression(pstate.tokens)
         term = resultAst.create(
-            ast.CompilationContext(pstate.codeUnit, pstate.compilationCU))
+            ast.CompilationContext(pstate.codeUnit))
 
         pstate.codeUnit.statementAsts.append(resultAst)
 

@@ -11,14 +11,22 @@ from Circa.common import (debug, errors)
 from Circa.utils.spy_object import SpyObject
 from Circa.utils.string_buffer import StringBuffer
 from token_definitions import *
+from Circa.core.branch import Branch
 
 class CompilationContext(object):
     def __init__(self, codeUnit, branch, parent=None):
-        if parent is not None:
-            debug._assert(isinstance(parent, CompilationContext))
+        debug._assert(parent is None or isinstance(parent, CompilationContext))
+        debug._assert(isinstance(branch,Branch))
+
         self.codeUnit = codeUnit
         self.branch = branch
         self.parent = parent
+
+    def bindName(self, term, name):
+        self.branch.bindName(term,name)
+
+    def createTerm(self, function, inputs):
+        return self.codeUnit.createTerm(function, inputs, branch=self.branch)
 
 class Node(object):
     def create(self, context):
@@ -212,8 +220,7 @@ class Infix(Expression):
             rightTerm = self.right.getTerm(context)
             debug._assert(leftTerm is not None)
             debug._assert(rightTerm is not None)
-            newTerm = context.codeUnit.createTerm(
-                    builtins.FEEDBACK_FUNC, [leftTerm, rightTerm])
+            newTerm = context.createTerm(builtins.FEEDBACK_FUNC, [leftTerm, rightTerm])
             newTerm.ast = self
             newTerm.execute()
             return newTerm
@@ -234,7 +241,7 @@ class Infix(Expression):
         if normalFunction is not None:
             debug._assert(normalFunction.cachedValue is not None)
 
-            newTerm = context.codeUnit.createTerm(normalFunction,
+            newTerm = context.createTerm(normalFunction,
                 inputs=[self.left.getTerm(context),
                         self.right.getTerm(context)])
             newTerm.ast = self
@@ -245,7 +252,7 @@ class Infix(Expression):
         assignFunction = getAssignOperatorFunction(self.token.match)
         if assignFunction is not None:
             # create a term that's the result of the operation
-            result_term = context.codeUnit.createTerm(assignFunction,
+            result_term = context.createTerm(assignFunction,
                inputs=[self.left.getTerm(context), self.right.getTerm(context)])
 
             # bind the name to this result
@@ -362,7 +369,7 @@ class Unary(Expression):
         mult = context.codeUnit.getNamed('mult')
         negative_one = context.codeUnit.createConstant(builtins.INT_TYPE)
         ca_variable.setValue(negative_one, -1)
-        newTerm = context.codeUnit.createTerm(mult,
+        newTerm = context.createTerm(mult,
                    inputs = [negative_one, self.right.getTerm(context)])
         newTerm.ast = self
         return newTerm
@@ -396,14 +403,14 @@ class FunctionCall(Expression):
 
         # Check for Function
         if func.getType() in (builtins.FUNCTION_TYPE, builtins.SUBROUTINE_TYPE):
-            newTerm = context.codeUnit.createTerm(func, inputs=arg_terms)
+            newTerm = context.createTerm(func, inputs=arg_terms)
             newTerm.ast = self
             return newTerm
 
         # Temp: Use a Python dynamic type check to see if this is a function
         elif isinstance(func.pythonValue, ca_function._Function):
             print 'FunctionCall - deprecated stuff'
-            return context.codeUnit.createTerm(func, inputs=arg_terms)
+            return context.createTerm(func, inputs=arg_terms)
 
         else:
             raise parse_errors.InternalError(self.function_name,
