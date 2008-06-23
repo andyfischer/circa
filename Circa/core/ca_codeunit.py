@@ -140,12 +140,7 @@ class CodeUnit(object):
 
     def getNamed(self, name):
         debug._assert(isinstance(name,str))
-
-        if self.mainBranch.containsName(name):
-            return self.mainBranch.getNamed(name)
-
-        # Get a globally-defined term
-        return Circa.getGlobal(name)
+        return self.mainBranch.getNamed(name)
 
     def getIdentifier(self, term):
         debug._assert(isinstance(term, Term))
