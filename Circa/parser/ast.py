@@ -15,7 +15,7 @@ from Circa.core.branch import Branch
 
 class CompilationContext(object):
     def __init__(self, codeUnit, parent=None, branch=None):
-        debug._assert(parent is None or isinstance(parent, CompilationContext))
+        debug._assert(parent is None or isinstance(parent,CompilationContext))
         debug._assert(branch is None or isinstance(branch,Branch))
 
         if branch is None:
@@ -39,6 +39,12 @@ class CompilationContext(object):
 
     def createTerm(self, function, inputs):
         return self.codeUnit.createTerm(function, inputs, branch=self.branch)
+
+    def createConstant(self, type):
+        return self.codeUnit.createConstant(type, branch=self.branch)
+
+    def createVariable(self, type):
+        return self.codeUnit.createVariable(type, branch=self.branch)
 
 def getGlobalCompilationContext():
     return CompilationContext(builtins.KERNEL)
@@ -131,7 +137,7 @@ class FunctionDecl(Statement):
             raise IdentifierNotFound(self.outputType)
 
         # Create a subroutine term
-        subroutineTerm = context.codeUnit.createConstant(builtins.SUBROUTINE_TYPE)
+        subroutineTerm = context.createConstant(builtins.SUBROUTINE_TYPE)
 
         ca_subroutine.setName(subroutineTerm, self.functionName.text)
         ca_subroutine.setInputTypes(subroutineTerm, inputTypeTerms)
@@ -157,7 +163,7 @@ class FunctionDecl(Statement):
             statement.create(innerCompilationContext)
 
         # Bind the subroutine's name
-        context.codeUnit.bindName(subroutineTerm, self.functionName.text)
+        context.bindName(subroutineTerm, self.functionName.text)
         return subroutineTerm
 
     def renderSource(self, output):
@@ -185,7 +191,7 @@ class ReturnStatement(Statement):
         return self.returnKeyword
     def create(self, context):
         result = self.right.getTerm(context)
-        context.codeUnit.bindName(result, "#return_val")
+        context.bindName(result, "#return_val")
     def renderSource(self, output):
         output.write('return ')
         self.right.renderSource(output)
@@ -225,7 +231,7 @@ class Infix(Expression):
             right_term = self.right.getTerm(context)
             if not isinstance(right_term, Term):
                 raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
-            context.codeUnit.bindName(right_term, str(self.left))
+            context.bindName(right_term, str(self.left))
             return right_term
 
         # Evaluate as feedback?
@@ -270,7 +276,7 @@ class Infix(Expression):
                inputs=[self.left.getTerm(context), self.right.getTerm(context)])
 
             # bind the name to this result
-            context.codeUnit.bindName(result_term, str(self.left))
+            context.bindName(result_term, str(self.left))
             return result_term
 
         debug.fail("Unable to evaluate token: " + self.token.text)
@@ -292,7 +298,7 @@ class LiteralString(Expression):
         return []
 
     def getTerm(self, context):
-        term = context.codeUnit.createVariable(builtins.STRING_TYPE)
+        term = context.createVariable(builtins.STRING_TYPE)
         term.ast = self
         # Strip quotation marks
         value = self.token.text.strip("'\"")

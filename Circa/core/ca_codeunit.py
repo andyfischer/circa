@@ -99,23 +99,23 @@ class CodeUnit(object):
 
         return newTerm
 
-    def createConstant(self, type):
+    def createConstant(self, type, branch=None):
         debug._assert(isinstance(type, Term))
 
         # Fetch the constant function for this type
         constantFunc = self.createTerm(builtins.CONST_GENERATOR, [type])
 
         # Create the term
-        return self.createTerm(constantFunc, [])
+        return self.createTerm(constantFunc, [], branch)
 
-    def createVariable(self, type):
+    def createVariable(self, type, branch=None):
         debug._assert(isinstance(type, Term))
 
         # Fetch the variable function for this type
         variableFunc = self.createTerm(builtins.VARIABLE_GENERATOR, [type])
 
         # Create the term
-        return self.createTerm(variableFunc, [])
+        return self.createTerm(variableFunc, [], branch)
 
     def deleteTerm(self, term):
         """
