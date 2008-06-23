@@ -10,7 +10,6 @@ from Circa.core.term import Term
 from Circa.common import (debug, errors)
 from Circa.utils.spy_object import SpyObject
 from Circa.utils.string_buffer import StringBuffer
-from Circa.runtime import variables
 from token_definitions import *
 
 class CompilationContext(object):
