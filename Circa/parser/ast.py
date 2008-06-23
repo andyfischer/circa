@@ -14,9 +14,12 @@ from token_definitions import *
 from Circa.core.branch import Branch
 
 class CompilationContext(object):
-    def __init__(self, codeUnit, branch, parent=None):
+    def __init__(self, codeUnit, parent=None, branch=None):
         debug._assert(parent is None or isinstance(parent, CompilationContext))
-        debug._assert(isinstance(branch,Branch))
+        debug._assert(branch is None or isinstance(branch,Branch))
+
+        if branch is None:
+            branch = codeUnit.mainBranch
 
         self.codeUnit = codeUnit
         self.branch = branch
@@ -25,8 +28,20 @@ class CompilationContext(object):
     def bindName(self, term, name):
         self.branch.bindName(term,name)
 
+    def getNamed(self, name):
+        if self.branch.containsName(name):
+            return self.branch.getNamed(name)
+
+        if self.parent is not None:
+            return self.parent.getNamed(name)
+
+        return None
+
     def createTerm(self, function, inputs):
         return self.codeUnit.createTerm(function, inputs, branch=self.branch)
+
+def getGlobalCompilationContext():
+    return CompilationContext(builtins.KERNEL)
 
 class Node(object):
     def create(self, context):
@@ -105,13 +120,13 @@ class FunctionDecl(Statement):
         # For each input arg, resolve the type
         inputTypeTerms = []
         for arg in self.inputArgs:
-            typeTerm = context.codeUnit.getNamed(arg.type.text)
+            typeTerm = context.getNamed(arg.type.text)
             if typeTerm is None:
                 raise IdentifierNotFound(arg.type)
             inputTypeTerms.append(typeTerm)
 
         # Resolve output type
-        outputTypeTerm = context.codeUnit.getNamed(self.outputType.text)
+        outputTypeTerm = context.getNamed(self.outputType.text)
         if outputTypeTerm is None:
             raise IdentifierNotFound(self.outputType)
 
@@ -136,8 +151,7 @@ class FunctionDecl(Statement):
         # Create terms for the body of the subroutine
         subsCodeUnit = ca_subroutine.codeUnit(subroutineTerm)
         innerCompilationContext = CompilationContext(
-                subsCodeUnit, subsCodeUnit.mainBranch,
-                parent = context)
+                subsCodeUnit, parent = context)
 
         for statement in self.statementList:
             statement.create(innerCompilationContext)
@@ -342,12 +356,12 @@ class Ident(Expression):
         return []
 
     def getTerm(self, context):
-        term = context.codeUnit.getNamed(self.token.text)
+        term = context.getNamed(self.token.text)
 
         if not term:
             raise parse_errors.IdentifierNotFound(self.token)
 
-        return context.codeUnit.getNamed(self.token.text)
+        return context.getNamed(self.token.text)
 
     def getFirstToken(self):
         return self.token
@@ -366,7 +380,7 @@ class Unary(Expression):
         yield self.right
 
     def getTerm(self, context):
-        mult = context.codeUnit.getNamed('mult')
+        mult = context.getNamed('mult')
         negative_one = context.codeUnit.createConstant(builtins.INT_TYPE)
         ca_variable.setValue(negative_one, -1)
         newTerm = context.createTerm(mult,
@@ -395,7 +409,7 @@ class FunctionCall(Expression):
 
     def getTerm(self, context):
         arg_terms = [expr.getTerm(context) for expr in self.args]
-        func = context.codeUnit.getNamed(self.function_name.text)
+        func = context.getNamed(self.function_name.text)
 
         if func is None:
             raise parse_errors.InternalError(self.function_name,
