@@ -13,8 +13,11 @@ from Circa.utils.string_buffer import StringBuffer
 from token_definitions import *
 
 class CompilationContext(object):
-    def __init__(self, codeUnit, parent=None):
+    def __init__(self, codeUnit, branch, parent=None):
+        if parent is not None:
+            debug._assert(isinstance(parent, CompilationContext))
         self.codeUnit = codeUnit
+        self.branch = branch
         self.parent = parent
 
 class Node(object):
@@ -123,9 +126,10 @@ class FunctionDecl(Statement):
             subroutineCodeUnit.bindName(placeholderTerm, name)
 
         # Create terms for the body of the subroutine
+        subsCodeUnit = ca_subroutine.codeUnit(subroutineTerm)
         innerCompilationContext = CompilationContext(
-                ca_subroutine.codeUnit(subroutineTerm),
-                parent = context.codeUnit)
+                subsCodeUnit, subsCodeUnit.mainBranch,
+                parent = context)
 
         for statement in self.statementList:
             statement.create(innerCompilationContext)
