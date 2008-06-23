@@ -3,6 +3,8 @@
 #
 # Defines classes for an abstract syntax tree
 
+import pdb
+
 import parse_errors, tokens
 from Circa.core import (builtins, ca_variable, ca_string, 
         ca_subroutine, ca_function, ca_type)
@@ -197,12 +199,47 @@ class ReturnStatement(Statement):
         self.right.renderSource(output)
 
 class IfBlock(Statement):
-    def __init__(self):
-        self.mainBlock = None
-        self.elseBlock = None
+    def __init__(self, condition, mainBlock, elseBlock):
+        debug._assert(isinstance(condition,Expression))
+        debug._assert(isinstance(mainBlock,StatementList))
+        debug._assert(elseBlock is None or isinstance(elseBlock,StatementList))
+
+        self.condition = condition
+        self.mainBlock = mainBlock
+        self.elseBlock = elseBlock
+
     def create(self, context):
-        pass
-        
+
+        # Create term for condition
+        condition = self.condition.create(context)
+
+        # Create an if-statement term
+        ifStatement = context.createTerm(builtins.IF_STATEMENT, [condition])
+
+        ifStatement.state.branches.append(Branch(ifStatement))
+        self.mainBlock.create(CompilationContext(context.codeUnit, context,
+            ifStatement.state.branches[0]))
+
+        if self.elseBlock is not None:
+            ifStatement.state.branches.append(Branch(ifStatement))
+            self.mainBlock.create(CompilationContext(context.codeUnit, context,
+                ifStatement.state.branches[1]))
+
+        # Todo: join rebound terms
+        return ifStatement
+
+
+    def renderSource(self,output):
+        output.write('if (')
+        self.condition.renderSource(output)
+        output.write(') {')
+        self.mainBlock.renderSource(output)
+        output.write('}')
+        if self.elseBlock is not None:
+            output.write(' else {')
+            output.elseBlock.renderSource(output)
+            output.write('}')
+
 
 class Expression(Statement):
     def create(self, context):

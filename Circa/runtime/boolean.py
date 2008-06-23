@@ -22,10 +22,31 @@ class Or(object):
     def evaluate(a,b):
         return a or b
 
+class IfStatement(object):
+    name = 'if-statement'
+    inputs = ['bool']
+    output = 'void'
+    pureFunction = False
+
+    def initialize(self):
+        self.branches = []
+
+    def evaluate(self, condition):
+        try:
+            if condition:
+                for term in self.branches[0]:
+                    term.execute()
+            else:
+                for term in self.branches[1]:
+                    term.execute()
+        except IndexError:
+            pass
 
 def createFunctions(codeUnit):
     function_builder.importPythonFunction(codeUnit, And)
     function_builder.importPythonFunction(codeUnit, Or)
+    builtins.IF_STATEMENT = function_builder.importPythonFunction(codeUnit,
+            IfStatement, instanceBased = True)
 
     # Create 'true' and 'false' constants
     true = codeUnit.createConstant(builtins.BOOL_TYPE)
