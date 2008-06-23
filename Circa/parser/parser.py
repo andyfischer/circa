@@ -244,7 +244,6 @@ def return_statement(tokens):
     return ast.ReturnStatement(returnKeyword, right)
 
 def if_statement(tokens):
-    result = ast.IfBlock()
 
     ifKeyword = tokens.consume(IF)
     tokens.consume(LPAREN)
@@ -252,12 +251,13 @@ def if_statement(tokens):
     tokens.consume(RPAREN)
 
     mainBlock = bracketed_statement_list(tokens)
+    elseBlock = None
 
     if tokens.nextIs(ELSE):
         elseKeyword = tokens.consume(ELSE)
-        result.elseBlock = bracketed_statement_list(tokens)
+        elseBlock = bracketed_statement_list(tokens)
 
-    return result
+    return ast.IfBlock(conditionExpression, mainBlock, elseBlock)
 
 def bracketed_statement_list(tokens):
     """

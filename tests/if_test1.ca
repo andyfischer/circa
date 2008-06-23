@@ -1,0 +1,10 @@
+
+if (true) {
+  print('hooray')
+} else {
+  print('boo 1')
+}
+
+if (false) {
+  print('boo 2')
+}
