@@ -13,7 +13,7 @@ class Feedback(function_builder.BaseFunction):
     @staticmethod
     def initialize(cxt):
         # Create a branch
-        cxt.caller().branch = branch.Branch(cxt.caller())
+        cxt.caller().state = branch.Branch(cxt.caller())
 
     @staticmethod
     def evaluate(cxt):
@@ -21,7 +21,7 @@ class Feedback(function_builder.BaseFunction):
         desired = cxt.inputTerm(1)
         
         # Delete anything currently in our branch
-        cxt.branch().clear()
+        cxt.state().clear()
 
         feedbackAccumulator = ca_function.feedbackAccumulator(target.functionTerm)
         feedbackPropagator = ca_function.feedbackPropagator(target.functionTerm)
@@ -33,10 +33,10 @@ class Feedback(function_builder.BaseFunction):
             return
 
         cxt.codeUnit().createTerm(feedbackPropagator, [target, desired],
-                branch = cxt.branch())
+                branch = cxt.state())
 
         # Execute
-        for term in cxt.branch():
+        for term in cxt.state():
             term.execute()
 
 def createFunctions(codeUnit):

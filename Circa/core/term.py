@@ -83,11 +83,6 @@ class Term(object):
 
     def execute(self):
         "Calls our function and updates our output value"
-
-        # Don't run until our inputs are ready
-        for input in self.inputs:
-            if input.cachedValue is None:
-                return
         
         ca_function.evaluateFunc(self.functionTerm)(self.executionContext)
         self.needsUpdate = False
@@ -130,7 +125,5 @@ class TermExecutionContext(object):
         return len(self.targetTerm.inputs)
     def codeUnit(self):
         return self.targetTerm.codeUnit
-    def branch(self):
-        return self.targetTerm.branch
     def setResult(self, value):
         self.targetTerm.cachedValue = value

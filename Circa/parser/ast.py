@@ -344,7 +344,7 @@ class Infix(Expression):
 
         # Normal function?
         # Try to find a defined operator
-        normalFunction = getOperatorFunction(context.codeUnit, self.token)
+        normalFunction = getOperatorFunction(context, self.token)
         if normalFunction is not None:
             debug._assert(normalFunction.cachedValue is not None)
 
@@ -530,20 +530,20 @@ class FunctionCall(Expression):
         output.write(str(self.function_name) + '(' + ','.join(map(str,self.args)) + ')')
 
 
-def getOperatorFunction(codeUnit, token):
+def getOperatorFunction(context, token):
 
     # Turn the token's text into a Circa string
-    tokenAsString = codeUnit.createConstant(builtins.STRING_TYPE)
+    tokenAsString = context.createConstant(builtins.STRING_TYPE)
     ca_string.setValue(tokenAsString, token.text)
 
     # Find operator function
-    operatorFunc = codeUnit.getNamed('operator')
+    operatorFunc = context.getNamed('operator')
 
     if operatorFunc is None:
         raise parse_errors.NoFunctionForOperator(token)
 
     # Access the operator function
-    operatorAccessor = codeUnit.createTerm(operatorFunc, [tokenAsString])
+    operatorAccessor = context.createTerm(operatorFunc, [tokenAsString])
 
     return operatorAccessor
 
