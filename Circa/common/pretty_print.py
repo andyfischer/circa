@@ -16,8 +16,12 @@ def printCodeUnit(codeUnit):
 
 def _printCodeUnitContents(cxt, codeUnit):
 
-    for term in codeUnit.allTerms:
+    for term in codeUnit.mainBranch:
         _printTerm(cxt, term)
+
+def printBranch(cxt, branch):
+    for term in branch:
+        _printTerm(cxt,term)
 
 def _printTerm(cxt, term):
     names = term.getNames()
@@ -29,9 +33,24 @@ def _printTerm(cxt, term):
     if term.isConstant():
         _printTermValue(cxt, term)
     elif term.isVariable():
-        cxt.out.writeln(functionName + " " + str(term.cachedValue))
+        _printTermValue(cxt, term)
+    elif term.functionTerm is builtins.IF_STATEMENT:
+        cxt.out.writeln("if (" + shortIdentifier(term.getInput(0)) + ")")
+        cxt.out.indent()
+        printBranch(cxt, term.state.branches[0])
+        cxt.out.unindent()
+        if len(term.state.branches) > 1:
+            cxt.out.writeln("else:")
+            cxt.out.indent()
+            printBranch(cxt, term.state.branches[1])
+            cxt.out.unindent()
     else:
-        cxt.out.writeln(functionName + "(...)")
+        cxt.out.write(functionName + "(")
+        cxt.out.write(','.join(map(shortIdentifier, term.inputs)))
+        cxt.out.writeln(")")
+
+def shortIdentifier(term):
+    return term.getIdentifier()
 
 def _printTermValue(cxt, term):
     if term.getType() is builtins.SUBROUTINE_TYPE:
@@ -41,6 +60,12 @@ def _printTermValue(cxt, term):
             _printTerm(cxt,term)
         cxt.out.unindent()
         cxt.out.writeln('}')
+
+    elif term.isConstant():
+        cxt.out.writeln("constant " + str(term))
+
+    elif term.isVariable():
+        cxt.out.writeln("variable " + str(term))
 
     else:
         functionName = ca_function.name(term.functionTerm)

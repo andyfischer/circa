@@ -25,6 +25,9 @@ def voidInitialize(term):
 def voidToString(term):
     return "<void>"
 
+def emptyFunction(term):
+    pass
+
 def createBuiltinTypes(kernel):
     intType = kernel.createConstant(builtins.TYPE_TYPE)
     ca_type.setName(intType, 'int')
@@ -52,6 +55,7 @@ def createBuiltinTypes(kernel):
 
     referenceType = kernel.createConstant(builtins.TYPE_TYPE)
     ca_type.setName(referenceType, 'ref')
+    ca_type.setInitialize(referenceType, emptyFunction)
     kernel.bindName(referenceType, 'ref')
 
     voidType = kernel.createConstant(builtins.TYPE_TYPE)

@@ -1,4 +1,5 @@
 
+import traceback
 from Circa.common import debug
 from Circa.core import (builtins, ca_function, ca_type)
 from Circa.core.term import Term
@@ -84,6 +85,8 @@ def importPythonFunction(codeUnit, pythonClass, instanceBased = False):
                 cxt.setResult(result)
             except Exception, e:
                 print "An internal error occured in " + pythonClass.name
+                traceback.print_exc()
+
     else:
         def initializeFunc(cxt):
             cxt.caller().state = pythonClass()
