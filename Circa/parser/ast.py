@@ -26,9 +26,15 @@ class CompilationContext(object):
         self.codeUnit = codeUnit
         self.branch = branch
         self.parent = parent
+        self.rebinds = {}
 
     def bindName(self, term, name):
-        self.branch.bindName(term,name)
+        # Check if this name is already defined
+        if self.branch.containsName(name):
+            self.branch.bindName(term,name,allowOverwrite=True)
+            # Do something else here
+        else:
+            self.branch.bindName(term,name)
 
     def getNamed(self, name):
         if self.branch.containsName(name):
@@ -226,9 +232,37 @@ class IfBlock(Statement):
             self.mainBlock.create(CompilationContext(context.codeUnit, context,
                 ifStatement.state.branches[1]))
 
-        # Todo: join rebound terms
-        return ifStatement
+        # Get a set of all names that are defined within our branches, and
+        # are also defined outside.
+        namesToJoin = set()
+        for branch in ifStatement.state.branches:
+            for (name,t) in branch.iterateNamespace():
+                if context.getNamed(name) is not None:
+                    namesToJoin.add(name)
 
+        # For every name to join, figure out the branch head. This will
+        # either be:
+        #  1) the binding from within this branch
+        #  or 2) the binding from outside, if the branch doesn't bind it
+
+        heads = {} # maps names to lists
+        for name in namesToJoin:
+            heads[name] = []
+
+            for branch in ifStatement.state.branches:
+                if branch.containsName(name):
+                    heads[name].append(branch.getNamed(name))
+                else:
+                    heads[name].append(context.getNamed(name))
+
+        # Create if-expr terms to join heads, and rebind the name to this
+        # new term.
+        for (name,list) in heads.items():
+            inputs = [condition, list[0], list[1]]
+            term = context.createTerm(builtins.IF_EXPR, inputs)
+            context.bindName(term, name)
+
+        return ifStatement
 
     def renderSource(self,output):
         output.write('if (')
@@ -383,7 +417,7 @@ class Literal(Expression):
 
     def getTerm(self, context):
         # Create a term
-        newTerm = context.codeUnit.createVariable(self.circaType)
+        newTerm = context.createVariable(self.circaType)
         newTerm.ast = self
 
         # Assign value

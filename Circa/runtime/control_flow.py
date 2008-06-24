@@ -31,14 +31,15 @@ class IfExpression(object):
     output = 'ref'
     pure = True
 
+    @staticmethod
     def evaluate(condition, a, b):
         if condition:
             return a
         else:
             return b
 
-
 def createFunctions(codeUnit):
     builtins.IF_STATEMENT = function_builder.importPythonFunction(codeUnit,
             IfStatement, instanceBased = True)
-    function_builder.importPythonFunction(codeUnit, IfExpression)
+    builtins.IF_EXPR = function_builder.importPythonFunction(codeUnit, IfExpression)
+
