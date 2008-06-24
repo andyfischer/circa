@@ -136,7 +136,7 @@ class CodeUnit(object):
     def bindName(self, term, name, allowOverwrite=False):
         return self.mainBranch.bindName(term,name,allowOverwrite)
 
-    def definesName(self, name):
+    def containsName(self, name):
         "Returns True if this codeunit defines the given name"
         return self.mainBranch.containsName(name)
 

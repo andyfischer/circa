@@ -14,6 +14,13 @@ from Circa.utils.spy_object import SpyObject
 from Circa.utils.string_buffer import StringBuffer
 from token_definitions import *
 from Circa.core.branch import Branch
+import Circa
+
+class GlobalCompilationContext(object):
+    def getNamed(self, name):
+        for module in Circa.LOADED_MODULES.values():
+            if module.containsName(name):
+                return module.getNamed(name)
 
 class CompilationContext(object):
     def __init__(self, codeUnit, parent=None, branch=None):
@@ -22,6 +29,9 @@ class CompilationContext(object):
 
         if branch is None:
             branch = codeUnit.mainBranch
+
+        if parent is None:
+            parent = GlobalCompilationContext()
 
         self.codeUnit = codeUnit
         self.branch = branch
@@ -53,9 +63,6 @@ class CompilationContext(object):
 
     def createVariable(self, type):
         return self.codeUnit.createVariable(type, branch=self.branch)
-
-def getGlobalCompilationContext():
-    return CompilationContext(builtins.KERNEL)
 
 class Node(object):
     def create(self, context):
