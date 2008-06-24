@@ -99,13 +99,29 @@ def statement(tokens):
     if tokens.nextIs(IDENT) and tokens.nextIs(EQUALS, lookahead=1):
         return name_binding_statement(tokens)
 
-    # Otherwise evaluate as an expression
-    return infix_expression(tokens)
+    # Otherwise, evaluate as an expression
+    return expression_statement(tokens)
+
+def statement_end(tokens):
+    """
+    Parses the end of a statement. May be indicated by NEWLINE or by the
+    end of the stream.
+    """
+    if tokens.finished():
+        return
+    else:
+        tokens.consume(NEWLINE)
+
+def expression_statement(tokens):
+    expr = infix_expression(tokens)
+    statement_end(tokens)
+    return expr
 
 def name_binding_statement(tokens):
     name = tokens.consume(IDENT)
     equalsSign = tokens.consume(EQUALS)
     rightExpr = infix_expression(tokens)
+    statement_end(tokens)
     return ast.NameBinding(name, rightExpr)
 
 # Infix precedence
@@ -251,6 +267,7 @@ def function_decl(tokens):
 def return_statement(tokens):
     returnKeyword = tokens.consume(RETURN)
     right = infix_expression(tokens)
+    statement_end(tokens)
     return ast.ReturnStatement(returnKeyword, right)
 
 def if_statement(tokens):
