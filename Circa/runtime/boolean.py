@@ -1,6 +1,7 @@
 
 # Defines various binary functions
 
+import pdb
 from Circa.common import function_builder
 from Circa.core import builtins
 
@@ -26,7 +27,7 @@ class IfStatement(object):
     name = 'if-statement'
     inputs = ['bool']
     output = 'void'
-    pureFunction = False
+    pure = False
 
     def initialize(self):
         self.branches = []
