@@ -263,6 +263,8 @@ def if_statement(tokens):
     mainBlock = bracketed_statement_list(tokens)
     elseBlock = None
 
+    tokens.tryConsume(NEWLINE)
+
     if tokens.nextIs(ELSE):
         elseKeyword = tokens.consume(ELSE)
         elseBlock = bracketed_statement_list(tokens)
@@ -283,6 +285,7 @@ def bracketed_statement_list(tokens):
             stmtList.append(statement(tokens))
         tokens.consume(RBRACKET)
     else:
+        tokens.tryConsume(NEWLINE)
         stmtList.append(statement(tokens))
     return stmtList
 

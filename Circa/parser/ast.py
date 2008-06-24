@@ -275,6 +275,14 @@ class IfBlock(Statement):
             output.elseBlock.renderSource(output)
             output.write('}')
 
+class WhileBlock(Statement):
+    def __init__(self, condition, stmtList):
+        debug._assert(isinstance(condition,Expression))
+        debug._assert(isinstance(stmtList,StatementList))
+
+        self.condition = condition
+        self.statementList = stmtList
+
 class NameBinding(Statement):
     def __init__(self, left, right):
         debug._assert(isinstance(left, tokens.TokenInstance))

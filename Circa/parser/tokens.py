@@ -88,6 +88,16 @@ class TokenStream(object):
 
         return token
 
+    def tryConsume(self, match):
+        """
+        If the next token matches 'match', then consume it and return it.
+        If not, we just return None, and no error is thrown.
+        """
+        if self.next().match == match:
+            return self.consume(match)
+        else:
+            return None
+
     def finished(self):
         return self.currentIndex >= len(self.tokens)
 
