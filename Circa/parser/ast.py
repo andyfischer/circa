@@ -241,6 +241,20 @@ class IfBlock(Statement):
             output.elseBlock.renderSource(output)
             output.write('}')
 
+class NameBinding(Statement):
+    def __init__(self, left, right):
+        debug._assert(isinstance(left, tokens.TokenInstance))
+        debug._assert(isinstance(right, Expression))
+        self.left = left
+        self.right = right
+
+    def create(self, context):
+        rightTerm = self.right.getTerm(context)
+        if not isinstance(rightTerm, Term):
+            raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
+
+        context.bindName(rightTerm, self.left.text)
+        return rightTerm
 
 class Expression(Statement):
     def create(self, context):
@@ -248,6 +262,7 @@ class Expression(Statement):
     def inputs(self):
         "Returns an iterable of our inputs"
         raise errors.PureVirtualMethodFail(self, 'inputs')
+
 
 class Infix(Expression):
     def __init__(self, functionToken, left, right):
@@ -263,14 +278,6 @@ class Infix(Expression):
         yield self.right
 
     def getTerm(self, context):
-
-        # Evaluate as an assignment?
-        if self.token.match == EQUALS:
-            right_term = self.right.getTerm(context)
-            if not isinstance(right_term, Term):
-                raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
-            context.bindName(right_term, str(self.left))
-            return right_term
 
         # Evaluate as feedback?
         if self.token.match == COLON_EQUALS:
