@@ -143,8 +143,8 @@ class CommandLine(object):
     def getTermFromIdentifier(self, id):
         debug._assert(isinstance(id, str))
 
-        # Handle ids of the form '#xxx'
-        if id[0] == '#':
+        # Handle ids of the form '$xxx'
+        if id[0] == '$':
             index = int(id[1:])
 
             for term in self.codeUnit.allTerms:

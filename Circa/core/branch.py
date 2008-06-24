@@ -35,11 +35,16 @@ class Branch(object):
         error will be thrown if this name is already bound.
         """
         debug._assert(isinstance(name, str))
-        if not allowOverwrite and name in self._namespace:
-            raise Exception("The name "+name+" is already bound. (to allow "
-                + "this, you can use the allowOverwrite parameter)")
+
+        if name in self._namespace:
+            if not allowOverwrite:
+                raise Exception("The name "+name+" is already bound. (to allow "
+                    + "this, you can use the allowOverwrite parameter)")
+
+            self._namespace[name] = None
 
         self._namespace[name] = term
+        term.givenName = name
 
     def iterateNamespace(self):
         return self._namespace.items()
