@@ -80,25 +80,15 @@ class Term(object):
 
     def iterateInnerTerms(self):
         return ca_type.iterateInnerTerms(self.getType())(self)
-  
-    def update(self):
-        """
-        Calls our function and updates this term's value.
-        If this function has side effects, this call does nothing.
-        """
-        if not ca_function.pureFunction(self.functionTerm):
-            return
-
-        # Don't update if not all our inputs are ready
-        for input in self.inputs:
-            if input.cachedValue is None:
-                return
-
-        ca_function.evaluateFunc(self.functionTerm)(self.executionContext)
-        self.needsUpdate = False
 
     def execute(self):
         "Calls our function and updates our output value"
+
+        # Don't run until our inputs are ready
+        for input in self.inputs:
+            if input.cachedValue is None:
+                return
+        
         ca_function.evaluateFunc(self.functionTerm)(self.executionContext)
         self.needsUpdate = False
 
