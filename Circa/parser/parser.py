@@ -36,8 +36,7 @@ def parseFile(filename):
 
     pstate = ParserState(tokens, ca_codeunit.CodeUnit())
 
-    compilationContext = ast.CompilationContext(
-            pstate.codeUnit, ast.getGlobalCompilationContext())
+    compilationContext = ast.CompilationContext(pstate.codeUnit)
 
     try:
         resultAst = statement_list(pstate.tokens)
@@ -62,7 +61,7 @@ def expression_statement(pstate):
         mark = pstate.tokens.markLocation()
         resultAst = parseExpression(pstate.tokens)
         term = resultAst.create(
-            ast.CompilationContext(pstate.codeUnit, ast.getGlobalCompilationContext()))
+            ast.CompilationContext(pstate.codeUnit))
 
         pstate.codeUnit.statementAsts.append(resultAst)
 
