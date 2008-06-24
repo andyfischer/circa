@@ -94,9 +94,19 @@ def statement(tokens):
         return return_statement(tokens)
     elif tokens.nextIs(IF):
         return if_statement(tokens)
-    else:
-        return infix_expression(tokens)
 
+    # Lookahead, check if this is a name binding
+    if tokens.nextIs(IDENT) and tokens.nextIs(EQUALS, lookahead=1):
+        return name_binding_statement(tokens)
+
+    # Otherwise evaluate as an expression
+    return infix_expression(tokens)
+
+def name_binding_statement(tokens):
+    name = tokens.consume(IDENT)
+    equalsSign = tokens.consume(EQUALS)
+    rightExpr = infix_expression(tokens)
+    return ast.NameBinding(name, rightExpr)
 
 # Infix precedence
 HIGHEST_INFIX_PRECEDENCE = 7
