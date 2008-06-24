@@ -78,9 +78,12 @@ def importPythonFunction(codeUnit, pythonClass, instanceBased = False):
         def initializeFunc(cxt):
             pass
         def evaluateFunc(cxt):
-            inputs = [cxt.input(n) for n in range(cxt.numInputs())]
-            result = pythonClass.evaluate(*inputs)
-            cxt.setResult(result)
+            try:
+                inputs = [cxt.input(n) for n in range(cxt.numInputs())]
+                result = pythonClass.evaluate(*inputs)
+                cxt.setResult(result)
+            except Exception, e:
+                print "An internal error occured in " + pythonClass.name
     else:
         def initializeFunc(cxt):
             cxt.caller().state = pythonClass()

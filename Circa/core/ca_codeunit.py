@@ -173,11 +173,11 @@ class CodeUnit(object):
         term.needsUpdate = True
 
     def updateAll(self):
-        for term in self.allTerms:
+        for term in self.mainBranch:
             term.update()
 
     def execute(self):
-        for term in self.allTerms:
+        for term in self.mainBranch:
             term.execute()
 
     def _recalculateAllUserSets(self):

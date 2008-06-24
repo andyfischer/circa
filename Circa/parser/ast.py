@@ -69,6 +69,7 @@ class StatementList(Node):
     def create(self, context):
         for statement in self._statements:
             statement.create(context)
+
     def getFirstToken(self):
         return self._statements[0].getFirstToken()
     def renderSource(self, output):
