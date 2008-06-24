@@ -153,7 +153,7 @@ class CodeUnit(object):
                 return name
 
         # Otherwise, use the default identifier
-        return '#' + str(term.globalID)
+        return '$' + str(term.globalID)
 
     def getNames(self, term):
         """

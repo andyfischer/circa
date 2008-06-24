@@ -27,6 +27,8 @@ def _printTerm(cxt, term):
     names = term.getNames()
     if names:
         cxt.out.write(",".join(names) + " = ")
+    else:
+        cxt.out.write(shortIdentifier(term) + " = ")
 
     functionName = ca_function.name(term.functionTerm)
 
@@ -50,6 +52,8 @@ def _printTerm(cxt, term):
         cxt.out.writeln(")")
 
 def shortIdentifier(term):
+    if term.givenName:
+        return term.givenName
     return term.getIdentifier()
 
 def _printTermValue(cxt, term):
