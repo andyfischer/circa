@@ -101,7 +101,7 @@ def bootstrapKernel(kernel):
     ca_function.setEvaluateFunc(constGenerator, constGeneratorEvaluate)
 
     # All done, re-evaluate everything
-    kernel.updateAll()
+    kernel.execute()
     kernel._recalculateAllUserSets()
 
     # Export public symbols

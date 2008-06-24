@@ -90,7 +90,9 @@ class CodeUnit(object):
         if ca_function.initializeFunc(function):
             ca_function.initializeFunc(function)(newTerm.executionContext)
 
-        newTerm.update()
+        # Immediately update, if this is a pure function
+        if ca_function.pureFunction(function):
+            newTerm.execute()
 
         # Add ourselves to .users of all our inputs and function
         function.users.add(newTerm)
@@ -171,10 +173,6 @@ class CodeUnit(object):
             term.inputs.extend(itertools.repeat(None, inputIndex+1-len(term.inputs)))
         term.inputs[inputIndex] = newInput
         term.needsUpdate = True
-
-    def updateAll(self):
-        for term in self.mainBranch:
-            term.update()
 
     def execute(self):
         for term in self.mainBranch:
