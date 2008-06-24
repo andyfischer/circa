@@ -251,8 +251,14 @@ def main():
         Circa.LOADED_MODULES[removeFileSuffix(filename)] = codeUnit
         targetCodeUnit = codeUnit
 
+    doInteractiveMode = 'i' in single_options
+
+    # Special case, if they didn't specify any args, then do interactive mode
+    if single_options == [] and actual_args == []:
+        doInteractiveMode = True
+
     # Start interactive mode?
-    if 'i' in single_options:
+    if doInteractiveMode:
         print "Starting interactive mode..."
         command_line = CommandLine(targetCodeUnit)
         command_line.doInputLoop()
