@@ -229,7 +229,7 @@ class IfBlock(Statement):
 
         if self.elseBlock is not None:
             ifStatement.state.branches.append(Branch(ifStatement))
-            self.mainBlock.create(CompilationContext(context.codeUnit, context,
+            self.elseBlock.create(CompilationContext(context.codeUnit, context,
                 ifStatement.state.branches[1]))
 
         # Get a set of all names that are defined within our branches, and
