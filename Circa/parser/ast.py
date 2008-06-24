@@ -262,10 +262,14 @@ class IfBlock(Statement):
                 else:
                     heads[name].append(context.getNamed(name))
 
+            # If there's no else block, add original heads
+            if len(ifStatement.state.branches) == 1:
+                heads[name].append(context.getNamed(name))
+
         # Create if-expr terms to join heads, and rebind the name to this
         # new term.
-        for (name,list) in heads.items():
-            inputs = [condition, list[0], list[1]]
+        for (name,head_list) in heads.items():
+            inputs = [condition] + head_list
             term = context.createTerm(builtins.IF_EXPR, inputs)
             context.bindName(term, name)
 
