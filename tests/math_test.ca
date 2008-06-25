@@ -1,20 +1,22 @@
 
 -- addition
-three = 1 + 2
-assert(three != 2)
-assert(three == 3)
-assert(three != 4)
+print(concat('one plus two is ', 1+2))
+print(concat('5.5 plus 2.2 is ', 5.5+2.2))
 
 -- subtraction
-assert(4 - 2 == 2)
-assert(1 - 2 == -1)
-assert(5 - -1 == 6)
+print(concat('two minus one is ', 2 - 1))
+print(concat('one minus two is ', 1 - 2))
 
 -- multiplication
-six = 2 * 3
-assert(six != 5)
-assert(six == 6)
-assert(six != 7)
+print(concat('two times three is ', 2 * 3))
 
-two = 8 / 4
-assert(two == 2)
+-- division
+print(concat('eight divided by four is ', 8 / 4))
+
+-- Operator precedence
+print(concat('1 + 2 * 3 = ', 1 + 2 * 3))
+print(concat('1 * 2 + 3 = ', 1 * 2 + 3))
+print(concat('5 - 4 + 3 = ', 5 - 4 + 3))
+print(concat('1 - 2 * 3 = ', 1 - 2 * 3))
+print(concat('1 + 4 / 2 = ', 1 + 4 * 2))
+print(concat('1 - 4 / 2 = ', 1 - 4 * 2))
