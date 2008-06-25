@@ -87,3 +87,7 @@ def InternalError(token, details=None):
    message = "Internal error"
    if details is not None: message += ": " + details
    return ParseError(token, message)
+
+# Internal errors
+class NoOptionHandler(Exception):
+    pass

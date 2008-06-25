@@ -37,6 +37,7 @@ class CompilationContext(object):
         self.branch = branch
         self.parent = parent
         self.rebinds = {}
+        self.metaOptionHandler = None
 
     def bindName(self, term, name):
         # Check if this name is already defined
@@ -63,6 +64,12 @@ class CompilationContext(object):
 
     def createVariable(self, type):
         return self.codeUnit.createVariable(type, branch=self.branch)
+
+    def handleMetaOption(self, optionName):
+        if self.metaOptionHandler is None:
+            raise parse_errors.NoOptionHandler()
+        else:
+            self.metaOptionHandler(optionName)
 
 class Node(object):
     def create(self, context):
@@ -311,6 +318,14 @@ class NameBinding(Statement):
 
         context.bindName(rightTerm, self.left.text)
         return rightTerm
+
+class MetaOptionStatement(Statement):
+    def __init__(self, optionName):
+        debug._assert(isinstance(optionName, tokens.TokenInstance))
+        self.optionName = optionName
+    def create(self, context):
+        context.handleMetaOption(self.optionName.text)
+        return None
 
 class Expression(Statement):
     def create(self, context):
