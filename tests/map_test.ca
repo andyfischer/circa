@@ -1,18 +1,17 @@
 
-test = map(int,int)
+my-map = map(int,int)
 
-test(4) := 3
-assert(test(4) != 4)
-assert(test(4) == 3)
+my-map(5) := 3
+print(concat('should be 3: ', my-map(5)))
 
-test(4) := 1
-assert(test(4) != 3)
-assert(test(4) == 1)
+my-map(3) := 1
+print(concat('should be 1: ', my-map(3)))
 
-string_map = map(string,int)
-string_map('hello') := 5
-assert(string_map('hello') == 5)
+string-map = map(string,int)
+string-map('key1') := 5
+print(concat('should be 5: ', string-map('key1')))
 
-i2s = map(int,string)
-i2s(1) := 'test'
-print(i2s(1))
+int-map = map(int,string)
+string-map(18) := 'apple'
+print(concat('should be apple: ', string-map(18)))
+
