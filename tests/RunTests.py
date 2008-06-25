@@ -53,3 +53,10 @@ Should be two: 2
 Should be three: 3
 Should be six: 6
 """)
+
+stdoutTest('circa subroutine_test.ca', expectedOutput=
+"""Reading file subroutine_test.ca...
+Called print_success
+Four squared is 16
+Five squared is 25
+""")

@@ -32,13 +32,12 @@ def subroutineEvaluateFunc(cxt):
     # Execute
     subroutine.codeUnit.execute()
 
-    # Find output placeholder
-    outputPlaceholder = subroutine.codeUnit.getNamed("#return_val")
-
-    # Copy output placeholder to this term's output
-    if outputPlaceholder:
+    # Find output placeholder, copy it to this term's output
+    if subroutine.codeUnit.containsName('#return_val'):
+        outputPlaceholder = subroutine.codeUnit.getNamed("#return_val")
         cxt.setResult(outputPlaceholder.cachedValue)
     else:
+        outputPlaceholder = None
         cxt.setResult(None)
 
 def toString(term):

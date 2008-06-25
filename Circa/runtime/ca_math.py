@@ -53,6 +53,9 @@ class Multiply(object):
 
     @staticmethod
     def evaluate(a,b):
+        # Temporary check for None
+        if a is None or b is None:
+            return None
         return a * b
 
 class Divide(object):

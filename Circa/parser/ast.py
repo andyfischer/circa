@@ -148,7 +148,10 @@ class FunctionDecl(Statement):
             inputTypeTerms.append(typeTerm)
 
         # Resolve output type
-        outputTypeTerm = context.getNamed(self.outputType.text)
+        if self.outputType is None:
+            outputTypeTerm = builtins.VOID_TYPE
+        else:
+            outputTypeTerm = context.getNamed(self.outputType.text)
         if outputTypeTerm is None:
             raise IdentifierNotFound(self.outputType)
 

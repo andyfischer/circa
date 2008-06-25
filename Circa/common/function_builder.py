@@ -1,5 +1,5 @@
 
-import traceback
+import pdb,traceback
 from Circa.common import debug
 from Circa.core import (builtins, ca_function, ca_type)
 from Circa.core.term import Term
@@ -86,6 +86,7 @@ def importPythonFunction(codeUnit, pythonClass, instanceBased = False):
             except Exception, e:
                 print "An internal error occured in " + pythonClass.name
                 traceback.print_exc()
+                pdb.set_trace()
 
     else:
         def initializeFunc(cxt):
