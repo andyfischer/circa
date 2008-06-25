@@ -31,6 +31,15 @@ class LessThan(object):
     def evaluate(a,b):
         return a < b
 
+class LessThanOrEquals(object):
+    name = 'less_than_eq'
+    inputs = ['float', 'float']
+    output = 'bool'
+
+    @staticmethod
+    def evaluate(a,b):
+        return a <= b
+
 class GreaterThan(object):
     name = 'greater_than'
     inputs = ['float', 'float']
@@ -39,10 +48,22 @@ class GreaterThan(object):
     @staticmethod
     def evaluate(a,b):
         return a > b
+    
+class GreaterThanOrEquals(object):
+    name = 'greater_than_eq'
+    inputs = ['float', 'float']
+    output = 'bool'
+
+    @staticmethod
+    def evaluate(a,b):
+        return a >= b
+    
+
 
 
 def createFunctions(codeUnit):
-    for functionDef in (Equals, NotEquals, LessThan, GreaterThan):
+    for functionDef in (Equals, NotEquals, LessThan, 
+            LessThanOrEquals, GreaterThan, GreaterThanOrEquals):
         function_builder.importPythonFunction(codeUnit, functionDef)
 
 
