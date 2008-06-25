@@ -60,3 +60,19 @@ Called print_success
 Four squared is 16
 Five squared is 25
 """)
+
+stdoutTest('circa math_test.ca', expectedOutput=
+"""Reading file math_test.ca...
+one plus two is 3
+5.5 plus 2.2 is 7.7
+two minus one is 1
+one minus two is -1
+two times three is 6
+eight divided by four is 2
+1 + 2 * 3 = 7
+1 * 2 + 3 = 5
+5 - 4 + 3 = 4
+1 - 2 * 3 = -5
+1 + 4 / 2 = 9
+1 - 4 / 2 = -7
+""")
