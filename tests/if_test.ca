@@ -58,6 +58,14 @@ else
     print('Syntax 7')
 }
 
+if (true) print('Single line 1')
+
+if (true) print('Single line 2')
+else print('Error!')
+
+if (false) print('Error!')
+else print('Single line 3')
+
 -- Check nested blocks
 
 if (true) {
@@ -123,8 +131,6 @@ else
     else
         print('Error!')
     
-
-
 
 -- Rebinding, simple
 
