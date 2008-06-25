@@ -11,7 +11,7 @@ class Concatenate(object):
 
     @staticmethod
     def evaluate(*inputs):
-        return "".join(inputs)
+        return "".join(map(str,inputs))
 
 def createFunctions(codeUnit):
     function_builder.importPythonFunction(codeUnit, Concatenate)

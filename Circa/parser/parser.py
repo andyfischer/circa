@@ -276,6 +276,8 @@ def if_statement(tokens):
     conditionExpression = infix_expression(tokens)
     tokens.consume(RPAREN)
 
+    tokens.tryConsume(NEWLINE)
+
     mainBlock = bracketed_statement_list(tokens)
     elseBlock = None
 
@@ -283,6 +285,7 @@ def if_statement(tokens):
 
     if tokens.nextIs(ELSE):
         elseKeyword = tokens.consume(ELSE)
+        tokens.tryConsume(NEWLINE)
         elseBlock = bracketed_statement_list(tokens)
 
     return ast.IfBlock(conditionExpression, mainBlock, elseBlock)
