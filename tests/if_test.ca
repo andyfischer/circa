@@ -1,41 +1,150 @@
 
-x = 0
+-- Test conditional execution, simple
+if (true)
+  print('Simple 1')
 
+if (false)
+  print('ERROR!')
+
+if ((1 + 2) > 1)
+  print('Complex condition 1')
+
+if ((1 + 2) < 1)
+  print('ERROR!')
+
+-- Conditional execution with else
+if (true)
+  print('Else 1')
+else
+  print('ERROR!')
+
+if (false)
+  print('ERROR!')
+else
+  print('Else 2')
+
+-- Multiline blocks
 if (true) {
-  x = 1
+    print('Multiline 1')
+    print('Multiline 2')
+    print('Multiline 3')
 } else {
-  assert(false)
+    print('Error!')
 }
 
-assert(x == 1)
-
-if (false) {
-  assert(false)
-} else {
-  x = 2
+-- Check various syntax forms
+if (true)
+  print('Syntax 1')
+else {
+  print('Uh oh..')
+  print('Error!')
 }
-
-assert(x == 2)
-assert(x != 1)
-
-if (true) {
-  x = 3
-}
-
-assert(x == 3)
-
-if (false) {
-  x = 4
-  assert(false)
-}
-
-assert(x == 3)
-assert(x != 4)
-assert(true)
 
 if (true)
-  x = 5
+{
+    print('Syntax 2')
+    print('Syntax 3')
+    print('Syntax 4')
+}
 else
-  assert(false)
+    print('Error!')
+print('Syntax 5')
 
-assert(x == 5)
+if (false)
+    print('Error!')
+else
+{
+    print('Syntax 6')
+    print('Syntax 7')
+}
+
+-- Check nested blocks
+
+if (true) {
+    if (false) {
+        print('Error!')
+    } else {
+        print('Nested 1')
+    }
+} else {
+    print('Error!')
+}
+
+if (false) {
+    print('Error!')
+} else {
+    if (false) {
+        print('Error!')
+    } else {
+        print('Nested 2')
+    }
+}
+
+if (false) {
+    print('Error!')
+} else {
+    if (true) {
+        print('Nested 3')
+    } else {
+        print('Error!')
+    }
+}
+
+if (true)
+    if (false)
+        print('Error!')
+    else
+        print('Nested 4')
+else
+    print('Error!')
+
+if (false)
+    print('Error!')
+else
+    if (true)
+        print('Nested 5')
+    else
+        print('Error!')
+    
+if (false)
+    print('Error!')
+else
+    if (true)
+        if (false)
+            print('Error!')
+        else
+            if (false)
+                print('Error!')
+            else
+                if (true)
+                    print('Nested 6')
+                else
+                    print('Error!')
+    else
+        print('Error!')
+    
+
+
+
+-- Rebinding, simple
+
+a = 1
+
+if (true) {
+  a = 2
+}
+
+print(concat('Should be two: ', a))
+
+b = 3
+if (false)
+  b = 4
+print(concat('Should be three: ', b))
+
+-- Rebinding, with else block
+c = 5
+if (true)
+  c = 6
+else
+  c = 7
+print(concat('Should be six: ', c))
