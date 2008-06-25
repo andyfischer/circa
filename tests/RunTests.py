@@ -45,6 +45,9 @@ Syntax 4
 Syntax 5
 Syntax 6
 Syntax 7
+Single line 1
+Single line 2
+Single line 3
 Nested 1
 Nested 2
 Nested 3
