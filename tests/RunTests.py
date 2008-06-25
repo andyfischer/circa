@@ -76,3 +76,11 @@ eight divided by four is 2
 1 + 4 / 2 = 9
 1 - 4 / 2 = -7
 """)
+
+stdoutTest('circa map_test.ca', expectedOutput=
+"""Reading file map_test.ca...
+should be 3: 3
+should be 1: 1
+should be 5: 5
+should be apple: apple
+""")
