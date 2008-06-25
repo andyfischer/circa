@@ -93,6 +93,8 @@ def statement(tokens):
         return return_statement(tokens)
     elif tokens.nextIs(IF):
         return if_statement(tokens)
+    elif tokens.nextIs(LBRACE):
+        return top_level_meta_statement(tokens)
 
     # Lookahead, check if this is a name binding
     if tokens.nextIs(IDENT) and tokens.nextIs(EQUALS, lookahead=1):
@@ -101,15 +103,6 @@ def statement(tokens):
     # Otherwise, evaluate as an expression
     return expression_statement(tokens)
 
-def statement_end(tokens):
-    """
-    Parses the end of a statement. May be indicated by NEWLINE or by the
-    end of the stream.
-    """
-    if tokens.finished():
-        return
-    else:
-        tokens.consume(NEWLINE)
 
 def expression_statement(tokens):
     expr = infix_expression(tokens)
@@ -289,6 +282,24 @@ def if_statement(tokens):
         elseBlock = bracketed_statement_list(tokens)
 
     return ast.IfBlock(conditionExpression, mainBlock, elseBlock)
+
+def top_level_meta_statement(tokens):
+    tokens.consume(LBRACE)
+    name = tokens.consume(IDENT)
+    tokens.consume(RBRACE)
+    statement_end(tokens)
+    return ast.MetaOptionStatement(name)
+
+def statement_end(tokens):
+    """
+    Parses the end of a statement. May be indicated by NEWLINE or by the
+    end of the stream.
+    """
+    if tokens.finished():
+        return
+    else:
+        tokens.consume(NEWLINE)
+
 
 def bracketed_statement_list(tokens):
     """
