@@ -1,8 +1,29 @@
 
-assert(5 > 3)
-assert(3 < 5)
-assert(1 + 2 > 2)
-assert(1 + 2 >= 3)
+if (5 > 3)
+    print('5 > 3')
+if (5 < 3)
+    print('Fail: 5 < 3')
 
-assert(1 == 1)
-assert(5 != 2)
+if (3 < 5)
+    print('3 > 5')
+
+if (1 + 2 > 2)
+    print('1 + 2 > 2')
+
+if (1 + 2 < 2)
+    print('Fail: 1 + 2 < 2')
+
+if (1 + 2 >= 2)
+    print('1 + 2 >= 2')
+if (1 + 2 >= 3)
+    print('1 + 2 >= 3')
+if (1 + 2 >= 4)
+    print('Fail: 1 + 2 >= 4')
+
+if (3 + 6 <= 10)
+    print('3 + 6 >= 10')
+if (3 + 6 <= 9)
+    print('3 + 6 >= 9')
+if (3 + 6 <= 8)
+    print('Fail: 3 + 6 >= 8')
+

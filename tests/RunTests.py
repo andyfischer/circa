@@ -16,13 +16,15 @@ def stdoutTest(command, expectedOutput):
             stdout_line = stdout_line[:-1]
 
             if line != stdout_line:
-                raise InputDidntMatch("Expected: %s\nActual:   %s" % (line, stdout_line))
+                raise InputDidntMatch("Expected: %s\nOutput:   %s" % (line, stdout_line))
 
             numLines += 1
 
         errors = []
     except InputDidntMatch, e:
+        print "Failed at line", numLines, "while running \"%s\"" % command
         print e
+        return
 
     print "Ran \"%s\", %i lines OK" % (command, numLines)
      
@@ -83,4 +85,15 @@ should be 3: 3
 should be 1: 1
 should be 5: 5
 should be apple: apple
+""")
+
+stdoutTest('circa comparison_test.ca', expectedOutput=
+"""Reading file comparison_test.ca...
+5 > 3
+3 > 5
+1 + 2 > 2
+1 + 2 >= 2
+1 + 2 >= 3
+3 + 6 >= 10
+3 + 6 >= 9
 """)

@@ -11,7 +11,9 @@ operator('/') := div
 operator('==') := equals
 operator('!=') := not_equals
 operator('<') := less_than
+operator('<=') := less_than_eq
 operator('>') := greater_than
+operator('>=') := greater_than_eq
 
 -- Bind assign operators to functions
 assign_operator('+=') := add
