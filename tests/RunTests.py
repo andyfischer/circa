@@ -30,8 +30,7 @@ def stdoutTest(command, expectedOutput):
      
 
 stdoutTest('circa if_test.ca', expectedOutput=
-"""Reading file if_test.ca...
-Simple 1
+"""Simple 1
 Complex condition 1
 Else 1
 Else 2
@@ -60,15 +59,13 @@ Should be six: 6
 """)
 
 stdoutTest('circa subroutine_test.ca', expectedOutput=
-"""Reading file subroutine_test.ca...
-Called print_success
+"""Called print_success
 Four squared is 16
 Five squared is 25
 """)
 
 stdoutTest('circa math_test.ca', expectedOutput=
-"""Reading file math_test.ca...
-one plus two is 3
+"""one plus two is 3
 5.5 plus 2.2 is 7.7
 two minus one is 1
 one minus two is -1
@@ -83,20 +80,31 @@ eight divided by four is 2
 """)
 
 stdoutTest('circa map_test.ca', expectedOutput=
-"""Reading file map_test.ca...
-should be 3: 3
+"""should be 3: 3
 should be 1: 1
 should be 5: 5
 should be apple: apple
 """)
 
 stdoutTest('circa comparison_test.ca', expectedOutput=
-"""Reading file comparison_test.ca...
-5 > 3
+"""5 > 3
 3 > 5
 1 + 2 > 2
 1 + 2 >= 2
 1 + 2 >= 3
 3 + 6 >= 10
 3 + 6 >= 9
+""")
+
+stdoutTest('circa boolean_test.ca', expectedOutput=
+"""should be true: True
+should be false: False
+and(true,true): True
+and(true,false): False
+and(false,true): False
+and(false,false): False
+or(true,true): True
+or(true,false): True
+or(false,true): True
+or(false,false): False
 """)

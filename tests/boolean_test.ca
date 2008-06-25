@@ -1,0 +1,17 @@
+
+-- Check 'true' and 'false' constants
+print(concat('should be true: ', true))
+print(concat('should be false: ', false))
+
+-- and
+print(concat('and(true,true): ', and(true,true)))
+print(concat('and(true,false): ', and(true,false)))
+print(concat('and(false,true): ', and(false,true)))
+print(concat('and(false,false): ', and(false,false)))
+
+-- or
+print(concat('or(true,true): ', or(true,true)))
+print(concat('or(true,false): ', or(true,false)))
+print(concat('or(false,true): ', or(false,true)))
+print(concat('or(false,false): ', or(false,false)))
+

@@ -136,9 +136,8 @@ else
 
 a = 1
 
-if (true) {
+if (true) 
   a = 2
-}
 
 print(concat('Should be two: ', a))
 
