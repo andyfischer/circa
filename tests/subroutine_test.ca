@@ -1,27 +1,17 @@
 
+function print_success() {
+    print('Called print_success')
+}
+
+print_success()
+
 function square(int a) -> int {
     return a*a
 }
 
-function dist(int a,int b) -> float {
-    --return sqrt(square(a) + square(b))
-}
+print(concat('Four squared is ', square(4)))
 
-function three_a_plus_two_b(int a,int b) -> int {
-  return 3 * a + 2 * b
-}
+five_squared = square(5)
 
-assert(square(2) == 4)
-assert(square(-1) == 1)
-
-x = 4 + 5
-assert(square(x) == 81)
-
-x = 1
-y = 1
-
-result1 = three_a_plus_two_b(x,y)
-
-assert(result1 == 5)
-
+print(concat('Five squared is ', five_squared))
 
