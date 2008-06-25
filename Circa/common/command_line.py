@@ -225,6 +225,8 @@ def main():
 
     targetCodeUnit = None
 
+    verbose = 'v' in single_options
+
     # Was a file name specified?
     if len(actual_args) == 0:
         print "No file specified, examining main"
@@ -237,7 +239,8 @@ def main():
             print "File not found: " + actual_args[0]
             return
 
-        print "Reading file " + filename + "..."
+        if verbose:
+            print "Reading file " + filename + "..."
 
         (errors, codeUnit) = parser.parseFile(filename)
 
