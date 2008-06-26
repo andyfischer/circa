@@ -20,6 +20,7 @@ class Expression(TermSyntaxInfo):
         if self.nameBinding is not None:
             result += self.nameBinding + ' = '
         result += str(self.expressionAst)
+        return result
 
 class Node(object):
     def __str__(self):

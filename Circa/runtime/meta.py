@@ -1,5 +1,4 @@
 
-
 import pdb
 
 from Circa.core import (builtins, ca_function, ca_type)
@@ -24,9 +23,8 @@ class ToSource(object):
 
     @staticmethod
     def evaluate(cxt):
-        buffer = StringBuffer()
-        cxt.caller().ast.renderSource(buffer)
-        cxt.setResult(str(buffer))
+        term = cxt.inputTerm(0)
+        cxt.setResult(str(term.termSyntaxInfo))
 
 def createFunctions(codeUnit):
     builtins.SYNTAX_FUNC = function_builder.importPythonFunction(codeUnit, Syntax)
