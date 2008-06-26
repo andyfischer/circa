@@ -5,50 +5,6 @@ from Circa.core import (builtins, ca_function, ca_type)
 from Circa.core.term import Term
 
 
-# This class allows Python code to create a function in a convenient
-# way. Then, the function 'createFunction' can be used to make a
-# Circa-based function out of one of these classes.
-class BaseFunction(object):
-    pureFunction = False
-    hasState = False
-    variableArgs = False
-    inputs = []
-    output = 'void'
-    initialize = None
-    
-    """
-    Should have these members:
-       pureFunction (bool)
-       hasState (bool)
-       name (string)
-       inputTypes (list of Circa type objects)
-       outputType (Circa type object)
-       evaluate (function)
-    """
-
-def createFunction(codeUnit, functionDef):
-    # Do some type checks
-    debug.assertType(functionDef.inputs, list, functionDef.__name__+'.inputs')
-    debug.assertType(functionDef.output, str, functionDef.__name__+'.output')
-
-    def findType(typeName):
-        type = codeUnit.getNamed(typeName)
-        if type is None:
-            raise Exception("Type not found: " + typeName)
-        return type
-
-    term = codeUnit.createConstant(builtins.FUNCTION_TYPE)
-    ca_function.setName(term, functionDef.name)
-    ca_function.setInputTypes(term, map(findType, functionDef.inputs))
-    ca_function.setOutputType(term, findType(functionDef.output))
-    ca_function.setPureFunction(term, functionDef.pureFunction)
-    ca_function.setHasState(term, functionDef.hasState)
-    ca_function.setVariableArgs(term, functionDef.variableArgs)
-    ca_function.setInitializeFunc(term, functionDef.initialize)
-    ca_function.setEvaluateFunc(term, functionDef.evaluate)
-    codeUnit.bindName(term, functionDef.name)
-    return term
-
 def importPythonFunction(codeUnit, pythonClass, instanceBased = False):
     """
     Create a Circa function out of the specially-formed Python class.

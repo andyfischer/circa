@@ -3,21 +3,22 @@ from Circa.common import (debug, function_builder)
 from Circa.core import builtins
 import pdb
 
-class Import(function_builder.BaseFunction):
-    name = 'python_import'
+class Import(object):
+    name = 'python-import'
     inputs = ['string']
     output = 'void'
-    pureFunction = False
+    pure = False
 
     @staticmethod
-    def evaluate(cxt):
-        execfile(cxt.input(0))
+    def evaluate(filename):
+        execfile(filename)
 
-class ImportFunctions(function_builder.BaseFunction):
-    name = 'python_import_functions'
+class ImportFunctions(object):
+    name = 'python-import-functions'
     inputs = ['string']
     output = 'void'
-    pureFunction = False
+    pure = False
+    meta = True
 
     @staticmethod
     def evaluate(cxt):
@@ -34,5 +35,5 @@ class ImportFunctions(function_builder.BaseFunction):
 
 
 def createFunctions(codeUnit):
-    function_builder.createFunction(codeUnit, Import)
-    function_builder.createFunction(codeUnit, ImportFunctions)
+    function_builder.importPythonFunction(codeUnit, Import)
+    function_builder.importPythonFunction(codeUnit, ImportFunctions)

@@ -51,7 +51,7 @@ def _printTerm(cxt, term):
         cxt.out.write(','.join(map(shortIdentifier, term.inputs)))
         cxt.out.writeln(")")
         cxt.out.indent()
-        printBranch(cxt, term.state)
+        printBranch(cxt, term.state.branch)
         cxt.out.unindent()
 
     else:
