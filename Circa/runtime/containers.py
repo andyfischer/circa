@@ -4,19 +4,19 @@ from Circa.core import (builtins, ca_function, ca_type)
 from Circa.common import (debug, function_builder)
 
 # Create Map functions
-class MapConstructor(function_builder.BaseFunction):
+class MapConstructor(object):
     name = 'map'
     inputs = ['type','type']
     output = 'Function'
     hasState = True
-    pureFunction = True
+    pure = True
+    meta = True
+    instanceBased = True
 
-    @staticmethod
-    def initialize(cxt):
-        cxt.caller().state = {}
+    def __init__(self):
+        self.hashtable = {}
 
-    @staticmethod
-    def evaluate(cxt):
+    def evaluate(self, cxt):
         keyType = cxt.inputTerm(0)
         valueType = cxt.inputTerm(1)
         ca_function.setName(cxt.caller(), 'map-' + 
@@ -30,19 +30,20 @@ class MapConstructor(function_builder.BaseFunction):
         ca_function.setFeedbackPropagator(cxt.caller(), MAP_FEEDBACK)
 
 def MapAccess_evaluate(cxt):
-    hashtable = cxt.caller().functionTerm.state
+    hashtable = cxt.caller().functionTerm.state.hashtable
     key = cxt.input(0)
     try:
         cxt.caller().cachedValue = hashtable[key]
     except KeyError:
         cxt.caller().cachedValue = None
 
-class MapFeedback(function_builder.BaseFunction):
+class MapFeedback(object):
     name = 'map-feedback'
     inputs = ['ref','ref']
     output = 'void'
     hasState = False
     pure = False
+    meta = True
 
     @staticmethod
     def evaluate(context):
@@ -50,7 +51,7 @@ class MapFeedback(function_builder.BaseFunction):
         desired = context.input(1)
 
         # Goal here is to change target's function so that it outputs desired
-        hashtable = target.functionTerm.state
+        hashtable = target.functionTerm.state.hashtable
         key = target.getInput(0).cachedValue
         hashtable[key] = desired
         target.functionTerm.needsUpdate = True
@@ -58,10 +59,10 @@ class MapFeedback(function_builder.BaseFunction):
 MAP_FEEDBACK = None
 
 def createFunctions(codeUnit):
-    function_builder.createFunction(codeUnit, MapConstructor)
+    function_builder.importPythonFunction(codeUnit, MapConstructor)
 
     global MAP_FEEDBACK
-    MAP_FEEDBACK = function_builder.createFunction(codeUnit, MapFeedback)
+    MAP_FEEDBACK = function_builder.importPythonFunction(codeUnit, MapFeedback)
 
 """
 m = map(string,string)

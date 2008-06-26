@@ -11,7 +11,7 @@ class IfStatement(object):
     output = 'void'
     pure = False
 
-    def initialize(self):
+    def __init__(self):
         self.branches = []
 
     def evaluate(self, condition):
