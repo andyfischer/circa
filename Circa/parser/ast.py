@@ -10,7 +10,7 @@ from Circa.core import (builtins, ca_codeunit, ca_variable, ca_string,
         ca_subroutine, ca_function, ca_type)
 from Circa.runtime import ca_module
 from Circa.core.term import Term
-from Circa.common import (debug, errors)
+from Circa.common import (debug, errors, to_source)
 from Circa.utils.spy_object import SpyObject
 from Circa.utils.string_buffer import StringBuffer
 from token_definitions import *
@@ -237,8 +237,9 @@ class ReturnStatement(Statement):
     def getFirstToken(self):
         return self.returnKeyword
     def create(self, context):
-        result = self.right.getTerm(context)
-        context.bindName(result, "#return_val")
+        (result,ast) = self.right.getTerm(context)
+        result.termSyntaxInfo = to_source.Expression(ast, '#return_val')
+        context.bindName(result, '#return_val')
     def renderSource(self, output):
         output.write('return ')
         self.right.renderSource(output)
@@ -333,11 +334,13 @@ class NameBinding(Statement):
         self.right = right
 
     def create(self, context):
-        rightTerm = self.right.getTerm(context)
+        (rightTerm, ast) = self.right.getTerm(context)
+        name = self.left.text
         if not isinstance(rightTerm, Term):
             raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
 
-        context.bindName(rightTerm, self.left.text)
+        rightTerm.termSyntaxInfo = to_source.Expression(ast, name)
+        context.bindName(rightTerm, name)
         return rightTerm
 
 class MetaOptionStatement(Statement):
@@ -350,16 +353,26 @@ class MetaOptionStatement(Statement):
 
 class Expression(Statement):
     def create(self, context):
-        return self.getTerm(context)
+        (term,ast) = self.getTerm(context)
+        term.termSyntaxInfo = to_source.Expression(ast)
+        return term
+
     def inputs(self):
         "Returns an iterable of our inputs"
+        raise errors.PureVirtualMethodFail(self, 'inputs')
+
+    def getTerm(self, context):
+        """
+        Creates a term (or finds an existing one). Returns a tuple of
+        (term, to_source.Ast)
+        """
         raise errors.PureVirtualMethodFail(self, 'inputs')
 
 
 class Infix(Expression):
     def __init__(self, functionToken, left, right):
-        assert isinstance(left, Expression)
-        assert isinstance(right, Expression)
+        debug._assert(isinstance(left, Expression))
+        debug._assert(isinstance(right, Expression))
 
         self.token = functionToken
         self.left = left
@@ -373,14 +386,13 @@ class Infix(Expression):
 
         # Evaluate as feedback?
         if self.token.match == COLON_EQUALS:
-            leftTerm = self.left.getTerm(context)
-            rightTerm = self.right.getTerm(context)
+            (leftTerm, leftAst) = self.left.getTerm(context)
+            (rightTerm, rightAst) = self.right.getTerm(context)
             debug._assert(leftTerm is not None)
             debug._assert(rightTerm is not None)
             newTerm = context.createTerm(builtins.FEEDBACK_FUNC, [leftTerm, rightTerm])
-            newTerm.ast = self
             newTerm.execute()
-            return newTerm
+            return (newTerm, to_source.Infix(':=', leftAst, rightAst))
 
         # Evaluate as a right-arrow?
         # (Not supported yet)
@@ -397,20 +409,23 @@ class Infix(Expression):
         normalFunction = getOperatorFunction(context, self.token)
         if normalFunction is not None:
             debug._assert(normalFunction.cachedValue is not None)
+            (leftTerm, leftAst) = self.left.getTerm(context)
+            (rightTerm, rightAst) = self.right.getTerm(context)
 
             newTerm = context.createTerm(normalFunction,
-                inputs=[self.left.getTerm(context),
-                        self.right.getTerm(context)])
-            newTerm.ast = self
-            return newTerm
+                inputs=[leftTerm, rightTerm])
+            return (newTerm, to_source.Infix(self.token.text,leftAst,rightAst))
 
         # Evaluate as a function + assign?
         # Try to find an assign operator
         assignFunction = getAssignOperatorFunction(self.token.match)
         if assignFunction is not None:
+            (leftTerm, leftAst) = self.left.getTerm(context)
+            (rightTerm, rightAst) = self.right.getTerm(context)
+
             # create a term that's the result of the operation
             result_term = context.createTerm(assignFunction,
-               inputs=[self.left.getTerm(context), self.right.getTerm(context)])
+               inputs=[leftTerm,rightTerm])
 
             # bind the name to this result
             context.bindName(result_term, str(self.left))
@@ -436,13 +451,12 @@ class LiteralString(Expression):
 
     def getTerm(self, context):
         term = context.createVariable(builtins.STRING_TYPE)
-        term.ast = self
         # Strip quotation marks
         value = self.token.text.strip("'\"")
         # Convert \n to newline
         value = value.replace("\\n","\n")
         ca_variable.setValue(term, value)
-        return term
+        return (term, to_source.TermValue(term))
 
     def renderSource(self,output):
         output.write(self.token.text)
@@ -476,11 +490,10 @@ class Literal(Expression):
     def getTerm(self, context):
         # Create a term
         newTerm = context.createVariable(self.circaType)
-        newTerm.ast = self
 
         # Assign value
         ca_variable.setValue(newTerm, self.value)
-        return newTerm
+        return (newTerm, to_source.TermValue(newTerm))
 
     def getFirstToken(self):
         return self.token
@@ -499,12 +512,13 @@ class Ident(Expression):
         return []
 
     def getTerm(self, context):
-        term = context.getNamed(self.token.text)
+        name = self.token.text
+        term = context.getNamed(name)
 
         if not term:
             raise parse_errors.IdentifierNotFound(self.token)
 
-        return context.getNamed(self.token.text)
+        return (term, to_source.TermName(term, name))
 
     def getFirstToken(self):
         return self.token
@@ -526,10 +540,11 @@ class Unary(Expression):
         mult = context.getNamed('mult')
         negative_one = context.codeUnit.createConstant(builtins.INT_TYPE)
         ca_variable.setValue(negative_one, -1)
+        (rightTerm, rightAst) = self.right.getTerm(context)
         newTerm = context.createTerm(mult,
-                   inputs = [negative_one, self.right.getTerm(context)])
+                   inputs = [negative_one, rightTerm])
         newTerm.ast = self
-        return newTerm
+        return (newTerm, to_source.Unary('-', rightAst))
 
     def getFirstToken(self):
         return self.functionToken;
@@ -551,7 +566,13 @@ class FunctionCall(Expression):
             yield arg
 
     def getTerm(self, context):
-        arg_terms = [expr.getTerm(context) for expr in self.args]
+        argTerms = []
+        argAsts = []
+        for expr in self.args:
+            (term, ast) = expr.getTerm(context)
+            argTerms.append(term)
+            argAsts.append(ast)
+
         func = context.getNamed(self.function_name.text)
 
         if func is None:
@@ -560,14 +581,8 @@ class FunctionCall(Expression):
 
         # Check for Function
         if func.getType() in (builtins.FUNCTION_TYPE, builtins.SUBROUTINE_TYPE):
-            newTerm = context.createTerm(func, inputs=arg_terms)
-            newTerm.ast = self
-            return newTerm
-
-        # Temp: Use a Python dynamic type check to see if this is a function
-        elif isinstance(func.pythonValue, ca_function._Function):
-            print 'FunctionCall - deprecated stuff'
-            return context.createTerm(func, inputs=arg_terms)
+            newTerm = context.createTerm(func, inputs=argTerms)
+            return (newTerm, to_source.FunctionCall(self.function_name.text, argAsts))
 
         else:
             raise parse_errors.InternalError(self.function_name,

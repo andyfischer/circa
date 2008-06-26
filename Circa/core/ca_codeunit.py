@@ -54,6 +54,8 @@ class CodeUnit(object):
         debug._assert(isinstance(function, Term))
         debug._assert(isinstance(inputs, list))
         debug._assert(branch is None or isinstance(branch,Branch))
+        for input in inputs:
+            debug._assert(input is not None)
 
         # Check if they have provided the correct number of arguments
         requiredArgCount = len(ca_function.inputTypes(function))
