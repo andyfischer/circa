@@ -4,20 +4,31 @@ Define the CodeUnit class
 import pdb
 
 from Circa.core import (ca_codeunit)
-from Circa.common import function_builder
-from Circa import parser
+from Circa.common import (debug, function_builder)
 
 class Module(object):
     name = 'Module'
     def __init__(self, name="", codeUnit=None):
+        debug._assert(isinstance(name, str))
+
         self.name = name
         self.codeUnit = codeUnit
+        self.mutableFile = False
 
     def toShortString(self):
         return "<Module %s>" % self.name
 
     def iterateInnerTerms(self):
         return self.codeUnit.iterateInnerTerms()
+
+    def execute(self):
+        return self.codeUnit.execute()
+
+    def containsName(self, name):
+        return self.codeUnit.containsName(name)
+
+    def getNamed(self, name):
+        return self.codeUnit.getNamed(name)
 
 class LoadModule(object):
     name = 'load-module'
@@ -28,6 +39,7 @@ class LoadModule(object):
 
     @staticmethod
     def evaluate(name):
+        from Circa import parser
         filename = name + '.ca'
 
         (errors, codeUnit) = parser.parseFile(filename)

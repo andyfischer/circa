@@ -242,7 +242,7 @@ def main():
         if verbose:
             print "Reading file " + filename + "..."
 
-        (errors, codeUnit) = parser.parseFile(filename)
+        (errors, module) = parser.parseFile(filename)
 
         if errors:
             print len(errors), "parsing errors occured"
@@ -250,9 +250,9 @@ def main():
                 print str(error)
             return
 
-        codeUnit.execute()
-        Circa.LOADED_MODULES[removeFileSuffix(filename)] = codeUnit
-        targetCodeUnit = codeUnit
+        module.execute()
+        Circa.LOADED_MODULES[removeFileSuffix(filename)] = module
+        targetCodeUnit = module.codeUnit
 
     doInteractiveMode = 'i' in single_options
 

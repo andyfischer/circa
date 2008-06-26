@@ -6,8 +6,9 @@
 import pdb
 
 import parse_errors, tokens
-from Circa.core import (builtins, ca_variable, ca_string, 
+from Circa.core import (builtins, ca_codeunit, ca_variable, ca_string, 
         ca_subroutine, ca_function, ca_type)
+from Circa.runtime import ca_module
 from Circa.core.term import Term
 from Circa.common import (debug, errors)
 from Circa.utils.spy_object import SpyObject
@@ -71,6 +72,26 @@ class CompilationContext(object):
         else:
             self.metaOptionHandler(optionName)
 
+class CompilationUnit(object):
+    def __init__(self, statementList):
+        self.statementList = statementList
+
+    def createModule(self):
+        codeUnit = ca_codeunit.CodeUnit()
+        resultModule = ca_module.Module("name", codeUnit)
+        compilationContext = CompilationContext(codeUnit)
+
+        def handleMetaOption(option):
+            if option == "mutable-file":
+                ca_module.mutableFile = True
+            else:
+                raise Exception("Unrecognized option: " + option)
+        compilationContext.metaOptionHandler = handleMetaOption
+        
+        self.statementList.create(compilationContext)
+
+        return resultModule
+
 class Node(object):
     def create(self, context):
         raise errors.PureVirtualMethodFail(self, 'create')
@@ -89,7 +110,6 @@ class StatementList(Node):
     def create(self, context):
         for statement in self._statements:
             statement.create(context)
-
     def getFirstToken(self):
         return self._statements[0].getFirstToken()
     def renderSource(self, output):

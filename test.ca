@@ -1,0 +1,5 @@
+[mutable-file]
+
+x = 4
+
+print(x)

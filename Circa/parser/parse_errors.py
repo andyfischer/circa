@@ -22,23 +22,24 @@ class ParseError(CircaError):
 
         return description
 
+# delete this:
 def TokenStreamExpected(expected, location):
-   return ParseError(location, "Expected: " + expected.name + ", found: " + location.text)
+    return ParseError(location, "Expected: " + expected.name + ", found: " + location.text)
 
 def IdentifierNotFound(identifier):
-   return ParseError(identifier, "Identifier not found: " + identifier.text)
+    return ParseError(identifier, "Identifier not found: " + identifier.text)
 
 def IdentifierIsNotAType(ident):
-   return ParseError(ident, "Not a valid type: " + ident.text)
+    return ParseError(ident, "Not a valid type: " + ident.text)
 
 def DanglingRightBracket(token):
-   return ParseError(token, "Found } without a corresponding {")
+    return ParseError(token, "Found } without a corresponding {")
 
 def NotAStatement(token):
-   return ParseError(token, "Not a statement: " + token.detailsStr())
+    return ParseError(token, "Not a statement: " + token.detailsStr())
 
 def NotImplemented(token):
-   return ParseError(token, "Feature is not implemented yet")
+    return ParseError(token, "Feature is not implemented yet")
 
 def ExpectedToken(found, expected):
     """
