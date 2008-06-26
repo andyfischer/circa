@@ -1,6 +1,9 @@
 
 import os
 
+TESTS_PASSED = 0
+TESTS_FAILED = 0
+
 class InputDidntMatch(Exception):
     pass
 
@@ -24,9 +27,25 @@ def stdoutTest(command, expectedOutput):
     except InputDidntMatch, e:
         print "Failed at line", numLines, "while running \"%s\"" % command
         print e
+        global TESTS_FAILED
+        TESTS_FAILED += 1
         return
 
     print "Ran \"%s\", %i lines OK" % (command, numLines)
+    global TESTS_PASSED
+    TESTS_PASSED += 1
+
+def printOverallResults():
+    if TESTS_FAILED == 0:
+        print "All tests passed (%i)" % TESTS_PASSED
+    else:
+        def pluralTests(count):
+            if count == 1:
+                return "1 test"
+            else:
+                return "%i tests" % count
+        print ("Test failures! %s passed. %s failed."
+                % (pluralTests(TESTS_PASSED), pluralTests(TESTS_FAILED)))
      
 
 stdoutTest('circa if_test.ca', expectedOutput=
@@ -108,3 +127,5 @@ or(true,false): True
 or(false,true): True
 or(false,false): False
 """)
+
+printOverallResults()
