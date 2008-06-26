@@ -5,7 +5,7 @@ import pdb
 from Circa.core import (builtins, ca_function, ca_type)
 from Circa.common import (debug, function_builder)
 
-class Syntax(function_builder.BaseFunction):
+class Syntax(object):
     name = "_syntax"
     inputs = ['void']
     output = 'void'
@@ -15,4 +15,4 @@ class Syntax(function_builder.BaseFunction):
         pass
 
 def createFunctions(codeUnit):
-    builtins.SYNTAX_FUNC = function_builder.createFunction(codeUnit, Syntax)
+    builtins.SYNTAX_FUNC = function_builder.importPythonFunction(codeUnit, Syntax)

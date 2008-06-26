@@ -4,10 +4,11 @@ import pdb
 from Circa.core import (builtins, ca_function, ca_type)
 from Circa.common import (debug, function_builder)
 
-class Assert(function_builder.BaseFunction):
+class Assert(object):
     name = 'assert'
     inputs = ['bool']
     output = 'void'
+    meta = True
 
     @staticmethod
     def evaluate(cxt):
@@ -35,6 +36,6 @@ class PdbTrace(object):
         pdb.set_trace()
 
 def createFunctions(codeUnit):
-    function_builder.createFunction(codeUnit, Assert)
+    function_builder.importPythonFunction(codeUnit, Assert)
     function_builder.importPythonFunction(codeUnit, Print)
     function_builder.importPythonFunction(codeUnit, PdbTrace)
