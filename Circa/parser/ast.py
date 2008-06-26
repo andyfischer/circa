@@ -210,6 +210,7 @@ class FunctionDecl(Statement):
 
         # Bind the subroutine's name
         context.bindName(subroutineTerm, self.functionName.text)
+
         return subroutineTerm
 
     def renderSource(self, output):

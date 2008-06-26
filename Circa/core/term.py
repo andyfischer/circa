@@ -38,8 +38,8 @@ class Term(object):
         # The CodeUnit object that owns us
         self.codeUnit = None
         
-        # The node in an AST used to create this term
-        self.ast = None
+        # This structure keeps track of how to turn us back into source code
+        self.termSyntaxInfo = None
 
         self.givenName = None
         self.debugName = None
