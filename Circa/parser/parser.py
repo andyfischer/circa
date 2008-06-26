@@ -42,8 +42,11 @@ def parseFile(filename):
         compilationUnit = compilation_unit(tokens)
         resultModule = compilationUnit.createModule()
 
+        resultModule.filename = filename
+
     except parse_errors.ParseError, e:
         errors.append(e)
+
 
     return (errors, resultModule)
 
