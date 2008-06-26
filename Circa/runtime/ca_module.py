@@ -14,6 +14,7 @@ class Module(object):
         self.name = name
         self.codeUnit = codeUnit
         self.mutableFile = False
+        self.filename = ""
 
     def toShortString(self):
         return "<Module %s>" % self.name
