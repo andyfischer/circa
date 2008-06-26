@@ -5,11 +5,12 @@ from Circa.core import (builtins, ca_variable, ca_function, ca_type)
 def emptyFunction(term):
     pass
 
-class VariableGenerator(function_builder.BaseFunction):
+class VariableGenerator(object):
     name = '_variable-generator'
     pureFunction = True
     inputs = ['type']
     output = 'Function'
+    meta = True
 
     @staticmethod
     def evaluate(cxt):
@@ -25,12 +26,13 @@ def Variable_evaluate(cxt):
     # Copy state to output
     cxt.setResult(cxt.state())
 
-class Assign(function_builder.BaseFunction):
+class Assign(object):
     name = 'assign'
     pure = False
     inputs = ['ref','ref']
     inputNames = ['target', 'value']
     output = 'void'
+    meta = True
 
     @staticmethod
     def evaluate(cxt):
@@ -43,8 +45,8 @@ ASSIGN_FUNCTION = None
 
 def createFunctions(codeUnit):
     builtins.VARIABLE_GENERATOR = (
-        function_builder.createFunction(codeUnit, VariableGenerator))
+        function_builder.importPythonFunction(codeUnit, VariableGenerator))
 
     global ASSIGN_FUNCTION
-    ASSIGN_FUNCTION = function_builder.createFunction(codeUnit, Assign)
+    ASSIGN_FUNCTION = function_builder.importPythonFunction(codeUnit, Assign)
 

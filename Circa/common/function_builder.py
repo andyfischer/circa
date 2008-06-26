@@ -58,6 +58,15 @@ def importPythonFunction(codeUnit, pythonClass, instanceBased = False):
       inputs: a list of strings representing Circa types
       output: a string representing a Circa type
       evaluate: a static function
+      instanceBased: boolean. If true, this will create a stateful function,
+        which will use an instance of the given class as the term's state.
+        The evaluate method will be bound, so you can refer to member
+        fields within it.
+      meta: boolean. If true, the evaluate function will be passed a
+        TermExecutionContext, allowing for access of various things.
+        If false, the evaluate function will just receive the values
+        of its inputs.
+        
     """
 
     debug._assert(isinstance(pythonClass, type))
@@ -75,28 +84,53 @@ def importPythonFunction(codeUnit, pythonClass, instanceBased = False):
     ca_function.setOutputType(functionTerm, findType(pythonClass.output))
     ca_function.setHasState(functionTerm, instanceBased)
 
-    if not instanceBased:
-        def initializeFunc(cxt):
-            pass
-        def evaluateFunc(cxt):
-            try:
-                inputs = [cxt.input(n) for n in range(cxt.numInputs())]
-                result = pythonClass.evaluate(*inputs)
-                cxt.setResult(result)
-            except Exception, e:
-                print "An internal error occured in " + pythonClass.name
-                traceback.print_exc()
-                pdb.set_trace()
+    try:
+        instanceBased = pythonClass.instanceBased
+    except:
+        pass
 
-    else:
+    try:
+        meta = pythonClass.meta
+    except:
+        meta = False
+
+    def initializeFunc(cxt):
+        pass
+
+    if instanceBased:
         def initializeFunc(cxt):
             cxt.caller().state = pythonClass()
-            cxt.caller().state.initialize()
 
-        def evaluateFunc(cxt):
-            inputs = [cxt.input(n) for n in range(cxt.numInputs())]
-            result = cxt.caller().state.evaluate(*inputs)
-            cxt.setResult(result)
+            if meta and hasattr(pythonClass, 'initialize'):
+                cxt.caller().state.initialize(cxt)
+
+    if meta:
+        if instanceBased:
+            def evaluateFunc(cxt):
+                cxt.state().evaluate(cxt)
+        else:
+            def evaluateFunc(cxt):
+                pythonClass.evaluate(cxt)
+
+    else:
+        if not instanceBased:
+            def evaluateFunc(cxt):
+                try:
+                    inputs = [cxt.input(n) for n in range(cxt.numInputs())]
+                    result = pythonClass.evaluate(*inputs)
+                    cxt.setResult(result)
+                except Exception, e:
+                    print "An internal error occured in " + pythonClass.name
+                    traceback.print_exc()
+                    pdb.set_trace()
+
+        else:
+
+            def evaluateFunc(cxt):
+                inputs = [cxt.input(n) for n in range(cxt.numInputs())]
+                result = cxt.caller().state.evaluate(*inputs)
+                cxt.setResult(result)
+
 
     ca_function.setInitializeFunc(functionTerm, initializeFunc)
     ca_function.setEvaluateFunc(functionTerm, evaluateFunc)

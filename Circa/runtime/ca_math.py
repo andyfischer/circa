@@ -17,11 +17,12 @@ class Add(object):
         debug._assert(a is not None)
         return a + b
 
-class AddFeedback(function_builder.BaseFunction):
+class AddFeedback(object):
     name = 'add-feedback'
     inputs = ['ref','ref']
     output = 'void'
     pure = False
+    meta = True
 
     @staticmethod
     def evaluate(cxt):
@@ -96,7 +97,7 @@ class SquareRoot(object):
 
 
 def createFunctions(codeUnit):
-    function_builder.createFunction(codeUnit, AddFeedback)
+    function_builder.importPythonFunction(codeUnit, AddFeedback)
     add = function_builder.importPythonFunction(codeUnit, Add)
 
     for functionDef in (Subtract,Multiply,Divide,Average,SquareRoot):
