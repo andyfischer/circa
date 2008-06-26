@@ -152,8 +152,8 @@ class CommandLine(object):
                     return term
             return None
 
-        if id in self.codeUnit.mainNamespace:
-            return self.codeUnit.mainNamespace[id]
+        if self.codeUnit.containsName(id):
+            return self.codeUnit.getNamed(id)
 
         return None
 

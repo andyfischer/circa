@@ -126,13 +126,15 @@ class StatementList(Node):
 class Statement(Node):
     pass
 
-class IgnoredSyntax(Statement):
-    def __init__(self, token):
-        self.token = token
+class CommentLine(Statement):
+    def __init__(self, text):
+        self.text = text
     def create(self, context):
-        pass
+        term = context.createTerm(builtins.COMMENT_FUNC, [])
+        term.termSyntaxInfo = to_source.CommentLine(self.text)
+        return term
     def renderSource(self, output):
-        output.write(self.token.text)
+        output.write(self.text)
 
 class FunctionDeclArg(Node):
     def __init__(self, type, name):
@@ -343,13 +345,18 @@ class NameBinding(Statement):
         context.bindName(rightTerm, name)
         return rightTerm
 
-class MetaOptionStatement(Statement):
+class HighLevelOptionStatement(Statement):
     def __init__(self, optionName):
         debug._assert(isinstance(optionName, tokens.TokenInstance))
         self.optionName = optionName
     def create(self, context):
         context.handleMetaOption(self.optionName.text)
-        return None
+
+        # Create a term to represent this high level option
+        option = context.createTerm(builtins.HIGH_LEVEL_OPTION_FUNC, inputs=[])
+        option.state = self.optionName.text
+        option.termSyntaxInfo = to_source.HighLevelOption(self.optionName.text)
+        return option
 
 class Expression(Statement):
     def create(self, context):

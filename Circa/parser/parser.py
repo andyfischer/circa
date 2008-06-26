@@ -47,7 +47,6 @@ def parseFile(filename):
     except parse_errors.ParseError, e:
         errors.append(e)
 
-
     return (errors, resultModule)
 
 
@@ -91,15 +90,17 @@ def statement(tokens):
     if tokens.nextIs(FUNCTION):
         return function_decl(tokens)
     elif tokens.nextIs(COMMENT_LINE):
-        return ast.IgnoredSyntax(tokens.consume(COMMENT_LINE))
+        commentLine = tokens.consume(COMMENT_LINE)
+        return ast.CommentLine(commentLine.text)
     elif tokens.nextIs(NEWLINE):
-        return ast.IgnoredSyntax(tokens.consume(NEWLINE))
+        tokens.consume(NEWLINE)
+        return ast.CommentLine("")
     elif tokens.nextIs(RETURN):
         return return_statement(tokens)
     elif tokens.nextIs(IF):
         return if_statement(tokens)
     elif tokens.nextIs(LBRACE):
-        return top_level_meta_statement(tokens)
+        return high_level_option_statement(tokens)
 
     # Lookahead, check if this is a name binding
     if tokens.nextIs(IDENT) and tokens.nextIs(EQUALS, lookahead=1):
@@ -288,12 +289,12 @@ def if_statement(tokens):
 
     return ast.IfBlock(conditionExpression, mainBlock, elseBlock)
 
-def top_level_meta_statement(tokens):
+def high_level_option_statement(tokens):
     tokens.consume(LBRACE)
     name = tokens.consume(IDENT)
     tokens.consume(RBRACE)
     statement_end(tokens)
-    return ast.MetaOptionStatement(name)
+    return ast.HighLevelOptionStatement(name)
 
 def statement_end(tokens):
     """
