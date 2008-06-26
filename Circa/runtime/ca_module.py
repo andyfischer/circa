@@ -10,6 +10,7 @@ class Module(object):
     name = 'Module'
     def __init__(self, name="", codeUnit=None):
         debug._assert(isinstance(name, str))
+        debug._assert(codeUnit is None or isinstance(codeUnit,ca_codeunit.CodeUnit))
 
         self.name = name
         self.codeUnit = codeUnit
@@ -31,6 +32,11 @@ class Module(object):
     def getNamed(self, name):
         return self.codeUnit.getNamed(name)
 
+    #def __setattr__(self, name, value):
+        #if name == 'codeUnit':
+            #pdb.set_trace()
+        #self.__dict__[name] = value
+
 class LoadModule(object):
     name = 'load-module'
     inputs = ['string']
@@ -43,7 +49,8 @@ class LoadModule(object):
         from Circa import parser
         filename = name + '.ca'
 
-        (errors, codeUnit) = parser.parseFile(filename)
+        (errors, module) = parser.parseFile(filename)
+        debug._assert(module.codeUnit is not None)
 
         if errors:
             print len(errors), "parsing errors occured"
@@ -51,7 +58,7 @@ class LoadModule(object):
                 print str(error)
             return
 
-        return Module(name, codeUnit)
+        return module
 
 class ExecModule(object):
     name = 'exec-module'

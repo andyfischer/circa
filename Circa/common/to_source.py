@@ -5,7 +5,7 @@ class TermSyntaxInfo(object):
     def __str__(self):
         raise errors.PureVirtualMethodFail(self, '__str__')
 
-class MetaOption(TermSyntaxInfo):
+class HighLevelOption(TermSyntaxInfo):
     def __init__(self, optionName):
         self.optionName = optionName
     def __str__(self):
@@ -21,6 +21,13 @@ class Expression(TermSyntaxInfo):
             result += self.nameBinding + ' = '
         result += str(self.expressionAst)
         return result
+
+class CommentLine(TermSyntaxInfo):
+    def __init__(self, text):
+        self.text = text
+        pass
+    def __str__(self):
+        return self.text
 
 class Node(object):
     def __str__(self):
