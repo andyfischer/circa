@@ -34,19 +34,18 @@ def parseFile(filename):
     # Reset token stream
     tokens.reset()
 
-    pstate = ParserState(tokens, ca_codeunit.CodeUnit())
+    errors = []
 
-    compilationContext = ast.CompilationContext(pstate.codeUnit)
-
+    resultModule = None
     try:
-        resultAst = statement_list(pstate.tokens)
-        resultAst.create(compilationContext)
-        pstate.codeUnit.ast = resultAst
+        # Compile to an AST
+        compilationUnit = compilation_unit(tokens)
+        resultModule = compilationUnit.createModule()
 
     except parse_errors.ParseError, e:
-        pstate.errors.append(e)
+        errors.append(e)
 
-    return (pstate.errors, pstate.codeUnit)
+    return (errors, resultModule)
 
 
 class ParserState(object):
@@ -68,6 +67,9 @@ def expression_statement(pstate):
     except MatchFailed, e:
         pstate.tokens.restoreMark(mark)
         raise parse_errors.ExpectedExpression(pstate.tokens.next())
+
+def compilation_unit(tokens):
+    return ast.CompilationUnit(statement_list(tokens))
 
 def statement_list(tokens):
     """
