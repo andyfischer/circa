@@ -201,6 +201,7 @@ class FunctionDecl(Statement):
             inputPlaceholderName = "#input_placeholder" + str(index)
             subroutineCodeUnit.bindName(placeholderTerm, inputPlaceholderName)
             subroutineCodeUnit.bindName(placeholderTerm, name)
+            placeholderTerm.outputReady = False
 
         # Create terms for the body of the subroutine
         subsCodeUnit = ca_subroutine.codeUnit(subroutineTerm)
