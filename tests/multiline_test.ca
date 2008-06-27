@@ -6,4 +6,4 @@ print("""
 multiline
  string
  test
-  """)
+""")
