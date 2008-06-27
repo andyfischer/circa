@@ -92,8 +92,10 @@ class CodeUnit(object):
         if ca_function.initializeFunc(function):
             ca_function.initializeFunc(function)(newTerm.executionContext)
 
-        # Immediately update, if this is a pure function
-        if ca_function.pureFunction(function):
+        # Immediately update, if this is a pure function, and all our inputs
+        # are ready.
+        if (ca_function.pureFunction(function) and
+                all([term.outputReady for term in inputs])):
             newTerm.execute()
 
         # Add ourselves to .users of all our inputs and function
