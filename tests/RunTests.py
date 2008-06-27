@@ -138,4 +138,8 @@ multiline
  test
 """)
 
+stdoutTest('circa to_source_test.ca', expectedOutput=
+"""a = 1 + 2
+""")
+
 printOverallResults()
