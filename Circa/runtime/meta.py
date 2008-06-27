@@ -36,10 +36,6 @@ class ModuleToSource(object):
 
     @staticmethod
     def evaluate(module):
-        # Temp: handle situation where 'module' is not ready
-        if module.codeUnit is None:
-            return ""
-
         debug._assert(module is not None)
         debug._assert(module.codeUnit is not None)
 

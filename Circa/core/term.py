@@ -32,6 +32,9 @@ class Term(object):
         # True if 'cachedValue' is out of date
         self.needsUpdate = True
 
+        # True if this term has been evaluated and may be accessed
+        self.outputReady = False
+
         # Persistent state.
         self.state = None
 
@@ -86,6 +89,7 @@ class Term(object):
         
         ca_function.evaluateFunc(self.functionTerm)(self.executionContext)
         self.needsUpdate = False
+        self.outputReady = True
 
     def execute_trace(self):
         """
