@@ -128,4 +128,14 @@ or(false,true): True
 or(false,false): False
 """)
 
+stdoutTest('circa multiline_test.ca', expectedOutput=
+"""
+ this
+  is
+  a
+multiline
+ string
+ test
+""")
+
 printOverallResults()
