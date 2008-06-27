@@ -46,7 +46,7 @@ class Infix(Node):
         self.left = left
         self.right = right
     def __str__(self):
-        return str(left) + ' ' + self.operator + ' ' + str(right)
+        return str(self.left) + ' ' + self.operator + ' ' + str(self.right)
 
 class Unary(Node):
     def __init__(self, operator, right):
