@@ -57,15 +57,39 @@ class CodeUnit(object):
         for input in inputs:
             debug._assert(input is not None)
 
-        # Check if they have provided the correct number of arguments
-        requiredArgCount = len(ca_function.inputTypes(function))
+        # Do type checking
+        functionInputTypes = ca_function.inputTypes(function)
+        variableArgs = ca_function.variableArgs(function)
 
-        if not ca_function.variableArgs(function):
+        # Check if they have provided the correct number of arguments
+        if not variableArgs:
+            requiredArgCount = len(functionInputTypes)
             if len(inputs) != requiredArgCount:
                 raise errors.WrongNumberOfArguments(ca_function.name(function),
                        requiredArgCount, len(inputs))
 
-        # Todo: Check if types match
+        def typeCheck(inputType, requiredType):
+            # The 'ref' type matches anything
+            if requiredType is builtins.REFERENCE_TYPE:
+                return True
+
+            # Temp: accept int for float
+            if (inputType is builtins.INT_TYPE and 
+                    requiredType is builtins.FLOAT_TYPE):
+                return True
+
+            return inputType is requiredType
+
+        for index in range(len(inputs)):
+            inputType = inputs[index].getType()
+            if ca_function.variableArgs(function):
+                requiredType = functionInputTypes[0]
+            else:
+                requiredType = functionInputTypes[index]
+                
+            if not typeCheck(inputType, requiredType):
+                raise errors.WrongType(ca_function.name(function), 
+                        requiredType.getIdentifier(), inputType.getIdentifier())
 
         # Try to reuse an existing term
         if not ca_function.hasState(function):
