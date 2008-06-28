@@ -589,8 +589,11 @@ class FunctionCall(Expression):
 
         # Check for Function
         if func.getType() in (builtins.FUNCTION_TYPE, builtins.SUBROUTINE_TYPE):
-            newTerm = context.createTerm(func, inputs=argTerms)
-            return (newTerm, to_source.FunctionCall(self.function_name.text, argAsts))
+            try:
+                newTerm = context.createTerm(func, inputs=argTerms)
+                return (newTerm, to_source.FunctionCall(self.function_name.text, argAsts))
+            except errors.CircaError,e:
+                raise parse_errors.InternalError(self.function_name, str(e))
 
         else:
             raise parse_errors.InternalError(self.function_name,

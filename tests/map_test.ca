@@ -12,6 +12,6 @@ string-map('key1') := 5
 print(concat('should be 5: ', string-map('key1')))
 
 int-map = map(int,string)
-string-map(18) := 'apple'
-print(concat('should be apple: ', string-map(18)))
+int-map(18) := 'apple'
+print(concat('should be apple: ', int-map(18)))
 

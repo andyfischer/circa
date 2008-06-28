@@ -13,3 +13,7 @@ def TypeCheckFail(argumentName, expectedType):
 def WrongNumberOfArguments(functionName, expectedNumArgs, givenNumArgs):
     return CircaError("%s() takes %d arguments (%d given)"
                     % (functionName, expectedNumArgs, givenNumArgs))
+
+def WrongType(functionName, expectedType, foundType):
+    return CircaError("Wrong type for function %s, expected %s, found %s"
+            % (functionName, expectedType, foundType))
