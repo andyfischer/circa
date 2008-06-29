@@ -27,8 +27,8 @@ class IfStatement(object):
 
 class IfExpression(object):
     name = 'if-expr'
-    inputs = ['bool', 'ref', 'ref']
-    output = 'ref'
+    inputs = ['bool', 'any', 'any']
+    output = 'any'
     pure = True
 
     @staticmethod

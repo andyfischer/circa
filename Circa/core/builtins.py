@@ -4,6 +4,7 @@ KERNEL_LOADED = False
 
 KERNEL = None
 
-REFERENCE_TYPE = None
 INT_TYPE = None
 FLOAT_TYPE = None
+REFERENCE_TYPE = None
+ANY_TYPE = None

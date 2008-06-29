@@ -96,4 +96,5 @@ def createBuiltinTypes(kernel):
     builtins.REFERENCE_TYPE = referenceType
     builtins.REF_TYPE = referenceType # Alias
     builtins.VOID_TYPE = voidType
+    builtins.ANY_TYPE = anyType
     builtins.SUBROUTINE_TYPE = subroutineType
