@@ -29,7 +29,7 @@ def Variable_evaluate(cxt):
 class Assign(object):
     name = 'assign'
     pure = False
-    inputs = ['ref','ref']
+    inputs = ['ref','any']
     inputNames = ['target', 'value']
     output = 'void'
     meta = True

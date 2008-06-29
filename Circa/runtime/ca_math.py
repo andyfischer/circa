@@ -92,7 +92,6 @@ class SquareRoot(object):
         return math.sqrt(a)
 
 
-
 def createFunctions(codeUnit):
     function_builder.importPythonFunction(codeUnit, AddFeedback)
     add = function_builder.importPythonFunction(codeUnit, Add)

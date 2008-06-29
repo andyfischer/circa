@@ -69,8 +69,12 @@ class CodeUnit(object):
                        requiredArgCount, len(inputs))
 
         def typeCheck(inputType, requiredType):
-            # The 'ref' type matches anything
+            # 'ref' type matches anything
             if requiredType is builtins.REFERENCE_TYPE:
+                return True
+
+            # 'any' type matches anything
+            if requiredType is builtins.ANY_TYPE:
                 return True
 
             # Temp: accept int for float
