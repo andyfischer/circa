@@ -4,7 +4,7 @@ from Circa.common import (debug, function_builder)
 
 class Concatenate(object):
     name = 'concat'
-    inputs = ['ref']
+    inputs = ['any']
     output = 'string'
     pure = False
     variableArgs = True
