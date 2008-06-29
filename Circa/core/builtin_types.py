@@ -25,6 +25,11 @@ def voidInitialize(term):
 def voidToString(term):
     return "<void>"
 
+def anyInitialize(term):
+    term.cachedValue = None
+def anyToString(term):
+    return str(term.cachedValue)
+
 def emptyFunction(term):
     pass
 
@@ -63,6 +68,12 @@ def createBuiltinTypes(kernel):
     ca_type.setInitialize(voidType, voidInitialize)
     ca_type.setToShortString(voidType, voidToString)
     kernel.bindName(voidType, 'void')
+
+    anyType = kernel.createConstant(builtins.TYPE_TYPE)
+    ca_type.setName(anyType, 'any')
+    ca_type.setInitialize(anyType, anyInitialize)
+    ca_type.setToShortString(anyType, anyToString)
+    kernel.bindName(anyType, 'any')
 
     """
     subroutineType = kernel.createConstant(builtins.TYPE_TYPE)
