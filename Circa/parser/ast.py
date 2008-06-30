@@ -10,7 +10,7 @@ from Circa.core import (builtins, ca_codeunit, ca_variable, ca_string,
         ca_subroutine, ca_function, ca_type)
 from Circa.runtime import ca_module
 from Circa.core.term import Term
-from Circa.common import (debug, errors, to_source)
+from Circa.common import (debug, errors, term_syntax)
 from Circa.utils.spy_object import SpyObject
 from Circa.utils.string_buffer import StringBuffer
 from token_definitions import *
@@ -131,7 +131,7 @@ class CommentLine(Statement):
         self.text = text
     def create(self, context):
         term = context.createTerm(builtins.COMMENT_FUNC, [])
-        term.termSyntaxInfo = to_source.CommentLine(self.text)
+        term.termSyntaxInfo = term_syntax.CommentLine(self.text)
         return term
     def renderSource(self, output):
         output.write(self.text)
@@ -241,7 +241,7 @@ class ReturnStatement(Statement):
         return self.returnKeyword
     def create(self, context):
         (result,ast) = self.right.getTerm(context)
-        result.termSyntaxInfo = to_source.Expression(ast, '#return_val')
+        result.termSyntaxInfo = term_syntax.Expression(ast, '#return_val')
         context.bindName(result, '#return_val')
     def renderSource(self, output):
         output.write('return ')
@@ -342,7 +342,7 @@ class NameBinding(Statement):
         if not isinstance(rightTerm, Term):
             raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
 
-        rightTerm.termSyntaxInfo = to_source.Expression(ast, name)
+        rightTerm.termSyntaxInfo = term_syntax.Expression(ast, name)
         context.bindName(rightTerm, name)
         return rightTerm
 
@@ -356,13 +356,13 @@ class HighLevelOptionStatement(Statement):
         # Create a term to represent this high level option
         option = context.createTerm(builtins.HIGH_LEVEL_OPTION_FUNC, inputs=[])
         option.state = self.optionName.text
-        option.termSyntaxInfo = to_source.HighLevelOption(self.optionName.text)
+        option.termSyntaxInfo = term_syntax.HighLevelOption(self.optionName.text)
         return option
 
 class Expression(Statement):
     def create(self, context):
         (term,ast) = self.getTerm(context)
-        term.termSyntaxInfo = to_source.Expression(ast)
+        term.termSyntaxInfo = term_syntax.Expression(ast)
         return term
 
     def inputs(self):
@@ -372,7 +372,7 @@ class Expression(Statement):
     def getTerm(self, context):
         """
         Creates a term (or finds an existing one). Returns a tuple of
-        (term, to_source.Ast)
+        (term, term_syntax.Ast)
         """
         raise errors.PureVirtualMethodFail(self, 'inputs')
 
@@ -400,7 +400,7 @@ class Infix(Expression):
             debug._assert(rightTerm is not None)
             newTerm = context.createTerm(builtins.FEEDBACK_FUNC, [leftTerm, rightTerm])
             newTerm.execute()
-            return (newTerm, to_source.Infix(':=', leftAst, rightAst))
+            return (newTerm, term_syntax.Infix(':=', leftAst, rightAst))
 
         # Evaluate as a right-arrow?
         # (Not supported yet)
@@ -422,7 +422,7 @@ class Infix(Expression):
 
             newTerm = context.createTerm(normalFunction,
                 inputs=[leftTerm, rightTerm])
-            return (newTerm, to_source.Infix(self.token.text,leftAst,rightAst))
+            return (newTerm, term_syntax.Infix(self.token.text,leftAst,rightAst))
 
         # Evaluate as a function + assign?
         # Try to find an assign operator
@@ -464,7 +464,7 @@ class LiteralString(Expression):
         # Convert \n to newline
         value = value.replace("\\n","\n")
         ca_variable.setValue(term, value)
-        return (term, to_source.TermValue(term))
+        return (term, term_syntax.TermValue(term))
 
     def renderSource(self,output):
         output.write(self.token.text)
@@ -501,7 +501,7 @@ class Literal(Expression):
 
         # Assign value
         ca_variable.setValue(newTerm, self.value)
-        return (newTerm, to_source.TermValue(newTerm))
+        return (newTerm, term_syntax.TermValue(newTerm))
 
     def getFirstToken(self):
         return self.token
@@ -526,7 +526,7 @@ class Ident(Expression):
         if not term:
             raise parse_errors.IdentifierNotFound(self.token)
 
-        return (term, to_source.TermName(term, name))
+        return (term, term_syntax.TermName(term, name))
 
     def getFirstToken(self):
         return self.token
@@ -552,7 +552,7 @@ class Unary(Expression):
         newTerm = context.createTerm(mult,
                    inputs = [negative_one, rightTerm])
         newTerm.ast = self
-        return (newTerm, to_source.Unary('-', rightAst))
+        return (newTerm, term_syntax.Unary('-', rightAst))
 
     def getFirstToken(self):
         return self.functionToken;
@@ -591,7 +591,7 @@ class FunctionCall(Expression):
         if func.getType() in (builtins.FUNCTION_TYPE, builtins.SUBROUTINE_TYPE):
             try:
                 newTerm = context.createTerm(func, inputs=argTerms)
-                return (newTerm, to_source.FunctionCall(self.function_name.text, argAsts))
+                return (newTerm, term_syntax.FunctionCall(self.function_name.text, argAsts))
             except errors.CircaError,e:
                 raise parse_errors.InternalError(self.function_name, str(e))
 

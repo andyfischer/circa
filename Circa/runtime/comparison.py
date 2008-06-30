@@ -1,4 +1,4 @@
-
+#
 # Defines Circa functions for numeric comparison and equality checking
 
 from Circa.common import function_builder
@@ -59,11 +59,7 @@ class GreaterThanOrEquals(object):
         return a >= b
     
 
-
-
 def createFunctions(codeUnit):
     for functionDef in (Equals, NotEquals, LessThan, 
             LessThanOrEquals, GreaterThan, GreaterThanOrEquals):
         function_builder.importPythonFunction(codeUnit, functionDef)
-
-
