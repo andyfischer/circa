@@ -23,7 +23,6 @@ class Or(object):
     def evaluate(a,b):
         return a or b
 
-
 def createFunctions(codeUnit):
     function_builder.importPythonFunction(codeUnit, And)
     function_builder.importPythonFunction(codeUnit, Or)

@@ -56,6 +56,17 @@ class MapFeedback(object):
         hashtable[key] = desired
         target.functionTerm.needsUpdate = True
 
+class GetMember(object):
+    name = 'get-member'
+    inputs = ['ref', 'any']
+    output = 'ref'
+    hasState = False
+    meta = True
+
+    @staticmethod
+    def evaluate(cxt):
+        pass
+
 MAP_FEEDBACK = None
 
 def createFunctions(codeUnit):
