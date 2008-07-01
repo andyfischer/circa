@@ -12,33 +12,31 @@ class CircaSubroutine(ca_function.CircaFunction):
         ca_function.CircaFunction.__init__(self)
         self.pureFunction = False
         self.codeUnit = ca_codeunit.CodeUnit()
-        self.evaluateFunc = subroutineEvaluateFunc
 
     def iterateInnerTerms(self):
         for term in self.codeUnit.allTerms:
             yield term
 
+    def evaluateFunc(self, cxt):
+        subroutine = cxt.caller().functionTerm.cachedValue
 
-def subroutineEvaluateFunc(cxt):
-    subroutine = cxt.caller().functionTerm.cachedValue
+        # Copy inputs to subroutine's input placeholders
+        for index in range(cxt.numInputs()):
+            inputPlaceholderName = "#input_placeholder" + str(index)
+            inputPlaceholder = subroutine.codeUnit.getNamed(inputPlaceholderName)
+            debug._assert(inputPlaceholder is not None)
+            ca_variable.setValue(inputPlaceholder, cxt.input(index))
 
-    # Copy inputs to subroutine's input placeholders
-    for index in range(cxt.numInputs()):
-        inputPlaceholderName = "#input_placeholder" + str(index)
-        inputPlaceholder = subroutine.codeUnit.getNamed(inputPlaceholderName)
-        debug._assert(inputPlaceholder is not None)
-        ca_variable.setValue(inputPlaceholder, cxt.input(index))
+        # Execute
+        subroutine.codeUnit.execute()
 
-    # Execute
-    subroutine.codeUnit.execute()
-
-    # Find output placeholder, copy it to this term's output
-    if subroutine.codeUnit.containsName('#return_val'):
-        outputPlaceholder = subroutine.codeUnit.getNamed("#return_val")
-        cxt.setResult(outputPlaceholder.cachedValue)
-    else:
-        outputPlaceholder = None
-        cxt.setResult(None)
+        # Find output placeholder, copy it to this term's output
+        if subroutine.codeUnit.containsName('#return_val'):
+            outputPlaceholder = subroutine.codeUnit.getNamed("#return_val")
+            cxt.setResult(outputPlaceholder.cachedValue)
+        else:
+            outputPlaceholder = None
+            cxt.setResult(None)
 
 def toString(term):
     if term.cachedValue is None:

@@ -24,7 +24,8 @@ class CircaFunction(object):
         # do something, and then put some result into Term.cachedValue.
         # If the function has 'pureFunction' set to False, then it is
         # welcome to do other things too.
-        self.evaluateFunc = None
+        if not hasattr(self, 'evaluateFunc'):
+            self.evaluateFunc = None
 
         self.feedbackAccumulator = None
 
