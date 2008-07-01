@@ -119,6 +119,7 @@ def importPythonType(codeUnit, pythonClass):
       name
       toShortString
       iterateInnerTerms
+      instanceBased
     """
 
     debug._assert(isinstance(pythonClass, type))
@@ -127,11 +128,24 @@ def importPythonType(codeUnit, pythonClass):
 
     ca_type.setName(typeTerm, pythonClass.name)
 
-    def toShortString(term):
-        return term.cachedValue.toShortString()
+    instanceBased = True
+    try:
+        instanceBased = pythonClass.instanceBased
+    except AttributeError: pass
 
-    def iterateInnerTerms(term):
-        return term.cachedValue.iterateInnerTerms()
+
+    if instanceBased:
+        def toShortString(term):
+            return term.cachedValue.toShortString()
+
+        def iterateInnerTerms(term):
+            return term.cachedValue.iterateInnerTerms()
+    else:
+        toShortString = pythonClass.toShortString
+
+        iterateInnerTerms = lambda: []
+        try: iterateInnerTerms = pythonClass.iterateInnerTerms
+        except AttributeError: pass
 
     ca_type.setAllocateData(typeTerm, pythonClass)
     ca_type.setToShortString(typeTerm, toShortString)

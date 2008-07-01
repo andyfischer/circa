@@ -1,3 +1,8 @@
+List work:
+* Add parser support for lists
+* Add a ListGenerator function
+
+Struct work:
 * Add parser support to make struct types
 * Add code to ca_struct to instantiate structs
 * Add support where a type name can be used as a function (constructor)
@@ -6,9 +11,6 @@
 Subroutine work:
 * Make all subroutines inline (create terms on execute)
 * Make sure we are smart about when these terms get created
-
-Python importing work:
-* Add a function that will take a string and create a RawPythonFunction object
 
 Source generation work:
 * Add to-source-string for all builtin types, for literals
