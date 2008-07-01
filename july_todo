@@ -1,0 +1,18 @@
+* Add parser support to make struct types
+* Add code to ca_struct to instantiate structs
+* Add support where a type name can be used as a function (constructor)
+* Add get-field and set-field functions, for structs
+
+Subroutine work:
+* Make all subroutines inline (create terms on execute)
+* Make sure we are smart about when these terms get created
+
+Python importing work:
+* Add a function that will take a string and create a RawPythonFunction object
+
+Source generation work:
+* Add to-source-string for all builtin types, for literals
+* Add Term.termSyntaxHints, a dynamic set of hints (such as infix vs function call)
+
+Function calls:
+* Add support for function overloading by type
