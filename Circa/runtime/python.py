@@ -33,7 +33,27 @@ class ImportFunctions(object):
                 print "Importing " + name
                 function_builder.createFunction(cxt.codeUnit(), object)
 
+class RawPythonFunction(object):
+    name = 'RawPythonFunction'
+
+    def __init__(self):
+        pass
+
+
+class CompileRawFunction(object):
+    name = 'compile-raw-python-function'
+    inputs = ['string']
+    inputNames = ['pythonSource']
+    output = 'RawPythonFunction'
+    meta = True
+
+    @staticmethod
+    def evaluate(cxt):
+        source = cxt.input(0)
+        cxt.result().code = compile(source, '<compile-raw-python-function>', 'exec')
 
 def createFunctions(codeUnit):
     function_builder.importPythonFunction(codeUnit, Import)
     function_builder.importPythonFunction(codeUnit, ImportFunctions)
+    function_builder.importPythonType(codeUnit, RawPythonFunction)
+    function_builder.importPythonFunction(codeUnit, CompileRawFunction)

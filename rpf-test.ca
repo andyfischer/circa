@@ -1,0 +1,2 @@
+
+f = compile-raw-python-function('def ex(a): print a + 1')
