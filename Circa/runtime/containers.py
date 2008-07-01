@@ -56,16 +56,24 @@ class MapFeedback(object):
         hashtable[key] = desired
         target.functionTerm.needsUpdate = True
 
-class GetMember(object):
-    name = 'get-member'
-    inputs = ['ref', 'any']
-    output = 'ref'
-    hasState = False
-    meta = True
+class ListType(object):
+    name = 'list'
+    instanceBased = False
 
     @staticmethod
-    def evaluate(cxt):
-        pass
+    def toShortString(term):
+        print term.cachedValue
+
+class PackList(object):
+    name = 'pack-list'
+    inputs = ['ref']
+    output = 'list'
+    variableArgs = True
+    pure = True
+
+    @staticmethod
+    def evaluate(*args):
+        return args
 
 MAP_FEEDBACK = None
 
@@ -74,6 +82,9 @@ def createFunctions(codeUnit):
 
     global MAP_FEEDBACK
     MAP_FEEDBACK = function_builder.importPythonFunction(codeUnit, MapFeedback)
+
+    function_builder.importPythonType(codeUnit, ListType)
+    function_builder.importPythonFunction(codeUnit, PackList)
 
 """
 m = map(string,string)

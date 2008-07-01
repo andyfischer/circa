@@ -37,20 +37,34 @@ class RawPythonFunction(object):
     name = 'RawPythonFunction'
 
     def __init__(self):
-        pass
+        self.func = None
+
+    def call(self, *inputs):
+        self.func(*inputs)
 
 
 class CompileRawFunction(object):
     name = 'compile-raw-python-function'
-    inputs = ['string']
-    inputNames = ['pythonSource']
+    inputs = ['string', 'string']
+    inputNames = ['pythonSource', 'funcName']
     output = 'RawPythonFunction'
     meta = True
 
     @staticmethod
     def evaluate(cxt):
         source = cxt.input(0)
-        cxt.result().code = compile(source, '<compile-raw-python-function>', 'exec')
+        code = compile(source, '<compile-raw-python-function>', 'exec')
+        exec code
+        cxt.result().func = locals()[cxt.input(1)]
+
+class WrapRawPythonFunction(object):
+    name = 'wrap-raw-python-function'
+    inputs = ['RawPythonFunction']
+    inputNames = ['function']
+    output = 'Function'
+    # Unfinished
+
+
 
 def createFunctions(codeUnit):
     function_builder.importPythonFunction(codeUnit, Import)
