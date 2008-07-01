@@ -107,14 +107,12 @@ class CodeUnit(object):
 
         outputType = ca_function.outputType(function)
 
-        # Initialize cachedData
+        # Initialize cachedValue
         debug._assert(outputType is not None)
 
-        initializeFunc = ca_type.initialize(outputType)
-
-        debug._assert(initializeFunc is not None)
-
-        initializeFunc(newTerm)
+        allocateData = ca_type.allocateData(outputType)
+        debug._assert(allocateData is not None)
+        newTerm.cachedValue = allocateData()
 
         # Initialize the term, if this function has an initializeFunc
         if ca_function.initializeFunc(function):
