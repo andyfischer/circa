@@ -127,16 +127,13 @@ def importPythonType(codeUnit, pythonClass):
 
     ca_type.setName(typeTerm, pythonClass.name)
 
-    def initialize(term):
-        term.cachedValue = pythonClass()
-
     def toShortString(term):
         return term.cachedValue.toShortString()
 
     def iterateInnerTerms(term):
         return term.cachedValue.iterateInnerTerms()
 
-    ca_type.setInitialize(typeTerm, initialize)
+    ca_type.setAllocateData(typeTerm, pythonClass)
     ca_type.setToShortString(typeTerm, toShortString)
     ca_type.setIterateInnerTerms(typeTerm, iterateInnerTerms)
 

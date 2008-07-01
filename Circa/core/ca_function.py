@@ -30,8 +30,8 @@ class CircaFunction(object):
 
         self.feedbackPropagator = None
 
-def initializeTerm(term):
-    term.cachedValue = CircaFunction()
+def allocateData():
+    return CircaFunction()
 def toString(term):
     if term.cachedValue is None:
         return "<undefined Function>"

@@ -7,15 +7,16 @@ def emptyFunction(term):
 class CircaType(object):
     def __init__(self):
         self.name = None
-        self.initialize = None
+        self.allocateData = None
         self.toShortString = None
+        self.toSourceString = None
 
         def iterateInnerTerms(term):
             return []
         self.iterateInnerTerms = iterateInnerTerms
 
-def CircaType_initializeTerm(term):
-    term.cachedValue = CircaType()
+def CircaType_allocateData():
+    return CircaType()
 
 def field(fieldName):
     def accessor(term):
@@ -29,6 +30,7 @@ def field(fieldName):
     return (accessor, setter)
     
 (name, setName) = field('name')
-(initialize, setInitialize) = field('initialize')
+(allocateData, setAllocateData) = field('allocateData')
 (toShortString, setToShortString) = field('toShortString')
+(toSourceString, setToSourceString) = field('toSourceString')
 (iterateInnerTerms, setIterateInnerTerms) = field('iterateInnerTerms')
