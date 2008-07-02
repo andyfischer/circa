@@ -1,4 +1,0 @@
-
-
-class Type(object):
-   pass
