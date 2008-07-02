@@ -1,6 +1,5 @@
 f = compile-raw-python-function('def ex(a): print a + 1', 'ex')
-python-str = 'def heythere(*args): print args'
-print(python-str)
+python-str = 'def heythere(*args): print "hi"'
 test = compile-raw-python-function(python-str, 'heythere')
-wrapped = wrap-raw-python-function(test)
-wrapped(2)
+wrapped = wrap-raw-python-function(f, pack-list(int))
+wrapped(1)

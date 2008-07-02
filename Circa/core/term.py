@@ -67,6 +67,8 @@ class Term(object):
     def getIdentifier(self):
         return self.codeUnit.getIdentifier(self)
 
+    name = getIdentifier
+
     def getNames(self):
         return self.codeUnit.getNames(self)
 
@@ -121,6 +123,8 @@ class TermExecutionContext(object):
         return self.targetTerm.getInput(index)
     def input(self, index):
         return self.targetTerm.getInput(index).cachedValue
+    def inputs(self):
+        return [self.input(n) for n in range(self.numInputs())]
     def state(self):
         return self.targetTerm.state
     def caller(self):

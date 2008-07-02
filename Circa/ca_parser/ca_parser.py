@@ -39,7 +39,8 @@ def parseFile(filename):
 
     resultModule = None
     try:
-        # Compile to an AST
+    
+    # Compile to an AST
         compilationUnit = compilation_unit(tokens)
         resultModule = compilationUnit.createModule()
 
@@ -47,7 +48,6 @@ def parseFile(filename):
 
     except parse_errors.ParseError, e:
         errors.append(e)
-        pdb.pm()
 
     return (errors, resultModule)
 
