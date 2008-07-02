@@ -4,6 +4,7 @@
 # High-level parser, turns a string into a Circa code object.
 #
 
+import pdb
 from Circa.core import ca_codeunit
 from Circa.parser import ast
 import tokens as _tokens_module
@@ -46,6 +47,7 @@ def parseFile(filename):
 
     except parse_errors.ParseError, e:
         errors.append(e)
+        pdb.pm()
 
     return (errors, resultModule)
 

@@ -460,7 +460,7 @@ class LiteralString(Expression):
     def getTerm(self, context):
         term = context.createVariable(builtins.STRING_TYPE)
         # Strip quotation marks
-        value = self.token.text.strip("'\"")
+        value = self.token.text[1:-1]
         # Convert \n to newline
         value = value.replace("\\n","\n")
         ca_variable.setValue(term, value)
