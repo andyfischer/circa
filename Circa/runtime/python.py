@@ -1,7 +1,7 @@
 
+import pdb
 from Circa.common import (debug, function_builder)
 from Circa.core import builtins
-import pdb
 
 class Import(object):
     name = 'python-import'
@@ -42,7 +42,6 @@ class RawPythonFunction(object):
     def call(self, *inputs):
         self.func(*inputs)
 
-
 class CompileRawFunction(object):
     name = 'compile-raw-python-function'
     inputs = ['string', 'string']
@@ -60,14 +59,22 @@ class CompileRawFunction(object):
 class WrapRawPythonFunction(object):
     name = 'wrap-raw-python-function'
     inputs = ['RawPythonFunction']
-    inputNames = ['function']
+    inputNames = ['functionBody']
     output = 'Function'
-    # Unfinished
+    meta = True
 
-
+    @staticmethod
+    def evaluate(cxt):
+        pythonFunc = cxt.input(0).func
+        f = cxt.result()
+        f.name = pythonFunc.__name__
+        f.inputs = []
+        f.inputNames = []
+        f.evaluate = cxt.input(0).func
 
 def createFunctions(codeUnit):
     function_builder.importPythonFunction(codeUnit, Import)
     function_builder.importPythonFunction(codeUnit, ImportFunctions)
     function_builder.importPythonType(codeUnit, RawPythonFunction)
     function_builder.importPythonFunction(codeUnit, CompileRawFunction)
+    function_builder.importPythonFunction(codeUnit, WrapRawPythonFunction)
