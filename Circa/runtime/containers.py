@@ -57,7 +57,7 @@ class MapFeedback(object):
         target.functionTerm.needsUpdate = True
 
 class ListType(object):
-    name = 'list'
+    name = 'List'
     instanceBased = False
 
     @staticmethod
@@ -65,9 +65,9 @@ class ListType(object):
         print term.cachedValue
 
 class PackList(object):
-    name = 'pack-list'
+    name = 'list'
     inputs = ['ref']
-    output = 'list'
+    output = 'List'
     variableArgs = True
     pure = True
 
@@ -84,7 +84,7 @@ def createFunctions(codeUnit):
     MAP_FEEDBACK = function_builder.importPythonFunction(codeUnit, MapFeedback)
 
     function_builder.importPythonType(codeUnit, ListType)
-    function_builder.importPythonFunction(codeUnit, PackList)
+    builtins.PACK_LIST_FUNC = function_builder.importPythonFunction(codeUnit, PackList)
 
 """
 m = map(string,string)
