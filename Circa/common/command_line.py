@@ -3,10 +3,10 @@
 import os,sys,pdb,traceback
 from string import Template
 import Circa
-from Circa import parser
+from Circa import ca_parser
 from Circa.common import (debug, errors, codeunit_utils, pretty_print)
 from Circa.core import (builtins, ca_codeunit, ca_type, ca_function)
-from Circa.parser import ast as ast_module
+from Circa.ca_parser import ast as ast_module
 
 class CommandLine(object):
     def __init__(self, codeUnit=None):
@@ -48,7 +48,7 @@ class CommandLine(object):
             print self.describeTerm(term, "$id: $func_id($input_ids) = $value")
 
         elif command == 'eval' or command == 'e':
-            ast = parser.parseStatement(commandArgs)
+            ast = ca_parser.parseStatement(commandArgs)
             print ast
             result = ast.create(ast_module.CompilationContext(self.codeUnit))
             print str(result)
@@ -124,7 +124,7 @@ class CommandLine(object):
         else:
             # Interpret as a Circa statement
             try:
-                ast = parser.parseStatement(inputStr)
+                ast = ca_parser.parseStatement(inputStr)
                 result = ast.create(ast_module.CompilationContext(self.codeUnit))
                 if result is None:
                     print "(void)"
@@ -242,7 +242,7 @@ def main():
         if verbose:
             print "Reading file " + filename + "..."
 
-        (errors, module) = parser.parseFile(filename)
+        (errors, module) = ca_parser.parseFile(filename)
 
         if errors:
             print len(errors), "parsing errors occured"

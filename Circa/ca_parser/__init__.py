@@ -7,7 +7,7 @@
 import pdb
 
 import tokens as _tokens_module
-import parser as _parser_module
+import ca_parser as _parser_module
 
 def parseStatement(string):
     "Parse the string as a statement, and return an AST"
