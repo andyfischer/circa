@@ -1,6 +1,6 @@
 
 from Circa.core import (ca_codeunit)
-from Circa.parser import ast
+from Circa.ca_parser import ast
 from Circa.utils.string_buffer import StringBuffer
 
 def appendLineComment(codeUnit, comment):

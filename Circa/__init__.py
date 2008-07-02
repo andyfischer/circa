@@ -38,10 +38,10 @@ def startReplLoop():
     cl.doInputLoop()
     
 def _loadStandardModule(name):
-    from Circa import parser
+    from Circa import ca_parser
 
     filename = os.path.join(os.environ['CIRCA_HOME'], 'stdlib', name + '.ca')
-    (errors, codeUnit) = parser.parseFile(filename)
+    (errors, codeUnit) = ca_parser.parseFile(filename)
 
     if errors:
         print "Errors in %s module:" % name

@@ -41,10 +41,10 @@ class LoadModule(object):
 
     @staticmethod
     def evaluate(name):
-        from Circa import parser
+        from Circa import ca_parser
         filename = name + '.ca'
 
-        (errors, module) = parser.parseFile(filename)
+        (errors, module) = ca_parser.parseFile(filename)
         debug._assert(module.codeUnit is not None)
 
         if errors:

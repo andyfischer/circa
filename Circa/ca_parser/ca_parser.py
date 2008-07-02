@@ -6,7 +6,7 @@
 
 import pdb
 from Circa.core import ca_codeunit
-from Circa.parser import ast
+from Circa.ca_parser import ast
 import tokens as _tokens_module
 from token_definitions import *
 import parse_errors
