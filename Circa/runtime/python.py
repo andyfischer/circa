@@ -58,8 +58,8 @@ class CompileRawFunction(object):
 
 class WrapRawPythonFunction(object):
     name = 'wrap-raw-python-function'
-    inputs = ['RawPythonFunction', 'list']
-    inputNames = ['functionBody', 'inputTypes']
+    inputs = ['RawPythonFunction', 'List', 'bool']
+    inputNames = ['functionBody', 'inputTypes', 'pure']
     output = 'Function'
     meta = True
 
@@ -73,6 +73,7 @@ class WrapRawPythonFunction(object):
         # Need some more sophisticated solution.
         f.inputTypes = list(cxt.inputTerm(1).inputs)
         f.outputType = builtins.VOID_TYPE
+        f.pureFunction = cxt.input(2)
 
         def evaluateFunc(cxt):
             pythonFunc(*cxt.inputs())

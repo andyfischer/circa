@@ -469,6 +469,20 @@ class LiteralString(Expression):
     def renderSource(self,output):
         output.write(self.token.text)
 
+class ListExpr(Expression):
+    def __init__(self):
+        self.elements = []
+    def append(self, expr):
+        debug._assert(isinstance(expr,Expression))
+        self.elements.append(expr)
+    def getTerm(self, context):
+        terms = []
+        for element in self.elements:
+            t = element.getTerm(context)
+            terms.append(t)
+
+        return context.createTerm(builtins.PACK_LIST_FUNC, terms)
+
 class Literal(Expression):
     def __init__(self, token, hasQuestionMark=False):
         self.token = token

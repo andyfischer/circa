@@ -186,6 +186,11 @@ def atom(tokens):
         questionMark = optional_question_mark(tokens)
         return ast.Literal(token)
 
+    # List expression (surrounded by []s)
+    # Disabled
+    #if tokens.nextIs(LBRACE):
+    #    return list_expr(tokens)
+
     # Identifier
     if tokens.nextIs(IDENT):
         token = tokens.consume()
@@ -262,6 +267,21 @@ def function_decl(tokens):
 
     result.closeBracket = tokens.consume(RBRACKET)
     
+    return result
+
+def list_expr(tokens):
+    lbrace = tokens.consume(LBRACE)
+    result = ast.ListExpr
+
+    while not tokens.nextIs(RBRACE):
+        result.append(infix_expression(tokens))
+
+        if not tokens.nextIs(COMMA):
+            break
+        
+        tokens.consume(COMMA)
+
+    rbrace = tokens.consume(RBRACE)
     return result
 
 def return_statement(tokens):
