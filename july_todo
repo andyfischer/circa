@@ -1,7 +1,3 @@
-List work:
-* Add parser support for lists
-* Add a ListGenerator function
-
 Struct work:
 * Add parser support to make struct types
 * Add code to ca_struct to instantiate structs
