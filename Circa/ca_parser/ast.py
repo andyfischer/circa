@@ -593,6 +593,7 @@ class FunctionCall(Expression):
                 newTerm = context.createTerm(func, inputs=argTerms)
                 return (newTerm, term_syntax.FunctionCall(self.function_name.text, argAsts))
             except errors.CircaError,e:
+                pdb.set_trace()
                 raise parse_errors.InternalError(self.function_name, str(e))
 
         else:

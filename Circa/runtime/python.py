@@ -58,8 +58,8 @@ class CompileRawFunction(object):
 
 class WrapRawPythonFunction(object):
     name = 'wrap-raw-python-function'
-    inputs = ['RawPythonFunction']
-    inputNames = ['functionBody']
+    inputs = ['RawPythonFunction', 'list']
+    inputNames = ['functionBody', 'inputTypes']
     output = 'Function'
     meta = True
 
@@ -68,9 +68,15 @@ class WrapRawPythonFunction(object):
         pythonFunc = cxt.input(0).func
         f = cxt.result()
         f.name = pythonFunc.__name__
-        f.inputs = []
-        f.inputNames = []
-        f.evaluate = cxt.input(0).func
+        # This method of accessing the list of input types is very hacky.
+        # Can't do this the regular way b/c list contents are passed as values.
+        # Need some more sophisticated solution.
+        f.inputTypes = list(cxt.inputTerm(1).inputs)
+        f.outputType = builtins.VOID_TYPE
+
+        def evaluateFunc(cxt):
+            pythonFunc(*cxt.inputs())
+        f.evaluateFunc = evaluateFunc
 
 def createFunctions(codeUnit):
     function_builder.importPythonFunction(codeUnit, Import)
