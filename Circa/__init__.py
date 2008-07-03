@@ -12,6 +12,7 @@ def initialize():
 
     _loadStandardModule('parsing')
     _loadStandardModule('master')
+    _loadStandardModule('math')
 
     LOADED_MODULES['main'] = ca_codeunit.CodeUnit()
 
