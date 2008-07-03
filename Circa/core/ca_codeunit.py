@@ -42,7 +42,7 @@ class CodeUnit(object):
         """
         return self._newTerm()
 
-    def createTerm(self, function, inputs, branch=None):
+    def createTerm(self, function, inputs, branch=None, initialValue=None):
         """
         Create a term with the given function and inputs.
         This call may reuse an existing term, if it's correct to do so.
@@ -54,8 +54,7 @@ class CodeUnit(object):
         debug._assert(isinstance(function, Term))
         debug._assert(isinstance(inputs, list))
         debug._assert(branch is None or isinstance(branch,Branch))
-        for input in inputs:
-            debug._assert(input is not None)
+        for input in inputs: debug._assert(input is not None)
 
         # Do type checking
         functionInputTypes = ca_function.inputTypes(function)
@@ -110,9 +109,12 @@ class CodeUnit(object):
         # Initialize cachedValue
         debug._assert(outputType is not None)
 
-        allocateData = ca_type.allocateData(outputType)
-        debug._assert(allocateData is not None)
-        newTerm.cachedValue = allocateData()
+        if initialValue is None:
+            allocateData = ca_type.allocateData(outputType)
+            debug._assert(allocateData is not None)
+            newTerm.cachedValue = allocateData()
+        else:
+            newTerm.cachedValue = initialValue
 
         # Initialize the term, if this function has an initializeFunc
         if ca_function.initializeFunc(function):
@@ -131,14 +133,15 @@ class CodeUnit(object):
 
         return newTerm
 
-    def createConstant(self, type, branch=None):
+    def createConstant(self, type, value=None, branch=None):
+
         debug._assert(isinstance(type, Term))
 
         # Fetch the constant function for this type
         constantFunc = self.createTerm(builtins.CONST_GENERATOR, [type])
 
         # Create the term
-        return self.createTerm(constantFunc, [], branch)
+        return self.createTerm(constantFunc, [], branch, initialValue=value)
 
     def createVariable(self, type, branch=None):
         debug._assert(isinstance(type, Term))

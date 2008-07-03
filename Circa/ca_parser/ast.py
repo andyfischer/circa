@@ -60,8 +60,8 @@ class CompilationContext(object):
     def createTerm(self, function, inputs):
         return self.codeUnit.createTerm(function, inputs, branch=self.branch)
 
-    def createConstant(self, type):
-        return self.codeUnit.createConstant(type, branch=self.branch)
+    def createConstant(self, type, value=None):
+        return self.codeUnit.createConstant(type, value=value, branch=self.branch)
 
     def createVariable(self, type):
         return self.codeUnit.createVariable(type, branch=self.branch)
@@ -417,8 +417,8 @@ class Infix(Expression):
             debug._assert(isinstance(self.right, Ident))
             (leftTerm, leftAst) = self.left.getTerm(context)
 
-            rightTermAsString = context.createConstant(builtins.STRING_TYPE)
-            ca_variable.setValue(rightTermAsString, self.right.token.text)
+            rightTermAsString = context.createConstant(builtins.STRING_TYPE,
+                    value = self.right.token.text)
 
             newTerm = context.createTerm(builtins.GET_FIELD,
                     inputs=[leftTerm, rightTermAsString])
@@ -572,8 +572,7 @@ class Unary(Expression):
 
     def getTerm(self, context):
         mult = context.getNamed('mult')
-        negative_one = context.codeUnit.createConstant(builtins.INT_TYPE)
-        ca_variable.setValue(negative_one, -1)
+        negative_one = context.codeUnit.createConstant(builtins.INT_TYPE, value = -1)
         (rightTerm, rightAst) = self.right.getTerm(context)
         newTerm = context.createTerm(mult,
                    inputs = [negative_one, rightTerm])
@@ -636,8 +635,7 @@ class FunctionCall(Expression):
 def getOperatorFunction(context, token):
 
     # Turn the token's text into a Circa string
-    tokenAsString = context.createConstant(builtins.STRING_TYPE)
-    ca_string.setValue(tokenAsString, token.text)
+    tokenAsString = context.createConstant(builtins.STRING_TYPE, value=token.text)
 
     # Find operator function
     operatorFunc = context.getNamed('operator')
