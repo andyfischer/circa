@@ -11,6 +11,10 @@ class CircaStructDefinition(object):
     def appendMember(self, name, type):
         self.members.append((name,type))
 
+class DynamicObject(object):
+    name = 'dynamic-object'
+
+
 class GetField(object):
     name = 'get-field'
     inputs = ['ref', 'string']
@@ -20,7 +24,9 @@ class GetField(object):
 
     @staticmethod
     def evaluate(cxt):
-        print "todo"
+        term = cxt.inputTerm(0)
+        type = term.getType()
+        cxt.setResult(type.getField(term, cxt.input(1)))
    
 def createTerms(codeUnit):
     builtins.GET_FIELD = function_builder.importPythonFunction(codeUnit, GetField)
