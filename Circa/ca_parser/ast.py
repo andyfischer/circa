@@ -412,6 +412,18 @@ class Infix(Expression):
             return context.getTerm(right_func, inputs=[left_inputs])
         """
 
+        # Evaluate as a dotted expression?
+        if self.token.match == DOT:
+            debug._assert(isinstance(self.right, Ident))
+            (leftTerm, leftAst) = self.left.getTerm(context)
+
+            rightTermAsString = context.createConstant(builtins.STRING_TYPE)
+            ca_variable.setValue(rightTermAsString, self.right.token.text)
+
+            newTerm = context.createTerm(builtins.GET_FIELD,
+                    inputs=[leftTerm, rightTermAsString])
+            return (newTerm, None)
+
         # Normal function?
         # Try to find a defined operator
         normalFunction = getOperatorFunction(context, self.token)

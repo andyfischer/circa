@@ -86,27 +86,3 @@ def createFunctions(codeUnit):
     function_builder.importPythonType(codeUnit, ListType)
     builtins.PACK_LIST_FUNC = function_builder.importPythonFunction(codeUnit, PackList)
 
-"""
-m = map(string,string)
-or
-m = Map(string,string)
-
-m('a') := 'b'
-print m('a')
-
-map-constructor:
-    hasState = True
-    inputTypes = [builtins.TYPE_TYPE, builtins.TYPE_TYPE]
-    outputType = [builtins.FUNC_TYPE]
-    state = current associations
-    evaluate = return a Function where:
-        hasState = False
-        inputTypes = (first type)
-        outputType = (second type)
-        evaluate:
-            in functionTerm.state, find association of input0 and return it
-        feedback:
-            in functionTerm.state, bind input0 to feedback0
-"""
-
-
