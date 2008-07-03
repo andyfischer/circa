@@ -26,7 +26,7 @@ def importPythonFunction(codeUnit, pythonClass, instanceBased = False):
     """
 
     debug._assert(isinstance(pythonClass, type))
-    debug.assertType(pythonClass.inputs, list, 'pythonClass.inputs')
+    debug.assertType(pythonClass.inputs, list)
 
     def findType(typeName):
         type = codeUnit.getNamed(typeName)
@@ -147,7 +147,7 @@ def importPythonType(codeUnit, pythonClass):
         try: iterateInnerTerms = pythonClass.iterateInnerTerms
         except AttributeError: pass
 
-    ca_type.setAllocateData(typeTerm, pythonClass)
+    ca_type.setAllocateData(typeTerm, lambda: pythonClass())
     ca_type.setToShortString(typeTerm, toShortString)
     ca_type.setIterateInnerTerms(typeTerm, iterateInnerTerms)
 

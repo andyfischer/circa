@@ -1,12 +1,18 @@
 
 from Circa.utils.string_buffer import StringBuffer
-import Circa.debug
+from Circa.common import debug
 
 class RawPythonFunction(object):
     name = 'RawPythonFunction'
 
     def __init__(self):
         self.function = None
+
+    @staticmethod
+    def create(funcName, inputs, body):
+        obj = RawPythonFunction()
+        obj.compile(funcName, inputs, body)
+        return obj
 
     def compile(funcName, inputs, body):
         debug._assertType(funcName, str)

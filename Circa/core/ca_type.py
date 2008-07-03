@@ -1,19 +1,35 @@
 
+import types
 from Circa.common import debug
+import raw_python
 
 def emptyFunction(term):
     pass
 
 class CircaType(object):
     def __init__(self):
-        self.name = None
+        self.name = "anon"
         self.allocateData = None
         self.toShortString = None
         self.toSourceString = None
+        self.iterateInnerTerms = None
 
-        def iterateInnerTerms(term):
-            return []
-        self.iterateInnerTerms = iterateInnerTerms
+    def __setattr__(self, name, obj):
+        if name == "name":
+            debug.assertType(obj, str)
+        elif name == "allocateData":
+            debug.assertNullableType(obj, types.FunctionType)
+        elif name == "toShortString":
+            debug.assertNullableType(obj, types.FunctionType)
+        elif name == "toSourceString":
+            debug.assertNullableType(obj, types.FunctionType)
+        elif name == "iterateInnerTerms":
+            debug.assertNullableType(obj, types.FunctionType)
+        else:
+            debug._assert(False, "CircaType has no field called \""+name+"\"")
+
+
+        self.__dict__[name] = obj
 
 def CircaType_allocateData():
     return CircaType()
