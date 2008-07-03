@@ -207,6 +207,7 @@ def atom(tokens):
     if tokens.finished():
         raise parse_errors.UnexpectedEOF()
 
+    pdb.set_trace()
     raise parse_errors.UnexpectedToken(tokens.next())
 
 def optional_question_mark(tokens):
@@ -222,6 +223,9 @@ def function_call(tokens):
     function_name = tokens.consume(IDENT)
     tokens.consume(LPAREN)
 
+    wasSkippingNewline = tokens.isSkipping(NEWLINE)
+    tokens.startSkipping(NEWLINE)
+
     args = []
 
     if not tokens.nextIs(RPAREN):
@@ -231,6 +235,8 @@ def function_call(tokens):
             tokens.consume(COMMA)
             args.append( infix_expression(tokens) )
 
+    if not wasSkippingNewline:
+        tokens.stopSkipping(NEWLINE)
     tokens.consume(RPAREN)
 
     return ast.FunctionCall(function_name, args)

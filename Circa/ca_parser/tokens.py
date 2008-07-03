@@ -144,6 +144,9 @@ class TokenStream(object):
     def stopSkippingEverything(self):
         self.skipSet = set()
 
+    def isSkipping(self, token_def):
+        return token_def in self.skipSet
+
     def nextIs(self, match, lookahead=0):
         next = self.next(lookahead)
         if not next: return False
