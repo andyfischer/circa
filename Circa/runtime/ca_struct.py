@@ -11,8 +11,15 @@ class CircaStructDefinition(object):
     def appendMember(self, name, type):
         self.members.append((name,type))
 
-class DynamicObject(object):
+class DynamicObjectType(object):
     name = 'dynamic-object'
+
+    def __init__(self):
+        self.members = {}
+
+    @staticmethod
+    def getField(term, name):
+        pass
 
 
 class GetField(object):
@@ -26,6 +33,9 @@ class GetField(object):
     def evaluate(cxt):
         term = cxt.inputTerm(0)
         type = term.getType()
+        if type.getField is None:
+            print "Error in get-field, type does not implement getField"
+            return
         cxt.setResult(type.getField(term, cxt.input(1)))
    
 def createTerms(codeUnit):
