@@ -22,9 +22,6 @@ def float_toString(term):
 def float_toSource(term):
     return str(term.cachedValue)
 
-def voidToString(term):
-    return "<void>"
-
 def anyToString(term):
     return str(term.cachedValue)
 
@@ -37,54 +34,62 @@ def createBuiltinTypes(kernel):
     intTerm = kernel.createConstant(builtins.TYPE_TYPE, value=intType)
     kernel.bindName(intTerm, 'int')
 
-    stringType = kernel.createConstant(builtins.TYPE_TYPE)
-    ca_type.setName(stringType, 'string')
-    ca_type.setAllocateData(stringType, lambda: "")
-    ca_type.setToShortString(stringType, string_toString)
-    kernel.bindName(stringType, 'string')
+    stringType = ca_type.CircaType()
+    stringType.name = 'string'
+    stringType.allocateData = lambda: ""
+    stringType.toShortString = string_toString
+    stringType.toSourceSpecialHandler = string_toSource
+    stringTerm = kernel.createConstant(builtins.TYPE_TYPE, value=stringType)
+    kernel.bindName(stringTerm, 'string')
 
-    boolType = kernel.createConstant(builtins.TYPE_TYPE)
-    ca_type.setName(boolType, 'bool')
-    ca_type.setAllocateData(boolType, lambda: False)
-    ca_type.setToShortString(boolType, bool_toString)
-    kernel.bindName(boolType, 'bool')
+    boolType = ca_type.CircaType()
+    boolType.name = 'bool'
+    boolType.allocateData = lambda: False
+    boolType.toShortString = bool_toString
+    boolType.toSourceSpecialHandler = bool_toSource
+    boolTerm = kernel.createConstant(builtins.TYPE_TYPE, value=boolType)
+    kernel.bindName(boolTerm, 'bool')
 
-    floatType = kernel.createConstant(builtins.TYPE_TYPE)
-    ca_type.setName(floatType, 'float')
-    ca_type.setAllocateData(floatType, lambda: 0.0)
-    ca_type.setToShortString(floatType, float_toString)
-    kernel.bindName(floatType, 'float')
+    floatType = ca_type.CircaType()
+    floatType.name = 'float'
+    floatType.allocateData = lambda: 0.0
+    floatType.toShortString = float_toString
+    floatType.toSourceSpecialHandler = float_toSource
+    floatTerm = kernel.createConstant(builtins.TYPE_TYPE, value=floatType)
+    kernel.bindName(floatTerm, 'float')
 
-    referenceType = kernel.createConstant(builtins.TYPE_TYPE)
-    ca_type.setName(referenceType, 'ref')
-    ca_type.setAllocateData(referenceType, lambda: None)
-    kernel.bindName(referenceType, 'ref')
+    referenceType = ca_type.CircaType()
+    referenceType.name = 'ref'
+    referenceType.allocateData = lambda: None
+    referenceTerm = kernel.createConstant(builtins.TYPE_TYPE, value=referenceType)
+    kernel.bindName(referenceTerm, 'ref')
 
-    voidType = kernel.createConstant(builtins.TYPE_TYPE)
-    ca_type.setName(voidType, 'void')
-    ca_type.setAllocateData(voidType, lambda: None)
-    ca_type.setToShortString(voidType, voidToString)
-    kernel.bindName(voidType, 'void')
+    voidType = ca_type.CircaType()
+    voidType.name = 'void'
+    voidType.allocateData = lambda: None
+    voidType.toShortString = lambda: '<void>'
+    voidTerm = kernel.createConstant(builtins.TYPE_TYPE, value=voidType)
+    kernel.bindName(voidTerm, 'void')
 
-    anyType = kernel.createConstant(builtins.TYPE_TYPE)
-    ca_type.setName(anyType, 'any')
-    ca_type.setAllocateData(anyType, lambda: None)
-    ca_type.setToShortString(anyType, anyToString)
-    kernel.bindName(anyType, 'any')
+    anyType = ca_type.CircaType()
+    anyType.name = 'any'
+    anyType.allocateData = lambda: None
+    anyTerm = kernel.createConstant(builtins.TYPE_TYPE, value=anyType)
+    kernel.bindName(anyTerm, 'any')
 
     subroutineType = function_builder.importPythonType(kernel, ca_subroutine.CircaSubroutine)
 
     # Make constant-generator terms for all new functions
-    for type in (intTerm, stringType, boolType, floatType, subroutineType):
+    for type in (intTerm, stringTerm, boolTerm, floatTerm, subroutineType):
         kernel.createTerm(builtins.CONST_GENERATOR, [type])
 
     # Export objects
     builtins.INT_TYPE = intTerm
-    builtins.STRING_TYPE = stringType
-    builtins.BOOL_TYPE = boolType
-    builtins.FLOAT_TYPE = floatType
-    builtins.REFERENCE_TYPE = referenceType
-    builtins.REF_TYPE = referenceType # Alias
-    builtins.VOID_TYPE = voidType
-    builtins.ANY_TYPE = anyType
+    builtins.STRING_TYPE = stringTerm
+    builtins.BOOL_TYPE = boolTerm
+    builtins.FLOAT_TYPE = floatTerm
+    builtins.REFERENCE_TYPE = referenceTerm
+    builtins.REF_TYPE = referenceTerm # Alias
+    builtins.VOID_TYPE = voidTerm
+    builtins.ANY_TYPE = anyTerm
     builtins.SUBROUTINE_TYPE = subroutineType
