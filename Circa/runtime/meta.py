@@ -24,10 +24,21 @@ class ToSource(object):
     @staticmethod
     def evaluate(cxt):
         term = cxt.inputTerm(0)
-        if term.termSyntaxInfo is None:
-            cxt.setResult("")
-        else:
-            cxt.setResult(str(term.termSyntaxInfo))
+
+        # Check if the function has a special handler
+        type = term.getType()
+        if type.value().toSourceSpecialHandler is not None:
+            cxt.setResult(type.toSourceSpecialHandler(term))
+            return
+
+        # Otherwise, generate source in the standard way
+        functionName = term.termSyntaxHints.functionName
+        sourceOfInputs = []
+        for inputTerm in term.inputs:
+            inputToSourceTerm = cxt.codeUnit().createTerm('to-source', [input])
+            sourceOfInputs.append(inputToSourceTerm.value())
+            
+        cxt.setResult(functionName + "(" + ",".join(sourceOfInputs) + ")")
 
 class ModuleToSource(object):
     name = 'module-to-source'

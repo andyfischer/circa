@@ -41,8 +41,8 @@ class Term(object):
         # The CodeUnit object that owns us
         self.codeUnit = None
         
-        # This structure keeps track of how to turn us back into source code
-        self.termSyntaxInfo = None
+        # This structure gives hints on how to produce source code for this term
+        self.termSyntaxHints = TermSyntaxHints()
 
         self.givenName = None
         self.debugName = None
@@ -71,6 +71,9 @@ class Term(object):
 
     def getNames(self):
         return self.codeUnit.getNames(self)
+
+    def value(self):
+        return self.cachedValue
 
     def isConstant(self):
         "Returns true if this term is a constant term"
@@ -111,12 +114,20 @@ class Term(object):
     def __str__(self):
         return str(self.cachedValue)
 
+class TermSyntaxHints(object):
+    __slots__ = ['functionName', 'infix']
+
+    def __init__(self):
+        self.functionName = None
+        self.infix = False
+
 class TermExecutionContext(object):
     """
     This object is provided to evaluate functions. The purpose is to be
     able to track when these calls occur, and hope to provide replacements
     for them.
     """
+
     def __init__(self, term):
         self.targetTerm = term
     def inputTerm(self, index):

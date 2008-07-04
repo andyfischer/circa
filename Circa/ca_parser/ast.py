@@ -240,8 +240,8 @@ class ReturnStatement(Statement):
     def getFirstToken(self):
         return self.returnKeyword
     def create(self, context):
-        (result,ast) = self.right.getTerm(context)
-        result.termSyntaxInfo = term_syntax.Expression(ast, '#return_val')
+        result = self.right.getTerm(context)
+        #result.termSyntaxInfo = term_syntax.Expression(ast, '#return_val')
         context.bindName(result, '#return_val')
     def renderSource(self, output):
         output.write('return ')
@@ -337,12 +337,12 @@ class NameBinding(Statement):
         self.right = right
 
     def create(self, context):
-        (rightTerm, ast) = self.right.getTerm(context)
+        rightTerm = self.right.getTerm(context)
         name = self.left.text
         if not isinstance(rightTerm, Term):
             raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
 
-        rightTerm.termSyntaxInfo = term_syntax.Expression(ast, name)
+        #rightTerm.termSyntaxInfo = term_syntax.Expression(ast, name)
         context.bindName(rightTerm, name)
         return rightTerm
 
@@ -361,8 +361,8 @@ class HighLevelOptionStatement(Statement):
 
 class Expression(Statement):
     def create(self, context):
-        (term,ast) = self.getTerm(context)
-        term.termSyntaxInfo = term_syntax.Expression(ast)
+        term = self.getTerm(context)
+        #term.termSyntaxInfo = term_syntax.Expression(ast)
         return term
 
     def inputs(self):
@@ -394,51 +394,57 @@ class Infix(Expression):
 
         # Evaluate as feedback?
         if self.token.match == COLON_EQUALS:
-            (leftTerm, leftAst) = self.left.getTerm(context)
-            (rightTerm, rightAst) = self.right.getTerm(context)
+            leftTerm = self.left.getTerm(context)
+            rightTerm = self.right.getTerm(context)
             debug._assert(leftTerm is not None)
             debug._assert(rightTerm is not None)
             newTerm = context.createTerm(builtins.FEEDBACK_FUNC, [leftTerm, rightTerm])
+            newTerm.termSyntaxHints.infix = True
+            newTerm.termSyntaxHints.functionName = ':='
             newTerm.execute()
-            return (newTerm, term_syntax.Infix(':=', leftAst, rightAst))
+            return newTerm
 
         # Evaluate as a right-arrow?
         if self.token.match == RIGHT_ARROW:
-            (left_inputs, leftAst) = self.left.getTerm(context)
-            (right_func, rightAst) = self.right.getTerm(context)
+            left_inputs = self.left.getTerm(context)
+            right_func = self.right.getTerm(context)
 
-            return (context.createTerm(right_func, inputs=[left_inputs]), None)
+            newTerm = context.createTerm(right_func, inputs=[left_inputs])
+            newTerm.termSyntaxHints.infix = True
+            newTerm.termSyntaxHints.functionName = '->'
 
         # Evaluate as a dotted expression?
         if self.token.match == DOT:
             debug._assert(isinstance(self.right, Ident))
-            (leftTerm, leftAst) = self.left.getTerm(context)
+            leftTerm = self.left.getTerm(context)
 
             rightTermAsString = context.createConstant(builtins.STRING_TYPE,
                     value = self.right.token.text)
 
             newTerm = context.createTerm(builtins.GET_FIELD,
                     inputs=[leftTerm, rightTermAsString])
-            return (newTerm, None)
+            return newTerm
 
         # Normal function?
         # Try to find a defined operator
         normalFunction = getOperatorFunction(context, self.token)
         if normalFunction is not None:
             debug._assert(normalFunction.cachedValue is not None)
-            (leftTerm, leftAst) = self.left.getTerm(context)
-            (rightTerm, rightAst) = self.right.getTerm(context)
+            leftTerm = self.left.getTerm(context)
+            rightTerm = self.right.getTerm(context)
 
             newTerm = context.createTerm(normalFunction,
                 inputs=[leftTerm, rightTerm])
-            return (newTerm, term_syntax.Infix(self.token.text,leftAst,rightAst))
+            newTerm.termSyntaxHints.infix = True
+            newTerm.termSyntaxHints.functionName = self.token.text
+            return newTerm
 
         # Evaluate as a function + assign?
         # Try to find an assign operator
         assignFunction = getAssignOperatorFunction(self.token.match)
         if assignFunction is not None:
-            (leftTerm, leftAst) = self.left.getTerm(context)
-            (rightTerm, rightAst) = self.right.getTerm(context)
+            leftTerm = self.left.getTerm(context)
+            rightTerm = self.right.getTerm(context)
 
             # create a term that's the result of the operation
             result_term = context.createTerm(assignFunction,
@@ -473,7 +479,7 @@ class LiteralString(Expression):
         # Convert \n to newline
         value = value.replace("\\n","\n")
         ca_variable.setValue(term, value)
-        return (term, term_syntax.TermValue(term))
+        return term
 
     def renderSource(self,output):
         output.write(self.token.text)
@@ -524,7 +530,7 @@ class Literal(Expression):
 
         # Assign value
         ca_variable.setValue(newTerm, self.value)
-        return (newTerm, term_syntax.TermValue(newTerm))
+        return newTerm #, term_syntax.TermValue(newTerm))
 
     def getFirstToken(self):
         return self.token
@@ -549,7 +555,7 @@ class Ident(Expression):
         if not term:
             raise parse_errors.IdentifierNotFound(self.token)
 
-        return (term, term_syntax.TermName(term, name))
+        return term
 
     def getFirstToken(self):
         return self.token
@@ -570,11 +576,11 @@ class Unary(Expression):
     def getTerm(self, context):
         mult = context.getNamed('mult')
         negative_one = context.codeUnit.createConstant(builtins.INT_TYPE, value = -1)
-        (rightTerm, rightAst) = self.right.getTerm(context)
+        rightTerm = self.right.getTerm(context)
         newTerm = context.createTerm(mult,
                    inputs = [negative_one, rightTerm])
         newTerm.ast = self
-        return (newTerm, term_syntax.Unary('-', rightAst))
+        return newTerm #term_syntax.Unary('-', rightAst))
 
     def getFirstToken(self):
         return self.functionToken;
@@ -602,14 +608,12 @@ class FunctionCall(Expression):
 
     def getTerm(self, context):
         argTerms = []
-        argAsts = []
         for expr in self.args:
             if isinstance(expr, NamedFunctionArg):
                 pass #todo
 
-            (term, ast) = expr.getTerm(context)
+            term = expr.getTerm(context)
             argTerms.append(term)
-            argAsts.append(ast)
 
         func = context.getNamed(self.function_name.text)
 
@@ -621,7 +625,8 @@ class FunctionCall(Expression):
         if func.getType() in (builtins.FUNCTION_TYPE, builtins.SUBROUTINE_TYPE):
             try:
                 newTerm = context.createTerm(func, inputs=argTerms)
-                return (newTerm, term_syntax.FunctionCall(self.function_name.text, argAsts))
+                newTerm.functionName = self.function_name.text
+                return newTerm
             except errors.CircaError,e:
                 pdb.set_trace()
                 raise parse_errors.InternalError(self.function_name, str(e))

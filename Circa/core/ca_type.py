@@ -11,7 +11,7 @@ class CircaType(object):
         self.name = "anon"
         self.allocateData = None
         self.toShortString = None
-        self.toSourceString = None
+        self.toSourceSpecialHandler = None
         self.iterateInnerTerms = None
 
     def __setattr__(self, name, obj):
@@ -21,7 +21,7 @@ class CircaType(object):
             debug.assertNullableType(obj, types.FunctionType)
         elif name == "toShortString":
             debug.assertNullableType(obj, types.FunctionType)
-        elif name == "toSourceString":
+        elif name == "toSourceSpecialHandler":
             debug.assertNullableType(obj, types.FunctionType)
         elif name == "iterateInnerTerms":
             debug.assertNullableType(obj, types.FunctionType)
@@ -29,7 +29,6 @@ class CircaType(object):
             debug.assertNullableType(obj, types.FunctionType)
         else:
             debug._assert(False, "CircaType has no field called \""+name+"\"")
-
 
         self.__dict__[name] = obj
 
