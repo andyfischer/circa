@@ -23,12 +23,8 @@ def importFunction(functionDef):
             instanceBased=True)
 
 def getGlobal(name):
-    from Circa.core import builtins
-    if builtins.KERNEL.definesName(name):
-        return builtins.KERNEL.getNamed(name)
-
     for module in LOADED_MODULES.values():
-        if module.definesName(name):
+        if module.containsName(name):
             return module.getNamed(name)
 
     return None
