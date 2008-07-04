@@ -14,7 +14,14 @@ def fail(message):
     pdb.set_trace()
 
 def assertType(object, expectedType):
-    if not isinstance(object, expectedType):
+    """
+    expectedType can be a type or a list of types
+    """
+    if isinstance(expectedType, list):
+        matches = any([isinstance(object, t) for t in expectedType])
+    else:
+        matches = isinstance(object, expectedType)
+    if not matches:
         print "Type fail, expected "+str(expectedType)+" but found "+str(type(object))
         pdb.set_trace()
 

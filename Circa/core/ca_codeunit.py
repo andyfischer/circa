@@ -10,15 +10,14 @@ from term import Term
 from branch import Branch
 
 class CodeUnit(object):
+    __slots__ = ['allTerms', 'mainBranch']
+
     def __init__(self):
         # allTerms is a list of Terms
         self.allTerms = []
 
         # mainBranch is a list of Terms
         self.mainBranch = Branch(None)
-
-        # an AST object that describes this code
-        self.ast = None
 
     def _newTerm(self, branch = None):
         "Internal method. Returns a new Term object."
@@ -32,6 +31,7 @@ class CodeUnit(object):
 
         branch.append(new_term)
         self.allTerms.append(new_term)
+
         return new_term
 
     def _bootstrapEmptyTerm(self):
@@ -47,14 +47,21 @@ class CodeUnit(object):
         Create a term with the given function and inputs.
         This call may reuse an existing term, if it's correct to do so.
 
+        'function' should be a callable term.
+        'function' can also be a string, which will be looked up in our scope.
+
         If 'branch' is specified, create the term inside that branch.
         Otherwise, the term is created in the main branch.
         """
 
-        debug._assert(isinstance(function, Term))
+        debug.assertType(function, [Term, str])
         debug._assert(isinstance(inputs, list))
         debug._assert(branch is None or isinstance(branch,Branch))
         for input in inputs: debug._assert(input is not None)
+
+        # If function is a string, look it up
+        if isinstance(function, str):
+            function = self.getNamed(function)
 
         # Do type checking
         functionInputTypes = ca_function.inputTypes(function)

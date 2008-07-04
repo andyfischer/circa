@@ -138,7 +138,7 @@ multiline
  test
 """)
 
-stdoutTest('circa to_source_test.ca', expectedOutput=
+stdoutTest('circa to-source.ca', expectedOutput=
 """a = 1 + 2
 """)
 

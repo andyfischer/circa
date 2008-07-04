@@ -114,7 +114,6 @@ def bootstrapKernel(kernel):
 
 # Create Kernel code unit
 kernel = ca_codeunit.CodeUnit()
-kernel.name = "Kernel"
 builtins.KERNEL = kernel
 
 bootstrapKernel(kernel)
