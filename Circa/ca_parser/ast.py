@@ -19,9 +19,7 @@ import Circa
 
 class GlobalCompilationContext(object):
     def getNamed(self, name):
-        for module in Circa.LOADED_MODULES.values():
-            if module.containsName(name):
-                return module.getNamed(name)
+        return Circa.getGlobal(name)
 
 class CompilationContext(object):
     def __init__(self, codeUnit, parent=None, branch=None):
