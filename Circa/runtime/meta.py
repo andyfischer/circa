@@ -28,17 +28,22 @@ class ToSource(object):
         # Check if the function has a special handler
         type = term.getType()
         if type.value().toSourceSpecialHandler is not None:
-            cxt.setResult(type.toSourceSpecialHandler(term))
+            cxt.setResult(type.value().toSourceSpecialHandler(term))
             return
 
         # Otherwise, generate source in the standard way
         functionName = term.termSyntaxHints.functionName
+        if functionName is None: functionName = '<none>'
+
         sourceOfInputs = []
         for inputTerm in term.inputs:
-            inputToSourceTerm = cxt.codeUnit().createTerm('to-source', [input])
+            inputToSourceTerm = cxt.codeUnit().createTerm('to-source', [inputTerm])
             sourceOfInputs.append(inputToSourceTerm.value())
             
-        cxt.setResult(functionName + "(" + ",".join(sourceOfInputs) + ")")
+        if term.termSyntaxHints.infix:
+            cxt.setResult(sourceOfInputs[0] + ' ' + functionName + ' ' + sourceOfInputs[1])
+        else:
+            cxt.setResult(functionName + "(" + ",".join(sourceOfInputs) + ")")
 
 class ModuleToSource(object):
     name = 'module-to-source'
