@@ -623,7 +623,7 @@ class FunctionCall(Expression):
         if func.getType() in (builtins.FUNCTION_TYPE, builtins.SUBROUTINE_TYPE):
             try:
                 newTerm = context.createTerm(func, inputs=argTerms)
-                newTerm.functionName = self.function_name.text
+                newTerm.termSyntaxHints.functionName = self.function_name.text
                 return newTerm
             except errors.CircaError,e:
                 pdb.set_trace()
