@@ -10,7 +10,7 @@ from term import Term
 from branch import Branch
 
 class CodeUnit(object):
-    __slots__ = ['allTerms', 'mainBranch']
+    __slots__ = ['allTerms', 'mainBranch', 'parent']
 
     def __init__(self):
         # allTerms is a list of Terms
@@ -18,6 +18,17 @@ class CodeUnit(object):
 
         # mainBranch is a list of Terms
         self.mainBranch = Branch(None)
+
+        self.parent = None
+
+    def __setattr__(self, name, obj):
+        if name == 'allTerms':
+            debug.assertType(obj, list)
+        elif name == 'mainBranch':
+            debug.assertType(obj, Branch)
+        elif name == 'parent':
+            debug.assertNullableType(obj, CodeUnit)
+        object.__setattr__(self,name,obj)
 
     def _newTerm(self, branch = None):
         "Internal method. Returns a new Term object."
