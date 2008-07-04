@@ -68,11 +68,15 @@ class CodeUnit(object):
         debug.assertType(function, [Term, str])
         debug._assert(isinstance(inputs, list))
         debug._assert(branch is None or isinstance(branch,Branch))
-        for input in inputs: debug._assert(input is not None)
+        for input in inputs:
+            debug.assertType(input, Term)
 
         # If function is a string, look it up
         if isinstance(function, str):
-            function = self.getNamed(function)
+            if self.containsName(function):
+                function = self.getNamed(function)
+            else:
+                function = Circa.getGlobal(function)
 
         # Do type checking
         functionInputTypes = ca_function.inputTypes(function)
