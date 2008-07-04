@@ -403,14 +403,11 @@ class Infix(Expression):
             return (newTerm, term_syntax.Infix(':=', leftAst, rightAst))
 
         # Evaluate as a right-arrow?
-        # (Not supported yet)
-        """
         if self.token.match == RIGHT_ARROW:
-            left_inputs = self.left.getTerm(context)
-            right_func = self.right.getTerm(context)
+            (left_inputs, leftAst) = self.left.getTerm(context)
+            (right_func, rightAst) = self.right.getTerm(context)
 
-            return context.getTerm(right_func, inputs=[left_inputs])
-        """
+            return (context.createTerm(right_func, inputs=[left_inputs]), None)
 
         # Evaluate as a dotted expression?
         if self.token.match == DOT:
@@ -586,6 +583,11 @@ class Unary(Expression):
         output.write('-')
         self.right.renderSource(output)
 
+class NamedFunctionArg(object):
+    def __init__(self, name, expr):
+        self.name = name
+        self.expr = expr
+
 class FunctionCall(Expression):
     def __init__(self, function_name, args):
         for arg in args:
@@ -602,6 +604,9 @@ class FunctionCall(Expression):
         argTerms = []
         argAsts = []
         for expr in self.args:
+            if isinstance(expr, NamedFunctionArg):
+                pass #todo
+
             (term, ast) = expr.getTerm(context)
             argTerms.append(term)
             argAsts.append(ast)

@@ -25,6 +25,8 @@ class CircaType(object):
             debug.assertNullableType(obj, types.FunctionType)
         elif name == "iterateInnerTerms":
             debug.assertNullableType(obj, types.FunctionType)
+        elif name == "getField":
+            debug.assertNullableType(obj, types.FunctionType)
         else:
             debug._assert(False, "CircaType has no field called \""+name+"\"")
 
