@@ -25,25 +25,33 @@ class ToSource(object):
     def evaluate(cxt):
         term = cxt.inputTerm(0)
 
-        # Check if the function has a special handler
-        type = term.getType()
-        if type.value().toSourceSpecialHandler is not None:
-            cxt.setResult(type.value().toSourceSpecialHandler(term))
-            return
+        result = ""
 
-        # Otherwise, generate source in the standard way
-        functionName = term.termSyntaxHints.functionName
-        if functionName is None: functionName = '<none>'
+        # Prepend a name binding, if any
+        if term.termSyntaxHints.nameBinding is not None:
+            result = term.termSyntaxHints.nameBinding + ' = '
 
-        sourceOfInputs = []
-        for inputTerm in term.inputs:
-            inputToSourceTerm = cxt.codeUnit().createTerm('to-source', [inputTerm])
-            sourceOfInputs.append(inputToSourceTerm.value())
-            
-        if term.termSyntaxHints.infix:
-            cxt.setResult(sourceOfInputs[0] + ' ' + functionName + ' ' + sourceOfInputs[1])
+        # Check if this is a constant or variable
+        if term.isConstant() or term.isVariable():
+            type = term.getType()
+            result += type.value().toSource(term)
         else:
-            cxt.setResult(functionName + "(" + ",".join(sourceOfInputs) + ")")
+
+            # Otherwise, generate source in the standard way
+            functionName = term.termSyntaxHints.functionName
+            if functionName is None: functionName = '<none>'
+
+            sourceOfInputs = []
+            for inputTerm in term.inputs:
+                inputToSourceTerm = cxt.codeUnit().createTerm('to-source', [inputTerm])
+                sourceOfInputs.append(inputToSourceTerm.value())
+                
+            if term.termSyntaxHints.infix:
+                result += (sourceOfInputs[0] + ' ' + functionName + ' ' + sourceOfInputs[1])
+            else:
+                result += (functionName + "(" + ",".join(sourceOfInputs) + ")")
+
+        cxt.setResult(result)
 
 class ModuleToSource(object):
     name = 'module-to-source'

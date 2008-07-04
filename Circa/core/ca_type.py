@@ -7,13 +7,13 @@ def emptyFunction(term):
     pass
 
 class CircaType(object):
-    __slots__ = ['name', 'allocateData', 'toShortString', 'toSourceSpecialHandler',
+    __slots__ = ['name', 'allocateData', 'toShortString', 'toSource',
             'iterateInnerTerms', 'getField']
     def __init__(self):
         self.name = "anon"
         self.allocateData = None
         self.toShortString = None
-        self.toSourceSpecialHandler = None
+        self.toSource = None
         self.iterateInnerTerms = None
 
     def __setattr__(self, name, obj):
@@ -23,7 +23,7 @@ class CircaType(object):
             debug.assertNullableType(obj, types.FunctionType)
         elif name == "toShortString":
             debug.assertNullableType(obj, types.FunctionType)
-        elif name == "toSourceSpecialHandler":
+        elif name == "toSource":
             debug.assertNullableType(obj, types.FunctionType)
         elif name == "iterateInnerTerms":
             debug.assertNullableType(obj, types.FunctionType)
