@@ -340,8 +340,8 @@ class NameBinding(Statement):
         if not isinstance(rightTerm, Term):
             raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
 
-        #rightTerm.termSyntaxInfo = term_syntax.Expression(ast, name)
         context.bindName(rightTerm, name)
+        rightTerm.termSyntaxHints.nameBinding = name
         return rightTerm
 
 class HighLevelOptionStatement(Statement):

@@ -31,6 +31,8 @@ class CircaFunction(object):
 
         self.feedbackPropagator = None
 
+        self.toSourceSpecialHandler = None
+
 def allocateData():
     return CircaFunction()
 def toString(term):

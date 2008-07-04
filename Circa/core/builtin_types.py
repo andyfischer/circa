@@ -30,7 +30,7 @@ def createBuiltinTypes(kernel):
     intType.name = 'int'
     intType.allocateData = lambda: 0
     intType.toShortString = int_toString
-    intType.toSourceSpecialHandler = int_toSource
+    intType.toSource = int_toSource
     intTerm = kernel.createConstant(builtins.TYPE_TYPE, value=intType)
     kernel.bindName(intTerm, 'int')
 
@@ -38,7 +38,7 @@ def createBuiltinTypes(kernel):
     stringType.name = 'string'
     stringType.allocateData = lambda: ""
     stringType.toShortString = string_toString
-    stringType.toSourceSpecialHandler = string_toSource
+    stringType.toSource = string_toSource
     stringTerm = kernel.createConstant(builtins.TYPE_TYPE, value=stringType)
     kernel.bindName(stringTerm, 'string')
 
@@ -46,7 +46,7 @@ def createBuiltinTypes(kernel):
     boolType.name = 'bool'
     boolType.allocateData = lambda: False
     boolType.toShortString = bool_toString
-    boolType.toSourceSpecialHandler = bool_toSource
+    boolType.toSource = bool_toSource
     boolTerm = kernel.createConstant(builtins.TYPE_TYPE, value=boolType)
     kernel.bindName(boolTerm, 'bool')
 
@@ -54,7 +54,7 @@ def createBuiltinTypes(kernel):
     floatType.name = 'float'
     floatType.allocateData = lambda: 0.0
     floatType.toShortString = float_toString
-    floatType.toSourceSpecialHandler = float_toSource
+    floatType.toSource = float_toSource
     floatTerm = kernel.createConstant(builtins.TYPE_TYPE, value=floatType)
     kernel.bindName(floatTerm, 'float')
 
