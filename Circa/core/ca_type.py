@@ -7,6 +7,8 @@ def emptyFunction(term):
     pass
 
 class CircaType(object):
+    __slots__ = ['name', 'allocateData', 'toShortString', 'toSourceSpecialHandler',
+            'iterateInnerTerms', 'getField']
     def __init__(self):
         self.name = "anon"
         self.allocateData = None
@@ -30,7 +32,7 @@ class CircaType(object):
         else:
             debug._assert(False, "CircaType has no field called \""+name+"\"")
 
-        self.__dict__[name] = obj
+        object.__setattr__(self, name, obj)
 
 def CircaType_allocateData():
     return CircaType()
