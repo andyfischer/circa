@@ -3,4 +3,4 @@
 import os
 
 os.chdir('tests')
-execfile('RunTests.py')
+execfile('OutputTests.py')

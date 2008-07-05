@@ -1,5 +1,5 @@
 
-import pdb
+import pdb, sys
 from Circa.common import (debug, function_builder)
 from Circa.core import builtins
 
@@ -79,9 +79,19 @@ class WrapRawPythonFunction(object):
             cxt.setResult(pythonFunc(*cxt.inputs()))
         f.evaluateFunc = evaluateFunc
 
+class CommandLineArg(object):
+    name = 'cl-arg'
+    inputs = ['int']
+    output = 'string'
+
+    @staticmethod
+    def evaluate(index):
+        return sys.argv[index]
+
 def createFunctions(codeUnit):
     function_builder.importPythonFunction(codeUnit, Import)
     function_builder.importPythonFunction(codeUnit, ImportFunctions)
     function_builder.importPythonType(codeUnit, RawPythonFunction)
     function_builder.importPythonFunction(codeUnit, CompileRawFunction)
     function_builder.importPythonFunction(codeUnit, WrapRawPythonFunction)
+    function_builder.importPythonFunction(codeUnit, CommandLineArg)
