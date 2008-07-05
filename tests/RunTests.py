@@ -145,6 +145,8 @@ stdoutTest('circa to-source.ca', expectedOutput=
 add(1,2)
 average(4,3,2,1)
 add(3 * 4,4 / 2)
+a + b
+add(a,b)
 to-source(1 + 2)
 """)
 
