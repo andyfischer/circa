@@ -115,12 +115,12 @@ class Term(object):
         return str(self.cachedValue)
 
 class TermSyntaxHints(object):
-    __slots__ = ['functionName', 'infix', 'nameBinding']
+    __slots__ = ['functionName', 'infix', 'rightArrow']
 
     def __init__(self):
         self.functionName = None
         self.infix = False
-        self.nameBinding = None
+        self.rightArrow = False
 
 class TermExecutionContext(object):
     """

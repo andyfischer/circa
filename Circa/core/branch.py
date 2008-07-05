@@ -1,11 +1,15 @@
 
 from Circa.common import debug
+import branch_syntax
 
 class Branch(object):
+    __slots__ = ['_list', '_namespace', 'ownerTerm', 'syntax']
+
     def __init__(self, ownerTerm):
         self._list = []
         self._namespace = {}
         self.ownerTerm = ownerTerm
+        self.syntax = branch_syntax.BranchSyntaxInfo()
 
     def append(self, term):
         # Make sure this term has the same codeUnit as our other terms

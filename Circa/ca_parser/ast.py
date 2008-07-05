@@ -129,7 +129,7 @@ class CommentLine(Statement):
         self.text = text
     def create(self, context):
         term = context.createTerm(builtins.COMMENT_FUNC, [])
-        term.termSyntaxInfo = term_syntax.CommentLine(self.text)
+        context.branch.syntax.append(self.text)
         return term
     def renderSource(self, output):
         output.write(self.text)
@@ -239,7 +239,7 @@ class ReturnStatement(Statement):
         return self.returnKeyword
     def create(self, context):
         result = self.right.getTerm(context)
-        #result.termSyntaxInfo = term_syntax.Expression(ast, '#return_val')
+        context.branch.syntax.appendReturnStatement(result)
         context.bindName(result, '#return_val')
     def renderSource(self, output):
         output.write('return ')
@@ -341,7 +341,7 @@ class NameBinding(Statement):
             raise parse_errors.ExpressionDidNotEvaluateToATerm(self.right.getFirstToken())
 
         context.bindName(rightTerm, name)
-        rightTerm.termSyntaxHints.nameBinding = name
+        context.branch.syntax.appendNameBinding(rightTerm, name)
         return rightTerm
 
 class HighLevelOptionStatement(Statement):
@@ -360,7 +360,7 @@ class HighLevelOptionStatement(Statement):
 class Expression(Statement):
     def create(self, context):
         term = self.getTerm(context)
-        #term.termSyntaxInfo = term_syntax.Expression(ast)
+        context.branch.syntax.append(term)
         return term
 
     def inputs(self):
@@ -404,12 +404,14 @@ class Infix(Expression):
 
         # Evaluate as a right-arrow?
         if self.token.match == RIGHT_ARROW:
+            debug.assertType(self.right, Ident)
             left_inputs = self.left.getTerm(context)
             right_func = self.right.getTerm(context)
 
             newTerm = context.createTerm(right_func, inputs=[left_inputs])
-            newTerm.termSyntaxHints.infix = True
-            newTerm.termSyntaxHints.functionName = '->'
+            newTerm.termSyntaxHints.rightArrow = True
+            newTerm.termSyntaxHints.functionName = self.right.token.text
+            return newTerm
 
         # Evaluate as a dotted expression?
         if self.token.match == DOT:

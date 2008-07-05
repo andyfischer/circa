@@ -1,0 +1,3 @@
+mod = load-module('module-to-source')
+
+print(module-to-source(mod))
