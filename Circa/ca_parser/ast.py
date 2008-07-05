@@ -376,13 +376,14 @@ class Expression(Statement):
 
 
 class Infix(Expression):
-    def __init__(self, functionToken, left, right):
-        debug._assert(isinstance(left, Expression))
-        debug._assert(isinstance(right, Expression))
+    def __init__(self, functionToken, inputs):
+        debug._assert(len(inputs) == 2)
+        debug.assertType(inputs[0], Expression)
+        debug.assertType(inputs[1], Expression)
 
         self.token = functionToken
-        self.left = left
-        self.right = right
+        self.left = inputs[0]
+        self.right = inputs[1]
 
     def inputs(self):
         yield self.left
