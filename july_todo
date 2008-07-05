@@ -8,9 +8,5 @@ Subroutine work:
 * Make all subroutines inline (create terms on execute)
 * Make sure we are smart about when these terms get created
 
-Source generation work:
-* Add to-source-string for all builtin types, for literals
-* Add Term.termSyntaxHints, a dynamic set of hints (such as infix vs function call)
-
 Function calls:
 * Add support for function overloading by type
