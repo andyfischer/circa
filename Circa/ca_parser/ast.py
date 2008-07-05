@@ -428,25 +428,11 @@ class Infix(Expression):
         # Try to find a defined operator
         normalFunction = getOperatorFunction(context, self.token)
         if normalFunction is not None:
-
-            # Make a map of which inputs are named, for syntax
-            namedInputs = {}
-            for index in range(len(self.inputs)):
-                input = self.inputs[index]
-                if isinstance(input, Ident):
-                    namedInputs[index] = input.text()
-
             debug._assert(normalFunction.cachedValue is not None)
-            leftTerm = self.inputs[0].getTerm(context)
-            rightTerm = self.inputs[1].getTerm(context)
-
-            newTerm = context.createTerm(normalFunction,
-                inputs=[leftTerm, rightTerm])
 
             newTerm = FunctionCall.createFunctionCall(context, normalFunction, self.inputs)
             newTerm.termSyntaxHints.infix = True
             newTerm.termSyntaxHints.functionName = self.token.text
-            newTerm.termSyntaxHints.namedInputs = namedInputs
             return newTerm
 
         # Evaluate as a function + assign?
@@ -650,7 +636,7 @@ class FunctionCall(Expression):
         # Make a map of which inputs are named, for syntax
         namedInputs = {}
         for index in range(len(inputTerms)):
-            input = inputTerms[index]
+            input = inputExprs[index]
             if isinstance(input, Ident):
                 namedInputs[index] = input.text()
 
