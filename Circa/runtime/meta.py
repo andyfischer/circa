@@ -37,18 +37,24 @@ class ToSource(object):
             functionName = term.termSyntaxHints.functionName
             if functionName is None: functionName = '<none>'
 
-            sourceOfInputs = []
-            for inputTerm in term.inputs:
+            def getInputSource(index):
+                if index in term.termSyntaxHints.namedInputs:
+                    return term.termSyntaxHints.namedInputs[index]
+
+                inputTerm = term.inputs[index]
+
                 inputToSourceTerm = cxt.codeUnit().createTerm('to-source', [inputTerm])
                 inputToSourceTerm.execute()
-                sourceOfInputs.append(inputToSourceTerm.value())
+                return inputToSourceTerm.value()
+
+            inputsAsSource = map(getInputSource, range(len(term.inputs)))
                 
             if term.termSyntaxHints.infix:
-                result += (sourceOfInputs[0] + ' ' + functionName + ' ' + sourceOfInputs[1])
+                result += (inputsAsSource[0] + ' ' + functionName + ' ' + inputsAsSource[1])
             elif term.termSyntaxHints.rightArrow:
-                result += (sourceOfInputs[0] + ' -> ' + functionName)
+                result += (inputsAsSource[0] + ' -> ' + functionName)
             else:
-                result += (functionName + "(" + ",".join(sourceOfInputs) + ")")
+                result += (functionName + "(" + ",".join(inputsAsSource) + ")")
 
         cxt.setResult(result)
 
