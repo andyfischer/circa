@@ -363,7 +363,7 @@ class Expression(Statement):
         context.branch.syntax.append(term)
         return term
 
-    def inputs(self):
+    def getInputs(self):
         "Returns an iterable of our inputs"
         raise errors.PureVirtualMethodFail(self, 'inputs')
 
@@ -382,19 +382,17 @@ class Infix(Expression):
         debug.assertType(inputs[1], Expression)
 
         self.token = functionToken
-        self.left = inputs[0]
-        self.right = inputs[1]
+        self.inputs = inputs
 
-    def inputs(self):
-        yield self.left
-        yield self.right
+    def getInputs(self):
+        return self.inputs
 
     def getTerm(self, context):
 
         # Evaluate as feedback?
         if self.token.match == COLON_EQUALS:
-            leftTerm = self.left.getTerm(context)
-            rightTerm = self.right.getTerm(context)
+            leftTerm = self.inputs[0].getTerm(context)
+            rightTerm = self.inputs[1].getTerm(context)
             debug._assert(leftTerm is not None)
             debug._assert(rightTerm is not None)
             newTerm = context.createTerm(builtins.FEEDBACK_FUNC, [leftTerm, rightTerm])
@@ -405,22 +403,22 @@ class Infix(Expression):
 
         # Evaluate as a right-arrow?
         if self.token.match == RIGHT_ARROW:
-            debug.assertType(self.right, Ident)
-            left_inputs = self.left.getTerm(context)
-            right_func = self.right.getTerm(context)
+            debug.assertType(self.inputs[1], Ident)
+            left_inputs = self.inputs[0].getTerm(context)
+            right_func = self.inputs[1].getTerm(context)
 
             newTerm = context.createTerm(right_func, inputs=[left_inputs])
             newTerm.termSyntaxHints.rightArrow = True
-            newTerm.termSyntaxHints.functionName = self.right.token.text
+            newTerm.termSyntaxHints.functionName = self.inputs[1].token.text
             return newTerm
 
         # Evaluate as a dotted expression?
         if self.token.match == DOT:
-            debug._assert(isinstance(self.right, Ident))
-            leftTerm = self.left.getTerm(context)
+            debug._assert(isinstance(self.inputs[1], Ident))
+            leftTerm = self.inputs[0].getTerm(context)
 
             rightTermAsString = context.createConstant(builtins.STRING_TYPE,
-                    value = self.right.token.text)
+                    value = self.inputs[1].token.text)
 
             newTerm = context.createTerm(builtins.GET_FIELD,
                     inputs=[leftTerm, rightTermAsString])
@@ -430,47 +428,53 @@ class Infix(Expression):
         # Try to find a defined operator
         normalFunction = getOperatorFunction(context, self.token)
         if normalFunction is not None:
+
+            # Make a map of which inputs are named, for syntax
+            namedInputs = {}
+            for index in range(len(self.inputs)):
+                input = self.inputs[index]
+                if isinstance(input, Ident):
+                    namedInputs[index] = input.text()
+
             debug._assert(normalFunction.cachedValue is not None)
-            leftTerm = self.left.getTerm(context)
-            rightTerm = self.right.getTerm(context)
+            leftTerm = self.inputs[0].getTerm(context)
+            rightTerm = self.inputs[1].getTerm(context)
 
             newTerm = context.createTerm(normalFunction,
                 inputs=[leftTerm, rightTerm])
+
+            newTerm = FunctionCall.createFunctionCall(context, normalFunction, self.inputs)
             newTerm.termSyntaxHints.infix = True
             newTerm.termSyntaxHints.functionName = self.token.text
+            newTerm.termSyntaxHints.namedInputs = namedInputs
             return newTerm
 
         # Evaluate as a function + assign?
         # Try to find an assign operator
         assignFunction = getAssignOperatorFunction(self.token.match)
         if assignFunction is not None:
-            leftTerm = self.left.getTerm(context)
-            rightTerm = self.right.getTerm(context)
+            leftTerm = self.inputs[0].getTerm(context)
+            rightTerm = self.inputs[1].getTerm(context)
 
             # create a term that's the result of the operation
             result_term = context.createTerm(assignFunction,
                inputs=[leftTerm,rightTerm])
 
             # bind the name to this result
-            context.bindName(result_term, str(self.left))
+            context.bindName(result_term, str(self.inputs[0]))
             return result_term
 
         debug.fail("Unable to evaluate token: " + self.token.text)
 
     def getFirstToken(self):
-        return self.left.getFirstToken()
-
-    def renderSource(self, output):
-        self.left.renderSource(output)
-        output.write(' ' + self.token.text + ' ')
-        self.right.renderSource(output)
+        return self.inputs[0].getFirstToken()
 
 class LiteralString(Expression):
     def __init__(self, token):
         self.token = token
         self.hasQuestionMark = False
 
-    def inputs(self):
+    def getInputs(self):
         return []
 
     def getTerm(self, context):
@@ -522,7 +526,7 @@ class Literal(Expression):
         else:
             raise parse_errors.InternalError("Couldn't recognize token: " + str(token))
 
-    def inputs(self):
+    def getInputs(self):
         return []
 
     def getTerm(self, context):
@@ -546,7 +550,7 @@ class Ident(Expression):
     def __init__(self, token):
         self.token = token
 
-    def inputs(self):
+    def getInputs(self):
         return []
 
     def getTerm(self, context):
@@ -561,6 +565,9 @@ class Ident(Expression):
     def getFirstToken(self):
         return self.token
 
+    def text(self):
+        return self.token.text
+
     def renderSource(self, output):
         output.write(self.token.text)
 
@@ -571,7 +578,7 @@ class Unary(Expression):
         self.functionToken = functionToken
         self.right = right
 
-    def inputs(self):
+    def getInputs(self):
         yield self.right
 
     def getTerm(self, context):
@@ -596,25 +603,18 @@ class NamedFunctionArg(object):
         self.expr = expr
 
 class FunctionCall(Expression):
-    def __init__(self, function_name, args):
-        for arg in args:
+    def __init__(self, function_name, inputs):
+        for arg in inputs:
             debug._assert(isinstance(arg,Expression))
 
         self.function_name = function_name
-        self.args = args
+        self.inputs = inputs
 
-    def inputs(self):
-        for arg in self.args:
+    def getInputs(self):
+        for arg in self.inputs:
             yield arg
 
     def getTerm(self, context):
-        argTerms = []
-        for expr in self.args:
-            if isinstance(expr, NamedFunctionArg):
-                pass #todo
-
-            term = expr.getTerm(context)
-            argTerms.append(term)
 
         func = context.getNamed(self.function_name.text)
 
@@ -625,7 +625,7 @@ class FunctionCall(Expression):
         # Check for Function
         if func.getType() in (builtins.FUNCTION_TYPE, builtins.SUBROUTINE_TYPE):
             try:
-                newTerm = context.createTerm(func, inputs=argTerms)
+                newTerm = FunctionCall.createFunctionCall(context, func, self.inputs)
                 newTerm.termSyntaxHints.functionName = self.function_name.text
                 return newTerm
             except errors.CircaError,e:
@@ -640,8 +640,23 @@ class FunctionCall(Expression):
         return self.function_name;
 
     def renderSource(self, output):
-        output.write(str(self.function_name) + '(' + ','.join(map(str,self.args)) + ')')
+        output.write(str(self.function_name) + '(' + ','.join(map(str,self.inputs)) + ')')
 
+    @staticmethod
+    def createFunctionCall(context, function, inputExprs):
+        "Helper function to create a term."
+        inputTerms = [expr.getTerm(context) for expr in inputExprs]
+
+        # Make a map of which inputs are named, for syntax
+        namedInputs = {}
+        for index in range(len(inputTerms)):
+            input = inputTerms[index]
+            if isinstance(input, Ident):
+                namedInputs[index] = input.text()
+
+        newTerm = context.createTerm(function, inputTerms)
+        newTerm.termSyntaxHints.namedInputs = namedInputs
+        return newTerm
 
 def getOperatorFunction(context, token):
 
