@@ -158,7 +158,7 @@ def infix_expression(tokens, precedence=0):
         if not right_expr:
             raise parse_errors.InternalError(first_righthand_token)
 
-        expr = ast.Infix(operator, expr, right_expr)
+        expr = ast.Infix(operator, [expr, right_expr])
 
     return expr
 
