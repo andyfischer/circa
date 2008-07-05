@@ -3,6 +3,9 @@
 print(to-source(1 + 2))
 print(to-source(3 * 4 - 2))
 
+-- Arrow expressions
+print(to-source(4 -> sqrt))
+
 -- Normal functions
 print(to-source(add(1,2)))
 print(to-source(average(4,3,2,1)))

@@ -1,8 +1,8 @@
 
 import pdb
 
-from Circa.core import (builtins, ca_function, ca_type)
-from Circa.common import (debug, function_builder)
+from Circa.core import (builtins, ca_function, ca_type, term)
+from Circa.common import (branch_syntax, debug, function_builder)
 from Circa.utils.string_buffer import StringBuffer
 
 class HighLevelOption(object):
@@ -27,10 +27,6 @@ class ToSource(object):
 
         result = ""
 
-        # Prepend a name binding, if any
-        if term.termSyntaxHints.nameBinding is not None:
-            result = term.termSyntaxHints.nameBinding + ' = '
-
         # Check if this is a constant or variable
         if term.isConstant() or term.isVariable():
             type = term.getType()
@@ -44,10 +40,13 @@ class ToSource(object):
             sourceOfInputs = []
             for inputTerm in term.inputs:
                 inputToSourceTerm = cxt.codeUnit().createTerm('to-source', [inputTerm])
+                inputToSourceTerm.execute()
                 sourceOfInputs.append(inputToSourceTerm.value())
                 
             if term.termSyntaxHints.infix:
                 result += (sourceOfInputs[0] + ' ' + functionName + ' ' + sourceOfInputs[1])
+            elif term.termSyntaxHints.rightArrow:
+                result += (sourceOfInputs[0] + ' -> ' + functionName)
             else:
                 result += (functionName + "(" + ",".join(sourceOfInputs) + ")")
 
@@ -57,17 +56,28 @@ class ModuleToSource(object):
     name = 'module-to-source'
     inputs = ['Module']
     output = 'string'
+    meta = True
 
     @staticmethod
-    def evaluate(module):
+    def evaluate(cxt):
+        module = cxt.input(0)
         debug._assert(module is not None)
         debug._assert(module.codeUnit is not None)
 
         buffer = StringBuffer()
-        for term in module.codeUnit.mainBranch:
-            if term.termSyntaxInfo is not None:
-                buffer.writeln(str(term.termSyntaxInfo))
-        return str(buffer)
+        for line in module.codeUnit.mainBranch.syntax:
+            if isinstance(line, term.Term):
+                toSourceTerm = cxt.codeUnit().createTerm('to-source', [line])
+                toSourceTerm.execute()
+                buffer.writeln(toSourceTerm.value())
+            elif type(line).__name__ is 'NameBindingLine':
+                toSourceTerm = cxt.codeUnit().createTerm('to-source', [line.term])
+                toSourceTerm.execute()
+                buffer.writeln('%s = %s' % (line.name, toSourceTerm.value()))
+            else:
+                buffer.writeln(str(line))
+
+        cxt.setResult(str(buffer))
 
 
 class Comment(object):

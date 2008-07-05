@@ -141,10 +141,11 @@ multiline
 stdoutTest('circa to-source.ca', expectedOutput=
 """1 + 2
 3 * 4 - 2
+4 -> sqrt
 add(1,2)
 average(4,3,2,1)
 add(3 * 4,4 / 2)
-my-name = to-source(1 + 2)
+to-source(1 + 2)
 """)
 
 stdoutTest('circa raw-python.ca', expectedOutput=
