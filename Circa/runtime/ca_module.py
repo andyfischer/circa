@@ -40,9 +40,8 @@ class LoadModule(object):
     pure = False
 
     @staticmethod
-    def evaluate(name):
+    def evaluate(filename):
         from Circa import ca_parser
-        filename = name + '.ca'
 
         (errors, module) = ca_parser.parseFile(filename)
         debug._assert(module.codeUnit is not None)

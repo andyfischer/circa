@@ -208,35 +208,43 @@ def removeFileSuffix(filename):
 
 def parseCommandLineArgs(args):
     single_options = []
-    actual_args = []
-    for word in args:
-        if word[0] == '-':
-            for c in word[1:]:
-                single_options.append(c)
-        else:
-            actual_args.append(word)
+    filename = None
+    runtime_args = []
 
-    return (single_options, actual_args)
+    reachedFilename = False
+    for arg in args:
+
+        if reachedFilename:
+            runtime_args.append(arg)
+        else:
+            if arg[0] == '-':
+                for character in arg[1:]:
+                    single_options.append(character)
+            else:
+                filename = arg
+                reachedFilename = filename
+
+    return (single_options, filename, runtime_args)
 
 def main():
     Circa.initialize()
 
-    (single_options, actual_args) = parseCommandLineArgs(sys.argv[1:])
+    (single_options, filename, runtime_args) = parseCommandLineArgs(sys.argv[1:])
 
     targetCodeUnit = None
 
     verbose = 'v' in single_options
 
     # Was a file name specified?
-    if len(actual_args) == 0:
+    if filename is None:
         print "No file specified, examining main"
         targetCodeUnit = Circa.LOADED_MODULES['main']
 
     # Load the given filename
     else:
-        filename = findUsersFilename(actual_args[0])
+        filename = findUsersFilename(filename)
         if filename is None:
-            print "File not found: " + actual_args[0]
+            print "File not found: " + filename
             return
 
         if verbose:
@@ -256,8 +264,8 @@ def main():
 
     doInteractiveMode = 'i' in single_options
 
-    # Special case, if they didn't specify any args, then do interactive mode
-    if single_options == [] and actual_args == []:
+    # Special case, if they didn't specify anything, go into interactive mode
+    if len(sys.argv) < 2:
         doInteractiveMode = True
 
     # Start interactive mode?
