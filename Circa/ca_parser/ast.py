@@ -595,6 +595,8 @@ class FunctionCall(Expression):
 
         self.function_name = function_name
         self.inputs = inputs
+        self.preInputWhitespace = None
+        self.postInputWhitespace = None
 
     def getInputs(self):
         for arg in self.inputs:
@@ -613,6 +615,8 @@ class FunctionCall(Expression):
             try:
                 newTerm = FunctionCall.createFunctionCall(context, func, self.inputs)
                 newTerm.termSyntaxHints.functionName = self.function_name.text
+                newTerm.termSyntaxHints.preInputWhitespace = self.preInputWhitespace
+                newTerm.termSyntaxHints.postInputWhitespace = self.postInputWhitespace
                 return newTerm
             except errors.CircaError,e:
                 pdb.set_trace()

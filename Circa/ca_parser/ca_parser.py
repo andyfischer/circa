@@ -220,6 +220,13 @@ def optional_question_mark(tokens):
         return tokens.consume(QUESTION)
     return None
  
+def possible_whitespace(tokens):
+    result = tokens.tryConsume(WHITESPACE)
+    if result is None:
+        return ""
+    else:
+        return result.text
+
 def function_call(tokens):
     function_name = tokens.consume(IDENT)
     tokens.consume(LPAREN)
@@ -228,19 +235,37 @@ def function_call(tokens):
     tokens.startSkipping(NEWLINE)
 
     args = []
+    preWhitespace = []
+    postWhitespace = []
 
     if not tokens.nextIs(RPAREN):
         args.append( infix_expression(tokens) )
 
+        tokens.stopSkipping(WHITESPACE)
+        preWhitespace.append("")
+        postWhitespace.append(possible_whitespace(tokens))
+
         while tokens.nextIs(COMMA):
             tokens.consume(COMMA)
-            args.append( infix_expression(tokens) )
 
+            preWhitespace.append(possible_whitespace(tokens))
+            tokens.startSkipping(WHITESPACE)
+            expr = infix_expression(tokens)
+            tokens.stopSkipping(WHITESPACE)
+
+            postWhitespace.append(possible_whitespace(tokens))
+
+            args.append(expr)
+
+    tokens.startSkipping(WHITESPACE)
     tokens.consume(RPAREN)
     if not wasSkippingNewline:
         tokens.stopSkipping(NEWLINE)
 
-    return ast.FunctionCall(function_name, args)
+    result = ast.FunctionCall(function_name, args)
+    result.preInputWhitespace = preWhitespace
+    result.postInputWhitespace = postWhitespace
+    return result
 
 def function_decl(tokens):
     result = ast.FunctionDecl()
