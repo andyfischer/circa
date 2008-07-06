@@ -144,7 +144,7 @@ stdoutTest('circa to-source.ca', expectedOutput=
 4 -> sqrt
 add(1,2)
 average(4,3,2,1)
-add(3 * 4,4 / 2)
+add(3*4, 4/2)
 a + b
 add(a,b)
 to-source(1 + 2)
@@ -152,6 +152,12 @@ to-source(1 + 2)
 
 stdoutTest('circa raw-python.ca', expectedOutput=
 """6
+""")
+
+stdoutTest('circa whitespace.ca', expectedOutput=
+"""1   + 2
+1+   2
+add(1 ,  2)
 """)
 
 printOverallResults()

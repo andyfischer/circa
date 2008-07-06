@@ -50,7 +50,11 @@ class ToSource(object):
             inputsAsSource = map(getInputSource, range(len(term.inputs)))
                 
             if term.termSyntaxHints.infix:
-                result += (inputsAsSource[0] + ' ' + functionName + ' ' + inputsAsSource[1])
+                result += (inputsAsSource[0]
+                        + term.termSyntaxHints.postInputWhitespace[0]
+                        + functionName
+                        + term.termSyntaxHints.preInputWhitespace[1]
+                        + inputsAsSource[1])
             elif term.termSyntaxHints.rightArrow:
                 result += (inputsAsSource[0] + ' -> ' + functionName)
             else:
