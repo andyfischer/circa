@@ -93,6 +93,7 @@ def statement(tokens):
         return function_decl(tokens)
     elif tokens.nextIs(COMMENT_LINE):
         commentLine = tokens.consume(COMMENT_LINE)
+        tokens.consume(NEWLINE)
         return ast.CommentLine(commentLine.text)
     elif tokens.nextIs(NEWLINE):
         tokens.consume(NEWLINE)
