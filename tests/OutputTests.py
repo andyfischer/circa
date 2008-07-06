@@ -77,13 +77,13 @@ Should be three: 3
 Should be six: 6
 """)
 
-stdoutTest('circa subroutine_test.ca', expectedOutput=
+stdoutTest('circa subroutine.ca', expectedOutput=
 """Called print_success
 Four squared is 16
 Five squared is 25
 """)
 
-stdoutTest('circa math_test.ca', expectedOutput=
+stdoutTest('circa math.ca', expectedOutput=
 """one plus two is 3
 5.5 plus 2.2 is 7.7
 two minus one is 1
@@ -98,14 +98,14 @@ eight divided by four is 2
 1 - 4 / 2 = -7
 """)
 
-stdoutTest('circa map_test.ca', expectedOutput=
+stdoutTest('circa map.ca', expectedOutput=
 """should be 3: 3
 should be 1: 1
 should be 5: 5
 should be apple: apple
 """)
 
-stdoutTest('circa comparison_test.ca', expectedOutput=
+stdoutTest('circa comparison.ca', expectedOutput=
 """5 > 3
 3 > 5
 1 + 2 > 2
@@ -115,7 +115,7 @@ stdoutTest('circa comparison_test.ca', expectedOutput=
 3 + 6 >= 9
 """)
 
-stdoutTest('circa boolean_test.ca', expectedOutput=
+stdoutTest('circa boolean.ca', expectedOutput=
 """should be true: True
 should be false: False
 and(true,true): True
@@ -128,7 +128,7 @@ or(false,true): True
 or(false,false): False
 """)
 
-stdoutTest('circa multiline_test.ca', expectedOutput=
+stdoutTest('circa multiline.ca', expectedOutput=
 """
  this
   is

@@ -10,7 +10,12 @@ def testSame(expected, actual):
     expected = expected.split('\n')
     actual = actual.split('\n')
     for index in range(len(expected)):
+
         expectedLine = expected[index]
+
+        if index >= len(actual):
+            return "On line %i\nExpected %s\nOutput reached EOF" % (index,expectedLine)
+
         actualLine = actual[index]
 
         if expectedLine != actualLine:
