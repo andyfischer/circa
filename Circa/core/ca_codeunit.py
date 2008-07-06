@@ -117,7 +117,8 @@ class CodeUnit(object):
                         requiredType.getIdentifier(), inputType.getIdentifier())
 
         # Try to reuse an existing term
-        if not ca_function.hasState(function):
+        hasState = ca_function.stateType(function) is not builtins.VOID_TYPE
+        if not hasState:
             existing = findExistingEquivalent(function, inputs)
             if existing:
                 return existing
@@ -127,6 +128,7 @@ class CodeUnit(object):
         newTerm.inputs = list(inputs)
 
         outputType = ca_function.outputType(function)
+        stateType = ca_function.stateType(function)
 
         # Initialize cachedValue
         debug._assert(outputType is not None)
@@ -137,6 +139,12 @@ class CodeUnit(object):
             newTerm.cachedValue = allocateData()
         else:
             newTerm.cachedValue = initialValue
+
+        # Initialize state
+        stateAllocateData = lambda: None
+        if stateType is not None:
+            stateAllocateData = ca_type.allocateData(stateType)
+        newTerm.state = stateAllocateData()
 
         # Initialize the term, if this function has an initializeFunc
         if ca_function.initializeFunc(function):

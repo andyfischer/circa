@@ -10,8 +10,10 @@ class CircaFunction(object):
         # outputType: Term
         self.outputType = None
 
+        # stateType: Term
+        self.stateType = None
+
         self.pureFunction = True
-        self.hasState = False
         self.name = None
 
         # True if this function will accept a variable number of arguments
@@ -50,8 +52,8 @@ def inputTypes(term):
     return term.cachedValue.inputTypes
 def outputType(term):
     return term.cachedValue.outputType
-def hasState(term):
-    return term.cachedValue.hasState
+def stateType(term):
+    return term.cachedValue.stateType
 def pureFunction(term):
     return term.cachedValue.pureFunction
 def variableArgs(term):
@@ -82,9 +84,8 @@ def setPureFunction(term, pure):
     debug._assert(isinstance(pure,bool))
     term.cachedValue.pureFunction = pure
 
-def setHasState(term, hasState):
-    debug._assert(isinstance(hasState,bool))
-    term.cachedValue.hasState = hasState
+def setStateType(term, stateType):
+    term.cachedValue.stateType = stateType
 def setVariableArgs(term, variableArgs):
     debug._assert(isinstance(variableArgs,bool))
     term.cachedValue.variableArgs = variableArgs

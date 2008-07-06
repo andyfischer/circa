@@ -38,7 +38,10 @@ def importPythonFunction(codeUnit, pythonClass, instanceBased = False):
     ca_function.setName(functionTerm, pythonClass.name)
     ca_function.setInputTypes(functionTerm, map(findType, pythonClass.inputs))
     ca_function.setOutputType(functionTerm, findType(pythonClass.output))
-    ca_function.setHasState(functionTerm, instanceBased)
+
+    try: stateTypeName = pythonClass.stateType
+    except: stateTypeName = 'void'
+    ca_function.setStateType(functionTerm, findType(stateTypeName))
 
     try:
         instanceBased = pythonClass.instanceBased

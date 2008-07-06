@@ -32,10 +32,8 @@ def bootstrapKernel(kernel):
     constGenerator = kernel._bootstrapEmptyTerm()
     constGenerator.cachedValue = ca_function.allocateData()
     ca_function.setName(constGenerator, "const-generator")
-    ca_function.setHasState(constGenerator, False)
     ca_function.setPureFunction(constGenerator, True)
     kernel.bindName(constGenerator, "_const-generator")
-
 
     # Create constant-Type function
     constTypeFunc = kernel._bootstrapEmptyTerm()
@@ -92,7 +90,7 @@ def bootstrapKernel(kernel):
         inputType = cxt.inputTerm(0)
         ca_function.setOutputType(cxt.caller(), inputType)
         ca_function.setEvaluateFunc(cxt.caller(), emptyFunction)
-        ca_function.setHasState(cxt.caller(), True)
+        #ca_function.setHasState(cxt.caller(), True)
         ca_function.setName(cxt.caller(), 'const-' + ca_type.name(inputType))
 
     # Define an evaluate function for constant functions
