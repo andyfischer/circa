@@ -24,7 +24,6 @@ class MapConstructor(object):
                 + ca_type.name(valueType))
         ca_function.setInputTypes(cxt.caller(), [keyType])
         ca_function.setOutputType(cxt.caller(), valueType)
-        ca_function.setHasState(cxt.caller(), False)
         ca_function.setPureFunction(cxt.caller(), True)
         ca_function.setEvaluateFunc(cxt.caller(), MapAccess_evaluate)
         ca_function.setFeedbackPropagator(cxt.caller(), MAP_FEEDBACK)

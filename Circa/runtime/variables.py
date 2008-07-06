@@ -17,7 +17,7 @@ class VariableGenerator(object):
         type = cxt.inputTerm(0)
 
         ca_function.setOutputType(cxt.caller(), type)
-        ca_function.setHasState(cxt.caller(), True)
+        ca_function.setStateType(cxt.caller(), type)
         ca_function.setName(cxt.caller(), 'variable-' + ca_type.name(type))
         ca_function.setEvaluateFunc(cxt.caller(), Variable_evaluate)
         ca_function.setFeedbackPropagator(cxt.caller(), ASSIGN_FUNCTION)

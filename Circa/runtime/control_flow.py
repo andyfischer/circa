@@ -10,6 +10,8 @@ class IfStatement(object):
     inputs = ['bool']
     output = 'void'
     pure = False
+    instanceBased = True
+    stateType = 'List'
 
     def __init__(self):
         self.branches = []
@@ -39,7 +41,6 @@ class IfExpression(object):
             return b
 
 def createFunctions(codeUnit):
-    builtins.IF_STATEMENT = function_builder.importPythonFunction(codeUnit,
-            IfStatement, instanceBased = True)
+    builtins.IF_STATEMENT = function_builder.importPythonFunction(codeUnit, IfStatement)
     builtins.IF_EXPR = function_builder.importPythonFunction(codeUnit, IfExpression)
 

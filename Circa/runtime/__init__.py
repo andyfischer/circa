@@ -11,13 +11,15 @@ import feedback, files, python, ca_math, meta, variables
 import strings
 
 def createFunctions(codeUnit):
+    # Make sure to do containers first
+    containers.createFunctions(codeUnit)
+
     boolean.createFunctions(codeUnit)
     ca_math.createFunctions(codeUnit)
     ca_module.createTerms(codeUnit)
     ca_struct.createTerms(codeUnit)
     comparison.createFunctions(codeUnit)
     control_flow.createFunctions(codeUnit)
-    containers.createFunctions(codeUnit)
     debugging.createFunctions(codeUnit)
     feedback.createFunctions(codeUnit)
     files.createFunctions(codeUnit)
