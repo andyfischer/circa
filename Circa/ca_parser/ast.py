@@ -391,18 +391,6 @@ class Infix(Expression):
 
     def getTerm(self, context):
 
-        # Evaluate as feedback?
-        if self.token.match == COLON_EQUALS:
-            leftTerm = self.inputs[0].getTerm(context)
-            rightTerm = self.inputs[1].getTerm(context)
-            debug._assert(leftTerm is not None)
-            debug._assert(rightTerm is not None)
-            newTerm = context.createTerm(builtins.FEEDBACK_FUNC, [leftTerm, rightTerm])
-            newTerm.termSyntaxHints.infix = True
-            newTerm.termSyntaxHints.functionName = ':='
-            newTerm.execute()
-            return newTerm
-
         # Evaluate as a right-arrow?
         if self.token.match == RIGHT_ARROW:
             debug.assertType(self.inputs[1], Ident)
@@ -437,6 +425,11 @@ class Infix(Expression):
             newTerm.termSyntaxHints.functionName = self.token.text
             newTerm.termSyntaxHints.preInputWhitespace = ["", self.postOperatorWS]
             newTerm.termSyntaxHints.postInputWhitespace = [self.preOperatorWS, ""]
+
+            # Special case: if this is a feedback term, execute now
+            if normalFunction is builtins.FEEDBACK_FUNC:
+                newTerm.execute()
+
             return newTerm
 
         # Evaluate as a function + assign?
@@ -653,6 +646,10 @@ class FunctionCall(Expression):
         return newTerm
 
 def getOperatorFunction(context, token):
+
+    # Special case: feedback
+    if token.match == COLON_EQUALS:
+        return builtins.FEEDBACK_FUNC
 
     # Turn the token's text into a Circa string
     tokenAsString = context.createConstant(builtins.STRING_TYPE, value=token.text)
