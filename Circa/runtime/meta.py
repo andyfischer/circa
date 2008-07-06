@@ -54,7 +54,15 @@ class ToSource(object):
             elif term.termSyntaxHints.rightArrow:
                 result += (inputsAsSource[0] + ' -> ' + functionName)
             else:
-                result += (functionName + "(" + ",".join(inputsAsSource) + ")")
+                result += functionName + "("
+                for index in range(len(inputsAsSource)):
+                    result += (term.termSyntaxHints.preInputWhitespace[index]
+                            + inputsAsSource[index]
+                            + term.termSyntaxHints.postInputWhitespace[index])
+                    if index + 1 < len(inputsAsSource):
+                        result += ','
+                result += ")"
+
 
         cxt.setResult(result)
 
