@@ -236,9 +236,9 @@ def function_call(tokens):
             tokens.consume(COMMA)
             args.append( infix_expression(tokens) )
 
+    tokens.consume(RPAREN)
     if not wasSkippingNewline:
         tokens.stopSkipping(NEWLINE)
-    tokens.consume(RPAREN)
 
     return ast.FunctionCall(function_name, args)
 

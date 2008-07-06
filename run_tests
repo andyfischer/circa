@@ -3,4 +3,4 @@
 import os
 
 os.chdir('tests')
-execfile('OutputTests.py')
+os.system('python OutputTests.py')

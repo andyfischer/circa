@@ -83,8 +83,7 @@ class TokenStream(object):
             raise parse_errors.ExpectedToken(token, match)
 
         # Advance current index
-        self.currentIndex = self.indexAfterSkipping(
-                self.indexAfterSkipping(self.currentIndex) + 1)
+        self.currentIndex = self.indexAfterSkipping(self.currentIndex) + 1
 
         return token
 
