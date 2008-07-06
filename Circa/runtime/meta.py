@@ -1,6 +1,7 @@
 
 import pdb
 
+import Circa
 from Circa.core import (builtins, ca_function, ca_type, term)
 from Circa.common import (branch_syntax, debug, function_builder)
 from Circa.utils.string_buffer import StringBuffer
@@ -97,6 +98,20 @@ class ModuleToSource(object):
 
         cxt.setResult(str(buffer))
 
+class GetLocal(object):
+    name = 'get-local'
+    inputs = ['string']
+    output = 'ref'
+    meta = True
+
+    @staticmethod
+    def evaluate(cxt):
+        name = cxt.input(0)
+
+        if cxt.codeUnit().containsName(name):
+            cxt.setResult(cxt.codeUnit().getNamed(name))
+        else:
+            cxt.setResult(Circa.getGlobal(name))
 
 class Comment(object):
     name = '_comment'
@@ -113,3 +128,4 @@ def createFunctions(codeUnit):
     function_builder.importPythonFunction(codeUnit,ToSource)
     function_builder.importPythonFunction(codeUnit,ModuleToSource)
     builtins.COMMENT_FUNC = function_builder.importPythonFunction(codeUnit,Comment)
+    function_builder.importPythonFunction(codeUnit,GetLocal)

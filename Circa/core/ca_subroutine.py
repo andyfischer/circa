@@ -38,7 +38,19 @@ class CircaSubroutine(ca_function.CircaFunction):
             outputPlaceholder = None
             cxt.setResult(None)
 
-def toString(term):
+def generateInlineSubroutineCall(subroutine):
+    """
+    Returns a CircaFunction object that calls the given subroutine, inlined.
+    """
+    result = ca_function.CircaFunction()
+    result.name = subroutine.name + '-inline-call'
+    result.inputTypes = list(subroutine.inputTypes)
+    result.outputType = subroutine.outputType
+
+    # todo
+
+
+def Subroutine_toString(term):
     if term.cachedValue is None:
         return "<undefined Subroutine>"
 
@@ -60,5 +72,3 @@ def field(fieldName):
 (inputTypes, setInputTypes) = field('inputTypes')
 (outputType, setOutputType) = field('outputType')
 (codeUnit, _) = field('codeUnit')
-
-
