@@ -376,13 +376,15 @@ class Expression(Statement):
 
 
 class Infix(Expression):
-    def __init__(self, functionToken, inputs):
+    def __init__(self, functionToken, inputs, preOperatorWS, postOperatorWS):
         debug._assert(len(inputs) == 2)
         debug.assertType(inputs[0], Expression)
         debug.assertType(inputs[1], Expression)
 
         self.token = functionToken
         self.inputs = inputs
+        self.preOperatorWS = preOperatorWS
+        self.postOperatorWS = postOperatorWS
 
     def getInputs(self):
         return self.inputs
@@ -433,6 +435,8 @@ class Infix(Expression):
             newTerm = FunctionCall.createFunctionCall(context, normalFunction, self.inputs)
             newTerm.termSyntaxHints.infix = True
             newTerm.termSyntaxHints.functionName = self.token.text
+            newTerm.termSyntaxHints.preInputWhitespace = ["", self.postOperatorWS]
+            newTerm.termSyntaxHints.postInputWhitespace = [self.preOperatorWS, ""]
             return newTerm
 
         # Evaluate as a function + assign?
