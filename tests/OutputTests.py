@@ -1,5 +1,6 @@
 
 import os
+import test_helper
 
 TESTS_PASSED = 0
 TESTS_FAILED = 0
@@ -23,7 +24,6 @@ def stdoutTest(command, expectedOutput):
 
             numLines += 1
 
-        errors = []
     except InputDidntMatch, e:
         print "Failed at line", numLines, "while running \"%s\"" % command
         print e
