@@ -1,5 +1,5 @@
 
-import os
+import os,glob
 import test_helper
 
 
@@ -7,6 +7,8 @@ def sourceToSourceTest(filename):
     file = open(filename, 'r')
     original_file = file.read()
     file.close()
+
+    print "Running source-to-source test of: " + filename
 
     actual_output = test_helper.runCommand("circa module-to-source.ca " + filename)
 
@@ -16,4 +18,5 @@ def sourceToSourceTest(filename):
         print "Source-to-source error in file: " + filename
         print result
 
-sourceToSourceTest("module-to-source.ca")
+for filename in glob.glob("*.ca"):
+    sourceToSourceTest(filename)
