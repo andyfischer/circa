@@ -21,7 +21,6 @@ class DynamicObjectType(object):
     def getField(term, name):
         pass
 
-
 class GetField(object):
     name = 'get-field'
     inputs = ['ref', 'string']

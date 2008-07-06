@@ -25,9 +25,6 @@ def float_toString(term):
 def float_toSource(term):
     return str(term.cachedValue)
 
-def anyToString(term):
-    return str(term.cachedValue)
-
 def createBuiltinTypes(kernel):
     intType = ca_type.CircaType()
     intType.name = 'int'
