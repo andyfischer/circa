@@ -192,8 +192,14 @@ def atom(tokens):
         questionMark = optional_question_mark(tokens)
         return ast.LiteralString(token)
 
+    # Literal multiline string
+    if tokens.nextIs(MULTILINE_STR):
+        token = tokens.consume()
+        questionMark = optional_question_mark(tokens)
+        return ast.LiteralMultilineString(token)
+
     # Literal value
-    if tokens.nextIn((FLOAT, INTEGER, MULTILINE_STR)):
+    if tokens.nextIn((FLOAT, INTEGER)):
         token = tokens.consume()
         questionMark = optional_question_mark(tokens)
         return ast.Literal(token)

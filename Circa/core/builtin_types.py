@@ -10,7 +10,10 @@ def int_toSource(term):
 def string_toString(term):
     return term.cachedValue
 def string_toSource(term):
-    return "'" + term.cachedValue + "'"
+    if term.termSyntaxHints.multilineString:
+        return '"""' + term.cachedValue + '"""'
+    else:
+        return "'" + term.cachedValue + "'"
 
 def bool_toString(term):
     return str(term.cachedValue)

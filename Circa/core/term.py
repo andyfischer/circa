@@ -116,7 +116,8 @@ class Term(object):
 
 class TermSyntaxHints(object):
     __slots__ = ['functionName', 'infix', 'rightArrow', 'namedInputs',
-            'preInputWhitespace', 'postInputWhitespace']
+            'preInputWhitespace', 'postInputWhitespace',
+            'multilineString']
 
     def __init__(self):
         self.functionName = None
@@ -125,6 +126,7 @@ class TermSyntaxHints(object):
         self.namedInputs = {}
         self.preInputWhitespace = []
         self.postInputWhitespace = []
+        self.multilineString = False
 
 class TermExecutionContext(object):
     """

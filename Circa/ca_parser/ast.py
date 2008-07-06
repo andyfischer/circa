@@ -61,8 +61,8 @@ class CompilationContext(object):
     def createConstant(self, type, value=None):
         return self.codeUnit.createConstant(type, value=value, branch=self.branch)
 
-    def createVariable(self, type):
-        return self.codeUnit.createVariable(type, branch=self.branch)
+    def createVariable(self, type, value=None):
+        return self.codeUnit.createVariable(type, value=value, branch=self.branch)
 
     def handleMetaOption(self, optionName):
         if self.metaOptionHandler is None:
@@ -469,8 +469,22 @@ class LiteralString(Expression):
         ca_variable.setValue(term, value)
         return term
 
-    def renderSource(self,output):
-        output.write(self.token.text)
+class LiteralMultilineString(Expression):
+    def __init__(self, token):
+        self.token = token
+
+    def getInputs(self):
+        return []
+
+    def getTerm(self, context):
+        # Strip quotation marks
+        value = self.token.text[3:-3]
+
+        # Create term
+        term = context.createVariable(builtins.STRING_TYPE, value=value)
+        ca_variable.setValue(term,value)
+        term.termSyntaxHints.multilineString = True
+        return term
 
 class ListExpr(Expression):
     def __init__(self):
@@ -497,15 +511,6 @@ class Literal(Expression):
         elif token.match == INTEGER:
             self.value = int(token.text)
             self.circaType = builtins.INT_TYPE
-            """
-        elif token.match == STRING:
-            # the literal should have ' or " marks on either side, strip these
-            self.value = token.text.strip("'\"")
-            self.circaType = builtins.STRING_TYPE
-            """
-        elif token.match == MULTILINE_STR:
-            self.value = token.text[3:-3]
-            self.circaType = builtins.STRING_TYPE
         else:
             raise parse_errors.InternalError("Couldn't recognize token: " + str(token))
 

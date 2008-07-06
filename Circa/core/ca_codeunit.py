@@ -165,14 +165,14 @@ class CodeUnit(object):
         # Create the term
         return self.createTerm(constantFunc, [], branch, initialValue=value)
 
-    def createVariable(self, type, branch=None):
+    def createVariable(self, type, value=None, branch=None):
         debug._assert(isinstance(type, Term))
 
         # Fetch the variable function for this type
         variableFunc = self.createTerm(builtins.VARIABLE_GENERATOR, [type])
 
         # Create the term
-        return self.createTerm(variableFunc, [], branch)
+        return self.createTerm(variableFunc, [], branch, initialValue=value)
 
     def deleteTerm(self, term):
         """
