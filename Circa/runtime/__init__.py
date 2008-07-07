@@ -5,7 +5,6 @@
 import boolean
 import ca_math
 import ca_module
-import ca_struct
 import comparison
 import containers
 import control_flow
@@ -25,7 +24,6 @@ def createFunctions(codeUnit):
     boolean.createFunctions(codeUnit)
     ca_math.createFunctions(codeUnit)
     ca_module.createTerms(codeUnit)
-    ca_struct.createTerms(codeUnit)
     comparison.createFunctions(codeUnit)
     control_flow.createFunctions(codeUnit)
     debugging.createFunctions(codeUnit)
