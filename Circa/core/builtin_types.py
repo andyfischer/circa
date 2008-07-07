@@ -79,12 +79,6 @@ def createBuiltinTypes(kernel):
 
     subroutineType = function_builder.importPythonType(kernel, ca_subroutine.CircaSubroutine)
 
-    structType = ca_type.CircaType()
-    structType.name = 'Struct'
-    structType.allocateData = ca_struct.Struct_allocateData
-    structTerm = kernel.createConstant(builtins.TYPE_TYPE, value=structType)
-    kernel.bindName(structTerm, 'Struct')
-
     # Make constant-generator terms for all new functions
     for type in (intTerm, stringTerm, boolTerm, floatTerm, subroutineType):
         kernel.createTerm(builtins.CONST_GENERATOR, [type])

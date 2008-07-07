@@ -8,13 +8,15 @@ class CircaStruct(ca_type.CircaType):
     def appendMember(self, name, type):
         self.members.append((name,type))
 
+    def allocateData(type):
+        result = StructInstance()
+        for (memberName, memberType) in type.members:
+            setattr(result, memberName, type.allocateData())
+        return result
+        
+
 class StructInstance(object):
     pass
-
-def Struct_allocateData(type):
-    result = StructInstance()
-    # ...
-
 
 class DynamicObjectType(object):
     name = 'dynamic-object'
