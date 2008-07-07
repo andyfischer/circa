@@ -32,7 +32,7 @@ class CircaType(object):
 
         object.__setattr__(self, name, obj)
 
-def CircaType_allocateData():
+def CircaType_allocateData(typeTerm):
     return CircaType()
 
 def field(fieldName):

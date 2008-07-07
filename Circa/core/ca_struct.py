@@ -1,15 +1,16 @@
 
 import function_builder
-from Circa.core import builtins
+from Circa.core import (builtins, ca_type)
 
-class CircaStructDefinition(object):
-    name = 'struct-definition'
-
+class CircaStruct(ca_type.CircaType):
     def __init__(self):
         self.members = []
-
     def appendMember(self, name, type):
         self.members.append((name,type))
+
+def Struct_allocateData(typeTerm):
+    return CircaStruct()
+
 
 class DynamicObjectType(object):
     name = 'dynamic-object'

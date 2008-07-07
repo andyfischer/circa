@@ -150,7 +150,7 @@ def importPythonType(codeUnit, pythonClass):
         try: iterateInnerTerms = pythonClass.iterateInnerTerms
         except AttributeError: pass
 
-    ca_type.setAllocateData(typeTerm, lambda: pythonClass())
+    ca_type.setAllocateData(typeTerm, lambda t: pythonClass())
     ca_type.setToShortString(typeTerm, toShortString)
     ca_type.setIterateInnerTerms(typeTerm, iterateInnerTerms)
 

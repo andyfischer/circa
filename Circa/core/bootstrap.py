@@ -30,7 +30,7 @@ def bootstrapKernel(kernel):
 
     # Create constant-generator function
     constGenerator = kernel._bootstrapEmptyTerm()
-    constGenerator.cachedValue = ca_function.allocateData()
+    constGenerator.cachedValue = ca_function.CircaFunction_allocateData(None)
     ca_function.setName(constGenerator, "const-generator")
     ca_function.setPureFunction(constGenerator, True)
     kernel.bindName(constGenerator, "_const-generator")
@@ -38,7 +38,7 @@ def bootstrapKernel(kernel):
     # Create constant-Type function
     constTypeFunc = kernel._bootstrapEmptyTerm()
     constTypeFunc.functionTerm = constGenerator
-    constTypeFunc.cachedValue = ca_function.allocateData()
+    constTypeFunc.cachedValue = ca_function.CircaFunction_allocateData(None)
     kernel.bindName(constTypeFunc, "_const-Type")
     ca_function.setName(constTypeFunc, "const-Type")
     ca_function.setPureFunction(constTypeFunc, True)
@@ -47,7 +47,7 @@ def bootstrapKernel(kernel):
     # Create Type type
     typeType = kernel._bootstrapEmptyTerm()
     typeType.functionTerm = constTypeFunc
-    typeType.cachedValue = ca_type.CircaType_allocateData()
+    typeType.cachedValue = ca_type.CircaType_allocateData(typeType)
     ca_type.setName(typeType, "Type")
     ca_type.setAllocateData(typeType, ca_type.CircaType_allocateData)
     # ca_type.setToString(typeType, ca_type.typeToString)
@@ -61,7 +61,7 @@ def bootstrapKernel(kernel):
     # Create constant-Function function
     constFuncFunc = kernel._bootstrapEmptyTerm()
     constFuncFunc.functionTerm = constGenerator
-    constFuncFunc.cachedValue = ca_function.allocateData()
+    constFuncFunc.cachedValue = ca_function.CircaFunction_allocateData(None)
     ca_function.setName(constFuncFunc, "const-Function")
     ca_function.setPureFunction(constFuncFunc, True)
     ca_function.setEvaluateFunc(constFuncFunc, emptyFunction)
@@ -73,9 +73,9 @@ def bootstrapKernel(kernel):
     # Create Function type
     functionType = kernel._bootstrapEmptyTerm()
     functionType.functionTerm = constTypeFunc
-    functionType.cachedValue = ca_type.CircaType_allocateData()
+    functionType.cachedValue = ca_type.CircaType_allocateData(typeType)
     ca_type.setName(functionType, "Function")
-    ca_type.setAllocateData(functionType, ca_function.allocateData)
+    ca_type.setAllocateData(functionType, ca_function.CircaFunction_allocateData)
     #ca_type.setToStringFunc(functionType, ca_function.toString)
     kernel.bindName(functionType, "Function")
 
