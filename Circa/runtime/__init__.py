@@ -2,13 +2,21 @@
 # Contains standard Circa symbols
 #
 
-import boolean, comparison, containers
+import boolean
+import ca_math
+import ca_module
 import ca_struct
+import comparison
+import containers
 import control_flow
 import debugging
-import ca_module
-import feedback, files, python, ca_math, meta, variables
+import feedback
+import files
+import language
+import meta
+import python
 import strings
+import variables
 
 def createFunctions(codeUnit):
     # Make sure to do containers first

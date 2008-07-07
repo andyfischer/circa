@@ -7,7 +7,7 @@ import pdb
 
 import parse_errors, tokens
 from Circa.core import (builtins, ca_codeunit, ca_variable, ca_string, 
-        ca_subroutine, ca_function, ca_type)
+        ca_struct, ca_subroutine, ca_function, ca_type)
 from Circa.runtime import ca_module
 from Circa.core.term import Term
 from Circa.common import (debug, errors, term_syntax)
@@ -214,22 +214,26 @@ class FunctionDecl(Statement):
 
         return subroutineTerm
 
-    def renderSource(self, output):
-        output.write("function " + self.functionName.text + "(")
-        firstArg = True
-        for arg in self.inputArgs:
-            if not firstArg:
-                output.write(', ')
-            firstArg = False
-            arg.renderSource(output)
-        output.write(") {")
+class StructDecl(Statement):
+    def __init__(self, name):
+        self.fields = []
+        self.name = name
+    def appendField(self, type, name):
+        self.fields.append((type,name))
+    def create(self, context):
+        structObj = ca_struct.CircaStruct()
+        structObj.name = self.name.text
 
-        output.indent()
-        for statement in self.statementList:
-            statement.renderSource(output)
-        output.unindent()
+        for (fieldType,fieldName) in self.fields:
+            typeTerm = context.getNamed(fieldType.text)
+            debug._assert(typeTerm is not None)
+            structObj.appendMember(fieldName.text, typeTerm)
 
-        output.write("}")
+
+        structTerm = context.createConstant(builtins.TYPE_TYPE, value=structObj)
+        context.bindName(structTerm, self.name.text)
+        return structTerm
+
 
 class ReturnStatement(Statement):
     def __init__(self, returnKeyword, right):
@@ -611,6 +615,12 @@ class FunctionCall(Expression):
         if func is None:
             raise parse_errors.InternalError(self.function_name,
                 "Function " + self.function_name.text + " not found.")
+
+        # Special case: If they supplied a type as the function, use a variable-generator
+        # as the function.
+        if func.getType() is builtins.TYPE_TYPE:
+            type = func
+            func = context.createTerm(builtins.VARIABLE_GENERATOR, inputs=[type])
 
         # Check for Function
         if func.getType() in (builtins.FUNCTION_TYPE, builtins.SUBROUTINE_TYPE):
