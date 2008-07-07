@@ -35,7 +35,7 @@ class CircaFunction(object):
 
         self.toSourceSpecialHandler = None
 
-def allocateData():
+def CircaFunction_allocateData(typeTerm):
     return CircaFunction()
 def toString(term):
     if term.cachedValue is None:

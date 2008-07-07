@@ -1,6 +1,6 @@
 
 from Circa.common import (debug, function_builder)
-import builtins, ca_type, ca_function, ca_subroutine
+import builtins, ca_type, ca_function, ca_struct, ca_subroutine
 
 def int_toString(term):
     return str(term.cachedValue)
@@ -28,7 +28,7 @@ def float_toSource(term):
 def createBuiltinTypes(kernel):
     intType = ca_type.CircaType()
     intType.name = 'int'
-    intType.allocateData = lambda: 0
+    intType.allocateData = lambda t: 0
     intType.toShortString = int_toString
     intType.toSource = int_toSource
     intTerm = kernel.createConstant(builtins.TYPE_TYPE, value=intType)
@@ -36,7 +36,7 @@ def createBuiltinTypes(kernel):
 
     stringType = ca_type.CircaType()
     stringType.name = 'string'
-    stringType.allocateData = lambda: ""
+    stringType.allocateData = lambda t: ""
     stringType.toShortString = string_toString
     stringType.toSource = string_toSource
     stringTerm = kernel.createConstant(builtins.TYPE_TYPE, value=stringType)
@@ -44,7 +44,7 @@ def createBuiltinTypes(kernel):
 
     boolType = ca_type.CircaType()
     boolType.name = 'bool'
-    boolType.allocateData = lambda: False
+    boolType.allocateData = lambda t: False
     boolType.toShortString = bool_toString
     boolType.toSource = bool_toSource
     boolTerm = kernel.createConstant(builtins.TYPE_TYPE, value=boolType)
@@ -52,7 +52,7 @@ def createBuiltinTypes(kernel):
 
     floatType = ca_type.CircaType()
     floatType.name = 'float'
-    floatType.allocateData = lambda: 0.0
+    floatType.allocateData = lambda t: 0.0
     floatType.toShortString = float_toString
     floatType.toSource = float_toSource
     floatTerm = kernel.createConstant(builtins.TYPE_TYPE, value=floatType)
@@ -60,24 +60,30 @@ def createBuiltinTypes(kernel):
 
     referenceType = ca_type.CircaType()
     referenceType.name = 'ref'
-    referenceType.allocateData = lambda: None
+    referenceType.allocateData = lambda t: None
     referenceTerm = kernel.createConstant(builtins.TYPE_TYPE, value=referenceType)
     kernel.bindName(referenceTerm, 'ref')
 
     voidType = ca_type.CircaType()
     voidType.name = 'void'
-    voidType.allocateData = lambda: None
+    voidType.allocateData = lambda t: None
     voidType.toShortString = lambda: '<void>'
     voidTerm = kernel.createConstant(builtins.TYPE_TYPE, value=voidType)
     kernel.bindName(voidTerm, 'void')
 
     anyType = ca_type.CircaType()
     anyType.name = 'any'
-    anyType.allocateData = lambda: None
+    anyType.allocateData = lambda t: None
     anyTerm = kernel.createConstant(builtins.TYPE_TYPE, value=anyType)
     kernel.bindName(anyTerm, 'any')
 
     subroutineType = function_builder.importPythonType(kernel, ca_subroutine.CircaSubroutine)
+
+    structType = ca_type.CircaType()
+    structType.name = 'Struct'
+    structType.allocateData = ca_struct.Struct_allocateData
+    structTerm = kernel.createConstant(builtins.TYPE_TYPE, value=structType)
+    kernel.bindName(structTerm, 'Struct')
 
     # Make constant-generator terms for all new functions
     for type in (intTerm, stringTerm, boolTerm, floatTerm, subroutineType):

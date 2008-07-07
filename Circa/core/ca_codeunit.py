@@ -136,15 +136,15 @@ class CodeUnit(object):
         if initialValue is None:
             allocateData = ca_type.allocateData(outputType)
             debug._assert(allocateData is not None)
-            newTerm.cachedValue = allocateData()
+            newTerm.cachedValue = allocateData(outputType)
         else:
             newTerm.cachedValue = initialValue
 
         # Initialize state
-        stateAllocateData = lambda: None
+        stateAllocateData = lambda t: None
         if stateType is not None:
             stateAllocateData = ca_type.allocateData(stateType)
-        newTerm.state = stateAllocateData()
+        newTerm.state = stateAllocateData(stateType)
 
         # Initialize the term, if this function has an initializeFunc
         if ca_function.initializeFunc(function):
