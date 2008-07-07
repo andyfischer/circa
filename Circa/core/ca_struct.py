@@ -43,6 +43,7 @@ class GetField(object):
     def evaluate(cxt):
         term = cxt.inputTerm(0)
         type = term.getType()
+        pdb.set_trace()
         if type.getField is None:
             print "Error in get-field, type does not implement getField"
             return

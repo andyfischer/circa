@@ -10,7 +10,7 @@ from Circa.core import (builtins, ca_codeunit, ca_variable, ca_string,
         ca_struct, ca_subroutine, ca_function, ca_type)
 from Circa.runtime import ca_module
 from Circa.core.term import Term
-from Circa.common import (debug, errors, term_syntax)
+from Circa.common import (debug, errors)
 from Circa.utils.spy_object import SpyObject
 from Circa.utils.string_buffer import StringBuffer
 from token_definitions import *
