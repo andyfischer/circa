@@ -42,12 +42,12 @@ class GetField(object):
     @staticmethod
     def evaluate(cxt):
         term = cxt.inputTerm(0)
-        type = term.getType()
+        typeObj = term.getType()
         pdb.set_trace()
-        if type.getField is None:
+        if typeObj.getField is None:
             print "Error in get-field, type does not implement getField"
             return
-        cxt.setResult(type.getField(term, cxt.input(1)))
+        cxt.setResult(typeObj.getField(term, cxt.input(1)))
    
 def createTerms(codeUnit):
     builtins.GET_FIELD = function_builder.importPythonFunction(codeUnit, GetField)

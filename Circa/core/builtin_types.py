@@ -1,6 +1,6 @@
 
 from Circa.common import (debug, function_builder)
-import builtins, ca_type, ca_function, ca_struct, ca_subroutine
+import builtins, ca_type, ca_function, ca_subroutine
 
 def int_toString(term):
     return str(term.cachedValue)

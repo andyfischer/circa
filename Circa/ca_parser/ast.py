@@ -7,8 +7,8 @@ import pdb
 
 import parse_errors, tokens
 from Circa.core import (builtins, ca_codeunit, ca_variable, ca_string, 
-        ca_struct, ca_subroutine, ca_function, ca_type)
-from Circa.runtime import ca_module
+        ca_subroutine, ca_function, ca_type)
+from Circa.runtime import (ca_module, ca_struct)
 from Circa.core.term import Term
 from Circa.common import (debug, errors)
 from Circa.utils.spy_object import SpyObject
