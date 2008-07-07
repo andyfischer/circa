@@ -83,7 +83,7 @@ def statement_list(tokens):
 
     result = ast.StatementList()
 
-    while not tokens.nextIs(RBRACKET) and not tokens.finished():
+    while not tokens.nextIs(RBRACE) and not tokens.finished():
         result.append(statement(tokens))
 
     return result
@@ -102,8 +102,10 @@ def statement(tokens):
         return return_statement(tokens)
     elif tokens.nextIs(IF):
         return if_statement(tokens)
-    elif tokens.nextIs(LBRACE):
+    elif tokens.nextIs(LBRACKET):
         return high_level_option_statement(tokens)
+    elif tokens.nextIs(TYPE):
+        return struct_decl(tokens)
 
     # Lookahead, check if this is a name binding
     if tokens.nextIs(IDENT) and tokens.nextIs(EQUALS, lookahead=1):
@@ -206,7 +208,7 @@ def atom(tokens):
 
     # List expression (surrounded by []s)
     # Disabled
-    #if tokens.nextIs(LBRACE):
+    #if tokens.nextIs(LBRACKET):
     #    return list_expr(tokens)
 
     # Identifier
@@ -310,19 +312,19 @@ def function_decl(tokens):
     else:
         result.outputType = None
 
-    result.openBracket = tokens.consume(LBRACKET)
+    result.openBracket = tokens.consume(LBRACE)
 
     result.statementList = statement_list(tokens)
 
-    result.closeBracket = tokens.consume(RBRACKET)
+    result.closeBracket = tokens.consume(RBRACE)
     
     return result
 
 def list_expr(tokens):
-    lbrace = tokens.consume(LBRACE)
+    lbrace = tokens.consume(LBRACKET)
     result = ast.ListExpr
 
-    while not tokens.nextIs(RBRACE):
+    while not tokens.nextIs(RBRACKET):
         result.append(infix_expression(tokens))
 
         if not tokens.nextIs(COMMA):
@@ -330,7 +332,7 @@ def list_expr(tokens):
         
         tokens.consume(COMMA)
 
-    rbrace = tokens.consume(RBRACE)
+    rbrace = tokens.consume(RBRACKET)
     return result
 
 def return_statement(tokens):
@@ -361,11 +363,16 @@ def if_statement(tokens):
     return ast.IfBlock(conditionExpression, mainBlock, elseBlock)
 
 def high_level_option_statement(tokens):
-    tokens.consume(LBRACE)
+    tokens.consume(LBRACKET)
     name = tokens.consume(IDENT)
-    tokens.consume(RBRACE)
+    tokens.consume(RBRACKET)
     statement_end(tokens)
     return ast.HighLevelOptionStatement(name)
+
+def struct_decl(tokens):
+    tokens.consume(TYPE)
+    tokens.consume(LBRACE)
+    tokens.consume(RBRACE)
 
 def statement_end(tokens):
     """
@@ -386,11 +393,11 @@ def bracketed_statement_list(tokens):
     """
     stmtList = ast.StatementList()
 
-    if tokens.nextIs(LBRACKET):
-        tokens.consume(LBRACKET)
-        while not tokens.nextIs(RBRACKET):
+    if tokens.nextIs(LBRACE):
+        tokens.consume(LBRACE)
+        while not tokens.nextIs(RBRACE):
             stmtList.append(statement(tokens))
-        tokens.consume(RBRACKET)
+        tokens.consume(RBRACE)
     else:
         tokens.tryConsume(NEWLINE)
         stmtList.append(statement(tokens))
