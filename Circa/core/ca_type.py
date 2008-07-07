@@ -15,6 +15,7 @@ class CircaType(object):
         self.toShortString = None
         self.toSource = None
         self.iterateInnerTerms = None
+        self.getField = None
 
     def __setattr__(self, name, obj):
         if name == "name":

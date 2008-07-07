@@ -1,23 +1,29 @@
 
+import pdb
 import function_builder
 from Circa.core import (builtins, ca_type)
 
 class CircaStruct(ca_type.CircaType):
     def __init__(self):
+        ca_type.CircaType.__init__(self)
         self.members = []
+        self.allocateData = CircaStruct_allocateData
+        self.getField = CircaStruct_getField
 
     def appendMember(self, name, type):
         self.members.append((name,type))
 
-    @staticmethod
-    def allocateData(type):
-        result = StructInstance()
-        for (memberName, memberType) in type.members:
-            memberTypeObj = memberType.value()
-            memberAllocateData = ca_type.allocateData(memberType)
-            setattr(result, memberName, memberAllocateData(memberTypeObj))
-        return result
+
+def CircaStruct_allocateData(type):
+    result = StructInstance()
+    for (memberName, memberType) in type.members:
+        memberTypeObj = memberType.value()
+        memberAllocateData = ca_type.allocateData(memberType)
+        setattr(result, memberName, memberAllocateData(memberTypeObj))
+    return result
         
+def CircaStruct_getField(term, fieldName):
+    return getattr(term.value(), fieldName)
 
 class StructInstance(object):
     pass
@@ -42,8 +48,7 @@ class GetField(object):
     @staticmethod
     def evaluate(cxt):
         term = cxt.inputTerm(0)
-        typeObj = term.getType()
-        pdb.set_trace()
+        typeObj = term.getType().value()
         if typeObj.getField is None:
             print "Error in get-field, type does not implement getField"
             return

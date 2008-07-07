@@ -6,4 +6,4 @@ type my-type {
 
 a = my-type()
 
-a -> concat -> print
+get-field(a,'int1') -> concat -> print
