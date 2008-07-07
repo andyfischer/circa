@@ -24,7 +24,8 @@ class VariableGenerator(object):
 
 def Variable_evaluate(cxt):
     # Copy state to output
-    cxt.setResult(cxt.state())
+    #cxt.setResult(cxt.state())
+    pass
 
 class Assign(object):
     name = 'assign'

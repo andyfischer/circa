@@ -1,0 +1,9 @@
+
+type my-type {
+  int int1
+  bool bool1
+}
+
+a = my-type()
+
+a -> concat -> print

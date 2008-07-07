@@ -5,13 +5,17 @@ from Circa.core import (builtins, ca_type)
 class CircaStruct(ca_type.CircaType):
     def __init__(self):
         self.members = []
+
     def appendMember(self, name, type):
         self.members.append((name,type))
 
+    @staticmethod
     def allocateData(type):
         result = StructInstance()
         for (memberName, memberType) in type.members:
-            setattr(result, memberName, type.allocateData())
+            memberTypeObj = memberType.value()
+            memberAllocateData = ca_type.allocateData(memberType)
+            setattr(result, memberName, memberAllocateData(memberTypeObj))
         return result
         
 

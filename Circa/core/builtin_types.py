@@ -79,7 +79,7 @@ def createBuiltinTypes(kernel):
 
     subroutineType = function_builder.importPythonType(kernel, ca_subroutine.CircaSubroutine)
 
-    # Make constant-generator terms for all new functions
+    # Make constant-generator terms for all types
     for type in (intTerm, stringTerm, boolTerm, floatTerm, subroutineType):
         kernel.createTerm(builtins.CONST_GENERATOR, [type])
 

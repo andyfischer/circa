@@ -90,11 +90,11 @@ class CodeUnit(object):
                        requiredArgCount, len(inputs))
 
         def typeCheck(inputType, requiredType):
-            # 'ref' type matches anything
+            # Temp: 'ref' type matches anything
             if requiredType is builtins.REFERENCE_TYPE:
                 return True
 
-            # 'any' type matches anything
+            # Temp: 'any' type matches anything
             if requiredType is builtins.ANY_TYPE:
                 return True
 
@@ -136,7 +136,7 @@ class CodeUnit(object):
         if initialValue is None:
             allocateData = ca_type.allocateData(outputType)
             debug._assert(allocateData is not None)
-            newTerm.cachedValue = allocateData(outputType)
+            newTerm.cachedValue = allocateData(outputType.value())
         else:
             newTerm.cachedValue = initialValue
 
@@ -144,7 +144,7 @@ class CodeUnit(object):
         stateAllocateData = lambda t: None
         if stateType is not None:
             stateAllocateData = ca_type.allocateData(stateType)
-        newTerm.state = stateAllocateData(stateType)
+            newTerm.state = stateAllocateData(stateType.value())
 
         # Initialize the term, if this function has an initializeFunc
         if ca_function.initializeFunc(function):

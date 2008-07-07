@@ -371,8 +371,28 @@ def high_level_option_statement(tokens):
 
 def struct_decl(tokens):
     tokens.consume(TYPE)
+    structName = tokens.consume(IDENT)
     tokens.consume(LBRACE)
+
+    result = ast.StructDecl(structName)
+
+    while True:
+        if tokens.nextIs(RBRACE):
+            break
+
+        if tokens.nextIs(NEWLINE):
+            tokens.consume(NEWLINE)
+            continue
+
+        type = tokens.consume(IDENT)
+        name = tokens.consume(IDENT)
+        tokens.consume(NEWLINE)
+
+        result.appendField(type, name)
+
     tokens.consume(RBRACE)
+
+    return result
 
 def statement_end(tokens):
     """
