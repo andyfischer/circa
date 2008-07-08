@@ -4,7 +4,7 @@ Define the CodeUnit class
 import itertools, pdb
 
 import Circa
-from Circa.common import (debug, errors)
+from Circa.common import (ca_vm, debug, errors)
 import builtins, ca_function, ca_type
 from term import Term
 from branch import Branch
@@ -240,6 +240,10 @@ class CodeUnit(object):
         term.needsUpdate = True
 
     def execute(self):
+        vm = ca_vm.CircaVirtualMachine()
+        vm.run(self)
+
+    def _updateAll(self):
         for term in self.mainBranch:
             term.execute()
 
