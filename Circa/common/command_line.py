@@ -4,7 +4,7 @@ import os,sys,pdb,traceback
 from string import Template
 import Circa
 from Circa import ca_parser
-from Circa.common import (debug, errors, codeunit_utils, pretty_print)
+from Circa.common import (debug, errors, pretty_print)
 from Circa.core import (builtins, ca_codeunit, ca_type, ca_function)
 from Circa.ca_parser import ast as ast_module
 
@@ -94,9 +94,6 @@ class CommandLine(object):
         elif command == 'trace' or command == 'tr':
             term = self.getTermFromIdentifier(commandArgs)
             term.execute_trace()
-
-        elif command == 'render' or command == "ren":
-            print (codeunit_utils.codeToSource(self.codeUnit))
 
         elif command == 'switch' or command == 'sw':
             module_name = commandArgs.strip()
