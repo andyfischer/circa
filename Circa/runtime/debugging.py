@@ -17,7 +17,7 @@ class Assert(object):
 
 class Print(object):
     name = 'print'
-    inputs = ['string']
+    inputs = ['any']
     output = 'void'
     pure = False
 

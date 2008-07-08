@@ -160,4 +160,9 @@ stdoutTest('circa whitespace.ca', expectedOutput=
 add(1 ,  2)
 """)
 
+stdoutTest('circa struct.ca', expectedOutput=
+"""0
+2
+""")
+
 printOverallResults()
