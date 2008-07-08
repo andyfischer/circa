@@ -17,15 +17,7 @@ class IfStatement(object):
         self.branches = []
 
     def evaluate(self, condition):
-        try:
-            if condition:
-                for term in self.branches[0]:
-                    term.execute()
-            else:
-                for term in self.branches[1]:
-                    term.execute()
-        except IndexError:
-            pass
+        pass
 
 class IfExpression(object):
     name = 'if-expr'
