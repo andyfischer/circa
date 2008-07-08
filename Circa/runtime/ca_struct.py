@@ -8,7 +8,6 @@ class CircaStruct(ca_type.CircaType):
         ca_type.CircaType.__init__(self)
         self.members = []
         self.allocateData = CircaStruct_allocateData
-        self.getField = CircaStruct_getField
 
     def appendMember(self, name, type):
         self.members.append((name,type))
@@ -22,8 +21,8 @@ def CircaStruct_allocateData(type):
         setattr(result, memberName, memberAllocateData(memberTypeObj))
     return result
         
-def CircaStruct_getField(term, fieldName):
-    return getattr(term.value(), fieldName)
+def CircaStruct_setField(term, name, value):
+    setattr(term.value(), name, value)
 
 class StructInstance(object):
     pass
@@ -41,18 +40,29 @@ class DynamicObjectType(object):
 class GetField(object):
     name = 'get-field'
     inputs = ['ref', 'string']
-    inputNames = ['term', 'fieldName']
+    inputNames = ['term', 'name']
     output = 'any'
     meta = True
 
     @staticmethod
     def evaluate(cxt):
         term = cxt.inputTerm(0)
-        typeObj = term.getType().value()
-        if typeObj.getField is None:
-            print "Error in get-field, type does not implement getField"
-            return
-        cxt.setResult(typeObj.getField(term, cxt.input(1)))
+        cxt.setResult(getattr(term.value(), cxt.input(1)))
+
+class SetField(object):
+    name = 'set-field'
+    inputs = ['ref', 'string', 'any']
+    inputNames = ['term', 'name', 'value']
+    output = 'void'
+    meta = True
+    pure = False
+
+    @staticmethod
+    def evaluate(cxt):
+        term = cxt.inputTerm(0)
+        setattr(term.value(), cxt.input(1), cxt.input(2))
+        cxt.setResult(None)
    
 def createTerms(codeUnit):
     builtins.GET_FIELD = function_builder.importPythonFunction(codeUnit, GetField)
+    function_builder.importPythonFunction(codeUnit, SetField)

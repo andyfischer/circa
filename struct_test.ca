@@ -1,9 +1,0 @@
-
-type my-type {
-  int int1
-  bool bool1
-}
-
-a = my-type()
-
-get-field(a,'int1') -> concat -> print
