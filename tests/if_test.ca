@@ -1,118 +1,109 @@
 
 -- Test conditional execution, simple
-if (true)
+if true
   print('Simple 1')
+end
 
-if (false)
+if false
   print('ERROR!')
+end
 
-if ((1 + 2) > 1)
+if (1 + 2) > 1
   print('Complex condition 1')
+end
 
-if ((1 + 2) < 1)
+if (1 + 2) < 1
   print('ERROR!')
+end
 
 -- Conditional execution with else
-if (true)
+if true
   print('Else 1')
 else
   print('ERROR!')
+end
 
-if (false)
+if false
   print('ERROR!')
 else
   print('Else 2')
+end
 
 -- Multiline blocks
-if (true) {
+if true
     print('Multiline 1')
     print('Multiline 2')
     print('Multiline 3')
-} else {
+else
     print('Error!')
-}
+end
 
 -- Check various syntax forms
-if (true)
+if true
   print('Syntax 1')
-else {
+else
   print('Uh oh..')
   print('Error!')
-}
+end
 
-if (true)
-{
+if true
     print('Syntax 2')
     print('Syntax 3')
     print('Syntax 4')
-}
 else
     print('Error!')
+end
 print('Syntax 5')
 
-if (false)
+if false
     print('Error!')
 else
-{
     print('Syntax 6')
     print('Syntax 7')
-}
-
-if (true) print('Single line 1')
-
-if (true) print('Single line 2')
-else print('Error!')
-
-if (false) print('Error!')
-else print('Single line 3')
+end
 
 -- Check nested blocks
 
-if (true) {
-    if (false) {
+if true
+    if false
         print('Error!')
-    } else {
+    else
         print('Nested 1')
-    }
-} else {
+    end
+else
     print('Error!')
-}
+end
 
-if (false) {
+if false
     print('Error!')
-} else {
-    if (false) {
+else
+    if false
         print('Error!')
-    } else {
+    else
         print('Nested 2')
-    }
-}
+    end
+end
 
-if (false) {
+if false
     print('Error!')
-} else {
-    if (true) {
+else
+    if true
         print('Nested 3')
-    } else {
+    else
         print('Error!')
-    }
-}
+    end
+end
 
-if (true)
-    if (false)
+if true
+    if false
         print('Error!')
     else
         print('Nested 4')
+    end
 else
     print('Error!')
+end
 
-if (false)
-    print('Error!')
-else
-    if (true)
-        print('Nested 5')
-    else
-        print('Error!')
     
 if (false)
     print('Error!')
@@ -125,31 +116,39 @@ else
                 print('Error!')
             else
                 if (true)
-                    print('Nested 6')
+                    print('Nested 5')
                 else
                     print('Error!')
+                end
+            end
+        end
     else
         print('Error!')
+    end
+end
     
 
 -- Rebinding, simple
 
 a = 1
 
-if (true) 
+if true
   a = 2
+end
 
 print(concat('Should be two: ', a))
 
 b = 3
-if (false)
+if false
   b = 4
+end
 print(concat('Should be three: ', b))
 
 -- Rebinding, with else block
 c = 5
-if (true)
+if true
   c = 6
 else
   c = 7
+end
 print(concat('Should be six: ', c))
