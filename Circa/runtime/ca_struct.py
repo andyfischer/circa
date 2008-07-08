@@ -43,6 +43,7 @@ class GetField(object):
     inputNames = ['term', 'name']
     output = 'any'
     meta = True
+    feedbackHandler = 'get-field-feedback'
 
     @staticmethod
     def evaluate(cxt):
@@ -62,7 +63,23 @@ class SetField(object):
         term = cxt.inputTerm(0)
         setattr(term.value(), cxt.input(1), cxt.input(2))
         cxt.setResult(None)
+
+class GetFieldFeedback(object):
+    name = 'get-field-feedback'
+    inputs = ['ref','ref']
+    output = 'void'
+    meta = True
+    pure = False
+
+    @staticmethod
+    def evaluate(cxt):
+        get_field_term = cxt.inputTerm(0)
+        desired = cxt.input(1)
+        target_struct = get_field_term.getInput(0).value()
+        field_name = get_field_term.getInput(1).value()
+        setattr(target_struct, field_name, desired)
    
 def createTerms(codeUnit):
+    function_builder.importPythonFunction(codeUnit, GetFieldFeedback)
     builtins.GET_FIELD = function_builder.importPythonFunction(codeUnit, GetField)
     function_builder.importPythonFunction(codeUnit, SetField)
