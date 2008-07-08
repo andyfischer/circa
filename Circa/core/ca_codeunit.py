@@ -10,7 +10,9 @@ from term import Term
 from branch import Branch
 
 class CodeUnit(object):
-    __slots__ = ['allTerms', 'mainBranch', 'parent']
+    __slots__ = ['name', 'allTerms', 'mainBranch', 'parent']
+
+    name = 'CodeUnit'
 
     def __init__(self):
         # allTerms is a list of Terms
@@ -282,3 +284,4 @@ def findExistingEquivalent(function, inputs):
    
     # None found
     return None
+

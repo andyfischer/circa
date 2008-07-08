@@ -2,7 +2,7 @@
 import pdb
 
 import Circa
-from Circa.core import (builtins, ca_function, ca_type, term)
+from Circa.core import (builtins, ca_codeunit, ca_function, ca_type, term)
 from Circa.common import (branch_syntax, debug, function_builder)
 from Circa.utils.string_buffer import StringBuffer
 
@@ -71,20 +71,19 @@ class ToSource(object):
 
         cxt.setResult(result)
 
-class ModuleToSource(object):
-    name = 'module-to-source'
-    inputs = ['Module']
+class CodeToSource(object):
+    name = 'code-to-source'
+    inputs = ['CodeUnit']
     output = 'string'
     meta = True
 
     @staticmethod
     def evaluate(cxt):
-        module = cxt.input(0)
-        debug._assert(module is not None)
-        debug._assert(module.codeUnit is not None)
+        codeUnit = cxt.input(0)
+        debug._assert(codeUnit is not None)
 
         buffer = StringBuffer()
-        for line in module.codeUnit.mainBranch.syntax:
+        for line in codeUnit.mainBranch.syntax:
             if isinstance(line, term.Term):
                 toSourceTerm = cxt.codeUnit().createTerm('to-source', [line])
                 toSourceTerm.execute()
@@ -123,9 +122,10 @@ class Comment(object):
         pass
 
 def createFunctions(codeUnit):
+    function_builder.importPythonType(codeUnit, ca_codeunit.CodeUnit)
     builtins.HIGH_LEVEL_OPTION_FUNC = (
             function_builder.importPythonFunction(codeUnit, HighLevelOption))
     function_builder.importPythonFunction(codeUnit,ToSource)
-    function_builder.importPythonFunction(codeUnit,ModuleToSource)
+    function_builder.importPythonFunction(codeUnit,CodeToSource)
     builtins.COMMENT_FUNC = function_builder.importPythonFunction(codeUnit,Comment)
     function_builder.importPythonFunction(codeUnit,GetLocal)
