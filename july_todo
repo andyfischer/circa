@@ -1,6 +1,30 @@
 Subroutine work:
 * Make all subroutines inline (create terms on execute)
-* Make sure we are smart about when these terms get created
 
 Function calls:
 * Add support for function overloading by type
+
+Execution:
+* Create an executor/virtual machine/emulator type object. This class
+  should take a CodeUnit as input, and run it. Must be able to handle
+  terms that affect control flow.
+
+Control flow:
+* For, while, return, etc
+
+Errors:
+* Every term can have a list of errors. Add functions to create errors,
+  modify executor so that it notices and prints errors, and don't execute
+  a term if its input have errors.
+
+Branches:
+* Every branch should be organized into a list of non-pure functions,
+  and a set of pure functions. Executing the branch means running through
+  the non-pure functions in order. If an error occurs in a non-pure
+  function, stop.
+
+  Also, preserve syntax.
+
+Python execution:
+* Add the ability to create a 'throwaway' term. We create the term, evaluate
+  it, return the result, and then delete the term.
