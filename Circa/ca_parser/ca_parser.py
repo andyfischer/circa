@@ -101,7 +101,7 @@ def statement(tokens):
     elif tokens.nextIs(RETURN):
         return return_statement(tokens)
     elif tokens.nextIs(IF):
-        return if_statement(tokens)
+        return if_block(tokens)
     elif tokens.nextIs(LBRACKET):
         return high_level_option_statement(tokens)
     elif tokens.nextIs(TYPE):
@@ -341,24 +341,24 @@ def return_statement(tokens):
     statement_end(tokens)
     return ast.ReturnStatement(returnKeyword, right)
 
-def if_statement(tokens):
+def if_block(tokens):
 
     ifKeyword = tokens.consume(IF)
-    tokens.consume(LPAREN)
     conditionExpression = infix_expression(tokens)
-    tokens.consume(RPAREN)
 
-    tokens.tryConsume(NEWLINE)
-
-    mainBlock = bracketed_statement_list(tokens)
+    mainBlock = ast.StatementList()
     elseBlock = None
 
-    tokens.tryConsume(NEWLINE)
+    while not (tokens.nextIs(ELSE) or tokens.nextIs(END)):
+        mainBlock.append(statement(tokens))
 
     if tokens.nextIs(ELSE):
-        elseKeyword = tokens.consume(ELSE)
-        tokens.tryConsume(NEWLINE)
-        elseBlock = bracketed_statement_list(tokens)
+        tokens.consume(ELSE)
+        elseBlock = ast.StatementList()
+        while not tokens.nextIs(END):
+            elseBlock.append(statement(tokens))
+
+    tokens.consume(END)
 
     return ast.IfBlock(conditionExpression, mainBlock, elseBlock)
 
