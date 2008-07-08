@@ -1,9 +1,3 @@
-Struct work:
-* Add parser support to make struct types
-* Add code to ca_struct to instantiate structs
-* Add support where a type name can be used as a function (constructor)
-* Add get-field and set-field functions, for structs
-
 Subroutine work:
 * Make all subroutines inline (create terms on execute)
 * Make sure we are smart about when these terms get created
