@@ -161,4 +161,12 @@ stdoutTest('circa struct.ca', expectedOutput=
 2
 """)
 
+stdoutTest('circa while.ca', expectedOutput=
+"""a = 1
+a = 2
+a = 3
+a = 4
+a after loop = 5
+""")
+
 printOverallResults()

@@ -9,6 +9,7 @@
 import pdb
 
 import builtins, ca_function, ca_type
+from Circa.common import debug
 
 nextGlobalID = 1
 
@@ -91,9 +92,13 @@ class Term(object):
 
     def execute(self):
         "Calls our function and updates our output value"
+        self.needsUpdate = False
+
+        for input in self.inputs:
+            input.requestUpdate()
+        self.functionTerm.requestUpdate()
         
         ca_function.evaluateFunc(self.functionTerm)(self.executionContext)
-        self.needsUpdate = False
         self.outputReady = True
 
     def execute_trace(self):
@@ -111,10 +116,9 @@ class Term(object):
         request may propogate upward.
         """
         if self.needsUpdate:
-            for input in self.inputs:
-                input.requestUpdate()
-            self.functionTerm.requestUpdate()
+
             self.execute()
+            self.needsUpdate = False
 
     def invalidate(self):
         """
@@ -122,16 +126,16 @@ class Term(object):
         to all the users of this term.
         """
 
-        # If needsUpdate is already true, don't do anything. This prevents a
-        # bunch of unnecessary calls
+        # If needsUpdate is already true, don't do anything.
         if self.needsUpdate:
             return
+
+        debug._assert(not self in self.users)
 
         self.needsUpdate = True
 
         for user in self.users:
-            self.invalidate()
-        
+            user.invalidate()
   
     # value accessors
     def __int__(self):
