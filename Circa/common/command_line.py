@@ -230,7 +230,26 @@ def main():
 
     targetCodeUnit = None
 
+    if ('i' in single_options) and ('p' in single_options):
+        print "Error: -i and -p options cannot be used together"
+        return
+
     verbose = 'v' in single_options
+    doInteractiveMode = False
+    executeModule = True
+
+    # -i is interactive mode
+    if 'i' in single_options:
+        doInteractiveMode = True
+
+    # -p is inspection mode
+    if 'p' in single_options:
+        executeModule = False
+        doInteractiveMode = True
+
+    # Do interactive mode if they didn't specify any arguments
+    if len(sys.argv) < 2:
+        doInteractiveMode = True
 
     # Was a file name specified?
     if filename is None:
@@ -255,15 +274,13 @@ def main():
                 print str(error)
             return
 
-        module.execute()
         Circa.LOADED_MODULES[removeFileSuffix(filename)] = module
         targetCodeUnit = module.codeUnit
 
-    doInteractiveMode = 'i' in single_options
+        # Execute the module
+        if executeModule:
+            module.execute()
 
-    # Special case, if they didn't specify anything, go into interactive mode
-    if len(sys.argv) < 2:
-        doInteractiveMode = True
 
     # Start interactive mode?
     if doInteractiveMode:

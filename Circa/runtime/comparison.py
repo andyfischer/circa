@@ -30,7 +30,6 @@ class LessThan(object):
 
     @staticmethod
     def evaluate(a,b):
-        pdb.set_trace()
         return a < b
 
 class LessThanOrEquals(object):
