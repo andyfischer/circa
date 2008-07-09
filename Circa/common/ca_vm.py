@@ -19,3 +19,6 @@ class CircaVirtualMachine(object):
                 else:
                     if len(term.state.branches) > 1:
                         self.run_branch(term.state.branches[1])
+            elif term.functionTerm is builtins.WHILE_STATEMENT:
+                while term.getInput(0).value():
+                    self.run_branch(term.state.branch)
