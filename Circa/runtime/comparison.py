@@ -1,6 +1,7 @@
 #
 # Defines Circa functions for numeric comparison and equality checking
 
+import pdb
 from Circa.common import function_builder
 from Circa.core import builtins
 
@@ -29,6 +30,7 @@ class LessThan(object):
 
     @staticmethod
     def evaluate(a,b):
+        pdb.set_trace()
         return a < b
 
 class LessThanOrEquals(object):

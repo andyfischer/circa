@@ -103,6 +103,35 @@ class Term(object):
         """
         pdb.runcall(ca_function.evaluateFunc(self.functionTerm), self.executionContext)
         self.needsUpdate = False
+
+    def requestUpdate(self):
+        """
+        Make sure 'term' is up-to-date. If it is not, we make sure that
+        term's inputs are all up-to-date, and then update 'term'. This
+        request may propogate upward.
+        """
+        if self.needsUpdate:
+            for input in self.inputs:
+                input.requestUpdate()
+            self.functionTerm.requestUpdate()
+            self.execute()
+
+    def invalidate(self):
+        """
+        Mark this term as 'needsUpdate'. This call propogates downward
+        to all the users of this term.
+        """
+
+        # If needsUpdate is already true, don't do anything. This prevents a
+        # bunch of unnecessary calls
+        if self.needsUpdate:
+            return
+
+        self.needsUpdate = True
+
+        for user in self.users:
+            self.invalidate()
+        
   
     # value accessors
     def __int__(self):
