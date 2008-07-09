@@ -128,9 +128,8 @@ class CommentLine(Statement):
     def __init__(self, text):
         self.text = text
     def create(self, context):
-        term = context.createTerm(builtins.COMMENT_FUNC, [])
         context.branch.syntax.append(self.text)
-        return term
+        return None
     def renderSource(self, output):
         output.write(self.text)
 
