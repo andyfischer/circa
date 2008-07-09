@@ -5,10 +5,9 @@ end
 
 a = 0
 
-while a < 10
-  a := a + 1
+while a < 5
   concat("a = ", a) -> print
-  a < 10 -> print
+  a := a + 1
 end
 
-assert(a == 10)
+concat("a after loop = ", a) -> print

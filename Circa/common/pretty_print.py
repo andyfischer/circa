@@ -53,15 +53,14 @@ def _printTerm(cxt, term):
         cxt.out.unindent()
     elif term.functionTerm is builtins.FEEDBACK_FUNC:
         cxt.out.write(functionName + "(")
-        cxt.out.write(','.join(map(shortIdentifier, term.inputs)))
+        cxt.out.write(', '.join(map(shortIdentifier, term.inputs)))
         cxt.out.writeln(")")
         cxt.out.indent()
         printBranch(cxt, term.state.branch)
         cxt.out.unindent()
-
     else:
         cxt.out.write(functionName + "(")
-        cxt.out.write(','.join(map(shortIdentifier, term.inputs)))
+        cxt.out.write(', '.join(map(shortIdentifier, term.inputs)))
         cxt.out.writeln(")")
 
 def shortIdentifier(term):

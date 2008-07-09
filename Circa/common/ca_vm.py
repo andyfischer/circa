@@ -1,4 +1,5 @@
 
+import pdb
 from Circa.core import builtins
 
 class CircaVirtualMachine(object):
@@ -24,5 +25,10 @@ class CircaVirtualMachine(object):
                     if len(term.state.branches) > 1:
                         self.run_branch(term.state.branches[1])
             elif term.functionTerm is builtins.WHILE_STATEMENT:
-                while term.getInput(0).value():
+                while True:
+                    term.getInput(0).requestUpdate()
+                    
+                    if not term.getInput(0).value():
+                        break
+
                     self.run_branch(term.state.branch)
