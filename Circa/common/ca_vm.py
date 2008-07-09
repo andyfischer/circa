@@ -10,6 +10,10 @@ class CircaVirtualMachine(object):
         
     def run_branch(self, branch):
         for term in branch:
+            for input in term.inputs:
+                input.requestUpdate()
+            term.functionTerm.requestUpdate()
+
             term.execute()
 
             # Handle terms with branches

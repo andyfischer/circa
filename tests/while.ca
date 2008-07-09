@@ -1,10 +1,14 @@
 
+while false
+  print('fail')
+end
 
 a = 0
 
 while a < 10
   a := a + 1
   concat("a = ", a) -> print
+  a < 10 -> print
 end
 
 assert(a == 10)
