@@ -37,15 +37,20 @@ def _printTerm(cxt, term):
     elif term.isVariable():
         _printTermValue(cxt, term)
     elif term.functionTerm is builtins.IF_STATEMENT:
-        cxt.out.writeln("if (" + shortIdentifier(term.getInput(0)) + ")")
+        cxt.out.writeln("if " + shortIdentifier(term.getInput(0)))
         cxt.out.indent()
         printBranch(cxt, term.state.branches[0])
         cxt.out.unindent()
         if len(term.state.branches) > 1:
-            cxt.out.writeln("else:")
+            cxt.out.writeln("else")
             cxt.out.indent()
             printBranch(cxt, term.state.branches[1])
             cxt.out.unindent()
+    elif term.functionTerm is builtins.WHILE_STATEMENT:
+        cxt.out.writeln("while " + shortIdentifier(term.getInput(0)))
+        cxt.out.indent()
+        printBranch(cxt, term.state.branch)
+        cxt.out.unindent()
     elif term.functionTerm is builtins.FEEDBACK_FUNC:
         cxt.out.write(functionName + "(")
         cxt.out.write(','.join(map(shortIdentifier, term.inputs)))
