@@ -312,24 +312,26 @@ class IfBlock(Statement):
 
         return ifStatement
 
-    def renderSource(self,output):
-        output.write('if (')
-        self.condition.renderSource(output)
-        output.write(') {')
-        self.mainBlock.renderSource(output)
-        output.write('}')
-        if self.elseBlock is not None:
-            output.write(' else {')
-            output.elseBlock.renderSource(output)
-            output.write('}')
-
 class WhileBlock(Statement):
-    def __init__(self, condition, stmtList):
-        debug._assert(isinstance(condition,Expression))
-        debug._assert(isinstance(stmtList,StatementList))
+    def __init__(self, conditionExpr, block):
+        debug._assert(isinstance(conditionExpr,Expression))
+        debug._assert(isinstance(block,StatementList))
 
-        self.condition = condition
-        self.statementList = stmtList
+        self.conditionExpr = conditionExpr
+        self.block = block
+
+    def create(self,context):
+        # Create term for condition
+        condition = self.conditionExpr.create(context)
+
+        # Create the statement term
+        whileStatement = context.createTerm(builtins.WHILE_STATEMENT, [condition])
+
+        self.block.create(CompilationContext(context.codeUnit, context,
+            whileStatement.state.branch))
+
+        return whileStatement
+
 
 class NameBinding(Statement):
     def __init__(self, left, right):

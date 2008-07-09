@@ -98,6 +98,7 @@ THIS =          TokenDef(54, 'this', pattern=word('this'))
 PATCH =         TokenDef(55, 'patch', pattern=word('patch'))
 ATTRIBUTE =     TokenDef(56, 'attribute', pattern=word('attribute'))
 END =           TokenDef(57, 'end', pattern=word('end'))
+WHILE =         TokenDef(58, 'while', pattern=word('while'))
 
 # Other tokens
 FLOAT =         TokenDef(70, 'float', pattern=r"([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+)")

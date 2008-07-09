@@ -9,6 +9,7 @@ class Assert(object):
     inputs = ['bool']
     output = 'void'
     meta = True
+    pure = False
 
     @staticmethod
     def evaluate(cxt):

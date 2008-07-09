@@ -102,6 +102,8 @@ def statement(tokens):
         return return_statement(tokens)
     elif tokens.nextIs(IF):
         return if_block(tokens)
+    elif tokens.nextIs(WHILE):
+        return while_block(tokens)
     elif tokens.nextIs(LBRACKET):
         return high_level_option_statement(tokens)
     elif tokens.nextIs(TYPE):
@@ -361,6 +363,18 @@ def if_block(tokens):
     tokens.consume(END)
 
     return ast.IfBlock(conditionExpression, mainBlock, elseBlock)
+
+def while_block(tokens):
+    whileKeyword = tokens.consume(WHILE)
+    conditionExpression = infix_expression(tokens)
+    block = ast.StatementList()
+
+    while not tokens.nextIs(END):
+        block.append(statement(tokens))
+
+    tokens.consume(END)
+
+    return ast.WhileBlock(conditionExpression, block)
 
 def high_level_option_statement(tokens):
     tokens.consume(LBRACKET)
