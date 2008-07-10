@@ -10,7 +10,9 @@ Execution:
   terms that affect control flow.
 
 Control flow:
-* For, while, return, etc
+* For loop
+* Break
+* Return
 
 Errors:
 * Every term can have a list of errors. Add functions to create errors,
