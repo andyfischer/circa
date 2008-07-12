@@ -14,7 +14,8 @@ class Feedback(object):
 
     def initialize(self,cxt):
         # Create a branch
-        self.branch = branch.Branch(cxt.caller())
+        self.branch = branch.Branch(owningTerm = cxt.caller(),
+                owningCodeUnit = cxt.codeUnit())
 
     def evaluate(self,cxt):
         target = cxt.inputTerm(0)
