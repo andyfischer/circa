@@ -19,7 +19,7 @@ class CodeUnit(object):
         self.allTerms = []
 
         # mainBranch is a list of Terms
-        self.mainBranch = Branch(None)
+        self.mainBranch = Branch(owningTerm=None, owningCodeUnit=self)
 
         self.parent = None
 
@@ -34,13 +34,14 @@ class CodeUnit(object):
 
     def _newTerm(self, branch = None):
         "Internal method. Returns a new Term object."
-        new_term = Term()
-        new_term.codeUnit = self
 
         if branch is None:
             branch = self.mainBranch
         else:
             debug._assert(isinstance(branch,Branch))
+        
+        new_term = Term(branch)
+        new_term.codeUnit = self
 
         branch.append(new_term)
         self.allTerms.append(new_term)

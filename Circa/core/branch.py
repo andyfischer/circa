@@ -3,12 +3,14 @@ from Circa.common import debug
 import branch_syntax
 
 class Branch(object):
-    __slots__ = ['_list', '_namespace', 'ownerTerm', 'syntax']
+    __slots__ = ['_list', '_namespace', 'owningTerm', 'owningCodeUnit', 'syntax']
 
-    def __init__(self, ownerTerm):
+    def __init__(self, owningTerm, owningCodeUnit):
+
         self._list = []
         self._namespace = {}
-        self.ownerTerm = ownerTerm
+        self.owningTerm = owningTerm
+        self.owningCodeUnit = owningCodeUnit
         self.syntax = branch_syntax.BranchSyntaxInfo()
 
     def append(self, term):

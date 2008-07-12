@@ -266,12 +266,14 @@ class IfBlock(Statement):
         # Create an if-statement term
         ifStatement = context.createTerm(builtins.IF_STATEMENT, [condition])
 
-        ifStatement.state.branches.append(Branch(ifStatement))
+        positiveBranch = Branch(owningTerm=ifStatement, owningCodeUnit=context.codeUnit)
+        ifStatement.state.branches.append(positiveBranch)
         self.mainBlock.create(CompilationContext(context.codeUnit, context,
             ifStatement.state.branches[0]))
 
         if self.elseBlock is not None:
-            ifStatement.state.branches.append(Branch(ifStatement))
+            elseBranch = Branch(owningTerm=ifStatement, owningCodeUnit=context.codeUnit)
+            ifStatement.state.branches.append(elseBranch)
             self.elseBlock.create(CompilationContext(context.codeUnit, context,
                 ifStatement.state.branches[1]))
 

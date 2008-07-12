@@ -14,8 +14,12 @@ from Circa.common import debug
 nextGlobalID = 1
 
 class Term(object):
-    def __init__(self):
+    def __init__(self, branch):
         "Don't use this constructor directly, use CodeUnit.createTerm instead"
+
+        debug._assert(branch is not None)
+
+        self.owningBranch = branch
    
         # Inputs, a list of terms
         self.inputs = []

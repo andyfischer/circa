@@ -28,7 +28,7 @@ class WhileStatement(object):
     stateType = 'List'
     
     def __init__(self):
-        self.branch = branch.Branch(None)
+        self.branch = branch.Branch(None, None)
 
     def evaluate(self, condition):
         pass
