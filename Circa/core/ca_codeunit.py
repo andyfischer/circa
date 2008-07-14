@@ -5,11 +5,11 @@ import itertools, pdb
 
 import Circa
 from Circa.common import (ca_vm, debug, errors)
-import builtins, ca_function, ca_type
+import builtins, ca_function, ca_type, ca_object
 from term import Term
 from branch import Branch
 
-class CodeUnit(object):
+class CodeUnit(ca_object.CircaObject):
     __slots__ = ['name', 'allTerms', 'mainBranch', 'parent']
 
     name = 'CodeUnit'

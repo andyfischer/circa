@@ -1,8 +1,9 @@
 
 from Circa.common import debug
 from Circa.core.term import Term
+import ca_object
 
-class CircaFunction(object):
+class CircaFunction(ca_object.CircaObject):
     def __init__(self):
         # inputTypes: list of Terms
         self.inputTypes = []

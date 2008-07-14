@@ -43,6 +43,13 @@ class Term(object):
         # Persistent state.
         self.state = None
 
+        # Inner branches; this can be considered part of the term's state
+        self.branches = []
+
+        # Pointers to other terms; this can be considered part of the
+        # term's state
+        self.termPointers = []
+
         # The CodeUnit object that owns us
         self.codeUnit = None
         
