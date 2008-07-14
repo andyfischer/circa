@@ -1,12 +1,12 @@
 
 import types
 from Circa.common import debug
-import raw_python
+import raw_python, ca_object
 
 def emptyFunction(term):
     pass
 
-class CircaType(object):
+class CircaType(ca_object.CircaObject):
     __slots__ = ['name', 'allocateData', 'toShortString', 'toSource',
             'iterateInnerTerms']
     def __init__(self):
