@@ -27,6 +27,8 @@ def setup_mac_env():
 
     if DEBUG_BUILD:
         env.Append(CPPFLAGS=['-ggdb'])
+        env.Append(CPPFLAGS=['-bundle'])
+        env.Append(CPPFLAGS=['-flat_namespace'])
 
 setup_mac_env()
 
