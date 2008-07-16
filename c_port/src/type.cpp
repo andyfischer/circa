@@ -6,6 +6,11 @@
 
 #define CA_TYPE(t) ((CircaType*)t->outputValue)
 
+CircaType::CircaType()
+{
+    typeID = TYPE_TYPE;
+}
+
 CircaObject* CaType_alloc(Term*)
 {
     return new CircaType();

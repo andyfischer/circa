@@ -5,13 +5,17 @@
 
 #include "object.h"
 
+#define CA_TYPE(t) ((CircaType*)t->outputValue)
+
 struct Term;
 
 struct CircaType : public CircaObject
 {
     string name;
 
+    CircaType();
     CircaObject* (*alloc)(Term*);
+    Term* toString;
 };
 
 extern "C" {

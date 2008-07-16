@@ -3,6 +3,7 @@
 
 #include "codeunit.h"
 #include "function.h"
+#include "primitive_types.h"
 #include "term.h"
 #include "type.h"
 
@@ -65,11 +66,52 @@ void bootstrap_kernel()
     CaFunction_setOutputType(constFuncFunc, 0, functionType);
 }
 
+void create_primitive_type(string name, CircaObject* (*allocFunc)(Term*),
+    void (*toStringFunc)(ExecContext*))
+{
+    CircaType* typeObj = CaType_alloc(null)->asType();
+    typeObj->name = name;
+    typeObj->alloc = allocFunc;
+
+    Term* typeTerm = KERNEL->createConstant(KERNEL->getNamed("Type"), typeObj, NULL);
+    KERNEL->bindName(typeTerm, name);
+
+    CircaFunction* toStringObj = CaFunction_alloc(null)->asFunction();
+    toStringObj->name = name + "-to-string";
+    toStringObj->execute = toStringFunc;
+    toStringObj->inputTypes.setAt(0, typeTerm);
+    toStringObj->outputTypes.setAt(0, KERNEL->getNamed("string"));
+
+    Term* toStringTerm = KERNEL->createConstant(KERNEL->getNamed("Function"), toStringObj, NULL);
+    typeObj->toString = toStringTerm;
+}
+
+void create_primitive_types()
+{
+    create_primitive_type("string", CaString_alloc, CaString_toString);
+    create_primitive_type("int", CaInt_alloc, CaInt_toString);
+
+    CircaType* floatType = CaType_alloc(null)->asType();
+    floatType->name = "float";
+    floatType->alloc = CaFloat_alloc;
+
+    Term* floatTerm = KERNEL->createConstant(KERNEL->getNamed("Type"), floatType, null);
+    KERNEL->bindName(floatTerm, "float");
+
+    CircaType* boolType = CaType_alloc(null)->asType();
+    boolType->name = "float";
+    boolType->alloc = CaFloat_alloc;
+
+    Term* boolTerm = KERNEL->createConstant(KERNEL->getNamed("Type"), boolType, null);
+    KERNEL->bindName(boolTerm, "bool");
+}
+
 extern "C" {
 
 void initialize()
 {
     bootstrap_kernel();
+    create_primitive_types();
     std::cout << "Initialized" << std::endl;
 }
 

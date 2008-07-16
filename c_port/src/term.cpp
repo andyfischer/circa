@@ -4,8 +4,10 @@
 #include <iostream>
 
 #include "branch.h"
+#include "function.h"
 #include "object.h"
 #include "term.h"
+#include "exec_context.h"
 
 
 void TermList::setAt(int index, Term* term)
@@ -20,6 +22,13 @@ void TermList::setAt(int index, Term* term)
 Term* TermList::operator[](int index)
 {
     return items[index];
+}
+
+void Term::execute()
+{
+    ExecContext context(this);
+
+    CA_FUNCTION(function)->execute(&context);
 }
 
 Term* Term_createRaw()

@@ -4,6 +4,9 @@
 
 #include "object.h"
 #include "term.h"
+#include "exec_context.h"
+
+#define CA_FUNCTION(t) ((CircaFunction*)t->outputValue)
 
 struct CircaFunction : public CircaObject
 {
@@ -19,7 +22,9 @@ struct CircaFunction : public CircaObject
 
     // Code
     void (*initialize)(Term*);
-    void (*evaluate)(Term*);
+    void (*execute)(ExecContext*);
+
+    CircaFunction();
 };
 
 extern "C" {
