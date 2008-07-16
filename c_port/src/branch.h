@@ -2,6 +2,7 @@
 #define __BRANCH_INCLUDED__
 
 #include "common_headers.h"
+#include "term_namespace.h"
 
 class CodeUnit;
 class Term;
@@ -9,11 +10,19 @@ class Term;
 struct Branch
 {
     std::vector<Term*> terms;
-    std::map<string, Term*> names;
+    TermNamespace names;
     Term* owningTerm;
     CodeUnit* owningCodeUnit;
 
     void append(Term* term);
+
+    // Returns true if there is a term with the given name
+    bool containsName(string name);
+
+    // Get the term with the given name. May throw NameNotFound
+    Term* getNamed(string name);
+
+    // Bind a name to a term
     void bindName(Term* term, string name);
 };
 

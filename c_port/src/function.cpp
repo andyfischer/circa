@@ -1,7 +1,16 @@
 
 #include "function.h"
+#include "object.h"
 
-#define CA_FUNCTION(t) ((CircaFunction*)t->outputValue)
+CircaFunction::CircaFunction()
+{
+    typeID = TYPE_FUNCTION;
+    stateType = NULL;
+    pureFunction = false;
+    variableArgs = false;
+    initialize = NULL;
+    execute = NULL;
+}
 
 CircaObject* CaFunction_alloc(Term*)
 {

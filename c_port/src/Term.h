@@ -16,6 +16,13 @@ struct TermList
 {
     std::vector<Term*> items;
 
+    TermList() { }
+
+    // Convenience constructor
+    TermList(Term* term) {
+        items.push_back(term);
+    }
+
     void setAt(int index, Term* term);
     Term* operator[](int index);
 };
@@ -35,6 +42,9 @@ struct Term
     TermSyntaxHints syntaxHints;
 
     int globaID;
+
+    Term() {}
+    void execute();
 };
 
 
