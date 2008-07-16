@@ -1,7 +1,6 @@
 import pdb
 
 from ctypes import *
-#cdll.LoadLibrary("libcirca.dylib")
-lib = CDLL("libcirca.dylib")
+circa = CDLL("libcirca.dylib")
 
-lib.ForeignFunctionTest()
+circa.initialize()

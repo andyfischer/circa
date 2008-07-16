@@ -5,7 +5,7 @@
 
 #include "object.h"
 
-using std::string;
+struct Term;
 
 struct CircaType : public CircaObject
 {
@@ -14,8 +14,12 @@ struct CircaType : public CircaObject
     CircaObject* (*alloc)(Term*);
 };
 
-CircaType* CaType_alloc(Term*);
+extern "C" {
+
+CircaObject* CaType_alloc(Term*);
 void CaType_setName(Term* term, const char* value);
-void CaType_setAllocFunc(Term* term, void* allocFunc);
+void CaType_setAllocFunc(Term* term, CircaObject*(*allocFunc)(Term*));
+
+}
 
 #endif

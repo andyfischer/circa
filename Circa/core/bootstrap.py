@@ -93,9 +93,6 @@ def bootstrapKernel(kernel):
         #ca_function.setHasState(cxt.caller(), True)
         ca_function.setName(cxt.caller(), 'const-' + ca_type.name(inputType))
 
-    # Define an evaluate function for constant functions
-    #def constFuncEvaluate
-
     ca_function.setEvaluateFunc(constGenerator, constGeneratorEvaluate)
 
     # All done, re-evaluate everything

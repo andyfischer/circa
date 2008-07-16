@@ -3,10 +3,13 @@
 
 class Term;
 
+#include "branch.h"
+
 struct CodeUnit
 {
-    Term* _bootstrapEmptyTerm();
+    Branch mainBranch;
 
+    Term* _bootstrapEmptyTerm();
     void bindName(Term* term, string name);
     void setInput(Term* term, int index, Term* input);
 };

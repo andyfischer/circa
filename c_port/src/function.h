@@ -22,8 +22,12 @@ struct CircaFunction : public CircaObject
     void (*evaluate)(Term*);
 };
 
-CircaFunction* CaFunction_alloc(Term*);
+extern "C" {
+
+CircaObject* CaFunction_alloc(Term*);
 void CaFunction_setPureFunction(Term* term, bool value);
 void CaFunction_setName(Term* term, const char* value);
 void CaFunction_setInputType(Term* term, int index, Term* type);
 void CaFunction_setOutputType(Term* term, int index, Term* type);
+
+}
