@@ -30,7 +30,7 @@ void bootstrap_kernel()
     Term* typeType = KERNEL->_bootstrapEmptyTerm();
     typeType->function = constTypeFunc;
     typeType->outputValue = CaType_alloc(null);
-    CaType_setName      (typeType, "Type");
+    CaType_setName     (typeType, "Type");
     CaType_setAllocFunc(typeType, CaType_alloc);
     KERNEL->bindName(typeType, "Type");
 
@@ -47,6 +47,30 @@ void bootstrap_kernel()
     CaFunction_setPureFunction(constFuncFunc, true);
     KERNEL->bindName(constFuncFunc, "const-Function");
 
-    //
+    // Implant const-Function
+    constGenerator->function = constFuncFunc;
+
+    // Create Function type
+    Term* functionType = KERNEL->_bootstrapEmptyTerm();
+    functionType->function = constTypeFunc;
+    functionType->outputValue = CaType_alloc(null);
+    CaType_setName     (functionType, "Function");
+    CaType_setAllocFunc(functionType, CaFunction_alloc);
+    KERNEL->bindName(functionType, "Function");
+
+    // Implant Function type
+    KERNEL->setInput(constGenerator, 0, typeType);
+    KERNEL->setInput(constFuncFunc, 0, functionType);
+    CaFunction_setOutputType(constGenerator, 0, functionType);
+    CaFunction_setOutputType(constFuncFunc, 0, functionType);
+}
+
+extern "C" {
+
+void initialize()
+{
+    bootstrap_kernel();
+    std::cout << "Initialized" << std::endl;
+}
 
 }

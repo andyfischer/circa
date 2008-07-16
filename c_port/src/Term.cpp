@@ -3,9 +3,24 @@
 #include <sstream>
 #include <iostream>
 
-#include "Branch.h"
-#include "CircaObject.h"
-#include "Term.h"
+#include "branch.h"
+#include "object.h"
+#include "term.h"
+
+
+void TermList::setAt(int index, Term* term)
+{
+    // Make sure there are enough blank elements in the list
+    while (items.size() <= index) {
+        items.push_back(null);
+    }
+
+    items[index] = term;
+}
+Term* TermList::operator[](int index)
+{
+    return items[index];
+}
 
 Term* Term_createRaw()
 {
@@ -29,9 +44,3 @@ CircaObject* Term_getState(Term* term)
     return term->state;
 }
 
-#pragma GCC visibility push(default)
-void ForeignFunctionTest()
-{
-    std::cout << "Test successful" << std::endl;
-}
-#pragma pop

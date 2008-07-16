@@ -15,6 +15,9 @@ struct TermSyntaxHints
 struct TermList
 {
     std::vector<Term*> items;
+
+    void setAt(int index, Term* term);
+    Term* operator[](int index);
 };
 
 struct Term
@@ -35,16 +38,14 @@ struct Term
 };
 
 
+extern "C" {
 
 Term* Term_getInput(Term* term, int index);
 Term* Term_getFunction(Term* term);
 CircaObject* Term_getOutputValue(Term* term);
 CircaObject* Term_getState(Term* term);
 
-#pragma GCC visibility push(default)
+}
 
-void ForeignFunctionTest();
-
-#pragma pop
 
 #endif
