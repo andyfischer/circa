@@ -2,12 +2,22 @@
 #include "common_headers.h"
 
 #include "codeunit.h"
+#include "errors.h"
 #include "function.h"
+#include "globals.h"
 #include "primitive_types.h"
 #include "term.h"
 #include "type.h"
 
-CodeUnit* KERNEL;
+CodeUnit* KERNEL = NULL;
+Term* BUILTIN_INT_TYPE = NULL;
+Term* BUILTIN_FLOAT_TYPE = NULL;
+Term* BUILTIN_BOOL_TYPE = NULL;
+Term* BUILTIN_STRING_TYPE = NULL;
+Term* BUILTIN_TYPE_TYPE = NULL;
+Term* BUILTIN_FUNCTION_TYPE = NULL;
+Term* BUILTIN_CODEUNIT_TYPE = NULL;
+
 
 void bootstrap_kernel()
 {
@@ -66,53 +76,47 @@ void bootstrap_kernel()
     CaFunction_setOutputType(constFuncFunc, 0, functionType);
 }
 
-void create_primitive_type(string name, CircaObject* (*allocFunc)(Term*),
+Term* create_primitive_type(string name, CircaObject* (*allocFunc)(Term*),
     void (*toStringFunc)(ExecContext*))
 {
     CircaType* typeObj = CaType_alloc(null)->asType();
     typeObj->name = name;
     typeObj->alloc = allocFunc;
 
-    Term* typeTerm = KERNEL->createConstant(KERNEL->getNamed("Type"), typeObj, NULL);
+    Term* typeTerm = KERNEL->createConstant(GetGlobal("Type"), typeObj, NULL);
     KERNEL->bindName(typeTerm, name);
 
+    // Create to-string function
     CircaFunction* toStringObj = CaFunction_alloc(null)->asFunction();
     toStringObj->name = name + "-to-string";
     toStringObj->execute = toStringFunc;
     toStringObj->inputTypes.setAt(0, typeTerm);
-    toStringObj->outputTypes.setAt(0, KERNEL->getNamed("string"));
+    toStringObj->outputTypes.setAt(0, GetGlobal("string"));
 
-    Term* toStringTerm = KERNEL->createConstant(KERNEL->getNamed("Function"), toStringObj, NULL);
+    Term* toStringTerm = KERNEL->createConstant(GetGlobal("Function"), toStringObj, NULL);
     typeObj->toString = toStringTerm;
 }
 
 void create_primitive_types()
 {
-    create_primitive_type("string", CaString_alloc, CaString_toString);
-    create_primitive_type("int", CaInt_alloc, CaInt_toString);
-
-    CircaType* floatType = CaType_alloc(null)->asType();
-    floatType->name = "float";
-    floatType->alloc = CaFloat_alloc;
-
-    Term* floatTerm = KERNEL->createConstant(KERNEL->getNamed("Type"), floatType, null);
-    KERNEL->bindName(floatTerm, "float");
-
-    CircaType* boolType = CaType_alloc(null)->asType();
-    boolType->name = "float";
-    boolType->alloc = CaFloat_alloc;
-
-    Term* boolTerm = KERNEL->createConstant(KERNEL->getNamed("Type"), boolType, null);
-    KERNEL->bindName(boolTerm, "bool");
+    BUILTIN_STRING_TYPE = create_primitive_type("string", CaString_alloc, CaString_toString);
+    BUILTIN_INT_TYPE = create_primitive_type("int", CaInt_alloc, CaInt_toString);
+    BUILTIN_FLOAT_TYPE = create_primitive_type("float", CaFloat_alloc, CaFloat_toString);
+    BUILTIN_BOOL_TYPE = create_primitive_type("bool", CaBool_alloc, CaBool_toString);
 }
 
 extern "C" {
 
 void initialize()
 {
-    bootstrap_kernel();
-    create_primitive_types();
-    std::cout << "Initialized" << std::endl;
+    try {
+        bootstrap_kernel();
+        create_primitive_types();
+        std::cout << "Initialized" << std::endl;
+    } catch (errors::CircaError& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
 }
 
 }

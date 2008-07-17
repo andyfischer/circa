@@ -3,17 +3,22 @@
 
 #include "bootstrap.h"
 #include "codeunit.h"
+#include "errors.h"
 #include "function.h"
 #include "term.h"
 #include "type.h"
 
+CodeUnit::CodeUnit()
+{
+    _type = BUILTIN_CODEUNIT_TYPE;
+}
+
 Term* CodeUnit::_newTerm(Branch* branch)
 {
-    if (branch == null)
-        branch = &mainBranch;
-
     Term* term = new Term();
-    branch->append(term);
+
+    if (branch != NULL)
+        branch->append(term);
     term->owningBranch = branch;
     return term;
 }
@@ -43,29 +48,52 @@ void CodeUnit::setInput(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 }
 
-Term* CodeUnit::createTerm(Term* function, TermList inputs, CircaObject* initialValue, 
-    Branch* branch)
+void initialize_term(Term* term, Term* function, CircaObject* initialValue)
 {
-    // Todo: try to reuse an existing term
+    if (term == NULL)
+        throw errors::InternalError("Term is NULL");
 
-    Term* term = _newTerm(branch);
+    if (function == NULL)
+        throw errors::InternalError("Function is NULL");
+
     term->function = function;
-    term->inputs = inputs;
 
     Term* outputType = CA_FUNCTION(function)->outputTypes[0];
     Term* stateType = CA_FUNCTION(function)->stateType;
 
+    if (outputType == NULL)
+        throw errors::InternalError("outputType is NULL");
+
     // Initialize outputValue
-    if (initialValue == null)
+    if (initialValue == NULL)
         term->outputValue = CA_TYPE(outputType)->alloc(outputType);
     else
         term->outputValue = initialValue;
 
     // Initialize state
-    if (stateType == null)
-        term->state = null;
+    if (stateType == NULL)
+        term->state = NULL;
     else
         term->state = CA_TYPE(outputType)->alloc(outputType);
+}
+
+void set_inputs(Term* term, TermList inputs)
+{
+    term->inputs = inputs;
+}
+
+Term* CodeUnit::createTerm(Term* function, TermList inputs, CircaObject* initialValue, 
+    Branch* branch)
+{
+    // Todo: try to reuse an existing term
+
+    if (branch == NULL)
+        branch = &this->mainBranch;
+
+    Term* term = _newTerm(branch);
+
+    initialize_term(term, function, initialValue);
+    set_inputs(term, inputs);
 
     return term;
 }
@@ -79,12 +107,17 @@ Term* CodeUnit::createConstant(Term* type, CircaObject* initialValue, Branch* br
     return createTerm(constantFunc, TermList(), initialValue, branch);
 }
 
-CircaObject* CodeUnit::executeFunction(Term* function, TermList inputs)
+CircaObject* CaCode_alloc(Term*)
+{
+    return new CodeUnit();
+}
+
+CircaObject* CaCode_executeFunction(Term* function, TermList inputs)
 {
     Term tempTerm;
 
-    tempTerm.function = function;
-    tempTerm.inputs = inputs;
+    initialize_term(&tempTerm, function, NULL);
+    set_inputs(&tempTerm, inputs);
 
     tempTerm.execute();
 
@@ -92,5 +125,22 @@ CircaObject* CodeUnit::executeFunction(Term* function, TermList inputs)
     tempTerm.outputValue = NULL;
 
     return result;
+}
+
+void CaCode_bindName(CodeUnit* codeUnit, Term* term, const char* name)
+{
+    codeUnit->bindName(term, name);
+}
+
+Term* CaCode_createTerm(CodeUnit* codeUnit, Term* function, TermList inputs,
+        CircaObject* initialValue, Branch* branch)
+{
+    return codeUnit->createTerm(function, inputs, initialValue, branch);
+}
+
+Term* CaCode_createConstant(CodeUnit* codeUnit, Term* type,
+        CircaObject* initialValue, Branch* branch)
+{
+    return codeUnit->createConstant(type, initialValue, branch);
 }
 

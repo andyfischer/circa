@@ -21,7 +21,14 @@ void TermList::setAt(int index, Term* term)
 }
 Term* TermList::operator[](int index)
 {
+    if (index >= items.size())
+        return NULL;
     return items[index];
+}
+
+Term* Term::getType() const
+{
+    return this->function->asFunction()->outputTypes[0];
 }
 
 void Term::execute()
@@ -29,6 +36,31 @@ void Term::execute()
     ExecContext context(this);
 
     CA_FUNCTION(function)->execute(&context);
+}
+
+CircaInt* Term::asInt()
+{
+    return this->outputValue->asInt();
+}
+CircaFloat* Term::asFloat()
+{
+    return this->outputValue->asFloat();
+}
+CircaBool* Term::asBool()
+{
+    return this->outputValue->asBool();
+}
+CircaString* Term::asString()
+{
+    return this->outputValue->asString();
+}
+CircaFunction* Term::asFunction()
+{
+    return this->outputValue->asFunction();
+}
+CircaType* Term::asType()
+{
+    return this->outputValue->asType();
 }
 
 Term* Term_createRaw()

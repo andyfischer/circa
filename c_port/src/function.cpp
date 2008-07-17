@@ -1,10 +1,11 @@
 
+#include "bootstrap.h"
 #include "function.h"
 #include "object.h"
 
 CircaFunction::CircaFunction()
 {
-    typeID = TYPE_FUNCTION;
+    _type = BUILTIN_FUNCTION_TYPE;
     stateType = NULL;
     pureFunction = false;
     variableArgs = false;

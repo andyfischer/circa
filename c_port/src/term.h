@@ -4,7 +4,13 @@
 #include <vector>
 
 class Branch;
+class CircaInt;
+class CircaFloat;
+class CircaBool;
+class CircaFunction;
+class CircaString;
 class CircaObject;
+class CircaType;
 class Term;
 
 struct TermSyntaxHints
@@ -44,7 +50,15 @@ struct Term
     int globaID;
 
     Term() {}
+    Term* getType() const;
     void execute();
+
+    CircaInt* asInt();
+    CircaFloat* asFloat();
+    CircaBool* asBool();
+    CircaString* asString();
+    CircaFunction* asFunction();
+    CircaType* asType();
 };
 
 
