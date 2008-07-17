@@ -1,4 +1,5 @@
 
+#include "bootstrap.h"
 #include "common_headers.h"
 #include "object.h"
 #include "term.h"
@@ -8,7 +9,7 @@
 
 CircaType::CircaType()
 {
-    typeID = TYPE_TYPE;
+    _type = BUILTIN_TYPE_TYPE;
 }
 
 CircaObject* CaType_alloc(Term*)

@@ -1,31 +1,15 @@
 
+#include "bootstrap.h"
 #include "exec_context.h"
 #include "object.h"
 #include "primitive_types.h"
 
-CircaInt::CircaInt()
-{
-    typeID = TYPE_INT;
-}
-
-CircaFloat::CircaFloat()
-{
-    typeID = TYPE_FLOAT;
-}
-
-CircaBool::CircaBool()
-{
-    typeID = TYPE_BOOL;
-}
-
-CircaString::CircaString()
-{
-    typeID = TYPE_STRING;
-}
 
 CircaObject* CaInt_alloc(Term*)
 {
-    return new CircaInt();
+    CircaObject* obj = new CircaInt();
+    obj->_type = BUILTIN_INT_TYPE;
+    return obj;
 }
 void CaInt_toString(ExecContext* cxt)
 {
@@ -35,7 +19,9 @@ void CaInt_toString(ExecContext* cxt)
 }
 CircaObject* CaFloat_alloc(Term*)
 {
-    return new CircaFloat();
+    CircaObject* obj = new CircaFloat();
+    obj->_type = BUILTIN_FLOAT_TYPE;
+    return obj;
 }
 void CaFloat_toString(ExecContext* cxt)
 {
@@ -45,7 +31,9 @@ void CaFloat_toString(ExecContext* cxt)
 }
 CircaObject* CaBool_alloc(Term*)
 {
-    return new CircaBool();
+    CircaObject* obj = new CircaBool();
+    obj->_type = BUILTIN_BOOL_TYPE;
+    return obj;
 }
 void CaBool_toString(ExecContext* cxt)
 {
@@ -56,7 +44,9 @@ void CaBool_toString(ExecContext* cxt)
 }
 CircaObject* CaString_alloc(Term*)
 {
-    return new CircaString();
+    CircaObject* obj = new CircaString();
+    obj->_type = BUILTIN_STRING_TYPE;
+    return obj;
 }
 void CaString_toString(ExecContext* cxt)
 {

@@ -1,6 +1,7 @@
 
 #include "common_headers.h"
 
+#include "bootstrap.h"
 #include "errors.h"
 #include "object.h"
 #include "primitive_types.h"
@@ -9,8 +10,8 @@
 CircaInt*
 CircaObject::asInt() const
 {
-    if (typeID != TYPE_INT)
-        throw TypeError();
+    if (_type != BUILTIN_INT_TYPE)
+        throw errors::TypeError();
 
     return (CircaInt*) this;
 }
@@ -18,8 +19,8 @@ CircaObject::asInt() const
 CircaFloat*
 CircaObject::asFloat() const
 {
-    if (typeID != TYPE_FLOAT)
-        throw TypeError();
+    if (_type != BUILTIN_FLOAT_TYPE)
+        throw errors::TypeError();
 
     return (CircaFloat*) this;
 }
@@ -27,8 +28,8 @@ CircaObject::asFloat() const
 CircaBool*
 CircaObject::asBool() const
 {
-    if (typeID != TYPE_BOOL)
-        throw TypeError();
+    if (_type != BUILTIN_BOOL_TYPE)
+        throw errors::TypeError();
 
     return (CircaBool*) this;
 }
@@ -36,8 +37,8 @@ CircaObject::asBool() const
 CircaString*
 CircaObject::asString() const
 {
-    if (typeID != TYPE_STRING)
-        throw TypeError();
+    if (_type != BUILTIN_STRING_TYPE)
+        throw errors::TypeError();
 
     return (CircaString*) this;
 }
@@ -45,8 +46,8 @@ CircaObject::asString() const
 CircaType*
 CircaObject::asType() const
 {
-    if (typeID != TYPE_TYPE)
-        throw TypeError();
+    if (_type != BUILTIN_TYPE_TYPE)
+        throw errors::TypeError();
 
     return (CircaType*) this;
 }
@@ -54,8 +55,8 @@ CircaObject::asType() const
 CircaFunction*
 CircaObject::asFunction() const
 {
-    if (typeID != TYPE_FUNCTION)
-        throw TypeError();
+    if (_type != BUILTIN_FUNCTION_TYPE)
+        throw errors::TypeError();
 
     return (CircaFunction*) this;
 }

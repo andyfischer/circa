@@ -1,13 +1,7 @@
 #ifndef __OBJECT_INCLUDED__
 #define __OBJECT_INCLUDED__
 
-#define TYPE_VOID     0
-#define TYPE_INT      1
-#define TYPE_FLOAT    2
-#define TYPE_BOOL     3
-#define TYPE_STRING   4
-#define TYPE_TYPE     5
-#define TYPE_FUNCTION 6
+struct Term;
 
 class CircaInt;
 class CircaFloat;
@@ -15,10 +9,11 @@ class CircaBool;
 class CircaString;
 class CircaType;
 class CircaFunction;
+class CodeUnit;
 
 struct CircaObject
 {
-    int typeID;
+    Term* _type;
 
     // Return ourselves as a CircaInt*. Throws an exception if our
     // type does not match
@@ -37,6 +32,8 @@ struct CircaObject
     CircaType* asType() const;
 
     CircaFunction* asFunction() const;
+
+    CodeUnit* asCodeUnit() const;
 };
 
 #endif
