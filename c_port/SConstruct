@@ -8,7 +8,7 @@ SOURCE_DIRECTORY = "src"
 
 env.Append(CPPDEFINES = ["_DEBUG"])
 env.Append(CPPDEFINES = ["DEBUG"])
-env.Replace(CXX = 'llvm-g++')
+#env.Replace(CXX = 'llvm-g++')
 
 def setup_windows_env():
     env.Append(CPPFLAGS=['/EHsc'])

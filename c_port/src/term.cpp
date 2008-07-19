@@ -3,18 +3,18 @@
 #include <sstream>
 #include <iostream>
 
+#include "builtins.h"
 #include "branch.h"
+#include "errors.h"
 #include "function.h"
-#include "object.h"
 #include "term.h"
-#include "exec_context.h"
 
 
 void TermList::setAt(int index, Term* term)
 {
     // Make sure there are enough blank elements in the list
     while (items.size() <= index) {
-        items.push_back(null);
+        items.push_back(NULL);
     }
 
     items[index] = term;
@@ -26,40 +26,44 @@ Term* TermList::operator[](int index)
     return items[index];
 }
 
-Term* Term::getType() const
-{
-    return this->function->asFunction()->outputTypes[0];
-}
-
 void Term::execute()
 {
-    ExecContext context(this);
-
-    CA_FUNCTION(function)->execute(&context);
+    as_function(this->function)->execute(this);
 }
 
-int as_int(Term* t)
+int& as_int(Term* t)
 {
-    if (t->outputValueType != BUILTIN_INT_TYPE)
+    if (t->type != BUILTIN_INT_TYPE)
         throw errors::TypeError();
 
-    return (int) t->outputValue;
+    return *((int*) t->value);
 }
 
-float as_float(Term* t)
+float& as_float(Term* t)
 {
-    if (t->outputValueType != BUILTIN_FLOAT_TYPE)
+    if (t->type != BUILTIN_FLOAT_TYPE)
         throw errors::TypeError();
 
-    return (float) t->outputValue;
+    return *((float*) t->value);
 }
 
-bool as_bool(Term* t)
+bool& as_bool(Term* t)
 {
-    if (t->outputValueType != BUILTIN_BOOL_TYPE)
+    if (t->type != BUILTIN_BOOL_TYPE)
         throw errors::TypeError();
 
-    return (bool) t->outputValue;
+    return *((bool*) t->value);
+}
+
+string& as_string(Term* t)
+{
+    if (t->type != BUILTIN_STRING_TYPE)
+        throw errors::TypeError();
+
+    if (t->value == NULL)
+        throw errors::InternalError("NULL pointer in as_string");
+
+    return *((string*) t->value);
 }
 
 Term* Term_createRaw()
@@ -74,13 +78,5 @@ Term* Term_getInput(Term* term, int index)
 Term* Term_getFunction(Term* term)
 {
     return term->function;
-}
-CircaObject* Term_getOutputValue(Term* term)
-{
-    return term->outputValue;
-}
-CircaObject* Term_getState(Term* term)
-{
-    return term->state;
 }
 

@@ -9,7 +9,6 @@ class CircaFloat;
 class CircaBool;
 class CircaFunction;
 class CircaString;
-class CircaObject;
 class CircaType;
 class Term;
 
@@ -40,10 +39,10 @@ struct Term
     Term* function;
     std::vector<Term*> users;
 
-    void* outputValue;
-    Term* outputValueType;
+    void* value;
+    Term* type;
 
-    CircaObject* state;
+    Term* state;
 
     bool needsUpdate;
 
@@ -52,22 +51,19 @@ struct Term
     int globaID;
 
     Term() {}
-    Term* getType() const;
     void execute();
 };
 
-int as_int(Term* t);
-float as_float(Term* t);
-bool as_bool(Term* t);
-string as_string(Term* t);
+int& as_int(Term* t);
+float& as_float(Term* t);
+bool& as_bool(Term* t);
+string& as_string(Term* t);
 
 
 extern "C" {
 
 Term* Term_getInput(Term* term, int index);
 Term* Term_getFunction(Term* term);
-CircaObject* Term_getOutputValue(Term* term);
-CircaObject* Term_getState(Term* term);
 
 }
 

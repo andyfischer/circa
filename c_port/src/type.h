@@ -3,26 +3,23 @@
 
 #include <string>
 
-#include "object.h"
-
-#define CA_TYPE(t) ((CircaType*)t->outputValue)
-
 struct Term;
 
-struct CircaType : public CircaObject
+struct CircaType
 {
     string name;
 
     CircaType();
-    CircaObject* (*alloc)(Term*);
+    void (*alloc)(Term*);
     Term* toString;
 };
 
 extern "C" {
 
-CircaObject* CaType_alloc(Term*);
-void CaType_setName(Term* term, const char* value);
-void CaType_setAllocFunc(Term* term, CircaObject*(*allocFunc)(Term*));
+CircaType* as_type(Term* term);
+void Type_alloc(Term* caller);
+void Type_setName(Term* term, const char* value);
+void Type_setAllocFunc(Term* term, void(*allocFunc)(Term*));
 
 }
 

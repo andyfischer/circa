@@ -1,11 +1,9 @@
 
-#include "bootstrap.h"
+#include "builtins.h"
 #include "function.h"
-#include "object.h"
 
 CircaFunction::CircaFunction()
 {
-    _type = BUILTIN_FUNCTION_TYPE;
     stateType = NULL;
     pureFunction = false;
     variableArgs = false;
@@ -13,24 +11,30 @@ CircaFunction::CircaFunction()
     execute = NULL;
 }
 
-CircaObject* CaFunction_alloc(Term*)
+CircaFunction* as_function(Term* term)
 {
-    return new CircaFunction();
+    // todo: type check
+    return (CircaFunction*) term->value;
 }
 
-void CaFunction_setPureFunction(Term* term, bool value)
+void Function_alloc(Term* caller)
 {
-    CA_FUNCTION(term)->pureFunction = value;
+    caller->value = new CircaFunction();
 }
-void CaFunction_setName(Term* term, const char* value)
+
+void Function_setPureFunction(Term* term, bool value)
 {
-    CA_FUNCTION(term)->name = value;
+    as_function(term)->pureFunction = value;
 }
-void CaFunction_setInputType(Term* term, int index, Term* type)
+void Function_setName(Term* term, const char* value)
 {
-    CA_FUNCTION(term)->inputTypes.setAt(index, type);
+    as_function(term)->name = value;
 }
-void CaFunction_setOutputType(Term* term, int index, Term* type)
+void Function_setInputType(Term* term, int index, Term* type)
 {
-    CA_FUNCTION(term)->outputTypes.setAt(index, type);
+    as_function(term)->inputTypes.setAt(index, type);
+}
+void Function_setOutputType(Term* term, int index, Term* type)
+{
+    as_function(term)->outputTypes.setAt(index, type);
 }

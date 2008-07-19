@@ -1,28 +1,31 @@
 
-#include "bootstrap.h"
+#include "builtins.h"
 #include "common_headers.h"
-#include "object.h"
 #include "term.h"
 #include "type.h"
 
-#define CA_TYPE(t) ((CircaType*)t->outputValue)
 
 CircaType::CircaType()
 {
-    _type = BUILTIN_TYPE_TYPE;
 }
 
-CircaObject* CaType_alloc(Term*)
+CircaType* as_type(Term* term)
 {
-    return new CircaType();
+    // todo: type check
+    return (CircaType*) term->value;
 }
 
-void CaType_setName(Term* term, const char* value)
+void Type_alloc(Term* caller)
 {
-    CA_TYPE(term)->name = value;
+    caller->value = new CircaType();
 }
 
-void CaType_setAllocFunc(Term* term, CircaObject*(*allocFunc)(Term*))
+void Type_setName(Term* term, const char* value)
 {
-    CA_TYPE(term)->alloc = allocFunc;
+    as_type(term)->name = value;
+}
+
+void Type_setAllocFunc(Term* term, void(*allocFunc)(Term*))
+{
+    as_type(term)->alloc = allocFunc;
 }

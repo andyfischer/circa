@@ -2,13 +2,10 @@
 #include "common_headers.h"
 #include <string>
 
-#include "object.h"
 #include "term.h"
-#include "exec_context.h"
 
-#define CA_FUNCTION(t) ((CircaFunction*)t->outputValue)
 
-struct CircaFunction : public CircaObject
+struct CircaFunction
 {
     TermList inputTypes;
     TermList outputTypes;
@@ -22,17 +19,18 @@ struct CircaFunction : public CircaObject
 
     // Code
     void (*initialize)(Term*);
-    void (*execute)(ExecContext*);
+    void (*execute)(Term*);
 
     CircaFunction();
 };
 
 extern "C" {
 
-CircaObject* CaFunction_alloc(Term*);
-void CaFunction_setPureFunction(Term* term, bool value);
-void CaFunction_setName(Term* term, const char* value);
-void CaFunction_setInputType(Term* term, int index, Term* type);
-void CaFunction_setOutputType(Term* term, int index, Term* type);
+CircaFunction* as_function(Term*);
+void Function_alloc(Term*);
+void Function_setPureFunction(Term* term, bool value);
+void Function_setName(Term* term, const char* value);
+void Function_setInputType(Term* term, int index, Term* type);
+void Function_setOutputType(Term* term, int index, Term* type);
 
 }
