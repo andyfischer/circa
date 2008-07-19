@@ -38,29 +38,28 @@ void Term::execute()
     CA_FUNCTION(function)->execute(&context);
 }
 
-CircaInt* Term::asInt()
+int as_int(Term* t)
 {
-    return this->outputValue->asInt();
+    if (t->outputValueType != BUILTIN_INT_TYPE)
+        throw errors::TypeError();
+
+    return (int) t->outputValue;
 }
-CircaFloat* Term::asFloat()
+
+float as_float(Term* t)
 {
-    return this->outputValue->asFloat();
+    if (t->outputValueType != BUILTIN_FLOAT_TYPE)
+        throw errors::TypeError();
+
+    return (float) t->outputValue;
 }
-CircaBool* Term::asBool()
+
+bool as_bool(Term* t)
 {
-    return this->outputValue->asBool();
-}
-CircaString* Term::asString()
-{
-    return this->outputValue->asString();
-}
-CircaFunction* Term::asFunction()
-{
-    return this->outputValue->asFunction();
-}
-CircaType* Term::asType()
-{
-    return this->outputValue->asType();
+    if (t->outputValueType != BUILTIN_BOOL_TYPE)
+        throw errors::TypeError();
+
+    return (bool) t->outputValue;
 }
 
 Term* Term_createRaw()

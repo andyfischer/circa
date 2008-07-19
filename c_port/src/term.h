@@ -40,7 +40,9 @@ struct Term
     Term* function;
     std::vector<Term*> users;
 
-    CircaObject* outputValue;
+    void* outputValue;
+    Term* outputValueType;
+
     CircaObject* state;
 
     bool needsUpdate;
@@ -52,14 +54,12 @@ struct Term
     Term() {}
     Term* getType() const;
     void execute();
-
-    CircaInt* asInt();
-    CircaFloat* asFloat();
-    CircaBool* asBool();
-    CircaString* asString();
-    CircaFunction* asFunction();
-    CircaType* asType();
 };
+
+int as_int(Term* t);
+float as_float(Term* t);
+bool as_bool(Term* t);
+string as_string(Term* t);
 
 
 extern "C" {
