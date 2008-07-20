@@ -17,7 +17,7 @@ def create_windows_env(releaseBuild):
     return env
         
 def create_mac_env(releaseBuild):
-    env = Environment(platform = 'posix')
+    env = Environment()
     # Python support
     #env.Append(CPPPATH = ["/System/Library/Frameworks/Python.framework/Versions/2.5/Headers"])
 
@@ -42,8 +42,13 @@ env.BuildDir('build', 'src')
 # Find source files
 buildFiles = []
 for file in os.listdir('src'):
+    if file == "test_program.cpp":
+        continue
+
     if file.endswith('.cpp'):
         buildFiles.append('build/' + file)
     
-env.SharedLibrary('circa', buildFiles)
+libcirca = env.SharedLibrary('circa', buildFiles)
+
+env.Program('test_program', 'build/test_program.cpp', LIBS=[libcirca])
 
