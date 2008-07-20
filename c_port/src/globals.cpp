@@ -3,6 +3,7 @@
 
 #include "builtins.h"
 #include "codeunit.h"
+#include "errors.h"
 #include "globals.h"
 
 Term* GetGlobal(string name)
@@ -10,7 +11,7 @@ Term* GetGlobal(string name)
     if (KERNEL->containsName(name))
         return KERNEL->getNamed(name);
 
-    return NULL;
+    throw errors::KeyError(name);
 }
 
 Term* GetGlobal(const char* name)

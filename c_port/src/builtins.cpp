@@ -1,6 +1,7 @@
 
 #include "common_headers.h"
 
+#include "builtin_functions.h"
 #include "codeunit.h"
 #include "errors.h"
 #include "function.h"
@@ -27,6 +28,8 @@ void const_generator(Term* caller)
     output->outputType = caller->inputs[0];
 }
 
+void empty_function(Term*) { }
+
 void bootstrap_kernel()
 {
     KERNEL = new CodeUnit();
@@ -48,7 +51,9 @@ void bootstrap_kernel()
 
     // Create Type type
     Term* typeType = KERNEL->_bootstrapEmptyTerm();
+    BUILTIN_TYPE_TYPE = typeType;
     typeType->function = constTypeFunc;
+    typeType->type = typeType;
     Type_alloc(typeType);
     Type_setName     (typeType, "Type");
     Type_setAllocFunc(typeType, Type_alloc);
@@ -72,7 +77,9 @@ void bootstrap_kernel()
 
     // Create Function type
     Term* functionType = KERNEL->_bootstrapEmptyTerm();
+    BUILTIN_FUNCTION_TYPE = functionType;
     functionType->function = constTypeFunc;
+    functionType->type = typeType;
     Type_alloc(functionType);
     Type_setName     (functionType, "Function");
     Type_setAllocFunc(functionType, Function_alloc);
@@ -83,6 +90,8 @@ void bootstrap_kernel()
     KERNEL->setInput(constFuncFunc, 0, functionType);
     Function_setOutputType(constGenerator, functionType);
     Function_setOutputType(constFuncFunc, functionType);
+    constFuncFunc->type = functionType;
+    constTypeFunc->type = functionType;
 }
 
 void int_alloc(Term* caller)
@@ -160,9 +169,8 @@ void create_builtin_types()
     BUILTIN_INT_TYPE = create_type("int", int_alloc, int_tostring);
     BUILTIN_FLOAT_TYPE = create_type("float", float_alloc, float_tostring);
     BUILTIN_BOOL_TYPE = create_type("bool", bool_alloc, bool_tostring);
-    BUILTIN_TYPE_TYPE = create_type("Type", Type_alloc, NULL);
-    BUILTIN_FUNCTION_TYPE = create_type("Function", Function_alloc, NULL);
     BUILTIN_SUBROUTINE_TYPE = create_type("Subroutine", Subroutine_alloc, NULL);
+    create_type("any", empty_function, NULL);
 }
 
 void initialize()
@@ -170,6 +178,7 @@ void initialize()
     try {
         bootstrap_kernel();
         create_builtin_types();
+        create_builtin_functions();
     } catch (errors::CircaError& e)
     {
         std::cout << "An error occured while initializing." << std::endl;

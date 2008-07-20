@@ -46,9 +46,10 @@ void CaCode_bindName(CodeUnit* codeUnit, Term* term, const char* name);
 Term* CaCode_createTerm(CodeUnit* codeUnit, Term* function, TermList inputs,
         Branch* branch);
 
-Term* CaCode_createConstant(CodeUnit* codeUnit, Term* type,
-        Branch* branch);
+Term* CaCode_createConstant(CodeUnit* codeUnit, Term* type, Branch* branch);
 
 }
+
+void transform_function_and_reeval(Term* term, Term* new_function);
 
 #endif
