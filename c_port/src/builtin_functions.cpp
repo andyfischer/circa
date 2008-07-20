@@ -10,11 +10,10 @@
 
 void to_string(Term* caller)
 {
-    Type* type = as_type(caller->type);
-    Term* toString = type->toString;
+    Term* toString = caller->inputs[0]->getType()->toString;
 
     if (toString == NULL) {
-        as_string(caller) = string("<") + type->name + ">";
+        as_string(caller) = string("<") + as_type(caller->type)->name + ">";
     } else {
         transform_function_and_reeval(caller, toString);
     }

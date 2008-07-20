@@ -9,6 +9,9 @@
 
 Type::Type()
 {
+    name = "undefined";
+    alloc = NULL;
+    toString = NULL;
 }
 
 Type* as_type(Term* term)
