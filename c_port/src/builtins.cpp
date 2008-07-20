@@ -17,6 +17,14 @@ Term* BUILTIN_TYPE_TYPE = NULL;
 Term* BUILTIN_FUNCTION_TYPE = NULL;
 Term* BUILTIN_CODEUNIT_TYPE = NULL;
 
+void const_generator(Term* caller)
+{
+    Function *output = as_function(caller);
+    Type* type = as_type(caller->inputs[0]);
+    output->name = "const-" + type->name;
+    output->outputType = caller->inputs[0];
+}
+
 void bootstrap_kernel()
 {
     KERNEL = new CodeUnit();
@@ -26,6 +34,7 @@ void bootstrap_kernel()
     Function_alloc(constGenerator);
     Function_setName(constGenerator, "const-generator");
     Function_setPureFunction(constGenerator, true);
+    Function_setExecute(constGenerator, const_generator);
     KERNEL->bindName(constGenerator, "const-generator");
 
     // Create const-Type function
@@ -46,7 +55,7 @@ void bootstrap_kernel()
     // Implant the Type type
     KERNEL->setInput(constTypeFunc, 0, typeType);
     Function_setInputType(constGenerator, 0, typeType);
-    Function_setOutputType(constTypeFunc, 0, typeType);
+    Function_setOutputType(constTypeFunc, typeType);
 
     // Create const-Function function
     Term* constFuncFunc = KERNEL->_bootstrapEmptyTerm();
@@ -70,8 +79,8 @@ void bootstrap_kernel()
     // Implant Function type
     KERNEL->setInput(constGenerator, 0, typeType);
     KERNEL->setInput(constFuncFunc, 0, functionType);
-    Function_setOutputType(constGenerator, 0, functionType);
-    Function_setOutputType(constFuncFunc, 0, functionType);
+    Function_setOutputType(constGenerator, functionType);
+    Function_setOutputType(constFuncFunc, functionType);
 }
 
 void int_alloc(Term* caller)
@@ -91,20 +100,24 @@ void string_alloc(Term* caller)
 
 void bool_alloc(Term* caller)
 {
-    caller->value = NULL;
+    caller->value = new bool;
 }
 
 void int_tostring(Term* caller)
 {
-
+    std::stringstream strm;
+    strm << as_int(caller->inputs[0]);
+    as_string(caller) = strm.str();
 }
 void float_tostring(Term* caller)
 {
-
+    std::stringstream strm;
+    strm << as_float(caller->inputs[0]);
+    as_string(caller) = strm.str();
 }
 void string_tostring(Term* caller)
 {
-
+    as_string(caller) = as_string(caller->inputs[0]);
 }
 
 void bool_tostring(Term* caller)
@@ -128,9 +141,15 @@ Term* create_primitive_type(string name, void (*allocFunc)(Term*),
     as_function(toString)->name = name + "-to-string";
     as_function(toString)->execute = toStringFunc;
     as_function(toString)->inputTypes.setAt(0, typeTerm);
-    as_function(toString)->outputTypes.setAt(0, GetGlobal("string"));
+
+    if (GetGlobal("string") == NULL)
+        throw errors::InternalError("string type not defined");
+
+    as_function(toString)->outputType = GetGlobal("string");
         
     as_type(typeTerm)->toString = toString;
+
+    return typeTerm;
 }
 
 void create_primitive_types()
@@ -141,18 +160,15 @@ void create_primitive_types()
     BUILTIN_BOOL_TYPE = create_primitive_type("bool", bool_alloc, bool_tostring);
 }
 
-extern "C" {
-
 void initialize()
 {
     try {
         bootstrap_kernel();
         create_primitive_types();
-        std::cout << "Initialized" << std::endl;
     } catch (errors::CircaError& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cout << "An error occured while initializing." << std::endl;
+        std::cout << e.message() << std::endl;
+        exit(1);
     }
-}
-
 }

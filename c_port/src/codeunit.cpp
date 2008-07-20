@@ -57,7 +57,7 @@ void initialize_term(Term* term, Term* function)
 
     term->function = function;
 
-    Term* outputType = as_function(function)->outputTypes[0];
+    Term* outputType = as_function(function)->outputType;
     Term* stateType = as_function(function)->stateType;
 
     if (outputType == NULL)
@@ -65,6 +65,7 @@ void initialize_term(Term* term, Term* function)
 
     // Allocate
     as_type(outputType)->alloc(term);
+    term->type = outputType;
 }
 
 void set_inputs(Term* term, TermList inputs)
@@ -91,6 +92,7 @@ Term* CodeUnit::createConstant(Term* type, Branch* branch)
 {
     // Fetch the constant function
     Term* constantFunc = createTerm(KERNEL->getNamed("const-generator"), TermList(type), NULL);
+    constantFunc->execute();
 
     // Create the term
     return createTerm(constantFunc, TermList(), branch);

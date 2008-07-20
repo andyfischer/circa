@@ -23,9 +23,18 @@ struct TermList
 
     TermList() { }
 
-    // Convenience constructor
+    // Convenience constructors
     TermList(Term* term) {
         items.push_back(term);
+    }
+    TermList(Term* term1, Term* term2) {
+        items.push_back(term1);
+        items.push_back(term2);
+    }
+    TermList(Term* term1, Term* term2, Term* term3) {
+        items.push_back(term1);
+        items.push_back(term2);
+        items.push_back(term3);
     }
 
     void setAt(int index, Term* term);

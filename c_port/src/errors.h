@@ -7,6 +7,9 @@ namespace errors {
 
 class CircaError : public std::exception
 {
+public:
+    CircaError() throw() {}
+    virtual string message() = 0;
 };
 
 class InternalError : public CircaError
@@ -16,11 +19,11 @@ public:
     {
         this->msg = message;
     }
-    virtual ~InternalError() throw() {}
+    ~InternalError() throw() {}
 
-    virtual const char* what()
+    virtual string message()
     {
-        return this->msg.c_str();
+        return string("Internal error: ") + this->msg;
     }
 
     string msg;
@@ -28,6 +31,11 @@ public:
 
 class TypeError : public CircaError
 {
+public:
+    virtual string message()
+    {
+        return string("Type error");
+    }
 };
 
 }
