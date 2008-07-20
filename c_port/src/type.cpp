@@ -5,19 +5,19 @@
 #include "type.h"
 
 
-CircaType::CircaType()
+Type::Type()
 {
 }
 
-CircaType* as_type(Term* term)
+Type* as_type(Term* term)
 {
     // todo: type check
-    return (CircaType*) term->value;
+    return (Type*) term->value;
 }
 
 void Type_alloc(Term* caller)
 {
-    caller->value = new CircaType();
+    caller->value = new Type();
 }
 
 void Type_setName(Term* term, const char* value)

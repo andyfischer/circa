@@ -1,0 +1,1 @@
+gdb test_program --command=gdb.commands

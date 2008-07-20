@@ -5,18 +5,18 @@
 
 struct Term;
 
-struct CircaType
+struct Type
 {
     string name;
 
-    CircaType();
+    Type();
     void (*alloc)(Term*);
     Term* toString;
 };
 
 extern "C" {
 
-CircaType* as_type(Term* term);
+Type* as_type(Term* term);
 void Type_alloc(Term* caller);
 void Type_setName(Term* term, const char* value);
 void Type_setAllocFunc(Term* term, void(*allocFunc)(Term*));
