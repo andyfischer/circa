@@ -1,19 +1,11 @@
 
 import os,sys, glob
 
-env = Environment()
-
-DEBUG_BUILD = True
-SOURCE_DIRECTORY = "src"
-
-env.Append(CPPDEFINES = ["_DEBUG"])
-env.Append(CPPDEFINES = ["DEBUG"])
-#env.Replace(CXX = 'llvm-g++')
-
-def setup_windows_env():
+def create_windows_env(releaseBuild):
+    env = Environment(platform = 'nt')
     env.Append(CPPFLAGS=['/EHsc'])
 
-    if DEBUG_BUILD:
+    if not releaseBuild:
         env.Append(LINKFLAGS = ['/DEBUG'])  # enable debugging information
         env.Append(LINKFLAGS = ['/NODEFAULTLIB:"LIBCMT.LIB"'])
         env.Append(LINKFLAGS = ['/NODEFAULTLIB:"LIBCPMT.LIB"'])
@@ -21,20 +13,37 @@ def setup_windows_env():
         env.Append(CCFLAGS = ['/MD'])        # MSVCRT.LIB & MSVCPRT.LIB
         env.Append(CCFLAGS = ['/Od'])        # Disable optimizations
         env.Append(CCFLAGS = ['/Z7'])
+
+    return env
         
-def setup_mac_env():
+def create_mac_env(releaseBuild):
+    env = Environment(platform = 'posix')
     # Python support
     #env.Append(CPPPATH = ["/System/Library/Frameworks/Python.framework/Versions/2.5/Headers"])
 
-    if DEBUG_BUILD:
+    if not releaseBuild:
         env.Append(CPPFLAGS=['-ggdb'])
         env.Append(CPPFLAGS=['-bundle'])
         env.Append(CPPFLAGS=['-flat_namespace'])
 
-setup_mac_env()
+    return env
 
-# Build everything in source directory
-source_files = glob.glob(SOURCE_DIRECTORY + '/*.cpp')
+RELEASE_BUILD = False
+SOURCE_DIRECTORY = "src"
 
-env.SharedLibrary('circa', source_files)
+env = create_mac_env(RELEASE_BUILD)
+
+env.Append(CPPDEFINES = ["_DEBUG"])
+env.Append(CPPDEFINES = ["DEBUG"])
+#env.Replace(CXX = 'llvm-g++')
+
+env.BuildDir('build', 'src')
+
+# Find source files
+buildFiles = []
+for file in os.listdir('src'):
+    if file.endswith('.cpp'):
+        buildFiles.append('build/' + file)
+    
+env.SharedLibrary('circa', buildFiles)
 
