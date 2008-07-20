@@ -1,6 +1,8 @@
 
-#include "builtins.h"
 #include "common_headers.h"
+
+#include "builtins.h"
+#include "errors.h"
 #include "term.h"
 #include "type.h"
 
@@ -11,7 +13,9 @@ Type::Type()
 
 Type* as_type(Term* term)
 {
-    // todo: type check
+    if (term->type != BUILTIN_TYPE_TYPE)
+        throw errors::TypeError();
+
     return (Type*) term->value;
 }
 
