@@ -8,7 +8,9 @@
 #include "errors.h"
 #include "function.h"
 #include "term.h"
+#include "type.h"
 
+int gNextGlobalID = 1;
 
 void TermList::setAt(int index, Term* term)
 {
@@ -24,6 +26,17 @@ Term* TermList::operator[](int index)
     if (index >= items.size())
         return NULL;
     return items[index];
+}
+
+Term::Term()
+{
+    owningBranch = NULL;
+    function = NULL;
+    value = NULL;
+    type = NULL;
+    state = NULL;
+    needsUpdate = true;
+    globalID = gNextGlobalID++;
 }
 
 void Term::execute()
@@ -42,6 +55,11 @@ void Term::execute()
     }
         
     func->execute(this);
+}
+
+Type* Term::getType() const
+{
+    return as_type(this->type);
 }
 
 int& as_int(Term* t)

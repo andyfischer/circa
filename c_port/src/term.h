@@ -4,12 +4,7 @@
 #include <vector>
 
 class Branch;
-class CircaInt;
-class CircaFloat;
-class CircaBool;
-class CircaFunction;
-class CircaString;
-class CircaType;
+class Type;
 class Term;
 
 struct TermSyntaxHints
@@ -57,10 +52,12 @@ struct Term
 
     TermSyntaxHints syntaxHints;
 
-    int globaID;
+    int globalID;
 
-    Term() {}
+    Term();
     void execute();
+
+    Type* getType() const;
 };
 
 int& as_int(Term* t);
