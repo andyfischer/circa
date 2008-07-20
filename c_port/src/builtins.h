@@ -13,6 +13,7 @@ extern Term* BUILTIN_STRING_TYPE;
 extern Term* BUILTIN_TYPE_TYPE;
 extern Term* BUILTIN_FUNCTION_TYPE;
 extern Term* BUILTIN_CODEUNIT_TYPE;
+extern Term* BUILTIN_SUBROUTINE_TYPE;
 
 void initialize();
 

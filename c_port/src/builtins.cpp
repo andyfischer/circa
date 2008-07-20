@@ -5,6 +5,7 @@
 #include "errors.h"
 #include "function.h"
 #include "globals.h"
+#include "subroutine.h"
 #include "term.h"
 #include "type.h"
 
@@ -16,6 +17,7 @@ Term* BUILTIN_STRING_TYPE = NULL;
 Term* BUILTIN_TYPE_TYPE = NULL;
 Term* BUILTIN_FUNCTION_TYPE = NULL;
 Term* BUILTIN_CODEUNIT_TYPE = NULL;
+Term* BUILTIN_SUBROUTINE_TYPE = NULL;
 
 void const_generator(Term* caller)
 {
@@ -128,7 +130,7 @@ void bool_tostring(Term* caller)
         as_string(caller) = "false";
 }
 
-Term* create_primitive_type(string name, void (*allocFunc)(Term*),
+Term* create_type(string name, void (*allocFunc)(Term*),
     void (*toStringFunc)(Term*))
 {
     Term* typeTerm = KERNEL->createConstant(GetGlobal("Type"), NULL);
@@ -152,19 +154,22 @@ Term* create_primitive_type(string name, void (*allocFunc)(Term*),
     return typeTerm;
 }
 
-void create_primitive_types()
+void create_builtin_types()
 {
-    BUILTIN_STRING_TYPE = create_primitive_type("string", string_alloc, string_tostring);
-    BUILTIN_INT_TYPE = create_primitive_type("int", int_alloc, int_tostring);
-    BUILTIN_FLOAT_TYPE = create_primitive_type("float", float_alloc, float_tostring);
-    BUILTIN_BOOL_TYPE = create_primitive_type("bool", bool_alloc, bool_tostring);
+    BUILTIN_STRING_TYPE = create_type("string", string_alloc, string_tostring);
+    BUILTIN_INT_TYPE = create_type("int", int_alloc, int_tostring);
+    BUILTIN_FLOAT_TYPE = create_type("float", float_alloc, float_tostring);
+    BUILTIN_BOOL_TYPE = create_type("bool", bool_alloc, bool_tostring);
+    BUILTIN_TYPE_TYPE = create_type("Type", Type_alloc, NULL);
+    BUILTIN_FUNCTION_TYPE = create_type("Function", Function_alloc, NULL);
+    BUILTIN_SUBROUTINE_TYPE = create_type("Subroutine", Subroutine_alloc, NULL);
 }
 
 void initialize()
 {
     try {
         bootstrap_kernel();
-        create_primitive_types();
+        create_builtin_types();
     } catch (errors::CircaError& e)
     {
         std::cout << "An error occured while initializing." << std::endl;

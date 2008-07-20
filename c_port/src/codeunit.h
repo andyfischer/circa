@@ -32,7 +32,6 @@ struct CodeUnit
     // Create a constant term. Calls createTerm with the appropriate constant
     // function.
     Term* createConstant(Term* type, Branch* branch);
-
 };
 
 extern "C" {
