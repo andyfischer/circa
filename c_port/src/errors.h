@@ -14,6 +14,8 @@ public:
 
 class InternalError : public CircaError
 {
+    string msg;
+
 public:
     InternalError(string message) throw()
     {
@@ -25,8 +27,6 @@ public:
     {
         return string("Internal error: ") + this->msg;
     }
-
-    string msg;
 };
 
 class TypeError : public CircaError
@@ -35,6 +35,22 @@ public:
     virtual string message()
     {
         return string("Type error");
+    }
+};
+
+class KeyError : public CircaError
+{
+    string msg;
+
+public:
+    KeyError(string message) throw()
+    {
+        this->msg = message;
+    }
+    ~KeyError() throw() {}
+    virtual string message()
+    {
+        return string("KeyError: ") + msg;
     }
 };
 

@@ -103,21 +103,6 @@ void CodeUnit_alloc(Term* caller)
     caller->value = new CodeUnit();
 }
 
-/*
-CircaObject* CaCode_executeFunction(Term* function, TermList inputs)
-{
-    Term tempTerm;
-
-    initialize_term(&tempTerm, function, NULL);
-    set_inputs(&tempTerm, inputs);
-
-    tempTerm.execute();
-
-    CircaObject* result = tempTerm.value;
-    tempTerm.value = NULL;
-
-    return result;
-}*/
 
 void CaCode_bindName(CodeUnit* codeUnit, Term* term, const char* name)
 {
@@ -136,3 +121,8 @@ Term* CaCode_createConstant(CodeUnit* codeUnit, Term* type,
     return codeUnit->createConstant(type, branch);
 }
 
+void transform_function_and_reeval(Term* term, Term* new_function)
+{
+    term->function = new_function;
+    term->execute();
+}
