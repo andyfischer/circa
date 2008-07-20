@@ -6,6 +6,7 @@
 #include "errors.h"
 #include "function.h"
 #include "globals.h"
+#include "structs.h"
 #include "subroutine.h"
 #include "term.h"
 #include "type.h"
@@ -19,6 +20,7 @@ Term* BUILTIN_TYPE_TYPE = NULL;
 Term* BUILTIN_FUNCTION_TYPE = NULL;
 Term* BUILTIN_CODEUNIT_TYPE = NULL;
 Term* BUILTIN_SUBROUTINE_TYPE = NULL;
+Term* BUILTIN_STRUCT_DEFINITION_TYPE = NULL;
 
 void const_generator(Term* caller)
 {
@@ -28,7 +30,7 @@ void const_generator(Term* caller)
     output->outputType = caller->inputs[0];
 }
 
-void empty_function(Term*) { }
+void empty_alloc_function(Term*,Term*) { }
 
 void bootstrap_kernel()
 {
@@ -36,7 +38,7 @@ void bootstrap_kernel()
 
     // Create const-generator function
     Term* constGenerator = KERNEL->_bootstrapEmptyTerm();
-    Function_alloc(constGenerator);
+    Function_alloc(NULL, constGenerator);
     Function_setName(constGenerator, "const-generator");
     Function_setPureFunction(constGenerator, true);
     Function_setExecute(constGenerator, const_generator);
@@ -45,7 +47,7 @@ void bootstrap_kernel()
     // Create const-Type function
     Term* constTypeFunc = KERNEL->_bootstrapEmptyTerm();
     constTypeFunc->function = constGenerator;
-    Function_alloc(constTypeFunc);
+    Function_alloc(NULL, constTypeFunc);
     Function_setName(constTypeFunc, "const-Type");
     Function_setPureFunction(constTypeFunc, true);
 
@@ -54,7 +56,7 @@ void bootstrap_kernel()
     BUILTIN_TYPE_TYPE = typeType;
     typeType->function = constTypeFunc;
     typeType->type = typeType;
-    Type_alloc(typeType);
+    Type_alloc(typeType, typeType);
     Type_setName     (typeType, "Type");
     Type_setAllocFunc(typeType, Type_alloc);
     KERNEL->bindName(typeType, "Type");
@@ -67,7 +69,7 @@ void bootstrap_kernel()
     // Create const-Function function
     Term* constFuncFunc = KERNEL->_bootstrapEmptyTerm();
     constFuncFunc->function = constGenerator;
-    Function_alloc(constFuncFunc);
+    Function_alloc(NULL, constFuncFunc);
     Function_setName        (constFuncFunc, "const-Function");
     Function_setPureFunction(constFuncFunc, true);
     KERNEL->bindName(constFuncFunc, "const-Function");
@@ -80,7 +82,7 @@ void bootstrap_kernel()
     BUILTIN_FUNCTION_TYPE = functionType;
     functionType->function = constTypeFunc;
     functionType->type = typeType;
-    Type_alloc(functionType);
+    Type_alloc(typeType, functionType);
     Type_setName     (functionType, "Function");
     Type_setAllocFunc(functionType, Function_alloc);
     KERNEL->bindName(functionType, "Function");
@@ -94,22 +96,22 @@ void bootstrap_kernel()
     constTypeFunc->type = functionType;
 }
 
-void int_alloc(Term* caller)
+void int_alloc(Term* type, Term* caller)
 {
     caller->value = new int;
 }
 
-void float_alloc(Term* caller)
+void float_alloc(Term* type, Term* caller)
 {
     caller->value = new float;
 }
 
-void string_alloc(Term* caller)
+void string_alloc(Term* type, Term* caller)
 {
     caller->value = new string;
 }
 
-void bool_alloc(Term* caller)
+void bool_alloc(Term* type, Term* caller)
 {
     caller->value = new bool;
 }
@@ -139,8 +141,7 @@ void bool_tostring(Term* caller)
         as_string(caller) = "false";
 }
 
-Term* create_type(string name, void (*allocFunc)(Term*),
-    void (*toStringFunc)(Term*))
+Term* create_type(string name, Type::AllocFunc allocFunc, void (*toStringFunc)(Term*))
 {
     Term* typeTerm = KERNEL->createConstant(GetGlobal("Type"), NULL);
     as_type(typeTerm)->name = name;
@@ -170,7 +171,8 @@ void create_builtin_types()
     BUILTIN_FLOAT_TYPE = create_type("float", float_alloc, float_tostring);
     BUILTIN_BOOL_TYPE = create_type("bool", bool_alloc, bool_tostring);
     BUILTIN_SUBROUTINE_TYPE = create_type("Subroutine", Subroutine_alloc, NULL);
-    create_type("any", empty_function, NULL);
+    BUILTIN_STRUCT_DEFINITION_TYPE = create_type("Struct", Struct_packed_alloc, NULL);
+    create_type("any", empty_alloc_function, NULL);
 }
 
 void initialize()

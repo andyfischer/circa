@@ -11,6 +11,6 @@ struct Subroutine
 
 Subroutine* as_subroutine(Term*);
 
-void Subroutine_alloc(Term* term);
+void Subroutine_alloc(Term* type, Term* term);
 
 #endif

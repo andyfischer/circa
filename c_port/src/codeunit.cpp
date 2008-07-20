@@ -64,8 +64,8 @@ void initialize_term(Term* term, Term* function)
         throw errors::InternalError("outputType is NULL");
 
     // Allocate
-    as_type(outputType)->alloc(term);
     term->type = outputType;
+    as_type(outputType)->alloc(outputType, term);
 }
 
 void set_inputs(Term* term, TermList inputs)

@@ -6,7 +6,6 @@
 #include "term.h"
 #include "type.h"
 
-
 Type::Type()
 {
     name = "undefined";
@@ -16,13 +15,14 @@ Type::Type()
 
 Type* as_type(Term* term)
 {
-    if (term->type != BUILTIN_TYPE_TYPE)
+    if ((term->type != BUILTIN_TYPE_TYPE)
+            && (term->type != BUILTIN_STRUCT_DEFINITION_TYPE))
         throw errors::TypeError();
 
     return (Type*) term->value;
 }
 
-void Type_alloc(Term* caller)
+void Type_alloc(Term* type, Term* caller)
 {
     caller->value = new Type();
 }
@@ -32,7 +32,7 @@ void Type_setName(Term* term, const char* value)
     as_type(term)->name = value;
 }
 
-void Type_setAllocFunc(Term* term, void(*allocFunc)(Term*))
+void Type_setAllocFunc(Term* term, Type::AllocFunc allocFunc)
 {
     as_type(term)->alloc = allocFunc;
 }
