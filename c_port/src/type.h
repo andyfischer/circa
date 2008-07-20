@@ -1,5 +1,5 @@
-#ifndef __TYPE_INCLUDED__
-#define __TYPE_INCLUDED__
+#ifndef CIRCA__TYPE__INCLUDED
+#define CIRCA__TYPE__INCLUDED
 
 #include <string>
 
@@ -7,19 +7,24 @@ struct Term;
 
 struct Type
 {
+    typedef void (*AllocFunc)(Term* type, Term* term);
+    typedef void (*DuplicateFunc)(Term* type, Term* src, Term* dest);
+
     string name;
 
     Type();
-    void (*alloc)(Term*);
+    AllocFunc alloc;
+    DuplicateFunc duplicate;
+
     Term* toString;
 };
 
 extern "C" {
 
 Type* as_type(Term* term);
-void Type_alloc(Term* caller);
+void Type_alloc(Term* type, Term* caller);
 void Type_setName(Term* term, const char* value);
-void Type_setAllocFunc(Term* term, void(*allocFunc)(Term*));
+void Type_setAllocFunc(Term* term, Type::AllocFunc allocFunc);
 
 }
 

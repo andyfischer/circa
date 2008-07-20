@@ -1,5 +1,5 @@
-#ifndef __TERM_INCLUDED__
-#define __TERM_INCLUDED__
+#ifndef CIRCA__TERM__INCLUDED
+#define CIRCA__TERM__INCLUDED
 
 #include <vector>
 
@@ -65,13 +65,11 @@ float& as_float(Term* t);
 bool& as_bool(Term* t);
 string& as_string(Term* t);
 
-
 extern "C" {
 
 Term* Term_getInput(Term* term, int index);
 Term* Term_getFunction(Term* term);
 
 }
-
 
 #endif
