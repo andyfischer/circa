@@ -5,6 +5,7 @@
 #include "codeunit.h"
 #include "errors.h"
 #include "function.h"
+#include "operations.h"
 #include "term.h"
 #include "type.h"
 
@@ -47,31 +48,6 @@ void CodeUnit::setInput(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 }
 
-void initialize_term(Term* term, Term* function)
-{
-    if (term == NULL)
-        throw errors::InternalError("Term is NULL");
-
-    if (function == NULL)
-        throw errors::InternalError("Function is NULL");
-
-    term->function = function;
-
-    Term* outputType = as_function(function)->outputType;
-    Term* stateType = as_function(function)->stateType;
-
-    if (outputType == NULL)
-        throw errors::InternalError("outputType is NULL");
-
-    // Allocate
-    term->type = outputType;
-    as_type(outputType)->alloc(outputType, term);
-}
-
-void set_inputs(Term* term, TermList inputs)
-{
-    term->inputs = inputs;
-}
 
 Term* CodeUnit::createTerm(Term* function, TermList inputs, Branch* branch)
 {
@@ -121,8 +97,3 @@ Term* CaCode_createConstant(CodeUnit* codeUnit, Term* type,
     return codeUnit->createConstant(type, branch);
 }
 
-void transform_function_and_reeval(Term* term, Term* new_function)
-{
-    term->function = new_function;
-    term->execute();
-}
