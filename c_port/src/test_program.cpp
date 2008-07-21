@@ -7,10 +7,10 @@ int main(const char * args[])
 {
     initialize();
 
-    Term* five = KERNEL->createConstant(GetGlobal("int"), NULL);
+    Term* five = create_constant(GetGlobal("int"));
     as_int(five) = 5;
 
-    Term* five_as_string = KERNEL->createTerm(GetGlobal("to-string"), TermList(five), NULL);
+    Term* five_as_string = create_term(GetGlobal("to-string"), TermList(five));
     five_as_string->execute();
     std::cout << "five = " << as_string(five_as_string) << std::endl;
 }
