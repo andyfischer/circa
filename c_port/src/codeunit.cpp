@@ -23,11 +23,6 @@ Term* CodeUnit::_newTerm(Branch* branch)
     return term;
 }
 
-Term* CodeUnit::_bootstrapEmptyTerm()
-{
-    return _newTerm(NULL);
-}
-
 void CodeUnit::bindName(Term* term, string name)
 {
     mainBranch.bindName(term, name);
@@ -41,11 +36,6 @@ bool CodeUnit::containsName(string name)
 Term* CodeUnit::getNamed(string name)
 {
     return mainBranch.getNamed(name);
-}
-
-void CodeUnit::setInput(Term* term, int index, Term* input)
-{
-    term->inputs.setAt(index, input);
 }
 
 Term* CodeUnit::createTerm(Term* function, TermList inputs, Branch* branch)

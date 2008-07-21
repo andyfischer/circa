@@ -58,6 +58,11 @@ void specialize_type(Term* term, Term* type)
     change_type(term, type);
 }
 
+void set_input(Term* term, int index, Term* input)
+{
+    term->inputs.setAt(index, input);
+}
+
 void set_inputs(Term* term, TermList inputs)
 {
     term->inputs = inputs;

@@ -39,7 +39,7 @@ void bootstrap_kernel()
     KERNEL = new CodeUnit();
 
     // Create const-generator function
-    Term* constGenerator = KERNEL->_bootstrapEmptyTerm();
+    Term* constGenerator = new Term;
     Function_alloc(NULL, constGenerator);
     Function_setName(constGenerator, "const-generator");
     Function_setPureFunction(constGenerator, true);
@@ -47,14 +47,14 @@ void bootstrap_kernel()
     KERNEL->bindName(constGenerator, "const-generator");
 
     // Create const-Type function
-    Term* constTypeFunc = KERNEL->_bootstrapEmptyTerm();
+    Term* constTypeFunc = new Term;
     constTypeFunc->function = constGenerator;
     Function_alloc(NULL, constTypeFunc);
     Function_setName(constTypeFunc, "const-Type");
     Function_setPureFunction(constTypeFunc, true);
 
     // Create Type type
-    Term* typeType = KERNEL->_bootstrapEmptyTerm();
+    Term* typeType = new Term;
     BUILTIN_TYPE_TYPE = typeType;
     typeType->function = constTypeFunc;
     typeType->type = typeType;
@@ -64,12 +64,12 @@ void bootstrap_kernel()
     KERNEL->bindName(typeType, "Type");
 
     // Implant the Type type
-    KERNEL->setInput(constTypeFunc, 0, typeType);
+    set_input(constTypeFunc, 0, typeType);
     Function_setInputType(constGenerator, 0, typeType);
     Function_setOutputType(constTypeFunc, typeType);
 
     // Create const-Function function
-    Term* constFuncFunc = KERNEL->_bootstrapEmptyTerm();
+    Term* constFuncFunc = new Term;
     constFuncFunc->function = constGenerator;
     Function_alloc(NULL, constFuncFunc);
     Function_setName        (constFuncFunc, "const-Function");
@@ -80,7 +80,7 @@ void bootstrap_kernel()
     constGenerator->function = constFuncFunc;
 
     // Create Function type
-    Term* functionType = KERNEL->_bootstrapEmptyTerm();
+    Term* functionType = new Term;
     BUILTIN_FUNCTION_TYPE = functionType;
     functionType->function = constTypeFunc;
     functionType->type = typeType;
@@ -90,8 +90,8 @@ void bootstrap_kernel()
     KERNEL->bindName(functionType, "Function");
 
     // Implant Function type
-    KERNEL->setInput(constGenerator, 0, typeType);
-    KERNEL->setInput(constFuncFunc, 0, functionType);
+    set_input(constGenerator, 0, typeType);
+    set_input(constFuncFunc, 0, functionType);
     Function_setOutputType(constGenerator, functionType);
     Function_setOutputType(constFuncFunc, functionType);
     constFuncFunc->type = functionType;
