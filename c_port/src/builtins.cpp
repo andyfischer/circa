@@ -6,6 +6,7 @@
 #include "errors.h"
 #include "function.h"
 #include "globals.h"
+#include "operations.h"
 #include "structs.h"
 #include "subroutine.h"
 #include "term.h"
@@ -21,6 +22,7 @@ Term* BUILTIN_FUNCTION_TYPE = NULL;
 Term* BUILTIN_CODEUNIT_TYPE = NULL;
 Term* BUILTIN_SUBROUTINE_TYPE = NULL;
 Term* BUILTIN_STRUCT_DEFINITION_TYPE = NULL;
+Term* BUILTIN_ANY_TYPE = NULL;
 
 void const_generator(Term* caller)
 {
@@ -141,38 +143,15 @@ void bool_tostring(Term* caller)
         as_string(caller) = "false";
 }
 
-Term* create_type(string name, Type::AllocFunc allocFunc, void (*toStringFunc)(Term*))
-{
-    Term* typeTerm = KERNEL->createConstant(GetGlobal("Type"), NULL);
-    as_type(typeTerm)->name = name;
-    as_type(typeTerm)->alloc = allocFunc;
-    KERNEL->bindName(typeTerm, name);
-
-    // Create to-string function
-    Term* toString = KERNEL->createConstant(GetGlobal("Function"), NULL);
-    as_function(toString)->name = name + "-to-string";
-    as_function(toString)->execute = toStringFunc;
-    as_function(toString)->inputTypes.setAt(0, typeTerm);
-
-    if (GetGlobal("string") == NULL)
-        throw errors::InternalError("string type not defined");
-
-    as_function(toString)->outputType = GetGlobal("string");
-        
-    as_type(typeTerm)->toString = toString;
-
-    return typeTerm;
-}
-
 void create_builtin_types()
 {
-    BUILTIN_STRING_TYPE = create_type("string", string_alloc, string_tostring);
-    BUILTIN_INT_TYPE = create_type("int", int_alloc, int_tostring);
-    BUILTIN_FLOAT_TYPE = create_type("float", float_alloc, float_tostring);
-    BUILTIN_BOOL_TYPE = create_type("bool", bool_alloc, bool_tostring);
-    BUILTIN_SUBROUTINE_TYPE = create_type("Subroutine", Subroutine_alloc, NULL);
-    BUILTIN_STRUCT_DEFINITION_TYPE = create_type("Struct", Struct_packed_alloc, NULL);
-    create_type("any", empty_alloc_function, NULL);
+    BUILTIN_STRING_TYPE = quick_create_type(KERNEL, "string", string_alloc, string_tostring);
+    BUILTIN_INT_TYPE = quick_create_type(KERNEL, "int", int_alloc, int_tostring);
+    BUILTIN_FLOAT_TYPE = quick_create_type(KERNEL, "float", float_alloc, float_tostring);
+    BUILTIN_BOOL_TYPE = quick_create_type(KERNEL, "bool", bool_alloc, bool_tostring);
+    BUILTIN_SUBROUTINE_TYPE = quick_create_type(KERNEL, "Subroutine", Subroutine_alloc, NULL);
+    BUILTIN_STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition", StructDefinition_alloc, NULL);
+    BUILTIN_ANY_TYPE = quick_create_type(KERNEL, "any", empty_alloc_function, NULL);
 }
 
 void initialize()

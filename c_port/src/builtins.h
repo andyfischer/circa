@@ -15,6 +15,7 @@ extern Term* BUILTIN_FUNCTION_TYPE;
 extern Term* BUILTIN_CODEUNIT_TYPE;
 extern Term* BUILTIN_SUBROUTINE_TYPE;
 extern Term* BUILTIN_STRUCT_DEFINITION_TYPE;
+extern Term* BUILTIN_ANY_TYPE;
 
 void initialize();
 

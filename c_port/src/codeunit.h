@@ -38,10 +38,8 @@ extern "C" {
 
 void CodeUnit_alloc(Term*);
 
-// Execute the given function immediately, and return the result
-//CircaObject* CaCode_executeFunction(Term* function, TermList inputs);
 
-void CaCode_bindName(CodeUnit* codeUnit, Term* term, const char* name);
+void Code_bindName(CodeUnit* codeUnit, Term* term, const char* name);
 
 Term* CaCode_createTerm(CodeUnit* codeUnit, Term* function, TermList inputs,
         Branch* branch);
@@ -50,6 +48,5 @@ Term* CaCode_createConstant(CodeUnit* codeUnit, Term* type, Branch* branch);
 
 }
 
-void transform_function_and_reeval(Term* term, Term* new_function);
 
 #endif

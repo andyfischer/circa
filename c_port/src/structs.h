@@ -21,10 +21,16 @@ struct StructDefinition : public Type
     void addField(std::string name, Term* type);
     int numFields() const;
     Term* getType(int index) const;
+
+    // Try to find a field with the given name. Returns -1 if not found.
+    int findField(std::string name);
 };
 
 StructDefinition* as_struct_definition(Term* term);
 
+void StructDefinition_alloc(Term* type, Term* term);
 void Struct_packed_alloc(Term* type, Term* term);
+
+void initialize_structs(CodeUnit* code);
 
 #endif

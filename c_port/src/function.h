@@ -1,12 +1,15 @@
+#ifndef CIRCA__FUNCTION__INCLUDED
+#define CIRCA__FUNCTION__INCLUDED
 
 #include "common_headers.h"
 #include <string>
 
 #include "term.h"
 
-
 struct Function
 {
+    typedef void (*ExecuteFunc)(Term* caller);
+
     TermList inputTypes;
     Term* outputType;
 
@@ -35,3 +38,5 @@ void Function_setOutputType(Term* term, Term* type);
 void Function_setExecute(Term* term, void(*executeFunc)(Term*));
 
 }
+
+#endif
