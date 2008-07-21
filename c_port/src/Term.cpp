@@ -7,6 +7,8 @@
 #include "branch.h"
 #include "errors.h"
 #include "function.h"
+#include "globals.h"
+#include "operations.h"
 #include "term.h"
 #include "type.h"
 
@@ -39,7 +41,8 @@ Term::Term()
     globalID = gNextGlobalID++;
 }
 
-void Term::execute()
+void
+Term::execute()
 {
     if (this->function == NULL)
         throw errors::InternalError("function term is NULL");
@@ -57,9 +60,17 @@ void Term::execute()
     func->execute(this);
 }
 
-Type* Term::getType() const
+Type*
+Term::getType() const
 {
     return as_type(this->type);
+}
+
+const char *
+Term::toString()
+{
+    Term* result = apply_function(GetGlobal("to-string"), TermList(this));
+    return as_string(result).c_str();
 }
 
 int& as_int(Term* t)

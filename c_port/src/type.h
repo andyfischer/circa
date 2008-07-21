@@ -8,13 +8,13 @@ struct Term;
 struct Type
 {
     typedef void (*AllocFunc)(Term* type, Term* term);
-    typedef void (*DuplicateFunc)(Term* type, Term* src, Term* dest);
+    typedef void (*CopyFunc)(Term* src, Term* dest);
 
     string name;
 
     Type();
     AllocFunc alloc;
-    DuplicateFunc duplicate;
+    CopyFunc copy;
 
     Term* toString;
 };

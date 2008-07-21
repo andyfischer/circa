@@ -22,7 +22,7 @@ struct Function
 
     // Code
     void (*initialize)(Term*);
-    void (*execute)(Term*);
+    ExecuteFunc execute;
 
     Function();
 };
