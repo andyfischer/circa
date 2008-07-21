@@ -29,7 +29,7 @@ void initialize_term(Term* term, Term* function)
     term->function = function;
 
     Term* outputType = as_function(function)->outputType;
-    Term* stateType = as_function(function)->stateType;
+    // Term* stateType = as_function(function)->stateType;
 
     if (outputType == NULL)
         throw errors::InternalError("outputType is NULL");
@@ -88,7 +88,7 @@ Term* get_const_function(Term* type)
 }
 
 Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,
-        Function::ExecuteFunc toStringFunc)
+        Function::ExecuteFunc toStringFunc, Type::CopyFunc copyFunc)
 {
     Term* typeTerm = create_constant(GetGlobal("Type"));
     as_type(typeTerm)->name = name;
@@ -111,8 +111,36 @@ Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,
     return typeTerm;
 }
 
+Term* quick_create_function(CodeUnit* code, string name, Function::ExecuteFunc executeFunc,
+        TermList inputTypes, Term* outputType)
+{
+    Term* term = create_constant(GetGlobal("Function"));
+    Function* func = as_function(term);
+    func->name = name;
+    func->execute = executeFunc;
+    func->inputTypes = inputTypes;
+    func->outputType = outputType;
+    code->bindName(term, name);
+	return term;
+}
+
 void transform_function_and_reeval(Term* term, Term* new_function)
 {
     term->function = new_function;
     term->execute();
+}
+
+void copy_term(Term* source, Term* dest)
+{
+    if (source->type != dest->type)
+        throw errors::TypeError();
+
+    as_type(source->type)->copy(source,dest);
+}
+
+Term* constant_string(std::string s)
+{
+    Term* term = create_term(GetGlobal("string"), TermList());
+    as_string(term) = s;
+    return term;
 }

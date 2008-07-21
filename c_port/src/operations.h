@@ -24,6 +24,15 @@ Term* apply_function(Term* function, TermList inputs);
 // Fetch the const function for this type
 Term* get_const_function(Term* type);
 
+// Create a new Type with the given properties. Also binds the name.
 Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,
-        Function::ExecuteFunc toStringFunc);
+        Function::ExecuteFunc toStringFunc, Type::CopyFunc copyFunc = NULL);
+
+// Create a new Function with the given properties. Also binds the name.
+Term* quick_create_function(CodeUnit* code, string name, Function::ExecuteFunc executeFunc,
+        TermList inputTypes, Term* outputType);
+
 void transform_function_and_reeval(Term* term, Term* new_function);
+void copy_term(Term* source, Term* dest);
+
+Term* constant_string(std::string s);

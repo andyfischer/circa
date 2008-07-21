@@ -23,6 +23,7 @@ Term* BUILTIN_CODEUNIT_TYPE = NULL;
 Term* BUILTIN_SUBROUTINE_TYPE = NULL;
 Term* BUILTIN_STRUCT_DEFINITION_TYPE = NULL;
 Term* BUILTIN_ANY_TYPE = NULL;
+Term* BUILTIN_VOID_TYPE = NULL;
 
 void const_generator(Term* caller)
 {
@@ -94,6 +95,7 @@ void bootstrap_kernel()
     set_input(constFuncFunc, 0, functionType);
     Function_setOutputType(constGenerator, functionType);
     Function_setOutputType(constFuncFunc, functionType);
+    constGenerator->type = functionType;
     constFuncFunc->type = functionType;
     constTypeFunc->type = functionType;
 }
@@ -150,8 +152,9 @@ void create_builtin_types()
     BUILTIN_FLOAT_TYPE = quick_create_type(KERNEL, "float", float_alloc, float_tostring);
     BUILTIN_BOOL_TYPE = quick_create_type(KERNEL, "bool", bool_alloc, bool_tostring);
     BUILTIN_SUBROUTINE_TYPE = quick_create_type(KERNEL, "Subroutine", Subroutine_alloc, NULL);
-    BUILTIN_STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition", StructDefinition_alloc, NULL);
+    BUILTIN_STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition", StructDefinition_alloc, NULL, StructDefinition_copy);
     BUILTIN_ANY_TYPE = quick_create_type(KERNEL, "any", empty_alloc_function, NULL);
+    BUILTIN_VOID_TYPE = quick_create_type(KERNEL, "void", empty_alloc_function, NULL);
 }
 
 void initialize()
@@ -159,7 +162,8 @@ void initialize()
     try {
         bootstrap_kernel();
         create_builtin_types();
-        create_builtin_functions();
+        initialize_builtin_functions(KERNEL);
+        initialize_structs(KERNEL);
     } catch (errors::CircaError& e)
     {
         std::cout << "An error occured while initializing." << std::endl;

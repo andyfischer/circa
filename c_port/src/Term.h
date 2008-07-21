@@ -58,6 +58,7 @@ struct Term
     void execute();
 
     Type* getType() const;
+    const char* toString();
 };
 
 int& as_int(Term* t);

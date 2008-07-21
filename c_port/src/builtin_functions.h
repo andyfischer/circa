@@ -1,6 +1,8 @@
 #ifndef __BUILTIN_FUNCTIONS__
 #define __BUILTIN_FUNCTIONS__
 
-void create_builtin_functions();
+class CodeUnit;
+
+void initialize_builtin_functions(CodeUnit*);
 
 #endif

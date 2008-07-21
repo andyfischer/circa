@@ -20,27 +20,14 @@ void to_string(Term* caller)
     }
 }
 
-void quick_create_function(CodeUnit* code, string name, void (*execute)(Term*),
-        TermList inputTypes, Term* outputType)
-{
-    Term* term = create_constant(GetGlobal("Function"));
-    Function* func = as_function(term);
-    func->name = name;
-    func->execute = execute;
-    func->inputTypes = inputTypes;
-    func->outputType = outputType;
-    code->bindName(term, name);
-}
 
 void add(Term* caller)
 {
     as_int(caller) = as_int(caller->inputs[0]) + as_int(caller->inputs[1]);
 }
 
-void create_builtin_functions()
+void initialize_builtin_functions(CodeUnit* code)
 {
-    CodeUnit* code = KERNEL;
-
     Term* int_t = GetGlobal("int");
     Term* float_t = GetGlobal("int");
     Term* string_t = GetGlobal("string");
