@@ -20,10 +20,10 @@ void to_string(Term* caller)
     }
 }
 
-void create_func(CodeUnit* code, string name, void (*execute)(Term*),
+void quick_create_function(CodeUnit* code, string name, void (*execute)(Term*),
         TermList inputTypes, Term* outputType)
 {
-    Term* term = code->createConstant(GetGlobal("Function"), NULL);
+    Term* term = create_constant(GetGlobal("Function"));
     Function* func = as_function(term);
     func->name = name;
     func->execute = execute;
@@ -46,7 +46,7 @@ void create_builtin_functions()
     Term* string_t = GetGlobal("string");
     Term* any_t = GetGlobal("any");
 
-    create_func(code, "to-string", to_string, TermList(any_t), string_t);
-    create_func(code, "add", add, TermList(int_t, int_t), int_t);
+    quick_create_function(code, "to-string", to_string, TermList(any_t), string_t);
+    quick_create_function(code, "add", add, TermList(int_t, int_t), int_t);
 }
 

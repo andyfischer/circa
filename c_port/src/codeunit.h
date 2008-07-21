@@ -25,10 +25,6 @@ struct CodeUnit
 
     // Create a term
     Term* createTerm(Term* function, TermList inputs, Branch* branch);
-
-    // Create a constant term. Calls createTerm with the appropriate constant
-    // function.
-    Term* createConstant(Term* type, Branch* branch);
 };
 
 extern "C" {
@@ -37,11 +33,6 @@ void CodeUnit_alloc(Term*);
 
 
 void Code_bindName(CodeUnit* codeUnit, Term* term, const char* name);
-
-Term* CaCode_createTerm(CodeUnit* codeUnit, Term* function, TermList inputs,
-        Branch* branch);
-
-Term* CaCode_createConstant(CodeUnit* codeUnit, Term* type, Branch* branch);
 
 }
 

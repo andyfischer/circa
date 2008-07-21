@@ -53,36 +53,13 @@ Term* CodeUnit::createTerm(Term* function, TermList inputs, Branch* branch)
     return term;
 }
 
-Term* CodeUnit::createConstant(Term* type, Branch* branch)
-{
-    // Fetch the constant function
-    Term* constantFunc = createTerm(KERNEL->getNamed("const-generator"), TermList(type), NULL);
-    constantFunc->execute();
-
-    // Create the term
-    return createTerm(constantFunc, TermList(), branch);
-}
-
 void CodeUnit_alloc(Term* caller)
 {
     caller->value = new CodeUnit();
 }
 
-
 void CaCode_bindName(CodeUnit* codeUnit, Term* term, const char* name)
 {
     codeUnit->bindName(term, name);
-}
-
-Term* CaCode_createTerm(CodeUnit* codeUnit, Term* function, TermList inputs,
-        Branch* branch)
-{
-    return codeUnit->createTerm(function, inputs, branch);
-}
-
-Term* CaCode_createConstant(CodeUnit* codeUnit, Term* type,
-        Branch* branch)
-{
-    return codeUnit->createConstant(type, branch);
 }
 
