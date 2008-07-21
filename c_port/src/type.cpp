@@ -13,10 +13,15 @@ Type::Type()
     toString = NULL;
 }
 
+bool is_type(Term* term)
+{
+    return ((term->type == BUILTIN_TYPE_TYPE)
+            || (term->type == BUILTIN_STRUCT_DEFINITION_TYPE));
+}
+
 Type* as_type(Term* term)
 {
-    if ((term->type != BUILTIN_TYPE_TYPE)
-            && (term->type != BUILTIN_STRUCT_DEFINITION_TYPE))
+    if (!is_type(term))
         throw errors::TypeError();
 
     return (Type*) term->value;

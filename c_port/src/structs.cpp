@@ -46,6 +46,11 @@ StructDefinition* as_struct_definition(Term* term)
     return (StructDefinition*) term->value;
 }
 
+StructInstance* as_struct_instance(Term* term)
+{
+    return (StructInstance*) term->value;
+}
+
 void StructDefinition_alloc(Term* type, Term* term)
 {
     term->value = new StructDefinition;
@@ -56,15 +61,15 @@ void Struct_packed_alloc(Term* type, Term* term)
     StructDefinition *def = as_struct_definition(type);
 
     int numFields = def->numFields();
-    Term ** fields = new Term*[numFields];
-
-    term->value = fields;
+    StructInstance* structInstance = new StructInstance;
+    structInstance->fields = new Term*[numFields];
+    term->value = structInstance;
 
     for (int i=0; i < numFields; i++)
     {
         Term* fieldType = def->getType(i);
-        fields[i] = new Term;
-        as_type(fieldType)->alloc(fieldType, fields[i]);
+        structInstance->fields[i] = new Term;
+        as_type(fieldType)->alloc(fieldType, structInstance->fields[i]);
     }
 }
 
@@ -79,5 +84,9 @@ void struct_get_field(Term* caller)
 
     Term* fieldType = def->getType(fieldIndex);
     specialize_type(caller, fieldType);
-}
 
+    StructInstance* structInstance = as_struct_instance(caller->inputs[0]);
+    Term* field = structInstance->fields[fieldIndex];
+
+    as_type(fieldType)->duplicate(fieldType, field, caller);
+}

@@ -21,6 +21,7 @@ struct Type
 
 extern "C" {
 
+bool is_type(Term* term);
 Type* as_type(Term* term);
 void Type_alloc(Term* type, Term* caller);
 void Type_setName(Term* term, const char* value);

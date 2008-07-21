@@ -10,6 +10,14 @@
 #include "term.h"
 #include "type.h"
 
+Term* create_term(Term* function, TermList inputs)
+{
+    Term* term = new Term;
+    initialize_term(term, function);
+    set_inputs(term, inputs);
+    return term;
+}
+
 void initialize_term(Term* term, Term* function)
 {
     if (term == NULL)
@@ -27,6 +35,11 @@ void initialize_term(Term* term, Term* function)
         throw errors::InternalError("outputType is NULL");
 
     change_type(term, outputType);
+}
+
+Term* create_constant(Term* type)
+{
+    return create_term(get_const_function(type), TermList());
 }
 
 void change_type(Term* term, Term* type)
@@ -48,6 +61,25 @@ void specialize_type(Term* term, Term* type)
 void set_inputs(Term* term, TermList inputs)
 {
     term->inputs = inputs;
+}
+
+Term* apply_function(Term* function, TermList inputs)
+{
+    // Check if 'function' is actually a type
+    if (is_type(function))
+    {
+        return create_term(get_const_function(function), TermList());
+    }
+
+    // Create a term in the normal way
+    return create_term(function, inputs);
+}
+
+Term* get_const_function(Term* type)
+{
+    Term* result = apply_function(GetGlobal("const-generator"), TermList(type));
+    result->execute();
+    return result;
 }
 
 Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,

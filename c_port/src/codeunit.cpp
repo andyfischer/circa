@@ -48,7 +48,6 @@ void CodeUnit::setInput(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 }
 
-
 Term* CodeUnit::createTerm(Term* function, TermList inputs, Branch* branch)
 {
     // Todo: try to reuse an existing term

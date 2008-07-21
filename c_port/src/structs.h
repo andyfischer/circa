@@ -26,6 +26,11 @@ struct StructDefinition : public Type
     int findField(std::string name);
 };
 
+struct StructInstance
+{
+    Term** fields;
+};
+
 StructDefinition* as_struct_definition(Term* term);
 
 void StructDefinition_alloc(Term* type, Term* term);
