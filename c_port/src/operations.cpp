@@ -90,13 +90,13 @@ Term* get_const_function(Term* type)
 Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,
         Function::ExecuteFunc toStringFunc)
 {
-    Term* typeTerm = code->createConstant(GetGlobal("Type"), NULL);
+    Term* typeTerm = create_constant(GetGlobal("Type"));
     as_type(typeTerm)->name = name;
     as_type(typeTerm)->alloc = allocFunc;
     code->bindName(typeTerm, name);
 
     // Create to-string function
-    Term* toString = code->createConstant(GetGlobal("Function"), NULL);
+    Term* toString = create_constant(GetGlobal("Function"));
     as_function(toString)->name = name + "-to-string";
     as_function(toString)->execute = toStringFunc;
     as_function(toString)->inputTypes.setAt(0, typeTerm);
