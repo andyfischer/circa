@@ -13,7 +13,6 @@ struct CodeUnit
     // Create a new term on the given branch.
     // 'branch' may be null, in which case we use mainBranch
     Term* _newTerm(Branch* branch);
-    Term* _bootstrapEmptyTerm();
 
     // Returns true if there is a term with the given name
     bool containsName(string name);
@@ -23,8 +22,6 @@ struct CodeUnit
 
     // Bind a name to a term
     void bindName(Term* term, string name);
-
-    void setInput(Term* term, int index, Term* input);
 
     // Create a term
     Term* createTerm(Term* function, TermList inputs, Branch* branch);
