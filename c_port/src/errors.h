@@ -41,7 +41,7 @@ public:
     InternalTypeError(Term* _term, Term* _expectedType) throw()
         : InternalError("")
     {
-        term = term;
+        term = _term;
         expectedType = _expectedType;
     }
     ~InternalTypeError() throw() {}

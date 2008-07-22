@@ -16,17 +16,29 @@ void run()
     std::cout << "five = " << as_string(five_as_string) << std::endl;
 
     Term* my_struct_def = create_constant(GetGlobal("StructDefinition"));
-
-    constant_string("hi");
-
-    return;
+    my_struct_def = apply_function(GetGlobal("struct-definition-set-name"),
+            TermList(my_struct_def, constant_string("my-struct")));
+    my_struct_def->execute();
 
     my_struct_def = apply_function(GetGlobal("add-field"),
             TermList(my_struct_def, constant_string("myInt"), GetGlobal("int")));
+    my_struct_def->execute();
     my_struct_def = apply_function(GetGlobal("add-field"),
             TermList(my_struct_def, constant_string("myString"), GetGlobal("string")));
+    my_struct_def->execute();
 
-    Term* struct_instance = apply_function(my_struct_def, TermList());
+    Term* my_instance = apply_function(my_struct_def, TermList());
+    my_instance->execute();
+
+    my_instance = apply_function(GetGlobal("set-field"),
+            TermList(my_instance, constant_string("myInt"), constant_int(2)));
+    my_instance->execute();
+
+    Term* hopefully_two = apply_function(GetGlobal("get-field"),
+            TermList(my_instance, constant_string("myInt")));
+    hopefully_two->execute();
+    
+    std::cout << "hopefully two = " << hopefully_two->toString() << std::endl;
 }
 
 int main(const char * args[])
@@ -35,6 +47,7 @@ int main(const char * args[])
         run();
     } catch (errors::CircaError &err)
     {
+        std::cout << "Top level error:\n";
         std::cout << err.message() << std::endl;
     }
 }

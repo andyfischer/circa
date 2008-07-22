@@ -7,10 +7,11 @@
 #include "type.h"
 
 Type::Type()
+  : name("undefined"),
+    alloc(NULL),
+    copy(NULL),
+    toString(NULL)
 {
-    name = "undefined";
-    alloc = NULL;
-    toString = NULL;
 }
 
 bool is_type(Term* term)
