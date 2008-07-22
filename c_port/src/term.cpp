@@ -41,25 +41,6 @@ Term::Term()
     globalID = gNextGlobalID++;
 }
 
-void
-Term::execute()
-{
-    if (this->function == NULL)
-        throw errors::InternalError("function term is NULL");
-
-    Function* func = as_function(this->function);
-
-    if (func == NULL)
-        throw errors::InternalError("function is NULL");
-
-    if (func->execute == NULL) {
-        std::cout << "warning: no evaluate function for " << func->name << std::endl;
-        return;
-    }
-        
-    func->execute(this);
-}
-
 Type*
 Term::getType() const
 {

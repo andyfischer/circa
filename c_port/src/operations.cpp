@@ -77,6 +77,31 @@ void set_inputs(Term* term, TermList inputs)
     term->inputs = inputs;
 }
 
+void execute(Term* term)
+{
+    if (term->function == NULL)
+        throw errors::InternalError("function term is NULL");
+
+    Function* func = as_function(term->function);
+
+    if (func == NULL)
+        throw errors::InternalError("function is NULL");
+
+    if (func->execute == NULL) {
+        std::cout << "Error: no evaluate function for " << func->name << std::endl;
+        return;
+    }
+
+    try {
+        func->execute(term);
+    }
+    catch (errors::InternalError &err)
+    {
+        std::cout << "An internal error occured while executing " + func->name << std::endl;
+        std::cout << err.message() << std::endl;
+    }
+}
+
 Term* apply_function(Term* function, TermList inputs)
 {
     // Check if 'function' is actually a type
@@ -92,7 +117,7 @@ Term* apply_function(Term* function, TermList inputs)
 Term* get_const_function(Term* type)
 {
     Term* result = apply_function(GetGlobal("const-generator"), TermList(type));
-    result->execute();
+    execute(result);
     return result;
 }
 
@@ -137,7 +162,7 @@ Term* quick_create_function(CodeUnit* code, string name, Function::ExecuteFunc e
 void transform_function_and_reeval(Term* term, Term* new_function)
 {
     term->function = new_function;
-    term->execute();
+    execute(term);
 }
 
 void copy_term(Term* source, Term* dest)
