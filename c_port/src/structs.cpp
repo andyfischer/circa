@@ -7,6 +7,11 @@
 #include "structs.h"
 #include "term.h"
 
+void StructDefinition_alloc(Term* type, Term* term);
+void StructDefinition_copy(Term* source, Term* dest);
+void StructInstance_alloc(Term* type, Term* term);
+void StructInstance_copy(Term* type, Term* term);
+
 StructDefinition::StructDefinition()
 {
 }
@@ -49,12 +54,17 @@ StructDefinition* as_struct_definition(Term* term)
 
 StructInstance* as_struct_instance(Term* term)
 {
+    // todo: type check
     return (StructInstance*) term->value;
 }
 
 void StructDefinition_alloc(Term* type, Term* term)
 {
-    term->value = new StructDefinition;
+    StructDefinition* def = new StructDefinition();
+    def->alloc = StructInstance_alloc;
+    def->copy = StructInstance_copy;
+
+    term->value = def;
 }
 
 void StructDefinition_copy(Term* source, Term* dest)
@@ -64,25 +74,41 @@ void StructDefinition_copy(Term* source, Term* dest)
 
 void struct_definition_add_field(Term* caller)
 {
+    string fieldName = as_string(caller->inputs[1]);
+    Term* fieldType = caller->inputs[2];
     copy_term(caller->inputs[0], caller);
-    as_struct_definition(caller)->addField(as_string(caller->inputs[1]), caller->inputs[2]);
+    as_struct_definition(caller)->addField(fieldName, fieldType);
 }
 
-void Struct_packed_alloc(Term* type, Term* term)
+void StructInstance_alloc(Term* type, Term* term)
 {
     StructDefinition *def = as_struct_definition(type);
 
     int numFields = def->numFields();
-    StructInstance* structInstance = new StructInstance;
+    StructInstance* structInstance = new StructInstance();
     structInstance->fields = new Term*[numFields];
     term->value = structInstance;
 
     for (int i=0; i < numFields; i++)
     {
         Term* fieldType = def->getType(i);
-        structInstance->fields[i] = new Term;
-        as_type(fieldType)->alloc(fieldType, structInstance->fields[i]);
+        Term* field = new Term();
+        change_type(field, fieldType);
+        structInstance->fields[i] = field;
     }
+}
+
+void StructInstance_copy(Term* source, Term* dest)
+{
+    *as_struct_instance(dest) = *as_struct_instance(source);
+}
+
+void struct_definition_set_name(Term* caller)
+{
+    specialize_type(caller, caller->inputs[0]->type);
+    copy_term(caller->inputs[0], caller);
+
+    as_struct_definition(caller)->name = as_string(caller->inputs[1]);
 }
 
 void struct_get_field(Term* caller)
@@ -100,31 +126,41 @@ void struct_get_field(Term* caller)
     StructInstance* structInstance = as_struct_instance(caller->inputs[0]);
     Term* field = structInstance->fields[fieldIndex];
 
-    as_type(fieldType)->copy(field, caller);
+    copy_term(field, caller);
 }
 
 void struct_set_field(Term* caller)
 {
-    Term* targetStruct = caller->inputs[0];
+    // Temp: Copy the target struct
+    specialize_type(caller, caller->inputs[0]->type);
+    copy_term(caller->inputs[0], caller);
+    
     string fieldName = as_string(caller->inputs[1]);
     Term* value = caller->inputs[2];
-    StructDefinition* def = as_struct_definition(targetStruct->type);
+    StructDefinition* def = as_struct_definition(caller->type);
 
     int fieldIndex = def->findField(fieldName);
     if (fieldIndex == -1)
         throw errors::InternalError(string("Field " ) + fieldName + " not found.");
 
-    StructInstance* structInstance = as_struct_instance(targetStruct);
+    StructInstance* structInstance = as_struct_instance(caller);
     Term* field = structInstance->fields[fieldIndex];
 
-    as_type(value->type)->copy(value, field);
+    copy_term(value, field);
 }
 
 void initialize_structs(CodeUnit* code)
 {
+    BUILTIN_STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition", StructDefinition_alloc, NULL, StructDefinition_copy);
     quick_create_function(code, "get-field", struct_get_field,
         TermList(GetGlobal("any"), GetGlobal("string")), GetGlobal("any"));
     quick_create_function(code, "set-field", struct_set_field,
         TermList(GetGlobal("any"), GetGlobal("string"), GetGlobal("any")),
-        GetGlobal("void"));
+        GetGlobal("any"));
+    quick_create_function(code, "add-field", struct_definition_add_field,
+        TermList(GetGlobal("StructDefinition"), GetGlobal("string"), GetGlobal("Type")),
+        GetGlobal("StructDefinition"));
+    quick_create_function(code, "struct-definition-set-name", struct_definition_set_name,
+        TermList(GetGlobal("StructDefinition"), GetGlobal("string")),
+        GetGlobal("StructDefinition"));
 }

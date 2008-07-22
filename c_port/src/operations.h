@@ -16,7 +16,7 @@ void set_inputs(Term* term, TermList inputs);
 // Examine 'function' and 'inputs' and returns a result term. A few things
 // may happen here:
 //  1. We might re-use an existing term
-//  2. 'function' might be a type
+//  2. 'function' might be a type (create an empty instance)
 //  3. We might specialize an overloaded function
 //  4. add more stuff here
 Term* apply_function(Term* function, TermList inputs);
@@ -36,3 +36,4 @@ void transform_function_and_reeval(Term* term, Term* new_function);
 void copy_term(Term* source, Term* dest);
 
 Term* constant_string(std::string s);
+Term* constant_int(int i);

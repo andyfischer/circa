@@ -104,10 +104,18 @@ void int_alloc(Term* type, Term* caller)
 {
     caller->value = new int;
 }
+void int_copy(Term* source, Term* dest)
+{
+    as_int(dest) = as_int(source);
+}
 
 void float_alloc(Term* type, Term* caller)
 {
     caller->value = new float;
+}
+void float_copy(Term* source, Term* dest)
+{
+    as_float(dest) = as_float(source);
 }
 
 void string_alloc(Term* type, Term* caller)
@@ -148,11 +156,12 @@ void bool_tostring(Term* caller)
 void create_builtin_types()
 {
     BUILTIN_STRING_TYPE = quick_create_type(KERNEL, "string", string_alloc, string_tostring);
-    BUILTIN_INT_TYPE = quick_create_type(KERNEL, "int", int_alloc, int_tostring);
-    BUILTIN_FLOAT_TYPE = quick_create_type(KERNEL, "float", float_alloc, float_tostring);
+    BUILTIN_INT_TYPE = quick_create_type(KERNEL, "int",
+            int_alloc, int_tostring, int_copy);
+    BUILTIN_FLOAT_TYPE = quick_create_type(KERNEL, "float",
+            float_alloc, float_tostring, float_copy);
     BUILTIN_BOOL_TYPE = quick_create_type(KERNEL, "bool", bool_alloc, bool_tostring);
     BUILTIN_SUBROUTINE_TYPE = quick_create_type(KERNEL, "Subroutine", Subroutine_alloc, NULL);
-    BUILTIN_STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition", StructDefinition_alloc, NULL, StructDefinition_copy);
     BUILTIN_ANY_TYPE = quick_create_type(KERNEL, "any", empty_alloc_function, NULL);
     BUILTIN_VOID_TYPE = quick_create_type(KERNEL, "void", empty_alloc_function, NULL);
 }

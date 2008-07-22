@@ -33,9 +33,6 @@ struct StructInstance
 
 StructDefinition* as_struct_definition(Term* term);
 
-void StructDefinition_alloc(Term* type, Term* term);
-void Struct_packed_alloc(Term* type, Term* term);
-void StructDefinition_copy(Term* source, Term* dest);
 
 void initialize_structs(CodeUnit* code);
 

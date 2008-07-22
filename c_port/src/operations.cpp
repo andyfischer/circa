@@ -49,7 +49,14 @@ void change_type(Term* term, Term* type)
     if (term->value != NULL)
         throw errors::InternalError("value is not NULL in change_type (possible memory leak)");
     term->type = type;
-    as_type(type)->alloc(type, term);
+
+    Type::AllocFunc alloc = as_type(type)->alloc;
+
+    if (alloc == NULL)
+        throw errors::InternalError(string("type ") + as_type(type)->name
+                + " has no alloc function");
+
+    alloc(type, term);
 }
 
 void specialize_type(Term* term, Term* type)
@@ -95,6 +102,7 @@ Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,
     Term* typeTerm = create_constant(GetGlobal("Type"));
     as_type(typeTerm)->name = name;
     as_type(typeTerm)->alloc = allocFunc;
+    as_type(typeTerm)->copy = copyFunc;
     code->bindName(typeTerm, name);
 
     // Create to-string function
@@ -137,12 +145,25 @@ void copy_term(Term* source, Term* dest)
     if (source->type != dest->type)
         throw errors::InternalTypeError(dest, source->type);
 
-    as_type(source->type)->copy(source,dest);
+    Type::CopyFunc copy = as_type(source->type)->copy;
+
+    if (copy == NULL)
+        throw errors::InternalError(string("type ") + as_type(source->type)->name
+                + " has no copy function");
+
+    copy(source,dest);
 }
 
 Term* constant_string(std::string s)
 {
     Term* term = apply_function(GetGlobal("string"), TermList());
     as_string(term) = s;
+    return term;
+}
+
+Term* constant_int(int i)
+{
+    Term* term = apply_function(GetGlobal("int"), TermList());
+    as_int(term) = i;
     return term;
 }
