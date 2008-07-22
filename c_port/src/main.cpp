@@ -2,8 +2,9 @@
 #include "common_headers.h"
 
 #include "circa.h"
+#include "errors.h"
 
-int main(const char * args[])
+void run()
 {
     initialize();
 
@@ -16,10 +17,24 @@ int main(const char * args[])
 
     Term* my_struct_def = create_constant(GetGlobal("StructDefinition"));
 
+    constant_string("hi");
+
+    return;
+
     my_struct_def = apply_function(GetGlobal("add-field"),
             TermList(my_struct_def, constant_string("myInt"), GetGlobal("int")));
     my_struct_def = apply_function(GetGlobal("add-field"),
             TermList(my_struct_def, constant_string("myString"), GetGlobal("string")));
 
     Term* struct_instance = apply_function(my_struct_def, TermList());
+}
+
+int main(const char * args[])
+{
+    try {
+        run();
+    } catch (errors::CircaError &err)
+    {
+        std::cout << err.message() << std::endl;
+    }
 }

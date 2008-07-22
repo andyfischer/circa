@@ -40,7 +40,7 @@ void bootstrap_kernel()
     KERNEL = new CodeUnit();
 
     // Create const-generator function
-    Term* constGenerator = new Term;
+    Term* constGenerator = new Term();
     Function_alloc(NULL, constGenerator);
     Function_setName(constGenerator, "const-generator");
     Function_setPureFunction(constGenerator, true);
@@ -48,7 +48,7 @@ void bootstrap_kernel()
     KERNEL->bindName(constGenerator, "const-generator");
 
     // Create const-Type function
-    Term* constTypeFunc = new Term;
+    Term* constTypeFunc = new Term();
     constTypeFunc->function = constGenerator;
     Function_alloc(NULL, constTypeFunc);
     Function_setName(constTypeFunc, "const-Type");
@@ -93,11 +93,11 @@ void bootstrap_kernel()
     // Implant Function type
     set_input(constGenerator, 0, typeType);
     set_input(constFuncFunc, 0, functionType);
-    Function_setOutputType(constGenerator, functionType);
-    Function_setOutputType(constFuncFunc, functionType);
     constGenerator->type = functionType;
     constFuncFunc->type = functionType;
     constTypeFunc->type = functionType;
+    Function_setOutputType(constGenerator, functionType);
+    Function_setOutputType(constFuncFunc, functionType);
 }
 
 void int_alloc(Term* type, Term* caller)

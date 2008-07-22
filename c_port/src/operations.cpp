@@ -12,6 +12,8 @@
 
 Term* create_term(Term* function, TermList inputs)
 {
+    if (!is_function(function))
+        throw errors::InternalError("1st arg to create_term must be a function");
     Term* term = new Term;
     initialize_term(term, function);
     set_inputs(term, inputs);
@@ -53,7 +55,7 @@ void change_type(Term* term, Term* type)
 void specialize_type(Term* term, Term* type)
 {
     if (term->type != BUILTIN_ANY_TYPE)
-        throw errors::TypeError();
+        throw errors::InternalTypeError(term, BUILTIN_ANY_TYPE);
 
     change_type(term, type);
 }
@@ -133,14 +135,14 @@ void transform_function_and_reeval(Term* term, Term* new_function)
 void copy_term(Term* source, Term* dest)
 {
     if (source->type != dest->type)
-        throw errors::TypeError();
+        throw errors::InternalTypeError(dest, source->type);
 
     as_type(source->type)->copy(source,dest);
 }
 
 Term* constant_string(std::string s)
 {
-    Term* term = create_term(GetGlobal("string"), TermList());
+    Term* term = apply_function(GetGlobal("string"), TermList());
     as_string(term) = s;
     return term;
 }

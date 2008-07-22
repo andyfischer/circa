@@ -29,7 +29,7 @@ void add(Term* caller)
 void initialize_builtin_functions(CodeUnit* code)
 {
     Term* int_t = GetGlobal("int");
-    Term* float_t = GetGlobal("int");
+    //Term* float_t = GetGlobal("int");
     Term* string_t = GetGlobal("string");
     Term* any_t = GetGlobal("any");
 

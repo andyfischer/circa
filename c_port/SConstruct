@@ -50,5 +50,5 @@ for file in os.listdir('src'):
     
 libcirca = env.SharedLibrary('circa', buildFiles)
 
-env.Program('test_program', 'build/test_program.cpp', LIBS=[libcirca])
+env.Program('circa', 'build/main.cpp', LIBS=[libcirca])
 

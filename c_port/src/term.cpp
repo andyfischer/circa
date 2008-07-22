@@ -31,13 +31,13 @@ Term* TermList::operator[](int index)
 }
 
 Term::Term()
+  : owningBranch(NULL),
+    function(NULL),
+    value(NULL),
+    type(NULL),
+    state(NULL),
+    needsUpdate(true)
 {
-    owningBranch = NULL;
-    function = NULL;
-    value = NULL;
-    type = NULL;
-    state = NULL;
-    needsUpdate = true;
     globalID = gNextGlobalID++;
 }
 
@@ -76,7 +76,7 @@ Term::toString()
 int& as_int(Term* t)
 {
     if (t->type != BUILTIN_INT_TYPE)
-        throw errors::TypeError();
+        throw errors::InternalTypeError(t, BUILTIN_INT_TYPE);
 
     return *((int*) t->value);
 }
@@ -84,7 +84,7 @@ int& as_int(Term* t)
 float& as_float(Term* t)
 {
     if (t->type != BUILTIN_FLOAT_TYPE)
-        throw errors::TypeError();
+        throw errors::InternalTypeError(t, BUILTIN_FLOAT_TYPE);
 
     return *((float*) t->value);
 }
@@ -92,7 +92,7 @@ float& as_float(Term* t)
 bool& as_bool(Term* t)
 {
     if (t->type != BUILTIN_BOOL_TYPE)
-        throw errors::TypeError();
+        throw errors::InternalTypeError(t, BUILTIN_BOOL_TYPE);
 
     return *((bool*) t->value);
 }
@@ -100,7 +100,7 @@ bool& as_bool(Term* t)
 string& as_string(Term* t)
 {
     if (t->type != BUILTIN_STRING_TYPE)
-        throw errors::TypeError();
+        throw errors::InternalTypeError(t, BUILTIN_STRING_TYPE);
 
     if (t->value == NULL)
         throw errors::InternalError("NULL pointer in as_string");
@@ -121,4 +121,3 @@ Term* Term_getFunction(Term* term)
 {
     return term->function;
 }
-
