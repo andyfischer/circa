@@ -1,5 +1,6 @@
 
 #include "builtins.h"
+#include "errors.h"
 #include "function.h"
 
 Function::Function()
@@ -11,9 +12,16 @@ Function::Function()
     execute = NULL;
 }
 
+bool is_function(Term* term)
+{
+    return term->type == BUILTIN_FUNCTION_TYPE;
+}
+
 Function* as_function(Term* term)
 {
-    // todo: type check
+    if (!is_function(term))
+        throw errors::InternalTypeError(term, BUILTIN_FUNCTION_TYPE);
+
     return (Function*) term->value;
 }
 

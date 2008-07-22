@@ -3,6 +3,8 @@
 
 #include "common_headers.h"
 
+class Term;
+
 namespace errors {
 
 class CircaError : public std::exception
@@ -14,6 +16,7 @@ public:
 
 class InternalError : public CircaError
 {
+protected:
     string msg;
 
 public:
@@ -29,13 +32,20 @@ public:
     }
 };
 
-class TypeError : public CircaError
+class InternalTypeError : public InternalError
 {
+    Term* term;
+    Term* expectedType;
+
 public:
-    virtual string message()
+    InternalTypeError(Term* _term, Term* _expectedType) throw()
+        : InternalError("")
     {
-        return string("Type error");
+        term = term;
+        expectedType = _expectedType;
     }
+    ~InternalTypeError() throw() {}
+    virtual string message();
 };
 
 class KeyError : public CircaError
