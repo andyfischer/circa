@@ -153,7 +153,7 @@ void struct_set_field(Term* caller)
     copy_term(value, field);
 }
 
-void initialize_structs(CodeUnit* code)
+void initialize_structs(Branch* code)
 {
     BUILTIN_STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition", StructDefinition_alloc, NULL, StructDefinition_copy);
     quick_create_function(code, "get-field", struct_get_field,

@@ -1,5 +1,5 @@
-#ifndef __GLOBALS_INCLUDED__
-#define __GLOBALS_INCLUDED__
+#ifndef CIRCA__GLOBALS__INCLUDED
+#define CIRCA__GLOBALS__INCLUDED
 
 
 Term* get_global(string name);

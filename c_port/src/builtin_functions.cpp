@@ -1,8 +1,8 @@
 #include "common_headers.h"
 
+#include "branch.h"
 #include "builtins.h"
 #include "builtin_functions.h"
-#include "codeunit.h"
 #include "function.h"
 #include "globals.h"
 #include "operations.h"
@@ -28,7 +28,7 @@ void add(Term* caller)
     as_int(caller) = as_int(caller->inputs[0]) + as_int(caller->inputs[1]);
 }
 
-void initialize_builtin_functions(CodeUnit* code)
+void initialize_builtin_functions(Branch* code)
 {
     Term* int_t = get_global("int");
     //Term* float_t = get_global("int");

@@ -1,8 +1,8 @@
 
 #include "common_headers.h"
 
+#include "branch.h"
 #include "builtins.h"
-#include "codeunit.h"
 #include "errors.h"
 #include "function.h"
 #include "globals.h"
@@ -135,7 +135,7 @@ Term* get_const_function(Term* type)
     return result;
 }
 
-Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,
+Term* quick_create_type(Branch* code, string name, Type::AllocFunc allocFunc,
         Function::ExecuteFunc toStringFunc, Type::CopyFunc copyFunc)
 {
     Term* typeTerm = create_constant(get_global("Type"));
@@ -161,7 +161,7 @@ Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,
     return typeTerm;
 }
 
-Term* quick_create_function(CodeUnit* code, string name, Function::ExecuteFunc executeFunc,
+Term* quick_create_function(Branch* code, string name, Function::ExecuteFunc executeFunc,
         TermList inputTypes, Term* outputType)
 {
     Term* term = create_constant(get_global("Function"));
