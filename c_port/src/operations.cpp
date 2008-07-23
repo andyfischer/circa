@@ -15,12 +15,12 @@ Term* create_term(Term* function, TermList inputs)
     if (!is_function(function))
         throw errors::InternalError("1st arg to create_term must be a function");
     Term* term = new Term;
-    initialize_term(term, function);
-    set_inputs(term, inputs);
+    initialize_term(term, function, inputs);
+    
     return term;
 }
 
-void initialize_term(Term* term, Term* function)
+void initialize_term(Term* term, Term* function, TermList inputs)
 {
     if (term == NULL)
         throw errors::InternalError("Term is NULL");
@@ -29,14 +29,27 @@ void initialize_term(Term* term, Term* function)
         throw errors::InternalError("Function is NULL");
 
     term->function = function;
+    Function* functionData = as_function(function);
 
-    Term* outputType = as_function(function)->outputType;
-    // Term* stateType = as_function(function)->stateType;
+    Term* outputType = functionData->outputType;
+    // Term* stateType = functionData->stateType;
 
     if (outputType == NULL)
         throw errors::InternalError("outputType is NULL");
 
     change_type(term, outputType);
+
+    set_inputs(term, inputs);
+
+    // Run the function's initialize (if it has one)
+    if (functionData->initialize != NULL) {
+        functionData->initialize(term);
+    }
+}
+
+void set_inputs(Term* term, TermList inputs)
+{
+    term->inputs = inputs;
 }
 
 Term* create_constant(Term* type)
@@ -70,11 +83,6 @@ void specialize_type(Term* term, Term* type)
 void set_input(Term* term, int index, Term* input)
 {
     term->inputs.setAt(index, input);
-}
-
-void set_inputs(Term* term, TermList inputs)
-{
-    term->inputs = inputs;
 }
 
 void execute(Term* term)

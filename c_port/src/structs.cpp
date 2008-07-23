@@ -137,9 +137,6 @@ void struct_set_field_init(Term* caller)
 void struct_set_field(Term* caller)
 {
     // Recycles input 0
-    // Temp: copy by hand
-    specialize_type(caller, caller->inputs[0]->type);
-    copy_term(caller->inputs[0], caller);
 
     string fieldName = as_string(caller->inputs[1]);
     Term* value = caller->inputs[2];
@@ -166,6 +163,7 @@ void initialize_structs(CodeUnit* code)
         GetGlobal("any"));
     // as_function(set_field)->recycleInput = 0;
     as_function(set_field)->initialize = struct_set_field_init;
+    as_function(set_field)->recycleInput = 0;
 
     Term* add_field = quick_create_function(code, "add-field", struct_definition_add_field,
         TermList(GetGlobal("StructDefinition"), GetGlobal("string"), GetGlobal("Type")),
