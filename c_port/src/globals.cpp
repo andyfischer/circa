@@ -14,7 +14,6 @@ Term* GetGlobal(string name)
     throw errors::KeyError(name);
 }
 
-Term* GetGlobal(const char* name)
+void empty_execute_function(Term* caller)
 {
-    return GetGlobal(string(name));
 }

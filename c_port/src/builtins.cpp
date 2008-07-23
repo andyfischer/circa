@@ -31,6 +31,7 @@ void const_generator(Term* caller)
     Type* type = as_type(caller->inputs[0]);
     output->name = "const-" + type->name;
     output->outputType = caller->inputs[0];
+    output->execute = empty_execute_function;
 }
 
 void empty_alloc_function(Term*,Term*) { }

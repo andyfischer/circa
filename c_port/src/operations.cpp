@@ -88,8 +88,14 @@ void execute(Term* term)
         throw errors::InternalError("function is NULL");
 
     if (func->execute == NULL) {
-        std::cout << "Error: no evaluate function for " << func->name << std::endl;
+        std::cout << "Error: no execute function for " << func->name << std::endl;
         return;
+    }
+
+    // Check if we need to recycle an input
+    if (func->recycleInput != -1) {
+        // Copy this input. In the future we'll support object stealing.
+        copy_term(term->inputs[0], term);
     }
 
     try {

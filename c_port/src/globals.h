@@ -3,11 +3,7 @@
 
 
 Term* GetGlobal(string name);
+void empty_execute_function(Term* caller);
 
-extern "C" {
-
-Term* GetGlobal(const char* name);
-
-}
 
 #endif

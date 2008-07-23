@@ -74,9 +74,9 @@ void StructDefinition_copy(Term* source, Term* dest)
 
 void struct_definition_add_field(Term* caller)
 {
+    // Recycling input: 0
     string fieldName = as_string(caller->inputs[1]);
     Term* fieldType = caller->inputs[2];
-    copy_term(caller->inputs[0], caller);
     as_struct_definition(caller)->addField(fieldName, fieldType);
 }
 
@@ -156,9 +156,12 @@ void initialize_structs(CodeUnit* code)
     quick_create_function(code, "set-field", struct_set_field,
         TermList(GetGlobal("any"), GetGlobal("string"), GetGlobal("any")),
         GetGlobal("any"));
-    quick_create_function(code, "add-field", struct_definition_add_field,
+
+    Term* add_field = quick_create_function(code, "add-field", struct_definition_add_field,
         TermList(GetGlobal("StructDefinition"), GetGlobal("string"), GetGlobal("Type")),
         GetGlobal("StructDefinition"));
+    as_function(add_field)->recycleInput = 0;
+
     quick_create_function(code, "struct-definition-set-name", struct_definition_set_name,
         TermList(GetGlobal("StructDefinition"), GetGlobal("string")),
         GetGlobal("StructDefinition"));

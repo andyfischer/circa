@@ -6,6 +6,7 @@
 Function::Function()
 {
     stateType = NULL;
+    recycleInput = -1;
     pureFunction = false;
     variableArgs = false;
     initialize = NULL;
