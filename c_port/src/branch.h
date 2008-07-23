@@ -1,10 +1,9 @@
-#ifndef __BRANCH_INCLUDED__
-#define __BRANCH_INCLUDED__
+#ifndef CIRCA__BRANCH__INCLUDED
+#define CIRCA__BRANCH__INCLUDED
 
 #include "common_headers.h"
 #include "term_namespace.h"
 
-class CodeUnit;
 class Term;
 
 struct Branch
@@ -12,7 +11,6 @@ struct Branch
     std::vector<Term*> terms;
     TermNamespace names;
     Term* owningTerm;
-    CodeUnit* owningCodeUnit;
 
     void append(Term* term);
 
@@ -26,14 +24,5 @@ struct Branch
     void bindName(Term* term, string name);
 };
 
-extern "C" {
-
-void CaBranch_append(Branch* branch, Term* term);
-void CaBranch_clear(Branch* branch);
-void CaBranch_containsName(Branch* branch, const char* name);
-void CaBranch_getNamed(Branch* branch, const char* name);
-void CaBranch_bindName(Branch* branch, Term* term, const char* name);
-
-}
 
 #endif

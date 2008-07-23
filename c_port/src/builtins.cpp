@@ -1,8 +1,8 @@
 
 #include "common_headers.h"
 
+#include "branch.h"
 #include "builtin_functions.h"
-#include "codeunit.h"
 #include "errors.h"
 #include "function.h"
 #include "globals.h"
@@ -12,7 +12,7 @@
 #include "term.h"
 #include "type.h"
 
-CodeUnit* KERNEL = NULL;
+Branch* KERNEL = NULL;
 Term* BUILTIN_INT_TYPE = NULL;
 Term* BUILTIN_FLOAT_TYPE = NULL;
 Term* BUILTIN_BOOL_TYPE = NULL;
@@ -38,7 +38,7 @@ void empty_alloc_function(Term*,Term*) { }
 
 void bootstrap_kernel()
 {
-    KERNEL = new CodeUnit();
+    KERNEL = new Branch();
 
     // Create const-generator function
     Term* constGenerator = new Term();

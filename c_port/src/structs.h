@@ -34,6 +34,6 @@ struct StructInstance
 StructDefinition* as_struct_definition(Term* term);
 
 
-void initialize_structs(CodeUnit* code);
+void initialize_structs(Branch* code);
 
 #endif

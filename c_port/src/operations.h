@@ -1,5 +1,4 @@
 
-#include "codeunit.h"
 #include "function.h"
 #include "term.h"
 #include "type.h"
@@ -26,11 +25,11 @@ Term* apply_function(Term* function, TermList inputs);
 Term* get_const_function(Term* type);
 
 // Create a new Type with the given properties. Also binds the name.
-Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,
+Term* quick_create_type(Branch* code, string name, Type::AllocFunc allocFunc,
         Function::ExecuteFunc toStringFunc, Type::CopyFunc copyFunc = NULL);
 
 // Create a new Function with the given properties. Also binds the name.
-Term* quick_create_function(CodeUnit* code, string name, Function::ExecuteFunc executeFunc,
+Term* quick_create_function(Branch* code, string name, Function::ExecuteFunc executeFunc,
         TermList inputTypes, Term* outputType);
 
 void change_function(Term* term, Term* new_function);

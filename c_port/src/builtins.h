@@ -1,10 +1,10 @@
-#ifndef __BOOTSTRAP_INCLUDED__
-#define __BOOTSTRAP_INCLUDED__
+#ifndef CIRCA__BOOTSTRAP__INCLUDED
+#define CIRCA__BOOTSTRAP__INCLUDED
 
-struct CodeUnit;
+struct Branch;
 struct Term;
 
-extern CodeUnit* KERNEL;
+extern Branch* KERNEL;
 
 extern Term* BUILTIN_INT_TYPE;
 extern Term* BUILTIN_FLOAT_TYPE;
