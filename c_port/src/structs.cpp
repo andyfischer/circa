@@ -105,7 +105,6 @@ void StructInstance_copy(Term* source, Term* dest)
 
 void struct_definition_set_name(Term* caller)
 {
-    specialize_type(caller, caller->inputs[0]->type);
     copy_term(caller->inputs[0], caller);
 
     as_struct_definition(caller)->name = as_string(caller->inputs[1]);

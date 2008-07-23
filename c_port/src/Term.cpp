@@ -51,6 +51,7 @@ const char *
 Term::toString()
 {
     Term* result = apply_function(GetGlobal("to-string"), TermList(this));
+    execute(result);
     return as_string(result).c_str();
 }
 

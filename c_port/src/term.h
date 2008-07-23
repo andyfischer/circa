@@ -55,7 +55,6 @@ struct Term
     int globalID;
 
     Term();
-    void execute();
 
     Type* getType() const;
     const char* toString();

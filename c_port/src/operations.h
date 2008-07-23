@@ -33,7 +33,7 @@ Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,
 Term* quick_create_function(CodeUnit* code, string name, Function::ExecuteFunc executeFunc,
         TermList inputTypes, Term* outputType);
 
-void transform_function_and_reeval(Term* term, Term* new_function);
+void change_function(Term* term, Term* new_function);
 void copy_term(Term* source, Term* dest);
 
 Term* constant_string(std::string s);
