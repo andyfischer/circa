@@ -128,12 +128,19 @@ void struct_get_field(Term* caller)
     copy_term(field, caller);
 }
 
+void struct_set_field_init(Term* caller)
+{
+    // Propagate type
+    specialize_type(caller, caller->inputs[0]->type);
+}
+
 void struct_set_field(Term* caller)
 {
-    // Temp: Copy the target struct
+    // Recycles input 0
+    // Temp: copy by hand
     specialize_type(caller, caller->inputs[0]->type);
     copy_term(caller->inputs[0], caller);
-    
+
     string fieldName = as_string(caller->inputs[1]);
     Term* value = caller->inputs[2];
     StructDefinition* def = as_struct_definition(caller->type);
@@ -153,9 +160,12 @@ void initialize_structs(CodeUnit* code)
     BUILTIN_STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition", StructDefinition_alloc, NULL, StructDefinition_copy);
     quick_create_function(code, "get-field", struct_get_field,
         TermList(GetGlobal("any"), GetGlobal("string")), GetGlobal("any"));
-    quick_create_function(code, "set-field", struct_set_field,
+
+    Term* set_field = quick_create_function(code, "set-field", struct_set_field,
         TermList(GetGlobal("any"), GetGlobal("string"), GetGlobal("any")),
         GetGlobal("any"));
+    // as_function(set_field)->recycleInput = 0;
+    as_function(set_field)->initialize = struct_set_field_init;
 
     Term* add_field = quick_create_function(code, "add-field", struct_definition_add_field,
         TermList(GetGlobal("StructDefinition"), GetGlobal("string"), GetGlobal("Type")),
