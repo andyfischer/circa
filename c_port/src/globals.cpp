@@ -6,7 +6,7 @@
 #include "errors.h"
 #include "globals.h"
 
-Term* GetGlobal(string name)
+Term* get_global(string name)
 {
     if (KERNEL->containsName(name))
         return KERNEL->getNamed(name);

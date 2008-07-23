@@ -38,20 +38,6 @@ Term* CodeUnit::getNamed(string name)
     return mainBranch.getNamed(name);
 }
 
-Term* CodeUnit::createTerm(Term* function, TermList inputs, Branch* branch)
-{
-    // Todo: try to reuse an existing term
-
-    if (branch == NULL)
-        branch = &this->mainBranch;
-
-    Term* term = _newTerm(branch);
-
-    initialize_term(term, function, inputs);
-
-    return term;
-}
-
 void CodeUnit_alloc(Term* caller)
 {
     caller->value = new CodeUnit();

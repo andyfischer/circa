@@ -8,25 +8,25 @@ void run()
 {
     initialize();
 
-    Term* five = create_constant(GetGlobal("int"));
+    Term* five = create_constant(get_global("int"));
     as_int(five) = 5;
 
-    Term* five_as_string = create_term(GetGlobal("to-string"), TermList(five));
+    Term* five_as_string = create_term(get_global("to-string"), TermList(five));
     execute(five_as_string);
     std::cout << "five = " << as_string(five_as_string) << std::endl;
 
-    Term* my_struct_def = create_constant(GetGlobal("StructDefinition"));
-    my_struct_def = apply_function(GetGlobal("struct-definition-set-name"),
+    Term* my_struct_def = create_constant(get_global("StructDefinition"));
+    my_struct_def = apply_function(get_global("struct-definition-set-name"),
             TermList(my_struct_def, constant_string("my-struct")));
     execute(my_struct_def);
     std::cout << "step 1: " << my_struct_def->toString() << std::endl;
 
-    my_struct_def = apply_function(GetGlobal("add-field"),
-            TermList(my_struct_def, constant_string("myInt"), GetGlobal("int")));
+    my_struct_def = apply_function(get_global("add-field"),
+            TermList(my_struct_def, constant_string("myInt"), get_global("int")));
     execute(my_struct_def);
     std::cout << "step 2: " << my_struct_def->toString() << std::endl;
-    my_struct_def = apply_function(GetGlobal("add-field"),
-            TermList(my_struct_def, constant_string("myString"), GetGlobal("string")));
+    my_struct_def = apply_function(get_global("add-field"),
+            TermList(my_struct_def, constant_string("myString"), get_global("string")));
     execute(my_struct_def);
     std::cout << "step 3: " << my_struct_def->toString() << std::endl;
 
@@ -34,12 +34,12 @@ void run()
     execute(my_instance);
     std::cout << "step 4: " << my_instance->toString() << std::endl;
 
-    my_instance = apply_function(GetGlobal("set-field"),
+    my_instance = apply_function(get_global("set-field"),
             TermList(my_instance, constant_string("myInt"), constant_int(2)));
     execute(my_instance);
     std::cout << "step 5: " << my_instance->toString() << std::endl;
 
-    Term* hopefully_two = apply_function(GetGlobal("get-field"),
+    Term* hopefully_two = apply_function(get_global("get-field"),
             TermList(my_instance, constant_string("myInt")));
     execute(hopefully_two);
     

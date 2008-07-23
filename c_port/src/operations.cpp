@@ -130,7 +130,7 @@ Term* apply_function(Term* function, TermList inputs)
 
 Term* get_const_function(Term* type)
 {
-    Term* result = apply_function(GetGlobal("const-generator"), TermList(type));
+    Term* result = apply_function(get_global("const-generator"), TermList(type));
     execute(result);
     return result;
 }
@@ -138,7 +138,7 @@ Term* get_const_function(Term* type)
 Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,
         Function::ExecuteFunc toStringFunc, Type::CopyFunc copyFunc)
 {
-    Term* typeTerm = create_constant(GetGlobal("Type"));
+    Term* typeTerm = create_constant(get_global("Type"));
     as_type(typeTerm)->name = name;
     as_type(typeTerm)->alloc = allocFunc;
     as_type(typeTerm)->copy = copyFunc;
@@ -146,15 +146,15 @@ Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,
 
     // Create to-string function
     if (toStringFunc != NULL) {
-        Term* toString = create_constant(GetGlobal("Function"));
+        Term* toString = create_constant(get_global("Function"));
         as_function(toString)->name = name + "-to-string";
         as_function(toString)->execute = toStringFunc;
         as_function(toString)->inputTypes.setAt(0, typeTerm);
 
-        if (GetGlobal("string") == NULL)
+        if (get_global("string") == NULL)
             throw errors::InternalError("string type not defined");
 
-        as_function(toString)->outputType = GetGlobal("string");
+        as_function(toString)->outputType = get_global("string");
         as_type(typeTerm)->toString = toString;
     }
 
@@ -164,7 +164,7 @@ Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,
 Term* quick_create_function(CodeUnit* code, string name, Function::ExecuteFunc executeFunc,
         TermList inputTypes, Term* outputType)
 {
-    Term* term = create_constant(GetGlobal("Function"));
+    Term* term = create_constant(get_global("Function"));
     Function* func = as_function(term);
     func->name = name;
     func->execute = executeFunc;
@@ -198,14 +198,14 @@ void copy_term(Term* source, Term* dest)
 
 Term* constant_string(std::string s)
 {
-    Term* term = apply_function(GetGlobal("string"), TermList());
+    Term* term = apply_function(get_global("string"), TermList());
     as_string(term) = s;
     return term;
 }
 
 Term* constant_int(int i)
 {
-    Term* term = apply_function(GetGlobal("int"), TermList());
+    Term* term = apply_function(get_global("int"), TermList());
     as_int(term) = i;
     return term;
 }
