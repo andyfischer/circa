@@ -47,8 +47,7 @@ Term* CodeUnit::createTerm(Term* function, TermList inputs, Branch* branch)
 
     Term* term = _newTerm(branch);
 
-    initialize_term(term, function);
-    set_inputs(term, inputs);
+    initialize_term(term, function, inputs);
 
     return term;
 }

@@ -6,12 +6,12 @@
 
 
 Term* create_term(Term* function, TermList inputs);
-void initialize_term(Term* term, Term* function);
+void initialize_term(Term* term, Term* function, TermList inputs);
+void set_inputs(Term* term, TermList inputs);
 Term* create_constant(Term* type);
 void change_type(Term* term, Term* type);
 void specialize_type(Term* term, Term* type);
 void set_input(Term* term, int index, Term* input);
-void set_inputs(Term* term, TermList inputs);
 void execute(Term* term);
 
 // Examine 'function' and 'inputs' and returns a result term. A few things
