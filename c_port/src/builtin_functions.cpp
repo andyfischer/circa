@@ -14,9 +14,11 @@ void to_string(Term* caller)
     Term* toString = caller->inputs[0]->getType()->toString;
 
     if (toString == NULL) {
-        as_string(caller) = string("<") + as_type(caller->type)->name + ">";
+        // std::cout << "Warning: toString is NULL" << std::endl;
+        as_string(caller) = string("<") + as_type(caller->inputs[0]->type)->name + ">";
     } else {
-        transform_function_and_reeval(caller, toString);
+        change_function(caller, toString);
+        execute(caller);
     }
 }
 

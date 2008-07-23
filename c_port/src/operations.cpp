@@ -131,17 +131,18 @@ Term* quick_create_type(CodeUnit* code, string name, Type::AllocFunc allocFunc,
     code->bindName(typeTerm, name);
 
     // Create to-string function
-    Term* toString = create_constant(GetGlobal("Function"));
-    as_function(toString)->name = name + "-to-string";
-    as_function(toString)->execute = toStringFunc;
-    as_function(toString)->inputTypes.setAt(0, typeTerm);
+    if (toStringFunc != NULL) {
+        Term* toString = create_constant(GetGlobal("Function"));
+        as_function(toString)->name = name + "-to-string";
+        as_function(toString)->execute = toStringFunc;
+        as_function(toString)->inputTypes.setAt(0, typeTerm);
 
-    if (GetGlobal("string") == NULL)
-        throw errors::InternalError("string type not defined");
+        if (GetGlobal("string") == NULL)
+            throw errors::InternalError("string type not defined");
 
-    as_function(toString)->outputType = GetGlobal("string");
-        
-    as_type(typeTerm)->toString = toString;
+        as_function(toString)->outputType = GetGlobal("string");
+        as_type(typeTerm)->toString = toString;
+    }
 
     return typeTerm;
 }
@@ -159,10 +160,12 @@ Term* quick_create_function(CodeUnit* code, string name, Function::ExecuteFunc e
 	return term;
 }
 
-void transform_function_and_reeval(Term* term, Term* new_function)
+void change_function(Term* term, Term* new_function)
 {
+    if (new_function->type != BUILTIN_FUNCTION_TYPE)
+        throw errors::InternalTypeError(new_function, BUILTIN_FUNCTION_TYPE);
+
     term->function = new_function;
-    execute(term);
 }
 
 void copy_term(Term* source, Term* dest)
