@@ -30,10 +30,10 @@ void add(Term* caller)
 
 void initialize_builtin_functions(CodeUnit* code)
 {
-    Term* int_t = GetGlobal("int");
-    //Term* float_t = GetGlobal("int");
-    Term* string_t = GetGlobal("string");
-    Term* any_t = GetGlobal("any");
+    Term* int_t = get_global("int");
+    //Term* float_t = get_global("int");
+    Term* string_t = get_global("string");
+    Term* any_t = get_global("any");
 
     quick_create_function(code, "to-string", to_string, TermList(any_t), string_t);
     quick_create_function(code, "add", add, TermList(int_t, int_t), int_t);

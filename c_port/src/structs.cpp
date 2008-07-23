@@ -130,7 +130,8 @@ void struct_get_field(Term* caller)
 
 void struct_set_field_init(Term* caller)
 {
-    // Propagate type
+    // Propagate type. This is temporary code, I think it will go away with
+    // more robust type checking.
     specialize_type(caller, caller->inputs[0]->type);
 }
 
@@ -156,21 +157,21 @@ void initialize_structs(CodeUnit* code)
 {
     BUILTIN_STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition", StructDefinition_alloc, NULL, StructDefinition_copy);
     quick_create_function(code, "get-field", struct_get_field,
-        TermList(GetGlobal("any"), GetGlobal("string")), GetGlobal("any"));
+        TermList(get_global("any"), get_global("string")), get_global("any"));
 
     Term* set_field = quick_create_function(code, "set-field", struct_set_field,
-        TermList(GetGlobal("any"), GetGlobal("string"), GetGlobal("any")),
-        GetGlobal("any"));
+        TermList(get_global("any"), get_global("string"), get_global("any")),
+        get_global("any"));
     // as_function(set_field)->recycleInput = 0;
     as_function(set_field)->initialize = struct_set_field_init;
     as_function(set_field)->recycleInput = 0;
 
     Term* add_field = quick_create_function(code, "add-field", struct_definition_add_field,
-        TermList(GetGlobal("StructDefinition"), GetGlobal("string"), GetGlobal("Type")),
-        GetGlobal("StructDefinition"));
+        TermList(get_global("StructDefinition"), get_global("string"), get_global("Type")),
+        get_global("StructDefinition"));
     as_function(add_field)->recycleInput = 0;
 
     quick_create_function(code, "struct-definition-set-name", struct_definition_set_name,
-        TermList(GetGlobal("StructDefinition"), GetGlobal("string")),
-        GetGlobal("StructDefinition"));
+        TermList(get_global("StructDefinition"), get_global("string")),
+        get_global("StructDefinition"));
 }

@@ -22,9 +22,6 @@ struct CodeUnit
 
     // Bind a name to a term
     void bindName(Term* term, string name);
-
-    // Create a term
-    Term* createTerm(Term* function, TermList inputs, Branch* branch);
 };
 
 extern "C" {
