@@ -6,11 +6,11 @@
 
 struct Subroutine
 {
-
+    // Todo
 };
 
 Subroutine* as_subroutine(Term*);
 
-void Subroutine_alloc(Term* term);
+void initialize_subroutine(Branch* kernel);
 
 #endif

@@ -164,7 +164,6 @@ void create_builtin_types()
     BUILTIN_FLOAT_TYPE = quick_create_type(KERNEL, "float",
             float_alloc, float_tostring, float_copy);
     BUILTIN_BOOL_TYPE = quick_create_type(KERNEL, "bool", bool_alloc, bool_tostring);
-    BUILTIN_SUBROUTINE_TYPE = quick_create_type(KERNEL, "Subroutine", Subroutine_alloc, NULL);
     BUILTIN_ANY_TYPE = quick_create_type(KERNEL, "any", empty_alloc_function, NULL);
     BUILTIN_VOID_TYPE = quick_create_type(KERNEL, "void", empty_alloc_function, NULL);
 }
@@ -174,9 +173,12 @@ void initialize()
     try {
         bootstrap_kernel();
         create_builtin_types();
+        initialize_branch(KERNEL);
         initialize_builtin_functions(KERNEL);
         initialize_structs(KERNEL);
-        initialize_branch(KERNEL);
+        initialize_subroutine(KERNEL);
+        initialize_term(KERNEL);
+
     } catch (errors::CircaError& e)
     {
         std::cout << "An error occured while initializing." << std::endl;
