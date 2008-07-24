@@ -24,5 +24,6 @@ struct Branch
     void bindName(Term* term, string name);
 };
 
+void initialize_branch(Branch* kernel);
 
 #endif

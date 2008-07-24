@@ -19,31 +19,31 @@ void run()
     my_struct_def = apply_function(get_global("struct-definition-set-name"),
             TermList(my_struct_def, constant_string("my-struct")));
     execute(my_struct_def);
-    std::cout << "step 1: " << my_struct_def->toString() << std::endl;
 
     my_struct_def = apply_function(get_global("add-field"),
             TermList(my_struct_def, constant_string("myInt"), get_global("int")));
     execute(my_struct_def);
-    std::cout << "step 2: " << my_struct_def->toString() << std::endl;
     my_struct_def = apply_function(get_global("add-field"),
             TermList(my_struct_def, constant_string("myString"), get_global("string")));
     execute(my_struct_def);
-    std::cout << "step 3: " << my_struct_def->toString() << std::endl;
 
     Term* my_instance = apply_function(my_struct_def, TermList());
     execute(my_instance);
-    std::cout << "step 4: " << my_instance->toString() << std::endl;
 
     my_instance = apply_function(get_global("set-field"),
             TermList(my_instance, constant_string("myInt"), constant_int(2)));
     execute(my_instance);
-    std::cout << "step 5: " << my_instance->toString() << std::endl;
 
     Term* hopefully_two = apply_function(get_global("get-field"),
             TermList(my_instance, constant_string("myInt")));
     execute(hopefully_two);
     
     std::cout << "hopefully two = " << hopefully_two->toString() << std::endl;
+
+    Term* br = apply_function(get_global("Branch"), TermList());
+    execute(br);
+
+
 }
 
 int main(const char * args[])
