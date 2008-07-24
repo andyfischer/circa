@@ -69,7 +69,7 @@ void change_type(Term* term, Term* type)
         throw errors::InternalError(string("type ") + as_type(type)->name
                 + " has no alloc function");
 
-    alloc(type, term);
+    alloc(term);
 }
 
 void specialize_type(Term* term, Term* type)
@@ -206,6 +206,7 @@ void steal_value(Term* source, Term* dest)
     // Todo: delete the value at dest
     dest->value = source->value;
     source->value = NULL;
+    source->needsUpdate = true;
 }
 
 Term* constant_string(Branch* branch, std::string s)
