@@ -92,19 +92,17 @@ string& as_string(Term* t)
     return *((string*) t->value);
 }
 
-Term* Term_getInput(Term* term, int index)
-{
-    return term->inputs[index];
-}
-Term* Term_getFunction(Term* term)
-{
-    return term->function;
-}
-
 // TermList type
 void TermList_alloc(Term* caller)
 {
     caller->value = new TermList();
+}
+
+TermList* as_term_list(Term* term)
+{
+    if (term->type != BUILTIN_TERM_LIST_TYPE)
+        throw errors::InternalTypeError(term, BUILTIN_TERM_LIST_TYPE);
+    return (TermList*) term->value;
 }
 
 void initialize_term(Branch* kernel)

@@ -25,6 +25,7 @@ Term* BUILTIN_STRUCT_DEFINITION_TYPE = NULL;
 Term* BUILTIN_BRANCH_TYPE = NULL;
 Term* BUILTIN_ANY_TYPE = NULL;
 Term* BUILTIN_VOID_TYPE = NULL;
+Term* BUILTIN_REFERENCE_TYPE = NULL;
 Term* BUILTIN_TERM_LIST_TYPE = NULL;
 
 void const_generator(Term* caller)
@@ -166,6 +167,7 @@ void create_builtin_types()
     BUILTIN_BOOL_TYPE = quick_create_type(KERNEL, "bool", bool_alloc, bool_tostring);
     BUILTIN_ANY_TYPE = quick_create_type(KERNEL, "any", empty_alloc_function, NULL);
     BUILTIN_VOID_TYPE = quick_create_type(KERNEL, "void", empty_alloc_function, NULL);
+    BUILTIN_REFERENCE_TYPE = quick_create_type(KERNEL, "Reference", empty_alloc_function, NULL);
 }
 
 void initialize()
@@ -173,11 +175,14 @@ void initialize()
     try {
         bootstrap_kernel();
         create_builtin_types();
+
+        // Do initialize_term first
+        initialize_term(KERNEL);
+
         initialize_branch(KERNEL);
         initialize_builtin_functions(KERNEL);
         initialize_structs(KERNEL);
         initialize_subroutine(KERNEL);
-        initialize_term(KERNEL);
 
     } catch (errors::CircaError& e)
     {
