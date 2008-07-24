@@ -175,6 +175,7 @@ void initialize()
         create_builtin_types();
         initialize_builtin_functions(KERNEL);
         initialize_structs(KERNEL);
+        initialize_branch(KERNEL);
     } catch (errors::CircaError& e)
     {
         std::cout << "An error occured while initializing." << std::endl;

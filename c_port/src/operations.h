@@ -34,6 +34,7 @@ Term* quick_create_function(Branch* code, string name, Function::ExecuteFunc exe
 
 void change_function(Term* term, Term* new_function);
 void copy_term(Term* source, Term* dest);
+void steal_value(Term* source, Term* dest);
 
 Term* constant_string(std::string s);
 Term* constant_int(int i);

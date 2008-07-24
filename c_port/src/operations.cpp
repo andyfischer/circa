@@ -102,8 +102,13 @@ void execute(Term* term)
 
     // Check if we need to recycle an input
     if (func->recycleInput != -1) {
-        // Copy this input. In the future we'll support object stealing.
-        copy_term(term->inputs[0], term);
+
+        // Temporary measure: If this type has a copy function, copy. Otherwise
+        // steal the value
+        if (as_type(term->type)->copy == NULL)
+            steal_value(term->inputs[0], term);
+        else
+            copy_term(term->inputs[0], term);
     }
 
     try {
@@ -194,6 +199,13 @@ void copy_term(Term* source, Term* dest)
                 + " has no copy function");
 
     copy(source,dest);
+}
+
+void steal_value(Term* source, Term* dest)
+{
+    // Todo: delete the value at dest
+    dest->value = source->value;
+    source->value = NULL;
 }
 
 Term* constant_string(std::string s)
