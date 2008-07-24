@@ -12,7 +12,7 @@ Subroutine* as_subroutine(Term* term)
     return (Subroutine*) term->value;
 }
 
-void Subroutine_alloc(Term* type, Term* term)
+void Subroutine_alloc(Term* term)
 {
     term->value = new Subroutine;
 }

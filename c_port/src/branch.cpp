@@ -35,7 +35,7 @@ Branch* as_branch(Term* term)
     return (Branch*) term->value;
 }
 
-void Branch_alloc(Term* type, Term* caller)
+void Branch_alloc(Term* caller)
 {
     caller->value = new Branch();
 }

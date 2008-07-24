@@ -28,7 +28,7 @@ Type* as_type(Term* term)
     return (Type*) term->value;
 }
 
-void Type_alloc(Term* type, Term* caller)
+void Type_alloc(Term* caller)
 {
     caller->value = new Type();
 }

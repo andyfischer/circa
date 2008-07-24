@@ -43,7 +43,7 @@ extern "C" {
 
 bool is_function(Term* term);
 Function* as_function(Term*);
-void Function_alloc(Term* type, Term* term);
+void Function_alloc(Term* term);
 void Function_setPureFunction(Term* term, bool value);
 void Function_setName(Term* term, const char* value);
 void Function_setInputType(Term* term, int index, Term* type);

@@ -7,9 +7,9 @@
 #include "structs.h"
 #include "term.h"
 
-void StructDefinition_alloc(Term* type, Term* term);
+void StructDefinition_alloc(Term* term);
 void StructDefinition_copy(Term* source, Term* dest);
-void StructInstance_alloc(Term* type, Term* term);
+void StructInstance_alloc(Term* term);
 void StructInstance_copy(Term* type, Term* term);
 
 StructDefinition::StructDefinition()
@@ -58,7 +58,7 @@ StructInstance* as_struct_instance(Term* term)
     return (StructInstance*) term->value;
 }
 
-void StructDefinition_alloc(Term* type, Term* term)
+void StructDefinition_alloc(Term* term)
 {
     StructDefinition* def = new StructDefinition();
     def->alloc = StructInstance_alloc;
@@ -80,9 +80,9 @@ void struct_definition_add_field(Term* caller)
     as_struct_definition(caller)->addField(fieldName, fieldType);
 }
 
-void StructInstance_alloc(Term* type, Term* term)
+void StructInstance_alloc(Term* term)
 {
-    StructDefinition *def = as_struct_definition(type);
+    StructDefinition *def = as_struct_definition(term->type);
 
     int numFields = def->numFields();
     StructInstance* structInstance = new StructInstance();

@@ -23,6 +23,7 @@ void TermList::setAt(int index, Term* term)
 
     items[index] = term;
 }
+
 Term* TermList::operator[](int index)
 {
     if (index >= items.size())
@@ -91,11 +92,6 @@ string& as_string(Term* t)
     return *((string*) t->value);
 }
 
-Term* Term_createRaw()
-{
-    return new Term();
-}
-
 Term* Term_getInput(Term* term, int index)
 {
     return term->inputs[index];
@@ -103,4 +99,15 @@ Term* Term_getInput(Term* term, int index)
 Term* Term_getFunction(Term* term)
 {
     return term->function;
+}
+
+// TermList type
+void TermList_alloc(Term* caller)
+{
+    caller->value = new TermList();
+}
+
+void initialize_term(Branch* kernel)
+{
+    BUILTIN_TERM_LIST_TYPE = quick_create_type(kernel, "TermList", TermList_alloc, NULL);
 }

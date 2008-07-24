@@ -72,4 +72,6 @@ Term* Term_getFunction(Term* term);
 
 }
 
+void initialize_term(Branch* kernel);
+
 #endif

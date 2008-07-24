@@ -26,7 +26,7 @@ Function* as_function(Term* term)
     return (Function*) term->value;
 }
 
-void Function_alloc(Term* type, Term* caller)
+void Function_alloc(Term* caller)
 {
     caller->value = new Function();
 }
