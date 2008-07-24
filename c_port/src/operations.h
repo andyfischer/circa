@@ -4,10 +4,10 @@
 #include "type.h"
 
 
-Term* create_term(Term* function, TermList inputs);
+Term* create_term(Branch* branch, Term* function, TermList inputs);
 void initialize_term(Term* term, Term* function, TermList inputs);
 void set_inputs(Term* term, TermList inputs);
-Term* create_constant(Term* type);
+Term* create_constant(Branch* branch, Term* type);
 void change_type(Term* term, Term* type);
 void specialize_type(Term* term, Term* type);
 void set_input(Term* term, int index, Term* input);
@@ -19,10 +19,10 @@ void execute(Term* term);
 //  2. 'function' might be a type (create an empty instance)
 //  3. We might specialize an overloaded function
 //  4. add more stuff here
-Term* apply_function(Term* function, TermList inputs);
+Term* apply_function(Branch* branch, Term* function, TermList inputs);
 
 // Fetch the const function for this type
-Term* get_const_function(Term* type);
+Term* get_const_function(Branch* branch, Term* type);
 
 // Create a new Type with the given properties. Also binds the name.
 Term* quick_create_type(Branch* code, string name, Type::AllocFunc allocFunc,
@@ -36,5 +36,5 @@ void change_function(Term* term, Term* new_function);
 void copy_term(Term* source, Term* dest);
 void steal_value(Term* source, Term* dest);
 
-Term* constant_string(std::string s);
-Term* constant_int(int i);
+Term* constant_string(Branch* branch, std::string s);
+Term* constant_int(Branch* branch, int i);

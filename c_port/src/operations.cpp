@@ -10,10 +10,10 @@
 #include "term.h"
 #include "type.h"
 
-Term* create_term(Term* function, TermList inputs)
+Term* create_term(Branch* branch, Term* function, TermList inputs)
 {
     if (!is_function(function))
-        throw errors::InternalError("1st arg to create_term must be a function");
+        throw errors::InternalError("2nd arg to create_term must be a function");
     Term* term = new Term;
     initialize_term(term, function, inputs);
     
@@ -52,9 +52,9 @@ void set_inputs(Term* term, TermList inputs)
     term->inputs = inputs;
 }
 
-Term* create_constant(Term* type)
+Term* create_constant(Branch* branch, Term* type)
 {
-    return create_term(get_const_function(type), TermList());
+    return create_term(branch, get_const_function(branch, type), TermList());
 }
 
 void change_type(Term* term, Term* type)
@@ -121,37 +121,37 @@ void execute(Term* term)
     }
 }
 
-Term* apply_function(Term* function, TermList inputs)
+Term* apply_function(Branch* branch, Term* function, TermList inputs)
 {
     // Check if 'function' is actually a type
     if (is_type(function))
     {
-        return create_term(get_const_function(function), TermList());
+        return create_term(branch, get_const_function(branch, function), TermList());
     }
 
     // Create a term in the normal way
-    return create_term(function, inputs);
+    return create_term(branch, function, inputs);
 }
 
-Term* get_const_function(Term* type)
+Term* get_const_function(Branch* branch, Term* type)
 {
-    Term* result = apply_function(get_global("const-generator"), TermList(type));
+    Term* result = apply_function(branch, get_global("const-generator"), TermList(type));
     execute(result);
     return result;
 }
 
-Term* quick_create_type(Branch* code, string name, Type::AllocFunc allocFunc,
+Term* quick_create_type(Branch* branch, string name, Type::AllocFunc allocFunc,
         Function::ExecuteFunc toStringFunc, Type::CopyFunc copyFunc)
 {
-    Term* typeTerm = create_constant(get_global("Type"));
+    Term* typeTerm = create_constant(branch, get_global("Type"));
     as_type(typeTerm)->name = name;
     as_type(typeTerm)->alloc = allocFunc;
     as_type(typeTerm)->copy = copyFunc;
-    code->bindName(typeTerm, name);
+    branch->bindName(typeTerm, name);
 
     // Create to-string function
     if (toStringFunc != NULL) {
-        Term* toString = create_constant(get_global("Function"));
+        Term* toString = create_constant(branch, get_global("Function"));
         as_function(toString)->name = name + "-to-string";
         as_function(toString)->execute = toStringFunc;
         as_function(toString)->inputTypes.setAt(0, typeTerm);
@@ -166,16 +166,16 @@ Term* quick_create_type(Branch* code, string name, Type::AllocFunc allocFunc,
     return typeTerm;
 }
 
-Term* quick_create_function(Branch* code, string name, Function::ExecuteFunc executeFunc,
+Term* quick_create_function(Branch* branch, string name, Function::ExecuteFunc executeFunc,
         TermList inputTypes, Term* outputType)
 {
-    Term* term = create_constant(get_global("Function"));
+    Term* term = create_constant(branch, get_global("Function"));
     Function* func = as_function(term);
     func->name = name;
     func->execute = executeFunc;
     func->inputTypes = inputTypes;
     func->outputType = outputType;
-    code->bindName(term, name);
+    branch->bindName(term, name);
 	return term;
 }
 
@@ -208,16 +208,16 @@ void steal_value(Term* source, Term* dest)
     source->value = NULL;
 }
 
-Term* constant_string(std::string s)
+Term* constant_string(Branch* branch, std::string s)
 {
-    Term* term = apply_function(get_global("string"), TermList());
+    Term* term = apply_function(branch, get_global("string"), TermList());
     as_string(term) = s;
     return term;
 }
 
-Term* constant_int(int i)
+Term* constant_int(Branch* branch, int i)
 {
-    Term* term = apply_function(get_global("int"), TermList());
+    Term* term = apply_function(branch, get_global("int"), TermList());
     as_int(term) = i;
     return term;
 }
