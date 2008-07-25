@@ -257,17 +257,9 @@
 	};
 	B6F114A70E33394F00B8BA44 /* builtins.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {824, 2478}}";
-			sepNavSelRange = "{1012, 0}";
+			sepNavIntBoundsRect = "{{0, 0}, {715, 2506}}";
+			sepNavSelRange = "{1093, 0}";
 			sepNavVisRange = "{693, 697}";
-		};
-	};
-	B6F114AB0E33394F00B8BA44 /* codeunit.cpp */ = {
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {691, 1918}}";
-			sepNavSelRange = "{1093, 56}";
-			sepNavVisRange = "{749, 651}";
-			sepNavWindowFrame = "{{61, 173}, {750, 558}}";
 		};
 	};
 	B6F114AF0E33394F00B8BA44 /* errors.h */ = {
@@ -281,8 +273,8 @@
 	B6F114B00E33394F00B8BA44 /* function.cpp */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {715, 728}}";
-			sepNavSelRange = "{708, 0}";
-			sepNavVisRange = "{463, 566}";
+			sepNavSelRange = "{354, 0}";
+			sepNavVisRange = "{463, 568}";
 		};
 	};
 	B6F114B30E33394F00B8BA44 /* globals.cpp */ = {

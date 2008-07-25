@@ -10,10 +10,10 @@
 		8DD76F6A0486A84900D96B5E /* circa.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* circa.1 */; };
 		B6A243A50E3568EB007F2BEB /* errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243A40E3568EB007F2BEB /* errors.cpp */; };
 		B6A243B30E356E26007F2BEB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243B20E356E26007F2BEB /* main.cpp */; };
+		B6A243DB0E3A4407007F2BEB /* tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243D90E3A4407007F2BEB /* tokenizer.cpp */; };
 		B6F114C00E33394F00B8BA44 /* branch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114A10E33394F00B8BA44 /* branch.cpp */; };
 		B6F114C20E33394F00B8BA44 /* builtin_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114A40E33394F00B8BA44 /* builtin_functions.cpp */; };
 		B6F114C40E33394F00B8BA44 /* builtins.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114A70E33394F00B8BA44 /* builtins.cpp */; };
-		B6F114C60E33394F00B8BA44 /* codeunit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114AB0E33394F00B8BA44 /* codeunit.cpp */; };
 		B6F114C80E33394F00B8BA44 /* function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114B00E33394F00B8BA44 /* function.cpp */; };
 		B6F114CA0E33394F00B8BA44 /* globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114B30E33394F00B8BA44 /* globals.cpp */; };
 		B6F114CC0E33394F00B8BA44 /* subroutine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114B60E33394F00B8BA44 /* subroutine.cpp */; };
@@ -40,6 +40,8 @@
 		8DD76F6C0486A84900D96B5E /* circa */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = circa; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6A243A40E3568EB007F2BEB /* errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = errors.cpp; sourceTree = "<group>"; };
 		B6A243B20E356E26007F2BEB /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		B6A243D90E3A4407007F2BEB /* tokenizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tokenizer.cpp; sourceTree = "<group>"; };
+		B6A243DA0E3A4407007F2BEB /* tokenizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tokenizer.h; sourceTree = "<group>"; };
 		B6F114A10E33394F00B8BA44 /* branch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = branch.cpp; sourceTree = "<group>"; };
 		B6F114A20E33394F00B8BA44 /* branch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = branch.h; sourceTree = "<group>"; };
 		B6F114A40E33394F00B8BA44 /* builtin_functions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = builtin_functions.cpp; sourceTree = "<group>"; };
@@ -47,8 +49,6 @@
 		B6F114A70E33394F00B8BA44 /* builtins.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = builtins.cpp; sourceTree = "<group>"; };
 		B6F114A80E33394F00B8BA44 /* builtins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = builtins.h; sourceTree = "<group>"; };
 		B6F114AA0E33394F00B8BA44 /* circa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = circa.h; sourceTree = "<group>"; };
-		B6F114AB0E33394F00B8BA44 /* codeunit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = codeunit.cpp; sourceTree = "<group>"; };
-		B6F114AC0E33394F00B8BA44 /* codeunit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = codeunit.h; sourceTree = "<group>"; };
 		B6F114AE0E33394F00B8BA44 /* common_headers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common_headers.h; sourceTree = "<group>"; };
 		B6F114AF0E33394F00B8BA44 /* errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = errors.h; sourceTree = "<group>"; };
 		B6F114B00E33394F00B8BA44 /* function.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = function.cpp; sourceTree = "<group>"; };
@@ -109,6 +109,8 @@
 		B6F114A00E33394F00B8BA44 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				B6A243D90E3A4407007F2BEB /* tokenizer.cpp */,
+				B6A243DA0E3A4407007F2BEB /* tokenizer.h */,
 				B6A243B20E356E26007F2BEB /* main.cpp */,
 				B6A243A40E3568EB007F2BEB /* errors.cpp */,
 				B6F115160E34F4B300B8BA44 /* operations.cpp */,
@@ -122,8 +124,6 @@
 				B6F114A70E33394F00B8BA44 /* builtins.cpp */,
 				B6F114A80E33394F00B8BA44 /* builtins.h */,
 				B6F114AA0E33394F00B8BA44 /* circa.h */,
-				B6F114AB0E33394F00B8BA44 /* codeunit.cpp */,
-				B6F114AC0E33394F00B8BA44 /* codeunit.h */,
 				B6F114AE0E33394F00B8BA44 /* common_headers.h */,
 				B6F114AF0E33394F00B8BA44 /* errors.h */,
 				B6F114B00E33394F00B8BA44 /* function.cpp */,
@@ -195,7 +195,6 @@
 				B6F114C00E33394F00B8BA44 /* branch.cpp in Sources */,
 				B6F114C20E33394F00B8BA44 /* builtin_functions.cpp in Sources */,
 				B6F114C40E33394F00B8BA44 /* builtins.cpp in Sources */,
-				B6F114C60E33394F00B8BA44 /* codeunit.cpp in Sources */,
 				B6F114C80E33394F00B8BA44 /* function.cpp in Sources */,
 				B6F114CA0E33394F00B8BA44 /* globals.cpp in Sources */,
 				B6F114CC0E33394F00B8BA44 /* subroutine.cpp in Sources */,
@@ -205,6 +204,7 @@
 				B6F1151B0E34F4B300B8BA44 /* structs.cpp in Sources */,
 				B6A243A50E3568EB007F2BEB /* errors.cpp in Sources */,
 				B6A243B30E356E26007F2BEB /* main.cpp in Sources */,
+				B6A243DB0E3A4407007F2BEB /* tokenizer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
