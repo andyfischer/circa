@@ -46,7 +46,6 @@ void run()
     Term* br = apply_function(branch, get_global("Branch"), TermList());
     execute(br);
 
-
 }
 
 int main(const char * args[])
