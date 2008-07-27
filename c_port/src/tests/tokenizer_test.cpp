@@ -2,7 +2,7 @@
 #include "common_headers.h"
 
 #include "errors.h"
-#include "tokenizer.h"
+#include "parser/token.h"
 
 class TestFailure : public errors::CircaError
 {

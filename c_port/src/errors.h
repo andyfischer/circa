@@ -71,6 +71,15 @@ public:
     }
 };
 
+class TokenMismatch : public CircaError
+{
+public:
+    TokenMismatch() throw()
+        : CircaError("Token mismatch")
+    {
+    }
+};
+
 }
 
 #endif
