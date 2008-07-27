@@ -2,7 +2,7 @@
 #include "common_headers.h"
 
 #include "circa.h"
-#include "errors.h"
+#include "tests/all_tests.h"
 
 void run()
 {
@@ -50,6 +50,9 @@ void run()
 
 int main(const char * args[])
 {
+    // todo: figure out a good way to process args
+    run_all_tests();
+
     try {
         run();
     } catch (errors::CircaError &err)

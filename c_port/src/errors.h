@@ -9,20 +9,27 @@ namespace errors {
 
 class CircaError : public std::exception
 {
+protected:
+    std::string msg;
 public:
     CircaError() throw() {}
-    virtual string message() = 0;
+    CircaError(std::string _msg) throw ()
+    {
+        this->msg = _msg;
+    }
+    ~CircaError() throw() {}
+    virtual string message()
+    {
+        return this->msg;
+    }
 };
 
 class InternalError : public CircaError
 {
-protected:
-    string msg;
-
 public:
     InternalError(string message) throw()
+        : CircaError(message)
     {
-        this->msg = message;
     }
     ~InternalError() throw() {}
 
