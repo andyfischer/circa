@@ -3,7 +3,7 @@
 
 #include "common_headers.h"
 
-namespace tokens {
+namespace token {
 
 struct TokenInstance
 {
@@ -11,8 +11,11 @@ struct TokenInstance
     std::string text;
 };
 
+typedef std::vector<TokenInstance> TokenList;
+
 extern const char * LPAREN;
 extern const char * RPAREN;
+extern const char * COMMA;
 extern const char * IDENTIFIER;
 extern const char * INTEGER;
 extern const char * FLOAT;
@@ -20,8 +23,8 @@ extern const char * WHITESPACE;
 extern const char * NEWLINE;
 extern const char * UNRECOGNIZED;
 
-void tokenize(std::string const &input, std::vector<TokenInstance> &results);
+void tokenize(std::string const &input, TokenList &results);
 
-} // namespace tokens
+} // namespace token
 
 #endif

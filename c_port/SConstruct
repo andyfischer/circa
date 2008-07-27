@@ -32,21 +32,25 @@ RELEASE_BUILD = False
 SOURCE_DIRECTORY = "src"
 
 env = create_mac_env(RELEASE_BUILD)
-
 env.Append(CPPDEFINES = ["_DEBUG"])
 env.Append(CPPDEFINES = ["DEBUG"])
 #env.Replace(CXX = 'llvm-g++')
 
 env.BuildDir('build', 'src')
+env.Append(CPPPATH = ['src'])
 
 # Find source files
+excludeFromLibrary = ['test_program.cpp']
 buildFiles = []
-for file in os.listdir('src'):
-    if file == "test_program.cpp":
-        continue
+for (dirpath, dirnames, filenames) in os.walk('src'):
+    for file in filenames:
+        if file in excludeFromLibrary:
+            continue
+        fullpath = os.path.join(dirpath, file)
+        fullpath = fullpath.replace("src","build")
 
-    if file.endswith('.cpp'):
-        buildFiles.append('build/' + file)
+        if fullpath.endswith('.cpp'):
+            buildFiles.append(fullpath)
     
 libcirca = env.SharedLibrary('circa', buildFiles)
 

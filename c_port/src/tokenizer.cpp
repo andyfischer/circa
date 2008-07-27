@@ -1,10 +1,11 @@
 
 #include "tokenizer.h"
 
-namespace tokens {
+namespace token {
 
 const char * LPAREN = "LPAREN";
 const char * RPAREN = "RPAREN";
+const char * COMMA = "COMMA";
 const char * IDENTIFIER = "IDENTIFIER";
 const char * INTEGER = "INTEGER";
 const char * FLOAT = "FLOAT";
@@ -19,18 +20,18 @@ struct TokenizeContext
     std::vector<TokenInstance> &results;
 
     TokenizeContext(std::string const &_input, std::vector<TokenInstance> &_results)
-        : input(_input), results(_results)
+        : input(_input), results(_results), nextIndex(0)
     {
     }
 
     char next() const {
-        if (nextIndex >= input.length())
+        if (finished())
             return 0;
         return input[nextIndex];
     }
 
     char consume() {
-        if (nextIndex >= input.length())
+        if (finished())
             return 0;
 
         char c = next();
@@ -71,7 +72,7 @@ bool is_letter(char c)
 
 bool is_number(char c)
 {
-    return (c >= '1' && c <= '0');
+    return (c >= '0' && c <= '9');
 }
 
 bool is_acceptable_inside_identifier(char c)
@@ -104,10 +105,16 @@ void top_level_consume_token(TokenizeContext &context)
     // Check for specific characters
     switch(context.next()) {
         case '(':
+            context.consume();
             context.pushResult(LPAREN, "(");
             return;
         case ')':
+            context.consume();
             context.pushResult(RPAREN, ")");
+            return;
+        case ',':
+            context.consume();
+            context.pushResult(COMMA, ",");
             return;
     }
 
@@ -164,10 +171,15 @@ void consume_number(TokenizeContext &context)
     }
 
     if (dot_encountered) {
-
+        context.pushResult(FLOAT, text.str());
     } else {
-
+        context.pushResult(INTEGER, text.str());
     }
 }
 
-} // namespace tokens
+void debug_print_token_list(std::ostream &stream, TokenList &tokens)
+{
+
+}
+
+} // namespace token
