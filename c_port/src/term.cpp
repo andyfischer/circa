@@ -57,6 +57,18 @@ Term::toString()
     return as_string(result).c_str();
 }
 
+int
+Term::numErrors() const
+{
+    return (int) errors.size();
+}
+
+std::string const&
+Term::getError(int index)
+{
+    return errors[index];
+}
+
 int& as_int(Term* t)
 {
     if (t->type != BUILTIN_INT_TYPE)

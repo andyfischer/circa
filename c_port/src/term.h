@@ -12,6 +12,8 @@ struct TermSyntaxHints
     // Todo
 };
 
+typedef std::vector<std::string> ErrorList;
+
 struct TermList
 {
     std::vector<Term*> items;
@@ -52,12 +54,17 @@ struct Term
 
     TermSyntaxHints syntaxHints;
 
+    ErrorList errors;
+
     int globalID;
 
     Term();
 
     Type* getType() const;
     const char* toString();
+
+    int numErrors() const;
+    std::string const& getError(int index);
 };
 
 int& as_int(Term* t);

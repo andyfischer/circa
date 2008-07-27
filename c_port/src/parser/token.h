@@ -19,6 +19,7 @@ extern const char * COMMA;
 extern const char * IDENTIFIER;
 extern const char * INTEGER;
 extern const char * FLOAT;
+extern const char * STRING;
 extern const char * WHITESPACE;
 extern const char * NEWLINE;
 extern const char * UNRECOGNIZED;

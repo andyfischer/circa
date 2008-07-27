@@ -1,5 +1,5 @@
 
-#include "tokenizer.h"
+#include "token.h"
 
 namespace token {
 
@@ -175,6 +175,20 @@ void consume_number(TokenizeContext &context)
     } else {
         context.pushResult(INTEGER, text.str());
     }
+}
+
+void consume_string_literal(TokenizeContext &context)
+{
+    std::stringstream text;
+
+    // consume quote mark
+    context.consume();
+
+    while (context.next() != '"') {
+        text << context.consume();
+    }
+
+    context.consume();
 }
 
 void debug_print_token_list(std::ostream &stream, TokenList &tokens)
