@@ -97,6 +97,8 @@
 			B6A244130E3D96F9007F2BEB /* PBXTextBookmark */ = B6A244130E3D96F9007F2BEB /* PBXTextBookmark */;
 			B6A244140E3D96F9007F2BEB /* PBXTextBookmark */ = B6A244140E3D96F9007F2BEB /* PBXTextBookmark */;
 			B6A244190E3D9767007F2BEB /* PBXTextBookmark */ = B6A244190E3D9767007F2BEB /* PBXTextBookmark */;
+			B6A2441E0E3E24B1007F2BEB /* PBXTextBookmark */ = B6A2441E0E3E24B1007F2BEB /* PBXTextBookmark */;
+			B6A2441F0E3E24B1007F2BEB /* PBXTextBookmark */ = B6A2441F0E3E24B1007F2BEB /* PBXTextBookmark */;
 			B6F115290E34F54500B8BA44 = B6F115290E34F54500B8BA44 /* PBXBookmark */;
 			B6F115300E34F67500B8BA44 = B6F115300E34F67500B8BA44 /* PBXTextBookmark */;
 		};
@@ -121,8 +123,8 @@
 	B6A243B20E356E26007F2BEB /* main.cpp */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {715, 1050}}";
-			sepNavSelRange = "{2318, 0}";
-			sepNavVisRange = "{1176, 934}";
+			sepNavSelRange = "{1484, 0}";
+			sepNavVisRange = "{1242, 868}";
 		};
 	};
 	B6A243B90E356E65007F2BEB /* errors.h:13 */ = {
@@ -315,9 +317,9 @@
 	};
 	B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {715, 924}}";
-			sepNavSelRange = "{1276, 0}";
-			sepNavVisRange = "{826, 709}";
+			sepNavIntBoundsRect = "{{0, 0}, {691, 1960}}";
+			sepNavSelRange = "{3699, 0}";
+			sepNavVisRange = "{712, 820}";
 		};
 	};
 	B6A243F80E3D6414007F2BEB /* token_stream.h */ = {
@@ -464,6 +466,26 @@
 		location = circa;
 		modificationTime = 238918884.922079;
 		state = 1;
+	};
+	B6A2441E0E3E24B1007F2BEB /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */;
+		name = "bootstrapping.cpp: 66";
+		rLen = 0;
+		rLoc = 1797;
+		rType = 0;
+		vrLen = 852;
+		vrLoc = 759;
+	};
+	B6A2441F0E3E24B1007F2BEB /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */;
+		name = "bootstrapping.cpp: 127";
+		rLen = 0;
+		rLoc = 3699;
+		rType = 0;
+		vrLen = 820;
+		vrLoc = 712;
 	};
 	B6F114970E33391C00B8BA44 /* circa */ = {
 		isa = PBXExecutable;

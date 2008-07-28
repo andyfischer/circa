@@ -10,13 +10,6 @@ void run()
 
     Branch* branch = new Branch();
 
-    Term* five = create_constant(branch, get_global("int"));
-    as_int(five) = 5;
-
-    Term* five_as_string = create_term(branch, get_global("to-string"), TermList(five));
-    execute(five_as_string);
-    std::cout << "five = " << as_string(five_as_string) << std::endl;
-
     Term* my_struct_def = create_constant(branch, get_global("StructDefinition"));
     my_struct_def = apply_function(branch, get_global("struct-definition-set-name"),
             TermList(my_struct_def, constant_string(branch, "my-struct")));
@@ -38,25 +31,14 @@ void run()
     execute(my_instance);
     branch->bindName(my_instance, "my_instance");
 
-    Term* hopefully_two = quick_eval_function(branch,
+    Term* hopefully_two = quick_exec_function(branch,
             "hopefully-two = get-field(my_instance, \"myInt\")");
 
-    //Term* hopefully_two = apply_function(branch, get_global("get-field"),
-            //TermList(my_instance, constant_string(branch, "myInt")));
-    execute(hopefully_two);
-    //branch->bindName(hopefully_two, "hopefully-two");
+    //quick_exec_function(branch, "ht-as-string = to-string(hopefully-two)");
 
-    Term* hopefully_two_as_string = apply_function(branch, get_global("to-string"),
-            TermList(hopefully_two));
-    execute(hopefully_two_as_string);
-
-    branch->bindName(hopefully_two_as_string, "a");
-
-    Term* print_hopefully_two = quick_eval_function(branch, "print(a)");
-    execute(print_hopefully_two);
-    
-    Term* br = apply_function(branch, get_global("Branch"), TermList());
-    execute(br);
+    quick_exec_function(branch, "print(\"Hopefully two: \")");
+    quick_exec_function(branch, "print(to-string(hopefully-two))");
+    //quick_exec_function(branch, "print(ht-as-string)");
 }
 
 int main(const char * args[])
