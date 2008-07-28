@@ -44,7 +44,7 @@ void list_apply(Term* caller)
 void this_branch(Term* caller)
 {
     // to fix, this will have problems when memory management is implemented
-    caller->value = caller->owningBranch->termList->value;
+    *as_list(caller) = caller->owningBranch->terms;
 }
 
 void initialize_builtin_functions(Branch* code)

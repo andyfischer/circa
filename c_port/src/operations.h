@@ -12,6 +12,7 @@ void change_type(Term* term, Term* type);
 void specialize_type(Term* term, Term* type);
 void set_input(Term* term, int index, Term* input);
 void execute(Term* term);
+void execute_branch(Branch* branch);
 
 // Examine 'function' and 'inputs' and returns a result term. A few things
 // may happen here:

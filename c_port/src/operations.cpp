@@ -14,8 +14,11 @@ Term* create_term(Branch* branch, Term* function, TermList inputs)
 {
     if (!is_function(function))
         throw errors::InternalError("2nd arg to create_term must be a function");
-    Term* term = new Term;
+    Term* term = new Term();
     initialize_term(term, function, inputs);
+
+    // Add to branch
+    branch->terms.append(term);
     
     return term;
 }
@@ -126,6 +129,14 @@ void execute(Term* term)
     {
         std::cout << "An internal error occured while executing " + func->name << std::endl;
         std::cout << err.message() << std::endl;
+    }
+}
+
+void execute_branch(Branch* branch)
+{
+    int count = branch->terms.count();
+    for (int index=0; index < count; index++) {
+        execute(branch->terms[count]);
     }
 }
 

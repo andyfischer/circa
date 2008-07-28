@@ -21,7 +21,7 @@ struct Type
     DeallocFunc dealloc;
 
     // memberFunctions is a list of Functions which 'belong' to this type.
-    // They are guaranteed to take a term of our type as their first
+    // They are guaranteed to take an instance of this type as their first
     // argument.
     TermNamespace memberFunctions;
 
