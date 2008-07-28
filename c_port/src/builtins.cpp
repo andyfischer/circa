@@ -183,13 +183,13 @@ void quick_eval_function(Branch* branch, std::string input)
 
     tstream.consume(token::LPAREN);
 
-    //TermList inputs;
+    TermList inputs;
 
     while(!tstream.nextIs(token::RPAREN)) {
 
         if (tstream.nextIs(token::IDENTIFIER)) {
             Term* term = get_global(tstream.consume(token::IDENTIFIER).text);
-            //inputs.append(term);
+            inputs.append(term);
 
         } else if (tstream.nextIs(token::STRING)) {
 

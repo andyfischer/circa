@@ -22,6 +22,10 @@ void to_string(Term* caller)
     }
 }
 
+void print(Term* caller)
+{
+    std::cout << as_string(caller->inputs[0]) << std::endl;
+}
 
 void add(Term* caller)
 {
@@ -34,8 +38,9 @@ void initialize_builtin_functions(Branch* code)
     //Term* float_t = get_global("int");
     Term* string_t = get_global("string");
     Term* any_t = get_global("any");
+    Term* void_t = get_global("void");
 
     quick_create_function(code, "to-string", to_string, TermList(any_t), string_t);
     quick_create_function(code, "add", add, TermList(int_t, int_t), int_t);
+    quick_create_function(code, "print", print, TermList(string_t), void_t);
 }
-
