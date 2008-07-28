@@ -34,6 +34,7 @@ struct TermList
         items.push_back(term3);
     }
 
+    void append(Term* term);
     void setAt(int index, Term* term);
     Term* operator[](int index);
 };

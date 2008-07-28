@@ -40,9 +40,15 @@ void run()
     Term* hopefully_two = apply_function(branch, get_global("get-field"),
             TermList(my_instance, constant_string(branch, "myInt")));
     execute(hopefully_two);
-    
-    std::cout << "hopefully two = " << hopefully_two->toString() << std::endl;
 
+    Term* hopefully_two_as_string = apply_function(branch, get_global("to-string"),
+            TermList(hopefully_two));
+    execute(hopefully_two_as_string);
+
+    Term* print_hopefully_two = apply_function(branch, get_global("print"),
+            TermList(hopefully_two_as_string));
+    execute(print_hopefully_two);
+    
     Term* br = apply_function(branch, get_global("Branch"), TermList());
     execute(br);
 

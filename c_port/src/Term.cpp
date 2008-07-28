@@ -14,7 +14,14 @@
 
 int gNextGlobalID = 1;
 
-void TermList::setAt(int index, Term* term)
+void
+TermList::append(Term* term)
+{
+    items.push_back(term);
+}
+
+void
+TermList::setAt(int index, Term* term)
 {
     // Make sure there are enough blank elements in the list
     while (items.size() <= index) {

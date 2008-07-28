@@ -9,6 +9,7 @@ const char * COMMA = "COMMA";
 const char * IDENTIFIER = "IDENTIFIER";
 const char * INTEGER = "INTEGER";
 const char * FLOAT = "FLOAT";
+const char * STRING = "STRING";
 const char * WHITESPACE = "WHITESPACE";
 const char * NEWLINE = "NEWLINE";
 const char * UNRECOGNIZED = "UNRECOGNIZED";
