@@ -1,6 +1,8 @@
 #ifndef CIRCA__BOOTSTRAP__INCLUDED
 #define CIRCA__BOOTSTRAP__INCLUDED
 
+#include "common_headers.h"
+
 struct Branch;
 struct Term;
 
@@ -21,6 +23,8 @@ extern Term* BUILTIN_VOID_TYPE;
 extern Term* BUILTIN_REFERENCE_TYPE;
 extern Term* BUILTIN_LIST_TYPE;
 
+Term* get_global(std::string name);
+void empty_execute_function(Term* caller);
 void initialize();
 
 #endif

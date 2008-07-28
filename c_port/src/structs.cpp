@@ -3,7 +3,6 @@
 #include "bootstrapping.h"
 #include "builtins.h"
 #include "errors.h"
-#include "globals.h"
 #include "operations.h"
 #include "structs.h"
 #include "term.h"

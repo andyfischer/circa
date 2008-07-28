@@ -5,7 +5,6 @@
 #include "branch.h"
 #include "builtins.h"
 #include "errors.h"
-#include "globals.h"
 #include "operations.h"
 #include "term.h"
 

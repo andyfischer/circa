@@ -3,9 +3,9 @@
 
 #include "bootstrapping.h"
 #include "branch.h"
+#include "builtins.h"
 #include "parser/token.h"
 #include "parser/token_stream.h"
-#include "globals.h"
 #include "operations.h"
 #include "subroutine.h"
 
@@ -140,7 +140,6 @@ Term* quick_create_subroutine(Branch* branch, string name, TermList inputTypes,
         subroutine->inputPlaceholders.setAt(inputIndex,
                 create_constant(subroutine->branch, inputTypes[inputIndex]));
     }
-    subroutine->outputPlaceholder = create_constant(subroutine->branch, outputType);
 
     branch->bindName(term, name);
     return term;

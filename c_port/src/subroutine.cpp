@@ -46,7 +46,8 @@ void Subroutine_execute(Term* caller)
     execute_branch(sub->branch);
 
     // Copy output to output placeholder
-    copy_term(sub->outputPlaceholder, caller);
+    if (sub->outputPlaceholder != NULL)
+        copy_term(sub->outputPlaceholder, caller);
 }
 
 void initialize_subroutine(Branch* kernel)

@@ -15,5 +15,4 @@ void test_assert_f(bool condition, int line, const char* file);
 
 #define test_assert(c) test_assert_f((c), __LINE__, __FILE__)
 
-
 #endif
