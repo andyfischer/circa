@@ -5,7 +5,6 @@
 #include "builtins.h"
 #include "builtin_functions.h"
 #include "function.h"
-#include "globals.h"
 #include "operations.h"
 #include "term.h"
 #include "type.h"
@@ -30,6 +29,11 @@ void print(Term* caller)
 void add(Term* caller)
 {
     as_int(caller) = as_int(caller->inputs[0]) + as_int(caller->inputs[1]);
+}
+
+void mult(Term* caller)
+{
+    as_int(caller) = as_int(caller->inputs[0]) * as_int(caller->inputs[1]);
 }
 
 void list_apply(Term* caller)
@@ -58,6 +62,7 @@ void initialize_builtin_functions(Branch* code)
 
     quick_create_function(code, "to-string", to_string, TermList(any_t), string_t);
     quick_create_function(code, "add", add, TermList(int_t, int_t), int_t);
+    quick_create_function(code, "mult", add, TermList(int_t, int_t), int_t);
     quick_create_function(code, "print", print, TermList(string_t), void_t);
     quick_create_function(code, "list-apply", this_branch, TermList(function_t, list_t), void_t);
     quick_create_function(code, "this-branch", this_branch, TermList(), list_t);

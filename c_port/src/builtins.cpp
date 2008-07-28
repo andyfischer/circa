@@ -8,7 +8,6 @@
 #include "builtin_functions.h"
 #include "errors.h"
 #include "function.h"
-#include "globals.h"
 #include "operations.h"
 #include "structs.h"
 #include "subroutine.h"
@@ -31,6 +30,9 @@ Term* BUILTIN_VOID_TYPE = NULL;
 Term* BUILTIN_REFERENCE_TYPE = NULL;
 Term* BUILTIN_LIST_TYPE = NULL;
 
+void empty_execute_function(Term*) { }
+void empty_alloc_function(Term*) { }
+
 void const_generator(Term* caller)
 {
     Function *output = as_function(caller);
@@ -40,7 +42,14 @@ void const_generator(Term* caller)
     output->execute = empty_execute_function;
 }
 
-void empty_alloc_function(Term*) { }
+Term* get_global(string name)
+{
+    if (KERNEL->containsName(name))
+        return KERNEL->getNamed(name);
+
+    throw errors::KeyError(name);
+}
+
 
 void bootstrap_kernel()
 {
