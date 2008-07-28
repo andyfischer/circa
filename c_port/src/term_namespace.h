@@ -1,7 +1,9 @@
+#ifndef CIRCA__TERM_NAMESPACE__INCLUDED
+#define CIRCA__TERM_NAMESPACE__INCLUDED
 
 #include "common_headers.h"
 
-class Term;
+struct Term;
 
 struct TermNamespace
 {
@@ -22,3 +24,5 @@ struct TermNamespace
         return _map[name];
     }
 };
+
+#endif

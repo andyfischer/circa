@@ -7,11 +7,6 @@ class Branch;
 class Type;
 class Term;
 
-struct TermSyntaxHints
-{
-    // Todo
-};
-
 typedef std::vector<std::string> ErrorList;
 
 struct TermList
@@ -53,8 +48,6 @@ struct Term
     Term* state;
 
     bool needsUpdate;
-
-    TermSyntaxHints syntaxHints;
 
     ErrorList errors;
 
