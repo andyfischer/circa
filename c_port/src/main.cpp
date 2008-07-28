@@ -45,8 +45,9 @@ void run()
             TermList(hopefully_two));
     execute(hopefully_two_as_string);
 
-    Term* print_hopefully_two = apply_function(branch, get_global("print"),
-            TermList(hopefully_two_as_string));
+    branch->bindName(hopefully_two_as_string, "a");
+
+    Term* print_hopefully_two = quick_eval_function(branch, "print(a)");
     execute(print_hopefully_two);
     
     Term* br = apply_function(branch, get_global("Branch"), TermList());

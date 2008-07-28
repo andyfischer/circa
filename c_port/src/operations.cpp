@@ -209,6 +209,14 @@ void steal_value(Term* source, Term* dest)
     source->needsUpdate = true;
 }
 
+Term* find_named(Branch* branch, std::string name)
+{
+    if (branch->containsName(name))
+        return branch->getNamed(name);
+
+    return get_global(name);
+}
+
 Term* constant_string(Branch* branch, std::string s)
 {
     Term* term = apply_function(branch, get_global("string"), TermList());

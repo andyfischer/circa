@@ -36,5 +36,7 @@ void change_function(Term* term, Term* new_function);
 void copy_term(Term* source, Term* dest);
 void steal_value(Term* source, Term* dest);
 
+Term* find_named(Branch* branch, std::string name);
+
 Term* constant_string(Branch* branch, std::string s);
 Term* constant_int(Branch* branch, int i);
