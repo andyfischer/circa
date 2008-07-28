@@ -8,7 +8,7 @@
 
 struct Branch
 {
-    Term* termList;
+    TermList terms;
     TermNamespace names;
     Term* owningTerm;
 

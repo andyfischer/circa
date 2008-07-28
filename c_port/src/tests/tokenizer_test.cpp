@@ -1,27 +1,10 @@
 
 #include "common_headers.h"
 
-#include "errors.h"
 #include <parser/token.h>
+#include <tests/common.h>
+#include "errors.h"
 
-class TestFailure : public errors::CircaError
-{
-    virtual std::string message()
-    {
-        return "Test failure";
-    }
-};
-
-void test_assert_f(bool condition, int line, const char* file)
-{
-    if (!condition) {
-        std::stringstream msg;
-        msg << "Assert failure in " << file << ", line: " << line;
-        throw errors::CircaError(msg.str());
-    }
-}
-
-#define test_assert(c) test_assert_f((c), __LINE__, __FILE__)
 
 
 void test_identifiers()

@@ -11,7 +11,7 @@
 
 void Branch::append(Term* term)
 {
-    as_list(termList)->append(term);
+    this->terms.append(term);
 }
 
 bool Branch::containsName(string name)

@@ -1,12 +1,13 @@
 
 #include "common_headers.h"
 
+#include "bootstrapping.h"
 #include "branch.h"
 #include "parser/token.h"
 #include "parser/token_stream.h"
 #include "globals.h"
 #include "operations.h"
-#include "bootstrapping.h"
+#include "subroutine.h"
 
 Term* quick_parse_function_call(Branch* branch, token::TokenStream &tstream)
 {
@@ -124,3 +125,23 @@ Term* quick_create_function(Branch* branch, string name, Function::ExecuteFunc e
 	return term;
 }
 
+Term* quick_create_subroutine(Branch* branch, string name, TermList inputTypes,
+        Term* outputType)
+{
+    Term* term = create_constant(branch, get_global("Subroutine"));
+    Subroutine* subroutine = as_subroutine(term);
+    subroutine->name = name;
+    subroutine->execute = Subroutine_execute;
+    subroutine->inputTypes = inputTypes;
+    subroutine->outputType = outputType;
+
+    // Create input & output placeholders
+    for (int inputIndex=0; inputIndex < inputTypes.count(); inputIndex++) {
+        subroutine->inputPlaceholders.setAt(inputIndex,
+                create_constant(subroutine->branch, inputTypes[inputIndex]));
+    }
+    subroutine->outputPlaceholder = create_constant(subroutine->branch, outputType);
+
+    branch->bindName(term, name);
+    return term;
+}

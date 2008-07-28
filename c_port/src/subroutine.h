@@ -3,13 +3,24 @@
 
 #include "common_headers.h"
 
+#include "function.h"
 
-struct Subroutine
+class Branch;
+class Term;
+
+struct Subroutine : public Function
 {
-    // Todo
+    Branch* branch;
+
+    TermList inputPlaceholders;
+    Term* outputPlaceholder;
+
+    Subroutine();
 };
 
 Subroutine* as_subroutine(Term*);
+
+void Subroutine_execute(Term* caller);
 
 void initialize_subroutine(Branch* kernel);
 
