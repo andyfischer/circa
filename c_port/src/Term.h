@@ -34,6 +34,7 @@ struct TermList
         items.push_back(term3);
     }
 
+    int count() const;
     void append(Term* term);
     void setAt(int index, Term* term);
     Term* operator[](int index);
@@ -73,7 +74,7 @@ float& as_float(Term* t);
 bool& as_bool(Term* t);
 string& as_string(Term* t);
 
-TermList* as_term_list(Term* term);
+TermList* as_list(Term* term);
 
 void initialize_term(Branch* kernel);
 

@@ -6,6 +6,7 @@ namespace token {
 const char * LPAREN = "LPAREN";
 const char * RPAREN = "RPAREN";
 const char * COMMA = "COMMA";
+const char * EQUALS = "EQUALS";
 const char * IDENTIFIER = "IDENTIFIER";
 const char * INTEGER = "INTEGER";
 const char * FLOAT = "FLOAT";
@@ -56,6 +57,7 @@ void top_level_consume_token(TokenizeContext &context);
 void consume_identifier(TokenizeContext &context);
 void consume_whitespace(TokenizeContext &context);
 void consume_number(TokenizeContext &context);
+void consume_string_literal(TokenizeContext &context);
 
 void tokenize(std::string const &input, std::vector<TokenInstance> &results)
 {
@@ -116,6 +118,13 @@ void top_level_consume_token(TokenizeContext &context)
         case ',':
             context.consume();
             context.pushResult(COMMA, ",");
+            return;
+        case '=':
+            context.consume();
+            context.pushResult(EQUALS, "=");
+            return;
+        case '"':
+            consume_string_literal(context);
             return;
     }
 
@@ -190,6 +199,8 @@ void consume_string_literal(TokenizeContext &context)
     }
 
     context.consume();
+
+    context.pushResult(STRING, text.str());
 }
 
 void debug_print_token_list(std::ostream &stream, TokenList &tokens)

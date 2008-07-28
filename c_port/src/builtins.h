@@ -19,7 +19,7 @@ extern Term* BUILTIN_BRANCH_TYPE;
 extern Term* BUILTIN_ANY_TYPE;
 extern Term* BUILTIN_VOID_TYPE;
 extern Term* BUILTIN_REFERENCE_TYPE;
-extern Term* BUILTIN_TERM_LIST_TYPE;
+extern Term* BUILTIN_LIST_TYPE;
 
 void initialize();
 

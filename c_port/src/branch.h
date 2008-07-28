@@ -2,13 +2,13 @@
 #define CIRCA__BRANCH__INCLUDED
 
 #include "common_headers.h"
+#include "term.h"
 #include "term_namespace.h"
 
-class Term;
 
 struct Branch
 {
-    std::vector<Term*> terms;
+    Term* termList;
     TermNamespace names;
     Term* owningTerm;
 

@@ -7,7 +7,7 @@ namespace token {
 
 struct TokenStream
 {
-    TokenList const& tokens;
+    TokenList tokens;
     int currentIndex;
 
     TokenStream(TokenList const& _tokens)
@@ -15,17 +15,35 @@ struct TokenStream
     {
     }
 
-    TokenInstance const& next() const
+    void stripWhitespace()
     {
-        if (finished())
-            throw errors::CircaError("Ran out of tokens");
+        int deleteCount = 0;
 
-        return tokens[currentIndex];
+        for (int i=0; i < tokens.size(); i++) {
+
+            if (tokens[i].match == WHITESPACE) {
+                deleteCount++;
+            } else if (deleteCount > 0) {
+                tokens[i - deleteCount] = tokens[i];
+            }
+        }
+
+        tokens.resize(tokens.size() - deleteCount);
     }
 
-    bool nextIs(const char * match) const
+    TokenInstance const& next(int lookahead=0) const
     {
-        return next().match == match;
+        int i = currentIndex + lookahead;
+
+        if (i >= tokens.size())
+            throw errors::CircaError("Ran out of tokens");
+
+        return tokens[i];
+    }
+
+    bool nextIs(const char * match, int lookahead=0) const
+    {
+        return next(lookahead).match == match;
     }
 
     std::string consume(const char * match)
@@ -34,7 +52,7 @@ struct TokenStream
             throw errors::CircaError("Ran out of tokens");
 
         if (next().match != match)
-            throw errors::TokenMismatch();
+            throw errors::TokenMismatch(match, next().match);
 
         return tokens[currentIndex++].text;
     }
