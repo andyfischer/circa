@@ -10,7 +10,7 @@
 
 void Branch::append(Term* term)
 {
-    terms.push_back(term);
+    as_list(termList)->append(term);
 }
 
 bool Branch::containsName(string name)
@@ -57,7 +57,7 @@ void branch_apply_function(Term* caller)
     // Recycles input 0
     Branch* branch = as_branch(caller);
     Term* function = caller->inputs[1];
-    TermList* inputs = as_term_list(caller->inputs[2]);
+    TermList* inputs = as_list(caller->inputs[2]);
 
     apply_function(branch, function, *inputs);
 }
@@ -73,7 +73,7 @@ void initialize_branch(Branch* kernel)
 
     Term* apply_function = quick_create_function(kernel, "apply-function",
         branch_apply_function,
-        TermList(BUILTIN_BRANCH_TYPE, get_global("Reference"), get_global("TermList")),
+        TermList(BUILTIN_BRANCH_TYPE, get_global("Reference"), get_global("List")),
         BUILTIN_BRANCH_TYPE);
     as_function(apply_function)->recycleInput = 0;
 }

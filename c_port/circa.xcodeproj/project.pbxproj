@@ -10,9 +10,10 @@
 		8DD76F6A0486A84900D96B5E /* circa.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* circa.1 */; };
 		B6A243A50E3568EB007F2BEB /* errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243A40E3568EB007F2BEB /* errors.cpp */; };
 		B6A243B30E356E26007F2BEB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243B20E356E26007F2BEB /* main.cpp */; };
-		B6A243DB0E3A4407007F2BEB /* tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243D90E3A4407007F2BEB /* tokenizer.cpp */; };
-		B6A243E90E3BA4BA007F2BEB /* all_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243E60E3BA4BA007F2BEB /* all_tests.cpp */; };
-		B6A243EA0E3BA4BA007F2BEB /* tokenizer_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243E80E3BA4BA007F2BEB /* tokenizer_test.cpp */; };
+		B6A243FD0E3D6414007F2BEB /* bootstrapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */; };
+		B6A243FE0E3D6414007F2BEB /* token.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243F60E3D6414007F2BEB /* token.cpp */; };
+		B6A243FF0E3D6414007F2BEB /* all_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243FA0E3D6414007F2BEB /* all_tests.cpp */; };
+		B6A244000E3D6414007F2BEB /* tokenizer_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243FC0E3D6414007F2BEB /* tokenizer_test.cpp */; };
 		B6F114C00E33394F00B8BA44 /* branch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114A10E33394F00B8BA44 /* branch.cpp */; };
 		B6F114C20E33394F00B8BA44 /* builtin_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114A40E33394F00B8BA44 /* builtin_functions.cpp */; };
 		B6F114C40E33394F00B8BA44 /* builtins.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114A70E33394F00B8BA44 /* builtins.cpp */; };
@@ -42,11 +43,14 @@
 		8DD76F6C0486A84900D96B5E /* circa */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = circa; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6A243A40E3568EB007F2BEB /* errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = errors.cpp; sourceTree = "<group>"; };
 		B6A243B20E356E26007F2BEB /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		B6A243D90E3A4407007F2BEB /* tokenizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tokenizer.cpp; sourceTree = "<group>"; };
-		B6A243DA0E3A4407007F2BEB /* tokenizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tokenizer.h; sourceTree = "<group>"; };
-		B6A243E60E3BA4BA007F2BEB /* all_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = all_tests.cpp; sourceTree = "<group>"; };
-		B6A243E70E3BA4BA007F2BEB /* all_tests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = all_tests.h; sourceTree = "<group>"; };
-		B6A243E80E3BA4BA007F2BEB /* tokenizer_test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tokenizer_test.cpp; sourceTree = "<group>"; };
+		B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bootstrapping.cpp; sourceTree = "<group>"; };
+		B6A243F40E3D6414007F2BEB /* bootstrapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bootstrapping.h; sourceTree = "<group>"; };
+		B6A243F60E3D6414007F2BEB /* token.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = token.cpp; sourceTree = "<group>"; };
+		B6A243F70E3D6414007F2BEB /* token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = token.h; sourceTree = "<group>"; };
+		B6A243F80E3D6414007F2BEB /* token_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = token_stream.h; sourceTree = "<group>"; };
+		B6A243FA0E3D6414007F2BEB /* all_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = all_tests.cpp; sourceTree = "<group>"; };
+		B6A243FB0E3D6414007F2BEB /* all_tests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = all_tests.h; sourceTree = "<group>"; };
+		B6A243FC0E3D6414007F2BEB /* tokenizer_test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tokenizer_test.cpp; sourceTree = "<group>"; };
 		B6F114A10E33394F00B8BA44 /* branch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = branch.cpp; sourceTree = "<group>"; };
 		B6F114A20E33394F00B8BA44 /* branch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = branch.h; sourceTree = "<group>"; };
 		B6F114A40E33394F00B8BA44 /* builtin_functions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = builtin_functions.cpp; sourceTree = "<group>"; };
@@ -111,12 +115,22 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B6A243E50E3BA4BA007F2BEB /* tests */ = {
+		B6A243F50E3D6414007F2BEB /* parser */ = {
 			isa = PBXGroup;
 			children = (
-				B6A243E60E3BA4BA007F2BEB /* all_tests.cpp */,
-				B6A243E70E3BA4BA007F2BEB /* all_tests.h */,
-				B6A243E80E3BA4BA007F2BEB /* tokenizer_test.cpp */,
+				B6A243F60E3D6414007F2BEB /* token.cpp */,
+				B6A243F70E3D6414007F2BEB /* token.h */,
+				B6A243F80E3D6414007F2BEB /* token_stream.h */,
+			);
+			path = parser;
+			sourceTree = "<group>";
+		};
+		B6A243F90E3D6414007F2BEB /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				B6A243FA0E3D6414007F2BEB /* all_tests.cpp */,
+				B6A243FB0E3D6414007F2BEB /* all_tests.h */,
+				B6A243FC0E3D6414007F2BEB /* tokenizer_test.cpp */,
 			);
 			path = tests;
 			sourceTree = "<group>";
@@ -124,9 +138,10 @@
 		B6F114A00E33394F00B8BA44 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				B6A243E50E3BA4BA007F2BEB /* tests */,
-				B6A243D90E3A4407007F2BEB /* tokenizer.cpp */,
-				B6A243DA0E3A4407007F2BEB /* tokenizer.h */,
+				B6A243F50E3D6414007F2BEB /* parser */,
+				B6A243F90E3D6414007F2BEB /* tests */,
+				B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */,
+				B6A243F40E3D6414007F2BEB /* bootstrapping.h */,
 				B6A243B20E356E26007F2BEB /* main.cpp */,
 				B6A243A40E3568EB007F2BEB /* errors.cpp */,
 				B6F115160E34F4B300B8BA44 /* operations.cpp */,
@@ -220,9 +235,10 @@
 				B6F1151B0E34F4B300B8BA44 /* structs.cpp in Sources */,
 				B6A243A50E3568EB007F2BEB /* errors.cpp in Sources */,
 				B6A243B30E356E26007F2BEB /* main.cpp in Sources */,
-				B6A243DB0E3A4407007F2BEB /* tokenizer.cpp in Sources */,
-				B6A243E90E3BA4BA007F2BEB /* all_tests.cpp in Sources */,
-				B6A243EA0E3BA4BA007F2BEB /* tokenizer_test.cpp in Sources */,
+				B6A243FD0E3D6414007F2BEB /* bootstrapping.cpp in Sources */,
+				B6A243FE0E3D6414007F2BEB /* token.cpp in Sources */,
+				B6A243FF0E3D6414007F2BEB /* all_tests.cpp in Sources */,
+				B6A244000E3D6414007F2BEB /* tokenizer_test.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,6 +280,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				USER_HEADER_SEARCH_PATHS = src;
 			};
 			name = Debug;
 		};
@@ -278,6 +295,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				USER_HEADER_SEARCH_PATHS = src;
 			};
 			name = Release;
 		};

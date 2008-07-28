@@ -14,6 +14,12 @@
 
 int gNextGlobalID = 1;
 
+int
+TermList::count() const
+{
+    return (int) items.size();
+}
+
 void
 TermList::append(Term* term)
 {
@@ -117,14 +123,14 @@ void TermList_alloc(Term* caller)
     caller->value = new TermList();
 }
 
-TermList* as_term_list(Term* term)
+TermList* as_list(Term* term)
 {
-    if (term->type != BUILTIN_TERM_LIST_TYPE)
-        throw errors::InternalTypeError(term, BUILTIN_TERM_LIST_TYPE);
+    if (term->type != BUILTIN_LIST_TYPE)
+        throw errors::InternalTypeError(term, BUILTIN_LIST_TYPE);
     return (TermList*) term->value;
 }
 
 void initialize_term(Branch* kernel)
 {
-    BUILTIN_TERM_LIST_TYPE = quick_create_type(kernel, "TermList", TermList_alloc, NULL);
+    BUILTIN_LIST_TYPE = quick_create_type(kernel, "List", TermList_alloc, NULL);
 }

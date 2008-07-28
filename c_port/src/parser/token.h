@@ -16,6 +16,7 @@ typedef std::vector<TokenInstance> TokenList;
 extern const char * LPAREN;
 extern const char * RPAREN;
 extern const char * COMMA;
+extern const char * EQUALS;
 extern const char * IDENTIFIER;
 extern const char * INTEGER;
 extern const char * FLOAT;

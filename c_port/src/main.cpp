@@ -36,10 +36,15 @@ void run()
             TermList(my_instance, constant_string(branch, "myInt"),
                 constant_int(branch, 2)));
     execute(my_instance);
+    branch->bindName(my_instance, "my_instance");
 
-    Term* hopefully_two = apply_function(branch, get_global("get-field"),
-            TermList(my_instance, constant_string(branch, "myInt")));
+    Term* hopefully_two = quick_eval_function(branch,
+            "hopefully-two = get-field(my_instance, \"myInt\")");
+
+    //Term* hopefully_two = apply_function(branch, get_global("get-field"),
+            //TermList(my_instance, constant_string(branch, "myInt")));
     execute(hopefully_two);
+    //branch->bindName(hopefully_two, "hopefully-two");
 
     Term* hopefully_two_as_string = apply_function(branch, get_global("to-string"),
             TermList(hopefully_two));
@@ -52,7 +57,6 @@ void run()
     
     Term* br = apply_function(branch, get_global("Branch"), TermList());
     execute(br);
-
 }
 
 int main(const char * args[])

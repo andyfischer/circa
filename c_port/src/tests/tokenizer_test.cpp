@@ -2,7 +2,7 @@
 #include "common_headers.h"
 
 #include "errors.h"
-#include "parser/token.h"
+#include <parser/token.h>
 
 class TestFailure : public errors::CircaError
 {
@@ -68,15 +68,27 @@ void test_integers()
 void test_symbols()
 {
     token::TokenList results;
-    token::tokenize(",()", results);
+    token::tokenize(",()=", results);
 
-    test_assert(results.size() == 3);
+    test_assert(results.size() == 4);
     test_assert(results[0].text == ",");
     test_assert(results[0].match == token::COMMA);
     test_assert(results[1].text == "(");
     test_assert(results[1].match == token::LPAREN);
     test_assert(results[2].text == ")");
     test_assert(results[2].match == token::RPAREN);
+    test_assert(results[3].text == "=");
+    test_assert(results[3].match == token::EQUALS);
+}
+
+void test_string_literal()
+{
+    token::TokenList results;
+    token::tokenize("\"string literal\"", results);
+
+    test_assert(results.size() == 1);
+    test_assert(results[0].text == "string literal");
+    test_assert(results[0].match == token::STRING);
 }
 
 void tokenize_test()
@@ -84,4 +96,5 @@ void tokenize_test()
     test_identifiers();
     test_integers();
     test_symbols();
+    test_string_literal();
 }
