@@ -11,7 +11,7 @@ struct TokenStream
     int currentIndex;
 
     TokenStream(TokenList const& _tokens)
-      : tokens(_tokens)
+      : tokens(_tokens), currentIndex(0)
     {
     }
 
@@ -28,7 +28,7 @@ struct TokenStream
         return next().match == match;
     }
 
-    TokenInstance const& consume(const char * match)
+    std::string consume(const char * match)
     {
         if (finished())
             throw errors::CircaError("Ran out of tokens");
@@ -36,7 +36,7 @@ struct TokenStream
         if (next().match != match)
             throw errors::TokenMismatch();
 
-        return tokens[currentIndex++];
+        return tokens[currentIndex++].text;
     }
 
     bool finished() const

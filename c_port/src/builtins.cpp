@@ -172,31 +172,6 @@ void create_builtin_types()
     BUILTIN_REFERENCE_TYPE = quick_create_type(KERNEL, "Reference", empty_alloc_function, NULL);
 }
 
-void quick_eval_function(Branch* branch, std::string input)
-{
-    token::TokenList tokenList;
-    token::tokenize(input, tokenList);
-    token::TokenStream tstream(tokenList);
-
-    std::string functionName = tstream.consume(token::IDENTIFIER).text;
-    Term* function = get_global(functionName);
-
-    tstream.consume(token::LPAREN);
-
-    TermList inputs;
-
-    while(!tstream.nextIs(token::RPAREN)) {
-
-        if (tstream.nextIs(token::IDENTIFIER)) {
-            Term* term = get_global(tstream.consume(token::IDENTIFIER).text);
-            inputs.append(term);
-
-        } else if (tstream.nextIs(token::STRING)) {
-
-        }
-    }
-}
-
 void initialize()
 {
     try {
