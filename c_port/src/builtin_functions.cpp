@@ -1,5 +1,6 @@
 #include "common_headers.h"
 
+#include "bootstrapping.h"
 #include "branch.h"
 #include "builtins.h"
 #include "builtin_functions.h"

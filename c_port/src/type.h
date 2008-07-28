@@ -10,7 +10,7 @@ struct Type
     typedef void (*AllocFunc)(Term* term);
     typedef void (*CopyFunc)(Term* src, Term* dest);
 
-    string name;
+    std::string name;
 
     Type();
     AllocFunc alloc;

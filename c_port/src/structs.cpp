@@ -1,5 +1,6 @@
 #include "common_headers.h"
 
+#include "bootstrapping.h"
 #include "builtins.h"
 #include "errors.h"
 #include "globals.h"

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 
+#include "bootstrapping.h"
 #include "builtins.h"
 #include "branch.h"
 #include "errors.h"

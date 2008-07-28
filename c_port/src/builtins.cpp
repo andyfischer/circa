@@ -3,6 +3,7 @@
 
 #include "parser/token.h"
 #include "parser/token_stream.h"
+#include "bootstrapping.h"
 #include "branch.h"
 #include "builtin_functions.h"
 #include "errors.h"
@@ -104,6 +105,13 @@ void bootstrap_kernel()
     constTypeFunc->type = functionType;
     Function_setOutputType(constGenerator, functionType);
     Function_setOutputType(constFuncFunc, functionType);
+
+    // Don't let these terms get updated
+    constGenerator->needsUpdate = false;
+    constFuncFunc->needsUpdate = false;
+    constTypeFunc->needsUpdate = false;
+    functionType->needsUpdate = false;
+    typeType->needsUpdate = false;
 }
 
 void int_alloc(Term* caller)
