@@ -15,7 +15,7 @@ Function::Function()
 
 bool is_function(Term* term)
 {
-    return term->type == BUILTIN_FUNCTION_TYPE;
+    return (term->type == BUILTIN_FUNCTION_TYPE) || (term->type == BUILTIN_SUBROUTINE_TYPE);
 }
 
 Function* as_function(Term* term)

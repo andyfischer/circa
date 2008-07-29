@@ -22,6 +22,9 @@ void execute_branch(Branch* branch);
 //  4. add more stuff here
 Term* apply_function(Branch* branch, Term* function, TermList inputs);
 
+// Perform 'apply_function' and then execute the result
+Term* exec_function(Branch* branch, Term* function, TermList inputs);
+
 // Fetch the const function for this type
 Term* get_const_function(Branch* branch, Term* type);
 

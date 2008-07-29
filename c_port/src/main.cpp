@@ -6,8 +6,6 @@
 
 void run()
 {
-    initialize();
-
     Branch* branch = new Branch();
 
     Term* my_struct_def = create_constant(branch, get_global("StructDefinition"));
@@ -43,6 +41,8 @@ void run()
 
 int main(const char * args[])
 {
+    initialize();
+	
     // todo: figure out a good way to process args
     run_all_tests();
 
@@ -54,3 +54,4 @@ int main(const char * args[])
         std::cout << err.message() << std::endl;
     }
 }
+
