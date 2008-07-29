@@ -19,7 +19,7 @@ struct TermNamespace
         _map[name] = term;
     }
 
-    Term*& operator[](string name)
+    Term* operator[](string name)
     {
         return _map[name];
     }

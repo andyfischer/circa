@@ -3,6 +3,7 @@
 
 #include "builtins.h"
 #include "errors.h"
+#include "function.h"
 #include "term.h"
 #include "type.h"
 
@@ -33,12 +34,15 @@ void Type_alloc(Term* caller)
     caller->value = new Type();
 }
 
-void Type_setName(Term* term, const char* value)
+void set_member_function(Term* type, std::string name, Term* function)
 {
-    as_type(term)->name = value;
+    Type* typeData = as_type(type);
+    as_function(function);
+
+    typeData->memberFunctions.bind(function, name);
 }
 
-void Type_setAllocFunc(Term* term, Type::AllocFunc allocFunc)
+Term* get_member_function(Term* type, std::string name)
 {
-    as_type(term)->alloc = allocFunc;
+    return as_type(type)->memberFunctions[name];
 }

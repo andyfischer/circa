@@ -32,8 +32,6 @@ void run()
     Term* hopefully_two = quick_exec_function(branch,
             "hopefully-two = get-field(my_instance, \"myInt\")");
 
-    //quick_exec_function(branch, "ht-as-string = to-string(hopefully-two)");
-
     quick_exec_function(branch, "print(\"Hopefully two: \")");
     quick_exec_function(branch, "print(to-string(hopefully-two))");
     //quick_exec_function(branch, "print(ht-as-string)");

@@ -25,7 +25,7 @@ Term* Branch::getNamed(string name)
 
 void Branch::bindName(Term* term, string name)
 {
-    names[name] = term;
+    names.bind(term, name);
 }
 
 Branch* as_branch(Term* term)

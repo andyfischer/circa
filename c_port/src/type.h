@@ -30,14 +30,12 @@ struct Type
     Type();
 };
 
-extern "C" {
-
 bool is_type(Term* term);
 Type* as_type(Term* term);
-void Type_alloc(Term* caller);
-void Type_setName(Term* term, const char* value);
-void Type_setAllocFunc(Term* term, Type::AllocFunc allocFunc);
 
-}
+void Type_alloc(Term* caller);
+
+void set_member_function(Term* type, std::string name, Term* function);
+Term* get_member_function(Term* type, std::string name);
 
 #endif
