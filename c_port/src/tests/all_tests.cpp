@@ -4,6 +4,8 @@
 #include "all_tests.h"
 #include "errors.h"
 
+namespace circa {
+
 void tokenize_test();
 void subroutine_test();
 void builtin_functions_test();
@@ -19,4 +21,6 @@ void run_all_tests()
         std::cout << "Error during tests:\n";
         std::cout << err.message() << std::endl;
     }
+}
+
 }

@@ -9,6 +9,8 @@
 #include "operations.h"
 #include "subroutine.h"
 
+namespace circa {
+
 void test_simple()
 {
     Branch *branch = new Branch();
@@ -37,4 +39,6 @@ void test_simple()
 void subroutine_test()
 {
     test_simple();
+}
+
 }
