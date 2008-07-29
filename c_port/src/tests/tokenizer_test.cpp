@@ -5,7 +5,7 @@
 #include <tests/common.h>
 #include "errors.h"
 
-
+namespace circa {
 
 void test_identifiers()
 {
@@ -81,3 +81,5 @@ void tokenize_test()
     test_symbols();
     test_string_literal();
 }
+
+} // namespace circa

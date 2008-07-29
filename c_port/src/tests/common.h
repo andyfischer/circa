@@ -3,6 +3,8 @@
 
 #include "errors.h"
 
+namespace circa {
+
 class TestFailure : public errors::CircaError
 {
     virtual std::string message()
@@ -14,5 +16,7 @@ class TestFailure : public errors::CircaError
 void test_assert_f(bool condition, int line, const char* file);
 
 #define test_assert(c) test_assert_f((c), __LINE__, __FILE__)
+
+} // namespace circa
 
 #endif

@@ -1,6 +1,8 @@
 
 #include "common.h"
 
+namespace circa {
+
 void test_assert_f(bool condition, int line, const char* file)
 {
     if (!condition) {
@@ -9,3 +11,5 @@ void test_assert_f(bool condition, int line, const char* file)
         throw errors::CircaError(msg.str());
     }
 }
+
+} // namespace circa

@@ -7,6 +7,8 @@
 #include "errors.h"
 #include "operations.h"
 
+namespace circa {
+
 void test_math()
 {
     Branch* branch = new Branch();
@@ -28,3 +30,5 @@ void builtin_functions_test()
 {
     test_math();
 }
+
+} // namespace circa

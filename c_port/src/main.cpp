@@ -44,7 +44,7 @@ int main(const char * args[])
     initialize();
 	
     // todo: figure out a good way to process args
-    run_all_tests();
+    circa::run_all_tests();
 
     try {
         run();
