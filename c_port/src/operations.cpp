@@ -135,7 +135,8 @@ void execute_branch(Branch* branch)
 {
     int count = branch->terms.count();
     for (int index=0; index < count; index++) {
-        execute(branch->terms[count]);
+		Term* term = branch->terms[index];
+        execute(term);
     }
 }
 
@@ -149,6 +150,13 @@ Term* apply_function(Branch* branch, Term* function, TermList inputs)
 
     // Create a term in the normal way
     return create_term(branch, function, inputs);
+}
+
+Term* exec_function(Branch* branch, Term* function, TermList inputs)
+{
+    Term* result = apply_function(branch, function, inputs);
+    execute(result);
+    return result;
 }
 
 Term* get_const_function(Branch* branch, Term* type)
