@@ -13,6 +13,8 @@ void test_range()
 
     Term* range_zero_to_ten = quick_exec_function(branch, "range(10)");
 
+    test_assert(as_int(as_list(range_zero_to_ten)->get(0)) == 0);
+    test_assert(as_int(as_list(range_zero_to_ten)->get(9)) == 9);
 }
 
 void list_test()
