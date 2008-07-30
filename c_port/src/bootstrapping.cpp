@@ -11,7 +11,8 @@
 
 Term* quick_parse_function_call(Branch* branch, token::TokenStream &tstream)
 {
-    Term* function = find_named(branch, tstream.consume(token::IDENTIFIER));
+	std::string functionName = tstream.consume(token::IDENTIFIER);
+    Term* function = find_named(branch, functionName);
 
     tstream.consume(token::LPAREN);
 
