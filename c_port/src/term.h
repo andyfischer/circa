@@ -13,10 +13,10 @@ struct TermList
 {
     std::vector<Term*> items;
 
-    TermList() { }
+    explicit TermList() { }
 
     // Convenience constructors
-    TermList(Term* term) {
+    explicit TermList(Term* term) {
         items.push_back(term);
     }
     TermList(Term* term1, Term* term2) {

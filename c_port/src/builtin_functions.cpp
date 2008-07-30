@@ -57,8 +57,14 @@ void list_apply(Term* caller)
     as_function(caller->inputs[0]);
     TermList* list = as_list(caller->inputs[1]);
 
-    for (int i=0; i < list->count(); i++)
-        apply_function(caller->owningBranch, caller->inputs[0], TermList(list[i]));
+    as_list(caller)->clear();
+
+    for (int i=0; i < list->count(); i++) {
+        Term* result = apply_function(caller->owningBranch, caller->inputs[0], TermList(list->get(i)));
+        execute(result);
+
+        as_list(caller)->append(result);
+    }
 }
 
 void this_branch(Term* caller)
@@ -82,6 +88,6 @@ void initialize_builtin_functions(Branch* code)
     quick_create_function(code, "concat", string_concat, TermList(string_t, string_t), string_t);
     quick_create_function(code, "print", print, TermList(string_t), void_t);
     quick_create_function(code, "range", range, TermList(int_t), list_t);
-    quick_create_function(code, "list-apply", this_branch, TermList(function_t, list_t), void_t);
+    quick_create_function(code, "list-apply", list_apply, TermList(function_t, list_t), list_t);
     quick_create_function(code, "this-branch", this_branch, TermList(), list_t);
 }
