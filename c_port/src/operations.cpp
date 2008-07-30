@@ -217,3 +217,10 @@ Term* constant_int(Branch* branch, int i)
     as_int(term) = i;
     return term;
 }
+
+Term* constant_list(Branch* branch, TermList list)
+{
+    Term* term = apply_function(branch, get_global("List"), TermList());
+    *as_list(term) = list;
+    return term;
+}

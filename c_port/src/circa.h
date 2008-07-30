@@ -5,5 +5,6 @@
 #include "errors.h"
 #include "function.h"
 #include "operations.h"
+#include "subroutine.h"
 #include "term.h"
 #include "type.h"
