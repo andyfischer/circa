@@ -37,6 +37,13 @@ Term* quick_parse_function_call(Branch* branch, token::TokenStream &tstream)
             inputs.append(term);
         }
 
+        // Check for integer literal
+        else if (tstream.nextIs(token::INTEGER)) {
+            int value = atoi(tstream.consume(token::INTEGER).c_str());
+            Term* term = constant_int(branch, value);
+            inputs.append(term);
+        }
+
         if (tstream.nextIs(token::COMMA))
             tstream.consume(token::COMMA);
         else {
