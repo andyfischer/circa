@@ -167,6 +167,10 @@ void string_tostring(Term* caller)
 {
     as_string(caller) = as_string(caller->inputs[0]);
 }
+void string_copy(Term* source, Term* dest)
+{
+    as_string(dest) = as_string(source);
+}
 
 void bool_tostring(Term* caller)
 {
@@ -178,7 +182,8 @@ void bool_tostring(Term* caller)
 
 void create_builtin_types()
 {
-    BUILTIN_STRING_TYPE = quick_create_type(KERNEL, "string", string_alloc, string_tostring);
+    BUILTIN_STRING_TYPE = quick_create_type(KERNEL, "string",
+            string_alloc, string_tostring, string_copy);
     BUILTIN_INT_TYPE = quick_create_type(KERNEL, "int",
             int_alloc, int_tostring, int_copy);
     BUILTIN_FLOAT_TYPE = quick_create_type(KERNEL, "float",
