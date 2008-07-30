@@ -21,7 +21,7 @@ bool is_function(Term* term)
 Function* as_function(Term* term)
 {
     if (!is_function(term))
-        throw errors::InternalTypeError(term, BUILTIN_FUNCTION_TYPE);
+        throw errors::TypeError(term, BUILTIN_FUNCTION_TYPE);
 
     return (Function*) term->value;
 }

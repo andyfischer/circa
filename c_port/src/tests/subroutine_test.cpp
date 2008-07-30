@@ -40,6 +40,26 @@ void test_simple()
 	test_assert(as_int(quick_exec_function(branch, "my-sub(one,two)")) == 12);
 }
 
+void test_simple2()
+{
+    Branch* branch = new Branch();
+    Term* any_t = get_global("any");
+    Term* void_t = get_global("void");
+    Term* int_t = get_global("int");
+    Term* string_t = get_global("string");
+
+    Term* print_term = quick_create_subroutine(branch, "print-term", TermList(string_t), void_t);
+
+    Term* input_names = constant_list(branch, TermList(constant_string(branch, "t")));
+    print_term = exec_function(branch, get_global("subroutine-name-inputs"),
+            TermList(print_term, input_names));
+    branch->bindName(print_term, "print-term");
+
+    quick_exec_function(as_subroutine(print_term)->branch, "print(to-string(t))");
+
+    quick_exec_function(branch, "print-term(\"test\")");
+}
+
 void subroutine_test()
 {
     test_simple();

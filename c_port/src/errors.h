@@ -39,19 +39,19 @@ public:
     }
 };
 
-class InternalTypeError : public InternalError
+class TypeError : public CircaError
 {
     Term* term;
     Term* expectedType;
 
 public:
-    InternalTypeError(Term* _term, Term* _expectedType) throw()
-        : InternalError("")
+    TypeError(Term* _term, Term* _expectedType) throw()
+        : CircaError("")
     {
         term = _term;
         expectedType = _expectedType;
     }
-    ~InternalTypeError() throw() {}
+    ~TypeError() throw() {}
     virtual string message();
 };
 

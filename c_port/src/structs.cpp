@@ -47,7 +47,7 @@ StructDefinition::findField(std::string name)
 StructDefinition* as_struct_definition(Term* term)
 {
     if (term->type != BUILTIN_STRUCT_DEFINITION_TYPE)
-        throw errors::InternalTypeError(term, BUILTIN_STRUCT_DEFINITION_TYPE);
+        throw errors::TypeError(term, BUILTIN_STRUCT_DEFINITION_TYPE);
 
     return (StructDefinition*) term->value;
 }

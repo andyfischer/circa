@@ -16,7 +16,7 @@ Subroutine::Subroutine()
 Subroutine* as_subroutine(Term* term)
 {
     if (term->type != BUILTIN_SUBROUTINE_TYPE)
-        throw errors::InternalTypeError(term, BUILTIN_SUBROUTINE_TYPE);
+        throw errors::TypeError(term, BUILTIN_SUBROUTINE_TYPE);
 
     return (Subroutine*) term->value;
 }

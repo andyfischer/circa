@@ -77,7 +77,7 @@ void change_type(Term* term, Term* type)
 void specialize_type(Term* term, Term* type)
 {
     if (term->type != BUILTIN_ANY_TYPE)
-        throw errors::InternalTypeError(term, BUILTIN_ANY_TYPE);
+        throw errors::TypeError(term, BUILTIN_ANY_TYPE);
 
     change_type(term, type);
 }
@@ -169,7 +169,7 @@ Term* get_const_function(Branch* branch, Term* type)
 void change_function(Term* term, Term* new_function)
 {
     if (new_function->type != BUILTIN_FUNCTION_TYPE)
-        throw errors::InternalTypeError(new_function, BUILTIN_FUNCTION_TYPE);
+        throw errors::TypeError(new_function, BUILTIN_FUNCTION_TYPE);
 
     term->function = new_function;
 }
@@ -177,7 +177,7 @@ void change_function(Term* term, Term* new_function)
 void copy_term(Term* source, Term* dest)
 {
     if (source->type != dest->type)
-        throw errors::InternalTypeError(dest, source->type);
+        throw errors::TypeError(dest, source->type);
 
     Type::CopyFunc copy = as_type(source->type)->copy;
 
