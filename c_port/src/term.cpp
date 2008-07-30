@@ -37,6 +37,12 @@ TermList::setAt(int index, Term* term)
     items[index] = term;
 }
 
+void
+TermList::clear()
+{
+    items.clear();
+}
+
 Term* TermList::get(int index) const
 {
     if (index >= items.size())
