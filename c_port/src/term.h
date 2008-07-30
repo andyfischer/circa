@@ -32,7 +32,8 @@ struct TermList
     int count() const;
     void append(Term* term);
     void setAt(int index, Term* term);
-    Term* operator[](int index);
+    Term* get(int index) const;
+    Term* operator[](int index) const;
 };
 
 struct Term

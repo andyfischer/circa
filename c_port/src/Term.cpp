@@ -37,11 +37,16 @@ TermList::setAt(int index, Term* term)
     items[index] = term;
 }
 
-Term* TermList::operator[](int index)
+Term* TermList::get(int index) const
 {
     if (index >= items.size())
         return NULL;
     return items[index];
+}
+
+Term* TermList::operator[](int index) const
+{
+    return get(index);
 }
 
 Term::Term()

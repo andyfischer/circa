@@ -50,7 +50,22 @@ void Subroutine_execute(Term* caller)
         copy_term(sub->outputPlaceholder, caller);
 }
 
+void subroutine_name_inputs(Term* caller)
+{
+    // Recycles input 0
+    TermList* name_list = as_list(caller->inputs[1]);
+    Subroutine* sub = as_subroutine(caller);
+    for (int inputIndex=0; inputIndex < sub->inputPlaceholders.count(); inputIndex++) {
+        sub->branch->bindName(sub->inputPlaceholders[inputIndex],
+                as_string(name_list->get(inputIndex)));
+    }
+}
+
 void initialize_subroutine(Branch* kernel)
 {
     BUILTIN_SUBROUTINE_TYPE = quick_create_type(KERNEL, "Subroutine", Subroutine_alloc, NULL);
+    Term* name_inputs = quick_create_function(KERNEL,
+            "subroutine-name-inputs", subroutine_name_inputs,
+            TermList(BUILTIN_SUBROUTINE_TYPE, get_global("List")), BUILTIN_SUBROUTINE_TYPE);
+    as_function(name_inputs)->recycleInput = 0;
 }
