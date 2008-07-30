@@ -16,9 +16,9 @@ TypeError::message()
         throw InternalError("term->type is not a type");
 
     if (!is_type(expectedType))
-        throw InternalError("2nd argument to InternalTypeError must be a type");
+        throw InternalError("2nd argument to TypeError must be a type");
 
-    return string("InternalTypeError: expected " + as_type(expectedType)->name
+    return string("TypeError: expected " + as_type(expectedType)->name
             + ", found " + as_type(term->type)->name);
 }
 
