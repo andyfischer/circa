@@ -8,7 +8,7 @@
 namespace errors {
 
 string
-InternalTypeError::message()
+TypeError::message()
 {
     // Usually we don't check that term->type is a type, but we do it
     // here in TypeError to avoid infinitely throwing exceptions.

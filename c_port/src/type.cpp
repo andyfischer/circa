@@ -24,7 +24,7 @@ bool is_type(Term* term)
 Type* as_type(Term* term)
 {
     if (!is_type(term))
-        throw errors::InternalTypeError(term, BUILTIN_TYPE_TYPE);
+        throw errors::TypeError(term, BUILTIN_TYPE_TYPE);
 
     return (Type*) term->value;
 }

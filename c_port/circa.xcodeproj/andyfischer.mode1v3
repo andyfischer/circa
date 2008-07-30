@@ -202,46 +202,6 @@
 			<key>Content</key>
 			<dict>
 				<key>PBXProjectModuleGUID</key>
-				<string>B6A244540E4024B0007F2BEB</string>
-				<key>PBXProjectModuleLabel</key>
-				<string>main.cpp</string>
-				<key>PBXSplitModuleInNavigatorKey</key>
-				<dict>
-					<key>Split0</key>
-					<dict>
-						<key>PBXProjectModuleGUID</key>
-						<string>B6A244550E4024B0007F2BEB</string>
-						<key>PBXProjectModuleLabel</key>
-						<string>main.cpp</string>
-						<key>_historyCapacity</key>
-						<integer>0</integer>
-						<key>bookmark</key>
-						<string>B6A244790E40D16E007F2BEB</string>
-						<key>history</key>
-						<array>
-							<string>B6A244610E40CF0C007F2BEB</string>
-						</array>
-					</dict>
-					<key>SplitCount</key>
-					<string>1</string>
-				</dict>
-				<key>StatusBarVisibility</key>
-				<true/>
-			</dict>
-			<key>Geometry</key>
-			<dict>
-				<key>Frame</key>
-				<string>{{0, 20}, {750, 461}}</string>
-				<key>PBXModuleWindowStatusBarHidden2</key>
-				<false/>
-				<key>RubberWindowFrame</key>
-				<string>43 102 750 502 0 0 1280 778 </string>
-			</dict>
-		</dict>
-		<dict>
-			<key>Content</key>
-			<dict>
-				<key>PBXProjectModuleGUID</key>
 				<string>B6A244170E3D9767007F2BEB</string>
 				<key>PBXProjectModuleLabel</key>
 				<string>bootstrapping.cpp</string>
@@ -256,7 +216,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>B6A2447A0E40D16E007F2BEB</string>
+						<string>B6A2447D0E40D3E1007F2BEB</string>
 						<key>history</key>
 						<array>
 							<string>B6A244630E40CF0C007F2BEB</string>
@@ -296,7 +256,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>B6A2447B0E40D16E007F2BEB</string>
+						<string>B6A2447E0E40D3E1007F2BEB</string>
 						<key>history</key>
 						<array>
 							<string>B6A244520E4024B0007F2BEB</string>
@@ -647,12 +607,11 @@
 		<string>B6A243AF0E356911007F2BEB</string>
 		<string>B6A243B00E356911007F2BEB</string>
 		<string>B6F114D50E33398200B8BA44</string>
+		<string>1CD10A99069EF8BA00B06720</string>
 		<string>/Users/andyfischer/circa/c_port/circa.xcodeproj</string>
 		<string>B6A244500E4024B0007F2BEB</string>
 		<string>B6A244170E3D9767007F2BEB</string>
-		<string>1CD10A99069EF8BA00B06720</string>
 		<string>1C78EAAD065D492600B07095</string>
-		<string>B6A244540E4024B0007F2BEB</string>
 	</array>
 	<key>WindowString</key>
 	<string>1 65 316 697 0 0 1280 778 </string>
@@ -869,7 +828,7 @@
 			<key>WindowToolGUID</key>
 			<string>1CD10A99069EF8BA00B06720</string>
 			<key>WindowToolIsVisible</key>
-			<true/>
+			<false/>
 		</dict>
 		<dict>
 			<key>Identifier</key>

@@ -31,7 +31,7 @@ void Branch::bindName(Term* term, string name)
 Branch* as_branch(Term* term)
 {
     if (term->type != BUILTIN_BRANCH_TYPE)
-        throw errors::InternalTypeError(term, BUILTIN_BRANCH_TYPE);
+        throw errors::TypeError(term, BUILTIN_BRANCH_TYPE);
 
     return (Branch*) term->value;
 }
