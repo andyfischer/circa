@@ -34,6 +34,10 @@ void test_simple()
     test_assert(as_int(exec_function(branch, my_sub, TermList(one, one))) == 7);
     test_assert(as_int(exec_function(branch, my_sub, TermList(one, two))) == 12);
     test_assert(as_int(exec_function(branch, my_sub, TermList(two, zero))) == 4);
+	
+	branch->bindName(one, "one");
+	branch->bindName(two, "two");
+	test_assert(as_int(quick_exec_function(branch, "my-sub(one,two)")) == 12);
 }
 
 void subroutine_test()
