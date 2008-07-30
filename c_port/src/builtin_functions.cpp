@@ -41,6 +41,13 @@ void string_concat(Term* caller)
     as_string(caller) = as_string(caller->inputs[0]) + as_string(caller->inputs[1]);
 }
 
+void range(Term* caller)
+{
+    int max = as_int(caller->inputs[0]);
+
+    as_list(caller)->clear();
+}
+
 void list_apply(Term* caller)
 {
     as_function(caller->inputs[0]);
