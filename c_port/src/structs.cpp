@@ -156,7 +156,7 @@ void struct_set_field(Term* caller)
 void initialize_structs(Branch* code)
 {
     BUILTIN_STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition", StructDefinition_alloc, NULL, StructDefinition_copy);
-    quick_create_function(code, "get-field", struct_get_field,
+    quick_create_member_function(code, "get-field", struct_get_field,
         TermList(get_global("any"), get_global("string")), get_global("any"));
 
     Term* set_field = quick_create_function(code, "set-field", struct_set_field,

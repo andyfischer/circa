@@ -125,6 +125,21 @@ Term* quick_create_function(Branch* branch, string name, Function::ExecuteFunc e
 	return term;
 }
 
+Term* quick_create_member_function(Branch* branch, Term* type, string name,
+        Function::ExecuteFunc executeFunc, TermList inputTypes, Term* outputType)
+{
+    as_type(type);
+
+    Term* term = create_constant(branch, get_global("Function"));
+    Function* func = as_function(term);
+    func->name = name;
+    func->execute = executeFunc;
+    func->inputTypes = inputTypes;
+    func->outputType = outputType;
+    as_type(type)->memberFunctions.bind(term, name);
+    return term;
+}
+
 Term* quick_create_subroutine(Branch* branch, string name, TermList inputTypes,
         Term* outputType)
 {
