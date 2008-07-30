@@ -2,6 +2,7 @@
 #include "common_headers.h"
 
 #include <tests/common.h>
+#include "bootstrapping.h"
 #include "branch.h"
 #include "builtins.h"
 #include "errors.h"
@@ -26,9 +27,18 @@ void test_math()
     test_assert(as_int(exec_function(branch, mult_f, TermList(negative_one,three))) == -3);
 }
 
+void test_string()
+{
+    Branch* branch = new Branch();
+
+    test_assert(as_string(quick_exec_function(branch, "concat(\"hello \", \"world\")"))
+            == "hello world");
+}
+
 void builtin_functions_test()
 {
     test_math();
+    test_string();
 }
 
 } // namespace circa

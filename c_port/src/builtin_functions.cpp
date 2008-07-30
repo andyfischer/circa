@@ -36,6 +36,11 @@ void mult(Term* caller)
     as_int(caller) = as_int(caller->inputs[0]) * as_int(caller->inputs[1]);
 }
 
+void string_concat(Term* caller)
+{
+    as_string(caller) = as_string(caller->inputs[0]) + as_string(caller->inputs[1]);
+}
+
 void list_apply(Term* caller)
 {
     as_function(caller->inputs[0]);
@@ -63,6 +68,7 @@ void initialize_builtin_functions(Branch* code)
     quick_create_function(code, "to-string", to_string, TermList(any_t), string_t);
     quick_create_function(code, "add", add, TermList(int_t, int_t), int_t);
     quick_create_function(code, "mult", mult, TermList(int_t, int_t), int_t);
+    quick_create_function(code, "concat", string_concat, TermList(string_t, string_t), string_t);
     quick_create_function(code, "print", print, TermList(string_t), void_t);
     quick_create_function(code, "list-apply", this_branch, TermList(function_t, list_t), void_t);
     quick_create_function(code, "this-branch", this_branch, TermList(), list_t);
