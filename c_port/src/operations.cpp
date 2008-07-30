@@ -18,6 +18,7 @@ Term* create_term(Branch* branch, Term* function, TermList inputs)
 
     // Add to branch
     branch->terms.append(term);
+    term->owningBranch = branch;
     
     return term;
 }

@@ -25,6 +25,8 @@ void test_math()
 
     test_assert(as_int(exec_function(branch, mult_f, TermList(two,three))) == 6);
     test_assert(as_int(exec_function(branch, mult_f, TermList(negative_one,three))) == -3);
+
+    test_assert(as_int(quick_exec_function(branch, "mult(5,3)")) == 15);
 }
 
 void test_string()

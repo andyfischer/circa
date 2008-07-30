@@ -46,6 +46,10 @@ void range(Term* caller)
     int max = as_int(caller->inputs[0]);
 
     as_list(caller)->clear();
+
+    for (int i=0; i < max; i++) {
+        as_list(caller)->append(constant_int(caller->owningBranch, i));
+    }
 }
 
 void list_apply(Term* caller)
@@ -77,6 +81,7 @@ void initialize_builtin_functions(Branch* code)
     quick_create_function(code, "mult", mult, TermList(int_t, int_t), int_t);
     quick_create_function(code, "concat", string_concat, TermList(string_t, string_t), string_t);
     quick_create_function(code, "print", print, TermList(string_t), void_t);
+    quick_create_function(code, "range", range, TermList(int_t), list_t);
     quick_create_function(code, "list-apply", this_branch, TermList(function_t, list_t), void_t);
     quick_create_function(code, "this-branch", this_branch, TermList(), list_t);
 }
