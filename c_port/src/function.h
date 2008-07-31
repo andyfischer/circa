@@ -8,12 +8,12 @@
 
 struct Function
 {
-    typedef void (*ExecuteFunc)(Term* caller);
+    typedef void (*ExecuteFunc)(Term caller);
 
     TermList inputTypes;
-    Term* outputType;
+    Term outputType;
 
-    Term* stateType;
+    Term stateType;
 
     // recycleInput is an index of which input we want to recycle.
     // This means that when executing, the runtime will do one of
@@ -33,7 +33,7 @@ struct Function
     string name;
 
     // Code
-    void (*initialize)(Term*);
+    void (*initialize)(Term);
     ExecuteFunc execute;
 
     Function();
@@ -41,14 +41,14 @@ struct Function
 
 extern "C" {
 
-bool is_function(Term* term);
-Function* as_function(Term*);
-void Function_alloc(Term* term);
-void Function_setPureFunction(Term* term, bool value);
-void Function_setName(Term* term, const char* value);
-void Function_setInputType(Term* term, int index, Term* type);
-void Function_setOutputType(Term* term, Term* type);
-void Function_setExecute(Term* term, void(*executeFunc)(Term*));
+bool is_function(Term term);
+Function* as_function(Term);
+void Function_alloc(Term term);
+void Function_setPureFunction(Term term, bool value);
+void Function_setName(Term term, const char* value);
+void Function_setInputType(Term term, int index, Term type);
+void Function_setOutputType(Term term, Term type);
+void Function_setExecute(Term term, void(*executeFunc)(Term));
 
 }
 

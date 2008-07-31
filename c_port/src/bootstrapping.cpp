@@ -9,10 +9,10 @@
 #include "operations.h"
 #include "subroutine.h"
 
-Term* quick_parse_function_call(Branch* branch, token::TokenStream &tstream)
+Term quick_parse_function_call(Branch* branch, token::TokenStream &tstream)
 {
 	std::string functionName = tstream.consume(token::IDENTIFIER);
-    Term* function = find_named(branch, functionName);
+    Term function = find_named(branch, functionName);
 
     tstream.consume(token::LPAREN);
 
@@ -27,20 +27,20 @@ Term* quick_parse_function_call(Branch* branch, token::TokenStream &tstream)
         
         // Check for identifier
         else if (tstream.nextIs(token::IDENTIFIER)) {
-            Term* term = find_named(branch, tstream.consume(token::IDENTIFIER));
+            Term term = find_named(branch, tstream.consume(token::IDENTIFIER));
             inputs.append(term);
         }
 
         // Check for string literal
         else if (tstream.nextIs(token::STRING)) {
-            Term* term = constant_string(branch, tstream.consume(token::STRING));
+            Term term = constant_string(branch, tstream.consume(token::STRING));
             inputs.append(term);
         }
 
         // Check for integer literal
         else if (tstream.nextIs(token::INTEGER)) {
             int value = atoi(tstream.consume(token::INTEGER).c_str());
-            Term* term = constant_int(branch, value);
+            Term term = constant_int(branch, value);
             inputs.append(term);
         }
 
@@ -52,12 +52,12 @@ Term* quick_parse_function_call(Branch* branch, token::TokenStream &tstream)
         }
     }
 
-    Term* result = apply_function(branch, function, inputs);
+    Term result = apply_function(branch, function, inputs);
 
     return result;
 }
 
-Term* quick_eval_function(Branch* branch, std::string input)
+Term quick_eval_function(Branch* branch, std::string input)
 {
     token::TokenList tokenList;
     token::tokenize(input, tokenList);
@@ -73,7 +73,7 @@ Term* quick_eval_function(Branch* branch, std::string input)
             tstream.consume(token::EQUALS);
         }
 
-        Term* result = quick_parse_function_call(branch, tstream);
+        Term result = quick_parse_function_call(branch, tstream);
 
         if (nameBinding != "")
             branch->bindName(result, nameBinding);
@@ -87,17 +87,17 @@ Term* quick_eval_function(Branch* branch, std::string input)
     }
 }
 
-Term* quick_exec_function(Branch* branch, std::string input)
+Term quick_exec_function(Branch* branch, std::string input)
 {
-    Term* result = quick_eval_function(branch,input);
+    Term result = quick_eval_function(branch,input);
     execute(result);
     return result;
 }
 
-Term* quick_create_type(Branch* branch, string name, Type::AllocFunc allocFunc,
+Term quick_create_type(Branch* branch, string name, Type::AllocFunc allocFunc,
         Function::ExecuteFunc toStringFunc, Type::CopyFunc copyFunc)
 {
-    Term* typeTerm = create_constant(branch, get_global("Type"));
+    Term typeTerm = create_constant(branch, get_global("Type"));
     as_type(typeTerm)->name = name;
     as_type(typeTerm)->alloc = allocFunc;
     as_type(typeTerm)->copy = copyFunc;
@@ -105,7 +105,7 @@ Term* quick_create_type(Branch* branch, string name, Type::AllocFunc allocFunc,
 
     // Create to-string function
     if (toStringFunc != NULL) {
-        Term* toString = create_constant(branch, get_global("Function"));
+        Term toString = create_constant(branch, get_global("Function"));
         as_function(toString)->name = name + "-to-string";
         as_function(toString)->execute = toStringFunc;
         as_function(toString)->inputTypes.setAt(0, typeTerm);
@@ -120,10 +120,10 @@ Term* quick_create_type(Branch* branch, string name, Type::AllocFunc allocFunc,
     return typeTerm;
 }
 
-Term* quick_create_function(Branch* branch, string name, Function::ExecuteFunc executeFunc,
-        TermList inputTypes, Term* outputType)
+Term quick_create_function(Branch* branch, string name, Function::ExecuteFunc executeFunc,
+        TermList inputTypes, Term outputType)
 {
-    Term* term = create_constant(branch, get_global("Function"));
+    Term term = create_constant(branch, get_global("Function"));
     Function* func = as_function(term);
     func->name = name;
     func->execute = executeFunc;
@@ -133,12 +133,12 @@ Term* quick_create_function(Branch* branch, string name, Function::ExecuteFunc e
 	return term;
 }
 
-Term* quick_create_member_function(Branch* branch, Term* type, string name,
-        Function::ExecuteFunc executeFunc, TermList inputTypes, Term* outputType)
+Term quick_create_member_function(Branch* branch, Term type, string name,
+        Function::ExecuteFunc executeFunc, TermList inputTypes, Term outputType)
 {
     as_type(type);
 
-    Term* term = create_constant(branch, get_global("Function"));
+    Term term = create_constant(branch, get_global("Function"));
     Function* func = as_function(term);
     func->name = name;
     func->execute = executeFunc;
@@ -148,10 +148,10 @@ Term* quick_create_member_function(Branch* branch, Term* type, string name,
     return term;
 }
 
-Term* quick_create_subroutine(Branch* branch, string name, TermList inputTypes,
-        Term* outputType)
+Term quick_create_subroutine(Branch* branch, string name, TermList inputTypes,
+        Term outputType)
 {
-    Term* term = create_constant(branch, get_global("Subroutine"));
+    Term term = create_constant(branch, get_global("Subroutine"));
     Subroutine* subroutine = as_subroutine(term);
     subroutine->name = name;
     subroutine->execute = Subroutine_execute;

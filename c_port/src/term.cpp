@@ -14,7 +14,7 @@
 
 int gNextGlobalID = 1;
 
-Term::Term()
+TermData::TermData()
   : owningBranch(NULL),
     function(NULL),
     value(NULL),
@@ -26,33 +26,33 @@ Term::Term()
 }
 
 Type*
-Term::getType() const
+TermData::getType() const
 {
     return as_type(this->type);
 }
 
 const char *
-Term::toString()
+TermData::toString()
 {
-    Term* result = apply_function(this->owningBranch,
+    Term result = apply_function(this->owningBranch,
             get_global("to-string"), TermList(this));
     execute(result);
     return as_string(result).c_str();
 }
 
 int
-Term::numErrors() const
+TermData::numErrors() const
 {
     return (int) errors.size();
 }
 
 std::string const&
-Term::getError(int index)
+TermData::getError(int index)
 {
     return errors[index];
 }
 
-int& as_int(Term* t)
+int& as_int(Term t)
 {
     if (t->type != BUILTIN_INT_TYPE)
         throw errors::TypeError(t, BUILTIN_INT_TYPE);
@@ -60,7 +60,7 @@ int& as_int(Term* t)
     return *((int*) t->value);
 }
 
-float& as_float(Term* t)
+float& as_float(Term t)
 {
     if (t->type != BUILTIN_FLOAT_TYPE)
         throw errors::TypeError(t, BUILTIN_FLOAT_TYPE);
@@ -68,7 +68,7 @@ float& as_float(Term* t)
     return *((float*) t->value);
 }
 
-bool& as_bool(Term* t)
+bool& as_bool(Term t)
 {
     if (t->type != BUILTIN_BOOL_TYPE)
         throw errors::TypeError(t, BUILTIN_BOOL_TYPE);
@@ -76,7 +76,7 @@ bool& as_bool(Term* t)
     return *((bool*) t->value);
 }
 
-string& as_string(Term* t)
+string& as_string(Term t)
 {
     if (t->type != BUILTIN_STRING_TYPE)
         throw errors::TypeError(t, BUILTIN_STRING_TYPE);
@@ -88,12 +88,12 @@ string& as_string(Term* t)
 }
 
 // TermList type
-void TermList_alloc(Term* caller)
+void TermList_alloc(Term caller)
 {
     caller->value = new TermList();
 }
 
-TermList* as_list(Term* term)
+TermList* as_list(Term term)
 {
     if (term->type != BUILTIN_LIST_TYPE)
         throw errors::TypeError(term, BUILTIN_LIST_TYPE);

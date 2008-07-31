@@ -10,13 +10,13 @@ TermList::count() const
 }
 
 void
-TermList::append(Term* term)
+TermList::append(Term term)
 {
     items.push_back(term);
 }
 
 void
-TermList::setAt(int index, Term* term)
+TermList::setAt(int index, Term term)
 {
     // Make sure there are enough blank elements in the list
     while (items.size() <= index) {
@@ -32,14 +32,14 @@ TermList::clear()
     items.clear();
 }
 
-Term* TermList::get(int index) const
+Term TermList::get(int index) const
 {
     if (index >= items.size())
         return NULL;
     return items[index];
 }
 
-Term* TermList::operator[](int index) const
+Term TermList::operator[](int index) const
 {
     return get(index);
 }

@@ -1,17 +1,15 @@
 #ifndef CIRCA__TYPE__INCLUDED
 #define CIRCA__TYPE__INCLUDED
 
-#include <string>
+#include "common_headers.h"
 
 #include "term_namespace.h"
 
-struct Term;
-
 struct Type
 {
-    typedef void (*AllocFunc)(Term* term);
-    typedef void (*DeallocFunc)(Term* term);
-    typedef void (*CopyFunc)(Term* src, Term* dest);
+    typedef void (*AllocFunc)(Term term);
+    typedef void (*DeallocFunc)(Term term);
+    typedef void (*CopyFunc)(Term src, Term dest);
 
     std::string name;
 
@@ -25,17 +23,17 @@ struct Type
     // argument.
     TermNamespace memberFunctions;
 
-    Term* toString;
+    Term toString;
 
     Type();
 };
 
-bool is_type(Term* term);
-Type* as_type(Term* term);
+bool is_type(Term term);
+Type* as_type(Term term);
 
-void Type_alloc(Term* caller);
+void Type_alloc(Term caller);
 
-void set_member_function(Term* type, std::string name, Term* function);
-Term* get_member_function(Term* type, std::string name);
+void set_member_function(Term type, std::string name, Term function);
+Term get_member_function(Term type, std::string name);
 
 #endif
