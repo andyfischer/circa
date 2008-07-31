@@ -20,8 +20,4 @@ Term quick_create_function(Branch* code, string name, Function::ExecuteFunc exec
 Term quick_create_member_function(Branch* code, Term type, string name,
         Function::ExecuteFunc, TermList inputTypes, Term outputType);
 
-// Create a new Subroutine
-Term quick_create_subroutine(Branch* branch, string name, TermList inputTypes,
-        Term outputType);
-
 #endif

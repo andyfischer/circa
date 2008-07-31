@@ -147,23 +147,3 @@ Term quick_create_member_function(Branch* branch, Term type, string name,
     as_type(type)->memberFunctions.bind(term, name);
     return term;
 }
-
-Term quick_create_subroutine(Branch* branch, string name, TermList inputTypes,
-        Term outputType)
-{
-    Term term = create_constant(branch, get_global("Subroutine"));
-    Subroutine* subroutine = as_subroutine(term);
-    subroutine->name = name;
-    subroutine->execute = Subroutine_execute;
-    subroutine->inputTypes = inputTypes;
-    subroutine->outputType = outputType;
-
-    // Create input placeholders
-    for (int inputIndex=0; inputIndex < inputTypes.count(); inputIndex++) {
-        subroutine->inputPlaceholders.setAt(inputIndex,
-                create_constant(subroutine->branch, inputTypes[inputIndex]));
-    }
-
-    branch->bindName(term, name);
-    return term;
-}
