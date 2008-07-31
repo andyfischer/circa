@@ -5,22 +5,19 @@
 
 #include "function.h"
 
-class Branch;
-class Term;
-
 struct Subroutine : public Function
 {
     Branch* branch;
 
     TermList inputPlaceholders;
-    Term* outputPlaceholder;
+    Term outputPlaceholder;
 
     Subroutine();
 };
 
-Subroutine* as_subroutine(Term*);
+Subroutine* as_subroutine(Term);
 
-void Subroutine_execute(Term* caller);
+void Subroutine_execute(Term caller);
 
 void initialize_subroutine(Branch* kernel);
 

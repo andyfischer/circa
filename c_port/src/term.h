@@ -1,27 +1,25 @@
 #ifndef CIRCA__TERM__INCLUDED
 #define CIRCA__TERM__INCLUDED
 
-#include <vector>
-
+#include "common_headers.h"
 #include "term_list.h"
 
-class Branch;
-class Type;
-class Term;
+struct Branch;
+struct Type;
 
 typedef std::vector<std::string> ErrorList;
 
-struct Term
+struct TermData
 {
     Branch* owningBranch;
     TermList inputs;
-    Term* function;
-    std::vector<Term*> users;
+    Term function;
+    std::vector<Term> users;
 
     void* value;
-    Term* type;
+    Term type;
 
-    Term* state;
+    Term state;
 
     bool needsUpdate;
 
@@ -29,7 +27,7 @@ struct Term
 
     int globalID;
 
-    Term();
+    TermData();
 
     Type* getType() const;
     const char* toString();
@@ -38,12 +36,12 @@ struct Term
     std::string const& getError(int index);
 };
 
-int& as_int(Term* t);
-float& as_float(Term* t);
-bool& as_bool(Term* t);
-string& as_string(Term* t);
+int& as_int(Term t);
+float& as_float(Term t);
+bool& as_bool(Term t);
+string& as_string(Term t);
 
-TermList* as_list(Term* term);
+TermList* as_list(Term term);
 
 void initialize_term(Branch* kernel);
 

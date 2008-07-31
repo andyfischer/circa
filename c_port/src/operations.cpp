@@ -9,11 +9,11 @@
 #include "term.h"
 #include "type.h"
 
-Term* create_term(Branch* branch, Term* function, TermList inputs)
+Term create_term(Branch* branch, Term function, TermList inputs)
 {
     if (!is_function(function))
         throw errors::InternalError("2nd arg to create_term must be a function");
-    Term* term = new Term();
+    Term term = new TermData();
     initialize_term(term, function, inputs);
 
     // Add to branch
@@ -23,7 +23,7 @@ Term* create_term(Branch* branch, Term* function, TermList inputs)
     return term;
 }
 
-void initialize_term(Term* term, Term* function, TermList inputs)
+void initialize_term(Term term, Term function, TermList inputs)
 {
     if (term == NULL)
         throw errors::InternalError("Term is NULL");
@@ -34,8 +34,8 @@ void initialize_term(Term* term, Term* function, TermList inputs)
     term->function = function;
     Function* functionData = as_function(function);
 
-    Term* outputType = functionData->outputType;
-    // Term* stateType = functionData->stateType;
+    Term outputType = functionData->outputType;
+    // Term stateType = functionData->stateType;
 
     if (outputType == NULL)
         throw errors::InternalError("outputType is NULL");
@@ -50,17 +50,17 @@ void initialize_term(Term* term, Term* function, TermList inputs)
     }
 }
 
-void set_inputs(Term* term, TermList inputs)
+void set_inputs(Term term, TermList inputs)
 {
     term->inputs = inputs;
 }
 
-Term* create_constant(Branch* branch, Term* type)
+Term create_constant(Branch* branch, Term type)
 {
     return create_term(branch, get_const_function(branch, type), TermList());
 }
 
-void change_type(Term* term, Term* type)
+void change_type(Term term, Term type)
 {
     if (term->value != NULL)
         throw errors::InternalError("value is not NULL in change_type (possible memory leak)");
@@ -75,7 +75,7 @@ void change_type(Term* term, Term* type)
     alloc(term);
 }
 
-void specialize_type(Term* term, Term* type)
+void specialize_type(Term term, Term type)
 {
     if (term->type != BUILTIN_ANY_TYPE)
         throw errors::TypeError(term, BUILTIN_ANY_TYPE);
@@ -83,12 +83,12 @@ void specialize_type(Term* term, Term* type)
     change_type(term, type);
 }
 
-void set_input(Term* term, int index, Term* input)
+void set_input(Term term, int index, Term input)
 {
     term->inputs.setAt(index, input);
 }
 
-void execute(Term* term)
+void execute(Term term)
 {
     if (term->function == NULL)
         throw errors::InternalError("function term is NULL");
@@ -136,12 +136,12 @@ void execute_branch(Branch* branch)
 {
     int count = branch->terms.count();
     for (int index=0; index < count; index++) {
-		Term* term = branch->terms[index];
+		Term term = branch->terms[index];
         execute(term);
     }
 }
 
-Term* apply_function(Branch* branch, Term* function, TermList inputs)
+Term apply_function(Branch* branch, Term function, TermList inputs)
 {
     // Check if 'function' is actually a type
     if (is_type(function))
@@ -153,21 +153,21 @@ Term* apply_function(Branch* branch, Term* function, TermList inputs)
     return create_term(branch, function, inputs);
 }
 
-Term* exec_function(Branch* branch, Term* function, TermList inputs)
+Term exec_function(Branch* branch, Term function, TermList inputs)
 {
-    Term* result = apply_function(branch, function, inputs);
+    Term result = apply_function(branch, function, inputs);
     execute(result);
     return result;
 }
 
-Term* get_const_function(Branch* branch, Term* type)
+Term get_const_function(Branch* branch, Term type)
 {
-    Term* result = apply_function(branch, get_global("const-generator"), TermList(type));
+    Term result = apply_function(branch, get_global("const-generator"), TermList(type));
     execute(result);
     return result;
 }
 
-void change_function(Term* term, Term* new_function)
+void change_function(Term term, Term new_function)
 {
     if (new_function->type != BUILTIN_FUNCTION_TYPE)
         throw errors::TypeError(new_function, BUILTIN_FUNCTION_TYPE);
@@ -175,7 +175,7 @@ void change_function(Term* term, Term* new_function)
     term->function = new_function;
 }
 
-void copy_term(Term* source, Term* dest)
+void copy_term(Term source, Term dest)
 {
     if (source->type != dest->type)
         throw errors::TypeError(dest, source->type);
@@ -189,7 +189,7 @@ void copy_term(Term* source, Term* dest)
     copy(source,dest);
 }
 
-void steal_value(Term* source, Term* dest)
+void steal_value(Term source, Term dest)
 {
     // Todo: delete the value at dest
     dest->value = source->value;
@@ -197,7 +197,7 @@ void steal_value(Term* source, Term* dest)
     source->needsUpdate = true;
 }
 
-Term* find_named(Branch* branch, std::string name)
+Term find_named(Branch* branch, std::string name)
 {
     if (branch->containsName(name))
         return branch->getNamed(name);
@@ -205,23 +205,23 @@ Term* find_named(Branch* branch, std::string name)
     return get_global(name);
 }
 
-Term* constant_string(Branch* branch, std::string s)
+Term constant_string(Branch* branch, std::string s)
 {
-    Term* term = apply_function(branch, get_global("string"), TermList());
+    Term term = apply_function(branch, get_global("string"), TermList());
     as_string(term) = s;
     return term;
 }
 
-Term* constant_int(Branch* branch, int i)
+Term constant_int(Branch* branch, int i)
 {
-    Term* term = apply_function(branch, get_global("int"), TermList());
+    Term term = apply_function(branch, get_global("int"), TermList());
     as_int(term) = i;
     return term;
 }
 
-Term* constant_list(Branch* branch, TermList list)
+Term constant_list(Branch* branch, TermList list)
 {
-    Term* term = apply_function(branch, get_global("List"), TermList());
+    Term term = apply_function(branch, get_global("List"), TermList());
     *as_list(term) = list;
     return term;
 }

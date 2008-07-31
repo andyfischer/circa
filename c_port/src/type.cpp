@@ -15,13 +15,13 @@ Type::Type()
 {
 }
 
-bool is_type(Term* term)
+bool is_type(Term term)
 {
     return ((term->type == BUILTIN_TYPE_TYPE)
             || (term->type == BUILTIN_STRUCT_DEFINITION_TYPE));
 }
 
-Type* as_type(Term* term)
+Type* as_type(Term term)
 {
     if (!is_type(term))
         throw errors::TypeError(term, BUILTIN_TYPE_TYPE);
@@ -29,12 +29,12 @@ Type* as_type(Term* term)
     return (Type*) term->value;
 }
 
-void Type_alloc(Term* caller)
+void Type_alloc(Term caller)
 {
     caller->value = new Type();
 }
 
-void set_member_function(Term* type, std::string name, Term* function)
+void set_member_function(Term type, std::string name, Term function)
 {
     Type* typeData = as_type(type);
     as_function(function);
@@ -42,7 +42,7 @@ void set_member_function(Term* type, std::string name, Term* function)
     typeData->memberFunctions.bind(function, name);
 }
 
-Term* get_member_function(Term* type, std::string name)
+Term get_member_function(Term type, std::string name)
 {
     return as_type(type)->memberFunctions[name];
 }

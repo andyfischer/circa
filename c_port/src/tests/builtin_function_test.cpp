@@ -14,11 +14,11 @@ void test_math()
 {
     Branch* branch = new Branch();
 
-    Term* two = constant_int(branch, 2);
-    Term* three = constant_int(branch, 3);
-    Term* negative_one = constant_int(branch, -1);
-    Term* add_f = get_global("add");
-    Term* mult_f = get_global("mult");
+    Term two = constant_int(branch, 2);
+    Term three = constant_int(branch, 3);
+    Term negative_one = constant_int(branch, -1);
+    Term add_f = get_global("add");
+    Term mult_f = get_global("mult");
 
     test_assert(as_int(exec_function(branch, add_f, TermList(two,three))) == 5);
     test_assert(as_int(exec_function(branch, add_f, TermList(two,negative_one))) == 1);
