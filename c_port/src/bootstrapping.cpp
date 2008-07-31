@@ -158,7 +158,7 @@ Term* quick_create_subroutine(Branch* branch, string name, TermList inputTypes,
     subroutine->inputTypes = inputTypes;
     subroutine->outputType = outputType;
 
-    // Create input & output placeholders
+    // Create input placeholders
     for (int inputIndex=0; inputIndex < inputTypes.count(); inputIndex++) {
         subroutine->inputPlaceholders.setAt(inputIndex,
                 create_constant(subroutine->branch, inputTypes[inputIndex]));

@@ -50,6 +50,30 @@ void Subroutine_execute(Term* caller)
         copy_term(sub->outputPlaceholder, caller);
 }
 
+void subroutine_create(Term* caller)
+{
+    // 0: name (string)
+    // 1: inputTypes (list of type)
+    // 2: outputType (type)
+
+    as_string(caller->inputs[0]);
+    as_list(caller->inputs[1]);
+    as_type(caller->inputs[2]);
+
+    Subroutine* sub = as_subroutine(caller);
+    sub->name = as_string(caller->inputs[0]);
+    sub->execute = Subroutine_execute;
+    sub->inputTypes = *as_list(caller->inputs[1]);
+    sub->outputType = caller->inputs[2];
+
+    // Create input placeholders
+    for (int inputIndex=0; inputIndex < sub->inputTypes.count(); inputIndex++) {
+        sub->inputPlaceholders.setAt(inputIndex,
+                create_constant(sub->branch, sub->inputTypes[inputIndex]));
+    }
+    
+}
+
 void subroutine_name_inputs(Term* caller)
 {
     // Recycles input 0
@@ -64,6 +88,11 @@ void subroutine_name_inputs(Term* caller)
 void initialize_subroutine(Branch* kernel)
 {
     BUILTIN_SUBROUTINE_TYPE = quick_create_type(KERNEL, "Subroutine", Subroutine_alloc, NULL);
+
+    quick_create_function(KERNEL, "subroutine-create", subroutine_create,
+            TermList(get_global("string"),get_global("List"),get_global("Type")),
+            BUILTIN_SUBROUTINE_TYPE);
+
     Term* name_inputs = quick_create_function(KERNEL,
             "subroutine-name-inputs", subroutine_name_inputs,
             TermList(BUILTIN_SUBROUTINE_TYPE, get_global("List")), BUILTIN_SUBROUTINE_TYPE);

@@ -14,8 +14,11 @@ namespace circa {
 void test_simple()
 {
     Branch *branch = new Branch();
-    Term* my_sub = quick_create_subroutine(branch, "my-sub",
-        TermList(get_global("int"), get_global("int")), get_global("int"));
+
+
+    Term* my_sub = quick_exec_function(branch,
+        "my-sub = subroutine-create(\"my-sub\", create-list(int,int), int)");
+
     Subroutine* sub = as_subroutine(my_sub);
 
     // Try to create this formula:
@@ -48,7 +51,13 @@ void test_simple2()
     Term* int_t = get_global("int");
     Term* string_t = get_global("string");
 
-    Term* print_term = quick_create_subroutine(branch, "print-term", TermList(string_t), void_t);
+    Term* list_with_string = constant_list(branch, TermList(string_t));
+    branch->bindName(list_with_string, "list-with-string_t");
+
+    Term* print_term = quick_exec_function(branch,
+        "subroutine-create(\"print-term\",list-with-string_t,void)");
+
+    //Term* print_term = quick_create_subroutine(branch, "print-term", TermList(string_t), void_t);
 
     Term* input_names = constant_list(branch, TermList(constant_string(branch, "t")));
     print_term = exec_function(branch, get_global("subroutine-name-inputs"),
@@ -63,6 +72,7 @@ void test_simple2()
 void subroutine_test()
 {
     test_simple();
+    test_simple2();
 }
 
 }
