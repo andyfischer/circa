@@ -64,7 +64,7 @@ void test_simple2()
             TermList(print_term, input_names));
     branch->bindName(print_term, "print-term");
 
-    quick_exec_function(as_subroutine(print_term)->branch, "print(to-string(t))");
+    quick_eval_function(as_subroutine(print_term)->branch, "print(to-string(t))");
 
     quick_exec_function(branch, "print-term(\"test\")");
 }
