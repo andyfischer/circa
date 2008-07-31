@@ -21,7 +21,10 @@ void test_list_apply()
 {
     Branch* branch = new Branch();
 
-    quick_exec_function(branch, "list-apply(print, list-apply(to-string, range(5)))");
+    Term* result = quick_exec_function(branch, "list-apply(to-string, range(5))");
+    
+    test_assert(as_string(as_list(result)->get(0)) == "0");
+    test_assert(as_string(as_list(result)->get(4)) == "4");
 }
 
 void list_test()
