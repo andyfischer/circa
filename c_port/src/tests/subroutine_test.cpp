@@ -69,10 +69,15 @@ void test_simple2()
     quick_exec_function(branch, "print-term(\"test\")");
 }
 
+void test_call_stack()
+{
+
+}
+
 void subroutine_test()
 {
     test_simple();
-    test_simple2();
+    //test_simple2();
 }
 
 }
