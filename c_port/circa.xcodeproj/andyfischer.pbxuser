@@ -14,7 +14,7 @@
 			B6A243D30E356F90007F2BEB /* errors.h:25 */,
 			B6A244380E3F7F70007F2BEB /* operations.cpp:137 */,
 			B6A244480E40233A007F2BEB /* subroutine_test.cpp:34 */,
-			B6A244600E40CF0B007F2BEB /* main.cpp:18 */,
+			B66935AF0E43770F00A75360 /* main.cpp:43 */,
 		);
 		codeSenseManager = B6F1149E0E33392200B8BA44 /* Code sense */;
 		executables = (
@@ -72,8 +72,12 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 238381198;
-			PBXWorkspaceStateSaveDate = 238381198;
+			PBXPerProjectTemplateStateSaveDate = 239301852;
+			PBXWorkspaceStateSaveDate = 239301852;
+		};
+		perUserProjectItems = {
+			B66935B50E43778600A75360 /* PBXTextBookmark */ = B66935B50E43778600A75360 /* PBXTextBookmark */;
+			B66935B60E43778600A75360 /* PBXTextBookmark */ = B66935B60E43778600A75360 /* PBXTextBookmark */;
 		};
 		sourceControlManager = B6F1149D0E33392200B8BA44 /* Source Control */;
 		userBuildSettings = {
@@ -85,6 +89,40 @@
 			B6F114970E33391C00B8BA44 /* circa */,
 		);
 	};
+	B66935AF0E43770F00A75360 /* main.cpp:43 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = B6A243B20E356E26007F2BEB /* main.cpp */;
+		functionName = "run()";
+		hitCount = 1;
+		ignoreCount = 0;
+		lineNumber = 43;
+		location = circa;
+		modificationTime = 239302511.196067;
+		state = 1;
+	};
+	B66935B50E43778600A75360 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B6A243B20E356E26007F2BEB /* main.cpp */;
+		rLen = 0;
+		rLoc = 42;
+		rType = 1;
+	};
+	B66935B60E43778600A75360 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B6A243B20E356E26007F2BEB /* main.cpp */;
+		name = "main.cpp: 43";
+		rLen = 0;
+		rLoc = 987;
+		rType = 0;
+		vrLen = 707;
+		vrLoc = 414;
+	};
 	B6A243A40E3568EB007F2BEB /* errors.cpp */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {715, 364}}";
@@ -95,9 +133,9 @@
 	};
 	B6A243B20E356E26007F2BEB /* main.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {675, 364}}";
-			sepNavSelRange = "{356, 0}";
-			sepNavVisRange = "{138, 218}";
+			sepNavIntBoundsRect = "{{0, 0}, {691, 924}}";
+			sepNavSelRange = "{987, 0}";
+			sepNavVisRange = "{414, 707}";
 			sepNavWindowFrame = "{{43, 46}, {750, 558}}";
 		};
 	};
@@ -114,7 +152,7 @@
 		ignoreCount = 0;
 		lineNumber = 13;
 		location = circa;
-		modificationTime = 239248459.808752;
+		modificationTime = 239302511.141954;
 		state = 1;
 	};
 	B6A243C60E356F1B007F2BEB /* errors.cpp:15 */ = {
@@ -131,7 +169,7 @@
 		ignoreCount = 0;
 		lineNumber = 15;
 		location = circa;
-		modificationTime = 239248459.229725;
+		modificationTime = 239302509.897973;
 		state = 1;
 	};
 	B6A243D30E356F90007F2BEB /* errors.h:25 */ = {
@@ -148,7 +186,7 @@
 		ignoreCount = 0;
 		lineNumber = 25;
 		location = circa;
-		modificationTime = 239248459.229734;
+		modificationTime = 239302509.89798;
 		state = 1;
 	};
 	B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */ = {
@@ -209,7 +247,7 @@
 		ignoreCount = 0;
 		lineNumber = 137;
 		location = circa;
-		modificationTime = 239248459.229743;
+		modificationTime = 239302509.897987;
 		state = 2;
 	};
 	B6A244410E401F16007F2BEB /* struct_test.cpp */ = {
@@ -234,25 +272,8 @@
 		ignoreCount = 0;
 		lineNumber = 34;
 		location = circa;
-		modificationTime = 239248459.229751;
+		modificationTime = 239302509.897995;
 		state = 2;
-	};
-	B6A244600E40CF0B007F2BEB /* main.cpp:18 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = B6A243B20E356E26007F2BEB /* main.cpp */;
-		functionName = "run()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 18;
-		location = circa;
-		modificationTime = 239248459.229759;
-		state = 1;
 	};
 	B6F114970E33391C00B8BA44 /* circa */ = {
 		isa = PBXExecutable;
@@ -261,7 +282,7 @@
 		argumentStrings = (
 		);
 		autoAttachOnCrash = 1;
-		breakpointsEnabled = 0;
+		breakpointsEnabled = 1;
 		configStateDict = {
 		};
 		customDataFormattersEnabled = 1;

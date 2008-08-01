@@ -15,10 +15,15 @@ Subroutine::Subroutine()
 
 Subroutine* as_subroutine(Term term)
 {
-    if (term->type != BUILTIN_SUBROUTINE_TYPE)
+    if (!is_subroutine(term))
         throw errors::TypeError(term, BUILTIN_SUBROUTINE_TYPE);
 
     return (Subroutine*) term->value;
+}
+
+bool is_subroutine(Term term)
+{
+    return term->type == BUILTIN_SUBROUTINE_TYPE;
 }
 
 void Subroutine_alloc(Term term)
@@ -71,7 +76,6 @@ void subroutine_create(Term caller)
         sub->inputPlaceholders.setAt(inputIndex,
                 create_constant(sub->branch, sub->inputTypes[inputIndex]));
     }
-    
 }
 
 void subroutine_name_inputs(Term caller)

@@ -147,4 +147,10 @@ void initialize_bootstrapped_code(Branch* kernel)
         "sub-append-function = subroutine-name-inputs(sub-append-function, list('sub,'func,'inputs))");
     quick_exec_function(kernel,
         "sub-append-function = function-recycle-input(sub-append-function,0)");
+    // to finish
 }
+
+// should there be places where 'current-subroutine' or 'current-branch' are defined?
+
+// when I print out the contents of a subroutine..
+// some term pointers point inside the subroutine, some point to the input placeholders

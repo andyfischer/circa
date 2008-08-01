@@ -8,6 +8,10 @@
 #include "operations.h"
 #include "term.h"
 
+Branch::Branch()
+{
+}
+
 void Branch::append(Term term)
 {
     this->terms.append(term);

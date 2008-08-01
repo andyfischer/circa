@@ -10,7 +10,8 @@ struct Branch
 {
     TermList terms;
     TermNamespace names;
-    Term owningTerm;
+
+    Branch();
 
     void append(Term term);
 
