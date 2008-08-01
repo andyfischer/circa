@@ -37,6 +37,12 @@ Term quick_parse_function_call(Branch* branch, token::TokenStream &tstream)
             inputs.append(term);
         }
 
+        // Check for quoted identifier, treat it like a string
+        else if (tstream.nextIs(token::QUOTED_IDENTIFIER)) {
+            Term term = constant_string(branch, tstream.consume(token::QUOTED_IDENTIFIER));
+            inputs.append(term);
+        }
+
         // Check for integer literal
         else if (tstream.nextIs(token::INTEGER)) {
             int value = atoi(tstream.consume(token::INTEGER).c_str());
@@ -133,17 +139,9 @@ Term quick_create_function(Branch* branch, string name, Function::ExecuteFunc ex
 	return term;
 }
 
-Term quick_create_member_function(Branch* branch, Term type, string name,
-        Function::ExecuteFunc executeFunc, TermList inputTypes, Term outputType)
+void initialize_bootstrapped_code(Branch* kernel)
 {
-    as_type(type);
-
-    Term term = create_constant(branch, get_global("Function"));
-    Function* func = as_function(term);
-    func->name = name;
-    func->execute = executeFunc;
-    func->inputTypes = inputTypes;
-    func->outputType = outputType;
-    as_type(type)->memberFunctions.bind(term, name);
-    return term;
+    quick_exec_function(kernel,
+        "sub-append-function = subroutine-create('sub-append-function,list(Subroutine,Function,List),Subroutine)");
+    //quick_exec_function(kernel, "sub-append-function = subroutine-name-inputs");
 }

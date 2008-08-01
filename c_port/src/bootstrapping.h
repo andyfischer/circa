@@ -17,7 +17,6 @@ Term quick_create_type(Branch* code, string name, Type::AllocFunc allocFunc,
 Term quick_create_function(Branch* code, string name, Function::ExecuteFunc executeFunc,
         TermList inputTypes, Term outputType);
 
-Term quick_create_member_function(Branch* code, Term type, string name,
-        Function::ExecuteFunc, TermList inputTypes, Term outputType);
+void initialize_bootstrapped_code(Branch* kernel);
 
 #endif

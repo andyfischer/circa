@@ -11,6 +11,7 @@ const char * IDENTIFIER = "IDENTIFIER";
 const char * INTEGER = "INTEGER";
 const char * FLOAT = "FLOAT";
 const char * STRING = "STRING";
+const char * QUOTED_IDENTIFIER = "QUOTED_IDENTIFIER";
 const char * WHITESPACE = "WHITESPACE";
 const char * NEWLINE = "NEWLINE";
 const char * UNRECOGNIZED = "UNRECOGNIZED";
@@ -58,6 +59,7 @@ void consume_identifier(TokenizeContext &context);
 void consume_whitespace(TokenizeContext &context);
 void consume_number(TokenizeContext &context);
 void consume_string_literal(TokenizeContext &context);
+void consume_quoted_identifier(TokenizeContext &context);
 
 void tokenize(std::string const &input, std::vector<TokenInstance> &results)
 {
@@ -125,6 +127,9 @@ void top_level_consume_token(TokenizeContext &context)
             return;
         case '"':
             consume_string_literal(context);
+            return;
+        case '\'':
+            consume_quoted_identifier(context);
             return;
     }
 
@@ -203,9 +208,18 @@ void consume_string_literal(TokenizeContext &context)
     context.pushResult(STRING, text.str());
 }
 
-void debug_print_token_list(std::ostream &stream, TokenList &tokens)
+void consume_quoted_identifier(TokenizeContext &context)
 {
+    std::stringstream text;
 
+    // consume quote mark
+    context.consume();
+
+    while (is_acceptable_inside_identifier(context.next())) {
+        text << context.consume();
+    }
+
+    context.pushResult(STRING, text.str());
 }
 
 } // namespace token

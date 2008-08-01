@@ -17,7 +17,7 @@ void test_simple()
 
 
     Term my_sub = quick_exec_function(branch,
-        "my-sub = subroutine-create(\"my-sub\", create-list(int,int), int)");
+        "my-sub = subroutine-create(\"my-sub\", list(int,int), int)");
 
     Subroutine* sub = as_subroutine(my_sub);
 

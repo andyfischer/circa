@@ -73,7 +73,7 @@ void initialize_branch(Branch* kernel)
 
     Term apply_function = quick_create_function(kernel, "apply-function",
         branch_apply_function,
-        TermList(BUILTIN_BRANCH_TYPE, get_global("Reference"), get_global("List")),
+        TermList(BUILTIN_BRANCH_TYPE, get_global("Function"), get_global("List")),
         BUILTIN_BRANCH_TYPE);
     as_function(apply_function)->recycleInput = 0;
 }

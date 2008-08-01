@@ -96,7 +96,7 @@ void initialize_builtin_functions(Branch* code)
     quick_create_function(code, "mult", mult, TermList(int_t, int_t), int_t);
     quick_create_function(code, "concat", string_concat, TermList(string_t, string_t), string_t);
     quick_create_function(code, "print", print, TermList(string_t), void_t);
-    quick_create_function(code, "create-list", create_list, TermList(any_t), list_t);
+    quick_create_function(code, "list", create_list, TermList(any_t), list_t);
     quick_create_function(code, "range", range, TermList(int_t), list_t);
     quick_create_function(code, "list-apply", list_apply, TermList(function_t, list_t), list_t);
     quick_create_function(code, "this-branch", this_branch, TermList(), list_t);

@@ -7,7 +7,7 @@
 
 struct Subroutine : public Function
 {
-    Branch* branch;
+    Branch* branch; // <-- needs to be a Term I think
 
     TermList inputPlaceholders;
     Term outputPlaceholder;
