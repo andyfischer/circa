@@ -16,6 +16,7 @@ struct Subroutine : public Function
 };
 
 Subroutine* as_subroutine(Term);
+bool is_subroutine(Term);
 
 void Subroutine_execute(Term caller);
 
