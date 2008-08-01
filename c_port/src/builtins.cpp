@@ -58,17 +58,17 @@ void bootstrap_kernel()
     // Create const-generator function
     Term constGenerator = new TermData();
     Function_alloc(constGenerator);
-    Function_setName(constGenerator, "const-generator");
-    Function_setPureFunction(constGenerator, true);
-    Function_setExecute(constGenerator, const_generator);
+    as_function(constGenerator)->name = "const-generator";
+    as_function(constGenerator)->pureFunction = true;
+    as_function(constGenerator)->execute = const_generator;
     KERNEL->bindName(constGenerator, "const-generator");
 
     // Create const-Type function
     Term constTypeFunc = new TermData();
     constTypeFunc->function = constGenerator;
     Function_alloc(constTypeFunc);
-    Function_setName(constTypeFunc, "const-Type");
-    Function_setPureFunction(constTypeFunc, true);
+    as_function(constTypeFunc)->name = "const-Type";
+    as_function(constTypeFunc)->pureFunction = true;
 
     // Create Type type
     Term typeType = new TermData();
@@ -82,15 +82,15 @@ void bootstrap_kernel()
 
     // Implant the Type type
     set_input(constTypeFunc, 0, typeType);
-    Function_setInputType(constGenerator, 0, typeType);
-    Function_setOutputType(constTypeFunc, typeType);
+    as_function(constGenerator)->inputTypes.setAt(0, typeType);
+    as_function(constTypeFunc)->outputType = typeType;
 
     // Create const-Function function
     Term constFuncFunc = new TermData();
     constFuncFunc->function = constGenerator;
     Function_alloc(constFuncFunc);
-    Function_setName        (constFuncFunc, "const-Function");
-    Function_setPureFunction(constFuncFunc, true);
+    as_function(constFuncFunc)->name = "const-Function";
+    as_function(constFuncFunc)->pureFunction = true;
     KERNEL->bindName(constFuncFunc, "const-Function");
 
     // Implant const-Function
@@ -112,8 +112,8 @@ void bootstrap_kernel()
     constGenerator->type = functionType;
     constFuncFunc->type = functionType;
     constTypeFunc->type = functionType;
-    Function_setOutputType(constGenerator, functionType);
-    Function_setOutputType(constFuncFunc, functionType);
+    as_function(constGenerator)->outputType = functionType;
+    as_function(constFuncFunc)->outputType = functionType;
 
     // Don't let these terms get updated
     constGenerator->needsUpdate = false;
@@ -205,6 +205,7 @@ void initialize()
 
         initialize_branch(KERNEL);
         initialize_builtin_functions(KERNEL);
+        initialize_functions(KERNEL);
         initialize_structs(KERNEL);
         initialize_subroutine(KERNEL);
 

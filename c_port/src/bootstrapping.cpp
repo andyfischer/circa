@@ -143,5 +143,8 @@ void initialize_bootstrapped_code(Branch* kernel)
 {
     quick_exec_function(kernel,
         "sub-append-function = subroutine-create('sub-append-function,list(Subroutine,Function,List),Subroutine)");
-    //quick_exec_function(kernel, "sub-append-function = subroutine-name-inputs");
+    quick_exec_function(kernel,
+        "sub-append-function = subroutine-name-inputs(sub-append-function, list('sub,'func,'inputs))");
+    quick_exec_function(kernel,
+        "sub-append-function = function-recycle-input(sub-append-function,0)");
 }
