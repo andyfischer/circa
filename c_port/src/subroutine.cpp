@@ -85,16 +85,25 @@ void subroutine_name_inputs(Term caller)
     }
 }
 
+void subroutine_get_branch(Term caller)
+{
+    Subroutine* sub = as_subroutine(caller->inputs[0]);
+    *as_branch(caller) = *sub->branch;
+}
+
 void initialize_subroutine(Branch* kernel)
 {
-    BUILTIN_SUBROUTINE_TYPE = quick_create_type(KERNEL, "Subroutine", Subroutine_alloc, NULL);
+    BUILTIN_SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine", Subroutine_alloc, NULL);
 
-    quick_create_function(KERNEL, "subroutine-create", subroutine_create,
+    quick_create_function(kernel, "subroutine-create", subroutine_create,
             TermList(get_global("string"),get_global("List"),get_global("Type")),
             BUILTIN_SUBROUTINE_TYPE);
 
-    Term name_inputs = quick_create_function(KERNEL,
+    Term name_inputs = quick_create_function(kernel,
             "subroutine-name-inputs", subroutine_name_inputs,
             TermList(BUILTIN_SUBROUTINE_TYPE, get_global("List")), BUILTIN_SUBROUTINE_TYPE);
     as_function(name_inputs)->recycleInput = 0;
+
+    quick_create_function(kernel, "subroutine-get-branch", subroutine_get_branch,
+            TermList(BUILTIN_SUBROUTINE_TYPE), get_global("Branch"));
 }

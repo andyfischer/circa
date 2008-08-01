@@ -208,6 +208,8 @@ void initialize()
         initialize_structs(KERNEL);
         initialize_subroutine(KERNEL);
 
+        initialize_bootstrapped_code(KERNEL);
+
     } catch (errors::CircaError& e)
     {
         std::cout << "An error occured while initializing." << std::endl;
