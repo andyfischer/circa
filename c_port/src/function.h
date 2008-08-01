@@ -39,17 +39,11 @@ struct Function
     Function();
 };
 
-extern "C" {
 
+void Function_alloc(Term caller);
 bool is_function(Term term);
 Function* as_function(Term);
-void Function_alloc(Term term);
-void Function_setPureFunction(Term term, bool value);
-void Function_setName(Term term, const char* value);
-void Function_setInputType(Term term, int index, Term type);
-void Function_setOutputType(Term term, Term type);
-void Function_setExecute(Term term, void(*executeFunc)(Term));
 
-}
+void initialize_functions(Branch* kernel);
 
 #endif

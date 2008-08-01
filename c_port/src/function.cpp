@@ -1,5 +1,6 @@
 
 #include "builtins.h"
+#include "bootstrapping.h"
 #include "errors.h"
 #include "function.h"
 
@@ -30,23 +31,17 @@ void Function_alloc(Term caller)
 {
     caller->value = new Function();
 }
-void Function_setPureFunction(Term term, bool value)
+
+void function_recycle_input(Term caller)
 {
-    as_function(term)->pureFunction = value;
+    // Recycles input 0
+    as_function(caller)->recycleInput = as_int(caller->inputs[1]);
 }
-void Function_setName(Term term, const char* value)
+
+void initialize_functions(Branch* kernel)
 {
-    as_function(term)->name = value;
-}
-void Function_setInputType(Term term, int index, Term type)
-{
-    as_function(term)->inputTypes.setAt(index, type);
-}
-void Function_setOutputType(Term term, Term type)
-{
-    as_function(term)->outputType = type;
-}
-void Function_setExecute(Term term, void(*executeFunc)(Term))
-{
-    as_function(term)->execute = executeFunc;
+    Term set_recycle_input = quick_create_function(kernel, "function-recycle-input",
+            function_recycle_input, TermList(get_global("Function"),get_global("int")),
+            get_global("Function"));
+    as_function(set_recycle_input)->recycleInput = 0;
 }
