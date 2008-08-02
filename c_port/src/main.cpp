@@ -44,12 +44,13 @@ void run()
     */
 }
 
+using namespace circa;
 
 int main(int nargs, const char * args[])
 {
     initialize();
 
-    circa::run_all_tests();
+    run_all_tests();
 
     try {
         run();
