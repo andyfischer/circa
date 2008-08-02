@@ -14,12 +14,12 @@ Function::Function()
     execute = NULL;
 }
 
-bool is_function(Term term)
+bool is_function(Term* term)
 {
     return (term->type == BUILTIN_FUNCTION_TYPE) || (term->type == BUILTIN_SUBROUTINE_TYPE);
 }
 
-Function* as_function(Term term)
+Function* as_function(Term* term)
 {
     if (!is_function(term))
         throw errors::TypeError(term, BUILTIN_FUNCTION_TYPE);
@@ -27,12 +27,12 @@ Function* as_function(Term term)
     return (Function*) term->value;
 }
 
-void Function_alloc(Term caller)
+void Function_alloc(Term* caller)
 {
     caller->value = new Function();
 }
 
-void function_recycle_input(Term caller)
+void function_recycle_input(Term* caller)
 {
     // Recycles input 0
     as_function(caller)->recycleInput = as_int(caller->inputs[1]);
@@ -40,7 +40,7 @@ void function_recycle_input(Term caller)
 
 void initialize_functions(Branch* kernel)
 {
-    Term set_recycle_input = quick_create_function(kernel, "function-recycle-input",
+    Term* set_recycle_input = quick_create_function(kernel, "function-recycle-input",
             function_recycle_input, TermList(get_global("Function"),get_global("int")),
             get_global("Function"));
     as_function(set_recycle_input)->recycleInput = 0;

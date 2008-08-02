@@ -13,7 +13,7 @@ Subroutine::Subroutine()
 {
 }
 
-Subroutine* as_subroutine(Term term)
+Subroutine* as_subroutine(Term* term)
 {
     if (!is_subroutine(term))
         throw errors::TypeError(term, BUILTIN_SUBROUTINE_TYPE);
@@ -21,24 +21,24 @@ Subroutine* as_subroutine(Term term)
     return (Subroutine*) term->value;
 }
 
-bool is_subroutine(Term term)
+bool is_subroutine(Term* term)
 {
     return term->type == BUILTIN_SUBROUTINE_TYPE;
 }
 
-void Subroutine_alloc(Term term)
+void Subroutine_alloc(Term* term)
 {
     term->value = new Subroutine();
     as_subroutine(term)->branch = new Branch();
 }
 
-void Subroutine_dealloc(Term term)
+void Subroutine_dealloc(Term* term)
 {
     delete as_subroutine(term)->branch;
     delete as_subroutine(term);
 }
 
-void Subroutine_execute(Term caller)
+void Subroutine_execute(Term* caller)
 {
     Subroutine* sub = as_subroutine(caller->function);
 
@@ -55,7 +55,7 @@ void Subroutine_execute(Term caller)
         copy_term(sub->outputPlaceholder, caller);
 }
 
-void subroutine_create(Term caller)
+void subroutine_create(Term* caller)
 {
     // 0: name (string)
     // 1: inputTypes (list of type)
@@ -78,7 +78,7 @@ void subroutine_create(Term caller)
     }
 }
 
-void subroutine_name_inputs(Term caller)
+void subroutine_name_inputs(Term* caller)
 {
     // Recycles input 0
     TermList* name_list = as_list(caller->inputs[1]);
@@ -89,7 +89,7 @@ void subroutine_name_inputs(Term caller)
     }
 }
 
-void subroutine_get_branch(Term caller)
+void subroutine_get_branch(Term* caller)
 {
     Subroutine* sub = as_subroutine(caller->inputs[0]);
     *as_branch(caller) = *sub->branch;
@@ -103,7 +103,7 @@ void initialize_subroutine(Branch* kernel)
             TermList(get_global("string"),get_global("List"),get_global("Type")),
             BUILTIN_SUBROUTINE_TYPE);
 
-    Term name_inputs = quick_create_function(kernel,
+    Term* name_inputs = quick_create_function(kernel,
             "subroutine-name-inputs", subroutine_name_inputs,
             TermList(BUILTIN_SUBROUTINE_TYPE, get_global("List")), BUILTIN_SUBROUTINE_TYPE);
     as_function(name_inputs)->recycleInput = 0;

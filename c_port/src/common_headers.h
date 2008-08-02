@@ -11,10 +11,7 @@
 using std::string;
 
 struct Branch;
-struct TermData;
+struct Term;
 struct Type;
-
-typedef TermData* Term;
-
 
 #endif

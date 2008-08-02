@@ -15,25 +15,25 @@
 #include "type.h"
 
 Branch* KERNEL = NULL;
-Term BUILTIN_INT_TYPE = NULL;
-Term BUILTIN_FLOAT_TYPE = NULL;
-Term BUILTIN_BOOL_TYPE = NULL;
-Term BUILTIN_STRING_TYPE = NULL;
-Term BUILTIN_TYPE_TYPE = NULL;
-Term BUILTIN_FUNCTION_TYPE = NULL;
-Term BUILTIN_CODEUNIT_TYPE = NULL;
-Term BUILTIN_SUBROUTINE_TYPE = NULL;
-Term BUILTIN_STRUCT_DEFINITION_TYPE = NULL;
-Term BUILTIN_BRANCH_TYPE = NULL;
-Term BUILTIN_ANY_TYPE = NULL;
-Term BUILTIN_VOID_TYPE = NULL;
-Term BUILTIN_REFERENCE_TYPE = NULL;
-Term BUILTIN_LIST_TYPE = NULL;
+Term* BUILTIN_INT_TYPE = NULL;
+Term* BUILTIN_FLOAT_TYPE = NULL;
+Term* BUILTIN_BOOL_TYPE = NULL;
+Term* BUILTIN_STRING_TYPE = NULL;
+Term* BUILTIN_TYPE_TYPE = NULL;
+Term* BUILTIN_FUNCTION_TYPE = NULL;
+Term* BUILTIN_CODEUNIT_TYPE = NULL;
+Term* BUILTIN_SUBROUTINE_TYPE = NULL;
+Term* BUILTIN_STRUCT_DEFINITION_TYPE = NULL;
+Term* BUILTIN_BRANCH_TYPE = NULL;
+Term* BUILTIN_ANY_TYPE = NULL;
+Term* BUILTIN_VOID_TYPE = NULL;
+Term* BUILTIN_REFERENCE_TYPE = NULL;
+Term* BUILTIN_LIST_TYPE = NULL;
 
-void empty_execute_function(Term) { }
-void empty_alloc_function(Term) { }
+void empty_execute_function(Term*) { }
+void empty_alloc_function(Term*) { }
 
-void const_generator(Term caller)
+void const_generator(Term* caller)
 {
     Function *output = as_function(caller);
     Type* type = as_type(caller->inputs[0]);
@@ -42,7 +42,7 @@ void const_generator(Term caller)
     output->execute = empty_execute_function;
 }
 
-Term get_global(string name)
+Term* get_global(string name)
 {
     if (KERNEL->containsName(name))
         return KERNEL->getNamed(name);
@@ -56,7 +56,7 @@ void bootstrap_kernel()
     KERNEL = new Branch();
 
     // Create const-generator function
-    Term constGenerator = new TermData();
+    Term* constGenerator = new Term();
     Function_alloc(constGenerator);
     as_function(constGenerator)->name = "const-generator";
     as_function(constGenerator)->pureFunction = true;
@@ -64,14 +64,14 @@ void bootstrap_kernel()
     KERNEL->bindName(constGenerator, "const-generator");
 
     // Create const-Type function
-    Term constTypeFunc = new TermData();
+    Term* constTypeFunc = new Term();
     constTypeFunc->function = constGenerator;
     Function_alloc(constTypeFunc);
     as_function(constTypeFunc)->name = "const-Type";
     as_function(constTypeFunc)->pureFunction = true;
 
     // Create Type type
-    Term typeType = new TermData();
+    Term* typeType = new Term();
     BUILTIN_TYPE_TYPE = typeType;
     typeType->function = constTypeFunc;
     typeType->type = typeType;
@@ -86,7 +86,7 @@ void bootstrap_kernel()
     as_function(constTypeFunc)->outputType = typeType;
 
     // Create const-Function function
-    Term constFuncFunc = new TermData();
+    Term* constFuncFunc = new Term();
     constFuncFunc->function = constGenerator;
     Function_alloc(constFuncFunc);
     as_function(constFuncFunc)->name = "const-Function";
@@ -97,7 +97,7 @@ void bootstrap_kernel()
     constGenerator->function = constFuncFunc;
 
     // Create Function type
-    Term functionType = new TermData();
+    Term* functionType = new Term();
     BUILTIN_FUNCTION_TYPE = functionType;
     functionType->function = constTypeFunc;
     functionType->type = typeType;
@@ -123,56 +123,56 @@ void bootstrap_kernel()
     typeType->needsUpdate = false;
 }
 
-void int_alloc(Term caller)
+void int_alloc(Term* caller)
 {
     caller->value = new int;
 }
-void int_copy(Term source, Term dest)
+void int_copy(Term* source, Term* dest)
 {
     as_int(dest) = as_int(source);
 }
 
-void float_alloc(Term caller)
+void float_alloc(Term* caller)
 {
     caller->value = new float;
 }
-void float_copy(Term source, Term dest)
+void float_copy(Term* source, Term* dest)
 {
     as_float(dest) = as_float(source);
 }
 
-void string_alloc(Term caller)
+void string_alloc(Term* caller)
 {
     caller->value = new string;
 }
 
-void bool_alloc(Term caller)
+void bool_alloc(Term* caller)
 {
     caller->value = new bool;
 }
 
-void int_tostring(Term caller)
+void int_tostring(Term* caller)
 {
     std::stringstream strm;
     strm << as_int(caller->inputs[0]);
     as_string(caller) = strm.str();
 }
-void float_tostring(Term caller)
+void float_tostring(Term* caller)
 {
     std::stringstream strm;
     strm << as_float(caller->inputs[0]);
     as_string(caller) = strm.str();
 }
-void string_tostring(Term caller)
+void string_tostring(Term* caller)
 {
     as_string(caller) = as_string(caller->inputs[0]);
 }
-void string_copy(Term source, Term dest)
+void string_copy(Term* source, Term* dest)
 {
     as_string(dest) = as_string(source);
 }
 
-void bool_tostring(Term caller)
+void bool_tostring(Term* caller)
 {
     if (as_bool(caller))
         as_string(caller) = "true";

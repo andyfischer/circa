@@ -7,18 +7,18 @@
 
 struct Subroutine : public Function
 {
-    Branch* branch; // <-- needs to be a Term I think
+    Branch* branch; // <-- needs to be a Term* I think
 
     TermList inputPlaceholders;
-    Term outputPlaceholder;
+    Term* outputPlaceholder;
 
     Subroutine();
 };
 
-Subroutine* as_subroutine(Term);
-bool is_subroutine(Term);
+Subroutine* as_subroutine(Term*);
+bool is_subroutine(Term*);
 
-void Subroutine_execute(Term caller);
+void Subroutine_execute(Term* caller);
 
 void initialize_subroutine(Branch* kernel);
 

@@ -9,17 +9,17 @@ struct Type;
 
 typedef std::vector<std::string> ErrorList;
 
-struct TermData
+struct Term
 {
     Branch* owningBranch;
     TermList inputs;
-    Term function;
+    Term* function;
     std::vector<Term> users;
 
     void* value;
-    Term type;
+    Term* type;
 
-    Term state;
+    Term* state;
 
     bool needsUpdate;
 
@@ -27,7 +27,7 @@ struct TermData
 
     int globalID;
 
-    TermData();
+    Term();
 
     Type* getType() const;
     const char* toString();
@@ -36,12 +36,12 @@ struct TermData
     std::string const& getError(int index);
 };
 
-int& as_int(Term t);
-float& as_float(Term t);
-bool& as_bool(Term t);
-string& as_string(Term t);
+int& as_int(Term* t);
+float& as_float(Term* t);
+bool& as_bool(Term* t);
+string& as_string(Term* t);
 
-TermList* as_list(Term term);
+TermList* as_list(Term* term);
 
 void initialize_term(Branch* kernel);
 
