@@ -44,3 +44,9 @@ Term TermList::operator[](int index) const
     return get(index);
 }
 
+void TermList::remap(TermMap& map)
+{
+    // Todo
+
+}
+

@@ -224,7 +224,7 @@ void duplicate_branch(Term source, Term dest)
     for (int index=0; index < dest_branch->terms.count(); index++) {
         Term term = dest_branch->terms[index];
         term->inputs.remap(newTermMap);
-        term->state = newTermMap.getRemapped(term.state);
+        term->state = newTermMap.getRemapped(term->state);
         if (as_type(term->type)->remapPointers != NULL)
             as_type(term->type)->remapPointers(term, newTermMap);
     }

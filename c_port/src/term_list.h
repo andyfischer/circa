@@ -3,6 +3,8 @@
 
 #include "common_headers.h"
 
+class TermMap;
+
 struct TermList
 {
     std::vector<Term> items;

@@ -8,20 +8,22 @@ Term&
 TermMap::operator[](Term key)
 {
     if (!contains(key))
-        throw errors::KeyError();
+        throw errors::KeyError("");
 
     return _map[key];
 }
 
-bool contains(Term key) const
+bool
+TermMap::contains(Term key) const
 {
     return _map.find(key) != _map.end();
 }
 
-Term TermMap::getRemapped(Term key) const
+Term
+TermMap::getRemapped(Term key)
 {
     if (contains(key))
-        return operator[](key);
+        return _map[key];
     else
         return key;
 }

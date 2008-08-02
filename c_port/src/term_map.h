@@ -14,7 +14,7 @@ struct TermMap
 
     // If 'key' exists in this map, return the associated term.
     // Otherwise, return 'key' back to them.
-    Term getRemapped(Term key) const;
+    Term getRemapped(Term key);
 };
 
 #endif
