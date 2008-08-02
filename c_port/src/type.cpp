@@ -11,6 +11,7 @@ Type::Type()
   : name("undefined"),
     alloc(NULL),
     copy(NULL),
+    remapPointers(NULL),
     toString(NULL)
 {
 }
