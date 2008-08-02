@@ -216,7 +216,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>B66935B60E43778600A75360</string>
+						<string>B66935B80E44E0C400A75360</string>
 						<key>history</key>
 						<array>
 							<string>B66935B50E43778600A75360</string>
@@ -344,7 +344,7 @@
 							<real>294</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>0 66 316 697 0 0 1280 778 </string>
+						<string>0 63 316 697 0 0 1280 778 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -381,7 +381,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {0, 0}}</string>
 								<key>RubberWindowFrame</key>
-								<string>0 66 316 697 0 0 1280 778 </string>
+								<string>0 63 316 697 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -401,7 +401,7 @@
 								<key>Frame</key>
 								<string>{{0, 5}, {0, 651}}</string>
 								<key>RubberWindowFrame</key>
-								<string>0 66 316 697 0 0 1280 778 </string>
+								<string>0 63 316 697 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
@@ -566,12 +566,12 @@
 		<string>B66935AC0E43750F00A75360</string>
 		<string>1C78EAAD065D492600B07095</string>
 		<string>B6F114D50E33398200B8BA44</string>
-		<string>/Users/andyfischer/circa/c_port/circa.xcodeproj</string>
 		<string>B66935B30E43778600A75360</string>
+		<string>/Users/andyfischer/circa/c_port/circa.xcodeproj</string>
 		<string>1CD10A99069EF8BA00B06720</string>
 	</array>
 	<key>WindowString</key>
-	<string>0 66 316 697 0 0 1280 778 </string>
+	<string>0 63 316 697 0 0 1280 778 </string>
 	<key>WindowToolsV3</key>
 	<array>
 		<dict>
