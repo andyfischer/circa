@@ -4,6 +4,8 @@
 #include "errors.h"
 #include "function.h"
 
+namespace circa {
+
 Function::Function()
 {
     stateType = NULL;
@@ -45,3 +47,5 @@ void initialize_functions(Branch* kernel)
             get_global("Function"));
     as_function(set_recycle_input)->recycleInput = 0;
 }
+
+} // namespace circa

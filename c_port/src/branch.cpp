@@ -8,6 +8,8 @@
 #include "operations.h"
 #include "term.h"
 
+namespace circa {
+
 Branch::Branch()
 {
 }
@@ -81,3 +83,5 @@ void initialize_branch(Branch* kernel)
         BUILTIN_BRANCH_TYPE);
     as_function(apply_function)->recycleInput = 0;
 }
+
+} // namespace circa

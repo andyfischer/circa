@@ -4,6 +4,8 @@
 #include "errors.h"
 #include "term_map.h"
 
+namespace circa {
+
 Term*&
 TermMap::operator[](Term* key)
 {
@@ -27,3 +29,5 @@ TermMap::getRemapped(Term* key)
     else
         return key;
 }
+
+} // namespace circa

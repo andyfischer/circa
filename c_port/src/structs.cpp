@@ -7,6 +7,8 @@
 #include "structs.h"
 #include "term.h"
 
+namespace circa {
+
 void StructDefinition_alloc(Term* term);
 void StructDefinition_copy(Term* source, Term* dest);
 void StructInstance_alloc(Term* term);
@@ -175,3 +177,5 @@ void initialize_structs(Branch* code)
         TermList(get_global("StructDefinition"), get_global("string")),
         get_global("StructDefinition"));
 }
+
+} // namespace circa

@@ -3,6 +3,7 @@
 
 #include "errors.h"
 
+namespace circa {
 namespace token {
 
 struct TokenStream
@@ -63,6 +64,7 @@ struct TokenStream
     }
 };
 
-}
+} // namespace token
+} // namespace circa
 
 #endif

@@ -3,6 +3,8 @@
 
 #include "common_headers.h"
 
+namespace circa {
+
 struct TermMap
 {
     std::map<Term*,Term*> _map;
@@ -16,5 +18,7 @@ struct TermMap
     // Otherwise, return 'key' back to them.
     Term* getRemapped(Term* key);
 };
+
+} // namespace circa
 
 #endif

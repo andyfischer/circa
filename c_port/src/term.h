@@ -4,8 +4,7 @@
 #include "common_headers.h"
 #include "term_list.h"
 
-struct Branch;
-struct Type;
+namespace circa {
 
 typedef std::vector<std::string> ErrorList;
 
@@ -44,5 +43,7 @@ string& as_string(Term* t);
 TermList* as_list(Term* term);
 
 void initialize_term(Branch* kernel);
+
+} // namespace circa
 
 #endif

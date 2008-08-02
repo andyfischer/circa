@@ -12,6 +12,8 @@
 #include "term.h"
 #include "type.h"
 
+namespace circa {
+
 int gNextGlobalID = 1;
 
 Term::Term()
@@ -104,3 +106,5 @@ void initialize_term(Branch* kernel)
 {
     BUILTIN_LIST_TYPE = quick_create_type(kernel, "List", TermList_alloc, NULL);
 }
+
+} // namespace circa

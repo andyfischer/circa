@@ -3,6 +3,8 @@
 
 #include "common_headers.h"
 
+namespace circa {
+
 struct TermNamespace
 {
     std::map<string, Term*> _map;
@@ -22,5 +24,7 @@ struct TermNamespace
         return _map[name];
     }
 };
+
+} // namespace circa
 
 #endif
