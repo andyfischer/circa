@@ -10,8 +10,12 @@
 
 using std::string;
 
+namespace circa {
+
 struct Branch;
 struct Term;
 struct Type;
+
+} // namespace circa
 
 #endif

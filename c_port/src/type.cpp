@@ -7,6 +7,8 @@
 #include "term.h"
 #include "type.h"
 
+namespace circa {
+
 Type::Type()
   : name("undefined"),
     alloc(NULL),
@@ -47,3 +49,5 @@ Term* get_member_function(Term* type, std::string name)
 {
     return as_type(type)->memberFunctions[name];
 }
+
+} // namespace circa

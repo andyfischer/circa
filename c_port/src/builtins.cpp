@@ -14,6 +14,8 @@
 #include "term.h"
 #include "type.h"
 
+namespace circa {
+
 Branch* KERNEL = NULL;
 Term* BUILTIN_INT_TYPE = NULL;
 Term* BUILTIN_FLOAT_TYPE = NULL;
@@ -218,3 +220,5 @@ void initialize()
         exit(1);
     }
 }
+
+} // namespace circa

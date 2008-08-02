@@ -10,6 +10,8 @@
 #include "term_map.h"
 #include "type.h"
 
+namespace circa {
+
 Term* create_term(Branch* branch, Term* function, TermList inputs)
 {
     if (!is_function(function))
@@ -258,3 +260,5 @@ Term* constant_list(Branch* branch, TermList list)
     *as_list(term) = list;
     return term;
 }
+
+} // namespace circa

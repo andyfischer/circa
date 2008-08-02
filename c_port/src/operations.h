@@ -3,6 +3,8 @@
 #include "term.h"
 #include "type.h"
 
+namespace circa {
+
 Term* create_term(Branch* branch, Term* function, TermList inputs);
 void initialize_term(Term* term, Term* function, TermList inputs);
 void set_inputs(Term* term, TermList inputs);
@@ -38,3 +40,5 @@ Term* find_named(Branch* branch, std::string name);
 Term* constant_string(Branch* branch, std::string s);
 Term* constant_int(Branch* branch, int i);
 Term* constant_list(Branch* branch, TermList list);
+
+} // namespace circa

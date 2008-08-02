@@ -3,7 +3,9 @@
 
 #include "common_headers.h"
 
-class TermMap;
+namespace circa {
+
+struct TermMap;
 
 struct TermList
 {
@@ -33,5 +35,7 @@ struct TermList
     Term* operator[](int index) const;
     void remap(TermMap& map);
 };
+
+} // namespace circa
 
 #endif

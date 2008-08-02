@@ -6,6 +6,8 @@
 #include "type.h"
 #include "function.h"
 
+namespace circa {
+
 Term* quick_eval_function(Branch* branch, std::string input);
 Term* quick_exec_function(Branch* branch, std::string input);
 
@@ -18,5 +20,7 @@ Term* quick_create_function(Branch* code, string name, Function::ExecuteFunc exe
         TermList inputTypes, Term* outputType);
 
 void initialize_bootstrapped_code(Branch* kernel);
+
+} // namespace circa
 
 #endif

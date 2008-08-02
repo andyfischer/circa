@@ -7,6 +7,8 @@
 #include "subroutine.h"
 #include "term.h"
 
+namespace circa {
+
 Subroutine::Subroutine()
   : branch(NULL),
     outputPlaceholder(NULL)
@@ -111,3 +113,5 @@ void initialize_subroutine(Branch* kernel)
     quick_create_function(kernel, "subroutine-get-branch", subroutine_get_branch,
             TermList(BUILTIN_SUBROUTINE_TYPE), get_global("Branch"));
 }
+
+} // namespace circa

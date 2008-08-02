@@ -3,6 +3,8 @@
 
 #include "common_headers.h"
 
+namespace circa {
+
 namespace errors {
 
 class CircaError : public std::exception
@@ -78,6 +80,7 @@ public:
     }
 };
 
-}
+} // namespace errors
+} // namespace circa
 
 #endif

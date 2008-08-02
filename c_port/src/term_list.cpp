@@ -2,6 +2,9 @@
 #include "common_headers.h"
 
 #include "term_list.h"
+#include "term_map.h"
+
+namespace circa {
 
 int
 TermList::count() const
@@ -46,7 +49,8 @@ Term* TermList::operator[](int index) const
 
 void TermList::remap(TermMap& map)
 {
-    // Todo
-
+    for (int i=0; i < items.size(); i++)
+        items[i] = map.getRemapped(items[i]);
 }
 
+} // namespace circa

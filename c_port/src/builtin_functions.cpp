@@ -9,6 +9,8 @@
 #include "term.h"
 #include "type.h"
 
+namespace circa {
+
 void to_string(Term* caller)
 {
     Term* toString = caller->inputs[0]->getType()->toString;
@@ -101,3 +103,5 @@ void initialize_builtin_functions(Branch* code)
     quick_create_function(code, "list-apply", list_apply, TermList(function_t, list_t), list_t);
     quick_create_function(code, "this-branch", this_branch, TermList(), list_t);
 }
+
+} // namespace circa

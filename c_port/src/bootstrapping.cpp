@@ -9,6 +9,8 @@
 #include "operations.h"
 #include "subroutine.h"
 
+namespace circa {
+
 Term* quick_parse_function_call(Branch* branch, token::TokenStream &tstream)
 {
 	std::string functionName = tstream.consume(token::IDENTIFIER);
@@ -154,3 +156,5 @@ void initialize_bootstrapped_code(Branch* kernel)
 
 // when I print out the contents of a subroutine..
 // some term pointers point inside the subroutine, some point to the input placeholders
+
+} // namespace circa

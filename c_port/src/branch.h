@@ -6,6 +6,8 @@
 #include "term.h"
 #include "term_namespace.h"
 
+namespace circa {
+
 struct Branch
 {
     TermList terms;
@@ -28,5 +30,7 @@ struct Branch
 Branch* as_branch(Term* term);
 
 void initialize_branch(Branch* kernel);
+
+} // namespace circa
 
 #endif

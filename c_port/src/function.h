@@ -2,9 +2,10 @@
 #define CIRCA__FUNCTION__INCLUDED
 
 #include "common_headers.h"
-#include <string>
 
 #include "term.h"
+
+namespace circa {
 
 struct Function
 {
@@ -46,5 +47,7 @@ bool is_function(Term* term);
 Function* as_function(Term*);
 
 void initialize_functions(Branch* kernel);
+
+} // namespace circa
 
 #endif

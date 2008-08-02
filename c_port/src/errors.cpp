@@ -5,6 +5,8 @@
 #include "term.h"
 #include "type.h"
 
+namespace circa {
+
 namespace errors {
 
 string
@@ -22,5 +24,5 @@ TypeError::message()
             + ", found " + as_type(term->type)->name);
 }
 
-
-}
+} // namespace errors
+} // namespace circa

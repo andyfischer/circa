@@ -5,6 +5,8 @@
 
 #include "type.h"
 
+namespace circa {
+
 struct StructDefinition : public Type
 {
     struct Field
@@ -33,7 +35,8 @@ struct StructInstance
 
 StructDefinition* as_struct_definition(Term* term);
 
-
 void initialize_structs(Branch* code);
+
+} // namespace circa
 
 #endif
