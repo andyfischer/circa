@@ -77,7 +77,7 @@
 		};
 		perUserProjectItems = {
 			B66935B50E43778600A75360 /* PBXTextBookmark */ = B66935B50E43778600A75360 /* PBXTextBookmark */;
-			B66935B60E43778600A75360 /* PBXTextBookmark */ = B66935B60E43778600A75360 /* PBXTextBookmark */;
+			B66935B80E44E0C400A75360 /* PBXTextBookmark */ = B66935B80E44E0C400A75360 /* PBXTextBookmark */;
 		};
 		sourceControlManager = B6F1149D0E33392200B8BA44 /* Source Control */;
 		userBuildSettings = {
@@ -113,15 +113,15 @@
 		rLoc = 42;
 		rType = 1;
 	};
-	B66935B60E43778600A75360 /* PBXTextBookmark */ = {
+	B66935B80E44E0C400A75360 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = B6A243B20E356E26007F2BEB /* main.cpp */;
-		name = "main.cpp: 43";
+		name = "main.cpp: 63";
 		rLen = 0;
-		rLoc = 987;
+		rLoc = 1358;
 		rType = 0;
-		vrLen = 707;
-		vrLoc = 414;
+		vrLen = 722;
+		vrLoc = 418;
 	};
 	B6A243A40E3568EB007F2BEB /* errors.cpp */ = {
 		uiCtxt = {
@@ -133,9 +133,9 @@
 	};
 	B6A243B20E356E26007F2BEB /* main.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {691, 924}}";
-			sepNavSelRange = "{987, 0}";
-			sepNavVisRange = "{414, 707}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 966}}";
+			sepNavSelRange = "{1358, 0}";
+			sepNavVisRange = "{126, 537}";
 			sepNavWindowFrame = "{{43, 46}, {750, 558}}";
 		};
 	};
