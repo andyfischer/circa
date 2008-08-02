@@ -28,10 +28,11 @@ Term exec_function(Branch* branch, Term function, TermList inputs);
 // Fetch the const function for this type
 Term get_const_function(Branch* branch, Term type);
 
-
 void change_function(Term term, Term new_function);
 void copy_term(Term source, Term dest);
 void steal_value(Term source, Term dest);
+
+void duplicate_branch(Term source, Term dest);
 
 Term find_named(Branch* branch, std::string name);
 

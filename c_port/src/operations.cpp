@@ -7,6 +7,7 @@
 #include "function.h"
 #include "operations.h"
 #include "term.h"
+#include "term_map.h"
 #include "type.h"
 
 Term create_term(Branch* branch, Term function, TermList inputs)
@@ -191,10 +192,42 @@ void copy_term(Term source, Term dest)
 
 void steal_value(Term source, Term dest)
 {
-    // Todo: delete the value at dest
+    // Delete value at dest
+    if (dest->value != NULL) {
+        if (as_type(dest)->dealloc != NULL)
+            as_type(dest)->dealloc(dest);
+        else
+            std::cout << "Warning: type " << as_type(dest)->name
+                << " needs a dealloc function";
+    }
     dest->value = source->value;
     source->value = NULL;
     source->needsUpdate = true;
+}
+
+void duplicate_branch(Term source, Term dest)
+{
+    Branch* source_branch = as_branch(source);
+    Branch* dest_branch = as_branch(dest);
+
+    TermMap newTermMap;
+
+    // Duplicate every term
+    for (int index=0; index < source_branch->terms.count(); index++) {
+        Term source_term = source_branch->terms[index];
+
+        Term dest_term = create_term(dest_branch, source_term->function, source_term->inputs);
+        newTermMap[source_term] = dest_term;
+    }
+
+    // Remap terms
+    for (int index=0; index < dest_branch->terms.count(); index++) {
+        Term term = dest_branch->terms[index];
+        term->inputs.remap(newTermMap);
+        term->state = newTermMap.getRemapped(term.state);
+        if (as_type(term->type)->remapPointers != NULL)
+            as_type(term->type)->remapPointers(term, newTermMap);
+    }
 }
 
 Term find_named(Branch* branch, std::string name)

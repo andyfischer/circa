@@ -29,7 +29,7 @@ struct TermList
     void clear();
     Term get(int index) const;
     Term operator[](int index) const;
+    void remap(TermMap& map);
 };
-
 
 #endif
