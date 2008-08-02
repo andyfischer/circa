@@ -5,7 +5,7 @@
 #include "tests/all_tests.h"
 
 /*
-void current_subroutine_name(Term caller)
+void current_subroutine_name(Term* caller)
 {
     Branch* branch = caller->owningBranch;
     if (branch == NULL) {
@@ -13,15 +13,15 @@ void current_subroutine_name(Term caller)
         return;
     }
 
-    Term owningTerm = branch->owningTerm;
+    Term* owningTerm* = branch->owningTerm;
 
-    if (owningTerm == NULL) {
-        as_string(caller) = "(null owningTerm on branch)";
+    if (owningTerm* == NULL) {
+        as_string(caller) = "(null owningTerm* on branch)";
         return;
     }
 
     if (!is_subroutine(owningTerm)) {
-        as_string(caller) = string("(branch->owningTerm has type: ")
+        as_string(caller) = string("(branch->owningTerm* has type: ")
             + as_type(owningTerm->type)->name + ")";
         return;
     }
@@ -34,10 +34,10 @@ void run()
     /*
     Branch* branch = new Branch();
 
-    Term sub = quick_exec_function(branch, "subroutine-create('test, list(), void)");
+    Term* sub = quick_exec_function(branch, "subroutine-create('test, list(), void)");
     Subroutine* subData = as_subroutine(sub);
 
-    Term csn = quick_create_function(branch, "current-subroutine-name",
+    Term* csn = quick_create_function(branch, "current-subroutine-name",
             current_subroutine_name, TermList(), get_global("string"));
 
     quick_exec_function(as_subroutine(sub)->branch, "print(current-subroutine-name())");

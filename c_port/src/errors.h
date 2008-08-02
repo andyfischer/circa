@@ -39,11 +39,11 @@ public:
 
 class TypeError : public CircaError
 {
-    Term term;
-    Term expectedType;
+    Term* term;
+    Term* expectedType;
 
 public:
-    TypeError(Term _term, Term _expectedType) throw()
+    TypeError(Term* _term, Term* _expectedType) throw()
         : CircaError("")
     {
         term = _term;
