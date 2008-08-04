@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8DD76F6A0486A84900D96B5E /* circa.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* circa.1 */; };
+		B68D10CD0E47685600C6D09A /* term_map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B68D10CB0E47685600C6D09A /* term_map.cpp */; };
 		B6A243A50E3568EB007F2BEB /* errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243A40E3568EB007F2BEB /* errors.cpp */; };
 		B6A243B30E356E26007F2BEB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243B20E356E26007F2BEB /* main.cpp */; };
 		B6A243FD0E3D6414007F2BEB /* bootstrapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */; };
@@ -47,6 +48,8 @@
 
 /* Begin PBXFileReference section */
 		8DD76F6C0486A84900D96B5E /* circa */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = circa; sourceTree = BUILT_PRODUCTS_DIR; };
+		B68D10CB0E47685600C6D09A /* term_map.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = term_map.cpp; sourceTree = "<group>"; };
+		B68D10CC0E47685600C6D09A /* term_map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = term_map.h; sourceTree = "<group>"; };
 		B6A243A40E3568EB007F2BEB /* errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = errors.cpp; sourceTree = "<group>"; };
 		B6A243B20E356E26007F2BEB /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bootstrapping.cpp; sourceTree = "<group>"; };
@@ -181,6 +184,8 @@
 				B6F115190E34F4B300B8BA44 /* structs.h */,
 				B6A244990E42A41B007F2BEB /* term_list.cpp */,
 				B6A2449A0E42A41B007F2BEB /* term_list.h */,
+				B68D10CB0E47685600C6D09A /* term_map.cpp */,
+				B68D10CC0E47685600C6D09A /* term_map.h */,
 				B6F114B60E33394F00B8BA44 /* subroutine.cpp */,
 				B6F114B70E33394F00B8BA44 /* subroutine.h */,
 				B6F114B80E33394F00B8BA44 /* term.cpp */,
@@ -265,6 +270,7 @@
 				B6A244810E40D94B007F2BEB /* list_test.cpp in Sources */,
 				B6A244820E40D94B007F2BEB /* primitive_type_test.cpp in Sources */,
 				B6A2449B0E42A41B007F2BEB /* term_list.cpp in Sources */,
+				B68D10CD0E47685600C6D09A /* term_map.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

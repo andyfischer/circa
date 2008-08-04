@@ -72,12 +72,12 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 239301852;
-			PBXWorkspaceStateSaveDate = 239301852;
+			PBXPerProjectTemplateStateSaveDate = 239560734;
+			PBXWorkspaceStateSaveDate = 239560734;
 		};
 		perUserProjectItems = {
-			B66935B50E43778600A75360 /* PBXTextBookmark */ = B66935B50E43778600A75360 /* PBXTextBookmark */;
-			B66935B80E44E0C400A75360 /* PBXTextBookmark */ = B66935B80E44E0C400A75360 /* PBXTextBookmark */;
+			B66935B50E43778600A75360 = B66935B50E43778600A75360 /* PBXTextBookmark */;
+			B66935B80E44E0C400A75360 = B66935B80E44E0C400A75360 /* PBXTextBookmark */;
 		};
 		sourceControlManager = B6F1149D0E33392200B8BA44 /* Source Control */;
 		userBuildSettings = {
@@ -99,11 +99,11 @@
 		delayBeforeContinue = 0;
 		fileReference = B6A243B20E356E26007F2BEB /* main.cpp */;
 		functionName = "run()";
-		hitCount = 1;
+		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 43;
 		location = circa;
-		modificationTime = 239302511.196067;
+		modificationTime = 239560854.892137;
 		state = 1;
 	};
 	B66935B50E43778600A75360 /* PBXTextBookmark */ = {
@@ -148,11 +148,11 @@
 		countType = 0;
 		delayBeforeContinue = 0;
 		fileReference = B6F114AF0E33394F00B8BA44 /* errors.h */;
-		hitCount = 0;
+		hitCount = 1;
 		ignoreCount = 0;
 		lineNumber = 13;
 		location = circa;
-		modificationTime = 239302511.141954;
+		modificationTime = 239560856.351407;
 		state = 1;
 	};
 	B6A243C60E356F1B007F2BEB /* errors.cpp:15 */ = {
@@ -169,7 +169,7 @@
 		ignoreCount = 0;
 		lineNumber = 15;
 		location = circa;
-		modificationTime = 239302509.897973;
+		modificationTime = 239560854.892104;
 		state = 1;
 	};
 	B6A243D30E356F90007F2BEB /* errors.h:25 */ = {
@@ -186,7 +186,7 @@
 		ignoreCount = 0;
 		lineNumber = 25;
 		location = circa;
-		modificationTime = 239302509.89798;
+		modificationTime = 239560854.892117;
 		state = 1;
 	};
 	B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */ = {
@@ -247,7 +247,7 @@
 		ignoreCount = 0;
 		lineNumber = 137;
 		location = circa;
-		modificationTime = 239302509.897987;
+		modificationTime = 239560854.892124;
 		state = 2;
 	};
 	B6A244410E401F16007F2BEB /* struct_test.cpp */ = {
@@ -272,7 +272,7 @@
 		ignoreCount = 0;
 		lineNumber = 34;
 		location = circa;
-		modificationTime = 239302509.897995;
+		modificationTime = 239560854.892131;
 		state = 2;
 	};
 	B6F114970E33391C00B8BA44 /* circa */ = {
@@ -282,7 +282,7 @@
 		argumentStrings = (
 		);
 		autoAttachOnCrash = 1;
-		breakpointsEnabled = 1;
+		breakpointsEnabled = 0;
 		configStateDict = {
 		};
 		customDataFormattersEnabled = 1;
@@ -331,8 +331,8 @@
 	};
 	B6F114AF0E33394F00B8BA44 /* errors.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 1218}}";
-			sepNavSelRange = "{230, 0}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 1246}}";
+			sepNavSelRange = "{236, 0}";
 			sepNavVisRange = "{0, 374}";
 			sepNavWindowFrame = "{{456, 193}, {750, 558}}";
 		};

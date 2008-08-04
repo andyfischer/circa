@@ -12,8 +12,13 @@ Term* quick_eval_function(Branch* branch, std::string input);
 Term* quick_exec_function(Branch* branch, std::string input);
 
 // Create a new Type with the given properties. Also binds the name.
-Term* quick_create_type(Branch* code, string name, Type::AllocFunc allocFunc,
-        Function::ExecuteFunc toStringFunc, Type::CopyFunc copyFunc = NULL);
+Term* quick_create_type(
+        Branch* branch,
+        string name,
+        Type::AllocFunc allocFunc,
+        Type::DeallocFunc deallocFunc,
+        Type::CopyFunc copyFunc,
+        Function::ExecuteFunc toStringFunc = NULL);
 
 // Create a new Function with the given properties. Also binds the name.
 Term* quick_create_function(Branch* code, string name, Function::ExecuteFunc executeFunc,

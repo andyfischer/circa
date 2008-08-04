@@ -1,13 +1,8 @@
 
 #include "common_headers.h"
 
-#include "bootstrapping.h"
-#include "branch.h"
-#include "builtins.h"
+#include "circa.h"
 #include "common.h"
-#include "errors.h"
-#include "operations.h"
-#include "subroutine.h"
 
 namespace circa {
 
@@ -15,32 +10,24 @@ void test_simple()
 {
     Branch *branch = new Branch();
 
+    // Try to create this formula:
+    // result = a*2 + b*5
 
     Term* my_sub = quick_exec_function(branch,
-        "my-sub = subroutine-create(\"my-sub\", list(int,int), int)");
+        "my-sub = subroutine-create('my-sub, list(int,int), int)");
+    my_sub = quick_exec_function(branch,
+        "my-sub = subroutine-name-inputs(my-sub, list('a, 'b))");
 
     Subroutine* sub = as_subroutine(my_sub);
 
-    // Try to create this formula:
-    // result = a*2 + b*5
-    Term* zero = constant_int(branch, 0);
-    Term* one = constant_int(branch, 1);
-    Term* two = constant_int(branch, 2);
-    Term* five = constant_int(branch, 5);
-    Term* a_times_two = apply_function(sub->branch, get_global("mult"),
-        TermList(sub->inputPlaceholders[0], two));
-    Term* b_times_five = apply_function(sub->branch, get_global("mult"),
-        TermList(sub->inputPlaceholders[1], five));
-    sub->outputPlaceholder = apply_function(sub->branch, get_global("add"),
-        TermList(a_times_two, b_times_five));
+    Term* result = quick_exec_function(sub->branch,
+        "output = add(mult(a,2),mult(b,5))");
 
-    test_assert(as_int(exec_function(branch, my_sub, TermList(one, one))) == 7);
-    test_assert(as_int(exec_function(branch, my_sub, TermList(one, two))) == 12);
-    test_assert(as_int(exec_function(branch, my_sub, TermList(two, zero))) == 4);
+    test_assert(as_int(exec_function(branch, my_sub, TermList(CONSTANT_1, CONSTANT_1))) == 7);
+    test_assert(as_int(exec_function(branch, my_sub, TermList(CONSTANT_1, CONSTANT_2))) == 12);
+    test_assert(as_int(exec_function(branch, my_sub, TermList(CONSTANT_2, CONSTANT_0))) == 4);
 	
-	branch->bindName(one, "one");
-	branch->bindName(two, "two");
-	test_assert(as_int(quick_exec_function(branch, "my-sub(one,two)")) == 12);
+	test_assert(as_int(quick_exec_function(branch, "my-sub(1,2)")) == 12);
 }
 
 void test_simple2()

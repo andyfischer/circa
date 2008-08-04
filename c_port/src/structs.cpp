@@ -69,6 +69,11 @@ void StructDefinition_alloc(Term* term)
     term->value = def;
 }
 
+void StructDefinition_dealloc(Term* term)
+{
+    delete as_struct_definition(term);
+}
+
 void StructDefinition_copy(Term* source, Term* dest)
 {
     *as_struct_definition(dest) = *as_struct_definition(source);
@@ -107,7 +112,7 @@ void StructInstance_copy(Term* source, Term* dest)
 
 void struct_definition_set_name(Term* caller)
 {
-    copy_term(caller->inputs[0], caller);
+    copy_value(caller->inputs[0], caller);
 
     as_struct_definition(caller)->name = as_string(caller->inputs[1]);
 }
@@ -127,7 +132,7 @@ void struct_get_field(Term* caller)
     StructInstance* structInstance = as_struct_instance(caller->inputs[0]);
     Term* field = structInstance->fields[fieldIndex];
 
-    copy_term(field, caller);
+    copy_value(field, caller);
 }
 
 void struct_set_field_init(Term* caller)
@@ -152,12 +157,16 @@ void struct_set_field(Term* caller)
     StructInstance* structInstance = as_struct_instance(caller);
     Term* field = structInstance->fields[fieldIndex];
 
-    copy_term(value, field);
+    copy_value(value, field);
 }
 
 void initialize_structs(Branch* code)
 {
-    BUILTIN_STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition", StructDefinition_alloc, NULL, StructDefinition_copy);
+    BUILTIN_STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition",
+            StructDefinition_alloc,
+            StructDefinition_dealloc,
+            StructDefinition_copy);
+
     quick_create_function(code, "get-field", struct_get_field,
         TermList(get_global("any"), get_global("string")), get_global("any"));
 

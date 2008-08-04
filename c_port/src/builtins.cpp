@@ -31,9 +31,13 @@ Term* BUILTIN_ANY_TYPE = NULL;
 Term* BUILTIN_VOID_TYPE = NULL;
 Term* BUILTIN_REFERENCE_TYPE = NULL;
 Term* BUILTIN_LIST_TYPE = NULL;
+Term* CONSTANT_0 = NULL;
+Term* CONSTANT_1 = NULL;
+Term* CONSTANT_2 = NULL;
 
 void empty_execute_function(Term*) { }
 void empty_alloc_function(Term*) { }
+void empty_function(Term*) { }
 
 void const_generator(Term* caller)
 {
@@ -129,6 +133,10 @@ void int_alloc(Term* caller)
 {
     caller->value = new int;
 }
+void int_dealloc(Term* caller)
+{
+    delete (int*) caller->value;
+}
 void int_copy(Term* source, Term* dest)
 {
     as_int(dest) = as_int(source);
@@ -137,6 +145,10 @@ void int_copy(Term* source, Term* dest)
 void float_alloc(Term* caller)
 {
     caller->value = new float;
+}
+void float_dealloc(Term* caller)
+{
+    delete (float*) caller->value;
 }
 void float_copy(Term* source, Term* dest)
 {
@@ -148,9 +160,24 @@ void string_alloc(Term* caller)
     caller->value = new string;
 }
 
+void string_dealloc(Term* caller)
+{
+    delete (string*) caller->value;
+}
+
 void bool_alloc(Term* caller)
 {
     caller->value = new bool;
+}
+
+void bool_dealloc(Term* caller)
+{
+    delete (bool*) caller->value;
+}
+
+void bool_copy(Term* source, Term* dest)
+{
+    as_bool(dest) = as_bool(source);
 }
 
 void int_tostring(Term* caller)
@@ -185,15 +212,29 @@ void bool_tostring(Term* caller)
 void create_builtin_types()
 {
     BUILTIN_STRING_TYPE = quick_create_type(KERNEL, "string",
-            string_alloc, string_tostring, string_copy);
+            string_alloc,
+            string_dealloc,
+            string_copy,
+            string_tostring);
     BUILTIN_INT_TYPE = quick_create_type(KERNEL, "int",
-            int_alloc, int_tostring, int_copy);
+            int_alloc, int_dealloc, int_copy, int_tostring);
     BUILTIN_FLOAT_TYPE = quick_create_type(KERNEL, "float",
-            float_alloc, float_tostring, float_copy);
-    BUILTIN_BOOL_TYPE = quick_create_type(KERNEL, "bool", bool_alloc, bool_tostring);
-    BUILTIN_ANY_TYPE = quick_create_type(KERNEL, "any", empty_alloc_function, NULL);
-    BUILTIN_VOID_TYPE = quick_create_type(KERNEL, "void", empty_alloc_function, NULL);
-    BUILTIN_REFERENCE_TYPE = quick_create_type(KERNEL, "Reference", empty_alloc_function, NULL);
+            float_alloc, float_dealloc, float_copy, float_tostring);
+    BUILTIN_BOOL_TYPE = quick_create_type(KERNEL, "bool",
+            bool_alloc, bool_dealloc, bool_copy, bool_tostring);
+    BUILTIN_ANY_TYPE = quick_create_type(KERNEL, "any",
+            empty_function, empty_function, NULL);
+    BUILTIN_VOID_TYPE = quick_create_type(KERNEL, "void",
+            empty_function, empty_function, NULL);
+    BUILTIN_REFERENCE_TYPE = quick_create_type(KERNEL, "Reference",
+            empty_function, empty_function, NULL);
+}
+
+void initialize_constants()
+{
+    CONSTANT_0 = constant_int(KERNEL, 0);
+    CONSTANT_1 = constant_int(KERNEL, 1);
+    CONSTANT_2 = constant_int(KERNEL, 2);
 }
 
 void initialize()
@@ -201,6 +242,8 @@ void initialize()
     try {
         bootstrap_kernel();
         create_builtin_types();
+
+        initialize_constants();
 
         // Do initialize_term first
         initialize_term(KERNEL);

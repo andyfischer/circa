@@ -9,9 +9,11 @@
 
 namespace circa {
 
+static const char * INPUT_PLACEHOLDER_PREFIX = "#input-";
+static const char * OUTPUT_PLACEHOLDER_NAME = "output";
+
 Subroutine::Subroutine()
-  : branch(NULL),
-    outputPlaceholder(NULL)
+  : branch(NULL)
 {
 }
 
@@ -40,21 +42,47 @@ void Subroutine_dealloc(Term* term)
     delete as_subroutine(term);
 }
 
+std::string GetInputPlaceholderName(int index)
+{
+    std::stringstream sstream;
+    sstream << INPUT_PLACEHOLDER_PREFIX << index;
+    return sstream.str();
+}
+
 void Subroutine_execute(Term* caller)
 {
     Subroutine* sub = as_subroutine(caller->function);
+    Branch* branch = sub->branch;
 
     // Copy inputs to input placeholders
-    for (int inputIndex=0; inputIndex < sub->inputTypes.count(); inputIndex++) {
-        copy_term(caller->inputs[inputIndex], sub->inputPlaceholders[inputIndex]);
+    int numInputs = caller->inputs.count();
+    for (int index=0; index < numInputs; index++) {
+        Term* incomingInput = caller->inputs[index];
+        std::string name = GetInputPlaceholderName(index);
+        if (!branch->containsName(name)) {
+            throw errors::InternalError(string("Too many arguments for subroutine ") +
+                    sub->name);
+        }
+
+        steal_value(incomingInput, branch->getNamed(name));
     }
 
-    // Execute every term of ours
+    // Execute every term in branch
     execute_branch(sub->branch);
 
-    // Copy output to output placeholder
-    if (sub->outputPlaceholder != NULL)
-        copy_term(sub->outputPlaceholder, caller);
+    // Copy output to output placeholder, if one exists
+    if (branch->containsName(OUTPUT_PLACEHOLDER_NAME)) {
+        Term* outputPlaceholder = branch->getNamed(OUTPUT_PLACEHOLDER_NAME);
+        steal_value(outputPlaceholder, caller);
+    }
+    else {
+        // Not having an output is OK, but make sure we are declared with
+        // type void.
+        if (!(caller->type == BUILTIN_VOID_TYPE)) {
+            std::cout << "Warning: Inconsistent data. Subroutine " <<
+                sub->name << " has a non-void output type, but has no output placeholder.";
+        }
+    }
 }
 
 void subroutine_create(Term* caller)
@@ -74,9 +102,10 @@ void subroutine_create(Term* caller)
     sub->outputType = caller->inputs[2];
 
     // Create input placeholders
-    for (int inputIndex=0; inputIndex < sub->inputTypes.count(); inputIndex++) {
-        sub->inputPlaceholders.setAt(inputIndex,
-                create_constant(sub->branch, sub->inputTypes[inputIndex]));
+    for (int index=0; index < sub->inputTypes.count(); index++) {
+        std::string name = GetInputPlaceholderName(index);
+        Term* placeholder = create_constant(sub->branch, sub->inputTypes[index]);
+        sub->branch->bindName(placeholder, name);
     }
 }
 
@@ -85,9 +114,12 @@ void subroutine_name_inputs(Term* caller)
     // Recycles input 0
     TermList* name_list = as_list(caller->inputs[1]);
     Subroutine* sub = as_subroutine(caller);
-    for (int inputIndex=0; inputIndex < sub->inputPlaceholders.count(); inputIndex++) {
-        sub->branch->bindName(sub->inputPlaceholders[inputIndex],
-                as_string(name_list->get(inputIndex)));
+    Branch* branch = sub->branch;
+
+    for (int index=0; index < sub->inputTypes.count(); index++) {
+        Term* inputPlaceholder = branch->getNamed(GetInputPlaceholderName(index));
+        std::string newName = as_string(name_list->get(index));
+        branch->bindName(inputPlaceholder, newName);
     }
 }
 
@@ -99,7 +131,7 @@ void subroutine_get_branch(Term* caller)
 
 void initialize_subroutine(Branch* kernel)
 {
-    BUILTIN_SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine", Subroutine_alloc, NULL);
+    BUILTIN_SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine", Subroutine_alloc, Subroutine_dealloc, NULL);
 
     quick_create_function(kernel, "subroutine-create", subroutine_create,
             TermList(get_global("string"),get_global("List"),get_global("Type")),

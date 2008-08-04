@@ -102,12 +102,18 @@ Term* quick_exec_function(Branch* branch, std::string input)
     return result;
 }
 
-Term* quick_create_type(Branch* branch, string name, Type::AllocFunc allocFunc,
-        Function::ExecuteFunc toStringFunc, Type::CopyFunc copyFunc)
+Term* quick_create_type(
+        Branch* branch,
+        string name,
+        Type::AllocFunc allocFunc,
+        Type::DeallocFunc deallocFunc,
+        Type::CopyFunc copyFunc,
+        Function::ExecuteFunc toStringFunc)
 {
     Term* typeTerm = create_constant(branch, get_global("Type"));
     as_type(typeTerm)->name = name;
     as_type(typeTerm)->alloc = allocFunc;
+    as_type(typeTerm)->dealloc = deallocFunc;
     as_type(typeTerm)->copy = copyFunc;
     branch->bindName(typeTerm, name);
 

@@ -9,10 +9,7 @@ namespace circa {
 
 struct Subroutine : public Function
 {
-    Branch* branch; // <-- needs to be a Term* I think
-
-    TermList inputPlaceholders;
-    Term* outputPlaceholder;
+    Branch* branch;
 
     Subroutine();
 };

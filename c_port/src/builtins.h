@@ -21,6 +21,9 @@ extern Term* BUILTIN_ANY_TYPE;
 extern Term* BUILTIN_VOID_TYPE;
 extern Term* BUILTIN_REFERENCE_TYPE;
 extern Term* BUILTIN_LIST_TYPE;
+extern Term* CONSTANT_0;
+extern Term* CONSTANT_1;
+extern Term* CONSTANT_2;
 
 Term* get_global(std::string name);
 void empty_execute_function(Term* caller);

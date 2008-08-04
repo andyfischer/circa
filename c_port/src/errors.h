@@ -74,8 +74,9 @@ public:
 class TokenMismatch : public CircaError
 {
 public:
-    TokenMismatch(const char* expected, const char* found) throw()
-        : CircaError(std::string("Expected: ") + expected + ", found: " + found)
+    TokenMismatch(const char* expected, const char* found, const char* foundText) throw()
+        : CircaError(std::string("Expected: ") + expected + ", found: " + found
+               + " (" + foundText + ")")
     {
     }
 };
