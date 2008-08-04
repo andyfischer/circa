@@ -121,7 +121,7 @@ void execute(Term* term)
         if (as_type(term->type)->copy == NULL)
             steal_value(term->inputs[0], term);
         else
-            copy_term(term->inputs[0], term);
+            copy_value(term->inputs[0], term);
     }
 
     try {
@@ -178,7 +178,7 @@ void change_function(Term* term, Term* new_function)
     term->function = new_function;
 }
 
-void copy_term(Term* source, Term* dest)
+void copy_value(Term* source, Term* dest)
 {
     if (source->type != dest->type)
         throw errors::TypeError(dest, source->type);
@@ -196,11 +196,11 @@ void steal_value(Term* source, Term* dest)
 {
     // Delete value at dest
     if (dest->value != NULL) {
-        if (as_type(dest)->dealloc != NULL)
-            as_type(dest)->dealloc(dest);
+        if (as_type(dest->type)->dealloc != NULL)
+            as_type(dest->type)->dealloc(dest);
         else
-            std::cout << "Warning: type " << as_type(dest)->name
-                << " needs a dealloc function";
+            std::cout << "Warning: type " << as_type(dest->type)->name
+                << " needs a dealloc function" << std::endl;
     }
     dest->value = source->value;
     source->value = NULL;
@@ -226,7 +226,6 @@ void duplicate_branch(Term* source, Term* dest)
     for (int index=0; index < dest_branch->terms.count(); index++) {
         Term* term = dest_branch->terms[index];
         term->inputs.remap(newTermMap);
-        term->state = newTermMap.getRemapped(term->state);
         if (as_type(term->type)->remapPointers != NULL)
             as_type(term->type)->remapPointers(term, newTermMap);
     }

@@ -30,7 +30,7 @@ Term* exec_function(Branch* branch, Term* function, TermList inputs);
 Term* get_const_function(Branch* branch, Term* type);
 
 void change_function(Term* term, Term* new_function);
-void copy_term(Term* source, Term* dest);
+void copy_value(Term* source, Term* dest);
 void steal_value(Term* source, Term* dest);
 
 void duplicate_branch(Term* source, Term* dest);

@@ -90,11 +90,6 @@ string& as_string(Term* t)
 }
 
 // TermList type
-void TermList_alloc(Term* caller)
-{
-    caller->value = new TermList();
-}
-
 TermList* as_list(Term* term)
 {
     if (term->type != BUILTIN_LIST_TYPE)
@@ -102,9 +97,22 @@ TermList* as_list(Term* term)
     return (TermList*) term->value;
 }
 
+void TermList_alloc(Term* caller)
+{
+    caller->value = new TermList();
+}
+
+void TermList_dealloc(Term* caller)
+{
+    delete as_list(caller);
+}
+
 void initialize_term(Branch* kernel)
 {
-    BUILTIN_LIST_TYPE = quick_create_type(kernel, "List", TermList_alloc, NULL);
+    BUILTIN_LIST_TYPE = quick_create_type(kernel, "List",
+            TermList_alloc,
+            TermList_dealloc,
+            NULL);
 }
 
 } // namespace circa

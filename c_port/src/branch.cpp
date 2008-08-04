@@ -47,6 +47,11 @@ void Branch_alloc(Term* caller)
     caller->value = new Branch();
 }
 
+void Branch_dealloc(Term* caller)
+{
+    delete as_branch(caller);
+}
+
 void Branch_copy(Term* source, Term* dest)
 {
     // Todo
@@ -70,7 +75,10 @@ void branch_apply_function(Term* caller)
 
 void initialize_branch(Branch* kernel)
 {
-    BUILTIN_BRANCH_TYPE = quick_create_type(kernel, "Branch", Branch_alloc, NULL, NULL);
+    BUILTIN_BRANCH_TYPE = quick_create_type(kernel, "Branch",
+            Branch_alloc,
+            Branch_dealloc,
+            Branch_copy);
 
     Term* bind_name = quick_create_function(kernel, "bind-name", branch_bind_name,
         TermList(BUILTIN_BRANCH_TYPE, get_global("string"), get_global("any")),

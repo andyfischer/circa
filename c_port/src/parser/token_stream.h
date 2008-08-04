@@ -53,7 +53,7 @@ struct TokenStream
             throw errors::CircaError("Ran out of tokens");
 
         if (next().match != match)
-            throw errors::TokenMismatch(match, next().match);
+            throw errors::TokenMismatch(match, next().match, next().text.c_str());
 
         return tokens[currentIndex++].text;
     }
