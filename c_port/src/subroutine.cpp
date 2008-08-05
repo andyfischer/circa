@@ -64,7 +64,7 @@ void Subroutine_execute(Term* caller)
                     sub->name);
         }
 
-        steal_value(incomingInput, branch->getNamed(name));
+        copy_value(incomingInput, branch->getNamed(name));
     }
 
     // Execute every term in branch
