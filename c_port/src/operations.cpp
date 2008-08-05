@@ -5,6 +5,7 @@
 #include "builtins.h"
 #include "errors.h"
 #include "function.h"
+#include "logging.h"
 #include "operations.h"
 #include "term.h"
 #include "term_map.h"
@@ -51,6 +52,12 @@ void initialize_term(Term* term, Term* function, TermList inputs)
     if (functionData->initialize != NULL) {
         functionData->initialize(term);
     }
+
+    // Add to the 'users' field of each input, and 'function'
+    function->users.add(term);
+    for (int index=0; index < inputs.count(); index++) {
+        inputs[index]->users.add(term);
+    }
 }
 
 void set_inputs(Term* term, TermList inputs)
@@ -96,12 +103,24 @@ void execute(Term* term)
     if (term->function == NULL)
         throw errors::InternalError("function term is NULL");
 
-    // Make sure all our inputs are up-to-date
+    // Check each input. Make sure:
+    //  1) they are up-to-date
+    //  2) they have a non-null value
     for (int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++)
     {
-        if (term->inputs[inputIndex]->needsUpdate)
-            execute(term->inputs[inputIndex]);
+        Term* input = term->inputs[inputIndex];
+        if (input->needsUpdate)
+            execute(input);
+            
+        if (input->value == NULL)
+            throw errors::InternalError(string("Input named ") + input->findName() + " has NULL value.");
     }
+    
+    // Make sure we have an allocated value
+    if (term->value == NULL) {
+        std::cout << "Reallocating term " << term->findName() << std::endl;
+        as_type(term->type)->alloc(term);
+    }    
 
     Function* func = as_function(term->function);
 
@@ -113,15 +132,19 @@ void execute(Term* term)
         return;
     }
 
-    // Check if we need to recycle an input
+    // Check if we should recycle an input
     if (func->recycleInput != -1) {
 
-        // Temporary measure: If this type has a copy function, copy. Otherwise
-        // steal the value
-        if (as_type(term->type)->copy == NULL)
-            steal_value(term->inputs[0], term);
+        Term* recycleTerm = term->inputs[func->recycleInput];
+        bool steal = true;
+
+        // Don't steal if the term has multiple users
+        steal = steal && (recycleTerm->users.count() > 1);
+
+        if (steal)
+            steal_value(recycleTerm, term);
         else
-            copy_value(term->inputs[0], term);
+            copy_value(recycleTerm, term);
     }
 
     try {
@@ -207,7 +230,7 @@ void steal_value(Term* source, Term* dest)
         return;
     }
 
-    std::cout << "Stealing value from " << dest->findName() << std::endl;
+    std::cout << "Stealing value from " << dest->findName() << ", " << (int) dest << std::endl;
     
     // if 'dest' has a value, delete it
     if (dest->value != NULL) {

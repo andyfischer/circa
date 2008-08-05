@@ -69,6 +69,7 @@
 		B6A244800E40D94B007F2BEB /* primitive_type_test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitive_type_test.cpp; sourceTree = "<group>"; };
 		B6A244990E42A41B007F2BEB /* term_list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = term_list.cpp; sourceTree = "<group>"; };
 		B6A2449A0E42A41B007F2BEB /* term_list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = term_list.h; sourceTree = "<group>"; };
+		B6B436C90E47E64F00E3B337 /* term_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = term_set.h; sourceTree = "<group>"; };
 		B6F114A10E33394F00B8BA44 /* branch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = branch.cpp; sourceTree = "<group>"; };
 		B6F114A20E33394F00B8BA44 /* branch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = branch.h; sourceTree = "<group>"; };
 		B6F114A40E33394F00B8BA44 /* builtin_functions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = builtin_functions.cpp; sourceTree = "<group>"; };
@@ -188,6 +189,7 @@
 				B6A2449A0E42A41B007F2BEB /* term_list.h */,
 				B68D10CB0E47685600C6D09A /* term_map.cpp */,
 				B68D10CC0E47685600C6D09A /* term_map.h */,
+				B6B436C90E47E64F00E3B337 /* term_set.h */,
 				B6F114B80E33394F00B8BA44 /* term.cpp */,
 				B6F114B90E33394F00B8BA44 /* term.h */,
 				B6F114BB0E33394F00B8BA44 /* term_namespace.h */,

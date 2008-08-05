@@ -18,6 +18,9 @@ struct TermSet
     void add(Term* term) {
         _items.push_back(term);
     }
+    int count() const {
+        return 5; // todo
+    }
 };
 
 } // namespace circa
