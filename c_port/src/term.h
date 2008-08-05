@@ -3,6 +3,7 @@
 
 #include "common_headers.h"
 #include "term_list.h"
+#include "term_set.h"
 
 namespace circa {
 
@@ -13,7 +14,7 @@ struct Term
     Branch* owningBranch;
     TermList inputs;
     Term* function;
-    std::vector<Term> users;
+    TermSet users;
 
     void* value;
     Term* type;
