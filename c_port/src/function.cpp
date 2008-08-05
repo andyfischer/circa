@@ -34,6 +34,11 @@ void Function_alloc(Term* caller)
     caller->value = new Function();
 }
 
+void Function_dealloc(Term* caller)
+{
+    delete as_function(caller);
+}
+
 void function_recycle_input(Term* caller)
 {
     // Recycles input 0

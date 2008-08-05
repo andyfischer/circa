@@ -170,6 +170,11 @@ Term* get_const_function(Branch* branch, Term* type)
     return result;
 }
 
+bool is_constant(Term* term)
+{
+    return term->function->function == CONST_GENERATOR;
+}
+
 void change_function(Term* term, Term* new_function)
 {
     if (new_function->type != BUILTIN_FUNCTION_TYPE)
@@ -194,7 +199,17 @@ void copy_value(Term* source, Term* dest)
 
 void steal_value(Term* source, Term* dest)
 {
-    // Delete value at dest
+    // In some situations, ignore their request to steal
+
+    // Don't steal from constant terms
+    if (is_constant(source)) {
+        copy_value(source, dest);
+        return;
+    }
+
+    std::cout << "Stealing value from " << dest->findName() << std::endl;
+    
+    // if 'dest' has a value, delete it
     if (dest->value != NULL) {
         if (as_type(dest->type)->dealloc != NULL)
             as_type(dest->type)->dealloc(dest);
@@ -202,6 +217,7 @@ void steal_value(Term* source, Term* dest)
             std::cout << "Warning: type " << as_type(dest->type)->name
                 << " needs a dealloc function" << std::endl;
     }
+
     dest->value = source->value;
     source->value = NULL;
     source->needsUpdate = true;

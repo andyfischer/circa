@@ -33,13 +33,28 @@ Term::getType() const
     return as_type(this->type);
 }
 
-const char *
+std::string
 Term::toString()
 {
     Term* result = apply_function(this->owningBranch,
             get_global("to-string"), TermList(this));
     execute(result);
-    return as_string(result).c_str();
+    return as_string(result);
+}
+
+std::string
+Term::findName()
+{
+    Branch* branch = this->owningBranch;
+    std::string name = branch->names.findName(this);
+
+    if (name == "") {
+        std::stringstream output;
+        output << "#" << this->globalID;
+        return output.str();
+    } else {
+        return name;
+    }
 }
 
 int
