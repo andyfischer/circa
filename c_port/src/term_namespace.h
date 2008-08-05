@@ -7,7 +7,8 @@ namespace circa {
 
 struct TermNamespace
 {
-    std::map<string, Term*> _map;
+    typedef std::map<string, Term*> StringToTermMap;
+    StringToTermMap _map;
 
     bool contains(string s)
     {
@@ -22,6 +23,18 @@ struct TermNamespace
     Term* operator[](string name)
     {
         return _map[name];
+    }
+
+    std::string findName(Term* term)
+    {
+        StringToTermMap::iterator it;
+        for (it = _map.begin(); it != _map.end(); ++it) {
+            if (it->second == term) {
+                return it->first;
+            }
+        }
+
+        return "";
     }
 };
 

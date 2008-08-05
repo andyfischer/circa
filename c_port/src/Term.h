@@ -29,7 +29,8 @@ struct Term
     Term();
 
     Type* getType() const;
-    const char* toString();
+    std::string toString();
+    std::string findName();
 
     int numErrors() const;
     std::string const& getError(int index);

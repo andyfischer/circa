@@ -7,6 +7,7 @@ namespace circa {
 
 extern Branch* KERNEL;
 
+extern Term* CONST_GENERATOR;
 extern Term* BUILTIN_INT_TYPE;
 extern Term* BUILTIN_FLOAT_TYPE;
 extern Term* BUILTIN_BOOL_TYPE;
