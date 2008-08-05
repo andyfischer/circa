@@ -9,37 +9,37 @@ namespace circa {
 int
 TermList::count() const
 {
-    return (int) items.size();
+    return (int) _items.size();
 }
 
 void
 TermList::append(Term* term)
 {
-    items.push_back(term);
+    _items.push_back(term);
 }
 
 void
 TermList::setAt(int index, Term* term)
 {
     // Make sure there are enough blank elements in the list
-    while (items.size() <= index) {
-        items.push_back(NULL);
+    while (_items.size() <= index) {
+        _items.push_back(NULL);
     }
 
-    items[index] = term;
+    _items[index] = term;
 }
 
 void
 TermList::clear()
 {
-    items.clear();
+    _items.clear();
 }
 
 Term* TermList::get(int index) const
 {
-    if (index >= items.size())
+    if (index >= _items.size())
         return NULL;
-    return items[index];
+    return _items[index];
 }
 
 Term* TermList::operator[](int index) const
@@ -49,8 +49,8 @@ Term* TermList::operator[](int index) const
 
 void TermList::remap(TermMap& map)
 {
-    for (int i=0; i < items.size(); i++)
-        items[i] = map.getRemapped(items[i]);
+    for (int i=0; i < _items.size(); i++)
+        _items[i] = map.getRemapped(_items[i]);
 }
 
 } // namespace circa

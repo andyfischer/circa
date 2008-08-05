@@ -9,22 +9,22 @@ struct TermMap;
 
 struct TermList
 {
-    std::vector<Term*> items;
+    std::vector<Term*> _items;
 
     explicit TermList() { }
 
     // Convenience constructors
     explicit TermList(Term* term) {
-        items.push_back(term);
+        _items.push_back(term);
     }
     TermList(Term* term1, Term* term2) {
-        items.push_back(term1);
-        items.push_back(term2);
+        _items.push_back(term1);
+        _items.push_back(term2);
     }
     TermList(Term* term1, Term* term2, Term* term3) {
-        items.push_back(term1);
-        items.push_back(term2);
-        items.push_back(term3);
+        _items.push_back(term1);
+        _items.push_back(term2);
+        _items.push_back(term3);
     }
 
     int count() const;
