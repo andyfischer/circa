@@ -220,9 +220,9 @@ void reference_dealloc(Term* caller)
 {
     caller->value = NULL;
 }
-Term* as_reference(Term* term)
+Term*& as_reference(Term* term)
 {
-    return (Term*) term->value;
+    return (Term*&) term->value;
 }
 void reference_copy(Term* source, Term* dest)
 {

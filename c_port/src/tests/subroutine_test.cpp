@@ -57,7 +57,9 @@ void test_using_subroutine_append()
     
     quick_exec_function(branch, "test-sub = subroutine-create('test-sub, list(int,int), int)");
     quick_exec_function(branch, "test-sub = subroutine-name-inputs(test-sub,list('a,'b))");
-    //quick_exec_function("test-sub = todo
+    quick_exec_function(branch, "a = subroutine-get-local(test-sub,'a)");
+    quick_exec_function(branch, "b = subroutine-get-local(test-sub,'b)");
+    quick_exec_function(branch, "test-sub = subroutine-append(test-sub, add, list(a,b))");
 }
 
 void subroutine_test()
