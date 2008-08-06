@@ -147,22 +147,45 @@ Term* quick_create_function(Branch* branch, string name, Function::ExecuteFunc e
 	return term;
 }
 
+void hosted_apply_function(Term* caller)
+{
+    // Recycles input 0
+    Branch* branch = as_branch(caller);
+    Term* function = caller->inputs[1];
+    TermList* inputs = as_list(caller->inputs[2]);
+
+    apply_function(branch, function, *inputs);
+}
+
+void subroutine_append(Term* caller)
+{
+    // Input 0: Subroutine (recycled)
+    // Input 1: Function
+    // Input 2: List
+    Subroutine* sub = as_subroutine(caller);
+    Term* func = caller->inputs[1];
+    Term* inputs = caller->inputs[2];
+
+    as_function(func);
+    as_list(inputs);
+
+    apply_function(sub->branch, func, *as_list(inputs));
+}
+
 void initialize_bootstrapped_code(Branch* kernel)
 {
-    quick_exec_function(kernel,
-        "sub-append-function = subroutine-create('sub-append-function,list(Subroutine,Function,List),Subroutine)");
-    quick_exec_function(kernel,
-        "sub-append-function = subroutine-name-inputs(sub-append-function, list('sub,'func,'inputs))");
-    Term* sub_append_function = quick_exec_function(kernel,
-        "sub-append-function = function-recycle-input(sub-append-function,0)");
+    Term* apply_function_f = quick_create_function(kernel, "apply-function",
+        hosted_apply_function,
+        TermList(BRANCH_TYPE, FUNCTION_TYPE, LIST_TYPE),
+        BRANCH_TYPE);
+    as_function(apply_function_f)->recycleInput = 0;
 
-    // Temp: change sub_append_function back to a Subroutine
-    unsafe_change_type(sub_append_function, get_global("Subroutine"));
-
-    Subroutine *sub = as_subroutine(sub_append_function);
-
-    //quick_exec_function(sub->branch, 
-    // to finish
+    Term* subroutine_append_f = quick_create_function(kernel,
+        "subroutine-append",
+        subroutine_append,
+        TermList(SUBROUTINE_TYPE, FUNCTION_TYPE, LIST_TYPE),
+        SUBROUTINE_TYPE);
+    as_function(subroutine_append_f)->recycleInput = 0;
 }
 
 } // namespace circa

@@ -38,13 +38,8 @@ void test_simple2()
     Term* int_t = get_global("int");
     Term* string_t = get_global("string");
 
-    Term* list_with_string = constant_list(branch, TermList(string_t));
-    branch->bindName(list_with_string, "list-with-string_t");
-
     Term* print_term = quick_exec_function(branch,
-        "subroutine-create(\"print-term\",list-with-string_t,void)");
-
-    //Term* print_term = quick_create_subroutine(branch, "print-term", TermList(string_t), void_t);
+        "subroutine-create('print-term,list(string),void)");
 
     Term* input_names = constant_list(branch, TermList(constant_string(branch, "t")));
     print_term = exec_function(branch, get_global("subroutine-name-inputs"),
@@ -56,14 +51,19 @@ void test_simple2()
     quick_exec_function(branch, "print-term(\"test\")");
 }
 
-void test_call_stack()
+void test_using_subroutine_append()
 {
-
+    Branch* branch = new Branch();
+    
+    quick_exec_function(branch, "test-sub = subroutine-create('test-sub, list(int,int), int)");
+    quick_exec_function(branch, "test-sub = subroutine-name-inputs(test-sub,list('a,'b))");
+    //quick_exec_function("test-sub = todo
 }
 
 void subroutine_test()
 {
     test_simple();
+    test_using_subroutine_append();
     //test_simple2();
 }
 

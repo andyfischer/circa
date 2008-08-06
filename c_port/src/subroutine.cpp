@@ -137,6 +137,11 @@ void subroutine_set_branch(Term* caller)
     *sub->branch = *as_branch(caller->inputs[1]);
 }
 
+void subroutine_get_local(Term* caller)
+{
+
+}
+
 void initialize_subroutine(Branch* kernel)
 {
     SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine", Subroutine_alloc, Subroutine_dealloc, NULL);

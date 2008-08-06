@@ -1,12 +1,8 @@
 
 #include "common_headers.h"
 
+#include "circa.h"
 #include <tests/common.h>
-#include "bootstrapping.h"
-#include "branch.h"
-#include "builtins.h"
-#include "errors.h"
-#include "operations.h"
 
 namespace circa {
 
