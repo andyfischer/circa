@@ -30,6 +30,8 @@ Term* get_global(std::string name);
 void empty_execute_function(Term* caller);
 void initialize();
 
+Term*& as_reference(Term* term);
+
 } // namespace circa
 
 #endif

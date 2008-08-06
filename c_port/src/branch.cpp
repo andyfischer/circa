@@ -63,7 +63,6 @@ void branch_bind_name(Term* caller)
     as_branch(caller)->bindName(caller->inputs[2], as_string(caller->inputs[1]));
 }
 
-
 void initialize_branch(Branch* kernel)
 {
     BRANCH_TYPE = quick_create_type(kernel, "Branch",

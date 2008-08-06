@@ -139,7 +139,13 @@ void subroutine_set_branch(Term* caller)
 
 void subroutine_get_local(Term* caller)
 {
+    // Input 0: Subroutine
+    // Input 1: String, name
+    // Output: Reference
+    Subroutine* sub = as_subroutine(caller->inputs[0]);
+    std::string name = as_string(caller->inputs[1]);
 
+    as_reference(caller) = sub->branch->getNamed(name);
 }
 
 void initialize_subroutine(Branch* kernel)
@@ -156,12 +162,15 @@ void initialize_subroutine(Branch* kernel)
     as_function(name_inputs)->recycleInput = 0;
 
     quick_create_function(kernel, "subroutine-get-branch", subroutine_get_branch,
-        TermList(SUBROUTINE_TYPE), get_global("Branch"));
+        TermList(SUBROUTINE_TYPE), BRANCH_TYPE);
 
     Term* set_branch = quick_create_function(kernel,
         "subroutine-set-branch", subroutine_set_branch,
-        TermList(SUBROUTINE_TYPE, get_global("Branch")), SUBROUTINE_TYPE);
+        TermList(SUBROUTINE_TYPE, BRANCH_TYPE), SUBROUTINE_TYPE);
     as_function(set_branch)->recycleInput = 0;
+
+    quick_create_function(kernel, "subroutine-get-local",
+        subroutine_get_local, TermList(SUBROUTINE_TYPE, STRING_TYPE), REFERENCE_TYPE);
 }
 
 } // namespace circa
