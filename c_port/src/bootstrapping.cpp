@@ -157,21 +157,6 @@ void hosted_apply_function(Term* caller)
     apply_function(branch, function, *inputs);
 }
 
-void subroutine_append(Term* caller)
-{
-    // Input 0: Subroutine (recycled)
-    // Input 1: Function
-    // Input 2: List
-    Subroutine* sub = as_subroutine(caller);
-    Term* func = caller->inputs[1];
-    Term* inputs = caller->inputs[2];
-
-    as_function(func);
-    as_list(inputs);
-
-    apply_function(sub->branch, func, *as_list(inputs));
-}
-
 void initialize_bootstrapped_code(Branch* kernel)
 {
     Term* apply_function_f = quick_create_function(kernel, "apply-function",
@@ -179,13 +164,6 @@ void initialize_bootstrapped_code(Branch* kernel)
         TermList(BRANCH_TYPE, FUNCTION_TYPE, LIST_TYPE),
         BRANCH_TYPE);
     as_function(apply_function_f)->recycleInput = 0;
-
-    Term* subroutine_append_f = quick_create_function(kernel,
-        "subroutine-append",
-        subroutine_append,
-        TermList(SUBROUTINE_TYPE, FUNCTION_TYPE, LIST_TYPE),
-        SUBROUTINE_TYPE);
-    as_function(subroutine_append_f)->recycleInput = 0;
 }
 
 } // namespace circa

@@ -148,6 +148,21 @@ void subroutine_get_local(Term* caller)
     as_reference(caller) = sub->branch->getNamed(name);
 }
 
+void subroutine_append(Term* caller)
+{
+    // Input 0: Subroutine (recycled)
+    // Input 1: Function
+    // Input 2: List
+    Subroutine* sub = as_subroutine(caller);
+    Term* func = caller->inputs[1];
+    Term* inputs = caller->inputs[2];
+
+    as_function(func);
+    as_list(inputs);
+
+    apply_function(sub->branch, func, *as_list(inputs));
+}
+
 void initialize_subroutine(Branch* kernel)
 {
     SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine", Subroutine_alloc, Subroutine_dealloc, NULL);
@@ -171,6 +186,13 @@ void initialize_subroutine(Branch* kernel)
 
     quick_create_function(kernel, "subroutine-get-local",
         subroutine_get_local, TermList(SUBROUTINE_TYPE, STRING_TYPE), REFERENCE_TYPE);
+
+    Term* subroutine_append_f = quick_create_function(kernel,
+        "subroutine-append",
+        subroutine_append,
+        TermList(SUBROUTINE_TYPE, FUNCTION_TYPE, LIST_TYPE),
+        SUBROUTINE_TYPE);
+    as_function(subroutine_append_f)->recycleInput = 0;
 }
 
 } // namespace circa

@@ -66,7 +66,6 @@ void subroutine_test()
 {
     test_simple();
     test_using_subroutine_append();
-    //test_simple2();
 }
 
 }
