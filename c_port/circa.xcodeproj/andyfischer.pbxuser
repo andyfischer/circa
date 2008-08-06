@@ -112,7 +112,7 @@
 		ignoreCount = 0;
 		lineNumber = 43;
 		location = circa;
-		modificationTime = 239650901.130972;
+		modificationTime = 239679691.451443;
 		state = 1;
 	};
 	B6A243A40E3568EB007F2BEB /* errors.cpp */ = {
@@ -140,11 +140,11 @@
 		countType = 0;
 		delayBeforeContinue = 0;
 		fileReference = B6F114AF0E33394F00B8BA44 /* errors.h */;
-		hitCount = 0;
+		hitCount = 1;
 		ignoreCount = 0;
 		lineNumber = 13;
 		location = circa;
-		modificationTime = 239650901.960502;
+		modificationTime = 239679692.739159;
 		state = 1;
 	};
 	B6A243C60E356F1B007F2BEB /* errors.cpp:15 */ = {
@@ -161,7 +161,7 @@
 		ignoreCount = 0;
 		lineNumber = 15;
 		location = circa;
-		modificationTime = 239650901.129086;
+		modificationTime = 239679691.451413;
 		state = 1;
 	};
 	B6A243D30E356F90007F2BEB /* errors.h:25 */ = {
@@ -178,14 +178,14 @@
 		ignoreCount = 0;
 		lineNumber = 25;
 		location = circa;
-		modificationTime = 239650901.129095;
+		modificationTime = 239679691.451418;
 		state = 1;
 	};
 	B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 2436}}";
-			sepNavSelRange = "{2610, 0}";
-			sepNavVisRange = "{2230, 676}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 2464}}";
+			sepNavSelRange = "{4896, 0}";
+			sepNavVisRange = "{4418, 620}";
 			sepNavWindowFrame = "{{492, 91}, {750, 558}}";
 		};
 	};
@@ -239,7 +239,7 @@
 		ignoreCount = 0;
 		lineNumber = 149;
 		location = circa;
-		modificationTime = 239650901.129102;
+		modificationTime = 239679691.451422;
 		state = 2;
 	};
 	B6A244410E401F16007F2BEB /* struct_test.cpp */ = {
@@ -264,7 +264,7 @@
 		ignoreCount = 0;
 		lineNumber = 34;
 		location = circa;
-		modificationTime = 239650901.13095;
+		modificationTime = 239679691.451433;
 		state = 2;
 	};
 	B6B436DD0E48B9AE00E3B337 /* PBXTextBookmark */ = {
@@ -295,7 +295,7 @@
 		ignoreCount = 0;
 		lineNumber = 230;
 		location = circa;
-		modificationTime = 239650901.131019;
+		modificationTime = 239679691.45145;
 		state = 1;
 	};
 	B6C950BA0E48C76F0082302C /* PBXTextBookmark */ = {
@@ -325,7 +325,7 @@
 		argumentStrings = (
 		);
 		autoAttachOnCrash = 1;
-		breakpointsEnabled = 0;
+		breakpointsEnabled = 1;
 		configStateDict = {
 		};
 		customDataFormattersEnabled = 1;
@@ -390,9 +390,9 @@
 	};
 	B6F114B60E33394F00B8BA44 /* subroutine.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 2240}}";
-			sepNavSelRange = "{1559, 0}";
-			sepNavVisRange = "{1033, 706}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 2464}}";
+			sepNavSelRange = "{408, 0}";
+			sepNavVisRange = "{234, 400}";
 		};
 	};
 	B6F114B80E33394F00B8BA44 /* term.cpp */ = {
