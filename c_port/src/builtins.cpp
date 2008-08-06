@@ -18,20 +18,20 @@ namespace circa {
 
 Branch* KERNEL = NULL;
 Term* CONST_GENERATOR = NULL;
-Term* BUILTIN_INT_TYPE = NULL;
-Term* BUILTIN_FLOAT_TYPE = NULL;
-Term* BUILTIN_BOOL_TYPE = NULL;
-Term* BUILTIN_STRING_TYPE = NULL;
-Term* BUILTIN_TYPE_TYPE = NULL;
-Term* BUILTIN_FUNCTION_TYPE = NULL;
-Term* BUILTIN_CODEUNIT_TYPE = NULL;
-Term* BUILTIN_SUBROUTINE_TYPE = NULL;
-Term* BUILTIN_STRUCT_DEFINITION_TYPE = NULL;
-Term* BUILTIN_BRANCH_TYPE = NULL;
-Term* BUILTIN_ANY_TYPE = NULL;
-Term* BUILTIN_VOID_TYPE = NULL;
-Term* BUILTIN_REFERENCE_TYPE = NULL;
-Term* BUILTIN_LIST_TYPE = NULL;
+Term* INT_TYPE = NULL;
+Term* FLOAT_TYPE = NULL;
+Term* BOOL_TYPE = NULL;
+Term* STRING_TYPE = NULL;
+Term* TYPE_TYPE = NULL;
+Term* FUNCTION_TYPE = NULL;
+Term* CODEUNIT_TYPE = NULL;
+Term* SUBROUTINE_TYPE = NULL;
+Term* STRUCT_DEFINITION_TYPE = NULL;
+Term* BRANCH_TYPE = NULL;
+Term* ANY_TYPE = NULL;
+Term* VOID_TYPE = NULL;
+Term* REFERENCE_TYPE = NULL;
+Term* LIST_TYPE = NULL;
 Term* CONSTANT_0 = NULL;
 Term* CONSTANT_1 = NULL;
 Term* CONSTANT_2 = NULL;
@@ -79,7 +79,7 @@ void bootstrap_kernel()
 
     // Create Type type
     Term* typeType = new Term();
-    BUILTIN_TYPE_TYPE = typeType;
+    TYPE_TYPE = typeType;
     typeType->function = constTypeFunc;
     typeType->type = typeType;
     Type_alloc(typeType);
@@ -105,7 +105,7 @@ void bootstrap_kernel()
 
     // Create Function type
     Term* functionType = new Term();
-    BUILTIN_FUNCTION_TYPE = functionType;
+    FUNCTION_TYPE = functionType;
     functionType->function = constTypeFunc;
     functionType->type = typeType;
     Type_alloc(functionType);
@@ -213,22 +213,22 @@ void bool_tostring(Term* caller)
 
 void create_builtin_types()
 {
-    BUILTIN_STRING_TYPE = quick_create_type(KERNEL, "string",
+    STRING_TYPE = quick_create_type(KERNEL, "string",
             string_alloc,
             string_dealloc,
             string_copy,
             string_tostring);
-    BUILTIN_INT_TYPE = quick_create_type(KERNEL, "int",
+    INT_TYPE = quick_create_type(KERNEL, "int",
             int_alloc, int_dealloc, int_copy, int_tostring);
-    BUILTIN_FLOAT_TYPE = quick_create_type(KERNEL, "float",
+    FLOAT_TYPE = quick_create_type(KERNEL, "float",
             float_alloc, float_dealloc, float_copy, float_tostring);
-    BUILTIN_BOOL_TYPE = quick_create_type(KERNEL, "bool",
+    BOOL_TYPE = quick_create_type(KERNEL, "bool",
             bool_alloc, bool_dealloc, bool_copy, bool_tostring);
-    BUILTIN_ANY_TYPE = quick_create_type(KERNEL, "any",
+    ANY_TYPE = quick_create_type(KERNEL, "any",
             empty_function, empty_function, NULL);
-    BUILTIN_VOID_TYPE = quick_create_type(KERNEL, "void",
+    VOID_TYPE = quick_create_type(KERNEL, "void",
             empty_function, empty_function, NULL);
-    BUILTIN_REFERENCE_TYPE = quick_create_type(KERNEL, "Reference",
+    REFERENCE_TYPE = quick_create_type(KERNEL, "Reference",
             empty_function, empty_function, NULL);
 }
 

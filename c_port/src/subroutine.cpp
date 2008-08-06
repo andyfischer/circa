@@ -20,14 +20,14 @@ Subroutine::Subroutine()
 Subroutine* as_subroutine(Term* term)
 {
     if (!is_subroutine(term))
-        throw errors::TypeError(term, BUILTIN_SUBROUTINE_TYPE);
+        throw errors::TypeError(term, SUBROUTINE_TYPE);
 
     return (Subroutine*) term->value;
 }
 
 bool is_subroutine(Term* term)
 {
-    return term->type == BUILTIN_SUBROUTINE_TYPE;
+    return term->type == SUBROUTINE_TYPE;
 }
 
 void Subroutine_alloc(Term* term)
@@ -78,7 +78,7 @@ void Subroutine_execute(Term* caller)
     else {
         // Not having an output is OK, but make sure we are declared with
         // type void.
-        if (!(caller->type == BUILTIN_VOID_TYPE)) {
+        if (!(caller->type == VOID_TYPE)) {
             std::cout << "Warning: Inconsistent data. Subroutine " <<
                 sub->name << " has a non-void output type, but has no output placeholder.";
         }
@@ -139,23 +139,23 @@ void subroutine_set_branch(Term* caller)
 
 void initialize_subroutine(Branch* kernel)
 {
-    BUILTIN_SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine", Subroutine_alloc, Subroutine_dealloc, NULL);
+    SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine", Subroutine_alloc, Subroutine_dealloc, NULL);
 
     quick_create_function(kernel, "subroutine-create", subroutine_create,
         TermList(get_global("string"),get_global("List"),get_global("Type")),
-        BUILTIN_SUBROUTINE_TYPE);
+        SUBROUTINE_TYPE);
 
     Term* name_inputs = quick_create_function(kernel,
         "subroutine-name-inputs", subroutine_name_inputs,
-        TermList(BUILTIN_SUBROUTINE_TYPE, get_global("List")), BUILTIN_SUBROUTINE_TYPE);
+        TermList(SUBROUTINE_TYPE, get_global("List")), SUBROUTINE_TYPE);
     as_function(name_inputs)->recycleInput = 0;
 
     quick_create_function(kernel, "subroutine-get-branch", subroutine_get_branch,
-        TermList(BUILTIN_SUBROUTINE_TYPE), get_global("Branch"));
+        TermList(SUBROUTINE_TYPE), get_global("Branch"));
 
     Term* set_branch = quick_create_function(kernel,
         "subroutine-set-branch", subroutine_set_branch,
-        TermList(BUILTIN_SUBROUTINE_TYPE, get_global("Branch")), BUILTIN_SUBROUTINE_TYPE);
+        TermList(SUBROUTINE_TYPE, get_global("Branch")), SUBROUTINE_TYPE);
     as_function(set_branch)->recycleInput = 0;
 }
 

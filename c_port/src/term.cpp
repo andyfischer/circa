@@ -71,32 +71,32 @@ Term::getError(int index)
 
 int& as_int(Term* t)
 {
-    if (t->type != BUILTIN_INT_TYPE)
-        throw errors::TypeError(t, BUILTIN_INT_TYPE);
+    if (t->type != INT_TYPE)
+        throw errors::TypeError(t, INT_TYPE);
 
     return *((int*) t->value);
 }
 
 float& as_float(Term* t)
 {
-    if (t->type != BUILTIN_FLOAT_TYPE)
-        throw errors::TypeError(t, BUILTIN_FLOAT_TYPE);
+    if (t->type != FLOAT_TYPE)
+        throw errors::TypeError(t, FLOAT_TYPE);
 
     return *((float*) t->value);
 }
 
 bool& as_bool(Term* t)
 {
-    if (t->type != BUILTIN_BOOL_TYPE)
-        throw errors::TypeError(t, BUILTIN_BOOL_TYPE);
+    if (t->type != BOOL_TYPE)
+        throw errors::TypeError(t, BOOL_TYPE);
 
     return *((bool*) t->value);
 }
 
 string& as_string(Term* t)
 {
-    if (t->type != BUILTIN_STRING_TYPE)
-        throw errors::TypeError(t, BUILTIN_STRING_TYPE);
+    if (t->type != STRING_TYPE)
+        throw errors::TypeError(t, STRING_TYPE);
 
     if (t->value == NULL)
         throw errors::InternalError("NULL pointer in as_string");
@@ -107,8 +107,8 @@ string& as_string(Term* t)
 // TermList type
 TermList* as_list(Term* term)
 {
-    if (term->type != BUILTIN_LIST_TYPE)
-        throw errors::TypeError(term, BUILTIN_LIST_TYPE);
+    if (term->type != LIST_TYPE)
+        throw errors::TypeError(term, LIST_TYPE);
     return (TermList*) term->value;
 }
 
@@ -124,7 +124,7 @@ void TermList_dealloc(Term* caller)
 
 void initialize_term(Branch* kernel)
 {
-    BUILTIN_LIST_TYPE = quick_create_type(kernel, "List",
+    LIST_TYPE = quick_create_type(kernel, "List",
             TermList_alloc,
             TermList_dealloc,
             NULL);
