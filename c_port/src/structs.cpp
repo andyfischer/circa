@@ -48,8 +48,8 @@ StructDefinition::findField(std::string name)
 
 StructDefinition* as_struct_definition(Term* term)
 {
-    if (term->type != BUILTIN_STRUCT_DEFINITION_TYPE)
-        throw errors::TypeError(term, BUILTIN_STRUCT_DEFINITION_TYPE);
+    if (term->type != STRUCT_DEFINITION_TYPE)
+        throw errors::TypeError(term, STRUCT_DEFINITION_TYPE);
 
     return (StructDefinition*) term->value;
 }
@@ -162,7 +162,7 @@ void struct_set_field(Term* caller)
 
 void initialize_structs(Branch* code)
 {
-    BUILTIN_STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition",
+    STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition",
             StructDefinition_alloc,
             StructDefinition_dealloc,
             StructDefinition_copy);

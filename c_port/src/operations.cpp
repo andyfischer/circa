@@ -97,8 +97,8 @@ void change_type(Term* term, Term* type)
 
 void specialize_type(Term* term, Term* type)
 {
-    if (term->type != BUILTIN_ANY_TYPE)
-        throw errors::TypeError(term, BUILTIN_ANY_TYPE);
+    if (term->type != ANY_TYPE)
+        throw errors::TypeError(term, ANY_TYPE);
 
     change_type(term, type);
 }
@@ -210,8 +210,8 @@ bool is_constant(Term* term)
 
 void change_function(Term* term, Term* new_function)
 {
-    if (new_function->type != BUILTIN_FUNCTION_TYPE)
-        throw errors::TypeError(new_function, BUILTIN_FUNCTION_TYPE);
+    if (new_function->type != FUNCTION_TYPE)
+        throw errors::TypeError(new_function, FUNCTION_TYPE);
 
     term->function = new_function;
 }

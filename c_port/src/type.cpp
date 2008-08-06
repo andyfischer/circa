@@ -20,14 +20,14 @@ Type::Type()
 
 bool is_type(Term* term)
 {
-    return ((term->type == BUILTIN_TYPE_TYPE)
-            || (term->type == BUILTIN_STRUCT_DEFINITION_TYPE));
+    return ((term->type == TYPE_TYPE)
+            || (term->type == STRUCT_DEFINITION_TYPE));
 }
 
 Type* as_type(Term* term)
 {
     if (!is_type(term))
-        throw errors::TypeError(term, BUILTIN_TYPE_TYPE);
+        throw errors::TypeError(term, TYPE_TYPE);
 
     return (Type*) term->value;
 }

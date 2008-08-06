@@ -18,13 +18,13 @@ Function::Function()
 
 bool is_function(Term* term)
 {
-    return (term->type == BUILTIN_FUNCTION_TYPE) || (term->type == BUILTIN_SUBROUTINE_TYPE);
+    return (term->type == FUNCTION_TYPE) || (term->type == SUBROUTINE_TYPE);
 }
 
 Function* as_function(Term* term)
 {
     if (!is_function(term))
-        throw errors::TypeError(term, BUILTIN_FUNCTION_TYPE);
+        throw errors::TypeError(term, FUNCTION_TYPE);
 
     return (Function*) term->value;
 }

@@ -36,8 +36,8 @@ void Branch::bindName(Term* term, string name)
 
 Branch* as_branch(Term* term)
 {
-    if (term->type != BUILTIN_BRANCH_TYPE)
-        throw errors::TypeError(term, BUILTIN_BRANCH_TYPE);
+    if (term->type != BRANCH_TYPE)
+        throw errors::TypeError(term, BRANCH_TYPE);
 
     return (Branch*) term->value;
 }
@@ -75,20 +75,20 @@ void branch_apply_function(Term* caller)
 
 void initialize_branch(Branch* kernel)
 {
-    BUILTIN_BRANCH_TYPE = quick_create_type(kernel, "Branch",
+    BRANCH_TYPE = quick_create_type(kernel, "Branch",
             Branch_alloc,
             Branch_dealloc,
             Branch_copy);
 
     Term* bind_name = quick_create_function(kernel, "bind-name", branch_bind_name,
-        TermList(BUILTIN_BRANCH_TYPE, get_global("string"), get_global("any")),
-        BUILTIN_BRANCH_TYPE);
+        TermList(BRANCH_TYPE, get_global("string"), get_global("any")),
+        BRANCH_TYPE);
     as_function(bind_name)->recycleInput = 0;
 
     Term* apply_function = quick_create_function(kernel, "apply-function",
         branch_apply_function,
-        TermList(BUILTIN_BRANCH_TYPE, get_global("Function"), get_global("List")),
-        BUILTIN_BRANCH_TYPE);
+        TermList(BRANCH_TYPE, get_global("Function"), get_global("List")),
+        BRANCH_TYPE);
     as_function(apply_function)->recycleInput = 0;
 }
 
