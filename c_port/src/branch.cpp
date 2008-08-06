@@ -63,15 +63,6 @@ void branch_bind_name(Term* caller)
     as_branch(caller)->bindName(caller->inputs[2], as_string(caller->inputs[1]));
 }
 
-void branch_apply_function(Term* caller)
-{
-    // Recycles input 0
-    Branch* branch = as_branch(caller);
-    Term* function = caller->inputs[1];
-    TermList* inputs = as_list(caller->inputs[2]);
-
-    apply_function(branch, function, *inputs);
-}
 
 void initialize_branch(Branch* kernel)
 {
@@ -84,12 +75,6 @@ void initialize_branch(Branch* kernel)
         TermList(BRANCH_TYPE, get_global("string"), get_global("any")),
         BRANCH_TYPE);
     as_function(bind_name)->recycleInput = 0;
-
-    Term* apply_function = quick_create_function(kernel, "apply-function",
-        branch_apply_function,
-        TermList(BRANCH_TYPE, get_global("Function"), get_global("List")),
-        BRANCH_TYPE);
-    as_function(apply_function)->recycleInput = 0;
 }
 
 } // namespace circa
