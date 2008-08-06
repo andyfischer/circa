@@ -70,6 +70,16 @@ Term* create_constant(Branch* branch, Term* type)
     return create_term(branch, get_const_function(branch, type), TermList());
 }
 
+void unsafe_change_type(Term* term, Term* type)
+{
+    if (term->value == NULL) {
+        change_type(term, type);
+        return;
+    }
+
+    term->type = type;
+}
+
 void change_type(Term* term, Term* type)
 {
     if (term->value != NULL)

@@ -250,10 +250,12 @@ void initialize()
         // Do initialize_term first
         initialize_term(KERNEL);
 
+        // Then initialize structs
+        initialize_structs(KERNEL);
+
         initialize_branch(KERNEL);
         initialize_builtin_functions(KERNEL);
         initialize_functions(KERNEL);
-        initialize_structs(KERNEL);
         initialize_subroutine(KERNEL);
 
         initialize_bootstrapped_code(KERNEL);

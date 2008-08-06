@@ -153,14 +153,16 @@ void initialize_bootstrapped_code(Branch* kernel)
         "sub-append-function = subroutine-create('sub-append-function,list(Subroutine,Function,List),Subroutine)");
     quick_exec_function(kernel,
         "sub-append-function = subroutine-name-inputs(sub-append-function, list('sub,'func,'inputs))");
-    quick_exec_function(kernel,
+    Term* sub_append_function = quick_exec_function(kernel,
         "sub-append-function = function-recycle-input(sub-append-function,0)");
+
+    // Temp: change sub_append_function back to a Subroutine
+    unsafe_change_type(sub_append_function, get_global("Subroutine"));
+
+    Subroutine *sub = as_subroutine(sub_append_function);
+
+    //quick_exec_function(sub->branch, 
     // to finish
 }
-
-// should there be places where 'current-subroutine' or 'current-branch' are defined?
-
-// when I print out the contents of a subroutine..
-// some term pointers point inside the subroutine, some point to the input placeholders
 
 } // namespace circa
