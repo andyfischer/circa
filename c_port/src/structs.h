@@ -21,6 +21,7 @@ struct StructDefinition : public Type
 
     StructDefinition();
     void addField(std::string name, Term* type);
+    void clear();
     int numFields() const;
     Term* getType(int index) const;
 
@@ -33,7 +34,9 @@ struct StructInstance
     Term** fields;
 };
 
+bool is_struct_definition(Term* term);
 StructDefinition* as_struct_definition(Term* term);
+Term* get_struct_field(Term* structTerm, int index);
 
 void initialize_structs(Branch* code);
 

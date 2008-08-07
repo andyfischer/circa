@@ -520,12 +520,12 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>B6F5F4060E4938D200CE7604</string>
+		<string>B6F5F40F0E4B708700CE7604</string>
 		<string>B6F5F3F90E48C82800CE7604</string>
 		<string>B6F5F3FA0E48C82800CE7604</string>
 		<string>B6F5F3FB0E48C82800CE7604</string>
-		<string>B6F114D50E33398200B8BA44</string>
 		<string>/Users/andyfischer/circa/c_port/circa.xcodeproj</string>
+		<string>B6F114D50E33398200B8BA44</string>
 		<string>1C78EAAD065D492600B07095</string>
 		<string>1CD10A99069EF8BA00B06720</string>
 	</array>
@@ -546,12 +546,14 @@
 					<key>Dock</key>
 					<array>
 						<dict>
+							<key>BecomeActive</key>
+							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
 								<string>1CD0528F0623707200166675</string>
 								<key>PBXProjectModuleLabel</key>
-								<string></string>
+								<string>structs.cpp</string>
 								<key>StatusBarVisibility</key>
 								<true/>
 							</dict>
@@ -618,7 +620,7 @@
 			<key>WindowToolGUID</key>
 			<string>B6F114D50E33398200B8BA44</string>
 			<key>WindowToolIsVisible</key>
-			<false/>
+			<true/>
 		</dict>
 		<dict>
 			<key>FirstTimeWindowDisplayed</key>
@@ -701,10 +703,10 @@
 									<key>Frame</key>
 									<string>{{349, 0}, {420, 363}}</string>
 									<key>RubberWindowFrame</key>
-									<string>350 56 769 722 0 0 1280 778 </string>
+									<string>438 55 769 722 0 0 1280 778 </string>
 								</dict>
 								<key>RubberWindowFrame</key>
-								<string>350 56 769 722 0 0 1280 778 </string>
+								<string>438 55 769 722 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXDebugSessionModule</string>
@@ -738,7 +740,7 @@
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.debugV3</string>
 			<key>WindowString</key>
-			<string>350 56 769 722 0 0 1280 778 </string>
+			<string>438 55 769 722 0 0 1280 778 </string>
 			<key>WindowToolGUID</key>
 			<string>1CD10A99069EF8BA00B06720</string>
 			<key>WindowToolIsVisible</key>
@@ -874,7 +876,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {691, 450}}</string>
 								<key>RubberWindowFrame</key>
-								<string>520 58 691 491 0 0 1280 778 </string>
+								<string>532 77 691 491 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXDebugCLIModule</string>
@@ -903,7 +905,7 @@
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.consoleV3</string>
 			<key>WindowString</key>
-			<string>520 58 691 491 0 0 1280 778 </string>
+			<string>532 77 691 491 0 0 1280 778 </string>
 			<key>WindowToolGUID</key>
 			<string>1C78EAAD065D492600B07095</string>
 			<key>WindowToolIsVisible</key>

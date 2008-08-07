@@ -4,6 +4,7 @@
 #include "builtins.h"
 #include "errors.h"
 #include "operations.h"
+#include "structs.h"
 #include "subroutine.h"
 #include "term.h"
 
@@ -150,10 +151,12 @@ void subroutine_get_local(Term* caller)
 
 void subroutine_append(Term* caller)
 {
-    // Input 0: Subroutine (recycled)
+    // Input 0: Subroutine
     // Input 1: Function
     // Input 2: List
-    Subroutine* sub = as_subroutine(caller);
+    // Result: (Subroutine,Reference)
+    Subroutine* sub = as_subroutine(get_struct_field(caller,0));
+    Term* ref = as_reference(get_struct_field(caller,1));
     Term* func = caller->inputs[1];
     Term* inputs = caller->inputs[2];
 
@@ -187,11 +190,14 @@ void initialize_subroutine(Branch* kernel)
     quick_create_function(kernel, "subroutine-get-local",
         subroutine_get_local, TermList(SUBROUTINE_TYPE, STRING_TYPE), REFERENCE_TYPE);
 
+    Term* subroutine_append_return_type = quick_exec_function(kernel,
+        "define-struct('subroutine-append-returns, list(Subroutine, Reference))");
+
     Term* subroutine_append_f = quick_create_function(kernel,
         "subroutine-append",
         subroutine_append,
         TermList(SUBROUTINE_TYPE, FUNCTION_TYPE, LIST_TYPE),
-        SUBROUTINE_TYPE);
+        subroutine_append_return_type);
     as_function(subroutine_append_f)->recycleInput = 0;
 }
 

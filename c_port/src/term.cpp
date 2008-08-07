@@ -46,6 +46,10 @@ std::string
 Term::findName()
 {
     Branch* branch = this->owningBranch;
+
+    if (branch == NULL)
+        return "<null branch>";
+
     std::string name = branch->names.findName(this);
 
     if (name == "") {
