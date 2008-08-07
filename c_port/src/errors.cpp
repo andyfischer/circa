@@ -21,7 +21,8 @@ TypeError::message()
         throw InternalError("2nd argument to TypeError must be a type");
 
     return string("TypeError: expected " + as_type(expectedType)->name
-            + ", found " + as_type(term->type)->name);
+            + ", found " + as_type(term->type)->name + " named "
+            + term->findName());
 }
 
 } // namespace errors

@@ -24,6 +24,12 @@ StructDefinition::addField(std::string name, Term* type)
     this->fields.push_back(Field(name, type));
 }
 
+void
+StructDefinition::clear()
+{
+    this->fields.clear();
+}
+
 int
 StructDefinition::numFields() const
 {
@@ -46,9 +52,14 @@ StructDefinition::findField(std::string name)
     return -1;
 }
 
+bool is_struct_definition(Term* term)
+{
+    return term->type == STRUCT_DEFINITION_TYPE;
+}
+
 StructDefinition* as_struct_definition(Term* term)
 {
-    if (term->type != STRUCT_DEFINITION_TYPE)
+    if (!is_struct_definition(term))
         throw errors::TypeError(term, STRUCT_DEFINITION_TYPE);
 
     return (StructDefinition*) term->value;
@@ -58,6 +69,11 @@ StructInstance* as_struct_instance(Term* term)
 {
     // todo: type check
     return (StructInstance*) term->value;
+}
+
+Term* get_struct_field(Term* structTerm, int index)
+{
+    return as_struct_instance(structTerm)->fields[index];
 }
 
 void StructDefinition_alloc(Term* term)
@@ -119,6 +135,11 @@ void struct_definition_set_name(Term* caller)
 
 void struct_get_field(Term* caller)
 {
+    if (!is_struct_definition(caller->inputs[0]->type)) {
+        throw errors::InternalError(string("Type is not a struct: ")
+                + as_type(caller->inputs[0]->type)->name);
+    }
+
     StructDefinition* def = as_struct_definition(caller->inputs[0]->type);
     string fieldName = as_string(caller->inputs[1]);
 
@@ -160,6 +181,34 @@ void struct_set_field(Term* caller)
     copy_value(value, field);
 }
 
+void struct_define(Term* caller)
+{
+    // Input 0: string name
+    // Input 0: list<Type>
+    std::string name = as_string(caller->inputs[0]);
+    TermList* typeList = as_list(caller->inputs[1]);
+
+    StructDefinition* def = as_struct_definition(caller);
+
+    def->clear();
+
+    def->name = name;
+
+    for (int index=0; index < typeList->count(); index++) {
+        std::stringstream fieldName;
+        fieldName << "field-" << index;
+        def->addField(fieldName.str(), typeList->get(index)); 
+    }
+}
+
+void struct_get_index(Term* caller)
+{
+    // Input 0: struct
+    // Input 1: int index
+    StructInstance* instance = as_struct_instance(caller->inputs[0]);
+    copy_value(instance->fields[as_int(caller->inputs[1])], caller);
+}
+
 void initialize_structs(Branch* code)
 {
     STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition",
@@ -168,23 +217,26 @@ void initialize_structs(Branch* code)
             StructDefinition_copy);
 
     quick_create_function(code, "get-field", struct_get_field,
-        TermList(get_global("any"), get_global("string")), get_global("any"));
+        TermList(ANY_TYPE, STRING_TYPE), ANY_TYPE);
 
     Term* set_field = quick_create_function(code, "set-field", struct_set_field,
-        TermList(get_global("any"), get_global("string"), get_global("any")),
-        get_global("any"));
-    // as_function(set_field)->recycleInput = 0;
+        TermList(ANY_TYPE, STRING_TYPE, ANY_TYPE), ANY_TYPE);
     as_function(set_field)->initialize = struct_set_field_init;
     as_function(set_field)->recycleInput = 0;
 
     Term* add_field = quick_create_function(code, "add-field", struct_definition_add_field,
-        TermList(get_global("StructDefinition"), get_global("string"), get_global("Type")),
-        get_global("StructDefinition"));
+        TermList(STRUCT_DEFINITION_TYPE, STRING_TYPE, TYPE_TYPE),
+        STRUCT_DEFINITION_TYPE);
     as_function(add_field)->recycleInput = 0;
 
     quick_create_function(code, "struct-definition-set-name", struct_definition_set_name,
-        TermList(get_global("StructDefinition"), get_global("string")),
-        get_global("StructDefinition"));
+        TermList(get_global("StructDefinition"), STRING_TYPE), STRUCT_DEFINITION_TYPE);
+
+    quick_create_function(code, "define-struct", struct_define,
+        TermList(STRING_TYPE, LIST_TYPE, LIST_TYPE), STRUCT_DEFINITION_TYPE);
+
+    quick_create_function(code, "get-index", struct_get_index,
+        TermList(ANY_TYPE, INT_TYPE), ANY_TYPE);
 }
 
 } // namespace circa
