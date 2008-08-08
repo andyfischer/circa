@@ -48,7 +48,7 @@ void copy_value(Term* source, Term* dest);
 //  1) if source is a constant
 void steal_value(Term* source, Term* dest);
 
-void duplicate_branch(Term* source, Term* dest);
+void duplicate_branch(Branch* source, Branch* dest);
 
 Term* find_named(Branch* branch, std::string name);
 

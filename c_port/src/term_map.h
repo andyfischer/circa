@@ -9,6 +9,8 @@ struct TermMap
 {
     std::map<Term*,Term*> _map;
 
+    typedef std::map<Term*,Term*>::iterator iterator;
+
     explicit TermMap() { }
     Term*& operator[](Term* key);
 
@@ -17,6 +19,10 @@ struct TermMap
     // If 'key' exists in this map, return the associated term.
     // Otherwise, return 'key' back to them.
     Term* getRemapped(Term* key);
+
+    iterator begin();
+
+    iterator end();
 };
 
 } // namespace circa

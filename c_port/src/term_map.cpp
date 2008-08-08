@@ -9,9 +9,6 @@ namespace circa {
 Term*&
 TermMap::operator[](Term* key)
 {
-    if (!contains(key))
-        throw errors::KeyError("");
-
     return _map[key];
 }
 
@@ -28,6 +25,18 @@ TermMap::getRemapped(Term* key)
         return _map[key];
     else
         return key;
+}
+
+TermMap::iterator
+TermMap::begin()
+{
+    return _map.begin();
+}
+
+TermMap::iterator
+TermMap::end()
+{
+    return _map.end();
 }
 
 } // namespace circa

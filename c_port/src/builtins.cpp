@@ -32,6 +32,8 @@ Term* ANY_TYPE = NULL;
 Term* VOID_TYPE = NULL;
 Term* REFERENCE_TYPE = NULL;
 Term* LIST_TYPE = NULL;
+Term* CONSTANT_INT = NULL;
+Term* CONSTANT_STRING = NULL;
 Term* CONSTANT_0 = NULL;
 Term* CONSTANT_1 = NULL;
 Term* CONSTANT_2 = NULL;
@@ -254,9 +256,13 @@ void create_builtin_types()
 
 void initialize_constants()
 {
+    CONSTANT_INT = get_const_function(KERNEL, INT_TYPE);
+    CONSTANT_STRING = get_const_function(KERNEL, STRING_TYPE);
+
     CONSTANT_0 = constant_int(KERNEL, 0);
     CONSTANT_1 = constant_int(KERNEL, 1);
     CONSTANT_2 = constant_int(KERNEL, 2);
+
 }
 
 void initialize()

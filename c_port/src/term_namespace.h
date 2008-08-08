@@ -36,6 +36,16 @@ struct TermNamespace
 
         return "";
     }
+
+    StringToTermMap::iterator begin()
+    {
+        return _map.begin();
+    }
+
+    StringToTermMap::iterator end()
+    {
+        return _map.end();
+    }
 };
 
 } // namespace circa

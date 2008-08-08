@@ -53,27 +53,32 @@ std::string GetInputPlaceholderName(int index)
 void Subroutine_execute(Term* caller)
 {
     Subroutine* sub = as_subroutine(caller->function);
-    Branch* branch = sub->branch;
+    Branch* original_branch = sub->branch;
+
+    // Create a temporary branch
+    Branch& exec_branch = *original_branch;
+
+    //duplicate_branch(original_branch, &exec_branch);
 
     // Copy inputs to input placeholders
     int numInputs = caller->inputs.count();
     for (int index=0; index < numInputs; index++) {
         Term* incomingInput = caller->inputs[index];
         std::string name = GetInputPlaceholderName(index);
-        if (!branch->containsName(name)) {
+        if (!exec_branch.containsName(name)) {
             throw errors::InternalError(string("Too many arguments for subroutine ") +
                     sub->name);
         }
 
-        copy_value(incomingInput, branch->getNamed(name));
+        copy_value(incomingInput, exec_branch.getNamed(name));
     }
 
-    // Execute every term in branch
-    execute_branch(sub->branch);
+    // Execute every term in exec_branch
+    execute_branch(&exec_branch);
 
     // Copy output to output placeholder, if one exists
-    if (branch->containsName(OUTPUT_PLACEHOLDER_NAME)) {
-        Term* outputPlaceholder = branch->getNamed(OUTPUT_PLACEHOLDER_NAME);
+    if (exec_branch.containsName(OUTPUT_PLACEHOLDER_NAME)) {
+        Term* outputPlaceholder = exec_branch.getNamed(OUTPUT_PLACEHOLDER_NAME);
         steal_value(outputPlaceholder, caller);
     }
     else {
