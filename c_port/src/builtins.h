@@ -22,6 +22,8 @@ extern Term* ANY_TYPE;
 extern Term* VOID_TYPE;
 extern Term* REFERENCE_TYPE;
 extern Term* LIST_TYPE;
+extern Term* CONSTANT_INT;
+extern Term* CONSTANT_STRING;
 extern Term* CONSTANT_0;
 extern Term* CONSTANT_1;
 extern Term* CONSTANT_2;

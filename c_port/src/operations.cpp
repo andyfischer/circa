@@ -256,27 +256,34 @@ void steal_value(Term* source, Term* dest)
     source->needsUpdate = true;
 }
 
-void duplicate_branch(Term* source, Term* dest)
+void duplicate_branch(Branch* source, Branch* dest)
 {
-    Branch* source_branch = as_branch(source);
-    Branch* dest_branch = as_branch(dest);
-
     TermMap newTermMap;
 
     // Duplicate every term
-    for (int index=0; index < source_branch->terms.count(); index++) {
-        Term* source_term = source_branch->terms[index];
+    for (int index=0; index < source->terms.count(); index++) {
+        Term* source_term = source->terms[index];
 
-        Term* dest_term = create_term(dest_branch, source_term->function, source_term->inputs);
+        Term* dest_term = create_term(dest, source_term->function, source_term->inputs);
         newTermMap[source_term] = dest_term;
+
+        copy_value(source_term, dest_term);
     }
 
     // Remap terms
-    for (int index=0; index < dest_branch->terms.count(); index++) {
-        Term* term = dest_branch->terms[index];
+    for (int index=0; index < dest->terms.count(); index++) {
+        Term* term = dest->terms[index];
         term->inputs.remap(newTermMap);
         if (as_type(term->type)->remapPointers != NULL)
             as_type(term->type)->remapPointers(term, newTermMap);
+    }
+
+    // Copy names
+    TermNamespace::StringToTermMap::iterator it;
+    for (it = source->names.begin(); it != source->names.end(); ++it) {
+        std::string name = it->first;
+        Term* original_term = it->second;
+        dest->bindName(newTermMap.getRemapped(original_term), name);
     }
 }
 

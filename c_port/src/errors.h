@@ -57,17 +57,15 @@ public:
 
 class KeyError : public CircaError
 {
-    string msg;
-
 public:
     KeyError(string message) throw()
+      : CircaError(message)
     {
-        this->msg = message;
     }
     ~KeyError() throw() {}
     virtual string message()
     {
-        return string("KeyError: ") + msg;
+        return string("KeyError: ") + this->msg;
     }
 };
 
