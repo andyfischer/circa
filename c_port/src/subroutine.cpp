@@ -56,9 +56,9 @@ void Subroutine_execute(Term* caller)
     Branch* original_branch = sub->branch;
 
     // Create a temporary branch
-    Branch& exec_branch = *original_branch;
+    Branch exec_branch;
 
-    //duplicate_branch(original_branch, &exec_branch);
+    duplicate_branch(original_branch, &exec_branch);
 
     // Copy inputs to input placeholders
     int numInputs = caller->inputs.count();
@@ -161,6 +161,8 @@ void subroutine_append(Term* caller)
     // Input 2: List
     // Result: (Subroutine,Reference)
     Term* return_field_0 = get_struct_field(caller,0);
+    std::cout << "caller type = " << caller->type->toString() << std::endl;
+    std::cout << "rf0 = " << return_field_0->toString() << std::endl;
     Subroutine* sub = as_subroutine(return_field_0);
     Term* ref = as_reference(get_struct_field(caller,1));
     Term* func = caller->inputs[1];

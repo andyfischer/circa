@@ -34,6 +34,11 @@ void Function_alloc(Term* caller)
     caller->value = new Function();
 }
 
+void Function_copy(Term* source, Term* dest)
+{
+    *as_function(dest) = *as_function(source);
+}
+
 void Function_dealloc(Term* caller)
 {
     delete as_function(caller);

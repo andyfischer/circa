@@ -216,7 +216,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>B6F5F42F0E4BE99700CE7604</string>
+						<string>B6F5F4310E4BFBDA00CE7604</string>
 						<key>history</key>
 						<array>
 							<string>B6F5F4220E4BD70800CE7604</string>
@@ -566,10 +566,10 @@
 		<string>B6F5F3FA0E48C82800CE7604</string>
 		<string>B6F5F3FB0E48C82800CE7604</string>
 		<string>B6F114D50E33398200B8BA44</string>
-		<string>B6F5F4200E4BD70800CE7604</string>
 		<string>/Users/andyfischer/circa/c_port/circa.xcodeproj</string>
 		<string>1C78EAAD065D492600B07095</string>
 		<string>1CD10A99069EF8BA00B06720</string>
+		<string>B6F5F4200E4BD70800CE7604</string>
 	</array>
 	<key>WindowString</key>
 	<string>0 63 316 697 0 0 1280 778 </string>
