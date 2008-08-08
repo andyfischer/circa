@@ -36,6 +36,12 @@ StructDefinition::numFields() const
     return (int) this->fields.size();
 }
 
+std::string
+StructDefinition::getName(int index) const
+{
+    return this->fields[index].name;
+}
+
 Term*
 StructDefinition::getType(int index) const
 {
@@ -124,6 +130,21 @@ void StructInstance_alloc(Term* term)
 void StructInstance_copy(Term* source, Term* dest)
 {
     *as_struct_instance(dest) = *as_struct_instance(source);
+}
+
+void StructInstance_tostring(Term* caller)
+{
+    StructInstance *inst = as_struct_instance(caller);
+    StructDefinition *def = as_struct_definition(caller->type);
+
+    std::stringstream output;
+    output << "{";
+    bool first = true;
+    for (int i=0; i < def->numFields(); i++) {
+        if (!first) output << ", ";
+        output << def->getName(i) << ": " << inst->fields[i]->toString();
+    }
+    output << "}";
 }
 
 void struct_definition_set_name(Term* caller)
