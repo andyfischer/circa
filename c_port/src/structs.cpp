@@ -73,13 +73,16 @@ StructDefinition* as_struct_definition(Term* term)
 
 StructInstance* as_struct_instance(Term* term)
 {
-    // todo: type check
+    if (!is_struct_definition(term->type)) {
+        throw errors::InternalError(string("Term is not a struct: ") + term->findName());
+    }
     return (StructInstance*) term->value;
 }
 
 Term* get_struct_field(Term* structTerm, int index)
 {
-    return as_struct_instance(structTerm)->fields[index];
+    StructInstance* instance = as_struct_instance(structTerm);
+    return instance->fields[index];
 }
 
 void StructDefinition_alloc(Term* term)
@@ -205,7 +208,7 @@ void struct_set_field(Term* caller)
 void struct_define(Term* caller)
 {
     // Input 0: string name
-    // Input 0: list<Type>
+    // Input 1: list<Type>
     std::string name = as_string(caller->inputs[0]);
     TermList* typeList = as_list(caller->inputs[1]);
 
@@ -218,7 +221,8 @@ void struct_define(Term* caller)
     for (int index=0; index < typeList->count(); index++) {
         std::stringstream fieldName;
         fieldName << "field-" << index;
-        def->addField(fieldName.str(), typeList->get(index)); 
+        Term* type = typeList->get(index);
+        def->addField(fieldName.str(), type); 
     }
 }
 

@@ -44,6 +44,7 @@ struct Function
 
 void Function_alloc(Term* caller);
 void Function_dealloc(Term* caller);
+void Function_copy(Term* source, Term* dest);
 bool is_function(Term* term);
 Function* as_function(Term*);
 

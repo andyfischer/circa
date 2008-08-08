@@ -33,10 +33,6 @@ void test_simple()
 void test_simple2()
 {
     Branch* branch = new Branch();
-    Term* any_t = get_global("any");
-    Term* void_t = get_global("void");
-    Term* int_t = get_global("int");
-    Term* string_t = get_global("string");
 
     Term* print_term = quick_exec_function(branch,
         "subroutine-create('print-term,list(string),void)");
@@ -48,7 +44,7 @@ void test_simple2()
 
     quick_eval_function(as_subroutine(print_term)->branch, "print(to-string(t))");
 
-    quick_exec_function(branch, "print-term(\"test\")");
+    quick_exec_function(branch, "print-term('test)");
 }
 
 void test_using_subroutine_append()
@@ -59,8 +55,8 @@ void test_using_subroutine_append()
     quick_exec_function(branch, "test-sub = subroutine-name-inputs(test-sub,list('a,'b))");
     quick_exec_function(branch, "a = subroutine-get-local(test-sub,'a)");
     quick_exec_function(branch, "b = subroutine-get-local(test-sub,'b)");
-    /*
     quick_exec_function(branch, "results = subroutine-append(test-sub, mult, list(a,4))");
+    /*
     quick_exec_function(branch, "test-sub = get-field(results, 'sub)");
     quick_exec_function(branch, "a-times-4 = get-field(results, 'term)");
     quick_exec_function(branch, "results = subroutine-append(test-sub, mult, list(b,3))");

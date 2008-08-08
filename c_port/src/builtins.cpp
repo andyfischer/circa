@@ -113,6 +113,7 @@ void bootstrap_kernel()
     Type_alloc(functionType);
     as_type(functionType)->name = "Function";
     as_type(functionType)->alloc = Function_alloc;
+    as_type(functionType)->copy = Function_copy;
     as_type(functionType)->dealloc = Function_dealloc;
     KERNEL->bindName(functionType, "Function");
 
