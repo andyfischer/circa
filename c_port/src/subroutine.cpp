@@ -155,7 +155,8 @@ void subroutine_append(Term* caller)
     // Input 1: Function
     // Input 2: List
     // Result: (Subroutine,Reference)
-    Subroutine* sub = as_subroutine(get_struct_field(caller,0));
+    Term* return_field_0 = get_struct_field(caller,0);
+    Subroutine* sub = as_subroutine(return_field_0);
     Term* ref = as_reference(get_struct_field(caller,1));
     Term* func = caller->inputs[1];
     Term* inputs = caller->inputs[2];
