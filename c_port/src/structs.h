@@ -17,7 +17,8 @@ struct StructDefinition : public Type
         Field(std::string _name, Term* _type) : name(_name), type(_type) {}
     };
     
-    std::vector<Field> fields;
+    typedef std::vector<Field> FieldList;
+    FieldList fields;
 
     StructDefinition();
     void addField(std::string name, Term* type);
@@ -28,16 +29,21 @@ struct StructDefinition : public Type
 
     // Try to find a field with the given name. Returns -1 if not found.
     int findField(std::string name);
+
+    std::string toString();
 };
 
 struct StructInstance
 {
     Term** fields;
+
+    std::string toString();
 };
 
 bool is_struct_definition(Term* term);
 StructDefinition* as_struct_definition(Term* term);
 Term* get_struct_field(Term* structTerm, int index);
+StructInstance* as_struct_instance(Term* term);
 
 void initialize_structs(Branch* code);
 

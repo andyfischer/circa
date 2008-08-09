@@ -58,6 +58,28 @@ StructDefinition::findField(std::string name)
     return -1;
 }
 
+std::string
+StructDefinition::toString()
+{
+    FieldList::iterator it;
+    std::stringstream output;
+    output << "struct " << this->name << " {";
+    bool first = true;
+    for (it = this->fields.begin(); it != this->fields.end(); ++it)
+    {
+        if (!first) output << ", ";
+        output << as_type(it->type)->name << " " << it->name;
+    }
+    output << "}";
+    return output.str();
+}
+
+std::string
+StructInstance::toString()
+{
+    return "<todo>";
+}
+
 bool is_struct_definition(Term* term)
 {
     return term->type == STRUCT_DEFINITION_TYPE;
@@ -69,14 +91,6 @@ StructDefinition* as_struct_definition(Term* term)
         throw errors::TypeError(term, STRUCT_DEFINITION_TYPE);
 
     return (StructDefinition*) term->value;
-}
-
-StructInstance* as_struct_instance(Term* term)
-{
-    if (!is_struct_definition(term->type)) {
-        throw errors::InternalError(string("Term is not a struct: ") + term->findName());
-    }
-    return (StructInstance*) term->value;
 }
 
 Term* get_struct_field(Term* structTerm, int index)
@@ -110,6 +124,14 @@ void struct_definition_add_field(Term* caller)
     string fieldName = as_string(caller->inputs[1]);
     Term* fieldType = caller->inputs[2];
     as_struct_definition(caller)->addField(fieldName, fieldType);
+}
+
+StructInstance* as_struct_instance(Term* term)
+{
+    if (!is_struct_definition(term->type)) {
+        throw errors::InternalError(string("Term is not a struct: ") + term->findName());
+    }
+    return (StructInstance*) term->value;
 }
 
 void StructInstance_alloc(Term* term)
@@ -205,7 +227,7 @@ void struct_set_field(Term* caller)
     copy_value(value, field);
 }
 
-void struct_define(Term* caller)
+void struct_define_anonymous(Term* caller)
 {
     // Input 0: string name
     // Input 1: list<Type>
@@ -257,8 +279,8 @@ void initialize_structs(Branch* code)
     quick_create_function(code, "struct-definition-set-name", struct_definition_set_name,
         TermList(get_global("StructDefinition"), STRING_TYPE), STRUCT_DEFINITION_TYPE);
 
-    quick_create_function(code, "define-struct", struct_define,
-        TermList(STRING_TYPE, LIST_TYPE, LIST_TYPE), STRUCT_DEFINITION_TYPE);
+    quick_create_function(code, "define-struct", struct_define_anonymous,
+        TermList(STRING_TYPE, LIST_TYPE), STRUCT_DEFINITION_TYPE);
 
     quick_create_function(code, "get-index", struct_get_index,
         TermList(ANY_TYPE, INT_TYPE), ANY_TYPE);

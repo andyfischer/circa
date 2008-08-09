@@ -160,6 +160,7 @@ void subroutine_append(Term* caller)
     // Input 1: Function
     // Input 2: List
     // Result: (Subroutine,Reference)
+    as_struct_instance(caller);
     Term* return_field_0 = get_struct_field(caller,0);
     std::cout << "caller type = " << caller->type->toString() << std::endl;
     std::cout << "rf0 = " << return_field_0->toString() << std::endl;

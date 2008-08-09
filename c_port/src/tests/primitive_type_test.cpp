@@ -22,7 +22,7 @@ void test_strings()
     test_assert(as_string(str2) == "one");
 }
 
-void primitive_type_test()
+void all_tests()
 {
     test_strings();
 }

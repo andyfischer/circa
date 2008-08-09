@@ -240,8 +240,6 @@ void steal_value(Term* source, Term* dest)
         return;
     }
 
-    std::cout << "Stealing value from " << dest->findName() << ", " << (int) dest << std::endl;
-    
     // if 'dest' has a value, delete it
     if (dest->value != NULL) {
         if (as_type(dest->type)->dealloc != NULL)
