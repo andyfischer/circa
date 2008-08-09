@@ -14,6 +14,7 @@ Term* STRUCT_INSTANCE_TO_STRING = NULL;
 void StructDefinition_alloc(Term* term);
 void StructDefinition_copy(Term* source, Term* dest);
 void StructInstance_alloc(Term* term);
+void StructInstance_dealloc(Term* term);
 void StructInstance_copy(Term* type, Term* term);
 
 StructDefinition::StructDefinition()
@@ -102,6 +103,7 @@ void StructDefinition_alloc(Term* term)
 {
     StructDefinition* def = new StructDefinition();
     def->alloc = StructInstance_alloc;
+    def->dealloc = StructInstance_dealloc;
     def->copy = StructInstance_copy;
     def->toString = STRUCT_INSTANCE_TO_STRING;
 
@@ -111,6 +113,7 @@ void StructDefinition_alloc(Term* term)
 void StructDefinition_dealloc(Term* term)
 {
     delete as_struct_definition(term);
+    term->value = NULL;
 }
 
 void StructDefinition_copy(Term* source, Term* dest)
@@ -124,6 +127,11 @@ void struct_definition_add_field(Term* caller)
     string fieldName = as_string(caller->inputs[1]);
     Term* fieldType = caller->inputs[2];
     as_struct_definition(caller)->addField(fieldName, fieldType);
+}
+
+StructInstance::~StructInstance()
+{
+    delete[] fields;
 }
 
 StructInstance* as_struct_instance(Term* term)
@@ -150,6 +158,11 @@ void StructInstance_alloc(Term* term)
         change_type(field, fieldType);
         structInstance->fields[i] = field;
     }
+}
+
+void StructInstance_dealloc(Term* term)
+{
+    delete as_struct_instance(term);
 }
 
 void StructInstance_copy(Term* source, Term* dest)
