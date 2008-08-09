@@ -9,6 +9,8 @@
 
 namespace circa {
 
+Term* STRUCT_INSTANCE_TO_STRING = NULL;
+
 void StructDefinition_alloc(Term* term);
 void StructDefinition_copy(Term* source, Term* dest);
 void StructInstance_alloc(Term* term);
@@ -58,6 +60,7 @@ StructDefinition::findField(std::string name)
     return -1;
 }
 
+/*
 std::string
 StructDefinition::toString()
 {
@@ -69,16 +72,12 @@ StructDefinition::toString()
     {
         if (!first) output << ", ";
         output << as_type(it->type)->name << " " << it->name;
+        first = false;
     }
     output << "}";
     return output.str();
 }
-
-std::string
-StructInstance::toString()
-{
-    return "<todo>";
-}
+*/
 
 bool is_struct_definition(Term* term)
 {
@@ -104,6 +103,7 @@ void StructDefinition_alloc(Term* term)
     StructDefinition* def = new StructDefinition();
     def->alloc = StructInstance_alloc;
     def->copy = StructInstance_copy;
+    def->toString = STRUCT_INSTANCE_TO_STRING;
 
     term->value = def;
 }
@@ -262,6 +262,10 @@ void initialize_structs(Branch* code)
             StructDefinition_alloc,
             StructDefinition_dealloc,
             StructDefinition_copy);
+
+    STRUCT_INSTANCE_TO_STRING = quick_create_function(code,
+            "struct-instance-to-string", StructInstance_tostring,
+            TermList(ANY_TYPE), STRING_TYPE);
 
     quick_create_function(code, "get-field", struct_get_field,
         TermList(ANY_TYPE, STRING_TYPE), ANY_TYPE);

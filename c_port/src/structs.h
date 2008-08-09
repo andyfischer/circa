@@ -30,7 +30,7 @@ struct StructDefinition : public Type
     // Try to find a field with the given name. Returns -1 if not found.
     int findField(std::string name);
 
-    std::string toString();
+    //std::string toString();
 };
 
 struct StructInstance
