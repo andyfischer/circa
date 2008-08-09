@@ -9,13 +9,11 @@
 			8DD76F620486A84900D96B5E /* circa */,
 		);
 		breakpoints = (
-			B6A243C60E356F1B007F2BEB /* errors.cpp:15 */,
 			B6A244380E3F7F70007F2BEB /* operations.cpp:149 */,
 			B6A244480E40233A007F2BEB /* subroutine_test.cpp:34 */,
 			B6F5F4160E4BD67300CE7604 /* errors.h:16 */,
 			B6F5F4180E4BD67400CE7604 /* errors.h:15 */,
 			B6F5F41D0E4BD6D400CE7604 /* errors.h:61 */,
-			B6F5F4380E4C192600CE7604 /* subroutine.cpp:163 */,
 		);
 		codeSenseManager = B6F1149E0E33392200B8BA44 /* Code sense */;
 		executables = (
@@ -93,6 +91,7 @@
 			B6F5F4280E4BE91200CE7604 /* PBXTextBookmark */ = B6F5F4280E4BE91200CE7604 /* PBXTextBookmark */;
 			B6F5F42F0E4BE99700CE7604 /* PBXTextBookmark */ = B6F5F42F0E4BE99700CE7604 /* PBXTextBookmark */;
 			B6F5F4310E4BFBDA00CE7604 /* PBXTextBookmark */ = B6F5F4310E4BFBDA00CE7604 /* PBXTextBookmark */;
+			B6F5F4430E4D2F0200CE7604 /* PBXTextBookmark */ = B6F5F4430E4D2F0200CE7604 /* PBXTextBookmark */;
 		};
 		sourceControlManager = B6F1149D0E33392200B8BA44 /* Source Control */;
 		userBuildSettings = {
@@ -113,9 +112,9 @@
 	};
 	B6A243A40E3568EB007F2BEB /* errors.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {715, 364}}";
-			sepNavSelRange = "{281, 0}";
-			sepNavVisRange = "{0, 617}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 434}}";
+			sepNavSelRange = "{292, 0}";
+			sepNavVisRange = "{0, 485}";
 			sepNavWindowFrame = "{{382, 94}, {750, 558}}";
 		};
 	};
@@ -126,23 +125,6 @@
 			sepNavVisRange = "{0, 422}";
 			sepNavWindowFrame = "{{43, 46}, {750, 558}}";
 		};
-	};
-	B6A243C60E356F1B007F2BEB /* errors.cpp:15 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = B6A243A40E3568EB007F2BEB /* errors.cpp */;
-		functionName = "InternalTypeError::message()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 15;
-		location = circa;
-		modificationTime = 239906775.522817;
-		state = 1;
 	};
 	B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */ = {
 		uiCtxt = {
@@ -161,9 +143,9 @@
 	};
 	B6A243FA0E3D6414007F2BEB /* all_tests.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {715, 297}}";
-			sepNavSelRange = "{130, 0}";
-			sepNavVisRange = "{0, 303}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 616}}";
+			sepNavSelRange = "{994, 0}";
+			sepNavVisRange = "{487, 581}";
 		};
 	};
 	B6A243FC0E3D6414007F2BEB /* tokenizer_test.cpp */ = {
@@ -202,14 +184,14 @@
 		ignoreCount = 0;
 		lineNumber = 149;
 		location = circa;
-		modificationTime = 239906775.522833;
+		modificationTime = 239939247.118084;
 		state = 2;
 	};
 	B6A244410E401F16007F2BEB /* struct_test.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {691, 658}}";
-			sepNavSelRange = "{0, 0}";
-			sepNavVisRange = "{188, 1275}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 1162}}";
+			sepNavSelRange = "{2212, 0}";
+			sepNavVisRange = "{1834, 569}";
 			sepNavWindowFrame = "{{130, 110}, {750, 558}}";
 		};
 	};
@@ -227,7 +209,7 @@
 		ignoreCount = 0;
 		lineNumber = 34;
 		location = circa;
-		modificationTime = 239906775.52284;
+		modificationTime = 239939247.118094;
 		state = 2;
 	};
 	B6B436DD0E48B9AE00E3B337 /* PBXTextBookmark */ = {
@@ -320,9 +302,9 @@
 	};
 	B6F114AF0E33394F00B8BA44 /* errors.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 1246}}";
+			sepNavIntBoundsRect = "{{0, 0}, {691, 1260}}";
 			sepNavSelRange = "{236, 0}";
-			sepNavVisRange = "{86, 330}";
+			sepNavVisRange = "{28, 516}";
 			sepNavWindowFrame = "{{456, 193}, {750, 558}}";
 		};
 	};
@@ -336,9 +318,9 @@
 	};
 	B6F114B60E33394F00B8BA44 /* subroutine.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 3234}}";
-			sepNavSelRange = "{4418, 0}";
-			sepNavVisRange = "{4267, 640}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 3220}}";
+			sepNavSelRange = "{4509, 0}";
+			sepNavVisRange = "{4208, 795}";
 		};
 	};
 	B6F114B80E33394F00B8BA44 /* term.cpp */ = {
@@ -374,16 +356,16 @@
 	B6F115160E34F4B300B8BA44 /* operations.cpp */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {708, 4438}}";
-			sepNavSelRange = "{2940, 0}";
+			sepNavSelRange = "{4026, 0}";
 			sepNavVisRange = "{3776, 552}";
 			sepNavWindowFrame = "{{32, 15}, {765, 708}}";
 		};
 	};
 	B6F115180E34F4B300B8BA44 /* structs.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 3976}}";
-			sepNavSelRange = "{7136, 0}";
-			sepNavVisRange = "{1520, 481}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 4144}}";
+			sepNavSelRange = "{2737, 0}";
+			sepNavVisRange = "{3285, 602}";
 		};
 	};
 	B6F5F3EF0E48C82800CE7604 /* PBXTextBookmark */ = {
@@ -455,11 +437,11 @@
 		countType = 0;
 		delayBeforeContinue = 0;
 		fileReference = B6F114AF0E33394F00B8BA44 /* errors.h */;
-		hitCount = 0;
+		hitCount = 3;
 		ignoreCount = 0;
 		lineNumber = 16;
 		location = circa;
-		modificationTime = 239906775.522846;
+		modificationTime = 239939318.174346;
 		state = 1;
 	};
 	B6F5F4180E4BD67400CE7604 /* errors.h:15 */ = {
@@ -475,7 +457,7 @@
 		ignoreCount = 0;
 		lineNumber = 15;
 		location = circa;
-		modificationTime = 239906775.522918;
+		modificationTime = 239939247.118184;
 		state = 1;
 	};
 	B6F5F41D0E4BD6D400CE7604 /* errors.h:61 */ = {
@@ -490,7 +472,7 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 61;
-		modificationTime = 239906775.52296;
+		modificationTime = 239939247.118237;
 		state = 1;
 	};
 	B6F5F4220E4BD70800CE7604 /* PBXTextBookmark */ = {
@@ -548,21 +530,14 @@
 		vrLen = 510;
 		vrLoc = 28;
 	};
-	B6F5F4380E4C192600CE7604 /* subroutine.cpp:163 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = B6F114B60E33394F00B8BA44 /* subroutine.cpp */;
-		functionName = "subroutine_append(Term* caller)";
-		hitCount = 1;
-		ignoreCount = 0;
-		lineNumber = 163;
-		location = circa;
-		modificationTime = 239906776.82403;
-		state = 1;
+	B6F5F4430E4D2F0200CE7604 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B6F114AF0E33394F00B8BA44 /* errors.h */;
+		name = "errors.h: 16";
+		rLen = 0;
+		rLoc = 236;
+		rType = 0;
+		vrLen = 516;
+		vrLoc = 28;
 	};
 }

@@ -51,10 +51,28 @@ void test_simple2()
     //quick_exec_function(&branch, "my-inst = set-field(my-inst, '
 }
 
+void function_body_whatever(Term*) {}
+
+void test_as_function_output()
+{
+    Branch *branch = new Branch();
+
+    Term* return_type = quick_exec_function(branch, "define-struct('rt, list(string,int))");
+    Term* func = quick_create_function(branch, "my-func", function_body_whatever,
+            TermList(INT_TYPE), return_type);
+
+    Term* func_inst = quick_exec_function(branch, "x = my-func(5)");
+
+    test_assert(func_inst->type == return_type);
+    test_assert(quick_exec_function(branch, "get-field(x, 0)")->type == STRING_TYPE);
+    test_assert(quick_exec_function(branch, "get-field(x, 1)")->type == INT_TYPE);
+}
+
 void all_tests()
 {
     test_simple();
     test_simple2();
+    test_as_function_output();
 }
 
 } // namespace struct_test
