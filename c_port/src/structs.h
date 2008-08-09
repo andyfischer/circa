@@ -37,6 +37,9 @@ struct StructInstance
 {
     Term** fields;
 
+    StructInstance() : fields(NULL) {}
+    ~StructInstance();
+
     std::string toString();
 };
 

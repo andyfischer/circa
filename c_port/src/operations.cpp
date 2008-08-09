@@ -242,11 +242,14 @@ void steal_value(Term* source, Term* dest)
 
     // if 'dest' has a value, delete it
     if (dest->value != NULL) {
-        if (as_type(dest->type)->dealloc != NULL)
+        if (as_type(dest->type)->dealloc != NULL) {
             as_type(dest->type)->dealloc(dest);
-        else
+            dest->value = NULL;
+        }
+        else {
             std::cout << "Warning: type " << as_type(dest->type)->name
                 << " needs a dealloc function" << std::endl;
+        }
     }
 
     dest->value = source->value;
