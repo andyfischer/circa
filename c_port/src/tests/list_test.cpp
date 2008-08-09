@@ -27,10 +27,11 @@ void test_list_apply()
     test_assert(as_string(as_list(result)->get(4)) == "4");
 }
 
-void list_test()
+void all_tests()
 {
     test_range();
     test_list_apply();
 }
 
-}}
+} // namespace list_test
+} // namespace circa

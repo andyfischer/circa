@@ -9,7 +9,8 @@
 #include "operations.h"
 #include "subroutine.h"
 
-namespace circa { namespace struct_test {
+namespace circa {
+namespace struct_test {
 
 void test_simple()
 {
@@ -41,9 +42,20 @@ void test_simple()
     test_assert(as_int(hopefully_two) == 2);
 }
 
-void struct_test()
+void test_simple2()
 {
-    test_simple();
+    Branch branch;
+    quick_exec_function(&branch,
+        "my-struct-def = define-struct('my-struct-def, list(int, string, Subroutine))");
+    quick_exec_function(&branch, "my-inst = my-struct-def()");
+    //quick_exec_function(&branch, "my-inst = set-field(my-inst, '
 }
 
-}} // namespace circa::struct_test
+void all_tests()
+{
+    test_simple();
+    test_simple2();
+}
+
+} // namespace struct_test
+} // namespace circa

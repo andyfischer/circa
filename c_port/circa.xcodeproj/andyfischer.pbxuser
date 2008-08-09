@@ -16,7 +16,6 @@
 			B6F5F4180E4BD67400CE7604 /* errors.h:15 */,
 			B6F5F41D0E4BD6D400CE7604 /* errors.h:61 */,
 			B6F5F4380E4C192600CE7604 /* subroutine.cpp:163 */,
-			B6F5F43E0E4C1CBC00CE7604 /* structs.cpp:83 */,
 		);
 		codeSenseManager = B6F1149E0E33392200B8BA44 /* Code sense */;
 		executables = (
@@ -142,7 +141,7 @@
 		ignoreCount = 0;
 		lineNumber = 15;
 		location = circa;
-		modificationTime = 239869133.900106;
+		modificationTime = 239906775.522817;
 		state = 1;
 	};
 	B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */ = {
@@ -203,7 +202,7 @@
 		ignoreCount = 0;
 		lineNumber = 149;
 		location = circa;
-		modificationTime = 239869133.900123;
+		modificationTime = 239906775.522833;
 		state = 2;
 	};
 	B6A244410E401F16007F2BEB /* struct_test.cpp */ = {
@@ -228,7 +227,7 @@
 		ignoreCount = 0;
 		lineNumber = 34;
 		location = circa;
-		modificationTime = 239869133.900129;
+		modificationTime = 239906775.52284;
 		state = 2;
 	};
 	B6B436DD0E48B9AE00E3B337 /* PBXTextBookmark */ = {
@@ -382,9 +381,9 @@
 	};
 	B6F115180E34F4B300B8BA44 /* structs.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 4144}}";
-			sepNavSelRange = "{1565, 0}";
-			sepNavVisRange = "{1126, 477}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 3976}}";
+			sepNavSelRange = "{7136, 0}";
+			sepNavVisRange = "{1520, 481}";
 		};
 	};
 	B6F5F3EF0E48C82800CE7604 /* PBXTextBookmark */ = {
@@ -460,7 +459,7 @@
 		ignoreCount = 0;
 		lineNumber = 16;
 		location = circa;
-		modificationTime = 239869133.900135;
+		modificationTime = 239906775.522846;
 		state = 1;
 	};
 	B6F5F4180E4BD67400CE7604 /* errors.h:15 */ = {
@@ -476,7 +475,7 @@
 		ignoreCount = 0;
 		lineNumber = 15;
 		location = circa;
-		modificationTime = 239869133.900203;
+		modificationTime = 239906775.522918;
 		state = 1;
 	};
 	B6F5F41D0E4BD6D400CE7604 /* errors.h:61 */ = {
@@ -491,7 +490,7 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 61;
-		modificationTime = 239869133.900245;
+		modificationTime = 239906775.52296;
 		state = 1;
 	};
 	B6F5F4220E4BD70800CE7604 /* PBXTextBookmark */ = {
@@ -563,24 +562,7 @@
 		ignoreCount = 0;
 		lineNumber = 163;
 		location = circa;
-		modificationTime = 239869135.205496;
-		state = 1;
-	};
-	B6F5F43E0E4C1CBC00CE7604 /* structs.cpp:83 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = B6F115180E34F4B300B8BA44 /* structs.cpp */;
-		functionName = "get_struct_field(Term* structTerm, int index)";
-		hitCount = 1;
-		ignoreCount = 0;
-		lineNumber = 83;
-		location = circa;
-		modificationTime = 239869137.464873;
+		modificationTime = 239906776.82403;
 		state = 1;
 	};
 }
