@@ -165,7 +165,17 @@ void StructInstance_dealloc(Term* term)
 
 void StructInstance_copy(Term* source, Term* dest)
 {
-    *as_struct_instance(dest) = *as_struct_instance(source);
+    StructDefinition* def = as_struct_definition(source->type);
+    StructInstance* source_i = as_struct_instance(source);
+    StructInstance* dest_i = as_struct_instance(dest);
+
+    if (source->type != dest->type) {
+        throw errors::InternalError("Types not equal in StructInstance_copy");
+    }
+
+    for (int i=0; i < def->numFields(); i++) {
+        copy_value(source_i->fields[i], dest_i->fields[i]);
+    }
 }
 
 std::string StructInstance_toString(Term* term)

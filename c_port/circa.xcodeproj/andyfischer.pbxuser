@@ -14,6 +14,7 @@
 			B6F5F41D0E4BD6D400CE7604 /* errors.h:61 */,
 			B6F5F4470E4D321300CE7604 /* errors.h:30 */,
 			B6DA80400E4DF4D80042DDC3 /* errors.h:15 */,
+			B65AF5E90E4FAF5200C9DFB6 /* struct_test.cpp:52 */,
 		);
 		codeSenseManager = B6F1149E0E33392200B8BA44 /* Code sense */;
 		executables = (
@@ -71,8 +72,12 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 240101853;
-			PBXWorkspaceStateSaveDate = 240101853;
+			PBXPerProjectTemplateStateSaveDate = 240103225;
+			PBXWorkspaceStateSaveDate = 240103225;
+		};
+		perUserProjectItems = {
+			B65AF5E70E4FAF4B00C9DFB6 /* PBXBookmark */ = B65AF5E70E4FAF4B00C9DFB6 /* PBXBookmark */;
+			B65AF5EF0E4FAFD000C9DFB6 /* PBXTextBookmark */ = B65AF5EF0E4FAFD000C9DFB6 /* PBXTextBookmark */;
 		};
 		sourceControlManager = B6F1149D0E33392200B8BA44 /* Source Control */;
 		userBuildSettings = {
@@ -83,6 +88,37 @@
 		executables = (
 			B6F114970E33391C00B8BA44 /* circa */,
 		);
+	};
+	B65AF5E70E4FAF4B00C9DFB6 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = B6A244410E401F16007F2BEB /* struct_test.cpp */;
+	};
+	B65AF5E90E4FAF5200C9DFB6 /* struct_test.cpp:52 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = B6A244410E401F16007F2BEB /* struct_test.cpp */;
+		functionName = "test_simple2()";
+		hitCount = 1;
+		ignoreCount = 0;
+		lineNumber = 52;
+		location = circa;
+		modificationTime = 240103265.984721;
+		state = 1;
+	};
+	B65AF5EF0E4FAFD000C9DFB6 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B6A244410E401F16007F2BEB /* struct_test.cpp */;
+		name = "struct_test.cpp: 64";
+		rLen = 0;
+		rLoc = 2212;
+		rType = 0;
+		vrLen = 1050;
+		vrLoc = 1220;
 	};
 	B68D10CB0E47685600C6D09A /* term_map.cpp */ = {
 		uiCtxt = {
@@ -165,14 +201,14 @@
 		ignoreCount = 0;
 		lineNumber = 149;
 		location = circa;
-		modificationTime = 240101881.052935;
+		modificationTime = 240103254.92504;
 		state = 2;
 	};
 	B6A244410E401F16007F2BEB /* struct_test.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 1162}}";
+			sepNavIntBoundsRect = "{{0, 0}, {691, 1120}}";
 			sepNavSelRange = "{2212, 0}";
-			sepNavVisRange = "{1834, 569}";
+			sepNavVisRange = "{1220, 994}";
 			sepNavWindowFrame = "{{130, 110}, {750, 558}}";
 		};
 	};
@@ -190,7 +226,7 @@
 		ignoreCount = 0;
 		lineNumber = 34;
 		location = circa;
-		modificationTime = 240101881.052947;
+		modificationTime = 240103254.925061;
 		state = 2;
 	};
 	B6DA80400E4DF4D80042DDC3 /* errors.h:15 */ = {
@@ -202,10 +238,11 @@
 		countType = 0;
 		delayBeforeContinue = 0;
 		fileReference = B6F114AF0E33394F00B8BA44 /* errors.h */;
-		hitCount = 0;
+		hitCount = 1;
 		ignoreCount = 0;
 		lineNumber = 15;
-		modificationTime = 240101910.315857;
+		location = circa;
+		modificationTime = 240103261.913434;
 		state = 1;
 	};
 	B6F114970E33391C00B8BA44 /* circa */ = {
@@ -264,9 +301,9 @@
 	};
 	B6F114AF0E33394F00B8BA44 /* errors.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 1260}}";
-			sepNavSelRange = "{236, 0}";
-			sepNavVisRange = "{86, 330}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 1246}}";
+			sepNavSelRange = "{917, 0}";
+			sepNavVisRange = "{104, 352}";
 			sepNavWindowFrame = "{{460, 190}, {750, 558}}";
 		};
 	};
@@ -287,9 +324,9 @@
 	};
 	B6F114B80E33394F00B8BA44 /* term.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 1974}}";
-			sepNavSelRange = "{644, 0}";
-			sepNavVisRange = "{446, 381}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 1554}}";
+			sepNavSelRange = "{927, 0}";
+			sepNavVisRange = "{543, 516}";
 			sepNavWindowFrame = "{{83, 150}, {750, 558}}";
 		};
 	};
@@ -325,9 +362,9 @@
 	};
 	B6F115180E34F4B300B8BA44 /* structs.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 4508}}";
-			sepNavSelRange = "{4234, 0}";
-			sepNavVisRange = "{3740, 546}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 4256}}";
+			sepNavSelRange = "{3873, 0}";
+			sepNavVisRange = "{3989, 509}";
 		};
 	};
 	B6F5F41D0E4BD6D400CE7604 /* errors.h:61 */ = {
@@ -342,7 +379,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 61;
-		modificationTime = 240101910.31584;
+		location = circa;
+		modificationTime = 240103256.4262;
 		state = 1;
 	};
 	B6F5F4470E4D321300CE7604 /* errors.h:30 */ = {
@@ -354,10 +392,11 @@
 		countType = 0;
 		delayBeforeContinue = 0;
 		fileReference = B6F114AF0E33394F00B8BA44 /* errors.h */;
-		hitCount = 0;
+		hitCount = 1;
 		ignoreCount = 0;
 		lineNumber = 30;
-		modificationTime = 240101910.315869;
+		location = circa;
+		modificationTime = 240103260.151631;
 		state = 1;
 	};
 }

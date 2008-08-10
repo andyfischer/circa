@@ -35,9 +35,10 @@ struct StructDefinition : public Type
 
 struct StructInstance
 {
+    int numFields;
     Term** fields;
 
-    StructInstance() : fields(NULL) {}
+    StructInstance() : numFields(0), fields(NULL) {}
     ~StructInstance();
 
     std::string toString();
