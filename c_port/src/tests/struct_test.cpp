@@ -37,7 +37,7 @@ void test_simple()
     branch->bindName(my_instance, "my_instance");
 
     Term* hopefully_two = quick_exec_function(branch,
-            "hopefully-two = get-field(my_instance, \"myInt\")");
+            "hopefully-two = get-field(my_instance, 'myInt)");
 
     test_assert(as_int(hopefully_two) == 2);
 }

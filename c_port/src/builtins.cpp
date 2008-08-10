@@ -209,7 +209,7 @@ std::string float_toString(Term* term)
 
 void string_alloc(Term* caller)
 {
-    caller->value = new string;
+    caller->value = new string();
 }
 
 void string_dealloc(Term* caller)
