@@ -146,7 +146,7 @@ void int_copy(Term* source, Term* dest)
 {
     as_int(dest) = as_int(source);
 }
-std::string int_tostring(Term* term)
+std::string int_toString(Term* term)
 {
     std::stringstream strm;
     strm << as_int(term);
@@ -165,7 +165,7 @@ void float_copy(Term* source, Term* dest)
 {
     as_float(dest) = as_float(source);
 }
-std::string float_tostring(Term* term)
+std::string float_toString(Term* term)
 {
     std::stringstream strm;
     strm << as_float(term);
@@ -205,7 +205,7 @@ void bool_copy(Term* source, Term* dest)
     as_bool(dest) = as_bool(source);
 }
 
-std::string bool_tostring(Term* term)
+std::string bool_toString(Term* term)
 {
     if (as_bool(term))
         return "true";
@@ -238,11 +238,14 @@ void create_builtin_types()
             string_copy,
             string_toString);
     INT_TYPE = quick_create_type(KERNEL, "int",
-            int_alloc, int_dealloc, int_copy, int_tostring);
+            int_alloc,
+            int_dealloc,
+            int_copy,
+            int_toString);
     FLOAT_TYPE = quick_create_type(KERNEL, "float",
-            float_alloc, float_dealloc, float_copy, float_tostring);
+            float_alloc, float_dealloc, float_copy, float_toString);
     BOOL_TYPE = quick_create_type(KERNEL, "bool",
-            bool_alloc, bool_dealloc, bool_copy, bool_tostring);
+            bool_alloc, bool_dealloc, bool_copy, bool_toString);
     ANY_TYPE = quick_create_type(KERNEL, "any",
             empty_function, empty_function, NULL);
     VOID_TYPE = quick_create_type(KERNEL, "void",
