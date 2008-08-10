@@ -11,18 +11,6 @@
 
 namespace circa {
 
-void to_string(Term* caller)
-{
-    Term* toString = caller->inputs[0]->getType()->toString;
-
-    if (toString == NULL) {
-        as_string(caller) = string("<") + as_type(caller->inputs[0]->type)->name + ">";
-    } else {
-        change_function(caller, toString);
-        execute(caller);
-    }
-}
-
 void print(Term* caller)
 {
     std::cout << as_string(caller->inputs[0]) << std::endl;
@@ -93,7 +81,7 @@ void initialize_builtin_functions(Branch* code)
     Term* function_t = get_global("Function");
     Term* list_t = get_global("List");
 
-    quick_create_function(code, "to-string", to_string, TermList(any_t), string_t);
+    // quick_create_function(code, "to-string", to_string, TermList(any_t), string_t);
     quick_create_function(code, "add", add, TermList(int_t, int_t), int_t);
     quick_create_function(code, "mult", mult, TermList(int_t, int_t), int_t);
     quick_create_function(code, "concat", string_concat, TermList(string_t, string_t), string_t);

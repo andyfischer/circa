@@ -36,10 +36,19 @@ Term::getType() const
 std::string
 Term::toString()
 {
+    /*
     Term* result = apply_function(this->owningBranch,
             get_global("to-string"), TermList(this));
     execute(result);
     return as_string(result);
+    */
+    Type::ToStringFunc func = as_type(this->type)->toString;
+
+    if (func == NULL) {
+        return std::string("<" + as_type(this->type)->name + " " + findName() + ">");
+    } else {
+        return func(this);
+    }
 }
 
 std::string

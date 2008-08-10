@@ -18,7 +18,7 @@ Term* quick_create_type(
         Type::AllocFunc allocFunc,
         Type::DeallocFunc deallocFunc,
         Type::CopyFunc copyFunc,
-        Function::ExecuteFunc toStringFunc = NULL);
+        Type::ToStringFunc toStringFunc = NULL);
 
 // Create a new Function with the given properties. Also binds the name.
 Term* quick_create_function(Branch* code, string name, Function::ExecuteFunc executeFunc,

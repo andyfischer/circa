@@ -146,13 +146,12 @@ void int_copy(Term* source, Term* dest)
 {
     as_int(dest) = as_int(source);
 }
-void int_tostring(Term* caller)
+std::string int_tostring(Term* term)
 {
     std::stringstream strm;
-    strm << as_int(caller->inputs[0]);
-    as_string(caller) = strm.str();
+    strm << as_int(term);
+    strm.str();
 }
-
 
 void float_alloc(Term* caller)
 {
@@ -166,11 +165,11 @@ void float_copy(Term* source, Term* dest)
 {
     as_float(dest) = as_float(source);
 }
-void float_tostring(Term* caller)
+std::string float_tostring(Term* term)
 {
     std::stringstream strm;
-    strm << as_float(caller->inputs[0]);
-    as_string(caller) = strm.str();
+    strm << as_float(term);
+    return strm.str();
 }
 
 void string_alloc(Term* caller)
@@ -181,6 +180,14 @@ void string_alloc(Term* caller)
 void string_dealloc(Term* caller)
 {
     delete (string*) caller->value;
+}
+std::string string_toString(Term* term)
+{
+    return as_string(term);
+}
+void string_copy(Term* source, Term* dest)
+{
+    as_string(dest) = as_string(source);
 }
 
 void bool_alloc(Term* caller)
@@ -198,21 +205,12 @@ void bool_copy(Term* source, Term* dest)
     as_bool(dest) = as_bool(source);
 }
 
-void string_tostring(Term* caller)
+std::string bool_tostring(Term* term)
 {
-    as_string(caller) = as_string(caller->inputs[0]);
-}
-void string_copy(Term* source, Term* dest)
-{
-    as_string(dest) = as_string(source);
-}
-
-void bool_tostring(Term* caller)
-{
-    if (as_bool(caller))
-        as_string(caller) = "true";
+    if (as_bool(term))
+        return "true";
     else
-        as_string(caller) = "false";
+        return "false";
 }
 
 void reference_alloc(Term* caller)
@@ -238,7 +236,7 @@ void create_builtin_types()
             string_alloc,
             string_dealloc,
             string_copy,
-            string_tostring);
+            string_toString);
     INT_TYPE = quick_create_type(KERNEL, "int",
             int_alloc, int_dealloc, int_copy, int_tostring);
     FLOAT_TYPE = quick_create_type(KERNEL, "float",

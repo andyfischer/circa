@@ -9,13 +9,12 @@
 
 namespace circa {
 
-Term* STRUCT_INSTANCE_TO_STRING = NULL;
-
 void StructDefinition_alloc(Term* term);
 void StructDefinition_copy(Term* source, Term* dest);
 void StructInstance_alloc(Term* term);
 void StructInstance_dealloc(Term* term);
 void StructInstance_copy(Term* type, Term* term);
+std::string StructInstance_toString(Term* term);
 
 StructDefinition::StructDefinition()
 {
@@ -105,7 +104,7 @@ void StructDefinition_alloc(Term* term)
     def->alloc = StructInstance_alloc;
     def->dealloc = StructInstance_dealloc;
     def->copy = StructInstance_copy;
-    def->toString = STRUCT_INSTANCE_TO_STRING;
+    def->toString = StructInstance_toString;
 
     term->value = def;
 }
@@ -170,11 +169,10 @@ void StructInstance_copy(Term* source, Term* dest)
     *as_struct_instance(dest) = *as_struct_instance(source);
 }
 
-void StructInstance_toString(Term* caller)
+std::string StructInstance_toString(Term* term)
 {
-    Term* input = caller->inputs[0];
-    StructInstance *inst = as_struct_instance(input);
-    StructDefinition *def = as_struct_definition(input->type);
+    StructInstance *inst = as_struct_instance(term);
+    StructDefinition *def = as_struct_definition(term->type);
 
     std::stringstream output;
     output << "{";
@@ -185,7 +183,7 @@ void StructInstance_toString(Term* caller)
         first = false;
     }
     output << "}";
-    as_string(caller) = output.str();
+    return output.str();
 }
 
 void struct_definition_set_name(Term* caller)
@@ -278,10 +276,6 @@ void initialize_structs(Branch* code)
             StructDefinition_alloc,
             StructDefinition_dealloc,
             StructDefinition_copy);
-
-    STRUCT_INSTANCE_TO_STRING = quick_create_function(code,
-            "struct-instance-to-string", StructInstance_toString,
-            TermList(ANY_TYPE), STRING_TYPE);
 
     quick_create_function(code, "get-field", struct_get_field,
         TermList(ANY_TYPE, STRING_TYPE), ANY_TYPE);

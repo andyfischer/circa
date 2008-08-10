@@ -113,7 +113,7 @@
 			sepNavIntBoundsRect = "{{0, 0}, {691, 896}}";
 			sepNavSelRange = "{1190, 0}";
 			sepNavVisRange = "{682, 700}";
-			sepNavWindowFrame = "{{43, 46}, {750, 558}}";
+			sepNavWindowFrame = "{{264, 90}, {750, 558}}";
 		};
 	};
 	B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */ = {
@@ -323,8 +323,8 @@
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {691, 1260}}";
 			sepNavSelRange = "{235, 0}";
-			sepNavVisRange = "{236, 525}";
-			sepNavWindowFrame = "{{460, 200}, {750, 558}}";
+			sepNavVisRange = "{236, 534}";
+			sepNavWindowFrame = "{{460, 190}, {750, 558}}";
 		};
 	};
 	B6F114B00E33394F00B8BA44 /* function.cpp */ = {
