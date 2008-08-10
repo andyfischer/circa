@@ -44,10 +44,13 @@ void test_simple()
 
 void test_simple2()
 {
+    std::cout << "Starting struct_test::test_simple2" << std::endl;
     Branch branch;
     quick_exec_function(&branch,
         "my-struct-def = define-struct('my-struct-def, list(int, string, Subroutine))");
-    quick_exec_function(&branch, "my-inst = my-struct-def()");
+    Term* myinst = quick_exec_function(&branch, "my-inst = my-struct-def()");
+    myinst->toString();
+    //std::cout << "in test_simple2: " << myinst->toString() << std::endl;
     //quick_exec_function(&branch, "my-inst = set-field(my-inst, '
 }
 

@@ -134,6 +134,41 @@ void bootstrap_kernel()
     typeType->needsUpdate = false;
 }
 
+int& as_int(Term* t)
+{
+    if (t->type != INT_TYPE)
+        throw errors::TypeError(t, INT_TYPE);
+
+    return *((int*) t->value);
+}
+
+float& as_float(Term* t)
+{
+    if (t->type != FLOAT_TYPE)
+        throw errors::TypeError(t, FLOAT_TYPE);
+
+    return *((float*) t->value);
+}
+
+bool& as_bool(Term* t)
+{
+    if (t->type != BOOL_TYPE)
+        throw errors::TypeError(t, BOOL_TYPE);
+
+    return *((bool*) t->value);
+}
+
+string& as_string(Term* t)
+{
+    if (t->type != STRING_TYPE)
+        throw errors::TypeError(t, STRING_TYPE);
+
+    if (t->value == NULL)
+        throw errors::InternalError("NULL pointer in as_string");
+
+    return *((string*) t->value);
+}
+
 void int_alloc(Term* caller)
 {
     caller->value = new int;
@@ -180,6 +215,7 @@ void string_alloc(Term* caller)
 void string_dealloc(Term* caller)
 {
     delete (string*) caller->value;
+    caller->value = NULL;
 }
 std::string string_toString(Term* term)
 {

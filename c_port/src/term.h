@@ -37,10 +37,6 @@ struct Term
     std::string const& getError(int index);
 };
 
-int& as_int(Term* t);
-float& as_float(Term* t);
-bool& as_bool(Term* t);
-string& as_string(Term* t);
 
 TermList* as_list(Term* term);
 
