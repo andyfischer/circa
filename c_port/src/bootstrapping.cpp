@@ -159,6 +159,11 @@ void hosted_apply_function(Term* caller)
     apply_function(branch, function, *inputs);
 }
 
+void hosted_to_string(Term* caller)
+{
+    as_string(caller) = caller->inputs[0]->toString();
+}
+
 void initialize_bootstrapped_code(Branch* kernel)
 {
     Term* apply_function_f = quick_create_function(kernel, "apply-function",
@@ -166,6 +171,9 @@ void initialize_bootstrapped_code(Branch* kernel)
         TermList(BRANCH_TYPE, FUNCTION_TYPE, LIST_TYPE),
         BRANCH_TYPE);
     as_function(apply_function_f)->recycleInput = 0;
+
+    quick_create_function(kernel, "to-string", hosted_to_string,
+        TermList(ANY_TYPE), STRING_TYPE);
 }
 
 } // namespace circa

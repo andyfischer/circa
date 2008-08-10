@@ -88,9 +88,10 @@ void change_type(Term* term, Term* type)
 
     Type::AllocFunc alloc = as_type(type)->alloc;
 
-    if (alloc == NULL)
+    if (alloc == NULL) {
         throw errors::InternalError(string("type ") + as_type(type)->name
                 + " has no alloc function");
+    }
 
     alloc(term);
 }

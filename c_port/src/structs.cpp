@@ -60,15 +60,15 @@ StructDefinition::findField(std::string name)
     return -1;
 }
 
-/*
 std::string
-StructDefinition::toString()
+StructDefinition_toString(Term* term)
 {
-    FieldList::iterator it;
+    StructDefinition *def = as_struct_definition(term);
+    StructDefinition::FieldList::iterator it;
     std::stringstream output;
-    output << "struct " << this->name << " {";
+    output << "struct " << def->name << " {";
     bool first = true;
-    for (it = this->fields.begin(); it != this->fields.end(); ++it)
+    for (it = def->fields.begin(); it != def->fields.end(); ++it)
     {
         if (!first) output << ", ";
         output << as_type(it->type)->name << " " << it->name;
@@ -77,7 +77,6 @@ StructDefinition::toString()
     output << "}";
     return output.str();
 }
-*/
 
 bool is_struct_definition(Term* term)
 {
@@ -275,7 +274,8 @@ void initialize_structs(Branch* code)
     STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition",
             StructDefinition_alloc,
             StructDefinition_dealloc,
-            StructDefinition_copy);
+            StructDefinition_copy,
+            StructDefinition_toString);
 
     quick_create_function(code, "get-field", struct_get_field,
         TermList(ANY_TYPE, STRING_TYPE), ANY_TYPE);
