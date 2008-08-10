@@ -14,6 +14,7 @@ struct Type
     typedef void (*DeallocFunc)(Term* term);
     typedef void (*CopyFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, TermMap& map);
+    typedef std::string (*ToStringFunc)(Term* term);
 
     std::string name;
 
@@ -22,13 +23,12 @@ struct Type
     CopyFunc copy;
     DeallocFunc dealloc;
     RemapPointersFunc remapPointers;
+    ToStringFunc toString;
 
     // memberFunctions is a list of Functions which 'belong' to this type.
     // They are guaranteed to take an instance of this type as their first
     // argument.
     TermNamespace memberFunctions;
-
-    Term* toString;
 
     Type();
 };

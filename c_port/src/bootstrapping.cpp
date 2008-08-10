@@ -108,16 +108,18 @@ Term* quick_create_type(
         Type::AllocFunc allocFunc,
         Type::DeallocFunc deallocFunc,
         Type::CopyFunc copyFunc,
-        Function::ExecuteFunc toStringFunc)
+        Type::ToStringFunc toStringFunc)
 {
     Term* typeTerm = create_constant(branch, get_global("Type"));
     as_type(typeTerm)->name = name;
     as_type(typeTerm)->alloc = allocFunc;
     as_type(typeTerm)->dealloc = deallocFunc;
     as_type(typeTerm)->copy = copyFunc;
+    as_type(typeTerm)->toString = toStringFunc;
     branch->bindName(typeTerm, name);
 
     // Create to-string function
+    /*
     if (toStringFunc != NULL) {
         Term* toString = create_constant(branch, get_global("Function"));
         as_function(toString)->name = name + "-to-string";
@@ -129,7 +131,7 @@ Term* quick_create_type(
 
         as_function(toString)->outputType = get_global("string");
         as_type(typeTerm)->toString = toString;
-    }
+    }*/
 
     return typeTerm;
 }

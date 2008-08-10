@@ -37,9 +37,9 @@ void Type_alloc(Term* caller)
     caller->value = new Type();
 }
 
-void Type_toString(Term* caller)
+std::string Type_toString(Term* caller)
 {
-
+    return std::string("<Type " + as_type(caller)->name + ">");
 }
 
 void set_member_function(Term* type, std::string name, Term* function)
