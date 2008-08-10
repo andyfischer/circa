@@ -170,10 +170,11 @@ void StructInstance_copy(Term* source, Term* dest)
     *as_struct_instance(dest) = *as_struct_instance(source);
 }
 
-void StructInstance_tostring(Term* caller)
+void StructInstance_toString(Term* caller)
 {
-    StructInstance *inst = as_struct_instance(caller);
-    StructDefinition *def = as_struct_definition(caller->type);
+    Term* input = caller->inputs[0];
+    StructInstance *inst = as_struct_instance(input);
+    StructDefinition *def = as_struct_definition(input->type);
 
     std::stringstream output;
     output << "{";
@@ -181,8 +182,10 @@ void StructInstance_tostring(Term* caller)
     for (int i=0; i < def->numFields(); i++) {
         if (!first) output << ", ";
         output << def->getName(i) << ": " << inst->fields[i]->toString();
+        first = false;
     }
     output << "}";
+    as_string(caller) = output.str();
 }
 
 void struct_definition_set_name(Term* caller)
@@ -277,7 +280,7 @@ void initialize_structs(Branch* code)
             StructDefinition_copy);
 
     STRUCT_INSTANCE_TO_STRING = quick_create_function(code,
-            "struct-instance-to-string", StructInstance_tostring,
+            "struct-instance-to-string", StructInstance_toString,
             TermList(ANY_TYPE), STRING_TYPE);
 
     quick_create_function(code, "get-field", struct_get_field,
