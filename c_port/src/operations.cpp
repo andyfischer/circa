@@ -145,9 +145,23 @@ void execute(Term* term)
 
     // Check if we should recycle an input
     if (func->recycleInput != -1) {
-
+    
         Term* recycleTerm = term->inputs[func->recycleInput];
         bool steal = true;
+        
+        // Sanity check. Make sure the recycle term has the same type as this
+        // function's output.
+        //
+        // Temporary exception: allow functions that output 'any'
+        if (recycleTerm->type != func->outputType
+            && (func->outputType != ANY_TYPE)) {
+            std::stringstream msg;
+            msg << "Misconfigured function " << func->name
+                << ", set to recycle input " << func->recycleInput << " (which has type "
+                << as_type(recycleTerm->type)->name << "), but the function's output type is "
+                << as_type(func->outputType)->name;
+            throw errors::InternalError(msg.str());
+        }
 
         // Don't steal if the term has multiple users
         steal = steal && (recycleTerm->users.count() > 1);
