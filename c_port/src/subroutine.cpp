@@ -161,6 +161,11 @@ void subroutine_append(Term* caller)
     // Input 2: List
     // Result: (Subroutine,Reference)
     //std::cout << "sd = " << as_struct_definition(caller->type)->toString() << std::endl;
+    
+    StructInstance* inst = as_struct_instance(caller);
+
+    std::cout << "subroutine_append on " << caller << std::endl;
+    
     caller->needsUpdate = false;
     std::cout << "si = " << caller->toString() << std::endl;
     std::cout << "si->type = " << caller->type->toString() << std::endl;
@@ -212,7 +217,6 @@ void initialize_subroutine(Branch* kernel)
         subroutine_append,
         TermList(SUBROUTINE_TYPE, FUNCTION_TYPE, LIST_TYPE),
         subroutine_append_return_type);
-    as_function(subroutine_append_f)->recycleInput = 0;
 }
 
 } // namespace circa

@@ -142,10 +142,12 @@ StructInstance* as_struct_instance(Term* term)
 
 void StructInstance_alloc(Term* term)
 {
+    std::cout << "StructInstance_alloc on " << term << std::endl;
     StructDefinition *def = as_struct_definition(term->type);
 
     int numFields = def->numFields();
     StructInstance* structInstance = new StructInstance();
+    structInstance->numFields = numFields;
     structInstance->fields = new Term*[numFields];
     term->value = structInstance;
 
@@ -168,10 +170,6 @@ void StructInstance_copy(Term* source, Term* dest)
     StructDefinition* def = as_struct_definition(source->type);
     StructInstance* source_i = as_struct_instance(source);
     StructInstance* dest_i = as_struct_instance(dest);
-
-    if (source->type != dest->type) {
-        throw errors::InternalError("Types not equal in StructInstance_copy");
-    }
 
     for (int i=0; i < def->numFields(); i++) {
         copy_value(source_i->fields[i], dest_i->fields[i]);
