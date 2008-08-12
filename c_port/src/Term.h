@@ -37,7 +37,6 @@ struct Term
     std::string const& getError(int index);
 };
 
-
 TermList* as_list(Term* term);
 
 void initialize_term(Branch* kernel);

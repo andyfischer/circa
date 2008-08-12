@@ -25,6 +25,8 @@ struct Branch
 
     // Bind a name to a term
     void bindName(Term* term, string name);
+
+    void clear();
 };
 
 Branch* as_branch(Term* term);

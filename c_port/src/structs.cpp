@@ -202,8 +202,6 @@ std::string StructInstance_toString(Term* term)
 
 void struct_definition_set_name(Term* caller)
 {
-    copy_value(caller->inputs[0], caller);
-
     as_struct_definition(caller)->name = as_string(caller->inputs[1]);
 }
 
@@ -319,8 +317,10 @@ void initialize_structs(Branch* code)
     quick_create_function(code, "get-index", struct_get_index,
         TermList(ANY_TYPE, INT_TYPE), ANY_TYPE);
 
-    quick_create_function(code, "struct-definition-set-name", struct_definition_set_name,
-        TermList(get_global("StructDefinition"), STRING_TYPE), STRUCT_DEFINITION_TYPE);
+    Term* set_name = quick_create_function(code, "struct-definition-set-name",
+        struct_definition_set_name,
+        TermList(STRUCT_DEFINITION_TYPE, STRING_TYPE), STRUCT_DEFINITION_TYPE);
+    as_function(set_name)->recycleInput = 0;
 
     quick_create_function(code, "define-struct", struct_define_anonymous,
         TermList(STRING_TYPE, LIST_TYPE), STRUCT_DEFINITION_TYPE);

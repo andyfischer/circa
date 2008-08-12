@@ -34,6 +34,13 @@ void Branch::bindName(Term* term, string name)
     names.bind(term, name);
 }
 
+void
+Branch::clear()
+{
+    terms.clear();
+    names.clear();
+}
+
 Branch* as_branch(Term* term)
 {
     if (term->type != BRANCH_TYPE)
