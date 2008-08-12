@@ -90,22 +90,8 @@ TermList* as_list(Term* term)
     return (TermList*) term->value;
 }
 
-void TermList_alloc(Term* caller)
-{
-    caller->value = new TermList();
-}
-
-void TermList_dealloc(Term* caller)
-{
-    delete as_list(caller);
-}
-
 void initialize_term(Branch* kernel)
 {
-    LIST_TYPE = quick_create_type(kernel, "List",
-            TermList_alloc,
-            TermList_dealloc,
-            NULL);
 }
 
 } // namespace circa

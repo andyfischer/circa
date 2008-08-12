@@ -162,6 +162,7 @@ void StructInstance_alloc(Term* term)
 
 void StructInstance_dealloc(Term* term)
 {
+    std::cout << "StructInstance_dealloc on " << term << std::endl;
     delete as_struct_instance(term);
 }
 
@@ -274,7 +275,9 @@ void struct_get_index(Term* caller)
     // Input 0: struct
     // Input 1: int index
     StructInstance* instance = as_struct_instance(caller->inputs[0]);
-    copy_value(instance->fields[as_int(caller->inputs[1])], caller);
+    Term* field = instance->fields[as_int(caller->inputs[1])];
+    specialize_type(caller, field->type);
+    copy_value(field, caller);
 }
 
 void initialize_structs(Branch* code)

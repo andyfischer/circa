@@ -67,8 +67,8 @@ void test_as_function_output()
     Term* func_inst = quick_exec_function(branch, "x = my-func(5)");
 
     test_assert(func_inst->type == return_type);
-    test_assert(quick_exec_function(branch, "get-field(x, 0)")->type == STRING_TYPE);
-    test_assert(quick_exec_function(branch, "get-field(x, 1)")->type == INT_TYPE);
+    test_assert(quick_exec_function(branch, "get-index(x, 0)")->type == STRING_TYPE);
+    test_assert(quick_exec_function(branch, "get-index(x, 1)")->type == INT_TYPE);
 }
 
 void all_tests()

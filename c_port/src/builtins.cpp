@@ -311,12 +311,12 @@ void initialize()
 
         initialize_constants();
 
-        // Do initialize_term first
+        // These need to be first:
         initialize_term(KERNEL);
-
-        // Then initialize structs
+        initialize_term_list(KERNEL);
         initialize_structs(KERNEL);
 
+        // Then everything else:
         initialize_branch(KERNEL);
         initialize_builtin_functions(KERNEL);
         initialize_functions(KERNEL);

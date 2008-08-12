@@ -36,6 +36,8 @@ struct TermList
     void remap(TermMap& map);
 };
 
+void initialize_term_list(Branch* kernel);
+
 } // namespace circa
 
 #endif
