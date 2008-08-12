@@ -27,6 +27,12 @@ StructDefinition::addField(std::string name, Term* type)
 }
 
 void
+StructDefinition::setName(int index, std::string const& name)
+{
+    this->fields[index].name = name;
+}
+
+void
 StructDefinition::clear()
 {
     this->fields.clear();
@@ -201,6 +207,15 @@ void struct_definition_set_name(Term* caller)
     as_struct_definition(caller)->name = as_string(caller->inputs[1]);
 }
 
+void struct_definition_rename_field(Term* caller)
+{
+    StructDefinition *def = as_struct_definition(caller);
+    int index = as_int(caller->inputs[1]);
+    std::string name = as_string(caller->inputs[2]);
+
+    def->setName(index, name);
+}
+
 void struct_get_field(Term* caller)
 {
     if (!is_struct_definition(caller->inputs[0]->type)) {
@@ -301,14 +316,20 @@ void initialize_structs(Branch* code)
         STRUCT_DEFINITION_TYPE);
     as_function(add_field)->recycleInput = 0;
 
+    quick_create_function(code, "get-index", struct_get_index,
+        TermList(ANY_TYPE, INT_TYPE), ANY_TYPE);
+
     quick_create_function(code, "struct-definition-set-name", struct_definition_set_name,
         TermList(get_global("StructDefinition"), STRING_TYPE), STRUCT_DEFINITION_TYPE);
 
     quick_create_function(code, "define-struct", struct_define_anonymous,
         TermList(STRING_TYPE, LIST_TYPE), STRUCT_DEFINITION_TYPE);
 
-    quick_create_function(code, "get-index", struct_get_index,
-        TermList(ANY_TYPE, INT_TYPE), ANY_TYPE);
+    Term* rename_fields = quick_create_function(code, "struct-definition-rename-field",
+        struct_definition_rename_field,
+        TermList(STRUCT_DEFINITION_TYPE, INT_TYPE, STRING_TYPE),
+        STRUCT_DEFINITION_TYPE);
+    as_function(rename_fields)->recycleInput = 0;
 }
 
 } // namespace circa
