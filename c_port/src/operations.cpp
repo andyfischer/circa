@@ -98,6 +98,10 @@ void change_type(Term* term, Term* type)
 
 void specialize_type(Term* term, Term* type)
 {
+    if (term->type == type) {
+        return;
+    }
+
     if (term->type != ANY_TYPE)
         throw errors::TypeError(term, ANY_TYPE);
 
@@ -154,7 +158,7 @@ void execute(Term* term)
         //
         // Temporary exception: allow functions that output 'any'
         if (recycleTerm->type != func->outputType
-            && (func->outputType != ANY_TYPE)) {
+                && (func->outputType != ANY_TYPE)) {
             std::stringstream msg;
             msg << "Misconfigured function " << func->name
                 << ", set to recycle input " << func->recycleInput << " (which has type "

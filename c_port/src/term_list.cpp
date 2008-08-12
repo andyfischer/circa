@@ -1,6 +1,9 @@
 
 #include "common_headers.h"
 
+#include "bootstrapping.h"
+#include "builtins.h"
+#include "term.h"
 #include "term_list.h"
 #include "term_map.h"
 
@@ -51,6 +54,24 @@ void TermList::remap(TermMap& map)
 {
     for (int i=0; i < _items.size(); i++)
         _items[i] = map.getRemapped(_items[i]);
+}
+
+void TermList_alloc(Term* caller)
+{
+    caller->value = new TermList();
+}
+
+void TermList_dealloc(Term* caller)
+{
+    delete as_list(caller);
+}
+
+void initialize_term_list(Branch* kernel)
+{
+    LIST_TYPE = quick_create_type(kernel, "List",
+            TermList_alloc,
+            TermList_dealloc,
+            NULL);
 }
 
 } // namespace circa

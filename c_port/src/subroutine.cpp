@@ -164,16 +164,7 @@ void subroutine_append(Term* caller)
     
     StructInstance* inst = as_struct_instance(caller);
 
-    std::cout << "subroutine_append on " << caller << std::endl;
-    
-    caller->needsUpdate = false;
-    std::cout << "si = " << caller->toString() << std::endl;
-    std::cout << "si->type = " << caller->type->toString() << std::endl;
-    caller->needsUpdate = true;
-
     Term* return_field_0 = get_struct_field(caller,0);
-    std::cout << "caller type = " << caller->type->toString() << std::endl;
-    std::cout << "rf0 = " << return_field_0->toString() << std::endl;
     Subroutine* sub = as_subroutine(return_field_0);
     Term* ref = as_reference(get_struct_field(caller,1));
     Term* func = caller->inputs[1];

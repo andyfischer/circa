@@ -14,9 +14,8 @@
 			B6F5F41D0E4BD6D400CE7604 /* errors.h:61 */,
 			B6F5F4470E4D321300CE7604 /* errors.h:30 */,
 			B6DA80400E4DF4D80042DDC3 /* errors.h:15 */,
-			B65AF5E90E4FAF5200C9DFB6 /* struct_test.cpp:52 */,
-			B6983C690E50AD1C0068D6F3 /* subroutine.cpp:167 */,
-			B6983C6E0E50B1150068D6F3 /* structs.cpp:154 */,
+			B6983C960E5125630068D6F3 /* common.cpp:11 */,
+			B6983C9A0E5125730068D6F3 /* errors.h:16 */,
 		);
 		codeSenseManager = B6F1149E0E33392200B8BA44 /* Code sense */;
 		executables = (
@@ -93,6 +92,8 @@
 			B6983C8D0E50B51C0068D6F3 /* PBXTextBookmark */ = B6983C8D0E50B51C0068D6F3 /* PBXTextBookmark */;
 			B6983C8E0E50B5370068D6F3 /* PBXTextBookmark */ = B6983C8E0E50B5370068D6F3 /* PBXTextBookmark */;
 			B6983C8F0E50B5370068D6F3 /* PBXTextBookmark */ = B6983C8F0E50B5370068D6F3 /* PBXTextBookmark */;
+			B6983C910E5125000068D6F3 /* PBXTextBookmark */ = B6983C910E5125000068D6F3 /* PBXTextBookmark */;
+			B6983C920E5125000068D6F3 /* PBXTextBookmark */ = B6983C920E5125000068D6F3 /* PBXTextBookmark */;
 		};
 		sourceControlManager = B6F1149D0E33392200B8BA44 /* Source Control */;
 		userBuildSettings = {
@@ -107,23 +108,6 @@
 	B65AF5E70E4FAF4B00C9DFB6 /* PBXBookmark */ = {
 		isa = PBXBookmark;
 		fRef = B6A244410E401F16007F2BEB /* struct_test.cpp */;
-	};
-	B65AF5E90E4FAF5200C9DFB6 /* struct_test.cpp:52 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = B6A244410E401F16007F2BEB /* struct_test.cpp */;
-		functionName = "test_simple2()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 52;
-		location = circa;
-		modificationTime = 240169531.151933;
-		state = 1;
 	};
 	B65AF5EF0E4FAFD000C9DFB6 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
@@ -142,43 +126,9 @@
 			sepNavVisRange = "{0, 301}";
 		};
 	};
-	B6983C690E50AD1C0068D6F3 /* subroutine.cpp:167 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = B6F114B60E33394F00B8BA44 /* subroutine.cpp */;
-		functionName = "subroutine_append(Term* caller)";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 167;
-		location = circa;
-		modificationTime = 240169531.151988;
-		state = 1;
-	};
 	B6983C6A0E50B1080068D6F3 /* PBXBookmark */ = {
 		isa = PBXBookmark;
 		fRef = B6F115180E34F4B300B8BA44 /* structs.cpp */;
-	};
-	B6983C6E0E50B1150068D6F3 /* structs.cpp:154 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = B6F115180E34F4B300B8BA44 /* structs.cpp */;
-		functionName = "StructInstance_alloc(Term* term)";
-		hitCount = 1;
-		ignoreCount = 0;
-		lineNumber = 154;
-		location = circa;
-		modificationTime = 240169532.619108;
-		state = 1;
 	};
 	B6983C740E50B1670068D6F3 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
@@ -300,6 +250,59 @@
 		vrLen = 1094;
 		vrLoc = 1177;
 	};
+	B6983C910E5125000068D6F3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B6F115180E34F4B300B8BA44 /* structs.cpp */;
+		name = "structs.cpp: 313";
+		rLen = 0;
+		rLoc = 8551;
+		rType = 0;
+		vrLen = 1156;
+		vrLoc = 3075;
+	};
+	B6983C920E5125000068D6F3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B6A244410E401F16007F2BEB /* struct_test.cpp */;
+		name = "struct_test.cpp: 64";
+		rLen = 0;
+		rLoc = 2212;
+		rType = 0;
+		vrLen = 1047;
+		vrLoc = 1177;
+	};
+	B6983C960E5125630068D6F3 /* common.cpp:11 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = B6A244250E3ED540007F2BEB /* common.cpp */;
+		functionName = "test_assert_f(bool condition, int line, const char* file)";
+		hitCount = 1;
+		ignoreCount = 0;
+		lineNumber = 11;
+		location = circa;
+		modificationTime = 240199157.162978;
+		state = 1;
+	};
+	B6983C9A0E5125730068D6F3 /* errors.h:16 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = B6F114AF0E33394F00B8BA44 /* errors.h */;
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 16;
+		location = circa;
+		modificationTime = 240199155.766141;
+		state = 1;
+	};
 	B6A243A40E3568EB007F2BEB /* errors.cpp */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {708, 434}}";
@@ -318,7 +321,7 @@
 	};
 	B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 2660}}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 2688}}";
 			sepNavSelRange = "{2890, 0}";
 			sepNavVisRange = "{2586, 565}";
 			sepNavWindowFrame = "{{492, 91}, {750, 558}}";
@@ -352,6 +355,14 @@
 			sepNavVisRange = "{1, 536}";
 		};
 	};
+	B6A244250E3ED540007F2BEB /* common.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {708, 286}}";
+			sepNavSelRange = "{226, 0}";
+			sepNavVisRange = "{0, 301}";
+			sepNavWindowFrame = "{{38, 44}, {765, 708}}";
+		};
+	};
 	B6A244270E3ED540007F2BEB /* subroutine_test.cpp */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {708, 1036}}";
@@ -374,14 +385,14 @@
 		ignoreCount = 0;
 		lineNumber = 149;
 		location = circa;
-		modificationTime = 240169531.151893;
+		modificationTime = 240199155.766084;
 		state = 2;
 	};
 	B6A244410E401F16007F2BEB /* struct_test.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {691, 1162}}";
-			sepNavSelRange = "{2212, 0}";
-			sepNavVisRange = "{1177, 1094}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 1190}}";
+			sepNavSelRange = "{2530, 0}";
+			sepNavVisRange = "{0, 559}";
 			sepNavWindowFrame = "{{130, 110}, {750, 558}}";
 		};
 	};
@@ -399,7 +410,7 @@
 		ignoreCount = 0;
 		lineNumber = 34;
 		location = circa;
-		modificationTime = 240169531.151909;
+		modificationTime = 240199155.766104;
 		state = 2;
 	};
 	B6DA80400E4DF4D80042DDC3 /* errors.h:15 */ = {
@@ -415,7 +426,7 @@
 		ignoreCount = 0;
 		lineNumber = 15;
 		location = circa;
-		modificationTime = 240169532.533041;
+		modificationTime = 240199157.113254;
 		state = 1;
 	};
 	B6F114970E33391C00B8BA44 /* circa */ = {
@@ -472,11 +483,19 @@
 			sepNavVisRange = "{822, 510}";
 		};
 	};
+	B6F114AA0E33394F00B8BA44 /* circa.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {706, 580}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 196}";
+			sepNavWindowFrame = "{{61, 23}, {765, 708}}";
+		};
+	};
 	B6F114AF0E33394F00B8BA44 /* errors.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 1246}}";
+			sepNavIntBoundsRect = "{{0, 0}, {691, 1246}}";
 			sepNavSelRange = "{917, 0}";
-			sepNavVisRange = "{104, 352}";
+			sepNavVisRange = "{618, 551}";
 			sepNavWindowFrame = "{{460, 190}, {750, 558}}";
 		};
 	};
@@ -490,9 +509,9 @@
 	};
 	B6F114B60E33394F00B8BA44 /* subroutine.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 3332}}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 3206}}";
 			sepNavSelRange = "{4570, 0}";
-			sepNavVisRange = "{4268, 835}";
+			sepNavVisRange = "{4268, 647}";
 		};
 	};
 	B6F114B80E33394F00B8BA44 /* term.cpp */ = {
@@ -528,16 +547,16 @@
 	B6F115160E34F4B300B8BA44 /* operations.cpp */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {708, 4564}}";
-			sepNavSelRange = "{6250, 0}";
-			sepNavVisRange = "{5991, 559}";
+			sepNavSelRange = "{6258, 0}";
+			sepNavVisRange = "{5977, 565}";
 			sepNavWindowFrame = "{{32, 15}, {765, 708}}";
 		};
 	};
 	B6F115180E34F4B300B8BA44 /* structs.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {706, 4452}}";
-			sepNavSelRange = "{4542, 0}";
-			sepNavVisRange = "{2888, 1266}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 4424}}";
+			sepNavSelRange = "{7207, 0}";
+			sepNavVisRange = "{6826, 619}";
 		};
 	};
 	B6F5F41D0E4BD6D400CE7604 /* errors.h:61 */ = {
@@ -553,7 +572,7 @@
 		ignoreCount = 0;
 		lineNumber = 61;
 		location = circa;
-		modificationTime = 240169532.577365;
+		modificationTime = 240199157.042655;
 		state = 1;
 	};
 	B6F5F4470E4D321300CE7604 /* errors.h:30 */ = {
@@ -569,7 +588,7 @@
 		ignoreCount = 0;
 		lineNumber = 30;
 		location = circa;
-		modificationTime = 240169532.467504;
+		modificationTime = 240199157.091708;
 		state = 1;
 	};
 }
