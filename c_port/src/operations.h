@@ -46,6 +46,7 @@ void copy_value(Term* source, Term* dest);
 // In some situations we are not allowed to steal a value. In these situations,
 // calling steal_value is equivalent to calling copy_value. These situations include:
 //  1) if source is a constant
+//  2) other?
 void steal_value(Term* source, Term* dest);
 
 void duplicate_branch(Branch* source, Branch* dest);

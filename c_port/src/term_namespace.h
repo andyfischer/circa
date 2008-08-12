@@ -19,6 +19,10 @@ struct TermNamespace
     {
         _map[name] = term;
     }
+    void clear()
+    {
+        _map.clear();
+    }
 
     Term* operator[](string name)
     {

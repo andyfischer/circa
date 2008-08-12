@@ -156,7 +156,7 @@ void execute(Term* term)
         // Sanity check. Make sure the recycle term has the same type as this
         // function's output.
         //
-        // Temporary exception: allow functions that output 'any'
+        // With a temporary exception: allow functions that output 'any'
         if (recycleTerm->type != func->outputType
                 && (func->outputType != ANY_TYPE)) {
             std::stringstream msg;
@@ -251,6 +251,9 @@ void copy_value(Term* source, Term* dest)
 
 void steal_value(Term* source, Term* dest)
 {
+    if (source->type != dest->type)
+        throw errors::TypeError(dest, source->type);
+
     // In some situations, ignore their request to steal
 
     // Don't steal from constant terms

@@ -43,6 +43,14 @@ void Subroutine_dealloc(Term* term)
     delete as_subroutine(term);
 }
 
+void Subroutine_copy(Term* source, Term* dest)
+{
+    Subroutine* sourceSub = as_subroutine(source);
+    Subroutine* destSub = as_subroutine(dest);
+    destSub->branch->clear();
+    duplicate_branch(sourceSub->branch, destSub->branch);
+}
+
 std::string GetInputPlaceholderName(int index)
 {
     std::stringstream sstream;
@@ -177,7 +185,10 @@ void subroutine_append(Term* caller)
 
 void initialize_subroutine(Branch* kernel)
 {
-    SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine", Subroutine_alloc, Subroutine_dealloc, NULL);
+    SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine",
+            Subroutine_alloc,
+            Subroutine_dealloc,
+            Subroutine_copy);
 
     quick_create_function(kernel, "subroutine-create", subroutine_create,
         TermList(get_global("string"),get_global("List"),get_global("Type")),
@@ -199,14 +210,18 @@ void initialize_subroutine(Branch* kernel)
     quick_create_function(kernel, "subroutine-get-local",
         subroutine_get_local, TermList(SUBROUTINE_TYPE, STRING_TYPE), REFERENCE_TYPE);
 
-    Term* subroutine_append_return_type = quick_exec_function(kernel,
-        "define-struct('subroutine-append-returns, list(Subroutine, Reference))");
+    quick_exec_function(kernel, 
+        "subroutine-append-ret = define-struct('subroutine-append-ret, list(Subroutine, Reference))");
+    quick_exec_function(kernel,
+        "subroutine-append-ret = struct-definition-rename-field(subroutine-append-ret, 0, 'sub)");
+    Term* subroutine_append_ret = quick_exec_function(kernel,
+        "subroutine-append-ret = struct-definition-rename-field(subroutine-append-ret, 1, 'term)");
 
     Term* subroutine_append_f = quick_create_function(kernel,
         "subroutine-append",
         subroutine_append,
         TermList(SUBROUTINE_TYPE, FUNCTION_TYPE, LIST_TYPE),
-        subroutine_append_return_type);
+        subroutine_append_ret);
 }
 
 } // namespace circa
