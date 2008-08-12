@@ -142,7 +142,6 @@ StructInstance* as_struct_instance(Term* term)
 
 void StructInstance_alloc(Term* term)
 {
-    std::cout << "StructInstance_alloc on " << term << std::endl;
     StructDefinition *def = as_struct_definition(term->type);
 
     int numFields = def->numFields();
@@ -162,7 +161,6 @@ void StructInstance_alloc(Term* term)
 
 void StructInstance_dealloc(Term* term)
 {
-    std::cout << "StructInstance_dealloc on " << term << std::endl;
     delete as_struct_instance(term);
 }
 
