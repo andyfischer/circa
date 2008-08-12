@@ -133,7 +133,7 @@ void execute(Term* term)
     
     // Make sure we have an allocated value
     if (term->value == NULL) {
-        std::cout << "Reallocating term " << term->findName() << std::endl;
+        // std::cout << "Reallocating term " << term->findName() << std::endl;
         as_type(term->type)->alloc(term);
     }    
 

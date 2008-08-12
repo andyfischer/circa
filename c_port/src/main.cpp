@@ -51,6 +51,7 @@ int main(int nargs, const char * args[])
     initialize();
 
     run_all_tests();
+    std::cout << "All tests finished" << std::endl;
 
     try {
         run();
@@ -60,4 +61,3 @@ int main(int nargs, const char * args[])
         std::cout << err.message() << std::endl;
     }
 }
-

@@ -104,6 +104,7 @@
 			B6983CB70E512B9E0068D6F3 /* PBXTextBookmark */ = B6983CB70E512B9E0068D6F3 /* PBXTextBookmark */;
 			B6983CB80E512B9E0068D6F3 /* PBXTextBookmark */ = B6983CB80E512B9E0068D6F3 /* PBXTextBookmark */;
 			B6983CBA0E512C0A0068D6F3 /* PBXTextBookmark */ = B6983CBA0E512C0A0068D6F3 /* PBXTextBookmark */;
+			B6983CBD0E512CB80068D6F3 /* PBXTextBookmark */ = B6983CBD0E512CB80068D6F3 /* PBXTextBookmark */;
 		};
 		sourceControlManager = B6F1149D0E33392200B8BA44 /* Source Control */;
 		userBuildSettings = {
@@ -418,6 +419,16 @@
 		vrLen = 1081;
 		vrLoc = 1177;
 	};
+	B6983CBD0E512CB80068D6F3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B6A244410E401F16007F2BEB /* struct_test.cpp */;
+		name = "struct_test.cpp: 80";
+		rLen = 0;
+		rLoc = 2479;
+		rType = 0;
+		vrLen = 1009;
+		vrLoc = 1109;
+	};
 	B6A243A40E3568EB007F2BEB /* errors.cpp */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {708, 434}}";
@@ -505,9 +516,9 @@
 	};
 	B6A244410E401F16007F2BEB /* struct_test.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {691, 1120}}";
-			sepNavSelRange = "{2199, 0}";
-			sepNavVisRange = "{1177, 1081}";
+			sepNavIntBoundsRect = "{{0, 0}, {691, 1050}}";
+			sepNavSelRange = "{2479, 0}";
+			sepNavVisRange = "{1109, 1009}";
 			sepNavWindowFrame = "{{130, 110}, {750, 558}}";
 		};
 	};
