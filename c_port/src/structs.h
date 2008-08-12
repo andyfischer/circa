@@ -22,6 +22,7 @@ struct StructDefinition : public Type
 
     StructDefinition();
     void addField(std::string name, Term* type);
+    void setName(int index, std::string const& name);
     void clear();
     int numFields() const;
     std::string getName(int index) const;

@@ -68,11 +68,25 @@ void test_as_function_output()
     test_assert(quick_exec_function(branch, "get-index(x, 1)")->type == INT_TYPE);
 }
 
+void test_rename_field()
+{
+    Branch *branch = new Branch();
+    quick_exec_function(branch, "s = define-struct('s, list(int,List))");
+    quick_exec_function(branch, "s = struct-definition-rename-field(s, 0, 'FirstField)");
+    quick_exec_function(branch, "s = struct-definition-rename-field(s, 1, 'SecondField)");
+    quick_exec_function(branch, "inst = s()");
+    Term* firstField = quick_exec_function(branch, "get-field(inst, 'FirstField)");
+
+    test_assert(firstField != NULL);
+    test_assert(firstField->type == INT_TYPE);
+}
+
 void all_tests()
 {
     test_simple();
     test_simple2();
     test_as_function_output();
+    test_rename_field();
 }
 
 } // namespace struct_test
