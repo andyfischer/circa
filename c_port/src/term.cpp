@@ -36,12 +36,6 @@ Term::getType() const
 std::string
 Term::toString()
 {
-    /*
-    Term* result = apply_function(this->owningBranch,
-            get_global("to-string"), TermList(this));
-    execute(result);
-    return as_string(result);
-    */
     Type::ToStringFunc func = as_type(this->type)->toString;
 
     if (func == NULL) {

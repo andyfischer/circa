@@ -61,7 +61,7 @@ void test_as_function_output()
     Branch *branch = new Branch();
 
     Term* return_type = quick_exec_function(branch, "define-struct('rt, list(string,int))");
-    Term* func = quick_create_function(branch, "my-func", function_body_whatever,
+    quick_create_function(branch, "my-func", function_body_whatever,
             TermList(INT_TYPE), return_type);
 
     Term* func_inst = quick_exec_function(branch, "x = my-func(5)");

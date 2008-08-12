@@ -185,7 +185,7 @@ std::string int_toString(Term* term)
 {
     std::stringstream strm;
     strm << as_int(term);
-    strm.str();
+    return strm.str();
 }
 
 void float_alloc(Term* caller)
@@ -300,7 +300,6 @@ void initialize_constants()
     CONSTANT_0 = constant_int(KERNEL, 0);
     CONSTANT_1 = constant_int(KERNEL, 1);
     CONSTANT_2 = constant_int(KERNEL, 2);
-
 }
 
 void initialize()
@@ -322,6 +321,7 @@ void initialize()
         initialize_functions(KERNEL);
         initialize_subroutine(KERNEL);
 
+        // Lastly:
         initialize_bootstrapped_code(KERNEL);
 
     } catch (errors::CircaError& e)

@@ -187,7 +187,9 @@ std::string StructInstance_toString(Term* term)
     bool first = true;
     for (int i=0; i < def->numFields(); i++) {
         if (!first) output << ", ";
-        output << def->getName(i) << ": " << inst->fields[i]->toString();
+        std::string name = def->getName(i);
+        output << name << ": ";
+        output << inst->fields[i]->toString();
         first = false;
     }
     output << "}";

@@ -160,7 +160,6 @@ void subroutine_append(Term* caller)
     // Input 1: Function
     // Input 2: List
     // Result: (Subroutine,Reference)
-    //std::cout << "sd = " << as_struct_definition(caller->type)->toString() << std::endl;
     
     StructInstance* inst = as_struct_instance(caller);
 
