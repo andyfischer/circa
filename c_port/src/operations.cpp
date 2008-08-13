@@ -43,6 +43,9 @@ void initialize_term(Term* term, Term* function, TermList inputs)
 
     if (outputType == NULL)
         throw errors::InternalError("outputType is NULL");
+        
+    if (!is_type(outputType))
+        throw errors::InternalError(outputType->findName() + " is not a type");
 
     change_type(term, outputType);
 

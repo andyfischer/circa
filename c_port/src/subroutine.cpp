@@ -48,6 +48,8 @@ void Subroutine_copy(Term* source, Term* dest)
     Subroutine* sourceSub = as_subroutine(source);
     Subroutine* destSub = as_subroutine(dest);
     destSub->branch->clear();
+
+    *((Function*) destSub) = *((Function*) sourceSub);
     duplicate_branch(sourceSub->branch, destSub->branch);
 }
 
@@ -74,8 +76,8 @@ void Subroutine_execute(Term* caller)
         Term* incomingInput = caller->inputs[index];
         std::string name = GetInputPlaceholderName(index);
         if (!exec_branch.containsName(name)) {
-            throw errors::InternalError(string("Too many arguments for subroutine ") +
-                    sub->name);
+            throw errors::InternalError(string("Too many arguments for subroutine ")
+                + sub->name);
         }
 
         copy_value(incomingInput, exec_branch.getNamed(name));

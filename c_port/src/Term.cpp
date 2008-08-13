@@ -48,10 +48,13 @@ Term::toString()
 std::string
 Term::findName()
 {
+    if (this == NULL)
+        return "<NULL TERM>";
+
     Branch* branch = this->owningBranch;
 
     if (branch == NULL)
-        return "<null branch>";
+        return "";
 
     std::string name = branch->names.findName(this);
 
