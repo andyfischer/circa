@@ -7,13 +7,14 @@
 namespace circa {
 
 Function::Function()
+  : outputType(NULL),
+    stateType(NULL),
+    recycleInput(-1),
+    pureFunction(false),
+    variableArgs(false),
+    initialize(NULL),
+    execute(NULL)
 {
-    stateType = NULL;
-    recycleInput = -1;
-    pureFunction = false;
-    variableArgs = false;
-    initialize = NULL;
-    execute = NULL;
 }
 
 bool is_function(Term* term)
