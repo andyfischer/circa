@@ -55,13 +55,19 @@ void test_using_subroutine_append()
     quick_exec_function(branch, "test-sub = subroutine-name-inputs(test-sub,list('a,'b))");
     quick_exec_function(branch, "a = subroutine-get-local(test-sub,'a)");
     quick_exec_function(branch, "b = subroutine-get-local(test-sub,'b)");
-    quick_exec_function(branch, "results = subroutine-append(test-sub, mult, list(a,4))");
-    
-    //quick_exec_function(branch, "test-sub = get-field(results, 'sub)");
-    //quick_exec_function(branch, "a-times-4 = get-field(results, 'term)");
-    /*quick_exec_function(branch, "results = subroutine-append(test-sub, mult, list(b,3))");
-    quick_exec_function(branch, "test-sub = get-field(results, 'sub)");
-    quick_exec_function(branch, "b-times-3 = get-field(results, 'term)");*/
+
+    quick_exec_function(branch, "append-result = subroutine-append(test-sub, mult, list(a,4))");
+    quick_exec_function(branch, "test-sub = get-field(append-result, 'sub)");
+    quick_exec_function(branch, "a-times-4 = get-field(append-result, 'term)");
+
+    quick_exec_function(branch, "append-result = subroutine-append(test-sub, mult, list(b,3))");
+    quick_exec_function(branch, "test-sub = get-field(append-result, 'sub)");
+    quick_exec_function(branch, "b-times-3 = get-field(append-result, 'term)");
+
+    quick_exec_function(branch,
+        "append-result = subroutine-append(test-sub, add, list(a-times-4,b-times-3))");
+    quick_exec_function(branch, "test-sub = get-field(append-result, 'sub)");
+    quick_exec_function(branch, "sum = get-field(append-result, 'term)");
 }
 
 void subroutine_test()
