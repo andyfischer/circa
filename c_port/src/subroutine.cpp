@@ -154,12 +154,24 @@ void subroutine_set_branch(Term* caller)
 void subroutine_get_local(Term* caller)
 {
     // Input 0: Subroutine
-    // Input 1: String, name
+    // Input 1: String name
     // Output: Reference
     Subroutine* sub = as_subroutine(caller->inputs[0]);
     std::string name = as_string(caller->inputs[1]);
 
     as_reference(caller) = sub->branch->getNamed(name);
+}
+
+void subroutine_bind(Term* caller)
+{
+    // Input 0: Subroutine (recycled)
+    // Input 1: Reference
+    // Input 2: String name
+    Subroutine* sub = as_subroutine(caller);
+    Term* ref = as_reference(caller->inputs[1]);
+    std::string name = as_string(caller->inputs[2]);
+
+    sub->branch->bindName(ref, name);
 }
 
 void subroutine_append(Term* caller)
@@ -173,14 +185,13 @@ void subroutine_append(Term* caller)
 
     Term* return_field_0 = get_struct_field(caller,0);
     Subroutine* sub = as_subroutine(return_field_0);
-    Term* ref = as_reference(get_struct_field(caller,1));
     Term* func = caller->inputs[1];
     Term* inputs = caller->inputs[2];
 
     as_function(func);
     as_list(inputs);
 
-    apply_function(sub->branch, func, *as_list(inputs));
+    as_reference(get_struct_field(caller,1)) = apply_function(sub->branch, func, *as_list(inputs));
 }
 
 void initialize_subroutine(Branch* kernel)
@@ -210,6 +221,10 @@ void initialize_subroutine(Branch* kernel)
     quick_create_function(kernel, "subroutine-get-local",
         subroutine_get_local, TermList(SUBROUTINE_TYPE, STRING_TYPE), REFERENCE_TYPE);
 
+    Term* bind = quick_create_function(kernel, "subroutine-bind",
+        subroutine_bind, TermList(SUBROUTINE_TYPE, REFERENCE_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
+    as_function(bind)->recycleInput = 0;
+
     quick_exec_function(kernel, 
         "subroutine-append-ret = define-struct('subroutine-append-ret, list(Subroutine, Reference))");
     quick_exec_function(kernel,
@@ -218,8 +233,7 @@ void initialize_subroutine(Branch* kernel)
         "subroutine-append-ret = struct-definition-rename-field(subroutine-append-ret, 1, 'term)");
 
     Term* subroutine_append_f = quick_create_function(kernel,
-        "subroutine-append",
-        subroutine_append,
+        "subroutine-append", subroutine_append,
         TermList(SUBROUTINE_TYPE, FUNCTION_TYPE, LIST_TYPE),
         subroutine_append_ret);
 }
