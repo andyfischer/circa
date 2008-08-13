@@ -41,14 +41,14 @@ public:
 
 class TypeError : public CircaError
 {
-    Term* term;
+    Term* offendingTerm;
     Term* expectedType;
 
 public:
-    TypeError(Term* _term, Term* _expectedType) throw()
+    TypeError(Term* _offendingTerm, Term* _expectedType) throw()
         : CircaError("")
     {
-        term = _term;
+        offendingTerm = _offendingTerm;
         expectedType = _expectedType;
     }
     ~TypeError() throw() {}

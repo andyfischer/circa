@@ -2,14 +2,14 @@
 {
 	08FB7793FE84155DC02AAC07 /* Project object */ = {
 		activeArchitecture = i386;
-		activeBuildConfigurationName = Release;
+		activeBuildConfigurationName = Debug;
 		activeExecutable = B6F114970E33391C00B8BA44 /* circa */;
 		activeTarget = 8DD76F620486A84900D96B5E /* circa */;
 		addToTargets = (
 			8DD76F620486A84900D96B5E /* circa */,
 		);
 		breakpoints = (
-			B6A244380E3F7F70007F2BEB /* operations.cpp:149 */,
+			B6A244380E3F7F70007F2BEB /* operations.cpp:152 */,
 			B6A244480E40233A007F2BEB /* subroutine_test.cpp:34 */,
 			B6F5F41D0E4BD6D400CE7604 /* errors.h:61 */,
 			B6F5F4470E4D321300CE7604 /* errors.h:30 */,
@@ -107,6 +107,9 @@
 			B6983CBD0E512CB80068D6F3 /* PBXTextBookmark */ = B6983CBD0E512CB80068D6F3 /* PBXTextBookmark */;
 			B6983CBF0E51F1B90068D6F3 /* PBXTextBookmark */ = B6983CBF0E51F1B90068D6F3 /* PBXTextBookmark */;
 			B6983CC00E51F1B90068D6F3 /* PBXTextBookmark */ = B6983CC00E51F1B90068D6F3 /* PBXTextBookmark */;
+			B6983CC40E5349640068D6F3 /* PBXTextBookmark */ = B6983CC40E5349640068D6F3 /* PBXTextBookmark */;
+			B6983CC50E53496A0068D6F3 /* PBXTextBookmark */ = B6983CC50E53496A0068D6F3 /* PBXTextBookmark */;
+			B6983CCA0E5349EE0068D6F3 /* PBXTextBookmark */ = B6983CCA0E5349EE0068D6F3 /* PBXTextBookmark */;
 		};
 		sourceControlManager = B6F1149D0E33392200B8BA44 /* Source Control */;
 		userBuildSettings = {
@@ -297,7 +300,7 @@
 		ignoreCount = 0;
 		lineNumber = 11;
 		location = circa;
-		modificationTime = 240251324.087004;
+		modificationTime = 240340352.359001;
 		state = 1;
 	};
 	B6983C9A0E5125730068D6F3 /* errors.h:16 */ = {
@@ -313,7 +316,7 @@
 		ignoreCount = 0;
 		lineNumber = 16;
 		location = circa;
-		modificationTime = 240251324.087009;
+		modificationTime = 240340352.359011;
 		state = 1;
 	};
 	B6983CA00E5128990068D6F3 /* PBXTextBookmark */ = {
@@ -340,7 +343,7 @@
 		ignoreCount = 0;
 		lineNumber = 192;
 		location = circa;
-		modificationTime = 240251324.087015;
+		modificationTime = 240340352.359049;
 		state = 2;
 	};
 	B6983CB20E512B9E0068D6F3 /* PBXTextBookmark */ = {
@@ -449,11 +452,41 @@
 		vrLen = 377;
 		vrLoc = 4268;
 	};
+	B6983CC40E5349640068D6F3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B6F114B60E33394F00B8BA44 /* subroutine.cpp */;
+		name = "subroutine.cpp: 242";
+		rLen = 0;
+		rLoc = 7343;
+		rType = 0;
+		vrLen = 389;
+		vrLoc = 4392;
+	};
+	B6983CC50E53496A0068D6F3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B6F114B60E33394F00B8BA44 /* subroutine.cpp */;
+		name = "subroutine.cpp: 242";
+		rLen = 0;
+		rLoc = 7343;
+		rType = 0;
+		vrLen = 428;
+		vrLoc = 4392;
+	};
+	B6983CCA0E5349EE0068D6F3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B6F114B60E33394F00B8BA44 /* subroutine.cpp */;
+		name = "subroutine.cpp: 242";
+		rLen = 0;
+		rLoc = 7343;
+		rType = 0;
+		vrLen = 428;
+		vrLoc = 4392;
+	};
 	B6A243A40E3568EB007F2BEB /* errors.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 434}}";
-			sepNavSelRange = "{292, 0}";
-			sepNavVisRange = "{0, 485}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 532}}";
+			sepNavSelRange = "{602, 0}";
+			sepNavVisRange = "{126, 771}";
 			sepNavWindowFrame = "{{382, 94}, {750, 558}}";
 		};
 	};
@@ -467,9 +500,9 @@
 	};
 	B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 2688}}";
-			sepNavSelRange = "{2890, 0}";
-			sepNavVisRange = "{2586, 565}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 2716}}";
+			sepNavSelRange = "{2836, 0}";
+			sepNavVisRange = "{2585, 525}";
 			sepNavWindowFrame = "{{492, 91}, {750, 558}}";
 		};
 	};
@@ -511,13 +544,13 @@
 	};
 	B6A244270E3ED540007F2BEB /* subroutine_test.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {675, 1064}}";
-			sepNavSelRange = "{477, 52}";
-			sepNavVisRange = "{207, 655}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 1204}}";
+			sepNavSelRange = "{2822, 0}";
+			sepNavVisRange = "{1548, 1250}";
 			sepNavWindowFrame = "{{456, 152}, {750, 558}}";
 		};
 	};
-	B6A244380E3F7F70007F2BEB /* operations.cpp:149 */ = {
+	B6A244380E3F7F70007F2BEB /* operations.cpp:152 */ = {
 		isa = PBXFileBreakpoint;
 		actions = (
 		);
@@ -529,16 +562,16 @@
 		functionName = "execute_branch(Branch* branch)";
 		hitCount = 0;
 		ignoreCount = 0;
-		lineNumber = 149;
+		lineNumber = 152;
 		location = circa;
-		modificationTime = 240251324.086961;
+		modificationTime = 240340352.358792;
 		state = 2;
 	};
 	B6A244410E401F16007F2BEB /* struct_test.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {691, 1050}}";
-			sepNavSelRange = "{2479, 0}";
-			sepNavVisRange = "{1109, 1009}";
+			sepNavIntBoundsRect = "{{0, 0}, {691, 1316}}";
+			sepNavSelRange = "{3040, 0}";
+			sepNavVisRange = "{1043, 1074}";
 			sepNavWindowFrame = "{{130, 110}, {750, 558}}";
 		};
 	};
@@ -556,7 +589,7 @@
 		ignoreCount = 0;
 		lineNumber = 34;
 		location = circa;
-		modificationTime = 240251324.086979;
+		modificationTime = 240340352.358812;
 		state = 2;
 	};
 	B6A2447F0E40D94B007F2BEB /* list_test.cpp */ = {
@@ -579,7 +612,7 @@
 		ignoreCount = 0;
 		lineNumber = 15;
 		location = circa;
-		modificationTime = 240251325.419586;
+		modificationTime = 240340353.702566;
 		state = 1;
 	};
 	B6F114970E33391C00B8BA44 /* circa */ = {
@@ -621,6 +654,14 @@
 		isa = PBXCodeSenseManager;
 		indexTemplatePath = "";
 	};
+	B6F114A10E33394F00B8BA44 /* branch.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {708, 1302}}";
+			sepNavSelRange = "{203, 0}";
+			sepNavVisRange = "{0, 270}";
+			sepNavWindowFrame = "{{84, 2}, {765, 708}}";
+		};
+	};
 	B6F114A40E33394F00B8BA44 /* builtin_functions.cpp */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {708, 1666}}";
@@ -646,9 +687,9 @@
 	};
 	B6F114AF0E33394F00B8BA44 /* errors.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 1260}}";
-			sepNavSelRange = "{508, 0}";
-			sepNavVisRange = "{316, 366}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 1232}}";
+			sepNavSelRange = "{953, 0}";
+			sepNavVisRange = "{719, 418}";
 			sepNavWindowFrame = "{{460, 190}, {750, 558}}";
 		};
 	};
@@ -662,16 +703,17 @@
 	};
 	B6F114B60E33394F00B8BA44 /* subroutine.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {675, 3122}}";
-			sepNavSelRange = "{4423, 55}";
-			sepNavVisRange = "{4268, 377}";
+			sepNavIntBoundsRect = "{{0, 0}, {706, 3402}}";
+			sepNavSelRange = "{839, 0}";
+			sepNavVisRange = "{2398, 1464}";
+			sepNavWindowFrame = "{{15, 65}, {765, 708}}";
 		};
 	};
 	B6F114B80E33394F00B8BA44 /* term.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 1232}}";
-			sepNavSelRange = "{536, 0}";
-			sepNavVisRange = "{439, 347}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 1344}}";
+			sepNavSelRange = "{927, 0}";
+			sepNavVisRange = "{788, 390}";
 			sepNavWindowFrame = "{{83, 150}, {750, 558}}";
 		};
 	};
@@ -685,31 +727,31 @@
 	};
 	B6F114BB0E33394F00B8BA44 /* term_namespace.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {715, 378}}";
-			sepNavSelRange = "{216, 0}";
-			sepNavVisRange = "{0, 380}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 756}}";
+			sepNavSelRange = "{601, 0}";
+			sepNavVisRange = "{394, 388}";
 		};
 	};
 	B6F114BD0E33394F00B8BA44 /* type.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 714}}";
-			sepNavSelRange = "{296, 0}";
-			sepNavVisRange = "{184, 389}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 910}}";
+			sepNavSelRange = "{444, 0}";
+			sepNavVisRange = "{163, 366}";
 		};
 	};
 	B6F115160E34F4B300B8BA44 /* operations.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 4564}}";
-			sepNavSelRange = "{6258, 0}";
-			sepNavVisRange = "{5977, 565}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 4844}}";
+			sepNavSelRange = "{1145, 0}";
+			sepNavVisRange = "{834, 602}";
 			sepNavWindowFrame = "{{32, 15}, {765, 708}}";
 		};
 	};
 	B6F115180E34F4B300B8BA44 /* structs.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {708, 4746}}";
-			sepNavSelRange = "{9093, 0}";
-			sepNavVisRange = "{4256, 562}";
+			sepNavIntBoundsRect = "{{0, 0}, {708, 4732}}";
+			sepNavSelRange = "{9111, 0}";
+			sepNavVisRange = "{5523, 611}";
 			sepNavWindowFrame = "{{13, 32}, {765, 708}}";
 		};
 	};
@@ -726,7 +768,7 @@
 		ignoreCount = 0;
 		lineNumber = 61;
 		location = circa;
-		modificationTime = 240251325.381843;
+		modificationTime = 240340353.647124;
 		state = 1;
 	};
 	B6F5F4470E4D321300CE7604 /* errors.h:30 */ = {
@@ -738,11 +780,11 @@
 		countType = 0;
 		delayBeforeContinue = 0;
 		fileReference = B6F114AF0E33394F00B8BA44 /* errors.h */;
-		hitCount = 1;
+		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 30;
 		location = circa;
-		modificationTime = 240251325.48001;
+		modificationTime = 240340353.657317;
 		state = 1;
 	};
 }

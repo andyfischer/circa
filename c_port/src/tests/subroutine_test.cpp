@@ -68,6 +68,10 @@ void test_using_subroutine_append()
         "append-result = subroutine-append(test-sub, add, list(a-times-4,b-times-3))");
     quick_exec_function(branch, "test-sub = get-field(append-result, 'sub)");
     quick_exec_function(branch, "sum = get-field(append-result, 'term)");
+    quick_exec_function(branch, "test-sub = subroutine-bind(test-sub, sum, 'output)");
+
+    // Finally, run it
+    std::cout << quick_exec_function(branch, "test-sub(2,3)")->toString();
 }
 
 void subroutine_test()
