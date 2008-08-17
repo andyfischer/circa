@@ -151,7 +151,7 @@ Term* quick_create_function(Branch* branch, string name, Function::ExecuteFunc e
 
 void hosted_apply_function(Term* caller)
 {
-    // Recycles input 0
+    recycle_value(caller->inputs[0], caller);
     Branch* branch = as_branch(caller);
     Term* function = caller->inputs[1];
     TermList* inputs = as_list(caller->inputs[2]);

@@ -8,30 +8,6 @@ namespace circa {
 
 void test_simple()
 {
-    Branch *branch = new Branch();
-
-    // Try to create this formula:
-    // result = a*2 + b*5
-
-    Term* my_sub = quick_exec_function(branch,
-        "my-sub = subroutine-create('my-sub, list(int,int), int)");
-    my_sub = quick_exec_function(branch,
-        "my-sub = subroutine-name-inputs(my-sub, list('a, 'b))");
-
-    Subroutine* sub = as_subroutine(my_sub);
-
-    Term* result = quick_exec_function(sub->branch,
-        "output = add(mult(a,2),mult(b,5))");
-
-    test_assert(as_int(exec_function(branch, my_sub, TermList(CONSTANT_1, CONSTANT_1))) == 7);
-    test_assert(as_int(exec_function(branch, my_sub, TermList(CONSTANT_1, CONSTANT_2))) == 12);
-    test_assert(as_int(exec_function(branch, my_sub, TermList(CONSTANT_2, CONSTANT_0))) == 4);
-	
-	test_assert(as_int(quick_exec_function(branch, "my-sub(1,2)")) == 12);
-}
-
-void test_simple2()
-{
     Branch* branch = new Branch();
 
     Term* print_term = quick_exec_function(branch,
@@ -76,7 +52,7 @@ void test_using_subroutine_append()
 
 void subroutine_test()
 {
-    test_simple();
+    // test_simple();
     test_using_subroutine_append();
 }
 
