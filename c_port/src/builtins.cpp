@@ -266,27 +266,27 @@ void reference_copy(Term* source, Term* dest)
     dest->value = source->value;
 }
 
-void print(Term* caller)
+void print__evaluate(Term* caller)
 {
     std::cout << as_string(caller->inputs[0]) << std::endl;
 }
 
-void add(Term* caller)
+void add__evaluate(Term* caller)
 {
     as_int(caller) = as_int(caller->inputs[0]) + as_int(caller->inputs[1]);
 }
 
-void mult(Term* caller)
+void mult__evaluate(Term* caller)
 {
     as_int(caller) = as_int(caller->inputs[0]) * as_int(caller->inputs[1]);
 }
 
-void string_concat(Term* caller)
+void string_concat__evaluate(Term* caller)
 {
     as_string(caller) = as_string(caller->inputs[0]) + as_string(caller->inputs[1]);
 }
 
-void create_list(Term* caller)
+void create_list__evaluate(Term* caller)
 {
     as_list(caller)->clear();
 
@@ -295,7 +295,7 @@ void create_list(Term* caller)
     }
 }
 
-void range(Term* caller)
+void range__evaluate(Term* caller)
 {
     int max = as_int(caller->inputs[0]);
 
@@ -306,7 +306,7 @@ void range(Term* caller)
     }
 }
 
-void list_apply(Term* caller)
+void list_apply__evaluate(Term* caller)
 {
     as_function(caller->inputs[0]);
     TermList* list = as_list(caller->inputs[1]);
@@ -321,7 +321,7 @@ void list_apply(Term* caller)
     }
 }
 
-void this_branch(Term* caller)
+void this_branch__evaluate(Term* caller)
 {
     // TOFIX, this will have problems when memory management is implemented
     *as_list(caller) = caller->owningBranch->terms;
@@ -329,7 +329,7 @@ void this_branch(Term* caller)
 
 
 
-void create_builtin_types()
+void initialize_constants()
 {
     STRING_TYPE = quick_create_type(KERNEL, "string",
             string_alloc,
@@ -353,10 +353,7 @@ void create_builtin_types()
             reference_alloc,
             reference_dealloc,
             reference_copy);
-}
 
-void initialize_constants()
-{
     CONSTANT_INT = get_const_function(KERNEL, INT_TYPE);
     CONSTANT_STRING = get_const_function(KERNEL, STRING_TYPE);
 
@@ -367,14 +364,14 @@ void initialize_constants()
 
 void initialize_builtin_functions(Branch* code)
 {
-    quick_create_function(code, "add", add, TermList(INT_TYPE, INT_TYPE), INT_TYPE);
-    quick_create_function(code, "mult", mult, TermList(INT_TYPE, INT_TYPE), INT_TYPE);
-    quick_create_function(code, "concat", string_concat, TermList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
-    quick_create_function(code, "print", print, TermList(STRING_TYPE), VOID_TYPE);
-    quick_create_function(code, "list", create_list, TermList(ANY_TYPE), LIST_TYPE);
-    quick_create_function(code, "range", range, TermList(INT_TYPE), LIST_TYPE);
-    quick_create_function(code, "list-apply", list_apply, TermList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
-    quick_create_function(code, "this-branch", this_branch, TermList(), LIST_TYPE);
+    quick_create_function(code, "add", add__evaluate, TermList(INT_TYPE, INT_TYPE), INT_TYPE);
+    quick_create_function(code, "mult", mult__evaluate, TermList(INT_TYPE, INT_TYPE), INT_TYPE);
+    quick_create_function(code, "concat", string_concat__evaluate, TermList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
+    quick_create_function(code, "print", print__evaluate, TermList(STRING_TYPE), VOID_TYPE);
+    quick_create_function(code, "list", create_list__evaluate, TermList(ANY_TYPE), LIST_TYPE);
+    quick_create_function(code, "range", range__evaluate, TermList(INT_TYPE), LIST_TYPE);
+    quick_create_function(code, "list-apply", list_apply__evaluate, TermList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
+    quick_create_function(code, "this-branch", this_branch__evaluate, TermList(), LIST_TYPE);
 }
 
 
@@ -382,8 +379,6 @@ void initialize()
 {
     try {
         bootstrap_kernel();
-        create_builtin_types();
-
         initialize_constants();
 
         // These need to be first:
