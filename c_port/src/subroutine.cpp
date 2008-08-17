@@ -11,7 +11,7 @@
 namespace circa {
 
 static const char * INPUT_PLACEHOLDER_PREFIX = "#input-";
-static const char * OUTPUT_PLACEHOLDER_NAME = "output";
+static const char * OUTPUT_PLACEHOLDER_NAME = "#output";
 
 Subroutine::Subroutine()
   : branch(NULL)
@@ -96,7 +96,8 @@ void Subroutine_execute(Term* caller)
         // type void.
         if (!(caller->type == VOID_TYPE)) {
             std::cout << "Warning: Inconsistent data. Subroutine " <<
-                sub->name << " has a non-void output type, but has no output placeholder.";
+                sub->name << " has a non-void output type, but has no output placeholder."
+                << std::endl;
         }
     }
 }
@@ -127,7 +128,7 @@ void subroutine_create(Term* caller)
 
 void subroutine_name_inputs(Term* caller)
 {
-    // Recycles input 0
+    recycle_value(caller->inputs[0], caller);
     TermList* name_list = as_list(caller->inputs[1]);
     Subroutine* sub = as_subroutine(caller);
     Branch* branch = sub->branch;
@@ -147,8 +148,9 @@ void subroutine_get_branch(Term* caller)
 
 void subroutine_set_branch(Term* caller)
 {
-    // Input 0: Subroutine (recycled)
+    // Input 0: Subroutine
     // Input 1: Branch
+    recycle_value(caller->inputs[0], caller);
     Subroutine* sub = as_subroutine(caller);
     *sub->branch = *as_branch(caller->inputs[1]);
 }
@@ -166,9 +168,10 @@ void subroutine_get_local(Term* caller)
 
 void subroutine_bind(Term* caller)
 {
-    // Input 0: Subroutine (recycled)
+    // Input 0: Subroutine
     // Input 1: Reference
     // Input 2: String name
+    recycle_value(caller->inputs[0], caller);
     Subroutine* sub = as_subroutine(caller);
     Term* ref = as_reference(caller->inputs[1]);
     std::string name = as_string(caller->inputs[2]);

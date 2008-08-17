@@ -3,6 +3,7 @@
 #include "bootstrapping.h"
 #include "errors.h"
 #include "function.h"
+#include "operations.h"
 
 namespace circa {
 
@@ -47,7 +48,7 @@ void Function_dealloc(Term* caller)
 
 void function_recycle_input(Term* caller)
 {
-    // Recycles input 0
+    recycle_value(caller->inputs[0], caller);
     as_function(caller)->recycleInput = as_int(caller->inputs[1]);
 }
 

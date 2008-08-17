@@ -257,7 +257,7 @@
 						<dict>
 							<key>PBXSmartGroupTreeModuleColumnWidthsKey</key>
 							<array>
-								<real>337</real>
+								<real>516</real>
 							</array>
 							<key>PBXSmartGroupTreeModuleColumnsKey_v4</key>
 							<array>
@@ -285,7 +285,7 @@
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 310}, {337, 664}}</string>
+							<string>{{0, 0}, {516, 664}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -297,19 +297,19 @@
 					<key>GeometryConfiguration</key>
 					<dict>
 						<key>Frame</key>
-						<string>{{0, 0}, {354, 682}}</string>
+						<string>{{0, 0}, {533, 682}}</string>
 						<key>GroupTreeTableConfiguration</key>
 						<array>
 							<string>MainColumn</string>
-							<real>337</real>
+							<real>516</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>-2 55 359 723 0 0 1280 778 </string>
+						<string>-2 55 538 723 0 0 1280 778 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
 					<key>Proportion</key>
-					<string>354pt</string>
+					<string>533pt</string>
 				</dict>
 				<dict>
 					<key>Dock</key>
@@ -341,7 +341,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {0, 0}}</string>
 								<key>RubberWindowFrame</key>
-								<string>-2 55 359 723 0 0 1280 778 </string>
+								<string>-2 55 538 723 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -361,7 +361,7 @@
 								<key>Frame</key>
 								<string>{{0, 5}, {0, 677}}</string>
 								<key>RubberWindowFrame</key>
-								<string>-2 55 359 723 0 0 1280 778 </string>
+								<string>-2 55 538 723 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
@@ -526,11 +526,11 @@
 		<string>B6983C800E50B1670068D6F3</string>
 		<string>1C78EAAD065D492600B07095</string>
 		<string>B6F114D50E33398200B8BA44</string>
-		<string>/Users/andyfischer/circa/c_port/circa.xcodeproj</string>
 		<string>1CD10A99069EF8BA00B06720</string>
+		<string>/Users/andyfischer/circa/c_port/circa.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>-2 55 359 723 0 0 1280 778 </string>
+	<string>-2 55 538 723 0 0 1280 778 </string>
 	<key>WindowToolsV3</key>
 	<array>
 		<dict>
@@ -744,7 +744,7 @@
 			<key>WindowToolGUID</key>
 			<string>1CD10A99069EF8BA00B06720</string>
 			<key>WindowToolIsVisible</key>
-			<true/>
+			<false/>
 		</dict>
 		<dict>
 			<key>Identifier</key>

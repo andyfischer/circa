@@ -66,7 +66,7 @@ void Branch_copy(Term* source, Term* dest)
 
 void branch_bind_name(Term* caller)
 {
-    // Recycles input 0
+    recycle_value(caller->inputs[0], caller);
     as_branch(caller)->bindName(caller->inputs[2], as_string(caller->inputs[1]));
 }
 

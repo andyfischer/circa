@@ -1,3 +1,5 @@
+#ifndef CIRCA__OPERATIONS__INCLUDED
+#define CIRCA__OPERATIONS__INCLUDED
 
 #include "function.h"
 #include "term.h"
@@ -34,6 +36,11 @@ Term* get_const_function(Branch* branch, Term* type);
 bool is_constant(Term* term);
 
 void change_function(Term* term, Term* new_function);
+
+// recycle_value will either call copy_value or steal_value, depending
+// on heuristics
+void recycle_value(Term* source, Term* dest);
+
 void copy_value(Term* source, Term* dest);
 
 // Attempt to 'steal' the output value from source. This is more efficient
@@ -58,3 +65,5 @@ Term* constant_int(Branch* branch, int i);
 Term* constant_list(Branch* branch, TermList list);
 
 } // namespace circa
+
+#endif

@@ -1,6 +1,7 @@
 #include "common_headers.h"
 
 #include "bootstrapping.h"
+#include "branch.h"
 #include "builtins.h"
 #include "errors.h"
 #include "operations.h"
@@ -127,7 +128,7 @@ void StructDefinition_copy(Term* source, Term* dest)
 
 void struct_definition_add_field(Term* caller)
 {
-    // Recycling input: 0
+    recycle_value(caller->inputs[0], caller);
     string fieldName = as_string(caller->inputs[1]);
     Term* fieldType = caller->inputs[2];
     as_struct_definition(caller)->addField(fieldName, fieldType);
@@ -148,6 +149,7 @@ StructInstance* as_struct_instance(Term* term)
 
 void StructInstance_alloc(Term* term)
 {
+    Branch *branch = new Branch();
     StructDefinition *def = as_struct_definition(term->type);
 
     int numFields = def->numFields();
@@ -159,9 +161,7 @@ void StructInstance_alloc(Term* term)
     for (int i=0; i < numFields; i++)
     {
         Term* fieldType = def->getType(i);
-        Term* field = new Term();
-        change_type(field, fieldType);
-        structInstance->fields[i] = field;
+        structInstance->fields[i] = create_constant(branch, fieldType);
     }
 }
 
@@ -202,11 +202,13 @@ std::string StructInstance_toString(Term* term)
 
 void struct_definition_set_name(Term* caller)
 {
+    recycle_value(caller->inputs[0], caller);
     as_struct_definition(caller)->name = as_string(caller->inputs[1]);
 }
 
 void struct_definition_rename_field(Term* caller)
 {
+    recycle_value(caller->inputs[0], caller);
     StructDefinition *def = as_struct_definition(caller);
     int index = as_int(caller->inputs[1]);
     std::string name = as_string(caller->inputs[2]);
@@ -234,7 +236,7 @@ void struct_get_field(Term* caller)
     StructInstance* structInstance = as_struct_instance(caller->inputs[0]);
     Term* field = structInstance->fields[fieldIndex];
 
-    copy_value(field, caller);
+    recycle_value(field, caller);
 }
 
 void struct_set_field_init(Term* caller)
@@ -246,7 +248,7 @@ void struct_set_field_init(Term* caller)
 
 void struct_set_field(Term* caller)
 {
-    // Recycles input 0
+    recycle_value(caller->inputs[0], caller);
 
     string fieldName = as_string(caller->inputs[1]);
     Term* value = caller->inputs[2];
@@ -259,7 +261,7 @@ void struct_set_field(Term* caller)
     StructInstance* structInstance = as_struct_instance(caller);
     Term* field = structInstance->fields[fieldIndex];
 
-    copy_value(value, field);
+    recycle_value(value, field);
 }
 
 void struct_define_anonymous(Term* caller)
@@ -290,7 +292,7 @@ void struct_get_index(Term* caller)
     StructInstance* instance = as_struct_instance(caller->inputs[0]);
     Term* field = instance->fields[as_int(caller->inputs[1])];
     specialize_type(caller, field->type);
-    copy_value(field, caller);
+    recycle_value(field, caller);
 }
 
 void initialize_structs(Branch* code)

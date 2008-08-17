@@ -127,6 +127,7 @@ void execute(Term* term)
     for (int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++)
     {
         Term* input = term->inputs[inputIndex];
+
         if (input->needsUpdate)
             execute(input);
             
@@ -148,35 +149,6 @@ void execute(Term* term)
     if (func->execute == NULL) {
         std::cout << "Error: no execute function for " << func->name << std::endl;
         return;
-    }
-
-    // Check if we should recycle an input
-    if (func->recycleInput != -1) {
-    
-        Term* recycleTerm = term->inputs[func->recycleInput];
-        bool steal = true;
-        
-        // Sanity check. Make sure the recycle term has the same type as this
-        // function's output.
-        //
-        // With a temporary exception: allow functions that output 'any'
-        if (recycleTerm->type != func->outputType
-                && (func->outputType != ANY_TYPE)) {
-            std::stringstream msg;
-            msg << "Misconfigured function " << func->name
-                << ", set to recycle input " << func->recycleInput << " (which has type "
-                << as_type(recycleTerm->type)->name << "), but the function's output type is "
-                << as_type(func->outputType)->name;
-            throw errors::InternalError(msg.str());
-        }
-
-        // Don't steal if the term has multiple users
-        steal = steal && (recycleTerm->users.count() > 1);
-
-        if (steal)
-            steal_value(recycleTerm, term);
-        else
-            copy_value(recycleTerm, term);
     }
 
     try {
@@ -236,6 +208,15 @@ void change_function(Term* term, Term* new_function)
         throw errors::TypeError(new_function, FUNCTION_TYPE);
 
     term->function = new_function;
+}
+
+void recycle_value(Term* source, Term* dest)
+{
+    // Don't steal if the term has multiple users
+    bool steal = (source->users.count() > 1);
+
+    // Temp: always try to steal
+    steal_value(source, dest);
 }
 
 void copy_value(Term* source, Term* dest)
