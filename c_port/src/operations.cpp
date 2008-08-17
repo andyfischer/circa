@@ -5,7 +5,6 @@
 #include "builtins.h"
 #include "errors.h"
 #include "function.h"
-#include "logging.h"
 #include "operations.h"
 #include "term.h"
 #include "term_map.h"
