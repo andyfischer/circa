@@ -266,6 +266,69 @@ void reference_copy(Term* source, Term* dest)
     dest->value = source->value;
 }
 
+void print(Term* caller)
+{
+    std::cout << as_string(caller->inputs[0]) << std::endl;
+}
+
+void add(Term* caller)
+{
+    as_int(caller) = as_int(caller->inputs[0]) + as_int(caller->inputs[1]);
+}
+
+void mult(Term* caller)
+{
+    as_int(caller) = as_int(caller->inputs[0]) * as_int(caller->inputs[1]);
+}
+
+void string_concat(Term* caller)
+{
+    as_string(caller) = as_string(caller->inputs[0]) + as_string(caller->inputs[1]);
+}
+
+void create_list(Term* caller)
+{
+    as_list(caller)->clear();
+
+    for (int i=0; i < caller->inputs.count(); i++) {
+        as_list(caller)->append(caller->inputs[i]);
+    }
+}
+
+void range(Term* caller)
+{
+    int max = as_int(caller->inputs[0]);
+
+    as_list(caller)->clear();
+
+    for (int i=0; i < max; i++) {
+        as_list(caller)->append(constant_int(caller->owningBranch, i));
+    }
+}
+
+void list_apply(Term* caller)
+{
+    as_function(caller->inputs[0]);
+    TermList* list = as_list(caller->inputs[1]);
+
+    as_list(caller)->clear();
+
+    for (int i=0; i < list->count(); i++) {
+        Term* result = apply_function(caller->owningBranch, caller->inputs[0], TermList(list->get(i)));
+        execute(result);
+
+        as_list(caller)->append(result);
+    }
+}
+
+void this_branch(Term* caller)
+{
+    // TOFIX, this will have problems when memory management is implemented
+    *as_list(caller) = caller->owningBranch->terms;
+}
+
+
+
 void create_builtin_types()
 {
     STRING_TYPE = quick_create_type(KERNEL, "string",
@@ -301,6 +364,19 @@ void initialize_constants()
     CONSTANT_1 = constant_int(KERNEL, 1);
     CONSTANT_2 = constant_int(KERNEL, 2);
 }
+
+void initialize_builtin_functions(Branch* code)
+{
+    quick_create_function(code, "add", add, TermList(INT_TYPE, INT_TYPE), INT_TYPE);
+    quick_create_function(code, "mult", mult, TermList(INT_TYPE, INT_TYPE), INT_TYPE);
+    quick_create_function(code, "concat", string_concat, TermList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
+    quick_create_function(code, "print", print, TermList(STRING_TYPE), VOID_TYPE);
+    quick_create_function(code, "list", create_list, TermList(ANY_TYPE), LIST_TYPE);
+    quick_create_function(code, "range", range, TermList(INT_TYPE), LIST_TYPE);
+    quick_create_function(code, "list-apply", list_apply, TermList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
+    quick_create_function(code, "this-branch", this_branch, TermList(), LIST_TYPE);
+}
+
 
 void initialize()
 {
