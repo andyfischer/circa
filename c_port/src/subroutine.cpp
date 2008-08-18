@@ -224,6 +224,15 @@ void subroutine_print__evaluate(Term* caller)
     as_string(caller) = output.str();
 }
 
+void subroutine_eval__evaluate(Term* caller)
+{
+    recycle_value(caller->inputs[0], caller);
+    Subroutine *sub = as_subroutine(caller);
+    std::string s = as_string(caller->inputs[1]);
+
+    quick_eval_function(sub->branch, s);
+}
+
 void initialize_subroutine(Branch* kernel)
 {
     SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine",
@@ -269,6 +278,10 @@ void initialize_subroutine(Branch* kernel)
         "subroutine-append", subroutine_append__evaluate,
         TermList(SUBROUTINE_TYPE, FUNCTION_TYPE, LIST_TYPE),
         subroutine_append_ret);
+
+    quick_create_function(kernel,
+        "subroutine-eval", subroutine_eval__evaluate,
+        TermList(SUBROUTINE_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
 
     quick_create_function(kernel, "subroutine-print",
         subroutine_print__evaluate,
