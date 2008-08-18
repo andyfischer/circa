@@ -46,14 +46,16 @@ void test_using_subroutine_append()
     quick_exec_function(branch, "sum = get-field(append-result, 'term)");
     quick_exec_function(branch, "test-sub = subroutine-bind(test-sub, sum, 'output)");
 
+    quick_exec_function(branch, "write-text-file('sub-append-test, export-graphviz(test-sub))");
+
     // Finally, run it
-    std::cout << quick_exec_function(branch, "test-sub(2,3)")->toString();
+    //std::cout << quick_exec_function(branch, "test-sub(2,3)")->toString();
 }
 
 void subroutine_test()
 {
     // test_simple();
-    //test_using_subroutine_append();
+    test_using_subroutine_append();
 }
 
 }

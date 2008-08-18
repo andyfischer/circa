@@ -15,7 +15,7 @@ void export_graphviz__evaluate(circa::Term* caller)
 
         for (int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++) {
             std::string inputStr = term->inputs[inputIndex]->toString();
-            output << inputStr << " -> " << termStr << std::endl;
+            output << inputStr << " -> " << termStr << ";\n";
         }
     }
 
@@ -24,7 +24,7 @@ void export_graphviz__evaluate(circa::Term* caller)
     circa::as_string(caller) = output.str();
 }
 
-void graphviz_init_functions(circa::Branch* branch)
+void graphviz_initialize(circa::Branch* branch)
 {
     circa::quick_create_function(branch, "export-graphviz",
             export_graphviz__evaluate,

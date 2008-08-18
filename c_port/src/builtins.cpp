@@ -6,6 +6,7 @@
 
 #include "parser/token.h"
 #include "parser/token_stream.h"
+#include "libraries/builtin_libraries.h"
 #include "bootstrapping.h"
 #include "branch.h"
 #include "builtin_functions.h"
@@ -446,6 +447,7 @@ void initialize()
 
         // Lastly:
         initialize_bootstrapped_code(KERNEL);
+        initialize_external_libraries(KERNEL);
 
     } catch (errors::CircaError& e)
     {
