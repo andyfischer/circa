@@ -199,6 +199,21 @@ void subroutine_append__evaluate(Term* caller)
     as_reference(get_struct_field(caller,1)) = apply_function(sub->branch, func, *as_list(inputs));
 }
 
+void subroutine_print__evaluate(Term* caller)
+{
+    Subroutine *sub = as_subroutine(caller->inputs[0]);
+    std::stringstream output;
+    output << sub->name << "()" << std::endl;
+    output << "{" << std::endl;
+
+    for (int i=0; i < sub->branch->terms.count(); i++) {
+        Term* term = sub->branch->terms[i];
+        output << term->function->toString() << "()" << std::endl;
+    }
+    output << "}" << std::endl;
+    as_string(caller) = output.str();
+}
+
 void initialize_subroutine(Branch* kernel)
 {
     SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine",
@@ -244,6 +259,10 @@ void initialize_subroutine(Branch* kernel)
         "subroutine-append", subroutine_append__evaluate,
         TermList(SUBROUTINE_TYPE, FUNCTION_TYPE, LIST_TYPE),
         subroutine_append_ret);
+
+    quick_create_function(kernel, "subroutine-print",
+        subroutine_print__evaluate,
+        TermList(SUBROUTINE_TYPE), STRING_TYPE);
 }
 
 } // namespace circa
