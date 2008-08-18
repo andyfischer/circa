@@ -189,6 +189,7 @@ void subroutine_append__evaluate(Term* caller)
     StructInstance* inst = as_struct_instance(caller);
 
     Term* return_field_0 = get_struct_field(caller,0);
+    recycle_value(caller->inputs[0], return_field_0);
     Subroutine* sub = as_subroutine(return_field_0);
     Term* func = caller->inputs[1];
     Term* inputs = caller->inputs[2];
@@ -208,7 +209,16 @@ void subroutine_print__evaluate(Term* caller)
 
     for (int i=0; i < sub->branch->terms.count(); i++) {
         Term* term = sub->branch->terms[i];
-        output << term->function->toString() << "()" << std::endl;
+        output << "  " << as_function(term->function)->name << "(";
+
+        bool firstInput = true;
+        for (int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++) {
+            if (!firstInput) output << ", ";
+            output << term->inputs[inputIndex]->toString();
+            firstInput = false;
+        }
+        
+        output << ")" << std::endl;
     }
     output << "}" << std::endl;
     as_string(caller) = output.str();
