@@ -33,10 +33,19 @@ void test_string()
             == "hello world");
 }
 
+void test_bool()
+{
+    Branch* branch = new Branch();
+
+    test_assert(as_string(quick_exec_function(branch, "if-expr(true, 'a, 'b)")) == "a");
+    test_assert(as_string(quick_exec_function(branch, "if-expr(false, 'a, 'b)")) == "b");
+}
+
 void builtin_functions_test()
 {
     test_math();
     test_string();
+    test_bool();
 }
 
 } // namespace circa

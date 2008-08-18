@@ -40,6 +40,8 @@ Term* CONSTANT_STRING = NULL;
 Term* CONSTANT_0 = NULL;
 Term* CONSTANT_1 = NULL;
 Term* CONSTANT_2 = NULL;
+Term* CONSTANT_TRUE = NULL;
+Term* CONSTANT_FALSE = NULL;
 
 void empty_execute_function(Term*) { }
 void empty_alloc_function(Term*) { }
@@ -289,6 +291,14 @@ void string_concat__evaluate(Term* caller)
     as_string(caller) = as_string(caller->inputs[0]) + as_string(caller->inputs[1]);
 }
 
+void if_expr__evaluate(Term* caller)
+{
+    int index = as_bool(caller->inputs[0]) ? 1 : 2;
+    Term *result = caller->inputs[index];
+    change_type(caller, result->type);
+    recycle_value(caller->inputs[index], caller);
+}
+
 void create_list__evaluate(Term* caller)
 {
     as_list(caller)->clear();
@@ -389,6 +399,13 @@ void initialize_constants()
     CONSTANT_0 = constant_int(KERNEL, 0);
     CONSTANT_1 = constant_int(KERNEL, 1);
     CONSTANT_2 = constant_int(KERNEL, 2);
+
+    CONSTANT_TRUE = apply_function(KERNEL, BOOL_TYPE, TermList());
+    as_bool(CONSTANT_TRUE) = true;
+    KERNEL->bindName(CONSTANT_TRUE, "true");
+    CONSTANT_FALSE = apply_function(KERNEL, BOOL_TYPE, TermList());
+    as_bool(CONSTANT_FALSE) = false;
+    KERNEL->bindName(CONSTANT_FALSE, "false");
 }
 
 void initialize_builtin_functions(Branch* code)
@@ -397,6 +414,8 @@ void initialize_builtin_functions(Branch* code)
     quick_create_function(code, "mult", mult__evaluate, TermList(INT_TYPE, INT_TYPE), INT_TYPE);
     quick_create_function(code, "concat", string_concat__evaluate, TermList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
     quick_create_function(code, "print", print__evaluate, TermList(STRING_TYPE), VOID_TYPE);
+    quick_create_function(code, "if-expr", if_expr__evaluate,
+        TermList(BOOL_TYPE, ANY_TYPE, ANY_TYPE), ANY_TYPE);
     quick_create_function(code, "list", create_list__evaluate, TermList(ANY_TYPE), LIST_TYPE);
     quick_create_function(code, "range", range__evaluate, TermList(INT_TYPE), LIST_TYPE);
     quick_create_function(code, "list-apply", list_apply__evaluate, TermList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
