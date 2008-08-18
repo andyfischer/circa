@@ -27,6 +27,8 @@ extern Term* CONSTANT_STRING;
 extern Term* CONSTANT_0;
 extern Term* CONSTANT_1;
 extern Term* CONSTANT_2;
+extern Term* CONSTANT_TRUE;
+extern Term* CONSTANT_FALSE;
 
 Term* get_global(std::string name);
 void empty_execute_function(Term* caller);

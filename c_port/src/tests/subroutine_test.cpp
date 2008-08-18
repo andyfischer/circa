@@ -53,7 +53,7 @@ void test_using_subroutine_append()
 void subroutine_test()
 {
     // test_simple();
-    test_using_subroutine_append();
+    //test_using_subroutine_append();
 }
 
 }
