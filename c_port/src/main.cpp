@@ -3,12 +3,17 @@
 
 #include "circa.h"
 #include "tests/all_tests.h"
+#include "graphviz.h"
 
 using namespace circa;
 
 void run()
 {
+    graphviz_init_functions(KERNEL);
+
     Branch* branch = new Branch();
+    quick_exec_function(branch, "sub = Subroutine()");
+    quick_exec_function(branch, "write-text-file(\"out.viz\", export-graphviz(sub))");
     /*
     quick_exec_function(branch, "s = read-text-file('test)");
     quick_exec_function(branch, "s2 = concat(s, \" there\")");
