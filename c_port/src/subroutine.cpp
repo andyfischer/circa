@@ -102,7 +102,7 @@ void Subroutine_execute(Term* caller)
     }
 }
 
-void subroutine_create(Term* caller)
+void subroutine_create__evaluate(Term* caller)
 {
     // 0: name (string)
     // 1: inputTypes (list of type)
@@ -126,7 +126,7 @@ void subroutine_create(Term* caller)
     }
 }
 
-void subroutine_name_inputs(Term* caller)
+void subroutine_name_inputs__evaluate(Term* caller)
 {
     recycle_value(caller->inputs[0], caller);
     TermList* name_list = as_list(caller->inputs[1]);
@@ -140,13 +140,13 @@ void subroutine_name_inputs(Term* caller)
     }
 }
 
-void subroutine_get_branch(Term* caller)
+void subroutine_get_branch__evaluate(Term* caller)
 {
     Subroutine* sub = as_subroutine(caller->inputs[0]);
     *as_branch(caller) = *sub->branch;
 }
 
-void subroutine_set_branch(Term* caller)
+void subroutine_set_branch__evaluate(Term* caller)
 {
     // Input 0: Subroutine
     // Input 1: Branch
@@ -155,7 +155,7 @@ void subroutine_set_branch(Term* caller)
     *sub->branch = *as_branch(caller->inputs[1]);
 }
 
-void subroutine_get_local(Term* caller)
+void subroutine_get_local__evaluate(Term* caller)
 {
     // Input 0: Subroutine
     // Input 1: String name
@@ -166,7 +166,7 @@ void subroutine_get_local(Term* caller)
     as_reference(caller) = sub->branch->getNamed(name);
 }
 
-void subroutine_bind(Term* caller)
+void subroutine_bind__evaluate(Term* caller)
 {
     // Input 0: Subroutine
     // Input 1: Reference
@@ -179,7 +179,7 @@ void subroutine_bind(Term* caller)
     sub->branch->bindName(ref, name);
 }
 
-void subroutine_append(Term* caller)
+void subroutine_append__evaluate(Term* caller)
 {
     // Input 0: Subroutine
     // Input 1: Function
@@ -206,28 +206,31 @@ void initialize_subroutine(Branch* kernel)
             Subroutine_dealloc,
             Subroutine_copy);
 
-    quick_create_function(kernel, "subroutine-create", subroutine_create,
+    quick_create_function(kernel, "subroutine-create",
+        subroutine_create__evaluate,
         TermList(get_global("string"),get_global("List"),get_global("Type")),
         SUBROUTINE_TYPE);
 
     Term* name_inputs = quick_create_function(kernel,
-        "subroutine-name-inputs", subroutine_name_inputs,
+        "subroutine-name-inputs", subroutine_name_inputs__evaluate,
         TermList(SUBROUTINE_TYPE, get_global("List")), SUBROUTINE_TYPE);
     as_function(name_inputs)->recycleInput = 0;
 
-    quick_create_function(kernel, "subroutine-get-branch", subroutine_get_branch,
+    quick_create_function(kernel, "subroutine-get-branch", subroutine_get_branch__evaluate,
         TermList(SUBROUTINE_TYPE), BRANCH_TYPE);
 
     Term* set_branch = quick_create_function(kernel,
-        "subroutine-set-branch", subroutine_set_branch,
+        "subroutine-set-branch", subroutine_set_branch__evaluate,
         TermList(SUBROUTINE_TYPE, BRANCH_TYPE), SUBROUTINE_TYPE);
     as_function(set_branch)->recycleInput = 0;
 
     quick_create_function(kernel, "subroutine-get-local",
-        subroutine_get_local, TermList(SUBROUTINE_TYPE, STRING_TYPE), REFERENCE_TYPE);
+        subroutine_get_local__evaluate,
+        TermList(SUBROUTINE_TYPE, STRING_TYPE), REFERENCE_TYPE);
 
     Term* bind = quick_create_function(kernel, "subroutine-bind",
-        subroutine_bind, TermList(SUBROUTINE_TYPE, REFERENCE_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
+        subroutine_bind__evaluate,
+        TermList(SUBROUTINE_TYPE, REFERENCE_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
     as_function(bind)->recycleInput = 0;
 
     quick_exec_function(kernel, 
@@ -238,7 +241,7 @@ void initialize_subroutine(Branch* kernel)
         "subroutine-append-ret = struct-definition-rename-field(subroutine-append-ret, 1, 'term)");
 
     Term* subroutine_append_f = quick_create_function(kernel,
-        "subroutine-append", subroutine_append,
+        "subroutine-append", subroutine_append__evaluate,
         TermList(SUBROUTINE_TYPE, FUNCTION_TYPE, LIST_TYPE),
         subroutine_append_ret);
 }
