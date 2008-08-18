@@ -330,17 +330,33 @@ void this_branch__evaluate(Term* caller)
     *as_list(caller) = caller->owningBranch->terms;
 }
 
+void read_text_file__evaluate(Term* caller)
+{
+    std::string filename = as_string(caller->inputs[0]);
+    std::ifstream file;
+    file.open(filename.c_str(), std::ios::in);
+    std::stringstream contents;
+    std::string line;
+    bool firstLine = true;
+    while (std::getline(file, line)) {
+        if (!firstLine)
+            contents << "\n";
+        contents << line;
+        firstLine = false;
+    }
+    file.close();
+    as_string(caller) = contents.str();
+}
+
 void write_text_file__evaluate(Term* caller)
 {
     std::string filename = as_string(caller->inputs[0]);
-    std::string text = as_string(caller->inputs[1]);
+    std::string contents = as_string(caller->inputs[1]);
     std::ofstream file;
     file.open(filename.c_str(), std::ios::out);
-    file << text;
+    file << contents;
     file.close();
 }
-
-
 
 void initialize_constants()
 {
@@ -385,6 +401,8 @@ void initialize_builtin_functions(Branch* code)
     quick_create_function(code, "range", range__evaluate, TermList(INT_TYPE), LIST_TYPE);
     quick_create_function(code, "list-apply", list_apply__evaluate, TermList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
     quick_create_function(code, "this-branch", this_branch__evaluate, TermList(), LIST_TYPE);
+    quick_create_function(code, "read-text-file", read_text_file__evaluate,
+            TermList(STRING_TYPE), STRING_TYPE);
     quick_create_function(code, "write-text-file", write_text_file__evaluate,
             TermList(STRING_TYPE, STRING_TYPE), VOID_TYPE);
 }
