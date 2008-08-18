@@ -1,4 +1,7 @@
 
+#include <iostream>
+#include <fstream>
+
 #include "common_headers.h"
 
 #include "parser/token.h"
@@ -327,6 +330,16 @@ void this_branch__evaluate(Term* caller)
     *as_list(caller) = caller->owningBranch->terms;
 }
 
+void write_text_file__evaluate(Term* caller)
+{
+    std::string filename = as_string(caller->inputs[0]);
+    std::string text = as_string(caller->inputs[1]);
+    std::ofstream file;
+    file.open(filename.c_str(), std::ios::out);
+    file << text;
+    file.close();
+}
+
 
 
 void initialize_constants()
@@ -372,6 +385,8 @@ void initialize_builtin_functions(Branch* code)
     quick_create_function(code, "range", range__evaluate, TermList(INT_TYPE), LIST_TYPE);
     quick_create_function(code, "list-apply", list_apply__evaluate, TermList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
     quick_create_function(code, "this-branch", this_branch__evaluate, TermList(), LIST_TYPE);
+    quick_create_function(code, "write-text-file", write_text_file__evaluate,
+            TermList(STRING_TYPE, STRING_TYPE), VOID_TYPE);
 }
 
 
