@@ -5,6 +5,7 @@
 #include <tests/common.h>
 
 namespace circa {
+namespace builtin_function_test {
 
 void test_math()
 {
@@ -41,11 +42,12 @@ void test_bool()
     test_assert(as_string(quick_exec_function(branch, "if-expr(false, 'a, 'b)")) == "b");
 }
 
-void builtin_functions_test()
+void all_tests()
 {
     test_math();
     test_string();
     test_bool();
 }
 
+} // namespace builtin_function_test
 } // namespace circa

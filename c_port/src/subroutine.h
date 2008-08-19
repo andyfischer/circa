@@ -17,6 +17,8 @@ struct Subroutine : public Function
 Subroutine* as_subroutine(Term*);
 bool is_subroutine(Term*);
 
+Branch* Subroutine_openBranch(Term* caller);
+void Subroutine_closeBranch(Term* caller, Branch* branch);
 void Subroutine_execute(Term* caller);
 
 void initialize_subroutine(Branch* kernel);

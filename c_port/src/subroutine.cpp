@@ -59,11 +59,6 @@ std::string GetInputPlaceholderName(int index)
     sstream << INPUT_PLACEHOLDER_PREFIX << index;
     return sstream.str();
 }
-/*
- 
-Branch* openBranch(Term* caller)
-void closeBranch(Term* caller, Branch*)
-*/
 
 Branch* Subroutine_openBranch(Term* caller)
 {

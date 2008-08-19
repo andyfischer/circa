@@ -303,7 +303,7 @@
 							<real>516</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>-2 55 538 723 0 0 1280 778 </string>
+						<string>-1 45 538 723 0 0 1280 778 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -340,7 +340,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {0, 0}}</string>
 								<key>RubberWindowFrame</key>
-								<string>-2 55 538 723 0 0 1280 778 </string>
+								<string>-1 45 538 723 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -360,7 +360,7 @@
 								<key>Frame</key>
 								<string>{{0, 5}, {0, 677}}</string>
 								<key>RubberWindowFrame</key>
-								<string>-2 55 538 723 0 0 1280 778 </string>
+								<string>-1 45 538 723 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
@@ -524,12 +524,12 @@
 		<string>B623398C0E5A487800A8CBDF</string>
 		<string>B623398D0E5A487800A8CBDF</string>
 		<string>1C78EAAD065D492600B07095</string>
-		<string>/Users/andyfischer/circa/c_port/circa.xcodeproj</string>
 		<string>B6F114D50E33398200B8BA44</string>
 		<string>1CD10A99069EF8BA00B06720</string>
+		<string>/Users/andyfischer/circa/c_port/circa.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>-2 55 538 723 0 0 1280 778 </string>
+	<string>-1 45 538 723 0 0 1280 778 </string>
 	<key>WindowToolsV3</key>
 	<array>
 		<dict>
