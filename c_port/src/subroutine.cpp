@@ -179,6 +179,7 @@ void subroutine_bind__evaluate(Term* caller)
     sub->branch->bindName(ref, name);
 }
 
+/*
 void subroutine_append__evaluate(Term* caller)
 {
     // Input 0: Subroutine
@@ -199,6 +200,7 @@ void subroutine_append__evaluate(Term* caller)
 
     as_reference(get_struct_field(caller,1)) = apply_function(sub->branch, func, *as_list(inputs));
 }
+*/
 
 void subroutine_print__evaluate(Term* caller)
 {
@@ -267,6 +269,7 @@ void initialize_subroutine(Branch* kernel)
         TermList(SUBROUTINE_TYPE, REFERENCE_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
     as_function(bind)->recycleInput = 0;
 
+    /*
     quick_exec_function(kernel, 
         "subroutine-append-ret = define-struct('subroutine-append-ret, list(Subroutine, Reference))");
     quick_exec_function(kernel,
@@ -277,7 +280,7 @@ void initialize_subroutine(Branch* kernel)
     Term* subroutine_append_f = quick_create_function(kernel,
         "subroutine-append", subroutine_append__evaluate,
         TermList(SUBROUTINE_TYPE, FUNCTION_TYPE, LIST_TYPE),
-        subroutine_append_ret);
+        subroutine_append_ret);*/
 
     quick_create_function(kernel,
         "subroutine-eval", subroutine_eval__evaluate,
