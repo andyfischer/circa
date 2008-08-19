@@ -6,6 +6,7 @@
 #include "errors.h"
 
 namespace circa {
+namespace tokenizer_test {
 
 void test_identifiers()
 {
@@ -74,7 +75,7 @@ void test_string_literal()
     test_assert(results[0].match == token::STRING);
 }
 
-void tokenize_test()
+void all_tests()
 {
     test_identifiers();
     test_integers();
@@ -82,4 +83,5 @@ void tokenize_test()
     test_string_literal();
 }
 
+} // namespace tokenizer_test
 } // namespace circa

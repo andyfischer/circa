@@ -6,10 +6,9 @@
 
 namespace circa {
 
-void tokenize_test();
-void subroutine_test();
-void builtin_functions_test();
-
+namespace tokenizer_test { void all_tests(); }
+namespace subroutine_test { void all_tests(); }
+namespace builtin_function_test { void all_tests(); }
 namespace struct_test { void all_tests(); }
 namespace primitive_type_test { void all_tests(); }
 namespace list_test { void all_tests(); }
@@ -20,9 +19,9 @@ void run_all_tests()
     typedef void (*RunTestsFunc)();
     std::vector<RunTestsFunc> tests;
 
-    tests.push_back(tokenize_test);
-    tests.push_back(subroutine_test);
-    tests.push_back(builtin_functions_test);
+    tests.push_back(tokenizer_test::all_tests);
+    tests.push_back(subroutine_test::all_tests);
+    tests.push_back(builtin_function_test::all_tests);
     tests.push_back(struct_test::all_tests);
     tests.push_back(primitive_type_test::all_tests);
     tests.push_back(list_test::all_tests);

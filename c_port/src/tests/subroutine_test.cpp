@@ -5,6 +5,7 @@
 #include "common.h"
 
 namespace circa {
+namespace subroutine_test {
 
 void test_simple()
 {
@@ -36,9 +37,10 @@ void test_using_subroutine_eval()
     test_assert(as_int(quick_exec_function(branch, "sub(1,2))")) == 10);
 }
 
-void subroutine_test()
+void all_tests()
 {
     test_using_subroutine_eval();
 }
 
-}
+} // namespace subroutine_test
+} // namespace circa
