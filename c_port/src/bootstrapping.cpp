@@ -80,6 +80,12 @@ Term* quick_eval_function(Branch* branch, std::string input)
             nameBinding = tstream.consume(token::IDENTIFIER);
             tstream.consume(token::EQUALS);
         }
+        
+        // Check for return statement
+        else if (tstream.nextIs(token::IDENTIFIER) && tstream.next().text == "return") {
+            nameBinding = "#output";
+            tstream.consume(token::IDENTIFIER);
+        }
 
         Term* result = quick_parse_function_call(branch, tstream);
 

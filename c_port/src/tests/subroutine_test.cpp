@@ -64,10 +64,11 @@ void test_using_subroutine_eval()
     quick_exec_function(branch, "sub = subroutine-create('test-sub, list(int,int), int)");
     quick_exec_function(branch, "sub = subroutine-name-inputs(sub, list('a,'b))");
     quick_exec_function(branch, "sub = subroutine-eval(sub, \"a-times-four = mult(a,4)\")");
-    quick_exec_function(branch, "sub = subroutine-eval(sub, \"b-times-three = mult(a,3)\")");
+    quick_exec_function(branch, "sub = subroutine-eval(sub, \"b-times-three = mult(b,3)\")");
     quick_exec_function(branch, "sub = subroutine-eval(sub, \"return add(a-times-four,b-times-three)\")");
+    quick_exec_function(branch, "sub = subroutine-eval(sub, \"print(to-string(b-times-three))\")");
 
-    quick_exec_function(branch, "print(sub(1,2))");
+    quick_exec_function(branch, "print(to-string(sub(1,2)))");
 
 }
 
