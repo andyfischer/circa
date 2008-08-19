@@ -23,8 +23,8 @@ def create_mac_env(releaseBuild):
 
     if not releaseBuild:
         env.Append(CPPFLAGS=['-ggdb'])
-        env.Append(CPPFLAGS=['-bundle'])
-        env.Append(CPPFLAGS=['-flat_namespace'])
+        # env.Append(CPPFLAGS=['-bundle'])
+        # env.Append(CPPFLAGS=['-flat_namespace'])
 
     return env
 
@@ -55,4 +55,6 @@ for (dirpath, dirnames, filenames) in os.walk('src'):
 libcirca = env.SharedLibrary('circa', buildFiles)
 
 env.Program('circa', 'build/main.cpp', LIBS=[libcirca])
+
+env.SetOption('num_jobs', 2)
 
