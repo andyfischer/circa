@@ -23,40 +23,6 @@ void test_simple()
     quick_exec_function(branch, "print-term('test)");
 }
 
-void test_using_subroutine_append()
-{
-    Branch* branch = new Branch();
-    
-    quick_exec_function(branch, "test-sub = subroutine-create('test-sub, list(int,int), int)");
-    quick_exec_function(branch, "print(subroutine-print(test-sub))");
-
-    quick_exec_function(branch, "test-sub = subroutine-name-inputs(test-sub,list('a,'b))");
-    quick_exec_function(branch, "a = subroutine-get-local(test-sub,'a)");
-    quick_exec_function(branch, "b = subroutine-get-local(test-sub,'b)");
-
-    quick_exec_function(branch, "append-result = subroutine-append(test-sub, mult, list(a,4))");
-    quick_exec_function(branch, "test-sub = get-field(append-result, 'sub)");
-    quick_exec_function(branch, "print(subroutine-print(test-sub))");
-    quick_exec_function(branch, "a-times-4 = get-field(append-result, 'term)");
-
-    quick_exec_function(branch, "append-result = subroutine-append(test-sub, mult, list(b,3))");
-    quick_exec_function(branch, "test-sub = get-field(append-result, 'sub)");
-    quick_exec_function(branch, "b-times-3 = get-field(append-result, 'term)");
-
-    quick_exec_function(branch,
-        "append-result = subroutine-append(test-sub, add, list(a-times-4,b-times-3))");
-    quick_exec_function(branch, "test-sub = get-field(append-result, 'sub)");
-    quick_exec_function(branch, "sum = get-field(append-result, 'term)");
-    quick_exec_function(branch, "test-sub = subroutine-bind(test-sub, sum, 'output)");
-
-    quick_exec_function(branch, "write-text-file('sub-append-test, export-graphviz(test-sub))");
-
-    quick_exec_function(branch, "print(subroutine-print(test-sub))");
-
-    // Finally, run it
-    //std::cout << quick_exec_function(branch, "test-sub(2,3)")->toString();
-}
-
 void test_using_subroutine_eval()
 {
     Branch* branch = new Branch();
@@ -66,16 +32,12 @@ void test_using_subroutine_eval()
     quick_exec_function(branch, "sub = subroutine-eval(sub, \"a-times-four = mult(a,4)\")");
     quick_exec_function(branch, "sub = subroutine-eval(sub, \"b-times-three = mult(b,3)\")");
     quick_exec_function(branch, "sub = subroutine-eval(sub, \"return add(a-times-four,b-times-three)\")");
-    quick_exec_function(branch, "sub = subroutine-eval(sub, \"print(to-string(b-times-three))\")");
 
-    quick_exec_function(branch, "print(to-string(sub(1,2)))");
-
+    test_assert(as_int(quick_exec_function(branch, "sub(1,2))")) == 10);
 }
 
 void subroutine_test()
 {
-    // test_simple();
-    test_using_subroutine_append();
     test_using_subroutine_eval();
 }
 
