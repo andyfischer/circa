@@ -9,7 +9,6 @@
 #include "libraries/builtin_libraries.h"
 #include "bootstrapping.h"
 #include "branch.h"
-#include "builtin_functions.h"
 #include "errors.h"
 #include "function.h"
 #include "operations.h"
@@ -47,6 +46,7 @@ Term* CONSTANT_FALSE = NULL;
 void empty_execute_function(Term*) { }
 void empty_alloc_function(Term*) { }
 void empty_function(Term*) { }
+void empty_copy_function(Term*,Term*) { }
 
 void const_generator(Term* caller)
 {
@@ -388,7 +388,7 @@ void initialize_constants()
     ANY_TYPE = quick_create_type(KERNEL, "any",
             empty_function, empty_function, NULL);
     VOID_TYPE = quick_create_type(KERNEL, "void",
-            empty_function, empty_function, NULL);
+            empty_function, empty_function, empty_copy_function);
     REFERENCE_TYPE = quick_create_type(KERNEL, "Reference",
             reference_alloc,
             reference_dealloc,
