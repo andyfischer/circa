@@ -60,35 +60,39 @@ std::string GetInputPlaceholderName(int index)
     return sstream.str();
 }
 
-void Subroutine_execute(Term* caller)
+Branch* Subroutine_openBranch(Term* caller)
 {
     Subroutine* sub = as_subroutine(caller->function);
     Branch* original_branch = sub->branch;
 
     // Create a temporary branch
-    Branch exec_branch;
+    Branch *exec_branch = new Branch();
 
-    duplicate_branch(original_branch, &exec_branch);
+    duplicate_branch(original_branch, exec_branch);
 
     // Copy inputs to input placeholders
     int numInputs = caller->inputs.count();
     for (int index=0; index < numInputs; index++) {
         Term* incomingInput = caller->inputs[index];
         std::string name = GetInputPlaceholderName(index);
-        if (!exec_branch.containsName(name)) {
+        if (!exec_branch->containsName(name)) {
             throw errors::InternalError(string("Too many arguments for subroutine ")
                 + sub->name);
         }
 
-        copy_value(incomingInput, exec_branch.getNamed(name));
+        copy_value(incomingInput, exec_branch->getNamed(name));
     }
 
-    // Execute every term in exec_branch
-    execute_branch(&exec_branch);
+    return exec_branch;
+}
+
+void Subroutine_closeBranch(Term* caller, Branch* branch)
+{
+    Subroutine* sub = as_subroutine(caller->function);
 
     // Copy output to output placeholder, if one exists
-    if (exec_branch.containsName(OUTPUT_PLACEHOLDER_NAME)) {
-        Term* outputPlaceholder = exec_branch.getNamed(OUTPUT_PLACEHOLDER_NAME);
+    if (branch->containsName(OUTPUT_PLACEHOLDER_NAME)) {
+        Term* outputPlaceholder = branch->getNamed(OUTPUT_PLACEHOLDER_NAME);
         steal_value(outputPlaceholder, caller);
     }
     else {
@@ -100,6 +104,15 @@ void Subroutine_execute(Term* caller)
                 << std::endl;
         }
     }
+
+    delete branch;
+}
+
+void Subroutine_execute(Term* caller)
+{
+    Branch *branch = Subroutine_openBranch(caller);
+    execute_branch(branch);
+    Subroutine_closeBranch(caller, branch);
 }
 
 void subroutine_create__evaluate(Term* caller)
@@ -179,6 +192,7 @@ void subroutine_bind__evaluate(Term* caller)
     sub->branch->bindName(ref, name);
 }
 
+/*
 void subroutine_append__evaluate(Term* caller)
 {
     // Input 0: Subroutine
@@ -199,6 +213,7 @@ void subroutine_append__evaluate(Term* caller)
 
     as_reference(get_struct_field(caller,1)) = apply_function(sub->branch, func, *as_list(inputs));
 }
+*/
 
 void subroutine_print__evaluate(Term* caller)
 {
@@ -267,6 +282,7 @@ void initialize_subroutine(Branch* kernel)
         TermList(SUBROUTINE_TYPE, REFERENCE_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
     as_function(bind)->recycleInput = 0;
 
+    /*
     quick_exec_function(kernel, 
         "subroutine-append-ret = define-struct('subroutine-append-ret, list(Subroutine, Reference))");
     quick_exec_function(kernel,
@@ -277,7 +293,7 @@ void initialize_subroutine(Branch* kernel)
     Term* subroutine_append_f = quick_create_function(kernel,
         "subroutine-append", subroutine_append__evaluate,
         TermList(SUBROUTINE_TYPE, FUNCTION_TYPE, LIST_TYPE),
-        subroutine_append_ret);
+        subroutine_append_ret);*/
 
     quick_create_function(kernel,
         "subroutine-eval", subroutine_eval__evaluate,
