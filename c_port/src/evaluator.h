@@ -23,7 +23,8 @@ class Evaluator {
     std::stack<Scope> mStack;
 
 public:
-    void runOneInstruction();
+    void evaluate(Term* term);
+    void runNextInstruction();
 
 };
 

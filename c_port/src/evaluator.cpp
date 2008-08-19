@@ -13,7 +13,24 @@ Evaluator::SubroutineScope::onClose()
 }
 
 void
-Evaluator::runOneInstruction()
+Evaluator::evaluate(Term* term)
+{
+    // Special case for subroutines. Open a branch scope.
+    if (is_subroutine(term->function)) {
+        SubroutineScope scope;
+
+        scope.callingTerm = term;
+        scope.branch = Subroutine_openBranch(term);
+
+        mStack.push(scope);
+
+    } else {
+        execute(term);
+    }
+}
+
+void
+Evaluator::runNextInstruction()
 {
     // Don't do anything if stack is empty
     if (mStack.empty())
@@ -31,18 +48,7 @@ Evaluator::runOneInstruction()
     Term* term = top.branch->terms[top.next];
     top.next += 1;
 
-    // Special case: subroutines
-    if (is_subroutine(term->function)) {
-        SubroutineScope scope;
-
-        scope.callingTerm = term;
-        scope.branch = Subroutine_openBranch(term);
-
-        mStack.push(scope);
-
-    } else {
-        execute(term);
-    }
+    this->evaluate(term);
 }
 
 } // namespace circa

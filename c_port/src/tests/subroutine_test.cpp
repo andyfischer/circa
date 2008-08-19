@@ -1,3 +1,4 @@
+// Copyright 2008 Andrew Fischer
 
 #include "common_headers.h"
 
@@ -37,9 +38,15 @@ void test_using_subroutine_eval()
     test_assert(as_int(quick_exec_function(branch, "sub(1,2))")) == 10);
 }
 
+void test_using_evaluator()
+{
+
+}
+
 void all_tests()
 {
     test_using_subroutine_eval();
+    test_using_evaluator();
 }
 
 } // namespace subroutine_test
