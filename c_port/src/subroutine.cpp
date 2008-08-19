@@ -59,36 +59,45 @@ std::string GetInputPlaceholderName(int index)
     sstream << INPUT_PLACEHOLDER_PREFIX << index;
     return sstream.str();
 }
+/*
+ 
+Branch* openBranch(Term* caller)
+void closeBranch(Term* caller, Branch*)
+*/
 
-void Subroutine_execute(Term* caller)
+Branch* Subroutine_openBranch(Term* caller)
 {
     Subroutine* sub = as_subroutine(caller->function);
     Branch* original_branch = sub->branch;
 
     // Create a temporary branch
-    Branch exec_branch;
+    Branch *exec_branch = new Branch();
 
-    duplicate_branch(original_branch, &exec_branch);
+    duplicate_branch(original_branch, exec_branch);
 
     // Copy inputs to input placeholders
     int numInputs = caller->inputs.count();
     for (int index=0; index < numInputs; index++) {
         Term* incomingInput = caller->inputs[index];
         std::string name = GetInputPlaceholderName(index);
-        if (!exec_branch.containsName(name)) {
+        if (!exec_branch->containsName(name)) {
             throw errors::InternalError(string("Too many arguments for subroutine ")
                 + sub->name);
         }
 
-        copy_value(incomingInput, exec_branch.getNamed(name));
+        copy_value(incomingInput, exec_branch->getNamed(name));
     }
 
-    // Execute every term in exec_branch
-    execute_branch(&exec_branch);
+    return exec_branch;
+}
+
+void Subroutine_closeBranch(Term* caller, Branch* branch)
+{
+    Subroutine* sub = as_subroutine(caller->function);
 
     // Copy output to output placeholder, if one exists
-    if (exec_branch.containsName(OUTPUT_PLACEHOLDER_NAME)) {
-        Term* outputPlaceholder = exec_branch.getNamed(OUTPUT_PLACEHOLDER_NAME);
+    if (branch->containsName(OUTPUT_PLACEHOLDER_NAME)) {
+        Term* outputPlaceholder = branch->getNamed(OUTPUT_PLACEHOLDER_NAME);
         steal_value(outputPlaceholder, caller);
     }
     else {
@@ -100,6 +109,15 @@ void Subroutine_execute(Term* caller)
                 << std::endl;
         }
     }
+
+    delete branch;
+}
+
+void Subroutine_execute(Term* caller)
+{
+    Branch *branch = Subroutine_openBranch(caller);
+    execute_branch(branch);
+    Subroutine_closeBranch(caller, branch);
 }
 
 void subroutine_create__evaluate(Term* caller)
