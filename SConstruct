@@ -34,7 +34,6 @@ SOURCE_DIRECTORY = "src"
 env = create_mac_env(RELEASE_BUILD)
 env.Append(CPPDEFINES = ["_DEBUG"])
 env.Append(CPPDEFINES = ["DEBUG"])
-#env.Replace(CXX = 'llvm-g++')
 
 env.BuildDir('build', 'src')
 env.Append(CPPPATH = ['src'])
@@ -54,7 +53,10 @@ for (dirpath, dirnames, filenames) in os.walk('src'):
     
 libcirca = env.SharedLibrary('circa', buildFiles)
 
-env.Program('circa', 'build/main.cpp', LIBS=[libcirca])
+circaBinary = env.Program('circa', 'build/main.cpp', LIBS=[libcirca])
+
+env.Install('bin', circaBinary)
 
 env.SetOption('num_jobs', 2)
+
 

@@ -21,4 +21,5 @@ circa.xcodeproj/*.mode1v3
 circa.xcodeproj/*.pbxuser
 circa.1
 tags
+bin/circa
 
