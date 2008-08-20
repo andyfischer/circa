@@ -51,11 +51,9 @@ for (dirpath, dirnames, filenames) in os.walk('src'):
         if fullpath.endswith('.cpp'):
             buildFiles.append(fullpath)
     
-libcirca = env.SharedLibrary('circa', buildFiles)
+libcirca = env.SharedLibrary('lib/circa', buildFiles)
 
-circaBinary = env.Program('circa', 'build/main.cpp', LIBS=[libcirca])
-
-env.Install('bin', circaBinary)
+circaBinary = env.Program('bin/circa', 'build/main.cpp', LIBS=[libcirca])
 
 env.SetOption('num_jobs', 2)
 
