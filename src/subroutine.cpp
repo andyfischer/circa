@@ -63,32 +63,28 @@ std::string GetInputPlaceholderName(int index)
 Branch* Subroutine_openBranch(Term* caller)
 {
     Subroutine* sub = as_subroutine(caller->function);
-    Branch* original_branch = sub->branch;
-
-    // Create a temporary branch
-    Branch *exec_branch = new Branch();
-
-    duplicate_branch(original_branch, exec_branch);
+    Branch* branch = as_branch(caller->state);
 
     // Copy inputs to input placeholders
     int numInputs = caller->inputs.count();
     for (int index=0; index < numInputs; index++) {
         Term* incomingInput = caller->inputs[index];
         std::string name = GetInputPlaceholderName(index);
-        if (!exec_branch->containsName(name)) {
+        if (!branch->containsName(name)) {
             throw errors::InternalError(string("Too many arguments for subroutine ")
                 + sub->name);
         }
 
-        copy_value(incomingInput, exec_branch->getNamed(name));
+        copy_value(incomingInput, branch->getNamed(name));
     }
 
-    return exec_branch;
+    return branch;
 }
 
-void Subroutine_closeBranch(Term* caller, Branch* branch)
+void Subroutine_closeBranch(Term* caller)
 {
     Subroutine* sub = as_subroutine(caller->function);
+    Branch* branch = as_branch(caller->state);
 
     // Copy output to output placeholder, if one exists
     if (branch->containsName(OUTPUT_PLACEHOLDER_NAME)) {
@@ -104,15 +100,23 @@ void Subroutine_closeBranch(Term* caller, Branch* branch)
                 << std::endl;
         }
     }
-
-    delete branch;
 }
 
-void Subroutine_execute(Term* caller)
+void subroutine_call__initialize(Term* caller)
 {
-    Branch *branch = Subroutine_openBranch(caller);
+    Subroutine *sub = as_subroutine(caller->function);
+    Branch *stateBranch = as_branch(caller->state);
+    duplicate_branch(sub->branch, stateBranch);
+
+}
+
+void subroutine_call__evaluate(Term* caller)
+{
+    Branch* branch = as_branch(caller->state);
+
+    Subroutine_openBranch(caller);
     execute_branch(branch);
-    Subroutine_closeBranch(caller, branch);
+    Subroutine_closeBranch(caller);
 }
 
 void subroutine_create__evaluate(Term* caller)
@@ -127,9 +131,11 @@ void subroutine_create__evaluate(Term* caller)
 
     Subroutine* sub = as_subroutine(caller);
     sub->name = as_string(caller->inputs[0]);
-    sub->execute = Subroutine_execute;
+    sub->initialize = subroutine_call__initialize;
+    sub->execute = subroutine_call__evaluate;
     sub->inputTypes = *as_list(caller->inputs[1]);
     sub->outputType = caller->inputs[2];
+    sub->stateType = BRANCH_TYPE;
 
     // Create input placeholders
     for (int index=0; index < sub->inputTypes.count(); index++) {
