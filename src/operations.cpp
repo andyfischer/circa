@@ -14,14 +14,16 @@ namespace circa {
 
 Term* create_term(Branch* branch, Term* function, TermList inputs)
 {
+    if (branch == NULL)
+        throw errors::InternalError("in create_term, branch is NULL");
     if (!is_function(function))
-        throw errors::InternalError("2nd arg to create_term must be a function");
-    Term* term = new Term();
-    initialize_term(term, function, inputs);
+        throw errors::InternalError("in create_term, 2nd arg to create_term must be a function");
 
-    // Add to branch
-    branch->terms.append(term);
+    Term* term = new Term();
     term->owningBranch = branch;
+    branch->terms.append(term);
+
+    initialize_term(term, function, inputs);
     
     return term;
 }
@@ -38,7 +40,7 @@ void initialize_term(Term* term, Term* function, TermList inputs)
     Function* functionData = as_function(function);
 
     Term* outputType = functionData->outputType;
-    // Term* stateType = functionData->stateType;
+    Term* stateType = functionData->stateType;
 
     if (outputType == NULL)
         throw errors::InternalError("outputType is NULL");
@@ -46,7 +48,16 @@ void initialize_term(Term* term, Term* function, TermList inputs)
     if (!is_type(outputType))
         throw errors::InternalError(outputType->findName() + " is not a type");
 
+    if (stateType != NULL && !is_type(stateType))
+        throw errors::InternalError(outputType->findName() + " is not a type");
+
     change_type(term, outputType);
+
+    // Create state (if a state type is defined)
+    if (stateType != NULL) 
+        term->state = create_constant(term->owningBranch, stateType);
+    else
+        term->state = NULL;
 
     set_inputs(term, inputs);
 

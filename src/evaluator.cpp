@@ -9,7 +9,7 @@ namespace circa {
 void
 Evaluator::SubroutineScope::onClose()
 {
-    Subroutine_closeBranch(callingTerm, branch);
+    Subroutine_closeBranch(this->callingTerm);
 }
 
 bool
@@ -26,6 +26,8 @@ Evaluator::evaluate(Term* term)
 
     // Special case for subroutines. Open a branch scope.
     if (is_subroutine(term->function)) {
+        std::cout << "(Opening branch)" << std::endl;
+
         SubroutineScope scope;
 
         scope.callingTerm = term;
@@ -35,7 +37,9 @@ Evaluator::evaluate(Term* term)
 
     } else {
         execute(term);
+        std::cout << "Result: " << term->toString() << std::endl;
     }
+
 }
 
 void
@@ -49,7 +53,7 @@ Evaluator::runNextInstruction()
 
     // Check if we have finished this branch
     if (top.next >= top.branch->terms.count()) {
-        std::cout << "Evaluator: closing branch" << std::endl;
+        std::cout << "(Closing branch)" << std::endl;
 
         top.onClose();  // after this call, 'branch' is invalid
         mStack.pop();
