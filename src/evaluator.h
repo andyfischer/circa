@@ -23,9 +23,10 @@ class Evaluator {
     std::stack<Scope> mStack;
 
 public:
+    bool isFinished() const;
     void evaluate(Term* term);
     void runNextInstruction();
-
+    void runUntilFinished();
 };
 
 }
