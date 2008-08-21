@@ -54,14 +54,12 @@ void test_using_evaluator()
     evaluator.evaluate(result);
     evaluator.runUntilFinished();
 
-    std::cout << result->toString() << std::endl;
-
     test_assert(as_int(result) == 11);
 }
 
 void all_tests()
 {
-    test_using_subroutine_eval();
+    //test_using_subroutine_eval();
     test_using_evaluator();
 }
 

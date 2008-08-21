@@ -21,23 +21,17 @@ Evaluator::isFinished() const
 void
 Evaluator::evaluate(Term* term)
 {
-    std::cout << "Evaluator: evaluating a term called " << term->findName() << " of function "
-        << as_function(term->function)->name << std::endl;
-
     // Special case for subroutines. Open a branch scope.
     if (is_subroutine(term->function)) {
-        std::cout << "(Opening branch)" << std::endl;
+        SubroutineScope *scope = new SubroutineScope();
 
-        SubroutineScope scope;
-
-        scope.callingTerm = term;
-        scope.branch = Subroutine_openBranch(term);
+        scope->callingTerm = term;
+        scope->branch = Subroutine_openBranch(term);
 
         mStack.push(scope);
 
     } else {
         execute(term);
-        std::cout << "Result: " << term->toString() << std::endl;
     }
 
 }
@@ -49,19 +43,19 @@ Evaluator::runNextInstruction()
     if (mStack.empty())
         return;
 
-    Scope &top = mStack.top();
+    Scope *top = mStack.top();
 
     // Check if we have finished this branch
-    if (top.next >= top.branch->terms.count()) {
-        std::cout << "(Closing branch)" << std::endl;
+    if (top->next >= top->branch->terms.count()) {
 
-        top.onClose();  // after this call, 'branch' is invalid
+        top->onClose();  // after this call, 'branch' is invalid
         mStack.pop();
+        delete top;
         return;
     }
 
-    Term* term = top.branch->terms[top.next];
-    top.next += 1;
+    Term* term = top->branch->terms[top->next];
+    top->next += 1;
 
     this->evaluate(term);
 }
