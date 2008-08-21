@@ -20,7 +20,7 @@ class Evaluator {
         virtual void onClose();
     };
 
-    std::stack<Scope> mStack;
+    std::stack<Scope*> mStack;
 
 public:
     bool isFinished() const;
