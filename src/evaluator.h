@@ -16,15 +16,22 @@ class Evaluator {
         virtual void onClose() {}
     };
 
+    enum Action {
+        NONE = 0,
+        CLOSE_BRANCH
+    };
+
     struct SubroutineScope : public Scope {
         virtual void onClose();
     };
 
     std::stack<Scope*> mStack;
+    Action mSpecialNextAction;
 
 public:
     bool isFinished() const;
     void evaluate(Term* term);
+    Term* getNextTerm();
     void runNextInstruction();
     void runUntilFinished();
 };
