@@ -33,29 +33,41 @@ Evaluator::evaluate(Term* term)
     } else {
         execute(term);
     }
+}
 
+Term*
+Evaluator::getNextTerm()
+{
+    if (isFinished())
+        return NULL;
+
+    Scope *scope = mStack.top();
+    return scope->branch->terms[scope->next];
 }
 
 void
 Evaluator::runNextInstruction()
 {
-    // Don't do anything if stack is empty
-    if (mStack.empty())
+    if (isFinished())
         return;
 
-    Scope *top = mStack.top();
+    Scope *scope = mStack.top();
 
-    // Check if we have finished this branch
-    if (top->next >= top->branch->terms.count()) {
-
-        top->onClose();  // after this call, 'branch' is invalid
+    if (mSpecialNextAction == CLOSE_BRANCH) {
+        scope->onClose();  // after this call, 'branch' is invalid
         mStack.pop();
-        delete top;
+        delete scope;
+        mSpecialNextAction = NONE;
         return;
     }
 
-    Term* term = top->branch->terms[top->next];
-    top->next += 1;
+    Term* term = scope->branch->terms[scope->next];
+
+    // Figure out what the next term is
+    if ((scope->next + 1) < scope->branch->terms.count())
+        scope->next += 1;
+    else
+        mSpecialNextAction = CLOSE_BRANCH;
 
     this->evaluate(term);
 }
