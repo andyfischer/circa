@@ -3,8 +3,7 @@
 
 #include "common_headers.h"
 
-namespace circa {
-namespace token {
+namespace circa { namespace parser { namespace token {
 
 struct TokenInstance
 {
@@ -30,6 +29,7 @@ extern const char * UNRECOGNIZED;
 void tokenize(std::string const &input, TokenList &results);
 
 } // namespace token
+} // namespace parser
 } // namespace circa
 
 #endif
