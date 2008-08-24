@@ -329,7 +329,7 @@ Term* constant_int(Branch* branch, int i)
 Term* constant_float(Branch* branch, float f)
 {
     Term* term = apply_function(branch, FLOAT_TYPE, TermList());
-    as_int(term) = f;
+    as_float(term) = f;
     return term;
 }
 

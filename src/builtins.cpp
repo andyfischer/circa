@@ -36,6 +36,7 @@ Term* VOID_TYPE = NULL;
 Term* REFERENCE_TYPE = NULL;
 Term* LIST_TYPE = NULL;
 Term* CONSTANT_INT = NULL;
+Term* CONSTANT_FLOAT = NULL;
 Term* CONSTANT_STRING = NULL;
 Term* CONSTANT_0 = NULL;
 Term* CONSTANT_1 = NULL;
@@ -395,6 +396,7 @@ void initialize_constants()
             reference_copy);
 
     CONSTANT_INT = get_const_function(KERNEL, INT_TYPE);
+    CONSTANT_FLOAT = get_const_function(KERNEL, FLOAT_TYPE);
     CONSTANT_STRING = get_const_function(KERNEL, STRING_TYPE);
 
     CONSTANT_0 = constant_float(KERNEL, 0);
