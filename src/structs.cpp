@@ -98,7 +98,7 @@ StructDefinition* as_struct_definition(Term* term)
     return (StructDefinition*) term->value;
 }
 
-Term* get_struct_field(Term* structTerm, int index)
+Term* Struct_getField(Term* structTerm, int index)
 {
     StructInstance* instance = as_struct_instance(structTerm);
     return instance->fields[index];

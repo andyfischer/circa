@@ -11,7 +11,7 @@
 
 namespace circa {
 
-Term* quick_parse_function_call(Branch* branch, token::TokenStream &tstream)
+Term* quick_parse_function_call(Branch* branch, parser::TokenStream &tstream)
 {
 	std::string functionName = tstream.consume(token::IDENTIFIER);
     Term* function = find_named(branch, functionName);
@@ -69,7 +69,7 @@ Term* quick_eval_function(Branch* branch, std::string input)
 {
     token::TokenList tokenList;
     token::tokenize(input, tokenList);
-    token::TokenStream tstream(tokenList);
+    parser::TokenStream tstream(tokenList);
     tstream.stripWhitespace();
 
     try {
@@ -180,6 +180,8 @@ void initialize_bootstrapped_code(Branch* kernel)
 
     quick_create_function(kernel, "to-string", hosted_to_string,
         TermList(ANY_TYPE), STRING_TYPE);
+
+    // Parser
 }
 
 } // namespace circa

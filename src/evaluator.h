@@ -16,7 +16,7 @@ class Evaluator {
         virtual void onClose() {}
     };
 
-    enum Action {
+    enum SpecialAction {
         NONE = 0,
         CLOSE_BRANCH
     };
@@ -26,7 +26,7 @@ class Evaluator {
     };
 
     std::stack<Scope*> mStack;
-    Action mSpecialNextAction;
+    SpecialAction mSpecialNextAction;
 
 public:
     bool isFinished() const;

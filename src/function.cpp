@@ -14,7 +14,9 @@ Function::Function()
     pureFunction(false),
     variableArgs(false),
     initialize(NULL),
-    execute(NULL)
+    execute(NULL),
+    feedbackAccumulationFunction(NULL),
+    feedbackPropagationFunction(NULL)
 {
 }
 

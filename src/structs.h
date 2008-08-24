@@ -45,8 +45,8 @@ struct StructInstance
 
 bool is_struct_definition(Term* term);
 StructDefinition* as_struct_definition(Term* term);
-Term* get_struct_field(Term* structTerm, int index);
 StructInstance* as_struct_instance(Term* term);
+Term* Struct_getField(Term* structTerm, int index);
 
 void initialize_structs(Branch* code);
 
