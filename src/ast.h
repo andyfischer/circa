@@ -1,8 +1,10 @@
 #ifndef CIRCA__AST__INCLUDED
 #define CIRCA__AST__INCLUDED
 
+#include <string>
+#include <vector>
+
 namespace circa {
-namespace parser {
 namespace ast {
 
 class Expression
@@ -107,7 +109,6 @@ public:
 
 
 } // namespace ast
-} // namespace parser
 } // namespace circa
 
 #endif
