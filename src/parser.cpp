@@ -70,22 +70,23 @@ ast::Expression* atom(token_stream::TokenStream& tokens)
 
 ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)
 {
-    return NULL;
-}
+    std::string functionName = tokens.consume(tokenizer::IDENTIFIER);
+    tokens.consume(tokenizer::LPAREN);
 
-ast::LiteralString* literalString(token_stream::TokenStream& tokens)
-{
-    return NULL;
-}
+    std::auto_ptr<ast::FunctionCall> functionCall(new ast::FunctionCall(functionName));
 
-ast::LiteralFloat* literalFloat(token_stream::TokenStream& tokens)
-{
-    return NULL;
-}
+    if (!tokens.nextIs(tokenizer::RPAREN))
+    {
+        functionCall->addArgument(infixExpression(tokens), "", "");
 
-ast::Identifier* identifier(token_stream::TokenStream& tokens)
-{
-    return NULL;
+        while (tokens.nextIs(tokenizer::COMMA)) {
+            tokens.consume(tokenizer::COMMA);
+
+            functionCall->addArgument(infixExpression(tokens), "", "");
+        }
+    }
+    
+    return functionCall.release();
 }
 
 } // namespace parser
