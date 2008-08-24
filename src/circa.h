@@ -1,4 +1,5 @@
 
+#include "parser/parser.h"
 #include "bootstrapping.h"
 #include "branch.h"
 #include "builtins.h"
