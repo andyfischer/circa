@@ -24,11 +24,11 @@ ast::Statement* statement(token_stream::TokenStream& tokens)
 
     // check for name binding
     if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.nextIs(tokenizer::EQUALS, 1)) {
-        statement->mNameBinding = tokens.consume(tokenizer::IDENTIFIER);
+        statement->nameBinding = tokens.consume(tokenizer::IDENTIFIER);
         tokens.consume(tokenizer::EQUALS);
     }
 
-    statement->mExpression = infixExpression(tokens);
+    statement->expression = infixExpression(tokens);
 
     return statement;
 }

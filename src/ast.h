@@ -7,9 +7,8 @@
 namespace circa {
 namespace ast {
 
-class Expression
+struct Expression
 {
-public:
     typedef std::vector<Expression*> List;
 
     Expression()
@@ -20,93 +19,91 @@ public:
     }
 };
 
-class Infix : public Expression
+struct Infix : public Expression
 {
-public:
-    std::string mOperator;
-    Expression* mLeft;
-    Expression* mRight;
+    std::string operatorStr;
+    Expression* left;
+    Expression* right;
 
     Infix()
-      : mLeft(NULL), mRight(NULL)
+      : left(NULL), right(NULL)
     {
     }
 
     ~Infix()
     {
-        delete mLeft;
-        delete mRight;
+        delete left;
+        delete right;
     }
 };
 
-class FunctionCall : public Expression
+struct FunctionCall : public Expression
 {
-public:
-    std::string mFunctionName;
-    Expression::List mInputs;
-    std::string mPreInputWhitespace;
-    std::string mPostInputWhitespace;
+    std::string functionName;
+    Expression::List inputs;
+    std::string preInputWhitespace;
+    std::string postInputWhitespace;
 
-    explicit FunctionCall(std::string const& name)
-      : mFunctionName(name)
+    explicit FunctionCall(std::string const& _name)
+      : functionName(_name)
+    {
+    }
+
+    void addInput(Expression* input)
+    {
+        this->inputs.push_back(input);
+    }
+};
+
+struct LiteralString : public Expression
+{
+    std::string text;
+
+    explicit LiteralString(std::string const& _text)
+      : text(_text)
     {
     }
 };
 
-class LiteralString : public Expression
+struct LiteralFloat : public Expression
 {
-public:
-    std::string mText;
+    std::string text;
 
-    explicit LiteralString(std::string const& text)
-      : mText(text)
+    explicit LiteralFloat(std::string const& _text)
+      : text(_text)
     {
     }
 };
 
-class LiteralFloat : public Expression
+struct Identifier : public Expression
 {
-    std::string mText;
+    std::string text;
 
-public:
-    explicit LiteralFloat(std::string const& text)
-      : mText(text)
-    {
-    }
-};
-
-class Identifier : public Expression
-{
-    std::string mText;
-
-public:
-    explicit Identifier(std::string const& text)
-      : mText(text)
+    explicit Identifier(std::string const& _text)
+      : text(_text)
     {
     }
 };
     
 
-class Statement
+struct Statement
 {
-public:
-    std::string mNameBinding;
-    Expression* mExpression;
-    std::string mPreEqualsWhitepace;
-    std::string mPostEqualsWhitespace;
+    std::string nameBinding;
+    Expression* expression;
+    std::string preEqualsWhitepace;
+    std::string postEqualsWhitespace;
 
     typedef std::vector<Statement*> List;
 };
 
 
-class StatementList
+struct StatementList
 {
-public:
-    Statement::List mStatements;
+    Statement::List statements;
 
     void push(Statement* statement)
     {
-        mStatements.push_back(statement);
+        this->statements.push_back(statement);
     }
 };
 
