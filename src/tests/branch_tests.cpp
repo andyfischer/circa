@@ -5,7 +5,7 @@
 #include <tests/common.h>
 
 namespace circa {
-namespace branch_test {
+namespace branch_tests {
 
 void test_duplicate()
 {
@@ -36,10 +36,12 @@ void test_duplicate()
     test_assert(as_int(term1_duplicate) == 5);
 }
 
-void all_tests()
+
+} // namespace branch_tests
+
+void register_branch_tests()
 {
-    test_duplicate();
+    REGISTER_TEST_CASE(branch_tests::test_duplicate);
 }
 
-} // namespace branch_test
 } // namespace circa

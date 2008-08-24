@@ -5,9 +5,9 @@
 #include "tests/common.h"
 
 namespace circa {
-namespace primitive_type_test {
+namespace primitive_type_tests {
 
-void test_strings()
+void strings()
 {
     Branch* branch = new Branch();
     Term* str1 = constant_string(branch, "one");
@@ -22,9 +22,11 @@ void test_strings()
     test_assert(as_string(str2) == "one");
 }
 
-void all_tests()
+} // namespace primitive_type_tests
+
+void register_primitive_type_tests()
 {
-    test_strings();
+    REGISTER_TEST_CASE(primitive_type_tests::strings);
 }
 
-}}
+} // namespace circa

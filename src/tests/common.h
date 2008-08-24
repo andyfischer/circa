@@ -17,6 +17,22 @@ void test_assert_f(bool condition, int line, const char* file);
 
 #define test_assert(c) test_assert_f((c), __LINE__, __FILE__)
 
+struct TestCase {
+    typedef void (*TestExecuteFunction)();
+
+    std::string name;
+    TestExecuteFunction execute;
+
+    TestCase::TestCase(std::string const& _name, TestExecuteFunction _execute)
+      : name(_name), execute(_execute)
+    {
+    }
+};
+
+extern std::vector<TestCase> gTestCases;
+
+#define REGISTER_TEST_CASE(f) gTestCases.push_back(TestCase(#f,f))
+
 } // namespace circa
 
 #endif

@@ -103,7 +103,7 @@ struct LiteralInteger : public Expression
       : text(_text)
     {
     }
-}
+};
 
 struct Identifier : public Expression
 {

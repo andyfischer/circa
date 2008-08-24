@@ -5,9 +5,9 @@
 #include "circa.h"
 
 namespace circa {
-namespace parser_test {
+namespace parser_tests {
 
-void test_atoms()
+void atoms()
 {
     token_stream::TokenStream tokens("1.0");
     ast::Expression *expr = parser::atom(tokens);
@@ -16,7 +16,7 @@ void test_atoms()
     test_assert(literal->text == "1.0");
 }
 
-void test_function_call()
+void function_call()
 {
     token_stream::TokenStream tokens("add(1,2)");
     ast::FunctionCall *functionCall =
@@ -24,15 +24,22 @@ void test_function_call()
     test_assert(functionCall != NULL);
     test_assert(functionCall->functionName == "add");
 
-    ast::LiteralInteger
-    
-
+    ast::LiteralInteger *arg1 =
+        dynamic_cast<ast::LiteralInteger*>(functionCall->arguments[0]->expression);
+    test_assert(arg1 != NULL);
+    test_assert(arg1->text == "1");
+    ast::LiteralInteger *arg2 =
+        dynamic_cast<ast::LiteralInteger*>(functionCall->arguments[1]->expression);
+    test_assert(arg2 != NULL);
+    test_assert(arg2->text == "2");
 }
 
-void all_tests()
+} // namespace parser_tests
+
+void register_parser_tests()
 {
-    test_atoms();
+    REGISTER_TEST_CASE(parser_tests::atoms);
+    REGISTER_TEST_CASE(parser_tests::function_call);
 }
 
-} // namespace parser_test
 } // namespace circa

@@ -5,9 +5,9 @@
 #include "tests/common.h"
 
 namespace circa {
-namespace list_test {
+namespace list_tests {
 
-void test_range()
+void range()
 {
     Branch* branch = new Branch();
 
@@ -17,7 +17,7 @@ void test_range()
     test_assert(as_int(as_list(range_zero_to_ten)->get(9)) == 9);
 }
 
-void test_list_apply()
+void list_apply()
 {
     Branch* branch = new Branch();
 
@@ -27,11 +27,12 @@ void test_list_apply()
     test_assert(as_string(as_list(result)->get(4)) == "4");
 }
 
-void all_tests()
+} // namespace list_tests
+
+void register_list_tests()
 {
-    test_range();
-    test_list_apply();
+    REGISTER_TEST_CASE(list_tests::range);
+    REGISTER_TEST_CASE(list_tests::list_apply);
 }
 
-} // namespace list_test
 } // namespace circa

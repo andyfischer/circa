@@ -3,6 +3,8 @@
 
 namespace circa {
 
+std::vector<TestCase> gTestCases;
+
 void test_assert_f(bool condition, int line, const char* file)
 {
     if (!condition) {
