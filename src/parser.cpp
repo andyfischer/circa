@@ -53,6 +53,10 @@ ast::Expression* atom(token_stream::TokenStream& tokens)
     if (tokens.nextIs(tokenizer::FLOAT))
         return new ast::LiteralFloat(tokens.consume(tokenizer::FLOAT));
 
+    // literal integer?
+    if (tokens.nextIs(tokenizer::INTEGER))
+        return new ast::LiteralInteger(tokens.consume(tokenizer::INTEGER));
+
     // identifier?
     if (tokens.nextIs(tokenizer::IDENTIFIER))
         return new ast::Identifier(tokens.consume(tokenizer::IDENTIFIER));
