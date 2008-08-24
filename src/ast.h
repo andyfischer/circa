@@ -95,6 +95,16 @@ struct LiteralFloat : public Expression
     }
 };
 
+struct LiteralInteger : public Expression
+{
+    std::string text;
+
+    explicit LiteralInteger(std::string const& _text)
+      : text(_text)
+    {
+    }
+}
+
 struct Identifier : public Expression
 {
     std::string text;

@@ -16,6 +16,19 @@ void test_atoms()
     test_assert(literal->text == "1.0");
 }
 
+void test_function_call()
+{
+    token_stream::TokenStream tokens("add(1,2)");
+    ast::FunctionCall *functionCall =
+        dynamic_cast<ast::FunctionCall*>(parser::functionCall(tokens));
+    test_assert(functionCall != NULL);
+    test_assert(functionCall->functionName == "add");
+
+    ast::LiteralInteger
+    
+
+}
+
 void all_tests()
 {
     test_atoms();
