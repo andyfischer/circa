@@ -9,6 +9,8 @@
 #include "operations.h"
 #include "subroutine.h"
 
+namespace token = circa::parser::token;
+
 namespace circa {
 
 Term* quick_parse_function_call(Branch* branch, parser::TokenStream &tstream)

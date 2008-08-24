@@ -5,6 +5,8 @@
 #include <tests/common.h>
 #include "errors.h"
 
+namespace token = circa::parser::token;
+
 namespace circa {
 namespace tokenizer_test {
 
