@@ -62,13 +62,20 @@ void consume_number(TokenizeContext &context);
 void consume_string_literal(TokenizeContext &context);
 void consume_quoted_identifier(TokenizeContext &context);
 
-void tokenize(std::string const &input, std::vector<TokenInstance> &results)
+void tokenize(std::string const &input, TokenList &results)
 {
     TokenizeContext context(input, results);
 
     while (!context.finished()) {
         top_level_consume_token(context);
     }
+}
+
+TokenList tokenize(std::string const& input)
+{
+    TokenList results;
+    tokenize(input, results);
+    return results;
 }
 
 bool is_letter(char c)

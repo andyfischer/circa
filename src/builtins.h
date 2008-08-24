@@ -23,6 +23,7 @@ extern Term* VOID_TYPE;
 extern Term* REFERENCE_TYPE;
 extern Term* LIST_TYPE;
 extern Term* CONSTANT_INT;
+extern Term* CONSTANT_FLOAT;
 extern Term* CONSTANT_STRING;
 extern Term* CONSTANT_0;
 extern Term* CONSTANT_1;

@@ -28,6 +28,7 @@ extern const char * NEWLINE;
 extern const char * UNRECOGNIZED;
 
 void tokenize(std::string const &input, TokenList &results);
+TokenList tokenize(std::string const& input);
 
 } // namespace tokenizer
 } // namespace circa

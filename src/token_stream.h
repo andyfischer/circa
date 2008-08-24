@@ -17,6 +17,11 @@ struct TokenStream
     {
     }
 
+    TokenStream(std::string const& input)
+      : tokens(tokenizer::tokenize(input)), currentIndex(0)
+    {
+    }
+
     void stripWhitespace()
     {
         int deleteCount = 0;

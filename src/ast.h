@@ -15,6 +15,9 @@ public:
     Expression()
     {
     }
+    virtual ~Expression()
+    {
+    }
 };
 
 class Infix : public Expression
