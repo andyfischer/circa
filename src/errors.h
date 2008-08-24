@@ -4,7 +4,6 @@
 #include "common_headers.h"
 
 namespace circa {
-
 namespace errors {
 
 class CircaError : public std::exception
@@ -66,16 +65,6 @@ public:
     virtual string message()
     {
         return string("KeyError: ") + this->msg;
-    }
-};
-
-class TokenMismatch : public CircaError
-{
-public:
-    TokenMismatch(const char* expected, const char* found, const char* foundText) throw()
-        : CircaError(std::string("Expected: ") + expected + ", found: " + found
-               + " (" + foundText + ")")
-    {
     }
 };
 

@@ -38,6 +38,9 @@ struct Function
     InitializeFunc initialize;
     ExecuteFunc execute;
 
+    Term* feedbackAccumulationFunction;
+    Term* feedbackPropagationFunction;
+
     Function();
 };
 

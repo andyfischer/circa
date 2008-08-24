@@ -279,12 +279,12 @@ void print__evaluate(Term* caller)
 
 void add__evaluate(Term* caller)
 {
-    as_int(caller) = as_int(caller->inputs[0]) + as_int(caller->inputs[1]);
+    as_float(caller) = as_float(caller->inputs[0]) + as_float(caller->inputs[1]);
 }
 
 void mult__evaluate(Term* caller)
 {
-    as_int(caller) = as_int(caller->inputs[0]) * as_int(caller->inputs[1]);
+    as_float(caller) = as_float(caller->inputs[0]) * as_float(caller->inputs[1]);
 }
 
 void string_concat__evaluate(Term* caller)
@@ -411,8 +411,10 @@ void initialize_constants()
 
 void initialize_builtin_functions(Branch* code)
 {
-    quick_create_function(code, "add", add__evaluate, TermList(INT_TYPE, INT_TYPE), INT_TYPE);
-    quick_create_function(code, "mult", mult__evaluate, TermList(INT_TYPE, INT_TYPE), INT_TYPE);
+    quick_create_function(code, "add", add__evaluate,
+            TermList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
+    quick_create_function(code, "mult", mult__evaluate,
+            TermList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
     quick_create_function(code, "concat", string_concat__evaluate, TermList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
     quick_create_function(code, "print", print__evaluate, TermList(STRING_TYPE), VOID_TYPE);
     quick_create_function(code, "if-expr", if_expr__evaluate,
@@ -426,7 +428,6 @@ void initialize_builtin_functions(Branch* code)
     quick_create_function(code, "write-text-file", write_text_file__evaluate,
             TermList(STRING_TYPE, STRING_TYPE), VOID_TYPE);
 }
-
 
 void initialize()
 {
