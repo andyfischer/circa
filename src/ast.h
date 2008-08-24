@@ -39,19 +39,39 @@ struct Infix : public Expression
 
 struct FunctionCall : public Expression
 {
+    struct Argument {
+        Expression* expression;
+        std::string preWhitespace;
+        std::string postWhitespace;
+
+        Argument::Argument()
+          : expression(NULL)
+        {
+        }
+        Argument::~Argument()
+        {
+            delete expression;
+        }
+    };
+
+    typedef std::vector<Argument*> ArgumentList;
+
     std::string functionName;
-    Expression::List inputs;
-    std::string preInputWhitespace;
-    std::string postInputWhitespace;
+    ArgumentList arguments;
 
     explicit FunctionCall(std::string const& _name)
       : functionName(_name)
     {
     }
 
-    void addInput(Expression* input)
+    void addArgument(Expression* expr, std::string const& preWhitespace,
+            std::string const& postWhitespace)
     {
-        this->inputs.push_back(input);
+        Argument *arg = new Argument();
+        arg->expression = expr;
+        arg->preWhitespace = preWhitespace;
+        arg->postWhitespace = postWhitespace;
+        this->arguments.push_back(arg);
     }
 };
 
