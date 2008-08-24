@@ -2,17 +2,17 @@
 #define CIRCA__TOKEN_STREAM__INCLUDED
 
 #include "syntax_errors.h"
-#include "token.h"
+#include "tokenizer.h"
 
 namespace circa {
-namespace parser {
+namespace token_stream {
 
 struct TokenStream
 {
-    token::TokenList tokens;
+    tokenizer::TokenList tokens;
     int currentIndex;
 
-    TokenStream(token::TokenList const& _tokens)
+    TokenStream(tokenizer::TokenList const& _tokens)
       : tokens(_tokens), currentIndex(0)
     {
     }
@@ -23,7 +23,7 @@ struct TokenStream
 
         for (int i=0; i < tokens.size(); i++) {
 
-            if (tokens[i].match == token::WHITESPACE) {
+            if (tokens[i].match == tokenizer::WHITESPACE) {
                 deleteCount++;
             } else if (deleteCount > 0) {
                 tokens[i - deleteCount] = tokens[i];
@@ -33,12 +33,12 @@ struct TokenStream
         tokens.resize(tokens.size() - deleteCount);
     }
 
-    token::TokenInstance const& next(int lookahead=0) const
+    tokenizer::TokenInstance const& next(int lookahead=0) const
     {
         int i = currentIndex + lookahead;
 
         if (i >= tokens.size())
-            throw errors::UnexpectedEOF();
+            throw syntax_errors::UnexpectedEOF();
 
         return tokens[i];
     }
@@ -51,10 +51,10 @@ struct TokenStream
     std::string consume(const char * match = NULL)
     {
         if (finished())
-            throw errors::UnexpectedEOF();
+            throw syntax_errors::UnexpectedEOF();
 
         if ((match != NULL) && next().match != match)
-            throw errors::UnexpectedToken(match, next().match, next().text.c_str());
+            throw syntax_errors::UnexpectedToken(match, next().match, next().text.c_str());
 
         return tokens[currentIndex++].text;
     }
@@ -65,7 +65,7 @@ struct TokenStream
     }
 };
 
-} // namespace token
+} // namespace token_stream
 } // namespace circa
 
 #endif

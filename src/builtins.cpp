@@ -4,8 +4,8 @@
 
 #include "common_headers.h"
 
-#include "parser/token.h"
-#include "parser/token_stream.h"
+#include "tokenizer.h"
+#include "token_stream.h"
 #include "libraries/builtin_libraries.h"
 #include "bootstrapping.h"
 #include "branch.h"

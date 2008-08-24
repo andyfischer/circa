@@ -6,8 +6,7 @@
 #include "errors.h"
 
 namespace circa {
-namespace parser {
-namespace errors {
+namespace syntax_errors {
 
 class ParseError : public circa::errors::CircaError
 {
@@ -37,8 +36,7 @@ public:
     }
 };
 
-} // namespace errors
-} // namespace parser
+} // namespace syntax_errors
 } // namespace circa
 
 #endif
