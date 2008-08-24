@@ -7,7 +7,7 @@
 #include "evaluator.h"
 
 namespace circa {
-namespace subroutine_test {
+namespace subroutine_tests {
 
 void test_simple()
 {
@@ -57,11 +57,11 @@ void test_using_evaluator()
     test_assert(as_float(result) == 11);
 }
 
-void all_tests()
+} // namespace subroutine_tests
+
+void register_subroutine_tests()
 {
-    //test_using_subroutine_eval();
-    test_using_evaluator();
+    REGISTER_TEST_CASE(subroutine_tests::test_using_evaluator);
 }
 
-} // namespace subroutine_test
 } // namespace circa

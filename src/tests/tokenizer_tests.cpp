@@ -8,7 +8,7 @@
 namespace token = circa::tokenizer;
 
 namespace circa {
-namespace tokenizer_test {
+namespace tokenizer_tests {
 
 void test_identifiers()
 {
@@ -77,13 +77,14 @@ void test_string_literal()
     test_assert(results[0].match == token::STRING);
 }
 
-void all_tests()
+} // namespace tokenizer_tests
+
+void register_tokenizer_tests()
 {
-    test_identifiers();
-    test_integers();
-    test_symbols();
-    test_string_literal();
+    REGISTER_TEST_CASE(tokenizer_tests::test_identifiers);
+    REGISTER_TEST_CASE(tokenizer_tests::test_integers);
+    REGISTER_TEST_CASE(tokenizer_tests::test_symbols);
+    REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
 }
 
-} // namespace tokenizer_test
 } // namespace circa

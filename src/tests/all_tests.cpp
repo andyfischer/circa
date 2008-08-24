@@ -2,40 +2,40 @@
 #include "common_headers.h"
 
 #include "all_tests.h"
+#include "common.h"
 #include "errors.h"
 
 namespace circa {
 
-namespace branch_test { void all_tests(); }
-namespace builtin_function_test { void all_tests(); }
-namespace list_test { void all_tests(); }
-namespace parser_test { void all_tests(); }
-namespace primitive_type_test { void all_tests(); }
-namespace subroutine_test { void all_tests(); }
-namespace struct_test { void all_tests(); }
-namespace tokenizer_test { void all_tests(); }
+void register_branch_tests();
+void register_builtin_function_tests();
+void register_list_tests();
+void register_parser_tests();
+void register_primitive_type_tests();
+void register_subroutine_tests();
+void register_struct_tests();
+void register_tokenizer_tests();
 
 void run_all_tests()
 {
-    typedef void (*RunTestsFunc)();
-    std::vector<RunTestsFunc> tests;
+    gTestCases.clear();
 
-    tests.push_back(builtin_function_test::all_tests);
-    tests.push_back(tokenizer_test::all_tests);
-    tests.push_back(subroutine_test::all_tests);
-    tests.push_back(struct_test::all_tests);
-    tests.push_back(parser_test::all_tests);
-    tests.push_back(primitive_type_test::all_tests);
-    tests.push_back(list_test::all_tests);
-    tests.push_back(branch_test::all_tests);
+    register_branch_tests();
+    register_builtin_function_tests();
+    register_list_tests();
+    register_parser_tests();
+    register_primitive_type_tests();
+    register_subroutine_tests();
+    register_struct_tests();
+    register_tokenizer_tests();
 
-    std::vector<RunTestsFunc>::iterator it;
-    for (it = tests.begin(); it != tests.end(); ++it) {
+    std::vector<TestCase>::iterator it;
+    for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
         try {
-            (*it)();
+            it->execute();
         }
         catch (errors::CircaError &err) {
-            std::cout << "Error during tests:\n";
+            std::cout << "Error white running test case " << it->name << std::endl;
             std::cout << err.message() << std::endl;
         }
     }

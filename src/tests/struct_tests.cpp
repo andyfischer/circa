@@ -10,7 +10,7 @@
 #include "subroutine.h"
 
 namespace circa {
-namespace struct_test {
+namespace struct_tests {
 
 void test_simple()
 {
@@ -81,13 +81,14 @@ void test_rename_field()
     test_assert(firstField->type == INT_TYPE);
 }
 
-void all_tests()
+} // namespace struct_tests
+
+void register_struct_tests()
 {
-    test_simple();
-    test_simple2();
-    test_as_function_output();
-    test_rename_field();
+    REGISTER_TEST_CASE(struct_tests::test_simple);
+    REGISTER_TEST_CASE(struct_tests::test_simple2);
+    REGISTER_TEST_CASE(struct_tests::test_as_function_output);
+    REGISTER_TEST_CASE(struct_tests::test_rename_field);
 }
 
-} // namespace struct_test
 } // namespace circa
