@@ -1,11 +1,11 @@
 
 #include "common_headers.h"
 
-#include <parser/token.h>
-#include <tests/common.h>
+#include "tests/common.h"
+#include "tokenizer.h"
 #include "errors.h"
 
-namespace token = circa::parser::token;
+namespace token = circa::tokenizer;
 
 namespace circa {
 namespace tokenizer_test {

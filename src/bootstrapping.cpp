@@ -4,16 +4,16 @@
 #include "bootstrapping.h"
 #include "branch.h"
 #include "builtins.h"
-#include "parser/token.h"
-#include "parser/token_stream.h"
+#include "tokenizer.h"
+#include "token_stream.h"
 #include "operations.h"
 #include "subroutine.h"
 
-namespace token = circa::parser::token;
+namespace token = circa::tokenizer;
 
 namespace circa {
 
-Term* quick_parse_function_call(Branch* branch, parser::TokenStream &tstream)
+Term* quick_parse_function_call(Branch* branch, token_stream::TokenStream &tstream)
 {
 	std::string functionName = tstream.consume(token::IDENTIFIER);
     Term* function = find_named(branch, functionName);
@@ -72,7 +72,7 @@ Term* quick_eval_function(Branch* branch, std::string input)
 {
     token::TokenList tokenList;
     token::tokenize(input, tokenList);
-    parser::TokenStream tstream(tokenList);
+    token_stream::TokenStream tstream(tokenList);
     tstream.stripWhitespace();
 
     try {

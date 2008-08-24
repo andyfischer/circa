@@ -1,7 +1,8 @@
 
-#include "token.h"
+#include "tokenizer.h"
 
-namespace circa { namespace parser { namespace token {
+namespace circa {
+namespace tokenizer {
 
 const char * LPAREN = "LPAREN";
 const char * RPAREN = "RPAREN";
@@ -223,5 +224,4 @@ void consume_quoted_identifier(TokenizeContext &context)
 }
 
 } // namespace token
-} // namespace parser
 } // namespace circa
