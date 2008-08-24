@@ -397,9 +397,9 @@ void initialize_constants()
     CONSTANT_INT = get_const_function(KERNEL, INT_TYPE);
     CONSTANT_STRING = get_const_function(KERNEL, STRING_TYPE);
 
-    CONSTANT_0 = constant_int(KERNEL, 0);
-    CONSTANT_1 = constant_int(KERNEL, 1);
-    CONSTANT_2 = constant_int(KERNEL, 2);
+    CONSTANT_0 = constant_float(KERNEL, 0);
+    CONSTANT_1 = constant_float(KERNEL, 1);
+    CONSTANT_2 = constant_float(KERNEL, 2);
 
     CONSTANT_TRUE = apply_function(KERNEL, BOOL_TYPE, TermList());
     as_bool(CONSTANT_TRUE) = true;

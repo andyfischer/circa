@@ -30,20 +30,20 @@ void test_using_subroutine_eval()
 {
     Branch* branch = new Branch();
 
-    quick_exec_function(branch, "sub = subroutine-create('test-sub, list(int,int), int)");
+    quick_exec_function(branch, "sub = subroutine-create('test-sub, list(float,float), float)");
     quick_exec_function(branch, "sub = subroutine-name-inputs(sub, list('a,'b))");
     quick_exec_function(branch, "sub = subroutine-eval(sub, \"a-times-four = mult(a,4)\")");
     quick_exec_function(branch, "sub = subroutine-eval(sub, \"b-times-three = mult(b,3)\")");
     quick_exec_function(branch, "sub = subroutine-eval(sub, \"return add(a-times-four,b-times-three)\")");
 
-    test_assert(as_int(quick_exec_function(branch, "sub(1,2))")) == 10);
+    test_assert(int(as_float(quick_exec_function(branch, "sub(1,2))"))) == 10);
 }
 
 void test_using_evaluator()
 {
     Branch* branch = new Branch();
 
-    quick_exec_function(branch, "sub = subroutine-create('test-sub, list(int,int), int)");
+    quick_exec_function(branch, "sub = subroutine-create('test-sub, list(float,float), float)");
     quick_exec_function(branch, "sub = subroutine-name-inputs(sub, list('a,'b))");
     quick_exec_function(branch, "sub = subroutine-eval(sub, \"a-times-four = mult(a,4)\")");
     quick_exec_function(branch, "sub = subroutine-eval(sub, \"b-times-three = mult(b,3)\")");
@@ -54,7 +54,7 @@ void test_using_evaluator()
     evaluator.evaluate(result);
     evaluator.runUntilFinished();
 
-    test_assert(as_int(result) == 11);
+    test_assert(as_float(result) == 11);
 }
 
 void all_tests()

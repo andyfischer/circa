@@ -314,21 +314,28 @@ Term* find_named(Branch* branch, std::string name)
 
 Term* constant_string(Branch* branch, std::string s)
 {
-    Term* term = apply_function(branch, get_global("string"), TermList());
+    Term* term = apply_function(branch, STRING_TYPE, TermList());
     as_string(term) = s;
     return term;
 }
 
 Term* constant_int(Branch* branch, int i)
 {
-    Term* term = apply_function(branch, get_global("int"), TermList());
+    Term* term = apply_function(branch, INT_TYPE, TermList());
     as_int(term) = i;
+    return term;
+}
+
+Term* constant_float(Branch* branch, float f)
+{
+    Term* term = apply_function(branch, FLOAT_TYPE, TermList());
+    as_int(term) = f;
     return term;
 }
 
 Term* constant_list(Branch* branch, TermList list)
 {
-    Term* term = apply_function(branch, get_global("List"), TermList());
+    Term* term = apply_function(branch, LIST_TYPE, TermList());
     *as_list(term) = list;
     return term;
 }

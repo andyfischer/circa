@@ -62,6 +62,7 @@ Term* find_named(Branch* branch, std::string name);
 
 Term* constant_string(Branch* branch, std::string s);
 Term* constant_int(Branch* branch, int i);
+Term* constant_float(Branch* branch, float f);
 Term* constant_list(Branch* branch, TermList list);
 
 } // namespace circa
