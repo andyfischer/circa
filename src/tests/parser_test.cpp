@@ -3,7 +3,8 @@
 
 #include "circa.h"
 
-namespace circa { namespace parser_test {
+namespace circa {
+namespace parser_test {
 
 void test_atoms()
 {
