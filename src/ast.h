@@ -117,7 +117,6 @@ struct Identifier : public Expression
         return text;
     }
 };
-    
 
 struct Statement
 {
@@ -142,7 +141,6 @@ struct Statement
     }
 };
 
-
 struct StatementList
 {
     Statement::List statements;
@@ -160,7 +158,6 @@ struct StatementList
         return output.str();
     }
 };
-
 
 } // namespace ast
 } // namespace circa
