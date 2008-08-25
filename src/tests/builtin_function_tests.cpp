@@ -23,7 +23,7 @@ void test_math()
     test_assert(as_float(exec_function(branch, mult_f, TermList(two,three))) == 6);
     test_assert(as_float(exec_function(branch, mult_f, TermList(negative_one,three))) == -3);
 
-    test_assert(as_float(quick_exec_function(branch, "mult(5,3)")) == 15);
+    test_assert(as_float(quick_exec_function(branch, "mult(5.0,3.0)")) == 15);
 }
 
 void test_string()

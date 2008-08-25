@@ -48,9 +48,15 @@ Term* quick_parse_function_call(Branch* branch, token_stream::TokenStream &tstre
         }
 
         // Check for integer literal
-        // Interpret as a float
         else if (tstream.nextIs(token::INTEGER)) {
-            float value = atof(tstream.consume(token::INTEGER).c_str());
+            int value = atoi(tstream.consume(token::INTEGER).c_str());
+            Term* term = constant_int(branch, value);
+            inputs.append(term);
+        }
+
+        // Check for float literal
+        else if (tstream.nextIs(token::FLOAT)) {
+            float value = atof(tstream.consume(token::FLOAT).c_str());
             Term* term = constant_float(branch, value);
             inputs.append(term);
         }

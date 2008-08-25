@@ -45,12 +45,12 @@ void test_using_evaluator()
 
     quick_exec_function(branch, "sub = subroutine-create('test-sub, list(float,float), float)");
     quick_exec_function(branch, "sub = subroutine-name-inputs(sub, list('a,'b))");
-    quick_exec_function(branch, "sub = subroutine-eval(sub, \"a-times-four = mult(a,4)\")");
-    quick_exec_function(branch, "sub = subroutine-eval(sub, \"b-times-three = mult(b,3)\")");
+    quick_exec_function(branch, "sub = subroutine-eval(sub, \"a-times-four = mult(a,4.0)\")");
+    quick_exec_function(branch, "sub = subroutine-eval(sub, \"b-times-three = mult(b,3.0)\")");
     quick_exec_function(branch, "sub = subroutine-eval(sub, \"return add(a-times-four,b-times-three)\")");
     
     Evaluator evaluator;
-    Term* result = quick_eval_function(branch, "sub(2,1)");
+    Term* result = quick_eval_function(branch, "sub(2.0,1.0)");
     evaluator.evaluate(result);
     evaluator.runUntilFinished();
 
