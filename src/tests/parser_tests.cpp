@@ -120,6 +120,21 @@ void create_function_call()
     test_assert(as_float(term) == 5);
 }
 
+void test_quick_eval_statement()
+{
+    Branch branch;
+
+    Term* result = parser::quick_eval_statement(&branch, "something = add(5.0,3.0)");
+
+    /*
+    test_assert(result != NULL);
+    test_assert(result->findName() == "something");
+    test_assert(as_function(result->function)->name == "add");
+    test_assert(result->needsUpdate);
+    execute(result);
+    test_assert(as_float(result) == 8);*/
+}
+
 } // namespace parser_tests
 
 void register_parser_tests()
@@ -131,6 +146,7 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::test_to_string);
     REGISTER_TEST_CASE(parser_tests::create_literals);
     REGISTER_TEST_CASE(parser_tests::create_function_call);
+    REGISTER_TEST_CASE(parser_tests::test_quick_eval_statement);
 }
 
 } // namespace circa

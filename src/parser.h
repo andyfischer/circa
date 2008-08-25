@@ -7,6 +7,8 @@
 namespace circa {
 namespace parser {
 
+Term* quick_eval_statement(Branch* branch, std::string const& input);
+
 ast::StatementList* statementList(token_stream::TokenStream& tokens);
 ast::Statement* statement(token_stream::TokenStream& tokens);
 ast::Expression* infixExpression(token_stream::TokenStream& tokens);
