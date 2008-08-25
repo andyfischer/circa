@@ -36,6 +36,15 @@ public:
     }
 };
 
+class UnrecognizedExpression : public ParseError
+{
+public:
+    UnrecognizedExpression() throw()
+      : ParseError("Unrecognized expression")
+    {
+    }
+};
+
 } // namespace syntax_errors
 } // namespace circa
 
