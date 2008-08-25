@@ -35,7 +35,7 @@ void function_call()
 
 void name_binding_expression()
 {
-    token_stream::TokenStream tokens("name=hi(2,u)");
+    token_stream::TokenStream tokens("name = hi(2,u)");
     ast::Statement *statement = parser::statement(tokens);
 
     test_assert(statement->nameBinding == "name");
@@ -44,6 +44,8 @@ void name_binding_expression()
         dynamic_cast<ast::FunctionCall*>(statement->expression);
 
     test_assert(functionCall->functionName == "hi");
+    test_assert(functionCall->toString() == "hi(2,u)");
+    test_assert(statement->toString() == "name = hi(2,u)");
 }
 
 } // namespace parser_tests

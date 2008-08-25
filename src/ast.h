@@ -2,6 +2,7 @@
 #define CIRCA__AST__INCLUDED
 
 #include <string>
+#include <sstream>
 #include <vector>
 
 namespace circa {
@@ -13,16 +14,20 @@ struct Expression
 
     Expression() { }
     virtual ~Expression() { }
+    virtual std::string toString() const = 0;
 };
 
 struct Infix : public Expression
 {
     std::string operatorStr;
+    std::string preOperatorWhitespace;
+    std::string postOperatorWhitespace;
     Expression* left;
     Expression* right;
 
     Infix();
     ~Infix();
+    virtual std::string toString() const { return "todo"; }
 };
 
 struct FunctionCall : public Expression
@@ -52,8 +57,9 @@ struct FunctionCall : public Expression
     {
     }
 
-    void addArgument(Expression* expr, std::string const& preWhitespace,
+    void addArgument(std::string const& preWhitespace, Expression* expr,
             std::string const& postWhitespace);
+    virtual std::string toString() const;
 };
 
 struct LiteralString : public Expression
@@ -63,6 +69,10 @@ struct LiteralString : public Expression
     explicit LiteralString(std::string const& _text)
       : text(_text)
     {
+    }
+    virtual std::string toString() const
+    {
+        return text;
     }
 };
 
@@ -74,6 +84,10 @@ struct LiteralFloat : public Expression
       : text(_text)
     {
     }
+    virtual std::string toString() const
+    {
+        return text;
+    }
 };
 
 struct LiteralInteger : public Expression
@@ -83,6 +97,10 @@ struct LiteralInteger : public Expression
     explicit LiteralInteger(std::string const& _text)
       : text(_text)
     {
+    }
+    virtual std::string toString() const
+    {
+        return text;
     }
 };
 
@@ -94,17 +112,34 @@ struct Identifier : public Expression
       : text(_text)
     {
     }
+    virtual std::string toString() const
+    {
+        return text;
+    }
 };
     
 
 struct Statement
 {
+    typedef std::vector<Statement*> List;
+
     std::string nameBinding;
     Expression* expression;
     std::string preEqualsWhitepace;
     std::string postEqualsWhitespace;
 
-    typedef std::vector<Statement*> List;
+    virtual std::string toString() const
+    {
+        std::string output;
+
+        if (nameBinding != "") {
+            output = nameBinding + preEqualsWhitepace + "=" + postEqualsWhitespace;
+        }
+
+        output += expression->toString();
+        
+        return output;
+    }
 };
 
 
@@ -113,6 +148,17 @@ struct StatementList
     Statement::List statements;
 
     void push(Statement* statement);
+
+    virtual std::string toString() const
+    {
+        std::stringstream output;
+
+        Statement::List::const_iterator it;
+        for (it = statements.begin(); it != statements.end(); ++it) {
+            output << (*it)->toString() << "\n";
+        }
+        return output.str();
+    }
 };
 
 

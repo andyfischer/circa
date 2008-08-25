@@ -7,6 +7,8 @@
 namespace circa {
 namespace parser {
 
+std::string possibleWhitespace(token_stream::TokenStream& tokens);
+
 ast::StatementList* statementList(token_stream::TokenStream& tokens)
 {
     ast::StatementList* sl = new ast::StatementList();
@@ -27,10 +29,17 @@ ast::Statement* statement(token_stream::TokenStream& tokens)
 {
     ast::Statement* statement = new ast::Statement();
 
+    bool isNameBinding = tokens.nextIs(tokenizer::IDENTIFIER)
+        && (tokens.nextIs(tokenizer::EQUALS, 1)
+                || (tokens.nextIs(tokenizer::WHITESPACE,1)
+                    && (tokens.nextIs(tokenizer::EQUALS,2))));
+
     // check for name binding
-    if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.nextIs(tokenizer::EQUALS, 1)) {
+    if (isNameBinding) {
         statement->nameBinding = tokens.consume(tokenizer::IDENTIFIER);
+        statement->preEqualsWhitepace = possibleWhitespace(tokens);
         tokens.consume(tokenizer::EQUALS);
+        statement->postEqualsWhitespace = possibleWhitespace(tokens);
     }
 
     statement->expression = infixExpression(tokens);
@@ -84,18 +93,27 @@ ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)
 
     std::auto_ptr<ast::FunctionCall> functionCall(new ast::FunctionCall(functionName));
 
-    if (!tokens.nextIs(tokenizer::RPAREN))
+    while (!tokens.nextIs(tokenizer::RPAREN))
     {
-        functionCall->addArgument(infixExpression(tokens), "", "");
+        std::string preWhitespace = possibleWhitespace(tokens);
+        std::auto_ptr<ast::Expression> expression(infixExpression(tokens));
+        std::string postWhitespace = possibleWhitespace(tokens);
 
-        while (tokens.nextIs(tokenizer::COMMA)) {
+        functionCall->addArgument(preWhitespace, expression.release(), postWhitespace);
+
+        if (!tokens.nextIs(tokenizer::RPAREN))
             tokens.consume(tokenizer::COMMA);
-
-            functionCall->addArgument(infixExpression(tokens), "", "");
-        }
     }
     
     return functionCall.release();
+}
+
+std::string possibleWhitespace(token_stream::TokenStream& tokens)
+{
+    if (tokens.nextIs(tokenizer::WHITESPACE))
+        return tokens.consume(tokenizer::WHITESPACE);
+    else
+        return "";
 }
 
 } // namespace parser
