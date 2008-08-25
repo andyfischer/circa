@@ -71,8 +71,8 @@ void test_to_string()
     // Build an AST programatically so that the toString function
     // can't cheat.
     ast::FunctionCall *functionCall = new ast::FunctionCall("something");
-    functionCall->addArgument(" ", new ast::LiteralString("input0"), "");
-    functionCall->addArgument("", new ast::LiteralInteger("4"), " ");
+    functionCall->addArgument(new ast::LiteralString("input0"), " ", "");
+    functionCall->addArgument(new ast::LiteralInteger("4"), "", " ");
     test_assert(functionCall->toString() == "something( \"input0\",4 )");
     delete functionCall;
 }
@@ -100,6 +100,26 @@ void create_literals()
     delete lstr;
 }
 
+void create_function_call()
+{
+    Branch branch;
+
+    ast::FunctionCall *functionCall = new ast::FunctionCall("add");
+    functionCall->addArgument(new ast::LiteralFloat("2"), "", "");
+    functionCall->addArgument(new ast::LiteralFloat("3"), "", "");
+
+    Term *term = functionCall->createTerm(&branch);
+    test_assert(as_function(term->function)->name == "add");
+
+    // make sure this term is not evaluated yet
+    test_assert(term->needsUpdate);
+
+    execute(term);
+
+    test_assert(!term->needsUpdate);
+    test_assert(as_float(term) == 5);
+}
+
 } // namespace parser_tests
 
 void register_parser_tests()
@@ -110,6 +130,7 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::name_binding_expression);
     REGISTER_TEST_CASE(parser_tests::test_to_string);
     REGISTER_TEST_CASE(parser_tests::create_literals);
+    REGISTER_TEST_CASE(parser_tests::create_function_call);
 }
 
 } // namespace circa
