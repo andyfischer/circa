@@ -7,13 +7,24 @@
 namespace circa {
 namespace parser_tests {
 
-void atoms()
+void literal_float()
 {
     token_stream::TokenStream tokens("1.0");
     ast::Expression *expr = parser::atom(tokens);
     ast::LiteralFloat *literal = dynamic_cast<ast::LiteralFloat*>(expr);
     test_assert(literal != NULL);
     test_assert(literal->text == "1.0");
+    test_assert(literal->toString() == "1.0");
+}
+
+void literal_string()
+{
+    token_stream::TokenStream tokens("\"quoted string\"");
+    ast::Expression *expr = parser::atom(tokens);
+    ast::LiteralString *literal = dynamic_cast<ast::LiteralString*>(expr);
+    test_assert(literal != NULL);
+    test_assert(literal->text == "quoted string");
+    test_assert(literal->toString() == "quoted string");
 }
 
 void function_call()
@@ -31,6 +42,7 @@ void function_call()
         dynamic_cast<ast::LiteralInteger*>(functionCall->arguments[1]->expression);
     test_assert(arg2 != NULL);
     test_assert(arg2->text == "2");
+    test_assert(functionCall->toString() == "add(1,2)");
 }
 
 void name_binding_expression()
@@ -52,7 +64,8 @@ void name_binding_expression()
 
 void register_parser_tests()
 {
-    REGISTER_TEST_CASE(parser_tests::atoms);
+    REGISTER_TEST_CASE(parser_tests::literal_float);
+    REGISTER_TEST_CASE(parser_tests::literal_string);
     REGISTER_TEST_CASE(parser_tests::function_call);
     REGISTER_TEST_CASE(parser_tests::name_binding_expression);
 }
