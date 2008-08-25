@@ -1,6 +1,8 @@
 #ifndef CIRCA__TOKEN_STREAM__INCLUDED
 #define CIRCA__TOKEN_STREAM__INCLUDED
 
+#include <set>
+
 #include "syntax_errors.h"
 #include "tokenizer.h"
 
@@ -11,6 +13,7 @@ struct TokenStream
 {
     tokenizer::TokenList tokens;
     int currentIndex;
+    std::set<const char*> skipSet;
 
     TokenStream(tokenizer::TokenList const& _tokens)
       : tokens(_tokens), currentIndex(0)
@@ -21,6 +24,28 @@ struct TokenStream
       : tokens(tokenizer::tokenize(input)), currentIndex(0)
     {
     }
+
+    /*
+    bool shouldSkip(const char* token)
+    {
+        return this->skipSet.find(token) != this->skipSet.end();
+    }
+
+    int indexAfterSkipping(int index)
+    {
+        while (true)
+        {
+            if (this->finished())
+                return index;
+
+            if (shouldSkip(tokens[index])) {
+                index++;
+            } else {
+                return index;
+            }
+        }
+    }
+    */
 
     void stripWhitespace()
     {
