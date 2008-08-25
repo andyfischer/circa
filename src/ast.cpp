@@ -18,7 +18,7 @@ Infix::~Infix()
 }
 
 void
-FunctionCall::addArgument(std::string const& preWhitespace, Expression* expr,
+FunctionCall::addArgument(Expression* expr, std::string const& preWhitespace,
             std::string const& postWhitespace)
 {
     Argument *arg = new Argument();
@@ -50,8 +50,16 @@ FunctionCall::toString() const
 Term*
 FunctionCall::createTerm(Branch* branch)
 {
-    //return apply_function(branch
-    return NULL;
+    Term* function = find_named(branch, this->functionName);
+
+    TermList inputs;
+
+    ArgumentList::const_iterator it;
+    for (it = this->arguments.begin(); it != this->arguments.end(); ++it) {
+        inputs.append((*it)->expression->createTerm(branch));
+    }
+
+    return apply_function(branch, function, inputs);
 }
 
 std::string

@@ -99,7 +99,7 @@ ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)
         std::auto_ptr<ast::Expression> expression(infixExpression(tokens));
         std::string postWhitespace = possibleWhitespace(tokens);
 
-        functionCall->addArgument(preWhitespace, expression.release(), postWhitespace);
+        functionCall->addArgument(expression.release(), preWhitespace, postWhitespace);
 
         if (!tokens.nextIs(tokenizer::RPAREN))
             tokens.consume(tokenizer::COMMA);

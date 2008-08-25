@@ -61,7 +61,7 @@ struct FunctionCall : public Expression
     {
     }
 
-    void addArgument(std::string const& preWhitespace, Expression* expr,
+    void addArgument(Expression* expr, std::string const& preWhitespace,
             std::string const& postWhitespace);
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
