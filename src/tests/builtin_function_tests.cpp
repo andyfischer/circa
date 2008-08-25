@@ -11,19 +11,19 @@ void test_math()
 {
     Branch* branch = new Branch();
 
-    Term* two = constant_int(branch, 2);
-    Term* three = constant_int(branch, 3);
-    Term* negative_one = constant_int(branch, -1);
+    Term* two = constant_float(branch, 2);
+    Term* three = constant_float(branch, 3);
+    Term* negative_one = constant_float(branch, -1);
     Term* add_f = get_global("add");
     Term* mult_f = get_global("mult");
 
-    test_assert(as_int(exec_function(branch, add_f, TermList(two,three))) == 5);
-    test_assert(as_int(exec_function(branch, add_f, TermList(two,negative_one))) == 1);
+    test_assert(as_float(exec_function(branch, add_f, TermList(two,three))) == 5);
+    test_assert(as_float(exec_function(branch, add_f, TermList(two,negative_one))) == 1);
 
-    test_assert(as_int(exec_function(branch, mult_f, TermList(two,three))) == 6);
-    test_assert(as_int(exec_function(branch, mult_f, TermList(negative_one,three))) == -3);
+    test_assert(as_float(exec_function(branch, mult_f, TermList(two,three))) == 6);
+    test_assert(as_float(exec_function(branch, mult_f, TermList(negative_one,three))) == -3);
 
-    test_assert(as_int(quick_exec_function(branch, "mult(5,3)")) == 15);
+    test_assert(as_float(quick_exec_function(branch, "mult(5,3)")) == 15);
 }
 
 void test_string()

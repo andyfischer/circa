@@ -21,32 +21,32 @@ void test_simple()
     execute(my_struct_def);
 
     my_struct_def = apply_function(branch, get_global("add-field"),
-            TermList(my_struct_def, constant_string(branch, "myInt"), get_global("int")));
+            TermList(my_struct_def, constant_string(branch, "myFloat"), FLOAT_TYPE));
     execute(my_struct_def);
     my_struct_def = apply_function(branch, get_global("add-field"),
-            TermList(my_struct_def, constant_string(branch, "myString"), get_global("string")));
+            TermList(my_struct_def, constant_string(branch, "myString"), STRING_TYPE));
     execute(my_struct_def);
 
     Term* my_instance = apply_function(branch, my_struct_def, TermList());
     execute(my_instance);
 
     my_instance = apply_function(branch, get_global("set-field"),
-            TermList(my_instance, constant_string(branch, "myInt"),
-                constant_int(branch, 2)));
+            TermList(my_instance, constant_string(branch, "myFloat"),
+                constant_float(branch, 2)));
     execute(my_instance);
     branch->bindName(my_instance, "my_instance");
 
     Term* hopefully_two = quick_exec_function(branch,
-            "hopefully-two = get-field(my_instance, 'myInt)");
+            "hopefully-two = get-field(my_instance, 'myFloat)");
 
-    test_assert(as_int(hopefully_two) == 2);
+    test_assert(as_float(hopefully_two) == 2);
 }
 
 void test_simple2()
 {
     Branch branch;
     quick_exec_function(&branch,
-        "my-struct-def = define-struct('my-struct-def, list(int, string, Subroutine))");
+        "my-struct-def = define-struct('my-struct-def, list(float, string, Subroutine))");
     Term* myinst = quick_exec_function(&branch, "my-inst = my-struct-def()");
     myinst->toString();
 }
@@ -57,28 +57,28 @@ void test_as_function_output()
 {
     Branch *branch = new Branch();
 
-    Term* return_type = quick_exec_function(branch, "define-struct('rt, list(string,int))");
+    Term* return_type = quick_exec_function(branch, "define-struct('rt, list(string,float))");
     quick_create_function(branch, "my-func", function_body_whatever,
-            TermList(INT_TYPE), return_type);
+            TermList(FLOAT_TYPE), return_type);
 
     Term* func_inst = quick_exec_function(branch, "x = my-func(5)");
 
     test_assert(func_inst->type == return_type);
     test_assert(quick_exec_function(branch, "get-index(x, 0)")->type == STRING_TYPE);
-    test_assert(quick_exec_function(branch, "get-index(x, 1)")->type == INT_TYPE);
+    test_assert(quick_exec_function(branch, "get-index(x, 1)")->type == FLOAT_TYPE);
 }
 
 void test_rename_field()
 {
     Branch *branch = new Branch();
-    quick_exec_function(branch, "s = define-struct('s, list(int,List))");
+    quick_exec_function(branch, "s = define-struct('s, list(float,List))");
     quick_exec_function(branch, "s = struct-definition-rename-field(s, 0, 'FirstField)");
     quick_exec_function(branch, "s = struct-definition-rename-field(s, 1, 'SecondField)");
     quick_exec_function(branch, "inst = s()");
     Term* firstField = quick_exec_function(branch, "get-field(inst, 'FirstField)");
 
     test_assert(firstField != NULL);
-    test_assert(firstField->type == INT_TYPE);
+    test_assert(firstField->type == FLOAT_TYPE);
 }
 
 } // namespace struct_tests
