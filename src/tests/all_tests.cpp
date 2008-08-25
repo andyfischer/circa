@@ -31,22 +31,26 @@ void run_all_tests()
 
     std::vector<TestCase>::iterator it;
     int totalTestCount = (int) gTestCases.size();
-    int numSuccess = 0;
-    int numFailure = 0;
+    int successCount = 0;
+    int failureCount = 0;
     for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
         try {
             it->execute();
-            numSuccess++;
+            successCount++;
         }
         catch (errors::CircaError &err) {
             std::cout << "Error white running test case " << it->name << std::endl;
             std::cout << err.message() << std::endl;
-            numFailure++;
+            failureCount++;
         }
     }
 
-    std::cout << "Ran " << totalTestCount << " tests, " << numSuccess <<
-        " success(es) and " << numFailure << " failure(s)." << std::endl;
+    std::string successes = successCount == 1 ? "success" : "sucesses";
+    std::string failures = failureCount == 1 ? "failure" : "failures";
+
+    std::cout << "Ran " << totalTestCount << " tests, " << successCount
+        << " " << successes << " and " << failureCount << " "
+        << failures << "." << std::endl;
 }
 
 }
