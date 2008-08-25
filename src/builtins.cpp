@@ -9,6 +9,7 @@
 #include "libraries/builtin_libraries.h"
 #include "bootstrapping.h"
 #include "branch.h"
+#include "builtins.h"
 #include "errors.h"
 #include "function.h"
 #include "operations.h"
