@@ -9,9 +9,18 @@ namespace parser {
 
 std::string possibleWhitespace(token_stream::TokenStream& tokens);
 
+Term* quick_eval_statement(Branch* branch, std::string const& input)
+{
+    token_stream::TokenStream tokens(input);
+
+    ast::Statement* statementAst = statement(tokens);
+
+    return statementAst->createTerm(branch);
+}
+
 ast::StatementList* statementList(token_stream::TokenStream& tokens)
 {
-    ast::StatementList* sl = new ast::StatementList();
+    ast::StatementList* statementList = new ast::StatementList();
 
     while (!tokens.finished()) {
         if (tokens.nextIs(tokenizer::NEWLINE)) {
@@ -19,10 +28,10 @@ ast::StatementList* statementList(token_stream::TokenStream& tokens)
             continue;
         }
 
-        sl->push(statement(tokens));
+        statementList->push(statement(tokens));
     }
 
-    return sl;
+    return statementList;
 }
 
 ast::Statement* statement(token_stream::TokenStream& tokens)

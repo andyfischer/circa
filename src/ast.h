@@ -130,20 +130,8 @@ struct Statement
     std::string preEqualsWhitepace;
     std::string postEqualsWhitespace;
 
-    virtual std::string toString() const
-    {
-        std::string output;
-
-        if (nameBinding != "") {
-            output = nameBinding + preEqualsWhitepace + "=" + postEqualsWhitespace;
-        }
-
-        output += expression->toString();
-        
-        return output;
-    }
-
-    void compile(Branch* branch);
+    virtual std::string toString() const;
+    Term* createTerm(Branch* branch);
 };
 
 struct StatementList
@@ -152,16 +140,7 @@ struct StatementList
 
     void push(Statement* statement);
 
-    virtual std::string toString() const
-    {
-        std::stringstream output;
-
-        Statement::List::const_iterator it;
-        for (it = statements.begin(); it != statements.end(); ++it) {
-            output << (*it)->toString() << "\n";
-        }
-        return output.str();
-    }
+    virtual std::string toString() const;
 };
 
 } // namespace ast

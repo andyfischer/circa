@@ -99,13 +99,29 @@ Identifier::createTerm(Branch* branch)
     return branch->getNamed(this->text);
 }
 
-void
-Statement::compile(Branch* branch)
+std::string
+Statement::toString() const
+{
+    std::string output;
+
+    if (nameBinding != "") {
+        output = nameBinding + preEqualsWhitepace + "=" + postEqualsWhitespace;
+    }
+
+    output += expression->toString();
+    
+    return output;
+}
+
+Term*
+Statement::createTerm(Branch* branch)
 {
     Term* term = this->expression->createTerm(branch);
     
     if (this->nameBinding != "")
         branch->bindName(term, this->nameBinding);
+
+    return term;
 }
 
 void
@@ -114,6 +130,17 @@ StatementList::push(Statement* statement)
     this->statements.push_back(statement);
 }
 
+std::string
+StatementList::toString() const
+{
+    std::stringstream output;
+
+    Statement::List::const_iterator it;
+    for (it = statements.begin(); it != statements.end(); ++it) {
+        output << (*it)->toString() << "\n";
+    }
+    return output.str();
+}
 
 } // namespace ast
 } // namespace circa
