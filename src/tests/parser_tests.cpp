@@ -74,6 +74,30 @@ void test_to_string()
     functionCall->addArgument(" ", new ast::LiteralString("input0"), "");
     functionCall->addArgument("", new ast::LiteralInteger("4"), " ");
     test_assert(functionCall->toString() == "something( \"input0\",4 )");
+    delete functionCall;
+}
+
+void create_literals()
+{
+    Branch branch;
+
+    ast::LiteralInteger *lint = new ast::LiteralInteger("13");
+    Term *int_t = lint->createTerm(&branch);
+    test_assert(int_t->type == INT_TYPE);
+    test_assert(as_int(int_t) == 13);
+    delete lint;
+
+    ast::LiteralFloat *lfloat = new ast::LiteralFloat("1.432");
+    Term *float_t = lfloat->createTerm(&branch);
+    test_assert(float_t->type == FLOAT_TYPE);
+    test_assert(as_float(float_t) > 1.431 && as_float(float_t) < 1.433);
+    delete lfloat;
+
+    ast::LiteralString *lstr = new ast::LiteralString("hello");
+    Term *str_t = lstr->createTerm(&branch);
+    test_assert(str_t->type == STRING_TYPE);
+    test_assert(as_string(str_t) == "hello");
+    delete lstr;
 }
 
 } // namespace parser_tests
@@ -85,6 +109,7 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::function_call);
     REGISTER_TEST_CASE(parser_tests::name_binding_expression);
     REGISTER_TEST_CASE(parser_tests::test_to_string);
+    REGISTER_TEST_CASE(parser_tests::create_literals);
 }
 
 } // namespace circa
