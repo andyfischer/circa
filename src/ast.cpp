@@ -1,7 +1,7 @@
 
 #include "common_headers.h"
 
-#include "ast.h"
+#include "circa.h"
 
 namespace circa {
 namespace ast {
@@ -45,6 +45,59 @@ FunctionCall::toString() const
     }
     output << ")";
     return output.str();
+}
+
+Term*
+FunctionCall::createTerm(Branch* branch)
+{
+    //return apply_function(branch
+    return NULL;
+}
+
+std::string
+LiteralString::toString() const
+{
+    return "\"" + this->text + "\"";
+}
+
+Term*
+LiteralString::createTerm(Branch* branch)
+{
+    return constant_string(branch, this->text);
+}
+
+Term*
+LiteralFloat::createTerm(Branch* branch)
+{
+    float value = atof(this->text.c_str());
+    return constant_float(branch, value);
+}
+
+Term*
+LiteralInteger::createTerm(Branch* branch)
+{
+    int value = atoi(this->text.c_str());
+    return constant_int(branch, value);
+}
+
+std::string
+Identifier::toString() const
+{
+    return text;
+}
+Term*
+Identifier::createTerm(Branch* branch)
+{
+    return branch->getNamed(this->text);
+}
+
+void
+Statement::compile(Branch* branch)
+{
+    Term* term = this->expression->createTerm(branch);
+    
+    if (this->nameBinding != "")
+        branch->bindName(term, this->nameBinding);
 }
 
 void
