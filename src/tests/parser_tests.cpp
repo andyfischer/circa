@@ -19,8 +19,7 @@ void atoms()
 void function_call()
 {
     token_stream::TokenStream tokens("add(1,2)");
-    ast::FunctionCall *functionCall =
-        dynamic_cast<ast::FunctionCall*>(parser::functionCall(tokens));
+    ast::FunctionCall *functionCall = parser::functionCall(tokens);
     test_assert(functionCall != NULL);
     test_assert(functionCall->functionName == "add");
 
@@ -34,12 +33,26 @@ void function_call()
     test_assert(arg2->text == "2");
 }
 
+void name_binding_expression()
+{
+    token_stream::TokenStream tokens("name=hi(2,u)");
+    ast::Statement *statement = parser::statement(tokens);
+
+    test_assert(statement->nameBinding == "name");
+
+    ast::FunctionCall *functionCall =
+        dynamic_cast<ast::FunctionCall*>(statement->expression);
+
+    test_assert(functionCall->functionName == "hi");
+}
+
 } // namespace parser_tests
 
 void register_parser_tests()
 {
     REGISTER_TEST_CASE(parser_tests::atoms);
     REGISTER_TEST_CASE(parser_tests::function_call);
+    REGISTER_TEST_CASE(parser_tests::name_binding_expression);
 }
 
 } // namespace circa

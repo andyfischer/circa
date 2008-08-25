@@ -12,6 +12,11 @@ ast::StatementList* statementList(token_stream::TokenStream& tokens)
     ast::StatementList* sl = new ast::StatementList();
 
     while (!tokens.finished()) {
+        if (tokens.nextIs(tokenizer::NEWLINE)) {
+            tokens.consume(tokenizer::NEWLINE);
+            continue;
+        }
+
         sl->push(statement(tokens));
     }
 
@@ -68,8 +73,8 @@ ast::Expression* atom(token_stream::TokenStream& tokens)
         tokens.consume(tokenizer::RPAREN);
         return expr;
     }
-    
-    return NULL;
+
+    throw syntax_errors::UnrecognizedExpression();
 }
 
 ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)
