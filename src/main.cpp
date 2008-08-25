@@ -19,7 +19,6 @@ int main(int nargs, const char * args[])
 
     if (runTests) {
         run_all_tests();
-        std::cout << "All tests finished" << std::endl;
     }
 
     try {
