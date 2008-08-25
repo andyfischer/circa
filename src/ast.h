@@ -11,12 +11,8 @@ struct Expression
 {
     typedef std::vector<Expression*> List;
 
-    Expression()
-    {
-    }
-    virtual ~Expression()
-    {
-    }
+    Expression() { }
+    virtual ~Expression() { }
 };
 
 struct Infix : public Expression
@@ -25,16 +21,8 @@ struct Infix : public Expression
     Expression* left;
     Expression* right;
 
-    Infix()
-      : left(NULL), right(NULL)
-    {
-    }
-
-    ~Infix()
-    {
-        delete left;
-        delete right;
-    }
+    Infix();
+    ~Infix();
 };
 
 struct FunctionCall : public Expression
@@ -65,14 +53,7 @@ struct FunctionCall : public Expression
     }
 
     void addArgument(Expression* expr, std::string const& preWhitespace,
-            std::string const& postWhitespace)
-    {
-        Argument *arg = new Argument();
-        arg->expression = expr;
-        arg->preWhitespace = preWhitespace;
-        arg->postWhitespace = postWhitespace;
-        this->arguments.push_back(arg);
-    }
+            std::string const& postWhitespace);
 };
 
 struct LiteralString : public Expression
@@ -131,10 +112,7 @@ struct StatementList
 {
     Statement::List statements;
 
-    void push(Statement* statement)
-    {
-        this->statements.push_back(statement);
-    }
+    void push(Statement* statement);
 };
 
 
