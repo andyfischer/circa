@@ -5,6 +5,8 @@
 #include <sstream>
 #include <vector>
 
+#include "common_headers.h"
+
 namespace circa {
 namespace ast {
 
@@ -15,6 +17,7 @@ struct Expression
     Expression() { }
     virtual ~Expression() { }
     virtual std::string toString() const = 0;
+    virtual Term* createTerm(Branch* branch) = 0;
 };
 
 struct Infix : public Expression
@@ -28,6 +31,7 @@ struct Infix : public Expression
     Infix();
     ~Infix();
     virtual std::string toString() const { return "todo"; }
+    virtual Term* createTerm(Branch* branch) { return NULL; }
 };
 
 struct FunctionCall : public Expression
@@ -60,6 +64,7 @@ struct FunctionCall : public Expression
     void addArgument(std::string const& preWhitespace, Expression* expr,
             std::string const& postWhitespace);
     virtual std::string toString() const;
+    virtual Term* createTerm(Branch* branch);
 };
 
 struct LiteralString : public Expression
@@ -70,10 +75,8 @@ struct LiteralString : public Expression
       : text(_text)
     {
     }
-    virtual std::string toString() const
-    {
-        return text;
-    }
+    virtual std::string toString() const;
+    virtual Term* createTerm(Branch* branch);
 };
 
 struct LiteralFloat : public Expression
@@ -88,6 +91,7 @@ struct LiteralFloat : public Expression
     {
         return text;
     }
+    virtual Term* createTerm(Branch* branch);
 };
 
 struct LiteralInteger : public Expression
@@ -102,6 +106,7 @@ struct LiteralInteger : public Expression
     {
         return text;
     }
+    virtual Term* createTerm(Branch* branch);
 };
 
 struct Identifier : public Expression
@@ -112,10 +117,8 @@ struct Identifier : public Expression
       : text(_text)
     {
     }
-    virtual std::string toString() const
-    {
-        return text;
-    }
+    virtual std::string toString() const;
+    virtual Term* createTerm(Branch* branch);
 };
 
 struct Statement
@@ -139,6 +142,8 @@ struct Statement
         
         return output;
     }
+
+    void compile(Branch* branch);
 };
 
 struct StatementList
