@@ -60,6 +60,14 @@ ast::Statement* statement(token_stream::TokenStream& tokens)
         statement->postEqualsWhitespace = possibleWhitespace(tokens);
     }
 
+    // check for return statement
+    else if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.next().text == "return") {
+        tokens.consume(tokenizer::IDENTIFIER);
+        statement->nameBinding = "#output";
+        statement->preEqualsWhitepace = "";
+        statement->postEqualsWhitespace = possibleWhitespace(tokens);
+    }
+
     statement->expression = infixExpression(tokens);
 
     return statement;
@@ -122,6 +130,8 @@ ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)
         if (!tokens.nextIs(tokenizer::RPAREN))
             tokens.consume(tokenizer::COMMA);
     }
+
+    tokens.consume(tokenizer::RPAREN);
     
     return functionCall.release();
 }

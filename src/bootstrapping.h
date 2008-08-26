@@ -8,9 +8,6 @@
 
 namespace circa {
 
-Term* quick_eval_function(Branch* branch, std::string input);
-Term* quick_exec_function(Branch* branch, std::string input);
-
 // Create a new Type with the given properties. Also binds the name.
 Term* quick_create_type(
         Branch* branch,

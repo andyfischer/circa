@@ -23,14 +23,14 @@ void test_math()
     test_assert(as_float(exec_function(branch, mult_f, TermList(two,three))) == 6);
     test_assert(as_float(exec_function(branch, mult_f, TermList(negative_one,three))) == -3);
 
-    test_assert(as_float(quick_exec_function(branch, "mult(5.0,3.0)")) == 15);
+    test_assert(as_float(parser::quick_exec_statement(branch, "mult(5.0,3.0)")) == 15);
 }
 
 void test_string()
 {
     Branch* branch = new Branch();
 
-    test_assert(as_string(quick_exec_function(branch, "concat(\"hello \", \"world\")"))
+    test_assert(as_string(parser::quick_exec_statement(branch, "concat(\"hello \", \"world\")"))
             == "hello world");
 }
 
@@ -38,8 +38,8 @@ void test_bool()
 {
     Branch* branch = new Branch();
 
-    test_assert(as_string(quick_exec_function(branch, "if-expr(true, 'a, 'b)")) == "a");
-    test_assert(as_string(quick_exec_function(branch, "if-expr(false, 'a, 'b)")) == "b");
+    test_assert(as_string(parser::quick_exec_statement(branch, "if-expr(true, 'a, 'b)")) == "a");
+    test_assert(as_string(parser::quick_exec_statement(branch, "if-expr(false, 'a, 'b)")) == "b");
 }
 
 } // namespace builtin_function_tests
