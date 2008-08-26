@@ -106,18 +106,33 @@ struct Identifier : public Expression
     virtual Term* createTerm(Branch* branch);
 };
 
-struct Statement
-{
+struct Statement {
     typedef std::vector<Statement*> List;
 
+    virtual std::string toString() const = 0;
+    virtual Term* createTerm(Branch* branch) = 0;
+};
+
+struct ExpressionStatement : public Statement
+{
     std::string nameBinding;
     Expression* expression;
     std::string preEqualsWhitepace;
     std::string postEqualsWhitespace;
 
     virtual std::string toString() const;
-    Term* createTerm(Branch* branch);
+    virtual Term* createTerm(Branch* branch);
 };
+
+// 'IgnorableStatement' includes comments and blank lines
+struct IgnorableStatement : public Statement
+{
+    std::string text;
+
+    virtual std::string toString() const { return text; }
+    virtual Term* createTerm(Branch* branch) { return NULL; }
+};
+
 
 struct StatementList
 {

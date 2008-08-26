@@ -12,6 +12,7 @@ Term* quick_exec_statement(Branch* branch, std::string const& input);
 
 ast::StatementList* statementList(token_stream::TokenStream& tokens);
 ast::Statement* statement(token_stream::TokenStream& tokens);
+ast::ExpressionStatement* expressionStatement(token_stream::TokenStream& tokens);
 ast::Expression* infixExpression(token_stream::TokenStream& tokens);
 ast::Expression* atom(token_stream::TokenStream& tokens);
 ast::FunctionCall* functionCall(token_stream::TokenStream& tokens);

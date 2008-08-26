@@ -65,7 +65,7 @@ struct TokenStream
 
     tokenizer::TokenInstance const& next(int lookahead=0) const
     {
-        int i = currentIndex + lookahead;
+        int i = this->currentIndex + lookahead;
 
         if (i >= tokens.size())
             throw syntax_errors::SyntaxError("Unexpected EOF");
@@ -75,13 +75,17 @@ struct TokenStream
 
     bool nextIs(const char * match, int lookahead=0) const
     {
+        if ((this->currentIndex + lookahead) >= tokens.size())
+            return false;
+            
         return next(lookahead).match == match;
     }
 
     std::string consume(const char * match = NULL)
     {
         if (finished())
-            throw syntax_errors::SyntaxError("Unexpected EOF");
+            throw syntax_errors::SyntaxError(
+                    std::string("Unexpected EOF while looking for ") + match);
 
         if ((match != NULL) && next().match != match)
             throw syntax_errors::UnexpectedToken(match, next().match, next().text.c_str());

@@ -44,7 +44,20 @@ ast::StatementList* statementList(token_stream::TokenStream& tokens)
 
 ast::Statement* statement(token_stream::TokenStream& tokens)
 {
-    ast::Statement* statement = new ast::Statement();
+    // toss leading whitespace
+    possibleWhitespace(tokens);
+
+    if (tokens.nextIs(tokenizer::NEWLINE)) {
+        tokens.consume(tokenizer::NEWLINE);
+        return new ast::IgnorableStatement();
+    }
+
+    return expressionStatement(tokens);
+}
+
+ast::ExpressionStatement* expressionStatement(token_stream::TokenStream& tokens)
+{
+    ast::ExpressionStatement* statement = new ast::ExpressionStatement();
 
     bool isNameBinding = tokens.nextIs(tokenizer::IDENTIFIER)
         && (tokens.nextIs(tokenizer::EQUALS, 1)

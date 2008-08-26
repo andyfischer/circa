@@ -52,7 +52,7 @@ void function_call()
 void name_binding_expression()
 {
     token_stream::TokenStream tokens("name = hi(2,u)");
-    ast::Statement *statement = parser::statement(tokens);
+    ast::ExpressionStatement *statement = parser::expressionStatement(tokens);
 
     test_assert(statement->nameBinding == "name");
 
