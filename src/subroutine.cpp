@@ -1,12 +1,5 @@
 
-#include "bootstrapping.h"
-#include "branch.h"
-#include "builtins.h"
-#include "errors.h"
-#include "operations.h"
-#include "structs.h"
-#include "subroutine.h"
-#include "term.h"
+#include "circa.h"
 
 namespace circa {
 
@@ -251,7 +244,7 @@ void subroutine_eval__evaluate(Term* caller)
     Subroutine *sub = as_subroutine(caller);
     std::string s = as_string(caller->inputs[1]);
 
-    quick_eval_function(sub->branch, s);
+    parser::quick_eval_statement(sub->branch, s);
 }
 
 void initialize_subroutine(Branch* kernel)
