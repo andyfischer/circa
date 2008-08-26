@@ -56,7 +56,9 @@ FunctionCall::createTerm(Branch* branch)
 
     ArgumentList::const_iterator it;
     for (it = this->arguments.begin(); it != this->arguments.end(); ++it) {
-        inputs.append((*it)->expression->createTerm(branch));
+        Term* term = (*it)->expression->createTerm(branch);
+        assert(term != NULL);
+        inputs.append(term);
     }
 
     return apply_function(branch, function, inputs);
@@ -96,7 +98,7 @@ Identifier::toString() const
 Term*
 Identifier::createTerm(Branch* branch)
 {
-    return branch->getNamed(this->text);
+    return find_named(branch,this->text);
 }
 
 std::string

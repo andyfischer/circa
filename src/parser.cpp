@@ -1,6 +1,7 @@
 
 #include "common_headers.h"
 
+#include "circa.h"
 #include "tokenizer.h"
 #include "parser.h"
 
@@ -17,6 +18,14 @@ Term* quick_eval_statement(Branch* branch, std::string const& input)
 
     return statementAst->createTerm(branch);
 }
+
+Term* quick_exec_statement(Branch* branch, std::string const& input)
+{
+    Term* term = quick_eval_statement(branch, input);
+    execute(term);
+    return term;
+}
+
 
 ast::StatementList* statementList(token_stream::TokenStream& tokens)
 {
