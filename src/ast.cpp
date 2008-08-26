@@ -102,7 +102,7 @@ Identifier::createTerm(Branch* branch)
 }
 
 std::string
-Statement::toString() const
+ExpressionStatement::toString() const
 {
     std::string output;
 
@@ -116,7 +116,7 @@ Statement::toString() const
 }
 
 Term*
-Statement::createTerm(Branch* branch)
+ExpressionStatement::createTerm(Branch* branch)
 {
     Term* term = this->expression->createTerm(branch);
     
