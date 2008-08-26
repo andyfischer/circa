@@ -1,13 +1,8 @@
 
-#include "common_headers.h"
 
-#include "bootstrapping.h"
-#include "branch.h"
-#include "builtins.h"
+#include "common_headers.h"
 #include "common.h"
-#include "errors.h"
-#include "operations.h"
-#include "subroutine.h"
+#include "circa.h"
 
 namespace circa {
 namespace struct_tests {
@@ -36,7 +31,7 @@ void test_simple()
     execute(my_instance);
     branch->bindName(my_instance, "my_instance");
 
-    Term* hopefully_two = quick_exec_function(branch,
+    Term* hopefully_two = parser::quick_exec_statement(branch,
             "hopefully-two = get-field(my_instance, 'myFloat)");
 
     test_assert(as_float(hopefully_two) == 2);
@@ -45,9 +40,9 @@ void test_simple()
 void test_simple2()
 {
     Branch branch;
-    quick_exec_function(&branch,
+    parser::quick_exec_statement(&branch,
         "my-struct-def = define-struct('my-struct-def, list(float, string, Subroutine))");
-    Term* myinst = quick_exec_function(&branch, "my-inst = my-struct-def()");
+    Term* myinst = parser::quick_exec_statement(&branch, "my-inst = my-struct-def()");
     myinst->toString();
 }
 
@@ -57,25 +52,25 @@ void test_as_function_output()
 {
     Branch *branch = new Branch();
 
-    Term* return_type = quick_exec_function(branch, "define-struct('rt, list(string,float))");
+    Term* return_type = parser::quick_exec_statement(branch, "define-struct('rt, list(string,float))");
     quick_create_function(branch, "my-func", function_body_whatever,
             TermList(FLOAT_TYPE), return_type);
 
-    Term* func_inst = quick_exec_function(branch, "x = my-func(5)");
+    Term* func_inst = parser::quick_exec_statement(branch, "x = my-func(5)");
 
     test_assert(func_inst->type == return_type);
-    test_assert(quick_exec_function(branch, "get-index(x, 0)")->type == STRING_TYPE);
-    test_assert(quick_exec_function(branch, "get-index(x, 1)")->type == FLOAT_TYPE);
+    test_assert(parser::quick_exec_statement(branch, "get-index(x, 0)")->type == STRING_TYPE);
+    test_assert(parser::quick_exec_statement(branch, "get-index(x, 1)")->type == FLOAT_TYPE);
 }
 
 void test_rename_field()
 {
     Branch *branch = new Branch();
-    quick_exec_function(branch, "s = define-struct('s, list(float,List))");
-    quick_exec_function(branch, "s = struct-definition-rename-field(s, 0, 'FirstField)");
-    quick_exec_function(branch, "s = struct-definition-rename-field(s, 1, 'SecondField)");
-    quick_exec_function(branch, "inst = s()");
-    Term* firstField = quick_exec_function(branch, "get-field(inst, 'FirstField)");
+    parser::quick_exec_statement(branch, "s = define-struct('s, list(float,List))");
+    parser::quick_exec_statement(branch, "s = struct-definition-rename-field(s, 0, 'FirstField)");
+    parser::quick_exec_statement(branch, "s = struct-definition-rename-field(s, 1, 'SecondField)");
+    parser::quick_exec_statement(branch, "inst = s()");
+    Term* firstField = parser::quick_exec_statement(branch, "get-field(inst, 'FirstField)");
 
     test_assert(firstField != NULL);
     test_assert(firstField->type == FLOAT_TYPE);
