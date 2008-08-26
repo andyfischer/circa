@@ -26,7 +26,6 @@ Term* quick_exec_statement(Branch* branch, std::string const& input)
     return term;
 }
 
-
 ast::StatementList* statementList(token_stream::TokenStream& tokens)
 {
     ast::StatementList* statementList = new ast::StatementList();
@@ -109,7 +108,7 @@ ast::Expression* atom(token_stream::TokenStream& tokens)
         return expr;
     }
 
-    throw syntax_errors::UnrecognizedExpression();
+    throw syntax_errors::SyntaxError("Unrecognized expression", &tokens.next());
 }
 
 ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)

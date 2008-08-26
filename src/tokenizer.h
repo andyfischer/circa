@@ -10,6 +10,10 @@ struct TokenInstance
 {
     const char * match;
     std::string text;
+    int line;
+    int character;
+
+    TokenInstance() : match(NULL), line(0), character(0) {}
 };
 
 typedef std::vector<TokenInstance> TokenList;

@@ -68,7 +68,7 @@ struct TokenStream
         int i = currentIndex + lookahead;
 
         if (i >= tokens.size())
-            throw syntax_errors::UnexpectedEOF();
+            throw syntax_errors::SyntaxError("Unexpected EOF");
 
         return tokens[i];
     }
@@ -81,7 +81,7 @@ struct TokenStream
     std::string consume(const char * match = NULL)
     {
         if (finished())
-            throw syntax_errors::UnexpectedEOF();
+            throw syntax_errors::SyntaxError("Unexpected EOF");
 
         if ((match != NULL) && next().match != match)
             throw syntax_errors::UnexpectedToken(match, next().match, next().text.c_str());

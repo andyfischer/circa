@@ -2,6 +2,7 @@
 #define CIRCA__COMON_HEADERS__INCLUDED
 
 #include <exception>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>

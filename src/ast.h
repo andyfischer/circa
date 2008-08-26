@@ -56,10 +56,7 @@ struct FunctionCall : public Expression
     std::string functionName;
     ArgumentList arguments;
 
-    explicit FunctionCall(std::string const& _name)
-      : functionName(_name)
-    {
-    }
+    explicit FunctionCall(std::string const& _name) : functionName(_name) { }
 
     void addArgument(Expression* expr, std::string const& preWhitespace,
             std::string const& postWhitespace);
@@ -71,10 +68,7 @@ struct LiteralString : public Expression
 {
     std::string text;
 
-    explicit LiteralString(std::string const& _text)
-      : text(_text)
-    {
-    }
+    explicit LiteralString(std::string const& _text) : text(_text) { }
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
 };
@@ -83,10 +77,7 @@ struct LiteralFloat : public Expression
 {
     std::string text;
 
-    explicit LiteralFloat(std::string const& _text)
-      : text(_text)
-    {
-    }
+    explicit LiteralFloat(std::string const& _text) : text(_text) { }
     virtual std::string toString() const
     {
         return text;
@@ -98,10 +89,7 @@ struct LiteralInteger : public Expression
 {
     std::string text;
 
-    explicit LiteralInteger(std::string const& _text)
-      : text(_text)
-    {
-    }
+    explicit LiteralInteger(std::string const& _text) : text(_text) { }
     virtual std::string toString() const
     {
         return text;
@@ -113,10 +101,7 @@ struct Identifier : public Expression
 {
     std::string text;
 
-    explicit Identifier(std::string const& _text)
-      : text(_text)
-    {
-    }
+    explicit Identifier(std::string const& _text) : text(_text) { }
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
 };
