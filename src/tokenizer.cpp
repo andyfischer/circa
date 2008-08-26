@@ -21,10 +21,12 @@ struct TokenizeContext
 {
     std::string const &input;
     int nextIndex;
+    int linePosition;
+    int charPosition;
     std::vector<TokenInstance> &results;
 
     TokenizeContext(std::string const &_input, std::vector<TokenInstance> &_results)
-        : input(_input), results(_results), nextIndex(0)
+        : input(_input), results(_results), nextIndex(0), linePosition(1), charPosition(0)
     {
     }
 
@@ -40,6 +42,13 @@ struct TokenizeContext
 
         char c = next();
         nextIndex++;
+
+        if (c == '\n') {
+            this->linePosition++;
+            this->charPosition = 0;
+        } else
+            this->charPosition++;
+
         return c;
     }
 
@@ -51,6 +60,12 @@ struct TokenizeContext
         TokenInstance instance;
         instance.match = match;
         instance.text = text;
+
+        instance.line = this->linePosition;
+
+        // I think this will give us the last character of the word. Will fix.
+        instance.character = this->charPosition;
+
         results.push_back(instance);
     }
 };

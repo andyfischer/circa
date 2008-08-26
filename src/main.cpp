@@ -6,9 +6,22 @@
 
 using namespace circa;
 
-void run()
+Branch* evaluate_file(std::string const& filename)
 {
+    Branch *branch = new Branch();
 
+    std::ifstream file(filename.c_str());
+
+    while (!file.eof()) {
+        std::string line;
+        std::getline(file,line);
+        token_stream::TokenStream tokens(line);
+        ast::Statement *statement = parser::statement(tokens);
+        statement->createTerm(branch);
+        delete statement;
+    }
+
+    return branch;
 }
 
 int main(int nargs, const char * args[])
@@ -22,7 +35,13 @@ int main(int nargs, const char * args[])
     }
 
     try {
-        run();
+
+        if (nargs > 1) {
+            Branch* branch = evaluate_file(args[1]);
+            execute_branch(branch);
+            delete branch;
+        }
+
     } catch (errors::CircaError &err)
     {
         std::cout << "Top level error:\n";

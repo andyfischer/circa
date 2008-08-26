@@ -6,41 +6,24 @@
 #include "errors.h"
 
 namespace circa {
+
+namespace tokenizer { class TokenInstance; }
+
 namespace syntax_errors {
 
-class ParseError : public circa::errors::CircaError
+class SyntaxError : public circa::errors::CircaError
 {
 public:
-    ParseError(std::string const& message) throw()
-      : circa::errors::CircaError(message)
-    {
-    }
+    SyntaxError(std::string const& message,
+            tokenizer::TokenInstance const* location = NULL) throw();
 };
 
-class UnexpectedToken : public ParseError
+class UnexpectedToken : public SyntaxError
 {
 public:
     UnexpectedToken(const char* expected, const char* found, const char* foundText) throw()
-        : ParseError(std::string("Expected: ") + expected + ", found: " + found
+        : SyntaxError(std::string("Expected: ") + expected + ", found: " + found
                + " (" + foundText + ")")
-    {
-    }
-};
-
-class UnexpectedEOF : public ParseError
-{
-public:
-    UnexpectedEOF() throw()
-      : ParseError("Unexpected EOF")
-    {
-    }
-};
-
-class UnrecognizedExpression : public ParseError
-{
-public:
-    UnrecognizedExpression() throw()
-      : ParseError("Unrecognized expression")
     {
     }
 };
