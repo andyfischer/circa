@@ -3,6 +3,7 @@
 
 #include "tests/common.h"
 #include "tokenizer.h"
+#include "token_stream.h"
 #include "errors.h"
 
 namespace token = circa::tokenizer;
@@ -77,6 +78,15 @@ void test_string_literal()
     test_assert(results[0].match == token::STRING);
 }
 
+void test_token_stream()
+{
+    token_stream::TokenStream tstream("1 2.0");
+
+    test_assert(tstream.nextIs(tokenizer::INTEGER));
+    test_assert(tstream.nextIs(tokenizer::WHITESPACE, 1));
+    test_assert(tstream.nextNonWhitespaceIs(tokenizer::FLOAT, 1));
+}
+
 } // namespace tokenizer_tests
 
 void register_tokenizer_tests()
@@ -85,6 +95,7 @@ void register_tokenizer_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_integers);
     REGISTER_TEST_CASE(tokenizer_tests::test_symbols);
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
+    REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
 }
 
 } // namespace circa
