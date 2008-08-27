@@ -21,11 +21,7 @@ public:
 class UnexpectedToken : public SyntaxError
 {
 public:
-    UnexpectedToken(const char* expected, const char* found, const char* foundText) throw()
-        : SyntaxError(std::string("Expected: ") + expected + ", found: " + found
-               + " (" + foundText + ")")
-    {
-    }
+    UnexpectedToken(int expected, int found, std::string const& foundText) throw();
 };
 
 } // namespace syntax_errors

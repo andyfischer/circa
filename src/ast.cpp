@@ -6,15 +6,40 @@
 namespace circa {
 namespace ast {
 
-Infix::Infix()
-  : left(NULL), right(NULL)
-{
-}
-
 Infix::~Infix()
 {
     delete left;
     delete right;
+}
+
+std::string
+Infix::toString() const
+{
+    if (left == NULL) return "<error, left is NULL>";
+    if (right == NULL) return "<error, right is NULL>";
+    return this->left->toString() + this->preOperatorWhitespace + this->operatorStr
+        + this->postOperatorWhitespace + this->right->toString();
+}
+Term*
+Infix::createTerm(Branch* branch)
+{
+    // special case: right arrow
+    if (this->operatorStr == "->") {
+        Term* leftTerm = this->left->createTerm(branch);
+
+        Identifier *rightIdent = dynamic_cast<Identifier*>(this->right);
+
+        if (rightIdent == NULL) {
+            throw syntax_errors::SyntaxError("Right side of -> must be an identifier");
+        }
+
+        Term* function = find_named(branch, rightIdent->text);
+
+        return apply_function(branch, function, TermList(leftTerm));
+    }
+
+    // todo
+    throw syntax_errors::SyntaxError("Infix is unimplemented");
 }
 
 void

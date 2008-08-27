@@ -28,10 +28,11 @@ struct Infix : public Expression
     Expression* left;
     Expression* right;
 
-    Infix();
+    Infix(std::string const& _operatorStr, Expression* _left, Expression* _right)
+        : operatorStr(_operatorStr), left(_left), right(_right) {}
     ~Infix();
-    virtual std::string toString() const { return "todo"; }
-    virtual Term* createTerm(Branch* branch) { return NULL; }
+    virtual std::string toString() const;
+    virtual Term* createTerm(Branch* branch);
 };
 
 struct FunctionCall : public Expression

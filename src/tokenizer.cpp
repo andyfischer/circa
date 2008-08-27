@@ -4,18 +4,40 @@
 namespace circa {
 namespace tokenizer {
 
-const char * LPAREN = "LPAREN";
-const char * RPAREN = "RPAREN";
-const char * COMMA = "COMMA";
-const char * EQUALS = "EQUALS";
-const char * IDENTIFIER = "IDENTIFIER";
-const char * INTEGER = "INTEGER";
-const char * FLOAT = "FLOAT";
-const char * STRING = "STRING";
-const char * QUOTED_IDENTIFIER = "QUOTED_IDENTIFIER";
-const char * WHITESPACE = "WHITESPACE";
-const char * NEWLINE = "NEWLINE";
-const char * UNRECOGNIZED = "UNRECOGNIZED";
+const char* getMatchText(int match)
+{
+    switch (match) {
+        case LPAREN: return "(";
+        case RPAREN: return ")";
+        case COMMA: return ",";
+        case IDENTIFIER: return "IDENTIFIER";
+        case INTEGER: return "INTEGER";
+        case FLOAT: return "FLOAT";
+        case STRING: return "STRING";
+        case QUOTED_IDENTIFIER: return "QUOTED_IDENTIFIER";
+        case DOT: return ".";
+        case STAR: return "*";
+        case SLASH: return "/";
+        case PLUS: return "+";
+        case MINUS: return "-";
+        case LTHAN: return "<";
+        case LTHANEQ: return "<=";
+        case GTHAN: return ">";
+        case GTHANEQ: return ">=";
+        case DOUBLE_EQUALS: return "==";
+        case NOT_EQUALS: return "!=";
+        case EQUALS: return "=";
+        case PLUS_EQUALS: return "+=";
+        case MINUS_EQUALS: return "-=";
+        case STAR_EQUALS: return "*=";
+        case SLASH_EQUALS: return "/=";
+        case RIGHT_ARROW: return "->";
+        case WHITESPACE: return "WHITESPACE";
+        case NEWLINE: return "NEWLINE";
+        case UNRECOGNIZED: return "UNRECOGNIZED";
+        default: return "NOT FOUND";
+    }
+}
 
 struct TokenizeContext
 {
@@ -56,7 +78,10 @@ struct TokenizeContext
         return nextIndex >= input.length();
     }
 
-    void pushResult(const char * match, std::string text) {
+    void pushResult(int match, std::string text = "") {
+        if (text == "")
+            text = getMatchText(match);
+
         TokenInstance instance;
         instance.match = match;
         instance.text = text;
@@ -146,7 +171,14 @@ void top_level_consume_token(TokenizeContext &context)
             return;
         case '=':
             context.consume();
-            context.pushResult(EQUALS, "=");
+
+            if (context.next() == '=') {
+                context.consume();
+                context.pushResult(DOUBLE_EQUALS);
+                return;
+            } 
+
+            context.pushResult(EQUALS);
             return;
         case '"':
             consume_string_literal(context);
@@ -157,6 +189,42 @@ void top_level_consume_token(TokenizeContext &context)
         case '\n':
             context.consume();
             context.pushResult(NEWLINE, "\n");
+            return;
+        case '.':
+            context.consume();
+            context.pushResult(DOT);
+            return;
+        case '*':
+            context.consume();
+            if (context.next() == '=') {
+                context.consume();
+                context.pushResult(STAR_EQUALS);
+                return;
+            }
+
+            context.pushResult(STAR);
+            return;
+        case '/':
+            context.consume();
+            if (context.next() == '=') {
+                context.consume();
+                context.pushResult(SLASH_EQUALS);
+                return;
+            }
+            context.pushResult(SLASH);
+            return;
+        case '+':
+            context.consume();
+            context.pushResult(PLUS);
+            return;
+        case '-':
+            context.consume();
+            if (context.next() == '>') {
+                context.consume();
+                context.pushResult(RIGHT_ARROW);
+                return;
+            }
+            context.pushResult(MINUS);
             return;
     }
 

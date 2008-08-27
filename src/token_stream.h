@@ -73,7 +73,7 @@ struct TokenStream
         return tokens[i];
     }
 
-    bool nextIs(const char * match, int lookahead=0) const
+    bool nextIs(int match, int lookahead=0) const
     {
         if ((this->currentIndex + lookahead) >= tokens.size())
             return false;
@@ -81,13 +81,13 @@ struct TokenStream
         return next(lookahead).match == match;
     }
 
-    std::string consume(const char * match = NULL)
+    std::string consume(int match = -1)
     {
         if (finished())
             throw syntax_errors::SyntaxError(
-                    std::string("Unexpected EOF while looking for ") + match);
+                    std::string("Unexpected EOF while looking for ") + tokenizer::getMatchText(match));
 
-        if ((match != NULL) && next().match != match)
+        if ((match != -1) && next().match != match)
             throw syntax_errors::UnexpectedToken(match, next().match, next().text.c_str());
 
         return tokens[currentIndex++].text;
