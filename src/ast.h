@@ -141,6 +141,7 @@ struct StatementList
     void push(Statement* statement);
 
     virtual std::string toString() const;
+    void createTerms(Branch* branch);
 };
 
 } // namespace ast
