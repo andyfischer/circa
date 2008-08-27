@@ -26,7 +26,7 @@ struct TokenizeContext
     std::vector<TokenInstance> &results;
 
     TokenizeContext(std::string const &_input, std::vector<TokenInstance> &_results)
-        : input(_input), results(_results), nextIndex(0), linePosition(1), charPosition(0)
+        : input(_input), results(_results), nextIndex(0), linePosition(1), charPosition(1)
     {
     }
 
@@ -45,7 +45,7 @@ struct TokenizeContext
 
         if (c == '\n') {
             this->linePosition++;
-            this->charPosition = 0;
+            this->charPosition = 1;
         } else
             this->charPosition++;
 
@@ -153,6 +153,10 @@ void top_level_consume_token(TokenizeContext &context)
             return;
         case '\'':
             consume_quoted_identifier(context);
+            return;
+        case '\n':
+            context.consume();
+            context.pushResult(NEWLINE, "\n");
             return;
     }
 
