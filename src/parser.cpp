@@ -47,8 +47,9 @@ ast::Statement* statement(token_stream::TokenStream& tokens)
     // toss leading whitespace
     possibleWhitespace(tokens);
 
-    if (tokens.nextIs(tokenizer::NEWLINE)) {
-        tokens.consume(tokenizer::NEWLINE);
+    if (tokens.nextIs(tokenizer::NEWLINE) || tokens.finished()) {
+        if (tokens.nextIs(tokenizer::NEWLINE))
+            tokens.consume(tokenizer::NEWLINE);
         return new ast::IgnorableStatement();
     }
 

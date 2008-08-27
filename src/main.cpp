@@ -10,16 +10,17 @@ Branch* evaluate_file(std::string const& filename)
 {
     Branch *branch = new Branch();
 
-    std::ifstream file(filename.c_str());
+    Branch temp_branch;
+    temp_branch.bindName(constant_string(&temp_branch, filename), "filename");
+    std::string file_contents = as_string(parser::quick_exec_statement(&temp_branch,
+                "read-text-file(filename)"));
 
-    while (!file.eof()) {
-        std::string line;
-        std::getline(file,line);
-        token_stream::TokenStream tokens(line);
-        ast::Statement *statement = parser::statement(tokens);
-        statement->createTerm(branch);
-        delete statement;
-    }
+    token_stream::TokenStream tokens(file_contents);
+    ast::StatementList *statementList = parser::statementList(tokens);
+
+    statementList->createTerms(branch);
+
+    delete statementList;
 
     return branch;
 }
@@ -30,7 +31,7 @@ int main(int nargs, const char * args[])
 
     bool runTests = true;
 
-    if (runTests) {
+    if (nargs == 1) {
         run_all_tests();
     }
 

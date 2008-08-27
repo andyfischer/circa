@@ -144,5 +144,14 @@ StatementList::toString() const
     return output.str();
 }
 
+void
+StatementList::createTerms(Branch* branch)
+{
+    Statement::List::const_iterator it;
+    for (it = statements.begin(); it != statements.end(); ++it) {
+        (*it)->createTerm(branch);
+    }
+}
+
 } // namespace ast
 } // namespace circa
