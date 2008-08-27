@@ -86,10 +86,61 @@ ast::ExpressionStatement* expressionStatement(token_stream::TokenStream& tokens)
     return statement;
 }
 
-ast::Expression* infixExpression(token_stream::TokenStream& tokens)
+int getInfixPrecedence(int match)
 {
-    // Todo: handle infix expressions
-    return atom(tokens);
+    switch(match) {
+        case tokenizer::DOT:
+            return 7;
+        case tokenizer::STAR:
+        case tokenizer::SLASH:
+            return 6;
+        case tokenizer::PLUS:
+        case tokenizer::MINUS:
+            return 5;
+        case tokenizer::LTHAN:
+        case tokenizer::LTHANEQ:
+        case tokenizer::GTHAN:
+        case tokenizer::GTHANEQ:
+        case tokenizer::DOUBLE_EQUALS:
+        case tokenizer::NOT_EQUALS:
+            return 3;
+        case tokenizer::EQUALS:
+        case tokenizer::PLUS_EQUALS:
+        case tokenizer::MINUS_EQUALS:
+        case tokenizer::STAR_EQUALS:
+        case tokenizer::SLASH_EQUALS:
+            return 2;
+        case tokenizer::RIGHT_ARROW:
+            return 1;
+        default:
+            return -1;
+    }
+}
+
+#define HIGHEST_INFIX_PRECEDENCE 7
+
+ast::Expression* infixExpression(token_stream::TokenStream& tokens,
+        int precedence)
+{
+    if (precedence > HIGHEST_INFIX_PRECEDENCE)
+        return atom(tokens);
+
+    ast::Expression* leftExpr = infixExpression(tokens, precedence+1);
+
+    while (!tokens.finished() && getInfixPrecedence(tokens.next().match) == precedence) {
+
+        possibleWhitespace(tokens);
+
+        std::string operatorStr = tokens.consume();
+
+        possibleWhitespace(tokens);
+
+        ast::Expression* rightExpr = infixExpression(tokens, precedence+1);
+
+        leftExpr = new ast::Infix(operatorStr, leftExpr, rightExpr);
+    }
+
+    return leftExpr;
 }
 
 ast::Expression* atom(token_stream::TokenStream& tokens)

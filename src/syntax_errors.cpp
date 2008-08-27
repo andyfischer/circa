@@ -17,5 +17,12 @@ SyntaxError::SyntaxError(std::string const& message,
     }
 }
 
+UnexpectedToken::UnexpectedToken(int expected, int found, std::string const& foundText) throw()
+    : SyntaxError(std::string("Expected: ") + tokenizer::getMatchText(expected) + ", found: " + tokenizer::getMatchText(found)
+           + " (" + foundText + ")")
+{
+}
+
+
 } // namespace circa
 } // namespace syntax_errors
