@@ -127,9 +127,9 @@ ast::Expression* infixExpression(token_stream::TokenStream& tokens,
 
     ast::Expression* leftExpr = infixExpression(tokens, precedence+1);
 
-    while (!tokens.finished() && getInfixPrecedence(tokens.next().match) == precedence) {
+    possibleWhitespace(tokens);
 
-        possibleWhitespace(tokens);
+    while (!tokens.finished() && getInfixPrecedence(tokens.next().match) == precedence) {
 
         std::string operatorStr = tokens.consume();
 
