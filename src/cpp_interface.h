@@ -19,9 +19,9 @@ void templated_dealloc(Term* term)
 }
 
 template <class T>
-void templated_copy(Term* source, Term* dest)
+void templated_duplicate(Term* source, Term* dest)
 {
-    *(reinterpret_cast<T*>(dest->value)) = *(reinterpret_cast<T*>(source->value));
+    dest->value = new T(*(reinterpret_cast<T*>(source->value)));
 }
 
 } // namespace cpp_interface
@@ -34,7 +34,7 @@ Term* quick_create_cpp_type(Branch* branch, std::string name)
     return quick_create_type(branch, name,
         cpp_interface::templated_alloc<T>,
         cpp_interface::templated_dealloc<T>,
-        cpp_interface::templated_copy<T>,
+        cpp_interface::templated_duplicate<T>,
         NULL);
 }
 

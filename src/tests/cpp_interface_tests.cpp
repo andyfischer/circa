@@ -6,23 +6,21 @@
 #include "parser.h"
 #include "tests/common.h"
 
-class MyDumbType {
+class Type1 {
 public:
-    static int timesConstructorCalled;
-    static int timesDestructorCalled;
+    static int instanceCount;
 
     std::string hi;
 
-    MyDumbType() {
-        timesConstructorCalled++;
+    Type1() {
+        instanceCount++;
     }
-    ~MyDumbType() {
-        timesDestructorCalled++;
+    ~Type1() {
+        instanceCount--;
     }
 };
 
-int MyDumbType::timesConstructorCalled = 0;
-int MyDumbType::timesDestructorCalled = 0;
+int Type1::instanceCount = 0;
 
 namespace circa {
 namespace cpp_interface_tests {
@@ -30,13 +28,16 @@ namespace cpp_interface_tests {
 void test_simple() {
     Branch branch;
 
-    MyDumbType::timesConstructorCalled = 0;
-    quick_create_cpp_type<MyDumbType>(&branch, "MyDumbType");
+    Type1::instanceCount = 0;
+    quick_create_cpp_type<Type1>(&branch, "Type1");
 
-    test_assert(MyDumbType::timesConstructorCalled == 0);
-    Term* term = parser::quick_eval_statement(&branch, "a = MyDumbType()");
-    test_assert(MyDumbType::timesConstructorCalled == 1);
+    test_assert(Type1::instanceCount == 0);
+    Term* term = parser::quick_eval_statement(&branch, "a = Type1()");
+    test_assert(Type1::instanceCount == 1);
 
+    delete term;
+
+    test_assert(Type1::instanceCount == 0);
 }
 
 } // namespace cpp_interface_tests

@@ -27,6 +27,11 @@ Term::Term()
     globalID = gNextGlobalID++;
 }
 
+Term::~Term()
+{
+    dealloc_value(this);
+}
+
 Type*
 Term::getType() const
 {
