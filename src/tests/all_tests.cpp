@@ -7,6 +7,7 @@
 
 namespace circa {
 
+void register_alien_tests();
 void register_branch_tests();
 void register_builtin_function_tests();
 void register_list_tests();
@@ -20,6 +21,7 @@ void run_all_tests()
 {
     gTestCases.clear();
 
+    register_alien_tests();
     register_branch_tests();
     register_builtin_function_tests();
     register_list_tests();
