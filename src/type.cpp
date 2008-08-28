@@ -12,7 +12,9 @@ namespace circa {
 Type::Type()
   : name("undefined"),
     alloc(NULL),
+    dealloc(NULL),
     copy(NULL),
+    equals(NULL),
     remapPointers(NULL),
     toString(NULL)
 {

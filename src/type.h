@@ -13,6 +13,7 @@ struct Type
     typedef void (*AllocFunc)(Term* term);
     typedef void (*DeallocFunc)(Term* term);
     typedef void (*CopyFunc)(Term* src, Term* dest);
+    typedef bool (*EqualsFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, TermMap& map);
     typedef std::string (*ToStringFunc)(Term* term);
 
@@ -20,8 +21,9 @@ struct Type
 
     // Code
     AllocFunc alloc;
-    CopyFunc copy;
     DeallocFunc dealloc;
+    CopyFunc copy;
+    EqualsFunc equals;
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
 

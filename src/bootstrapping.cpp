@@ -15,7 +15,7 @@ namespace circa {
 
 Term* quick_create_type(
         Branch* branch,
-        string name,
+        std::string name,
         Type::AllocFunc allocFunc,
         Type::DeallocFunc deallocFunc,
         Type::CopyFunc copyFunc,
