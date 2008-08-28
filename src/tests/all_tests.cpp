@@ -7,9 +7,9 @@
 
 namespace circa {
 
-void register_alien_tests();
 void register_branch_tests();
 void register_builtin_function_tests();
+void register_cpp_interface_tests();
 void register_list_tests();
 void register_parser_tests();
 void register_primitive_type_tests();
@@ -21,9 +21,9 @@ void run_all_tests()
 {
     gTestCases.clear();
 
-    register_alien_tests();
     register_branch_tests();
     register_builtin_function_tests();
+    register_cpp_interface_tests();
     register_list_tests();
     register_parser_tests();
     register_primitive_type_tests();

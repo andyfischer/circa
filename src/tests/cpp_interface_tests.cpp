@@ -1,7 +1,7 @@
 
 #include "common_headers.h"
 
-#include "alien.h"
+#include "cpp_interface.h"
 #include "branch.h"
 #include "parser.h"
 #include "tests/common.h"
@@ -24,13 +24,13 @@ int MyDumbType::timesConstructorCalled = 0;
 int MyDumbType::timesDestructorCalled = 0;
 
 namespace circa {
-namespace alien_tests {
+namespace cpp_interface_tests {
 
 void test_simple() {
     Branch branch;
 
     MyDumbType::timesConstructorCalled = 0;
-    alien::quick_create_type_templated<MyDumbType>(&branch, "MyDumbType");
+    cpp_interface::quick_create_type_templated<MyDumbType>(&branch, "MyDumbType");
     test_assert(MyDumbType::timesConstructorCalled == 0);
 
     parser::quick_eval_statement(&branch, "a = MyDumbType()");
@@ -38,11 +38,11 @@ void test_simple() {
     test_assert(MyDumbType::timesConstructorCalled == 1);
 }
 
-} // namespace alien_tests
+} // namespace cpp_interface_tests
 
-void register_alien_tests()
+void register_cpp_interface_tests()
 {
-    REGISTER_TEST_CASE(alien_tests::test_simple);
+    REGISTER_TEST_CASE(cpp_interface_tests::test_simple);
 }
 
 } // namespace circa
