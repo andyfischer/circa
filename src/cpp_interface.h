@@ -3,7 +3,7 @@
 #include "term.h"
 
 namespace circa {
-namespace alien {
+namespace cpp_interface {
 
 template <class T>
 void templated_alloc(Term* term)
@@ -34,5 +34,5 @@ Term* quick_create_type_templated(Branch* branch, std::string name)
         NULL);
 }
 
-} // namespace alien
+} // namespace cpp_interface
 } // namespace circa
