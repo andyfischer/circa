@@ -37,6 +37,8 @@ bool is_constant(Term* term);
 
 void change_function(Term* term, Term* new_function);
 
+void dealloc_value(Term* term);
+
 // recycle_value will either call duplicate_value or steal_value, depending
 // on heuristics
 void recycle_value(Term* source, Term* dest);

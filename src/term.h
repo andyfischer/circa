@@ -28,6 +28,7 @@ struct Term
     int globalID;
 
     Term();
+    ~Term();
 
     Type* getType() const;
     std::string toString();
