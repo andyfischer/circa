@@ -34,5 +34,11 @@ Term* quick_create_type_templated(Branch* branch, std::string name)
         NULL);
 }
 
+template <class T>
+T& as(Term* term)
+{
+    return *dynamic_cast<T*>(term->value);
+}
+
 } // namespace cpp_interface
 } // namespace circa

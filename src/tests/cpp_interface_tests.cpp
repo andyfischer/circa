@@ -7,10 +7,11 @@
 #include "tests/common.h"
 
 class MyDumbType {
-    std::string hi;
 public:
     static int timesConstructorCalled;
     static int timesDestructorCalled;
+
+    std::string hi;
 
     MyDumbType() {
         timesConstructorCalled++;
@@ -31,11 +32,13 @@ void test_simple() {
 
     MyDumbType::timesConstructorCalled = 0;
     cpp_interface::quick_create_type_templated<MyDumbType>(&branch, "MyDumbType");
+
     test_assert(MyDumbType::timesConstructorCalled == 0);
-
-    parser::quick_eval_statement(&branch, "a = MyDumbType()");
-
+    Term* term = parser::quick_eval_statement(&branch, "a = MyDumbType()");
     test_assert(MyDumbType::timesConstructorCalled == 1);
+
+
+
 }
 
 } // namespace cpp_interface_tests
