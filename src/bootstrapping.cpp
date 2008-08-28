@@ -18,31 +18,16 @@ Term* quick_create_type(
         std::string name,
         Type::AllocFunc allocFunc,
         Type::DeallocFunc deallocFunc,
-        Type::CopyFunc copyFunc,
+        Type::DuplicateFunc duplicateFunc,
         Type::ToStringFunc toStringFunc)
 {
     Term* typeTerm = create_constant(branch, get_global("Type"));
     as_type(typeTerm)->name = name;
     as_type(typeTerm)->alloc = allocFunc;
     as_type(typeTerm)->dealloc = deallocFunc;
-    as_type(typeTerm)->copy = copyFunc;
+    as_type(typeTerm)->duplicate = duplicateFunc;
     as_type(typeTerm)->toString = toStringFunc;
     branch->bindName(typeTerm, name);
-
-    // Create to-string function
-    /*
-    if (toStringFunc != NULL) {
-        Term* toString = create_constant(branch, get_global("Function"));
-        as_function(toString)->name = name + "-to-string";
-        as_function(toString)->execute = toStringFunc;
-        as_function(toString)->inputTypes.setAt(0, typeTerm);
-
-        if (get_global("string") == NULL)
-            throw errors::InternalError("string type not defined");
-
-        as_function(toString)->outputType = get_global("string");
-        as_type(typeTerm)->toString = toString;
-    }*/
 
     return typeTerm;
 }

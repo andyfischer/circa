@@ -14,7 +14,7 @@ Term* quick_create_type(
         std::string name,
         Type::AllocFunc allocFunc,
         Type::DeallocFunc deallocFunc,
-        Type::CopyFunc copyFunc,
+        Type::DuplicateFunc duplicateFunc,
         Type::ToStringFunc toStringFunc = NULL);
 
 // Create a new Function with the given properties. Also binds the name.

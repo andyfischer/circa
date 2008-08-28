@@ -31,13 +31,11 @@ void test_simple() {
     Branch branch;
 
     MyDumbType::timesConstructorCalled = 0;
-    cpp_interface::quick_create_type_templated<MyDumbType>(&branch, "MyDumbType");
+    quick_create_cpp_type<MyDumbType>(&branch, "MyDumbType");
 
     test_assert(MyDumbType::timesConstructorCalled == 0);
     Term* term = parser::quick_eval_statement(&branch, "a = MyDumbType()");
     test_assert(MyDumbType::timesConstructorCalled == 1);
-
-
 
 }
 

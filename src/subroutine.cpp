@@ -36,7 +36,7 @@ void Subroutine_dealloc(Term* term)
     delete as_subroutine(term);
 }
 
-void Subroutine_copy(Term* source, Term* dest)
+void Subroutine_duplicate(Term* source, Term* dest)
 {
     Subroutine* sourceSub = as_subroutine(source);
     Subroutine* destSub = as_subroutine(dest);
@@ -68,7 +68,7 @@ Branch* Subroutine_openBranch(Term* caller)
                 + sub->name);
         }
 
-        copy_value(incomingInput, branch->getNamed(name));
+        duplicate_value(incomingInput, branch->getNamed(name));
     }
 
     return branch;
@@ -252,7 +252,7 @@ void initialize_subroutine(Branch* kernel)
     SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine",
             Subroutine_alloc,
             Subroutine_dealloc,
-            Subroutine_copy);
+            Subroutine_duplicate);
 
     quick_create_function(kernel, "subroutine-create",
         subroutine_create__evaluate,

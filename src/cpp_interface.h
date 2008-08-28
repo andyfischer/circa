@@ -24,13 +24,17 @@ void templated_copy(Term* source, Term* dest)
     *(reinterpret_cast<T*>(dest->value)) = *(reinterpret_cast<T*>(source->value));
 }
 
+} // namespace cpp_interface
+
+// Public functions
+
 template <class T>
-Term* quick_create_type_templated(Branch* branch, std::string name)
+Term* quick_create_cpp_type(Branch* branch, std::string name)
 {
     return quick_create_type(branch, name,
-        templated_alloc<T>,
-        templated_dealloc<T>,
-        templated_copy<T>,
+        cpp_interface::templated_alloc<T>,
+        cpp_interface::templated_dealloc<T>,
+        cpp_interface::templated_copy<T>,
         NULL);
 }
 
@@ -40,5 +44,4 @@ T& as(Term* term)
     return *dynamic_cast<T*>(term->value);
 }
 
-} // namespace cpp_interface
 } // namespace circa
