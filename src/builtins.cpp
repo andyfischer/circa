@@ -48,7 +48,7 @@ Term* CONSTANT_FALSE = NULL;
 void empty_execute_function(Term*) { }
 void empty_alloc_function(Term*) { }
 void empty_function(Term*) { }
-void empty_copy_function(Term*,Term*) { }
+void empty_duplicate_function(Term*,Term*) { }
 
 void const_generator(Term* caller)
 {
@@ -121,7 +121,7 @@ void bootstrap_kernel()
     Type_alloc(functionType);
     as_type(functionType)->name = "Function";
     as_type(functionType)->alloc = Function_alloc;
-    as_type(functionType)->copy = Function_copy;
+    as_type(functionType)->duplicate = Function_duplicate;
     as_type(functionType)->dealloc = Function_dealloc;
     KERNEL->bindName(functionType, "Function");
 
@@ -185,8 +185,9 @@ void int_dealloc(Term* caller)
 {
     delete (int*) caller->value;
 }
-void int_copy(Term* source, Term* dest)
+void int_duplicate(Term* source, Term* dest)
 {
+    int_alloc(dest);
     as_int(dest) = as_int(source);
 }
 std::string int_toString(Term* term)
@@ -204,8 +205,9 @@ void float_dealloc(Term* caller)
 {
     delete (float*) caller->value;
 }
-void float_copy(Term* source, Term* dest)
+void float_duplicate(Term* source, Term* dest)
 {
+    float_alloc(dest);
     as_float(dest) = as_float(source);
 }
 std::string float_toString(Term* term)
@@ -229,8 +231,9 @@ std::string string_toString(Term* term)
 {
     return as_string(term);
 }
-void string_copy(Term* source, Term* dest)
+void string_duplicate(Term* source, Term* dest)
 {
+    string_alloc(dest);
     as_string(dest) = as_string(source);
 }
 
@@ -244,8 +247,9 @@ void bool_dealloc(Term* caller)
     delete (bool*) caller->value;
 }
 
-void bool_copy(Term* source, Term* dest)
+void bool_duplicate(Term* source, Term* dest)
 {
+    bool_alloc(dest);
     as_bool(dest) = as_bool(source);
 }
 
@@ -269,7 +273,7 @@ Term*& as_reference(Term* term)
 {
     return (Term*&) term->value;
 }
-void reference_copy(Term* source, Term* dest)
+void reference_duplicate(Term* source, Term* dest)
 {
     dest->value = source->value;
 }
@@ -376,25 +380,25 @@ void initialize_constants()
     STRING_TYPE = quick_create_type(KERNEL, "string",
             string_alloc,
             string_dealloc,
-            string_copy,
+            string_duplicate,
             string_toString);
     INT_TYPE = quick_create_type(KERNEL, "int",
             int_alloc,
             int_dealloc,
-            int_copy,
+            int_duplicate,
             int_toString);
     FLOAT_TYPE = quick_create_type(KERNEL, "float",
-            float_alloc, float_dealloc, float_copy, float_toString);
+            float_alloc, float_dealloc, float_duplicate, float_toString);
     BOOL_TYPE = quick_create_type(KERNEL, "bool",
-            bool_alloc, bool_dealloc, bool_copy, bool_toString);
+            bool_alloc, bool_dealloc, bool_duplicate, bool_toString);
     ANY_TYPE = quick_create_type(KERNEL, "any",
             empty_function, empty_function, NULL);
     VOID_TYPE = quick_create_type(KERNEL, "void",
-            empty_function, empty_function, empty_copy_function);
+            empty_function, empty_function, empty_duplicate_function);
     REFERENCE_TYPE = quick_create_type(KERNEL, "Reference",
             reference_alloc,
             reference_dealloc,
-            reference_copy);
+            reference_duplicate);
 
     CONSTANT_INT = get_const_function(KERNEL, INT_TYPE);
     CONSTANT_FLOAT = get_const_function(KERNEL, FLOAT_TYPE);

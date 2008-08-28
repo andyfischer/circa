@@ -220,6 +220,19 @@ void change_function(Term* term, Term* new_function)
     term->function = new_function;
 }
 
+void dealloc_value(Term* term)
+{
+    if (term->value == NULL)
+        return;
+
+    if (as_type(term->type)->dealloc == NULL)
+        throw errors::InternalError("type " + as_type(term->type)->name
+            + " has no dealloc function");
+
+    as_type(term->type)->dealloc(term);
+    term->value = NULL;
+}
+
 void recycle_value(Term* source, Term* dest)
 {
     // Don't steal if the term has multiple users
@@ -229,18 +242,20 @@ void recycle_value(Term* source, Term* dest)
     steal_value(source, dest);
 }
 
-void copy_value(Term* source, Term* dest)
+void duplicate_value(Term* source, Term* dest)
 {
     if (source->type != dest->type)
         throw errors::TypeError(dest, source->type);
 
-    Type::CopyFunc copy = as_type(source->type)->copy;
+    Type::DuplicateFunc duplicate = as_type(source->type)->duplicate;
 
-    if (copy == NULL)
+    if (duplicate == NULL)
         throw errors::InternalError(string("type ") + as_type(source->type)->name
-                + " has no copy function");
+                + " has no duplicate function");
 
-    copy(source,dest);
+    dealloc_value(dest);
+
+    duplicate(source, dest);
 }
 
 void steal_value(Term* source, Term* dest)
@@ -252,21 +267,12 @@ void steal_value(Term* source, Term* dest)
 
     // Don't steal from constant terms
     if (is_constant(source)) {
-        copy_value(source, dest);
+        duplicate_value(source, dest);
         return;
     }
 
     // if 'dest' has a value, delete it
-    if (dest->value != NULL) {
-        if (as_type(dest->type)->dealloc != NULL) {
-            as_type(dest->type)->dealloc(dest);
-            dest->value = NULL;
-        }
-        else {
-            std::cout << "Warning: type " << as_type(dest->type)->name
-                << " needs a dealloc function" << std::endl;
-        }
-    }
+    dealloc_value(dest);
 
     dest->value = source->value;
     source->value = NULL;
@@ -284,7 +290,7 @@ void duplicate_branch(Branch* source, Branch* dest)
         Term* dest_term = create_term(dest, source_term->function, source_term->inputs);
         newTermMap[source_term] = dest_term;
 
-        copy_value(source_term, dest_term);
+        duplicate_value(source_term, dest_term);
     }
 
     // Remap terms

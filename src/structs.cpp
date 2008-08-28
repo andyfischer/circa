@@ -11,10 +11,10 @@
 namespace circa {
 
 void StructDefinition_alloc(Term* term);
-void StructDefinition_copy(Term* source, Term* dest);
+void StructDefinition_duplicate(Term* source, Term* dest);
 void StructInstance_alloc(Term* term);
 void StructInstance_dealloc(Term* term);
-void StructInstance_copy(Term* type, Term* term);
+void StructInstance_duplicate(Term* type, Term* term);
 std::string StructInstance_toString(Term* term);
 
 StructDefinition::StructDefinition()
@@ -109,7 +109,7 @@ void StructDefinition_alloc(Term* term)
     StructDefinition* def = new StructDefinition();
     def->alloc = StructInstance_alloc;
     def->dealloc = StructInstance_dealloc;
-    def->copy = StructInstance_copy;
+    def->duplicate = StructInstance_duplicate;
     def->toString = StructInstance_toString;
 
     term->value = def;
@@ -121,7 +121,7 @@ void StructDefinition_dealloc(Term* term)
     term->value = NULL;
 }
 
-void StructDefinition_copy(Term* source, Term* dest)
+void StructDefinition_duplicate(Term* source, Term* dest)
 {
     *as_struct_definition(dest) = *as_struct_definition(source);
 }
@@ -170,14 +170,14 @@ void StructInstance_dealloc(Term* term)
     delete as_struct_instance(term);
 }
 
-void StructInstance_copy(Term* source, Term* dest)
+void StructInstance_duplicate(Term* source, Term* dest)
 {
     StructDefinition* def = as_struct_definition(source->type);
     StructInstance* source_i = as_struct_instance(source);
     StructInstance* dest_i = as_struct_instance(dest);
 
     for (int i=0; i < def->numFields(); i++) {
-        copy_value(source_i->fields[i], dest_i->fields[i]);
+        duplicate_value(source_i->fields[i], dest_i->fields[i]);
     }
 }
 
@@ -300,7 +300,7 @@ void initialize_structs(Branch* code)
     STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition",
             StructDefinition_alloc,
             StructDefinition_dealloc,
-            StructDefinition_copy,
+            StructDefinition_duplicate,
             StructDefinition_toString);
 
     quick_create_function(code, "get-field", struct_get_field,

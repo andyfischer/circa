@@ -13,7 +13,7 @@ Type::Type()
   : name("undefined"),
     alloc(NULL),
     dealloc(NULL),
-    copy(NULL),
+    duplicate(NULL),
     equals(NULL),
     remapPointers(NULL),
     toString(NULL)

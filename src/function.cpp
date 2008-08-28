@@ -38,8 +38,9 @@ void Function_alloc(Term* caller)
     caller->value = new Function();
 }
 
-void Function_copy(Term* source, Term* dest)
+void Function_duplicate(Term* source, Term* dest)
 {
+    Function_alloc(dest);
     *as_function(dest) = *as_function(source);
 }
 

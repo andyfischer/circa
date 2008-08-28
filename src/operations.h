@@ -37,11 +37,11 @@ bool is_constant(Term* term);
 
 void change_function(Term* term, Term* new_function);
 
-// recycle_value will either call copy_value or steal_value, depending
+// recycle_value will either call duplicate_value or steal_value, depending
 // on heuristics
 void recycle_value(Term* source, Term* dest);
 
-void copy_value(Term* source, Term* dest);
+void duplicate_value(Term* source, Term* dest);
 
 // Attempt to 'steal' the output value from source. This is more efficient
 // than copying, and useful if 1) dest needs a copy of source's value, and
@@ -51,7 +51,7 @@ void copy_value(Term* source, Term* dest);
 // value. But it may be less efficient to do so.
 //
 // In some situations we are not allowed to steal a value. In these situations,
-// calling steal_value is equivalent to calling copy_value. These situations include:
+// calling steal_value is equivalent to calling duplicate_value. These situations include:
 //  1) if source is a constant
 //  2) other?
 void steal_value(Term* source, Term* dest);
