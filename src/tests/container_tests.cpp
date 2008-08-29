@@ -77,12 +77,40 @@ void test_namespace()
     test_assert(!nspace.contains("a"));
 }
 
+void test_list()
+{
+    TermList list;
+    Term* term = new Term();
+    Term* term2 = new Term();
+
+    test_assert(list.count() == 0);
+
+    list.append(term);
+    list.append(term2);
+    test_assert(list.count() == 2);
+    test_assert(list[0] == term);
+    test_assert(list[1] == term2);
+
+    Term* term3 = new Term();
+    TermMap remap;
+    remap[term] = term3;
+    list.remapPointers(remap);
+    test_assert(list.count() == 2);
+    test_assert(list[0] == term3);
+    test_assert(list[1] == term2);
+
+    list.clear();
+
+    test_assert(list.count() == 0);
+}
+
 } // namespace container_tests
 
 void register_container_tests()
 {
     REGISTER_TEST_CASE(container_tests::test_set);
     REGISTER_TEST_CASE(container_tests::test_namespace);
+    REGISTER_TEST_CASE(container_tests::test_list);
 }
 
 } // namespace circa
