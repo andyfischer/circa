@@ -40,8 +40,6 @@ struct Term
 
 TermList* as_list(Term* term);
 
-void initialize_term(Branch* kernel);
-
 } // namespace circa
 
 #endif

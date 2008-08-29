@@ -108,8 +108,4 @@ TermList* as_list(Term* term)
     return (TermList*) term->value;
 }
 
-void initialize_term(Branch* kernel)
-{
-}
-
 } // namespace circa
