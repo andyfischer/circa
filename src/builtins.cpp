@@ -10,6 +10,7 @@
 #include "bootstrapping.h"
 #include "branch.h"
 #include "builtins.h"
+#include "cpp_interface.h"
 #include "errors.h"
 #include "function.h"
 #include "operations.h"
@@ -36,6 +37,7 @@ Term* ANY_TYPE = NULL;
 Term* VOID_TYPE = NULL;
 Term* REFERENCE_TYPE = NULL;
 Term* LIST_TYPE = NULL;
+Term* MAP_TYPE = NULL;
 Term* CONSTANT_INT = NULL;
 Term* CONSTANT_FLOAT = NULL;
 Term* CONSTANT_STRING = NULL;
@@ -400,6 +402,10 @@ void initialize_constants()
             reference_dealloc,
             reference_duplicate);
 
+    BRANCH_TYPE = quick_create_cpp_type<Branch>(KERNEL, "Branch");
+    LIST_TYPE = quick_create_cpp_type<TermList>(KERNEL, "List");
+    MAP_TYPE = quick_create_cpp_type<TermMap>(KERNEL, "Map");
+
     CONSTANT_INT = get_const_function(KERNEL, INT_TYPE);
     CONSTANT_FLOAT = get_const_function(KERNEL, FLOAT_TYPE);
     CONSTANT_STRING = get_const_function(KERNEL, STRING_TYPE);
@@ -444,7 +450,6 @@ void initialize()
 
         // These need to be first:
         initialize_term(KERNEL);
-        initialize_term_list(KERNEL);
         initialize_structs(KERNEL);
 
         // Then everything else:

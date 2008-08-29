@@ -178,5 +178,10 @@ StatementList::createTerms(Branch* branch)
     }
 }
 
+void initialize_ast_functions(Branch* kernel)
+{
+
+}
+
 } // namespace ast
 } // namespace circa
