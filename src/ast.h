@@ -42,11 +42,11 @@ struct FunctionCall : public Expression
         std::string preWhitespace;
         std::string postWhitespace;
 
-        Argument::Argument()
+        Argument()
           : expression(NULL)
         {
         }
-        Argument::~Argument()
+        ~Argument()
         {
             delete expression;
         }
