@@ -55,21 +55,6 @@ Branch* as_branch(Term* term)
     return (Branch*) term->value;
 }
 
-void Branch_alloc(Term* caller)
-{
-    caller->value = new Branch();
-}
-
-void Branch_dealloc(Term* caller)
-{
-    delete as_branch(caller);
-}
-
-void Branch_copy(Term* source, Term* dest)
-{
-    // Todo
-}
-
 void branch_bind_name(Term* caller)
 {
     recycle_value(caller->inputs[0], caller);
@@ -78,11 +63,6 @@ void branch_bind_name(Term* caller)
 
 void initialize_branch(Branch* kernel)
 {
-    BRANCH_TYPE = quick_create_type(kernel, "Branch",
-            Branch_alloc,
-            Branch_dealloc,
-            Branch_copy);
-
     Term* bind_name = quick_create_function(kernel, "bind-name", branch_bind_name,
         TermList(BRANCH_TYPE, get_global("string"), get_global("any")),
         BRANCH_TYPE);
