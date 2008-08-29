@@ -13,6 +13,7 @@
 #include "cpp_interface.h"
 #include "errors.h"
 #include "function.h"
+#include "map_function.h"
 #include "operations.h"
 #include "structs.h"
 #include "subroutine.h"
@@ -455,6 +456,7 @@ void initialize()
         initialize_branch(KERNEL);
         initialize_builtin_functions(KERNEL);
         initialize_functions(KERNEL);
+        initialize_map_function(KERNEL);
         initialize_subroutine(KERNEL);
 
         // Lastly:

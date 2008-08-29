@@ -11,9 +11,6 @@
 
 namespace circa {
 
-void StructDefinition_alloc(Term* term);
-std::string StructInstance_toString(Term* term);
-
 StructDefinition::StructDefinition()
 {
 }
