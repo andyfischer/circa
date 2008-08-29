@@ -12,6 +12,12 @@ TermMap::operator[](Term* key)
     return _map[key];
 }
 
+Term*
+TermMap::operator[](Term* key) const
+{
+    return _map.find(key)->second;
+}
+
 bool
 TermMap::contains(Term* key) const
 {
@@ -19,10 +25,10 @@ TermMap::contains(Term* key) const
 }
 
 Term*
-TermMap::getRemapped(Term* key)
+TermMap::getRemapped(Term* key) const
 {
     if (contains(key))
-        return _map[key];
+        return operator[](key);
     else
         return key;
 }

@@ -50,7 +50,7 @@ Term* TermList::operator[](int index) const
     return get(index);
 }
 
-void TermList::remap(TermMap& map)
+void TermList::remapPointers(TermMap const& map)
 {
     for (int i=0; i < _items.size(); i++)
         _items[i] = map.getRemapped(_items[i]);

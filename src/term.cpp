@@ -33,6 +33,18 @@ Term::~Term()
     TermSet users = this->users;
     this->users = TermSet();
 
+    TermMap nullPointerRemap;
+    nullPointerRemap[this] = NULL;
+
+    std::set<Term*>::const_iterator it;
+    for (it = users._items.begin(); it != users._items.end(); ++it) {
+        remap_pointers(*it, this, NULL);
+    }
+
+    if (this->owningBranch != NULL) {
+        this->owningBranch->remapPointers(nullPointerRemap);
+    }
+
     dealloc_value(this);
 }
 

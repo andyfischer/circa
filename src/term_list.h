@@ -33,7 +33,7 @@ struct TermList
     void clear();
     Term* get(int index) const;
     Term* operator[](int index) const;
-    void remap(TermMap& map);
+    void remapPointers(TermMap const& map);
 };
 
 void initialize_term_list(Branch* kernel);
