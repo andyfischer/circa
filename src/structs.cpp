@@ -3,6 +3,7 @@
 #include "bootstrapping.h"
 #include "branch.h"
 #include "builtins.h"
+#include "cpp_interface.h"
 #include "errors.h"
 #include "operations.h"
 #include "structs.h"
@@ -11,10 +12,6 @@
 namespace circa {
 
 void StructDefinition_alloc(Term* term);
-void StructDefinition_duplicate(Term* source, Term* dest);
-void StructInstance_alloc(Term* term);
-void StructInstance_dealloc(Term* term);
-void StructInstance_duplicate(Term* type, Term* term);
 std::string StructInstance_toString(Term* term);
 
 StructDefinition::StructDefinition()
@@ -98,90 +95,32 @@ StructDefinition* as_struct_definition(Term* term)
     return (StructDefinition*) term->value;
 }
 
-Term* Struct_getField(Term* structTerm, int index)
-{
-    StructInstance* instance = as_struct_instance(structTerm);
-    return instance->fields[index];
-}
-
-void StructDefinition_alloc(Term* term)
-{
-    StructDefinition* def = new StructDefinition();
-    def->alloc = StructInstance_alloc;
-    def->dealloc = StructInstance_dealloc;
-    def->duplicate = StructInstance_duplicate;
-    def->toString = StructInstance_toString;
-
-    term->value = def;
-}
-
-void StructDefinition_dealloc(Term* term)
-{
-    delete as_struct_definition(term);
-    term->value = NULL;
-}
-
-void StructDefinition_duplicate(Term* source, Term* dest)
-{
-    *as_struct_definition(dest) = *as_struct_definition(source);
-}
-
-void struct_definition_add_field(Term* caller)
-{
-    recycle_value(caller->inputs[0], caller);
-    string fieldName = as_string(caller->inputs[1]);
-    Term* fieldType = caller->inputs[2];
-    as_struct_definition(caller)->addField(fieldName, fieldType);
-}
-
-StructInstance::~StructInstance()
-{
-    delete[] fields;
-}
-
 StructInstance* as_struct_instance(Term* term)
 {
-    if (!is_struct_definition(term->type)) {
-        throw errors::InternalError(string("Term is not a struct: ") + term->findName());
-    }
     return (StructInstance*) term->value;
 }
 
-void StructInstance_alloc(Term* term)
+void StructInstance__alloc(Term* term)
 {
-    Branch *branch = new Branch();
     StructDefinition *def = as_struct_definition(term->type);
+    term->value = new StructInstance(*def);
+}
 
-    int numFields = def->numFields();
-    StructInstance* structInstance = new StructInstance();
-    structInstance->numFields = numFields;
-    structInstance->fields = new Term*[numFields];
-    term->value = structInstance;
-
-    for (int i=0; i < numFields; i++)
-    {
-        Term* fieldType = def->getType(i);
-        structInstance->fields[i] = create_constant(branch, fieldType);
+StructInstance::StructInstance(StructDefinition const& definition)
+{
+    for (int i=0; i < definition.numFields(); i++) {
+        Term* type = definition.getType(i);
+        Term* newTerm = create_constant(&this->branch, definition.getType(i));
+        this->fields.append(newTerm);
     }
 }
 
-void StructInstance_dealloc(Term* term)
+Term* StructInstance::getField(int index)
 {
-    delete as_struct_instance(term);
+    return this->fields[index];
 }
 
-void StructInstance_duplicate(Term* source, Term* dest)
-{
-    StructDefinition* def = as_struct_definition(source->type);
-    StructInstance* source_i = as_struct_instance(source);
-    StructInstance* dest_i = as_struct_instance(dest);
-
-    for (int i=0; i < def->numFields(); i++) {
-        duplicate_value(source_i->fields[i], dest_i->fields[i]);
-    }
-}
-
-std::string StructInstance_toString(Term* term)
+std::string StructInstance__toString(Term* term)
 {
     StructInstance *inst = as_struct_instance(term);
     StructDefinition *def = as_struct_definition(term->type);
@@ -200,6 +139,25 @@ std::string StructInstance_toString(Term* term)
     return output.str();
 }
 
+void StructDefinition_alloc(Term* term)
+{
+    StructDefinition* def = new StructDefinition();
+    def->alloc = StructInstance__alloc;
+    def->dealloc = cpp_interface::templated_dealloc<StructInstance>;
+    def->duplicate = cpp_interface::templated_duplicate<StructInstance>;
+    def->toString = StructInstance__toString;
+
+    term->value = def;
+}
+
+void struct_definition_add_field(Term* caller)
+{
+    recycle_value(caller->inputs[0], caller);
+    string fieldName = as_string(caller->inputs[1]);
+    Term* fieldType = caller->inputs[2];
+    as_struct_definition(caller)->addField(fieldName, fieldType);
+}
+
 void struct_definition_set_name(Term* caller)
 {
     recycle_value(caller->inputs[0], caller);
@@ -216,7 +174,7 @@ void struct_definition_rename_field(Term* caller)
     def->setName(index, name);
 }
 
-void struct_get_field(Term* caller)
+void Struct__get_field(Term* caller)
 {
     if (!is_struct_definition(caller->inputs[0]->type)) {
         throw errors::InternalError(string("Type is not a struct: ")
@@ -234,7 +192,7 @@ void struct_get_field(Term* caller)
     specialize_type(caller, fieldType);
 
     StructInstance* structInstance = as_struct_instance(caller->inputs[0]);
-    Term* field = structInstance->fields[fieldIndex];
+    Term* field = structInstance->getField(fieldIndex);
 
     recycle_value(field, caller);
 }
@@ -299,11 +257,11 @@ void initialize_structs(Branch* code)
 {
     STRUCT_DEFINITION_TYPE = quick_create_type(KERNEL, "StructDefinition",
             StructDefinition_alloc,
-            StructDefinition_dealloc,
-            StructDefinition_duplicate,
+            cpp_interface::templated_dealloc<StructDefinition>,
+            cpp_interface::templated_duplicate<StructDefinition>,
             StructDefinition_toString);
 
-    quick_create_function(code, "get-field", struct_get_field,
+    quick_create_function(code, "get-field", Struct__get_field,
         TermList(ANY_TYPE, STRING_TYPE), ANY_TYPE);
 
     Term* set_field = quick_create_function(code, "set-field", struct_set_field,

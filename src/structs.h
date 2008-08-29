@@ -3,6 +3,7 @@
 
 #include "common_headers.h"
 
+#include "branch.h"
 #include "type.h"
 
 namespace circa {
@@ -34,12 +35,13 @@ struct StructDefinition : public Type
 
 struct StructInstance
 {
-    int numFields;
-    Term** fields;
+    Branch branch;
+    TermList fields;
 
-    StructInstance() : numFields(0), fields(NULL) {}
-    ~StructInstance();
+    StructInstance(StructDefinition const&);
+    ~StructInstance() {}
 
+    Term* getField(int i);
     std::string toString();
 };
 

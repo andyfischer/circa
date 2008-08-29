@@ -56,16 +56,18 @@ struct TermNamespace
     void remapPointers(TermMap const& remapping)
     {
         StringToTermMap::iterator it;
-        for (it = _map.begin(); it != _map.end(); ++it) {
-            Term* replacement = remapping[it->second];
+        for (it = _map.begin(); it != _map.end(); ) {
+            Term* replacement = remapping.getRemapped(it->second);
             if (replacement != it->second) {
                 if (replacement == NULL) {
-                    _map.erase(it); // don't touch 'it' after this
+                    _map.erase(it++);
+                    continue;
                 }
                 else {
                     _map[it->first] = replacement;
                 }
             }
+            ++it;
         }
     }
 };

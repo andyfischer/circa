@@ -1,42 +1,63 @@
 
 #include "common_headers.h"
+#include "builtins.h"
+#include "bootstrapping.h"
+#include "operations.h"
+#include "parser.h"
 #include "common.h"
-#include "circa.h"
+#include "structs.h"
 
 namespace circa {
 namespace struct_tests {
 
-void test_simple()
+void test_create_instance()
 {
-    Branch *branch = new Branch();
-    Term* my_struct_def = create_constant(branch, get_global("StructDefinition"));
-    my_struct_def = apply_function(branch, get_global("struct-definition-set-name"),
-            TermList(my_struct_def, constant_string(branch, "my-struct")));
+    StructDefinition *def = new StructDefinition();
+
+    def->addField("int1", INT_TYPE);
+    def->addField("str1", STRING_TYPE);
+
+    test_assert(def->numFields() == 2);
+    test_assert(def->getType(0) == INT_TYPE);
+    test_assert(def->getType(1) == STRING_TYPE);
+
+    StructInstance *inst = new StructInstance(*def);
+
+    test_assert(inst->getField(0)->type == INT_TYPE);
+    test_assert(inst->getField(1)->type == STRING_TYPE);
+}
+
+void test_misc()
+{
+    Branch branch;
+    Term* my_struct_def = create_constant(&branch, get_global("StructDefinition"));
+    my_struct_def = apply_function(&branch, get_global("struct-definition-set-name"),
+            TermList(my_struct_def, constant_string(&branch, "my-struct")));
     execute(my_struct_def);
 
-    my_struct_def = apply_function(branch, get_global("add-field"),
-            TermList(my_struct_def, constant_string(branch, "myFloat"), FLOAT_TYPE));
+    my_struct_def = apply_function(&branch, get_global("add-field"),
+            TermList(my_struct_def, constant_string(&branch, "myFloat"), FLOAT_TYPE));
     execute(my_struct_def);
-    my_struct_def = apply_function(branch, get_global("add-field"),
-            TermList(my_struct_def, constant_string(branch, "myString"), STRING_TYPE));
+    my_struct_def = apply_function(&branch, get_global("add-field"),
+            TermList(my_struct_def, constant_string(&branch, "myString"), STRING_TYPE));
     execute(my_struct_def);
 
-    Term* my_instance = apply_function(branch, my_struct_def, TermList());
+    Term* my_instance = apply_function(&branch, my_struct_def, TermList());
     execute(my_instance);
 
-    my_instance = apply_function(branch, get_global("set-field"),
-            TermList(my_instance, constant_string(branch, "myFloat"),
-                constant_float(branch, 2)));
+    my_instance = apply_function(&branch, get_global("set-field"),
+            TermList(my_instance, constant_string(&branch, "myFloat"),
+                constant_float(&branch, 2)));
     execute(my_instance);
-    branch->bindName(my_instance, "my_instance");
+    branch.bindName(my_instance, "my_instance");
 
-    Term* hopefully_two = parser::quick_exec_statement(branch,
+    Term* hopefully_two = parser::quick_exec_statement(&branch,
             "hopefully-two = get-field(my_instance, 'myFloat)");
 
     test_assert(as_float(hopefully_two) == 2);
 }
 
-void test_simple2()
+void test_misc2()
 {
     Branch branch;
     parser::quick_exec_statement(&branch,
@@ -79,8 +100,9 @@ void test_rename_field()
 
 void register_struct_tests()
 {
-    REGISTER_TEST_CASE(struct_tests::test_simple);
-    REGISTER_TEST_CASE(struct_tests::test_simple2);
+    REGISTER_TEST_CASE(struct_tests::test_create_instance);
+    REGISTER_TEST_CASE(struct_tests::test_misc);
+    REGISTER_TEST_CASE(struct_tests::test_misc2);
     REGISTER_TEST_CASE(struct_tests::test_as_function_output);
     REGISTER_TEST_CASE(struct_tests::test_rename_field);
 }

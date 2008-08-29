@@ -1,6 +1,8 @@
 
 #include "tests/common.h"
 #include "branch.h"
+#include "builtins.h"
+#include "operations.h"
 #include "parser.h"
 #include "term.h"
 #include "term_list.h"
@@ -31,11 +33,20 @@ void safe_delete()
     }
 }
 
+void test_create_constant()
+{
+    Branch branch;
+    Term *term = create_constant(&branch, INT_TYPE);
+
+    test_assert(term->type == INT_TYPE);
+}
+
 } // namespace operations_tests
 
 void register_operations_tests()
 {
     REGISTER_TEST_CASE(operations_tests::safe_delete);
+    REGISTER_TEST_CASE(operations_tests::test_create_constant);
 }
 
 } // namespace circa
