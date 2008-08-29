@@ -25,7 +25,7 @@ struct TestCase {
     std::string name;
     TestExecuteFunction execute;
 
-    TestCase::TestCase(std::string const& _name, TestExecuteFunction _execute)
+    TestCase(std::string const& _name, TestExecuteFunction _execute)
       : name(_name), execute(_execute)
     {
     }
