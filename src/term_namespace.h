@@ -12,7 +12,7 @@ struct TermNamespace
     typedef std::map<string, Term*> StringToTermMap;
     StringToTermMap _map;
 
-    bool contains(string s)
+    bool contains(std::string s)
     {
         return _map.find(s) != _map.end();
 
