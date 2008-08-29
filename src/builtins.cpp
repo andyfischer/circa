@@ -449,7 +449,6 @@ void initialize()
         initialize_constants();
 
         // These need to be first:
-        initialize_term(KERNEL);
         initialize_structs(KERNEL);
 
         // Then everything else:
