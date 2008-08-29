@@ -29,6 +29,10 @@ Term::Term()
 
 Term::~Term()
 {
+    // Find all our users, and tell them to stop using us
+    TermSet users = this->users;
+    this->users = TermSet();
+
     dealloc_value(this);
 }
 
