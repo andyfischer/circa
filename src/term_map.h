@@ -13,12 +13,13 @@ struct TermMap
 
     explicit TermMap() { }
     Term*& operator[](Term* key);
+    Term* operator[](Term* key) const;
 
     bool contains(Term* key) const;
 
     // If 'key' exists in this map, return the associated term.
     // Otherwise, return 'key' back to them.
-    Term* getRemapped(Term* key);
+    Term* getRemapped(Term* key) const;
 
     iterator begin();
 

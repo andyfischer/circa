@@ -58,6 +58,8 @@ void duplicate_value(Term* source, Term* dest);
 //  2) other?
 void steal_value(Term* source, Term* dest);
 
+void remap_pointers(Term* term, Term* original, Term* replacement);
+
 void duplicate_branch(Branch* source, Branch* dest);
 
 Term* find_named(Branch* branch, std::string name);

@@ -3,6 +3,8 @@
 
 #include "common_headers.h"
 
+#include "term_map.h"
+
 namespace circa {
 
 struct TermNamespace
@@ -49,6 +51,22 @@ struct TermNamespace
     StringToTermMap::iterator end()
     {
         return _map.end();
+    }
+
+    void remapPointers(TermMap const& remapping)
+    {
+        StringToTermMap::iterator it;
+        for (it = _map.begin(); it != _map.end(); ++it) {
+            Term* replacement = remapping[it->second];
+            if (replacement != it->second) {
+                if (replacement == NULL) {
+                    _map.erase(it); // don't touch 'it' after this
+                }
+                else {
+                    _map[it->first] = replacement;
+                }
+            }
+        }
     }
 };
 

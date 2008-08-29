@@ -279,6 +279,17 @@ void steal_value(Term* source, Term* dest)
     source->needsUpdate = true;
 }
 
+void remap_pointers(Term* term, Term* original, Term* replacement)
+{
+    TermMap map;
+    map[original] = replacement;
+
+    term->inputs.remapPointers(map);
+
+    if (as_type(term->type)->remapPointers != NULL)
+        as_type(term->type)->remapPointers(term, map);
+}
+
 void duplicate_branch(Branch* source, Branch* dest)
 {
     TermMap newTermMap;
@@ -296,7 +307,7 @@ void duplicate_branch(Branch* source, Branch* dest)
     // Remap terms
     for (int index=0; index < dest->terms.count(); index++) {
         Term* term = dest->terms[index];
-        term->inputs.remap(newTermMap);
+        term->inputs.remapPointers(newTermMap);
         if (as_type(term->type)->remapPointers != NULL)
             as_type(term->type)->remapPointers(term, newTermMap);
     }

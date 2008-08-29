@@ -26,6 +26,9 @@ struct Branch
     // Bind a name to a term
     void bindName(Term* term, string name);
 
+    // Remap pointers
+    void remapPointers(TermMap const& map);
+
     void clear();
 };
 

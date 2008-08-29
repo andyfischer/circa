@@ -34,6 +34,12 @@ void Branch::bindName(Term* term, string name)
     names.bind(term, name);
 }
 
+void Branch::remapPointers(TermMap const& map)
+{
+    terms.remapPointers(map);
+    names.remapPointers(map);
+}
+
 void
 Branch::clear()
 {
