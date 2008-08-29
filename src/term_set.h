@@ -9,17 +9,19 @@ class Term;
 
 struct TermSet
 {
-    std::vector<Term*> _items;
+    std::set<Term*> _items;
 
     bool contains(Term* term) const {
-        //return _items.find(term) != _items.end();
-        return false; //todo
+        return _items.find(term) != _items.end();
     }
     void add(Term* term) {
-        _items.push_back(term);
+        _items.insert(term);
+    }
+    void remove(Term* term) {
+        _items.erase(term);
     }
     int count() const {
-        return 5; // todo
+        return (int) _items.size();
     }
 };
 

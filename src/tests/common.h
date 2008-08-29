@@ -13,9 +13,11 @@ class TestFailure : public errors::CircaError
     }
 };
 
-void test_assert_f(bool condition, int line, const char* file);
+void _test_assert_function(bool condition, int line, const char* file);
+void _test_fail_function(int line, const char* file);
 
-#define test_assert(c) test_assert_f((c), __LINE__, __FILE__)
+#define test_assert(c) _test_assert_function((c), __LINE__, __FILE__)
+#define test_fail() _test_fail_function( __LINE__, __FILE__)
 
 struct TestCase {
     typedef void (*TestExecuteFunction)();
