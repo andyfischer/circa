@@ -41,12 +41,22 @@ void test_create_constant()
     test_assert(term->type == INT_TYPE);
 }
 
+void test_misc()
+{
+    test_assert(is_type(TYPE_TYPE));
+    test_assert(is_instance(TYPE_TYPE, TYPE_TYPE));
+
+    test_assert(is_type(FUNCTION_TYPE));
+    test_assert(is_instance(FUNCTION_TYPE, TYPE_TYPE));
+}
+
 } // namespace operations_tests
 
 void register_operations_tests()
 {
     REGISTER_TEST_CASE(operations_tests::safe_delete);
     REGISTER_TEST_CASE(operations_tests::test_create_constant);
+    REGISTER_TEST_CASE(operations_tests::test_misc);
 }
 
 } // namespace circa
