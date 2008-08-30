@@ -4,6 +4,7 @@
 #include "builtins.h"
 #include "errors.h"
 #include "function.h"
+#include "operations.h"
 #include "term.h"
 #include "type.h"
 
@@ -11,6 +12,7 @@ namespace circa {
 
 Type::Type()
   : name("undefined"),
+    parentType(NULL),
     alloc(NULL),
     dealloc(NULL),
     duplicate(NULL),
@@ -20,10 +22,30 @@ Type::Type()
 {
 }
 
+bool is_instance(Term* term, Term* type)
+{
+    Term* actualType = term->type;
+
+    while (actualType != NULL) {
+
+        if (actualType == type)
+            return true;
+
+        actualType = as_type(actualType)->parentType;
+    }
+
+    return false;
+}
+
+void assert_instance(Term* term, Term* type)
+{
+    if (!is_instance(term, type))
+        throw errors::TypeError(term, type);
+}
+
 bool is_type(Term* term)
 {
-    return ((term->type == TYPE_TYPE)
-            || (term->type == STRUCT_DEFINITION_TYPE));
+    return term->type == TYPE_TYPE;
 }
 
 Type* as_type(Term* term)

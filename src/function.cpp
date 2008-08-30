@@ -22,7 +22,7 @@ Function::Function()
 
 bool is_function(Term* term)
 {
-    return (term->type == FUNCTION_TYPE) || (term->type == SUBROUTINE_TYPE);
+    return is_instance(term, FUNCTION_TYPE);
 }
 
 Function* as_function(Term* term)

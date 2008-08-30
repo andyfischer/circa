@@ -13,13 +13,16 @@ string
 TypeError::message()
 {
     // The goal here is to assume as little as possible
+    if (expectedType == NULL)
+        throw InternalError("In TypeError: expectedType is NULL");
 
     if (!is_type(expectedType))
-        throw InternalError("2nd argument to TypeError must be a type");
+        throw InternalError("In TypeError: expectedType must be a type");
+
     std::string expected = as_type(expectedType)->name;
 
     if (offendingTerm == NULL)
-        return std::string("Term is NULL (expected ") + expected + ")";
+        return std::string("In TypeError: Term is NULL (expected ") + expected + ")";
 
     if (offendingTerm->type == NULL)
         return std::string("Term '") + offendingTerm->findName() + "' has NULL type "

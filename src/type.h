@@ -19,7 +19,11 @@ struct Type
 
     std::string name;
 
-    // Code
+    // Parent type, if any. Currently it's the responsibility of the type definer
+    // to make sure that a derived value can be safely upcast.
+    Term* parentType;
+
+    // Functions
     AllocFunc alloc;
     DeallocFunc dealloc;
     DuplicateFunc duplicate;
@@ -34,6 +38,12 @@ struct Type
 
     Type();
 };
+
+// Return true if the term is an instance (possibly derived) of the given type
+bool is_instance(Term* term, Term* type);
+
+// Throw a TypeError if term is not an instance of type
+void assert_instance(Term* term, Term* type);
 
 bool is_type(Term* term);
 Type* as_type(Term* term);
