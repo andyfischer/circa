@@ -126,9 +126,8 @@ void test_quick_eval_statement()
 
     Term* result = parser::quick_eval_statement(&branch, "something = add(5.0,3.0)");
 
-    /*
     test_assert(result != NULL);
-    test_assert(result->findName() == "something");
+    /*test_assert(result->findName() == "something");
     test_assert(as_function(result->function)->name == "add");
     test_assert(result->needsUpdate);
     execute(result);
