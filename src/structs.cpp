@@ -107,7 +107,7 @@ StructInstance::StructInstance(StructDefinition const& definition)
 {
     for (int i=0; i < definition.numFields(); i++) {
         Term* type = definition.getType(i);
-        Term* newTerm = create_constant(&this->branch, definition.getType(i));
+        Term* newTerm = create_constant(&this->branch, type);
         this->fields.append(newTerm);
     }
 }
@@ -257,6 +257,7 @@ void initialize_structs(Branch* code)
             cpp_interface::templated_dealloc<StructDefinition>,
             cpp_interface::templated_duplicate<StructDefinition>,
             StructDefinition_toString);
+    as_type(STRUCT_DEFINITION_TYPE)->parentType = TYPE_TYPE;
 
     quick_create_function(code, "get-field", Struct__get_field,
         TermList(ANY_TYPE, STRING_TYPE), ANY_TYPE);
