@@ -24,6 +24,10 @@ Type::Type()
 
 bool is_instance(Term* term, Term* type)
 {
+    // Special case during bootstrapping. I hope you are careful!
+    if (CURRENTLY_BOOTSTRAPPING && type == NULL)
+        return true;
+
     Term* actualType = term->type;
 
     while (actualType != NULL) {
@@ -45,14 +49,12 @@ void assert_instance(Term* term, Term* type)
 
 bool is_type(Term* term)
 {
-    return term->type == TYPE_TYPE;
+    return is_instance(term, TYPE_TYPE);
 }
 
 Type* as_type(Term* term)
 {
-    if (!is_type(term))
-        throw errors::TypeError(term, TYPE_TYPE);
-
+    assert_instance(term, TYPE_TYPE);
     return (Type*) term->value;
 }
 

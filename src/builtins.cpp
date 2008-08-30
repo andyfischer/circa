@@ -22,6 +22,8 @@
 
 namespace circa {
 
+bool CURRENTLY_BOOTSTRAPPING = true;
+
 Branch* KERNEL = NULL;
 Term* CONST_GENERATOR = NULL;
 Term* INT_TYPE = NULL;
@@ -448,6 +450,8 @@ void initialize()
     try {
         bootstrap_kernel();
         initialize_constants();
+
+        CURRENTLY_BOOTSTRAPPING = false;
 
         // These need to be first:
         initialize_structs(KERNEL);
