@@ -2,15 +2,9 @@
 #define CIRCA__MAP_FUNCTION__INCLUDED
 
 #include "branch.h"
-#include "function.h"
+#include "term_map.h"
 
 namespace circa {
-
-struct MapFunctionInstance : public Function
-{
-    Branch branch;
-    TermMap map;
-};
 
 void initialize_map_function(Branch* kernel);
 
