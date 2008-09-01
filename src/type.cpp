@@ -17,6 +17,7 @@ Type::Type()
     dealloc(NULL),
     duplicate(NULL),
     equals(NULL),
+    compare(NULL),
     remapPointers(NULL),
     toString(NULL)
 {

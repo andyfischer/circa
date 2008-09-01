@@ -24,6 +24,12 @@ void templated_duplicate(Term* source, Term* dest)
     dest->value = new T(*(reinterpret_cast<T*>(source->value)));
 }
 
+template <class T>
+bool templated_equals(Term* a, Term* b)
+{
+    return (*(reinterpret_cast<T*>(a->value))) == (*(reinterpret_cast<T*>(b->value)));
+}
+
 } // namespace cpp_interface
 
 // Public functions
@@ -31,11 +37,13 @@ void templated_duplicate(Term* source, Term* dest)
 template <class T>
 Term* quick_create_cpp_type(Branch* branch, std::string name)
 {
-    return quick_create_type(branch, name,
+    Term* term = quick_create_type(branch, name,
         cpp_interface::templated_alloc<T>,
         cpp_interface::templated_dealloc<T>,
         cpp_interface::templated_duplicate<T>,
         NULL);
+    //as_type(term)->equals = cpp_interface::templated_equals<T>;
+    return term;
 }
 
 template <class T>

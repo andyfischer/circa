@@ -88,6 +88,15 @@ Term::findName()
     }
 }
 
+bool
+Term::equals(Term* term)
+{
+    if (this->type != term->type)
+        return false;
+
+    return as_type(this->type)->equals(this, term);
+}
+
 int
 Term::numErrors() const
 {
