@@ -31,6 +31,7 @@ void test_int()
     Branch branch;
 
     test_assert(as_type(INT_TYPE)->equals != NULL);
+    test_assert(as_type(INT_TYPE)->toString != NULL);
 
     Term* four = constant_int(&branch, 4);
     Term* another_four = constant_int(&branch, 4);
@@ -38,6 +39,8 @@ void test_int()
 
     test_assert(four->equals(another_four));
     test_assert(!four->equals(five));
+
+    test_assert(four->toString() == "4");
 }
 
 void test_float()
@@ -45,12 +48,16 @@ void test_float()
     Branch branch;
 
     test_assert(as_type(FLOAT_TYPE)->equals != NULL);
+    test_assert(as_type(FLOAT_TYPE)->toString != NULL);
 
     Term* point_one = constant_float(&branch, .1);
     Term* point_one_again = constant_float(&branch, .1);
     Term* point_two = constant_float(&branch, 0.2);
+
     test_assert(point_one->equals(point_one));
     test_assert(point_two->equals(point_two));
+
+    test_assert(point_one->toString() == "0.1");
 }
 
 void test_string()
