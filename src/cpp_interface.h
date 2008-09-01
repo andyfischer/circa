@@ -41,7 +41,8 @@ Term* quick_create_cpp_type(Branch* branch, std::string name)
 template <class T>
 T& as(Term* term)
 {
-    return *dynamic_cast<T*>(term->value);
+    // TODO: Add type checking to this function
+    return *reinterpret_cast<T*>(term->value);
 }
 
 } // namespace circa
