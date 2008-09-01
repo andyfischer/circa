@@ -18,7 +18,9 @@ struct MapFunctionState
 
 Term* MAP_FUNCTION_STATE_TYPE = NULL;
 
-void map_create__evaluate(Term* term)
+void map__execute(Term* term);
+
+void map_create__execute(Term* term)
 {
     Term* inputType = term->inputs[0];
     Term* outputType = term->inputs[1];
@@ -27,17 +29,20 @@ void map_create__evaluate(Term* term)
     function->inputTypes = TermList(inputType);
     function->outputType = outputType;
     function->name = "map<" + as_type(inputType)->name + "," + as_type(outputType)->name + ">";
+    function->execute = map__execute;
 }
 
-void map__evaluate(Term* term)
+void map__execute(Term* term)
 {
-
+    MapFunctionState &state = as<MapFunctionState>(term->state);
+    // todo
 }
 
 void initialize_map_function(Branch* kernel)
 {
-    MAP_FUNCTION_STATE_TYPE = quick_create_cpp_type<MapFunctionState>(kernel, "MapState");
-    quick_create_function(kernel, "map", map_create__evaluate,
+    MAP_FUNCTION_STATE_TYPE = quick_create_cpp_type<MapFunctionState>(kernel, "Map$State");
+
+    quick_create_function(kernel, "map", map_create__execute,
         TermList(TYPE_TYPE, TYPE_TYPE), FUNCTION_TYPE);
 }
 
