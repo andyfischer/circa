@@ -182,64 +182,23 @@ string& as_string(Term* t)
     return *((string*) t->value);
 }
 
-void int_alloc(Term* caller)
-{
-    caller->value = new int;
-}
-void int_dealloc(Term* caller)
-{
-    delete (int*) caller->value;
-}
-void int_duplicate(Term* source, Term* dest)
-{
-    int_alloc(dest);
-    as_int(dest) = as_int(source);
-}
-std::string int_toString(Term* term)
+std::string int__toString(Term* term)
 {
     std::stringstream strm;
     strm << as_int(term);
     return strm.str();
 }
 
-void float_alloc(Term* caller)
-{
-    caller->value = new float;
-}
-void float_dealloc(Term* caller)
-{
-    delete (float*) caller->value;
-}
-void float_duplicate(Term* source, Term* dest)
-{
-    float_alloc(dest);
-    as_float(dest) = as_float(source);
-}
-std::string float_toString(Term* term)
+std::string float__toString(Term* term)
 {
     std::stringstream strm;
     strm << as_float(term);
     return strm.str();
 }
 
-void string_alloc(Term* caller)
-{
-    caller->value = new string();
-}
-
-void string_dealloc(Term* caller)
-{
-    delete (string*) caller->value;
-    caller->value = NULL;
-}
-std::string string_toString(Term* term)
+std::string string__toString(Term* term)
 {
     return as_string(term);
-}
-void string_duplicate(Term* source, Term* dest)
-{
-    string_alloc(dest);
-    as_string(dest) = as_string(source);
 }
 
 void bool_alloc(Term* caller)
@@ -382,18 +341,18 @@ void write_text_file__evaluate(Term* caller)
 
 void initialize_constants()
 {
-    STRING_TYPE = quick_create_type(KERNEL, "string",
-            string_alloc,
-            string_dealloc,
-            string_duplicate,
-            string_toString);
-    INT_TYPE = quick_create_type(KERNEL, "int",
-            int_alloc,
-            int_dealloc,
-            int_duplicate,
-            int_toString);
-    FLOAT_TYPE = quick_create_type(KERNEL, "float",
-            float_alloc, float_dealloc, float_duplicate, float_toString);
+    STRING_TYPE = quick_create_cpp_type<std::string>(KERNEL, "string");
+    add_cpp_equals_function<std::string>(STRING_TYPE);
+    as_type(STRING_TYPE)->toString = string__toString;
+
+    INT_TYPE = quick_create_cpp_type<int>(KERNEL, "int");
+    add_cpp_equals_function<int>(INT_TYPE);
+    as_type(INT_TYPE)->toString = int__toString;
+
+    FLOAT_TYPE = quick_create_cpp_type<float>(KERNEL, "float");
+    add_cpp_equals_function<float>(FLOAT_TYPE);
+    as_type(FLOAT_TYPE)->toString = float__toString;
+
     BOOL_TYPE = quick_create_type(KERNEL, "bool",
             bool_alloc, bool_dealloc, bool_duplicate, bool_toString);
     ANY_TYPE = quick_create_type(KERNEL, "any",

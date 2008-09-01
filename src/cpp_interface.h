@@ -30,6 +30,12 @@ bool templated_equals(Term* a, Term* b)
     return (*(reinterpret_cast<T*>(a->value))) == (*(reinterpret_cast<T*>(b->value)));
 }
 
+template <class T>
+std::string templated_toString(Term* term)
+{
+    return reinterpret_cast<T*>(term->value)->toString();
+}
+
 } // namespace cpp_interface
 
 // Public functions
@@ -42,8 +48,19 @@ Term* quick_create_cpp_type(Branch* branch, std::string name)
         cpp_interface::templated_dealloc<T>,
         cpp_interface::templated_duplicate<T>,
         NULL);
-    //as_type(term)->equals = cpp_interface::templated_equals<T>;
     return term;
+}
+
+template <class T>
+Term* add_cpp_equals_function(Term* type)
+{
+    as_type(type)->equals = cpp_interface::templated_equals<T>;
+}
+
+template <class T>
+Term* add_cpp_toString_function(Term* type)
+{
+    as_type(type)->toString = cpp_interface::templated_toString<T>;
 }
 
 template <class T>
