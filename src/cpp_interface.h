@@ -52,18 +52,6 @@ Term* quick_create_cpp_type(Branch* branch, std::string name)
 }
 
 template <class T>
-Term* add_cpp_equals_function(Term* type)
-{
-    as_type(type)->equals = cpp_interface::templated_equals<T>;
-}
-
-template <class T>
-Term* add_cpp_toString_function(Term* type)
-{
-    as_type(type)->toString = cpp_interface::templated_toString<T>;
-}
-
-template <class T>
 T& as(Term* term)
 {
     // TODO: Add type checking to this function

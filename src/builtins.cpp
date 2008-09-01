@@ -342,15 +342,15 @@ void write_text_file__evaluate(Term* caller)
 void initialize_constants()
 {
     STRING_TYPE = quick_create_cpp_type<std::string>(KERNEL, "string");
-    add_cpp_equals_function<std::string>(STRING_TYPE);
+    as_type(STRING_TYPE)->equals = cpp_interface::templated_equals<std::string>;
     as_type(STRING_TYPE)->toString = string__toString;
 
     INT_TYPE = quick_create_cpp_type<int>(KERNEL, "int");
-    add_cpp_equals_function<int>(INT_TYPE);
+    as_type(INT_TYPE)->equals = cpp_interface::templated_equals<int>;
     as_type(INT_TYPE)->toString = int__toString;
 
     FLOAT_TYPE = quick_create_cpp_type<float>(KERNEL, "float");
-    add_cpp_equals_function<float>(FLOAT_TYPE);
+    as_type(FLOAT_TYPE)->equals = cpp_interface::templated_equals<float>;
     as_type(FLOAT_TYPE)->toString = float__toString;
 
     BOOL_TYPE = quick_create_type(KERNEL, "bool",
