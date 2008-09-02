@@ -55,8 +55,11 @@ void map_create__execute(Term* term)
 void map_access__evaluate(Term* term)
 {
     ValueMap& map = as<ValueMap>(term->inputs[0]);
+
+    Term* value = map.findValueForKey(term->inputs[1]);
     
-    duplicate_value(map.findValueForKey(term->inputs[1]), term);
+    change_type(term, value->type);
+    duplicate_value(value, term);
 }
 
 void map_set__evaluate(Term* term)
