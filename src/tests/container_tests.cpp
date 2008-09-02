@@ -2,10 +2,13 @@
 #include "common_headers.h"
 
 #include "tests/common.h"
+#include "branch.h"
+#include "operations.h"
 #include "term.h"
 #include "term_list.h"
 #include "term_namespace.h"
 #include "term_set.h"
+#include "value_map.h"
 
 namespace circa {
 namespace container_tests {
@@ -104,6 +107,22 @@ void test_list()
     test_assert(list.count() == 0);
 }
 
+void value_map()
+{
+    Branch branch;
+    ValueMap map;
+
+    Term* two = constant_int(&branch, 2);
+    Term* hi = constant_string(&branch, "hi");
+
+    map.set(two, hi);
+
+
+
+
+
+}
+
 } // namespace container_tests
 
 void register_container_tests()
@@ -111,6 +130,7 @@ void register_container_tests()
     REGISTER_TEST_CASE(container_tests::test_set);
     REGISTER_TEST_CASE(container_tests::test_namespace);
     REGISTER_TEST_CASE(container_tests::test_list);
+    REGISTER_TEST_CASE(container_tests::value_map);
 }
 
 } // namespace circa

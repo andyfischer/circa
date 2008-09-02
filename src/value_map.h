@@ -16,6 +16,9 @@ struct ValueMap
 
     Branch branch;
     PairList pairs;
+
+    Term* findValueForKey(Term* term);
+    void set(Term* key, Term* value);
 };
 
 void initialize_map_function(Branch* kernel);
