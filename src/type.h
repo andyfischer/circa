@@ -20,8 +20,8 @@ struct Type
 
     std::string name;
 
-    // Parent type, if any. Currently it's the responsibility of the type definer
-    // to make sure that a derived value can be safely upcast.
+    // Parent type, if any. This field only comes into play when casting a
+    // value to its original C++ type.
     Term* parentType;
 
     // Functions
@@ -39,6 +39,7 @@ struct Type
     TermNamespace memberFunctions;
 
     Type();
+    void addMemberFunction(std::string const& name, Term* function);
 };
 
 // Return true if the term is an instance (possibly derived) of the given type

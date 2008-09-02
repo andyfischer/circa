@@ -3,6 +3,7 @@
 
 #include "bootstrapping.h"
 #include "builtins.h"
+#include "errors.h"
 #include "term.h"
 #include "term_list.h"
 #include "term_map.h"
@@ -19,6 +20,16 @@ void
 TermList::append(Term* term)
 {
     _items.push_back(term);
+}
+
+void
+TermList::appendAll(TermList const& list)
+{
+    if (&list == this)
+        throw errors::InternalError("Circular call");
+
+    for (int i=0; i < list.count(); i++)
+        append(list[i]);
 }
 
 void

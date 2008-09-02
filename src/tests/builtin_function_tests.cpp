@@ -54,7 +54,7 @@ void test_float()
     Term* point_one_again = constant_float(&branch, .1);
     Term* point_two = constant_float(&branch, 0.2);
 
-    test_assert(point_one->equals(point_one));
+    test_assert(point_one->equals(point_one_again));
     test_assert(point_two->equals(point_two));
 
     test_assert(point_one->toString() == "0.1");

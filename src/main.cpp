@@ -29,8 +29,6 @@ int main(int nargs, const char * args[])
 {
     initialize();
 
-    bool runTests = true;
-
     if (nargs == 1) {
         run_all_tests();
     }

@@ -186,7 +186,25 @@ Term* apply_function(Branch* branch, Term* function, TermList inputs)
     // Check if 'function' is actually a type
     if (is_type(function))
     {
-        return create_term(branch, get_const_function(branch, function), TermList());
+        if (inputs.count() != 0)
+            throw errors::InternalError("Multiple inputs in constructor not supported");
+
+        return create_term(branch, get_const_function(branch, function), inputs);
+    }
+
+    // If 'function' is not really a function, see if we can treat it like a function
+    if (!is_function(function)) {
+
+        Type* type = as_type(function->type);
+
+        if (!type->memberFunctions.contains(""))
+            throw errors::InternalError("Term is not a type, and has no default function");
+
+        TermList memberFunctionInputs;
+        memberFunctionInputs.append(function);
+        memberFunctionInputs.appendAll(inputs);
+
+        return create_term(branch, type->memberFunctions[""], memberFunctionInputs);
     }
 
     // Create a term in the normal way
