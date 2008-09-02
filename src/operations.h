@@ -55,7 +55,7 @@ void duplicate_value(Term* source, Term* dest);
 // In some situations we are not allowed to steal a value. In these situations,
 // calling steal_value is equivalent to calling duplicate_value. These situations include:
 //  1) if source is a constant
-//  2) other?
+//  2) ... (possible future situations)
 void steal_value(Term* source, Term* dest);
 
 void remap_pointers(Term* term, Term* original, Term* replacement);
