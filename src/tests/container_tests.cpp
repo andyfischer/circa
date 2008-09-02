@@ -3,6 +3,7 @@
 
 #include "tests/common.h"
 #include "branch.h"
+#include "builtins.h"
 #include "operations.h"
 #include "term.h"
 #include "term_list.h"
@@ -113,14 +114,15 @@ void value_map()
     ValueMap map;
 
     Term* two = constant_int(&branch, 2);
+    Term* another_two = constant_int(&branch, 2);
     Term* hi = constant_string(&branch, "hi");
 
     map.set(two, hi);
 
+    // Change our version of hi to verify that ValueMap has made a duplicate
+    as_string(hi) = "hello";
 
-
-
-
+    test_assert(as_string(map.findValueForKey(another_two)) == "hi");
 }
 
 } // namespace container_tests
