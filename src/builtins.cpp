@@ -13,12 +13,12 @@
 #include "cpp_interface.h"
 #include "errors.h"
 #include "function.h"
-#include "map_function.h"
 #include "operations.h"
 #include "structs.h"
 #include "subroutine.h"
 #include "term.h"
 #include "type.h"
+#include "value_map.h"
 
 namespace circa {
 
