@@ -33,8 +33,8 @@ TypeError::message()
             + "' is not a type. (expected " + expected + ")";
 
     return string("TypeError: expected " + as_type(expectedType)->name
-            + ", found " + as_type(offendingTerm->type)->name + " \""
-            + offendingTerm->findName()) + "\"";
+            + ", found " + as_type(offendingTerm->type)->name);
+            //+ " \"" + offendingTerm->findName()) + "\"";
 }
 
 } // namespace errors

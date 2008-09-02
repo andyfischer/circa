@@ -29,6 +29,7 @@ struct TermList
 
     int count() const;
     void append(Term* term);
+    void appendAll(TermList const& list);
     void setAt(int index, Term* term);
     void clear();
     Term* get(int index) const;

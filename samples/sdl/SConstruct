@@ -21,6 +21,10 @@ def create_mac_env(releaseBuild):
     # Python support
     #env.Append(CPPPATH = ["/System/Library/Frameworks/Python.framework/Versions/2.5/Headers"])
 
+    env.Append(CCFLAGS = ['-I/Library/Frameworks/SDL.framework/Headers'])
+    env.Append(CCFLAGS = ['-framework SDL'])
+    env.Append(CCFLAGS = ['-framework Cocoa'])
+
     if not releaseBuild:
         env.Append(CPPFLAGS=['-ggdb'])
         # env.Append(CPPFLAGS=['-bundle'])
@@ -35,25 +39,18 @@ env = create_mac_env(RELEASE_BUILD)
 env.Append(CPPDEFINES = ["_DEBUG"])
 env.Append(CPPDEFINES = ["DEBUG"])
 
-env.BuildDir('build', 'src')
 env.Append(CPPPATH = ['src'])
 
 # Find source files
-excludeFromLibrary = ['test_program.cpp']
-buildFiles = []
+sourceFiles = []
 for (dirpath, dirnames, filenames) in os.walk('src'):
     for file in filenames:
-        if file in excludeFromLibrary:
-            continue
         fullpath = os.path.join(dirpath, file)
-        fullpath = fullpath.replace("src","build")
 
         if fullpath.endswith('.cpp'):
-            buildFiles.append(fullpath)
+            sourceFiles.append(fullpath)
     
-libcirca = env.SharedLibrary('lib/circa', buildFiles)
-
-circaBinary = env.Program('bin/circa', 'build/main.cpp', LIBS=[libcirca])
+binary = env.Program('bin/circa-sdl', sourceFiles)
 
 env.SetOption('num_jobs', 2)
 

@@ -217,7 +217,7 @@ void bool_duplicate(Term* source, Term* dest)
     as_bool(dest) = as_bool(source);
 }
 
-std::string bool_toString(Term* term)
+std::string bool__toString(Term* term)
 {
     if (as_bool(term))
         return "true";
@@ -305,12 +305,6 @@ void list_apply__evaluate(Term* caller)
     }
 }
 
-void this_branch__evaluate(Term* caller)
-{
-    // TOFIX, this will have problems when memory management is implemented
-    *as_list(caller) = caller->owningBranch->terms;
-}
-
 void read_text_file__evaluate(Term* caller)
 {
     std::string filename = as_string(caller->inputs[0]);
@@ -353,8 +347,9 @@ void initialize_constants()
     as_type(FLOAT_TYPE)->equals = cpp_interface::templated_equals<float>;
     as_type(FLOAT_TYPE)->toString = float__toString;
 
-    BOOL_TYPE = quick_create_type(KERNEL, "bool",
-            bool_alloc, bool_dealloc, bool_duplicate, bool_toString);
+    BOOL_TYPE = quick_create_cpp_type<bool>(KERNEL, "bool");
+    as_type(BOOL_TYPE)->toString = bool__toString;
+
     ANY_TYPE = quick_create_type(KERNEL, "any",
             empty_function, empty_function, NULL);
     VOID_TYPE = quick_create_type(KERNEL, "void",
@@ -366,7 +361,7 @@ void initialize_constants()
 
     BRANCH_TYPE = quick_create_cpp_type<Branch>(KERNEL, "Branch");
     LIST_TYPE = quick_create_cpp_type<TermList>(KERNEL, "List");
-    MAP_TYPE = quick_create_cpp_type<TermMap>(KERNEL, "Map");
+    //MAP_TYPE = quick_create_cpp_type<TermMap>(KERNEL, "Map");
 
     CONSTANT_INT = get_const_function(KERNEL, INT_TYPE);
     CONSTANT_FLOAT = get_const_function(KERNEL, FLOAT_TYPE);
@@ -397,7 +392,6 @@ void initialize_builtin_functions(Branch* code)
     quick_create_function(code, "list", create_list__evaluate, TermList(ANY_TYPE), LIST_TYPE);
     quick_create_function(code, "range", range__evaluate, TermList(INT_TYPE), LIST_TYPE);
     quick_create_function(code, "list-apply", list_apply__evaluate, TermList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
-    quick_create_function(code, "this-branch", this_branch__evaluate, TermList(), LIST_TYPE);
     quick_create_function(code, "read-text-file", read_text_file__evaluate,
             TermList(STRING_TYPE), STRING_TYPE);
     quick_create_function(code, "write-text-file", write_text_file__evaluate,

@@ -5,21 +5,11 @@
 #include "builtins.h"
 #include "cpp_interface.h"
 #include "map_function.h"
+#include "type.h"
 
 namespace circa {
 
-void map__evaluate(Term* term);
-
-struct MapFunctionState
-{
-    Branch branch;
-    TermMap map;
-};
-
-Term* MAP_FUNCTION_STATE_TYPE = NULL;
-
-void map__execute(Term* term);
-
+/*
 void map_create__execute(Term* term)
 {
     Term* inputType = term->inputs[0];
@@ -31,19 +21,22 @@ void map_create__execute(Term* term)
     function->name = "map<" + as_type(inputType)->name + "," + as_type(outputType)->name + ">";
     function->execute = map__execute;
 }
+*/
 
-void map__execute(Term* term)
+void map_access__evaluate(Term* term)
 {
-    MapFunctionState &state = as<MapFunctionState>(term->state);
-    // todo
+    ValueMap& map = as<ValueMap>(term->inputs[0]);
+
 }
 
 void initialize_map_function(Branch* kernel)
 {
-    MAP_FUNCTION_STATE_TYPE = quick_create_cpp_type<MapFunctionState>(kernel, "Map$State");
+    MAP_TYPE = quick_create_cpp_type<ValueMap>(kernel, "Map");
 
-    quick_create_function(kernel, "map", map_create__execute,
-        TermList(TYPE_TYPE, TYPE_TYPE), FUNCTION_TYPE);
+    Term* accessFunc = quick_create_function(kernel, "map-access", map_access__evaluate,
+        TermList(MAP_TYPE, ANY_TYPE), ANY_TYPE);
+    
+    as_type(MAP_TYPE)->addMemberFunction("", accessFunc);
 }
 
 } // namespace circa
