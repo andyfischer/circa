@@ -48,12 +48,6 @@ Term::~Term()
     dealloc_value(this);
 }
 
-Type*
-Term::getType() const
-{
-    return as_type(this->type);
-}
-
 std::string
 Term::toString()
 {

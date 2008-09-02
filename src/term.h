@@ -30,10 +30,9 @@ struct Term
     Term();
     ~Term();
 
-    Type* getType() const;
     std::string toString();
-    std::string findName();
     bool equals(Term* term);
+    std::string findName();
 
     int numErrors() const;
     std::string const& getError(int index);
