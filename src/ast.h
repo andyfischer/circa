@@ -122,6 +122,7 @@ struct Identifier : public Expression
 struct Statement {
     typedef std::vector<Statement*> List;
 
+    virtual ~Statement() {}
     virtual std::string toString() const = 0;
     virtual Term* createTerm(Branch* branch) = 0;
 };
@@ -132,6 +133,7 @@ struct StatementList
 
     void push(Statement* statement);
 
+    ~StatementList();
     virtual std::string toString() const;
     void createTerms(Branch* branch);
 };
@@ -143,6 +145,7 @@ struct ExpressionStatement : public Statement
     std::string preEqualsWhitepace;
     std::string postEqualsWhitespace;
 
+    virtual ~ExpressionStatement() { delete expression; }
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
 };
@@ -152,6 +155,7 @@ struct IgnorableStatement : public Statement
 {
     std::string text;
 
+    virtual ~IgnorableStatement() { }
     virtual std::string toString() const { return text; }
     virtual Term* createTerm(Branch* branch) { return NULL; }
 };

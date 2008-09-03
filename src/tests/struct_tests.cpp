@@ -25,6 +25,9 @@ void test_create_instance()
 
     test_assert(inst->getField(0)->type == INT_TYPE);
     test_assert(inst->getField(1)->type == STRING_TYPE);
+
+    delete inst;
+    delete def;
 }
 
 void test_misc()

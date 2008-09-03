@@ -180,6 +180,14 @@ ExpressionStatement::createTerm(Branch* branch)
     return term;
 }
 
+StatementList::~StatementList()
+{
+    Statement::List::iterator it;
+    for (it = statements.begin(); it != statements.end(); ++it) {
+        delete (*it);
+    }
+}
+
 void
 StatementList::push(Statement* statement)
 {

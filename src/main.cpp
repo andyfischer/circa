@@ -33,6 +33,15 @@ int main(int nargs, const char * args[])
         run_all_tests();
     }
 
+    if (nargs == 2 && std::string("--list-tests") == args[1]) {
+        std::vector<std::string> testNames = list_all_test_names();
+
+        std::vector<std::string>::const_iterator it;
+        for (it = testNames.begin(); it != testNames.end(); ++it) {
+            std::cout << *it << std::endl;
+        }
+    }
+
     try {
 
         if (nargs > 1) {

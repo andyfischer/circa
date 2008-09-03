@@ -15,6 +15,8 @@ void literal_float()
     test_assert(literal != NULL);
     test_assert(literal->text == "1.0");
     test_assert(literal->toString() == "1.0");
+
+    delete expr;
 }
 
 void literal_string()
@@ -118,6 +120,8 @@ void create_function_call()
 
     test_assert(!term->needsUpdate);
     test_assert(as_float(term) == 5);
+
+    delete functionCall;
 }
 
 void test_quick_eval_statement()
@@ -175,6 +179,9 @@ void rebind_operator()
     tokens.reset("add(@a, 5)");
     ast::Statement* statement = parser::statement(tokens);
 
+    // todo
+
+    delete statement;
 }
 
 void ast_walk()
@@ -182,6 +189,9 @@ void ast_walk()
     token_stream::TokenStream tokens("concat(to-string(add(1,2.0)), \"cheese\")");
     ast::Expression* expr = parser::infixExpression(tokens);
 
+    // todo
+
+    delete expr;
 }
 
 } // namespace parser_tests
