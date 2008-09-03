@@ -16,7 +16,11 @@ Term* quick_eval_statement(Branch* branch, std::string const& input)
 
     ast::Statement* statementAst = statement(tokens);
 
-    return statementAst->createTerm(branch);
+    Term* result = statementAst->createTerm(branch);
+
+    delete statementAst;
+
+    return result;
 }
 
 Term* quick_exec_statement(Branch* branch, std::string const& input)

@@ -131,6 +131,9 @@ void set_input(Term* term, int index, Term* input)
 
 void execute(Term* term)
 {
+    if (term == NULL)
+        throw errors::InternalError("term is NULL");
+
     if (term->function == NULL)
         throw errors::InternalError("function term is NULL");
 

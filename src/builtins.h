@@ -37,6 +37,7 @@ extern Term* CONSTANT_FALSE;
 Term* get_global(std::string name);
 void empty_execute_function(Term* caller);
 void initialize();
+void shutdown();
 
 int& as_int(Term* t);
 float& as_float(Term* t);
