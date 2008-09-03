@@ -180,7 +180,7 @@ void rebind_operator()
 void ast_walk()
 {
     token_stream::TokenStream tokens("concat(to-string(add(1,2.0)), \"cheese\")");
-    ast::Expression* expr = parser::expression(tokens);
+    ast::Expression* expr = parser::infixExpression(tokens);
 
 }
 
