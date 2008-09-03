@@ -43,6 +43,14 @@ Infix::createTerm(Branch* branch)
 }
 
 void
+Infix::walk(ExpressionWalkingFunction func)
+{
+    func(this);
+    left->walk(func);
+    right->walk(func);
+}
+
+void
 FunctionCall::addArgument(Expression* expr, std::string const& preWhitespace,
             std::string const& postWhitespace)
 {
@@ -87,6 +95,16 @@ FunctionCall::createTerm(Branch* branch)
     }
 
     return apply_function(branch, function, inputs);
+}
+
+void
+FunctionCall::walk(ExpressionWalkingFunction func)
+{
+    func(this);
+    ArgumentList::iterator it;
+    for (it == arguments.begin(); it != arguments.end(); ++it) {
+        ((*it)->expression)->walk(func);
+    }
 }
 
 std::string
