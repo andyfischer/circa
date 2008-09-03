@@ -257,12 +257,12 @@ void initialize_subroutine(Branch* kernel)
 
     quick_create_function(kernel, "subroutine-create",
         subroutine_create__evaluate,
-        TermList(get_global("string"),get_global("List"),get_global("Type")),
+        TermList(STRING_TYPE,LIST_TYPE,TYPE_TYPE),
         SUBROUTINE_TYPE);
 
     Term* name_inputs = quick_create_function(kernel,
         "subroutine-name-inputs", subroutine_name_inputs__evaluate,
-        TermList(SUBROUTINE_TYPE, get_global("List")), SUBROUTINE_TYPE);
+        TermList(SUBROUTINE_TYPE, LIST_TYPE), SUBROUTINE_TYPE);
     as_function(name_inputs)->recycleInput = 0;
 
     quick_create_function(kernel, "subroutine-get-branch", subroutine_get_branch__evaluate,
@@ -281,19 +281,6 @@ void initialize_subroutine(Branch* kernel)
         subroutine_bind__evaluate,
         TermList(SUBROUTINE_TYPE, REFERENCE_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
     as_function(bind)->recycleInput = 0;
-
-    /*
-    quick_exec_function(kernel, 
-        "subroutine-append-ret = define-struct('subroutine-append-ret, list(Subroutine, Reference))");
-    quick_exec_function(kernel,
-        "subroutine-append-ret = struct-definition-rename-field(subroutine-append-ret, 0, 'sub)");
-    Term* subroutine_append_ret = quick_exec_function(kernel,
-        "subroutine-append-ret = struct-definition-rename-field(subroutine-append-ret, 1, 'term)");
-
-    Term* subroutine_append_f = quick_create_function(kernel,
-        "subroutine-append", subroutine_append__evaluate,
-        TermList(SUBROUTINE_TYPE, FUNCTION_TYPE, LIST_TYPE),
-        subroutine_append_ret);*/
 
     quick_create_function(kernel,
         "subroutine-eval", subroutine_eval__evaluate,

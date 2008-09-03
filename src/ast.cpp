@@ -195,7 +195,10 @@ FunctionDecl::addArgument(std::string const& type, std::string const& name)
 Term*
 FunctionDecl::createTerm(Branch* branch)
 {
-    // todo
+    Branch workspace;
+
+    //parser::quick_exec_function(&workspace, "subroutine-create
+
     return NULL;
 }
 
