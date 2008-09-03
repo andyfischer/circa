@@ -9,6 +9,9 @@
 
 namespace circa {
 namespace ast {
+    
+struct Expression;
+typedef void (*ExpressionWalkingFunction)(Expression* expr);
 
 struct Expression
 {
@@ -18,6 +21,7 @@ struct Expression
     virtual ~Expression() { }
     virtual std::string toString() const = 0;
     virtual Term* createTerm(Branch* branch) = 0;
+    virtual void walk(ExpressionWalkingFunction func) = 0;
 };
 
 struct Infix : public Expression
@@ -33,6 +37,7 @@ struct Infix : public Expression
     ~Infix();
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
+    virtual void walk(ExpressionWalkingFunction func);
 };
 
 struct FunctionCall : public Expression
@@ -63,6 +68,7 @@ struct FunctionCall : public Expression
             std::string const& postWhitespace);
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
+    virtual void walk(ExpressionWalkingFunction func);
 };
 
 struct LiteralString : public Expression
@@ -72,6 +78,7 @@ struct LiteralString : public Expression
     explicit LiteralString(std::string const& _text) : text(_text) { }
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
+    virtual void walk(ExpressionWalkingFunction func) { func(this); }
 };
 
 struct LiteralFloat : public Expression
@@ -84,6 +91,7 @@ struct LiteralFloat : public Expression
         return text;
     }
     virtual Term* createTerm(Branch* branch);
+    virtual void walk(ExpressionWalkingFunction func) { func(this); }
 };
 
 struct LiteralInteger : public Expression
@@ -96,6 +104,7 @@ struct LiteralInteger : public Expression
         return text;
     }
     virtual Term* createTerm(Branch* branch);
+    virtual void walk(ExpressionWalkingFunction func) { func(this); }
 };
 
 struct Identifier : public Expression
@@ -106,6 +115,7 @@ struct Identifier : public Expression
     explicit Identifier(std::string const& _text) : text(_text), hasRebindOperator(false) {}
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
+    virtual void walk(ExpressionWalkingFunction func) { func(this); }
 };
 
 struct Statement {
