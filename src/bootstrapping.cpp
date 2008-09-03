@@ -35,7 +35,7 @@ Term* quick_create_type(
 Term* quick_create_function(Branch* branch, string name, Function::ExecuteFunc executeFunc,
         TermList inputTypes, Term* outputType)
 {
-    Term* term = create_constant(branch, get_global("Function"));
+    Term* term = create_constant(branch, FUNCTION_TYPE);
     Function* func = as_function(term);
     func->name = name;
     func->execute = executeFunc;
