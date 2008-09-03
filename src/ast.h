@@ -101,8 +101,9 @@ struct LiteralInteger : public Expression
 struct Identifier : public Expression
 {
     std::string text;
+    bool hasRebindOperator;
 
-    explicit Identifier(std::string const& _text) : text(_text) { }
+    explicit Identifier(std::string const& _text) : text(_text), hasRebindOperator(false) {}
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
 };

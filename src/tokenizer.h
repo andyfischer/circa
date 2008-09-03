@@ -23,6 +23,7 @@ const int RPAREN = 2;
 const int LBRACE = 30;
 const int RBRACE = 31;
 const int COMMA = 3;
+const int AMPERSAND = 32;
 
 const int IDENTIFIER = 4;
 const int INTEGER = 5;
