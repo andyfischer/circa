@@ -95,6 +95,9 @@ void unsafe_change_type(Term* term, Term* type)
 
 void change_type(Term* term, Term* type)
 {
+    if (term->type == type)
+        return;
+
     if (term->value != NULL)
         throw errors::InternalError("value is not NULL in change_type (possible memory leak)");
     term->type = type;
@@ -183,6 +186,9 @@ void execute_branch(Branch* branch)
 
 Term* apply_function(Branch* branch, Term* function, TermList inputs)
 {
+    if (function->needsUpdate)
+        execute(function);
+
     // Check if 'function' is actually a type
     if (is_type(function))
     {
@@ -198,7 +204,8 @@ Term* apply_function(Branch* branch, Term* function, TermList inputs)
         Type* type = as_type(function->type);
 
         if (!type->memberFunctions.contains(""))
-            throw errors::InternalError("Term is not a type, and has no default function");
+            throw errors::InternalError(std::string("Term ") + function->toString()
+                    + " is not a type, and has no default function");
 
         TermList memberFunctionInputs;
         memberFunctionInputs.append(function);
