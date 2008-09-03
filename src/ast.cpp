@@ -197,7 +197,27 @@ FunctionDecl::createTerm(Branch* branch)
 {
     Branch workspace;
 
-    //parser::quick_exec_function(&workspace, "subroutine-create
+    TermList inputTypes;
+
+    ArgumentList::const_iterator it;
+    for (it = this->arguments.begin(); it != this->arguments.end(); ++it)
+    {
+        Term* term = branch->getNamed(it->type);
+        if (term == NULL)
+            throw syntax_errors::SyntaxError(std::string("Identifier not found: ") + it->type);
+
+        if (!is_type(term))
+            throw syntax_errors::SyntaxError(std::string("Identifier is not a type: ") + it->type);
+
+        inputTypes.append(term);
+    }
+
+    Term* outputType = branch->getNamed(this->outputType);
+    if (outputType == NULL)
+        throw syntax_errors::SyntaxError(std::string("Identifier not found: ") + this->outputType);
+    if (!is_type(outputType))
+        throw syntax_errors::SyntaxError(std::string("Identifier is not a type: ") + this->outputType);
+
 
     return NULL;
 }
