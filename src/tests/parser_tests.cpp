@@ -177,6 +177,13 @@ void rebind_operator()
 
 }
 
+void ast_walk()
+{
+    token_stream::TokenStream tokens("concat(to-string(add(1,2.0)), \"cheese\")");
+    ast::Expression* expr = parser::expression(tokens);
+
+}
+
 } // namespace parser_tests
 
 void register_parser_tests()
@@ -191,6 +198,7 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::test_quick_eval_statement);
     REGISTER_TEST_CASE(parser_tests::function_decl_ast);
     REGISTER_TEST_CASE(parser_tests::rebind_operator);
+    REGISTER_TEST_CASE(parser_tests::ast_walk);
 }
 
 } // namespace circa
