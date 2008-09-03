@@ -19,7 +19,7 @@ void register_subroutine_tests();
 void register_struct_tests();
 void register_tokenizer_tests();
 
-void run_all_tests()
+void register_all_tests()
 {
     gTestCases.clear();
 
@@ -34,6 +34,11 @@ void run_all_tests()
     register_subroutine_tests();
     register_struct_tests();
     register_tokenizer_tests();
+}
+
+void run_all_tests()
+{
+    register_all_tests();
 
     std::vector<TestCase>::iterator it;
     int totalTestCount = (int) gTestCases.size();
@@ -57,6 +62,18 @@ void run_all_tests()
     std::cout << "Ran " << totalTestCount << " tests, " << successCount
         << " " << successes << " and " << failureCount << " "
         << failures << "." << std::endl;
+}
+
+std::vector<std::string> list_all_test_names()
+{
+    register_all_tests();
+
+    std::vector<std::string> output;
+
+    std::vector<TestCase>::iterator it;
+    output.push_back(it->name);
+
+    return output;
 }
 
 }
