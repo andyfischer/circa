@@ -118,7 +118,10 @@ LiteralInteger::createTerm(Branch* branch)
 std::string
 Identifier::toString() const
 {
-    return text;
+    std::string rebindSymbol = "";
+    if (hasRebindOperator)
+        rebindSymbol = "@";
+    return rebindSymbol + text;
 }
 Term*
 Identifier::createTerm(Branch* branch)
@@ -218,6 +221,10 @@ FunctionDecl::createTerm(Branch* branch)
     if (!is_type(outputType))
         throw syntax_errors::SyntaxError(std::string("Identifier is not a type: ") + this->outputType);
 
+    // Load into workspace
+    constant_string(&workspace, this->functionName, "functionName");
+    constant_list(&workspace, inputTypes, "inputTypes");
+    workspace.bindName(outputType, "outputType");
 
     return NULL;
 }

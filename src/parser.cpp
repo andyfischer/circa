@@ -166,9 +166,22 @@ ast::Expression* atom(token_stream::TokenStream& tokens)
     if (tokens.nextIs(tokenizer::INTEGER))
         return new ast::LiteralInteger(tokens.consume(tokenizer::INTEGER));
 
+    // rebind operator?
+    bool hasRebindOperator = false;
+
+    if (tokens.nextIs(tokenizer::AMPERSAND)) {
+        hasRebindOperator = true;
+        tokens.consume(tokenizer::AMPERSAND);
+    }
+
     // identifier?
-    if (tokens.nextIs(tokenizer::IDENTIFIER))
-        return new ast::Identifier(tokens.consume(tokenizer::IDENTIFIER));
+    if (tokens.nextIs(tokenizer::IDENTIFIER)) {
+        ast::Identifier* id = new ast::Identifier(tokens.consume(tokenizer::IDENTIFIER));
+        id->hasRebindOperator = hasRebindOperator;
+        return id;
+    } else if (hasRebindOperator) {
+        throw syntax_errors::SyntaxError("@ operator only allowed before an identifier");
+    }
 
     // parenthesized expression?
     if (tokens.nextIs(tokenizer::LPAREN)) {

@@ -151,6 +151,32 @@ void function_decl_ast()
     test_assert(decl.toString() == "function add(float arg1, float arg2)\n{\nx = add(arg1,arg2)\n}");
 }
 
+void rebind_operator()
+{
+    token_stream::TokenStream tokens("@cheese");
+    ast::Expression* expr = parser::atom(tokens);
+
+    ast::Identifier* id = dynamic_cast<ast::Identifier*>(expr);
+    test_assert(id != NULL);
+    test_assert(id->text == "cheese");
+    test_assert(id->hasRebindOperator);
+
+    delete expr;
+
+    tokens.reset("gouda");
+    expr = parser::atom(tokens);
+    id = dynamic_cast<ast::Identifier*>(expr);
+    test_assert(id != NULL);
+    test_assert(id->text == "gouda");
+    test_assert(!id->hasRebindOperator);
+
+    delete expr;
+
+    tokens.reset("add(@a, 5)");
+    ast::Statement* statement = parser::statement(tokens);
+
+}
+
 } // namespace parser_tests
 
 void register_parser_tests()
@@ -164,6 +190,7 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::create_function_call);
     REGISTER_TEST_CASE(parser_tests::test_quick_eval_statement);
     REGISTER_TEST_CASE(parser_tests::function_decl_ast);
+    REGISTER_TEST_CASE(parser_tests::rebind_operator);
 }
 
 } // namespace circa

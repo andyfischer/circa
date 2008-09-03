@@ -25,6 +25,12 @@ struct TokenStream
     {
     }
 
+    void reset(std::string const& input)
+    {
+        tokens = tokenizer::tokenize(input);
+        currentIndex = 0;
+    }
+
     /*
     bool shouldSkip(const char* token)
     {
