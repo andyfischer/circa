@@ -134,6 +134,23 @@ void test_quick_eval_statement()
     test_assert(as_float(result) == 8);*/
 }
 
+void function_decl_ast()
+{
+    // Create a FunctionDecl from scratch
+    ast::FunctionDecl decl;
+    decl.functionName = "add";
+    decl.outputType = "float";
+    decl.addArgument("float","arg1");
+    decl.addArgument("float","arg2");
+
+    decl.statements = new ast::StatementList();
+
+    token_stream::TokenStream tokens("x = add(arg1,arg2)");
+    decl.statements->push(parser::statement(tokens));
+
+    test_assert(decl.toString() == "function add(float arg1, float arg2)\n{\nx = add(arg1,arg2)\n}");
+}
+
 } // namespace parser_tests
 
 void register_parser_tests()
@@ -146,6 +163,7 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::create_literals);
     REGISTER_TEST_CASE(parser_tests::create_function_call);
     REGISTER_TEST_CASE(parser_tests::test_quick_eval_statement);
+    REGISTER_TEST_CASE(parser_tests::function_decl_ast);
 }
 
 } // namespace circa

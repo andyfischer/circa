@@ -149,19 +149,26 @@ struct FunctionDecl : public Statement
     struct Argument {
         std::string type;
         std::string name;
+
+        Argument() {}
+        Argument(std::string const& _type, std::string const& _name)
+            : type(_type), name(_name) {}
     };
+    typedef std::vector<Argument> ArgumentList;
 
     std::string functionName;
-    std::vector<Argument> arguments;
+    ArgumentList arguments;
+    std::string outputType;
     StatementList *statements;
 
+    FunctionDecl() : statements(NULL) {}
     FunctionDecl(std::string const& _functionName)
         : functionName(_functionName), statements(NULL) {}
     ~FunctionDecl();
 
     void addArgument(std::string const& type, std::string const& name);
 
-    virtual std::string toString() const { return "todo"; }
+    virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
 };
 

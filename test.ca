@@ -1,8 +1,5 @@
 
 
-operators = Map()
-operators = map-set(operators, "+", add)
-
-f = operators("+")
-
-f(1.0,2.0) -> to-string -> print
+function square(float a) -> float {
+    return mult(a,a)
+}
