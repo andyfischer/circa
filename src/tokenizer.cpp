@@ -9,6 +9,8 @@ const char* getMatchText(int match)
     switch (match) {
         case LPAREN: return "(";
         case RPAREN: return ")";
+        case LBRACE: return "{";
+        case RBRACE: return "}";
         case COMMA: return ",";
         case IDENTIFIER: return "IDENTIFIER";
         case INTEGER: return "INTEGER";
@@ -164,6 +166,14 @@ void top_level_consume_token(TokenizeContext &context)
         case ')':
             context.consume();
             context.pushResult(RPAREN, ")");
+            return;
+        case '{':
+            context.consume();
+            context.pushResult(LBRACE);
+            return;
+        case '}':
+            context.consume();
+            context.pushResult(RBRACE);
             return;
         case ',':
             context.consume();

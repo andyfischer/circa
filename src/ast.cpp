@@ -178,6 +178,27 @@ StatementList::createTerms(Branch* branch)
     }
 }
 
+FunctionDecl::~FunctionDecl()
+{
+    delete this->statements;
+}
+
+void
+FunctionDecl::addArgument(std::string const& type, std::string const& name)
+{
+    Argument arg;
+    arg.type = type;
+    arg.name = name;
+    this->arguments.push_back(arg);
+}
+
+Term*
+FunctionDecl::createTerm(Branch* branch)
+{
+    // todo
+    return NULL;
+}
+
 void initialize_ast_functions(Branch* kernel)
 {
 

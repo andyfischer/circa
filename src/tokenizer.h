@@ -20,6 +20,8 @@ typedef std::vector<TokenInstance> TokenList;
 
 const int LPAREN = 1;
 const int RPAREN = 2;
+const int LBRACE = 30;
+const int RBRACE = 31;
 const int COMMA = 3;
 
 const int IDENTIFIER = 4;

@@ -114,6 +114,16 @@ struct Statement {
     virtual Term* createTerm(Branch* branch) = 0;
 };
 
+struct StatementList
+{
+    Statement::List statements;
+
+    void push(Statement* statement);
+
+    virtual std::string toString() const;
+    void createTerms(Branch* branch);
+};
+
 struct ExpressionStatement : public Statement
 {
     std::string nameBinding;
@@ -134,15 +144,25 @@ struct IgnorableStatement : public Statement
     virtual Term* createTerm(Branch* branch) { return NULL; }
 };
 
-
-struct StatementList
+struct FunctionDecl : public Statement
 {
-    Statement::List statements;
+    struct Argument {
+        std::string type;
+        std::string name;
+    };
 
-    void push(Statement* statement);
+    std::string functionName;
+    std::vector<Argument> arguments;
+    StatementList *statements;
 
-    virtual std::string toString() const;
-    void createTerms(Branch* branch);
+    FunctionDecl(std::string const& _functionName)
+        : functionName(_functionName), statements(NULL) {}
+    ~FunctionDecl();
+
+    void addArgument(std::string const& type, std::string const& name);
+
+    virtual std::string toString() const { return "todo"; }
+    virtual Term* createTerm(Branch* branch);
 };
 
 } // namespace ast
