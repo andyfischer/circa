@@ -199,6 +199,28 @@ FunctionDecl::createTerm(Branch* branch)
     return NULL;
 }
 
+std::string
+FunctionDecl::toString() const
+{
+    std::stringstream out;
+
+    out << "function " << functionName << "(";
+    ArgumentList::const_iterator it;
+    bool first = true;
+    for (it = arguments.begin(); it != arguments.end(); ++it) {
+        if (!first) out << ", ";
+        out << it->type << " " << it->name;
+        first = false;
+    }
+    out << ")" << std::endl << "{" << std::endl;
+
+    out << statements->toString();
+
+    out << "}";
+
+    return out.str();
+}
+
 void initialize_ast_functions(Branch* kernel)
 {
 

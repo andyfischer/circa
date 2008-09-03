@@ -234,9 +234,19 @@ ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
 
     possibleWhitespace(tokens);
 
+    if (tokens.nextIs(tokenizer::RIGHT_ARROW)) {
+        tokens.consume(tokenizer::RIGHT_ARROW);
+        possibleWhitespace(tokens);
+        decl->outputType = tokens.consume(tokenizer::IDENTIFIER);
+        possibleWhitespace(tokens);
+    }
+
     tokens.consume(tokenizer::LBRACE);
 
-    // todo
+    decl->statements = statementList(tokens);
+
+    tokens.consume(tokenizer::RBRACE);
+    
     return decl.release();
 }
 
