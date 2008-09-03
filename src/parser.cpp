@@ -53,6 +53,11 @@ ast::Statement* statement(token_stream::TokenStream& tokens)
         return new ast::IgnorableStatement();
     }
 
+    // Check for keywords
+    if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.next().text == "function") {
+        return functionDecl(tokens);
+    }
+
     return expressionStatement(tokens);
 }
 
@@ -198,6 +203,41 @@ ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)
     tokens.consume(tokenizer::RPAREN);
     
     return functionCall.release();
+}
+
+ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
+{
+    tokens.consume(tokenizer::IDENTIFIER);
+    possibleWhitespace(tokens);
+
+    std::auto_ptr<ast::FunctionDecl> decl(new ast::FunctionDecl(tokens.consume(tokenizer::IDENTIFIER)));
+
+    possibleWhitespace(tokens);
+
+    tokens.consume(tokenizer::LPAREN);
+
+    while (!tokens.nextIs(tokenizer::RPAREN))
+    {
+        std::string preWhitespace = possibleWhitespace(tokens);
+        std::string type = tokens.consume(tokenizer::IDENTIFIER);
+        std::string innerWhitespace = possibleWhitespace(tokens);
+        std::string name = tokens.consume(tokenizer::IDENTIFIER);
+        std::string postWhitespace = possibleWhitespace(tokens);
+
+        decl->addArgument(type, name);
+
+        if (!tokens.nextIs(tokenizer::RPAREN))
+            tokens.consume(tokenizer::COMMA);
+    }
+
+    tokens.consume(tokenizer::RPAREN);
+
+    possibleWhitespace(tokens);
+
+    tokens.consume(tokenizer::LBRACE);
+
+    // todo
+    return decl.release();
 }
 
 std::string possibleWhitespace(token_stream::TokenStream& tokens)
