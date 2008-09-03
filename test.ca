@@ -1,5 +1,8 @@
 
-a = add(1.0,2.0)
-to-string(a) -> print
-a -> to-string -> print
 
+operators = Map()
+operators = map-set(operators, "+", add)
+
+f = operators("+")
+
+f(1.0,2.0) -> to-string -> print
