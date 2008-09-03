@@ -63,6 +63,7 @@ struct FunctionCall : public Expression
     ArgumentList arguments;
 
     explicit FunctionCall(std::string const& _name) : functionName(_name) { }
+    ~FunctionCall();
 
     void addArgument(Expression* expr, std::string const& preWhitespace,
             std::string const& postWhitespace);

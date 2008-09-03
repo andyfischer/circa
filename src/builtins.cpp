@@ -428,4 +428,10 @@ void initialize()
     }
 }
 
+void shutdown()
+{
+    delete KERNEL;
+    KERNEL = NULL;
+}
+
 } // namespace circa

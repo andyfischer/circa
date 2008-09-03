@@ -50,6 +50,14 @@ Infix::walk(ExpressionWalkingFunction func)
     right->walk(func);
 }
 
+FunctionCall::~FunctionCall()
+{
+    ArgumentList::iterator it;
+    for (it = this->arguments.begin(); it != this->arguments.end(); ++it) {
+        delete (*it);
+    }
+}
+
 void
 FunctionCall::addArgument(Expression* expr, std::string const& preWhitespace,
             std::string const& postWhitespace)

@@ -46,4 +46,6 @@ int main(int nargs, const char * args[])
         std::cout << "Top level error:\n";
         std::cout << err.message() << std::endl;
     }
+
+    shutdown();
 }
