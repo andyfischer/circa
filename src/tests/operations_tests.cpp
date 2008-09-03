@@ -41,6 +41,17 @@ void test_create_constant()
     test_assert(term->type == INT_TYPE);
 }
 
+void test_constant_int()
+{
+    Branch branch;
+    Term *term = constant_int(&branch, -2);
+    test_assert(as_int(term) == -2);
+
+    Term *term2 = constant_int(&branch, 154, "george");
+    test_assert(term2 == branch.getNamed("george"));
+    test_assert(as_int(term2) == 154);
+}
+
 void test_misc()
 {
     test_assert(is_type(TYPE_TYPE));
@@ -56,6 +67,7 @@ void register_operations_tests()
 {
     REGISTER_TEST_CASE(operations_tests::safe_delete);
     REGISTER_TEST_CASE(operations_tests::test_create_constant);
+    REGISTER_TEST_CASE(operations_tests::test_constant_int);
     REGISTER_TEST_CASE(operations_tests::test_misc);
 }
 
