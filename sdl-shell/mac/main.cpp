@@ -17,6 +17,23 @@
 
 SDL_Surface *gScreen;
 
+void draw_line(circa::Term* term)
+{
+    float x1 = circa::as_float(term->inputs[0]);
+    float y1 = circa::as_float(term->inputs[1]);
+    float x2 = circa::as_float(term->inputs[2]);
+    float y2 = circa::as_float(term->inputs[3]);
+    int color = circa::as_int(term->inputs[4]);
+
+    lineColor(gScreen, x1, y1, x2, y2, color);
+}
+
+void initialize_circa()
+{
+    // Load a bunch of functions
+    circa::import_c_function(draw_line, "draw_line(float,float,float,float,int)");
+}
+
 void initialize_sdl()
 {
 	Uint32 initflags = SDL_INIT_VIDEO;  /* See documentation for details */
