@@ -39,7 +39,7 @@ env.BuildDir('build', 'src')
 env.Append(CPPPATH = ['src'])
 
 # Find source files
-excludeFromLibrary = ['test_program.cpp']
+excludeFromLibrary = ['test_program.cpp', 'main.cpp']
 buildFiles = []
 for (dirpath, dirnames, filenames) in os.walk('src'):
     for file in filenames:
@@ -51,9 +51,12 @@ for (dirpath, dirnames, filenames) in os.walk('src'):
         if fullpath.endswith('.cpp'):
             buildFiles.append(fullpath)
     
-libcirca = env.SharedLibrary('lib/circa', buildFiles)
+circa_so = env.StaticLibrary('lib/circa', buildFiles)
+circa_dl = env.SharedLibrary('bin/circa', buildFiles)
 
-circaBinary = env.Program('bin/circa', 'build/main.cpp', LIBS=[libcirca])
+circaBinary = env.Program('bin/circa', 'build/main.cpp', LIBS=[circa_so])
 
 env.SetOption('num_jobs', 2)
+
+env.Default(circaBinary)
 

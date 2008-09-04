@@ -3,24 +3,38 @@
 	29B97313FDCFA39411CA2CEA /* Project object */ = {
 		activeArchitecture = i386;
 		activeBuildConfigurationName = Debug;
-		activeExecutable = B61129D20E704B2300EFD3C3 /* circa-sdl-test */;
-		activeTarget = 8D1107260486CEB800E47090 /* circa-sdl-test */;
+		activeExecutable = B61129D20E704B2300EFD3C3 /* circa_sdl_shell */;
+		activeTarget = 8D1107260486CEB800E47090 /* circa_sdl_shell */;
 		addToTargets = (
-			8D1107260486CEB800E47090 /* circa-sdl-test */,
+			8D1107260486CEB800E47090 /* circa_sdl_shell */,
 		);
 		codeSenseManager = B61129EC0E704B3300EFD3C3 /* Code sense */;
 		executables = (
-			B61129D20E704B2300EFD3C3 /* circa-sdl-test */,
+			B61129D20E704B2300EFD3C3 /* circa_sdl_shell */,
 		);
 		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXExecutablesDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXExecutablesDataSource_NameID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					22,
+					300,
+					150,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXExecutablesDataSource_ActiveFlagID,
+					PBXExecutablesDataSource_NameID,
+					PBXExecutablesDataSource_CommentsID,
+				);
+			};
 			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
 				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					243,
+					262,
 					20,
-					48.16259765625,
+					48,
 					43,
 					43,
 					20,
@@ -35,24 +49,42 @@
 					PBXFileDataSource_Target_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 242240292;
-			PBXWorkspaceStateSaveDate = 242240292;
-		};
-		perUserProjectItems = {
-			B6112A010E704D7200EFD3C3 /* PBXTextBookmark */ = B6112A010E704D7200EFD3C3 /* PBXTextBookmark */;
-			B6112A020E704D7200EFD3C3 /* PBXTextBookmark */ = B6112A020E704D7200EFD3C3 /* PBXTextBookmark */;
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					222,
+					60,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 242243271;
+			PBXWorkspaceStateSaveDate = 242243271;
 		};
 		sourceControlManager = B61129EB0E704B3300EFD3C3 /* Source Control */;
 		userBuildSettings = {
 		};
 	};
-	8D1107260486CEB800E47090 /* circa-sdl-test */ = {
+	8D1107260486CEB800E47090 /* circa_sdl_shell */ = {
 		activeExec = 0;
 		executables = (
-			B61129D20E704B2300EFD3C3 /* circa-sdl-test */,
+			B61129D20E704B2300EFD3C3 /* circa_sdl_shell */,
 		);
 	};
-	B61129D20E704B2300EFD3C3 /* circa-sdl-test */ = {
+	B61129D20E704B2300EFD3C3 /* circa_sdl_shell */ = {
 		isa = PBXExecutable;
 		activeArgIndices = (
 		);
@@ -72,7 +104,7 @@
 		executableSystemSymbolLevel = 0;
 		executableUserSymbolLevel = 0;
 		libgmallocEnabled = 0;
-		name = "circa-sdl-test";
+		name = circa_sdl_shell;
 		sourceDirectories = (
 		);
 	};
@@ -89,9 +121,9 @@
 	};
 	B61129F30E704D4C00EFD3C3 /* SDL_gfxPrimitives.c */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {686, 63266}}";
+			sepNavIntBoundsRect = "{{0, 0}, {686, 63462}}";
 			sepNavSelRange = "{8177, 101}";
-			sepNavVisRange = "{8312, 592}";
+			sepNavVisRange = "{7882, 453}";
 		};
 	};
 	B61129F40E704D4C00EFD3C3 /* SDL_gfxPrimitives.h */ = {
@@ -109,23 +141,5 @@
 			sepNavVisRange = "{165, 846}";
 			sepNavWindowFrame = "{{61, 23}, {765, 708}}";
 		};
-	};
-	B6112A010E704D7200EFD3C3 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		comments = "warning: unused variable 'dA'";
-		fRef = B61129F30E704D4C00EFD3C3 /* SDL_gfxPrimitives.c */;
-		rLen = 1;
-		rLoc = 307;
-		rType = 1;
-	};
-	B6112A020E704D7200EFD3C3 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = B61129F30E704D4C00EFD3C3 /* SDL_gfxPrimitives.c */;
-		name = "SDL_gfxPrimitives.c: 308";
-		rLen = 101;
-		rLoc = 8177;
-		rType = 0;
-		vrLen = 858;
-		vrLoc = 8355;
 	};
 }
