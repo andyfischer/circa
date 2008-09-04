@@ -1,0 +1,41 @@
+
+Installation
+--------------------------------------------------------------
+
+Become superuser for library installation.
+
+Linux (gcc):
+
+./autogen.sh
+./configure
+make
+make install
+ldconfig
+make distclean
+
+
+Windows (xmingw32):
+
+./autogen.sh
+cross-configure
+cross-make
+cross-make install
+make distclean
+
+
+Check the "Other Builds" Directory
+----------------------------------
+
+Windows (VisualC):
+
+unzip -a VisualC.zip
+vcvars32.bat
+copy VisualC/makefile
+nmake
+
+
+MacOS X (Project Builder)
+
+tar -xvzf OSX-PB.tgz
+[see README] 
+Binaries: http://ttongue-skunkworks.imagiware.com/Code/SDL_gfx_MacOSX.html
