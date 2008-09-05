@@ -123,12 +123,16 @@ struct Identifier : public Expression
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
 };
 
-struct Statement {
-    typedef std::vector<Statement*> List;
+struct Statement
+{
+    Expression* expression;
 
-    virtual ~Statement() {}
+    Statement() : expression(NULL) {}
+    virtual ~Statement() { delete expression; }
     virtual std::string toString() const = 0;
     virtual Term* createTerm(Branch* branch) = 0;
+
+    typedef std::vector<Statement*> List;
 };
 
 struct StatementList
@@ -145,11 +149,9 @@ struct StatementList
 struct ExpressionStatement : public Statement
 {
     std::string nameBinding;
-    Expression* expression;
     std::string preEqualsWhitepace;
     std::string postEqualsWhitespace;
 
-    virtual ~ExpressionStatement() { delete expression; }
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
 };

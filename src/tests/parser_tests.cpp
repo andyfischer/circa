@@ -197,12 +197,17 @@ void rebind_operator()
 
     delete expr;
 
-    tokens.reset("add(@a, 5)");
-    ast::Statement* statement = parser::statement(tokens);
+    Branch branch;
+    Term* a = constant_int(&branch, 2, "a");
+    Term* b = constant_int(&branch, 5, "b");
 
-    // todo
+    test_assert(branch.getNamed("a") == a);
+    test_assert(branch.getNamed("b") == b);
 
-    delete statement;
+    Term* result = parser::quick_eval_statement(&branch, "add(@a, b)");
+
+    test_assert(branch.getNamed("a") == result);
+    test_assert(branch.getNamed("b") == b);
 }
 
 void ast_walk()

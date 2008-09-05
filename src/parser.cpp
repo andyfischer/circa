@@ -19,6 +19,29 @@ Term* quick_eval_statement(Branch* branch, std::string const& input)
     Term* result = statementAst->createTerm(branch);
 
     // check for rebind operator
+    struct RebindFinder : public ast::ExpressionWalker
+    {
+        std::vector<std::string> rebindNames;
+
+        virtual void visit(ast::Expression* expr)
+        {
+            ast::Identifier* asIdent = dynamic_cast<ast::Identifier*>(expr);
+            if (asIdent == NULL)
+                return;
+
+            if (asIdent->hasRebindOperator)
+                rebindNames.push_back(asIdent->text);
+        }
+
+    } rebindFinder;
+
+    statementAst->expression->walk(rebindFinder);
+
+    std::vector<std::string>::iterator it;
+    for (it = rebindFinder.rebindNames.begin(); it != rebindFinder.rebindNames.end(); ++it)
+    {
+        branch->bindName(result, *it);
+    }
 
     delete statementAst;
 
