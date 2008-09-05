@@ -9,10 +9,12 @@
 /* Begin PBXBuildFile section */
 		B62339740E5A417700A8CBDF /* builtin_libraries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B62339700E5A417700A8CBDF /* builtin_libraries.cpp */; };
 		B62339750E5A417700A8CBDF /* graphviz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B62339720E5A417700A8CBDF /* graphviz.cpp */; };
+		B6769D6A0E70D2E900BC7FAE /* importing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6769D660E70D2E900BC7FAE /* importing.cpp */; };
+		B6769D6B0E70D2E900BC7FAE /* value_map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6769D680E70D2E900BC7FAE /* value_map.cpp */; };
+		B6769D6D0E70D2F600BC7FAE /* importing_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6769D6C0E70D2F600BC7FAE /* importing_tests.cpp */; };
 		B68D10CD0E47685600C6D09A /* term_map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B68D10CB0E47685600C6D09A /* term_map.cpp */; };
 		B69A203F0E68717300AF7F28 /* container_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69A203D0E68717300AF7F28 /* container_tests.cpp */; };
 		B69A20400E68717300AF7F28 /* operations_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69A203E0E68717300AF7F28 /* operations_tests.cpp */; };
-		B69A20560E68CCB700AF7F28 /* map_function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69A20540E68CCB700AF7F28 /* map_function.cpp */; };
 		B6A243A50E3568EB007F2BEB /* errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243A40E3568EB007F2BEB /* errors.cpp */; };
 		B6A243B30E356E26007F2BEB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243B20E356E26007F2BEB /* main.cpp */; };
 		B6A243FD0E3D6414007F2BEB /* bootstrapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */; };
@@ -62,13 +64,16 @@
 		B62339720E5A417700A8CBDF /* graphviz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphviz.cpp; sourceTree = "<group>"; };
 		B62339730E5A417700A8CBDF /* graphviz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = graphviz.h; sourceTree = "<group>"; };
 		B64CA7220E6279E400ADB947 /* circa */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = circa; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6769D660E70D2E900BC7FAE /* importing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = importing.cpp; sourceTree = "<group>"; };
+		B6769D670E70D2E900BC7FAE /* importing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = importing.h; sourceTree = "<group>"; };
+		B6769D680E70D2E900BC7FAE /* value_map.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = value_map.cpp; sourceTree = "<group>"; };
+		B6769D690E70D2E900BC7FAE /* value_map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = value_map.h; sourceTree = "<group>"; };
+		B6769D6C0E70D2F600BC7FAE /* importing_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = importing_tests.cpp; sourceTree = "<group>"; };
 		B68D10CB0E47685600C6D09A /* term_map.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = term_map.cpp; sourceTree = "<group>"; };
 		B68D10CC0E47685600C6D09A /* term_map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = term_map.h; sourceTree = "<group>"; };
 		B69A203D0E68717300AF7F28 /* container_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = container_tests.cpp; sourceTree = "<group>"; };
 		B69A203E0E68717300AF7F28 /* operations_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = operations_tests.cpp; sourceTree = "<group>"; };
 		B69A20530E68CCB700AF7F28 /* cpp_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpp_interface.h; sourceTree = "<group>"; };
-		B69A20540E68CCB700AF7F28 /* map_function.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = map_function.cpp; sourceTree = "<group>"; };
-		B69A20550E68CCB700AF7F28 /* map_function.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = map_function.h; sourceTree = "<group>"; };
 		B6A243A40E3568EB007F2BEB /* errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = errors.cpp; sourceTree = "<group>"; };
 		B6A243B20E356E26007F2BEB /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bootstrapping.cpp; sourceTree = "<group>"; };
@@ -173,6 +178,7 @@
 		B6A243F90E3D6414007F2BEB /* tests */ = {
 			isa = PBXGroup;
 			children = (
+				B6769D6C0E70D2F600BC7FAE /* importing_tests.cpp */,
 				B69A203D0E68717300AF7F28 /* container_tests.cpp */,
 				B69A203E0E68717300AF7F28 /* operations_tests.cpp */,
 				B6EEE5880E670E9B009E2FA2 /* cpp_interface_tests.cpp */,
@@ -195,9 +201,11 @@
 		B6F114A00E33394F00B8BA44 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				B6769D660E70D2E900BC7FAE /* importing.cpp */,
+				B6769D670E70D2E900BC7FAE /* importing.h */,
+				B6769D680E70D2E900BC7FAE /* value_map.cpp */,
+				B6769D690E70D2E900BC7FAE /* value_map.h */,
 				B69A20530E68CCB700AF7F28 /* cpp_interface.h */,
-				B69A20540E68CCB700AF7F28 /* map_function.cpp */,
-				B69A20550E68CCB700AF7F28 /* map_function.h */,
 				B6BA5BED0E622ED800B4C3A0 /* ast.cpp */,
 				B6BA5BEE0E622ED800B4C3A0 /* ast.h */,
 				B6BA5BEF0E622ED800B4C3A0 /* evaluator.cpp */,
@@ -328,7 +336,9 @@
 				B6EEE5890E670E9B009E2FA2 /* cpp_interface_tests.cpp in Sources */,
 				B69A203F0E68717300AF7F28 /* container_tests.cpp in Sources */,
 				B69A20400E68717300AF7F28 /* operations_tests.cpp in Sources */,
-				B69A20560E68CCB700AF7F28 /* map_function.cpp in Sources */,
+				B6769D6A0E70D2E900BC7FAE /* importing.cpp in Sources */,
+				B6769D6B0E70D2E900BC7FAE /* value_map.cpp in Sources */,
+				B6769D6D0E70D2F600BC7FAE /* importing_tests.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
