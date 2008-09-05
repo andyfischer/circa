@@ -36,6 +36,11 @@ struct Term
 
     int numErrors() const;
     std::string const& getError(int index);
+
+    int& asInt();
+    float& asFloat();
+    std::string& asString();
+    bool& asBool();
 };
 
 TermList* as_list(Term* term);
