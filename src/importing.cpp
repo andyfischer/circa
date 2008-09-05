@@ -26,14 +26,17 @@ Term* import_c_function(Branch* branch, Function::ExecuteFunc execute, std::stri
     ast::FunctionHeader::ArgumentList::iterator it;
     for (it = header->arguments.begin(); it != header->arguments.end(); ++it) {
         std::string typeName = it->type;
-        Term* type = branch->getNamed(typeName);
+        Term* type = find_named(branch, typeName);
+        
+        if (type == NULL)
+            throw errors::InternalError(std::string("Couldn't find term: ") + typeName);
         as_type(type);
         inputTypes.append(type);
     }
 
     Term* outputType = NULL;
     if (header->outputType != "")
-        outputType = branch->getNamed(header->outputType);
+        outputType = find_named(branch,header->outputType);
     else
         outputType = VOID_TYPE;
 
