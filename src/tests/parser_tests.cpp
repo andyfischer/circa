@@ -157,6 +157,25 @@ void function_decl_ast()
     test_assert(decl.toString() == "function add(float arg1, float arg2)\n{\nx = add(arg1,arg2)\n}");
 }
 
+void function_header()
+{
+    token_stream::TokenStream tokens("function test(int a, float, string b , int) -> float");
+    ast::FunctionHeader* header = parser::functionHeader(tokens);
+
+    test_assert(header->functionName == "test");
+    test_assert(header->arguments[0].type == "int");
+    test_assert(header->arguments[0].name == "a");
+    test_assert(header->arguments[1].type == "float");
+    test_assert(header->arguments[1].name == "");
+    test_assert(header->arguments[2].type == "string");
+    test_assert(header->arguments[2].name == "b");
+    test_assert(header->arguments[3].type == "int");
+    test_assert(header->arguments[3].name == "");
+    test_assert(header->outputType == "float");
+
+    delete header;
+}
+
 void rebind_operator()
 {
     token_stream::TokenStream tokens("@cheese");
@@ -209,6 +228,7 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::create_function_call);
     REGISTER_TEST_CASE(parser_tests::test_quick_eval_statement);
     REGISTER_TEST_CASE(parser_tests::function_decl_ast);
+    REGISTER_TEST_CASE(parser_tests::function_header);
     REGISTER_TEST_CASE(parser_tests::rebind_operator);
     REGISTER_TEST_CASE(parser_tests::ast_walk);
 }
