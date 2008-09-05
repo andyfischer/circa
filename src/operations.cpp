@@ -349,14 +349,6 @@ void duplicate_branch(Branch* source, Branch* dest)
     }
 }
 
-Term* find_named(Branch* branch, std::string name)
-{
-    if (branch->containsName(name))
-        return branch->getNamed(name);
-
-    return get_global(name);
-}
-
 Term* constant_string(Branch* branch, std::string const& s, std::string const& name)
 {
     Term* term = apply_function(branch, STRING_TYPE, TermList());

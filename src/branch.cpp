@@ -19,14 +19,22 @@ void Branch::append(Term* term)
     this->terms.append(term);
 }
 
-bool Branch::containsName(string name)
+bool Branch::containsName(std::string const& name) const
 {
     return names.contains(name);
 }
 
-Term* Branch::getNamed(string name)
+Term* Branch::getNamed(std::string const& name) const
 {
     return names[name];
+}
+
+Term* Branch::findNamed(std::string const& name) const
+{
+    if (containsName(name))
+        return getNamed(name);
+
+    return get_global(name);
 }
 
 void Branch::bindName(Term* term, string name)
