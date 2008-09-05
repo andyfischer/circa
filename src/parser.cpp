@@ -18,6 +18,8 @@ Term* quick_eval_statement(Branch* branch, std::string const& input)
 
     Term* result = statementAst->createTerm(branch);
 
+    // check for rebind operator
+
     delete statementAst;
 
     return result;
@@ -224,14 +226,15 @@ ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)
 
 ast::FunctionHeader* functionHeader(token_stream::TokenStream& tokens)
 {
-    tokens.consume(tokenizer::IDENTIFIER); // 'function'
-    possibleWhitespace(tokens);
-
     std::auto_ptr<ast::FunctionHeader> header(new ast::FunctionHeader());
 
-    header->functionName = tokens.consume(tokenizer::IDENTIFIER);
-
+    std::string firstIdentifier = tokens.consume(tokenizer::IDENTIFIER); // 'function'
     possibleWhitespace(tokens);
+
+    if (firstIdentifier == "function") {
+        header->functionName = tokens.consume(tokenizer::IDENTIFIER);
+        possibleWhitespace(tokens);
+    }
 
     tokens.consume(tokenizer::LPAREN);
 

@@ -43,11 +43,11 @@ Infix::createTerm(Branch* branch)
 }
 
 void
-Infix::walk(ExpressionWalkingFunction func)
+Infix::walk(ExpressionWalker& walker)
 {
-    func(this);
-    left->walk(func);
-    right->walk(func);
+    walker.visit(this);
+    left->walk(walker);
+    right->walk(walker);
 }
 
 FunctionCall::~FunctionCall()
@@ -106,12 +106,17 @@ FunctionCall::createTerm(Branch* branch)
 }
 
 void
-FunctionCall::walk(ExpressionWalkingFunction func)
+FunctionCall::walk(ExpressionWalker& walker)
 {
-    func(this);
+    walker.visit(this);
     ArgumentList::iterator it;
-    for (it == arguments.begin(); it != arguments.end(); ++it) {
-        ((*it)->expression)->walk(func);
+    for (it = arguments.begin(); it != arguments.end(); ++it) {
+        if (*it == NULL)
+            throw errors::InternalError("argument is null");
+        Expression* expr = (*it)->expression;
+        if (expr == NULL)
+            throw errors::InternalError("expression is null");
+        expr->walk(walker);
     }
 }
 
