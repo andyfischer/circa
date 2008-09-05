@@ -11,7 +11,11 @@ namespace circa {
 namespace ast {
     
 struct Expression;
-typedef void (*ExpressionWalkingFunction)(Expression* expr);
+
+struct ExpressionWalker
+{
+    virtual void visit(Expression* expr) = 0;
+};
 
 struct Expression
 {
@@ -21,7 +25,7 @@ struct Expression
     virtual ~Expression() { }
     virtual std::string toString() const = 0;
     virtual Term* createTerm(Branch* branch) = 0;
-    virtual void walk(ExpressionWalkingFunction func) = 0;
+    virtual void walk(ExpressionWalker &walker) = 0;
 };
 
 struct Infix : public Expression
@@ -37,7 +41,7 @@ struct Infix : public Expression
     ~Infix();
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
-    virtual void walk(ExpressionWalkingFunction func);
+    virtual void walk(ExpressionWalker &walker);
 };
 
 struct FunctionCall : public Expression
@@ -69,7 +73,7 @@ struct FunctionCall : public Expression
             std::string const& postWhitespace);
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
-    virtual void walk(ExpressionWalkingFunction func);
+    virtual void walk(ExpressionWalker &walker);
 };
 
 struct LiteralString : public Expression
@@ -79,7 +83,7 @@ struct LiteralString : public Expression
     explicit LiteralString(std::string const& _text) : text(_text) { }
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
-    virtual void walk(ExpressionWalkingFunction func) { func(this); }
+    virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
 };
 
 struct LiteralFloat : public Expression
@@ -92,7 +96,7 @@ struct LiteralFloat : public Expression
         return text;
     }
     virtual Term* createTerm(Branch* branch);
-    virtual void walk(ExpressionWalkingFunction func) { func(this); }
+    virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
 };
 
 struct LiteralInteger : public Expression
@@ -105,7 +109,7 @@ struct LiteralInteger : public Expression
         return text;
     }
     virtual Term* createTerm(Branch* branch);
-    virtual void walk(ExpressionWalkingFunction func) { func(this); }
+    virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
 };
 
 struct Identifier : public Expression
@@ -116,7 +120,7 @@ struct Identifier : public Expression
     explicit Identifier(std::string const& _text) : text(_text), hasRebindOperator(false) {}
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
-    virtual void walk(ExpressionWalkingFunction func) { func(this); }
+    virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
 };
 
 struct Statement {

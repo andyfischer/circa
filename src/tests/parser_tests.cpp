@@ -210,7 +210,29 @@ void ast_walk()
     token_stream::TokenStream tokens("concat(to-string(add(1,2.0)), \"cheese\")");
     ast::Expression* expr = parser::infixExpression(tokens);
 
-    // todo
+    std::vector<std::string> expected;
+    expected.push_back("concat(to-string(add(1,2.0)), \"cheese\")");
+    expected.push_back("to-string(add(1,2.0))");
+    expected.push_back("add(1,2.0)");
+    expected.push_back("1");
+    expected.push_back("2.0");
+    expected.push_back("\"cheese\"");
+
+    struct MyWalker : public ast::ExpressionWalker
+    {
+        std::vector<std::string> found;
+
+        virtual void visit(ast::Expression* expr)
+        {
+            found.push_back(expr->toString());
+        }
+    } walker;
+
+    expr->walk(walker);
+
+    for (int i=0; i < (int) expected.size(); i++) {
+        test_assert(expected[i] == walker.found[i]);
+    }
 
     delete expr;
 }
