@@ -12,28 +12,29 @@ struct TermNamespace
     typedef std::map<string, Term*> StringToTermMap;
     StringToTermMap _map;
 
-    bool contains(std::string s)
+    bool contains(std::string s) const
     {
         return _map.find(s) != _map.end();
 
     }
-    void bind(Term* term, string name)
+    void bind(Term* term, std::string name)
     {
         _map[name] = term;
     }
+
     void clear()
     {
         _map.clear();
     }
 
-    Term* operator[](string name)
+    Term* operator[](std::string name) const
     {
-        return _map[name];
+        return _map.find(name)->second;
     }
 
-    std::string findName(Term* term)
+    std::string findName(Term* term) const
     {
-        StringToTermMap::iterator it;
+        StringToTermMap::const_iterator it;
         for (it = _map.begin(); it != _map.end(); ++it) {
             if (it->second == term) {
                 return it->first;

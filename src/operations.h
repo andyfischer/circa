@@ -62,8 +62,6 @@ void remap_pointers(Term* term, Term* original, Term* replacement);
 
 void duplicate_branch(Branch* source, Branch* dest);
 
-Term* find_named(Branch* branch, std::string name);
-
 Term* constant_string(Branch* branch, std::string const& s, std::string const& name="");
 Term* constant_int(Branch* branch, int i, std::string const& name="");
 Term* constant_float(Branch* branch, float f, std::string const& name="");

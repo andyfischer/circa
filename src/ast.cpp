@@ -33,7 +33,7 @@ Infix::createTerm(Branch* branch)
             throw syntax_errors::SyntaxError("Right side of -> must be an identifier");
         }
 
-        Term* function = find_named(branch, rightIdent->text);
+        Term* function = branch->findNamed(rightIdent->text);
 
         return apply_function(branch, function, TermList(leftTerm));
     }
@@ -91,7 +91,7 @@ FunctionCall::toString() const
 Term*
 FunctionCall::createTerm(Branch* branch)
 {
-    Term* function = find_named(branch, this->functionName);
+    Term* function = branch->findNamed(this->functionName);
 
     TermList inputs;
 
@@ -152,7 +152,7 @@ Identifier::toString() const
 Term*
 Identifier::createTerm(Branch* branch)
 {
-    return find_named(branch,this->text);
+    return branch->findNamed(this->text);
 }
 
 std::string
