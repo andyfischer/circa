@@ -103,6 +103,26 @@ Term::getError(int index)
     return errors[index];
 }
 
+int& Term::asInt()
+{
+    return as_int(this);
+}
+
+float& Term::asFloat()
+{
+    return as_float(this);
+}
+
+std::string& Term::asString()
+{
+    return as_string(this);
+}
+
+bool& Term::asBool()
+{
+    return as_bool(this);
+}
+
 // TermList type
 TermList* as_list(Term* term)
 {
