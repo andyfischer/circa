@@ -240,8 +240,15 @@ ast::FunctionHeader* functionHeader(token_stream::TokenStream& tokens)
         std::string preWhitespace = possibleWhitespace(tokens);
         std::string type = tokens.consume(tokenizer::IDENTIFIER);
         std::string innerWhitespace = possibleWhitespace(tokens);
-        std::string name = tokens.consume(tokenizer::IDENTIFIER);
-        std::string postWhitespace = possibleWhitespace(tokens);
+
+        std::string name, postWhitespace;
+        if (tokens.nextIs(tokenizer::COMMA) || tokens.nextIs(tokenizer::RPAREN)) {
+            name = "";
+            postWhitespace = "";
+        } else {
+            name = tokens.consume(tokenizer::IDENTIFIER);
+            postWhitespace = possibleWhitespace(tokens);
+        }
 
         header->addArgument(type, name);
 
