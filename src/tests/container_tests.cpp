@@ -149,14 +149,14 @@ void value_map_from_source()
 {
     Branch branch;
 
-    parser::quick_exec_statement(&branch, "myMap = Map()");
-    parser::quick_exec_statement(&branch, "myMap = map-set(myMap, 'a, 2)");
-    parser::quick_exec_statement(&branch, "myMap = map-set(myMap, 'b, 5)");
+    parser::eval_statement(&branch, "myMap = Map()");
+    parser::eval_statement(&branch, "myMap = map-set(myMap, 'a, 2)");
+    parser::eval_statement(&branch, "myMap = map-set(myMap, 'b, 5)");
 
-    Term* a = parser::quick_exec_statement(&branch, "map-access(myMap, 'a)");
+    Term* a = parser::eval_statement(&branch, "map-access(myMap, 'a)");
     test_assert(as_int(a) == 2);
 
-    Term* b = parser::quick_exec_statement(&branch, "myMap('b)");
+    Term* b = parser::eval_statement(&branch, "myMap('b)");
     test_assert(as_int(b) == 5);
 }
 

@@ -18,7 +18,7 @@ Term* quick_create_type(
         Type::ToStringFunc toStringFunc = NULL);
 
 // Create a new Function with the given properties. Also binds the name.
-Term* quick_create_function(Branch* code, string name, Function::ExecuteFunc executeFunc,
+Term* quick_create_function(Branch* code, string name, Function::EvaluateFunc evaluateFunc,
         TermList inputTypes, Term* outputType);
 
 void initialize_bootstrapped_code(Branch* kernel);

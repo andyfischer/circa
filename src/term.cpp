@@ -131,4 +131,9 @@ TermList* as_list(Term* term)
     return (TermList*) term->value;
 }
 
+void Term::eval()
+{
+    evaluate(this);
+}
+
 } // namespace circa

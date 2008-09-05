@@ -14,8 +14,8 @@ void safe_delete()
 {
     Branch branch;
 
-    Term* term1 = parser::quick_eval_statement(&branch, "term1 = 1");
-    Term* termSum = parser::quick_eval_statement(&branch, "sum = add(term1,2)");
+    Term* term1 = parser::apply_statement(&branch, "term1 = 1");
+    Term* termSum = parser::apply_statement(&branch, "sum = add(term1,2)");
 
     test_assert(branch.containsName("term1"));
     test_assert(branch.containsName("sum"));

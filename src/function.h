@@ -10,7 +10,7 @@ namespace circa {
 struct Function
 {
     typedef void (*InitializeFunc)(Term* caller);
-    typedef void (*ExecuteFunc)(Term* caller);
+    typedef void (*EvaluateFunc)(Term* caller);
 
     TermList inputTypes;
     Term* outputType;
@@ -23,7 +23,7 @@ struct Function
     //  1) the runtime may copy this input to the calling term
     //  2) or, 'steal' the value from this input and give it to
     //     the calling term (this is much more efficient).
-    // Either way, the execute function should not attempt to access
+    // Either way, the evaluate function should not attempt to access
     // the value of the input that it wants to recycle.
     // This value may also be -1, which means to not try to recycle.
     // -1 is the default.
@@ -36,7 +36,7 @@ struct Function
 
     // Code
     InitializeFunc initialize;
-    ExecuteFunc execute;
+    EvaluateFunc evaluate;
 
     Term* feedbackAccumulationFunction;
     Term* feedbackPropagationFunction;

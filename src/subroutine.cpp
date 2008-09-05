@@ -108,7 +108,7 @@ void subroutine_call__evaluate(Term* caller)
     Branch* branch = as_branch(caller->state);
 
     Subroutine_openBranch(caller);
-    execute_branch(branch);
+    evaluate_branch(branch);
     Subroutine_closeBranch(caller);
 }
 
@@ -125,7 +125,7 @@ void subroutine_create__evaluate(Term* caller)
     Subroutine* sub = as_subroutine(caller);
     sub->name = as_string(caller->inputs[0]);
     sub->initialize = subroutine_call__initialize;
-    sub->execute = subroutine_call__evaluate;
+    sub->evaluate = subroutine_call__evaluate;
     sub->inputTypes = *as_list(caller->inputs[1]);
     sub->outputType = caller->inputs[2];
     sub->stateType = BRANCH_TYPE;
@@ -244,7 +244,7 @@ void subroutine_eval__evaluate(Term* caller)
     Subroutine *sub = as_subroutine(caller);
     std::string s = as_string(caller->inputs[1]);
 
-    parser::quick_eval_statement(sub->branch, s);
+    parser::apply_statement(sub->branch, s);
 }
 
 void initialize_subroutine(Branch* kernel)

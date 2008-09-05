@@ -10,7 +10,7 @@
 
 namespace circa {
 
-Term* import_c_function(Branch* branch, Function::ExecuteFunc execute, std::string const& headerText)
+Term* import_c_function(Branch* branch, Function::EvaluateFunc evaluate, std::string const& headerText)
 {
     token_stream::TokenStream tokens(headerText);
     ast::FunctionHeader *header = parser::functionHeader(tokens);
@@ -19,7 +19,7 @@ Term* import_c_function(Branch* branch, Function::ExecuteFunc execute, std::stri
     Function* func = as_function(term);
 
     func->name = header->functionName;
-    func->execute = execute;
+    func->evaluate = evaluate;
 
     TermList inputTypes;
 
