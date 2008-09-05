@@ -41,6 +41,8 @@ struct Term
     float& asFloat();
     std::string& asString();
     bool& asBool();
+
+    void eval();
 };
 
 TermList* as_list(Term* term);

@@ -32,13 +32,13 @@ Term* quick_create_type(
     return typeTerm;
 }
 
-Term* quick_create_function(Branch* branch, string name, Function::ExecuteFunc executeFunc,
+Term* quick_create_function(Branch* branch, string name, Function::EvaluateFunc evaluateFunc,
         TermList inputTypes, Term* outputType)
 {
     Term* term = create_constant(branch, FUNCTION_TYPE);
     Function* func = as_function(term);
     func->name = name;
-    func->execute = executeFunc;
+    func->evaluate = evaluateFunc;
     func->inputTypes = inputTypes;
     func->outputType = outputType;
     branch->bindName(term, name);

@@ -129,7 +129,7 @@ void set_input(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 }
 
-void execute(Term* term)
+void evaluate(Term* term)
 {
     if (term == NULL)
         throw errors::InternalError("term is NULL");
@@ -145,7 +145,7 @@ void execute(Term* term)
         Term* input = term->inputs[inputIndex];
 
         if (input->needsUpdate)
-            execute(input);
+            evaluate(input);
             
         if (input->value == NULL)
             throw errors::InternalError(string("Input named ") + input->findName() + " has NULL value.");
@@ -162,13 +162,13 @@ void execute(Term* term)
     if (func == NULL)
         throw errors::InternalError("function is NULL");
 
-    if (func->execute == NULL) {
-        std::cout << "Error: no execute function for " << func->name << std::endl;
+    if (func->evaluate == NULL) {
+        std::cout << "Error: no evaluate function for " << func->name << std::endl;
         return;
     }
 
     try {
-        func->execute(term);
+        func->evaluate(term);
         term->needsUpdate = false;
     }
     catch (errors::InternalError &err)
@@ -178,19 +178,19 @@ void execute(Term* term)
     }
 }
 
-void execute_branch(Branch* branch)
+void evaluate_branch(Branch* branch)
 {
     int count = branch->terms.count();
     for (int index=0; index < count; index++) {
 		Term* term = branch->terms[index];
-        execute(term);
+        evaluate(term);
     }
 }
 
 Term* apply_function(Branch* branch, Term* function, TermList inputs)
 {
     if (function->needsUpdate)
-        execute(function);
+        evaluate(function);
 
     // Check if 'function' is actually a type
     if (is_type(function))
@@ -221,17 +221,17 @@ Term* apply_function(Branch* branch, Term* function, TermList inputs)
     return create_term(branch, function, inputs);
 }
 
-Term* exec_function(Branch* branch, Term* function, TermList inputs)
+Term* eval_function(Branch* branch, Term* function, TermList inputs)
 {
     Term* result = apply_function(branch, function, inputs);
-    execute(result);
+    evaluate(result);
     return result;
 }
 
 Term* get_const_function(Branch* branch, Term* type)
 {
     Term* result = apply_function(branch, get_global("const-generator"), TermList(type));
-    execute(result);
+    evaluate(result);
     return result;
 }
 

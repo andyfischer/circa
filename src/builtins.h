@@ -35,7 +35,7 @@ extern Term* CONSTANT_TRUE;
 extern Term* CONSTANT_FALSE;
 
 Term* get_global(std::string name);
-void empty_execute_function(Term* caller);
+void empty_evaluate_function(Term* caller);
 void initialize();
 void shutdown();
 

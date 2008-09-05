@@ -10,7 +10,7 @@ namespace parser {
 
 std::string possibleWhitespace(token_stream::TokenStream& tokens);
 
-Term* quick_eval_statement(Branch* branch, std::string const& input)
+Term* apply_statement(Branch* branch, std::string const& input)
 {
     token_stream::TokenStream tokens(input);
 
@@ -48,10 +48,10 @@ Term* quick_eval_statement(Branch* branch, std::string const& input)
     return result;
 }
 
-Term* quick_exec_statement(Branch* branch, std::string const& input)
+Term* eval_statement(Branch* branch, std::string const& input)
 {
-    Term* term = quick_eval_statement(branch, input);
-    execute(term);
+    Term* term = apply_statement(branch, input);
+    evaluate(term);
     return term;
 }
 

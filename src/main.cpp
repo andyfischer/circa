@@ -12,7 +12,7 @@ Branch* evaluate_file(std::string const& filename)
 
     Branch temp_branch;
     temp_branch.bindName(constant_string(&temp_branch, filename), "filename");
-    std::string file_contents = as_string(parser::quick_exec_statement(&temp_branch,
+    std::string file_contents = as_string(parser::eval_statement(&temp_branch,
                 "read-text-file(filename)"));
 
     token_stream::TokenStream tokens(file_contents);
@@ -46,7 +46,7 @@ int main(int nargs, const char * args[])
 
         if (nargs > 1) {
             Branch* branch = evaluate_file(args[1]);
-            execute_branch(branch);
+            evaluate_branch(branch);
             delete branch;
         }
 

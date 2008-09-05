@@ -116,7 +116,7 @@ void create_function_call()
     // make sure this term is not evaluated yet
     test_assert(term->needsUpdate);
 
-    execute(term);
+    evaluate(term);
 
     test_assert(!term->needsUpdate);
     test_assert(as_float(term) == 5);
@@ -128,13 +128,13 @@ void test_quick_eval_statement()
 {
     Branch branch;
 
-    Term* result = parser::quick_eval_statement(&branch, "something = add(5.0,3.0)");
+    Term* result = parser::apply_statement(&branch, "something = add(5.0,3.0)");
 
     test_assert(result != NULL);
     /*test_assert(result->findName() == "something");
     test_assert(as_function(result->function)->name == "add");
     test_assert(result->needsUpdate);
-    execute(result);
+    evaluate(result);
     test_assert(as_float(result) == 8);*/
 }
 
@@ -204,7 +204,7 @@ void rebind_operator()
     test_assert(branch.getNamed("a") == a);
     test_assert(branch.getNamed("b") == b);
 
-    Term* result = parser::quick_eval_statement(&branch, "add(@a, b)");
+    Term* result = parser::apply_statement(&branch, "add(@a, b)");
 
     test_assert(branch.getNamed("a") == result);
     test_assert(branch.getNamed("b") == b);

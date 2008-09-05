@@ -50,7 +50,7 @@ Term* CONSTANT_2 = NULL;
 Term* CONSTANT_TRUE = NULL;
 Term* CONSTANT_FALSE = NULL;
 
-void empty_execute_function(Term*) { }
+void empty_evaluate_function(Term*) { }
 void empty_alloc_function(Term*) { }
 void empty_function(Term*) { }
 void empty_duplicate_function(Term*,Term*) { }
@@ -61,7 +61,7 @@ void const_generator(Term* caller)
     Type* type = as_type(caller->inputs[0]);
     output->name = "const-" + type->name;
     output->outputType = caller->inputs[0];
-    output->execute = empty_execute_function;
+    output->evaluate = empty_evaluate_function;
 }
 
 Term* get_global(string name)
@@ -82,7 +82,7 @@ void bootstrap_kernel()
     Function_alloc(CONST_GENERATOR);
     as_function(CONST_GENERATOR)->name = "const-generator";
     as_function(CONST_GENERATOR)->pureFunction = true;
-    as_function(CONST_GENERATOR)->execute = const_generator;
+    as_function(CONST_GENERATOR)->evaluate = const_generator;
     KERNEL->bindName(CONST_GENERATOR, "const-generator");
 
     // Create const-Type function
@@ -299,7 +299,7 @@ void list_apply__evaluate(Term* caller)
 
     for (int i=0; i < list->count(); i++) {
         Term* result = apply_function(caller->owningBranch, caller->inputs[0], TermList(list->get(i)));
-        execute(result);
+        evaluate(result);
 
         as_list(caller)->append(result);
     }

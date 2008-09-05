@@ -31,7 +31,7 @@ Evaluator::evaluate(Term* term)
         mStack.push(scope);
 
     } else {
-        execute(term);
+        term->eval();
     }
 }
 

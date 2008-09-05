@@ -40,7 +40,7 @@ void memory_management() {
     quick_create_cpp_type<Type1>(&branch, "Type1");
 
     test_assert(Type1::gInstanceCount == 0);
-    Term* term = parser::quick_eval_statement(&branch, "a = Type1()");
+    Term* term = parser::apply_statement(&branch, "a = Type1()");
     test_assert(Type1::gInstanceCount == 1);
 
     delete term;
@@ -58,11 +58,11 @@ void default_function() {
 
     as_type(type1)->addMemberFunction("", appendStr);
 
-    Term* hi = parser::quick_exec_statement(&branch, "hi = Type1()");
+    Term* hi = parser::eval_statement(&branch, "hi = Type1()");
 
     as<Type1>(hi).myString = "hi";
 
-    Term* hi2u = parser::quick_exec_statement(&branch, "hi2u = hi(\"2u\"))");
+    Term* hi2u = parser::eval_statement(&branch, "hi2u = hi(\"2u\"))");
 
     test_assert(as<Type1>(hi2u).myString == "hi2u");
 }

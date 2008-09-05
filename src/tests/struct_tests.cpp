@@ -36,25 +36,25 @@ void test_misc()
     Term* my_struct_def = create_constant(&branch, get_global("StructDefinition"));
     my_struct_def = apply_function(&branch, get_global("struct-definition-set-name"),
             TermList(my_struct_def, constant_string(&branch, "my-struct")));
-    execute(my_struct_def);
+    evaluate(my_struct_def);
 
     my_struct_def = apply_function(&branch, get_global("add-field"),
             TermList(my_struct_def, constant_string(&branch, "myFloat"), FLOAT_TYPE));
-    execute(my_struct_def);
+    evaluate(my_struct_def);
     my_struct_def = apply_function(&branch, get_global("add-field"),
             TermList(my_struct_def, constant_string(&branch, "myString"), STRING_TYPE));
-    execute(my_struct_def);
+    evaluate(my_struct_def);
 
     Term* my_instance = apply_function(&branch, my_struct_def, TermList());
-    execute(my_instance);
+    evaluate(my_instance);
 
     my_instance = apply_function(&branch, get_global("set-field"),
             TermList(my_instance, constant_string(&branch, "myFloat"),
                 constant_float(&branch, 2)));
-    execute(my_instance);
+    evaluate(my_instance);
     branch.bindName(my_instance, "my_instance");
 
-    Term* hopefully_two = parser::quick_exec_statement(&branch,
+    Term* hopefully_two = parser::eval_statement(&branch,
             "hopefully-two = get-field(my_instance, 'myFloat)");
 
     test_assert(as_float(hopefully_two) == 2);
@@ -63,9 +63,9 @@ void test_misc()
 void test_misc2()
 {
     Branch branch;
-    parser::quick_exec_statement(&branch,
+    parser::eval_statement(&branch,
         "my-struct-def = define-struct('my-struct-def, list(float, string, Subroutine))");
-    Term* myinst = parser::quick_exec_statement(&branch, "my-inst = my-struct-def()");
+    Term* myinst = parser::eval_statement(&branch, "my-inst = my-struct-def()");
     myinst->toString();
 }
 
@@ -75,25 +75,25 @@ void test_as_function_output()
 {
     Branch *branch = new Branch();
 
-    Term* return_type = parser::quick_exec_statement(branch, "define-struct('rt, list(string,float))");
+    Term* return_type = parser::eval_statement(branch, "define-struct('rt, list(string,float))");
     quick_create_function(branch, "my-func", function_body_whatever,
             TermList(FLOAT_TYPE), return_type);
 
-    Term* func_inst = parser::quick_exec_statement(branch, "x = my-func(5)");
+    Term* func_inst = parser::eval_statement(branch, "x = my-func(5)");
 
     test_assert(func_inst->type == return_type);
-    test_assert(parser::quick_exec_statement(branch, "get-index(x, 0)")->type == STRING_TYPE);
-    test_assert(parser::quick_exec_statement(branch, "get-index(x, 1)")->type == FLOAT_TYPE);
+    test_assert(parser::eval_statement(branch, "get-index(x, 0)")->type == STRING_TYPE);
+    test_assert(parser::eval_statement(branch, "get-index(x, 1)")->type == FLOAT_TYPE);
 }
 
 void test_rename_field()
 {
     Branch *branch = new Branch();
-    parser::quick_exec_statement(branch, "s = define-struct('s, list(float,List))");
-    parser::quick_exec_statement(branch, "s = struct-definition-rename-field(s, 0, 'FirstField)");
-    parser::quick_exec_statement(branch, "s = struct-definition-rename-field(s, 1, 'SecondField)");
-    parser::quick_exec_statement(branch, "inst = s()");
-    Term* firstField = parser::quick_exec_statement(branch, "get-field(inst, 'FirstField)");
+    parser::eval_statement(branch, "s = define-struct('s, list(float,List))");
+    parser::eval_statement(branch, "s = struct-definition-rename-field(s, 0, 'FirstField)");
+    parser::eval_statement(branch, "s = struct-definition-rename-field(s, 1, 'SecondField)");
+    parser::eval_statement(branch, "inst = s()");
+    Term* firstField = parser::eval_statement(branch, "get-field(inst, 'FirstField)");
 
     test_assert(firstField != NULL);
     test_assert(firstField->type == FLOAT_TYPE);
