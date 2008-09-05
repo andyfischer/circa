@@ -222,12 +222,14 @@ ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)
     return functionCall.release();
 }
 
-ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
+ast::FunctionHeader* functionHeader(token_stream::TokenStream& tokens)
 {
-    tokens.consume(tokenizer::IDENTIFIER);
+    tokens.consume(tokenizer::IDENTIFIER); // 'function'
     possibleWhitespace(tokens);
 
-    std::auto_ptr<ast::FunctionDecl> decl(new ast::FunctionDecl(tokens.consume(tokenizer::IDENTIFIER)));
+    std::auto_ptr<ast::FunctionHeader> header(new ast::FunctionHeader());
+
+    header->functionName = tokens.consume(tokenizer::IDENTIFIER);
 
     possibleWhitespace(tokens);
 
@@ -241,7 +243,7 @@ ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
         std::string name = tokens.consume(tokenizer::IDENTIFIER);
         std::string postWhitespace = possibleWhitespace(tokens);
 
-        decl->addArgument(type, name);
+        header->addArgument(type, name);
 
         if (!tokens.nextIs(tokenizer::RPAREN))
             tokens.consume(tokenizer::COMMA);
@@ -254,9 +256,18 @@ ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
     if (tokens.nextIs(tokenizer::RIGHT_ARROW)) {
         tokens.consume(tokenizer::RIGHT_ARROW);
         possibleWhitespace(tokens);
-        decl->outputType = tokens.consume(tokenizer::IDENTIFIER);
+        header->outputType = tokens.consume(tokenizer::IDENTIFIER);
         possibleWhitespace(tokens);
     }
+
+    return header.release();
+}
+
+ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
+{
+    std::auto_ptr<ast::FunctionDecl> decl(new ast::FunctionDecl());
+
+    decl->header = functionHeader(tokens);
 
     tokens.consume(tokenizer::LBRACE);
 

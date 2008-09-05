@@ -160,7 +160,7 @@ struct IgnorableStatement : public Statement
     virtual Term* createTerm(Branch* branch) { return NULL; }
 };
 
-struct FunctionDecl : public Statement
+struct FunctionHeader
 {
     struct Argument {
         std::string type;
@@ -175,14 +175,20 @@ struct FunctionDecl : public Statement
     std::string functionName;
     ArgumentList arguments;
     std::string outputType;
+
+    FunctionHeader() {}
+    ~FunctionHeader() {}
+    void addArgument(std::string const& type, std::string const& name);
+    std::string toString() const;
+};
+
+struct FunctionDecl : public Statement
+{
+    FunctionHeader *header;
     StatementList *statements;
 
-    FunctionDecl() : statements(NULL) {}
-    FunctionDecl(std::string const& _functionName)
-        : functionName(_functionName), statements(NULL) {}
+    FunctionDecl() : header(NULL), statements(NULL) {}
     ~FunctionDecl();
-
-    void addArgument(std::string const& type, std::string const& name);
 
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);

@@ -20,6 +20,7 @@ ast::FunctionCall* functionCall(token_stream::TokenStream& tokens);
 ast::LiteralString* literalString(token_stream::TokenStream& tokens);
 ast::LiteralFloat* literalFloat(token_stream::TokenStream& tokens);
 ast::Identifier* identifier(token_stream::TokenStream& tokens);
+ast::FunctionHeader* functionHeader(token_stream::TokenStream& tokens);
 ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens);
 
 } // namespace parser
