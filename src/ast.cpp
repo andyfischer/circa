@@ -215,18 +215,35 @@ StatementList::createTerms(Branch* branch)
     }
 }
 
-FunctionDecl::~FunctionDecl()
-{
-    delete this->statements;
-}
-
 void
-FunctionDecl::addArgument(std::string const& type, std::string const& name)
+FunctionHeader::addArgument(std::string const& type, std::string const& name)
 {
     Argument arg;
     arg.type = type;
     arg.name = name;
     this->arguments.push_back(arg);
+}
+
+std::string
+FunctionHeader::toString() const
+{
+    std::stringstream out;
+    out << "function " << functionName << "(";
+    ArgumentList::const_iterator it;
+    bool first = true;
+    for (it = arguments.begin(); it != arguments.end(); ++it) {
+        if (!first) out << ", ";
+        out << it->type << " " << it->name;
+        first = false;
+    }
+    out << ")";
+    return out.str();
+}
+
+FunctionDecl::~FunctionDecl()
+{
+    delete this->header;
+    delete this->statements;
 }
 
 Term*
@@ -236,8 +253,8 @@ FunctionDecl::createTerm(Branch* branch)
 
     TermList inputTypes;
 
-    ArgumentList::const_iterator it;
-    for (it = this->arguments.begin(); it != this->arguments.end(); ++it)
+    FunctionHeader::ArgumentList::const_iterator it;
+    for (it = this->header->arguments.begin(); it != this->header->arguments.end(); ++it)
     {
         Term* term = branch->getNamed(it->type);
         if (term == NULL)
@@ -249,14 +266,14 @@ FunctionDecl::createTerm(Branch* branch)
         inputTypes.append(term);
     }
 
-    Term* outputType = branch->getNamed(this->outputType);
+    Term* outputType = branch->getNamed(this->header->outputType);
     if (outputType == NULL)
-        throw syntax_errors::SyntaxError(std::string("Identifier not found: ") + this->outputType);
+        throw syntax_errors::SyntaxError(std::string("Identifier not found: ") + this->header->outputType);
     if (!is_type(outputType))
-        throw syntax_errors::SyntaxError(std::string("Identifier is not a type: ") + this->outputType);
+        throw syntax_errors::SyntaxError(std::string("Identifier is not a type: ") + this->header->outputType);
 
     // Load into workspace
-    constant_string(&workspace, this->functionName, "functionName");
+    constant_string(&workspace, this->header->functionName, "functionName");
     constant_list(&workspace, inputTypes, "inputTypes");
     workspace.bindName(outputType, "outputType");
 
@@ -268,15 +285,7 @@ FunctionDecl::toString() const
 {
     std::stringstream out;
 
-    out << "function " << functionName << "(";
-    ArgumentList::const_iterator it;
-    bool first = true;
-    for (it = arguments.begin(); it != arguments.end(); ++it) {
-        if (!first) out << ", ";
-        out << it->type << " " << it->name;
-        first = false;
-    }
-    out << ")" << std::endl << "{" << std::endl;
+    out << header->toString() << std::endl << "{" << std::endl;
 
     out << statements->toString();
 

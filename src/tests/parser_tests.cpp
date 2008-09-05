@@ -142,10 +142,12 @@ void function_decl_ast()
 {
     // Create a FunctionDecl from scratch
     ast::FunctionDecl decl;
-    decl.functionName = "add";
-    decl.outputType = "float";
-    decl.addArgument("float","arg1");
-    decl.addArgument("float","arg2");
+
+    decl.header = new ast::FunctionHeader();
+    decl.header->functionName = "add";
+    decl.header->outputType = "float";
+    decl.header->addArgument("float","arg1");
+    decl.header->addArgument("float","arg2");
 
     decl.statements = new ast::StatementList();
 
