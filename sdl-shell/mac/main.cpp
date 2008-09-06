@@ -31,7 +31,7 @@ void draw_line(circa::Term* term)
 void initialize_circa()
 {
     // Load a bunch of functions
-    circa::import_c_function(draw_line, "draw_line(float,float,float,float,int)");
+    circa::import_c_function(draw_line, "draw-line(float,float,float,float,int)");
 }
 
 void initialize_sdl()
@@ -58,14 +58,13 @@ void initialize_sdl()
 		exit(2);
 	}
 }
-    
+
 void main_loop()
 {
 	bool done;
     SDL_Event event;
 
     SDL_LockSurface(gScreen);
-    stringRGBA(gScreen, 20, 20, "hello", 0, 0, 255, 0);
     lineColor(gScreen, 20, 20, 50, 50, 0xff0000ff);
     SDL_UnlockSurface(gScreen);
     SDL_Flip(gScreen);
