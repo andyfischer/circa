@@ -36,22 +36,22 @@ void test_misc()
     Term* my_struct_def = create_constant(&branch, get_global("StructDefinition"));
     my_struct_def = apply_function(&branch, get_global("struct-definition-set-name"),
             TermList(my_struct_def, constant_string(&branch, "my-struct")));
-    evaluate(my_struct_def);
+    my_struct_def->eval();
 
     my_struct_def = apply_function(&branch, get_global("add-field"),
             TermList(my_struct_def, constant_string(&branch, "myFloat"), FLOAT_TYPE));
-    evaluate(my_struct_def);
+    my_struct_def->eval();
     my_struct_def = apply_function(&branch, get_global("add-field"),
             TermList(my_struct_def, constant_string(&branch, "myString"), STRING_TYPE));
-    evaluate(my_struct_def);
+    my_struct_def->eval();
 
     Term* my_instance = apply_function(&branch, my_struct_def, TermList());
-    evaluate(my_instance);
+    my_instance->eval();
 
     my_instance = apply_function(&branch, get_global("set-field"),
             TermList(my_instance, constant_string(&branch, "myFloat"),
                 constant_float(&branch, 2)));
-    evaluate(my_instance);
+    my_instance->eval();
     branch.bindName(my_instance, "my_instance");
 
     Term* hopefully_two = parser::eval_statement(&branch,
