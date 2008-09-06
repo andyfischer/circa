@@ -66,6 +66,8 @@ Term* constant_int(Branch* branch, int i, std::string const& name="");
 Term* constant_float(Branch* branch, float f, std::string const& name="");
 Term* constant_list(Branch* branch, TermList list, std::string const& name="");
 
+Branch* evaluate_file(std::string const& filename);
+
 } // namespace circa
 
 #endif
