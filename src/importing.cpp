@@ -43,6 +43,9 @@ Term* import_c_function(Branch* branch, Function::EvaluateFunc evaluate, std::st
     func->inputTypes = inputTypes;
     func->outputType = outputType;
     branch->bindName(term, header->functionName);
+
+    delete header;
+
     return term;
 }
 
