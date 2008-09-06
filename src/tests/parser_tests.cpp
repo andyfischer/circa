@@ -116,7 +116,7 @@ void create_function_call()
     // make sure this term is not evaluated yet
     test_assert(term->needsUpdate);
 
-    evaluate(term);
+    term->eval();
 
     test_assert(!term->needsUpdate);
     test_assert(as_float(term) == 5);

@@ -4,8 +4,9 @@
 #include "common_headers.h"
 
 namespace circa {
+namespace evaluation {
 
-class Evaluator {
+class Engine {
 
     struct Scope {
         Term* callingTerm;
@@ -36,6 +37,9 @@ public:
     void runUntilFinished();
 };
 
+void evaluate(Term* term);
+
+}
 }
 
 #endif

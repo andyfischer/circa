@@ -4,6 +4,7 @@
 #include "branch.h"
 #include "builtins.h"
 #include "errors.h"
+#include "evaluation.h"
 #include "function.h"
 #include "operations.h"
 #include "term.h"
@@ -129,68 +130,20 @@ void set_input(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 }
 
-void evaluate(Term* term)
-{
-    if (term == NULL)
-        throw errors::InternalError("term is NULL");
-
-    if (term->function == NULL)
-        throw errors::InternalError("function term is NULL");
-
-    // Check each input. Make sure:
-    //  1) they are up-to-date
-    //  2) they have a non-null value
-    for (int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++)
-    {
-        Term* input = term->inputs[inputIndex];
-
-        if (input->needsUpdate)
-            evaluate(input);
-            
-        if (input->value == NULL)
-            throw errors::InternalError(string("Input named ") + input->findName() + " has NULL value.");
-    }
-    
-    // Make sure we have an allocated value
-    if (term->value == NULL) {
-        // std::cout << "Reallocating term " << term->findName() << std::endl;
-        as_type(term->type)->alloc(term);
-    }    
-
-    Function* func = as_function(term->function);
-
-    if (func == NULL)
-        throw errors::InternalError("function is NULL");
-
-    if (func->evaluate == NULL) {
-        std::cout << "Error: no evaluate function for " << func->name << std::endl;
-        return;
-    }
-
-    try {
-        func->evaluate(term);
-        term->needsUpdate = false;
-    }
-    catch (errors::InternalError &err)
-    {
-        std::cout << "An internal error occured while executing " + func->name << std::endl;
-        std::cout << err.message() << std::endl;
-    }
-}
 
 void evaluate_branch(Branch* branch)
 {
     int count = branch->terms.count();
     for (int index=0; index < count; index++) {
 		Term* term = branch->terms[index];
-        evaluate(term);
+        evaluation::evaluate(term);
     }
 }
 
 Term* apply_function(Branch* branch, Term* function, TermList inputs)
 {
     if (function->needsUpdate)
-        evaluate(function);
+        evaluation::evaluate(function);
 
     // Check if 'function' is actually a type
     if (is_type(function))
@@ -224,14 +177,14 @@ Term* apply_function(Branch* branch, Term* function, TermList inputs)
 Term* eval_function(Branch* branch, Term* function, TermList inputs)
 {
     Term* result = apply_function(branch, function, inputs);
-    evaluate(result);
+    evaluation::evaluate(result);
     return result;
 }
 
 Term* get_const_function(Branch* branch, Term* type)
 {
     Term* result = apply_function(branch, get_global("const-generator"), TermList(type));
-    evaluate(result);
+    evaluation::evaluate(result);
     return result;
 }
 

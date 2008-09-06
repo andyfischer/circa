@@ -15,7 +15,6 @@ void unsafe_change_type(Term* term, Term* type);
 void change_type(Term* term, Term* type);
 void specialize_type(Term* term, Term* type);
 void set_input(Term* term, int index, Term* input);
-void evaluate(Term* term);
 void evaluate_branch(Branch* branch);
 
 // Examine 'function' and 'inputs' and returns a result term. A few things

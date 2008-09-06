@@ -4,7 +4,7 @@
 
 #include "circa.h"
 #include "common.h"
-#include "evaluator.h"
+#include "evaluation.h"
 
 namespace circa {
 namespace subroutine_tests {
@@ -49,7 +49,7 @@ void test_using_evaluator()
     parser::eval_statement(branch, "sub = subroutine-eval(sub, \"b-times-three = mult(b,3.0)\")");
     parser::eval_statement(branch, "sub = subroutine-eval(sub, \"return add(a-times-four,b-times-three)\")");
     
-    Evaluator evaluator;
+    evaluation::Engine evaluator;
     Term* result = parser::eval_statement(branch, "sub(2.0,1.0)");
     evaluator.evaluate(result);
     evaluator.runUntilFinished();

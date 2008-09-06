@@ -12,6 +12,7 @@
 #include "builtins.h"
 #include "cpp_interface.h"
 #include "errors.h"
+#include "evaluation.h"
 #include "function.h"
 #include "operations.h"
 #include "structs.h"
@@ -299,7 +300,7 @@ void list_apply__evaluate(Term* caller)
 
     for (int i=0; i < list->count(); i++) {
         Term* result = apply_function(caller->owningBranch, caller->inputs[0], TermList(list->get(i)));
-        evaluate(result);
+        evaluation::evaluate(result);
 
         as_list(caller)->append(result);
     }

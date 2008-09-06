@@ -7,6 +7,7 @@
 #include "builtins.h"
 #include "branch.h"
 #include "errors.h"
+#include "evaluation.h"
 #include "function.h"
 #include "operations.h"
 #include "term.h"
@@ -133,7 +134,7 @@ TermList* as_list(Term* term)
 
 void Term::eval()
 {
-    evaluate(this);
+    evaluation::evaluate(this);
 }
 
 } // namespace circa
