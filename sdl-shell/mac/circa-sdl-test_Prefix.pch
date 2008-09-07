@@ -1,9 +1,0 @@
-//
-// Prefix header for all source files of the 'circa-sdl-test' target in the 'circa-sdl-test' project
-//
-
-#include "SDL.h"
-
-#ifdef __OBJC__
-    #import <Cocoa/Cocoa.h>
-#endif

@@ -1,0 +1,15 @@
+import commands
+
+
+env = Environment()
+
+sdl_cflags = commands.getoutput("sdl-config --cflags")
+print "sdl_cflags =", sdl_cflags
+
+sdl_libs = commands.getoutput("sdl-config --libs")
+print "sdl_libs =", sdl_libs
+
+env.Append(CFLAGS = sdl_cflags)
+env.Append(LINKFLAGS = sdl_libs)
+
+env.Program('SDLTest', 'SDLTest.c')

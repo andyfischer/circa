@@ -134,6 +134,9 @@ void set_input(Term* term, int index, Term* input)
 
 void evaluate_branch(Branch* branch)
 {
+    if (branch == NULL)
+        throw errors::InternalError("branch is NULL");
+
     int count = branch->terms.count();
     for (int index=0; index < count; index++) {
 		Term* term = branch->terms[index];
