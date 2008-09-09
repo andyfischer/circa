@@ -21,7 +21,7 @@ Term* quick_create_type(
         Type::DuplicateFunc duplicateFunc,
         Type::ToStringFunc toStringFunc)
 {
-    Term* typeTerm = create_constant(branch, get_global("Type"));
+    Term* typeTerm = create_constant(branch, TYPE_TYPE);
     as_type(typeTerm)->name = name;
     as_type(typeTerm)->alloc = allocFunc;
     as_type(typeTerm)->dealloc = deallocFunc;
