@@ -70,7 +70,7 @@ Term* get_global(string name)
     if (KERNEL->containsName(name))
         return KERNEL->getNamed(name);
 
-    throw errors::KeyError(name);
+    return NULL;
 }
 
 
@@ -79,7 +79,7 @@ void bootstrap_kernel()
     KERNEL = new Branch();
 
     // Create const-generator function
-    Term* CONST_GENERATOR = new Term();
+    CONST_GENERATOR = new Term();
     Function_alloc(CONST_GENERATOR);
     as_function(CONST_GENERATOR)->name = "const-generator";
     as_function(CONST_GENERATOR)->pureFunction = true;

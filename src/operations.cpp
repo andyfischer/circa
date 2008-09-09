@@ -187,7 +187,7 @@ Term* eval_function(Branch* branch, Term* function, TermList inputs)
 
 Term* get_const_function(Branch* branch, Term* type)
 {
-    Term* result = apply_function(branch, get_global("const-generator"), TermList(type));
+    Term* result = apply_function(branch, CONST_GENERATOR, TermList(type));
     evaluation::evaluate(result);
     return result;
 }

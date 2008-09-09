@@ -58,8 +58,8 @@ void function_recycle_input(Term* caller)
 void initialize_functions(Branch* kernel)
 {
     Term* set_recycle_input = quick_create_function(kernel, "function-recycle-input",
-            function_recycle_input, TermList(get_global("Function"),get_global("int")),
-            get_global("Function"));
+            function_recycle_input, TermList(FUNCTION_TYPE,INT_TYPE),
+            FUNCTION_TYPE);
     as_function(set_recycle_input)->recycleInput = 0;
 }
 
