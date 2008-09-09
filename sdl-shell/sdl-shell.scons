@@ -1,15 +1,24 @@
 import commands
 
-
 env = Environment()
 
-sdl_cflags = commands.getoutput("sdl-config --cflags")
-print "sdl_cflags =", sdl_cflags
+#env.Append(CPPFLAGS = ['-ggdb'])
 
-sdl_libs = commands.getoutput("sdl-config --libs")
-print "sdl_libs =", sdl_libs
 
-env.Append(CFLAGS = sdl_cflags)
-env.Append(LINKFLAGS = sdl_libs)
+# include SDL
+SDL_cflags = commands.getoutput("sdl-config --cflags")
+cpp_flags = SDL_cflags
+env.Append(CFLAGS = SDL_cflags)
+env.Append(LINKFLAGS = commands.getoutput("sdl-config --libs"))
+env.Append(LIBS = ['SDL_gfx'])
+
+# include circa lib
+env.Append(CPPPATH = '../src')
+env.Append(LIBPATH = ['../lib'])
+env.Append(LIBS = ['circa'])
+
+cppflags = SDL_cflags + " -ggdb"
+env.Append(CPPFLAGS = cppflags)
 
 env.Program('SDLTest', 'SDLTest.c')
+env.Program('sdl-shell', 'main.cpp')
