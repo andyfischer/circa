@@ -13,8 +13,8 @@ void range()
 
     Term* range_zero_to_ten = parser::eval_statement(branch, "range(10)");
 
-    test_assert(as_int(as_list(range_zero_to_ten)->get(0)) == 0);
-    test_assert(as_int(as_list(range_zero_to_ten)->get(9)) == 9);
+    test_assert(as_int(as_list(range_zero_to_ten).get(0)) == 0);
+    test_assert(as_int(as_list(range_zero_to_ten).get(9)) == 9);
 }
 
 void list_apply()
@@ -23,8 +23,8 @@ void list_apply()
 
     Term* result = parser::eval_statement(branch, "list-apply(to-string, range(5))");
     
-    test_assert(as_string(as_list(result)->get(0)) == "0");
-    test_assert(as_string(as_list(result)->get(4)) == "4");
+    test_assert(as_string(as_list(result).get(0)) == "0");
+    test_assert(as_string(as_list(result).get(4)) == "4");
 }
 
 } // namespace list_tests

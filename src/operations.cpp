@@ -134,7 +134,6 @@ void set_input(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 }
 
-
 void evaluate_branch(Branch* branch)
 {
     if (branch == NULL)
@@ -145,6 +144,49 @@ void evaluate_branch(Branch* branch)
 		Term* term = branch->terms[index];
         term->eval();
     }
+}
+
+void hosted_apply_function(Term* caller)
+{
+    Branch* branch = as_branch(caller->inputs[0]);
+    Term* function = as_ref(caller->inputs[1]);
+    TermList& inputs = as_list(caller->inputs[2]);
+
+    // Evaluate function, if needed
+    if (function->needsUpdate)
+        function->eval();
+    
+    // Check if 'function' is actually a type
+    if (is_type(function))
+    {
+        if (inputs.count() != 0) {
+            caller->pushError("Multiple inputs in constructor not supported");
+            return;
+        }
+
+        as_ref(caller) = create_term(branch, get_const_function(branch, function), inputs);
+    }
+
+    // If 'function' is not really a function, see if we can treat it like a function
+    if (!is_function(function)) {
+
+        Type* type = as_type(function->type);
+
+        if (!type->memberFunctions.contains("")) {
+            caller->pushError(std::string("Term ") + function->toString()
+                    + " is not a type, and has no default function");
+            return;
+        }
+
+        TermList memberFunctionInputs;
+        memberFunctionInputs.append(function);
+        memberFunctionInputs.appendAll(inputs);
+
+        as_ref(caller) = create_term(branch, type->memberFunctions[""], memberFunctionInputs);
+    }
+
+    // Create a term in the normal way
+    as_ref(caller) = create_term(branch, function, inputs);
 }
 
 Term* apply_function(Branch* branch, Term* function, TermList inputs)
@@ -339,7 +381,7 @@ Term* constant_float(Branch* branch, float f, std::string const& name)
 Term* constant_list(Branch* branch, TermList list, std::string const& name)
 {
     Term* term = apply_function(branch, LIST_TYPE, TermList());
-    *as_list(term) = list;
+    as_list(term) = list;
     if (name != "")
         branch->bindName(term, name);
     return term;

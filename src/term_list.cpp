@@ -67,14 +67,11 @@ void TermList::remapPointers(TermMap const& map)
         _items[i] = map.getRemapped(_items[i]);
 }
 
-void TermList_alloc(Term* caller)
+TermList& as_list(Term* term)
 {
-    caller->value = new TermList();
-}
-
-void TermList_dealloc(Term* caller)
-{
-    delete as_list(caller);
+    if (term->type != LIST_TYPE)
+        throw errors::TypeError(term, LIST_TYPE);
+    return *((TermList*) term->value);
 }
 
 } // namespace circa

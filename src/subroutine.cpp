@@ -126,7 +126,7 @@ void subroutine_create__evaluate(Term* caller)
     sub->name = as_string(caller->inputs[0]);
     sub->initialize = subroutine_call__initialize;
     sub->evaluate = subroutine_call__evaluate;
-    sub->inputTypes = *as_list(caller->inputs[1]);
+    sub->inputTypes = as_list(caller->inputs[1]);
     sub->outputType = caller->inputs[2];
     sub->stateType = BRANCH_TYPE;
 
@@ -141,13 +141,13 @@ void subroutine_create__evaluate(Term* caller)
 void subroutine_name_inputs__evaluate(Term* caller)
 {
     recycle_value(caller->inputs[0], caller);
-    TermList* name_list = as_list(caller->inputs[1]);
+    TermList& name_list = as_list(caller->inputs[1]);
     Subroutine* sub = as_subroutine(caller);
     Branch* branch = sub->branch;
 
     for (int index=0; index < sub->inputTypes.count(); index++) {
         Term* inputPlaceholder = branch->getNamed(GetInputPlaceholderName(index));
-        std::string newName = as_string(name_list->get(index));
+        std::string newName = as_string(name_list.get(index));
         branch->bindName(inputPlaceholder, newName);
     }
 }
@@ -175,7 +175,7 @@ void subroutine_get_local__evaluate(Term* caller)
     Subroutine* sub = as_subroutine(caller->inputs[0]);
     std::string name = as_string(caller->inputs[1]);
 
-    as_reference(caller) = sub->branch->getNamed(name);
+    as_ref(caller) = sub->branch->getNamed(name);
 }
 
 void subroutine_bind__evaluate(Term* caller)
@@ -185,34 +185,11 @@ void subroutine_bind__evaluate(Term* caller)
     // Input 2: String name
     recycle_value(caller->inputs[0], caller);
     Subroutine* sub = as_subroutine(caller);
-    Term* ref = as_reference(caller->inputs[1]);
+    Term* ref = as_ref(caller->inputs[1]);
     std::string name = as_string(caller->inputs[2]);
 
     sub->branch->bindName(ref, name);
 }
-
-/*
-void subroutine_append__evaluate(Term* caller)
-{
-    // Input 0: Subroutine
-    // Input 1: Function
-    // Input 2: List
-    // Result: (Subroutine,Reference)
-    
-    StructInstance* inst = as_struct_instance(caller);
-
-    Term* return_field_0 = get_struct_field(caller,0);
-    recycle_value(caller->inputs[0], return_field_0);
-    Subroutine* sub = as_subroutine(return_field_0);
-    Term* func = caller->inputs[1];
-    Term* inputs = caller->inputs[2];
-
-    as_function(func);
-    as_list(inputs);
-
-    as_reference(get_struct_field(caller,1)) = apply_function(sub->branch, func, *as_list(inputs));
-}
-*/
 
 void subroutine_print__evaluate(Term* caller)
 {

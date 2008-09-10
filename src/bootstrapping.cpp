@@ -45,16 +45,6 @@ Term* quick_create_function(Branch* branch, string name, Function::EvaluateFunc 
 	return term;
 }
 
-void hosted_apply_function(Term* caller)
-{
-    recycle_value(caller->inputs[0], caller);
-    Branch* branch = as_branch(caller);
-    Term* function = caller->inputs[1];
-    TermList* inputs = as_list(caller->inputs[2]);
-
-    apply_function(branch, function, *inputs);
-}
-
 void hosted_to_string(Term* caller)
 {
     as_string(caller) = caller->inputs[0]->toString();
@@ -62,12 +52,6 @@ void hosted_to_string(Term* caller)
 
 void initialize_bootstrapped_code(Branch* kernel)
 {
-    Term* apply_function_f = quick_create_function(kernel, "apply-function",
-        hosted_apply_function,
-        TermList(BRANCH_TYPE, FUNCTION_TYPE, LIST_TYPE),
-        BRANCH_TYPE);
-    as_function(apply_function_f)->recycleInput = 0;
-
     quick_create_function(kernel, "to-string", hosted_to_string,
         TermList(ANY_TYPE), STRING_TYPE);
 
