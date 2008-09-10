@@ -37,6 +37,8 @@ struct TermList
     void remapPointers(TermMap const& map);
 };
 
+TermList& as_list(Term* term);
+
 } // namespace circa
 
 #endif

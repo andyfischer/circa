@@ -49,8 +49,6 @@ struct Term
     void eval();
 };
 
-TermList* as_list(Term* term);
-
 } // namespace circa
 
 #endif

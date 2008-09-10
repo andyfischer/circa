@@ -233,7 +233,7 @@ void reference_dealloc(Term* caller)
 {
     caller->value = NULL;
 }
-Term*& as_reference(Term* term)
+Term*& as_ref(Term* term)
 {
     return (Term*&) term->value;
 }
@@ -272,10 +272,10 @@ void if_expr__evaluate(Term* caller)
 
 void create_list__evaluate(Term* caller)
 {
-    as_list(caller)->clear();
+    as_list(caller).clear();
 
     for (int i=0; i < caller->inputs.count(); i++) {
-        as_list(caller)->append(caller->inputs[i]);
+        as_list(caller).append(caller->inputs[i]);
     }
 }
 
@@ -283,26 +283,26 @@ void range__evaluate(Term* caller)
 {
     int max = as_int(caller->inputs[0]);
 
-    as_list(caller)->clear();
+    as_list(caller).clear();
 
     for (int i=0; i < max; i++) {
-        as_list(caller)->append(constant_int(caller->owningBranch, i));
+        as_list(caller).append(constant_int(caller->owningBranch, i));
     }
 }
 
 void list_apply__evaluate(Term* caller)
 {
     as_function(caller->inputs[0]);
-    TermList* list = as_list(caller->inputs[1]);
+    TermList& list = as_list(caller->inputs[1]);
 
-    as_list(caller)->clear();
+    as_list(caller).clear();
 
-    for (int i=0; i < list->count(); i++) {
-        Term* result = apply_function(caller->owningBranch, caller->inputs[0], TermList(list->get(i)));
+    for (int i=0; i < list.count(); i++) {
+        Term* result = apply_function(caller->owningBranch, caller->inputs[0], TermList(list.get(i)));
 
         result->eval();
 
-        as_list(caller)->append(result);
+        as_list(caller).append(result);
     }
 }
 

@@ -224,7 +224,7 @@ void struct_define_anonymous(Term* caller)
     // Input 0: string name
     // Input 1: list<Type>
     std::string name = as_string(caller->inputs[0]);
-    TermList* typeList = as_list(caller->inputs[1]);
+    TermList& typeList = as_list(caller->inputs[1]);
 
     StructDefinition* def = as_struct_definition(caller);
 
@@ -232,10 +232,10 @@ void struct_define_anonymous(Term* caller)
 
     def->name = name;
 
-    for (int index=0; index < typeList->count(); index++) {
+    for (int index=0; index < typeList.count(); index++) {
         std::stringstream fieldName;
         fieldName << "field-" << index;
-        Term* type = typeList->get(index);
+        Term* type = typeList.get(index);
         def->addField(fieldName.str(), type); 
     }
 }

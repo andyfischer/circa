@@ -151,14 +151,6 @@ bool& Term::asBool()
     return as_bool(this);
 }
 
-// TermList type
-TermList* as_list(Term* term)
-{
-    if (term->type != LIST_TYPE)
-        throw errors::TypeError(term, LIST_TYPE);
-    return (TermList*) term->value;
-}
-
 void Term::eval()
 {
     evaluation::evaluate_term(this);
