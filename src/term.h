@@ -34,10 +34,12 @@ struct Term
     bool equals(Term* term);
     std::string findName();
 
+    bool hasError() const;
     int numErrors() const;
-    std::string const& getError(int index);
+    std::string const& getError(int index) const;
     void clearErrors();
     void pushError(std::string const& message);
+    std::string getErrorMessage() const;
 
     int& asInt();
     float& asFloat();

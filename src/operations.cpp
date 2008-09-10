@@ -70,6 +70,10 @@ void initialize_term(Term* term, Term* function, TermList inputs)
     // Add to the 'users' field of each input, and 'function'
     function->users.add(term);
     for (int index=0; index < inputs.count(); index++) {
+
+        if (inputs[index] == NULL)
+            continue;
+
         inputs[index]->users.add(term);
     }
 }

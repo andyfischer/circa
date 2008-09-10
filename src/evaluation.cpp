@@ -110,21 +110,29 @@ void evaluate_term(Term* term)
     }
 
     // Check each input. Make sure:
+    //  1) they are not null
     //  1) they are up-to-date
     //  2) they have a non-null value
     for (int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++)
     {
         Term* input = term->inputs[inputIndex];
-
-        if (input->needsUpdate)
-            evaluate_term(input);
-            
-        if (input->value == NULL) {
+         
+        if (input == NULL) {
             std::stringstream message;
             message << "Input " << inputIndex << " is NULL";
             term->pushError(message.str());
             return;
         }
+
+        if (input->value == NULL) {
+            std::stringstream message;
+            message << "Input " << inputIndex << " has NULL value";
+            term->pushError(message.str());
+            return;
+        }
+
+        if (input->needsUpdate)
+            evaluate_term(input);
     }
     
     // Make sure we have an allocated value
@@ -132,7 +140,6 @@ void evaluate_term(Term* term)
         // std::cout << "Reallocating term " << term->findName() << std::endl;
         as_type(term->type)->alloc(term);
     }    
-
 
     try {
         func->evaluate(term);

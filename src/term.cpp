@@ -92,6 +92,12 @@ Term::equals(Term* term)
     return as_type(this->type)->equals(this, term);
 }
 
+bool
+Term::hasError() const
+{
+    return numErrors() != 0;
+}
+
 int
 Term::numErrors() const
 {
@@ -99,7 +105,7 @@ Term::numErrors() const
 }
 
 std::string const&
-Term::getError(int index)
+Term::getError(int index) const
 {
     return this->errors[index];
 }
@@ -114,6 +120,15 @@ void
 Term::pushError(std::string const& message)
 {
     this->errors.push_back(message);
+}
+
+std::string
+Term::getErrorMessage() const
+{
+    if (numErrors() == 0)
+        return "";
+    else
+        return this->errors[numErrors()-1];
 }
 
 int& Term::asInt()
