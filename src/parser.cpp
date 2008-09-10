@@ -2,7 +2,6 @@
 #include "common_headers.h"
 
 #include "circa.h"
-#include "evaluation.h"
 #include "tokenizer.h"
 #include "parser.h"
 
@@ -52,7 +51,7 @@ Term* apply_statement(Branch* branch, std::string const& input)
 Term* eval_statement(Branch* branch, std::string const& input)
 {
     Term* term = apply_statement(branch, input);
-    evaluation::evaluate(term);
+    term->eval();
     return term;
 }
 

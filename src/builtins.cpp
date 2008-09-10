@@ -73,7 +73,6 @@ Term* get_global(string name)
     return NULL;
 }
 
-
 void bootstrap_kernel()
 {
     KERNEL = new Branch();
@@ -300,7 +299,8 @@ void list_apply__evaluate(Term* caller)
 
     for (int i=0; i < list->count(); i++) {
         Term* result = apply_function(caller->owningBranch, caller->inputs[0], TermList(list->get(i)));
-        evaluation::evaluate(result);
+
+        result->eval();
 
         as_list(caller)->append(result);
     }

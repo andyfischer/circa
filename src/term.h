@@ -36,6 +36,8 @@ struct Term
 
     int numErrors() const;
     std::string const& getError(int index);
+    void clearErrors();
+    void pushError(std::string const& message);
 
     int& asInt();
     float& asFloat();
