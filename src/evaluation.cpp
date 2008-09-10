@@ -33,7 +33,7 @@ Engine::evaluate(Term* term)
         mStack.push(scope);
 
     } else {
-        term->eval();
+        evaluate_term(term);
     }
 }
 
@@ -82,13 +82,32 @@ Engine::runUntilFinished()
     }
 }
 
-void evaluate(Term* term)
+void evaluate_term(Term* term)
 {
     if (term == NULL)
         throw errors::InternalError("term is NULL");
 
-    if (term->function == NULL)
-        throw errors::InternalError("function term is NULL");
+    term->clearErrors();
+
+    // Check function
+    if (term->function == NULL) {
+        term->pushError("Function is NULL");
+        return;
+    }
+
+    if (!is_function(term->function)) {
+        term->pushError("is_function(term->function) is false");
+        return;
+    }
+
+    Function* func = as_function(term->function);
+
+    if (func->evaluate == NULL) {
+        std::stringstream message;
+        message << "Function '" << func->name << "' has no evaluate function";
+        term->pushError(message.str());
+        return;
+    }
 
     // Check each input. Make sure:
     //  1) they are up-to-date
@@ -98,10 +117,14 @@ void evaluate(Term* term)
         Term* input = term->inputs[inputIndex];
 
         if (input->needsUpdate)
-            evaluate(input);
+            evaluate_term(input);
             
-        if (input->value == NULL)
-            throw errors::InternalError(string("Input named ") + input->findName() + " has NULL value.");
+        if (input->value == NULL) {
+            std::stringstream message;
+            message << "Input " << inputIndex << " is NULL";
+            term->pushError(message.str());
+            return;
+        }
     }
     
     // Make sure we have an allocated value
@@ -110,15 +133,6 @@ void evaluate(Term* term)
         as_type(term->type)->alloc(term);
     }    
 
-    Function* func = as_function(term->function);
-
-    if (func == NULL)
-        throw errors::InternalError("function is NULL");
-
-    if (func->evaluate == NULL) {
-        std::cout << "Error: no evaluate function for " << func->name << std::endl;
-        return;
-    }
 
     try {
         func->evaluate(term);
@@ -126,8 +140,10 @@ void evaluate(Term* term)
     }
     catch (errors::InternalError &err)
     {
-        std::cout << "An internal error occured while executing " + func->name << std::endl;
-        std::cout << err.message() << std::endl;
+        std::stringstream message;
+        message << "An internal error occured while executing " + func->name << ": "
+            << err.message();
+        term->pushError(message.str());
     }
 }
 

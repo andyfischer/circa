@@ -4,7 +4,6 @@
 #include "branch.h"
 #include "builtins.h"
 #include "errors.h"
-#include "evaluation.h"
 #include "function.h"
 #include "operations.h"
 #include "parser.h"
@@ -140,14 +139,14 @@ void evaluate_branch(Branch* branch)
     int count = branch->terms.count();
     for (int index=0; index < count; index++) {
 		Term* term = branch->terms[index];
-        evaluation::evaluate(term);
+        term->eval();
     }
 }
 
 Term* apply_function(Branch* branch, Term* function, TermList inputs)
 {
     if (function->needsUpdate)
-        evaluation::evaluate(function);
+        function->eval();
 
     // Check if 'function' is actually a type
     if (is_type(function))
@@ -181,14 +180,14 @@ Term* apply_function(Branch* branch, Term* function, TermList inputs)
 Term* eval_function(Branch* branch, Term* function, TermList inputs)
 {
     Term* result = apply_function(branch, function, inputs);
-    evaluation::evaluate(result);
+    result->eval();
     return result;
 }
 
 Term* get_const_function(Branch* branch, Term* type)
 {
     Term* result = apply_function(branch, CONST_GENERATOR, TermList(type));
-    evaluation::evaluate(result);
+    result->eval();
     return result;
 }
 

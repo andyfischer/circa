@@ -37,7 +37,7 @@ public:
     void runUntilFinished();
 };
 
-void evaluate(Term* term);
+void evaluate_term(Term* term);
 
 }
 }

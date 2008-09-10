@@ -95,13 +95,25 @@ Term::equals(Term* term)
 int
 Term::numErrors() const
 {
-    return (int) errors.size();
+    return (int) this->errors.size();
 }
 
 std::string const&
 Term::getError(int index)
 {
-    return errors[index];
+    return this->errors[index];
+}
+
+void
+Term::clearErrors()
+{
+    this->errors.clear();
+}
+
+void
+Term::pushError(std::string const& message)
+{
+    this->errors.push_back(message);
 }
 
 int& Term::asInt()
@@ -134,7 +146,7 @@ TermList* as_list(Term* term)
 
 void Term::eval()
 {
-    evaluation::evaluate(this);
+    evaluation::evaluate_term(this);
 }
 
 } // namespace circa
