@@ -49,4 +49,4 @@ Term* import_c_function(Branch* branch, Function::EvaluateFunc evaluate, std::st
     return term;
 }
 
-}
+} // namespace circa

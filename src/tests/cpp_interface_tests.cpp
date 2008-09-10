@@ -1,12 +1,12 @@
 
 #include "common_headers.h"
 
+#include "tests/common.h"
 #include "cpp_interface.h"
 #include "branch.h"
 #include "builtins.h"
 #include "operations.h"
 #include "parser.h"
-#include "tests/common.h"
 
 namespace circa {
 namespace cpp_interface_tests {

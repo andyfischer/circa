@@ -20,8 +20,8 @@ struct Type
 
     std::string name;
 
-    // Parent type, if any. This field only comes into play when casting a
-    // value to its original C++ type.
+    // Parent type, if any. This field is only used when determining if a cast
+    // to C++ type is legal.
     Term* parentType;
 
     // Functions

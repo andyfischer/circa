@@ -38,20 +38,6 @@ ValueMap::set(Term* key, Term* value)
     }
 }
 
-/*
-void map_create__execute(Term* term)
-{
-    Term* inputType = term->inputs[0];
-    Term* outputType = term->inputs[1];
-
-    Function *function = as_function(term);
-    function->inputTypes = TermList(inputType);
-    function->outputType = outputType;
-    function->name = "map<" + as_type(inputType)->name + "," + as_type(outputType)->name + ">";
-    function->execute = map__execute;
-}
-*/
-
 void map_access__evaluate(Term* term)
 {
     ValueMap& map = as<ValueMap>(term->inputs[0]);

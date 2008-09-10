@@ -13,7 +13,7 @@ struct Branch
     TermList terms;
     TermNamespace names;
 
-    Branch();
+    Branch() {}
 
     void append(Term* term);
 

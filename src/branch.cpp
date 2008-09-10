@@ -10,10 +10,6 @@
 
 namespace circa {
 
-Branch::Branch()
-{
-}
-
 void Branch::append(Term* term)
 {
     this->terms.append(term);

@@ -39,7 +39,7 @@ public:
 
 void evaluate_term(Term* term);
 
-}
-}
+} // namespace evaluation
+} // namespace circa
 
 #endif

@@ -15,7 +15,7 @@
 
 namespace circa {
 
-int gNextGlobalID = 1;
+static int gNextGlobalID = 1;
 
 Term::Term()
   : owningBranch(NULL),
