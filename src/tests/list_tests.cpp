@@ -1,8 +1,13 @@
 
 #include "common_headers.h"
 
-#include "circa.h"
 #include "tests/common.h"
+#include "branch.h"
+#include "builtins.h"
+#include "operations.h"
+#include "parser.h"
+#include "term.h"
+#include "term_list.h"
 
 namespace circa {
 namespace list_tests {

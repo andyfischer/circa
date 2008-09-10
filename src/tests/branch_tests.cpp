@@ -1,8 +1,11 @@
 
 #include "common_headers.h"
 
-#include "circa.h"
 #include <tests/common.h>
+#include "branch.h"
+#include "builtins.h"
+#include "operations.h"
+#include "term.h"
 
 namespace circa {
 namespace branch_tests {

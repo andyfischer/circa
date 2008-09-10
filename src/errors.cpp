@@ -6,13 +6,11 @@
 #include "type.h"
 
 namespace circa {
-
 namespace errors {
 
 string
 TypeError::message()
 {
-    // The goal here is to assume as little as possible
     if (expectedType == NULL)
         throw InternalError("In TypeError: expectedType is NULL");
 

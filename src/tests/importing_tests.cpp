@@ -1,9 +1,9 @@
 
 #include "common_headers.h"
 
+#include "tests/common.h"
 #include "circa.h"
 #include "importing.h"
-#include <tests/common.h>
 
 namespace circa {
 namespace importing_tests {
@@ -24,7 +24,7 @@ void test_import_c()
     test_assert(as_int(result) == 9);
 }
 
-} // namespace branch_tests
+} // namespace importing_tests
 
 void register_importing_tests()
 {

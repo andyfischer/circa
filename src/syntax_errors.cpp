@@ -23,6 +23,5 @@ UnexpectedToken::UnexpectedToken(int expected, int found, std::string const& fou
 {
 }
 
-
 } // namespace circa
 } // namespace syntax_errors
