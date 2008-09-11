@@ -1,3 +1,5 @@
+// Copyright 2008 Paul Hodge
+
 #ifndef CIRCA__COMON_HEADERS__INCLUDED
 #define CIRCA__COMON_HEADERS__INCLUDED
 

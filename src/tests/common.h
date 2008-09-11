@@ -1,3 +1,5 @@
+// Copyright 2008 Paul Hodge
+
 #ifndef CIRCA__TEST_COMMON__INCLUDED
 #define CIRCA__TEST_COMMON__INCLUDED
 

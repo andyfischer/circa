@@ -1,3 +1,5 @@
+// Copyright 2008 Paul Hodge
+
 #ifndef CIRCA__BOOTSTRAPPING__INCLUDED
 #define CIRCA__BOOTSTRAPPING__INCLUDED
 

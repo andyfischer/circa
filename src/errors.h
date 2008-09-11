@@ -1,5 +1,7 @@
-#ifndef __ERRORS_INCLUDED__
-#define __ERRORS_INCLUDED__
+// Copyright 2008 Paul Hodge
+
+#ifndef CIRCA__ERRORS__INCLUDED
+#define CIRCA__ERRORS__INCLUDED
 
 #include "common_headers.h"
 

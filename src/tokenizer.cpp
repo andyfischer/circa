@@ -1,3 +1,4 @@
+// Copyright 2008 Paul Hodge
 
 #include "tokenizer.h"
 
