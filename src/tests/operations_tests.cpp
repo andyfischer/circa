@@ -1,3 +1,4 @@
+// Copyright 2008 Andrew Fischer
 
 #include "tests/common.h"
 #include "branch.h"

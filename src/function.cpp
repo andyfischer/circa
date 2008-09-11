@@ -1,3 +1,4 @@
+// Copyright 2008 Andrew Fischer
 
 #include "builtins.h"
 #include "bootstrapping.h"

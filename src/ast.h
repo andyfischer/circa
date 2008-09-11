@@ -1,3 +1,5 @@
+// Copyright 2008 Andrew Fischer
+
 #ifndef CIRCA__AST__INCLUDED
 #define CIRCA__AST__INCLUDED
 

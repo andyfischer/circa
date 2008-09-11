@@ -1,3 +1,4 @@
+// Copyright 2008 Andrew Fischer
 
 #include "branch.h"
 #include "errors.h"
