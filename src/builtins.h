@@ -35,6 +35,7 @@ extern Term* CONSTANT_1;
 extern Term* CONSTANT_2;
 extern Term* CONSTANT_TRUE;
 extern Term* CONSTANT_FALSE;
+extern Term* UNKNOWN_FUNCTION;
 
 Term* get_global(std::string name);
 void empty_evaluate_function(Term* caller);

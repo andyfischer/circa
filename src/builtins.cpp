@@ -49,6 +49,7 @@ Term* CONSTANT_1 = NULL;
 Term* CONSTANT_2 = NULL;
 Term* CONSTANT_TRUE = NULL;
 Term* CONSTANT_FALSE = NULL;
+Term* UNKNOWN_FUNCTION = NULL;
 
 void empty_evaluate_function(Term*) { }
 void empty_alloc_function(Term*) { }
@@ -333,6 +334,11 @@ void write_text_file__evaluate(Term* caller)
     file.close();
 }
 
+void unknown_function__evaluate(Term* caller)
+{
+    std::cout << "Warning, calling an unknown function" << std::endl;
+}
+
 void initialize_constants()
 {
     STRING_TYPE = quick_create_cpp_type<std::string>(KERNEL, "string");
@@ -396,6 +402,9 @@ void initialize_builtin_functions(Branch* code)
             TermList(STRING_TYPE), STRING_TYPE);
     quick_create_function(code, "write-text-file", write_text_file__evaluate,
             TermList(STRING_TYPE, STRING_TYPE), VOID_TYPE);
+    UNKNOWN_FUNCTION = quick_create_function(code, "unknown-function",
+            unknown_function__evaluate,
+            TermList(ANY_TYPE), ANY_TYPE);
 }
 
 void initialize()
