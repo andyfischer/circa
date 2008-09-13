@@ -58,6 +58,9 @@ void assert_instance(Term* term, Term* type);
 bool is_type(Term* term);
 Type* as_type(Term* term);
 
+void unsafe_change_type(Term* term, Term* type);
+void change_type(Term* term, Term* type);
+
 void Type_alloc(Term* caller);
 
 void set_member_function(Term* type, std::string name, Term* function);
