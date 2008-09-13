@@ -405,6 +405,7 @@ void initialize_builtin_functions(Branch* code)
     UNKNOWN_FUNCTION = quick_create_function(code, "unknown-function",
             unknown_function__evaluate,
             TermList(ANY_TYPE), ANY_TYPE);
+    as_function(UNKNOWN_FUNCTION)->stateType = STRING_TYPE;
 }
 
 void initialize()

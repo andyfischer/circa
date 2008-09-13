@@ -21,6 +21,7 @@ extern Term* FUNCTION_TYPE;
 extern Term* CODEUNIT_TYPE;
 extern Term* SUBROUTINE_TYPE;
 extern Term* STRUCT_DEFINITION_TYPE;
+extern Term* COMPOUND_TYPE_TYPE;
 extern Term* BRANCH_TYPE;
 extern Term* ANY_TYPE;
 extern Term* VOID_TYPE;

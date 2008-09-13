@@ -94,9 +94,6 @@ FunctionCall::createTerm(Branch* branch)
 {
     Term* function = branch->findNamed(this->functionName);
 
-    if (function == NULL)
-        function = UNKNOWN_FUNCTION;
-
     TermList inputs;
 
     ArgumentList::const_iterator it;
@@ -104,6 +101,12 @@ FunctionCall::createTerm(Branch* branch)
         Term* term = (*it)->expression->createTerm(branch);
         assert(term != NULL);
         inputs.append(term);
+    }
+
+    if (function == NULL) {
+        Term* result = apply_function(branch, UNKNOWN_FUNCTION, inputs);
+        as_string(result->state) = this->functionName;
+        return result;
     }
 
     return apply_function(branch, function, inputs);
