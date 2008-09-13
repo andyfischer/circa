@@ -14,7 +14,7 @@ namespace circa {
 Type::Type()
   : name(""),
     parentType(NULL),
-    dataSize(sizeof(void*)), // Currently, all data is stored via pointer
+    dataSize(sizeof(void*)),
     alloc(NULL),
     dealloc(NULL),
     duplicate(NULL),
@@ -102,6 +102,35 @@ void set_member_function(Term* type, std::string name, Term* function)
 Term* get_member_function(Term* type, std::string name)
 {
     return as_type(type)->memberFunctions[name];
+}
+
+void unsafe_change_type(Term* term, Term* type)
+{
+    if (term->value == NULL) {
+        change_type(term, type);
+        return;
+    }
+
+    term->type = type;
+}
+
+void change_type(Term* term, Term* type)
+{
+    if (term->type == type)
+        return;
+
+    if (term->value != NULL)
+        throw errors::InternalError("value is not NULL in change_type (possible memory leak)");
+    term->type = type;
+
+    Type::AllocFunc alloc = as_type(type)->alloc;
+
+    if (alloc == NULL) {
+        throw errors::InternalError(string("type ") + as_type(type)->name
+                + " has no alloc function");
+    }
+
+    alloc(term);
 }
 
 } // namespace circa

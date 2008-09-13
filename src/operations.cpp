@@ -89,34 +89,6 @@ Term* create_constant(Branch* branch, Term* type)
     return create_term(branch, get_const_function(branch, type), TermList());
 }
 
-void unsafe_change_type(Term* term, Term* type)
-{
-    if (term->value == NULL) {
-        change_type(term, type);
-        return;
-    }
-
-    term->type = type;
-}
-
-void change_type(Term* term, Term* type)
-{
-    if (term->type == type)
-        return;
-
-    if (term->value != NULL)
-        throw errors::InternalError("value is not NULL in change_type (possible memory leak)");
-    term->type = type;
-
-    Type::AllocFunc alloc = as_type(type)->alloc;
-
-    if (alloc == NULL) {
-        throw errors::InternalError(string("type ") + as_type(type)->name
-                + " has no alloc function");
-    }
-
-    alloc(term);
-}
 
 void specialize_type(Term* term, Term* type)
 {
