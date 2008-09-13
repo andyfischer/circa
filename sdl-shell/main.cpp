@@ -47,7 +47,8 @@ void DrawScreen(SDL_Surface* screen, int h)
         }
     }
 
-    aalineColor(screen, 10, 10, 500, 500, 0xffffffff);
+    gScreen = screen;
+    circa::evaluate_branch(myCode);
 
     if(SDL_MUSTLOCK(screen))
         SDL_UnlockSurface(screen);
@@ -74,7 +75,7 @@ int main(int argc, char* argv[])
         return 1;
     }
   
-    if (SDL_Init(SDL_INIT_VIDEO) < 0 ) return 1;
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) return 1;
    
     if (!(screen = SDL_SetVideoMode(WIDTH, HEIGHT, DEPTH, SDL_FULLSCREEN|SDL_HWSURFACE)))
     {

@@ -1,0 +1,33 @@
+
+tokenize('(') := LPAREN
+tokenize(')') := RPAREN
+tokenize('{') := LBRACE
+tokenize('}') := RBRACE
+tokenize(',') := COMMA
+tokenize('@') := AMPERSAND
+tokenize('.') := DOT
+tokenize('*') := STAR
+tokenize('/') := SLASH
+tokenize('+') := PLUS
+tokenize('-') := MINUS
+tokenize('<') := LTHAN
+tokenize('>') := GTHAN
+tokenize('<=') := LTHANEQ
+tokenize('>=') := GTHANEQ
+tokenize('==') := DOUBLE_EQUAL
+tokenize('!=') := NOT_EQUAL
+tokenize('=') := EQUALS
+tokenize('+=') := PLUS_EQUALS
+tokenize('-=') := MINUS_EQUALS
+tokenize('*=') := STAR_EQUALS
+tokenize('/=') := SLASH_EQUALS
+tokenize('->') := RIGHT_ARROW
+regexp('[ \t]*') := WHITESPACE
+regexp('[a-zA-Z]') := LETTER
+regexp('[0-9]') := DIGIT
+regexp('0x[0-9]') := HEX_INT
+tokenize(DIGIT DOT DIGIT) := FLOAT
+tokenize(DOT DIGIT) := FLOAT
+tokenize(DIGIT DOT) := FLOAT
+tokenize('\'.*\'') := QUOTED_IDENTIFIER
+identifier('function') := FUNCTION
