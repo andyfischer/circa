@@ -1,5 +1,8 @@
 // Copyright 2008 Andrew Fischer
 
+#ifndef CIRCA__CPP_INTERFACE__INCLUDED
+#define CIRCA__CPP_INTERFACE__INCLUDED
+
 #include "bootstrapping.h"
 #include "term.h"
 
@@ -60,3 +63,5 @@ T& as(Term* term)
 }
 
 } // namespace circa
+
+#endif

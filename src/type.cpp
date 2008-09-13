@@ -14,6 +14,7 @@ namespace circa {
 Type::Type()
   : name(""),
     parentType(NULL),
+    dataSize(sizeof(void*)), // Currently, all data is stored via pointer
     alloc(NULL),
     dealloc(NULL),
     duplicate(NULL),
@@ -32,6 +33,16 @@ Type::addMemberFunction(std::string const& name, Term* function)
         throw errors::InternalError("argument 0 of function doesn't match this type");
 
     this->memberFunctions.bind(function, name);
+}
+
+size_t
+Type::getInstanceOffset() const
+{
+    if (this->parentType == NULL)
+        return 0;
+
+    Type* parent = as_type(this->parentType);
+    return parent->getInstanceOffset() + parent->dataSize;
 }
 
 bool is_instance(Term* term, Term* type)
