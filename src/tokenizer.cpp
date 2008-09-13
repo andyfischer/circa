@@ -303,6 +303,7 @@ void consume_number(TokenizeContext &context)
     }
 }
 
+
 void consume_string_literal(TokenizeContext &context)
 {
     std::stringstream text;

@@ -28,6 +28,7 @@ struct Expression
     virtual std::string toString() const = 0;
     virtual Term* createTerm(Branch* branch) = 0;
     virtual void walk(ExpressionWalker &walker) = 0;
+    virtual std::string typeName() = 0;
 };
 
 struct Infix : public Expression
@@ -44,6 +45,7 @@ struct Infix : public Expression
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
     virtual void walk(ExpressionWalker &walker);
+    virtual std::string typeName() { return "infix"; }
 };
 
 struct FunctionCall : public Expression
@@ -76,6 +78,7 @@ struct FunctionCall : public Expression
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
     virtual void walk(ExpressionWalker &walker);
+    virtual std::string typeName() { return "function-call"; }
 };
 
 struct LiteralString : public Expression
@@ -86,6 +89,7 @@ struct LiteralString : public Expression
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
+    virtual std::string typeName() { return "literal-string"; }
 };
 
 struct LiteralFloat : public Expression
@@ -99,6 +103,7 @@ struct LiteralFloat : public Expression
     }
     virtual Term* createTerm(Branch* branch);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
+    virtual std::string typeName() { return "literal-float"; }
 };
 
 struct LiteralInteger : public Expression
@@ -112,6 +117,7 @@ struct LiteralInteger : public Expression
     }
     virtual Term* createTerm(Branch* branch);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
+    virtual std::string typeName() { return "literal-integer"; }
 };
 
 struct Identifier : public Expression
@@ -123,6 +129,7 @@ struct Identifier : public Expression
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
+    virtual std::string typeName() { return "identifier"; }
 };
 
 struct Statement
@@ -133,6 +140,7 @@ struct Statement
     virtual ~Statement() { delete expression; }
     virtual std::string toString() const = 0;
     virtual Term* createTerm(Branch* branch) = 0;
+    virtual std::string typeName() { return "statement"; }
 
     typedef std::vector<Statement*> List;
 };
@@ -146,6 +154,7 @@ struct StatementList
     ~StatementList();
     virtual std::string toString() const;
     void createTerms(Branch* branch);
+    virtual std::string typeName() { return "statement-list"; }
 };
 
 struct ExpressionStatement : public Statement
@@ -156,6 +165,7 @@ struct ExpressionStatement : public Statement
 
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
+    virtual std::string typeName() { return "expression-statement"; }
 };
 
 // 'IgnorableStatement' includes comments and blank lines
@@ -166,6 +176,7 @@ struct IgnorableStatement : public Statement
     virtual ~IgnorableStatement() { }
     virtual std::string toString() const { return text; }
     virtual Term* createTerm(Branch* branch) { return NULL; }
+    virtual std::string typeName() { return "ignorable-statement"; }
 };
 
 struct FunctionHeader

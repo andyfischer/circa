@@ -258,6 +258,8 @@ ast::FunctionHeader* functionHeader(token_stream::TokenStream& tokens)
     if (firstIdentifier == "function") {
         header->functionName = tokens.consume(tokenizer::IDENTIFIER);
         possibleWhitespace(tokens);
+    } else {
+        header->functionName = firstIdentifier;
     }
 
     tokens.consume(tokenizer::LPAREN);
