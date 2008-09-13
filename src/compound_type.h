@@ -1,16 +1,13 @@
 // Copyright 2008 Paul Hodge
 
-#ifndef CIRCA__STRUCTS__INCLUDED
-#define CIRCA__STRUCTS__INCLUDED
+#ifndef CIRCA__COMPOUND_TYPE__INCLUDED
+#define CIRCA__COMPOUND_TYPE__INCLUDED
 
-#include "common_headers.h"
-
-#include "branch.h"
 #include "type.h"
 
 namespace circa {
 
-struct StructDefinition : public Type
+struct CompoundType : public Type
 {
     struct Field
     {
@@ -23,7 +20,7 @@ struct StructDefinition : public Type
     typedef std::vector<Field> FieldList;
     FieldList fields;
 
-    StructDefinition();
+    CompoundType();
     void addField(std::string name, Term* type);
     void setName(int index, std::string const& name);
     void clear();
@@ -35,25 +32,9 @@ struct StructDefinition : public Type
     int findField(std::string name);
 };
 
-struct StructInstance
-{
-    Branch branch;
-    TermList fields;
+bool is_compound_type(Term* term);
+CompoundType& as_compound_type(Term* term);
 
-    StructInstance(StructDefinition const&);
-    ~StructInstance() {}
-
-    Term* getField(int i);
-    std::string toString();
-};
-
-bool is_struct_definition(Term* term);
-StructDefinition* as_struct_definition(Term* term);
-StructInstance* as_struct_instance(Term* term);
-Term* Struct_getField(Term* structTerm, int index);
-
-void initialize_structs(Branch* code);
-
-} // namespace circa
+}
 
 #endif

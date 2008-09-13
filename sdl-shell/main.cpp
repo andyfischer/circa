@@ -67,6 +67,12 @@ int main(int argc, char* argv[])
     circa::initialize();
     circa::import_c_function(circa::KERNEL, draw_line, "draw-line(int,int,int,int,int)");
     myCode = circa::evaluate_file("mycode.ca");
+
+    if (circa::hasCompileErrors(myCode)) {
+        std::cout << "There were compilation errors:" << std::endl;
+        circa::printCompileErrors(myCode, std::cout);
+        return 1;
+    }
   
     if (SDL_Init(SDL_INIT_VIDEO) < 0 ) return 1;
    

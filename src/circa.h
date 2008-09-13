@@ -4,6 +4,7 @@
 #include "bootstrapping.h"
 #include "branch.h"
 #include "builtins.h"
+#include "compilation.h"
 #include "errors.h"
 #include "function.h"
 #include "importing.h"
