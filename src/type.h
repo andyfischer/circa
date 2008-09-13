@@ -20,8 +20,10 @@ struct Type
 
     std::string name;
 
-    // Parent type, if any. This field is only used when determining if a cast
-    // to C++ type is legal.
+    // Size of data
+    size_t dataSize;
+
+    // Parent type, if any.
     Term* parentType;
 
     // Functions
@@ -39,7 +41,12 @@ struct Type
     TermNamespace memberFunctions;
 
     Type();
+
     void addMemberFunction(std::string const& name, Term* function);
+
+    // Return the offset of where to find the instance of this
+    // type. Usually 0, will be non-0 if a derived type is given
+    size_t getInstanceOffset() const;
 };
 
 // Return true if the term is an instance (possibly derived) of the given type

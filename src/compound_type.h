@@ -7,7 +7,7 @@
 
 namespace circa {
 
-struct CompoundType : public Type
+struct CompoundType
 {
     struct Field
     {
