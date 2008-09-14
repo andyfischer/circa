@@ -20,10 +20,10 @@ struct Type
 
     std::string name;
 
-    // Size of data
+    // Size of raw data (if any)
     size_t dataSize;
 
-    // Parent type, if any.
+    // Parent type (if any)
     Term* parentType;
 
     // Functions
@@ -34,6 +34,9 @@ struct Type
     CompareFunc compare;
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
+
+    // 'fields' is a namespace of type terms. Each is instantiated on the term.
+    TermNamespace fields;
 
     // memberFunctions is a list of Functions which 'belong' to this type.
     // They are guaranteed to take an instance of this type as their first
@@ -60,6 +63,7 @@ Type* as_type(Term* term);
 
 void unsafe_change_type(Term* term, Term* type);
 void change_type(Term* term, Term* type);
+void specialize_type(Term* term, Term* type);
 
 void Type_alloc(Term* caller);
 

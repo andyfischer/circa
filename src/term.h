@@ -3,6 +3,7 @@
 
 #include "common_headers.h"
 #include "term_list.h"
+#include "term_namespace.h"
 #include "term_set.h"
 
 namespace circa {
@@ -15,11 +16,11 @@ struct Term
     TermList inputs;
     Term* function;
     TermSet users;
-
-    void* value;
     Term* type;
 
+    void* value;
     Term* state;
+    TermNamespace fields;
 
     bool needsUpdate;
 
