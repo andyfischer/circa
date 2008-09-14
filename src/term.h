@@ -2,6 +2,7 @@
 #define CIRCA__TERM__INCLUDED
 
 #include "common_headers.h"
+
 #include "term_list.h"
 #include "term_namespace.h"
 #include "term_set.h"
@@ -18,9 +19,21 @@ struct Term
     TermSet users;
     Term* type;
 
+    // 'localBranch' includes the 'state' term and any terms that are
+    // part of 'fields'. This field starts out as NULL, and a branch is
+    // created when needed.
+    Branch* localBranch;
+
+    // Our raw value. This is meant to be transient. For example, if we are a pure
+    // function, the executor is allowed to reevaluate us at any time, and is thus
+    // allowed to (temporarily) throw out our value.
     void* value;
-    Term* state;
+
+    // Considered part of our transient value, allows for compound types.
     TermNamespace fields;
+
+    // Persisted value
+    Term* state;
 
     bool needsUpdate;
 

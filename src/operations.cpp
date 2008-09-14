@@ -56,8 +56,11 @@ void initialize_term(Term* term, Term* function, TermList inputs)
     change_type(term, outputType);
 
     // Create state (if a state type is defined)
-    if (stateType != NULL) 
-        term->state = create_constant(term->owningBranch, stateType);
+    if (stateType != NULL) {
+        if (term->localBranch == NULL)
+            term->localBranch = new Branch();
+        term->state = create_constant(term->localBranch, stateType);
+    }
     else
         term->state = NULL;
 
