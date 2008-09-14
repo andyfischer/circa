@@ -41,6 +41,17 @@ void test_fields()
     test_assert(myinst->fields["field-name"]->type == INT_TYPE);
 }
 
+/*
+ Some needed tests (which used to exist in struct tests)
+
+ add-field
+ set-field
+ get-field
+ rename-field
+
+ */
+
+
 
 } // namespace type_tests
 
