@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "branch.h"
 #include "builtins.h"
 #include "errors.h"
 #include "function.h"
@@ -136,7 +137,10 @@ void change_type(Term* term, Term* typeTerm)
     for (it = type->fields.begin(); it != type->fields.end(); ++it) {
         std::string name = it->first;
         Term* fieldType = it->second;
-        term->fields[name] = create_constant(term->owningBranch, fieldType);
+
+        if (term->localBranch == NULL)
+            term->localBranch = new Branch();
+        term->fields[name] = create_constant(term->localBranch, fieldType);
     }
 }
 
