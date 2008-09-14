@@ -90,17 +90,6 @@ Term* create_constant(Branch* branch, Term* type)
 }
 
 
-void specialize_type(Term* term, Term* type)
-{
-    if (term->type == type) {
-        return;
-    }
-
-    if (term->type != ANY_TYPE)
-        throw errors::TypeError(term, ANY_TYPE);
-
-    change_type(term, type);
-}
 
 void set_input(Term* term, int index, Term* input)
 {

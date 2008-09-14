@@ -133,4 +133,16 @@ void change_type(Term* term, Term* type)
     alloc(term);
 }
 
+void specialize_type(Term* term, Term* type)
+{
+    if (term->type == type) {
+        return;
+    }
+
+    if (term->type != ANY_TYPE)
+        throw errors::TypeError(term, ANY_TYPE);
+
+    change_type(term, type);
+}
+
 } // namespace circa

@@ -27,9 +27,14 @@ struct TermNamespace
         _map.clear();
     }
 
-    Term* operator[](std::string name) const
+    Term* operator[](std::string const& name) const
     {
         return _map.find(name)->second;
+    }
+
+    Term*& operator[](std::string const& name)
+    {
+        return _map[name];
     }
 
     std::string findName(Term* term) const

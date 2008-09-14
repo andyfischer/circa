@@ -30,12 +30,24 @@ void derived_type()
     test_assert(as_type(derivedType2)->getInstanceOffset() == 18);
 }
 
+void test_fields()
+{
+    Branch branch;
+    Term* mytype = create_constant(&branch, TYPE_TYPE);
+    as_type(mytype)->fields["field-name"] = INT_TYPE;
+
+    Term* myinst = create_constant(&branch, mytype);
+
+    test_assert(myinst->fields["field-name"]->type == INT_TYPE);
+}
+
 
 } // namespace type_tests
 
 void register_type_tests()
 {
     REGISTER_TEST_CASE(type_tests::derived_type);
+    REGISTER_TEST_CASE(type_tests::test_fields);
 }
 
 } // namespace circa

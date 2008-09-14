@@ -11,7 +11,6 @@ Term* create_term(Branch* branch, Term* function, TermList inputs);
 void initialize_term(Term* term, Term* function, TermList inputs);
 void set_inputs(Term* term, TermList inputs);
 Term* create_constant(Branch* branch, Term* type);
-void specialize_type(Term* term, Term* type);
 void set_input(Term* term, int index, Term* input);
 void evaluate_branch(Branch* branch);
 
