@@ -114,23 +114,30 @@ void unsafe_change_type(Term* term, Term* type)
     term->type = type;
 }
 
-void change_type(Term* term, Term* type)
+void change_type(Term* term, Term* typeTerm)
 {
-    if (term->type == type)
+    if (term->type == typeTerm)
         return;
 
     if (term->value != NULL)
         throw errors::InternalError("value is not NULL in change_type (possible memory leak)");
-    term->type = type;
+    term->type = typeTerm;
 
-    Type::AllocFunc alloc = as_type(type)->alloc;
+    Type *type = as_type(typeTerm);
 
-    if (alloc == NULL) {
-        throw errors::InternalError(string("type ") + as_type(type)->name
-                + " has no alloc function");
+    if (type->alloc == NULL) {
+        throw errors::InternalError(string("type ") + type->name + " has no alloc function");
     }
 
-    alloc(term);
+    type->alloc(term);
+
+    // Create fields
+    TermNamespace::iterator it;
+    for (it = type->fields.begin(); it != type->fields.end(); ++it) {
+        std::string name = it->first;
+        Term* fieldType = it->second;
+        term->fields[name] = create_constant(term->owningBranch, fieldType);
+    }
 }
 
 void specialize_type(Term* term, Term* type)
@@ -143,6 +150,21 @@ void specialize_type(Term* term, Term* type)
         throw errors::TypeError(term, ANY_TYPE);
 
     change_type(term, type);
+}
+
+namespace type_private {
+
+void empty_function(Term*) {}
+
+}
+
+Term* create_empty_type(Branch* branch)
+{
+    Term* term = create_constant(branch, TYPE_TYPE);
+    Type* type = as_type(term);
+    type->alloc = type_private::empty_function;
+    type->dealloc = type_private::empty_function;
+    return term;
 }
 
 } // namespace circa

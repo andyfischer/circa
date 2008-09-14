@@ -33,7 +33,7 @@ void derived_type()
 void test_fields()
 {
     Branch branch;
-    Term* mytype = create_constant(&branch, TYPE_TYPE);
+    Term* mytype = create_empty_type(&branch);
     as_type(mytype)->fields["field-name"] = INT_TYPE;
 
     Term* myinst = create_constant(&branch, mytype);
