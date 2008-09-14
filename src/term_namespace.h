@@ -10,6 +10,7 @@ namespace circa {
 struct TermNamespace
 {
     typedef std::map<string, Term*> StringToTermMap;
+    typedef StringToTermMap::iterator iterator;
     StringToTermMap _map;
 
     bool contains(std::string s) const
@@ -49,12 +50,12 @@ struct TermNamespace
         return "";
     }
 
-    StringToTermMap::iterator begin()
+    iterator begin()
     {
         return _map.begin();
     }
 
-    StringToTermMap::iterator end()
+    iterator end()
     {
         return _map.end();
     }
