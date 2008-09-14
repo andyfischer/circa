@@ -16,7 +16,6 @@
 #include "function.h"
 #include "operations.h"
 #include "primitive_types.h"
-#include "structs.h"
 #include "subroutine.h"
 #include "term.h"
 #include "type.h"
@@ -297,9 +296,6 @@ void initialize()
         initialize_constants();
 
         CURRENTLY_BOOTSTRAPPING = false;
-
-        // These need to be first:
-        initialize_structs(KERNEL);
 
         // Then everything else:
         initialize_branch(KERNEL);
