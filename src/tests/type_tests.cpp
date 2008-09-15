@@ -39,8 +39,8 @@ void test_fields()
 
     Term* myinst = create_constant(&branch, mytype);
 
-    test_assert(myinst->fields["field-name"] != NULL);
-    test_assert(myinst->fields["field-name"]->type == INT_TYPE);
+    test_assert(myinst->field("field-name") != NULL);
+    test_assert(myinst->field("field-name")->type == INT_TYPE);
 }
 
 void test_set_field()

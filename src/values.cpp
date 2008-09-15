@@ -44,12 +44,8 @@ void duplicate_value(Term* source, Term* dest)
     duplicate(source, dest);
 
     // duplicate fields too
-    TermNamespace::iterator it;
-    for (it = source->fields.begin(); it != source->fields.end(); ++it) {
-        std::string name = it->first;
-        Term* sourceField = it->second;
-
-        duplicate_value(sourceField, dest->fields[name]);
+    for (int i=0; i < source->fields.size(); i++) {
+        duplicate_value(source->fields[i], dest->fields[i]);
     }
 }
 
@@ -73,11 +69,8 @@ void steal_value(Term* source, Term* dest)
 
     // steal fields as well
     TermNamespace::iterator it;
-    for (it = source->fields.begin(); it != source->fields.end(); ++it) {
-        std::string name = it->first;
-        Term* sourceField = it->second;
-
-        steal_value(sourceField, dest->fields[name]);
+    for (int i=0; i < source->fields.size(); i++) {
+        steal_value(source->fields[i], dest->fields[i]);
     }
 
     source->value = NULL;
@@ -85,4 +78,3 @@ void steal_value(Term* source, Term* dest)
 }
 
 } // namespace circa
-

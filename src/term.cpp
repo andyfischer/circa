@@ -23,7 +23,6 @@ Term::Term()
     function(NULL),
     value(NULL),
     type(NULL),
-    localBranch(NULL),
     state(NULL),
     needsUpdate(true)
 {
@@ -32,9 +31,6 @@ Term::Term()
 
 Term::~Term()
 {
-    delete localBranch;
-    localBranch = NULL;
-
     // Find all our users, and tell them to stop using us
     TermSet users = this->users;
     this->users = TermSet();
@@ -86,6 +82,13 @@ Term::findName()
     } else {
         return name;
     }
+}
+
+Term*
+Term::field(std::string const& name) const
+{
+    // TODO: find the field index with this name
+    return this->fields[0];
 }
 
 bool
