@@ -42,6 +42,16 @@ Type::addMemberFunction(std::string const& name, Term* function)
     this->memberFunctions.bind(function, name);
 }
 
+int
+Type::getIndexForField(std::string const& name) const
+{
+    for (int index=0; index < this->fields.size(); index++) {
+        if (this->fields[index].name == name)
+            return index;
+    }
+    return -1;
+}
+
 size_t
 Type::getInstanceOffset() const
 {
