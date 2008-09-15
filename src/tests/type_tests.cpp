@@ -5,6 +5,7 @@
 #include "branch.h"
 #include "builtins.h"
 #include "operations.h"
+#include "parser.h"
 #include "type.h"
 
 namespace circa {
@@ -38,20 +39,34 @@ void test_fields()
 
     Term* myinst = create_constant(&branch, mytype);
 
+    test_assert(myinst->fields["field-name"] != NULL);
     test_assert(myinst->fields["field-name"]->type == INT_TYPE);
+}
+
+void test_set_field()
+{
+    Branch branch;
+    Term* mytype = create_empty_type(&branch);
+    as_type(mytype)->fields["field-name"] = INT_TYPE;
+
+    Term* myterm = create_constant(&branch, mytype);
+    branch.bindName(myterm, "myterm");
+
+    parser::eval_statement(&branch, "set-field(@myterm, 'field-name, 15)");
+    test_assert(branch["myterm"] != NULL);
+    //Doesn't work yet, need parametric types
+    //test_assert(branch["myterm"]->fields["field-name"] != NULL);
+    //test_assert(branch["myterm"]->fields["field-name"]->asInt() == 15);
 }
 
 /*
  Some needed tests (which used to exist in struct tests)
 
  add-field
- set-field
  get-field
  rename-field
 
  */
-
-
 
 } // namespace type_tests
 
@@ -59,6 +74,7 @@ void register_type_tests()
 {
     REGISTER_TEST_CASE(type_tests::derived_type);
     REGISTER_TEST_CASE(type_tests::test_fields);
+    REGISTER_TEST_CASE(type_tests::test_set_field);
 }
 
 } // namespace circa
