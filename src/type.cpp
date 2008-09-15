@@ -138,9 +138,7 @@ void change_type(Term* term, Term* typeTerm)
         std::string name = it->first;
         Term* fieldType = it->second;
 
-        if (term->localBranch == NULL)
-            term->localBranch = new Branch();
-        term->fields[name] = create_constant(term->localBranch, fieldType);
+        term->fields.push_back(create_constant(NULL, fieldType));
     }
 }
 

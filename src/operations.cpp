@@ -17,14 +17,16 @@ namespace circa {
 
 Term* create_term(Branch* branch, Term* function, TermList inputs)
 {
-    if (branch == NULL)
-        throw errors::InternalError("in create_term, branch is NULL");
+    //if (branch == NULL)
+    //  throw errors::InternalError("in create_term, branch is NULL");
     if (!is_function(function))
         throw errors::InternalError("in create_term, 2nd arg to create_term must be a function");
 
     Term* term = new Term();
     term->owningBranch = branch;
-    branch->terms.append(term);
+
+    if (branch != NULL)
+        branch->terms.append(term);
 
     initialize_term(term, function, inputs);
     
@@ -58,9 +60,7 @@ void initialize_term(Term* term, Term* function, TermList inputs)
 
     // Create state (if a state type is defined)
     if (stateType != NULL) {
-        if (term->localBranch == NULL)
-            term->localBranch = new Branch();
-        term->state = create_constant(term->localBranch, stateType);
+        term->state = create_constant(NULL, stateType);
     }
     else
         term->state = NULL;

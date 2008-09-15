@@ -19,20 +19,16 @@ struct Term
     TermSet users;
     Term* type;
 
-    // 'localBranch' includes the 'state' term and any terms that are
-    // part of 'fields'. This field starts out as NULL, and a branch is
-    // created when needed.
-    Branch* localBranch;
-
     // Our raw value. This is meant to be transient. For example, if we are a pure
     // function, the executor is allowed to reevaluate us at any time, and is thus
     // allowed to (temporarily) throw out our value.
     void* value;
 
-    // Considered part of our transient value, allows for compound types.
-    TermNamespace fields;
+    // Considered part of our value, allows for compound types. Each term is owned
+    // by us.
+    std::vector<Term*> fields;
 
-    // Persisted value
+    // Persisted value. Owned by us.
     Term* state;
 
     bool needsUpdate;
@@ -47,6 +43,8 @@ struct Term
     std::string toString();
     bool equals(Term* term);
     std::string findName();
+
+    Term* field(std::string const& name) const;
 
     bool hasError() const;
     int numErrors() const;
