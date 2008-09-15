@@ -8,6 +8,7 @@
 #include "errors.h"
 #include "operations.h"
 #include "term.h"
+#include "values.h"
 
 namespace circa {
 

@@ -5,6 +5,7 @@
 #include "errors.h"
 #include "function.h"
 #include "operations.h"
+#include "values.h"
 
 namespace circa {
 

@@ -1,6 +1,7 @@
 // Copyright 2008 Andrew Fischer
 
 #include "circa.h"
+#include "values.h"
 
 namespace circa {
 

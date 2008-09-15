@@ -7,6 +7,7 @@
 #include "builtins.h"
 #include "operations.h"
 #include "parser.h"
+#include "values.h"
 
 namespace circa {
 namespace cpp_interface_tests {
