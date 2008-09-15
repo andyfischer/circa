@@ -6,6 +6,21 @@
 
 namespace circa {
 
+namespace values_private {
+
+void really_steal_value(Term* source, Term* dest)
+{
+    // if 'dest' has a value, delete it
+    dealloc_value(dest);
+
+    dest->value = source->value;
+
+    source->value = NULL;
+    source->needsUpdate = true;
+}
+
+} // namespace values_private
+
 void dealloc_value(Term* term)
 {
     if (term->value == NULL)
@@ -21,11 +36,20 @@ void dealloc_value(Term* term)
 
 void recycle_value(Term* source, Term* dest)
 {
+    if (source->type != dest->type)
+        throw errors::TypeError(dest, source->type);
+
     // Don't steal if the term has multiple users
     bool steal = (source->users.count() > 1);
 
     // Temp: always try to steal
     steal_value(source, dest);
+
+    // Recursively call for all fields
+    int numFields = as_type(source->type)->numFields();
+    for (int fieldIndex=0; fieldIndex < numFields; fieldIndex++) {
+        recycle_value(source->fields[fieldIndex], dest->fields[fieldIndex]);
+    }
 }
 
 void duplicate_value(Term* source, Term* dest)
@@ -42,11 +66,6 @@ void duplicate_value(Term* source, Term* dest)
     dealloc_value(dest);
 
     duplicate(source, dest);
-
-    // duplicate fields too
-    for (int i=0; i < source->fields.size(); i++) {
-        duplicate_value(source->fields[i], dest->fields[i]);
-    }
 }
 
 void steal_value(Term* source, Term* dest)
@@ -54,27 +73,13 @@ void steal_value(Term* source, Term* dest)
     if (source->type != dest->type)
         throw errors::TypeError(dest, source->type);
 
-    // In some situations, ignore their request to steal
-
     // Don't steal from constant terms
     if (is_constant(source)) {
         duplicate_value(source, dest);
         return;
     }
 
-    // if 'dest' has a value, delete it
-    dealloc_value(dest);
-
-    dest->value = source->value;
-
-    // steal fields as well
-    TermNamespace::iterator it;
-    for (int i=0; i < source->fields.size(); i++) {
-        steal_value(source->fields[i], dest->fields[i]);
-    }
-
-    source->value = NULL;
-    source->needsUpdate = true;
+    values_private::really_steal_value(source, dest);
 }
 
 } // namespace circa

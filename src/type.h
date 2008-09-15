@@ -56,6 +56,7 @@ struct Type
     void addField(std::string const& name, Term* type);
     void addMemberFunction(std::string const& name, Term* function);
     int getIndexForField(std::string const& name) const;
+    int numFields() const { return (int) fields.size(); }
 
     // Return the offset of where to find the instance of this
     // type. Usually 0, will be non-0 if a derived type is given
