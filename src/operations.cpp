@@ -251,6 +251,15 @@ void duplicate_value(Term* source, Term* dest)
     dealloc_value(dest);
 
     duplicate(source, dest);
+
+    // duplicate fields too
+    TermNamespace::iterator it;
+    for (it = source->fields.begin(); it != source->fields.end(); ++it) {
+        std::string name = it->first;
+        Term* sourceField = it->second;
+
+        duplicate_value(sourceField, dest->fields[name]);
+    }
 }
 
 void steal_value(Term* source, Term* dest)
@@ -270,6 +279,16 @@ void steal_value(Term* source, Term* dest)
     dealloc_value(dest);
 
     dest->value = source->value;
+
+    // steal fields as well
+    TermNamespace::iterator it;
+    for (it = source->fields.begin(); it != source->fields.end(); ++it) {
+        std::string name = it->first;
+        Term* sourceField = it->second;
+
+        steal_value(sourceField, dest->fields[name]);
+    }
+
     source->value = NULL;
     source->needsUpdate = true;
 }
