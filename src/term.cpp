@@ -87,8 +87,10 @@ Term::findName()
 Term*
 Term::field(std::string const& name) const
 {
-    // TODO: find the field index with this name
-    return this->fields[0];
+    int index = as_type(this->type)->getIndexForField(name);
+    if (index == -1)
+        return NULL;
+    return this->fields[index];
 }
 
 bool

@@ -41,6 +41,9 @@ void test_fields()
 
     test_assert(myinst->field("field-name") != NULL);
     test_assert(myinst->field("field-name")->type == INT_TYPE);
+
+    // nonexistant field
+    test_assert(myinst->field("other-name") == NULL);
 }
 
 void test_set_field()
