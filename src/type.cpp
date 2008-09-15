@@ -27,6 +27,12 @@ Type::Type()
 }
 
 void
+Type::addField(std::string const& name, Term* type)
+{
+    this->fields.push_back(Field(name,type));
+}
+
+void
 Type::addMemberFunction(std::string const& name, Term* function)
 {
     // make sure argument 0 of the function matches this type
@@ -133,12 +139,9 @@ void change_type(Term* term, Term* typeTerm)
     type->alloc(term);
 
     // Create fields
-    TermNamespace::iterator it;
+    Type::FieldVector::iterator it;
     for (it = type->fields.begin(); it != type->fields.end(); ++it) {
-        std::string name = it->first;
-        Term* fieldType = it->second;
-
-        term->fields.push_back(create_constant(NULL, fieldType));
+        term->fields.push_back(create_constant(NULL, it->type));
     }
 }
 

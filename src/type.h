@@ -18,6 +18,13 @@ struct Type
     typedef void (*RemapPointersFunc)(Term* term, TermMap& map);
     typedef std::string (*ToStringFunc)(Term* term);
 
+    struct Field {
+        std::string name;
+        Term* type;
+        Field(std::string const& _name, Term* _type) : name(_name),type(_type) {}
+    };
+    typedef std::vector<Field> FieldVector;
+
     std::string name;
 
     // Size of raw data (if any)
@@ -35,8 +42,9 @@ struct Type
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
 
-    // 'fields' is a namespace of type terms. Each is instantiated on the term.
-    TermNamespace fields;
+    // 'fields' are each instatiated on the term, and considered to be part of
+    // its value.
+    FieldVector fields;
 
     // memberFunctions is a list of Functions which 'belong' to this type.
     // They are guaranteed to take an instance of this type as their first
@@ -45,6 +53,7 @@ struct Type
 
     Type();
 
+    void addField(std::string const& name, Term* type);
     void addMemberFunction(std::string const& name, Term* function);
 
     // Return the offset of where to find the instance of this

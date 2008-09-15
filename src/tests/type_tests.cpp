@@ -35,7 +35,7 @@ void test_fields()
 {
     Branch branch;
     Term* mytype = create_empty_type(&branch);
-    as_type(mytype)->fields["field-name"] = INT_TYPE;
+    as_type(mytype)->addField("field-name", INT_TYPE);
 
     Term* myinst = create_constant(&branch, mytype);
 
@@ -47,7 +47,7 @@ void test_set_field()
 {
     Branch branch;
     Term* mytype = create_empty_type(&branch);
-    as_type(mytype)->fields["field-name"] = INT_TYPE;
+    as_type(mytype)->addField("field-name", INT_TYPE);
 
     Term* myterm = create_constant(&branch, mytype);
     branch.bindName(myterm, "myterm");
