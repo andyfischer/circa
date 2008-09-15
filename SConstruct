@@ -1,5 +1,5 @@
 
-import os,sys, glob
+import os,sys, glob, gch
 
 def create_windows_env(releaseBuild):
     env = Environment(platform = 'nt')
@@ -17,7 +17,7 @@ def create_windows_env(releaseBuild):
     return env
         
 def create_mac_env(releaseBuild):
-    env = Environment()
+    env = Environment(tools = ["default", "gch"], toolpath=".")
     # Python support
     #env.Append(CPPPATH = ["/System/Library/Frameworks/Python.framework/Versions/2.5/Headers"])
 
@@ -38,6 +38,11 @@ env.Append(CPPDEFINES = ["DEBUG"])
 env.BuildDir('build', 'src')
 env.Append(CPPPATH = ['src'])
 
+# Precompiled header support
+# env.Prepend(CPPPATH=['.'])
+# env['Gch'] = env.Gch('common_headers.hpp')[0]
+# env['GchSh'] = env.GchSh('src/common_headers.h')[0]
+
 # Find source files
 excludeFromLibrary = ['test_program.cpp', 'main.cpp']
 buildFiles = []
@@ -50,6 +55,8 @@ for (dirpath, dirnames, filenames) in os.walk('src'):
 
         if fullpath.endswith('.cpp'):
             buildFiles.append(fullpath)
+
+
     
 circa_so = env.StaticLibrary('lib/circa', buildFiles)
 circa_dl = env.SharedLibrary('bin/circa', buildFiles)

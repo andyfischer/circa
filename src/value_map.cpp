@@ -8,6 +8,7 @@
 #include "operations.h"
 #include "type.h"
 #include "value_map.h"
+#include "values.h"
 
 namespace circa {
 
