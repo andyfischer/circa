@@ -138,6 +138,9 @@ void change_type(Term* term, Term* typeTerm)
 
     if (term->value != NULL)
         throw errors::InternalError("value is not NULL in change_type (possible memory leak)");
+
+    Term* oldType = term->type;
+
     term->type = typeTerm;
 
     Type *type = as_type(typeTerm);
@@ -147,6 +150,13 @@ void change_type(Term* term, Term* typeTerm)
     }
 
     type->alloc(term);
+
+    // Remove old fields
+    if (oldType != NULL) {
+        for (int index=0; as_type(oldType)->numFields(); index++)
+            delete term->fields[index];
+    }
+    term->fields.clear();
 
     // Create fields
     Type::FieldVector::iterator it;
