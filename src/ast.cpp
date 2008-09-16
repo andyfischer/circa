@@ -293,7 +293,27 @@ FunctionDecl::createTerm(Branch* branch)
     constant_list(&workspace, inputTypes, "inputTypes");
     workspace.bindName(outputType, "outputType");
 
-    return NULL;
+    // Create
+    Term* sub = parser::eval_statement(&workspace,
+            "sub = subroutine-create(functionName, inputTypes, outputType)");
+
+    // Name inputs
+    
+
+    int numStatements = this->statements->count();
+    for (int statementIndex=0; statementIndex < numStatements; statementIndex++) {
+        Statement* statement = this->statements->operator[](statementIndex);
+
+        statement->createTerm(as_subroutine(sub)->branch);
+
+        //constant_string(&workspace, statement->text, "statement");
+        //parser::eval_statement(&workspace,
+                //"subroutine-eval(@sub, statement)");
+    }
+
+    branch->bindName(sub, this->header->functionName);
+
+    return sub;
 }
 
 std::string

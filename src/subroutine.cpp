@@ -140,6 +140,16 @@ void subroutine_create__evaluate(Term* caller)
     }
 }
 
+void subroutine_name_input__evaluate(Term* caller)
+{
+    recycle_value(caller->inputs[0], caller);
+    int index = as_int(caller->inputs[1]);
+    std::string name = as_string(caller->inputs[2]);
+    Subroutine* sub = as_subroutine(caller);
+    Term* inputPlaceholder = sub->branch->getNamed(GetInputPlaceholderName(index));
+    sub->branch->bindName(inputPlaceholder, name);
+}
+
 void subroutine_name_inputs__evaluate(Term* caller)
 {
     recycle_value(caller->inputs[0], caller);
@@ -239,10 +249,13 @@ void initialize_subroutine(Branch* kernel)
         TermList(STRING_TYPE,LIST_TYPE,TYPE_TYPE),
         SUBROUTINE_TYPE);
 
+    Term* name_input = quick_create_function(kernel,
+        "subroutine-name-input", subroutine_name_input__evaluate,
+        TermList(SUBROUTINE_TYPE, INT_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
+
     Term* name_inputs = quick_create_function(kernel,
         "subroutine-name-inputs", subroutine_name_inputs__evaluate,
         TermList(SUBROUTINE_TYPE, LIST_TYPE), SUBROUTINE_TYPE);
-    as_function(name_inputs)->recycleInput = 0;
 
     quick_create_function(kernel, "subroutine-get-branch", subroutine_get_branch__evaluate,
         TermList(SUBROUTINE_TYPE), BRANCH_TYPE);
