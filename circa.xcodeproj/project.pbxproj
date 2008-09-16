@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B62339740E5A417700A8CBDF /* builtin_libraries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B62339700E5A417700A8CBDF /* builtin_libraries.cpp */; };
-		B62339750E5A417700A8CBDF /* graphviz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B62339720E5A417700A8CBDF /* graphviz.cpp */; };
 		B6769D6A0E70D2E900BC7FAE /* importing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6769D660E70D2E900BC7FAE /* importing.cpp */; };
 		B6769D6B0E70D2E900BC7FAE /* value_map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6769D680E70D2E900BC7FAE /* value_map.cpp */; };
 		B6769D6D0E70D2F600BC7FAE /* importing_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6769D6C0E70D2F600BC7FAE /* importing_tests.cpp */; };
@@ -21,8 +19,15 @@
 		B6A243FF0E3D6414007F2BEB /* all_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243FA0E3D6414007F2BEB /* all_tests.cpp */; };
 		B6A244290E3ED540007F2BEB /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A244250E3ED540007F2BEB /* common.cpp */; };
 		B6A2449B0E42A41B007F2BEB /* term_list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A244990E42A41B007F2BEB /* term_list.cpp */; };
+		B6B06CE40E7F480700671D05 /* compilation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CD80E7F480700671D05 /* compilation.cpp */; };
+		B6B06CE50E7F480700671D05 /* evaluation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CDB0E7F480700671D05 /* evaluation.cpp */; };
+		B6B06CE60E7F480700671D05 /* builtin_libraries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CDE0E7F480700671D05 /* builtin_libraries.cpp */; };
+		B6B06CE70E7F480700671D05 /* graphviz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CE00E7F480700671D05 /* graphviz.cpp */; };
+		B6B06CE80E7F480700671D05 /* primitive_types.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CE20E7F480700671D05 /* primitive_types.cpp */; };
+		B6B06CEB0E7F481B00671D05 /* error_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CE90E7F481B00671D05 /* error_tests.cpp */; };
+		B6B06CEC0E7F481B00671D05 /* type_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CEA0E7F481B00671D05 /* type_tests.cpp */; };
+		B6B06CFF0E7F491300671D05 /* values.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CFD0E7F491300671D05 /* values.cpp */; };
 		B6BA5BF70E622ED800B4C3A0 /* ast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5BED0E622ED800B4C3A0 /* ast.cpp */; };
-		B6BA5BF80E622ED800B4C3A0 /* evaluator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5BEF0E622ED800B4C3A0 /* evaluator.cpp */; };
 		B6BA5BF90E622ED800B4C3A0 /* parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5BF10E622ED800B4C3A0 /* parser.cpp */; };
 		B6BA5BFA0E622ED800B4C3A0 /* tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5BF50E622ED800B4C3A0 /* tokenizer.cpp */; };
 		B6BA5C030E622F1900B4C3A0 /* branch_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5BFB0E622F1900B4C3A0 /* branch_tests.cpp */; };
@@ -30,7 +35,6 @@
 		B6BA5C050E622F1900B4C3A0 /* list_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5BFD0E622F1900B4C3A0 /* list_tests.cpp */; };
 		B6BA5C060E622F1900B4C3A0 /* parser_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5BFE0E622F1900B4C3A0 /* parser_tests.cpp */; };
 		B6BA5C070E622F1900B4C3A0 /* primitive_type_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5BFF0E622F1900B4C3A0 /* primitive_type_tests.cpp */; };
-		B6BA5C080E622F1900B4C3A0 /* struct_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5C000E622F1900B4C3A0 /* struct_tests.cpp */; };
 		B6BA5C090E622F1900B4C3A0 /* subroutine_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5C010E622F1900B4C3A0 /* subroutine_tests.cpp */; };
 		B6BA5C0A0E622F1900B4C3A0 /* tokenizer_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5C020E622F1900B4C3A0 /* tokenizer_tests.cpp */; };
 		B6BCE0A60E6477F70062B391 /* syntax_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BCE0A50E6477F70062B391 /* syntax_errors.cpp */; };
@@ -42,7 +46,6 @@
 		B6F114CD0E33394F00B8BA44 /* term.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114B80E33394F00B8BA44 /* term.cpp */; };
 		B6F114D00E33394F00B8BA44 /* type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114BD0E33394F00B8BA44 /* type.cpp */; };
 		B6F1151A0E34F4B300B8BA44 /* operations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F115160E34F4B300B8BA44 /* operations.cpp */; };
-		B6F1151B0E34F4B300B8BA44 /* structs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F115180E34F4B300B8BA44 /* structs.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -58,11 +61,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B623396E0E5A417700A8CBDF /* debugger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = debugger.h; sourceTree = "<group>"; };
-		B62339700E5A417700A8CBDF /* builtin_libraries.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = builtin_libraries.cpp; sourceTree = "<group>"; };
-		B62339710E5A417700A8CBDF /* builtin_libraries.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = builtin_libraries.h; sourceTree = "<group>"; };
-		B62339720E5A417700A8CBDF /* graphviz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphviz.cpp; sourceTree = "<group>"; };
-		B62339730E5A417700A8CBDF /* graphviz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = graphviz.h; sourceTree = "<group>"; };
 		B64CA7220E6279E400ADB947 /* circa */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = circa; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6769D660E70D2E900BC7FAE /* importing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = importing.cpp; sourceTree = "<group>"; };
 		B6769D670E70D2E900BC7FAE /* importing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = importing.h; sourceTree = "<group>"; };
@@ -84,11 +82,24 @@
 		B6A244260E3ED540007F2BEB /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		B6A244990E42A41B007F2BEB /* term_list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = term_list.cpp; sourceTree = "<group>"; };
 		B6A2449A0E42A41B007F2BEB /* term_list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = term_list.h; sourceTree = "<group>"; };
+		B6B06CD80E7F480700671D05 /* compilation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compilation.cpp; sourceTree = "<group>"; };
+		B6B06CD90E7F480700671D05 /* compilation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compilation.h; sourceTree = "<group>"; };
+		B6B06CDA0E7F480700671D05 /* essentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = essentials.h; sourceTree = "<group>"; };
+		B6B06CDB0E7F480700671D05 /* evaluation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = evaluation.cpp; sourceTree = "<group>"; };
+		B6B06CDC0E7F480700671D05 /* evaluation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = evaluation.h; sourceTree = "<group>"; };
+		B6B06CDE0E7F480700671D05 /* builtin_libraries.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = builtin_libraries.cpp; sourceTree = "<group>"; };
+		B6B06CDF0E7F480700671D05 /* builtin_libraries.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = builtin_libraries.h; sourceTree = "<group>"; };
+		B6B06CE00E7F480700671D05 /* graphviz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphviz.cpp; sourceTree = "<group>"; };
+		B6B06CE10E7F480700671D05 /* graphviz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = graphviz.h; sourceTree = "<group>"; };
+		B6B06CE20E7F480700671D05 /* primitive_types.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitive_types.cpp; sourceTree = "<group>"; };
+		B6B06CE30E7F480700671D05 /* primitive_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = primitive_types.h; sourceTree = "<group>"; };
+		B6B06CE90E7F481B00671D05 /* error_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = error_tests.cpp; sourceTree = "<group>"; };
+		B6B06CEA0E7F481B00671D05 /* type_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = type_tests.cpp; sourceTree = "<group>"; };
+		B6B06CFD0E7F491300671D05 /* values.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = values.cpp; sourceTree = "<group>"; };
+		B6B06CFE0E7F491300671D05 /* values.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = values.h; sourceTree = "<group>"; };
 		B6B436C90E47E64F00E3B337 /* term_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = term_set.h; sourceTree = "<group>"; };
 		B6BA5BED0E622ED800B4C3A0 /* ast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ast.cpp; sourceTree = "<group>"; };
 		B6BA5BEE0E622ED800B4C3A0 /* ast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ast.h; sourceTree = "<group>"; };
-		B6BA5BEF0E622ED800B4C3A0 /* evaluator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = evaluator.cpp; sourceTree = "<group>"; };
-		B6BA5BF00E622ED800B4C3A0 /* evaluator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = evaluator.h; sourceTree = "<group>"; };
 		B6BA5BF10E622ED800B4C3A0 /* parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parser.cpp; sourceTree = "<group>"; };
 		B6BA5BF20E622ED800B4C3A0 /* parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parser.h; sourceTree = "<group>"; };
 		B6BA5BF30E622ED800B4C3A0 /* syntax_errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = syntax_errors.h; sourceTree = "<group>"; };
@@ -100,7 +111,6 @@
 		B6BA5BFD0E622F1900B4C3A0 /* list_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_tests.cpp; sourceTree = "<group>"; };
 		B6BA5BFE0E622F1900B4C3A0 /* parser_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parser_tests.cpp; sourceTree = "<group>"; };
 		B6BA5BFF0E622F1900B4C3A0 /* primitive_type_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitive_type_tests.cpp; sourceTree = "<group>"; };
-		B6BA5C000E622F1900B4C3A0 /* struct_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = struct_tests.cpp; sourceTree = "<group>"; };
 		B6BA5C010E622F1900B4C3A0 /* subroutine_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = subroutine_tests.cpp; sourceTree = "<group>"; };
 		B6BA5C020E622F1900B4C3A0 /* tokenizer_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tokenizer_tests.cpp; sourceTree = "<group>"; };
 		B6BCE0A50E6477F70062B391 /* syntax_errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = syntax_errors.cpp; sourceTree = "<group>"; };
@@ -123,8 +133,6 @@
 		B6F114BE0E33394F00B8BA44 /* type.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = type.h; sourceTree = "<group>"; };
 		B6F115160E34F4B300B8BA44 /* operations.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = operations.cpp; sourceTree = "<group>"; };
 		B6F115170E34F4B300B8BA44 /* operations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = operations.h; sourceTree = "<group>"; };
-		B6F115180E34F4B300B8BA44 /* structs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = structs.cpp; sourceTree = "<group>"; };
-		B6F115190E34F4B300B8BA44 /* structs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = structs.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,20 +172,11 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B623396F0E5A417700A8CBDF /* libraries */ = {
-			isa = PBXGroup;
-			children = (
-				B62339700E5A417700A8CBDF /* builtin_libraries.cpp */,
-				B62339710E5A417700A8CBDF /* builtin_libraries.h */,
-				B62339720E5A417700A8CBDF /* graphviz.cpp */,
-				B62339730E5A417700A8CBDF /* graphviz.h */,
-			);
-			path = libraries;
-			sourceTree = "<group>";
-		};
 		B6A243F90E3D6414007F2BEB /* tests */ = {
 			isa = PBXGroup;
 			children = (
+				B6B06CE90E7F481B00671D05 /* error_tests.cpp */,
+				B6B06CEA0E7F481B00671D05 /* type_tests.cpp */,
 				B6769D6C0E70D2F600BC7FAE /* importing_tests.cpp */,
 				B69A203D0E68717300AF7F28 /* container_tests.cpp */,
 				B69A203E0E68717300AF7F28 /* operations_tests.cpp */,
@@ -187,7 +186,6 @@
 				B6BA5BFD0E622F1900B4C3A0 /* list_tests.cpp */,
 				B6BA5BFE0E622F1900B4C3A0 /* parser_tests.cpp */,
 				B6BA5BFF0E622F1900B4C3A0 /* primitive_type_tests.cpp */,
-				B6BA5C000E622F1900B4C3A0 /* struct_tests.cpp */,
 				B6BA5C010E622F1900B4C3A0 /* subroutine_tests.cpp */,
 				B6BA5C020E622F1900B4C3A0 /* tokenizer_tests.cpp */,
 				B6A244250E3ED540007F2BEB /* common.cpp */,
@@ -198,9 +196,30 @@
 			path = tests;
 			sourceTree = "<group>";
 		};
+		B6B06CDD0E7F480700671D05 /* libraries */ = {
+			isa = PBXGroup;
+			children = (
+				B6B06CDE0E7F480700671D05 /* builtin_libraries.cpp */,
+				B6B06CDF0E7F480700671D05 /* builtin_libraries.h */,
+				B6B06CE00E7F480700671D05 /* graphviz.cpp */,
+				B6B06CE10E7F480700671D05 /* graphviz.h */,
+			);
+			path = libraries;
+			sourceTree = "<group>";
+		};
 		B6F114A00E33394F00B8BA44 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				B6B06CFD0E7F491300671D05 /* values.cpp */,
+				B6B06CFE0E7F491300671D05 /* values.h */,
+				B6B06CD80E7F480700671D05 /* compilation.cpp */,
+				B6B06CD90E7F480700671D05 /* compilation.h */,
+				B6B06CDA0E7F480700671D05 /* essentials.h */,
+				B6B06CDB0E7F480700671D05 /* evaluation.cpp */,
+				B6B06CDC0E7F480700671D05 /* evaluation.h */,
+				B6B06CDD0E7F480700671D05 /* libraries */,
+				B6B06CE20E7F480700671D05 /* primitive_types.cpp */,
+				B6B06CE30E7F480700671D05 /* primitive_types.h */,
 				B6769D660E70D2E900BC7FAE /* importing.cpp */,
 				B6769D670E70D2E900BC7FAE /* importing.h */,
 				B6769D680E70D2E900BC7FAE /* value_map.cpp */,
@@ -208,8 +227,6 @@
 				B69A20530E68CCB700AF7F28 /* cpp_interface.h */,
 				B6BA5BED0E622ED800B4C3A0 /* ast.cpp */,
 				B6BA5BEE0E622ED800B4C3A0 /* ast.h */,
-				B6BA5BEF0E622ED800B4C3A0 /* evaluator.cpp */,
-				B6BA5BF00E622ED800B4C3A0 /* evaluator.h */,
 				B6BA5BF10E622ED800B4C3A0 /* parser.cpp */,
 				B6BA5BF20E622ED800B4C3A0 /* parser.h */,
 				B6BCE0A50E6477F70062B391 /* syntax_errors.cpp */,
@@ -217,8 +234,6 @@
 				B6BA5BF40E622ED800B4C3A0 /* token_stream.h */,
 				B6BA5BF50E622ED800B4C3A0 /* tokenizer.cpp */,
 				B6BA5BF60E622ED800B4C3A0 /* tokenizer.h */,
-				B623396E0E5A417700A8CBDF /* debugger.h */,
-				B623396F0E5A417700A8CBDF /* libraries */,
 				B6A243F90E3D6414007F2BEB /* tests */,
 				B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */,
 				B6A243F40E3D6414007F2BEB /* bootstrapping.h */,
@@ -235,8 +250,6 @@
 				B6A243B20E356E26007F2BEB /* main.cpp */,
 				B6F115160E34F4B300B8BA44 /* operations.cpp */,
 				B6F115170E34F4B300B8BA44 /* operations.h */,
-				B6F115180E34F4B300B8BA44 /* structs.cpp */,
-				B6F115190E34F4B300B8BA44 /* structs.h */,
 				B6F114B60E33394F00B8BA44 /* subroutine.cpp */,
 				B6F114B70E33394F00B8BA44 /* subroutine.h */,
 				B6A244990E42A41B007F2BEB /* term_list.cpp */,
@@ -310,7 +323,6 @@
 				B6F114CD0E33394F00B8BA44 /* term.cpp in Sources */,
 				B6F114D00E33394F00B8BA44 /* type.cpp in Sources */,
 				B6F1151A0E34F4B300B8BA44 /* operations.cpp in Sources */,
-				B6F1151B0E34F4B300B8BA44 /* structs.cpp in Sources */,
 				B6A243A50E3568EB007F2BEB /* errors.cpp in Sources */,
 				B6A243B30E356E26007F2BEB /* main.cpp in Sources */,
 				B6A243FD0E3D6414007F2BEB /* bootstrapping.cpp in Sources */,
@@ -318,10 +330,7 @@
 				B6A244290E3ED540007F2BEB /* common.cpp in Sources */,
 				B6A2449B0E42A41B007F2BEB /* term_list.cpp in Sources */,
 				B68D10CD0E47685600C6D09A /* term_map.cpp in Sources */,
-				B62339740E5A417700A8CBDF /* builtin_libraries.cpp in Sources */,
-				B62339750E5A417700A8CBDF /* graphviz.cpp in Sources */,
 				B6BA5BF70E622ED800B4C3A0 /* ast.cpp in Sources */,
-				B6BA5BF80E622ED800B4C3A0 /* evaluator.cpp in Sources */,
 				B6BA5BF90E622ED800B4C3A0 /* parser.cpp in Sources */,
 				B6BA5BFA0E622ED800B4C3A0 /* tokenizer.cpp in Sources */,
 				B6BA5C030E622F1900B4C3A0 /* branch_tests.cpp in Sources */,
@@ -329,7 +338,6 @@
 				B6BA5C050E622F1900B4C3A0 /* list_tests.cpp in Sources */,
 				B6BA5C060E622F1900B4C3A0 /* parser_tests.cpp in Sources */,
 				B6BA5C070E622F1900B4C3A0 /* primitive_type_tests.cpp in Sources */,
-				B6BA5C080E622F1900B4C3A0 /* struct_tests.cpp in Sources */,
 				B6BA5C090E622F1900B4C3A0 /* subroutine_tests.cpp in Sources */,
 				B6BA5C0A0E622F1900B4C3A0 /* tokenizer_tests.cpp in Sources */,
 				B6BCE0A60E6477F70062B391 /* syntax_errors.cpp in Sources */,
@@ -339,6 +347,14 @@
 				B6769D6A0E70D2E900BC7FAE /* importing.cpp in Sources */,
 				B6769D6B0E70D2E900BC7FAE /* value_map.cpp in Sources */,
 				B6769D6D0E70D2F600BC7FAE /* importing_tests.cpp in Sources */,
+				B6B06CE40E7F480700671D05 /* compilation.cpp in Sources */,
+				B6B06CE50E7F480700671D05 /* evaluation.cpp in Sources */,
+				B6B06CE60E7F480700671D05 /* builtin_libraries.cpp in Sources */,
+				B6B06CE70E7F480700671D05 /* graphviz.cpp in Sources */,
+				B6B06CE80E7F480700671D05 /* primitive_types.cpp in Sources */,
+				B6B06CEB0E7F481B00671D05 /* error_tests.cpp in Sources */,
+				B6B06CEC0E7F481B00671D05 /* type_tests.cpp in Sources */,
+				B6B06CFF0E7F491300671D05 /* values.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
