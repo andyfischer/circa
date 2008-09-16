@@ -177,6 +177,16 @@ void function_header()
     delete header;
 }
 
+void function_decl_parse()
+{
+    token_stream::TokenStream tokens("function func(string a, int b) -> void\n{\n"
+            "concat(a, to-string(b)) -> print\n"
+            "}\n");
+    ast::Statement* statement = parser::statement(tokens);
+
+    test_assert(statement->typeName() == "function-decl");
+}
+
 void rebind_operator()
 {
     token_stream::TokenStream tokens("@cheese");
@@ -257,6 +267,7 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::test_quick_eval_statement);
     REGISTER_TEST_CASE(parser_tests::function_decl_ast);
     REGISTER_TEST_CASE(parser_tests::function_header);
+    REGISTER_TEST_CASE(parser_tests::function_decl_parse);
     REGISTER_TEST_CASE(parser_tests::rebind_operator);
     REGISTER_TEST_CASE(parser_tests::ast_walk);
 }

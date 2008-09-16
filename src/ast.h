@@ -211,6 +211,7 @@ struct FunctionDecl : public Statement
 
     virtual std::string toString() const;
     virtual Term* createTerm(Branch* branch);
+    virtual std::string typeName() { return "function-decl"; }
 };
 
 } // namespace ast

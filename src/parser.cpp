@@ -10,6 +10,7 @@ namespace circa {
 namespace parser {
 
 std::string possibleWhitespace(token_stream::TokenStream& tokens);
+std::string possibleNewline(token_stream::TokenStream& tokens);
 
 Term* apply_statement(Branch* branch, std::string const& input)
 {
@@ -64,6 +65,10 @@ ast::StatementList* statementList(token_stream::TokenStream& tokens)
         if (tokens.nextIs(tokenizer::NEWLINE)) {
             tokens.consume(tokenizer::NEWLINE);
             continue;
+        }
+
+        if (tokens.nextIs(tokenizer::RBRACE)) {
+            break;
         }
 
         statementList->push(statement(tokens));
@@ -305,11 +310,19 @@ ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
 
     decl->header = functionHeader(tokens);
 
+    possibleNewline(tokens);
+
     tokens.consume(tokenizer::LBRACE);
+
+    possibleNewline(tokens);
 
     decl->statements = statementList(tokens);
 
+    possibleNewline(tokens);
+
     tokens.consume(tokenizer::RBRACE);
+
+    possibleNewline(tokens);
     
     return decl.release();
 }
@@ -320,6 +333,16 @@ std::string possibleWhitespace(token_stream::TokenStream& tokens)
         return tokens.consume(tokenizer::WHITESPACE);
     else
         return "";
+}
+
+std::string possibleNewline(token_stream::TokenStream& tokens)
+{
+    std::stringstream output;
+
+    while (tokens.nextIs(tokenizer::NEWLINE) || tokens.nextIs(tokenizer::WHITESPACE))
+        output << tokens.consume();
+
+    return output.str();
 }
 
 } // namespace parser
