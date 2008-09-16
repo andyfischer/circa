@@ -155,6 +155,8 @@ struct StatementList
     virtual std::string toString() const;
     void createTerms(Branch* branch);
     virtual std::string typeName() { return "statement-list"; }
+    int count() const { return (int) statements.size(); }
+    Statement* operator[](int index) { return statements[index]; }
 };
 
 struct ExpressionStatement : public Statement
