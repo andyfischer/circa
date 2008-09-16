@@ -7,6 +7,20 @@
 namespace circa {
 namespace ast {
 
+Term* find_and_apply_function(Branch* branch, std::string const& functionName,
+        TermList inputs)
+{
+    Term* function = branch->findNamed(functionName);
+
+    if (function == NULL) {
+        Term* result = apply_function(branch, UNKNOWN_FUNCTION, inputs);
+        as_string(result->state) = functionName;
+        return result;
+    }
+
+    return apply_function(branch, function, inputs);
+}
+
 Infix::~Infix()
 {
     delete left;
@@ -34,9 +48,7 @@ Infix::createTerm(Branch* branch)
             throw syntax_errors::SyntaxError("Right side of -> must be an identifier");
         }
 
-        Term* function = branch->findNamed(rightIdent->text);
-
-        return apply_function(branch, function, TermList(leftTerm));
+        return find_and_apply_function(branch, rightIdent->text, TermList(leftTerm));
     }
 
     // todo
@@ -92,8 +104,6 @@ FunctionCall::toString() const
 Term*
 FunctionCall::createTerm(Branch* branch)
 {
-    Term* function = branch->findNamed(this->functionName);
-
     TermList inputs;
 
     ArgumentList::const_iterator it;
@@ -103,13 +113,7 @@ FunctionCall::createTerm(Branch* branch)
         inputs.append(term);
     }
 
-    if (function == NULL) {
-        Term* result = apply_function(branch, UNKNOWN_FUNCTION, inputs);
-        as_string(result->state) = this->functionName;
-        return result;
-    }
-
-    return apply_function(branch, function, inputs);
+    return find_and_apply_function(branch, this->functionName, inputs);
 }
 
 void
@@ -268,7 +272,7 @@ FunctionDecl::createTerm(Branch* branch)
     FunctionHeader::ArgumentList::const_iterator it;
     for (it = this->header->arguments.begin(); it != this->header->arguments.end(); ++it)
     {
-        Term* term = branch->getNamed(it->type);
+        Term* term = branch->findNamed(it->type);
         if (term == NULL)
             throw syntax_errors::SyntaxError(std::string("Identifier not found: ") + it->type);
 
@@ -278,7 +282,7 @@ FunctionDecl::createTerm(Branch* branch)
         inputTypes.append(term);
     }
 
-    Term* outputType = branch->getNamed(this->header->outputType);
+    Term* outputType = branch->findNamed(this->header->outputType);
     if (outputType == NULL)
         throw syntax_errors::SyntaxError(std::string("Identifier not found: ") + this->header->outputType);
     if (!is_type(outputType))
