@@ -5,10 +5,11 @@
 #include "token_stream.h"
 
 namespace circa {
-namespace parser {
 
 Term* apply_statement(Branch* branch, std::string const& input);
 Term* eval_statement(Branch* branch, std::string const& input);
+
+namespace parser {
 
 ast::StatementList* statementList(token_stream::TokenStream& tokens);
 ast::Statement* statement(token_stream::TokenStream& tokens);

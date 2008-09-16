@@ -294,7 +294,7 @@ FunctionDecl::createTerm(Branch* branch)
     workspace.bindName(outputType, "outputType");
 
     // Create
-    Term* sub = parser::eval_statement(&workspace,
+    Term* sub = eval_statement(&workspace,
             "sub = subroutine-create(functionName, inputTypes, outputType)");
 
     // Name inputs
@@ -307,7 +307,7 @@ FunctionDecl::createTerm(Branch* branch)
         statement->createTerm(as_subroutine(sub)->branch);
 
         //constant_string(&workspace, statement->text, "statement");
-        //parser::eval_statement(&workspace,
+        //eval_statement(&workspace,
                 //"subroutine-eval(@sub, statement)");
     }
 

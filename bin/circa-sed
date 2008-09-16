@@ -1,0 +1,1 @@
+sed -i '' $* ~/circa/src/*.cpp ~/circa/src/*.h ~/circa/src/tests/*.cpp ~/circa/src/tests/*.h

@@ -7,16 +7,12 @@
 #include "parser.h"
 
 namespace circa {
-namespace parser {
-
-std::string possibleWhitespace(token_stream::TokenStream& tokens);
-std::string possibleNewline(token_stream::TokenStream& tokens);
 
 Term* apply_statement(Branch* branch, std::string const& input)
 {
     token_stream::TokenStream tokens(input);
 
-    ast::Statement* statementAst = statement(tokens);
+    ast::Statement* statementAst = parser::statement(tokens);
 
     Term* result = statementAst->createTerm(branch);
 
@@ -56,6 +52,12 @@ Term* eval_statement(Branch* branch, std::string const& input)
     term->eval();
     return term;
 }
+
+namespace parser {
+
+std::string possibleWhitespace(token_stream::TokenStream& tokens);
+std::string possibleNewline(token_stream::TokenStream& tokens);
+
 
 ast::StatementList* statementList(token_stream::TokenStream& tokens)
 {

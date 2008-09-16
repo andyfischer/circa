@@ -13,7 +13,7 @@ void test_simple()
 {
     Branch* branch = new Branch();
 
-    Term* print_term = parser::eval_statement(branch,
+    Term* print_term = eval_statement(branch,
         "subroutine-create('print-term,list(string),void)");
 
     Term* input_names = constant_list(branch, TermList(constant_string(branch, "t")));
@@ -21,36 +21,36 @@ void test_simple()
             TermList(print_term, input_names));
     branch->bindName(print_term, "print-term");
 
-    parser::eval_statement(as_subroutine(print_term)->branch, "print(to-string(t))");
+    eval_statement(as_subroutine(print_term)->branch, "print(to-string(t))");
 
-    parser::eval_statement(branch, "print-term('test)");
+    eval_statement(branch, "print-term('test)");
 }
 
 void test_using_subroutine_eval()
 {
     Branch* branch = new Branch();
 
-    parser::eval_statement(branch, "sub = subroutine-create('test-sub, list(float,float), float)");
-    parser::eval_statement(branch, "sub = subroutine-name-inputs(sub, list('a,'b))");
-    parser::eval_statement(branch, "sub = subroutine-eval(sub, \"a-times-four = mult(a,4)\")");
-    parser::eval_statement(branch, "sub = subroutine-eval(sub, \"b-times-three = mult(b,3)\")");
-    parser::eval_statement(branch, "sub = subroutine-eval(sub, \"return add(a-times-four,b-times-three)\")");
+    eval_statement(branch, "sub = subroutine-create('test-sub, list(float,float), float)");
+    eval_statement(branch, "sub = subroutine-name-inputs(sub, list('a,'b))");
+    eval_statement(branch, "sub = subroutine-eval(sub, \"a-times-four = mult(a,4)\")");
+    eval_statement(branch, "sub = subroutine-eval(sub, \"b-times-three = mult(b,3)\")");
+    eval_statement(branch, "sub = subroutine-eval(sub, \"return add(a-times-four,b-times-three)\")");
 
-    test_assert(int(as_float(parser::eval_statement(branch, "sub(1,2))"))) == 10);
+    test_assert(int(as_float(eval_statement(branch, "sub(1,2))"))) == 10);
 }
 
 void test_using_evaluator()
 {
     Branch* branch = new Branch();
 
-    parser::eval_statement(branch, "sub = subroutine-create('test-sub, list(float,float), float)");
-    parser::eval_statement(branch, "sub = subroutine-name-inputs(sub, list('a,'b))");
-    parser::eval_statement(branch, "sub = subroutine-eval(sub, \"a-times-four = mult(a,4.0)\")");
-    parser::eval_statement(branch, "sub = subroutine-eval(sub, \"b-times-three = mult(b,3.0)\")");
-    parser::eval_statement(branch, "sub = subroutine-eval(sub, \"return add(a-times-four,b-times-three)\")");
+    eval_statement(branch, "sub = subroutine-create('test-sub, list(float,float), float)");
+    eval_statement(branch, "sub = subroutine-name-inputs(sub, list('a,'b))");
+    eval_statement(branch, "sub = subroutine-eval(sub, \"a-times-four = mult(a,4.0)\")");
+    eval_statement(branch, "sub = subroutine-eval(sub, \"b-times-three = mult(b,3.0)\")");
+    eval_statement(branch, "sub = subroutine-eval(sub, \"return add(a-times-four,b-times-three)\")");
     
     evaluation::Engine evaluator;
-    Term* result = parser::eval_statement(branch, "sub(2.0,1.0)");
+    Term* result = eval_statement(branch, "sub(2.0,1.0)");
     evaluator.evaluate(result);
     evaluator.runUntilFinished();
 

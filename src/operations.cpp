@@ -298,7 +298,7 @@ Branch* evaluate_file(std::string const& filename)
 
     Branch temp_branch;
     temp_branch.bindName(constant_string(&temp_branch, filename), "filename");
-    std::string file_contents = as_string(parser::eval_statement(&temp_branch,
+    std::string file_contents = as_string(eval_statement(&temp_branch,
                 "read-text-file(filename)"));
 
     token_stream::TokenStream tokens(file_contents);

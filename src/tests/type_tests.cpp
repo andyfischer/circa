@@ -55,7 +55,7 @@ void test_set_field()
     Term* myterm = create_constant(&branch, mytype);
     branch.bindName(myterm, "myterm");
 
-    parser::eval_statement(&branch, "set-field(@myterm, 'field-name, 15)");
+    eval_statement(&branch, "set-field(@myterm, 'field-name, 15)");
     test_assert(branch["myterm"] != NULL);
     //Doesn't work yet, need parametric types
     //test_assert(branch["myterm"]->fields["field-name"] != NULL);
