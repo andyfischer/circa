@@ -17,7 +17,7 @@ void range()
 {
     Branch* branch = new Branch();
 
-    Term* range_zero_to_ten = parser::eval_statement(branch, "range(10)");
+    Term* range_zero_to_ten = eval_statement(branch, "range(10)");
 
     test_assert(as_int(as_list(range_zero_to_ten).get(0)) == 0);
     test_assert(as_int(as_list(range_zero_to_ten).get(9)) == 9);
@@ -27,7 +27,7 @@ void list_apply()
 {
     Branch* branch = new Branch();
 
-    Term* result = parser::eval_statement(branch, "list-apply(to-string, range(5))");
+    Term* result = eval_statement(branch, "list-apply(to-string, range(5))");
     
     test_assert(as_string(as_list(result).get(0)) == "0");
     test_assert(as_string(as_list(result).get(4)) == "4");
