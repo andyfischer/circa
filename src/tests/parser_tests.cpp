@@ -129,7 +129,7 @@ void test_quick_eval_statement()
 {
     Branch branch;
 
-    Term* result = apply_statement(&branch, "something = add(5.0,3.0)");
+    Term* result = apply_statement(branch, "something = add(5.0,3.0)");
 
     test_assert(result != NULL);
     /*test_assert(result->findName() == "something");
@@ -215,7 +215,7 @@ void rebind_operator()
     test_assert(branch.getNamed("a") == a);
     test_assert(branch.getNamed("b") == b);
 
-    Term* result = apply_statement(&branch, "add(@a, b)");
+    Term* result = apply_statement(branch, "add(@a, b)");
 
     test_assert(branch.getNamed("a") == result);
     test_assert(branch.getNamed("b") == b);

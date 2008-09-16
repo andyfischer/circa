@@ -15,8 +15,8 @@ void safe_delete()
 {
     Branch branch;
 
-    Term* term1 = apply_statement(&branch, "term1 = 1");
-    Term* termSum = apply_statement(&branch, "sum = add(term1,2)");
+    Term* term1 = apply_statement(branch, "term1 = 1");
+    Term* termSum = apply_statement(branch, "sum = add(term1,2)");
 
     test_assert(branch.containsName("term1"));
     test_assert(branch.containsName("sum"));

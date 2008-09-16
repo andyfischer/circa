@@ -28,7 +28,7 @@ void test_math()
     test_assert(as_float(eval_function(&branch, mult_f, TermList(two,three))) == 6);
     test_assert(as_float(eval_function(&branch, mult_f, TermList(negative_one,three))) == -3);
 
-    test_assert(as_float(eval_statement(&branch, "mult(5.0,3.0)")) == 15);
+    test_assert(as_float(eval_statement(branch, "mult(5.0,3.0)")) == 15);
 }
 
 void test_int()
@@ -69,7 +69,7 @@ void test_string()
 {
     Branch branch;
 
-    test_assert(as_string(eval_statement(&branch, "concat(\"hello \", \"world\")"))
+    test_assert(as_string(eval_statement(branch, "concat(\"hello \", \"world\")"))
             == "hello world");
 }
 
@@ -77,8 +77,8 @@ void test_bool()
 {
     Branch branch;
 
-    test_assert(as_string(eval_statement(&branch, "if-expr(true, 'a, 'b)")) == "a");
-    test_assert(as_string(eval_statement(&branch, "if-expr(false, 'a, 'b)")) == "b");
+    test_assert(as_string(eval_statement(branch, "if-expr(true, 'a, 'b)")) == "a");
+    test_assert(as_string(eval_statement(branch, "if-expr(false, 'a, 'b)")) == "b");
 }
 
 } // namespace builtin_function_tests

@@ -15,7 +15,7 @@ namespace list_tests {
 
 void range()
 {
-    Branch* branch = new Branch();
+    Branch branch;
 
     Term* range_zero_to_ten = eval_statement(branch, "range(10)");
 
@@ -25,7 +25,7 @@ void range()
 
 void list_apply()
 {
-    Branch* branch = new Branch();
+    Branch branch;
 
     Term* result = eval_statement(branch, "list-apply(to-string, range(5))");
     
