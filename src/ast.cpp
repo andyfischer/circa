@@ -267,7 +267,7 @@ FunctionDecl::createTerm(Branch* branch)
 {
     Branch workspace;
 
-    TermList inputTypes;
+    eval_statement(&workspace, "inputTypes = list()");
 
     FunctionHeader::ArgumentList::const_iterator it;
     for (it = this->header->arguments.begin(); it != this->header->arguments.end(); ++it)
@@ -279,7 +279,8 @@ FunctionDecl::createTerm(Branch* branch)
         if (!is_type(term))
             throw syntax_errors::SyntaxError(std::string("Identifier is not a type: ") + it->type);
 
-        inputTypes.append(term);
+        workspace.bindName(term, "t");
+        eval_statement(&workspace, "list-append(@inputTypes, t)");
     }
 
     Term* outputType = branch->findNamed(this->header->outputType);
@@ -290,7 +291,6 @@ FunctionDecl::createTerm(Branch* branch)
 
     // Load into workspace
     constant_string(&workspace, this->header->functionName, "functionName");
-    constant_list(&workspace, inputTypes, "inputTypes");
     workspace.bindName(outputType, "outputType");
 
     // Create
