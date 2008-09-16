@@ -27,7 +27,12 @@ int main(int nargs, const char * args[])
     try {
         if (nargs > 1) {
             Branch* branch = evaluate_file(args[1]);
-            evaluate_branch(branch);
+
+            if (hasCompileErrors(branch)) {
+                printCompileErrors(branch, std::cout);
+            } else {
+                evaluate_branch(branch);
+            }
             delete branch;
         }
 
