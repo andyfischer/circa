@@ -11,24 +11,24 @@ namespace subroutine_tests {
 
 void test_simple()
 {
-    Branch* branch = new Branch();
+    Branch branch;
 
     Term* print_term = eval_statement(branch,
         "subroutine-create('print-term,list(string),void)");
 
-    Term* input_names = constant_list(branch, TermList(constant_string(branch, "t")));
-    print_term = eval_function(branch, get_global("subroutine-name-inputs"),
+    Term* input_names = constant_list(&branch, TermList(constant_string(&branch, "t")));
+    print_term = eval_function(&branch, get_global("subroutine-name-inputs"),
             TermList(print_term, input_names));
-    branch->bindName(print_term, "print-term");
+    branch.bindName(print_term, "print-term");
 
-    eval_statement(as_subroutine(print_term)->branch, "print(to-string(t))");
+    eval_statement(*as_subroutine(print_term)->branch, "print(to-string(t))");
 
     eval_statement(branch, "print-term('test)");
 }
 
 void test_using_subroutine_eval()
 {
-    Branch* branch = new Branch();
+    Branch branch;
 
     eval_statement(branch, "sub = subroutine-create('test-sub, list(float,float), float)");
     eval_statement(branch, "sub = subroutine-name-inputs(sub, list('a,'b))");
@@ -41,7 +41,7 @@ void test_using_subroutine_eval()
 
 void test_using_evaluator()
 {
-    Branch* branch = new Branch();
+    Branch branch;
 
     eval_statement(branch, "sub = subroutine-create('test-sub, list(float,float), float)");
     eval_statement(branch, "sub = subroutine-name-inputs(sub, list('a,'b))");

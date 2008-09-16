@@ -8,13 +8,13 @@
 
 namespace circa {
 
-Term* apply_statement(Branch* branch, std::string const& input)
+Term* apply_statement(Branch& branch, std::string const& input)
 {
     token_stream::TokenStream tokens(input);
 
     ast::Statement* statementAst = parser::statement(tokens);
 
-    Term* result = statementAst->createTerm(branch);
+    Term* result = statementAst->createTerm(&branch);
 
     // check for rebind operator
     struct RebindFinder : public ast::ExpressionWalker
@@ -38,7 +38,7 @@ Term* apply_statement(Branch* branch, std::string const& input)
     std::vector<std::string>::iterator it;
     for (it = rebindFinder.rebindNames.begin(); it != rebindFinder.rebindNames.end(); ++it)
     {
-        branch->bindName(result, *it);
+        branch.bindName(result, *it);
     }
 
     delete statementAst;
@@ -46,7 +46,7 @@ Term* apply_statement(Branch* branch, std::string const& input)
     return result;
 }
 
-Term* eval_statement(Branch* branch, std::string const& input)
+Term* eval_statement(Branch& branch, std::string const& input)
 {
     Term* term = apply_statement(branch, input);
     term->eval();

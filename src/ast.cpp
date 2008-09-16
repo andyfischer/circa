@@ -267,7 +267,7 @@ FunctionDecl::createTerm(Branch* branch)
 {
     Branch workspace;
 
-    eval_statement(&workspace, "inputTypes = list()");
+    eval_statement(workspace, "inputTypes = list()");
 
     FunctionHeader::ArgumentList::const_iterator it;
     for (it = this->header->arguments.begin(); it != this->header->arguments.end(); ++it)
@@ -280,7 +280,7 @@ FunctionDecl::createTerm(Branch* branch)
             throw syntax_errors::SyntaxError(std::string("Identifier is not a type: ") + it->type);
 
         workspace.bindName(term, "t");
-        eval_statement(&workspace, "list-append(@inputTypes, t)");
+        eval_statement(workspace, "list-append(@inputTypes, t)");
     }
 
     Term* outputType = branch->findNamed(this->header->outputType);
@@ -294,7 +294,7 @@ FunctionDecl::createTerm(Branch* branch)
     workspace.bindName(outputType, "outputType");
 
     // Create
-    Term* sub = eval_statement(&workspace,
+    Term* sub = eval_statement(workspace,
             "sub = subroutine-create(functionName, inputTypes, outputType)");
 
     // Name inputs
@@ -307,7 +307,7 @@ FunctionDecl::createTerm(Branch* branch)
         statement->createTerm(as_subroutine(sub)->branch);
 
         //constant_string(&workspace, statement->text, "statement");
-        //eval_statement(&workspace,
+        //eval_statement(workspace,
                 //"subroutine-eval(@sub, statement)");
     }
 

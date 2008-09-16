@@ -233,7 +233,7 @@ void subroutine_eval__evaluate(Term* caller)
     Subroutine *sub = as_subroutine(caller);
     std::string s = as_string(caller->inputs[1]);
 
-    apply_statement(sub->branch, s);
+    apply_statement(*sub->branch, s);
 }
 
 void initialize_subroutine(Branch* kernel)

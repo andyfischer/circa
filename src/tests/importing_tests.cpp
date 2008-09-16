@@ -20,7 +20,7 @@ void test_import_c()
 
     import_c_function(&branch, my_imported_function, "function my-imported-func(int,int) -> int");
 
-    Term* result = eval_statement(&branch, "my-imported-func(4,5)");
+    Term* result = eval_statement(branch, "my-imported-func(4,5)");
 
     test_assert(as_int(result) == 9);
 }
