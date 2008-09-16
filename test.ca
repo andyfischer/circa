@@ -3,3 +3,5 @@
 function square(float a) -> float {
     return mult(a,a)
 }
+
+3.0 -> square -> to-string -> print
