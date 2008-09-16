@@ -195,6 +195,12 @@ void range__evaluate(Term* caller)
     }
 }
 
+void list_append__evaluate(Term* caller)
+{
+    recycle_value(caller->inputs[0], caller);
+    as_list(caller).append(caller->inputs[1]);
+}
+
 void list_apply__evaluate(Term* caller)
 {
     as_function(caller->inputs[0]);
@@ -278,6 +284,7 @@ void initialize_builtin_functions(Branch* code)
         TermList(BOOL_TYPE, ANY_TYPE, ANY_TYPE), ANY_TYPE);
     quick_create_function(code, "list", create_list__evaluate, TermList(ANY_TYPE), LIST_TYPE);
     quick_create_function(code, "range", range__evaluate, TermList(INT_TYPE), LIST_TYPE);
+    quick_create_function(code, "list-append", list_append__evaluate, TermList(LIST_TYPE, ANY_TYPE), LIST_TYPE);
     quick_create_function(code, "list-apply", list_apply__evaluate, TermList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
     quick_create_function(code, "read-text-file", read_text_file__evaluate,
             TermList(STRING_TYPE), STRING_TYPE);
