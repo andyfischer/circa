@@ -6,21 +6,6 @@
 
 namespace circa {
 
-namespace values_private {
-
-void really_steal_value(Term* source, Term* dest)
-{
-    // if 'dest' has a value, delete it
-    dealloc_value(dest);
-
-    dest->value = source->value;
-
-    source->value = NULL;
-    source->needsUpdate = true;
-}
-
-} // namespace values_private
-
 void dealloc_value(Term* term)
 {
     if (term->value == NULL)
@@ -73,13 +58,13 @@ void steal_value(Term* source, Term* dest)
     if (source->type != dest->type)
         throw errors::TypeError(dest, source->type);
 
-    // Don't steal from constant terms
-    if (is_constant(source)) {
-        duplicate_value(source, dest);
-        return;
-    }
+    // if 'dest' has a value, delete it
+    dealloc_value(dest);
 
-    values_private::really_steal_value(source, dest);
+    dest->value = source->value;
+
+    source->value = NULL;
+    source->needsUpdate = true;
 }
 
 } // namespace circa
