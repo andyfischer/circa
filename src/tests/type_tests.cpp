@@ -31,6 +31,7 @@ void derived_type()
     test_assert(as_type(derivedType2)->getInstanceOffset() == 18);
 }
 
+/*
 void test_fields()
 {
     Branch branch;
@@ -61,23 +62,15 @@ void test_set_field()
     //test_assert(branch["myterm"]->fields["field-name"] != NULL);
     //test_assert(branch["myterm"]->fields["field-name"]->asInt() == 15);
 }
-
-/*
- Some needed tests (which used to exist in struct tests)
-
- add-field
- get-field
- rename-field
-
- */
+*/
 
 } // namespace type_tests
 
 void register_type_tests()
 {
     REGISTER_TEST_CASE(type_tests::derived_type);
-    REGISTER_TEST_CASE(type_tests::test_fields);
-    REGISTER_TEST_CASE(type_tests::test_set_field);
+    //REGISTER_TEST_CASE(type_tests::test_fields);
+    //REGISTER_TEST_CASE(type_tests::test_set_field);
 }
 
 } // namespace circa
