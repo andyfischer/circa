@@ -5,11 +5,10 @@
 
 #include "common_headers.h"
 
-#include "tokenizer.h"
-#include "token_stream.h"
 #include "bootstrapping.h"
 #include "branch.h"
 #include "builtins.h"
+#include "compound_type.h"
 #include "cpp_interface.h"
 #include "errors.h"
 #include "evaluation.h"
@@ -17,6 +16,8 @@
 #include "operations.h"
 #include "primitive_types.h"
 #include "subroutine.h"
+#include "tokenizer.h"
+#include "token_stream.h"
 #include "term.h"
 #include "type.h"
 #include "value_map.h"
@@ -36,7 +37,7 @@ Term* TYPE_TYPE = NULL;
 Term* FUNCTION_TYPE = NULL;
 Term* CODEUNIT_TYPE = NULL;
 Term* SUBROUTINE_TYPE = NULL;
-Term* STRUCT_DEFINITION_TYPE = NULL;
+Term* COMPOUND_TYPE_TYPE = NULL;
 Term* BRANCH_TYPE = NULL;
 Term* ANY_TYPE = NULL;
 Term* VOID_TYPE = NULL;
@@ -308,6 +309,7 @@ void initialize()
         // Then everything else:
         initialize_branch(KERNEL);
         initialize_builtin_functions(KERNEL);
+        initialize_compound_type(KERNEL);
         initialize_functions(KERNEL);
         initialize_map_function(KERNEL);
         initialize_subroutine(KERNEL);

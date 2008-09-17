@@ -1,9 +1,10 @@
 // Copyright 2008 Andrew Fischer
 
-#include "common_headers.h"
 #include "tests/common.h"
+#include "common_headers.h"
 #include "branch.h"
 #include "builtins.h"
+#include "compound_type.h"
 #include "operations.h"
 #include "parser.h"
 #include "type.h"
@@ -29,6 +30,22 @@ void derived_type()
     as_type(derivedType2)->dataSize = 3;
     as_type(derivedType2)->parentType = derivedType;
     test_assert(as_type(derivedType2)->getInstanceOffset() == 18);
+}
+
+void compound_type()
+{
+    CompoundType ctype;
+    ctype.addField(INT_TYPE, "int1");
+    test_assert(ctype.getType(0) == INT_TYPE);
+    test_assert(ctype.getName(0) == "int1");
+
+    Branch branch;
+    Term* t;
+    t = eval_statement(branch, "t = CompoundType()");
+    test_assert(as_compound_type(t).numFields() == 0);
+    t = eval_statement(branch, "compound-type-add-field(@t, int, 'myfield)");
+    test_assert(as_compound_type(t).getType(0) == INT_TYPE);
+    test_assert(as_compound_type(t).getName(0) == "myfield");
 }
 
 /*
@@ -69,6 +86,7 @@ void test_set_field()
 void register_type_tests()
 {
     REGISTER_TEST_CASE(type_tests::derived_type);
+    REGISTER_TEST_CASE(type_tests::compound_type);
     //REGISTER_TEST_CASE(type_tests::test_fields);
     //REGISTER_TEST_CASE(type_tests::test_set_field);
 }

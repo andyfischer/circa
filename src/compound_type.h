@@ -13,10 +13,10 @@ struct CompoundType
 {
     struct Field
     {
-        std::string name;
         Term* type;
+        std::string name;
 
-        Field(std::string _name, Term* _type) : name(_name), type(_type) {}
+        Field(Term* _type, std::string _name) : type(_type), name(_name) {}
     };
     
     typedef std::vector<Field> FieldVector;
@@ -24,8 +24,8 @@ struct CompoundType
 
     CompoundType() {}
 
-    void addField(std::string name, Term* type) {
-        fields.push_back(Field(name,type));
+    void addField(Term* type, std::string name) {
+        fields.push_back(Field(type,name));
     }
 
     int numFields() const {
