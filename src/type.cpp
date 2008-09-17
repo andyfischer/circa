@@ -27,12 +27,6 @@ Type::Type()
 }
 
 void
-Type::addField(std::string const& name, Term* type)
-{
-    this->fields.push_back(Field(name,type));
-}
-
-void
 Type::addMemberFunction(std::string const& name, Term* function)
 {
     // make sure argument 0 of the function matches this type
@@ -40,16 +34,6 @@ Type::addMemberFunction(std::string const& name, Term* function)
         throw errors::InternalError("argument 0 of function doesn't match this type");
 
     this->memberFunctions.bind(function, name);
-}
-
-int
-Type::getIndexForField(std::string const& name) const
-{
-    for (int index=0; index < this->fields.size(); index++) {
-        if (this->fields[index].name == name)
-            return index;
-    }
-    return -1;
 }
 
 size_t
@@ -150,19 +134,6 @@ void change_type(Term* term, Term* typeTerm)
     }
 
     type->alloc(term);
-
-    // Remove old fields
-    if (oldType != NULL) {
-        for (int index=0; as_type(oldType)->numFields(); index++)
-            delete term->fields[index];
-    }
-    term->fields.clear();
-
-    // Create fields
-    Type::FieldVector::iterator it;
-    for (it = type->fields.begin(); it != type->fields.end(); ++it) {
-        term->fields.push_back(create_constant(NULL, it->type));
-    }
 }
 
 void specialize_type(Term* term, Term* type)

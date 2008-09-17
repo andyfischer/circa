@@ -24,10 +24,6 @@ struct Term
     // allowed to (temporarily) throw out our value.
     void* value;
 
-    // Considered part of our value, allows for compound types. Each term is owned
-    // by us.
-    std::vector<Term*> fields;
-
     // Persisted value. Owned by us.
     Term* state;
 

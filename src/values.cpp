@@ -29,12 +29,6 @@ void recycle_value(Term* source, Term* dest)
 
     // Temp: always try to steal
     steal_value(source, dest);
-
-    // Recursively call for all fields
-    int numFields = as_type(source->type)->numFields();
-    for (int fieldIndex=0; fieldIndex < numFields; fieldIndex++) {
-        recycle_value(source->fields[fieldIndex], dest->fields[fieldIndex]);
-    }
 }
 
 void duplicate_value(Term* source, Term* dest)
