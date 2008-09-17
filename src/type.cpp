@@ -36,16 +36,6 @@ Type::addMemberFunction(std::string const& name, Term* function)
     this->memberFunctions.bind(function, name);
 }
 
-size_t
-Type::getInstanceOffset() const
-{
-    if (this->parentType == NULL)
-        return 0;
-
-    Type* parent = as_type(this->parentType);
-    return parent->getInstanceOffset() + parent->dataSize;
-}
-
 bool is_instance(Term* term, Term* type)
 {
     // Special case during bootstrapping.
