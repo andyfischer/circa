@@ -4,20 +4,23 @@
 #define CIRCA__COMPOUND_VALUE__INCLUDED
 
 #include "branch.h"
-#include "common_headers.h"
+#include "term_list.h"
 
 namespace circa {
 
 struct CompoundValue {
+    TermList fields;
     Branch branch;
 
     Term* getField(int index) {
-        return branch[index];
+        return fields[index];
     }
 };
 
 bool is_compound_value(Term*);
 CompoundValue& as_compound_value(Term*);
+
+void instantiate_compound_value(CompoundType const &type, CompoundValue &value);
 
 } // namespace circa
 
