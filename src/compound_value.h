@@ -12,6 +12,8 @@ struct CompoundValue {
     TermList fields;
     Branch branch;
 
+    Term* append(Term* type);
+
     Term* getField(int index) {
         return fields[index];
     }
