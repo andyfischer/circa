@@ -27,7 +27,7 @@ Type::Type()
 }
 
 void
-Type::addMemberFunction(std::string const& name, Term* function)
+Type::addMemberFunction(std::string const &name, Term *function)
 {
     // make sure argument 0 of the function matches this type
     if (as_type(as_function(function)->inputTypes[0]) != this)
@@ -36,7 +36,41 @@ Type::addMemberFunction(std::string const& name, Term* function)
     this->memberFunctions.bind(function, name);
 }
 
-bool is_instance(Term* term, Term* type)
+/*
+const char * PARENT_FIELD_NAME = ":parent";
+
+bool has_parent(Term *term)
+{
+    if (!is_compound_value(term))
+        return false;
+    return as_compound_type(term->type).getName(0) == PARENT_FIELD_NAME;
+}
+
+Term* get_parent(Term *term)
+{
+    assert(has_parent(term));
+    return as_compound_value(term).getField(0);
+}
+
+Term* get_superclass(Term *type)
+{
+    assert(as_compound_type(type).getName(0) == SUPERCLASS_FIELD_NAME);
+    return as_compound_type(type).getType(0);
+}
+
+Term* get_as_type(Term *term, Term *type)
+{
+    if (term->type == type)
+        return term;
+
+    if (has_superclass(type))
+        return get_as_type(term, get_parent(type), get_superclass(type));
+
+    return NULL;
+}
+*/
+
+bool is_instance(Term *term, Term *type)
 {
     // Special case during bootstrapping.
     if (CURRENTLY_BOOTSTRAPPING && type == NULL)
@@ -55,34 +89,34 @@ bool is_instance(Term* term, Term* type)
     return false;
 }
 
-void assert_instance(Term* term, Term* type)
+void assert_instance(Term *term, Term *type)
 {
     if (!is_instance(term, type))
         throw errors::TypeError(term, type);
 }
 
-bool is_type(Term* term)
+bool is_type(Term *term)
 {
     return is_instance(term, TYPE_TYPE);
 }
 
-Type* as_type(Term* term)
+Type* as_type(Term *term)
 {
     assert_instance(term, TYPE_TYPE);
     return (Type*) term->value;
 }
 
-void Type_alloc(Term* caller)
+void Type_alloc(Term *caller)
 {
     caller->value = new Type();
 }
 
-std::string Type_toString(Term* caller)
+std::string Type_toString(Term *caller)
 {
     return std::string("<Type " + as_type(caller)->name + ">");
 }
 
-void set_member_function(Term* type, std::string name, Term* function)
+void set_member_function(Term *type, std::string name, Term *function)
 {
     Type* typeData = as_type(type);
     as_function(function);
@@ -95,7 +129,7 @@ Term* get_member_function(Term* type, std::string name)
     return as_type(type)->memberFunctions[name];
 }
 
-void unsafe_change_type(Term* term, Term* type)
+void unsafe_change_type(Term *term, Term *type)
 {
     if (term->value == NULL) {
         change_type(term, type);
@@ -105,7 +139,7 @@ void unsafe_change_type(Term* term, Term* type)
     term->type = type;
 }
 
-void change_type(Term* term, Term* typeTerm)
+void change_type(Term *term, Term *typeTerm)
 {
     if (term->type == typeTerm)
         return;
@@ -126,7 +160,7 @@ void change_type(Term* term, Term* typeTerm)
     type->alloc(term);
 }
 
-void specialize_type(Term* term, Term* type)
+void specialize_type(Term *term, Term *type)
 {
     if (term->type == type) {
         return;

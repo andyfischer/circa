@@ -45,6 +45,13 @@ struct Type
     void addMemberFunction(std::string const& name, Term* function);
 };
 
+
+// Return 'term' as an instance of 'type'. In the simple case, if 'term' is
+// an instance of 'type', just return it. If 'term' is a derived type, then
+// we look up the inheritance tree until we find 'type', and return that
+// instance. If the type isn't found, return NULL.
+Term* get_as_type(Term *term, Term *type);
+
 // Return true if the term is an instance (possibly derived) of the given type
 bool is_instance(Term* term, Term* type);
 
