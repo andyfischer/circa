@@ -9,6 +9,7 @@
 #include "list.h"
 #include "operations.h"
 #include "parser.h"
+#include "ref_list.h"
 #include "term.h"
 #include "term_map.h"
 #include "type.h"
@@ -16,7 +17,7 @@
 
 namespace circa {
 
-Term* create_term(Branch* branch, Term* function, TermList inputs)
+Term* create_term(Branch* branch, Term* function, ReferenceList inputs)
 {
     //if (branch == NULL)
     //  throw errors::InternalError("in create_term, branch is NULL");
@@ -34,7 +35,7 @@ Term* create_term(Branch* branch, Term* function, TermList inputs)
     return term;
 }
 
-void initialize_term(Term* term, Term* function, TermList inputs)
+void initialize_term(Term* term, Term* function, ReferenceList inputs)
 {
     if (term == NULL)
         throw errors::InternalError("Term* is NULL");
@@ -84,14 +85,14 @@ void initialize_term(Term* term, Term* function, TermList inputs)
     }
 }
 
-void set_inputs(Term* term, TermList inputs)
+void set_inputs(Term* term, ReferenceList inputs)
 {
     term->inputs = inputs;
 }
 
 Term* create_constant(Branch* branch, Term* type)
 {
-    return create_term(branch, get_const_function(branch, type), TermList());
+    return create_term(branch, get_const_function(branch, type), ReferenceList());
 }
 
 void set_input(Term* term, int index, Term* input)
@@ -115,7 +116,7 @@ void hosted_apply_function(Term* caller)
 {
     Branch* branch = as_branch(caller->inputs[0]);
     Term* function = as_ref(caller->inputs[1]);
-    TermList inputs = as_list(caller->inputs[2]).toReferenceList();
+    ReferenceList inputs = as_list(caller->inputs[2]).toReferenceList();
 
     // Evaluate function, if needed
     if (function->needsUpdate)
@@ -143,7 +144,7 @@ void hosted_apply_function(Term* caller)
             return;
         }
 
-        TermList memberFunctionInputs;
+        ReferenceList memberFunctionInputs;
         memberFunctionInputs.append(function);
         memberFunctionInputs.appendAll(inputs);
 
@@ -154,7 +155,7 @@ void hosted_apply_function(Term* caller)
     as_ref(caller) = create_term(branch, function, inputs);
 }
 
-Term* apply_function(Branch* branch, Term* function, TermList inputs)
+Term* apply_function(Branch* branch, Term* function, ReferenceList inputs)
 {
     if (function->needsUpdate)
         function->eval();
@@ -177,7 +178,7 @@ Term* apply_function(Branch* branch, Term* function, TermList inputs)
             throw errors::InternalError(std::string("Term ") + function->toString()
                     + " is not a type, and has no default function");
 
-        TermList memberFunctionInputs;
+        ReferenceList memberFunctionInputs;
         memberFunctionInputs.append(function);
         memberFunctionInputs.appendAll(inputs);
 
@@ -188,7 +189,7 @@ Term* apply_function(Branch* branch, Term* function, TermList inputs)
     return create_term(branch, function, inputs);
 }
 
-Term* eval_function(Branch* branch, Term* function, TermList inputs)
+Term* eval_function(Branch* branch, Term* function, ReferenceList inputs)
 {
     Term* result = apply_function(branch, function, inputs);
     result->eval();
@@ -197,7 +198,7 @@ Term* eval_function(Branch* branch, Term* function, TermList inputs)
 
 Term* get_const_function(Branch* branch, Term* type)
 {
-    Term* result = apply_function(branch, CONST_GENERATOR, TermList(type));
+    Term* result = apply_function(branch, CONST_GENERATOR, ReferenceList(type));
     result->eval();
     return result;
 }
@@ -259,7 +260,7 @@ void duplicate_branch(Branch* source, Branch* dest)
 
 Term* constant_string(Branch* branch, std::string const& s, std::string const& name)
 {
-    Term* term = apply_function(branch, STRING_TYPE, TermList());
+    Term* term = apply_function(branch, STRING_TYPE, ReferenceList());
     as_string(term) = s;
     if (name != "")
         branch->bindName(term, name);
@@ -268,7 +269,7 @@ Term* constant_string(Branch* branch, std::string const& s, std::string const& n
 
 Term* constant_int(Branch* branch, int i, std::string const& name)
 {
-    Term* term = apply_function(branch, INT_TYPE, TermList());
+    Term* term = apply_function(branch, INT_TYPE, ReferenceList());
     as_int(term) = i;
     if (name != "")
         branch->bindName(term, name);
@@ -277,16 +278,16 @@ Term* constant_int(Branch* branch, int i, std::string const& name)
 
 Term* constant_float(Branch* branch, float f, std::string const& name)
 {
-    Term* term = apply_function(branch, FLOAT_TYPE, TermList());
+    Term* term = apply_function(branch, FLOAT_TYPE, ReferenceList());
     as_float(term) = f;
     if (name != "")
         branch->bindName(term, name);
     return term;
 }
 
-Term* constant_list(Branch* branch, TermList list, std::string const& name)
+Term* constant_list(Branch* branch, ReferenceList list, std::string const& name)
 {
-    Term* term = apply_function(branch, LIST_TYPE, TermList());
+    Term* term = apply_function(branch, LIST_TYPE, ReferenceList());
     // FIXME as_list(term) = list;
     if (name != "")
         branch->bindName(term, name);

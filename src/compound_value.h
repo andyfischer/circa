@@ -4,12 +4,12 @@
 #define CIRCA__COMPOUND_VALUE__INCLUDED
 
 #include "branch.h"
-#include "term_list.h"
+#include "ref_list.h"
 
 namespace circa {
 
 struct CompoundValue {
-    TermList fields;
+    ReferenceList fields;
     Branch branch;
 
     Term* addField(Term* type);

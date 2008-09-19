@@ -3,15 +3,7 @@
 #include "common_headers.h"
 
 #include "tests/common.h"
-#include "branch.h"
-#include "builtins.h"
-#include "operations.h"
-#include "parser.h"
-#include "term.h"
-#include "term_list.h"
-#include "term_namespace.h"
-#include "term_set.h"
-#include "value_map.h"
+#include "circa.h"
 
 namespace circa {
 namespace container_tests {
@@ -91,7 +83,7 @@ void test_namespace()
 
 void test_list()
 {
-    TermList list;
+    ReferenceList list;
     Term* term = new Term();
     Term* term2 = new Term();
 

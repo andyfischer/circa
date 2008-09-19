@@ -28,6 +28,6 @@ void graphviz_initialize(circa::Branch* branch)
 {
     circa::quick_create_function(branch, "export-graphviz",
             export_graphviz__evaluate,
-            circa::TermList(circa::SUBROUTINE_TYPE),
+            circa::ReferenceList(circa::SUBROUTINE_TYPE),
             circa::STRING_TYPE);
 }

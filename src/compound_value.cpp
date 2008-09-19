@@ -55,7 +55,7 @@ void CompoundValue__create__evaluate(Term* caller)
     }
 }
 
-Term* quickly_make_compound_value(Branch* branch, TermList types)
+Term* quickly_make_compound_value(Branch* branch, ReferenceList types)
 {
     Term *term = create_constant(branch, COMPOUND_VALUE_TYPE);
     CompoundValue &value = as_compound_value(term);
@@ -84,7 +84,7 @@ void initialize_compound_value(Branch& kernel)
 
     quick_create_function(&kernel, "compound-value",
             CompoundValue__create__evaluate,
-            TermList(LIST_TYPE), COMPOUND_VALUE_TYPE);
+            ReferenceList(LIST_TYPE), COMPOUND_VALUE_TYPE);
 
     // Create CompoundType
     Term* CompoundType = eval_statement(kernel, "CompoundType = CompoundValue()");

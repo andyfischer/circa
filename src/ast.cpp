@@ -8,7 +8,7 @@ namespace circa {
 namespace ast {
 
 Term* find_and_apply_function(Branch* branch, std::string const& functionName,
-        TermList inputs)
+        ReferenceList inputs)
 {
     Term* function = branch->findNamed(functionName);
 
@@ -48,7 +48,7 @@ Infix::createTerm(Branch* branch)
             throw syntax_errors::SyntaxError("Right side of -> must be an identifier");
         }
 
-        return find_and_apply_function(branch, rightIdent->text, TermList(leftTerm));
+        return find_and_apply_function(branch, rightIdent->text, ReferenceList(leftTerm));
     }
 
     // todo
@@ -104,7 +104,7 @@ FunctionCall::toString() const
 Term*
 FunctionCall::createTerm(Branch* branch)
 {
-    TermList inputs;
+    ReferenceList inputs;
 
     ArgumentList::const_iterator it;
     for (it = this->arguments.begin(); it != this->arguments.end(); ++it) {

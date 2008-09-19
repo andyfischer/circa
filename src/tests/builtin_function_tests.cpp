@@ -22,11 +22,11 @@ void test_math()
     Term* add_f = get_global("add");
     Term* mult_f = get_global("mult");
 
-    test_assert(as_float(eval_function(&branch, add_f, TermList(two,three))) == 5);
-    test_assert(as_float(eval_function(&branch, add_f, TermList(two,negative_one))) == 1);
+    test_assert(as_float(eval_function(&branch, add_f, ReferenceList(two,three))) == 5);
+    test_assert(as_float(eval_function(&branch, add_f, ReferenceList(two,negative_one))) == 1);
 
-    test_assert(as_float(eval_function(&branch, mult_f, TermList(two,three))) == 6);
-    test_assert(as_float(eval_function(&branch, mult_f, TermList(negative_one,three))) == -3);
+    test_assert(as_float(eval_function(&branch, mult_f, ReferenceList(two,three))) == 6);
+    test_assert(as_float(eval_function(&branch, mult_f, ReferenceList(negative_one,three))) == -3);
 
     test_assert(as_float(eval_statement(branch, "mult(5.0,3.0)")) == 15);
 }

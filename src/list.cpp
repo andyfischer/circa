@@ -27,10 +27,10 @@ List::clear()
     branch.clear();
 }
 
-TermList
+ReferenceList
 List::toReferenceList()
 {
-    TermList result;
+    ReferenceList result;
 
     for (int i=0; i < items.count(); i++)
         result.append(as_ref(items[i]));

@@ -12,7 +12,7 @@ struct Function
     typedef void (*InitializeFunc)(Term* caller);
     typedef void (*EvaluateFunc)(Term* caller);
 
-    TermList inputTypes;
+    ReferenceList inputTypes;
     Term* outputType;
 
     Term* stateType;

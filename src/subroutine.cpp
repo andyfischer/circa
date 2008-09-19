@@ -246,41 +246,41 @@ void initialize_subroutine(Branch* kernel)
 
     quick_create_function(kernel, "subroutine-create",
         subroutine_create__evaluate,
-        TermList(STRING_TYPE,LIST_TYPE,TYPE_TYPE),
+        ReferenceList(STRING_TYPE,LIST_TYPE,TYPE_TYPE),
         SUBROUTINE_TYPE);
 
     Term* name_input = quick_create_function(kernel,
         "subroutine-name-input", subroutine_name_input__evaluate,
-        TermList(SUBROUTINE_TYPE, INT_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
+        ReferenceList(SUBROUTINE_TYPE, INT_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
 
     Term* name_inputs = quick_create_function(kernel,
         "subroutine-name-inputs", subroutine_name_inputs__evaluate,
-        TermList(SUBROUTINE_TYPE, LIST_TYPE), SUBROUTINE_TYPE);
+        ReferenceList(SUBROUTINE_TYPE, LIST_TYPE), SUBROUTINE_TYPE);
 
     quick_create_function(kernel, "subroutine-get-branch", subroutine_get_branch__evaluate,
-        TermList(SUBROUTINE_TYPE), BRANCH_TYPE);
+        ReferenceList(SUBROUTINE_TYPE), BRANCH_TYPE);
 
     Term* set_branch = quick_create_function(kernel,
         "subroutine-set-branch", subroutine_set_branch__evaluate,
-        TermList(SUBROUTINE_TYPE, BRANCH_TYPE), SUBROUTINE_TYPE);
+        ReferenceList(SUBROUTINE_TYPE, BRANCH_TYPE), SUBROUTINE_TYPE);
     as_function(set_branch)->recycleInput = 0;
 
     quick_create_function(kernel, "subroutine-get-local",
         subroutine_get_local__evaluate,
-        TermList(SUBROUTINE_TYPE, STRING_TYPE), REFERENCE_TYPE);
+        ReferenceList(SUBROUTINE_TYPE, STRING_TYPE), REFERENCE_TYPE);
 
     Term* bind = quick_create_function(kernel, "subroutine-bind",
         subroutine_bind__evaluate,
-        TermList(SUBROUTINE_TYPE, REFERENCE_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
+        ReferenceList(SUBROUTINE_TYPE, REFERENCE_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
     as_function(bind)->recycleInput = 0;
 
     quick_create_function(kernel,
         "subroutine-eval", subroutine_eval__evaluate,
-        TermList(SUBROUTINE_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
+        ReferenceList(SUBROUTINE_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
 
     quick_create_function(kernel, "subroutine-print",
         subroutine_print__evaluate,
-        TermList(SUBROUTINE_TYPE), STRING_TYPE);
+        ReferenceList(SUBROUTINE_TYPE), STRING_TYPE);
 }
 
 } // namespace circa
