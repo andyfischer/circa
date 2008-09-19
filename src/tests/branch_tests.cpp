@@ -14,8 +14,8 @@ namespace branch_tests {
 void test_duplicate()
 {
     Branch* original = new Branch();
-    Term* term1 = create_term(original, CONSTANT_INT, TermList());
-    Term* term2 = create_term(original, CONSTANT_STRING, TermList());
+    Term* term1 = create_term(original, CONSTANT_INT, ReferenceList());
+    Term* term2 = create_term(original, CONSTANT_STRING, ReferenceList());
     as_int(term1) = 5;
     as_string(term2) = "yarn";
     original->bindName(term1, "one name for term1");

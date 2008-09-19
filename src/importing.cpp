@@ -22,7 +22,7 @@ Term* import_c_function(Branch* branch, Function::EvaluateFunc evaluate, std::st
     func->name = header->functionName;
     func->evaluate = evaluate;
 
-    TermList inputTypes;
+    ReferenceList inputTypes;
 
     ast::FunctionHeader::ArgumentList::iterator it;
     for (it = header->arguments.begin(); it != header->arguments.end(); ++it) {

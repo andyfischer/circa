@@ -213,7 +213,7 @@ void list_apply__evaluate(Term* caller)
     as_list(caller).clear();
 
     for (int i=0; i < list.count(); i++) {
-        Term* result = apply_function(caller->owningBranch, caller->inputs[0], TermList(list.get(i)));
+        Term* result = apply_function(caller->owningBranch, caller->inputs[0], ReferenceList(list.get(i)));
 
         result->eval();
 
@@ -257,7 +257,7 @@ void unknown_function__evaluate(Term* caller)
 void initialize_constants()
 {
     BRANCH_TYPE = quick_create_cpp_type<Branch>(KERNEL, "Branch");
-    LIST_TYPE = quick_create_cpp_type<TermList>(KERNEL, "List");
+    LIST_TYPE = quick_create_cpp_type<List>(KERNEL, "List");
     //MAP_TYPE = quick_create_cpp_type<TermMap>(KERNEL, "Map");
 
     CONSTANT_INT = get_const_function(KERNEL, INT_TYPE);
@@ -268,10 +268,10 @@ void initialize_constants()
     CONSTANT_1 = constant_float(KERNEL, 1);
     CONSTANT_2 = constant_float(KERNEL, 2);
 
-    CONSTANT_TRUE = apply_function(KERNEL, BOOL_TYPE, TermList());
+    CONSTANT_TRUE = apply_function(KERNEL, BOOL_TYPE, ReferenceList());
     as_bool(CONSTANT_TRUE) = true;
     KERNEL->bindName(CONSTANT_TRUE, "true");
-    CONSTANT_FALSE = apply_function(KERNEL, BOOL_TYPE, TermList());
+    CONSTANT_FALSE = apply_function(KERNEL, BOOL_TYPE, ReferenceList());
     as_bool(CONSTANT_FALSE) = false;
     KERNEL->bindName(CONSTANT_FALSE, "false");
 }
@@ -279,24 +279,24 @@ void initialize_constants()
 void initialize_builtin_functions(Branch* code)
 {
     quick_create_function(code, "add", add__evaluate,
-            TermList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
+            ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
     quick_create_function(code, "mult", mult__evaluate,
-            TermList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
-    quick_create_function(code, "concat", string_concat__evaluate, TermList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
-    quick_create_function(code, "print", print__evaluate, TermList(STRING_TYPE), VOID_TYPE);
+            ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
+    quick_create_function(code, "concat", string_concat__evaluate, ReferenceList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
+    quick_create_function(code, "print", print__evaluate, ReferenceList(STRING_TYPE), VOID_TYPE);
     quick_create_function(code, "if-expr", if_expr__evaluate,
-        TermList(BOOL_TYPE, ANY_TYPE, ANY_TYPE), ANY_TYPE);
-    quick_create_function(code, "list", create_list__evaluate, TermList(ANY_TYPE), LIST_TYPE);
-    quick_create_function(code, "range", range__evaluate, TermList(INT_TYPE), LIST_TYPE);
-    quick_create_function(code, "list-append", list_append__evaluate, TermList(LIST_TYPE, ANY_TYPE), LIST_TYPE);
-    quick_create_function(code, "list-apply", list_apply__evaluate, TermList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
+        ReferenceList(BOOL_TYPE, ANY_TYPE, ANY_TYPE), ANY_TYPE);
+    quick_create_function(code, "list", create_list__evaluate, ReferenceList(ANY_TYPE), LIST_TYPE);
+    quick_create_function(code, "range", range__evaluate, ReferenceList(INT_TYPE), LIST_TYPE);
+    quick_create_function(code, "list-append", list_append__evaluate, ReferenceList(LIST_TYPE, ANY_TYPE), LIST_TYPE);
+    quick_create_function(code, "list-apply", list_apply__evaluate, ReferenceList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
     quick_create_function(code, "read-text-file", read_text_file__evaluate,
-            TermList(STRING_TYPE), STRING_TYPE);
+            ReferenceList(STRING_TYPE), STRING_TYPE);
     quick_create_function(code, "write-text-file", write_text_file__evaluate,
-            TermList(STRING_TYPE, STRING_TYPE), VOID_TYPE);
+            ReferenceList(STRING_TYPE, STRING_TYPE), VOID_TYPE);
     UNKNOWN_FUNCTION = quick_create_function(code, "unknown-function",
             unknown_function__evaluate,
-            TermList(ANY_TYPE), ANY_TYPE);
+            ReferenceList(ANY_TYPE), ANY_TYPE);
     as_function(UNKNOWN_FUNCTION)->stateType = STRING_TYPE;
 }
 

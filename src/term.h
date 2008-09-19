@@ -3,7 +3,7 @@
 
 #include "common_headers.h"
 
-#include "term_list.h"
+#include "ref_list.h"
 #include "term_namespace.h"
 #include "term_set.h"
 
@@ -14,7 +14,7 @@ typedef std::vector<std::string> ErrorList;
 struct Term
 {
     Branch* owningBranch;
-    TermList inputs;
+    ReferenceList inputs;
     Term* function;
     TermSet users;
     Term* type;

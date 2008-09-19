@@ -16,4 +16,5 @@
 #include "tokenizer.h"
 #include "token_stream.h"
 #include "type.h"
+#include "value_map.h"
 #include "values.h"

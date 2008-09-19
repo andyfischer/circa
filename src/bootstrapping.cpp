@@ -34,7 +34,7 @@ Term* quick_create_type(
 }
 
 Term* quick_create_function(Branch* branch, string name, Function::EvaluateFunc evaluateFunc,
-        TermList inputTypes, Term* outputType)
+        ReferenceList inputTypes, Term* outputType)
 {
     Term* term = create_constant(branch, FUNCTION_TYPE);
     Function* func = as_function(term);
@@ -54,7 +54,7 @@ void hosted_to_string(Term* caller)
 void initialize_bootstrapped_code(Branch* kernel)
 {
     quick_create_function(kernel, "to-string", hosted_to_string,
-        TermList(ANY_TYPE), STRING_TYPE);
+        ReferenceList(ANY_TYPE), STRING_TYPE);
 
     // Parser
 }

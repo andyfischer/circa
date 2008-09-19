@@ -52,7 +52,7 @@ void initialize_compound_type(Branch* kernel)
 
     quick_create_function(kernel, "compound-type-add-field",
             CompoundType__add_field__evaluate,
-            TermList(COMPOUND_TYPE_TYPE, TYPE_TYPE, STRING_TYPE),
+            ReferenceList(COMPOUND_TYPE_TYPE, TYPE_TYPE, STRING_TYPE),
             COMPOUND_TYPE_TYPE);
 }
 

@@ -16,9 +16,9 @@ void test_simple()
     Term* print_term = eval_statement(branch,
         "subroutine-create('print-term,list(string),void)");
 
-    Term* input_names = constant_list(&branch, TermList(constant_string(&branch, "t")));
+    Term* input_names = constant_list(&branch, ReferenceList(constant_string(&branch, "t")));
     print_term = eval_function(&branch, get_global("subroutine-name-inputs"),
-            TermList(print_term, input_names));
+            ReferenceList(print_term, input_names));
     branch.bindName(print_term, "print-term");
 
     eval_statement(*as_subroutine(print_term)->branch, "print(to-string(t))");

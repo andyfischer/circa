@@ -65,10 +65,10 @@ void initialize_map_function(Branch* kernel)
     MAP_TYPE = quick_create_cpp_type<ValueMap>(kernel, "Map");
 
     Term* accessFunc = quick_create_function(kernel, "map-access", map_access__evaluate,
-        TermList(MAP_TYPE, ANY_TYPE), ANY_TYPE);
+        ReferenceList(MAP_TYPE, ANY_TYPE), ANY_TYPE);
 
     Term* setFunc = quick_create_function(kernel, "map-set", map_set__evaluate,
-        TermList(MAP_TYPE, ANY_TYPE, ANY_TYPE), MAP_TYPE);
+        ReferenceList(MAP_TYPE, ANY_TYPE, ANY_TYPE), MAP_TYPE);
     
     as_type(MAP_TYPE)->addMemberFunction("", accessFunc);
 }
