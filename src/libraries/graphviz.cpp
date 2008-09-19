@@ -9,8 +9,8 @@ void export_graphviz__evaluate(circa::Term* caller)
 
     output << "digraph G {" << std::endl;
 
-    for (int i=0; i < sub->branch->terms.count(); i++) {
-        circa::Term* term = sub->branch->terms[i];
+    for (int i=0; i < sub->branch->numTerms(); i++) {
+        circa::Term* term = sub->branch->get(i);
         std::string termStr = term->toString();
 
         for (int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++) {

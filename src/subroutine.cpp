@@ -128,7 +128,7 @@ void subroutine_create__evaluate(Term* caller)
     sub->name = as_string(caller->inputs[0]);
     sub->initialize = subroutine_call__initialize;
     sub->evaluate = subroutine_call__evaluate;
-    sub->inputTypes = as_list(caller->inputs[1]);
+    sub->inputTypes = as_list(caller->inputs[1]).toReferenceList();
     sub->outputType = caller->inputs[2];
     sub->stateType = BRANCH_TYPE;
 
@@ -153,7 +153,7 @@ void subroutine_name_input__evaluate(Term* caller)
 void subroutine_name_inputs__evaluate(Term* caller)
 {
     recycle_value(caller->inputs[0], caller);
-    TermList& name_list = as_list(caller->inputs[1]);
+    List name_list = as_list(caller->inputs[1]);
     Subroutine* sub = as_subroutine(caller);
     Branch* branch = sub->branch;
 
@@ -210,8 +210,8 @@ void subroutine_print__evaluate(Term* caller)
     output << sub->name << "()" << std::endl;
     output << "{" << std::endl;
 
-    for (int i=0; i < sub->branch->terms.count(); i++) {
-        Term* term = sub->branch->terms[i];
+    for (int i=0; i < sub->branch->numTerms(); i++) {
+        Term* term = sub->branch->get(i);
         output << "  " << as_function(term->function)->name << "(";
 
         bool firstInput = true;

@@ -6,13 +6,14 @@
 #include "compound_type.h"
 #include "compound_value.h"
 #include "cpp_interface.h"
+#include "list.h"
 #include "operations.h"
 #include "parser.h"
 
 namespace circa {
 
 Term*
-CompoundValue::append(Term* type)
+CompoundValue::addField(Term* type)
 {
     Term* field  = create_constant(&this->branch, type);
     this->fields.append(field);
@@ -46,7 +47,7 @@ void instantiate_compound_value(CompoundType const &type, CompoundValue &value)
 
 void CompoundValue__create__evaluate(Term* caller)
 {
-    TermList &types = as_list(caller->inputs[0]);
+    List &types = as_list(caller->inputs[0]);
     CompoundValue &cvalue = as_compound_value(caller);
 
     for (int i=0; i < types.count(); i++) {
@@ -60,7 +61,7 @@ Term* quickly_make_compound_value(Branch* branch, TermList types)
     CompoundValue &value = as_compound_value(term);
 
     for (int i=0; i < types.count(); i++)
-        value.append(types[i]);
+        value.addField(types[i]);
 
     return term;
 }
@@ -68,8 +69,8 @@ Term* quickly_make_compound_value(Branch* branch, TermList types)
 Term* bootstrapped_make_compound_type(Branch* branch)
 {
     Term* compoundType = create_constant(branch, COMPOUND_VALUE_TYPE);
-    as_compound_value(compoundType).append(REFERENCE_TYPE);
-    Term* fieldList = as_compound_value(compoundType).append(LIST_TYPE);
+    as_compound_value(compoundType).addField(REFERENCE_TYPE);
+    Term* fieldList = as_compound_value(compoundType).addField(LIST_TYPE);
 
     // todo
 

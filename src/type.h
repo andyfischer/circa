@@ -66,6 +66,7 @@ void change_type(Term* term, Term* type);
 void specialize_type(Term* term, Term* type);
 
 void Type_alloc(Term* caller);
+void Type_dealloc(Term* caller);
 
 void set_member_function(Term* type, std::string name, Term* function);
 Term* get_member_function(Term* type, std::string name);

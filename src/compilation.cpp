@@ -15,10 +15,10 @@ void checkForCompileError(Term* term, std::string& errorMessage)
     }
 }
 
-bool hasCompileErrors(Branch* branch)
+bool hasCompileErrors(Branch& branch)
 {
-    for (int i=0; i < branch->terms.count(); i++) {
-        Term* term = branch->terms[i];
+    for (int i=0; i < branch.numTerms(); i++) {
+        Term* term = branch[i];
         std::string message;
         checkForCompileError(term, message);
         if (message != "")
@@ -27,12 +27,12 @@ bool hasCompileErrors(Branch* branch)
     return false;
 }
 
-std::vector<std::string> getCompileErrors(Branch* branch)
+std::vector<std::string> getCompileErrors(Branch& branch)
 {
     std::vector<std::string> results;
 
-    for (int i=0; i < branch->terms.count(); i++) {
-        Term* term = branch->terms[i];
+    for (int i=0; i < branch.numTerms(); i++) {
+        Term* term = branch[i];
         std::string message;
 
         checkForCompileError(term, message);
@@ -44,10 +44,10 @@ std::vector<std::string> getCompileErrors(Branch* branch)
     return results;
 }
 
-void printCompileErrors(Branch* branch, std::ostream& output)
+void printCompileErrors(Branch& branch, std::ostream& output)
 {
-    for (int i=0; i < branch->terms.count(); i++) {
-        Term* term = branch->terms[i];
+    for (int i=0; i < branch.numTerms(); i++) {
+        Term* term = branch[i];
         std::string message;
 
         checkForCompileError(term, message);

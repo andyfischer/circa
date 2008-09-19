@@ -28,8 +28,8 @@ int main(int nargs, const char * args[])
         if (nargs > 1) {
             Branch* branch = evaluate_file(args[1]);
 
-            if (hasCompileErrors(branch)) {
-                printCompileErrors(branch, std::cout);
+            if (hasCompileErrors(*branch)) {
+                printCompileErrors(*branch, std::cout);
             } else {
                 evaluate_branch(branch);
             }

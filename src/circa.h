@@ -8,6 +8,7 @@
 #include "errors.h"
 #include "function.h"
 #include "importing.h"
+#include "list.h"
 #include "operations.h"
 #include "parser.h"
 #include "subroutine.h"

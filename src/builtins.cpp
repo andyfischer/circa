@@ -13,6 +13,7 @@
 #include "errors.h"
 #include "evaluation.h"
 #include "function.h"
+#include "list.h"
 #include "operations.h"
 #include "primitive_types.h"
 #include "subroutine.h"
@@ -102,6 +103,7 @@ void bootstrap_kernel()
     Type_alloc(typeType);
     as_type(typeType)->name = "Type";
     as_type(typeType)->alloc = Type_alloc;
+    as_type(typeType)->dealloc = Type_dealloc;
     KERNEL->bindName(typeType, "Type");
 
     // Implant the Type type
@@ -206,7 +208,7 @@ void list_append__evaluate(Term* caller)
 void list_apply__evaluate(Term* caller)
 {
     as_function(caller->inputs[0]);
-    TermList& list = as_list(caller->inputs[1]);
+    List& list = as_list(caller->inputs[1]);
 
     as_list(caller).clear();
 
