@@ -12,9 +12,15 @@
 
 namespace circa {
 
-void Branch::append(Term* term)
+Branch::~Branch()
 {
-    this->terms.append(term);
+    std::vector<Term*> myTerms = this->terms;
+
+    this->terms.clear();
+
+    std::vector<Term*>::iterator it;
+    for (it = myTerms.begin(); it != myTerms.end(); ++it)
+        delete *it;
 }
 
 bool Branch::containsName(std::string const& name) const
@@ -42,7 +48,9 @@ void Branch::bindName(Term* term, string name)
 
 void Branch::remapPointers(TermMap const& map)
 {
-    terms.remapPointers(map);
+    for (int i=0; i < terms.size(); i++)
+        terms[i] = map.getRemapped(terms[i]);
+
     names.remapPointers(map);
 }
 

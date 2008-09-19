@@ -45,7 +45,7 @@ Engine::getNextTerm()
         return NULL;
 
     Scope *scope = mStack.top();
-    return scope->branch->terms[scope->next];
+    return scope->branch->get(scope->next);
 }
 
 void
@@ -64,10 +64,10 @@ Engine::runNextInstruction()
         return;
     }
 
-    Term* term = scope->branch->terms[scope->next];
+    Term* term = scope->branch->get(scope->next);
 
     // Figure out what the next term is
-    if ((scope->next + 1) < scope->branch->terms.count())
+    if ((scope->next + 1) < scope->branch->numTerms())
         scope->next += 1;
     else
         mSpecialNextAction = CLOSE_BRANCH;

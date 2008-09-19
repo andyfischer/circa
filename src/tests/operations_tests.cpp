@@ -27,9 +27,9 @@ void safe_delete()
     test_assert(termSum->inputs[0] == NULL);
     test_assert(!branch.containsName("term1"));
 
-    for (int i=0; i < branch.terms.count(); i++)
+    for (int i=0; i < branch.numTerms(); i++)
     {
-        if (branch.terms[i] == term1)
+        if (branch[i] == term1)
             test_fail();
     }
 }

@@ -6,6 +6,7 @@
 #include "builtins.h"
 #include "errors.h"
 #include "function.h"
+#include "list.h"
 #include "operations.h"
 #include "parser.h"
 #include "term.h"
@@ -26,7 +27,7 @@ Term* create_term(Branch* branch, Term* function, TermList inputs)
     term->owningBranch = branch;
 
     if (branch != NULL)
-        branch->terms.append(term);
+        branch->append(term);
 
     initialize_term(term, function, inputs);
     
@@ -103,9 +104,9 @@ void evaluate_branch(Branch* branch)
     if (branch == NULL)
         throw errors::InternalError("branch is NULL");
 
-    int count = branch->terms.count();
+    int count = branch->numTerms();
     for (int index=0; index < count; index++) {
-		Term* term = branch->terms[index];
+		Term* term = branch->get(index);
         term->eval();
     }
 }
@@ -114,7 +115,7 @@ void hosted_apply_function(Term* caller)
 {
     Branch* branch = as_branch(caller->inputs[0]);
     Term* function = as_ref(caller->inputs[1]);
-    TermList& inputs = as_list(caller->inputs[2]);
+    TermList inputs = as_list(caller->inputs[2]).toReferenceList();
 
     // Evaluate function, if needed
     if (function->needsUpdate)
@@ -230,8 +231,8 @@ void duplicate_branch(Branch* source, Branch* dest)
     TermMap newTermMap;
 
     // Duplicate every term
-    for (int index=0; index < source->terms.count(); index++) {
-        Term* source_term = source->terms[index];
+    for (int index=0; index < source->numTerms(); index++) {
+        Term* source_term = source->get(index);
 
         Term* dest_term = create_term(dest, source_term->function, source_term->inputs);
         newTermMap[source_term] = dest_term;
@@ -240,8 +241,8 @@ void duplicate_branch(Branch* source, Branch* dest)
     }
 
     // Remap terms
-    for (int index=0; index < dest->terms.count(); index++) {
-        Term* term = dest->terms[index];
+    for (int index=0; index < dest->numTerms(); index++) {
+        Term* term = dest->get(index);
         term->inputs.remapPointers(newTermMap);
         if (as_type(term->type)->remapPointers != NULL)
             as_type(term->type)->remapPointers(term, newTermMap);
@@ -286,7 +287,7 @@ Term* constant_float(Branch* branch, float f, std::string const& name)
 Term* constant_list(Branch* branch, TermList list, std::string const& name)
 {
     Term* term = apply_function(branch, LIST_TYPE, TermList());
-    as_list(term) = list;
+    // FIXME as_list(term) = list;
     if (name != "")
         branch->bindName(term, name);
     return term;

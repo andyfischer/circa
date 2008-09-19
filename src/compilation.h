@@ -7,9 +7,9 @@
 
 namespace circa {
 
-bool hasCompileErrors(Branch* branch);
-std::vector<std::string> getCompileErrors(Branch* branch);
-void printCompileErrors(Branch* branch, std::ostream& output);
+bool hasCompileErrors(Branch& branch);
+std::vector<std::string> getCompileErrors(Branch& branch);
+void printCompileErrors(Branch& branch, std::ostream& output);
 
 } // namespace circa
 

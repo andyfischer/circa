@@ -10,14 +10,23 @@
 
 namespace circa {
 
-struct Branch
+class Branch
 {
-    TermList terms;
+private:
+    std::vector<Term*> terms;
+
+public:
     TermNamespace names;
 
     Branch() {}
+    ~Branch();
 
-    void append(Term* term);
+    int numTerms() const { return terms.size(); }
+
+    Term* get(int index) const { return terms[index]; }
+    Term* operator[](int index) const { return terms[index]; }
+
+    void append(Term* term) { terms.push_back(term); }
 
     // Returns true if there is a term with the given name
     bool containsName(std::string const& name) const;

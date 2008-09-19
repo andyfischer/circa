@@ -111,6 +111,11 @@ void Type_alloc(Term *caller)
     caller->value = new Type();
 }
 
+void Type_dealloc(Term* caller)
+{
+    // todo
+}
+
 std::string Type_toString(Term *caller)
 {
     return std::string("<Type " + as_type(caller)->name + ">");

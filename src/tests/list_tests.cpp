@@ -5,10 +5,10 @@
 #include "tests/common.h"
 #include "branch.h"
 #include "builtins.h"
+#include "list.h"
 #include "operations.h"
 #include "parser.h"
 #include "term.h"
-#include "term_list.h"
 
 namespace circa {
 namespace list_tests {
