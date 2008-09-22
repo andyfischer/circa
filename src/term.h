@@ -53,6 +53,7 @@ struct Term
     float& asFloat();
     std::string& asString();
     bool& asBool();
+    Term*& asRef();
 
     void eval();
 };

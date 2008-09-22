@@ -30,10 +30,18 @@ public:
     }
 
     int count() const { return (int) _items.size(); }
-    void append(Term* term) { _items.push_back(term); }
+    void append(Term* term)
+    {
+        _items.push_back(term);
+        if (_items.size() > 1000000)
+            std::cout << "too high in append" << std::endl;
+    }
     void appendAll(ReferenceList const& list);
     void setAt(int index, Term* term)
     {
+        if (index > 1000000)
+            std::cout << "index too big in setAt" << std::endl;
+
         // Make sure there are enough blank elements in the list
         while (_items.size() <= index) {
             _items.push_back(NULL);

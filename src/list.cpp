@@ -21,6 +21,13 @@ List::append(Term* term)
 }
 
 void
+List::appendSlot(Term* type)
+{
+    Term* newTerm = create_constant(&this->branch, type);
+    this->items.append(newTerm);
+}
+
+void
 List::clear()
 {
     items.clear();
@@ -43,11 +50,6 @@ List& as_list(Term* term)
     if (term->type != LIST_TYPE)
         throw errors::TypeError(term, LIST_TYPE);
     return *((List*) term->value);
-}
-
-void initialize_list(Branch* kernel)
-{
-    LIST_TYPE = quick_create_cpp_type<List>(kernel, "List");
 }
 
 } // namespace circa

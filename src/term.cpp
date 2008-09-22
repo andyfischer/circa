@@ -159,6 +159,11 @@ bool& Term::asBool()
     return as_bool(this);
 }
 
+Term*& Term::asRef()
+{
+    return as_ref(this);
+}
+
 void Term::eval()
 {
     evaluation::evaluate_term(this);
