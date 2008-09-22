@@ -34,17 +34,6 @@ CompoundValue& as_compound_value(Term* term)
 
 // Bootstrap
 
-void instantiate_compound_value(CompoundType const &type, CompoundValue &value)
-{
-    value.fields.clear();
-    value.branch.clear();
-
-    for (int fieldIndex=0; fieldIndex < type.numFields(); fieldIndex++) {
-        Term* term = create_constant(&value.branch, type.getType(fieldIndex));
-        value.fields.append(term);
-    }
-}
-
 void CompoundValue__create__evaluate(Term* caller)
 {
     List &types = as_list(caller->inputs[0]);
@@ -64,6 +53,11 @@ Term* quickly_make_compound_value(Branch* branch, ReferenceList types)
         value.addField(types[i]);
 
     return term;
+}
+
+Term* get_field(Term* term, std::string const& fieldName)
+{
+
 }
 
 Term* bootstrapped_make_compound_type(Branch* branch)

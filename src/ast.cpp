@@ -106,9 +106,9 @@ FunctionCall::createTerm(Branch* branch)
 {
     ReferenceList inputs;
 
-    ArgumentList::const_iterator it;
-    for (it = this->arguments.begin(); it != this->arguments.end(); ++it) {
-        Term* term = (*it)->expression->createTerm(branch);
+    for (int i=0; i < arguments.size(); i++) {
+        Argument* arg = arguments[i];
+        Term* term = arg->expression->createTerm(branch);
         assert(term != NULL);
         inputs.append(term);
     }

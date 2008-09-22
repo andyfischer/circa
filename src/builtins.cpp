@@ -8,7 +8,6 @@
 #include "bootstrapping.h"
 #include "branch.h"
 #include "builtins.h"
-#include "compound_type.h"
 #include "cpp_interface.h"
 #include "errors.h"
 #include "evaluation.h"
@@ -38,7 +37,6 @@ Term* TYPE_TYPE = NULL;
 Term* FUNCTION_TYPE = NULL;
 Term* CODEUNIT_TYPE = NULL;
 Term* SUBROUTINE_TYPE = NULL;
-Term* COMPOUND_VALUE_TYPE = NULL;
 Term* COMPOUND_TYPE_TYPE = NULL;
 Term* BRANCH_TYPE = NULL;
 Term* ANY_TYPE = NULL;
@@ -276,6 +274,24 @@ void initialize_constants()
     KERNEL->bindName(CONSTANT_FALSE, "false");
 }
 
+void initialize_compound_types(Branch* kernel)
+{
+    LIST_TYPE = quick_create_cpp_type<List>(kernel, "List");
+
+    COMPOUND_TYPE_TYPE = create_constant(kernel, LIST_TYPE, "CompoundType");
+
+    as_list(COMPOUND_TYPE_TYPE).appendSlot(LIST_TYPE);
+
+    Term* compoundTypeField = create_constant(kernel, LIST_TYPE, "CompoundType::Field");
+    Term* field_1 = as_type(compoundTypeField).appendSlot(LIST_TYPE);
+    Term* field_2 = as_type(compoundTypeField).appendSlot(LIST_TYPE);
+
+    as_list(field_1).appendSlot(REFERENCE_TYPE)->asRef() = REFERENCE_TYPE;
+    as_list(field_1).appendSlot(STRING_TYPE)->asString() = "type";
+    as_list(field_2).appendSlot(REFERENCE_TYPE)->asRef() = STRING_TYPE;
+    as_list(field_2).appendSlot(STRING_TYPE)->asString() = "name";
+}
+
 void initialize_builtin_functions(Branch* code)
 {
     quick_create_function(code, "add", add__evaluate,
@@ -306,13 +322,13 @@ void initialize()
         bootstrap_kernel();
         initialize_primitive_types(KERNEL);
         initialize_constants();
+        initialize_compound_types(KERNEL);
 
         CURRENTLY_BOOTSTRAPPING = false;
 
         // Then everything else:
         initialize_branch(KERNEL);
         initialize_builtin_functions(KERNEL);
-        initialize_compound_type(KERNEL);
         initialize_functions(KERNEL);
         initialize_map_function(KERNEL);
         initialize_subroutine(KERNEL);
