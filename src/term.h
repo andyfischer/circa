@@ -17,6 +17,8 @@ struct Term
     ReferenceList inputs;
     Term* function;
     TermSet users;
+
+    // data type
     Term* type;
 
     // Our raw value. This is meant to be transient. For example, if we are a pure

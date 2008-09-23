@@ -20,7 +20,7 @@ void register_parser_tests();
 void register_primitive_type_tests();
 void register_subroutine_tests();
 void register_tokenizer_tests();
-//void register_type_tests();
+void register_type_tests();
 
 void register_all_tests()
 {
@@ -38,7 +38,7 @@ void register_all_tests()
     register_primitive_type_tests();
     register_subroutine_tests();
     register_tokenizer_tests();
-    //register_type_tests();
+    register_type_tests();
 }
 
 void run_all_tests()
