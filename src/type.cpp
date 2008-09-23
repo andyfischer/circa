@@ -41,14 +41,14 @@ Term* get_parent_type(Term *type)
 {
     assert(type != NULL);
     assert(type->type == COMPOUND_TYPE_TYPE);
-    return as_list(type)[0];
+    return as_list(type)[0]->asRef();
 }
 
 Term* get_parent(Term *term)
 {
     assert(term != NULL);
     assert(term->type->type == COMPOUND_TYPE_TYPE);
-    return as_list(term)[0];
+    return as_list(term)[0]->asRef();
 }
 
 Term* get_as_type(Term *term, Term *type)
