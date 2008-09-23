@@ -45,6 +45,8 @@ struct Type
     void addMemberFunction(std::string const& name, Term* function);
 };
 
+Term* get_parent_type(Term *type);
+Term* get_parent(Term *term);
 
 // Return 'term' as an instance of 'type'. In the simple case, if 'term' is
 // an instance of 'type', just return it. If 'term' is a derived type, then

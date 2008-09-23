@@ -6,6 +6,7 @@
 #include "builtins.h"
 #include "errors.h"
 #include "function.h"
+#include "list.h"
 #include "operations.h"
 #include "term.h"
 #include "type.h"
@@ -36,24 +37,18 @@ Type::addMemberFunction(std::string const &name, Term *function)
     this->memberFunctions.bind(function, name);
 }
 
-/*
-bool has_parent(Term *term)
+Term* get_parent_type(Term *type)
 {
-    if (term->type != COMPOUND_TYPE_TYPE)
-        return false;
-    return as_compound_type(term->type).getName(0) == PARENT_FIELD_NAME;
+    assert(type != NULL);
+    assert(type->type == COMPOUND_TYPE_TYPE);
+    return as_list(type)[0];
 }
 
 Term* get_parent(Term *term)
 {
-    assert(has_parent(term));
-    return as_compound_value(term).getField(0);
-}
-
-Term* get_superclass(Term *type)
-{
-    assert(as_compound_type(type).getName(0) == SUPERCLASS_FIELD_NAME);
-    return as_compound_type(type).getType(0);
+    assert(term != NULL);
+    assert(term->type->type == COMPOUND_TYPE_TYPE);
+    return as_list(term)[0];
 }
 
 Term* get_as_type(Term *term, Term *type)
@@ -61,12 +56,15 @@ Term* get_as_type(Term *term, Term *type)
     if (term->type == type)
         return term;
 
-    if (has_superclass(type))
-        return get_as_type(term, get_parent(type), get_superclass(type));
+    if (term->type->type != COMPOUND_TYPE_TYPE)
+        return NULL;
 
-    return NULL;
+    Term* parent = get_parent(term);
+    if (parent == NULL)
+        return NULL;
+
+    return get_as_type(parent, get_parent_type(type));
 }
-*/
 
 bool is_instance(Term *term, Term *type)
 {
