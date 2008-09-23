@@ -60,7 +60,7 @@ void test_instantiate_compound_value()
 
 void bootstrapped_objects()
 {
-
+    test_assert(get_parent_type(COMPOUND_TYPE_TYPE) == TYPE_TYPE);
 }
 
 } // namespace type_tests
@@ -68,8 +68,6 @@ void bootstrapped_objects()
 void register_type_tests()
 {
     REGISTER_TEST_CASE(type_tests::bootstrapped_objects);
-    //REGISTER_TEST_CASE(type_tests::compound_type);
-    //REGISTER_TEST_CASE(type_tests::test_instantiate_compound_value);
 }
 
 } // namespace circa
