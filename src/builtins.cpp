@@ -278,18 +278,38 @@ void initialize_compound_types(Branch* kernel)
 {
     LIST_TYPE = quick_create_cpp_type<List>(kernel, "List");
 
-    COMPOUND_TYPE_TYPE = create_constant(kernel, LIST_TYPE, "CompoundType");
+    /* 
+        type CompoundType {
+            Ref parent
+            List<Field> fields
+        }
+        type Field {
+            Ref type
+            String name
+        }
+    */
 
-    as_list(COMPOUND_TYPE_TYPE).appendSlot(LIST_TYPE);
+    COMPOUND_TYPE_TYPE = create_constant(kernel, LIST_TYPE);
+    kernel->bindName(COMPOUND_TYPE_TYPE, "CompoundType");
 
-    Term* compoundTypeField = create_constant(kernel, LIST_TYPE, "CompoundType::Field");
-    Term* field_1 = as_type(compoundTypeField).appendSlot(LIST_TYPE);
-    Term* field_2 = as_type(compoundTypeField).appendSlot(LIST_TYPE);
+    // parent
+    as_list(COMPOUND_TYPE_TYPE).appendSlot(REFERENCE_TYPE)->asRef() = TYPE_TYPE;
 
-    as_list(field_1).appendSlot(REFERENCE_TYPE)->asRef() = REFERENCE_TYPE;
-    as_list(field_1).appendSlot(STRING_TYPE)->asString() = "type";
-    as_list(field_2).appendSlot(REFERENCE_TYPE)->asRef() = STRING_TYPE;
-    as_list(field_2).appendSlot(STRING_TYPE)->asString() = "name";
+    // fields
+    Term* CompoundType_fields = as_list(COMPOUND_TYPE_TYPE).appendSlot(LIST_TYPE);
+
+    // field 0: (ref 'parent')
+    Term* CompoundType_field0 = as_list(CompoundType_fields).appendSlot(LIST_TYPE);
+    as_list(CompoundType_field0).appendSlot(REFERENCE_TYPE)->asRef() = REFERENCE_TYPE;
+    as_list(CompoundType_field0).appendSlot(STRING_TYPE)->asString() = "type";
+
+    // field 1: (list 'fields')
+    Term* CompoundType_field1 = as_list(CompoundType_fields).appendSlot(LIST_TYPE);
+    as_list(CompoundType_field1).appendSlot(REFERENCE_TYPE)->asRef() = LIST_TYPE;
+    as_list(CompoundType_field1).appendSlot(STRING_TYPE)->asString() = "fields";
+
+    // bootstrap
+    COMPOUND_TYPE_TYPE->type = COMPOUND_TYPE_TYPE;
 }
 
 void initialize_builtin_functions(Branch* code)
