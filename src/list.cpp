@@ -12,19 +12,21 @@
 
 namespace circa {
 
-void
+Term*
 List::append(Term* term)
 {
     Term* newTerm = create_constant(&this->branch, term->type);
     recycle_value(term, newTerm);
     this->items.append(newTerm);
+    return newTerm;
 }
 
-void
+Term*
 List::appendSlot(Term* type)
 {
     Term* newTerm = create_constant(&this->branch, type);
     this->items.append(newTerm);
+    return newTerm;
 }
 
 void

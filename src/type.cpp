@@ -37,11 +37,9 @@ Type::addMemberFunction(std::string const &name, Term *function)
 }
 
 /*
-const char * PARENT_FIELD_NAME = ":parent";
-
 bool has_parent(Term *term)
 {
-    if (!is_compound_value(term))
+    if (term->type != COMPOUND_TYPE_TYPE)
         return false;
     return as_compound_type(term->type).getName(0) == PARENT_FIELD_NAME;
 }
