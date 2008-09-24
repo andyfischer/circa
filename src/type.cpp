@@ -109,6 +109,7 @@ bool is_type(Term *term)
 
 Type* as_type(Term *term)
 {
+    term = get_as(term, TYPE_TYPE);
     assert_instance(term, TYPE_TYPE);
     return (Type*) term->value;
 }
