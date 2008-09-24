@@ -69,6 +69,9 @@ void bootstrapped_objects()
     test_assert(get_as(COMPOUND_TYPE, TYPE_TYPE)->type == TYPE_TYPE);
 
     test_assert(as_type(COMPOUND_TYPE) != NULL);
+
+    test_assert(get_field(COMPOUND_TYPE, "parent") == get_parent(COMPOUND_TYPE));
+    test_assert(get_field(COMPOUND_TYPE, "fields") != NULL);
 }
 
 } // namespace type_tests

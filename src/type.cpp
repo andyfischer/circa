@@ -44,6 +44,18 @@ Term* get_compound_type_fields(Term *ct)
     return as_list(ct)[1];
 }
 
+Term* get_field_type(Term *field)
+{
+    assert(field != NULL);
+    return as_list(field)[0];
+}
+
+Term* get_field_name(Term *field)
+{
+    assert(field != NULL);
+    return as_list(field)[1];
+}
+
 Term* get_parent_type(Term *type)
 {
     assert(type != NULL);
@@ -103,6 +115,25 @@ Type* as_type(Term *term)
     term = get_as(term, TYPE_TYPE);
     assert_instance(term, TYPE_TYPE);
     return (Type*) term->value;
+}
+
+Term* get_field(Term *term, std::string const& fieldName)
+{
+    assert_instance(term->type, COMPOUND_TYPE);
+
+    // Look into term's type, find the index of this field name
+    List& fields = as_list(get_compound_type_fields(term->type));
+
+    int index = 0;
+    for (; index < fields.count(); index++) {
+        if (as_string(get_field_name(fields[index])) == fieldName)
+            break;
+    }
+
+    if (index == fields.count())
+        return NULL;
+
+    return as_list(term)[index];
 }
 
 void Type_alloc(Term *caller)
