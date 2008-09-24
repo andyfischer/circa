@@ -24,9 +24,6 @@ struct Type
     // Size of raw data (if any)
     size_t dataSize;
 
-    // Parent type (if any)
-    Term* parentType;
-
     // Functions
     AllocFunc alloc;
     InitializeFunc init;

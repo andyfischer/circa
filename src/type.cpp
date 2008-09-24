@@ -15,7 +15,6 @@ namespace circa {
 
 Type::Type()
   : name(""),
-    parentType(NULL),
     dataSize(sizeof(void*)),
     alloc(NULL),
     init(NULL),
@@ -83,17 +82,9 @@ bool is_instance(Term *term, Term *type)
     if (CURRENTLY_BOOTSTRAPPING && type == NULL)
         return true;
 
-    Term* actualType = term->type;
+    term = get_as(term, type);
 
-    while (actualType != NULL) {
-
-        if (actualType == type)
-            return true;
-
-        actualType = as_type(actualType)->parentType;
-    }
-
-    return false;
+    return term != NULL;
 }
 
 void assert_instance(Term *term, Term *type)
