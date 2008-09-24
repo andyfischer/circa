@@ -62,7 +62,7 @@ Term* get_parent(Term *term)
     return as_list(term)[0];
 }
 
-Term* get_as_type(Term *term, Term *type)
+Term* get_as(Term *term, Term *type)
 {
     if (term->type == type)
         return term;
@@ -74,7 +74,7 @@ Term* get_as_type(Term *term, Term *type)
     if (parent == NULL)
         return NULL;
 
-    return get_as_type(parent, get_parent_type(type));
+    return get_as(parent, get_parent_type(term->type));
 }
 
 bool is_instance(Term *term, Term *type)
