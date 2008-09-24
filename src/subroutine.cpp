@@ -242,7 +242,6 @@ void initialize_subroutine(Branch* kernel)
             Subroutine_alloc,
             Subroutine_dealloc,
             Subroutine_duplicate);
-    as_type(SUBROUTINE_TYPE)->parentType = FUNCTION_TYPE;
 
     quick_create_function(kernel, "subroutine-create",
         subroutine_create__evaluate,
