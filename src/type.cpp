@@ -18,6 +18,7 @@ Type::Type()
     parentType(NULL),
     dataSize(sizeof(void*)),
     alloc(NULL),
+    init(NULL),
     dealloc(NULL),
     duplicate(NULL),
     equals(NULL),
@@ -37,18 +38,28 @@ Type::addMemberFunction(std::string const &name, Term *function)
     this->memberFunctions.bind(function, name);
 }
 
+Term* get_compound_type_fields(Term *ct)
+{
+    assert(ct != NULL);
+    assert(ct->type == COMPOUND_TYPE);
+    return as_list(ct)[1];
+}
+
 Term* get_parent_type(Term *type)
 {
     assert(type != NULL);
-    assert(type->type == COMPOUND_TYPE_TYPE);
-    return as_list(type)[0]->asRef();
+    assert(type->type == COMPOUND_TYPE);
+
+    Term* parent_field = as_list(get_compound_type_fields(type))[0];
+
+    return as_list(parent_field)[0]->asRef();
 }
 
 Term* get_parent(Term *term)
 {
     assert(term != NULL);
-    assert(term->type->type == COMPOUND_TYPE_TYPE);
-    return as_list(term)[0]->asRef();
+    assert(term->type->type == COMPOUND_TYPE);
+    return as_list(term)[0];
 }
 
 Term* get_as_type(Term *term, Term *type)
@@ -56,7 +67,7 @@ Term* get_as_type(Term *term, Term *type)
     if (term->type == type)
         return term;
 
-    if (term->type->type != COMPOUND_TYPE_TYPE)
+    if (term->type->type != COMPOUND_TYPE)
         return NULL;
 
     Term* parent = get_parent(term);
@@ -154,11 +165,13 @@ void change_type(Term *term, Term *typeTerm)
 
     Type *type = as_type(typeTerm);
 
-    if (type->alloc == NULL) {
+    if (type->alloc == NULL)
         throw errors::InternalError(string("type ") + type->name + " has no alloc function");
-    }
 
     type->alloc(term);
+
+    if (type->init != NULL) 
+        type->init(term);
 }
 
 void specialize_type(Term *term, Term *type)

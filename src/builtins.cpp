@@ -37,7 +37,7 @@ Term* TYPE_TYPE = NULL;
 Term* FUNCTION_TYPE = NULL;
 Term* CODEUNIT_TYPE = NULL;
 Term* SUBROUTINE_TYPE = NULL;
-Term* COMPOUND_TYPE_TYPE = NULL;
+Term* COMPOUND_TYPE = NULL;
 Term* BRANCH_TYPE = NULL;
 Term* ANY_TYPE = NULL;
 Term* VOID_TYPE = NULL;
@@ -274,6 +274,12 @@ void initialize_constants()
     KERNEL->bindName(CONSTANT_FALSE, "false");
 }
 
+void CompoundType__init(Term* term)
+{
+    // create parent
+
+}
+
 void initialize_compound_types(Branch* kernel)
 {
     LIST_TYPE = quick_create_cpp_type<List>(kernel, "List");
@@ -289,19 +295,19 @@ void initialize_compound_types(Branch* kernel)
         }
     */
 
-    COMPOUND_TYPE_TYPE = create_constant(kernel, LIST_TYPE);
-    kernel->bindName(COMPOUND_TYPE_TYPE, "CompoundType");
+    COMPOUND_TYPE = create_constant(kernel, LIST_TYPE);
+    kernel->bindName(COMPOUND_TYPE, "CompoundType");
 
-    // parent
-    as_list(COMPOUND_TYPE_TYPE).appendSlot(REFERENCE_TYPE)->asRef() = TYPE_TYPE;
+    // parent instance
+    as_list(COMPOUND_TYPE).appendSlot(TYPE_TYPE);
 
     // fields
-    Term* CompoundType_fields = as_list(COMPOUND_TYPE_TYPE).appendSlot(LIST_TYPE);
+    Term* CompoundType_fields = as_list(COMPOUND_TYPE).appendSlot(LIST_TYPE);
 
     // field 0: (ref 'parent')
     Term* CompoundType_field0 = as_list(CompoundType_fields).appendSlot(LIST_TYPE);
-    as_list(CompoundType_field0).appendSlot(REFERENCE_TYPE)->asRef() = REFERENCE_TYPE;
-    as_list(CompoundType_field0).appendSlot(STRING_TYPE)->asString() = "type";
+    as_list(CompoundType_field0).appendSlot(REFERENCE_TYPE)->asRef() = TYPE_TYPE;
+    as_list(CompoundType_field0).appendSlot(STRING_TYPE)->asString() = "parent";
 
     // field 1: (list 'fields')
     Term* CompoundType_field1 = as_list(CompoundType_fields).appendSlot(LIST_TYPE);
@@ -309,7 +315,7 @@ void initialize_compound_types(Branch* kernel)
     as_list(CompoundType_field1).appendSlot(STRING_TYPE)->asString() = "fields";
 
     // bootstrap
-    COMPOUND_TYPE_TYPE->type = COMPOUND_TYPE_TYPE;
+    COMPOUND_TYPE->type = COMPOUND_TYPE;
 }
 
 void initialize_builtin_functions(Branch* code)

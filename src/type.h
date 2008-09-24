@@ -11,6 +11,7 @@ namespace circa {
 struct Type
 {
     typedef void (*AllocFunc)(Term* term);
+    typedef void (*InitializeFunc)(Term* term);
     typedef void (*DeallocFunc)(Term* term);
     typedef void (*DuplicateFunc)(Term* src, Term* dest);
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
@@ -28,6 +29,7 @@ struct Type
 
     // Functions
     AllocFunc alloc;
+    InitializeFunc init;
     DeallocFunc dealloc;
     DuplicateFunc duplicate;
     EqualsFunc equals;

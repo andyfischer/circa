@@ -60,7 +60,8 @@ void test_instantiate_compound_value()
 
 void bootstrapped_objects()
 {
-    test_assert(get_parent_type(COMPOUND_TYPE_TYPE) == TYPE_TYPE);
+    test_assert(get_parent_type(COMPOUND_TYPE) == TYPE_TYPE);
+    test_assert(get_parent(COMPOUND_TYPE)->type == TYPE_TYPE);
 }
 
 } // namespace type_tests

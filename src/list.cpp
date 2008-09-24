@@ -49,7 +49,7 @@ List::toReferenceList()
 
 List& as_list(Term* term)
 {
-    if (term->type != LIST_TYPE && term->type != COMPOUND_TYPE_TYPE)
+    if (term->type != LIST_TYPE && term->type != COMPOUND_TYPE)
         throw errors::TypeError(term, LIST_TYPE);
     return *((List*) term->value);
 }
