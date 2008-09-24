@@ -44,8 +44,11 @@ struct Type
     void addMemberFunction(std::string const& name, Term* function);
 };
 
+// Get the parent type of 'type'. 'type' must be an instance of CompoundType
 Term* get_parent_type(Term *type);
+
 Term* get_parent(Term *term);
+
 
 // Return 'term' as an instance of 'type'. In the simple case, if 'term' is
 // an instance of 'type', just return it. If 'term' is a derived type, then
@@ -61,6 +64,9 @@ void assert_instance(Term* term, Term* type);
 
 bool is_type(Term* term);
 Type* as_type(Term* term);
+
+// 'term' must be a compound value
+Term* get_field(Term *term, std::string const& fieldName);
 
 void unsafe_change_type(Term* term, Term* type);
 void change_type(Term* term, Term* type);
