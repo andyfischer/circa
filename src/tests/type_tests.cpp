@@ -62,6 +62,11 @@ void bootstrapped_objects()
 {
     test_assert(get_parent_type(COMPOUND_TYPE) == TYPE_TYPE);
     test_assert(get_parent(COMPOUND_TYPE)->type == TYPE_TYPE);
+
+    test_assert(get_as(COMPOUND_TYPE, COMPOUND_TYPE) == COMPOUND_TYPE);
+
+    test_assert(get_as(COMPOUND_TYPE, TYPE_TYPE) != NULL);
+    test_assert(get_as(COMPOUND_TYPE, TYPE_TYPE)->type == TYPE_TYPE);
 }
 
 } // namespace type_tests
