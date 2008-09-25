@@ -74,11 +74,25 @@ void bootstrapped_objects()
     test_assert(get_field(COMPOUND_TYPE, "fields") != NULL);
 }
 
+void compound_types()
+{
+    Branch branch;
+
+    Term* type1 = eval_statement(branch, "type1 = CompoundType()");
+    test_assert(type1 != NULL);
+    test_assert(get_field(type1, "parent")->type == TYPE_TYPE);
+
+    Term* type2 = eval_statement(branch, "type2 = CompoundType()");
+    test_assert(type2 != NULL);
+    test_assert(get_field(type1, "parent") != get_field(type2, "parent"));
+}
+
 } // namespace type_tests
 
 void register_type_tests()
 {
     REGISTER_TEST_CASE(type_tests::bootstrapped_objects);
+    REGISTER_TEST_CASE(type_tests::compound_types);
 }
 
 } // namespace circa

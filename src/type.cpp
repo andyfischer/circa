@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "cpp_interface.h"
 #include "errors.h"
 #include "function.h"
 #include "list.h"
@@ -75,6 +76,8 @@ Term* get_parent(Term *term)
 
 Term* get_as(Term *term, Term *type)
 {
+    assert(term != NULL);
+
     if (term->type == type)
         return term;
 
@@ -90,6 +93,8 @@ Term* get_as(Term *term, Term *type)
 
 bool is_instance(Term *term, Term *type)
 {
+    assert(term != NULL);
+
     // Special case during bootstrapping.
     if (CURRENTLY_BOOTSTRAPPING && type == NULL)
         return true;
@@ -101,6 +106,8 @@ bool is_instance(Term *term, Term *type)
 
 void assert_instance(Term *term, Term *type)
 {
+    assert(term != NULL);
+
     if (!is_instance(term, type))
         throw errors::TypeError(term, type);
 }
@@ -112,8 +119,9 @@ bool is_type(Term *term)
 
 Type* as_type(Term *term)
 {
-    term = get_as(term, TYPE_TYPE);
+    assert(term != NULL);
     assert_instance(term, TYPE_TYPE);
+    term = get_as(term, TYPE_TYPE);
     return (Type*) term->value;
 }
 
@@ -143,12 +151,27 @@ void Type_alloc(Term *caller)
 
 void Type_dealloc(Term* caller)
 {
-    // todo
+    delete as_type(caller);
 }
 
 std::string Type_toString(Term *caller)
 {
     return std::string("<Type " + as_type(caller)->name + ">");
+}
+
+void CompoundType__alloc(Term *caller)
+{
+    cpp_interface::templated_alloc<List>(caller);
+
+    List& fields = as_list(get_compound_type_fields(caller->type));
+
+    for (int i=0; i < fields.count(); i++)
+        as_list(caller).appendSlot(get_field_type(fields[i])->asRef());
+}
+
+void CompoundType__dealloc(Term *caller)
+{
+    cpp_interface::templated_dealloc<List>(caller);
 }
 
 void set_member_function(Term *type, std::string name, Term *function)
@@ -222,6 +245,48 @@ Term* create_empty_type(Branch* branch)
     type->alloc = type_private::empty_function;
     type->dealloc = type_private::empty_function;
     return term;
+}
+
+void initialize_compound_types(Branch* kernel)
+{
+    LIST_TYPE = quick_create_cpp_type<List>(kernel, "List");
+
+    /* 
+        type CompoundType {
+            Ref parent
+            List<Field> fields
+        }
+        type Field {
+            Ref type
+            String name
+        }
+    */
+
+    COMPOUND_TYPE = create_constant(kernel, LIST_TYPE);
+    kernel->bindName(COMPOUND_TYPE, "CompoundType");
+
+    // parent instance, type
+    as_list(COMPOUND_TYPE).appendSlot(TYPE_TYPE);
+
+    // fields
+    Term* CompoundType_fields = as_list(COMPOUND_TYPE).appendSlot(LIST_TYPE);
+
+    // field 0: (ref 'parent')
+    Term* CompoundType_field0 = as_list(CompoundType_fields).appendSlot(LIST_TYPE);
+    as_list(CompoundType_field0).appendSlot(REFERENCE_TYPE)->asRef() = TYPE_TYPE;
+    as_list(CompoundType_field0).appendSlot(STRING_TYPE)->asString() = "parent";
+
+    // field 1: (list 'fields')
+    Term* CompoundType_field1 = as_list(CompoundType_fields).appendSlot(LIST_TYPE);
+    as_list(CompoundType_field1).appendSlot(REFERENCE_TYPE)->asRef() = LIST_TYPE;
+    as_list(CompoundType_field1).appendSlot(STRING_TYPE)->asString() = "fields";
+
+    // bootstrap
+    COMPOUND_TYPE->type = COMPOUND_TYPE;
+
+    as_type(COMPOUND_TYPE)->name = "CompoundType";
+    as_type(COMPOUND_TYPE)->alloc = CompoundType__alloc;
+    as_type(COMPOUND_TYPE)->dealloc = CompoundType__dealloc;
 }
 
 } // namespace circa
