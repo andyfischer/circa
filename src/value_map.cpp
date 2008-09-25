@@ -67,7 +67,7 @@ void initialize_map_function(Branch* kernel)
     Term* accessFunc = quick_create_function(kernel, "map-access", map_access__evaluate,
         ReferenceList(MAP_TYPE, ANY_TYPE), ANY_TYPE);
 
-    Term* setFunc = quick_create_function(kernel, "map-set", map_set__evaluate,
+    quick_create_function(kernel, "map-set", map_set__evaluate,
         ReferenceList(MAP_TYPE, ANY_TYPE, ANY_TYPE), MAP_TYPE);
     
     as_type(MAP_TYPE)->addMemberFunction("", accessFunc);

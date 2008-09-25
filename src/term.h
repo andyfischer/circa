@@ -9,6 +9,8 @@
 
 namespace circa {
 
+struct List;
+
 typedef std::vector<std::string> ErrorList;
 
 struct Term
@@ -21,9 +23,7 @@ struct Term
     // data type
     Term* type;
 
-    // Our raw value. This is meant to be transient. For example, if we are a pure
-    // function, the executor is allowed to reevaluate us at any time, and is thus
-    // allowed to (temporarily) throw out our value.
+    // Our current value. This is meant to be transient.
     void* value;
 
     // Persisted value. Owned by us.
@@ -56,6 +56,7 @@ struct Term
     std::string& asString();
     bool& asBool();
     Term*& asRef();
+    List& asList();
 
     void eval();
 };

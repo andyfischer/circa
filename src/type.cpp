@@ -174,6 +174,7 @@ void CompoundType__dealloc(Term *caller)
 void CompoundType__create_compound_type__evaluate(Term* caller)
 {
     std::string name = as_string(caller->inputs[0]);
+    *as_type(caller) = *as_type(LIST_TYPE);
     as_type(caller)->alloc = CompoundType__alloc;
     as_type(caller)->dealloc = CompoundType__dealloc;
 }
@@ -291,6 +292,7 @@ void initialize_compound_types(Branch* kernel)
     COMPOUND_TYPE->type = COMPOUND_TYPE;
 
     as_type(COMPOUND_TYPE)->name = "CompoundType";
+    *as_type(COMPOUND_TYPE) = *as_type(LIST_TYPE);
     as_type(COMPOUND_TYPE)->alloc = CompoundType__alloc;
     as_type(COMPOUND_TYPE)->dealloc = CompoundType__dealloc;
 

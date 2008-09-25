@@ -248,11 +248,11 @@ void initialize_subroutine(Branch* kernel)
         ReferenceList(STRING_TYPE,LIST_TYPE,TYPE_TYPE),
         SUBROUTINE_TYPE);
 
-    Term* name_input = quick_create_function(kernel,
+    quick_create_function(kernel,
         "subroutine-name-input", subroutine_name_input__evaluate,
         ReferenceList(SUBROUTINE_TYPE, INT_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
 
-    Term* name_inputs = quick_create_function(kernel,
+    quick_create_function(kernel,
         "subroutine-name-inputs", subroutine_name_inputs__evaluate,
         ReferenceList(SUBROUTINE_TYPE, LIST_TYPE), SUBROUTINE_TYPE);
 

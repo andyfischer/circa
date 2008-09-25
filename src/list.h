@@ -14,6 +14,12 @@ private:
     Branch branch;
 public:
 
+    // Default constructor
+    List() {}
+
+    // Copy constructor
+    List(List const& copy);
+
     int count() const { return items.count(); }
     Term* get(int index) const { return items.get(index); }
     Term* operator[] (int index) const{ return this->get(index); }

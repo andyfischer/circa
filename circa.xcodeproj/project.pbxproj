@@ -18,7 +18,6 @@
 		B6A243FD0E3D6414007F2BEB /* bootstrapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */; };
 		B6A243FF0E3D6414007F2BEB /* all_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A243FA0E3D6414007F2BEB /* all_tests.cpp */; };
 		B6A244290E3ED540007F2BEB /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A244250E3ED540007F2BEB /* common.cpp */; };
-		B6A2449B0E42A41B007F2BEB /* term_list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6A244990E42A41B007F2BEB /* term_list.cpp */; };
 		B6B06CE40E7F480700671D05 /* compilation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CD80E7F480700671D05 /* compilation.cpp */; };
 		B6B06CE50E7F480700671D05 /* evaluation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CDB0E7F480700671D05 /* evaluation.cpp */; };
 		B6B06CE60E7F480700671D05 /* builtin_libraries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CDE0E7F480700671D05 /* builtin_libraries.cpp */; };
@@ -38,6 +37,8 @@
 		B6BA5C090E622F1900B4C3A0 /* subroutine_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5C010E622F1900B4C3A0 /* subroutine_tests.cpp */; };
 		B6BA5C0A0E622F1900B4C3A0 /* tokenizer_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5C020E622F1900B4C3A0 /* tokenizer_tests.cpp */; };
 		B6BCE0A60E6477F70062B391 /* syntax_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BCE0A50E6477F70062B391 /* syntax_errors.cpp */; };
+		B6DB9E590E8C035C004811E1 /* list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6DB9E550E8C035C004811E1 /* list.cpp */; };
+		B6DB9E5A0E8C035C004811E1 /* ref_list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6DB9E570E8C035C004811E1 /* ref_list.cpp */; };
 		B6EEE5890E670E9B009E2FA2 /* cpp_interface_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6EEE5880E670E9B009E2FA2 /* cpp_interface_tests.cpp */; };
 		B6F114C00E33394F00B8BA44 /* branch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114A10E33394F00B8BA44 /* branch.cpp */; };
 		B6F114C40E33394F00B8BA44 /* builtins.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114A70E33394F00B8BA44 /* builtins.cpp */; };
@@ -80,8 +81,6 @@
 		B6A243FB0E3D6414007F2BEB /* all_tests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = all_tests.h; sourceTree = "<group>"; };
 		B6A244250E3ED540007F2BEB /* common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common.cpp; sourceTree = "<group>"; };
 		B6A244260E3ED540007F2BEB /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
-		B6A244990E42A41B007F2BEB /* term_list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = term_list.cpp; sourceTree = "<group>"; };
-		B6A2449A0E42A41B007F2BEB /* term_list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = term_list.h; sourceTree = "<group>"; };
 		B6B06CD80E7F480700671D05 /* compilation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compilation.cpp; sourceTree = "<group>"; };
 		B6B06CD90E7F480700671D05 /* compilation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compilation.h; sourceTree = "<group>"; };
 		B6B06CDA0E7F480700671D05 /* essentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = essentials.h; sourceTree = "<group>"; };
@@ -114,6 +113,10 @@
 		B6BA5C010E622F1900B4C3A0 /* subroutine_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = subroutine_tests.cpp; sourceTree = "<group>"; };
 		B6BA5C020E622F1900B4C3A0 /* tokenizer_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tokenizer_tests.cpp; sourceTree = "<group>"; };
 		B6BCE0A50E6477F70062B391 /* syntax_errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = syntax_errors.cpp; sourceTree = "<group>"; };
+		B6DB9E550E8C035C004811E1 /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list.cpp; sourceTree = "<group>"; };
+		B6DB9E560E8C035C004811E1 /* list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
+		B6DB9E570E8C035C004811E1 /* ref_list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ref_list.cpp; sourceTree = "<group>"; };
+		B6DB9E580E8C035C004811E1 /* ref_list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ref_list.h; sourceTree = "<group>"; };
 		B6EEE5880E670E9B009E2FA2 /* cpp_interface_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cpp_interface_tests.cpp; sourceTree = "<group>"; };
 		B6F114A10E33394F00B8BA44 /* branch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = branch.cpp; sourceTree = "<group>"; };
 		B6F114A20E33394F00B8BA44 /* branch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = branch.h; sourceTree = "<group>"; };
@@ -210,6 +213,12 @@
 		B6F114A00E33394F00B8BA44 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				B6B06CDD0E7F480700671D05 /* libraries */,
+				B6A243F90E3D6414007F2BEB /* tests */,
+				B6DB9E550E8C035C004811E1 /* list.cpp */,
+				B6DB9E560E8C035C004811E1 /* list.h */,
+				B6DB9E570E8C035C004811E1 /* ref_list.cpp */,
+				B6DB9E580E8C035C004811E1 /* ref_list.h */,
 				B6B06CFD0E7F491300671D05 /* values.cpp */,
 				B6B06CFE0E7F491300671D05 /* values.h */,
 				B6B06CD80E7F480700671D05 /* compilation.cpp */,
@@ -217,7 +226,6 @@
 				B6B06CDA0E7F480700671D05 /* essentials.h */,
 				B6B06CDB0E7F480700671D05 /* evaluation.cpp */,
 				B6B06CDC0E7F480700671D05 /* evaluation.h */,
-				B6B06CDD0E7F480700671D05 /* libraries */,
 				B6B06CE20E7F480700671D05 /* primitive_types.cpp */,
 				B6B06CE30E7F480700671D05 /* primitive_types.h */,
 				B6769D660E70D2E900BC7FAE /* importing.cpp */,
@@ -234,7 +242,6 @@
 				B6BA5BF40E622ED800B4C3A0 /* token_stream.h */,
 				B6BA5BF50E622ED800B4C3A0 /* tokenizer.cpp */,
 				B6BA5BF60E622ED800B4C3A0 /* tokenizer.h */,
-				B6A243F90E3D6414007F2BEB /* tests */,
 				B6A243F30E3D6414007F2BEB /* bootstrapping.cpp */,
 				B6A243F40E3D6414007F2BEB /* bootstrapping.h */,
 				B6F114A10E33394F00B8BA44 /* branch.cpp */,
@@ -252,8 +259,6 @@
 				B6F115170E34F4B300B8BA44 /* operations.h */,
 				B6F114B60E33394F00B8BA44 /* subroutine.cpp */,
 				B6F114B70E33394F00B8BA44 /* subroutine.h */,
-				B6A244990E42A41B007F2BEB /* term_list.cpp */,
-				B6A2449A0E42A41B007F2BEB /* term_list.h */,
 				B68D10CB0E47685600C6D09A /* term_map.cpp */,
 				B68D10CC0E47685600C6D09A /* term_map.h */,
 				B6B436C90E47E64F00E3B337 /* term_set.h */,
@@ -328,7 +333,6 @@
 				B6A243FD0E3D6414007F2BEB /* bootstrapping.cpp in Sources */,
 				B6A243FF0E3D6414007F2BEB /* all_tests.cpp in Sources */,
 				B6A244290E3ED540007F2BEB /* common.cpp in Sources */,
-				B6A2449B0E42A41B007F2BEB /* term_list.cpp in Sources */,
 				B68D10CD0E47685600C6D09A /* term_map.cpp in Sources */,
 				B6BA5BF70E622ED800B4C3A0 /* ast.cpp in Sources */,
 				B6BA5BF90E622ED800B4C3A0 /* parser.cpp in Sources */,
@@ -355,6 +359,8 @@
 				B6B06CEB0E7F481B00671D05 /* error_tests.cpp in Sources */,
 				B6B06CEC0E7F481B00671D05 /* type_tests.cpp in Sources */,
 				B6B06CFF0E7F491300671D05 /* values.cpp in Sources */,
+				B6DB9E590E8C035C004811E1 /* list.cpp in Sources */,
+				B6DB9E5A0E8C035C004811E1 /* ref_list.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
