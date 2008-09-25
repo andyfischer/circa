@@ -59,6 +59,8 @@ void empty_alloc_function(Term*) { }
 
 void const_generator(Term* caller)
 {
+    assert(caller->inputs[0] != NULL);
+
     Function *output = as_function(caller);
     Type* type = as_type(caller->inputs[0]);
     output->name = "const-" + type->name;
@@ -272,50 +274,6 @@ void initialize_constants()
     CONSTANT_FALSE = apply_function(KERNEL, BOOL_TYPE, ReferenceList());
     as_bool(CONSTANT_FALSE) = false;
     KERNEL->bindName(CONSTANT_FALSE, "false");
-}
-
-void CompoundType__init(Term* term)
-{
-    // create parent
-
-}
-
-void initialize_compound_types(Branch* kernel)
-{
-    LIST_TYPE = quick_create_cpp_type<List>(kernel, "List");
-
-    /* 
-        type CompoundType {
-            Ref parent
-            List<Field> fields
-        }
-        type Field {
-            Ref type
-            String name
-        }
-    */
-
-    COMPOUND_TYPE = create_constant(kernel, LIST_TYPE);
-    kernel->bindName(COMPOUND_TYPE, "CompoundType");
-
-    // parent instance
-    as_list(COMPOUND_TYPE).appendSlot(TYPE_TYPE);
-
-    // fields
-    Term* CompoundType_fields = as_list(COMPOUND_TYPE).appendSlot(LIST_TYPE);
-
-    // field 0: (ref 'parent')
-    Term* CompoundType_field0 = as_list(CompoundType_fields).appendSlot(LIST_TYPE);
-    as_list(CompoundType_field0).appendSlot(REFERENCE_TYPE)->asRef() = TYPE_TYPE;
-    as_list(CompoundType_field0).appendSlot(STRING_TYPE)->asString() = "parent";
-
-    // field 1: (list 'fields')
-    Term* CompoundType_field1 = as_list(CompoundType_fields).appendSlot(LIST_TYPE);
-    as_list(CompoundType_field1).appendSlot(REFERENCE_TYPE)->asRef() = LIST_TYPE;
-    as_list(CompoundType_field1).appendSlot(STRING_TYPE)->asString() = "fields";
-
-    // bootstrap
-    COMPOUND_TYPE->type = COMPOUND_TYPE;
 }
 
 void initialize_builtin_functions(Branch* code)

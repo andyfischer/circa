@@ -80,6 +80,8 @@ Term* get_member_function(Term* type, std::string name);
 
 Term* create_empty_type(Branch* branch);
 
+void initialize_compound_types(Branch* kernel);
+
 } // namespace circa
 
 #endif
