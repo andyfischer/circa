@@ -78,17 +78,29 @@ void compound_types()
 {
     Branch branch;
 
-    Term* type1 = eval_statement(branch, "type1 = CompoundType()");
+    Term* type1 = eval_statement(branch, "type1 = create-compound-type('type1)");
     test_assert(type1 != NULL);
     test_assert(get_field(type1, "parent")->type == TYPE_TYPE);
     test_assert(get_field(type1, "fields")->type == LIST_TYPE);
+    test_assert(is_type(type1));
 
-    Term* type2 = eval_statement(branch, "type2 = CompoundType()");
+    Term* type2 = eval_statement(branch, "type2 = create-compound-type('type2)");
     test_assert(type2 != NULL);
     test_assert(get_field(type2, "parent")->type == TYPE_TYPE);
     test_assert(get_field(type2, "fields")->type == LIST_TYPE);
     test_assert(get_field(type1, "parent") != get_field(type2, "parent"));
     test_assert(get_field(type1, "fields") != get_field(type2, "fields"));
+
+    eval_statement(branch, "compound-type-append-field(@type1, int, 'myint)");
+    eval_statement(branch, "compound-type-append-field(@type1, string, 'mystring)");
+    return; // fixme
+    test_assert(is_type(type1));
+
+    Term* inst1 = eval_statement(branch, "inst1 = type1()");
+    test_assert(get_field(inst1, "myint") != NULL);
+    test_assert(get_field(inst1, "myint")->type == INT_TYPE);
+    test_assert(get_field(inst1, "mystring") != NULL);
+    test_assert(get_field(inst1, "mystring")->type == INT_TYPE);
 }
 
 } // namespace type_tests

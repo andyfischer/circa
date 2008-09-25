@@ -29,27 +29,14 @@ List::appendSlot(Term* type)
     return newTerm;
 }
 
-void
-List::clear()
+bool is_list(Term* term)
 {
-    items.clear();
-    branch.clear();
-}
-
-ReferenceList
-List::toReferenceList()
-{
-    ReferenceList result;
-
-    for (int i=0; i < items.count(); i++)
-        result.append(as_ref(items[i]));
-
-    return result;
+    return (term->type == LIST_TYPE || term->type == COMPOUND_TYPE);
 }
 
 List& as_list(Term* term)
 {
-    if (term->type != LIST_TYPE && term->type != COMPOUND_TYPE)
+    if (!is_list(term))
         throw errors::TypeError(term, LIST_TYPE);
     return *((List*) term->value);
 }
