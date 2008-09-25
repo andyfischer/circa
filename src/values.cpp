@@ -25,7 +25,7 @@ void recycle_value(Term* source, Term* dest)
         throw errors::TypeError(dest, source->type);
 
     // Don't steal if the term has multiple users
-    bool steal = (source->users.count() > 1);
+    // bool steal = (source->users.count() > 1);
 
     // Temp: always try to steal
     steal_value(source, dest);

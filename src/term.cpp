@@ -10,6 +10,7 @@
 #include "errors.h"
 #include "evaluation.h"
 #include "function.h"
+#include "list.h"
 #include "operations.h"
 #include "term.h"
 #include "type.h"
@@ -162,6 +163,11 @@ bool& Term::asBool()
 Term*& Term::asRef()
 {
     return as_ref(this);
+}
+
+List& Term::asList()
+{
+    return as_list(this);
 }
 
 void Term::eval()

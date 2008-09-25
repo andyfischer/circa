@@ -91,9 +91,11 @@ void compound_types()
     test_assert(get_field(type1, "parent") != get_field(type2, "parent"));
     test_assert(get_field(type1, "fields") != get_field(type2, "fields"));
 
+    test_assert(is_type(type1));
     eval_statement(branch, "compound-type-append-field(@type1, int, 'myint)");
+    return;
+    test_assert(is_type(type1));
     eval_statement(branch, "compound-type-append-field(@type1, string, 'mystring)");
-    return; // fixme
     test_assert(is_type(type1));
 
     Term* inst1 = eval_statement(branch, "inst1 = type1()");

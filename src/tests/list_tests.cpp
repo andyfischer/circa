@@ -9,9 +9,49 @@
 #include "operations.h"
 #include "parser.h"
 #include "term.h"
+#include "values.h"
 
 namespace circa {
 namespace list_tests {
+
+void create()
+{
+    Branch branch;
+
+    Term* list1 = eval_statement(branch, "list1 = list(1, 'pie, 2.0)");
+
+    test_assert(list1->asList()[0]->asInt() == 1);
+    test_assert(list1->asList()[0]->asInt() != 2);
+    test_assert(list1->asList()[1]->asString() == "pie");
+    test_assert(list1->asList()[2]->asFloat() == 2.0);
+
+    // make sure items are copied by value
+    eval_statement(branch, "a = 5");
+    Term* list2 = eval_statement(branch, "list2 = list(a)");
+    test_assert(list2->asList()[0]->asInt() == 5);
+    // branch["a"]->asInt() = 6; fixme, need to disable value stealing
+    // test_assert(list2->asList()[0]->asInt() == 5);
+}
+
+void operations()
+{
+    Branch branch;
+
+    Term* list1 = eval_statement(branch, "list1 = list('pie)");
+    Term* list2 = eval_statement(branch, "list2 = list()");
+
+    duplicate_value(list1, list2);
+
+    test_assert(list1->asList()[0]->asString() == "pie");
+    test_assert(list2->asList()[0]->asString() == "pie");
+    list1->asList()[0]->asString() = "cake";
+    test_assert(list2->asList()[0]->asString() == "pie");
+
+    steal_value(list1, list2);
+
+    test_assert(list1->value == NULL);
+    test_assert(list2->asList()[0]->asString() == "cake");
+}
 
 void range()
 {
@@ -37,6 +77,8 @@ void list_apply()
 
 void register_list_tests()
 {
+    REGISTER_TEST_CASE(list_tests::create);
+    REGISTER_TEST_CASE(list_tests::operations);
     REGISTER_TEST_CASE(list_tests::range);
     REGISTER_TEST_CASE(list_tests::list_apply);
 }

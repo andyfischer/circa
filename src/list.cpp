@@ -12,6 +12,14 @@
 
 namespace circa {
 
+List::List(List const& copy)
+{
+    for (int i=0; i < copy.count(); i++) {
+        Term* term = appendSlot(copy[i]->type);
+        duplicate_value(copy[i], term);
+    }
+}
+
 Term*
 List::append(Term* term)
 {
