@@ -126,7 +126,7 @@ void hosted_apply_function(Term* caller)
     if (is_type(function))
     {
         if (inputs.count() != 0) {
-            caller->pushError("Multiple inputs in constructor not supported");
+            caller->pushError("Arguments in constructor not supported yet");
             return;
         }
 

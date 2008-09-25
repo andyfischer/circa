@@ -15,19 +15,7 @@
 
 namespace circa {
 
-Type::Type()
-  : name(""),
-    dataSize(sizeof(void*)),
-    alloc(NULL),
-    init(NULL),
-    dealloc(NULL),
-    duplicate(NULL),
-    equals(NULL),
-    compare(NULL),
-    remapPointers(NULL),
-    toString(NULL)
-{
-}
+void CompoundType__dealloc(Term* caller);
 
 void
 Type::addMemberFunction(std::string const &name, Term *function)
@@ -78,6 +66,7 @@ Term* get_parent(Term *term)
 {
     assert(term != NULL);
     assert(term->type->type == COMPOUND_TYPE);
+    assert(is_list(term));
     return as_list(term)[0];
 }
 
@@ -166,6 +155,7 @@ std::string Type_toString(Term *caller)
     return std::string("<Type " + as_type(caller)->name + ">");
 }
 
+
 void CompoundType__alloc(Term *caller)
 {
     cpp_interface::templated_alloc<List>(caller);
@@ -181,6 +171,13 @@ void CompoundType__dealloc(Term *caller)
     cpp_interface::templated_dealloc<List>(caller);
 }
 
+void CompoundType__create_compound_type__evaluate(Term* caller)
+{
+    std::string name = as_string(caller->inputs[0]);
+    as_type(caller)->alloc = CompoundType__alloc;
+    as_type(caller)->dealloc = CompoundType__dealloc;
+}
+
 void CompoundType__append_field__evaluate(Term *caller)
 {
     recycle_value(caller->inputs[0], caller);
@@ -190,6 +187,7 @@ void CompoundType__append_field__evaluate(Term *caller)
     compound_type_append_field(caller, type, name);
 }
 
+/*
 void set_member_function(Term *type, std::string name, Term *function)
 {
     Type* typeData = as_type(type);
@@ -201,7 +199,7 @@ void set_member_function(Term *type, std::string name, Term *function)
 Term* get_member_function(Term* type, std::string name)
 {
     return as_type(type)->memberFunctions[name];
-}
+}*/
 
 void unsafe_change_type(Term *term, Term *type)
 {
@@ -296,7 +294,12 @@ void initialize_compound_types(Branch* kernel)
     as_type(COMPOUND_TYPE)->alloc = CompoundType__alloc;
     as_type(COMPOUND_TYPE)->dealloc = CompoundType__dealloc;
 
-    quick_create_function(kernel, "append-field",
+
+    quick_create_function(kernel, "create-compound-type",
+            CompoundType__create_compound_type__evaluate,
+            ReferenceList(STRING_TYPE),
+            COMPOUND_TYPE);
+    quick_create_function(kernel, "compound-type-append-field",
             CompoundType__append_field__evaluate,
             ReferenceList(COMPOUND_TYPE, TYPE_TYPE, STRING_TYPE),
             COMPOUND_TYPE);

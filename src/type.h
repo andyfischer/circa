@@ -39,7 +39,18 @@ struct Type
     // argument.
     TermNamespace memberFunctions;
 
-    Type();
+    Type() :
+        name(""),
+        dataSize(sizeof(void*)),
+        alloc(NULL),
+        init(NULL),
+        dealloc(NULL),
+        duplicate(NULL),
+        equals(NULL),
+        compare(NULL),
+        remapPointers(NULL),
+        toString(NULL)
+    {}
 
     void addMemberFunction(std::string const& name, Term* function);
 };
