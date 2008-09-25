@@ -11,6 +11,7 @@
 #include "operations.h"
 #include "term.h"
 #include "type.h"
+#include "values.h"
 
 namespace circa {
 
@@ -41,14 +42,20 @@ Type::addMemberFunction(std::string const &name, Term *function)
 Term* get_compound_type_fields(Term *ct)
 {
     assert(ct != NULL);
-    assert(ct->type == COMPOUND_TYPE);
     return as_list(ct)[1];
 }
 
-Term* get_field_type(Term *field)
+Term* get_field_type(Term* field)
 {
     assert(field != NULL);
     return as_list(field)[0];
+}
+
+void compound_type_append_field(Term* ct, Term *type, std::string const& name)
+{
+    Term* field = as_list(get_compound_type_fields(ct)).appendSlot(LIST_TYPE);
+    as_list(field).appendSlot(REFERENCE_TYPE)->asRef() = type;
+    as_list(field).appendSlot(STRING_TYPE)->asString() = name;
 }
 
 Term* get_field_name(Term *field)
@@ -174,6 +181,15 @@ void CompoundType__dealloc(Term *caller)
     cpp_interface::templated_dealloc<List>(caller);
 }
 
+void CompoundType__append_field__evaluate(Term *caller)
+{
+    recycle_value(caller->inputs[0], caller);
+    Term* type = caller->inputs[1];
+    std::string name = as_string(caller->inputs[2]);
+
+    compound_type_append_field(caller, type, name);
+}
+
 void set_member_function(Term *type, std::string name, Term *function)
 {
     Type* typeData = as_type(type);
@@ -269,17 +285,9 @@ void initialize_compound_types(Branch* kernel)
     as_list(COMPOUND_TYPE).appendSlot(TYPE_TYPE);
 
     // fields
-    Term* CompoundType_fields = as_list(COMPOUND_TYPE).appendSlot(LIST_TYPE);
-
-    // field 0: (ref 'parent')
-    Term* CompoundType_field0 = as_list(CompoundType_fields).appendSlot(LIST_TYPE);
-    as_list(CompoundType_field0).appendSlot(REFERENCE_TYPE)->asRef() = TYPE_TYPE;
-    as_list(CompoundType_field0).appendSlot(STRING_TYPE)->asString() = "parent";
-
-    // field 1: (list 'fields')
-    Term* CompoundType_field1 = as_list(CompoundType_fields).appendSlot(LIST_TYPE);
-    as_list(CompoundType_field1).appendSlot(REFERENCE_TYPE)->asRef() = LIST_TYPE;
-    as_list(CompoundType_field1).appendSlot(STRING_TYPE)->asString() = "fields";
+    as_list(COMPOUND_TYPE).appendSlot(LIST_TYPE);
+    compound_type_append_field(COMPOUND_TYPE, TYPE_TYPE, "parent");
+    compound_type_append_field(COMPOUND_TYPE, LIST_TYPE, "fields");
 
     // bootstrap
     COMPOUND_TYPE->type = COMPOUND_TYPE;
@@ -287,6 +295,11 @@ void initialize_compound_types(Branch* kernel)
     as_type(COMPOUND_TYPE)->name = "CompoundType";
     as_type(COMPOUND_TYPE)->alloc = CompoundType__alloc;
     as_type(COMPOUND_TYPE)->dealloc = CompoundType__dealloc;
+
+    quick_create_function(kernel, "append-field",
+            CompoundType__append_field__evaluate,
+            ReferenceList(COMPOUND_TYPE, TYPE_TYPE, STRING_TYPE),
+            COMPOUND_TYPE);
 }
 
 } // namespace circa

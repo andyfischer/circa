@@ -81,10 +81,14 @@ void compound_types()
     Term* type1 = eval_statement(branch, "type1 = CompoundType()");
     test_assert(type1 != NULL);
     test_assert(get_field(type1, "parent")->type == TYPE_TYPE);
+    test_assert(get_field(type1, "fields")->type == LIST_TYPE);
 
     Term* type2 = eval_statement(branch, "type2 = CompoundType()");
     test_assert(type2 != NULL);
+    test_assert(get_field(type2, "parent")->type == TYPE_TYPE);
+    test_assert(get_field(type2, "fields")->type == LIST_TYPE);
     test_assert(get_field(type1, "parent") != get_field(type2, "parent"));
+    test_assert(get_field(type1, "fields") != get_field(type2, "fields"));
 }
 
 } // namespace type_tests
