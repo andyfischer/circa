@@ -83,14 +83,12 @@ void unsafe_change_type(Term* term, Term* type);
 void change_type(Term* term, Term* type);
 void specialize_type(Term* term, Term* type);
 
-void Type_alloc(Term* caller);
-void Type_dealloc(Term* caller);
-
 void set_member_function(Term* type, std::string name, Term* function);
 Term* get_member_function(Term* type, std::string name);
 
 Term* create_empty_type(Branch* branch);
 
+void initialize_type_type(Term* typeType);
 void initialize_compound_types(Branch* kernel);
 
 } // namespace circa

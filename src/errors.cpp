@@ -31,9 +31,9 @@ TypeError::message()
         return std::string("The type field of '") + offendingTerm->findName()
             + "' is not a type. (expected " + expected + ")";
 
-    return string("TypeError: expected " + as_type(expectedType)->name
-            + ", found " + as_type(offendingTerm->type)->name);
-            //+ " \"" + offendingTerm->findName()) + "\"";
+    return std::string("TypeError: expected " + as_type(expectedType)->name
+            + ", found " + as_type(offendingTerm->type)->name)
+            + " = " + offendingTerm->toString();
 }
 
 } // namespace errors
