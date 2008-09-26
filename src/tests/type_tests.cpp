@@ -11,53 +11,6 @@
 namespace circa {
 namespace type_tests {
 
-    /*
-
-void compound_type()
-{
-    CompoundType ctype;
-    ctype.addField(INT_TYPE, "int1");
-    test_assert(ctype.getType(0) == INT_TYPE);
-    test_assert(ctype.getName(0) == "int1");
-
-    Branch branch;
-    Term* t;
-    t = eval_statement(branch, "t = CompoundType()");
-    test_assert(as_compound_type(t).numFields() == 0);
-    t = eval_statement(branch, "compound-type-add-field(@t, int, 'myfield)");
-    test_assert(as_compound_type(t).getType(0) == INT_TYPE);
-    test_assert(as_compound_type(t).getName(0) == "myfield");
-    t = eval_statement(branch, "compound-type-add-field(@t, bool, \"a bool field\")");
-    test_assert(as_compound_type(t).getType(1) == BOOL_TYPE);
-    test_assert(as_compound_type(t).getName(1) == "a bool field");
-}
-
-void test_instantiate_compound_value()
-{
-    Branch branch;
-    Term* t;
-    t = eval_statement(branch, "t = CompoundType()");
-    t = eval_statement(branch, "compound-type-add-field(@t, int, 'a)");
-    t = eval_statement(branch, "compound-type-add-field(@t, string, 'b)");
-
-    CompoundValue value;
-
-    instantiate_compound_value(as_compound_type(t), value);
-
-    test_assert(value.getField(0)->type == INT_TYPE);
-    test_assert(value.getField(1)->type == STRING_TYPE);
-
-    t = eval_statement(branch, "t = CompoundType()");
-    t = eval_statement(branch, "compound-type-add-field(@t, float, 'a)");
-    t = eval_statement(branch, "compound-type-add-field(@t, float, 'b)");
-
-    instantiate_compound_value(as_compound_type(t), value);
-
-    test_assert(value.getField(0)->type == FLOAT_TYPE);
-    test_assert(value.getField(1)->type == FLOAT_TYPE);
-}
-*/
-
 void bootstrapped_objects()
 {
     test_assert(get_parent_type(COMPOUND_TYPE) == TYPE_TYPE);
@@ -72,6 +25,18 @@ void bootstrapped_objects()
 
     test_assert(get_field(COMPOUND_TYPE, "parent") == get_parent(COMPOUND_TYPE));
     test_assert(get_field(COMPOUND_TYPE, "fields") != NULL);
+
+    std::cout << "COMPOUND_TYPE = " << COMPOUND_TYPE->toString() << std::endl;
+
+    Branch branch;
+    Term* typeA = eval_statement(branch, "typeA = CompoundType()");
+
+    return;
+
+    eval_statement(branch, "compound-type-append-field(@type1, int, 'I)");
+    typeA = eval_statement(branch, "compound-type-append-field(@type1, string, 'S)");
+
+    std::cout << "typeA = " << typeA->toString() << std::endl;
 }
 
 void compound_types()
@@ -92,13 +57,14 @@ void compound_types()
     test_assert(get_field(type1, "fields") != get_field(type2, "fields"));
 
     test_assert(is_type(type1));
-    eval_statement(branch, "compound-type-append-field(@type1, int, 'myint)");
-    return; // FIXME
+    std::cout << type1->toString() << std::endl;
+    type1 = eval_statement(branch, "compound-type-append-field(@type1, int, 'myint)");
+    std::cout << type1->toString() << std::endl;
     test_assert(is_type(type1));
-    eval_statement(branch, "compound-type-append-field(@type1, string, 'mystring)");
+    type1 = eval_statement(branch, "compound-type-append-field(@type1, string, 'mystring)");
     test_assert(is_type(type1));
 
-    Term* inst1 = eval_statement(branch, "inst1 = type1()");
+    Term* inst1 = eval_statement(branch, "inst1 = type1()"); // <-- death here
     test_assert(get_field(inst1, "myint") != NULL);
     test_assert(get_field(inst1, "myint")->type == INT_TYPE);
     test_assert(get_field(inst1, "mystring") != NULL);

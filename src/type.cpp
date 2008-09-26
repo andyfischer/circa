@@ -27,6 +27,12 @@ Type::addMemberFunction(std::string const &name, Term *function)
     this->memberFunctions.bind(function, name);
 }
 
+Term* get_compound_type_parent(Term *ct)
+{
+    assert(ct != NULL);
+    return as_list(ct)[0];
+}
+
 Term* get_compound_type_fields(Term *ct)
 {
     assert(ct != NULL);
@@ -36,7 +42,15 @@ Term* get_compound_type_fields(Term *ct)
 Term* get_field_type(Term* field)
 {
     assert(field != NULL);
+    assert(is_list(field));
     return as_list(field)[0];
+}
+
+Term* get_field_name(Term *field)
+{
+    assert(field != NULL);
+    assert(is_list(field));
+    return as_list(field)[1];
 }
 
 void compound_type_append_field(Term* ct, Term *type, std::string const& name)
@@ -44,12 +58,6 @@ void compound_type_append_field(Term* ct, Term *type, std::string const& name)
     Term* field = as_list(get_compound_type_fields(ct)).appendSlot(LIST_TYPE);
     as_list(field).appendSlot(REFERENCE_TYPE)->asRef() = type;
     as_list(field).appendSlot(STRING_TYPE)->asString() = name;
-}
-
-Term* get_field_name(Term *field)
-{
-    assert(field != NULL);
-    return as_list(field)[1];
 }
 
 Term* get_parent_type(Term *type)
@@ -155,15 +163,23 @@ std::string Type_toString(Term *caller)
     return std::string("<Type " + as_type(caller)->name + ">");
 }
 
-
 void CompoundType__alloc(Term *caller)
 {
     cpp_interface::templated_alloc<List>(caller);
 
     List& fields = as_list(get_compound_type_fields(caller->type));
-
+    
+    // std::cout << "caller type: " << as_type(caller->type)->name << std::endl;
+    
     for (int i=0; i < fields.count(); i++)
         as_list(caller).appendSlot(get_field_type(fields[i])->asRef());
+
+    if (caller->type == COMPOUND_TYPE) {
+        Type* parent = as_type(as_list(caller)[0]);
+        *parent = *as_type(LIST_TYPE);
+        parent->alloc = CompoundType__alloc;
+        parent->dealloc = CompoundType__dealloc;
+    }
 }
 
 void CompoundType__dealloc(Term *caller)
@@ -174,9 +190,7 @@ void CompoundType__dealloc(Term *caller)
 void CompoundType__create_compound_type__evaluate(Term* caller)
 {
     std::string name = as_string(caller->inputs[0]);
-    *as_type(caller) = *as_type(LIST_TYPE);
-    as_type(caller)->alloc = CompoundType__alloc;
-    as_type(caller)->dealloc = CompoundType__dealloc;
+    as_type(caller)->name = name;
 }
 
 void CompoundType__append_field__evaluate(Term *caller)
@@ -184,7 +198,6 @@ void CompoundType__append_field__evaluate(Term *caller)
     recycle_value(caller->inputs[0], caller);
     Term* type = caller->inputs[1];
     std::string name = as_string(caller->inputs[2]);
-
     compound_type_append_field(caller, type, name);
 }
 
@@ -262,6 +275,15 @@ Term* create_empty_type(Branch* branch)
     return term;
 }
 
+void initialize_type_type(Term* typeType)
+{
+    Type_alloc(typeType);
+    as_type(typeType)->name = "Type";
+    as_type(typeType)->alloc = Type_alloc;
+    as_type(typeType)->dealloc = Type_dealloc;
+    as_type(typeType)->toString = Type_toString;
+}
+
 void initialize_compound_types(Branch* kernel)
 {
     /* 
@@ -273,6 +295,15 @@ void initialize_compound_types(Branch* kernel)
             Ref type
             String name
         }
+
+        CompoundType = { List fields }
+        CompoundType = [Type, [[Type*, 'parent'], [List* 'fields']]]
+        CompoundType() = [Type, List]
+
+        typeA = { int I, string S }
+        typeA = [Type, [[int*, 'I'], [string*, 'S']]]
+        typeA() = [Int, String]
+
     */
 
     COMPOUND_TYPE = create_constant(kernel, LIST_TYPE);

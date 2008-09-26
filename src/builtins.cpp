@@ -100,10 +100,7 @@ void bootstrap_kernel()
     TYPE_TYPE = typeType;
     typeType->function = constTypeFunc;
     typeType->type = typeType;
-    Type_alloc(typeType);
-    as_type(typeType)->name = "Type";
-    as_type(typeType)->alloc = Type_alloc;
-    as_type(typeType)->dealloc = Type_dealloc;
+    initialize_type_type(typeType);
     KERNEL->bindName(typeType, "Type");
 
     // Implant the Type type
@@ -127,7 +124,7 @@ void bootstrap_kernel()
     FUNCTION_TYPE = functionType;
     functionType->function = constTypeFunc;
     functionType->type = typeType;
-    Type_alloc(functionType);
+    as_type(typeType)->alloc(functionType);
     as_type(functionType)->name = "Function";
     as_type(functionType)->alloc = Function_alloc;
     as_type(functionType)->duplicate = Function_duplicate;
