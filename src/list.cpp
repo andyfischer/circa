@@ -37,6 +37,21 @@ List::appendSlot(Term* type)
     return newTerm;
 }
 
+std::string List__toString(Term* caller)
+{
+    std::stringstream out;
+    List& list = as_list(caller);
+    out << "[";
+    bool first_item = true;
+    for (int i=0; i < list.count(); i++) {
+        if (!first_item) out << ", ";
+        out << list[i]->toString();
+        first_item = false;
+    }
+    out << "]";
+    return out.str();
+}
+
 bool is_list(Term* term)
 {
     return (term->type == LIST_TYPE || term->type == COMPOUND_TYPE);

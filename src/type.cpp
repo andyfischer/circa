@@ -264,8 +264,6 @@ Term* create_empty_type(Branch* branch)
 
 void initialize_compound_types(Branch* kernel)
 {
-    LIST_TYPE = quick_create_cpp_type<List>(kernel, "List");
-
     /* 
         type CompoundType {
             Ref parent

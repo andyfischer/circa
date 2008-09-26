@@ -93,7 +93,7 @@ void compound_types()
 
     test_assert(is_type(type1));
     eval_statement(branch, "compound-type-append-field(@type1, int, 'myint)");
-    return;
+    return; // FIXME
     test_assert(is_type(type1));
     eval_statement(branch, "compound-type-append-field(@type1, string, 'mystring)");
     test_assert(is_type(type1));

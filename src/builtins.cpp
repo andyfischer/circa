@@ -258,7 +258,7 @@ void initialize_constants()
 {
     BRANCH_TYPE = quick_create_cpp_type<Branch>(KERNEL, "Branch");
     LIST_TYPE = quick_create_cpp_type<List>(KERNEL, "List");
-    //MAP_TYPE = quick_create_cpp_type<TermMap>(KERNEL, "Map");
+    as_type(LIST_TYPE)->toString = List__toString;
 
     CONSTANT_INT = get_const_function(KERNEL, INT_TYPE);
     CONSTANT_FLOAT = get_const_function(KERNEL, FLOAT_TYPE);
