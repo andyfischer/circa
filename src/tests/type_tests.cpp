@@ -31,12 +31,14 @@ void bootstrapped_objects()
     Branch branch;
     Term* typeA = eval_statement(branch, "typeA = CompoundType()");
 
-    return;
-
-    eval_statement(branch, "compound-type-append-field(@type1, int, 'I)");
-    typeA = eval_statement(branch, "compound-type-append-field(@type1, string, 'S)");
+    eval_statement(branch, "compound-type-append-field(@typeA, int, 'I)");
+    typeA = eval_statement(branch, "compound-type-append-field(@typeA, string, 'S)");
 
     std::cout << "typeA = " << typeA->toString() << std::endl;
+
+    Term* typeAinstance = eval_statement(branch, "typeAinstance = typeA()");
+
+    std::cout << "typeAinstance = " << typeAinstance->toString() << std::endl;
 }
 
 void compound_types()

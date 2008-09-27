@@ -33,10 +33,13 @@ Term* get_compound_type_parent(Term *ct)
     return as_list(ct)[0];
 }
 
+const int COMPOUND_TYPE_FIELDS_INDEX = 1;
+
 Term* get_compound_type_fields(Term *ct)
 {
     assert(ct != NULL);
-    return as_list(ct)[1];
+    assert(is_list(ct));
+    return as_list_unchecked(ct)[COMPOUND_TYPE_FIELDS_INDEX];
 }
 
 Term* get_field_type(Term* field)
@@ -70,12 +73,28 @@ Term* get_parent_type(Term *type)
     return as_list(parent_field)[0]->asRef();
 }
 
+Term* get_field(Term *term, std::string const& fieldName)
+{
+    assert_instance(term->type, COMPOUND_TYPE);
+
+    // Look into term's type, find the index of this field name
+    List& fields = as_list_unchecked(as_list_unchecked(term->type)[COMPOUND_TYPE_FIELDS_INDEX]);
+
+    int index = 0;
+    for (; index < fields.count(); index++) {
+        if (as_string(get_field_name(fields[index])) == fieldName)
+            break;
+    }
+
+    if (index == fields.count())
+        return NULL;
+
+    return as_list_unchecked(term)[index];
+}
+
 Term* get_parent(Term *term)
 {
-    assert(term != NULL);
-    assert(term->type->type == COMPOUND_TYPE);
-    assert(is_list(term));
-    return as_list(term)[0];
+    return get_field(term, "parent");
 }
 
 Term* get_as(Term *term, Term *type)
@@ -89,6 +108,7 @@ Term* get_as(Term *term, Term *type)
         return NULL;
 
     Term* parent = get_parent(term);
+
     if (parent == NULL)
         return NULL;
 
@@ -127,25 +147,6 @@ Type* as_type(Term *term)
     assert_instance(term, TYPE_TYPE);
     term = get_as(term, TYPE_TYPE);
     return (Type*) term->value;
-}
-
-Term* get_field(Term *term, std::string const& fieldName)
-{
-    assert_instance(term->type, COMPOUND_TYPE);
-
-    // Look into term's type, find the index of this field name
-    List& fields = as_list(get_compound_type_fields(term->type));
-
-    int index = 0;
-    for (; index < fields.count(); index++) {
-        if (as_string(get_field_name(fields[index])) == fieldName)
-            break;
-    }
-
-    if (index == fields.count())
-        return NULL;
-
-    return as_list(term)[index];
 }
 
 void Type_alloc(Term *caller)
