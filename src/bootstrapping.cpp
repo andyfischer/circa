@@ -15,6 +15,7 @@ namespace token = circa::tokenizer;
 
 namespace circa {
 
+    /*
 Term* quick_create_type(
         Branch* branch,
         std::string name,
@@ -33,6 +34,7 @@ Term* quick_create_type(
 
     return typeTerm;
 }
+*/
 
 Term* quick_create_function(Branch* branch, string name, Function::EvaluateFunc evaluateFunc,
         ReferenceList inputTypes, Term* outputType)

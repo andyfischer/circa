@@ -7,14 +7,6 @@
 
 namespace circa {
 
-struct Subroutine : public Function
-{
-    Branch* branch;
-
-    Subroutine();
-};
-
-Subroutine* as_subroutine(Term*);
 bool is_subroutine(Term*);
 
 Branch* Subroutine_openBranch(Term* caller);

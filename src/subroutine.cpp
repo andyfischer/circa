@@ -8,19 +8,6 @@ namespace circa {
 static const char * INPUT_PLACEHOLDER_PREFIX = "#input-";
 static const char * OUTPUT_PLACEHOLDER_NAME = "#output";
 
-Subroutine::Subroutine()
-  : branch(NULL)
-{
-}
-
-Subroutine* as_subroutine(Term* term)
-{
-    if (!is_subroutine(term))
-        throw errors::TypeError(term, SUBROUTINE_TYPE);
-
-    return (Subroutine*) term->value;
-}
-
 bool is_subroutine(Term* term)
 {
     return term->type == SUBROUTINE_TYPE;
@@ -238,10 +225,8 @@ void subroutine_eval__evaluate(Term* caller)
 
 void initialize_subroutine(Branch* kernel)
 {
-    SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine",
-            Subroutine_alloc,
-            Subroutine_dealloc,
-            Subroutine_duplicate);
+    eval_statement(*kernel, "Subroutine = create-compound-type('Subroutine)");
+    eval_statement(*kernel, "compound-type-append-field(@Subroutine, Branch, 'branch)");
 
     quick_create_function(kernel, "subroutine-create",
         subroutine_create__evaluate,

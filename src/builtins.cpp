@@ -14,7 +14,6 @@
 #include "function.h"
 #include "list.h"
 #include "operations.h"
-#include "primitive_types.h"
 #include "subroutine.h"
 #include "tokenizer.h"
 #include "token_stream.h"
