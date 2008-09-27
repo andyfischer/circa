@@ -13,20 +13,20 @@ namespace type_tests {
 
 void bootstrapped_objects()
 {
-    test_assert(get_parent_type(COMPOUND_TYPE) == TYPE_TYPE);
-    test_assert(get_parent(COMPOUND_TYPE)->type == TYPE_TYPE);
+    test_assert(get_parent_type(COMPOUND_TYPE_TYPE) == TYPE_TYPE);
+    test_assert(get_parent(COMPOUND_TYPE_TYPE)->type == TYPE_TYPE);
 
-    test_assert(get_as(COMPOUND_TYPE, COMPOUND_TYPE) == COMPOUND_TYPE);
+    test_assert(get_as(COMPOUND_TYPE_TYPE, COMPOUND_TYPE_TYPE) == COMPOUND_TYPE_TYPE);
 
-    test_assert(get_as(COMPOUND_TYPE, TYPE_TYPE) != NULL);
-    test_assert(get_as(COMPOUND_TYPE, TYPE_TYPE)->type == TYPE_TYPE);
+    test_assert(get_as(COMPOUND_TYPE_TYPE, TYPE_TYPE) != NULL);
+    test_assert(get_as(COMPOUND_TYPE_TYPE, TYPE_TYPE)->type == TYPE_TYPE);
 
-    test_assert(as_type(COMPOUND_TYPE) != NULL);
+    test_assert(as_type(COMPOUND_TYPE_TYPE) != NULL);
 
-    test_assert(get_field(COMPOUND_TYPE, "parent") == get_parent(COMPOUND_TYPE));
-    test_assert(get_field(COMPOUND_TYPE, "fields") != NULL);
+    test_assert(get_field(COMPOUND_TYPE_TYPE, "parent") == get_parent(COMPOUND_TYPE_TYPE));
+    test_assert(get_field(COMPOUND_TYPE_TYPE, "fields") != NULL);
 
-    std::cout << "COMPOUND_TYPE = " << COMPOUND_TYPE->toString() << std::endl;
+    //std::cout << "COMPOUND_TYPE_TYPE = " << COMPOUND_TYPE_TYPE->toString() << std::endl;
 
     Branch branch;
     Term* typeA = eval_statement(branch, "typeA = CompoundType()");
@@ -34,11 +34,11 @@ void bootstrapped_objects()
     eval_statement(branch, "compound-type-append-field(@typeA, int, 'I)");
     typeA = eval_statement(branch, "compound-type-append-field(@typeA, string, 'S)");
 
-    std::cout << "typeA = " << typeA->toString() << std::endl;
+    //std::cout << "typeA = " << typeA->toString() << std::endl;
 
     Term* typeAinstance = eval_statement(branch, "typeAinstance = typeA()");
 
-    std::cout << "typeAinstance = " << typeAinstance->toString() << std::endl;
+    //std::cout << "typeAinstance = " << typeAinstance->toString() << std::endl;
 }
 
 void compound_types()
@@ -59,18 +59,18 @@ void compound_types()
     test_assert(get_field(type1, "fields") != get_field(type2, "fields"));
 
     test_assert(is_type(type1));
-    std::cout << type1->toString() << std::endl;
+    //std::cout << type1->toString() << std::endl;
     type1 = eval_statement(branch, "compound-type-append-field(@type1, int, 'myint)");
-    std::cout << type1->toString() << std::endl;
+    //std::cout << type1->toString() << std::endl;
     test_assert(is_type(type1));
     type1 = eval_statement(branch, "compound-type-append-field(@type1, string, 'mystring)");
     test_assert(is_type(type1));
 
-    Term* inst1 = eval_statement(branch, "inst1 = type1()"); // <-- death here
+    Term* inst1 = eval_statement(branch, "inst1 = type1()");
     test_assert(get_field(inst1, "myint") != NULL);
     test_assert(get_field(inst1, "myint")->type == INT_TYPE);
     test_assert(get_field(inst1, "mystring") != NULL);
-    test_assert(get_field(inst1, "mystring")->type == INT_TYPE);
+    test_assert(get_field(inst1, "mystring")->type == STRING_TYPE);
 }
 
 } // namespace type_tests
