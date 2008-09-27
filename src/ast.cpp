@@ -304,7 +304,7 @@ FunctionDecl::createTerm(Branch* branch)
     for (int statementIndex=0; statementIndex < numStatements; statementIndex++) {
         Statement* statement = this->statements->operator[](statementIndex);
 
-        statement->createTerm(as_subroutine(sub)->branch);
+        // FIXME statement->createTerm(as_subroutine(sub)->branch);
 
         //constant_string(&workspace, statement->text, "statement");
         //eval_statement(workspace,

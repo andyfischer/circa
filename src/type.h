@@ -3,6 +3,7 @@
 
 #include "common_headers.h"
 
+#include "term.h"
 #include "term_map.h"
 #include "term_namespace.h"
 
@@ -10,29 +11,19 @@ namespace circa {
 
 struct Type
 {
-    typedef void (*AllocFunc)(Term* term);
-    typedef void (*InitializeFunc)(Term* term);
-    typedef void (*DeallocFunc)(Term* term);
-    typedef void (*DuplicateFunc)(Term* src, Term* dest);
-    typedef bool (*EqualsFunc)(Term* src, Term* dest);
-    typedef int  (*CompareFunc)(Term* src, Term* dest);
-    typedef void (*RemapPointersFunc)(Term* term, TermMap& map);
-    typedef std::string (*ToStringFunc)(Term* term);
+    virtual void alloc(Term* term) = 0;
+    virtual void initialize(Term* term) = 0;
+    virtual void dealloc(Term* term) = 0;
+    virtual void duplicate(Term* source, Term* dest) = 0;
+    virtual bool equals(Term* a, Term* b) = 0;
+    virtual int compare(Term* a, Term* b) = 0;
+    virtual void remapPointers(Term* term, TermMap& map) = 0;
+    virtual std::string toString(Term* term) = 0;
 
     std::string name;
 
     // Size of raw data (if any)
     size_t dataSize;
-
-    // Functions
-    AllocFunc alloc;
-    InitializeFunc init;
-    DeallocFunc dealloc;
-    DuplicateFunc duplicate;
-    EqualsFunc equals;
-    CompareFunc compare;
-    RemapPointersFunc remapPointers;
-    ToStringFunc toString;
 
     // memberFunctions is a list of Functions which 'belong' to this type.
     // They are guaranteed to take an instance of this type as their first
@@ -41,18 +32,41 @@ struct Type
 
     Type() :
         name(""),
-        dataSize(sizeof(void*)),
-        alloc(NULL),
-        init(NULL),
-        dealloc(NULL),
-        duplicate(NULL),
-        equals(NULL),
-        compare(NULL),
-        remapPointers(NULL),
-        toString(NULL)
-    {}
+        dataSize(sizeof(void*))
+    {
+    }
 
     void addMemberFunction(std::string const& name, Term* function);
+};
+
+template <class CppType>
+struct TemplatedType : public Type
+{
+    void alloc(Term* term)
+    {
+        term->value = new CppType();
+    }
+
+    void dealloc(Term* term)
+    {
+        delete reinterpret_cast<CppType*>(term->value);
+    }
+
+    void duplicate(Term* source, Term* dest)
+    {
+        dest->value = new CppType(*(reinterpret_cast<CppType*>(source->value)));
+    }
+
+    bool equals(Term* a, Term* b)
+    {
+        return (*(reinterpret_cast<CppType*>(a->value)))
+            == (*(reinterpret_cast<CppType*>(b->value)));
+    }
+
+    std::string toString(Term* term)
+    {
+        return "todo"; //return reinterpret_cast<T*>(term->value)->toString();
+    }
 };
 
 // Get the parent type of 'type'. 'type' must be an instance of CompoundType
@@ -89,6 +103,7 @@ Term* get_member_function(Term* type, std::string name);
 Term* create_empty_type(Branch* branch);
 
 void initialize_type_type(Term* typeType);
+void initialize_primitive_types(Branch* kernel);
 void initialize_compound_types(Branch* kernel);
 
 } // namespace circa

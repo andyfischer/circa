@@ -61,7 +61,7 @@ void test_using_evaluator()
 
 void register_subroutine_tests()
 {
-    // FIXME .. REGISTER_TEST_CASE(subroutine_tests::test_using_evaluator);
+    // REGISTER_TEST_CASE(subroutine_tests::test_using_evaluator);
 }
 
 } // namespace circa

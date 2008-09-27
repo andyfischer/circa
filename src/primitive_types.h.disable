@@ -4,10 +4,10 @@
 #define CIRCA__PRIMITIVE_TYPES__INCLUDED
 
 #include "common_headers.h"
+#include "type.h"
 
 namespace circa {
 
-void initialize_primitive_types(Branch* kernel);
 
 } // namespace circa
 
