@@ -27,24 +27,26 @@ Type::addMemberFunction(std::string const &name, Term *function)
     this->memberFunctions.bind(function, name);
 }
 
+bool is_compound_type(Term* term)
+{
+    assert(term != NULL);
+    return term->type == COMPOUND_TYPE_TYPE;
+}
+
 Term* get_compound_type_parent(Term *ct)
 {
-    assert(ct != NULL);
+    assert(is_compound_type(ct));
     return as_list(ct)[0];
 }
 
-const int COMPOUND_TYPE_FIELDS_INDEX = 1;
-
 Term* get_compound_type_fields(Term *ct)
 {
-    assert(ct != NULL);
-    assert(is_list(ct));
-    return as_list_unchecked(ct)[COMPOUND_TYPE_FIELDS_INDEX];
+    assert(is_compound_type(ct));
+    return as_list_unchecked(ct)[1];
 }
 
 Term* get_field_type(Term* field)
 {
-    assert(field != NULL);
     assert(is_list(field));
     return as_list(field)[0];
 }
@@ -66,7 +68,7 @@ void compound_type_append_field(Term* ct, Term *type, std::string const& name)
 Term* get_parent_type(Term *type)
 {
     assert(type != NULL);
-    assert(type->type == COMPOUND_TYPE);
+    assert(type->type == COMPOUND_TYPE_TYPE);
 
     Term* parent_field = as_list(get_compound_type_fields(type))[0];
 
@@ -75,10 +77,10 @@ Term* get_parent_type(Term *type)
 
 Term* get_field(Term *term, std::string const& fieldName)
 {
-    assert_instance(term->type, COMPOUND_TYPE);
+    assert_instance(term->type, COMPOUND_TYPE_TYPE);
 
     // Look into term's type, find the index of this field name
-    List& fields = as_list_unchecked(as_list_unchecked(term->type)[COMPOUND_TYPE_FIELDS_INDEX]);
+    List& fields = as_list_unchecked(as_list_unchecked(term->type)[1]);
 
     int index = 0;
     for (; index < fields.count(); index++) {
@@ -104,7 +106,7 @@ Term* get_as(Term *term, Term *type)
     if (term->type == type)
         return term;
 
-    if (term->type->type != COMPOUND_TYPE)
+    if (term->type->type != COMPOUND_TYPE_TYPE)
         return NULL;
 
     Term* parent = get_parent(term);
@@ -175,7 +177,7 @@ void CompoundType__alloc(Term *caller)
     for (int i=0; i < fields.count(); i++)
         as_list(caller).appendSlot(get_field_type(fields[i])->asRef());
 
-    if (caller->type == COMPOUND_TYPE) {
+    if (caller->type == COMPOUND_TYPE_TYPE) {
         Type* parent = as_type(as_list(caller)[0]);
         *parent = *as_type(LIST_TYPE);
         parent->alloc = CompoundType__alloc;
@@ -307,34 +309,34 @@ void initialize_compound_types(Branch* kernel)
 
     */
 
-    COMPOUND_TYPE = create_constant(kernel, LIST_TYPE);
-    kernel->bindName(COMPOUND_TYPE, "CompoundType");
-
-    // parent instance, type
-    as_list(COMPOUND_TYPE).appendSlot(TYPE_TYPE);
-
-    // fields
-    as_list(COMPOUND_TYPE).appendSlot(LIST_TYPE);
-    compound_type_append_field(COMPOUND_TYPE, TYPE_TYPE, "parent");
-    compound_type_append_field(COMPOUND_TYPE, LIST_TYPE, "fields");
+    COMPOUND_TYPE_TYPE = create_constant(kernel, LIST_TYPE);
+    kernel->bindName(COMPOUND_TYPE_TYPE, "CompoundType");
 
     // bootstrap
-    COMPOUND_TYPE->type = COMPOUND_TYPE;
+    COMPOUND_TYPE_TYPE->type = COMPOUND_TYPE_TYPE;
 
-    as_type(COMPOUND_TYPE)->name = "CompoundType";
-    *as_type(COMPOUND_TYPE) = *as_type(LIST_TYPE);
-    as_type(COMPOUND_TYPE)->alloc = CompoundType__alloc;
-    as_type(COMPOUND_TYPE)->dealloc = CompoundType__dealloc;
+    // parent instance, type
+    as_list(COMPOUND_TYPE_TYPE).appendSlot(TYPE_TYPE);
+
+    // fields
+    as_list(COMPOUND_TYPE_TYPE).appendSlot(LIST_TYPE);
+    compound_type_append_field(COMPOUND_TYPE_TYPE, TYPE_TYPE, "parent");
+    compound_type_append_field(COMPOUND_TYPE_TYPE, LIST_TYPE, "fields");
+
+    as_type(COMPOUND_TYPE_TYPE)->name = "CompoundType";
+    *as_type(COMPOUND_TYPE_TYPE) = *as_type(LIST_TYPE);
+    as_type(COMPOUND_TYPE_TYPE)->alloc = CompoundType__alloc;
+    as_type(COMPOUND_TYPE_TYPE)->dealloc = CompoundType__dealloc;
 
 
     quick_create_function(kernel, "create-compound-type",
             CompoundType__create_compound_type__evaluate,
             ReferenceList(STRING_TYPE),
-            COMPOUND_TYPE);
+            COMPOUND_TYPE_TYPE);
     quick_create_function(kernel, "compound-type-append-field",
             CompoundType__append_field__evaluate,
-            ReferenceList(COMPOUND_TYPE, TYPE_TYPE, STRING_TYPE),
-            COMPOUND_TYPE);
+            ReferenceList(COMPOUND_TYPE_TYPE, TYPE_TYPE, STRING_TYPE),
+            COMPOUND_TYPE_TYPE);
 }
 
 } // namespace circa
