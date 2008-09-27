@@ -54,13 +54,24 @@ std::string List__toString(Term* caller)
 
 bool is_list(Term* term)
 {
-    return (term->type == LIST_TYPE || term->type == COMPOUND_TYPE);
+    if (term->type == LIST_TYPE || term->type == COMPOUND_TYPE)
+        return true;
+
+    if (get_as(term, LIST_TYPE) != NULL)
+        return true;
+
+    return get_as(term, COMPOUND_TYPE) != NULL;
 }
 
 List& as_list(Term* term)
 {
     if (!is_list(term))
         throw errors::TypeError(term, LIST_TYPE);
+    return *((List*) term->value);
+}
+
+List& as_list_unchecked(Term* term)
+{
     return *((List*) term->value);
 }
 

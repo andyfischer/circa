@@ -45,6 +45,7 @@ public:
 std::string List__toString(Term* caller);
 bool is_list(Term* term);
 List& as_list(Term* term);
+List& as_list_unchecked(Term* term);
 
 } // namespace circa
 
