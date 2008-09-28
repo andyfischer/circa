@@ -65,6 +65,38 @@ Type::addMemberFunction(std::string const &name, Term *function)
     this->memberFunctions.bind(function, name);
 }
 
+struct CompoundValue {
+
+    Branch branch;
+    ReferenceList fields;
+
+private:
+    Term* appendSlot(Term* type) {
+        Term* newTerm = create_constant(&branch, type);
+        fields.append(newTerm);
+        return newTerm;
+    }
+
+public:
+    static void alloc(Term* term)
+    {
+        CompoundValue *value = new CompoundValue();
+        term->value = value;
+
+        // create a slot for each field
+        Type& type = *as_type(term->type);
+        int numFields = (int) type.fields.size();
+
+        for (int f=0; f < numFields; f++)
+            value->appendSlot(type.fields[f].type);
+    }
+
+    static void dealloc(Term* term)
+    {
+        delete (CompoundValue*) term->value;
+    }
+};
+
 bool is_compound_type(Term* term)
 {
     assert(term != NULL);
@@ -392,26 +424,6 @@ void initialize_primitive_types(Branch* kernel)
 
 void initialize_compound_types(Branch* kernel)
 {
-    /* 
-        type CompoundType {
-            Ref parent
-            List<Field> fields
-        }
-        type Field {
-            Ref type
-            String name
-        }
-
-        CompoundType = { List fields }
-        CompoundType = [Type, [[Type*, 'parent'], [List* 'fields']]]
-        CompoundType() = [Type, List]
-
-        typeA = { int I, string S }
-        typeA = [Type, [[int*, 'I'], [string*, 'S']]]
-        typeA() = [Int, String]
-
-    */
-
     COMPOUND_TYPE_TYPE = create_constant(kernel, LIST_TYPE);
     kernel->bindName(COMPOUND_TYPE_TYPE, "CompoundType");
 
