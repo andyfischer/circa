@@ -13,20 +13,20 @@ namespace type_tests {
 
 void bootstrapped_objects()
 {
-    //FIXME test_assert(get_parent_type(COMPOUND_TYPE_TYPE) == TYPE_TYPE);
-    //FIXME test_assert(get_parent(COMPOUND_TYPE_TYPE)->type == TYPE_TYPE);
+    //FIXME test_assert(get_parent_type(COMPOUND_TYPE) == TYPE_TYPE);
+    //FIXME test_assert(get_parent(COMPOUND_TYPE)->type == TYPE_TYPE);
 
-    test_assert(get_as(COMPOUND_TYPE_TYPE, COMPOUND_TYPE_TYPE) == COMPOUND_TYPE_TYPE);
+    test_assert(get_as(COMPOUND_TYPE, COMPOUND_TYPE) == COMPOUND_TYPE);
 
-    test_assert(get_as(COMPOUND_TYPE_TYPE, TYPE_TYPE) != NULL);
-    test_assert(get_as(COMPOUND_TYPE_TYPE, TYPE_TYPE)->type == TYPE_TYPE);
+    test_assert(get_as(COMPOUND_TYPE, TYPE_TYPE) != NULL);
+    test_assert(get_as(COMPOUND_TYPE, TYPE_TYPE)->type == TYPE_TYPE);
 
-    test_assert(as_type(COMPOUND_TYPE_TYPE) != NULL);
+    test_assert(as_type(COMPOUND_TYPE) != NULL);
 
-    //FIXME test_assert(get_field(COMPOUND_TYPE_TYPE, "parent") == get_parent(COMPOUND_TYPE_TYPE));
-    test_assert(get_field(COMPOUND_TYPE_TYPE, "fields") != NULL);
+    //FIXME test_assert(get_field(COMPOUND_TYPE, "parent") == get_parent(COMPOUND_TYPE));
+    test_assert(get_field(COMPOUND_TYPE, "fields") != NULL);
 
-    //std::cout << "COMPOUND_TYPE_TYPE = " << COMPOUND_TYPE_TYPE->toString() << std::endl;
+    //std::cout << "COMPOUND_TYPE = " << COMPOUND_TYPE->toString() << std::endl;
 
     Branch branch;
     Term* typeA = eval_statement(branch, "typeA = CompoundType()");
