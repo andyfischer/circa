@@ -1,6 +1,7 @@
 // Copyright 2008 Paul Hodge
 
 #include "circa.h"
+#include "type.h"
 #include "values.h"
 
 namespace circa {
@@ -13,27 +14,17 @@ bool is_subroutine(Term* term)
     return term->type == SUBROUTINE_TYPE;
 }
 
-void Subroutine_alloc(Term* term)
-{
-    term->value = new Subroutine();
-    as_subroutine(term)->branch = new Branch();
-}
-
-void Subroutine_dealloc(Term* term)
-{
-    delete as_subroutine(term)->branch;
-    delete as_subroutine(term);
-}
-
+/*
 void Subroutine_duplicate(Term* source, Term* dest)
 {
-    Subroutine* sourceSub = as_subroutine(source);
-    Subroutine* destSub = as_subroutine(dest);
-    destSub->branch->clear();
+    Subroutine& sourceSub = as_subroutine(source);
+    Subroutine& destSub = as_subroutine(dest);
+    destSub.branch.clear();
 
     *((Function*) destSub) = *((Function*) sourceSub);
     duplicate_branch(sourceSub->branch, destSub->branch);
 }
+*/
 
 std::string GetInputPlaceholderName(int index)
 {
@@ -44,7 +35,8 @@ std::string GetInputPlaceholderName(int index)
 
 Branch* Subroutine_openBranch(Term* caller)
 {
-    Subroutine* sub = as_subroutine(caller->function);
+    /*
+    Subroutine& sub = as_subroutine(caller->function);
     Branch* branch = as_branch(caller->state);
 
     // Copy inputs to input placeholders
@@ -54,17 +46,19 @@ Branch* Subroutine_openBranch(Term* caller)
         std::string name = GetInputPlaceholderName(index);
         if (!branch->containsName(name)) {
             throw errors::InternalError(string("Too many arguments for subroutine ")
-                + sub->name);
+                + sub.name);
         }
 
         duplicate_value(incomingInput, branch->getNamed(name));
     }
 
     return branch;
+    */
 }
 
 void Subroutine_closeBranch(Term* caller)
 {
+    /*
     Subroutine* sub = as_subroutine(caller->function);
     Branch* branch = as_branch(caller->state);
 
@@ -82,14 +76,16 @@ void Subroutine_closeBranch(Term* caller)
                 << std::endl;
         }
     }
+    */
 }
 
 void subroutine_call__initialize(Term* caller)
 {
+    /*
     Subroutine *sub = as_subroutine(caller->function);
     Branch *stateBranch = as_branch(caller->state);
     duplicate_branch(sub->branch, stateBranch);
-
+    */
 }
 
 void subroutine_call__evaluate(Term* caller)
@@ -111,19 +107,19 @@ void subroutine_create__evaluate(Term* caller)
     as_list(caller->inputs[1]);
     as_type(caller->inputs[2]);
 
-    Subroutine* sub = as_subroutine(caller);
-    sub->name = as_string(caller->inputs[0]);
-    sub->initialize = subroutine_call__initialize;
-    sub->evaluate = subroutine_call__evaluate;
-    sub->inputTypes = as_list(caller->inputs[1]).toReferenceList();
-    sub->outputType = caller->inputs[2];
-    sub->stateType = BRANCH_TYPE;
+    Subroutine& sub = as_subroutine(caller);
+    sub.name = as_string(caller->inputs[0]);
+    sub.initialize = subroutine_call__initialize;
+    sub.evaluate = subroutine_call__evaluate;
+    sub.inputTypes = as_list(caller->inputs[1]).toReferenceList();
+    sub.outputType = caller->inputs[2];
+    sub.stateType = BRANCH_TYPE;
 
     // Create input placeholders
-    for (int index=0; index < sub->inputTypes.count(); index++) {
+    for (int index=0; index < sub.inputTypes.count(); index++) {
         std::string name = GetInputPlaceholderName(index);
-        Term* placeholder = create_constant(sub->branch, sub->inputTypes[index]);
-        sub->branch->bindName(placeholder, name);
+        Term* placeholder = create_constant(&sub.branch, sub.inputTypes[index]);
+        sub.branch.bindName(placeholder, name);
     }
 }
 
@@ -132,38 +128,40 @@ void subroutine_name_input__evaluate(Term* caller)
     recycle_value(caller->inputs[0], caller);
     int index = as_int(caller->inputs[1]);
     std::string name = as_string(caller->inputs[2]);
-    Subroutine* sub = as_subroutine(caller);
-    Term* inputPlaceholder = sub->branch->getNamed(GetInputPlaceholderName(index));
-    sub->branch->bindName(inputPlaceholder, name);
+    Subroutine& sub = as_subroutine(caller);
+    Term* inputPlaceholder = sub.branch.getNamed(GetInputPlaceholderName(index));
+    sub.branch.bindName(inputPlaceholder, name);
 }
 
 void subroutine_name_inputs__evaluate(Term* caller)
 {
     recycle_value(caller->inputs[0], caller);
     List name_list = as_list(caller->inputs[1]);
-    Subroutine* sub = as_subroutine(caller);
-    Branch* branch = sub->branch;
+    Subroutine& sub = as_subroutine(caller);
+    Branch& branch = sub.branch;
 
-    for (int index=0; index < sub->inputTypes.count(); index++) {
-        Term* inputPlaceholder = branch->getNamed(GetInputPlaceholderName(index));
+    for (int index=0; index < sub.inputTypes.count(); index++) {
+        Term* inputPlaceholder = branch.getNamed(GetInputPlaceholderName(index));
         std::string newName = as_string(name_list.get(index));
-        branch->bindName(inputPlaceholder, newName);
+        branch.bindName(inputPlaceholder, newName);
     }
 }
 
 void subroutine_get_branch__evaluate(Term* caller)
 {
-    Subroutine* sub = as_subroutine(caller->inputs[0]);
-    *as_branch(caller) = *sub->branch;
+    Subroutine& sub = as_subroutine(caller->inputs[0]);
+    *as_branch(caller) = sub.branch;
 }
 
 void subroutine_set_branch__evaluate(Term* caller)
 {
+    /*
     // Input 0: Subroutine
     // Input 1: Branch
     recycle_value(caller->inputs[0], caller);
     Subroutine* sub = as_subroutine(caller);
     *sub->branch = *as_branch(caller->inputs[1]);
+    */
 }
 
 void subroutine_get_local__evaluate(Term* caller)
@@ -171,10 +169,10 @@ void subroutine_get_local__evaluate(Term* caller)
     // Input 0: Subroutine
     // Input 1: String name
     // Output: Reference
-    Subroutine* sub = as_subroutine(caller->inputs[0]);
+    Subroutine& sub = as_subroutine(caller->inputs[0]);
     std::string name = as_string(caller->inputs[1]);
 
-    as_ref(caller) = sub->branch->getNamed(name);
+    as_ref(caller) = sub.branch.getNamed(name);
 }
 
 void subroutine_bind__evaluate(Term* caller)
@@ -183,16 +181,17 @@ void subroutine_bind__evaluate(Term* caller)
     // Input 1: Reference
     // Input 2: String name
     recycle_value(caller->inputs[0], caller);
-    Subroutine* sub = as_subroutine(caller);
+    Subroutine& sub = as_subroutine(caller);
     Term* ref = as_ref(caller->inputs[1]);
     std::string name = as_string(caller->inputs[2]);
 
-    sub->branch->bindName(ref, name);
+    sub.branch.bindName(ref, name);
 }
 
 void subroutine_print__evaluate(Term* caller)
 {
-    Subroutine *sub = as_subroutine(caller->inputs[0]);
+    /*
+    Subroutine& sub = as_subroutine(caller->inputs[0]);
     std::stringstream output;
     output << sub->name << "()" << std::endl;
     output << "{" << std::endl;
@@ -212,21 +211,22 @@ void subroutine_print__evaluate(Term* caller)
     }
     output << "}" << std::endl;
     as_string(caller) = output.str();
+    */
 }
 
 void subroutine_eval__evaluate(Term* caller)
 {
     recycle_value(caller->inputs[0], caller);
-    Subroutine *sub = as_subroutine(caller);
+    Subroutine &sub = as_subroutine(caller);
     std::string s = as_string(caller->inputs[1]);
 
-    apply_statement(*sub->branch, s);
+    apply_statement(sub.branch, s);
 }
 
 void initialize_subroutine(Branch* kernel)
 {
-    eval_statement(*kernel, "Subroutine = create-compound-type('Subroutine)");
-    eval_statement(*kernel, "compound-type-append-field(@Subroutine, Branch, 'branch)");
+    SUBROUTINE_TYPE = quick_create_type(kernel, "Subroutine");
+    assign_from_cpp_type<Subroutine>(*as_type(SUBROUTINE_TYPE));
 
     quick_create_function(kernel, "subroutine-create",
         subroutine_create__evaluate,
@@ -241,7 +241,8 @@ void initialize_subroutine(Branch* kernel)
         "subroutine-name-inputs", subroutine_name_inputs__evaluate,
         ReferenceList(SUBROUTINE_TYPE, LIST_TYPE), SUBROUTINE_TYPE);
 
-    quick_create_function(kernel, "subroutine-get-branch", subroutine_get_branch__evaluate,
+    quick_create_function(kernel, "subroutine-get-branch",
+        subroutine_get_branch__evaluate,
         ReferenceList(SUBROUTINE_TYPE), BRANCH_TYPE);
 
     Term* set_branch = quick_create_function(kernel,

@@ -21,7 +21,7 @@ void test_simple()
             ReferenceList(print_term, input_names));
     branch.bindName(print_term, "print-term");
 
-    eval_statement(*as_subroutine(print_term)->branch, "print(to-string(t))");
+    eval_statement(as_subroutine(print_term).branch, "print(to-string(t))");
 
     eval_statement(branch, "print-term('test)");
 }
