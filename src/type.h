@@ -26,12 +26,14 @@ struct Type
     struct Field {
         Term* type; // reference
         std::string name;
+        Field(Term* _type, std::string _name) : type(_type), name(_name) {}
     };
     typedef std::vector<Field> FieldList;
 
     std::string name;
 
-    // Size of raw data (if any)
+    // Size of raw data. Currently this isn't really used- we allocate each piece
+    // of memory dynamically, so the 'raw data' is the size of a pointer.
     size_t dataSize;
 
     // Functions
@@ -68,10 +70,7 @@ struct Type
 
     void addField(Term* type, std::string const& name)
     {
-        Field field;
-        field.type = type;
-        field.name = name;
-        fields.push_back(field);
+        fields.push_back(Field(type,name));
     }
 
     void addMemberFunction(std::string const& name, Term* function);
@@ -116,22 +115,6 @@ void assign_from_cpp_type(Type& type)
 
 Term* quick_create_type(Branch* branch, std::string name);
 
-/*
-template <class CppType>
-Term* create_from_cpp_type(Branch* branch, std::string name)
-{
-    Term* term = create_constant(branch, TYPE_TYPE);
-    as_type(term)->name = name;
-    assign_from_cpp_type<CppType>(*as_type(term));
-    branch->bindName(term, name);
-}*/
-
-// Get the parent type of 'type'. 'type' must be an instance of CompoundType
-// Term* get_parent_type(Term *type);
-
-// Term* get_parent(Term *term);
-
-
 // Return 'term' as an instance of 'type'. In the simple case, if 'term' is
 // an instance of 'type', just return it. If 'term' is a derived type, then
 // we look up the inheritance tree until we find 'type', and return that
@@ -147,7 +130,6 @@ bool is_instance(Term* term, Term* type);
 
 // Throw a TypeError if term is not an instance of type
 void assert_instance(Term* term, Term* type);
-
 
 // 'term' must be a compound value
 Term* get_field(Term *term, std::string const& fieldName);
