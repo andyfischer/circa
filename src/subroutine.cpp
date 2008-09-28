@@ -14,6 +14,13 @@ bool is_subroutine(Term* term)
     return term->type == SUBROUTINE_TYPE;
 }
 
+Subroutine& as_subroutine(Term* term)
+{
+    term = get_as_checked(term, SUBROUTINE_TYPE);
+
+    return *((Subroutine*) term->value);
+}
+
 /*
 void Subroutine_duplicate(Term* source, Term* dest)
 {

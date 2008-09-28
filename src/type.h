@@ -132,6 +132,10 @@ Term* create_from_cpp_type(Branch* branch, std::string name)
 // instance. If the type isn't found, return NULL.
 Term* get_as(Term *term, Term *type);
 
+// Similar to 'get_as', but we never return NULL. If term is not an instance
+// of type, throw a TypeError.
+Term* get_as_checked(Term *term, Term *type);
+
 // Return true if the term is an instance (possibly derived) of the given type
 bool is_instance(Term* term, Term* type);
 
