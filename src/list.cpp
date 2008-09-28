@@ -54,7 +54,7 @@ std::string List__toString(Term* caller)
 
 bool is_list(Term* term)
 {
-    return (term->type == LIST_TYPE || term->type->type == COMPOUND_TYPE_TYPE);
+    return (term->type == LIST_TYPE || term->type->type == COMPOUND_TYPE);
 }
 
 List& as_list(Term* term)
