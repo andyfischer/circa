@@ -156,6 +156,16 @@ Term* get_as(Term *term, Term *type)
     return get_as(parent, get_parent_type(term->type));
 }
 
+Term* get_as_checked(Term *term, Term *type)
+{
+    term = get_as(term, type);
+
+    if (term == NULL)
+        throw errors::TypeError(term, type);
+
+    return term;
+}
+
 bool is_instance(Term *term, Term *type)
 {
     assert(term != NULL);
