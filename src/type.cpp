@@ -49,7 +49,6 @@ string& as_string(Term* t)
 
     return *((string*) t->value);
 }
-    
 
 Term*& as_ref(Term* term)
 {
@@ -200,48 +199,12 @@ Type* as_type(Term *term)
     return (Type*) term->value;
 }
 
-/*
-Term* quick_create_type(
-        Branch* branch,
-        std::string name,
-        Type::AllocFunc allocFunc,
-        Type::DeallocFunc deallocFunc,
-        Type::DuplicateFunc duplicateFunc,
-        Type::ToStringFunc toStringFunc)
-{
-    Term* typeTerm = create_constant(branch, TYPE_TYPE);
-    as_type(typeTerm)->name = name;
-    as_type(typeTerm)->alloc = allocFunc;
-    as_type(typeTerm)->dealloc = deallocFunc;
-    as_type(typeTerm)->duplicate = duplicateFunc;
-    as_type(typeTerm)->toString = toStringFunc;
-    branch->bindName(typeTerm, name);
-
-    return typeTerm;
-}
-*/
-
 Term* quick_create_type(Branch* branch, std::string name)
 {
     Term* term = create_constant(branch, TYPE_TYPE);
     as_type(term)->name = name;
     branch->bindName(term, name);
     return term;
-}
-
-void Type_alloc(Term *caller)
-{
-    caller->value = new Type();
-}
-
-void Type_dealloc(Term* caller)
-{
-    delete as_type(caller);
-}
-
-std::string Type_toString(Term *caller)
-{
-    return std::string("<Type " + as_type(caller)->name + ">");
 }
 
 void CompoundType__dealloc(Term *caller);
@@ -386,13 +349,17 @@ std::string bool__toString(Term* term)
         return "false";
 }
 
+std::string Type__toString(Term *caller)
+{
+    return std::string("<Type " + as_type(caller)->name + ">");
+}
+
 void initialize_type_type(Term* typeType)
 {
-    Type_alloc(typeType);
+    typeType->value = new Type();
     as_type(typeType)->name = "Type";
-    as_type(typeType)->alloc = Type_alloc;
-    as_type(typeType)->dealloc = Type_dealloc;
-    as_type(typeType)->toString = Type_toString;
+    assign_from_cpp_type<Type>(*as_type(typeType));
+    as_type(typeType)->toString = Type__toString;
 }
 
 void initialize_primitive_types(Branch* kernel)

@@ -23,6 +23,12 @@ struct Type
     typedef void (*RemapPointersFunc)(Term* term, TermMap& map);
     typedef std::string (*ToStringFunc)(Term* term);
 
+    struct Field {
+        Term* type; // reference
+        std::string name;
+    };
+    typedef std::vector<Field> FieldList;
+
     std::string name;
 
     // Size of raw data (if any)
@@ -38,6 +44,8 @@ struct Type
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
     
+    // Fields, applies to compound types
+    FieldList fields;
 
     // memberFunctions is a list of Functions which 'belong' to this type.
     // They are guaranteed to take an instance of this type as their first
@@ -58,21 +66,19 @@ struct Type
     {
     }
 
+    void addField(Term* type, std::string const& name)
+    {
+        Field field;
+        field.type = type;
+        field.name = name;
+        fields.push_back(field);
+    }
+
     void addMemberFunction(std::string const& name, Term* function);
 };
 
 bool is_type(Term* term);
 Type* as_type(Term* term);
-
-/*
-Term* quick_create_type(
-        Branch* branch,
-        std::string name,
-        Type::AllocFunc allocFunc,
-        Type::DeallocFunc deallocFunc,
-        Type::DuplicateFunc duplicateFunc,
-        Type::ToStringFunc toStringFunc);
-        */
 
 template <class T>
 void templated_alloc(Term* term)
