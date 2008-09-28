@@ -3,10 +3,6 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
-#include "builtins.h"
-#include "operations.h"
-#include "term.h"
 #include "term_map.h"
 #include "term_namespace.h"
 
@@ -37,7 +33,6 @@ struct Type
     CompareFunc compare;
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
-    
 
     // memberFunctions is a list of Functions which 'belong' to this type.
     // They are guaranteed to take an instance of this type as their first
@@ -55,75 +50,15 @@ struct Type
         compare(NULL),
         remapPointers(NULL),
         toString(NULL)
-    {
-    }
+    {}
 
     void addMemberFunction(std::string const& name, Term* function);
 };
 
-bool is_type(Term* term);
-Type* as_type(Term* term);
-
-/*
-Term* quick_create_type(
-        Branch* branch,
-        std::string name,
-        Type::AllocFunc allocFunc,
-        Type::DeallocFunc deallocFunc,
-        Type::DuplicateFunc duplicateFunc,
-        Type::ToStringFunc toStringFunc);
-        */
-
-template <class T>
-void templated_alloc(Term* term)
-{
-    term->value = new T();
-}
-
-template <class T>
-void templated_dealloc(Term* term)
-{
-    delete reinterpret_cast<T*>(term->value);
-    term->value = NULL;
-}
-
-template <class T>
-void templated_duplicate(Term* source, Term* dest)
-{
-    dest->value = new T(*(reinterpret_cast<T*>(source->value)));
-}
-
-template <class T>
-bool templated_equals(Term* a, Term* b)
-{
-    return (*(reinterpret_cast<T*>(a->value))) == (*(reinterpret_cast<T*>(b->value)));
-}
-
-template <class CppType>
-void assign_from_cpp_type(Type& type)
-{
-    type.alloc = templated_alloc<CppType>;
-    type.dealloc = templated_dealloc<CppType>;
-    type.duplicate = templated_duplicate<CppType>;
-    //type.equals = templated_equals<CppType>;
-}
-
-Term* quick_create_type(Branch* branch, std::string name);
-
-/*
-template <class CppType>
-Term* create_from_cpp_type(Branch* branch, std::string name)
-{
-    Term* term = create_constant(branch, TYPE_TYPE);
-    as_type(term)->name = name;
-    assign_from_cpp_type<CppType>(*as_type(term));
-    branch->bindName(term, name);
-}*/
-
 // Get the parent type of 'type'. 'type' must be an instance of CompoundType
-// Term* get_parent_type(Term *type);
+Term* get_parent_type(Term *type);
 
-// Term* get_parent(Term *term);
+Term* get_parent(Term *term);
 
 
 // Return 'term' as an instance of 'type'. In the simple case, if 'term' is
@@ -138,6 +73,8 @@ bool is_instance(Term* term, Term* type);
 // Throw a TypeError if term is not an instance of type
 void assert_instance(Term* term, Term* type);
 
+bool is_type(Term* term);
+Type* as_type(Term* term);
 
 // 'term' must be a compound value
 Term* get_field(Term *term, std::string const& fieldName);
@@ -152,7 +89,6 @@ Term* get_member_function(Term* type, std::string name);
 Term* create_empty_type(Branch* branch);
 
 void initialize_type_type(Term* typeType);
-void initialize_primitive_types(Branch* kernel);
 void initialize_compound_types(Branch* kernel);
 
 } // namespace circa

@@ -190,6 +190,35 @@ Type* as_type(Term *term)
     return (Type*) term->value;
 }
 
+/*
+Term* quick_create_type(
+        Branch* branch,
+        std::string name,
+        Type::AllocFunc allocFunc,
+        Type::DeallocFunc deallocFunc,
+        Type::DuplicateFunc duplicateFunc,
+        Type::ToStringFunc toStringFunc)
+{
+    Term* typeTerm = create_constant(branch, TYPE_TYPE);
+    as_type(typeTerm)->name = name;
+    as_type(typeTerm)->alloc = allocFunc;
+    as_type(typeTerm)->dealloc = deallocFunc;
+    as_type(typeTerm)->duplicate = duplicateFunc;
+    as_type(typeTerm)->toString = toStringFunc;
+    branch->bindName(typeTerm, name);
+
+    return typeTerm;
+}
+*/
+
+Term* quick_create_type(Branch* branch, std::string name)
+{
+    Term* term = create_constant(branch, TYPE_TYPE);
+    as_type(term)->name = name;
+    branch->bindName(term, name);
+    return term;
+}
+
 void Type_alloc(Term *caller)
 {
     caller->value = new Type();
@@ -204,6 +233,8 @@ std::string Type_toString(Term *caller)
 {
     return std::string("<Type " + as_type(caller)->name + ">");
 }
+
+void CompoundType__dealloc(Term *caller);
 
 void CompoundType__alloc(Term *caller)
 {
@@ -305,6 +336,7 @@ void specialize_type(Term *term, Term *type)
 namespace type_private {
 
 void empty_function(Term*) {}
+void empty_duplicate_function(Term*,Term*) {}
 
 }
 
@@ -315,6 +347,33 @@ Term* create_empty_type(Branch* branch)
     type->alloc = type_private::empty_function;
     type->dealloc = type_private::empty_function;
     return term;
+}
+
+std::string int__toString(Term* term)
+{
+    std::stringstream strm;
+    strm << as_int(term);
+    return strm.str();
+}
+
+std::string float__toString(Term* term)
+{
+    std::stringstream strm;
+    strm << as_float(term);
+    return strm.str();
+}
+
+std::string string__toString(Term* term)
+{
+    return as_string(term);
+}
+
+std::string bool__toString(Term* term)
+{
+    if (as_bool(term))
+        return "true";
+    else
+        return "false";
 }
 
 void initialize_type_type(Term* typeType)
@@ -344,13 +403,14 @@ void initialize_primitive_types(Branch* kernel)
     as_type(BOOL_TYPE)->toString = bool__toString;
 
     ANY_TYPE = quick_create_type(KERNEL, "any",
-            empty_function, empty_function, NULL);
+            type_private::empty_function,
+            type_private::empty_function,
+            NULL);
     VOID_TYPE = quick_create_type(KERNEL, "void",
-            empty_function, empty_function, empty_duplicate_function);
-    REFERENCE_TYPE = quick_create_type(KERNEL, "Reference",
-            reference_alloc,
-            reference_dealloc,
-            reference_duplicate);
+            type_private::empty_function,
+            type_private::empty_function,
+            type_private::empty_duplicate_function);
+    REFERENCE_TYPE = quick_create_cpp_type<Term*>(KERNEL, "Reference");
 }
 
 void initialize_compound_types(Branch* kernel)

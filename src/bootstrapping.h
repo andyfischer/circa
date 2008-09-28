@@ -11,7 +11,6 @@
 namespace circa {
 
 // Create a new Type with the given properties. Also binds the name.
-/*
 Term* quick_create_type(
         Branch* branch,
         std::string name,
@@ -19,7 +18,6 @@ Term* quick_create_type(
         Type::DeallocFunc deallocFunc,
         Type::DuplicateFunc duplicateFunc,
         Type::ToStringFunc toStringFunc = NULL);
-*/
 
 // Create a new Function with the given properties. Also binds the name.
 Term* quick_create_function(Branch* code, string name, Function::EvaluateFunc evaluateFunc,

@@ -7,7 +7,13 @@
 
 namespace circa {
 
+struct Subroutine : public Function
+{
+    Branch branch;
+};
+
 bool is_subroutine(Term*);
+Subroutine& as_subroutine(Term*);
 
 Branch* Subroutine_openBranch(Term* caller);
 void Subroutine_closeBranch(Term* caller);
