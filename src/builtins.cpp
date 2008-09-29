@@ -246,7 +246,8 @@ void write_text_file__evaluate(Term* caller)
 
 void unknown_function__evaluate(Term* caller)
 {
-    std::cout << "Warning, calling an unknown function" << std::endl;
+    std::cout << "Warning, calling an unknown function: "
+        << as_string(caller->state) << std::endl;
 }
 
 void initialize_constants()

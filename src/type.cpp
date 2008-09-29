@@ -70,14 +70,14 @@ struct CompoundValue {
     Branch branch;
     ReferenceList fields;
 
-private:
+    // Member functions
     Term* appendSlot(Term* type) {
         Term* newTerm = create_constant(&branch, type);
         fields.append(newTerm);
         return newTerm;
     }
 
-public:
+    // Static functions
     static void alloc(Term* term)
     {
         CompoundValue *value = new CompoundValue();
@@ -114,6 +114,24 @@ public:
         Term* fieldType = term->inputs[1];
         std::string fieldName = as_string(term->inputs[2]);
         output.addField(fieldType, fieldName);
+    }
+
+    static void get_field(Term* term)
+    {
+        CompoundValue *value = (CompoundValue*) term->value;
+        std::string fieldName = as_string(term->inputs[1]);
+        Type& type = *as_type(term->type);
+
+        int index = type.findField(fieldName);
+
+        if (index == -1) {
+            term->pushError(std::string("field \'")+fieldName+"\' not found");
+            return;
+        }
+
+        assert(index >= 0);
+
+        recycle_value(value->fields[index], term);
     }
 };
 
@@ -354,6 +372,10 @@ void initialize_compound_types(Branch* kernel)
             CompoundValue::append_field,
             ReferenceList(TYPE_TYPE, TYPE_TYPE, STRING_TYPE),
             TYPE_TYPE);
+    quick_create_function(kernel, "get-field",
+            CompoundValue::get_field,
+            ReferenceList(ANY_TYPE, STRING_TYPE),
+            ANY_TYPE);
 }
 
 } // namespace circa
