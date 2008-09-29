@@ -73,6 +73,15 @@ struct Type
         fields.push_back(Field(type,name));
     }
 
+    int findField(std::string const& name)
+    {
+        for (int i=0; i < (int) fields.size(); i++) {
+            if (fields[i].name == name)
+                return i;
+        }
+        return -1;
+    }
+
     void addMemberFunction(std::string const& name, Term* function);
 };
 

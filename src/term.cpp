@@ -88,7 +88,6 @@ Term::findName()
 Term*
 Term::field(std::string const& name) const
 {
-    // todo
     return NULL;
 }
 
