@@ -12,6 +12,8 @@
 
 namespace circa {
 
+const int COMPOUND_TYPE_SIGNATURE = 0x43214321;
+
 struct Type
 {
     typedef void (*AllocFunc)(Term* term);
@@ -140,7 +142,6 @@ bool is_instance(Term* term, Term* type);
 // Throw a TypeError if term is not an instance of type
 void assert_instance(Term* term, Term* type);
 
-// 'term' must be a compound value
 Term* get_field(Term *term, std::string const& fieldName);
 
 void unsafe_change_type(Term* term, Term* type);

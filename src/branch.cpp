@@ -19,9 +19,14 @@ Branch::~Branch()
     this->terms.clear();
 
     std::vector<Term*>::iterator it;
-    // FIXME
-    //for (it = myTerms.begin(); it != myTerms.end(); ++it)
+    for (it = myTerms.begin(); it != myTerms.end(); ++it) {
+        // FIXME
+        // We should delete terms here, but it currently causes errors
         //delete *it;
+        Term *term = *it;
+        if (term != NULL)
+            term->owningBranch = NULL;
+    }
 }
 
 bool Branch::containsName(std::string const& name) const

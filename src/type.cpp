@@ -67,10 +67,13 @@ Type::addMemberFunction(std::string const &name, Term *function)
 
 struct CompoundValue {
 
+    int signature;
     Branch branch;
     ReferenceList fields;
 
     // Member functions
+    CompoundValue() : signature(COMPOUND_TYPE_SIGNATURE) {}
+
     Term* appendSlot(Term* type) {
         Term* newTerm = create_constant(&branch, type);
         fields.append(newTerm);
@@ -135,27 +138,20 @@ struct CompoundValue {
     }
 };
 
+bool is_compound_value(Term *term)
+{
+    return ((CompoundValue*) term->value)->signature == COMPOUND_TYPE_SIGNATURE;
+}
+
 Term* get_field(Term *term, std::string const& fieldName)
 {
-    return NULL;
-    /*
-     * FIXME
-    assert_instance(term->type, COMPOUND_TYPE);
-
-    // Look into term's type, find the index of this field name
-    List& fields = as_list_unchecked(as_list_unchecked(term->type)[1]);
-
-    int index = 0;
-    for (; index < fields.count(); index++) {
-        if (as_string(get_field_name(fields[index])) == fieldName)
-            break;
-    }
-
-    if (index == fields.count())
+    assert(is_compound_value(term));
+    CompoundValue *value = (CompoundValue*) term->value;
+    Type& type = *as_type(term->type);
+    int index = type.findField(fieldName);
+    if (index == -1)
         return NULL;
-
-    return as_list_unchecked(term)[index];
-    */
+    return value->fields[index];
 }
 
 Term* get_as(Term *term, Term *type)

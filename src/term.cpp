@@ -86,9 +86,9 @@ Term::findName()
 }
 
 Term*
-Term::field(std::string const& name) const
+Term::field(std::string const& name)
 {
-    return NULL;
+    return get_field(this, name);
 }
 
 bool
