@@ -29,10 +29,16 @@ public:
     void append(Term* term) { terms.push_back(term); }
 
     // Returns true if there is a term with the given name
-    bool containsName(std::string const& name) const;
+    bool containsName(std::string const& name) const
+    {
+        return names.contains(name);
+    }
 
     // Get the term with the given name.
-    Term* getNamed(std::string const& name) const;
+    Term* getNamed(std::string const& name) const
+    {
+        return names[name];
+    }
 
     // Convenience syntax for getNamed
     Term* operator[](std::string const& name) const { return getNamed(name); }
@@ -42,7 +48,10 @@ public:
     Term* findNamed(std::string const& name) const;
 
     // Bind a name to a term
-    void bindName(Term* term, string name);
+    void bindName(Term* term, string name)
+    {
+        names.bind(term, name);
+    }
 
     // Remap pointers
     void remapPointers(TermMap const& map);

@@ -16,8 +16,7 @@ bool is_subroutine(Term* term)
 
 Subroutine& as_subroutine(Term* term)
 {
-    term = get_as_checked(term, SUBROUTINE_TYPE);
-
+    assert_instance(term, SUBROUTINE_TYPE);
     return *((Subroutine*) term->value);
 }
 
