@@ -43,9 +43,11 @@ void compound_types()
     //test_assert(is_string(inst1_myint));
     
     // test Term::field
-    test_assert(inst1->field("myint") == inst1_myint);
+    test_assert(inst1->field("myint") != NULL);
 
     inst1->field("myint")->asInt() = 5;
+    eval_statement(branch, "get-field(inst1, 'myint)");
+    test_assert(eval_statement(branch, "get-field(inst1, 'myint)")->asInt() == 5);
 
     Term* inst2 = eval_statement(branch, "inst2 = type1()");
 

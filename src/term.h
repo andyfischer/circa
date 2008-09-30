@@ -42,7 +42,7 @@ struct Term
     bool equals(Term* term);
     std::string findName();
 
-    Term* field(std::string const& name) const;
+    Term* field(std::string const& name);
 
     bool hasError() const;
     int numErrors() const;
