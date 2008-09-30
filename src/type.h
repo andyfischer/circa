@@ -126,16 +126,6 @@ void assign_from_cpp_type(Type& type)
 
 Term* quick_create_type(Branch* branch, std::string name);
 
-// Return 'term' as an instance of 'type'. In the simple case, if 'term' is
-// an instance of 'type', just return it. If 'term' is a derived type, then
-// we look up the inheritance tree until we find 'type', and return that
-// instance. If the type isn't found, return NULL.
-Term* get_as(Term *term, Term *type);
-
-// Similar to 'get_as', but we never return NULL. If term is not an instance
-// of type, throw a TypeError.
-Term* get_as_checked(Term *term, Term *type);
-
 // Return true if the term is an instance (possibly derived) of the given type
 bool is_instance(Term* term, Term* type);
 

@@ -29,27 +29,12 @@ Branch::~Branch()
     }
 }
 
-bool Branch::containsName(std::string const& name) const
-{
-    return names.contains(name);
-}
-
-Term* Branch::getNamed(std::string const& name) const
-{
-    return names[name];
-}
-
 Term* Branch::findNamed(std::string const& name) const
 {
     if (containsName(name))
         return getNamed(name);
 
     return get_global(name);
-}
-
-void Branch::bindName(Term* term, string name)
-{
-    names.bind(term, name);
 }
 
 void Branch::remapPointers(TermMap const& map)

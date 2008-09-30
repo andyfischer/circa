@@ -134,6 +134,7 @@ struct CompoundValue {
 
         assert(index >= 0);
 
+        specialize_type(term, value->fields[index]->type);
         recycle_value(value->fields[index], term);
     }
 };
@@ -154,39 +155,6 @@ Term* get_field(Term *term, std::string const& fieldName)
     return value->fields[index];
 }
 
-Term* get_as(Term *term, Term *type)
-{
-    assert(term != NULL);
-
-    if (term->type == type)
-        return term;
-
-    return NULL;
-
-    /* FIXME
-
-    if (term->type->type != COMPOUND_TYPE)
-        return NULL;
-
-    Term* parent = get_parent(term);
-
-    if (parent == NULL)
-        return NULL;
-
-    return get_as(parent, get_parent_type(term->type));
-    */
-}
-
-Term* get_as_checked(Term *term, Term *type)
-{
-    term = get_as(term, type);
-
-    if (term == NULL)
-        throw errors::TypeError(term, type);
-
-    return term;
-}
-
 bool is_instance(Term *term, Term *type)
 {
     assert(term != NULL);
@@ -195,9 +163,7 @@ bool is_instance(Term *term, Term *type)
     if (CURRENTLY_BOOTSTRAPPING && type == NULL)
         return true;
 
-    term = get_as(term, type);
-
-    return term != NULL;
+    return term->type == type;
 }
 
 void assert_instance(Term *term, Term *type)
@@ -215,10 +181,8 @@ bool is_type(Term *term)
 
 Type* as_type(Term *term)
 {
-    assert(term != NULL);
     assert_instance(term, TYPE_TYPE);
-    term = get_as(term, TYPE_TYPE);
-    return (Type*) term->value;
+    return ((Type*) term->value);
 }
 
 Term* quick_create_type(Branch* branch, std::string name)
