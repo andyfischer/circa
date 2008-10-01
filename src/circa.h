@@ -11,7 +11,6 @@
 #include "list.h"
 #include "operations.h"
 #include "parser.h"
-#include "subroutine.h"
 #include "term.h"
 #include "tokenizer.h"
 #include "token_stream.h"
