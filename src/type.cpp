@@ -217,8 +217,10 @@ void change_type(Term *term, Term *typeTerm)
 
     Type *type = as_type(typeTerm);
 
-    if (type->alloc == NULL)
+    if (type->alloc == NULL) {
+        std::cout << "name: " << typeTerm->findName() << std::endl;
         throw errors::InternalError(string("type ") + type->name + " has no alloc function");
+    }
 
     type->alloc(term);
 

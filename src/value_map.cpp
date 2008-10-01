@@ -40,9 +40,15 @@ ValueMap::set(Term* key, Term* value)
     }
 }
 
+ValueMap& as_value_map(Term* term)
+{
+    // todo, add type checking
+    return *((ValueMap*) term->value);
+}
+
 void map_access__evaluate(Term* term)
 {
-    ValueMap& map = as<ValueMap>(term->inputs[0]);
+    ValueMap& map = as_value_map(term->inputs[0]);
 
     Term* value = map.findValueForKey(term->inputs[1]);
     
@@ -57,7 +63,7 @@ void map_set__evaluate(Term* term)
 
     recycle_value(term->inputs[0], term);
 
-    as<ValueMap>(term).set(key, value);
+    as_value_map(term).set(key, value);
 }
 
 void initialize_map_function(Branch* kernel)
