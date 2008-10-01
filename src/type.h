@@ -85,6 +85,10 @@ struct Type
     }
 
     void addMemberFunction(std::string const& name, Term* function);
+
+    // Hosted functions:
+    static std::string to_string(Term *caller);
+
 };
 
 bool is_type(Term* term);

@@ -20,18 +20,6 @@ Subroutine& as_subroutine(Term* term)
     return *((Subroutine*) term->value);
 }
 
-/*
-void Subroutine_duplicate(Term* source, Term* dest)
-{
-    Subroutine& sourceSub = as_subroutine(source);
-    Subroutine& destSub = as_subroutine(dest);
-    destSub.branch.clear();
-
-    *((Function*) destSub) = *((Function*) sourceSub);
-    duplicate_branch(sourceSub->branch, destSub->branch);
-}
-*/
-
 std::string GetInputPlaceholderName(int index)
 {
     std::stringstream sstream;

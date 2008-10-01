@@ -254,34 +254,45 @@ Term* create_empty_type(Branch* branch)
     return term;
 }
 
-std::string int__toString(Term* term)
-{
-    std::stringstream strm;
-    strm << as_int(term);
-    return strm.str();
-}
+namespace primitives {
+    namespace int_t {
+        std::string to_string(Term* term)
+        {
+            std::stringstream strm;
+            strm << as_int(term);
+            return strm.str();
+        }
+    }
 
-std::string float__toString(Term* term)
-{
-    std::stringstream strm;
-    strm << as_float(term);
-    return strm.str();
-}
+    namespace float_t {
+        std::string to_string(Term* term)
+        {
+            std::stringstream strm;
+            strm << as_float(term);
+            return strm.str();
+        }
+    }
 
-std::string string__toString(Term* term)
-{
-    return as_string(term);
-}
+    namespace string_t {
+        std::string to_string(Term* term)
+        {
+            return as_string(term);
+        }
+    }
 
-std::string bool__toString(Term* term)
-{
-    if (as_bool(term))
-        return "true";
-    else
-        return "false";
-}
+    namespace bool_t {
+        std::string to_string(Term* term)
+        {
+            if (as_bool(term))
+                return "true";
+            else
+                return "false";
+        }
+    }
 
-std::string Type__toString(Term *caller)
+} // namespace primitives
+
+std::string Type::to_string(Term *caller)
 {
     return std::string("<Type " + as_type(caller)->name + ">");
 }
@@ -291,25 +302,25 @@ void initialize_type_type(Term* typeType)
     typeType->value = new Type();
     as_type(typeType)->name = "Type";
     assign_from_cpp_type<Type>(*as_type(typeType));
-    as_type(typeType)->toString = Type__toString;
+    as_type(typeType)->toString = Type::to_string;
 }
 
 void initialize_primitive_types(Branch* kernel)
 {
     STRING_TYPE = quick_create_cpp_type<std::string>(KERNEL, "string");
     as_type(STRING_TYPE)->equals = cpp_interface::templated_equals<std::string>;
-    as_type(STRING_TYPE)->toString = string__toString;
+    as_type(STRING_TYPE)->toString = primitives::string_t::to_string;
 
     INT_TYPE = quick_create_cpp_type<int>(KERNEL, "int");
     as_type(INT_TYPE)->equals = cpp_interface::templated_equals<int>;
-    as_type(INT_TYPE)->toString = int__toString;
+    as_type(INT_TYPE)->toString = primitives::int_t::to_string;
 
     FLOAT_TYPE = quick_create_cpp_type<float>(KERNEL, "float");
     as_type(FLOAT_TYPE)->equals = cpp_interface::templated_equals<float>;
-    as_type(FLOAT_TYPE)->toString = float__toString;
+    as_type(FLOAT_TYPE)->toString = primitives::float_t::to_string;
 
     BOOL_TYPE = quick_create_cpp_type<bool>(KERNEL, "bool");
-    as_type(BOOL_TYPE)->toString = bool__toString;
+    as_type(BOOL_TYPE)->toString = primitives::bool_t::to_string;
 
     ANY_TYPE = quick_create_type(KERNEL, "any",
             type_private::empty_function,
