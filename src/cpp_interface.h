@@ -5,6 +5,7 @@
 
 #include "bootstrapping.h"
 #include "term.h"
+#include "type.h"
 
 namespace circa {
 namespace cpp_interface {
@@ -42,24 +43,30 @@ std::string templated_toString(Term* term)
 
 } // namespace cpp_interface
 
+template <class CppType>
+void assign_from_cpp_type(Type& type)
+{
+    type.alloc = cpp_interface::templated_alloc<CppType>;
+    type.dealloc = cpp_interface::templated_dealloc<CppType>;
+    type.duplicate = cpp_interface::templated_duplicate<CppType>;
+    //type.equals = cpp_interface::templated_equals<CppType>;
+}
+
 // Public functions
 
 template <class T>
 Term* quick_create_cpp_type(Branch* branch, std::string name)
 {
-    Term* term = quick_create_type(branch, name,
-        cpp_interface::templated_alloc<T>,
-        cpp_interface::templated_dealloc<T>,
-        cpp_interface::templated_duplicate<T>,
-        NULL);
+    Term* term = quick_create_type(branch, name);
+    assign_from_cpp_type<T>(*as_type(term));
     return term;
 }
 
 template <class T>
 T& as(Term* term)
 {
-    // TODO: Add type checking to this function
-    return *reinterpret_cast<T*>(term->value);
+    // todo: add type checking
+    return *((T*) term->value);
 }
 
 } // namespace circa
