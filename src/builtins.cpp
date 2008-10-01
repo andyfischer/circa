@@ -59,11 +59,11 @@ void const_generator(Term* caller)
 {
     assert(caller->inputs[0] != NULL);
 
-    Function *output = as_function(caller);
+    Function& output = as_function(caller);
     Type* type = as_type(caller->inputs[0]);
-    output->name = "const-" + type->name;
-    output->outputType = caller->inputs[0];
-    output->evaluate = empty_evaluate_function;
+    output.name = "const-" + type->name;
+    output.outputType = caller->inputs[0];
+    output.evaluate = empty_evaluate_function;
 }
 
 Term* get_global(string name)
@@ -80,18 +80,18 @@ void bootstrap_kernel()
 
     // Create const-generator function
     CONST_GENERATOR = new Term();
-    Function_alloc(CONST_GENERATOR);
-    as_function(CONST_GENERATOR)->name = "const-generator";
-    as_function(CONST_GENERATOR)->pureFunction = true;
-    as_function(CONST_GENERATOR)->evaluate = const_generator;
+    Function::alloc(CONST_GENERATOR);
+    as_function(CONST_GENERATOR).name = "const-generator";
+    as_function(CONST_GENERATOR).pureFunction = true;
+    as_function(CONST_GENERATOR).evaluate = const_generator;
     KERNEL->bindName(CONST_GENERATOR, "const-generator");
 
     // Create const-Type function
     Term* constTypeFunc = new Term();
     constTypeFunc->function = CONST_GENERATOR;
-    Function_alloc(constTypeFunc);
-    as_function(constTypeFunc)->name = "const-Type";
-    as_function(constTypeFunc)->pureFunction = true;
+    Function::alloc(constTypeFunc);
+    as_function(constTypeFunc).name = "const-Type";
+    as_function(constTypeFunc).pureFunction = true;
 
     // Create Type type
     Term* typeType = new Term();
@@ -103,15 +103,15 @@ void bootstrap_kernel()
 
     // Implant the Type type
     set_input(constTypeFunc, 0, typeType);
-    as_function(CONST_GENERATOR)->inputTypes.setAt(0, typeType);
-    as_function(constTypeFunc)->outputType = typeType;
+    as_function(CONST_GENERATOR).inputTypes.setAt(0, typeType);
+    as_function(constTypeFunc).outputType = typeType;
 
     // Create const-Function function
     Term* constFuncFunc = new Term();
     constFuncFunc->function = CONST_GENERATOR;
-    Function_alloc(constFuncFunc);
-    as_function(constFuncFunc)->name = "const-Function";
-    as_function(constFuncFunc)->pureFunction = true;
+    Function::alloc(constFuncFunc);
+    as_function(constFuncFunc).name = "const-Function";
+    as_function(constFuncFunc).pureFunction = true;
     KERNEL->bindName(constFuncFunc, "const-Function");
 
     // Implant const-Function
@@ -124,9 +124,9 @@ void bootstrap_kernel()
     functionType->type = typeType;
     as_type(typeType)->alloc(functionType);
     as_type(functionType)->name = "Function";
-    as_type(functionType)->alloc = Function_alloc;
-    as_type(functionType)->duplicate = Function_duplicate;
-    as_type(functionType)->dealloc = Function_dealloc;
+    as_type(functionType)->alloc = Function::alloc;
+    as_type(functionType)->duplicate = Function::duplicate;
+    as_type(functionType)->dealloc = Function::dealloc;
     KERNEL->bindName(functionType, "Function");
 
     // Implant Function type
@@ -135,8 +135,8 @@ void bootstrap_kernel()
     CONST_GENERATOR->type = functionType;
     constFuncFunc->type = functionType;
     constTypeFunc->type = functionType;
-    as_function(CONST_GENERATOR)->outputType = functionType;
-    as_function(constFuncFunc)->outputType = functionType;
+    as_function(CONST_GENERATOR).outputType = functionType;
+    as_function(constFuncFunc).outputType = functionType;
 
     // Don't let these terms get updated
     CONST_GENERATOR->needsUpdate = false;
@@ -293,7 +293,7 @@ void initialize_builtin_functions(Branch* code)
     UNKNOWN_FUNCTION = quick_create_function(code, "unknown-function",
             unknown_function__evaluate,
             ReferenceList(ANY_TYPE), ANY_TYPE);
-    as_function(UNKNOWN_FUNCTION)->stateType = STRING_TYPE;
+    as_function(UNKNOWN_FUNCTION).stateType = STRING_TYPE;
 }
 
 void initialize()

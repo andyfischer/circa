@@ -17,10 +17,10 @@ Term* import_c_function(Branch* branch, Function::EvaluateFunc evaluate, std::st
     ast::FunctionHeader *header = parser::functionHeader(tokens);
 
     Term* term = create_constant(branch, FUNCTION_TYPE);
-    Function* func = as_function(term);
+    Function& func = as_function(term);
 
-    func->name = header->functionName;
-    func->evaluate = evaluate;
+    func.name = header->functionName;
+    func.evaluate = evaluate;
 
     ReferenceList inputTypes;
 
@@ -41,8 +41,8 @@ Term* import_c_function(Branch* branch, Function::EvaluateFunc evaluate, std::st
     else
         outputType = VOID_TYPE;
 
-    func->inputTypes = inputTypes;
-    func->outputType = outputType;
+    func.inputTypes = inputTypes;
+    func.outputType = outputType;
     branch->bindName(term, header->functionName);
 
     delete header;
