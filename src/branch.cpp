@@ -71,7 +71,6 @@ void initialize_branch(Branch* kernel)
     Term* bind_name = quick_create_function(kernel, "bind-name", branch_bind_name,
         ReferenceList(BRANCH_TYPE, STRING_TYPE, ANY_TYPE),
         BRANCH_TYPE);
-    as_function(bind_name)->recycleInput = 0;
 }
 
 } // namespace circa

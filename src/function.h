@@ -17,18 +17,6 @@ struct Function
 
     Term* stateType;
 
-    // recycleInput is an index of which input we want to recycle.
-    // This means that when executing, the runtime will do one of
-    // two things:
-    //  1) the runtime may copy this input to the calling term
-    //  2) or, 'steal' the value from this input and give it to
-    //     the calling term (this is much more efficient).
-    // Either way, the evaluate function should not attempt to access
-    // the value of the input that it wants to recycle.
-    // This value may also be -1, which means to not try to recycle.
-    // -1 is the default.
-    int recycleInput;
-
     bool pureFunction;
     bool variableArgs;
 
