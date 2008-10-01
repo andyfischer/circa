@@ -3,8 +3,8 @@
 #include "branch.h"
 #include "errors.h"
 #include "evaluation.h"
+#include "function.h"
 #include "operations.h"
-#include "subroutine.h"
 
 namespace circa {
 namespace evaluation {
@@ -12,7 +12,7 @@ namespace evaluation {
 void
 Engine::SubroutineScope::onClose()
 {
-    Subroutine_closeBranch(this->callingTerm);
+    //FIXME Subroutine_closeBranch(this->callingTerm);
 }
 
 bool
@@ -25,7 +25,7 @@ void
 Engine::evaluate(Term* term)
 {
     // Special case for subroutines. Open a branch scope.
-    if (is_subroutine(term->function)) {
+    /*if (is_subroutine(term->function)) {
         SubroutineScope *scope = new SubroutineScope();
 
         scope->callingTerm = term;
@@ -33,7 +33,7 @@ Engine::evaluate(Term* term)
 
         mStack.push(scope);
 
-    } else {
+    } else*/ {
         evaluate_term(term);
     }
 }

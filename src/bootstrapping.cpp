@@ -9,7 +9,6 @@
 #include "token_stream.h"
 #include "operations.h"
 #include "ref_list.h"
-#include "subroutine.h"
 
 namespace token = circa::tokenizer;
 

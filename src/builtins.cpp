@@ -14,7 +14,6 @@
 #include "function.h"
 #include "list.h"
 #include "operations.h"
-#include "subroutine.h"
 #include "tokenizer.h"
 #include "token_stream.h"
 #include "term.h"
@@ -35,7 +34,6 @@ Term* STRING_TYPE = NULL;
 Term* TYPE_TYPE = NULL;
 Term* FUNCTION_TYPE = NULL;
 Term* CODEUNIT_TYPE = NULL;
-Term* SUBROUTINE_TYPE = NULL;
 Term* BRANCH_TYPE = NULL;
 Term* ANY_TYPE = NULL;
 Term* VOID_TYPE = NULL;
@@ -311,7 +309,6 @@ void initialize()
         initialize_builtin_functions(KERNEL);
         initialize_functions(KERNEL);
         initialize_map_function(KERNEL);
-        initialize_subroutine(KERNEL);
 
         // Lastly:
         initialize_bootstrapped_code(KERNEL);
