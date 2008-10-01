@@ -59,7 +59,7 @@ void
 Type::addMemberFunction(std::string const &name, Term *function)
 {
     // make sure argument 0 of the function matches this type
-    if (as_type(as_function(function)->inputTypes[0]) != this)
+    if (as_type(as_function(function).inputTypes[0]) != this)
         throw errors::InternalError("argument 0 of function doesn't match this type");
 
     this->memberFunctions.bind(function, name);

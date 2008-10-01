@@ -101,11 +101,11 @@ void evaluate_term(Term* term)
         return;
     }
 
-    Function* func = as_function(term->function);
+    Function& func = as_function(term->function);
 
-    if (func->evaluate == NULL) {
+    if (func.evaluate == NULL) {
         std::stringstream message;
-        message << "Function '" << func->name << "' has no evaluate function";
+        message << "Function '" << func.name << "' has no evaluate function";
         term->pushError(message.str());
         return;
     }
@@ -143,13 +143,13 @@ void evaluate_term(Term* term)
     }    
 
     try {
-        func->evaluate(term);
+        func.evaluate(term);
         term->needsUpdate = false;
     }
     catch (errors::InternalError &err)
     {
         std::stringstream message;
-        message << "An internal error occured while executing " + func->name << ": "
+        message << "An internal error occured while executing " + func.name << ": "
             << err.message();
         term->pushError(message.str());
     }

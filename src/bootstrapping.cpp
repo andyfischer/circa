@@ -39,11 +39,11 @@ Term* quick_create_function(Branch* branch, string name, Function::EvaluateFunc 
         ReferenceList inputTypes, Term* outputType)
 {
     Term* term = create_constant(branch, FUNCTION_TYPE);
-    Function* func = as_function(term);
-    func->name = name;
-    func->evaluate = evaluateFunc;
-    func->inputTypes = inputTypes;
-    func->outputType = outputType;
+    Function& func = as_function(term);
+    func.name = name;
+    func.evaluate = evaluateFunc;
+    func.inputTypes = inputTypes;
+    func.outputType = outputType;
     branch->bindName(term, name);
 	return term;
 }

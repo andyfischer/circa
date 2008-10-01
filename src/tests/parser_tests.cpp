@@ -112,7 +112,7 @@ void create_function_call()
     functionCall->addArgument(new ast::LiteralFloat("3"), "", "");
 
     Term *term = functionCall->createTerm(&branch);
-    test_assert(as_function(term->function)->name == "add");
+    test_assert(as_function(term->function).name == "add");
 
     // make sure this term is not evaluated yet
     test_assert(term->needsUpdate);

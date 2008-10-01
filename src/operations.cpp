@@ -44,10 +44,10 @@ void initialize_term(Term* term, Term* function, ReferenceList inputs)
         throw errors::InternalError("Function is NULL");
 
     term->function = function;
-    Function* functionData = as_function(function);
+    Function& functionData = as_function(function);
 
-    Term* outputType = functionData->outputType;
-    Term* stateType = functionData->stateType;
+    Term* outputType = functionData.outputType;
+    Term* stateType = functionData.stateType;
 
     if (outputType == NULL)
         throw errors::InternalError("outputType is NULL");
@@ -70,8 +70,8 @@ void initialize_term(Term* term, Term* function, ReferenceList inputs)
     set_inputs(term, inputs);
 
     // Run the function's initialize (if it has one)
-    if (functionData->initialize != NULL) {
-        functionData->initialize(term);
+    if (functionData.initialize != NULL) {
+        functionData.initialize(term);
     }
 
     // Add to the 'users' field of each input, and 'function'

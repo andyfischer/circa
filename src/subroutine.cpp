@@ -6,9 +6,6 @@
 
 namespace circa {
 
-static const char * INPUT_PLACEHOLDER_PREFIX = "#input-";
-static const char * OUTPUT_PLACEHOLDER_NAME = "#output";
-
 bool is_subroutine(Term* term)
 {
     return term->type == SUBROUTINE_TYPE;
@@ -23,7 +20,7 @@ Subroutine& as_subroutine(Term* term)
 std::string GetInputPlaceholderName(int index)
 {
     std::stringstream sstream;
-    sstream << INPUT_PLACEHOLDER_PREFIX << index;
+    sstream << "#input-" << index;
     return sstream.str();
 }
 
