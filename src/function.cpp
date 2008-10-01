@@ -12,7 +12,6 @@ namespace circa {
 Function::Function()
   : outputType(NULL),
     stateType(NULL),
-    recycleInput(-1),
     pureFunction(false),
     variableArgs(false),
     initialize(NULL),
@@ -51,18 +50,8 @@ void Function_dealloc(Term* caller)
     delete as_function(caller);
 }
 
-void function_recycle_input(Term* caller)
-{
-    recycle_value(caller->inputs[0], caller);
-    as_function(caller)->recycleInput = as_int(caller->inputs[1]);
-}
-
 void initialize_functions(Branch* kernel)
 {
-    Term* set_recycle_input = quick_create_function(kernel, "function-recycle-input",
-            function_recycle_input, ReferenceList(FUNCTION_TYPE,INT_TYPE),
-            FUNCTION_TYPE);
-    as_function(set_recycle_input)->recycleInput = 0;
 }
 
 } // namespace circa

@@ -242,7 +242,6 @@ void initialize_subroutine(Branch* kernel)
     Term* set_branch = quick_create_function(kernel,
         "subroutine-set-branch", subroutine_set_branch__evaluate,
         ReferenceList(SUBROUTINE_TYPE, BRANCH_TYPE), SUBROUTINE_TYPE);
-    as_function(set_branch)->recycleInput = 0;
 
     quick_create_function(kernel, "subroutine-get-local",
         subroutine_get_local__evaluate,
@@ -251,7 +250,6 @@ void initialize_subroutine(Branch* kernel)
     Term* bind = quick_create_function(kernel, "subroutine-bind",
         subroutine_bind__evaluate,
         ReferenceList(SUBROUTINE_TYPE, REFERENCE_TYPE, STRING_TYPE), SUBROUTINE_TYPE);
-    as_function(bind)->recycleInput = 0;
 
     quick_create_function(kernel,
         "subroutine-eval", subroutine_eval__evaluate,
