@@ -176,18 +176,18 @@ void create_list__evaluate(Term* caller)
 {
     as_list(caller).clear();
 
-    for (int i=0; i < caller->inputs.count(); i++) {
+    for (unsigned int i=0; i < caller->inputs.count(); i++) {
         as_list(caller).append(caller->inputs[i]);
     }
 }
 
 void range__evaluate(Term* caller)
 {
-    int max = as_int(caller->inputs[0]);
+    unsigned int max = as_int(caller->inputs[0]);
 
     as_list(caller).clear();
 
-    for (int i=0; i < max; i++) {
+    for (unsigned int i=0; i < max; i++) {
         as_list(caller).append(constant_int(caller->owningBranch, i));
     }
 }

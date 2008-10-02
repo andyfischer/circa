@@ -114,7 +114,7 @@ void evaluate_term(Term* term)
     //  1) they are not null
     //  1) they are up-to-date
     //  2) they have a non-null value
-    for (int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++)
+    for (unsigned int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++)
     {
         Term* input = term->inputs[inputIndex];
          

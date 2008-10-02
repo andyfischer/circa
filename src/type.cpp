@@ -65,6 +65,7 @@ Type::addMemberFunction(std::string const &name, Term *function)
     this->memberFunctions.bind(function, name);
 }
 
+
 struct CompoundValue {
 
     int signature;
@@ -97,6 +98,7 @@ struct CompoundValue {
     static void dealloc(Term* term)
     {
         delete (CompoundValue*) term->value;
+        term->value = NULL;
     }
 
     static void create_compound_type(Term* term)
@@ -119,34 +121,44 @@ struct CompoundValue {
         output.addField(fieldType, fieldName);
     }
 
+    static bool is_compound_value(Term *term)
+    {
+        assert(term != NULL);
+        assert(term->value != NULL);
+        return ((CompoundValue*) term->value)->signature == COMPOUND_TYPE_SIGNATURE;
+    }
+
+    static CompoundValue& as_compound_value(Term *term)
+    {
+        assert(is_compound_value(term));
+        return *((CompoundValue*) term->value);
+    }
+
     static void get_field(Term* term)
     {
-        CompoundValue *value = (CompoundValue*) term->value;
+        CompoundValue &value = as_compound_value(term->inputs[0]);
         std::string fieldName = as_string(term->inputs[1]);
-        Type& type = *as_type(term->type);
+        Type& type = *as_type(term->inputs[0]->type);
 
         int index = type.findField(fieldName);
 
         if (index == -1) {
+            std::cout << "field not found" << std::endl;
             term->pushError(std::string("field \'")+fieldName+"\' not found");
             return;
         }
 
         assert(index >= 0);
 
-        specialize_type(term, value->fields[index]->type);
-        recycle_value(value->fields[index], term);
+        Term* field = value.fields[index];
+        specialize_type(term, field->type);
+        recycle_value(field, term);
     }
 };
 
-bool is_compound_value(Term *term)
-{
-    return ((CompoundValue*) term->value)->signature == COMPOUND_TYPE_SIGNATURE;
-}
-
 Term* get_field(Term *term, std::string const& fieldName)
 {
-    assert(is_compound_value(term));
+    assert(CompoundValue::is_compound_value(term));
     CompoundValue *value = (CompoundValue*) term->value;
     Type& type = *as_type(term->type);
     int index = type.findField(fieldName);
@@ -211,7 +223,7 @@ void change_type(Term *term, Term *typeTerm)
     if (term->value != NULL)
         throw errors::InternalError("value is not NULL in change_type (possible memory leak)");
 
-    Term* oldType = term->type;
+    // Term* oldType = term->type;
 
     term->type = typeTerm;
 
@@ -322,6 +334,7 @@ void initialize_primitive_types(Branch* kernel)
     as_type(FLOAT_TYPE)->toString = primitives::float_t::to_string;
 
     BOOL_TYPE = quick_create_cpp_type<bool>(KERNEL, "bool");
+    as_type(BOOL_TYPE)->equals = cpp_interface::templated_equals<bool>;
     as_type(BOOL_TYPE)->toString = primitives::bool_t::to_string;
 
     ANY_TYPE = quick_create_type(KERNEL, "any",

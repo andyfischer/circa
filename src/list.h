@@ -35,7 +35,7 @@ public:
     {
         ReferenceList result;
 
-        for (int i=0; i < items.count(); i++)
+        for (unsigned int i=0; i < items.count(); i++)
             result.append(as_ref(items[i]));
 
         return result;

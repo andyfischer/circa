@@ -22,7 +22,6 @@
 		B6B06CE50E7F480700671D05 /* evaluation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CDB0E7F480700671D05 /* evaluation.cpp */; };
 		B6B06CE60E7F480700671D05 /* builtin_libraries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CDE0E7F480700671D05 /* builtin_libraries.cpp */; };
 		B6B06CE70E7F480700671D05 /* graphviz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CE00E7F480700671D05 /* graphviz.cpp */; };
-		B6B06CE80E7F480700671D05 /* primitive_types.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CE20E7F480700671D05 /* primitive_types.cpp */; };
 		B6B06CEB0E7F481B00671D05 /* error_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CE90E7F481B00671D05 /* error_tests.cpp */; };
 		B6B06CEC0E7F481B00671D05 /* type_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CEA0E7F481B00671D05 /* type_tests.cpp */; };
 		B6B06CFF0E7F491300671D05 /* values.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B06CFD0E7F491300671D05 /* values.cpp */; };
@@ -43,7 +42,6 @@
 		B6F114C00E33394F00B8BA44 /* branch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114A10E33394F00B8BA44 /* branch.cpp */; };
 		B6F114C40E33394F00B8BA44 /* builtins.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114A70E33394F00B8BA44 /* builtins.cpp */; };
 		B6F114C80E33394F00B8BA44 /* function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114B00E33394F00B8BA44 /* function.cpp */; };
-		B6F114CC0E33394F00B8BA44 /* subroutine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114B60E33394F00B8BA44 /* subroutine.cpp */; };
 		B6F114CD0E33394F00B8BA44 /* term.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114B80E33394F00B8BA44 /* term.cpp */; };
 		B6F114D00E33394F00B8BA44 /* type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F114BD0E33394F00B8BA44 /* type.cpp */; };
 		B6F1151A0E34F4B300B8BA44 /* operations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6F115160E34F4B300B8BA44 /* operations.cpp */; };
@@ -90,8 +88,6 @@
 		B6B06CDF0E7F480700671D05 /* builtin_libraries.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = builtin_libraries.h; sourceTree = "<group>"; };
 		B6B06CE00E7F480700671D05 /* graphviz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphviz.cpp; sourceTree = "<group>"; };
 		B6B06CE10E7F480700671D05 /* graphviz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = graphviz.h; sourceTree = "<group>"; };
-		B6B06CE20E7F480700671D05 /* primitive_types.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitive_types.cpp; sourceTree = "<group>"; };
-		B6B06CE30E7F480700671D05 /* primitive_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = primitive_types.h; sourceTree = "<group>"; };
 		B6B06CE90E7F481B00671D05 /* error_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = error_tests.cpp; sourceTree = "<group>"; };
 		B6B06CEA0E7F481B00671D05 /* type_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = type_tests.cpp; sourceTree = "<group>"; };
 		B6B06CFD0E7F491300671D05 /* values.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = values.cpp; sourceTree = "<group>"; };
@@ -127,8 +123,6 @@
 		B6F114AF0E33394F00B8BA44 /* errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = errors.h; sourceTree = "<group>"; };
 		B6F114B00E33394F00B8BA44 /* function.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = function.cpp; sourceTree = "<group>"; };
 		B6F114B10E33394F00B8BA44 /* function.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = function.h; sourceTree = "<group>"; };
-		B6F114B60E33394F00B8BA44 /* subroutine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = subroutine.cpp; sourceTree = "<group>"; };
-		B6F114B70E33394F00B8BA44 /* subroutine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = subroutine.h; sourceTree = "<group>"; };
 		B6F114B80E33394F00B8BA44 /* term.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = term.cpp; sourceTree = "<group>"; };
 		B6F114B90E33394F00B8BA44 /* term.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = term.h; sourceTree = "<group>"; };
 		B6F114BB0E33394F00B8BA44 /* term_namespace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = term_namespace.h; sourceTree = "<group>"; };
@@ -226,8 +220,6 @@
 				B6B06CDA0E7F480700671D05 /* essentials.h */,
 				B6B06CDB0E7F480700671D05 /* evaluation.cpp */,
 				B6B06CDC0E7F480700671D05 /* evaluation.h */,
-				B6B06CE20E7F480700671D05 /* primitive_types.cpp */,
-				B6B06CE30E7F480700671D05 /* primitive_types.h */,
 				B6769D660E70D2E900BC7FAE /* importing.cpp */,
 				B6769D670E70D2E900BC7FAE /* importing.h */,
 				B6769D680E70D2E900BC7FAE /* value_map.cpp */,
@@ -257,8 +249,6 @@
 				B6A243B20E356E26007F2BEB /* main.cpp */,
 				B6F115160E34F4B300B8BA44 /* operations.cpp */,
 				B6F115170E34F4B300B8BA44 /* operations.h */,
-				B6F114B60E33394F00B8BA44 /* subroutine.cpp */,
-				B6F114B70E33394F00B8BA44 /* subroutine.h */,
 				B68D10CB0E47685600C6D09A /* term_map.cpp */,
 				B68D10CC0E47685600C6D09A /* term_map.h */,
 				B6B436C90E47E64F00E3B337 /* term_set.h */,
@@ -324,7 +314,6 @@
 				B6F114C00E33394F00B8BA44 /* branch.cpp in Sources */,
 				B6F114C40E33394F00B8BA44 /* builtins.cpp in Sources */,
 				B6F114C80E33394F00B8BA44 /* function.cpp in Sources */,
-				B6F114CC0E33394F00B8BA44 /* subroutine.cpp in Sources */,
 				B6F114CD0E33394F00B8BA44 /* term.cpp in Sources */,
 				B6F114D00E33394F00B8BA44 /* type.cpp in Sources */,
 				B6F1151A0E34F4B300B8BA44 /* operations.cpp in Sources */,
@@ -355,7 +344,6 @@
 				B6B06CE50E7F480700671D05 /* evaluation.cpp in Sources */,
 				B6B06CE60E7F480700671D05 /* builtin_libraries.cpp in Sources */,
 				B6B06CE70E7F480700671D05 /* graphviz.cpp in Sources */,
-				B6B06CE80E7F480700671D05 /* primitive_types.cpp in Sources */,
 				B6B06CEB0E7F481B00671D05 /* error_tests.cpp in Sources */,
 				B6B06CEC0E7F481B00671D05 /* type_tests.cpp in Sources */,
 				B6B06CFF0E7F491300671D05 /* values.cpp in Sources */,

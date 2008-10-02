@@ -16,6 +16,7 @@ struct Expression;
 
 struct ExpressionWalker
 {
+    virtual ~ExpressionWalker() {}
     virtual void visit(Expression* expr) = 0;
 };
 
@@ -151,7 +152,7 @@ struct StatementList
 
     void push(Statement* statement);
 
-    ~StatementList();
+    virtual ~StatementList();
     virtual std::string toString() const;
     void createTerms(Branch* branch);
     virtual std::string typeName() { return "statement-list"; }

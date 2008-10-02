@@ -106,7 +106,7 @@ FunctionCall::createTerm(Branch* branch)
 {
     ReferenceList inputs;
 
-    for (int i=0; i < arguments.size(); i++) {
+    for (unsigned int i=0; i < arguments.size(); i++) {
         Argument* arg = arguments[i];
         Term* term = arg->expression->createTerm(branch);
         assert(term != NULL);
@@ -302,7 +302,7 @@ FunctionDecl::createTerm(Branch* branch)
 
     int numStatements = this->statements->count();
     for (int statementIndex=0; statementIndex < numStatements; statementIndex++) {
-        Statement* statement = this->statements->operator[](statementIndex);
+        //Statement* statement = this->statements->operator[](statementIndex);
 
         // FIXME statement->createTerm(as_subroutine(sub)->branch);
 

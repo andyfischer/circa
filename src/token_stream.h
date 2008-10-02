@@ -12,7 +12,7 @@ namespace token_stream {
 struct TokenStream
 {
     tokenizer::TokenList tokens;
-    int currentIndex;
+    unsigned int currentIndex;
     std::set<const char*> skipSet;
 
     TokenStream(tokenizer::TokenList const& _tokens)
@@ -57,7 +57,7 @@ struct TokenStream
     {
         int deleteCount = 0;
 
-        for (int i=0; i < tokens.size(); i++) {
+        for (int i=0; i < (int) tokens.size(); i++) {
 
             if (tokens[i].match == tokenizer::WHITESPACE) {
                 deleteCount++;
@@ -71,7 +71,7 @@ struct TokenStream
 
     tokenizer::TokenInstance const& next(int lookahead=0) const
     {
-        int i = this->currentIndex + lookahead;
+        unsigned int i = this->currentIndex + lookahead;
 
         if (i >= tokens.size())
             throw syntax_errors::SyntaxError("Unexpected EOF");
@@ -105,7 +105,7 @@ struct TokenStream
 
         while (true) {
 
-            if (index >= tokens.size())
+            if (index >= (int) tokens.size())
                 return false;
 
             if (tokens[index].match == tokenizer::WHITESPACE) {

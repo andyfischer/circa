@@ -76,7 +76,7 @@ void initialize_term(Term* term, Term* function, ReferenceList inputs)
 
     // Add to the 'users' field of each input, and 'function'
     function->users.add(term);
-    for (int index=0; index < inputs.count(); index++) {
+    for (unsigned int index=0; index < inputs.count(); index++) {
 
         if (inputs[index] == NULL)
             continue;
@@ -92,7 +92,9 @@ void set_inputs(Term* term, ReferenceList inputs)
 
 Term* create_constant(Branch* branch, Term* type)
 {
-    return create_term(branch, get_const_function(branch, type), ReferenceList());
+    Term *term = create_term(branch, get_const_function(branch, type), ReferenceList());
+    term->stealingOk = false;
+    return term;
 }
 
 void set_input(Term* term, int index, Term* input)
