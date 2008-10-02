@@ -29,7 +29,7 @@ public:
         _items.push_back(term3);
     }
 
-    int count() const { return (int) _items.size(); }
+    size_t count() const { return _items.size(); }
     void append(Term* term)
     {
         _items.push_back(term);
@@ -37,7 +37,7 @@ public:
             std::cout << "too high in append" << std::endl;
     }
     void appendAll(ReferenceList const& list);
-    void setAt(int index, Term* term)
+    void setAt(unsigned int index, Term* term)
     {
         if (index > 1000000)
             std::cout << "index too big in setAt" << std::endl;
@@ -50,13 +50,13 @@ public:
         _items[index] = term;
     }
     void clear() { _items.clear(); }
-    Term* get(int index) const
+    Term* get(unsigned int index) const
     {
         if (index >= _items.size())
             return NULL;
         return _items[index];
     }
-    Term* operator[](int index) const { return get(index); }
+    Term* operator[](unsigned int index) const { return get(index); }
     void remapPointers(TermMap const& map);
 };
 

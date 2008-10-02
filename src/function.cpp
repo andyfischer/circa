@@ -77,7 +77,7 @@ void Function::subroutine_create(Term* caller)
     sub.stateType = BRANCH_TYPE;
 
     // Create input placeholders
-    for (int index=0; index < sub.inputTypes.count(); index++) {
+    for (unsigned int index=0; index < sub.inputTypes.count(); index++) {
         std::string name = get_placeholder_name_for_index(index);
         Term* placeholder = create_constant(&sub.subroutineBranch,
                 sub.inputTypes[index]);

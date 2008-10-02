@@ -26,6 +26,9 @@ struct Term
     // Our current value. This is meant to be transient.
     void* value;
 
+    // If true, recycle_value is allowed to steal our value
+    bool stealingOk;
+
     // Persisted value. Owned by us.
     Term* state;
 

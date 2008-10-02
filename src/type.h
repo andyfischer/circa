@@ -94,7 +94,6 @@ struct Type
 bool is_type(Term* term);
 Type* as_type(Term* term);
 
-
 Term* quick_create_type(Branch* branch, std::string name);
 
 // Return true if the term is an instance of the given type

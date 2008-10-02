@@ -22,8 +22,9 @@ static int gNextGlobalID = 1;
 Term::Term()
   : owningBranch(NULL),
     function(NULL),
-    value(NULL),
     type(NULL),
+    value(NULL),
+    stealingOk(true),
     state(NULL),
     needsUpdate(true)
 {

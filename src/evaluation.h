@@ -14,6 +14,7 @@ class Engine {
         int next;
 
         Scope() : callingTerm(NULL), branch(NULL), next(0) {}
+        virtual ~Scope() {}
         virtual void onClose() {}
     };
 

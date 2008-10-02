@@ -4,7 +4,7 @@
 
 #include "all_tests.h"
 #include "common.h"
-#include "errors.h"
+#include "circa.h"
 
 namespace circa {
 

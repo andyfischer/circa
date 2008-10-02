@@ -24,11 +24,14 @@ void recycle_value(Term* source, Term* dest)
     if (source->type != dest->type)
         throw errors::TypeError(dest, source->type);
 
-    // Don't steal if the term has multiple users
-    // bool steal = (source->users.count() > 1);
+    // Don't steal if the term says not to
+    // Also don't steal if the term has multiple users
+    bool steal = !source->stealingOk && (source->users.count() > 1);
 
-    // Temp: always try to steal
-    steal_value(source, dest);
+    if (steal)
+        steal_value(source, dest);
+    else
+        duplicate_value(source, dest);
 }
 
 void duplicate_value(Term* source, Term* dest)

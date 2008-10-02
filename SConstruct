@@ -23,6 +23,7 @@ def create_mac_env(releaseBuild):
 
     if not releaseBuild:
         env.Append(CPPFLAGS=['-ggdb'])
+        env.Append(CPPFLAGS=['-Wall'])
         # env.Append(CPPFLAGS=['-bundle'])
         # env.Append(CPPFLAGS=['-flat_namespace'])
 
