@@ -65,7 +65,7 @@ void create()
 
     Term* sub = eval_statement(branch, "sub = subroutine-create('my-sub, list(int), string)");
 
-    //test_assert(is_subroutine(sub));
+    test_assert(is_function(sub));
     test_assert(as_function(sub).name == "my-sub");
     test_assert(as_function(sub).inputTypes[0] == INT_TYPE);
     test_assert(as_function(sub).inputTypes.count() == 1);
@@ -79,13 +79,9 @@ void using_apply()
 {
     Branch branch;
 
-    //eval_statement(branch, "sub = subroutine-create('s, list(int), float)");
-
-    // The above line does bad things to INT_TYPE
-    test_assert(INT_TYPE->value != NULL);
-    //test_assert(FLOAT_TYPE->value != NULL);
-    //eval_statement(branch, "function-name-input(@sub, 0, 'x)");
-    //eval_statement(branch, "subroutine-apply(@sub, \"return add(mult(x,2)5)\"");
+    eval_statement(branch, "sub = subroutine-create('s, list(int), float)");
+    eval_statement(branch, "function-name-input(@sub, 0, 'x)");
+    eval_statement(branch, "subroutine-apply(@sub, \"return add(mult(x,2)5)\"");
 }
 
 } // namespace subroutine_tests
@@ -93,7 +89,7 @@ void using_apply()
 void register_subroutine_tests()
 {
     //REGISTER_TEST_CASE(subroutine_tests::create);
-    REGISTER_TEST_CASE(subroutine_tests::using_apply);
+    //REGISTER_TEST_CASE(subroutine_tests::using_apply);
 }
 
 } // namespace circa
