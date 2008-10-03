@@ -18,7 +18,7 @@ void test_import_c()
 {
     Branch branch;
 
-    import_c_function(&branch, my_imported_function, "function my-imported-func(int,int) -> int");
+    import_c_function(branch, my_imported_function, "function my-imported-func(int,int) -> int");
 
     Term* result = eval_statement(branch, "my-imported-func(4,5)");
 

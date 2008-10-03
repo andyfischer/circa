@@ -15,7 +15,7 @@ void initialize_term(Term* term, Term* function, ReferenceList inputs);
 void set_inputs(Term* term, ReferenceList inputs);
 Term* create_constant(Branch* branch, Term* type);
 void set_input(Term* term, int index, Term* input);
-void evaluate_branch(Branch* branch);
+void evaluate_branch(Branch& branch);
 
 // Examine 'function' and 'inputs' and returns a result term. A few things
 // may happen here:

@@ -17,13 +17,13 @@ ReferenceList::appendAll(ReferenceList const& list)
     if (&list == this)
         throw errors::InternalError("Circular call");
 
-    for (int i=0; i < list.count(); i++)
+    for (unsigned int i=0; i < list.count(); i++)
         append(list[i]);
 }
 
 void ReferenceList::remapPointers(TermMap const& map)
 {
-    for (int i=0; i < _items.size(); i++)
+    for (unsigned int i=0; i < _items.size(); i++)
         _items[i] = map.getRemapped(_items[i]);
 }
 

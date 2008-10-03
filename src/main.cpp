@@ -31,7 +31,7 @@ int main(int nargs, const char * args[])
             if (hasCompileErrors(*branch)) {
                 printCompileErrors(*branch, std::cout);
             } else {
-                evaluate_branch(branch);
+                evaluate_branch(*branch);
             }
             delete branch;
         }
