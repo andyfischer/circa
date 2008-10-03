@@ -102,14 +102,11 @@ void set_input(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 }
 
-void evaluate_branch(Branch* branch)
+void evaluate_branch(Branch& branch)
 {
-    if (branch == NULL)
-        throw errors::InternalError("branch is NULL");
-
-    int count = branch->numTerms();
+    int count = branch.numTerms();
     for (int index=0; index < count; index++) {
-		Term* term = branch->get(index);
+		Term* term = branch.get(index);
         term->eval();
     }
 }

@@ -7,7 +7,7 @@
 
 namespace circa {
 
-Term* import_c_function(Branch* branch, Function::EvaluateFunc func, std::string const& header);
+Term* import_c_function(Branch& branch, Function::EvaluateFunc func, std::string const& header);
 
 }
 
