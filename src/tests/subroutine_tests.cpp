@@ -79,8 +79,11 @@ void using_apply()
 {
     Branch branch;
 
-    // One of these lines does bad things to INT_TYPE:
-    //eval_statement(branch, "sub = subroutine-create('s, list(int), int)");
+    //eval_statement(branch, "sub = subroutine-create('s, list(int), float)");
+
+    // The above line does bad things to INT_TYPE
+    test_assert(INT_TYPE->value != NULL);
+    //test_assert(FLOAT_TYPE->value != NULL);
     //eval_statement(branch, "function-name-input(@sub, 0, 'x)");
     //eval_statement(branch, "subroutine-apply(@sub, \"return add(mult(x,2)5)\"");
 }
