@@ -31,15 +31,6 @@ public:
         items.clear();
         branch.clear();
     }
-    ReferenceList toReferenceList()
-    {
-        ReferenceList result;
-
-        for (unsigned int i=0; i < items.count(); i++)
-            result.append(as_ref(items[i]));
-
-        return result;
-    }
 };
 
 std::string List__toString(Term* caller);

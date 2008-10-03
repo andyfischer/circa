@@ -1,7 +1,7 @@
 // Copyright 2008 Paul Hodge
 
 #include "common_headers.h"
-#include "essentials.h"
+#include "circa.h"
 #include "values.h"
 
 namespace circa {

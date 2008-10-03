@@ -64,6 +64,8 @@ void Function::subroutine_create(Term* caller)
     // 1: inputTypes (list of type)
     // 2: outputType (type)
 
+    /* FIXME
+     
     as_string(caller->inputs[0]);
     as_list(caller->inputs[1]);
     as_type(caller->inputs[2]);
@@ -83,6 +85,7 @@ void Function::subroutine_create(Term* caller)
                 sub.inputTypes[index]);
         sub.subroutineBranch.bindName(placeholder, name);
     }
+    */
 }
 
 void

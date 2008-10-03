@@ -114,49 +114,6 @@ void evaluate_branch(Branch* branch)
     }
 }
 
-void hosted_apply_function(Term* caller)
-{
-    Branch* branch = as_branch(caller->inputs[0]);
-    Term* function = as_ref(caller->inputs[1]);
-    ReferenceList inputs = as_list(caller->inputs[2]).toReferenceList();
-
-    // Evaluate function, if needed
-    if (function->needsUpdate)
-        function->eval();
-    
-    // Check if 'function' is actually a type
-    if (is_type(function))
-    {
-        if (inputs.count() != 0) {
-            caller->pushError("Arguments in constructor not supported yet");
-            return;
-        }
-
-        as_ref(caller) = create_term(branch, get_const_function(branch, function), inputs);
-    }
-
-    // If 'function' is not really a function, see if we can treat it like a function
-    if (!is_function(function)) {
-
-        Type* type = as_type(function->type);
-
-        if (!type->memberFunctions.contains("")) {
-            caller->pushError(std::string("Term ") + function->toString()
-                    + " is not a type, and has no default function");
-            return;
-        }
-
-        ReferenceList memberFunctionInputs;
-        memberFunctionInputs.append(function);
-        memberFunctionInputs.appendAll(inputs);
-
-        as_ref(caller) = create_term(branch, type->memberFunctions[""], memberFunctionInputs);
-    }
-
-    // Create a term in the normal way
-    as_ref(caller) = create_term(branch, function, inputs);
-}
-
 Term* apply_function(Branch* branch, Term* function, ReferenceList inputs)
 {
     if (function->needsUpdate)
