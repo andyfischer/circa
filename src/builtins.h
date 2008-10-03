@@ -28,6 +28,7 @@ extern Term* MAP_TYPE;
 extern Term* CONSTANT_INT;
 extern Term* CONSTANT_FLOAT;
 extern Term* CONSTANT_STRING;
+extern Term* CONSTANT_BOOL;
 extern Term* CONSTANT_0;
 extern Term* CONSTANT_1;
 extern Term* CONSTANT_2;

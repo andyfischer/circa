@@ -39,7 +39,7 @@ Term* Branch::findNamed(std::string const& name) const
 
 void Branch::remapPointers(TermMap const& map)
 {
-    for (int i=0; i < terms.size(); i++)
+    for (unsigned int i=0; i < terms.size(); i++)
         terms[i] = map.getRemapped(terms[i]);
 
     names.remapPointers(map);
