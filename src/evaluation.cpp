@@ -114,8 +114,9 @@ void evaluate_term(Term* term)
 
     // Check each input. Make sure:
     //  1) they are not null
-    //  1) they are up-to-date
-    //  2) they have a non-null value
+    //  2) they are up-to-date
+    //  3) they have a non-null value
+    //  4) they have no errors
     for (unsigned int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++)
     {
         Term* input = term->inputs[inputIndex];
@@ -134,13 +135,19 @@ void evaluate_term(Term* term)
             return;
         }
 
+        if (input->hasError()) {
+            std::stringstream message;
+            message << "Input " << inputIndex << " has an error";
+            term->pushError(message.str());
+            return;
+        }
+
         if (input->needsUpdate)
             evaluate_term(input);
     }
     
     // Make sure we have an allocated value
     if (term->value == NULL) {
-        // std::cout << "Reallocating term " << term->findName() << std::endl;
         as_type(term->type)->alloc(term);
     }    
 
@@ -157,13 +164,12 @@ void evaluate_term(Term* term)
     }
 }
 
-
 void evaluate_branch(Branch& branch)
 {
     int count = branch.numTerms();
     for (int index=0; index < count; index++) {
 		Term* term = branch.get(index);
-        term->eval();
+        evaluate_term(term);
     }
 }
 
