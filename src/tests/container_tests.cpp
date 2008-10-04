@@ -10,7 +10,7 @@ namespace container_tests {
 
 void test_set()
 {
-    TermSet set;
+    ReferenceSet set;
 
     Term* term1 = new Term();
 
