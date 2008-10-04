@@ -6,8 +6,8 @@
 #include "branch.h"
 #include "builtins.h"
 #include "operations.h"
+#include "ref_map.h"
 #include "term.h"
-#include "term_map.h"
 #include "term_namespace.h"
 
 namespace circa {
@@ -22,7 +22,7 @@ struct Type
     typedef void (*DuplicateFunc)(Term* src, Term* dest);
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
     typedef int  (*CompareFunc)(Term* src, Term* dest);
-    typedef void (*RemapPointersFunc)(Term* term, TermMap& map);
+    typedef void (*RemapPointersFunc)(Term* term, ReferenceMap& map);
     typedef std::string (*ToStringFunc)(Term* term);
 
     struct Field {

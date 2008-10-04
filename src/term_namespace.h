@@ -3,7 +3,7 @@
 
 #include "common_headers.h"
 
-#include "term_map.h"
+#include "ref_map.h"
 
 namespace circa {
 
@@ -60,7 +60,7 @@ struct TermNamespace
         return _map.end();
     }
 
-    void remapPointers(TermMap const& remapping)
+    void remapPointers(ReferenceMap const& remapping)
     {
         StringToTermMap::iterator it;
         for (it = _map.begin(); it != _map.end(); ) {

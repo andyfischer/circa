@@ -22,6 +22,8 @@ namespace circa {
 struct Branch;
 struct Term;
 struct Type;
+struct ReferenceList;
+struct ReferenceMap;
 
 } // namespace circa
 

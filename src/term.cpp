@@ -37,7 +37,7 @@ Term::~Term()
     ReferenceSet users = this->users;
     this->users.clear();
 
-    TermMap nullPointerRemap;
+    ReferenceMap nullPointerRemap;
     nullPointerRemap[this] = NULL;
 
     std::set<Term*>::const_iterator it;

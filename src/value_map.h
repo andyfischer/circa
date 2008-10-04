@@ -4,7 +4,6 @@
 #define CIRCA__MAP_FUNCTION__INCLUDED
 
 #include "branch.h"
-#include "term_map.h"
 
 namespace circa {
 

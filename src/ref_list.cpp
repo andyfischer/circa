@@ -7,7 +7,7 @@
 #include "errors.h"
 #include "term.h"
 #include "ref_list.h"
-#include "term_map.h"
+#include "ref_map.h"
 
 namespace circa {
 
@@ -21,7 +21,7 @@ ReferenceList::appendAll(ReferenceList const& list)
         append(list[i]);
 }
 
-void ReferenceList::remapPointers(TermMap const& map)
+void ReferenceList::remapPointers(ReferenceMap const& map)
 {
     for (unsigned int i=0; i < _items.size(); i++)
         _items[i] = map.getRemapped(_items[i]);
