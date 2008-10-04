@@ -216,17 +216,14 @@ void change_type(Term *term, Term *typeTerm)
     if (term->type == typeTerm)
         return;
 
-    if (term->value != NULL)
-        throw errors::InternalError("value is not NULL in change_type (possible memory leak)");
-
-    // Term* oldType = term->type;
+    // if term->value is not NULL, it's a possible memory leak
+    assert(term->value == NULL);
 
     term->type = typeTerm;
 
     Type *type = as_type(typeTerm);
 
     if (type->alloc == NULL) {
-        std::cout << "name: " << typeTerm->findName() << std::endl;
         throw errors::InternalError(string("type ") + type->name + " has no alloc function");
     }
 

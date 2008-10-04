@@ -241,23 +241,4 @@ Term* constant_list(Branch* branch, ReferenceList list, std::string const& name)
     return term;
 }
 
-Branch* evaluate_file(std::string const& filename)
-{
-    Branch *branch = new Branch();
-
-    Branch temp_branch;
-    temp_branch.bindName(constant_string(&temp_branch, filename), "filename");
-    std::string file_contents = as_string(eval_statement(temp_branch,
-                "read-text-file(filename)"));
-
-    token_stream::TokenStream tokens(file_contents);
-    ast::StatementList *statementList = parser::statementList(tokens);
-
-    statementList->createTerms(branch);
-
-    delete statementList;
-
-    return branch;
-}
-
 } // namespace circa

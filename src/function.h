@@ -47,7 +47,6 @@ struct Function
     static void name_input(Term* caller);
 };
 
-void Function_duplicate(Term* source, Term* dest);
 bool is_function(Term* term);
 Function& as_function(Term*);
 

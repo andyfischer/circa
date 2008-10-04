@@ -5,6 +5,7 @@
 #include "evaluation.h"
 #include "function.h"
 #include "operations.h"
+#include "parser.h"
 
 namespace circa {
 
@@ -94,6 +95,25 @@ void evaluate_branch(Branch& branch)
 		Term* term = branch.get(index);
         evaluate_term(term);
     }
+}
+
+Branch* evaluate_file(std::string const& filename)
+{
+    Branch *branch = new Branch();
+
+    Branch temp_branch;
+    temp_branch.bindName(constant_string(&temp_branch, filename), "filename");
+    std::string file_contents = as_string(eval_statement(temp_branch,
+                "read-text-file(filename)"));
+
+    token_stream::TokenStream tokens(file_contents);
+    ast::StatementList *statementList = parser::statementList(tokens);
+
+    statementList->createTerms(branch);
+
+    delete statementList;
+
+    return branch;
 }
 
 } // namespace circa

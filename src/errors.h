@@ -56,20 +56,6 @@ public:
     virtual string message();
 };
 
-class KeyError : public CircaError
-{
-public:
-    KeyError(string message) throw()
-      : CircaError(message)
-    {
-    }
-    ~KeyError() throw() {}
-    virtual string message()
-    {
-        return string("KeyError: ") + this->msg;
-    }
-};
-
 } // namespace errors
 } // namespace circa
 
