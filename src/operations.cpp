@@ -102,15 +102,6 @@ void set_input(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 }
 
-void evaluate_branch(Branch& branch)
-{
-    int count = branch.numTerms();
-    for (int index=0; index < count; index++) {
-		Term* term = branch.get(index);
-        term->eval();
-    }
-}
-
 Term* apply_function(Branch* branch, Term* function, ReferenceList inputs)
 {
     if (function->needsUpdate)

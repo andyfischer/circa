@@ -172,7 +172,7 @@ List& Term::asList()
 
 void Term::eval()
 {
-    evaluation::evaluate_term(this);
+    evaluate_term(this);
 }
 
 } // namespace circa

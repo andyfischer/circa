@@ -15,15 +15,22 @@ void spy_function(Term * caller)
     gSpyResults.push_back(as_string(caller->inputs[0]));
 }
 
-void init_spy_function(Branch& branch)
+void i_only_throw_errors(Term * caller)
+{
+    caller->pushError("error");
+}
+
+void init_test_functions(Branch& branch)
 {
     import_c_function(branch, spy_function, "function spy(string)");
+    import_c_function(branch, i_only_throw_errors,
+            "function i-only-throw-errors() -> string");
 }
 
 void test_simple()
 {
     Branch branch;
-    init_spy_function(branch);
+    init_test_functions(branch);
 
     gSpyResults.clear();
 
@@ -40,11 +47,34 @@ void test_simple()
     test_assert(gSpyResults[2] == "3");
 }
 
+void blocked_by_error()
+{
+    Branch branch;
+    init_test_functions(branch);
+
+    gSpyResults.clear();
+
+    Term *spy_1 = apply_statement(branch, "spy('1)");
+    Term *error = apply_statement(branch, "e = i-only-throw-errors()");
+    Term *spy_errored = apply_statement(branch, "spy(e)");
+
+    test_assert(gSpyResults.size() == 0);
+
+    evaluate_branch(branch);
+
+    test_assert(gSpyResults.size() == 1);
+    test_assert(gSpyResults[0] == "1");
+    test_assert(!spy_1->hasError());
+    test_assert(error->hasError());
+    test_assert(spy_errored->hasError());
+}
+
 } // execution_tests
 
 void register_execution_tests()
 {
     REGISTER_TEST_CASE(execution_tests::test_simple);
+    REGISTER_TEST_CASE(execution_tests::blocked_by_error);
 }
 
 } // namespace circa

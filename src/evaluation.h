@@ -38,9 +38,11 @@ public:
     void runUntilFinished();
 };
 
-void evaluate_term(Term* term);
-
 } // namespace evaluation
+
+void evaluate_term(Term* term);
+void evaluate_branch(Branch& branch);
+
 } // namespace circa
 
 #endif
