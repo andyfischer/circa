@@ -83,6 +83,8 @@ Engine::runUntilFinished()
     }
 }
 
+} // namespace evaluation
+
 void evaluate_term(Term* term)
 {
     if (term == NULL)
@@ -155,5 +157,14 @@ void evaluate_term(Term* term)
     }
 }
 
-} // namespace evaluation
+
+void evaluate_branch(Branch& branch)
+{
+    int count = branch.numTerms();
+    for (int index=0; index < count; index++) {
+		Term* term = branch.get(index);
+        term->eval();
+    }
+}
+
 } // namespace circa

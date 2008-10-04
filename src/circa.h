@@ -6,6 +6,7 @@
 #include "builtins.h"
 #include "compilation.h"
 #include "errors.h"
+#include "evaluation.h"
 #include "function.h"
 #include "importing.h"
 #include "list.h"
