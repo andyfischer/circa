@@ -171,10 +171,6 @@ bool is_instance(Term *term, Term *type)
 {
     assert(term != NULL);
 
-    // Special case during bootstrapping.
-    if (CURRENTLY_BOOTSTRAPPING && type == NULL)
-        return true;
-
     return term->type == type;
 }
 

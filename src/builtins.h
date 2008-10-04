@@ -7,8 +7,6 @@
 
 namespace circa {
 
-extern bool CURRENTLY_BOOTSTRAPPING;
-
 extern Branch* KERNEL;
 
 extern Term* CONST_GENERATOR;

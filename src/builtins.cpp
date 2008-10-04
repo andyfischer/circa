@@ -23,8 +23,6 @@
 
 namespace circa {
 
-bool CURRENTLY_BOOTSTRAPPING = true;
-
 Branch* KERNEL = NULL;
 Term* CONST_GENERATOR = NULL;
 Term* INT_TYPE = NULL;
@@ -310,8 +308,6 @@ void initialize()
         initialize_primitive_types(KERNEL);
         initialize_constants();
         initialize_compound_types(KERNEL);
-
-        CURRENTLY_BOOTSTRAPPING = false;
 
         // Then everything else:
         initialize_branch(KERNEL);
