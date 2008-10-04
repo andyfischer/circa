@@ -4,8 +4,8 @@
 #include "common_headers.h"
 
 #include "ref_list.h"
+#include "ref_set.h"
 #include "term_namespace.h"
-#include "term_set.h"
 
 namespace circa {
 
@@ -18,7 +18,7 @@ struct Term
     Branch* owningBranch;
     ReferenceList inputs;
     Term* function;
-    TermSet users;
+    ReferenceSet users;
 
     // data type
     Term* type;

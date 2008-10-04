@@ -34,8 +34,8 @@ Term::Term()
 Term::~Term()
 {
     // Find all our users, and tell them to stop using us
-    TermSet users = this->users;
-    this->users = TermSet();
+    ReferenceSet users = this->users;
+    this->users.clear();
 
     TermMap nullPointerRemap;
     nullPointerRemap[this] = NULL;

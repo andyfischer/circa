@@ -5,9 +5,7 @@
 
 namespace circa {
 
-class Term;
-
-struct TermSet
+struct ReferenceSet
 {
     std::set<Term*> _items;
 
@@ -22,6 +20,9 @@ struct TermSet
     }
     int count() const {
         return (int) _items.size();
+    }
+    void clear() {
+        _items.clear();
     }
 };
 
