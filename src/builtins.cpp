@@ -243,6 +243,11 @@ void write_text_file__evaluate(Term* caller)
     file.close();
 }
 
+void to_string__evaluate(Term* caller)
+{
+    as_string(caller) = caller->inputs[0]->toString();
+}
+
 void unknown_function__evaluate(Term* caller)
 {
     std::cout << "Warning, calling an unknown function: "
@@ -290,6 +295,8 @@ void initialize_builtin_functions(Branch* code)
             ReferenceList(STRING_TYPE), STRING_TYPE);
     quick_create_function(code, "write-text-file", write_text_file__evaluate,
             ReferenceList(STRING_TYPE, STRING_TYPE), VOID_TYPE);
+    quick_create_function(code, "to-string", to_string__evaluate,
+        ReferenceList(ANY_TYPE), STRING_TYPE);
     UNKNOWN_FUNCTION = quick_create_function(code, "unknown-function",
             unknown_function__evaluate,
             ReferenceList(ANY_TYPE), ANY_TYPE);
@@ -311,9 +318,6 @@ void initialize()
         initialize_builtin_functions(KERNEL);
         initialize_functions(KERNEL);
         initialize_map_function(KERNEL);
-
-        // Lastly:
-        initialize_bootstrapped_code(KERNEL);
 
     } catch (errors::CircaError& e)
     {
