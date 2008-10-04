@@ -5,8 +5,6 @@
 
 namespace circa {
 
-struct TermMap;
-
 struct ReferenceList
 {
 private:
@@ -57,7 +55,7 @@ public:
         return _items[index];
     }
     Term* operator[](unsigned int index) const { return get(index); }
-    void remapPointers(TermMap const& map);
+    void remapPointers(ReferenceMap const& map);
 };
 
 } // namespace circa

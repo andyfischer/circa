@@ -67,7 +67,7 @@ void test_namespace()
     test_assert(nspace["a"] == term);
 
     Term *term2 = new Term();
-    TermMap remap;
+    ReferenceMap remap;
     remap[term] = term2;
     nspace.remapPointers(remap);
     test_assert(nspace["a"] == term2);
@@ -96,7 +96,7 @@ void test_list()
     test_assert(list[1] == term2);
 
     Term* term3 = new Term();
-    TermMap remap;
+    ReferenceMap remap;
     remap[term] = term3;
     list.remapPointers(remap);
     test_assert(list.count() == 2);

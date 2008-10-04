@@ -54,7 +54,7 @@ public:
     }
 
     // Remap pointers
-    void remapPointers(TermMap const& map);
+    void remapPointers(ReferenceMap const& map);
 
     void clear();
 };

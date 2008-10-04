@@ -10,8 +10,8 @@
 #include "operations.h"
 #include "parser.h"
 #include "ref_list.h"
+#include "ref_map.h"
 #include "term.h"
-#include "term_map.h"
 #include "type.h"
 #include "values.h"
 
@@ -165,7 +165,7 @@ void change_function(Term* term, Term* new_function)
 
 void remap_pointers(Term* term, Term* original, Term* replacement)
 {
-    TermMap map;
+    ReferenceMap map;
     map[original] = replacement;
 
     term->inputs.remapPointers(map);
@@ -176,7 +176,7 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
 
 void duplicate_branch(Branch* source, Branch* dest)
 {
-    TermMap newTermMap;
+    ReferenceMap newTermMap;
 
     // Duplicate every term
     for (int index=0; index < source->numTerms(); index++) {

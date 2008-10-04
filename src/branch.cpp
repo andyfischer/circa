@@ -7,6 +7,7 @@
 #include "builtins.h"
 #include "errors.h"
 #include "operations.h"
+#include "ref_map.h"
 #include "term.h"
 #include "values.h"
 
@@ -37,7 +38,7 @@ Term* Branch::findNamed(std::string const& name) const
     return get_global(name);
 }
 
-void Branch::remapPointers(TermMap const& map)
+void Branch::remapPointers(ReferenceMap const& map)
 {
     for (unsigned int i=0; i < terms.size(); i++)
         terms[i] = map.getRemapped(terms[i]);
