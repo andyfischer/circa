@@ -111,7 +111,7 @@ void specialize_type(Term* term, Term* type);
 void set_member_function(Term* type, std::string name, Term* function);
 Term* get_member_function(Term* type, std::string name);
 
-Term* create_empty_type(Branch* branch);
+Term* create_empty_type(Branch& branch);
 
 void initialize_type_type(Term* typeType);
 void initialize_primitive_types(Branch* kernel);

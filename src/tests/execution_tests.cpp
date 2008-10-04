@@ -67,6 +67,7 @@ void blocked_by_error()
     test_assert(!spy_1->hasError());
     test_assert(error->hasError());
     test_assert(spy_errored->hasError());
+    test_assert(spy_errored->needsUpdate);
 }
 
 } // execution_tests

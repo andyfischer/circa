@@ -259,12 +259,14 @@ void empty_duplicate_function(Term*,Term*) {}
 
 }
 
-Term* create_empty_type(Branch* branch)
+Term* create_empty_type(Branch& branch, std::string name)
 {
-    Term* term = create_constant(branch, TYPE_TYPE);
+    Term* term = create_constant(&branch, TYPE_TYPE);
     Type* type = as_type(term);
     type->alloc = type_private::empty_function;
     type->dealloc = type_private::empty_function;
+    type->name = name;
+    branch.bindName(term, name);
     return term;
 }
 
@@ -337,14 +339,8 @@ void initialize_primitive_types(Branch* kernel)
     as_type(BOOL_TYPE)->equals = cpp_interface::templated_equals<bool>;
     as_type(BOOL_TYPE)->toString = primitives::bool_t::to_string;
 
-    ANY_TYPE = quick_create_type(KERNEL, "any",
-            type_private::empty_function,
-            type_private::empty_function,
-            NULL);
-    VOID_TYPE = quick_create_type(KERNEL, "void",
-            type_private::empty_function,
-            type_private::empty_function,
-            type_private::empty_duplicate_function);
+    ANY_TYPE = create_empty_type(*KERNEL, "any");
+    VOID_TYPE = create_empty_type(*KERNEL, "void");
     REFERENCE_TYPE = quick_create_cpp_type<Term*>(KERNEL, "Reference");
 }
 
