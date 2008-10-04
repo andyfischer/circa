@@ -11,7 +11,7 @@
 namespace circa {
 
 // Create a new Function with the given properties. Also binds the name.
-Term* quick_create_function(Branch* code, string name, Function::EvaluateFunc evaluateFunc,
+Term* quick_create_function(Branch* code, std::string name, Function::EvaluateFunc evaluateFunc,
         ReferenceList inputTypes, Term* outputType);
 
 } // namespace circa

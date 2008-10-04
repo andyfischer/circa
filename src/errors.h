@@ -19,7 +19,7 @@ public:
         this->msg = _msg;
     }
     ~CircaError() throw() {}
-    virtual string message()
+    virtual std::string message()
     {
         return this->msg;
     }
@@ -28,15 +28,15 @@ public:
 class InternalError : public CircaError
 {
 public:
-    InternalError(string message) throw()
+    InternalError(std::string message) throw()
         : CircaError(message)
     {
     }
     ~InternalError() throw() {}
 
-    virtual string message()
+    virtual std::string message()
     {
-        return string("Internal error: ") + this->msg;
+        return std::string("Internal error: ") + this->msg;
     }
 };
 
@@ -53,7 +53,7 @@ public:
         expectedType = _expectedType;
     }
     ~TypeError() throw() {}
-    virtual string message();
+    virtual std::string message();
 };
 
 } // namespace errors

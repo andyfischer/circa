@@ -24,7 +24,7 @@ struct Function
     bool pureFunction;
     bool variableArgs;
 
-    string name;
+    std::string name;
 
     Branch subroutineBranch;
 

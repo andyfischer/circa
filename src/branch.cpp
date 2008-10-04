@@ -61,17 +61,4 @@ Branch* as_branch(Term* term)
     return (Branch*) term->value;
 }
 
-void branch_bind_name(Term* caller)
-{
-    recycle_value(caller->inputs[0], caller);
-    as_branch(caller)->bindName(caller->inputs[2], as_string(caller->inputs[1]));
-}
-
-void initialize_branch(Branch* kernel)
-{
-    quick_create_function(kernel, "bind-name", branch_bind_name,
-        ReferenceList(BRANCH_TYPE, STRING_TYPE, ANY_TYPE),
-        BRANCH_TYPE);
-}
-
 } // namespace circa

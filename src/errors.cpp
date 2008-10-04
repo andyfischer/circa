@@ -9,7 +9,7 @@
 namespace circa {
 namespace errors {
 
-string
+std::string
 TypeError::message()
 {
     if (expectedType == NULL)

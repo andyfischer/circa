@@ -14,7 +14,7 @@ namespace token = circa::tokenizer;
 
 namespace circa {
 
-Term* quick_create_function(Branch* branch, string name, Function::EvaluateFunc evaluateFunc,
+Term* quick_create_function(Branch* branch, std::string name, Function::EvaluateFunc evaluateFunc,
         ReferenceList inputTypes, Term* outputType)
 {
     Term* term = create_constant(branch, FUNCTION_TYPE);

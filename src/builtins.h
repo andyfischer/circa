@@ -42,7 +42,7 @@ void shutdown();
 int& as_int(Term* t);
 float& as_float(Term* t);
 bool& as_bool(Term* t);
-string& as_string(Term* t);
+std::string& as_string(Term* t);
 Term*& as_ref(Term* term);
 
 } // namespace circa

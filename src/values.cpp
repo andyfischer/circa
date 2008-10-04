@@ -42,7 +42,7 @@ void duplicate_value(Term* source, Term* dest)
     Type::DuplicateFunc duplicate = as_type(source->type)->duplicate;
 
     if (duplicate == NULL)
-        throw errors::InternalError(string("type ") + as_type(source->type)->name
+        throw errors::InternalError(std::string("type ") + as_type(source->type)->name
                 + " has no duplicate function");
 
     dealloc_value(dest);
