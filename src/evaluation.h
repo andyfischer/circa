@@ -4,41 +4,6 @@
 #include "common_headers.h"
 
 namespace circa {
-namespace evaluation {
-
-class Engine {
-
-    struct Scope {
-        Term* callingTerm;
-        Branch* branch;
-        int next;
-
-        Scope() : callingTerm(NULL), branch(NULL), next(0) {}
-        virtual ~Scope() {}
-        virtual void onClose() {}
-    };
-
-    enum SpecialAction {
-        NONE = 0,
-        CLOSE_BRANCH
-    };
-
-    struct SubroutineScope : public Scope {
-        virtual void onClose();
-    };
-
-    std::stack<Scope*> mStack;
-    SpecialAction mSpecialNextAction;
-
-public:
-    bool isFinished() const;
-    void evaluate(Term* term);
-    Term* getNextTerm();
-    void runNextInstruction();
-    void runUntilFinished();
-};
-
-} // namespace evaluation
 
 void evaluate_term(Term* term);
 void evaluate_branch(Branch& branch);
