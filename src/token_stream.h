@@ -31,28 +31,6 @@ struct TokenStream
         currentIndex = 0;
     }
 
-    /*
-    bool shouldSkip(const char* token)
-    {
-        return this->skipSet.find(token) != this->skipSet.end();
-    }
-
-    int indexAfterSkipping(int index)
-    {
-        while (true)
-        {
-            if (this->finished())
-                return index;
-
-            if (shouldSkip(tokens[index])) {
-                index++;
-            } else {
-                return index;
-            }
-        }
-    }
-    */
-
     void stripWhitespace()
     {
         int deleteCount = 0;

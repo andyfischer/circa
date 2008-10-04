@@ -39,7 +39,7 @@ bool& as_bool(Term* t)
     return *((bool*) t->value);
 }
 
-string& as_string(Term* t)
+std::string& as_string(Term* t)
 {
     if (t->type != STRING_TYPE)
         throw errors::TypeError(t, STRING_TYPE);
@@ -47,7 +47,7 @@ string& as_string(Term* t)
     if (t->value == NULL)
         throw errors::InternalError("NULL pointer in as_string");
 
-    return *((string*) t->value);
+    return *((std::string*) t->value);
 }
 
 Term*& as_ref(Term* term)
@@ -224,7 +224,7 @@ void change_type(Term *term, Term *typeTerm)
     Type *type = as_type(typeTerm);
 
     if (type->alloc == NULL) {
-        throw errors::InternalError(string("type ") + type->name + " has no alloc function");
+        throw errors::InternalError(std::string("type ") + type->name + " has no alloc function");
     }
 
     type->alloc(term);

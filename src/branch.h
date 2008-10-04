@@ -48,7 +48,7 @@ public:
     Term* findNamed(std::string const& name) const;
 
     // Bind a name to a term
-    void bindName(Term* term, string name)
+    void bindName(Term* term, std::string name)
     {
         names.bind(term, name);
     }
@@ -60,8 +60,6 @@ public:
 };
 
 Branch* as_branch(Term* term);
-
-void initialize_branch(Branch* kernel);
 
 } // namespace circa
 

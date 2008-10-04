@@ -63,7 +63,7 @@ void const_generator(Term* caller)
     output.evaluate = empty_evaluate_function;
 }
 
-Term* get_global(string name)
+Term* get_global(std::string name)
 {
     if (KERNEL->containsName(name))
         return KERNEL->getNamed(name);
@@ -310,7 +310,6 @@ void initialize()
         initialize_compound_types(KERNEL);
 
         // Then everything else:
-        initialize_branch(KERNEL);
         initialize_builtin_functions(KERNEL);
         initialize_functions(KERNEL);
         initialize_map_function(KERNEL);

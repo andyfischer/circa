@@ -15,8 +15,6 @@
 #include <sstream>
 #include <vector>
 
-using std::string;
-
 namespace circa {
 
 struct Branch;
