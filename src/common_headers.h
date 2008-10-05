@@ -4,6 +4,7 @@
 #define CIRCA__COMON_HEADERS__INCLUDED
 
 #include <cassert>
+#include <cstdio>
 #include <exception>
 #include <fstream>
 #include <iostream>
@@ -11,6 +12,7 @@
 #include <memory>
 #include <set>
 #include <stack>
+#include <stdexcept>
 #include <string>
 #include <sstream>
 #include <vector>

@@ -47,12 +47,6 @@ void test_set()
     test_assert(set.contains(term1));
     test_assert(set.count() == 1);
 
-    /*TermMap remap;
-    remap[term1] = term2;
-    set.remapPointers(remap);
-    test_assert(set.contains(term2));
-    test_assert(set.count() == 1);*/
-
     delete term1;
     delete term2;
 }
