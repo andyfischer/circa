@@ -13,6 +13,8 @@ struct List;
 
 typedef std::vector<std::string> ErrorList;
 
+void assert_good(Term* term);
+
 struct Term
 {
     Branch* owningBranch;

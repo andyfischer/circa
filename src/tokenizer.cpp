@@ -52,7 +52,11 @@ struct TokenizeContext
     std::vector<TokenInstance> &results;
 
     TokenizeContext(std::string const &_input, std::vector<TokenInstance> &_results)
-        : input(_input), results(_results), nextIndex(0), linePosition(1), charPosition(1)
+        : input(_input),
+          nextIndex(0),
+          linePosition(1),
+          charPosition(1),
+          results(_results)
     {
     }
 

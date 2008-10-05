@@ -21,12 +21,10 @@ Branch::~Branch()
 
     std::vector<Term*>::iterator it;
     for (it = myTerms.begin(); it != myTerms.end(); ++it) {
-        // FIXME
-        // We should delete terms here, but it currently causes errors
-        //delete *it;
         Term *term = *it;
-        if (term != NULL)
-            term->owningBranch = NULL;
+        assert_good(term);
+        term->owningBranch = NULL;
+        delete term;
     }
 }
 

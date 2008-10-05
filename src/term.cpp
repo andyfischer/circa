@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <sstream>
 #include <iostream>
+#include <stdexcept>
 
 #include "bootstrapping.h"
 #include "builtins.h"
@@ -17,6 +18,16 @@
 
 namespace circa {
 
+static std::set<Term*> DEBUG_GOOD_POINTER_SET;
+
+void assert_good(Term* term)
+{
+    std::set<Term*>::iterator it = DEBUG_GOOD_POINTER_SET.find(term);
+
+    if (it == DEBUG_GOOD_POINTER_SET.end())
+        throw std::runtime_error("assert_good failed");
+}
+
 static int gNextGlobalID = 1;
 
 Term::Term()
@@ -29,10 +40,13 @@ Term::Term()
     needsUpdate(true)
 {
     globalID = gNextGlobalID++;
+    DEBUG_GOOD_POINTER_SET.insert(this);
 }
 
 Term::~Term()
 {
+    assert_good(this);
+
     // Find all our users, and tell them to stop using us
     ReferenceSet users = this->users;
     this->users.clear();
@@ -45,11 +59,13 @@ Term::~Term()
         remap_pointers(*it, this, NULL);
     }
 
-    if (this->owningBranch != NULL) {
-        this->owningBranch->remapPointers(nullPointerRemap);
+    if (owningBranch != NULL) {
+        owningBranch->remapPointers(nullPointerRemap);
     }
 
     dealloc_value(this);
+
+    DEBUG_GOOD_POINTER_SET.erase(this);
 }
 
 std::string
