@@ -60,12 +60,7 @@ public:
     }
 
     // This is called by Term, when it's deleted
-    void termDeleted(Term* term)
-    {
-        for (int i = 0; i < (int) _terms.size(); i++)
-            if (_terms[i] == term)
-                _terms[i] = NULL;
-    }
+    void termDeleted(Term* term);
 
     // Remap pointers
     void remapPointers(ReferenceMap const& map);

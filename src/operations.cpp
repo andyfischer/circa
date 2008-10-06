@@ -164,7 +164,7 @@ void change_function(Term* term, Term* new_function)
     term->function = new_function;
 }
 
-void remap_pointers(Term* term, ReferenceMap &map)
+void remap_pointers(Term* term, ReferenceMap const& map)
 {
     assert_good(term);
 
@@ -174,6 +174,7 @@ void remap_pointers(Term* term, ReferenceMap &map)
     if (as_type(term->type)->remapPointers != NULL)
         as_type(term->type)->remapPointers(term, map);
 }
+
 void remap_pointers(Term* term, Term* original, Term* replacement)
 {
     ReferenceMap map;

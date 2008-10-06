@@ -24,11 +24,7 @@ Branch::~Branch()
             deleteMap[*it] = NULL;
     }
 
-    // Perform remapping
-    for (it = _terms.begin(); it != _terms.end(); ++it) {
-        if (*it != NULL)
-            remap_pointers(*it, deleteMap);
-    }
+    remapPointers(deleteMap);
 
     // dealloc_value on everybody
     for (int i = (int) _terms.size() - 1; i >= 0; i--)
@@ -63,9 +59,28 @@ Term* Branch::findNamed(std::string const& name) const
     return get_global(name);
 }
 
+void Branch::termDeleted(Term* term)
+{
+    ReferenceMap deleteMap;
+    deleteMap[term] = NULL;
+
+    remapPointers(deleteMap);
+
+    for (int i = 0; i < (int) _terms.size(); i++) {
+        if (_terms[i] == term)
+            _terms[i] = NULL;
+    }
+}
+
 void Branch::remapPointers(ReferenceMap const& map)
 {
     names.remapPointers(map);
+
+    std::vector<Term*>::iterator it;
+    for (it = _terms.begin(); it != _terms.end(); ++it) {
+        if (*it != NULL)
+            remap_pointers(*it, map);
+    }
 }
 
 void
