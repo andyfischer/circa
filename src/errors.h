@@ -25,21 +25,6 @@ public:
     }
 };
 
-class InternalError : public CircaError
-{
-public:
-    InternalError(std::string message) throw()
-        : CircaError(message)
-    {
-    }
-    ~InternalError() throw() {}
-
-    virtual std::string message()
-    {
-        return std::string("Internal error: ") + this->msg;
-    }
-};
-
 class TypeError : public CircaError
 {
     Term* offendingTerm;

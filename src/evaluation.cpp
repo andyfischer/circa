@@ -12,7 +12,7 @@ namespace circa {
 void evaluate_term(Term* term)
 {
     if (term == NULL)
-        throw errors::InternalError("term is NULL");
+        throw std::runtime_error("term is NULL");
 
     term->clearErrors();
 
@@ -79,11 +79,11 @@ void evaluate_term(Term* term)
         func.evaluate(term);
         term->needsUpdate = false;
     }
-    catch (errors::InternalError &err)
+    catch (std::exception const& err)
     {
         std::stringstream message;
-        message << "An internal error occured while executing " + func.name << ": "
-            << err.message();
+        message << "An exception occured while executing " + func.name << ": "
+            << err.what();
         error_occured(term, message.str());
     }
 }

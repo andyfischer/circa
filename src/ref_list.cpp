@@ -15,7 +15,7 @@ void
 ReferenceList::appendAll(ReferenceList const& list)
 {
     if (&list == this)
-        throw errors::InternalError("Circular call");
+        throw std::runtime_error("Circular call");
 
     for (unsigned int i=0; i < list.count(); i++)
         append(list[i]);

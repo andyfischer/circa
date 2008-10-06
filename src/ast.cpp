@@ -32,8 +32,10 @@ Infix::toString() const
 {
     if (left == NULL) return "<error, left is NULL>";
     if (right == NULL) return "<error, right is NULL>";
-    return this->left->toString() + this->preOperatorWhitespace + this->operatorStr
-        + this->postOperatorWhitespace + this->right->toString();
+    return this->left->toString() + this->preOperatorWhitespace
+        + this->operatorStr
+        + this->postOperatorWhitespace
+        + this->right->toString();
 }
 Term*
 Infix::createTerm(Branch* branch)
@@ -123,10 +125,10 @@ FunctionCall::walk(ExpressionWalker& walker)
     ArgumentList::iterator it;
     for (it = arguments.begin(); it != arguments.end(); ++it) {
         if (*it == NULL)
-            throw errors::InternalError("argument is null");
+            throw std::runtime_error("argument is null");
         Expression* expr = (*it)->expression;
         if (expr == NULL)
-            throw errors::InternalError("expression is null");
+            throw std::runtime_error("expression is null");
         expr->walk(walker);
     }
 }

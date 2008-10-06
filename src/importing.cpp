@@ -30,7 +30,7 @@ Term* import_c_function(Branch& branch, Function::EvaluateFunc evaluate, std::st
         Term* type = branch.findNamed(typeName);
         
         if (type == NULL)
-            throw errors::InternalError(std::string("Couldn't find term: ") + typeName);
+            throw std::runtime_error(std::string("Couldn't find term: ") + typeName);
         as_type(type);
         inputTypes.append(type);
     }
