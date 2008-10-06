@@ -20,7 +20,7 @@ Branch::~Branch()
     this->terms.clear();
 
     // dealloc_value on everybody
-    for (unsigned int i = myTerms.size() - 1; i >= 0; i--)
+    for (int i = (int) myTerms.size() - 1; i >= 0; i--)
     {
         Term *term = myTerms[i];
         if (term == NULL)
@@ -31,7 +31,7 @@ Branch::~Branch()
     }
 
     // delete stuff in reverse order
-    for (unsigned int i = myTerms.size() - 1; i >= 0; i--)
+    for (int i = (int) myTerms.size() - 1; i >= 0; i--)
     {
         Term *term = myTerms[i];
 

@@ -36,6 +36,7 @@ struct Function
     Term* feedbackPropagationFunction;
 
     Function();
+    ~Function();
 
     // Hosted functions
     static void alloc(Term* caller);
