@@ -16,16 +16,20 @@
 #include "term.h"
 #include "type.h"
 
+#define CHECK_FOR_BAD_POINTERS true
+
 namespace circa {
 
 static std::set<Term*> DEBUG_GOOD_POINTER_SET;
 
 void assert_good(Term* term)
 {
+#if CHECK_FOR_BAD_POINTERS
     std::set<Term*>::iterator it = DEBUG_GOOD_POINTER_SET.find(term);
 
     if (it == DEBUG_GOOD_POINTER_SET.end())
-        throw std::runtime_error("assert_good failed");
+        throw std::runtime_error("assert_good failed: ");
+#endif
 }
 
 static int gNextGlobalID = 1;
@@ -48,16 +52,17 @@ Term::~Term()
     assert_good(this);
 
     // Find all our users, and tell them to stop using us
-    ReferenceSet users = this->users;
-    this->users.clear();
+    /*ReferenceSet oldUsers = this->users;
+    this->users.clear();*/
 
     ReferenceMap nullPointerRemap;
     nullPointerRemap[this] = NULL;
 
-    std::set<Term*>::const_iterator it;
-    for (it = users._items.begin(); it != users._items.end(); ++it) {
-        remap_pointers(*it, this, NULL);
-    }
+    /*std::set<Term*>::const_iterator it;
+    for (it = oldUsers._items.begin(); it != oldUsers._items.end(); ++it) {
+        // Disabled, 'users' is unsafe
+        //remap_pointers(*it, this, NULL);
+    }*/
 
     if (owningBranch != NULL) {
         owningBranch->remapPointers(nullPointerRemap);

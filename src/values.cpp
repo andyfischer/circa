@@ -11,8 +11,11 @@ void dealloc_value(Term* term)
     if (term->value == NULL)
         return;
 
+    if (term->type->value == NULL)
+        throw std::runtime_error("type is undefined");
+
     if (as_type(term->type)->dealloc == NULL)
-        throw errors::InternalError("type " + as_type(term->type)->name
+        throw std::runtime_error("type " + as_type(term->type)->name
             + " has no dealloc function");
 
     as_type(term->type)->dealloc(term);
@@ -25,8 +28,11 @@ void recycle_value(Term* source, Term* dest)
         throw errors::TypeError(dest, source->type);
 
     // Don't steal if the term says not to
-    // Also don't steal if the term has multiple users
-    bool steal = !source->stealingOk && (source->users.count() > 1);
+    bool steal = !source->stealingOk;
+
+    // Don't steal from types
+    if (source->type == TYPE_TYPE)
+        steal = false;
 
     if (steal)
         steal_value(source, dest);
@@ -42,7 +48,7 @@ void duplicate_value(Term* source, Term* dest)
     Type::DuplicateFunc duplicate = as_type(source->type)->duplicate;
 
     if (duplicate == NULL)
-        throw errors::InternalError(std::string("type ") + as_type(source->type)->name
+        throw std::runtime_error(std::string("type ") + as_type(source->type)->name
                 + " has no duplicate function");
 
     dealloc_value(dest);

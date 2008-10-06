@@ -18,7 +18,6 @@
 #include "token_stream.h"
 #include "term.h"
 #include "type.h"
-#include "value_map.h"
 #include "values.h"
 
 namespace circa {
@@ -312,7 +311,6 @@ void initialize()
         // Then everything else:
         initialize_builtin_functions(KERNEL);
         initialize_functions(KERNEL);
-        initialize_map_function(KERNEL);
 
     } catch (errors::CircaError& e)
     {

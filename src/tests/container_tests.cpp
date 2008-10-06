@@ -106,54 +106,6 @@ void test_list()
     delete term3;
 }
 
-void value_map()
-{
-    Branch branch;
-    ValueMap map;
-
-    Term* two = constant_int(&branch, 2);
-    Term* another_two = constant_int(&branch, 2);
-    Term* hi = constant_string(&branch, "hi");
-    Term* bye = constant_string(&branch, "bye");
-
-    map.set(two, hi);
-
-    // Change our version of hi to verify that ValueMap has made a duplicate
-    as_string(hi) = "hello";
-
-    test_assert(as_string(map.findValueForKey(another_two)) == "hi");
-
-    map.set(two, hi);
-
-    test_assert(as_string(map.findValueForKey(another_two)) == "hello");
-
-    map.set(two, bye);
-
-    test_assert(as_string(map.findValueForKey(another_two)) == "bye");
-}
-
-void value_map_from_source()
-{
-    Branch branch;
-
-    eval_statement(branch, "myMap = Map()");
-    eval_statement(branch, "myMap = map-set(myMap, 'a, 2)");
-    eval_statement(branch, "myMap = map-set(myMap, 'b, 5)");
-
-    Term* a = eval_statement(branch, "map-access(myMap, 'a)");
-    test_assert(as_int(a) == 2);
-
-    Term* b = eval_statement(branch, "myMap('b)");
-    test_assert(as_int(b) == 5);
-}
-
-void value_list_source()
-{
-    Branch branch;
-
-    //todo
-}
-
 } // namespace container_tests
 
 void register_container_tests()
@@ -161,8 +113,6 @@ void register_container_tests()
     REGISTER_TEST_CASE(container_tests::test_set);
     REGISTER_TEST_CASE(container_tests::test_namespace);
     REGISTER_TEST_CASE(container_tests::test_list);
-    REGISTER_TEST_CASE(container_tests::value_map);
-    REGISTER_TEST_CASE(container_tests::value_map_from_source);
 }
 
 } // namespace circa
