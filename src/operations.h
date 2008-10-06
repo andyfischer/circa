@@ -11,7 +11,6 @@
 namespace circa {
 
 Term* create_term(Branch* branch, Term* function, ReferenceList inputs);
-void initialize_term(Term* term, Term* function, ReferenceList inputs);
 void set_inputs(Term* term, ReferenceList inputs);
 Term* create_constant(Branch* branch, Term* type);
 void set_input(Term* term, int index, Term* input);
@@ -35,12 +34,8 @@ bool is_constant(Term* term);
 
 void change_function(Term* term, Term* new_function);
 
-void dealloc_value(Term* term);
-
 void remap_pointers(Term* term, ReferenceMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
-
-void duplicate_branch(Branch* source, Branch* dest);
 
 Term* constant_string(Branch* branch, std::string const& s, std::string const& name="");
 Term* constant_int(Branch* branch, int i, std::string const& name="");

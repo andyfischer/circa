@@ -98,4 +98,35 @@ Branch* as_branch(Term* term)
     return (Branch*) term->value;
 }
 
+void duplicate_branch(Branch* source, Branch* dest)
+{
+    ReferenceMap newTermMap;
+
+    // Duplicate every term
+    for (int index=0; index < source->numTerms(); index++) {
+        Term* source_term = source->get(index);
+
+        Term* dest_term = create_term(dest, source_term->function, source_term->inputs);
+        newTermMap[source_term] = dest_term;
+
+        duplicate_value(source_term, dest_term);
+    }
+
+    // Remap terms
+    for (int index=0; index < dest->numTerms(); index++) {
+        Term* term = dest->get(index);
+        term->inputs.remapPointers(newTermMap);
+        if (as_type(term->type)->remapPointers != NULL)
+            as_type(term->type)->remapPointers(term, newTermMap);
+    }
+
+    // Copy names
+    TermNamespace::StringToTermMap::iterator it;
+    for (it = source->names.begin(); it != source->names.end(); ++it) {
+        std::string name = it->first;
+        Term* original_term = it->second;
+        dest->bindName(newTermMap.getRemapped(original_term), name);
+    }
+}
+
 } // namespace circa

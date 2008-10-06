@@ -15,6 +15,7 @@
 #include "operations.h"
 #include "term.h"
 #include "type.h"
+#include "values.h"
 
 #define CHECK_FOR_BAD_POINTERS true
 
