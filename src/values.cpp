@@ -27,8 +27,8 @@ void recycle_value(Term* source, Term* dest)
     if (source->type != dest->type)
         throw errors::TypeError(dest, source->type);
 
-    // Don't steal if the term says not to
-    bool steal = !source->stealingOk;
+    // Only steal if the term says it's OK
+    bool steal = source->stealingOk;
 
     // Don't steal from types
     if (source->type == TYPE_TYPE)
@@ -42,6 +42,9 @@ void recycle_value(Term* source, Term* dest)
 
 void duplicate_value(Term* source, Term* dest)
 {
+    if (source == dest)
+        throw std::runtime_error("in duplicate_value, can't have source == dest");
+
     if (source->type != dest->type)
         throw errors::TypeError(dest, source->type);
 
