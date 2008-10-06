@@ -37,6 +37,7 @@ void change_function(Term* term, Term* new_function);
 
 void dealloc_value(Term* term);
 
+void remap_pointers(Term* term, ReferenceMap &map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
 
 void duplicate_branch(Branch* source, Branch* dest);
