@@ -1,5 +1,5 @@
-#ifndef CIRCA__TERM_SET__INCLUDED
-#define CIRCA__TERM_SET__INCLUDED
+#ifndef CIRCA_REF_SET_INCLUDED
+#define CIRCA_REF_SET_INCLUDED
 
 #include "common_headers.h"
 

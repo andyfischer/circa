@@ -1,7 +1,7 @@
 // Copyright 2008 Andrew Fischer
 
-#ifndef CIRCA__OPERATIONS__INCLUDED
-#define CIRCA__OPERATIONS__INCLUDED
+#ifndef CIRCA_OPERATIONS_INCLUDED
+#define CIRCA_OPERATIONS_INCLUDED
 
 #include "function.h"
 #include "term.h"

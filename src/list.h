@@ -1,7 +1,7 @@
 // Copyright 2008 Andrew Fischer
 
-#ifndef CIRCA__LIST__INCLUDED
-#define CIRCA__LIST__INCLUDED
+#ifndef CIRCA_LIST_INCLUDED
+#define CIRCA_LIST_INCLUDED
 
 #include "ref_list.h"
 

@@ -1,7 +1,7 @@
 // Copyright 2008 Andrew Fischer
 
-#ifndef CIRCA__ERRORS__INCLUDED
-#define CIRCA__ERRORS__INCLUDED
+#ifndef CIRCA_ERRORS_INCLUDED
+#define CIRCA_ERRORS_INCLUDED
 
 #include "common_headers.h"
 

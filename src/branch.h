@@ -1,7 +1,7 @@
 // Copyright 2008 Andrew Fischer
 
-#ifndef CIRCA__BRANCH__INCLUDED
-#define CIRCA__BRANCH__INCLUDED
+#ifndef CIRCA_BRANCH_INCLUDED
+#define CIRCA_BRANCH_INCLUDED
 
 #include "common_headers.h"
 

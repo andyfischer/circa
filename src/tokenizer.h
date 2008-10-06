@@ -1,5 +1,5 @@
-#ifndef CIRCA__TOKENIZER__INCLUDED
-#define CIRCA__TOKENIZER__INCLUDED
+#ifndef CIRCA_TOKENIZER_INCLUDED
+#define CIRCA_TOKENIZER_INCLUDED
 
 #include "common_headers.h"
 

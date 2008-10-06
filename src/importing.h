@@ -1,5 +1,5 @@
-#ifndef CIRCA__IMPORTING__INCLUDED
-#define CIRCA__IMPORTING__INCLUDED
+#ifndef CIRCA_IMPORTING_INCLUDED
+#define CIRCA_IMPORTING_INCLUDED
 
 #include "common_headers.h"
 

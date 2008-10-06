@@ -1,5 +1,5 @@
-#ifndef CIRCA__PARSER__INCLUDED
-#define CIRCA__PARSER__INCLUDED
+#ifndef CIRCA_PARSER_INCLUDED
+#define CIRCA_PARSER_INCLUDED
 
 #include "ast.h"
 #include "token_stream.h"

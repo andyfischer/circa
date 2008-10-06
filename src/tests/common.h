@@ -1,7 +1,7 @@
 // Copyright 2008 Andrew Fischer
 
-#ifndef CIRCA__TEST_COMMON__INCLUDED
-#define CIRCA__TEST_COMMON__INCLUDED
+#ifndef CIRCA_TEST_COMMON_INCLUDED
+#define CIRCA_TEST_COMMON_INCLUDED
 
 #include "errors.h"
 
