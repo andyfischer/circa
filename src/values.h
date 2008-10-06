@@ -26,6 +26,8 @@ void duplicate_value(Term* source, Term* dest);
 //  2) ... (possible future situations)
 void steal_value(Term* source, Term* dest);
 
+void dealloc_value(Term* term);
+
 } // namespace circa
 
 #endif

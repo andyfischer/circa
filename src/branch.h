@@ -70,6 +70,8 @@ public:
 
 Branch* as_branch(Term* term);
 
+void duplicate_branch(Branch* source, Branch* dest);
+
 } // namespace circa
 
 #endif
