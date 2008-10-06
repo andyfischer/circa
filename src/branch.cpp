@@ -15,14 +15,10 @@ namespace circa {
 
 Branch::~Branch()
 {
-    std::vector<Term*> myTerms = this->terms;
-
-    this->terms.clear();
-
     // dealloc_value on everybody
-    for (int i = (int) myTerms.size() - 1; i >= 0; i--)
+    for (int i = (int) _terms.size() - 1; i >= 0; i--)
     {
-        Term *term = myTerms[i];
+        Term *term = _terms[i];
         if (term == NULL)
             continue;
 
@@ -31,15 +27,15 @@ Branch::~Branch()
     }
 
     // delete stuff in reverse order
-    for (int i = (int) myTerms.size() - 1; i >= 0; i--)
+    for (int i = (int) _terms.size() - 1; i >= 0; i--)
     {
-        Term *term = myTerms[i];
+        Term *term = _terms[i];
 
         if (term == NULL)
             continue;
 
         assert_good(term);
-        delete term;
+        //delete term;
     }
 }
 
@@ -53,16 +49,13 @@ Term* Branch::findNamed(std::string const& name) const
 
 void Branch::remapPointers(ReferenceMap const& map)
 {
-    for (unsigned int i=0; i < terms.size(); i++)
-        terms[i] = map.getRemapped(terms[i]);
-
     names.remapPointers(map);
 }
 
 void
 Branch::clear()
 {
-    terms.clear();
+    _terms.clear();
     names.clear();
 }
 

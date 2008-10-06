@@ -64,11 +64,11 @@ Term::~Term()
         //remap_pointers(*it, this, NULL);
     }*/
 
-    if (owningBranch != NULL) {
-        owningBranch->remapPointers(nullPointerRemap);
-    }
-
     dealloc_value(this);
+
+    if (owningBranch != NULL) {
+        owningBranch->termDeleted(this);
+    }
 
     DEBUG_GOOD_POINTER_SET.erase(this);
 }

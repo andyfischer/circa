@@ -13,7 +13,7 @@ namespace circa {
 class Branch
 {
 private:
-    std::vector<Term*> terms;
+    std::vector<Term*> _terms;
 
 public:
     TermNamespace names;
@@ -21,16 +21,17 @@ public:
     Branch() {}
     ~Branch();
 
-    int numTerms() const { return terms.size(); }
+    int numTerms() const { return _terms.size(); }
 
-    Term* get(int index) const { return terms[index]; }
-    Term* operator[](int index) const { return terms[index]; }
+    Term* get(int index) const { return _terms[index]; }
+    Term* operator[](int index) const { return _terms[index]; }
 
     void append(Term* term)
     {
+        assert_good(term);
         assert(term->owningBranch == NULL);
         term->owningBranch = this;
-        terms.push_back(term);
+        _terms.push_back(term);
     }
 
     // Returns true if there is a term with the given name
@@ -56,6 +57,14 @@ public:
     void bindName(Term* term, std::string name)
     {
         names.bind(term, name);
+    }
+
+    // This is called by Term, when it's deleted
+    void termDeleted(Term* term)
+    {
+        for (int i = 0; i < (int) _terms.size(); i++)
+            if (_terms[i] == term)
+                _terms[i] = NULL;
     }
 
     // Remap pointers
