@@ -78,6 +78,7 @@ struct CompoundValue {
     Term* appendSlot(Term* type) {
         Term* newTerm = create_constant(&branch, type);
         fields.append(newTerm);
+        newTerm->stealingOk = false;
         return newTerm;
     }
 
@@ -152,6 +153,10 @@ struct CompoundValue {
 
         Term* field = value.fields[index];
         specialize_type(term, field->type);
+
+        if (field->stealingOk)
+            std::cout << "warning: stealing from a field" << std::endl;
+
         recycle_value(field, term);
     }
 };

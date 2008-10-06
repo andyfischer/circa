@@ -37,9 +37,11 @@ void compound_types()
     test_assert(inst1 != NULL);
     test_assert(inst1->type = type1);
     test_assert(inst1->value != NULL);
+    test_assert(inst1->field("myint")->value != NULL); // remove
 
     // test get-field function
     Term* inst1_myint = eval_statement(branch, "get-field(inst1, 'myint)");
+    test_assert(inst1->field("myint")->value != NULL); // remove
     test_assert(inst1_myint != NULL);
     test_assert(!inst1_myint->hasError());
     //test_assert(is_int(inst1_myint));
