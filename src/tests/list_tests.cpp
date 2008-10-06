@@ -30,11 +30,11 @@ void create()
     test_assert(list1->asList()[2]->asFloat() == 2.0);
 
     // make sure items are copied by value
-    eval_statement(branch, "a = 5");
+    eval_statement(branch, "a = 5")->stealingOk = false;
     Term* list2 = eval_statement(branch, "list2 = list(a)");
     test_assert(list2->asList()[0]->asInt() == 5);
-    // branch["a"]->asInt() = 6; fixme, need to disable value stealing
-    // test_assert(list2->asList()[0]->asInt() == 5);
+    branch["a"]->asInt() = 6;
+    test_assert(list2->asList()[0]->asInt() == 5);
 }
 
 void operations()

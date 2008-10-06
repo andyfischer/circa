@@ -40,7 +40,6 @@ void test_duplicate()
     test_assert(as_int(term1_duplicate) == 5);
 }
 
-
 } // namespace branch_tests
 
 void register_branch_tests()
