@@ -19,11 +19,26 @@ Branch::~Branch()
 
     this->terms.clear();
 
-    std::vector<Term*>::iterator it;
-    for (it = myTerms.begin(); it != myTerms.end(); ++it) {
-        Term *term = *it;
+    // dealloc_value on everybody
+    for (unsigned int i = myTerms.size() - 1; i >= 0; i--)
+    {
+        Term *term = myTerms[i];
+        if (term == NULL)
+            continue;
+
         assert_good(term);
-        term->owningBranch = NULL;
+        dealloc_value(term);
+    }
+
+    // delete stuff in reverse order
+    for (unsigned int i = myTerms.size() - 1; i >= 0; i--)
+    {
+        Term *term = myTerms[i];
+
+        if (term == NULL)
+            continue;
+
+        assert_good(term);
         delete term;
     }
 }

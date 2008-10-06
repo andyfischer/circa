@@ -19,13 +19,12 @@ namespace circa {
 
 Term* create_term(Branch* branch, Term* function, ReferenceList inputs)
 {
-    //if (branch == NULL)
-    //  throw errors::InternalError("in create_term, branch is NULL");
+    if (branch == NULL)
+        throw std::runtime_error("in create_term, branch is NULL");
     if (!is_function(function))
-        throw errors::InternalError("in create_term, 2nd arg to create_term must be a function");
+        throw std::runtime_error("in create_term, 2nd arg to create_term must be a function");
 
     Term* term = new Term();
-    term->owningBranch = branch;
 
     if (branch != NULL)
         branch->append(term);
@@ -75,14 +74,14 @@ void initialize_term(Term* term, Term* function, ReferenceList inputs)
     }
 
     // Add to the 'users' field of each input, and 'function'
-    function->users.add(term);
+    /*function->users.add(term);
     for (unsigned int index=0; index < inputs.count(); index++) {
 
         if (inputs[index] == NULL)
             continue;
 
         inputs[index]->users.add(term);
-    }
+    }*/
 }
 
 void set_inputs(Term* term, ReferenceList inputs)
@@ -157,6 +156,8 @@ bool is_constant(Term* term)
 
 void change_function(Term* term, Term* new_function)
 {
+    assert_good(term);
+
     if (new_function->type != FUNCTION_TYPE)
         throw errors::TypeError(new_function, FUNCTION_TYPE);
 
@@ -165,6 +166,8 @@ void change_function(Term* term, Term* new_function)
 
 void remap_pointers(Term* term, Term* original, Term* replacement)
 {
+    assert_good(term);
+
     ReferenceMap map;
     map[original] = replacement;
 

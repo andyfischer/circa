@@ -26,7 +26,12 @@ public:
     Term* get(int index) const { return terms[index]; }
     Term* operator[](int index) const { return terms[index]; }
 
-    void append(Term* term) { terms.push_back(term); }
+    void append(Term* term)
+    {
+        assert(term->owningBranch == NULL);
+        term->owningBranch = this;
+        terms.push_back(term);
+    }
 
     // Returns true if there is a term with the given name
     bool containsName(std::string const& name) const

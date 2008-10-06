@@ -20,7 +20,7 @@ struct Term
     Branch* owningBranch;
     ReferenceList inputs;
     Term* function;
-    ReferenceSet users;
+    //ReferenceSet users;
 
     // data type
     Term* type;
