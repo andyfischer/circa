@@ -1,5 +1,5 @@
-#ifndef CIRCA__EVALUATOR__INCLUDED
-#define CIRCA__EVALUATOR__INCLUDED
+#ifndef CIRCA_EVALUATOR_INCLUDED
+#define CIRCA_EVALUATOR_INCLUDED
 
 #include "common_headers.h"
 

@@ -1,7 +1,7 @@
 // Copyright 2008 Paul Hodge
 
-#ifndef CIRCA__AST__INCLUDED
-#define CIRCA__AST__INCLUDED
+#ifndef CIRCA_AST_INCLUDED
+#define CIRCA_AST_INCLUDED
 
 #include <string>
 #include <sstream>

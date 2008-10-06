@@ -1,7 +1,7 @@
 // Copyright 2008 Paul Hodge
 
-#ifndef CIRCA__COMPILATION__INCLUDED
-#define CIRCA__COMPILATION__INCLUDED
+#ifndef CIRCA_COMPILATION_INCLUDED
+#define CIRCA_COMPILATION_INCLUDED
 
 #include "common_headers.h"
 

@@ -1,7 +1,7 @@
 // Copyright 2008 Paul Hodge
 
-#ifndef CIRCA__VALUES__INCLUDED
-#define CIRCA__VALUES__INCLUDED
+#ifndef CIRCA_VALUES_INCLUDED
+#define CIRCA_VALUES_INCLUDED
 
 #include "common_headers.h"
 

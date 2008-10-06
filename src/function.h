@@ -1,5 +1,5 @@
-#ifndef CIRCA__FUNCTION__INCLUDED
-#define CIRCA__FUNCTION__INCLUDED
+#ifndef CIRCA_FUNCTION_INCLUDED
+#define CIRCA_FUNCTION_INCLUDED
 
 #include "common_headers.h"
 

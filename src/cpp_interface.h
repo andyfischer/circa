@@ -1,7 +1,7 @@
 // Copyright 2008 Paul Hodge
 
-#ifndef CIRCA__CPP_INTERFACE__INCLUDED
-#define CIRCA__CPP_INTERFACE__INCLUDED
+#ifndef CIRCA_CPP_INTERFACE_INCLUDED
+#define CIRCA_CPP_INTERFACE_INCLUDED
 
 #include "bootstrapping.h"
 #include "term.h"
