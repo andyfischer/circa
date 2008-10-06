@@ -37,10 +37,10 @@ Term* create_term(Branch* branch, Term* function, ReferenceList inputs)
 void initialize_term(Term* term, Term* function, ReferenceList inputs)
 {
     if (term == NULL)
-        throw errors::InternalError("Term* is NULL");
+        throw std::runtime_error("Term* is NULL");
 
     if (function == NULL)
-        throw errors::InternalError("Function is NULL");
+        throw std::runtime_error("Function is NULL");
 
     term->function = function;
     Function& functionData = as_function(function);
@@ -49,13 +49,13 @@ void initialize_term(Term* term, Term* function, ReferenceList inputs)
     Term* stateType = functionData.stateType;
 
     if (outputType == NULL)
-        throw errors::InternalError("outputType is NULL");
+        throw std::runtime_error("outputType is NULL");
         
     if (!is_type(outputType))
-        throw errors::InternalError(outputType->findName() + " is not a type");
+        throw std::runtime_error(outputType->findName() + " is not a type");
 
     if (stateType != NULL && !is_type(stateType))
-        throw errors::InternalError(outputType->findName() + " is not a type");
+        throw std::runtime_error(outputType->findName() + " is not a type");
 
     change_type(term, outputType);
 
@@ -72,16 +72,6 @@ void initialize_term(Term* term, Term* function, ReferenceList inputs)
     if (functionData.initialize != NULL) {
         functionData.initialize(term);
     }
-
-    // Add to the 'users' field of each input, and 'function'
-    /*function->users.add(term);
-    for (unsigned int index=0; index < inputs.count(); index++) {
-
-        if (inputs[index] == NULL)
-            continue;
-
-        inputs[index]->users.add(term);
-    }*/
 }
 
 void set_inputs(Term* term, ReferenceList inputs)
@@ -110,7 +100,7 @@ Term* apply_function(Branch* branch, Term* function, ReferenceList inputs)
     if (is_type(function))
     {
         if (inputs.count() != 0)
-            throw errors::InternalError("Multiple inputs in constructor not supported");
+            throw std::runtime_error("Multiple inputs in constructor not supported");
 
         return create_term(branch, get_const_function(branch, function), inputs);
     }
@@ -121,7 +111,7 @@ Term* apply_function(Branch* branch, Term* function, ReferenceList inputs)
         Type* type = as_type(function->type);
 
         if (!type->memberFunctions.contains(""))
-            throw errors::InternalError(std::string("Term ") + function->toString()
+            throw std::runtime_error(std::string("Term ") + function->toString()
                     + " is not a type, and has no default function");
 
         ReferenceList memberFunctionInputs;

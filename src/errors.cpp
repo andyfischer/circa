@@ -13,10 +13,10 @@ std::string
 TypeError::message()
 {
     if (expectedType == NULL)
-        throw InternalError("In TypeError: expectedType is NULL");
+        throw std::runtime_error("In TypeError: expectedType is NULL");
 
     if (!is_type(expectedType))
-        throw InternalError("In TypeError: expectedType must be a type");
+        throw std::runtime_error("In TypeError: expectedType must be a type");
 
     std::string expected = as_type(expectedType)->name;
 

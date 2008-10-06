@@ -45,7 +45,7 @@ std::string& as_string(Term* t)
         throw errors::TypeError(t, STRING_TYPE);
 
     if (t->value == NULL)
-        throw errors::InternalError("NULL pointer in as_string");
+        throw std::runtime_error("NULL pointer in as_string");
 
     return *((std::string*) t->value);
 }
@@ -60,11 +60,10 @@ Type::addMemberFunction(std::string const &name, Term *function)
 {
     // make sure argument 0 of the function matches this type
     if (as_type(as_function(function).inputTypes[0]) != this)
-        throw errors::InternalError("argument 0 of function doesn't match this type");
+        throw std::runtime_error("argument 0 of function doesn't match this type");
 
     this->memberFunctions.bind(function, name);
 }
-
 
 struct CompoundValue {
 
@@ -228,7 +227,7 @@ void change_type(Term *term, Term *typeTerm)
     Type *type = as_type(typeTerm);
 
     if (type->alloc == NULL) {
-        throw errors::InternalError(std::string("type ") + type->name + " has no alloc function");
+        throw std::runtime_error(std::string("type ") + type->name + " has no alloc function");
     }
 
     type->alloc(term);
