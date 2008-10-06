@@ -22,6 +22,10 @@ Function::Function()
 {
 }
 
+Function::~Function()
+{
+}
+
 bool is_function(Term* term)
 {
     return is_instance(term, FUNCTION_TYPE);
