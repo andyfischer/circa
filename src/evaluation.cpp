@@ -18,12 +18,12 @@ void evaluate_term(Term* term)
 
     // Check function
     if (term->function == NULL) {
-        term->pushError("Function is NULL");
+        error_occured(term, "Function is NULL");
         return;
     }
 
     if (!is_function(term->function)) {
-        term->pushError("is_function(term->function) is false");
+        error_occured(term, "is_function(term->function) is false");
         return;
     }
 
@@ -32,7 +32,7 @@ void evaluate_term(Term* term)
     if (func.evaluate == NULL) {
         std::stringstream message;
         message << "Function '" << func.name << "' has no evaluate function";
-        term->pushError(message.str());
+        error_occured(term, message.str());
         return;
     }
 
@@ -48,21 +48,21 @@ void evaluate_term(Term* term)
         if (input == NULL) {
             std::stringstream message;
             message << "Input " << inputIndex << " is NULL";
-            term->pushError(message.str());
+            error_occured(term, message.str());
             return;
         }
 
         if (input->value == NULL) {
             std::stringstream message;
             message << "Input " << inputIndex << " has NULL value";
-            term->pushError(message.str());
+            error_occured(term, message.str());
             return;
         }
 
         if (input->hasError()) {
             std::stringstream message;
             message << "Input " << inputIndex << " has an error";
-            term->pushError(message.str());
+            error_occured(term, message.str());
             return;
         }
 
@@ -84,7 +84,7 @@ void evaluate_term(Term* term)
         std::stringstream message;
         message << "An internal error occured while executing " + func.name << ": "
             << err.message();
-        term->pushError(message.str());
+        error_occured(term, message.str());
     }
 }
 
