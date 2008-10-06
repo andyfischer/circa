@@ -249,4 +249,10 @@ Term* constant_list(Branch* branch, ReferenceList list, std::string const& name)
     return term;
 }
 
+void error_occured(Term* errorTerm, std::string const& message)
+{
+    //std::cout << "error occured: " << message << std::endl;
+    errorTerm->pushError(message);
+}
+
 } // namespace circa

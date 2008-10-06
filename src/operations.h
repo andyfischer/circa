@@ -47,6 +47,8 @@ Term* constant_int(Branch* branch, int i, std::string const& name="");
 Term* constant_float(Branch* branch, float f, std::string const& name="");
 Term* constant_list(Branch* branch, ReferenceList list, std::string const& name="");
 
+void error_occured(Term* errorTerm, std::string const& message);
+
 } // namespace circa
 
 #endif

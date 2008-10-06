@@ -17,7 +17,7 @@ void spy_function(Term * caller)
 
 void i_only_throw_errors(Term * caller)
 {
-    caller->pushError("error");
+    error_occured(caller, "error");
 }
 
 void init_test_functions(Branch& branch)

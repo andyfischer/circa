@@ -144,8 +144,7 @@ struct CompoundValue {
         int index = type.findField(fieldName);
 
         if (index == -1) {
-            std::cout << "field not found" << std::endl;
-            term->pushError(std::string("field \'")+fieldName+"\' not found");
+            error_occured(term, std::string("field \'")+fieldName+"\' not found");
             return;
         }
 
