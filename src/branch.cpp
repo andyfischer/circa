@@ -15,6 +15,21 @@ namespace circa {
 
 Branch::~Branch()
 {
+    // Create a map where all our terms go to NULL
+    ReferenceMap deleteMap;
+    
+    std::vector<Term*>::iterator it;
+    for (it = _terms.begin(); it != _terms.end(); ++it) {
+        if (*it != NULL)
+            deleteMap[*it] = NULL;
+    }
+
+    // Perform remapping
+    for (it = _terms.begin(); it != _terms.end(); ++it) {
+        if (*it != NULL)
+            remap_pointers(*it, deleteMap);
+    }
+
     // dealloc_value on everybody
     for (int i = (int) _terms.size() - 1; i >= 0; i--)
     {
@@ -35,7 +50,8 @@ Branch::~Branch()
             continue;
 
         assert_good(term);
-        //delete term;
+        term->owningBranch = NULL;
+        delete term;
     }
 }
 

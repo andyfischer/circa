@@ -20,7 +20,9 @@
 
 namespace circa {
 
+#if CHECK_FOR_BAD_POINTERS
 static std::set<Term*> DEBUG_GOOD_POINTER_SET;
+#endif
 
 void assert_good(Term* term)
 {
@@ -44,25 +46,18 @@ Term::Term()
     needsUpdate(true)
 {
     globalID = gNextGlobalID++;
+
+#if CHECK_FOR_BAD_POINTERS
     DEBUG_GOOD_POINTER_SET.insert(this);
+#endif
 }
 
 Term::~Term()
 {
     assert_good(this);
 
-    // Find all our users, and tell them to stop using us
-    /*ReferenceSet oldUsers = this->users;
-    this->users.clear();*/
-
     ReferenceMap nullPointerRemap;
     nullPointerRemap[this] = NULL;
-
-    /*std::set<Term*>::const_iterator it;
-    for (it = oldUsers._items.begin(); it != oldUsers._items.end(); ++it) {
-        // Disabled, 'users' is unsafe
-        //remap_pointers(*it, this, NULL);
-    }*/
 
     dealloc_value(this);
 
@@ -70,7 +65,9 @@ Term::~Term()
         owningBranch->termDeleted(this);
     }
 
+#if CHECK_FOR_BAD_POINTERS
     DEBUG_GOOD_POINTER_SET.erase(this);
+#endif
 }
 
 std::string

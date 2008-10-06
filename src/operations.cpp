@@ -164,17 +164,21 @@ void change_function(Term* term, Term* new_function)
     term->function = new_function;
 }
 
-void remap_pointers(Term* term, Term* original, Term* replacement)
+void remap_pointers(Term* term, ReferenceMap &map)
 {
     assert_good(term);
 
-    ReferenceMap map;
-    map[original] = replacement;
-
     term->inputs.remapPointers(map);
+    term->function = map.getRemapped(term->function);
 
     if (as_type(term->type)->remapPointers != NULL)
         as_type(term->type)->remapPointers(term, map);
+}
+void remap_pointers(Term* term, Term* original, Term* replacement)
+{
+    ReferenceMap map;
+    map[original] = replacement;
+    remap_pointers(term, map);
 }
 
 void duplicate_branch(Branch* source, Branch* dest)
