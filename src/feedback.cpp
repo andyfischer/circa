@@ -3,7 +3,9 @@
 #include "common_headers.h"
 
 #include "builtins.h"
+#include "evaluation.h"
 #include "function.h"
+#include "operations.h"
 
 namespace circa {
 
@@ -21,8 +23,11 @@ namespace feedback {
 
         if (targetsFunction.feedbackAssignFunction != NULL)
         {
-
+            apply_function(branch, targetsFunction.feedbackAssignFunction,
+                    ReferenceList(target, desired));
         }
+
+        evaluate_branch(branch);
     }
 }
 
