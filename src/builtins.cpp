@@ -11,6 +11,7 @@
 #include "cpp_interface.h"
 #include "errors.h"
 #include "evaluation.h"
+#include "feedback.h"
 #include "function.h"
 #include "list.h"
 #include "operations.h"
@@ -310,6 +311,7 @@ void initialize()
 
         // Then everything else:
         initialize_builtin_functions(KERNEL);
+        initialize_feedback_functions(*KERNEL);
         initialize_functions(KERNEL);
 
     } catch (errors::CircaError& e)

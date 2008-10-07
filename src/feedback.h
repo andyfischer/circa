@@ -5,7 +5,7 @@
 
 namespace circa {
 
-void initialize_feedback_functions(Branch* kernel);
+void initialize_feedback_functions(Branch& kernel);
 
 } // namespace circa
 
