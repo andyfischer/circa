@@ -78,7 +78,8 @@ std::vector<std::string> list_all_test_names()
     std::vector<std::string> output;
 
     std::vector<TestCase>::iterator it;
-    output.push_back(it->name);
+    for (it = gTestCases.begin(); it != gTestCases.end(); ++it)
+        output.push_back(it->name);
 
     return output;
 }

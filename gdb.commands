@@ -1,3 +1,0 @@
-# break errors::InternalError::InternalError(std::string)
-break circa::errors::CircaError::CircaError()
-run
