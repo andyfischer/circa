@@ -90,12 +90,12 @@ Branch::clear()
     names.clear();
 }
 
-Branch* as_branch(Term* term)
+Branch& as_branch(Term* term)
 {
     if (term->type != BRANCH_TYPE)
         throw errors::TypeError(term, BRANCH_TYPE);
 
-    return (Branch*) term->value;
+    return *((Branch*) term->value);
 }
 
 void duplicate_branch(Branch* source, Branch* dest)

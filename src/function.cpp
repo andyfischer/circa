@@ -17,8 +17,9 @@ Function::Function()
     variableArgs(false),
     initialize(NULL),
     evaluate(NULL),
+    meta(false),
     feedbackAccumulationFunction(NULL),
-    feedbackPropagationFunction(NULL)
+    feedbackAssignFunction(NULL)
 {
 }
 

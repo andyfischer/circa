@@ -32,8 +32,9 @@ struct Function
     InitializeFunc initialize;
     EvaluateFunc evaluate;
 
+    bool meta;
     Term* feedbackAccumulationFunction;
-    Term* feedbackPropagationFunction;
+    Term* feedbackAssignFunction;
 
     Function();
     ~Function();
