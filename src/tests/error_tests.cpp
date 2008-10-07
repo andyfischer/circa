@@ -7,6 +7,7 @@
 #include "builtins.h"
 #include "operations.h"
 #include "term.h"
+#include "values.h"
 
 namespace circa {
 namespace error_tests {

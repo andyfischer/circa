@@ -73,4 +73,40 @@ void steal_value(Term* source, Term* dest)
     source->needsUpdate = true;
 }
 
+Term* constant_string(Branch& branch, std::string const& s, std::string const& name)
+{
+    Term* term = apply_function(branch, STRING_TYPE, ReferenceList());
+    as_string(term) = s;
+    if (name != "")
+        branch.bindName(term, name);
+    return term;
+}
+
+Term* constant_int(Branch& branch, int i, std::string const& name)
+{
+    Term* term = apply_function(branch, INT_TYPE, ReferenceList());
+    as_int(term) = i;
+    if (name != "")
+        branch.bindName(term, name);
+    return term;
+}
+
+Term* constant_float(Branch& branch, float f, std::string const& name)
+{
+    Term* term = apply_function(branch, FLOAT_TYPE, ReferenceList());
+    as_float(term) = f;
+    if (name != "")
+        branch.bindName(term, name);
+    return term;
+}
+
+Term* constant_list(Branch& branch, ReferenceList list, std::string const& name)
+{
+    Term* term = apply_function(branch, LIST_TYPE, ReferenceList());
+    // FIXME as_list(term) = list;
+    if (name != "")
+        branch.bindName(term, name);
+    return term;
+}
+
 } // namespace circa

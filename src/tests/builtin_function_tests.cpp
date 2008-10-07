@@ -8,6 +8,7 @@
 #include "operations.h"
 #include "parser.h"
 #include "term.h"
+#include "values.h"
 
 namespace circa {
 namespace builtin_function_tests {

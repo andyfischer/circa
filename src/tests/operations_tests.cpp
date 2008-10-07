@@ -7,6 +7,7 @@
 #include "parser.h"
 #include "term.h"
 #include "ref_list.h"
+#include "values.h"
 
 namespace circa {
 namespace operations_tests {

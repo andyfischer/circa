@@ -6,6 +6,7 @@
 #include "function.h"
 #include "operations.h"
 #include "parser.h"
+#include "values.h"
 
 namespace circa {
 

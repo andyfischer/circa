@@ -37,11 +37,6 @@ void change_function(Term* term, Term* new_function);
 void remap_pointers(Term* term, ReferenceMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
 
-Term* constant_string(Branch& branch, std::string const& s, std::string const& name="");
-Term* constant_int(Branch& branch, int i, std::string const& name="");
-Term* constant_float(Branch& branch, float f, std::string const& name="");
-Term* constant_list(Branch& branch, ReferenceList list, std::string const& name="");
-
 void error_occured(Term* errorTerm, std::string const& message);
 
 } // namespace circa
