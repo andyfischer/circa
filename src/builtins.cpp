@@ -186,7 +186,7 @@ void range__evaluate(Term* caller)
     as_list(caller).clear();
 
     for (unsigned int i=0; i < max; i++) {
-        as_list(caller).append(constant_int(caller->owningBranch, i));
+        as_list(caller).append(constant_int(*caller->owningBranch, i));
     }
 }
 
@@ -204,7 +204,7 @@ void list_apply__evaluate(Term* caller)
     as_list(caller).clear();
 
     for (int i=0; i < list.count(); i++) {
-        Term* result = apply_function(caller->owningBranch, caller->inputs[0], ReferenceList(list.get(i)));
+        Term* result = apply_function(*caller->owningBranch, caller->inputs[0], ReferenceList(list.get(i)));
 
         result->eval();
 
@@ -257,19 +257,19 @@ void initialize_constants()
     LIST_TYPE = quick_create_cpp_type<List>(KERNEL, "List");
     as_type(LIST_TYPE)->toString = List__toString;
 
-    CONSTANT_INT = get_const_function(KERNEL, INT_TYPE);
-    CONSTANT_FLOAT = get_const_function(KERNEL, FLOAT_TYPE);
-    CONSTANT_STRING = get_const_function(KERNEL, STRING_TYPE);
-    CONSTANT_BOOL = get_const_function(KERNEL, BOOL_TYPE);
+    CONSTANT_INT = get_const_function(*KERNEL, INT_TYPE);
+    CONSTANT_FLOAT = get_const_function(*KERNEL, FLOAT_TYPE);
+    CONSTANT_STRING = get_const_function(*KERNEL, STRING_TYPE);
+    CONSTANT_BOOL = get_const_function(*KERNEL, BOOL_TYPE);
 
-    CONSTANT_0 = constant_float(KERNEL, 0);
-    CONSTANT_1 = constant_float(KERNEL, 1);
-    CONSTANT_2 = constant_float(KERNEL, 2);
+    CONSTANT_0 = constant_float(*KERNEL, 0);
+    CONSTANT_1 = constant_float(*KERNEL, 1);
+    CONSTANT_2 = constant_float(*KERNEL, 2);
 
-    CONSTANT_TRUE = apply_function(KERNEL, BOOL_TYPE, ReferenceList());
+    CONSTANT_TRUE = apply_function(*KERNEL, BOOL_TYPE, ReferenceList());
     as_bool(CONSTANT_TRUE) = true;
     KERNEL->bindName(CONSTANT_TRUE, "true");
-    CONSTANT_FALSE = apply_function(KERNEL, BOOL_TYPE, ReferenceList());
+    CONSTANT_FALSE = apply_function(*KERNEL, BOOL_TYPE, ReferenceList());
     as_bool(CONSTANT_FALSE) = false;
     KERNEL->bindName(CONSTANT_FALSE, "false");
 }

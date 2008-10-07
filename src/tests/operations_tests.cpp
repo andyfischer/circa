@@ -45,10 +45,10 @@ void test_create_constant()
 void test_constant_int()
 {
     Branch branch;
-    Term *term = constant_int(&branch, -2);
+    Term *term = constant_int(branch, -2);
     test_assert(as_int(term) == -2);
 
-    Term *term2 = constant_int(&branch, 154, "george");
+    Term *term2 = constant_int(branch, 154, "george");
     test_assert(term2 == branch.getNamed("george"));
     test_assert(as_int(term2) == 154);
 }

@@ -16,17 +16,17 @@ void test_math()
 {
     Branch branch;
 
-    Term* two = constant_float(&branch, 2);
-    Term* three = constant_float(&branch, 3);
-    Term* negative_one = constant_float(&branch, -1);
+    Term* two = constant_float(branch, 2);
+    Term* three = constant_float(branch, 3);
+    Term* negative_one = constant_float(branch, -1);
     Term* add_f = get_global("add");
     Term* mult_f = get_global("mult");
 
-    test_assert(as_float(eval_function(&branch, add_f, ReferenceList(two,three))) == 5);
-    test_assert(as_float(eval_function(&branch, add_f, ReferenceList(two,negative_one))) == 1);
+    test_assert(as_float(eval_function(branch, add_f, ReferenceList(two,three))) == 5);
+    test_assert(as_float(eval_function(branch, add_f, ReferenceList(two,negative_one))) == 1);
 
-    test_assert(as_float(eval_function(&branch, mult_f, ReferenceList(two,three))) == 6);
-    test_assert(as_float(eval_function(&branch, mult_f, ReferenceList(negative_one,three))) == -3);
+    test_assert(as_float(eval_function(branch, mult_f, ReferenceList(two,three))) == 6);
+    test_assert(as_float(eval_function(branch, mult_f, ReferenceList(negative_one,three))) == -3);
 
     test_assert(as_float(eval_statement(branch, "mult(5.0,3.0)")) == 15);
 }
@@ -38,9 +38,9 @@ void test_int()
     test_assert(as_type(INT_TYPE)->equals != NULL);
     test_assert(as_type(INT_TYPE)->toString != NULL);
 
-    Term* four = constant_int(&branch, 4);
-    Term* another_four = constant_int(&branch, 4);
-    Term* five = constant_int(&branch, 5);
+    Term* four = constant_int(branch, 4);
+    Term* another_four = constant_int(branch, 4);
+    Term* five = constant_int(branch, 5);
 
     test_assert(four->equals(another_four));
     test_assert(!four->equals(five));
@@ -55,9 +55,9 @@ void test_float()
     test_assert(as_type(FLOAT_TYPE)->equals != NULL);
     test_assert(as_type(FLOAT_TYPE)->toString != NULL);
 
-    Term* point_one = constant_float(&branch, .1);
-    Term* point_one_again = constant_float(&branch, .1);
-    Term* point_two = constant_float(&branch, 0.2);
+    Term* point_one = constant_float(branch, .1);
+    Term* point_one_again = constant_float(branch, .1);
+    Term* point_two = constant_float(branch, 0.2);
 
     test_assert(point_one->equals(point_one_again));
     test_assert(point_two->equals(point_two));

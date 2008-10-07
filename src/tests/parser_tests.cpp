@@ -209,8 +209,8 @@ void rebind_operator()
     delete expr;
 
     Branch branch;
-    Term* a = constant_int(&branch, 2, "a");
-    Term* b = constant_int(&branch, 5, "b");
+    Term* a = constant_int(branch, 2, "a");
+    Term* b = constant_int(branch, 5, "b");
 
     test_assert(branch.getNamed("a") == a);
     test_assert(branch.getNamed("b") == b);

@@ -7,10 +7,10 @@
 namespace circa {
 namespace ast {
 
-Term* find_and_apply_function(Branch* branch, std::string const& functionName,
+Term* find_and_apply_function(Branch& branch, std::string const& functionName,
         ReferenceList inputs)
 {
-    Term* function = branch->findNamed(functionName);
+    Term* function = branch.findNamed(functionName);
 
     if (function == NULL) {
         Term* result = apply_function(branch, UNKNOWN_FUNCTION, inputs);
@@ -50,7 +50,7 @@ Infix::createTerm(Branch* branch)
             throw syntax_errors::SyntaxError("Right side of -> must be an identifier");
         }
 
-        return find_and_apply_function(branch, rightIdent->text, ReferenceList(leftTerm));
+        return find_and_apply_function(*branch, rightIdent->text, ReferenceList(leftTerm));
     }
 
     // todo
@@ -115,7 +115,7 @@ FunctionCall::createTerm(Branch* branch)
         inputs.append(term);
     }
 
-    return find_and_apply_function(branch, this->functionName, inputs);
+    return find_and_apply_function(*branch, this->functionName, inputs);
 }
 
 void
@@ -142,21 +142,21 @@ LiteralString::toString() const
 Term*
 LiteralString::createTerm(Branch* branch)
 {
-    return constant_string(branch, this->text);
+    return constant_string(*branch, this->text);
 }
 
 Term*
 LiteralFloat::createTerm(Branch* branch)
 {
     float value = atof(this->text.c_str());
-    return constant_float(branch, value);
+    return constant_float(*branch, value);
 }
 
 Term*
 LiteralInteger::createTerm(Branch* branch)
 {
     int value = atoi(this->text.c_str());
-    return constant_int(branch, value);
+    return constant_int(*branch, value);
 }
 
 std::string
@@ -292,7 +292,7 @@ FunctionDecl::createTerm(Branch* branch)
         throw syntax_errors::SyntaxError(std::string("Identifier is not a type: ") + this->header->outputType);
 
     // Load into workspace
-    constant_string(&workspace, this->header->functionName, "functionName");
+    constant_string(workspace, this->header->functionName, "functionName");
     workspace.bindName(outputType, "outputType");
 
     // Create

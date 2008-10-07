@@ -21,13 +21,13 @@ void set_input(Term* term, int index, Term* input);
 //  2. 'function' might be a type (create an empty instance)
 //  3. We might specialize an overloaded function
 //  4. add more stuff here
-Term* apply_function(Branch* branch, Term* function, ReferenceList inputs);
+Term* apply_function(Branch& branch, Term* function, ReferenceList inputs);
 
 // Perform 'apply_function' and then evaluate the result
-Term* eval_function(Branch* branch, Term* function, ReferenceList inputs);
+Term* eval_function(Branch& branch, Term* function, ReferenceList inputs);
 
 // Fetch the const function for this type
-Term* get_const_function(Branch* branch, Term* type);
+Term* get_const_function(Branch& branch, Term* type);
 
 // Return true if the term is a constant
 bool is_constant(Term* term);
@@ -37,10 +37,10 @@ void change_function(Term* term, Term* new_function);
 void remap_pointers(Term* term, ReferenceMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
 
-Term* constant_string(Branch* branch, std::string const& s, std::string const& name="");
-Term* constant_int(Branch* branch, int i, std::string const& name="");
-Term* constant_float(Branch* branch, float f, std::string const& name="");
-Term* constant_list(Branch* branch, ReferenceList list, std::string const& name="");
+Term* constant_string(Branch& branch, std::string const& s, std::string const& name="");
+Term* constant_int(Branch& branch, int i, std::string const& name="");
+Term* constant_float(Branch& branch, float f, std::string const& name="");
+Term* constant_list(Branch& branch, ReferenceList list, std::string const& name="");
 
 void error_occured(Term* errorTerm, std::string const& message);
 

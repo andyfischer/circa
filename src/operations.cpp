@@ -83,7 +83,7 @@ void set_inputs(Term* term, ReferenceList inputs)
 
 Term* create_constant(Branch* branch, Term* type)
 {
-    Term *term = create_term(branch, get_const_function(branch, type), ReferenceList());
+    Term *term = create_term(branch, get_const_function(*branch, type), ReferenceList());
     term->stealingOk = false;
     return term;
 }
@@ -93,7 +93,7 @@ void set_input(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 }
 
-Term* apply_function(Branch* branch, Term* function, ReferenceList inputs)
+Term* apply_function(Branch& branch, Term* function, ReferenceList inputs)
 {
     if (function->needsUpdate)
         function->eval();
@@ -104,7 +104,7 @@ Term* apply_function(Branch* branch, Term* function, ReferenceList inputs)
         if (inputs.count() != 0)
             throw std::runtime_error("Multiple inputs in constructor not supported");
 
-        return create_term(branch, get_const_function(branch, function), inputs);
+        return create_term(&branch, get_const_function(branch, function), inputs);
     }
 
     // If 'function' is not really a function, see if we can treat it like a function
@@ -120,21 +120,21 @@ Term* apply_function(Branch* branch, Term* function, ReferenceList inputs)
         memberFunctionInputs.append(function);
         memberFunctionInputs.appendAll(inputs);
 
-        return create_term(branch, type->memberFunctions[""], memberFunctionInputs);
+        return create_term(&branch, type->memberFunctions[""], memberFunctionInputs);
     }
 
     // Create a term in the normal way
-    return create_term(branch, function, inputs);
+    return create_term(&branch, function, inputs);
 }
 
-Term* eval_function(Branch* branch, Term* function, ReferenceList inputs)
+Term* eval_function(Branch& branch, Term* function, ReferenceList inputs)
 {
     Term* result = apply_function(branch, function, inputs);
     result->eval();
     return result;
 }
 
-Term* get_const_function(Branch* branch, Term* type)
+Term* get_const_function(Branch& branch, Term* type)
 {
     Term* result = apply_function(branch, CONST_GENERATOR, ReferenceList(type));
     result->eval();
@@ -174,39 +174,39 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
     remap_pointers(term, map);
 }
 
-Term* constant_string(Branch* branch, std::string const& s, std::string const& name)
+Term* constant_string(Branch& branch, std::string const& s, std::string const& name)
 {
     Term* term = apply_function(branch, STRING_TYPE, ReferenceList());
     as_string(term) = s;
     if (name != "")
-        branch->bindName(term, name);
+        branch.bindName(term, name);
     return term;
 }
 
-Term* constant_int(Branch* branch, int i, std::string const& name)
+Term* constant_int(Branch& branch, int i, std::string const& name)
 {
     Term* term = apply_function(branch, INT_TYPE, ReferenceList());
     as_int(term) = i;
     if (name != "")
-        branch->bindName(term, name);
+        branch.bindName(term, name);
     return term;
 }
 
-Term* constant_float(Branch* branch, float f, std::string const& name)
+Term* constant_float(Branch& branch, float f, std::string const& name)
 {
     Term* term = apply_function(branch, FLOAT_TYPE, ReferenceList());
     as_float(term) = f;
     if (name != "")
-        branch->bindName(term, name);
+        branch.bindName(term, name);
     return term;
 }
 
-Term* constant_list(Branch* branch, ReferenceList list, std::string const& name)
+Term* constant_list(Branch& branch, ReferenceList list, std::string const& name)
 {
     Term* term = apply_function(branch, LIST_TYPE, ReferenceList());
     // FIXME as_list(term) = list;
     if (name != "")
-        branch->bindName(term, name);
+        branch.bindName(term, name);
     return term;
 }
 

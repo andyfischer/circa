@@ -10,7 +10,7 @@ namespace primitive_type_tests {
 
 void strings()
 {
-    Branch* branch = new Branch();
+    Branch branch;
     Term* str1 = constant_string(branch, "one");
     Term* str2 = constant_string(branch, "two");
 
