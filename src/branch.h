@@ -68,7 +68,7 @@ public:
     void clear();
 };
 
-Branch* as_branch(Term* term);
+Branch& as_branch(Term* term);
 
 void duplicate_branch(Branch* source, Branch* dest);
 
