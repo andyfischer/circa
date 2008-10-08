@@ -75,7 +75,7 @@ struct CompoundValue {
     CompoundValue() : signature(COMPOUND_TYPE_SIGNATURE) {}
 
     Term* appendSlot(Term* type) {
-        Term* newTerm = create_constant(&branch, type);
+        Term* newTerm = create_var(&branch, type);
         fields.append(newTerm);
         newTerm->stealingOk = false;
         return newTerm;
@@ -198,7 +198,7 @@ Type* as_type(Term *term)
 
 Term* quick_create_type(Branch* branch, std::string name)
 {
-    Term* term = create_constant(branch, TYPE_TYPE);
+    Term* term = create_var(branch, TYPE_TYPE);
     as_type(term)->name = name;
     branch->bindName(term, name);
     return term;
@@ -257,7 +257,7 @@ void empty_duplicate_function(Term*,Term*) {}
 
 Term* create_empty_type(Branch& branch, std::string name)
 {
-    Term* term = create_constant(&branch, TYPE_TYPE);
+    Term* term = create_var(&branch, TYPE_TYPE);
     Type* type = as_type(term);
     type->alloc = type_private::empty_function;
     type->dealloc = type_private::empty_function;

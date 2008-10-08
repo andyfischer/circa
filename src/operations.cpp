@@ -63,7 +63,7 @@ void initialize_term(Term* term, Term* function, ReferenceList inputs)
 
     // Create state (if a state type is defined)
     if (stateType != NULL) {
-        term->state = create_constant(NULL, stateType);
+        term->state = create_var(NULL, stateType);
     }
     else
         term->state = NULL;
@@ -81,7 +81,7 @@ void set_inputs(Term* term, ReferenceList inputs)
     term->inputs = inputs;
 }
 
-Term* create_constant(Branch* branch, Term* type)
+Term* create_var(Branch* branch, Term* type)
 {
     Term *term = create_term(branch, get_var_function(*branch, type), ReferenceList());
     term->stealingOk = false;
