@@ -25,6 +25,7 @@ namespace circa {
 
 Branch* KERNEL = NULL;
 Term* VAR_FUNCTION_GENERATOR = NULL;
+Term* VAR_FUNCTION_FEEDBACK_ASSIGN = NULL;
 Term* INT_TYPE = NULL;
 Term* FLOAT_TYPE = NULL;
 Term* BOOL_TYPE = NULL;
@@ -58,9 +59,10 @@ void var_function_generator(Term* caller)
 
     Function& output = as_function(caller);
     Type* type = as_type(caller->inputs[0]);
-    output.name = "const-" + type->name;
+    output.name = "var-" + type->name;
     output.outputType = caller->inputs[0];
     output.evaluate = empty_evaluate_function;
+    output.feedbackAssignFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
 }
 
 Term* get_global(std::string name)
