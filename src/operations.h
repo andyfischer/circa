@@ -12,7 +12,7 @@ namespace circa {
 
 Term* create_term(Branch* branch, Term* function, ReferenceList inputs);
 void set_inputs(Term* term, ReferenceList inputs);
-Term* create_constant(Branch* branch, Term* type);
+Term* create_var(Branch* branch, Term* type);
 void set_input(Term* term, int index, Term* input);
 
 // Examine 'function' and 'inputs' and returns a result term. A few things

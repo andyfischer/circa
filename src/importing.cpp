@@ -16,7 +16,7 @@ Term* import_c_function(Branch& branch, Function::EvaluateFunc evaluate, std::st
     token_stream::TokenStream tokens(headerText);
     ast::FunctionHeader *header = parser::functionHeader(tokens);
 
-    Term* term = create_constant(&branch, FUNCTION_TYPE);
+    Term* term = create_var(&branch, FUNCTION_TYPE);
     Function& func = as_function(term);
 
     func.name = header->functionName;

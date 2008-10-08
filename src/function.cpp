@@ -86,7 +86,7 @@ void Function::subroutine_create(Term* caller)
     // Create input placeholders
     for (unsigned int index=0; index < sub.inputTypes.count(); index++) {
         std::string name = get_placeholder_name_for_index(index);
-        Term* placeholder = create_constant(&sub.subroutineBranch,
+        Term* placeholder = create_var(&sub.subroutineBranch,
                 sub.inputTypes[index]);
         sub.subroutineBranch.bindName(placeholder, name);
     }

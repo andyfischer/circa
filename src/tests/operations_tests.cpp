@@ -35,10 +35,10 @@ void safe_delete()
     }
 }
 
-void test_create_constant()
+void test_create_var()
 {
     Branch branch;
-    Term *term = create_constant(&branch, INT_TYPE);
+    Term *term = create_var(&branch, INT_TYPE);
 
     test_assert(term->type == INT_TYPE);
 }
@@ -68,7 +68,7 @@ void test_misc()
 void register_operations_tests()
 {
     REGISTER_TEST_CASE(operations_tests::safe_delete);
-    REGISTER_TEST_CASE(operations_tests::test_create_constant);
+    REGISTER_TEST_CASE(operations_tests::test_create_var);
     REGISTER_TEST_CASE(operations_tests::test_int_var);
     REGISTER_TEST_CASE(operations_tests::test_misc);
 }

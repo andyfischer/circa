@@ -17,7 +17,7 @@ namespace circa {
 Term* quick_create_function(Branch* branch, std::string name, Function::EvaluateFunc evaluateFunc,
         ReferenceList inputTypes, Term* outputType)
 {
-    Term* term = create_constant(branch, FUNCTION_TYPE);
+    Term* term = create_var(branch, FUNCTION_TYPE);
     Function& func = as_function(term);
     func.name = name;
     func.evaluate = evaluateFunc;
