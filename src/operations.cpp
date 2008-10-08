@@ -21,8 +21,8 @@ void initialize_term(Term* term, Term* function, ReferenceList inputs);
 
 Term* create_term(Branch* branch, Term* function, ReferenceList inputs)
 {
-    if (branch == NULL)
-        throw std::runtime_error("in create_term, branch is NULL");
+    //if (branch == NULL)
+    //    throw std::runtime_error("in create_term, branch is NULL");
     if (!is_function(function))
         throw std::runtime_error("in create_term, 2nd arg to create_term must be a function");
 

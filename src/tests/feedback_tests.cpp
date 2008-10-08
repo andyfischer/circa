@@ -14,8 +14,6 @@ void test_no_feedback_function()
     Term* a = eval_statement(branch, "a = 1?");
 
     Term* apply_feedback = eval_statement(branch, "apply-feedback(a, 2)");
-
-
 }
 
 } // namespace feedback_tests
