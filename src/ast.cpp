@@ -142,21 +142,21 @@ LiteralString::toString() const
 Term*
 LiteralString::createTerm(Branch* branch)
 {
-    return constant_string(*branch, this->text);
+    return string_var(*branch, this->text);
 }
 
 Term*
 LiteralFloat::createTerm(Branch* branch)
 {
     float value = atof(this->text.c_str());
-    return constant_float(*branch, value);
+    return float_var(*branch, value);
 }
 
 Term*
 LiteralInteger::createTerm(Branch* branch)
 {
     int value = atoi(this->text.c_str());
-    return constant_int(*branch, value);
+    return int_var(*branch, value);
 }
 
 std::string
@@ -292,7 +292,7 @@ FunctionDecl::createTerm(Branch* branch)
         throw syntax_errors::SyntaxError(std::string("Identifier is not a type: ") + this->header->outputType);
 
     // Load into workspace
-    constant_string(workspace, this->header->functionName, "functionName");
+    string_var(workspace, this->header->functionName, "functionName");
     workspace.bindName(outputType, "outputType");
 
     // Create
@@ -308,7 +308,7 @@ FunctionDecl::createTerm(Branch* branch)
 
         // FIXME statement->createTerm(as_subroutine(sub)->branch);
 
-        //constant_string(&workspace, statement->text, "statement");
+        //string_var(&workspace, statement->text, "statement");
         //eval_statement(workspace,
                 //"subroutine-eval(@sub, statement)");
     }

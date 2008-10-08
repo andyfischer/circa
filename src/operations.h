@@ -27,10 +27,10 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList inputs);
 Term* eval_function(Branch& branch, Term* function, ReferenceList inputs);
 
 // Fetch the const function for this type
-Term* get_const_function(Branch& branch, Term* type);
+Term* get_var_function(Branch& branch, Term* type);
 
 // Return true if the term is a constant
-bool is_constant(Term* term);
+bool is_var(Term* term);
 
 void change_function(Term* term, Term* new_function);
 

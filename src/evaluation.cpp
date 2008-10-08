@@ -103,7 +103,7 @@ Branch* evaluate_file(std::string const& filename)
     Branch *branch = new Branch();
 
     Branch temp_branch;
-    temp_branch.bindName(constant_string(temp_branch, filename), "filename");
+    temp_branch.bindName(string_var(temp_branch, filename), "filename");
     std::string file_contents = as_string(eval_statement(temp_branch,
                 "read-text-file(filename)"));
 

@@ -28,10 +28,10 @@ void steal_value(Term* source, Term* dest);
 
 void dealloc_value(Term* term);
 
-Term* constant_string(Branch& branch, std::string const& s, std::string const& name="");
-Term* constant_int(Branch& branch, int i, std::string const& name="");
-Term* constant_float(Branch& branch, float f, std::string const& name="");
-Term* constant_list(Branch& branch, ReferenceList list, std::string const& name="");
+Term* string_var(Branch& branch, std::string const& s, std::string const& name="");
+Term* int_var(Branch& branch, int i, std::string const& name="");
+Term* float_var(Branch& branch, float f, std::string const& name="");
+Term* list_var(Branch& branch, ReferenceList list, std::string const& name="");
 
 } // namespace circa
 

@@ -24,7 +24,7 @@
 namespace circa {
 
 Branch* KERNEL = NULL;
-Term* CONST_GENERATOR = NULL;
+Term* VAR_FUNCTION_GENERATOR = NULL;
 Term* INT_TYPE = NULL;
 Term* FLOAT_TYPE = NULL;
 Term* BOOL_TYPE = NULL;
@@ -38,10 +38,10 @@ Term* VOID_TYPE = NULL;
 Term* REFERENCE_TYPE = NULL;
 Term* LIST_TYPE = NULL;
 Term* MAP_TYPE = NULL;
-Term* CONSTANT_INT = NULL;
-Term* CONSTANT_FLOAT = NULL;
-Term* CONSTANT_STRING = NULL;
-Term* CONSTANT_BOOL = NULL;
+Term* VAR_INT = NULL;
+Term* VAR_FLOAT = NULL;
+Term* VAR_STRING = NULL;
+Term* VAR_BOOL = NULL;
 Term* CONSTANT_0 = NULL;
 Term* CONSTANT_1 = NULL;
 Term* CONSTANT_2 = NULL;
@@ -52,7 +52,7 @@ Term* UNKNOWN_FUNCTION = NULL;
 void empty_evaluate_function(Term*) { }
 void empty_alloc_function(Term*) { }
 
-void const_generator(Term* caller)
+void var_function_generator(Term* caller)
 {
     assert(caller->inputs[0] != NULL);
 
@@ -75,17 +75,17 @@ void bootstrap_kernel()
 {
     KERNEL = new Branch();
 
-    // Create const-generator function
-    CONST_GENERATOR = new Term();
-    Function::alloc(CONST_GENERATOR);
-    as_function(CONST_GENERATOR).name = "const-generator";
-    as_function(CONST_GENERATOR).pureFunction = true;
-    as_function(CONST_GENERATOR).evaluate = const_generator;
-    KERNEL->bindName(CONST_GENERATOR, "const-generator");
+    // Create var-function-generator function
+    VAR_FUNCTION_GENERATOR = new Term();
+    Function::alloc(VAR_FUNCTION_GENERATOR);
+    as_function(VAR_FUNCTION_GENERATOR).name = "var-function-generator";
+    as_function(VAR_FUNCTION_GENERATOR).pureFunction = true;
+    as_function(VAR_FUNCTION_GENERATOR).evaluate = var_function_generator;
+    KERNEL->bindName(VAR_FUNCTION_GENERATOR, "var-function-generator");
 
     // Create const-Type function
     Term* constTypeFunc = new Term();
-    constTypeFunc->function = CONST_GENERATOR;
+    constTypeFunc->function = VAR_FUNCTION_GENERATOR;
     Function::alloc(constTypeFunc);
     as_function(constTypeFunc).name = "const-Type";
     as_function(constTypeFunc).pureFunction = true;
@@ -100,19 +100,19 @@ void bootstrap_kernel()
 
     // Implant the Type type
     set_input(constTypeFunc, 0, typeType);
-    as_function(CONST_GENERATOR).inputTypes.setAt(0, typeType);
+    as_function(VAR_FUNCTION_GENERATOR).inputTypes.setAt(0, typeType);
     as_function(constTypeFunc).outputType = typeType;
 
     // Create const-Function function
     Term* constFuncFunc = new Term();
-    constFuncFunc->function = CONST_GENERATOR;
+    constFuncFunc->function = VAR_FUNCTION_GENERATOR;
     Function::alloc(constFuncFunc);
     as_function(constFuncFunc).name = "const-Function";
     as_function(constFuncFunc).pureFunction = true;
     KERNEL->bindName(constFuncFunc, "const-Function");
 
     // Implant const-Function
-    CONST_GENERATOR->function = constFuncFunc;
+    VAR_FUNCTION_GENERATOR->function = constFuncFunc;
 
     // Create Function type
     Term* functionType = new Term();
@@ -127,16 +127,16 @@ void bootstrap_kernel()
     KERNEL->bindName(functionType, "Function");
 
     // Implant Function type
-    set_input(CONST_GENERATOR, 0, typeType);
+    set_input(VAR_FUNCTION_GENERATOR, 0, typeType);
     set_input(constFuncFunc, 0, functionType);
-    CONST_GENERATOR->type = functionType;
+    VAR_FUNCTION_GENERATOR->type = functionType;
     constFuncFunc->type = functionType;
     constTypeFunc->type = functionType;
-    as_function(CONST_GENERATOR).outputType = functionType;
+    as_function(VAR_FUNCTION_GENERATOR).outputType = functionType;
     as_function(constFuncFunc).outputType = functionType;
 
     // Don't let these terms get updated
-    CONST_GENERATOR->needsUpdate = false;
+    VAR_FUNCTION_GENERATOR->needsUpdate = false;
     constFuncFunc->needsUpdate = false;
     constTypeFunc->needsUpdate = false;
     functionType->needsUpdate = false;
@@ -187,7 +187,7 @@ void range__evaluate(Term* caller)
     as_list(caller).clear();
 
     for (unsigned int i=0; i < max; i++) {
-        as_list(caller).append(constant_int(*caller->owningBranch, i));
+        as_list(caller).append(int_var(*caller->owningBranch, i));
     }
 }
 
@@ -258,14 +258,14 @@ void initialize_constants()
     LIST_TYPE = quick_create_cpp_type<List>(KERNEL, "List");
     as_type(LIST_TYPE)->toString = List__toString;
 
-    CONSTANT_INT = get_const_function(*KERNEL, INT_TYPE);
-    CONSTANT_FLOAT = get_const_function(*KERNEL, FLOAT_TYPE);
-    CONSTANT_STRING = get_const_function(*KERNEL, STRING_TYPE);
-    CONSTANT_BOOL = get_const_function(*KERNEL, BOOL_TYPE);
+    VAR_INT = get_var_function(*KERNEL, INT_TYPE);
+    VAR_FLOAT = get_var_function(*KERNEL, FLOAT_TYPE);
+    VAR_STRING = get_var_function(*KERNEL, STRING_TYPE);
+    VAR_BOOL = get_var_function(*KERNEL, BOOL_TYPE);
 
-    CONSTANT_0 = constant_float(*KERNEL, 0);
-    CONSTANT_1 = constant_float(*KERNEL, 1);
-    CONSTANT_2 = constant_float(*KERNEL, 2);
+    CONSTANT_0 = float_var(*KERNEL, 0);
+    CONSTANT_1 = float_var(*KERNEL, 1);
+    CONSTANT_2 = float_var(*KERNEL, 2);
 
     CONSTANT_TRUE = apply_function(*KERNEL, BOOL_TYPE, ReferenceList());
     as_bool(CONSTANT_TRUE) = true;

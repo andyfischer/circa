@@ -16,7 +16,7 @@ void test_evaluate()
 {
     Branch branch;
 
-    Term* one = constant_float(branch, 1.0);
+    Term* one = float_var(branch, 1.0);
 
     Term* term1 = apply_function(branch, get_global("add"), ReferenceList(NULL, one));
     term1->eval();

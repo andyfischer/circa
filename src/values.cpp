@@ -73,7 +73,7 @@ void steal_value(Term* source, Term* dest)
     source->needsUpdate = true;
 }
 
-Term* constant_string(Branch& branch, std::string const& s, std::string const& name)
+Term* string_var(Branch& branch, std::string const& s, std::string const& name)
 {
     Term* term = apply_function(branch, STRING_TYPE, ReferenceList());
     as_string(term) = s;
@@ -82,7 +82,7 @@ Term* constant_string(Branch& branch, std::string const& s, std::string const& n
     return term;
 }
 
-Term* constant_int(Branch& branch, int i, std::string const& name)
+Term* int_var(Branch& branch, int i, std::string const& name)
 {
     Term* term = apply_function(branch, INT_TYPE, ReferenceList());
     as_int(term) = i;
@@ -91,7 +91,7 @@ Term* constant_int(Branch& branch, int i, std::string const& name)
     return term;
 }
 
-Term* constant_float(Branch& branch, float f, std::string const& name)
+Term* float_var(Branch& branch, float f, std::string const& name)
 {
     Term* term = apply_function(branch, FLOAT_TYPE, ReferenceList());
     as_float(term) = f;
@@ -100,7 +100,7 @@ Term* constant_float(Branch& branch, float f, std::string const& name)
     return term;
 }
 
-Term* constant_list(Branch& branch, ReferenceList list, std::string const& name)
+Term* list_var(Branch& branch, ReferenceList list, std::string const& name)
 {
     Term* term = apply_function(branch, LIST_TYPE, ReferenceList());
     // FIXME as_list(term) = list;
