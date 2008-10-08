@@ -11,7 +11,9 @@ void test_no_feedback_function()
 {
     Branch branch;
 
+    Term* a = eval_statement(branch, "a = 1?");
 
+    Term* apply_feedback = eval_statement(branch, "apply-feedback(a, 2)");
 
 
 }

@@ -83,7 +83,7 @@ void set_inputs(Term* term, ReferenceList inputs)
 
 Term* create_constant(Branch* branch, Term* type)
 {
-    Term *term = create_term(branch, get_const_function(*branch, type), ReferenceList());
+    Term *term = create_term(branch, get_var_function(*branch, type), ReferenceList());
     term->stealingOk = false;
     return term;
 }
@@ -104,7 +104,7 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList inputs)
         if (inputs.count() != 0)
             throw std::runtime_error("Multiple inputs in constructor not supported");
 
-        return create_term(&branch, get_const_function(branch, function), inputs);
+        return create_term(&branch, get_var_function(branch, function), inputs);
     }
 
     // If 'function' is not really a function, see if we can treat it like a function
@@ -134,16 +134,16 @@ Term* eval_function(Branch& branch, Term* function, ReferenceList inputs)
     return result;
 }
 
-Term* get_const_function(Branch& branch, Term* type)
+Term* get_var_function(Branch& branch, Term* type)
 {
-    Term* result = apply_function(branch, CONST_GENERATOR, ReferenceList(type));
+    Term* result = apply_function(branch, VAR_FUNCTION_GENERATOR, ReferenceList(type));
     result->eval();
     return result;
 }
 
-bool is_constant(Term* term)
+bool is_var(Term* term)
 {
-    return term->function->function == CONST_GENERATOR;
+    return term->function->function == VAR_FUNCTION_GENERATOR;
 }
 
 void change_function(Term* term, Term* new_function)
