@@ -39,10 +39,10 @@ Term* create_term(Branch* branch, Term* function, ReferenceList inputs)
 void initialize_term(Term* term, Term* function, ReferenceList inputs)
 {
     if (term == NULL)
-        throw std::runtime_error("Term* is NULL");
+        throw std::runtime_error("term is NULL");
 
     if (function == NULL)
-        throw std::runtime_error("Function is NULL");
+        throw std::runtime_error("function is NULL");
 
     term->function = function;
     Function& functionData = as_function(function);
