@@ -40,10 +40,10 @@ namespace feedback {
 
 void initialize_feedback_functions(Branch& kernel)
 {
-    Term* apply_feedback = import_c_function(kernel, feedback::apply_feedback,
+    APPLY_FEEDBACK = import_c_function(kernel, feedback::apply_feedback,
             "function apply-feedback(any,any)");
-    as_function(apply_feedback).meta = true;
-    as_function(apply_feedback).stateType = BRANCH_TYPE;
+    as_function(APPLY_FEEDBACK).meta = true;
+    as_function(APPLY_FEEDBACK).stateType = BRANCH_TYPE;
 }
 
 } // namespace circa

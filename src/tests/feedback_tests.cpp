@@ -12,7 +12,7 @@ void test_var_feedback()
     Branch branch;
 
     // test int
-    Term* a = eval_statement(branch, "a = 1");
+    Term* a = eval_statement(branch, "a = 1?");
 
     test_assert(as_int(a) == 1);
 
@@ -26,10 +26,20 @@ void test_var_feedback()
     test_assert(as_int(a) == 2);
 
     // test string
-    Term* str = eval_statement(branch, "str = \"sofa\"");
+    Term* str = eval_statement(branch, "str = \"sofa\"?");
     test_assert(as_string(str) == "sofa");
     eval_statement(branch, "apply-feedback(str, \"lamp\")");
     test_assert(as_string(str) == "lamp");
+}
+
+void test_add_feedback()
+{
+    Branch branch;
+    Term* a = eval_statement(branch, "a = 1.0?");
+    eval_statement(branch, "sum = add(a,a)");
+    eval_statement(branch, "apply-feedback(sum, 3.0)");
+
+    test_assert(as_float(a) == 1.5);
 }
 
 } // namespace feedback_tests
@@ -37,6 +47,7 @@ void test_var_feedback()
 void register_feedback_tests()
 {
     REGISTER_TEST_CASE(feedback_tests::test_var_feedback);
+    REGISTER_TEST_CASE(feedback_tests::test_add_feedback);
 }
 
 } // namespace circa
