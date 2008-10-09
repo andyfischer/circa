@@ -20,7 +20,7 @@ namespace feedback {
         Term* target = caller->inputs[0];
         Term* desired = caller->inputs[1];
 
-        Function& targetsFunction = as_function(target);
+        Function& targetsFunction = as_function(target->function);
 
         if (targetsFunction.feedbackAssignFunction != NULL)
         {

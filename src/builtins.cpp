@@ -75,6 +75,24 @@ Term* get_global(std::string name)
 
 void bootstrap_kernel()
 {
+    // This is a crazy function. We need to create the 5 core functions in our system,
+    // all of which need to reference each other or themselves.
+    //
+    // Here is what we need to create:
+    //
+    // var-function-generator(Type) -> Function
+    //    Given a type, returns a function which is a 'plain value' function. This term
+    //    has function const-Function.
+    // const-Type() -> Type
+    //    Function which returns a Type value. This is created by var-function-generator
+    // const-Function() -> Function
+    //    Function which returns a Function value. This is created by var-function-generator.
+    // Type Function
+    //    Stores the Type object for functions. This term has function const-Type
+    // Type Type
+    //    Type is a type, this term stores the Type object for types. This term has
+    //    function const-Type
+
     KERNEL = new Branch();
 
     // Create var-function-generator function
@@ -254,6 +272,17 @@ void unknown_function__evaluate(Term* caller)
         << as_string(caller->state) << std::endl;
 }
 
+namespace var_function {
+
+    void feedback_assign(Term* caller)
+    {
+        Term* target = caller->inputs[0];
+        Term* desired = caller->inputs[1];
+
+        duplicate_value(desired, target);
+    }
+}
+
 void initialize_constants()
 {
     BRANCH_TYPE = quick_create_cpp_type<Branch>(KERNEL, "Branch");
@@ -301,6 +330,15 @@ void initialize_builtin_functions(Branch* code)
             unknown_function__evaluate,
             ReferenceList(ANY_TYPE), ANY_TYPE);
     as_function(UNKNOWN_FUNCTION).stateType = STRING_TYPE;
+
+    VAR_FUNCTION_FEEDBACK_ASSIGN = quick_create_function(code, "var-function-feedback-assign",
+        var_function::feedback_assign,
+        ReferenceList(ANY_TYPE, ANY_TYPE), VOID_TYPE);
+
+    as_function(VAR_INT).feedbackAssignFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
+    as_function(VAR_FLOAT).feedbackAssignFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
+    as_function(VAR_BOOL).feedbackAssignFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
+    as_function(VAR_STRING).feedbackAssignFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
 }
 
 void initialize()

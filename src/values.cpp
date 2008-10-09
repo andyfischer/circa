@@ -109,20 +109,4 @@ Term* list_var(Branch& branch, ReferenceList list, std::string const& name)
     return term;
 }
 
-namespace var_function {
-
-    void feedback_assign(Term* caller)
-    {
-        Term* target = caller->inputs[0];
-        Term* desired = caller->inputs[1];
-
-        duplicate_value(desired, target);
-    }
-}
-
-void initialize_value_functions(Branch* kernel)
-{
-    // todo
-}
-
 } // namespace circa

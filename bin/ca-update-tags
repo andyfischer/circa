@@ -1,2 +1,1 @@
-cd ~/circa/c_port
-ctags -R src
+ctags -R ~/circa/src -o ~/circa/tags
