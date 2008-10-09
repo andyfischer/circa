@@ -19,7 +19,7 @@ Function::Function()
     evaluate(NULL),
     meta(false),
     feedbackAccumulationFunction(NULL),
-    feedbackAssignFunction(NULL)
+    feedbackPropogateFunction(NULL)
 {
 }
 

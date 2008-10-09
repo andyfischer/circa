@@ -22,9 +22,9 @@ namespace feedback {
 
         Function& targetsFunction = as_function(target->function);
 
-        if (targetsFunction.feedbackAssignFunction != NULL)
+        if (targetsFunction.feedbackPropogateFunction != NULL)
         {
-            apply_function(branch, targetsFunction.feedbackAssignFunction,
+            apply_function(branch, targetsFunction.feedbackPropogateFunction,
                     ReferenceList(target, desired));
         } else {
             std::stringstream out;

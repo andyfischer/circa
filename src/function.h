@@ -34,7 +34,7 @@ struct Function
 
     bool meta;
     Term* feedbackAccumulationFunction;
-    Term* feedbackAssignFunction;
+    Term* feedbackPropogateFunction;
 
     Function();
     ~Function();
