@@ -49,6 +49,7 @@ Term* CONSTANT_2 = NULL;
 Term* CONSTANT_TRUE = NULL;
 Term* CONSTANT_FALSE = NULL;
 Term* UNKNOWN_FUNCTION = NULL;
+Term* APPLY_FEEDBACK = NULL;
 
 void empty_evaluate_function(Term*) { }
 void empty_alloc_function(Term*) { }
@@ -168,9 +169,51 @@ void print__evaluate(Term* caller)
     std::cout << as_string(caller->inputs[0]) << std::endl;
 }
 
-void add__evaluate(Term* caller)
-{
-    as_float(caller) = as_float(caller->inputs[0]) + as_float(caller->inputs[1]);
+namespace add_function {
+
+    void evaluate(Term* caller)
+    {
+        as_float(caller) = as_float(caller->inputs[0]) + as_float(caller->inputs[1]);
+    }
+    void feedback_propogate(Term* caller)
+    {
+        Term* target = caller->inputs[0];
+        Term* desired = caller->inputs[1];
+        Branch& myBranch = as_branch(caller->state);
+        myBranch.clear();
+
+        // for now, send 1/n of the delta to each input
+        float delta = as_float(desired) - as_float(target);
+
+        int numInputs = target->inputs.count();
+
+        if (numInputs == 0)
+            return;
+
+        for (int i=0; i < numInputs; i++) {
+            float inputDelta = delta / numInputs;
+
+            Term* input = target->inputs[i];
+
+            apply_function(myBranch, APPLY_FEEDBACK,
+                ReferenceList(input, float_var(myBranch, as_float(input) + inputDelta)));
+        }
+
+        evaluate_branch(myBranch);
+    }
+    static void setup(Branch* kernel)
+    {
+        Term* eval_func = quick_create_function(kernel, "add", evaluate,
+            ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
+
+        Term* fp_func =
+            quick_create_function(kernel, "add-feedback-propogate",
+                feedback_propogate,
+                ReferenceList(ANY_TYPE, ANY_TYPE), VOID_TYPE);
+        as_function(fp_func).stateType = BRANCH_TYPE;
+
+        as_function(eval_func).feedbackPropogateFunction = fp_func;
+    }
 }
 
 void mult__evaluate(Term* caller)
@@ -308,8 +351,7 @@ void initialize_constants()
 
 void initialize_builtin_functions(Branch* code)
 {
-    quick_create_function(code, "add", add__evaluate,
-            ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
+    add_function::setup(code);
     quick_create_function(code, "mult", mult__evaluate,
             ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
     quick_create_function(code, "concat", string_concat__evaluate, ReferenceList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
