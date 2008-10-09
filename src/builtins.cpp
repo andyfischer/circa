@@ -62,7 +62,7 @@ void var_function_generator(Term* caller)
     output.name = "var-" + type->name;
     output.outputType = caller->inputs[0];
     output.evaluate = empty_evaluate_function;
-    output.feedbackAssignFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
+    output.feedbackPropogateFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
 }
 
 Term* get_global(std::string name)
@@ -335,10 +335,10 @@ void initialize_builtin_functions(Branch* code)
         var_function::feedback_assign,
         ReferenceList(ANY_TYPE, ANY_TYPE), VOID_TYPE);
 
-    as_function(VAR_INT).feedbackAssignFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
-    as_function(VAR_FLOAT).feedbackAssignFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
-    as_function(VAR_BOOL).feedbackAssignFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
-    as_function(VAR_STRING).feedbackAssignFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
+    as_function(VAR_INT).feedbackPropogateFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
+    as_function(VAR_FLOAT).feedbackPropogateFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
+    as_function(VAR_BOOL).feedbackPropogateFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
+    as_function(VAR_STRING).feedbackPropogateFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
 }
 
 void initialize()
