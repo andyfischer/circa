@@ -84,7 +84,9 @@ struct FunctionCall : public Expression
 
 struct Literal : public Expression
 {
-    std::string hasQuestionMark;
+    bool hasQuestionMark;
+
+    Literal() : hasQuestionMark(false) {}
 };
 
 struct LiteralString : public Literal
