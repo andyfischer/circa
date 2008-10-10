@@ -21,6 +21,7 @@ const char* getMatchText(int match)
         case QUOTED_IDENTIFIER: return "QUOTED_IDENTIFIER";
         case DOT: return ".";
         case STAR: return "*";
+        case QUESTION: return "?";
         case SLASH: return "/";
         case PLUS: return "+";
         case MINUS: return "-";
@@ -213,6 +214,10 @@ void top_level_consume_token(TokenizeContext &context)
         case '.':
             context.consume();
             context.pushResult(DOT);
+            return;
+        case '?':
+            context.consume();
+            context.pushResult(QUESTION);
             return;
         case '*':
             context.consume();

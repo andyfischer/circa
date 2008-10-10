@@ -189,7 +189,9 @@ ast::Expression* infixExpression(TokenStream& tokens,
 
 void post_literal(TokenStream& tokens, ast::Literal* literal)
 {
+    if (tokens.nextIs(tokenizer::QUESTION)) {
 
+    }
 }
 
 ast::Expression* atom(TokenStream& tokens)
