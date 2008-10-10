@@ -33,6 +33,7 @@ const int QUOTED_IDENTIFIER = 8;
 
 const int DOT = 9;
 const int STAR = 10;
+const int QUESTION = 33;
 const int SLASH = 11;
 const int PLUS = 12;
 const int MINUS = 13;

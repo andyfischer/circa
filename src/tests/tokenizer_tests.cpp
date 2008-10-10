@@ -56,9 +56,9 @@ void test_integers()
 void test_symbols()
 {
     token::TokenList results;
-    token::tokenize(",()=", results);
+    token::tokenize(",()=?", results);
 
-    test_assert(results.size() == 4);
+    test_assert(results.size() == 5);
     test_assert(results[0].text == ",");
     test_assert(results[0].match == token::COMMA);
     test_assert(results[1].text == "(");
@@ -67,6 +67,8 @@ void test_symbols()
     test_assert(results[2].match == token::RPAREN);
     test_assert(results[3].text == "=");
     test_assert(results[3].match == token::EQUALS);
+    test_assert(results[4].text == "?");
+    test_assert(results[4].match == token::QUESTION);
 }
 
 void test_string_literal()
