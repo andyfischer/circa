@@ -2,15 +2,10 @@
 
 #include "common_headers.h"
 
-#include "bootstrapping.h"
 #include "branch.h"
 #include "builtins.h"
-#include "tokenizer.h"
-#include "token_stream.h"
 #include "operations.h"
 #include "ref_list.h"
-
-namespace token = circa::tokenizer;
 
 namespace circa {
 
