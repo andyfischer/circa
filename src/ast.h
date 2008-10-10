@@ -82,7 +82,12 @@ struct FunctionCall : public Expression
     virtual std::string typeName() { return "function-call"; }
 };
 
-struct LiteralString : public Expression
+struct Literal : public Expression
+{
+    std::string hasQuestionMark;
+};
+
+struct LiteralString : public Literal
 {
     std::string text;
 
@@ -93,7 +98,7 @@ struct LiteralString : public Expression
     virtual std::string typeName() { return "literal-string"; }
 };
 
-struct LiteralFloat : public Expression
+struct LiteralFloat : public Literal
 {
     std::string text;
 
@@ -107,7 +112,7 @@ struct LiteralFloat : public Expression
     virtual std::string typeName() { return "literal-float"; }
 };
 
-struct LiteralInteger : public Expression
+struct LiteralInteger : public Literal
 {
     std::string text;
 

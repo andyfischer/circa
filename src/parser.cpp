@@ -6,11 +6,13 @@
 #include "tokenizer.h"
 #include "parser.h"
 
+using namespace circa::token_stream;
+
 namespace circa {
 
 Term* apply_statement(Branch& branch, std::string const& input)
 {
-    token_stream::TokenStream tokens(input);
+    TokenStream tokens(input);
 
     ast::Statement* statementAst = parser::statement(tokens);
 
@@ -55,11 +57,11 @@ Term* eval_statement(Branch& branch, std::string const& input)
 
 namespace parser {
 
-std::string possibleWhitespace(token_stream::TokenStream& tokens);
-std::string possibleNewline(token_stream::TokenStream& tokens);
+std::string possibleWhitespace(TokenStream& tokens);
+std::string possibleNewline(TokenStream& tokens);
 
 
-ast::StatementList* statementList(token_stream::TokenStream& tokens)
+ast::StatementList* statementList(TokenStream& tokens)
 {
     ast::StatementList* statementList = new ast::StatementList();
 
@@ -79,7 +81,7 @@ ast::StatementList* statementList(token_stream::TokenStream& tokens)
     return statementList;
 }
 
-ast::Statement* statement(token_stream::TokenStream& tokens)
+ast::Statement* statement(TokenStream& tokens)
 {
     // toss leading whitespace
     possibleWhitespace(tokens);
@@ -98,7 +100,7 @@ ast::Statement* statement(token_stream::TokenStream& tokens)
     return expressionStatement(tokens);
 }
 
-ast::ExpressionStatement* expressionStatement(token_stream::TokenStream& tokens)
+ast::ExpressionStatement* expressionStatement(TokenStream& tokens)
 {
     ast::ExpressionStatement* statement = new ast::ExpressionStatement();
 
@@ -161,7 +163,7 @@ int getInfixPrecedence(int match)
 
 #define HIGHEST_INFIX_PRECEDENCE 7
 
-ast::Expression* infixExpression(token_stream::TokenStream& tokens,
+ast::Expression* infixExpression(TokenStream& tokens,
         int precedence)
 {
     if (precedence > HIGHEST_INFIX_PRECEDENCE)
@@ -185,7 +187,12 @@ ast::Expression* infixExpression(token_stream::TokenStream& tokens,
     return leftExpr;
 }
 
-ast::Expression* atom(token_stream::TokenStream& tokens)
+void post_literal(TokenStream& tokens, ast::Literal* literal)
+{
+
+}
+
+ast::Expression* atom(TokenStream& tokens)
 {
     // function call?
     if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.nextIs(tokenizer::LPAREN, 1))
@@ -231,7 +238,7 @@ ast::Expression* atom(token_stream::TokenStream& tokens)
     throw syntax_errors::SyntaxError("Unrecognized expression", &tokens.next());
 }
 
-ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)
+ast::FunctionCall* functionCall(TokenStream& tokens)
 {
     std::string functionName = tokens.consume(tokenizer::IDENTIFIER);
     tokens.consume(tokenizer::LPAREN);
@@ -255,7 +262,7 @@ ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)
     return functionCall.release();
 }
 
-ast::FunctionHeader* functionHeader(token_stream::TokenStream& tokens)
+ast::FunctionHeader* functionHeader(TokenStream& tokens)
 {
     std::auto_ptr<ast::FunctionHeader> header(new ast::FunctionHeader());
 
@@ -306,7 +313,7 @@ ast::FunctionHeader* functionHeader(token_stream::TokenStream& tokens)
     return header.release();
 }
 
-ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
+ast::FunctionDecl* functionDecl(TokenStream& tokens)
 {
     std::auto_ptr<ast::FunctionDecl> decl(new ast::FunctionDecl());
 
@@ -329,7 +336,7 @@ ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
     return decl.release();
 }
 
-std::string possibleWhitespace(token_stream::TokenStream& tokens)
+std::string possibleWhitespace(TokenStream& tokens)
 {
     if (tokens.nextIs(tokenizer::WHITESPACE))
         return tokens.consume(tokenizer::WHITESPACE);
@@ -337,7 +344,7 @@ std::string possibleWhitespace(token_stream::TokenStream& tokens)
         return "";
 }
 
-std::string possibleNewline(token_stream::TokenStream& tokens)
+std::string possibleNewline(TokenStream& tokens)
 {
     std::stringstream output;
 
