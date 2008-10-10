@@ -19,6 +19,11 @@ public:
     // Default constructor
     Dictionary() {}
 
+    bool contains(std::string const& name) const
+    {
+        return _dict.find(name) != _dict.end();
+    }
+
     Term* operator[] (std::string const& name) const { return this->get(name); }
     Term* get(std::string const& name) const {
         RefDictionary::const_iterator it = _dict.find(name);

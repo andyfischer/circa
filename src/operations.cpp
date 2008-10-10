@@ -104,11 +104,11 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList inputs)
         if (inputs.count() != 0)
             throw std::runtime_error("Multiple inputs in constructor not supported");
 
-        return create_term(&branch, get_var_function(branch, function), inputs);
+        function = get_var_function(branch, function);
     }
 
     // If 'function' is not really a function, see if we can treat it like a function
-    if (!is_function(function)) {
+    else if (!is_function(function)) {
 
         Type* type = as_type(function->type);
 
@@ -120,7 +120,8 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList inputs)
         memberFunctionInputs.append(function);
         memberFunctionInputs.appendAll(inputs);
 
-        return create_term(&branch, type->memberFunctions[""], memberFunctionInputs);
+        function = type->memberFunctions[""];
+        inputs = memberFunctionInputs;
     }
 
     // Create a term in the normal way
