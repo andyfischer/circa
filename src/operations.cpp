@@ -17,8 +17,6 @@
 
 namespace circa {
 
-void initialize_term(Term* term, Term* function, ReferenceList inputs);
-
 Term* create_term(Branch* branch, Term* function, ReferenceList inputs)
 {
     //if (branch == NULL)
@@ -30,19 +28,6 @@ Term* create_term(Branch* branch, Term* function, ReferenceList inputs)
 
     if (branch != NULL)
         branch->append(term);
-
-    initialize_term(term, function, inputs);
-    
-    return term;
-}
-
-void initialize_term(Term* term, Term* function, ReferenceList inputs)
-{
-    if (term == NULL)
-        throw std::runtime_error("term is NULL");
-
-    if (function == NULL)
-        throw std::runtime_error("function is NULL");
 
     term->function = function;
     Function& functionData = as_function(function);
@@ -74,11 +59,22 @@ void initialize_term(Term* term, Term* function, ReferenceList inputs)
     if (functionData.initialize != NULL) {
         functionData.initialize(term);
     }
+
+    return term;
 }
 
 void set_inputs(Term* term, ReferenceList inputs)
 {
+    assert_good(term);
+
     term->inputs = inputs;
+}
+
+void set_input(Term* term, int index, Term* input)
+{
+    assert_good(term);
+
+    term->inputs.setAt(index, input);
 }
 
 Term* create_var(Branch* branch, Term* type)
@@ -86,11 +82,6 @@ Term* create_var(Branch* branch, Term* type)
     Term *term = create_term(branch, get_var_function(*branch, type), ReferenceList());
     term->stealingOk = false;
     return term;
-}
-
-void set_input(Term* term, int index, Term* input)
-{
-    term->inputs.setAt(index, input);
 }
 
 Term* apply_function(Branch& branch, Term* function, ReferenceList inputs)
@@ -124,7 +115,7 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList inputs)
         inputs = memberFunctionInputs;
     }
 
-    // Create a term in the normal way
+    // Create the term
     return create_term(&branch, function, inputs);
 }
 
@@ -170,6 +161,9 @@ void remap_pointers(Term* term, ReferenceMap const& map)
 
 void remap_pointers(Term* term, Term* original, Term* replacement)
 {
+    assert_good(term);
+    assert_good(original);
+
     ReferenceMap map;
     map[original] = replacement;
     remap_pointers(term, map);
