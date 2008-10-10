@@ -190,8 +190,30 @@ ast::Expression* infixExpression(TokenStream& tokens,
 void post_literal(TokenStream& tokens, ast::Literal* literal)
 {
     if (tokens.nextIs(tokenizer::QUESTION)) {
-
+        tokens.consume(tokenizer::QUESTION);
+        literal->hasQuestionMark = true;
     }
+}
+
+ast::Literal* literal_float(TokenStream& tokens)
+{
+    ast::Literal* lit = new ast::LiteralFloat(tokens.consume(tokenizer::FLOAT));
+    post_literal(tokens, lit);
+    return lit;
+}
+
+ast::Literal* literal_integer(TokenStream& tokens)
+{
+    ast::Literal* lit = new ast::LiteralInteger(tokens.consume(tokenizer::INTEGER));
+    post_literal(tokens, lit);
+    return lit;
+}
+
+ast::Literal* literal_string(TokenStream& tokens)
+{
+    ast::Literal* lit = new ast::LiteralString(tokens.consume());
+    post_literal(tokens, lit);
+    return lit;
 }
 
 ast::Expression* atom(TokenStream& tokens)
@@ -202,15 +224,15 @@ ast::Expression* atom(TokenStream& tokens)
 
     // literal string?
     if (tokens.nextIs(tokenizer::STRING) || tokens.nextIs(tokenizer::QUOTED_IDENTIFIER))
-        return new ast::LiteralString(tokens.consume());
+        return literal_string(tokens);
 
     // literal float?
     if (tokens.nextIs(tokenizer::FLOAT))
-        return new ast::LiteralFloat(tokens.consume(tokenizer::FLOAT));
+        return literal_float(tokens);
 
     // literal integer?
     if (tokens.nextIs(tokenizer::INTEGER))
-        return new ast::LiteralInteger(tokens.consume(tokenizer::INTEGER));
+        return literal_integer(tokens);
 
     // rebind operator?
     bool hasRebindOperator = false;

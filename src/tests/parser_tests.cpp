@@ -16,6 +16,17 @@ void literal_float()
     test_assert(literal != NULL);
     test_assert(literal->text == "1.0");
     test_assert(literal->toString() == "1.0");
+    test_assert(literal->hasQuestionMark == false);
+
+    delete expr;
+
+    tokens.reset("5.0?");
+    expr = parser::atom(tokens);
+    literal = dynamic_cast<ast::LiteralFloat*>(expr);
+    test_assert(literal != NULL);
+    test_assert(literal->text == "5.0");
+    test_assert(literal->toString() == "5.0");
+    test_assert(literal->hasQuestionMark == true);
 
     delete expr;
 }
