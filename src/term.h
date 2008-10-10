@@ -5,7 +5,7 @@
 
 #include "ref_list.h"
 #include "ref_set.h"
-#include "term_namespace.h"
+#include "dictionary.h"
 
 namespace circa {
 
@@ -20,7 +20,6 @@ struct Term
     Branch* owningBranch;
     ReferenceList inputs;
     Term* function;
-    //ReferenceSet users;
 
     // data type
     Term* type;
@@ -33,6 +32,8 @@ struct Term
 
     // Persisted value. Owned by us.
     Term* state;
+
+    Dictionary properties;
 
     bool needsUpdate;
 

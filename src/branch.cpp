@@ -51,6 +51,15 @@ Branch::~Branch()
     }
 }
 
+void Branch::append(Term* term)
+{
+    assert_good(term);
+    assert(term->owningBranch == NULL);
+    term->owningBranch = this;
+    _terms.push_back(term);
+}
+
+
 Term* Branch::findNamed(std::string const& name) const
 {
     if (containsName(name))

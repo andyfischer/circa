@@ -5,7 +5,6 @@
 
 #include "common_headers.h"
 
-#include "term.h"
 #include "term_namespace.h"
 
 namespace circa {
@@ -26,13 +25,7 @@ public:
     Term* get(int index) const { return _terms[index]; }
     Term* operator[](int index) const { return _terms[index]; }
 
-    void append(Term* term)
-    {
-        assert_good(term);
-        assert(term->owningBranch == NULL);
-        term->owningBranch = this;
-        _terms.push_back(term);
-    }
+    void append(Term* term);
 
     // Returns true if there is a term with the given name
     bool containsName(std::string const& name) const

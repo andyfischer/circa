@@ -5,6 +5,7 @@
 #include "branch.h"
 #include "builtins.h"
 #include "compilation.h"
+#include "term.h"
 
 namespace circa {
 
