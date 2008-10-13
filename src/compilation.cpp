@@ -9,26 +9,26 @@
 
 namespace circa {
 
-void checkForCompileError(Term* term, std::string& errorMessage)
+void check_for_compile_error(Term* term, std::string& errorMessage)
 {
     if (term->function == UNKNOWN_FUNCTION) {
         errorMessage = std::string("Unknown function: " + as_string(term->state));
     }
 }
 
-bool hasCompileErrors(Branch& branch)
+bool has_compile_errors(Branch& branch)
 {
     for (int i=0; i < branch.numTerms(); i++) {
         Term* term = branch[i];
         std::string message;
-        checkForCompileError(term, message);
+        check_for_compile_error(term, message);
         if (message != "")
             return true;
     }
     return false;
 }
 
-std::vector<std::string> getCompileErrors(Branch& branch)
+std::vector<std::string> get_compile_errors(Branch& branch)
 {
     std::vector<std::string> results;
 
@@ -36,7 +36,7 @@ std::vector<std::string> getCompileErrors(Branch& branch)
         Term* term = branch[i];
         std::string message;
 
-        checkForCompileError(term, message);
+        check_for_compile_error(term, message);
 
         if (message != "")
             results.push_back(message);
@@ -45,13 +45,13 @@ std::vector<std::string> getCompileErrors(Branch& branch)
     return results;
 }
 
-void printCompileErrors(Branch& branch, std::ostream& output)
+void print_compile_errors(Branch& branch, std::ostream& output)
 {
     for (int i=0; i < branch.numTerms(); i++) {
         Term* term = branch[i];
         std::string message;
 
-        checkForCompileError(term, message);
+        check_for_compile_error(term, message);
 
         if (message != "")
             output << message << std::endl;

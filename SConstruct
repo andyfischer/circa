@@ -1,5 +1,5 @@
 
-import os,sys, glob, gch
+import os,sys, glob 
 
 def create_windows_env(releaseBuild):
     env = Environment(platform = 'nt')
@@ -17,7 +17,7 @@ def create_windows_env(releaseBuild):
     return env
         
 def create_mac_env(releaseBuild):
-    env = Environment(tools = ["default", "gch"], toolpath=".")
+    env = Environment(tools = ["default"], toolpath=".")
     # Python support
     #env.Append(CPPPATH = ["/System/Library/Frameworks/Python.framework/Versions/2.5/Headers"])
 
