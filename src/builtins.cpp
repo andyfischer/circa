@@ -410,4 +410,16 @@ void shutdown()
     KERNEL = NULL;
 }
 
+Term* get_var_function(Branch& branch, Term* type)
+{
+    Term* result = apply_function(branch, VAR_FUNCTION_GENERATOR, ReferenceList(type));
+    result->eval();
+    return result;
+}
+
+bool is_var(Term* term)
+{
+    return term->function->function == VAR_FUNCTION_GENERATOR;
+}
+
 } // namespace circa

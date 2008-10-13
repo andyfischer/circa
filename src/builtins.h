@@ -46,6 +46,12 @@ bool& as_bool(Term* t);
 std::string& as_string(Term* t);
 Term*& as_ref(Term* term);
 
+// Fetch the const function for this type
+Term* get_var_function(Branch& branch, Term* type);
+
+// Return true if the term is a constant
+bool is_var(Term* term);
+
 } // namespace circa
 
 #endif
