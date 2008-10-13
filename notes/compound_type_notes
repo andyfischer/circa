@@ -1,6 +1,0 @@
-
-
-the *actual data* of an instance of CompoundType will look like:
-
-Ref (= Type) [parent]
-List (= {Ref, "parent"}, {List, "fields"} ) [fields]

@@ -30,7 +30,7 @@ When we create a feedback term:
 
 
 Note that many of these operations depend on the items being constant.
-If they are not constant, this code will have to be modifid to handle
+If they are not constant, this code will have to be modified to handle
 the situation where they change.
 
 
