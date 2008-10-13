@@ -1,0 +1,10 @@
+
+Function 'map'
+
+word-count = map(string,int)
+
+returns an instance of type Map<string,int>
+
+this instance can be treated like a function
+
+word-count('hi') = 3
