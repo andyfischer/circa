@@ -126,18 +126,6 @@ Term* eval_function(Branch& branch, Term* function, ReferenceList inputs)
     return result;
 }
 
-Term* get_var_function(Branch& branch, Term* type)
-{
-    Term* result = apply_function(branch, VAR_FUNCTION_GENERATOR, ReferenceList(type));
-    result->eval();
-    return result;
-}
-
-bool is_var(Term* term)
-{
-    return term->function->function == VAR_FUNCTION_GENERATOR;
-}
-
 void change_function(Term* term, Term* new_function)
 {
     assert_good(term);

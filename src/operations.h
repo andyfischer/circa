@@ -26,12 +26,6 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList inputs);
 // Perform 'apply_function' and then evaluate the result
 Term* eval_function(Branch& branch, Term* function, ReferenceList inputs);
 
-// Fetch the const function for this type
-Term* get_var_function(Branch& branch, Term* type);
-
-// Return true if the term is a constant
-bool is_var(Term* term);
-
 void change_function(Term* term, Term* new_function);
 
 void remap_pointers(Term* term, ReferenceMap const& map);
