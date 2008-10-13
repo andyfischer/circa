@@ -4,7 +4,7 @@
 
 #include "circa.h"
 #include "common.h"
-#include "evaluation.h"
+#include "runtime.h"
 
 namespace circa {
 namespace subroutine_tests {

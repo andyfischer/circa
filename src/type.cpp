@@ -9,6 +9,7 @@
 #include "function.h"
 #include "list.h"
 #include "operations.h"
+#include "runtime.h"
 #include "term.h"
 #include "type.h"
 #include "values.h"

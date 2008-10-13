@@ -169,10 +169,4 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
     remap_pointers(term, map);
 }
 
-void error_occured(Term* errorTerm, std::string const& message)
-{
-    //std::cout << "error occured: " << message << std::endl;
-    errorTerm->pushError(message);
-}
-
 } // namespace circa
