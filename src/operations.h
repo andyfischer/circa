@@ -37,8 +37,6 @@ void change_function(Term* term, Term* new_function);
 void remap_pointers(Term* term, ReferenceMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
 
-void error_occured(Term* errorTerm, std::string const& message);
-
 } // namespace circa
 
 #endif

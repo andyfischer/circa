@@ -2,7 +2,7 @@
 
 #include "branch.h"
 #include "errors.h"
-#include "evaluation.h"
+#include "runtime.h"
 #include "function.h"
 #include "operations.h"
 #include "parser.h"
@@ -115,6 +115,12 @@ Branch* evaluate_file(std::string const& filename)
     delete statementList;
 
     return branch;
+}
+
+void error_occured(Term* errorTerm, std::string const& message)
+{
+    //std::cout << "error occured: " << message << std::endl;
+    errorTerm->pushError(message);
 }
 
 } // namespace circa
