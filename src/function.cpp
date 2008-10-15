@@ -122,6 +122,11 @@ void Function::name_input(Term* caller)
     sub.subroutineBranch.bindName(inputPlaceholder, name);
 }
 
+void Function::get_input_name(Term* caller)
+{
+    // todo
+}
+
 void initialize_functions(Branch* kernel)
 {
     quick_create_function(kernel, "subroutine-create",
