@@ -234,15 +234,6 @@ void if_expr__evaluate(Term* caller)
     recycle_value(caller->inputs[index], caller);
 }
 
-void create_list__evaluate(Term* caller)
-{
-    as_list(caller).clear();
-
-    for (unsigned int i=0; i < caller->inputs.count(); i++) {
-        as_list(caller).append(caller->inputs[i]);
-    }
-}
-
 void range__evaluate(Term* caller)
 {
     unsigned int max = as_int(caller->inputs[0]);
@@ -358,7 +349,6 @@ void initialize_builtin_functions(Branch* kernel)
     quick_create_function(kernel, "print", print__evaluate, ReferenceList(STRING_TYPE), VOID_TYPE);
     quick_create_function(kernel, "if-expr", if_expr__evaluate,
         ReferenceList(BOOL_TYPE, ANY_TYPE, ANY_TYPE), ANY_TYPE);
-    quick_create_function(kernel, "list", create_list__evaluate, ReferenceList(ANY_TYPE), LIST_TYPE);
     quick_create_function(kernel, "range", range__evaluate, ReferenceList(INT_TYPE), LIST_TYPE);
     quick_create_function(kernel, "list-append", list_append__evaluate, ReferenceList(LIST_TYPE, ANY_TYPE), LIST_TYPE);
     quick_create_function(kernel, "list-apply", list_apply__evaluate, ReferenceList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
@@ -390,6 +380,7 @@ void initialize()
         initialize_primitive_types(KERNEL);
         initialize_constants();
         initialize_compound_types(KERNEL);
+        initialize_list_functions(KERNEL);
 
         // Then everything else:
         initialize_builtin_functions(KERNEL);

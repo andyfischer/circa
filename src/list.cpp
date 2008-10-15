@@ -101,6 +101,7 @@ namespace get_list_references {
         }
 
         List& caller_list = as_list(caller);
+        caller_list.clear();
 
         for (unsigned int i=0; i < input->inputs.count(); i++) {
             caller_list.appendSlot(REFERENCE_TYPE)->asRef() = input->inputs[i];
