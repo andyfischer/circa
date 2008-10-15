@@ -84,7 +84,25 @@ void builtin_types()
     //test_assert(as_type(TYPE_TYPE)->equals != NULL);
     test_assert(as_type(FUNCTION_TYPE)->alloc != NULL);
     test_assert(as_type(FUNCTION_TYPE)->dealloc != NULL);
+    test_assert(as_type(REFERENCE_TYPE)->alloc != NULL);
+    test_assert(as_type(REFERENCE_TYPE)->dealloc != NULL);
     //test_assert(as_type(FUNCTION_TYPE)->equals != NULL);
+}
+
+void reference_type_deletion_bug()
+{
+    // There used to be a bug where deleting a reference term would delete
+    // the thing it was pointed to.
+    Branch *branch = new Branch();
+
+    Term* myref = apply_function(*branch, REFERENCE_TYPE, ReferenceList());
+
+    myref->asRef() = INT_TYPE;
+
+    delete branch;
+
+    assert_good(INT_TYPE);
+    test_assert(INT_TYPE->type != NULL);
 }
 
 } // namespace type_tests
@@ -93,6 +111,7 @@ void register_type_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
     REGISTER_TEST_CASE(type_tests::builtin_types);
+    REGISTER_TEST_CASE(type_tests::reference_type_deletion_bug);
 }
 
 } // namespace circa
