@@ -349,31 +349,31 @@ void initialize_constants()
     KERNEL->bindName(CONSTANT_FALSE, "false");
 }
 
-void initialize_builtin_functions(Branch* code)
+void initialize_builtin_functions(Branch* kernel)
 {
-    add_function::setup(code);
-    quick_create_function(code, "mult", mult__evaluate,
+    add_function::setup(kernel);
+    quick_create_function(kernel, "mult", mult__evaluate,
             ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
-    quick_create_function(code, "concat", string_concat__evaluate, ReferenceList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
-    quick_create_function(code, "print", print__evaluate, ReferenceList(STRING_TYPE), VOID_TYPE);
-    quick_create_function(code, "if-expr", if_expr__evaluate,
+    quick_create_function(kernel, "concat", string_concat__evaluate, ReferenceList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
+    quick_create_function(kernel, "print", print__evaluate, ReferenceList(STRING_TYPE), VOID_TYPE);
+    quick_create_function(kernel, "if-expr", if_expr__evaluate,
         ReferenceList(BOOL_TYPE, ANY_TYPE, ANY_TYPE), ANY_TYPE);
-    quick_create_function(code, "list", create_list__evaluate, ReferenceList(ANY_TYPE), LIST_TYPE);
-    quick_create_function(code, "range", range__evaluate, ReferenceList(INT_TYPE), LIST_TYPE);
-    quick_create_function(code, "list-append", list_append__evaluate, ReferenceList(LIST_TYPE, ANY_TYPE), LIST_TYPE);
-    quick_create_function(code, "list-apply", list_apply__evaluate, ReferenceList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
-    quick_create_function(code, "read-text-file", read_text_file__evaluate,
+    quick_create_function(kernel, "list", create_list__evaluate, ReferenceList(ANY_TYPE), LIST_TYPE);
+    quick_create_function(kernel, "range", range__evaluate, ReferenceList(INT_TYPE), LIST_TYPE);
+    quick_create_function(kernel, "list-append", list_append__evaluate, ReferenceList(LIST_TYPE, ANY_TYPE), LIST_TYPE);
+    quick_create_function(kernel, "list-apply", list_apply__evaluate, ReferenceList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
+    quick_create_function(kernel, "read-text-file", read_text_file__evaluate,
             ReferenceList(STRING_TYPE), STRING_TYPE);
-    quick_create_function(code, "write-text-file", write_text_file__evaluate,
+    quick_create_function(kernel, "write-text-file", write_text_file__evaluate,
             ReferenceList(STRING_TYPE, STRING_TYPE), VOID_TYPE);
-    quick_create_function(code, "to-string", to_string__evaluate,
+    quick_create_function(kernel, "to-string", to_string__evaluate,
         ReferenceList(ANY_TYPE), STRING_TYPE);
-    UNKNOWN_FUNCTION = quick_create_function(code, "unknown-function",
+    UNKNOWN_FUNCTION = quick_create_function(kernel, "unknown-function",
             unknown_function__evaluate,
             ReferenceList(ANY_TYPE), ANY_TYPE);
     as_function(UNKNOWN_FUNCTION).stateType = STRING_TYPE;
 
-    VAR_FUNCTION_FEEDBACK_ASSIGN = quick_create_function(code, "var-function-feedback-assign",
+    VAR_FUNCTION_FEEDBACK_ASSIGN = quick_create_function(kernel, "var-function-feedback-assign",
         var_function::feedback_assign,
         ReferenceList(ANY_TYPE, ANY_TYPE), VOID_TYPE);
 
