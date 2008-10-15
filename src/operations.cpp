@@ -139,8 +139,7 @@ void change_function(Term* term, Term* new_function)
 {
     assert_good(term);
 
-    if (new_function->type != FUNCTION_TYPE)
-        throw errors::TypeError(new_function, FUNCTION_TYPE);
+    assert_type(new_function, FUNCTION_TYPE);
 
     term->function = new_function;
 }

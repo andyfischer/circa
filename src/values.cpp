@@ -24,8 +24,7 @@ void dealloc_value(Term* term)
 
 void recycle_value(Term* source, Term* dest)
 {
-    if (source->type != dest->type)
-        throw errors::TypeError(dest, source->type);
+    assert_type(source, dest->type);
 
     // Only steal if the term says it's OK
     bool steal = source->stealingOk;
@@ -45,8 +44,7 @@ void duplicate_value(Term* source, Term* dest)
     if (source == dest)
         throw std::runtime_error("in duplicate_value, can't have source == dest");
 
-    if (source->type != dest->type)
-        throw errors::TypeError(dest, source->type);
+    assert_type(source, dest->type);
 
     Type::DuplicateFunc duplicate = as_type(source->type)->duplicate;
 
@@ -61,8 +59,7 @@ void duplicate_value(Term* source, Term* dest)
 
 void steal_value(Term* source, Term* dest)
 {
-    if (source->type != dest->type)
-        throw errors::TypeError(dest, source->type);
+    assert_type(source, dest->type);
 
     // if 'dest' has a value, delete it
     dealloc_value(dest);
