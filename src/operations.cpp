@@ -126,6 +126,15 @@ Term* eval_function(Branch& branch, Term* function, ReferenceList inputs)
     return result;
 }
 
+Term* eval_function(Branch& branch, std::string const& functionName, ReferenceList inputs)
+{
+    Term* function = branch.findNamed(functionName);
+    if (function == NULL)
+        throw std::runtime_error(std::string("function not found: ")+functionName);
+
+    return eval_function(branch, function, inputs);
+}
+
 void change_function(Term* term, Term* new_function)
 {
     assert_good(term);

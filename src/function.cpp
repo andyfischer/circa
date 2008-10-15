@@ -69,17 +69,24 @@ void Function::subroutine_create(Term* caller)
     // 1: inputTypes (list of type)
     // 2: outputType (type)
 
-    /* FIXME
-     
     as_string(caller->inputs[0]);
     as_list(caller->inputs[1]);
     as_type(caller->inputs[2]);
+
 
     Function& sub = as_function(caller);
     sub.name = as_string(caller->inputs[0]);
     sub.initialize = Function::call_subroutine__initialize;
     sub.evaluate = Function::call_subroutine;
-    sub.inputTypes = as_list(caller->inputs[1]).toReferenceList();
+
+    // extract references to input types
+    {
+        Branch workspace;
+        Term* list_refs = eval_function(workspace, "get-list-references",
+                ReferenceList(caller->inputs[1]));
+        sub.inputTypes = as_list(list_refs).toReferenceList();
+    }
+
     sub.outputType = caller->inputs[2];
     sub.stateType = BRANCH_TYPE;
 
@@ -90,7 +97,6 @@ void Function::subroutine_create(Term* caller)
                 sub.inputTypes[index]);
         sub.subroutineBranch.bindName(placeholder, name);
     }
-    */
 }
 
 void

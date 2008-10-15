@@ -26,6 +26,8 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList inputs);
 // Perform 'apply_function' and then evaluate the result
 Term* eval_function(Branch& branch, Term* function, ReferenceList inputs);
 
+Term* eval_function(Branch& branch, std::string const& functionName, ReferenceList inputs);
+
 void change_function(Term* term, Term* new_function);
 
 void remap_pointers(Term* term, ReferenceMap const& map);
