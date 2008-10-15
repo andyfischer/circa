@@ -6,6 +6,7 @@
 #include "function.h"
 #include "list.h"
 #include "operations.h"
+#include "type.h"
 #include "values.h"
 
 namespace circa {
@@ -29,13 +30,12 @@ Function::~Function()
 
 bool is_function(Term* term)
 {
-    return is_instance(term, FUNCTION_TYPE);
+    return term->type == FUNCTION_TYPE;
 }
 
 Function& as_function(Term* term)
 {
-    if (!is_function(term))
-        throw errors::TypeError(term, FUNCTION_TYPE);
+    assert_type(term, FUNCTION_TYPE);
 
     return *((Function*) term->value);
 }

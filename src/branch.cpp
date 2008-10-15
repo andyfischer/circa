@@ -8,6 +8,7 @@
 #include "operations.h"
 #include "ref_map.h"
 #include "term.h"
+#include "type.h"
 #include "values.h"
 
 namespace circa {
@@ -100,8 +101,7 @@ Branch::clear()
 
 Branch& as_branch(Term* term)
 {
-    if (term->type != BRANCH_TYPE)
-        throw errors::TypeError(term, BRANCH_TYPE);
+    assert_type(term, BRANCH_TYPE);
 
     return *((Branch*) term->value);
 }

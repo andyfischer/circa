@@ -96,11 +96,8 @@ Type* as_type(Term* term);
 
 Term* quick_create_type(Branch* branch, std::string name);
 
-// Return true if the term is an instance of the given type
-bool is_instance(Term* term, Term* type);
-
-// Throw a TypeError if term is not an instance of type
-void assert_instance(Term* term, Term* type);
+// Throw an exception if term is not an instance of type
+void assert_type(Term* term, Term* type);
 
 Term* get_field(Term *term, std::string const& fieldName);
 

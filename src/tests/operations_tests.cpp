@@ -57,10 +57,10 @@ void test_int_var()
 void test_misc()
 {
     test_assert(is_type(TYPE_TYPE));
-    test_assert(is_instance(TYPE_TYPE, TYPE_TYPE));
+    test_assert(TYPE_TYPE->type == TYPE_TYPE);
 
     test_assert(is_type(FUNCTION_TYPE));
-    test_assert(is_instance(FUNCTION_TYPE, TYPE_TYPE));
+    test_assert(FUNCTION_TYPE->type == TYPE_TYPE);
 }
 
 } // namespace operations_tests

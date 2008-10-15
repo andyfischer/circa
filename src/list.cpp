@@ -9,6 +9,7 @@
 #include "list.h"
 #include "operations.h"
 #include "runtime.h"
+#include "type.h"
 #include "values.h"
 
 namespace circa {
@@ -60,8 +61,7 @@ bool is_list(Term* term)
 
 List& as_list(Term* term)
 {
-    if (!is_list(term))
-        throw errors::TypeError(term, LIST_TYPE);
+    assert_type(term, LIST_TYPE);
     return *((List*) term->value);
 }
 

@@ -18,32 +18,28 @@ namespace circa {
 
 int& as_int(Term* t)
 {
-    if (t->type != INT_TYPE)
-        throw errors::TypeError(t, INT_TYPE);
+    assert_type(t, INT_TYPE);
 
     return *((int*) t->value);
 }
 
 float& as_float(Term* t)
 {
-    if (t->type != FLOAT_TYPE)
-        throw errors::TypeError(t, FLOAT_TYPE);
+    assert_type(t, FLOAT_TYPE);
 
     return *((float*) t->value);
 }
 
 bool& as_bool(Term* t)
 {
-    if (t->type != BOOL_TYPE)
-        throw errors::TypeError(t, BOOL_TYPE);
+    assert_type(t, BOOL_TYPE);
 
     return *((bool*) t->value);
 }
 
 std::string& as_string(Term* t)
 {
-    if (t->type != STRING_TYPE)
-        throw errors::TypeError(t, STRING_TYPE);
+    assert_type(t, STRING_TYPE);
 
     if (t->value == NULL)
         throw std::runtime_error("NULL pointer in as_string");
@@ -171,29 +167,25 @@ Term* get_field(Term *term, std::string const& fieldName)
     return value->fields[index];
 }
 
-bool is_instance(Term *term, Term *type)
+void assert_type(Term *term, Term *type)
 {
     assert(term != NULL);
+    // assert(type != NULL); type may be NULL during bootstrapping
 
-    return term->type == type;
+    if (term->type != type)
+        throw std::runtime_error("type mismatch");
+        //throw errors::TypeError(term, type);
 }
 
-void assert_instance(Term *term, Term *type)
+bool is_type(Term* term)
 {
     assert(term != NULL);
-
-    if (!is_instance(term, type))
-        throw errors::TypeError(term, type);
-}
-
-bool is_type(Term *term)
-{
-    return is_instance(term, TYPE_TYPE);
+    return term->type == TYPE_TYPE;
 }
 
 Type* as_type(Term *term)
 {
-    assert_instance(term, TYPE_TYPE);
+    assert_type(term, TYPE_TYPE);
     return ((Type*) term->value);
 }
 
@@ -243,8 +235,7 @@ void specialize_type(Term *term, Term *type)
         return;
     }
 
-    if (term->type != ANY_TYPE)
-        throw errors::TypeError(term, ANY_TYPE);
+    assert_type(term, ANY_TYPE);
 
     change_type(term, type);
 }
