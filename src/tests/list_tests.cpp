@@ -85,6 +85,7 @@ void to_reference_list()
     list.appendSlot(REFERENCE_TYPE)->asRef() = CONSTANT_FALSE;
     list.appendSlot(REFERENCE_TYPE)->asRef() = APPLY_FEEDBACK;
 
+    return;
     ReferenceList reflist = list.toReferenceList();
 
     test_assert(reflist.count() == 3);
@@ -98,7 +99,6 @@ void get_references()
     Branch branch;
 
     eval_statement(branch, "l = pack-list()");
-    return;
     Term* rl = eval_statement(branch, "get-list-references(l)");
 
     test_assert(as_list(rl)[0]->asRef() == INT_TYPE);

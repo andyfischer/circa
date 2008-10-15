@@ -47,6 +47,16 @@ std::string& as_string(Term* t)
     return *((std::string*) t->value);
 }
 
+namespace ref_type {
+    void alloc(Term* term) {
+        term->value = NULL;
+    }
+
+    void dealloc(Term* term) {
+        term->value = NULL;
+    }
+}
+
 Term*& as_ref(Term* term)
 {
     return (Term*&) term->value;
@@ -199,6 +209,8 @@ Term* quick_create_type(Branch* branch, std::string name)
 
 void unsafe_change_type(Term *term, Term *type)
 {
+    assert(type != NULL);
+
     if (term->value == NULL) {
         change_type(term, type);
         return;
@@ -209,6 +221,8 @@ void unsafe_change_type(Term *term, Term *type)
 
 void change_type(Term *term, Term *typeTerm)
 {
+    assert_type(typeTerm, TYPE_TYPE);
+
     if (term->type == typeTerm)
         return;
 
@@ -329,7 +343,9 @@ void initialize_primitive_types(Branch* kernel)
 
     ANY_TYPE = create_empty_type(*KERNEL, "any");
     VOID_TYPE = create_empty_type(*KERNEL, "void");
-    REFERENCE_TYPE = quick_create_cpp_type<Term*>(KERNEL, "Reference");
+    REFERENCE_TYPE = quick_create_type(KERNEL, "Reference");
+    as_type(REFERENCE_TYPE)->alloc = ref_type::alloc;
+    as_type(REFERENCE_TYPE)->dealloc = ref_type::dealloc;
 }
 
 void initialize_compound_types(Branch* kernel)
