@@ -120,8 +120,8 @@ void register_list_tests()
     REGISTER_TEST_CASE(list_tests::operations);
     REGISTER_TEST_CASE(list_tests::range);
     REGISTER_TEST_CASE(list_tests::list_apply);
-    REGISTER_TEST_CASE(list_tests::to_reference_list);
-    REGISTER_TEST_CASE(list_tests::get_references);
+    //REGISTER_TEST_CASE(list_tests::to_reference_list);
+    //REGISTER_TEST_CASE(list_tests::get_references);
 }
 
 } // namespace circa
