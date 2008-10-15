@@ -1,0 +1,23 @@
+
+Notes on how to write a Circa parser in Circa:
+
+
+Need Token types & objects
+Need token-to-string map
+
+Tokenizer state machine:
+
+(start)
+  next is letter -> consume-identifier
+  next is whitespace -> consume-whitespace
+  next is number -> consume-number
+  next is '(' -> {consume '(', push LPAREN;} start
+  (many other rules for one-letter symbols)
+
+(consume-identifier)
+  next is letter -> consume-identifier
+  else -> {push IDENTIFIER} start
+
+(consume-whitespace)
+  next is whitespace -> consume-whitespace
+  else -> {push WHITESPACE} start

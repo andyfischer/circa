@@ -31,12 +31,15 @@ public:
         items.clear();
         branch.clear();
     }
+
+    ReferenceList toReferenceList() const;
 };
 
 std::string List__toString(Term* caller);
 bool is_list(Term* term);
 List& as_list(Term* term);
 List& as_list_unchecked(Term* term);
+void initialize_list_functions(Branch* kernel);
 
 } // namespace circa
 

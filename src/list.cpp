@@ -8,6 +8,7 @@
 #include "errors.h"
 #include "list.h"
 #include "operations.h"
+#include "runtime.h"
 #include "values.h"
 
 namespace circa {
@@ -67,6 +68,54 @@ List& as_list(Term* term)
 List& as_list_unchecked(Term* term)
 {
     return *((List*) term->value);
+}
+
+ReferenceList List::toReferenceList() const
+{
+    ReferenceList result;
+    for (int i=0; i < count(); i++) {
+        result.append(get(i)->asRef());
+    }
+    return result;
+}
+
+namespace pack_list {
+
+    void evaluate(Term* caller) {
+        as_list(caller).clear();
+
+        for (unsigned int i=0; i < caller->inputs.count(); i++) {
+            as_list(caller).append(caller->inputs[i]);
+        }
+    }
+}
+
+namespace get_list_references {
+
+    void evaluate(Term* caller) {
+        Term* input = caller->inputs[0];
+        if (as_function(input->function).name != "pack-list") {
+            error_occured(caller,
+                    "get-list-refernces only works with pack-list as input");
+            return;
+        }
+
+        List& caller_list = as_list(caller);
+
+        for (unsigned int i=0; i < input->inputs.count(); i++) {
+            caller_list.appendSlot(REFERENCE_TYPE)->asRef() = input->inputs[i];
+        }
+    }
+}
+
+void initialize_list_functions(Branch* kernel)
+{
+    Term* pack_list = quick_create_function(kernel, "pack-list",
+            pack_list::evaluate, ReferenceList(ANY_TYPE), LIST_TYPE);
+    kernel->bindName(pack_list, "list");
+    Term* get_list_references = quick_create_function(kernel, "get-list-references",
+        get_list_references::evaluate, ReferenceList(LIST_TYPE), LIST_TYPE);
+    as_function(get_list_references).meta = true;
 }
 
 } // namespace circa
