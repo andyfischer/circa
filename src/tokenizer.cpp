@@ -12,6 +12,8 @@ const char* getMatchText(int match)
         case RPAREN: return ")";
         case LBRACE: return "{";
         case RBRACE: return "}";
+        case LBRACKET: return "[";
+        case RBRACKET: return "]";
         case COMMA: return ",";
         case AMPERSAND: return "@";
         case IDENTIFIER: return "IDENTIFIER";
@@ -181,6 +183,14 @@ void top_level_consume_token(TokenizeContext &context)
         case '}':
             context.consume();
             context.pushResult(RBRACE);
+            return;
+        case '[':
+            context.consume();
+            context.pushResult(LBRACKET);
+            return;
+        case ']':
+            context.consume();
+            context.pushResult(RBRACKET);
             return;
         case ',':
             context.consume();

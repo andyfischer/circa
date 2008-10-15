@@ -22,6 +22,8 @@ const int LPAREN = 1;
 const int RPAREN = 2;
 const int LBRACE = 30;
 const int RBRACE = 31;
+const int LBRACKET = 34;
+const int RBRACKET = 35;
 const int COMMA = 3;
 const int AMPERSAND = 32;
 
