@@ -26,10 +26,6 @@ Function::Function()
 {
 }
 
-Function::~Function()
-{
-}
-
 bool is_function(Term* term)
 {
     return term->type == FUNCTION_TYPE;

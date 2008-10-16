@@ -24,7 +24,7 @@ void evaluate_term(Term* term)
     }
 
     if (!is_function(term->function)) {
-        error_occured(term, "is_function(term->function) is false");
+        error_occured(term, "term->function is not a function");
         return;
     }
 
@@ -71,7 +71,7 @@ void evaluate_term(Term* term)
             evaluate_term(input);
     }
     
-    // Make sure we have an allocated value
+    // Make sure we have an allocated value. Allocate one if necessary
     if (term->value == NULL) {
         as_type(term->type)->alloc(term);
     }    

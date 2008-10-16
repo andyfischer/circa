@@ -38,9 +38,9 @@ void test_identifiers()
 void test_integers()
 {
     token::TokenList results;
-    token::tokenize("1 0 1234567890", results);
+    token::tokenize("1 0 1234567890 -3", results);
 
-    test_assert(results.size() == 5);
+    test_assert(results.size() == 7);
     test_assert(results[0].text == "1");
     test_assert(results[0].match == token::INTEGER);
     test_assert(results[1].text == " ");
@@ -51,6 +51,32 @@ void test_integers()
     test_assert(results[3].match == token::WHITESPACE);
     test_assert(results[4].text == "1234567890");
     test_assert(results[4].match == token::INTEGER);
+    test_assert(results[5].text == " ");
+    test_assert(results[5].match == token::WHITESPACE);
+    test_assert(results[6].text == "-3");
+    test_assert(results[6].match == token::INTEGER);
+}
+
+void test_floats()
+{
+    token::TokenList results;
+    token::tokenize("1.0 16. .483 .123. -0.1 -.54", results);
+
+    test_assert(results[0].text == "1.0");
+    test_assert(results[0].match == token::FLOAT);
+    test_assert(results[2].text == "16.");
+    test_assert(results[2].match == token::FLOAT);
+    test_assert(results[4].text == ".483");
+    test_assert(results[4].match == token::FLOAT);
+    test_assert(results[6].text == ".123");
+    test_assert(results[6].match == token::FLOAT);
+    test_assert(results[7].text == ".");
+    test_assert(results[7].match == token::DOT);
+    test_assert(results[9].text == "-0.1");
+    test_assert(results[9].match == token::FLOAT);
+    test_assert(results[11].text == "-.54");
+    test_assert(results[11].match == token::FLOAT);
+    test_assert(results.size() == 12);
 }
 
 void test_symbols()
@@ -100,6 +126,7 @@ void register_tokenizer_tests()
 {
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers);
     REGISTER_TEST_CASE(tokenizer_tests::test_integers);
+    REGISTER_TEST_CASE(tokenizer_tests::test_floats);
     REGISTER_TEST_CASE(tokenizer_tests::test_symbols);
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
