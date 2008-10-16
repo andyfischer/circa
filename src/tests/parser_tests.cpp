@@ -96,19 +96,19 @@ void create_literals()
     Branch branch;
 
     ast::LiteralInteger *lint = new ast::LiteralInteger("13");
-    Term *int_t = lint->createTerm(&branch);
+    Term *int_t = lint->createTerm(branch);
     test_assert(int_t->type == INT_TYPE);
     test_assert(as_int(int_t) == 13);
     delete lint;
 
     ast::LiteralFloat *lfloat = new ast::LiteralFloat("1.432");
-    Term *float_t = lfloat->createTerm(&branch);
+    Term *float_t = lfloat->createTerm(branch);
     test_assert(float_t->type == FLOAT_TYPE);
     test_assert(as_float(float_t) > 1.431 && as_float(float_t) < 1.433);
     delete lfloat;
 
     ast::LiteralString *lstr = new ast::LiteralString("hello");
-    Term *str_t = lstr->createTerm(&branch);
+    Term *str_t = lstr->createTerm(branch);
     test_assert(str_t->type == STRING_TYPE);
     test_assert(as_string(str_t) == "hello");
     delete lstr;
@@ -122,7 +122,7 @@ void create_function_call()
     functionCall->addArgument(new ast::LiteralFloat("2"), "", "");
     functionCall->addArgument(new ast::LiteralFloat("3"), "", "");
 
-    Term *term = functionCall->createTerm(&branch);
+    Term *term = functionCall->createTerm(branch);
     test_assert(as_function(term->function).name == "add");
 
     // make sure this term is not evaluated yet

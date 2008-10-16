@@ -16,7 +16,7 @@ Term* apply_statement(Branch& branch, std::string const& input)
 
     ast::Statement* statementAst = parser::statement(tokens);
 
-    Term* result = statementAst->createTerm(&branch);
+    Term* result = statementAst->createTerm(branch);
 
     // check for rebind operator
     struct RebindFinder : public ast::ExpressionWalker

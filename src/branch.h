@@ -47,10 +47,7 @@ public:
     Term* findNamed(std::string const& name) const;
 
     // Bind a name to a term
-    void bindName(Term* term, std::string name)
-    {
-        names.bind(term, name);
-    }
+    void bindName(Term* term, std::string name);
 
     // This is called by Term, when it's deleted
     void termDeleted(Term* term);

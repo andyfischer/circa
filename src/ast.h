@@ -27,7 +27,7 @@ struct Expression
     Expression() { }
     virtual ~Expression() { }
     virtual std::string toString() const = 0;
-    virtual Term* createTerm(Branch* branch) = 0;
+    virtual Term* createTerm(Branch& branch) = 0;
     virtual void walk(ExpressionWalker &walker) = 0;
     virtual std::string typeName() = 0;
 };
@@ -44,7 +44,7 @@ struct Infix : public Expression
         : operatorStr(_operatorStr), left(_left), right(_right) {}
     ~Infix();
     virtual std::string toString() const;
-    virtual Term* createTerm(Branch* branch);
+    virtual Term* createTerm(Branch& branch);
     virtual void walk(ExpressionWalker &walker);
     virtual std::string typeName() { return "infix"; }
 };
@@ -77,7 +77,7 @@ struct FunctionCall : public Expression
     void addArgument(Expression* expr, std::string const& preWhitespace,
             std::string const& postWhitespace);
     virtual std::string toString() const;
-    virtual Term* createTerm(Branch* branch);
+    virtual Term* createTerm(Branch& branch);
     virtual void walk(ExpressionWalker &walker);
     virtual std::string typeName() { return "function-call"; }
 };
@@ -95,7 +95,7 @@ struct LiteralString : public Literal
 
     explicit LiteralString(std::string const& _text) : text(_text) { }
     virtual std::string toString() const;
-    virtual Term* createTerm(Branch* branch);
+    virtual Term* createTerm(Branch& branch);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
     virtual std::string typeName() { return "literal-string"; }
 };
@@ -109,7 +109,7 @@ struct LiteralFloat : public Literal
     {
         return text;
     }
-    virtual Term* createTerm(Branch* branch);
+    virtual Term* createTerm(Branch& branch);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
     virtual std::string typeName() { return "literal-float"; }
 };
@@ -123,7 +123,7 @@ struct LiteralInteger : public Literal
     {
         return text;
     }
-    virtual Term* createTerm(Branch* branch);
+    virtual Term* createTerm(Branch& branch);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
     virtual std::string typeName() { return "literal-integer"; }
 };
@@ -135,7 +135,7 @@ struct Identifier : public Expression
 
     explicit Identifier(std::string const& _text) : text(_text), hasRebindOperator(false) {}
     virtual std::string toString() const;
-    virtual Term* createTerm(Branch* branch);
+    virtual Term* createTerm(Branch& branch);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
     virtual std::string typeName() { return "identifier"; }
 };
@@ -147,7 +147,7 @@ struct Statement
     Statement() : expression(NULL) {}
     virtual ~Statement() { delete expression; }
     virtual std::string toString() const = 0;
-    virtual Term* createTerm(Branch* branch) = 0;
+    virtual Term* createTerm(Branch& branch) = 0;
     virtual std::string typeName() { return "statement"; }
 
     typedef std::vector<Statement*> List;
@@ -161,7 +161,7 @@ struct StatementList
 
     virtual ~StatementList();
     virtual std::string toString() const;
-    void createTerms(Branch* branch);
+    void createTerms(Branch& branch);
     virtual std::string typeName() { return "statement-list"; }
     int count() const { return (int) statements.size(); }
     Statement* operator[](int index) { return statements[index]; }
@@ -174,7 +174,7 @@ struct ExpressionStatement : public Statement
     std::string postEqualsWhitespace;
 
     virtual std::string toString() const;
-    virtual Term* createTerm(Branch* branch);
+    virtual Term* createTerm(Branch& branch);
     virtual std::string typeName() { return "expression-statement"; }
 };
 
@@ -185,7 +185,7 @@ struct IgnorableStatement : public Statement
 
     virtual ~IgnorableStatement() { }
     virtual std::string toString() const { return text; }
-    virtual Term* createTerm(Branch* branch) { return NULL; }
+    virtual Term* createTerm(Branch& branch) { return NULL; }
     virtual std::string typeName() { return "ignorable-statement"; }
 };
 
@@ -220,7 +220,7 @@ struct FunctionDecl : public Statement
     ~FunctionDecl();
 
     virtual std::string toString() const;
-    virtual Term* createTerm(Branch* branch);
+    virtual Term* createTerm(Branch& branch);
     virtual std::string typeName() { return "function-decl"; }
 };
 

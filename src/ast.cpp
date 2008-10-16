@@ -38,7 +38,7 @@ Infix::toString() const
         + this->right->toString();
 }
 Term*
-Infix::createTerm(Branch* branch)
+Infix::createTerm(Branch& branch)
 {
     // special case: right arrow
     if (this->operatorStr == "->") {
@@ -50,7 +50,7 @@ Infix::createTerm(Branch* branch)
             throw syntax_errors::SyntaxError("Right side of -> must be an identifier");
         }
 
-        return find_and_apply_function(*branch, rightIdent->text, ReferenceList(leftTerm));
+        return find_and_apply_function(branch, rightIdent->text, ReferenceList(leftTerm));
     }
 
     // todo
@@ -104,7 +104,7 @@ FunctionCall::toString() const
 }
 
 Term*
-FunctionCall::createTerm(Branch* branch)
+FunctionCall::createTerm(Branch& branch)
 {
     ReferenceList inputs;
 
@@ -115,7 +115,7 @@ FunctionCall::createTerm(Branch* branch)
         inputs.append(term);
     }
 
-    return find_and_apply_function(*branch, this->functionName, inputs);
+    return find_and_apply_function(branch, this->functionName, inputs);
 }
 
 void
@@ -140,26 +140,26 @@ LiteralString::toString() const
 }
 
 Term*
-LiteralString::createTerm(Branch* branch)
+LiteralString::createTerm(Branch& branch)
 {
-    return string_var(*branch, this->text);
+    return string_var(branch, this->text);
 }
 
 Term*
-LiteralFloat::createTerm(Branch* branch)
+LiteralFloat::createTerm(Branch& branch)
 {
     float value = atof(this->text.c_str());
-    Term* term = float_var(*branch, value);
+    Term* term = float_var(branch, value);
     float mutability = hasQuestionMark ? 1.0 : 0.0;
     term->properties.addSlot("mutability", FLOAT_TYPE)->asFloat() = mutability;
     return term;
 }
 
 Term*
-LiteralInteger::createTerm(Branch* branch)
+LiteralInteger::createTerm(Branch& branch)
 {
     int value = atoi(this->text.c_str());
-    return int_var(*branch, value);
+    return int_var(branch, value);
 }
 
 std::string
@@ -171,9 +171,9 @@ Identifier::toString() const
     return rebindSymbol + text;
 }
 Term*
-Identifier::createTerm(Branch* branch)
+Identifier::createTerm(Branch& branch)
 {
-    return branch->findNamed(this->text);
+    return branch.findNamed(this->text);
 }
 
 std::string
@@ -191,12 +191,12 @@ ExpressionStatement::toString() const
 }
 
 Term*
-ExpressionStatement::createTerm(Branch* branch)
+ExpressionStatement::createTerm(Branch& branch)
 {
     Term* term = this->expression->createTerm(branch);
     
     if (this->nameBinding != "")
-        branch->bindName(term, this->nameBinding);
+        branch.bindName(term, this->nameBinding);
 
     return term;
 }
@@ -228,7 +228,7 @@ StatementList::toString() const
 }
 
 void
-StatementList::createTerms(Branch* branch)
+StatementList::createTerms(Branch& branch)
 {
     Statement::List::const_iterator it;
     for (it = statements.begin(); it != statements.end(); ++it) {
@@ -268,7 +268,7 @@ FunctionDecl::~FunctionDecl()
 }
 
 Term*
-FunctionDecl::createTerm(Branch* branch)
+FunctionDecl::createTerm(Branch& branch)
 {
     Branch workspace;
 
@@ -277,7 +277,7 @@ FunctionDecl::createTerm(Branch* branch)
     FunctionHeader::ArgumentList::const_iterator it;
     for (it = this->header->arguments.begin(); it != this->header->arguments.end(); ++it)
     {
-        Term* term = branch->findNamed(it->type);
+        Term* term = branch.findNamed(it->type);
         if (term == NULL)
             throw syntax_errors::SyntaxError(std::string("Identifier not found: ") + it->type);
 
@@ -288,7 +288,7 @@ FunctionDecl::createTerm(Branch* branch)
         eval_statement(workspace, "list-append(@inputTypes, t)");
     }
 
-    Term* outputType = branch->findNamed(this->header->outputType);
+    Term* outputType = branch.findNamed(this->header->outputType);
     if (outputType == NULL)
         throw syntax_errors::SyntaxError(std::string("Identifier not found: ") + this->header->outputType);
     if (!is_type(outputType))
@@ -316,7 +316,7 @@ FunctionDecl::createTerm(Branch* branch)
                 //"subroutine-eval(@sub, statement)");
     }
 
-    branch->bindName(sub, this->header->functionName);
+    branch.bindName(sub, this->header->functionName);
 
     return sub;
 }
@@ -335,7 +335,7 @@ FunctionDecl::toString() const
     return out.str();
 }
 
-void initialize_ast_functions(Branch* kernel)
+void initialize_ast_functions(Branch& kernel)
 {
 
 }
