@@ -6,6 +6,8 @@
 #include "function.h"
 #include "list.h"
 #include "operations.h"
+#include "parser.h"
+#include "runtime.h"
 #include "type.h"
 #include "values.h"
 
@@ -36,7 +38,7 @@ bool is_function(Term* term)
 Function& as_function(Term* term)
 {
     assert_type(term, FUNCTION_TYPE);
-
+    assert(term->value != NULL);
     return *((Function*) term->value);
 }
 
@@ -52,7 +54,7 @@ void Function::dealloc(Term* caller)
 
 void Function::duplicate(Term* source, Term* dest)
 {
-    Function::alloc(dest); // necessary?
+    Function::alloc(dest);
     as_function(dest) = as_function(source);
 }
 
@@ -72,7 +74,6 @@ void Function::subroutine_create(Term* caller)
     as_string(caller->inputs[0]);
     as_list(caller->inputs[1]);
     as_type(caller->inputs[2]);
-
 
     Function& sub = as_function(caller);
     sub.name = as_string(caller->inputs[0]);
@@ -108,7 +109,24 @@ Function::call_subroutine__initialize(Term* caller)
 void
 Function::call_subroutine(Term* caller)
 {
-    // todo
+    Function &sub = as_function(caller->function);
+
+    Branch branch;
+
+    duplicate_branch(&sub.subroutineBranch, &branch);
+
+    for (unsigned int input=0; input < sub.inputTypes.count(); input++) {
+
+        Term* inputPlaceholder = branch[get_placeholder_name_for_index(input)];
+
+        recycle_value(caller->inputs[input], inputPlaceholder);
+    }
+    
+    evaluate_branch(branch);
+
+    Term* outputPlaceholder = branch[OUTPUT_PLACEHOLDER_NAME];
+
+    recycle_value(outputPlaceholder, caller);
 }
 
 void Function::name_input(Term* caller)
@@ -119,12 +137,31 @@ void Function::name_input(Term* caller)
     Function& sub = as_function(caller);
     Term* inputPlaceholder =
         sub.subroutineBranch.getNamed(get_placeholder_name_for_index(index));
+
+    // remove the name on this term, so that this new name will stick
+    inputPlaceholder->name = "";
     sub.subroutineBranch.bindName(inputPlaceholder, name);
 }
 
 void Function::get_input_name(Term* caller)
 {
-    // todo
+    Function& sub = as_function(caller->inputs[0]);
+    int index = as_int(caller->inputs[1]);
+
+    Term* inputPlaceholder =
+        sub.subroutineBranch.getNamed(get_placeholder_name_for_index(index));
+
+    as_string(caller) = inputPlaceholder->name;
+}
+
+void Function::subroutine_apply(Term* caller)
+{
+    recycle_value(caller->inputs[0], caller);
+    std::string input = as_string(caller->inputs[1]);
+
+    Function& sub = as_function(caller);
+
+    apply_statement(sub.subroutineBranch, input);
 }
 
 void initialize_functions(Branch* kernel)
@@ -137,6 +174,14 @@ void initialize_functions(Branch* kernel)
     quick_create_function(kernel,
         "function-name-input", Function::name_input,
         ReferenceList(FUNCTION_TYPE, INT_TYPE, STRING_TYPE), FUNCTION_TYPE);
+
+    quick_create_function(kernel,
+        "function-get-input-name", Function::get_input_name,
+        ReferenceList(FUNCTION_TYPE, INT_TYPE), STRING_TYPE);
+
+    quick_create_function(kernel,
+        "subroutine-apply", Function::subroutine_apply,
+        ReferenceList(FUNCTION_TYPE, STRING_TYPE), FUNCTION_TYPE);
 }
 
 } // namespace circa

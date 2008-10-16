@@ -48,6 +48,7 @@ struct Function
     static void call_subroutine(Term* caller);
     static void name_input(Term* caller);
     static void get_input_name(Term* caller);
+    static void subroutine_apply(Term* caller);
 };
 
 bool is_function(Term* term);

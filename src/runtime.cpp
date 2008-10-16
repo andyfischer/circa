@@ -110,7 +110,7 @@ Branch* evaluate_file(std::string const& filename)
     token_stream::TokenStream tokens(file_contents);
     ast::StatementList *statementList = parser::statementList(tokens);
 
-    statementList->createTerms(branch);
+    statementList->createTerms(*branch);
 
     delete statementList;
 

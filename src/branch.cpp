@@ -59,6 +59,14 @@ void Branch::append(Term* term)
     _terms.push_back(term);
 }
 
+void Branch::bindName(Term* term, std::string name)
+{
+    names.bind(term, name);
+
+    // If the term doesn't have a real name, then use this one.
+    if (term->name == "")
+        term->name = name;
+}
 
 Term* Branch::findNamed(std::string const& name) const
 {
@@ -102,7 +110,7 @@ Branch::clear()
 Branch& as_branch(Term* term)
 {
     assert_type(term, BRANCH_TYPE);
-
+    assert(term->value != NULL);
     return *((Branch*) term->value);
 }
 

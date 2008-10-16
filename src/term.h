@@ -33,6 +33,10 @@ struct Term
     // Persisted value. Owned by us.
     Term* state;
 
+    // Our name. We might have other aliases, according to the
+    // owning branch.
+    std::string name;
+
     Dictionary properties;
 
     bool needsUpdate;

@@ -62,11 +62,13 @@ bool is_list(Term* term)
 List& as_list(Term* term)
 {
     assert_type(term, LIST_TYPE);
+    assert(term->value != NULL);
     return *((List*) term->value);
 }
 
 List& as_list_unchecked(Term* term)
 {
+    assert(term->value != NULL);
     return *((List*) term->value);
 }
 

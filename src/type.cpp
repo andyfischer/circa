@@ -16,35 +16,39 @@
 
 namespace circa {
 
-int& as_int(Term* t)
+int& as_int(Term* term)
 {
-    assert_type(t, INT_TYPE);
+    assert_type(term, INT_TYPE);
+    assert(term->value != NULL);
 
-    return *((int*) t->value);
+    return *((int*) term->value);
 }
 
-float& as_float(Term* t)
+float& as_float(Term* term)
 {
-    assert_type(t, FLOAT_TYPE);
+    assert_type(term, FLOAT_TYPE);
+    assert(term->value != NULL);
 
-    return *((float*) t->value);
+    return *((float*) term->value);
 }
 
-bool& as_bool(Term* t)
+bool& as_bool(Term* term)
 {
-    assert_type(t, BOOL_TYPE);
+    assert_type(term, BOOL_TYPE);
+    assert(term->value != NULL);
 
-    return *((bool*) t->value);
+    return *((bool*) term->value);
 }
 
-std::string& as_string(Term* t)
+std::string& as_string(Term* term)
 {
-    assert_type(t, STRING_TYPE);
+    assert_type(term, STRING_TYPE);
+    assert(term->value != NULL);
 
-    if (t->value == NULL)
+    if (term->value == NULL)
         throw std::runtime_error("NULL pointer in as_string");
 
-    return *((std::string*) t->value);
+    return *((std::string*) term->value);
 }
 
 namespace ref_type {
@@ -196,6 +200,7 @@ bool is_type(Term* term)
 Type* as_type(Term *term)
 {
     assert_type(term, TYPE_TYPE);
+    assert(term->value != NULL);
     return ((Type*) term->value);
 }
 
