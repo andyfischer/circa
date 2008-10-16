@@ -91,7 +91,7 @@ struct TokenizeContext
     }
 
     void pushResult(int match, std::string text = "") {
-        if (text == "")
+        if (text == "" && match != STRING)
             text = getMatchText(match);
 
         TokenInstance instance;

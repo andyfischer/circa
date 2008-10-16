@@ -136,18 +136,19 @@ void create_function_call()
     delete functionCall;
 }
 
-void test_quick_eval_statement()
+void test_apply_statement()
 {
     Branch branch;
 
     Term* result = apply_statement(branch, "something = add(5.0,3.0)");
 
     test_assert(result != NULL);
-    /*test_assert(result->findName() == "something");
-    test_assert(as_function(result->function)->name == "add");
+    test_assert(result->name == "something");
+    test_assert(as_function(result->function).name == "add");
     test_assert(result->needsUpdate);
-    evaluate(result);
-    test_assert(as_float(result) == 8);*/
+    evaluate_term(result);
+    test_assert(as_float(result) == 8);
+    test_assert(!result->needsUpdate);
 }
 
 void function_decl_ast()
@@ -264,6 +265,18 @@ void ast_walk()
     delete expr;
 }
 
+void test_eval_statement()
+{
+    Branch b;
+
+    test_assert(eval_statement(b, "5")->asInt() == 5);
+    test_assert(eval_statement(b, "-2")->asInt() == -2);
+    test_assert(eval_statement(b, "1.0")->asFloat() == 1.0);
+    //test_assert(eval_statement(b, "-.123")->asFloat() == -0.123);FIXME
+    test_assert(eval_statement(b, "\"apple\"")->asString() == "apple");
+    test_assert(eval_statement(b, "\"\"")->asString() == "");
+}
+
 } // namespace parser_tests
 
 void register_parser_tests()
@@ -275,12 +288,13 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::test_to_string);
     REGISTER_TEST_CASE(parser_tests::create_literals);
     REGISTER_TEST_CASE(parser_tests::create_function_call);
-    REGISTER_TEST_CASE(parser_tests::test_quick_eval_statement);
+    REGISTER_TEST_CASE(parser_tests::test_apply_statement);
     REGISTER_TEST_CASE(parser_tests::function_decl_ast);
     REGISTER_TEST_CASE(parser_tests::function_header);
     REGISTER_TEST_CASE(parser_tests::function_decl_parse);
     REGISTER_TEST_CASE(parser_tests::rebind_operator);
     REGISTER_TEST_CASE(parser_tests::ast_walk);
+    REGISTER_TEST_CASE(parser_tests::test_eval_statement);
 }
 
 } // namespace circa
