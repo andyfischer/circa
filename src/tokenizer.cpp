@@ -63,10 +63,11 @@ struct TokenizeContext
     {
     }
 
-    char next() const {
-        if (finished())
+    char next(int lookahead=0) const {
+        unsigned int index = nextIndex + lookahead;
+        if (index >= input.length())
             return 0;
-        return input[nextIndex];
+        return input[index];
     }
 
     char consume() {
@@ -86,7 +87,7 @@ struct TokenizeContext
     }
 
     bool finished() const {
-        return nextIndex >= input.length();
+        return nextIndex >= (int) input.length();
     }
 
     void pushResult(int match, std::string text = "") {
@@ -222,6 +223,10 @@ void top_level_consume_token(TokenizeContext &context)
             context.pushResult(NEWLINE, "\n");
             return;
         case '.':
+            if (is_number(context.next(1))) {
+                consume_number(context);
+                return;
+            }
             context.consume();
             context.pushResult(DOT);
             return;
@@ -253,12 +258,18 @@ void top_level_consume_token(TokenizeContext &context)
             context.pushResult(PLUS);
             return;
         case '-':
+            if (is_number(context.next(1)) || context.next(1) == '.') {
+                consume_number(context);
+                return;
+            }
+            
             context.consume();
             if (context.next() == '>') {
                 context.consume();
                 context.pushResult(RIGHT_ARROW);
                 return;
             }
+
             context.pushResult(MINUS);
             return;
     }
@@ -295,7 +306,13 @@ void consume_number(TokenizeContext &context)
 {
     std::stringstream text;
 
+    bool minus_sign = false;
     bool dot_encountered = false;
+
+    if (context.next() == '-') {
+        text << context.consume();
+        minus_sign = true;
+    }
 
     while (true) {
         if (is_number(context.next())) {
