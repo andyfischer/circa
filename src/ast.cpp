@@ -2,7 +2,15 @@
 
 #include "common_headers.h"
 
-#include "circa.h"
+#include "ast.h"
+#include "branch.h"
+#include "builtins.h"
+#include "operations.h"
+#include "parser.h"
+#include "runtime.h"
+#include "term.h"
+#include "token_stream.h"
+#include "values.h"
 
 namespace circa {
 namespace ast {
@@ -47,14 +55,14 @@ Infix::createTerm(Branch& branch)
         Identifier *rightIdent = dynamic_cast<Identifier*>(this->right);
 
         if (rightIdent == NULL) {
-            throw syntax_errors::SyntaxError("Right side of -> must be an identifier");
+            parser::syntax_error("Right side of -> must be an identifier");
         }
 
         return find_and_apply_function(branch, rightIdent->text, ReferenceList(leftTerm));
     }
 
     // todo
-    throw syntax_errors::SyntaxError("Infix is unimplemented");
+    parser::syntax_error("Infix is unimplemented");
 }
 
 void
@@ -279,10 +287,10 @@ FunctionDecl::createTerm(Branch& branch)
     {
         Term* term = branch.findNamed(it->type);
         if (term == NULL)
-            throw syntax_errors::SyntaxError(std::string("Identifier not found: ") + it->type);
+            parser::syntax_error(std::string("Identifier not found: ") + it->type);
 
         if (!is_type(term))
-            throw syntax_errors::SyntaxError(std::string("Identifier is not a type: ") + it->type);
+            parser::syntax_error(std::string("Identifier is not a type: ") + it->type);
 
         workspace.bindName(term, "t");
         eval_statement(workspace, "list-append(@inputTypes, t)");
@@ -290,9 +298,9 @@ FunctionDecl::createTerm(Branch& branch)
 
     Term* outputType = branch.findNamed(this->header->outputType);
     if (outputType == NULL)
-        throw syntax_errors::SyntaxError(std::string("Identifier not found: ") + this->header->outputType);
+        parser::syntax_error(std::string("Identifier not found: ") + this->header->outputType);
     if (!is_type(outputType))
-        throw syntax_errors::SyntaxError(std::string("Identifier is not a type: ") + this->header->outputType);
+        parser::syntax_error(std::string("Identifier is not a type: ") + this->header->outputType);
 
     // Load into workspace
     string_var(workspace, this->header->functionName, "functionName");

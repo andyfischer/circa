@@ -1,3 +1,5 @@
+// Copyright 2008 Andrew Fischer
+
 #ifndef CIRCA_PARSER_INCLUDED
 #define CIRCA_PARSER_INCLUDED
 
@@ -23,6 +25,9 @@ ast::LiteralFloat* literalFloat(token_stream::TokenStream& tokens);
 ast::Identifier* identifier(token_stream::TokenStream& tokens);
 ast::FunctionHeader* functionHeader(token_stream::TokenStream& tokens);
 ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens);
+
+void syntax_error(std::string const& message,
+        tokenizer::TokenInstance const* location = NULL);
 
 } // namespace parser
 } // namespace circa
