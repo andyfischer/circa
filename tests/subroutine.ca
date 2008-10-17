@@ -1,8 +1,7 @@
 
-function print_success() {
+function print_success(int) {
     print('Called print_success')
 }
-
 print_success()
 
 function square(int a) -> int {

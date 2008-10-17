@@ -248,7 +248,7 @@ ast::Expression* atom(TokenStream& tokens)
         id->hasRebindOperator = hasRebindOperator;
         return id;
     } else if (hasRebindOperator) {
-        throw syntax_errors::SyntaxError("@ operator only allowed before an identifier");
+        syntax_error("@ operator only allowed before an identifier");
     }
 
     // parenthesized expression?
@@ -259,7 +259,9 @@ ast::Expression* atom(TokenStream& tokens)
         return expr;
     }
 
-    throw syntax_errors::SyntaxError("Unrecognized expression", &tokens.next());
+    syntax_error("Unrecognized expression", &tokens.next());
+
+    return NULL; // unreachable
 }
 
 ast::FunctionCall* functionCall(TokenStream& tokens)
@@ -376,6 +378,18 @@ std::string possibleNewline(TokenStream& tokens)
         output << tokens.consume();
 
     return output.str();
+}
+
+void syntax_error(std::string const& message, tokenizer::TokenInstance const* location)
+{
+    std::stringstream out;
+    out << "Syntax error: " << message;
+
+    if (location != NULL) {
+        out << ", at line " << location->line << ", char " << location->character;
+    }
+
+    throw std::runtime_error(out.str());
 }
 
 } // namespace parser

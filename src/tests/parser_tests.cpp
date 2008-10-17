@@ -197,6 +197,13 @@ void function_decl_parse()
     ast::Statement* statement = parser::statement(tokens);
 
     test_assert(statement->typeName() == "function-decl");
+
+    tokens.reset("function func2() {\n"
+            "print(\"hello\")\n"
+            "}\n"
+            "some-function(1,2)\n");
+
+    ast::StatementList* statementList = parser::statementList(tokens);
 }
 
 void rebind_operator()
