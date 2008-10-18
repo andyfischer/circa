@@ -4,9 +4,11 @@
 
 #include "branch.h"
 #include "builtins.h"
-#include "operations.h"
+#include "function.h"
+#include "runtime.h"
 #include "ref_list.h"
 #include "type.h"
+#include "values.h"
 
 namespace circa {
 

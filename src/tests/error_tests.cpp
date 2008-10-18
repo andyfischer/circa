@@ -5,7 +5,7 @@
 #include "tests/common.h"
 #include "branch.h"
 #include "builtins.h"
-#include "operations.h"
+#include "runtime.h"
 #include "term.h"
 #include "values.h"
 

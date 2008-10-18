@@ -4,10 +4,11 @@
 #include "branch.h"
 #include "builtins.h"
 #include "importing.h"
-#include "operations.h"
+#include "runtime.h"
 #include "parser.h"
 #include "term.h"
 #include "token_stream.h"
+#include "type.h"
 
 namespace circa {
 

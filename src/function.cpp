@@ -5,7 +5,6 @@
 #include "errors.h"
 #include "function.h"
 #include "list.h"
-#include "operations.h"
 #include "parser.h"
 #include "runtime.h"
 #include "type.h"

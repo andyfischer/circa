@@ -5,7 +5,7 @@
 #include "branch.h"
 #include "builtins.h"
 #include "errors.h"
-#include "operations.h"
+#include "runtime.h"
 #include "ref_map.h"
 #include "term.h"
 #include "type.h"

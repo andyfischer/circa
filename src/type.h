@@ -5,7 +5,6 @@
 
 #include "branch.h"
 #include "builtins.h"
-#include "operations.h"
 #include "ref_map.h"
 #include "term.h"
 #include "term_namespace.h"

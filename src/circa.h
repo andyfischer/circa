@@ -9,7 +9,6 @@
 #include "function.h"
 #include "importing.h"
 #include "list.h"
-#include "operations.h"
 #include "parser.h"
 #include "runtime.h"
 #include "term.h"
