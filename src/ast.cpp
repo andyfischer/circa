@@ -63,6 +63,8 @@ Infix::createTerm(Branch& branch)
 
     // todo
     parser::syntax_error("Infix is unimplemented");
+
+    return NULL; // unreachable
 }
 
 void
@@ -287,7 +289,7 @@ FunctionDecl::createTerm(Branch& branch)
     {
         Term* term = branch.findNamed(it->type);
         if (term == NULL)
-            parser::syntax_error(std::string("Identifier not found: ") + it->type);
+            parser::syntax_error(std::string("Identifier not found (input type): ") + it->type);
 
         if (!is_type(term))
             parser::syntax_error(std::string("Identifier is not a type: ") + it->type);
@@ -296,11 +298,17 @@ FunctionDecl::createTerm(Branch& branch)
         eval_statement(workspace, "list-append(@inputTypes, t)");
     }
 
-    Term* outputType = branch.findNamed(this->header->outputType);
-    if (outputType == NULL)
-        parser::syntax_error(std::string("Identifier not found: ") + this->header->outputType);
-    if (!is_type(outputType))
-        parser::syntax_error(std::string("Identifier is not a type: ") + this->header->outputType);
+    Term* outputType = NULL;
+
+    if (this->header->outputType == "") {
+        outputType = VOID_TYPE;
+    } else {
+        outputType = branch.findNamed(this->header->outputType);
+        if (outputType == NULL)
+            parser::syntax_error(std::string("Identifier not found (output type): ") + this->header->outputType);
+        if (!is_type(outputType))
+            parser::syntax_error(std::string("Identifier is not a type: ") + this->header->outputType);
+    }
 
     // Load into workspace
     string_var(workspace, this->header->functionName, "functionName");

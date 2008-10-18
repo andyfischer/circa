@@ -1,6 +1,6 @@
 
 function print_success(int) {
-    print('Called print_success')
+    print("Called print_success")
 }
 print_success()
 
@@ -8,9 +8,9 @@ function square(int a) -> int {
     return a*a
 }
 
-print(concat('Four squared is ', square(4)))
+print(concat("Four squared is ", square(4)))
 
 five_squared = square(5)
 
-print(concat('Five squared is ', five_squared))
+print(concat("Five squared is ", five_squared))
 
