@@ -25,8 +25,13 @@ TokenStream::consume(int match)
     if (finished())
         parser::syntax_error(std::string("Unexpected EOF while looking for ") + tokenizer::getMatchText(match));
 
-    if ((match != -1) && next().match != match)
-        parser::syntax_error("Unexpected token", &next());
+    if ((match != -1) && next().match != match) {
+        std::stringstream msg;
+        msg << "Unexpected token (expected " << tokenizer::getMatchText(match)
+            << ", found " << next().text << ")";
+        parser::syntax_error(msg.str(), &next());
+
+    }
 
     return tokens[currentIndex++].text;
 }
