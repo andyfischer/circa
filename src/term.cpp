@@ -11,7 +11,6 @@
 #include "errors.h"
 #include "function.h"
 #include "list.h"
-#include "operations.h"
 #include "runtime.h"
 #include "term.h"
 #include "type.h"

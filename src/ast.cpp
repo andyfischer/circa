@@ -5,11 +5,11 @@
 #include "ast.h"
 #include "branch.h"
 #include "builtins.h"
-#include "operations.h"
 #include "parser.h"
 #include "runtime.h"
 #include "term.h"
 #include "token_stream.h"
+#include "type.h"
 #include "values.h"
 
 namespace circa {

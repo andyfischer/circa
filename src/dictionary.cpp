@@ -3,7 +3,7 @@
 #include "common_headers.h"
 
 #include "dictionary.h"
-#include "operations.h"
+#include "runtime.h"
 
 namespace circa {
 

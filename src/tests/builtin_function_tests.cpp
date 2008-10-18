@@ -5,9 +5,10 @@
 #include <tests/common.h>
 #include "branch.h"
 #include "builtins.h"
-#include "operations.h"
 #include "parser.h"
+#include "runtime.h"
 #include "term.h"
+#include "type.h"
 #include "values.h"
 
 namespace circa {
