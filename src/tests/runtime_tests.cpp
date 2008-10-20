@@ -11,7 +11,7 @@
 #include "values.h"
 
 namespace circa {
-namespace operations_tests {
+namespace runtime_tests {
 
 void safe_delete()
 {
@@ -64,14 +64,14 @@ void test_misc()
     test_assert(FUNCTION_TYPE->type == TYPE_TYPE);
 }
 
-} // namespace operations_tests
+} // namespace runtime_tests
 
-void register_operations_tests()
+void register_runtime_tests()
 {
-    REGISTER_TEST_CASE(operations_tests::safe_delete);
-    REGISTER_TEST_CASE(operations_tests::test_create_var);
-    REGISTER_TEST_CASE(operations_tests::test_int_var);
-    REGISTER_TEST_CASE(operations_tests::test_misc);
+    REGISTER_TEST_CASE(runtime_tests::safe_delete);
+    REGISTER_TEST_CASE(runtime_tests::test_create_var);
+    REGISTER_TEST_CASE(runtime_tests::test_int_var);
+    REGISTER_TEST_CASE(runtime_tests::test_misc);
 }
 
 } // namespace circa

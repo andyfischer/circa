@@ -18,7 +18,7 @@ void register_feedback_tests();
 void register_importing_tests();
 void register_introspection_tests();
 void register_list_tests();
-void register_operations_tests();
+void register_runtime_tests();
 void register_parser_tests();
 void register_primitive_type_tests();
 void register_subroutine_tests();
@@ -39,7 +39,7 @@ void register_all_tests()
     register_importing_tests();
     register_introspection_tests();
     register_list_tests();
-    register_operations_tests();
+    register_runtime_tests();
     register_parser_tests();
     register_primitive_type_tests();
     register_subroutine_tests();
