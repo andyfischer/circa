@@ -136,6 +136,10 @@ Term* create_term(Branch* branch, Term* function, ReferenceList inputs)
         branch->append(term);
 
     term->function = function;
+
+    // Add to users of function
+    function->users.appendUnique(term);
+    
     Function& functionData = as_function(function);
 
     Term* outputType = functionData.outputType;
@@ -174,6 +178,15 @@ void set_inputs(Term* term, ReferenceList inputs)
     assert_good(term);
 
     term->inputs = inputs;
+
+    for (unsigned int i=0; i < inputs.count(); i++)
+    {
+        Term* inputTerm = inputs[i];
+        if (inputTerm != NULL) {
+            assert_good(inputTerm);
+            inputTerm->users.appendUnique(term);
+        }
+    }
 }
 
 void set_input(Term* term, int index, Term* input)
@@ -181,6 +194,11 @@ void set_input(Term* term, int index, Term* input)
     assert_good(term);
 
     term->inputs.setAt(index, input);
+
+    if (input != NULL) {
+        assert_good(input);
+        input->users.appendUnique(term);
+    }
 }
 
 Term* create_var(Branch* branch, Term* type)
@@ -269,6 +287,48 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
     ReferenceMap map;
     map[original] = replacement;
     remap_pointers(term, map);
+}
+
+bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs)
+{
+    // If this function has state, then always return false
+    if (as_function(function).stateType != VOID_TYPE)
+        return false;
+
+    // Check inputs
+    unsigned int numInputs = target->inputs.count();
+
+    if (numInputs != inputs.count())
+        return false;
+
+    for (unsigned int i=0; i < numInputs; i++) {
+        if (target->inputs[i] != inputs[i])
+            return false;
+    }
+
+    return true;
+}
+
+Term* find_equivalent_existing(Term* function, ReferenceList const& inputs)
+{
+    for (unsigned int inputIndex=0; inputIndex < inputs.count(); inputIndex++) {
+        Term* input = inputs[inputIndex];
+
+        if (input == NULL)
+            continue;
+
+        unsigned int numUsers = input->users.count();
+        for (unsigned int userIndex=0; userIndex < numUsers; userIndex++) {
+            Term* user = input->users[userIndex];
+
+            assert_good(user);
+
+            if (is_equivalent(user, function, inputs))
+                return user;
+        }
+    }
+
+    return NULL;
 }
 
 } // namespace circa

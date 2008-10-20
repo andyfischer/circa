@@ -33,6 +33,9 @@ void change_function(Term* term, Term* new_function);
 void remap_pointers(Term* term, ReferenceMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
 
+bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs);
+Term* find_equivalent_existing(Term* function, ReferenceList const& inputs);
+
 } // namespace circa
 
 #endif
