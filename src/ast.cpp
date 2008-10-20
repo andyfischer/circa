@@ -5,6 +5,7 @@
 #include "ast.h"
 #include "branch.h"
 #include "builtins.h"
+#include "function.h"
 #include "parser.h"
 #include "runtime.h"
 #include "term.h"
@@ -125,7 +126,9 @@ FunctionCall::createTerm(Branch& branch)
         inputs.append(term);
     }
 
-    return find_and_apply_function(branch, this->functionName, inputs);
+    Term* result = find_and_apply_function(branch, this->functionName, inputs);
+    assert(result != NULL);
+    return result;
 }
 
 void
@@ -180,10 +183,13 @@ Identifier::toString() const
         rebindSymbol = "@";
     return rebindSymbol + text;
 }
+
 Term*
 Identifier::createTerm(Branch& branch)
 {
-    return branch.findNamed(this->text);
+    Term* result = branch.findNamed(this->text);
+    assert(result != NULL);
+    return result;
 }
 
 std::string
@@ -280,6 +286,7 @@ FunctionDecl::~FunctionDecl()
 Term*
 FunctionDecl::createTerm(Branch& branch)
 {
+    // Make a workspace where we'll assemble this function
     Branch workspace;
 
     eval_statement(workspace, "inputTypes = list()");
@@ -316,23 +323,19 @@ FunctionDecl::createTerm(Branch& branch)
 
     // Create
     Term* sub = eval_statement(workspace,
-            "sub = subroutine-create(functionName, inputTypes, outputType)");
+        "sub = subroutine-create(functionName, inputTypes, outputType)");
 
     // Name inputs
-    
-
     int numStatements = this->statements->count();
     for (int statementIndex=0; statementIndex < numStatements; statementIndex++) {
-        //Statement* statement = this->statements->operator[](statementIndex);
+        Statement* statement = this->statements->operator[](statementIndex);
 
-        // FIXME statement->createTerm(as_subroutine(sub)->branch);
-
-        //string_var(&workspace, statement->text, "statement");
-        //eval_statement(workspace,
-                //"subroutine-eval(@sub, statement)");
+        statement->createTerm(as_function(sub).subroutineBranch);
     }
 
-    branch.bindName(sub, this->header->functionName);
+    Term* outer_val = create_var(&branch, FUNCTION_TYPE);
+    steal_value(sub, outer_val);
+    branch.bindName(outer_val, this->header->functionName);
 
     return sub;
 }
