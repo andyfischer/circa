@@ -24,28 +24,32 @@ Branch::~Branch()
             deleteMap[*it] = NULL;
     }
 
-    remapPointers(deleteMap);
+    this->remapPointers(deleteMap);
 
-    // dealloc_value on everybody
-    for (int i = (int) _terms.size() - 1; i >= 0; i--)
+    // dealloc_value on all non-types
+    for (unsigned int i = 0; i < _terms.size(); i++)
     {
         Term *term = _terms[i];
+
         if (term == NULL)
             continue;
 
         assert_good(term);
-        dealloc_value(term);
+
+        if (term->type != TYPE_TYPE)
+            dealloc_value(term);
     }
 
-    // delete stuff in reverse order
-    for (int i = (int) _terms.size() - 1; i >= 0; i--)
+    // delete everybody
+    for (unsigned int i = 0; i < _terms.size(); i++)
     {
         Term *term = _terms[i];
-
         if (term == NULL)
             continue;
 
         assert_good(term);
+
+        dealloc_value(term);
         term->owningBranch = NULL;
         delete term;
     }
@@ -81,7 +85,7 @@ void Branch::termDeleted(Term* term)
     ReferenceMap deleteMap;
     deleteMap[term] = NULL;
 
-    remapPointers(deleteMap);
+    this->remapPointers(deleteMap);
 
     for (int i = 0; i < (int) _terms.size(); i++) {
         if (_terms[i] == term)

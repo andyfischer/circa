@@ -60,6 +60,20 @@ Term::~Term()
 
     dealloc_value(this);
 
+    // tell people not to use us
+    if (this->function != NULL)
+        this->function->users.remove(this);
+
+    for (unsigned int i=0; i < this->inputs.count(); i++) {
+        Term* input = this->inputs[i];
+        if (input == NULL)
+            continue;
+
+        //TEMP assert_good(input);
+
+        //TEMP input->users.remove(this);
+    }
+
     if (owningBranch != NULL) {
         owningBranch->termDeleted(this);
     }

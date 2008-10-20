@@ -11,6 +11,9 @@ void dealloc_value(Term* term)
     if (term->value == NULL)
         return;
 
+    if (term->type == NULL)
+        return;
+
     if (term->type->value == NULL)
         throw std::runtime_error("type is undefined");
 
