@@ -31,14 +31,28 @@ public:
     void append(Term* term)
     {
         _items.push_back(term);
+
+        // Check for a previous bug
         if (_items.size() > 1000000)
-            std::cout << "too high in append" << std::endl;
+            throw std::runtime_error("too many items");
     }
+
+    // Add 'term' to this list, if it's not in the list already
+    void appendUnique(Term* term)
+    {
+        for (unsigned int i=0; i < count(); i++)
+            if (get(i) == term)
+                return;
+
+        append(term);
+    }
+
     void appendAll(ReferenceList const& list);
     void setAt(unsigned int index, Term* term)
     {
+        // Check for a previous bug
         if (index > 1000000)
-            std::cout << "index too big in setAt" << std::endl;
+            throw std::runtime_error("index too big in setAt");
 
         // Make sure there are enough blank elements in the list
         while (_items.size() <= index) {
