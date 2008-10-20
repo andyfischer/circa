@@ -302,8 +302,9 @@ bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs)
         return false;
 
     for (unsigned int i=0; i < numInputs; i++) {
-        if (target->inputs[i] != inputs[i])
+        if (target->inputs[i] != inputs[i]) {
             return false;
+        }
     }
 
     return true;

@@ -52,6 +52,7 @@ void test_int_var()
 
     Term *term2 = int_var(branch, 154, "george");
     test_assert(term2 == branch.getNamed("george"));
+    test_assert(term2->name == "george");
     test_assert(as_int(term2) == 154);
 }
 
@@ -64,6 +65,22 @@ void test_misc()
     test_assert(FUNCTION_TYPE->type == TYPE_TYPE);
 }
 
+void test_find_existing_equivalent()
+{
+    Branch branch;
+
+    Term* add_func = eval_statement(branch, "add");
+    Term* a = eval_statement(branch, "a = 1");
+    Term* b = eval_statement(branch, "b = 1");
+    Term* addition = eval_statement(branch, "add(a,b)");
+
+    test_assert(is_equivalent(addition, add_func, ReferenceList(a,b)));
+
+    test_assert(addition == find_equivalent_existing(add_func, ReferenceList(a,b)));
+
+    test_assert(NULL == find_equivalent_existing(add_func, ReferenceList(b,a)));
+}
+
 } // namespace runtime_tests
 
 void register_runtime_tests()
@@ -72,6 +89,7 @@ void register_runtime_tests()
     REGISTER_TEST_CASE(runtime_tests::test_create_var);
     REGISTER_TEST_CASE(runtime_tests::test_int_var);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
+    REGISTER_TEST_CASE(runtime_tests::test_find_existing_equivalent);
 }
 
 } // namespace circa
