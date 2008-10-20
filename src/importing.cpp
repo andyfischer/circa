@@ -25,6 +25,7 @@ Term* quick_create_function(Branch* branch, std::string name, Function::Evaluate
     func.evaluate = evaluateFunc;
     func.inputTypes = inputTypes;
     func.outputType = outputType;
+    func.stateType = VOID_TYPE;
     branch->bindName(term, name);
 	return term;
 }
@@ -61,6 +62,7 @@ Term* import_c_function(Branch& branch, Function::EvaluateFunc evaluate, std::st
 
     func.inputTypes = inputTypes;
     func.outputType = outputType;
+    func.stateType = VOID_TYPE;
     branch.bindName(term, header->functionName);
 
     delete header;
