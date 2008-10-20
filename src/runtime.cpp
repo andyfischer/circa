@@ -123,7 +123,7 @@ void error_occured(Term* errorTerm, std::string const& message)
     errorTerm->pushError(message);
 }
 
-Term* create_term(Branch* branch, Term* function, ReferenceList inputs)
+Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
 {
     //if (branch == NULL)
     //    throw std::runtime_error("in create_term, branch is NULL");
@@ -173,7 +173,7 @@ Term* create_term(Branch* branch, Term* function, ReferenceList inputs)
     return term;
 }
 
-void set_inputs(Term* term, ReferenceList inputs)
+void set_inputs(Term* term, ReferenceList const& inputs)
 {
     assert_good(term);
 
@@ -208,8 +208,11 @@ Term* create_var(Branch* branch, Term* type)
     return term;
 }
 
-Term* apply_function(Branch& branch, Term* function, ReferenceList inputs)
+Term* apply_function(Branch& branch, Term* function, ReferenceList const& _inputs)
 {
+    // Make a local copy of _inputs
+    ReferenceList inputs = _inputs;
+
     if (function->needsUpdate)
         function->eval();
 
@@ -239,18 +242,25 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList inputs)
         inputs = memberFunctionInputs;
     }
 
+    // Attempt to re-use an existing term
+    //Term* existing = find_equivalent_existing(function, inputs);
+
+    //if (existing != NULL)
+        //return existing;
+
     // Create the term
     return create_term(&branch, function, inputs);
 }
 
-Term* eval_function(Branch& branch, Term* function, ReferenceList inputs)
+Term* eval_function(Branch& branch, Term* function, ReferenceList const& inputs)
 {
     Term* result = apply_function(branch, function, inputs);
     result->eval();
     return result;
 }
 
-Term* eval_function(Branch& branch, std::string const& functionName, ReferenceList inputs)
+Term* eval_function(Branch& branch, std::string const& functionName,
+        ReferenceList const &inputs)
 {
     Term* function = branch.findNamed(functionName);
     if (function == NULL)
@@ -274,9 +284,13 @@ void remap_pointers(Term* term, ReferenceMap const& map)
 
     term->inputs.remapPointers(map);
     term->function = map.getRemapped(term->function);
+    term->users.remapPointers(map);
+    term->users.removeNulls();
 
     if (as_type(term->type)->remapPointers != NULL)
         as_type(term->type)->remapPointers(term, map);
+
+    term->type = map.getRemapped(term->type);
 }
 
 void remap_pointers(Term* term, Term* original, Term* replacement)

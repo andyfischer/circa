@@ -10,8 +10,8 @@ void evaluate_branch(Branch& branch);
 Branch* evaluate_file(std::string const& filename);
 void error_occured(Term* errorTerm, std::string const& message);
 
-Term* create_term(Branch* branch, Term* function, ReferenceList inputs);
-void set_inputs(Term* term, ReferenceList inputs);
+Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs);
+void set_inputs(Term* term, ReferenceList const& inputs);
 Term* create_var(Branch* branch, Term* type);
 void set_input(Term* term, int index, Term* input);
 
@@ -21,12 +21,15 @@ void set_input(Term* term, int index, Term* input);
 //  2. 'function' might be a type (create an empty instance)
 //  3. We might specialize an overloaded function
 //  4. add more stuff here
-Term* apply_function(Branch& branch, Term* function, ReferenceList inputs);
+Term* apply_function(Branch& branch, Term* function, ReferenceList const& inputs);
 
 // Perform 'apply_function' and then evaluate the result
-Term* eval_function(Branch& branch, Term* function, ReferenceList inputs);
+Term* eval_function(Branch& branch, Term* function, ReferenceList const& inputs);
 
-Term* eval_function(Branch& branch, std::string const& functionName, ReferenceList inputs);
+// Look up the given function in branch, and then do the above 'eval_function'
+Term* eval_function(Branch& branch,
+                    std::string const& functionName,
+                    ReferenceList const& inputs);
 
 void change_function(Term* term, Term* new_function);
 

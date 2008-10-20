@@ -61,6 +61,26 @@ public:
 
         _items[index] = term;
     }
+
+    // Remove 'term' from this list
+    void remove(Term* term)
+    {
+        std::vector<Term*>::iterator it;
+
+        for (it = _items.begin(); it != _items.end(); ) {
+
+            if (*it == term)
+                it = _items.erase(it);
+            else
+                ++it;
+        }
+    }
+
+    void removeNulls()
+    {
+        remove(NULL);
+    }
+
     void clear() { _items.clear(); }
     Term* get(unsigned int index) const
     {
