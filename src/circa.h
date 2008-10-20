@@ -1,7 +1,6 @@
 // Copyright 2008 Paul Hodge
 
 #include "ast.h"
-#include "bootstrapping.h"
 #include "branch.h"
 #include "builtins.h"
 #include "compilation.h"

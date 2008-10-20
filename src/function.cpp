@@ -1,9 +1,9 @@
 // Copyright 2008 Paul Hodge
 
 #include "builtins.h"
-#include "bootstrapping.h"
 #include "errors.h"
 #include "function.h"
+#include "importing.h"
 #include "list.h"
 #include "parser.h"
 #include "runtime.h"

@@ -2,9 +2,9 @@
 
 #include "common_headers.h"
 
-#include "bootstrapping.h"
 #include "builtins.h"
 #include "errors.h"
+#include "importing.h"
 #include "term.h"
 #include "ref_list.h"
 #include "ref_map.h"

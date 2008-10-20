@@ -6,6 +6,7 @@
 #include "builtins.h"
 #include "cpp_interface.h"
 #include "errors.h"
+#include "importing.h"
 #include "list.h"
 #include "runtime.h"
 #include "type.h"

@@ -5,7 +5,6 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "bootstrapping.h"
 #include "builtins.h"
 #include "branch.h"
 #include "errors.h"
@@ -30,7 +29,7 @@ void assert_good(Term* term)
     std::set<Term*>::iterator it = DEBUG_GOOD_POINTER_SET.find(term);
 
     if (it == DEBUG_GOOD_POINTER_SET.end())
-        throw std::runtime_error("assert_good failed: ");
+        throw std::runtime_error("assert_good failed (bad term pointer)");
 #endif
 }
 
