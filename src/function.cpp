@@ -1,9 +1,9 @@
 // Copyright 2008 Andrew Fischer
 
 #include "builtins.h"
-#include "bootstrapping.h"
 #include "errors.h"
 #include "function.h"
+#include "importing.h"
 #include "list.h"
 #include "parser.h"
 #include "runtime.h"

@@ -3,7 +3,7 @@
 #ifndef CIRCA_CPP_INTERFACE_INCLUDED
 #define CIRCA_CPP_INTERFACE_INCLUDED
 
-#include "bootstrapping.h"
+#include "importing.h"
 #include "term.h"
 #include "type.h"
 
