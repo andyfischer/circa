@@ -5,6 +5,7 @@
 
 #include "common_headers.h"
 
+#include "pointer_visitor.h"
 #include "term_namespace.h"
 
 namespace circa {
@@ -54,6 +55,9 @@ public:
 
     // Remap pointers
     void remapPointers(ReferenceMap const& map);
+
+    // Visit pointers
+    void visitPointers(PointerVisitor& visitor);
 
     void clear();
 };

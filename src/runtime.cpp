@@ -278,6 +278,17 @@ void change_function(Term* term, Term* new_function)
     term->function = new_function;
 }
 
+
+void shrink_users(Term* term)
+{
+    int numDeleted = 0;
+    for (unsigned int user_i=0; user_i < term->users.count(); user_i++) {
+        
+
+
+    }
+}
+
 void remap_pointers(Term* term, ReferenceMap const& map)
 {
     assert_good(term);

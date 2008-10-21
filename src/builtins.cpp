@@ -116,6 +116,8 @@ void bootstrap_kernel()
     typeType->function = constTypeFunc;
     typeType->type = typeType;
     initialize_type_type(typeType);
+    as_type(TYPE_TYPE)->remapPointers = Type::typeRemapPointers;
+    as_type(TYPE_TYPE)->visitPointers = Type::typeVisitPointers;
     KERNEL->bindName(typeType, "Type");
 
     // Implant the Type type

@@ -59,6 +59,16 @@ namespace ref_type {
     void dealloc(Term* term) {
         term->value = NULL;
     }
+
+    void visitPointers(Term* term, PointerVisitor& visitor)
+    {
+        visitor.visitPointer((Term*) term->value);
+    }
+
+    void remapPointers(Term* term, ReferenceMap const& map)
+    {
+        term->value = map.getRemapped((Term*) term->value);
+    }
 }
 
 Term*& as_ref(Term* term)
@@ -76,8 +86,8 @@ Type::addMemberFunction(std::string const &name, Term *function)
     this->memberFunctions.bind(function, name);
 }
 
-struct CompoundValue {
-
+struct CompoundValue
+{
     int signature;
     Branch branch;
     ReferenceList fields;
@@ -320,6 +330,25 @@ std::string Type::to_string(Term *caller)
     return std::string("<Type " + as_type(caller)->name + ">");
 }
 
+void Type::typeRemapPointers(Term *term, ReferenceMap const& map)
+{
+    Type &type = *as_type(term);
+
+    for (unsigned int field_i=0; field_i < type.fields.size(); field_i++) {
+        Field &field = type.fields[field_i];
+        field.type = map.getRemapped(field.type);
+    }
+}
+
+void Type::typeVisitPointers(Term *term, PointerVisitor &visitor)
+{
+    Type &type = *as_type(term);
+
+    for (unsigned int field_i=0; field_i < type.fields.size(); field_i++) {
+        visitor.visitPointer(type.fields[field_i].type);
+    }
+}
+
 void initialize_type_type(Term* typeType)
 {
     typeType->value = new Type();
@@ -351,6 +380,8 @@ void initialize_primitive_types(Branch* kernel)
     REFERENCE_TYPE = quick_create_type(KERNEL, "Reference");
     as_type(REFERENCE_TYPE)->alloc = ref_type::alloc;
     as_type(REFERENCE_TYPE)->dealloc = ref_type::dealloc;
+    as_type(REFERENCE_TYPE)->visitPointers = ref_type::visitPointers;
+    as_type(REFERENCE_TYPE)->remapPointers = ref_type::remapPointers;
 }
 
 void initialize_compound_types(Branch* kernel)

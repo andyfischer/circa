@@ -1,3 +1,5 @@
+// Copyright 2008 Paul Hodge
+
 #ifndef CIRCA_TYPE_INCLUDED
 #define CIRCA_TYPE_INCLUDED
 
@@ -5,6 +7,7 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "pointer_visitor.h"
 #include "ref_map.h"
 #include "term.h"
 #include "term_namespace.h"
@@ -22,6 +25,7 @@ struct Type
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
     typedef int  (*CompareFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
+    typedef void (*VisitPointersFunc)(Term* term, PointerVisitor &listener);
     typedef std::string (*ToStringFunc)(Term* term);
 
     struct Field {
@@ -45,6 +49,7 @@ struct Type
     EqualsFunc equals;
     CompareFunc compare;
     RemapPointersFunc remapPointers;
+    VisitPointersFunc visitPointers;
     ToStringFunc toString;
     
     // Fields, applies to compound types
@@ -65,6 +70,7 @@ struct Type
         equals(NULL),
         compare(NULL),
         remapPointers(NULL),
+        visitPointers(NULL),
         toString(NULL)
     {
     }
@@ -88,6 +94,8 @@ struct Type
     // Hosted functions:
     static std::string to_string(Term *caller);
 
+    static void typeRemapPointers(Term *term, ReferenceMap const& map);
+    static void typeVisitPointers(Term *term, PointerVisitor& visitor);
 };
 
 bool is_type(Term* term);

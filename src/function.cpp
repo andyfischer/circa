@@ -53,6 +53,22 @@ void Function::duplicate(Term* source, Term* dest)
     as_function(dest) = as_function(source);
 }
 
+void remapPointers(Term* term, ReferenceMap &map)
+{
+    Function &func = as_function(term);
+    func.inputTypes.remapPointers(map);
+    func.outputType = map.getRemapped(func.outputType);
+    func.stateType = map.getRemapped(func.stateType);
+}
+
+void visitPointers(Term* term, PointerVisitor &visitor)
+{
+    Function &func = as_function(term);
+    func.inputTypes.visitPointers(visitor);
+    visitor.visitPointer(func.outputType);
+    visitor.visitPointer(func.stateType);
+}
+
 std::string get_placeholder_name_for_index(int index)
 {
     std::stringstream sstream;

@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "term.h"
+#include "type.h"
 
 namespace circa {
 
@@ -30,5 +31,54 @@ void print_branch_extended(Branch& branch, std::ostream &output)
     }
 }
 
+ReferenceList list_all_pointers(Term* term)
+{
+    ReferenceList result;
+
+    for (unsigned int input_i=0; input_i < term->inputs.count(); input_i++) {
+        result.appendUnique(term->inputs[input_i]);
+    }
+
+    result.appendUnique(term->function);
+    result.appendUnique(term->type);
+
+    Type& type = *as_type(term);
+    if (type.visitPointers == NULL)
+        std::cout << "warning: visitPointers is null" << std::endl;
+    else {
+        struct AppendPointersToList : PointerVisitor
+        {
+            ReferenceList& list;
+            AppendPointersToList(ReferenceList &_list) : list(_list) {}
+
+            virtual void visitPointer(Term* term) {
+                list.appendUnique(term);
+            }
+        };
+
+        AppendPointersToList visitor(result);
+
+        type.visitPointers(term, visitor);
+    }
+
+    return result;
+}
+
+bool is_using(Term* user, Term* usee)
+{
+
+    return false;
+}
+
+void check_pointers(Term* term)
+{
+    ReferenceList pointers = list_all_pointers(term);
+
+    for (unsigned int i=0; i < pointers.count(); i++) {
+        if (is_bad_pointer(pointers[i])) {
+            // todo
+        }
+    }
+}
 
 } // namespace circa
