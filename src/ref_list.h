@@ -3,6 +3,8 @@
 
 #include "common_headers.h"
 
+#include "pointer_visitor.h"
+
 namespace circa {
 
 struct ReferenceList
@@ -90,6 +92,7 @@ public:
     }
     Term* operator[](unsigned int index) const { return get(index); }
     void remapPointers(ReferenceMap const& map);
+    void visitPointers(PointerVisitor &visitor);
 };
 
 } // namespace circa

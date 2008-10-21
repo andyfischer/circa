@@ -1,3 +1,5 @@
+// Copyright 2008 Andrew Fischer
+
 #ifndef CIRCA_TERM_INCLUDED
 #define CIRCA_TERM_INCLUDED
 
@@ -13,6 +15,7 @@ struct List;
 
 typedef std::vector<std::string> ErrorList;
 
+bool is_bad_pointer(Term* term);
 void assert_good(Term* term);
 
 struct Term

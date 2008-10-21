@@ -18,7 +18,6 @@ struct Function
 
     ReferenceList inputTypes;
     Term* outputType;
-
     Term* stateType;
 
     bool pureFunction;
@@ -42,6 +41,8 @@ struct Function
     static void alloc(Term* caller);
     static void dealloc(Term* caller);
     static void duplicate(Term* source, Term* dest);
+    static void remapPointers(Term* term, ReferenceMap &map);
+    static void visitPointers(Term* term, PointerVisitor &visitor);
     static void subroutine_create(Term* caller);
     static void call_subroutine__initialize(Term* caller);
     static void call_subroutine(Term* caller);

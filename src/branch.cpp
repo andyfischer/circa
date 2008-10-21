@@ -104,6 +104,39 @@ void Branch::remapPointers(ReferenceMap const& map)
     }
 }
 
+void Branch::visitPointers(PointerVisitor& visitor)
+{
+    struct VisitPointerIfOutsideBranch : PointerVisitor
+    {
+        Branch *branch;
+        PointerVisitor &visitor;
+
+        VisitPointerIfOutsideBranch(Branch *_branch, PointerVisitor &_visitor)
+            : branch(_branch), visitor(_visitor) {}
+
+        virtual void visitPointer(Term* term)
+        {
+            if (term->owningBranch != branch)
+                visitor.visitPointer(term);
+        }
+    };
+
+    VisitPointerIfOutsideBranch myVisitor(this, visitor);
+
+    std::vector<Term*>::iterator it;
+    for (it = _terms.begin(); it != _terms.end(); ++it) {
+        if (*it == NULL)
+            continue;
+
+        Type& type = *as_type((*it)->type);
+
+        if (type.visitPointers == NULL)
+            continue;
+
+        type.visitPointers(*it, myVisitor);
+    }
+}
+
 void
 Branch::clear()
 {
