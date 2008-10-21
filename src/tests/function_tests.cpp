@@ -7,7 +7,7 @@
 #include "runtime.h"
 
 namespace circa {
-namespace subroutine_tests {
+namespace function_tests {
 
 void create()
 {
@@ -53,12 +53,12 @@ void using_apply()
     test_assert(as_float(result2) == 15.0);
 }
 
-} // namespace subroutine_tests
+} // namespace function_tests
 
-void register_subroutine_tests()
+void register_function_tests()
 {
-    REGISTER_TEST_CASE(subroutine_tests::create);
-    REGISTER_TEST_CASE(subroutine_tests::using_apply);
+    REGISTER_TEST_CASE(function_tests::create);
+    REGISTER_TEST_CASE(function_tests::using_apply);
 }
 
 } // namespace circa
