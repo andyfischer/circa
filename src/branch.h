@@ -60,6 +60,10 @@ public:
     void visitPointers(PointerVisitor& visitor);
 
     void clear();
+
+    // Hosted functions
+    static void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
+    static void hosted_visit_pointers(Term* caller, PointerVisitor& visitor);
 };
 
 Branch& as_branch(Term* term);

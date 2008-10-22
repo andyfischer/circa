@@ -34,6 +34,8 @@ extern Term* CONSTANT_TRUE;
 extern Term* CONSTANT_FALSE;
 extern Term* UNKNOWN_FUNCTION;
 extern Term* APPLY_FEEDBACK;
+extern Term* ADD_FUNC;
+extern Term* MULT_FUNC;
 
 Term* get_global(std::string name);
 void empty_evaluate_function(Term* caller);

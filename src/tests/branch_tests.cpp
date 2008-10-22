@@ -49,6 +49,34 @@ void external_pointers()
 
     test_assert(list_all_pointers(inner_branch)
         == ReferenceList(inner_branch->function, inner_branch->type));
+
+    Term* inner_int = create_var(&as_branch(inner_branch), INT_TYPE);
+    Term* inner_add = apply_function(as_branch(inner_branch), ADD_FUNC,
+            ReferenceList(inner_int, inner_int));
+
+    // make sure that the pointer from inner_add to inner_int does
+    // not show up in list_all_pointers.
+
+    test_assert(list_all_pointers(inner_branch) == ReferenceList(
+                inner_branch->function,
+                inner_branch->type,
+                INT_TYPE,
+                VAR_FUNCTION_GENERATOR, // temp
+                ADD_FUNC));
+
+    ReferenceMap myRemap;
+    myRemap[ADD_FUNC] = MULT_FUNC;
+
+    remap_pointers(inner_branch, myRemap);
+
+    test_assert(list_all_pointers(inner_branch) == ReferenceList(
+                inner_branch->function,
+                inner_branch->type,
+                INT_TYPE,
+                VAR_FUNCTION_GENERATOR, // temp
+                MULT_FUNC));
+
+    test_assert(inner_add->function == MULT_FUNC);
 }
 
 } // namespace branch_tests
