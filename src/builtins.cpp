@@ -148,6 +148,8 @@ void bootstrap_kernel()
     as_type(functionType).alloc = Function::alloc;
     as_type(functionType).duplicate = Function::duplicate;
     as_type(functionType).dealloc = Function::dealloc;
+    as_type(functionType).remapPointers = Function::remapPointers;
+    as_type(functionType).visitPointers = Function::visitPointers;
     KERNEL->bindName(functionType, "Function");
 
     // Implant Function type

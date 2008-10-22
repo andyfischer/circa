@@ -4,6 +4,7 @@
 
 #include "circa.h"
 #include "common.h"
+#include "introspection.h"
 #include "runtime.h"
 
 namespace circa {
@@ -53,12 +54,30 @@ void using_apply()
     test_assert(as_float(result2) == 15.0);
 }
 
+void external_pointers()
+{
+    Branch branch;
+
+    Term* function = create_var(&branch, FUNCTION_TYPE);
+
+    as_function(function).inputTypes = ReferenceList(INT_TYPE, INT_TYPE);
+    as_function(function).outputType = STRING_TYPE;
+
+    test_equals(list_all_pointers(function), ReferenceList(
+            function->function,
+            FUNCTION_TYPE,
+            INT_TYPE,
+            STRING_TYPE,
+            NULL));
+}
+
 } // namespace function_tests
 
 void register_function_tests()
 {
     REGISTER_TEST_CASE(function_tests::create);
     REGISTER_TEST_CASE(function_tests::using_apply);
+    REGISTER_TEST_CASE(function_tests::external_pointers);
 }
 
 } // namespace circa
