@@ -31,6 +31,13 @@ void print_branch_extended(Branch& branch, std::ostream &output)
     }
 }
 
+void print_terms(ReferenceList const& list, std::ostream &output)
+{
+    for (unsigned int i=0; i < list.count(); i++) {
+        print_term_extended(list[i], output);
+    }
+}
+
 ReferenceList list_all_pointers(Term* term)
 {
     ReferenceList result;
@@ -42,9 +49,9 @@ ReferenceList list_all_pointers(Term* term)
     result.appendUnique(term->function);
     result.appendUnique(term->type);
 
-    Type& type = as_type(term);
+    Type& type = as_type(term->type);
     if (type.visitPointers == NULL)
-        std::cout << "warning: visitPointers is null" << std::endl;
+        std::cout << "warning: visitPointers is null on " << type.name << std::endl;
     else {
         struct AppendPointersToList : PointerVisitor
         {
