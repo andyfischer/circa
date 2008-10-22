@@ -49,6 +49,8 @@ Term* CONSTANT_TRUE = NULL;
 Term* CONSTANT_FALSE = NULL;
 Term* UNKNOWN_FUNCTION = NULL;
 Term* APPLY_FEEDBACK = NULL;
+Term* ADD_FUNC = NULL;
+Term* MULT_FUNC = NULL;
 
 void empty_evaluate_function(Term*) { }
 void empty_alloc_function(Term*) { }
@@ -204,7 +206,7 @@ namespace add_function {
     }
     static void setup(Branch* kernel)
     {
-        Term* eval_func = quick_create_function(kernel, "add", evaluate,
+        ADD_FUNC = quick_create_function(kernel, "add", evaluate,
             ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
 
         Term* fp_func =
@@ -213,7 +215,7 @@ namespace add_function {
                 ReferenceList(ANY_TYPE, ANY_TYPE), VOID_TYPE);
         as_function(fp_func).stateType = BRANCH_TYPE;
 
-        as_function(eval_func).feedbackPropogateFunction = fp_func;
+        as_function(ADD_FUNC).feedbackPropogateFunction = fp_func;
     }
 }
 
@@ -321,6 +323,9 @@ namespace var_function {
 void initialize_constants()
 {
     BRANCH_TYPE = quick_create_cpp_type<Branch>(KERNEL, "Branch");
+    as_type(BRANCH_TYPE).remapPointers = Branch::hosted_remap_pointers;
+    as_type(BRANCH_TYPE).visitPointers = Branch::hosted_visit_pointers;
+
     LIST_TYPE = quick_create_cpp_type<List>(KERNEL, "List");
     as_type(LIST_TYPE).toString = List__toString;
 
@@ -344,7 +349,7 @@ void initialize_constants()
 void initialize_builtin_functions(Branch* kernel)
 {
     add_function::setup(kernel);
-    quick_create_function(kernel, "mult", mult__evaluate,
+    MULT_FUNC = quick_create_function(kernel, "mult", mult__evaluate,
             ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
     quick_create_function(kernel, "concat", string_concat__evaluate, ReferenceList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
     quick_create_function(kernel, "print", print__evaluate, ReferenceList(STRING_TYPE), VOID_TYPE);

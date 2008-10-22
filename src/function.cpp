@@ -59,6 +59,7 @@ void remapPointers(Term* term, ReferenceMap &map)
     func.inputTypes.remapPointers(map);
     func.outputType = map.getRemapped(func.outputType);
     func.stateType = map.getRemapped(func.stateType);
+    func.subroutineBranch.remapPointers(map);
 }
 
 void visitPointers(Term* term, PointerVisitor &visitor)
@@ -67,6 +68,7 @@ void visitPointers(Term* term, PointerVisitor &visitor)
     func.inputTypes.visitPointers(visitor);
     visitor.visitPointer(func.outputType);
     visitor.visitPointer(func.stateType);
+    func.subroutineBranch.visitPointers(visitor);
 }
 
 std::string get_placeholder_name_for_index(int index)

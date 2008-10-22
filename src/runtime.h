@@ -35,6 +35,7 @@ void change_function(Term* term, Term* new_function);
 
 void remap_pointers(Term* term, ReferenceMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
+void visit_pointers(Term* term, PointerVisitor &visitor);
 
 bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs);
 Term* find_equivalent_existing(Term* function, ReferenceList const& inputs);

@@ -130,10 +130,7 @@ void Branch::visitPointers(PointerVisitor& visitor)
 
         Type& type = as_type((*it)->type);
 
-        if (type.visitPointers == NULL)
-            continue;
-
-        type.visitPointers(*it, myVisitor);
+        visit_pointers(*it, myVisitor);
     }
 }
 
@@ -142,6 +139,18 @@ Branch::clear()
 {
     _terms.clear();
     names.clear();
+}
+
+void
+Branch::hosted_remap_pointers(Term* caller, ReferenceMap const& map)
+{
+    as_branch(caller).remapPointers(map);
+}
+
+void
+Branch::hosted_visit_pointers(Term* caller, PointerVisitor& visitor)
+{
+    as_branch(caller).visitPointers(visitor);
 }
 
 Branch& as_branch(Term* term)
