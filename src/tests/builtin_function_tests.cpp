@@ -37,8 +37,8 @@ void test_int()
 {
     Branch branch;
 
-    test_assert(as_type(INT_TYPE)->equals != NULL);
-    test_assert(as_type(INT_TYPE)->toString != NULL);
+    test_assert(as_type(INT_TYPE).equals != NULL);
+    test_assert(as_type(INT_TYPE).toString != NULL);
 
     Term* four = int_var(branch, 4);
     Term* another_four = int_var(branch, 4);
@@ -54,8 +54,8 @@ void test_float()
 {
     Branch branch;
 
-    test_assert(as_type(FLOAT_TYPE)->equals != NULL);
-    test_assert(as_type(FLOAT_TYPE)->toString != NULL);
+    test_assert(as_type(FLOAT_TYPE).equals != NULL);
+    test_assert(as_type(FLOAT_TYPE).toString != NULL);
 
     Term* point_one = float_var(branch, .1);
     Term* point_one_again = float_var(branch, .1);

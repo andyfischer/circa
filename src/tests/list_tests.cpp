@@ -21,7 +21,7 @@ void create()
     Term* list1 = eval_statement(branch, "list1 = list(1, 'pie, 2.0)");
 
     test_assert(list1->type == LIST_TYPE);
-    test_assert(as_type(list1->type)->toString != NULL);
+    test_assert(as_type(list1->type).toString != NULL);
     test_assert(list1->toString() == "[1, pie, 2]");
 
     test_assert(list1->asList()[0]->asInt() == 1);

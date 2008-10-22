@@ -21,17 +21,17 @@ void compound_types()
 
     type1 = eval_statement(branch, "compound-type-append-field(@type1, int, 'myint)");
     test_assert(is_type(type1));
-    test_assert(as_type(type1)->fields.size() == 1);
-    test_assert(as_type(type1)->fields[0].name == "myint");
-    test_assert(as_type(type1)->fields[0].type == INT_TYPE);
-    test_assert(as_type(type1)->findField("myint") == 0);
+    test_assert(as_type(type1).fields.size() == 1);
+    test_assert(as_type(type1).fields[0].name == "myint");
+    test_assert(as_type(type1).fields[0].type == INT_TYPE);
+    test_assert(as_type(type1).findField("myint") == 0);
 
     type1 = eval_statement(branch, "compound-type-append-field(@type1, string, 'astr)");
     test_assert(is_type(type1));
-    test_assert(as_type(type1)->fields.size() == 2);
-    test_assert(as_type(type1)->fields[1].name == "astr");
-    test_assert(as_type(type1)->fields[1].type == STRING_TYPE);
-    test_assert(as_type(type1)->findField("astr") == 1);
+    test_assert(as_type(type1).fields.size() == 2);
+    test_assert(as_type(type1).fields[1].name == "astr");
+    test_assert(as_type(type1).fields[1].type == STRING_TYPE);
+    test_assert(as_type(type1).findField("astr") == 1);
 
     Term* inst1 = eval_statement(branch, "inst1 = type1()");
     test_assert(inst1 != NULL);
@@ -67,25 +67,25 @@ void compound_types()
 
 void builtin_types()
 {
-    test_assert(as_type(INT_TYPE)->alloc != NULL);
-    test_assert(as_type(INT_TYPE)->dealloc != NULL);
-    test_assert(as_type(INT_TYPE)->equals != NULL);
-    test_assert(as_type(FLOAT_TYPE)->alloc != NULL);
-    test_assert(as_type(FLOAT_TYPE)->dealloc != NULL);
-    test_assert(as_type(FLOAT_TYPE)->equals != NULL);
-    test_assert(as_type(STRING_TYPE)->alloc != NULL);
-    test_assert(as_type(STRING_TYPE)->dealloc != NULL);
-    test_assert(as_type(STRING_TYPE)->equals != NULL);
-    test_assert(as_type(BOOL_TYPE)->alloc != NULL);
-    test_assert(as_type(BOOL_TYPE)->dealloc != NULL);
-    test_assert(as_type(BOOL_TYPE)->equals != NULL);
-    test_assert(as_type(TYPE_TYPE)->alloc != NULL);
-    test_assert(as_type(TYPE_TYPE)->dealloc != NULL);
+    test_assert(as_type(INT_TYPE).alloc != NULL);
+    test_assert(as_type(INT_TYPE).dealloc != NULL);
+    test_assert(as_type(INT_TYPE).equals != NULL);
+    test_assert(as_type(FLOAT_TYPE).alloc != NULL);
+    test_assert(as_type(FLOAT_TYPE).dealloc != NULL);
+    test_assert(as_type(FLOAT_TYPE).equals != NULL);
+    test_assert(as_type(STRING_TYPE).alloc != NULL);
+    test_assert(as_type(STRING_TYPE).dealloc != NULL);
+    test_assert(as_type(STRING_TYPE).equals != NULL);
+    test_assert(as_type(BOOL_TYPE).alloc != NULL);
+    test_assert(as_type(BOOL_TYPE).dealloc != NULL);
+    test_assert(as_type(BOOL_TYPE).equals != NULL);
+    test_assert(as_type(TYPE_TYPE).alloc != NULL);
+    test_assert(as_type(TYPE_TYPE).dealloc != NULL);
     //test_assert(as_type(TYPE_TYPE)->equals != NULL);
-    test_assert(as_type(FUNCTION_TYPE)->alloc != NULL);
-    test_assert(as_type(FUNCTION_TYPE)->dealloc != NULL);
-    test_assert(as_type(REFERENCE_TYPE)->alloc != NULL);
-    test_assert(as_type(REFERENCE_TYPE)->dealloc != NULL);
+    test_assert(as_type(FUNCTION_TYPE).alloc != NULL);
+    test_assert(as_type(FUNCTION_TYPE).dealloc != NULL);
+    test_assert(as_type(REFERENCE_TYPE).alloc != NULL);
+    test_assert(as_type(REFERENCE_TYPE).dealloc != NULL);
     //test_assert(as_type(FUNCTION_TYPE)->equals != NULL);
 }
 
