@@ -53,7 +53,7 @@ void Function::duplicate(Term* source, Term* dest)
     as_function(dest) = as_function(source);
 }
 
-void remapPointers(Term* term, ReferenceMap &map)
+void Function::remapPointers(Term* term, ReferenceMap const& map)
 {
     Function &func = as_function(term);
     func.inputTypes.remapPointers(map);
@@ -62,7 +62,7 @@ void remapPointers(Term* term, ReferenceMap &map)
     func.subroutineBranch.remapPointers(map);
 }
 
-void visitPointers(Term* term, PointerVisitor &visitor)
+void Function::visitPointers(Term* term, PointerVisitor& visitor)
 {
     Function &func = as_function(term);
     func.inputTypes.visitPointers(visitor);

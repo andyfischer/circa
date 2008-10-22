@@ -116,6 +116,8 @@ void Branch::visitPointers(PointerVisitor& visitor)
 
         virtual void visitPointer(Term* term)
         {
+            if (term == NULL)
+                return;
             if (term->owningBranch != branch)
                 visitor.visitPointer(term);
         }

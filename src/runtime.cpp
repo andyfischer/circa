@@ -291,12 +291,16 @@ void remap_pointers(Term* term, ReferenceMap const& map)
 {
     assert_good(term);
 
+    // make sure this map doesn't try to remap NULL, because such a thing
+    // would almost definitely lead to errors.
+    assert(!map.contains(NULL));
+
     term->inputs.remapPointers(map);
     term->function = map.getRemapped(term->function);
     term->users.remapPointers(map);
     term->users.removeNulls();
 
-    if (as_type(term->type).remapPointers != NULL)
+    if ((term->value != NULL) && (as_type(term->type).remapPointers != NULL))
         as_type(term->type).remapPointers(term, map);
 
     term->type = map.getRemapped(term->type);

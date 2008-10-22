@@ -10,6 +10,11 @@ namespace circa {
 
 void print_term_extended(Term* term, std::ostream &output)
 {
+    if (term == NULL) {
+        output << "<NULL>";
+        return;
+    }
+
     std::string name = term->name;
     std::string funcName = term->function->name;
     std::string typeName = term->type->name;
