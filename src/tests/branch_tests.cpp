@@ -5,6 +5,7 @@
 #include <tests/common.h>
 #include "branch.h"
 #include "builtins.h"
+#include "introspection.h"
 #include "runtime.h"
 #include "term.h"
 
@@ -40,11 +41,22 @@ void test_duplicate()
     test_assert(as_int(term1_duplicate) == 5);
 }
 
+void external_pointers()
+{
+    Branch branch;
+
+    Term* inner_branch = create_var(&branch, BRANCH_TYPE);
+
+    test_assert(list_all_pointers(inner_branch)
+        == ReferenceList(inner_branch->function, inner_branch->type));
+}
+
 } // namespace branch_tests
 
 void register_branch_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
+    REGISTER_TEST_CASE(branch_tests::external_pointers);
 }
 
 } // namespace circa

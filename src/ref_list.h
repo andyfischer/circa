@@ -91,6 +91,19 @@ public:
         return _items[index];
     }
     Term* operator[](unsigned int index) const { return get(index); }
+
+    bool operator==(ReferenceList const& b)
+    {
+        if (count() != b.count())
+            return false;
+
+        for (unsigned int i=0; i < count(); i++)
+            if (get(i) != b.get(i))
+                return false;
+
+        return true;
+    }
+
     void remapPointers(ReferenceMap const& map);
     void visitPointers(PointerVisitor &visitor);
 };
