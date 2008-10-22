@@ -128,7 +128,7 @@ void Branch::visitPointers(PointerVisitor& visitor)
         if (*it == NULL)
             continue;
 
-        Type& type = *as_type((*it)->type);
+        Type& type = as_type((*it)->type);
 
         if (type.visitPointers == NULL)
             continue;
@@ -169,8 +169,8 @@ void duplicate_branch(Branch* source, Branch* dest)
     for (int index=0; index < dest->numTerms(); index++) {
         Term* term = dest->get(index);
         term->inputs.remapPointers(newTermMap);
-        if (as_type(term->type)->remapPointers != NULL)
-            as_type(term->type)->remapPointers(term, newTermMap);
+        if (as_type(term->type).remapPointers != NULL)
+            as_type(term->type).remapPointers(term, newTermMap);
     }
 
     // Copy names

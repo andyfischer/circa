@@ -80,8 +80,8 @@ void
 Type::addMemberFunction(std::string const &name, Term *function)
 {
     // make sure argument 0 of the function matches this type
-    if (as_type(as_function(function).inputTypes[0]) != this)
-        throw std::runtime_error("argument 0 of function doesn't match this type");
+    //if (as_type(as_function(function).inputTypes[0]) != this)
+        //throw std::runtime_error("argument 0 of function doesn't match this type");
 
     this->memberFunctions.bind(function, name);
 }
@@ -109,7 +109,7 @@ struct CompoundValue
         term->value = value;
 
         // create a slot for each field
-        Type& type = *as_type(term->type);
+        Type& type = as_type(term->type);
         int numFields = (int) type.fields.size();
 
         for (int f=0; f < numFields; f++)
@@ -125,7 +125,7 @@ struct CompoundValue
     static void create_compound_type(Term* term)
     {
         std::string name = as_string(term->inputs[0]);
-        Type& output = *as_type(term);
+        Type& output = as_type(term);
 
         output.name = name;
         output.alloc = alloc;
@@ -135,7 +135,7 @@ struct CompoundValue
     static void append_field(Term* term)
     {
         recycle_value(term->inputs[0], term);
-        Type& output = *as_type(term);
+        Type& output = as_type(term);
         as_type(term->inputs[1]);
         Term* fieldType = term->inputs[1];
         std::string fieldName = as_string(term->inputs[2]);
@@ -159,7 +159,7 @@ struct CompoundValue
     {
         CompoundValue &value = as_compound_value(term->inputs[0]);
         std::string fieldName = as_string(term->inputs[1]);
-        Type& type = *as_type(term->inputs[0]->type);
+        Type& type = as_type(term->inputs[0]->type);
 
         int index = type.findField(fieldName);
 
@@ -184,7 +184,7 @@ Term* get_field(Term *term, std::string const& fieldName)
 {
     assert(CompoundValue::is_compound_value(term));
     CompoundValue *value = (CompoundValue*) term->value;
-    Type& type = *as_type(term->type);
+    Type& type = as_type(term->type);
     int index = type.findField(fieldName);
     if (index == -1)
         return NULL;
@@ -207,17 +207,17 @@ bool is_type(Term* term)
     return term->type == TYPE_TYPE;
 }
 
-Type* as_type(Term *term)
+Type& as_type(Term *term)
 {
     assert_type(term, TYPE_TYPE);
     assert(term->value != NULL);
-    return ((Type*) term->value);
+    return *((Type*) term->value);
 }
 
 Term* quick_create_type(Branch* branch, std::string name)
 {
     Term* term = create_var(branch, TYPE_TYPE);
-    as_type(term)->name = name;
+    as_type(term).name = name;
     branch->bindName(term, name);
     return term;
 }
@@ -246,16 +246,16 @@ void change_type(Term *term, Term *typeTerm)
 
     term->type = typeTerm;
 
-    Type *type = as_type(typeTerm);
+    Type& type = as_type(typeTerm);
 
-    if (type->alloc == NULL) {
-        throw std::runtime_error(std::string("type ") + type->name + " has no alloc function");
+    if (type.alloc == NULL) {
+        throw std::runtime_error(std::string("type ") + type.name + " has no alloc function");
     }
 
-    type->alloc(term);
+    type.alloc(term);
 
-    if (type->init != NULL) 
-        type->init(term);
+    if (type.init != NULL) 
+        type.init(term);
 }
 
 void specialize_type(Term *term, Term *type)
@@ -279,10 +279,10 @@ void empty_duplicate_function(Term*,Term*) {}
 Term* create_empty_type(Branch& branch, std::string name)
 {
     Term* term = create_var(&branch, TYPE_TYPE);
-    Type* type = as_type(term);
-    type->alloc = type_private::empty_function;
-    type->dealloc = type_private::empty_function;
-    type->name = name;
+    Type& type = as_type(term);
+    type.alloc = type_private::empty_function;
+    type.dealloc = type_private::empty_function;
+    type.name = name;
     branch.bindName(term, name);
     return term;
 }
@@ -327,12 +327,12 @@ namespace primitives {
 
 std::string Type::to_string(Term *caller)
 {
-    return std::string("<Type " + as_type(caller)->name + ">");
+    return std::string("<Type " + as_type(caller).name + ">");
 }
 
 void Type::typeRemapPointers(Term *term, ReferenceMap const& map)
 {
-    Type &type = *as_type(term);
+    Type &type = as_type(term);
 
     for (unsigned int field_i=0; field_i < type.fields.size(); field_i++) {
         Field &field = type.fields[field_i];
@@ -342,7 +342,7 @@ void Type::typeRemapPointers(Term *term, ReferenceMap const& map)
 
 void Type::typeVisitPointers(Term *term, PointerVisitor &visitor)
 {
-    Type &type = *as_type(term);
+    Type &type = as_type(term);
 
     for (unsigned int field_i=0; field_i < type.fields.size(); field_i++) {
         visitor.visitPointer(type.fields[field_i].type);
@@ -352,36 +352,36 @@ void Type::typeVisitPointers(Term *term, PointerVisitor &visitor)
 void initialize_type_type(Term* typeType)
 {
     typeType->value = new Type();
-    as_type(typeType)->name = "Type";
-    assign_from_cpp_type<Type>(*as_type(typeType));
-    as_type(typeType)->toString = Type::to_string;
+    as_type(typeType).name = "Type";
+    assign_from_cpp_type<Type>(as_type(typeType));
+    as_type(typeType).toString = Type::to_string;
 }
 
 void initialize_primitive_types(Branch* kernel)
 {
     STRING_TYPE = quick_create_cpp_type<std::string>(KERNEL, "string");
-    as_type(STRING_TYPE)->equals = cpp_interface::templated_equals<std::string>;
-    as_type(STRING_TYPE)->toString = primitives::string_t::to_string;
+    as_type(STRING_TYPE).equals = cpp_interface::templated_equals<std::string>;
+    as_type(STRING_TYPE).toString = primitives::string_t::to_string;
 
     INT_TYPE = quick_create_cpp_type<int>(KERNEL, "int");
-    as_type(INT_TYPE)->equals = cpp_interface::templated_equals<int>;
-    as_type(INT_TYPE)->toString = primitives::int_t::to_string;
+    as_type(INT_TYPE).equals = cpp_interface::templated_equals<int>;
+    as_type(INT_TYPE).toString = primitives::int_t::to_string;
 
     FLOAT_TYPE = quick_create_cpp_type<float>(KERNEL, "float");
-    as_type(FLOAT_TYPE)->equals = cpp_interface::templated_equals<float>;
-    as_type(FLOAT_TYPE)->toString = primitives::float_t::to_string;
+    as_type(FLOAT_TYPE).equals = cpp_interface::templated_equals<float>;
+    as_type(FLOAT_TYPE).toString = primitives::float_t::to_string;
 
     BOOL_TYPE = quick_create_cpp_type<bool>(KERNEL, "bool");
-    as_type(BOOL_TYPE)->equals = cpp_interface::templated_equals<bool>;
-    as_type(BOOL_TYPE)->toString = primitives::bool_t::to_string;
+    as_type(BOOL_TYPE).equals = cpp_interface::templated_equals<bool>;
+    as_type(BOOL_TYPE).toString = primitives::bool_t::to_string;
 
     ANY_TYPE = create_empty_type(*KERNEL, "any");
     VOID_TYPE = create_empty_type(*KERNEL, "void");
     REFERENCE_TYPE = quick_create_type(KERNEL, "Reference");
-    as_type(REFERENCE_TYPE)->alloc = ref_type::alloc;
-    as_type(REFERENCE_TYPE)->dealloc = ref_type::dealloc;
-    as_type(REFERENCE_TYPE)->visitPointers = ref_type::visitPointers;
-    as_type(REFERENCE_TYPE)->remapPointers = ref_type::remapPointers;
+    as_type(REFERENCE_TYPE).alloc = ref_type::alloc;
+    as_type(REFERENCE_TYPE).dealloc = ref_type::dealloc;
+    as_type(REFERENCE_TYPE).visitPointers = ref_type::visitPointers;
+    as_type(REFERENCE_TYPE).remapPointers = ref_type::remapPointers;
 }
 
 void initialize_compound_types(Branch* kernel)

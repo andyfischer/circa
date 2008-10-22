@@ -73,7 +73,7 @@ void evaluate_term(Term* term)
     
     // Make sure we have an allocated value. Allocate one if necessary
     if (term->value == NULL) {
-        as_type(term->type)->alloc(term);
+        as_type(term->type).alloc(term);
     }    
 
     try {
@@ -228,9 +228,9 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList const& _input
     // If 'function' is not really a function, see if we can treat it like a function
     else if (!is_function(function)) {
 
-        Type* type = as_type(function->type);
+        Type& type = as_type(function->type);
 
-        if (!type->memberFunctions.contains(""))
+        if (!type.memberFunctions.contains(""))
             throw std::runtime_error(std::string("Term ") + function->toString()
                     + " is not a type, and has no default function");
 
@@ -238,7 +238,7 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList const& _input
         memberFunctionInputs.append(function);
         memberFunctionInputs.appendAll(inputs);
 
-        function = type->memberFunctions[""];
+        function = type.memberFunctions[""];
         inputs = memberFunctionInputs;
     }
 
@@ -283,8 +283,6 @@ void shrink_users(Term* term)
 {
     int numDeleted = 0;
     for (unsigned int user_i=0; user_i < term->users.count(); user_i++) {
-        
-
 
     }
 }
@@ -298,8 +296,8 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     term->users.remapPointers(map);
     term->users.removeNulls();
 
-    if (as_type(term->type)->remapPointers != NULL)
-        as_type(term->type)->remapPointers(term, map);
+    if (as_type(term->type).remapPointers != NULL)
+        as_type(term->type).remapPointers(term, map);
 
     term->type = map.getRemapped(term->type);
 }

@@ -58,8 +58,8 @@ void var_function_generator(Term* caller)
     assert(caller->inputs[0] != NULL);
 
     Function& output = as_function(caller);
-    Type* type = as_type(caller->inputs[0]);
-    output.name = "var-" + type->name;
+    Type& type = as_type(caller->inputs[0]);
+    output.name = "var-" + type.name;
     output.outputType = caller->inputs[0];
     output.evaluate = empty_evaluate_function;
     output.feedbackPropogateFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
@@ -116,8 +116,8 @@ void bootstrap_kernel()
     typeType->function = constTypeFunc;
     typeType->type = typeType;
     initialize_type_type(typeType);
-    as_type(TYPE_TYPE)->remapPointers = Type::typeRemapPointers;
-    as_type(TYPE_TYPE)->visitPointers = Type::typeVisitPointers;
+    as_type(TYPE_TYPE).remapPointers = Type::typeRemapPointers;
+    as_type(TYPE_TYPE).visitPointers = Type::typeVisitPointers;
     KERNEL->bindName(typeType, "Type");
 
     // Implant the Type type
@@ -141,11 +141,11 @@ void bootstrap_kernel()
     FUNCTION_TYPE = functionType;
     functionType->function = constTypeFunc;
     functionType->type = typeType;
-    as_type(typeType)->alloc(functionType);
-    as_type(functionType)->name = "Function";
-    as_type(functionType)->alloc = Function::alloc;
-    as_type(functionType)->duplicate = Function::duplicate;
-    as_type(functionType)->dealloc = Function::dealloc;
+    as_type(typeType).alloc(functionType);
+    as_type(functionType).name = "Function";
+    as_type(functionType).alloc = Function::alloc;
+    as_type(functionType).duplicate = Function::duplicate;
+    as_type(functionType).dealloc = Function::dealloc;
     KERNEL->bindName(functionType, "Function");
 
     // Implant Function type
@@ -322,7 +322,7 @@ void initialize_constants()
 {
     BRANCH_TYPE = quick_create_cpp_type<Branch>(KERNEL, "Branch");
     LIST_TYPE = quick_create_cpp_type<List>(KERNEL, "List");
-    as_type(LIST_TYPE)->toString = List__toString;
+    as_type(LIST_TYPE).toString = List__toString;
 
     VAR_INT = get_var_function(*KERNEL, INT_TYPE);
     VAR_FLOAT = get_var_function(*KERNEL, FLOAT_TYPE);

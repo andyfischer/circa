@@ -17,11 +17,11 @@ void dealloc_value(Term* term)
     if (term->type->value == NULL)
         throw std::runtime_error("type is undefined");
 
-    if (as_type(term->type)->dealloc == NULL)
-        throw std::runtime_error("type " + as_type(term->type)->name
+    if (as_type(term->type).dealloc == NULL)
+        throw std::runtime_error("type " + as_type(term->type).name
             + " has no dealloc function");
 
-    as_type(term->type)->dealloc(term);
+    as_type(term->type).dealloc(term);
     term->value = NULL;
 }
 
@@ -49,10 +49,10 @@ void duplicate_value(Term* source, Term* dest)
 
     assert_type(source, dest->type);
 
-    Type::DuplicateFunc duplicate = as_type(source->type)->duplicate;
+    Type::DuplicateFunc duplicate = as_type(source->type).duplicate;
 
     if (duplicate == NULL)
-        throw std::runtime_error(std::string("type ") + as_type(source->type)->name
+        throw std::runtime_error(std::string("type ") + as_type(source->type).name
                 + " has no duplicate function");
 
     dealloc_value(dest);

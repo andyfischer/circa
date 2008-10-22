@@ -18,7 +18,7 @@ TypeError::message()
     if (!is_type(expectedType))
         throw std::runtime_error("In TypeError: expectedType must be a type");
 
-    std::string expected = as_type(expectedType)->name;
+    std::string expected = as_type(expectedType).name;
 
     if (offendingTerm == NULL)
         return std::string("In TypeError: Term is NULL (expected ") + expected + ")";
@@ -31,8 +31,8 @@ TypeError::message()
         return std::string("The type field of '") + offendingTerm->findName()
             + "' is not a type. (expected " + expected + ")";
 
-    return std::string("TypeError: expected " + as_type(expectedType)->name
-            + ", found " + as_type(offendingTerm->type)->name)
+    return std::string("TypeError: expected " + as_type(expectedType).name
+            + ", found " + as_type(offendingTerm->type).name)
             + " = " + offendingTerm->toString();
 }
 

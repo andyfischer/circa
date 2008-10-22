@@ -89,10 +89,10 @@ Term::~Term()
 std::string
 Term::toString()
 {
-    Type::ToStringFunc func = as_type(this->type)->toString;
+    Type::ToStringFunc func = as_type(this->type).toString;
 
     if (func == NULL) {
-        return std::string("<" + as_type(this->type)->name + " " + findName() + ">");
+        return std::string("<" + as_type(this->type).name + " " + findName() + ">");
     } else {
         return func(this);
     }
@@ -132,7 +132,7 @@ Term::equals(Term* term)
     if (this->type != term->type)
         return false;
 
-    return as_type(this->type)->equals(this, term);
+    return as_type(this->type).equals(this, term);
 }
 
 bool

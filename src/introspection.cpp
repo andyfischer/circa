@@ -42,7 +42,7 @@ ReferenceList list_all_pointers(Term* term)
     result.appendUnique(term->function);
     result.appendUnique(term->type);
 
-    Type& type = *as_type(term);
+    Type& type = as_type(term);
     if (type.visitPointers == NULL)
         std::cout << "warning: visitPointers is null" << std::endl;
     else {
