@@ -67,8 +67,7 @@ void external_pointers()
             function->function,
             FUNCTION_TYPE,
             INT_TYPE,
-            STRING_TYPE,
-            NULL));
+            STRING_TYPE));
 
     function = eval_statement(branch,
             "subroutine-create(\"mysub\",list(float,float),bool)");

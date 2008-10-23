@@ -47,8 +47,8 @@ void external_pointers()
 
     Term* inner_branch = create_var(&branch, BRANCH_TYPE);
 
-    test_assert(list_all_pointers(inner_branch)
-        == ReferenceList(inner_branch->function, inner_branch->type));
+    test_equals(list_all_pointers(inner_branch),
+        ReferenceList(inner_branch->function, inner_branch->type));
 
     Term* inner_int = create_var(&as_branch(inner_branch), INT_TYPE);
     Term* inner_add = apply_function(as_branch(inner_branch), ADD_FUNC,
@@ -57,24 +57,32 @@ void external_pointers()
     // make sure that the pointer from inner_add to inner_int does
     // not show up in list_all_pointers.
 
-    test_assert(list_all_pointers(inner_branch) == ReferenceList(
+    //print_terms(list_all_pointers(inner_branch), std::cout);
+
+    test_equals(list_all_pointers(inner_branch), ReferenceList(
                 inner_branch->function,
                 inner_branch->type,
                 INT_TYPE,
                 VAR_FUNCTION_GENERATOR, // temp
-                ADD_FUNC));
+                FUNCTION_TYPE,
+                ADD_FUNC,
+                FLOAT_TYPE));
 
     ReferenceMap myRemap;
     myRemap[ADD_FUNC] = MULT_FUNC;
 
     remap_pointers(inner_branch, myRemap);
 
+    //print_terms(list_all_pointers(inner_branch), std::cout);
+
     test_assert(list_all_pointers(inner_branch) == ReferenceList(
                 inner_branch->function,
                 inner_branch->type,
                 INT_TYPE,
                 VAR_FUNCTION_GENERATOR, // temp
-                MULT_FUNC));
+                FUNCTION_TYPE,
+                MULT_FUNC,
+                FLOAT_TYPE));
 
     test_assert(inner_add->function == MULT_FUNC);
 }

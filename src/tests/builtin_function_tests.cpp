@@ -5,6 +5,7 @@
 #include <tests/common.h>
 #include "branch.h"
 #include "builtins.h"
+#include "introspection.h"
 #include "parser.h"
 #include "runtime.h"
 #include "term.h"
@@ -83,6 +84,38 @@ void test_bool()
     test_assert(as_string(eval_statement(branch, "if-expr(false, 'a, 'b)")) == "b");
 }
 
+void test_reference()
+{
+    Branch branch;
+
+    Term* myref = create_var(&branch, REFERENCE_TYPE);
+    Term* a = create_var(&branch, INT_TYPE);
+    Term* b = create_var(&branch, INT_TYPE);
+
+    as_ref(myref) = a;
+
+    test_equals(list_all_pointers(myref),
+        ReferenceList(myref->function, REFERENCE_TYPE, a));
+
+    ReferenceMap myMap;
+    myMap[a] = b;
+
+    remap_pointers(myref, myMap);
+
+    test_assert(as_ref(myref) == b);
+
+    test_equals(list_all_pointers(myref),
+        ReferenceList(myref->function, REFERENCE_TYPE, b));
+
+    myMap[b] = NULL;
+    remap_pointers(myref, myMap);
+
+    test_assert(as_ref(myref) == NULL);
+
+    test_equals(list_all_pointers(myref),
+        ReferenceList(myref->function, REFERENCE_TYPE));
+}
+
 } // namespace builtin_function_tests
 
 void register_builtin_function_tests()
@@ -92,6 +125,7 @@ void register_builtin_function_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_math);
     REGISTER_TEST_CASE(builtin_function_tests::test_string);
     REGISTER_TEST_CASE(builtin_function_tests::test_bool);
+    REGISTER_TEST_CASE(builtin_function_tests::test_reference);
 }
 
 } // namespace circa
