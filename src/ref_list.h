@@ -41,6 +41,34 @@ public:
         _items.push_back(term4);
         _items.push_back(term5);
     }
+    ReferenceList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5, Term* term6) {
+        _items.push_back(term1);
+        _items.push_back(term2);
+        _items.push_back(term3);
+        _items.push_back(term4);
+        _items.push_back(term5);
+        _items.push_back(term6);
+    }
+    ReferenceList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5, Term* term6, Term* term7) {
+        _items.push_back(term1);
+        _items.push_back(term2);
+        _items.push_back(term3);
+        _items.push_back(term4);
+        _items.push_back(term5);
+        _items.push_back(term6);
+        _items.push_back(term7);
+    }
+    ReferenceList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5, Term* term6, Term* term7, Term* term8) {
+        _items.push_back(term1);
+        _items.push_back(term2);
+        _items.push_back(term3);
+        _items.push_back(term4);
+        _items.push_back(term5);
+        _items.push_back(term6);
+        _items.push_back(term7);
+        _items.push_back(term8);
+    }
+
 
     size_t count() const { return _items.size(); }
     void append(Term* term)
