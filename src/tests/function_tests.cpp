@@ -69,6 +69,20 @@ void external_pointers()
             INT_TYPE,
             STRING_TYPE,
             NULL));
+
+    function = eval_statement(branch,
+            "subroutine-create(\"mysub\",list(float,float),bool)");
+
+    test_equals(list_all_pointers(function), ReferenceList(
+            function->inputs[0],
+            function->inputs[1], // a list of (float,float)
+            BOOL_TYPE,
+            KERNEL->findNamed("subroutine-create"),
+            FUNCTION_TYPE,
+            FLOAT_TYPE,
+            BRANCH_TYPE,
+            function->inputs[1]->function->function->function // This is crazy
+            ));
 }
 
 } // namespace function_tests
