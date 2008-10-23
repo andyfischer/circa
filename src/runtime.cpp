@@ -312,6 +312,7 @@ void visit_pointers(Term* term, PointerVisitor &visitor)
 
     term->inputs.visitPointers(visitor);
     visitor.visitPointer(term->function);
+    visitor.visitPointer(term->type);
     term->users.visitPointers(visitor);
 
     if (type.visitPointers != NULL)

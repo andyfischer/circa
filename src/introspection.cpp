@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "runtime.h"
 #include "term.h"
 #include "type.h"
 
@@ -47,31 +48,19 @@ ReferenceList list_all_pointers(Term* term)
 {
     ReferenceList result;
 
-    for (unsigned int input_i=0; input_i < term->inputs.count(); input_i++) {
-        result.appendUnique(term->inputs[input_i]);
-    }
+    struct AppendPointersToList : PointerVisitor
+    {
+        ReferenceList& list;
+        AppendPointersToList(ReferenceList &_list) : list(_list) {}
 
-    result.appendUnique(term->function);
-    result.appendUnique(term->type);
-
-    Type& type = as_type(term->type);
-    if (type.visitPointers == NULL)
-        std::cout << "warning: visitPointers is null on " << type.name << std::endl;
-    else {
-        struct AppendPointersToList : PointerVisitor
-        {
-            ReferenceList& list;
-            AppendPointersToList(ReferenceList &_list) : list(_list) {}
-
-            virtual void visitPointer(Term* term) {
+        virtual void visitPointer(Term* term) {
+            if (term != NULL)
                 list.appendUnique(term);
-            }
-        };
+        }
+    };
 
-        AppendPointersToList visitor(result);
-
-        type.visitPointers(term, visitor);
-    }
+    AppendPointersToList visitor(result);
+    visit_pointers(term, visitor);
 
     return result;
 }
