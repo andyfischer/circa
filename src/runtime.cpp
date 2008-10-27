@@ -137,9 +137,6 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
 
     term->function = function;
 
-    // Add to users of function
-    function->users.appendUnique(term);
-    
     Function& functionData = as_function(function);
 
     Term* outputType = functionData.outputType;
@@ -178,15 +175,6 @@ void set_inputs(Term* term, ReferenceList const& inputs)
     assert_good(term);
 
     term->inputs = inputs;
-
-    for (unsigned int i=0; i < inputs.count(); i++)
-    {
-        Term* inputTerm = inputs[i];
-        if (inputTerm != NULL) {
-            assert_good(inputTerm);
-            inputTerm->users.appendUnique(term);
-        }
-    }
 }
 
 void set_input(Term* term, int index, Term* input)
@@ -194,11 +182,6 @@ void set_input(Term* term, int index, Term* input)
     assert_good(term);
 
     term->inputs.setAt(index, input);
-
-    if (input != NULL) {
-        assert_good(input);
-        input->users.appendUnique(term);
-    }
 }
 
 Term* create_var(Branch* branch, Term* type)
@@ -278,15 +261,6 @@ void change_function(Term* term, Term* new_function)
     term->function = new_function;
 }
 
-
-void shrink_users(Term* term)
-{
-    int numDeleted = 0;
-    for (unsigned int user_i=0; user_i < term->users.count(); user_i++) {
-
-    }
-}
-
 void remap_pointers(Term* term, ReferenceMap const& map)
 {
     assert_good(term);
@@ -297,8 +271,6 @@ void remap_pointers(Term* term, ReferenceMap const& map)
 
     term->inputs.remapPointers(map);
     term->function = map.getRemapped(term->function);
-    term->users.remapPointers(map);
-    term->users.removeNulls();
 
     if ((term->value != NULL) && (as_type(term->type).remapPointers != NULL))
         as_type(term->type).remapPointers(term, map);
@@ -313,7 +285,6 @@ void visit_pointers(Term* term, PointerVisitor &visitor)
     term->inputs.visitPointers(visitor);
     visitor.visitPointer(term->function);
     visitor.visitPointer(term->type);
-    term->users.visitPointers(visitor);
 
     if (type.visitPointers != NULL)
         type.visitPointers(term, visitor);
@@ -353,6 +324,7 @@ bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs)
 
 Term* find_equivalent_existing(Term* function, ReferenceList const& inputs)
 {
+    /*
     for (unsigned int inputIndex=0; inputIndex < inputs.count(); inputIndex++) {
         Term* input = inputs[inputIndex];
 
@@ -369,6 +341,7 @@ Term* find_equivalent_existing(Term* function, ReferenceList const& inputs)
                 return user;
         }
     }
+    */
 
     return NULL;
 }

@@ -131,6 +131,15 @@ public:
             return NULL;
         return _items[index];
     }
+
+    bool contains(Term* term) const
+    {
+        for (unsigned int i=0; i < count(); i++)
+            if (get(i) == term)
+                return true;
+        return false;
+    }
+
     Term* operator[](unsigned int index) const { return get(index); }
 
     bool operator==(ReferenceList const& b)

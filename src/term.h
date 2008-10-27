@@ -24,9 +24,6 @@ struct Term
     ReferenceList inputs;
     Term* function;
 
-    // Terms that are using us
-    ReferenceList users;
-
     // data type
     Term* type;
 

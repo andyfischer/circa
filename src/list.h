@@ -23,6 +23,7 @@ public:
     int count() const { return items.count(); }
     Term* get(int index) const { return items.get(index); }
     Term* operator[] (int index) const{ return this->get(index); }
+
     Term* append(Term* term);
     Term* appendSlot(Term* type);
 
