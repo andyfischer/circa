@@ -67,6 +67,12 @@ ReferenceList list_all_pointers(Term* term)
 
 bool is_using(Term* user, Term* usee)
 {
+    assert_good(user);
+    assert_good(usee);
+    if (user->inputs.contains(usee))
+        return true;
+    if (user->function == usee)
+        return true;
 
     return false;
 }
