@@ -57,8 +57,6 @@ void external_pointers()
     // make sure that the pointer from inner_add to inner_int does
     // not show up in list_all_pointers.
 
-    //print_terms(list_all_pointers(inner_branch), std::cout);
-
     test_equals(list_all_pointers(inner_branch), ReferenceList(
                 inner_branch->function,
                 inner_branch->type,
@@ -72,8 +70,6 @@ void external_pointers()
     myRemap[ADD_FUNC] = MULT_FUNC;
 
     remap_pointers(inner_branch, myRemap);
-
-    //print_terms(list_all_pointers(inner_branch), std::cout);
 
     test_assert(list_all_pointers(inner_branch) == ReferenceList(
                 inner_branch->function,
