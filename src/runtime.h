@@ -15,6 +15,9 @@ void set_inputs(Term* term, ReferenceList const& inputs);
 Term* create_var(Branch* branch, Term* type);
 void set_input(Term* term, int index, Term* input);
 
+// Call this whenever the term 'pointer' is modified to point at 'pointee'
+void register_pointer(Term* pointer, Term* pointee);
+
 // Examine 'function' and 'inputs' and returns a result term. A few things
 // may happen here:
 //  1. We might re-use an existing term

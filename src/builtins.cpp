@@ -100,6 +100,7 @@ void bootstrap_kernel()
 
     // Create var-function-generator function
     VAR_FUNCTION_GENERATOR = new Term();
+    VAR_FUNCTION_GENERATOR->owningBranch = KERNEL;
     Function::alloc(VAR_FUNCTION_GENERATOR);
     as_function(VAR_FUNCTION_GENERATOR).name = "var-function-generator";
     as_function(VAR_FUNCTION_GENERATOR).pureFunction = true;
@@ -108,28 +109,30 @@ void bootstrap_kernel()
 
     // Create const-Type function
     Term* constTypeFunc = new Term();
+    constTypeFunc->owningBranch = KERNEL;
     constTypeFunc->function = VAR_FUNCTION_GENERATOR;
     Function::alloc(constTypeFunc);
     as_function(constTypeFunc).name = "const-Type";
     as_function(constTypeFunc).pureFunction = true;
 
     // Create Type type
-    Term* typeType = new Term();
-    TYPE_TYPE = typeType;
-    typeType->function = constTypeFunc;
-    typeType->type = typeType;
-    initialize_type_type(typeType);
+    TYPE_TYPE = new Term();
+    TYPE_TYPE->owningBranch = KERNEL;
+    TYPE_TYPE->function = constTypeFunc;
+    TYPE_TYPE->type = TYPE_TYPE;
+    initialize_type_type(TYPE_TYPE);
     as_type(TYPE_TYPE).remapPointers = Type::typeRemapPointers;
     as_type(TYPE_TYPE).visitPointers = Type::typeVisitPointers;
-    KERNEL->bindName(typeType, "Type");
+    KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Implant the Type type
-    set_input(constTypeFunc, 0, typeType);
-    as_function(VAR_FUNCTION_GENERATOR).inputTypes.setAt(0, typeType);
-    as_function(constTypeFunc).outputType = typeType;
+    set_input(constTypeFunc, 0, TYPE_TYPE);
+    as_function(VAR_FUNCTION_GENERATOR).inputTypes.setAt(0, TYPE_TYPE);
+    as_function(constTypeFunc).outputType = TYPE_TYPE;
 
     // Create const-Function function
     Term* constFuncFunc = new Term();
+    constFuncFunc->owningBranch = KERNEL;
     constFuncFunc->function = VAR_FUNCTION_GENERATOR;
     Function::alloc(constFuncFunc);
     as_function(constFuncFunc).name = "const-Function";
@@ -140,34 +143,34 @@ void bootstrap_kernel()
     VAR_FUNCTION_GENERATOR->function = constFuncFunc;
 
     // Create Function type
-    Term* functionType = new Term();
-    FUNCTION_TYPE = functionType;
-    functionType->function = constTypeFunc;
-    functionType->type = typeType;
-    as_type(typeType).alloc(functionType);
-    as_type(functionType).name = "Function";
-    as_type(functionType).alloc = Function::alloc;
-    as_type(functionType).duplicate = Function::duplicate;
-    as_type(functionType).dealloc = Function::dealloc;
-    as_type(functionType).remapPointers = Function::remapPointers;
-    as_type(functionType).visitPointers = Function::visitPointers;
-    KERNEL->bindName(functionType, "Function");
+    FUNCTION_TYPE = new Term();
+    FUNCTION_TYPE->owningBranch = KERNEL;
+    FUNCTION_TYPE->function = constTypeFunc;
+    FUNCTION_TYPE->type = TYPE_TYPE;
+    as_type(TYPE_TYPE).alloc(FUNCTION_TYPE);
+    as_type(FUNCTION_TYPE).name = "Function";
+    as_type(FUNCTION_TYPE).alloc = Function::alloc;
+    as_type(FUNCTION_TYPE).duplicate = Function::duplicate;
+    as_type(FUNCTION_TYPE).dealloc = Function::dealloc;
+    as_type(FUNCTION_TYPE).remapPointers = Function::remapPointers;
+    as_type(FUNCTION_TYPE).visitPointers = Function::visitPointers;
+    KERNEL->bindName(FUNCTION_TYPE, "Function");
 
     // Implant Function type
-    set_input(VAR_FUNCTION_GENERATOR, 0, typeType);
-    set_input(constFuncFunc, 0, functionType);
-    VAR_FUNCTION_GENERATOR->type = functionType;
-    constFuncFunc->type = functionType;
-    constTypeFunc->type = functionType;
-    as_function(VAR_FUNCTION_GENERATOR).outputType = functionType;
-    as_function(constFuncFunc).outputType = functionType;
+    set_input(VAR_FUNCTION_GENERATOR, 0, TYPE_TYPE);
+    set_input(constFuncFunc, 0, FUNCTION_TYPE);
+    VAR_FUNCTION_GENERATOR->type = FUNCTION_TYPE;
+    constFuncFunc->type = FUNCTION_TYPE;
+    constTypeFunc->type = FUNCTION_TYPE;
+    as_function(VAR_FUNCTION_GENERATOR).outputType = FUNCTION_TYPE;
+    as_function(constFuncFunc).outputType = FUNCTION_TYPE;
 
     // Don't let these terms get updated
     VAR_FUNCTION_GENERATOR->needsUpdate = false;
     constFuncFunc->needsUpdate = false;
     constTypeFunc->needsUpdate = false;
-    functionType->needsUpdate = false;
-    typeType->needsUpdate = false;
+    FUNCTION_TYPE->needsUpdate = false;
+    TYPE_TYPE->needsUpdate = false;
 }
 
 void print__evaluate(Term* caller)
