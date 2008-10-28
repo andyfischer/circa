@@ -63,6 +63,7 @@ void var_function_generator(Term* caller)
     Type& type = as_type(caller->inputs[0]);
     output.name = "var-" + type.name;
     output.outputType = caller->inputs[0];
+    output.pureFunction = false;
     output.evaluate = empty_evaluate_function;
     output.feedbackPropogateFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
 }
@@ -210,6 +211,7 @@ namespace add_function {
     {
         ADD_FUNC = quick_create_function(kernel, "add", evaluate,
             ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
+        as_function(ADD_FUNC).pureFunction = true;
 
         Term* fp_func =
             quick_create_function(kernel, "add-feedback-propogate",

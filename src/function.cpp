@@ -16,6 +16,7 @@ Function::Function()
   : outputType(NULL),
     stateType(NULL),
     pureFunction(false),
+    hasSideEffects(false),
     variableArgs(false),
     initialize(NULL),
     evaluate(NULL),
