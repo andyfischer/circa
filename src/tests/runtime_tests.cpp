@@ -3,6 +3,7 @@
 #include "tests/common.h"
 #include "branch.h"
 #include "builtins.h"
+#include "introspection.h"
 #include "parser.h"
 #include "runtime.h"
 #include "term.h"
@@ -76,9 +77,9 @@ void test_find_existing_equivalent()
 
     test_assert(is_equivalent(addition, add_func, ReferenceList(a,b)));
 
-    test_assert(addition == find_equivalent_existing(add_func, ReferenceList(a,b)));
+    test_assert(addition == find_equivalent(add_func, ReferenceList(a,b)));
 
-    test_assert(NULL == find_equivalent_existing(add_func, ReferenceList(b,a)));
+    test_assert(NULL == find_equivalent(add_func, ReferenceList(b,a)));
 }
 
 } // namespace runtime_tests
