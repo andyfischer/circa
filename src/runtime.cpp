@@ -299,6 +299,9 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     assert(!map.contains(NULL));
 
     term->inputs.remapPointers(map);
+    for (unsigned int i=0; i < term->inputs.count(); i++)
+        register_pointer(term, term->inputs[i]);
+
     term->function = map.getRemapped(term->function);
     register_pointer(term, term->function);
 
