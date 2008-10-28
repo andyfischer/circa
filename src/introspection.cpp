@@ -89,10 +89,20 @@ void check_pointers(Term* term)
     }
 }
 
+bool function_allows_term_reuse(Function &function)
+{
+    if (function.stateType != VOID_TYPE)
+        return false;
+
+    if (!function.pureFunction)
+        return false;
+
+    return true;
+}
+
 bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs)
 {
-    // If this function has state, then always return false
-    if (as_function(function).stateType != VOID_TYPE)
+    if (!function_allows_term_reuse(as_function(function)))
         return false;
 
     // Check inputs
@@ -114,7 +124,7 @@ Term* find_equivalent(Branch &branch, Term* function, ReferenceList const& input
 {
     // This step is inefficient because we check every term in the branch.
     // Will improve in the future.
-    for (unsigned int i=0; i < branch.numTerms(); i++) {
+    for (int i=0; i < branch.numTerms(); i++) {
         Term *term = branch[i];
         if (is_equivalent(term, function, inputs))
             return term;
@@ -124,16 +134,25 @@ Term* find_equivalent(Branch &branch, Term* function, ReferenceList const& input
 
 Term* find_equivalent(Term* function, ReferenceList const& inputs)
 {
+    if (!function_allows_term_reuse(as_function(function)))
+        return false;
+
     Term* term = NULL;
 
-    term = find_equivalent(*function->owningBranch, function, inputs);
+    if (function->owningBranch != NULL)
+        term = find_equivalent(*function->owningBranch, function, inputs);
     if (term != NULL)
         return term;
 
     // This step is inefficient because we check the owning branch of
     // every input, which may check some branches multiple times.
     for (unsigned int i=0; i < inputs.count(); i++) {
-        term = find_equivalent(*inputs[i]->owningBranch, function, inputs);
+        if (inputs[i] == NULL)
+            continue;
+
+        Branch* branch = inputs[i]->owningBranch;
+        if (branch != NULL)
+            term = find_equivalent(*branch, function, inputs);
         if (term != NULL)
             return term;
     }

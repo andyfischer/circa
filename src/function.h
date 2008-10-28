@@ -21,6 +21,7 @@ struct Function
     Term* stateType;
 
     bool pureFunction;
+    bool hasSideEffects;
     bool variableArgs;
 
     std::string name;

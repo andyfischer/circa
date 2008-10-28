@@ -2,6 +2,7 @@
 
 #include "branch.h"
 #include "errors.h"
+#include "introspection.h"
 #include "runtime.h"
 #include "function.h"
 #include "parser.h"
@@ -226,10 +227,10 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList const& _input
     }
 
     // Attempt to re-use an existing term
-    //Term* existing = find_equivalent_existing(function, inputs);
+    Term* existing = find_equivalent(function, inputs);
 
-    //if (existing != NULL)
-        //return existing;
+    if (existing != NULL)
+        return existing;
 
     // Create the term
     return create_term(&branch, function, inputs);
@@ -289,7 +290,6 @@ void visit_pointers(Term* term, PointerVisitor &visitor)
     if (type.visitPointers != NULL)
         type.visitPointers(term, visitor);
 }
-
 
 void remap_pointers(Term* term, Term* original, Term* replacement)
 {
