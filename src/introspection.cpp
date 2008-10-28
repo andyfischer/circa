@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "function.h"
 #include "runtime.h"
 #include "term.h"
 #include "type.h"
@@ -87,5 +88,58 @@ void check_pointers(Term* term)
         }
     }
 }
+
+bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs)
+{
+    // If this function has state, then always return false
+    if (as_function(function).stateType != VOID_TYPE)
+        return false;
+
+    // Check inputs
+    unsigned int numInputs = target->inputs.count();
+
+    if (numInputs != inputs.count())
+        return false;
+
+    for (unsigned int i=0; i < numInputs; i++) {
+        if (target->inputs[i] != inputs[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+Term* find_equivalent(Branch &branch, Term* function, ReferenceList const& inputs)
+{
+    // This step is inefficient because we check every term in the branch.
+    // Will improve in the future.
+    for (unsigned int i=0; i < branch.numTerms(); i++) {
+        Term *term = branch[i];
+        if (is_equivalent(term, function, inputs))
+            return term;
+    }
+    return NULL;
+}
+
+Term* find_equivalent(Term* function, ReferenceList const& inputs)
+{
+    Term* term = NULL;
+
+    term = find_equivalent(*function->owningBranch, function, inputs);
+    if (term != NULL)
+        return term;
+
+    // This step is inefficient because we check the owning branch of
+    // every input, which may check some branches multiple times.
+    for (unsigned int i=0; i < inputs.count(); i++) {
+        term = find_equivalent(*inputs[i]->owningBranch, function, inputs);
+        if (term != NULL)
+            return term;
+    }
+
+    return NULL;
+}
+
 
 } // namespace circa

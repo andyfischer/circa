@@ -301,49 +301,4 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
     remap_pointers(term, map);
 }
 
-bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs)
-{
-    // If this function has state, then always return false
-    if (as_function(function).stateType != VOID_TYPE)
-        return false;
-
-    // Check inputs
-    unsigned int numInputs = target->inputs.count();
-
-    if (numInputs != inputs.count())
-        return false;
-
-    for (unsigned int i=0; i < numInputs; i++) {
-        if (target->inputs[i] != inputs[i]) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-Term* find_equivalent_existing(Term* function, ReferenceList const& inputs)
-{
-    /*
-    for (unsigned int inputIndex=0; inputIndex < inputs.count(); inputIndex++) {
-        Term* input = inputs[inputIndex];
-
-        if (input == NULL)
-            continue;
-
-        unsigned int numUsers = input->users.count();
-        for (unsigned int userIndex=0; userIndex < numUsers; userIndex++) {
-            Term* user = input->users[userIndex];
-
-            assert_good(user);
-
-            if (is_equivalent(user, function, inputs))
-                return user;
-        }
-    }
-    */
-
-    return NULL;
-}
-
 } // namespace circa
