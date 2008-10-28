@@ -80,6 +80,14 @@ void test_find_existing_equivalent()
     test_assert(addition == find_equivalent(add_func, ReferenceList(a,b)));
 
     test_assert(NULL == find_equivalent(add_func, ReferenceList(b,a)));
+
+    Term* another_addition = eval_statement(branch, "add(a,b)");
+
+    test_assert(addition == another_addition);
+
+    Term* a_different_addition = eval_statement(branch, "add(b,a)");
+
+    test_assert(addition != a_different_addition);
 }
 
 } // namespace runtime_tests
