@@ -32,16 +32,14 @@ namespace add_function {
 
         evaluate_branch(myBranch);
     }
-    static void setup(Branch* kernel)
+    static void setup(Branch& kernel)
     {
-        ADD_FUNC = quick_create_function(kernel, "add", evaluate,
-            ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
+        ADD_FUNC = import_c_function(kernel, evaluate,
+                "function add(float, float) -> float");
         as_function(ADD_FUNC).pureFunction = true;
 
-        Term* fp_func =
-            quick_create_function(kernel, "add-feedback-propogate",
-                feedback_propogate,
-                ReferenceList(ANY_TYPE, ANY_TYPE), VOID_TYPE);
+        Term* fp_func = import_c_function(kernel, feedback_propogate,
+                "function add-feedback-propogate(any,any)");
         as_function(fp_func).stateType = BRANCH_TYPE;
 
         as_function(ADD_FUNC).feedbackPropogateFunction = fp_func;
