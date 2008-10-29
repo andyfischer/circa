@@ -1,3 +1,5 @@
+// Copyright 2008 Andrew Fischer
+
 #ifndef CIRCA_EVALUATOR_INCLUDED
 #define CIRCA_EVALUATOR_INCLUDED
 
