@@ -175,13 +175,14 @@ void bootstrap_kernel()
 
 #include "builtin_functions/add.cpp"
 #include "builtin_functions/if_expr.cpp"
+#include "builtin_functions/read_text_file.cpp"
 #include "builtin_functions/write_text_file.cpp"
+#include "builtin_functions/to_string.cpp"
 
 void print__evaluate(Term* caller)
 {
     std::cout << as_string(caller->inputs[0]) << std::endl;
 }
-
 
 void mult__evaluate(Term* caller)
 {
@@ -192,7 +193,6 @@ void string_concat__evaluate(Term* caller)
 {
     as_string(caller) = as_string(caller->inputs[0]) + as_string(caller->inputs[1]);
 }
-
 
 void range__evaluate(Term* caller)
 {
@@ -225,30 +225,6 @@ void list_apply__evaluate(Term* caller)
 
         as_list(caller).append(result);
     }
-}
-
-void read_text_file__evaluate(Term* caller)
-{
-    std::string filename = as_string(caller->inputs[0]);
-    std::ifstream file;
-    file.open(filename.c_str(), std::ios::in);
-    std::stringstream contents;
-    std::string line;
-    bool firstLine = true;
-    while (std::getline(file, line)) {
-        if (!firstLine)
-            contents << "\n";
-        contents << line;
-        firstLine = false;
-    }
-    file.close();
-    as_string(caller) = contents.str();
-}
-
-
-void to_string__evaluate(Term* caller)
-{
-    as_string(caller) = caller->inputs[0]->toString();
 }
 
 void unknown_function__evaluate(Term* caller)
@@ -298,7 +274,9 @@ void initialize_builtin_functions(Branch* kernel)
 {
     add_function::setup(*kernel);
     if_expr_function::setup(*kernel);
+    read_text_file_function::setup(*kernel);
     write_text_file_function::setup(*kernel);
+    to_string_function::setup(*kernel);
     MULT_FUNC = quick_create_function(kernel, "mult", mult__evaluate,
             ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
     quick_create_function(kernel, "concat", string_concat__evaluate, ReferenceList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
@@ -306,10 +284,6 @@ void initialize_builtin_functions(Branch* kernel)
     quick_create_function(kernel, "range", range__evaluate, ReferenceList(INT_TYPE), LIST_TYPE);
     quick_create_function(kernel, "list-append", list_append__evaluate, ReferenceList(LIST_TYPE, ANY_TYPE), LIST_TYPE);
     quick_create_function(kernel, "list-apply", list_apply__evaluate, ReferenceList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
-    quick_create_function(kernel, "read-text-file", read_text_file__evaluate,
-            ReferenceList(STRING_TYPE), STRING_TYPE);
-    quick_create_function(kernel, "to-string", to_string__evaluate,
-        ReferenceList(ANY_TYPE), STRING_TYPE);
     UNKNOWN_FUNCTION = quick_create_function(kernel, "unknown-function",
             unknown_function__evaluate,
             ReferenceList(ANY_TYPE), ANY_TYPE);
