@@ -173,58 +173,14 @@ void bootstrap_kernel()
     TYPE_TYPE->needsUpdate = false;
 }
 
+#include "builtin_functions/add.cpp"
+#include "builtin_functions/if_expr.cpp"
+
 void print__evaluate(Term* caller)
 {
     std::cout << as_string(caller->inputs[0]) << std::endl;
 }
 
-namespace add_function {
-
-    void evaluate(Term* caller)
-    {
-        as_float(caller) = as_float(caller->inputs[0]) + as_float(caller->inputs[1]);
-    }
-    void feedback_propogate(Term* caller)
-    {
-        Term* target = caller->inputs[0];
-        Term* desired = caller->inputs[1];
-        Branch& myBranch = as_branch(caller->state);
-        myBranch.clear();
-
-        // for now, send 1/n of the delta to each input
-        float delta = as_float(desired) - as_float(target);
-
-        int numInputs = target->inputs.count();
-
-        if (numInputs == 0)
-            return;
-
-        for (int i=0; i < numInputs; i++) {
-            float inputDelta = delta / numInputs;
-
-            Term* input = target->inputs[i];
-
-            apply_function(myBranch, APPLY_FEEDBACK,
-                ReferenceList(input, float_var(myBranch, as_float(input) + inputDelta)));
-        }
-
-        evaluate_branch(myBranch);
-    }
-    static void setup(Branch* kernel)
-    {
-        ADD_FUNC = quick_create_function(kernel, "add", evaluate,
-            ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
-        as_function(ADD_FUNC).pureFunction = true;
-
-        Term* fp_func =
-            quick_create_function(kernel, "add-feedback-propogate",
-                feedback_propogate,
-                ReferenceList(ANY_TYPE, ANY_TYPE), VOID_TYPE);
-        as_function(fp_func).stateType = BRANCH_TYPE;
-
-        as_function(ADD_FUNC).feedbackPropogateFunction = fp_func;
-    }
-}
 
 void mult__evaluate(Term* caller)
 {
@@ -236,13 +192,6 @@ void string_concat__evaluate(Term* caller)
     as_string(caller) = as_string(caller->inputs[0]) + as_string(caller->inputs[1]);
 }
 
-void if_expr__evaluate(Term* caller)
-{
-    int index = as_bool(caller->inputs[0]) ? 1 : 2;
-    Term *result = caller->inputs[index];
-    change_type(caller, result->type);
-    recycle_value(caller->inputs[index], caller);
-}
 
 void range__evaluate(Term* caller)
 {
@@ -356,12 +305,11 @@ void initialize_constants()
 void initialize_builtin_functions(Branch* kernel)
 {
     add_function::setup(kernel);
+    if_expr_function::setup(kernel);
     MULT_FUNC = quick_create_function(kernel, "mult", mult__evaluate,
             ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
     quick_create_function(kernel, "concat", string_concat__evaluate, ReferenceList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
     quick_create_function(kernel, "print", print__evaluate, ReferenceList(STRING_TYPE), VOID_TYPE);
-    quick_create_function(kernel, "if-expr", if_expr__evaluate,
-        ReferenceList(BOOL_TYPE, ANY_TYPE, ANY_TYPE), ANY_TYPE);
     quick_create_function(kernel, "range", range__evaluate, ReferenceList(INT_TYPE), LIST_TYPE);
     quick_create_function(kernel, "list-append", list_append__evaluate, ReferenceList(LIST_TYPE, ANY_TYPE), LIST_TYPE);
     quick_create_function(kernel, "list-apply", list_apply__evaluate, ReferenceList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);

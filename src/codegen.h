@@ -10,7 +10,7 @@
 namespace circa {
 
 void generate_cpp_code(Term* term, OutputStream& output);
-
+void initialize_codegen_functions(Branch& kernel);
 
 }
 
