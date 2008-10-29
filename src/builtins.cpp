@@ -175,6 +175,7 @@ void bootstrap_kernel()
 
 #include "builtin_functions/add.cpp"
 #include "builtin_functions/if_expr.cpp"
+#include "builtin_functions/write_text_file.cpp"
 
 void print__evaluate(Term* caller)
 {
@@ -244,15 +245,6 @@ void read_text_file__evaluate(Term* caller)
     as_string(caller) = contents.str();
 }
 
-void write_text_file__evaluate(Term* caller)
-{
-    std::string filename = as_string(caller->inputs[0]);
-    std::string contents = as_string(caller->inputs[1]);
-    std::ofstream file;
-    file.open(filename.c_str(), std::ios::out);
-    file << contents;
-    file.close();
-}
 
 void to_string__evaluate(Term* caller)
 {
@@ -304,8 +296,9 @@ void initialize_constants()
 
 void initialize_builtin_functions(Branch* kernel)
 {
-    add_function::setup(kernel);
-    if_expr_function::setup(kernel);
+    add_function::setup(*kernel);
+    if_expr_function::setup(*kernel);
+    write_text_file_function::setup(*kernel);
     MULT_FUNC = quick_create_function(kernel, "mult", mult__evaluate,
             ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
     quick_create_function(kernel, "concat", string_concat__evaluate, ReferenceList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
@@ -315,8 +308,6 @@ void initialize_builtin_functions(Branch* kernel)
     quick_create_function(kernel, "list-apply", list_apply__evaluate, ReferenceList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
     quick_create_function(kernel, "read-text-file", read_text_file__evaluate,
             ReferenceList(STRING_TYPE), STRING_TYPE);
-    quick_create_function(kernel, "write-text-file", write_text_file__evaluate,
-            ReferenceList(STRING_TYPE, STRING_TYPE), VOID_TYPE);
     quick_create_function(kernel, "to-string", to_string__evaluate,
         ReferenceList(ANY_TYPE), STRING_TYPE);
     UNKNOWN_FUNCTION = quick_create_function(kernel, "unknown-function",

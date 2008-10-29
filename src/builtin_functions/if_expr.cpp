@@ -10,9 +10,9 @@ namespace if_expr_function {
         recycle_value(caller->inputs[index], caller);
     }
 
-    void setup(Branch *kernel)
+    void setup(Branch &kernel)
     {
-        quick_create_function(kernel, "if-expr", evaluate,
-            ReferenceList(BOOL_TYPE, ANY_TYPE, ANY_TYPE), ANY_TYPE);
+        import_c_function(kernel, evaluate,
+                "function if-expr(bool, any, any) -> any");
     }
 }
