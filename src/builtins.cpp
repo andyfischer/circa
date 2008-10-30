@@ -14,9 +14,8 @@
 #include "importing.h"
 #include "list.h"
 #include "runtime.h"
-#include "tokenizer.h"
-#include "token_stream.h"
 #include "term.h"
+#include "token_stream.h"
 #include "type.h"
 #include "values.h"
 
@@ -179,11 +178,7 @@ void bootstrap_kernel()
 #include "builtin_functions/write_text_file.cpp"
 #include "builtin_functions/to_string.cpp"
 #include "builtin_functions/print.cpp"
-
-void print__evaluate(Term* caller)
-{
-    std::cout << as_string(caller->inputs[0]) << std::endl;
-}
+#include "builtin_functions/tokenize.cpp"
 
 void mult__evaluate(Term* caller)
 {
@@ -275,10 +270,11 @@ void initialize_builtin_functions(Branch* kernel)
 {
     add_function::setup(*kernel);
     if_expr_function::setup(*kernel);
-    read_text_file_function::setup(*kernel);
-    write_text_file_function::setup(*kernel);
-    to_string_function::setup(*kernel);
     print_function::setup(*kernel);
+    read_text_file_function::setup(*kernel);
+    to_string_function::setup(*kernel);
+    tokenize_function::setup(*kernel);
+    write_text_file_function::setup(*kernel);
 
     ADD_FUNC = kernel->getNamed("add");
     MULT_FUNC = quick_create_function(kernel, "mult", mult__evaluate,

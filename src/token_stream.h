@@ -16,19 +16,26 @@ struct TokenStream
     unsigned int currentIndex;
     std::set<const char*> skipSet;
 
+    TokenStream()
+      : currentIndex(0)
+    {
+    }
+
     TokenStream(tokenizer::TokenList const& _tokens)
       : tokens(_tokens), currentIndex(0)
     {
     }
 
     TokenStream(std::string const& input)
-      : tokens(tokenizer::tokenize(input)), currentIndex(0)
+      : currentIndex(0)
     {
+        tokenizer::tokenize(input, tokens);
     }
 
     void reset(std::string const& input)
     {
-        tokens = tokenizer::tokenize(input);
+        tokens.clear();
+        tokenizer::tokenize(input, tokens);
         currentIndex = 0;
     }
 

@@ -1,3 +1,5 @@
+// Copyright 2008 Andrew Fischer
+
 #ifndef CIRCA_TOKENIZER_INCLUDED
 #define CIRCA_TOKENIZER_INCLUDED
 
@@ -58,7 +60,6 @@ const int UNRECOGNIZED = 28;
 
 const char* getMatchText(int match);
 void tokenize(std::string const &input, TokenList &results);
-TokenList tokenize(std::string const& input);
 
 } // namespace tokenizer
 } // namespace circa
