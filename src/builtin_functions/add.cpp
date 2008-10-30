@@ -34,14 +34,14 @@ namespace add_function {
     }
     static void setup(Branch& kernel)
     {
-        ADD_FUNC = import_c_function(kernel, evaluate,
+        Term* add_func = import_c_function(kernel, evaluate,
                 "function add(float, float) -> float");
-        as_function(ADD_FUNC).pureFunction = true;
+        as_function(add_func).pureFunction = true;
 
         Term* fp_func = import_c_function(kernel, feedback_propogate,
                 "function add-feedback-propogate(any,any)");
         as_function(fp_func).stateType = BRANCH_TYPE;
 
-        as_function(ADD_FUNC).feedbackPropogateFunction = fp_func;
+        as_function(add_func).feedbackPropogateFunction = fp_func;
     }
 }

@@ -178,6 +178,7 @@ void bootstrap_kernel()
 #include "builtin_functions/read_text_file.cpp"
 #include "builtin_functions/write_text_file.cpp"
 #include "builtin_functions/to_string.cpp"
+#include "builtin_functions/print.cpp"
 
 void print__evaluate(Term* caller)
 {
@@ -277,10 +278,12 @@ void initialize_builtin_functions(Branch* kernel)
     read_text_file_function::setup(*kernel);
     write_text_file_function::setup(*kernel);
     to_string_function::setup(*kernel);
+    print_function::setup(*kernel);
+
+    ADD_FUNC = kernel->getNamed("add");
     MULT_FUNC = quick_create_function(kernel, "mult", mult__evaluate,
             ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
     quick_create_function(kernel, "concat", string_concat__evaluate, ReferenceList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
-    quick_create_function(kernel, "print", print__evaluate, ReferenceList(STRING_TYPE), VOID_TYPE);
     quick_create_function(kernel, "range", range__evaluate, ReferenceList(INT_TYPE), LIST_TYPE);
     quick_create_function(kernel, "list-append", list_append__evaluate, ReferenceList(LIST_TYPE, ANY_TYPE), LIST_TYPE);
     quick_create_function(kernel, "list-apply", list_apply__evaluate, ReferenceList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);

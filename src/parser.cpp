@@ -60,7 +60,6 @@ namespace parser {
 std::string possibleWhitespace(TokenStream& tokens);
 std::string possibleNewline(TokenStream& tokens);
 
-
 ast::StatementList* statementList(TokenStream& tokens)
 {
     ast::StatementList* statementList = new ast::StatementList();
