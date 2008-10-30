@@ -222,7 +222,7 @@ ast::Expression* atom(TokenStream& tokens)
         return functionCall(tokens);
 
     // literal string?
-    if (tokens.nextIs(tokenizer::STRING) || tokens.nextIs(tokenizer::QUOTED_IDENTIFIER))
+    if (tokens.nextIs(tokenizer::STRING))
         return literal_string(tokens);
 
     // literal float?

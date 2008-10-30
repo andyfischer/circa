@@ -20,7 +20,6 @@ const char* getMatchText(int match)
         case INTEGER: return "INTEGER";
         case FLOAT: return "FLOAT";
         case STRING: return "STRING";
-        case QUOTED_IDENTIFIER: return "QUOTED_IDENTIFIER";
         case DOT: return ".";
         case STAR: return "*";
         case QUESTION: return "?";
@@ -119,7 +118,6 @@ void consume_identifier(TokenizeContext &context);
 void consume_whitespace(TokenizeContext &context);
 void consume_number(TokenizeContext &context);
 void consume_string_literal(TokenizeContext &context);
-void consume_quoted_identifier(TokenizeContext &context);
 
 void tokenize(std::string const &input, TokenList &results)
 {
@@ -213,10 +211,8 @@ void top_level_consume_token(TokenizeContext &context)
             context.pushResult(EQUALS);
             return;
         case '"':
-            consume_string_literal(context);
-            return;
         case '\'':
-            consume_quoted_identifier(context);
+            consume_string_literal(context);
             return;
         case '\n':
             context.consume();
@@ -343,28 +339,15 @@ void consume_string_literal(TokenizeContext &context)
 {
     std::stringstream text;
 
-    // consume quote mark
-    context.consume();
+    // consume starting quote
+    char quote_type = context.consume();
 
-    while (context.next() != '"') {
+    while (context.next() != quote_type && !context.finished()) {
         text << context.consume();
     }
 
+    // consume ending quote
     context.consume();
-
-    context.pushResult(STRING, text.str());
-}
-
-void consume_quoted_identifier(TokenizeContext &context)
-{
-    std::stringstream text;
-
-    // consume quote mark
-    context.consume();
-
-    while (is_acceptable_inside_identifier(context.next())) {
-        text << context.consume();
-    }
 
     context.pushResult(STRING, text.str());
 }

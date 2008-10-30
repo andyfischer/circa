@@ -18,7 +18,7 @@ void create()
 {
     Branch branch;
 
-    Term* list1 = eval_statement(branch, "list1 = list(1, 'pie, 2.0)");
+    Term* list1 = eval_statement(branch, "list1 = list(1, 'pie', 2.0)");
 
     test_assert(list1->type == LIST_TYPE);
     test_assert(as_type(list1->type).toString != NULL);
@@ -41,7 +41,7 @@ void operations()
 {
     Branch branch;
 
-    Term* list1 = eval_statement(branch, "list1 = list('pie)");
+    Term* list1 = eval_statement(branch, "list1 = list('pie')");
     Term* list2 = eval_statement(branch, "list2 = list()");
 
     duplicate_value(list1, list2);
