@@ -80,8 +80,8 @@ void test_bool()
 {
     Branch branch;
 
-    test_assert(as_string(eval_statement(branch, "if-expr(true, 'a, 'b)")) == "a");
-    test_assert(as_string(eval_statement(branch, "if-expr(false, 'a, 'b)")) == "b");
+    test_assert(as_string(eval_statement(branch, "if-expr(true, 'a', 'b')")) == "a");
+    test_assert(as_string(eval_statement(branch, "if-expr(false, 'a', 'b')")) == "b");
 }
 
 void test_reference()

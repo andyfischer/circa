@@ -14,7 +14,7 @@ void create()
 {
     Branch branch;
 
-    Term* sub = eval_statement(branch, "sub = subroutine-create('my-sub, list(int), string)");
+    Term* sub = eval_statement(branch, "sub = subroutine-create('my-sub', list(int), string)");
 
     test_assert(is_function(sub));
     test_assert(as_function(sub).name == "my-sub");
@@ -23,7 +23,7 @@ void create()
     test_assert(as_function(sub).outputType == STRING_TYPE);
 
     // name input
-    sub = eval_statement(branch, "sub = function-name-input(@sub, 0, 'apple)");
+    sub = eval_statement(branch, "sub = function-name-input(@sub, 0, 'apple')");
 
     test_assert(is_function(sub));
     test_assert(as_function(sub).name == "my-sub");
@@ -39,8 +39,8 @@ void using_apply()
 {
     Branch branch;
 
-    eval_statement(branch, "sub = subroutine-create('s, list(float), float)");
-    eval_statement(branch, "function-name-input(@sub, 0, 'x)");
+    eval_statement(branch, "sub = subroutine-create('s', list(float), float)");
+    eval_statement(branch, "function-name-input(@sub, 0, 'x')");
     eval_statement(branch, "subroutine-apply(@sub, \"return add(mult(x,2.0),5.0)\")");
 
     // now run it

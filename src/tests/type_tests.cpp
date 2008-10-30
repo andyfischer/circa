@@ -15,18 +15,18 @@ void compound_types()
 {
     Branch branch;
 
-    Term* type1 = eval_statement(branch, "type1 = create-compound-type('type1)");
+    Term* type1 = eval_statement(branch, "type1 = create-compound-type('type1')");
     test_assert(type1 != NULL);
     test_assert(is_type(type1));
 
-    type1 = eval_statement(branch, "compound-type-append-field(@type1, int, 'myint)");
+    type1 = eval_statement(branch, "compound-type-append-field(@type1, int, 'myint')");
     test_assert(is_type(type1));
     test_assert(as_type(type1).fields.size() == 1);
     test_assert(as_type(type1).fields[0].name == "myint");
     test_assert(as_type(type1).fields[0].type == INT_TYPE);
     test_assert(as_type(type1).findField("myint") == 0);
 
-    type1 = eval_statement(branch, "compound-type-append-field(@type1, string, 'astr)");
+    type1 = eval_statement(branch, "compound-type-append-field(@type1, string, 'astr')");
     test_assert(is_type(type1));
     test_assert(as_type(type1).fields.size() == 2);
     test_assert(as_type(type1).fields[1].name == "astr");
@@ -40,13 +40,13 @@ void compound_types()
     test_assert(inst1->field("myint")->value != NULL); // remove
 
     // test get-field function
-    Term* inst1_myint = eval_statement(branch, "get-field(inst1, 'myint)");
+    Term* inst1_myint = eval_statement(branch, "get-field(inst1, 'myint')");
     test_assert(inst1->field("myint")->value != NULL); // remove
     test_assert(inst1_myint != NULL);
     test_assert(!inst1_myint->hasError());
     //test_assert(is_int(inst1_myint));
 
-    Term* inst1_astr = eval_statement(branch, "get-field(inst1, 'astr)");
+    Term* inst1_astr = eval_statement(branch, "get-field(inst1, 'astr')");
     test_assert(inst1_astr != NULL);
     test_assert(!inst1_astr->hasError());
     //test_assert(is_string(inst1_myint));
@@ -55,8 +55,8 @@ void compound_types()
     test_assert(inst1->field("myint") != NULL);
     test_assert(inst1->field("myint")->value != NULL);
     inst1->field("myint")->asInt() = 5;
-    eval_statement(branch, "get-field(inst1, 'myint)");
-    test_assert(eval_statement(branch, "get-field(inst1, 'myint)")->asInt() == 5);
+    eval_statement(branch, "get-field(inst1, 'myint')");
+    test_assert(eval_statement(branch, "get-field(inst1, 'myint')")->asInt() == 5);
 
     Term* inst2 = eval_statement(branch, "inst2 = type1()");
 
