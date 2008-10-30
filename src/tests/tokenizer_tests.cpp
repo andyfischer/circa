@@ -3,6 +3,11 @@
 #include "common_headers.h"
 
 #include "tests/common.h"
+#include "branch.h"
+#include "parser.h"
+#include "builtins.h"
+#include "term.h"
+#include "runtime.h"
 #include "tokenizer.h"
 #include "token_stream.h"
 #include "errors.h"
@@ -129,6 +134,16 @@ void token_stream_to_string()
             "WHITESPACE \" \", FLOAT \"0.123\"]}");
 }
 
+void hosted_tokenize()
+{
+    Branch branch;
+    Term* result = eval_statement(branch, "\"hi + 0.123\" -> tokenize -> to-string");
+
+    test_assert(as_string(result) == 
+            "{index: 0, tokens: [IDENTIFIER \"hi\", WHITESPACE \" \", + \"+\", "
+            "WHITESPACE \" \", FLOAT \"0.123\"]}");
+}
+
 } // namespace tokenizer_tests
 
 void register_tokenizer_tests()
@@ -140,6 +155,7 @@ void register_tokenizer_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
     REGISTER_TEST_CASE(tokenizer_tests::token_stream_to_string);
+    REGISTER_TEST_CASE(tokenizer_tests::hosted_tokenize);
 }
 
 } // namespace circa
