@@ -49,6 +49,7 @@ void assign_from_cpp_type(Type& type)
     type.alloc = cpp_interface::templated_alloc<CppType>;
     type.dealloc = cpp_interface::templated_dealloc<CppType>;
     type.duplicate = cpp_interface::templated_duplicate<CppType>;
+    type.cppTypeInfo = &typeid(CppType);
     //type.equals = cpp_interface::templated_equals<CppType>;
 }
 
@@ -65,7 +66,15 @@ Term* quick_create_cpp_type(Branch* branch, std::string name)
 template <class T>
 T& as(Term* term)
 {
-    // todo: add type checking
+    Type& type = as_type(term->type);
+
+    if (type.cppTypeInfo == NULL)
+        throw std::runtime_error(std::string("type ") + type.name
+                + " is not a C++ type");
+
+    if (*type.cppTypeInfo != typeid(T))
+        throw std::runtime_error("C++ type mismatch");
+
     return *((T*) term->value);
 }
 

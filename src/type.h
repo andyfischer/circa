@@ -5,6 +5,8 @@
 
 #include "common_headers.h"
 
+#include <typeinfo>
+
 #include "branch.h"
 #include "builtins.h"
 #include "pointer_visitor.h"
@@ -41,6 +43,9 @@ struct Type
     // of memory dynamically, so the 'raw data' is the size of a pointer.
     size_t dataSize;
 
+    // C++ type info
+    const std::type_info *cppTypeInfo;
+
     // Functions
     AllocFunc alloc;
     InitializeFunc init;
@@ -63,6 +68,7 @@ struct Type
     Type() :
         name(""),
         dataSize(sizeof(void*)),
+        cppTypeInfo(NULL),
         alloc(NULL),
         init(NULL),
         dealloc(NULL),
