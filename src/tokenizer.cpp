@@ -123,13 +123,6 @@ void tokenize(std::string const &input, TokenList &results)
     }
 }
 
-TokenList tokenize(std::string const& input)
-{
-    TokenList results;
-    tokenize(input, results);
-    return results;
-}
-
 bool is_letter(char c)
 {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
