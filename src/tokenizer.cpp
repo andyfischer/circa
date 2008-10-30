@@ -46,6 +46,13 @@ const char* getMatchText(int match)
     }
 }
 
+std::string TokenInstance::toString() const
+{
+    std::stringstream out;
+    out << getMatchText(match) << " \"" << text << "\"";
+    return out.str();
+}
+
 struct TokenizeContext
 {
     std::string const &input;

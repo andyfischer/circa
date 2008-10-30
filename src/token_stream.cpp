@@ -30,10 +30,28 @@ TokenStream::consume(int match)
         msg << "Unexpected token (expected " << tokenizer::getMatchText(match)
             << ", found " << next().text << ")";
         parser::syntax_error(msg.str(), &next());
-
     }
 
     return tokens[currentIndex++].text;
+}
+
+std::string
+TokenStream::toString() const
+{
+    std::stringstream out;
+
+    out << "{index: " << currentIndex << ", ";
+    out << "tokens: [";
+
+    bool first = true;
+
+    for (unsigned int i=0; i < tokens.size(); i++) {
+        if (!first) out << ", ";
+        out << tokens[i].toString();
+        first = false;
+    }
+    out << "]}";
+    return out.str();
 }
 
 } // namespace token_stream

@@ -14,8 +14,9 @@ namespace tokenize_function {
 
     void setup(Branch& kernel)
     {
-        //quick_create_cpp_type<tokenizer::TokenList>(kernel, "TokenList");
-        quick_create_cpp_type<token_stream::TokenStream>(&kernel, "TokenStream");
+        Term* tokenStreamType = 
+            quick_create_cpp_type<token_stream::TokenStream>(&kernel, "TokenStream");
+        register_cpp_toString<token_stream::TokenStream>(tokenStreamType);
 
         import_c_function(kernel, evaluate,
             "function tokenize(string) -> TokenStream");

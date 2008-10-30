@@ -120,6 +120,15 @@ void test_token_stream()
     test_assert(tstream.nextNonWhitespaceIs(tokenizer::FLOAT, 1));
 }
 
+void token_stream_to_string()
+{
+    token_stream::TokenStream tstream("hi + 0.123");
+
+    test_assert(tstream.toString() ==
+            "{index: 0, tokens: [IDENTIFIER \"hi\", WHITESPACE \" \", + \"+\", "
+            "WHITESPACE \" \", FLOAT \"0.123\"]}");
+}
+
 } // namespace tokenizer_tests
 
 void register_tokenizer_tests()
@@ -130,6 +139,7 @@ void register_tokenizer_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_symbols);
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
+    REGISTER_TEST_CASE(tokenizer_tests::token_stream_to_string);
 }
 
 } // namespace circa
