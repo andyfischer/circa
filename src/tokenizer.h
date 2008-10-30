@@ -16,6 +16,8 @@ struct TokenInstance
     int character;
 
     TokenInstance() : match(0), line(0), character(0) {}
+
+    std::string toString() const;
 };
 
 typedef std::vector<TokenInstance> TokenList;

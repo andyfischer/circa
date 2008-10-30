@@ -43,6 +43,8 @@ std::string templated_toString(Term* term)
 
 } // namespace cpp_interface
 
+// Public functions
+
 template <class CppType>
 void assign_from_cpp_type(Type& type)
 {
@@ -53,14 +55,18 @@ void assign_from_cpp_type(Type& type)
     //type.equals = cpp_interface::templated_equals<CppType>;
 }
 
-// Public functions
-
 template <class T>
 Term* quick_create_cpp_type(Branch* branch, std::string name)
 {
     Term* term = quick_create_type(branch, name);
     assign_from_cpp_type<T>(as_type(term));
     return term;
+}
+
+template <class T>
+void register_cpp_toString(Term* type)
+{
+    as_type(type).toString = cpp_interface::templated_toString<T>;
 }
 
 template <class T>

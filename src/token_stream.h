@@ -93,6 +93,8 @@ struct TokenStream
     {
         return (currentIndex >= tokens.size());
     }
+
+    std::string toString() const;
 };
 
 } // namespace token_stream
