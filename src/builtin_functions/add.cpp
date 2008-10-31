@@ -32,7 +32,7 @@ namespace add_function {
 
         evaluate_branch(myBranch);
     }
-    static void setup(Branch& kernel)
+    void setup(Branch& kernel)
     {
         Term* add_func = import_c_function(kernel, evaluate,
                 "function add(float, float) -> float");
