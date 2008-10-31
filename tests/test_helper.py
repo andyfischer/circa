@@ -44,3 +44,9 @@ def runCommand(command):
         lines.append(stdout_line)
 
     return '\n'.join(lines)
+
+def loadFile(filename):
+    f = open(filename)
+    contents = f.read()
+    f.close()
+    return contents

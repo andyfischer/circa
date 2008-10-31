@@ -26,6 +26,9 @@ void print_term_extended(Term* term, std::ostream &output)
 
     output << funcName << "() -> " << typeName;
 
+    if (term->hasError())
+        output << " *" << term->getErrorMessage() << "*";
+
     output << std::endl;
 }
 
@@ -159,6 +162,5 @@ Term* find_equivalent(Term* function, ReferenceList const& inputs)
 
     return NULL;
 }
-
 
 } // namespace circa

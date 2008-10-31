@@ -1,5 +1,0 @@
-[mutable-file]
-
-x = 4
-
-print(to-source(x))

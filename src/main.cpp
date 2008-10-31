@@ -33,6 +33,7 @@ int main(int nargs, const char * args[])
             } else {
                 evaluate_branch(*branch);
             }
+
             delete branch;
         }
 

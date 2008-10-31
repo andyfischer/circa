@@ -7,6 +7,7 @@
 #include "errors.h"
 #include "function.h"
 #include "importing.h"
+#include "introspection.h"
 #include "list.h"
 #include "parser.h"
 #include "runtime.h"

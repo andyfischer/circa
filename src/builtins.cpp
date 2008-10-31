@@ -173,6 +173,8 @@ void bootstrap_kernel()
 }
 
 #include "builtin_functions/add.cpp"
+#include "builtin_functions/and.cpp"
+#include "builtin_functions/or.cpp"
 #include "builtin_functions/if_expr.cpp"
 #include "builtin_functions/read_text_file.cpp"
 #include "builtin_functions/write_text_file.cpp"
@@ -270,8 +272,10 @@ void initialize_constants()
 
 void initialize_builtin_functions(Branch* kernel)
 {
+    and_function::setup(*kernel);
     add_function::setup(*kernel);
     if_expr_function::setup(*kernel);
+    or_function::setup(*kernel);
     print_function::setup(*kernel);
     read_text_file_function::setup(*kernel);
     to_string_function::setup(*kernel);
