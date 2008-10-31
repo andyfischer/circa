@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "tests/common.h"
+#include <tests/common.h>
 #include "branch.h"
 #include "parser.h"
 #include "builtins.h"

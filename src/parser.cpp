@@ -85,6 +85,24 @@ ast::Statement* statement(TokenStream& tokens)
     // toss leading whitespace
     possibleWhitespace(tokens);
 
+    // Check for comment line
+    if (tokens.nextIs(tokenizer::DOUBLE_MINUS)) {
+        tokens.consume(tokenizer::DOUBLE_MINUS);
+
+        // Throw away the rest of this line
+        while (!tokens.finished()) {
+            if (tokens.nextIs(tokenizer::NEWLINE)) {
+                tokens.consume(tokenizer::NEWLINE);
+                break;
+            }
+
+            tokens.consume();
+        }
+
+        return new ast::IgnorableStatement();
+    }
+
+    // Check for blank line
     if (tokens.nextIs(tokenizer::NEWLINE) || tokens.finished()) {
         if (tokens.nextIs(tokenizer::NEWLINE))
             tokens.consume(tokenizer::NEWLINE);
