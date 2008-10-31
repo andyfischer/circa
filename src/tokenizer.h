@@ -42,6 +42,7 @@ const int QUESTION = 33;
 const int SLASH = 11;
 const int PLUS = 12;
 const int MINUS = 13;
+const int DOUBLE_MINUS = 36;
 const int LTHAN = 14;
 const int LTHANEQ = 15;
 const int GTHAN = 16;

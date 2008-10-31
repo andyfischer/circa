@@ -26,6 +26,7 @@ const char* getMatchText(int match)
         case SLASH: return "/";
         case PLUS: return "+";
         case MINUS: return "-";
+        case DOUBLE_MINUS: return "--";
         case LTHAN: return "<";
         case LTHANEQ: return "<=";
         case GTHAN: return ">";
@@ -263,6 +264,12 @@ void top_level_consume_token(TokenizeContext &context)
             if (context.next() == '>') {
                 context.consume();
                 context.pushResult(RIGHT_ARROW);
+                return;
+            }
+
+            if (context.next() == '-') {
+                context.consume();
+                context.pushResult(DOUBLE_MINUS);
                 return;
             }
 

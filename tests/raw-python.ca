@@ -1,3 +1,0 @@
-print-plus-1-raw-func = compile-raw-python-function('def printplus1(a): print a + 1', 'printplus1')
-print-plus-1 = wrap-raw-python-function(print-plus-1-raw-func, list(int), void, false)
-print-plus-1(5)
