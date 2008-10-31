@@ -249,6 +249,8 @@ void initialize_constants()
     LIST_TYPE = quick_create_cpp_type<List>(KERNEL, "List");
     as_type(LIST_TYPE).toString = List__toString;
 
+    quick_create_cpp_type<Dictionary>(KERNEL, "Dictionary");
+
     VAR_INT = get_var_function(*KERNEL, INT_TYPE);
     VAR_FLOAT = get_var_function(*KERNEL, FLOAT_TYPE);
     VAR_STRING = get_var_function(*KERNEL, STRING_TYPE);

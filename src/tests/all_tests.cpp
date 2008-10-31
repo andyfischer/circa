@@ -10,6 +10,7 @@ namespace circa {
 
 void register_branch_tests();
 void register_builtin_function_tests();
+void register_builtin_type_tests();
 void register_container_tests();
 void register_cpp_interface_tests();
 void register_error_tests();
@@ -31,6 +32,7 @@ void register_all_tests()
 
     register_branch_tests();
     register_builtin_function_tests();
+    register_builtin_type_tests();
     register_container_tests();
     register_cpp_interface_tests();
     register_error_tests();
