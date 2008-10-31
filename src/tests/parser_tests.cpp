@@ -284,6 +284,16 @@ void test_eval_statement()
     test_assert(eval_statement(b, "\"\"")->asString() == "");
 }
 
+void comment_statement()
+{
+    token_stream::TokenStream tokens("-- this is a comment");
+
+    ast::Statement* statement = parser::statement(tokens);
+    test_assert(dynamic_cast<ast::IgnorableStatement*>(statement) != NULL);
+
+    test_assert(tokens.finished());
+}
+
 } // namespace parser_tests
 
 void register_parser_tests()
@@ -302,6 +312,7 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::rebind_operator);
     REGISTER_TEST_CASE(parser_tests::ast_walk);
     REGISTER_TEST_CASE(parser_tests::test_eval_statement);
+    REGISTER_TEST_CASE(parser_tests::comment_statement);
 }
 
 } // namespace circa
