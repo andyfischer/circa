@@ -1,2 +1,2 @@
-cd /Users/andyfischer/circa/test
+cd $CIRCA_HOME/test
 ./run_all.py
