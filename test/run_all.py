@@ -6,7 +6,7 @@ TESTS_RUN = 0
 FAILURES = []
 
 def do_output_test(*args):
-    from tests import output_test
+    import output_test
     global TESTS_RUN
     global FAILURES
     
@@ -29,6 +29,6 @@ def print_results():
         for failure in FAILURES:
             print failure
 
-do_output_test("tests/boolean.ca")
+do_output_test("circa/boolean.ca")
 
 print_results()
