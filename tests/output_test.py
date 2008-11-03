@@ -29,13 +29,18 @@ def run_test(filename):
 
     numLines = 0
     for line in expectedOutput.split('\n'):
-        stdout_line = stdout.readline()
+        # Make sure there is nothing in stderr
+        stderr_line = stderr.readline()
+        if stderr_line != "":
+            stderr_line = stderr_line[:-1] # remove trailing newline
+            return "stderr: " + stderr_line
 
-        # Remove the trailing newline
-        stdout_line = stdout_line[:-1]
+        # Read a line from stdout and check it against expected
+        stdout_line = stdout.readline()
+        stdout_line = stdout_line[:-1] # remove trailing newline
 
         if line != stdout_line:
-            return ("[line "+str(numLines)+"]\nexpected: %s\n  output: %s" % (line, stdout_line))
+            return ("[line %n]\nexpected: %s\n  output: %s" % (numLines, line, stdout_line))
 
         numLines += 1
 
