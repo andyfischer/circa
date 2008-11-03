@@ -33,14 +33,15 @@ def run_test(filename):
         stderr_line = stderr.readline()
         if stderr_line != "":
             stderr_line = stderr_line[:-1] # remove trailing newline
-            return "stderr: " + stderr_line
+            return "While running %s, received error: %s" % (command, stderr_line)
 
         # Read a line from stdout and check it against expected
         stdout_line = stdout.readline()
         stdout_line = stdout_line[:-1] # remove trailing newline
 
         if line != stdout_line:
-            return ("[line %n]\nexpected: %s\n  output: %s" % (numLines, line, stdout_line))
+            return ("Unexpected output for %s on line %d..\nExpected: %s\n  Output: %s"
+                    % (filename, numLines, line, stdout_line))
 
         numLines += 1
 
