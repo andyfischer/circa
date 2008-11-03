@@ -117,7 +117,6 @@ void Function::subroutine_create(Term* caller)
 void
 Function::call_subroutine__initialize(Term* caller)
 {
-    // todo
 }
 
 void
