@@ -1,1 +1,1 @@
-grep $* ~/circa/Circa/**/*.py
+grep -r $* $CIRCA_HOME/src

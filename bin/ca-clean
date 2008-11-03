@@ -1,2 +1,0 @@
-rm ~/code/circa/Circa/*.pyc
-rm ~/code/circa/Circa/*/*.pyc
