@@ -51,7 +51,7 @@ Term* apply_statement(Branch& branch, std::string const& input)
 Term* eval_statement(Branch& branch, std::string const& input)
 {
     Term* term = apply_statement(branch, input);
-    term->eval();
+    evaluate_term(term);
     return term;
 }
 

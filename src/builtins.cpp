@@ -219,7 +219,7 @@ void list_apply__evaluate(Term* caller)
     for (int i=0; i < list.count(); i++) {
         Term* result = apply_function(*caller->owningBranch, caller->inputs[0], ReferenceList(list.get(i)));
 
-        result->eval();
+        evaluate_term(result);
 
         as_list(caller).append(result);
     }
@@ -335,7 +335,7 @@ void shutdown()
 Term* get_var_function(Branch& branch, Term* type)
 {
     Term* result = apply_function(branch, VAR_FUNCTION_GENERATOR, ReferenceList(type));
-    result->eval();
+    evaluate_term(result);
     return result;
 }
 

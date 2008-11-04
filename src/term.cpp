@@ -187,9 +187,4 @@ List& Term::asList()
     return as_list(this);
 }
 
-void Term::eval()
-{
-    evaluate_term(this);
-}
-
 } // namespace circa
