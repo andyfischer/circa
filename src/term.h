@@ -70,8 +70,6 @@ struct Term
     bool& asBool();
     Term*& asRef();
     List& asList();
-
-    void eval();
 };
 
 } // namespace circa

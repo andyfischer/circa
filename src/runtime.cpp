@@ -225,7 +225,7 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList const& _input
     ReferenceList inputs = _inputs;
 
     if (function->needsUpdate)
-        function->eval();
+        evaluate_term(function);
 
     // Check if 'function' is actually a type
     if (is_type(function))
@@ -266,7 +266,7 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList const& _input
 Term* eval_function(Branch& branch, Term* function, ReferenceList const& inputs)
 {
     Term* result = apply_function(branch, function, inputs);
-    result->eval();
+    evaluate_term(result);
     return result;
 }
 
