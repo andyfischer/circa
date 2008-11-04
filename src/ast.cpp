@@ -49,8 +49,8 @@ Infix::toString() const
 Term*
 Infix::createTerm(Branch& branch)
 {
-    // special case: right arrow
-    if (this->operatorStr == "->") {
+    // special case: right arrow or dot
+    if (this->operatorStr == "->" || this->operatorStr == ".") {
         Term* leftTerm = this->left->createTerm(branch);
 
         Identifier *rightIdent = dynamic_cast<Identifier*>(this->right);

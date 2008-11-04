@@ -1,17 +1,17 @@
 
 -- Check 'true' and 'false' constants
-print(concat('should be true: ', true -> to-string))
-print(concat('should be false: ', false -> to-string))
+print(concat('should be true: ', true.to-string))
+print(concat('should be false: ', false.to-string))
 
 -- and
-print(concat('and(true,true): ', and(true,true) -> to-string))
-print(concat('and(true,false): ', and(true,false) -> to-string))
-print(concat('and(false,true): ', and(false,true) -> to-string))
-print(concat('and(false,false): ', and(false,false) -> to-string))
+print(concat('and(true,true): ', and(true,true).to-string))
+print(concat('and(true,false): ', and(true,false).to-string))
+print(concat('and(false,true): ', and(false,true).to-string))
+print(concat('and(false,false): ', and(false,false).to-string))
 
 -- or
-print(concat('or(true,true): ', or(true,true) -> to-string))
-print(concat('or(true,false): ', or(true,false) -> to-string))
-print(concat('or(false,true): ', or(false,true) -> to-string))
-print(concat('or(false,false): ', or(false,false) -> to-string))
+print(concat('or(true,true): ', or(true,true).to-string))
+print(concat('or(true,false): ', or(true,false).to-string))
+print(concat('or(false,true): ', or(false,true).to-string))
+print(concat('or(false,false): ', or(false,false).to-string))
 
