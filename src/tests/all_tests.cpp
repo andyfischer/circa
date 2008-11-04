@@ -69,7 +69,7 @@ void run_all_tests()
         }
     }
 
-    std::string successes = successCount == 1 ? "success" : "sucesses";
+    std::string successes = successCount == 1 ? "success" : "successes";
     std::string failures = failureCount == 1 ? "failure" : "failures";
 
     std::cout << "Ran " << totalTestCount << " tests, " << successCount
