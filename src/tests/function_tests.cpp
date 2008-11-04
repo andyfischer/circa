@@ -16,6 +16,8 @@ void create()
 
     Term* sub = eval_statement(branch, "sub = subroutine-create('my-sub', list(int), string)");
 
+    test_assert(!sub->hasError());
+
     test_assert(is_function(sub));
     test_assert(as_function(sub).name == "my-sub");
     test_assert(as_function(sub).inputTypes[0] == INT_TYPE);

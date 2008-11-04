@@ -99,6 +99,13 @@ void Function::subroutine_create(Term* caller)
         Branch workspace;
         Term* list_refs = eval_function(workspace, "get-list-references",
                 ReferenceList(caller->inputs[1]));
+
+        if (list_refs->hasError()) {
+            error_occured(caller, std::string("get-list-references error: ")
+                + list_refs->getError(0));
+            return;
+        }
+
         sub.inputTypes = as_list(list_refs).toReferenceList();
     }
 
@@ -148,8 +155,21 @@ void Function::name_input(Term* caller)
     int index = as_int(caller->inputs[1]);
     std::string name = as_string(caller->inputs[2]);
     Function& sub = as_function(caller);
+
+    if (index < 0) {
+        error_occured(caller, "index must be >= 0");
+        return;
+    }
+
+    if ((unsigned int) index >= sub.inputTypes.count()) {
+        error_occured(caller, "index out of bounds");
+        return;
+    }
+
     Term* inputPlaceholder =
         sub.subroutineBranch.getNamed(get_placeholder_name_for_index(index));
+
+    assert(inputPlaceholder != NULL);
 
     // remove the name on this term, so that this new name will stick
     inputPlaceholder->name = "";
