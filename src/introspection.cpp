@@ -163,4 +163,18 @@ Term* find_equivalent(Term* function, ReferenceList const& inputs)
     return NULL;
 }
 
+void print_runtime_errors(Branch& branch, std::ostream& output)
+{
+    for (int i=0; i < branch.numTerms(); i++) {
+        Term *term = branch[i];
+
+        if (term == NULL)
+            continue;
+
+        if (term->hasError()) {
+            output << "error on " << term->name << ": " << term->getError(0) << std::endl;
+        }
+    }
+}
+
 } // namespace circa

@@ -282,6 +282,7 @@ Term* create_empty_type(Branch& branch, std::string name)
     Type& type = as_type(term);
     type.alloc = type_private::empty_function;
     type.dealloc = type_private::empty_function;
+    type.duplicate = type_private::empty_duplicate_function;
     type.name = name;
     branch.bindName(term, name);
     return term;

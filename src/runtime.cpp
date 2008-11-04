@@ -120,7 +120,7 @@ Branch* evaluate_file(std::string const& filename)
 
 void error_occured(Term* errorTerm, std::string const& message)
 {
-    std::cout << "error occured: " << message << std::endl;
+    // std::cout << "error occured: " << message << std::endl;
     errorTerm->pushError(message);
 }
 

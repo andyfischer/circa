@@ -11,6 +11,7 @@ ReferenceList list_all_pointers(Term* term);
 void print_terms(ReferenceList const& list, std::ostream &output);
 bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs);
 Term* find_equivalent(Term* function, ReferenceList const& inputs);
+void print_runtime_errors(Branch& branch, std::ostream& output);
 
 }
 

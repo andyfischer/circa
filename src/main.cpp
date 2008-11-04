@@ -32,6 +32,7 @@ int main(int nargs, const char * args[])
                 print_compile_errors(*branch, std::cout);
             } else {
                 evaluate_branch(*branch);
+                print_runtime_errors(*branch, std::cout);
             }
 
             delete branch;
