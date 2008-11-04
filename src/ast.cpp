@@ -361,11 +361,11 @@ FunctionDecl::toString() const
 {
     std::stringstream out;
 
-    out << header->toString() << std::endl << "{" << std::endl;
+    out << header->toString() << std::endl;
 
     out << statements->toString();
 
-    out << "}";
+    out << "end";
 
     return out.str();
 }
