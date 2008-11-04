@@ -289,20 +289,21 @@ FunctionDecl::createTerm(Branch& branch)
     // Make a workspace where we'll assemble this function
     Branch workspace;
 
-    eval_statement(workspace, "inputTypes = list()");
+    Term* inputTypes = eval_statement(workspace, "inputTypes = list()");
 
-    FunctionHeader::ArgumentList::const_iterator it;
-    for (it = this->header->arguments.begin(); it != this->header->arguments.end(); ++it)
+    for (unsigned int inputIndex=0;
+         inputIndex < this->header->arguments.size();
+         inputIndex++)
     {
-        Term* term = branch.findNamed(it->type);
+        FunctionHeader::Argument &arg = this->header->arguments[inputIndex];
+        Term* term = branch.findNamed(arg.type);
         if (term == NULL)
-            parser::syntax_error(std::string("Identifier not found (input type): ") + it->type);
+            parser::syntax_error(std::string("Identifier not found (input type): ") + arg.type);
 
         if (!is_type(term))
-            parser::syntax_error(std::string("Identifier is not a type: ") + it->type);
+            parser::syntax_error(std::string("Identifier is not a type: ") + arg.type);
 
-        workspace.bindName(term, "t");
-        eval_statement(workspace, "list-append(@inputTypes, t)");
+        set_input(inputTypes, inputIndex, term);
     }
 
     Term* outputType = NULL;
@@ -325,12 +326,27 @@ FunctionDecl::createTerm(Branch& branch)
     Term* sub = eval_statement(workspace,
         "sub = subroutine-create(functionName, inputTypes, outputType)");
 
-    // Name inputs
+    // Name each input
+    for (unsigned int inputIndex=0;
+         inputIndex < this->header->arguments.size();
+         inputIndex++)
+    {
+        std::string name = this->header->arguments[inputIndex].name;
+        int_var(workspace, inputIndex, "inputIndex");
+        string_var(workspace, name, "name");
+
+        sub = eval_statement(workspace,
+                "function-name-input(@sub, inputIndex, name)");
+    }
+
+    // Apply every statement
     int numStatements = this->statements->count();
     for (int statementIndex=0; statementIndex < numStatements; statementIndex++) {
         Statement* statement = this->statements->operator[](statementIndex);
 
         statement->createTerm(as_function(sub).subroutineBranch);
+
+        // ...
     }
 
     Term* outer_val = create_var(&branch, FUNCTION_TYPE);

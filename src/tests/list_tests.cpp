@@ -97,7 +97,7 @@ void get_references()
 {
     Branch branch;
 
-    eval_statement(branch, "l = pack-list(int, any, false)");
+    eval_statement(branch, "l = list(int, any, false)");
     Term* rl = eval_statement(branch, "get-list-references(l)");
 
     test_assert(as_list(rl)[0]->asRef() == INT_TYPE);
