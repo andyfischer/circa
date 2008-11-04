@@ -70,7 +70,7 @@ ast::StatementList* statementList(TokenStream& tokens)
             continue;
         }
 
-        if (tokens.nextIs(tokenizer::RBRACE)) {
+        if (tokens.nextIs(tokenizer::RBRACE) || tokens.nextIs(tokenizer::END)) {
             break;
         }
 
@@ -364,15 +364,15 @@ ast::FunctionDecl* functionDecl(TokenStream& tokens)
 
     possibleNewline(tokens);
 
-    tokens.consume(tokenizer::LBRACE);
+    /*tokens.consume(tokenizer::LBRACE);
 
-    possibleNewline(tokens);
+    possibleNewline(tokens);*/
 
     decl->statements = statementList(tokens);
 
     possibleNewline(tokens);
 
-    tokens.consume(tokenizer::RBRACE);
+    tokens.consume(tokenizer::END);
 
     possibleNewline(tokens);
     

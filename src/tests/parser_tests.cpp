@@ -167,7 +167,7 @@ void function_decl_ast()
     token_stream::TokenStream tokens("x = add(arg1,arg2)");
     decl.statements->push(parser::statement(tokens));
 
-    test_assert(decl.toString() == "function add(float arg1, float arg2)\n{\nx = add(arg1,arg2)\n}");
+    test_assert(decl.toString() == "function add(float arg1, float arg2)\nx = add(arg1,arg2)\nend");
 }
 
 void function_header()
@@ -191,16 +191,16 @@ void function_header()
 
 void function_decl_parse()
 {
-    token_stream::TokenStream tokens("function func(string a, int b) -> void\n{\n"
+    token_stream::TokenStream tokens("function func(string a, int b) -> void\n"
             "concat(a, to-string(b)) -> print\n"
-            "}\n");
+            "end");
     ast::Statement* statement = parser::statement(tokens);
 
     test_assert(statement->typeName() == "function-decl");
 
-    tokens.reset("function func2() {\n"
+    tokens.reset("function func2()\n"
             "print(\"hello\")\n"
-            "}\n"
+            "end\n"
             "some-function(1,2)\n");
 
     ast::StatementList* statementList = parser::statementList(tokens);
