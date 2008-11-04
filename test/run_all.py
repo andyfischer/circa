@@ -30,5 +30,6 @@ def print_results():
             print failure
 
 do_output_test("circa/boolean.ca")
+do_output_test("circa/subroutine.ca")
 
 print_results()

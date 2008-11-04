@@ -152,9 +152,10 @@ Function::call_subroutine(Term* caller)
     
     evaluate_branch(branch);
 
-    Term* outputPlaceholder = branch[OUTPUT_PLACEHOLDER_NAME];
-
-    recycle_value(outputPlaceholder, caller);
+    if (branch.containsName(OUTPUT_PLACEHOLDER_NAME)) {
+        Term* outputPlaceholder = branch[OUTPUT_PLACEHOLDER_NAME];
+        recycle_value(outputPlaceholder, caller);
+    }
 }
 
 void Function::name_input(Term* caller)
