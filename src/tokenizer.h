@@ -56,6 +56,8 @@ const int STAR_EQUALS = 23;
 const int SLASH_EQUALS = 24;
 const int RIGHT_ARROW = 25;
 
+const int END = 37;
+
 const int WHITESPACE = 26;
 const int NEWLINE = 27;
 const int UNRECOGNIZED = 28;

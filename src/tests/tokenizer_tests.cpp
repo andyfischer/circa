@@ -108,6 +108,16 @@ void test_symbols()
     test_assert(results[7].match == token::DOUBLE_MINUS);
 }
 
+void test_keywords()
+{
+    token::TokenList results;
+    token::tokenize("end", results);
+
+    test_assert(results.size() == 1);
+    test_assert(results[0].text == "end");
+    test_assert(results[0].match == token::END);
+}
+
 void test_string_literal()
 {
     token::TokenList results;
@@ -154,6 +164,7 @@ void register_tokenizer_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_integers);
     REGISTER_TEST_CASE(tokenizer_tests::test_floats);
     REGISTER_TEST_CASE(tokenizer_tests::test_symbols);
+    REGISTER_TEST_CASE(tokenizer_tests::test_keywords);
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
     REGISTER_TEST_CASE(tokenizer_tests::token_stream_to_string);
