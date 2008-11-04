@@ -41,6 +41,7 @@ const char* getMatchText(int match)
         case RIGHT_ARROW: return "->";
         case WHITESPACE: return "WHITESPACE";
         case NEWLINE: return "NEWLINE";
+        case END: return "end";
         case UNRECOGNIZED: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -152,6 +153,17 @@ bool is_whitespace(char c)
 void top_level_consume_token(TokenizeContext &context)
 {
     if (is_letter(context.next())) {
+
+        if (context.next() == 'e' && context.next(1) == 'n'
+                && context.next(2) == 'd') {
+
+            context.consume();
+            context.consume();
+            context.consume();
+            context.pushResult(END);
+            return;
+        }
+
         consume_identifier(context);
         return;
     }
