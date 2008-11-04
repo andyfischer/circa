@@ -116,7 +116,7 @@ void Function::subroutine_create(Term* caller)
     for (unsigned int index=0; index < sub.inputTypes.count(); index++) {
         std::string name = get_placeholder_name_for_index(index);
         Term* placeholder = create_var(&sub.subroutineBranch,
-                sub.inputTypes[index]);
+            sub.inputTypes[index]);
         sub.subroutineBranch.bindName(placeholder, name);
     }
 }
@@ -130,6 +130,14 @@ void
 Function::call_subroutine(Term* caller)
 {
     Function &sub = as_function(caller->function);
+
+    if (sub.inputTypes.count() != caller->inputs.count()) {
+        std::stringstream msg;
+        msg << "Wrong number of inputs, expected: " << sub.inputTypes.count()
+            << ", found: " << caller->inputs.count();
+        error_occured(caller, msg.str());
+        return;
+    }
 
     Branch branch;
 
