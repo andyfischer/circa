@@ -1,16 +1,16 @@
 
-function print_success(int) {
+function print_success(float) {
     print("Called print_success")
 }
-print_success()
+print_success(0.0)
 
-function square(int a) -> int {
+function square(float a) -> float {
     return mult(a,a)
 }
 
-print(concat("Four squared is ", square(4)))
+print(concat("Four squared is ", square(4.0) -> to-string))
 
-five_squared = square(5)
+five_squared = square(5.0)
 
-print(concat("Five squared is ", five_squared))
+print(concat("Five squared is ", five_squared -> to-string))
 

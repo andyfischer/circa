@@ -10,6 +10,7 @@ namespace circa {
 void evaluate_term(Term* term);
 void evaluate_branch(Branch& branch);
 Branch* evaluate_file(std::string const& filename);
+
 void error_occured(Term* errorTerm, std::string const& message);
 
 Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs);
@@ -25,7 +26,7 @@ void register_pointer(Term* pointer, Term* pointee);
 //  1. We might re-use an existing term
 //  2. 'function' might be a type (create an empty instance)
 //  3. We might specialize an overloaded function
-//  4. add more stuff here
+//  4. Something else that is possibly implemented in the future?
 Term* apply_function(Branch& branch, Term* function, ReferenceList const& inputs);
 
 // Perform 'apply_function' and then evaluate the result

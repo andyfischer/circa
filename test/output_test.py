@@ -40,7 +40,7 @@ def run_test(filename):
         stdout_line = stdout_line[:-1] # remove trailing newline
 
         if line != stdout_line:
-            return ("Unexpected output for %s on line %d..\nExpected: %s\n  Output: %s"
+            return ("Unexpected output for %s on line %d:\nExpected: %s\n  Output: %s"
                     % (filename, numLines, line, stdout_line))
 
         numLines += 1
