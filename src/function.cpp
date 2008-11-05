@@ -1,7 +1,6 @@
 // Copyright 2008 Andrew Fischer
 
 #include "builtins.h"
-#include "errors.h"
 #include "function.h"
 #include "importing.h"
 #include "list.h"

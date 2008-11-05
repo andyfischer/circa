@@ -38,10 +38,10 @@ int main(int nargs, const char * args[])
             delete branch;
         }
 
-    } catch (errors::CircaError &err)
+    } catch (std::runtime_error const& err)
     {
         std::cout << "Top level error:\n";
-        std::cout << err.message() << std::endl;
+        std::cout << err.what() << std::endl;
     }
 
     shutdown();

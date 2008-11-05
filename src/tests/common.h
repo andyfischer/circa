@@ -3,14 +3,13 @@
 #ifndef CIRCA_TEST_COMMON_INCLUDED
 #define CIRCA_TEST_COMMON_INCLUDED
 
-#include "errors.h"
 #include "ref_list.h"
 
 namespace circa {
 
-class TestFailure : public errors::CircaError
+class TestFailure : public std::runtime_error
 {
-    virtual std::string message()
+    virtual std::string what()
     {
         return "Test failure";
     }
