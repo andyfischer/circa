@@ -82,7 +82,7 @@ void external_pointers()
             FUNCTION_TYPE,
             FLOAT_TYPE,
             BRANCH_TYPE,
-            function->inputs[1]->function->function->function // This is crazy
+            get_var_function(*KERNEL, FLOAT_TYPE)
             ));
 }
 

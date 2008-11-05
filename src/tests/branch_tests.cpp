@@ -60,9 +60,8 @@ void external_pointers()
     test_equals(list_all_pointers(inner_branch), ReferenceList(
                 inner_branch->function,
                 inner_branch->type,
+                inner_int->function,
                 INT_TYPE,
-                VAR_FUNCTION_GENERATOR, // temp
-                FUNCTION_TYPE,
                 ADD_FUNC,
                 FLOAT_TYPE));
 
@@ -71,12 +70,11 @@ void external_pointers()
 
     remap_pointers(inner_branch, myRemap);
 
-    test_assert(list_all_pointers(inner_branch) == ReferenceList(
+    test_equals(list_all_pointers(inner_branch), ReferenceList(
                 inner_branch->function,
                 inner_branch->type,
+                inner_int->function,
                 INT_TYPE,
-                VAR_FUNCTION_GENERATOR, // temp
-                FUNCTION_TYPE,
                 MULT_FUNC,
                 FLOAT_TYPE));
 

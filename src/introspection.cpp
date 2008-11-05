@@ -94,7 +94,7 @@ void check_pointers(Term* term)
 
 bool function_allows_term_reuse(Function &function)
 {
-    if (function.stateType != VOID_TYPE)
+    if ((function.stateType != VOID_TYPE) && (function.stateType != NULL))
         return false;
 
     if (!function.pureFunction)
@@ -102,6 +102,8 @@ bool function_allows_term_reuse(Function &function)
 
     return true;
 }
+
+bool gTraceFindEquivalent = false;
 
 bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs)
 {
@@ -137,8 +139,14 @@ Term* find_equivalent(Branch &branch, Term* function, ReferenceList const& input
 
 Term* find_equivalent(Term* function, ReferenceList const& inputs)
 {
-    if (!function_allows_term_reuse(as_function(function)))
+    gTraceFindEquivalent = false;
+
+    if (!function_allows_term_reuse(as_function(function))) {
+        if (gTraceFindEquivalent)
+            std::cout << "function doesn't allow term reuse" << std::endl;
+
         return false;
+    }
 
     Term* term = NULL;
 
