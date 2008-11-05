@@ -12,6 +12,9 @@ void print_terms(ReferenceList const& list, std::ostream &output);
 bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs);
 Term* find_equivalent(Term* function, ReferenceList const& inputs);
 void print_runtime_errors(Branch& branch, std::ostream& output);
+bool has_compile_errors(Branch& branch);
+std::vector<std::string> get_compile_errors(Branch& branch);
+void print_compile_errors(Branch& branch, std::ostream& output);
 
 }
 
