@@ -79,10 +79,6 @@ Term*& as_ref(Term* term)
 void
 Type::addMemberFunction(std::string const &name, Term *function)
 {
-    // make sure argument 0 of the function matches this type
-    //if (as_type(as_function(function).inputTypes[0]) != this)
-        //throw std::runtime_error("argument 0 of function doesn't match this type");
-
     this->memberFunctions.bind(function, name);
 }
 
