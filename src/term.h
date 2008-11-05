@@ -20,20 +20,20 @@ void assert_good(Term* term);
 
 struct Term
 {
+    // Our current value. This is meant to be transient.
+    void* value;
+
+    // A Type term that describes our data type
+    Term* type;
+
     Branch* owningBranch;
     ReferenceList inputs;
     Term* function;
 
-    // data type
-    Term* type;
-
-    // Our current value. This is meant to be transient.
-    void* value;
-
     // If true, recycle_value is allowed to steal our value
     bool stealingOk;
 
-    // Persisted value. Owned by us.
+    // Persisted internal value. Owned by us.
     Term* state;
 
     // Our name. We might have other aliases, according to the

@@ -39,10 +39,10 @@ void assert_good(Term* term)
 static int gNextGlobalID = 1;
 
 Term::Term()
-  : owningBranch(NULL),
-    function(NULL),
+  : value(NULL),
     type(NULL),
-    value(NULL),
+    owningBranch(NULL),
+    function(NULL),
     stealingOk(true),
     state(NULL),
     needsUpdate(true)
