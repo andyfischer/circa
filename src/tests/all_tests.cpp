@@ -13,7 +13,6 @@ void register_builtin_function_tests();
 void register_builtin_type_tests();
 void register_container_tests();
 void register_cpp_interface_tests();
-void register_error_tests();
 void register_execution_tests();
 void register_feedback_tests();
 void register_importing_tests();
@@ -35,7 +34,6 @@ void register_all_tests()
     register_builtin_type_tests();
     register_container_tests();
     register_cpp_interface_tests();
-    register_error_tests();
     register_execution_tests();
     register_feedback_tests();
     register_importing_tests();
