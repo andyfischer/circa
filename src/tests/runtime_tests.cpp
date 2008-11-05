@@ -90,6 +90,21 @@ void test_find_existing_equivalent()
     test_assert(addition != a_different_addition);
 }
 
+void var_function_reuse()
+{
+    Branch branch;
+
+    Term* function = get_var_function(branch, INT_TYPE);
+    Term* function2 = get_var_function(branch, INT_TYPE);
+
+    test_assert(function == function2);
+
+    Term* a = int_var(branch, 3);
+    Term* b = int_var(branch, 4);
+
+    test_assert(a->function == b->function);
+}
+
 } // namespace runtime_tests
 
 void register_runtime_tests()
@@ -99,6 +114,7 @@ void register_runtime_tests()
     REGISTER_TEST_CASE(runtime_tests::test_int_var);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
     REGISTER_TEST_CASE(runtime_tests::test_find_existing_equivalent);
+    REGISTER_TEST_CASE(runtime_tests::var_function_reuse);
 }
 
 } // namespace circa
