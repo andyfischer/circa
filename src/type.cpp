@@ -5,7 +5,6 @@
 #include "branch.h"
 #include "builtins.h"
 #include "cpp_interface.h"
-#include "errors.h"
 #include "function.h"
 #include "importing.h"
 #include "list.h"

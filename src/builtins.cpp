@@ -8,7 +8,6 @@
 #include "branch.h"
 #include "builtins.h"
 #include "cpp_interface.h"
-#include "errors.h"
 #include "feedback.h"
 #include "function.h"
 #include "importing.h"
@@ -318,10 +317,10 @@ void initialize()
         initialize_feedback_functions(*KERNEL);
         initialize_functions(KERNEL);
 
-    } catch (errors::CircaError& e)
+    } catch (std::runtime_error const& e)
     {
         std::cout << "An error occured while initializing." << std::endl;
-        std::cout << e.message() << std::endl;
+        std::cout << e.what() << std::endl;
         exit(1);
     }
 }

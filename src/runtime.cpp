@@ -1,7 +1,6 @@
 // Copyright 2008 Paul Hodge
 
 #include "branch.h"
-#include "errors.h"
 #include "introspection.h"
 #include "runtime.h"
 #include "function.h"

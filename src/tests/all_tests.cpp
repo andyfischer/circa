@@ -60,9 +60,9 @@ void run_all_tests()
             it->execute();
             successCount++;
         }
-        catch (errors::CircaError &err) {
+        catch (std::runtime_error const& err) {
             std::cout << "Error white running test case " << it->name << std::endl;
-            std::cout << err.message() << std::endl;
+            std::cout << err.what() << std::endl;
             failureCount++;
         }
     }

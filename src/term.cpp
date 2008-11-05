@@ -7,7 +7,6 @@
 
 #include "builtins.h"
 #include "branch.h"
-#include "errors.h"
 #include "function.h"
 #include "list.h"
 #include "runtime.h"
