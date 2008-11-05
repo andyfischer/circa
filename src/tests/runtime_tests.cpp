@@ -105,6 +105,34 @@ void var_function_reuse()
     test_assert(a->function == b->function);
 }
 
+void null_input_errors()
+{
+    Branch branch;
+
+    Term* one = float_var(branch, 1.0);
+
+    Term* term1 = apply_function(branch, get_global("add"), ReferenceList(NULL, one));
+    evaluate_term(term1);
+    test_assert(term1->hasError());
+    test_assert(term1->getErrorMessage() == "Input 0 is NULL");
+
+    term1->function = NULL;
+    evaluate_term(term1);
+    test_assert(term1->hasError());
+    test_assert(term1->getErrorMessage() == "Function is NULL");
+
+    Term* term2 = apply_function(branch, get_global("add"), ReferenceList(one, NULL));
+    evaluate_term(term2);
+    test_assert(term2->hasError());
+    test_assert(term2->getErrorMessage() == "Input 1 is NULL");
+
+    set_input(term2, 1, one);
+    evaluate_term(term2);
+    test_assert(!term2->hasError());
+    test_assert(term2->getErrorMessage() == "");
+    test_assert(term2->asFloat() == 2.0);
+}
+
 } // namespace runtime_tests
 
 void register_runtime_tests()
@@ -115,6 +143,7 @@ void register_runtime_tests()
     REGISTER_TEST_CASE(runtime_tests::test_misc);
     REGISTER_TEST_CASE(runtime_tests::test_find_existing_equivalent);
     REGISTER_TEST_CASE(runtime_tests::var_function_reuse);
+    REGISTER_TEST_CASE(runtime_tests::null_input_errors);
 }
 
 } // namespace circa
