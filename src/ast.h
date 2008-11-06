@@ -46,7 +46,7 @@ struct Infix : public Expression
     virtual std::string toString() const;
     virtual Term* createTerm(Branch& branch);
     virtual void walk(ExpressionWalker &walker);
-    virtual std::string typeName() { return "infix"; }
+    virtual std::string typeName() { return "Infix"; }
 };
 
 struct FunctionCall : public Expression
@@ -79,7 +79,7 @@ struct FunctionCall : public Expression
     virtual std::string toString() const;
     virtual Term* createTerm(Branch& branch);
     virtual void walk(ExpressionWalker &walker);
-    virtual std::string typeName() { return "function-call"; }
+    virtual std::string typeName() { return "FunctionCall"; }
 };
 
 struct Literal : public Expression
@@ -97,7 +97,7 @@ struct LiteralString : public Literal
     virtual std::string toString() const;
     virtual Term* createTerm(Branch& branch);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
-    virtual std::string typeName() { return "literal-string"; }
+    virtual std::string typeName() { return "LiteralString"; }
 };
 
 struct LiteralFloat : public Literal
@@ -111,7 +111,7 @@ struct LiteralFloat : public Literal
     }
     virtual Term* createTerm(Branch& branch);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
-    virtual std::string typeName() { return "literal-float"; }
+    virtual std::string typeName() { return "LiteralFloat"; }
 };
 
 struct LiteralInteger : public Literal
@@ -125,7 +125,7 @@ struct LiteralInteger : public Literal
     }
     virtual Term* createTerm(Branch& branch);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
-    virtual std::string typeName() { return "literal-integer"; }
+    virtual std::string typeName() { return "LiteralInteger"; }
 };
 
 struct Identifier : public Expression
