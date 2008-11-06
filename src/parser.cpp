@@ -114,6 +114,10 @@ ast::Statement* statement(TokenStream& tokens)
         return functionDecl(tokens);
     }
 
+    if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.next().text == "type") {
+        return typeDecl(tokens);
+    }
+
     return expressionStatement(tokens);
 }
 
@@ -376,6 +380,45 @@ ast::FunctionDecl* functionDecl(TokenStream& tokens)
 
     possibleNewline(tokens);
     
+    return decl.release();
+}
+
+ast::TypeDecl* typeDecl(token_stream::TokenStream& tokens)
+{
+    std::auto_ptr<ast::TypeDecl> decl(new ast::TypeDecl());
+
+    std::string typeKeyword = tokens.consume(tokenizer::IDENTIFIER);
+    assert(typeKeyword == "type");
+
+    possibleWhitespace(tokens);
+
+    decl->name = tokens.consume(tokenizer::IDENTIFIER);
+
+    possibleNewline(tokens);
+
+    tokens.consume(tokenizer::LBRACE);
+
+    possibleNewline(tokens);
+
+    while (true) {
+
+        possibleWhitespace(tokens);
+
+        if (tokens.nextIs(tokenizer::RBRACE)) {
+            tokens.consume(tokenizer::RBRACE);
+            break;
+        }
+
+        std::string fieldType = tokens.consume(tokenizer::IDENTIFIER);
+        possibleWhitespace(tokens);
+        std::string fieldName = tokens.consume(tokenizer::IDENTIFIER);
+        possibleWhitespace(tokens);
+
+        decl->addMember(fieldType, fieldName);
+
+        tokens.consume(tokenizer::NEWLINE);
+    }
+
     return decl.release();
 }
 

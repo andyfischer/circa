@@ -370,5 +370,18 @@ FunctionDecl::toString() const
     return out.str();
 }
 
+std::string
+TypeDecl::toString() const
+{
+    return "TODO";
+}
+
+Term*
+TypeDecl::createTerm(Branch& branch)
+{
+    // FIXME
+    return NULL;
+}
+
 } // namespace ast
 } // namespace circa

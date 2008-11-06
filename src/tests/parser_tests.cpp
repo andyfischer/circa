@@ -196,7 +196,7 @@ void function_decl_parse()
             "end");
     ast::Statement* statement = parser::statement(tokens);
 
-    test_assert(statement->typeName() == "function-decl");
+    test_assert(statement->typeName() == "FunctionDecl");
 
     tokens.reset("function func2()\n"
             "print(\"hello\")\n"
@@ -294,6 +294,27 @@ void comment_statement()
     test_assert(tokens.finished());
 }
 
+void test_type_decl()
+{
+    token_stream::TokenStream tokens("type Vector {\nfloat x\nint y\n}");
+
+    ast::TypeDecl* typeDecl = parser::typeDecl(tokens);
+    test_assert(typeDecl != NULL);
+    test_assert(typeDecl->name == "Vector");
+    test_assert(typeDecl->members[0].type == "float");
+    test_assert(typeDecl->members[0].name == "x");
+    test_assert(typeDecl->members[1].type == "int");
+    test_assert(typeDecl->members[1].name == "y");
+}
+
+void test_type_decl2()
+{
+    token_stream::TokenStream tokens("type Mytype\n{\nstring str\nfloat asdf\n}");
+    ast::Statement* statement = parser::statement(tokens);
+
+    test_assert(dynamic_cast<ast::TypeDecl*>(statement) != NULL);
+}
+
 } // namespace parser_tests
 
 void register_parser_tests()
@@ -313,6 +334,8 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::ast_walk);
     REGISTER_TEST_CASE(parser_tests::test_eval_statement);
     REGISTER_TEST_CASE(parser_tests::comment_statement);
+    REGISTER_TEST_CASE(parser_tests::test_type_decl);
+    REGISTER_TEST_CASE(parser_tests::test_type_decl2);
 }
 
 } // namespace circa

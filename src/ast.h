@@ -137,7 +137,7 @@ struct Identifier : public Expression
     virtual std::string toString() const;
     virtual Term* createTerm(Branch& branch);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
-    virtual std::string typeName() { return "identifier"; }
+    virtual std::string typeName() { return "Identifier"; }
 };
 
 struct Statement
@@ -148,7 +148,7 @@ struct Statement
     virtual ~Statement() { delete expression; }
     virtual std::string toString() const = 0;
     virtual Term* createTerm(Branch& branch) = 0;
-    virtual std::string typeName() { return "statement"; }
+    virtual std::string typeName() { return "Statement"; }
 
     typedef std::vector<Statement*> List;
 };
@@ -162,7 +162,7 @@ struct StatementList
     virtual ~StatementList();
     virtual std::string toString() const;
     void createTerms(Branch& branch);
-    virtual std::string typeName() { return "statement-list"; }
+    virtual std::string typeName() { return "StatementList"; }
     int count() const { return (int) statements.size(); }
     Statement* operator[](int index) { return statements[index]; }
 };
@@ -175,7 +175,7 @@ struct ExpressionStatement : public Statement
 
     virtual std::string toString() const;
     virtual Term* createTerm(Branch& branch);
-    virtual std::string typeName() { return "expression-statement"; }
+    virtual std::string typeName() { return "ExpressionStatement"; }
 };
 
 // 'IgnorableStatement' includes comments and blank lines
@@ -186,7 +186,7 @@ struct IgnorableStatement : public Statement
     virtual ~IgnorableStatement() { }
     virtual std::string toString() const { return text; }
     virtual Term* createTerm(Branch& branch) { return NULL; }
-    virtual std::string typeName() { return "ignorable-statement"; }
+    virtual std::string typeName() { return "IgnorableStatement"; }
 };
 
 struct FunctionHeader
@@ -221,7 +221,31 @@ struct FunctionDecl : public Statement
 
     virtual std::string toString() const;
     virtual Term* createTerm(Branch& branch);
-    virtual std::string typeName() { return "function-decl"; }
+    virtual std::string typeName() { return "FunctionDecl"; }
+};
+
+struct TypeDecl : public Statement
+{
+    struct Member {
+        std::string type;
+        std::string name;
+
+        Member(std::string const& _type, std::string const& _name)
+          : type(_type), name(_name) {}
+    };
+    typedef std::vector<Member> MemberList;
+
+    std::string name;
+    MemberList members;
+
+    void addMember(std::string const& type, std::string const& name)
+    {
+        members.push_back(Member(type, name));
+    }
+
+    virtual std::string toString() const;
+    virtual Term* createTerm(Branch& branch);
+    virtual std::string typeName() { return "TypeDecl"; }
 };
 
 } // namespace ast
