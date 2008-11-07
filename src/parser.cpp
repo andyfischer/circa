@@ -15,8 +15,10 @@ Term* apply_statement(Branch& branch, std::string const& input)
     TokenStream tokens(input);
 
     ast::Statement* statementAst = parser::statement(tokens);
+    assert(statementAst != NULL);
 
     Term* result = statementAst->createTerm(branch);
+    assert(result != NULL);
 
     // check for rebind operator
     struct RebindFinder : public ast::ExpressionWalker
@@ -35,12 +37,14 @@ Term* apply_statement(Branch& branch, std::string const& input)
 
     } rebindFinder;
 
-    statementAst->expression->walk(rebindFinder);
+    if (statementAst->expression != NULL) {
+        statementAst->expression->walk(rebindFinder);
 
-    std::vector<std::string>::iterator it;
-    for (it = rebindFinder.rebindNames.begin(); it != rebindFinder.rebindNames.end(); ++it)
-    {
-        branch.bindName(result, *it);
+        std::vector<std::string>::iterator it;
+        for (it = rebindFinder.rebindNames.begin(); it != rebindFinder.rebindNames.end(); ++it)
+        {
+            branch.bindName(result, *it);
+        }
     }
 
     delete statementAst;
