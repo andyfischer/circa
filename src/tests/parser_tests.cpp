@@ -307,12 +307,26 @@ void test_type_decl()
     test_assert(typeDecl->members[1].name == "y");
 }
 
-void test_type_decl2()
+void test_type_decl_statement()
 {
     token_stream::TokenStream tokens("type Mytype\n{\nstring str\nfloat asdf\n}");
     ast::Statement* statement = parser::statement(tokens);
 
     test_assert(dynamic_cast<ast::TypeDecl*>(statement) != NULL);
+}
+
+void test_type_decl_full_trip()
+{
+    Branch branch;
+    Term *t = eval_statement(branch, "type Mytype\n{\nstring s\nfloat a\n}");
+
+    test_assert(!t->hasError());
+
+    test_assert(t->name == "Mytype");
+    test_assert(as_type(t).fields[0].type == STRING_TYPE);
+    test_assert(as_type(t).fields[0].name == "s");
+    test_assert(as_type(t).fields[1].type == FLOAT_TYPE);
+    test_assert(as_type(t).fields[1].name == "a");
 }
 
 } // namespace parser_tests
@@ -335,7 +349,8 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::test_eval_statement);
     REGISTER_TEST_CASE(parser_tests::comment_statement);
     REGISTER_TEST_CASE(parser_tests::test_type_decl);
-    REGISTER_TEST_CASE(parser_tests::test_type_decl2);
+    REGISTER_TEST_CASE(parser_tests::test_type_decl_statement);
+    REGISTER_TEST_CASE(parser_tests::test_type_decl_full_trip);
 }
 
 } // namespace circa

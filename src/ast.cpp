@@ -345,8 +345,6 @@ FunctionDecl::createTerm(Branch& branch)
         Statement* statement = this->statements->operator[](statementIndex);
 
         statement->createTerm(as_function(sub).subroutineBranch);
-
-        // ...
     }
 
     Term* outer_val = create_var(&branch, FUNCTION_TYPE);
@@ -373,14 +371,41 @@ FunctionDecl::toString() const
 std::string
 TypeDecl::toString() const
 {
-    return "TODO";
+    std::stringstream out;
+
+    out << "type " << name << "{" << std::endl;
+
+    MemberList::const_iterator it;
+    for (it = members.begin(); it != members.end(); ++it) {
+        out << "  " << it->type << " " << it->name << std::endl;
+    }
+
+    out << "}";
+
+    return out.str();
 }
 
 Term*
 TypeDecl::createTerm(Branch& branch)
 {
-    // FIXME
-    return NULL;
+    Branch workspace;
+
+    string_var(workspace, this->name, "typeName");
+
+    eval_statement(workspace, "t = create-compound-type(typeName)");
+
+    MemberList::const_iterator it;
+    for (it = members.begin(); it != members.end(); ++it) {
+        //string_var(workspace, it->type, "fieldType");
+        string_var(workspace, it->name, "fieldName");
+        eval_statement(workspace,
+            std::string("compound-type-append-field(@t, "+it->type+", fieldName)"));
+    }
+
+    Term* result_term = create_var(&branch, TYPE_TYPE);
+    steal_value(workspace["t"], result_term);
+    branch.bindName(result_term, this->name);
+    return result_term;
 }
 
 } // namespace ast
