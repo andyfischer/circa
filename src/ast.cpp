@@ -46,6 +46,7 @@ Infix::toString() const
         + this->postOperatorWhitespace
         + this->right->toString();
 }
+
 Term*
 Infix::createTerm(Branch& branch)
 {
