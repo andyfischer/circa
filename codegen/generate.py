@@ -16,7 +16,7 @@ namespace ${name}_function {
     void setup(Branch& kernel)
     {
         Term* main_func = import_c_function(kernel, evaluate,
-                $header);
+                "$header");
         as_function(main_func).pureFunction = $is_pure;
 
         $feedback_propogate_setup
@@ -64,7 +64,8 @@ def generate_function(functionName):
 
     result = TEMPLATE.substitute(configs)
 
-    print result
+    output = open(output_path, 'w')
+    output.write(result)
+    output.close()
 
-    
 generate_function("add")
