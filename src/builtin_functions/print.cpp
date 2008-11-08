@@ -1,4 +1,8 @@
+
 // Copyright 2008 Paul Hodge
+
+// This file was generated using ../src/builtin_functions/print.source.py. You should probably not modify
+// this file directly.
 
 namespace print_function {
 
@@ -7,8 +11,13 @@ namespace print_function {
         std::cout << as_string(caller->inputs[0]) << std::endl;
     }
 
-    void setup(Branch& kernel) {
-        import_c_function(kernel, evaluate,
-             "function print(string)");
+    
+    void setup(Branch& kernel)
+    {
+        Term* main_func = import_c_function(kernel, evaluate,
+                "function print(string)");
+        as_function(main_func).pureFunction = false;
+
+        
     }
 }

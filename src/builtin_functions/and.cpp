@@ -1,4 +1,8 @@
+
 // Copyright 2008 Paul Hodge
+
+// This file was generated using ../src/builtin_functions/and.source.py. You should probably not modify
+// this file directly.
 
 namespace and_function {
 
@@ -7,9 +11,13 @@ namespace and_function {
         as_bool(caller) = as_bool(caller->inputs[0]) && as_bool(caller->inputs[1]);
     }
 
+    
     void setup(Branch& kernel)
     {
-        import_c_function(kernel, evaluate,
-            "function and(bool, bool) -> bool");
+        Term* main_func = import_c_function(kernel, evaluate,
+                "function and(bool,bool) -> bool");
+        as_function(main_func).pureFunction = true;
+
+        
     }
 }

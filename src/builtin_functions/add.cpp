@@ -1,6 +1,9 @@
 
 // Copyright 2008 Paul Hodge
 
+// This file was generated using ../src/builtin_functions/add.source.py. You should probably not modify
+// this file directly.
+
 namespace add_function {
 
     void evaluate(Term* caller)
