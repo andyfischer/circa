@@ -1,13 +1,13 @@
-// Copyright 2008 Paul Hodge
+# Copyright 2008 Paul Hodge
 
-namespace add_function {
+header = "function add(float,float) -> float"
+pure = True
 
-    void evaluate(Term* caller)
-    {
-        as_float(caller) = as_float(caller->inputs[0]) + as_float(caller->inputs[1]);
-    }
-    void feedback_propogate(Term* caller)
-    {
+evaluate = """
+        as_float(caller) = as_float(caller->inputs[0]) + as_float(caller->inputs[1])
+"""
+
+feedback_propogate = """
         Term* target = caller->inputs[0];
         Term* desired = caller->inputs[1];
         Branch& myBranch = as_branch(caller->state);
@@ -31,16 +31,4 @@ namespace add_function {
         }
 
         evaluate_branch(myBranch);
-    }
-    void setup(Branch& kernel)
-    {
-        Term* add_func = import_c_function(kernel, evaluate,
-                "function add(float, float) -> float");
-        as_function(add_func).pureFunction = true;
-
-        Term* fp_func = import_c_function(kernel, feedback_propogate,
-                "function add-feedback-propogate(any,any)");
-        as_function(fp_func).stateType = BRANCH_TYPE;
-        as_function(add_func).feedbackPropogateFunction = fp_func;
-    }
-}
+"""
