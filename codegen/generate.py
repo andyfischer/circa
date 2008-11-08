@@ -5,6 +5,9 @@ import os, string
 TEMPLATE = string.Template("""
 // Copyright 2008 Andrew Fischer
 
+// This file was generated using $source_file. You should probably not modify
+// this file directly.
+
 namespace ${name}_function {
 
     void evaluate(Term* caller)
@@ -49,7 +52,7 @@ def generate_function(functionName):
     if not os.path.exists(output_path):
         raise Exception("couldn't find file: "+output_path)
 
-    configs = {'name':functionName}
+    configs = {'name':functionName, 'source_file':py_source_path}
 
     execfile(py_source_path, configs)
 
@@ -69,3 +72,9 @@ def generate_function(functionName):
     output.close()
 
 generate_function("add")
+generate_function("and")
+generate_function("if_expr")
+generate_function("or")
+generate_function("print")
+generate_function("read_text_file")
+generate_function("write_text_file")

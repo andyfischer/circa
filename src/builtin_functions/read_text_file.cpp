@@ -1,9 +1,14 @@
+
 // Copyright 2008 Andrew Fischer
+
+// This file was generated using ../src/builtin_functions/read_text_file.source.py. You should probably not modify
+// this file directly.
 
 namespace read_text_file_function {
 
     void evaluate(Term* caller)
     {
+        
         std::string filename = as_string(caller->inputs[0]);
         std::ifstream file;
         file.open(filename.c_str(), std::ios::in);
@@ -18,10 +23,16 @@ namespace read_text_file_function {
         }
         file.close();
         as_string(caller) = contents.str();
+
     }
+
     
-    void setup(Branch &kernel) {
-        import_c_function(kernel, evaluate,
-            "function read-text-file(string) -> string");
+    void setup(Branch& kernel)
+    {
+        Term* main_func = import_c_function(kernel, evaluate,
+                "function read-text-file(string) -> string");
+        as_function(main_func).pureFunction = false;
+
+        
     }
 }
