@@ -4,7 +4,7 @@ header = "function add(float,float) -> float"
 pure = True
 
 evaluate = """
-        as_float(caller) = as_float(caller->inputs[0]) + as_float(caller->inputs[1])
+        as_float(caller) = as_float(caller->inputs[0]) + as_float(caller->inputs[1]);
 """
 
 feedback_propogate = """
