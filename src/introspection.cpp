@@ -107,6 +107,9 @@ bool gTraceFindEquivalent = false;
 
 bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs)
 {
+    if (target->function != function)
+        return false;
+
     if (!function_allows_term_reuse(as_function(function)))
         return false;
 
