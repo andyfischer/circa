@@ -47,24 +47,46 @@ void register_all_tests()
     register_type_tests();
 }
 
-void run_all_tests()
+bool run_test(TestCase& testCase)
+{
+    try {
+        testCase.execute();
+        return true;
+    }
+    catch (std::runtime_error const& err) {
+        std::cout << "Error white running test case " << testCase.name << std::endl;
+        std::cout << err.what() << std::endl;
+        return false;
+    }
+}
+
+void run_test(std::string const& testName)
 {
     register_all_tests();
 
     std::vector<TestCase>::iterator it;
+    for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
+        if (it->name == testName) {
+            run_test(*it);
+            return;
+        }
+    }
+
+    std::cout << "Couldn't find a test named: " << testName << std::endl;
+}
+
+void run_all_tests()
+{
+    register_all_tests();
+
     int totalTestCount = (int) gTestCases.size();
     int successCount = 0;
     int failureCount = 0;
+    std::vector<TestCase>::iterator it;
     for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
-        try {
-            it->execute();
-            successCount++;
-        }
-        catch (std::runtime_error const& err) {
-            std::cout << "Error white running test case " << it->name << std::endl;
-            std::cout << err.what() << std::endl;
-            failureCount++;
-        }
+        bool result = run_test(*it);
+        if (result) successCount++;
+        else failureCount--;
     }
 
     std::string successes = successCount == 1 ? "success" : "successes";
