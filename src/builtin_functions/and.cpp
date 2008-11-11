@@ -1,8 +1,8 @@
 
 // Copyright 2008 Paul Hodge
 
-// This file was generated using ../src/builtin_functions/and.source.py. You should probably not modify
-// this file directly.
+// This file was generated using ../src/builtin_functions/and.source.py.
+// You should probably not modify this file directly.
 
 namespace and_function {
 
