@@ -5,10 +5,10 @@ import os, string
 TEMPLATE = string.Template("""
 // Copyright 2008 Andrew Fischer
 
-// This file was generated using $source_file. You should probably not modify
-// this file directly.
+// This file was generated using $source_file.
+// You should probably not modify this file directly.
 
-namespace ${name}_function {
+namespace $namespace_name {
 
     void evaluate(Term* caller)
     {
@@ -41,6 +41,14 @@ FEEDBACK_PROPOGATE_SETUP_TEMPLATE = string.Template("""
         as_function(main_func).feedbackPropogateFunction = fp_func;
 """)
 
+ALL_FUNCTIONS = []
+
+def convert_to_cpp_identifier(ident):
+    return ident.replace('-', '_')
+
+def get_namespace_for_function(functionName):
+    return convert_to_cpp_identifier(functionName) + "_function"
+
 def generate_function(functionName):
 
     root_path = os.path.join('..','src','builtin_functions')
@@ -49,10 +57,10 @@ def generate_function(functionName):
 
     if not os.path.exists(py_source_path):
         raise Exception("couldn't find file: "+py_source_path)
-    if not os.path.exists(output_path):
-        raise Exception("couldn't find file: "+output_path)
 
-    configs = {'name':functionName, 'source_file':py_source_path}
+    configs = {'name':functionName,
+               'namespace_name':convert_to_cpp_identifier(functionName) + "_function",
+               'source_file':py_source_path}
 
     execfile(py_source_path, configs)
 
@@ -71,10 +79,35 @@ def generate_function(functionName):
     output.write(result)
     output.close()
 
+    ALL_FUNCTIONS.append(functionName)
+
+def write_registry():
+    out = open('../src/builtin_functions/all_generated_functions.cpp', 'w')
+    out.write('// Generated file\n')
+    out.write('\n')
+    for function in ALL_FUNCTIONS:
+        out.write('#include "%s.cpp"\n' % function)
+    out.write('\n')
+    out.write('void setup_generated_functions(Branch& kernel)\n')
+    out.write('{\n')
+    for function in ALL_FUNCTIONS:
+        out.write('    '+get_namespace_for_function(function)+'::setup(kernel);\n')
+    out.write('}\n')
+    out.close()
+
 generate_function("add")
 generate_function("and")
-generate_function("if_expr")
+generate_function("concat")
+generate_function("if-expr")
+generate_function("list-append")
+generate_function("list-apply")
+generate_function("mult")
 generate_function("or")
 generate_function("print")
-generate_function("read_text_file")
-generate_function("write_text_file")
+generate_function("range")
+generate_function("read-text-file")
+generate_function("to-string")
+generate_function("tokenize")
+generate_function("write-text-file")
+
+write_registry()

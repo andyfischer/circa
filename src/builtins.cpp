@@ -12,6 +12,7 @@
 #include "function.h"
 #include "importing.h"
 #include "list.h"
+#include "parser.h"
 #include "runtime.h"
 #include "term.h"
 #include "token_stream.h"
@@ -171,58 +172,6 @@ void bootstrap_kernel()
     TYPE_TYPE->needsUpdate = false;
 }
 
-#include "builtin_functions/add.cpp"
-#include "builtin_functions/and.cpp"
-#include "builtin_functions/or.cpp"
-#include "builtin_functions/if_expr.cpp"
-#include "builtin_functions/read_text_file.cpp"
-#include "builtin_functions/write_text_file.cpp"
-#include "builtin_functions/to_string.cpp"
-#include "builtin_functions/print.cpp"
-#include "builtin_functions/tokenize.cpp"
-
-void mult__evaluate(Term* caller)
-{
-    as_float(caller) = as_float(caller->inputs[0]) * as_float(caller->inputs[1]);
-}
-
-void string_concat__evaluate(Term* caller)
-{
-    as_string(caller) = as_string(caller->inputs[0]) + as_string(caller->inputs[1]);
-}
-
-void range__evaluate(Term* caller)
-{
-    unsigned int max = as_int(caller->inputs[0]);
-
-    as_list(caller).clear();
-
-    for (unsigned int i=0; i < max; i++) {
-        as_list(caller).append(int_var(*caller->owningBranch, i));
-    }
-}
-
-void list_append__evaluate(Term* caller)
-{
-    recycle_value(caller->inputs[0], caller);
-    as_list(caller).append(caller->inputs[1]);
-}
-
-void list_apply__evaluate(Term* caller)
-{
-    as_function(caller->inputs[0]);
-    List& list = as_list(caller->inputs[1]);
-
-    as_list(caller).clear();
-
-    for (int i=0; i < list.count(); i++) {
-        Term* result = apply_function(*caller->owningBranch, caller->inputs[0], ReferenceList(list.get(i)));
-
-        evaluate_term(result);
-
-        as_list(caller).append(result);
-    }
-}
 
 void unknown_function__evaluate(Term* caller)
 {
@@ -267,27 +216,23 @@ void initialize_constants()
     CONSTANT_FALSE = apply_function(*KERNEL, BOOL_TYPE, ReferenceList());
     as_bool(CONSTANT_FALSE) = false;
     KERNEL->bindName(CONSTANT_FALSE, "false");
+
+    Term* tokenStreamType = 
+        quick_create_cpp_type<token_stream::TokenStream>(KERNEL, "TokenStream");
+    register_cpp_toString<token_stream::TokenStream>(tokenStreamType);
 }
+
+#include "builtin_functions/all_generated_functions.cpp"
 
 void initialize_builtin_functions(Branch* kernel)
 {
-    and_function::setup(*kernel);
-    add_function::setup(*kernel);
-    if_expr_function::setup(*kernel);
-    or_function::setup(*kernel);
-    print_function::setup(*kernel);
-    read_text_file_function::setup(*kernel);
-    to_string_function::setup(*kernel);
-    tokenize_function::setup(*kernel);
-    write_text_file_function::setup(*kernel);
+    setup_generated_functions(*kernel);
 
     ADD_FUNC = kernel->getNamed("add");
-    MULT_FUNC = quick_create_function(kernel, "mult", mult__evaluate,
-            ReferenceList(FLOAT_TYPE, FLOAT_TYPE), FLOAT_TYPE);
-    quick_create_function(kernel, "concat", string_concat__evaluate, ReferenceList(STRING_TYPE, STRING_TYPE), STRING_TYPE);
-    quick_create_function(kernel, "range", range__evaluate, ReferenceList(INT_TYPE), LIST_TYPE);
-    quick_create_function(kernel, "list-append", list_append__evaluate, ReferenceList(LIST_TYPE, ANY_TYPE), LIST_TYPE);
-    quick_create_function(kernel, "list-apply", list_apply__evaluate, ReferenceList(FUNCTION_TYPE, LIST_TYPE), LIST_TYPE);
+    MULT_FUNC = kernel->getNamed("mult");
+
+    assert(as_function(MULT_FUNC).evaluate != add_function::evaluate);
+
     UNKNOWN_FUNCTION = quick_create_function(kernel, "unknown-function",
             unknown_function__evaluate,
             ReferenceList(ANY_TYPE), ANY_TYPE);

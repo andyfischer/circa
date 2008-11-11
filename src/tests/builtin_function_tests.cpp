@@ -5,6 +5,7 @@
 #include <tests/common.h>
 #include "branch.h"
 #include "builtins.h"
+#include "function.h"
 #include "introspection.h"
 #include "parser.h"
 #include "runtime.h"
@@ -22,16 +23,16 @@ void test_math()
     Term* two = float_var(branch, 2);
     Term* three = float_var(branch, 3);
     Term* negative_one = float_var(branch, -1);
-    Term* add_f = get_global("add");
-    Term* mult_f = get_global("mult");
 
-    test_assert(as_float(eval_function(branch, add_f, ReferenceList(two,three))) == 5);
-    test_assert(as_float(eval_function(branch, add_f, ReferenceList(two,negative_one))) == 1);
+    test_assert(as_float(eval_function(branch, ADD_FUNC, ReferenceList(two,three))) == 5);
+    test_assert(as_float(eval_function(branch, ADD_FUNC, ReferenceList(two,negative_one))) == 1);
 
-    test_assert(as_float(eval_function(branch, mult_f, ReferenceList(two,three))) == 6);
-    test_assert(as_float(eval_function(branch, mult_f, ReferenceList(negative_one,three))) == -3);
+    test_assert(ADD_FUNC != MULT_FUNC);
+    test_assert(as_function(MULT_FUNC).evaluate != as_function(ADD_FUNC).evaluate);
 
-    test_assert(as_float(eval_statement(branch, "mult(5.0,3.0)")) == 15);
+    eval_function(branch, MULT_FUNC, ReferenceList(two,three));
+    test_assert(as_float(eval_function(branch, MULT_FUNC, ReferenceList(two,three))) == 6);
+    test_assert(as_float(eval_function(branch, MULT_FUNC, ReferenceList(negative_one,three))) == -3);
 }
 
 void test_int()

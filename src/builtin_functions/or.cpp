@@ -1,8 +1,8 @@
 
 // Copyright 2008 Andrew Fischer
 
-// This file was generated using ../src/builtin_functions/or.source.py. You should probably not modify
-// this file directly.
+// This file was generated using ../src/builtin_functions/or.source.py.
+// You should probably not modify this file directly.
 
 namespace or_function {
 
