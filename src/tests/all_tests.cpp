@@ -67,7 +67,9 @@ void run_test(std::string const& testName)
     std::vector<TestCase>::iterator it;
     for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
         if (it->name == testName) {
-            run_test(*it);
+            bool result = run_test(*it);
+            if (result)
+                std::cout << testName << " succeeded" << std::endl;
             return;
         }
     }

@@ -18,6 +18,7 @@
 #include "token_stream.h"
 #include "type.h"
 #include "values.h"
+#include "tests/all_tests.h"
 
 namespace circa {
 
@@ -92,8 +93,7 @@ void bootstrap_kernel()
     // Type Function
     //    Stores the Type object for functions. This term has function const-Type
     // Type Type
-    //    Type is a type, this term stores the Type object for types. This term has
-    //    function const-Type
+    //    Stores the Type object for types. This term has function const-Type
 
     KERNEL = new Branch();
 
@@ -172,7 +172,6 @@ void bootstrap_kernel()
     TYPE_TYPE->needsUpdate = false;
 }
 
-
 void unknown_function__evaluate(Term* caller)
 {
     std::cout << "Warning, calling an unknown function: "
@@ -230,8 +229,6 @@ void initialize_builtin_functions(Branch* kernel)
 
     ADD_FUNC = kernel->getNamed("add");
     MULT_FUNC = kernel->getNamed("mult");
-
-    assert(as_function(MULT_FUNC).evaluate != add_function::evaluate);
 
     UNKNOWN_FUNCTION = quick_create_function(kernel, "unknown-function",
             unknown_function__evaluate,

@@ -27,9 +27,6 @@ void test_math()
     test_assert(as_float(eval_function(branch, ADD_FUNC, ReferenceList(two,three))) == 5);
     test_assert(as_float(eval_function(branch, ADD_FUNC, ReferenceList(two,negative_one))) == 1);
 
-    test_assert(ADD_FUNC != MULT_FUNC);
-    test_assert(as_function(MULT_FUNC).evaluate != as_function(ADD_FUNC).evaluate);
-
     eval_function(branch, MULT_FUNC, ReferenceList(two,three));
     test_assert(as_float(eval_function(branch, MULT_FUNC, ReferenceList(two,three))) == 6);
     test_assert(as_float(eval_function(branch, MULT_FUNC, ReferenceList(negative_one,three))) == -3);
