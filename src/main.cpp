@@ -12,7 +12,6 @@ int main(int nargs, const char * args[])
     initialize();
 
     if (nargs == 1) {
-        run_test("builtin_function_tests::test_math");
         run_all_tests();
     }
 
