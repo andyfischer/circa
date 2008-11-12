@@ -220,7 +220,7 @@ void initialize_constants()
     register_cpp_toString<token_stream::TokenStream>(tokenStreamType);
 }
 
-#include "builtin_functions/all_generated_functions.cpp"
+#include "builtin_functions/generated/setup_all.cpp"
 
 void initialize_builtin_functions(Branch* kernel)
 {
