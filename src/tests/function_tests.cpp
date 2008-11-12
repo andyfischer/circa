@@ -3,7 +3,7 @@
 #include "common_headers.h"
 
 #include "circa.h"
-#include "common.h"
+#include "testing.h"
 #include "introspection.h"
 #include "runtime.h"
 

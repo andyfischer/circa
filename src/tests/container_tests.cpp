@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "tests/common.h"
+#include "testing.h"
 #include "circa.h"
 
 namespace circa {

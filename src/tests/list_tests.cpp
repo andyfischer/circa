@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "tests/common.h"
+#include "testing.h"
 #include "branch.h"
 #include "builtins.h"
 #include "list.h"

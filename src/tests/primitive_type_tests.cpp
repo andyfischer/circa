@@ -3,7 +3,7 @@
 #include "common_headers.h"
 
 #include "circa.h"
-#include "tests/common.h"
+#include "testing.h"
 
 namespace circa {
 namespace primitive_type_tests {

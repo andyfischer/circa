@@ -1,6 +1,6 @@
 // Copyright 2008 Paul Hodge
 
-#include "tests/common.h"
+#include "testing.h"
 #include "branch.h"
 #include "builtins.h"
 #include "introspection.h"

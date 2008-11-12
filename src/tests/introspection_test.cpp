@@ -1,7 +1,7 @@
 
 #include "common_headers.h"
 
-#include "tests/common.h"
+#include "testing.h"
 #include "builtins.h"
 #include "introspection.h"
 
