@@ -1,2 +1,2 @@
-cd $CIRCA_HOME/codegen
+cd $CIRCA_HOME/scripts
 ./generate.py
