@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, string
+import os, string, Utils
 
 TEMPLATE = string.Template("""
 // Copyright 2008 Paul Hodge
@@ -12,17 +12,17 @@ namespace $namespace_name {
 
     void evaluate(Term* caller)
     {
-        $evaluate
+$evaluate
     }
 
-    $feedback_propogate_defn
+$feedback_propogate_defn
     void setup(Branch& kernel)
     {
         Term* main_func = import_c_function(kernel, evaluate,
                 "$header");
         as_function(main_func).pureFunction = $is_pure;
 
-        $feedback_propogate_setup
+$feedback_propogate_setup
     }
 }
 """)
@@ -30,7 +30,7 @@ namespace $namespace_name {
 FEEDBACK_PROPOGATE_DEFN_TEMPLATE = string.Template("""
     void feedback_propogate(Term* caller)
     {
-        $feedback_propogate
+$feedback_propogate
     }
 """)
 
@@ -64,11 +64,26 @@ def generate_function(functionName):
 
     execfile(py_source_path, configs)
 
+    def normalize(s, indent):
+        return Utils.normalize_indent(
+                    Utils.strip_surrounding_blank_lines(
+                        Utils.strip_extra_blank_lines(s)), indent)
+    def normalize4(s):
+        return normalize(s, '    ')
+    def normalize8(s):
+        return normalize(s, '        ')
+
+
     configs['is_pure'] = 'true' if configs['pure'] else 'false'
+    configs['evaluate'] = normalize8(configs['evaluate'])
 
     if 'feedback_propogate' in configs:
-        configs['feedback_propogate_defn'] = FEEDBACK_PROPOGATE_DEFN_TEMPLATE.substitute(configs)
-        configs['feedback_propogate_setup'] = FEEDBACK_PROPOGATE_SETUP_TEMPLATE.substitute(configs)
+        configs['feedback_propogate'] = Utils.strip_surrounding_blank_lines(
+                configs['feedback_propogate'])
+        configs['feedback_propogate_defn'] = (
+            normalize4(FEEDBACK_PROPOGATE_DEFN_TEMPLATE.substitute(configs)))
+        configs['feedback_propogate_setup'] = (
+            normalize8(FEEDBACK_PROPOGATE_SETUP_TEMPLATE.substitute(configs)))
     else:
         configs['feedback_propogate_defn'] = ""
         configs['feedback_propogate_setup'] = ""
