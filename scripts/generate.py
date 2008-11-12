@@ -53,7 +53,7 @@ def generate_function(functionName):
 
     root_path = os.path.join('..','src','builtin_functions')
     py_source_path = os.path.join(root_path, functionName + '.source.py')
-    output_path = os.path.join(root_path, functionName + '.cpp')
+    output_path = os.path.join(root_path, 'generated', functionName + '.cpp')
 
     if not os.path.exists(py_source_path):
         raise Exception("couldn't find file: "+py_source_path)
@@ -72,7 +72,6 @@ def generate_function(functionName):
         return normalize(s, '    ')
     def normalize8(s):
         return normalize(s, '        ')
-
 
     configs['is_pure'] = 'true' if configs['pure'] else 'false'
     configs['evaluate'] = normalize8(configs['evaluate'])
@@ -97,7 +96,7 @@ def generate_function(functionName):
     ALL_FUNCTIONS.append(functionName)
 
 def write_registry():
-    out = open('../src/builtin_functions/all_generated_functions.cpp', 'w')
+    out = open('../src/builtin_functions/generated/setup_all.cpp', 'w')
     out.write('// Generated file\n')
     out.write('\n')
     for function in ALL_FUNCTIONS:
