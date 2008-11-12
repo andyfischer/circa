@@ -1,6 +1,6 @@
 // Copyright 2008 Andrew Fischer
 
-#include "tests/common.h"
+#include "testing.h"
 #include "common_headers.h"
 #include "branch.h"
 #include "builtins.h"

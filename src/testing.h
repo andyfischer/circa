@@ -1,7 +1,7 @@
 // Copyright 2008 Andrew Fischer
 
-#ifndef CIRCA_TEST_COMMON_INCLUDED
-#define CIRCA_TEST_COMMON_INCLUDED
+#ifndef CIRCA_TESTING_INCLUDED
+#define CIRCA_TESTING_INCLUDED
 
 #include "ref_list.h"
 
@@ -39,6 +39,10 @@ struct TestCase {
 extern std::vector<TestCase> gTestCases;
 
 #define REGISTER_TEST_CASE(f) gTestCases.push_back(TestCase(#f,f))
+
+void run_test(std::string const& testName);
+void run_all_tests();
+std::vector<std::string> list_all_test_names();
 
 } // namespace circa
 

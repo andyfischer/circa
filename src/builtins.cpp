@@ -18,7 +18,6 @@
 #include "token_stream.h"
 #include "type.h"
 #include "values.h"
-#include "tests/all_tests.h"
 
 namespace circa {
 
