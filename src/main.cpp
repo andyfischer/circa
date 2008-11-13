@@ -7,36 +7,49 @@
 
 using namespace circa;
 
-int main(int nargs, const char * args[])
+int circa_main(std::vector<std::string> args)
 {
     initialize();
 
-    if (nargs == 1) {
+    args.erase(args.begin());
+
+    bool justPrintBranch = false;
+
+    if (args.size() == 0) {
         run_all_tests();
+        goto shutdown;
     }
 
-    if (nargs == 2 && std::string("--list-tests") == args[1]) {
+    if (args[0] == "--list-tests") {
         std::vector<std::string> testNames = list_all_test_names();
 
         std::vector<std::string>::const_iterator it;
         for (it = testNames.begin(); it != testNames.end(); ++it) {
             std::cout << *it << std::endl;
         }
+        goto shutdown;
+    }
+
+    if (args[0] == "-p") {
+        justPrintBranch = true;
+        args.erase(args.begin());
     }
 
     try {
-        if (nargs > 1) {
-            Branch* branch = evaluate_file(args[1]);
+        Branch* branch = evaluate_file(args[0]);
 
-            if (has_compile_errors(*branch)) {
-                print_compile_errors(*branch, std::cout);
-            } else {
-                evaluate_branch(*branch);
-                print_runtime_errors(*branch, std::cout);
-            }
-
-            delete branch;
+        if (justPrintBranch) {
+            print_branch_extended(*branch, std::cout);
         }
+
+        else if (has_compile_errors(*branch)) {
+            print_compile_errors(*branch, std::cout);
+        } else {
+            evaluate_branch(*branch);
+            print_runtime_errors(*branch, std::cout);
+        }
+
+        delete branch;
 
     } catch (std::runtime_error const& err)
     {
@@ -44,5 +57,18 @@ int main(int nargs, const char * args[])
         std::cout << err.what() << std::endl;
     }
 
+shutdown:
     shutdown();
+    
+    return 0;
+}
+
+int main(int nargs, const char * args[])
+{
+    std::vector<std::string> args_vector;
+
+    for (int i = 0; i < nargs; i++)
+        args_vector.push_back(args[i]);
+
+    return circa_main(args_vector);
 }
