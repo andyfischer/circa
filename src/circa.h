@@ -9,6 +9,7 @@
 #include "list.h"
 #include "parser.h"
 #include "runtime.h"
+#include "syntax.h"
 #include "term.h"
 #include "tokenizer.h"
 #include "token_stream.h"

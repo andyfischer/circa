@@ -47,6 +47,7 @@ void print_term_extended(Term* term, std::ostream &output)
         Term* input = term->inputs[input_index];
         if (!first_input) output << ", ";
         output << get_short_local_name(input);
+        first_input = false;
     }
 
     output << ")";
