@@ -74,6 +74,14 @@ void test_string()
             == "hello world");
 }
 
+void test_concat()
+{
+    Branch branch;
+
+    //TODO
+    //test_assert(eval_as<std::string>("concat('a ', 'b', ' c')") == "a b c");
+}
+
 void test_bool()
 {
     Branch branch;
@@ -122,6 +130,7 @@ void register_builtin_function_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_float);
     REGISTER_TEST_CASE(builtin_function_tests::test_math);
     REGISTER_TEST_CASE(builtin_function_tests::test_string);
+    REGISTER_TEST_CASE(builtin_function_tests::test_concat);
     REGISTER_TEST_CASE(builtin_function_tests::test_bool);
     REGISTER_TEST_CASE(builtin_function_tests::test_reference);
 }

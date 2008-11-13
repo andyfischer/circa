@@ -7,14 +7,6 @@
 
 namespace circa {
 
-class TestFailure : public std::runtime_error
-{
-    virtual std::string what()
-    {
-        return "Test failure";
-    }
-};
-
 void _test_assert_function(bool condition, int line, const char* file);
 void _test_fail_function(int line, const char* file);
 void _test_equals_function(ReferenceList const& a, ReferenceList const& b,
