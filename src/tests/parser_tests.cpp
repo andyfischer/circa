@@ -203,7 +203,7 @@ void function_decl_parse()
             "end\n"
             "some-function(1,2)\n");
 
-    ast::StatementList* statementList = parser::statementList(tokens);
+    /*ast::StatementList* statementList = */parser::statementList(tokens);
 }
 
 void rebind_operator()

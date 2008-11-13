@@ -21,7 +21,9 @@ Function::Function()
     evaluate(NULL),
     meta(false),
     feedbackAccumulationFunction(NULL),
-    feedbackPropogateFunction(NULL)
+    feedbackPropogateFunction(NULL),
+    generateCppFunction(NULL),
+    printCircaSourceFunction(NULL)
 {
 }
 

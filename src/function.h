@@ -36,6 +36,7 @@ struct Function
     Term* feedbackAccumulationFunction;
     Term* feedbackPropogateFunction;
     Term* generateCppFunction;
+    Term* printCircaSourceFunction;
 
     Function();
 
