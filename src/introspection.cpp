@@ -10,6 +10,18 @@
 
 namespace circa {
 
+std::string get_short_local_name(Term* term)
+{
+    if (term == NULL)
+        return "NULL";
+    if (term->name != "")
+        return term->name;
+
+    std::stringstream stream;
+    stream << "#" << term->globalID;
+    return stream.str();
+}
+
 void print_term_extended(Term* term, std::ostream &output)
 {
     if (term == NULL) {
@@ -18,13 +30,29 @@ void print_term_extended(Term* term, std::ostream &output)
     }
 
     std::string name = term->name;
-    std::string funcName = term->function->name;
+    std::string funcName = get_short_local_name(term->function);
     std::string typeName = term->type->name;
 
-    if (name != "")
-        output << "'" << name << "' ";
+    output << "#" << term->globalID;
 
-    output << funcName << "() -> " << typeName;
+    if (name != "")
+        output << " " << name << "";
+
+    output << ": ";
+
+    output << funcName << "(";
+
+    bool first_input = true;
+    for (unsigned int input_index=0; input_index < term->inputs.count(); input_index++) {
+        Term* input = term->inputs[input_index];
+        if (!first_input) output << ", ";
+        output << get_short_local_name(input);
+    }
+
+    output << ")";
+
+    if (term->type != VOID_TYPE)
+        output << " -> " << typeName;
 
     if (term->hasError())
         output << " *" << term->getErrorMessage() << "*";
