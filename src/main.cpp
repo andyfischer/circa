@@ -14,6 +14,7 @@ int circa_main(std::vector<std::string> args)
     args.erase(args.begin());
 
     bool justPrintBranch = false;
+    bool justPrintSource = false;
 
     if (args.size() == 0) {
         run_all_tests();
@@ -35,11 +36,24 @@ int circa_main(std::vector<std::string> args)
         args.erase(args.begin());
     }
 
+    if (args[0] == "-s") {
+        justPrintSource = true;
+        args.erase(args.begin());
+
+        if (justPrintBranch) {
+            // todo: fatal
+        }
+    }
+
     try {
         Branch* branch = evaluate_file(args[0]);
 
         if (justPrintBranch) {
             print_branch_extended(*branch, std::cout);
+        }
+
+        else if (justPrintSource) {
+            print_source(*branch, std::cout);
         }
 
         else if (has_compile_errors(*branch)) {
