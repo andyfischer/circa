@@ -4,6 +4,7 @@
 #define CIRCA_CPP_INTERFACE_INCLUDED
 
 #include "importing.h"
+#include "parser.h"
 #include "term.h"
 #include "type.h"
 
@@ -82,6 +83,17 @@ T& as(Term* term)
         throw std::runtime_error("C++ type mismatch");
 
     return *((T*) term->value);
+}
+
+template <class T>
+T eval_as(std::string const& statement)
+{
+    Branch branch;
+
+    Term* result_term = eval_statement(branch, statement);
+    T result = as<T>(result_term);
+
+    return result;
 }
 
 } // namespace circa

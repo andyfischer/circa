@@ -43,6 +43,7 @@ void remap_pointers(Term* term, ReferenceMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
 void visit_pointers(Term* term, PointerVisitor &visitor);
 
+
 } // namespace circa
 
 #endif

@@ -1,11 +1,12 @@
 // Copyright 2008 Paul Hodge
 
-#include "testing.h"
 #include "branch.h"
 #include "builtins.h"
+#include "cpp_interface.h"
 #include "introspection.h"
 #include "parser.h"
 #include "runtime.h"
+#include "testing.h"
 #include "term.h"
 #include "type.h"
 #include "ref_list.h"
@@ -133,6 +134,11 @@ void null_input_errors()
     test_assert(term2->asFloat() == 2.0);
 }
 
+void test_eval_as()
+{
+    test_assert(eval_as<float>("add(1.0,2.0)") == 3);
+}
+
 } // namespace runtime_tests
 
 void register_runtime_tests()
@@ -144,6 +150,7 @@ void register_runtime_tests()
     REGISTER_TEST_CASE(runtime_tests::test_find_existing_equivalent);
     REGISTER_TEST_CASE(runtime_tests::var_function_reuse);
     REGISTER_TEST_CASE(runtime_tests::null_input_errors);
+    REGISTER_TEST_CASE(runtime_tests::test_eval_as);
 }
 
 } // namespace circa

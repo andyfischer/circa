@@ -3,5 +3,9 @@
 header = "function concat(string,string) -> string"
 pure = True
 evaluate = """
-    as_string(caller) = as_string(caller->inputs[0]) + as_string(caller->inputs[1]);
+    std::stringstream out;
+    for (unsigned int index=0; index < caller->inputs.count(); index++) {
+        out << as_string(caller->inputs[index]);
+    }
+    as_string(caller) = out.str();
 """

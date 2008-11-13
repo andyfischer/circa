@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "cpp_interface.h"
 #include "testing.h"
 #include "branch.h"
 #include "builtins.h"
@@ -78,8 +79,7 @@ void test_concat()
 {
     Branch branch;
 
-    //TODO
-    //test_assert(eval_as<std::string>("concat('a ', 'b', ' c')") == "a b c");
+    test_assert(eval_as<std::string>("concat('a ', 'b', ' c')") == "a b c");
 }
 
 void test_bool()
