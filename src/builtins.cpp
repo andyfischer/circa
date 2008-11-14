@@ -190,14 +190,14 @@ namespace var_function {
 
 void initialize_constants()
 {
-    BRANCH_TYPE = quick_create_cpp_type<Branch>(KERNEL, "Branch");
+    BRANCH_TYPE = quick_create_cpp_type<Branch>(*KERNEL, "Branch");
     as_type(BRANCH_TYPE).remapPointers = Branch::hosted_remap_pointers;
     as_type(BRANCH_TYPE).visitPointers = Branch::hosted_visit_pointers;
 
-    LIST_TYPE = quick_create_cpp_type<List>(KERNEL, "List");
+    LIST_TYPE = quick_create_cpp_type<List>(*KERNEL, "List");
     as_type(LIST_TYPE).toString = List__toString;
 
-    quick_create_cpp_type<Dictionary>(KERNEL, "Dictionary");
+    quick_create_cpp_type<Dictionary>(*KERNEL, "Dictionary");
 
     VAR_INT = get_var_function(*KERNEL, INT_TYPE);
     VAR_FLOAT = get_var_function(*KERNEL, FLOAT_TYPE);
@@ -216,7 +216,7 @@ void initialize_constants()
     KERNEL->bindName(CONSTANT_FALSE, "false");
 
     Term* tokenStreamType = 
-        quick_create_cpp_type<token_stream::TokenStream>(KERNEL, "TokenStream");
+        quick_create_cpp_type<token_stream::TokenStream>(*KERNEL, "TokenStream");
     register_cpp_toString<token_stream::TokenStream>(tokenStreamType);
 }
 

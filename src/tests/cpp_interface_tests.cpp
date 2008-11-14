@@ -38,7 +38,7 @@ void memory_management() {
     Branch branch;
 
     Type1::gInstanceCount = 0;
-    quick_create_cpp_type<Type1>(&branch, "Type1");
+    quick_create_cpp_type<Type1>(branch, "Type1");
 
     test_assert(Type1::gInstanceCount == 0);
     Term* term = apply_statement(branch, "a = Type1()");
@@ -52,7 +52,7 @@ void memory_management() {
 void default_function() {
     Branch branch;
 
-    Term* type1 = quick_create_cpp_type<Type1>(&branch, "Type1");
+    Term* type1 = quick_create_cpp_type<Type1>(branch, "Type1");
 
     Term* appendStr = quick_create_function(&branch, "append-str",
             append_string__evaluate, ReferenceList(type1, STRING_TYPE), type1);
