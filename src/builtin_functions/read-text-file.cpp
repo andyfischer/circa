@@ -1,4 +1,3 @@
-
 // Copyright 2008 Andrew Fischer
 
 namespace read_text_file_function {
@@ -21,13 +20,10 @@ namespace read_text_file_function {
         as_string(caller) = contents.str();
     }
 
-
     void setup(Branch& kernel)
     {
         Term* main_func = import_c_function(kernel, evaluate,
                 "function read-text-file(string) -> string");
         as_function(main_func).pureFunction = false;
-
-
     }
 }

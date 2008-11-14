@@ -11,13 +11,10 @@ namespace if_expr_function {
         recycle_value(caller->inputs[index], caller);
     }
 
-
     void setup(Branch& kernel)
     {
         Term* main_func = import_c_function(kernel, evaluate,
                 "function if-expr(bool,any,any) -> any");
         as_function(main_func).pureFunction = true;
-
-
     }
 }

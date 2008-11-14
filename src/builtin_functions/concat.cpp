@@ -1,4 +1,3 @@
-
 // Copyright 2008 Andrew Fischer
 
 namespace concat_function {
@@ -12,13 +11,10 @@ namespace concat_function {
         as_string(caller) = out.str();
     }
 
-
     void setup(Branch& kernel)
     {
         Term* main_func = import_c_function(kernel, evaluate,
                 "function concat(string,string) -> string");
         as_function(main_func).pureFunction = true;
-
-
     }
 }
