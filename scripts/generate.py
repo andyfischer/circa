@@ -5,9 +5,6 @@ import os, string, Utils
 TEMPLATE = string.Template("""
 // Copyright 2008 Andrew Fischer
 
-// This file was generated using $source_file.
-// You should probably not modify this file directly.
-
 namespace $namespace_name {
 
     void evaluate(Term* caller)
