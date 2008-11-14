@@ -13,6 +13,7 @@ Term* eval_statement(Branch& branch, std::string const& input);
 
 namespace parser {
 
+std::string possibleWhitespace(token_stream::TokenStream& tokens);
 ast::StatementList* statementList(token_stream::TokenStream& tokens);
 ast::Statement* statement(token_stream::TokenStream& tokens);
 ast::ExpressionStatement* expressionStatement(token_stream::TokenStream& tokens);

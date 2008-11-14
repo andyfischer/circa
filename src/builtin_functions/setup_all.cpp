@@ -8,6 +8,7 @@
 #include "list-apply.cpp"
 #include "mult.cpp"
 #include "or.cpp"
+#include "parse-function-header.cpp"
 #include "print.cpp"
 #include "range.cpp"
 #include "read-text-file.cpp"
@@ -25,6 +26,7 @@ void setup_generated_functions(Branch& kernel)
     list_apply_function::setup(kernel);
     mult_function::setup(kernel);
     or_function::setup(kernel);
+    parse_function_header_function::setup(kernel);
     print_function::setup(kernel);
     range_function::setup(kernel);
     read_text_file_function::setup(kernel);

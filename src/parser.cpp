@@ -61,8 +61,8 @@ Term* eval_statement(Branch& branch, std::string const& input)
 
 namespace parser {
 
-std::string possibleWhitespace(TokenStream& tokens);
-std::string possibleNewline(TokenStream& tokens);
+std::string possibleWhitespace(token_stream::TokenStream& tokens);
+std::string possibleNewline(token_stream::TokenStream& tokens);
 
 ast::StatementList* statementList(TokenStream& tokens)
 {
@@ -426,7 +426,7 @@ ast::TypeDecl* typeDecl(token_stream::TokenStream& tokens)
     return decl.release();
 }
 
-std::string possibleWhitespace(TokenStream& tokens)
+std::string possibleWhitespace(token_stream::TokenStream& tokens)
 {
     if (tokens.nextIs(tokenizer::WHITESPACE))
         return tokens.consume(tokenizer::WHITESPACE);
@@ -434,7 +434,7 @@ std::string possibleWhitespace(TokenStream& tokens)
         return "";
 }
 
-std::string possibleNewline(TokenStream& tokens)
+std::string possibleNewline(token_stream::TokenStream& tokens)
 {
     std::stringstream output;
 

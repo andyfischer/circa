@@ -126,7 +126,7 @@ void run_all_tests()
     for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
         bool result = run_test(*it);
         if (result) successCount++;
-        else failureCount--;
+        else failureCount++;
     }
 
     std::string successes = successCount == 1 ? "success" : "successes";

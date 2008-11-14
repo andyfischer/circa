@@ -122,6 +122,18 @@ void test_reference()
         ReferenceList(myref->function, REFERENCE_TYPE));
 }
 
+void test_parse_function_header()
+{
+    ast::FunctionHeader header = eval_as<ast::FunctionHeader>(
+        "parse-function-header('function fname(int arg1, string arg2) -> float')");
+
+    test_assert(header.functionName == "fname");
+    test_assert(header.arguments[0].name == "arg1");
+    test_assert(header.arguments[0].type == "int");
+    test_assert(header.outputType == "float");
+
+}
+
 } // namespace builtin_function_tests
 
 void register_builtin_function_tests()
@@ -133,6 +145,7 @@ void register_builtin_function_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_concat);
     REGISTER_TEST_CASE(builtin_function_tests::test_bool);
     REGISTER_TEST_CASE(builtin_function_tests::test_reference);
+    REGISTER_TEST_CASE(builtin_function_tests::test_parse_function_header);
 }
 
 } // namespace circa

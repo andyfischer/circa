@@ -355,19 +355,19 @@ void initialize_type_type(Term* typeType)
 
 void initialize_primitive_types(Branch* kernel)
 {
-    STRING_TYPE = quick_create_cpp_type<std::string>(KERNEL, "string");
+    STRING_TYPE = quick_create_cpp_type<std::string>(*KERNEL, "string");
     as_type(STRING_TYPE).equals = cpp_interface::templated_equals<std::string>;
     as_type(STRING_TYPE).toString = primitives::string_t::to_string;
 
-    INT_TYPE = quick_create_cpp_type<int>(KERNEL, "int");
+    INT_TYPE = quick_create_cpp_type<int>(*KERNEL, "int");
     as_type(INT_TYPE).equals = cpp_interface::templated_equals<int>;
     as_type(INT_TYPE).toString = primitives::int_t::to_string;
 
-    FLOAT_TYPE = quick_create_cpp_type<float>(KERNEL, "float");
+    FLOAT_TYPE = quick_create_cpp_type<float>(*KERNEL, "float");
     as_type(FLOAT_TYPE).equals = cpp_interface::templated_equals<float>;
     as_type(FLOAT_TYPE).toString = primitives::float_t::to_string;
 
-    BOOL_TYPE = quick_create_cpp_type<bool>(KERNEL, "bool");
+    BOOL_TYPE = quick_create_cpp_type<bool>(*KERNEL, "bool");
     as_type(BOOL_TYPE).equals = cpp_interface::templated_equals<bool>;
     as_type(BOOL_TYPE).toString = primitives::bool_t::to_string;
 
