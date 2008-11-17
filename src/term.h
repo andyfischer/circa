@@ -31,7 +31,7 @@ struct Term
     // Input terms
     ReferenceList inputs;
 
-    // Our function- the thing that takes our inputs (and possibly state), and produces a value.
+    // Our function: the thing that takes our inputs (and possibly state), and produces a value.
     Term* function;
 
     // Persisted internal value. Owned by us.
@@ -58,6 +58,11 @@ struct Term
     // A globally unique ID
     unsigned int globalID;
 
+    // A branch that contains any terms owned by this term, such as 'state' or
+    // anything inside 'properties'. This may be NULL if this term doesn't have
+    // any such terms.
+    Branch* myBranch;
+
     Term();
     ~Term();
 
@@ -70,6 +75,9 @@ struct Term
     void clearError();
     void pushError(std::string const& message);
     std::string getErrorMessage() const;
+
+    // If myBranch is NULL, create it and return it. If it's not NULL, just return myBranch.
+    Branch* getMyBranch();
 
     int& asInt();
     float& asFloat();

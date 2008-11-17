@@ -35,7 +35,7 @@ void assert_good(Term* term)
 #endif
 }
 
-static int gNextGlobalID = 1;
+static unsigned int gNextGlobalID = 1;
 
 Term::Term()
   : value(NULL),
@@ -44,7 +44,8 @@ Term::Term()
     state(NULL),
     owningBranch(NULL),
     stealingOk(true),
-    needsUpdate(true)
+    needsUpdate(true),
+    myBranch(NULL)
 {
     globalID = gNextGlobalID++;
 
@@ -61,6 +62,9 @@ Term::~Term()
     nullPointerRemap[this] = NULL;
 
     dealloc_value(this);
+
+    delete myBranch;
+    myBranch = NULL;
 
     if (owningBranch != NULL) {
         owningBranch->termDeleted(this);
@@ -123,6 +127,15 @@ Term::getErrorMessage() const
         return "";
     else
         return this->errors[0];
+}
+
+Branch*
+Term::getMyBranch()
+{
+    if (myBranch == NULL)
+        myBranch = new Branch();
+
+    return myBranch;
 }
 
 int& Term::asInt()
