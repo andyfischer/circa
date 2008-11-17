@@ -92,7 +92,6 @@ void Function::subroutine_create(Term* caller)
 
     Function& sub = as_function(caller);
     sub.name = as_string(caller->inputs[0]);
-    sub.initialize = Function::call_subroutine__initialize;
     sub.evaluate = Function::call_subroutine;
 
     // extract references to input types
@@ -103,7 +102,7 @@ void Function::subroutine_create(Term* caller)
 
         if (list_refs->hasError()) {
             error_occured(caller, std::string("get-list-references error: ")
-                + list_refs->getError(0));
+                + list_refs->getErrorMessage());
             return;
         }
 
@@ -120,11 +119,6 @@ void Function::subroutine_create(Term* caller)
             sub.inputTypes[index]);
         sub.subroutineBranch.bindName(placeholder, name);
     }
-}
-
-void
-Function::call_subroutine__initialize(Term* caller)
-{
 }
 
 void

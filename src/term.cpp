@@ -40,10 +40,10 @@ static int gNextGlobalID = 1;
 Term::Term()
   : value(NULL),
     type(NULL),
-    owningBranch(NULL),
     function(NULL),
-    stealingOk(true),
     state(NULL),
+    owningBranch(NULL),
+    stealingOk(true),
     needsUpdate(true)
 {
     globalID = gNextGlobalID++;
@@ -77,28 +77,9 @@ Term::toString()
     Type::ToStringFunc func = as_type(this->type).toString;
 
     if (func == NULL) {
-        return std::string("<" + as_type(this->type).name + " " + findName() + ">");
+        return std::string("<" + as_type(this->type).name + " " + name + ">");
     } else {
         return func(this);
-    }
-}
-
-std::string
-Term::findName()
-{
-    Branch* branch = this->owningBranch;
-
-    if (branch == NULL)
-        return "";
-
-    std::string name = branch->names.findName(this);
-
-    if (name == "") {
-        std::stringstream output;
-        output << "#" << this->globalID;
-        return output.str();
-    } else {
-        return name;
     }
 }
 
@@ -120,23 +101,11 @@ Term::equals(Term* term)
 bool
 Term::hasError() const
 {
-    return numErrors() != 0;
-}
-
-int
-Term::numErrors() const
-{
-    return (int) this->errors.size();
-}
-
-std::string const&
-Term::getError(int index) const
-{
-    return this->errors[index];
+    return this->errors.size() != 0;
 }
 
 void
-Term::clearErrors()
+Term::clearError()
 {
     this->errors.clear();
 }
@@ -150,10 +119,10 @@ Term::pushError(std::string const& message)
 std::string
 Term::getErrorMessage() const
 {
-    if (numErrors() == 0)
+    if (!hasError())
         return "";
     else
-        return this->errors[numErrors()-1];
+        return this->errors[0];
 }
 
 int& Term::asInt()
