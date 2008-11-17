@@ -10,6 +10,20 @@
 
 namespace circa {
 
+bool check_valid_type(Function &func, int index, Term* term)
+{
+    // TODO: Also check types for variableArgs functions
+    if (func.variableArgs)
+        return true;
+
+    Term* expectedType = func.inputTypes[index];
+
+    if (expectedType == ANY_TYPE)
+        return true;
+
+    return term->type == expectedType;
+}
+
 void evaluate_term(Term* term)
 {
     if (term == NULL)
@@ -38,10 +52,11 @@ void evaluate_term(Term* term)
     }
 
     // Check each input. Make sure:
-    //  1) they are not null
-    //  2) they are up-to-date
-    //  3) they have a non-null value
-    //  4) they have no errors
+    //  1) it is not null
+    //  2) it is up-to-date
+    //  3) it has a non-null value
+    //  4) it has no errors
+    //  5) it has the correct type
     for (unsigned int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++)
     {
         Term* input = term->inputs[inputIndex];
@@ -63,6 +78,15 @@ void evaluate_term(Term* term)
         if (input->hasError()) {
             std::stringstream message;
             message << "Input " << inputIndex << " has an error";
+            error_occured(term, message.str());
+            return;
+        }
+        
+        // Check type
+        if (!check_valid_type(func, inputIndex, input)) {
+            std::stringstream message;
+            message << "Runtime type error: input " << inputIndex << " has type "
+                << as_type(input->type).name;
             error_occured(term, message.str());
             return;
         }

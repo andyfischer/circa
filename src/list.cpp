@@ -114,6 +114,7 @@ void initialize_list_functions(Branch* kernel)
 {
     Term* pack_list = quick_create_function(kernel, "pack-list",
             pack_list::evaluate, ReferenceList(ANY_TYPE), LIST_TYPE);
+    as_function(pack_list).variableArgs = true;
     kernel->bindName(pack_list, "list");
     Term* get_list_references = quick_create_function(kernel, "get-list-references",
         get_list_references::evaluate, ReferenceList(LIST_TYPE), LIST_TYPE);
