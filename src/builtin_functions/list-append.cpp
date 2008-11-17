@@ -1,4 +1,3 @@
-
 // Copyright 2008 Andrew Fischer
 
 namespace list_append_function {

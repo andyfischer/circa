@@ -80,24 +80,13 @@ ReferenceList List::toReferenceList() const
     return result;
 }
 
-namespace pack_list {
-
-    void evaluate(Term* caller) {
-        as_list(caller).clear();
-
-        for (unsigned int i=0; i < caller->inputs.count(); i++) {
-            as_list(caller).append(caller->inputs[i]);
-        }
-    }
-}
-
 namespace get_list_references {
 
     void evaluate(Term* caller) {
         Term* input = caller->inputs[0];
-        if (as_function(input->function).name != "pack-list") {
+        if (as_function(input->function).name != "list-pack") {
             error_occured(caller,
-                    "get-list-refernces only works with pack-list as input");
+                    "get-list-refernces only works with list-pack as input");
             return;
         }
 
@@ -112,10 +101,6 @@ namespace get_list_references {
 
 void initialize_list_functions(Branch* kernel)
 {
-    Term* pack_list = quick_create_function(kernel, "pack-list",
-            pack_list::evaluate, ReferenceList(ANY_TYPE), LIST_TYPE);
-    as_function(pack_list).variableArgs = true;
-    kernel->bindName(pack_list, "list");
     Term* get_list_references = quick_create_function(kernel, "get-list-references",
         get_list_references::evaluate, ReferenceList(LIST_TYPE), LIST_TYPE);
     as_function(get_list_references).meta = true;
