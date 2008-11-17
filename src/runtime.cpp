@@ -29,7 +29,7 @@ void evaluate_term(Term* term)
     if (term == NULL)
         throw std::runtime_error("term is NULL");
 
-    term->clearErrors();
+    term->clearError();
 
     // Check function
     if (term->function == NULL) {
@@ -174,10 +174,10 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
         throw std::runtime_error("outputType is NULL");
         
     if (!is_type(outputType))
-        throw std::runtime_error(outputType->findName() + " is not a type");
+        throw std::runtime_error(outputType->name + " is not a type");
 
     if (stateType != NULL && !is_type(stateType))
-        throw std::runtime_error(outputType->findName() + " is not a type");
+        throw std::runtime_error(outputType->name + " is not a type");
 
     change_type(term, outputType);
 

@@ -212,7 +212,7 @@ void print_runtime_errors(Branch& branch, std::ostream& output)
             continue;
 
         if (term->hasError()) {
-            output << "error on " << term->name << ": " << term->getError(0) << std::endl;
+            output << "error on " << term->name << ": " << term->getErrorMessage() << std::endl;
         }
     }
 }

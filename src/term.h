@@ -20,47 +20,54 @@ void assert_good(Term* term);
 
 struct Term
 {
-    // Our current value. This is meant to be transient.
+    // Our current value. In some situations, when someone refers to this term, they
+    // may be referring to this value. May be NULL. The type of this value is described
+    // by 'type'.
     void* value;
 
     // A Type term that describes our data type
     Term* type;
 
-    Branch* owningBranch;
+    // Input terms
     ReferenceList inputs;
-    Term* function;
 
-    // If true, recycle_value is allowed to steal our value
-    bool stealingOk;
+    // Our function- the thing that takes our inputs (and possibly state), and produces a value.
+    Term* function;
 
     // Persisted internal value. Owned by us.
     Term* state;
 
-    // Our name. We might have other aliases, according to the
-    // owning branch.
+    // The branch that owns this term.
+    Branch* owningBranch;
+
+    // If true, recycle_value is allowed to steal our value.
+    bool stealingOk;
+
+    // Our name.
+    // Note that we might have other aliases, according to the owning branch.
     std::string name;
 
+    // Dynamically-named properties
     Dictionary properties;
 
+    // True if this term's value is out-of-date
     bool needsUpdate;
 
     ErrorList errors;
 
-    int globalID;
+    // A globally unique ID
+    unsigned int globalID;
 
     Term();
     ~Term();
 
     std::string toString();
     bool equals(Term* term);
-    std::string findName();
 
     Term* field(std::string const& name);
 
     bool hasError() const;
-    int numErrors() const;
-    std::string const& getError(int index) const;
-    void clearErrors();
+    void clearError();
     void pushError(std::string const& message);
     std::string getErrorMessage() const;
 
