@@ -15,29 +15,6 @@
 namespace circa {
 namespace runtime_tests {
 
-void safe_delete()
-{
-    Branch branch;
-
-    Term* term1 = apply_statement(branch, "term1 = 1");
-    Term* termSum = apply_statement(branch, "sum = add(term1,2)");
-
-    test_assert(branch.containsName("term1"));
-    test_assert(branch.containsName("sum"));
-    test_assert(termSum->inputs[0] == term1);
-
-    delete term1;
-
-    test_assert(termSum->inputs[0] == NULL);
-    test_assert(!branch.containsName("term1"));
-
-    for (int i=0; i < branch.numTerms(); i++)
-    {
-        if (branch[i] == term1)
-            test_fail();
-    }
-}
-
 void test_create_var()
 {
     Branch branch;
@@ -154,7 +131,6 @@ void test_runtime_type_error()
 
 void register_runtime_tests()
 {
-    REGISTER_TEST_CASE(runtime_tests::safe_delete);
     REGISTER_TEST_CASE(runtime_tests::test_create_var);
     REGISTER_TEST_CASE(runtime_tests::test_int_var);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
