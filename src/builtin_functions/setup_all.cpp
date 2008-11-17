@@ -6,6 +6,7 @@
 #include "if-expr.cpp"
 #include "list-append.cpp"
 #include "list-apply.cpp"
+#include "list-pack.cpp"
 #include "mult.cpp"
 #include "or.cpp"
 #include "parse-function-header.cpp"
@@ -24,6 +25,7 @@ void setup_generated_functions(Branch& kernel)
     if_expr_function::setup(kernel);
     list_append_function::setup(kernel);
     list_apply_function::setup(kernel);
+    list_pack_function::setup(kernel);
     mult_function::setup(kernel);
     or_function::setup(kernel);
     parse_function_header_function::setup(kernel);
