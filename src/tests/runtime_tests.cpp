@@ -139,6 +139,17 @@ void test_eval_as()
     test_assert(eval_as<float>("add(1.0,2.0)") == 3);
 }
 
+void test_runtime_type_error()
+{
+    // this test might become invalid when compile-time type checking is added
+    Branch branch;
+    Term* term = eval_statement(branch, "add('hello', true)");
+
+    evaluate_term(term);
+
+    test_assert(term->hasError());
+}
+
 } // namespace runtime_tests
 
 void register_runtime_tests()
@@ -151,6 +162,7 @@ void register_runtime_tests()
     REGISTER_TEST_CASE(runtime_tests::var_function_reuse);
     REGISTER_TEST_CASE(runtime_tests::null_input_errors);
     REGISTER_TEST_CASE(runtime_tests::test_eval_as);
+    REGISTER_TEST_CASE(runtime_tests::test_runtime_type_error);
 }
 
 } // namespace circa

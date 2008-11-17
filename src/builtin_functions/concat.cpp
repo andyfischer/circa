@@ -16,5 +16,6 @@ namespace concat_function {
         Term* main_func = import_c_function(kernel, evaluate,
                 "function concat(string,string) -> string");
         as_function(main_func).pureFunction = true;
+        as_function(main_func).variableArgs = true;
     }
 }
