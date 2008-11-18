@@ -37,32 +37,28 @@ void compound_types()
     test_assert(inst1 != NULL);
     test_assert(inst1->type = type1);
     test_assert(inst1->value != NULL);
-    test_assert(inst1->field("myint")->value != NULL); // remove
 
     // test get-field function
     Term* inst1_myint = eval_statement(branch, "get-field(inst1, 'myint')");
-    test_assert(inst1->field("myint")->value != NULL); // remove
     test_assert(inst1_myint != NULL);
     test_assert(!inst1_myint->hasError());
-    //test_assert(is_int(inst1_myint));
 
     Term* inst1_astr = eval_statement(branch, "get-field(inst1, 'astr')");
     test_assert(inst1_astr != NULL);
     test_assert(!inst1_astr->hasError());
-    //test_assert(is_string(inst1_myint));
     
-    // test Term::field
-    test_assert(inst1->field("myint") != NULL);
-    test_assert(inst1->field("myint")->value != NULL);
-    inst1->field("myint")->asInt() = 5;
+    // test get_field
+    test_assert(get_field(inst1,"myint") != NULL);
+    test_assert(get_field(inst1,"myint")->value != NULL);
+    get_field(inst1,"myint")->asInt() = 5;
     eval_statement(branch, "get-field(inst1, 'myint')");
     test_assert(eval_statement(branch, "get-field(inst1, 'myint')")->asInt() == 5);
 
     Term* inst2 = eval_statement(branch, "inst2 = type1()");
 
-    test_assert(inst1->field("myint") != inst2->field("myint"));
-    inst2->field("myint")->asInt() = 7;
-    test_assert(inst1->field("myint")->asInt() == 5);
+    test_assert(get_field(inst1,"myint") != get_field(inst2,"myint"));
+    get_field(inst2,"myint")->asInt() = 7;
+    test_assert(get_field(inst1,"myint")->asInt() == 5);
 }
 
 void builtin_types()

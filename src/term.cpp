@@ -88,9 +88,18 @@ Term::toString()
 }
 
 Term*
-Term::field(std::string const& name)
+Term::property(std::string const& name)
 {
-    return get_field(this, name);
+    return getMyBranch()->getNamed(name);
+}
+
+Term*
+Term::addProperty(std::string const& name, Term* type)
+{
+    Term* term = create_var(getMyBranch(), type);
+    assert(term != NULL);
+    getMyBranch()->bindName(term, name);
+    return term;
 }
 
 bool

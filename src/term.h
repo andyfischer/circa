@@ -47,9 +47,6 @@ struct Term
     // Note that we might have other aliases, according to the owning branch.
     std::string name;
 
-    // Dynamically-named properties
-    Dictionary properties;
-
     // True if this term's value is out-of-date
     bool needsUpdate;
 
@@ -69,7 +66,11 @@ struct Term
     std::string toString();
     bool equals(Term* term);
 
-    Term* field(std::string const& name);
+    // Returns the named property
+    Term* property(std::string const& name);
+
+    // Add a property with the given type
+    Term* addProperty(std::string const& name, Term* type);
 
     bool hasError() const;
     void clearError();

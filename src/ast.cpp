@@ -165,7 +165,7 @@ LiteralFloat::createTerm(Branch& branch)
     float value = atof(this->text.c_str());
     Term* term = float_var(branch, value);
     float mutability = hasQuestionMark ? 1.0 : 0.0;
-    term->properties.addSlot("mutability", FLOAT_TYPE)->asFloat() = mutability;
+    term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
     return term;
 }
 
