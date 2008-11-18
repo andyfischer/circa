@@ -125,7 +125,7 @@ void test_reference()
 void test_parse_function_header()
 {
     ast::FunctionHeader header = eval_as<ast::FunctionHeader>(
-        "parse-function-header('function fname(int arg1, string arg2) -> float')");
+        "parse-function-header('function fname(int arg1, string arg2) -> float'.tokenize)");
 
     test_assert(header.functionName == "fname");
     test_assert(header.arguments[0].name == "arg1");
