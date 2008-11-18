@@ -7,10 +7,8 @@
 
 namespace parse_function_header_function {
 
-    ast::FunctionHeader main(std::string input)
+    ast::FunctionHeader main(token_stream::TokenStream &tokens)
     {
-        token_stream::TokenStream tokens(input);
-
         ast::FunctionHeader result;
 
         std::string firstIdentifier = tokens.consume(tokenizer::IDENTIFIER); // 'function'
@@ -62,7 +60,7 @@ namespace parse_function_header_function {
 
     void evaluate(Term* caller)
     {
-        as<ast::FunctionHeader>(caller) = main(as_string(caller->inputs[0]));
+        as<ast::FunctionHeader>(caller) = main(as<token_stream::TokenStream>(caller->inputs[0]));
     }
 
     void setup(Branch& kernel)
@@ -70,7 +68,7 @@ namespace parse_function_header_function {
         quick_create_cpp_type<ast::FunctionHeader>(kernel, "FunctionHeader");
 
         Term* main_func = import_c_function(kernel, evaluate,
-                "function parse-function-header(string) -> FunctionHeader");
+                "function parse-function-header(TokenStream) -> FunctionHeader");
         as_function(main_func).pureFunction = false;
     }
 }
