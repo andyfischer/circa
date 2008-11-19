@@ -9,6 +9,7 @@
 #include "list-pack.cpp"
 #include "mult.cpp"
 #include "or.cpp"
+#include "parse-expression.cpp"
 #include "parse-function-header.cpp"
 #include "print.cpp"
 #include "range.cpp"
@@ -28,6 +29,7 @@ void setup_generated_functions(Branch& kernel)
     list_pack_function::setup(kernel);
     mult_function::setup(kernel);
     or_function::setup(kernel);
+    parse_expression_function::setup(kernel);
     parse_function_header_function::setup(kernel);
     print_function::setup(kernel);
     range_function::setup(kernel);
