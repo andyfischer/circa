@@ -7,9 +7,10 @@
 
 namespace parse_function_header_function {
 
-    ast::FunctionHeader main(token_stream::TokenStream &tokens)
+    void evaluate(Term* caller)
     {
-        ast::FunctionHeader result;
+        token_stream::TokenStream &tokens = as<token_stream::TokenStream>(caller->inputs[0]);
+        ast::FunctionHeader &result = as<ast::FunctionHeader>(caller);
 
         std::string firstIdentifier = tokens.consume(tokenizer::IDENTIFIER); // 'function'
         parser::possibleWhitespace(tokens);
@@ -54,13 +55,6 @@ namespace parse_function_header_function {
             result.outputType = tokens.consume(tokenizer::IDENTIFIER);
             parser::possibleWhitespace(tokens);
         }
-
-        return result;
-    }
-
-    void evaluate(Term* caller)
-    {
-        as<ast::FunctionHeader>(caller) = main(as<token_stream::TokenStream>(caller->inputs[0]));
     }
 
     void setup(Branch& kernel)
