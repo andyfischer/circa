@@ -172,21 +172,19 @@ void function_decl_ast()
 
 void function_header()
 {
-    token_stream::TokenStream tokens("function test(int a, float, string b , int) -> float");
-    ast::FunctionHeader* header = parser::functionHeader(tokens);
+    ast::FunctionHeader header = eval_as<ast::FunctionHeader>(
+        "'function test(int a, float, string b , int) -> float'.tokenize.parse-function-header");
 
-    test_assert(header->functionName == "test");
-    test_assert(header->arguments[0].type == "int");
-    test_assert(header->arguments[0].name == "a");
-    test_assert(header->arguments[1].type == "float");
-    test_assert(header->arguments[1].name == "");
-    test_assert(header->arguments[2].type == "string");
-    test_assert(header->arguments[2].name == "b");
-    test_assert(header->arguments[3].type == "int");
-    test_assert(header->arguments[3].name == "");
-    test_assert(header->outputType == "float");
-
-    delete header;
+    test_assert(header.functionName == "test");
+    test_assert(header.arguments[0].type == "int");
+    test_assert(header.arguments[0].name == "a");
+    test_assert(header.arguments[1].type == "float");
+    test_assert(header.arguments[1].name == "");
+    test_assert(header.arguments[2].type == "string");
+    test_assert(header.arguments[2].name == "b");
+    test_assert(header.arguments[3].type == "int");
+    test_assert(header.arguments[3].name == "");
+    test_assert(header.outputType == "float");
 }
 
 void function_decl_parse()
