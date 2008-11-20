@@ -11,8 +11,11 @@ namespace tokenize_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_c_function(kernel, evaluate,
-                "function tokenize(string) -> TokenStream");
+        ast::FunctionHeader myFunctionHeader;
+        myFunctionHeader.functionName = "tokenize";
+        myFunctionHeader.addArgument("string", "");
+        myFunctionHeader.outputType = "TokenStream";
+        Term* main_func = import_c_function_manual_header(kernel, evaluate, myFunctionHeader);
         as_function(main_func).pureFunction = true;
     }
 }
