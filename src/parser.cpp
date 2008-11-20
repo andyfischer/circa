@@ -6,13 +6,11 @@
 #include "tokenizer.h"
 #include "parser.h"
 
-using namespace circa::token_stream;
-
 namespace circa {
 
 Term* apply_statement(Branch& branch, std::string const& input)
 {
-    TokenStream tokens(input);
+    token_stream::TokenStream tokens(input);
 
     ast::Statement* statementAst = parser::statement(tokens);
     assert(statementAst != NULL);
@@ -64,7 +62,7 @@ namespace parser {
 std::string possibleWhitespace(token_stream::TokenStream& tokens);
 std::string possibleNewline(token_stream::TokenStream& tokens);
 
-ast::StatementList* statementList(TokenStream& tokens)
+ast::StatementList* statementList(token_stream::TokenStream& tokens)
 {
     ast::StatementList* statementList = new ast::StatementList();
 
@@ -84,7 +82,7 @@ ast::StatementList* statementList(TokenStream& tokens)
     return statementList;
 }
 
-ast::Statement* statement(TokenStream& tokens)
+ast::Statement* statement(token_stream::TokenStream& tokens)
 {
     // toss leading whitespace
     possibleWhitespace(tokens);
@@ -125,7 +123,7 @@ ast::Statement* statement(TokenStream& tokens)
     return expressionStatement(tokens);
 }
 
-ast::ExpressionStatement* expressionStatement(TokenStream& tokens)
+ast::ExpressionStatement* expressionStatement(token_stream::TokenStream& tokens)
 {
     ast::ExpressionStatement* statement = new ast::ExpressionStatement();
 
@@ -188,7 +186,7 @@ int getInfixPrecedence(int match)
 
 #define HIGHEST_INFIX_PRECEDENCE 7
 
-ast::Expression* infixExpression(TokenStream& tokens,
+ast::Expression* infixExpression(token_stream::TokenStream& tokens,
         int precedence)
 {
     if (precedence > HIGHEST_INFIX_PRECEDENCE)
@@ -212,7 +210,7 @@ ast::Expression* infixExpression(TokenStream& tokens,
     return leftExpr;
 }
 
-void post_literal(TokenStream& tokens, ast::Literal* literal)
+void post_literal(token_stream::TokenStream& tokens, ast::Literal* literal)
 {
     if (tokens.nextIs(tokenizer::QUESTION)) {
         tokens.consume(tokenizer::QUESTION);
@@ -220,28 +218,28 @@ void post_literal(TokenStream& tokens, ast::Literal* literal)
     }
 }
 
-ast::Literal* literal_float(TokenStream& tokens)
+ast::Literal* literal_float(token_stream::TokenStream& tokens)
 {
     ast::Literal* lit = new ast::LiteralFloat(tokens.consume(tokenizer::FLOAT));
     post_literal(tokens, lit);
     return lit;
 }
 
-ast::Literal* literal_integer(TokenStream& tokens)
+ast::Literal* literal_integer(token_stream::TokenStream& tokens)
 {
     ast::Literal* lit = new ast::LiteralInteger(tokens.consume(tokenizer::INTEGER));
     post_literal(tokens, lit);
     return lit;
 }
 
-ast::Literal* literal_string(TokenStream& tokens)
+ast::Literal* literal_string(token_stream::TokenStream& tokens)
 {
     ast::Literal* lit = new ast::LiteralString(tokens.consume());
     post_literal(tokens, lit);
     return lit;
 }
 
-ast::Expression* atom(TokenStream& tokens)
+ast::Expression* atom(token_stream::TokenStream& tokens)
 {
     // function call?
     if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.nextIs(tokenizer::LPAREN, 1))
@@ -289,7 +287,7 @@ ast::Expression* atom(TokenStream& tokens)
     return NULL; // unreachable
 }
 
-ast::FunctionCall* functionCall(TokenStream& tokens)
+ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)
 {
     std::string functionName = tokens.consume(tokenizer::IDENTIFIER);
     tokens.consume(tokenizer::LPAREN);
@@ -313,7 +311,7 @@ ast::FunctionCall* functionCall(TokenStream& tokens)
     return functionCall.release();
 }
 
-ast::FunctionHeader* functionHeader(TokenStream& tokens)
+ast::FunctionHeader* functionHeader(token_stream::TokenStream& tokens)
 {
     std::auto_ptr<ast::FunctionHeader> header(new ast::FunctionHeader());
 
@@ -364,7 +362,7 @@ ast::FunctionHeader* functionHeader(TokenStream& tokens)
     return header.release();
 }
 
-ast::FunctionDecl* functionDecl(TokenStream& tokens)
+ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
 {
     std::auto_ptr<ast::FunctionDecl> decl(new ast::FunctionDecl());
 

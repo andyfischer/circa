@@ -3,6 +3,7 @@
 #include "ast.h"
 #include "branch.h"
 #include "builtins.h"
+#include "cpp_interface.h"
 #include "function.h"
 #include "importing.h"
 #include "introspection.h"
