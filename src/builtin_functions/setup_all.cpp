@@ -20,6 +20,10 @@
 
 void setup_generated_functions(Branch& kernel)
 {
+    // do parsing functions first
+    parse_function_header_function::setup(kernel);
+    tokenize_function::setup(kernel);
+
     add_function::setup(kernel);
     and_function::setup(kernel);
     concat_function::setup(kernel);
@@ -30,11 +34,9 @@ void setup_generated_functions(Branch& kernel)
     mult_function::setup(kernel);
     or_function::setup(kernel);
     parse_expression_function::setup(kernel);
-    parse_function_header_function::setup(kernel);
     print_function::setup(kernel);
     range_function::setup(kernel);
     read_text_file_function::setup(kernel);
     to_string_function::setup(kernel);
-    tokenize_function::setup(kernel);
     write_text_file_function::setup(kernel);
 }

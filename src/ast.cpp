@@ -22,6 +22,8 @@ Term* find_and_apply_function(Branch& branch, std::string const& functionName,
     Term* function = branch.findNamed(functionName);
 
     if (function == NULL) {
+        std::cout << "warning: function not found: " << functionName << std::endl;
+
         Term* result = apply_function(branch, UNKNOWN_FUNCTION, inputs);
         as_string(result->state) = functionName;
         return result;

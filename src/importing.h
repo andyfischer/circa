@@ -5,6 +5,8 @@
 
 #include "function.h"
 
+namespace ast { class FunctionHeader; }
+
 namespace circa {
 
 // Create a new Function with the given properties. Also binds the name in this branch.
@@ -21,6 +23,9 @@ Term* quick_create_function(Branch* code,
 // Example : "function do-something(int, string) -> int"
 Term* import_c_function(Branch& branch, Function::EvaluateFunc func, std::string const& header);
 
+Term* import_c_function_manual_header(Branch& branch,
+                                      Function::EvaluateFunc func,
+                                      ast::FunctionHeader &header);
 }
 
 #endif

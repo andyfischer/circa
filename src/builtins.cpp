@@ -5,6 +5,7 @@
 
 #include "common_headers.h"
 
+#include "ast.h"
 #include "branch.h"
 #include "builtins.h"
 #include "cpp_interface.h"
@@ -20,6 +21,8 @@
 #include "values.h"
 
 namespace circa {
+
+#include "builtin_functions/setup_all.cpp"
 
 Branch* KERNEL = NULL;
 Term* VAR_FUNCTION_GENERATOR = NULL;
@@ -220,7 +223,6 @@ void initialize_constants()
     register_cpp_toString<token_stream::TokenStream>(tokenStreamType);
 }
 
-#include "builtin_functions/setup_all.cpp"
 
 void initialize_builtin_functions(Branch* kernel)
 {
@@ -246,24 +248,16 @@ void initialize_builtin_functions(Branch* kernel)
 
 void initialize()
 {
-    try {
-        bootstrap_kernel();
-        initialize_primitive_types(KERNEL);
-        initialize_constants();
-        initialize_compound_types(KERNEL);
-        initialize_list_functions(KERNEL);
+    bootstrap_kernel();
+    initialize_primitive_types(KERNEL);
+    initialize_constants();
+    initialize_compound_types(KERNEL);
+    initialize_list_functions(KERNEL);
 
-        // Then everything else:
-        initialize_builtin_functions(KERNEL);
-        initialize_feedback_functions(*KERNEL);
-        initialize_functions(KERNEL);
-
-    } catch (std::runtime_error const& e)
-    {
-        std::cout << "An error occured while initializing." << std::endl;
-        std::cout << e.what() << std::endl;
-        exit(1);
-    }
+    // Then everything else:
+    initialize_builtin_functions(KERNEL);
+    initialize_feedback_functions(*KERNEL);
+    initialize_functions(KERNEL);
 }
 
 void shutdown()

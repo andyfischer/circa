@@ -79,8 +79,11 @@ T& as(Term* term)
         throw std::runtime_error(std::string("type ") + type.name
                 + " is not a C++ type");
 
-    if (*type.cppTypeInfo != typeid(T))
-        throw std::runtime_error("C++ type mismatch");
+    if (*type.cppTypeInfo != typeid(T)) {
+        std::stringstream error;
+        error << "C++ type mismatch, existing data has type " << type.name;
+        throw std::runtime_error(error.str());
+    }
 
     return *((T*) term->value);
 }
