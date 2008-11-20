@@ -131,7 +131,18 @@ void test_parse_function_header()
     test_assert(header.arguments[0].name == "arg1");
     test_assert(header.arguments[0].type == "int");
     test_assert(header.outputType == "float");
+}
 
+void test_builtin_equals()
+{
+    test_assert(eval_as<bool>("equals(1,1)"));
+    test_assert(!eval_as<bool>("equals(1,2)"));
+    test_assert(eval_as<bool>("equals('hello','hello')"));
+    test_assert(!eval_as<bool>("equals('hello','goodbye')"));
+
+    Branch branch;
+    Term* term = eval_statement(branch, "equals(5.0, add)");
+    test_assert(term->hasError());
 }
 
 } // namespace builtin_function_tests
@@ -146,6 +157,7 @@ void register_builtin_function_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_bool);
     REGISTER_TEST_CASE(builtin_function_tests::test_reference);
     REGISTER_TEST_CASE(builtin_function_tests::test_parse_function_header);
+    REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
 }
 
 } // namespace circa
