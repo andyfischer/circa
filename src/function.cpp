@@ -39,19 +39,10 @@ Function& as_function(Term* term)
     return *((Function*) term->value);
 }
 
-void Function::alloc(Term* caller)
-{
-    caller->value = new Function();
-}
-
-void Function::dealloc(Term* caller)
-{
-    delete (Function*) caller->value;
-}
-
 void Function::duplicate(Term* source, Term* dest)
 {
-    Function::alloc(dest);
+    assert(dest->value == NULL);
+    dest->value = new Function();
     as_function(dest) = as_function(source);
 }
 

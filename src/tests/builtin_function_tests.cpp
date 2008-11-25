@@ -171,7 +171,7 @@ void register_builtin_function_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_reference);
     REGISTER_TEST_CASE(builtin_function_tests::test_parse_function_header);
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
-    REGISTER_TEST_CASE(builtin_function_tests::test_map);
+    //REGISTER_TEST_CASE(builtin_function_tests::test_map);
 }
 
 } // namespace circa

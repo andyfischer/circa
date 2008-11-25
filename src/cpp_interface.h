@@ -12,16 +12,15 @@ namespace circa {
 namespace cpp_interface {
 
 template <class T>
-void templated_alloc(Term* term)
+void* templated_alloc(Term* typeTerm)
 {
-    term->value = new T();
+    return new T();
 }
 
 template <class T>
-void templated_dealloc(Term* term)
+void templated_dealloc(void* data)
 {
-    delete reinterpret_cast<T*>(term->value);
-    term->value = NULL;
+    delete reinterpret_cast<T*>(data);
 }
 
 template <class T>

@@ -51,13 +51,11 @@ std::string& as_string(Term* term)
 }
 
 namespace ref_type {
-    void alloc(Term* term) {
-        term->value = NULL;
+    void* alloc(Term* term) {
+        return NULL;
     }
 
-    void dealloc(Term* term) {
-        term->value = NULL;
-    }
+    void dealloc(void* data) { }
 
     void visitPointers(Term* term, PointerVisitor& visitor)
     {
@@ -98,23 +96,23 @@ struct CompoundValue
     }
 
     // Static functions
-    static void alloc(Term* term)
+    static void* alloc(Term* typeTerm)
     {
         CompoundValue *value = new CompoundValue();
-        term->value = value;
 
         // create a slot for each field
-        Type& type = as_type(term->type);
+        Type& type = as_type(typeTerm);
         int numFields = (int) type.fields.size();
 
         for (int f=0; f < numFields; f++)
             value->appendSlot(type.fields[f].type);
+
+        return value;
     }
 
-    static void dealloc(Term* term)
+    static void dealloc(void* data)
     {
-        delete (CompoundValue*) term->value;
-        term->value = NULL;
+        delete (CompoundValue*) data;
     }
 
     static void create_compound_type(Term* term)
@@ -251,7 +249,7 @@ void change_type(Term *term, Term *typeTerm)
         throw std::runtime_error(std::string("type ") + type.name + " has no alloc function");
     }
 
-    type.alloc(term);
+    term->value = type.alloc(typeTerm);
 
     if (type.init != NULL) 
         type.init(term);
@@ -270,7 +268,11 @@ void specialize_type(Term *term, Term *type)
 
 namespace type_private {
 
-void empty_function(Term*) {}
+void* empty_allocate(Term*)
+{
+    return NULL;
+}
+void empty_dealloc(void*) {}
 void empty_duplicate_function(Term*,Term*) {}
 
 }
@@ -279,12 +281,17 @@ Term* create_empty_type(Branch& branch, std::string name)
 {
     Term* term = create_var(&branch, TYPE_TYPE);
     Type& type = as_type(term);
-    type.alloc = type_private::empty_function;
-    type.dealloc = type_private::empty_function;
+    type.alloc = type_private::empty_allocate;
+    type.dealloc = type_private::empty_dealloc;
     type.duplicate = type_private::empty_duplicate_function;
     type.name = name;
     branch.bindName(term, name);
     return term;
+}
+
+void* alloc_from_type(Term* typeTerm)
+{
+    return as_type(typeTerm).alloc(typeTerm);
 }
 
 namespace primitives {
