@@ -28,7 +28,7 @@ namespace feedback {
         } else {
             std::stringstream out;
             out << "Function " << targetsFunction.name <<
-                " doesn't have a feedback-assign function";
+                " doesn't have a feedback-propogate function";
             error_occured(caller, out.str());
             return;
         }
