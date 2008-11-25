@@ -61,12 +61,9 @@ namespace parse_function_header_function {
     {
         quick_create_cpp_type<ast::FunctionHeader>(kernel, "FunctionHeader");
 
-        ast::FunctionHeader myFunctionHeader;
-        myFunctionHeader.functionName = "parse-function-header";
-        myFunctionHeader.outputType = "FunctionHeader";
-        myFunctionHeader.addArgument("TokenStream", "");
+        Term* main_func = import_c_function(kernel, evaluate,
+            "function parse-function-header(TokenStream) -> FunctionHeader");
 
-        Term* main_func = import_c_function_manual_header(kernel, evaluate, myFunctionHeader);
         as_function(main_func).pureFunction = false;
     }
 }

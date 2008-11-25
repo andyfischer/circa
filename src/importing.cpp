@@ -34,17 +34,8 @@ Term* quick_create_function(Branch* branch, std::string name, Function::Evaluate
 
 Term* import_c_function(Branch& branch, Function::EvaluateFunc evaluate, std::string const& headerText)
 {
-    Branch workspace;
-    string_var(workspace, headerText, "headerText");
-
-    return import_c_function_manual_header(branch, evaluate,
-            as<ast::FunctionHeader>(eval_statement(workspace,
-                    "headerText.tokenize.parse-function-header")));
-
-    /*
     token_stream::TokenStream tokens(headerText);
-    return import_c_function_manual_header(branch, evaluate, parser::functionHeader(tokens));
-    */
+    return import_c_function_manual_header(branch, evaluate, *parser::functionHeader(tokens));
 }
 
 Term* import_c_function_manual_header(Branch& branch,

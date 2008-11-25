@@ -129,7 +129,7 @@ void Branch::visitPointers(PointerVisitor& visitor)
         if (*it == NULL)
             continue;
 
-        Type& type = as_type((*it)->type);
+        // Type& type = as_type((*it)->type);
 
         visit_pointers(*it, myVisitor);
     }

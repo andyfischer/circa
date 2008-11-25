@@ -54,6 +54,7 @@ const int PLUS_EQUALS = 21;
 const int MINUS_EQUALS = 22;
 const int STAR_EQUALS = 23;
 const int SLASH_EQUALS = 24;
+const int COLON_EQUALS = 38;
 const int RIGHT_ARROW = 25;
 
 const int END = 37;

@@ -179,6 +179,8 @@ int getInfixPrecedence(int match)
             return 2;
         case tokenizer::RIGHT_ARROW:
             return 1;
+        case tokenizer::COLON_EQUALS:
+            return 0;
         default:
             return -1;
     }

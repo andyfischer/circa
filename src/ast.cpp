@@ -65,6 +65,15 @@ Infix::createTerm(Branch& branch)
         return find_and_apply_function(branch, rightIdent->text, ReferenceList(leftTerm));
     }
 
+    // another special case: :=
+    if (this->operatorStr == ":=") {
+
+        Term* leftTerm = this->left->createTerm(branch);
+        Term* rightTerm = this->right->createTerm(branch);
+
+        return apply_function(branch, APPLY_FEEDBACK, ReferenceList(leftTerm, rightTerm));
+    }
+
     // todo
     parser::syntax_error("Infix is unimplemented");
 

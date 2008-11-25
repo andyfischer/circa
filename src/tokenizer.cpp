@@ -38,6 +38,7 @@ const char* getMatchText(int match)
         case MINUS_EQUALS: return "-=";
         case STAR_EQUALS: return "*=";
         case SLASH_EQUALS: return "/=";
+        case COLON_EQUALS: return ":=";
         case RIGHT_ARROW: return "->";
         case WHITESPACE: return "WHITESPACE";
         case NEWLINE: return "NEWLINE";
@@ -262,6 +263,14 @@ void top_level_consume_token(TokenizeContext &context)
             }
             context.pushResult(SLASH);
             return;
+        case ':':
+            context.consume();
+            if (context.next() == '=') {
+                context.consume();
+                context.pushResult(COLON_EQUALS);
+                return;
+            }
+            break; // fall through
         case '+':
             context.consume();
             context.pushResult(PLUS);

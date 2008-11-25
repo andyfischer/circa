@@ -73,6 +73,14 @@ void steal_value(Term* source, Term* dest)
     source->needsUpdate = true;
 }
 
+bool values_equal(Term* a, Term* b)
+{
+    if (a->type != b->type)
+        return false;
+
+    return as_type(a->type).equals(a,b);
+}
+
 Term* string_var(Branch& branch, std::string const& s, std::string const& name)
 {
     Term* term = apply_function(branch, STRING_TYPE, ReferenceList());
@@ -95,15 +103,6 @@ Term* float_var(Branch& branch, float f, std::string const& name)
 {
     Term* term = apply_function(branch, FLOAT_TYPE, ReferenceList());
     as_float(term) = f;
-    if (name != "")
-        branch.bindName(term, name);
-    return term;
-}
-
-Term* list_var(Branch& branch, ReferenceList list, std::string const& name)
-{
-    Term* term = apply_function(branch, LIST_TYPE, ReferenceList());
-    // FIXME as_list(term) = list;
     if (name != "")
         branch.bindName(term, name);
     return term;
