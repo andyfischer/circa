@@ -212,8 +212,12 @@ Type& as_type(Term *term)
 Term* quick_create_type(Branch* branch, std::string name)
 {
     Term* term = create_var(branch, TYPE_TYPE);
-    as_type(term).name = name;
-    branch->bindName(term, name);
+
+    if (name != "") {
+        as_type(term).name = name;
+        branch->bindName(term, name);
+    }
+
     return term;
 }
 

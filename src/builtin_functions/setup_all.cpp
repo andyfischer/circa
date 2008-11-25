@@ -8,6 +8,7 @@
 #include "list-append.cpp"
 #include "list-apply.cpp"
 #include "list-pack.cpp"
+#include "map.cpp"
 #include "mult.cpp"
 #include "or.cpp"
 #include "parse-expression.cpp"
@@ -33,6 +34,7 @@ void setup_generated_functions(Branch& kernel)
     list_append_function::setup(kernel);
     list_apply_function::setup(kernel);
     list_pack_function::setup(kernel);
+    map_function::setup(kernel);
     mult_function::setup(kernel);
     or_function::setup(kernel);
     parse_expression_function::setup(kernel);

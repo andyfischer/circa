@@ -107,7 +107,7 @@ struct Type
 bool is_type(Term* term);
 Type& as_type(Term* term);
 
-Term* quick_create_type(Branch* branch, std::string name);
+Term* quick_create_type(Branch* branch, std::string name="");
 
 // Throw an exception if term is not an instance of type
 void assert_type(Term* term, Term* type);

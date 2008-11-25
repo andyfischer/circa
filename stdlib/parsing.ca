@@ -1,4 +1,14 @@
 
+type FunctionHeaderArgument {
+    string type
+    string name
+}
+type FunctionHeaderAST {
+    List arguments
+    string functionName
+    string outputType
+}
+
 -- Metaprogramming functions
 operator = map(string, Function)
 assign-operator = map(string, Function)
