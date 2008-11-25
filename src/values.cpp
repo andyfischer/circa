@@ -21,7 +21,7 @@ void dealloc_value(Term* term)
         throw std::runtime_error("type " + as_type(term->type).name
             + " has no dealloc function");
 
-    as_type(term->type).dealloc(term);
+    as_type(term->type).dealloc(term->value);
     term->value = NULL;
 }
 

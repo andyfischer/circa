@@ -102,7 +102,7 @@ void bootstrap_kernel()
     // Create var-function-generator function
     VAR_FUNCTION_GENERATOR = new Term();
     VAR_FUNCTION_GENERATOR->owningBranch = KERNEL;
-    Function::alloc(VAR_FUNCTION_GENERATOR);
+    VAR_FUNCTION_GENERATOR->value = new Function();
     as_function(VAR_FUNCTION_GENERATOR).name = "var-function-generator";
     as_function(VAR_FUNCTION_GENERATOR).pureFunction = true;
     as_function(VAR_FUNCTION_GENERATOR).evaluate = var_function_generator;
@@ -112,7 +112,7 @@ void bootstrap_kernel()
     Term* constTypeFunc = new Term();
     constTypeFunc->owningBranch = KERNEL;
     constTypeFunc->function = VAR_FUNCTION_GENERATOR;
-    Function::alloc(constTypeFunc);
+    constTypeFunc->value = new Function();
     as_function(constTypeFunc).name = "const-Type";
     as_function(constTypeFunc).pureFunction = true;
 
@@ -135,7 +135,7 @@ void bootstrap_kernel()
     Term* constFuncFunc = new Term();
     constFuncFunc->owningBranch = KERNEL;
     constFuncFunc->function = VAR_FUNCTION_GENERATOR;
-    Function::alloc(constFuncFunc);
+    constFuncFunc->value = new Function();
     as_function(constFuncFunc).name = "const-Function";
     as_function(constFuncFunc).pureFunction = true;
     KERNEL->bindName(constFuncFunc, "const-Function");
@@ -148,11 +148,11 @@ void bootstrap_kernel()
     FUNCTION_TYPE->owningBranch = KERNEL;
     FUNCTION_TYPE->function = constTypeFunc;
     FUNCTION_TYPE->type = TYPE_TYPE;
-    as_type(TYPE_TYPE).alloc(FUNCTION_TYPE);
+    FUNCTION_TYPE->value = alloc_from_type(TYPE_TYPE);
     as_type(FUNCTION_TYPE).name = "Function";
-    as_type(FUNCTION_TYPE).alloc = Function::alloc;
+    as_type(FUNCTION_TYPE).alloc = cpp_interface::templated_alloc<Function>;
     as_type(FUNCTION_TYPE).duplicate = Function::duplicate;
-    as_type(FUNCTION_TYPE).dealloc = Function::dealloc;
+    as_type(FUNCTION_TYPE).dealloc = cpp_interface::templated_dealloc<Function>;
     as_type(FUNCTION_TYPE).remapPointers = Function::remapPointers;
     as_type(FUNCTION_TYPE).visitPointers = Function::visitPointers;
     KERNEL->bindName(FUNCTION_TYPE, "Function");

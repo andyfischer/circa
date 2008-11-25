@@ -41,8 +41,6 @@ struct Function
     Function();
 
     // Hosted functions
-    static void alloc(Term* caller);
-    static void dealloc(Term* caller);
     static void duplicate(Term* source, Term* dest);
     static void remapPointers(Term* term, ReferenceMap const& map);
     static void visitPointers(Term* term, PointerVisitor& visitor);

@@ -97,7 +97,7 @@ void evaluate_term(Term* term)
     
     // Make sure we have an allocated value. Allocate one if necessary
     if (term->value == NULL) {
-        as_type(term->type).alloc(term);
+        term->value = alloc_from_type(term->type);
     }    
 
     try {

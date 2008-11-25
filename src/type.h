@@ -20,9 +20,9 @@ const int COMPOUND_TYPE_SIGNATURE = 0x43214321;
 
 struct Type
 {
-    typedef void (*AllocFunc)(Term* term);
+    typedef void* (*AllocFunc)(Term* typeTerm);
     typedef void (*InitializeFunc)(Term* term);
-    typedef void (*DeallocFunc)(Term* term);
+    typedef void (*DeallocFunc)(void* data);
     typedef void (*DuplicateFunc)(Term* src, Term* dest);
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
     typedef int  (*CompareFunc)(Term* src, Term* dest);
@@ -122,6 +122,8 @@ void set_member_function(Term* type, std::string name, Term* function);
 Term* get_member_function(Term* type, std::string name);
 
 Term* create_empty_type(Branch& branch);
+
+void* alloc_from_type(Term* typeTerm);
 
 void initialize_type_type(Term* typeType);
 void initialize_primitive_types(Branch* kernel);
