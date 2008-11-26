@@ -1,7 +1,7 @@
 // Copyright 2008 Paul Hodge
 
-#ifndef CIRCA_COMON_HEADERS_INCLUDED
-#define CIRCA_COMON_HEADERS_INCLUDED
+#ifndef CIRCA_COMMON_HEADERS_INCLUDED
+#define CIRCA_COMMON_HEADERS_INCLUDED
 
 #include <cassert>
 #include <cstdio>
