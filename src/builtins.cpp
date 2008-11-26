@@ -271,9 +271,4 @@ Term* get_var_function(Branch& branch, Term* type)
     return result;
 }
 
-bool is_var(Term* term)
-{
-    return term->function->function == VAR_FUNCTION_GENERATOR;
-}
-
 } // namespace circa
