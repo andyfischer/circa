@@ -1,7 +1,7 @@
 // Copyright 2008 Andrew Fischer
 
-#ifndef CIRCA_BOOTSTRAP_INCLUDED
-#define CIRCA_BOOTSTRAP_INCLUDED
+#ifndef CIRCA_BUILTINS_INCLUDED
+#define CIRCA_BUILTINS_INCLUDED
 
 #include "common_headers.h"
 
