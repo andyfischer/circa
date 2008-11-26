@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "builtin_functions.h"
+#include "builtin_function_registry.h"
 
 namespace circa {
 
@@ -21,4 +21,4 @@ void registerBuiltinFunctions(Branch& kernel)
     }
 }
 
-}
+} // namespace circa
