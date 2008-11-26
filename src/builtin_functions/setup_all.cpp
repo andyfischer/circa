@@ -2,6 +2,7 @@
 
 #include "add.cpp"
 #include "and.cpp"
+#include "apply-feedback.cpp"
 #include "concat.cpp"
 #include "equals.cpp"
 #include "if-expr.cpp"
@@ -28,6 +29,7 @@ void setup_generated_functions(Branch& kernel)
 
     add_function::setup(kernel);
     and_function::setup(kernel);
+    apply_feedback_function::setup(kernel);
     concat_function::setup(kernel);
     equals_function::setup(kernel);
     if_expr_function::setup(kernel);

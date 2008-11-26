@@ -1,18 +1,8 @@
 // Copyright 2008 Paul Hodge
 
-#include "common_headers.h"
+namespace apply_feedback_function {
 
-#include "builtins.h"
-#include "function.h"
-#include "importing.h"
-#include "introspection.h"
-#include "runtime.h"
-
-namespace circa {
-
-namespace feedback {
-
-    void apply_feedback(Term* caller)
+    void evaluate(Term* caller)
     {
         Branch &branch = as_branch(caller->state);
         branch.clear();
@@ -36,14 +26,12 @@ namespace feedback {
 
         evaluate_branch(branch);
     }
-}
 
-void initialize_feedback_functions(Branch& kernel)
-{
-    APPLY_FEEDBACK = import_c_function(kernel, feedback::apply_feedback,
-            "function apply-feedback(any,any)");
-    as_function(APPLY_FEEDBACK).meta = true;
-    as_function(APPLY_FEEDBACK).stateType = BRANCH_TYPE;
+    void setup(Branch& kernel)
+    {
+        APPLY_FEEDBACK = import_c_function(kernel, apply_feedback_function::evaluate,
+                "function apply-feedback(any,any)");
+        as_function(APPLY_FEEDBACK).meta = true;
+        as_function(APPLY_FEEDBACK).stateType = BRANCH_TYPE;
+    }
 }
-
-} // namespace circa
