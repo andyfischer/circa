@@ -18,6 +18,8 @@
 #include "token_stream.h"
 #include "type.h"
 #include "values.h"
+#include "builtin_function_registry.h"
+
 
 namespace circa {
 
@@ -226,6 +228,7 @@ void initialize_constants()
 void initialize_builtin_functions(Branch* kernel)
 {
     setup_generated_functions(*kernel);
+    registerBuiltinFunctions(*kernel);
 
     ADD_FUNC = kernel->getNamed("add");
     MULT_FUNC = kernel->getNamed("mult");

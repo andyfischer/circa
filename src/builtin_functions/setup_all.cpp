@@ -1,5 +1,6 @@
 // Generated file
 
+
 #include "add.cpp"
 #include "and.cpp"
 #include "apply-feedback.cpp"
@@ -27,7 +28,6 @@ void setup_generated_functions(Branch& kernel)
     parse_function_header_function::setup(kernel);
     tokenize_function::setup(kernel);
 
-    add_function::setup(kernel);
     and_function::setup(kernel);
     apply_feedback_function::setup(kernel);
     concat_function::setup(kernel);
@@ -46,3 +46,4 @@ void setup_generated_functions(Branch& kernel)
     to_string_function::setup(kernel);
     write_text_file_function::setup(kernel);
 }
+

@@ -1,5 +1,6 @@
 // Copyright 2008 Paul Hodge
 
+namespace circa {
 namespace add_function {
 
     void evaluate(Term* caller)
@@ -44,4 +45,7 @@ namespace add_function {
         as_function(fp_func).stateType = BRANCH_TYPE;
         as_function(main_func).feedbackPropogateFunction = fp_func;
     }
+
+    REGISTER_BUILTIN_FUNCTION(setup);
+}
 }

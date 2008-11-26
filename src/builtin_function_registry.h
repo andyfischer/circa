@@ -15,7 +15,7 @@ public:
     RegisterBuiltinFunctionOnStartupHack(RegistrationFunction func);
 };
 
-#define REGISTER_BUILTIN_FUNCTION(n) static RegisterBuiltinFunctionOnStartupHack #n;
+#define REGISTER_BUILTIN_FUNCTION(n) static RegisterBuiltinFunctionOnStartupHack RegistrationObject(n);
 
 void registerBuiltinFunctions(Branch& kernel);
 
