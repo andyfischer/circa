@@ -9,7 +9,6 @@
 #include "branch.h"
 #include "builtins.h"
 #include "cpp_interface.h"
-#include "feedback.h"
 #include "function.h"
 #include "importing.h"
 #include "list.h"
@@ -256,7 +255,6 @@ void initialize()
 
     // Then everything else:
     initialize_builtin_functions(KERNEL);
-    initialize_feedback_functions(*KERNEL);
     initialize_functions(KERNEL);
 }
 
