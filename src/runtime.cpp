@@ -75,7 +75,7 @@ void evaluate_term(Term* term)
             return;
         }
 
-        if (input->hasError()) {
+        if (input->hasError() && !func.meta) {
             std::stringstream message;
             message << "Input " << inputIndex << " has an error";
             error_occured(term, message.str());

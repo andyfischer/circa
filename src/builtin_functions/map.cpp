@@ -55,7 +55,9 @@ namespace map_function {
 
         void evaluate(Term* caller)
         {
-            State &state = as<State>(caller->state);
+            Term* mapFunction = caller->function;
+            assert(mapFunction->state != NULL);
+            State &state = as<State>(mapFunction->state);
             Term* value = state.find(caller->inputs[0]);
             if (value == NULL) {
                 error_occured(caller, "key not found");
@@ -71,6 +73,10 @@ namespace map_function {
         void evaluate(Term* caller)
         {
             Term* target = caller->inputs[0];
+
+            assert(target->function->state != NULL);
+            assert(target->function->state->type == STATE_TYPE);
+
             specialized_map_function::State &mapState =
                 as<specialized_map_function::State>(target->function->state);
             Term* key = target->inputs[0];
@@ -89,7 +95,6 @@ namespace map_function {
 
         result.inputTypes = ReferenceList(keyType);
         result.outputType = valueType;
-        result.stateType = STATE_TYPE;
         result.pureFunction = true;
         result.name = std::string("Map<") + as_type(keyType).name + ","
             + as_type(valueType).name + ">";
@@ -105,8 +110,11 @@ namespace map_function {
 
         STATE_TYPE = quick_create_cpp_type<specialized_map_function::State>(kernel);
 
+        as_function(main_func).stateType = STATE_TYPE;
+
         FEEDBACK_PROPOGATE = import_c_function(kernel, feedback_propogate::evaluate,
                 "function map-feedback(any, any)");
+        as_function(FEEDBACK_PROPOGATE).meta = true;
     }
 }
 

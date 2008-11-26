@@ -5,6 +5,7 @@
 #include "builtins.h"
 #include "function.h"
 #include "importing.h"
+#include "introspection.h"
 #include "runtime.h"
 
 namespace circa {
