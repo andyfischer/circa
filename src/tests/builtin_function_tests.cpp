@@ -153,9 +153,8 @@ void test_map()
     eval_statement(branch, "ages('Henry') := 11");
     eval_statement(branch, "ages('Absalom') := 205");
 
-    eval_statement(branch, "ages('Henry').to-string.print");
-
-    print_branch_extended(branch, std::cout);
+    test_assert(eval_statement(branch, "ages('Henry')")->asInt() == 11);
+    test_assert(eval_statement(branch, "ages('Absalom')")->asInt() == 205);
 }
 
 } // namespace builtin_function_tests
@@ -171,7 +170,7 @@ void register_builtin_function_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_reference);
     REGISTER_TEST_CASE(builtin_function_tests::test_parse_function_header);
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
-    //REGISTER_TEST_CASE(builtin_function_tests::test_map);
+    REGISTER_TEST_CASE(builtin_function_tests::test_map);
 }
 
 } // namespace circa
