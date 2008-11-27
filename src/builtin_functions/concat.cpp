@@ -1,5 +1,8 @@
 // Copyright 2008 Andrew Fischer
 
+#include "circa.h"
+
+namespace circa {
 namespace concat_function {
 
     void evaluate(Term* caller)
@@ -18,4 +21,5 @@ namespace concat_function {
         as_function(main_func).pureFunction = true;
         as_function(main_func).variableArgs = true;
     }
+}
 }

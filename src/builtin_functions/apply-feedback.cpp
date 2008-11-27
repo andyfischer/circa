@@ -1,5 +1,8 @@
 // Copyright 2008 Andrew Fischer
 
+#include "circa.h"
+
+namespace circa {
 namespace apply_feedback_function {
 
     void evaluate(Term* caller)
@@ -34,4 +37,5 @@ namespace apply_feedback_function {
         as_function(APPLY_FEEDBACK).meta = true;
         as_function(APPLY_FEEDBACK).stateType = BRANCH_TYPE;
     }
+}
 }

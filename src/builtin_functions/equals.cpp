@@ -1,5 +1,8 @@
 // Copyright 2008 Andrew Fischer
 
+#include "circa.h"
+
+namespace circa {
 namespace equals_function {
 
     void evaluate(Term* caller)
@@ -29,4 +32,5 @@ namespace equals_function {
                 "function equals(any,any) -> bool");
         as_function(main_func).pureFunction = true;
     }
+}
 }

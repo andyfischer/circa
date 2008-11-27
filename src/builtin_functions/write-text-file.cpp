@@ -1,5 +1,8 @@
 // Copyright 2008 Andrew Fischer
 
+#include "circa.h"
+
+namespace circa {
 namespace write_text_file_function {
 
     void evaluate(Term* caller)
@@ -19,3 +22,4 @@ namespace write_text_file_function {
         as_function(main_func).pureFunction = false;
     }
 }
+} // namespace circa

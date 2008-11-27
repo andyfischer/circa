@@ -3,6 +3,7 @@
 #ifndef CIRCA_LIST_INCLUDED
 #define CIRCA_LIST_INCLUDED
 
+#include "branch.h"
 #include "ref_list.h"
 
 namespace circa {

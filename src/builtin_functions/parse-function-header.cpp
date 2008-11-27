@@ -1,10 +1,12 @@
 // Copyright 2008 Andrew Fischer
 
 #include "ast.h"
+#include "cpp_interface.h"
 #include "parser.h"
 #include "tokenizer.h"
 #include "token_stream.h"
 
+namespace circa {
 namespace parse_function_header_function {
 
     void evaluate(Term* caller)
@@ -67,3 +69,4 @@ namespace parse_function_header_function {
         as_function(main_func).pureFunction = false;
     }
 }
+} // namespace circa

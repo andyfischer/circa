@@ -1,5 +1,8 @@
 // Copyright 2008 Andrew Fischer
 
+#include "circa.h"
+
+namespace circa {
 namespace to_string_function {
 
     void evaluate(Term* caller)
@@ -23,3 +26,4 @@ namespace to_string_function {
         as_function(main_func).pureFunction = true;
     }
 }
+} // namespace circa

@@ -1,5 +1,8 @@
 // Copyright 2008 Andrew Fischer
 
+#include "circa.h"
+
+namespace circa {
 namespace range_function {
 
     void evaluate(Term* caller)
@@ -20,3 +23,4 @@ namespace range_function {
         as_function(main_func).pureFunction = true;
     }
 }
+} // namespace circa

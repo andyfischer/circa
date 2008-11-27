@@ -18,12 +18,10 @@
 #include "token_stream.h"
 #include "type.h"
 #include "values.h"
-#include "builtin_function_registry.h"
+#include "setup_builtin_functions.h"
 
 
 namespace circa {
-
-#include "builtin_functions/setup_all.cpp"
 
 Branch* KERNEL = NULL;
 Term* VAR_FUNCTION_GENERATOR = NULL;
@@ -224,14 +222,15 @@ void initialize_constants()
     register_cpp_toString<token_stream::TokenStream>(tokenStreamType);
 }
 
-
 void initialize_builtin_functions(Branch* kernel)
 {
-    setup_generated_functions(*kernel);
-    registerBuiltinFunctions(*kernel);
+    setup_builtin_functions(*kernel);
 
     ADD_FUNC = kernel->getNamed("add");
     MULT_FUNC = kernel->getNamed("mult");
+
+    assert(ADD_FUNC != NULL);
+    assert(MULT_FUNC != NULL);
 
     UNKNOWN_FUNCTION = quick_create_function(kernel, "unknown-function",
             unknown_function__evaluate,

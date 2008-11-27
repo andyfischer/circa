@@ -1,6 +1,8 @@
-
 // Copyright 2008 Andrew Fischer
 
+#include "circa.h"
+
+namespace circa {
 namespace list_apply_function {
 
     void evaluate(Term* caller)
@@ -25,7 +27,6 @@ namespace list_apply_function {
         Term* main_func = import_c_function(kernel, evaluate,
                 "function list-apply(Function, List) -> List");
         as_function(main_func).pureFunction = true;
-
-
     }
+}
 }

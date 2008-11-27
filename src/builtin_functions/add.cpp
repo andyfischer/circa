@@ -1,5 +1,7 @@
 // Copyright 2008 Andrew Fischer
 
+#include "circa.h"
+
 namespace circa {
 namespace add_function {
 
@@ -45,7 +47,5 @@ namespace add_function {
         as_function(fp_func).stateType = BRANCH_TYPE;
         as_function(main_func).feedbackPropogateFunction = fp_func;
     }
-
-    REGISTER_BUILTIN_FUNCTION(setup);
 }
 }

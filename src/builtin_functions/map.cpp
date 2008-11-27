@@ -1,5 +1,8 @@
 // Copyright 2008 Andrew Fischer
 
+#include "circa.h"
+
+namespace circa {
 namespace map_function {
 
     static Term* STATE_TYPE = NULL;
@@ -118,3 +121,4 @@ namespace map_function {
     }
 }
 
+} // namespace circa

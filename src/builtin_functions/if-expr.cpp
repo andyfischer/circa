@@ -1,6 +1,8 @@
-
 // Copyright 2008 Andrew Fischer
 
+#include "circa.h"
+
+namespace circa {
 namespace if_expr_function {
 
     void evaluate(Term* caller)
@@ -17,4 +19,5 @@ namespace if_expr_function {
                 "function if-expr(bool,any,any) -> any");
         as_function(main_func).pureFunction = true;
     }
+}
 }
