@@ -8,6 +8,7 @@
 #include "ast.h"
 #include "branch.h"
 #include "builtins.h"
+#include "builtin_types.h"
 #include "cpp_interface.h"
 #include "function.h"
 #include "importing.h"
@@ -250,9 +251,8 @@ void initialize_builtin_functions(Branch* kernel)
 void initialize()
 {
     bootstrap_kernel();
-    initialize_primitive_types(KERNEL);
+    initialize_builtin_types(KERNEL);
     initialize_constants();
-    initialize_compound_types(KERNEL);
     initialize_list_functions(KERNEL);
 
     // Then everything else:
