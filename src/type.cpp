@@ -132,7 +132,6 @@ void* alloc_from_type(Term* typeTerm)
     return as_type(typeTerm).alloc(typeTerm);
 }
 
-
 std::string Type::to_string(Term *caller)
 {
     return std::string("<Type " + as_type(caller).name + ">");
@@ -164,6 +163,5 @@ void initialize_type_type(Term* typeType)
     assign_from_cpp_type<Type>(as_type(typeType));
     as_type(typeType).toString = Type::to_string;
 }
-
 
 } // namespace circa
