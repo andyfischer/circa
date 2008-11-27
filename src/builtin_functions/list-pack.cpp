@@ -1,7 +1,9 @@
 // Copyright 2008 Paul Hodge
 
+#include "circa.h"
 #include "list.h"
 
+namespace circa {
 namespace list_pack_function {
 
     void evaluate(Term* caller) {
@@ -20,4 +22,5 @@ namespace list_pack_function {
         as_function(main_func).pureFunction = true;
         kernel.bindName(main_func, "list");
     }
+}
 }

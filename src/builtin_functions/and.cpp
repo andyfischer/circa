@@ -1,5 +1,8 @@
 // Copyright 2008 Paul Hodge
 
+#include "circa.h"
+
+namespace circa {
 namespace and_function {
 
     void evaluate(Term* caller)
@@ -13,4 +16,5 @@ namespace and_function {
                 "function and(bool,bool) -> bool");
         as_function(main_func).pureFunction = true;
     }
+}
 }

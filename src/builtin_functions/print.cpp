@@ -1,5 +1,8 @@
 // Copyright 2008 Paul Hodge
 
+#include "circa.h"
+
+namespace circa {
 namespace print_function {
 
     void evaluate(Term* caller)
@@ -14,3 +17,4 @@ namespace print_function {
         as_function(main_func).pureFunction = false;
     }
 }
+} // namespace circa

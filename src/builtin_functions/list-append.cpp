@@ -1,5 +1,8 @@
 // Copyright 2008 Paul Hodge
 
+#include "circa.h"
+
+namespace circa {
 namespace list_append_function {
 
     void evaluate(Term* caller)
@@ -14,4 +17,5 @@ namespace list_append_function {
                 "function list-append(List, any) -> List");
         as_function(main_func).pureFunction = true;
     }
+}
 }

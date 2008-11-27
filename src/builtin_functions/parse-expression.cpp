@@ -5,6 +5,7 @@
 #include "tokenizer.h"
 #include "token_stream.h"
 
+namespace circa {
 namespace parse_expression_function {
 
     void evaluate(Term* caller)
@@ -26,3 +27,4 @@ namespace parse_expression_function {
         */
     }
 }
+} // namespace circa

@@ -1,5 +1,8 @@
 // Copyright 2008 Paul Hodge
 
+#include "circa.h"
+
+namespace circa {
 namespace tokenize_function {
 
     void evaluate(Term* caller)
@@ -19,3 +22,4 @@ namespace tokenize_function {
         as_function(main_func).pureFunction = true;
     }
 }
+} // namespace circa

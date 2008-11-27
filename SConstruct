@@ -1,5 +1,5 @@
 
-import os,sys, glob 
+import os, sys, glob 
 
 def create_windows_env(releaseBuild):
     env = Environment(platform = 'nt')
@@ -51,8 +51,8 @@ for (dirpath, dirnames, filenames) in os.walk('src'):
     for file in filenames:
         if file in excludeFromLibrary:
             continue
-        if 'builtin_functions' in dirnames:
-            dirnames.remove('builtin_functions')
+#if 'builtin_functions' in dirnames:
+#dirnames.remove('builtin_functions')
         fullpath = os.path.join(dirpath, file)
         fullpath = fullpath.replace("src","build")
 
