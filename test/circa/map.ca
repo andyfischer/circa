@@ -2,10 +2,10 @@
 my-map = map(int,int)
 
 my-map(5) := 3
-print(concat('should be 3: ', my-map(5)))
+print(concat('should be 3: ', my-map(5).to-string))
 
 my-map(3) := 1
-print(concat('should be 1: ', my-map(3)))
+print(concat('should be 1: ', my-map(3).to-string))
 
 string-map = map(string,int)
 string-map('key1') := 5

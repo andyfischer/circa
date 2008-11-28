@@ -2,9 +2,11 @@
 
 #include "common_headers.h"
 
-#include "circa.h"
-#include "tokenizer.h"
+#include "branch.h"
 #include "parser.h"
+#include "pointer_visitor.h"
+#include "runtime.h"
+#include "tokenizer.h"
 
 namespace circa {
 
