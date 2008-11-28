@@ -296,6 +296,25 @@ void top_level_consume_token(TokenizeContext &context)
 
             context.pushResult(MINUS);
             return;
+
+        case '<':
+            if (context.next(1) == '=') {
+                context.consume();
+                context.pushResult(LTHANEQ);
+                return;
+            }
+            context.consume();
+            context.pushResult(LTHAN);
+            return;
+        case '>':
+            if (context.next(1) == '=') {
+                context.consume();
+                context.pushResult(GTHANEQ);
+                return;
+            }
+            context.consume();
+            context.pushResult(GTHAN);
+            return;
     }
 
     // Fall through, consume the next letter as UNRECOGNIZED

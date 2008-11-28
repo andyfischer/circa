@@ -28,7 +28,8 @@ TokenStream::consume(int match)
     if ((match != -1) && next().match != match) {
         std::stringstream msg;
         msg << "Unexpected token (expected " << tokenizer::getMatchText(match)
-            << ", found " << next().text << ")";
+            << ", found " << tokenizer::getMatchText(next().match)
+            << " '" << next().text << "')";
         parser::syntax_error(msg.str(), &next());
     }
 
