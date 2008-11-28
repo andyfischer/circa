@@ -21,7 +21,6 @@ Type::addMemberFunction(std::string const &name, Term *function)
     this->memberFunctions.bind(function, name);
 }
 
-
 void assert_type(Term *term, Term *type)
 {
     assert(term != NULL);

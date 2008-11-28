@@ -10,6 +10,7 @@ namespace circa {
 namespace add_function { void setup(Branch& kernel); }
 namespace and_function { void setup(Branch& kernel); }
 namespace apply_feedback_function { void setup(Branch& kernel); }
+namespace assert_function { void setup(Branch& kernel); }
 namespace concat_function { void setup(Branch& kernel); }
 namespace cos_function { void setup(Branch& kernel); }
 namespace div_function { void setup(Branch& kernel); }
@@ -36,6 +37,7 @@ void setup_builtin_functions(Branch& kernel)
     add_function::setup(kernel);
     and_function::setup(kernel);
     apply_feedback_function::setup(kernel);
+    assert_function::setup(kernel);
     concat_function::setup(kernel);
     cos_function::setup(kernel);
     div_function::setup(kernel);

@@ -29,6 +29,7 @@ def print_results():
         for failure in FAILURES:
             print failure
 
+do_output_test("circa/assert.ca")
 do_output_test("circa/boolean.ca")
 do_output_test("circa/subroutine.ca")
 
