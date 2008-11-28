@@ -218,6 +218,10 @@ void initialize_constants()
     as_bool(CONSTANT_FALSE) = false;
     KERNEL->bindName(CONSTANT_FALSE, "false");
 
+    Term* pi = apply_function(*KERNEL, FLOAT_TYPE, ReferenceList());
+    as_float(pi) = 3.14159;
+    KERNEL->bindName(pi, "PI");
+
     Term* tokenStreamType = 
         quick_create_cpp_type<token_stream::TokenStream>(*KERNEL, "TokenStream");
     register_cpp_toString<token_stream::TokenStream>(tokenStreamType);
