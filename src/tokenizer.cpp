@@ -298,21 +298,22 @@ void top_level_consume_token(TokenizeContext &context)
             return;
 
         case '<':
-            if (context.next(1) == '=') {
+            context.consume();
+            if (context.next() == '=') {
                 context.consume();
                 context.pushResult(LTHANEQ);
                 return;
             }
-            context.consume();
             context.pushResult(LTHAN);
             return;
+
         case '>':
-            if (context.next(1) == '=') {
+            context.consume();
+            if (context.next() == '=') {
                 context.consume();
                 context.pushResult(GTHANEQ);
                 return;
             }
-            context.consume();
             context.pushResult(GTHAN);
             return;
     }

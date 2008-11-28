@@ -86,9 +86,9 @@ void test_floats()
 void test_symbols()
 {
     token::TokenList results;
-    token::tokenize(",()=?][--", results);
+    token::tokenize(",()=?][--<=>=<>", results);
 
-    test_assert(results.size() == 8);
+    test_assert(results.size() == 12);
     test_assert(results[0].text == ",");
     test_assert(results[0].match == token::COMMA);
     test_assert(results[1].text == "(");
@@ -105,6 +105,14 @@ void test_symbols()
     test_assert(results[6].match == token::LBRACKET);
     test_assert(results[7].text == "--");
     test_assert(results[7].match == token::DOUBLE_MINUS);
+    test_assert(results[8].text == "<=");
+    test_assert(results[8].match == token::LTHANEQ);
+    test_assert(results[9].text == ">=");
+    test_assert(results[9].match == token::GTHANEQ);
+    test_assert(results[10].text == "<");
+    test_assert(results[10].match == token::LTHAN);
+    test_assert(results[11].text == ">");
+    test_assert(results[11].match == token::GTHAN);
 }
 
 void test_keywords()
