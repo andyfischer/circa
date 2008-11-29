@@ -16,6 +16,32 @@
 namespace circa {
 namespace ast {
 
+std::string getInfixFunctionName(std::string infix)
+{
+    if (infix == "+")
+        return "add";
+    else if (infix == "-")
+        return "sub";
+    else if (infix == "*")
+        return "mult";
+    else if (infix == "/")
+        return "div";
+    else if (infix == "<")
+        return "less-than";
+    else if (infix == "<=")
+        return "less-than-eq";
+    else if (infix == ">")
+        return "greater-than";
+    else if (infix == ">=")
+        return "greater-than-eq";
+    else if (infix == "==")
+        return "equals";
+
+    assert(false);
+
+    return ""; // unreachable
+}
+
 Term* find_and_apply_function(Branch& branch, std::string const& functionName,
         ReferenceList inputs)
 {
@@ -74,10 +100,19 @@ Infix::createTerm(Branch& branch)
         return apply_function(branch, APPLY_FEEDBACK, ReferenceList(leftTerm, rightTerm));
     }
 
-    // todo
-    parser::syntax_error("Infix is unimplemented");
+    std::string functionName = getInfixFunctionName(this->operatorStr);
 
-    return NULL; // unreachable
+    Term* function = branch.findNamed(functionName);
+
+    if (function == NULL) {
+        parser::syntax_error(std::string("couldn't find function: ") + functionName);
+        return NULL; // unreachable
+    }
+
+    Term* leftTerm = this->left->createTerm(branch);
+    Term* rightTerm = this->right->createTerm(branch);
+    
+    return apply_function(branch, function, ReferenceList(leftTerm, rightTerm));
 }
 
 void
