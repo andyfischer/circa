@@ -28,6 +28,7 @@ namespace print_function { void setup(Branch& kernel); }
 namespace range_function { void setup(Branch& kernel); }
 namespace read_text_file_function { void setup(Branch& kernel); }
 namespace sin_function { void setup(Branch& kernel); }
+namespace sub_function { void setup(Branch& kernel); }
 namespace to_string_function { void setup(Branch& kernel); }
 namespace tokenize_function { void setup(Branch& kernel); }
 namespace write_text_file_function { void setup(Branch& kernel); }
@@ -55,6 +56,7 @@ void setup_builtin_functions(Branch& kernel)
     range_function::setup(kernel);
     read_text_file_function::setup(kernel);
     sin_function::setup(kernel);
+    sub_function::setup(kernel);
     to_string_function::setup(kernel);
     tokenize_function::setup(kernel);
     write_text_file_function::setup(kernel);
