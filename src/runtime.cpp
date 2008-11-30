@@ -113,12 +113,17 @@ void evaluate_term(Term* term)
     }
 }
 
-void evaluate_branch(Branch& branch)
+void evaluate_branch(Branch& branch, Term* errorListener)
 {
     int count = branch.numTerms();
     for (int index=0; index < count; index++) {
 		Term* term = branch.get(index);
         evaluate_term(term);
+
+        if (term->hasError()) {
+            error_occured(errorListener, term->getErrorMessage());
+            return;
+        }
     }
 }
 
@@ -143,7 +148,9 @@ Branch* evaluate_file(std::string const& filename)
 
 void error_occured(Term* errorTerm, std::string const& message)
 {
-    // std::cout << "error occured: " << message << std::endl;
+    if (errorTerm == NULL)
+        throw std::runtime_error(message);
+
     errorTerm->pushError(message);
 }
 
