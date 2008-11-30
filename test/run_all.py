@@ -32,6 +32,7 @@ def print_results():
 do_output_test("circa/assert.ca")
 do_output_test("circa/boolean.ca")
 do_output_test("circa/infix.ca")
+do_output_test("circa/lessthan.ca")
 do_output_test("circa/subroutine.ca")
 
 print_results()

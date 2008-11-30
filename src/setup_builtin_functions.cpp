@@ -16,6 +16,7 @@ namespace cos_function { void setup(Branch& kernel); }
 namespace div_function { void setup(Branch& kernel); }
 namespace equals_function { void setup(Branch& kernel); }
 namespace if_expr_function { void setup(Branch& kernel); }
+namespace less_than_function { void setup(Branch& kernel); }
 namespace list_append_function { void setup(Branch& kernel); }
 namespace list_apply_function { void setup(Branch& kernel); }
 namespace list_pack_function { void setup(Branch& kernel); }
@@ -44,6 +45,7 @@ void setup_builtin_functions(Branch& kernel)
     div_function::setup(kernel);
     equals_function::setup(kernel);
     if_expr_function::setup(kernel);
+    less_than_function::setup(kernel);
     list_append_function::setup(kernel);
     list_apply_function::setup(kernel);
     list_pack_function::setup(kernel);

@@ -1,0 +1,10 @@
+
+print('integers:')
+(1 < 2).to-string.print
+(2 < 2).to-string.print
+(3 < 2).to-string.print
+
+print('floats:')
+(1.0 < 2.0).to-string.print
+(2.0 < 2.0).to-string.print
+(3.0 < 2.0).to-string.print
