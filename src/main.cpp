@@ -21,6 +21,23 @@ int circa_main(std::vector<std::string> args)
         goto shutdown;
     }
 
+    if (args[0] == "-e") {
+        args.erase(args.begin());
+        std::stringstream command;
+        bool firstArg = true;
+        while (!args.empty()) {
+            if (!firstArg) command << " ";
+            command << args[0];
+            args.erase(args.begin());
+            firstArg = false;
+        }
+
+        Branch workspace;
+        Term* result = eval_statement(workspace, command.str());
+        std::cout << result->toString() << std::endl;
+        goto shutdown;
+    }
+
     if (args[0] == "--list-tests") {
         std::vector<std::string> testNames = list_all_test_names();
 
