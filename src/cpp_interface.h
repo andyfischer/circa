@@ -36,6 +36,12 @@ bool templated_equals(Term* a, Term* b)
 }
 
 template <class T>
+bool templated_lessThan(Term* a, Term* b)
+{
+    return (*(reinterpret_cast<T*>(a->value))) < (*(reinterpret_cast<T*>(b->value)));
+}
+
+template <class T>
 std::string templated_toString(Term* term)
 {
     return reinterpret_cast<T*>(term->value)->toString();

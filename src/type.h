@@ -25,7 +25,7 @@ struct Type
     typedef void (*DeallocFunc)(void* data);
     typedef void (*DuplicateFunc)(Term* src, Term* dest);
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
-    typedef int  (*CompareFunc)(Term* src, Term* dest);
+    typedef bool (*LessThanFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
     typedef void (*VisitPointersFunc)(Term* term, PointerVisitor &listener);
     typedef std::string (*ToStringFunc)(Term* term);
@@ -52,7 +52,7 @@ struct Type
     DeallocFunc dealloc;
     DuplicateFunc duplicate;
     EqualsFunc equals;
-    CompareFunc compare;
+    LessThanFunc lessThan;
     RemapPointersFunc remapPointers;
     VisitPointersFunc visitPointers;
     ToStringFunc toString;
@@ -74,7 +74,7 @@ struct Type
         dealloc(NULL),
         duplicate(NULL),
         equals(NULL),
-        compare(NULL),
+        lessThan(NULL),
         remapPointers(NULL),
         visitPointers(NULL),
         toString(NULL)
