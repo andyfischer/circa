@@ -2,10 +2,10 @@
 print("Fibonacci solver")
 
 function fib(float i) -> float
-  if (i == 0 || i == 1)
-    return 1
+  if (i == 0.0 || i == 1.0)
+    return 1.0
   else
-    return fib(i - 1) + fib(i - 2)
+    return fib(i - 1.0) + fib(i - 2.0)
 end
 
 print(fib(5))

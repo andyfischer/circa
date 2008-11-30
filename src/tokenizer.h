@@ -56,6 +56,8 @@ const int STAR_EQUALS = 23;
 const int SLASH_EQUALS = 24;
 const int COLON_EQUALS = 38;
 const int RIGHT_ARROW = 25;
+const int DOUBLE_AMPERSAND = 39;
+const int DOUBLE_VERTICAL_BAR = 40;
 
 const int END = 37;
 
