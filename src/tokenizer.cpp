@@ -40,6 +40,8 @@ const char* getMatchText(int match)
         case SLASH_EQUALS: return "/=";
         case COLON_EQUALS: return ":=";
         case RIGHT_ARROW: return "->";
+        case DOUBLE_AMPERSAND: return "&&";
+        case DOUBLE_VERTICAL_BAR: return "||";
         case WHITESPACE: return "WHITESPACE";
         case NEWLINE: return "NEWLINE";
         case END: return "end";
@@ -316,6 +318,24 @@ void top_level_consume_token(TokenizeContext &context)
             }
             context.pushResult(GTHAN);
             return;
+
+        case '|':
+            context.consume();
+            if (context.next() == '|') {
+                context.consume();
+                context.pushResult(DOUBLE_VERTICAL_BAR);
+                return;
+            }
+            break;
+
+        case '&':
+            context.consume();
+            if (context.next() == '&') {
+                context.consume();
+                context.pushResult(DOUBLE_AMPERSAND);
+                return;
+            }
+            break;
     }
 
     // Fall through, consume the next letter as UNRECOGNIZED

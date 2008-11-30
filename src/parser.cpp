@@ -159,20 +159,23 @@ int getInfixPrecedence(int match)
 {
     switch(match) {
         case tokenizer::DOT:
-            return 7;
+            return 8;
         case tokenizer::STAR:
         case tokenizer::SLASH:
-            return 6;
+            return 7;
         case tokenizer::PLUS:
         case tokenizer::MINUS:
-            return 5;
+            return 6;
         case tokenizer::LTHAN:
         case tokenizer::LTHANEQ:
         case tokenizer::GTHAN:
         case tokenizer::GTHANEQ:
         case tokenizer::DOUBLE_EQUALS:
         case tokenizer::NOT_EQUALS:
-            return 3;
+            return 5;
+        case tokenizer::DOUBLE_AMPERSAND:
+        case tokenizer::DOUBLE_VERTICAL_BAR:
+            return 4;
         case tokenizer::EQUALS:
         case tokenizer::PLUS_EQUALS:
         case tokenizer::MINUS_EQUALS:
@@ -188,7 +191,7 @@ int getInfixPrecedence(int match)
     }
 }
 
-#define HIGHEST_INFIX_PRECEDENCE 7
+#define HIGHEST_INFIX_PRECEDENCE 8
 
 ast::Expression* infixExpression(token_stream::TokenStream& tokens,
         int precedence)

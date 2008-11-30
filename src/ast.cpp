@@ -36,6 +36,10 @@ std::string getInfixFunctionName(std::string infix)
         return "greater-than-eq";
     else if (infix == "==")
         return "equals";
+    else if (infix == "||")
+        return "or";
+    else if (infix == "&&")
+        return "and";
 
     assert(false);
 
