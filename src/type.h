@@ -39,11 +39,8 @@ struct Type
 
     std::string name;
 
-    // Size of raw data. Currently this isn't really used- we allocate each piece
-    // of memory dynamically, so the 'raw data' is the size of a pointer.
-    size_t dataSize;
-
-    // C++ type info
+    // C++ type info. This is only used to do runtime type checks, when the data
+    // is accessed as a C++ type. Otherwise, this is optional.
     const std::type_info *cppTypeInfo;
 
     // Functions
@@ -67,7 +64,6 @@ struct Type
 
     Type() :
         name(""),
-        dataSize(sizeof(void*)),
         cppTypeInfo(NULL),
         alloc(NULL),
         init(NULL),
@@ -126,8 +122,6 @@ Term* create_empty_type(Branch& branch, std::string name);
 void* alloc_from_type(Term* typeTerm);
 
 void initialize_type_type(Term* typeType);
-void initialize_primitive_types(Branch* kernel);
-void initialize_compound_types(Branch* kernel);
 
 } // namespace circa
 
