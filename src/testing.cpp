@@ -129,12 +129,14 @@ void run_all_tests()
         else failureCount++;
     }
 
-    std::string successes = successCount == 1 ? "success" : "successes";
-    std::string failures = failureCount == 1 ? "failure" : "failures";
+    std::cout << "Ran " << totalTestCount << " tests. ";
 
-    std::cout << "Ran " << totalTestCount << " tests, " << successCount
-        << " " << successes << " and " << failureCount << " "
-        << failures << "." << std::endl;
+    if (failureCount == 0) {
+        std::cout << "All tests passed." << std::endl;
+    } else {
+        std::string tests = failureCount == 1 ? "test" : "tests";
+        std::cout << failureCount << " " << tests << " failed." << std::endl;
+    }
 }
 
 std::vector<std::string> list_all_test_names()
