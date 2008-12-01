@@ -103,7 +103,7 @@ void initialize_list_functions(Branch* kernel)
 {
     Term* get_list_references = quick_create_function(kernel, "get-list-references",
         get_list_references::evaluate, ReferenceList(LIST_TYPE), LIST_TYPE);
-    as_function(get_list_references).meta = true;
+    as_function(get_list_references).setInputMeta(0, true);
 }
 
 } // namespace circa

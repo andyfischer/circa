@@ -34,7 +34,7 @@ namespace apply_feedback_function {
     {
         APPLY_FEEDBACK = import_c_function(kernel, apply_feedback_function::evaluate,
                 "function apply-feedback(any,any)");
-        as_function(APPLY_FEEDBACK).meta = true;
+        as_function(APPLY_FEEDBACK).setInputMeta(0,true);
         as_function(APPLY_FEEDBACK).stateType = BRANCH_TYPE;
     }
 }

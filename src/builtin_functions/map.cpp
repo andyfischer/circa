@@ -117,7 +117,7 @@ namespace map_function {
 
         FEEDBACK_PROPOGATE = import_c_function(kernel, feedback_propogate::evaluate,
                 "function map-feedback(any, any)");
-        as_function(FEEDBACK_PROPOGATE).meta = true;
+        as_function(FEEDBACK_PROPOGATE).setInputMeta(0, true);
     }
 }
 

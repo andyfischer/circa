@@ -19,12 +19,33 @@ Function::Function()
     variableArgs(false),
     initialize(NULL),
     evaluate(NULL),
-    meta(false),
     feedbackAccumulationFunction(NULL),
     feedbackPropogateFunction(NULL),
     generateCppFunction(NULL),
     printCircaSourceFunction(NULL)
 {
+}
+
+Function::InputProperties&
+Function::getInputProperties(unsigned int index)
+{
+    assert(index < inputTypes.count());
+
+    // check to grow inputProperties
+    while (index < inputProperties.size()-1) {
+        inputProperties.push_back(InputProperties());
+    }
+
+    return inputProperties[index];
+}
+
+void Function::setInputMeta(int index, bool value)
+{
+    getInputProperties(index).meta = value;
+}
+void Function::setInputModified(int index, bool value)
+{
+    getInputProperties(index).modified = value;
 }
 
 bool is_function(Term* term)
