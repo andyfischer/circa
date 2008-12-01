@@ -59,7 +59,12 @@ void evaluate_term(Term* term)
     //  5) it has the correct type
     for (unsigned int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++)
     {
+        int effectiveIndex = inputIndex;
+        if (func.variableArgs)
+            effectiveIndex = 0;
+
         Term* input = term->inputs[inputIndex];
+        Function::InputProperties inputProps = func.getInputProperties(effectiveIndex);
          
         if (input == NULL) {
             std::stringstream message;
@@ -75,7 +80,7 @@ void evaluate_term(Term* term)
             return;
         }
 
-        if (input->hasError() && !func.meta) {
+        if (input->hasError() && !inputProps.meta) {
             std::stringstream message;
             message << "Input " << inputIndex << " has an error";
             error_occured(term, message.str());
@@ -83,7 +88,7 @@ void evaluate_term(Term* term)
         }
         
         // Check type
-        if (!check_valid_type(func, inputIndex, input)) {
+        if (!check_valid_type(func, effectiveIndex, input)) {
             std::stringstream message;
             message << "Runtime type error: input " << inputIndex << " has type "
                 << as_type(input->type).name;

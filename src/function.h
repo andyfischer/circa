@@ -16,7 +16,16 @@ struct Function
     typedef void (*InitializeFunc)(Term* caller);
     typedef void (*EvaluateFunc)(Term* caller);
 
+    struct InputProperties {
+        bool modified;
+        bool meta;
+
+        InputProperties() : modified(false), meta(false) {}
+    };
+    typedef std::vector<InputProperties> InputPropertiesList;
+
     ReferenceList inputTypes;
+    InputPropertiesList inputProperties;
     Term* outputType;
     Term* stateType;
 
@@ -32,13 +41,17 @@ struct Function
     InitializeFunc initialize;
     EvaluateFunc evaluate;
 
-    bool meta;
+    // External functions
     Term* feedbackAccumulationFunction;
     Term* feedbackPropogateFunction;
     Term* generateCppFunction;
     Term* printCircaSourceFunction;
 
     Function();
+
+    InputProperties& getInputProperties(unsigned int index);
+    void setInputMeta(int index, bool value);
+    void setInputModified(int index, bool value);
 
     // Hosted functions
     static void duplicate(Term* source, Term* dest);
