@@ -12,10 +12,6 @@ namespace circa {
 
 bool check_valid_type(Function &func, int index, Term* term)
 {
-    // TODO: Also check types for variableArgs functions
-    if (func.variableArgs)
-        return true;
-
     Term* expectedType = func.inputTypes[index];
 
     if (expectedType == ANY_TYPE)
