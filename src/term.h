@@ -60,6 +60,8 @@ struct Term
     // any such terms.
     Branch* myBranch;
 
+    int references;
+
     Term();
     ~Term();
 

@@ -45,7 +45,8 @@ Term::Term()
     owningBranch(NULL),
     stealingOk(true),
     needsUpdate(true),
-    myBranch(NULL)
+    myBranch(NULL),
+    references(0)
 {
     globalID = gNextGlobalID++;
 

@@ -2,11 +2,47 @@
 
 #include "common_headers.h"
 
+#include "ref_set.h"
+#include "reference.h"
 #include "testing.h"
-#include "circa.h"
+#include "term.h"
+#include "term_namespace.h"
 
 namespace circa {
 namespace container_tests {
+
+void test_reference()
+{
+    Term* term1 = new Term();
+    Term* term2 = new Term();
+
+    Reference ref1(term1);
+
+    test_assert(ref1.term == term1);
+    test_assert(term1->references == 1);
+
+    Reference ref2;
+    ref2 = term1;
+
+    test_assert(ref2.term == term1);
+    test_assert(term1->references == 2);
+
+    ref1 = term2;
+
+    test_assert(term1->references == 1);
+    test_assert(term2->references == 1);
+
+    ref2 = term2;
+    test_assert(term1->references == 0);
+    test_assert(term2->references == 2);
+
+    {
+        Reference tempref(term2);
+        test_assert(term2->references == 3);
+    }
+
+    test_assert(term2->references == 2);
+}
 
 void test_set()
 {
@@ -110,6 +146,7 @@ void test_list()
 
 void register_container_tests()
 {
+    REGISTER_TEST_CASE(container_tests::test_reference);
     REGISTER_TEST_CASE(container_tests::test_set);
     REGISTER_TEST_CASE(container_tests::test_namespace);
     REGISTER_TEST_CASE(container_tests::test_list);
