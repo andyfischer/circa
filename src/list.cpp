@@ -86,7 +86,7 @@ namespace get_list_references {
         Term* input = caller->inputs[0];
         if (as_function(input->function).name != "list-pack") {
             error_occured(caller,
-                    "get-list-refernces only works with list-pack as input");
+                    "get-list-references only works with list-pack as input");
             return;
         }
 
