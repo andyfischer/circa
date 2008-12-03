@@ -47,6 +47,16 @@ void test_reference()
     Reference ref3(ref1);
     test_assert(ref3._term == term2);
     test_assert(term2->references == 3);
+
+    ref1 = term1;
+    ref2 = ref1;
+
+    test_assert(ref2._term == term1);
+    test_assert(term1->references == 2);
+
+    term1->name = "hi";
+    test_assert((*ref1).name == "hi");
+    test_assert(ref1->name == "hi");
 }
 
 void test_set()

@@ -42,6 +42,24 @@ struct Reference
         set(t);
         return *this;
     }
+
+    Reference& operator=(Reference const& ref)
+    {
+        set(ref._term);
+        return *this;
+    }
+
+    Term& operator*() const
+    {
+        assert(_term != NULL);
+        return *_term;
+    }
+
+    Term* operator->() const
+    {
+        assert(_term != NULL);
+        return _term;
+    }
 };
 
 }
