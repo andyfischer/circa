@@ -18,13 +18,13 @@ void test_reference()
 
     Reference ref1(term1);
 
-    test_assert(ref1.term == term1);
+    test_assert(ref1._term == term1);
     test_assert(term1->references == 1);
 
     Reference ref2;
     ref2 = term1;
 
-    test_assert(ref2.term == term1);
+    test_assert(ref2._term == term1);
     test_assert(term1->references == 2);
 
     ref1 = term2;
@@ -38,10 +38,15 @@ void test_reference()
 
     {
         Reference tempref(term2);
+        test_assert(tempref._term == term2);
         test_assert(term2->references == 3);
     }
 
     test_assert(term2->references == 2);
+
+    Reference ref3(ref1);
+    test_assert(ref3._term == term2);
+    test_assert(term2->references == 3);
 }
 
 void test_set()

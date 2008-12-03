@@ -11,31 +11,30 @@ namespace circa {
 
 struct Reference
 {
-    Term* term;
+    Term* _term;
 
-    Reference() : term(NULL) {}
-    Reference(Term* t) : term(NULL)
-    {
-        set(t);
-    }
+    Reference() : _term(NULL) {}
+    Reference(Term* t) : _term(NULL) { set(t); }
+    Reference(Reference const& ref) : _term(NULL) { set(ref._term); }
 
     ~Reference()
     {
-        if (term != NULL)
-            term->references--;
+        if (_term != NULL)
+            _term->references--;
     }
     
     void set(Term* t)
     {
-        if (term == t)
+        if (_term == t)
             return;
 
-        if (term != NULL) {
-            term->references--;
-        }
+        if (_term != NULL)
+            _term->references--;
 
-        term = t;
-        term->references++;
+        _term = t;
+
+        if (_term != NULL)
+            _term->references++;
     }
 
     Reference& operator=(Term* t)
