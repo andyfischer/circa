@@ -27,11 +27,11 @@ bool is_bad_pointer(Term* term)
     return DEBUG_GOOD_POINTER_SET.find(term) == DEBUG_GOOD_POINTER_SET.end();
 }
 
-void assert_good(Term* term)
+void assert_good_pointer(Term* term)
 {
 #if CHECK_FOR_BAD_POINTERS
     if (is_bad_pointer(term))
-        throw std::runtime_error("assert_good failed (bad term pointer)");
+        throw std::runtime_error("assert_good_pointer failed (bad term pointer)");
 #endif
 }
 
@@ -57,7 +57,7 @@ Term::Term()
 
 Term::~Term()
 {
-    assert_good(this);
+    assert_good_pointer(this);
 
     ReferenceMap nullPointerRemap;
     nullPointerRemap[this] = NULL;

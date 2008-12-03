@@ -33,7 +33,7 @@ Branch::~Branch()
         if (term == NULL)
             continue;
 
-        assert_good(term);
+        assert_good_pointer(term);
 
         if (term->type != TYPE_TYPE)
             dealloc_value(term);
@@ -46,7 +46,7 @@ Branch::~Branch()
         if (term == NULL)
             continue;
 
-        assert_good(term);
+        assert_good_pointer(term);
 
         dealloc_value(term);
         term->owningBranch = NULL;
@@ -56,7 +56,7 @@ Branch::~Branch()
 
 void Branch::append(Term* term)
 {
-    assert_good(term);
+    assert_good_pointer(term);
     assert(term->owningBranch == NULL);
     term->owningBranch = this;
     _terms.push_back(term);

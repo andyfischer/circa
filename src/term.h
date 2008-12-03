@@ -16,7 +16,7 @@ struct List;
 typedef std::vector<std::string> ErrorList;
 
 bool is_bad_pointer(Term* term);
-void assert_good(Term* term);
+void assert_good_pointer(Term* term);
 
 struct Term
 {
@@ -82,6 +82,7 @@ struct Term
     // If myBranch is NULL, create it and return it. If it's not NULL, just return myBranch.
     Branch* getMyBranch();
 
+    // Convenience accessors
     int& asInt();
     float& asFloat();
     std::string& asString();

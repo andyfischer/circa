@@ -97,7 +97,7 @@ void reference_type_deletion_bug()
 
     delete branch;
 
-    assert_good(INT_TYPE);
+    assert_good_pointer(INT_TYPE);
     test_assert(INT_TYPE->type != NULL);
 }
 

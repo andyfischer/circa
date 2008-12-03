@@ -100,8 +100,8 @@ ReferenceList list_all_pointers(Term* term)
 
 bool is_using(Term* user, Term* usee)
 {
-    assert_good(user);
-    assert_good(usee);
+    assert_good_pointer(user);
+    assert_good_pointer(usee);
     if (user->inputs.contains(usee))
         return true;
     if (user->function == usee)

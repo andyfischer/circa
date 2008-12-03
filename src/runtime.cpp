@@ -208,7 +208,7 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
 
 void set_inputs(Term* term, ReferenceList const& inputs)
 {
-    assert_good(term);
+    assert_good_pointer(term);
 
     term->inputs = inputs;
 
@@ -218,7 +218,7 @@ void set_inputs(Term* term, ReferenceList const& inputs)
 
 void set_input(Term* term, int index, Term* input)
 {
-    assert_good(term);
+    assert_good_pointer(term);
 
     term->inputs.setAt(index, input);
 
@@ -227,7 +227,7 @@ void set_input(Term* term, int index, Term* input)
 
 void register_pointer(Term* pointer, Term* pointee)
 {
-    assert_good(pointer);
+    assert_good_pointer(pointer);
 
     if (pointee == NULL)
         return;
@@ -313,7 +313,7 @@ Term* eval_function(Branch& branch, std::string const& functionName,
 
 void change_function(Term* term, Term* new_function)
 {
-    assert_good(term);
+    assert_good_pointer(term);
 
     assert_type(new_function, FUNCTION_TYPE);
 
@@ -323,7 +323,7 @@ void change_function(Term* term, Term* new_function)
 
 void remap_pointers(Term* term, ReferenceMap const& map)
 {
-    assert_good(term);
+    assert_good_pointer(term);
 
     // make sure this map doesn't try to remap NULL, because such a thing
     // would almost definitely lead to errors.
@@ -357,8 +357,8 @@ void visit_pointers(Term* term, PointerVisitor &visitor)
 
 void remap_pointers(Term* term, Term* original, Term* replacement)
 {
-    assert_good(term);
-    assert_good(original);
+    assert_good_pointer(term);
+    assert_good_pointer(original);
 
     ReferenceMap map;
     map[original] = replacement;
