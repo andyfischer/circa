@@ -5,8 +5,6 @@
 
 #include "common_headers.h"
 
-#include "term.h"
-
 namespace circa {
 
 struct Reference
@@ -17,50 +15,17 @@ struct Reference
     Reference(Term* t) : _term(NULL) { set(t); }
     Reference(Reference const& ref) : _term(NULL) { set(ref._term); }
 
-    ~Reference()
-    {
-        if (_term != NULL)
-            _term->references--;
-    }
-    
-    void set(Term* t)
-    {
-        if (_term == t)
-            return;
-
-        if (_term != NULL)
-            _term->references--;
-
-        _term = t;
-
-        if (_term != NULL)
-            _term->references++;
-    }
-
-    Reference& operator=(Term* t)
-    {
-        set(t);
-        return *this;
-    }
-
-    Reference& operator=(Reference const& ref)
-    {
-        set(ref._term);
-        return *this;
-    }
-
-    Term& operator*() const
-    {
-        assert(_term != NULL);
-        return *_term;
-    }
-
-    Term* operator->() const
-    {
-        assert(_term != NULL);
-        return _term;
-    }
+    ~Reference();
+    void set(Term* t);
+    Term* get() const { return _term; }
+    Reference& operator=(Term* t);
+    Reference& operator=(Reference const& ref);
+    Term& operator*() const;
+    Term* operator->() const;
 };
+
+bool operator==(Reference const& lhs, Reference const& rhs);
+bool operator<(Reference const& lhs, Reference const& rhs);
 
 }
 

@@ -3,22 +3,24 @@
 
 #include "common_headers.h"
 
+#include "reference.h"
+
 namespace circa {
 
 struct ReferenceMap
 {
-    std::map<Term*,Term*> _map;
+    std::map<Reference,Reference> _map;
 
-    typedef std::map<Term*,Term*>::iterator iterator;
+    typedef std::map<Reference,Reference>::iterator iterator;
 
     explicit ReferenceMap() { }
-    Term*& operator[](Term* key) {
+    Reference& operator[](Term* key) {
         return _map[key];
     }
     Term* operator[](Term* key) const {
         if (!contains(key))
             return NULL;
-        return _map.find(key)->second;
+        return _map.find(key)->second.get();
     }
 
     bool contains(Term* key) const {
