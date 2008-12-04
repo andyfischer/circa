@@ -42,12 +42,6 @@ void empty_evaluate_function(Term* caller);
 void initialize();
 void shutdown();
 
-int& as_int(Term* t);
-float& as_float(Term* t);
-bool& as_bool(Term* t);
-std::string& as_string(Term* t);
-Term*& as_ref(Term* term);
-
 // Fetch the const function for this type
 Term* get_var_function(Branch& branch, Term* type);
 
