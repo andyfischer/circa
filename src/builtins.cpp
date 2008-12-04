@@ -255,7 +255,7 @@ void initialize_builtin_functions(Branch* kernel)
 void initialize()
 {
     bootstrap_kernel();
-    initialize_builtin_types(KERNEL);
+    initialize_builtin_types(*KERNEL);
     initialize_constants();
     initialize_list_functions(KERNEL);
 
