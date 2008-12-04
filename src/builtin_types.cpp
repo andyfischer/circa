@@ -213,46 +213,48 @@ Term* get_field(Term *term, std::string const& fieldName)
 }
 
 
-void initialize_builtin_types(Branch* kernel)
+void initialize_builtin_types(Branch& kernel)
 {
-    STRING_TYPE = quick_create_cpp_type<std::string>(*KERNEL, "string");
+    STRING_TYPE = quick_create_cpp_type<std::string>(kernel, "string");
     as_type(STRING_TYPE).equals = cpp_interface::templated_equals<std::string>;
     as_type(STRING_TYPE).toString = primitives::string_t::to_string;
 
-    INT_TYPE = quick_create_cpp_type<int>(*KERNEL, "int");
+    INT_TYPE = quick_create_cpp_type<int>(kernel, "int");
     as_type(INT_TYPE).equals = cpp_interface::templated_equals<int>;
     as_type(INT_TYPE).lessThan = cpp_interface::templated_lessThan<int>;
     as_type(INT_TYPE).toString = primitives::int_t::to_string;
 
-    FLOAT_TYPE = quick_create_cpp_type<float>(*KERNEL, "float");
+    FLOAT_TYPE = quick_create_cpp_type<float>(kernel, "float");
     as_type(FLOAT_TYPE).equals = cpp_interface::templated_equals<float>;
     as_type(FLOAT_TYPE).lessThan = cpp_interface::templated_lessThan<float>;
     as_type(FLOAT_TYPE).toString = primitives::float_t::to_string;
 
-    BOOL_TYPE = quick_create_cpp_type<bool>(*KERNEL, "bool");
+    BOOL_TYPE = quick_create_cpp_type<bool>(kernel, "bool");
     as_type(BOOL_TYPE).equals = cpp_interface::templated_equals<bool>;
     as_type(BOOL_TYPE).toString = primitives::bool_t::to_string;
 
-    ANY_TYPE = create_empty_type(*KERNEL, "any");
-    VOID_TYPE = create_empty_type(*KERNEL, "void");
-    REFERENCE_TYPE = quick_create_type(KERNEL, "Reference");
+    ANY_TYPE = create_empty_type(kernel, "any");
+    VOID_TYPE = create_empty_type(kernel, "void");
+    REFERENCE_TYPE = quick_create_type(kernel, "Reference");
     as_type(REFERENCE_TYPE).alloc = ref_type::alloc;
     as_type(REFERENCE_TYPE).dealloc = ref_type::dealloc;
     as_type(REFERENCE_TYPE).visitPointers = ref_type::visitPointers;
     as_type(REFERENCE_TYPE).remapPointers = ref_type::remapPointers;
 
-    quick_create_function(kernel, "create-compound-type",
+    quick_create_function(&kernel, "create-compound-type",
             CompoundValue::create_compound_type,
             ReferenceList(STRING_TYPE),
             TYPE_TYPE);
-    quick_create_function(kernel, "compound-type-append-field",
+    quick_create_function(&kernel, "compound-type-append-field",
             CompoundValue::append_field,
             ReferenceList(TYPE_TYPE, TYPE_TYPE, STRING_TYPE),
             TYPE_TYPE);
-    quick_create_function(kernel, "get-field",
+    quick_create_function(&kernel, "get-field",
             CompoundValue::get_field,
             ReferenceList(ANY_TYPE, STRING_TYPE),
             ANY_TYPE);
+
+    quick_create_cpp_type<Branch>(kernel, "Branch");
 }
 
 } // namespace circa

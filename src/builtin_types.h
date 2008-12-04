@@ -5,7 +5,7 @@
 
 namespace circa {
 
-void initialize_builtin_types(Branch* kernel);
+void initialize_builtin_types(Branch& kernel);
 
 } // namespace circa
 

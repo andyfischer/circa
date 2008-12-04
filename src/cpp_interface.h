@@ -64,7 +64,7 @@ void assign_from_cpp_type(Type& type)
 template <class T>
 Term* quick_create_cpp_type(Branch& branch, std::string name="")
 {
-    Term* term = quick_create_type(&branch, name);
+    Term* term = quick_create_type(branch, name);
     assign_from_cpp_type<T>(as_type(term));
     return term;
 }

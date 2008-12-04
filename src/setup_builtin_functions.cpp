@@ -22,6 +22,7 @@ namespace list_apply_function { void setup(Branch& kernel); }
 namespace list_pack_function { void setup(Branch& kernel); }
 namespace map_function { void setup(Branch& kernel); }
 namespace mult_function { void setup(Branch& kernel); }
+namespace not_function { void setup(Branch& kernel); }
 namespace or_function { void setup(Branch& kernel); }
 namespace parse_expression_function { void setup(Branch& kernel); }
 namespace parse_function_header_function { void setup(Branch& kernel); }
@@ -51,6 +52,7 @@ void setup_builtin_functions(Branch& kernel)
     list_pack_function::setup(kernel);
     map_function::setup(kernel);
     mult_function::setup(kernel);
+    not_function::setup(kernel);
     or_function::setup(kernel);
     parse_expression_function::setup(kernel);
     parse_function_header_function::setup(kernel);
