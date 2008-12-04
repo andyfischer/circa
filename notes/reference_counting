@@ -1,0 +1,77 @@
+
+Reference counting / memory management strategy
+
+Two ways we can keep track of who is referencing what:
+
+1) A count
+2) A list of reference holders
+
+Counting
+  Advantages
+    Much more efficient
+    Simpler
+  Disadvantages
+    No way to tell who is pointing at a thing. Less introspection.
+    No way to support the deletion of a term with a count.
+
+List of Reference Holders
+  Advantages
+    Better introspection & debugging
+    Deletion of a referenced term is supported: the referencers can be notified.
+  Disadvantages
+    More complicated
+    Less efficient
+    Who is the owner?
+    When notified, the owner must loop through all references. Possibly error-prone.
+
+Different Categories of Referencing
+  References to permanent or built-in objects
+    These should probably not be tracked with a list. But perhaps we want the
+    option to do so.
+  References within a branch
+    These can be optimized, since this is a common case. We could say that any
+    reference-related operation must lazily check every term within that branch.
+    However, initial implementations of this suggest that it is problematic. We
+    frequently want to check references, and scanning the whole branch becomes
+    a performance issue.
+  References from an inner branch to a containing branch
+  References from a outer branch to an inner branch
+  References across branches
+
+Who is the reference holder? This is the thing that actually gets put in a list.
+  Term?
+    The problem here is, when we want to do an introspective operation, the term
+    must check if its value wants to do this operation. This operations must be
+    provided on Type.
+  Virtual class? (the data itself would inherit)
+    This reduces the above problem, but it's possible that for some introspective
+    operations, we really want to know about the term.
+
+What introspective operations do we want to support?
+  List of all users
+    Does it make sense for this list to contain things that aren't terms?
+    Probably not. If it's something that the outside world will see, it should be
+    a term. This suggests that terms should be reference owners.
+  Rebinding to a different term
+  On a term deletion, collapse the term into its users
+    This operation cannot be supported in all situations.
+    As a backup plan, one could copy a duplicate of the term into the branch
+    that needs it
+      A problem with this: some branches might not like it if you secretely add
+      additional terms. This is a branch-related philosophy question.
+      Another problem with this: if the data is the reference owner, how will it
+      know where the branch is?
+
+Philosophy question: If a term contains data which holds a reference, do we consider
+that the term owns that reference, or the data? Can data live without being a term?
+  Initial thought is no. Terms are our 'object'. Everything should be an 'object' (for
+  some definition of that word)
+
+What classes need to hold references?
+  Terms (inputs, function, type, state)
+  Branch
+  Function
+  Type
+  ...
+
+
