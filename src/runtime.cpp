@@ -168,15 +168,12 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
         branch->append(term);
 
     term->function = function;
-    register_pointer(term, function);
 
     Function& functionData = as_function(function);
 
     Term* outputType = functionData.outputType;
-    register_pointer(term, outputType);
 
     Term* stateType = functionData.stateType;
-    register_pointer(term, stateType);
 
     if (outputType == NULL)
         throw std::runtime_error("outputType is NULL");
@@ -211,9 +208,6 @@ void set_inputs(Term* term, ReferenceList const& inputs)
     assert_good_pointer(term);
 
     term->inputs = inputs;
-
-    for (unsigned int i=0; i < inputs.count(); i++)
-        register_pointer(term, inputs[i]);
 }
 
 void set_input(Term* term, int index, Term* input)
@@ -221,26 +215,6 @@ void set_input(Term* term, int index, Term* input)
     assert_good_pointer(term);
 
     term->inputs.setAt(index, input);
-
-    register_pointer(term, input);
-}
-
-void register_pointer(Term* pointer, Term* pointee)
-{
-    assert_good_pointer(pointer);
-
-    if (pointee == NULL)
-        return;
-
-    Branch* pointeeBranch = pointee->owningBranch;
-
-    if (pointeeBranch == NULL)
-        return;
-
-    if (pointeeBranch->permanent)
-        return;
-
-    // todo: handle external pointers
 }
 
 Term* create_var(Branch* branch, Term* type)
@@ -318,7 +292,6 @@ void change_function(Term* term, Term* new_function)
     assert_type(new_function, FUNCTION_TYPE);
 
     term->function = new_function;
-    register_pointer(term, new_function);
 }
 
 void remap_pointers(Term* term, ReferenceMap const& map)
@@ -330,17 +303,13 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     assert(!map.contains(NULL));
 
     term->inputs.remapPointers(map);
-    for (unsigned int i=0; i < term->inputs.count(); i++)
-        register_pointer(term, term->inputs[i]);
 
     term->function = map.getRemapped(term->function);
-    register_pointer(term, term->function);
 
     if ((term->value != NULL) && (as_type(term->type).remapPointers != NULL))
         as_type(term->type).remapPointers(term, map);
 
     term->type = map.getRemapped(term->type);
-    register_pointer(term, term->type);
 }
 
 void visit_pointers(Term* term, PointerVisitor &visitor)
