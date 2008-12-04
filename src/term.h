@@ -60,6 +60,8 @@ struct Term
     // any such terms.
     Branch* myBranch;
 
+    // Count of how many Reference objects are pointing at us. This functionality
+    // is not fully implemented.
     int references;
 
     Term();

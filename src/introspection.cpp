@@ -110,17 +110,6 @@ bool is_using(Term* user, Term* usee)
     return false;
 }
 
-void check_pointers(Term* term)
-{
-    ReferenceList pointers = list_all_pointers(term);
-
-    for (unsigned int i=0; i < pointers.count(); i++) {
-        if (is_bad_pointer(pointers[i])) {
-            // todo
-        }
-    }
-}
-
 bool function_allows_term_reuse(Function &function)
 {
     if ((function.stateType != VOID_TYPE) && (function.stateType != NULL))
@@ -131,8 +120,6 @@ bool function_allows_term_reuse(Function &function)
 
     return true;
 }
-
-bool gTraceFindEquivalent = false;
 
 bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs)
 {
@@ -171,12 +158,7 @@ Term* find_equivalent(Branch &branch, Term* function, ReferenceList const& input
 
 Term* find_equivalent(Term* function, ReferenceList const& inputs)
 {
-    gTraceFindEquivalent = false;
-
     if (!function_allows_term_reuse(as_function(function))) {
-        if (gTraceFindEquivalent)
-            std::cout << "function doesn't allow term reuse" << std::endl;
-
         return false;
     }
 
