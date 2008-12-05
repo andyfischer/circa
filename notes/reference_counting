@@ -12,7 +12,7 @@ Counting
     Simpler
   Disadvantages
     No way to tell who is pointing at a thing. Less introspection.
-    No way to support the deletion of a term with a count.
+    No way to support the deletion of a term with a non-zero count.
 
 List of Reference Holders
   Advantages
@@ -73,5 +73,13 @@ What classes need to hold references?
   Function
   Type
   ...
+
+Implementation
+  Reference class
+    Advantages
+      Error protection
+  Normal pointers
+    Advantages
+      Simplier
 
 

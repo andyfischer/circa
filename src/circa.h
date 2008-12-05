@@ -9,7 +9,6 @@
 #include "introspection.h"
 #include "list.h"
 #include "parser.h"
-#include "reference.h"
 #include "runtime.h"
 #include "syntax.h"
 #include "term.h"
