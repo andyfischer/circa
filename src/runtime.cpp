@@ -334,4 +334,33 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
     remap_pointers(term, map);
 }
 
+void assign_pointer(Term*& pointer, Term* value, Term* owner)
+{
+    assert(owner != NULL);
+
+    Term* previousValue = pointer;
+
+    if (pointer == value)
+        // noop
+        return;
+
+    pointer = value;
+
+    if (previousValue != NULL) {
+        // check to remove 'owner' from users of 'previousValue'
+        struct DoesTermPointToThis : PointerVisitor()
+        {
+            Term* target;
+            bool answer;
+            DoesTermPointToThis(Term* _target) : target(_target), answer(false) {}
+
+        };
+        ...
+    }
+
+    if (pointer != NULL) {
+        pointer->users.add(owner);
+    }
+}
+
 } // namespace circa

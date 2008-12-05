@@ -40,6 +40,11 @@ void remap_pointers(Term* term, ReferenceMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
 void visit_pointers(Term* term, PointerVisitor &visitor);
 
+// Assign the pointer 'pointer' to 'value', where 'owner' is the owner.
+// This updates the 'users' field of value (if value is non-NULL),
+// and it also updates 'users' on the previous value of 'pointer' (if
+// that was non-NULL). 'owner' must not be NULL.
+void assign_pointer(Term*& pointer, Term* value, Term* owner);
 
 } // namespace circa
 
