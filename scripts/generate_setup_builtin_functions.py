@@ -27,6 +27,9 @@ def run(functionsDirectory, outputFilename):
     predeclarations = map(makePredeclaration, namespaces)
     calls = map(makeCall, namespaces)
 
+    predeclarations.sort()
+    calls.sort()
+
     output = string.Template(TEMPLATE).substitute({
         'predeclarations':"\n".join(predeclarations),
         'calls':"\n    ".join(calls)})
