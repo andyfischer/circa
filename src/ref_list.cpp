@@ -23,13 +23,13 @@ ReferenceList::appendAll(ReferenceList const& list)
 void ReferenceList::remapPointers(ReferenceMap const& map)
 {
     for (unsigned int i=0; i < _items.size(); i++)
-        _items[i] = map.getRemapped(_items[i].get());
+        _items[i] = map.getRemapped(_items[i]);
 }
 
 void ReferenceList::visitPointers(PointerVisitor &visitor)
 {
     for (unsigned int i=0; i < _items.size(); i++)
-        visitor.visitPointer(_items[i].get());
+        visitor.visitPointer(_items[i]);
 }
 
 } // namespace circa

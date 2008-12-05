@@ -3,13 +3,11 @@
 
 #include "common_headers.h"
 
-#include "reference.h"
-
 namespace circa {
 
 struct ReferenceSet
 {
-    std::set<Reference> _items;
+    std::set<Term*> _items;
 
     bool contains(Term* term) const {
         return _items.find(term) != _items.end();

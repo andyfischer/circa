@@ -3,7 +3,6 @@
 #include "common_headers.h"
 
 #include "ref_set.h"
-#include "reference.h"
 #include "testing.h"
 #include "term.h"
 #include "term_namespace.h"
@@ -11,6 +10,7 @@
 namespace circa {
 namespace container_tests {
 
+/*
 void test_reference()
 {
     Term* term1 = new Term();
@@ -58,6 +58,7 @@ void test_reference()
     test_assert((*ref1).name == "hi");
     test_assert(ref1->name == "hi");
 }
+*/
 
 void test_set()
 {
@@ -161,7 +162,7 @@ void test_list()
 
 void register_container_tests()
 {
-    REGISTER_TEST_CASE(container_tests::test_reference);
+    // REGISTER_TEST_CASE(container_tests::test_reference);
     REGISTER_TEST_CASE(container_tests::test_set);
     REGISTER_TEST_CASE(container_tests::test_namespace);
     REGISTER_TEST_CASE(container_tests::test_list);

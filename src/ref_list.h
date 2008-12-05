@@ -3,7 +3,6 @@
 
 #include "common_headers.h"
 
-#include "reference.h"
 #include "pointer_visitor.h"
 
 namespace circa {
@@ -11,7 +10,7 @@ namespace circa {
 struct ReferenceList
 {
 private:
-    std::vector<Reference> _items;
+    std::vector<Term*> _items;
  
 public:
     explicit ReferenceList() { }
@@ -109,7 +108,7 @@ public:
     // Remove 'term' from this list
     void remove(Term* term)
     {
-        std::vector<Reference>::iterator it;
+        std::vector<Term*>::iterator it;
 
         for (it = _items.begin(); it != _items.end(); ) {
 
@@ -130,7 +129,7 @@ public:
     {
         if (index >= _items.size())
             return NULL;
-        return _items[index].get();
+        return _items[index];
     }
 
     bool contains(Term* term) const
