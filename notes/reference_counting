@@ -82,4 +82,31 @@ Implementation
     Advantages
       Simplier
 
+Decision: Terms are the reference holder
+
+Implementation is normal pointer, because the Reference class would be unnecessarily
+complex, and it's too much of a C++-ism.
+
+====
+
+Part 2!
+
+This isn't the end of the story.
+
+The problem is that when a piece of data has a pointer to a thing, and then
+this piece of data is transferred between terms (an operation that should be cheap),
+it becomes annoying to update the data's usees.
+
+Perhaps we need two categories of 'user' lists.
+1) There are the Term users, which appear for the fields on Term: 'input', 'function', 'type'.
+2) Then there are other users. How are they handled?
+
+Also, I think the story is more complicated. In some cases, we want to know *how* a term
+is referred to. For example, we might have a branch that binds 'a' and 'b' to a term, and
+assign 'b' to a list index, and we *care* that we used b. This suggests a different approach,
+an object called SymbolicRef, which contains a name or something. This name needs a branch
+to be relevant.
+
+What do we need 'users' for?
+  For creating new terms: to see if there are existing equivalents.
 
