@@ -12,7 +12,7 @@ namespace importing_tests {
 
 void my_imported_function(Term* term)
 {
-    as_int(term) = as_int(term->inputs[0]) + as_int(term->inputs[1]);
+    as_int(term) = as_int(term->input(0)) + as_int(term->input(1));
 }
 
 void test_import_c()

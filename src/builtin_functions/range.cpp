@@ -7,7 +7,7 @@ namespace range_function {
 
     void evaluate(Term* caller)
     {
-        unsigned int max = as_int(caller->inputs[0]);
+        unsigned int max = as_int(caller->input(0));
         
         as_list(caller).clear();
         

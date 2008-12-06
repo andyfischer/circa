@@ -7,7 +7,7 @@ namespace assert_function {
 
     void evaluate(Term* caller)
     {
-        if (!as_bool(caller->inputs[0])) {
+        if (!as_bool(caller->input(0))) {
             error_occured(caller, "Assert failed");
         }
     }

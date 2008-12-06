@@ -7,7 +7,7 @@ namespace evaluate_file_function {
 
     void evaluate(Term* caller)
     {
-        std::string &filename = as_string(caller->inputs[0]);
+        std::string &filename = as_string(caller->input(0));
         Branch &output = as_branch(caller);
 
         Branch workspace;

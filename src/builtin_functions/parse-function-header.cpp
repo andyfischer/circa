@@ -11,7 +11,7 @@ namespace parse_function_header_function {
 
     void evaluate(Term* caller)
     {
-        token_stream::TokenStream &tokens = as<token_stream::TokenStream>(caller->inputs[0]);
+        token_stream::TokenStream &tokens = as<token_stream::TokenStream>(caller->input(0));
         ast::FunctionHeader &result = as<ast::FunctionHeader>(caller);
 
         std::string firstIdentifier = tokens.consume(tokenizer::IDENTIFIER); // 'function'

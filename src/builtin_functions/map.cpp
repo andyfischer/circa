@@ -61,7 +61,7 @@ namespace map_function {
             Term* mapFunction = caller->function;
             assert(mapFunction->state != NULL);
             State &state = as<State>(mapFunction->state);
-            Term* value = state.find(caller->inputs[0]);
+            Term* value = state.find(caller->input(0));
             if (value == NULL) {
                 error_occured(caller, "key not found");
                 return;
@@ -75,15 +75,15 @@ namespace map_function {
 
         void evaluate(Term* caller)
         {
-            Term* target = caller->inputs[0];
+            Term* target = caller->input(0);
 
             assert(target->function->state != NULL);
             assert(target->function->state->type == STATE_TYPE);
 
             specialized_map_function::State &mapState =
                 as<specialized_map_function::State>(target->function->state);
-            Term* key = target->inputs[0];
-            Term* desired = caller->inputs[1];
+            Term* key = target->input(0);
+            Term* desired = caller->input(1);
 
             mapState.assign(key, desired);
         }
@@ -93,8 +93,8 @@ namespace map_function {
     {
         Function &result = as_function(caller);
 
-        Term* keyType = caller->inputs[0];
-        Term* valueType = caller->inputs[1];
+        Term* keyType = caller->input(0);
+        Term* valueType = caller->input(1);
 
         result.inputTypes = ReferenceList(keyType);
         result.outputType = valueType;

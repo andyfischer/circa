@@ -7,8 +7,8 @@ namespace less_than_function {
 
     void evaluate(Term* caller)
     {
-        Term* input0 = caller->inputs[0];
-        Term* input1 = caller->inputs[1];
+        Term* input0 = caller->input(0);
+        Term* input1 = caller->input(1);
         assert(input0->type == input1->type);
 
         Type &type = as_type(input0->type);

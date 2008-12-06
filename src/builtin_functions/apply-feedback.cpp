@@ -10,8 +10,8 @@ namespace apply_feedback_function {
         Branch &branch = as_branch(caller->state);
         branch.clear();
 
-        Term* target = caller->inputs[0];
-        Term* desired = caller->inputs[1];
+        Term* target = caller->input(0);
+        Term* desired = caller->input(1);
 
         Function& targetsFunction = as_function(target->function);
 

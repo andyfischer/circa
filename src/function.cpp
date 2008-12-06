@@ -98,19 +98,19 @@ void Function::subroutine_create(Term* caller)
     // 1: inputTypes (list of type)
     // 2: outputType (type)
 
-    as_string(caller->inputs[0]);
-    as_list(caller->inputs[1]);
-    as_type(caller->inputs[2]);
+    as_string(caller->input(0));
+    as_list(caller->input(1));
+    as_type(caller->input(2));
 
     Function& sub = as_function(caller);
-    sub.name = as_string(caller->inputs[0]);
+    sub.name = as_string(caller->input(0));
     sub.evaluate = Function::call_subroutine;
 
     // extract references to input types
     {
         Branch workspace;
         Term* list_refs = eval_function(workspace, "get-list-references",
-                ReferenceList(caller->inputs[1]));
+                ReferenceList(caller->input(1)));
 
         if (list_refs->hasError()) {
             error_occured(caller, std::string("get-list-references error: ")
@@ -121,7 +121,7 @@ void Function::subroutine_create(Term* caller)
         sub.inputTypes = as_list(list_refs).toReferenceList();
     }
 
-    sub.outputType = caller->inputs[2];
+    sub.outputType = caller->input(2);
     sub.stateType = BRANCH_TYPE;
 
     // Create input placeholders
@@ -167,9 +167,9 @@ Function::call_subroutine(Term* caller)
 
 void Function::name_input(Term* caller)
 {
-    recycle_value(caller->inputs[0], caller);
-    int index = as_int(caller->inputs[1]);
-    std::string name = as_string(caller->inputs[2]);
+    recycle_value(caller->input(0), caller);
+    int index = as_int(caller->input(1));
+    std::string name = as_string(caller->input(2));
     Function& sub = as_function(caller);
 
     if (index < 0) {
@@ -194,8 +194,8 @@ void Function::name_input(Term* caller)
 
 void Function::get_input_name(Term* caller)
 {
-    Function& sub = as_function(caller->inputs[0]);
-    int index = as_int(caller->inputs[1]);
+    Function& sub = as_function(caller->input(0));
+    int index = as_int(caller->input(1));
 
     Term* inputPlaceholder =
         sub.subroutineBranch.getNamed(get_placeholder_name_for_index(index));
@@ -205,8 +205,8 @@ void Function::get_input_name(Term* caller)
 
 void Function::subroutine_apply(Term* caller)
 {
-    recycle_value(caller->inputs[0], caller);
-    std::string input = as_string(caller->inputs[1]);
+    recycle_value(caller->input(0), caller);
+    std::string input = as_string(caller->input(1));
 
     Function& sub = as_function(caller);
 

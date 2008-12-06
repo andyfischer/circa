@@ -12,8 +12,8 @@ namespace add_function {
 
     void feedback_propogate(Term* caller)
     {
-        Term* target = caller->inputs[0];
-        Term* desired = caller->inputs[1];
+        Term* target = caller->input(0);
+        Term* desired = caller->input(1);
         Branch& myBranch = as_branch(caller->state);
         myBranch.clear();
     

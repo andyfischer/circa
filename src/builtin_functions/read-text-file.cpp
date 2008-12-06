@@ -7,7 +7,7 @@ namespace read_text_file_function {
 
     void evaluate(Term* caller)
     {
-        std::string filename = as_string(caller->inputs[0]);
+        std::string filename = as_string(caller->input(0));
         std::ifstream file;
         file.open(filename.c_str(), std::ios::in);
         std::stringstream contents;

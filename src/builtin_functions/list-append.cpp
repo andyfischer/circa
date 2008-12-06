@@ -7,8 +7,8 @@ namespace list_append_function {
 
     void evaluate(Term* caller)
     {
-        recycle_value(caller->inputs[0], caller);
-        as_list(caller).append(caller->inputs[1]);
+        recycle_value(caller->input(0), caller);
+        as_list(caller).append(caller->input(1));
     }
 
     void setup(Branch& kernel)

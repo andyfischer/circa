@@ -7,7 +7,7 @@ namespace tokenize_function {
 
     void evaluate(Term* caller)
     {
-        std::string& input = as_string(caller->inputs[0]);
+        std::string& input = as_string(caller->input(0));
         
         as<token_stream::TokenStream>(caller).reset(input);
     }

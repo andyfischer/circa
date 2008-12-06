@@ -83,7 +83,7 @@ ReferenceList List::toReferenceList() const
 namespace get_list_references {
 
     void evaluate(Term* caller) {
-        Term* input = caller->inputs[0];
+        Term* input = caller->input(0);
         if (as_function(input->function).name != "list-pack") {
             error_occured(caller,
                     "get-list-references only works with list-pack as input");

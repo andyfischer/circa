@@ -12,7 +12,7 @@ std::vector<std::string> gSpyResults;
 
 void spy_function(Term * caller)
 {
-    gSpyResults.push_back(as_string(caller->inputs[0]));
+    gSpyResults.push_back(as_string(caller->input(0)));
 }
 
 void i_only_throw_errors(Term * caller)

@@ -59,12 +59,12 @@ void empty_alloc_function(Term*) { }
 
 void var_function_generator(Term* caller)
 {
-    assert(caller->inputs[0] != NULL);
+    assert(caller->input(0) != NULL);
 
     Function& output = as_function(caller);
-    Type& type = as_type(caller->inputs[0]);
+    Type& type = as_type(caller->input(0));
     output.name = "var-" + type.name;
-    output.outputType = caller->inputs[0];
+    output.outputType = caller->input(0);
     output.pureFunction = false;
     output.evaluate = empty_evaluate_function;
     output.feedbackPropogateFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
@@ -184,8 +184,8 @@ namespace var_function {
 
     void feedback_assign(Term* caller)
     {
-        Term* target = caller->inputs[0];
-        Term* desired = caller->inputs[1];
+        Term* target = caller->input(0);
+        Term* desired = caller->input(1);
 
         duplicate_value(desired, target);
     }

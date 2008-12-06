@@ -7,7 +7,7 @@ namespace and_function {
 
     void evaluate(Term* caller)
     {
-        as_bool(caller) = as_bool(caller->inputs[0]) && as_bool(caller->inputs[1]);
+        as_bool(caller) = as_bool(caller->input(0)) && as_bool(caller->input(1));
     }
 
     void setup(Branch& kernel)

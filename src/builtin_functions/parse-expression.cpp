@@ -11,7 +11,7 @@ namespace parse_expression_function {
     void evaluate(Term* caller)
     {
         /*
-        token_stream::TokenStream &tokens = as<token_stream::TokenStream>(caller->inputs[0]);
+        token_stream::TokenStream &tokens = as<token_stream::TokenStream>(caller->input(0));
         ast::Expression &result = as<ast::Expression>(caller);
         */
     }

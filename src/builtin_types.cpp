@@ -146,7 +146,7 @@ struct CompoundValue
 
     static void create_compound_type(Term* term)
     {
-        std::string name = as_string(term->inputs[0]);
+        std::string name = as_string(term->input(0));
         Type& output = as_type(term);
 
         output.name = name;
@@ -156,11 +156,11 @@ struct CompoundValue
 
     static void append_field(Term* term)
     {
-        recycle_value(term->inputs[0], term);
+        recycle_value(term->input(0), term);
         Type& output = as_type(term);
-        as_type(term->inputs[1]);
-        Term* fieldType = term->inputs[1];
-        std::string fieldName = as_string(term->inputs[2]);
+        as_type(term->input(1));
+        Term* fieldType = term->input(1);
+        std::string fieldName = as_string(term->input(2));
         output.addField(fieldType, fieldName);
     }
 
@@ -179,9 +179,9 @@ struct CompoundValue
 
     static void get_field(Term* term)
     {
-        CompoundValue &value = as_compound_value(term->inputs[0]);
-        std::string fieldName = as_string(term->inputs[1]);
-        Type& type = as_type(term->inputs[0]->type);
+        CompoundValue &value = as_compound_value(term->input(0));
+        std::string fieldName = as_string(term->input(1));
+        Type& type = as_type(term->input(0)->type);
 
         int index = type.findField(fieldName);
 
