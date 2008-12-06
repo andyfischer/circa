@@ -1,1 +1,1 @@
-sed -i '' $* $CIRCA_HOME/src/*.cpp $CIRCA_HOME/src/*.h $CIRCA_HOME/src/tests/*.cpp $CIRCA_HOME/src/tests/*.h
+sed -i '' $* $CIRCA_HOME/src/*.cpp $CIRCA_HOME/src/*.h $CIRCA_HOME/src/tests/*.cpp $CIRCA_HOME/src/builtin_functions/*.cpp

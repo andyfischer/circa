@@ -7,7 +7,7 @@ namespace if_expr_function {
 
     void evaluate(Term* caller)
     {
-        int index = as_bool(caller->inputs[0]) ? 1 : 2;
+        int index = as_bool(caller->input(0)) ? 1 : 2;
         Term *result = caller->inputs[index];
         change_type(caller, result->type);
         recycle_value(caller->inputs[index], caller);

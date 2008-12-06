@@ -7,7 +7,7 @@ namespace to_string_function {
 
     void evaluate(Term* caller)
     {
-        Term* term = caller->inputs[0];
+        Term* term = caller->input(0);
         
         Type::ToStringFunc func = as_type(term->type).toString;
         

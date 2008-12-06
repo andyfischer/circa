@@ -7,8 +7,8 @@ namespace equals_function {
 
     void evaluate(Term* caller)
     {
-        Term *input0 = caller->inputs[0];
-        Term *input1 = caller->inputs[1];
+        Term *input0 = caller->input(0);
+        Term *input1 = caller->input(1);
         if (input0->type != input1->type) {
             error_occured(caller, "different types");
             return;
