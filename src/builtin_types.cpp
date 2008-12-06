@@ -6,6 +6,7 @@
 #include "builtin_types.h"
 #include "cpp_interface.h"
 #include "runtime.h"
+#include "symbolic_list.h"
 #include "values.h"
 
 namespace circa {
@@ -212,7 +213,6 @@ Term* get_field(Term *term, std::string const& fieldName)
     return value->fields[index];
 }
 
-
 void initialize_builtin_types(Branch& kernel)
 {
     STRING_TYPE = quick_create_cpp_type<std::string>(kernel, "string");
@@ -255,6 +255,8 @@ void initialize_builtin_types(Branch& kernel)
             ANY_TYPE);
 
     quick_create_cpp_type<Branch>(kernel, "Branch");
+
+    quick_create_cpp_type<SymbolicRefList>(kernel, "SList");
 }
 
 } // namespace circa

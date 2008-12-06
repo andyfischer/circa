@@ -348,14 +348,15 @@ void assign_pointer(Term*& pointer, Term* value, Term* owner)
 
     if (previousValue != NULL) {
         // check to remove 'owner' from users of 'previousValue'
-        struct DoesTermPointToThis : PointerVisitor()
+        struct DoesTermPointToThis : public PointerVisitor
         {
             Term* target;
             bool answer;
             DoesTermPointToThis(Term* _target) : target(_target), answer(false) {}
 
         };
-        ...
+
+        // todo..
     }
 
     if (pointer != NULL) {
