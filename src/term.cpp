@@ -45,8 +45,7 @@ Term::Term()
     owningBranch(NULL),
     stealingOk(true),
     needsUpdate(true),
-    myBranch(NULL),
-    references(0)
+    myBranch(NULL)
 {
     globalID = gNextGlobalID++;
 
@@ -74,6 +73,12 @@ Term::~Term()
 #if CHECK_FOR_BAD_POINTERS
     DEBUG_GOOD_POINTER_SET.erase(this);
 #endif
+}
+
+Term*
+Term::input(int index) const
+{
+    return this->inputs[index];
 }
 
 std::string

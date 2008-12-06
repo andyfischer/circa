@@ -66,6 +66,8 @@ struct Term
     Term();
     ~Term();
 
+    Term* input(int index) const;
+
     std::string toString();
     bool equals(Term* term);
 
