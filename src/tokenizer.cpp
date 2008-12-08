@@ -45,6 +45,7 @@ const char* getMatchText(int match)
         case WHITESPACE: return "WHITESPACE";
         case NEWLINE: return "NEWLINE";
         case END: return "end";
+        case IF: return "if";
         case UNRECOGNIZED: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -157,13 +158,24 @@ void top_level_consume_token(TokenizeContext &context)
 {
     if (is_letter(context.next())) {
 
-        if (context.next() == 'e' && context.next(1) == 'n'
-                && context.next(2) == 'd') {
+        if (context.next() == 'e'
+                && context.next(1) == 'n'
+                && context.next(2) == 'd'
+                && !is_acceptable_inside_identifier(context.next(3))) {
 
             context.consume();
             context.consume();
             context.consume();
             context.pushResult(END);
+            return;
+        }
+
+        if (context.next() == 'i'
+            && context.next(1) == 'f'
+            && !is_acceptable_inside_identifier(context.next(2))) {
+            context.consume();
+            context.consume();
+            context.pushResult(IF);
             return;
         }
 
