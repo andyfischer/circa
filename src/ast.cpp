@@ -239,6 +239,11 @@ Term*
 Identifier::createTerm(Branch& branch)
 {
     Term* result = branch.findNamed(this->text);
+
+    if (result == NULL) {
+        parser::syntax_error(std::string("Couldn't find identifier: ") + this->text);
+    }
+
     assert(result != NULL);
     return result;
 }
