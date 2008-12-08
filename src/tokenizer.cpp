@@ -46,6 +46,7 @@ const char* getMatchText(int match)
         case NEWLINE: return "NEWLINE";
         case END: return "end";
         case IF: return "if";
+        case ELSE: return "else";
         case UNRECOGNIZED: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -176,6 +177,19 @@ void top_level_consume_token(TokenizeContext &context)
             context.consume();
             context.consume();
             context.pushResult(IF);
+            return;
+        }
+
+        if (context.next() == 'e'
+            && context.next(1) == 'l'
+            && context.next(2) == 's'
+            && context.next(3) == 'e'
+            && !is_acceptable_inside_identifier(context.next(4))) {
+            context.consume();
+            context.consume();
+            context.consume();
+            context.consume();
+            context.pushResult(ELSE);
             return;
         }
 

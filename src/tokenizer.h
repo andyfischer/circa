@@ -61,6 +61,7 @@ const int DOUBLE_VERTICAL_BAR = 40;
 
 const int END = 37;
 const int IF = 41;
+const int ELSE = 42;
 
 const int WHITESPACE = 26;
 const int NEWLINE = 27;

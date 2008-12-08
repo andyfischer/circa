@@ -118,13 +118,15 @@ void test_symbols()
 void test_keywords()
 {
     token::TokenList results;
-    token::tokenize("end,if", results);
+    token::tokenize("end,if,else", results);
 
-    test_assert(results.size() == 3);
+    test_assert(results.size() == 5);
     test_assert(results[0].text == "end");
     test_assert(results[0].match == token::END);
     test_assert(results[2].text == "if");
     test_assert(results[2].match == token::IF);
+    test_assert(results[4].text == "else");
+    test_assert(results[4].match == token::ELSE);
 }
 
 void test_string_literal()
