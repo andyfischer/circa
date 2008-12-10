@@ -147,7 +147,7 @@ bool is_number(char c)
 
 bool is_acceptable_inside_identifier(char c)
 {
-    return is_letter(c) || is_number(c) || c == '_' || c == '-';
+    return is_letter(c) || is_number(c) || c == '_' || c == '-' || c == ':';
 }
 
 bool is_whitespace(char c)

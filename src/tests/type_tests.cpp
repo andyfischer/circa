@@ -1,11 +1,13 @@
 // Copyright 2008 Paul Hodge
 
-#include "testing.h"
 #include "common_headers.h"
+
+#include "builtin_types.h"
 #include "branch.h"
 #include "builtins.h"
 #include "runtime.h"
 #include "parser.h"
+#include "testing.h"
 #include "type.h"
 
 namespace circa {

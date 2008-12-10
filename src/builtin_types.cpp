@@ -164,18 +164,6 @@ struct CompoundValue
         output.addField(fieldType, fieldName);
     }
 
-    static bool is_compound_value(Term *term)
-    {
-        assert(term != NULL);
-        assert(term->value != NULL);
-        return ((CompoundValue*) term->value)->signature == COMPOUND_TYPE_SIGNATURE;
-    }
-
-    static CompoundValue& as_compound_value(Term *term)
-    {
-        assert(is_compound_value(term));
-        return *((CompoundValue*) term->value);
-    }
 
     static void get_field(Term* term)
     {
@@ -202,14 +190,34 @@ struct CompoundValue
     }
 };
 
+bool is_compound_value(Term *term)
+{
+    assert(term != NULL);
+    assert(term->value != NULL);
+    return ((CompoundValue*) term->value)->signature == COMPOUND_TYPE_SIGNATURE;
+}
+
+CompoundValue& as_compound_value(Term *term)
+{
+    assert(is_compound_value(term));
+    return *((CompoundValue*) term->value);
+}
+
 Term* get_field(Term *term, std::string const& fieldName)
 {
-    assert(CompoundValue::is_compound_value(term));
+    assert(is_compound_value(term));
     CompoundValue *value = (CompoundValue*) term->value;
     Type& type = as_type(term->type);
     int index = type.findField(fieldName);
     if (index == -1)
         return NULL;
+    return value->fields[index];
+}
+
+Term* get_field(Term *term, int index)
+{
+    assert(is_compound_value(term));
+    CompoundValue *value = (CompoundValue*) term->value;
     return value->fields[index];
 }
 

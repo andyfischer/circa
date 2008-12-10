@@ -108,8 +108,6 @@ Term* quick_create_type(Branch& branch, std::string name="");
 // Throw an exception if term is not an instance of type
 void assert_type(Term* term, Term* type);
 
-Term* get_field(Term *term, std::string const& fieldName);
-
 void unsafe_change_type(Term* term, Term* type);
 void change_type(Term* term, Term* type);
 void specialize_type(Term* term, Term* type);
