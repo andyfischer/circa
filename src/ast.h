@@ -243,9 +243,24 @@ struct TypeDecl : public Statement
         members.push_back(Member(type, name));
     }
 
+    // for Statement
     virtual std::string toString() const;
     virtual Term* createTerm(Branch& branch);
     virtual std::string typeName() { return "TypeDecl"; }
+};
+
+struct IfStatement : public Statement
+{
+    Expression* condition;
+    StatementList* positiveBranch;
+    StatementList* negativeBranch;
+
+    IfStatement() : condition(NULL), positiveBranch(NULL), negativeBranch(NULL) {}
+
+    // for Statement
+    virtual std::string toString() const;
+    virtual Term* createTerm(Branch& branch);
+    virtual std::string typeName() { return "IfStatement"; }
 };
 
 } // namespace ast

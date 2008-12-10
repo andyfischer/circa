@@ -99,9 +99,15 @@ T eval_as(std::string const& statement)
     Branch branch;
 
     Term* result_term = eval_statement(branch, statement);
-    T result = as<T>(result_term);
 
-    return result;
+    return as<T>(result_term);
+}
+
+template <class T>
+T eval_as(Branch branch, std::string const& statement)
+{
+    Term* result = eval_statement(branch, statement);
+    return as<T>(result);
 }
 
 } // namespace circa

@@ -255,6 +255,7 @@ void initialize_builtin_types(Branch& kernel)
             ANY_TYPE);
 
     quick_create_cpp_type<Branch>(kernel, "Branch");
+    quick_create_cpp_type<Branch*>(kernel, "BranchPtr");
 
     quick_create_cpp_type<SymbolicRefList>(kernel, "SList");
 }

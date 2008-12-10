@@ -74,7 +74,7 @@ ast::StatementList* statementList(token_stream::TokenStream& tokens)
             continue;
         }
 
-        if (tokens.nextIs(tokenizer::RBRACE) || tokens.nextIs(tokenizer::END)) {
+        if (tokens.nextIs(tokenizer::END) || tokens.nextIs(tokenizer::ELSE)) {
             break;
         }
 
@@ -120,6 +120,10 @@ ast::Statement* statement(token_stream::TokenStream& tokens)
 
     if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.next().text == "type") {
         return typeDecl(tokens);
+    }
+
+    if (tokens.nextIs(tokenizer::IF)) {
+        return ifStatement(tokens);
     }
 
     return expressionStatement(tokens);
@@ -429,6 +433,32 @@ ast::TypeDecl* typeDecl(token_stream::TokenStream& tokens)
     }
 
     return decl.release();
+}
+
+ast::IfStatement* ifStatement(token_stream::TokenStream& tokens)
+{
+    tokens.consume(tokenizer::IF);
+    possibleWhitespace(tokens);
+
+    std::auto_ptr<ast::IfStatement> result(new ast::IfStatement());
+
+    result->condition = infixExpression(tokens);
+
+    possibleNewline(tokens);
+
+    result->positiveBranch = statementList(tokens);
+
+    if (tokens.nextIs(tokenizer::ELSE)) {
+        tokens.consume(tokenizer::ELSE);
+        possibleNewline(tokens);
+
+        result->negativeBranch = statementList(tokens);
+    }
+
+    tokens.consume(tokenizer::END);
+    possibleNewline(tokens);
+
+    return result.release();
 }
 
 std::string possibleWhitespace(token_stream::TokenStream& tokens)
