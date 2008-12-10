@@ -87,15 +87,21 @@ void _test_equals_function(ReferenceList const& a, ReferenceList const& b,
 
 bool run_test(TestCase& testCase)
 {
+#define CATCH_TEST_EXCEPTIONS 0
+
+#if CATCH_TEST_EXCEPTIONS
     try {
+#endif
         testCase.execute();
         return true;
+#if CATCH_TEST_EXCEPTIONS
     }
     catch (std::runtime_error const& err) {
         std::cout << "Error white running test case " << testCase.name << std::endl;
         std::cout << err.what() << std::endl;
         return false;
     }
+#endif
 }
 
 void run_test(std::string const& testName)
