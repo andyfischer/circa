@@ -5,22 +5,25 @@
 namespace circa {
 namespace if_statement_function {
 
-    struct State {
-        Branch positiveBranch;
-        Branch negativeBranch;
-    };
+    /*
+    type State
+    {
+      Branch positiveBranch
+      Branch negative branch
+    }
+    */
 
     void evaluate(Term* caller)
     {
         bool condition = as_bool(caller->input(0));
-        State &state = as<State>(caller->state);
 
         if (condition)
-            evaluate_branch(state.positiveBranch);
+            evaluate_branch(as_branch(get_field(caller->state, 0)));
         else
-            evaluate_branch(state.negativeBranch);
+            evaluate_branch(as_branch(get_field(caller->state, 1)));
     }
 
+    /*
     namespace if_statement_get_branch_function {
 
         // This function is hopefully temporary, it exposes the branches inside
@@ -47,17 +50,21 @@ namespace if_statement_function {
             as_function(main_func).pureFunction = true;
             as_function(main_func).setInputMeta(0, true);
         }
-    }
+    }*/
 
     void setup(Branch& kernel)
     {
-        Term* stateType = quick_create_cpp_type<State>(kernel, "if-statement::State");
+
         Term* main_func = import_c_function(kernel, evaluate,
                 "function if-statement(bool)");
         as_function(main_func).pureFunction = false;
-        as_function(main_func).stateType = stateType;
 
-        if_statement_get_branch_function::setup(kernel);
+        eval_statement(kernel,
+                "if-statement::State = create-compound-type('if-statement::State')");
+        eval_statement(kernel,
+                "compound-type-append-field(@if-statement::State, Branch, 'positiveBranch')");
+        as_function(main_func).stateType = eval_statement(kernel,
+                "compound-type-append-field(@if-statement::State, Branch, 'negativeBranch')");
     }
 }
 }
