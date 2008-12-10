@@ -157,6 +157,18 @@ void test_map()
     test_assert(eval_statement(branch, "ages('Absalom')")->asInt() == 205);
 }
 
+void test_if_statement()
+{
+    Branch branch;
+
+    Term* condition = eval_statement(branch, "cond = true");
+    Term* if_statement = eval_statement(branch, "if_s = if-statement(cond)");
+
+    //Branch *positiveBranch = eval_as<Branch*>(branch, "if-statement-get-branch(if_s, true)");
+    //Branch *negativeBranch = eval_as<Branch*>(branch, "if-statement-get-branch(if_s, false)");
+
+}
+
 } // namespace builtin_function_tests
 
 void register_builtin_function_tests()
@@ -171,6 +183,7 @@ void register_builtin_function_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_parse_function_header);
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_map);
+    REGISTER_TEST_CASE(builtin_function_tests::test_if_statement);
 }
 
 } // namespace circa

@@ -464,5 +464,18 @@ TypeDecl::createTerm(Branch& branch)
     return result_term;
 }
 
+std::string
+IfStatement::toString() const
+{
+    return "IfStatment::toString TODO";
+}
+
+Term*
+IfStatement::createTerm(Branch& branch)
+{
+    // FIXME
+    return NULL;
+}
+
 } // namespace ast
 } // namespace circa

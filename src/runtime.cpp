@@ -92,8 +92,10 @@ void evaluate_term(Term* term)
             return;
         }
 
-        if (input->needsUpdate)
+        if (input->needsUpdate) {
+            assert(term != input); // prevent infinite recursion
             evaluate_term(input);
+        }
     }
     
     // Make sure we have an allocated value. Allocate one if necessary
