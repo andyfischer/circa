@@ -69,6 +69,9 @@ ast::StatementList* statementList(token_stream::TokenStream& tokens)
     ast::StatementList* statementList = new ast::StatementList();
 
     while (!tokens.finished()) {
+
+        possibleWhitespace(tokens);
+
         if (tokens.nextIs(tokenizer::NEWLINE)) {
             tokens.consume(tokenizer::NEWLINE);
             continue;

@@ -327,6 +327,21 @@ void test_type_decl_full_trip()
     test_assert(as_type(t).fields[1].name == "a");
 }
 
+void test_parse_if_block()
+{
+    token_stream::TokenStream tokens(
+            "if (x > 2) \n print('yes') \n else \n print('no') \n end");
+
+    ast::IfStatement* ifStatement = parser::ifStatement(tokens);
+
+    test_assert(ifStatement != NULL);
+
+    // these lines will need to be fixed when there is better whitespace preservation
+    test_assert(ifStatement->condition->toString() == "x>2");
+    test_assert(ifStatement->positiveBranch->toString() == "print(\"yes\")\n");
+    test_assert(ifStatement->negativeBranch->toString() == "print(\"no\")\n");
+}
+
 } // namespace parser_tests
 
 void register_parser_tests()
@@ -349,6 +364,7 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::test_type_decl);
     REGISTER_TEST_CASE(parser_tests::test_type_decl_statement);
     REGISTER_TEST_CASE(parser_tests::test_type_decl_full_trip);
+    REGISTER_TEST_CASE(parser_tests::test_parse_if_block);
 }
 
 } // namespace circa
