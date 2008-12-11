@@ -164,9 +164,28 @@ void test_if_statement()
     Term* condition = eval_statement(branch, "cond = true");
     Term* if_statement = eval_statement(branch, "if_s = if-statement(cond)");
 
-    //Branch *positiveBranch = eval_as<Branch*>(branch, "if-statement-get-branch(if_s, true)");
-    //Branch *negativeBranch = eval_as<Branch*>(branch, "if-statement-get-branch(if_s, false)");
+    Branch &positiveBranch = as_branch(if_statement->state->field(0));
+    Branch &negativeBranch = as_branch(if_statement->state->field(1));
 
+    Term* posTerm = apply_statement(positiveBranch, "x = 1.0 + 1.0");
+    Term* negTerm = apply_statement(negativeBranch, "x = 1.0 + 1.0");
+
+    dealloc_value(negTerm);
+    dealloc_value(posTerm);
+
+    evaluate_branch(branch);
+
+    test_assert(as_float(posTerm) == 2.0);
+    test_assert(negTerm->value == NULL);
+
+    dealloc_value(posTerm);
+
+    as_bool(condition) = false;
+
+    evaluate_branch(branch);
+
+    test_assert(posTerm->value == NULL);
+    test_assert(as_float(negTerm) == 2.0);
 }
 
 } // namespace builtin_function_tests

@@ -92,6 +92,10 @@ struct Term
     bool& asBool();
     Term*& asRef();
     List& asList();
+
+    // Accessors for compound types
+    Term* field(int index);
+    Term* field(std::string const& fieldName);
 };
 
 } // namespace circa
