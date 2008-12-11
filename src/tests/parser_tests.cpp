@@ -340,6 +340,18 @@ void test_parse_if_block()
     test_assert(ifStatement->condition->toString() == "x>2");
     test_assert(ifStatement->positiveBranch->toString() == "print(\"yes\")\n");
     test_assert(ifStatement->negativeBranch->toString() == "print(\"no\")\n");
+
+    delete ifStatement;
+
+    tokens.reset("if (false) \n print('blah') \n end");
+
+    ifStatement = parser::ifStatement(tokens);
+
+    test_assert(ifStatement->condition->toString() == "false");
+    test_assert(ifStatement->positiveBranch->toString() == "print(\"blah\")\n");
+    test_assert(ifStatement->negativeBranch == NULL);
+
+    delete ifStatement;
 }
 
 } // namespace parser_tests
