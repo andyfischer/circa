@@ -170,8 +170,11 @@ void test_if_statement()
     Term* posTerm = apply_statement(positiveBranch, "x = 1.0 + 1.0");
     Term* negTerm = apply_statement(negativeBranch, "x = 1.0 + 1.0");
 
-    dealloc_value(negTerm);
     dealloc_value(posTerm);
+    dealloc_value(negTerm);
+
+    test_assert(posTerm->value == NULL);
+    test_assert(negTerm->value == NULL);
 
     evaluate_branch(branch);
 
