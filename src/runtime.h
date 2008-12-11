@@ -26,6 +26,11 @@ void set_input(Term* term, int index, Term* input);
 //  4. Something else that is possibly implemented in the future?
 Term* apply_function(Branch& branch, Term* function, ReferenceList const& inputs);
 
+// Look up the given function in branch, and then call the above apply_function
+Term* apply_function(Branch& branch,
+                     std::string const& functionName, 
+                     ReferenceList const& inputs);
+
 // Perform 'apply_function' and then evaluate the result
 Term* eval_function(Branch& branch, Term* function, ReferenceList const& inputs);
 
