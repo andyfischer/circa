@@ -473,8 +473,20 @@ IfStatement::toString() const
 Term*
 IfStatement::createTerm(Branch& branch)
 {
-    // FIXME
-    return NULL;
+    assert(this->condition != NULL);
+    assert(this->positiveBranch != NULL);
+
+    Term* conditionTerm = this->condition->createTerm(branch);
+
+    Term* ifStatementTerm = apply_function(branch, "if-statement", ReferenceList(conditionTerm));
+
+    this->positiveBranch->createTerms(as_branch(ifStatementTerm->state->field(0)));
+
+    if (this->negativeBranch != NULL) {
+        this->negativeBranch->createTerms(as_branch(ifStatementTerm->state->field(1)));
+    }
+
+    return ifStatementTerm;
 }
 
 } // namespace ast

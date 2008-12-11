@@ -270,6 +270,17 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList const& _input
     return create_term(&branch, function, inputs);
 }
 
+Term* apply_function(Branch& branch,
+                     std::string const& functionName, 
+                     ReferenceList const& inputs)
+{
+    Term* function = branch.findNamed(functionName);
+    if (function == NULL)
+        throw std::runtime_error(std::string("function not found: ")+functionName);
+
+    return apply_function(branch, function, inputs);
+}
+
 Term* eval_function(Branch& branch, Term* function, ReferenceList const& inputs)
 {
     Term* result = apply_function(branch, function, inputs);
