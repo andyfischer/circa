@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "builtins.h"
+#include "builtin_types.h"
 #include "branch.h"
 #include "function.h"
 #include "list.h"
@@ -181,6 +182,16 @@ Term*& Term::asRef()
 List& Term::asList()
 {
     return as_list(this);
+}
+
+Term* Term::field(int index)
+{
+    return get_field(this, index);
+}
+
+Term* Term::field(std::string const& fieldName)
+{
+    return get_field(this, fieldName);
 }
 
 } // namespace circa
