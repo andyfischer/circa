@@ -213,9 +213,12 @@ void initialize_constants()
 
     CONSTANT_TRUE = apply_function(*KERNEL, BOOL_TYPE, ReferenceList());
     as_bool(CONSTANT_TRUE) = true;
+    CONSTANT_TRUE->stealingOk = false;
     KERNEL->bindName(CONSTANT_TRUE, "true");
+
     CONSTANT_FALSE = apply_function(*KERNEL, BOOL_TYPE, ReferenceList());
     as_bool(CONSTANT_FALSE) = false;
+    CONSTANT_FALSE->stealingOk = false;
     KERNEL->bindName(CONSTANT_FALSE, "false");
 
     Term* pi = apply_function(*KERNEL, FLOAT_TYPE, ReferenceList());
