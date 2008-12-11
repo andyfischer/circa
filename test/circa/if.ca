@@ -8,11 +8,11 @@ if false
   print('ERROR!')
 end
 
-if (1 + 2) > 1
+if (1.0 + 2.0) > 1.0
   print('Complex condition 1')
 end
 
-if (1 + 2) < 1
+if (1.0 + 2.0) < 1.0
   print('ERROR!')
 end
 
@@ -136,13 +136,13 @@ if true
   a = 2
 end
 
-print(concat('Should be two: ', a))
+print(concat('Should be two: ', a.to-string))
 
 b = 3
 if false
   b = 4
 end
-print(concat('Should be three: ', b))
+print(concat('Should be three: ', b.to-string))
 
 -- Rebinding, with else block
 c = 5
@@ -151,4 +151,4 @@ if true
 else
   c = 7
 end
-print(concat('Should be six: ', c))
+print(concat('Should be six: ', c.to-string))
