@@ -76,6 +76,17 @@ Term* Branch::findNamed(std::string const& name) const
     if (containsName(name))
         return getNamed(name);
 
+    if (owningTerm != NULL) {
+        Branch* outerBranch = owningTerm->owningBranch;
+
+        if (outerBranch != NULL) {
+
+            assert(outerBranch != this);
+
+            return outerBranch->findNamed(name);
+        }
+    }
+
     return get_global(name);
 }
 

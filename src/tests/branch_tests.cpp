@@ -104,6 +104,18 @@ void test_owning_term()
     test_assert(as_branch(b).owningTerm == b);
 }
 
+void find_name_in_outer_branch()
+{
+    Branch branch;
+
+    Term* a = eval_statement(branch, "a = 1");
+
+    Term* b = eval_statement(branch, "Branch()");
+    alloc_value(b);
+
+    test_assert(as_branch(b).findNamed("a") == a);
+}
+
 } // namespace branch_tests
 
 void register_branch_tests()
@@ -111,6 +123,7 @@ void register_branch_tests()
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
     REGISTER_TEST_CASE(branch_tests::external_pointers);
     REGISTER_TEST_CASE(branch_tests::test_owning_term);
+    REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
 }
 
 } // namespace circa
