@@ -21,7 +21,6 @@
 #include "values.h"
 #include "setup_builtin_functions.h"
 
-
 namespace circa {
 
 Branch* KERNEL = NULL;
@@ -196,6 +195,7 @@ void initialize_constants()
     BRANCH_TYPE = quick_create_cpp_type<Branch>(*KERNEL, "Branch");
     as_type(BRANCH_TYPE).remapPointers = Branch::hosted_remap_pointers;
     as_type(BRANCH_TYPE).visitPointers = Branch::hosted_visit_pointers;
+    as_type(BRANCH_TYPE).updateOwner = Branch::hosted_update_owner;
 
     LIST_TYPE = quick_create_cpp_type<List>(*KERNEL, "List");
     as_type(LIST_TYPE).toString = List__toString;

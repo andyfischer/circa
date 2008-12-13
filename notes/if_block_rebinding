@@ -1,0 +1,22 @@
+
+Need to support rebinding semantics in if-blocks.
+
+1) If we have a name which is bound outside the if-block
+and 2) if this name is rebound anywhere inside the if-block,
+then for this name, we must create an if-expr after the if-block, which decides
+between the bindings at both branches, using the if-block's condition. Then in
+the outer scode, this name is bound to this if-expr.
+
+An algorithm:
+
+Make a list of every name that is bound within the if-statement
+Remove any name that is not bound in the outer scode
+We now have a list of names that are re-bound inside the if-block
+
+For every such name:
+  Create an if-expr after the if-statement. Use the if-statement's condition
+  For every branch
+    Find this name's binding in this branch. This may lead to the outer branch's
+    binding (if this branch does not use this name)
+    Use this binding as an input to the if-expr
+  In the outer branch, bind this name to our new if-expr

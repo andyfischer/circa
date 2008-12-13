@@ -2,12 +2,15 @@
 
 #include "common_headers.h"
 
-#include "testing.h"
 #include "branch.h"
 #include "builtins.h"
 #include "introspection.h"
+#include "parser.h"
 #include "runtime.h"
 #include "term.h"
+#include "testing.h"
+#include "type.h"
+#include "values.h"
 
 namespace circa {
 namespace branch_tests {
@@ -81,12 +84,33 @@ void external_pointers()
     test_assert(inner_add->function == MULT_FUNC);
 }
 
+void test_owning_term()
+{
+    Branch branch;
+
+    Term* b = eval_statement(branch, "Branch()");
+    alloc_value(b);
+
+    test_assert(b->type == BRANCH_TYPE);
+    test_assert(as_branch(b).owningTerm == b);
+
+    Term* b2 = eval_statement(branch, "Branch()");
+    steal_value(b, b2);
+
+    test_assert(as_branch(b2).owningTerm == b2);
+
+    duplicate_value(b2, b);
+
+    test_assert(as_branch(b).owningTerm == b);
+}
+
 } // namespace branch_tests
 
 void register_branch_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
     REGISTER_TEST_CASE(branch_tests::external_pointers);
+    REGISTER_TEST_CASE(branch_tests::test_owning_term);
 }
 
 } // namespace circa
