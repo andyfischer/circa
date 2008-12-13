@@ -100,7 +100,7 @@ void evaluate_term(Term* term)
     
     // Make sure we have an allocated value. Allocate one if necessary
     if (term->value == NULL) {
-        term->value = alloc_from_type(term->type);
+        alloc_value(term);
     }    
 
     try {

@@ -28,6 +28,7 @@ struct Type
     typedef bool (*LessThanFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
     typedef void (*VisitPointersFunc)(Term* term, PointerVisitor &listener);
+    typedef void (*UpdateOwner)(Term* term);
     typedef std::string (*ToStringFunc)(Term* term);
 
     struct Field {
@@ -52,6 +53,7 @@ struct Type
     LessThanFunc lessThan;
     RemapPointersFunc remapPointers;
     VisitPointersFunc visitPointers;
+    UpdateOwner updateOwner;
     ToStringFunc toString;
     
     // Fields, applies to compound types
@@ -73,6 +75,7 @@ struct Type
         lessThan(NULL),
         remapPointers(NULL),
         visitPointers(NULL),
+        updateOwner(NULL),
         toString(NULL)
     {
     }

@@ -6,6 +6,12 @@
 
 namespace circa {
 
+void alloc_value(Term* term)
+{
+    term->value = alloc_from_type(term->type);
+    update_owner(term);
+}
+
 void dealloc_value(Term* term)
 {
     if (term->value == NULL)
@@ -58,6 +64,8 @@ void duplicate_value(Term* source, Term* dest)
     dealloc_value(dest);
 
     duplicate(source, dest);
+
+    update_owner(dest);
 }
 
 void steal_value(Term* source, Term* dest)
@@ -71,6 +79,21 @@ void steal_value(Term* source, Term* dest)
 
     source->value = NULL;
     source->needsUpdate = true;
+
+    update_owner(dest);
+}
+
+void update_owner(Term* term)
+{
+    if (term->value == NULL)
+        return;
+
+    Type &type = as_type(term->type);
+
+    if (type.updateOwner == NULL)
+        return;
+
+    type.updateOwner(term);
 }
 
 bool values_equal(Term* a, Term* b)

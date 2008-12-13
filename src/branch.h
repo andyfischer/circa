@@ -16,6 +16,8 @@ private:
     std::vector<Term*> _terms;
 
 public:
+    Term* owningTerm;
+
     TermNamespace names;
 
     // 'permanent' means that this branch will not be deleted until the
@@ -24,7 +26,7 @@ public:
     //  - We don't keep any record of external links
     bool permanent;
 
-    Branch() : permanent(false) {}
+    Branch() : owningTerm(NULL), permanent(false) {}
     ~Branch();
 
     int numTerms() const { return _terms.size(); }
@@ -70,6 +72,7 @@ public:
     // Hosted functions
     static void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
     static void hosted_visit_pointers(Term* caller, PointerVisitor& visitor);
+    static void hosted_update_owner(Term* term);
 };
 
 Branch& as_branch(Term* term);
