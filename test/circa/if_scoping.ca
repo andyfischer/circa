@@ -1,0 +1,30 @@
+
+-- Use a term from an outer scope
+a = 'Outer scope success'
+if true
+  print(a)
+end
+
+-- Rebinding, simple
+a = 1
+
+if true
+  a = 2
+end
+
+print(concat('Should be two: ', a.to-string))
+
+b = 3
+if false
+  b = 4
+end
+print(concat('Should be three: ', b.to-string))
+
+-- Rebinding, with else block
+c = 5
+if true
+  c = 6
+else
+  c = 7
+end
+print(concat('Should be six: ', c.to-string))

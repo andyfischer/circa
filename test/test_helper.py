@@ -50,3 +50,11 @@ def loadFile(filename):
     contents = f.read()
     f.close()
     return contents
+
+def readFileAsLines(filename):
+    contents = loadFile(filename)
+
+    def filterBlanks(line):
+        return line != ''
+
+    return filter(filterBlanks, contents.split('\n'))

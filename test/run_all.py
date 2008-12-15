@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os,sys
+import os,sys,test_helper
 
 TESTS_RUN = 0
 FAILURES = []
@@ -29,11 +29,7 @@ def print_results():
         for failure in FAILURES:
             print failure
 
-do_output_test("circa/assert.ca")
-do_output_test("circa/boolean.ca")
-do_output_test("circa/if.ca")
-do_output_test("circa/infix.ca")
-do_output_test("circa/lessthan.ca")
-do_output_test("circa/subroutine.ca")
+for file in test_helper.readFileAsLines('test_manifest'):
+    do_output_test(file)
 
 print_results()
