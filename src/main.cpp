@@ -62,7 +62,7 @@ int circa_main(std::vector<std::string> args)
         }
     }
 
-    try {
+    //try {
         Branch* branch = evaluate_file(args[0]);
 
         if (justPrintBranch) {
@@ -82,11 +82,11 @@ int circa_main(std::vector<std::string> args)
 
         delete branch;
 
-    } catch (std::runtime_error const& err)
+    /*} catch (std::runtime_error const& err)
     {
         std::cout << "Top level error:\n";
         std::cout << err.what() << std::endl;
-    }
+    }*/
 
 shutdown:
     shutdown();

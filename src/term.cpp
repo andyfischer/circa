@@ -148,8 +148,10 @@ Term::getErrorMessage() const
 Branch*
 Term::getMyBranch()
 {
-    if (myBranch == NULL)
+    if (myBranch == NULL) {
         myBranch = new Branch();
+        myBranch->owningTerm = this;
+    }
 
     return myBranch;
 }

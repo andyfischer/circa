@@ -190,7 +190,7 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
 
     // Create state (if a state type is defined)
     if (stateType != NULL) {
-        term->state = create_var(NULL, stateType);
+        term->state = create_var(term->getMyBranch(), stateType);
     }
     else
         term->state = NULL;

@@ -107,13 +107,29 @@ void test_owning_term()
 void find_name_in_outer_branch()
 {
     Branch branch;
-
     Term* a = eval_statement(branch, "a = 1");
 
     Term* b = eval_statement(branch, "Branch()");
     alloc_value(b);
 
     test_assert(as_branch(b).findNamed("a") == a);
+}
+
+void find_name_in_outer_branch_from_if()
+{
+    Branch branch;
+    Term* a = eval_statement(branch, "a = 1");
+
+    Term* if_s = eval_function(branch, "if-statement", ReferenceList(CONSTANT_TRUE));
+
+    Branch& posBranch = as_branch(if_s->state->field(0));
+
+    test_assert(posBranch.owningTerm = if_s->state);
+    test_assert(if_s->state->owningBranch == if_s->myBranch);
+    test_assert(if_s->myBranch->owningTerm == if_s);
+    test_assert(if_s->owningBranch == &branch);
+
+    test_assert(posBranch.findNamed("a") == a);
 }
 
 } // namespace branch_tests
@@ -124,6 +140,7 @@ void register_branch_tests()
     REGISTER_TEST_CASE(branch_tests::external_pointers);
     REGISTER_TEST_CASE(branch_tests::test_owning_term);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
+    REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch_from_if);
 }
 
 } // namespace circa
