@@ -32,7 +32,7 @@ Function::getInputProperties(unsigned int index)
     assert(index < inputTypes.count());
 
     // check to grow inputProperties
-    while (index < inputProperties.size()-1) {
+    while ((index+1) > inputProperties.size()) {
         inputProperties.push_back(InputProperties());
     }
 

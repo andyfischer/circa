@@ -480,10 +480,15 @@ IfStatement::createTerm(Branch& branch)
 
     Term* ifStatementTerm = apply_function(branch, "if-statement", ReferenceList(conditionTerm));
 
-    this->positiveBranch->createTerms(as_branch(ifStatementTerm->state->field(0)));
+    Branch& posBranch = as_branch(ifStatementTerm->state->field(0));
+    Branch& negBranch = as_branch(ifStatementTerm->state->field(1));
+
+    assert(posBranch.owningTerm == ifStatementTerm);
+
+    this->positiveBranch->createTerms(posBranch);
 
     if (this->negativeBranch != NULL) {
-        this->negativeBranch->createTerms(as_branch(ifStatementTerm->state->field(1)));
+        this->negativeBranch->createTerms(negBranch);
     }
 
     return ifStatementTerm;

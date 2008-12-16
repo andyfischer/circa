@@ -19,8 +19,12 @@ void test_create_var()
 {
     Branch branch;
     Term *term = create_var(&branch, INT_TYPE);
-
     test_assert(term->type == INT_TYPE);
+    test_assert(term->value != NULL);
+
+    term = create_var(&branch, BRANCH_TYPE);
+    test_assert(term->value != NULL);
+    test_assert(as_branch(term).owningTerm == term);
 }
 
 void test_int_var()
