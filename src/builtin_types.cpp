@@ -144,6 +144,15 @@ struct CompoundValue
         delete (CompoundValue*) data;
     }
 
+    /*static void hosted_update_owner(Term* term)
+    {
+        CompoundValue &value = as_compound_value(term);
+
+        for (int f=0; f < value.fields.count(); f++) {
+            update_owner(value.fields[f]);
+        }
+    }*/
+
     static void create_compound_type(Term* term)
     {
         std::string name = as_string(term->input(0));
@@ -163,7 +172,6 @@ struct CompoundValue
         std::string fieldName = as_string(term->input(2));
         output.addField(fieldType, fieldName);
     }
-
 
     static void get_field(Term* term)
     {

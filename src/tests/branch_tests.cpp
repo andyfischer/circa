@@ -124,7 +124,7 @@ void find_name_in_outer_branch_from_if()
 
     Branch& posBranch = as_branch(if_s->state->field(0));
 
-    test_assert(posBranch.owningTerm = if_s->state);
+    test_assert(posBranch.owningTerm == if_s->state);
     test_assert(if_s->state->owningBranch == if_s->myBranch);
     test_assert(if_s->myBranch->owningTerm == if_s);
     test_assert(if_s->owningBranch == &branch);

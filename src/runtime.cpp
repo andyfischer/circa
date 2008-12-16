@@ -221,7 +221,9 @@ void set_input(Term* term, int index, Term* input)
 
 Term* create_var(Branch* branch, Term* type)
 {
-    Term *term = create_term(branch, get_var_function(*branch, type), ReferenceList());
+    Term *var_function = get_var_function(*branch, type);
+    Term *term = create_term(branch, var_function, ReferenceList());
+    alloc_value(term);
     term->stealingOk = false;
     return term;
 }
