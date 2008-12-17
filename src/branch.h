@@ -16,7 +16,11 @@ private:
     std::vector<Term*> _terms;
 
 public:
+    // This might be obsolete
     Term* owningTerm;
+
+    // Points to a Branch term which is our outer scope.
+    Term* outerScope;
 
     TermNamespace names;
 
@@ -26,7 +30,7 @@ public:
     //  - We don't keep any record of external links
     bool permanent;
 
-    Branch() : owningTerm(NULL), permanent(false) {}
+    Branch() : owningTerm(NULL), outerScope(NULL), permanent(false) {}
     ~Branch();
 
     int numTerms() const { return _terms.size(); }
