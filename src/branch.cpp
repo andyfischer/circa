@@ -76,15 +76,11 @@ Term* Branch::findNamed(std::string const& name) const
     if (containsName(name))
         return getNamed(name);
 
-    if (owningTerm != NULL) {
-        Branch* outerBranch = owningTerm->owningBranch;
+    if (outerScope != NULL) {
+        assert(outerScope->value != this);
 
-        if (outerBranch != NULL) {
-
-            assert(outerBranch != this);
-
-            return outerBranch->findNamed(name);
-        }
+        Branch& outerBranch = as_branch(outerScope);
+        return outerBranch.findNamed(name);
     }
 
     return get_global(name);
