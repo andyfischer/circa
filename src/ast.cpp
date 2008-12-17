@@ -487,8 +487,6 @@ IfStatement::createTerm(CompilationContext &context)
     Branch& posBranch = as_branch(ifStatementTerm->state->field(0));
     Branch& negBranch = as_branch(ifStatementTerm->state->field(1));
 
-    assert(posBranch.owningTerm == ifStatementTerm);
-
     context.push(&posBranch, ifStatementTerm->state->field(0));
     this->positiveBranch->createTerms(context);
     context.pop();

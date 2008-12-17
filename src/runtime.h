@@ -9,7 +9,6 @@ namespace circa {
 
 void evaluate_term(Term* term);
 void evaluate_branch(Branch& branch, Term* errorListener=NULL);
-Branch* evaluate_file(std::string const& filename);
 
 void error_occured(Term* errorTerm, std::string const& message);
 

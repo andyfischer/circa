@@ -131,27 +131,6 @@ void evaluate_branch(Branch& branch, Term* errorListener)
     }
 }
 
-Branch* evaluate_file(std::string const& filename)
-{
-    Branch *branch = new Branch();
-
-    Branch temp_branch;
-    temp_branch.bindName(string_var(temp_branch, filename), "filename");
-    std::string file_contents = as_string(eval_statement(temp_branch,
-                "read-text-file(filename)"));
-
-    token_stream::TokenStream tokens(file_contents);
-    ast::StatementList *statementList = parser::statementList(tokens);
-
-    CompilationContext context;
-    context.push(branch, NULL);
-    statementList->createTerms(context);
-
-    delete statementList;
-
-    return branch;
-}
-
 void error_occured(Term* errorTerm, std::string const& message)
 {
     if (errorTerm == NULL)
