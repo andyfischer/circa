@@ -16,6 +16,42 @@
 namespace circa {
 namespace ast {
 
+Term*
+CompilationContext::findNamed(std::string const& name) const
+{
+    assert(!branchStack.empty());
+
+    for (size_t i = branchStack.size() - 1; i >= 0; i--) {
+        Branch* branch = branchStack[i];
+
+        Term* term = branch->findNamed(name);
+
+        if (term != NULL)
+            return term;
+    }
+
+    return NULL;
+}
+
+Branch&
+CompilationContext::topBranch() const
+{
+    assert(!branchStack.empty());
+    return *branchStack.back();
+}
+
+void
+CompilationContext::push(Branch* branch)
+{
+    branchStack.push_back(branch);
+}
+
+void
+CompilationContext::pop()
+{
+    branchStack.pop_back();
+}
+
 std::string getInfixFunctionName(std::string infix)
 {
     if (infix == "+")
@@ -46,20 +82,20 @@ std::string getInfixFunctionName(std::string infix)
     return ""; // unreachable
 }
 
-Term* find_and_apply_function(Branch& branch, std::string const& functionName,
+Term* find_and_apply_function(CompilationContext &context, std::string const& functionName,
         ReferenceList inputs)
 {
-    Term* function = branch.findNamed(functionName);
+    Term* function = context.findNamed(functionName);
 
     if (function == NULL) {
         std::cout << "warning: function not found: " << functionName << std::endl;
 
-        Term* result = apply_function(branch, UNKNOWN_FUNCTION, inputs);
+        Term* result = apply_function(context.topBranch(), UNKNOWN_FUNCTION, inputs);
         as_string(result->state) = functionName;
         return result;
     }
 
-    return apply_function(branch, function, inputs);
+    return apply_function(context.topBranch(), function, inputs);
 }
 
 Infix::~Infix()
@@ -80,11 +116,11 @@ Infix::toString() const
 }
 
 Term*
-Infix::createTerm(Branch& branch)
+Infix::createTerm(CompilationContext &context)
 {
     // special case: right arrow or dot
     if (this->operatorStr == "->" || this->operatorStr == ".") {
-        Term* leftTerm = this->left->createTerm(branch);
+        Term* leftTerm = this->left->createTerm(context);
 
         Identifier *rightIdent = dynamic_cast<Identifier*>(this->right);
 
@@ -92,31 +128,31 @@ Infix::createTerm(Branch& branch)
             parser::syntax_error("Right side of -> must be an identifier");
         }
 
-        return find_and_apply_function(branch, rightIdent->text, ReferenceList(leftTerm));
+        return find_and_apply_function(context, rightIdent->text, ReferenceList(leftTerm));
     }
 
     // another special case: :=
     if (this->operatorStr == ":=") {
 
-        Term* leftTerm = this->left->createTerm(branch);
-        Term* rightTerm = this->right->createTerm(branch);
+        Term* leftTerm = this->left->createTerm(context);
+        Term* rightTerm = this->right->createTerm(context);
 
-        return apply_function(branch, APPLY_FEEDBACK, ReferenceList(leftTerm, rightTerm));
+        return apply_function(context.topBranch(), APPLY_FEEDBACK, ReferenceList(leftTerm, rightTerm));
     }
 
     std::string functionName = getInfixFunctionName(this->operatorStr);
 
-    Term* function = branch.findNamed(functionName);
+    Term* function = context.findNamed(functionName);
 
     if (function == NULL) {
         parser::syntax_error(std::string("couldn't find function: ") + functionName);
         return NULL; // unreachable
     }
 
-    Term* leftTerm = this->left->createTerm(branch);
-    Term* rightTerm = this->right->createTerm(branch);
+    Term* leftTerm = this->left->createTerm(context);
+    Term* rightTerm = this->right->createTerm(context);
     
-    return apply_function(branch, function, ReferenceList(leftTerm, rightTerm));
+    return apply_function(context.topBranch(), function, ReferenceList(leftTerm, rightTerm));
 }
 
 void
@@ -166,18 +202,18 @@ FunctionCall::toString() const
 }
 
 Term*
-FunctionCall::createTerm(Branch& branch)
+FunctionCall::createTerm(CompilationContext &context)
 {
     ReferenceList inputs;
 
     for (unsigned int i=0; i < arguments.size(); i++) {
         Argument* arg = arguments[i];
-        Term* term = arg->expression->createTerm(branch);
+        Term* term = arg->expression->createTerm(context);
         assert(term != NULL);
         inputs.append(term);
     }
 
-    Term* result = find_and_apply_function(branch, this->functionName, inputs);
+    Term* result = find_and_apply_function(context, this->functionName, inputs);
     assert(result != NULL);
     return result;
 }
@@ -204,26 +240,26 @@ LiteralString::toString() const
 }
 
 Term*
-LiteralString::createTerm(Branch& branch)
+LiteralString::createTerm(CompilationContext &context)
 {
-    return string_var(branch, this->text);
+    return string_var(context.topBranch(), this->text);
 }
 
 Term*
-LiteralFloat::createTerm(Branch& branch)
+LiteralFloat::createTerm(CompilationContext &context)
 {
     float value = atof(this->text.c_str());
-    Term* term = float_var(branch, value);
+    Term* term = float_var(context.topBranch(), value);
     float mutability = hasQuestionMark ? 1.0 : 0.0;
     term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
     return term;
 }
 
 Term*
-LiteralInteger::createTerm(Branch& branch)
+LiteralInteger::createTerm(CompilationContext &context)
 {
     int value = atoi(this->text.c_str());
-    return int_var(branch, value);
+    return int_var(context.topBranch(), value);
 }
 
 std::string
@@ -236,9 +272,9 @@ Identifier::toString() const
 }
 
 Term*
-Identifier::createTerm(Branch& branch)
+Identifier::createTerm(CompilationContext &context)
 {
-    Term* result = branch.findNamed(this->text);
+    Term* result = context.findNamed(this->text);
 
     if (result == NULL) {
         parser::syntax_error(std::string("Couldn't find identifier: ") + this->text);
@@ -263,12 +299,12 @@ ExpressionStatement::toString() const
 }
 
 Term*
-ExpressionStatement::createTerm(Branch& branch)
+ExpressionStatement::createTerm(CompilationContext &context)
 {
-    Term* term = this->expression->createTerm(branch);
+    Term* term = this->expression->createTerm(context);
     
     if (this->nameBinding != "")
-        branch.bindName(term, this->nameBinding);
+        context.topBranch().bindName(term, this->nameBinding);
 
     return term;
 }
@@ -300,11 +336,11 @@ StatementList::toString() const
 }
 
 void
-StatementList::createTerms(Branch& branch)
+StatementList::createTerms(CompilationContext &context)
 {
     Statement::List::const_iterator it;
     for (it = statements.begin(); it != statements.end(); ++it) {
-        (*it)->createTerm(branch);
+        (*it)->createTerm(context);
     }
 }
 
@@ -340,7 +376,7 @@ FunctionDecl::~FunctionDecl()
 }
 
 Term*
-FunctionDecl::createTerm(Branch& branch)
+FunctionDecl::createTerm(CompilationContext &context)
 {
     // Make a workspace where we'll assemble this function
     Branch workspace;
@@ -352,7 +388,7 @@ FunctionDecl::createTerm(Branch& branch)
          inputIndex++)
     {
         FunctionHeader::Argument &arg = this->header->arguments[inputIndex];
-        Term* term = branch.findNamed(arg.type);
+        Term* term = context.topBranch().findNamed(arg.type);
         if (term == NULL)
             parser::syntax_error(std::string("Identifier not found (input type): ") + arg.type);
 
@@ -367,7 +403,7 @@ FunctionDecl::createTerm(Branch& branch)
     if (this->header->outputType == "") {
         outputType = VOID_TYPE;
     } else {
-        outputType = branch.findNamed(this->header->outputType);
+        outputType = context.findNamed(this->header->outputType);
         if (outputType == NULL)
             parser::syntax_error(std::string("Identifier not found (output type): ") + this->header->outputType);
         if (!is_type(outputType))
@@ -396,16 +432,18 @@ FunctionDecl::createTerm(Branch& branch)
     }
 
     // Apply every statement
+    context.push(&as_function(sub).subroutineBranch);
     int numStatements = this->statements->count();
     for (int statementIndex=0; statementIndex < numStatements; statementIndex++) {
         Statement* statement = this->statements->operator[](statementIndex);
 
-        statement->createTerm(as_function(sub).subroutineBranch);
+        statement->createTerm(context);
     }
+    context.pop();
 
-    Term* outer_val = create_var(&branch, FUNCTION_TYPE);
+    Term* outer_val = create_var(&context.topBranch(), FUNCTION_TYPE);
     steal_value(sub, outer_val);
-    branch.bindName(outer_val, this->header->functionName);
+    context.topBranch().bindName(outer_val, this->header->functionName);
 
     return sub;
 }
@@ -442,7 +480,7 @@ TypeDecl::toString() const
 }
 
 Term*
-TypeDecl::createTerm(Branch& branch)
+TypeDecl::createTerm(CompilationContext &context)
 {
     Branch workspace;
 
@@ -458,9 +496,9 @@ TypeDecl::createTerm(Branch& branch)
             std::string("compound-type-append-field(@t, "+it->type+", fieldName)"));
     }
 
-    Term* result_term = create_var(&branch, TYPE_TYPE);
+    Term* result_term = create_var(&context.topBranch(), TYPE_TYPE);
     steal_value(workspace["t"], result_term);
-    branch.bindName(result_term, this->name);
+    context.topBranch().bindName(result_term, this->name);
     return result_term;
 }
 
@@ -471,24 +509,28 @@ IfStatement::toString() const
 }
 
 Term*
-IfStatement::createTerm(Branch& branch)
+IfStatement::createTerm(CompilationContext &context)
 {
     assert(this->condition != NULL);
     assert(this->positiveBranch != NULL);
 
-    Term* conditionTerm = this->condition->createTerm(branch);
+    Term* conditionTerm = this->condition->createTerm(context);
 
-    Term* ifStatementTerm = apply_function(branch, "if-statement", ReferenceList(conditionTerm));
+    Term* ifStatementTerm = apply_function(context.topBranch(), "if-statement", ReferenceList(conditionTerm));
 
     Branch& posBranch = as_branch(ifStatementTerm->state->field(0));
     Branch& negBranch = as_branch(ifStatementTerm->state->field(1));
 
     assert(posBranch.owningTerm == ifStatementTerm);
 
-    this->positiveBranch->createTerms(posBranch);
+    context.push(&posBranch);
+    this->positiveBranch->createTerms(context);
+    context.pop();
 
     if (this->negativeBranch != NULL) {
-        this->negativeBranch->createTerms(negBranch);
+        context.push(&negBranch);
+        this->negativeBranch->createTerms(context);
+        context.pop();
     }
 
     return ifStatementTerm;

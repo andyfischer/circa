@@ -17,7 +17,9 @@ Term* apply_statement(Branch& branch, std::string const& input)
     ast::Statement* statementAst = parser::statement(tokens);
     assert(statementAst != NULL);
 
-    Term* result = statementAst->createTerm(branch);
+    ast::CompilationContext context;
+    context.push(&branch);
+    Term* result = statementAst->createTerm(context);
     assert(result != NULL);
 
     // check for rebind operator
