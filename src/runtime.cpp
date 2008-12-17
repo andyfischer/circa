@@ -1,6 +1,7 @@
 // Copyright 2008 Andrew Fischer
 
 #include "branch.h"
+#include "compilation.h"
 #include "introspection.h"
 #include "runtime.h"
 #include "function.h"
@@ -142,8 +143,8 @@ Branch* evaluate_file(std::string const& filename)
     token_stream::TokenStream tokens(file_contents);
     ast::StatementList *statementList = parser::statementList(tokens);
 
-    ast::CompilationContext context;
-    context.push(branch);
+    CompilationContext context;
+    context.push(branch, NULL);
     statementList->createTerms(context);
 
     delete statementList;

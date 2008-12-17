@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "compilation.h"
 #include "parser.h"
 #include "pointer_visitor.h"
 #include "runtime.h"
@@ -17,8 +18,8 @@ Term* apply_statement(Branch& branch, std::string const& input)
     ast::Statement* statementAst = parser::statement(tokens);
     assert(statementAst != NULL);
 
-    ast::CompilationContext context;
-    context.push(&branch);
+    CompilationContext context;
+    context.push(&branch, NULL);
     Term* result = statementAst->createTerm(context);
     assert(result != NULL);
 
