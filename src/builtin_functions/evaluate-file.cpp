@@ -18,7 +18,10 @@ namespace evaluate_file_function {
         token_stream::TokenStream tokens(file_contents);
         ast::StatementList *statementList = parser::statementList(tokens);
 
-        statementList->createTerms(output);
+        ast::CompilationContext context;
+        context.push(&output);
+        statementList->createTerms(context);
+        context.pop();
 
         delete statementList;
     }

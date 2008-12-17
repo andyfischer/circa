@@ -142,7 +142,9 @@ Branch* evaluate_file(std::string const& filename)
     token_stream::TokenStream tokens(file_contents);
     ast::StatementList *statementList = parser::statementList(tokens);
 
-    statementList->createTerms(*branch);
+    ast::CompilationContext context;
+    context.push(branch);
+    statementList->createTerms(context);
 
     delete statementList;
 
