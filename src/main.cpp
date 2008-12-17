@@ -62,31 +62,31 @@ int circa_main(std::vector<std::string> args)
         }
     }
 
-    //try {
-        Branch* branch = evaluate_file(args[0]);
+    try {
+        Branch workspace;
+        string_var(workspace, args[0], "filename");
+        Branch& branch = as_branch(eval_statement(workspace, "evaluate-file(filename)"));
 
         if (justPrintBranch) {
-            print_branch_extended(*branch, std::cout);
+            print_branch_extended(branch, std::cout);
         }
 
         else if (justPrintSource) {
-            print_source(*branch, std::cout);
+            print_source(branch, std::cout);
         }
 
-        else if (has_compile_errors(*branch)) {
-            print_compile_errors(*branch, std::cout);
+        else if (has_compile_errors(branch)) {
+            print_compile_errors(branch, std::cout);
         } else {
-            evaluate_branch(*branch);
-            print_runtime_errors(*branch, std::cout);
+            evaluate_branch(branch);
+            print_runtime_errors(branch, std::cout);
         }
 
-        delete branch;
-
-    /*} catch (std::runtime_error const& err)
+    } catch (std::runtime_error const& err)
     {
         std::cout << "Top level error:\n";
         std::cout << err.what() << std::endl;
-    }*/
+    }
 
 shutdown:
     shutdown();
