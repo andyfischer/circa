@@ -9,26 +9,11 @@
 
 #include "common_headers.h"
 
+#include "compilation.h"
+
 namespace circa {
 namespace ast {
 
-struct CompilationContext
-{
-    typedef std::vector<Branch*> BranchList;
-
-    BranchList branchStack;
-
-    CompilationContext() {}
-    CompilationContext(Branch* root) { push(root); }
-
-    Term* findNamed(std::string const& name) const;
-
-    Branch& topBranch() const;
-
-    void push(Branch*);
-    void pop();
-};
-    
 struct Expression;
 
 struct ExpressionWalker

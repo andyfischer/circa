@@ -4,6 +4,7 @@
 
 #include "testing.h"
 #include "circa.h"
+#include "compilation.h"
 
 namespace circa {
 namespace parser_tests {
@@ -94,7 +95,7 @@ void test_to_string()
 void create_literals()
 {
     Branch branch;
-    ast::CompilationContext context(&branch);
+    CompilationContext context(&branch);
 
     ast::LiteralInteger *lint = new ast::LiteralInteger("13");
     Term *int_t = lint->createTerm(context);
@@ -118,7 +119,7 @@ void create_literals()
 void create_function_call()
 {
     Branch branch;
-    ast::CompilationContext context(&branch);
+    CompilationContext context(&branch);
 
     ast::FunctionCall *functionCall = new ast::FunctionCall("add");
     functionCall->addArgument(new ast::LiteralFloat("2"), "", "");

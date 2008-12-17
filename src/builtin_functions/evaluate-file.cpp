@@ -1,6 +1,7 @@
 // Copyright 2008 Paul Hodge
 
 #include "circa.h"
+#include "compilation.h"
 
 namespace circa {
 namespace evaluate_file_function {
@@ -18,8 +19,8 @@ namespace evaluate_file_function {
         token_stream::TokenStream tokens(file_contents);
         ast::StatementList *statementList = parser::statementList(tokens);
 
-        ast::CompilationContext context;
-        context.push(&output);
+        CompilationContext context;
+        context.push(&output, NULL);
         statementList->createTerms(context);
         context.pop();
 

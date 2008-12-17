@@ -5,6 +5,7 @@
 #include "ast.h"
 #include "branch.h"
 #include "builtins.h"
+#include "compilation.h"
 #include "function.h"
 #include "parser.h"
 #include "runtime.h"
@@ -16,41 +17,6 @@
 namespace circa {
 namespace ast {
 
-Term*
-CompilationContext::findNamed(std::string const& name) const
-{
-    assert(!branchStack.empty());
-
-    for (size_t i = branchStack.size() - 1; i >= 0; i--) {
-        Branch* branch = branchStack[i];
-
-        Term* term = branch->findNamed(name);
-
-        if (term != NULL)
-            return term;
-    }
-
-    return NULL;
-}
-
-Branch&
-CompilationContext::topBranch() const
-{
-    assert(!branchStack.empty());
-    return *branchStack.back();
-}
-
-void
-CompilationContext::push(Branch* branch)
-{
-    branchStack.push_back(branch);
-}
-
-void
-CompilationContext::pop()
-{
-    branchStack.pop_back();
-}
 
 std::string getInfixFunctionName(std::string infix)
 {
@@ -432,7 +398,7 @@ FunctionDecl::createTerm(CompilationContext &context)
     }
 
     // Apply every statement
-    context.push(&as_function(sub).subroutineBranch);
+    context.push(&as_function(sub).subroutineBranch, NULL);
     int numStatements = this->statements->count();
     for (int statementIndex=0; statementIndex < numStatements; statementIndex++) {
         Statement* statement = this->statements->operator[](statementIndex);
@@ -523,12 +489,12 @@ IfStatement::createTerm(CompilationContext &context)
 
     assert(posBranch.owningTerm == ifStatementTerm);
 
-    context.push(&posBranch);
+    context.push(&posBranch, ifStatementTerm->state->field(0));
     this->positiveBranch->createTerms(context);
     context.pop();
 
     if (this->negativeBranch != NULL) {
-        context.push(&negBranch);
+        context.push(&negBranch, ifStatementTerm->state->field(1));
         this->negativeBranch->createTerms(context);
         context.pop();
     }
