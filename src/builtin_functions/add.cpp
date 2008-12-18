@@ -31,7 +31,7 @@ namespace add_function {
             Term* input = target->inputs[i];
     
             apply_function(myBranch, APPLY_FEEDBACK,
-                ReferenceList(input, float_var(myBranch, as_float(input) + inputDelta)));
+                ReferenceList(input, float_value(myBranch, as_float(input) + inputDelta)));
         }
     
         evaluate_branch(myBranch);

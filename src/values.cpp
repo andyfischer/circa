@@ -104,7 +104,7 @@ bool values_equal(Term* a, Term* b)
     return as_type(a->type).equals(a,b);
 }
 
-Term* string_var(Branch& branch, std::string const& s, std::string const& name)
+Term* string_value(Branch& branch, std::string const& s, std::string const& name)
 {
     Term* term = apply_function(branch, STRING_TYPE, ReferenceList());
     as_string(term) = s;
@@ -113,7 +113,7 @@ Term* string_var(Branch& branch, std::string const& s, std::string const& name)
     return term;
 }
 
-Term* int_var(Branch& branch, int i, std::string const& name)
+Term* int_value(Branch& branch, int i, std::string const& name)
 {
     Term* term = apply_function(branch, INT_TYPE, ReferenceList());
     as_int(term) = i;
@@ -122,7 +122,7 @@ Term* int_var(Branch& branch, int i, std::string const& name)
     return term;
 }
 
-Term* float_var(Branch& branch, float f, std::string const& name)
+Term* float_value(Branch& branch, float f, std::string const& name)
 {
     Term* term = apply_function(branch, FLOAT_TYPE, ReferenceList());
     as_float(term) = f;

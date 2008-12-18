@@ -64,7 +64,7 @@ int circa_main(std::vector<std::string> args)
 
     try {
         Branch workspace;
-        string_var(workspace, args[0], "filename");
+        string_value(workspace, args[0], "filename");
         Branch& branch = as_branch(eval_statement(workspace, "evaluate-file(filename)"));
 
         if (justPrintBranch) {

@@ -12,7 +12,7 @@ namespace range_function {
         as_list(caller).clear();
         
         for (unsigned int i=0; i < max; i++) {
-            as_list(caller).append(int_var(*caller->owningBranch, i));
+            as_list(caller).append(int_value(*caller->owningBranch, i));
         }
     }
 

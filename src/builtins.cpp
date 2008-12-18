@@ -207,9 +207,9 @@ void initialize_constants()
     VAR_STRING = get_var_function(*KERNEL, STRING_TYPE);
     VAR_BOOL = get_var_function(*KERNEL, BOOL_TYPE);
 
-    CONSTANT_0 = float_var(*KERNEL, 0);
-    CONSTANT_1 = float_var(*KERNEL, 1);
-    CONSTANT_2 = float_var(*KERNEL, 2);
+    CONSTANT_0 = float_value(*KERNEL, 0);
+    CONSTANT_1 = float_value(*KERNEL, 1);
+    CONSTANT_2 = float_value(*KERNEL, 2);
 
     CONSTANT_TRUE = apply_function(*KERNEL, BOOL_TYPE, ReferenceList());
     as_bool(CONSTANT_TRUE) = true;
