@@ -27,13 +27,13 @@ void test_create_var()
     test_assert(as_branch(term).owningTerm == term);
 }
 
-void test_int_var()
+void test_int_value()
 {
     Branch branch;
-    Term *term = int_var(branch, -2);
+    Term *term = int_value(branch, -2);
     test_assert(as_int(term) == -2);
 
-    Term *term2 = int_var(branch, 154, "george");
+    Term *term2 = int_value(branch, 154, "george");
     test_assert(term2 == branch.getNamed("george"));
     test_assert(term2->name == "george");
     test_assert(as_int(term2) == 154);
@@ -81,8 +81,8 @@ void var_function_reuse()
 
     test_assert(function == function2);
 
-    Term* a = int_var(branch, 3);
-    Term* b = int_var(branch, 4);
+    Term* a = int_value(branch, 3);
+    Term* b = int_value(branch, 4);
 
     test_assert(a->function == b->function);
 }
@@ -91,7 +91,7 @@ void null_input_errors()
 {
     Branch branch;
 
-    Term* one = float_var(branch, 1.0);
+    Term* one = float_value(branch, 1.0);
 
     Term* term1 = apply_function(branch, get_global("add"), ReferenceList(NULL, one));
     evaluate_term(term1);
@@ -136,7 +136,7 @@ void test_runtime_type_error()
 void register_runtime_tests()
 {
     REGISTER_TEST_CASE(runtime_tests::test_create_var);
-    REGISTER_TEST_CASE(runtime_tests::test_int_var);
+    REGISTER_TEST_CASE(runtime_tests::test_int_value);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
     REGISTER_TEST_CASE(runtime_tests::test_find_existing_equivalent);
     REGISTER_TEST_CASE(runtime_tests::var_function_reuse);

@@ -229,8 +229,8 @@ void rebind_operator()
     delete expr;
 
     Branch branch;
-    Term* a = int_var(branch, 2, "a");
-    Term* b = int_var(branch, 5, "b");
+    Term* a = int_value(branch, 2, "a");
+    Term* b = int_value(branch, 5, "b");
 
     test_assert(branch.getNamed("a") == a);
     test_assert(branch.getNamed("b") == b);

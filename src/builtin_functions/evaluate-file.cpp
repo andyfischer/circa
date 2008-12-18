@@ -12,7 +12,7 @@ namespace evaluate_file_function {
         Branch &output = as_branch(caller);
 
         Branch workspace;
-        workspace.bindName(string_var(workspace, filename), "filename");
+        workspace.bindName(string_value(workspace, filename), "filename");
         std::string file_contents = as_string(eval_statement(workspace,
                     "read-text-file(filename)"));
 

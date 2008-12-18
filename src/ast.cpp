@@ -208,14 +208,14 @@ LiteralString::toString() const
 Term*
 LiteralString::createTerm(CompilationContext &context)
 {
-    return string_var(context.topBranch(), this->text);
+    return string_value(context.topBranch(), this->text);
 }
 
 Term*
 LiteralFloat::createTerm(CompilationContext &context)
 {
     float value = atof(this->text.c_str());
-    Term* term = float_var(context.topBranch(), value);
+    Term* term = float_value(context.topBranch(), value);
     float mutability = hasQuestionMark ? 1.0 : 0.0;
     term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
     return term;
@@ -225,7 +225,7 @@ Term*
 LiteralInteger::createTerm(CompilationContext &context)
 {
     int value = atoi(this->text.c_str());
-    return int_var(context.topBranch(), value);
+    return int_value(context.topBranch(), value);
 }
 
 std::string
@@ -377,7 +377,7 @@ FunctionDecl::createTerm(CompilationContext &context)
     }
 
     // Load into workspace
-    string_var(workspace, this->header->functionName, "functionName");
+    string_value(workspace, this->header->functionName, "functionName");
     workspace.bindName(outputType, "outputType");
 
     // Create
@@ -390,8 +390,8 @@ FunctionDecl::createTerm(CompilationContext &context)
          inputIndex++)
     {
         std::string name = this->header->arguments[inputIndex].name;
-        int_var(workspace, inputIndex, "inputIndex");
-        string_var(workspace, name, "name");
+        int_value(workspace, inputIndex, "inputIndex");
+        string_value(workspace, name, "name");
 
         sub = eval_statement(workspace,
                 "function-name-input(@sub, inputIndex, name)");
@@ -450,14 +450,14 @@ TypeDecl::createTerm(CompilationContext &context)
 {
     Branch workspace;
 
-    string_var(workspace, this->name, "typeName");
+    string_value(workspace, this->name, "typeName");
 
     eval_statement(workspace, "t = create-compound-type(typeName)");
 
     MemberList::const_iterator it;
     for (it = members.begin(); it != members.end(); ++it) {
-        //string_var(workspace, it->type, "fieldType");
-        string_var(workspace, it->name, "fieldName");
+        //string_value(workspace, it->type, "fieldType");
+        string_value(workspace, it->name, "fieldName");
         eval_statement(workspace,
             std::string("compound-type-append-field(@t, "+it->type+", fieldName)"));
     }
