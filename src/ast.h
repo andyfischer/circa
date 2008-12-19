@@ -258,6 +258,7 @@ struct IfStatement : public Statement
     StatementList* negativeBranch;
 
     IfStatement() : condition(NULL), positiveBranch(NULL), negativeBranch(NULL) {}
+    ~IfStatement();
 
     // for Statement
     virtual std::string toString() const;

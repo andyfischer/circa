@@ -35,7 +35,11 @@ Term* quick_create_function(Branch* branch, std::string name, Function::Evaluate
 Term* import_c_function(Branch& branch, Function::EvaluateFunc evaluate, std::string const& headerText)
 {
     token_stream::TokenStream tokens(headerText);
-    return import_c_function_manual_header(branch, evaluate, *parser::functionHeader(tokens));
+
+    ast::FunctionHeader *header = parser::functionHeader(tokens);
+    Term* result = import_c_function_manual_header(branch, evaluate, *header);
+    delete header;
+    return result;
 }
 
 Term* import_c_function_manual_header(Branch& branch,
