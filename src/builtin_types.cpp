@@ -247,7 +247,22 @@ struct Set {
         set.remove(caller->input(1));
     }
 
-    static void to_string
+    static std::string to_string(Term* caller)
+    {
+        Set &set = as<Set>(caller);
+        std::vector<Term*>::iterator it;
+        std::stringstream output;
+        bool first = true;
+        output << "{";
+        for (it = set.members.begin(); it != set.members.end(); ++it) {
+            if (!first) output << ", ";
+            output << (*it)->toString();
+            first = false;
+        }
+        output << "}";
+
+        return output.str();
+    }
 };
 
 bool is_compound_value(Term *term)
@@ -327,12 +342,14 @@ void initialize_builtin_types(Branch& kernel)
 
     quick_create_cpp_type<SymbolicRefList>(kernel, "SList");
 
+    Term* set_type = quick_create_cpp_type<Set>(kernel, "Set");
+    as_type(set_type).toString = Set::to_string;
+
     Term* set_add = import_c_function(kernel, Set::hosted_add,
         "function Set::add(Set, any) -> any");
     Term* set_remove = import_c_function(kernel, Set::hosted_remove,
         "function Set::remove(Set, any) -> any");
 
-    Term* set_type = quick_create_cpp_type<Set>(kernel, "Set");
     as_type(set_type).addMemberFunction("add", set_add);
     as_type(set_type).addMemberFunction("remove", set_remove);
 }

@@ -7,7 +7,17 @@ namespace circa {
 
 struct ReferenceSet
 {
-    std::set<Term*> _items;
+    typedef std::set<Term*> TermPtrSet;
+    TermPtrSet _items;
+
+    typedef TermPtrSet::iterator iterator;
+
+    iterator begin() {
+        return _items.begin();
+    }
+    iterator end() {
+        return _items.end();
+    }
 
     bool contains(Term* term) const {
         return _items.find(term) != _items.end();
