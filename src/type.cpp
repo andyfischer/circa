@@ -86,10 +86,7 @@ void change_type(Term *term, Term *typeTerm)
         throw std::runtime_error(std::string("type ") + type.name + " has no alloc function");
     }
 
-    term->value = type.alloc(typeTerm);
-
-    if (type.init != NULL) 
-        type.init(term);
+    alloc_value(term);
 }
 
 void specialize_type(Term *term, Term *type)
