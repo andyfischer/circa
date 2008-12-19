@@ -468,6 +468,13 @@ TypeDecl::createTerm(CompilationContext &context)
     return result_term;
 }
 
+IfStatement::~IfStatement()
+{
+    delete condition;
+    delete positiveBranch;
+    delete negativeBranch;
+}
+
 std::string
 IfStatement::toString() const
 {
