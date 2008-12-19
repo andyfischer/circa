@@ -62,9 +62,6 @@ public:
     // Bind a name to a term
     void bindName(Term* term, std::string name);
 
-    // This is called by Term, when it's deleted
-    void termDeleted(Term* term);
-
     // Remap pointers
     void remapPointers(ReferenceMap const& map);
 
@@ -82,6 +79,8 @@ public:
 Branch& as_branch(Term* term);
 
 void duplicate_branch(Branch* source, Branch* dest);
+
+extern int DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR;
 
 } // namespace circa
 
