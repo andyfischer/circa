@@ -497,6 +497,10 @@ IfStatement::createTerm(CompilationContext &context)
         context.pop();
     }
 
+    // Create joining terms
+
+    // First, get a list of all names that were bound in these branches
+
     return ifStatementTerm;
 }
 
