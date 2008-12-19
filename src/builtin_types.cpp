@@ -198,6 +198,58 @@ struct CompoundValue
     }
 };
 
+struct Set {
+    Branch branch;
+
+    // TODO: more efficient data structure
+    std::vector<Term*> members;
+
+    bool contains(Term* value) {
+        std::vector<Term*>::iterator it;
+        for (it = members.begin(); it != members.end(); ++it) {
+            if (values_equal(value, *it))
+                return true;
+        }
+        return false;
+    }
+
+    void add(Term* value) {
+        if (contains(value))
+            return;
+
+        Term* duplicatedValue = create_var(&branch, value->type);
+        duplicate_value(value, duplicatedValue);
+        members.push_back(duplicatedValue);
+    }
+
+    void remove(Term* value) {
+        std::vector<Term*>::iterator it;
+        for (it = members.begin(); it != members.end(); ++it) {
+            if (values_equal(value, *it)) {
+                members.erase(it);
+                // TODO: remove value from branch
+                return;
+            }
+        }
+    }
+
+    static void hosted_add(Term* caller)
+    {
+        recycle_value(caller->input(0), caller);
+        Set& set = as<Set>(caller);
+        set.add(caller->input(1));
+    }
+
+    static void hosted_remove(Term* caller)
+    {
+        recycle_value(caller->input(0), caller);
+        Set& set = as<Set>(caller);
+        set.remove(caller->input(1));
+    }
+
+    static void to_string
+};
+
 bool is_compound_value(Term *term)
 {
     assert(term != NULL);
@@ -274,6 +326,15 @@ void initialize_builtin_types(Branch& kernel)
     quick_create_cpp_type<Branch*>(kernel, "BranchPtr");
 
     quick_create_cpp_type<SymbolicRefList>(kernel, "SList");
+
+    Term* set_add = import_c_function(kernel, Set::hosted_add,
+        "function Set::add(Set, any) -> any");
+    Term* set_remove = import_c_function(kernel, Set::hosted_remove,
+        "function Set::remove(Set, any) -> any");
+
+    Term* set_type = quick_create_cpp_type<Set>(kernel, "Set");
+    as_type(set_type).addMemberFunction("add", set_add);
+    as_type(set_type).addMemberFunction("remove", set_remove);
 }
 
 } // namespace circa

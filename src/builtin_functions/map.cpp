@@ -24,7 +24,7 @@ namespace map_function {
 
             Pair* findPair(Term* key) {
                 std::vector<Pair>::iterator it;
-                for (it = pairs.begin(); it != pairs.end(); it++) {
+                for (it = pairs.begin(); it != pairs.end(); ++it) {
                     if (values_equal(key, it->key))
                         return &*it;
                 }
