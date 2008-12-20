@@ -22,7 +22,15 @@ struct ExpressionWalker
     virtual void visit(Expression* expr) = 0;
 };
 
-struct Expression
+struct ASTNode
+{
+    virtual ~ASTNode() {}
+    virtual std::string typeName() const = 0;
+    virtual int numChildren() const = 0;
+    virtual ASTNode* getChild(int index) const = 0;
+};
+
+struct Expression : public ASTNode
 {
     typedef std::vector<Expression*> List;
 
@@ -31,7 +39,11 @@ struct Expression
     virtual std::string toString() const = 0;
     virtual Term* createTerm(CompilationContext &context) = 0;
     virtual void walk(ExpressionWalker &walker) = 0;
-    virtual std::string typeName() = 0;
+    
+    // for ASTNode
+    virtual std::string typeName() const = 0;
+    virtual int numChildren() const = 0;
+    virtual ASTNode* getChild(int index) const = 0;
 };
 
 struct Infix : public Expression
@@ -48,7 +60,15 @@ struct Infix : public Expression
     virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
     virtual void walk(ExpressionWalker &walker);
-    virtual std::string typeName() { return "Infix"; }
+    virtual std::string typeName() const { return "Infix"; }
+
+    virtual int numChildren() const { return 2; }
+    virtual ASTNode* getChild(int index) const
+    {
+        if (index == 0) return left;
+        if (index == 1) return right;
+        return NULL;
+    }
 };
 
 struct FunctionCall : public Expression
@@ -81,7 +101,12 @@ struct FunctionCall : public Expression
     virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
     virtual void walk(ExpressionWalker &walker);
-    virtual std::string typeName() { return "FunctionCall"; }
+    virtual std::string typeName() const { return "FunctionCall"; }
+    virtual int numChildren() const { return arguments.size(); }
+    virtual ASTNode* getChild(int index) const
+    {
+        return arguments[index]->expression;
+    }
 };
 
 struct Literal : public Expression
@@ -99,7 +124,9 @@ struct LiteralString : public Literal
     virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
-    virtual std::string typeName() { return "LiteralString"; }
+    virtual std::string typeName() const { return "LiteralString"; }
+    virtual int numChildren() const { return 0; }
+    virtual ASTNode* getChild(int index) const { return NULL; }
 };
 
 struct LiteralFloat : public Literal
@@ -113,7 +140,9 @@ struct LiteralFloat : public Literal
     }
     virtual Term* createTerm(CompilationContext &context);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
-    virtual std::string typeName() { return "LiteralFloat"; }
+    virtual std::string typeName() const { return "LiteralFloat"; }
+    virtual int numChildren() const { return 0; }
+    virtual ASTNode* getChild(int index) const { return NULL; }
 };
 
 struct LiteralInteger : public Literal
@@ -127,7 +156,9 @@ struct LiteralInteger : public Literal
     }
     virtual Term* createTerm(CompilationContext &context);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
-    virtual std::string typeName() { return "LiteralInteger"; }
+    virtual std::string typeName() const { return "LiteralInteger"; }
+    virtual int numChildren() const { return 0; }
+    virtual ASTNode* getChild(int index) const { return NULL; }
 };
 
 struct Identifier : public Expression
@@ -139,10 +170,12 @@ struct Identifier : public Expression
     virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
     virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
-    virtual std::string typeName() { return "Identifier"; }
+    virtual std::string typeName() const { return "Identifier"; }
+    virtual int numChildren() const { return 0; }
+    virtual ASTNode* getChild(int index) const { return NULL; }
 };
 
-struct Statement
+struct Statement : public ASTNode
 {
     Expression* expression;
 
@@ -150,7 +183,13 @@ struct Statement
     virtual ~Statement() { delete expression; }
     virtual std::string toString() const = 0;
     virtual Term* createTerm(CompilationContext &context) = 0;
-    virtual std::string typeName() { return "Statement"; }
+    virtual std::string typeName() const { return "Statement"; }
+    virtual int numChildren() const { return 1; }
+    virtual ASTNode* getChild(int index) const
+    {
+        if (index == 0) return expression;
+        return NULL; 
+    }
 
     typedef std::vector<Statement*> List;
 };
@@ -164,7 +203,9 @@ struct StatementList
     virtual ~StatementList();
     virtual std::string toString() const;
     void createTerms(CompilationContext &context);
-    virtual std::string typeName() { return "StatementList"; }
+    virtual std::string typeName() const { return "StatementList"; }
+    virtual int numChildren() const { return statements.size(); }
+    virtual ASTNode* getChild(int index) const { return statements[index]; }
     int count() const { return (int) statements.size(); }
     Statement* operator[](int index) { return statements[index]; }
 };
@@ -177,7 +218,9 @@ struct ExpressionStatement : public Statement
 
     virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
-    virtual std::string typeName() { return "ExpressionStatement"; }
+    virtual std::string typeName() const { return "ExpressionStatement"; }
+    virtual int numChildren() const { return 0; }
+    virtual ASTNode* getChild(int index) const { return NULL; }
 };
 
 // 'IgnorableStatement' includes comments and blank lines
@@ -188,7 +231,9 @@ struct IgnorableStatement : public Statement
     virtual ~IgnorableStatement() { }
     virtual std::string toString() const { return text; }
     virtual Term* createTerm(CompilationContext &context) { return NULL; }
-    virtual std::string typeName() { return "IgnorableStatement"; }
+    virtual std::string typeName() const { return "IgnorableStatement"; }
+    virtual int numChildren() const { return 0; }
+    virtual ASTNode* getChild(int index) const { return NULL; }
 };
 
 struct FunctionHeader
@@ -223,7 +268,9 @@ struct FunctionDecl : public Statement
 
     virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
-    virtual std::string typeName() { return "FunctionDecl"; }
+    virtual std::string typeName() const { return "FunctionDecl"; }
+    virtual int numChildren() const { return 0; }
+    virtual ASTNode* getChild(int index) const { return NULL; }
 };
 
 struct TypeDecl : public Statement
@@ -248,7 +295,9 @@ struct TypeDecl : public Statement
     // for Statement
     virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
-    virtual std::string typeName() { return "TypeDecl"; }
+    virtual std::string typeName() const { return "TypeDecl"; }
+    virtual int numChildren() const { return 0; }
+    virtual ASTNode* getChild(int index) const { return NULL; }
 };
 
 struct IfStatement : public Statement
@@ -262,7 +311,9 @@ struct IfStatement : public Statement
     // for Statement
     virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
-    virtual std::string typeName() { return "IfStatement"; }
+    virtual std::string typeName() const { return "IfStatement"; }
+    virtual int numChildren() const { return 0; }
+    virtual ASTNode* getChild(int index) const { return NULL; }
 };
 
 } // namespace ast

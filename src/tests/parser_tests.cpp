@@ -197,6 +197,7 @@ void function_decl_parse()
             "end");
     ast::Statement* statement = parser::statement(tokens);
 
+    std::cout << statement->typeName() << std::endl;
     test_assert(statement->typeName() == "FunctionDecl");
 
     tokens.reset("function func2()\n"
