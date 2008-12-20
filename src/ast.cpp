@@ -528,5 +528,31 @@ IfStatement::createTerm(CompilationContext &context)
     return ifStatementTerm;
 }
 
+void
+output_ast_to_string(ASTNode *node, std::stringstream &out)
+{
+    int numChildren = node->numChildren();
+
+    if (numChildren > 0) {
+        out << "(" << node->typeName();
+        for (int i=0; i < numChildren; i++)
+        {
+            out << " ";
+            output_ast_to_string(node->getChild(i), out);
+        }
+        out << ")";
+    } else {
+        out << node->typeName();
+    }
+}
+
+std::string
+print_ast(ASTNode *node)
+{
+    std::stringstream stream;
+    output_ast_to_string(node, stream);
+    return stream.str();
+}
+
 } // namespace ast
 } // namespace circa
