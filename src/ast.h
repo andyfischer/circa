@@ -316,6 +316,8 @@ struct IfStatement : public Statement
     virtual ASTNode* getChild(int index) const { return NULL; }
 };
 
+std::string print_ast(ASTNode *node);
+
 } // namespace ast
 } // namespace circa
 
