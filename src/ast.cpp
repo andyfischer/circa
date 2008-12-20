@@ -84,8 +84,32 @@ Infix::toString() const
 Term*
 Infix::createTerm(CompilationContext &context)
 {
-    // special case: right arrow or dot
-    if (this->operatorStr == "->" || this->operatorStr == ".") {
+    // special case for dot operator. Try to find a member function.
+    // If not found, apply right term as a function
+    if (this->operatorStr == ".") {
+        Term* leftTerm = this->left->createTerm(context);
+
+        Identifier *rightIdent = dynamic_cast<Identifier*>(this->right);
+
+        if (rightIdent == NULL) {
+            parser::syntax_error("Right side of . must be an identifier");
+        }
+
+        Type &leftType = as_type(leftTerm->type);
+
+        if (leftType.memberFunctions.contains(rightIdent->text)) {
+            Term* function = leftType.memberFunctions[rightIdent->text];
+
+            parser::syntax_error("unimplemented");
+
+        } else {
+
+            return find_and_apply_function(context, rightIdent->text, ReferenceList(leftTerm));
+        }
+    }
+
+    // special case for right arrow. Apply the right term as a function
+    if (this->operatorStr == "->") {
         Term* leftTerm = this->left->createTerm(context);
 
         Identifier *rightIdent = dynamic_cast<Identifier*>(this->right);
