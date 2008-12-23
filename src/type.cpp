@@ -28,7 +28,6 @@ void assert_type(Term *term, Term *type)
 
     if (term->type != type)
         throw std::runtime_error("type mismatch");
-        //throw errors::TypeError(term, type);
 }
 
 bool is_type(Term* term)

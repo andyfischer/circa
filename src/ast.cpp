@@ -18,7 +18,6 @@
 namespace circa {
 namespace ast {
 
-
 std::string getInfixFunctionName(std::string infix)
 {
     Branch workspace;
@@ -60,15 +59,18 @@ Infix::createTerm(CompilationContext &context)
         else if (right->typeName() == "FunctionCall")
             functionName = dynamic_cast<FunctionCall*>(right)->functionName;
         else
-            parser::syntax_error(right->typeName() + " on right side of .");
+            parser::syntax_error(right->typeName() + " on right side of infix dot");
 
         Type &leftType = as_type(leftTerm->type);
 
         // Try to find the function. Check the type's member function first.
         Term* function = NULL;
 
+        bool memberFunctionCall = false;
+
         if (leftType.memberFunctions.contains(functionName)) {
             function = leftType.memberFunctions[functionName];
+            memberFunctionCall = true;
 
         } else {
             function = context.findNamed(functionName);
@@ -77,7 +79,32 @@ Infix::createTerm(CompilationContext &context)
         if (function == NULL)
             parser::syntax_error(functionName + " function not found.");
 
-        return apply_function(context.topBranch(), function, ReferenceList(leftTerm));
+        // Assemble input list
+        ReferenceList inputs(leftTerm);
+
+        if (right->typeName() == "FunctionCall") {
+            FunctionCall* functionCall = dynamic_cast<FunctionCall*>(right);
+
+            for (unsigned int i=0; i < functionCall->arguments.size(); i++) {
+                FunctionCall::Argument *arg = functionCall->arguments[i];
+                Term *term = arg->expression->createTerm(context);
+                inputs.append(term);
+            }
+        }
+
+        Term* result = apply_function(context.topBranch(), function, inputs);
+
+        if (memberFunctionCall
+                && (left->typeName() == "Identifier")
+                && (right->typeName() == "FunctionCall")) {
+
+            // Rebind this identifier
+            std::string id = dynamic_cast<Identifier*>(left)->text;
+
+            context.topBranch().bindName(result, id);
+        }
+
+        return result;
     }
 
     // special case for right arrow. Apply the right term as a function

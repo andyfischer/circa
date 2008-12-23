@@ -48,6 +48,8 @@
 		B606EBCA0EF783690019E00C /* function_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B606EBC60EF783690019E00C /* function_tests.cpp */; };
 		B606EBCB0EF783690019E00C /* introspection_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B606EBC70EF783690019E00C /* introspection_test.cpp */; };
 		B606EBCC0EF783690019E00C /* runtime_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B606EBC80EF783690019E00C /* runtime_tests.cpp */; };
+		B614B68F0F0091C900AA3646 /* compilation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B614B68D0F0091C900AA3646 /* compilation.cpp */; };
+		B614B6910F0091D900AA3646 /* get-infix-function-name.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B614B6900F0091D900AA3646 /* get-infix-function-name.cpp */; };
 		B64D6A3A0EA65E9500DAD382 /* dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B64D6A2F0EA65E9500DAD382 /* dictionary.cpp */; };
 		B64D6A3E0EA65E9500DAD382 /* runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B64D6A380EA65E9500DAD382 /* runtime.cpp */; };
 		B64D6A430EA65ED400DAD382 /* feedback_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B64D6A420EA65ED400DAD382 /* feedback_tests.cpp */; };
@@ -140,6 +142,9 @@
 		B606EBC60EF783690019E00C /* function_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = function_tests.cpp; sourceTree = "<group>"; };
 		B606EBC70EF783690019E00C /* introspection_test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = introspection_test.cpp; sourceTree = "<group>"; };
 		B606EBC80EF783690019E00C /* runtime_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = runtime_tests.cpp; sourceTree = "<group>"; };
+		B614B68D0F0091C900AA3646 /* compilation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compilation.cpp; sourceTree = "<group>"; };
+		B614B68E0F0091C900AA3646 /* compilation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compilation.h; sourceTree = "<group>"; };
+		B614B6900F0091D900AA3646 /* get-infix-function-name.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "get-infix-function-name.cpp"; sourceTree = "<group>"; };
 		B64CA7220E6279E400ADB947 /* circa */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = circa; sourceTree = BUILT_PRODUCTS_DIR; };
 		B64D6A2F0EA65E9500DAD382 /* dictionary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dictionary.cpp; sourceTree = "<group>"; };
 		B64D6A300EA65E9500DAD382 /* dictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dictionary.h; sourceTree = "<group>"; };
@@ -231,6 +236,7 @@
 		B606EB710EF782FC0019E00C /* builtin_functions */ = {
 			isa = PBXGroup;
 			children = (
+				B614B6900F0091D900AA3646 /* get-infix-function-name.cpp */,
 				B606EB720EF782FC0019E00C /* add.cpp */,
 				B606EB730EF782FC0019E00C /* and.cpp */,
 				B606EB740EF782FC0019E00C /* apply-feedback.cpp */,
@@ -296,6 +302,8 @@
 				B6A243F90E3D6414007F2BEB /* tests */,
 				B606EBB00EF783380019E00C /* builtin_types.cpp */,
 				B606EBB10EF783380019E00C /* builtin_types.h */,
+				B614B68D0F0091C900AA3646 /* compilation.cpp */,
+				B614B68E0F0091C900AA3646 /* compilation.h */,
 				B606EBB20EF783380019E00C /* introspection.cpp */,
 				B606EBB30EF783380019E00C /* introspection.h */,
 				B606EBB40EF783380019E00C /* output_stream.h */,
@@ -467,6 +475,8 @@
 				B606EBCA0EF783690019E00C /* function_tests.cpp in Sources */,
 				B606EBCB0EF783690019E00C /* introspection_test.cpp in Sources */,
 				B606EBCC0EF783690019E00C /* runtime_tests.cpp in Sources */,
+				B614B68F0F0091C900AA3646 /* compilation.cpp in Sources */,
+				B614B6910F0091D900AA3646 /* get-infix-function-name.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
