@@ -7,6 +7,8 @@
 
 namespace circa {
 
+#define CATCH_TEST_EXCEPTIONS 0
+
 std::vector<TestCase> gTestCases;
 
 void register_branch_tests();
@@ -87,7 +89,6 @@ void _test_equals_function(ReferenceList const& a, ReferenceList const& b,
 
 bool run_test(TestCase& testCase)
 {
-#define CATCH_TEST_EXCEPTIONS 1
 
 #if CATCH_TEST_EXCEPTIONS
     try {

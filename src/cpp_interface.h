@@ -104,7 +104,7 @@ T eval_as(std::string const& statement)
 }
 
 template <class T>
-T eval_as(Branch branch, std::string const& statement)
+T eval_as(Branch &branch, std::string const& statement)
 {
     Term* result = eval_statement(branch, statement);
     return as<T>(result);
