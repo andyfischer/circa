@@ -89,23 +89,33 @@ Infix::createTerm(CompilationContext &context)
     if (this->operatorStr == ".") {
         Term* leftTerm = this->left->createTerm(context);
 
-        Identifier *rightIdent = dynamic_cast<Identifier*>(this->right);
+        // Figure out the function name. Right expression might be
+        // an identifier or a function call
+        std::string functionName;
 
-        if (rightIdent == NULL) {
-            parser::syntax_error("Right side of . must be an identifier");
-        }
+        if (right->typeName() == "Identifier")
+            functionName = dynamic_cast<Identifier*>(right)->text;
+        else if (right->typeName() == "FunctionCall")
+            functionName = dynamic_cast<FunctionCall*>(right)->functionName;
+        else
+            parser::syntax_error(right->typeName() + " on right side of .");
 
         Type &leftType = as_type(leftTerm->type);
 
-        if (leftType.memberFunctions.contains(rightIdent->text)) {
-            Term* function = leftType.memberFunctions[rightIdent->text];
+        // Try to find the function. Check the type's member function first.
+        Term* function = NULL;
 
-            parser::syntax_error("unimplemented");
+        if (leftType.memberFunctions.contains(functionName)) {
+            function = leftType.memberFunctions[functionName];
 
         } else {
-
-            return find_and_apply_function(context, rightIdent->text, ReferenceList(leftTerm));
+            function = context.findNamed(functionName);
         }
+
+        if (function == NULL)
+            parser::syntax_error(functionName + " function not found.");
+
+        return apply_function(context.topBranch(), function, ReferenceList(leftTerm));
     }
 
     // special case for right arrow. Apply the right term as a function
