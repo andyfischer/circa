@@ -3,7 +3,11 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "builtins.h"
 #include "compilation.h"
+#include "ref_list.h"
+#include "runtime.h"
+#include "term.h"
 
 namespace circa {
 
@@ -47,5 +51,23 @@ CompilationContext::pop()
 {
     stack.pop_back();
 }
+
+Term* find_and_apply_function(CompilationContext &context,
+        std::string const& functionName,
+        ReferenceList inputs)
+{
+    Term* function = context.findNamed(functionName);
+
+    if (function == NULL) {
+        std::cout << "warning: function not found: " << functionName << std::endl;
+
+        Term* result = apply_function(context.topBranch(), UNKNOWN_FUNCTION, inputs);
+        as_string(result->state) = functionName;
+        return result;
+    }
+
+    return apply_function(context.topBranch(), function, inputs);
+}
+
 
 } // namespace circa

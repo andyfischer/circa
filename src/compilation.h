@@ -32,6 +32,10 @@ struct CompilationContext
     void pop();
 };
 
+Term* find_and_apply_function(CompilationContext &context,
+        std::string const& functionName,
+        ReferenceList inputs);
+
 } // namespace circa
 
 #endif
