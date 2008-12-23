@@ -1,0 +1,20 @@
+s = Set()
+
+s.add(1)
+
+s.to-string.print
+
+s.add(2)
+s.add(3)
+
+s.to-string.print
+
+s.remove(2)
+
+s.to-string.print
+
+s.add(2)
+s.add(2)
+s.add(2)
+
+s.to-string.print
