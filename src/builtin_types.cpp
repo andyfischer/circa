@@ -249,7 +249,6 @@ struct Set {
 
     static std::string to_string(Term* caller)
     {
-<<<<<<< HEAD:src/builtin_types.cpp
         Set &set = as<Set>(caller);
         std::vector<Term*>::iterator it;
         std::stringstream output;
@@ -263,9 +262,6 @@ struct Set {
         output << "}";
 
         return output.str();
-=======
-        return "todo";
->>>>>>> 46dab7716ea58f7c1c290266c4ef6634f72f5778:src/builtin_types.cpp
     }
 };
 
