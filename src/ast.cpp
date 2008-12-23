@@ -26,22 +26,6 @@ std::string getInfixFunctionName(std::string infix)
     return eval_as<std::string>(workspace, "get-infix-function-name(infix)");
 }
 
-Term* find_and_apply_function(CompilationContext &context, std::string const& functionName,
-        ReferenceList inputs)
-{
-    Term* function = context.findNamed(functionName);
-
-    if (function == NULL) {
-        std::cout << "warning: function not found: " << functionName << std::endl;
-
-        Term* result = apply_function(context.topBranch(), UNKNOWN_FUNCTION, inputs);
-        as_string(result->state) = functionName;
-        return result;
-    }
-
-    return apply_function(context.topBranch(), function, inputs);
-}
-
 Infix::~Infix()
 {
     delete left;
