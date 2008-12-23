@@ -57,6 +57,8 @@ Term::Term()
 
 Term::~Term()
 {
+    assert(DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR > 0);
+
     assert_good_pointer(this);
 
     ReferenceMap nullPointerRemap;
@@ -66,10 +68,6 @@ Term::~Term()
 
     delete myBranch;
     myBranch = NULL;
-
-    if (owningBranch != NULL) {
-        owningBranch->termDeleted(this);
-    }
 
 #if CHECK_FOR_BAD_POINTERS
     DEBUG_GOOD_POINTER_SET.erase(this);
