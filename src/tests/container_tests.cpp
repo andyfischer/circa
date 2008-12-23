@@ -98,9 +98,6 @@ void test_set()
     set.add(term1);
     test_assert(set.contains(term1));
     test_assert(set.count() == 1);
-
-    delete term1;
-    delete term2;
 }
 
 void test_namespace()
@@ -122,9 +119,6 @@ void test_namespace()
     remap[term2] = NULL;
     nspace.remapPointers(remap);
     test_assert(!nspace.contains("a"));
-
-    delete term;
-    delete term2;
 }
 
 void test_list()
@@ -152,10 +146,6 @@ void test_list()
     list.clear();
 
     test_assert(list.count() == 0);
-
-    delete term;
-    delete term2;
-    delete term3;
 }
 
 } // namespace container_tests

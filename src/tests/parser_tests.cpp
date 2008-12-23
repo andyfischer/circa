@@ -204,7 +204,10 @@ void function_decl_parse()
             "end\n"
             "some-function(1,2)\n");
 
-    /*ast::StatementList* statementList = */parser::statementList(tokens);
+    ast::StatementList* statementList = parser::statementList(tokens);
+
+    delete statement;
+    delete statementList;
 }
 
 void rebind_operator()
@@ -293,6 +296,8 @@ void comment_statement()
     test_assert(dynamic_cast<ast::IgnorableStatement*>(statement) != NULL);
 
     test_assert(tokens.finished());
+
+    delete statement;
 }
 
 void test_type_decl()
@@ -306,6 +311,8 @@ void test_type_decl()
     test_assert(typeDecl->members[0].name == "x");
     test_assert(typeDecl->members[1].type == "int");
     test_assert(typeDecl->members[1].name == "y");
+
+    delete typeDecl;
 }
 
 void test_type_decl_statement()
@@ -314,6 +321,8 @@ void test_type_decl_statement()
     ast::Statement* statement = parser::statement(tokens);
 
     test_assert(dynamic_cast<ast::TypeDecl*>(statement) != NULL);
+
+    delete statement;
 }
 
 void test_type_decl_full_trip()

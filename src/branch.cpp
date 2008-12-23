@@ -12,8 +12,12 @@
 
 namespace circa {
 
+int DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR = 0;
+
 Branch::~Branch()
 {
+    DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR++;
+
     // Create a map where all our terms go to NULL
     ReferenceMap deleteMap;
     
@@ -52,6 +56,8 @@ Branch::~Branch()
         term->owningBranch = NULL;
         delete term;
     }
+
+    DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR--;
 }
 
 void Branch::append(Term* term)
@@ -84,19 +90,6 @@ Term* Branch::findNamed(std::string const& name) const
     }
 
     return get_global(name);
-}
-
-void Branch::termDeleted(Term* term)
-{
-    ReferenceMap deleteMap;
-    deleteMap[term] = NULL;
-
-    this->remapPointers(deleteMap);
-
-    for (int i = 0; i < (int) _terms.size(); i++) {
-        if (_terms[i] == term)
-            _terms[i] = NULL;
-    }
 }
 
 void Branch::remapPointers(ReferenceMap const& map)
