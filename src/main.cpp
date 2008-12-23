@@ -62,7 +62,8 @@ int circa_main(std::vector<std::string> args)
         }
     }
 
-    try {
+    //try
+    {
         Branch workspace;
         string_value(workspace, args[0], "filename");
         Branch& branch = as_branch(eval_statement(workspace, "evaluate-file(filename)"));
@@ -82,10 +83,11 @@ int circa_main(std::vector<std::string> args)
             print_runtime_errors(branch, std::cout);
         }
 
-    } catch (std::runtime_error const& err)
+    /*} catch (std::runtime_error const& err)
     {
         std::cout << "Top level error:\n";
         std::cout << err.what() << std::endl;
+        */
     }
 
 shutdown:
