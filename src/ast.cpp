@@ -6,6 +6,7 @@
 #include "branch.h"
 #include "builtins.h"
 #include "compilation.h"
+#include "cpp_interface.h"
 #include "function.h"
 #include "parser.h"
 #include "runtime.h"
@@ -20,32 +21,9 @@ namespace ast {
 
 std::string getInfixFunctionName(std::string infix)
 {
-    if (infix == "+")
-        return "add";
-    else if (infix == "-")
-        return "sub";
-    else if (infix == "*")
-        return "mult";
-    else if (infix == "/")
-        return "div";
-    else if (infix == "<")
-        return "less-than";
-    else if (infix == "<=")
-        return "less-than-eq";
-    else if (infix == ">")
-        return "greater-than";
-    else if (infix == ">=")
-        return "greater-than-eq";
-    else if (infix == "==")
-        return "equals";
-    else if (infix == "||")
-        return "or";
-    else if (infix == "&&")
-        return "and";
-
-    assert(false);
-
-    return ""; // unreachable
+    Branch workspace;
+    string_value(workspace, infix, "infix");
+    return eval_as<std::string>(workspace, "get-infix-function-name(infix)");
 }
 
 Term* find_and_apply_function(CompilationContext &context, std::string const& functionName,
