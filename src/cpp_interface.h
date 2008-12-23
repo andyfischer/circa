@@ -100,6 +100,9 @@ T eval_as(std::string const& statement)
 
     Term* result_term = eval_statement(branch, statement);
 
+    if (result_term->hasError())
+        throw std::runtime_error(result_term->getErrorMessage());
+
     return as<T>(result_term);
 }
 
@@ -107,6 +110,10 @@ template <class T>
 T eval_as(Branch &branch, std::string const& statement)
 {
     Term* result = eval_statement(branch, statement);
+
+    if (result->hasError())
+        throw std::runtime_error(result->getErrorMessage());
+
     return as<T>(result);
 }
 
