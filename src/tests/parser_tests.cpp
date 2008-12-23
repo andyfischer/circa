@@ -357,6 +357,17 @@ void test_parse_if_block()
     delete ifStatement;
 }
 
+void member_function_call_parse()
+{
+    token_stream::TokenStream tokens("thing.func(1)");
+    ast::Expression* expression = parser::infixExpression(tokens);
+
+    test_assert(expression != NULL);
+
+    test_assert(ast::print_ast(expression) == 
+            "(Infix Identifier (FunctionCall LiteralInteger))");
+}
+
 } // namespace parser_tests
 
 void register_parser_tests()
@@ -380,6 +391,7 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::test_type_decl_statement);
     REGISTER_TEST_CASE(parser_tests::test_type_decl_full_trip);
     REGISTER_TEST_CASE(parser_tests::test_parse_if_block);
+    REGISTER_TEST_CASE(parser_tests::member_function_call_parse);
 }
 
 } // namespace circa
