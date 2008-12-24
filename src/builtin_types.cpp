@@ -263,22 +263,6 @@ Set::hosted_remove(Term* caller)
     set.remove(caller->input(1));
 }
 
-void
-Set::hosted_union(Term* caller)
-{
-    Set &result = as<Set>(caller);
-
-    for (int inputIndex=0; inputIndex < caller->numInputs(); inputIndex++) {
-        Set &input = as<Set>(caller->input(inputIndex));
-
-        std::vector<Term*>::iterator it;
-
-        for (it = input.members.begin(); it != input.members.end(); ++it) {
-            result.add(*it);
-        }
-    }
-}
-
 std::string
 Set::to_string(Term* caller)
 {
@@ -381,9 +365,6 @@ void initialize_builtin_types(Branch& kernel)
         "function Set::add(Set, any) -> Set");
     Term* set_remove = import_c_function(kernel, Set::hosted_remove,
         "function Set::remove(Set, any) -> Set");
-    Term* set_union = import_c_function(kernel, Set::hosted_union,
-        "function set-union(Set) -> Set");
-    as_function(set_union).variableArgs = true;
 
     as_type(set_type).addMemberFunction("add", set_add);
     as_type(set_type).addMemberFunction("remove", set_remove);

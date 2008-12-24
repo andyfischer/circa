@@ -15,7 +15,6 @@ struct Set {
     void clear();
     static void hosted_add(Term* caller);
     static void hosted_remove(Term* caller);
-    static void hosted_union(Term* caller);
     static std::string to_string(Term* caller);
 };
 
