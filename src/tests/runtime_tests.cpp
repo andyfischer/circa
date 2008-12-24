@@ -76,8 +76,8 @@ void var_function_reuse()
 {
     Branch branch;
 
-    Term* function = get_var_function(branch, INT_TYPE);
-    Term* function2 = get_var_function(branch, INT_TYPE);
+    Term* function = get_value_function(branch, INT_TYPE);
+    Term* function2 = get_value_function(branch, INT_TYPE);
 
     test_assert(function == function2);
 

@@ -43,7 +43,7 @@ void initialize();
 void shutdown();
 
 // Fetch the const function for this type
-Term* get_var_function(Branch& branch, Term* type);
+Term* get_value_function(Branch& branch, Term* type);
 
 } // namespace circa
 
