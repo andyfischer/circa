@@ -273,6 +273,13 @@ void shutdown()
     KERNEL = NULL;
 }
 
+Term* get_value_function(Term* type)
+{
+    Term* result = apply_function(*type->owningBranch, VAR_FUNCTION_GENERATOR, ReferenceList(type));
+    evaluate_term(result);
+    return result;
+}
+
 Term* get_value_function(Branch& branch, Term* type)
 {
     Term* result = apply_function(branch, VAR_FUNCTION_GENERATOR, ReferenceList(type));
