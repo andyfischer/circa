@@ -83,6 +83,12 @@ Term::input(int index) const
     return this->inputs[index];
 }
 
+int
+Term::numInputs() const
+{
+    return this->inputs.count();
+}
+
 std::string
 Term::toString()
 {

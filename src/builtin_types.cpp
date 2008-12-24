@@ -199,8 +199,6 @@ struct CompoundValue
 };
 
 struct Set {
-    Branch branch;
-
     // TODO: more efficient data structure
     std::vector<Term*> members;
 
@@ -217,7 +215,7 @@ struct Set {
         if (contains(value))
             return;
 
-        Term* duplicatedValue = create_value(&branch, value->type);
+        Term* duplicatedValue = create_value(value->type);
         duplicate_value(value, duplicatedValue);
         members.push_back(duplicatedValue);
     }
@@ -226,8 +224,9 @@ struct Set {
         std::vector<Term*>::iterator it;
         for (it = members.begin(); it != members.end(); ++it) {
             if (values_equal(value, *it)) {
+
+                delete *it;
                 members.erase(it);
-                // TODO: remove value from branch
                 return;
             }
         }
@@ -245,6 +244,21 @@ struct Set {
         recycle_value(caller->input(0), caller);
         Set& set = as<Set>(caller);
         set.remove(caller->input(1));
+    }
+
+    static void hosted_union(Term* caller)
+    {
+        Set &result = as<Set>(caller);
+
+        for (int inputIndex=0; inputIndex < caller->numInputs(); inputIndex++) {
+            Set &input = as<Set>(caller->input(inputIndex));
+
+            std::vector<Term*>::iterator it;
+
+            for (it = input.members.begin(); it != input.members.end(); ++it) {
+                result.add(*it);
+            }
+        }
     }
 
     static std::string to_string(Term* caller)
@@ -349,6 +363,9 @@ void initialize_builtin_types(Branch& kernel)
         "function Set::add(Set, any) -> Set");
     Term* set_remove = import_c_function(kernel, Set::hosted_remove,
         "function Set::remove(Set, any) -> Set");
+    Term* set_union = import_c_function(kernel, Set::hosted_union,
+        "function set-union(Set) -> Set");
+    as_function(set_union).variableArgs = true;
 
     as_type(set_type).addMemberFunction("add", set_add);
     as_type(set_type).addMemberFunction("remove", set_remove);
