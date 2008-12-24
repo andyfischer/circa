@@ -19,14 +19,8 @@ s.add(2)
 
 s.to-string.print
 
-left = Set()
-left.add(1)
-left.add(2)
-left.add(4)
-
-right = Set()
-right.add(4)
-right.add(5)
+left = set(1,2,4)
+right = set(4,5)
 
 u = set-union(left,right)
 
