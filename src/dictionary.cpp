@@ -11,7 +11,7 @@ Term* Dictionary::addSlot(std::string const& name, Term* type)
 {
     assert(get(name) == NULL);
 
-    Term* newTerm = create_var(&_branch, type);
+    Term* newTerm = create_value(&_branch, type);
     _dict[name] = newTerm;
     return newTerm;
 }

@@ -24,7 +24,7 @@ List::List(List const& copy)
 Term*
 List::append(Term* term)
 {
-    Term* newTerm = create_var(&this->branch, term->type);
+    Term* newTerm = create_value(&this->branch, term->type);
     recycle_value(term, newTerm);
     this->items.append(newTerm);
     return newTerm;
@@ -33,7 +33,7 @@ List::append(Term* term)
 Term*
 List::appendSlot(Term* type)
 {
-    Term* newTerm = create_var(&this->branch, type);
+    Term* newTerm = create_value(&this->branch, type);
     this->items.append(newTerm);
     return newTerm;
 }

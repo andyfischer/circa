@@ -21,7 +21,7 @@ Term* quick_create_function(Branch* branch, std::string name, Function::Evaluate
         assert(is_type(inputTypes[i]));
     assert(is_type(outputType));
 
-    Term* term = create_var(branch, FUNCTION_TYPE);
+    Term* term = create_value(branch, FUNCTION_TYPE);
     Function& func = as_function(term);
     func.name = name;
     func.evaluate = evaluateFunc;
@@ -46,7 +46,7 @@ Term* import_c_function_manual_header(Branch& branch,
                                       Function::EvaluateFunc evaluate,
                                       ast::FunctionHeader &header)
 {
-    Term* term = create_var(&branch, FUNCTION_TYPE);
+    Term* term = create_value(&branch, FUNCTION_TYPE);
     Function& func = as_function(term);
 
     func.name = header.functionName;

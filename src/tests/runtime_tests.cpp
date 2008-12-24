@@ -15,14 +15,14 @@
 namespace circa {
 namespace runtime_tests {
 
-void test_create_var()
+void test_create_value()
 {
     Branch branch;
-    Term *term = create_var(&branch, INT_TYPE);
+    Term *term = create_value(&branch, INT_TYPE);
     test_assert(term->type == INT_TYPE);
     test_assert(term->value != NULL);
 
-    term = create_var(&branch, BRANCH_TYPE);
+    term = create_value(&branch, BRANCH_TYPE);
     test_assert(term->value != NULL);
     test_assert(as_branch(term).owningTerm == term);
 }
@@ -135,7 +135,7 @@ void test_runtime_type_error()
 
 void register_runtime_tests()
 {
-    REGISTER_TEST_CASE(runtime_tests::test_create_var);
+    REGISTER_TEST_CASE(runtime_tests::test_create_value);
     REGISTER_TEST_CASE(runtime_tests::test_int_value);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
     REGISTER_TEST_CASE(runtime_tests::test_find_existing_equivalent);

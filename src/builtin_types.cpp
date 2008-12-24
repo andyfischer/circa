@@ -118,7 +118,7 @@ struct CompoundValue
     CompoundValue() : signature(COMPOUND_TYPE_SIGNATURE) {}
 
     Term* appendSlot(Term* type) {
-        Term* newTerm = create_var(&branch, type);
+        Term* newTerm = create_value(&branch, type);
         fields.append(newTerm);
         newTerm->stealingOk = false;
         return newTerm;
@@ -217,7 +217,7 @@ struct Set {
         if (contains(value))
             return;
 
-        Term* duplicatedValue = create_var(&branch, value->type);
+        Term* duplicatedValue = create_value(&branch, value->type);
         duplicate_value(value, duplicatedValue);
         members.push_back(duplicatedValue);
     }

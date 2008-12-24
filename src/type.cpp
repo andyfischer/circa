@@ -45,7 +45,7 @@ Type& as_type(Term *term)
 
 Term* quick_create_type(Branch& branch, std::string name)
 {
-    Term* term = create_var(&branch, TYPE_TYPE);
+    Term* term = create_value(&branch, TYPE_TYPE);
 
     if (name != "") {
         as_type(term).name = name;
@@ -112,7 +112,7 @@ void empty_duplicate_function(Term*,Term*) {}
 
 Term* create_empty_type(Branch& branch, std::string name)
 {
-    Term* term = create_var(&branch, TYPE_TYPE);
+    Term* term = create_value(&branch, TYPE_TYPE);
     Type& type = as_type(term);
     type.alloc = type_private::empty_allocate;
     type.dealloc = type_private::empty_dealloc;

@@ -141,8 +141,6 @@ void error_occured(Term* errorTerm, std::string const& message)
 
 Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
 {
-    //if (branch == NULL)
-    //    throw std::runtime_error("in create_term, branch is NULL");
     if (!is_function(function))
         throw std::runtime_error("in create_term, 2nd arg to create_term must be a function");
 
@@ -172,7 +170,7 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
 
     // Create state (if a state type is defined)
     if (stateType != NULL) {
-        term->state = create_var(term->getMyBranch(), stateType);
+        term->state = create_value(term->getMyBranch(), stateType);
     }
     else
         term->state = NULL;
@@ -201,7 +199,7 @@ void set_input(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 }
 
-Term* create_var(Branch* branch, Term* type)
+Term* create_value(Branch* branch, Term* type)
 {
     Term *var_function = get_var_function(*branch, type);
     Term *term = create_term(branch, var_function, ReferenceList());

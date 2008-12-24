@@ -60,7 +60,7 @@ void external_pointers()
 {
     Branch branch;
 
-    Term* function = create_var(&branch, FUNCTION_TYPE);
+    Term* function = create_value(&branch, FUNCTION_TYPE);
 
     as_function(function).inputTypes = ReferenceList(INT_TYPE, INT_TYPE);
     as_function(function).outputType = STRING_TYPE;
