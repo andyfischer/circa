@@ -201,7 +201,7 @@ void set_input(Term* term, int index, Term* input)
 
 Term* create_value(Branch* branch, Term* type)
 {
-    Term *var_function = get_var_function(*branch, type);
+    Term *var_function = get_value_function(*branch, type);
     Term *term = create_term(branch, var_function, ReferenceList());
     alloc_value(term);
     term->stealingOk = false;
@@ -222,7 +222,7 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList const& _input
         if (inputs.count() != 0)
             throw std::runtime_error("Multiple inputs in constructor not supported");
 
-        function = get_var_function(branch, function);
+        function = get_value_function(branch, function);
     }
 
     // If 'function' is not really a function, see if we can treat it like a function

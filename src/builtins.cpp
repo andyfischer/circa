@@ -202,10 +202,10 @@ void initialize_constants()
 
     quick_create_cpp_type<Dictionary>(*KERNEL, "Dictionary");
 
-    VAR_INT = get_var_function(*KERNEL, INT_TYPE);
-    VAR_FLOAT = get_var_function(*KERNEL, FLOAT_TYPE);
-    VAR_STRING = get_var_function(*KERNEL, STRING_TYPE);
-    VAR_BOOL = get_var_function(*KERNEL, BOOL_TYPE);
+    VAR_INT = get_value_function(*KERNEL, INT_TYPE);
+    VAR_FLOAT = get_value_function(*KERNEL, FLOAT_TYPE);
+    VAR_STRING = get_value_function(*KERNEL, STRING_TYPE);
+    VAR_BOOL = get_value_function(*KERNEL, BOOL_TYPE);
 
     CONSTANT_0 = float_value(*KERNEL, 0);
     CONSTANT_1 = float_value(*KERNEL, 1);
@@ -273,7 +273,7 @@ void shutdown()
     KERNEL = NULL;
 }
 
-Term* get_var_function(Branch& branch, Term* type)
+Term* get_value_function(Branch& branch, Term* type)
 {
     Term* result = apply_function(branch, VAR_FUNCTION_GENERATOR, ReferenceList(type));
     evaluate_term(result);

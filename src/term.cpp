@@ -57,7 +57,8 @@ Term::Term()
 
 Term::~Term()
 {
-    assert(DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR > 0);
+    if (owningBranch != NULL)
+        assert(DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR > 0);
 
     assert_good_pointer(this);
 
