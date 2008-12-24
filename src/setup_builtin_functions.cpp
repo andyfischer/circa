@@ -33,6 +33,7 @@ namespace parse_function_header_function { void setup(Branch& kernel); }
 namespace print_function { void setup(Branch& kernel); }
 namespace range_function { void setup(Branch& kernel); }
 namespace read_text_file_function { void setup(Branch& kernel); }
+namespace set_function { void setup(Branch& kernel); }
 namespace sin_function { void setup(Branch& kernel); }
 namespace slist_pack_function { void setup(Branch& kernel); }
 namespace sub_function { void setup(Branch& kernel); }
@@ -68,6 +69,7 @@ void setup_builtin_functions(Branch& kernel)
     print_function::setup(kernel);
     range_function::setup(kernel);
     read_text_file_function::setup(kernel);
+    set_function::setup(kernel);
     sin_function::setup(kernel);
     slist_pack_function::setup(kernel);
     sub_function::setup(kernel);

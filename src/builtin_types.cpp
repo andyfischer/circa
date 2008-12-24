@@ -6,6 +6,7 @@
 #include "builtin_types.h"
 #include "cpp_interface.h"
 #include "runtime.h"
+#include "set.h"
 #include "symbolic_list.h"
 #include "values.h"
 
@@ -198,86 +199,103 @@ struct CompoundValue
     }
 };
 
-struct Set {
-    // TODO: more efficient data structure
-    std::vector<Term*> members;
 
-    bool contains(Term* value) {
-        std::vector<Term*>::iterator it;
-        for (it = members.begin(); it != members.end(); ++it) {
-            if (values_equal(value, *it))
-                return true;
-        }
-        return false;
+bool
+Set::contains(Term* value)
+{
+    std::vector<Term*>::iterator it;
+    for (it = members.begin(); it != members.end(); ++it) {
+        if (values_equal(value, *it))
+            return true;
     }
+    return false;
+}
 
-    void add(Term* value) {
-        if (contains(value))
+void
+Set::add(Term* value)
+{
+    if (contains(value))
+        return;
+
+    Term* duplicatedValue = create_value(value->type);
+    duplicate_value(value, duplicatedValue);
+    members.push_back(duplicatedValue);
+}
+
+void
+Set::remove(Term* value) 
+{
+    std::vector<Term*>::iterator it;
+    for (it = members.begin(); it != members.end(); ++it) {
+        if (values_equal(value, *it)) {
+
+            delete *it;
+            members.erase(it);
             return;
+        }
+    }
+}
 
-        Term* duplicatedValue = create_value(value->type);
-        duplicate_value(value, duplicatedValue);
-        members.push_back(duplicatedValue);
+void
+Set::clear()
+{
+    std::vector<Term*>::iterator it;
+    for (it = members.begin(); it != members.end(); ++it) {
+        delete *it;
     }
 
-    void remove(Term* value) {
+    members.clear();
+}
+
+void
+Set::hosted_add(Term* caller)
+{
+    recycle_value(caller->input(0), caller);
+    Set& set = as<Set>(caller);
+    set.add(caller->input(1));
+}
+
+void
+Set::hosted_remove(Term* caller)
+{
+    recycle_value(caller->input(0), caller);
+    Set& set = as<Set>(caller);
+    set.remove(caller->input(1));
+}
+
+void
+Set::hosted_union(Term* caller)
+{
+    Set &result = as<Set>(caller);
+
+    for (int inputIndex=0; inputIndex < caller->numInputs(); inputIndex++) {
+        Set &input = as<Set>(caller->input(inputIndex));
+
         std::vector<Term*>::iterator it;
-        for (it = members.begin(); it != members.end(); ++it) {
-            if (values_equal(value, *it)) {
 
-                delete *it;
-                members.erase(it);
-                return;
-            }
+        for (it = input.members.begin(); it != input.members.end(); ++it) {
+            result.add(*it);
         }
     }
+}
 
-    static void hosted_add(Term* caller)
-    {
-        recycle_value(caller->input(0), caller);
-        Set& set = as<Set>(caller);
-        set.add(caller->input(1));
+std::string
+Set::to_string(Term* caller)
+{
+    Set &set = as<Set>(caller);
+    std::vector<Term*>::iterator it;
+    std::stringstream output;
+    bool first = true;
+    output << "{";
+    for (it = set.members.begin(); it != set.members.end(); ++it) {
+        if (!first) output << ", ";
+        output << (*it)->toString();
+        first = false;
     }
+    output << "}";
 
-    static void hosted_remove(Term* caller)
-    {
-        recycle_value(caller->input(0), caller);
-        Set& set = as<Set>(caller);
-        set.remove(caller->input(1));
-    }
-
-    static void hosted_union(Term* caller)
-    {
-        Set &result = as<Set>(caller);
-
-        for (int inputIndex=0; inputIndex < caller->numInputs(); inputIndex++) {
-            Set &input = as<Set>(caller->input(inputIndex));
-
-            std::vector<Term*>::iterator it;
-
-            for (it = input.members.begin(); it != input.members.end(); ++it) {
-                result.add(*it);
-            }
-        }
-    }
-
-    static std::string to_string(Term* caller)
-    {
-        Set &set = as<Set>(caller);
-        std::vector<Term*>::iterator it;
-        std::stringstream output;
-        bool first = true;
-        output << "{";
-        for (it = set.members.begin(); it != set.members.end(); ++it) {
-            if (!first) output << ", ";
-            output << (*it)->toString();
-            first = false;
-        }
-        output << "}";
-
-        return output.str();
-    }
-};
+    return output.str();
+}
 
 bool is_compound_value(Term *term)
 {
