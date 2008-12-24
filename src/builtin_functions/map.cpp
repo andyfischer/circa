@@ -40,13 +40,13 @@ namespace map_function {
             void assign(Term* key, Term* value) {
                 Pair *existing = findPair(key);
 
-                Term* duplicatedValue = create_var(&branch, value->type);
+                Term* duplicatedValue = create_value(&branch, value->type);
                 duplicate_value(value, duplicatedValue);
 
                 if (existing != NULL) {
                     existing->value = duplicatedValue;
                 } else {
-                    Term* duplicatedKey = create_var(&branch, key->type);
+                    Term* duplicatedKey = create_value(&branch, key->type);
                     duplicate_value(key, duplicatedKey);
                     Pair newPair;
                     newPair.key = duplicatedKey;

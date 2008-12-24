@@ -48,12 +48,12 @@ void external_pointers()
 {
     Branch branch;
 
-    Term* inner_branch = create_var(&branch, BRANCH_TYPE);
+    Term* inner_branch = create_value(&branch, BRANCH_TYPE);
 
     test_equals(list_all_pointers(inner_branch),
         ReferenceList(inner_branch->function, inner_branch->type));
 
-    Term* inner_int = create_var(&as_branch(inner_branch), INT_TYPE);
+    Term* inner_int = create_value(&as_branch(inner_branch), INT_TYPE);
     Term* inner_add = apply_function(as_branch(inner_branch), ADD_FUNC,
             ReferenceList(inner_int, inner_int));
 

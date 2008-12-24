@@ -430,7 +430,7 @@ FunctionDecl::createTerm(CompilationContext &context)
     }
     context.pop();
 
-    Term* outer_val = create_var(&context.topBranch(), FUNCTION_TYPE);
+    Term* outer_val = create_value(&context.topBranch(), FUNCTION_TYPE);
     steal_value(sub, outer_val);
     context.topBranch().bindName(outer_val, this->header->functionName);
 
@@ -485,7 +485,7 @@ TypeDecl::createTerm(CompilationContext &context)
             std::string("compound-type-append-field(@t, "+it->type+", fieldName)"));
     }
 
-    Term* result_term = create_var(&context.topBranch(), TYPE_TYPE);
+    Term* result_term = create_value(&context.topBranch(), TYPE_TYPE);
     steal_value(workspace["t"], result_term);
     context.topBranch().bindName(result_term, this->name);
     return result_term;

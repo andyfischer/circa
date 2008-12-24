@@ -94,9 +94,9 @@ void test_reference()
 {
     Branch branch;
 
-    Term* myref = create_var(&branch, REFERENCE_TYPE);
-    Term* a = create_var(&branch, INT_TYPE);
-    Term* b = create_var(&branch, INT_TYPE);
+    Term* myref = create_value(&branch, REFERENCE_TYPE);
+    Term* a = create_value(&branch, INT_TYPE);
+    Term* b = create_value(&branch, INT_TYPE);
 
     as_ref(myref) = a;
 

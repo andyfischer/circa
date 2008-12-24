@@ -101,7 +101,7 @@ Term::property(std::string const& name)
 Term*
 Term::addProperty(std::string const& name, Term* type)
 {
-    Term* term = create_var(getMyBranch(), type);
+    Term* term = create_value(getMyBranch(), type);
     assert(term != NULL);
     getMyBranch()->bindName(term, name);
     return term;
