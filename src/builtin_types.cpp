@@ -358,10 +358,10 @@ void initialize_builtin_types(Branch& kernel)
 
     Term* set_add = import_c_function(kernel, Set::hosted_add,
         "function Set::add(Set, any) -> Set");
+    as_type(set_type).addMemberFunction("add", set_add);
+
     Term* set_remove = import_c_function(kernel, Set::hosted_remove,
         "function Set::remove(Set, any) -> Set");
-
-    as_type(set_type).addMemberFunction("add", set_add);
     as_type(set_type).addMemberFunction("remove", set_remove);
 }
 

@@ -13,17 +13,11 @@
 #include "term.h"
 #include "token_stream.h"
 #include "type.h"
+#include "wrappers.h"
 #include "values.h"
 
 namespace circa {
 namespace ast {
-
-std::string getInfixFunctionName(std::string infix)
-{
-    Branch workspace;
-    string_value(workspace, infix, "infix");
-    return eval_as<std::string>(workspace, "get-infix-function-name(infix)");
-}
 
 Infix::~Infix()
 {
