@@ -16,6 +16,7 @@ namespace cos_function { void setup(Branch& kernel); }
 namespace div_function { void setup(Branch& kernel); }
 namespace equals_function { void setup(Branch& kernel); }
 namespace evaluate_file_function { void setup(Branch& kernel); }
+namespace get_branch_bound_names_function { void setup(Branch& kernel); }
 namespace get_infix_function_name_function { void setup(Branch& kernel); }
 namespace greater_than_function { void setup(Branch& kernel); }
 namespace if_expr_function { void setup(Branch& kernel); }
@@ -53,6 +54,7 @@ void setup_builtin_functions(Branch& kernel)
     div_function::setup(kernel);
     equals_function::setup(kernel);
     evaluate_file_function::setup(kernel);
+    get_branch_bound_names_function::setup(kernel);
     get_infix_function_name_function::setup(kernel);
     greater_than_function::setup(kernel);
     if_expr_function::setup(kernel);
