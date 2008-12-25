@@ -352,7 +352,6 @@ void initialize_builtin_types(Branch& kernel)
             ANY_TYPE);
 
     quick_create_cpp_type<Branch>(kernel, "Branch");
-    quick_create_cpp_type<Branch*>(kernel, "BranchPtr");
 
     Term* set_type = quick_create_cpp_type<Set>(kernel, "Set");
     as_type(set_type).toString = Set::to_string;
