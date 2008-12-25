@@ -7,7 +7,6 @@
 #include "cpp_interface.h"
 #include "runtime.h"
 #include "set.h"
-#include "symbolic_list.h"
 #include "values.h"
 
 namespace circa {
@@ -354,8 +353,6 @@ void initialize_builtin_types(Branch& kernel)
 
     quick_create_cpp_type<Branch>(kernel, "Branch");
     quick_create_cpp_type<Branch*>(kernel, "BranchPtr");
-
-    quick_create_cpp_type<SymbolicRefList>(kernel, "SList");
 
     Term* set_type = quick_create_cpp_type<Set>(kernel, "Set");
     as_type(set_type).toString = Set::to_string;

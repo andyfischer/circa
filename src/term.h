@@ -50,6 +50,7 @@ struct Term
     // True if this term's value is out-of-date
     bool needsUpdate;
 
+    // Errors that have occurred
     ErrorList errors;
 
     // A globally unique ID

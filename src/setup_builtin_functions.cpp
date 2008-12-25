@@ -37,7 +37,6 @@ namespace read_text_file_function { void setup(Branch& kernel); }
 namespace set_function { void setup(Branch& kernel); }
 namespace set_union_function { void setup(Branch& kernel); }
 namespace sin_function { void setup(Branch& kernel); }
-namespace slist_pack_function { void setup(Branch& kernel); }
 namespace sub_function { void setup(Branch& kernel); }
 namespace to_string_function { void setup(Branch& kernel); }
 namespace tokenize_function { void setup(Branch& kernel); }
@@ -75,7 +74,6 @@ void setup_builtin_functions(Branch& kernel)
     set_function::setup(kernel);
     set_union_function::setup(kernel);
     sin_function::setup(kernel);
-    slist_pack_function::setup(kernel);
     sub_function::setup(kernel);
     to_string_function::setup(kernel);
     tokenize_function::setup(kernel);
