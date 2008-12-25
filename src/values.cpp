@@ -23,11 +23,14 @@ void dealloc_value(Term* term)
     if (term->type->value == NULL)
         throw std::runtime_error("type is undefined");
 
-    if (as_type(term->type).dealloc == NULL)
-        throw std::runtime_error("type " + as_type(term->type).name
-            + " has no dealloc function");
+    if (term->ownsValue) {
+        if (as_type(term->type).dealloc == NULL)
+            throw std::runtime_error("type " + as_type(term->type).name
+                + " has no dealloc function");
 
-    as_type(term->type).dealloc(term->value);
+        as_type(term->type).dealloc(term->value);
+    }
+
     term->value = NULL;
 }
 

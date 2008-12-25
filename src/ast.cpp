@@ -525,6 +525,9 @@ IfStatement::createTerm(CompilationContext &context)
 
     // First, get a list of all names that were bound in these branches
 
+    Branch workspace;
+
+
     return ifStatementTerm;
 }
 
