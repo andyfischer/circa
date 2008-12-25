@@ -44,6 +44,7 @@ Term::Term()
     function(NULL),
     state(NULL),
     owningBranch(NULL),
+    ownsValue(true),
     stealingOk(true),
     needsUpdate(true),
     myBranch(NULL)
