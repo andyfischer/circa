@@ -11,6 +11,7 @@
 #include "list.h"
 #include "parser.h"
 #include "runtime.h"
+#include "set.h"
 #include "syntax.h"
 #include "term.h"
 #include "tokenizer.h"

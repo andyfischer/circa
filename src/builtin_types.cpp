@@ -199,7 +199,6 @@ struct CompoundValue
     }
 };
 
-
 bool
 Set::contains(Term* value)
 {
