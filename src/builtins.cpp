@@ -240,14 +240,10 @@ void initialize_builtin_functions(Branch* kernel)
     assert(ADD_FUNC != NULL);
     assert(MULT_FUNC != NULL);
 
-    UNKNOWN_FUNCTION = quick_create_function(kernel, "unknown-function",
-            unknown_function__evaluate,
-            ReferenceList(ANY_TYPE), ANY_TYPE);
+    UNKNOWN_FUNCTION = import_c_function(*kernel, unknown_function__evaluate, "unknown-function(any) -> any");
     as_function(UNKNOWN_FUNCTION).stateType = STRING_TYPE;
 
-    VAR_FUNCTION_FEEDBACK_ASSIGN = quick_create_function(kernel, "var-function-feedback-assign",
-        var_function::feedback_assign,
-        ReferenceList(ANY_TYPE, ANY_TYPE), VOID_TYPE);
+    VAR_FUNCTION_FEEDBACK_ASSIGN = import_c_function(*kernel, var_function::feedback_assign, "var-function-feedback-assign(any,any)");
 
     as_function(VAR_INT).feedbackPropogateFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;
     as_function(VAR_FLOAT).feedbackPropogateFunction = VAR_FUNCTION_FEEDBACK_ASSIGN;

@@ -338,18 +338,9 @@ void initialize_builtin_types(Branch& kernel)
     as_type(REFERENCE_TYPE).visitPointers = ref_type::visitPointers;
     as_type(REFERENCE_TYPE).remapPointers = ref_type::remapPointers;
 
-    quick_create_function(&kernel, "create-compound-type",
-            CompoundValue::create_compound_type,
-            ReferenceList(STRING_TYPE),
-            TYPE_TYPE);
-    quick_create_function(&kernel, "compound-type-append-field",
-            CompoundValue::append_field,
-            ReferenceList(TYPE_TYPE, TYPE_TYPE, STRING_TYPE),
-            TYPE_TYPE);
-    quick_create_function(&kernel, "get-field",
-            CompoundValue::get_field,
-            ReferenceList(ANY_TYPE, STRING_TYPE),
-            ANY_TYPE);
+    import_c_function(kernel, CompoundValue::create_compound_type, "create-compound-type(string) -> Type");
+    import_c_function(kernel, CompoundValue::append_field, "compound-type-append-field(Type,Type,string) -> Type");
+    import_c_function(kernel, CompoundValue::get_field, "get-field(any,string) -> any");
 
     quick_create_cpp_type<Branch>(kernel, "Branch");
 
