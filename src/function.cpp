@@ -124,36 +124,4 @@ Function::call_subroutine(Term* caller)
     }
 }
 
-void Function::get_input_name(Term* caller)
-{
-    Function& sub = as_function(caller->input(0));
-    int index = as_int(caller->input(1));
-
-    Term* inputPlaceholder =
-        sub.subroutineBranch.getNamed(get_placeholder_name_for_index(index));
-
-    as_string(caller) = inputPlaceholder->name;
-}
-
-void Function::subroutine_apply(Term* caller)
-{
-    recycle_value(caller->input(0), caller);
-    std::string input = as_string(caller->input(1));
-
-    Function& sub = as_function(caller);
-
-    apply_statement(sub.subroutineBranch, input);
-}
-
-void initialize_functions(Branch* kernel)
-{
-    quick_create_function(kernel,
-        "function-get-input-name", Function::get_input_name,
-        ReferenceList(FUNCTION_TYPE, INT_TYPE), STRING_TYPE);
-
-    quick_create_function(kernel,
-        "subroutine-apply", Function::subroutine_apply,
-        ReferenceList(FUNCTION_TYPE, STRING_TYPE), FUNCTION_TYPE);
-}
-
 } // namespace circa

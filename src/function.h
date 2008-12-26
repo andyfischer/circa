@@ -59,14 +59,10 @@ struct Function
     static void visitPointers(Term* term, PointerVisitor& visitor);
     static void call_subroutine__initialize(Term* caller);
     static void call_subroutine(Term* caller);
-    static void get_input_name(Term* caller);
-    static void subroutine_apply(Term* caller);
 };
 
 bool is_function(Term* term);
 Function& as_function(Term*);
-
-void initialize_functions(Branch* kernel);
 
 std::string get_placeholder_name_for_index(int index);
 
