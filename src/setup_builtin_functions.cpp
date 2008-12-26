@@ -16,6 +16,7 @@ namespace cos_function { void setup(Branch& kernel); }
 namespace div_function { void setup(Branch& kernel); }
 namespace equals_function { void setup(Branch& kernel); }
 namespace evaluate_file_function { void setup(Branch& kernel); }
+namespace function_name_input_function { void setup(Branch& kernel); }
 namespace get_branch_bound_names_function { void setup(Branch& kernel); }
 namespace get_infix_function_name_function { void setup(Branch& kernel); }
 namespace greater_than_function { void setup(Branch& kernel); }
@@ -38,6 +39,7 @@ namespace set_function { void setup(Branch& kernel); }
 namespace set_union_function { void setup(Branch& kernel); }
 namespace sin_function { void setup(Branch& kernel); }
 namespace sub_function { void setup(Branch& kernel); }
+namespace subroutine_create_function { void setup(Branch& kernel); }
 namespace to_string_function { void setup(Branch& kernel); }
 namespace tokenize_function { void setup(Branch& kernel); }
 namespace write_text_file_function { void setup(Branch& kernel); }
@@ -53,6 +55,7 @@ void setup_builtin_functions(Branch& kernel)
     div_function::setup(kernel);
     equals_function::setup(kernel);
     evaluate_file_function::setup(kernel);
+    function_name_input_function::setup(kernel);
     get_branch_bound_names_function::setup(kernel);
     get_infix_function_name_function::setup(kernel);
     greater_than_function::setup(kernel);
@@ -75,6 +78,7 @@ void setup_builtin_functions(Branch& kernel)
     set_union_function::setup(kernel);
     sin_function::setup(kernel);
     sub_function::setup(kernel);
+    subroutine_create_function::setup(kernel);
     to_string_function::setup(kernel);
     tokenize_function::setup(kernel);
     write_text_file_function::setup(kernel);

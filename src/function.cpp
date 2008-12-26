@@ -92,47 +92,6 @@ std::string get_placeholder_name_for_index(int index)
     return sstream.str();
 }
 
-void Function::subroutine_create(Term* caller)
-{
-    // 0: name (string)
-    // 1: inputTypes (list of type)
-    // 2: outputType (type)
-
-    as_string(caller->input(0));
-    as_list(caller->input(1));
-    as_type(caller->input(2));
-
-    Function& sub = as_function(caller);
-    sub.name = as_string(caller->input(0));
-    sub.evaluate = Function::call_subroutine;
-
-    // extract references to input types
-    {
-        Branch workspace;
-        Term* list_refs = eval_function(workspace, "get-list-references",
-                ReferenceList(caller->input(1)));
-
-        if (list_refs->hasError()) {
-            error_occured(caller, std::string("get-list-references error: ")
-                + list_refs->getErrorMessage());
-            return;
-        }
-
-        sub.inputTypes = as_list(list_refs).toReferenceList();
-    }
-
-    sub.outputType = caller->input(2);
-    sub.stateType = BRANCH_TYPE;
-
-    // Create input placeholders
-    for (unsigned int index=0; index < sub.inputTypes.count(); index++) {
-        std::string name = get_placeholder_name_for_index(index);
-        Term* placeholder = create_value(&sub.subroutineBranch,
-            sub.inputTypes[index]);
-        sub.subroutineBranch.bindName(placeholder, name);
-    }
-}
-
 void
 Function::call_subroutine(Term* caller)
 {
@@ -165,33 +124,6 @@ Function::call_subroutine(Term* caller)
     }
 }
 
-void Function::name_input(Term* caller)
-{
-    recycle_value(caller->input(0), caller);
-    int index = as_int(caller->input(1));
-    std::string name = as_string(caller->input(2));
-    Function& sub = as_function(caller);
-
-    if (index < 0) {
-        error_occured(caller, "index must be >= 0");
-        return;
-    }
-
-    if ((unsigned int) index >= sub.inputTypes.count()) {
-        error_occured(caller, "index out of bounds");
-        return;
-    }
-
-    Term* inputPlaceholder =
-        sub.subroutineBranch.getNamed(get_placeholder_name_for_index(index));
-
-    assert(inputPlaceholder != NULL);
-
-    // remove the name on this term, so that this new name will stick
-    inputPlaceholder->name = "";
-    sub.subroutineBranch.bindName(inputPlaceholder, name);
-}
-
 void Function::get_input_name(Term* caller)
 {
     Function& sub = as_function(caller->input(0));
@@ -215,15 +147,6 @@ void Function::subroutine_apply(Term* caller)
 
 void initialize_functions(Branch* kernel)
 {
-    quick_create_function(kernel, "subroutine-create",
-        Function::subroutine_create,
-        ReferenceList(STRING_TYPE,LIST_TYPE,TYPE_TYPE),
-        FUNCTION_TYPE);
-
-    quick_create_function(kernel,
-        "function-name-input", Function::name_input,
-        ReferenceList(FUNCTION_TYPE, INT_TYPE, STRING_TYPE), FUNCTION_TYPE);
-
     quick_create_function(kernel,
         "function-get-input-name", Function::get_input_name,
         ReferenceList(FUNCTION_TYPE, INT_TYPE), STRING_TYPE);
