@@ -260,7 +260,6 @@ void initialize()
 
     // Then everything else:
     initialize_builtin_functions(KERNEL);
-    initialize_functions(KERNEL);
 }
 
 void shutdown()
