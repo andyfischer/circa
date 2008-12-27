@@ -364,7 +364,7 @@ FunctionDecl::createTerm(CompilationContext &context)
     // Make a workspace where we'll assemble this function
     Branch workspace;
 
-    Term* inputTypes = eval_statement(workspace, "inputTypes = list()");
+    Term* inputTypes = eval_statement(workspace, "inputTypes = tuple()");
 
     for (unsigned int inputIndex=0;
          inputIndex < this->header->arguments.size();

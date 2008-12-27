@@ -44,6 +44,7 @@ namespace subroutine_apply_function { void setup(Branch& kernel); }
 namespace subroutine_create_function { void setup(Branch& kernel); }
 namespace to_string_function { void setup(Branch& kernel); }
 namespace tokenize_function { void setup(Branch& kernel); }
+namespace tuple_function { void setup(Branch& kernel); }
 namespace write_text_file_function { void setup(Branch& kernel); }
 
 void setup_builtin_functions(Branch& kernel)
@@ -85,6 +86,7 @@ void setup_builtin_functions(Branch& kernel)
     subroutine_create_function::setup(kernel);
     to_string_function::setup(kernel);
     tokenize_function::setup(kernel);
+    tuple_function::setup(kernel);
     write_text_file_function::setup(kernel);
 }
 
