@@ -13,27 +13,12 @@ namespace subroutine_create_function {
         // 2: outputType (type)
 
         as_string(caller->input(0));
-        as_list(caller->input(1));
         as_type(caller->input(2));
 
         Function& sub = as_function(caller);
         sub.name = as_string(caller->input(0));
         sub.evaluate = Function::call_subroutine;
-
-        // extract references to input types
-        {
-            Branch workspace;
-            Term* list_refs = eval_function(workspace, "get-list-references",
-                    ReferenceList(caller->input(1)));
-
-            if (list_refs->hasError()) {
-                error_occured(caller, std::string("get-list-references error: ")
-                    + list_refs->getErrorMessage());
-                return;
-            }
-
-            sub.inputTypes = as_list(list_refs).toReferenceList();
-        }
+        sub.inputTypes = as<ReferenceList>(caller->input(1));
 
         sub.outputType = caller->input(2);
         sub.stateType = BRANCH_TYPE;
@@ -50,7 +35,7 @@ namespace subroutine_create_function {
     void setup(Branch& kernel)
     {
         import_c_function(kernel, evaluate,
-                "subroutine-create(string,List,Type) -> Function");
+                "subroutine-create(string,Tuple,Type) -> Function");
     }
 }
 }

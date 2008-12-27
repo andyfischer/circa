@@ -14,7 +14,7 @@ void create()
 {
     Branch branch;
 
-    Term* sub = eval_statement(branch, "sub = subroutine-create('my-sub', list(int), string)");
+    Term* sub = eval_statement(branch, "sub = subroutine-create('my-sub', tuple(int), string)");
 
     test_assert(!sub->hasError());
 
@@ -41,7 +41,7 @@ void using_apply()
 {
     Branch branch;
 
-    eval_statement(branch, "sub = subroutine-create('s', list(float), float)");
+    eval_statement(branch, "sub = subroutine-create('s', tuple(float), float)");
     eval_statement(branch, "function-name-input(@sub, 0, 'x')");
     eval_statement(branch, "subroutine-apply(@sub, \"return add(mult(x,2.0),5.0)\")");
 
@@ -72,7 +72,7 @@ void external_pointers()
             STRING_TYPE));
 
     function = eval_statement(branch,
-            "subroutine-create(\"mysub\",list(float,float),bool)");
+            "subroutine-create(\"mysub\",tuple(float,float),bool)");
 
     test_equals(list_all_pointers(function), ReferenceList(
             function->input(0),
@@ -91,7 +91,7 @@ void subroutine_binding_input_names()
     Branch branch;
 
     Term* mysub = eval_statement(branch,
-            "mysub = subroutine-create('mysub', list(int), void)");
+            "mysub = subroutine-create('mysub', tuple(int), void)");
     test_assert(mysub != NULL);
 
     mysub = eval_statement(branch, "function-name-input(@mysub, 0, 'a')");

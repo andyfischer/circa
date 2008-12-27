@@ -342,6 +342,8 @@ void initialize_builtin_types(Branch& kernel)
     import_c_function(kernel, CompoundValue::append_field, "compound-type-append-field(Type,Type,string) -> Type");
     import_c_function(kernel, CompoundValue::get_field, "get-field(any,string) -> any");
 
+    quick_create_cpp_type<ReferenceList>(kernel, "Tuple");
+
     quick_create_cpp_type<Branch>(kernel, "Branch");
 
     Term* set_type = quick_create_cpp_type<Set>(kernel, "Set");
