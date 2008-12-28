@@ -1,4 +1,0 @@
-
-Future work: remove idea that terms are owned by branches. Just use reference counting.
-
-Allow terms to be created without a branch.
