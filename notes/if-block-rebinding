@@ -1,0 +1,65 @@
+
+## Outline ##
+
+Need to support rebinding semantics in if-blocks.
+
+1) If we have a name which is bound outside the if-block
+and 2) if this name is rebound anywhere inside the if-block,
+then for this name, we must create an if-expr after the if-block, which decides
+between the bindings at both branches, using the if-block's condition. Then in
+the outer scode, this name is bound to this if-expr.
+
+## Some examples ##
+
+a = 1
+if x
+  a = 2
+end
+
+Must result in a = if-expr(x, 2, 1)
+
+----------------
+
+a = 1
+if x
+  ...
+else
+  a = 3
+end
+
+Must result in a = if-expr(x, 1, 3)
+
+----------------
+
+a = 1
+if x
+  ...
+end
+
+Must not rebind a
+
+----------------
+
+if x
+  a = 1
+  ...
+end
+
+Must not bind a in the outer scope
+
+
+## Algorithm ##
+
+Make a list REBINDS, of every name that is bound in any branch within
+  the if-statement.
+Remove any name from REBINDS that is not bound in the outer scope.
+
+For every name N in REBINDS:
+  Create an if-expr JOIN-EXPR after the if-statement. These might be contained
+    inside the if-statement.
+  Use the if-statement's condition as argument 0 in JOIN-EXPR.
+  For every branch B:
+    Find this name's binding in branch B. This may lead to the outer branch's
+    binding, if this branch does not bind this name.
+    Use this binding as an input to JOIN-EXPR.
+  In the outer branch, bind name N to JOIN-EXPR.
