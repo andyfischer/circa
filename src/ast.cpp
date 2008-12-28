@@ -364,7 +364,8 @@ FunctionDecl::createTerm(CompilationContext &context)
     // Make a workspace where we'll assemble this function
     Branch workspace;
 
-    Term* inputTypes = eval_statement(workspace, "inputTypes = tuple()");
+
+    ReferenceList inputTypes;
 
     for (unsigned int inputIndex=0;
          inputIndex < this->header->arguments.size();
@@ -378,7 +379,7 @@ FunctionDecl::createTerm(CompilationContext &context)
         if (!is_type(term))
             parser::syntax_error(std::string("Identifier is not a type: ") + arg.type);
 
-        set_input(inputTypes, inputIndex, term);
+        inputTypes.append(term);
     }
 
     Term* outputType = NULL;
@@ -394,6 +395,8 @@ FunctionDecl::createTerm(CompilationContext &context)
     }
 
     // Load into workspace
+    Term* inputTypesTerm = eval_statement(workspace, "inputTypes = tuple()");
+    as<ReferenceList>(inputTypesTerm) = inputTypes;
     string_value(workspace, this->header->functionName, "functionName");
     workspace.bindName(outputType, "outputType");
 
