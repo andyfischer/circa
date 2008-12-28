@@ -93,24 +93,6 @@ void to_reference_list()
     test_assert(reflist[2] == APPLY_FEEDBACK);
 }
 
-void get_references()
-{
-    Branch branch;
-
-    eval_statement(branch, "l = list(int, any, false)");
-    Term* rl = eval_statement(branch, "get-list-references(l)");
-
-    test_assert(as_list(rl)[0]->asRef() == INT_TYPE);
-    test_assert(as_list(rl)[1]->asRef() == ANY_TYPE);
-    test_assert(as_list(rl)[2]->asRef() == CONSTANT_FALSE);
-
-    ReferenceList reflist = as_list(rl).toReferenceList();
-
-    test_assert(reflist[0] == INT_TYPE);
-    test_assert(reflist[1] == ANY_TYPE);
-    test_assert(reflist[2] == CONSTANT_FALSE);
-}
-
 } // namespace list_tests
 
 void register_list_tests()
@@ -120,7 +102,6 @@ void register_list_tests()
     REGISTER_TEST_CASE(list_tests::range);
     REGISTER_TEST_CASE(list_tests::list_apply);
     REGISTER_TEST_CASE(list_tests::to_reference_list);
-    REGISTER_TEST_CASE(list_tests::get_references);
 }
 
 } // namespace circa

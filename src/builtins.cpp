@@ -256,7 +256,6 @@ void initialize()
     bootstrap_kernel();
     initialize_builtin_types(*KERNEL);
     initialize_constants();
-    initialize_list_functions(KERNEL);
 
     // Then everything else:
     initialize_builtin_functions(KERNEL);
