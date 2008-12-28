@@ -80,30 +80,4 @@ ReferenceList List::toReferenceList() const
     return result;
 }
 
-namespace get_list_references {
-
-    void evaluate(Term* caller) {
-        Term* input = caller->input(0);
-        if (as_function(input->function).name != "list-pack") {
-            error_occured(caller,
-                    "get-list-references only works with list-pack as input");
-            return;
-        }
-
-        List& caller_list = as_list(caller);
-        caller_list.clear();
-
-        for (unsigned int i=0; i < input->inputs.count(); i++) {
-            caller_list.appendSlot(REFERENCE_TYPE)->asRef() = input->inputs[i];
-        }
-    }
-}
-
-void initialize_list_functions(Branch* kernel)
-{
-    Term* get_list_references = quick_create_function(kernel, "get-list-references",
-        get_list_references::evaluate, ReferenceList(LIST_TYPE), LIST_TYPE);
-    as_function(get_list_references).setInputMeta(0, true);
-}
-
 } // namespace circa
