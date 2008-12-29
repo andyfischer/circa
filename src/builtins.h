@@ -36,6 +36,7 @@ extern Term* UNKNOWN_FUNCTION;
 extern Term* APPLY_FEEDBACK;
 extern Term* ADD_FUNC;
 extern Term* MULT_FUNC;
+extern Term* ALIAS_FUNC;
 
 Term* get_global(std::string name);
 void empty_evaluate_function(Term* caller);

@@ -52,6 +52,7 @@ Term* UNKNOWN_FUNCTION = NULL;
 Term* APPLY_FEEDBACK = NULL;
 Term* ADD_FUNC = NULL;
 Term* MULT_FUNC = NULL;
+Term* ALIAS_FUNC = NULL;
 
 void empty_evaluate_function(Term*) { }
 void empty_alloc_function(Term*) { }
