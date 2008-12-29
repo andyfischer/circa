@@ -4,7 +4,7 @@
 #include "list.h"
 
 namespace circa {
-namespace list_pack_function {
+namespace list_function {
 
     void evaluate(Term* caller) {
         as_list(caller).clear();
@@ -17,10 +17,9 @@ namespace list_pack_function {
     void setup(Branch& kernel)
     {
         Term* main_func = import_c_function(kernel, evaluate,
-                "function list-pack(any) -> List");
+                "function list(any) -> List");
         as_function(main_func).variableArgs = true;
         as_function(main_func).pureFunction = true;
-        kernel.bindName(main_func, "list");
     }
 }
 }
