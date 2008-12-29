@@ -1,7 +1,7 @@
 // Copyright 2008 Paul Hodge
 
-#ifndef CIRCA_EVALUATOR_INCLUDED
-#define CIRCA_EVALUATOR_INCLUDED
+#ifndef CIRCA_RUNTIME_INCLUDED
+#define CIRCA_RUNTIME_INCLUDED
 
 #include "common_headers.h"
 
