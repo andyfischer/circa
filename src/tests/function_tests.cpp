@@ -25,7 +25,7 @@ void create()
     test_assert(as_function(sub).outputType == STRING_TYPE);
 
     // name input
-    sub = eval_statement(branch, "sub = function-name-input(@sub, 0, 'apple')");
+    sub = eval_statement(branch, "function-name-input(@sub, 0, 'apple')");
 
     test_assert(is_function(sub));
     test_assert(as_function(sub).name == "my-sub");
@@ -48,7 +48,7 @@ void using_apply()
     // now run it
     Term* result = eval_statement(branch, "result = sub(2.0)");
 
-    test_assert(as_float(result) == 9.0);
+    test_equals(as_float(result), 9.0);
 
     // run it again
     Term* result2 = eval_statement(branch, "result2 = sub(5.0)");
