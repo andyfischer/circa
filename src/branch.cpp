@@ -72,9 +72,14 @@ void Branch::bindName(Term* term, std::string name)
 {
     names.bind(term, name);
 
-    // If the term doesn't have a real name, then use this one.
-    if (term->name == "")
-        term->name = name;
+#if 0
+    // enable this code when subroutine inputs can work properly
+    if (term->name != "") {
+        throw std::runtime_error(std::string("term already has name: ")+term->name);
+    }
+#endif
+
+    term->name = name;
 }
 
 Term* Branch::findNamed(std::string const& name) const
