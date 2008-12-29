@@ -19,7 +19,7 @@ namespace get_branch_bound_names_function {
         for (it = branch.names._map.begin(); it != branch.names._map.end(); ++it) {
             std::string const& name = it->first;
 
-            Term* value = create_value(STRING_TYPE);
+            Term* value = create_value(NULL, STRING_TYPE);
             as_string(value) = name;
 
             result.add(value);

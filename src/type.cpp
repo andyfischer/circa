@@ -159,4 +159,10 @@ void initialize_type_type(Term* typeType)
     as_type(typeType).toString = Type::to_string;
 }
 
+Term* resolve_possible_alias(Term* term)
+{
+    // todo
+
+}
+
 } // namespace circa

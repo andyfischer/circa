@@ -107,9 +107,18 @@ bool values_equal(Term* a, Term* b)
     return as_type(a->type).equals(a,b);
 }
 
+Term* create_value(Branch* branch, Term* type)
+{
+    Term *var_function = get_value_function(*branch, type);
+    Term *term = create_term(branch, var_function, ReferenceList());
+    alloc_value(term);
+    term->stealingOk = false;
+    return term;
+}
+
 Term* string_value(Branch& branch, std::string const& s, std::string const& name)
 {
-    Term* term = apply_function(branch, STRING_TYPE, ReferenceList());
+    Term* term = create_value(&branch, STRING_TYPE);
     as_string(term) = s;
     if (name != "")
         branch.bindName(term, name);
@@ -118,7 +127,7 @@ Term* string_value(Branch& branch, std::string const& s, std::string const& name
 
 Term* int_value(Branch& branch, int i, std::string const& name)
 {
-    Term* term = apply_function(branch, INT_TYPE, ReferenceList());
+    Term* term = create_value(&branch, INT_TYPE);
     as_int(term) = i;
     if (name != "")
         branch.bindName(term, name);
@@ -127,7 +136,7 @@ Term* int_value(Branch& branch, int i, std::string const& name)
 
 Term* float_value(Branch& branch, float f, std::string const& name)
 {
-    Term* term = apply_function(branch, FLOAT_TYPE, ReferenceList());
+    Term* term = create_value(&branch, FLOAT_TYPE);
     as_float(term) = f;
     if (name != "")
         branch.bindName(term, name);

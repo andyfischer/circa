@@ -205,7 +205,7 @@ Set::add(Term* value)
     if (contains(value))
         return;
 
-    Term* duplicatedValue = create_value(value->type);
+    Term* duplicatedValue = create_value(NULL, value->type);
     duplicate_value(value, duplicatedValue);
     members.push_back(duplicatedValue);
 }

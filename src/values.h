@@ -26,11 +26,12 @@ void update_owner(Term* term);
 
 bool values_equal(Term* a, Term* b);
 
+Term* create_value(Branch* branch, Term* type);
+
 Term* string_value(Branch& branch, std::string const& s, std::string const& name="");
 Term* int_value(Branch& branch, int i, std::string const& name="");
 Term* float_value(Branch& branch, float f, std::string const& name="");
 
-Term* create_alias(Branch& branch, Term* term);
 
 } // namespace circa
 

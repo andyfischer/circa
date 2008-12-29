@@ -124,6 +124,8 @@ void* alloc_from_type(Term* typeTerm);
 
 void initialize_type_type(Term* typeType);
 
+Term* resolve_possible_alias(Term* term);
+
 } // namespace circa
 
 #endif
