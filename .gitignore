@@ -22,5 +22,5 @@ circa.xcodeproj/*.pbxuser
 circa.1
 tags
 bin/circa
-
+src/setup_builtin_functions.cpp
 scratch.ca
