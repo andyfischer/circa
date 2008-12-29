@@ -46,8 +46,7 @@ struct Term
     // If true, recycle_value is allowed to steal our value.
     bool stealingOk;
 
-    // Our name.
-    // Note that we might have other aliases, according to the owning branch.
+    // Our name binding.
     std::string name;
 
     // True if this term's value is out-of-date
