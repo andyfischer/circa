@@ -115,7 +115,7 @@ Function::call_subroutine(Term* caller)
 
         recycle_value(caller->inputs[input], inputPlaceholder);
     }
-    
+
     evaluate_branch(branch);
 
     if (branch.containsName(OUTPUT_PLACEHOLDER_NAME)) {

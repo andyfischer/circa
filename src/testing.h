@@ -4,10 +4,12 @@
 #define CIRCA_TESTING_INCLUDED
 
 #include "ref_list.h"
+#include "term.h"
 
 namespace circa {
 
 void _test_assert_function(bool condition, int line, const char* file);
+void _test_assert_function(Term* term, int line, const char* file);
 void _test_fail_function(int line, const char* file);
 void _test_equals_function(ReferenceList const& a, ReferenceList const& b,
         const char* aText, const char* bText, int line, const char* file);

@@ -48,10 +48,13 @@ void using_apply()
     // now run it
     Term* result = eval_statement(branch, "result = sub(2.0)");
 
+    test_assert(result);
+
     test_equals(as_float(result), 9.0);
 
     // run it again
     Term* result2 = eval_statement(branch, "result2 = sub(5.0)");
+    test_assert(result2);
 
     test_assert(as_float(result2) == 15.0);
 }
