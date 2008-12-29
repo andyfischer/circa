@@ -193,6 +193,21 @@ void test_if_statement()
     test_assert(as_float(negTerm) == 2.0);
 }
 
+void test_alias()
+{
+    Branch branch;
+
+    Term *five = eval_statement(branch, "five = 5");
+    Term *a = eval_statement(branch, "a = alias(five)");
+
+    test_assert(a);
+    test_assert(as_int(a) == 5);
+
+    as_int(five) = 55;
+
+    test_assert(as_int(a) == 55);
+}
+
 } // namespace builtin_function_tests
 
 void register_builtin_function_tests()
@@ -208,6 +223,7 @@ void register_builtin_function_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_map);
     REGISTER_TEST_CASE(builtin_function_tests::test_if_statement);
+    REGISTER_TEST_CASE(builtin_function_tests::test_alias);
 }
 
 } // namespace circa
