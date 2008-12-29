@@ -39,8 +39,8 @@ void default_function() {
 
     Term* type1 = quick_create_cpp_type<Type1>(branch, "Type1");
 
-    Term* appendStr = quick_create_function(&branch, "append-str",
-            append_string__evaluate, ReferenceList(type1, STRING_TYPE), type1);
+    Term* appendStr = import_c_function(branch, append_string__evaluate,
+            "append-str(Type1, string) -> Type1");
 
     as_type(type1).addMemberFunction("", appendStr);
 

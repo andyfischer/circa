@@ -73,7 +73,8 @@ void Branch::bindName(Term* term, std::string name)
     names.bind(term, name);
 
 #if 0
-    // enable this code when subroutine inputs can work properly
+    // enable this code when subroutine inputs can work without having
+    // multiple name bindings.
     if (term->name != "") {
         throw std::runtime_error(std::string("term already has name: ")+term->name);
     }

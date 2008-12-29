@@ -14,24 +14,6 @@
 
 namespace circa {
 
-Term* quick_create_function(Branch* branch, std::string name, Function::EvaluateFunc evaluateFunc,
-        ReferenceList inputTypes, Term* outputType)
-{
-    for (unsigned int i=0; i < inputTypes.count(); i++)
-        assert(is_type(inputTypes[i]));
-    assert(is_type(outputType));
-
-    Term* term = create_value(branch, FUNCTION_TYPE);
-    Function& func = as_function(term);
-    func.name = name;
-    func.evaluate = evaluateFunc;
-    func.inputTypes = inputTypes;
-    func.outputType = outputType;
-    func.stateType = VOID_TYPE;
-    branch->bindName(term, name);
-	return term;
-}
-
 Term* import_c_function(Branch& branch, Function::EvaluateFunc evaluate, std::string const& headerText)
 {
     token_stream::TokenStream tokens(headerText);

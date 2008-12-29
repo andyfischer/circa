@@ -369,7 +369,6 @@ FunctionDecl::createTerm(CompilationContext &context)
     // Make a workspace where we'll assemble this function
     Branch workspace;
 
-
     ReferenceList inputTypes;
 
     for (unsigned int inputIndex=0;
@@ -535,6 +534,7 @@ IfStatement::createTerm(CompilationContext &context)
 
     Branch workspace;
 
+    //eval_statement(workspace, "names = get-branch-bound-names()");
 
     return ifStatementTerm;
 }

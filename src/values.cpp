@@ -134,4 +134,12 @@ Term* float_value(Branch& branch, float f, std::string const& name)
     return term;
 }
 
+Term* create_alias(Branch& branch, Term* term)
+{
+    Term* new_term = create_value(&branch, term->type);
+    new_term->ownsValue = false;
+    new_term->value = term->value;
+    return new_term;
+}
+
 } // namespace circa
