@@ -161,8 +161,10 @@ void test_if_statement()
 {
     Branch branch;
 
-    Term* condition = eval_statement(branch, "cond = true");
+    Term* condition = eval_statement(branch, "cond = bool()");
     Term* if_statement = eval_statement(branch, "if_s = if-statement(cond)");
+
+    as_bool(condition) = true;
 
     Branch &positiveBranch = as_branch(if_statement->state->field(0));
     Branch &negativeBranch = as_branch(if_statement->state->field(1));

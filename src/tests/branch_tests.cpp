@@ -22,17 +22,15 @@ void test_duplicate()
     Term* term2 = apply_function(original, VAR_STRING, ReferenceList());
     as_int(term1) = 5;
     as_string(term2) = "yarn";
-    original.bindName(term1, "one name for term1");
-    original.bindName(term1, "another name for term1");
+    original.bindName(term1, "term1");
     original.bindName(term2, "term two");
 
     Branch duplicate;
 
     duplicate_branch(&original, &duplicate);
 
-    Term* term1_duplicate = duplicate.getNamed("one name for term1");
+    Term* term1_duplicate = duplicate.getNamed("term1");
     test_assert(term1_duplicate != NULL);
-    test_assert(term1_duplicate == duplicate.getNamed("another name for term1"));
 
     Term* term2_duplicate = duplicate.getNamed("term two");
 
