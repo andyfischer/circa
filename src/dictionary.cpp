@@ -4,6 +4,7 @@
 
 #include "dictionary.h"
 #include "runtime.h"
+#include "values.h"
 
 namespace circa {
 

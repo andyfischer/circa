@@ -170,7 +170,7 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
 
     // Create state (if a state type is defined)
     if (stateType != NULL) {
-        term->state = create_value(stateType);
+        term->state = create_value(NULL, stateType);
     }
     else
         term->state = NULL;
@@ -197,24 +197,6 @@ void set_input(Term* term, int index, Term* input)
     assert_good_pointer(term);
 
     term->inputs.setAt(index, input);
-}
-
-Term* create_value(Term* type)
-{
-    Term *var_function = get_value_function(type);
-    Term *term = create_term(NULL, var_function, ReferenceList());
-    alloc_value(term);
-    term->stealingOk = false;
-    return term;
-}
-
-Term* create_value(Branch* branch, Term* type)
-{
-    Term *var_function = get_value_function(*branch, type);
-    Term *term = create_term(branch, var_function, ReferenceList());
-    alloc_value(term);
-    term->stealingOk = false;
-    return term;
 }
 
 Term* apply_function(Branch& branch, Term* function, ReferenceList const& _inputs)

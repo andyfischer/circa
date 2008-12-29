@@ -14,8 +14,6 @@ void error_occured(Term* errorTerm, std::string const& message);
 
 Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs);
 void set_inputs(Term* term, ReferenceList const& inputs);
-Term* create_value(Term* type);
-Term* create_value(Branch* branch, Term* type);
 void set_input(Term* term, int index, Term* input);
 
 // Examine 'function' and 'inputs' and returns a result term. A few things
