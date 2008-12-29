@@ -26,7 +26,7 @@ namespace if_statement_function { void setup(Branch& kernel); }
 namespace less_than_function { void setup(Branch& kernel); }
 namespace list_append_function { void setup(Branch& kernel); }
 namespace list_apply_function { void setup(Branch& kernel); }
-namespace list_pack_function { void setup(Branch& kernel); }
+namespace list_function { void setup(Branch& kernel); }
 namespace map_function { void setup(Branch& kernel); }
 namespace mult_function { void setup(Branch& kernel); }
 namespace not_function { void setup(Branch& kernel); }
@@ -68,7 +68,7 @@ void setup_builtin_functions(Branch& kernel)
     less_than_function::setup(kernel);
     list_append_function::setup(kernel);
     list_apply_function::setup(kernel);
-    list_pack_function::setup(kernel);
+    list_function::setup(kernel);
     map_function::setup(kernel);
     mult_function::setup(kernel);
     not_function::setup(kernel);
