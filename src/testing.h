@@ -11,6 +11,9 @@ void _test_assert_function(bool condition, int line, const char* file);
 void _test_fail_function(int line, const char* file);
 void _test_equals_function(ReferenceList const& a, ReferenceList const& b,
         const char* aText, const char* bText, int line, const char* file);
+void _test_equals_function(float a, float b,
+        const char* aText, const char* bText,
+        int line, const char* file);
 
 #define test_assert(c) _test_assert_function((c), __LINE__, __FILE__)
 #define test_fail() _test_fail_function( __LINE__, __FILE__)

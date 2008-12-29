@@ -72,7 +72,7 @@ void _test_equals_function(ReferenceList const& a, ReferenceList const& b,
     std::stringstream msg;
 
     if (a.count() != b.count()) {
-        msg << "Equality fail in " << file << ", line " << line << std::endl;
+        msg << "List equality fail in " << file << ", line " << line << std::endl;
         msg << "  " << aText << " has " << a.count() << " items, ";
         msg << bText << " has " << b.count() << " items.";
         throw std::runtime_error(msg.str());
@@ -80,10 +80,25 @@ void _test_equals_function(ReferenceList const& a, ReferenceList const& b,
 
     for (unsigned int i=0; i < a.count(); i++) {
         if (a[i] != b[i]) {
-            msg << "Equality fail in " << file << ", line " << line << std::endl;
+            msg << "List equality fail in " << file << ", line " << line << std::endl;
             msg << "  " << aText << " != " << bText << " (index " << i << " differs)";
             throw std::runtime_error(msg.str());
         }
+    }
+}
+
+void _test_equals_function(float a, float b,
+        const char* aText, const char* bText,
+        int line, const char* file)
+{
+    const int EPSILON = 0.0001;
+
+    std::stringstream msg;
+
+    if (abs(a-b) > EPSILON) {
+        msg << "Equality fail in " << file << ", line " << line << std::endl;
+        msg << aText << " [" << a << "] != " << bText << " [" << b << "]";
+        throw std::runtime_error(msg.str());
     }
 }
 
