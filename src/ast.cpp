@@ -284,6 +284,11 @@ ExpressionStatement::toString() const
 Term*
 ExpressionStatement::createTerm(CompilationContext &context)
 {
+    // Make sure our expression is not just an identifier.
+    if (expression->typeName() == "Identifier" && nameBinding != "") {
+        parser::syntax_error("Renaming an identifier is not currently supported");
+    }
+
     Term* term = this->expression->createTerm(context);
     
     if (this->nameBinding != "")
