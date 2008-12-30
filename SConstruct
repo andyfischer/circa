@@ -1,7 +1,7 @@
 
 import os, sys, glob 
 
-# generate setup_builtin_functions.cpp
+# generate setup_builtin_functions.cpp and register_all_tests.cpp
 from scripts import generate_cpp_registration
 generate_cpp_registration.do_builtin_functions(
     'src/builtin_functions',
@@ -27,14 +27,10 @@ def create_windows_env(releaseBuild):
         
 def create_mac_env(releaseBuild):
     env = Environment(tools = ["default"], toolpath=".")
-    # Python support
-    #env.Append(CPPPATH = ["/System/Library/Frameworks/Python.framework/Versions/2.5/Headers"])
 
     if not releaseBuild:
         env.Append(CPPFLAGS=['-ggdb'])
         env.Append(CPPFLAGS=['-Wall'])
-        # env.Append(CPPFLAGS=['-bundle'])
-        # env.Append(CPPFLAGS=['-flat_namespace'])
 
     return env
 

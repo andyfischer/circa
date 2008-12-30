@@ -19,9 +19,11 @@
 #include "token_stream.h"
 #include "type.h"
 #include "values.h"
-#include "setup_builtin_functions.h"
 
 namespace circa {
+
+// setup_builtin_functions is defined in setup_builtin_functions.cpp
+void setup_builtin_functions(Branch&);
 
 Branch* KERNEL = NULL;
 Term* VAR_FUNCTION_GENERATOR = NULL;
