@@ -11,44 +11,8 @@ namespace circa {
 
 std::vector<TestCase> gTestCases;
 
-void register_branch_tests();
-void register_builtin_function_tests();
-void register_builtin_type_tests();
-void register_container_tests();
-void register_cpp_interface_tests();
-void register_execution_tests();
-void register_feedback_tests();
-void register_importing_tests();
-void register_introspection_tests();
-void register_list_tests();
-void register_runtime_tests();
-void register_parser_tests();
-void register_primitive_type_tests();
-void register_function_tests();
-void register_tokenizer_tests();
-void register_type_tests();
-
-void register_all_tests()
-{
-    gTestCases.clear();
-
-    register_branch_tests();
-    register_builtin_function_tests();
-    register_builtin_type_tests();
-    register_container_tests();
-    register_cpp_interface_tests();
-    register_execution_tests();
-    register_feedback_tests();
-    register_importing_tests();
-    register_introspection_tests();
-    register_list_tests();
-    register_runtime_tests();
-    register_parser_tests();
-    register_primitive_type_tests();
-    register_function_tests();
-    register_tokenizer_tests();
-    register_type_tests();
-}
+// this function is defined in register_all_tests.cpp
+void register_all_tests();
 
 void _test_assert_function(bool condition, int line, const char* file)
 {
