@@ -9,7 +9,7 @@ namespace circa {
 
 extern Branch* KERNEL;
 
-extern Term* VAR_FUNCTION_GENERATOR;
+extern Term* VALUE_FUNCTION_GENERATOR;
 extern Term* INT_TYPE;
 extern Term* FLOAT_TYPE;
 extern Term* BOOL_TYPE;
