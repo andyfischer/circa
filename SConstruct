@@ -2,9 +2,13 @@
 import os, sys, glob 
 
 # generate setup_builtin_functions.cpp
-from scripts import generate_setup_builtin_functions
-generate_setup_builtin_functions.run('src/builtin_functions',
+from scripts import generate_cpp_registration
+generate_cpp_registration.do_builtin_functions(
+    'src/builtin_functions',
     'src/setup_builtin_functions.cpp')
+generate_cpp_registration.do_register_all_tests(
+    'src/tests',
+    'src/register_all_tests.cpp')
 
 def create_windows_env(releaseBuild):
     env = Environment(platform = 'nt')
