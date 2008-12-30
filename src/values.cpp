@@ -109,11 +109,37 @@ bool values_equal(Term* a, Term* b)
 
 Term* create_value(Branch* branch, Term* type)
 {
+    assert(type != NULL);
     Term *var_function = get_value_function(*branch, type);
     Term *term = create_term(branch, var_function, ReferenceList());
     alloc_value(term);
     term->stealingOk = false;
     return term;
+}
+
+Term* create_value(Branch* branch, Term* type, void* initialValue)
+{
+    Term* term = create_value(branch, type);
+    assert(term->value == NULL);
+    // TODO: somehow type-check initialValue
+    term->value = initialValue;
+    return term;
+}
+
+Term* create_value(Branch* branch, std::string const& typeName, void* initialValue)
+{
+    Term *type = NULL;
+
+    if (branch == NULL) {
+        type = get_global(typeName);
+    } else {
+        type = branch->findNamed(typeName);
+    }
+
+    if (type == NULL)
+        throw std::runtime_error(std::string("Couldn't find type: ")+typeName);
+
+    return create_value(branch, type, initialValue);
 }
 
 Term* string_value(Branch& branch, std::string const& s, std::string const& name)

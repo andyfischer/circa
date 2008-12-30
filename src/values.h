@@ -26,7 +26,11 @@ void update_owner(Term* term);
 
 bool values_equal(Term* a, Term* b);
 
+// Create a new value term with the given type.
+// 'branch' may be NULL.
 Term* create_value(Branch* branch, Term* type);
+Term* create_value(Branch* branch, Term* type, void* initialValue);
+Term* create_value(Branch* branch, std::string const& typeName, void* initialValue);
 
 Term* string_value(Branch& branch, std::string const& s, std::string const& name="");
 Term* int_value(Branch& branch, int i, std::string const& name="");
