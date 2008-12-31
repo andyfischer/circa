@@ -152,13 +152,13 @@ Branch::clear()
 Term*
 Branch::eval(std::string const& statement)
 {
-    return eval_statement(*this, statement);
+    return eval_statement(this, statement);
 }
 
 Term*
 Branch::apply(std::string const& statement)
 {
-    return apply_statement(*this, statement);
+    return apply_statement(this, statement);
 }
 
 void

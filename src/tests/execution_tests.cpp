@@ -34,9 +34,9 @@ void test_simple()
 
     gSpyResults.clear();
 
-    apply_statement(branch, "spy('1')");
-    apply_statement(branch, "spy('2')");
-    apply_statement(branch, "spy('3')");
+    branch.apply("spy('1')");
+    branch.apply("spy('2')");
+    branch.apply("spy('3')");
 
     test_assert(gSpyResults.size() == 0);
 
@@ -54,9 +54,9 @@ void blocked_by_error()
 
     gSpyResults.clear();
 
-    Term *spy_1 = apply_statement(branch, "spy('1')");
-    Term *error = apply_statement(branch, "e = i-only-throw-errors()");
-    Term *spy_errored = apply_statement(branch, "spy(e)");
+    Term *spy_1 = branch.apply("spy('1')");
+    Term *error = branch.apply("e = i-only-throw-errors()");
+    Term *spy_errored = branch.apply("spy(e)");
 
     test_assert(gSpyResults.size() == 0);
 

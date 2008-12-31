@@ -14,7 +14,7 @@ namespace builtin_type_tests {
 void test_dictionary()
 {
     Branch branch;
-    Term *d = eval_statement(branch, "d = Dictionary()");
+    Term *d = branch.eval("d = Dictionary()");
     test_assert(d != NULL);
     as<Dictionary>(d);
 

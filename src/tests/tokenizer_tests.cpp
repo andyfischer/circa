@@ -160,7 +160,7 @@ void token_stream_to_string()
 void hosted_tokenize()
 {
     Branch branch;
-    Term* result = eval_statement(branch, "\"hi + 0.123\" -> tokenize -> to-string");
+    Term* result = branch.eval("\"hi + 0.123\" -> tokenize -> to-string");
 
     test_assert(as_string(result) == 
             "{index: 0, tokens: [IDENTIFIER \"hi\", WHITESPACE \" \", + \"+\", "

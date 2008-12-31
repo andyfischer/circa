@@ -52,10 +52,10 @@ void test_find_existing_equivalent()
 {
     Branch branch;
 
-    Term* add_func = eval_statement(branch, "add");
-    Term* a = eval_statement(branch, "a = 1");
-    Term* b = eval_statement(branch, "b = 1");
-    Term* addition = eval_statement(branch, "add(a,b)");
+    Term* add_func = branch.eval("add");
+    Term* a = branch.eval("a = 1");
+    Term* b = branch.eval("b = 1");
+    Term* addition = branch.eval("add(a,b)");
 
     test_assert(is_equivalent(addition, add_func, ReferenceList(a,b)));
 
@@ -63,11 +63,11 @@ void test_find_existing_equivalent()
 
     test_assert(NULL == find_equivalent(add_func, ReferenceList(b,a)));
 
-    Term* another_addition = eval_statement(branch, "add(a,b)");
+    Term* another_addition = branch.eval("add(a,b)");
 
     test_assert(addition == another_addition);
 
-    Term* a_different_addition = eval_statement(branch, "add(b,a)");
+    Term* a_different_addition = branch.eval("add(b,a)");
 
     test_assert(addition != a_different_addition);
 }
@@ -124,7 +124,7 @@ void test_runtime_type_error()
 {
     // this test might become invalid when compile-time type checking is added
     Branch branch;
-    Term* term = eval_statement(branch, "add('hello', true)");
+    Term* term = branch.eval("add('hello', true)");
 
     evaluate_term(term);
 

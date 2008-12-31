@@ -33,7 +33,7 @@ int circa_main(std::vector<std::string> args)
         }
 
         Branch workspace;
-        Term* result = eval_statement(workspace, command.str());
+        Term* result = workspace.eval(command.str());
         std::cout << result->toString() << std::endl;
         goto shutdown;
     }
@@ -66,7 +66,7 @@ int circa_main(std::vector<std::string> args)
     {
         Branch workspace;
         string_value(workspace, args[0], "filename");
-        Branch& branch = as_branch(eval_statement(workspace, "evaluate-file(filename)"));
+        Branch& branch = as_branch(workspace.eval("evaluate-file(filename)"));
 
         if (justPrintBranch) {
             print_branch_extended(branch, std::cout);

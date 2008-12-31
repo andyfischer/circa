@@ -98,7 +98,7 @@ T eval_as(std::string const& statement)
 {
     Branch branch;
 
-    Term* result_term = eval_statement(branch, statement);
+    Term* result_term = branch.eval(statement);
 
     if (result_term->hasError())
         throw std::runtime_error(result_term->getErrorMessage());
@@ -109,7 +109,7 @@ T eval_as(std::string const& statement)
 template <class T>
 T eval_as(Branch &branch, std::string const& statement)
 {
-    Term* result = eval_statement(branch, statement);
+    Term* result = branch.eval(statement);
 
     if (result->hasError())
         throw std::runtime_error(result->getErrorMessage());

@@ -14,7 +14,7 @@ void create()
 {
     Branch branch;
 
-    Term* sub = eval_statement(branch, "sub = subroutine-create('my-sub', tuple(int), string)");
+    Term* sub = branch.eval("sub = subroutine-create('my-sub', tuple(int), string)");
 
     test_assert(!sub->hasError());
 
@@ -25,7 +25,7 @@ void create()
     test_assert(as_function(sub).outputType == STRING_TYPE);
 
     // name input
-    sub = eval_statement(branch, "function-name-input(@sub, 0, 'apple')");
+    sub = branch.eval("function-name-input(@sub, 0, 'apple')");
 
     test_assert(is_function(sub));
     test_assert(as_function(sub).name == "my-sub");
@@ -33,7 +33,7 @@ void create()
     test_assert(as_function(sub).inputTypes.count() == 1);
     test_assert(as_function(sub).outputType == STRING_TYPE);
 
-    Term *input_name = eval_statement(branch, "in = function-get-input-name(sub, 0)");
+    Term *input_name = branch.eval("in = function-get-input-name(sub, 0)");
     test_assert(input_name->asString() == "apple");
 }
 
@@ -41,19 +41,19 @@ void using_apply()
 {
     Branch branch;
 
-    eval_statement(branch, "sub = subroutine-create('s', tuple(float), float)");
-    eval_statement(branch, "function-name-input(@sub, 0, 'x')");
-    eval_statement(branch, "subroutine-apply(@sub, \"return add(mult(x,2.0),5.0)\")");
+    branch.eval("sub = subroutine-create('s', tuple(float), float)");
+    branch.eval("function-name-input(@sub, 0, 'x')");
+    branch.eval("subroutine-apply(@sub, \"return add(mult(x,2.0),5.0)\")");
 
     // now run it
-    Term* result = eval_statement(branch, "result = sub(2.0)");
+    Term* result = branch.eval("result = sub(2.0)");
 
     test_assert(result);
 
     test_equals(as_float(result), 9.0);
 
     // run it again
-    Term* result2 = eval_statement(branch, "result2 = sub(5.0)");
+    Term* result2 = branch.eval("result2 = sub(5.0)");
     test_assert(result2);
 
     test_assert(as_float(result2) == 15.0);
@@ -74,7 +74,7 @@ void external_pointers()
             INT_TYPE,
             STRING_TYPE));
 
-    function = eval_statement(branch,
+    function = branch.eval(
             "subroutine-create(\"mysub\",tuple(float,float),bool)");
 
     test_equals(list_all_pointers(function), ReferenceList(
@@ -93,11 +93,11 @@ void subroutine_binding_input_names()
 {
     Branch branch;
 
-    Term* mysub = eval_statement(branch,
+    Term* mysub = branch.eval(
             "mysub = subroutine-create('mysub', tuple(int), void)");
     test_assert(mysub != NULL);
 
-    mysub = eval_statement(branch, "function-name-input(@mysub, 0, 'a')");
+    mysub = branch.eval("function-name-input(@mysub, 0, 'a')");
 
     test_assert(as_function(mysub).subroutineBranch.findNamed("a") != NULL);
 }

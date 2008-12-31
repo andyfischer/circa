@@ -30,11 +30,11 @@ namespace if_statement_function {
                 "function if-statement(bool)");
         as_function(main_func).pureFunction = false;
 
-        eval_statement(kernel,
+        kernel.eval(
                 "if-statement::State = create-compound-type('if-statement::State')");
-        eval_statement(kernel,
+        kernel.eval(
                 "compound-type-append-field(@if-statement::State, Branch, 'positiveBranch')");
-        as_function(main_func).stateType = eval_statement(kernel,
+        as_function(main_func).stateType = kernel.eval(
                 "compound-type-append-field(@if-statement::State, Branch, 'negativeBranch')");
     }
 }
