@@ -70,6 +70,9 @@ public:
 
     void clear();
 
+    Term* eval(std::string const& statement);
+    Term* apply(std::string const& statement);
+
     // Hosted functions
     static void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
     static void hosted_visit_pointers(Term* caller, PointerVisitor& visitor);
