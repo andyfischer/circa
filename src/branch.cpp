@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "parser.h"
 #include "runtime.h"
 #include "ref_map.h"
 #include "term.h"
@@ -146,6 +147,18 @@ Branch::clear()
 {
     _terms.clear();
     names.clear();
+}
+
+Term*
+Branch::eval(std::string const& statement)
+{
+    return eval_statement(*this, statement);
+}
+
+Term*
+Branch::apply(std::string const& statement)
+{
+    return apply_statement(*this, statement);
 }
 
 void

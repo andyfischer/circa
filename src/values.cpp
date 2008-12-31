@@ -117,16 +117,23 @@ Term* create_value(Branch* branch, Term* type)
     return term;
 }
 
-Term* create_value(Branch* branch, Term* type, void* initialValue)
+Term* create_value(Branch* branch, Term* type, void* initialValue, std::string const& name)
 {
+    if (branch == NULL)
+        assert(name == "");
+
     Term* term = create_value(branch, type);
     assert(term->value == NULL);
     // TODO: somehow type-check initialValue
     term->value = initialValue;
+
+    if (name != "")
+        branch->bindName(term, name);
+
     return term;
 }
 
-Term* create_value(Branch* branch, std::string const& typeName, void* initialValue)
+Term* create_value(Branch* branch, std::string const& typeName, void* initialValue, std::string const& name)
 {
     Term *type = NULL;
 
@@ -139,7 +146,7 @@ Term* create_value(Branch* branch, std::string const& typeName, void* initialVal
     if (type == NULL)
         throw std::runtime_error(std::string("Couldn't find type: ")+typeName);
 
-    return create_value(branch, type, initialValue);
+    return create_value(branch, type, initialValue, name);
 }
 
 Term* string_value(Branch& branch, std::string const& s, std::string const& name)

@@ -534,7 +534,10 @@ IfStatement::createTerm(CompilationContext &context)
 
     Branch workspace;
 
-    //eval_statement(workspace, "names = get-branch-bound-names()");
+    create_value(&workspace, "Branch", &posBranch, "posBranch");
+    create_value(&workspace, "Branch", &negBranch, "negBranch");
+
+    workspace.eval("names = get-branch-bound-names()");
 
     return ifStatementTerm;
 }
