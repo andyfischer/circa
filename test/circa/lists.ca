@@ -1,0 +1,5 @@
+
+l = list(1,2)
+
+-- test list-join
+list-join(list(1,2),list(3,4)).to-string.print
