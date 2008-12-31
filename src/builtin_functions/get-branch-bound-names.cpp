@@ -12,7 +12,7 @@ namespace get_branch_bound_names_function {
     void evaluate(Term* caller)
     {
         Branch &branch = as<Branch>(caller->input(0));
-        Set &result = as<Set>(caller);
+        List &result = as<List>(caller);
         result.clear();
 
         TermNamespace::iterator it;
@@ -22,7 +22,7 @@ namespace get_branch_bound_names_function {
             Term* value = create_value(NULL, STRING_TYPE);
             as_string(value) = name;
 
-            result.add(value);
+            result.append(value);
 
             delete value;
         }
@@ -31,7 +31,7 @@ namespace get_branch_bound_names_function {
     void setup(Branch& kernel)
     {
         Term* main_func = import_c_function(kernel, evaluate,
-                "function get-branch-bound-names(Branch) -> Set");
+                "function get-branch-bound-names(Branch) -> List");
         as_function(main_func).pureFunction = true;
     }
 }

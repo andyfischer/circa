@@ -107,25 +107,25 @@ bool values_equal(Term* a, Term* b)
     return as_type(a->type).equals(a,b);
 }
 
-Term* create_value(Branch* branch, Term* type)
-{
-    assert(type != NULL);
-    Term *var_function = get_value_function(*branch, type);
-    Term *term = create_term(branch, var_function, ReferenceList());
-    alloc_value(term);
-    term->stealingOk = false;
-    return term;
-}
-
 Term* create_value(Branch* branch, Term* type, void* initialValue, std::string const& name)
 {
+    assert(type != NULL);
     if (branch == NULL)
         assert(name == "");
 
-    Term* term = create_value(branch, type);
-    assert(term->value == NULL);
+    Term *var_function = get_value_function(*branch, type);
+    Term *term = create_term(branch, var_function, ReferenceList());
+
+    if (initialValue == NULL)
+        alloc_value(term);
+    else {
+        term->value = initialValue;
+        term->ownsValue = false;
+    }
+
+    term->stealingOk = false;
+
     // TODO: somehow type-check initialValue
-    term->value = initialValue;
 
     if (name != "")
         branch->bindName(term, name);

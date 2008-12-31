@@ -10,6 +10,7 @@
 #include "function.h"
 #include "parser.h"
 #include "runtime.h"
+#include "set.h"
 #include "term.h"
 #include "token_stream.h"
 #include "type.h"
@@ -537,7 +538,12 @@ IfStatement::createTerm(CompilationContext &context)
     create_value(&workspace, "Branch", &posBranch, "posBranch");
     create_value(&workspace, "Branch", &negBranch, "negBranch");
 
-    workspace.eval("names = get-branch-bound-names()");
+    workspace.eval("names = posBranch.get-branch-bound-names");
+    workspace.eval("list-join(@names, negBranch.get-branch-bound-names)");
+
+    workspace.eval("names.to-string.print");
+
+    List& names = as<List>(workspace["names"]);
 
     return ifStatementTerm;
 }
