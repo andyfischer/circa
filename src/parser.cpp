@@ -11,15 +11,17 @@
 
 namespace circa {
 
-Term* apply_statement(Branch& branch, std::string const& input)
+Term* apply_statement(Branch* branch, std::string const& input)
 {
+    assert(branch != NULL);
+
     token_stream::TokenStream tokens(input);
 
     ast::Statement* statementAst = parser::statement(tokens);
     assert(statementAst != NULL);
 
     CompilationContext context;
-    context.push(&branch, NULL);
+    context.push(branch, NULL);
     Term* result = statementAst->createTerm(context);
     assert(result != NULL);
 
@@ -46,7 +48,7 @@ Term* apply_statement(Branch& branch, std::string const& input)
         std::vector<std::string>::iterator it;
         for (it = rebindFinder.rebindNames.begin(); it != rebindFinder.rebindNames.end(); ++it)
         {
-            branch.bindName(result, *it);
+            branch->bindName(result, *it);
         }
     }
 
@@ -55,7 +57,7 @@ Term* apply_statement(Branch& branch, std::string const& input)
     return result;
 }
 
-Term* eval_statement(Branch& branch, std::string const& input)
+Term* eval_statement(Branch* branch, std::string const& input)
 {
     Term* term = apply_statement(branch, input);
     evaluate_term(term);

@@ -143,7 +143,7 @@ void test_apply_statement()
 {
     Branch branch;
 
-    Term* result = apply_statement(branch, "something = add(5.0,3.0)");
+    Term* result = apply_statement(&branch, "something = add(5.0,3.0)");
 
     test_assert(result != NULL);
     test_assert(result->name == "something");
@@ -238,7 +238,7 @@ void rebind_operator()
     test_assert(branch.getNamed("a") == a);
     test_assert(branch.getNamed("b") == b);
 
-    Term* result = apply_statement(branch, "add(@a, b)");
+    Term* result = apply_statement(&branch, "add(@a, b)");
 
     test_assert(branch.getNamed("a") == result);
     test_assert(branch.getNamed("b") == b);
@@ -280,12 +280,12 @@ void test_eval_statement()
 {
     Branch b;
 
-    test_assert(eval_statement(b, "5")->asInt() == 5);
-    test_assert(eval_statement(b, "-2")->asInt() == -2);
-    test_assert(eval_statement(b, "1.0")->asFloat() == 1.0);
-    //test_assert(eval_statement(b, "-.123")->asFloat() == -0.123);FIXME
-    test_assert(eval_statement(b, "\"apple\"")->asString() == "apple");
-    test_assert(eval_statement(b, "\"\"")->asString() == "");
+    test_assert(eval_statement(&b, "5")->asInt() == 5);
+    test_assert(eval_statement(&b, "-2")->asInt() == -2);
+    test_assert(eval_statement(&b, "1.0")->asFloat() == 1.0);
+    //test_assert(eval_statement(&b, "-.123")->asFloat() == -0.123);FIXME
+    test_assert(eval_statement(&b, "\"apple\"")->asString() == "apple");
+    test_assert(eval_statement(&b, "\"\"")->asString() == "");
 }
 
 void comment_statement()
@@ -328,7 +328,7 @@ void test_type_decl_statement()
 void test_type_decl_full_trip()
 {
     Branch branch;
-    Term *t = eval_statement(branch, "type Mytype\n{\nstring s\nfloat a\n}");
+    Term *t = eval_statement(&branch, "type Mytype\n{\nstring s\nfloat a\n}");
 
     test_assert(!t->hasError());
 

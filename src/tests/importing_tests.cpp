@@ -25,7 +25,7 @@ void test_import_c()
     test_assert(as_function(func_as_term).outputType == INT_TYPE);
     test_assert(as_function(func_as_term).stateType == VOID_TYPE);
 
-    Term* result = eval_statement(branch, "my-imported-func(4,5)");
+    Term* result = branch.eval("my-imported-func(4,5)");
 
     test_assert(as_int(result) == 9);
 }

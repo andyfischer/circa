@@ -13,7 +13,7 @@ namespace subroutine_apply_function {
 
         Function& sub = as_function(caller);
 
-        apply_statement(sub.subroutineBranch, input);
+        sub.subroutineBranch.apply(input);
     }
 
     void setup(Branch& kernel)

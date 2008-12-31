@@ -399,13 +399,13 @@ FunctionDecl::createTerm(CompilationContext &context)
     }
 
     // Load into workspace
-    Term* inputTypesTerm = eval_statement(workspace, "inputTypes = tuple()");
+    Term* inputTypesTerm = workspace.eval("inputTypes = tuple()");
     as<ReferenceList>(inputTypesTerm) = inputTypes;
     string_value(workspace, this->header->functionName, "functionName");
     workspace.bindName(outputType, "outputType");
 
     // Create
-    Term* sub = eval_statement(workspace,
+    Term* sub = workspace.eval(
         "sub = subroutine-create(functionName, inputTypes, outputType)");
 
     // Name each input
@@ -417,7 +417,7 @@ FunctionDecl::createTerm(CompilationContext &context)
         int_value(workspace, inputIndex, "inputIndex");
         string_value(workspace, name, "name");
 
-        sub = eval_statement(workspace,
+        sub = workspace.eval(
                 "function-name-input(@sub, inputIndex, name)");
     }
 
@@ -476,13 +476,13 @@ TypeDecl::createTerm(CompilationContext &context)
 
     string_value(workspace, this->name, "typeName");
 
-    eval_statement(workspace, "t = create-compound-type(typeName)");
+    workspace.eval("t = create-compound-type(typeName)");
 
     MemberList::const_iterator it;
     for (it = members.begin(); it != members.end(); ++it) {
         //string_value(workspace, it->type, "fieldType");
         string_value(workspace, it->name, "fieldName");
-        eval_statement(workspace,
+        workspace.eval(
             std::string("compound-type-append-field(@t, "+it->type+", fieldName)"));
     }
 

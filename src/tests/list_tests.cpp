@@ -18,7 +18,7 @@ void create()
 {
     Branch branch;
 
-    Term* list1 = eval_statement(branch, "list1 = list(1, 'pie', 2.0)");
+    Term* list1 = branch.eval("list1 = list(1, 'pie', 2.0)");
 
     test_assert(list1->type == LIST_TYPE);
     test_assert(as_type(list1->type).toString != NULL);
@@ -30,8 +30,8 @@ void create()
     test_assert(list1->asList()[2]->asFloat() == 2.0);
 
     // make sure items are copied by value
-    eval_statement(branch, "a = 5")->stealingOk = false;
-    Term* list2 = eval_statement(branch, "list2 = list(a)");
+    branch.eval("a = 5")->stealingOk = false;
+    Term* list2 = branch.eval("list2 = list(a)");
     test_assert(list2->asList()[0]->asInt() == 5);
     branch["a"]->asInt() = 6;
     test_assert(list2->asList()[0]->asInt() == 5);
@@ -41,8 +41,8 @@ void operations()
 {
     Branch branch;
 
-    Term* list1 = eval_statement(branch, "list1 = list('pie')");
-    Term* list2 = eval_statement(branch, "list2 = list()");
+    Term* list1 = branch.eval("list1 = list('pie')");
+    Term* list2 = branch.eval("list2 = list()");
 
     duplicate_value(list1, list2);
 
@@ -61,7 +61,7 @@ void range()
 {
     Branch branch;
 
-    Term* range_zero_to_ten = eval_statement(branch, "range(10)");
+    Term* range_zero_to_ten = branch.eval("range(10)");
 
     test_assert(as_int(as_list(range_zero_to_ten).get(0)) == 0);
     test_assert(as_int(as_list(range_zero_to_ten).get(9)) == 9);
@@ -71,7 +71,7 @@ void list_apply()
 {
     Branch branch;
 
-    Term* result = eval_statement(branch, "list-apply(to-string, range(5))");
+    Term* result = branch.eval("list-apply(to-string, range(5))");
     
     test_assert(as_string(as_list(result).get(0)) == "0");
     test_assert(as_string(as_list(result).get(4)) == "4");

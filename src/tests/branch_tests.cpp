@@ -86,13 +86,13 @@ void test_owning_term()
 {
     Branch branch;
 
-    Term* b = eval_statement(branch, "Branch()");
+    Term* b = branch.eval("Branch()");
     alloc_value(b);
 
     test_assert(b->type == BRANCH_TYPE);
     test_assert(as_branch(b).owningTerm == b);
 
-    Term* b2 = eval_statement(branch, "Branch()");
+    Term* b2 = branch.eval("Branch()");
     steal_value(b, b2);
 
     test_assert(as_branch(b2).owningTerm == b2);
@@ -105,12 +105,12 @@ void test_owning_term()
 void find_name_in_outer_branch()
 {
     Branch branch;
-    Term* outer_branch = eval_statement(branch, "Branch()");
+    Term* outer_branch = branch.eval("Branch()");
     alloc_value(outer_branch);
 
-    Term* a = eval_statement(as_branch(outer_branch), "a = 1");
+    Term* a = as_branch(outer_branch).eval("a = 1");
 
-    Term* inner_branch = eval_statement(as_branch(outer_branch), "Branch()");
+    Term* inner_branch = as_branch(outer_branch).eval("Branch()");
     alloc_value(inner_branch);
 
     as_branch(inner_branch).outerScope = outer_branch;

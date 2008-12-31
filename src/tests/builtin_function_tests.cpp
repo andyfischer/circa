@@ -71,7 +71,7 @@ void test_string()
 {
     Branch branch;
 
-    test_assert(as_string(eval_statement(branch, "concat(\"hello \", \"world\")"))
+    test_assert(as_string(branch.eval("concat(\"hello \", \"world\")"))
             == "hello world");
 }
 
@@ -86,8 +86,8 @@ void test_bool()
 {
     Branch branch;
 
-    test_assert(as_string(eval_statement(branch, "if-expr(true, 'a', 'b')")) == "a");
-    test_assert(as_string(eval_statement(branch, "if-expr(false, 'a', 'b')")) == "b");
+    test_assert(as_string(branch.eval("if-expr(true, 'a', 'b')")) == "a");
+    test_assert(as_string(branch.eval("if-expr(false, 'a', 'b')")) == "b");
 }
 
 void test_reference()
@@ -141,7 +141,7 @@ void test_builtin_equals()
     test_assert(!eval_as<bool>("equals('hello','goodbye')"));
 
     Branch branch;
-    Term* term = eval_statement(branch, "equals(5.0, add)");
+    Term* term = branch.eval("equals(5.0, add)");
     test_assert(term->hasError());
 }
 
@@ -149,28 +149,28 @@ void test_map()
 {
     Branch branch;
 
-    eval_statement(branch, "ages = map(string, int)");
-    eval_statement(branch, "ages('Henry') := 11");
-    eval_statement(branch, "ages('Absalom') := 205");
+    branch.eval("ages = map(string, int)");
+    branch.eval("ages('Henry') := 11");
+    branch.eval("ages('Absalom') := 205");
 
-    test_assert(eval_statement(branch, "ages('Henry')")->asInt() == 11);
-    test_assert(eval_statement(branch, "ages('Absalom')")->asInt() == 205);
+    test_assert(branch.eval("ages('Henry')")->asInt() == 11);
+    test_assert(branch.eval("ages('Absalom')")->asInt() == 205);
 }
 
 void test_if_statement()
 {
     Branch branch;
 
-    Term* condition = eval_statement(branch, "cond = bool()");
-    Term* if_statement = eval_statement(branch, "if_s = if-statement(cond)");
+    Term* condition = branch.eval("cond = bool()");
+    Term* if_statement = branch.eval("if_s = if-statement(cond)");
 
     as_bool(condition) = true;
 
     Branch &positiveBranch = as_branch(if_statement->state->field(0));
     Branch &negativeBranch = as_branch(if_statement->state->field(1));
 
-    Term* posTerm = apply_statement(positiveBranch, "x = 1.0 + 1.0");
-    Term* negTerm = apply_statement(negativeBranch, "x = 1.0 + 1.0");
+    Term* posTerm = positiveBranch.apply("x = 1.0 + 1.0");
+    Term* negTerm = negativeBranch.apply("x = 1.0 + 1.0");
 
     dealloc_value(posTerm);
     dealloc_value(negTerm);
@@ -197,8 +197,8 @@ void test_alias()
 {
     Branch branch;
 
-    Term *five = eval_statement(branch, "five = 5");
-    Term *a = eval_statement(branch, "a = alias(five)");
+    Term *five = branch.eval("five = 5");
+    Term *a = branch.eval("a = alias(five)");
 
     test_assert(a);
     test_assert(as_int(a) == 5);

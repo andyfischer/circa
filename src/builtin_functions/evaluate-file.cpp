@@ -13,7 +13,7 @@ namespace evaluate_file_function {
 
         Branch workspace;
         workspace.bindName(string_value(workspace, filename), "filename");
-        std::string file_contents = as_string(eval_statement(workspace,
+        std::string file_contents = as_string(workspace.eval(
                     "read-text-file(filename)"));
 
         token_stream::TokenStream tokens(file_contents);

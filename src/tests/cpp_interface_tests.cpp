@@ -44,11 +44,11 @@ void default_function() {
 
     as_type(type1).addMemberFunction("", appendStr);
 
-    Term* hi = eval_statement(branch, "hi = Type1()");
+    Term* hi = branch.eval("hi = Type1()");
 
     as<Type1>(hi).myString = "hi";
 
-    Term* hi2u = eval_statement(branch, "hi2u = hi(\"2u\"))");
+    Term* hi2u = branch.eval("hi2u = hi(\"2u\"))");
 
     test_assert(as<Type1>(hi2u).myString == "hi2u");
 }
