@@ -32,7 +32,7 @@ struct ASTNode
 
 struct Expression : public ASTNode
 {
-    typedef std::vector<Expression*> List;
+    typedef std::vector<Expression*> Vector;
 
     Expression() { }
     virtual ~Expression() { }
@@ -191,12 +191,12 @@ struct Statement : public ASTNode
         return NULL; 
     }
 
-    typedef std::vector<Statement*> List;
+    typedef std::vector<Statement*> Vector;
 };
 
 struct StatementList
 {
-    Statement::List statements;
+    Statement::Vector statements;
 
     void push(Statement* statement);
 

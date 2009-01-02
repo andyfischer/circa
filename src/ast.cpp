@@ -9,6 +9,7 @@
 #include "cpp_interface.h"
 #include "function.h"
 #include "parser.h"
+#include "list.h"
 #include "runtime.h"
 #include "set.h"
 #include "term.h"
@@ -300,7 +301,7 @@ ExpressionStatement::createTerm(CompilationContext &context)
 
 StatementList::~StatementList()
 {
-    Statement::List::iterator it;
+    Statement::Vector::iterator it;
     for (it = statements.begin(); it != statements.end(); ++it) {
         delete (*it);
     }
@@ -317,7 +318,7 @@ StatementList::toString() const
 {
     std::stringstream output;
 
-    Statement::List::const_iterator it;
+    Statement::Vector::const_iterator it;
     for (it = statements.begin(); it != statements.end(); ++it) {
         output << (*it)->toString() << "\n";
     }
@@ -327,7 +328,7 @@ StatementList::toString() const
 void
 StatementList::createTerms(CompilationContext &context)
 {
-    Statement::List::const_iterator it;
+    Statement::Vector::const_iterator it;
     for (it = statements.begin(); it != statements.end(); ++it) {
         (*it)->createTerm(context);
     }
@@ -518,6 +519,7 @@ IfStatement::createTerm(CompilationContext &context)
 
     Branch& posBranch = as_branch(ifStatementTerm->state->field(0));
     Branch& negBranch = as_branch(ifStatementTerm->state->field(1));
+    Branch& joiningTermsBranch = as_branch(ifStatementTerm->state->field(2));
 
     context.push(&posBranch, ifStatementTerm->state->field(0));
     this->positiveBranch->createTerms(context);
@@ -541,9 +543,30 @@ IfStatement::createTerm(CompilationContext &context)
     workspace.eval("names = posBranch.get-branch-bound-names");
     workspace.eval("list-join(@names, negBranch.get-branch-bound-names)");
 
-    workspace.eval("names.to-string.print");
+    workspace.eval("list-remove-duplicates(@names)");
 
     List& names = as<List>(workspace["names"]);
+    Branch& outerBranch = context.topBranch();
+
+    // Remove any names which are not bound in the outer branch
+    for (int i=0; i < names.count(); i++) {
+        if (!outerBranch.containsName(as_string(names[i]))) {
+            names.remove(i--);
+        }
+    }
+
+    // For each name, create joining term
+    for (int i=0; i < names.count(); i++) {
+        std::string &name = as_string(names[i]);
+
+        Term* posTerm = posBranch.containsName(name) ? posBranch[name] : outerBranch.findNamed(name);
+        Term* negTerm = negBranch.containsName(name) ? negBranch[name] : outerBranch.findNamed(name);
+
+        Term* joining_term = apply_function(joiningTermsBranch,
+                "if-expr",
+                ReferenceList(conditionTerm, posTerm, negTerm));
+        outerBranch.bindName(joining_term, name);
+    }
 
     return ifStatementTerm;
 }
