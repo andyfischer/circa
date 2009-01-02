@@ -10,6 +10,7 @@ namespace if_statement_function {
     {
       Branch positiveBranch
       Branch negativeBranch
+      Branch joiningTerms
     }
     */
 
@@ -21,6 +22,8 @@ namespace if_statement_function {
             evaluate_branch(as_branch(get_field(caller->state, 0)));
         else
             evaluate_branch(as_branch(get_field(caller->state, 1)));
+
+        evaluate_branch(as_branch(get_field(caller->state, 2)));
     }
 
     void setup(Branch& kernel)
@@ -31,11 +34,11 @@ namespace if_statement_function {
         as_function(main_func).pureFunction = false;
 
         kernel.eval(
-                "if-statement::State = create-compound-type('if-statement::State')");
-        kernel.eval(
-                "compound-type-append-field(@if-statement::State, Branch, 'positiveBranch')");
-        as_function(main_func).stateType = kernel.eval(
-                "compound-type-append-field(@if-statement::State, Branch, 'negativeBranch')");
+            "if-statement::State = create-compound-type('if-statement::State')");
+        kernel.eval("compound-type-append-field(@if-statement::State, Branch, 'positiveBranch')");
+        kernel.eval("compound-type-append-field(@if-statement::State, Branch, 'negativeBranch')");
+        kernel.eval("compound-type-append-field(@if-statement::State, Branch, 'joiningTerms')");
+        as_function(main_func).stateType = kernel["if-statement::State"];
     }
 }
 }
