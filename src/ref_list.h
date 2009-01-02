@@ -119,6 +119,11 @@ public:
         }
     }
 
+    void remove(int index)
+    {
+        _items.erase(_items.begin() + index);
+    }
+
     void removeNulls()
     {
         remove(NULL);

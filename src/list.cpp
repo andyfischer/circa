@@ -38,6 +38,13 @@ List::appendSlot(Term* type)
     return newTerm;
 }
 
+void
+List::remove(int index)
+{
+    this->items.remove(index);
+    // TODO: delete the term
+}
+
 std::string List__toString(Term* caller)
 {
     std::stringstream out;

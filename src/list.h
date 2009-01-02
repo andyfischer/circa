@@ -28,6 +28,8 @@ public:
     Term* append(Term* term);
     Term* appendSlot(Term* type);
 
+    void remove(int index);
+
     void clear()
     {
         items.clear();
