@@ -5,9 +5,10 @@
 
 #include "common_headers.h"
 
+#include "dictionary.h"
 #include "ref_list.h"
 #include "ref_set.h"
-#include "dictionary.h"
+#include "term_syntax_hints.h"
 
 namespace circa {
 
@@ -57,6 +58,9 @@ struct Term
 
     // A globally unique ID
     unsigned int globalID;
+
+    // Syntax hints, used for source code reproduction
+    TermSyntaxHints syntaxHints;
 
     // A branch that contains any terms owned by this term, such as 'state' or
     // anything inside 'properties'. This may be NULL if this term doesn't have

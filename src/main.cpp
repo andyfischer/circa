@@ -93,7 +93,7 @@ int circa_main(std::vector<std::string> args)
 
     } catch (std::runtime_error const& err)
     {
-        std::cout << "Top level error:\n";
+        std::cout << "Top level exception:\n";
         std::cout << err.what() << std::endl;
     }
 
