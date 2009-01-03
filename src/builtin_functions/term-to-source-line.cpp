@@ -5,27 +5,72 @@
 namespace circa {
 namespace term_to_source_line_function {
 
+    std::string get_input_source(Term* term, int inputIndex)
+    {
+        switch (term->syntaxHints.getInputSyntax(inputIndex).style) {
+            case TermSyntaxHints::InputSyntax::BY_VALUE:
+            {
+                return term->input(inputIndex)->toString();
+            }
+            break;
+
+            case TermSyntaxHints::InputSyntax::BY_NAME:
+            {
+                return term->input(inputIndex)->name;
+            }
+            break;
+
+            case TermSyntaxHints::InputSyntax::UNKNOWN_STYLE:
+            default:
+            {
+                return "(!unknown)";
+            }
+            break;
+        }
+    }
+
     void evaluate(Term* caller)
     {
         Term* term = caller->input(0);
 
         std::stringstream result;
 
+        // add possible name binding
         if (term->name != "") {
             result << term->name << " = ";
         }
 
-        result << term->function->name << "(";
+        // add the declaration syntax
+        switch (term->syntaxHints.declarationStyle) {
+            case TermSyntaxHints::FUNCTION_CALL:
+            {
 
-        for (int i=0; i < term->numInputs(); i++) {
-            Term* input = term->input(i);
+                result << term->function->name << "(";
 
-            if (i > 0) result << ", ";
+                for (int i=0; i < term->numInputs(); i++) {
+                    if (i > 0) result << ", ";
 
-            result << input->name;
+                    result << get_input_source(term, i);
+                }
+
+                result << ")";
+
+            }
+            break;
+
+            case TermSyntaxHints::LITERAL_VALUE:
+            {
+                result << term->toString();
+            }
+            break;
+
+
+            case TermSyntaxHints::UNKNOWN_DECLARATION_STYLE:
+            {
+                result << "(!error, unknown declaration style)";
+            }
+            break;
         }
-
-        result << ")";
 
         as_string(caller) = result.str();
     }
