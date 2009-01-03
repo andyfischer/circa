@@ -62,7 +62,7 @@ int circa_main(std::vector<std::string> args)
         }
     }
 
-    //try
+    try
     {
         Branch workspace;
         string_value(workspace, args[0], "filename");
@@ -79,15 +79,22 @@ int circa_main(std::vector<std::string> args)
         else if (has_compile_errors(branch)) {
             print_compile_errors(branch, std::cout);
         } else {
-            evaluate_branch(branch);
-            print_runtime_errors(branch, std::cout);
+
+            Term* error_listener = new Term();
+
+            evaluate_branch(branch, error_listener);
+
+            if (error_listener->hasError()) {
+                std::cout << "Error occured: " << error_listener->getErrorMessage() << std::endl;
+            }
+
+            // print_runtime_errors(branch, std::cout);
         }
 
-    /*} catch (std::runtime_error const& err)
+    } catch (std::runtime_error const& err)
     {
         std::cout << "Top level error:\n";
         std::cout << err.what() << std::endl;
-        */
     }
 
 shutdown:
