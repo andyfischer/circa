@@ -200,6 +200,9 @@ FunctionCall::createTerm(CompilationContext &context)
 
     Term* result = find_and_apply_function(context, this->functionName, inputs);
     assert(result != NULL);
+
+    result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
+
     return result;
 }
 
@@ -237,6 +240,7 @@ LiteralFloat::createTerm(CompilationContext &context)
     Term* term = float_value(context.topBranch(), value);
     float mutability = hasQuestionMark ? 1.0 : 0.0;
     term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
+    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     return term;
 }
 
@@ -244,7 +248,9 @@ Term*
 LiteralInteger::createTerm(CompilationContext &context)
 {
     int value = atoi(this->text.c_str());
-    return int_value(context.topBranch(), value);
+    Term* term = int_value(context.topBranch(), value);
+    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    return term;
 }
 
 std::string

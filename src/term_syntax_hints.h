@@ -10,12 +10,34 @@ namespace circa {
 struct TermSyntaxHints
 {
     struct InputSyntax {
-        enum Style { BY_NAME, BY_VALUE };
+        enum Style {
+            UNKNOWN_STYLE=0,
+            BY_NAME,
+            BY_VALUE };
 
         Style style;
+
+        InputSyntax() : style(UNKNOWN_STYLE) {}
     };
 
+    enum DeclarationStyle {
+        UNKNOWN_DECLARATION_STYLE=0,
+        FUNCTION_CALL,
+        LITERAL_VALUE
+    };
+
+    DeclarationStyle declarationStyle;
+
     std::vector<InputSyntax> inputSyntax;
+
+    TermSyntaxHints() : declarationStyle(UNKNOWN_DECLARATION_STYLE) {}
+
+    InputSyntax getInputSyntax(unsigned int index) {
+        if (index >= inputSyntax.size())
+            return InputSyntax();
+
+        return inputSyntax[index];
+    }
 };
 
 }
