@@ -272,6 +272,14 @@ std::string get_source_of_input(Term* term, int inputIndex)
     }
 }
 
+bool should_print_term_source_line(Term* term)
+{
+    if (term->syntaxHints.declarationStyle == TermSyntaxHints::INSIDE_AN_EXPRESSION)
+        return false;
+
+    return true;
+}
+
 std::string get_term_source_line(Term* term)
 {
     std::stringstream result;

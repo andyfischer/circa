@@ -23,7 +23,8 @@ struct TermSyntaxHints
     enum DeclarationStyle {
         UNKNOWN_DECLARATION_STYLE=0,
         FUNCTION_CALL,
-        LITERAL_VALUE
+        LITERAL_VALUE,
+        INSIDE_AN_EXPRESSION
     };
 
     DeclarationStyle declarationStyle;
