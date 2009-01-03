@@ -12,7 +12,6 @@ struct List
 {
 private:
     ReferenceList items;
-    Branch branch;
 public:
 
     // Default constructor
@@ -29,12 +28,7 @@ public:
     Term* appendSlot(Term* type);
 
     void remove(int index);
-
-    void clear()
-    {
-        items.clear();
-        branch.clear();
-    }
+    void clear();
 
     ReferenceList toReferenceList() const;
 };

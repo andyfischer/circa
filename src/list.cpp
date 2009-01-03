@@ -24,7 +24,7 @@ List::List(List const& copy)
 Term*
 List::append(Term* term)
 {
-    Term* newTerm = create_value(&this->branch, term->type);
+    Term* newTerm = create_value(NULL, term->type);
     recycle_value(term, newTerm);
     this->items.append(newTerm);
     return newTerm;
@@ -33,7 +33,7 @@ List::append(Term* term)
 Term*
 List::appendSlot(Term* type)
 {
-    Term* newTerm = create_value(&this->branch, type);
+    Term* newTerm = create_value(NULL, type);
     this->items.append(newTerm);
     return newTerm;
 }
@@ -41,8 +41,16 @@ List::appendSlot(Term* type)
 void
 List::remove(int index)
 {
-    this->items.remove(index);
-    // TODO: delete the term
+    delete items[index];
+    items.remove(index);
+}
+
+void
+List::clear()
+{
+    for (unsigned int i=0; i < items.count(); i++)
+        delete items[i];
+    items.clear();
 }
 
 std::string List__toString(Term* caller)
