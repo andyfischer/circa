@@ -248,4 +248,72 @@ void print_compile_errors(Branch& branch, std::ostream& output)
     }
 }
 
+std::string get_source_of_input(Term* term, int inputIndex)
+{
+    switch (term->syntaxHints.getInputSyntax(inputIndex).style) {
+        case TermSyntaxHints::InputSyntax::BY_VALUE:
+        {
+            return term->input(inputIndex)->toString();
+        }
+        break;
+
+        case TermSyntaxHints::InputSyntax::BY_NAME:
+        {
+            return term->input(inputIndex)->name;
+        }
+        break;
+
+        case TermSyntaxHints::InputSyntax::UNKNOWN_STYLE:
+        default:
+        {
+            return "(!unknown)";
+        }
+        break;
+    }
+}
+
+std::string get_term_source_line(Term* term)
+{
+    std::stringstream result;
+
+    // add possible name binding
+    if (term->name != "") {
+        result << term->name << " = ";
+    }
+
+    // add the declaration syntax
+    switch (term->syntaxHints.declarationStyle) {
+        case TermSyntaxHints::FUNCTION_CALL:
+        {
+
+            result << term->function->name << "(";
+
+            for (int i=0; i < term->numInputs(); i++) {
+                if (i > 0) result << ", ";
+
+                result << get_source_of_input(term, i);
+            }
+
+            result << ")";
+
+        }
+        break;
+
+        case TermSyntaxHints::LITERAL_VALUE:
+        {
+            result << term->toString();
+        }
+        break;
+
+
+        case TermSyntaxHints::UNKNOWN_DECLARATION_STYLE:
+        {
+            result << "(!error, unknown declaration style)";
+        }
+        break;
+    }
+
+    return result.str();
+}
+
 } // namespace circa
