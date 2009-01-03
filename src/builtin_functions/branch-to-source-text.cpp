@@ -2,6 +2,7 @@
 
 #include "branch.h"
 #include "circa.h"
+#include "introspection.h"
 
 namespace circa {
 namespace branch_to_source_text_function {
@@ -15,11 +16,10 @@ namespace branch_to_source_text_function {
 
             Term* term = branch[i];
 
-            Branch workspace;
-            std::string source = as_string(eval_function(workspace,
-                    "term-to-source-line", ReferenceList(term)));
+            if (!should_print_term_source_line(term))
+                continue;
 
-            result << source << "\n";
+            result << get_term_source_line(term) << "\n";
         }
 
         as_string(caller) = result.str();

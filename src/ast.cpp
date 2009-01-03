@@ -21,6 +21,13 @@
 namespace circa {
 namespace ast {
 
+bool is_literal(ASTNode* node)
+{
+    return (node->typeName() == "LiteralInteger")
+        || (node->typeName() == "LiteralFloat")
+        || (node->typeName() == "LiteralString");
+}
+
 Infix::~Infix()
 {
     delete left;
@@ -195,11 +202,25 @@ FunctionCall::createTerm(CompilationContext &context)
         Argument* arg = arguments[i];
         Term* term = arg->expression->createTerm(context);
         assert(term != NULL);
+        term->syntaxHints.declarationStyle = TermSyntaxHints::INSIDE_AN_EXPRESSION;
         inputs.append(term);
     }
 
     Term* result = find_and_apply_function(context, this->functionName, inputs);
     assert(result != NULL);
+
+    for (unsigned int i=0; i < arguments.size(); i++) {
+
+        TermSyntaxHints::InputSyntax inputSyntax;
+
+        if (is_literal(arguments[i]->expression)) {
+            inputSyntax.style = TermSyntaxHints::InputSyntax::BY_VALUE;
+        } else if (arguments[i]->expression->typeName() == "Identifier") {
+            inputSyntax.style = TermSyntaxHints::InputSyntax::BY_NAME;
+        }
+
+        result->syntaxHints.inputSyntax.push_back(inputSyntax);
+    }
 
     result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
 
@@ -230,7 +251,9 @@ LiteralString::toString() const
 Term*
 LiteralString::createTerm(CompilationContext &context)
 {
-    return string_value(context.topBranch(), this->text);
+    Term* term = string_value(context.topBranch(), this->text);
+    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    return term;
 }
 
 Term*
