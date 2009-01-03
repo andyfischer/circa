@@ -1,3 +1,5 @@
+// Copyright 2008 Andrew Fischer
+
 #ifndef CIRCA_FUNCTION_INCLUDED
 #define CIRCA_FUNCTION_INCLUDED
 
