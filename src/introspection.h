@@ -16,6 +16,7 @@ void print_runtime_errors(Branch& branch, std::ostream& output);
 bool has_compile_errors(Branch& branch);
 std::vector<std::string> get_compile_errors(Branch& branch);
 void print_compile_errors(Branch& branch, std::ostream& output);
+std::string get_term_source_line(Term* term);
 
 }
 
