@@ -292,7 +292,7 @@ std::string get_term_source(Term* term)
         if (comment == "")
             return "";
         else {
-            result << "-- " << comment;
+            result << "--" << comment;
             return result.str();
         }
     }
