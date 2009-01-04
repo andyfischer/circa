@@ -13,7 +13,7 @@ struct TermSyntaxHints
         enum Style {
             UNKNOWN_STYLE=0,
             BY_NAME,
-            BY_VALUE };
+            BY_SOURCE };
 
         Style style;
 
@@ -23,15 +23,21 @@ struct TermSyntaxHints
     enum DeclarationStyle {
         UNKNOWN_DECLARATION_STYLE=0,
         FUNCTION_CALL,
-        LITERAL_VALUE,
-        INSIDE_AN_EXPRESSION
+        INFIX,
+        DOT_CONCATENATION,
+        LITERAL_VALUE
     };
 
     DeclarationStyle declarationStyle;
 
     std::vector<InputSyntax> inputSyntax;
 
-    TermSyntaxHints() : declarationStyle(UNKNOWN_DECLARATION_STYLE) {}
+    bool occursInsideAnExpression;
+
+    TermSyntaxHints() :
+        declarationStyle(UNKNOWN_DECLARATION_STYLE),
+        occursInsideAnExpression(false)
+    {}
 
     InputSyntax getInputSyntax(unsigned int index) {
         if (index >= inputSyntax.size())

@@ -52,6 +52,7 @@ Infix::createTerm(CompilationContext &context)
     // If not found, apply right term as a function
     if (this->operatorStr == ".") {
         Term* leftTerm = this->left->createTerm(context);
+        leftTerm->syntaxHints.occursInsideAnExpression = true;
 
         // Figure out the function name. Right expression might be
         // an identifier or a function call
@@ -106,6 +107,15 @@ Infix::createTerm(CompilationContext &context)
 
             context.topBranch().bindName(result, id);
         }
+
+        TermSyntaxHints::InputSyntax leftInputSyntax;
+        if (left->typeName() == "Identifier")
+            leftInputSyntax.style = TermSyntaxHints::InputSyntax::BY_NAME;
+        else 
+            leftInputSyntax.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
+
+        result->syntaxHints.inputSyntax.push_back(leftInputSyntax);
+        result->syntaxHints.declarationStyle = TermSyntaxHints::DOT_CONCATENATION;
 
         return result;
     }
@@ -202,7 +212,7 @@ FunctionCall::createTerm(CompilationContext &context)
         Argument* arg = arguments[i];
         Term* term = arg->expression->createTerm(context);
         assert(term != NULL);
-        term->syntaxHints.declarationStyle = TermSyntaxHints::INSIDE_AN_EXPRESSION;
+        term->syntaxHints.occursInsideAnExpression = true;
         inputs.append(term);
     }
 
@@ -214,7 +224,7 @@ FunctionCall::createTerm(CompilationContext &context)
         TermSyntaxHints::InputSyntax inputSyntax;
 
         if (is_literal(arguments[i]->expression)) {
-            inputSyntax.style = TermSyntaxHints::InputSyntax::BY_VALUE;
+            inputSyntax.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
         } else if (arguments[i]->expression->typeName() == "Identifier") {
             inputSyntax.style = TermSyntaxHints::InputSyntax::BY_NAME;
         }
