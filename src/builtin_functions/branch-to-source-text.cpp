@@ -19,7 +19,11 @@ namespace branch_to_source_text_function {
             if (!should_print_term_source_line(term))
                 continue;
 
-            result << get_term_source(term) << "\n";
+            result << get_term_source(term);
+
+            if (i+1 < branch.numTerms()) {
+                result << "\n";
+            }
         }
 
         as_string(caller) = result.str();
