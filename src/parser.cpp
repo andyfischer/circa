@@ -77,10 +77,10 @@ ast::StatementList* statementList(token_stream::TokenStream& tokens)
 
         possibleWhitespace(tokens);
 
-        if (tokens.nextIs(tokenizer::NEWLINE)) {
+        /*if (tokens.nextIs(tokenizer::NEWLINE)) {
             tokens.consume(tokenizer::NEWLINE);
             continue;
-        }
+        }*/
 
         if (tokens.nextIs(tokenizer::END) || tokens.nextIs(tokenizer::ELSE)) {
             break;
@@ -165,6 +165,9 @@ ast::ExpressionStatement* expressionStatement(token_stream::TokenStream& tokens)
     }
 
     statement->expression = infixExpression(tokens);
+
+    if (tokens.nextIs(tokenizer::NEWLINE))
+        tokens.consume(tokenizer::NEWLINE);
 
     return statement;
 }
