@@ -228,9 +228,10 @@ struct IgnorableStatement : public Statement
 {
     std::string text;
 
+    IgnorableStatement(std::string const& _text) : text(_text) {}
     virtual ~IgnorableStatement() { }
     virtual std::string toString() const { return text; }
-    virtual Term* createTerm(CompilationContext &context) { return NULL; }
+    virtual Term* createTerm(CompilationContext &context);
     virtual std::string typeName() const { return "IgnorableStatement"; }
     virtual int numChildren() const { return 0; }
     virtual ASTNode* getChild(int index) const { return NULL; }
