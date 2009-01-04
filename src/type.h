@@ -30,6 +30,7 @@ struct Type
     typedef void (*VisitPointersFunc)(Term* term, PointerVisitor &listener);
     typedef void (*UpdateOwner)(Term* term);
     typedef std::string (*ToStringFunc)(Term* term);
+    typedef std::string (*ToSourceStringFunc)(Term* term);
 
     struct Field {
         Term* type; // reference
@@ -55,6 +56,7 @@ struct Type
     VisitPointersFunc visitPointers;
     UpdateOwner updateOwner;
     ToStringFunc toString;
+    ToSourceStringFunc toSourceString;
     
     // Fields, applies to compound types
     FieldList fields;
@@ -76,7 +78,8 @@ struct Type
         remapPointers(NULL),
         visitPointers(NULL),
         updateOwner(NULL),
-        toString(NULL)
+        toString(NULL),
+        toSourceString(NULL)
     {
     }
 
@@ -124,7 +127,8 @@ void* alloc_from_type(Term* typeTerm);
 
 void initialize_type_type(Term* typeType);
 
-Term* resolve_possible_alias(Term* term);
+std::string to_string(Term* term);
+std::string to_source_string(Term* term);
 
 } // namespace circa
 

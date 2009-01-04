@@ -159,10 +159,26 @@ void initialize_type_type(Term* typeType)
     as_type(typeType).toString = Type::to_string;
 }
 
-Term* resolve_possible_alias(Term* term)
+std::string to_string(Term* term)
 {
-    // todo
+    Type::ToStringFunc func = as_type(term->type).toString;
 
+    if (func == NULL) {
+        throw std::runtime_error("No toString function defined");
+    } else {
+        return func(term);
+    }
+}
+
+std::string to_source_string(Term* term)
+{
+    Type::ToSourceStringFunc func = as_type(term->type).toSourceString;
+
+    if (func == NULL) {
+        throw std::runtime_error("No toSourceString function defined");
+    } else {
+        return func(term);
+    }
 }
 
 } // namespace circa
