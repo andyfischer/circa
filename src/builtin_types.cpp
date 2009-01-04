@@ -93,6 +93,11 @@ namespace primitives {
         {
             return as_string(term);
         }
+
+        std::string to_source_string(Term* term)
+        {
+            return std::string("'") + as_string(term) + "'";
+        }
     }
 
     namespace bool_t {
@@ -305,20 +310,24 @@ void initialize_builtin_types(Branch& kernel)
     STRING_TYPE = quick_create_cpp_type<std::string>(kernel, "string");
     as_type(STRING_TYPE).equals = cpp_interface::templated_equals<std::string>;
     as_type(STRING_TYPE).toString = primitives::string_t::to_string;
+    as_type(STRING_TYPE).toSourceString = primitives::string_t::to_source_string;
 
     INT_TYPE = quick_create_cpp_type<int>(kernel, "int");
     as_type(INT_TYPE).equals = cpp_interface::templated_equals<int>;
     as_type(INT_TYPE).lessThan = cpp_interface::templated_lessThan<int>;
     as_type(INT_TYPE).toString = primitives::int_t::to_string;
+    as_type(INT_TYPE).toSourceString = primitives::int_t::to_string;
 
     FLOAT_TYPE = quick_create_cpp_type<float>(kernel, "float");
     as_type(FLOAT_TYPE).equals = cpp_interface::templated_equals<float>;
     as_type(FLOAT_TYPE).lessThan = cpp_interface::templated_lessThan<float>;
     as_type(FLOAT_TYPE).toString = primitives::float_t::to_string;
+    as_type(FLOAT_TYPE).toSourceString = primitives::float_t::to_string;
 
     BOOL_TYPE = quick_create_cpp_type<bool>(kernel, "bool");
     as_type(BOOL_TYPE).equals = cpp_interface::templated_equals<bool>;
     as_type(BOOL_TYPE).toString = primitives::bool_t::to_string;
+    as_type(BOOL_TYPE).toSourceString = primitives::bool_t::to_string;
 
     ANY_TYPE = create_empty_type(kernel, "any");
     VOID_TYPE = create_empty_type(kernel, "void");

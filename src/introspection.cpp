@@ -253,7 +253,7 @@ std::string get_source_of_input(Term* term, int inputIndex)
     switch (term->syntaxHints.getInputSyntax(inputIndex).style) {
         case TermSyntaxHints::InputSyntax::BY_VALUE:
         {
-            return term->input(inputIndex)->toString();
+            return to_source_string(term->input(inputIndex));
         }
         break;
 
@@ -309,7 +309,7 @@ std::string get_term_source_line(Term* term)
 
         case TermSyntaxHints::LITERAL_VALUE:
         {
-            result << term->toString();
+            result << to_source_string(term);
         }
         break;
 
