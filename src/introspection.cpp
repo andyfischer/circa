@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "function.h"
+#include "introspection.h"
 #include "runtime.h"
 #include "term.h"
 #include "type.h"
@@ -251,9 +252,9 @@ void print_compile_errors(Branch& branch, std::ostream& output)
 std::string get_source_of_input(Term* term, int inputIndex)
 {
     switch (term->syntaxHints.getInputSyntax(inputIndex).style) {
-        case TermSyntaxHints::InputSyntax::BY_VALUE:
+        case TermSyntaxHints::InputSyntax::BY_SOURCE:
         {
-            return to_source_string(term->input(inputIndex));
+            return get_term_source(term->input(inputIndex));
         }
         break;
 
@@ -274,13 +275,13 @@ std::string get_source_of_input(Term* term, int inputIndex)
 
 bool should_print_term_source_line(Term* term)
 {
-    if (term->syntaxHints.declarationStyle == TermSyntaxHints::INSIDE_AN_EXPRESSION)
+    if (term->syntaxHints.occursInsideAnExpression)
         return false;
 
     return true;
 }
 
-std::string get_term_source_line(Term* term)
+std::string get_term_source(Term* term)
 {
     std::stringstream result;
 
@@ -303,7 +304,6 @@ std::string get_term_source_line(Term* term)
             }
 
             result << ")";
-
         }
         break;
 
@@ -319,6 +319,19 @@ std::string get_term_source_line(Term* term)
             result << "(!error, unknown declaration style)";
         }
         break;
+
+        case TermSyntaxHints::DOT_CONCATENATION:
+        {
+            result << get_source_of_input(term, 0);
+            result << ".";
+            result << term->function->name; /*<< "(";
+            for (int i=1; i < term->numInputs(); i++) {
+                if (i > 1) result << ", ";
+
+                result << get_source_of_input(term, i);
+            }
+            result << ")";*/
+        }
     }
 
     return result.str();
