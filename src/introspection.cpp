@@ -285,6 +285,18 @@ std::string get_term_source(Term* term)
 {
     std::stringstream result;
 
+    // handle special cases
+    if (term->function == COMMENT_FUNC) {
+        std::string comment = as_string(term->state->field(0));
+
+        if (comment == "")
+            return "";
+        else {
+            result << "-- " << comment;
+            return result.str();
+        }
+    }
+
     // add possible name binding
     if (term->name != "") {
         result << term->name << " = ";

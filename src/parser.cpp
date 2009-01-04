@@ -99,6 +99,7 @@ ast::Statement* statement(token_stream::TokenStream& tokens)
 
     // Check for comment line
     if (tokens.nextIs(tokenizer::DOUBLE_MINUS)) {
+        std::stringstream commentText;
         tokens.consume(tokenizer::DOUBLE_MINUS);
 
         // Throw away the rest of this line
@@ -108,17 +109,18 @@ ast::Statement* statement(token_stream::TokenStream& tokens)
                 break;
             }
 
+            commentText << tokens.next().text;
             tokens.consume();
         }
 
-        return new ast::IgnorableStatement();
+        return new ast::IgnorableStatement(commentText.str());
     }
 
     // Check for blank line
     if (tokens.nextIs(tokenizer::NEWLINE) || tokens.finished()) {
         if (tokens.nextIs(tokenizer::NEWLINE))
             tokens.consume(tokenizer::NEWLINE);
-        return new ast::IgnorableStatement();
+        return new ast::IgnorableStatement("");
     }
 
     // Check for keywords
