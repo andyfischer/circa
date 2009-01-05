@@ -20,6 +20,7 @@ struct CompilationContext
         bool insideExpression;
 
         ExpressionFrame() : insideExpression(true) {}
+        ExpressionFrame(bool _ie) : insideExpression(_ie) {}
     };
     typedef std::vector<ExpressionFrame> ExpressionFrameList;
 
@@ -41,6 +42,8 @@ struct CompilationContext
 
     void pushExpressionFrame(bool insideExpression);
     void popExpressionFrame();
+
+    bool isInsideExpression() const;
 };
 
 Term* find_and_apply_function(CompilationContext &context,
