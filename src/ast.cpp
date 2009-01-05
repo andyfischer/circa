@@ -52,7 +52,8 @@ Infix::createTerm(CompilationContext &context)
     // If not found, apply right term as a function
     if (this->operatorStr == ".") {
         Term* leftTerm = this->left->createTerm(context);
-        leftTerm->syntaxHints.occursInsideAnExpression = true;
+        if (this->left->typeName() != "Identifier")
+            leftTerm->syntaxHints.occursInsideAnExpression = true;
 
         // Figure out the function name. Right expression might be
         // an identifier or a function call
@@ -212,7 +213,10 @@ FunctionCall::createTerm(CompilationContext &context)
         Argument* arg = arguments[i];
         Term* term = arg->expression->createTerm(context);
         assert(term != NULL);
-        term->syntaxHints.occursInsideAnExpression = true;
+
+        if (arg->expression->typeName() != "Identifier")
+            term->syntaxHints.occursInsideAnExpression = true;
+
         inputs.append(term);
     }
 
@@ -334,6 +338,8 @@ ExpressionStatement::createTerm(CompilationContext &context)
     
     if (this->nameBinding != "")
         context.topBranch().bindName(term, this->nameBinding);
+
+    term->syntaxHints.occursInsideAnExpression = false;
 
     return term;
 }
