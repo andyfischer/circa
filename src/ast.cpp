@@ -122,6 +122,7 @@ Infix::createTerm(CompilationContext &context)
 
         result->syntaxHints.inputSyntax.push_back(leftInputSyntax);
         result->syntaxHints.declarationStyle = TermSyntaxHints::DOT_CONCATENATION;
+        result->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
 
         return result;
     }
@@ -161,7 +162,7 @@ Infix::createTerm(CompilationContext &context)
         return NULL; // unreachable
     }
 
-        context.pushExpressionFrame(true);
+    context.pushExpressionFrame(true);
     Term* leftTerm = this->left->createTerm(context);
     Term* rightTerm = this->right->createTerm(context);
     context.popExpressionFrame();
@@ -219,9 +220,6 @@ FunctionCall::createTerm(CompilationContext &context)
         context.popExpressionFrame();
         assert(term != NULL);
 
-        if (arg->expression->typeName() != "Identifier")
-            term->syntaxHints.occursInsideAnExpression = true;
-
         inputs.append(term);
     }
 
@@ -242,6 +240,7 @@ FunctionCall::createTerm(CompilationContext &context)
     }
 
     result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
+    result->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
 
     return result;
 }
@@ -257,6 +256,7 @@ LiteralString::createTerm(CompilationContext &context)
 {
     Term* term = string_value(context.topBranch(), this->text);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    term->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
     return term;
 }
 
@@ -268,6 +268,7 @@ LiteralFloat::createTerm(CompilationContext &context)
     float mutability = hasQuestionMark ? 1.0 : 0.0;
     term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    term->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
     return term;
 }
 
@@ -277,6 +278,7 @@ LiteralInteger::createTerm(CompilationContext &context)
     int value = atoi(this->text.c_str());
     Term* term = int_value(context.topBranch(), value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    term->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
     return term;
 }
 
@@ -342,7 +344,7 @@ ExpressionStatement::createTerm(CompilationContext &context)
         context.pendingRebind = "";
     }
 
-    term->syntaxHints.occursInsideAnExpression = false;
+    //term->syntaxHints.occursInsideAnExpression = false;
 
     return term;
 }

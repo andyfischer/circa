@@ -49,13 +49,22 @@ CompilationContext::pushScope(Branch* branch, Term* branchOwner)
 void
 CompilationContext::pushExpressionFrame(bool insideExpression)
 {
-    // todo
+    expressionStack.push_back(ExpressionFrame(insideExpression));
 }
 
 void
 CompilationContext::popExpressionFrame()
 {
-    // todo
+    expressionStack.pop_back();
+}
+
+bool
+CompilationContext::isInsideExpression() const
+{
+    if (expressionStack.empty())
+        return false;
+
+    return expressionStack.back().insideExpression;
 }
 
 void
