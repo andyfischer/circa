@@ -10,6 +10,11 @@ namespace list_get_element_function {
         List& list = as<List>(caller->input(0));
         int index = as_int(caller->input(1));
 
+        if (index >= list.count()) {
+            error_occured(caller, "list index out of bounds");
+            return;
+        }
+
         change_type(caller, list[index]->type);
         duplicate_value(list[index], caller);
     }
