@@ -16,12 +16,6 @@ namespace ast {
 
 struct Expression;
 
-struct ExpressionWalker
-{
-    virtual ~ExpressionWalker() {}
-    virtual void visit(Expression* expr) = 0;
-};
-
 struct ASTNode
 {
     virtual ~ASTNode() {}
@@ -38,7 +32,6 @@ struct Expression : public ASTNode
     virtual ~Expression() { }
     virtual std::string toString() const = 0;
     virtual Term* createTerm(CompilationContext &context) = 0;
-    virtual void walk(ExpressionWalker &walker) = 0;
     
     // for ASTNode
     virtual std::string typeName() const = 0;
@@ -59,7 +52,6 @@ struct Infix : public Expression
     ~Infix();
     virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
-    virtual void walk(ExpressionWalker &walker);
     virtual std::string typeName() const { return "Infix"; }
 
     virtual int numChildren() const { return 2; }
@@ -100,7 +92,6 @@ struct FunctionCall : public Expression
             std::string const& postWhitespace);
     virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
-    virtual void walk(ExpressionWalker &walker);
     virtual std::string typeName() const { return "FunctionCall"; }
     virtual int numChildren() const { return arguments.size(); }
     virtual ASTNode* getChild(int index) const
@@ -123,7 +114,6 @@ struct LiteralString : public Literal
     explicit LiteralString(std::string const& _text) : text(_text) { }
     virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
-    virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
     virtual std::string typeName() const { return "LiteralString"; }
     virtual int numChildren() const { return 0; }
     virtual ASTNode* getChild(int index) const { return NULL; }
@@ -139,7 +129,6 @@ struct LiteralFloat : public Literal
         return text;
     }
     virtual Term* createTerm(CompilationContext &context);
-    virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
     virtual std::string typeName() const { return "LiteralFloat"; }
     virtual int numChildren() const { return 0; }
     virtual ASTNode* getChild(int index) const { return NULL; }
@@ -155,7 +144,6 @@ struct LiteralInteger : public Literal
         return text;
     }
     virtual Term* createTerm(CompilationContext &context);
-    virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
     virtual std::string typeName() const { return "LiteralInteger"; }
     virtual int numChildren() const { return 0; }
     virtual ASTNode* getChild(int index) const { return NULL; }
@@ -169,7 +157,6 @@ struct Identifier : public Expression
     explicit Identifier(std::string const& _text) : text(_text), hasRebindOperator(false) {}
     virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
-    virtual void walk(ExpressionWalker &walker) { walker.visit(this); }
     virtual std::string typeName() const { return "Identifier"; }
     virtual int numChildren() const { return 0; }
     virtual ASTNode* getChild(int index) const { return NULL; }
