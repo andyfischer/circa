@@ -14,11 +14,11 @@ namespace circa {
 Term*
 CompilationContext::findNamed(std::string const& name) const
 {
-    assert(!stack.empty());
+    assert(!scopeStack.empty());
 
-    for (size_t i = stack.size() - 1; i >= 0; i--) {
+    for (size_t i = scopeStack.size() - 1; i >= 0; i--) {
 
-        Term* term = stack[i].branch->findNamed(name);
+        Term* term = scopeStack[i].branch->findNamed(name);
 
         if (term != NULL)
             return term;
@@ -30,26 +30,26 @@ CompilationContext::findNamed(std::string const& name) const
 CompilationContext::Scope const&
 CompilationContext::topScope() const
 {
-    return stack.back();
+    return scopeStack.back();
 }
 
 Branch&
 CompilationContext::topBranch() const
 {
-    assert(!stack.empty());
-    return *stack.back().branch;
+    assert(!scopeStack.empty());
+    return *scopeStack.back().branch;
 }
 
 void
 CompilationContext::push(Branch* branch, Term* branchOwner)
 {
-    stack.push_back(Scope(branch, branchOwner));
+    scopeStack.push_back(Scope(branch, branchOwner));
 }
 
 void
 CompilationContext::pop()
 {
-    stack.pop_back();
+    scopeStack.pop_back();
 }
 
 Term* find_and_apply_function(CompilationContext &context,
@@ -68,6 +68,14 @@ Term* find_and_apply_function(CompilationContext &context,
 
     return apply_function(context.topBranch(), function, inputs);
 }
+
+Term* create_comment(Branch& branch, std::string const& text)
+{
+    Term* result = apply_function(branch, COMMENT_FUNC, ReferenceList());
+    as_string(result->state->field(0)) = text;
+    return result;
+}
+
 
 
 } // namespace circa

@@ -347,11 +347,8 @@ ExpressionStatement::createTerm(CompilationContext &context)
 Term*
 IgnorableStatement::createTerm(CompilationContext &context)
 {
-    Term* result = apply_function(context.topBranch(), COMMENT_FUNC, ReferenceList());
-    as_string(result->state->field(0)) = this->text;
-    return result;
+    return create_comment(context.topBranch(), this->text);
 }
-
 
 StatementList::~StatementList()
 {
