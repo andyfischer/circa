@@ -11,6 +11,15 @@ int circa_main(std::vector<std::string> args)
 {
     initialize();
 
+    // load args into kernel
+    List *cl_args = new List();
+    
+    for (unsigned int i=0; i < args.size(); i++) {
+        cl_args->append(args[i]);
+    }
+
+    create_value(KERNEL, "List", cl_args, "cl-args");
+
     args.erase(args.begin());
 
     bool justPrintBranch = false;

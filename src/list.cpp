@@ -38,6 +38,15 @@ List::appendSlot(Term* type)
     return newTerm;
 }
 
+Term*
+List::append(std::string const& str)
+{
+    Term *term = create_value(NULL, STRING_TYPE);
+    as_string(term) = str;
+    items.append(term);
+    return term;
+}
+
 void
 List::remove(int index)
 {
