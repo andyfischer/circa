@@ -21,10 +21,11 @@ Term* apply_statement(Branch* branch, std::string const& input)
     assert(statementAst != NULL);
 
     CompilationContext context;
-    context.push(branch, NULL);
+    context.pushScope(branch, NULL);
     Term* result = statementAst->createTerm(context);
     assert(result != NULL);
 
+    /*
     // check for rebind operator
     struct RebindFinder : public ast::ExpressionWalker
     {
@@ -51,6 +52,7 @@ Term* apply_statement(Branch* branch, std::string const& input)
             branch->bindName(result, *it);
         }
     }
+    */
 
     delete statementAst;
 

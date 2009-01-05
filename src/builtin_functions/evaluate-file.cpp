@@ -20,9 +20,9 @@ namespace evaluate_file_function {
         ast::StatementList *statementList = parser::statementList(tokens);
 
         CompilationContext context;
-        context.push(&output, NULL);
+        context.pushScope(&output, NULL);
         statementList->createTerms(context);
-        context.pop();
+        context.popScope();
 
         delete statementList;
     }

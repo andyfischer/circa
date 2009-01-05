@@ -51,7 +51,10 @@ Infix::createTerm(CompilationContext &context)
     // special case for dot operator. Try to find a member function.
     // If not found, apply right term as a function
     if (this->operatorStr == ".") {
+        context.pushExpressionFrame(true);
         Term* leftTerm = this->left->createTerm(context);
+        context.popExpressionFrame();
+
         if (this->left->typeName() != "Identifier")
             leftTerm->syntaxHints.occursInsideAnExpression = true;
 
@@ -92,7 +95,9 @@ Infix::createTerm(CompilationContext &context)
 
             for (unsigned int i=0; i < functionCall->arguments.size(); i++) {
                 FunctionCall::Argument *arg = functionCall->arguments[i];
+                context.pushExpressionFrame(true);
                 Term *term = arg->expression->createTerm(context);
+                context.popExpressionFrame();
                 inputs.append(term);
             }
         }
@@ -123,7 +128,9 @@ Infix::createTerm(CompilationContext &context)
 
     // special case for right arrow. Apply the right term as a function
     if (this->operatorStr == "->") {
+        context.pushExpressionFrame(true);
         Term* leftTerm = this->left->createTerm(context);
+        context.popExpressionFrame();
 
         Identifier *rightIdent = dynamic_cast<Identifier*>(this->right);
 
@@ -137,8 +144,10 @@ Infix::createTerm(CompilationContext &context)
     // another special case: :=
     if (this->operatorStr == ":=") {
 
+        context.pushExpressionFrame(true);
         Term* leftTerm = this->left->createTerm(context);
         Term* rightTerm = this->right->createTerm(context);
+        context.popExpressionFrame();
 
         return apply_function(context.topBranch(), APPLY_FEEDBACK, ReferenceList(leftTerm, rightTerm));
     }
@@ -152,8 +161,10 @@ Infix::createTerm(CompilationContext &context)
         return NULL; // unreachable
     }
 
+        context.pushExpressionFrame(true);
     Term* leftTerm = this->left->createTerm(context);
     Term* rightTerm = this->right->createTerm(context);
+    context.popExpressionFrame();
     
     return apply_function(context.topBranch(), function, ReferenceList(leftTerm, rightTerm));
 }
@@ -211,7 +222,9 @@ FunctionCall::createTerm(CompilationContext &context)
 
     for (unsigned int i=0; i < arguments.size(); i++) {
         Argument* arg = arguments[i];
+        context.pushExpressionFrame(true);
         Term* term = arg->expression->createTerm(context);
+        context.popExpressionFrame();
         assert(term != NULL);
 
         if (arg->expression->typeName() != "Identifier")
@@ -308,7 +321,11 @@ Identifier::createTerm(CompilationContext &context)
         parser::syntax_error(std::string("Couldn't find identifier: ") + this->text);
     }
 
-    assert(result != NULL);
+    if (hasRebindOperator) {
+        assert(context.pendingRebind == "");
+        context.pendingRebind = this->text;
+    }
+
     return result;
 }
 
@@ -334,10 +351,19 @@ ExpressionStatement::createTerm(CompilationContext &context)
         parser::syntax_error("Renaming an identifier is not currently supported");
     }
 
+    context.pushExpressionFrame(false);
+
     Term* term = this->expression->createTerm(context);
+
+    context.popExpressionFrame();
     
     if (this->nameBinding != "")
         context.topBranch().bindName(term, this->nameBinding);
+
+    if (context.pendingRebind != "") {
+        context.topBranch().bindName(term, context.pendingRebind);
+        context.pendingRebind = "";
+    }
 
     term->syntaxHints.occursInsideAnExpression = false;
 
@@ -475,14 +501,14 @@ FunctionDecl::createTerm(CompilationContext &context)
     }
 
     // Apply every statement
-    context.push(&as_function(sub).subroutineBranch, NULL);
+    context.pushScope(&as_function(sub).subroutineBranch, NULL);
     int numStatements = this->statements->count();
     for (int statementIndex=0; statementIndex < numStatements; statementIndex++) {
         Statement* statement = this->statements->operator[](statementIndex);
 
         statement->createTerm(context);
     }
-    context.pop();
+    context.popScope();
 
     Term* outer_val = create_value(&context.topBranch(), FUNCTION_TYPE);
     steal_value(sub, outer_val);
@@ -564,7 +590,9 @@ IfStatement::createTerm(CompilationContext &context)
     assert(this->condition != NULL);
     assert(this->positiveBranch != NULL);
 
+    context.pushExpressionFrame(true);
     Term* conditionTerm = this->condition->createTerm(context);
+    context.popExpressionFrame();
 
     Term* ifStatementTerm = apply_function(context.topBranch(), "if-statement", ReferenceList(conditionTerm));
 
@@ -572,14 +600,14 @@ IfStatement::createTerm(CompilationContext &context)
     Branch& negBranch = as_branch(ifStatementTerm->state->field(1));
     Branch& joiningTermsBranch = as_branch(ifStatementTerm->state->field(2));
 
-    context.push(&posBranch, ifStatementTerm->state->field(0));
+    context.pushScope(&posBranch, ifStatementTerm->state->field(0));
     this->positiveBranch->createTerms(context);
-    context.pop();
+    context.popScope();
 
     if (this->negativeBranch != NULL) {
-        context.push(&negBranch, ifStatementTerm->state->field(1));
+        context.pushScope(&negBranch, ifStatementTerm->state->field(1));
         this->negativeBranch->createTerms(context);
-        context.pop();
+        context.popScope();
     }
 
     // Create joining terms

@@ -14,13 +14,21 @@ struct CompilationContext
         Scope() : branch(NULL), branchOwner(NULL) {}
         Scope(Branch* _b, Term* _bo) : branch(_b), branchOwner(_bo) {}
     };
-
     typedef std::vector<Scope> ScopeList;
 
+    struct ExpressionFrame {
+        bool insideExpression;
+
+        ExpressionFrame() : insideExpression(true) {}
+    };
+    typedef std::vector<ExpressionFrame> ExpressionFrameList;
+
     ScopeList scopeStack;
+    ExpressionFrameList expressionStack;
+    std::string pendingRebind;
 
     CompilationContext() {}
-    CompilationContext(Branch* root) { push(root, NULL); }
+    CompilationContext(Branch* root) { pushScope(root, NULL); }
 
     Term* findNamed(std::string const& name) const;
 
@@ -28,8 +36,11 @@ struct CompilationContext
 
     Branch& topBranch() const;
 
-    void push(Branch* branch, Term* owningTerm);
-    void pop();
+    void pushScope(Branch* branch, Term* owningTerm);
+    void popScope();
+
+    void pushExpressionFrame(bool insideExpression);
+    void popExpressionFrame();
 };
 
 Term* find_and_apply_function(CompilationContext &context,
