@@ -17,7 +17,7 @@ struct CompilationContext
 
     typedef std::vector<Scope> ScopeList;
 
-    ScopeList stack;
+    ScopeList scopeStack;
 
     CompilationContext() {}
     CompilationContext(Branch* root) { push(root, NULL); }
@@ -35,6 +35,8 @@ struct CompilationContext
 Term* find_and_apply_function(CompilationContext &context,
         std::string const& functionName,
         ReferenceList inputs);
+
+Term* create_comment(Branch& branch, std::string const& text);
 
 } // namespace circa
 
