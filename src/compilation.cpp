@@ -41,13 +41,25 @@ CompilationContext::topBranch() const
 }
 
 void
-CompilationContext::push(Branch* branch, Term* branchOwner)
+CompilationContext::pushScope(Branch* branch, Term* branchOwner)
 {
     scopeStack.push_back(Scope(branch, branchOwner));
 }
 
 void
-CompilationContext::pop()
+CompilationContext::pushExpressionFrame(bool insideExpression)
+{
+    // todo
+}
+
+void
+CompilationContext::popExpressionFrame()
+{
+    // todo
+}
+
+void
+CompilationContext::popScope()
 {
     scopeStack.pop_back();
 }
