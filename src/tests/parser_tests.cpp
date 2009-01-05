@@ -244,38 +244,6 @@ void rebind_operator()
     test_assert(branch.getNamed("b") == b);
 }
 
-void ast_walk()
-{
-    token_stream::TokenStream tokens("concat(to-string(add(1,2.0)), \"cheese\")");
-    ast::Expression* expr = parser::infixExpression(tokens);
-
-    std::vector<std::string> expected;
-    expected.push_back("concat(to-string(add(1,2.0)), \"cheese\")");
-    expected.push_back("to-string(add(1,2.0))");
-    expected.push_back("add(1,2.0)");
-    expected.push_back("1");
-    expected.push_back("2.0");
-    expected.push_back("\"cheese\"");
-
-    struct MyWalker : public ast::ExpressionWalker
-    {
-        std::vector<std::string> found;
-
-        virtual void visit(ast::Expression* expr)
-        {
-            found.push_back(expr->toString());
-        }
-    } walker;
-
-    expr->walk(walker);
-
-    for (int i=0; i < (int) expected.size(); i++) {
-        test_assert(expected[i] == walker.found[i]);
-    }
-
-    delete expr;
-}
-
 void test_eval_statement()
 {
     Branch b;
@@ -393,7 +361,6 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::function_header);
     REGISTER_TEST_CASE(parser_tests::function_decl_parse);
     REGISTER_TEST_CASE(parser_tests::rebind_operator);
-    REGISTER_TEST_CASE(parser_tests::ast_walk);
     REGISTER_TEST_CASE(parser_tests::test_eval_statement);
     REGISTER_TEST_CASE(parser_tests::comment_statement);
     REGISTER_TEST_CASE(parser_tests::test_type_decl);

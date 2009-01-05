@@ -169,14 +169,6 @@ Infix::createTerm(CompilationContext &context)
     return apply_function(context.topBranch(), function, ReferenceList(leftTerm, rightTerm));
 }
 
-void
-Infix::walk(ExpressionWalker& walker)
-{
-    walker.visit(this);
-    left->walk(walker);
-    right->walk(walker);
-}
-
 FunctionCall::~FunctionCall()
 {
     ArgumentList::iterator it;
@@ -252,21 +244,6 @@ FunctionCall::createTerm(CompilationContext &context)
     result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
 
     return result;
-}
-
-void
-FunctionCall::walk(ExpressionWalker& walker)
-{
-    walker.visit(this);
-    ArgumentList::iterator it;
-    for (it = arguments.begin(); it != arguments.end(); ++it) {
-        if (*it == NULL)
-            throw std::runtime_error("argument is null");
-        Expression* expr = (*it)->expression;
-        if (expr == NULL)
-            throw std::runtime_error("expression is null");
-        expr->walk(walker);
-    }
 }
 
 std::string
