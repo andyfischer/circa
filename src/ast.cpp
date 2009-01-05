@@ -55,9 +55,6 @@ Infix::createTerm(CompilationContext &context)
         Term* leftTerm = this->left->createTerm(context);
         context.popExpressionFrame();
 
-        if (this->left->typeName() != "Identifier")
-            leftTerm->syntaxHints.occursInsideAnExpression = true;
-
         // Figure out the function name. Right expression might be
         // an identifier or a function call
         std::string functionName;
@@ -254,32 +251,19 @@ LiteralString::toString() const
 Term*
 LiteralString::createTerm(CompilationContext &context)
 {
-    Term* term = string_value(context.topBranch(), this->text);
-    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    term->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
-    return term;
+    return create_literal_string(context, *this);
 }
 
 Term*
 LiteralFloat::createTerm(CompilationContext &context)
 {
-    float value = atof(this->text.c_str());
-    Term* term = float_value(context.topBranch(), value);
-    float mutability = hasQuestionMark ? 1.0 : 0.0;
-    term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
-    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    term->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
-    return term;
+    return create_literal_float(context, *this);
 }
 
 Term*
 LiteralInteger::createTerm(CompilationContext &context)
 {
-    int value = atoi(this->text.c_str());
-    Term* term = int_value(context.topBranch(), value);
-    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    term->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
-    return term;
+    return create_literal_integer(context, *this);
 }
 
 std::string
@@ -343,8 +327,6 @@ ExpressionStatement::createTerm(CompilationContext &context)
         context.topBranch().bindName(term, context.pendingRebind);
         context.pendingRebind = "";
     }
-
-    //term->syntaxHints.occursInsideAnExpression = false;
 
     return term;
 }
