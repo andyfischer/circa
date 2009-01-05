@@ -2,12 +2,14 @@
 
 #include "common_headers.h"
 
+#include "ast.h"
 #include "branch.h"
 #include "builtins.h"
 #include "compilation.h"
 #include "ref_list.h"
 #include "runtime.h"
 #include "term.h"
+#include "values.h"
 
 namespace circa {
 
@@ -97,6 +99,32 @@ Term* create_comment(Branch& branch, std::string const& text)
     return result;
 }
 
+Term* create_literal_string(CompilationContext &context, ast::LiteralString ast)
+{
+    Term* term = string_value(context.topBranch(), ast.text);
+    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    term->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
+    return term;
+}
 
+Term* create_literal_float(CompilationContext &context, ast::LiteralFloat& ast)
+{
+    float value = atof(ast.text.c_str());
+    Term* term = float_value(context.topBranch(), value);
+    float mutability = ast.hasQuestionMark ? 1.0 : 0.0;
+    term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
+    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    term->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
+    return term;
+}
+
+Term* create_literal_integer(CompilationContext &context, ast::LiteralInteger& ast)
+{
+    int value = atoi(ast.text.c_str());
+    Term* term = int_value(context.topBranch(), value);
+    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    term->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
+    return term;
+}
 
 } // namespace circa
