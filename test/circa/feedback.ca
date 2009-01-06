@@ -1,0 +1,8 @@
+
+simple = 1
+simple := 2
+print(concat('should be two: ', simple.to-string))
+
+x = 1.0?
+add(x, 1.0) := 4.0
+print(concat('should be three: ', x.to-string))
