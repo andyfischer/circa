@@ -1,5 +1,6 @@
 circa/assert.ca
 circa/boolean.ca
+circa/feedback.ca
 circa/if.ca
 circa/if_scoping.ca
 circa/infix.ca
