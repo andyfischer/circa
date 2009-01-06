@@ -206,4 +206,14 @@ Term* create_dot_concatenated_call(CompilationContext &context,
     return result;
 }
 
+Term* create_feedback_call(CompilationContext &context, ast::Infix& ast)
+{
+    context.pushExpressionFrame(true);
+    Term* leftTerm = ast.left->createTerm(context);
+    Term* rightTerm = ast.right->createTerm(context);
+    context.popExpressionFrame();
+
+    return apply_function(context.topBranch(), APPLY_FEEDBACK, ReferenceList(leftTerm, rightTerm));
+}
+
 } // namespace circa
