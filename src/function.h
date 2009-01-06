@@ -51,6 +51,7 @@ struct Function
 
     Function();
 
+    Term* inputType(int index);
     InputProperties& getInputProperties(unsigned int index);
     void setInputMeta(int index, bool value);
     void setInputModified(int index, bool value);

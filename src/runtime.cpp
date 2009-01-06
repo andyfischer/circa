@@ -201,11 +201,28 @@ void set_input(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 }
 
+Term* possibly_coerce_term(Branch& branch, Term* original, Term* expectedType)
+{
+    // (In the future, we will have more complicated coersion rules)
+    
+    // Ignore NULL
+    if (original == NULL)
+        return original;
+
+    // Coerce from int to float
+    if (original->type == INT_TYPE && expectedType == FLOAT_TYPE) {
+        return apply_function(branch, "int-to-float", ReferenceList(original));
+    }
+
+    return original;
+}
+
 Term* apply_function(Branch& branch, Term* function, ReferenceList const& _inputs)
 {
     // Make a local copy of _inputs
     ReferenceList inputs = _inputs;
 
+    // Evaluate this function if needed
     if (function->needsUpdate)
         evaluate_term(function);
 
@@ -233,6 +250,14 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList const& _input
 
         function = type.memberFunctions[""];
         inputs = memberFunctionInputs;
+    }
+
+    Function& functionData = as_function(function);
+
+    // Possibly coerce inputs
+    for (unsigned int i=0; i < inputs.count(); i++) {
+        inputs.setAt(i, possibly_coerce_term(branch, inputs[i],
+                functionData.inputType(i)));
     }
 
     // Attempt to re-use an existing term

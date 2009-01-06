@@ -26,6 +26,15 @@ Function::Function()
 {
 }
 
+Term*
+Function::inputType(int index)
+{
+    if (variableArgs)
+        return inputTypes[0];
+    else
+        return inputTypes[index];
+}
+
 Function::InputProperties&
 Function::getInputProperties(unsigned int index)
 {

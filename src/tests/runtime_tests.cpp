@@ -53,8 +53,8 @@ void test_find_existing_equivalent()
     Branch branch;
 
     Term* add_func = branch.eval("add");
-    Term* a = branch.eval("a = 1");
-    Term* b = branch.eval("b = 1");
+    Term* a = branch.eval("a = 1.0");
+    Term* b = branch.eval("b = 1.0");
     Term* addition = branch.eval("add(a,b)");
 
     test_assert(is_equivalent(addition, add_func, ReferenceList(a,b)));
