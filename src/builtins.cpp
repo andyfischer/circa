@@ -101,6 +101,7 @@ void bootstrap_kernel()
     //    Stores the Type object for types. This term has function const-Type
 
     KERNEL = new Branch();
+    KERNEL->permanent = true;
 
     // Create var-function-generator function
     VALUE_FUNCTION_GENERATOR = new Term();
@@ -177,12 +178,6 @@ void bootstrap_kernel()
     TYPE_TYPE->needsUpdate = false;
 }
 
-void unknown_function__evaluate(Term* caller)
-{
-    std::cout << "Warning, calling an unknown function: "
-        << as_string(caller->state) << std::endl;
-}
-
 namespace var_function {
 
     void feedback_assign(Term* caller)
@@ -243,9 +238,6 @@ void initialize_builtin_functions(Branch* kernel)
 
     assert(ADD_FUNC != NULL);
     assert(MULT_FUNC != NULL);
-
-    UNKNOWN_FUNCTION = import_c_function(*kernel, unknown_function__evaluate, "unknown-function(any) -> any");
-    as_function(UNKNOWN_FUNCTION).stateType = STRING_TYPE;
 
     VALUE_FUNCTION_FEEDBACK_ASSIGN = import_c_function(*kernel, var_function::feedback_assign, "var-function-feedback-assign(any,any)");
 
