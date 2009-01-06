@@ -51,77 +51,7 @@ Infix::createTerm(CompilationContext &context)
     // special case for dot operator. Try to find a member function.
     // If not found, apply right term as a function
     if (this->operatorStr == ".") {
-        context.pushExpressionFrame(true);
-        Term* leftTerm = this->left->createTerm(context);
-        context.popExpressionFrame();
-
-        // Figure out the function name. Right expression might be
-        // an identifier or a function call
-        std::string functionName;
-
-        if (right->typeName() == "Identifier")
-            functionName = dynamic_cast<Identifier*>(right)->text;
-        else if (right->typeName() == "FunctionCall")
-            functionName = dynamic_cast<FunctionCall*>(right)->functionName;
-        else
-            parser::syntax_error(right->typeName() + " on right side of infix dot");
-
-        Type &leftType = as_type(leftTerm->type);
-
-        // Try to find the function. Check the type's member function first.
-        Term* function = NULL;
-
-        bool memberFunctionCall = false;
-
-        if (leftType.memberFunctions.contains(functionName)) {
-            function = leftType.memberFunctions[functionName];
-            memberFunctionCall = true;
-
-        } else {
-            function = context.findNamed(functionName);
-        }
-
-        if (function == NULL)
-            parser::syntax_error(functionName + " function not found.");
-
-        // Assemble input list
-        ReferenceList inputs(leftTerm);
-
-        if (right->typeName() == "FunctionCall") {
-            FunctionCall* functionCall = dynamic_cast<FunctionCall*>(right);
-
-            for (unsigned int i=0; i < functionCall->arguments.size(); i++) {
-                FunctionCall::Argument *arg = functionCall->arguments[i];
-                context.pushExpressionFrame(true);
-                Term *term = arg->expression->createTerm(context);
-                context.popExpressionFrame();
-                inputs.append(term);
-            }
-        }
-
-        Term* result = apply_function(context.topBranch(), function, inputs);
-
-        if (memberFunctionCall
-                && (left->typeName() == "Identifier")
-                && (right->typeName() == "FunctionCall")) {
-
-            // Rebind this identifier
-            std::string id = dynamic_cast<Identifier*>(left)->text;
-
-            context.topBranch().bindName(result, id);
-        }
-
-        TermSyntaxHints::InputSyntax leftInputSyntax;
-        if (left->typeName() == "Identifier")
-            leftInputSyntax.style = TermSyntaxHints::InputSyntax::BY_NAME;
-        else 
-            leftInputSyntax.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
-
-        result->syntaxHints.inputSyntax.push_back(leftInputSyntax);
-        result->syntaxHints.declarationStyle = TermSyntaxHints::DOT_CONCATENATION;
-        result->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
-
-        return result;
+        return create_dot_concatenated_call(context, *this);
     }
 
     // special case for right arrow. Apply the right term as a function
