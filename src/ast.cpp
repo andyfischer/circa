@@ -53,22 +53,12 @@ Infix::createTerm(CompilationContext &context)
         return create_dot_concatenated_call(context, *this);
     }
 
-    // special case for right arrow. Apply the right term as a function
+    // special case for ->
     if (this->operatorStr == "->") {
-        context.pushExpressionFrame(true);
-        Term* leftTerm = this->left->createTerm(context);
-        context.popExpressionFrame();
-
-        Identifier *rightIdent = dynamic_cast<Identifier*>(this->right);
-
-        if (rightIdent == NULL) {
-            parser::syntax_error("Right side of -> must be an identifier");
-        }
-
-        return find_and_apply_function(context, rightIdent->text, ReferenceList(leftTerm));
+        return create_arrow_concatenated_call(context, *this);
     }
 
-    // another special case: :=
+    // special case for :=
     if (this->operatorStr == ":=") {
         return create_feedback_call(context, *this);
     }

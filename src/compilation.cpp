@@ -206,6 +206,21 @@ Term* create_dot_concatenated_call(CompilationContext &context,
     return result;
 }
 
+Term* create_arrow_concatenated_call(CompilationContext &context, ast::Infix& ast)
+{
+    context.pushExpressionFrame(true);
+    Term* leftTerm = ast.left->createTerm(context);
+    context.popExpressionFrame();
+
+    ast::Identifier *rightIdent = dynamic_cast<ast::Identifier*>(ast.right);
+
+    if (rightIdent == NULL) {
+        parser::syntax_error("Right side of -> must be an identifier");
+    }
+
+    return find_and_apply_function(context, rightIdent->text, ReferenceList(leftTerm));
+}
+
 Term* create_feedback_call(CompilationContext &context, ast::Infix& ast)
 {
     context.pushExpressionFrame(true);
