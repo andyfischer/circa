@@ -6,6 +6,8 @@
 namespace circa {
 
 namespace ast {
+    class FunctionCall;
+    class Infix;
     class LiteralString;
     class LiteralFloat;
     class LiteralInteger;
@@ -57,9 +59,11 @@ Term* find_and_apply_function(CompilationContext &context,
         ReferenceList inputs);
 
 Term* create_comment(Branch& branch, std::string const& text);
-Term* create_literal_string(CompilationContext &context, ast::LiteralString ast);
+Term* create_literal_string(CompilationContext &context, ast::LiteralString& ast);
 Term* create_literal_float(CompilationContext &context, ast::LiteralFloat& ast);
 Term* create_literal_integer(CompilationContext &context, ast::LiteralInteger& ast);
+Term* create_dot_concatenated_call(CompilationContext &context,
+                                   ast::Infix& ast);
 
 } // namespace circa
 

@@ -6,9 +6,11 @@
 #include "branch.h"
 #include "builtins.h"
 #include "compilation.h"
+#include "parser.h"
 #include "ref_list.h"
 #include "runtime.h"
 #include "term.h"
+#include "type.h"
 #include "values.h"
 
 namespace circa {
@@ -92,6 +94,7 @@ Term* find_and_apply_function(CompilationContext &context,
     return apply_function(context.topBranch(), function, inputs);
 }
 
+
 Term* create_comment(Branch& branch, std::string const& text)
 {
     Term* result = apply_function(branch, COMMENT_FUNC, ReferenceList());
@@ -99,7 +102,7 @@ Term* create_comment(Branch& branch, std::string const& text)
     return result;
 }
 
-Term* create_literal_string(CompilationContext &context, ast::LiteralString ast)
+Term* create_literal_string(CompilationContext &context, ast::LiteralString& ast)
 {
     Term* term = string_value(context.topBranch(), ast.text);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
@@ -125,6 +128,82 @@ Term* create_literal_integer(CompilationContext &context, ast::LiteralInteger& a
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     term->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
     return term;
+}
+
+Term* create_dot_concatenated_call(CompilationContext &context,
+                                   ast::Infix& ast)
+{
+    context.pushExpressionFrame(true);
+    Term* leftTerm = ast.left->createTerm(context);
+    context.popExpressionFrame();
+
+    // Figure out the function name. Right expression might be
+    // an identifier or a function call
+    std::string functionName;
+
+    if (ast.right->typeName() == "Identifier")
+        functionName = dynamic_cast<ast::Identifier*>(ast.right)->text;
+    else if (ast.right->typeName() == "FunctionCall")
+        functionName = dynamic_cast<ast::FunctionCall*>(ast.right)->functionName;
+    else
+        parser::syntax_error(ast.right->typeName() + " on right side of infix dot");
+
+    Type &leftType = as_type(leftTerm->type);
+
+    // Try to find the function. Check the type's member function first.
+    Term* function = NULL;
+
+    bool memberFunctionCall = false;
+
+    if (leftType.memberFunctions.contains(functionName)) {
+        function = leftType.memberFunctions[functionName];
+        memberFunctionCall = true;
+
+    } else {
+        function = context.findNamed(functionName);
+    }
+
+    if (function == NULL)
+        parser::syntax_error(functionName + " function not found.");
+
+    // Assemble input list
+    ReferenceList inputs(leftTerm);
+
+    if (ast.right->typeName() == "FunctionCall") {
+        ast::FunctionCall* functionCall = dynamic_cast<ast::FunctionCall*>(ast.right);
+
+        for (unsigned int i=0; i < functionCall->arguments.size(); i++) {
+            ast::FunctionCall::Argument *arg = functionCall->arguments[i];
+            context.pushExpressionFrame(true);
+            Term *term = arg->expression->createTerm(context);
+            context.popExpressionFrame();
+            inputs.append(term);
+        }
+    }
+
+    Term* result = apply_function(context.topBranch(), function, inputs);
+
+    if (memberFunctionCall
+            && (ast.left->typeName() == "Identifier")
+            && (ast.right->typeName() == "FunctionCall")) {
+
+        // Rebind this identifier
+        std::string id = dynamic_cast<ast::Identifier*>(ast.left)->text;
+
+        context.topBranch().bindName(result, id);
+    }
+
+    TermSyntaxHints::InputSyntax leftInputSyntax;
+    if (ast.left->typeName() == "Identifier")
+        leftInputSyntax.style = TermSyntaxHints::InputSyntax::BY_NAME;
+    else 
+        leftInputSyntax.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
+
+    result->syntaxHints.inputSyntax.push_back(leftInputSyntax);
+    result->syntaxHints.declarationStyle = TermSyntaxHints::DOT_CONCATENATION;
+    result->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
+
+    return result;
 }
 
 } // namespace circa
