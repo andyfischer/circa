@@ -83,9 +83,8 @@ Term* find_and_apply_function(CompilationContext &context,
 {
     Term* function = context.findNamed(functionName);
 
+    // If function is not found, produce an instance of unknown-function
     if (function == NULL) {
-        std::cout << "warning: function not found: " << functionName << std::endl;
-
         Term* result = apply_function(context.topBranch(), UNKNOWN_FUNCTION, inputs);
         as_string(result->state) = functionName;
         return result;
