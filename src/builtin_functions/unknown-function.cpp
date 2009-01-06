@@ -17,6 +17,8 @@ namespace unknown_function_function {
         Term* main_func = import_c_function(kernel, evaluate,
                 "function unknown(any) -> any");
         as_function(main_func).stateType = STRING_TYPE;
+        as_function(main_func).pureFunction = false;
+        as_function(main_func).hasSideEffects = true;
 
         UNKNOWN_FUNCTION = main_func;
     }
