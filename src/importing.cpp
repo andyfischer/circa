@@ -19,14 +19,14 @@ Term* import_c_function(Branch& branch, Function::EvaluateFunc evaluate, std::st
     token_stream::TokenStream tokens(headerText);
 
     ast::FunctionHeader *header = parser::functionHeader(tokens);
-    Term* result = import_c_function_manual_header(branch, evaluate, *header);
+    Term* result = import_c_function(branch, evaluate, *header);
     delete header;
     return result;
 }
 
-Term* import_c_function_manual_header(Branch& branch,
-                                      Function::EvaluateFunc evaluate,
-                                      ast::FunctionHeader &header)
+Term* import_c_function(Branch& branch,
+                        Function::EvaluateFunc evaluate,
+                        ast::FunctionHeader &header)
 {
     Term* term = create_value(&branch, FUNCTION_TYPE);
     Function& func = as_function(term);
