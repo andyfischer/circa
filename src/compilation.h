@@ -63,6 +63,7 @@ Term* create_literal_string(CompilationContext &context, ast::LiteralString& ast
 Term* create_literal_float(CompilationContext &context, ast::LiteralFloat& ast);
 Term* create_literal_integer(CompilationContext &context, ast::LiteralInteger& ast);
 Term* create_dot_concatenated_call(CompilationContext &context, ast::Infix& ast);
+Term* create_arrow_concatenated_call(CompilationContext &context, ast::Infix& ast);
 Term* create_feedback_call(CompilationContext &context, ast::Infix& ast);
 
 } // namespace circa
