@@ -1,27 +1,34 @@
-*.swp
-*.pyc
-.DS_Store
+# generated files:
+src/setup_builtin_functions.cpp
+src/register_all_tests.cpp
+
+# build results:
+build
+obj
+bin/circa
 *.o
 *.so
-*.os
 *.a
 *.dylib
 *.obj
 *.lib
 *.exe
+
+# project file artifacts:
+circa.xcodeproj/*.mode1v3
+circa.xcodeproj/*.pbxuser
+circa.1
 *.ilk
 *.exe.manifest
 *.pdb
 *.suo
 .sconsign.dblite
 
-build
-obj
-circa.xcodeproj/*.mode1v3
-circa.xcodeproj/*.pbxuser
-circa.1
+# miscellaneous
 tags
-bin/circa
-src/setup_builtin_functions.cpp
-src/register_all_tests.cpp
 scratch.ca
+x
+*.swp
+*.pyc
+.DS_Store
+*.os
