@@ -21,7 +21,7 @@ namespace comment_function {
     void setup(Branch& kernel)
     {
         Term* main_func = import_c_function(kernel, evaluate,
-                "function and(bool,bool) -> bool");
+                "function comment()");
         as_function(main_func).pureFunction = true;
 
         kernel.eval("comment::State = create-compound-type('comment::State')");
