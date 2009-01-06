@@ -85,7 +85,9 @@ Term* find_and_apply_function(CompilationContext &context,
 
     // If function is not found, produce an instance of unknown-function
     if (function == NULL) {
-        Term* result = apply_function(context.topBranch(), UNKNOWN_FUNCTION, inputs);
+        Term* result = apply_function(context.topBranch(),
+                                      UNKNOWN_FUNCTION,
+                                      inputs);
         as_string(result->state) = functionName;
         return result;
     }
