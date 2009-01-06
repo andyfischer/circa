@@ -48,8 +48,7 @@ Infix::toString() const
 Term*
 Infix::createTerm(CompilationContext &context)
 {
-    // special case for dot operator. Try to find a member function.
-    // If not found, apply right term as a function
+    // special case for dot operator.
     if (this->operatorStr == ".") {
         return create_dot_concatenated_call(context, *this);
     }
@@ -71,13 +70,7 @@ Infix::createTerm(CompilationContext &context)
 
     // another special case: :=
     if (this->operatorStr == ":=") {
-
-        context.pushExpressionFrame(true);
-        Term* leftTerm = this->left->createTerm(context);
-        Term* rightTerm = this->right->createTerm(context);
-        context.popExpressionFrame();
-
-        return apply_function(context.topBranch(), APPLY_FEEDBACK, ReferenceList(leftTerm, rightTerm));
+        return create_feedback_call(context, *this);
     }
 
     std::string functionName = getInfixFunctionName(this->operatorStr);
