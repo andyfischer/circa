@@ -20,7 +20,7 @@ CompilationContext::findNamed(std::string const& name) const
 {
     assert(!scopeStack.empty());
 
-    for (size_t i = scopeStack.size() - 1; i >= 0; i--) {
+    for (int i = (int) (scopeStack.size() - 1); i >= 0; i--) {
 
         Term* term = scopeStack[i].branch->findNamed(name);
 
