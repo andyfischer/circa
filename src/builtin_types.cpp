@@ -86,6 +86,17 @@ namespace primitives {
             strm << as_float(term);
             return strm.str();
         }
+
+        std::string to_source_string(Term* term)
+        {
+            // Figuring out how many decimal places to show is a hard problem.
+            // This will need to be revisited.
+            std::stringstream strm;
+            strm.setf(std::ios::fixed, std::ios::floatfield);
+            strm.precision(1);
+            strm << as_float(term);
+            return strm.str();
+        }
     }
 
     namespace string_t {
@@ -322,7 +333,7 @@ void initialize_builtin_types(Branch& kernel)
     as_type(FLOAT_TYPE).equals = cpp_interface::templated_equals<float>;
     as_type(FLOAT_TYPE).lessThan = cpp_interface::templated_lessThan<float>;
     as_type(FLOAT_TYPE).toString = primitives::float_t::to_string;
-    as_type(FLOAT_TYPE).toSourceString = primitives::float_t::to_string;
+    as_type(FLOAT_TYPE).toSourceString = primitives::float_t::to_source_string;
 
     BOOL_TYPE = quick_create_cpp_type<bool>(kernel, "bool");
     as_type(BOOL_TYPE).equals = cpp_interface::templated_equals<bool>;

@@ -28,7 +28,9 @@ void reproduce_source() {
     round_trip_source("b = concat('a', 'b')");
     round_trip_source("'hello'.print");
     round_trip_source("c = 'hello'.print");
-    //round_trip_source("add(1.0,2.0)");
+    round_trip_source("add(1.0, 2.0)");
+    round_trip_source("d = add(1.0, 2.0)");
+    //round_trip_source("1.0 + 2.0");
 }
 
 } // namespace introspection_tests
