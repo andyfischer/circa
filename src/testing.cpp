@@ -73,11 +73,22 @@ void _test_equals_function(float a, float b,
 {
     const int EPSILON = 0.0001;
 
-    std::stringstream msg;
-
     if (abs(a-b) > EPSILON) {
+        std::stringstream msg;
         msg << "Equality fail in " << file << ", line " << line << std::endl;
         msg << aText << " [" << a << "] != " << bText << " [" << b << "]";
+        throw std::runtime_error(msg.str());
+    }
+}
+
+void _test_equals_function(std::string a, std::string b,
+        const char* aText, const char* bText,
+        int line, const char* file)
+{
+    if (a != b) {
+        std::stringstream msg;
+        msg << "Failed assert: " << a << " != " << b;
+        msg << ", in " << file << ", line " << line << std::endl;
         throw std::runtime_error(msg.str());
     }
 }
