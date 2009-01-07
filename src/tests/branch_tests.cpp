@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "debug.h"
 #include "introspection.h"
 #include "parser.h"
 #include "runtime.h"
@@ -40,6 +41,11 @@ void test_duplicate()
     // make sure 'duplicate' uses different terms
     as_int(term1) = 8;
     test_assert(as_int(term1_duplicate) == 5);
+
+    assert(sanity_check_term(term1));
+    assert(sanity_check_term(term2));
+    assert(sanity_check_term(term1_duplicate));
+    assert(sanity_check_term(term2_duplicate));
 }
 
 void external_pointers()

@@ -154,7 +154,7 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
         branch->append(term);
 
     term->function = function;
-    function->users.add(term);
+    function->users.appendUnique(term);
 
     Function& functionData = as_function(function);
 
@@ -197,7 +197,7 @@ void set_input(Term* term, int index, Term* input)
 
     if (input != NULL) {
         assert_good_pointer(input);
-        input->users.add(term);
+        input->users.appendUnique(term);
     }
 
     if (previousInput != NULL && !is_actually_using(previousInput, term))
