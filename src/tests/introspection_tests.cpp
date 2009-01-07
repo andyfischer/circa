@@ -14,22 +14,21 @@ void simple() {
 
 }
 
-void reproduce_source() {
+void round_trip_source(std::string statement)
+{
     Branch branch;
+    Term *t = branch.apply(statement);
+    test_equals(get_term_source(t), statement);
+}
 
-    Term *a = branch.apply("a = 1");
-    test_assert(get_term_source(a) == "a = 1");
-
-    //fixme
-    //Term *b = branch.apply("b = add(1.0,2.0)");
-    //std::cout << get_term_source(b) << std::endl;
-    //test_assert(get_term_source(b) == "b = add(1.0,2.0)");
-
-    Term *b = branch.apply("b = concat('a', 'b')");
-    test_assert(get_term_source(b) == "b = concat('a', 'b')");
-
-    Term *c = branch.apply("c = 'hello'.print");
-    test_assert(get_term_source(c) == "c = 'hello'.print");
+void reproduce_source() {
+    round_trip_source("1");
+    round_trip_source("a = 1");
+    round_trip_source("concat('a', 'b')");
+    round_trip_source("b = concat('a', 'b')");
+    round_trip_source("'hello'.print");
+    round_trip_source("c = 'hello'.print");
+    //round_trip_source("add(1.0,2.0)");
 }
 
 } // namespace introspection_tests
