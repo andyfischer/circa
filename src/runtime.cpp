@@ -143,6 +143,8 @@ void error_occured(Term* errorTerm, std::string const& message)
 
 Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
 {
+    assert_good_pointer(function);
+
     if (!is_function(function))
         throw std::runtime_error("in create_term, 2nd arg to create_term must be a function");
 
@@ -152,12 +154,11 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
         branch->append(term);
 
     term->function = function;
+    function->users.add(term);
 
     Function& functionData = as_function(function);
 
     Term* outputType = functionData.outputType;
-
-    Term* stateType = functionData.stateType;
 
     if (outputType == NULL)
         throw std::runtime_error("outputType is NULL");
@@ -165,19 +166,18 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
     if (!is_type(outputType))
         throw std::runtime_error(outputType->name + " is not a type");
 
-    if (stateType != NULL && !is_type(stateType))
-        throw std::runtime_error(outputType->name + " is not a type");
-
     change_type(term, outputType);
 
     // Create state (if a state type is defined)
+    Term* stateType = functionData.stateType;
     if (stateType != NULL) {
+        if (!is_type(stateType))
+            throw std::runtime_error(outputType->name + " is not a type");
         term->state = create_value(NULL, stateType);
     }
-    else
-        term->state = NULL;
 
-    set_inputs(term, inputs);
+    for (unsigned int i=0; i < inputs.count(); i++)
+        set_input(term, i, inputs[i]);
 
     // Run the function's initialize (if it has one)
     if (functionData.initialize != NULL) {
@@ -187,18 +187,37 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
     return term;
 }
 
-void set_inputs(Term* term, ReferenceList const& inputs)
-{
-    assert_good_pointer(term);
-
-    term->inputs = inputs;
-}
-
 void set_input(Term* term, int index, Term* input)
 {
     assert_good_pointer(term);
 
+    Term* previousInput = term->inputs[index];
+
     term->inputs.setAt(index, input);
+
+    if (input != NULL) {
+        assert_good_pointer(input);
+        input->users.add(term);
+    }
+
+    if (previousInput != NULL && !is_actually_using(previousInput, term))
+        previousInput->users.remove(term);
+}
+
+bool is_actually_using(Term* user, Term* usee)
+{
+    assert_good_pointer(user);
+    assert_good_pointer(usee);
+
+    if (user->function == usee)
+        return true;
+
+    for (unsigned int i=0; i < user->inputs.count(); i++) {
+        if (user->inputs[i] == usee)
+            return true;
+    }
+
+    return false;
 }
 
 Term* possibly_coerce_term(Branch& branch, Term* original, Term* expectedType)
@@ -345,36 +364,6 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
     ReferenceMap map;
     map[original] = replacement;
     remap_pointers(term, map);
-}
-
-void assign_pointer(Term*& pointer, Term* value, Term* owner)
-{
-    assert(owner != NULL);
-
-    Term* previousValue = pointer;
-
-    if (pointer == value)
-        // noop
-        return;
-
-    pointer = value;
-
-    if (previousValue != NULL) {
-        // check to remove 'owner' from users of 'previousValue'
-        struct DoesTermPointToThis : public PointerVisitor
-        {
-            Term* target;
-            bool answer;
-            DoesTermPointToThis(Term* _target) : target(_target), answer(false) {}
-
-        };
-
-        // todo..
-    }
-
-    if (pointer != NULL) {
-        pointer->users.add(owner);
-    }
 }
 
 } // namespace circa

@@ -67,7 +67,7 @@ struct Term
     // any such terms.
     Branch* myBranch;
 
-    // Terms that are pointing to us
+    // 'users' are terms which are using us as an input or as a function.
     ReferenceSet users;
 
     Term();
