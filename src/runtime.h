@@ -4,6 +4,7 @@
 #define CIRCA_RUNTIME_INCLUDED
 
 #include "common_headers.h"
+#include "pointer_visitor.h"
 
 namespace circa {
 

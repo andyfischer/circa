@@ -64,6 +64,7 @@ Term::~Term()
     assert_good_pointer(this);
 
     delete this->state;
+    this->state = NULL;
 
     ReferenceMap nullPointerRemap;
     nullPointerRemap[this] = NULL;
