@@ -99,18 +99,6 @@ ReferenceList list_all_pointers(Term* term)
     return result;
 }
 
-bool is_using(Term* user, Term* usee)
-{
-    assert_good_pointer(user);
-    assert_good_pointer(usee);
-    if (user->inputs.contains(usee))
-        return true;
-    if (user->function == usee)
-        return true;
-
-    return false;
-}
-
 bool function_allows_term_reuse(Function &function)
 {
     if ((function.stateType != VOID_TYPE) && (function.stateType != NULL))
@@ -145,42 +133,31 @@ bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs)
     return true;
 }
 
-Term* find_equivalent(Branch &branch, Term* function, ReferenceList const& inputs)
-{
-    // This step is inefficient because we check every term in the branch.
-    // Will improve in the future.
-    for (int i=0; i < branch.numTerms(); i++) {
-        Term *term = branch[i];
-        if (is_equivalent(term, function, inputs))
-            return term;
-    }
-    return NULL;
-}
-
 Term* find_equivalent(Term* function, ReferenceList const& inputs)
 {
     if (!function_allows_term_reuse(as_function(function))) {
-        return false;
+        return NULL;
     }
 
-    Term* term = NULL;
-
-    if (function->owningBranch != NULL)
-        term = find_equivalent(*function->owningBranch, function, inputs);
-    if (term != NULL)
-        return term;
-
-    // This step is inefficient because we check the owning branch of
-    // every input, which may check some branches multiple times.
-    for (unsigned int i=0; i < inputs.count(); i++) {
-        if (inputs[i] == NULL)
+    // Check users of each input
+    for (unsigned int input_i=0; input_i < inputs.count(); input_i++) {
+        Term* input = inputs[input_i];
+        if (input == NULL)
             continue;
 
-        Branch* branch = inputs[i]->owningBranch;
-        if (branch != NULL)
-            term = find_equivalent(*branch, function, inputs);
-        if (term != NULL)
-            return term;
+        for (unsigned int user_i=0; user_i < input->users.count(); user_i++) {
+            Term* user = input->users[user_i];
+
+            if (is_equivalent(user, function, inputs))
+                return user;
+        }
+    }
+
+    // Check users of function
+    for (unsigned int i=0; i < function->users.count(); i++) {
+        Term* user = function->users[i];
+        if (is_equivalent(user, function, inputs))
+            return user;
     }
 
     return NULL;
