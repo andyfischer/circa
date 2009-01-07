@@ -1,3 +1,5 @@
+// Copyright 2008 Paul Hodge
+
 #ifndef CIRCA_TERM_LIST_INCLUDED
 #define CIRCA_TERM_LIST_INCLUDED
 
