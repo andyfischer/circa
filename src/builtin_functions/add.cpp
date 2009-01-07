@@ -16,17 +16,30 @@ namespace add_function {
         Term* desired = caller->input(1);
         Branch& myBranch = as_branch(caller->state);
         myBranch.clear();
-    
-        // for now, send 1/n of the delta to each input
-        float delta = as_float(desired) - as_float(target);
-    
+
         int numInputs = target->inputs.count();
-    
+
         if (numInputs == 0)
             return;
+
+        // find the total of input mutability
+        float totalInputMutability = 0.0;
+        for (int i=0; i < numInputs; i++) {
+            totalInputMutability += as_float(target->input(i)->property("mutability"));
+        }
+
+        if (totalInputMutability == 0.0) {
+            error_occured(caller, "no inputs are mutable");
+            return;
+        }
+    
+        float total_delta = as_float(desired) - as_float(target);
+    
     
         for (int i=0; i < numInputs; i++) {
-            float inputDelta = delta / numInputs;
+            float mutability = as_float(target->input(i)->property("mutability"));
+
+            float inputDelta = total_delta * mutability / totalInputMutability;
     
             Term* input = target->inputs[i];
     
@@ -36,6 +49,7 @@ namespace add_function {
     
         evaluate_branch(myBranch);
     }
+
     void setup(Branch& kernel)
     {
         Term* main_func = import_c_function(kernel, evaluate,
