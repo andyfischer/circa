@@ -63,21 +63,7 @@ Infix::createTerm(CompilationContext &context)
         return create_feedback_call(context, *this);
     }
 
-    std::string functionName = getInfixFunctionName(this->operatorStr);
-
-    Term* function = context.findNamed(functionName);
-
-    if (function == NULL) {
-        parser::syntax_error(std::string("couldn't find function: ") + functionName);
-        return NULL; // unreachable
-    }
-
-    context.pushExpressionFrame(true);
-    Term* leftTerm = this->left->createTerm(context);
-    Term* rightTerm = this->right->createTerm(context);
-    context.popExpressionFrame();
-    
-    return apply_function(context.topBranch(), function, ReferenceList(leftTerm, rightTerm));
+    return create_infix_call(context, *this);
 }
 
 FunctionCall::~FunctionCall()

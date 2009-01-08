@@ -12,6 +12,7 @@
 #include "term.h"
 #include "type.h"
 #include "values.h"
+#include "wrappers.h"
 
 namespace circa {
 
@@ -230,6 +231,29 @@ Term* create_feedback_call(CompilationContext &context, ast::Infix& ast)
     context.popExpressionFrame();
 
     return apply_function(context.topBranch(), APPLY_FEEDBACK, ReferenceList(leftTerm, rightTerm));
+}
+
+Term* create_infix_call(CompilationContext &context, ast::Infix& ast)
+{
+    std::string functionName = getInfixFunctionName(ast.operatorStr);
+
+    Term* function = context.findNamed(functionName);
+
+    if (function == NULL) {
+        parser::syntax_error(std::string("couldn't find function: ") + functionName);
+        return NULL; // unreachable
+    }
+
+    context.pushExpressionFrame(true);
+    Term* leftTerm = ast.left->createTerm(context);
+    Term* rightTerm = ast.right->createTerm(context);
+    context.popExpressionFrame();
+    
+    Term* result = apply_function(context.topBranch(), function, ReferenceList(leftTerm, rightTerm));
+
+    result->syntaxHints.declarationStyle = TermSyntaxHints::INFIX;
+
+    return result;
 }
 
 } // namespace circa
