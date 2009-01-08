@@ -26,6 +26,9 @@ void reproduce_source() {
     round_trip_source("d = add(1.0, 2.0)");
     round_trip_source("1.0 + 2.0");
     round_trip_source("blah = 1.0 + 2.0");
+    round_trip_source("complex = 1.0 + 2.0 + 3.0");
+    //round_trip_source("complex = (4.0 + 3.0) + 2.0");
+    round_trip_source("coersion = 1 + 2");
 }
 
 } // namespace introspection_tests

@@ -230,7 +230,7 @@ Term* possibly_coerce_term(Branch& branch, Term* original, Term* expectedType)
 
     // Coerce from int to float
     if (original->type == INT_TYPE && expectedType == FLOAT_TYPE) {
-        return apply_function(branch, "int-to-float", ReferenceList(original));
+        return apply_function(branch, INT_TO_FLOAT_FUNC, ReferenceList(original));
     }
 
     return original;
