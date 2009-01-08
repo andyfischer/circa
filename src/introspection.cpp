@@ -269,6 +269,8 @@ std::string get_term_source(Term* term)
 {
     std::stringstream result;
 
+    result << term->syntaxHints.precedingWhitespace;
+
     // handle special cases
     if (term->function == COMMENT_FUNC) {
         std::string comment = as_string(term->state->field(0));
@@ -309,13 +311,6 @@ std::string get_term_source(Term* term)
         }
         break;
 
-
-        case TermSyntaxHints::UNKNOWN_DECLARATION_STYLE:
-        {
-            result << "(!error, unknown declaration style)";
-        }
-        break;
-
         case TermSyntaxHints::DOT_CONCATENATION:
         {
             result << get_source_of_input(term, 0);
@@ -331,7 +326,15 @@ std::string get_term_source(Term* term)
             result << get_source_of_input(term, 1);
         }
         break;
+
+        case TermSyntaxHints::UNKNOWN_DECLARATION_STYLE:
+        {
+            result << "(!error, unknown declaration style)";
+        }
+        break;
     }
+
+    result << term->syntaxHints.followingWhitespace;
 
     return result.str();
 }

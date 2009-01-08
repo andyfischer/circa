@@ -67,8 +67,9 @@ ast::StatementList* statementList(token_stream::TokenStream& tokens)
 
 ast::Statement* statement(token_stream::TokenStream& tokens)
 {
-    // toss leading whitespace
-    possibleWhitespace(tokens);
+    std::string precedingWhitespace = possibleWhitespace(tokens);
+
+    ast::Statement* result = NULL;
 
     // Check for comment line
     if (tokens.nextIs(tokenizer::DOUBLE_MINUS)) {
@@ -86,30 +87,36 @@ ast::Statement* statement(token_stream::TokenStream& tokens)
             tokens.consume();
         }
 
-        return new ast::IgnorableStatement(commentText.str());
+        result = new ast::IgnorableStatement(commentText.str());
     }
 
     // Check for blank line
-    if (tokens.nextIs(tokenizer::NEWLINE) || tokens.finished()) {
+    else if (tokens.nextIs(tokenizer::NEWLINE) || tokens.finished()) {
         if (tokens.nextIs(tokenizer::NEWLINE))
             tokens.consume(tokenizer::NEWLINE);
-        return new ast::IgnorableStatement("");
+        result = new ast::IgnorableStatement("");
     }
 
     // Check for keywords
-    if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.next().text == "function") {
-        return functionDecl(tokens);
+    else if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.next().text == "function") {
+        result = functionDecl(tokens);
     }
 
-    if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.next().text == "type") {
-        return typeDecl(tokens);
+    else if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.next().text == "type") {
+        result = typeDecl(tokens);
     }
 
-    if (tokens.nextIs(tokenizer::IF)) {
-        return ifStatement(tokens);
+    else if (tokens.nextIs(tokenizer::IF)) {
+        result = ifStatement(tokens);
     }
 
-    return expressionStatement(tokens);
+    else {
+        result = expressionStatement(tokens);
+    }
+
+    result->precedingWhitespace = precedingWhitespace;
+
+    return result;
 }
 
 ast::ExpressionStatement* expressionStatement(token_stream::TokenStream& tokens)
