@@ -8,12 +8,6 @@
 namespace circa {
 namespace introspection_tests {
 
-void simple() {
-
-    // print_branch_extended(*KERNEL, std::cout);
-
-}
-
 void round_trip_source(std::string statement)
 {
     Branch branch;
@@ -30,14 +24,14 @@ void reproduce_source() {
     round_trip_source("c = 'hello'.print");
     round_trip_source("add(1.0, 2.0)");
     round_trip_source("d = add(1.0, 2.0)");
-    //round_trip_source("1.0 + 2.0");
+    round_trip_source("1.0 + 2.0");
+    round_trip_source("blah = 1.0 + 2.0");
 }
 
 } // namespace introspection_tests
 
 void register_introspection_tests()
 {
-    REGISTER_TEST_CASE(introspection_tests::simple);
     REGISTER_TEST_CASE(introspection_tests::reproduce_source);
 }
 
