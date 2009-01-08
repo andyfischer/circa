@@ -189,6 +189,8 @@ ExpressionStatement::createTerm(CompilationContext &context)
         context.pendingRebind = "";
     }
 
+    term->syntaxHints.precedingWhitespace = this->precedingWhitespace;
+
     return term;
 }
 

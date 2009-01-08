@@ -164,6 +164,7 @@ struct Identifier : public Expression
 
 struct Statement : public ASTNode
 {
+    std::string precedingWhitespace;
     Expression* expression;
 
     Statement() : expression(NULL) {}

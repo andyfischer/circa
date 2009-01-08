@@ -33,6 +33,8 @@ struct TermSyntaxHints
     std::vector<InputSyntax> inputSyntax;
     bool occursInsideAnExpression;
     std::string functionName;
+    std::string precedingWhitespace;
+    std::string followingWhitespace;
 
     TermSyntaxHints() :
         declarationStyle(UNKNOWN_DECLARATION_STYLE),
