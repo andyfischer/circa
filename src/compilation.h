@@ -66,6 +66,7 @@ Term* create_dot_concatenated_call(CompilationContext &context, ast::Infix& ast)
 Term* create_arrow_concatenated_call(CompilationContext &context, ast::Infix& ast);
 Term* create_feedback_call(CompilationContext &context, ast::Infix& ast);
 Term* create_infix_call(CompilationContext &context, ast::Infix& ast);
+Term* create_function_call(CompilationContext &context, ast::FunctionCall& ast);
 
 } // namespace circa
 

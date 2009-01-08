@@ -21,13 +21,6 @@
 namespace circa {
 namespace ast {
 
-bool is_literal(ASTNode* node)
-{
-    return (node->typeName() == "LiteralInteger")
-        || (node->typeName() == "LiteralFloat")
-        || (node->typeName() == "LiteralString");
-}
-
 Infix::~Infix()
 {
     delete left;
@@ -107,38 +100,7 @@ FunctionCall::toString() const
 Term*
 FunctionCall::createTerm(CompilationContext &context)
 {
-    ReferenceList inputs;
-
-    for (unsigned int i=0; i < arguments.size(); i++) {
-        Argument* arg = arguments[i];
-        context.pushExpressionFrame(true);
-        Term* term = arg->expression->createTerm(context);
-        context.popExpressionFrame();
-        assert(term != NULL);
-
-        inputs.append(term);
-    }
-
-    Term* result = find_and_apply_function(context, this->functionName, inputs);
-    assert(result != NULL);
-
-    for (unsigned int i=0; i < arguments.size(); i++) {
-
-        TermSyntaxHints::InputSyntax inputSyntax;
-
-        if (is_literal(arguments[i]->expression)) {
-            inputSyntax.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
-        } else if (arguments[i]->expression->typeName() == "Identifier") {
-            inputSyntax.style = TermSyntaxHints::InputSyntax::BY_NAME;
-        }
-
-        result->syntaxHints.inputSyntax.push_back(inputSyntax);
-    }
-
-    result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
-    result->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
-
-    return result;
+    return create_function_call(context, *this);
 }
 
 std::string
