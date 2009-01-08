@@ -313,14 +313,17 @@ std::string get_term_source(Term* term)
         {
             result << get_source_of_input(term, 0);
             result << ".";
-            result << term->function->name; /*<< "(";
-            for (int i=1; i < term->numInputs(); i++) {
-                if (i > 1) result << ", ";
-
-                result << get_source_of_input(term, i);
-            }
-            result << ")";*/
+            result << term->function->name;
         }
+        break;
+
+        case TermSyntaxHints::INFIX:
+        {
+            result << get_source_of_input(term, 0) << " ";
+            result << term->syntaxHints.functionName << " ";
+            result << get_source_of_input(term, 1);
+        }
+        break;
     }
 
     return result.str();

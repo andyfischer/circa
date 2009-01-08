@@ -28,11 +28,11 @@ struct TermSyntaxHints
         LITERAL_VALUE
     };
 
+    // Members:
     DeclarationStyle declarationStyle;
-
     std::vector<InputSyntax> inputSyntax;
-
     bool occursInsideAnExpression;
+    std::string functionName;
 
     TermSyntaxHints() :
         declarationStyle(UNKNOWN_DECLARATION_STYLE),
@@ -44,6 +44,16 @@ struct TermSyntaxHints
             return InputSyntax();
 
         return inputSyntax[index];
+    }
+
+    void setInputSyntax(unsigned int index, InputSyntax const& syntax)
+    {
+        assert(index < 1000);
+
+        while (index >= inputSyntax.size())
+            inputSyntax.push_back(InputSyntax());
+
+        inputSyntax[index] = syntax;
     }
 };
 

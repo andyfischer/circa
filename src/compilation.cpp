@@ -233,6 +233,18 @@ Term* create_feedback_call(CompilationContext &context, ast::Infix& ast)
     return apply_function(context.topBranch(), APPLY_FEEDBACK, ReferenceList(leftTerm, rightTerm));
 }
 
+TermSyntaxHints::InputSyntax get_input_syntax(ast::ASTNode* node)
+{
+    TermSyntaxHints::InputSyntax result;
+
+    if (node->typeName() == "Identifier")
+        result.style = TermSyntaxHints::InputSyntax::BY_NAME;
+    else
+        result.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
+
+    return result;
+}
+
 Term* create_infix_call(CompilationContext &context, ast::Infix& ast)
 {
     std::string functionName = getInfixFunctionName(ast.operatorStr);
@@ -251,7 +263,10 @@ Term* create_infix_call(CompilationContext &context, ast::Infix& ast)
     
     Term* result = apply_function(context.topBranch(), function, ReferenceList(leftTerm, rightTerm));
 
+    result->syntaxHints.setInputSyntax(0, get_input_syntax(ast.left));
+    result->syntaxHints.setInputSyntax(1, get_input_syntax(ast.right));
     result->syntaxHints.declarationStyle = TermSyntaxHints::INFIX;
+    result->syntaxHints.functionName = ast.operatorStr;
 
     return result;
 }
