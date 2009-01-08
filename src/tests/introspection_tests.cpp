@@ -32,6 +32,9 @@ void reproduce_source() {
 
     // whitespace tests
     round_trip_source("   1");
+    round_trip_source("   5 + 4");
+    round_trip_source("   concat('a', 'b')");
+    round_trip_source("   'hey'.print");
 }
 
 } // namespace introspection_tests
