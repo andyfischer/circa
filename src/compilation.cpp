@@ -256,4 +256,47 @@ Term* create_infix_call(CompilationContext &context, ast::Infix& ast)
     return result;
 }
 
+bool is_literal(ast::ASTNode* node)
+{
+    return (node->typeName() == "LiteralInteger")
+        || (node->typeName() == "LiteralFloat")
+        || (node->typeName() == "LiteralString");
+}
+
+Term* create_function_call(CompilationContext &context, ast::FunctionCall& ast)
+{
+    ReferenceList inputs;
+
+    for (unsigned int i=0; i < ast.arguments.size(); i++) {
+        ast::FunctionCall::Argument* arg = ast.arguments[i];
+        context.pushExpressionFrame(true);
+        Term* term = arg->expression->createTerm(context);
+        context.popExpressionFrame();
+        assert(term != NULL);
+
+        inputs.append(term);
+    }
+
+    Term* result = find_and_apply_function(context, ast.functionName, inputs);
+    assert(result != NULL);
+
+    for (unsigned int i=0; i < ast.arguments.size(); i++) {
+
+        TermSyntaxHints::InputSyntax inputSyntax;
+
+        if (is_literal(ast.arguments[i]->expression)) {
+            inputSyntax.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
+        } else if (ast.arguments[i]->expression->typeName() == "Identifier") {
+            inputSyntax.style = TermSyntaxHints::InputSyntax::BY_NAME;
+        }
+
+        result->syntaxHints.inputSyntax.push_back(inputSyntax);
+    }
+
+    result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
+    result->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
+
+    return result;
+}
+
 } // namespace circa
