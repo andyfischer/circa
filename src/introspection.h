@@ -6,8 +6,8 @@
 namespace circa {
 
 std::string get_short_local_name(Term* term);
-void print_term_extended(Term* term, std::ostream &output);
-void print_branch_extended(Branch& branch, std::ostream &output);
+void print_raw_term(Term* term, std::ostream &output);
+void print_raw_branch(Branch& branch, std::ostream &output);
 ReferenceList list_all_pointers(Term* term);
 void print_terms(ReferenceList const& list, std::ostream &output);
 bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs);

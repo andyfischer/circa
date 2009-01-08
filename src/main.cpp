@@ -78,7 +78,7 @@ int circa_main(std::vector<std::string> args)
         Branch& branch = as_branch(workspace.eval("evaluate-file(filename)"));
 
         if (justPrintBranch) {
-            print_branch_extended(branch, std::cout);
+            print_raw_branch(branch, std::cout);
         }
 
         else if (justPrintSource) {

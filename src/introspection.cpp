@@ -23,7 +23,7 @@ std::string get_short_local_name(Term* term)
     return stream.str();
 }
 
-void print_term_extended(Term* term, std::ostream &output)
+void print_raw_term(Term* term, std::ostream &output)
 {
     if (term == NULL) {
         output << "<NULL>";
@@ -62,19 +62,19 @@ void print_term_extended(Term* term, std::ostream &output)
     output << std::endl;
 }
 
-void print_branch_extended(Branch& branch, std::ostream &output)
+void print_raw_branch(Branch& branch, std::ostream &output)
 {
     for (int i=0; i < branch.numTerms(); i++) {
         Term* term = branch[i];
 
-        print_term_extended(term, output);
+        print_raw_term(term, output);
     }
 }
 
 void print_terms(ReferenceList const& list, std::ostream &output)
 {
     for (unsigned int i=0; i < list.count(); i++) {
-        print_term_extended(list[i], output);
+        print_raw_term(list[i], output);
     }
 }
 
