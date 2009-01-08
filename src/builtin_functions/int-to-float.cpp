@@ -17,6 +17,8 @@ namespace int_to_float_function {
         Term* main_func = import_c_function(kernel, evaluate,
                 "function int-to-float(int) -> float");
         as_function(main_func).pureFunction = true;
+
+        INT_TO_FLOAT_FUNC = main_func;
     }
 }
 }

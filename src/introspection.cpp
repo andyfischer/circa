@@ -228,16 +228,23 @@ void print_compile_errors(Branch& branch, std::ostream& output)
 
 std::string get_source_of_input(Term* term, int inputIndex)
 {
+    Term* input = term->input(inputIndex);
+
+    // Special case: ignore functions that were inserted by coersion
+    if (input->function == INT_TO_FLOAT_FUNC) {
+        input = input->input(0);
+    }
+
     switch (term->syntaxHints.getInputSyntax(inputIndex).style) {
         case TermSyntaxHints::InputSyntax::BY_SOURCE:
         {
-            return get_term_source(term->input(inputIndex));
+            return get_term_source(input);
         }
         break;
 
         case TermSyntaxHints::InputSyntax::BY_NAME:
         {
-            return term->input(inputIndex)->name;
+            return input->name;
         }
         break;
 

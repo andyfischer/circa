@@ -56,6 +56,7 @@ Term* ADD_FUNC = NULL;
 Term* MULT_FUNC = NULL;
 Term* ALIAS_FUNC = NULL;
 Term* COMMENT_FUNC = NULL;
+Term* INT_TO_FLOAT_FUNC = NULL;
 
 void empty_evaluate_function(Term*) { }
 void empty_alloc_function(Term*) { }
