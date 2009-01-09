@@ -37,41 +37,80 @@ def create_mac_env(releaseBuild):
 RELEASE_BUILD = False
 SOURCE_DIRECTORY = "src"
 
-env = create_mac_env(RELEASE_BUILD)
-env.Append(CPPDEFINES = ["_DEBUG"])
-env.Append(CPPDEFINES = ["DEBUG"])
+ENV = create_mac_env(RELEASE_BUILD)
+ENV.Append(CPPDEFINES = ["_DEBUG"])
+ENV.Append(CPPDEFINES = ["DEBUG"])
 
-env.BuildDir('build', 'src')
-env.Append(CPPPATH = ['src'])
+ENV.BuildDir('build/src', 'src',duplicate=0)
+ENV.Append(CPPPATH = ['src'])
+
+if not os.path.exists('build'):
+    os.mkdir('build')
 
 # Precompiled header support
-# env.Prepend(CPPPATH=['.'])
-# env['Gch'] = env.Gch('common_headers.hpp')[0]
-# env['GchSh'] = env.GchSh('src/common_headers.h')[0]
+# ENV.Prepend(CPPPATH=['.'])
+# ENV['Gch'] = ENV.Gch('common_headers.hpp')[0]
+# ENV['GchSh'] = ENV.GchSh('src/common_headers.h')[0]
+
+def write_text_file(path, contents):
+    f = open(path, 'w')
+    f.write(contents)
+    f.close()
+
+BUILD_FILES = []
+
+def source_directory(dir, excludes=[]):
+    for path in os.listdir(dir):
+        full_path = os.path.join(dir,path)
+        if not os.path.isfile(full_path): continue
+        if path in excludes: continue
+        if not path.endswith('.cpp'): continue
+
+        global BUILD_FILES
+        full_path = full_path.replace("src","build/src")
+        BUILD_FILES.append(full_path)
+
+
+def source_directory_into_one_cpp(dir, name):
+    generated_cpp = []
+    generated_filename = 'build/'+name+'.cpp'
+    for path in os.listdir(dir):
+        full_path = os.path.join(dir,path)
+        if not os.path.isfile(full_path):
+            continue
+
+        generated_cpp.append("#include \"../" + full_path + "\"")
+
+    generated_cpp = "\n".join(generated_cpp)
+    write_text_file(generated_filename, generated_cpp)
+
+    global BUILD_FILES
+    BUILD_FILES.append(generated_filename)
+
+source_directory('src', excludes=['test_program.cpp', 'main.cpp'])
+source_directory_into_one_cpp('src/tests', 'all_tests')
+source_directory_into_one_cpp('src/builtin_functions', 'all_builtin_functions')
 
 # Find source files
-excludeFromLibrary = ['test_program.cpp', 'main.cpp']
-buildFiles = []
-for (dirpath, dirnames, filenames) in os.walk('src'):
-    for file in filenames:
-        if file in excludeFromLibrary:
-            continue
-#if 'builtin_functions' in dirnames:
-#dirnames.remove('builtin_functions')
-        fullpath = os.path.join(dirpath, file)
-        fullpath = fullpath.replace("src","build")
-
-        if fullpath.endswith('.cpp'):
-            buildFiles.append(fullpath)
+#excludeFromLibrary = ['test_program.cpp', 'main.cpp']
+#for (dirpath, dirnames, filenames) in os.walk('src'):
+#    for file in filenames:
+#        if file in excludeFromLibrary:
+#            continue
+#        fullpath = os.path.join(dirpath, file)
+#        fullpath = fullpath.replace("src","build")
+#
+#        if fullpath.endswith('.cpp'):
+#            BUILD_FILES.append(fullpath)
 
 
     
-circa_so = env.StaticLibrary('lib/circa', buildFiles)
-circa_dl = env.SharedLibrary('bin/circa', buildFiles)
+circa_so = ENV.StaticLibrary('lib/circa', BUILD_FILES)
+circa_dl = ENV.SharedLibrary('bin/circa', BUILD_FILES)
 
-circaBinary = env.Program('bin/circa', 'build/main.cpp', LIBS=[circa_so])
+circaBinary = ENV.Program('bin/circa', 'build/src/main.cpp', LIBS=[circa_so])
 
-env.SetOption('num_jobs', 2)
+ENV.SetOption('num_jobs', 2)
 
-env.Default(circaBinary)
+ENV.Default(circaBinary)
 
