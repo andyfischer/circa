@@ -131,6 +131,21 @@ void test_runtime_type_error()
     test_assert(term->hasError());
 }
 
+void test_recycle_with_multiple_users()
+{
+    Branch branch;
+    Term* a = branch.apply("a = if-expr(true, 1, 2)");
+    Term* x = branch.apply("x = if-expr(true, a, 3)");
+    Term* y = branch.apply("y = if-expr(true, a, 3)");
+
+    evaluate_branch(branch);
+
+    test_assert(a->users.count() == 2);
+    test_assert(as_int(a) == 1);
+    test_assert(as_int(x) == 1);
+    test_assert(as_int(y) == 1);
+}
+
 } // namespace runtime_tests
 
 void register_runtime_tests()
@@ -143,6 +158,7 @@ void register_runtime_tests()
     REGISTER_TEST_CASE(runtime_tests::null_input_errors);
     REGISTER_TEST_CASE(runtime_tests::test_eval_as);
     REGISTER_TEST_CASE(runtime_tests::test_runtime_type_error);
+    REGISTER_TEST_CASE(runtime_tests::test_recycle_with_multiple_users);
 }
 
 } // namespace circa

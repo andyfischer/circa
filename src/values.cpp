@@ -38,17 +38,18 @@ void recycle_value(Term* source, Term* dest)
 {
     assert_type(source, dest->type);
 
-    // Only steal if the term says it's OK
-    bool steal = source->stealingOk;
+    // Usually don't steal. Later, as an optimization, we will sometimes steal.
+    bool steal = false;
 
-    // Don't steal from types
-    if (source->type == TYPE_TYPE)
-        steal = false;
+    // Steal if this type has no duplicate function
+    if (as_type(source->type).duplicate == NULL)
+        steal = true;
 
-    if (steal)
+    if (steal) {
         steal_value(source, dest);
-    else
+    } else {
         duplicate_value(source, dest);
+    }
 }
 
 void duplicate_value(Term* source, Term* dest)

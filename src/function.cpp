@@ -52,6 +52,7 @@ void Function::setInputMeta(int index, bool value)
 {
     getInputProperties(index).meta = value;
 }
+
 void Function::setInputModified(int index, bool value)
 {
     getInputProperties(index).modified = value;
