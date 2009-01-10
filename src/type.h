@@ -16,8 +16,6 @@
 
 namespace circa {
 
-const int COMPOUND_TYPE_SIGNATURE = 0x43214321;
-
 struct Type
 {
     typedef void* (*AllocFunc)(Term* typeTerm);

@@ -123,86 +123,52 @@ namespace primitives {
 
 } // namespace primitives
 
-struct CompoundValue
+Term* CompoundValue::appendSlot(Term* type) {
+    Term* newTerm = create_value(&branch, type);
+    fields.append(newTerm);
+    newTerm->stealingOk = false;
+    return newTerm;
+}
+
+// Static functions
+void* CompoundValue::alloc(Term* typeTerm)
 {
-    int signature;
-    Branch branch;
-    ReferenceList fields;
+    CompoundValue *value = new CompoundValue();
 
-    // Member functions
-    CompoundValue() : signature(COMPOUND_TYPE_SIGNATURE) {}
+    // create a slot for each field
+    Type& type = as_type(typeTerm);
+    int numFields = (int) type.fields.size();
 
-    Term* appendSlot(Term* type) {
-        Term* newTerm = create_value(&branch, type);
-        fields.append(newTerm);
-        newTerm->stealingOk = false;
-        return newTerm;
-    }
+    for (int f=0; f < numFields; f++)
+        value->appendSlot(type.fields[f].type);
 
-    // Static functions
-    static void* alloc(Term* typeTerm)
-    {
-        CompoundValue *value = new CompoundValue();
+    return value;
+}
 
-        // create a slot for each field
-        Type& type = as_type(typeTerm);
-        int numFields = (int) type.fields.size();
+void CompoundValue::dealloc(void* data)
+{
+    delete (CompoundValue*) data;
+}
 
-        for (int f=0; f < numFields; f++)
-            value->appendSlot(type.fields[f].type);
+void CompoundValue::create_compound_type(Term* term)
+{
+    std::string name = as_string(term->input(0));
+    Type& output = as_type(term);
 
-        return value;
-    }
+    output.name = name;
+    output.alloc = alloc;
+    output.dealloc = dealloc;
+}
 
-    static void dealloc(void* data)
-    {
-        delete (CompoundValue*) data;
-    }
-
-    static void create_compound_type(Term* term)
-    {
-        std::string name = as_string(term->input(0));
-        Type& output = as_type(term);
-
-        output.name = name;
-        output.alloc = alloc;
-        output.dealloc = dealloc;
-    }
-
-    static void append_field(Term* term)
-    {
-        recycle_value(term->input(0), term);
-        Type& output = as_type(term);
-        as_type(term->input(1));
-        Term* fieldType = term->input(1);
-        std::string fieldName = as_string(term->input(2));
-        output.addField(fieldType, fieldName);
-    }
-
-    static void get_field(Term* term)
-    {
-        CompoundValue &value = as_compound_value(term->input(0));
-        std::string fieldName = as_string(term->input(1));
-        Type& type = as_type(term->input(0)->type);
-
-        int index = type.findField(fieldName);
-
-        if (index == -1) {
-            error_occured(term, std::string("field \'")+fieldName+"\' not found");
-            return;
-        }
-
-        assert(index >= 0);
-
-        Term* field = value.fields[index];
-        specialize_type(term, field->type);
-
-        if (field->stealingOk)
-            std::cout << "warning: stealing from a field" << std::endl;
-
-        recycle_value(field, term);
-    }
-};
+void CompoundValue::append_field(Term* term)
+{
+    recycle_value(term->input(0), term);
+    Type& output = as_type(term);
+    as_type(term->input(1));
+    Term* fieldType = term->input(1);
+    std::string fieldName = as_string(term->input(2));
+    output.addField(fieldType, fieldName);
+}
 
 bool
 Set::contains(Term* value)
@@ -350,7 +316,6 @@ void initialize_builtin_types(Branch& kernel)
 
     import_c_function(kernel, CompoundValue::create_compound_type, "create-compound-type(string) -> Type");
     import_c_function(kernel, CompoundValue::append_field, "compound-type-append-field(Type,Type,string) -> Type");
-    import_c_function(kernel, CompoundValue::get_field, "get-field(any,string) -> any");
 
     quick_create_cpp_type<ReferenceList>(kernel, "Tuple");
 

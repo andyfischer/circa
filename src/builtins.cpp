@@ -240,7 +240,8 @@ void initialize_builtin_functions(Branch* kernel)
     assert(ADD_FUNC != NULL);
     assert(MULT_FUNC != NULL);
 
-    VALUE_FUNCTION_FEEDBACK_ASSIGN = import_c_function(*kernel, var_function::feedback_assign, "var-function-feedback-assign(any,any)");
+    VALUE_FUNCTION_FEEDBACK_ASSIGN = import_c_function(*kernel,
+        var_function::feedback_assign, "var-function-feedback-assign(any,any)");
 
     as_function(VAR_INT).feedbackPropogateFunction = VALUE_FUNCTION_FEEDBACK_ASSIGN;
     as_function(VAR_FLOAT).feedbackPropogateFunction = VALUE_FUNCTION_FEEDBACK_ASSIGN;
