@@ -1,0 +1,24 @@
+
+import os, subprocess
+
+def shell(cmd):
+    result = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True).communicate()[0]
+    result = result.replace('\n', ' ')
+    print result
+    return result
+
+
+env = Environment()
+
+env.ParseConfig('sdl-config --cflags')
+env.ParseConfig('sdl-config --libs')
+
+env.Append(LIBS = ['SDL_mixer', 'SDL_image'])
+
+#env.Append(CPPFLAGS = shell('sdl-config --cflags --libs'))
+
+env.Append(CPPPATH = "../src")
+env.Append(LIBPATH = "../lib")
+env.Append(LIBS = ['circa'])
+
+env.Program('main', ['main.cpp'], ['circa'])
