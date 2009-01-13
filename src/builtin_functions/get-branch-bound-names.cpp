@@ -30,7 +30,7 @@ namespace get_branch_bound_names_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_c_function(kernel, evaluate,
+        Term* main_func = import_function(kernel, evaluate,
                 "function get-branch-bound-names(Branch) -> List");
         as_function(main_func).pureFunction = true;
     }

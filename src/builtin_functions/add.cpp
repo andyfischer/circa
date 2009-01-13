@@ -52,11 +52,11 @@ namespace add_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_c_function(kernel, evaluate,
+        Term* main_func = import_function(kernel, evaluate,
                 "function add(float,float) -> float");
         as_function(main_func).pureFunction = true;
 
-        Term* fp_func = import_c_function(kernel, feedback_propogate,
+        Term* fp_func = import_function(kernel, feedback_propogate,
                 "function add-feedback-propogate(any,any)");
         as_function(fp_func).stateType = BRANCH_TYPE;
         as_function(main_func).feedbackPropogateFunction = fp_func;

@@ -38,7 +38,7 @@ namespace get_infix_function_name_function {
         
     void setup(Branch& kernel)
     {
-        import_c_function(kernel, evaluate,
+        import_function(kernel, evaluate,
             "function get-infix-function-name(string) -> string");
     }
 }

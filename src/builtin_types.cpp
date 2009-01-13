@@ -314,8 +314,8 @@ void initialize_builtin_types(Branch& kernel)
     as_type(REFERENCE_TYPE).visitPointers = ref_type::visitPointers;
     as_type(REFERENCE_TYPE).remapPointers = ref_type::remapPointers;
 
-    import_c_function(kernel, CompoundValue::create_compound_type, "create-compound-type(string) -> Type");
-    import_c_function(kernel, CompoundValue::append_field, "compound-type-append-field(Type,Type,string) -> Type");
+    import_function(kernel, CompoundValue::create_compound_type, "create-compound-type(string) -> Type");
+    import_function(kernel, CompoundValue::append_field, "compound-type-append-field(Type,Type,string) -> Type");
 
     import_type<ReferenceList>(kernel, "Tuple");
 
@@ -324,11 +324,11 @@ void initialize_builtin_types(Branch& kernel)
     Term* set_type = import_type<Set>(kernel, "Set");
     as_type(set_type).toString = Set::to_string;
 
-    Term* set_add = import_c_function(kernel, Set::hosted_add,
+    Term* set_add = import_function(kernel, Set::hosted_add,
         "function Set::add(Set, any) -> Set");
     as_type(set_type).addMemberFunction("add", set_add);
 
-    Term* set_remove = import_c_function(kernel, Set::hosted_remove,
+    Term* set_remove = import_function(kernel, Set::hosted_remove,
         "function Set::remove(Set, any) -> Set");
     as_type(set_type).addMemberFunction("remove", set_remove);
 }

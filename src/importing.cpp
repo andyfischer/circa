@@ -14,17 +14,17 @@
 
 namespace circa {
 
-Term* import_c_function(Branch& branch, Function::EvaluateFunc evaluate, std::string const& headerText)
+Term* import_function(Branch& branch, Function::EvaluateFunc evaluate, std::string const& headerText)
 {
     token_stream::TokenStream tokens(headerText);
 
     ast::FunctionHeader *header = parser::functionHeader(tokens);
-    Term* result = import_c_function(branch, evaluate, *header);
+    Term* result = import_function(branch, evaluate, *header);
     delete header;
     return result;
 }
 
-Term* import_c_function(Branch& branch,
+Term* import_function(Branch& branch,
                         Function::EvaluateFunc evaluate,
                         ast::FunctionHeader &header)
 {

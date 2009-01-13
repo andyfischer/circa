@@ -31,7 +31,7 @@ namespace branch_to_source_text_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_c_function(kernel, evaluate,
+        Term* main_func = import_function(kernel, evaluate,
                 "function branch-to-source-text(Branch) -> string");
         as_function(main_func).pureFunction = true;
     }

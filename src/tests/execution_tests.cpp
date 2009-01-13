@@ -22,8 +22,8 @@ void i_only_throw_errors(Term * caller)
 
 void init_test_functions(Branch& branch)
 {
-    import_c_function(branch, spy_function, "function spy(string)");
-    import_c_function(branch, i_only_throw_errors,
+    import_function(branch, spy_function, "function spy(string)");
+    import_function(branch, i_only_throw_errors,
             "function i-only-throw-errors() -> string");
 }
 

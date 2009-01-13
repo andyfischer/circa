@@ -39,7 +39,7 @@ void default_function() {
 
     Term* type1 = import_type<Type1>(branch, "Type1");
 
-    Term* appendStr = import_c_function(branch, append_string__evaluate,
+    Term* appendStr = import_function(branch, append_string__evaluate,
             "append-str(Type1, string) -> Type1");
 
     as_type(type1).addMemberFunction("", appendStr);

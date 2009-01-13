@@ -15,7 +15,7 @@ namespace sin_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_c_function(kernel, evaluate,
+        Term* main_func = import_function(kernel, evaluate,
                 "function sin(float) -> float");
         as_function(main_func).pureFunction = true;
     }

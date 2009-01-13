@@ -21,7 +21,7 @@ namespace list_get_element_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_c_function(kernel, evaluate,
+        Term* main_func = import_function(kernel, evaluate,
                 "function list-get-element(List, int) -> any");
         as_function(main_func).pureFunction = true;
     }

@@ -21,7 +21,7 @@ namespace parse_expression_function {
         /*
         import_type<ast::Expression>(kernel, "ExpressionAST");
 
-        Term* main_func = import_c_function(kernel, evaluate,
+        Term* main_func = import_function(kernel, evaluate,
                 "function parse-expression(TokenStream) -> ExpressionAST");
         as_function(main_func).pureFunction = false;
         */

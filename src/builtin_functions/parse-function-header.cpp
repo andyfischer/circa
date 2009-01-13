@@ -63,7 +63,7 @@ namespace parse_function_header_function {
     {
         import_type<ast::FunctionHeader>(kernel, "FunctionHeader");
 
-        Term* main_func = import_c_function(kernel, evaluate,
+        Term* main_func = import_function(kernel, evaluate,
             "function parse-function-header(TokenStream) -> FunctionHeader");
 
         as_function(main_func).pureFunction = false;
