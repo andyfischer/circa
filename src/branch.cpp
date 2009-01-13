@@ -90,10 +90,7 @@ Term* Branch::findNamed(std::string const& name) const
         return getNamed(name);
 
     if (outerScope != NULL) {
-        assert(outerScope->value != this);
-
-        Branch& outerBranch = as_branch(outerScope);
-        return outerBranch.findNamed(name);
+        return outerScope->findNamed(name);
     }
 
     return get_global(name);
@@ -169,7 +166,7 @@ Branch::apply(std::string const& statement)
 Branch& Branch::startBranch(std::string const& name)
 {
     Term* result = create_value(this, BRANCH_TYPE, NULL, name);
-    as_branch(result).outerScope = this->owningTerm;
+    as_branch(result).outerScope = this;
     return as_branch(result);
 }
 
