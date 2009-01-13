@@ -61,7 +61,7 @@ namespace parse_function_header_function {
 
     void setup(Branch& kernel)
     {
-        quick_create_cpp_type<ast::FunctionHeader>(kernel, "FunctionHeader");
+        import_type<ast::FunctionHeader>(kernel, "FunctionHeader");
 
         Term* main_func = import_c_function(kernel, evaluate,
             "function parse-function-header(TokenStream) -> FunctionHeader");

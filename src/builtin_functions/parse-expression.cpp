@@ -19,7 +19,7 @@ namespace parse_expression_function {
     void setup(Branch& kernel)
     {
         /*
-        quick_create_cpp_type<ast::Expression>(kernel, "ExpressionAST");
+        import_type<ast::Expression>(kernel, "ExpressionAST");
 
         Term* main_func = import_c_function(kernel, evaluate,
                 "function parse-expression(TokenStream) -> ExpressionAST");
