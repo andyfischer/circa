@@ -68,3 +68,19 @@ circaBinary = ENV.Program('bin/circa', 'build/src/main.cpp', LIBS=[circa_so])
 
 ENV.SetOption('num_jobs', 2)
 ENV.Default(circaBinary)
+
+############################## ca_sdl ###############################
+
+CASDL_ENV = Environment()
+CASDL_ENV.ParseConfig('sdl-config --cflags')
+CASDL_ENV.ParseConfig('sdl-config --libs')
+
+CASDL_ENV.Append(LIBS = ['SDL_mixer', 'SDL_image'])
+
+CASDL_ENV.Append(CPPPATH = "src")
+CASDL_ENV.Append(LIBPATH = "lib")
+CASDL_ENV.Append(LIBS = ['circa'])
+
+# Temp: This build result should go in the ca-sdl, but this causes problems.
+# Probably fixed by upgrading SCons
+CASDL_ENV.Program('main', ['ca-sdl/main.cpp'], ['circa'])
