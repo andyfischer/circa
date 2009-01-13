@@ -284,24 +284,24 @@ Term* get_field(Term *term, int index)
 
 void initialize_builtin_types(Branch& kernel)
 {
-    STRING_TYPE = quick_create_cpp_type<std::string>(kernel, "string");
+    STRING_TYPE = import_type<std::string>(kernel, "string");
     as_type(STRING_TYPE).equals = cpp_interface::templated_equals<std::string>;
     as_type(STRING_TYPE).toString = primitives::string_t::to_string;
     as_type(STRING_TYPE).toSourceString = primitives::string_t::to_source_string;
 
-    INT_TYPE = quick_create_cpp_type<int>(kernel, "int");
+    INT_TYPE = import_type<int>(kernel, "int");
     as_type(INT_TYPE).equals = cpp_interface::templated_equals<int>;
     as_type(INT_TYPE).lessThan = cpp_interface::templated_lessThan<int>;
     as_type(INT_TYPE).toString = primitives::int_t::to_string;
     as_type(INT_TYPE).toSourceString = primitives::int_t::to_string;
 
-    FLOAT_TYPE = quick_create_cpp_type<float>(kernel, "float");
+    FLOAT_TYPE = import_type<float>(kernel, "float");
     as_type(FLOAT_TYPE).equals = cpp_interface::templated_equals<float>;
     as_type(FLOAT_TYPE).lessThan = cpp_interface::templated_lessThan<float>;
     as_type(FLOAT_TYPE).toString = primitives::float_t::to_string;
     as_type(FLOAT_TYPE).toSourceString = primitives::float_t::to_source_string;
 
-    BOOL_TYPE = quick_create_cpp_type<bool>(kernel, "bool");
+    BOOL_TYPE = import_type<bool>(kernel, "bool");
     as_type(BOOL_TYPE).equals = cpp_interface::templated_equals<bool>;
     as_type(BOOL_TYPE).toString = primitives::bool_t::to_string;
     as_type(BOOL_TYPE).toSourceString = primitives::bool_t::to_string;
@@ -317,11 +317,11 @@ void initialize_builtin_types(Branch& kernel)
     import_c_function(kernel, CompoundValue::create_compound_type, "create-compound-type(string) -> Type");
     import_c_function(kernel, CompoundValue::append_field, "compound-type-append-field(Type,Type,string) -> Type");
 
-    quick_create_cpp_type<ReferenceList>(kernel, "Tuple");
+    import_type<ReferenceList>(kernel, "Tuple");
 
-    quick_create_cpp_type<Branch>(kernel, "Branch");
+    import_type<Branch>(kernel, "Branch");
 
-    Term* set_type = quick_create_cpp_type<Set>(kernel, "Set");
+    Term* set_type = import_type<Set>(kernel, "Set");
     as_type(set_type).toString = Set::to_string;
 
     Term* set_add = import_c_function(kernel, Set::hosted_add,

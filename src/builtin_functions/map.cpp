@@ -111,7 +111,7 @@ namespace map_function {
                 "function map(Type,Type) -> Function");
         as_function(main_func).pureFunction = true;
 
-        STATE_TYPE = quick_create_cpp_type<specialized_map_function::State>(kernel);
+        STATE_TYPE = import_type<specialized_map_function::State>(kernel);
 
         as_function(main_func).stateType = STATE_TYPE;
 

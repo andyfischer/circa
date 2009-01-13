@@ -37,7 +37,7 @@ void append_string__evaluate(Term* term)
 void default_function() {
     Branch branch;
 
-    Term* type1 = quick_create_cpp_type<Type1>(branch, "Type1");
+    Term* type1 = import_type<Type1>(branch, "Type1");
 
     Term* appendStr = import_c_function(branch, append_string__evaluate,
             "append-str(Type1, string) -> Type1");
