@@ -18,7 +18,7 @@ namespace tokenize_function {
         myFunctionHeader.functionName = "tokenize";
         myFunctionHeader.addArgument("string", "");
         myFunctionHeader.outputType = "TokenStream";
-        Term* main_func = import_c_function(kernel, evaluate, myFunctionHeader);
+        Term* main_func = import_function(kernel, evaluate, myFunctionHeader);
         as_function(main_func).pureFunction = true;
     }
 }

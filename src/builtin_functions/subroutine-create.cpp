@@ -34,7 +34,7 @@ namespace subroutine_create_function {
 
     void setup(Branch& kernel)
     {
-        import_c_function(kernel, evaluate,
+        import_function(kernel, evaluate,
                 "subroutine-create(string,Tuple,Type) -> Function");
     }
 }

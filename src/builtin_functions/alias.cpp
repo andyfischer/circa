@@ -15,7 +15,7 @@ namespace alias_function {
 
     void setup(Branch& kernel)
     {
-        ALIAS_FUNC = import_c_function(kernel, evaluate,
+        ALIAS_FUNC = import_function(kernel, evaluate,
                 "function alias(any) -> any");
         as_function(ALIAS_FUNC).pureFunction = true;
     }

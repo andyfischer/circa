@@ -107,7 +107,7 @@ namespace map_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_c_function(kernel, evaluate,
+        Term* main_func = import_function(kernel, evaluate,
                 "function map(Type,Type) -> Function");
         as_function(main_func).pureFunction = true;
 
@@ -115,7 +115,7 @@ namespace map_function {
 
         as_function(main_func).stateType = STATE_TYPE;
 
-        FEEDBACK_PROPOGATE = import_c_function(kernel, feedback_propogate::evaluate,
+        FEEDBACK_PROPOGATE = import_function(kernel, feedback_propogate::evaluate,
                 "function map-feedback(any, any)");
         as_function(FEEDBACK_PROPOGATE).setInputMeta(0, true);
     }

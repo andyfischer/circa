@@ -29,7 +29,7 @@ namespace evaluate_file_function {
 
     void setup(Branch& kernel)
     {
-        /*Term* main_func = */import_c_function(kernel, evaluate,
+        /*Term* main_func = */import_function(kernel, evaluate,
                 "function evaluate-file(string) -> Branch");
     }
 }

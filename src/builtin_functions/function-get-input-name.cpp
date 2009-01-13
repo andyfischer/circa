@@ -19,7 +19,7 @@ namespace function_get_input_name_function {
 
     void setup(Branch& kernel)
     {
-        import_c_function(kernel, evaluate,
+        import_function(kernel, evaluate,
             "function-get-input-name(Function, int) -> string");
     }
 }

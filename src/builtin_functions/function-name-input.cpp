@@ -35,7 +35,7 @@ namespace function_name_input_function {
 
     void setup(Branch& kernel)
     {
-        import_c_function(kernel, evaluate,
+        import_function(kernel, evaluate,
                 "function-name-input(Function,int,string) -> Function");
     }
 }

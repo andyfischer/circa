@@ -19,7 +19,7 @@ void test_import_c()
 {
     Branch branch;
 
-    Term* func_as_term = import_c_function(branch, my_imported_function,
+    Term* func_as_term = import_function(branch, my_imported_function,
             "function my-imported-func(int,int) -> int");
 
     test_assert(as_function(func_as_term).outputType == INT_TYPE);
