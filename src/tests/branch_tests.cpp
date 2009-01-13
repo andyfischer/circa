@@ -124,7 +124,7 @@ void find_name_in_outer_branch()
     Term* inner_branch = as_branch(outer_branch).eval("Branch()");
     alloc_value(inner_branch);
 
-    as_branch(inner_branch).outerScope = outer_branch;
+    as_branch(inner_branch).outerScope = &as_branch(outer_branch);
 
     test_assert(as_branch(inner_branch).findNamed("a") == a);
 }

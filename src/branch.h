@@ -19,8 +19,8 @@ public:
     // Our owning term
     Term* owningTerm;
 
-    // Points to a Branch term which is our outer scope.
-    Term* outerScope;
+    // Points to a Branch which is our outer scope.
+    Branch* outerScope;
 
     TermNamespace names;
 
