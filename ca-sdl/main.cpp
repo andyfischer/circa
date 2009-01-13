@@ -57,6 +57,11 @@ void apply_surface(circa::Term* caller)
     SDL_BlitSurface( source, NULL, destination, &offset );
 }
 
+void SDL_FreeSurface_c(circa::Term* caller)
+{
+    SDL_Surface* surface = circa::as<SDL_Surface*>(caller->input(0));
+}
+
 int main( int argc, char* args[] )
 {
     circa::initialize();
@@ -69,6 +74,8 @@ int main( int argc, char* args[] )
             "load-image(string) -> SDL_Surface");
     circa::import_function(branch, apply_surface,
             "apply-surface(SDL_Surface,SDL_Surface,int,int)");
+    circa::import_function(branch, SDL_FreeSurface_c,
+            "SDL_FreeSurface(SDL_Surface)");
 
     //Initialize all SDL subsystems
     if( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
@@ -94,10 +101,11 @@ int main( int argc, char* args[] )
     branch.eval("message = load-image('hello_world.bmp')");
     branch.eval("background = load-image('background.bmp')");
 
+    // Construct the redrawing branch
     circa::Branch &redraw = branch.startBranch("redraw");
 
     //Apply the background to the screen
-    redraw.eval("apply-surface(screen, background, 0, 0)");
+    redraw.apply("apply-surface(screen, background, 0, 0)");
 
     circa::Int message_x(redraw, "message_x");
     circa::Int message_y(redraw, "message_y");
@@ -106,20 +114,30 @@ int main( int argc, char* args[] )
     message_y = 140;
 
     //Apply the message to the screen
-    redraw.eval("apply-surface(screen, message, message_x, message_y)");
+    redraw.apply("apply-surface(screen, message, message_x, message_y)");
 
-    //Update the screen
-    if( SDL_Flip( screen ) == -1 )
-    {
-        return 1;
+    // Main loop
+    while (true) {
+        SDL_Event event;
+        SDL_PollEvent(&event);
+
+        if (event.type == SDL_QUIT)
+            break;
+
+        redraw.eval();
+
+        //Update the screen
+        if( SDL_Flip( screen ) == -1 )
+        {
+            return 1;
+        }
+
+        SDL_Delay( 10 );
     }
 
-    //Wait 2 seconds
-    SDL_Delay( 2000 );
-
     //Free the surfaces
-    SDL_FreeSurface( circa::as<SDL_Surface*>(branch["message"] ) );
-    SDL_FreeSurface( circa::as<SDL_Surface*>(branch["background"] ) );
+    branch.eval("SDL_FreeSurface(message)");
+    branch.eval("SDL_FreeSurface(background)");
 
     //Quit SDL
     SDL_Quit();
