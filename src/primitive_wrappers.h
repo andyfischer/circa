@@ -15,12 +15,12 @@ private:
     bool _owned;
 public:
     Int() {
-        _term = create_term(NULL, INT_TYPE);
+        _term = create_value(NULL, INT_TYPE);
         _owned = true;
     }
-    Int(Branch &branch) {
-        _term = create_term(branch, INT_TYPE);
-        _owned = true;
+    Int(Branch &branch, std::string const& name="") {
+        _term = create_value(&branch, INT_TYPE, NULL, name);
+        _owned = false;
     }   
     Int(Term* term) {
         _term = term;
@@ -30,7 +30,7 @@ public:
         if (_owned)
             delete _term;
     }
-    Int& operator=(int value);
+    Int& operator=(int value)
     {
         as_int(_term) = value;
         return *this;
