@@ -149,6 +149,11 @@ Branch::clear()
     names.clear();
 }
 
+void Branch::eval()
+{
+    evaluate_branch(*this);
+}
+
 Term*
 Branch::eval(std::string const& statement)
 {
@@ -159,6 +164,13 @@ Term*
 Branch::apply(std::string const& statement)
 {
     return apply_statement(this, statement);
+}
+
+Branch& Branch::startBranch(std::string const& name)
+{
+    Term* result = create_value(this, BRANCH_TYPE, NULL, name);
+    as_branch(result).outerScope = this->owningTerm;
+    return as_branch(result);
 }
 
 void

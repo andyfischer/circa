@@ -16,7 +16,7 @@ private:
     std::vector<Term*> _terms;
 
 public:
-    // This might be obsolete
+    // Our owning term
     Term* owningTerm;
 
     // Points to a Branch term which is our outer scope.
@@ -70,8 +70,15 @@ public:
 
     void clear();
 
+    // Evaluate this branch.
+    void eval();
+
+    // Evaluate the given statement, return the result term.
     Term* eval(std::string const& statement);
     Term* apply(std::string const& statement);
+
+    // Start a sub-branch with the given name
+    Branch& startBranch(std::string const& name);
 
     // Hosted functions
     static void hosted_remap_pointers(Term* caller, ReferenceMap const& map);

@@ -94,17 +94,19 @@ int main( int argc, char* args[] )
     branch.eval("message = load-image('hello_world.bmp')");
     branch.eval("background = load-image('background.bmp')");
 
-    //Apply the background to the screen
-    branch.eval("apply-surface(screen, background, 0, 0)");
+    circa::Branch &redraw = branch.startBranch("redraw");
 
-    circa::Int message_x(branch, "message_x");
-    circa::Int message_y(branch, "message_y");
+    //Apply the background to the screen
+    redraw.eval("apply-surface(screen, background, 0, 0)");
+
+    circa::Int message_x(redraw, "message_x");
+    circa::Int message_y(redraw, "message_y");
 
     message_x = 180;
     message_y = 140;
 
     //Apply the message to the screen
-    branch.eval("apply-surface(screen, message, message_x, message_y)");
+    redraw.eval("apply-surface(screen, message, message_x, message_y)");
 
     //Update the screen
     if( SDL_Flip( screen ) == -1 )
