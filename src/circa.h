@@ -11,6 +11,7 @@
 #include "introspection.h"
 #include "list.h"
 #include "parser.h"
+#include "primitive_wrappers.h"
 #include "runtime.h"
 #include "set.h"
 #include "syntax.h"
