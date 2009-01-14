@@ -82,6 +82,8 @@ struct Term
     // Returns the named property
     Term* property(std::string const& name);
 
+    bool hasProperty(std::string const& name);
+
     // Add a property with the given type
     Term* addProperty(std::string const& name, Term* type);
 

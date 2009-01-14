@@ -10,6 +10,15 @@ namespace add_function {
         as_float(caller) = as_float(caller->input(0)) + as_float(caller->input(1));
     }
 
+    float get_mutability(Term* term)
+    {
+        // temp:
+        if (!term->hasProperty("mutability"))
+            return 1.0;
+
+        return as_float(term->property("mutability"));
+    }
+
     void feedback_propogate(Term* caller)
     {
         Term* target = caller->input(0);
@@ -25,7 +34,7 @@ namespace add_function {
         // find the total of input mutability
         float totalInputMutability = 0.0;
         for (int i=0; i < numInputs; i++) {
-            totalInputMutability += as_float(target->input(i)->property("mutability"));
+            totalInputMutability += get_mutability(target->input(i));
         }
 
         if (totalInputMutability == 0.0) {
@@ -37,7 +46,7 @@ namespace add_function {
     
     
         for (int i=0; i < numInputs; i++) {
-            float mutability = as_float(target->input(i)->property("mutability"));
+            float mutability = get_mutability(target->input(i));
 
             float inputDelta = total_delta * mutability / totalInputMutability;
     

@@ -109,6 +109,11 @@ Term::property(std::string const& name)
     return getMyBranch()->getNamed(name);
 }
 
+bool Term::hasProperty(std::string const& name)
+{
+    return getMyBranch()->containsName(name);
+}
+
 Term*
 Term::addProperty(std::string const& name, Term* type)
 {
