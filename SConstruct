@@ -75,7 +75,7 @@ CASDL_ENV = Environment()
 CASDL_ENV.ParseConfig('sdl-config --cflags')
 CASDL_ENV.ParseConfig('sdl-config --libs')
 
-CASDL_ENV.Append(LIBS = ['SDL_mixer', 'SDL_image'])
+CASDL_ENV.Append(LIBS = ['SDL_mixer', 'SDL_image', 'SDL_gfx'])
 
 CASDL_ENV.Append(CPPPATH = "src")
 CASDL_ENV.Append(LIBPATH = "lib")

@@ -3,6 +3,8 @@ be redestributed without written permission.*/
 
 //The headers
 #include "SDL/SDL.h"
+#include "/opt/local/include/SDL/SDL_gfxPrimitives.h"
+
 #include <string>
 
 #include "circa.h"
@@ -57,6 +59,16 @@ void apply_surface(circa::Term* caller)
     SDL_BlitSurface( source, NULL, destination, &offset );
 }
 
+void rectangle(circa::Term* caller)
+{
+    rectangleColor(circa::as<SDL_Surface*>(caller->input(0)),
+        (int) as_float(caller->input(1)),
+        (int) as_float(caller->input(2)),
+        (int) as_float(caller->input(3)),
+        (int) as_float(caller->input(4)),
+        as_int(caller->input(5)));
+}
+
 void SDL_FreeSurface_c(circa::Term* caller)
 {
     SDL_Surface* surface = circa::as<SDL_Surface*>(caller->input(0));
@@ -76,6 +88,8 @@ int main( int argc, char* args[] )
             "apply-surface(SDL_Surface,SDL_Surface,int,int)");
     circa::import_function(branch, SDL_FreeSurface_c,
             "SDL_FreeSurface(SDL_Surface)");
+    circa::import_function(branch, rectangle,
+            "rectangle(SDL_Surface,float,float,float,float,int)");
 
     //Initialize all SDL subsystems
     if( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
@@ -98,7 +112,6 @@ int main( int argc, char* args[] )
     SDL_WM_SetCaption( "Hello World", NULL );
 
     //Load the images
-    branch.eval("message = load-image('hello_world.bmp')");
     branch.eval("background = load-image('background.bmp')");
 
     // Construct the redrawing branch
@@ -107,14 +120,26 @@ int main( int argc, char* args[] )
     //Apply the background to the screen
     redraw.apply("apply-surface(screen, background, 0, 0)");
 
-    circa::Int message_x(redraw, "message_x");
-    circa::Int message_y(redraw, "message_y");
+    circa::Float mouse_x(redraw, "mouse_x");
+    circa::Float mouse_y(redraw, "mouse_y");
+    circa::Int rect_size(redraw, "rect_size");
 
-    message_x = 180;
-    message_y = 140;
+    rect_size = 5;
 
-    //Apply the message to the screen
-    redraw.apply("apply-surface(screen, message, message_x, message_y)");
+    redraw.apply("rect_x = 320.0");
+    redraw.apply("rect_y = 240.0");
+
+    for (int i=0; i < 10; i++) {
+
+        redraw.apply("dist_x = 0.0?");
+        redraw.apply("dist_y = 0.0?");
+        redraw.apply("rect_x = rect_x + dist_x");
+        redraw.apply("rect_y = rect_y + dist_y");
+        redraw.apply("rectangle(screen, rect_x - rect_size, rect_y - rect_size, rect_x + rect_size, rect_y + rect_size, 0)");
+    }
+
+    redraw.apply("rect_x := mouse_x");
+    redraw.apply("rect_y := mouse_y");
 
     // Main loop
     while (true) {
@@ -123,6 +148,12 @@ int main( int argc, char* args[] )
 
         if (event.type == SDL_QUIT)
             break;
+
+        if (event.type == SDL_MOUSEMOTION)
+        {
+            mouse_x = event.motion.x;
+            mouse_y = event.motion.y;
+        }
 
         redraw.eval();
 
@@ -136,7 +167,6 @@ int main( int argc, char* args[] )
     }
 
     //Free the surfaces
-    branch.eval("SDL_FreeSurface(message)");
     branch.eval("SDL_FreeSurface(background)");
 
     //Quit SDL
