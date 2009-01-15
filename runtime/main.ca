@@ -1,0 +1,4 @@
+-- (work in progress)
+filename = list-get-element(cl-args,2)
+branch = evaluate-file(filename)
+branch.branch-to-source-text.print
