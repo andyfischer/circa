@@ -112,7 +112,6 @@ int main( int argc, char* args[] )
     SDL_WM_SetCaption( "Hello World", NULL );
 
     //Load the images
-    branch.eval("background = load-image('background.bmp')");
 
     // Construct the redrawing branch
     circa::Branch &redraw = branch.startBranch("redraw");
