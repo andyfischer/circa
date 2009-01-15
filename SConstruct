@@ -83,4 +83,4 @@ CASDL_ENV.Append(LIBS = ['circa'])
 
 # Temp: This build result should go in the cgame folder, but this causes problems.
 # Probably fixed by upgrading SCons
-CASDL_ENV.Program('main', ['cgame/main.cpp'], ['circa'])
+CASDL_ENV.Program('cgm', ['cgame/main.cpp'], ['circa'])

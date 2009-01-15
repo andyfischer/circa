@@ -5,6 +5,7 @@ src/register_all_tests.cpp
 # build results:
 build
 obj
+cgm
 bin/circa
 *.o
 *.so
