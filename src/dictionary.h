@@ -13,7 +13,7 @@ struct Dictionary
 private:
     typedef std::map<std::string, Term*> RefDictionary;
     RefDictionary _dict;
-    Branch _branch;
+
 public:
 
     // Default constructor
@@ -25,22 +25,10 @@ public:
     }
 
     Term* operator[] (std::string const& name) const { return this->get(name); }
-    Term* get(std::string const& name) const {
-        RefDictionary::const_iterator it = _dict.find(name);
 
-        if (it == _dict.end())
-            return NULL;
-
-        return it->second;
-    }
-
+    Term* get(std::string const& name) const;
     Term* addSlot(std::string const& name, Term* type);
-
-    void clear()
-    {
-        _dict.clear();
-        _branch.clear();
-    }
+    void clear();
 };
 
 } // namespace circa
