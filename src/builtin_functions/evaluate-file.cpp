@@ -9,22 +9,8 @@ namespace evaluate_file_function {
     void evaluate(Term* caller)
     {
         std::string &filename = as_string(caller->input(0));
-        Branch &output = as_branch(caller);
-
-        Branch workspace;
-        workspace.bindName(string_value(workspace, filename), "filename");
-        std::string file_contents = as_string(workspace.eval(
-                    "read-text-file(filename)"));
-
-        token_stream::TokenStream tokens(file_contents);
-        ast::StatementList *statementList = parser::statementList(tokens);
-
-        CompilationContext context;
-        context.pushScope(&output, NULL);
-        statementList->createTerms(context);
-        context.popScope();
-
-        delete statementList;
+        dealloc_value(caller);
+        caller->value = evaluate_file(filename);
     }
 
     void setup(Branch& kernel)

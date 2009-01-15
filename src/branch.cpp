@@ -10,6 +10,7 @@
 #include "term.h"
 #include "type.h"
 #include "values.h"
+#include "wrappers.h"
 
 namespace circa {
 
@@ -224,6 +225,24 @@ void duplicate_branch(Branch* source, Branch* dest)
         Term* original_term = it->second;
         dest->bindName(newTermMap.getRemapped(original_term), name);
     }
+}
+
+Branch* evaluate_file(std::string const& filename)
+{
+    Branch* result = new Branch;
+    std::string fileContents = read_text_file(filename);
+
+    token_stream::TokenStream tokens(fileContents);
+    ast::StatementList *statementList = parser::statementList(tokens);
+
+    CompilationContext context;
+    context.pushScope(result, NULL);
+    statementList->createTerms(context);
+    context.popScope();
+
+    delete statementList;
+
+    return result;
 }
 
 } // namespace circa

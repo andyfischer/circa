@@ -11,6 +11,7 @@
 namespace circa {
 
 std::string getInfixFunctionName(std::string infix);
+std::string read_text_file(std::string const& filename);
 
 } // namespace circa
 

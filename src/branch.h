@@ -89,6 +89,7 @@ public:
 Branch& as_branch(Term* term);
 
 void duplicate_branch(Branch* source, Branch* dest);
+Branch* evaluate_file(std::string const& filename);
 
 extern int DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR;
 
