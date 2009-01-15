@@ -11,7 +11,7 @@
 
 namespace circa {
 
-Term* apply_statement(Branch* branch, std::string const& input)
+Term* compile_statement(Branch* branch, std::string const& input)
 {
     assert(branch != NULL);
 
@@ -32,7 +32,7 @@ Term* apply_statement(Branch* branch, std::string const& input)
 
 Term* eval_statement(Branch* branch, std::string const& input)
 {
-    Term* term = apply_statement(branch, input);
+    Term* term = compile_statement(branch, input);
     evaluate_term(term);
     return term;
 }

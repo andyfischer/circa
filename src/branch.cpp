@@ -160,7 +160,7 @@ Branch::eval(std::string const& statement)
 Term*
 Branch::apply(std::string const& statement)
 {
-    return apply_statement(this, statement);
+    return compile_statement(this, statement);
 }
 
 Branch& Branch::startBranch(std::string const& name)

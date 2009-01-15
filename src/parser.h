@@ -8,7 +8,7 @@
 
 namespace circa {
 
-Term* apply_statement(Branch* branch, std::string const& input);
+Term* compile_statement(Branch* branch, std::string const& input);
 Term* eval_statement(Branch* branch, std::string const& input);
 
 namespace parser {
