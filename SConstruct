@@ -81,6 +81,6 @@ CASDL_ENV.Append(CPPPATH = "src")
 CASDL_ENV.Append(LIBPATH = "lib")
 CASDL_ENV.Append(LIBS = ['circa'])
 
-# Temp: This build result should go in the ca-sdl, but this causes problems.
+# Temp: This build result should go in the cgame folder, but this causes problems.
 # Probably fixed by upgrading SCons
-CASDL_ENV.Program('main', ['ca-sdl/main.cpp'], ['circa'])
+CASDL_ENV.Program('main', ['cgame/main.cpp'], ['circa'])
