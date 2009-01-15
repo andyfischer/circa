@@ -31,8 +31,9 @@ Term* Dictionary::addSlot(std::string const& name, Term* type)
 void Dictionary::clear()
 {
     RefDictionary::iterator it;
-    for (it = _dict.begin(); it != _dict.end(); ++it)
+    for (it = _dict.begin(); it != _dict.end(); ++it) {
         delete it->second;
+    }
     _dict.clear();
 }
 
