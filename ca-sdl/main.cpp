@@ -118,7 +118,7 @@ int main( int argc, char* args[] )
     circa::Branch &redraw = branch.startBranch("redraw");
 
     //Apply the background to the screen
-    redraw.apply("apply-surface(screen, background, 0, 0)");
+    redraw.compile("apply-surface(screen, background, 0, 0)");
 
     circa::Float mouse_x(redraw, "mouse_x");
     circa::Float mouse_y(redraw, "mouse_y");
@@ -126,20 +126,20 @@ int main( int argc, char* args[] )
 
     rect_size = 5;
 
-    redraw.apply("rect_x = 320.0");
-    redraw.apply("rect_y = 240.0");
+    redraw.compile("rect_x = 320.0");
+    redraw.compile("rect_y = 240.0");
 
     for (int i=0; i < 10; i++) {
 
-        redraw.apply("dist_x = 0.0?");
-        redraw.apply("dist_y = 0.0?");
-        redraw.apply("rect_x = rect_x + dist_x");
-        redraw.apply("rect_y = rect_y + dist_y");
-        redraw.apply("rectangle(screen, rect_x - rect_size, rect_y - rect_size, rect_x + rect_size, rect_y + rect_size, 0)");
+        redraw.compile("dist_x = 0.0?");
+        redraw.compile("dist_y = 0.0?");
+        redraw.compile("rect_x = rect_x + dist_x");
+        redraw.compile("rect_y = rect_y + dist_y");
+        redraw.compile("rectangle(screen, rect_x - rect_size, rect_y - rect_size, rect_x + rect_size, rect_y + rect_size, 0)");
     }
 
-    redraw.apply("rect_x := mouse_x");
-    redraw.apply("rect_y := mouse_y");
+    redraw.compile("rect_x := mouse_x");
+    redraw.compile("rect_y := mouse_y");
 
     // Main loop
     while (true) {

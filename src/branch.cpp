@@ -158,7 +158,7 @@ Branch::eval(std::string const& statement)
 }
 
 Term*
-Branch::apply(std::string const& statement)
+Branch::compile(std::string const& statement)
 {
     return compile_statement(this, statement);
 }

@@ -11,7 +11,7 @@ namespace introspection_tests {
 void round_trip_source(std::string statement)
 {
     Branch branch;
-    Term *t = branch.apply(statement);
+    Term *t = branch.compile(statement);
     test_equals(get_term_source(t), statement);
 }
 
