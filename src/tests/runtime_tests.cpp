@@ -134,9 +134,9 @@ void test_runtime_type_error()
 void test_recycle_with_multiple_users()
 {
     Branch branch;
-    Term* a = branch.apply("a = if-expr(true, 1, 2)");
-    Term* x = branch.apply("x = if-expr(true, a, 3)");
-    Term* y = branch.apply("y = if-expr(true, a, 3)");
+    Term* a = branch.compile("a = if-expr(true, 1, 2)");
+    Term* x = branch.compile("x = if-expr(true, a, 3)");
+    Term* y = branch.compile("y = if-expr(true, a, 3)");
 
     evaluate_branch(branch);
 

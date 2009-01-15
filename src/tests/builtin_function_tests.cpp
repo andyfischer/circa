@@ -169,8 +169,8 @@ void test_if_statement()
     Branch &positiveBranch = as_branch(if_statement->state->field(0));
     Branch &negativeBranch = as_branch(if_statement->state->field(1));
 
-    Term* posTerm = positiveBranch.apply("x = 1.0 + 1.0");
-    Term* negTerm = negativeBranch.apply("x = 1.0 + 1.0");
+    Term* posTerm = positiveBranch.compile("x = 1.0 + 1.0");
+    Term* negTerm = negativeBranch.compile("x = 1.0 + 1.0");
 
     dealloc_value(posTerm);
     dealloc_value(negTerm);

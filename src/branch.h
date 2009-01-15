@@ -75,7 +75,7 @@ public:
 
     // Evaluate the given statement, return the result term.
     Term* eval(std::string const& statement);
-    Term* apply(std::string const& statement);
+    Term* compile(std::string const& statement);
 
     // Start a sub-branch with the given name
     Branch& startBranch(std::string const& name);
