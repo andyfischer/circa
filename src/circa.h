@@ -11,7 +11,6 @@
 #include "introspection.h"
 #include "list.h"
 #include "parser.h"
-#include "primitive_wrappers.h"
 #include "runtime.h"
 #include "set.h"
 #include "syntax.h"
@@ -20,3 +19,5 @@
 #include "token_stream.h"
 #include "type.h"
 #include "values.h"
+
+#include "opt/PrimitiveWrappers.hpp"
