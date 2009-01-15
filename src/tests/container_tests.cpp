@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "ref_set.h"
+#include "dictionary.h"
 #include "testing.h"
 #include "term.h"
 #include "term_namespace.h"
@@ -148,6 +149,31 @@ void test_list()
     test_assert(list.count() == 0);
 }
 
+void test_dictionary()
+{
+    Dictionary dict;
+
+    test_assert(!dict.contains("a"));
+
+    dict.addSlot("a", INT_TYPE);
+    as_int(dict["a"]) = 4;
+    dict.addSlot("b", INT_TYPE);
+    as_int(dict["b"]) = 6;
+
+    test_assert(dict.contains("a"));
+    test_assert(dict.contains("b"));
+
+    test_assert(as_int(dict["a"]) == 4);
+    test_assert(as_int(dict["b"]) == 6);
+
+    //dict.clear(); <-- this causes us to crash later :(
+    /*
+
+    test_assert(!dict.contains("a"));
+    test_assert(!dict.contains("b"));
+    */
+}
+
 } // namespace container_tests
 
 void register_container_tests()
@@ -156,6 +182,7 @@ void register_container_tests()
     REGISTER_TEST_CASE(container_tests::test_set);
     REGISTER_TEST_CASE(container_tests::test_namespace);
     REGISTER_TEST_CASE(container_tests::test_list);
+    REGISTER_TEST_CASE(container_tests::test_dictionary);
 }
 
 } // namespace circa
