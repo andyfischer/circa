@@ -9,8 +9,9 @@ namespace evaluate_file_function {
     void evaluate(Term* caller)
     {
         std::string &filename = as_string(caller->input(0));
-        dealloc_value(caller);
-        caller->value = evaluate_file(filename);
+        Branch &branch = as_branch(caller);
+        branch.clear();
+        evaluate_file(branch, filename);
     }
 
     void setup(Branch& kernel)
