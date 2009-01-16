@@ -440,8 +440,8 @@ IfStatement::createTerm(CompilationContext &context)
 
     Branch workspace;
 
-    create_value(&workspace, "Branch", &posBranch, "posBranch");
-    create_value(&workspace, "Branch", &negBranch, "negBranch");
+    import_value(workspace, BRANCH_TYPE, &posBranch, "posBranch");
+    import_value(workspace, BRANCH_TYPE, &negBranch, "negBranch");
 
     workspace.eval("names = posBranch.get-branch-bound-names");
     workspace.eval("list-join(@names, negBranch.get-branch-bound-names)");

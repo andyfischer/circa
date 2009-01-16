@@ -19,7 +19,7 @@ public:
         _owned = true;
     }
     Int(Branch &branch, std::string const& name="") {
-        _term = create_value(&branch, INT_TYPE, NULL, name);
+        _term = create_value(&branch, INT_TYPE, name);
         _owned = false;
     }   
     Int(Term* term) {
@@ -51,7 +51,7 @@ public:
         _owned = true;
     }
     Float(Branch &branch, std::string const& name="") {
-        _term = create_value(&branch, FLOAT_TYPE, NULL, name);
+        _term = create_value(&branch, FLOAT_TYPE, name);
         _owned = false;
     }   
     Float(Term* term) {

@@ -28,8 +28,10 @@ bool values_equal(Term* a, Term* b);
 
 // Create a new value term with the given type.
 // 'branch' may be NULL.
-Term* create_value(Branch* branch, Term* type, void* initialValue=NULL, std::string const& name="");
-Term* create_value(Branch* branch, std::string const& typeName, void* initialValue, std::string const& name="");
+Term* create_value(Branch* branch, Term* type, std::string const& name="");
+Term* create_value(Branch* branch, std::string const& typeName, std::string const& name="");
+
+Term* import_value(Branch& branch, Term* type, void* initialValue, std::string const& name="");
 
 Term* string_value(Branch& branch, std::string const& s, std::string const& name="");
 Term* int_value(Branch& branch, int i, std::string const& name="");

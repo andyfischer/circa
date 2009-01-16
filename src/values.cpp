@@ -108,7 +108,7 @@ bool values_equal(Term* a, Term* b)
     return as_type(a->type).equals(a,b);
 }
 
-Term* create_value(Branch* branch, Term* type, void* initialValue, std::string const& name)
+Term* create_value(Branch* branch, Term* type, std::string const& name)
 {
     assert(type != NULL);
     if (branch == NULL)
@@ -117,16 +117,9 @@ Term* create_value(Branch* branch, Term* type, void* initialValue, std::string c
     Term *var_function = get_value_function(*branch, type);
     Term *term = create_term(branch, var_function, ReferenceList());
 
-    if (initialValue == NULL)
-        alloc_value(term);
-    else {
-        term->value = initialValue;
-        term->ownsValue = false;
-    }
+    alloc_value(term);
 
     term->stealingOk = false;
-
-    // TODO: somehow type-check initialValue
 
     if (name != "")
         branch->bindName(term, name);
@@ -134,7 +127,7 @@ Term* create_value(Branch* branch, Term* type, void* initialValue, std::string c
     return term;
 }
 
-Term* create_value(Branch* branch, std::string const& typeName, void* initialValue, std::string const& name)
+Term* create_value(Branch* branch, std::string const& typeName, std::string const& name)
 {
     Term *type = NULL;
 
@@ -147,7 +140,23 @@ Term* create_value(Branch* branch, std::string const& typeName, void* initialVal
     if (type == NULL)
         throw std::runtime_error(std::string("Couldn't find type: ")+typeName);
 
-    return create_value(branch, type, initialValue, name);
+    return create_value(branch, type, name);
+}
+
+Term* import_value(Branch& branch, Term* type, void* initialValue, std::string const& name)
+{
+    assert(type != NULL);
+    Term *var_function = get_value_function(branch, type);
+    Term *term = create_term(&branch, var_function, ReferenceList());
+
+    term->value = initialValue;
+    term->ownsValue = false;
+    term->stealingOk = false;
+
+    if (name != "")
+        branch.bindName(term, name);
+
+    return term;
 }
 
 Term* string_value(Branch& branch, std::string const& s, std::string const& name)
