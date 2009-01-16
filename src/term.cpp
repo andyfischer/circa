@@ -117,15 +117,6 @@ Term::addProperty(std::string const& name, Term* type)
 }
 
 bool
-Term::equals(Term* term)
-{
-    if (this->type != term->type)
-        return false;
-
-    return as_type(this->type).equals(this, term);
-}
-
-bool
 Term::hasError() const
 {
     return this->errors.size() != 0;

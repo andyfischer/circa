@@ -75,7 +75,6 @@ struct Term
     int numInputs() const;
 
     std::string toString();
-    bool equals(Term* term);
 
     // Returns the named property
     Term* property(std::string const& name);
