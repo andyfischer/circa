@@ -46,8 +46,7 @@ Term::Term()
     owningBranch(NULL),
     ownsValue(true),
     stealingOk(true),
-    needsUpdate(true),
-    myBranch(NULL)
+    needsUpdate(true)
 {
     globalID = gNextGlobalID++;
 
@@ -70,9 +69,6 @@ Term::~Term()
     nullPointerRemap[this] = NULL;
 
     dealloc_value(this);
-
-    delete myBranch;
-    myBranch = NULL;
 
 #if CHECK_FOR_BAD_POINTERS
     DEBUG_GOOD_POINTER_SET.erase(this);
@@ -106,21 +102,18 @@ Term::toString()
 Term*
 Term::property(std::string const& name)
 {
-    return getMyBranch()->getNamed(name);
+    return properties[name];
 }
 
 bool Term::hasProperty(std::string const& name)
 {
-    return getMyBranch()->containsName(name);
+    return properties.contains(name);
 }
 
 Term*
 Term::addProperty(std::string const& name, Term* type)
 {
-    Term* term = create_value(getMyBranch(), type);
-    assert(term != NULL);
-    getMyBranch()->bindName(term, name);
-    return term;
+    return properties.addSlot(name, type);
 }
 
 bool
@@ -157,17 +150,6 @@ Term::getErrorMessage() const
         return "";
     else
         return this->errors[0];
-}
-
-Branch*
-Term::getMyBranch()
-{
-    if (myBranch == NULL) {
-        myBranch = new Branch();
-        myBranch->owningTerm = this;
-    }
-
-    return myBranch;
 }
 
 int& Term::asInt()
