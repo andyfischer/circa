@@ -91,6 +91,8 @@ int main( int argc, char* args[] )
     circa::import_function(branch, rectangle,
             "rectangle(SDL_Surface,float,float,float,float,int)");
 
+    circa::evaluate_file(branch, "cgame.ca");
+
     //Initialize all SDL subsystems
     if( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
     {

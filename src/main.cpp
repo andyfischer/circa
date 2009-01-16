@@ -18,7 +18,7 @@ int circa_main(std::vector<std::string> args)
         cl_args->append(args[i]);
     }
 
-    create_value(KERNEL, "List", cl_args, "cl-args");
+    import_value(*KERNEL, LIST_TYPE, cl_args, "cl-args");
 
     args.erase(args.begin());
 
