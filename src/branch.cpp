@@ -213,9 +213,7 @@ void duplicate_branch(Branch* source, Branch* dest)
     // Remap terms
     for (int index=0; index < dest->numTerms(); index++) {
         Term* term = dest->get(index);
-        term->inputs.remapPointers(newTermMap);
-        if (as_type(term->type).remapPointers != NULL)
-            as_type(term->type).remapPointers(term, newTermMap);
+        remap_pointers(term, newTermMap);
     }
 
     // Copy names

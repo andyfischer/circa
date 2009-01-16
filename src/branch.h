@@ -25,9 +25,7 @@ public:
     TermNamespace names;
 
     // 'permanent' means that this branch will not be deleted until the
-    // entire program is shut down. This allows us to do a few things:
-    //  - We're allowed to point to any term externally
-    //  - We don't keep any record of external links
+    // entire program is shut down.
     bool permanent;
 
     Branch() : owningTerm(NULL), outerScope(NULL), permanent(false) {}
