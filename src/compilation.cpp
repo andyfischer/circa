@@ -21,15 +21,7 @@ CompilationContext::findNamed(std::string const& name) const
 {
     assert(!scopeStack.empty());
 
-    for (int i = (int) (scopeStack.size() - 1); i >= 0; i--) {
-
-        Term* term = scopeStack[i].branch->findNamed(name);
-
-        if (term != NULL)
-            return term;
-    }
-
-    return NULL;
+    return topBranch().findNamed(name);
 }
 
 CompilationContext::Scope const&
@@ -95,7 +87,6 @@ Term* find_and_apply_function(CompilationContext &context,
 
     return apply_function(context.topBranch(), function, inputs);
 }
-
 
 Term* create_comment(Branch& branch, std::string const& text)
 {
