@@ -324,6 +324,8 @@ FunctionDecl::createTerm(CompilationContext &context)
                 "function-name-input(@sub, inputIndex, name)");
     }
 
+    as_function(sub).subroutineBranch.outerScope = &context.topBranch();
+
     // Apply every statement
     context.pushScope(&as_function(sub).subroutineBranch, NULL);
     int numStatements = this->statements->count();

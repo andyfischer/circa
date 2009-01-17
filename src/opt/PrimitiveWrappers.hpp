@@ -19,8 +19,16 @@ public:
         _owned = true;
     }
     Int(Branch &branch, std::string const& name="") {
-        _term = create_value(&branch, INT_TYPE, name);
-        _owned = false;
+        if (name != "" && branch.containsName(name)) {
+            _term = branch[name];
+
+            assert(_term->type == INT_TYPE);
+
+            _owned = false;
+        } else {
+            _term = create_value(&branch, INT_TYPE, name);
+            _owned = false;
+        }
     }   
     Int(Term* term) {
         _term = term;
@@ -51,8 +59,16 @@ public:
         _owned = true;
     }
     Float(Branch &branch, std::string const& name="") {
-        _term = create_value(&branch, FLOAT_TYPE, name);
-        _owned = false;
+        if (name != "" && branch.containsName(name)) {
+            _term = branch[name];
+
+            assert(_term->type == FLOAT_TYPE);
+
+            _owned = false;
+        } else {
+            _term = create_value(&branch, FLOAT_TYPE, name);
+            _owned = false;
+        }
     }   
     Float(Term* term) {
         _term = term;

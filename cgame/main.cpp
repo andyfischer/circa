@@ -91,7 +91,9 @@ int main( int argc, char* args[] )
     circa::import_function(branch, rectangle,
             "rectangle(SDL_Surface,float,float,float,float,int)");
 
-    circa::evaluate_file(branch, "cgame.ca");
+    circa::evaluate_file(branch, "cgame/main.ca");
+
+    circa::print_raw_branch(branch, std::cout);
 
     //Initialize all SDL subsystems
     if( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
@@ -115,18 +117,22 @@ int main( int argc, char* args[] )
 
     //Load the images
 
-    // Construct the redrawing branch
+    // Make a call to redraw()
     circa::Branch &redraw = circa::call_subroutine(branch, "redraw");
+    std::cout << "redraw:" << std::endl;
+    circa::print_raw_branch(redraw, std::cout);
 
     circa::Float mouse_x(redraw, "mouse_x");
     circa::Float mouse_y(redraw, "mouse_y");
     circa::Int rect_size(redraw, "rect_size");
 
+    std::cout << float(mouse_x) << std::endl;
+    std::cout << float(mouse_y) << std::endl;
+    std::cout << int(rect_size) << std::endl;
+
     rect_size = 5;
 
-    redraw.compile("rect_x = 320.0");
-    redraw.compile("rect_y = 240.0");
-
+    /*
     for (int i=0; i < 10; i++) {
 
         redraw.compile("dist_x = 0.0?");
@@ -138,6 +144,7 @@ int main( int argc, char* args[] )
 
     redraw.compile("rect_x := mouse_x");
     redraw.compile("rect_y := mouse_y");
+    */
 
     // Main loop
     while (true) {
