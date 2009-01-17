@@ -116,10 +116,7 @@ int main( int argc, char* args[] )
     //Load the images
 
     // Construct the redrawing branch
-    circa::Branch &redraw = branch.startBranch("redraw");
-
-    //Apply the background to the screen
-    redraw.compile("apply-surface(screen, background, 0, 0)");
+    circa::Branch &redraw = circa::call_subroutine(branch, "redraw");
 
     circa::Float mouse_x(redraw, "mouse_x");
     circa::Float mouse_y(redraw, "mouse_y");

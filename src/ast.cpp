@@ -418,11 +418,17 @@ IfStatement::createTerm(CompilationContext &context)
     Term* conditionTerm = this->condition->createTerm(context);
     context.popExpressionFrame();
 
-    Term* ifStatementTerm = apply_function(context.topBranch(), "if-statement", ReferenceList(conditionTerm));
+    Term* ifStatementTerm = apply_function(context.topBranch(),
+                                           "if-statement",
+                                           ReferenceList(conditionTerm));
 
     Branch& posBranch = as_branch(ifStatementTerm->state->field(0));
     Branch& negBranch = as_branch(ifStatementTerm->state->field(1));
     Branch& joiningTermsBranch = as_branch(ifStatementTerm->state->field(2));
+
+    posBranch.outerScope = &context.topBranch();
+    negBranch.outerScope = &context.topBranch();
+    joiningTermsBranch.outerScope = &context.topBranch();
 
     context.pushScope(&posBranch, ifStatementTerm->state->field(0));
     this->positiveBranch->createTerms(context);
