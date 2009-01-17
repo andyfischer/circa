@@ -159,6 +159,16 @@ Term* import_value(Branch& branch, Term* type, void* initialValue, std::string c
     return term;
 }
 
+Term* import_value(Branch& branch, std::string const& typeName, void* initialValue, std::string const& name)
+{
+    Term* type = branch.findNamed(typeName);
+
+    if (type == NULL)
+        throw std::runtime_error("Couldn't find type: "+typeName);
+
+    return import_value(branch, type, initialValue, name);
+}
+
 Term* string_value(Branch& branch, std::string const& s, std::string const& name)
 {
     Term* term = create_value(&branch, STRING_TYPE);

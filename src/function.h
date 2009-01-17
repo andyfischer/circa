@@ -60,14 +60,15 @@ struct Function
     static void duplicate(Term* source, Term* dest);
     static void remapPointers(Term* term, ReferenceMap const& map);
     static void visitPointers(Term* term, PointerVisitor& visitor);
-    static void call_subroutine__initialize(Term* caller);
-    static void call_subroutine(Term* caller);
+    static void subroutine_evaluate(Term* caller);
 };
 
 bool is_function(Term* term);
 Function& as_function(Term*);
 
 std::string get_placeholder_name_for_index(int index);
+
+Branch& call_subroutine(Branch& branch, std::string const& functionName);
 
 } // namespace circa
 

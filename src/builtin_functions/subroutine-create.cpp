@@ -17,7 +17,7 @@ namespace subroutine_create_function {
 
         Function& sub = as_function(caller);
         sub.name = as_string(caller->input(0));
-        sub.evaluate = Function::call_subroutine;
+        sub.evaluate = Function::subroutine_evaluate;
         sub.inputTypes = as<ReferenceList>(caller->input(1));
 
         sub.outputType = caller->input(2);
