@@ -102,7 +102,7 @@ int main( int argc, char* args[] )
     //Set up the screen
     SDL_Surface* screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT,
             SCREEN_BPP, SDL_SWSURFACE );
-    circa::as<SDL_Surface*>(branch.eval("screen = SDL_Surface()")) = screen;
+    circa::import_value(branch, "SDL_Surface", screen, "screen");
 
     //If there was an error in setting up the screen
     if( screen == NULL )

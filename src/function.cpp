@@ -103,7 +103,7 @@ std::string get_placeholder_name_for_index(int index)
 }
 
 void
-Function::call_subroutine(Term* caller)
+Function::subroutine_evaluate(Term* caller)
 {
     Function &sub = as_function(caller->function);
 
@@ -132,6 +132,12 @@ Function::call_subroutine(Term* caller)
         Term* outputPlaceholder = branch[OUTPUT_PLACEHOLDER_NAME];
         recycle_value(outputPlaceholder, caller);
     }
+}
+
+Branch& call_subroutine(Branch& branch, std::string const& functionName)
+{
+    Term* newTerm = apply_function(branch, functionName, ReferenceList());
+    return as_branch(newTerm->state);
 }
 
 } // namespace circa
