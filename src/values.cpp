@@ -72,6 +72,20 @@ void duplicate_value(Term* source, Term* dest)
     update_owner(dest);
 }
 
+void assign_value(Term* source, Term* dest)
+{
+    assert_type(source, dest->type);
+
+    Type::AssignFunc assign = as_type(source->type).assign;
+
+    if (assign == NULL)
+        throw std::runtime_error(std::string("type ") + as_type(source->type).name
+                + " has no assign function");
+
+
+    assign(source, dest);
+}
+
 void steal_value(Term* source, Term* dest)
 {
     assert_type(source, dest->type);

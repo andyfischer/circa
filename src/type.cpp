@@ -155,7 +155,9 @@ void initialize_type_type(Term* typeType)
 {
     typeType->value = new Type();
     as_type(typeType).name = "Type";
-    assign_from_cpp_type<Type>(as_type(typeType));
+    as_type(typeType).alloc = cpp_interface::templated_alloc<Type>;
+    as_type(typeType).dealloc = cpp_interface::templated_dealloc<Type>;
+    as_type(typeType).duplicate = cpp_interface::templated_duplicate<Type>;
     as_type(typeType).toString = Type::to_string;
 }
 
