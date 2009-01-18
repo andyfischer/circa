@@ -11,6 +11,12 @@
 
 namespace circa {
 
+bool is_value(Term* term)
+{
+    assert_good_pointer(term);
+    return term->function->function == VALUE_FUNCTION_GENERATOR;
+}
+
 std::string get_short_local_name(Term* term)
 {
     if (term == NULL)
