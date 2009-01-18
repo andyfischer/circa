@@ -99,6 +99,8 @@ int main( int argc, char* args[] )
 
     circa::evaluate_file(branch, "cgame/main.ca");
 
+    circa::print_raw_branch(branch, std::cout);
+
     //Initialize all SDL subsystems
     if( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
     {

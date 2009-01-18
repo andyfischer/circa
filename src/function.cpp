@@ -107,7 +107,7 @@ void initialize_subroutine_call(Term* term)
     Function &def = as_function(term->function);
 
     as_branch(term->state).clear();
-    duplicate_branch(&def.subroutineBranch, &as_branch(term->state));
+    duplicate_branch(def.subroutineBranch, as_branch(term->state));
 }
 
 void
