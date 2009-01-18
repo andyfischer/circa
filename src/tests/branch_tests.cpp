@@ -142,6 +142,19 @@ void test_startBranch()
 
 void test_migrate()
 {
+    Branch orig, replace;
+
+    Term* a = orig.eval("a = 1");
+
+    Term* a_replace = replace.eval("a = 2");
+
+    migrate_branch(orig, replace);
+
+    // Test that the 'orig' terms are the same terms
+    test_assert(orig["a"] == a);
+
+    // Test that the value was transferred
+    test_assert(as_int(a) == 2);
 }
 
 } // namespace branch_tests
@@ -153,6 +166,7 @@ void register_branch_tests()
     REGISTER_TEST_CASE(branch_tests::test_owning_term);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
     REGISTER_TEST_CASE(branch_tests::test_startBranch);
+    REGISTER_TEST_CASE(branch_tests::test_migrate);
 }
 
 } // namespace circa

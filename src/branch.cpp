@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "introspection.h"
 #include "parser.h"
 #include "runtime.h"
 #include "ref_map.h"
@@ -241,30 +242,17 @@ void migrate_branch(Branch& original, Branch& replacement)
         if (term->name == "")
             continue;
 
-        // Only migrate terms with state
-        if (term->state == NULL)
-            continue;
-
         if (!replacement.containsName(term->name))
             // todo: print a warning here?
             continue;
 
         Term* replaceTerm = replacement[term->name];
 
-        if (replaceTerm->state == NULL)
-            // todo: warning
-            continue;
-
-        if (term->state->type != replaceTerm->state->type)
-            // todo: warning
-            continue;
-
         // Special behavior for branches
-        if (term->state->type == BRANCH_TYPE) {
+        if (term->state != NULL && term->state->type == BRANCH_TYPE) {
             migrate_branch(as_branch(term->state), as_branch(replaceTerm->state));
-        } else {
-            dealloc_value(term->state);
-            duplicate_value(replaceTerm->state, term->state);
+        } else if (is_value(term)) {
+            assign_value(replaceTerm, term);
         }
     }
 }
