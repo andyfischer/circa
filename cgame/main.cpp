@@ -91,20 +91,19 @@ int main( int argc, char* args[] )
     circa::import_function(branch, rectangle,
             "rectangle(SDL_Surface,float,float,float,float,int)");
 
-    circa::evaluate_file(branch, "cgame/main.ca");
+    //Set up the screen
+    SDL_Surface* screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT,
+            SCREEN_BPP, SDL_SWSURFACE );
 
-    circa::print_raw_branch(branch, std::cout);
+    circa::import_value(branch, "SDL_Surface", &screen, "screen");
+
+    circa::evaluate_file(branch, "cgame/main.ca");
 
     //Initialize all SDL subsystems
     if( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
     {
         return 1;
     }
-
-    //Set up the screen
-    SDL_Surface* screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT,
-            SCREEN_BPP, SDL_SWSURFACE );
-    circa::import_value(branch, "SDL_Surface", screen, "screen");
 
     //If there was an error in setting up the screen
     if( screen == NULL )
@@ -125,10 +124,6 @@ int main( int argc, char* args[] )
     circa::Float mouse_x(redraw, "mouse_x");
     circa::Float mouse_y(redraw, "mouse_y");
     circa::Int rect_size(redraw, "rect_size");
-
-    std::cout << float(mouse_x) << std::endl;
-    std::cout << float(mouse_y) << std::endl;
-    std::cout << int(rect_size) << std::endl;
 
     rect_size = 5;
 
