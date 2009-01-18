@@ -196,32 +196,76 @@ Branch& as_branch(Term* term)
     return *((Branch*) term->value);
 }
 
-void duplicate_branch(Branch* source, Branch* dest)
+std::string get_name_for_attribute(std::string attribute)
+{
+    return "#attr:" + attribute;
+}
+
+void duplicate_branch(Branch& source, Branch& dest)
 {
     ReferenceMap newTermMap;
 
     // Duplicate every term
-    for (int index=0; index < source->numTerms(); index++) {
-        Term* source_term = source->get(index);
+    for (int index=0; index < source.numTerms(); index++) {
+        Term* source_term = source.get(index);
 
-        Term* dest_term = create_term(dest, source_term->function, source_term->inputs);
+        Term* dest_term = create_term(&dest, source_term->function, source_term->inputs);
         newTermMap[source_term] = dest_term;
 
         duplicate_value(source_term, dest_term);
     }
 
     // Remap terms
-    for (int index=0; index < dest->numTerms(); index++) {
-        Term* term = dest->get(index);
+    for (int index=0; index < dest.numTerms(); index++) {
+        Term* term = dest.get(index);
         remap_pointers(term, newTermMap);
     }
 
     // Copy names
     TermNamespace::StringToTermMap::iterator it;
-    for (it = source->names.begin(); it != source->names.end(); ++it) {
+    for (it = source.names.begin(); it != source.names.end(); ++it) {
         std::string name = it->first;
         Term* original_term = it->second;
-        dest->bindName(newTermMap.getRemapped(original_term), name);
+        dest.bindName(newTermMap.getRemapped(original_term), name);
+    }
+}
+
+void migrate_branch(Branch& original, Branch& replacement)
+{
+    // This function is a work in progress
+
+    // For now, just look for named terms in 'original', and replace
+    // values with values from 'replacement'
+    for (int termIndex=0; termIndex < original.numTerms(); termIndex++) {
+        Term* term = original[termIndex];
+        if (term->name == "")
+            continue;
+
+        // Only migrate terms with state
+        if (term->state == NULL)
+            continue;
+
+        if (!replacement.containsName(term->name))
+            // todo: print a warning here?
+            continue;
+
+        Term* replaceTerm = replacement[term->name];
+
+        if (replaceTerm->state == NULL)
+            // todo: warning
+            continue;
+
+        if (term->state->type != replaceTerm->state->type)
+            // todo: warning
+            continue;
+
+        // Special behavior for branches
+        if (term->state->type == BRANCH_TYPE) {
+            migrate_branch(as_branch(term->state), as_branch(replaceTerm->state));
+        } else {
+            dealloc_value(term->state);
+            duplicate_value(replaceTerm->state, term->state);
+        }
     }
 }
 
@@ -238,6 +282,19 @@ void evaluate_file(Branch& branch, std::string const& filename)
     context.popScope();
 
     delete statementList;
+
+    string_value(branch, filename, get_name_for_attribute("source-file"));
+}
+
+void reload_branch_from_file(Branch& branch)
+{
+    std::string filename = as_string(branch[get_name_for_attribute("source-file")]);
+
+    Branch replacement;
+
+    evaluate_file(replacement, filename);
+
+    migrate_branch(branch, replacement);
 }
 
 } // namespace circa

@@ -28,7 +28,7 @@ void test_duplicate()
 
     Branch duplicate;
 
-    duplicate_branch(&original, &duplicate);
+    duplicate_branch(original, duplicate);
 
     Term* term1_duplicate = duplicate.getNamed("term1");
     test_assert(term1_duplicate != NULL);
