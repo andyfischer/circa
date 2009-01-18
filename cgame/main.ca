@@ -1,5 +1,5 @@
 
-screen = SDL_Surface()
+--screen = SDL_Surface()
 background = load-image('background.bmp')
 
 function redraw()
@@ -7,7 +7,7 @@ function redraw()
 
     mouse_x = 3.0
     mouse_y = 5.0
-    rect_size = 2
+    rect_size = 3
 
-    rectangle(screen, mouse_x - 1, mouse_y - 1, mouse_x + 1, mouse_y + 1)
+    rectangle(screen, mouse_x - rect_size, mouse_y - rect_size, mouse_x + rect_size, mouse_y + rect_size, 0)
 end

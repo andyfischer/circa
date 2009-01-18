@@ -102,9 +102,22 @@ std::string get_placeholder_name_for_index(int index)
     return sstream.str();
 }
 
+void initialize_subroutine_call(Term* term)
+{
+    Function &def = as_function(term->function);
+
+    as_branch(term->state).clear();
+    duplicate_branch(&def.subroutineBranch, &as_branch(term->state));
+}
+
 void
 Function::subroutine_evaluate(Term* caller)
 {
+    Branch &branch = as_branch(caller->state);
+
+    if (branch.numTerms() == 0)
+        initialize_subroutine_call(caller);
+
     Function &sub = as_function(caller->function);
 
     if (sub.inputTypes.count() != caller->inputs.count()) {
@@ -115,10 +128,7 @@ Function::subroutine_evaluate(Term* caller)
         return;
     }
 
-    Branch branch;
-
-    duplicate_branch(&sub.subroutineBranch, &branch);
-
+    // Implant inputs
     for (unsigned int input=0; input < sub.inputTypes.count(); input++) {
 
         Term* inputPlaceholder = branch[get_placeholder_name_for_index(input)];
@@ -128,6 +138,7 @@ Function::subroutine_evaluate(Term* caller)
 
     evaluate_branch(branch);
 
+    // Copy output
     if (branch.containsName(OUTPUT_PLACEHOLDER_NAME)) {
         Term* outputPlaceholder = branch[OUTPUT_PLACEHOLDER_NAME];
         recycle_value(outputPlaceholder, caller);
@@ -137,6 +148,7 @@ Function::subroutine_evaluate(Term* caller)
 Branch& call_subroutine(Branch& branch, std::string const& functionName)
 {
     Term* newTerm = apply_function(branch, functionName, ReferenceList());
+    initialize_subroutine_call(newTerm);
     return as_branch(newTerm->state);
 }
 
