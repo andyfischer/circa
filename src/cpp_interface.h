@@ -30,6 +30,12 @@ void templated_duplicate(Term* source, Term* dest)
 }
 
 template <class T>
+void templated_assign(Term* source, Term* dest)
+{
+    *reinterpret_cast<T*>(dest->value) = *reinterpret_cast<T*>(source->value);
+}
+
+template <class T>
 bool templated_equals(Term* a, Term* b)
 {
     return (*(reinterpret_cast<T*>(a->value))) == (*(reinterpret_cast<T*>(b->value)));
@@ -51,21 +57,16 @@ std::string templated_toString(Term* term)
 
 // Public functions
 
-template <class CppType>
-void assign_from_cpp_type(Type& type)
-{
-    type.alloc = cpp_interface::templated_alloc<CppType>;
-    type.dealloc = cpp_interface::templated_dealloc<CppType>;
-    type.duplicate = cpp_interface::templated_duplicate<CppType>;
-    type.cppTypeInfo = &typeid(CppType);
-    //type.equals = cpp_interface::templated_equals<CppType>;
-}
-
 template <class T>
 Term* import_type(Branch& branch, std::string name="")
 {
     Term* term = quick_create_type(branch, name);
-    assign_from_cpp_type<T>(as_type(term));
+    Type& type = as_type(term);
+    type.alloc = cpp_interface::templated_alloc<T>;
+    type.dealloc = cpp_interface::templated_dealloc<T>;
+    type.duplicate = cpp_interface::templated_duplicate<T>;
+    type.assign = cpp_interface::templated_assign<T>;
+    type.cppTypeInfo = &typeid(T);
     return term;
 }
 

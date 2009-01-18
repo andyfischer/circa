@@ -22,6 +22,7 @@ struct Type
     typedef void (*InitializeFunc)(Term* term);
     typedef void (*DeallocFunc)(void* data);
     typedef void (*DuplicateFunc)(Term* src, Term* dest);
+    typedef void (*AssignFunc)(Term* src, Term* dest);
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
     typedef bool (*LessThanFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
@@ -48,6 +49,7 @@ struct Type
     InitializeFunc init;
     DeallocFunc dealloc;
     DuplicateFunc duplicate;
+    AssignFunc assign;
     EqualsFunc equals;
     LessThanFunc lessThan;
     RemapPointersFunc remapPointers;
