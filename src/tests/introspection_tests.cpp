@@ -8,6 +8,16 @@
 namespace circa {
 namespace introspection_tests {
 
+void test_is_value()
+{
+    Branch branch;
+
+    test_assert(is_value(create_value(&branch, INT_TYPE)));
+    test_assert(is_value(create_value(&branch, STRING_TYPE)));
+    test_assert(is_value(create_value(&branch, BOOL_TYPE)));
+    test_assert(!is_value(branch.eval("1 + 2")));
+}
+
 void round_trip_source(std::string statement)
 {
     Branch branch;
@@ -41,6 +51,7 @@ void reproduce_source() {
 
 void register_introspection_tests()
 {
+    REGISTER_TEST_CASE(introspection_tests::test_is_value);
     REGISTER_TEST_CASE(introspection_tests::reproduce_source);
 }
 

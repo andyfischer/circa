@@ -140,6 +140,10 @@ void test_startBranch()
     test_assert(sub.findNamed("a") == a);
 }
 
+void test_migrate()
+{
+}
+
 } // namespace branch_tests
 
 void register_branch_tests()
