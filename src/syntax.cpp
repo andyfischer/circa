@@ -37,7 +37,7 @@ std::string get_source_of_input(Term* term, int inputIndex)
         case TermSyntaxHints::InputSyntax::UNKNOWN_STYLE:
         default:
         {
-            return "(!unknown)";
+            return ""; // "(!unknown)";
         }
         break;
     }
@@ -46,6 +46,9 @@ std::string get_source_of_input(Term* term, int inputIndex)
 bool should_print_term_source_line(Term* term)
 {
     if (term->syntaxHints.occursInsideAnExpression)
+        return false;
+
+    if (term->syntaxHints.declarationStyle == TermSyntaxHints::UNKNOWN_DECLARATION_STYLE)
         return false;
 
     return true;
@@ -128,7 +131,7 @@ std::string get_term_source(Term* term)
 
         case TermSyntaxHints::UNKNOWN_DECLARATION_STYLE:
         {
-            result << "(!error, unknown declaration style)";
+            // result << "(!error, unknown declaration style)";
         }
         break;
     }
