@@ -142,7 +142,8 @@ Identifier::createTerm(CompilationContext &context)
     Term* result = context.findNamed(this->text);
 
     if (result == NULL) {
-        parser::syntax_error(std::string("Couldn't find identifier: ") + this->text);
+        // parser::syntax_error(std::string("Couldn't find identifier: ") + this->text);
+        return NULL;
     }
 
     if (hasRebindOperator) {
