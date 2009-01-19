@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "function.h"
 #include "introspection.h"
 #include "parser.h"
 #include "runtime.h"
@@ -250,8 +251,13 @@ void migrate_branch(Branch& original, Branch& replacement)
 
         // Special behavior for branches
         if (term->state != NULL && term->state->type == BRANCH_TYPE) {
+            // branch migration
             migrate_branch(as_branch(term->state), as_branch(replaceTerm->state));
+        } else if (is_value(term) && term->type == FUNCTION_TYPE) {
+            // subroutine migration
+            migrate_branch(get_subroutine_branch(term), get_subroutine_branch(replaceTerm));
         } else if (is_value(term)) {
+            // value migration
             assign_value(replaceTerm, term);
         }
     }
