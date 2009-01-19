@@ -78,25 +78,24 @@ int main( int argc, char* args[] )
 {
     circa::initialize();
 
-    circa::Branch branch;
+    circa::import_type<SDL_Surface*>(*circa::KERNEL, "SDL_Surface");
 
-    circa::import_type<SDL_Surface*>(branch, "SDL_Surface");
-
-    circa::import_function(branch, load_image,
+    circa::import_function(*circa::KERNEL, load_image,
             "load-image(string) -> SDL_Surface");
-    circa::import_function(branch, apply_surface,
+    circa::import_function(*circa::KERNEL, apply_surface,
             "apply-surface(SDL_Surface,SDL_Surface,int,int)");
-    circa::import_function(branch, SDL_FreeSurface_c,
+    circa::import_function(*circa::KERNEL, SDL_FreeSurface_c,
             "SDL_FreeSurface(SDL_Surface)");
-    circa::import_function(branch, rectangle,
+    circa::import_function(*circa::KERNEL, rectangle,
             "rectangle(SDL_Surface,float,float,float,float,int)");
 
     //Set up the screen
     SDL_Surface* screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT,
             SCREEN_BPP, SDL_SWSURFACE );
 
-    circa::import_value(branch, "SDL_Surface", &screen, "screen");
+    circa::import_value(*circa::KERNEL, "SDL_Surface", &screen, "screen");
 
+    circa::Branch branch;
     circa::evaluate_file(branch, "cgame/main.ca");
 
     circa::print_raw_branch(branch, std::cout);
@@ -129,20 +128,6 @@ int main( int argc, char* args[] )
 
     rect_size = 5;
 
-    /*
-    for (int i=0; i < 10; i++) {
-
-        redraw.compile("dist_x = 0.0?");
-        redraw.compile("dist_y = 0.0?");
-        redraw.compile("rect_x = rect_x + dist_x");
-        redraw.compile("rect_y = rect_y + dist_y");
-        redraw.compile("rectangle(screen, rect_x - rect_size, rect_y - rect_size, rect_x + rect_size, rect_y + rect_size, 0)");
-    }
-
-    redraw.compile("rect_x := mouse_x");
-    redraw.compile("rect_y := mouse_y");
-    */
-
     // Main loop
     while (true) {
         SDL_Event event;
@@ -151,10 +136,13 @@ int main( int argc, char* args[] )
         if (event.type == SDL_QUIT)
             break;
 
-        if (event.type == SDL_MOUSEMOTION)
-        {
+        if (event.type == SDL_MOUSEMOTION) {
             mouse_x = event.motion.x;
             mouse_y = event.motion.y;
+        } else if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_5) {
+                circa::reload_branch_from_file(branch);
+            }
         }
 
         redraw.eval();
