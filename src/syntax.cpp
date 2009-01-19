@@ -37,7 +37,7 @@ std::string get_source_of_input(Term* term, int inputIndex)
         case TermSyntaxHints::InputSyntax::UNKNOWN_STYLE:
         default:
         {
-            return ""; // "(!unknown)";
+            return "(!unknown)";
         }
         break;
     }
