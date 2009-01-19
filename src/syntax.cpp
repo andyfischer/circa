@@ -79,7 +79,7 @@ std::string get_term_source(Term* term)
 
         result << get_branch_source(definedFunc.subroutineBranch) << "\n";
         
-        result << "end" << "\n";
+        result << "end";
 
         return result.str();
     }
