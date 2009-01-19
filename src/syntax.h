@@ -5,8 +5,9 @@
 
 namespace circa {
 
-void print_source_line(Term* term, std::ostream &output);
-void print_source(Branch& branch, std::ostream &output);
+std::string get_term_source(Term* term);
+bool should_print_term_source_line(Term* term);
+std::string get_branch_source(Branch& branch);
 
 }
 
