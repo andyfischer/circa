@@ -40,7 +40,7 @@ Term* eval_statement(Branch* branch, std::string const& input)
 namespace parser {
 
 std::string possibleWhitespace(token_stream::TokenStream& tokens);
-std::string possibleNewline(token_stream::TokenStream& tokens);
+std::string possibleWhitespaceNewline(token_stream::TokenStream& tokens);
 
 ast::StatementList* statementList(token_stream::TokenStream& tokens)
 {
@@ -371,19 +371,19 @@ ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
 
     decl->header = functionHeader(tokens);
 
-    //possibleNewline(tokens);
+    //possibleWhitespaceNewline(tokens);
 
     /*tokens.consume(tokenizer::LBRACE);
 
-    possibleNewline(tokens);*/
+    possibleWhitespaceNewline(tokens);*/
 
     decl->statements = statementList(tokens);
 
-    possibleNewline(tokens);
+    possibleWhitespaceNewline(tokens);
 
     tokens.consume(tokenizer::END);
 
-    possibleNewline(tokens);
+    possibleWhitespaceNewline(tokens);
     
     return decl.release();
 }
@@ -399,11 +399,11 @@ ast::TypeDecl* typeDecl(token_stream::TokenStream& tokens)
 
     decl->name = tokens.consume(tokenizer::IDENTIFIER);
 
-    possibleNewline(tokens);
+    possibleWhitespaceNewline(tokens);
 
     tokens.consume(tokenizer::LBRACE);
 
-    possibleNewline(tokens);
+    possibleWhitespaceNewline(tokens);
 
     while (true) {
 
@@ -436,19 +436,19 @@ ast::IfStatement* ifStatement(token_stream::TokenStream& tokens)
 
     result->condition = infixExpression(tokens);
 
-    possibleNewline(tokens);
+    possibleWhitespaceNewline(tokens);
 
     result->positiveBranch = statementList(tokens);
 
     if (tokens.nextIs(tokenizer::ELSE)) {
         tokens.consume(tokenizer::ELSE);
-        possibleNewline(tokens);
+        possibleWhitespaceNewline(tokens);
 
         result->negativeBranch = statementList(tokens);
     }
 
     tokens.consume(tokenizer::END);
-    possibleNewline(tokens);
+    possibleWhitespaceNewline(tokens);
 
     return result.release();
 }
@@ -461,7 +461,7 @@ std::string possibleWhitespace(token_stream::TokenStream& tokens)
         return "";
 }
 
-std::string possibleNewline(token_stream::TokenStream& tokens)
+std::string possibleWhitespaceNewline(token_stream::TokenStream& tokens)
 {
     std::stringstream output;
 
