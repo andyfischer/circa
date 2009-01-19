@@ -269,9 +269,6 @@ FunctionDecl::~FunctionDecl()
 Term*
 FunctionDecl::createTerm(CompilationContext &context)
 {
-    // Make a workspace where we'll assemble this function
-    Branch workspace;
-
     ReferenceList inputTypes;
 
     for (unsigned int inputIndex=0;
@@ -302,32 +299,37 @@ FunctionDecl::createTerm(CompilationContext &context)
     }
 
     // Load into workspace
-    Term* inputTypesTerm = workspace.eval("inputTypes = tuple()");
-    as<ReferenceList>(inputTypesTerm) = inputTypes;
-    string_value(workspace, this->header->functionName, "functionName");
-    workspace.bindName(outputType, "outputType");
+    //Term* inputTypesTerm = workspace.eval("inputTypes = tuple()");
+    //as<ReferenceList>(inputTypesTerm) = inputTypes;
+    //string_value(workspace, this->header->functionName, "functionName");
+    //workspace.bindName(outputType, "outputType");
 
-    // Create
-    Term* sub = workspace.eval(
-        "sub = subroutine-create(functionName, inputTypes, outputType)");
+    Term* resultTerm = create_value(&context.topBranch(), FUNCTION_TYPE, this->header->functionName);
+    Function& result = as_function(resultTerm);
+    result.name = header->functionName;
+    result.inputTypes = inputTypes;
+    result.outputType = outputType;
+    result.evaluate = Function::subroutine_evaluate;
+    result.stateType = BRANCH_TYPE;
 
-    // Name each input
+    // Create input placeholders
     for (unsigned int inputIndex=0;
          inputIndex < this->header->arguments.size();
          inputIndex++)
     {
         std::string name = this->header->arguments[inputIndex].name;
-        int_value(workspace, inputIndex, "inputIndex");
-        string_value(workspace, name, "name");
+        std::string internalName = get_placeholder_name_for_index(inputIndex);
+        Term* placeholder = create_value(&result.subroutineBranch, result.inputTypes[inputIndex], internalName);
 
-        sub = workspace.eval(
-                "function-name-input(@sub, inputIndex, name)");
+        // hack to bind two names to this one term
+        placeholder->name = "";
+        result.subroutineBranch.bindName(placeholder, name);
     }
 
-    as_function(sub).subroutineBranch.outerScope = &context.topBranch();
+    result.subroutineBranch.outerScope = &context.topBranch();
 
     // Apply every statement
-    context.pushScope(&as_function(sub).subroutineBranch, NULL);
+    context.pushScope(&result.subroutineBranch, NULL);
     int numStatements = this->statements->count();
     for (int statementIndex=0; statementIndex < numStatements; statementIndex++) {
         Statement* statement = this->statements->operator[](statementIndex);
@@ -336,11 +338,7 @@ FunctionDecl::createTerm(CompilationContext &context)
     }
     context.popScope();
 
-    Term* outer_val = create_value(&context.topBranch(), FUNCTION_TYPE);
-    steal_value(sub, outer_val);
-    context.topBranch().bindName(outer_val, this->header->functionName);
-
-    return sub;
+    return resultTerm;
 }
 
 std::string
