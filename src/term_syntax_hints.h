@@ -16,6 +16,7 @@ struct TermSyntaxHints
             BY_SOURCE };
 
         Style style;
+        std::string name;
 
         InputSyntax() : style(UNKNOWN_STYLE) {}
     };

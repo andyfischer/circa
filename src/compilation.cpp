@@ -228,9 +228,10 @@ TermSyntaxHints::InputSyntax get_input_syntax(ast::ASTNode* node)
 {
     TermSyntaxHints::InputSyntax result;
 
-    if (node->typeName() == "Identifier")
+    if (node->typeName() == "Identifier") {
         result.style = TermSyntaxHints::InputSyntax::BY_NAME;
-    else
+        result.name = dynamic_cast<ast::Identifier*>(node)->text;
+    } else
         result.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
 
     return result;
@@ -299,6 +300,7 @@ Term* create_function_call(CompilationContext &context, ast::FunctionCall& ast)
     }
 
     result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
+    result->syntaxHints.functionName = ast.functionName;
     result->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
 
     return result;
