@@ -233,8 +233,9 @@ TermSyntaxHints::InputSyntax get_input_syntax(ast::ASTNode* node)
     if (node->typeName() == "Identifier") {
         result.style = TermSyntaxHints::InputSyntax::BY_NAME;
         result.name = dynamic_cast<ast::Identifier*>(node)->text;
-    } else
+    } else {
         result.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
+    }
 
     return result;
 }
@@ -291,15 +292,8 @@ Term* create_function_call(CompilationContext &context, ast::FunctionCall& ast)
 
     for (unsigned int i=0; i < ast.arguments.size(); i++) {
 
-        TermSyntaxHints::InputSyntax inputSyntax;
-
-        if (is_literal(ast.arguments[i]->expression)) {
-            inputSyntax.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
-        } else if (ast.arguments[i]->expression->typeName() == "Identifier") {
-            inputSyntax.style = TermSyntaxHints::InputSyntax::BY_NAME;
-        }
-
-        result->syntaxHints.inputSyntax.push_back(inputSyntax);
+        result->syntaxHints.inputSyntax.push_back(
+                get_input_syntax(ast.arguments[i]->expression));
     }
 
     result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
