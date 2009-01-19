@@ -92,6 +92,8 @@ Term* create_comment(Branch& branch, std::string const& text)
 {
     Term* result = apply_function(branch, COMMENT_FUNC, ReferenceList());
     as_string(result->state->field(0)) = text;
+    result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    result->syntaxHints.occursInsideAnExpression = false;
     return result;
 }
 
@@ -259,6 +261,7 @@ Term* create_infix_call(CompilationContext &context, ast::Infix& ast)
     result->syntaxHints.setInputSyntax(1, get_input_syntax(ast.right));
     result->syntaxHints.declarationStyle = TermSyntaxHints::INFIX;
     result->syntaxHints.functionName = ast.operatorStr;
+    result->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
 
     return result;
 }

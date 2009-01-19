@@ -77,9 +77,7 @@ std::string get_term_source(Term* term)
 
         result << "function " << definedFunc.name << "()\n";
 
-        for (int i=0; i < definedFunc.subroutineBranch.numTerms(); i++) {
-            result << get_term_source(definedFunc.subroutineBranch[i]) << "\n";
-        }
+        result << get_branch_source(definedFunc.subroutineBranch) << "\n";
         
         result << "end" << "\n";
 
