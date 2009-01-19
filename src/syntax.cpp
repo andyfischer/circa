@@ -4,6 +4,7 @@
 
 #include "builtins.h"
 #include "branch.h"
+#include "function.h"
 #include "introspection.h"
 #include "syntax.h"
 #include "term.h"
@@ -16,7 +17,7 @@ std::string get_source_of_input(Term* term, int inputIndex)
     Term* input = term->input(inputIndex);
 
     // Special case: ignore functions that were inserted by coersion
-    if (input->function == INT_TO_FLOAT_FUNC) {
+    if (input != NULL && input->function == INT_TO_FLOAT_FUNC) {
         input = input->input(0);
     }
 
@@ -29,7 +30,7 @@ std::string get_source_of_input(Term* term, int inputIndex)
 
         case TermSyntaxHints::InputSyntax::BY_NAME:
         {
-            return input->name;
+            return term->syntaxHints.getInputSyntax(inputIndex).name;
         }
         break;
 
@@ -66,6 +67,20 @@ std::string get_term_source(Term* term)
             result << "--" << comment;
             return result.str();
         }
+    } else if (is_value(term) && term->type == FUNCTION_TYPE) {
+        Function &definedFunc = as_function(term);
+
+        std::stringstream result;
+
+        result << "function " << definedFunc.name << "()\n";
+
+        for (int i=0; i < definedFunc.subroutineBranch.numTerms(); i++) {
+            result << get_term_source(definedFunc.subroutineBranch[i]) << "\n";
+        }
+        
+        result << "end" << "\n";
+
+        return result.str();
     }
 
     // add possible name binding
@@ -77,8 +92,7 @@ std::string get_term_source(Term* term)
     switch (term->syntaxHints.declarationStyle) {
         case TermSyntaxHints::FUNCTION_CALL:
         {
-
-            result << term->function->name << "(";
+            result << term->syntaxHints.functionName << "(";
 
             for (int i=0; i < term->numInputs(); i++) {
                 if (i > 0) result << ", ";
@@ -145,5 +159,4 @@ std::string get_branch_source(Branch& branch)
     return result.str();
 }
 
-    
 } // namespace circa
