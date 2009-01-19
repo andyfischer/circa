@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import test_helper
 
 def run_test(filename):
