@@ -88,7 +88,7 @@ int circa_main(std::vector<std::string> args)
         }
 
         else if (justPrintSource) {
-            std::cout << get_branch_source(branch) << std::endl;
+            std::cout << get_branch_source(branch);
         }
 
         else if (has_compile_errors(branch)) {
