@@ -16,6 +16,17 @@ def do_output_test(*args):
 
     TESTS_RUN += 1
 
+def do_source_reproduction_test(*args):
+    import source_reproduction_test
+    global TESTS_RUN
+    global FAILURES
+
+    result = source_reproduction_test.run_test(*args)
+    if result is not True:
+        FAILURES.append(result)
+
+    TESTS_RUN += 1
+
 def print_results():
     output = "Ran %d tests." % TESTS_RUN
 
@@ -31,5 +42,7 @@ def print_results():
 
 for file in test_helper.readFileAsLines('test_manifest'):
     do_output_test(file)
+for file in test_helper.readFileAsLines('source_repro_tests'):
+    do_source_reproduction_test(file)
 
 print_results()
