@@ -313,6 +313,9 @@ FunctionDecl::createTerm(CompilationContext &context)
     result.evaluate = Function::subroutine_evaluate;
     result.stateType = BRANCH_TYPE;
 
+    // Syntax hints
+    resultTerm->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+
     // Create input placeholders
     for (unsigned int inputIndex=0;
          inputIndex < this->header->arguments.size();
