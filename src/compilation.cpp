@@ -278,7 +278,6 @@ Term* create_function_call(CompilationContext &context, ast::FunctionCall& ast)
         context.pushExpressionFrame(true);
         Term* term = arg->expression->createTerm(context);
         context.popExpressionFrame();
-        assert(term != NULL);
 
         inputs.append(term);
     }
