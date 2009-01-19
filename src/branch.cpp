@@ -247,6 +247,12 @@ void migrate_branch(Branch& original, Branch& replacement)
             // todo: print a warning here?
             continue;
 
+        // Don't migrate terms with a 'should-migrate' set to false
+        // This might be a temporary measure.
+        if (term->hasProperty("should-migrate")
+                && !as_bool(term->property("should-migrate")))
+            continue;
+
         Term* replaceTerm = replacement[term->name];
 
         // Special behavior for branches
