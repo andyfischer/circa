@@ -126,8 +126,6 @@ int main( int argc, char* args[] )
     circa::Float mouse_y(redraw, "mouse_y");
     circa::Int rect_size(redraw, "rect_size");
 
-    rect_size = 5;
-
     // Main loop
     while (true) {
         SDL_Event event;

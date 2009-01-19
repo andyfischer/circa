@@ -68,6 +68,8 @@ Function& as_function(Term*);
 
 std::string get_placeholder_name_for_index(int index);
 
+void set_subroutine_input_name(Function& func, int index, std::string const& name);
+
 Branch& call_subroutine(Branch& branch, std::string const& functionName);
 Branch& get_subroutine_branch(Term* term);
 

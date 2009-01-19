@@ -145,6 +145,18 @@ Function::subroutine_evaluate(Term* caller)
     }
 }
 
+void set_subroutine_input_name(Function& func, int index, std::string const& name)
+{
+    Term* inputPlaceholder =
+        func.subroutineBranch.getNamed(get_placeholder_name_for_index(index));
+
+    assert(inputPlaceholder != NULL);
+
+    // remove the name on this term, so that this new name will stick
+    inputPlaceholder->name = "";
+    func.subroutineBranch.bindName(inputPlaceholder, name);
+}
+
 // deprecated:
 Branch& call_subroutine(Branch& branch, std::string const& functionName)
 {
