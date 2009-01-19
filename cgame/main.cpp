@@ -126,6 +126,10 @@ int main( int argc, char* args[] )
     circa::Float mouse_y(redraw, "mouse_y");
     circa::Int rect_size(redraw, "rect_size");
 
+    // This call is awfully unreadable:
+    circa::as_bool(redraw["mouse_x"]->addProperty("should-migrate", circa::BOOL_TYPE)) = false;
+    circa::as_bool(redraw["mouse_y"]->addProperty("should-migrate", circa::BOOL_TYPE)) = false;
+
     // Main loop
     while (true) {
         SDL_Event event;
