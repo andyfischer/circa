@@ -1,30 +1,7 @@
 
 import os
 
-def testSame(expected, actual):
-    """
-    Does a line-wise comparison of the strings expected and actual.
-    Returns None if succeeded, or a error message (string) if failed.
-    """
-
-    expected = expected.split('\n')
-    actual = actual.split('\n')
-    for index in range(len(expected)):
-
-        expectedLine = expected[index]
-
-        if index >= len(actual):
-            return "On line %i\nExpected %s\nOutput reached EOF" % (index,expectedLine)
-
-        actualLine = actual[index]
-
-        if expectedLine != actualLine:
-            return ("On line %i\nExpected: %s\nOutput:   %s" % 
-                    (index, expectedLine, actualLine))
-
-    return None
-
-def runCommand(command):
+def run_command(command):
     """
     Run the given command, return everything that was printed to stdout.
     """
@@ -45,14 +22,14 @@ def runCommand(command):
 
     return '\n'.join(lines)
 
-def loadFile(filename):
+def load_file(filename):
     f = open(filename)
     contents = f.read()
     f.close()
     return contents
 
 def readFileAsLines(filename):
-    contents = loadFile(filename)
+    contents = load_file(filename)
 
     def filterBlanks(line):
         return line != ''
@@ -74,7 +51,7 @@ def compare_command_against_file(command, filename):
     if not os.path.exists(filename):
         return "Couldn't find file: " + filename
 
-    expectedOutput = loadFile(filename)
+    expectedOutput = load_file(filename)
 
     (stdin, stdout, stderr) = os.popen3(command)
 
