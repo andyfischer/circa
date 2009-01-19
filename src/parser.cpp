@@ -40,6 +40,7 @@ Term* eval_statement(Branch* branch, std::string const& input)
 namespace parser {
 
 std::string possibleWhitespace(token_stream::TokenStream& tokens);
+std::string possibleNewline(token_stream::TokenStream& tokens);
 std::string possibleWhitespaceNewline(token_stream::TokenStream& tokens);
 
 ast::StatementList* statementList(token_stream::TokenStream& tokens)
@@ -371,7 +372,7 @@ ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
 
     decl->header = functionHeader(tokens);
 
-    //possibleWhitespaceNewline(tokens);
+    possibleNewline(tokens);
 
     /*tokens.consume(tokenizer::LBRACE);
 
@@ -457,6 +458,14 @@ std::string possibleWhitespace(token_stream::TokenStream& tokens)
 {
     if (tokens.nextIs(tokenizer::WHITESPACE))
         return tokens.consume(tokenizer::WHITESPACE);
+    else
+        return "";
+}
+
+std::string possibleNewline(token_stream::TokenStream& tokens)
+{
+    if (tokens.nextIs(tokenizer::NEWLINE))
+        return tokens.consume(tokenizer::NEWLINE);
     else
         return "";
 }
