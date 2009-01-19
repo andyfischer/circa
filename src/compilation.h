@@ -27,7 +27,7 @@ struct CompilationContext
     struct ExpressionFrame {
         bool insideExpression;
 
-        ExpressionFrame() : insideExpression(true) {}
+        ExpressionFrame() : insideExpression(false) {}
         ExpressionFrame(bool _ie) : insideExpression(_ie) {}
     };
     typedef std::vector<ExpressionFrame> ExpressionFrameList;
