@@ -119,7 +119,7 @@ int main( int argc, char* args[] )
     //Load the images
 
     // Make a call to redraw()
-    circa::Branch &redraw = circa::call_subroutine(branch, "redraw");
+    circa::Branch &redraw = circa::get_subroutine_branch(branch["redraw"]);
     std::cout << "redraw:" << std::endl;
     circa::print_raw_branch(redraw, std::cout);
 

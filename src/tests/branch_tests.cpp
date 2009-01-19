@@ -146,7 +146,7 @@ void test_migrate()
 
     Term* a = orig.eval("a = 1");
 
-    Term* a_replace = replace.eval("a = 2");
+    replace.eval("a = 2");
 
     migrate_branch(orig, replace);
 

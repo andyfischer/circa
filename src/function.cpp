@@ -145,11 +145,17 @@ Function::subroutine_evaluate(Term* caller)
     }
 }
 
+// deprecated:
 Branch& call_subroutine(Branch& branch, std::string const& functionName)
 {
     Term* newTerm = apply_function(branch, functionName, ReferenceList());
     initialize_subroutine_call(newTerm);
     return as_branch(newTerm->state);
+}
+
+Branch& get_subroutine_branch(Term* term)
+{
+    return as_function(term).subroutineBranch;
 }
 
 } // namespace circa

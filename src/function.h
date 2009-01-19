@@ -69,6 +69,7 @@ Function& as_function(Term*);
 std::string get_placeholder_name_for_index(int index);
 
 Branch& call_subroutine(Branch& branch, std::string const& functionName);
+Branch& get_subroutine_branch(Term* term);
 
 } // namespace circa
 
