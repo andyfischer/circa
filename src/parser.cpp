@@ -48,18 +48,17 @@ ast::StatementList* statementList(token_stream::TokenStream& tokens)
 
     while (!tokens.finished()) {
 
-        possibleWhitespace(tokens);
-
-        /*if (tokens.nextIs(tokenizer::NEWLINE)) {
-            tokens.consume(tokenizer::NEWLINE);
-            continue;
-        }*/
+        std::string leadingWhitespace = possibleWhitespace(tokens);
 
         if (tokens.nextIs(tokenizer::END) || tokens.nextIs(tokenizer::ELSE)) {
             break;
         }
 
-        statementList->push(statement(tokens));
+        ast::Statement *statemnt = statement(tokens);
+
+        statemnt->precedingWhitespace = leadingWhitespace + statemnt->precedingWhitespace;
+
+        statementList->push(statemnt);
     }
 
     return statementList;
@@ -372,7 +371,7 @@ ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
 
     decl->header = functionHeader(tokens);
 
-    possibleNewline(tokens);
+    //possibleNewline(tokens);
 
     /*tokens.consume(tokenizer::LBRACE);
 
