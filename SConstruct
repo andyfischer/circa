@@ -69,7 +69,7 @@ circaBinary = ENV.Program('bin/circa', 'build/src/main.cpp', LIBS=[circa_so])
 ENV.SetOption('num_jobs', 2)
 ENV.Default(circaBinary)
 
-############################## ca_sdl ###############################
+############################## cgame ###############################
 
 CASDL_ENV = Environment()
 CASDL_ENV.ParseConfig('sdl-config --cflags')
@@ -84,3 +84,4 @@ CASDL_ENV.Append(LIBS = ['circa'])
 # Temp: This build result should go in the cgame folder, but this causes problems.
 # Probably fixed by upgrading SCons
 CASDL_ENV.Program('cgm', ['cgame/main.cpp'], ['circa'])
+CASDL_ENV.Command('bin/cgame', 'cgm', Copy("$TARGET", "$SOURCE"))
