@@ -42,9 +42,9 @@ void test_identifiers()
 void test_integers()
 {
     token::TokenList results;
-    token::tokenize("1 0 1234567890 -3", results);
+    token::tokenize("1 0 1234567890 -3 0x123", results);
 
-    test_assert(results.size() == 7);
+    test_assert(results.size() == 9);
     test_assert(results[0].text == "1");
     test_assert(results[0].match == token::INTEGER);
     test_assert(results[1].text == " ");
@@ -59,6 +59,8 @@ void test_integers()
     test_assert(results[5].match == token::WHITESPACE);
     test_assert(results[6].text == "-3");
     test_assert(results[6].match == token::INTEGER);
+    test_assert(results[8].text == "0x123");
+    test_assert(results[8].match == token::HEX_INTEGER);
 }
 
 void test_floats()

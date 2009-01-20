@@ -236,6 +236,13 @@ ast::Literal* literal_integer(token_stream::TokenStream& tokens)
     return lit;
 }
 
+ast::Literal* literal_hex(token_stream::TokenStream& tokens)
+{
+    ast::Literal* lit = new ast::LiteralInteger(tokens.consume(tokenizer::HEX_INTEGER));
+    post_literal(tokens, lit);
+    return lit;
+}
+
 ast::Literal* literal_string(token_stream::TokenStream& tokens)
 {
     ast::Literal* lit = new ast::LiteralString(tokens.consume());
@@ -260,6 +267,10 @@ ast::Expression* atom(token_stream::TokenStream& tokens)
     // literal integer?
     if (tokens.nextIs(tokenizer::INTEGER))
         return literal_integer(tokens);
+
+    // literal hex?
+    if (tokens.nextIs(tokenizer::HEX_INTEGER))
+        return literal_hex(tokens);
 
     // rebind operator?
     bool hasRebindOperator = false;

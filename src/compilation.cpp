@@ -118,7 +118,7 @@ Term* create_literal_float(CompilationContext &context, ast::LiteralFloat& ast)
 
 Term* create_literal_integer(CompilationContext &context, ast::LiteralInteger& ast)
 {
-    int value = atoi(ast.text.c_str());
+    int value = strtol(ast.text.c_str(), NULL, 0);
     Term* term = int_value(context.topBranch(), value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     term->syntaxHints.occursInsideAnExpression = context.isInsideExpression();
