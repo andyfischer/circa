@@ -18,6 +18,7 @@ const char* getMatchText(int match)
         case AMPERSAND: return "@";
         case IDENTIFIER: return "IDENTIFIER";
         case INTEGER: return "INTEGER";
+        case HEX_INTEGER: return "HEX_INTEGER";
         case FLOAT: return "FLOAT";
         case STRING: return "STRING";
         case DOT: return ".";
@@ -124,6 +125,7 @@ void top_level_consume_token(TokenizeContext &context);
 void consume_identifier(TokenizeContext &context);
 void consume_whitespace(TokenizeContext &context);
 void consume_number(TokenizeContext &context);
+void consume_hex_number(TokenizeContext &context);
 void consume_string_literal(TokenizeContext &context);
 
 void tokenize(std::string const &input, TokenList &results)
@@ -143,6 +145,11 @@ bool is_letter(char c)
 bool is_number(char c)
 {
     return (c >= '0' && c <= '9');
+}
+
+bool is_hexadecimal_digit(char c)
+{
+    return is_number(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
 }
 
 bool is_acceptable_inside_identifier(char c)
@@ -199,6 +206,12 @@ void top_level_consume_token(TokenizeContext &context)
 
     if (is_whitespace(context.next())) {
         consume_whitespace(context);
+        return;
+    }
+
+    if (context.next() == '0'
+        && context.next(1) == 'x') {
+        consume_hex_number(context);
         return;
     }
 
@@ -427,6 +440,21 @@ void consume_number(TokenizeContext &context)
     } else {
         context.pushResult(INTEGER, text.str());
     }
+}
+
+void consume_hex_number(TokenizeContext &context)
+{
+    std::stringstream text;
+
+    // consume the 0x part
+    text << context.consume();
+    text << context.consume();
+
+    while (is_hexadecimal_digit(context.next())) {
+        text << context.consume();
+    }
+
+    context.pushResult(HEX_INTEGER, text.str());
 }
 
 void consume_string_literal(TokenizeContext &context)

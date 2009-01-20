@@ -33,6 +33,7 @@ const int AMPERSAND = 32;
 
 const int IDENTIFIER = 4;
 const int INTEGER = 5;
+const int HEX_INTEGER = 44;
 const int FLOAT = 6;
 const int STRING = 7;
 
