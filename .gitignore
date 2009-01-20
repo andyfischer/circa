@@ -7,6 +7,7 @@ build
 obj
 cgm
 bin/circa
+bin/cgame
 *.o
 *.so
 *.a

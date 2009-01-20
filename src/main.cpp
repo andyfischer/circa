@@ -127,4 +127,3 @@ int main(int nargs, const char * args[])
 
     return circa_main(args_vector);
 }
-
