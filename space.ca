@@ -1,0 +1,27 @@
+
+ship_x = 320.0
+ship_y = 280.0
+ship_facing = 0.0
+
+front_dist = 12.0
+back_angle = 2.5
+
+function redraw()
+    fill_rectangle(0,0,640,480, 2147483647)
+    a_x = ship_x + front_dist * cos(ship_facing)
+    a_y = ship_y + front_dist * sin(ship_facing)
+
+    b_x = ship_x + 1.5 * front_dist * cos(ship_facing + back_angle)
+    b_y = ship_y + front_dist * sin(ship_facing + back_angle)
+
+    c_x = ship_x - front_dist * cos(ship_facing)
+    c_y = ship_y - front_dist * sin(ship_facing)
+
+    d_x = ship_x + 1.5 * front_dist * cos(ship_facing - back_angle)
+    d_y = ship_y + front_dist * sin(ship_facing - back_angle)
+
+    line_to(a_x, a_y, b_x, b_y, 0)
+    line_to(b_x, b_y, c_x, c_y, 0)
+    line_to(c_x, c_y, d_x, d_y, 0)
+    line_to(d_x, d_y, a_x, a_y, 0)
+end
