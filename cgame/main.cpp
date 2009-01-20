@@ -14,6 +14,8 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
 
+SDL_Surface* SCREEN = NULL;
+
 void load_image(circa::Term* caller)
 {
     //Temporary storage for the image that's loaded
@@ -61,12 +63,32 @@ void apply_surface(circa::Term* caller)
 
 void rectangle(circa::Term* caller)
 {
-    rectangleColor(circa::as<SDL_Surface*>(caller->input(0)),
+    rectangleColor(SCREEN,
+        (int) as_float(caller->input(0)),
         (int) as_float(caller->input(1)),
         (int) as_float(caller->input(2)),
         (int) as_float(caller->input(3)),
-        (int) as_float(caller->input(4)),
-        as_int(caller->input(5)));
+        as_int(caller->input(4)));
+}
+
+void fill_rectangle(circa::Term* caller)
+{
+    boxColor(SCREEN,
+        (int) as_float(caller->input(0)),
+        (int) as_float(caller->input(1)),
+        (int) as_float(caller->input(2)),
+        (int) as_float(caller->input(3)),
+        as_int(caller->input(4)));
+}
+
+void line_to(circa::Term* caller)
+{
+    aalineColor(SCREEN,
+        (int) as_float(caller->input(0)),
+        (int) as_float(caller->input(1)),
+        (int) as_float(caller->input(2)),
+        (int) as_float(caller->input(3)),
+        as_int(caller->input(4)));
 }
 
 void SDL_FreeSurface_c(circa::Term* caller)
@@ -86,19 +108,35 @@ int main( int argc, char* args[] )
             "apply-surface(SDL_Surface,SDL_Surface,int,int)");
     circa::import_function(*circa::KERNEL, SDL_FreeSurface_c,
             "SDL_FreeSurface(SDL_Surface)");
+    circa::import_function(*circa::KERNEL, line_to,
+            "line_to(float,float,float,float,int)");
     circa::import_function(*circa::KERNEL, rectangle,
-            "rectangle(SDL_Surface,float,float,float,float,int)");
+            "rectangle(float,float,float,float,int)");
+    circa::import_function(*circa::KERNEL, fill_rectangle,
+            "fill_rectangle(float,float,float,float,int)");
 
     //Set up the screen
-    SDL_Surface* screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT,
+    SCREEN = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT,
             SCREEN_BPP, SDL_SWSURFACE );
 
-    circa::import_value(*circa::KERNEL, "SDL_Surface", &screen, "screen");
+    //If there was an error in setting up the screen
+    if( SCREEN == NULL )
+    {
+        return 1;
+    }
 
-    circa::Branch branch;
-    circa::evaluate_file(branch, "cgame/main.ca");
+    std::string filename;
+    if (argc > 1)
+        filename = args[1];
+    else
+        filename = "cgame/main.ca";
 
-    circa::print_raw_branch(branch, std::cout);
+    std::cout << "loading file: " << filename << std::endl;
+
+    circa::Branch script_main;
+    circa::evaluate_file(script_main, filename);
+
+    circa::print_raw_branch(script_main, std::cout);
 
     //Initialize all SDL subsystems
     if( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
@@ -106,11 +144,6 @@ int main( int argc, char* args[] )
         return 1;
     }
 
-    //If there was an error in setting up the screen
-    if( screen == NULL )
-    {
-        return 1;
-    }
 
     //Set the window caption
     SDL_WM_SetCaption( "Hello World", NULL );
@@ -118,7 +151,7 @@ int main( int argc, char* args[] )
     //Load the images
 
     // Make a call to redraw()
-    circa::Branch &redraw = circa::get_subroutine_branch(branch["redraw"]);
+    circa::Branch &redraw = circa::get_subroutine_branch(script_main["redraw"]);
     std::cout << "redraw:" << std::endl;
     circa::print_raw_branch(redraw, std::cout);
 
@@ -143,14 +176,14 @@ int main( int argc, char* args[] )
             mouse_y = event.motion.y;
         } else if (event.type == SDL_KEYDOWN) {
             if (event.key.keysym.sym == SDLK_5) {
-                circa::reload_branch_from_file(branch);
+                circa::reload_branch_from_file(script_main);
             }
         }
 
         redraw.eval();
 
         //Update the screen
-        if( SDL_Flip( screen ) == -1 )
+        if( SDL_Flip(SCREEN) == -1 )
         {
             return 1;
         }
@@ -159,7 +192,7 @@ int main( int argc, char* args[] )
     }
 
     //Free the surfaces
-    branch.eval("SDL_FreeSurface(background)");
+    script_main.eval("SDL_FreeSurface(background)");
 
     //Quit SDL
     SDL_Quit();
