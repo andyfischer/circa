@@ -1,2 +1,10 @@
+Circa is a programming language designed to enable rapid development. For more
+information about Circa and its features, see the ABOUT file.
 
-This software is still in pre-alpha development and should not be used by anyone.
+The current status of this project is pre-alpha. There are many known issues.
+It's not yet recommended for widespread consumption.
+
+The design and implementation was started in 2007 by Andrew Fischer.
+
+This project is available to the public under the MIT licence. See the LICENSE
+file for more information.
