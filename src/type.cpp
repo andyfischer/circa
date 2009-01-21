@@ -183,4 +183,14 @@ std::string to_source_string(Term* term)
     }
 }
 
+PointerIterator* start_pointer_iterator(Term* term)
+{
+    Type& type = as_type(term->type);
+
+    if (type.startPointerIterator == NULL)
+        return NULL;
+
+    return type.startPointerIterator(term);
+}
+
 } // namespace circa

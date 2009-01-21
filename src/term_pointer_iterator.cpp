@@ -4,39 +4,44 @@
 
 #include "term.h"
 #include "term_pointer_iterator.h"
+#include "type.h"
 
 namespace circa {
 
 TermPointerIterator::TermPointerIterator()
-  : _currentTerm(NULL), _step(INPUTS)
+  : _term(NULL), _step(INPUTS), _stepIndex(0), _nestedIterator(NULL)
 {
 }
 
 TermPointerIterator::TermPointerIterator(Term* term)
-  : _currentTerm(NULL), _step(INPUTS)
+  : _term(NULL), _step(INPUTS), _stepIndex(0), _nestedIterator(NULL)
 {
     start(term);
 }
 
 void TermPointerIterator::start(Term* term)
 {
-    _currentTerm = term;
+    _term = term;
     _step = INPUTS;
     _stepIndex = 0;
+    _nestedIterator = NULL;
     advanceToValidPointer();
 }
 
 Term*& TermPointerIterator::current()
 {
+    if (finished())
+        throw std::runtime_error("iterator is finished");
+
     switch (_step) {
     case INPUTS:
-        return _currentTerm->inputs[_stepIndex];
+        return _term->inputs[_stepIndex];
     case FUNCTION:
-        return _currentTerm->function;
+        return _term->function;
     case TYPE:
-        return _currentTerm->type;
+        return _term->type;
     case INSIDE_VALUE:
-        throw std::runtime_error("unimplemented");
+        return _nestedIterator->current();
     }
 
     throw std::runtime_error("internal error in TermPointerIterator::current");
@@ -52,31 +57,48 @@ void TermPointerIterator::advanceToValidPointer()
 {
     switch(_step) {
     case INPUTS:
-        if (_stepIndex >= _currentTerm->numInputs()) {
+        if (_stepIndex >= _term->numInputs()) {
             _step = FUNCTION;
             _stepIndex = 0;
         }
         return;
     case FUNCTION:
-        if (_stepIndex > 0) {
-            _step = TYPE;
-            _stepIndex = 0;
-        }
+        if (_stepIndex == 0)
+            return;
+
+        _step = TYPE;
+        _stepIndex = 0;
         return;
     case TYPE:
-        if (_stepIndex > 0) {
-            _step = INSIDE_VALUE;
-            _stepIndex = 0;
-        }
+
+        if (_stepIndex == 0)
+            return;
+
+        _step = INSIDE_VALUE;
+        _stepIndex = 0;
+        _nestedIterator = start_pointer_iterator(_term);
+
         // fall through
+
     case INSIDE_VALUE:
-        _currentTerm = NULL;
+        if (_nestedIterator == NULL) {
+            _term = NULL;
+            _nestedIterator = NULL;
+            return;
+        }
+        
+        if (_nestedIterator->finished()) {
+            delete _nestedIterator;
+            _nestedIterator = NULL;
+            _term = NULL;
+            return;
+        }
     }
 }
 
-bool TermPointerIterator::finished() const
+bool TermPointerIterator::finished()
 {
-    return _currentTerm == NULL;
+    return _term == NULL;
 }
 
 } // namespace circa

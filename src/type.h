@@ -10,6 +10,7 @@
 #include "branch.h"
 #include "builtins.h"
 #include "pointer_visitor.h"
+#include "pointer_iterator.h"
 #include "ref_map.h"
 #include "term.h"
 #include "term_namespace.h"
@@ -27,6 +28,7 @@ struct Type
     typedef bool (*LessThanFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
     typedef void (*VisitPointersFunc)(Term* term, PointerVisitor &listener);
+    typedef PointerIterator* (*StartPointerIteratorFunc)(Term* term);
     typedef void (*UpdateOwner)(Term* term);
     typedef std::string (*ToStringFunc)(Term* term);
     typedef std::string (*ToSourceStringFunc)(Term* term);
@@ -54,6 +56,7 @@ struct Type
     LessThanFunc lessThan;
     RemapPointersFunc remapPointers;
     VisitPointersFunc visitPointers;
+    StartPointerIteratorFunc startPointerIterator;
     UpdateOwner updateOwner;
     ToStringFunc toString;
     ToSourceStringFunc toSourceString;
@@ -129,6 +132,8 @@ void initialize_type_type(Term* typeType);
 
 std::string to_string(Term* term);
 std::string to_source_string(Term* term);
+
+PointerIterator* start_pointer_iterator(Term*);
 
 } // namespace circa
 
