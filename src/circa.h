@@ -15,6 +15,7 @@
 #include "set.h"
 #include "syntax.h"
 #include "term.h"
+#include "term_pointer_iterator.h"
 #include "tokenizer.h"
 #include "token_stream.h"
 #include "type.h"

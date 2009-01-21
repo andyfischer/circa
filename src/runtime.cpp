@@ -191,7 +191,7 @@ void set_input(Term* term, int index, Term* input)
 {
     assert_good_pointer(term);
 
-    Term* previousInput = term->inputs[index];
+    Term* previousInput = term->inputs.get(index);
 
     term->inputs.setAt(index, input);
 
