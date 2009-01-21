@@ -71,7 +71,6 @@ public:
         _items.push_back(term8);
     }
 
-
     size_t count() const { return _items.size(); }
     void append(Term* term)
     {
@@ -148,6 +147,11 @@ public:
     }
 
     Term* operator[](unsigned int index) const { return get(index); }
+
+    Term*& operator[](unsigned int index)
+    {
+        return _items[index];
+    }
 
     bool operator==(ReferenceList const& b)
     {
