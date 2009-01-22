@@ -3,7 +3,7 @@ be redestributed without written permission.*/
 
 //The headers
 #include "SDL/SDL.h"
-#include "/opt/local/include/SDL/SDL_gfxPrimitives.h"
+#include "SDL_gfxPrimitives.h"
 
 #include <string>
 

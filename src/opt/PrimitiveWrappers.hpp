@@ -83,7 +83,7 @@ public:
         as_float(_term) = value;
         return *this;
     }
-    operator int() const
+    operator float() const
     {
         return as_float(_term);
     }
