@@ -190,6 +190,9 @@ PointerIterator* start_pointer_iterator(Term* term)
     if (type.startPointerIterator == NULL)
         return NULL;
 
+    if (term->value == NULL)
+        return NULL;
+
     return type.startPointerIterator(term);
 }
 

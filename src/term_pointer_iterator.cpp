@@ -19,13 +19,19 @@ TermPointerIterator::TermPointerIterator(Term* term)
     start(term);
 }
 
+TermPointerIterator::~TermPointerIterator()
+{
+    delete _nestedIterator;
+    _nestedIterator = NULL;
+}
+
 void TermPointerIterator::start(Term* term)
 {
     _term = term;
     _step = INPUTS;
     _stepIndex = 0;
     _nestedIterator = NULL;
-    advanceToValidPointer();
+    findNextValidPointer();
 }
 
 Term*& TermPointerIterator::current()
@@ -49,19 +55,25 @@ Term*& TermPointerIterator::current()
 
 void TermPointerIterator::advance()
 {
-    _stepIndex++;
-    advanceToValidPointer();
+    if (_step == INSIDE_VALUE)
+        _nestedIterator->advance();
+    else
+        _stepIndex++;
+
+    findNextValidPointer();
 }
 
-void TermPointerIterator::advanceToValidPointer()
+void TermPointerIterator::findNextValidPointer()
 {
     switch(_step) {
     case INPUTS:
-        if (_stepIndex >= _term->numInputs()) {
-            _step = FUNCTION;
-            _stepIndex = 0;
-        }
+        if (_stepIndex < _term->numInputs())
+            return;
+
+        _step = FUNCTION;
+        _stepIndex = 0;
         return;
+
     case FUNCTION:
         if (_stepIndex == 0)
             return;
@@ -69,8 +81,8 @@ void TermPointerIterator::advanceToValidPointer()
         _step = TYPE;
         _stepIndex = 0;
         return;
-    case TYPE:
 
+    case TYPE:
         if (_stepIndex == 0)
             return;
 
@@ -78,17 +90,16 @@ void TermPointerIterator::advanceToValidPointer()
         _stepIndex = 0;
         _nestedIterator = start_pointer_iterator(_term);
 
-        // fall through
-
-    case INSIDE_VALUE:
         if (_nestedIterator == NULL) {
             _term = NULL;
-            _nestedIterator = NULL;
-            return;
         }
-        
+
+        return;
+
+    case INSIDE_VALUE:
         if (_nestedIterator->finished()) {
             delete _nestedIterator;
+            _step = INPUTS;
             _nestedIterator = NULL;
             _term = NULL;
             return;

@@ -47,7 +47,7 @@ void nested_branch()
 {
     Branch branch;
 
-    /*Term *one =*/ branch.eval("one = 1.0");
+    Term *one = branch.eval("one = 1.0");
     Term *nested = branch.eval("nested = Branch()");
 
     as_branch(nested).outerScope = &branch;
@@ -62,13 +62,16 @@ void nested_branch()
     test_assert(it.current() == BRANCH_TYPE);
     it.advance();
     test_assert(!it.finished());
+
     test_assert(it.current()->function == VALUE_FUNCTION_GENERATOR);
     it.advance();
     test_assert(it.current() == FLOAT_TYPE);
     it.advance();
-    test_assert(it.current()->function == VALUE_FUNCTION_GENERATOR);
+    test_assert(it.current() == one);
     it.advance();
-    test_assert(it.current()->function == FLOAT_TYPE);
+    test_assert(it.current() == ADD_FUNC);
+    it.advance();
+    test_assert(it.current() == FLOAT_TYPE);
     it.advance();
     test_assert(it.finished());
 }
