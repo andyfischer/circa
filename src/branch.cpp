@@ -187,12 +187,6 @@ Branch::hosted_visit_pointers(Term* caller, PointerVisitor& visitor)
     as_branch(caller).visitPointers(visitor);
 }
 
-void
-Branch::hosted_update_owner(Term* caller)
-{
-    as_branch(caller).owningTerm = caller;
-}
-
 Branch& as_branch(Term* term)
 {
     assert_type(term, BRANCH_TYPE);

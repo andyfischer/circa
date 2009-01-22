@@ -17,9 +17,6 @@ private:
     std::vector<Term*> _terms;
 
 public:
-    // Our owning term
-    Term* owningTerm;
-
     // Points to a Branch which is our outer scope.
     Branch* outerScope;
 
@@ -29,7 +26,7 @@ public:
     // entire program is shut down.
     bool permanent;
 
-    Branch() : owningTerm(NULL), outerScope(NULL), permanent(false) {}
+    Branch() : outerScope(NULL), permanent(false) {}
     ~Branch();
 
     int numTerms() const { return _terms.size(); }
@@ -84,7 +81,6 @@ public:
     // Hosted functions
     static void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
     static void hosted_visit_pointers(Term* caller, PointerVisitor& visitor);
-    static void hosted_update_owner(Term* term);
     static PointerIterator* start_pointer_iterator(Term* term);
 };
 
