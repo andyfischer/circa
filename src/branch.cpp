@@ -7,9 +7,11 @@
 #include "function.h"
 #include "introspection.h"
 #include "parser.h"
+#include "pointer_iterator.h"
 #include "runtime.h"
 #include "ref_map.h"
 #include "term.h"
+#include "term_pointer_iterator.h"
 #include "type.h"
 #include "values.h"
 #include "wrappers.h"
@@ -295,6 +297,99 @@ void reload_branch_from_file(Branch& branch)
     evaluate_file(replacement, filename);
 
     migrate_branch(branch, replacement);
+}
+
+class BranchPointerIterator : public PointerIterator
+{
+private:
+    Branch* _branch;
+    int _index;
+    TermPointerIterator* _nestedIterator;
+
+public:
+    BranchPointerIterator(Branch* branch)
+      : _branch(branch),
+        _index(0),
+        _nestedIterator(NULL)
+    {
+        if (_branch->numTerms() == 0) {
+            // Already finished.
+            _branch = NULL;
+        } else {
+            _nestedIterator = new TermPointerIterator(_branch->get(0));
+        }
+
+        findNextValidPointer();
+    }
+
+    virtual Term*& current()
+    {
+        assert(!finished());
+        return _nestedIterator->current();
+    }
+
+    virtual bool finished()
+    {
+        return _branch == NULL;
+    }
+
+    virtual void advance()
+    {
+        assert(!finished());
+
+        // Move forward at least one
+        internalAdvance();
+
+        // Now, we're allowed to skip pointers. Specifically, we skip
+        // pointers that are internal to our branch, because they are
+        // not anyone else's business. We only expose pointers that
+        // point outside of this branch.
+
+        while(!finished()
+                && current() != NULL
+                && current()->owningBranch == _branch)
+            internalAdvance();
+    }
+
+private:
+    void findNextValidPointer()
+    {
+        assert(!finished());
+
+        while (_nestedIterator->finished()) {
+            delete _nestedIterator;
+            _nestedIterator = NULL;
+
+            _index++;
+
+            if (_index >= _branch->numTerms()) {
+                // finished
+                _branch = NULL;
+                return;
+            }
+
+            _nestedIterator = new TermPointerIterator(_branch->get(_index));
+        }
+    }
+
+    // in internalAdvance, we advance by one actual pointer. However, this
+    // pointer might not be exposed to the outside world: it might be
+    // skipped in the public version of advance().
+    
+    void internalAdvance()
+    {
+        assert(!finished());
+
+        _nestedIterator->advance();
+
+        findNextValidPointer();
+    }
+};
+
+PointerIterator*
+Branch::start_pointer_iterator(Term* term)
+{
+    return new BranchPointerIterator((Branch*) term->value);
 }
 
 } // namespace circa

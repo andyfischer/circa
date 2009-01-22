@@ -17,11 +17,12 @@ private:
     int _stepIndex;
     PointerIterator* _nestedIterator;
 
-    void advanceToValidPointer();
+    void findNextValidPointer();
 
 public:
     TermPointerIterator();
     TermPointerIterator(Term*);
+    ~TermPointerIterator();
 
     void start(Term*);
     virtual Term*& current();

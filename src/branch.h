@@ -5,6 +5,7 @@
 
 #include "common_headers.h"
 
+#include "pointer_iterator.h"
 #include "pointer_visitor.h"
 #include "term_namespace.h"
 
@@ -84,10 +85,10 @@ public:
     static void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
     static void hosted_visit_pointers(Term* caller, PointerVisitor& visitor);
     static void hosted_update_owner(Term* term);
+    static PointerIterator* start_pointer_iterator(Term* term);
 };
 
 Branch& as_branch(Term* term);
-
 void duplicate_branch(Branch& source, Branch& dest);
 void migrate_branch(Branch& original, Branch& replacement);
 void evaluate_file(Branch& branch, std::string const& filename);
