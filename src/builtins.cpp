@@ -195,7 +195,6 @@ void initialize_constants()
     BRANCH_TYPE = import_type<Branch>(*KERNEL, "Branch");
     as_type(BRANCH_TYPE).remapPointers = Branch::hosted_remap_pointers;
     as_type(BRANCH_TYPE).visitPointers = Branch::hosted_visit_pointers;
-    as_type(BRANCH_TYPE).updateOwner = Branch::hosted_update_owner;
     as_type(BRANCH_TYPE).startPointerIterator = Branch::start_pointer_iterator;
 
     LIST_TYPE = import_type<List>(*KERNEL, "List");

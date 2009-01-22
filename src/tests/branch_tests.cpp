@@ -93,6 +93,7 @@ void external_pointers()
     */
 }
 
+/*
 void test_owning_term()
 {
     Branch branch;
@@ -111,7 +112,7 @@ void test_owning_term()
     duplicate_value(b2, b);
 
     test_assert(as_branch(b).owningTerm == b);
-}
+}*/
 
 void find_name_in_outer_branch()
 {
@@ -163,7 +164,6 @@ void register_branch_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
     REGISTER_TEST_CASE(branch_tests::external_pointers);
-    REGISTER_TEST_CASE(branch_tests::test_owning_term);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
     REGISTER_TEST_CASE(branch_tests::test_startBranch);
     REGISTER_TEST_CASE(branch_tests::test_migrate);

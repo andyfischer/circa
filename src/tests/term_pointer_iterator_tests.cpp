@@ -52,8 +52,8 @@ void nested_branch()
 
     as_branch(nested).outerScope = &branch;
 
-    /*Term *two =*/ as_branch(nested).eval("two = 1.0");
-    /*Term *a =*/ as_branch(nested).eval("a = add(one,two)");
+    as_branch(nested).eval("two = 1.0");
+    as_branch(nested).eval("a = add(one,two)");
 
     TermPointerIterator it(nested);
 
