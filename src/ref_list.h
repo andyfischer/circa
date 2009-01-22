@@ -125,11 +125,6 @@ public:
         _items.erase(_items.begin() + index);
     }
 
-    void removeNulls()
-    {
-        remove(NULL);
-    }
-
     void clear() { _items.clear(); }
     Term* get(unsigned int index) const
     {
