@@ -31,13 +31,12 @@ void TermPointerIterator::start(Term* term)
     _step = INPUTS;
     _stepIndex = 0;
     _nestedIterator = NULL;
-    findNextValidPointer();
+    advanceIfStateIsInvalid();
 }
 
 Term*& TermPointerIterator::current()
 {
-    if (finished())
-        throw std::runtime_error("iterator is finished");
+    assert(!finished());
 
     switch (_step) {
     case INPUTS:
@@ -60,10 +59,10 @@ void TermPointerIterator::advance()
     else
         _stepIndex++;
 
-    findNextValidPointer();
+    advanceIfStateIsInvalid();
 }
 
-void TermPointerIterator::findNextValidPointer()
+void TermPointerIterator::advanceIfStateIsInvalid()
 {
     switch(_step) {
     case INPUTS:

@@ -89,6 +89,7 @@ void duplicate_branch(Branch& source, Branch& dest);
 void migrate_branch(Branch& original, Branch& replacement);
 void evaluate_file(Branch& branch, std::string const& filename);
 void reload_branch_from_file(Branch& branch);
+PointerIterator* start_branch_pointer_iterator(Branch* branch);
 
 extern int DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR;
 

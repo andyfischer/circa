@@ -386,4 +386,9 @@ Branch::start_pointer_iterator(Term* term)
     return new BranchPointerIterator((Branch*) term->value);
 }
 
+PointerIterator* start_branch_pointer_iterator(Branch* branch)
+{
+    return new BranchPointerIterator(branch);
+}
+
 } // namespace circa
