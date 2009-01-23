@@ -30,11 +30,11 @@ void test_import_c()
     test_assert(as_int(result) == 9);
 }
 
-} // namespace importing_tests
-
-void register_importing_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(importing_tests::test_import_c);
 }
+
+} // namespace importing_tests
 
 } // namespace circa

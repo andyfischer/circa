@@ -102,14 +102,14 @@ void subroutine_binding_input_names()
     test_assert(as_function(mysub).subroutineBranch.findNamed("a") != NULL);
 }
 
-} // namespace function_tests
-
-void register_function_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(function_tests::create);
     REGISTER_TEST_CASE(function_tests::using_apply);
     REGISTER_TEST_CASE(function_tests::external_pointers);
     REGISTER_TEST_CASE(function_tests::subroutine_binding_input_names);
 }
+
+} // namespace function_tests
 
 } // namespace circa

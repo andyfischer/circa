@@ -103,13 +103,12 @@ void reference_type_deletion_bug()
     test_assert(INT_TYPE->type != NULL);
 }
 
-} // namespace type_tests
-
-void register_type_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
     REGISTER_TEST_CASE(type_tests::builtin_types);
     REGISTER_TEST_CASE(type_tests::reference_type_deletion_bug);
 }
 
+} // namespace type_tests
 } // namespace circa

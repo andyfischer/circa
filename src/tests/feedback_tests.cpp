@@ -42,12 +42,12 @@ void test_add_feedback()
     test_assert(as_float(a) == 1.5);
 }
 
-} // namespace feedback_tests
-
-void register_feedback_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(feedback_tests::test_var_feedback);
     REGISTER_TEST_CASE(feedback_tests::test_add_feedback);
 }
+
+} // namespace feedback_tests
 
 } // namespace circa

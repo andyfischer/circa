@@ -76,12 +76,12 @@ void blocked_by_error()
     test_assert(spy_errored->needsUpdate);
 }
 
-} // execution_tests
-
-void register_execution_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(execution_tests::test_simple);
     REGISTER_TEST_CASE(execution_tests::blocked_by_error);
 }
+
+} // execution_tests
 
 } // namespace circa

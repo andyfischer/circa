@@ -21,11 +21,11 @@ void test_dictionary()
     // todo: add more here
 }
 
-} // namespace builtin_type_tests
-
-void register_builtin_type_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(builtin_type_tests::test_dictionary);
 }
+
+} // namespace builtin_type_tests
 
 } // namespace circa

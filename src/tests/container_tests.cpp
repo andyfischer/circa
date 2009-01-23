@@ -174,9 +174,7 @@ void test_dictionary()
     */
 }
 
-} // namespace container_tests
-
-void register_container_tests()
+void register_tests()
 {
     // REGISTER_TEST_CASE(container_tests::test_reference);
     REGISTER_TEST_CASE(container_tests::test_set);
@@ -184,5 +182,7 @@ void register_container_tests()
     REGISTER_TEST_CASE(container_tests::test_list);
     REGISTER_TEST_CASE(container_tests::test_dictionary);
 }
+
+} // namespace container_tests
 
 } // namespace circa

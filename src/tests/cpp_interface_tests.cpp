@@ -53,11 +53,11 @@ void default_function() {
     test_assert(as<Type1>(hi2u).myString == "hi2u");
 }
 
-} // namespace cpp_interface_tests
-
-void register_cpp_interface_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(cpp_interface_tests::default_function);
 }
+
+} // namespace cpp_interface_tests
 
 } // namespace circa

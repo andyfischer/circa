@@ -93,9 +93,7 @@ void to_reference_list()
     test_assert(reflist[2] == APPLY_FEEDBACK);
 }
 
-} // namespace list_tests
-
-void register_list_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(list_tests::create);
     REGISTER_TEST_CASE(list_tests::operations);
@@ -103,5 +101,7 @@ void register_list_tests()
     REGISTER_TEST_CASE(list_tests::list_apply);
     REGISTER_TEST_CASE(list_tests::to_reference_list);
 }
+
+} // namespace list_tests
 
 } // namespace circa

@@ -146,9 +146,7 @@ void test_recycle_with_multiple_users()
     test_assert(as_int(y) == 1);
 }
 
-} // namespace runtime_tests
-
-void register_runtime_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(runtime_tests::test_create_value);
     REGISTER_TEST_CASE(runtime_tests::test_int_value);
@@ -160,5 +158,7 @@ void register_runtime_tests()
     REGISTER_TEST_CASE(runtime_tests::test_runtime_type_error);
     REGISTER_TEST_CASE(runtime_tests::test_recycle_with_multiple_users);
 }
+
+} // namespace runtime_tests
 
 } // namespace circa

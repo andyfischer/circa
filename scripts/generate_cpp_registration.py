@@ -50,10 +50,10 @@ def do_register_all_tests(directory, outputFile):
     (files, names) = list_cpp_files(directory)
 
     def makePredeclaration(name):
-        return "void register_"+name+"();"
+        return "namespace "+name+" { void register_tests(); }"
 
     def makeCall(name):
-        return "register_"+name+"();"
+        return name+"::register_tests();"
 
     predeclarations = map(makePredeclaration, names)
     predeclarations.sort()
