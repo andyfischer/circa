@@ -8,6 +8,7 @@
 #include "function.h"
 #include "importing.h"
 #include "list.h"
+#include "pointer_iterator.h"
 #include "runtime.h"
 #include "term.h"
 #include "type.h"
@@ -149,6 +150,49 @@ void Type::typeVisitPointers(Term *term, PointerVisitor &visitor)
     for (unsigned int field_i=0; field_i < type.fields.size(); field_i++) {
         visitor.visitPointer(type.fields[field_i].type);
     }
+}
+
+class TypePointerIterator : public PointerIterator
+{
+private:
+    Type* _type;
+    int _fieldIndex;
+
+public:
+    TypePointerIterator(Type* type)
+      : _type(type), _fieldIndex(0)
+    {
+        advanceIfStateIsInvalid();
+    }
+
+    virtual Term*& current()
+    {
+        return _type->fields[_fieldIndex].type;
+    }
+
+    virtual void advance()
+    {
+        _fieldIndex++;
+        advanceIfStateIsInvalid();
+    }
+
+    virtual bool finished()
+    {
+        return _type == NULL;
+    }
+private:
+    void advanceIfStateIsInvalid()
+    {
+        if (_fieldIndex >= (int) _type->fields.size()) {
+            // finished
+            _type = NULL;
+        }
+    }
+};
+
+PointerIterator* Type::typeStartPointerIterator(Term* term)
+{
+    return new TypePointerIterator(&as_type(term));
 }
 
 void initialize_type_type(Term* typeType)
