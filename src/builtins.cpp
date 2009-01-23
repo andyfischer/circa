@@ -129,6 +129,7 @@ void bootstrap_kernel()
     initialize_type_type(TYPE_TYPE);
     as_type(TYPE_TYPE).remapPointers = Type::typeRemapPointers;
     as_type(TYPE_TYPE).visitPointers = Type::typeVisitPointers;
+        as_type(TYPE_TYPE).startPointerIterator = Type::typeStartPointerIterator;
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Implant the Type type

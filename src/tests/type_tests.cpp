@@ -103,11 +103,36 @@ void reference_type_deletion_bug()
     test_assert(INT_TYPE->type != NULL);
 }
 
+void type_iterator()
+{
+    Branch branch;
+    Term *t = branch.eval("t = Type()");
+    Type &type = as_type(t);
+
+    PointerIterator *it;
+
+    it = start_pointer_iterator(t);
+    test_assert(it->finished());
+    delete it;
+
+    type.addField(INT_TYPE, "int1");
+    type.addField(STRING_TYPE, "int1");
+
+    it = start_pointer_iterator(t);
+    test_assert(it->current() == INT_TYPE);
+    it->advance();
+    test_assert(it->current() == STRING_TYPE);
+    it->advance();
+    test_assert(it->finished());
+    delete it;
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
     REGISTER_TEST_CASE(type_tests::builtin_types);
     REGISTER_TEST_CASE(type_tests::reference_type_deletion_bug);
+    REGISTER_TEST_CASE(type_tests::type_iterator);
 }
 
 } // namespace type_tests

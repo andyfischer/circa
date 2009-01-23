@@ -107,6 +107,7 @@ struct Type
 
     static void typeRemapPointers(Term *term, ReferenceMap const& map);
     static void typeVisitPointers(Term *term, PointerVisitor& visitor);
+    static PointerIterator* typeStartPointerIterator(Term* term);
 };
 
 bool is_type(Term* term);
