@@ -51,11 +51,11 @@ void test_assign()
     test_assert(b->value == b_addr);
 }
 
-} // namespace value_tests
-
-void register_value_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(value_tests::test_duplicate);
+    REGISTER_TEST_CASE(value_tests::test_assign);
 }
+} // namespace value_tests
 
 } // namespace circa

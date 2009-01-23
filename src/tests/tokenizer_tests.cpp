@@ -169,9 +169,7 @@ void hosted_tokenize()
             "WHITESPACE \" \", FLOAT \"0.123\"]}");
 }
 
-} // namespace tokenizer_tests
-
-void register_tokenizer_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers);
     REGISTER_TEST_CASE(tokenizer_tests::test_integers);
@@ -183,5 +181,7 @@ void register_tokenizer_tests()
     REGISTER_TEST_CASE(tokenizer_tests::token_stream_to_string);
     REGISTER_TEST_CASE(tokenizer_tests::hosted_tokenize);
 }
+
+} // namespace tokenizer_tests
 
 } // namespace circa

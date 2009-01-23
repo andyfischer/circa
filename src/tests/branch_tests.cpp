@@ -158,9 +158,7 @@ void test_migrate()
     test_assert(as_int(a) == 2);
 }
 
-} // namespace branch_tests
-
-void register_branch_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
     REGISTER_TEST_CASE(branch_tests::external_pointers);
@@ -168,5 +166,7 @@ void register_branch_tests()
     REGISTER_TEST_CASE(branch_tests::test_startBranch);
     REGISTER_TEST_CASE(branch_tests::test_migrate);
 }
+
+} // namespace branch_tests
 
 } // namespace circa

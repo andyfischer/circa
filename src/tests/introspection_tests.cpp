@@ -47,12 +47,12 @@ void reproduce_source() {
     round_trip_source("   'hey'.print");
 }
 
-} // namespace introspection_tests
-
-void register_introspection_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(introspection_tests::test_is_value);
     REGISTER_TEST_CASE(introspection_tests::reproduce_source);
 }
+
+} // namespace introspection_tests
 
 } // namespace circa

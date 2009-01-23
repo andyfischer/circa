@@ -76,13 +76,12 @@ void nested_branch()
     test_assert(it.finished());
 }
 
-}
-
-void register_term_pointer_iterator_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(term_pointer_iterator_tests::simple);
     REGISTER_TEST_CASE(term_pointer_iterator_tests::no_inputs);
     REGISTER_TEST_CASE(term_pointer_iterator_tests::nested_branch);
 }
 
+}
 } // namespace circa

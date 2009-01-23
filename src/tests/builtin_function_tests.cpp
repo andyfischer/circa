@@ -208,9 +208,7 @@ void test_alias()
     test_assert(as_int(a) == 55);
 }
 
-} // namespace builtin_function_tests
-
-void register_builtin_function_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
     REGISTER_TEST_CASE(builtin_function_tests::test_float);
@@ -225,5 +223,7 @@ void register_builtin_function_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_if_statement);
     REGISTER_TEST_CASE(builtin_function_tests::test_alias);
 }
+
+} // namespace builtin_function_tests
 
 } // namespace circa

@@ -345,9 +345,7 @@ void member_function_call_parse()
             "(Infix Identifier (FunctionCall LiteralInteger))");
 }
 
-} // namespace parser_tests
-
-void register_parser_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::literal_float);
     REGISTER_TEST_CASE(parser_tests::literal_string);
@@ -369,5 +367,7 @@ void register_parser_tests()
     REGISTER_TEST_CASE(parser_tests::test_parse_if_block);
     REGISTER_TEST_CASE(parser_tests::member_function_call_parse);
 }
+
+} // namespace parser_tests
 
 } // namespace circa

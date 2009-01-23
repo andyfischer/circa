@@ -31,12 +31,12 @@ void builtin_objects()
     test_assert(KERNEL->findNamed("bool") == BOOL_TYPE);
 }
 
-} // namespace primitive_type_tests
-
-void register_primitive_type_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(primitive_type_tests::strings);
     REGISTER_TEST_CASE(primitive_type_tests::builtin_objects);
 }
+
+} // namespace primitive_type_tests
 
 } // namespace circa
