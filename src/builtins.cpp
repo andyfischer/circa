@@ -267,6 +267,7 @@ void shutdown()
 Term* get_value_function(Term* type)
 {
     Term* result = apply_function(*type->owningBranch, VALUE_FUNCTION_GENERATOR, ReferenceList(type));
+    assert(result->input(0) == type);
     evaluate_term(result);
     return result;
 }
@@ -274,6 +275,7 @@ Term* get_value_function(Term* type)
 Term* get_value_function(Branch& branch, Term* type)
 {
     Term* result = apply_function(branch, VALUE_FUNCTION_GENERATOR, ReferenceList(type));
+    assert(result->input(0) == type);
     evaluate_term(result);
     return result;
 }

@@ -14,6 +14,8 @@ std::vector<TestCase> gTestCases;
 // this function is defined in register_all_tests.cpp
 void register_all_tests();
 
+void post_test_sanity_check();
+
 void _test_assert_function(bool condition, int line, const char* file)
 {
     if (!condition) {
@@ -93,22 +95,27 @@ void _test_equals_function(std::string a, std::string b,
     }
 }
 
-bool run_test(TestCase& testCase)
+bool run_test_catching(TestCase& testCase)
 {
-
-#if CATCH_TEST_EXCEPTIONS
     try {
-#endif
         testCase.execute();
+        post_test_sanity_check();
         return true;
-#if CATCH_TEST_EXCEPTIONS
     }
     catch (std::runtime_error const& err) {
         std::cout << "Error white running test case " << testCase.name << std::endl;
         std::cout << err.what() << std::endl;
         return false;
     }
-#endif
+}
+
+bool run_test(TestCase& testCase)
+{
+    testCase.execute();
+
+    post_test_sanity_check();
+
+    return true;
 }
 
 void run_test(std::string const& testName)
@@ -150,6 +157,12 @@ void run_all_tests()
         std::string tests = failureCount == 1 ? "test" : "tests";
         std::cout << failureCount << " " << tests << " failed." << std::endl;
     }
+}
+
+void post_test_sanity_check()
+{
+    
+
 }
 
 std::vector<std::string> list_all_test_names()
