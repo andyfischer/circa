@@ -311,7 +311,7 @@ public:
             _branch = NULL;
         } else {
             _nestedIterator = new TermPointerIterator(_branch->get(0));
-            findNextValidPointer();
+            advanceIfStateIsInvalid();
         }
     }
 
@@ -345,7 +345,7 @@ public:
     }
 
 private:
-    void findNextValidPointer()
+    void advanceIfStateIsInvalid()
     {
         assert(!finished());
 
@@ -375,7 +375,7 @@ private:
 
         _nestedIterator->advance();
 
-        findNextValidPointer();
+        advanceIfStateIsInvalid();
     }
 };
 
