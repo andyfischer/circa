@@ -369,5 +369,4 @@ void register_tests()
 }
 
 } // namespace parser_tests
-
 } // namespace circa

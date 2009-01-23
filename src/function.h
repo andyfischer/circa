@@ -72,6 +72,7 @@ void set_subroutine_input_name(Function& func, int index, std::string const& nam
 
 Branch& call_subroutine(Branch& branch, std::string const& functionName);
 Branch& get_subroutine_branch(Term* term);
+PointerIterator* start_function_pointer_iterator(Function* function);
 
 } // namespace circa
 
