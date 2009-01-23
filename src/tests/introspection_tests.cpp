@@ -4,6 +4,8 @@
 #include "testing.h"
 #include "builtins.h"
 #include "introspection.h"
+#include "syntax.h"
+#include "values.h"
 
 namespace circa {
 namespace introspection_tests {

@@ -118,6 +118,8 @@ bool function_allows_term_reuse(Function &function)
 
 bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs)
 {
+    assert_good_pointer(target);
+    assert_good_pointer(function);
     if (target->function != function)
         return false;
 

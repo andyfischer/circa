@@ -23,21 +23,29 @@ bool check_valid_type(Function &func, int index, Term* term)
 
 void evaluate_term(Term* term)
 {
+    Term *orig0 = NULL;
+    if (term->inputs.count() > 0)
+        orig0 = term->inputs[0]; // temp
+
     if (term == NULL)
         throw std::runtime_error("term is NULL");
 
     term->clearError();
+
+    assert((orig0 == NULL) || term->inputs[0] == orig0); // temp
 
     // Check function
     if (term->function == NULL) {
         error_occured(term, "Function is NULL");
         return;
     }
+    assert((orig0 == NULL) || term->inputs[0] == orig0); // temp
 
     if (!is_function(term->function)) {
         error_occured(term, "term->function is not a function");
         return;
     }
+    assert((orig0 == NULL) || term->inputs[0] == orig0); // temp
 
     Function& func = as_function(term->function);
 
@@ -47,6 +55,7 @@ void evaluate_term(Term* term)
         error_occured(term, message.str());
         return;
     }
+    assert((orig0 == NULL) || term->inputs[0] == orig0); // temp
 
     // Check each input. Make sure:
     //  1) it is not null
@@ -56,6 +65,7 @@ void evaluate_term(Term* term)
     //  5) it has the correct type
     for (unsigned int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++)
     {
+    assert((orig0 == NULL) || term->inputs[0] == orig0); // temp
         int effectiveIndex = inputIndex;
         if (func.variableArgs)
             effectiveIndex = 0;
@@ -98,13 +108,18 @@ void evaluate_term(Term* term)
             assert(term != input); // prevent infinite recursion
             evaluate_term(input);
         }
+    assert((orig0 == NULL) || term->inputs[0] == orig0); // temp
     }
+    assert((orig0 == NULL) || term->inputs[0] == orig0); // temp
     
     // Make sure we have an allocated value. Allocate one if necessary
     if (term->value == NULL) {
+    assert((orig0 == NULL) || term->inputs[0] == orig0); // temp
         alloc_value(term);
+    assert((orig0 == NULL) || term->inputs[0] == orig0); // temp
     }
 
+    assert((orig0 == NULL) || term->inputs[0] == orig0); // temp
     // Execute the function
     try {
         func.evaluate(term);
@@ -280,7 +295,8 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList const& _input
     }
 
     // Attempt to re-use an existing term
-    Term* existing = find_equivalent(function, inputs);
+    // Disabled because sometimes the contents of 'users' is bad (FIXME)
+    Term* existing = NULL; //find_equivalent(function, inputs);
 
     if (existing != NULL)
         return existing;
