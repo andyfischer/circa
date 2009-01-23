@@ -17,8 +17,6 @@ private:
     int _stepIndex;
     PointerIterator* _nestedIterator;
 
-    void findNextValidPointer();
-
 public:
     TermPointerIterator();
     TermPointerIterator(Term*);
@@ -28,6 +26,9 @@ public:
     virtual Term*& current();
     virtual void advance();
     virtual bool finished();
+
+private:
+    void advanceIfStateIsInvalid();
 };
 
 } // namespace circa

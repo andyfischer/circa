@@ -1,10 +1,12 @@
 // Copyright 2008 Paul Hodge
 
+#include "branch.h"
 #include "builtins.h"
 #include "function.h"
 #include "importing.h"
 #include "list.h"
 #include "parser.h"
+#include "pointer_iterator.h"
 #include "runtime.h"
 #include "type.h"
 #include "values.h"
@@ -169,5 +171,88 @@ Branch& get_subroutine_branch(Term* term)
 {
     return as_function(term).subroutineBranch;
 }
+
+class FunctionPointerIterator : public PointerIterator
+{
+private:
+    enum Step { INPUT_TYPES, OUTPUT_TYPE, STATE_TYPE, SUBROUTINE_BRANCH };
+    Function* _function;
+    Step _step;
+    int _inputIndex;
+    PointerIterator *_subroutineBranchIterator;
+public:
+    FunctionPointerIterator(Function* function)
+      : _function(function),
+        _step(INPUT_TYPES),
+        _inputIndex(0),
+        _subroutineBranchIterator(NULL)
+    {
+        advanceIfStateIsInvalid();
+    }
+
+    virtual Term*& current()
+    {
+        assert(!finished());
+
+        switch (_step) {
+        case INPUT_TYPES:
+            return _function->inputTypes[_inputIndex];
+        case OUTPUT_TYPE:
+            return _function->outputType;
+        case STATE_TYPE:
+            return _function->stateType;
+        case SUBROUTINE_BRANCH:
+            return _subroutineBranchIterator->current();
+        }
+    }
+    virtual void advance()
+    {
+        switch (_step) {
+        case INPUT_TYPES:
+            _inputIndex++;
+            break;
+        case OUTPUT_TYPE:
+            _step = STATE_TYPE;
+            break;
+        case STATE_TYPE:
+            _step = SUBROUTINE_BRANCH;
+            _subroutineBranchIterator = start_branch_pointer_iterator(&_function->subroutineBranch);
+            if (_subroutineBranchIterator == NULL)
+                _function = NULL;
+            break;
+        case SUBROUTINE_BRANCH:
+            _subroutineBranchIterator->advance();
+            break;
+        }
+
+        advanceIfStateIsInvalid();
+    }
+    virtual bool finished()
+    {
+        return _function == NULL;
+    }
+
+private:
+    void advanceIfStateIsInvalid()
+    {
+        switch(_step) {
+        case INPUT_TYPES:
+            if (_inputIndex >= (int) _function->inputTypes.count()) {
+                _step = OUTPUT_TYPE;
+            }
+            return;
+        case OUTPUT_TYPE:
+            return;
+        case STATE_TYPE:
+            return;
+        case SUBROUTINE_BRANCH:
+            if (_subroutineBranchIterator->finished()) {
+                delete _subroutineBranchIterator;
+                _subroutineBranchIterator = NULL;
+                _function = NULL;
+            }
+        }
+    }
+};
 
 } // namespace circa
