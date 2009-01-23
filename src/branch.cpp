@@ -311,9 +311,8 @@ public:
             _branch = NULL;
         } else {
             _nestedIterator = new TermPointerIterator(_branch->get(0));
+            findNextValidPointer();
         }
-
-        findNextValidPointer();
     }
 
     virtual Term*& current()

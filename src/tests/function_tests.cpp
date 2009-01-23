@@ -102,12 +102,40 @@ void subroutine_binding_input_names()
     test_assert(as_function(mysub).subroutineBranch.findNamed("a") != NULL);
 }
 
+void pointer_iterator()
+{
+    Function func;
+    func.inputTypes.append(BOOL_TYPE);
+    func.inputTypes.append(INT_TYPE);
+    func.outputType = STRING_TYPE;
+
+    PointerIterator* it = start_function_pointer_iterator(&func);
+
+    test_assert(it->current() == BOOL_TYPE);
+    it->advance();
+    test_assert(it->current() == INT_TYPE);
+    it->advance();
+    test_assert(it->current() == STRING_TYPE);
+    it->advance();
+    test_assert(it->finished());
+    delete it;
+
+    // Try with no input types
+    func.inputTypes.clear();
+    it = start_function_pointer_iterator(&func);
+    test_assert(it->current() == STRING_TYPE);
+    it->advance();
+    test_assert(it->finished());
+    delete it;
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(function_tests::create);
     REGISTER_TEST_CASE(function_tests::using_apply);
     REGISTER_TEST_CASE(function_tests::external_pointers);
     REGISTER_TEST_CASE(function_tests::subroutine_binding_input_names);
+    REGISTER_TEST_CASE(function_tests::pointer_iterator);
 }
 
 } // namespace function_tests

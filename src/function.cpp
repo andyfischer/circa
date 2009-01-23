@@ -204,8 +204,20 @@ public:
         case SUBROUTINE_BRANCH:
             return _subroutineBranchIterator->current();
         }
+
+        throw std::runtime_error("internal error");
     }
+
     virtual void advance()
+    {
+        assert(!finished());
+        internalAdvance();
+
+        while(!finished() && current() == NULL)
+            internalAdvance();
+    }
+    
+    void internalAdvance()
     {
         switch (_step) {
         case INPUT_TYPES:
@@ -254,5 +266,10 @@ private:
         }
     }
 };
+
+PointerIterator* start_function_pointer_iterator(Function* function)
+{
+    return new FunctionPointerIterator(function);
+}
 
 } // namespace circa
