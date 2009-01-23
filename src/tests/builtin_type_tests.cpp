@@ -21,9 +21,35 @@ void test_dictionary()
     // todo: add more here
 }
 
+void test_reference()
+{
+    Branch branch;
+    Term *r = branch.eval("r = Reference()");
+    Term *s = branch.eval("s = 1.0");
+    Term *t = branch.eval("t = 1.0");
+
+    test_assert(as_ref(r) == NULL);
+    as_ref(r) = s;
+    test_assert(as_ref(r) == s);
+
+    PointerIterator* it = start_pointer_iterator(r);
+
+    test_assert(it->current() == s);
+
+    it->current() = t;
+
+    test_assert(as_ref(r) == t);
+
+    it->advance();
+    test_assert(it->finished());
+
+    delete it;
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_type_tests::test_dictionary);
+    REGISTER_TEST_CASE(builtin_type_tests::test_reference);
 }
 
 } // namespace builtin_type_tests
