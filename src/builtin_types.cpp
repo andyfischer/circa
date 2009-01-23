@@ -5,6 +5,7 @@
 #include "builtins.h"
 #include "builtin_types.h"
 #include "cpp_interface.h"
+#include "pointer_iterator.h"
 #include "runtime.h"
 #include "set.h"
 #include "values.h"
@@ -46,6 +47,11 @@ std::string& as_string(Term* term)
     return *((std::string*) term->value);
 }
 
+Term*& as_ref(Term* term)
+{
+    return (Term*&) term->value;
+}
+
 namespace ref_type {
     void* alloc(Term* term) {
         return NULL;
@@ -62,11 +68,39 @@ namespace ref_type {
     {
         term->value = map.getRemapped((Term*) term->value);
     }
-}
 
-Term*& as_ref(Term* term)
-{
-    return (Term*&) term->value;
+    class ReferencePointerIterator : public PointerIterator
+    {
+    private:
+        Term* _containingTerm;
+
+    public:
+        ReferencePointerIterator(Term* containingTerm)
+          : _containingTerm(containingTerm)
+        {
+            if (_containingTerm->value == NULL)
+                _containingTerm = NULL;
+        }
+
+        virtual Term*& current()
+        {
+            assert(!finished());
+            return as_ref(_containingTerm);
+        }
+        virtual void advance()
+        {
+            _containingTerm = NULL;
+        }
+        virtual bool finished()
+        {
+            return _containingTerm == NULL;
+        }
+    };
+
+    PointerIterator* startPointerIterator(Term* term)
+    {
+        return new ReferencePointerIterator(term);
+    }
 }
 
 namespace primitives {
@@ -313,6 +347,7 @@ void initialize_builtin_types(Branch& kernel)
     as_type(REFERENCE_TYPE).dealloc = ref_type::dealloc;
     as_type(REFERENCE_TYPE).visitPointers = ref_type::visitPointers;
     as_type(REFERENCE_TYPE).remapPointers = ref_type::remapPointers;
+    as_type(REFERENCE_TYPE).startPointerIterator = ref_type::startPointerIterator;
 
     import_function(kernel, CompoundValue::create_compound_type, "create-compound-type(string) -> Type");
     import_function(kernel, CompoundValue::append_field, "compound-type-append-field(Type,Type,string) -> Type");
