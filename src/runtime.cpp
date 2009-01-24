@@ -319,7 +319,7 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList const& _input
 
     // Attempt to re-use an existing term
     // Disabled because sometimes the contents of 'users' is bad (FIXME)
-    Term* existing = NULL; //find_equivalent(function, inputs);
+    Term* existing = NULL; // find_equivalent(function, inputs);
 
     if (existing != NULL)
         return existing;
