@@ -226,6 +226,22 @@ void set_inputs(Term* term, ReferenceList inputs)
     }
 }
 
+void delete_term(Term* term)
+{
+    if (term->state != NULL)
+        delete_term(term->state);
+    term->state = NULL;
+    dealloc_value(term);
+
+#if DEBUG_CHECK_FOR_BAD_POINTERS
+    DEBUG_GOOD_POINTER_SET.erase(term);
+#endif
+
+#if !DEBUG_NEVER_DELETE_TERMS
+    delete term;
+#endif
+}
+
 bool is_actually_using(Term* user, Term* usee)
 {
     assert_good_pointer(user);

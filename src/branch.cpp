@@ -57,7 +57,7 @@ Branch::~Branch()
 
         dealloc_value(term);
         term->owningBranch = NULL;
-        delete term;
+        delete_term(term);
     }
 }
 

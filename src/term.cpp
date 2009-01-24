@@ -39,19 +39,6 @@ Term::Term()
 
 Term::~Term()
 {
-    assert_good_pointer(this);
-
-    delete this->state;
-    this->state = NULL;
-
-    ReferenceMap nullPointerRemap;
-    nullPointerRemap[this] = NULL;
-
-    dealloc_value(this);
-
-#if DEBUG_CHECK_FOR_BAD_POINTERS
-    DEBUG_GOOD_POINTER_SET.erase(this);
-#endif
 }
 
 Term*
