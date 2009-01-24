@@ -165,7 +165,7 @@ public:
         advanceIfStateIsInvalid();
     }
 
-    virtual Term*& current()
+    virtual Term* current()
     {
         return _type->fields[_fieldIndex].type;
     }

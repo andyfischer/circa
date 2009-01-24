@@ -14,7 +14,7 @@ public:
 
     // Return the current pointer. It's invalid to call this if finished()
     // would return true.
-    virtual Term*& current() = 0;
+    virtual Term* current() = 0;
 
     // Advance to the next pointer. It's invalid to call this if finished()
     // would return true. This call may cause this iterator to become finished.

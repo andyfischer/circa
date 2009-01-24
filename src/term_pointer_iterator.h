@@ -23,7 +23,7 @@ public:
     ~TermPointerIterator();
 
     void start(Term*);
-    virtual Term*& current();
+    virtual Term* current();
     virtual void advance();
     virtual bool finished();
 
