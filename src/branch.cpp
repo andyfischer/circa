@@ -44,11 +44,7 @@ Branch::~Branch()
 
         while (!it->finished()) {
             Term* term = it->current();
-            if (term == NULL) {
-                // fixme, iterators should not output NULL
-                it->advance();
-                continue;
-            }
+            assert(term != NULL);
 
             assert_good_pointer(term);
 
@@ -340,6 +336,9 @@ public:
         } else {
             _nestedIterator = new TermPointerIterator(_branch->get(0));
             advanceIfStateIsInvalid();
+
+            while (!finished() && !shouldExposePointer(current()))
+                internalAdvance();
         }
     }
 
@@ -366,13 +365,15 @@ public:
         // not anyone else's business. We only expose pointers that
         // point outside of this branch.
 
-        while(!finished()
-                && current() != NULL
-                && current()->owningBranch == _branch)
+        while(!finished() && !shouldExposePointer(current()))
             internalAdvance();
     }
 
 private:
+    bool shouldExposePointer(Term* ptr) {
+        return (ptr != NULL) && current()->owningBranch != _branch;
+    }
+
     void advanceIfStateIsInvalid()
     {
         assert(!finished());
