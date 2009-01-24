@@ -5,16 +5,22 @@
 
 namespace circa {
 
-// This flag enables a global map of 'good' Term pointers. When a Term
-// is deleted, it's address is no longer 'good'. Then a call to
-// assert_good_pointer will fail. This feature has a performance cost.
+// This flag helps identify pointers to deleted Terms. We keep a 
+// global set of 'good' pointers, and any call to assert_good_pointer
+// will check that the given piece of memory is valid. This option
+// comes with a performance penalty.
+//
+// It's recommended that you never use is_bad_pointer, because this
+// would be easy to abuse. Instead, use assert_good_pointer.
 #define DEBUG_CHECK_FOR_BAD_POINTERS true
 
 // Enabling this flag causes us to never actually delete Term objects.
 // This removes the possibility that a bad pointer will mistakenly be
-// deemed a good pointer, just because a new Term occupies the same
-// memory that a previous Term did.
+// deemed a good pointer, just because the new Term occupies the same
+// memory that a previous Term did. The drawback to this option is
+// of course, unbounded memory consumption.
 #define DEBUG_NEVER_DELETE_TERMS true
+
 
 #if DEBUG_CHECK_FOR_BAD_POINTERS
 extern std::set<Term*> DEBUG_GOOD_POINTER_SET;
