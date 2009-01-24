@@ -34,7 +34,7 @@ void TermPointerIterator::start(Term* term)
     advanceIfStateIsInvalid();
 }
 
-Term*& TermPointerIterator::current()
+Term* TermPointerIterator::current()
 {
     assert(!finished());
 

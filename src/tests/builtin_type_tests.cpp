@@ -37,9 +37,9 @@ void test_reference()
 
     test_assert(it->current() == s);
 
-    it->current() = t;
+    as_ref(r) = t;
 
-    test_assert(as_ref(r) == t);
+    test_assert(it->current() == t);
 
     it->advance();
     test_assert(it->finished());

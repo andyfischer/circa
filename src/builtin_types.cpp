@@ -82,7 +82,7 @@ namespace ref_type {
                 _containingTerm = NULL;
         }
 
-        virtual Term*& current()
+        virtual Term* current()
         {
             assert(!finished());
             return as_ref(_containingTerm);

@@ -190,7 +190,7 @@ public:
         advanceIfStateIsInvalid();
     }
 
-    virtual Term*& current()
+    virtual Term* current()
     {
         assert(!finished());
 

@@ -64,7 +64,7 @@ void find_name_in_outer_branch()
     test_assert(as_branch(inner_branch).findNamed("a") == a);
 }
 
-void safe_deletion()
+void cleanup_users_after_delete()
 {
     Branch branch;
 
@@ -120,7 +120,7 @@ void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
-    REGISTER_TEST_CASE(branch_tests::safe_deletion);
+    REGISTER_TEST_CASE(branch_tests::cleanup_users_after_delete);
     REGISTER_TEST_CASE(branch_tests::test_startBranch);
     REGISTER_TEST_CASE(branch_tests::test_migrate);
 }
