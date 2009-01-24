@@ -17,8 +17,6 @@ namespace map_function {
         };
 
         struct State {
-            Branch branch;
-
             // TODO: more efficient data structure
             std::vector<Pair> pairs;
 
@@ -40,13 +38,13 @@ namespace map_function {
             void assign(Term* key, Term* value) {
                 Pair *existing = findPair(key);
 
-                Term* duplicatedValue = create_value(&branch, value->type);
+                Term* duplicatedValue = create_value(NULL, value->type);
                 duplicate_value(value, duplicatedValue);
 
                 if (existing != NULL) {
                     existing->value = duplicatedValue;
                 } else {
-                    Term* duplicatedKey = create_value(&branch, key->type);
+                    Term* duplicatedKey = create_value(NULL, key->type);
                     duplicate_value(key, duplicatedKey);
                     Pair newPair;
                     newPair.key = duplicatedKey;

@@ -91,9 +91,10 @@ void TermPointerIterator::advanceIfStateIsInvalid()
 
         if (_nestedIterator == NULL) {
             _term = NULL;
+            return;
         }
 
-        return;
+        // fall through
 
     case INSIDE_VALUE:
         if (_nestedIterator->finished()) {
