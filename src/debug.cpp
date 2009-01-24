@@ -8,6 +8,23 @@
 
 namespace circa {
 
+#if DEBUG_CHECK_FOR_BAD_POINTERS
+std::set<Term*> DEBUG_GOOD_POINTER_SET;
+#endif
+
+bool is_bad_pointer(Term* term)
+{
+    return DEBUG_GOOD_POINTER_SET.find(term) == DEBUG_GOOD_POINTER_SET.end();
+}
+
+void assert_good_pointer(Term* term)
+{
+#if DEBUG_CHECK_FOR_BAD_POINTERS
+    if (is_bad_pointer(term))
+        throw std::runtime_error("assert_good_pointer failed (bad term pointer)");
+#endif
+}
+
 bool sanity_check_term(Term* term)
 {
     if (is_bad_pointer(term))

@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "debug.h"
 #include "function.h"
 #include "introspection.h"
 #include "runtime.h"

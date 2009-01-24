@@ -91,8 +91,6 @@ void evaluate_file(Branch& branch, std::string const& filename);
 void reload_branch_from_file(Branch& branch);
 PointerIterator* start_branch_pointer_iterator(Branch* branch);
 
-extern int DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR;
-
 } // namespace circa
 
 #endif
