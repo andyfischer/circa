@@ -19,7 +19,9 @@ void error_occured(Term* errorTerm, std::string const& message);
 // exact inputs. You may want to instead use apply_function(), which does some
 // helpful magic.
 Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs);
+
 void set_input(Term* term, int index, Term* input);
+void set_inputs(Term* term, ReferenceList inputs);
 
 // Check the function and inputs of 'user', returns whether they are actually
 // using 'usee'.

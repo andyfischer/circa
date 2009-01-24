@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "debug.h"
 #include "function.h"
 #include "introspection.h"
 #include "parser.h"
@@ -18,12 +19,8 @@
 
 namespace circa {
 
-int DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR = 0;
-
 Branch::~Branch()
 {
-    DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR++;
-
     // Create a map where all our terms go to NULL
     ReferenceMap deleteMap;
     
@@ -62,8 +59,6 @@ Branch::~Branch()
         term->owningBranch = NULL;
         delete term;
     }
-
-    DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR--;
 }
 
 void Branch::append(Term* term)

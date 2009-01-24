@@ -8,6 +8,7 @@
 #include "builtins.h"
 #include "builtin_types.h"
 #include "branch.h"
+#include "debug.h"
 #include "function.h"
 #include "list.h"
 #include "runtime.h"
@@ -15,26 +16,7 @@
 #include "type.h"
 #include "values.h"
 
-#define CHECK_FOR_BAD_POINTERS true
-
 namespace circa {
-
-#if CHECK_FOR_BAD_POINTERS
-static std::set<Term*> DEBUG_GOOD_POINTER_SET;
-#endif
-
-bool is_bad_pointer(Term* term)
-{
-    return DEBUG_GOOD_POINTER_SET.find(term) == DEBUG_GOOD_POINTER_SET.end();
-}
-
-void assert_good_pointer(Term* term)
-{
-#if CHECK_FOR_BAD_POINTERS
-    if (is_bad_pointer(term))
-        throw std::runtime_error("assert_good_pointer failed (bad term pointer)");
-#endif
-}
 
 static unsigned int gNextGlobalID = 1;
 
@@ -50,16 +32,13 @@ Term::Term()
 {
     globalID = gNextGlobalID++;
 
-#if CHECK_FOR_BAD_POINTERS
+#if DEBUG_CHECK_FOR_BAD_POINTERS
     DEBUG_GOOD_POINTER_SET.insert(this);
 #endif
 }
 
 Term::~Term()
 {
-    if (owningBranch != NULL)
-        assert(DEBUG_CURRENTLY_INSIDE_BRANCH_DESTRUCTOR > 0);
-
     assert_good_pointer(this);
 
     delete this->state;
@@ -70,7 +49,7 @@ Term::~Term()
 
     dealloc_value(this);
 
-#if CHECK_FOR_BAD_POINTERS
+#if DEBUG_CHECK_FOR_BAD_POINTERS
     DEBUG_GOOD_POINTER_SET.erase(this);
 #endif
 }

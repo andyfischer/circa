@@ -16,9 +16,6 @@ struct List;
 
 typedef std::vector<std::string> ErrorList;
 
-bool is_bad_pointer(Term* term);
-void assert_good_pointer(Term* term);
-
 struct Term
 {
     // Our current value. In some situations, when someone refers to this term, they
