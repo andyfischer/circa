@@ -75,12 +75,6 @@ void cleanup_users_after_delete()
 
     Term* b = subBranch.eval("b = add(a,a)");
 
-    print_raw_branch(branch, std::cout);
-std::cout << "--" << std::endl;
-    print_raw_branch(subBranch, std::cout);
-
-    std::cout << a->users.count() << std::endl;
-
     test_assert(a->users.contains(b));
 
     dealloc_value(branch["sub"]);

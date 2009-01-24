@@ -21,18 +21,7 @@ namespace circa {
 
 Branch::~Branch()
 {
-    // Create a map where all our terms go to NULL
-    ReferenceMap deleteMap;
-    
-    std::vector<Term*>::iterator it;
-    for (it = _terms.begin(); it != _terms.end(); ++it) {
-        if (*it != NULL)
-            deleteMap[*it] = NULL;
-    }
-
-    this->remapPointers(deleteMap);
-
-    // dealloc_value on all non-types
+    // Dealloc_value on all non-types
     for (unsigned int i = 0; i < _terms.size(); i++)
     {
         Term *term = _terms[i];
@@ -44,7 +33,51 @@ Branch::~Branch()
 
         if (term->type != TYPE_TYPE)
             dealloc_value(term);
+
+        if (term->state != NULL)
+            dealloc_value(term->state);
     }
+
+    // Find any terms that are using our terms, and tell them to stop.
+    {
+        PointerIterator *it = start_branch_pointer_iterator(this);
+
+        while (!it->finished()) {
+            Term* term = it->current();
+            if (term == NULL) {
+                // fixme, iterators should not output NULL
+                it->advance();
+                continue;
+            }
+
+            assert_good_pointer(term);
+
+            for (int user=0; user < (int) term->users.count(); user++) {
+                if (term->users[user] == NULL)
+                    continue;
+                assert_good_pointer(term->users[user]);
+                if (term->users[user]->owningBranch == this) {
+                    term->users[user] = NULL;
+                }
+            }
+            term->users.removeNulls();
+            it->advance();
+        }
+        delete it;
+    }
+
+    // Create a map where all our terms go to NULL
+    /*
+    ReferenceMap deleteMap;
+    
+    std::vector<Term*>::iterator it;
+    for (it = _terms.begin(); it != _terms.end(); ++it) {
+        if (*it != NULL)
+            deleteMap[*it] = NULL;
+    }
+
+    this->remapPointers(deleteMap);
+    */
 
     // delete everybody
     for (unsigned int i = 0; i < _terms.size(); i++)
