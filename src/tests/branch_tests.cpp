@@ -48,72 +48,6 @@ void test_duplicate()
     assert(sanity_check_term(term2_duplicate));
 }
 
-void external_pointers()
-{
-    Branch branch;
-
-    Term* inner_branch = create_value(&branch, BRANCH_TYPE);
-
-    test_equals(list_all_pointers(inner_branch),
-        ReferenceList(inner_branch->function, inner_branch->type));
-
-    Term* inner_int = create_value(&as_branch(inner_branch), INT_TYPE);
-    Term* inner_add = apply_function(as_branch(inner_branch), ADD_FUNC,
-            ReferenceList(inner_int, inner_int));
-
-    // make sure that the pointer from inner_add to inner_int does
-    // not show up in list_all_pointers.
-
-    /*
-     fixme
-    test_equals(list_all_pointers(inner_branch), ReferenceList(
-                inner_branch->function,
-                inner_branch->type,
-                inner_int->function,
-                FLOAT_TYPE,
-                INT_TYPE,
-                ADD_FUNC,
-                FLOAT_TYPE));
-
-    ReferenceMap myRemap;
-    myRemap[ADD_FUNC] = MULT_FUNC;
-
-    remap_pointers(inner_branch, myRemap);
-
-    test_equals(list_all_pointers(inner_branch), ReferenceList(
-                inner_branch->function,
-                inner_branch->type,
-                inner_int->function,
-                FLOAT_TYPE,
-                INT_TYPE,
-                MULT_FUNC,
-                FLOAT_TYPE));
-
-    test_assert(inner_add->function == MULT_FUNC);
-    */
-}
-
-/*
-void test_owning_term()
-{
-    Branch branch;
-
-    Term* b = branch.eval("Branch()");
-    alloc_value(b);
-
-    test_assert(b->type == BRANCH_TYPE);
-    test_assert(as_branch(b).owningTerm == b);
-
-    Term* b2 = branch.eval("Branch()");
-    steal_value(b, b2);
-
-    test_assert(as_branch(b2).owningTerm == b2);
-
-    duplicate_value(b2, b);
-
-    test_assert(as_branch(b).owningTerm == b);
-}*/
-
 void find_name_in_outer_branch()
 {
     Branch branch;
@@ -128,6 +62,30 @@ void find_name_in_outer_branch()
     as_branch(inner_branch).outerScope = &as_branch(outer_branch);
 
     test_assert(as_branch(inner_branch).findNamed("a") == a);
+}
+
+void safe_deletion()
+{
+    Branch branch;
+
+    Term* a = branch.eval("a = 1.0");
+
+    Branch &subBranch = as_branch(branch.eval("sub = Branch()"));
+    subBranch.outerScope = &branch;
+
+    Term* b = subBranch.eval("b = add(a,a)");
+
+    print_raw_branch(branch, std::cout);
+std::cout << "--" << std::endl;
+    print_raw_branch(subBranch, std::cout);
+
+    std::cout << a->users.count() << std::endl;
+
+    test_assert(a->users.contains(b));
+
+    dealloc_value(branch["sub"]);
+
+    test_assert(!a->users.contains(b));
 }
 
 void test_startBranch()
@@ -161,8 +119,8 @@ void test_migrate()
 void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
-    REGISTER_TEST_CASE(branch_tests::external_pointers);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
+    REGISTER_TEST_CASE(branch_tests::safe_deletion);
     REGISTER_TEST_CASE(branch_tests::test_startBranch);
     REGISTER_TEST_CASE(branch_tests::test_migrate);
 }

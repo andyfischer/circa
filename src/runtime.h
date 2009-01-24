@@ -23,6 +23,8 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs);
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, ReferenceList inputs);
 
+void delete_term(Term* term);
+
 // Check the function and inputs of 'user', returns whether they are actually
 // using 'usee'.
 bool is_actually_using(Term* user, Term* usee);
