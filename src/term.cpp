@@ -8,6 +8,7 @@
 #include "builtins.h"
 #include "builtin_types.h"
 #include "branch.h"
+#include "compound_value.h"
 #include "debug.h"
 #include "function.h"
 #include "list.h"
