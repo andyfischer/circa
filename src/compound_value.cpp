@@ -6,8 +6,13 @@
 
 namespace circa {
 
+CompoundValue::~CompoundValue()
+{
+    // TODO: delete our terms
+}
+
 Term* CompoundValue::appendSlot(Term* type) {
-    Term* newTerm = create_value(&branch, type);
+    Term* newTerm = create_value(NULL, type);
     fields.append(newTerm);
     newTerm->stealingOk = false;
     return newTerm;
@@ -41,6 +46,7 @@ void CompoundValue::create_compound_type(Term* term)
     output.name = name;
     output.alloc = alloc;
     output.dealloc = dealloc;
+    output.startPointerIterator = start_pointer_iterator;
 }
 
 void CompoundValue::append_field(Term* term)
@@ -51,6 +57,11 @@ void CompoundValue::append_field(Term* term)
     Term* fieldType = term->input(1);
     std::string fieldName = as_string(term->input(2));
     output.addField(fieldType, fieldName);
+}
+
+PointerIterator* CompoundValue::start_pointer_iterator(Term* term)
+{
+    return start_compound_value_pointer_iterator(&as_compound_value(term));
 }
 
 bool is_compound_value(Term *term)
