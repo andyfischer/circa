@@ -12,17 +12,19 @@ const int COMPOUND_TYPE_SIGNATURE = 0x43214321;
 struct CompoundValue
 {
     int signature;
-    Branch branch;
     ReferenceList fields;
 
     // Member functions
     CompoundValue() : signature(COMPOUND_TYPE_SIGNATURE) {}
+    ~CompoundValue();
 
     Term* appendSlot(Term* type);
 
-    // Static functions
+    // Hosted functions
     static void* alloc(Term* typeTerm);
     static void dealloc(void* data);
+    static PointerIterator* start_pointer_iterator(Term* term);
+
     static void create_compound_type(Term* term);
     static void append_field(Term* term);
 };
