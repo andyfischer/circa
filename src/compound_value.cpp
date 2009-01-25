@@ -84,4 +84,76 @@ Term* get_field(Term *term, int index)
     return value->fields[index];
 }
 
+class CompoundValuePointerIterator : public PointerIterator
+{
+private:
+    CompoundValue* _value;
+    int _index;
+    PointerIterator* _nestedIterator;
+public:
+    CompoundValuePointerIterator(CompoundValue* value)
+      : _value(value), _index(0), _nestedIterator(NULL)
+    {
+        if (_value->fields.count() == 0) {
+            // Already finished
+            _value = NULL;
+        } else {
+            _nestedIterator = new TermPointerIterator(_value->fields[0]);
+            postAdvance();
+            while (!finished() && !shouldExposePointer(current()))
+                internalAdvance();
+        }
+    }
+
+    virtual Term* current()
+    {
+        assert(!finished());
+        return _nestedIterator->current();
+    }
+    virtual void advance()
+    {
+        assert(!finished());
+        internalAdvance();
+        while (!finished() && !shouldExposePointer(current()))
+            internalAdvance();
+    }
+    virtual bool finished()
+    {
+        return _value == NULL;
+    }
+
+private:
+    bool shouldExposePointer(Term* term)
+    {
+        return term != NULL;
+    }
+    void internalAdvance()
+    {
+        assert(!finished());
+        _nestedIterator->advance();
+        postAdvance();
+    }
+
+    void postAdvance()
+    {
+        while (_nestedIterator->finished()) {
+            delete _nestedIterator;
+            _nestedIterator = NULL;
+
+            _index++;
+            if (_index >= (int) _value->fields.count()) {
+                _value = NULL;
+                return;
+            }
+
+            _nestedIterator = new TermPointerIterator(_value->fields[_index]);
+        }
+    }
+};
+
+PointerIterator* start_compound_value_pointer_iterator(CompoundValue* value)
+{
+    return new CompoundValuePointerIterator(value);
+}
+
 } // namespace circa
