@@ -31,7 +31,9 @@ void assert_good_pointer(Term* term);
 
 // Perform a bunch of checks to see if this term is healthy, and all its related
 // data is consistent.
-bool sanity_check_term(Term* term);
+void sanity_check_term(Term* term);
+
+void sanity_check_the_world();
 
 } // namespace circa
 

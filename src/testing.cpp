@@ -161,8 +161,7 @@ void run_all_tests()
 
 void post_test_sanity_check()
 {
-    
-
+    sanity_check_the_world();
 }
 
 std::vector<std::string> list_all_test_names()

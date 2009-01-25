@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "builtins.h"
 #include "debug.h"
 #include "runtime.h"
 #include "term.h"
@@ -25,25 +26,27 @@ void assert_good_pointer(Term* term)
 #endif
 }
 
-bool sanity_check_term(Term* term)
+void sanity_check_term(Term* term)
 {
-    if (is_bad_pointer(term))
-        return false;
+    assert_good_pointer(term);
 
-    if(!term->function->users.contains(term))
-        return false;
+    assert(term->function->users.contains(term));
 
     for (unsigned int i=0; i < term->inputs.count(); i++) {
-        if(!term->inputs[i]->users.contains(term))
-            return false;
+        assert(term->inputs[i]->users.contains(term));
     }
 
     for (unsigned int i=0; i < term->users.count(); i++) {
-        if (!is_actually_using(term->users[i], term))
-            return false;
+        assert(is_actually_using(term->users[i], term));
     }
+}
 
-    return true;
+void sanity_check_the_world()
+{
+    for (int i=0; i < KERNEL->numTerms(); i++) {
+        Term* term = KERNEL->get(i);
+        sanity_check_term(term);
+    }
 }
 
 } // namespace circa

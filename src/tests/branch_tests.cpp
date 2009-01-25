@@ -42,10 +42,10 @@ void test_duplicate()
     as_int(term1) = 8;
     test_assert(as_int(term1_duplicate) == 5);
 
-    assert(sanity_check_term(term1));
-    assert(sanity_check_term(term2));
-    assert(sanity_check_term(term1_duplicate));
-    assert(sanity_check_term(term2_duplicate));
+    sanity_check_term(term1);
+    sanity_check_term(term2);
+    sanity_check_term(term1_duplicate);
+    sanity_check_term(term2_duplicate);
 }
 
 void find_name_in_outer_branch()
