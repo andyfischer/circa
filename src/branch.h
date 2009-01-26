@@ -90,6 +90,7 @@ void migrate_branch(Branch& original, Branch& replacement);
 void evaluate_file(Branch& branch, std::string const& filename);
 void reload_branch_from_file(Branch& branch);
 PointerIterator* start_branch_pointer_iterator(Branch* branch);
+PointerIterator* start_branch_control_flow_iterator(Branch* branch);
 
 } // namespace circa
 

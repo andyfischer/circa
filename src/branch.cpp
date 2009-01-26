@@ -332,5 +332,9 @@ PointerIterator* start_branch_pointer_iterator(Branch* branch)
     return new BranchExternalPointerIterator(branch);
 }
 
+PointerIterator* start_branch_control_flow_iterator(Branch* branch)
+{
+    return new BranchControlFlowIterator(branch);
+}
 
 } // namespace circa

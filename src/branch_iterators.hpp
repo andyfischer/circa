@@ -128,4 +128,57 @@ private:
     }
 };
 
+class BranchControlFlowIterator : PointerIterator
+{
+    BranchIterator _branchIterator;
+    PointerIterator* _nestedIterator;
+
+public:
+    BranchControlFlowIterator(Branch* branch)
+      : _branchIterator(branch), _nestedIterator(NULL)
+    {
+        if (!_branchIterator.finished()) {
+            _nestedIterator = start_control_flow_iterator(_branchIterator->current());
+            advanceIfStateIsInvalid();
+        }
+    }
+
+    Term* current()
+    {
+        if (_nestedIterator == NULL)
+            return _branchIterator.current();
+        else
+            return _nestedIterator->current();
+    }
+
+    void advance()
+    {
+        if (_nestedIterator != NULL)
+            _nestedIterator->advance();
+        else
+            _branchIterator->advance();
+
+        advanceIfStateIsInvalid();
+    }
+
+    bool finished()
+    {
+        return _branchIterator.finished();
+    }
+private:
+    void advanceIfStateIsInvalid()
+    {
+        if (finished())
+            return;
+        while (_nestedIterator != NULL && _nestedIterator->finished()) {
+            delete _nestedIterator;
+            _nestedIterator = NULL;
+            _branchIterator.advance();
+            if (_branchIterator.finished())
+                return;
+            _nestedIterator = start_control_flow_iterator(branchNext);
+        }
+    }
+};
+
 } // namespace circa
