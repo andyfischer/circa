@@ -83,8 +83,7 @@ void List::dealloc(void* data)
     delete (List*) data;
 }
 
-
-std::string List__toString(Term* caller)
+std::string List::to_string(Term* caller)
 {
     std::stringstream out;
     List& list = as_list(caller);

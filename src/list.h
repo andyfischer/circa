@@ -36,10 +36,10 @@ struct List
 
     static void* alloc(Term* typeTerm);
     static void dealloc(void* data);
+    static std::string to_string(Term* caller);
     static PointerIterator* start_pointer_iterator(Term* term);
 };
 
-std::string List__toString(Term* caller);
 bool is_list(Term* term);
 List& as_list(Term* term);
 List& as_list_unchecked(Term* term);

@@ -108,6 +108,24 @@ void specialize_type(Term *term, Term *type)
     change_type(term, type);
 }
 
+Term* get_field(Term *term, std::string const& fieldName)
+{
+    assert(is_list(term));
+    List *value = (List*) term->value;
+    Type& type = as_type(term->type);
+    int index = type.findField(fieldName);
+    if (index == -1)
+        return NULL;
+    return value->items[index];
+}
+
+Term* get_field(Term *term, int index)
+{
+    assert(is_list(term));
+    List *value = (List*) term->value;
+    return value->items[index];
+}
+
 namespace type_private {
 
 void* empty_allocate(Term*)
@@ -254,24 +272,5 @@ PointerIterator* start_pointer_iterator(Term* term)
 
     return type.startPointerIterator(term);
 }
-
-Term* get_field(Term *term, std::string const& fieldName)
-{
-    assert(is_list(term));
-    List *value = (List*) term->value;
-    Type& type = as_type(term->type);
-    int index = type.findField(fieldName);
-    if (index == -1)
-        return NULL;
-    return value->items[index];
-}
-
-Term* get_field(Term *term, int index)
-{
-    assert(is_list(term));
-    List *value = (List*) term->value;
-    return value->items[index];
-}
-
 
 } // namespace circa
