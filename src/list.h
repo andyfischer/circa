@@ -33,6 +33,8 @@ struct List
 
     void remove(int index);
     void clear();
+
+    static PointerIterator* start_pointer_iterator(Term* term);
 };
 
 std::string List__toString(Term* caller);
@@ -40,6 +42,8 @@ bool is_list(Term* term);
 List& as_list(Term* term);
 List& as_list_unchecked(Term* term);
 void initialize_list_functions(Branch* kernel);
+
+PointerIterator* start_list_pointer_iterator(List* list);
 
 } // namespace circa
 
