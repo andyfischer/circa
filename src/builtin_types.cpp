@@ -5,7 +5,6 @@
 #include "builtins.h"
 #include "builtin_types.h"
 #include "cpp_interface.h"
-#include "compound_value.h"
 #include "pointer_iterator.h"
 #include "runtime.h"
 #include "set.h"

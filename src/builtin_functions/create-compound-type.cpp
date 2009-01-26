@@ -11,9 +11,9 @@ namespace create_compound_type_function {
         Type& output = as_type(caller);
 
         output.name = name;
-        output.alloc = CompoundValue::alloc;
-        output.dealloc = CompoundValue::dealloc;
-        output.startPointerIterator = CompoundValue::start_pointer_iterator;
+        output.alloc = List::alloc;
+        output.dealloc = List::dealloc;
+        output.startPointerIterator = List::start_pointer_iterator;
     }
 
     void setup(Branch& kernel)
