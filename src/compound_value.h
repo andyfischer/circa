@@ -7,6 +7,7 @@
 
 namespace circa {
 
+// This is a dumb thing that allows for some runtime type assertion.
 const int COMPOUND_TYPE_SIGNATURE = 0x43214321;
 
 struct CompoundValue

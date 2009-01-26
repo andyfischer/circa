@@ -8,14 +8,16 @@
 
 namespace circa {
 
+// This is a dumb thing that allows for some runtime type assertion.
+const int LIST_TYPE_SIGNATURE = 0x91917575;
+
 struct List
 {
-private:
+    int signature;
     ReferenceList items;
 
-public:
     // Default constructor
-    List() {}
+    List() : signature(LIST_TYPE_SIGNATURE) {}
 
     // Copy constructor
     List(List const& copy);

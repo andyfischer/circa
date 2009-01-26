@@ -14,6 +14,7 @@
 namespace circa {
 
 List::List(List const& copy)
+  : signature(LIST_TYPE_SIGNATURE)
 {
     for (int i=0; i < copy.count(); i++) {
         Term* term = appendSlot(copy[i]->type);
