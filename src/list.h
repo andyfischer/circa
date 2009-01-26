@@ -34,6 +34,8 @@ struct List
     void remove(int index);
     void clear();
 
+    static void* alloc(Term* typeTerm);
+    static void dealloc(void* data);
     static PointerIterator* start_pointer_iterator(Term* term);
 };
 
