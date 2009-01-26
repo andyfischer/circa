@@ -32,6 +32,8 @@ Term::Term()
     needsUpdate(true)
 {
     globalID = gNextGlobalID++;
+    
+    
 
 #if DEBUG_CHECK_FOR_BAD_POINTERS
     DEBUG_GOOD_POINTER_SET.insert(this);

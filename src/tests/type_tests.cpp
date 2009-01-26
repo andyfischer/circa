@@ -4,6 +4,7 @@
 
 #include "builtin_types.h"
 #include "branch.h"
+#include "compound_value.h"
 #include "builtins.h"
 #include "runtime.h"
 #include "parser.h"
