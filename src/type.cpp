@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "compound_value.h"
 #include "cpp_interface.h"
 #include "function.h"
 #include "importing.h"
@@ -15,6 +16,14 @@
 #include "values.h"
 
 namespace circa {
+
+void Type::makeCompoundType(std::string const& name)
+{
+    this->name = name;
+    alloc = CompoundValue::alloc;
+    dealloc = CompoundValue::dealloc;
+    startPointerIterator = CompoundValue::start_pointer_iterator;
+}
 
 void
 Type::addMemberFunction(std::string const &name, Term *function)
@@ -126,6 +135,13 @@ Term* create_empty_type(Branch& branch, std::string name)
 void* alloc_from_type(Term* typeTerm)
 {
     return as_type(typeTerm).alloc(typeTerm);
+}
+
+Type& create_compound_type(Branch& branch, std::string const& name)
+{
+    Term* term = create_value(&branch, TYPE_TYPE, name);
+    as_type(term).makeCompoundType(name);
+    return as_type(term);
 }
 
 std::string Type::to_string(Term *caller)

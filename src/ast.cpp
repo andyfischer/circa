@@ -379,22 +379,15 @@ TypeDecl::toString() const
 Term*
 TypeDecl::createTerm(CompilationContext &context)
 {
-    Branch workspace;
-
-    string_value(workspace, this->name, "typeName");
-
-    workspace.eval("t = create-compound-type(typeName)");
+    Term* result_term = create_value(&context.topBranch(), TYPE_TYPE);
+    Type &type = as_type(result_term);
+    type.makeCompoundType(this->name);
 
     MemberList::const_iterator it;
     for (it = members.begin(); it != members.end(); ++it) {
-        //string_value(workspace, it->type, "fieldType");
-        string_value(workspace, it->name, "fieldName");
-        workspace.eval(
-            std::string("compound-type-append-field(@t, "+it->type+", fieldName)"));
+        type.addField(context.findNamed(it->type), it->name);
     }
 
-    Term* result_term = create_value(&context.topBranch(), TYPE_TYPE);
-    steal_value(workspace["t"], result_term);
     context.topBranch().bindName(result_term, this->name);
     return result_term;
 }

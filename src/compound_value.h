@@ -4,6 +4,7 @@
 #define CIRCA_COMPOUND_VALUE_INCLUDED
 
 #include "pointer_iterator.h"
+#include "ref_list.h"
 
 namespace circa {
 
