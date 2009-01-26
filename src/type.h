@@ -100,6 +100,8 @@ struct Type
         return -1;
     }
 
+    void makeCompoundType(std::string const& name);
+
     void addMemberFunction(std::string const& name, Term* function);
 
     // Hosted functions:
@@ -130,6 +132,8 @@ Term* create_empty_type(Branch& branch, std::string name);
 void* alloc_from_type(Term* typeTerm);
 
 void initialize_type_type(Term* typeType);
+
+Type& create_compound_type(Branch& branch, std::string const& name);
 
 std::string to_string(Term* term);
 std::string to_source_string(Term* term);

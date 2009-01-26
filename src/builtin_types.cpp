@@ -274,7 +274,6 @@ void initialize_builtin_types(Branch& kernel)
     as_type(REFERENCE_TYPE).remapPointers = ref_type::remapPointers;
     as_type(REFERENCE_TYPE).startPointerIterator = ref_type::startPointerIterator;
 
-    import_function(kernel, CompoundValue::create_compound_type, "create-compound-type(string) -> Type");
     import_function(kernel, CompoundValue::append_field, "compound-type-append-field(Type,Type,string) -> Type");
 
     import_type<ReferenceList>(kernel, "Tuple");

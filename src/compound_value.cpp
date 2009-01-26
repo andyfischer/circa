@@ -38,17 +38,6 @@ void CompoundValue::dealloc(void* data)
     delete (CompoundValue*) data;
 }
 
-void CompoundValue::create_compound_type(Term* term)
-{
-    std::string name = as_string(term->input(0));
-    Type& output = as_type(term);
-
-    output.name = name;
-    output.alloc = alloc;
-    output.dealloc = dealloc;
-    output.startPointerIterator = start_pointer_iterator;
-}
-
 void CompoundValue::append_field(Term* term)
 {
     recycle_value(term->input(0), term);
