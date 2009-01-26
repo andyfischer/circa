@@ -82,19 +82,4 @@ public:
     }
 };
 
-/*
-class MapExternalPointerIterator : PointerIterator
-{
-    MapIterator _iterator;
-
-public:
-    MapExternalPointerIterator(Map* map)
-      : _iterator(map)
-    {
-    }
-
-    Term* current()
-};
-*/
-
 } // namespace circa

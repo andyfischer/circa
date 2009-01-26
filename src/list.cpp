@@ -95,13 +95,4 @@ List& as_list_unchecked(Term* term)
     return *((List*) term->value);
 }
 
-ReferenceList List::toReferenceList() const
-{
-    ReferenceList result;
-    for (int i=0; i < count(); i++) {
-        result.append(get(i)->asRef());
-    }
-    return result;
-}
-
 } // namespace circa

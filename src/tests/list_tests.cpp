@@ -77,29 +77,12 @@ void list_apply()
     test_assert(as_string(as_list(result).get(4)) == "4");
 }
 
-void to_reference_list()
-{
-    List list;
-
-    list.appendSlot(REFERENCE_TYPE)->asRef() = INT_TYPE;
-    list.appendSlot(REFERENCE_TYPE)->asRef() = CONSTANT_FALSE;
-    list.appendSlot(REFERENCE_TYPE)->asRef() = APPLY_FEEDBACK;
-
-    ReferenceList reflist = list.toReferenceList();
-
-    test_assert(reflist.count() == 3);
-    test_assert(reflist[0] == INT_TYPE);
-    test_assert(reflist[1] == CONSTANT_FALSE);
-    test_assert(reflist[2] == APPLY_FEEDBACK);
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(list_tests::create);
     REGISTER_TEST_CASE(list_tests::operations);
     REGISTER_TEST_CASE(list_tests::range);
     REGISTER_TEST_CASE(list_tests::list_apply);
-    REGISTER_TEST_CASE(list_tests::to_reference_list);
 }
 
 } // namespace list_tests
