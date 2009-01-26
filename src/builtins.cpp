@@ -199,7 +199,7 @@ void initialize_constants()
     as_type(BRANCH_TYPE).startPointerIterator = Branch::start_pointer_iterator;
 
     LIST_TYPE = import_type<List>(*KERNEL, "List");
-    as_type(LIST_TYPE).toString = List__toString;
+    as_type(LIST_TYPE).toString = List::to_string;
 
     import_type<Dictionary>(*KERNEL, "Dictionary");
 

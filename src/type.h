@@ -124,8 +124,6 @@ void unsafe_change_type(Term* term, Term* type);
 void change_type(Term* term, Term* type);
 void specialize_type(Term* term, Term* type);
 
-void set_member_function(Term* type, std::string name, Term* function);
-Term* get_member_function(Term* type, std::string name);
 Term* get_field(Term *term, std::string const& fieldName);
 Term* get_field(Term *term, int index);
 
