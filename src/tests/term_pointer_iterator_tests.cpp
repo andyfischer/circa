@@ -15,7 +15,7 @@ void simple()
     Term *two = branch.eval("two = 2.0");
     Term *t = branch.eval("a = add(one,two)");
 
-    TermPointerIterator it(t);
+    TermExternalPointersIterator it(t);
 
     test_assert(it.current() == one);
     it.advance();
@@ -34,7 +34,7 @@ void no_inputs()
 
     Term *one = branch.eval("one = 1.0");
 
-    TermPointerIterator it(one);
+    TermExternalPointersIterator it(one);
 
     test_assert(it.current()->function == VALUE_FUNCTION_GENERATOR);
     it.advance();
@@ -55,7 +55,7 @@ void nested_branch()
     as_branch(nested).eval("two = 1.0");
     as_branch(nested).eval("a = add(one,two)");
 
-    TermPointerIterator it(nested);
+    TermExternalPointersIterator it(nested);
 
     test_assert(it.current()->function == VALUE_FUNCTION_GENERATOR);
     it.advance();

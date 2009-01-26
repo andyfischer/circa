@@ -109,7 +109,7 @@ public:
             // Already finished
             _value = NULL;
         } else {
-            _nestedIterator = new TermPointerIterator(_value->fields[0]);
+            _nestedIterator = new TermExternalPointersIterator(_value->fields[0]);
             postAdvance();
             while (!finished() && !shouldExposePointer(current()))
                 internalAdvance();
@@ -157,7 +157,7 @@ private:
                 return;
             }
 
-            _nestedIterator = new TermPointerIterator(_value->fields[_index]);
+            _nestedIterator = new TermExternalPointersIterator(_value->fields[_index]);
         }
     }
 };

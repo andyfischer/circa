@@ -8,24 +8,24 @@
 
 namespace circa {
 
-TermPointerIterator::TermPointerIterator()
+TermExternalPointersIterator::TermExternalPointersIterator()
   : _term(NULL), _step(INPUTS), _stepIndex(0), _nestedIterator(NULL)
 {
 }
 
-TermPointerIterator::TermPointerIterator(Term* term)
+TermExternalPointersIterator::TermExternalPointersIterator(Term* term)
   : _term(NULL), _step(INPUTS), _stepIndex(0), _nestedIterator(NULL)
 {
     start(term);
 }
 
-TermPointerIterator::~TermPointerIterator()
+TermExternalPointersIterator::~TermExternalPointersIterator()
 {
     delete _nestedIterator;
     _nestedIterator = NULL;
 }
 
-void TermPointerIterator::start(Term* term)
+void TermExternalPointersIterator::start(Term* term)
 {
     _term = term;
     _step = INPUTS;
@@ -34,7 +34,7 @@ void TermPointerIterator::start(Term* term)
     advanceIfStateIsInvalid();
 }
 
-Term* TermPointerIterator::current()
+Term* TermExternalPointersIterator::current()
 {
     assert(!finished());
 
@@ -49,10 +49,10 @@ Term* TermPointerIterator::current()
         return _nestedIterator->current();
     }
 
-    throw std::runtime_error("internal error in TermPointerIterator::current");
+    throw std::runtime_error("internal error in TermExternalPointersIterator::current");
 }
 
-void TermPointerIterator::advance()
+void TermExternalPointersIterator::advance()
 {
     if (_step == INSIDE_VALUE)
         _nestedIterator->advance();
@@ -62,7 +62,7 @@ void TermPointerIterator::advance()
     advanceIfStateIsInvalid();
 }
 
-void TermPointerIterator::advanceIfStateIsInvalid()
+void TermExternalPointersIterator::advanceIfStateIsInvalid()
 {
     switch(_step) {
     case INPUTS:
@@ -107,7 +107,7 @@ void TermPointerIterator::advanceIfStateIsInvalid()
     }
 }
 
-bool TermPointerIterator::finished()
+bool TermExternalPointersIterator::finished()
 {
     return _term == NULL;
 }

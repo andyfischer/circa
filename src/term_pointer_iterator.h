@@ -7,7 +7,7 @@
 
 namespace circa {
 
-class TermPointerIterator : public PointerIterator
+class TermExternalPointersIterator : public PointerIterator
 {
 private:
     enum Step { INPUTS, FUNCTION, TYPE, INSIDE_VALUE };
@@ -18,9 +18,9 @@ private:
     PointerIterator* _nestedIterator;
 
 public:
-    TermPointerIterator();
-    TermPointerIterator(Term*);
-    ~TermPointerIterator();
+    TermExternalPointersIterator();
+    TermExternalPointersIterator(Term*);
+    ~TermExternalPointersIterator();
 
     void start(Term*);
     virtual Term* current();
