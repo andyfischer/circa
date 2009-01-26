@@ -64,6 +64,25 @@ List::clear()
     items.clear();
 }
 
+void* List::alloc(Term* typeTerm)
+{
+    List *value = new List();
+
+    // create a slot for each field
+    Type& type = as_type(typeTerm);
+    int numFields = (int) type.fields.size();
+
+    for (int f=0; f < numFields; f++)
+        value->appendSlot(type.fields[f].type);
+
+    return value;
+}
+
+void List::dealloc(void* data)
+{
+    delete (List*) data;
+}
+
 std::string List__toString(Term* caller)
 {
     std::stringstream out;
