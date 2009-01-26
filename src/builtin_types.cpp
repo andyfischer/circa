@@ -11,6 +11,8 @@
 #include "set.h"
 #include "values.h"
 
+#include "builtin_types/map.hpp"
+
 namespace circa {
 
 int& as_int(Term* term)
@@ -276,8 +278,8 @@ void initialize_builtin_types(Branch& kernel)
     import_function(kernel, CompoundValue::append_field, "compound-type-append-field(Type,Type,string) -> Type");
 
     import_type<ReferenceList>(kernel, "Tuple");
-
     import_type<Branch>(kernel, "Branch");
+    import_type<Map>(kernel, "Map");
 
     Term* set_type = import_type<Set>(kernel, "Set");
     as_type(set_type).toString = Set::to_string;
