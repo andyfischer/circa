@@ -26,9 +26,6 @@ struct CompoundValue
     static void* alloc(Term* typeTerm);
     static void dealloc(void* data);
     static PointerIterator* start_pointer_iterator(Term* term);
-
-    static void create_compound_type(Term* term);
-    static void append_field(Term* term);
 };
 
 CompoundValue& as_compound_value(Term *term);
