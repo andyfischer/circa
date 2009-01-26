@@ -72,11 +72,32 @@ Function& as_function(Term* term)
     return *((Function*) term->value);
 }
 
-void Function::duplicate(Term* source, Term* dest)
+void Function::duplicate(Term* sourceTerm, Term* destTerm)
 {
-    assert(dest->value == NULL);
-    dest->value = new Function();
-    as_function(dest) = as_function(source);
+    assert(destTerm->value == NULL);
+    assert(is_function(sourceTerm));
+    assert(is_function(destTerm));
+    destTerm->value = new Function();
+
+    Function &source = as_function(sourceTerm);
+    Function &dest = as_function(destTerm);
+
+    dest.inputTypes =      source.inputTypes;
+    dest.inputProperties = source.inputProperties;
+    dest.outputType =      source.outputType;
+    dest.stateType =       source.stateType;
+    dest.pureFunction =    source.pureFunction;
+    dest.hasSideEffects =  source.hasSideEffects;
+    dest.variableArgs =    source.variableArgs;
+    dest.name =            source.name;
+    dest.initialize =      source.initialize;
+    dest.evaluate =        source.evaluate;
+    dest.feedbackAccumulationFunction =    source.feedbackAccumulationFunction;
+    dest.feedbackPropogateFunction =       source.feedbackPropogateFunction;
+    dest.generateCppFunction =             source.generateCppFunction;
+    dest.printCircaSourceFunction =        source.printCircaSourceFunction;
+
+    duplicate_branch(source.subroutineBranch, dest.subroutineBranch);
 }
 
 void Function::remapPointers(Term* term, ReferenceMap const& map)
