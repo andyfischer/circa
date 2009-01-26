@@ -323,7 +323,7 @@ class BranchPointerIterator : public PointerIterator
 private:
     Branch* _branch;
     int _index;
-    TermPointerIterator* _nestedIterator;
+    TermExternalPointersIterator* _nestedIterator;
 
 public:
     BranchPointerIterator(Branch* branch)
@@ -335,7 +335,7 @@ public:
             // Already finished.
             _branch = NULL;
         } else {
-            _nestedIterator = new TermPointerIterator(_branch->get(0));
+            _nestedIterator = new TermExternalPointersIterator(_branch->get(0));
             advanceIfStateIsInvalid();
 
             while (!finished() && !shouldExposePointer(current()))
@@ -391,7 +391,7 @@ private:
                 return;
             }
 
-            _nestedIterator = new TermPointerIterator(_branch->get(_index));
+            _nestedIterator = new TermExternalPointersIterator(_branch->get(_index));
         }
     }
 
