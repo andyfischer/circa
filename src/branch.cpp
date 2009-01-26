@@ -48,12 +48,13 @@ Branch::~Branch()
 
             assert_good_pointer(term);
 
-            for (int user=0; user < (int) term->users.count(); user++) {
-                if (term->users[user] == NULL)
+            for (int userIndex=0; userIndex < (int) term->users.count(); userIndex++) {
+                Term* user = term->users[userIndex];
+                if (user == NULL)
                     continue;
-                assert_good_pointer(term->users[user]);
-                if (term->users[user]->owningBranch == this) {
-                    term->users[user] = NULL;
+                assert_good_pointer(user);
+                if (user->owningBranch == this) {
+                    term->users[userIndex] = NULL;
                 }
             }
             term->users.removeNulls();

@@ -3,7 +3,9 @@
 #include "common_headers.h"
 
 #include "testing.h"
+#include "compound_value.h"
 #include "cpp_interface.h"
+#include "debug.h"
 #include "builtins.h"
 #include "branch.h"
 #include "parser.h"

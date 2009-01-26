@@ -94,6 +94,8 @@
 		B6BA5C060E622F1900B4C3A0 /* parser_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5BFE0E622F1900B4C3A0 /* parser_tests.cpp */; };
 		B6BA5C070E622F1900B4C3A0 /* primitive_type_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5BFF0E622F1900B4C3A0 /* primitive_type_tests.cpp */; };
 		B6BA5C0A0E622F1900B4C3A0 /* tokenizer_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5C020E622F1900B4C3A0 /* tokenizer_tests.cpp */; };
+		B6BDB19D0F2D286B00AB5321 /* compound_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BDB19B0F2D286B00AB5321 /* compound_value.cpp */; };
+		B6BDB19F0F2D287A00AB5321 /* compound_value_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BDB19E0F2D287A00AB5321 /* compound_value_tests.cpp */; };
 		B6DB9E590E8C035C004811E1 /* list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6DB9E550E8C035C004811E1 /* list.cpp */; };
 		B6DB9E5A0E8C035C004811E1 /* ref_list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6DB9E570E8C035C004811E1 /* ref_list.cpp */; };
 		B6EEE5890E670E9B009E2FA2 /* cpp_interface_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6EEE5880E670E9B009E2FA2 /* cpp_interface_tests.cpp */; };
@@ -230,6 +232,9 @@
 		B6BA5BFE0E622F1900B4C3A0 /* parser_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parser_tests.cpp; sourceTree = "<group>"; };
 		B6BA5BFF0E622F1900B4C3A0 /* primitive_type_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitive_type_tests.cpp; sourceTree = "<group>"; };
 		B6BA5C020E622F1900B4C3A0 /* tokenizer_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tokenizer_tests.cpp; sourceTree = "<group>"; };
+		B6BDB19B0F2D286B00AB5321 /* compound_value.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compound_value.cpp; sourceTree = "<group>"; };
+		B6BDB19C0F2D286B00AB5321 /* compound_value.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compound_value.h; sourceTree = "<group>"; };
+		B6BDB19E0F2D287A00AB5321 /* compound_value_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compound_value_tests.cpp; sourceTree = "<group>"; };
 		B6DB9E550E8C035C004811E1 /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list.cpp; sourceTree = "<group>"; };
 		B6DB9E560E8C035C004811E1 /* list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
 		B6DB9E570E8C035C004811E1 /* ref_list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ref_list.cpp; sourceTree = "<group>"; };
@@ -356,6 +361,7 @@
 		B6A243F90E3D6414007F2BEB /* tests */ = {
 			isa = PBXGroup;
 			children = (
+				B6BDB19E0F2D287A00AB5321 /* compound_value_tests.cpp */,
 				B697D18D0F2A726D00335240 /* introspection_tests.cpp */,
 				B697D18E0F2A726D00335240 /* term_pointer_iterator_tests.cpp */,
 				B697D18F0F2A726D00335240 /* value_tests.cpp */,
@@ -385,6 +391,8 @@
 				B6A243F90E3D6414007F2BEB /* tests */,
 				B697D17F0F2A722800335240 /* opt */,
 				B697D1860F2A725900335240 /* term_pointer_iterator.cpp */,
+				B6BDB19B0F2D286B00AB5321 /* compound_value.cpp */,
+				B6BDB19C0F2D286B00AB5321 /* compound_value.h */,
 				B697D1890F2A725900335240 /* wrappers.cpp */,
 				B697D1870F2A725900335240 /* term_pointer_iterator.h */,
 				B697D1880F2A725900335240 /* term_syntax_hints.h */,
@@ -593,6 +601,8 @@
 				B697D1BA0F2A729C00335240 /* term-to-source.cpp in Sources */,
 				B697D1BB0F2A729C00335240 /* tuple.cpp in Sources */,
 				B697D1BC0F2A729C00335240 /* unknown-function.cpp in Sources */,
+				B6BDB19D0F2D286B00AB5321 /* compound_value.cpp in Sources */,
+				B6BDB19F0F2D287A00AB5321 /* compound_value_tests.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
