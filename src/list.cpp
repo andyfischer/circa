@@ -83,6 +83,7 @@ void List::dealloc(void* data)
     delete (List*) data;
 }
 
+
 std::string List__toString(Term* caller)
 {
     std::stringstream out;
@@ -100,12 +101,12 @@ std::string List__toString(Term* caller)
 
 bool is_list(Term* term)
 {
-    return term->type == LIST_TYPE;
+    return ((List*) term->value)->signature == LIST_TYPE_SIGNATURE;
 }
 
 List& as_list(Term* term)
 {
-    assert_type(term, LIST_TYPE);
+    assert(is_list(term));
     assert(term->value != NULL);
     return *((List*) term->value);
 }
@@ -182,6 +183,11 @@ private:
         }
     }
 };
+
+PointerIterator* List::start_pointer_iterator(Term* term)
+{
+    return new ListPointerIterator(&as_list(term));
+}
 
 PointerIterator* start_list_pointer_iterator(List* list)
 {

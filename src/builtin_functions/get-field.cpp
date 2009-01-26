@@ -7,7 +7,7 @@ namespace get_field_function {
 
     void evaluate(Term* caller)
     {
-        CompoundValue &value = as_compound_value(caller->input(0));
+        List &value = as_list(caller->input(0));
         std::string fieldName = as_string(caller->input(1));
         Type& type = as_type(caller->input(0)->type);
 
@@ -20,7 +20,7 @@ namespace get_field_function {
 
         assert(index >= 0);
 
-        Term* field = value.fields[index];
+        Term* field = value.items[index];
         specialize_type(caller, field->type);
 
         if (field->stealingOk)

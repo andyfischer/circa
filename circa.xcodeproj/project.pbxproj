@@ -47,6 +47,8 @@
 		B606EBCC0EF783690019E00C /* runtime_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B606EBC80EF783690019E00C /* runtime_tests.cpp */; };
 		B614B68F0F0091C900AA3646 /* compilation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B614B68D0F0091C900AA3646 /* compilation.cpp */; };
 		B614B6910F0091D900AA3646 /* get-infix-function-name.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B614B6900F0091D900AA3646 /* get-infix-function-name.cpp */; };
+		B63B40720F2D85630049FAEE /* compound-type-append-field.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B63B40700F2D85630049FAEE /* compound-type-append-field.cpp */; };
+		B63B40730F2D85630049FAEE /* create-compound-type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B63B40710F2D85630049FAEE /* create-compound-type.cpp */; };
 		B64D6A3A0EA65E9500DAD382 /* dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B64D6A2F0EA65E9500DAD382 /* dictionary.cpp */; };
 		B64D6A3E0EA65E9500DAD382 /* runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B64D6A380EA65E9500DAD382 /* runtime.cpp */; };
 		B64D6A430EA65ED400DAD382 /* feedback_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B64D6A420EA65ED400DAD382 /* feedback_tests.cpp */; };
@@ -94,7 +96,6 @@
 		B6BA5C060E622F1900B4C3A0 /* parser_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5BFE0E622F1900B4C3A0 /* parser_tests.cpp */; };
 		B6BA5C070E622F1900B4C3A0 /* primitive_type_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5BFF0E622F1900B4C3A0 /* primitive_type_tests.cpp */; };
 		B6BA5C0A0E622F1900B4C3A0 /* tokenizer_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BA5C020E622F1900B4C3A0 /* tokenizer_tests.cpp */; };
-		B6BDB19D0F2D286B00AB5321 /* compound_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BDB19B0F2D286B00AB5321 /* compound_value.cpp */; };
 		B6BDB19F0F2D287A00AB5321 /* compound_value_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6BDB19E0F2D287A00AB5321 /* compound_value_tests.cpp */; };
 		B6DB9E590E8C035C004811E1 /* list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6DB9E550E8C035C004811E1 /* list.cpp */; };
 		B6DB9E5A0E8C035C004811E1 /* ref_list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6DB9E570E8C035C004811E1 /* ref_list.cpp */; };
@@ -166,6 +167,8 @@
 		B614B68D0F0091C900AA3646 /* compilation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compilation.cpp; sourceTree = "<group>"; };
 		B614B68E0F0091C900AA3646 /* compilation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compilation.h; sourceTree = "<group>"; };
 		B614B6900F0091D900AA3646 /* get-infix-function-name.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "get-infix-function-name.cpp"; sourceTree = "<group>"; };
+		B63B40700F2D85630049FAEE /* compound-type-append-field.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "compound-type-append-field.cpp"; sourceTree = "<group>"; };
+		B63B40710F2D85630049FAEE /* create-compound-type.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "create-compound-type.cpp"; sourceTree = "<group>"; };
 		B64CA7220E6279E400ADB947 /* circa */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = circa; sourceTree = BUILT_PRODUCTS_DIR; };
 		B64D6A2F0EA65E9500DAD382 /* dictionary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dictionary.cpp; sourceTree = "<group>"; };
 		B64D6A300EA65E9500DAD382 /* dictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dictionary.h; sourceTree = "<group>"; };
@@ -232,8 +235,6 @@
 		B6BA5BFE0E622F1900B4C3A0 /* parser_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parser_tests.cpp; sourceTree = "<group>"; };
 		B6BA5BFF0E622F1900B4C3A0 /* primitive_type_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitive_type_tests.cpp; sourceTree = "<group>"; };
 		B6BA5C020E622F1900B4C3A0 /* tokenizer_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tokenizer_tests.cpp; sourceTree = "<group>"; };
-		B6BDB19B0F2D286B00AB5321 /* compound_value.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compound_value.cpp; sourceTree = "<group>"; };
-		B6BDB19C0F2D286B00AB5321 /* compound_value.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compound_value.h; sourceTree = "<group>"; };
 		B6BDB19E0F2D287A00AB5321 /* compound_value_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compound_value_tests.cpp; sourceTree = "<group>"; };
 		B6DB9E550E8C035C004811E1 /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list.cpp; sourceTree = "<group>"; };
 		B6DB9E560E8C035C004811E1 /* list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
@@ -295,6 +296,8 @@
 		B606EB710EF782FC0019E00C /* builtin_functions */ = {
 			isa = PBXGroup;
 			children = (
+				B63B40700F2D85630049FAEE /* compound-type-append-field.cpp */,
+				B63B40710F2D85630049FAEE /* create-compound-type.cpp */,
 				B697D1930F2A729C00335240 /* alias.cpp */,
 				B697D1940F2A729C00335240 /* branch-to-source-text.cpp */,
 				B697D1950F2A729C00335240 /* comment.cpp */,
@@ -391,8 +394,6 @@
 				B6A243F90E3D6414007F2BEB /* tests */,
 				B697D17F0F2A722800335240 /* opt */,
 				B697D1860F2A725900335240 /* term_pointer_iterator.cpp */,
-				B6BDB19B0F2D286B00AB5321 /* compound_value.cpp */,
-				B6BDB19C0F2D286B00AB5321 /* compound_value.h */,
 				B697D1890F2A725900335240 /* wrappers.cpp */,
 				B697D1870F2A725900335240 /* term_pointer_iterator.h */,
 				B697D1880F2A725900335240 /* term_syntax_hints.h */,
@@ -601,8 +602,9 @@
 				B697D1BA0F2A729C00335240 /* term-to-source.cpp in Sources */,
 				B697D1BB0F2A729C00335240 /* tuple.cpp in Sources */,
 				B697D1BC0F2A729C00335240 /* unknown-function.cpp in Sources */,
-				B6BDB19D0F2D286B00AB5321 /* compound_value.cpp in Sources */,
 				B6BDB19F0F2D287A00AB5321 /* compound_value_tests.cpp in Sources */,
+				B63B40720F2D85630049FAEE /* compound-type-append-field.cpp in Sources */,
+				B63B40730F2D85630049FAEE /* create-compound-type.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

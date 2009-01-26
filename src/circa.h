@@ -5,7 +5,6 @@
 #include "builtins.h"
 #include "builtin_types.h"
 #include "cpp_interface.h"
-#include "compound_value.h"
 #include "debug.h"
 #include "function.h"
 #include "importing.h"

@@ -3,6 +3,7 @@
 #include "branch.h"
 #include "builtins.h"
 #include "importing.h"
+#include "type.h"
 
 namespace circa {
 namespace comment_function {

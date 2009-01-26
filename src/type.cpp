@@ -4,7 +4,6 @@
 
 #include "branch.h"
 #include "builtins.h"
-#include "compound_value.h"
 #include "cpp_interface.h"
 #include "function.h"
 #include "importing.h"
@@ -20,9 +19,9 @@ namespace circa {
 void Type::makeCompoundType(std::string const& name)
 {
     this->name = name;
-    alloc = CompoundValue::alloc;
-    dealloc = CompoundValue::dealloc;
-    startPointerIterator = CompoundValue::start_pointer_iterator;
+    alloc = List::alloc;
+    dealloc = List::dealloc;
+    startPointerIterator = List::start_pointer_iterator;
 }
 
 void
@@ -255,5 +254,24 @@ PointerIterator* start_pointer_iterator(Term* term)
 
     return type.startPointerIterator(term);
 }
+
+Term* get_field(Term *term, std::string const& fieldName)
+{
+    assert(is_list(term));
+    List *value = (List*) term->value;
+    Type& type = as_type(term->type);
+    int index = type.findField(fieldName);
+    if (index == -1)
+        return NULL;
+    return value->items[index];
+}
+
+Term* get_field(Term *term, int index)
+{
+    assert(is_list(term));
+    List *value = (List*) term->value;
+    return value->items[index];
+}
+
 
 } // namespace circa
