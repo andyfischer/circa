@@ -42,6 +42,7 @@ struct Function
     // Code
     InitializeFunc initialize;
     EvaluateFunc evaluate;
+    PointerIterator* startControlFlowIterator;
 
     // External functions
     Term* feedbackAccumulationFunction;

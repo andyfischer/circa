@@ -21,6 +21,7 @@ Function::Function()
     variableArgs(false),
     initialize(NULL),
     evaluate(NULL),
+    startControlFlowIterator(NULL),
     feedbackAccumulationFunction(NULL),
     feedbackPropogateFunction(NULL),
     generateCppFunction(NULL),
@@ -92,6 +93,7 @@ void Function::duplicate(Term* sourceTerm, Term* destTerm)
     dest.name =            source.name;
     dest.initialize =      source.initialize;
     dest.evaluate =        source.evaluate;
+    dest.startControlFlowIterator =        source.startControlFlowIterator;
     dest.feedbackAccumulationFunction =    source.feedbackAccumulationFunction;
     dest.feedbackPropogateFunction =       source.feedbackPropogateFunction;
     dest.generateCppFunction =             source.generateCppFunction;

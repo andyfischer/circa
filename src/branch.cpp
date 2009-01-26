@@ -318,7 +318,7 @@ void reload_branch_from_file(Branch& branch)
     migrate_branch(branch, replacement);
 }
 
-class BranchPointerIterator : public PointerIterator
+class BranchExternalPointerIterator : public PointerIterator
 {
 private:
     Branch* _branch;
@@ -326,7 +326,7 @@ private:
     TermExternalPointersIterator* _nestedIterator;
 
 public:
-    BranchPointerIterator(Branch* branch)
+    BranchExternalPointerIterator(Branch* branch)
       : _branch(branch),
         _index(0),
         _nestedIterator(NULL)
@@ -412,12 +412,45 @@ private:
 PointerIterator*
 Branch::start_pointer_iterator(Term* term)
 {
-    return new BranchPointerIterator((Branch*) term->value);
+    return new BranchExternalPointerIterator((Branch*) term->value);
 }
 
 PointerIterator* start_branch_pointer_iterator(Branch* branch)
 {
-    return new BranchPointerIterator(branch);
+    return new BranchExternalPointerIterator(branch);
 }
+
+class BranchIterator : PointerIterator
+{
+    Branch* _branch;
+    int _index;
+
+public:
+    BranchIterator(Branch* branch)
+      : _branch(branch), _index(0)
+    {
+        if (_index >= _branch->numTerms())
+            _branch = NULL;
+    }
+
+    Term* current()
+    {
+        assert(!finished());
+        return _branch->get(_index);
+    }
+
+    void advance()
+    {
+        assert(!finished());
+        _index++;
+        if (_index >= _branch->numTerms())
+            _branch = NULL;
+    }
+
+    bool finished()
+    {
+        return _branch == NULL;
+    }
+};
 
 } // namespace circa
