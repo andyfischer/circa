@@ -12,8 +12,8 @@ struct List
 {
 private:
     ReferenceList items;
-public:
 
+public:
     // Default constructor
     List() {}
 
@@ -31,8 +31,6 @@ public:
 
     void remove(int index);
     void clear();
-
-    ReferenceList toReferenceList() const;
 };
 
 std::string List__toString(Term* caller);
