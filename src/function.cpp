@@ -19,7 +19,6 @@ Function::Function()
     pureFunction(false),
     hasSideEffects(false),
     variableArgs(false),
-    initialize(NULL),
     evaluate(NULL),
     startControlFlowIterator(NULL),
     feedbackAccumulationFunction(NULL),
@@ -91,7 +90,6 @@ void Function::duplicate(Term* sourceTerm, Term* destTerm)
     dest.hasSideEffects =  source.hasSideEffects;
     dest.variableArgs =    source.variableArgs;
     dest.name =            source.name;
-    dest.initialize =      source.initialize;
     dest.evaluate =        source.evaluate;
     dest.startControlFlowIterator =        source.startControlFlowIterator;
     dest.feedbackAccumulationFunction =    source.feedbackAccumulationFunction;

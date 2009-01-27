@@ -180,11 +180,6 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
     for (unsigned int i=0; i < inputs.count(); i++)
         set_input(term, i, inputs[i]);
 
-    // Run the function's initialize (if it has one)
-    if (functionData.initialize != NULL) {
-        functionData.initialize(term);
-    }
-
     return term;
 }
 
