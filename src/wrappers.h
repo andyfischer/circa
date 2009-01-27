@@ -13,6 +13,8 @@ namespace circa {
 std::string getInfixFunctionName(std::string infix);
 std::string read_text_file(std::string const& filename);
 
+std::string eval_as_string(Term* function, Term* input0);
+
 } // namespace circa
 
 #endif

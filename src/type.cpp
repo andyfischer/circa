@@ -25,7 +25,7 @@ void Type::makeCompoundType(std::string const& name)
 }
 
 void
-Type::addMemberFunction(std::string const &name, Term *function)
+Type::addMemberFunction(Term* function, std::string const &name)
 {
     this->memberFunctions.bind(function, name);
 }
@@ -183,6 +183,11 @@ void Type::typeVisitPointers(Term *term, PointerVisitor &visitor)
     for (unsigned int field_i=0; field_i < type.fields.size(); field_i++) {
         visitor.visitPointer(type.fields[field_i].type);
     }
+}
+
+void Type::name_accessor(Term* caller)
+{
+    as_string(caller) = as_type(caller->input(0)).name;
 }
 
 class TypePointerIterator : public PointerIterator

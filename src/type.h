@@ -60,6 +60,12 @@ struct Type
     UpdateOwner updateOwner;
     ToStringFunc toString;
     ToSourceStringFunc toSourceString;
+
+    // Experimental. Subroutine versions of the above functions
+    Term* toStringSub;
+    Term* toSourceStringSub;
+
+    Term* valueFunction;
     
     // Fields, applies to compound types
     FieldList fields;
@@ -82,7 +88,10 @@ struct Type
         visitPointers(NULL),
         updateOwner(NULL),
         toString(NULL),
-        toSourceString(NULL)
+        toSourceString(NULL),
+        toStringSub(NULL),
+        toSourceStringSub(NULL),
+        valueFunction(NULL)
     {
     }
 
@@ -102,10 +111,11 @@ struct Type
 
     void makeCompoundType(std::string const& name);
 
-    void addMemberFunction(std::string const& name, Term* function);
+    void addMemberFunction(Term* function, std::string const& name);
 
     // Hosted functions:
     static std::string to_string(Term *caller);
+    static void name_accessor(Term* caller);
 
     static void typeRemapPointers(Term *term, ReferenceMap const& map);
     static void typeVisitPointers(Term *term, PointerVisitor& visitor);

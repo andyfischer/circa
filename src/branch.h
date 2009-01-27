@@ -93,6 +93,8 @@ PointerIterator* start_branch_iterator(Branch* branch);
 PointerIterator* start_branch_pointer_iterator(Branch* branch);
 PointerIterator* start_branch_control_flow_iterator(Branch* branch);
 
+Term* find_named(Branch* branch, std::string const& name);
+
 } // namespace circa
 
 #endif

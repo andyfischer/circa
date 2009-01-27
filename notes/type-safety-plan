@@ -1,0 +1,21 @@
+
+-- Type-safe pointers --
+
+Generic types can have references to 'any'.
+
+Have a named-parameter function which takes 'any' and gives it a name.
+
+Generic types can have references to the results of named-parameter.
+
+Have a specialize-type function which replaces 'any' pointers with other types.
+
+Every type has a list of parameters.
+
+-- value function reuse --
+
+Every type owns its 'value' function.
+
+-- Type using subroutines --
+
+In order to have types that expand upon other types, we need type's functions
+to be stored as subroutines. How much work would this require?

@@ -279,16 +279,18 @@ void initialize_builtin_types(Branch& kernel)
     import_type<Branch>(kernel, "Branch");
     import_type<Map>(kernel, "Map");
 
+    import_member_function(TYPE_TYPE, Type::name_accessor, "name(Type) -> string");
+
     Term* set_type = import_type<Set>(kernel, "Set");
     as_type(set_type).toString = Set::to_string;
 
     Term* set_add = import_function(kernel, Set::hosted_add,
         "function Set::add(Set, any) -> Set");
-    as_type(set_type).addMemberFunction("add", set_add);
+    as_type(set_type).addMemberFunction(set_add, "add");
 
     Term* set_remove = import_function(kernel, Set::hosted_remove,
         "function Set::remove(Set, any) -> Set");
-    as_type(set_type).addMemberFunction("remove", set_remove);
+    as_type(set_type).addMemberFunction(set_remove, "remove");
 }
 
 } // namespace circa

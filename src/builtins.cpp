@@ -62,13 +62,13 @@ Term* INT_TO_FLOAT_FUNC = NULL;
 void empty_evaluate_function(Term*) { }
 void empty_alloc_function(Term*) { }
 
-void var_function_generator(Term* caller)
+void value_function_generator(Term* caller)
 {
     assert(caller->input(0) != NULL);
 
     Function& output = as_function(caller);
     Type& type = as_type(caller->input(0));
-    output.name = "var-" + type.name;
+    output.name = "value-" + type.name;
     output.outputType = caller->input(0);
     output.pureFunction = false;
     output.evaluate = empty_evaluate_function;
@@ -109,10 +109,10 @@ void bootstrap_kernel()
     VALUE_FUNCTION_GENERATOR = new Term();
     VALUE_FUNCTION_GENERATOR->owningBranch = KERNEL;
     VALUE_FUNCTION_GENERATOR->value = new Function();
-    as_function(VALUE_FUNCTION_GENERATOR).name = "var-function-generator";
+    as_function(VALUE_FUNCTION_GENERATOR).name = "value-function-generator";
     as_function(VALUE_FUNCTION_GENERATOR).pureFunction = true;
-    as_function(VALUE_FUNCTION_GENERATOR).evaluate = var_function_generator;
-    KERNEL->bindName(VALUE_FUNCTION_GENERATOR, "var-function-generator");
+    as_function(VALUE_FUNCTION_GENERATOR).evaluate = value_function_generator;
+    KERNEL->bindName(VALUE_FUNCTION_GENERATOR, "value-function-generator");
 
     // Create const-Type function
     Term* constTypeFunc = new Term();

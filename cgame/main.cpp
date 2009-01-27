@@ -180,7 +180,12 @@ int main( int argc, char* args[] )
             }
         }
 
-        redraw.eval();
+        try {
+            redraw.eval();
+        } catch (std::exception &e) {
+            std::cout << e.what() << std::endl;
+            return 0;
+        }
 
         //Update the screen
         if( SDL_Flip(SCREEN) == -1 )

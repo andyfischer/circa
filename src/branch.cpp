@@ -342,4 +342,12 @@ PointerIterator* start_branch_control_flow_iterator(Branch* branch)
     return new BranchControlFlowIterator(branch);
 }
 
+Term* find_named(Branch* branch, std::string const& name)
+{
+    if (branch == NULL)
+        return get_global(name);
+    else
+        return branch->findNamed(name);
+}
+
 } // namespace circa
