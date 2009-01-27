@@ -17,6 +17,7 @@ struct Function
 {
     typedef void (*InitializeFunc)(Term* caller);
     typedef void (*EvaluateFunc)(Term* caller);
+    typedef PointerIterator* (*PointerIteratorFunc)(Term* caller);
 
     struct InputProperties {
         bool modified;
@@ -42,7 +43,7 @@ struct Function
     // Code
     InitializeFunc initialize;
     EvaluateFunc evaluate;
-    PointerIterator* startControlFlowIterator;
+    PointerIteratorFunc startControlFlowIterator;
 
     // External functions
     Term* feedbackAccumulationFunction;
@@ -61,7 +62,8 @@ struct Function
     static void duplicate(Term* source, Term* dest);
     static void remapPointers(Term* term, ReferenceMap const& map);
     static void visitPointers(Term* term, PointerVisitor& visitor);
-    static void subroutine_evaluate(Term* caller);
+    static void subroutine_call_evaluate(Term* caller);
+    static PointerIterator* subroutine_call_start_control_flow_iterator(Term* caller);
 };
 
 bool is_function(Term* term);
@@ -74,6 +76,10 @@ void set_subroutine_input_name(Function& func, int index, std::string const& nam
 Branch& call_subroutine(Branch& branch, std::string const& functionName);
 Branch& get_subroutine_branch(Term* term);
 PointerIterator* start_function_pointer_iterator(Function* function);
+
+// Call the start_control_flow_iterator function for this term's function,
+// and return the new iterator. Returns NULL if there is no such function.
+PointerIterator* start_control_flow_iterator(Term* term);
 
 } // namespace circa
 

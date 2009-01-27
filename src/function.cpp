@@ -136,7 +136,7 @@ void initialize_subroutine_call(Term* term)
 }
 
 void
-Function::subroutine_evaluate(Term* caller)
+Function::subroutine_call_evaluate(Term* caller)
 {
     Branch &branch = as_branch(caller->state);
 
@@ -170,6 +170,13 @@ Function::subroutine_evaluate(Term* caller)
     }
 }
 
+PointerIterator*
+Function::subroutine_call_start_control_flow_iterator(Term* caller)
+{
+    Branch &branch = as_branch(caller->state);
+    return start_branch_control_flow_iterator(&branch);
+}
+
 void set_subroutine_input_name(Function& func, int index, std::string const& name)
 {
     Term* inputPlaceholder =
@@ -180,14 +187,6 @@ void set_subroutine_input_name(Function& func, int index, std::string const& nam
     // remove the name on this term, so that this new name will stick
     inputPlaceholder->name = "";
     func.subroutineBranch.bindName(inputPlaceholder, name);
-}
-
-// deprecated:
-Branch& call_subroutine(Branch& branch, std::string const& functionName)
-{
-    Term* newTerm = apply_function(branch, functionName, ReferenceList());
-    initialize_subroutine_call(newTerm);
-    return as_branch(newTerm->state);
 }
 
 Branch& get_subroutine_branch(Term* term)
@@ -293,6 +292,16 @@ private:
 PointerIterator* start_function_pointer_iterator(Function* function)
 {
     return new FunctionPointerIterator(function);
+}
+
+PointerIterator* start_control_flow_iterator(Term* term)
+{
+    Function &func = as_function(term->function);
+
+    if (func.startControlFlowIterator == NULL)
+        return NULL;
+
+    return func.startControlFlowIterator(term);
 }
 
 } // namespace circa
