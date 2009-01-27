@@ -4,7 +4,7 @@
 
 namespace circa {
 
-class BranchIterator : PointerIterator
+class BranchIterator : public PointerIterator
 {
     Branch* _branch;
     int _index;
@@ -128,7 +128,7 @@ private:
     }
 };
 
-class BranchControlFlowIterator : PointerIterator
+class BranchControlFlowIterator : public PointerIterator
 {
     BranchIterator _branchIterator;
     PointerIterator* _nestedIterator;
@@ -138,7 +138,7 @@ public:
       : _branchIterator(branch), _nestedIterator(NULL)
     {
         if (!_branchIterator.finished()) {
-            _nestedIterator = start_control_flow_iterator(_branchIterator->current());
+            _nestedIterator = start_control_flow_iterator(_branchIterator.current());
             advanceIfStateIsInvalid();
         }
     }
@@ -156,7 +156,7 @@ public:
         if (_nestedIterator != NULL)
             _nestedIterator->advance();
         else
-            _branchIterator->advance();
+            _branchIterator.advance();
 
         advanceIfStateIsInvalid();
     }
@@ -176,7 +176,7 @@ private:
             _branchIterator.advance();
             if (_branchIterator.finished())
                 return;
-            _nestedIterator = start_control_flow_iterator(branchNext);
+            _nestedIterator = start_control_flow_iterator(_branchIterator.current());
         }
     }
 };

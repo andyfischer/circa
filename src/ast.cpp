@@ -310,7 +310,7 @@ FunctionDecl::createTerm(CompilationContext &context)
     result.name = header->functionName;
     result.inputTypes = inputTypes;
     result.outputType = outputType;
-    result.evaluate = Function::subroutine_evaluate;
+    result.evaluate = Function::subroutine_call_evaluate;
     result.stateType = BRANCH_TYPE;
 
     // Syntax hints

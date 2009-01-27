@@ -327,6 +327,11 @@ Branch::start_pointer_iterator(Term* term)
     return new BranchExternalPointerIterator((Branch*) term->value);
 }
 
+PointerIterator* start_branch_iterator(Branch* branch)
+{
+    return new BranchIterator(branch);
+}
+
 PointerIterator* start_branch_pointer_iterator(Branch* branch)
 {
     return new BranchExternalPointerIterator(branch);
