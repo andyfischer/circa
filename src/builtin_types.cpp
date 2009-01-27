@@ -18,7 +18,6 @@ int& as_int(Term* term)
 {
     assert_type(term, INT_TYPE);
     assert(term->value != NULL);
-
     return *((int*) term->value);
 }
 
@@ -26,7 +25,6 @@ float& as_float(Term* term)
 {
     assert_type(term, FLOAT_TYPE);
     assert(term->value != NULL);
-
     return *((float*) term->value);
 }
 
@@ -34,7 +32,6 @@ bool& as_bool(Term* term)
 {
     assert_type(term, BOOL_TYPE);
     assert(term->value != NULL);
-
     return *((bool*) term->value);
 }
 
@@ -42,16 +39,19 @@ std::string& as_string(Term* term)
 {
     assert_type(term, STRING_TYPE);
     assert(term->value != NULL);
-
-    if (term->value == NULL)
-        throw std::runtime_error("NULL pointer in as_string");
-
     return *((std::string*) term->value);
 }
 
 Term*& as_ref(Term* term)
 {
+    assert_type(term, REFERENCE_TYPE);
     return (Term*&) term->value;
+}
+
+void*& as_void_ptr(Term* term)
+{
+    assert_type(term, VOID_PTR_TYPE);
+    return term->value;
 }
 
 namespace ref_type {
@@ -263,6 +263,8 @@ void initialize_builtin_types(Branch& kernel)
     as_type(BOOL_TYPE).equals = cpp_interface::templated_equals<bool>;
     as_type(BOOL_TYPE).toString = primitives::bool_t::to_string;
     as_type(BOOL_TYPE).toSourceString = primitives::bool_t::to_string;
+
+    VOID_PTR_TYPE = import_type<void*>(kernel, "void_ptr");
 
     ANY_TYPE = create_empty_type(kernel, "any");
     VOID_TYPE = create_empty_type(kernel, "void");
