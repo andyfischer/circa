@@ -15,7 +15,6 @@ namespace circa {
 
 struct Function
 {
-    typedef void (*InitializeFunc)(Term* caller);
     typedef void (*EvaluateFunc)(Term* caller);
     typedef PointerIterator* (*PointerIteratorFunc)(Term* caller);
 
@@ -41,7 +40,6 @@ struct Function
     Branch subroutineBranch;
 
     // Code
-    InitializeFunc initialize;
     EvaluateFunc evaluate;
     PointerIteratorFunc startControlFlowIterator;
 
