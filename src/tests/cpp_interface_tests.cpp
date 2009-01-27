@@ -42,7 +42,7 @@ void default_function() {
     Term* appendStr = import_function(branch, append_string__evaluate,
             "append-str(Type1, string) -> Type1");
 
-    as_type(type1).addMemberFunction("", appendStr);
+    as_type(type1).addMemberFunction(appendStr, "");
 
     Term* hi = branch.eval("hi = Type1()");
 

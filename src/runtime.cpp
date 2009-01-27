@@ -3,10 +3,11 @@
 #include "branch.h"
 #include "compilation.h"
 #include "debug.h"
+#include "function.h"
 #include "introspection.h"
 #include "runtime.h"
-#include "function.h"
 #include "parser.h"
+#include "syntax.h"
 #include "type.h"
 #include "values.h"
 
@@ -128,7 +129,8 @@ void evaluate_branch(Branch& branch, Term* errorListener)
         evaluate_term(term);
 
         if (term->hasError()) {
-            error_occured(errorListener, term->getErrorMessage());
+            std::string msg = term->getErrorMessage() + " on line: " + get_term_source(term);
+            error_occured(errorListener, msg);
             return;
         }
     }
@@ -400,11 +402,6 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
     ReferenceMap map;
     map[original] = replacement;
     remap_pointers(term, map);
-}
-
-void can_safely_point_to(Term* pointer, Term* pointee)
-{
-
 }
 
 } // namespace circa
