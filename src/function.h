@@ -19,6 +19,7 @@ struct Function
     typedef PointerIterator* (*PointerIteratorFunc)(Term* caller);
 
     struct InputProperties {
+        std::string name;
         bool modified;
         bool meta;
 
