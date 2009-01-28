@@ -247,11 +247,10 @@ std::string to_string(Term* term)
 {
     Type::ToStringFunc func = as_type(term->type).toString;
 
-    if (func == NULL) {
+    if (func == NULL)
         throw std::runtime_error("No toString function defined");
-    } else {
+    else
         return func(term);
-    }
 }
 
 std::string to_source_string(Term* term)

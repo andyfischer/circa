@@ -164,7 +164,7 @@ bool is_whitespace(char c)
 
 void top_level_consume_token(TokenizeContext &context)
 {
-    if (is_letter(context.next())) {
+    if (is_letter(context.next()) || context.next() == '_') {
 
         if (context.next() == 'e'
                 && context.next(1) == 'n'

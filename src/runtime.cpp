@@ -329,7 +329,7 @@ Term* apply_function(Branch& branch,
                      std::string const& functionName, 
                      ReferenceList const& inputs)
 {
-    Term* function = branch.findNamed(functionName);
+    Term* function = find_named(&branch,functionName);
     if (function == NULL)
         throw std::runtime_error(std::string("function not found: ")+functionName);
 
@@ -346,7 +346,7 @@ Term* eval_function(Branch& branch, Term* function, ReferenceList const& inputs)
 Term* eval_function(Branch& branch, std::string const& functionName,
         ReferenceList const &inputs)
 {
-    Term* function = branch.findNamed(functionName);
+    Term* function = find_named(&branch,functionName);
     if (function == NULL)
         throw std::runtime_error(std::string("function not found: ")+functionName);
 

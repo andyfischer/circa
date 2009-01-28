@@ -277,7 +277,7 @@ FunctionDecl::createTerm(CompilationContext &context)
          inputIndex++)
     {
         FunctionHeader::Argument &arg = this->header->arguments[inputIndex];
-        Term* term = context.topBranch().findNamed(arg.type);
+        Term* term = find_named(&context.topBranch(), arg.type);
         if (term == NULL)
             parser::syntax_error(std::string("Identifier not found (input type): ") + arg.type);
 
@@ -465,8 +465,10 @@ IfStatement::createTerm(CompilationContext &context)
     for (int i=0; i < names.count(); i++) {
         std::string &name = as_string(names[i]);
 
-        Term* posTerm = posBranch.containsName(name) ? posBranch[name] : outerBranch.findNamed(name);
-        Term* negTerm = negBranch.containsName(name) ? negBranch[name] : outerBranch.findNamed(name);
+        Term* posTerm = posBranch.containsName(name) ?
+            posBranch[name] : find_named(&outerBranch, name);
+        Term* negTerm = negBranch.containsName(name) ?
+            negBranch[name] : find_named(&outerBranch, name);
 
         Term* joining_term = apply_function(joiningTermsBranch,
                 "if-expr",

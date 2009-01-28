@@ -61,7 +61,7 @@ void find_name_in_outer_branch()
 
     as_branch(inner_branch).outerScope = &as_branch(outer_branch);
 
-    test_assert(as_branch(inner_branch).findNamed("a") == a);
+    test_assert(find_named(&as_branch(inner_branch), "a") == a);
 }
 
 void cleanup_users_after_delete()
@@ -90,7 +90,7 @@ void test_startBranch()
 
     Branch& sub = branch.startBranch("sub");
 
-    test_assert(sub.findNamed("a") == a);
+    test_assert(find_named(&sub, "a") == a);
 }
 
 void test_migrate()

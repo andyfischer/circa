@@ -25,10 +25,10 @@ void strings()
 
 void builtin_objects()
 {
-    test_assert(KERNEL->findNamed("int") == INT_TYPE);
-    test_assert(KERNEL->findNamed("float") == FLOAT_TYPE);
-    test_assert(KERNEL->findNamed("string") == STRING_TYPE);
-    test_assert(KERNEL->findNamed("bool") == BOOL_TYPE);
+    test_assert(find_named(KERNEL,"int") == INT_TYPE);
+    test_assert(find_named(KERNEL,"float") == FLOAT_TYPE);
+    test_assert(find_named(KERNEL,"string") == STRING_TYPE);
+    test_assert(find_named(KERNEL,"bool") == BOOL_TYPE);
 }
 
 void register_tests()

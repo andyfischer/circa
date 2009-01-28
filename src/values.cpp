@@ -145,11 +145,7 @@ Term* create_value(Branch* branch, std::string const& typeName, std::string cons
 {
     Term *type = NULL;
 
-    if (branch == NULL) {
-        type = get_global(typeName);
-    } else {
-        type = branch->findNamed(typeName);
-    }
+    type = find_named(branch, typeName);
 
     if (type == NULL)
         throw std::runtime_error(std::string("Couldn't find type: ")+typeName);
@@ -175,7 +171,7 @@ Term* import_value(Branch& branch, Term* type, void* initialValue, std::string c
 
 Term* import_value(Branch& branch, std::string const& typeName, void* initialValue, std::string const& name)
 {
-    Term* type = branch.findNamed(typeName);
+    Term* type = find_named(&branch, typeName);
 
     if (type == NULL)
         throw std::runtime_error("Couldn't find type: "+typeName);
