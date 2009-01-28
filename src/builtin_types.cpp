@@ -284,8 +284,8 @@ void initialize_builtin_types(Branch& kernel)
     Term* set_type = import_type<Set>(kernel, "Set");
     as_type(set_type).toString = Set::to_string;
 
-    import_member_function(set_type, Set::hosted_add, "function Set::add(Set, any) -> Set");
-    import_member_function(set_type, Set::hosted_remove, "function Set::remove(Set, any) -> Set");
+    import_member_function(set_type, Set::hosted_add, "function add(Set, any) -> Set");
+    import_member_function(set_type, Set::hosted_remove, "function remove(Set, any) -> Set");
 }
 
 } // namespace circa
