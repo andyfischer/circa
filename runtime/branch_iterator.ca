@@ -1,0 +1,5 @@
+
+type BranchIterator {
+  Ref _branch
+  int _index
+}

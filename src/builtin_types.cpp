@@ -268,7 +268,7 @@ void initialize_builtin_types(Branch& kernel)
 
     ANY_TYPE = create_empty_type(kernel, "any");
     VOID_TYPE = create_empty_type(kernel, "void");
-    REFERENCE_TYPE = quick_create_type(kernel, "Reference");
+    REFERENCE_TYPE = quick_create_type(kernel, "Ref");
     as_type(REFERENCE_TYPE).alloc = ref_type::alloc;
     as_type(REFERENCE_TYPE).dealloc = ref_type::dealloc;
     as_type(REFERENCE_TYPE).visitPointers = ref_type::visitPointers;
