@@ -21,6 +21,7 @@
 namespace circa {
 
 struct Branch;
+struct Function;
 struct Term;
 struct Type;
 struct ReferenceList;

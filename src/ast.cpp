@@ -270,7 +270,11 @@ FunctionDecl::~FunctionDecl()
 Term*
 FunctionDecl::createTerm(CompilationContext &context)
 {
-    ReferenceList inputTypes;
+    Term* resultTerm = create_value(&context.topBranch(), FUNCTION_TYPE, this->header->functionName);
+    Function& result = as_function(resultTerm);
+    result.name = header->functionName;
+    result.evaluate = Function::subroutine_call_evaluate;
+    result.stateType = BRANCH_TYPE;
 
     for (unsigned int inputIndex=0;
          inputIndex < this->header->arguments.size();
@@ -284,34 +288,22 @@ FunctionDecl::createTerm(CompilationContext &context)
         if (!is_type(term))
             parser::syntax_error(std::string("Identifier is not a type: ") + arg.type);
 
-        inputTypes.append(term);
-    }
+        result.inputTypes.append(term);
 
-    Term* outputType = NULL;
+        Function::InputProperties inputProps;
+        inputProps.name = arg.name;
+        result.inputProperties.push_back(inputProps);
+    }
 
     if (this->header->outputType == "") {
-        outputType = VOID_TYPE;
+        result.outputType = VOID_TYPE;
     } else {
-        outputType = context.findNamed(this->header->outputType);
-        if (outputType == NULL)
+        result.outputType = context.findNamed(this->header->outputType);
+        if (result.outputType == NULL)
             parser::syntax_error(std::string("Identifier not found (output type): ") + this->header->outputType);
-        if (!is_type(outputType))
+        if (!is_type(result.outputType))
             parser::syntax_error(std::string("Identifier is not a type: ") + this->header->outputType);
     }
-
-    // Load into workspace
-    //Term* inputTypesTerm = workspace.eval("inputTypes = tuple()");
-    //as<ReferenceList>(inputTypesTerm) = inputTypes;
-    //string_value(workspace, this->header->functionName, "functionName");
-    //workspace.bindName(outputType, "outputType");
-
-    Term* resultTerm = create_value(&context.topBranch(), FUNCTION_TYPE, this->header->functionName);
-    Function& result = as_function(resultTerm);
-    result.name = header->functionName;
-    result.inputTypes = inputTypes;
-    result.outputType = outputType;
-    result.evaluate = Function::subroutine_call_evaluate;
-    result.stateType = BRANCH_TYPE;
 
     // Syntax hints
     resultTerm->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
