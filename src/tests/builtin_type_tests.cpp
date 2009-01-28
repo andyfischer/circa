@@ -26,7 +26,7 @@ void test_dictionary()
 void test_reference()
 {
     Branch branch;
-    Term *r = branch.eval("r = Reference()");
+    Term *r = branch.eval("r = Ref()");
     Term *s = branch.eval("s = 1.0");
     Term *t = branch.eval("t = 1.0");
 
