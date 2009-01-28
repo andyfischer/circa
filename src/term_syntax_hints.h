@@ -1,7 +1,7 @@
 // Copyright 2008 Andrew Fischer
 
-#ifndef CIRCA_SYNTAX_HINTS_INCLUDED
-#define CIRCA_SYNTAX_HINTS_INCLUDED
+#ifndef CIRCA_TERM_SYNTAX_HINTS_INCLUDED
+#define CIRCA_TERM_SYNTAX_HINTS_INCLUDED
 
 #include "common_headers.h"
 

@@ -9,7 +9,13 @@ namespace generate_cpp_type_wrapper_function {
 
     void evaluate(Term* caller)
     {
-        // TODO
+        Type& type = as_type(caller->input(0));
+        std::stringstream out;
+
+        out << "// Generated file\n";
+
+        out << "class " << type.name << " {\n";
+
     }
 
     void setup(Branch& kernel)
