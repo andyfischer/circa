@@ -386,6 +386,7 @@ TypeDecl::createTerm(CompilationContext &context)
     MemberList::const_iterator it;
     for (it = members.begin(); it != members.end(); ++it) {
         type.addField(context.findNamed(it->type), it->name);
+        type.syntaxHints.addField(it->name);
     }
 
     context.topBranch().bindName(result_term, this->name);

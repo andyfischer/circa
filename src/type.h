@@ -14,6 +14,7 @@
 #include "ref_map.h"
 #include "term.h"
 #include "term_namespace.h"
+#include "type_syntax_hints.h"
 
 namespace circa {
 
@@ -65,6 +66,7 @@ struct Type
     Term* toStringSub;
     Term* toSourceStringSub;
 
+    // Unimplemented. Stores our value function
     Term* valueFunction;
     
     // Fields, applies to compound types
@@ -74,6 +76,9 @@ struct Type
     // They are guaranteed to take an instance of this type as their first
     // argument.
     TermNamespace memberFunctions;
+
+    // Syntax hints
+    TypeSyntaxHints syntaxHints;
 
     Type() :
         name(""),
