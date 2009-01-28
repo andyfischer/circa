@@ -64,6 +64,13 @@ void compound_types()
     test_assert(get_field(inst1,"myint")->asInt() == 5);
 }
 
+/*
+void compound_types2()
+{
+    Type type;
+
+}
+*/
 
 void type_iterator()
 {

@@ -21,7 +21,7 @@ CompilationContext::findNamed(std::string const& name) const
 {
     assert(!scopeStack.empty());
 
-    return topBranch().findNamed(name);
+    return find_named(&topBranch(),name);
 }
 
 CompilationContext::Scope const&

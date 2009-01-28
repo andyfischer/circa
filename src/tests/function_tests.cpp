@@ -81,7 +81,7 @@ void external_pointers()
             function->input(0),
             function->input(1), // a list of (float,float)
             BOOL_TYPE,
-            KERNEL->findNamed("subroutine-create"),
+            get_global("subroutine-create"),
             FUNCTION_TYPE,
             FLOAT_TYPE,
             BRANCH_TYPE,
@@ -99,7 +99,7 @@ void subroutine_binding_input_names()
 
     mysub = branch.eval("function-name-input(@mysub, 0, 'a')");
 
-    test_assert(as_function(mysub).subroutineBranch.findNamed("a") != NULL);
+    test_assert(find_named(&as_function(mysub).subroutineBranch,"a") != NULL);
 }
 
 void pointer_iterator()

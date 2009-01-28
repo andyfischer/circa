@@ -116,18 +116,6 @@ void Branch::bindName(Term* term, std::string name)
     term->name = name;
 }
 
-Term* Branch::findNamed(std::string const& name) const
-{
-    if (containsName(name))
-        return getNamed(name);
-
-    if (outerScope != NULL) {
-        return outerScope->findNamed(name);
-    }
-
-    return get_global(name);
-}
-
 void Branch::remapPointers(ReferenceMap const& map)
 {
     names.remapPointers(map);
@@ -344,10 +332,14 @@ PointerIterator* start_branch_control_flow_iterator(Branch* branch)
 
 Term* find_named(Branch* branch, std::string const& name)
 {
-    if (branch == NULL)
-        return get_global(name);
-    else
-        return branch->findNamed(name);
+    if (branch != NULL) {
+        if (branch->containsName(name))
+            return branch->getNamed(name);
+
+        return find_named(branch->outerScope, name);
+    }
+
+    return get_global(name);
 }
 
 } // namespace circa
