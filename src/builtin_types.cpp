@@ -265,6 +265,7 @@ void initialize_builtin_types(Branch& kernel)
     as_type(BOOL_TYPE).toSourceString = primitives::bool_t::to_string;
 
     VOID_PTR_TYPE = import_type<void*>(kernel, "void_ptr");
+    as_type(VOID_PTR_TYPE).cppTypeName = "void*";
 
     ANY_TYPE = create_empty_type(kernel, "any");
     VOID_TYPE = create_empty_type(kernel, "void");

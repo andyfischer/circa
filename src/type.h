@@ -47,6 +47,9 @@ struct Type
     // is accessed as a C++ type. Otherwise, this is optional.
     const std::type_info *cppTypeInfo;
 
+    // C++ type name
+    std::string cppTypeName;
+
     // Functions
     AllocFunc alloc;
     InitializeFunc init;

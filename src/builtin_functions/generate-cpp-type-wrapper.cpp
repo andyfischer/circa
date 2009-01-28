@@ -15,7 +15,26 @@ namespace generate_cpp_type_wrapper_function {
         out << "// Generated file\n";
 
         out << "class " << type.name << " {\n";
+        out << "public: \n";
 
+        for (unsigned int i=0; i < type.fields.size(); i++) {
+            // std::string typeName = type.syntaxHints.getFieldTypeName(i);
+
+            Term* typeTerm = type.fields[i].type;
+            Type& fieldType = as_type(typeTerm);
+            std::string typeName;
+            if (fieldType.cppTypeName != "")
+                typeName = fieldType.cppTypeName;
+            else
+                typeName = fieldType.name;
+            std::string fieldName = type.fields[i].name;
+
+            out << "   " << typeName << " " << fieldName << ";\n";
+        }
+
+        out << "};";
+
+        as_string(caller) = out.str();
     }
 
     void setup(Branch& kernel)
