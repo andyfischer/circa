@@ -14,8 +14,6 @@ namespace circa {
 
 struct List;
 
-typedef std::vector<std::string> ErrorList;
-
 struct Term
 {
     // Our current value. In some situations, when someone refers to this term, they
@@ -50,9 +48,6 @@ struct Term
     // True if this term's value is out-of-date
     bool needsUpdate;
 
-    // Errors that have occurred
-    ErrorList errors;
-
     // A globally unique ID
     unsigned int globalID;
 
@@ -74,12 +69,13 @@ struct Term
     std::string toString();
 
     // Returns the named property
-    Term* property(std::string const& name);
+    Term* property(std::string const& name) const;
 
-    bool hasProperty(std::string const& name);
-
-    // Add a property with the given type
+    bool hasProperty(std::string const& name) const;
     Term* addProperty(std::string const& name, Term* type);
+    void removeProperty(std::string const& name);
+
+    // Property accessors
 
     bool hasError() const;
     void clearError();
