@@ -62,14 +62,14 @@ std::string get_term_source(Term* term)
 
     // handle special cases
     if (term->function == COMMENT_FUNC) {
-        std::string comment = as_string(term->state->field(0));
-
+        std::string comment = get_comment_string(term);
         if (comment == "")
             return "";
         else {
             result << "--" << comment;
             return result.str();
         }
+        
     } else if (is_value(term) && term->type == FUNCTION_TYPE) {
         Function &definedFunc = as_function(term);
 
@@ -97,7 +97,6 @@ std::string get_term_source(Term* term)
 
             for (int i=0; i < term->numInputs(); i++) {
                 if (i > 0) result << ", ";
-
                 result << get_source_of_input(term, i);
             }
 
@@ -137,6 +136,11 @@ std::string get_term_source(Term* term)
     result << term->syntaxHints.followingWhitespace;
 
     return result.str();
+}
+
+std::string get_comment_string(Term* term)
+{
+    return as_string(term->state->field(0));
 }
 
 std::string get_branch_source(Branch& branch)

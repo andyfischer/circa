@@ -5,7 +5,9 @@
 
 namespace circa {
 
+std::string get_source_of_input(Term* term, int inputIndex);
 std::string get_term_source(Term* term);
+std::string get_comment_string(Term* term);
 bool should_print_term_source_line(Term* term);
 std::string get_branch_source(Branch& branch);
 
