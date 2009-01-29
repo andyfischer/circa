@@ -63,11 +63,8 @@ struct Type
     StartPointerIteratorFunc startPointerIterator;
     UpdateOwner updateOwner;
     ToStringFunc toString;
-    ToSourceStringFunc toSourceString;
-
-    // Experimental. Subroutine versions of the above functions
-    Term* toStringSub;
-    Term* toSourceStringSub;
+    ToStringFunc toSourceString;
+    ToStringFunc getCppTypeName;
 
     // Unimplemented. Stores our value function
     Term* valueFunction;
@@ -79,6 +76,9 @@ struct Type
     // They are guaranteed to take an instance of this type as their first
     // argument.
     TermNamespace memberFunctions;
+
+    // Type parameters
+    ReferenceList parameters;
 
     // Syntax hints
     TypeSyntaxHints syntaxHints;
@@ -97,8 +97,7 @@ struct Type
         updateOwner(NULL),
         toString(NULL),
         toSourceString(NULL),
-        toStringSub(NULL),
-        toSourceStringSub(NULL),
+        getCppTypeName(NULL),
         valueFunction(NULL)
     {
     }

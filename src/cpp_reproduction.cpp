@@ -4,10 +4,12 @@
 
 namespace circa {
 
-std::string type_id_to_cpp(Type& type)
+std::string type_id_to_cpp(Term* typeTerm)
 {
-    if (type.cppTypeName != "")
-        return type.cppTypeName;
+    Type &type = as_type(typeTerm);
+
+    if (type.getCppTypeName != NULL)
+        return type.getCppTypeName(typeTerm);
     else
         return type.name;
 }
@@ -28,12 +30,12 @@ std::string statement_to_cpp(Term* term)
     }
 
     if (is_value(term)) {
-        out << type_id_to_cpp(as_type(term->type)) << " " << term->name << ";";
+        out << type_id_to_cpp(term->type) << " " << term->name << ";";
         return out.str();
     }
 
     if (term->name != "") {
-        out << type_id_to_cpp(as_type(term->type)) << " " << term->name << " = ";
+        out << type_id_to_cpp(term->type) << " " << term->name << " = ";
     }
 
     out << term->syntaxHints.functionName << "(";
@@ -52,13 +54,13 @@ std::string function_decl_to_cpp(Function& func)
 {
     std::stringstream out;
 
-    out << type_id_to_cpp(as_type(func.outputType)) << " " << func.name << "(";
+    out << type_id_to_cpp(func.outputType) << " " << func.name << "(";
 
     for (unsigned int i=0; i < func.inputTypes.count(); i++) {
         Term* type = func.inputTypes[i];
         std::string name = func.inputProperties[i].name;
         if (i > 0) out << ", ";
-        out << type_id_to_cpp(as_type(type)) << " " << name;
+        out << type_id_to_cpp(type) << " " << name;
     }
 
     out << ")\n";
