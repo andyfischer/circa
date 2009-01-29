@@ -31,8 +31,6 @@ Term::Term()
     needsUpdate(true)
 {
     globalID = gNextGlobalID++;
-    
-    
 
 #if DEBUG_CHECK_FOR_BAD_POINTERS
     DEBUG_GOOD_POINTER_SET.insert(this);
@@ -67,48 +65,50 @@ Term::toString()
     }
 }
 
-Term*
-Term::property(std::string const& name)
+Term* Term::property(std::string const& name) const
 {
     return properties[name];
 }
 
-bool Term::hasProperty(std::string const& name)
+bool Term::hasProperty(std::string const& name) const
 {
     return properties.contains(name);
 }
 
-Term*
-Term::addProperty(std::string const& name, Term* type)
+Term* Term::addProperty(std::string const& name, Term* type)
 {
     return properties.addSlot(name, type);
 }
 
-bool
-Term::hasError() const
+void Term::removeProperty(std::string const& name)
 {
-    return this->errors.size() != 0;
+    properties.remove(name);
 }
 
-void
-Term::clearError()
+bool Term::hasError() const
 {
-    this->errors.clear();
+    return hasProperty("error");
 }
 
-void
-Term::pushError(std::string const& message)
+void Term::clearError()
 {
-    this->errors.push_back(message);
+    if (hasProperty("error"))
+        removeProperty("error");
 }
 
-std::string
-Term::getErrorMessage() const
+void Term::pushError(std::string const& message)
 {
-    if (!hasError())
-        return "";
+    if (!hasProperty("error"))
+        addProperty("error", STRING_TYPE);
+    as_string(property("error")) = message;
+}
+
+std::string Term::getErrorMessage() const
+{
+    if (hasProperty("error"))
+        return as_string(property("error"));
     else
-        return this->errors[0];
+        return "";
 }
 
 int& Term::asInt()

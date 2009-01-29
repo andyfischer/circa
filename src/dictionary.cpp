@@ -28,6 +28,14 @@ Term* Dictionary::addSlot(std::string const& name, Term* type)
     return newTerm;
 }
 
+void Dictionary::remove(std::string const& name)
+{
+    Term* term = get(name);
+    assert(term != NULL);
+    delete term;
+    _dict.erase(_dict.find(name));
+}
+
 void Dictionary::clear()
 {
     RefDictionary::iterator it;
