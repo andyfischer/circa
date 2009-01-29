@@ -43,7 +43,6 @@ void compound_types()
     // test get-field function
     Term* inst1_myint = branch.eval("get-field(inst1, 'myint')");
     test_assert(inst1_myint != NULL);
-    std::cout << inst1_myint->getErrorMessage() << std::endl;
     test_assert(!inst1_myint->hasError());
 
     Term* inst1_astr = branch.eval("get-field(inst1, 'astr')");

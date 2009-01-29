@@ -21,7 +21,7 @@ namespace generate_cpp_type_wrapper_function {
             // std::string typeName = type.syntaxHints.getFieldTypeName(i);
 
             Term* typeTerm = type.fields[i].type;
-            std::string typeName = type_id_to_cpp(as_type(typeTerm));
+            std::string typeName = type_id_to_cpp(typeTerm);
             std::string fieldName = type.fields[i].name;
 
             out << "   " << typeName << " " << fieldName << ";\n";
