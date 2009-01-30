@@ -82,7 +82,7 @@ public:
 
 Branch& as_branch(Term* term);
 void duplicate_branch(Branch& source, Branch& dest);
-void migrate_branch(Branch& original, Branch& replacement);
+void migrate_branch(Branch& replacement, Branch& target);
 void evaluate_file(Branch& branch, std::string const& filename);
 void reload_branch_from_file(Branch& branch);
 PointerIterator* start_branch_iterator(Branch* branch);
