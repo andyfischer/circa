@@ -55,6 +55,10 @@ struct Branch
     // Visit pointers
     void visitPointers(PointerVisitor& visitor);
 
+    // Replace the term object 'existing' with 'replacement'. Caller takes
+    // responsiblity for all memory ownership issues.
+    void _replaceTermObject(Term* existing, Term* replacement);
+
     void clear();
 
     // Evaluate this branch.
