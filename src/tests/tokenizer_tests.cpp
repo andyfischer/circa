@@ -120,15 +120,33 @@ void test_symbols()
 void test_keywords()
 {
     token::TokenList results;
-    token::tokenize("end,if,else", results);
+    token::tokenize("end,if,else,state", results);
 
-    test_assert(results.size() == 5);
+    test_assert(results.size() == 7);
     test_assert(results[0].text == "end");
     test_assert(results[0].match == token::END);
     test_assert(results[2].text == "if");
     test_assert(results[2].match == token::IF);
     test_assert(results[4].text == "else");
     test_assert(results[4].match == token::ELSE);
+    test_assert(results[6].text == "state");
+    test_assert(results[6].match == token::STATE);
+}
+
+void test_identifiers_that_look_like_keywords()
+{
+    token::TokenList results;
+    token::tokenize("endup,iffy,else_,stateful", results);
+
+    test_assert(results.size() == 7);
+    test_assert(results[0].text == "endup");
+    test_assert(results[0].match == token::IDENTIFIER);
+    test_assert(results[2].text == "iffy");
+    test_assert(results[2].match == token::IDENTIFIER);
+    test_assert(results[4].text == "else_");
+    test_assert(results[4].match == token::IDENTIFIER);
+    test_assert(results[6].text == "stateful");
+    test_assert(results[6].match == token::IDENTIFIER);
 }
 
 void test_string_literal()
@@ -176,6 +194,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_floats);
     REGISTER_TEST_CASE(tokenizer_tests::test_symbols);
     REGISTER_TEST_CASE(tokenizer_tests::test_keywords);
+    REGISTER_TEST_CASE(tokenizer_tests::test_identifiers_that_look_like_keywords);
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
     REGISTER_TEST_CASE(tokenizer_tests::token_stream_to_string);
