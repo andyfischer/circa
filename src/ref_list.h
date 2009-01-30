@@ -131,6 +131,7 @@ public:
     }
 
     void clear() { _items.clear(); }
+
     Term* get(unsigned int index) const
     {
         if (index >= _items.size())

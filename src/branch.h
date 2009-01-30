@@ -7,16 +7,15 @@
 
 #include "pointer_iterator.h"
 #include "pointer_visitor.h"
+#include "ref_list.h"
 #include "term_namespace.h"
 
 namespace circa {
 
-class Branch
+struct Branch
 {
-private:
-    std::vector<Term*> _terms;
+    ReferenceList _terms;
 
-public:
     // Points to a Branch which is our outer scope.
     Branch* outerScope;
 
@@ -25,7 +24,7 @@ public:
     Branch() : outerScope(NULL) {}
     ~Branch();
 
-    int numTerms() const { return _terms.size(); }
+    int numTerms() const { return _terms.count(); }
 
     Term* get(int index) const { return _terms[index]; }
     Term* operator[](int index) const { return _terms[index]; }

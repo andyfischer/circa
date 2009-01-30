@@ -24,7 +24,7 @@ namespace circa {
 Branch::~Branch()
 {
     // Dealloc_value on all non-types
-    for (unsigned int i = 0; i < _terms.size(); i++)
+    for (unsigned int i = 0; i < _terms.count(); i++)
     {
         Term *term = _terms[i];
 
@@ -41,7 +41,7 @@ Branch::~Branch()
     }
 
     // Delete everybody
-    for (unsigned int i = 0; i < _terms.size(); i++)
+    for (unsigned int i = 0; i < _terms.count(); i++)
     {
         Term *term = _terms[i];
         if (term == NULL)
@@ -60,7 +60,7 @@ void Branch::append(Term* term)
     assert_good_pointer(term);
     assert(term->owningBranch == NULL);
     term->owningBranch = this;
-    _terms.push_back(term);
+    _terms.append(term);
 }
 
 void Branch::bindName(Term* term, std::string name)
@@ -78,10 +78,10 @@ void Branch::remapPointers(ReferenceMap const& map)
 {
     names.remapPointers(map);
 
-    std::vector<Term*>::iterator it;
-    for (it = _terms.begin(); it != _terms.end(); ++it) {
-        if (*it != NULL)
-            remap_pointers(*it, map);
+    for (unsigned int i = 0; i < _terms.count(); i++) {
+        Term* term = _terms[i];
+        if (term != NULL)
+            remap_pointers(term, map);
     }
 }
 
@@ -106,14 +106,12 @@ void Branch::visitPointers(PointerVisitor& visitor)
 
     VisitPointerIfOutsideBranch myVisitor(this, visitor);
 
-    std::vector<Term*>::iterator it;
-    for (it = _terms.begin(); it != _terms.end(); ++it) {
-        if (*it == NULL)
+    for (unsigned int i = 0; i < _terms.count(); i++) {
+        Term* term = _terms[i];
+        if (term == NULL)
             continue;
 
-        // Type& type = as_type((*it)->type);
-
-        visit_pointers(*it, myVisitor);
+        visit_pointers(term, myVisitor);
     }
 }
 
@@ -223,6 +221,7 @@ void migrate_branch(Branch& replacement, Branch& target)
     // 5. Discard 'original'.
     //
 
+    
     //Branch original;
 //
     //duplicate_branch(target, original);
