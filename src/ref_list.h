@@ -166,6 +166,14 @@ public:
         return true;
     }
 
+    int findIndex(Term* term)
+    {
+        for (unsigned int i=0; i < count(); i++)
+            if (_items[i] == term)
+                return i;
+        return -1;
+    }
+
     void remapPointers(ReferenceMap const& map);
     void visitPointers(PointerVisitor &visitor);
 };

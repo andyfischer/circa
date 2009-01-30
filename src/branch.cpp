@@ -115,6 +115,20 @@ void Branch::visitPointers(PointerVisitor& visitor)
     }
 }
 
+void Branch::_replaceTermObject(Term* existing, Term* replacement)
+{
+    int existingIndex = _terms.findIndex(existing);
+
+    assert(existingIndex >= 0);
+
+    _terms[existingIndex] = replacement;
+
+    ReferenceMap map;
+    map[existing] = replacement;
+
+    remapPointers(map);
+}
+
 void
 Branch::clear()
 {
@@ -199,6 +213,21 @@ void duplicate_branch(Branch& source, Branch& dest)
     }
 }
 
+void migrate_term(Term* source, Term* dest)
+{
+    // Special behavior for branches
+    if (dest->state != NULL && dest->state->type == BRANCH_TYPE) {
+        // branch migration
+        migrate_branch(as_branch(source->state),as_branch(dest->state));
+    } else if (is_value(dest) && dest->type == FUNCTION_TYPE) {
+        // subroutine migration
+        migrate_branch(get_subroutine_branch(source),get_subroutine_branch(dest));
+    } else if (is_value(dest)) {
+        // value migration
+        assign_value(source, dest);
+    }
+}
+
 void migrate_branch(Branch& replacement, Branch& target)
 {
     // This function is a work in progress
@@ -221,41 +250,30 @@ void migrate_branch(Branch& replacement, Branch& target)
     // 5. Discard 'original'.
     //
 
-    
-    //Branch original;
-//
-    //duplicate_branch(target, original);
+    ReferenceList originalTerms = target._terms;
+    TermNamespace originalNamespace = target.names;
 
-    // For now, just look for named terms in 'target', and replace
-    // values with values from 'replacement'
-    for (int termIndex=0; termIndex < target.numTerms(); termIndex++) {
-        Term* term = target[termIndex];
-        if (term->name == "")
+    target.clear();
+    duplicate_branch(replacement, target);
+
+    // Go through every one of original's names, see if we can migrate them.
+    TermNamespace::iterator it;
+    for (it = originalNamespace.begin(); it != originalNamespace.end(); ++it)
+    {
+        std::string name = it->first;
+        Term* originalTerm = it->second;
+
+        // Skip if name isn't in replacement
+        if (!target.names.contains(name))
             continue;
 
-        if (!replacement.containsName(term->name))
-            // todo: print a warning here?
-            continue;
+        Term* targetTerm = target[name];
 
-        // Don't migrate terms with a 'should-migrate' set to false
-        // This might be a temporary measure.
-        if (term->hasProperty("should-migrate")
-                && !as_bool(term->property("should-migrate")))
-            continue;
+        // Replace in list
+        target._replaceTermObject(targetTerm, originalTerm);
+        originalTerms.remove(originalTerm);
 
-        Term* replaceTerm = replacement[term->name];
-
-        // Special behavior for branches
-        if (term->state != NULL && term->state->type == BRANCH_TYPE) {
-            // branch migration
-            migrate_branch(as_branch(replaceTerm->state),as_branch(term->state));
-        } else if (is_value(term) && term->type == FUNCTION_TYPE) {
-            // subroutine migration
-            migrate_branch(get_subroutine_branch(replaceTerm),get_subroutine_branch(term));
-        } else if (is_value(term)) {
-            // value migration
-            assign_value(replaceTerm, term);
-        }
+        migrate_term(targetTerm, originalTerm);
     }
 }
 
