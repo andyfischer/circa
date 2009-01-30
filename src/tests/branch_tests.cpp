@@ -110,6 +110,31 @@ void test_migrate()
     test_assert(as_int(a) == 2);
 }
 
+void test_migrate2()
+{
+    // In this test, we migrate with 1 term added and 1 term removed.
+    Branch orig, replace;
+
+    Term* a = orig.eval("a = 1");
+    Term* b = orig.eval("b = 2");
+
+    Term* a2 = replace.eval("a = 3");
+    Term* c = replace.eval("c = 4");
+
+    // Sanity check our branches
+    test_assert(orig[0] == a);
+    test_assert(orig[1] == b);
+    test_assert(replace[0] == a2);
+    test_assert(replace[1] == c);
+
+    migrate_branch(replace, orig);
+
+    test_assert(orig[0] == a);
+    test_assert(orig[1]->name == "c");
+    test_assert(as_int(orig[0]) == 3);
+}
+
+
 void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
@@ -119,6 +144,7 @@ void register_tests()
 #endif
     REGISTER_TEST_CASE(branch_tests::test_startBranch);
     REGISTER_TEST_CASE(branch_tests::test_migrate);
+    REGISTER_TEST_CASE(branch_tests::test_migrate2);
 }
 
 } // namespace branch_tests
