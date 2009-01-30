@@ -1,15 +1,16 @@
 
-ship_x = 320.0
-ship_y = 280.0
+ship_y = 300.0
 ship_facing = 0.0
 
-front_dist = 12.0
+front_dist = 18.0
 back_angle = 2.5
 
 
-
 function redraw()
-    fill_rectangle(0,0,640,480, 0xffffffff)
+    mouse_x = 0.0
+
+    ship_x = mouse_x * 2.0 + 1.0
+    fill_rectangle(0,0,640,480, 0xffffff)
 
     a_x = ship_x + front_dist * cos(ship_facing)
     a_y = ship_y + front_dist * sin(ship_facing)

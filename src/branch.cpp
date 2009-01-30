@@ -213,19 +213,29 @@ void duplicate_branch(Branch& source, Branch& dest)
     }
 }
 
-void migrate_term(Term* source, Term* dest)
+// Returns whether the term was migrated
+bool migrate_term(Term* source, Term* dest)
 {
-    // Special behavior for branches
+    // Branch migration
     if (dest->state != NULL && dest->state->type == BRANCH_TYPE) {
-        // branch migration
         migrate_branch(as_branch(source->state),as_branch(dest->state));
-    } else if (is_value(dest) && dest->type == FUNCTION_TYPE) {
-        // subroutine migration
+        return true;
+    } 
+    
+    // Subroutine migration
+    if (is_value(dest) && dest->type == FUNCTION_TYPE) {
         migrate_branch(get_subroutine_branch(source),get_subroutine_branch(dest));
-    } else if (is_value(dest)) {
-        // value migration
-        assign_value(source, dest);
+        return true;
     }
+    
+    // Value migration
+    if (is_value(dest)) {
+        // TODO: Don't do this to state
+        assign_value(source, dest);
+        return true;
+    }
+
+    return false;
 }
 
 void migrate_branch(Branch& replacement, Branch& target)
@@ -269,11 +279,17 @@ void migrate_branch(Branch& replacement, Branch& target)
 
         Term* targetTerm = target[name];
 
-        // Replace in list
-        target._replaceTermObject(targetTerm, originalTerm);
-        originalTerms.remove(originalTerm);
+        // Skip if type doesn't match
+        if (originalTerm->type != targetTerm->type)
+            continue;
 
-        migrate_term(targetTerm, originalTerm);
+        bool migrated = migrate_term(targetTerm, originalTerm);
+
+        if (migrated) {
+            // Replace in list
+            target._replaceTermObject(targetTerm, originalTerm);
+            originalTerms.remove(originalTerm);
+        }
     }
 }
 
