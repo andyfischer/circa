@@ -48,6 +48,7 @@ const char* getMatchText(int match)
         case END: return "end";
         case IF: return "if";
         case ELSE: return "else";
+        case STATE: return "state";
         case UNRECOGNIZED: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -162,43 +163,39 @@ bool is_whitespace(char c)
     return c == ' ' || c == '\t';
 }
 
+bool try_to_consume_keyword(TokenizeContext& context, int keyword)
+{
+    const char* str = getMatchText(keyword);
+    int str_len = strlen(str);
+
+    // Check if every letter matches
+    for (int i=0; i < str_len; i++) {
+        if (context.next(i) != str[i])
+            return false;
+    }
+
+    // Check that this is really the end of the word
+    if (is_acceptable_inside_identifier(context.next(str_len)))
+        return false;
+
+    // Keyword matches, now consume it
+    for (int i=0; i < str_len; i++) {
+        context.consume();
+    }
+
+    context.pushResult(keyword);
+
+    return true;
+}
+
 void top_level_consume_token(TokenizeContext &context)
 {
     if (is_letter(context.next()) || context.next() == '_') {
 
-        if (context.next() == 'e'
-                && context.next(1) == 'n'
-                && context.next(2) == 'd'
-                && !is_acceptable_inside_identifier(context.next(3))) {
-
-            context.consume();
-            context.consume();
-            context.consume();
-            context.pushResult(END);
-            return;
-        }
-
-        if (context.next() == 'i'
-            && context.next(1) == 'f'
-            && !is_acceptable_inside_identifier(context.next(2))) {
-            context.consume();
-            context.consume();
-            context.pushResult(IF);
-            return;
-        }
-
-        if (context.next() == 'e'
-            && context.next(1) == 'l'
-            && context.next(2) == 's'
-            && context.next(3) == 'e'
-            && !is_acceptable_inside_identifier(context.next(4))) {
-            context.consume();
-            context.consume();
-            context.consume();
-            context.consume();
-            context.pushResult(ELSE);
-            return;
-        }
+        if (try_to_consume_keyword(context, END)) return;
+        if (try_to_consume_keyword(context, IF)) return;
+        if (try_to_consume_keyword(context, ELSE)) return;
+        if (try_to_consume_keyword(context, STATE)) return;
 
         consume_identifier(context);
         return;
