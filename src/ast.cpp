@@ -408,7 +408,7 @@ IfStatement::createTerm(CompilationContext &context)
     Term* conditionTerm = this->condition->createTerm(context);
     context.popExpressionFrame();
 
-    Term* ifStatementTerm = apply_function(context.topBranch(),
+    Term* ifStatementTerm = apply_function(&context.topBranch(),
                                            "if-statement",
                                            ReferenceList(conditionTerm));
 
@@ -463,7 +463,7 @@ IfStatement::createTerm(CompilationContext &context)
         Term* negTerm = negBranch.containsName(name) ?
             negBranch[name] : find_named(&outerBranch, name);
 
-        Term* joining_term = apply_function(joiningTermsBranch,
+        Term* joining_term = apply_function(&joiningTermsBranch,
                 "if-expr",
                 ReferenceList(conditionTerm, posTerm, negTerm));
         outerBranch.bindName(joining_term, name);

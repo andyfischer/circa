@@ -33,6 +33,8 @@ bool& as_bool(Term*);
 std::string& as_string(Term*);
 Term*& as_ref(Term*);
 
+// Build options
+#define TRACK_USERS 0
 
 } // namespace circa
 

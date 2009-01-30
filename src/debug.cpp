@@ -30,8 +30,7 @@ void sanity_check_term(Term* term)
 {
     assert_good_pointer(term);
 
-    assert(term->function->users.contains(term));
-
+#if TRACK_USERS
     for (unsigned int i=0; i < term->inputs.count(); i++) {
         assert(term->inputs[i]->users.contains(term));
     }
@@ -39,6 +38,7 @@ void sanity_check_term(Term* term)
     for (unsigned int i=0; i < term->users.count(); i++) {
         assert(is_actually_using(term->users[i], term));
     }
+#endif
 }
 
 void sanity_check_the_world()

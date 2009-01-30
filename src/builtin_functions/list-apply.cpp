@@ -13,7 +13,7 @@ namespace list_apply_function {
         as_list(caller).clear();
         
         for (int i=0; i < list.count(); i++) {
-            Term* result = apply_function(*caller->owningBranch, caller->input(0), ReferenceList(list.get(i)));
+            Term* result = apply_function(caller->owningBranch, caller->input(0), ReferenceList(list.get(i)));
         
             evaluate_term(result);
         

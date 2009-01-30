@@ -76,8 +76,8 @@ void var_function_reuse()
 {
     Branch branch;
 
-    Term* function = get_value_function(branch, INT_TYPE);
-    Term* function2 = get_value_function(branch, INT_TYPE);
+    Term* function = get_value_function(INT_TYPE);
+    Term* function2 = get_value_function(INT_TYPE);
 
     test_assert(function == function2);
 
@@ -93,7 +93,7 @@ void null_input_errors()
 
     Term* one = float_value(branch, 1.0);
 
-    Term* term1 = apply_function(branch, get_global("add"), ReferenceList(NULL, one));
+    Term* term1 = apply_function(&branch, get_global("add"), ReferenceList(NULL, one));
     evaluate_term(term1);
     test_assert(term1->hasError());
     test_assert(term1->getErrorMessage() == "Input 0 is NULL");
@@ -103,7 +103,7 @@ void null_input_errors()
     test_assert(term1->hasError());
     test_assert(term1->getErrorMessage() == "Function is NULL");
 
-    Term* term2 = apply_function(branch, get_global("add"), ReferenceList(one, NULL));
+    Term* term2 = apply_function(&branch, get_global("add"), ReferenceList(one, NULL));
     evaluate_term(term2);
     test_assert(term2->hasError());
     test_assert(term2->getErrorMessage() == "Input 1 is NULL");
@@ -156,7 +156,9 @@ void register_tests()
     REGISTER_TEST_CASE(runtime_tests::null_input_errors);
     REGISTER_TEST_CASE(runtime_tests::test_eval_as);
     REGISTER_TEST_CASE(runtime_tests::test_runtime_type_error);
+#if TRACK_USERS
     REGISTER_TEST_CASE(runtime_tests::test_recycle_with_multiple_users);
+#endif
 }
 
 } // namespace runtime_tests

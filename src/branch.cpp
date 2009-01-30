@@ -41,6 +41,7 @@ Branch::~Branch()
     }
 
     // Find any terms that are using our terms, and tell them to stop.
+    /*
     {
         PointerIterator *it = start_branch_pointer_iterator(this);
 
@@ -63,7 +64,7 @@ Branch::~Branch()
             it->advance();
         }
         delete it;
-    }
+    }*/
 
     // Create a map where all our terms go to NULL
     /*

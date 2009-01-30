@@ -85,7 +85,7 @@ void external_pointers()
             FUNCTION_TYPE,
             FLOAT_TYPE,
             BRANCH_TYPE,
-            get_value_function(*KERNEL, FLOAT_TYPE)
+            get_value_function(FLOAT_TYPE)
             ));
 }
 

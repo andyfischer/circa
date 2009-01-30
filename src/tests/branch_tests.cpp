@@ -19,8 +19,8 @@ namespace branch_tests {
 void test_duplicate()
 {
     Branch original;
-    Term* term1 = apply_function(original, VAR_INT, ReferenceList());
-    Term* term2 = apply_function(original, VAR_STRING, ReferenceList());
+    Term* term1 = apply_function(&original, VAR_INT, ReferenceList());
+    Term* term2 = apply_function(&original, VAR_STRING, ReferenceList());
     as_int(term1) = 5;
     as_string(term2) = "yarn";
     original.bindName(term1, "term1");
@@ -114,7 +114,9 @@ void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
+#if TRACK_USERS
     REGISTER_TEST_CASE(branch_tests::cleanup_users_after_delete);
+#endif
     REGISTER_TEST_CASE(branch_tests::test_startBranch);
     REGISTER_TEST_CASE(branch_tests::test_migrate);
 }
