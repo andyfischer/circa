@@ -207,7 +207,8 @@ void migrate_branch(Branch& replacement, Branch& target)
 
     // The goal:
     //
-    // Modify 'target' so that it is roughly equivalent to 'replacement'
+    // Modify 'target' so that it is roughly equivalent to 'replacement',
+    // but with as much state preserved as possible.
     //
     // The algorithm:
     //
@@ -221,8 +222,10 @@ void migrate_branch(Branch& replacement, Branch& target)
     //    'target' with the matching term from 'original'.
     // 5. Discard 'original'.
     //
-    // For every term in 'target', 
-    //
+
+    //Branch original;
+//
+    //duplicate_branch(target, original);
 
     // For now, just look for named terms in 'target', and replace
     // values with values from 'replacement'
