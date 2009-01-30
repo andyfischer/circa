@@ -40,46 +40,7 @@ Branch::~Branch()
             dealloc_value(term->state);
     }
 
-    // Find any terms that are using our terms, and tell them to stop.
-    /*
-    {
-        PointerIterator *it = start_branch_pointer_iterator(this);
-
-        while (!it->finished()) {
-            Term* term = it->current();
-            assert(term != NULL);
-
-            assert_good_pointer(term);
-
-            for (int userIndex=0; userIndex < (int) term->users.count(); userIndex++) {
-                Term* user = term->users[userIndex];
-                if (user == NULL)
-                    continue;
-                assert_good_pointer(user);
-                if (user->owningBranch == this) {
-                    term->users[userIndex] = NULL;
-                }
-            }
-            term->users.removeNulls();
-            it->advance();
-        }
-        delete it;
-    }*/
-
-    // Create a map where all our terms go to NULL
-    /*
-    ReferenceMap deleteMap;
-    
-    std::vector<Term*>::iterator it;
-    for (it = _terms.begin(); it != _terms.end(); ++it) {
-        if (*it != NULL)
-            deleteMap[*it] = NULL;
-    }
-
-    this->remapPointers(deleteMap);
-    */
-
-    // delete everybody
+    // Delete everybody
     for (unsigned int i = 0; i < _terms.size(); i++)
     {
         Term *term = _terms[i];
@@ -106,13 +67,9 @@ void Branch::bindName(Term* term, std::string name)
 {
     names.bind(term, name);
 
-#if 0
-    // enable this code when subroutine inputs can work without having
-    // multiple name bindings.
     if (term->name != "") {
         throw std::runtime_error(std::string("term already has name: ")+term->name);
     }
-#endif
 
     term->name = name;
 }

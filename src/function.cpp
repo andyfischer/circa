@@ -154,9 +154,11 @@ Function::subroutine_call_evaluate(Term* caller)
     // Implant inputs
     for (unsigned int input=0; input < sub.inputTypes.count(); input++) {
 
-        Term* inputPlaceholder = branch[get_placeholder_name_for_index(input)];
+        std::string inputName = sub.getInputProperties(input).name;
 
-        recycle_value(caller->inputs[input], inputPlaceholder);
+        Term* inputTerm = branch[inputName];
+
+        recycle_value(caller->inputs[input], inputTerm);
     }
 
     evaluate_branch(branch);
@@ -173,18 +175,6 @@ Function::subroutine_call_start_control_flow_iterator(Term* caller)
 {
     Branch &branch = as_branch(caller->state);
     return start_branch_control_flow_iterator(&branch);
-}
-
-void set_subroutine_input_name(Function& func, int index, std::string const& name)
-{
-    Term* inputPlaceholder =
-        func.subroutineBranch.getNamed(get_placeholder_name_for_index(index));
-
-    assert(inputPlaceholder != NULL);
-
-    // remove the name on this term, so that this new name will stick
-    inputPlaceholder->name = "";
-    func.subroutineBranch.bindName(inputPlaceholder, name);
 }
 
 Branch& get_subroutine_branch(Term* term)
