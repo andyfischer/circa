@@ -87,14 +87,14 @@ ast::Statement* statement(token_stream::TokenStream& tokens)
             tokens.consume();
         }
 
-        result = new ast::IgnorableStatement(commentText.str());
+        result = new ast::CommentStatement(commentText.str());
     }
 
     // Check for blank line
     else if (tokens.nextIs(tokenizer::NEWLINE) || tokens.finished()) {
         if (tokens.nextIs(tokenizer::NEWLINE))
             tokens.consume(tokenizer::NEWLINE);
-        result = new ast::IgnorableStatement("");
+        result = new ast::CommentStatement("");
     }
 
     // Check for keywords

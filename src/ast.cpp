@@ -196,7 +196,7 @@ ExpressionStatement::createTerm(CompilationContext &context)
 }
 
 Term*
-IgnorableStatement::createTerm(CompilationContext &context)
+CommentStatement::createTerm(CompilationContext &context)
 {
     return create_comment(context.topBranch(), this->text);
 }
