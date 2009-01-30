@@ -101,7 +101,7 @@ void test_migrate()
 
     replace.eval("a = 2");
 
-    migrate_branch(orig, replace);
+    migrate_branch(replace, orig);
 
     // Test that the 'orig' terms are the same terms
     test_assert(orig["a"] == a);

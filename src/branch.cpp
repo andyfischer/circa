@@ -201,14 +201,33 @@ void duplicate_branch(Branch& source, Branch& dest)
     }
 }
 
-void migrate_branch(Branch& original, Branch& replacement)
+void migrate_branch(Branch& replacement, Branch& target)
 {
     // This function is a work in progress
 
-    // For now, just look for named terms in 'original', and replace
+    // The goal:
+    //
+    // Modify 'target' so that it is roughly equivalent to 'replacement'
+    //
+    // The algorithm:
+    //
+    // 1. Copy 'target' to a temporary branch 'original'
+    // 2. Overwrite 'target' with the contents of 'replacement'
+    // 3. For every term in 'original', look for a match inside 'replacement'.
+    //    A 'match' is defined loosely on purpose, because we want to allow for
+    //    any amount of cleverness. But at a minimum, if two terms have the same
+    //    name, then they match.
+    // 4. If a match is found, completely replace the relevant term inside
+    //    'target' with the matching term from 'original'.
+    // 5. Discard 'original'.
+    //
+    // For every term in 'target', 
+    //
+
+    // For now, just look for named terms in 'target', and replace
     // values with values from 'replacement'
-    for (int termIndex=0; termIndex < original.numTerms(); termIndex++) {
-        Term* term = original[termIndex];
+    for (int termIndex=0; termIndex < target.numTerms(); termIndex++) {
+        Term* term = target[termIndex];
         if (term->name == "")
             continue;
 
@@ -227,10 +246,10 @@ void migrate_branch(Branch& original, Branch& replacement)
         // Special behavior for branches
         if (term->state != NULL && term->state->type == BRANCH_TYPE) {
             // branch migration
-            migrate_branch(as_branch(term->state), as_branch(replaceTerm->state));
+            migrate_branch(as_branch(replaceTerm->state),as_branch(term->state));
         } else if (is_value(term) && term->type == FUNCTION_TYPE) {
             // subroutine migration
-            migrate_branch(get_subroutine_branch(term), get_subroutine_branch(replaceTerm));
+            migrate_branch(get_subroutine_branch(replaceTerm),get_subroutine_branch(term));
         } else if (is_value(term)) {
             // value migration
             assign_value(replaceTerm, term);
@@ -263,7 +282,7 @@ void reload_branch_from_file(Branch& branch)
 
     evaluate_file(replacement, filename);
 
-    migrate_branch(branch, replacement);
+    migrate_branch(replacement, branch);
 }
 
 
