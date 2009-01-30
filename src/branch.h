@@ -22,11 +22,7 @@ public:
 
     TermNamespace names;
 
-    // 'permanent' means that this branch will not be deleted until the
-    // entire program is shut down.
-    bool permanent;
-
-    Branch() : outerScope(NULL), permanent(false) {}
+    Branch() : outerScope(NULL) {}
     ~Branch();
 
     int numTerms() const { return _terms.size(); }

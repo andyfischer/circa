@@ -103,7 +103,6 @@ void bootstrap_kernel()
     //    Stores the Type object for types. This term has function const-Type
 
     KERNEL = new Branch();
-    KERNEL->permanent = true;
 
     // Create var-function-generator function
     VALUE_FUNCTION_GENERATOR = new Term();
