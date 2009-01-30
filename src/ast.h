@@ -30,7 +30,6 @@ struct Expression : public ASTNode
 
     Expression() { }
     virtual ~Expression() { }
-    virtual std::string toString() const = 0;
     virtual Term* createTerm(CompilationContext &context) = 0;
     
     // for ASTNode
@@ -50,7 +49,6 @@ struct Infix : public Expression
     Infix(std::string const& _operatorStr, Expression* _left, Expression* _right)
         : operatorStr(_operatorStr), left(_left), right(_right) {}
     ~Infix();
-    virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
     virtual std::string typeName() const { return "Infix"; }
 
@@ -90,7 +88,6 @@ struct FunctionCall : public Expression
 
     void addArgument(Expression* expr, std::string const& preWhitespace,
             std::string const& postWhitespace);
-    virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
     virtual std::string typeName() const { return "FunctionCall"; }
     virtual int numChildren() const { return arguments.size(); }
@@ -112,7 +109,6 @@ struct LiteralString : public Literal
     std::string text;
 
     explicit LiteralString(std::string const& _text) : text(_text) { }
-    virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
     virtual std::string typeName() const { return "LiteralString"; }
     virtual int numChildren() const { return 0; }
@@ -124,10 +120,6 @@ struct LiteralFloat : public Literal
     std::string text;
 
     explicit LiteralFloat(std::string const& _text) : text(_text) { }
-    virtual std::string toString() const
-    {
-        return text;
-    }
     virtual Term* createTerm(CompilationContext &context);
     virtual std::string typeName() const { return "LiteralFloat"; }
     virtual int numChildren() const { return 0; }
@@ -139,10 +131,6 @@ struct LiteralInteger : public Literal
     std::string text;
 
     explicit LiteralInteger(std::string const& _text) : text(_text) { }
-    virtual std::string toString() const
-    {
-        return text;
-    }
     virtual Term* createTerm(CompilationContext &context);
     virtual std::string typeName() const { return "LiteralInteger"; }
     virtual int numChildren() const { return 0; }
@@ -155,7 +143,6 @@ struct Identifier : public Expression
     bool hasRebindOperator;
 
     explicit Identifier(std::string const& _text) : text(_text), hasRebindOperator(false) {}
-    virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
     virtual std::string typeName() const { return "Identifier"; }
     virtual int numChildren() const { return 0; }
@@ -169,7 +156,6 @@ struct Statement : public ASTNode
 
     Statement() : expression(NULL) {}
     virtual ~Statement() { delete expression; }
-    virtual std::string toString() const = 0;
     virtual Term* createTerm(CompilationContext &context) = 0;
     virtual std::string typeName() const { return "Statement"; }
     virtual int numChildren() const { return 1; }
@@ -182,14 +168,13 @@ struct Statement : public ASTNode
     typedef std::vector<Statement*> Vector;
 };
 
-struct StatementList
+struct StatementList : public ASTNode
 {
     Statement::Vector statements;
 
     void push(Statement* statement);
 
     virtual ~StatementList();
-    virtual std::string toString() const;
     void createTerms(CompilationContext &context);
     virtual std::string typeName() const { return "StatementList"; }
     virtual int numChildren() const { return statements.size(); }
@@ -204,7 +189,6 @@ struct ExpressionStatement : public Statement
     std::string preEqualsWhitepace;
     std::string postEqualsWhitespace;
 
-    virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
     virtual std::string typeName() const { return "ExpressionStatement"; }
     virtual int numChildren() const { return 0; }
@@ -218,7 +202,6 @@ struct CommentStatement : public Statement
 
     CommentStatement(std::string const& _text) : text(_text) {}
     virtual ~CommentStatement() { }
-    virtual std::string toString() const { return text; }
     virtual Term* createTerm(CompilationContext &context);
     virtual std::string typeName() const { return "CommentStatement"; }
     virtual int numChildren() const { return 0; }
@@ -244,7 +227,6 @@ struct FunctionHeader
     FunctionHeader() {}
     ~FunctionHeader() {}
     void addArgument(std::string const& type, std::string const& name);
-    std::string toString() const;
 };
 
 struct FunctionDecl : public Statement
@@ -255,11 +237,10 @@ struct FunctionDecl : public Statement
     FunctionDecl() : header(NULL), statements(NULL) {}
     ~FunctionDecl();
 
-    virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
     virtual std::string typeName() const { return "FunctionDecl"; }
-    virtual int numChildren() const { return 0; }
-    virtual ASTNode* getChild(int index) const { return NULL; }
+    virtual int numChildren() const { return 1; }
+    virtual ASTNode* getChild(int index) const { return statements; }
 };
 
 struct TypeDecl : public Statement
@@ -282,7 +263,6 @@ struct TypeDecl : public Statement
     }
 
     // for Statement
-    virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
     virtual std::string typeName() const { return "TypeDecl"; }
     virtual int numChildren() const { return 0; }
@@ -299,7 +279,6 @@ struct IfStatement : public Statement
     ~IfStatement();
 
     // for Statement
-    virtual std::string toString() const;
     virtual Term* createTerm(CompilationContext &context);
     virtual std::string typeName() const { return "IfStatement"; }
     virtual int numChildren() const { return 0; }
