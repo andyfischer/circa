@@ -27,17 +27,6 @@ Infix::~Infix()
     delete right;
 }
 
-std::string
-Infix::toString() const
-{
-    if (left == NULL) return "<error, left is NULL>";
-    if (right == NULL) return "<error, right is NULL>";
-    return this->left->toString() + this->preOperatorWhitespace
-        + this->operatorStr
-        + this->postOperatorWhitespace
-        + this->right->toString();
-}
-
 Term*
 Infix::createTerm(CompilationContext &context)
 {
@@ -78,35 +67,10 @@ FunctionCall::addArgument(Expression* expr, std::string const& preWhitespace,
     this->arguments.push_back(arg);
 }
 
-std::string
-FunctionCall::toString() const
-{
-    std::stringstream output;
-    output << this->functionName << "(";
-
-    bool firstArg = true;
-    ArgumentList::const_iterator it;
-    for (it = arguments.begin(); it != arguments.end(); ++it) {
-        if (!firstArg)
-            output << ",";
-        output << (*it)->preWhitespace << (*it)->expression->toString()
-            << (*it)->postWhitespace;
-        firstArg = false;
-    }
-    output << ")";
-    return output.str();
-}
-
 Term*
 FunctionCall::createTerm(CompilationContext &context)
 {
     return create_function_call(context, *this);
-}
-
-std::string
-LiteralString::toString() const
-{
-    return "\"" + this->text + "\"";
 }
 
 Term*
@@ -127,15 +91,6 @@ LiteralInteger::createTerm(CompilationContext &context)
     return create_literal_integer(context, *this);
 }
 
-std::string
-Identifier::toString() const
-{
-    std::string rebindSymbol = "";
-    if (hasRebindOperator)
-        rebindSymbol = "@";
-    return rebindSymbol + text;
-}
-
 Term*
 Identifier::createTerm(CompilationContext &context)
 {
@@ -152,20 +107,6 @@ Identifier::createTerm(CompilationContext &context)
     }
 
     return result;
-}
-
-std::string
-ExpressionStatement::toString() const
-{
-    std::string output;
-
-    if (nameBinding != "") {
-        output = nameBinding + preEqualsWhitepace + "=" + postEqualsWhitespace;
-    }
-
-    output += expression->toString();
-    
-    return output;
 }
 
 Term*
@@ -215,18 +156,6 @@ StatementList::push(Statement* statement)
     this->statements.push_back(statement);
 }
 
-std::string
-StatementList::toString() const
-{
-    std::stringstream output;
-
-    Statement::Vector::const_iterator it;
-    for (it = statements.begin(); it != statements.end(); ++it) {
-        output << (*it)->toString() << "\n";
-    }
-    return output.str();
-}
-
 void
 StatementList::createTerms(CompilationContext &context)
 {
@@ -243,22 +172,6 @@ FunctionHeader::addArgument(std::string const& type, std::string const& name)
     arg.type = type;
     arg.name = name;
     this->arguments.push_back(arg);
-}
-
-std::string
-FunctionHeader::toString() const
-{
-    std::stringstream out;
-    out << "function " << functionName << "(";
-    ArgumentList::const_iterator it;
-    bool first = true;
-    for (it = arguments.begin(); it != arguments.end(); ++it) {
-        if (!first) out << ", ";
-        out << it->type << " " << it->name;
-        first = false;
-    }
-    out << ")";
-    return out.str();
 }
 
 FunctionDecl::~FunctionDecl()
@@ -337,37 +250,6 @@ FunctionDecl::createTerm(CompilationContext &context)
     return resultTerm;
 }
 
-std::string
-FunctionDecl::toString() const
-{
-    std::stringstream out;
-
-    out << header->toString() << std::endl;
-
-    out << statements->toString();
-
-    out << "end";
-
-    return out.str();
-}
-
-std::string
-TypeDecl::toString() const
-{
-    std::stringstream out;
-
-    out << "type " << name << "{" << std::endl;
-
-    MemberList::const_iterator it;
-    for (it = members.begin(); it != members.end(); ++it) {
-        out << "  " << it->type << " " << it->name << std::endl;
-    }
-
-    out << "}";
-
-    return out.str();
-}
-
 Term*
 TypeDecl::createTerm(CompilationContext &context)
 {
@@ -390,12 +272,6 @@ IfStatement::~IfStatement()
     delete condition;
     delete positiveBranch;
     delete negativeBranch;
-}
-
-std::string
-IfStatement::toString() const
-{
-    return "IfStatment::toString TODO";
 }
 
 Term*
