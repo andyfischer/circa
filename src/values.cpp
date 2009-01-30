@@ -128,7 +128,7 @@ Term* create_value(Branch* branch, Term* type, std::string const& name)
     if (branch == NULL)
         assert(name == "");
 
-    Term *var_function = get_value_function(*branch, type);
+    Term *var_function = get_value_function(type);
     Term *term = create_term(branch, var_function, ReferenceList());
 
     alloc_value(term);
@@ -156,7 +156,7 @@ Term* create_value(Branch* branch, std::string const& typeName, std::string cons
 Term* import_value(Branch& branch, Term* type, void* initialValue, std::string const& name)
 {
     assert(type != NULL);
-    Term *var_function = get_value_function(branch, type);
+    Term *var_function = get_value_function(type);
     Term *term = create_term(&branch, var_function, ReferenceList());
 
     term->value = initialValue;

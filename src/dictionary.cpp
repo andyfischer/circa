@@ -32,7 +32,7 @@ void Dictionary::remove(std::string const& name)
 {
     Term* term = get(name);
     assert(term != NULL);
-    delete term;
+    delete_term(term);
     _dict.erase(_dict.find(name));
 }
 

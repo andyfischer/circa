@@ -78,19 +78,19 @@ Term* find_and_apply_function(CompilationContext &context,
 
     // If function is not found, produce an instance of unknown-function
     if (function == NULL) {
-        Term* result = apply_function(context.topBranch(),
+        Term* result = apply_function(&context.topBranch(),
                                       UNKNOWN_FUNCTION,
                                       inputs);
         as_string(result->state) = functionName;
         return result;
     }
 
-    return apply_function(context.topBranch(), function, inputs);
+    return apply_function(&context.topBranch(), function, inputs);
 }
 
 Term* create_comment(Branch& branch, std::string const& text)
 {
-    Term* result = apply_function(branch, COMMENT_FUNC, ReferenceList());
+    Term* result = apply_function(&branch, COMMENT_FUNC, ReferenceList());
     as_string(result->state->field(0)) = text;
     result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     result->syntaxHints.occursInsideAnExpression = false;
@@ -176,7 +176,7 @@ Term* create_dot_concatenated_call(CompilationContext &context,
         }
     }
 
-    Term* result = apply_function(context.topBranch(), function, inputs);
+    Term* result = apply_function(&context.topBranch(), function, inputs);
 
     if (memberFunctionCall
             && (ast.left->typeName() == "Identifier")
@@ -223,7 +223,7 @@ Term* create_feedback_call(CompilationContext &context, ast::Infix& ast)
     Term* rightTerm = ast.right->createTerm(context);
     context.popExpressionFrame();
 
-    return apply_function(context.topBranch(), APPLY_FEEDBACK, ReferenceList(leftTerm, rightTerm));
+    return apply_function(&context.topBranch(), APPLY_FEEDBACK, ReferenceList(leftTerm, rightTerm));
 }
 
 TermSyntaxHints::InputSyntax get_input_syntax(ast::ASTNode* node)
@@ -256,7 +256,7 @@ Term* create_infix_call(CompilationContext &context, ast::Infix& ast)
     Term* rightTerm = ast.right->createTerm(context);
     context.popExpressionFrame();
     
-    Term* result = apply_function(context.topBranch(), function, ReferenceList(leftTerm, rightTerm));
+    Term* result = apply_function(&context.topBranch(), function, ReferenceList(leftTerm, rightTerm));
 
     result->syntaxHints.setInputSyntax(0, get_input_syntax(ast.left));
     result->syntaxHints.setInputSyntax(1, get_input_syntax(ast.right));

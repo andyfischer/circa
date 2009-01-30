@@ -13,6 +13,74 @@
 
 namespace circa {
 
+Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
+{
+    assert_good_pointer(function);
+
+    if (!is_function(function))
+        throw std::runtime_error("in create_term, 2nd arg to create_term must be a function");
+
+    Term* term = new Term();
+
+    if (branch != NULL)
+        branch->append(term);
+
+    term->function = function;
+
+    Function& functionData = as_function(function);
+
+    Term* outputType = functionData.outputType;
+
+    if (outputType == NULL)
+        throw std::runtime_error("outputType is NULL");
+        
+    if (!is_type(outputType))
+        throw std::runtime_error(outputType->name + " is not a type");
+
+    change_type(term, outputType);
+
+    // Create state (if a state type is defined)
+    Term* stateType = functionData.stateType;
+    if (stateType != NULL) {
+        if (!is_type(stateType))
+            throw std::runtime_error(outputType->name + " is not a type");
+        term->state = create_value(NULL, stateType);
+    }
+
+    for (unsigned int i=0; i < inputs.count(); i++)
+        set_input(term, i, inputs[i]);
+
+    return term;
+}
+
+void delete_term(Term* term)
+{
+    if (term->state != NULL)
+        delete_term(term->state);
+    term->state = NULL;
+
+    dealloc_value(term);
+
+#if TRACK_USERS
+    // Remove us from 'user' lists
+    for (unsigned int i=0; i < term->inputs.count(); i++) {
+        Term* user = term->inputs[i];
+        if (user == NULL)
+            continue;
+        assert_good_pointer(user);
+        user->users.remove(term);
+    }
+#endif
+
+#if DEBUG_CHECK_FOR_BAD_POINTERS
+    DEBUG_GOOD_POINTER_SET.erase(term);
+#endif
+
+#if !DEBUG_NEVER_DELETE_TERMS
+    delete term;
+#endif
+}
+
 bool check_valid_type(Function &func, int index, Term* term)
 {
     Term* expectedType = func.inputTypes[index];
@@ -144,46 +212,6 @@ void error_occured(Term* errorTerm, std::string const& message)
     errorTerm->pushError(message);
 }
 
-Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
-{
-    assert_good_pointer(function);
-
-    if (!is_function(function))
-        throw std::runtime_error("in create_term, 2nd arg to create_term must be a function");
-
-    Term* term = new Term();
-
-    if (branch != NULL)
-        branch->append(term);
-
-    term->function = function;
-    function->users.appendUnique(term);
-
-    Function& functionData = as_function(function);
-
-    Term* outputType = functionData.outputType;
-
-    if (outputType == NULL)
-        throw std::runtime_error("outputType is NULL");
-        
-    if (!is_type(outputType))
-        throw std::runtime_error(outputType->name + " is not a type");
-
-    change_type(term, outputType);
-
-    // Create state (if a state type is defined)
-    Term* stateType = functionData.stateType;
-    if (stateType != NULL) {
-        if (!is_type(stateType))
-            throw std::runtime_error(outputType->name + " is not a type");
-        term->state = create_value(NULL, stateType);
-    }
-
-    for (unsigned int i=0; i < inputs.count(); i++)
-        set_input(term, i, inputs[i]);
-
-    return term;
-}
 
 void set_input(Term* term, int index, Term* input)
 {
@@ -193,6 +221,7 @@ void set_input(Term* term, int index, Term* input)
 
     term->inputs.setAt(index, input);
 
+#if TRACK_USERS
     if (input != NULL) {
         assert_good_pointer(input);
         input->users.appendUnique(term);
@@ -200,6 +229,7 @@ void set_input(Term* term, int index, Term* input)
 
     if (previousInput != NULL && !is_actually_using(previousInput, term))
         previousInput->users.remove(term);
+#endif
 }
 
 void set_inputs(Term* term, ReferenceList inputs)
@@ -212,32 +242,21 @@ void set_inputs(Term* term, ReferenceList inputs)
         if (inputs[i] == NULL)
             continue;
 
+#if TRACK_USERS
         inputs[i]->users.appendUnique(term);
+#endif
     }
 
+#if TRACK_USERS
     for (int i=0; i < (int) previousInputs.count(); i++) {
         if (previousInputs[i] == NULL)
             continue;
         if (!is_actually_using(previousInputs[i], term))
             previousInputs[i]->users.remove(term);
     }
-}
-
-void delete_term(Term* term)
-{
-    if (term->state != NULL)
-        delete_term(term->state);
-    term->state = NULL;
-    dealloc_value(term);
-
-#if DEBUG_CHECK_FOR_BAD_POINTERS
-    DEBUG_GOOD_POINTER_SET.erase(term);
-#endif
-
-#if !DEBUG_NEVER_DELETE_TERMS
-    delete term;
 #endif
 }
+
 
 bool is_actually_using(Term* user, Term* usee)
 {
@@ -255,7 +274,7 @@ bool is_actually_using(Term* user, Term* usee)
     return false;
 }
 
-Term* possibly_coerce_term(Branch& branch, Term* original, Term* expectedType)
+Term* possibly_coerce_term(Branch* branch, Term* original, Term* expectedType)
 {
     // (In the future, we will have more complicated coersion rules)
     
@@ -271,7 +290,7 @@ Term* possibly_coerce_term(Branch& branch, Term* original, Term* expectedType)
     return original;
 }
 
-Term* apply_function(Branch& branch, Term* function, ReferenceList const& _inputs)
+Term* apply_function(Branch* branch, Term* function, ReferenceList const& _inputs)
 {
     // Make a local copy of _inputs
     ReferenceList inputs = _inputs;
@@ -284,9 +303,9 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList const& _input
     if (is_type(function))
     {
         if (inputs.count() != 0)
-            throw std::runtime_error("Multiple inputs in constructor not supported");
+            throw std::runtime_error("Inputs in constructor function is not yet supported");
 
-        function = get_value_function(branch, function);
+        function = get_value_function(function);
     }
 
     // If 'function' is not really a function, see if we can treat it like a function
@@ -322,14 +341,14 @@ Term* apply_function(Branch& branch, Term* function, ReferenceList const& _input
         return existing;
 
     // Create the term
-    return create_term(&branch, function, inputs);
+    return create_term(branch, function, inputs);
 }
 
-Term* apply_function(Branch& branch,
+Term* apply_function(Branch* branch,
                      std::string const& functionName, 
                      ReferenceList const& inputs)
 {
-    Term* function = find_named(&branch,functionName);
+    Term* function = find_named(branch,functionName);
     if (function == NULL)
         throw std::runtime_error(std::string("function not found: ")+functionName);
 
@@ -338,7 +357,7 @@ Term* apply_function(Branch& branch,
 
 Term* eval_function(Branch& branch, Term* function, ReferenceList const& inputs)
 {
-    Term* result = apply_function(branch, function, inputs);
+    Term* result = apply_function(&branch, function, inputs);
     evaluate_term(result);
     return result;
 }

@@ -17,7 +17,7 @@ namespace apply_feedback_function {
 
         if (targetsFunction.feedbackPropogateFunction != NULL)
         {
-            apply_function(branch, targetsFunction.feedbackPropogateFunction,
+            apply_function(&branch, targetsFunction.feedbackPropogateFunction,
                     ReferenceList(target, desired));
         } else {
             std::stringstream out;

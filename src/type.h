@@ -157,6 +157,9 @@ std::string to_source_string(Term* term);
 
 PointerIterator* start_pointer_iterator(Term*);
 
+// Fetch the const function for this type
+Term* get_value_function(Term* type);
+
 } // namespace circa
 
 #endif

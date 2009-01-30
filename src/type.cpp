@@ -277,4 +277,22 @@ PointerIterator* start_pointer_iterator(Term* term)
     return type.startPointerIterator(term);
 }
 
+Term* get_value_function(Term* typeTerm)
+{
+    Type& type = as_type(typeTerm);
+
+    // Check to use an existing value
+    if (type.valueFunction != NULL)
+        return type.valueFunction;
+
+    Term* result = apply_function(NULL, VALUE_FUNCTION_GENERATOR, ReferenceList(typeTerm));
+    assert(result->input(0) == typeTerm);
+    evaluate_term(result);
+
+    // Save this result on the type, for future calls
+    type.valueFunction = result;
+
+    return result;
+}
+
 } // namespace circa

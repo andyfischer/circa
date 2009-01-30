@@ -204,26 +204,26 @@ void initialize_constants()
 
     import_type<Dictionary>(*KERNEL, "Dictionary");
 
-    VAR_INT = get_value_function(*KERNEL, INT_TYPE);
-    VAR_FLOAT = get_value_function(*KERNEL, FLOAT_TYPE);
-    VAR_STRING = get_value_function(*KERNEL, STRING_TYPE);
-    VAR_BOOL = get_value_function(*KERNEL, BOOL_TYPE);
+    VAR_INT = get_value_function(INT_TYPE);
+    VAR_FLOAT = get_value_function(FLOAT_TYPE);
+    VAR_STRING = get_value_function(STRING_TYPE);
+    VAR_BOOL = get_value_function(BOOL_TYPE);
 
     CONSTANT_0 = float_value(*KERNEL, 0);
     CONSTANT_1 = float_value(*KERNEL, 1);
     CONSTANT_2 = float_value(*KERNEL, 2);
 
-    CONSTANT_TRUE = apply_function(*KERNEL, BOOL_TYPE, ReferenceList());
+    CONSTANT_TRUE = apply_function(KERNEL, BOOL_TYPE, ReferenceList());
     as_bool(CONSTANT_TRUE) = true;
     CONSTANT_TRUE->stealingOk = false;
     KERNEL->bindName(CONSTANT_TRUE, "true");
 
-    CONSTANT_FALSE = apply_function(*KERNEL, BOOL_TYPE, ReferenceList());
+    CONSTANT_FALSE = apply_function(KERNEL, BOOL_TYPE, ReferenceList());
     as_bool(CONSTANT_FALSE) = false;
     CONSTANT_FALSE->stealingOk = false;
     KERNEL->bindName(CONSTANT_FALSE, "false");
 
-    Term* pi = apply_function(*KERNEL, FLOAT_TYPE, ReferenceList());
+    Term* pi = apply_function(KERNEL, FLOAT_TYPE, ReferenceList());
     as_float(pi) = 3.14159;
     KERNEL->bindName(pi, "PI");
 
@@ -263,22 +263,6 @@ void shutdown()
 {
     delete KERNEL;
     KERNEL = NULL;
-}
-
-Term* get_value_function(Term* type)
-{
-    Term* result = apply_function(*type->owningBranch, VALUE_FUNCTION_GENERATOR, ReferenceList(type));
-    assert(result->input(0) == type);
-    evaluate_term(result);
-    return result;
-}
-
-Term* get_value_function(Branch& branch, Term* type)
-{
-    Term* result = apply_function(branch, VALUE_FUNCTION_GENERATOR, ReferenceList(type));
-    assert(result->input(0) == type);
-    evaluate_term(result);
-    return result;
 }
 
 } // namespace circa
