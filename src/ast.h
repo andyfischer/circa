@@ -211,16 +211,16 @@ struct ExpressionStatement : public Statement
     virtual ASTNode* getChild(int index) const { return NULL; }
 };
 
-// 'IgnorableStatement' includes comments and blank lines
-struct IgnorableStatement : public Statement
+// 'CommentStatement' includes comments and blank lines
+struct CommentStatement : public Statement
 {
     std::string text;
 
-    IgnorableStatement(std::string const& _text) : text(_text) {}
-    virtual ~IgnorableStatement() { }
+    CommentStatement(std::string const& _text) : text(_text) {}
+    virtual ~CommentStatement() { }
     virtual std::string toString() const { return text; }
     virtual Term* createTerm(CompilationContext &context);
-    virtual std::string typeName() const { return "IgnorableStatement"; }
+    virtual std::string typeName() const { return "CommentStatement"; }
     virtual int numChildren() const { return 0; }
     virtual ASTNode* getChild(int index) const { return NULL; }
 };

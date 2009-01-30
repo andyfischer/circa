@@ -261,7 +261,7 @@ void comment_statement()
     token_stream::TokenStream tokens("-- this is a comment");
 
     ast::Statement* statement = parser::statement(tokens);
-    test_assert(dynamic_cast<ast::IgnorableStatement*>(statement) != NULL);
+    test_assert(dynamic_cast<ast::CommentStatement*>(statement) != NULL);
 
     test_assert(tokens.finished());
 
