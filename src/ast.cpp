@@ -314,12 +314,12 @@ FunctionDecl::createTerm(CompilationContext &context)
          inputIndex++)
     {
         std::string name = this->header->arguments[inputIndex].name;
-        std::string internalName = get_placeholder_name_for_index(inputIndex);
-        Term* placeholder = create_value(&result.subroutineBranch, result.inputTypes[inputIndex], internalName);
 
-        // hack to bind two names to this one term
-        placeholder->name = "";
-        result.subroutineBranch.bindName(placeholder, name);
+        if (name == "")
+            name = get_placeholder_name_for_index(inputIndex);
+
+        /*Term* placeholder =*/ create_value(&result.subroutineBranch, result.inputTypes[inputIndex], name);
+
     }
 
     result.subroutineBranch.outerScope = &context.topBranch();

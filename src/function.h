@@ -11,7 +11,7 @@
 namespace circa {
 
 #define INPUT_PLACEHOLDER_PREFIX "#input-"
-#define OUTPUT_PLACEHOLDER_NAME "#output"
+#define OUTPUT_PLACEHOLDER_NAME "#return"
 
 struct Function
 {
@@ -69,8 +69,6 @@ bool is_function(Term* term);
 Function& as_function(Term*);
 
 std::string get_placeholder_name_for_index(int index);
-
-void set_subroutine_input_name(Function& func, int index, std::string const& name);
 
 Branch& call_subroutine(Branch& branch, std::string const& functionName);
 Branch& get_subroutine_branch(Term* term);
