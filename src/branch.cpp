@@ -315,10 +315,7 @@ void evaluate_file(Branch& branch, std::string const& filename)
     TokenStream tokens(fileContents);
     ast::StatementList *statementList = parser::statementList(tokens);
 
-    CompilationContext context;
-    context.pushScope(&branch, NULL);
-    statementList->createTerms(context);
-    context.popScope();
+    statementList->createTerms(branch);
 
     delete statementList;
 

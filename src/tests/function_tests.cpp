@@ -25,6 +25,7 @@ void create()
     test_assert(as_function(sub).outputType == STRING_TYPE);
 
     // name input
+/*
     sub = branch.eval("function-name-input(@sub, 0, 'apple')");
 
     test_assert(is_function(sub));
@@ -34,7 +35,8 @@ void create()
     test_assert(as_function(sub).outputType == STRING_TYPE);
 
     Term *input_name = branch.eval("in = function-get-input-name(sub, 0)");
-    test_assert(input_name->asString() == "apple");
+    test_equals(input_name->asString(), "apple");
+*/
 }
 
 void using_apply()

@@ -16,32 +16,6 @@
 
 namespace circa {
 
-Term*
-CompilationContext::findNamed(std::string const& name) const
-{
-    assert(!scopeStack.empty());
-
-    return find_named(&topBranch(),name);
-}
-
-CompilationContext::Scope const&
-CompilationContext::topScope() const
-{
-    return scopeStack.back();
-}
-
-Branch&
-CompilationContext::topBranch() const
-{
-    assert(!scopeStack.empty());
-    return *scopeStack.back().branch;
-}
-
-void
-CompilationContext::pushScope(Branch* branch, Term* branchOwner)
-{
-    scopeStack.push_back(Scope(branch, branchOwner));
-}
 
 bool push_is_inside_expression(Branch& branch, bool value)
 {
@@ -72,15 +46,30 @@ bool is_inside_expression(Branch& branch)
         return false;
 }
 
+void push_pending_rebind(Branch& branch, std::string const& name)
+{
+    std::string attrname = get_name_for_attribute("comp-pending-rebind");
+
+    if (branch.containsName(attrname))
+        throw std::runtime_error("pending rebind already exists");
+
+    string_value(branch, name, attrname);
+}
+
+std::string get_pending_rebind(Branch& branch)
+{
+    std::string attrname = get_name_for_attribute("comp-pending-rebind");
+
+    if (branch.containsName(attrname))
+        return as_string(branch[attrname]);
+    else
+        return "";
+}
+
 void remove_compilation_attrs(Branch& branch)
 {
     branch.removeTerm(get_name_for_attribute("comp-inside-expr"));
-}
-
-void
-CompilationContext::popScope()
-{
-    scopeStack.pop_back();
+    branch.removeTerm(get_name_for_attribute("comp-pending-rebind"));
 }
 
 Term* find_and_apply_function(Branch& branch,
@@ -138,12 +127,12 @@ Term* create_literal_integer(Branch& branch, ast::LiteralInteger& ast)
     return term;
 }
 
-Term* create_dot_concatenated_call(CompilationContext &context,
+Term* create_dot_concatenated_call(Branch &branch,
                                    ast::Infix& ast)
 {
-    bool previousIsInsideExpression = push_is_inside_expression(context.topBranch(), true);
-    Term* leftTerm = ast.left->createTerm(context);
-    pop_is_inside_expression(context.topBranch(), previousIsInsideExpression);
+    bool previousIsInsideExpression = push_is_inside_expression(branch, true);
+    Term* leftTerm = ast.left->createTerm(branch);
+    pop_is_inside_expression(branch, previousIsInsideExpression);
 
     // Figure out the function name. Right expression might be
     // an identifier or a function call
@@ -168,7 +157,7 @@ Term* create_dot_concatenated_call(CompilationContext &context,
         memberFunctionCall = true;
 
     } else {
-        function = context.findNamed(functionName);
+        function = find_named(&branch,functionName);
     }
 
     if (function == NULL)
@@ -182,14 +171,14 @@ Term* create_dot_concatenated_call(CompilationContext &context,
 
         for (unsigned int i=0; i < functionCall->arguments.size(); i++) {
             ast::FunctionCall::Argument *arg = functionCall->arguments[i];
-            bool previousIsInsideExpression = push_is_inside_expression(context.topBranch(), true);
-            Term *term = arg->expression->createTerm(context);
-            pop_is_inside_expression(context.topBranch(), previousIsInsideExpression);
+            bool previousIsInsideExpression = push_is_inside_expression(branch, true);
+            Term *term = arg->expression->createTerm(branch);
+            pop_is_inside_expression(branch, previousIsInsideExpression);
             inputs.append(term);
         }
     }
 
-    Term* result = apply_function(&context.topBranch(), function, inputs);
+    Term* result = apply_function(&branch, function, inputs);
 
     if (memberFunctionCall
             && (ast.left->typeName() == "Identifier")
@@ -198,7 +187,7 @@ Term* create_dot_concatenated_call(CompilationContext &context,
         // Rebind this identifier
         std::string id = dynamic_cast<ast::Identifier*>(ast.left)->text;
 
-        context.topBranch().bindName(result, id);
+        branch.bindName(result, id);
     }
 
     TermSyntaxHints::InputSyntax leftInputSyntax;
@@ -209,16 +198,16 @@ Term* create_dot_concatenated_call(CompilationContext &context,
 
     result->syntaxHints.inputSyntax.push_back(leftInputSyntax);
     result->syntaxHints.declarationStyle = TermSyntaxHints::DOT_CONCATENATION;
-    result->syntaxHints.occursInsideAnExpression = is_inside_expression(context.topBranch());
+    result->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
 
     return result;
 }
 
-Term* create_arrow_concatenated_call(CompilationContext &context, ast::Infix& ast)
+Term* create_arrow_concatenated_call(Branch &branch, ast::Infix& ast)
 {
-    bool previousIsInsideExpression = push_is_inside_expression(context.topBranch(), true);
-    Term* leftTerm = ast.left->createTerm(context);
-    pop_is_inside_expression(context.topBranch(), previousIsInsideExpression);
+    bool previousIsInsideExpression = push_is_inside_expression(branch, true);
+    Term* leftTerm = ast.left->createTerm(branch);
+    pop_is_inside_expression(branch, previousIsInsideExpression);
 
     ast::Identifier *rightIdent = dynamic_cast<ast::Identifier*>(ast.right);
 
@@ -226,17 +215,17 @@ Term* create_arrow_concatenated_call(CompilationContext &context, ast::Infix& as
         parser::syntax_error("Right side of -> must be an identifier");
     }
 
-    return find_and_apply_function(context.topBranch(), rightIdent->text, ReferenceList(leftTerm));
+    return find_and_apply_function(branch, rightIdent->text, ReferenceList(leftTerm));
 }
 
-Term* create_feedback_call(CompilationContext &context, ast::Infix& ast)
+Term* create_feedback_call(Branch &branch, ast::Infix& ast)
 {
-    bool previousIsInsideExpression = push_is_inside_expression(context.topBranch(), true);
-    Term* leftTerm = ast.left->createTerm(context);
-    Term* rightTerm = ast.right->createTerm(context);
-    pop_is_inside_expression(context.topBranch(), previousIsInsideExpression);
+    bool previousIsInsideExpression = push_is_inside_expression(branch, true);
+    Term* leftTerm = ast.left->createTerm(branch);
+    Term* rightTerm = ast.right->createTerm(branch);
+    pop_is_inside_expression(branch, previousIsInsideExpression);
 
-    return apply_function(&context.topBranch(), APPLY_FEEDBACK, ReferenceList(leftTerm, rightTerm));
+    return apply_function(&branch, APPLY_FEEDBACK, ReferenceList(leftTerm, rightTerm));
 }
 
 TermSyntaxHints::InputSyntax get_input_syntax(ast::ASTNode* node)
@@ -253,29 +242,29 @@ TermSyntaxHints::InputSyntax get_input_syntax(ast::ASTNode* node)
     return result;
 }
 
-Term* create_infix_call(CompilationContext &context, ast::Infix& ast)
+Term* create_infix_call(Branch &branch, ast::Infix& ast)
 {
     std::string functionName = getInfixFunctionName(ast.operatorStr);
 
-    Term* function = context.findNamed(functionName);
+    Term* function = find_named(&branch,functionName);
 
     if (function == NULL) {
         parser::syntax_error(std::string("couldn't find function: ") + functionName);
         return NULL; // unreachable
     }
 
-    bool previousIsInsideExpression = push_is_inside_expression(context.topBranch(), true);
-    Term* leftTerm = ast.left->createTerm(context);
-    Term* rightTerm = ast.right->createTerm(context);
-    pop_is_inside_expression(context.topBranch(), previousIsInsideExpression);
+    bool previousIsInsideExpression = push_is_inside_expression(branch, true);
+    Term* leftTerm = ast.left->createTerm(branch);
+    Term* rightTerm = ast.right->createTerm(branch);
+    pop_is_inside_expression(branch, previousIsInsideExpression);
     
-    Term* result = apply_function(&context.topBranch(), function, ReferenceList(leftTerm, rightTerm));
+    Term* result = apply_function(&branch, function, ReferenceList(leftTerm, rightTerm));
 
     result->syntaxHints.setInputSyntax(0, get_input_syntax(ast.left));
     result->syntaxHints.setInputSyntax(1, get_input_syntax(ast.right));
     result->syntaxHints.declarationStyle = TermSyntaxHints::INFIX;
     result->syntaxHints.functionName = ast.operatorStr;
-    result->syntaxHints.occursInsideAnExpression = is_inside_expression(context.topBranch());
+    result->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
 
     return result;
 }
@@ -287,20 +276,20 @@ bool is_literal(ast::ASTNode* node)
         || (node->typeName() == "LiteralString");
 }
 
-Term* create_function_call(CompilationContext &context, ast::FunctionCall& ast)
+Term* create_function_call(Branch &branch, ast::FunctionCall& ast)
 {
     ReferenceList inputs;
 
     for (unsigned int i=0; i < ast.arguments.size(); i++) {
         ast::FunctionCall::Argument* arg = ast.arguments[i];
-        bool previousIsInsideExpression = push_is_inside_expression(context.topBranch(), true);
-        Term* term = arg->expression->createTerm(context);
-        pop_is_inside_expression(context.topBranch(), previousIsInsideExpression);
+        bool previousIsInsideExpression = push_is_inside_expression(branch, true);
+        Term* term = arg->expression->createTerm(branch);
+        pop_is_inside_expression(branch, previousIsInsideExpression);
 
         inputs.append(term);
     }
 
-    Term* result = find_and_apply_function(context.topBranch(), ast.functionName, inputs);
+    Term* result = find_and_apply_function(branch, ast.functionName, inputs);
     assert(result != NULL);
 
     for (unsigned int i=0; i < ast.arguments.size(); i++) {
@@ -311,28 +300,28 @@ Term* create_function_call(CompilationContext &context, ast::FunctionCall& ast)
 
     result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
     result->syntaxHints.functionName = ast.functionName;
-    result->syntaxHints.occursInsideAnExpression = is_inside_expression(context.topBranch());
+    result->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
 
     return result;
 }
 
-Term* create_stateful_value_declaration(CompilationContext &context,
+Term* create_stateful_value_declaration(Branch &branch,
         ast::StatefulValueDeclaration& ast)
 {
     Term* initialValue = NULL;
     
     if (ast.initialValue != NULL)
-        initialValue = ast.initialValue->createTerm(context);
+        initialValue = ast.initialValue->createTerm(branch);
 
-    Term* type = context.findNamed(ast.type);
+    Term* type = find_named(&branch, ast.type);
 
-    Term* value = create_value(&context.topBranch(), type);
+    Term* value = create_value(&branch, type);
     value->setIsStateful(true);
 
     if (initialValue != NULL)
         assign_value(initialValue, value);
 
-    context.topBranch().bindName(value, ast.name);
+    branch.bindName(value, ast.name);
 
     return value;
 }
