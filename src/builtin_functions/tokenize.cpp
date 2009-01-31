@@ -9,7 +9,7 @@ namespace tokenize_function {
     {
         std::string& input = as_string(caller->input(0));
         
-        as<token_stream::TokenStream>(caller).reset(input);
+        as<TokenStream>(caller).reset(input);
     }
 
     void setup(Branch& kernel)

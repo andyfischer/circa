@@ -11,7 +11,7 @@ namespace parser_tests {
 
 void literal_float()
 {
-    token_stream::TokenStream tokens("1.0");
+    TokenStream tokens("1.0");
     ast::Expression *expr = parser::atom(tokens);
     ast::LiteralFloat *literal = dynamic_cast<ast::LiteralFloat*>(expr);
     test_assert(literal != NULL);
@@ -32,7 +32,7 @@ void literal_float()
 
 void literal_string()
 {
-    token_stream::TokenStream tokens("\"quoted string\"");
+    TokenStream tokens("\"quoted string\"");
     ast::Expression *expr = parser::atom(tokens);
     ast::LiteralString *literal = dynamic_cast<ast::LiteralString*>(expr);
     test_assert(literal != NULL);
@@ -43,7 +43,7 @@ void literal_string()
 
 void function_call()
 {
-    token_stream::TokenStream tokens("add(1,2)");
+    TokenStream tokens("add(1,2)");
     ast::FunctionCall *functionCall = parser::functionCall(tokens);
     test_assert(functionCall != NULL);
     test_assert(functionCall->functionName == "add");
@@ -63,7 +63,7 @@ void function_call()
 
 void name_binding_expression()
 {
-    token_stream::TokenStream tokens("name = hi(2,u)");
+    TokenStream tokens("name = hi(2,u)");
     ast::ExpressionStatement *statement = parser::expressionStatement(tokens);
 
     test_assert(statement->nameBinding == "name");
@@ -167,7 +167,7 @@ void function_decl_ast()
 
     decl.statements = new ast::StatementList();
 
-    token_stream::TokenStream tokens("x = add(arg1,arg2)");
+    TokenStream tokens("x = add(arg1,arg2)");
     decl.statements->push(parser::statement(tokens));
 
     test_equals(ast::print_ast(&decl),
@@ -193,7 +193,7 @@ void function_header()
 
 void function_decl_parse()
 {
-    token_stream::TokenStream tokens("function func(string a, int b) -> void\n"
+    TokenStream tokens("function func(string a, int b) -> void\n"
             "concat(a, to-string(b)) -> print\n"
             "end");
     ast::Statement* statement = parser::statement(tokens);
@@ -213,7 +213,7 @@ void function_decl_parse()
 
 void rebind_operator()
 {
-    token_stream::TokenStream tokens("@cheese");
+    TokenStream tokens("@cheese");
     ast::Expression* expr = parser::atom(tokens);
 
     ast::Identifier* id = dynamic_cast<ast::Identifier*>(expr);
@@ -259,7 +259,7 @@ void test_eval_statement()
 
 void comment_statement()
 {
-    token_stream::TokenStream tokens("-- this is a comment");
+    TokenStream tokens("-- this is a comment");
 
     ast::Statement* statement = parser::statement(tokens);
     test_assert(dynamic_cast<ast::CommentStatement*>(statement) != NULL);
@@ -271,7 +271,7 @@ void comment_statement()
 
 void test_type_decl()
 {
-    token_stream::TokenStream tokens("type Vector {\nfloat x\nint y\n}");
+    TokenStream tokens("type Vector {\nfloat x\nint y\n}");
 
     ast::TypeDecl* typeDecl = parser::typeDecl(tokens);
     test_assert(typeDecl != NULL);
@@ -286,7 +286,7 @@ void test_type_decl()
 
 void test_type_decl_statement()
 {
-    token_stream::TokenStream tokens("type Mytype\n{\nstring str\nfloat asdf\n}");
+    TokenStream tokens("type Mytype\n{\nstring str\nfloat asdf\n}");
     ast::Statement* statement = parser::statement(tokens);
 
     test_assert(dynamic_cast<ast::TypeDecl*>(statement) != NULL);
@@ -310,7 +310,7 @@ void test_type_decl_full_trip()
 
 void test_parse_if_block()
 {
-    token_stream::TokenStream tokens(
+    TokenStream tokens(
             "if (x > 2) \n print('yes') \n else \n print('no') \n end");
 
     ast::IfStatement* ifStatement = parser::ifStatement(tokens);
@@ -337,7 +337,7 @@ void test_parse_if_block()
 
 void member_function_call_parse()
 {
-    token_stream::TokenStream tokens("thing.func(1)");
+    TokenStream tokens("thing.func(1)");
     ast::Expression* expression = parser::infixExpression(tokens);
 
     test_assert(expression != NULL);

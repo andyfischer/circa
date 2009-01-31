@@ -227,8 +227,8 @@ void initialize_constants()
     KERNEL->bindName(pi, "PI");
 
     Term* tokenStreamType = 
-        import_type<token_stream::TokenStream>(*KERNEL, "TokenStream");
-    register_cpp_toString<token_stream::TokenStream>(tokenStreamType);
+        import_type<TokenStream>(*KERNEL, "TokenStream");
+    register_cpp_toString<TokenStream>(tokenStreamType);
 }
 
 void initialize_builtin_functions(Branch* kernel)
