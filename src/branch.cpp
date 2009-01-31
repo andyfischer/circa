@@ -297,7 +297,7 @@ void evaluate_file(Branch& branch, std::string const& filename)
 {
     std::string fileContents = read_text_file(filename);
 
-    token_stream::TokenStream tokens(fileContents);
+    TokenStream tokens(fileContents);
     ast::StatementList *statementList = parser::statementList(tokens);
 
     CompilationContext context;

@@ -8,7 +8,6 @@
 #include "tokenizer.h"
 
 namespace circa {
-namespace token_stream {
 
 struct TokenStream
 {
@@ -97,7 +96,6 @@ struct TokenStream
     std::string toString() const;
 };
 
-} // namespace token_stream
 } // namespace circa
 
 #endif

@@ -6,7 +6,6 @@
 #include "parser.h"
 
 namespace circa {
-namespace token_stream {
 
 tokenizer::TokenInstance const&
 TokenStream::next(int lookahead) const
@@ -55,6 +54,5 @@ TokenStream::toString() const
     return out.str();
 }
 
-} // namespace token_stream
 } // namespace circa
 

@@ -161,7 +161,7 @@ void test_string_literal()
 
 void test_token_stream()
 {
-    token_stream::TokenStream tstream("1 2.0");
+    TokenStream tstream("1 2.0");
 
     test_assert(tstream.nextIs(tokenizer::INTEGER));
     test_assert(tstream.nextIs(tokenizer::WHITESPACE, 1));
@@ -170,7 +170,7 @@ void test_token_stream()
 
 void token_stream_to_string()
 {
-    token_stream::TokenStream tstream("hi + 0.123");
+    TokenStream tstream("hi + 0.123");
 
     test_assert(tstream.toString() ==
             "{index: 0, tokens: [IDENTIFIER \"hi\", WHITESPACE \" \", + \"+\", "

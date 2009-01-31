@@ -15,7 +15,7 @@ Term* compile_statement(Branch* branch, std::string const& input)
 {
     assert(branch != NULL);
 
-    token_stream::TokenStream tokens(input);
+    TokenStream tokens(input);
 
     ast::Statement* statementAst = parser::statement(tokens);
     assert(statementAst != NULL);
@@ -39,11 +39,11 @@ Term* eval_statement(Branch* branch, std::string const& input)
 
 namespace parser {
 
-std::string possibleWhitespace(token_stream::TokenStream& tokens);
-std::string possibleNewline(token_stream::TokenStream& tokens);
-std::string possibleWhitespaceNewline(token_stream::TokenStream& tokens);
+std::string possibleWhitespace(TokenStream& tokens);
+std::string possibleNewline(TokenStream& tokens);
+std::string possibleWhitespaceNewline(TokenStream& tokens);
 
-ast::StatementList* statementList(token_stream::TokenStream& tokens)
+ast::StatementList* statementList(TokenStream& tokens)
 {
     ast::StatementList* statementList = new ast::StatementList();
 
@@ -65,7 +65,7 @@ ast::StatementList* statementList(token_stream::TokenStream& tokens)
     return statementList;
 }
 
-ast::Statement* statement(token_stream::TokenStream& tokens)
+ast::Statement* statement(TokenStream& tokens)
 {
     std::string precedingWhitespace = possibleWhitespace(tokens);
 
@@ -123,7 +123,7 @@ ast::Statement* statement(token_stream::TokenStream& tokens)
     return result;
 }
 
-ast::ExpressionStatement* expressionStatement(token_stream::TokenStream& tokens)
+ast::ExpressionStatement* expressionStatement(TokenStream& tokens)
 {
     ast::ExpressionStatement* statement = new ast::ExpressionStatement();
 
@@ -194,7 +194,7 @@ int getInfixPrecedence(int match)
 
 #define HIGHEST_INFIX_PRECEDENCE 8
 
-ast::Expression* infixExpression(token_stream::TokenStream& tokens,
+ast::Expression* infixExpression(TokenStream& tokens,
         int precedence)
 {
     if (precedence > HIGHEST_INFIX_PRECEDENCE)
@@ -218,7 +218,7 @@ ast::Expression* infixExpression(token_stream::TokenStream& tokens,
     return leftExpr;
 }
 
-void post_literal(token_stream::TokenStream& tokens, ast::Literal* literal)
+void post_literal(TokenStream& tokens, ast::Literal* literal)
 {
     if (tokens.nextIs(tokenizer::QUESTION)) {
         tokens.consume(tokenizer::QUESTION);
@@ -226,35 +226,35 @@ void post_literal(token_stream::TokenStream& tokens, ast::Literal* literal)
     }
 }
 
-ast::Literal* literal_float(token_stream::TokenStream& tokens)
+ast::Literal* literal_float(TokenStream& tokens)
 {
     ast::Literal* lit = new ast::LiteralFloat(tokens.consume(tokenizer::FLOAT));
     post_literal(tokens, lit);
     return lit;
 }
 
-ast::Literal* literal_integer(token_stream::TokenStream& tokens)
+ast::Literal* literal_integer(TokenStream& tokens)
 {
     ast::Literal* lit = new ast::LiteralInteger(tokens.consume(tokenizer::INTEGER));
     post_literal(tokens, lit);
     return lit;
 }
 
-ast::Literal* literal_hex(token_stream::TokenStream& tokens)
+ast::Literal* literal_hex(TokenStream& tokens)
 {
     ast::Literal* lit = new ast::LiteralInteger(tokens.consume(tokenizer::HEX_INTEGER));
     post_literal(tokens, lit);
     return lit;
 }
 
-ast::Literal* literal_string(token_stream::TokenStream& tokens)
+ast::Literal* literal_string(TokenStream& tokens)
 {
     ast::Literal* lit = new ast::LiteralString(tokens.consume());
     post_literal(tokens, lit);
     return lit;
 }
 
-ast::Expression* atom(token_stream::TokenStream& tokens)
+ast::Expression* atom(TokenStream& tokens)
 {
     // function call?
     if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.nextIs(tokenizer::LPAREN, 1))
@@ -306,7 +306,7 @@ ast::Expression* atom(token_stream::TokenStream& tokens)
     return NULL; // unreachable
 }
 
-ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)
+ast::FunctionCall* functionCall(TokenStream& tokens)
 {
     std::string functionName = tokens.consume(tokenizer::IDENTIFIER);
     tokens.consume(tokenizer::LPAREN);
@@ -330,7 +330,7 @@ ast::FunctionCall* functionCall(token_stream::TokenStream& tokens)
     return functionCall.release();
 }
 
-ast::FunctionHeader* functionHeader(token_stream::TokenStream& tokens)
+ast::FunctionHeader* functionHeader(TokenStream& tokens)
 {
     std::auto_ptr<ast::FunctionHeader> header(new ast::FunctionHeader());
 
@@ -381,7 +381,7 @@ ast::FunctionHeader* functionHeader(token_stream::TokenStream& tokens)
     return header.release();
 }
 
-ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
+ast::FunctionDecl* functionDecl(TokenStream& tokens)
 {
     std::auto_ptr<ast::FunctionDecl> decl(new ast::FunctionDecl());
 
@@ -404,7 +404,7 @@ ast::FunctionDecl* functionDecl(token_stream::TokenStream& tokens)
     return decl.release();
 }
 
-ast::TypeDecl* typeDecl(token_stream::TokenStream& tokens)
+ast::TypeDecl* typeDecl(TokenStream& tokens)
 {
     std::auto_ptr<ast::TypeDecl> decl(new ast::TypeDecl());
 
@@ -443,7 +443,7 @@ ast::TypeDecl* typeDecl(token_stream::TokenStream& tokens)
     return decl.release();
 }
 
-ast::IfStatement* ifStatement(token_stream::TokenStream& tokens)
+ast::IfStatement* ifStatement(TokenStream& tokens)
 {
     tokens.consume(tokenizer::IF);
     possibleWhitespace(tokens);
@@ -469,13 +469,13 @@ ast::IfStatement* ifStatement(token_stream::TokenStream& tokens)
     return result.release();
 }
 
-ast::StatefulValueDeclaration* statefulValueDeclaration(token_stream::TokenStream& tokens)
+ast::StatefulValueDeclaration* statefulValueDeclaration(TokenStream& tokens)
 {
     // TODO
     return NULL;
 }
 
-std::string possibleWhitespace(token_stream::TokenStream& tokens)
+std::string possibleWhitespace(TokenStream& tokens)
 {
     if (tokens.nextIs(tokenizer::WHITESPACE))
         return tokens.consume(tokenizer::WHITESPACE);
@@ -483,7 +483,7 @@ std::string possibleWhitespace(token_stream::TokenStream& tokens)
         return "";
 }
 
-std::string possibleNewline(token_stream::TokenStream& tokens)
+std::string possibleNewline(TokenStream& tokens)
 {
     if (tokens.nextIs(tokenizer::NEWLINE))
         return tokens.consume(tokenizer::NEWLINE);
@@ -491,7 +491,7 @@ std::string possibleNewline(token_stream::TokenStream& tokens)
         return "";
 }
 
-std::string possibleWhitespaceNewline(token_stream::TokenStream& tokens)
+std::string possibleWhitespaceNewline(TokenStream& tokens)
 {
     std::stringstream output;
 

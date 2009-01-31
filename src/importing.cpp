@@ -16,7 +16,7 @@ namespace circa {
 
 Term* import_function(Branch& branch, Function::EvaluateFunc evaluate, std::string const& headerText)
 {
-    token_stream::TokenStream tokens(headerText);
+    TokenStream tokens(headerText);
 
     ast::FunctionHeader *header = parser::functionHeader(tokens);
     Term* result = import_function(&branch, evaluate, *header);
@@ -26,7 +26,7 @@ Term* import_function(Branch& branch, Function::EvaluateFunc evaluate, std::stri
 
 Term* import_member_function(Term* type, Function::EvaluateFunc evaluate, std::string const& headerText)
 {
-    token_stream::TokenStream tokens(headerText);
+    TokenStream tokens(headerText);
 
     ast::FunctionHeader *header = parser::functionHeader(tokens);
     Term* result = import_function(NULL, evaluate, *header);
