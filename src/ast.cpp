@@ -348,6 +348,11 @@ IfStatement::createTerm(CompilationContext &context)
     return ifStatementTerm;
 }
 
+Term* StatefulValueDeclaration::createTerm(CompilationContext &context)
+{
+    return create_stateful_value_declaration(context, *this);
+}
+
 void
 output_ast_to_string(ASTNode *node, std::stringstream &out)
 {

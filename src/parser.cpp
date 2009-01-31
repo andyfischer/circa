@@ -110,6 +110,10 @@ ast::Statement* statement(token_stream::TokenStream& tokens)
         result = ifStatement(tokens);
     }
 
+    else if (tokens.nextIs(tokenizer::STATE)) {
+        result = statefulValueDeclaration(tokens);
+    }
+
     else {
         result = expressionStatement(tokens);
     }
@@ -463,6 +467,12 @@ ast::IfStatement* ifStatement(token_stream::TokenStream& tokens)
     possibleWhitespaceNewline(tokens);
 
     return result.release();
+}
+
+ast::StatefulValueDeclaration* statefulValueDeclaration(token_stream::TokenStream& tokens)
+{
+    // TODO
+    return NULL;
 }
 
 std::string possibleWhitespace(token_stream::TokenStream& tokens)

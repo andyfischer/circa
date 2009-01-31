@@ -285,6 +285,21 @@ struct IfStatement : public Statement
     virtual ASTNode* getChild(int index) const { return NULL; }
 };
 
+struct StatefulValueDeclaration : public Statement
+{
+    std::string type;
+    std::string name;
+    Expression* initialValue;
+
+    StatefulValueDeclaration() : initialValue(NULL) {}
+
+    // for Statement
+    virtual Term* createTerm(CompilationContext &context);
+    virtual std::string typeName() const { return "StatefulValueDeclaration"; }
+    virtual int numChildren() const { return 1; }
+    virtual ASTNode* getChild(int index) const { return initialValue; }
+};
+
 std::string print_ast(ASTNode *node);
 
 } // namespace ast
