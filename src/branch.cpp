@@ -192,10 +192,9 @@ void duplicate_branch(Branch& source, Branch& dest)
     for (int index=0; index < source.numTerms(); index++) {
         Term* source_term = source.get(index);
 
-        Term* dest_term = create_term(&dest, source_term->function, source_term->inputs);
-        newTermMap[source_term] = dest_term;
+        Term* dest_term = create_duplicate(&dest, source_term);
 
-        duplicate_value(source_term, dest_term);
+        newTermMap[source_term] = dest_term;
     }
 
     // Remap terms
@@ -230,7 +229,11 @@ bool migrate_term(Term* source, Term* dest)
     
     // Value migration
     if (is_value(dest)) {
-        // TODO: Don't do this to state
+        // Don't migrate state
+        if (dest->isStateful()) {
+            return false;
+        }
+
         assign_value(source, dest);
         return true;
     }

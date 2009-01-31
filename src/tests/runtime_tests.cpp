@@ -146,19 +146,34 @@ void test_recycle_with_multiple_users()
     test_assert(as_int(y) == 1);
 }
 
+void test_create_duplicate()
+{
+    Branch branch;
+
+    Term* a = branch.eval("a = 5");
+    a->setIsStateful(true);
+
+    Term* b = create_duplicate(&branch, a);
+
+    test_assert(a->function == b->function);
+    test_assert(a->type == b->type);
+    test_assert(b->isStateful());
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(runtime_tests::test_create_value);
     REGISTER_TEST_CASE(runtime_tests::test_int_value);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
     //REGISTER_TEST_CASE(runtime_tests::test_find_existing_equivalent); FIXME
-    //REGISTER_TEST_CASE(runtime_tests::var_function_reuse); FIXME
+    REGISTER_TEST_CASE(runtime_tests::var_function_reuse);
     REGISTER_TEST_CASE(runtime_tests::null_input_errors);
     REGISTER_TEST_CASE(runtime_tests::test_eval_as);
     REGISTER_TEST_CASE(runtime_tests::test_runtime_type_error);
 #if TRACK_USERS
     REGISTER_TEST_CASE(runtime_tests::test_recycle_with_multiple_users);
 #endif
+    REGISTER_TEST_CASE(runtime_tests::test_create_duplicate);
 }
 
 } // namespace runtime_tests

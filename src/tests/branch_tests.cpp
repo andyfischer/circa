@@ -134,6 +134,28 @@ void test_migrate2()
     test_assert(as_int(orig[0]) == 3);
 }
 
+void test_dont_migrate_state()
+{
+    Branch orig, replace;
+    Term* a = orig.eval("state int a = 1");
+    replace.eval("a = 2");
+
+    test_assert(a->isStateful());
+
+    migrate_branch(replace, orig);
+
+    test_assert(orig["a"] == a);
+    test_assert(as_int(orig["a"]) == 1);
+
+    orig.clear();
+    replace.clear();
+
+    a = orig.eval("state int a = 1");
+    replace.eval("state int a = 2");
+    test_assert(orig["a"] == a);
+    test_assert(as_int(orig["a"]) == 1);
+}
+
 
 void register_tests()
 {
@@ -145,6 +167,7 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_startBranch);
     REGISTER_TEST_CASE(branch_tests::test_migrate);
     REGISTER_TEST_CASE(branch_tests::test_migrate2);
+    REGISTER_TEST_CASE(branch_tests::test_dont_migrate_state);
 }
 
 } // namespace branch_tests

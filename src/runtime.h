@@ -25,6 +25,8 @@ void delete_term(Term* term);
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, ReferenceList inputs);
 
+Term* create_duplicate(Branch* branch, Term* source);
+
 // Check the function and inputs of 'user', returns whether they are actually
 // using 'usee'.
 bool is_actually_using(Term* user, Term* usee);

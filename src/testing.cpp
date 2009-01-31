@@ -7,8 +7,6 @@
 
 namespace circa {
 
-#define CATCH_TEST_EXCEPTIONS 0
-
 std::vector<TestCase> gTestCases;
 
 // this function is defined in register_all_tests.cpp
@@ -125,7 +123,7 @@ void run_test(std::string const& testName)
     std::vector<TestCase>::iterator it;
     for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
         if (it->name == testName) {
-            bool result = run_test(*it);
+            bool result = run_test_catching(*it);
             if (result)
                 std::cout << testName << " succeeded" << std::endl;
             return;
@@ -144,7 +142,7 @@ void run_all_tests()
     int failureCount = 0;
     std::vector<TestCase>::iterator it;
     for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
-        bool result = run_test(*it);
+        bool result = run_test_catching(*it);
         if (result) successCount++;
         else failureCount++;
     }

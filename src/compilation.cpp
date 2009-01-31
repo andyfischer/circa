@@ -306,14 +306,18 @@ Term* create_function_call(CompilationContext &context, ast::FunctionCall& ast)
 Term* create_stateful_value_declaration(CompilationContext &context,
         ast::StatefulValueDeclaration& ast)
 {
-    Term* initialValue = ast.initialValue->createTerm(context);
+    Term* initialValue = NULL;
+    
+    if (ast.initialValue != NULL)
+        initialValue = ast.initialValue->createTerm(context);
 
     Term* type = context.findNamed(ast.type);
 
     Term* value = create_value(&context.topBranch(), type);
     value->setIsStateful(true);
 
-    assign_value(initialValue, value);
+    if (initialValue != NULL)
+        assign_value(initialValue, value);
 
     return value;
 }
