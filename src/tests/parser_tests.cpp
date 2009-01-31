@@ -95,22 +95,21 @@ void test_to_string()
 void create_literals()
 {
     Branch branch;
-    CompilationContext context(&branch);
 
     ast::LiteralInteger *lint = new ast::LiteralInteger("13");
-    Term *int_t = lint->createTerm(context);
+    Term *int_t = lint->createTerm(branch);
     test_assert(int_t->type == INT_TYPE);
     test_assert(as_int(int_t) == 13);
     delete lint;
 
     ast::LiteralFloat *lfloat = new ast::LiteralFloat("1.432");
-    Term *float_t = lfloat->createTerm(context);
+    Term *float_t = lfloat->createTerm(branch);
     test_assert(float_t->type == FLOAT_TYPE);
     test_assert(as_float(float_t) > 1.431 && as_float(float_t) < 1.433);
     delete lfloat;
 
     ast::LiteralString *lstr = new ast::LiteralString("hello");
-    Term *str_t = lstr->createTerm(context);
+    Term *str_t = lstr->createTerm(branch);
     test_assert(str_t->type == STRING_TYPE);
     test_assert(as_string(str_t) == "hello");
     delete lstr;
@@ -119,13 +118,12 @@ void create_literals()
 void create_function_call()
 {
     Branch branch;
-    CompilationContext context(&branch);
 
     ast::FunctionCall *functionCall = new ast::FunctionCall("add");
     functionCall->addArgument(new ast::LiteralFloat("2"), "", "");
     functionCall->addArgument(new ast::LiteralFloat("3"), "", "");
 
-    Term *term = functionCall->createTerm(context);
+    Term *term = functionCall->createTerm(branch);
     test_assert(as_function(term->function).name == "add");
 
     // make sure this term is not evaluated yet
@@ -171,7 +169,7 @@ void function_decl_ast()
     decl.statements->push(parser::statement(tokens));
 
     test_equals(ast::print_ast(&decl),
-            "(FunctionDecl (StatementList ExpressionStatement))");
+            "(FunctionDecl (StatementList (ExpressionStatement (FunctionCall Identifier Identifier))))");
 }
 
 void function_header()
@@ -321,9 +319,9 @@ void test_parse_if_block()
     test_equals(ast::print_ast(ifStatement->condition),
             "(Infix Identifier LiteralInteger)");
     test_equals(ast::print_ast(ifStatement->positiveBranch),
-            "(StatementList ExpressionStatement)");
+            "(StatementList (ExpressionStatement (FunctionCall LiteralString)))");
     test_equals(ast::print_ast(ifStatement->negativeBranch),
-            "(StatementList ExpressionStatement)");
+            "(StatementList (ExpressionStatement (FunctionCall LiteralString)))");
 
     delete ifStatement;
 
@@ -333,7 +331,7 @@ void test_parse_if_block()
 
     test_equals(ast::print_ast(ifStatement->condition), "Identifier");
     test_equals(ast::print_ast(ifStatement->positiveBranch),
-            "(StatementList ExpressionStatement)");
+            "(StatementList (ExpressionStatement (FunctionCall LiteralString)))");
     test_assert(ifStatement->negativeBranch == NULL);
 
     delete ifStatement;

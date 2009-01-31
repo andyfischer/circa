@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "ast.h"
 #include "branch.h"
 #include "compilation.h"
 #include "parser.h"
@@ -20,9 +21,7 @@ Term* compile_statement(Branch* branch, std::string const& input)
     ast::Statement* statementAst = parser::statement(tokens);
     assert(statementAst != NULL);
 
-    CompilationContext context;
-    context.pushScope(branch, NULL);
-    Term* result = statementAst->createTerm(context);
+    Term* result = statementAst->createTerm(*branch);
     assert(result != NULL);
 
     remove_compilation_attrs(*branch);

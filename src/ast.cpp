@@ -28,24 +28,24 @@ Infix::~Infix()
 }
 
 Term*
-Infix::createTerm(CompilationContext &context)
+Infix::createTerm(Branch &branch)
 {
     // special case for dot operator.
     if (this->operatorStr == ".") {
-        return create_dot_concatenated_call(context, *this);
+        return create_dot_concatenated_call(branch, *this);
     }
 
     // special case for ->
     if (this->operatorStr == "->") {
-        return create_arrow_concatenated_call(context, *this);
+        return create_arrow_concatenated_call(branch, *this);
     }
 
     // special case for :=
     if (this->operatorStr == ":=") {
-        return create_feedback_call(context, *this);
+        return create_feedback_call(branch, *this);
     }
 
-    return create_infix_call(context, *this);
+    return create_infix_call(branch, *this);
 }
 
 FunctionCall::~FunctionCall()
@@ -68,33 +68,33 @@ FunctionCall::addArgument(Expression* expr, std::string const& preWhitespace,
 }
 
 Term*
-FunctionCall::createTerm(CompilationContext &context)
+FunctionCall::createTerm(Branch &branch)
 {
-    return create_function_call(context, *this);
+    return create_function_call(branch, *this);
 }
 
 Term*
-LiteralString::createTerm(CompilationContext &context)
+LiteralString::createTerm(Branch &branch)
 {
-    return create_literal_string(context.topBranch(), *this);
+    return create_literal_string(branch, *this);
 }
 
 Term*
-LiteralFloat::createTerm(CompilationContext &context)
+LiteralFloat::createTerm(Branch &branch)
 {
-    return create_literal_float(context.topBranch(), *this);
+    return create_literal_float(branch, *this);
 }
 
 Term*
-LiteralInteger::createTerm(CompilationContext &context)
+LiteralInteger::createTerm(Branch &branch)
 {
-    return create_literal_integer(context.topBranch(), *this);
+    return create_literal_integer(branch, *this);
 }
 
 Term*
-Identifier::createTerm(CompilationContext &context)
+Identifier::createTerm(Branch &branch)
 {
-    Term* result = context.findNamed(this->text);
+    Term* result = find_named(&branch,this->text);
 
     if (result == NULL) {
         // parser::syntax_error(std::string("Couldn't find identifier: ") + this->text);
@@ -102,31 +102,31 @@ Identifier::createTerm(CompilationContext &context)
     }
 
     if (hasRebindOperator) {
-        assert(context.pendingRebind == "");
-        context.pendingRebind = this->text;
+        push_pending_rebind(branch, this->text);
     }
 
     return result;
 }
 
 Term*
-ExpressionStatement::createTerm(CompilationContext &context)
+ExpressionStatement::createTerm(Branch &branch)
 {
     // Make sure our expression is not just an identifier.
     if (expression->typeName() == "Identifier" && nameBinding != "") {
         parser::syntax_error("Renaming an identifier is not currently supported");
     }
 
-    bool prev = push_is_inside_expression(context.topBranch(), false);
-    Term* term = this->expression->createTerm(context);
-    pop_is_inside_expression(context.topBranch(), prev);
+    bool prev = push_is_inside_expression(branch, false);
+    Term* term = this->expression->createTerm(branch);
+    pop_is_inside_expression(branch, prev);
     
     if (this->nameBinding != "")
-        context.topBranch().bindName(term, this->nameBinding);
+        branch.bindName(term, this->nameBinding);
 
-    if (context.pendingRebind != "") {
-        context.topBranch().bindName(term, context.pendingRebind);
-        context.pendingRebind = "";
+    std::string pendingRebind = get_pending_rebind(branch);
+    if (pendingRebind != "") {
+        branch.bindName(term, pendingRebind);
+        branch.removeTerm(get_name_for_attribute("comp-pending-rebind"));
     }
 
     term->syntaxHints.precedingWhitespace = this->precedingWhitespace;
@@ -135,9 +135,9 @@ ExpressionStatement::createTerm(CompilationContext &context)
 }
 
 Term*
-CommentStatement::createTerm(CompilationContext &context)
+CommentStatement::createTerm(Branch &branch)
 {
-    return create_comment(context.topBranch(), this->text);
+    return create_comment(branch, this->text);
 }
 
 StatementList::~StatementList()
@@ -155,11 +155,11 @@ StatementList::push(Statement* statement)
 }
 
 void
-StatementList::createTerms(CompilationContext &context)
+StatementList::createTerms(Branch &branch)
 {
     Statement::Vector::const_iterator it;
     for (it = statements.begin(); it != statements.end(); ++it) {
-        (*it)->createTerm(context);
+        (*it)->createTerm(branch);
     }
 }
 
@@ -179,9 +179,9 @@ FunctionDecl::~FunctionDecl()
 }
 
 Term*
-FunctionDecl::createTerm(CompilationContext &context)
+FunctionDecl::createTerm(Branch &branch)
 {
-    Term* resultTerm = create_value(&context.topBranch(), FUNCTION_TYPE, this->header->functionName);
+    Term* resultTerm = create_value(&branch, FUNCTION_TYPE, this->header->functionName);
     Function& result = as_function(resultTerm);
     result.name = header->functionName;
     result.evaluate = Function::subroutine_call_evaluate;
@@ -192,7 +192,7 @@ FunctionDecl::createTerm(CompilationContext &context)
          inputIndex++)
     {
         FunctionHeader::Argument &arg = this->header->arguments[inputIndex];
-        Term* term = find_named(&context.topBranch(), arg.type);
+        Term* term = find_named(&branch, arg.type);
         if (term == NULL)
             parser::syntax_error(std::string("Identifier not found (input type): ") + arg.type);
 
@@ -209,7 +209,7 @@ FunctionDecl::createTerm(CompilationContext &context)
     if (this->header->outputType == "") {
         result.outputType = VOID_TYPE;
     } else {
-        result.outputType = context.findNamed(this->header->outputType);
+        result.outputType = find_named(&branch,this->header->outputType);
         if (result.outputType == NULL)
             parser::syntax_error(std::string("Identifier not found (output type): ") + this->header->outputType);
         if (!is_type(result.outputType))
@@ -233,35 +233,33 @@ FunctionDecl::createTerm(CompilationContext &context)
 
     }
 
-    result.subroutineBranch.outerScope = &context.topBranch();
+    result.subroutineBranch.outerScope = &branch;
 
     // Apply every statement
-    context.pushScope(&result.subroutineBranch, NULL);
     int numStatements = this->statements->count();
     for (int statementIndex=0; statementIndex < numStatements; statementIndex++) {
         Statement* statement = this->statements->operator[](statementIndex);
 
-        statement->createTerm(context);
+        statement->createTerm(result.subroutineBranch);
     }
-    context.popScope();
 
     return resultTerm;
 }
 
 Term*
-TypeDecl::createTerm(CompilationContext &context)
+TypeDecl::createTerm(Branch &branch)
 {
-    Term* result_term = create_value(&context.topBranch(), TYPE_TYPE);
+    Term* result_term = create_value(&branch, TYPE_TYPE);
     Type &type = as_type(result_term);
     type.makeCompoundType(this->name);
 
     MemberList::const_iterator it;
     for (it = members.begin(); it != members.end(); ++it) {
-        type.addField(context.findNamed(it->type), it->name);
+        type.addField(find_named(&branch,it->type), it->name);
         type.syntaxHints.addField(it->name);
     }
 
-    context.topBranch().bindName(result_term, this->name);
+    branch.bindName(result_term, this->name);
     return result_term;
 }
 
@@ -273,16 +271,16 @@ IfStatement::~IfStatement()
 }
 
 Term*
-IfStatement::createTerm(CompilationContext &context)
+IfStatement::createTerm(Branch &branch)
 {
     assert(this->condition != NULL);
     assert(this->positiveBranch != NULL);
 
-    bool prev = push_is_inside_expression(context.topBranch(), false);
-    Term* conditionTerm = this->condition->createTerm(context);
-    pop_is_inside_expression(context.topBranch(), prev);
+    bool prev = push_is_inside_expression(branch, true);
+    Term* conditionTerm = this->condition->createTerm(branch);
+    pop_is_inside_expression(branch, prev);
 
-    Term* ifStatementTerm = apply_function(&context.topBranch(),
+    Term* ifStatementTerm = apply_function(&branch,
                                            "if-statement",
                                            ReferenceList(conditionTerm));
 
@@ -290,18 +288,14 @@ IfStatement::createTerm(CompilationContext &context)
     Branch& negBranch = as_branch(ifStatementTerm->state->field(1));
     Branch& joiningTermsBranch = as_branch(ifStatementTerm->state->field(2));
 
-    posBranch.outerScope = &context.topBranch();
-    negBranch.outerScope = &context.topBranch();
-    joiningTermsBranch.outerScope = &context.topBranch();
+    posBranch.outerScope = &branch;
+    negBranch.outerScope = &branch;
+    joiningTermsBranch.outerScope = &branch;
 
-    context.pushScope(&posBranch, ifStatementTerm->state->field(0));
-    this->positiveBranch->createTerms(context);
-    context.popScope();
+    this->positiveBranch->createTerms(posBranch);
 
     if (this->negativeBranch != NULL) {
-        context.pushScope(&negBranch, ifStatementTerm->state->field(1));
-        this->negativeBranch->createTerms(context);
-        context.popScope();
+        this->negativeBranch->createTerms(negBranch);
     }
 
     // Create joining terms
@@ -319,7 +313,7 @@ IfStatement::createTerm(CompilationContext &context)
     workspace.eval("list-remove-duplicates(@names)");
 
     List& names = as<List>(workspace["names"]);
-    Branch& outerBranch = context.topBranch();
+    Branch& outerBranch = branch;
 
     // Remove any names which are not bound in the outer branch
     for (int i=0; i < names.count(); i++) {
@@ -346,9 +340,9 @@ IfStatement::createTerm(CompilationContext &context)
     return ifStatementTerm;
 }
 
-Term* StatefulValueDeclaration::createTerm(CompilationContext &context)
+Term* StatefulValueDeclaration::createTerm(Branch &branch)
 {
-    return create_stateful_value_declaration(context, *this);
+    return create_stateful_value_declaration(branch, *this);
 }
 
 void

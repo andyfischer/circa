@@ -30,7 +30,7 @@ struct Expression : public ASTNode
 
     Expression() { }
     virtual ~Expression() { }
-    virtual Term* createTerm(CompilationContext &context) = 0;
+    virtual Term* createTerm(Branch &branch) = 0;
     
     // for ASTNode
     virtual std::string typeName() const = 0;
@@ -49,7 +49,7 @@ struct Infix : public Expression
     Infix(std::string const& _operatorStr, Expression* _left, Expression* _right)
         : operatorStr(_operatorStr), left(_left), right(_right) {}
     ~Infix();
-    virtual Term* createTerm(CompilationContext &context);
+    virtual Term* createTerm(Branch &branch);
     virtual std::string typeName() const { return "Infix"; }
 
     virtual int numChildren() const { return 2; }
@@ -88,7 +88,7 @@ struct FunctionCall : public Expression
 
     void addArgument(Expression* expr, std::string const& preWhitespace,
             std::string const& postWhitespace);
-    virtual Term* createTerm(CompilationContext &context);
+    virtual Term* createTerm(Branch &branch);
     virtual std::string typeName() const { return "FunctionCall"; }
     virtual int numChildren() const { return arguments.size(); }
     virtual ASTNode* getChild(int index) const
@@ -109,7 +109,7 @@ struct LiteralString : public Literal
     std::string text;
 
     explicit LiteralString(std::string const& _text) : text(_text) { }
-    virtual Term* createTerm(CompilationContext &context);
+    virtual Term* createTerm(Branch &branch);
     virtual std::string typeName() const { return "LiteralString"; }
     virtual int numChildren() const { return 0; }
     virtual ASTNode* getChild(int index) const { return NULL; }
@@ -120,7 +120,7 @@ struct LiteralFloat : public Literal
     std::string text;
 
     explicit LiteralFloat(std::string const& _text) : text(_text) { }
-    virtual Term* createTerm(CompilationContext &context);
+    virtual Term* createTerm(Branch &branch);
     virtual std::string typeName() const { return "LiteralFloat"; }
     virtual int numChildren() const { return 0; }
     virtual ASTNode* getChild(int index) const { return NULL; }
@@ -131,7 +131,7 @@ struct LiteralInteger : public Literal
     std::string text;
 
     explicit LiteralInteger(std::string const& _text) : text(_text) { }
-    virtual Term* createTerm(CompilationContext &context);
+    virtual Term* createTerm(Branch &branch);
     virtual std::string typeName() const { return "LiteralInteger"; }
     virtual int numChildren() const { return 0; }
     virtual ASTNode* getChild(int index) const { return NULL; }
@@ -143,7 +143,7 @@ struct Identifier : public Expression
     bool hasRebindOperator;
 
     explicit Identifier(std::string const& _text) : text(_text), hasRebindOperator(false) {}
-    virtual Term* createTerm(CompilationContext &context);
+    virtual Term* createTerm(Branch &branch);
     virtual std::string typeName() const { return "Identifier"; }
     virtual int numChildren() const { return 0; }
     virtual ASTNode* getChild(int index) const { return NULL; }
@@ -156,7 +156,7 @@ struct Statement : public ASTNode
 
     Statement() : expression(NULL) {}
     virtual ~Statement() { delete expression; }
-    virtual Term* createTerm(CompilationContext &context) = 0;
+    virtual Term* createTerm(Branch &branch) = 0;
     virtual std::string typeName() const { return "Statement"; }
     virtual int numChildren() const { return 1; }
     virtual ASTNode* getChild(int index) const
@@ -175,7 +175,7 @@ struct StatementList : public ASTNode
     void push(Statement* statement);
 
     virtual ~StatementList();
-    void createTerms(CompilationContext &context);
+    void createTerms(Branch &branch);
     virtual std::string typeName() const { return "StatementList"; }
     virtual int numChildren() const { return statements.size(); }
     virtual ASTNode* getChild(int index) const { return statements[index]; }
@@ -189,10 +189,8 @@ struct ExpressionStatement : public Statement
     std::string preEqualsWhitepace;
     std::string postEqualsWhitespace;
 
-    virtual Term* createTerm(CompilationContext &context);
+    virtual Term* createTerm(Branch &branch);
     virtual std::string typeName() const { return "ExpressionStatement"; }
-    virtual int numChildren() const { return 0; }
-    virtual ASTNode* getChild(int index) const { return NULL; }
 };
 
 // 'CommentStatement' includes comments and blank lines
@@ -202,7 +200,7 @@ struct CommentStatement : public Statement
 
     CommentStatement(std::string const& _text) : text(_text) {}
     virtual ~CommentStatement() { }
-    virtual Term* createTerm(CompilationContext &context);
+    virtual Term* createTerm(Branch &branch);
     virtual std::string typeName() const { return "CommentStatement"; }
     virtual int numChildren() const { return 0; }
     virtual ASTNode* getChild(int index) const { return NULL; }
@@ -237,7 +235,7 @@ struct FunctionDecl : public Statement
     FunctionDecl() : header(NULL), statements(NULL) {}
     ~FunctionDecl();
 
-    virtual Term* createTerm(CompilationContext &context);
+    virtual Term* createTerm(Branch &branch);
     virtual std::string typeName() const { return "FunctionDecl"; }
     virtual int numChildren() const { return 1; }
     virtual ASTNode* getChild(int index) const { return statements; }
@@ -263,7 +261,7 @@ struct TypeDecl : public Statement
     }
 
     // for Statement
-    virtual Term* createTerm(CompilationContext &context);
+    virtual Term* createTerm(Branch &branch);
     virtual std::string typeName() const { return "TypeDecl"; }
     virtual int numChildren() const { return 0; }
     virtual ASTNode* getChild(int index) const { return NULL; }
@@ -279,7 +277,7 @@ struct IfStatement : public Statement
     ~IfStatement();
 
     // for Statement
-    virtual Term* createTerm(CompilationContext &context);
+    virtual Term* createTerm(Branch &branch);
     virtual std::string typeName() const { return "IfStatement"; }
     virtual int numChildren() const { return 0; }
     virtual ASTNode* getChild(int index) const { return NULL; }
@@ -294,7 +292,7 @@ struct StatefulValueDeclaration : public Statement
     StatefulValueDeclaration() : initialValue(NULL) {}
 
     // for Statement
-    virtual Term* createTerm(CompilationContext &context);
+    virtual Term* createTerm(Branch &branch);
     virtual std::string typeName() const { return "StatefulValueDeclaration"; }
     virtual int numChildren() const { return 1; }
     virtual ASTNode* getChild(int index) const { return initialValue; }
