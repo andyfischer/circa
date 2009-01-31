@@ -82,6 +82,9 @@ struct Term
     void pushError(std::string const& message);
     std::string getErrorMessage() const;
 
+    bool isStateful() const;
+    void setIsStateful(bool value);
+
     // Convenience accessors
     int& asInt();
     float& asFloat();

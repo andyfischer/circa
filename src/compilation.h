@@ -11,6 +11,7 @@ namespace ast {
     class LiteralString;
     class LiteralFloat;
     class LiteralInteger;
+    class StatefulValueDeclaration;
 }
 
 struct CompilationContext
@@ -67,6 +68,8 @@ Term* create_arrow_concatenated_call(CompilationContext &context, ast::Infix& as
 Term* create_feedback_call(CompilationContext &context, ast::Infix& ast);
 Term* create_infix_call(CompilationContext &context, ast::Infix& ast);
 Term* create_function_call(CompilationContext &context, ast::FunctionCall& ast);
+Term* create_stateful_value_declaration(CompilationContext &context,
+        ast::StatefulValueDeclaration& ast);
 
 } // namespace circa
 

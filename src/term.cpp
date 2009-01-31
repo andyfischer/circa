@@ -77,6 +77,13 @@ bool Term::hasProperty(std::string const& name) const
 
 Term* Term::addProperty(std::string const& name, Term* type)
 {
+    if (hasProperty(name)) {
+        if (property(name)->type != type)
+            throw std::runtime_error("Property "+name+" exists with different type");
+
+        return property(name);
+    }
+
     return properties.addSlot(name, type);
 }
 
@@ -98,8 +105,7 @@ void Term::clearError()
 
 void Term::pushError(std::string const& message)
 {
-    if (!hasProperty("error"))
-        addProperty("error", STRING_TYPE);
+    addProperty("error", STRING_TYPE);
     as_string(property("error")) = message;
 }
 
@@ -109,6 +115,20 @@ std::string Term::getErrorMessage() const
         return as_string(property("error"));
     else
         return "";
+}
+
+bool Term::isStateful() const
+{
+    if (hasProperty("stateful"))
+        return as_bool(property("stateful"));
+    else
+        return false;
+}
+
+void Term::setIsStateful(bool value)
+{
+    addProperty("stateful", BOOL_TYPE);
+    as_bool(property("stateful")) = value;
 }
 
 int& Term::asInt()
