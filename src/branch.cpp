@@ -226,15 +226,15 @@ bool migrate_term(Term* source, Term* dest)
         migrate_branch(get_subroutine_branch(source),get_subroutine_branch(dest));
         return true;
     }
-    
+
     // Value migration
     if (is_value(dest)) {
-        // Don't migrate state
-        if (dest->isStateful()) {
-            return false;
+
+        // Don't overwrite value for state. But do migrate this term object
+        if (!dest->isStateful()) {
+            assign_value(source, dest);
         }
 
-        assign_value(source, dest);
         return true;
     }
 
@@ -243,8 +243,6 @@ bool migrate_term(Term* source, Term* dest)
 
 void migrate_branch(Branch& replacement, Branch& target)
 {
-    // This function is a work in progress
-
     // The goal:
     //
     // Modify 'target' so that it is roughly equivalent to 'replacement',
@@ -277,14 +275,16 @@ void migrate_branch(Branch& replacement, Branch& target)
         Term* originalTerm = it->second;
 
         // Skip if name isn't in replacement
-        if (!target.names.contains(name))
+        if (!target.names.contains(name)) {
             continue;
+        }
 
         Term* targetTerm = target[name];
 
         // Skip if type doesn't match
-        if (originalTerm->type != targetTerm->type)
+        if (originalTerm->type != targetTerm->type) {
             continue;
+        }
 
         bool migrated = migrate_term(targetTerm, originalTerm);
 

@@ -319,6 +319,8 @@ Term* create_stateful_value_declaration(CompilationContext &context,
     if (initialValue != NULL)
         assign_value(initialValue, value);
 
+    context.topBranch().bindName(value, ast.name);
+
     return value;
 }
 
