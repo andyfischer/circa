@@ -45,4 +45,16 @@ void Dictionary::clear()
     _dict.clear();
 }
 
+void Dictionary::import(Dictionary const& dest)
+{
+    RefDictionary::const_iterator it;
+    for (it = dest._dict.begin(); it != dest._dict.end(); ++it) {
+        std::string const& name = it->first;
+        Term* val = it->second;
+
+        addSlot(name, val->type);
+        assign_value(val, get(name));
+    }
+}
+
 } // namespace circa

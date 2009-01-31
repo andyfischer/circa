@@ -167,12 +167,19 @@ void test_dictionary()
     test_assert(as_int(dict["a"]) == 4);
     test_assert(as_int(dict["b"]) == 6);
 
-    //dict.clear(); <-- this causes us to crash later :(
-    /*
+    dict.clear();
 
     test_assert(!dict.contains("a"));
     test_assert(!dict.contains("b"));
-    */
+
+    // duplication
+    dict.addSlot("a", INT_TYPE);
+    as_int(dict["a"]) = 55;
+    Dictionary dup;
+    dup.import(dict);
+    test_assert(dup.contains("a"));
+    test_assert(dup["a"] != dict["a"]);
+    test_assert(as_int(dup["a"]) == 55);
 }
 
 void register_tests()

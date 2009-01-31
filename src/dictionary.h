@@ -30,6 +30,7 @@ public:
     Term* addSlot(std::string const& name, Term* type);
     void remove(std::string const& name);
     void clear();
+    void import(Dictionary const& dest);
 };
 
 } // namespace circa
