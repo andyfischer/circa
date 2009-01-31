@@ -76,19 +76,19 @@ FunctionCall::createTerm(CompilationContext &context)
 Term*
 LiteralString::createTerm(CompilationContext &context)
 {
-    return create_literal_string(context, *this);
+    return create_literal_string(context.topBranch(), *this);
 }
 
 Term*
 LiteralFloat::createTerm(CompilationContext &context)
 {
-    return create_literal_float(context, *this);
+    return create_literal_float(context.topBranch(), *this);
 }
 
 Term*
 LiteralInteger::createTerm(CompilationContext &context)
 {
-    return create_literal_integer(context, *this);
+    return create_literal_integer(context.topBranch(), *this);
 }
 
 Term*

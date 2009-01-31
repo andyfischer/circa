@@ -83,22 +83,22 @@ CompilationContext::popScope()
     scopeStack.pop_back();
 }
 
-Term* find_and_apply_function(CompilationContext &context,
+Term* find_and_apply_function(Branch& branch,
         std::string const& functionName,
         ReferenceList inputs)
 {
-    Term* function = context.findNamed(functionName);
+    Term* function = find_named(&branch, functionName);
 
     // If function is not found, produce an instance of unknown-function
     if (function == NULL) {
-        Term* result = apply_function(&context.topBranch(),
+        Term* result = apply_function(&branch,
                                       UNKNOWN_FUNCTION,
                                       inputs);
         as_string(result->state) = functionName;
         return result;
     }
 
-    return apply_function(&context.topBranch(), function, inputs);
+    return apply_function(&branch, function, inputs);
 }
 
 Term* create_comment(Branch& branch, std::string const& text)
@@ -110,31 +110,31 @@ Term* create_comment(Branch& branch, std::string const& text)
     return result;
 }
 
-Term* create_literal_string(CompilationContext &context, ast::LiteralString& ast)
+Term* create_literal_string(Branch& branch, ast::LiteralString& ast)
 {
-    Term* term = string_value(context.topBranch(), ast.text);
+    Term* term = string_value(branch, ast.text);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    term->syntaxHints.occursInsideAnExpression = is_inside_expression(context.topBranch());
+    term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     return term;
 }
 
-Term* create_literal_float(CompilationContext &context, ast::LiteralFloat& ast)
+Term* create_literal_float(Branch& branch, ast::LiteralFloat& ast)
 {
     float value = atof(ast.text.c_str());
-    Term* term = float_value(context.topBranch(), value);
+    Term* term = float_value(branch, value);
     float mutability = ast.hasQuestionMark ? 1.0 : 0.0;
     term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    term->syntaxHints.occursInsideAnExpression = is_inside_expression(context.topBranch());
+    term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     return term;
 }
 
-Term* create_literal_integer(CompilationContext &context, ast::LiteralInteger& ast)
+Term* create_literal_integer(Branch& branch, ast::LiteralInteger& ast)
 {
     int value = strtol(ast.text.c_str(), NULL, 0);
-    Term* term = int_value(context.topBranch(), value);
+    Term* term = int_value(branch, value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    term->syntaxHints.occursInsideAnExpression = is_inside_expression(context.topBranch());
+    term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     return term;
 }
 
@@ -226,7 +226,7 @@ Term* create_arrow_concatenated_call(CompilationContext &context, ast::Infix& as
         parser::syntax_error("Right side of -> must be an identifier");
     }
 
-    return find_and_apply_function(context, rightIdent->text, ReferenceList(leftTerm));
+    return find_and_apply_function(context.topBranch(), rightIdent->text, ReferenceList(leftTerm));
 }
 
 Term* create_feedback_call(CompilationContext &context, ast::Infix& ast)
@@ -300,7 +300,7 @@ Term* create_function_call(CompilationContext &context, ast::FunctionCall& ast)
         inputs.append(term);
     }
 
-    Term* result = find_and_apply_function(context, ast.functionName, inputs);
+    Term* result = find_and_apply_function(context.topBranch(), ast.functionName, inputs);
     assert(result != NULL);
 
     for (unsigned int i=0; i < ast.arguments.size(); i++) {

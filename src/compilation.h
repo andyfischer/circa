@@ -50,7 +50,7 @@ struct CompilationContext
     void popScope();
 };
 
-Term* find_and_apply_function(CompilationContext &context,
+Term* find_and_apply_function(Branch& branch,
         std::string const& functionName,
         ReferenceList inputs);
 
@@ -59,9 +59,9 @@ void pop_is_inside_expression(Branch& branch, bool value);
 void remove_compilation_attrs(Branch& branch);
 
 Term* create_comment(Branch& branch, std::string const& text);
-Term* create_literal_string(CompilationContext &context, ast::LiteralString& ast);
-Term* create_literal_float(CompilationContext &context, ast::LiteralFloat& ast);
-Term* create_literal_integer(CompilationContext &context, ast::LiteralInteger& ast);
+Term* create_literal_string(Branch& branch, ast::LiteralString& ast);
+Term* create_literal_float(Branch& branch, ast::LiteralFloat& ast);
+Term* create_literal_integer(Branch& branch, ast::LiteralInteger& ast);
 Term* create_dot_concatenated_call(CompilationContext &context, ast::Infix& ast);
 Term* create_arrow_concatenated_call(CompilationContext &context, ast::Infix& ast);
 Term* create_feedback_call(CompilationContext &context, ast::Infix& ast);
