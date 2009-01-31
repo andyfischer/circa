@@ -50,6 +50,11 @@ struct TermNamespace
         return "";
     }
 
+    void remove(std::string const& name)
+    {
+        _map.erase(name);
+    }
+
     iterator begin()
     {
         return _map.begin();

@@ -206,6 +206,15 @@ Term* float_value(Branch& branch, float f, std::string const& name)
     return term;
 }
 
+Term* bool_value(Branch& branch, bool b, std::string const& name)
+{
+    Term* term = create_value(&branch, BOOL_TYPE);
+    as_bool(term) = b;
+    if (name != "")
+        branch.bindName(term, name);
+    return term;
+}
+
 Term* create_alias(Branch& branch, Term* term)
 {
     return eval_function(branch, ALIAS_FUNC, ReferenceList(term));

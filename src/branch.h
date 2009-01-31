@@ -31,6 +31,8 @@ struct Branch
 
     void append(Term* term);
 
+    void removeTerm(std::string const& name);
+
     // Returns true if there is a term with the given name
     bool containsName(std::string const& name) const
     {
@@ -80,6 +82,7 @@ struct Branch
 };
 
 Branch& as_branch(Term* term);
+std::string get_name_for_attribute(std::string attribute);
 void duplicate_branch(Branch& source, Branch& dest);
 void migrate_branch(Branch& replacement, Branch& target);
 void evaluate_file(Branch& branch, std::string const& filename);

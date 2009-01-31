@@ -63,6 +63,18 @@ void Branch::append(Term* term)
     _terms.append(term);
 }
 
+void Branch::removeTerm(std::string const& name)
+{
+    if (!names.contains(name))
+        return;
+
+    Term* term = names[name];
+
+    names.remove(name);
+    _terms.remove(term);
+    // TODO: delete this term
+}
+
 void Branch::bindName(Term* term, std::string name)
 {
     names.bind(term, name);
