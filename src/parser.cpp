@@ -25,6 +25,8 @@ Term* compile_statement(Branch* branch, std::string const& input)
     Term* result = statementAst->createTerm(context);
     assert(result != NULL);
 
+    remove_compilation_attrs(*branch);
+
     delete statementAst;
 
     return result;

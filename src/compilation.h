@@ -48,16 +48,15 @@ struct CompilationContext
 
     void pushScope(Branch* branch, Term* owningTerm);
     void popScope();
-
-    void pushExpressionFrame(bool insideExpression);
-    void popExpressionFrame();
-
-    bool isInsideExpression() const;
 };
 
 Term* find_and_apply_function(CompilationContext &context,
         std::string const& functionName,
         ReferenceList inputs);
+
+bool push_is_inside_expression(Branch& branch, bool value);
+void pop_is_inside_expression(Branch& branch, bool value);
+void remove_compilation_attrs(Branch& branch);
 
 Term* create_comment(Branch& branch, std::string const& text);
 Term* create_literal_string(CompilationContext &context, ast::LiteralString& ast);

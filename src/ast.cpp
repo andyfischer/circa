@@ -117,11 +117,9 @@ ExpressionStatement::createTerm(CompilationContext &context)
         parser::syntax_error("Renaming an identifier is not currently supported");
     }
 
-    context.pushExpressionFrame(false);
-
+    bool prev = push_is_inside_expression(context.topBranch(), false);
     Term* term = this->expression->createTerm(context);
-
-    context.popExpressionFrame();
+    pop_is_inside_expression(context.topBranch(), prev);
     
     if (this->nameBinding != "")
         context.topBranch().bindName(term, this->nameBinding);
@@ -280,9 +278,9 @@ IfStatement::createTerm(CompilationContext &context)
     assert(this->condition != NULL);
     assert(this->positiveBranch != NULL);
 
-    context.pushExpressionFrame(true);
+    bool prev = push_is_inside_expression(context.topBranch(), false);
     Term* conditionTerm = this->condition->createTerm(context);
-    context.popExpressionFrame();
+    pop_is_inside_expression(context.topBranch(), prev);
 
     Term* ifStatementTerm = apply_function(&context.topBranch(),
                                            "if-statement",
