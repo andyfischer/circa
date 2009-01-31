@@ -318,9 +318,12 @@ void test_parse_if_block()
     test_assert(ifStatement != NULL);
 
     // these lines will need to be fixed when there is better whitespace preservation
-    //test_assert(ifStatement->condition->toString() == "x>2");
-    //test_assert(ifStatement->positiveBranch->toString() == "print(\"yes\")\n");
-    //test_assert(ifStatement->negativeBranch->toString() == "print(\"no\")\n");
+    test_equals(ast::print_ast(ifStatement->condition),
+            "(Infix Identifier LiteralInteger)");
+    test_equals(ast::print_ast(ifStatement->positiveBranch),
+            "(StatementList ExpressionStatement)");
+    test_equals(ast::print_ast(ifStatement->negativeBranch),
+            "(StatementList ExpressionStatement)");
 
     delete ifStatement;
 
@@ -328,8 +331,9 @@ void test_parse_if_block()
 
     ifStatement = parser::ifStatement(tokens);
 
-    //test_assert(ifStatement->condition->toString() == "false");
-    //test_assert(ifStatement->positiveBranch->toString() == "print(\"blah\")\n");
+    test_equals(ast::print_ast(ifStatement->condition), "Identifier");
+    test_equals(ast::print_ast(ifStatement->positiveBranch),
+            "(StatementList ExpressionStatement)");
     test_assert(ifStatement->negativeBranch == NULL);
 
     delete ifStatement;
@@ -344,6 +348,27 @@ void member_function_call_parse()
 
     test_assert(ast::print_ast(expression) == 
             "(Infix Identifier (FunctionCall LiteralInteger))");
+}
+
+void stateful_value_declaration_test()
+{
+    TokenStream tokens("state int x");
+    ast::StatefulValueDeclaration *svd = parser::statefulValueDeclaration(tokens);
+    test_assert(svd != NULL);
+    test_assert(svd->type == "int");
+    test_assert(svd->name == "x");
+    test_assert(svd->initialValue == NULL);
+    delete svd;
+
+    tokens.reset("state string blah = \"hey\"");
+    svd = parser::statefulValueDeclaration(tokens);
+    test_assert(svd != NULL);
+    test_assert(svd->type == "string");
+    test_assert(svd->name == "blah");
+    test_assert(svd->initialValue != NULL);
+    test_equals(ast::print_ast(svd->initialValue), "LiteralString");
+    test_equals(ast::print_ast(svd), "(StatefulValueDeclaration LiteralString)");
+    delete svd;
 }
 
 void register_tests()
@@ -367,6 +392,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_type_decl_full_trip);
     REGISTER_TEST_CASE(parser_tests::test_parse_if_block);
     REGISTER_TEST_CASE(parser_tests::member_function_call_parse);
+    REGISTER_TEST_CASE(parser_tests::stateful_value_declaration_test);
 }
 
 } // namespace parser_tests

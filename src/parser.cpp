@@ -471,8 +471,31 @@ ast::IfStatement* ifStatement(TokenStream& tokens)
 
 ast::StatefulValueDeclaration* statefulValueDeclaration(TokenStream& tokens)
 {
-    // TODO
-    return NULL;
+    tokens.consume(tokenizer::STATE);
+
+    possibleWhitespace(tokens);
+
+    std::string type = tokens.consume(tokenizer::IDENTIFIER);
+    possibleWhitespace(tokens);
+    std::string name = tokens.consume(tokenizer::IDENTIFIER);
+
+    possibleWhitespace(tokens);
+
+    ast::Expression *initialValue = NULL;
+
+    if (tokens.nextIs(tokenizer::EQUALS)) {
+        tokens.consume(tokenizer::EQUALS);
+        possibleWhitespace(tokens);
+        initialValue = infixExpression(tokens);
+    }
+
+    possibleWhitespaceNewline(tokens);
+
+    ast::StatefulValueDeclaration *result = new ast::StatefulValueDeclaration();
+    result->type = type;
+    result->name = name;
+    result->initialValue = initialValue;
+    return result;
 }
 
 std::string possibleWhitespace(TokenStream& tokens)
