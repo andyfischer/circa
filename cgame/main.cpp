@@ -155,8 +155,8 @@ int main( int argc, char* args[] )
     std::cout << "redraw:" << std::endl;
     circa::print_raw_branch(redraw, std::cout);
 
-    circa::Float mouse_x(redraw, "mouse_x");
-    circa::Float mouse_y(redraw, "mouse_y");
+    circa::Float mouse_x(script_main, "mouse_x");
+    circa::Float mouse_y(script_main, "mouse_y");
     circa::Int rect_size(redraw, "rect_size");
 
     // Main loop
