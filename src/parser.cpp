@@ -5,6 +5,7 @@
 #include "ast.h"
 #include "branch.h"
 #include "compilation.h"
+#include "function.h"
 #include "parser.h"
 #include "pointer_visitor.h"
 #include "runtime.h"
@@ -144,7 +145,7 @@ ast::ExpressionStatement* expressionStatement(TokenStream& tokens)
     // check for return statement
     else if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.next().text == "return") {
         tokens.consume(tokenizer::IDENTIFIER);
-        statement->nameBinding = "#output";
+        statement->nameBinding = OUTPUT_PLACEHOLDER_NAME;
         statement->preEqualsWhitepace = "";
         statement->postEqualsWhitespace = possibleWhitespace(tokens);
     }
