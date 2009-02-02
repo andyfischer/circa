@@ -331,6 +331,8 @@ void evaluate_file(Branch& branch, std::string const& filename)
 
     delete statementList;
 
+    remove_compilation_attrs(branch);
+
     string_value(branch, filename, get_name_for_attribute("source-file"));
 }
 
