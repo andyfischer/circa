@@ -22,6 +22,8 @@ struct List
     // Copy constructor
     List(List const& copy);
 
+    List& operator=(List const& b);
+
     int count() const { return items.count(); }
     Term* get(int index) const { return items.get(index); }
     Term* operator[] (int index) const { return this->get(index); }
