@@ -293,9 +293,11 @@ IfStatement::createTerm(Branch &branch)
     joiningTermsBranch.outerScope = &branch;
 
     this->positiveBranch->createTerms(posBranch);
+    remove_compilation_attrs(posBranch);
 
     if (this->negativeBranch != NULL) {
         this->negativeBranch->createTerms(negBranch);
+        remove_compilation_attrs(negBranch);
     }
 
     // Create joining terms

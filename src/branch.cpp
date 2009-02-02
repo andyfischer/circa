@@ -75,6 +75,18 @@ void Branch::removeTerm(std::string const& name)
     // TODO: delete this term
 }
 
+Term* Branch::findFirstBinding(std::string const& name) const
+{
+    for (unsigned int i = 0; i < _terms.count(); i++) {
+        if (_terms[i] == NULL)
+            continue;
+        if (_terms[i]->name == name)
+            return _terms[i];
+    }
+
+    return NULL;
+}
+
 void Branch::bindName(Term* term, std::string name)
 {
     names.bind(term, name);

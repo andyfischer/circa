@@ -20,7 +20,7 @@ public:
     }
     Int(Branch &branch, std::string const& name="") {
         if (name != "" && branch.containsName(name)) {
-            _term = branch[name];
+            _term = branch.findFirstBinding(name);
 
             assert(_term->type == INT_TYPE);
 
@@ -60,7 +60,7 @@ public:
     }
     Float(Branch &branch, std::string const& name="") {
         if (name != "" && branch.containsName(name)) {
-            _term = branch[name];
+            _term = branch.findFirstBinding(name);
 
             assert(_term->type == FLOAT_TYPE);
 
@@ -78,7 +78,7 @@ public:
         if (_owned)
             delete _term;
     }
-    Float& operator=(int value)
+    Float& operator=(float value)
     {
         as_float(_term) = value;
         return *this;
@@ -88,6 +88,47 @@ public:
         return as_float(_term);
     }
 };
-}
+
+class Bool {
+private:
+    Term* _term;
+    bool _owned;
+public:
+    Bool() {
+        _term = create_value(NULL, BOOL_TYPE);
+        _owned = true;
+    }
+    Bool(Branch &branch, std::string const& name="") {
+        if (name != "" && branch.containsName(name)) {
+            _term = branch.findFirstBinding(name);
+
+            assert(_term->type == BOOL_TYPE);
+
+            _owned = false;
+        } else {
+            _term = create_value(&branch, BOOL_TYPE, name);
+            _owned = false;
+        }
+    }   
+    Bool(Term* term) {
+        _term = term;
+        _owned = false;
+    }
+    ~Bool() {
+        if (_owned)
+            delete _term;
+    }
+    Bool& operator=(bool value)
+    {
+        as_bool(_term) = value;
+        return *this;
+    }
+    operator bool() const
+    {
+        return as_bool(_term);
+    }
+};
+
+} // namespace circa
 
 #endif
