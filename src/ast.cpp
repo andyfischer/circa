@@ -202,7 +202,12 @@ FunctionDecl::createTerm(Branch &branch)
         result.inputTypes.append(term);
 
         Function::InputProperties inputProps;
-        inputProps.name = arg.name;
+
+        std::string inputName = arg.name;
+        if (inputName == "")
+            inputName = get_placeholder_name_for_index(inputIndex);
+
+        inputProps.name = inputName;
         result.inputProperties.push_back(inputProps);
     }
 
@@ -224,13 +229,9 @@ FunctionDecl::createTerm(Branch &branch)
          inputIndex < this->header->arguments.size();
          inputIndex++)
     {
-        std::string name = this->header->arguments[inputIndex].name;
+        std::string name = result.inputProperties[inputIndex].name;
 
-        if (name == "")
-            name = get_placeholder_name_for_index(inputIndex);
-
-        /*Term* placeholder =*/ create_value(&result.subroutineBranch, result.inputTypes[inputIndex], name);
-
+        create_value(&result.subroutineBranch, result.inputTypes[inputIndex], name);
     }
 
     result.subroutineBranch.outerScope = &branch;
