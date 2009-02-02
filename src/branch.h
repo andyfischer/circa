@@ -45,6 +45,10 @@ struct Branch
         return names[name];
     }
 
+    // Find the first term with the given name binding.
+    // This is kind of confusing. Might be good to revist this system.
+    Term* findFirstBinding(std::string const& name) const;
+
     // Convenience syntax for getNamed
     Term* operator[](std::string const& name) const { return getNamed(name); }
 

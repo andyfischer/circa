@@ -144,20 +144,20 @@ int main( int argc, char* args[] )
         return 1;
     }
 
-
     //Set the window caption
     SDL_WM_SetCaption( "Hello World", NULL );
 
-    //Load the images
-
-    // Make a call to redraw()
+    // Access the redraw() function
     circa::Branch &redraw = circa::get_subroutine_branch(script_main["redraw"]);
-    std::cout << "redraw:" << std::endl;
     circa::print_raw_branch(redraw, std::cout);
 
     circa::Float mouse_x(script_main, "mouse_x");
     circa::Float mouse_y(script_main, "mouse_y");
     circa::Int rect_size(redraw, "rect_size");
+    circa::Bool up_pressed(script_main, "up_pressed");
+    circa::Bool down_pressed(script_main, "down_pressed");
+    circa::Bool left_pressed(script_main, "left_pressed");
+    circa::Bool right_pressed(script_main, "right_pressed");
 
     // Main loop
     while (true) {
@@ -171,8 +171,29 @@ int main( int argc, char* args[] )
             mouse_x = event.motion.x;
             mouse_y = event.motion.y;
         } else if (event.type == SDL_KEYDOWN) {
-            if (event.key.keysym.sym == SDLK_5) {
+            switch(event.key.keysym.sym) {
+            case SDLK_5:
                 circa::reload_branch_from_file(script_main);
+                break;
+            case SDLK_UP:
+                up_pressed = true; break;
+            case SDLK_DOWN:
+                down_pressed = true; break;
+            case SDLK_LEFT:
+                left_pressed = true; break;
+            case SDLK_RIGHT:
+                right_pressed = true; break;
+            }
+        } else if (event.type == SDL_KEYUP) {
+            switch(event.key.keysym.sym) {
+            case SDLK_UP:
+                up_pressed = false; break;
+            case SDLK_DOWN:
+                down_pressed = false; break;
+            case SDLK_LEFT:
+                left_pressed = false; break;
+            case SDLK_RIGHT:
+                right_pressed = false; break;
             }
         }
 
