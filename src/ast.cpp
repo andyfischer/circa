@@ -243,6 +243,8 @@ FunctionDecl::createTerm(Branch &branch)
         statement->createTerm(result.subroutineBranch);
     }
 
+    remove_compilation_attrs(result.subroutineBranch);
+
     return resultTerm;
 }
 
