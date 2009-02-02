@@ -2,7 +2,7 @@
 
 #include "ast.h"
 #include "branch.h"
-#include "cpp_interface.h"
+#include "cpp_importing.h"
 #include "values.h"
 
 namespace circa {

@@ -1,7 +1,7 @@
 // Copyright 2008 Andrew Fischer
 
 #include "ast.h"
-#include "cpp_interface.h"
+#include "cpp_importing.h"
 #include "parser.h"
 #include "tokenizer.h"
 #include "token_stream.h"

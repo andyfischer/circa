@@ -9,7 +9,7 @@
 #include "branch.h"
 #include "builtins.h"
 #include "builtin_types.h"
-#include "cpp_interface.h"
+#include "cpp_importing.h"
 #include "function.h"
 #include "importing.h"
 #include "list.h"
@@ -156,9 +156,9 @@ void bootstrap_kernel()
     FUNCTION_TYPE->type = TYPE_TYPE;
     FUNCTION_TYPE->value = alloc_from_type(TYPE_TYPE);
     as_type(FUNCTION_TYPE).name = "Function";
-    as_type(FUNCTION_TYPE).alloc = cpp_interface::templated_alloc<Function>;
+    as_type(FUNCTION_TYPE).alloc = cpp_importing::templated_alloc<Function>;
     as_type(FUNCTION_TYPE).duplicate = Function::duplicate;
-    as_type(FUNCTION_TYPE).dealloc = cpp_interface::templated_dealloc<Function>;
+    as_type(FUNCTION_TYPE).dealloc = cpp_importing::templated_dealloc<Function>;
     as_type(FUNCTION_TYPE).remapPointers = Function::remapPointers;
     as_type(FUNCTION_TYPE).visitPointers = Function::visitPointers;
     KERNEL->bindName(FUNCTION_TYPE, "Function");
