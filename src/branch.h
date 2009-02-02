@@ -24,6 +24,8 @@ struct Branch
     Branch() : outerScope(NULL) {}
     ~Branch();
 
+    Branch& operator=(Branch const& b);
+
     int numTerms() const { return _terms.count(); }
 
     Term* get(int index) const { return _terms[index]; }

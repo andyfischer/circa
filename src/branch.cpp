@@ -55,6 +55,18 @@ Branch::~Branch()
     }
 }
 
+Branch& Branch::operator=(Branch const& b)
+{
+    // Const hack because not everything is const-correct
+    Branch& b_unconst = const_cast<Branch&>(b);
+
+    clear();
+
+    duplicate_branch(b_unconst, *this);
+
+    return *this;
+}
+
 void Branch::append(Term* term)
 {
     assert_good_pointer(term);
