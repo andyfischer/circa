@@ -3,14 +3,14 @@
 #include "common_headers.h"
 
 #include "testing.h"
-#include "cpp_interface.h"
+#include "cpp_importing.h"
 #include "branch.h"
 #include "builtins.h"
 #include "parser.h"
 #include "values.h"
 
 namespace circa {
-namespace cpp_interface_tests {
+namespace cpp_importing_tests {
 
 class Type1 {
 public:
@@ -55,9 +55,9 @@ void default_function() {
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(cpp_interface_tests::default_function);
+    REGISTER_TEST_CASE(cpp_importing_tests::default_function);
 }
 
-} // namespace cpp_interface_tests
+} // namespace cpp_importing_tests
 
 } // namespace circa

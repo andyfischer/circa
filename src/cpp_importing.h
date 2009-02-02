@@ -9,7 +9,7 @@
 #include "type.h"
 
 namespace circa {
-namespace cpp_interface {
+namespace cpp_importing {
 
 template <class T>
 void* templated_alloc(Term* typeTerm)
@@ -53,7 +53,7 @@ std::string templated_toString(Term* term)
     return reinterpret_cast<T*>(term->value)->toString();
 }
 
-} // namespace cpp_interface
+} // namespace cpp_importing
 
 // Public functions
 
@@ -62,10 +62,10 @@ Term* import_type(Branch& branch, std::string name="")
 {
     Term* term = quick_create_type(branch, name);
     Type& type = as_type(term);
-    type.alloc = cpp_interface::templated_alloc<T>;
-    type.dealloc = cpp_interface::templated_dealloc<T>;
-    type.duplicate = cpp_interface::templated_duplicate<T>;
-    type.assign = cpp_interface::templated_assign<T>;
+    type.alloc = cpp_importing::templated_alloc<T>;
+    type.dealloc = cpp_importing::templated_dealloc<T>;
+    type.duplicate = cpp_importing::templated_duplicate<T>;
+    type.assign = cpp_importing::templated_assign<T>;
     type.cppTypeInfo = &typeid(T);
     return term;
 }
@@ -73,7 +73,7 @@ Term* import_type(Branch& branch, std::string name="")
 template <class T>
 void register_cpp_toString(Term* type)
 {
-    as_type(type).toString = cpp_interface::templated_toString<T>;
+    as_type(type).toString = cpp_importing::templated_toString<T>;
 }
 
 template <class T>

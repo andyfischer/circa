@@ -4,7 +4,7 @@
 
 #include "builtins.h"
 #include "builtin_types.h"
-#include "cpp_interface.h"
+#include "cpp_importing.h"
 #include "pointer_iterator.h"
 #include "runtime.h"
 #include "set.h"
@@ -255,24 +255,24 @@ Set::to_string(Term* caller)
 void initialize_builtin_types(Branch& kernel)
 {
     STRING_TYPE = import_type<std::string>(kernel, "string");
-    as_type(STRING_TYPE).equals = cpp_interface::templated_equals<std::string>;
+    as_type(STRING_TYPE).equals = cpp_importing::templated_equals<std::string>;
     as_type(STRING_TYPE).toString = primitives::string_t::to_string;
     as_type(STRING_TYPE).toSourceString = primitives::string_t::to_source_string;
 
     INT_TYPE = import_type<int>(kernel, "int");
-    as_type(INT_TYPE).equals = cpp_interface::templated_equals<int>;
-    as_type(INT_TYPE).lessThan = cpp_interface::templated_lessThan<int>;
+    as_type(INT_TYPE).equals = cpp_importing::templated_equals<int>;
+    as_type(INT_TYPE).lessThan = cpp_importing::templated_lessThan<int>;
     as_type(INT_TYPE).toString = primitives::int_t::to_string;
     as_type(INT_TYPE).toSourceString = primitives::int_t::to_string;
 
     FLOAT_TYPE = import_type<float>(kernel, "float");
-    as_type(FLOAT_TYPE).equals = cpp_interface::templated_equals<float>;
-    as_type(FLOAT_TYPE).lessThan = cpp_interface::templated_lessThan<float>;
+    as_type(FLOAT_TYPE).equals = cpp_importing::templated_equals<float>;
+    as_type(FLOAT_TYPE).lessThan = cpp_importing::templated_lessThan<float>;
     as_type(FLOAT_TYPE).toString = primitives::float_t::to_string;
     as_type(FLOAT_TYPE).toSourceString = primitives::float_t::to_source_string;
 
     BOOL_TYPE = import_type<bool>(kernel, "bool");
-    as_type(BOOL_TYPE).equals = cpp_interface::templated_equals<bool>;
+    as_type(BOOL_TYPE).equals = cpp_importing::templated_equals<bool>;
     as_type(BOOL_TYPE).toString = primitives::bool_t::to_string;
     as_type(BOOL_TYPE).toSourceString = primitives::bool_t::to_string;
 

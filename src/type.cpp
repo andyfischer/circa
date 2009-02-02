@@ -4,7 +4,7 @@
 
 #include "branch.h"
 #include "builtins.h"
-#include "cpp_interface.h"
+#include "cpp_importing.h"
 #include "function.h"
 #include "importing.h"
 #include "list.h"
@@ -237,9 +237,9 @@ void initialize_type_type(Term* typeType)
 {
     typeType->value = new Type();
     as_type(typeType).name = "Type";
-    as_type(typeType).alloc = cpp_interface::templated_alloc<Type>;
-    as_type(typeType).dealloc = cpp_interface::templated_dealloc<Type>;
-    as_type(typeType).duplicate = cpp_interface::templated_duplicate<Type>;
+    as_type(typeType).alloc = cpp_importing::templated_alloc<Type>;
+    as_type(typeType).dealloc = cpp_importing::templated_dealloc<Type>;
+    as_type(typeType).duplicate = cpp_importing::templated_duplicate<Type>;
     as_type(typeType).toString = Type::to_string;
 }
 
