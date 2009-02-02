@@ -23,6 +23,33 @@ List::List(List const& copy)
     }
 }
 
+List& List::operator=(List const& b)
+{
+    // If all our types match, then don't replace terms.
+    bool typesMatch = true;
+    for (int i=0; i < b.count(); i++) {
+        if (get(i)->type != b[i]->type) {
+            typesMatch = false;
+            break;
+        }
+    }
+
+    if (typesMatch) {
+        // Copy w/o creating new terms
+        for (int i=0; i < b.count(); i++) {
+            assign_value(b[i], get(i));
+        }
+    } else {
+        clear();
+        for (int i=0; i < b.count(); i++) {
+            Term* term = appendSlot(b[i]->type);
+            assign_value(b[i], term);
+        }
+    }
+
+    return *this;
+}
+
 Term*
 List::append(Term* term)
 {
