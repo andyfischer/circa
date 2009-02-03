@@ -21,7 +21,7 @@ void test_duplicate()
     void* a_addr = a->value;
     //void* b_addr = b->value;
 
-    duplicate_value(a, b);
+    copy_value(a, b);
 
     test_assert(as_int(b) == 2);
     test_assert(b->value != a_addr);

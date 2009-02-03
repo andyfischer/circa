@@ -260,7 +260,7 @@ void set_inputs(Term* term, ReferenceList inputs)
 Term* create_duplicate(Branch* branch, Term* source)
 {
     Term* term = create_term(branch, source->function, source->inputs);
-    duplicate_value(source, term);
+    copy_value(source, term);
 
     term->properties.import(source->properties);
     return term;

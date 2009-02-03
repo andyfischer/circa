@@ -22,7 +22,7 @@ namespace map_function {
                 return;
             }
 
-            duplicate_value(value, caller);
+            copy_value(value, caller);
         }
     }
 
