@@ -24,13 +24,6 @@ void templated_dealloc(void* data)
 }
 
 template <class T>
-void templated_duplicate(Term* source, Term* dest)
-{
-    std::cout << "still using templated_duplicate: " << as_type(source->type).name << std::endl;
-    dest->value = new T(*(reinterpret_cast<T*>(source->value)));
-}
-
-template <class T>
 void templated_assign(Term* source, Term* dest)
 {
     *reinterpret_cast<T*>(dest->value) = *reinterpret_cast<T*>(source->value);
@@ -65,7 +58,6 @@ Term* import_type(Branch& branch, std::string name="")
     Type& type = as_type(term);
     type.alloc = cpp_importing::templated_alloc<T>;
     type.dealloc = cpp_importing::templated_dealloc<T>;
-    type.duplicate = cpp_importing::templated_duplicate<T>;
     type.copy = cpp_importing::templated_assign<T>;
     type.cppTypeInfo = &typeid(T);
     return term;
