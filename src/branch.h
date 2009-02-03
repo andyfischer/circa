@@ -82,6 +82,7 @@ struct Branch
     Branch& startBranch(std::string const& name);
 
     // Hosted functions
+    static void copy(Term* source, Term* dest);
     static void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
     static void hosted_visit_pointers(Term* caller, PointerVisitor& visitor);
     static PointerIterator* start_pointer_iterator(Term* term);
