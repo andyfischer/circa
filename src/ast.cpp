@@ -111,9 +111,13 @@ Identifier::createTerm(Branch &branch)
 Term*
 ExpressionStatement::createTerm(Branch &branch)
 {
-    // Make sure our expression is not just an identifier.
+    // Special case: when we are just renaming an identifier.
+    // Create a call to "copy"
     if (expression->typeName() == "Identifier" && nameBinding != "") {
-        parser::syntax_error("Renaming an identifier is not currently supported");
+        Term* identifiedTerm = expression->createTerm(branch);
+        Term* result = apply_function(&branch, COPY_FUNC, ReferenceList(identifiedTerm));
+        branch.bindName(result, nameBinding);
+        return result;
     }
 
     bool prev = push_is_inside_expression(branch, false);
