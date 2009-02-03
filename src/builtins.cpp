@@ -126,11 +126,14 @@ void bootstrap_kernel()
     TYPE_TYPE->owningBranch = KERNEL;
     TYPE_TYPE->function = constTypeFunc;
     TYPE_TYPE->type = TYPE_TYPE;
-    initialize_type_type(TYPE_TYPE);
+    TYPE_TYPE->value = new Type();
+
+    as_type(TYPE_TYPE).alloc = cpp_importing::templated_alloc<Type>;
+    as_type(TYPE_TYPE).dealloc = cpp_importing::templated_dealloc<Type>;
     as_type(TYPE_TYPE).copy = Type::type_copy;
     as_type(TYPE_TYPE).remapPointers = Type::typeRemapPointers;
     as_type(TYPE_TYPE).visitPointers = Type::typeVisitPointers;
-        as_type(TYPE_TYPE).startPointerIterator = Type::typeStartPointerIterator;
+    as_type(TYPE_TYPE).startPointerIterator = Type::typeStartPointerIterator;
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Implant the Type type

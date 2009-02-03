@@ -149,8 +149,6 @@ Term* create_empty_type(Branch& branch, std::string name);
 
 void* alloc_from_type(Term* typeTerm);
 
-void initialize_type_type(Term* typeType);
-
 Type& create_compound_type(Branch& branch, std::string const& name);
 
 std::string to_string(Term* term);
