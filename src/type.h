@@ -66,7 +66,7 @@ struct Type
     ToStringFunc toSourceString;
     ToStringFunc getCppTypeName;
 
-    // Unimplemented. Stores our value function
+    // Stores our value function
     Term* valueFunction;
     
     // Fields, applies to compound types
@@ -124,6 +124,7 @@ struct Type
     static std::string to_string(Term *caller);
     static void name_accessor(Term* caller);
 
+    static void type_copy(Term* source, Term* dest);
     static void typeRemapPointers(Term *term, ReferenceMap const& map);
     static void typeVisitPointers(Term *term, PointerVisitor& visitor);
     static PointerIterator* typeStartPointerIterator(Term* term);

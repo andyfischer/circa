@@ -166,6 +166,11 @@ std::string Type::to_string(Term *caller)
     return std::string("<Type " + as_type(caller).name + ">");
 }
 
+void Type::type_copy(Term* source, Term* dest)
+{
+    as_type(dest) = as_type(source);
+}
+
 void Type::typeRemapPointers(Term *term, ReferenceMap const& map)
 {
     Type &type = as_type(term);

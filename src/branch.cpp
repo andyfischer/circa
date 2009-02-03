@@ -196,6 +196,12 @@ Branch& Branch::startBranch(std::string const& name)
     return as_branch(result);
 }
 
+void Branch::copy(Term* source, Term* dest)
+{
+    as_branch(dest).clear();
+    duplicate_branch(as_branch(source), as_branch(dest));
+}
+
 void
 Branch::hosted_remap_pointers(Term* caller, ReferenceMap const& map)
 {
