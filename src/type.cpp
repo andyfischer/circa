@@ -238,16 +238,6 @@ PointerIterator* Type::typeStartPointerIterator(Term* term)
     return new TypePointerIterator(&as_type(term));
 }
 
-void initialize_type_type(Term* typeType)
-{
-    typeType->value = new Type();
-    as_type(typeType).name = "Type";
-    as_type(typeType).alloc = cpp_importing::templated_alloc<Type>;
-    as_type(typeType).dealloc = cpp_importing::templated_dealloc<Type>;
-    as_type(typeType).duplicate = cpp_importing::templated_duplicate<Type>;
-    as_type(typeType).toString = Type::to_string;
-}
-
 std::string to_string(Term* term)
 {
     Type::ToStringFunc func = as_type(term->type).toString;
