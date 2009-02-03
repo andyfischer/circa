@@ -52,33 +52,6 @@ void recycle_value(Term* source, Term* dest)
     }
 }
 
-void duplicate_value(Term* source, Term* dest)
-{
-    if (as_type(source->type).copy != NULL) {
-        copy_value(source,dest);
-        return;
-    }
-
-    std::cout << "still using duplicate_value: " << as_type(source->type).name << std::endl;
-
-    if (source == dest)
-        throw std::runtime_error("in duplicate_value, can't have source == dest");
-
-    assert_type(source, dest->type);
-
-    Type::DuplicateFunc duplicate = as_type(source->type).duplicate;
-
-    if (duplicate == NULL)
-        throw std::runtime_error(std::string("type ") + as_type(source->type).name
-                + " has no duplicate function");
-
-    dealloc_value(dest);
-
-    duplicate(source, dest);
-
-    update_owner(dest);
-}
-
 void copy_value(Term* source, Term* dest)
 {
     assert_type(source, dest->type);

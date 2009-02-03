@@ -16,7 +16,7 @@ namespace list_get_element_function {
         }
 
         change_type(caller, list[index]->type);
-        duplicate_value(list[index], caller);
+        copy_value(list[index], caller);
     }
 
     void setup(Branch& kernel)

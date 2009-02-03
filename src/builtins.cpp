@@ -191,7 +191,7 @@ namespace var_function {
         Term* target = caller->input(0);
         Term* desired = caller->input(1);
 
-        duplicate_value(desired, target);
+        copy_value(desired, target);
     }
 }
 

@@ -9,11 +9,9 @@ namespace circa {
 
 void alloc_value(Term* term);
 
-// recycle_value will either call duplicate_value or steal_value, depending
+// recycle_value will either call copy_value or steal_value, depending
 // on heuristics
 void recycle_value(Term* source, Term* dest);
-
-void duplicate_value(Term* source, Term* dest);
 
 void copy_value(Term* source, Term* dest);
 

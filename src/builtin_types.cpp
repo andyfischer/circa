@@ -189,7 +189,7 @@ Set::add(Term* value)
         return;
 
     Term* duplicatedValue = create_value(NULL, value->type);
-    duplicate_value(value, duplicatedValue);
+    copy_value(value, duplicatedValue);
     members.push_back(duplicatedValue);
 }
 

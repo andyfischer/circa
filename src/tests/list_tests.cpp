@@ -44,7 +44,7 @@ void operations()
     Term* list1 = branch.eval("list1 = list('pie')");
     Term* list2 = branch.eval("list2 = list()");
 
-    duplicate_value(list1, list2);
+    copy_value(list1, list2);
 
     test_assert(list1->asList()[0]->asString() == "pie");
     test_assert(list2->asList()[0]->asString() == "pie");
