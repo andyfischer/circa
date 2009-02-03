@@ -72,15 +72,16 @@ Function& as_function(Term* term)
     return *((Function*) term->value);
 }
 
-void Function::duplicate(Term* sourceTerm, Term* destTerm)
+void Function::copy(Term* sourceTerm, Term* destTerm)
 {
     assert(destTerm->value == NULL);
     assert(is_function(sourceTerm));
     assert(is_function(destTerm));
-    destTerm->value = new Function();
 
     Function &source = as_function(sourceTerm);
     Function &dest = as_function(destTerm);
+
+    dest = Function();
 
     dest.inputTypes =      source.inputTypes;
     dest.inputProperties = source.inputProperties;
