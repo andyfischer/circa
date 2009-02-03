@@ -54,7 +54,6 @@ struct Type
     AllocFunc alloc;
     InitializeFunc init;
     DeallocFunc dealloc;
-    DuplicateFunc duplicate;
     CopyFunc copy;
     EqualsFunc equals;
     LessThanFunc lessThan;
@@ -89,7 +88,6 @@ struct Type
         alloc(NULL),
         init(NULL),
         dealloc(NULL),
-        duplicate(NULL),
         equals(NULL),
         lessThan(NULL),
         remapPointers(NULL),
