@@ -26,6 +26,7 @@ void templated_dealloc(void* data)
 template <class T>
 void templated_duplicate(Term* source, Term* dest)
 {
+    std::cout << "still using templated_duplicate: " << as_type(source->type).name << std::endl;
     dest->value = new T(*(reinterpret_cast<T*>(source->value)));
 }
 

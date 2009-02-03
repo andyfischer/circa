@@ -13,6 +13,7 @@ namespace create_compound_type_function {
         output.name = name;
         output.alloc = List::alloc;
         output.dealloc = List::dealloc;
+        output.copy = List::copy;
         output.startPointerIterator = List::start_pointer_iterator;
     }
 
