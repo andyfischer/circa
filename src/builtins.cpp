@@ -58,6 +58,7 @@ Term* MULT_FUNC = NULL;
 Term* ALIAS_FUNC = NULL;
 Term* COMMENT_FUNC = NULL;
 Term* INT_TO_FLOAT_FUNC = NULL;
+Term* COPY_FUNC = NULL;
 
 void empty_evaluate_function(Term*) { }
 void empty_alloc_function(Term*) { }
@@ -242,6 +243,7 @@ void initialize_builtin_functions(Branch* kernel)
 
     ADD_FUNC = kernel->getNamed("add");
     MULT_FUNC = kernel->getNamed("mult");
+    COPY_FUNC = kernel->getNamed("copy");
 
     assert(ADD_FUNC != NULL);
     assert(MULT_FUNC != NULL);
