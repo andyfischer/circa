@@ -117,6 +117,11 @@ void List::dealloc(void* data)
     delete (List*) data;
 }
 
+void List::copy(Term* source, Term* dest)
+{
+    as_list(dest) = as_list(source);
+}
+
 std::string List::to_string(Term* caller)
 {
     std::stringstream out;

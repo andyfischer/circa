@@ -40,6 +40,7 @@ struct List
 
     static void* alloc(Term* typeTerm);
     static void dealloc(void* data);
+    static void copy(Term* source, Term* dest);
     static std::string to_string(Term* caller);
     static PointerIterator* start_pointer_iterator(Term* term);
 };
