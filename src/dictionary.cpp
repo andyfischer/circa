@@ -53,7 +53,7 @@ void Dictionary::import(Dictionary const& dest)
         Term* val = it->second;
 
         addSlot(name, val->type);
-        assign_value(val, get(name));
+        copy_value(val, get(name));
     }
 }
 

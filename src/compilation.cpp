@@ -319,7 +319,7 @@ Term* create_stateful_value_declaration(Branch &branch,
     value->setIsStateful(true);
 
     if (initialValue != NULL)
-        assign_value(initialValue, value);
+        copy_value(initialValue, value);
 
     branch.bindName(value, ast.name);
 

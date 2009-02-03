@@ -43,13 +43,13 @@ List& List::operator=(List const& b)
     if (typesMatch) {
         // Copy w/o creating new terms
         for (int i=0; i < b.count(); i++) {
-            assign_value(b[i], get(i));
+            copy_value(b[i], get(i));
         }
     } else {
         clear();
         for (int i=0; i < b.count(); i++) {
             Term* term = appendSlot(b[i]->type);
-            assign_value(b[i], term);
+            copy_value(b[i], term);
         }
     }
 

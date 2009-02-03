@@ -274,7 +274,7 @@ bool migrate_term(Term* source, Term* dest)
 
         // Don't overwrite value for state. But do migrate this term object
         if (!dest->isStateful()) {
-            assign_value(source, dest);
+            copy_value(source, dest);
         }
 
         return true;
