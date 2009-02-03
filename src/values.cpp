@@ -59,6 +59,8 @@ void duplicate_value(Term* source, Term* dest)
         return;
     }
 
+    std::cout << "still using duplicate_value: " << as_type(source->type).name << std::endl;
+
     if (source == dest)
         throw std::runtime_error("in duplicate_value, can't have source == dest");
 
