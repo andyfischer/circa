@@ -127,7 +127,7 @@ void bootstrap_kernel()
     TYPE_TYPE->function = constTypeFunc;
     TYPE_TYPE->type = TYPE_TYPE;
     initialize_type_type(TYPE_TYPE);
-    as_type(TYPE_TYPE).assign = Type::type_copy;
+    as_type(TYPE_TYPE).copy = Type::type_copy;
     as_type(TYPE_TYPE).remapPointers = Type::typeRemapPointers;
     as_type(TYPE_TYPE).visitPointers = Type::typeVisitPointers;
         as_type(TYPE_TYPE).startPointerIterator = Type::typeStartPointerIterator;
@@ -195,7 +195,7 @@ namespace var_function {
 void initialize_constants()
 {
     BRANCH_TYPE = import_type<Branch>(*KERNEL, "Branch");
-    as_type(BRANCH_TYPE).assign = Branch::copy;
+    as_type(BRANCH_TYPE).copy = Branch::copy;
     as_type(BRANCH_TYPE).remapPointers = Branch::hosted_remap_pointers;
     as_type(BRANCH_TYPE).visitPointers = Branch::hosted_visit_pointers;
     as_type(BRANCH_TYPE).startPointerIterator = Branch::start_pointer_iterator;

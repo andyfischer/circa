@@ -54,8 +54,8 @@ void recycle_value(Term* source, Term* dest)
 
 void duplicate_value(Term* source, Term* dest)
 {
-    if (as_type(source->type).assign != NULL) {
-        assign_value(source,dest);
+    if (as_type(source->type).copy != NULL) {
+        copy_value(source,dest);
         return;
     }
 
@@ -77,18 +77,18 @@ void duplicate_value(Term* source, Term* dest)
     update_owner(dest);
 }
 
-void assign_value(Term* source, Term* dest)
+void copy_value(Term* source, Term* dest)
 {
     assert_type(source, dest->type);
 
-    Type::AssignFunc assign = as_type(source->type).assign;
+    Type::CopyFunc copy = as_type(source->type).copy;
 
-    if (assign == NULL)
+    if (copy == NULL)
         throw std::runtime_error(std::string("type ") + as_type(source->type).name
-                + " has no assign function");
+                + " has no copy function");
 
 
-    assign(source, dest);
+    copy(source, dest);
 }
 
 void steal_value(Term* source, Term* dest)
