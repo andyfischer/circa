@@ -226,31 +226,37 @@ std::string get_name_for_attribute(std::string attribute)
     return "#attr:" + attribute;
 }
 
-void duplicate_branch(Branch& source, Branch& dest)
+void duplicate_branch(ReferenceMap& newTermMap, Branch& source, Branch& dest)
 {
-    ReferenceMap newTermMap;
-
     // Duplicate every term
     for (int index=0; index < source.numTerms(); index++) {
         Term* source_term = source.get(index);
 
-        Term* dest_term = create_duplicate(&dest, source_term);
+        Term* dest_term = create_duplicate(&dest, source_term, false);
 
         newTermMap[source_term] = dest_term;
+
+        if (dest_term->state != NULL && dest_term->state->type == BRANCH_TYPE) {
+            duplicate_branch(newTermMap, as_branch(source_term->state),
+                    as_branch(dest_term->state));
+        }
+
+        // Copy names
+        if (source_term->name != "")
+            dest.bindName(dest_term, source_term->name);
     }
+}
+
+void duplicate_branch(Branch& source, Branch& dest)
+{
+    ReferenceMap newTermMap;
+
+    duplicate_branch(newTermMap, source, dest);
 
     // Remap terms
     for (int index=0; index < dest.numTerms(); index++) {
         Term* term = dest.get(index);
         remap_pointers(term, newTermMap);
-    }
-
-    // Copy names
-    TermNamespace::StringToTermMap::iterator it;
-    for (it = source.names.begin(); it != source.names.end(); ++it) {
-        std::string name = it->first;
-        Term* original_term = it->second;
-        dest.bindName(newTermMap.getRemapped(original_term), name);
     }
 }
 
