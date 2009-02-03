@@ -54,6 +54,11 @@ void recycle_value(Term* source, Term* dest)
 
 void duplicate_value(Term* source, Term* dest)
 {
+    if (as_type(source->type).assign != NULL) {
+        assign_value(source,dest);
+        return;
+    }
+
     if (source == dest)
         throw std::runtime_error("in duplicate_value, can't have source == dest");
 
