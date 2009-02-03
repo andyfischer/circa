@@ -9,15 +9,17 @@
 namespace circa {
 
 // This is a dumb thing that allows for some runtime type assertion.
+// Should be improved in the future. At the very least, if we're
+// going to be using type tags, then everyone should use them.
 const int LIST_TYPE_SIGNATURE = 0x91917575;
 
 struct List
 {
-    int signature;
+    int _signature;
     ReferenceList items;
 
     // Default constructor
-    List() : signature(LIST_TYPE_SIGNATURE) {}
+    List() : _signature(LIST_TYPE_SIGNATURE) {}
 
     // Copy constructor
     List(List const& copy);

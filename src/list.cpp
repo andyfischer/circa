@@ -15,7 +15,7 @@
 namespace circa {
 
 List::List(List const& copy)
-  : signature(LIST_TYPE_SIGNATURE)
+  : _signature(LIST_TYPE_SIGNATURE)
 {
     for (int i=0; i < copy.count(); i++) {
         Term* term = appendSlot(copy[i]->type);
@@ -27,10 +27,16 @@ List& List::operator=(List const& b)
 {
     // If all our types match, then don't replace terms.
     bool typesMatch = true;
-    for (int i=0; i < b.count(); i++) {
-        if (get(i)->type != b[i]->type) {
-            typesMatch = false;
-            break;
+
+    if (count() != b.count())
+        typesMatch = false;
+
+    if (typesMatch) {
+        for (int i=0; i < b.count(); i++) {
+            if (get(i)->type != b[i]->type) {
+                typesMatch = false;
+                break;
+            }
         }
     }
 
@@ -53,6 +59,7 @@ List& List::operator=(List const& b)
 Term*
 List::append(Term* term)
 {
+    assert(term != NULL);
     Term* newTerm = create_value(NULL, term->type);
     recycle_value(term, newTerm);
     this->items.append(newTerm);
@@ -127,7 +134,7 @@ std::string List::to_string(Term* caller)
 
 bool is_list(Term* term)
 {
-    return ((List*) term->value)->signature == LIST_TYPE_SIGNATURE;
+    return ((List*) term->value)->_signature == LIST_TYPE_SIGNATURE;
 }
 
 List& as_list(Term* term)
