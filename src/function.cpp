@@ -74,7 +74,6 @@ Function& as_function(Term* term)
 
 void Function::copy(Term* sourceTerm, Term* destTerm)
 {
-    assert(destTerm->value == NULL);
     assert(is_function(sourceTerm));
     assert(is_function(destTerm));
 
