@@ -41,14 +41,14 @@ void recycle_value(Term* source, Term* dest)
     // Usually don't steal. Later, as an optimization, we will sometimes steal.
     bool steal = false;
 
-    // Steal if this type has no duplicate function
-    if (as_type(source->type).duplicate == NULL)
+    // Steal if this type has no copy function
+    if (as_type(source->type).copy == NULL)
         steal = true;
 
     if (steal) {
         steal_value(source, dest);
     } else {
-        duplicate_value(source, dest);
+        copy_value(source, dest);
     }
 }
 
@@ -82,6 +82,9 @@ void duplicate_value(Term* source, Term* dest)
 void copy_value(Term* source, Term* dest)
 {
     assert_type(source, dest->type);
+
+    if (dest->value == NULL)
+        alloc_value(dest);
 
     Type::CopyFunc copy = as_type(source->type).copy;
 

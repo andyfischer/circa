@@ -144,6 +144,7 @@ Term* create_empty_type(Branch& branch, std::string name)
     type.alloc = type_private::empty_allocate;
     type.dealloc = type_private::empty_dealloc;
     type.duplicate = type_private::empty_duplicate_function;
+    type.copy = type_private::empty_duplicate_function;
     type.name = name;
     branch.bindName(term, name);
     return term;
