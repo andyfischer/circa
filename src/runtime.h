@@ -25,7 +25,10 @@ void delete_term(Term* term);
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, ReferenceList inputs);
 
-Term* create_duplicate(Branch* branch, Term* source);
+// Create a duplicate of the given term
+// If 'copyBranches' is false, don't copy branch state. It's assumed that the
+// caller will do this. This functionality is used by duplicate_branch
+Term* create_duplicate(Branch* branch, Term* source, bool copyBranches=true);
 
 // Check the function and inputs of 'user', returns whether they are actually
 // using 'usee'.

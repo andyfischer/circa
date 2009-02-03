@@ -257,12 +257,19 @@ void set_inputs(Term* term, ReferenceList inputs)
 #endif
 }
 
-Term* create_duplicate(Branch* branch, Term* source)
+Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
 {
     Term* term = create_term(branch, source->function, source->inputs);
     copy_value(source, term);
-
     term->properties.import(source->properties);
+
+    if (source->state != NULL) {
+        if (source->state != BRANCH_TYPE || copyBranches) {
+            copy_value(source->state, term->state);
+            term->state->properties.import(source->state->properties);
+        }
+    }
+        
     return term;
 }
 
