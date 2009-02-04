@@ -260,8 +260,10 @@ void set_inputs(Term* term, ReferenceList inputs)
 Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
 {
     Term* term = create_term(branch, source->function, source->inputs);
+
     copy_value(source, term);
     term->properties.import(source->properties);
+    term->syntaxHints = source->syntaxHints;
 
     if (source->state != NULL) {
         if (source->state != BRANCH_TYPE || copyBranches) {
@@ -410,10 +412,15 @@ void remap_pointers(Term* term, ReferenceMap const& map)
 
     if ((term->value != NULL)
             && term->type != NULL
-            && (as_type(term->type).remapPointers != NULL))
+            && (as_type(term->type).remapPointers != NULL)) {
+
         as_type(term->type).remapPointers(term, map);
+    }
 
     term->type = map.getRemapped(term->type);
+
+    if (term->state != NULL)
+        remap_pointers(term->state, map);
 }
 
 void visit_pointers(Term* term, PointerVisitor &visitor)

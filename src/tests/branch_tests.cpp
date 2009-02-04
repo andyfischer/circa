@@ -48,6 +48,32 @@ void test_duplicate()
     sanity_check_term(term2_duplicate);
 }
 
+void test_duplicate_nested()
+{
+    Branch branch;
+    branch.eval("a = 1.0");
+    Branch& inner = branch.eval("inner = branch()")->state->asBranch();
+    inner.outerScope = &branch;
+    inner.eval("i = 2.0");
+    inner.eval("j = add(a,i)");
+
+    Branch dupe;
+    duplicate_branch(branch, dupe);
+
+    Term* inner_i = dupe["inner"]->state->asBranch()["i"];
+    Term* inner_j = dupe["inner"]->state->asBranch()["j"];
+
+    test_assert(inner_i != NULL);
+    test_assert(inner_j != NULL);
+
+    test_assert(dupe["a"]->asFloat() == 1.0);
+    test_assert(inner_i->asFloat() == 2.0);
+    test_assert(inner_j->input(0) != branch["a"]);
+    test_assert(inner_j->input(0) != NULL);
+    test_assert(inner_j->input(0) == dupe["a"]);
+    test_assert(inner_j->input(1) == inner_i);
+}
+
 void find_name_in_outer_branch()
 {
     Branch branch;
@@ -160,6 +186,7 @@ void test_dont_migrate_state()
 void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
+    REGISTER_TEST_CASE(branch_tests::test_duplicate_nested);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
 #if TRACK_USERS
     REGISTER_TEST_CASE(branch_tests::cleanup_users_after_delete);
