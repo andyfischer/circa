@@ -20,6 +20,7 @@ Term* find_and_apply_function(Branch& branch,
 
 bool push_is_inside_expression(Branch& branch, bool value);
 void pop_is_inside_expression(Branch& branch, bool value);
+bool is_inside_expression(Branch& branch);
 void push_pending_rebind(Branch& branch, std::string const& name);
 std::string get_pending_rebind(Branch& branch);
 void remove_compilation_attrs(Branch& branch);

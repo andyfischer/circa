@@ -11,6 +11,7 @@
 #include "importing.h"
 #include "introspection.h"
 #include "list.h"
+#include "newparser.h"
 #include "parser.h"
 #include "runtime.h"
 #include "set.h"

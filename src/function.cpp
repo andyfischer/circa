@@ -37,6 +37,12 @@ Function::inputType(int index)
         return inputTypes[index];
 }
 
+void Function::appendInput(Term* type, std::string const& name)
+{
+    inputTypes.append(type);
+    getInputProperties(inputTypes.count()-1).name = name;
+}
+
 Function::InputProperties&
 Function::getInputProperties(unsigned int index)
 {
