@@ -21,6 +21,7 @@ void Type::makeCompoundType(std::string const& name)
     this->name = name;
     alloc = List::alloc;
     dealloc = List::dealloc;
+    copy = List::copy;
     startPointerIterator = List::start_pointer_iterator;
 }
 
