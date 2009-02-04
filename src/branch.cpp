@@ -226,7 +226,7 @@ std::string get_name_for_attribute(std::string attribute)
     return "#attr:" + attribute;
 }
 
-void duplicate_branch(ReferenceMap& newTermMap, Branch& source, Branch& dest)
+void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& dest)
 {
     // Duplicate every term
     for (int index=0; index < source.numTerms(); index++) {
@@ -237,7 +237,7 @@ void duplicate_branch(ReferenceMap& newTermMap, Branch& source, Branch& dest)
         newTermMap[source_term] = dest_term;
 
         if (dest_term->state != NULL && dest_term->state->type == BRANCH_TYPE) {
-            duplicate_branch(newTermMap, as_branch(source_term->state),
+            duplicate_branch_nested(newTermMap, as_branch(source_term->state),
                     as_branch(dest_term->state));
         }
 
@@ -251,9 +251,9 @@ void duplicate_branch(Branch& source, Branch& dest)
 {
     ReferenceMap newTermMap;
 
-    duplicate_branch(newTermMap, source, dest);
+    duplicate_branch_nested(newTermMap, source, dest);
 
-    // Remap terms
+    // Remap pointers
     for (int index=0; index < dest.numTerms(); index++) {
         Term* term = dest.get(index);
         remap_pointers(term, newTermMap);

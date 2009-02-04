@@ -92,6 +92,7 @@ struct Term
     bool& asBool();
     Term*& asRef();
     List& asList();
+    Branch& asBranch();
 
     // Accessors for compound types
     Term* field(int index);

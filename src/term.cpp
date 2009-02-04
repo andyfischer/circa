@@ -161,6 +161,11 @@ List& Term::asList()
     return as_list(this);
 }
 
+Branch& Term::asBranch()
+{
+    return as_branch(this);
+}
+
 Term* Term::field(int index)
 {
     return get_field(this, index);
