@@ -284,6 +284,17 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     Term* result = infix_expression(branch, tokens);
 
+    std::string pendingRebind = pop_pending_rebind(branch);
+
+    if (pendingRebind != "") {
+        if (name != "") {
+            throw std::runtime_error("term has both a name and a pending rebind: "
+                    + name + "," + pendingRebind);
+        }
+
+        name = pendingRebind;
+    }
+
     if (name != "") {
         branch.bindName(result, name);
     }

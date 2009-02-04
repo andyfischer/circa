@@ -127,10 +127,9 @@ ExpressionStatement::createTerm(Branch &branch)
     if (this->nameBinding != "")
         branch.bindName(term, this->nameBinding);
 
-    std::string pendingRebind = get_pending_rebind(branch);
+    std::string pendingRebind = pop_pending_rebind(branch);
     if (pendingRebind != "") {
         branch.bindName(term, pendingRebind);
-        branch.removeTerm(get_name_for_attribute("comp-pending-rebind"));
     }
 
     term->syntaxHints.precedingWhitespace = this->precedingWhitespace;

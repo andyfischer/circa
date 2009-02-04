@@ -56,14 +56,17 @@ void push_pending_rebind(Branch& branch, std::string const& name)
     string_value(branch, name, attrname);
 }
 
-std::string get_pending_rebind(Branch& branch)
+std::string pop_pending_rebind(Branch& branch)
 {
     std::string attrname = get_name_for_attribute("comp-pending-rebind");
 
-    if (branch.containsName(attrname))
-        return as_string(branch[attrname]);
-    else
+    if (branch.containsName(attrname)) {
+        std::string result = as_string(branch[attrname]);
+        branch.removeTerm(get_name_for_attribute("comp-pending-rebind"));
+        return result;
+    } else {
         return "";
+    }
 }
 
 void remove_compilation_attrs(Branch& branch)

@@ -101,6 +101,16 @@ void test_identifier()
     test_assert(branch[1]->input(1) == a);
 }
 
+void test_rebind()
+{
+    Branch branch;
+    newparser::compile(branch, newparser::statement, "a = 1.0");
+    newparser::compile(branch, newparser::statement, "add(@a,a)");
+
+    test_assert(branch.numTerms() == 2);
+    test_assert(branch["a"] == branch[1]);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(newparser_tests::test_comment);
@@ -111,6 +121,7 @@ void register_tests()
     REGISTER_TEST_CASE(newparser_tests::test_name_binding);
     REGISTER_TEST_CASE(newparser_tests::test_function_call);
     REGISTER_TEST_CASE(newparser_tests::test_identifier);
+    REGISTER_TEST_CASE(newparser_tests::test_rebind);
 }
 
 } // namespace newparser_tests
