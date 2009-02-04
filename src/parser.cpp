@@ -100,11 +100,11 @@ ast::Statement* statement(TokenStream& tokens)
     }
 
     // Check for keywords
-    else if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.next().text == "function") {
+    else if (tokens.nextIs(tokenizer::FUNCTION)) {
         result = functionDecl(tokens);
     }
 
-    else if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.next().text == "type") {
+    else if (tokens.nextIs(tokenizer::TYPE)) {
         result = typeDecl(tokens);
     }
 
@@ -336,15 +336,12 @@ ast::FunctionHeader* functionHeader(TokenStream& tokens)
 {
     std::auto_ptr<ast::FunctionHeader> header(new ast::FunctionHeader());
 
-    std::string firstIdentifier = tokens.consume(tokenizer::IDENTIFIER); // 'function'
+    if (tokens.nextIs(tokenizer::FUNCTION))
+        tokens.consume(tokenizer::FUNCTION);
     possibleWhitespace(tokens);
 
-    if (firstIdentifier == "function") {
-        header->functionName = tokens.consume(tokenizer::IDENTIFIER);
-        possibleWhitespace(tokens);
-    } else {
-        header->functionName = firstIdentifier;
-    }
+    header->functionName = tokens.consume(tokenizer::IDENTIFIER);
+    possibleWhitespace(tokens);
 
     tokens.consume(tokenizer::LPAREN);
 
@@ -410,8 +407,7 @@ ast::TypeDecl* typeDecl(TokenStream& tokens)
 {
     std::auto_ptr<ast::TypeDecl> decl(new ast::TypeDecl());
 
-    std::string typeKeyword = tokens.consume(tokenizer::IDENTIFIER);
-    assert(typeKeyword == "type");
+    tokens.consume(tokenizer::TYPE);
 
     possibleWhitespace(tokens);
 

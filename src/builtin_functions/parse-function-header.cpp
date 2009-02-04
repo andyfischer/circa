@@ -14,15 +14,13 @@ namespace parse_function_header_function {
         TokenStream &tokens = as<TokenStream>(caller->input(0));
         ast::FunctionHeader &result = as<ast::FunctionHeader>(caller);
 
-        std::string firstIdentifier = tokens.consume(tokenizer::IDENTIFIER); // 'function'
+        if (tokens.nextIs(tokenizer::FUNCTION))
+            tokens.consume(tokenizer::FUNCTION);
+
         parser::possibleWhitespace(tokens);
 
-        if (firstIdentifier == "function") {
-            result.functionName = tokens.consume(tokenizer::IDENTIFIER);
-            parser::possibleWhitespace(tokens);
-        } else {
-            result.functionName = firstIdentifier;
-        }
+        result.functionName = tokens.consume(tokenizer::IDENTIFIER);
+        parser::possibleWhitespace(tokens);
 
         tokens.consume(tokenizer::LPAREN);
 
