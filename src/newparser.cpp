@@ -268,7 +268,27 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 
 Term* expression_statement(Branch& branch, TokenStream& tokens)
 {
-    return infix_expression(branch, tokens);
+    bool isNameBinding = tokens.nextIs(tokenizer::IDENTIFIER)
+        && (tokens.nextIs(tokenizer::EQUALS, 1)
+                || (tokens.nextIs(tokenizer::WHITESPACE,1)
+                    && (tokens.nextIs(tokenizer::EQUALS,2))));
+
+    // check for name binding
+    std::string name;
+    if (isNameBinding) {
+        name = tokens.consume(tokenizer::IDENTIFIER);
+        possible_whitespace(tokens);
+        tokens.consume(EQUALS);
+        possible_whitespace(tokens);
+    }
+
+    Term* result = infix_expression(branch, tokens);
+
+    if (name != "") {
+        branch.bindName(result, name);
+    }
+
+    return result;
 }
 
 int getInfixPrecedence(int match)
@@ -382,28 +402,14 @@ Term* atom(Branch& branch, TokenStream& tokens)
     if (tokens.nextIs(FLOAT))
         return literal_float(branch, tokens);
 
-/*
     // literal hex?
     if (tokens.nextIs(HEX_INTEGER))
-        return literal_hex(tokens);
-
-    // rebind operator?
-    bool hasRebindOperator = false;
-
-    if (tokens.nextIs(AMPERSAND)) {
-        hasRebindOperator = true;
-        tokens.consume(AMPERSAND);
-    }
+        return literal_hex(branch, tokens);
 
     // identifier?
-    if (tokens.nextIs(IDENTIFIER)) {
-        ast::Identifier* id = new ast::Identifier(tokens.consume(tokenizer::IDENTIFIER));
-        id->hasRebindOperator = hasRebindOperator;
-        return id;
-    } else if (hasRebindOperator) {
-        throw std::runtime_error("@ operator only allowed before an identifier");
+    if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AMPERSAND)) {
+        return identifier(branch, tokens);
     }
-*/
 
     // parenthesized expression?
     if (tokens.nextIs(LPAREN)) {
@@ -420,13 +426,44 @@ Term* atom(Branch& branch, TokenStream& tokens)
 
 Term* function_call(Branch& branch, TokenStream& tokens)
 {
-    // todo
-    return NULL;
+    std::string functionName = tokens.consume(IDENTIFIER);
+    tokens.consume(LPAREN);
+
+    Term* function = find_named(&branch, functionName);
+    if (function == NULL)
+        throw std::runtime_error("couldn't find function: "+functionName);
+
+    ReferenceList inputs;
+
+    while(!tokens.nextIs(RPAREN)) {
+        possible_whitespace(tokens);
+        Term* term = infix_expression(branch, tokens);
+        possible_whitespace(tokens);
+
+        inputs.append(term);
+
+        if (!tokens.nextIs(RPAREN))
+            tokens.consume(COMMA);
+    }
+
+    tokens.consume(RPAREN);
+    
+    return apply_function(&branch, function, inputs);
 }
 
 Term* literal_integer(Branch& branch, TokenStream& tokens)
 {
     std::string text = tokens.consume(INTEGER);
+    int value = strtol(text.c_str(), NULL, 0);
+    Term* term = int_value(branch, value);
+    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
+    return term;
+}
+
+Term* literal_hex(Branch& branch, TokenStream& tokens)
+{
+    std::string text = tokens.consume(HEX_INTEGER);
     int value = strtol(text.c_str(), NULL, 0);
     Term* term = int_value(branch, value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
@@ -453,6 +490,22 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     return term;
+}
+
+Term* identifier(Branch& branch, TokenStream& tokens)
+{
+    bool rebind = false;
+    if (tokens.nextIs(AMPERSAND)) {
+        tokens.consume(AMPERSAND);
+        rebind = true;
+    }
+
+    std::string id = tokens.consume(IDENTIFIER);
+
+    if (rebind)
+        push_pending_rebind(branch, id);
+
+    return find_named(&branch, id);
 }
 
 std::string possible_whitespace(TokenStream& tokens)
