@@ -30,6 +30,9 @@ struct TermSyntaxHints
     };
 
     // Members:
+    int line;
+    int startChar;
+    int endChar;
     DeclarationStyle declarationStyle;
     std::vector<InputSyntax> inputSyntax;
     bool occursInsideAnExpression;
@@ -38,6 +41,9 @@ struct TermSyntaxHints
     std::string followingWhitespace;
 
     TermSyntaxHints() :
+        line(0),
+        startChar(0),
+        endChar(0),
         declarationStyle(UNKNOWN_DECLARATION_STYLE),
         occursInsideAnExpression(false)
     {}
