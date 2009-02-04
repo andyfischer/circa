@@ -49,6 +49,8 @@ const char* getMatchText(int match)
         case IF: return "if";
         case ELSE: return "else";
         case STATE: return "state";
+        case FUNCTION: return "function";
+        case TYPE: return "type";
         case UNRECOGNIZED: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -192,6 +194,8 @@ void top_level_consume_token(TokenizeContext &context)
 {
     if (is_letter(context.next()) || context.next() == '_') {
 
+        if (try_to_consume_keyword(context, FUNCTION)) return;
+        if (try_to_consume_keyword(context, TYPE)) return;
         if (try_to_consume_keyword(context, END)) return;
         if (try_to_consume_keyword(context, IF)) return;
         if (try_to_consume_keyword(context, ELSE)) return;
