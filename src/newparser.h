@@ -10,8 +10,10 @@ typedef Term* (*ParsingStep)(Branch& branch, TokenStream& tokens);
 Term* compile(Branch& branch, ParsingStep step, std::string const& input);
 
 Term* compile_statement(Branch& branch, std::string const& input);
+Term* evaluate_statement(Branch& branch, std::string const& input);
 
 // Parsing steps:
+Term* statement_list(Branch& branch, TokenStream& tokens);
 Term* statement(Branch& branch, TokenStream& tokens);
 Term* comment_statement(Branch& branch, TokenStream& tokens);
 Term* blank_line(Branch& branch, TokenStream& tokens);

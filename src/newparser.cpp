@@ -38,6 +38,23 @@ Term* compile_statement(Branch& branch, std::string const& input)
     return statement(branch, tokens);
 }
 
+Term* evaluate_statement(Branch& branch, std::string const& input)
+{
+    Term* result = compile_statement(branch, input);
+    evaluate_term(result);
+    return result;
+}
+
+Term* statement_list(Branch& branch, TokenStream& tokens)
+{
+    Term* term = NULL;
+
+    while (!tokens.finished())
+        term = statement(branch, tokens);
+
+    return term;
+}
+
 Term* statement(Branch& branch, TokenStream& tokens)
 {
     std::string precedingWhitespace = possible_whitespace(tokens);
@@ -267,8 +284,20 @@ Term* if_statement(Branch& branch, TokenStream& tokens)
 
 Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 {
-    // TODO
-    return NULL;
+    tokens.consume(STATE);
+    possible_whitespace(tokens);
+    std::string typeName = tokens.consume(IDENTIFIER);
+    possible_whitespace(tokens);
+    std::string name = tokens.consume(IDENTIFIER);
+    possible_newline(tokens);
+
+    Term* type = find_named(&branch, typeName);
+    assert(type != NULL);
+
+    Term* result = create_value(&branch, type, name);
+    result->setIsStateful(true);
+
+    return result;
 }
 
 Term* expression_statement(Branch& branch, TokenStream& tokens)

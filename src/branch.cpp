@@ -2,20 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
-#include "builtins.h"
-#include "debug.h"
-#include "function.h"
-#include "introspection.h"
-#include "parser.h"
-#include "pointer_iterator.h"
-#include "runtime.h"
-#include "ref_map.h"
-#include "term.h"
-#include "term_pointer_iterator.h"
-#include "type.h"
-#include "values.h"
-#include "wrappers.h"
+#include "circa.h"
 
 #include "branch_iterators.hpp"
 
@@ -180,12 +167,14 @@ void Branch::eval()
 Term*
 Branch::eval(std::string const& statement)
 {
+    //return newparser::evaluate_statement(*this, statement);
     return eval_statement(this, statement);
 }
 
 Term*
 Branch::compile(std::string const& statement)
 {
+    //return newparser::compile_statement(*this, statement);
     return compile_statement(this, statement);
 }
 
