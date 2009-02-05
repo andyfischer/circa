@@ -335,14 +335,7 @@ void evaluate_file(Branch& branch, std::string const& filename)
 {
     std::string fileContents = read_text_file(filename);
 
-    TokenStream tokens(fileContents);
-    ast::StatementList *statementList = parser::statementList(tokens);
-
-    statementList->createTerms(branch);
-
-    delete statementList;
-
-    remove_compilation_attrs(branch);
+    newparser::compile(branch, newparser::statement_list, fileContents);
 
     string_value(branch, filename, get_name_for_attribute("source-file"));
 }

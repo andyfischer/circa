@@ -30,7 +30,7 @@ struct TermSyntaxHints
         static InputSyntax byName(std::string const& name)
         {
             InputSyntax result;
-            result.style = BY_SOURCE;
+            result.style = BY_NAME;
             result.name = name;
             return result;
         }
