@@ -494,12 +494,19 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
     ReferenceList inputs;
 
-    while(!tokens.nextIs(RPAREN)) {
+    TermSyntaxHints::InputSyntaxList inputSyntax;
+
+    while (!tokens.nextIs(RPAREN)) {
         possible_whitespace(tokens);
         Term* term = infix_expression(branch, tokens);
         possible_whitespace(tokens);
 
         inputs.append(term);
+
+        if (term->name == "")
+            inputSyntax.push_back(TermSyntaxHints::InputSyntax::bySource());
+        else
+            inputSyntax.push_back(TermSyntaxHints::InputSyntax::byName(term->name));
 
         if (!tokens.nextIs(RPAREN))
             tokens.consume(COMMA);
@@ -507,7 +514,14 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
     tokens.consume(RPAREN);
     
-    return apply_function(&branch, function, inputs);
+    Term* result = apply_function(&branch, function, inputs);
+
+    result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
+    result->syntaxHints.functionName = functionName;
+    result->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
+    result->syntaxHints.inputSyntax = inputSyntax;
+
+    return result;
 }
 
 Term* literal_integer(Branch& branch, TokenStream& tokens)

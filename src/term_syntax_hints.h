@@ -19,6 +19,21 @@ struct TermSyntaxHints
         std::string name;
 
         InputSyntax() : style(UNKNOWN_STYLE) {}
+
+        static InputSyntax bySource()
+        {
+            InputSyntax result;
+            result.style = BY_SOURCE;
+            return result;
+        }
+
+        static InputSyntax byName(std::string const& name)
+        {
+            InputSyntax result;
+            result.style = BY_SOURCE;
+            result.name = name;
+            return result;
+        }
     };
 
     enum DeclarationStyle {
@@ -29,12 +44,14 @@ struct TermSyntaxHints
         LITERAL_VALUE
     };
 
+    typedef std::vector<InputSyntax> InputSyntaxList;
+
     // Members:
     int line;
     int startChar;
     int endChar;
     DeclarationStyle declarationStyle;
-    std::vector<InputSyntax> inputSyntax;
+    InputSyntaxList inputSyntax;
     bool occursInsideAnExpression;
     std::string functionName;
     std::string precedingWhitespace;
