@@ -220,6 +220,17 @@ void test_arrow_concatenation2()
     test_assert(branch.numTerms() == 3);
 }
 
+void test_syntax_hints()
+{
+    Branch branch;
+    Term* t = newparser::compile(branch, newparser::function_call, "assert(false)");
+
+    test_assert(t->syntaxHints.functionName == "assert");
+    test_assert(t->syntaxHints.getInputSyntax(0).style
+            == TermSyntaxHints::InputSyntax::BY_NAME);
+    test_assert(t->syntaxHints.getInputSyntax(0).name == "false");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(newparser_tests::test_comment);
@@ -237,6 +248,7 @@ void register_tests()
     REGISTER_TEST_CASE(newparser_tests::test_stateful_value_decl);
     REGISTER_TEST_CASE(newparser_tests::test_arrow_concatenation);
     REGISTER_TEST_CASE(newparser_tests::test_arrow_concatenation2);
+    REGISTER_TEST_CASE(newparser_tests::test_syntax_hints);
 }
 
 } // namespace newparser_tests
