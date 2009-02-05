@@ -143,8 +143,8 @@ ast::ExpressionStatement* expressionStatement(TokenStream& tokens)
     }
 
     // check for return statement
-    else if (tokens.nextIs(tokenizer::IDENTIFIER) && tokens.next().text == "return") {
-        tokens.consume(tokenizer::IDENTIFIER);
+    else if (tokens.nextIs(tokenizer::RETURN)) {
+        tokens.consume(tokenizer::RETURN);
         statement->nameBinding = OUTPUT_PLACEHOLDER_NAME;
         statement->preEqualsWhitepace = "";
         statement->postEqualsWhitespace = possibleWhitespace(tokens);
