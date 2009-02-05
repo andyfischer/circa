@@ -166,12 +166,20 @@ void test_function_decl()
 
     Branch& funcbranch = func.subroutineBranch;
 
-    print_raw_branch(funcbranch, std::cout);
+    test_equals(funcbranch[0]->name, "what");
+    test_equals(funcbranch[1]->name, "hey");
+    test_equals(funcbranch[2]->name, "yo");
+    test_equals(funcbranch[3]->name, "whathey");
+    test_equals(funcbranch[3]->function->name, "concat");
+    test_assert(funcbranch[3]->input(0) == funcbranch[0]);
+    test_assert(funcbranch[3]->input(1) == funcbranch[1]);
+    test_assert(funcbranch[3]->input(1) == funcbranch[1]);
+    test_assert(funcbranch[4]->asInt() == 3);
+    test_equals(funcbranch[5]->function->name, "greater-than");
+    test_assert(funcbranch[5]->input(0) == funcbranch[2]);
+    test_assert(funcbranch[5]->input(1) == funcbranch[4]);
+    test_equals(funcbranch[5]->name, "#return");
     test_assert(funcbranch.numTerms() == 6);
-    test_assert(funcbranch[0]->name == "what");
-    test_assert(funcbranch[1]->name == "hey");
-    test_assert(funcbranch[2]->name == "yo");
-    test_assert(funcbranch[3]->name == "whathey");
 }
 
 void register_tests()
@@ -187,7 +195,7 @@ void register_tests()
     REGISTER_TEST_CASE(newparser_tests::test_rebind);
     REGISTER_TEST_CASE(newparser_tests::test_infix);
     REGISTER_TEST_CASE(newparser_tests::test_type_decl);
-    //REGISTER_TEST_CASE(newparser_tests::test_function_decl);
+    REGISTER_TEST_CASE(newparser_tests::test_function_decl);
 }
 
 } // namespace newparser_tests

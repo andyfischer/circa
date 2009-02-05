@@ -41,6 +41,7 @@ void Function::appendInput(Term* type, std::string const& name)
 {
     inputTypes.append(type);
     getInputProperties(inputTypes.count()-1).name = name;
+    create_value(&subroutineBranch, type, name);
 }
 
 Function::InputProperties&
