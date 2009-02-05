@@ -74,6 +74,11 @@ Term* statement(Branch& branch, TokenStream& tokens)
         result = stateful_value_decl(branch, tokens);
     }
 
+    // Return statement
+    else if (tokens.nextIs(RETURN)) {
+        result = return_statement(branch, tokens);
+    }
+
     // Expression statement
     else {
         result = expression_statement(branch, tokens);
@@ -299,6 +304,18 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         branch.bindName(result, name);
     }
 
+    return result;
+}
+
+Term* return_statement(Branch& branch, TokenStream& tokens)
+{
+    tokens.consume(RETURN);
+    possible_whitespace(tokens);
+
+    Term* result = infix_expression(branch, tokens);
+
+    branch.bindName(result, "#return");
+    
     return result;
 }
 

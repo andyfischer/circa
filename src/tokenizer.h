@@ -66,6 +66,7 @@ const int END = 37;
 const int IF = 41;
 const int ELSE = 42;
 const int STATE = 48;
+const int RETURN = 51;
 
 const int WHITESPACE = 26;
 const int NEWLINE = 27;
