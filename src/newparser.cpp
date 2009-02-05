@@ -45,6 +45,18 @@ Term* evaluate_statement(Branch& branch, std::string const& input)
     return result;
 }
 
+void set_input_syntax(Term* term, int index, Term* input)
+{
+    TermSyntaxHints::InputSyntax& syntax = term->syntaxHints.getInputSyntax(index);
+    if (input->name == "") {
+        syntax.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
+        syntax.name = "";
+    } else {
+        syntax.style = TermSyntaxHints::InputSyntax::BY_NAME;
+        syntax.name = input->name;
+    }
+}
+
 Term* statement_list(Branch& branch, TokenStream& tokens)
 {
     Term* term = NULL;
@@ -100,6 +112,10 @@ Term* statement(Branch& branch, TokenStream& tokens)
     else {
         result = expression_statement(branch, tokens);
     }
+
+    if (precedingWhitespace != "" && result != NULL)
+        result->syntaxHints.precedingWhitespace = 
+            precedingWhitespace + result->syntaxHints.precedingWhitespace;
 
     return result;
 }
@@ -431,13 +447,65 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
     while (!tokens.finished() && getInfixPrecedence(tokens.next().match) == precedence) {
         std::string operatorStr = tokens.consume();
         possible_whitespace(tokens);
-        Term* rightExpr = infix_expression_nested(branch, tokens, precedence+1);
 
-        std::string functionName = getInfixFunctionName(operatorStr);
-        Term* function = find_named(&branch, functionName);
-        assert(function != NULL);
+        Term* result = NULL;
 
-        leftExpr = apply_function(&branch, function, ReferenceList(leftExpr, rightExpr));
+        if (operatorStr == ".") {
+            // dot concatenated call
+
+            std::string functionName = tokens.consume(IDENTIFIER);
+
+            // Try to find this function
+            Term* function = NULL;
+           
+            // Check member functions first
+            Type& leftExprType = as_type(leftExpr->type);
+
+            bool memberFunctionCall = false;
+            if (leftExprType.memberFunctions.contains(functionName)) {
+                function = leftExprType.memberFunctions[functionName];
+                memberFunctionCall = true;
+            } else {
+                function = find_named(&branch, functionName);
+            }
+
+            assert(function != NULL);
+
+            ReferenceList inputs(leftExpr);
+
+            // Look for inputs
+            if (tokens.nextIs(LPAREN)) {
+                // TODO
+                tokens.consume(LPAREN);
+            }
+
+            result = apply_function(&branch, function, inputs);
+
+            if (memberFunctionCall && leftExpr->name != "") {
+                branch.bindName(result, leftExpr->name);
+            }
+
+            result->syntaxHints.declarationStyle = TermSyntaxHints::DOT_CONCATENATION;
+
+            set_input_syntax(result, 0, leftExpr);
+            
+
+        } else {
+            Term* rightExpr = infix_expression_nested(branch, tokens, precedence+1);
+
+            std::string functionName = getInfixFunctionName(operatorStr);
+            Term* function = find_named(&branch, functionName);
+            assert(function != NULL);
+
+            result = apply_function(&branch, function, ReferenceList(leftExpr, rightExpr));
+            result->syntaxHints.declarationStyle = TermSyntaxHints::INFIX;
+            result->syntaxHints.functionName = operatorStr;
+
+            set_input_syntax(result, 0, leftExpr);
+            set_input_syntax(result, 1, rightExpr);
+        }
+
+        leftExpr = result;
     }
 
     return leftExpr;
