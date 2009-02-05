@@ -182,6 +182,16 @@ void test_function_decl()
     test_assert(funcbranch.numTerms() == 6);
 }
 
+void test_stateful_value_decl()
+{
+    Branch branch;
+    Term* a = newparser::compile(branch, newparser::statement, "state int a");
+
+    test_assert(is_value(a));
+    test_assert(a->isStateful());
+    test_assert(a->type == INT_TYPE);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(newparser_tests::test_comment);
@@ -196,6 +206,7 @@ void register_tests()
     REGISTER_TEST_CASE(newparser_tests::test_infix);
     REGISTER_TEST_CASE(newparser_tests::test_type_decl);
     REGISTER_TEST_CASE(newparser_tests::test_function_decl);
+    REGISTER_TEST_CASE(newparser_tests::test_stateful_value_decl);
 }
 
 } // namespace newparser_tests
