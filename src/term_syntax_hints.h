@@ -65,9 +65,9 @@ struct TermSyntaxHints
         occursInsideAnExpression(false)
     {}
 
-    InputSyntax getInputSyntax(unsigned int index) {
-        if (index >= inputSyntax.size())
-            return InputSyntax();
+    InputSyntax& getInputSyntax(unsigned int index) {
+        while (index >= inputSyntax.size())
+            inputSyntax.push_back(InputSyntax());
 
         return inputSyntax[index];
     }
