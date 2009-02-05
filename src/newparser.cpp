@@ -305,6 +305,15 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     std::string typeName = tokens.consume(IDENTIFIER);
     possible_whitespace(tokens);
     std::string name = tokens.consume(IDENTIFIER);
+    possible_whitespace(tokens);
+
+    Term* initialValue = NULL;
+    if (tokens.nextIs(EQUALS)) {
+        tokens.consume(EQUALS);
+        possible_whitespace(tokens);
+        initialValue = infix_expression(branch, tokens);
+    }
+
     possible_newline(tokens);
 
     Term* type = find_named(&branch, typeName);
@@ -312,6 +321,9 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 
     Term* result = create_value(&branch, type, name);
     result->setIsStateful(true);
+
+    if (initialValue != NULL)
+        copy_value(initialValue, result);
 
     return result;
 }
@@ -426,6 +438,8 @@ std::string getInfixFunctionName(std::string const& infix)
         return "or";
     else if (infix == "&&")
         return "and";
+    else if (infix == ":=")
+        return "apply-feedback";
     else
         return "#unrecognized";
 }
