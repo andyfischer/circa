@@ -167,8 +167,8 @@ void Branch::eval()
 Term*
 Branch::eval(std::string const& statement)
 {
-    return newparser::evaluate_statement(*this, statement);
-    //return eval_statement(this, statement);
+    //return newparser::evaluate_statement(*this, statement);
+    return eval_statement(this, statement);
 }
 
 Term*

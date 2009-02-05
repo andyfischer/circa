@@ -503,6 +503,22 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             set_input_syntax(result, 0, leftExpr);
             
+        } else if (operatorStr == "->") {
+            std::string functionName = tokens.consume(IDENTIFIER);
+            possible_whitespace(tokens);
+
+            // Try to find this function
+            Term* function = find_named(&branch, functionName);
+
+            assert(function != NULL);
+
+            ReferenceList inputs(leftExpr);
+
+            result = apply_function(&branch, function, inputs);
+
+            result->syntaxHints.declarationStyle = TermSyntaxHints::ARROW_CONCATENATION;
+
+            set_input_syntax(result, 0, leftExpr);
 
         } else {
             Term* rightExpr = infix_expression_nested(branch, tokens, precedence+1);
