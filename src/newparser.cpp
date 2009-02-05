@@ -288,6 +288,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     }
 
     Term* result = infix_expression(branch, tokens);
+    possible_newline(tokens);
 
     std::string pendingRebind = pop_pending_rebind(branch);
 
@@ -313,6 +314,7 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     Term* result = infix_expression(branch, tokens);
+    possible_newline(tokens);
 
     branch.bindName(result, "#return");
     
