@@ -167,15 +167,13 @@ void Branch::eval()
 Term*
 Branch::eval(std::string const& statement)
 {
-    //return newparser::evaluate_statement(*this, statement);
-    return eval_statement(this, statement);
+    return newparser::evaluate_statement(*this, statement);
 }
 
 Term*
 Branch::compile(std::string const& statement)
 {
     return newparser::compile_statement(*this, statement);
-    //return compile_statement(this, statement);
 }
 
 Branch& Branch::startBranch(std::string const& name)
