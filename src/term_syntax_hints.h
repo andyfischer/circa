@@ -41,6 +41,7 @@ struct TermSyntaxHints
         FUNCTION_CALL,
         INFIX,
         DOT_CONCATENATION,
+        ARROW_CONCATENATION,
         LITERAL_VALUE
     };
 

@@ -192,6 +192,34 @@ void test_stateful_value_decl()
     test_assert(a->type == INT_TYPE);
 }
 
+void test_arrow_concatenation()
+{
+    Branch branch;
+    Term* a = newparser::compile(branch, newparser::statement, "1 -> to-string");
+
+    test_assert(branch[0]->asInt() == 1);
+    test_assert(branch[1] == a);
+    test_equals(branch[1]->function->name, "to-string");
+    test_assert(branch[1]->input(0) == branch[0]);
+    test_assert(branch[1]->type == STRING_TYPE);
+    test_assert(branch.numTerms() == 2);
+}
+
+void test_arrow_concatenation2()
+{
+    Branch branch;
+    Term* a = newparser::compile(branch, newparser::statement,
+        "\"hello\" -> tokenize -> to-string");
+
+    test_assert(branch[0]->asString() == "hello");
+    test_equals(branch[1]->function->name, "tokenize");
+    test_assert(branch[1]->input(0) == branch[0]);
+    test_equals(branch[2]->function->name, "to-string");
+    test_assert(branch[2]->input(0) == branch[1]);
+    test_assert(branch[2] == a);
+    test_assert(branch.numTerms() == 3);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(newparser_tests::test_comment);
@@ -207,6 +235,8 @@ void register_tests()
     REGISTER_TEST_CASE(newparser_tests::test_type_decl);
     REGISTER_TEST_CASE(newparser_tests::test_function_decl);
     REGISTER_TEST_CASE(newparser_tests::test_stateful_value_decl);
+    REGISTER_TEST_CASE(newparser_tests::test_arrow_concatenation);
+    REGISTER_TEST_CASE(newparser_tests::test_arrow_concatenation2);
 }
 
 } // namespace newparser_tests
