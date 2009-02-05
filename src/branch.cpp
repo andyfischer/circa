@@ -174,8 +174,8 @@ Branch::eval(std::string const& statement)
 Term*
 Branch::compile(std::string const& statement)
 {
-    //return newparser::compile_statement(*this, statement);
-    return compile_statement(this, statement);
+    return newparser::compile_statement(*this, statement);
+    //return compile_statement(this, statement);
 }
 
 Branch& Branch::startBranch(std::string const& name)
