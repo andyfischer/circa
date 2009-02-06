@@ -45,6 +45,8 @@ Term* evaluate_statement(Branch& branch, std::string const& input)
     return result;
 }
 
+// Helper functions:
+
 void set_input_syntax(Term* term, int index, Term* input)
 {
     TermSyntaxHints::InputSyntax& syntax = term->syntaxHints.getInputSyntax(index);
@@ -55,6 +57,13 @@ void set_input_syntax(Term* term, int index, Term* input)
         syntax.style = TermSyntaxHints::InputSyntax::BY_NAME;
         syntax.name = input->name;
     }
+}
+
+void prepend_whitespace(Term* term, std::string const& whitespace)
+{
+    if (whitespace != "" && term != NULL)
+        term->syntaxHints.precedingWhitespace = 
+            whitespace + term->syntaxHints.precedingWhitespace;
 }
 
 Term* statement_list(Branch& branch, TokenStream& tokens)
@@ -116,9 +125,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
         assert(result != NULL);
     }
 
-    if (precedingWhitespace != "" && result != NULL)
-        result->syntaxHints.precedingWhitespace = 
-            precedingWhitespace + result->syntaxHints.precedingWhitespace;
+    prepend_whitespace(result, precedingWhitespace);
 
     return result;
 }
@@ -220,7 +227,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     if (func.outputType == NULL)
         func.outputType = VOID_TYPE;
 
-    possible_whitespace_or_newline(tokens);
+    possible_whitespace(tokens);
+    possible_newline(tokens);
 
     while (!tokens.nextIs(END)) {
         statement(func.subroutineBranch, tokens);
