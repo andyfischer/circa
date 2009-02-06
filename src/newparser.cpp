@@ -287,24 +287,28 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     negBranch.outerScope = &branch;
     joiningTermsBranch.outerScope = &branch;
 
-    while (!tokens.nextIs(ELSE) && !tokens.nextIs(END)) {
+    while (!tokens.nextIs(END)) {
 
         possible_whitespace(tokens);
-        statement(posBranch, tokens);
 
         if (tokens.nextIs(ELSE)) {
             tokens.consume(ELSE);
             while (!tokens.nextIs(END)) {
                 statement(negBranch, tokens);
+                possible_whitespace(tokens);
             }
             break;
+        } else if (tokens.nextIs(END)) {
+            break;
+        } else {
+            statement(posBranch, tokens);
         }
     }
 
+    tokens.consume(END);
+
     remove_compilation_attrs(posBranch);
     remove_compilation_attrs(negBranch);
-
-    tokens.consume(END);
 
     possible_whitespace_or_newline(tokens);
 
