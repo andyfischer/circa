@@ -117,7 +117,7 @@ Term* create_value(Branch* branch, Term* type, std::string const& name)
     alloc_value(term);
 
     term->stealingOk = false;
-    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    //term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
 
     if (name != "")
         branch->bindName(term, name);

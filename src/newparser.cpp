@@ -168,6 +168,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     tokens.consume(LPAREN);
 
     Term* result = create_value(&branch, FUNCTION_TYPE, functionName);
+    result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     Function& func = as_function(result);
 
     initialize_as_subroutine(func);
