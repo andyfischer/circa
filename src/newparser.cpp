@@ -76,11 +76,13 @@ Term* statement(Branch& branch, TokenStream& tokens)
     // Comment line
     if (tokens.nextIs(DOUBLE_MINUS)) {
         result = comment_statement(branch, tokens);
+        assert(result != NULL);
     }
 
     // Blank line
     else if (tokens.finished() || tokens.nextIs(NEWLINE)) {
         result = blank_line(branch, tokens);
+        assert(result != NULL);
     }
 
     // Function decl
@@ -111,6 +113,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
     // Expression statement
     else {
         result = expression_statement(branch, tokens);
+        assert(result != NULL);
     }
 
     if (precedingWhitespace != "" && result != NULL)
@@ -489,8 +492,18 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             // Look for inputs
             if (tokens.nextIs(LPAREN)) {
-                // TODO
                 tokens.consume(LPAREN);
+
+                while (!tokens.nextIs(RPAREN)) {
+                    possible_whitespace(tokens);
+                    Term* input = infix_expression(branch, tokens);
+                    inputs.append(input);
+                    possible_whitespace(tokens);
+
+                    if (!tokens.nextIs(RPAREN))
+                        tokens.consume(COMMA);
+                }
+                tokens.consume(RPAREN);
             }
 
             result = apply_function(&branch, function, inputs);
@@ -538,6 +551,8 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
         leftExpr = result;
     }
 
+    assert(leftExpr != NULL);
+
     return leftExpr;
 }
 
@@ -576,7 +591,10 @@ Term* atom(Branch& branch, TokenStream& tokens)
         return result;
     }
 
-    throw std::runtime_error("unrecognized expression");
+    std::cout << tokens.next().text;
+
+    throw std::runtime_error("unrecognized expression at " 
+        + tokens.next().locationAsString());
 
     return NULL; // unreachable
 }

@@ -64,6 +64,13 @@ std::string TokenInstance::toString() const
     return out.str();
 }
 
+std::string TokenInstance::locationAsString() const
+{
+    std::stringstream out;
+    out << "line " << line << ", char " << character;
+    return out.str();
+}
+
 struct TokenizeContext
 {
     std::string const &input;

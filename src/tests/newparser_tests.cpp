@@ -220,6 +220,21 @@ void test_arrow_concatenation2()
     test_assert(branch.numTerms() == 3);
 }
 
+void test_dot_concatenation()
+{
+    Branch branch;
+
+    newparser::compile(branch, newparser::statement, "s = Set()");
+    Term *s = newparser::compile(branch, newparser::statement, "s.add(1)");
+
+    test_assert(branch.numTerms() == 3);
+    test_assert(is_value(branch[0]));
+    test_assert(is_value(branch[1]));
+    test_assert(branch[1]->asInt() == 1);
+    test_equals(as_function(branch[2]->function).name, "add");
+    test_assert(branch["s"] == s);
+}
+
 void test_syntax_hints()
 {
     Branch branch;
@@ -248,6 +263,7 @@ void register_tests()
     REGISTER_TEST_CASE(newparser_tests::test_stateful_value_decl);
     REGISTER_TEST_CASE(newparser_tests::test_arrow_concatenation);
     REGISTER_TEST_CASE(newparser_tests::test_arrow_concatenation2);
+    REGISTER_TEST_CASE(newparser_tests::test_dot_concatenation);
     REGISTER_TEST_CASE(newparser_tests::test_syntax_hints);
 }
 
