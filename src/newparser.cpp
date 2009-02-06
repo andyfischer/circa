@@ -638,8 +638,9 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
         if (term->name == "")
             inputSyntax.push_back(TermSyntaxHints::InputSyntax::bySource());
-        else
+        else {
             inputSyntax.push_back(TermSyntaxHints::InputSyntax::byName(term->name));
+        }
 
         if (!tokens.nextIs(RPAREN))
             tokens.consume(COMMA);
@@ -723,6 +724,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     if (result == NULL) {
         result = apply_function(&branch, UNKNOWN_IDENTIFIER_FUNC, ReferenceList());
         as_string(result->state) = id;
+        branch.bindName(result, id);
     }
 
     return result;
