@@ -647,8 +647,15 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     std::string text = tokens.consume(FLOAT);
     float value = atof(text.c_str());
     Term* term = float_value(branch, value);
-    // float mutability = ast.hasQuestionMark ? 1.0 : 0.0;
-    // term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
+
+    float mutability = 0.0;
+
+    if (tokens.nextIs(QUESTION)) {
+        tokens.consume(QUESTION);
+        mutability = 1.0;
+    }
+
+    term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     return term;
