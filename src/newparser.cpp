@@ -372,9 +372,23 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         name = pendingRebind;
     }
 
-    if (name != "") {
+    if (name != "")
         branch.bindName(result, name);
+
+    // Go through all of our terms, if they don't have names then assume they
+    // were created just for us. Update the syntax hints to reflect this.
+    for (int i=0; i < result->numInputs(); i++) {
+        Term* input = result->input(i);
+
+        if (input == NULL)
+            continue;
+
+        if (input->name != "")
+            continue;
+
+        input->syntaxHints.occursInsideAnExpression = true;
     }
+
 
     return result;
 }
