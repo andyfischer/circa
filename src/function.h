@@ -69,6 +69,8 @@ struct Function
 bool is_function(Term* term);
 Function& as_function(Term*);
 
+void initialize_as_subroutine(Function& func);
+
 std::string get_placeholder_name_for_index(int index);
 
 Branch& call_subroutine(Branch& branch, std::string const& functionName);

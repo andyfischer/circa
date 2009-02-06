@@ -125,6 +125,12 @@ void Function::visitPointers(Term* term, PointerVisitor& visitor)
     func.subroutineBranch.visitPointers(visitor);
 }
 
+void initialize_as_subroutine(Function& func)
+{
+    func.evaluate = Function::subroutine_call_evaluate;
+    func.stateType = BRANCH_TYPE;
+}
+
 std::string get_placeholder_name_for_index(int index)
 {
     std::stringstream sstream;
