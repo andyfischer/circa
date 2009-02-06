@@ -95,9 +95,9 @@ Term* statement(Branch& branch, TokenStream& tokens)
         result = type_decl(branch, tokens);
     }
 
-    // If statement
+    // If block
     else if (tokens.nextIs(IF)) {
-        result = if_statement(branch, tokens);
+        result = if_block(branch, tokens);
     }
 
     // Stateful value decl
@@ -268,7 +268,7 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
     return result;
 }
 
-Term* if_statement(Branch& branch, TokenStream& tokens)
+Term* if_block(Branch& branch, TokenStream& tokens)
 {
     tokens.consume(IF);
     possible_whitespace(tokens);
@@ -288,6 +288,8 @@ Term* if_statement(Branch& branch, TokenStream& tokens)
     joiningTermsBranch.outerScope = &branch;
 
     while (!tokens.nextIs(ELSE) && !tokens.nextIs(END)) {
+
+        possible_whitespace(tokens);
         statement(posBranch, tokens);
 
         if (tokens.nextIs(ELSE)) {
@@ -524,19 +526,14 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             result->syntaxHints.declarationStyle = TermSyntaxHints::DOT_CONCATENATION;
 
             set_input_syntax(result, 0, leftExpr);
-            
+
         } else if (operatorStr == "->") {
             std::string functionName = tokens.consume(IDENTIFIER);
             possible_whitespace(tokens);
 
-            // Try to find this function
-            Term* function = find_named(&branch, functionName);
-
-            assert(function != NULL);
-
             ReferenceList inputs(leftExpr);
 
-            result = apply_function(&branch, function, inputs);
+            result = find_and_apply_function(branch, functionName, inputs);
 
             result->syntaxHints.declarationStyle = TermSyntaxHints::ARROW_CONCATENATION;
 
@@ -546,10 +543,8 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             Term* rightExpr = infix_expression_nested(branch, tokens, precedence+1);
 
             std::string functionName = getInfixFunctionName(operatorStr);
-            Term* function = find_named(&branch, functionName);
-            assert(function != NULL);
 
-            result = apply_function(&branch, function, ReferenceList(leftExpr, rightExpr));
+            result = find_and_apply_function(branch, functionName, ReferenceList(leftExpr, rightExpr));
             result->syntaxHints.declarationStyle = TermSyntaxHints::INFIX;
             result->syntaxHints.functionName = operatorStr;
 
@@ -559,8 +554,6 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
         leftExpr = result;
     }
-
-    assert(leftExpr != NULL);
 
     return leftExpr;
 }
@@ -613,10 +606,6 @@ Term* function_call(Branch& branch, TokenStream& tokens)
     std::string functionName = tokens.consume(IDENTIFIER);
     tokens.consume(LPAREN);
 
-    Term* function = find_named(&branch, functionName);
-    if (function == NULL)
-        throw std::runtime_error("couldn't find function: "+functionName);
-
     ReferenceList inputs;
 
     TermSyntaxHints::InputSyntaxList inputSyntax;
@@ -639,7 +628,7 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
     tokens.consume(RPAREN);
     
-    Term* result = apply_function(&branch, function, inputs);
+    Term* result = find_and_apply_function(branch, functionName, inputs);
 
     result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
     result->syntaxHints.functionName = functionName;

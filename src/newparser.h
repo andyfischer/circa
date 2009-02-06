@@ -19,7 +19,7 @@ Term* comment_statement(Branch& branch, TokenStream& tokens);
 Term* blank_line(Branch& branch, TokenStream& tokens);
 Term* function_decl(Branch& branch, TokenStream& tokens);
 Term* type_decl(Branch& branch, TokenStream& tokens);
-Term* if_statement(Branch& branch, TokenStream& tokens);
+Term* if_block(Branch& branch, TokenStream& tokens);
 Term* stateful_value_decl(Branch& branch, TokenStream& tokens);
 Term* expression_statement(Branch& branch, TokenStream& tokens);
 Term* return_statement(Branch& branch, TokenStream& tokens);
