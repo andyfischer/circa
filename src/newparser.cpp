@@ -170,6 +170,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     Term* result = create_value(&branch, FUNCTION_TYPE, functionName);
     Function& func = as_function(result);
 
+    initialize_as_subroutine(func);
+
     func.name = functionName;
 
     while (!tokens.nextIs(RPAREN))
@@ -183,6 +185,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         if (tokens.nextIs(IDENTIFIER)) {
             name = tokens.consume(IDENTIFIER);
             possible_whitespace(tokens);
+        } else {
+            name = get_placeholder_name_for_index(func.inputProperties.size());
         }
 
         Term* typeTerm = find_named(&branch, type);
@@ -212,11 +216,16 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         func.outputType = outputType;
     }
 
+    if (func.outputType == NULL)
+        func.outputType = VOID_TYPE;
+
     possible_whitespace_or_newline(tokens);
 
     while (!tokens.nextIs(END)) {
         statement(func.subroutineBranch, tokens);
     }
+
+    tokens.consume(END);
 
     return result;
 }
