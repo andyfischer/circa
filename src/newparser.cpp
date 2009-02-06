@@ -699,7 +699,14 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     if (rebind)
         push_pending_rebind(branch, id);
 
-    return find_named(&branch, id);
+    Term* result = find_named(&branch, id);
+
+    if (result == NULL) {
+        result = apply_function(&branch, UNKNOWN_IDENTIFIER_FUNC, ReferenceList());
+        as_string(result->state) = id;
+    }
+
+    return result;
 }
 
 std::string possible_whitespace(TokenStream& tokens)
