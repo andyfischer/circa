@@ -16,7 +16,6 @@
 
 namespace circa {
 
-
 bool push_is_inside_expression(Branch& branch, bool value)
 {
     bool previous;
