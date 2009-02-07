@@ -11,6 +11,7 @@ struct TermNamespace
 {
     typedef std::map<std::string, Term*> StringToTermMap;
     typedef StringToTermMap::iterator iterator;
+    typedef StringToTermMap::const_iterator const_iterator;
     StringToTermMap _map;
 
     bool contains(std::string s) const
@@ -55,15 +56,10 @@ struct TermNamespace
         _map.erase(name);
     }
 
-    iterator begin()
-    {
-        return _map.begin();
-    }
-
-    iterator end()
-    {
-        return _map.end();
-    }
+    iterator begin() { return _map.begin(); }
+    iterator end() { return _map.end(); }
+    const_iterator begin() const { return _map.begin(); }
+    const_iterator end() const { return _map.end(); }
 
     void remapPointers(ReferenceMap const& remapping)
     {
