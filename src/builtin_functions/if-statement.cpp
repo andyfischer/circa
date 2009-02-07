@@ -23,6 +23,7 @@ namespace if_statement_function {
         else
             evaluate_branch(as_branch(get_field(caller->state, 1)));
 
+        // joining-terms branch
         evaluate_branch(as_branch(get_field(caller->state, 2)));
     }
 

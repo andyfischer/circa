@@ -10,6 +10,7 @@
 #include "parser.h"
 #include "pointer_visitor.h"
 #include "runtime.h"
+#include "syntax.h"
 #include "tokenizer.h"
 #include "type.h"
 #include "values.h"
@@ -277,6 +278,7 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
     return result;
 }
 
+
 Term* if_block(Branch& branch, TokenStream& tokens)
 {
     tokens.consume(IF);
@@ -290,7 +292,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     Term* result = apply_function(&branch, "if-statement", ReferenceList(condition));
     Branch& posBranch = as_branch(result->state->field(0));
     Branch& negBranch = as_branch(result->state->field(1));
-    Branch& joiningTermsBranch = as_branch(result->state->field(1));
+    Branch& joiningTermsBranch = as_branch(result->state->field(2));
 
     posBranch.outerScope = &branch;
     negBranch.outerScope = &branch;
@@ -303,7 +305,8 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         if (tokens.nextIs(ELSE)) {
             tokens.consume(ELSE);
             while (!tokens.nextIs(END)) {
-                statement(negBranch, tokens);
+                Term* result = statement(negBranch, tokens);
+
                 possible_whitespace(tokens);
             }
             break;
@@ -321,8 +324,63 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     possible_whitespace_or_newline(tokens);
 
-    // TODO: joining terms
+    update_if_statement_joining_terms(result);
+
     return result;
+}
+
+void update_if_statement_joining_terms(Term* if_statement)
+{
+    Term* conditionTerm = if_statement->input(0);
+    Branch& posBranch = as_branch(if_statement->state->field(0));
+    Branch& negBranch = as_branch(if_statement->state->field(1));
+    Branch& joiningTermsBranch = as_branch(if_statement->state->field(2));
+    Branch& outerBranch = *posBranch.outerScope;
+    
+    // Get a list of all names bound in either branch
+    std::set<std::string> boundNames;
+
+    {
+        TermNamespace::const_iterator it;
+        for (it = posBranch.names.begin(); it != posBranch.names.end(); ++it)
+            boundNames.insert(it->first);
+        for (it = negBranch.names.begin(); it != negBranch.names.end(); ++it)
+            boundNames.insert(it->first);
+    }
+
+    // Ignore any names which are not bound in the outer branch
+    {
+        std::set<std::string>::iterator it;
+        for (it = boundNames.begin(); it != boundNames.end();)
+        {
+            if (find_named(&outerBranch, *it) == NULL)
+                boundNames.erase(it++);
+            else
+                ++it;
+        }
+    }
+
+    joiningTermsBranch.clear();
+
+    // For each name, create a joining term
+    {
+        std::set<std::string>::const_iterator it;
+        for (it = boundNames.begin(); it != boundNames.end(); ++it)
+        {
+            std::string const& name = *it;
+
+            Term* outerVersion = find_named(&outerBranch, name);
+            Term* posVersion = posBranch.containsName(name) ? posBranch[name] : outerVersion;
+            Term* negVersion = negBranch.containsName(name) ? negBranch[name] : outerVersion;
+
+            Term* joining = apply_function(&joiningTermsBranch, "if-expr",
+                    ReferenceList(conditionTerm, posVersion, negVersion));
+
+            // Bind these names in the outer branch. This is probably dangerous
+            // and should be changed
+            outerBranch.bindName(joining, name);
+        }
+    }
 }
 
 Term* stateful_value_decl(Branch& branch, TokenStream& tokens)

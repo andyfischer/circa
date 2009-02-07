@@ -36,5 +36,8 @@ std::string possible_whitespace(TokenStream& tokens);
 std::string possible_newline(TokenStream& tokens);
 std::string possible_whitespace_or_newline(TokenStream& tokens);
 
+// Helper functions:
+void update_if_statement_joining_terms(Term* if_statement);
+
 } // namespace newparser
 } // namespace circa
