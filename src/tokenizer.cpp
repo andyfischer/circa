@@ -332,19 +332,21 @@ void top_level_consume_token(TokenizeContext &context)
                 return;
             }
             
-            context.consume();
-            if (context.next() == '>') {
+            if (context.next(1) == '>') {
+                context.consume();
                 context.consume();
                 context.pushResult(RIGHT_ARROW);
                 return;
             }
 
-            if (context.next() == '-') {
+            if (context.next(1) == '-') {
+                context.consume();
                 context.consume();
                 context.pushResult(DOUBLE_MINUS);
                 return;
             }
 
+            context.consume();
             context.pushResult(MINUS);
             return;
 
@@ -473,13 +475,14 @@ void consume_string_literal(TokenizeContext &context)
 
     // consume starting quote
     char quote_type = context.consume();
+    text << quote_type;
 
     while (context.next() != quote_type && !context.finished()) {
         text << context.consume();
     }
 
     // consume ending quote
-    context.consume();
+    text << context.consume();
 
     context.pushResult(STRING, text.str());
 }

@@ -154,7 +154,7 @@ void test_string_literal()
     token::tokenize("\"string literal\"", results);
 
     test_assert(results.size() == 1);
-    test_assert(results[0].text == "string literal");
+    test_assert(results[0].text == "\"string literal\"");
     test_assert(results[0].match == token::STRING);
 }
 
