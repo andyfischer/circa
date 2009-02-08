@@ -1,2 +1,5 @@
 circa/assert.ca
+circa/boolean.ca
+circa/comparison.ca
+circa/feedback.ca
 circa/sample1.ca

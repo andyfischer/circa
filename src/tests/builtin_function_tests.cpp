@@ -70,8 +70,8 @@ void test_string()
 {
     Branch branch;
 
-    test_assert(as_string(branch.eval("concat(\"hello \", \"world\")"))
-            == "hello world");
+    test_equals(as_string(branch.eval("concat(\"hello \", \"world\")")),
+            "hello world");
 }
 
 void test_concat()

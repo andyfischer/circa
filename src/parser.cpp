@@ -64,6 +64,13 @@ void prepend_whitespace(Term* term, std::string const& whitespace)
             whitespace + term->syntaxHints.precedingWhitespace;
 }
 
+void append_whitespace(Term* term, std::string const& whitespace)
+{
+    if (whitespace != "" && term != NULL)
+        term->syntaxHints.followingWhitespace = 
+            whitespace + term->syntaxHints.followingWhitespace;
+}
+
 void push_pending_rebind(Branch& branch, std::string const& name)
 {
     std::string attrname = get_name_for_attribute("comp-pending-rebind");
@@ -89,7 +96,6 @@ std::string pop_pending_rebind(Branch& branch)
 
 void remove_compilation_attrs(Branch& branch)
 {
-    branch.removeTerm(get_name_for_attribute("comp-inside-expr"));
     branch.removeTerm(get_name_for_attribute("comp-pending-rebind"));
 }
 
@@ -196,7 +202,6 @@ Term* comment_statement(Branch& branch, TokenStream& tokens)
     Term* result = apply_function(&branch, COMMENT_FUNC, ReferenceList());
     as_string(result->state->field(0)) = commentText.str();
     result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    result->syntaxHints.occursInsideAnExpression = false;
     return result;
 }
 
@@ -208,7 +213,6 @@ Term* blank_line(Branch& branch, TokenStream& tokens)
     Term* result = apply_function(&branch, COMMENT_FUNC, ReferenceList());
     as_string(result->state->field(0)) = "";
     result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    result->syntaxHints.occursInsideAnExpression = false;
 
     return result;
 }
@@ -773,7 +777,6 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
     result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
     result->syntaxHints.functionName = functionName;
-    //result->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     result->syntaxHints.inputSyntax = inputSyntax;
 
     return result;
@@ -785,7 +788,6 @@ Term* literal_integer(Branch& branch, TokenStream& tokens)
     int value = strtol(text.c_str(), NULL, 0);
     Term* term = int_value(branch, value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    //term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     return term;
 }
 
@@ -795,7 +797,6 @@ Term* literal_hex(Branch& branch, TokenStream& tokens)
     int value = strtol(text.c_str(), NULL, 0);
     Term* term = int_value(branch, value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    //term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     return term;
 }
 
@@ -814,16 +815,18 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
 
     term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    //term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     return term;
 }
 
 Term* literal_string(Branch& branch, TokenStream& tokens)
 {
     std::string text = tokens.consume(STRING);
+
+    // strip quote marks
+    text = text.substr(1, text.length()-2);
+
     Term* term = string_value(branch, text);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    //term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     return term;
 }
 
@@ -842,6 +845,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
 
     Term* result = find_named(&branch, id);
 
+    // If not found, create an instance of unknown-identifier
     if (result == NULL) {
         result = apply_function(&branch, UNKNOWN_IDENTIFIER_FUNC, ReferenceList());
         as_string(result->state) = id;

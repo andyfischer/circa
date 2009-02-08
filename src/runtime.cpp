@@ -210,7 +210,6 @@ void error_occured(Term* errorTerm, std::string const& message)
     errorTerm->pushError(message);
 }
 
-
 void set_input(Term* term, int index, Term* input)
 {
     assert_good_pointer(term);
