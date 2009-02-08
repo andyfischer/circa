@@ -215,9 +215,23 @@ void set_input(Term* term, int index, Term* input)
 {
     assert_good_pointer(term);
 
-    Term* previousInput = term->inputs.get(index);
+    // Term* previousInput = term->inputs.get(index);
 
     term->inputs.setAt(index, input);
+
+    // Update syntax hints
+    TermSyntaxHints::InputSyntax& syntax = term->syntaxHints.getInputSyntax(index);
+
+    if (input == NULL) {
+        syntax.style = TermSyntaxHints::InputSyntax::UNKNOWN_STYLE;
+        syntax.name = "";
+    } else if (input->name == "") {
+        syntax.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
+        syntax.name = "";
+    } else {
+        syntax.style = TermSyntaxHints::InputSyntax::BY_NAME;
+        syntax.name = input->name;
+    }
 
 #if TRACK_USERS
     if (input != NULL) {
@@ -227,31 +241,6 @@ void set_input(Term* term, int index, Term* input)
 
     if (previousInput != NULL && !is_actually_using(previousInput, term))
         previousInput->users.remove(term);
-#endif
-}
-
-void set_inputs(Term* term, ReferenceList inputs)
-{
-    ReferenceList previousInputs = term->inputs;
-
-    term->inputs = inputs;
-
-    for (int i=0; i < (int) inputs.count(); i++) {
-        if (inputs[i] == NULL)
-            continue;
-
-#if TRACK_USERS
-        inputs[i]->users.appendUnique(term);
-#endif
-    }
-
-#if TRACK_USERS
-    for (int i=0; i < (int) previousInputs.count(); i++) {
-        if (previousInputs[i] == NULL)
-            continue;
-        if (!is_actually_using(previousInputs[i], term))
-            previousInputs[i]->users.remove(term);
-    }
 #endif
 }
 

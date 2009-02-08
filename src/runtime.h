@@ -23,7 +23,6 @@ Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs);
 void delete_term(Term* term);
 
 void set_input(Term* term, int index, Term* input);
-void set_inputs(Term* term, ReferenceList inputs);
 
 // Create a duplicate of the given term
 // If 'copyBranches' is false, don't copy branch state. It's assumed that the
