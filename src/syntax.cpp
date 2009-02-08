@@ -82,6 +82,9 @@ std::string get_term_source(Term* term)
         result << "end";
 
         return result.str();
+    } else if (term->function == IF_STATEMENT) {
+        result << "if ...";
+        return result.str();
     }
 
     // add possible name binding

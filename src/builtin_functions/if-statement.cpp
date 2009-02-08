@@ -40,6 +40,8 @@ namespace if_statement_function {
         kernel.eval("compound-type-append-field(@if-statement::State, Branch, 'negativeBranch')");
         kernel.eval("compound-type-append-field(@if-statement::State, Branch, 'joiningTerms')");
         as_function(main_func).stateType = kernel["if-statement::State"];
+
+        IF_STATEMENT = main_func;
     }
 }
 }

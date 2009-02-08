@@ -369,7 +369,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     possible_whitespace_or_newline(tokens);
 
-    Term* result = apply_function(&branch, "if-statement", ReferenceList(condition));
+    Term* result = apply_function(&branch, IF_STATEMENT, ReferenceList(condition));
     Branch& posBranch = as_branch(result->state->field(0));
     Branch& negBranch = as_branch(result->state->field(1));
     Branch& joiningTermsBranch = as_branch(result->state->field(2));
