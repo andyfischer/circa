@@ -12,10 +12,10 @@
 #include "type.h"
 #include "values.h"
 
-#include "newparser.h"
+#include "parser.h"
 
 namespace circa {
-namespace newparser {
+namespace parser {
 
 using namespace circa::tokenizer;
 

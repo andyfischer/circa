@@ -5,7 +5,7 @@
 #include "token_stream.h"
 
 namespace circa {
-namespace newparser {
+namespace parser {
 
 typedef Term* (*ParsingStep)(Branch& branch, TokenStream& tokens);
 
@@ -48,5 +48,5 @@ std::string pop_pending_rebind(Branch& branch);
 void remove_compilation_attrs(Branch& branch);
 void update_if_statement_joining_terms(Term* if_statement);
 
-} // namespace newparser
+} // namespace parser
 } // namespace circa
