@@ -4,7 +4,6 @@
 
 #include "branch.h"
 #include "builtins.h"
-#include "compilation.h"
 #include "function.h"
 #include "pointer_visitor.h"
 #include "runtime.h"
@@ -64,6 +63,55 @@ void prepend_whitespace(Term* term, std::string const& whitespace)
         term->syntaxHints.precedingWhitespace = 
             whitespace + term->syntaxHints.precedingWhitespace;
 }
+
+void push_pending_rebind(Branch& branch, std::string const& name)
+{
+    std::string attrname = get_name_for_attribute("comp-pending-rebind");
+
+    if (branch.containsName(attrname))
+        throw std::runtime_error("pending rebind already exists");
+
+    string_value(branch, name, attrname);
+}
+
+std::string pop_pending_rebind(Branch& branch)
+{
+    std::string attrname = get_name_for_attribute("comp-pending-rebind");
+
+    if (branch.containsName(attrname)) {
+        std::string result = as_string(branch[attrname]);
+        branch.removeTerm(get_name_for_attribute("comp-pending-rebind"));
+        return result;
+    } else {
+        return "";
+    }
+}
+
+void remove_compilation_attrs(Branch& branch)
+{
+    branch.removeTerm(get_name_for_attribute("comp-inside-expr"));
+    branch.removeTerm(get_name_for_attribute("comp-pending-rebind"));
+}
+
+Term* find_and_apply_function(Branch& branch,
+        std::string const& functionName,
+        ReferenceList inputs)
+{
+    Term* function = find_named(&branch, functionName);
+
+    // If function is not found, produce an instance of unknown-function
+    if (function == NULL) {
+        Term* result = apply_function(&branch,
+                                      UNKNOWN_FUNCTION,
+                                      inputs);
+        as_string(result->state) = functionName;
+        return result;
+    }
+
+    return apply_function(&branch, function, inputs);
+}
+
+// Parsing functions:
 
 Term* statement_list(Branch& branch, TokenStream& tokens)
 {
@@ -725,7 +773,7 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
     result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
     result->syntaxHints.functionName = functionName;
-    result->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
+    //result->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     result->syntaxHints.inputSyntax = inputSyntax;
 
     return result;
@@ -737,7 +785,7 @@ Term* literal_integer(Branch& branch, TokenStream& tokens)
     int value = strtol(text.c_str(), NULL, 0);
     Term* term = int_value(branch, value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
+    //term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     return term;
 }
 
@@ -747,7 +795,7 @@ Term* literal_hex(Branch& branch, TokenStream& tokens)
     int value = strtol(text.c_str(), NULL, 0);
     Term* term = int_value(branch, value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
+    //term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     return term;
 }
 
@@ -766,7 +814,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
 
     term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
+    //term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     return term;
 }
 
@@ -775,7 +823,7 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     std::string text = tokens.consume(STRING);
     Term* term = string_value(branch, text);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
+    //term->syntaxHints.occursInsideAnExpression = is_inside_expression(branch);
     return term;
 }
 

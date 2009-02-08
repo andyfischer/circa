@@ -3,7 +3,6 @@
 #include "common_headers.h"
 
 #include "token_stream.h"
-#include "compilation.h"
 
 namespace circa {
 

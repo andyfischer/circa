@@ -1,7 +1,6 @@
 // Copyright 2008 Andrew Fischer
 
 #include "branch.h"
-#include "compilation.h"
 #include "debug.h"
 #include "function.h"
 #include "introspection.h"
