@@ -117,6 +117,24 @@ Term* find_and_apply_function(Branch& branch,
     return apply_function(&branch, function, inputs);
 }
 
+void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
+{
+    for (int i=0; i < term->numInputs(); i++) {
+        Term* input = term->input(i);
+
+        if (input == NULL)
+            continue;
+
+        if (input->name != "")
+            continue;
+
+        input->syntaxHints.occursInsideAnExpression = true;
+
+        recursively_mark_terms_as_occuring_inside_an_expression(input);
+    }
+}
+
+
 // Parsing functions:
 
 Term* statement_list(Branch& branch, TokenStream& tokens)
@@ -346,6 +364,9 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     Term* condition = infix_expression(branch, tokens);
     assert(condition != NULL);
 
+    condition->syntaxHints.occursInsideAnExpression = true;
+    recursively_mark_terms_as_occuring_inside_an_expression(condition);
+
     possible_whitespace_or_newline(tokens);
 
     Term* result = apply_function(&branch, "if-statement", ReferenceList(condition));
@@ -472,6 +493,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     return result;
 }
 
+
 Term* expression_statement(Branch& branch, TokenStream& tokens)
 {
     bool isNameBinding = tokens.nextIs(tokenizer::IDENTIFIER)
@@ -507,18 +529,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     // Go through all of our terms, if they don't have names then assume they
     // were created just for us. Update the syntax hints to reflect this.
-    for (int i=0; i < result->numInputs(); i++) {
-        Term* input = result->input(i);
-
-        if (input == NULL)
-            continue;
-
-        if (input->name != "")
-            continue;
-
-        input->syntaxHints.occursInsideAnExpression = true;
-    }
-
+    recursively_mark_terms_as_occuring_inside_an_expression(result);
 
     return result;
 }
@@ -752,24 +763,29 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
     ReferenceList inputs;
 
-    TermSyntaxHints::InputSyntaxList inputSyntax;
+    TermSyntaxHints::InputSyntaxList inputSyntaxList;
 
     while (!tokens.nextIs(RPAREN)) {
-        possible_whitespace(tokens);
+        TermSyntaxHints::InputSyntax inputSyntax;
+
+        inputSyntax.precedingWhitespace = possible_whitespace(tokens);
         Term* term = infix_expression(branch, tokens);
-        possible_whitespace(tokens);
+        inputSyntax.followingWhitespace = possible_whitespace(tokens);
 
         inputs.append(term);
 
         if (term->name == "")
-            inputSyntax.push_back(TermSyntaxHints::InputSyntax::bySource());
+            inputSyntax.bySource();
         else {
-            inputSyntax.push_back(TermSyntaxHints::InputSyntax::byName(term->name));
+            inputSyntax.byName(term->name);
         }
 
         if (!tokens.nextIs(RPAREN))
             tokens.consume(COMMA);
+
+        inputSyntaxList.push_back(inputSyntax);
     }
+
 
     tokens.consume(RPAREN);
     
@@ -777,7 +793,7 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
     result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
     result->syntaxHints.functionName = functionName;
-    result->syntaxHints.inputSyntax = inputSyntax;
+    result->syntaxHints.inputSyntax = inputSyntaxList;
 
     return result;
 }

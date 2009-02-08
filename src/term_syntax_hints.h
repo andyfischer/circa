@@ -17,22 +17,27 @@ struct TermSyntaxHints
 
         Style style;
         std::string name;
+        std::string precedingWhitespace;
+        std::string followingWhitespace;
 
         InputSyntax() : style(UNKNOWN_STYLE) {}
 
-        static InputSyntax bySource()
+        void unknownStyle()
         {
-            InputSyntax result;
-            result.style = BY_SOURCE;
-            return result;
+            style = UNKNOWN_STYLE;
+            name = "";
         }
 
-        static InputSyntax byName(std::string const& name)
+        void bySource()
         {
-            InputSyntax result;
-            result.style = BY_NAME;
-            result.name = name;
-            return result;
+            style = BY_SOURCE;
+            name = "";
+        }
+
+        void byName(std::string const& name)
+        {
+            style = BY_NAME;
+            this->name = name;
         }
     };
 

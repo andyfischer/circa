@@ -96,8 +96,10 @@ std::string get_term_source(Term* term)
             result << term->syntaxHints.functionName << "(";
 
             for (int i=0; i < term->numInputs(); i++) {
-                if (i > 0) result << ", ";
+                if (i > 0) result << ",";
+                result << term->syntaxHints.getInputSyntax(i).precedingWhitespace;
                 result << get_source_of_input(term, i);
+                result << term->syntaxHints.getInputSyntax(i).followingWhitespace;
             }
 
             result << ")";
