@@ -6,7 +6,6 @@
 #include "cpp_importing.h"
 #include "branch.h"
 #include "builtins.h"
-#include "parser.h"
 #include "values.h"
 
 namespace circa {

@@ -1,6 +1,5 @@
 // Copyright 2008 Andrew Fischer
 
-#include "ast.h"
 #include "branch.h"
 #include "cpp_importing.h"
 #include "values.h"

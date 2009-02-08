@@ -5,7 +5,6 @@
 #include "function.h"
 #include "importing.h"
 #include "list.h"
-#include "parser.h"
 #include "pointer_iterator.h"
 #include "runtime.h"
 #include "type.h"

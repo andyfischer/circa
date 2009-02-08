@@ -6,7 +6,6 @@
 #include "branch.h"
 #include "builtins.h"
 #include "list.h"
-#include "parser.h"
 #include "term.h"
 #include "type.h"
 #include "values.h"

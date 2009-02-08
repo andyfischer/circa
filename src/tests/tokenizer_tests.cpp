@@ -4,7 +4,6 @@
 
 #include "testing.h"
 #include "branch.h"
-#include "parser.h"
 #include "builtins.h"
 #include "term.h"
 #include "runtime.h"

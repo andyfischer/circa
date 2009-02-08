@@ -8,7 +8,6 @@
 #include "builtins.h"
 #include "function.h"
 #include "introspection.h"
-#include "parser.h"
 #include "runtime.h"
 #include "term.h"
 #include "type.h"
@@ -122,17 +121,6 @@ void test_reference()
         ReferenceList(myref->function, REFERENCE_TYPE));
 }
 
-void test_parse_function_header()
-{
-    ast::FunctionHeader header = eval_as<ast::FunctionHeader>(
-        "parse-function-header('function fname(int arg1, string arg2) -> float'.tokenize)");
-
-    test_assert(header.functionName == "fname");
-    test_assert(header.arguments[0].name == "arg1");
-    test_assert(header.arguments[0].type == "int");
-    test_assert(header.outputType == "float");
-}
-
 void test_builtin_equals()
 {
     test_assert(eval_as<bool>("equals(1,1)"));
@@ -217,7 +205,6 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_concat);
     REGISTER_TEST_CASE(builtin_function_tests::test_bool);
     REGISTER_TEST_CASE(builtin_function_tests::test_reference);
-    REGISTER_TEST_CASE(builtin_function_tests::test_parse_function_header);
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_map);
     REGISTER_TEST_CASE(builtin_function_tests::test_if_statement);

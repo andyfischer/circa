@@ -6,7 +6,6 @@
 #include "builtins.h"
 #include "debug.h"
 #include "introspection.h"
-#include "parser.h"
 #include "runtime.h"
 #include "term.h"
 #include "testing.h"

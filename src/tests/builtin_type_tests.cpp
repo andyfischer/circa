@@ -7,7 +7,6 @@
 #include "debug.h"
 #include "builtins.h"
 #include "branch.h"
-#include "parser.h"
 #include "runtime.h"
 
 namespace circa {

@@ -6,7 +6,6 @@
 #include "function.h"
 #include "introspection.h"
 #include "runtime.h"
-#include "parser.h"
 #include "syntax.h"
 #include "type.h"
 #include "values.h"

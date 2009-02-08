@@ -5,7 +5,6 @@
 
 #include "common_headers.h"
 
-#include "ast.h"
 #include "branch.h"
 #include "builtins.h"
 #include "builtin_types.h"
@@ -13,7 +12,6 @@
 #include "function.h"
 #include "importing.h"
 #include "list.h"
-#include "parser.h"
 #include "runtime.h"
 #include "term.h"
 #include "token_stream.h"
