@@ -219,18 +219,12 @@ void set_input(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 
     // Update syntax hints
-    TermSyntaxHints::InputSyntax& syntax = term->syntaxHints.getInputSyntax(index);
-
-    if (input == NULL) {
-        syntax.style = TermSyntaxHints::InputSyntax::UNKNOWN_STYLE;
-        syntax.name = "";
-    } else if (input->name == "") {
-        syntax.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
-        syntax.name = "";
-    } else {
-        syntax.style = TermSyntaxHints::InputSyntax::BY_NAME;
-        syntax.name = input->name;
-    }
+    if (input == NULL)
+        term->syntaxHints.getInputSyntax(index).unknownStyle();
+    else if (input->name == "")
+        term->syntaxHints.getInputSyntax(index).bySource();
+    else
+        term->syntaxHints.getInputSyntax(index).byName(input->name);
 
 #if TRACK_USERS
     if (input != NULL) {
