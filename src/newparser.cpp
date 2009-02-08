@@ -167,9 +167,10 @@ Term* blank_line(Branch& branch, TokenStream& tokens)
     return result;
 }
 
-Term* function_decl(Branch& branch, TokenStream& tokens)
+Term* function_from_header(Branch& branch, TokenStream& tokens)
 {
-    tokens.consume(FUNCTION);
+    if (tokens.nextIs(FUNCTION))
+        tokens.consume(FUNCTION);
     possible_whitespace(tokens);
     std::string functionName = tokens.consume(IDENTIFIER);
     possible_whitespace(tokens);
@@ -179,9 +180,9 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     Function& func = as_function(result);
 
-    initialize_as_subroutine(func);
-
     func.name = functionName;
+    func.stateType = VOID_TYPE;
+    func.outputType = VOID_TYPE;
 
     while (!tokens.nextIs(RPAREN))
     {
@@ -225,11 +226,19 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         func.outputType = outputType;
     }
 
-    if (func.outputType == NULL)
-        func.outputType = VOID_TYPE;
-
     possible_whitespace(tokens);
     possible_newline(tokens);
+    
+
+    return result;
+}
+
+Term* function_decl(Branch& branch, TokenStream& tokens)
+{
+    Term* result = function_from_header(branch, tokens);
+    Function& func = as_function(result);
+
+    initialize_as_subroutine(func);
 
     while (!tokens.nextIs(END)) {
         statement(func.subroutineBranch, tokens);
@@ -305,7 +314,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         if (tokens.nextIs(ELSE)) {
             tokens.consume(ELSE);
             while (!tokens.nextIs(END)) {
-                Term* result = statement(negBranch, tokens);
+                statement(negBranch, tokens);
 
                 possible_whitespace(tokens);
             }
