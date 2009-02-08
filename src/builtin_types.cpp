@@ -131,6 +131,10 @@ namespace primitives {
             strm.setf(std::ios::fixed, std::ios::floatfield);
             strm.precision(1);
             strm << as_float(term);
+
+            if (term->hasProperty("mutability")
+                    && term->property("mutability")->asFloat() == 1.0)
+                strm << "?";
             return strm.str();
         }
     }
