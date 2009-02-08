@@ -90,16 +90,4 @@ Term* find_and_apply_function(Branch& branch,
     return apply_function(&branch, function, inputs);
 }
 
-void syntax_error(std::string const& message, tokenizer::TokenInstance const* location)
-{
-    std::stringstream out;
-    out << "Syntax error: " << message;
-
-    if (location != NULL) {
-        out << ", at line " << location->line << ", char " << location->character;
-    }
-
-    throw std::runtime_error(out.str());
-}
-
 } // namespace circa

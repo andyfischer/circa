@@ -13,7 +13,7 @@ TokenStream::next(int lookahead) const
     unsigned int i = this->currentIndex + lookahead;
 
     if (i >= tokens.size())
-        syntax_error("Unexpected EOF");
+        std::runtime_error("Unexpected EOF");
 
     return tokens[i];
 }
@@ -22,14 +22,14 @@ std::string
 TokenStream::consume(int match)
 {
     if (finished())
-        syntax_error(std::string("Unexpected EOF while looking for ") + tokenizer::getMatchText(match));
+        std::runtime_error(std::string("Unexpected EOF while looking for ") + tokenizer::getMatchText(match));
 
     if ((match != -1) && next().match != match) {
         std::stringstream msg;
         msg << "Unexpected token (expected " << tokenizer::getMatchText(match)
             << ", found " << tokenizer::getMatchText(next().match)
             << " '" << next().text << "')";
-        syntax_error(msg.str(), &next());
+        std::runtime_error(msg.str());
     }
 
     return tokens[currentIndex++].text;

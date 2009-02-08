@@ -18,9 +18,6 @@ void push_pending_rebind(Branch& branch, std::string const& name);
 std::string pop_pending_rebind(Branch& branch);
 void remove_compilation_attrs(Branch& branch);
 
-void syntax_error(std::string const& message,
-        tokenizer::TokenInstance const* location = NULL);
-
 } // namespace circa
 
 #endif
