@@ -1,6 +1,5 @@
 // Copyright 2008 Paul Hodge
 
-#include "ast.h"
 #include "branch.h"
 #include "builtins.h"
 #include "builtin_types.h"
@@ -12,7 +11,6 @@
 #include "introspection.h"
 #include "list.h"
 #include "newparser.h"
-#include "parser.h"
 #include "runtime.h"
 #include "set.h"
 #include "syntax.h"

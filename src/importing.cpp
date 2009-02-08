@@ -1,13 +1,11 @@
 // Copyright 2008 Paul Hodge
 
-#include "ast.h"
 #include "branch.h"
 #include "builtins.h"
 #include "cpp_importing.h"
 #include "importing.h"
 #include "newparser.h"
 #include "runtime.h"
-#include "parser.h"
 #include "term.h"
 #include "token_stream.h"
 #include "type.h"

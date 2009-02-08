@@ -2,6 +2,8 @@
 
 #include "common_headers.h"
 
+#include "token_stream.h"
+
 namespace circa {
 namespace newparser {
 

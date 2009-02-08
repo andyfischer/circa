@@ -4,7 +4,6 @@
 #define CIRCA_CPP_INTERFACE_INCLUDED
 
 #include "importing.h"
-#include "parser.h"
 #include "term.h"
 #include "type.h"
 

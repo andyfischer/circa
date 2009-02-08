@@ -2,12 +2,10 @@
 
 #include "common_headers.h"
 
-#include "ast.h"
 #include "branch.h"
 #include "builtins.h"
 #include "compilation.h"
 #include "function.h"
-#include "parser.h"
 #include "pointer_visitor.h"
 #include "runtime.h"
 #include "syntax.h"
