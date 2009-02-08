@@ -4,8 +4,7 @@
 #include "common_headers.h"
 
 #include "function.h"
-
-namespace ast { class FunctionHeader; }
+#include "token_stream.h"
 
 namespace circa {
 
@@ -17,10 +16,6 @@ Term* import_function(Branch& branch, Function::EvaluateFunc func, std::string c
 
 Term* import_member_function(Term* type, Function::EvaluateFunc evaluate, std::string const& headerText);
 
-// 'branch' may be NULL
-Term* import_function(Branch* branch,
-                        Function::EvaluateFunc func,
-                        ast::FunctionHeader &header);
 }
 
 #endif
