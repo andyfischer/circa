@@ -532,7 +532,7 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     return result;
 }
 
-int getInfixPrecedence(int match)
+int get_infix_precedence(int match)
 {
     switch(match) {
         case tokenizer::DOT:
@@ -568,7 +568,7 @@ int getInfixPrecedence(int match)
     }
 }
 
-std::string getInfixFunctionName(std::string const& infix)
+std::string get_infix_function_name(std::string const& infix)
 {
     if (infix == "+")
         return "add";
@@ -612,7 +612,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
     possible_whitespace(tokens);
 
-    while (!tokens.finished() && getInfixPrecedence(tokens.next().match) == precedence) {
+    while (!tokens.finished() && get_infix_precedence(tokens.next().match) == precedence) {
         std::string operatorStr = tokens.consume();
         possible_whitespace(tokens);
 
@@ -682,7 +682,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
         } else {
             Term* rightExpr = infix_expression_nested(branch, tokens, precedence+1);
 
-            std::string functionName = getInfixFunctionName(operatorStr);
+            std::string functionName = get_infix_function_name(operatorStr);
 
             result = find_and_apply_function(branch, functionName, ReferenceList(leftExpr, rightExpr));
             result->syntaxHints.declarationStyle = TermSyntaxHints::INFIX;
