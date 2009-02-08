@@ -6,13 +6,6 @@
 
 namespace circa {
 
-std::string getInfixFunctionName(std::string infix)
-{
-    Branch workspace;
-    string_value(workspace, infix, "infix");
-    return eval_as<std::string>(workspace, "get-infix-function-name(infix)");
-}
-
 std::string read_text_file(std::string const& filename)
 {
     Branch workspace;
