@@ -1,7 +1,6 @@
 // Copyright 2008 Paul Hodge
 
 #include "circa.h"
-#include "compilation.h"
 
 namespace circa {
 namespace evaluate_file_function {
