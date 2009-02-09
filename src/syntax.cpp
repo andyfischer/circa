@@ -100,6 +100,14 @@ std::string get_term_source(Term* term)
 
         Branch& posBranch = as_branch(term->state->field(0));
         result << get_branch_source(posBranch) << "\n";
+
+        Branch& negBranch = as_branch(term->state->field(1));
+
+        if (negBranch.numTerms() > 0) {
+            result << "else\n";
+            result << get_branch_source(negBranch) << "\n";
+        }
+
         result << "end";
         return result.str();
     }
