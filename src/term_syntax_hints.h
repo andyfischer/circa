@@ -59,6 +59,7 @@ struct TermSyntaxHints
     int endChar;
     DeclarationStyle declarationStyle;
     InputSyntaxList inputSyntax;
+    int parens;
     bool occursInsideAnExpression;
     std::string functionName;
     std::string precedingWhitespace;
@@ -69,6 +70,7 @@ struct TermSyntaxHints
         startChar(0),
         endChar(0),
         declarationStyle(UNKNOWN_DECLARATION_STYLE),
+        parens(0),
         occursInsideAnExpression(false)
     {}
 
