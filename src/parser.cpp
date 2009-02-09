@@ -367,7 +367,8 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     condition->syntaxHints.occursInsideAnExpression = true;
     recursively_mark_terms_as_occuring_inside_an_expression(condition);
 
-    possible_whitespace_or_newline(tokens);
+    possible_whitespace(tokens);
+    possible_newline(tokens);
 
     Term* result = apply_function(&branch, IF_STATEMENT, ReferenceList(condition));
     result->syntaxHints.declarationStyle = TermSyntaxHints::SPECIAL_CASE;
@@ -379,31 +380,31 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     negBranch.outerScope = &branch;
     joiningTermsBranch.outerScope = &branch;
 
+    Branch *target = &posBranch;
+
     while (!tokens.nextIs(END)) {
 
-        possible_whitespace(tokens);
+        std::string prespace = possible_whitespace(tokens);
 
         if (tokens.nextIs(ELSE)) {
             tokens.consume(ELSE);
-            while (!tokens.nextIs(END)) {
-                statement(negBranch, tokens);
-
-                possible_whitespace(tokens);
-            }
-            break;
-        } else if (tokens.nextIs(END)) {
+            possible_newline(tokens);
+            assert(target != &negBranch);
+            target = &negBranch;
+        } if (tokens.nextIs(END)) {
             break;
         } else {
-            statement(posBranch, tokens);
+            Term* term = statement(*target, tokens);
+            prepend_whitespace(term, prespace);
         }
     }
 
     tokens.consume(END);
+    possible_whitespace(tokens);
+    possible_newline(tokens);
 
     remove_compilation_attrs(posBranch);
     remove_compilation_attrs(negBranch);
-
-    possible_whitespace_or_newline(tokens);
 
     update_if_statement_joining_terms(result);
 
