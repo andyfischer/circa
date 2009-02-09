@@ -96,6 +96,10 @@ std::string get_term_source(Term* term)
         result << "if (";
         result << get_source_of_input(term, 0);
         result << ")\n";
+
+        Branch& posBranch = as_branch(term->state->field(0));
+        result << get_branch_source(posBranch) << "\n";
+        result << "end";
         return result.str();
     }
 
