@@ -59,7 +59,12 @@ struct TermSyntaxHints
     int endChar;
     DeclarationStyle declarationStyle;
     InputSyntaxList inputSyntax;
+    
+    // This way of storing parens is error-prone, because we can't reproduce
+    // source if the user has 2 or more sets of parens with whitespace between them.
+    // Perhaps we can store parens with precedingWhitespace ?
     int parens;
+
     bool occursInsideAnExpression;
     std::string functionName;
     std::string precedingWhitespace;

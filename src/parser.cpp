@@ -495,7 +495,6 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     return result;
 }
 
-
 Term* expression_statement(Branch& branch, TokenStream& tokens)
 {
     bool isNameBinding = tokens.nextIs(tokenizer::IDENTIFIER)
