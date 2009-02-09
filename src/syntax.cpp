@@ -20,27 +20,37 @@ std::string get_source_of_input(Term* term, int inputIndex)
     if (input != NULL && input->function == INT_TO_FLOAT_FUNC) {
         input = input->input(0);
     }
+    
+    TermSyntaxHints::InputSyntax& inputSyntax = 
+        term->syntaxHints.getInputSyntax(inputIndex);
 
-    switch (term->syntaxHints.getInputSyntax(inputIndex).style) {
+    std::stringstream result;
+
+    result << inputSyntax.precedingWhitespace;
+
+    switch (inputSyntax.style) {
         case TermSyntaxHints::InputSyntax::BY_SOURCE:
         {
-            return get_term_source(input);
+            result << get_term_source(input);
         }
         break;
 
         case TermSyntaxHints::InputSyntax::BY_NAME:
         {
-            return term->syntaxHints.getInputSyntax(inputIndex).name;
+            result << term->syntaxHints.getInputSyntax(inputIndex).name;
         }
         break;
 
         case TermSyntaxHints::InputSyntax::UNKNOWN_STYLE:
         default:
         {
-            return "(!unknown)";
+            result << "(!unknown)";
         }
         break;
     }
+
+    result << inputSyntax.followingWhitespace;
+    return result.str();
 }
 
 bool should_print_term_source_line(Term* term)
@@ -83,7 +93,9 @@ std::string get_term_source(Term* term)
 
         return result.str();
     } else if (term->function == IF_STATEMENT) {
-        result << "if ...";
+        result << "if (";
+        result << get_source_of_input(term, 0);
+        result << ")\n";
         return result.str();
     }
 
@@ -100,9 +112,7 @@ std::string get_term_source(Term* term)
 
             for (int i=0; i < term->numInputs(); i++) {
                 if (i > 0) result << ",";
-                result << term->syntaxHints.getInputSyntax(i).precedingWhitespace;
                 result << get_source_of_input(term, i);
-                result << term->syntaxHints.getInputSyntax(i).followingWhitespace;
             }
 
             result << ")";
