@@ -2,4 +2,5 @@ circa/assert.ca
 circa/boolean.ca
 circa/comparison.ca
 circa/feedback.ca
+circa/if.ca
 circa/sample1.ca

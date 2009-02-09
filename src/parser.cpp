@@ -747,6 +747,7 @@ Term* atom(Branch& branch, TokenStream& tokens)
         tokens.consume(LPAREN);
         Term* result = infix_expression(branch, tokens);
         tokens.consume(RPAREN);
+        result->syntaxHints.parens += 1;
         return result;
     }
 

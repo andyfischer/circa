@@ -70,6 +70,7 @@ std::string get_term_source(Term* term)
 
     result << term->syntaxHints.precedingWhitespace;
 
+
     // handle special cases
     if (term->function == COMMENT_FUNC) {
         std::string comment = get_comment_string(term);
@@ -93,9 +94,9 @@ std::string get_term_source(Term* term)
 
         return result.str();
     } else if (term->function == IF_STATEMENT) {
-        result << "if (";
+        result << "if ";
         result << get_source_of_input(term, 0);
-        result << ")\n";
+        result << "\n";
 
         Branch& posBranch = as_branch(term->state->field(0));
         result << get_branch_source(posBranch) << "\n";
@@ -107,6 +108,9 @@ std::string get_term_source(Term* term)
     if (term->name != "") {
         result << term->name << " = ";
     }
+
+    for (int p=0; p < term->syntaxHints.parens; p++)
+        result << "(";
 
     // add the declaration syntax
     switch (term->syntaxHints.declarationStyle) {
@@ -151,6 +155,9 @@ std::string get_term_source(Term* term)
         }
         break;
     }
+
+    for (int p=0; p < term->syntaxHints.parens; p++)
+        result << ")";
 
     result << term->syntaxHints.followingWhitespace;
 
