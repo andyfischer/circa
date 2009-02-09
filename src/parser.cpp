@@ -60,8 +60,8 @@ void set_input_syntax(Term* term, int index, Term* input)
 void prepend_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
-        term->syntaxHints.precedingWhitespace = 
-            whitespace + term->syntaxHints.precedingWhitespace;
+        term->syntaxHints.preWhitespace = 
+            whitespace + term->syntaxHints.preWhitespace;
 }
 
 void append_whitespace(Term* term, std::string const& whitespace)
@@ -149,7 +149,7 @@ Term* statement_list(Branch& branch, TokenStream& tokens)
 
 Term* statement(Branch& branch, TokenStream& tokens)
 {
-    std::string precedingWhitespace = possible_whitespace(tokens);
+    std::string preWhitespace = possible_whitespace(tokens);
 
     Term* result = NULL;
 
@@ -196,7 +196,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
         assert(result != NULL);
     }
 
-    prepend_whitespace(result, precedingWhitespace);
+    prepend_whitespace(result, preWhitespace);
 
     return result;
 }
@@ -770,7 +770,7 @@ Term* function_call(Branch& branch, TokenStream& tokens)
     while (!tokens.nextIs(RPAREN)) {
         TermSyntaxHints::InputSyntax inputSyntax;
 
-        inputSyntax.precedingWhitespace = possible_whitespace(tokens);
+        inputSyntax.preWhitespace = possible_whitespace(tokens);
         Term* term = infix_expression(branch, tokens);
         inputSyntax.followingWhitespace = possible_whitespace(tokens);
 

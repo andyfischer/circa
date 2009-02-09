@@ -26,7 +26,7 @@ std::string get_source_of_input(Term* term, int inputIndex)
 
     std::stringstream result;
 
-    result << inputSyntax.precedingWhitespace;
+    result << inputSyntax.preWhitespace;
 
     switch (inputSyntax.style) {
         case TermSyntaxHints::InputSyntax::BY_SOURCE:
@@ -68,7 +68,7 @@ std::string get_term_source(Term* term)
 {
     std::stringstream result;
 
-    result << term->syntaxHints.precedingWhitespace;
+    result << term->syntaxHints.preWhitespace;
 
 
     // handle special cases

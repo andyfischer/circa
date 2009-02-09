@@ -17,7 +17,7 @@ struct TermSyntaxHints
 
         Style style;
         std::string name;
-        std::string precedingWhitespace;
+        std::string preWhitespace;
         std::string followingWhitespace;
 
         InputSyntax() : style(UNKNOWN_STYLE) {}
@@ -62,12 +62,12 @@ struct TermSyntaxHints
     
     // This way of storing parens is error-prone, because we can't reproduce
     // source if the user has 2 or more sets of parens with whitespace between them.
-    // Perhaps we can store parens with precedingWhitespace ?
+    // Perhaps we can store parens with preWhitespace ?
     int parens;
 
     bool occursInsideAnExpression;
     std::string functionName;
-    std::string precedingWhitespace;
+    std::string preWhitespace;
     std::string followingWhitespace;
 
     TermSyntaxHints() :
