@@ -70,7 +70,6 @@ std::string get_term_source(Term* term)
 
     result << term->syntaxHints.preWhitespace;
 
-
     // handle special cases
     if (term->function == COMMENT_FUNC) {
         std::string comment = get_comment_string(term);
@@ -152,7 +151,7 @@ std::string get_term_source(Term* term)
         case TermSyntaxHints::INFIX:
         {
             result << get_source_of_input(term, 0) << " ";
-            result << term->syntaxHints.functionName << " ";
+            result << term->syntaxHints.functionName;
             result << get_source_of_input(term, 1);
         }
         break;

@@ -48,7 +48,7 @@ struct TermSyntaxHints
         DOT_CONCATENATION,
         ARROW_CONCATENATION,
         LITERAL_VALUE,
-        SPECIAL_CASE // includes if-statement
+        IF_STATEMENT
     };
 
     typedef std::vector<InputSyntax> InputSyntaxList;
