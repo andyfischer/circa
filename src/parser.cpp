@@ -371,7 +371,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     possible_newline(tokens);
 
     Term* result = apply_function(&branch, IF_STATEMENT, ReferenceList(condition));
-    result->syntaxHints.declarationStyle = TermSyntaxHints::SPECIAL_CASE;
+    result->syntaxHints.declarationStyle = TermSyntaxHints::IF_STATEMENT;
     Branch& posBranch = as_branch(result->state->field(0));
     Branch& negBranch = as_branch(result->state->field(1));
     Branch& joiningTermsBranch = as_branch(result->state->field(2));
@@ -626,11 +626,14 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
     Term* leftExpr = infix_expression_nested(branch, tokens, precedence+1);
 
-    possible_whitespace(tokens);
+    std::string preOperatorWhitespace = possible_whitespace(tokens);
 
     while (!tokens.finished() && get_infix_precedence(tokens.next().match) == precedence) {
         std::string operatorStr = tokens.consume();
-        possible_whitespace(tokens);
+
+        //std::cout << "before " << operatorStr << ", '" << preOperatorWhitespace << "'" << std::endl;
+
+        std::string postOperatorWhitespace = possible_whitespace(tokens);
 
         Term* result = NULL;
 
@@ -706,6 +709,9 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             set_input_syntax(result, 0, leftExpr);
             set_input_syntax(result, 1, rightExpr);
+
+            result->syntaxHints.getInputSyntax(0).followingWhitespace = preOperatorWhitespace;
+            result->syntaxHints.getInputSyntax(1).preWhitespace = postOperatorWhitespace;
         }
 
         leftExpr = result;
