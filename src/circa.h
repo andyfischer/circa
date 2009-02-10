@@ -10,6 +10,8 @@
 #include "importing.h"
 #include "introspection.h"
 #include "list.h"
+#include "testing.h"
+#include "migration.h"
 #include "parser.h"
 #include "runtime.h"
 #include "set.h"
