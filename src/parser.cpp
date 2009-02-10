@@ -308,6 +308,9 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     initialize_as_subroutine(func);
 
+    // allow access to outer scope. This is dangerous and should be revisited.
+    func.subroutineBranch.outerScope = &branch;
+
     while (!tokens.nextIs(END)) {
         statement(func.subroutineBranch, tokens);
     }

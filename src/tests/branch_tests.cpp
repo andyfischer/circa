@@ -2,15 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
-#include "builtins.h"
-#include "debug.h"
-#include "introspection.h"
-#include "runtime.h"
-#include "term.h"
-#include "testing.h"
-#include "type.h"
-#include "values.h"
+#include "circa.h"
 
 namespace circa {
 namespace branch_tests {
