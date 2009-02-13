@@ -54,6 +54,11 @@ void recycle_value(Term* source, Term* dest)
 
 void copy_value(Term* source, Term* dest)
 {
+    // Temp: Do a type specialization if dest has type 'any'.
+    // This should be removed once type inference rules are smarter.
+    if (dest->type == ANY_TYPE)
+        specialize_type(dest, source->type);
+
     assert_type(source, dest->type);
 
     if (dest->value == NULL)
