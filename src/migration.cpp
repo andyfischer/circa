@@ -4,6 +4,8 @@
 
 namespace circa {
 
+/* Old style of migration..
+
 // Returns whether the term was migrated
 bool migrate_term(Term* source, Term* dest)
 {
@@ -31,6 +33,29 @@ bool migrate_term(Term* source, Term* dest)
     }
 
     return false;
+}
+*/
+
+// New style of migration. Just copy over stateful terms, don't try to 
+// extract Term objects.
+void migrate_term(Term* source, Term* dest)
+{
+    // Branch migration
+    if (dest->state != NULL && dest->state->type == BRANCH_TYPE) {
+        migrate_branch(as_branch(source->state),as_branch(dest->state));
+        return;
+    } 
+    
+    // Subroutine migration
+    if (is_value(dest) && dest->type == FUNCTION_TYPE) {
+        migrate_branch(get_subroutine_branch(source),get_subroutine_branch(dest));
+        return;
+    }
+
+    // Value migration
+    if (is_value(dest) && dest->isStateful()) {
+        copy_value(source, dest);
+    }
 }
 
 void migrate_branch(Branch& replacement, Branch& target)
@@ -78,13 +103,16 @@ void migrate_branch(Branch& replacement, Branch& target)
             continue;
         }
 
-        bool migrated = migrate_term(targetTerm, originalTerm);
+        migrate_term(originalTerm, targetTerm);
 
+#if 0
+        Temporarily don't try to move Term objects. Will be enabled in the future.
         if (migrated) {
             // Replace in list
             target._replaceTermObject(targetTerm, originalTerm);
             originalTerms.remove(originalTerm);
         }
+#endif
     }
 }
 
