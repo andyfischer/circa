@@ -19,7 +19,7 @@ function redraw()
 
     ship_facing = PI*2
 
-    ship_x = mouse_x + 1.0
+    ship_x = mouse_x
     fill_rectangle(0,0,640,480, 0xffffff)
 
     a_x = ship_x + front_dist * cos(ship_facing)

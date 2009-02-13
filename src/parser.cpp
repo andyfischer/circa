@@ -517,6 +517,11 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     Term* result = infix_expression(branch, tokens);
     possible_newline(tokens);
 
+    // If this item is just an identifier, and we're trying to rename it,
+    // create an implicit call to 'copy'.
+    if (result->name != "" && name != "")
+        result = apply_function(&branch, COPY_FUNC, ReferenceList(result));
+
     std::string pendingRebind = pop_pending_rebind(branch);
 
     if (pendingRebind != "") {

@@ -246,6 +246,16 @@ void test_syntax_hints()
     test_assert(t->syntaxHints.getInputSyntax(0).name == "false");
 }
 
+void test_implicit_copy_by_identifier()
+{
+    Branch branch;
+    Term* a = branch.eval("a = 1");
+    Term* b = branch.eval("b = a");
+
+    test_assert(b->function == COPY_FUNC);
+    test_assert(b->input(0) == a);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -265,6 +275,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_arrow_concatenation2);
     REGISTER_TEST_CASE(parser_tests::test_dot_concatenation);
     REGISTER_TEST_CASE(parser_tests::test_syntax_hints);
+    REGISTER_TEST_CASE(parser_tests::test_implicit_copy_by_identifier);
 }
 
 } // namespace parser_tests
