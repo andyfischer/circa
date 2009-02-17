@@ -48,6 +48,11 @@ struct Ref
         return *this;
     }
 
+    operator Term*()
+    {
+        return _target;
+    }
+
     static void removeRef(Term* term, Ref* ref);
 };
 

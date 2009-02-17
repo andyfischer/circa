@@ -23,11 +23,13 @@ void test_basic()
     test_assert(ref._target == t);
     test_assert(t->refs.size() == 1);
     test_assert(t->refs[0] == &ref);
+    test_assert( ((Term*) ref) == t);
 
     ref = NULL;
 
     test_assert(ref._target == NULL);
     test_assert(t->refs.size() == 0);
+
 
     delete t;
 }
