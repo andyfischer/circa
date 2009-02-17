@@ -22,9 +22,6 @@ static unsigned int gNextGlobalID = 1;
 
 Term::Term()
   : value(NULL),
-    type(this),
-    function(this),
-    state(this),
     owningBranch(NULL),
     ownsValue(true),
     stealingOk(true),

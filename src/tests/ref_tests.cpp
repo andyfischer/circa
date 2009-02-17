@@ -9,7 +9,7 @@ namespace ref_tests {
 
 void test_basic()
 {
-    Ref ref(NULL);
+    Ref ref;
 
     test_assert(ref._target == NULL);
     test_assert(ref._owner == NULL);
@@ -35,7 +35,7 @@ void test_basic()
 
 void test_copy()
 {
-    Ref ref(NULL);
+    Ref ref;
 
     Term* t = new Term();
 
@@ -62,7 +62,7 @@ void test_destroy()
     Term* t = new Term();
 
     {
-        Ref ref(NULL);
+        Ref ref;
         ref = t;
         test_assert(t->refs.size() == 1);
     }
@@ -76,6 +76,7 @@ void register_tests()
     REGISTER_TEST_CASE(ref_tests::test_copy);
     REGISTER_TEST_CASE(ref_tests::test_destroy);
 }
+
 } // namespace ref_tests
 
 } // namespace circa

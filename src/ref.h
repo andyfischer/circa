@@ -3,6 +3,10 @@
 #ifndef CIRCA_REFERENCE_INCLUDED
 #define CIRCA_REFERENCE_INCLUDED
 
+// Ref
+//
+// Maintains a safe weak pointer to a Term.
+
 #include "common_headers.h"
 
 namespace circa {
@@ -12,15 +16,16 @@ struct Ref
     Term* _target;
     Term* _owner;
 
-    Ref(Term *owner)
+    Ref()
       : _target(NULL),
-        _owner(owner)
+        _owner(NULL)
     {
     }
 
-    ~Ref()
+    Ref(Term *initialValue)
+      : _target(initialValue),
+        _owner(NULL)
     {
-        set(NULL);
     }
 
     // Copy constructor
@@ -29,6 +34,11 @@ struct Ref
         _owner(copy._owner)
     {
         set(copy._target);
+    }
+
+    ~Ref()
+    {
+        set(NULL);
     }
 
     // Assignment copy
