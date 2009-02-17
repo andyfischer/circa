@@ -3,6 +3,11 @@
 #ifndef CIRCA_TERM_LIST_INCLUDED
 #define CIRCA_TERM_LIST_INCLUDED
 
+// RefList
+//
+// A list of weak Term pointers.
+//
+
 #include "common_headers.h"
 
 #include "pointer_visitor.h"
