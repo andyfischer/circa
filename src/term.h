@@ -6,6 +6,7 @@
 #include "common_headers.h"
 
 #include "dictionary.h"
+#include "referencer.h"
 #include "ref.h"
 #include "ref_list.h"
 #include "ref_set.h"
@@ -61,8 +62,8 @@ struct Term
     // 'users' are terms which are using us as an input or as a function.
     RefList users;
 
-    // Ref objects which are pointing to us
-    std::vector<Ref*> refs;
+    // Objects which are pointing to us
+    std::vector<Referencer*> refs;
 
     Term();
     ~Term();
@@ -71,6 +72,9 @@ struct Term
     int numInputs() const;
 
     std::string toString();
+
+    // Remove this referencer
+    void removeReferencer(Referencer*);
 
     // Returns the named property
     Term* property(std::string const& name) const;
