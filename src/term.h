@@ -23,16 +23,16 @@ struct Term
     void* value;
 
     // A Type term that describes our data type
-    Term* type;
+    Ref type;
 
     // Input terms
     ReferenceList inputs;
 
     // Our function: the thing that takes our inputs (and possibly state), and produces a value.
-    Term* function;
+    Ref function;
 
     // Persisted internal value. Owned by us.
-    Term* state;
+    Ref state;
 
     // The branch that owns this term.
     Branch* owningBranch;
