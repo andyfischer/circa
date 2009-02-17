@@ -6,6 +6,7 @@
 #include "common_headers.h"
 
 #include "dictionary.h"
+#include "ref.h"
 #include "ref_list.h"
 #include "ref_set.h"
 #include "term_syntax_hints.h"
@@ -59,6 +60,9 @@ struct Term
 
     // 'users' are terms which are using us as an input or as a function.
     ReferenceList users;
+
+    // Ref objects which are pointing to us
+    std::vector<Ref*> refs;
 
     Term();
     ~Term();

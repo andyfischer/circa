@@ -149,7 +149,7 @@ void test_migrate2()
 
     // Term preservation is disabled
     //test_assert(orig[0] == a);
-    //test_assert(orig[1]->name == "c");
+    test_assert(orig[1]->name == "c");
     test_assert(orig["a"]->asInt() == 3);
 }
 
