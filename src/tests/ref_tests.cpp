@@ -30,7 +30,6 @@ void test_basic()
     test_assert(ref._target == NULL);
     test_assert(t->refs.size() == 0);
 
-
     delete t;
 }
 
