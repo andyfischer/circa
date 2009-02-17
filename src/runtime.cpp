@@ -11,7 +11,7 @@
 
 namespace circa {
 
-Term* create_term(Branch* branch, Term* function, ReferenceList const& inputs)
+Term* create_term(Branch* branch, Term* function, RefList const& inputs)
 {
     assert_good_pointer(function);
 
@@ -281,16 +281,16 @@ Term* possibly_coerce_term(Branch* branch, Term* original, Term* expectedType)
 
     // Coerce from int to float
     if (original->type == INT_TYPE && expectedType == FLOAT_TYPE) {
-        return apply_function(branch, INT_TO_FLOAT_FUNC, ReferenceList(original));
+        return apply_function(branch, INT_TO_FLOAT_FUNC, RefList(original));
     }
 
     return original;
 }
 
-Term* apply_function(Branch* branch, Term* function, ReferenceList const& _inputs)
+Term* apply_function(Branch* branch, Term* function, RefList const& _inputs)
 {
     // Make a local copy of _inputs
-    ReferenceList inputs = _inputs;
+    RefList inputs = _inputs;
 
     // Evaluate this function if needed
     if (function->needsUpdate)
@@ -314,7 +314,7 @@ Term* apply_function(Branch* branch, Term* function, ReferenceList const& _input
             throw std::runtime_error(std::string("Term ") + function->toString()
                     + " is not a type, and has no default function");
 
-        ReferenceList memberFunctionInputs;
+        RefList memberFunctionInputs;
         memberFunctionInputs.append(function);
         memberFunctionInputs.appendAll(inputs);
 
@@ -343,7 +343,7 @@ Term* apply_function(Branch* branch, Term* function, ReferenceList const& _input
 
 Term* apply_function(Branch* branch,
                      std::string const& functionName, 
-                     ReferenceList const& inputs)
+                     RefList const& inputs)
 {
     Term* function = find_named(branch,functionName);
     if (function == NULL)
@@ -352,7 +352,7 @@ Term* apply_function(Branch* branch,
     return apply_function(branch, function, inputs);
 }
 
-Term* eval_function(Branch& branch, Term* function, ReferenceList const& inputs)
+Term* eval_function(Branch& branch, Term* function, RefList const& inputs)
 {
     Term* result = apply_function(&branch, function, inputs);
     evaluate_term(result);
@@ -360,7 +360,7 @@ Term* eval_function(Branch& branch, Term* function, ReferenceList const& inputs)
 }
 
 Term* eval_function(Branch& branch, std::string const& functionName,
-        ReferenceList const &inputs)
+        RefList const &inputs)
 {
     Term* function = find_named(&branch,functionName);
     if (function == NULL)

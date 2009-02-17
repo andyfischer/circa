@@ -11,7 +11,7 @@
 namespace circa {
 
 void
-ReferenceList::appendAll(ReferenceList const& list)
+RefList::appendAll(RefList const& list)
 {
     if (&list == this)
         throw std::runtime_error("Circular call");
@@ -20,13 +20,13 @@ ReferenceList::appendAll(ReferenceList const& list)
         append(list[i]);
 }
 
-void ReferenceList::remapPointers(ReferenceMap const& map)
+void RefList::remapPointers(ReferenceMap const& map)
 {
     for (unsigned int i=0; i < _items.size(); i++)
         _items[i] = map.getRemapped(_items[i]);
 }
 
-void ReferenceList::visitPointers(PointerVisitor &visitor)
+void RefList::visitPointers(PointerVisitor &visitor)
 {
     for (unsigned int i=0; i < _items.size(); i++)
         visitor.visitPointer(_items[i]);

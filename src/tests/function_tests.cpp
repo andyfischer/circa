@@ -67,10 +67,10 @@ void external_pointers()
 
     Term* function = create_value(&branch, FUNCTION_TYPE);
 
-    as_function(function).inputTypes = ReferenceList(INT_TYPE, INT_TYPE);
+    as_function(function).inputTypes = RefList(INT_TYPE, INT_TYPE);
     as_function(function).outputType = STRING_TYPE;
 
-    test_equals(list_all_pointers(function), ReferenceList(
+    test_equals(list_all_pointers(function), RefList(
             function->function,
             FUNCTION_TYPE,
             INT_TYPE,
@@ -79,7 +79,7 @@ void external_pointers()
     function = branch.eval(
             "subroutine-create(\"mysub\",tuple(float,float),bool)");
 
-    test_equals(list_all_pointers(function), ReferenceList(
+    test_equals(list_all_pointers(function), RefList(
             function->input(0),
             function->input(1), // a list of (float,float)
             BOOL_TYPE,

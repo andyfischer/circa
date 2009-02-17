@@ -117,7 +117,7 @@ Term* create_value(Branch* branch, Term* type, std::string const& name)
         assert(name == "");
 
     Term *var_function = get_value_function(type);
-    Term *term = create_term(branch, var_function, ReferenceList());
+    Term *term = create_term(branch, var_function, RefList());
 
     alloc_value(term);
 
@@ -146,7 +146,7 @@ Term* import_value(Branch& branch, Term* type, void* initialValue, std::string c
 {
     assert(type != NULL);
     Term *var_function = get_value_function(type);
-    Term *term = create_term(&branch, var_function, ReferenceList());
+    Term *term = create_term(&branch, var_function, RefList());
 
     term->value = initialValue;
     term->ownsValue = false;
@@ -206,7 +206,7 @@ Term* bool_value(Branch& branch, bool b, std::string const& name)
 
 Term* create_alias(Branch& branch, Term* term)
 {
-    return eval_function(branch, ALIAS_FUNC, ReferenceList(term));
+    return eval_function(branch, ALIAS_FUNC, RefList(term));
 }
 
 } // namespace circa

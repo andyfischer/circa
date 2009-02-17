@@ -56,11 +56,11 @@ void test_find_existing_equivalent()
     Term* b = branch.eval("b = 1.0");
     Term* addition = branch.eval("add(a,b)");
 
-    test_assert(is_equivalent(addition, add_func, ReferenceList(a,b)));
+    test_assert(is_equivalent(addition, add_func, RefList(a,b)));
 
-    test_assert(addition == find_equivalent(add_func, ReferenceList(a,b)));
+    test_assert(addition == find_equivalent(add_func, RefList(a,b)));
 
-    test_assert(NULL == find_equivalent(add_func, ReferenceList(b,a)));
+    test_assert(NULL == find_equivalent(add_func, RefList(b,a)));
 
     Term* another_addition = branch.eval("add(a,b)");
 
@@ -92,7 +92,7 @@ void null_input_errors()
 
     Term* one = float_value(branch, 1.0);
 
-    Term* term1 = apply_function(&branch, get_global("add"), ReferenceList(NULL, one));
+    Term* term1 = apply_function(&branch, get_global("add"), RefList(NULL, one));
     evaluate_term(term1);
     test_assert(term1->hasError());
     test_assert(term1->getErrorMessage() == "Input 0 is NULL");
@@ -102,7 +102,7 @@ void null_input_errors()
     test_assert(term1->hasError());
     test_assert(term1->getErrorMessage() == "Function is NULL");
 
-    Term* term2 = apply_function(&branch, get_global("add"), ReferenceList(one, NULL));
+    Term* term2 = apply_function(&branch, get_global("add"), RefList(one, NULL));
     evaluate_term(term2);
     test_assert(term2->hasError());
     test_assert(term2->getErrorMessage() == "Input 1 is NULL");

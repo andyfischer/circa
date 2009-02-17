@@ -77,7 +77,7 @@ struct Type
     TermNamespace memberFunctions;
 
     // Type parameters
-    ReferenceList parameters;
+    RefList parameters;
 
     // Syntax hints
     TypeSyntaxHints syntaxHints;

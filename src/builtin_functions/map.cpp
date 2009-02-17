@@ -49,7 +49,7 @@ namespace map_function {
         Term* keyType = caller->input(0);
         Term* valueType = caller->input(1);
 
-        result.inputTypes = ReferenceList(keyType);
+        result.inputTypes = RefList(keyType);
         result.outputType = valueType;
         result.pureFunction = true;
         result.name = std::string("Map<") + as_type(keyType).name + ","

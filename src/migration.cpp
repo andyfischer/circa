@@ -80,7 +80,7 @@ void migrate_branch(Branch& replacement, Branch& target)
     // 5. Discard 'original'.
     //
 
-    ReferenceList originalTerms = target._terms;
+    RefList originalTerms = target._terms;
     TermNamespace originalNamespace = target.names;
 
     target.clear();

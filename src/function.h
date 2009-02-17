@@ -27,7 +27,7 @@ struct Function
     };
     typedef std::vector<InputProperties> InputPropertiesList;
 
-    ReferenceList inputTypes;
+    RefList inputTypes;
     InputPropertiesList inputProperties;
     Term* outputType;
     Term* stateType;

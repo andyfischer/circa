@@ -295,7 +295,7 @@ void initialize_builtin_types(Branch& kernel)
     as_type(REFERENCE_TYPE).startPointerIterator = ref_type::startPointerIterator;
     as_type(REFERENCE_TYPE).cppTypeName = "Term*";
 
-    import_type<ReferenceList>(kernel, "Tuple");
+    import_type<RefList>(kernel, "Tuple");
     import_type<Branch>(kernel, "Branch");
     import_type<Map>(kernel, "Map");
 

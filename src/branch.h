@@ -14,7 +14,7 @@ namespace circa {
 
 struct Branch
 {
-    ReferenceList _terms;
+    RefList _terms;
 
     // Points to a Branch which is our outer scope.
     Branch* outerScope;

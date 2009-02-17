@@ -101,7 +101,7 @@ void remove_compilation_attrs(Branch& branch)
 
 Term* find_and_apply_function(Branch& branch,
         std::string const& functionName,
-        ReferenceList inputs)
+        RefList inputs)
 {
     Term* function = find_named(&branch, functionName);
 
@@ -217,7 +217,7 @@ Term* comment_statement(Branch& branch, TokenStream& tokens)
         tokens.consume();
     }
 
-    Term* result = apply_function(&branch, COMMENT_FUNC, ReferenceList());
+    Term* result = apply_function(&branch, COMMENT_FUNC, RefList());
     as_string(result->state->field(0)) = commentText.str();
     result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     return result;
@@ -228,7 +228,7 @@ Term* blank_line(Branch& branch, TokenStream& tokens)
     if (!tokens.finished())
         tokens.consume(NEWLINE);
 
-    Term* result = apply_function(&branch, COMMENT_FUNC, ReferenceList());
+    Term* result = apply_function(&branch, COMMENT_FUNC, RefList());
     as_string(result->state->field(0)) = "";
     result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
 
@@ -373,7 +373,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
     possible_newline(tokens);
 
-    Term* result = apply_function(&branch, IF_STATEMENT, ReferenceList(condition));
+    Term* result = apply_function(&branch, IF_STATEMENT, RefList(condition));
     result->syntaxHints.declarationStyle = TermSyntaxHints::IF_STATEMENT;
     Branch& posBranch = as_branch(result->state->field(0));
     Branch& negBranch = as_branch(result->state->field(1));
@@ -459,7 +459,7 @@ void update_if_statement_joining_terms(Term* if_statement)
             Term* negVersion = negBranch.containsName(name) ? negBranch[name] : outerVersion;
 
             Term* joining = apply_function(&joiningTermsBranch, "if-expr",
-                    ReferenceList(conditionTerm, posVersion, negVersion));
+                    RefList(conditionTerm, posVersion, negVersion));
 
             // Bind these names in the outer branch. This is probably dangerous
             // and should be changed
@@ -520,7 +520,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     // If this item is just an identifier, and we're trying to rename it,
     // create an implicit call to 'copy'.
     if (result->name != "" && name != "")
-        result = apply_function(&branch, COPY_FUNC, ReferenceList(result));
+        result = apply_function(&branch, COPY_FUNC, RefList(result));
 
     std::string pendingRebind = pop_pending_rebind(branch);
 
@@ -666,7 +666,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             assert(function != NULL);
 
-            ReferenceList inputs(leftExpr);
+            RefList inputs(leftExpr);
 
             // Look for inputs
             if (tokens.nextIs(LPAREN)) {
@@ -698,7 +698,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             std::string functionName = tokens.consume(IDENTIFIER);
             possible_whitespace(tokens);
 
-            ReferenceList inputs(leftExpr);
+            RefList inputs(leftExpr);
 
             result = find_and_apply_function(branch, functionName, inputs);
 
@@ -711,7 +711,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             std::string functionName = get_infix_function_name(operatorStr);
 
-            result = find_and_apply_function(branch, functionName, ReferenceList(leftExpr, rightExpr));
+            result = find_and_apply_function(branch, functionName, RefList(leftExpr, rightExpr));
             result->syntaxHints.declarationStyle = TermSyntaxHints::INFIX;
             result->syntaxHints.functionName = operatorStr;
 
@@ -777,7 +777,7 @@ Term* function_call(Branch& branch, TokenStream& tokens)
     std::string functionName = tokens.consume(IDENTIFIER);
     tokens.consume(LPAREN);
 
-    ReferenceList inputs;
+    RefList inputs;
 
     TermSyntaxHints::InputSyntaxList inputSyntaxList;
 
@@ -879,7 +879,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
 
     // If not found, create an instance of unknown-identifier
     if (result == NULL) {
-        result = apply_function(&branch, UNKNOWN_IDENTIFIER_FUNC, ReferenceList());
+        result = apply_function(&branch, UNKNOWN_IDENTIFIER_FUNC, RefList());
         as_string(result->state) = id;
         branch.bindName(result, id);
     }

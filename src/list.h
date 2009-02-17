@@ -16,7 +16,7 @@ const int LIST_TYPE_SIGNATURE = 0x91917575;
 struct List
 {
     int _signature;
-    ReferenceList items;
+    RefList items;
 
     // Default constructor
     List() : _signature(LIST_TYPE_SIGNATURE) {}

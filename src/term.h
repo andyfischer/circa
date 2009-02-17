@@ -26,7 +26,7 @@ struct Term
     Ref type;
 
     // Input terms
-    ReferenceList inputs;
+    RefList inputs;
 
     // Our function: the thing that takes our inputs (and possibly state), and produces a value.
     Ref function;
@@ -59,7 +59,7 @@ struct Term
     Dictionary properties;
 
     // 'users' are terms which are using us as an input or as a function.
-    ReferenceList users;
+    RefList users;
 
     // Ref objects which are pointing to us
     std::vector<Ref*> refs;
