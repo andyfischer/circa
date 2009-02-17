@@ -62,6 +62,19 @@ Term::toString()
     }
 }
 
+void
+Term::removeReferencer(Referencer* refer)
+{
+    std::vector<Referencer*>::iterator it;
+    for (it = this->refs.begin(); it != this->refs.end();) {
+        if (*it == refer) {
+            it = this->refs.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
 Term* Term::property(std::string const& name) const
 {
     return properties[name];

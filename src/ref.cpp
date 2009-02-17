@@ -17,21 +17,7 @@ void Ref::set(Term* target)
         _target->refs.push_back(this);
 
     if (previousTarget != NULL)
-        removeRef(previousTarget, this);
+        previousTarget->removeReferencer(this);
 }
 
-void Ref::removeRef(Term* term, Ref* ref)
-{
-    std::vector<Ref*>::iterator it;
-    for (it = term->refs.begin(); it != term->refs.end();) {
-
-        if (*it == ref) {
-            it = term->refs.erase(it);
-        } else {
-            ++it;
-        }
-    }
-}
-    
 } // namespace circa
-
