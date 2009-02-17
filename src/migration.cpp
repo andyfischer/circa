@@ -48,12 +48,14 @@ void migrate_term(Term* source, Term* dest)
     
     // Subroutine migration
     if (is_value(dest) && dest->type == FUNCTION_TYPE) {
+        std::cout << "migrating subroutine: " << dest->name << std::endl;
         migrate_branch(get_subroutine_branch(source),get_subroutine_branch(dest));
         return;
     }
 
     // Value migration
     if (is_value(dest) && dest->isStateful()) {
+        std::cout << "migrating state: " << dest->name << std::endl;
         copy_value(source, dest);
     }
 }
@@ -104,15 +106,6 @@ void migrate_branch(Branch& replacement, Branch& target)
         }
 
         migrate_term(originalTerm, targetTerm);
-
-#if 0
-        Temporarily don't try to move Term objects. Will be enabled in the future.
-        if (migrated) {
-            // Replace in list
-            target._replaceTermObject(targetTerm, originalTerm);
-            originalTerms.remove(originalTerm);
-        }
-#endif
     }
 }
 
