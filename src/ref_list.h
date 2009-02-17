@@ -9,41 +9,41 @@
 
 namespace circa {
 
-struct ReferenceList
+struct RefList
 {
 private:
     std::vector<Term*> _items;
  
 public:
-    explicit ReferenceList() { }
+    explicit RefList() { }
 
     // Convenience constructors
-    explicit ReferenceList(Term* term) {
+    explicit RefList(Term* term) {
         _items.push_back(term);
     }
-    ReferenceList(Term* term1, Term* term2) {
+    RefList(Term* term1, Term* term2) {
         _items.push_back(term1);
         _items.push_back(term2);
     }
-    ReferenceList(Term* term1, Term* term2, Term* term3) {
+    RefList(Term* term1, Term* term2, Term* term3) {
         _items.push_back(term1);
         _items.push_back(term2);
         _items.push_back(term3);
     }
-    ReferenceList(Term* term1, Term* term2, Term* term3, Term* term4) {
+    RefList(Term* term1, Term* term2, Term* term3, Term* term4) {
         _items.push_back(term1);
         _items.push_back(term2);
         _items.push_back(term3);
         _items.push_back(term4);
     }
-    ReferenceList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5) {
+    RefList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5) {
         _items.push_back(term1);
         _items.push_back(term2);
         _items.push_back(term3);
         _items.push_back(term4);
         _items.push_back(term5);
     }
-    ReferenceList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5, Term* term6) {
+    RefList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5, Term* term6) {
         _items.push_back(term1);
         _items.push_back(term2);
         _items.push_back(term3);
@@ -51,7 +51,7 @@ public:
         _items.push_back(term5);
         _items.push_back(term6);
     }
-    ReferenceList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5, Term* term6, Term* term7) {
+    RefList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5, Term* term6, Term* term7) {
         _items.push_back(term1);
         _items.push_back(term2);
         _items.push_back(term3);
@@ -60,7 +60,7 @@ public:
         _items.push_back(term6);
         _items.push_back(term7);
     }
-    ReferenceList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5, Term* term6, Term* term7, Term* term8) {
+    RefList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5, Term* term6, Term* term7, Term* term8) {
         _items.push_back(term1);
         _items.push_back(term2);
         _items.push_back(term3);
@@ -91,7 +91,7 @@ public:
         append(term);
     }
 
-    void appendAll(ReferenceList const& list);
+    void appendAll(RefList const& list);
     void setAt(unsigned int index, Term* term)
     {
         // Check for a previous bug
@@ -154,7 +154,7 @@ public:
         return _items[index];
     }
 
-    bool operator==(ReferenceList const& b)
+    bool operator==(RefList const& b)
     {
         if (count() != b.count())
             return false;

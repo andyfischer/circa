@@ -46,7 +46,7 @@ void _test_fail_function(int line, const char* file)
     throw std::runtime_error(msg.str());
 }
 
-void _test_equals_function(ReferenceList const& a, ReferenceList const& b,
+void _test_equals_function(RefList const& a, RefList const& b,
         const char* aText, const char* bText, int line, const char* file)
 {
     std::stringstream msg;

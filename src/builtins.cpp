@@ -218,17 +218,17 @@ void initialize_constants()
     CONSTANT_1 = float_value(*KERNEL, 1);
     CONSTANT_2 = float_value(*KERNEL, 2);
 
-    CONSTANT_TRUE = apply_function(KERNEL, BOOL_TYPE, ReferenceList());
+    CONSTANT_TRUE = apply_function(KERNEL, BOOL_TYPE, RefList());
     as_bool(CONSTANT_TRUE) = true;
     CONSTANT_TRUE->stealingOk = false;
     KERNEL->bindName(CONSTANT_TRUE, "true");
 
-    CONSTANT_FALSE = apply_function(KERNEL, BOOL_TYPE, ReferenceList());
+    CONSTANT_FALSE = apply_function(KERNEL, BOOL_TYPE, RefList());
     as_bool(CONSTANT_FALSE) = false;
     CONSTANT_FALSE->stealingOk = false;
     KERNEL->bindName(CONSTANT_FALSE, "false");
 
-    Term* pi = apply_function(KERNEL, FLOAT_TYPE, ReferenceList());
+    Term* pi = apply_function(KERNEL, FLOAT_TYPE, RefList());
     as_float(pi) = 3.14159;
     KERNEL->bindName(pi, "PI");
 

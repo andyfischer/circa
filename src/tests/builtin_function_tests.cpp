@@ -24,12 +24,12 @@ void test_math()
     Term* three = float_value(branch, 3);
     Term* negative_one = float_value(branch, -1);
 
-    test_assert(as_float(eval_function(branch, ADD_FUNC, ReferenceList(two,three))) == 5);
-    test_assert(as_float(eval_function(branch, ADD_FUNC, ReferenceList(two,negative_one))) == 1);
+    test_assert(as_float(eval_function(branch, ADD_FUNC, RefList(two,three))) == 5);
+    test_assert(as_float(eval_function(branch, ADD_FUNC, RefList(two,negative_one))) == 1);
 
-    eval_function(branch, MULT_FUNC, ReferenceList(two,three));
-    test_assert(as_float(eval_function(branch, MULT_FUNC, ReferenceList(two,three))) == 6);
-    test_assert(as_float(eval_function(branch, MULT_FUNC, ReferenceList(negative_one,three))) == -3);
+    eval_function(branch, MULT_FUNC, RefList(two,three));
+    test_assert(as_float(eval_function(branch, MULT_FUNC, RefList(two,three))) == 6);
+    test_assert(as_float(eval_function(branch, MULT_FUNC, RefList(negative_one,three))) == -3);
 }
 
 void test_int()
@@ -100,7 +100,7 @@ void test_reference()
     as_ref(myref) = a;
 
     test_equals(list_all_pointers(myref),
-        ReferenceList(myref->function, REFERENCE_TYPE, a));
+        RefList(myref->function, REFERENCE_TYPE, a));
 
     ReferenceMap myMap;
     myMap[a] = b;
@@ -110,7 +110,7 @@ void test_reference()
     test_assert(as_ref(myref) == b);
 
     test_equals(list_all_pointers(myref),
-        ReferenceList(myref->function, REFERENCE_TYPE, b));
+        RefList(myref->function, REFERENCE_TYPE, b));
 
     myMap[b] = NULL;
     remap_pointers(myref, myMap);
@@ -118,7 +118,7 @@ void test_reference()
     test_assert(as_ref(myref) == NULL);
 
     test_equals(list_all_pointers(myref),
-        ReferenceList(myref->function, REFERENCE_TYPE));
+        RefList(myref->function, REFERENCE_TYPE));
 }
 
 void test_builtin_equals()

@@ -78,21 +78,21 @@ void print_raw_branch(Branch& branch, std::ostream &output)
     }
 }
 
-void print_terms(ReferenceList const& list, std::ostream &output)
+void print_terms(RefList const& list, std::ostream &output)
 {
     for (unsigned int i=0; i < list.count(); i++) {
         print_raw_term(list[i], output);
     }
 }
 
-ReferenceList list_all_pointers(Term* term)
+RefList list_all_pointers(Term* term)
 {
-    ReferenceList result;
+    RefList result;
 
     struct AppendPointersToList : PointerVisitor
     {
-        ReferenceList& list;
-        AppendPointersToList(ReferenceList &_list) : list(_list) {}
+        RefList& list;
+        AppendPointersToList(RefList &_list) : list(_list) {}
 
         virtual void visitPointer(Term* term) {
             if (term != NULL)
@@ -117,7 +117,7 @@ bool function_allows_term_reuse(Function &function)
     return true;
 }
 
-bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs)
+bool is_equivalent(Term* target, Term* function, RefList const& inputs)
 {
     assert_good_pointer(target);
     assert_good_pointer(function);
@@ -142,7 +142,7 @@ bool is_equivalent(Term* target, Term* function, ReferenceList const& inputs)
     return true;
 }
 
-Term* find_equivalent(Term* function, ReferenceList const& inputs)
+Term* find_equivalent(Term* function, RefList const& inputs)
 {
     if (!function_allows_term_reuse(as_function(function))) {
         return NULL;

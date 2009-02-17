@@ -7,7 +7,7 @@ namespace tuple_function {
 
     void evaluate(Term* caller)
     {
-        as<ReferenceList>(caller) = caller->inputs;
+        as<RefList>(caller) = caller->inputs;
     }
 
     void setup(Branch& kernel)

@@ -125,7 +125,7 @@ void test_namespace()
 
 void test_list()
 {
-    ReferenceList list;
+    RefList list;
     Term* term = new Term();
     Term* term2 = new Term();
 

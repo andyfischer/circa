@@ -24,7 +24,7 @@ struct Branch;
 struct Function;
 struct Term;
 struct Type;
-struct ReferenceList;
+struct RefList;
 struct ReferenceMap;
 
 int& as_int(Term*);
