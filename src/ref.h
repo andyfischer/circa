@@ -9,11 +9,9 @@
 
 #include "common_headers.h"
 
-#include "referencer.h"
-
 namespace circa {
 
-struct Ref : public Referencer
+struct Ref
 {
     Term* _target;
     Term* _owner;
@@ -53,14 +51,23 @@ struct Ref : public Referencer
 
     void set(Term* target);
 
-    // Convenience = overload
     Ref& operator=(Term* target)
     {
         set(target);
         return *this;
     }
 
-    operator Term*()
+    bool operator==(Term* t) const
+    {
+        return _target == t;
+    }
+
+    operator Term*() const
+    {
+        return _target;
+    }
+
+    operator Term*&()
     {
         return _target;
     }

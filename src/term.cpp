@@ -63,11 +63,11 @@ Term::toString()
 }
 
 void
-Term::removeReferencer(Referencer* refer)
+Term::removeReferencer(Ref* ref)
 {
-    std::vector<Referencer*>::iterator it;
+    std::vector<Ref*>::iterator it;
     for (it = this->refs.begin(); it != this->refs.end();) {
-        if (*it == refer) {
+        if (*it == ref) {
             it = this->refs.erase(it);
         } else {
             ++it;

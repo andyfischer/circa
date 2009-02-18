@@ -10,6 +10,7 @@
 
 #include "common_headers.h"
 
+#include "ref.h"
 #include "pointer_visitor.h"
 
 namespace circa {
@@ -17,63 +18,63 @@ namespace circa {
 struct RefList
 {
 private:
-    std::vector<Term*> _items;
+    std::vector<Ref> _items;
  
 public:
     explicit RefList() { }
 
     // Convenience constructors
     explicit RefList(Term* term) {
-        _items.push_back(term);
+        append(term);
     }
     RefList(Term* term1, Term* term2) {
-        _items.push_back(term1);
-        _items.push_back(term2);
+        append(term1);
+        append(term2);
     }
     RefList(Term* term1, Term* term2, Term* term3) {
-        _items.push_back(term1);
-        _items.push_back(term2);
-        _items.push_back(term3);
+        append(term1);
+        append(term2);
+        append(term3);
     }
     RefList(Term* term1, Term* term2, Term* term3, Term* term4) {
-        _items.push_back(term1);
-        _items.push_back(term2);
-        _items.push_back(term3);
-        _items.push_back(term4);
+        append(term1);
+        append(term2);
+        append(term3);
+        append(term4);
     }
     RefList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5) {
-        _items.push_back(term1);
-        _items.push_back(term2);
-        _items.push_back(term3);
-        _items.push_back(term4);
-        _items.push_back(term5);
+        append(term1);
+        append(term2);
+        append(term3);
+        append(term4);
+        append(term5);
     }
     RefList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5, Term* term6) {
-        _items.push_back(term1);
-        _items.push_back(term2);
-        _items.push_back(term3);
-        _items.push_back(term4);
-        _items.push_back(term5);
-        _items.push_back(term6);
+        append(term1);
+        append(term2);
+        append(term3);
+        append(term4);
+        append(term5);
+        append(term6);
     }
     RefList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5, Term* term6, Term* term7) {
-        _items.push_back(term1);
-        _items.push_back(term2);
-        _items.push_back(term3);
-        _items.push_back(term4);
-        _items.push_back(term5);
-        _items.push_back(term6);
-        _items.push_back(term7);
+        append(term1);
+        append(term2);
+        append(term3);
+        append(term4);
+        append(term5);
+        append(term6);
+        append(term7);
     }
     RefList(Term* term1, Term* term2, Term* term3, Term* term4, Term* term5, Term* term6, Term* term7, Term* term8) {
-        _items.push_back(term1);
-        _items.push_back(term2);
-        _items.push_back(term3);
-        _items.push_back(term4);
-        _items.push_back(term5);
-        _items.push_back(term6);
-        _items.push_back(term7);
-        _items.push_back(term8);
+        append(term1);
+        append(term2);
+        append(term3);
+        append(term4);
+        append(term5);
+        append(term6);
+        append(term7);
+        append(term8);
     }
 
     size_t count() const { return _items.size(); }
@@ -114,7 +115,7 @@ public:
     // Remove 'term' from this list
     void remove(Term* term)
     {
-        std::vector<Term*>::iterator it;
+        std::vector<Ref>::iterator it;
 
         for (it = _items.begin(); it != _items.end(); ) {
 

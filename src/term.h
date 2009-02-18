@@ -6,7 +6,6 @@
 #include "common_headers.h"
 
 #include "dictionary.h"
-#include "referencer.h"
 #include "ref.h"
 #include "ref_list.h"
 #include "ref_set.h"
@@ -63,7 +62,7 @@ struct Term
     RefList users;
 
     // Objects which are pointing to us
-    std::vector<Referencer*> refs;
+    std::vector<Ref*> refs;
 
     Term();
     ~Term();
@@ -74,7 +73,7 @@ struct Term
     std::string toString();
 
     // Remove this referencer
-    void removeReferencer(Referencer*);
+    void removeReferencer(Ref*);
 
     // Returns the named property
     Term* property(std::string const& name) const;
