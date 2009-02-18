@@ -72,9 +72,6 @@ struct Term
 
     std::string toString();
 
-    // Remove this referencer
-    void removeReferencer(Ref*);
-
     // Returns the named property
     Term* property(std::string const& name) const;
 

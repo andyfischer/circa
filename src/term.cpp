@@ -36,6 +36,11 @@ Term::Term()
 
 Term::~Term()
 {
+    // Clear references
+    std::vector<Ref*>::iterator it;
+    for (it = refs.begin(); it != refs.end(); ++it) {
+        (*it)->_target = NULL;
+    }
 }
 
 Term*
@@ -59,19 +64,6 @@ Term::toString()
         return std::string("<" + as_type(this->type).name + " " + name + ">");
     } else {
         return func(this);
-    }
-}
-
-void
-Term::removeReferencer(Ref* ref)
-{
-    std::vector<Ref*>::iterator it;
-    for (it = this->refs.begin(); it != this->refs.end();) {
-        if (*it == ref) {
-            it = this->refs.erase(it);
-        } else {
-            ++it;
-        }
     }
 }
 
