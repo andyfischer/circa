@@ -23,9 +23,10 @@ struct Ref
     }
 
     Ref(Term *initialValue)
-      : _target(initialValue),
+      : _target(NULL),
         _owner(NULL)
     {
+        set(initialValue);
     }
 
     // Copy constructor
@@ -77,6 +78,8 @@ struct Ref
         return _target;
     }
 };
+
+void remove_referencer(Term* term, Ref* ref);
 
 } // namespace circa
 
