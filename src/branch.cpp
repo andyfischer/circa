@@ -38,8 +38,9 @@ Branch::~Branch()
 
         dealloc_value(term);
         term->owningBranch = NULL;
-        delete_term(term);
     }
+
+    _terms.clear();
 }
 
 Branch& Branch::operator=(Branch const& b)
