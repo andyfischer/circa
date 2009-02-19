@@ -8,6 +8,7 @@
 namespace circa {
 
 void remove_referencer(Term* term, Ref* ref);
+void delete_term(Term* term);
 
 } // namespace circa
 

@@ -1,11 +1,6 @@
 // Copyright 2008 Andrew Fischer
 
-#include "common_headers.h"
-
-#include "dictionary.h"
-#include "runtime.h"
-#include "term.h"
-#include "values.h"
+#include "circa.h"
 
 namespace circa {
 

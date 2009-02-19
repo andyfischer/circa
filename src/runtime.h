@@ -20,8 +20,6 @@ void error_occured(Term* errorTerm, std::string const& message);
 // helpful magic.
 Term* create_term(Branch* branch, Term* function, RefList const& inputs);
 
-void delete_term(Term* term);
-
 void set_input(Term* term, int index, Term* input);
 
 // Create a duplicate of the given term
@@ -59,7 +57,6 @@ void change_function(Term* term, Term* new_function);
 void remap_pointers(Term* term, ReferenceMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
 void visit_pointers(Term* term, PointerVisitor &visitor);
-
 
 } // namespace circa
 
