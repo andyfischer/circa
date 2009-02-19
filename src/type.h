@@ -11,6 +11,7 @@
 #include "builtins.h"
 #include "pointer_visitor.h"
 #include "pointer_iterator.h"
+#include "ref.h"
 #include "ref_map.h"
 #include "term.h"
 #include "term_namespace.h"
@@ -35,7 +36,7 @@ struct Type
     typedef std::string (*ToSourceStringFunc)(Term* term);
 
     struct Field {
-        Term* type; // reference
+        Ref type;
         std::string name;
         Field(Term* _type, std::string _name) : type(_type), name(_name) {}
     };
@@ -66,7 +67,7 @@ struct Type
     ToStringFunc getCppTypeName;
 
     // Stores our value function
-    Term* valueFunction;
+    Ref valueFunction;
     
     // Fields, applies to compound types
     FieldList fields;
