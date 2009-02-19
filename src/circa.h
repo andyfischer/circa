@@ -14,6 +14,7 @@
 #include "migration.h"
 #include "parser.h"
 #include "ref.h"
+#include "references.h"
 #include "runtime.h"
 #include "set.h"
 #include "syntax.h"
