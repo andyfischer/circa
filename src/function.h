@@ -45,10 +45,10 @@ struct Function
     PointerIteratorFunc startControlFlowIterator;
 
     // External functions
-    Term* feedbackAccumulationFunction;
-    Term* feedbackPropogateFunction;
-    Term* generateCppFunction;
-    Term* printCircaSourceFunction;
+    Ref feedbackAccumulationFunction;
+    Ref feedbackPropogateFunction;
+    Ref generateCppFunction;
+    Ref printCircaSourceFunction;
 
     Function();
 
