@@ -8,7 +8,6 @@
 #include "dictionary.h"
 #include "ref.h"
 #include "ref_list.h"
-#include "ref_set.h"
 #include "term_syntax_hints.h"
 
 namespace circa {
