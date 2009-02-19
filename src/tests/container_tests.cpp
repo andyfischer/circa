@@ -12,96 +12,6 @@
 namespace circa {
 namespace container_tests {
 
-/*
-void test_reference()
-{
-    Term* term1 = new Term();
-    Term* term2 = new Term();
-
-    Reference ref1(term1);
-
-    test_assert(ref1._term == term1);
-    test_assert(term1->references == 1);
-
-    Reference ref2;
-    ref2 = term1;
-
-    test_assert(ref2._term == term1);
-    test_assert(term1->references == 2);
-
-    ref1 = term2;
-
-    test_assert(term1->references == 1);
-    test_assert(term2->references == 1);
-
-    ref2 = term2;
-    test_assert(term1->references == 0);
-    test_assert(term2->references == 2);
-
-    {
-        Reference tempref(term2);
-        test_assert(tempref._term == term2);
-        test_assert(term2->references == 3);
-    }
-
-    test_assert(term2->references == 2);
-
-    Reference ref3(ref1);
-    test_assert(ref3._term == term2);
-    test_assert(term2->references == 3);
-
-    ref1 = term1;
-    ref2 = ref1;
-
-    test_assert(ref2._term == term1);
-    test_assert(term1->references == 2);
-
-    term1->name = "hi";
-    test_assert((*ref1).name == "hi");
-    test_assert(ref1->name == "hi");
-}
-*/
-
-void test_set()
-{
-    ReferenceSet set;
-
-    Term* term1 = new Term();
-
-    test_assert(!set.contains(term1));
-    test_assert(set.count() == 0);
-
-    set.add(term1);
-
-    test_assert(set.contains(term1));
-    test_assert(set.count() == 1);
-
-    set.add(term1);
-
-    test_assert(set.contains(term1));
-    test_assert(set.count() == 1);
-
-    Term* term2 = new Term();
-    set.add(term2);
-
-    test_assert(set.contains(term2));
-    test_assert(set.count() == 2);
-
-    set.remove(term1);
-
-    test_assert(!set.contains(term1));
-    test_assert(set.count() == 1);
-
-    set.remove(term2);
-
-    test_assert(!set.contains(term2));
-    test_assert(set.count() == 0);
-
-    set.add(term1);
-    test_assert(set.contains(term1));
-    test_assert(set.count() == 1);
-}
-
 void test_namespace()
 {
     TermNamespace nspace;
@@ -184,8 +94,6 @@ void test_dictionary()
 
 void register_tests()
 {
-    // REGISTER_TEST_CASE(container_tests::test_reference);
-    REGISTER_TEST_CASE(container_tests::test_set);
     REGISTER_TEST_CASE(container_tests::test_namespace);
     REGISTER_TEST_CASE(container_tests::test_list);
     REGISTER_TEST_CASE(container_tests::test_dictionary);
