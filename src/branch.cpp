@@ -71,7 +71,6 @@ void Branch::removeTerm(std::string const& name)
 
     names.remove(name);
     _terms.remove(term);
-    delete_term(term);
 }
 
 Term* Branch::findFirstBinding(std::string const& name) const

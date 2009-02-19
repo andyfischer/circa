@@ -6,6 +6,8 @@ namespace circa {
 
 void remove_referencer(Term* term, Ref* ref)
 {
+    assert_good_pointer(term);
+
     std::vector<Ref*>::iterator it;
     for (it = term->refs.begin(); it != term->refs.end();) {
         if (*it == ref) {
@@ -21,6 +23,8 @@ void remove_referencer(Term* term, Ref* ref)
 
 void delete_term(Term* term)
 {
+    assert_good_pointer(term);
+
     if (term->state != NULL)
         delete_term(term->state);
     term->state = NULL;
