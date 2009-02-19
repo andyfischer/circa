@@ -29,8 +29,6 @@ void test_basic()
 
     test_assert(ref._target == NULL);
     test_assert(t->refs.size() == 0);
-
-    delete t;
 }
 
 void test_copy()
@@ -53,8 +51,6 @@ void test_copy()
     test_assert(another_copy._target == t);
     test_assert(t->refs.size() == 3);
     test_assert(t->refs[2] == &another_copy);
-
-    delete t;
 }
 
 void test_destroy()

@@ -38,17 +38,9 @@ void delete_term(Term* term)
     }
 
     term->refs.clear();
-
-#if TRACK_USERS
-    // Remove us from 'user' lists
-    for (unsigned int i=0; i < term->inputs.count(); i++) {
-        Term* user = term->inputs[i];
-        if (user == NULL)
-            continue;
-        assert_good_pointer(user);
-        user->users.remove(term);
-    }
-#endif
+    term->inputs.clear();
+    term->type = NULL;
+    term->function = NULL;
 
 #if DEBUG_CHECK_FOR_BAD_POINTERS
     DEBUG_GOOD_POINTER_SET.erase(term);
