@@ -21,7 +21,6 @@ namespace circa {
 // of course, unbounded memory consumption.
 #define DEBUG_NEVER_DELETE_TERMS true
 
-
 #if DEBUG_CHECK_FOR_BAD_POINTERS
 extern std::set<Term*> DEBUG_GOOD_POINTER_SET;
 #endif
