@@ -79,8 +79,6 @@ struct Ref
     }
 };
 
-void remove_referencer(Term* term, Ref* ref);
-
 } // namespace circa
 
 #endif // CIRCA_REFERENCE_INCLUDED

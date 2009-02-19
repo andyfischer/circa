@@ -59,6 +59,15 @@ void delete_term(Term* term)
 
     dealloc_value(term);
 
+    // Clear references
+    std::vector<Ref*>::iterator it;
+    for (it = term->refs.begin(); it != term->refs.end(); ++it) {
+        (*it)->_target = NULL;
+    }
+
+    term->refs.clear();
+    
+
 #if TRACK_USERS
     // Remove us from 'user' lists
     for (unsigned int i=0; i < term->inputs.count(); i++) {

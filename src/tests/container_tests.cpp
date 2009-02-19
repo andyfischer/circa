@@ -3,7 +3,6 @@
 #include "common_headers.h"
 
 #include "builtins.h"
-#include "ref_set.h"
 #include "dictionary.h"
 #include "testing.h"
 #include "term.h"
