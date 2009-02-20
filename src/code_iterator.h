@@ -20,21 +20,12 @@ public:
         postAdvance();
     }
 
-    void reset(Branch* branch)
-    {
-        _topBranch = branch;
-        _topIndex = 0;
-
-        delete _subBranch;
-        _subBranch = NULL;
-
-        postAdvance();
-    }
-
     ~CodeIterator()
     {
         delete _subBranch;
     }
+
+    void reset(Branch* branch);
 
     Term* current();
     void advance();
@@ -43,6 +34,14 @@ public:
     bool finished()
     {
         return _topBranch == NULL;
+    }
+
+    int depth()
+    {
+        if (_subBranch == NULL)
+            return 0;
+        else
+            return _subBranch->depth() + 1;
     }
 };
     
