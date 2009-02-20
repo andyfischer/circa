@@ -2,13 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
-#include "debug.h"
-#include "function.h"
-#include "introspection.h"
-#include "runtime.h"
-#include "term.h"
-#include "type.h"
+#include "circa.h"
 
 namespace circa {
 
@@ -82,10 +76,18 @@ void print_raw_term(Term* term, std::ostream &output)
 
 void print_raw_branch(Branch& branch, std::ostream &output)
 {
-    for (int i=0; i < branch.numTerms(); i++) {
-        Term* term = branch[i];
+    int indent = 0;
+    
+    for (CodeIterator it(&branch); !it.finished(); it.advance()) {
+        Term* term = it.current();
+
+        for (int i=0; i < indent; i++)
+            output << "  ";
 
         print_raw_term(term, output);
+
+        if (get_inner_branch(term) != NULL)
+            indent++;
     }
 }
 
