@@ -14,19 +14,9 @@ class CodeIterator
     CodeIterator* _subBranch;
 
 public:
-    CodeIterator(Branch* branch)
-      : _topBranch(branch), _topIndex(0), _subBranch(NULL)
-    {
-        postAdvance();
-    }
-
-    ~CodeIterator()
-    {
-        delete _subBranch;
-    }
-
+    CodeIterator(Branch* branch);
+    ~CodeIterator();
     void reset(Branch* branch);
-
     Term* current();
     void advance();
     void postAdvance();

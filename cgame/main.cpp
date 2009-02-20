@@ -149,7 +149,6 @@ int main( int argc, char* args[] )
 
     // Access the redraw() function
     circa::Branch &redraw = circa::get_subroutine_branch(script_main["redraw"]);
-    circa::print_raw_branch(redraw, std::cout);
 
     circa::Float mouse_x(script_main, "mouse_x");
     circa::Float mouse_y(script_main, "mouse_y");
@@ -174,6 +173,8 @@ int main( int argc, char* args[] )
             switch(event.key.keysym.sym) {
             case SDLK_5:
                 circa::reload_branch_from_file(script_main);
+                std::cout << "Script reloaded, new contents:" << std::endl;
+                print_raw_branch(script_main, std::cout);
                 break;
             case SDLK_UP:
                 up_pressed = true; break;

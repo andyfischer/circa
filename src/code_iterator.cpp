@@ -4,6 +4,17 @@
 
 namespace circa {
 
+CodeIterator::CodeIterator(Branch* branch)
+  : _topBranch(branch), _topIndex(0), _subBranch(NULL)
+{
+    postAdvance();
+}
+
+CodeIterator::~CodeIterator()
+{
+    delete _subBranch;
+}
+
 void CodeIterator::reset(Branch* branch)
 {
     _topBranch = branch;
