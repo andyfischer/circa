@@ -5,6 +5,8 @@
 #include "circa.h"
 #include "testing.h"
 
+#include "branch_iterators.hpp"
+
 namespace circa {
 namespace term_pointer_iterator_tests {
 
@@ -76,11 +78,52 @@ void nested_branch()
     test_assert(it.finished());
 }
 
+void recursive_iterator()
+{
+    Branch branch;
+
+    Term* a = branch.eval("a = 1");
+    Term* b = branch.eval("b = 2");
+
+    RecursiveBranchIterator it(&branch);
+
+    test_assert(it.current() == a);
+    it.advance();
+    test_assert(it.current() == b);
+    it.advance();
+    test_assert(it.finished());
+
+    Term* funcTerm = create_value(&branch, FUNCTION_TYPE);
+    Function &func = as_function(funcTerm);
+
+    Term* c = func.subroutineBranch.eval("c = 3");
+    Term* d = func.subroutineBranch.eval("d = 4");
+
+    Term* e = branch.eval("e = 5");
+
+    it.reset(&branch);
+
+    test_assert(it.current() == a);
+    it.advance();
+    test_assert(it.current() == b);
+    it.advance();
+    test_assert(it.current() == funcTerm);
+    it.advance();
+    test_assert(it.current() == c);
+    it.advance();
+    test_assert(it.current() == d);
+    it.advance();
+    test_assert(it.current() == e);
+    it.advance();
+    test_assert(it.finished());
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(term_pointer_iterator_tests::simple);
     REGISTER_TEST_CASE(term_pointer_iterator_tests::no_inputs);
     //REGISTER_TEST_CASE(term_pointer_iterator_tests::nested_branch); FIXME
+    REGISTER_TEST_CASE(term_pointer_iterator_tests::recursive_iterator);
 }
 
 }

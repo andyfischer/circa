@@ -18,6 +18,14 @@ bool is_value(Term* term)
     return term->function->function == VALUE_FUNCTION_GENERATOR;
 }
 
+Branch* get_inner_branch(Term* term)
+{
+    if (is_value(term) && term->type == FUNCTION_TYPE)
+        return &as_function(term).subroutineBranch;
+
+    return NULL;
+}
+
 std::string get_short_local_name(Term* term)
 {
     if (term == NULL)
@@ -44,7 +52,7 @@ void print_raw_term(Term* term, std::ostream &output)
     output << "#" << term->globalID;
 
     if (name != "")
-        output << " " << name << "";
+        output << " [" << name << "]";
 
     output << ": ";
 
@@ -62,6 +70,9 @@ void print_raw_term(Term* term, std::ostream &output)
 
     if (term->type != VOID_TYPE)
         output << " -> " << typeName;
+
+    if (is_value(term))
+        output << " :: " << term->toString();
 
     if (term->hasError())
         output << " *" << term->getErrorMessage() << "*";
