@@ -3,6 +3,17 @@
 #include "circa.h"
 
 namespace circa {
+
+void CodeIterator::reset(Branch* branch)
+{
+    _topBranch = branch;
+    _topIndex = 0;
+
+    delete _subBranch;
+    _subBranch = NULL;
+
+    postAdvance();
+}
     
 Term* CodeIterator::current()
 {

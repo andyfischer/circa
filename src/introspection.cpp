@@ -76,10 +76,10 @@ void print_raw_term(Term* term, std::ostream &output)
 
 void print_raw_branch(Branch& branch, std::ostream &output)
 {
-    int indent = 0;
-    
     for (CodeIterator it(&branch); !it.finished(); it.advance()) {
         Term* term = it.current();
+
+        int indent = it.depth();
 
         for (int i=0; i < indent; i++)
             output << "  ";
