@@ -76,7 +76,7 @@ CASDL_ENV.ParseConfig('sdl-config --cflags')
 CASDL_ENV.ParseConfig('sdl-config --libs')
 
 CASDL_ENV.Append(LIBS = ['SDL_gfx'])
-
+CASDL_ENV.Append(CPPFLAGS=['-ggdb'])
 CASDL_ENV.Append(CPPPATH = "src")
 CASDL_ENV.Append(LIBPATH = "lib")
 CASDL_ENV.Append(LIBS = ['circa'])
