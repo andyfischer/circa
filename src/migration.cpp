@@ -83,7 +83,9 @@ void reload_branch_from_file(Branch& branch)
 
     evaluate_file(replacement, filename);
 
-    migrate_branch(replacement, branch);
+    //TEMP
+    //migrate_branch(replacement, branch);
+    duplicate_branch(replacement, branch);
 }
 
 } // namespace circa

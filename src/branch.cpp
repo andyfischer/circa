@@ -206,6 +206,11 @@ Branch::hosted_visit_pointers(Term* caller, PointerVisitor& visitor)
     as_branch(caller).visitPointers(visitor);
 }
 
+bool is_branch(Term* term)
+{
+    return as_type(term->type).isCompoundType() || term->type == BRANCH_TYPE;
+}
+
 Branch& as_branch(Term* term)
 {
     if (!as_type(term->type).isCompoundType())
@@ -229,9 +234,9 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
 
         newTermMap[source_term] = dest_term;
 
-        if (dest_term->state != NULL && dest_term->state->type == BRANCH_TYPE) {
-            duplicate_branch_nested(newTermMap, as_branch(source_term->state),
-                    as_branch(dest_term->state));
+        if (has_inner_branch(source_term)) {
+            duplicate_branch_nested(newTermMap, *get_inner_branch(source_term),
+                    *get_inner_branch(dest_term));
         }
 
         // Copy names
