@@ -47,7 +47,6 @@ void push_pending_rebind(Branch& branch, std::string const& name);
 std::string pop_pending_rebind(Branch& branch);
 void remove_compilation_attrs(Branch& branch);
 void old_update_if_statement_joining_terms(Term* if_statement);
-void update_if_block_joining_terms(Term* if_block);
 
 } // namespace parser
 } // namespace circa

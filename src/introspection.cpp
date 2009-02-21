@@ -20,6 +20,9 @@ Branch* get_inner_branch(Term* term)
     if (term->function == get_global("branch"))
         return &as_branch(term->state);
 
+    if (term->function == get_global("if"))
+        return &as_branch(term->state);
+
     return NULL;
 }
 
