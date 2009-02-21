@@ -154,11 +154,6 @@ Branch& Term::asBranch()
     return as_branch(this);
 }
 
-List& Term::asList()
-{
-    return as_list(this);
-}
-
 Term* Term::field(int index)
 {
     return get_field(this, index);

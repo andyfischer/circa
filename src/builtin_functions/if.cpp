@@ -17,8 +17,7 @@ namespace if_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
-                "function if(bool)");
+        import_function(kernel, evaluate, "function if(bool)");
     }
 }
 }

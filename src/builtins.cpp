@@ -5,18 +5,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
-#include "builtins.h"
-#include "builtin_types.h"
-#include "cpp_importing.h"
-#include "function.h"
-#include "importing.h"
-#include "list.h"
-#include "runtime.h"
-#include "term.h"
-#include "token_stream.h"
-#include "type.h"
-#include "values.h"
+#include "circa.h"
 
 namespace circa {
 
@@ -203,9 +192,6 @@ void initialize_constants()
     as_type(BRANCH_TYPE).remapPointers = Branch::hosted_remap_pointers;
     as_type(BRANCH_TYPE).visitPointers = Branch::hosted_visit_pointers;
     as_type(BRANCH_TYPE).startPointerIterator = Branch::start_pointer_iterator;
-
-    LIST_TYPE = import_type<List>(*KERNEL, "List");
-    as_type(LIST_TYPE).toString = List::to_string;
 
     import_type<Dictionary>(*KERNEL, "Dictionary");
 

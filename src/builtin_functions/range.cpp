@@ -9,17 +9,18 @@ namespace range_function {
     {
         unsigned int max = as_int(caller->input(0));
         
-        as_list(caller).clear();
+        Branch& branch = as_branch(caller);
         
         for (unsigned int i=0; i < max; i++) {
-            as_list(caller).append(int_value(*caller->owningBranch, i));
+            Term* v = create_value(&branch, INT_TYPE);
+            as_int(v) = i;
         }
     }
 
     void setup(Branch& kernel)
     {
         Term* main_func = import_function(kernel, evaluate,
-                "function range(int) -> List");
+                "function range(int) -> Branch");
         as_function(main_func).pureFunction = true;
     }
 }
