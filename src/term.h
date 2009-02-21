@@ -94,8 +94,8 @@ struct Term
     std::string& asString();
     bool& asBool();
     Term*& asRef();
-    List& asList();
     Branch& asBranch();
+    List& asList();
 
     // Accessors for compound types
     Term* field(int index);

@@ -1,14 +1,6 @@
 // Copyright 2008 Paul Hodge
 
-#include "branch.h"
-#include "builtins.h"
-#include "function.h"
-#include "importing.h"
-#include "list.h"
-#include "pointer_iterator.h"
-#include "runtime.h"
-#include "type.h"
-#include "values.h"
+#include "circa.h"
 
 namespace circa {
 
