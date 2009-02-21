@@ -144,7 +144,7 @@ bool& Term::asBool()
     return as_bool(this);
 }
 
-Term*& Term::asRef()
+Ref& Term::asRef()
 {
     return as_ref(this);
 }

@@ -22,8 +22,11 @@ namespace circa {
 
 struct Branch;
 struct Function;
+struct PointerVisitor;
+struct PointerIterator;
 struct Term;
 struct Type;
+struct Ref;
 struct RefList;
 struct ReferenceMap;
 
@@ -31,7 +34,7 @@ int& as_int(Term*);
 float& as_float(Term*);
 bool& as_bool(Term*);
 std::string& as_string(Term*);
-Term*& as_ref(Term*);
+Ref& as_ref(Term*);
 
 // Build options
 #define TRACK_USERS 0

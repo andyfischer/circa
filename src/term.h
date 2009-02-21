@@ -93,7 +93,7 @@ struct Term
     float& asFloat();
     std::string& asString();
     bool& asBool();
-    Term*& asRef();
+    Ref& asRef();
     Branch& asBranch();
 
     // Accessors for compound types
