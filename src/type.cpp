@@ -29,7 +29,6 @@ Type::addMemberFunction(Term* function, std::string const &name)
 void assert_type(Term *term, Term *type)
 {
     assert(term != NULL);
-    // assert(type != NULL); type may be NULL during bootstrapping
 
     if (term->type != type) {
         std::stringstream err;

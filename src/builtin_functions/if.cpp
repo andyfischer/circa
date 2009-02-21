@@ -17,7 +17,8 @@ namespace if_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "function if(bool)");
+        Term* func = import_function(kernel, evaluate, "function if(bool)");
+        as_function(func).stateType = BRANCH_TYPE;
     }
 }
 }

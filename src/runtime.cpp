@@ -259,7 +259,7 @@ Term* possibly_coerce_term(Branch* branch, Term* original, Term* expectedType)
     return original;
 }
 
-Term* apply_function(Branch* branch, Term* function, RefList const& _inputs)
+Term* apply_function(Branch* branch, Term* function, RefList const& _inputs, std::string const& name)
 {
     // Make a local copy of _inputs
     RefList inputs = _inputs;
@@ -302,15 +302,13 @@ Term* apply_function(Branch* branch, Term* function, RefList const& _inputs)
                 functionData.inputType(i)));
     }
 
-    // Attempt to re-use an existing term
-    // Disabled because sometimes the contents of 'users' is bad (FIXME)
-    Term* existing = NULL; //find_equivalent(function, inputs);
-
-    if (existing != NULL)
-        return existing;
-
     // Create the term
-    return create_term(branch, function, inputs);
+    Term* result = create_term(branch, function, inputs);
+
+    if (name != "" && branch != NULL)
+        branch->bindName(result, name);
+
+    return result;
 }
 
 Term* apply_function(Branch* branch,

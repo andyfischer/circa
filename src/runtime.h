@@ -37,7 +37,7 @@ bool is_actually_using(Term* user, Term* usee);
 //  2. 'function' might be a type, in which case we create a value of this type.
 //  3. We might specialize an overloaded function
 //  4. We might coerce inputs to a different type.
-Term* apply_function(Branch* branch, Term* function, RefList const& inputs);
+Term* apply_function(Branch* branch, Term* function, RefList const& inputs, std::string const& name="");
 
 // Find the named function in this branch, and then call the above apply_function.
 Term* apply_function(Branch* branch,
