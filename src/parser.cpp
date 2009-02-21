@@ -358,8 +358,7 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
     return result;
 }
 
-
-Term* if_block(Branch& branch, TokenStream& tokens)
+Term* old_if_block(Branch& branch, TokenStream& tokens)
 {
     tokens.consume(IF);
     possible_whitespace(tokens);
@@ -409,12 +408,53 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     remove_compilation_attrs(posBranch);
     remove_compilation_attrs(negBranch);
 
-    update_if_statement_joining_terms(result);
+    old_update_if_statement_joining_terms(result);
 
     return result;
 }
 
-void update_if_statement_joining_terms(Term* if_statement)
+Term* if_block(Branch& branch, TokenStream& tokens)
+{
+    tokens.consume(IF);
+    possible_whitespace(tokens);
+
+    Term* condition = infix_expression(branch, tokens);
+    assert(condition != NULL);
+
+    condition->syntaxHints.occursInsideAnExpression = true;
+    recursively_mark_terms_as_occuring_inside_an_expression(condition);
+
+    possible_whitespace(tokens);
+    possible_newline(tokens);
+
+    Term* result = apply_function(&branch, get_global("if"), RefList(condition));
+    result->syntaxHints.declarationStyle = TermSyntaxHints::IF_STATEMENT;
+    Branch& innerBranch = as_branch(result->state);
+    innerBranch.outerScope = &branch;
+
+    while (!tokens.nextIs(END)) {
+        std::string prespace = possible_whitespace(tokens);
+
+        if (tokens.nextIs(END)) {
+            break;
+        } else {
+            Term* term = statement(innerBranch, tokens);
+            prepend_whitespace(term, prespace);
+        }
+    }
+
+    tokens.consume(END);
+    possible_whitespace(tokens);
+    possible_newline(tokens);
+
+    remove_compilation_attrs(innerBranch);
+
+    update_if_block_joining_terms(result);
+
+    return result;
+}
+
+void old_update_if_statement_joining_terms(Term* if_statement)
 {
     Term* conditionTerm = if_statement->input(0);
     Branch& posBranch = as_branch(if_statement->state->field(0));
@@ -463,6 +503,62 @@ void update_if_statement_joining_terms(Term* if_statement)
 
             // Bind these names in the outer branch. This is probably dangerous
             // and should be changed
+            outerBranch.bindName(joining, name);
+        }
+    }
+}
+
+void update_if_block_joining_terms(Term* if_block)
+{
+    Term* conditionTerm = if_block->input(0);
+    Branch& innerBranch = as_branch(if_block->state);
+    Branch& outerBranch = *innerBranch.outerScope;
+
+    
+    // Get a list of all names bound in this branch
+    std::set<std::string> boundNames;
+
+    {
+        TermNamespace::const_iterator it;
+        for (it = innerBranch.names.begin(); it != innerBranch.names.end(); ++it)
+            boundNames.insert(it->first);
+    }
+
+    // Ignore any names which are not bound in the outer branch
+    {
+        std::set<std::string>::iterator it;
+        for (it = boundNames.begin(); it != boundNames.end();)
+        {
+            if (find_named(&outerBranch, *it) == NULL)
+                boundNames.erase(it++);
+            else
+                ++it;
+        }
+    }
+
+    // Find or create a branch for joining terms
+    if (!innerBranch.containsName("#joining_terms")) {
+        create_value(&innerBranch, get_global("branch"), "#joining_terms");
+    }
+
+    Branch& joiningTermsBranch = as_branch(innerBranch["#joining_terms"]->state);
+    joiningTermsBranch.clear();
+
+    // For each name, create a joining term
+    {
+        std::set<std::string>::const_iterator it;
+        for (it = boundNames.begin(); it != boundNames.end(); ++it)
+        {
+            std::string const& name = *it;
+
+            Term* outerVersion = find_named(&outerBranch, name);
+            Term* innerVersion = innerBranch[name];
+
+            Term* joining = apply_function(&joiningTermsBranch, "if-expr",
+                    RefList(conditionTerm, innerVersion, outerVersion));
+
+            // Bind these names in the outer branch. This is probably dangerous
+            // and might need to be changed.
             outerBranch.bindName(joining, name);
         }
     }
