@@ -77,6 +77,10 @@ struct Ref
     {
         return _target;
     }
+
+    static void visit_pointers(Term* term, PointerVisitor& visitor);
+    static void remap_pointers(Term* term, ReferenceMap const& map);
+    static PointerIterator* start_pointer_iterator(Term* term);
 };
 
 } // namespace circa

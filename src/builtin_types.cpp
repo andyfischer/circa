@@ -42,10 +42,10 @@ std::string& as_string(Term* term)
     return *((std::string*) term->value);
 }
 
-Term*& as_ref(Term* term)
+Ref& as_ref(Term* term)
 {
     assert_type(term, REF_TYPE);
-    return (Term*&) term->value;
+    return *((Ref*) term->value);
 }
 
 void*& as_void_ptr(Term* term)
@@ -54,6 +54,7 @@ void*& as_void_ptr(Term* term)
     return term->value;
 }
 
+/*
 namespace ref_type {
     void* alloc(Term* term) {
         return NULL;
@@ -70,40 +71,8 @@ namespace ref_type {
     {
         term->value = map.getRemapped((Term*) term->value);
     }
-
-    class ReferencePointerIterator : public PointerIterator
-    {
-    private:
-        Term* _containingTerm;
-
-    public:
-        ReferencePointerIterator(Term* containingTerm)
-          : _containingTerm(containingTerm)
-        {
-            if (_containingTerm->value == NULL)
-                _containingTerm = NULL;
-        }
-
-        virtual Term* current()
-        {
-            assert(!finished());
-            return as_ref(_containingTerm);
-        }
-        virtual void advance()
-        {
-            _containingTerm = NULL;
-        }
-        virtual bool finished()
-        {
-            return _containingTerm == NULL;
-        }
-    };
-
-    PointerIterator* startPointerIterator(Term* term)
-    {
-        return new ReferencePointerIterator(term);
-    }
 }
+*/
 
 namespace primitives {
     namespace int_t {
@@ -287,13 +256,10 @@ void initialize_builtin_types(Branch& kernel)
     as_type(VOID_PTR_TYPE).parameters.append(ANY_TYPE);
 
     VOID_TYPE = create_empty_type(kernel, "void");
-    REF_TYPE = quick_create_type(kernel, "Ref");
-    as_type(REF_TYPE).alloc = ref_type::alloc;
-    as_type(REF_TYPE).dealloc = ref_type::dealloc;
-    as_type(REF_TYPE).visitPointers = ref_type::visitPointers;
-    as_type(REF_TYPE).remapPointers = ref_type::remapPointers;
-    as_type(REF_TYPE).startPointerIterator = ref_type::startPointerIterator;
-    as_type(REF_TYPE).cppTypeName = "Term*";
+    REF_TYPE = import_type<Ref>(kernel, "Ref");
+    as_type(REF_TYPE).visitPointers = Ref::visit_pointers;
+    as_type(REF_TYPE).remapPointers = Ref::remap_pointers;
+    as_type(REF_TYPE).startPointerIterator = Ref::start_pointer_iterator;
 
     import_type<RefList>(kernel, "Tuple");
     import_type<Branch>(kernel, "Branch");

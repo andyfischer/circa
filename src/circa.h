@@ -12,6 +12,7 @@
 #include "introspection.h"
 #include "migration.h"
 #include "parser.h"
+#include "pointer_visitor.h"
 #include "ref.h"
 #include "references.h"
 #include "runtime.h"
