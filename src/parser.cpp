@@ -538,7 +538,7 @@ void update_if_block_joining_terms(Term* if_block)
 
     // Find or create a branch for joining terms
     if (!innerBranch.containsName("#joining_terms")) {
-        create_value(&innerBranch, get_global("branch"), "#joining_terms");
+        apply_function(&innerBranch, get_global("branch"), RefList(), "#joining_terms");
     }
 
     Branch& joiningTermsBranch = as_branch(innerBranch["#joining_terms"]->state);

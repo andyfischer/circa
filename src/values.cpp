@@ -115,6 +115,7 @@ Term* create_value(Branch* branch, Term* type, std::string const& name)
     assert(type != NULL);
     if (branch == NULL)
         assert(name == "");
+    assert(is_type(type));
 
     Term *var_function = get_value_function(type);
     Term *term = create_term(branch, var_function, RefList());
