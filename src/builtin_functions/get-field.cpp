@@ -7,20 +7,8 @@ namespace get_field_function {
 
     void evaluate(Term* caller)
     {
-        List &value = as_list(caller->input(0));
         std::string fieldName = as_string(caller->input(1));
-        Type& type = as_type(caller->input(0)->type);
-
-        int index = type.findField(fieldName);
-
-        if (index == -1) {
-            error_occured(caller, std::string("field \'")+fieldName+"\' not found");
-            return;
-        }
-
-        assert(index >= 0);
-
-        Term* field = value.items[index];
+        Term* field = get_field(caller->input(0), fieldName);
         specialize_type(caller, field->type);
 
         if (field->stealingOk)

@@ -116,6 +116,7 @@ struct Type
     }
 
     void makeCompoundType(std::string const& name);
+    bool isCompoundType();
 
     void addMemberFunction(Term* function, std::string const& name);
 

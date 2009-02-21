@@ -19,10 +19,15 @@ namespace circa {
 void Type::makeCompoundType(std::string const& name)
 {
     this->name = name;
-    alloc = List::alloc;
-    dealloc = List::dealloc;
-    copy = List::copy;
-    startPointerIterator = List::start_pointer_iterator;
+    alloc = Branch::alloc;
+    dealloc = Branch::dealloc;
+    copy = Branch::copy;
+    startPointerIterator = Branch::start_pointer_iterator;
+}
+
+bool Type::isCompoundType()
+{
+    return alloc == Branch::alloc;
 }
 
 void
@@ -36,8 +41,12 @@ void assert_type(Term *term, Term *type)
     assert(term != NULL);
     // assert(type != NULL); type may be NULL during bootstrapping
 
-    if (term->type != type)
-        throw std::runtime_error("type mismatch");
+    if (term->type != type) {
+        std::stringstream err;
+        err << "assert_type failed, expected " << as_type(type).name;
+        err << ", found " << as_type(term->type).name;
+        throw std::runtime_error(err.str());
+    }
 }
 
 bool is_type(Term* term)
@@ -111,20 +120,12 @@ void specialize_type(Term *term, Term *type)
 
 Term* get_field(Term *term, std::string const& fieldName)
 {
-    assert(is_list(term));
-    List *value = (List*) term->value;
-    Type& type = as_type(term->type);
-    int index = type.findField(fieldName);
-    if (index == -1)
-        return NULL;
-    return value->items[index];
+    return as_branch(term)[fieldName];
 }
 
 Term* get_field(Term *term, int index)
 {
-    assert(is_list(term));
-    List *value = (List*) term->value;
-    return value->items[index];
+    return as_branch(term)[index];
 }
 
 namespace type_private {
