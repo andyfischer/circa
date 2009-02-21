@@ -183,6 +183,25 @@ Branch& Branch::startBranch(std::string const& name)
     return as_branch(result);
 }
 
+void* Branch::alloc(Term* typeTerm)
+{
+    Branch* branch = new Branch();
+
+    // create a slot for each field
+    Type& type = as_type(typeTerm);
+    int numFields = (int) type.fields.size();
+
+    for (int f=0; f < numFields; f++)
+        create_value(branch, type.fields[f].type, type.fields[f].name);
+
+    return branch;
+}
+
+void Branch::dealloc(void* data)
+{
+    delete (Branch*) data;
+}
+
 void Branch::copy(Term* source, Term* dest)
 {
     as_branch(dest).clear();
@@ -203,7 +222,8 @@ Branch::hosted_visit_pointers(Term* caller, PointerVisitor& visitor)
 
 Branch& as_branch(Term* term)
 {
-    assert_type(term, BRANCH_TYPE);
+    if (!as_type(term->type).isCompoundType())
+        assert_type(term, BRANCH_TYPE);
     assert(term->value != NULL);
     return *((Branch*) term->value);
 }
