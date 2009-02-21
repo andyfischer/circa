@@ -310,4 +310,10 @@ Term* find_named(Branch* branch, std::string const& name)
     return get_global(name);
 }
 
+/*void branch_append_values(Branch& destination, Branch& source)
+{
+    for (int i=0; i < source.numTerms(); i++)
+        create_duplicate(&destination, source[i]);
+}*/
+
 } // namespace circa

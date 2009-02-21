@@ -16,10 +16,10 @@ struct Branch
 {
     RefList _terms;
 
+    TermNamespace names;
+
     // Points to a Branch which is our outer scope.
     Branch* outerScope;
-
-    TermNamespace names;
 
     Branch() : outerScope(NULL) {}
     ~Branch();
@@ -99,6 +99,8 @@ PointerIterator* start_branch_pointer_iterator(Branch* branch);
 PointerIterator* start_branch_control_flow_iterator(Branch* branch);
 
 Term* find_named(Branch* branch, std::string const& name);
+
+//void branch_append_values(Branch& destination, Branch& source);
 
 } // namespace circa
 
