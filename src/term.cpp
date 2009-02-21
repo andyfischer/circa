@@ -5,16 +5,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "builtins.h"
-#include "builtin_types.h"
-#include "branch.h"
-#include "debug.h"
-#include "function.h"
-#include "list.h"
-#include "runtime.h"
-#include "term.h"
-#include "type.h"
-#include "values.h"
+#include "circa.h"
 
 namespace circa {
 
@@ -158,14 +149,14 @@ Term*& Term::asRef()
     return as_ref(this);
 }
 
-List& Term::asList()
-{
-    return as_list(this);
-}
-
 Branch& Term::asBranch()
 {
     return as_branch(this);
+}
+
+List& Term::asList()
+{
+    return as_list(this);
 }
 
 Term* Term::field(int index)

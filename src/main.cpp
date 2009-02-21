@@ -12,13 +12,13 @@ int circa_main(std::vector<std::string> args)
     initialize();
 
     // load args into kernel
-    List *cl_args = new List();
+    /*List *cl_args = new List();
     
     for (unsigned int i=0; i < args.size(); i++) {
         cl_args->append(args[i]);
     }
 
-    import_value(*KERNEL, LIST_TYPE, cl_args, "cl-args");
+    import_value(*KERNEL, LIST_TYPE, cl_args, "cl-args");*/
 
     args.erase(args.begin());
 
