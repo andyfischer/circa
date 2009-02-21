@@ -147,17 +147,6 @@ int main( int argc, char* args[] )
     //Set the window caption
     SDL_WM_SetCaption( "Hello World", NULL );
 
-    // Access the redraw() function
-    circa::Branch &redraw = circa::get_subroutine_branch(script_main["redraw"]);
-
-    circa::Float mouse_x(script_main, "mouse_x");
-    circa::Float mouse_y(script_main, "mouse_y");
-    circa::Int rect_size(redraw, "rect_size");
-    circa::Bool up_pressed(script_main, "up_pressed");
-    circa::Bool down_pressed(script_main, "down_pressed");
-    circa::Bool left_pressed(script_main, "left_pressed");
-    circa::Bool right_pressed(script_main, "right_pressed");
-
     // Main loop
     while (true) {
         SDL_Event event;
@@ -167,8 +156,8 @@ int main( int argc, char* args[] )
             break;
 
         if (event.type == SDL_MOUSEMOTION) {
-            mouse_x = event.motion.x;
-            mouse_y = event.motion.y;
+            script_main["mouse_x"]->asFloat() = event.motion.x;
+            script_main["mouse_y"]->asFloat() = event.motion.y;
         } else if (event.type == SDL_KEYDOWN) {
             switch(event.key.keysym.sym) {
             case SDLK_5:
@@ -177,29 +166,29 @@ int main( int argc, char* args[] )
                 print_raw_branch(script_main, std::cout);
                 break;
             case SDLK_UP:
-                up_pressed = true; break;
+                script_main["up_pressed"]->asBool() = true; break;
             case SDLK_DOWN:
-                down_pressed = true; break;
+                script_main["down_pressed"]->asBool() = true; break;
             case SDLK_LEFT:
-                left_pressed = true; break;
+                script_main["left_pressed"]->asBool() = true; break;
             case SDLK_RIGHT:
-                right_pressed = true; break;
+                script_main["right_pressed"]->asBool() = true; break;
             }
         } else if (event.type == SDL_KEYUP) {
             switch(event.key.keysym.sym) {
             case SDLK_UP:
-                up_pressed = false; break;
+                script_main["up_pressed"]->asBool() = false; break;
             case SDLK_DOWN:
-                down_pressed = false; break;
+                script_main["down_pressed"]->asBool() = false; break;
             case SDLK_LEFT:
-                left_pressed = false; break;
+                script_main["left_pressed"]->asBool() = false; break;
             case SDLK_RIGHT:
-                right_pressed = false; break;
+                script_main["right_pressed"]->asBool() = false; break;
             }
         }
 
         try {
-            redraw.eval();
+            circa::get_subroutine_branch(script_main["redraw"]).eval();
         } catch (std::exception &e) {
             std::cout << e.what() << std::endl;
             return 0;

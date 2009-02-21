@@ -4,40 +4,6 @@
 
 namespace circa {
 
-/* Old style of migration..
-
-// Returns whether the term was migrated
-bool migrate_term(Term* source, Term* dest)
-{
-    // Branch migration
-    if (dest->state != NULL && dest->state->type == BRANCH_TYPE) {
-        migrate_branch(as_branch(source->state),as_branch(dest->state));
-        return true;
-    } 
-    
-    // Subroutine migration
-    if (is_value(dest) && dest->type == FUNCTION_TYPE) {
-        migrate_branch(get_subroutine_branch(source),get_subroutine_branch(dest));
-        return true;
-    }
-
-    // Value migration
-    if (is_value(dest)) {
-
-        // Don't overwrite value for state. But do migrate this term object
-        if (!dest->isStateful()) {
-            copy_value(source, dest);
-        }
-
-        return true;
-    }
-
-    return false;
-}
-*/
-
-// New style of migration. Just copy over stateful terms, don't try to 
-// extract Term objects.
 void migrate_term(Term* source, Term* dest)
 {
     // Branch migration
@@ -53,7 +19,7 @@ void migrate_term(Term* source, Term* dest)
         return;
     }
 
-    // Value migration
+    // Stateful value migration
     if (is_value(dest) && dest->isStateful()) {
         std::cout << "migrating state: " << dest->name << std::endl;
         copy_value(source, dest);
