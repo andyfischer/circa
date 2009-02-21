@@ -177,13 +177,6 @@ Function::subroutine_call_evaluate(Term* caller)
     }
 }
 
-PointerIterator*
-Function::subroutine_call_start_control_flow_iterator(Term* caller)
-{
-    Branch &branch = as_branch(caller->state);
-    return start_branch_control_flow_iterator(&branch);
-}
-
 Branch& get_subroutine_branch(Term* term)
 {
     return as_function(term).subroutineBranch;

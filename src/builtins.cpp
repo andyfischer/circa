@@ -33,9 +33,6 @@ Term* VAR_INT = NULL;
 Term* VAR_FLOAT = NULL;
 Term* VAR_STRING = NULL;
 Term* VAR_BOOL = NULL;
-Term* CONSTANT_0 = NULL;
-Term* CONSTANT_1 = NULL;
-Term* CONSTANT_2 = NULL;
 Term* CONSTANT_TRUE = NULL;
 Term* CONSTANT_FALSE = NULL;
 Term* UNKNOWN_FUNCTION = NULL;
@@ -200,10 +197,6 @@ void initialize_constants()
     VAR_STRING = get_value_function(STRING_TYPE);
     VAR_BOOL = get_value_function(BOOL_TYPE);
 
-    CONSTANT_0 = float_value(*KERNEL, 0);
-    CONSTANT_1 = float_value(*KERNEL, 1);
-    CONSTANT_2 = float_value(*KERNEL, 2);
-
     CONSTANT_TRUE = apply_function(KERNEL, BOOL_TYPE, RefList());
     as_bool(CONSTANT_TRUE) = true;
     CONSTANT_TRUE->stealingOk = false;
@@ -218,8 +211,7 @@ void initialize_constants()
     as_float(pi) = 3.14159;
     KERNEL->bindName(pi, "PI");
 
-    Term* tokenStreamType = 
-        import_type<TokenStream>(*KERNEL, "TokenStream");
+    Term* tokenStreamType = import_type<TokenStream>(*KERNEL, "TokenStream");
     register_cpp_toString<TokenStream>(tokenStreamType);
 }
 

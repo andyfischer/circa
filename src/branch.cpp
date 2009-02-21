@@ -138,20 +138,6 @@ void Branch::visitPointers(PointerVisitor& visitor)
     }
 }
 
-void Branch::_replaceTermObject(Term* existing, Term* replacement)
-{
-    int existingIndex = _terms.findIndex(existing);
-
-    assert(existingIndex >= 0);
-
-    _terms[existingIndex] = replacement;
-
-    ReferenceMap map;
-    map[existing] = replacement;
-
-    remapPointers(map);
-}
-
 void
 Branch::clear()
 {
@@ -293,11 +279,6 @@ PointerIterator* start_branch_pointer_iterator(Branch* branch)
     return new BranchExternalPointerIterator(branch);
 }
 
-PointerIterator* start_branch_control_flow_iterator(Branch* branch)
-{
-    return new BranchControlFlowIterator(branch);
-}
-
 Term* find_named(Branch* branch, std::string const& name)
 {
     if (branch != NULL) {
@@ -309,11 +290,5 @@ Term* find_named(Branch* branch, std::string const& name)
 
     return get_global(name);
 }
-
-/*void branch_append_values(Branch& destination, Branch& source)
-{
-    for (int i=0; i < source.numTerms(); i++)
-        create_duplicate(&destination, source[i]);
-}*/
 
 } // namespace circa
