@@ -449,7 +449,48 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     remove_compilation_attrs(innerBranch);
 
-    update_if_block_joining_terms(result);
+    // Create the joining branch
+    Term* joining = apply_function(&branch, get_global("branch"), RefList(), "#joining");
+    Branch& joiningBranch = as_branch(joining->state);
+
+    // Get a list of all names bound in this branch
+    std::set<std::string> boundNames;
+
+    {
+        TermNamespace::const_iterator it;
+        for (it = innerBranch.names.begin(); it != innerBranch.names.end(); ++it)
+            boundNames.insert(it->first);
+    }
+
+    // Ignore any names which are not bound in the outer branch
+    {
+        std::set<std::string>::iterator it;
+        for (it = boundNames.begin(); it != boundNames.end();)
+        {
+            if (find_named(&branch, *it) == NULL)
+                boundNames.erase(it++);
+            else
+                ++it;
+        }
+    }
+
+    // For each name, create a joining term
+    {
+        std::set<std::string>::const_iterator it;
+        for (it = boundNames.begin(); it != boundNames.end(); ++it)
+        {
+            std::string const& name = *it;
+
+            Term* outerVersion = find_named(&branch, name);
+            Term* innerVersion = innerBranch[name];
+
+            Term* joining = apply_function(&joiningBranch, "if-expr",
+                    RefList(condition, innerVersion, outerVersion));
+
+            // Bind these names in the outer branch
+            branch.bindName(joining, name);
+        }
+    }
 
     return result;
 }
@@ -503,62 +544,6 @@ void old_update_if_statement_joining_terms(Term* if_statement)
 
             // Bind these names in the outer branch. This is probably dangerous
             // and should be changed
-            outerBranch.bindName(joining, name);
-        }
-    }
-}
-
-void update_if_block_joining_terms(Term* if_block)
-{
-    Term* conditionTerm = if_block->input(0);
-    Branch& innerBranch = as_branch(if_block->state);
-    Branch& outerBranch = *innerBranch.outerScope;
-
-    
-    // Get a list of all names bound in this branch
-    std::set<std::string> boundNames;
-
-    {
-        TermNamespace::const_iterator it;
-        for (it = innerBranch.names.begin(); it != innerBranch.names.end(); ++it)
-            boundNames.insert(it->first);
-    }
-
-    // Ignore any names which are not bound in the outer branch
-    {
-        std::set<std::string>::iterator it;
-        for (it = boundNames.begin(); it != boundNames.end();)
-        {
-            if (find_named(&outerBranch, *it) == NULL)
-                boundNames.erase(it++);
-            else
-                ++it;
-        }
-    }
-
-    // Find or create a branch for joining terms
-    if (!innerBranch.containsName("#joining_terms")) {
-        apply_function(&innerBranch, get_global("branch"), RefList(), "#joining_terms");
-    }
-
-    Branch& joiningTermsBranch = as_branch(innerBranch["#joining_terms"]->state);
-    joiningTermsBranch.clear();
-
-    // For each name, create a joining term
-    {
-        std::set<std::string>::const_iterator it;
-        for (it = boundNames.begin(); it != boundNames.end(); ++it)
-        {
-            std::string const& name = *it;
-
-            Term* outerVersion = find_named(&outerBranch, name);
-            Term* innerVersion = innerBranch[name];
-
-            Term* joining = apply_function(&joiningTermsBranch, "if-expr",
-                    RefList(conditionTerm, innerVersion, outerVersion));
-
-            // Bind these names in the outer branch. This is probably dangerous
-            // and might need to be changed.
             outerBranch.bindName(joining, name);
         }
     }
