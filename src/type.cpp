@@ -2,17 +2,7 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
-#include "builtins.h"
-#include "cpp_importing.h"
-#include "function.h"
-#include "importing.h"
-#include "list.h"
-#include "pointer_iterator.h"
-#include "runtime.h"
-#include "term.h"
-#include "type.h"
-#include "values.h"
+#include "circa.h"
 
 namespace circa {
 
