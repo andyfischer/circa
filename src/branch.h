@@ -63,10 +63,6 @@ struct Branch
     // Visit pointers
     void visitPointers(PointerVisitor& visitor);
 
-    // Replace the term object 'existing' with 'replacement'. Caller takes
-    // responsiblity for all memory ownership issues.
-    void _replaceTermObject(Term* existing, Term* replacement);
-
     void clear();
 
     // Evaluate this branch.
@@ -96,11 +92,8 @@ void duplicate_branch(Branch& source, Branch& dest);
 void evaluate_file(Branch& branch, std::string const& filename);
 PointerIterator* start_branch_iterator(Branch* branch);
 PointerIterator* start_branch_pointer_iterator(Branch* branch);
-PointerIterator* start_branch_control_flow_iterator(Branch* branch);
 
 Term* find_named(Branch* branch, std::string const& name);
-
-//void branch_append_values(Branch& destination, Branch& source);
 
 } // namespace circa
 

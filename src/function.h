@@ -63,7 +63,6 @@ struct Function
     static void remapPointers(Term* term, ReferenceMap const& map);
     static void visitPointers(Term* term, PointerVisitor& visitor);
     static void subroutine_call_evaluate(Term* caller);
-    static PointerIterator* subroutine_call_start_control_flow_iterator(Term* caller);
 };
 
 bool is_function(Term* term);
