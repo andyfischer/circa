@@ -299,7 +299,7 @@ bool branch_has_outer_scope(Branch& branch)
 Term*& branch_get_outer_scope(Branch& branch)
 {
     if (!branch_has_outer_scope(branch))
-        return as_ref(create_value(&branch, REFERENCE_TYPE,
+        return as_ref(create_value(&branch, REF_TYPE,
                                     get_name_for_attribute("outer_scope")));
 
     return as_ref(branch[get_name_for_attribute("outer_scope")]);

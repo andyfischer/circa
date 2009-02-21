@@ -66,8 +66,8 @@ void builtin_types()
     //test_assert(as_type(TYPE_TYPE)->equals != NULL);
     test_assert(as_type(FUNCTION_TYPE).alloc != NULL);
     test_assert(as_type(FUNCTION_TYPE).dealloc != NULL);
-    test_assert(as_type(REFERENCE_TYPE).alloc != NULL);
-    test_assert(as_type(REFERENCE_TYPE).dealloc != NULL);
+    test_assert(as_type(REF_TYPE).alloc != NULL);
+    test_assert(as_type(REF_TYPE).dealloc != NULL);
     //test_assert(as_type(FUNCTION_TYPE)->equals != NULL);
 }
 
@@ -77,7 +77,7 @@ void reference_type_deletion_bug()
     // the thing it was pointed to.
     Branch *branch = new Branch();
 
-    Term* myref = apply_function(branch, REFERENCE_TYPE, RefList());
+    Term* myref = apply_function(branch, REF_TYPE, RefList());
 
     myref->asRef() = INT_TYPE;
 
