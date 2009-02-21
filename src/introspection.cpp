@@ -14,8 +14,11 @@ bool is_value(Term* term)
 
 Branch* get_inner_branch(Term* term)
 {
-    if (is_value(term) && term->type == FUNCTION_TYPE)
+    if (is_value(term) && term->type == get_global("Function"))
         return &as_function(term).subroutineBranch;
+
+    if (term->function == get_global("branch"))
+        return &as_branch(term->state);
 
     return NULL;
 }
