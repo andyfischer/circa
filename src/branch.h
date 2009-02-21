@@ -95,6 +95,9 @@ PointerIterator* start_branch_pointer_iterator(Branch* branch);
 
 Term* find_named(Branch* branch, std::string const& name);
 
+bool branch_has_outer_scope(Branch& branch);
+Term*& branch_get_outer_scope(Branch& branch);
+
 } // namespace circa
 
 #endif

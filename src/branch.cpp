@@ -291,4 +291,18 @@ Term* find_named(Branch* branch, std::string const& name)
     return get_global(name);
 }
 
+bool branch_has_outer_scope(Branch& branch)
+{
+    return branch.containsName(get_name_for_attribute("outer_scope"));
+}
+
+Term*& branch_get_outer_scope(Branch& branch)
+{
+    if (!branch_has_outer_scope(branch))
+        return as_ref(create_value(&branch, REFERENCE_TYPE,
+                                    get_name_for_attribute("outer_scope")));
+
+    return as_ref(branch[get_name_for_attribute("outer_scope")]);
+}
+
 } // namespace circa
