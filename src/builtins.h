@@ -21,7 +21,7 @@ extern Term* BRANCH_TYPE;
 extern Term* ANY_TYPE;
 extern Term* VOID_TYPE;
 extern Term* VOID_PTR_TYPE;
-extern Term* REFERENCE_TYPE;
+extern Term* REF_TYPE;
 extern Term* LIST_TYPE;
 extern Term* MAP_TYPE;
 extern Term* VAR_INT;

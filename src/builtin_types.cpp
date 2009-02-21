@@ -44,7 +44,7 @@ std::string& as_string(Term* term)
 
 Term*& as_ref(Term* term)
 {
-    assert_type(term, REFERENCE_TYPE);
+    assert_type(term, REF_TYPE);
     return (Term*&) term->value;
 }
 
@@ -287,13 +287,13 @@ void initialize_builtin_types(Branch& kernel)
     as_type(VOID_PTR_TYPE).parameters.append(ANY_TYPE);
 
     VOID_TYPE = create_empty_type(kernel, "void");
-    REFERENCE_TYPE = quick_create_type(kernel, "Ref");
-    as_type(REFERENCE_TYPE).alloc = ref_type::alloc;
-    as_type(REFERENCE_TYPE).dealloc = ref_type::dealloc;
-    as_type(REFERENCE_TYPE).visitPointers = ref_type::visitPointers;
-    as_type(REFERENCE_TYPE).remapPointers = ref_type::remapPointers;
-    as_type(REFERENCE_TYPE).startPointerIterator = ref_type::startPointerIterator;
-    as_type(REFERENCE_TYPE).cppTypeName = "Term*";
+    REF_TYPE = quick_create_type(kernel, "Ref");
+    as_type(REF_TYPE).alloc = ref_type::alloc;
+    as_type(REF_TYPE).dealloc = ref_type::dealloc;
+    as_type(REF_TYPE).visitPointers = ref_type::visitPointers;
+    as_type(REF_TYPE).remapPointers = ref_type::remapPointers;
+    as_type(REF_TYPE).startPointerIterator = ref_type::startPointerIterator;
+    as_type(REF_TYPE).cppTypeName = "Term*";
 
     import_type<RefList>(kernel, "Tuple");
     import_type<Branch>(kernel, "Branch");
