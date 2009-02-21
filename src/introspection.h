@@ -6,6 +6,7 @@
 namespace circa {
 
 bool is_value(Term* term);
+bool has_inner_branch(Term* term);
 Branch* get_inner_branch(Term* term);
 std::string get_short_local_name(Term* term);
 void print_raw_term(Term* term, std::ostream &output);

@@ -218,7 +218,7 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
     term->syntaxHints = source->syntaxHints;
 
     if (source->state != NULL) {
-        if (source->state != BRANCH_TYPE || copyBranches) {
+        if (is_branch(source->state) || copyBranches) {
             copy_value(source->state, term->state);
             term->state->properties.import(source->state->properties);
         }
@@ -355,6 +355,11 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     // make sure this map doesn't try to remap NULL, because such a thing
     // would almost definitely lead to errors.
     assert(!map.contains(NULL));
+
+    for (int i=0; i < term->inputs.count(); i++) {
+        Term* orig = term->inputs[i];
+        Term* remap = map.getRemapped(orig);
+    }
 
     term->inputs.remapPointers(map);
 

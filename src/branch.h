@@ -86,6 +86,7 @@ struct Branch
     static PointerIterator* start_pointer_iterator(Term* term);
 };
 
+bool is_branch(Term* term);
 Branch& as_branch(Term* term);
 std::string get_name_for_attribute(std::string attribute);
 void duplicate_branch(Branch& source, Branch& dest);

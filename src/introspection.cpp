@@ -12,6 +12,11 @@ bool is_value(Term* term)
     return term->function->function == VALUE_FUNCTION_GENERATOR;
 }
 
+bool has_inner_branch(Term* term)
+{
+    return get_inner_branch(term) != NULL;
+}
+
 Branch* get_inner_branch(Term* term)
 {
     if (is_value(term) && term->type == get_global("Function"))
