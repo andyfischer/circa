@@ -218,7 +218,7 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
     term->syntaxHints = source->syntaxHints;
 
     if (source->state != NULL) {
-        if (is_branch(source->state) || copyBranches) {
+        if (!is_branch(source->state) || copyBranches) {
             copy_value(source->state, term->state);
             term->state->properties.import(source->state->properties);
         }

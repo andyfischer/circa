@@ -65,6 +65,20 @@ void test_duplicate_nested()
     test_assert(inner_j->input(1) == inner_i);
 }
 
+void test_duplicate_nested_dont_make_extra_terms()
+{
+    // this test case looks for a bug where nested branches have
+    // too many terms after duplication
+    Branch orig;
+    Branch& inner = orig.eval("inner = branch()")->state->asBranch();
+    inner.eval("i = 2");
+
+    Branch dupe;
+    duplicate_branch(orig, dupe);
+
+    test_assert(dupe["inner"]->state->asBranch().numTerms() == 1);
+}
+
 void find_name_in_outer_branch()
 {
     Branch branch;
@@ -79,24 +93,6 @@ void find_name_in_outer_branch()
     as_branch(inner_branch).outerScope = &as_branch(outer_branch);
 
     test_assert(find_named(&as_branch(inner_branch), "a") == a);
-}
-
-void cleanup_users_after_delete()
-{
-    Branch branch;
-
-    Term* a = branch.eval("a = 1.0");
-
-    Branch &subBranch = as_branch(branch.eval("sub = Branch()"));
-    subBranch.outerScope = &branch;
-
-    Term* b = subBranch.eval("b = add(a,a)");
-
-    test_assert(a->users.contains(b));
-
-    dealloc_value(branch["sub"]);
-
-    test_assert(!a->users.contains(b));
 }
 
 void test_startBranch()
@@ -157,10 +153,8 @@ void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_nested);
+    REGISTER_TEST_CASE(branch_tests::test_duplicate_nested_dont_make_extra_terms);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
-#if TRACK_USERS
-    REGISTER_TEST_CASE(branch_tests::cleanup_users_after_delete);
-#endif
     REGISTER_TEST_CASE(branch_tests::test_startBranch);
     REGISTER_TEST_CASE(branch_tests::test_migrate);
     REGISTER_TEST_CASE(branch_tests::test_migrate2);
