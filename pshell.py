@@ -13,6 +13,7 @@ libcirca.initialize()
 def error(s):
     print "error:",s
 
+
 class Term(object):
     def __init__(self, ptr=None):
         self.ptr = ptr
@@ -38,6 +39,8 @@ class Branch(object):
         return libcirca.print_raw_branch(self.ptr)
     def get_outer_branch(self):
         return Branch(libcirca.get_outer_branch(self.ptr))
+    def reload_from_file(self):
+        libcirca.reload_branch_from_file(self.ptr)
 
 def evaluate_file(filename):
     ptr = libcirca.new_branch()
@@ -56,7 +59,7 @@ class CommandLine(cmd.Cmd):
         else: return self.termTargetStack[-1]
 
     def pushTarget(self, term):
-        print "cursor:", term.print_raw()
+        print "current term:", term.print_raw()
         self.termTargetStack.append(term)
 
     def do_open(self, line):
@@ -94,6 +97,9 @@ class CommandLine(cmd.Cmd):
 
     def do_num_inputs(self, line):
         print self.termTarget().num_inputs()
+
+    def do_reload(self, line):
+        self.branch.reload_from_file()
 
 
 cl = CommandLine()
