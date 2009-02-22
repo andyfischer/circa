@@ -49,13 +49,7 @@ Term::numInputs() const
 std::string
 Term::toString()
 {
-    Type::ToStringFunc func = as_type(this->type).toString;
-
-    if (func == NULL) {
-        return std::string("<" + as_type(this->type).name + " " + name + ">");
-    } else {
-        return func(this);
-    }
+    return to_string(this);
 }
 
 Term* Term::property(std::string const& name) const

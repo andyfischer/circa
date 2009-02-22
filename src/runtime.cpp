@@ -152,10 +152,7 @@ void evaluate_term(Term* term)
     }
     catch (std::exception const& err)
     {
-        std::stringstream message;
-        message << "An exception occured while executing " + func.name << ": "
-            << err.what();
-        error_occured(term, message.str());
+        error_occured(term, err.what());
     }
 }
 
@@ -167,8 +164,9 @@ void evaluate_branch(Branch& branch, Term* errorListener)
         evaluate_term(term);
 
         if (term->hasError()) {
-            std::string msg = term->getErrorMessage() + " on line: " + get_term_source(term);
-            error_occured(errorListener, msg);
+            std::stringstream out;
+            out << "On term " << term_to_raw_string(term) << "\n" << term->getErrorMessage();
+            error_occured(errorListener, out.str());
             return;
         }
     }

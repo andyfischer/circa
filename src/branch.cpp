@@ -224,6 +224,19 @@ std::string get_name_for_attribute(std::string attribute)
     return "#attr:" + attribute;
 }
 
+Term* find_term_by_id(Branch& branch, int id)
+{
+    for (CodeIterator it(&branch); !it.finished(); it.advance()) {
+        if (*it == NULL)
+            continue;
+
+        if (it->globalID == id)
+            return *it;
+    }
+
+    return NULL;
+}
+
 void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& dest)
 {
     // Duplicate every term
