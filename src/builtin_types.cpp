@@ -54,26 +54,6 @@ void*& as_void_ptr(Term* term)
     return term->value;
 }
 
-/*
-namespace ref_type {
-    void* alloc(Term* term) {
-        return NULL;
-    }
-
-    void dealloc(void* data) { }
-
-    void visitPointers(Term* term, PointerVisitor& visitor)
-    {
-        visitor.visitPointer((Term*) term->value);
-    }
-
-    void remapPointers(Term* term, ReferenceMap const& map)
-    {
-        term->value = map.getRemapped((Term*) term->value);
-    }
-}
-*/
-
 namespace primitives {
     namespace int_t {
         std::string to_string(Term* term)
