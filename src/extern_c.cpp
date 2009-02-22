@@ -53,5 +53,6 @@ Term* find_named(Branch* branch, const char* name) { return circa::find_named(br
 bool has_inner_branch(Term* term) { return circa::has_inner_branch(term); }
 Branch* get_inner_branch(Term* term) { return circa::get_inner_branch(term); }
 Branch* get_outer_branch(Branch* branch) { return branch->outerScope; }
+void reload_branch_from_file(Branch* branch) { circa::reload_branch_from_file(*branch); }
 
 }
