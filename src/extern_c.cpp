@@ -21,12 +21,10 @@ void evaluate_file(Branch* branch, const char* filename)
     circa::evaluate_file(*branch, filename);
 }
 
-const char* print_raw_term(Term* term)
+const char* term_to_raw_string(Term* term)
 {
     static std::string result;
-    std::stringstream sstream;
-    circa::print_raw_term(term, sstream);
-    result = sstream.str();
+    result = circa::term_to_raw_string(term);
     return result.c_str();
 }
 
@@ -44,8 +42,14 @@ Term* term_get_input(Term* term, int i) { return term->inputs[i]; }
 
 const char* term_get_name(Term* term)
 {
-    std::string result;
+    static std::string result;
     result = term->name;
+    return result.c_str();
+}
+const char* to_string(Term* term)
+{
+    static std::string result;
+    result = circa::to_string(term);
     return result.c_str();
 }
 
@@ -54,5 +58,7 @@ bool has_inner_branch(Term* term) { return circa::has_inner_branch(term); }
 Branch* get_inner_branch(Term* term) { return circa::get_inner_branch(term); }
 Branch* get_outer_branch(Branch* branch) { return branch->outerScope; }
 void reload_branch_from_file(Branch* branch) { circa::reload_branch_from_file(*branch); }
+Term* find_term_by_id(Branch* branch, int i) { return find_term_by_id(*branch,i); }
+void evaluate_term(Term* term) { circa::evaluate_term(term); }
 
 }

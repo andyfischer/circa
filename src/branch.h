@@ -94,6 +94,7 @@ void evaluate_file(Branch& branch, std::string const& filename);
 PointerIterator* start_branch_iterator(Branch* branch);
 PointerIterator* start_branch_pointer_iterator(Branch* branch);
 
+Term* find_term_by_id(Branch& branch, int id);
 Term* find_named(Branch* branch, std::string const& name);
 
 bool branch_has_outer_scope(Branch& branch);

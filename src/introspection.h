@@ -9,6 +9,7 @@ bool is_value(Term* term);
 bool has_inner_branch(Term* term);
 Branch* get_inner_branch(Term* term);
 std::string get_short_local_name(Term* term);
+std::string term_to_raw_string(Term* term);
 void print_raw_term(Term* term, std::ostream &output);
 void print_raw_branch(Branch& branch, std::ostream &output);
 RefList list_all_pointers(Term* term);

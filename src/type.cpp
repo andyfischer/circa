@@ -234,7 +234,9 @@ std::string to_string(Term* term)
     Type::ToStringFunc func = as_type(term->type).toString;
 
     if (func == NULL)
-        throw std::runtime_error("No toString function defined");
+        return "<" + as_type(term->type).name + " has no toString func>";
+    else if (term->value == NULL)
+        return "<NULL>";
     else
         return func(term);
 }

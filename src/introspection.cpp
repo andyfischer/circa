@@ -43,12 +43,12 @@ std::string get_short_local_name(Term* term)
     return stream.str();
 }
 
-void print_raw_term(Term* term, std::ostream &output)
+std::string term_to_raw_string(Term* term)
 {
-    if (term == NULL) {
-        output << "<NULL>";
-        return;
-    }
+    if (term == NULL)
+        return "<NULL>";
+
+    std::stringstream output;
 
     std::string name = term->name;
     std::string funcName = get_short_local_name(term->function);
@@ -79,10 +79,15 @@ void print_raw_term(Term* term, std::ostream &output)
     if (is_value(term))
         output << " :: " << term->toString();
 
-    if (term->hasError())
-        output << " *" << term->getErrorMessage() << "*";
+    //if (term->hasError()) output << " *" << term->getErrorMessage() << "*";
 
-    output << std::endl;
+    return output.str();
+}
+
+// Deprecated
+void print_raw_term(Term* term, std::ostream& strm)
+{
+    strm << term_to_raw_string(term) << std::endl;
 }
 
 void print_raw_branch(Branch& branch, std::ostream &output)

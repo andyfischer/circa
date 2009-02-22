@@ -21,6 +21,9 @@ public:
     void advance();
     void postAdvance();
 
+    Term* operator*() { return current(); }
+    Term* operator->() { return current(); }
+
     bool finished()
     {
         return _topBranch == NULL;
