@@ -62,9 +62,10 @@ source_directory('src', excludes=['test_program.cpp', 'main.cpp'])
 source_directory_into_one_cpp('src/tests', 'all_tests')
 source_directory_into_one_cpp('src/builtin_functions', 'all_builtin_functions')
 
-circa_so = ENV.StaticLibrary('lib/circa', BUILD_FILES)
+circa_slib = ENV.StaticLibrary('lib/circa', BUILD_FILES)
+circa_so = ENV.SharedLibrary('lib/circa', BUILD_FILES)
 
-circaBinary = ENV.Program('bin/circa', 'build/src/main.cpp', LIBS=[circa_so])
+circaBinary = ENV.Program('bin/circa', 'build/src/main.cpp', LIBS=[circa_slib])
 
 ENV.SetOption('num_jobs', 2)
 ENV.Default(circaBinary)

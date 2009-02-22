@@ -258,7 +258,6 @@ void duplicate_branch(Branch& source, Branch& dest)
     }
 }
 
-
 void evaluate_file(Branch& branch, std::string const& filename)
 {
     std::string fileContents = read_text_file(filename);
