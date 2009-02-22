@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 import readline
 import cmd, sys
@@ -52,15 +53,11 @@ class CommandLine(cmd.Cmd):
         cmd.Cmd.__init__(self)
         self.prompt = "> "
         self.branch = None
-        self.termTargetStack = []
+        self.term = None
 
-    def termTarget(self):
-        if self.termTargetStack is []: return None
-        else: return self.termTargetStack[-1]
-
-    def pushTarget(self, term):
+    def setTermTarget(self, term):
         print "current term:", term.print_raw()
-        self.termTargetStack.append(term)
+        self.term = term
 
     def do_open(self, line):
         self.branch = evaluate_file(line)
@@ -76,7 +73,7 @@ class CommandLine(cmd.Cmd):
 
     def do_input(self, line):
         i = int(line)
-        t = self.termTarget().get_input(i)
+        t = self.term.get_input(i)
         self.pushTarget(t)
 
     def do_show(self, line):
@@ -96,10 +93,11 @@ class CommandLine(cmd.Cmd):
         self.branch = self.branch.get_outer_branch()
 
     def do_num_inputs(self, line):
-        print self.termTarget().num_inputs()
+        print self.term.num_inputs()
 
     def do_reload(self, line):
         self.branch.reload_from_file()
+        self.term = None
 
 
 cl = CommandLine()
