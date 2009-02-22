@@ -2,6 +2,7 @@
 
 #include "circa.h"
 
+using namespace circa;
 
 extern "C" {
 
@@ -10,17 +11,17 @@ void initialize()
     circa::initialize();
 }
 
-circa::Branch* new_branch()
+Branch* new_branch()
 {
-    return new circa::Branch();
+    return new Branch();
 }
 
-void evaluate_file(circa::Branch* branch, const char* filename)
+void evaluate_file(Branch* branch, const char* filename)
 {
     circa::evaluate_file(*branch, filename);
 }
 
-const char* print_raw_term(circa::Term* term)
+const char* print_raw_term(Term* term)
 {
     static std::string result;
     std::stringstream sstream;
@@ -29,7 +30,7 @@ const char* print_raw_term(circa::Term* term)
     return result.c_str();
 }
 
-const char* print_raw_branch(circa::Branch* branch)
+const char* print_raw_branch(Branch* branch)
 {
     static std::string result;
     std::stringstream sstream;
@@ -38,19 +39,19 @@ const char* print_raw_branch(circa::Branch* branch)
     return result.c_str();
 }
 
-int term_num_inputs(circa::Term* term)
+int term_num_inputs(Term* term) { return term->inputs.count(); }
+Term* term_get_input(Term* term, int i) { return term->inputs[i]; }
+
+const char* term_get_name(Term* term)
 {
-    return term->inputs.count();
+    std::string result;
+    result = term->name;
+    return result.c_str();
 }
 
-circa::Term* term_get_input(circa::Term* term, int i)
-{
-    return term->inputs[i];
-}
-
-circa::Term* find_named(circa::Branch* branch, const char* name)
-{
-    return circa::find_named(branch, name);
-}
+Term* find_named(Branch* branch, const char* name) { return circa::find_named(branch, name); }
+bool has_inner_branch(Term* term) { return circa::has_inner_branch(term); }
+Branch* get_inner_branch(Term* term) { return circa::get_inner_branch(term); }
+Branch* get_outer_branch(Branch* branch) { return branch->outerScope; }
 
 }

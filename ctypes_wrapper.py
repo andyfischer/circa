@@ -7,21 +7,37 @@ libcirca = cdll.LoadLibrary("lib/libcirca.dylib")
 libcirca.print_raw_branch.restype = c_char_p
 libcirca.print_raw_term.restype = c_char_p
 libcirca.term_num_inputs.restype = c_int
+libcirca.term_get_name.restype = c_char_p
 libcirca.initialize()
 
 def error(s):
     print "error:",s
 
-def print_term(term):
-    return str(libcirca.print_raw_term(term))
+class Term(object):
+    def __init__(self, ptr=None):
+        self.ptr = ptr
+    def get_name(self):
+        return str(libcirca.term_get_name(self.ptr))
+    def get_input(self, i):
+        return Term(libcirca.term_get_input(self.ptr, i))
+    def num_inputs(self):
+        return libcirca.term_num_inputs(self.ptr)
+    def has_inner_branch(self):
+        return bool(libcirca.has_inner_branch(self.ptr))
+    def get_inner_branch(self):
+        return Branch(libcirca.get_inner_branch(self.ptr))
+    def print_raw(self):
+        return str(libcirca.print_raw_term(self.ptr))
 
 class Branch(object):
     def __init__(self, ptr=None):
         self.ptr = ptr
     def find_named(self, name):
-        return libcirca.find_named(self.ptr, name)
+        return Term(libcirca.find_named(self.ptr, name))
     def print_raw(self):
         return libcirca.print_raw_branch(self.ptr)
+    def get_outer_branch(self):
+        return Branch(libcirca.get_outer_branch(self.ptr))
 
 def evaluate_file(filename):
     ptr = libcirca.new_branch()
@@ -40,7 +56,7 @@ class CommandLine(cmd.Cmd):
         else: return self.termTargetStack[-1]
 
     def pushTarget(self, term):
-        print "cursor:", print_term(term)
+        print "cursor:", term.print_raw()
         self.termTargetStack.append(term)
 
     def do_open(self, line):
@@ -57,20 +73,27 @@ class CommandLine(cmd.Cmd):
 
     def do_input(self, line):
         i = int(line)
-        t = libcirca.term_get_input(self.termTarget(), i)
+        t = self.termTarget().get_input(i)
         self.pushTarget(t)
 
     def do_show(self, line):
         if self.branch is None:
-            print "(no branch loaded)"
+            error("no branch loaded")
         else:
             print self.branch.print_raw()
 
     def do_down(self, line):
         term = self.branch.find_named(line)
+        if not term.has_inner_branch():
+            error("term doesn't have a local branch")
+        else:
+            self.branch = term.get_inner_branch()
+
+    def do_up(self, line):
+        self.branch = self.branch.get_outer_branch()
 
     def do_num_inputs(self, line):
-        print libcirca.term_num_inputs(self.termTarget())
+        print self.termTarget().num_inputs()
 
 
 cl = CommandLine()
