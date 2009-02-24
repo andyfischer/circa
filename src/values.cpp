@@ -81,11 +81,10 @@ void copy_value_but_dont_copy_inner_branch(Term* source, Term* dest)
 
     assert_type(source, dest->type);
 
-    /*if (source->type == FUNCTION_TYPE) {
+    if (source->type == FUNCTION_TYPE) {
         Function::copyExceptBranch(source,dest);
         return;
     }
-    */
     
     if (has_inner_branch(dest))
         return;
