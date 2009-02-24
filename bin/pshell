@@ -1,0 +1,2 @@
+scons -Q -C $CIRCA_HOME lib/libcirca.dylib
+$CIRCA_HOME/pshell/main.py $*
