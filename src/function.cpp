@@ -70,7 +70,7 @@ Function& as_function(Term* term)
     return *((Function*) term->value);
 }
 
-void Function::copy(Term* sourceTerm, Term* destTerm)
+void Function::copyExceptBranch(Term* sourceTerm, Term* destTerm)
 {
     assert(is_function(sourceTerm));
     assert(is_function(destTerm));
@@ -94,7 +94,13 @@ void Function::copy(Term* sourceTerm, Term* destTerm)
     dest.feedbackPropogateFunction =       source.feedbackPropogateFunction;
     dest.generateCppFunction =             source.generateCppFunction;
     dest.printCircaSourceFunction =        source.printCircaSourceFunction;
+}
 
+void Function::copy(Term* sourceTerm, Term* destTerm)
+{
+    Function::copyExceptBranch(sourceTerm, destTerm);
+    Function &source = as_function(sourceTerm);
+    Function &dest = as_function(destTerm);
     duplicate_branch(source.subroutineBranch, dest.subroutineBranch);
 }
 
