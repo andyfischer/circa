@@ -74,6 +74,25 @@ void copy_value(Term* source, Term* dest)
     copy(source, dest);
 }
 
+void copy_value_but_dont_copy_inner_branch(Term* source, Term* dest)
+{
+    // Special case: functions. Need to copy a bunch of data, but not the
+    // subroutineBranch.
+
+    assert_type(source, dest->type);
+
+    /*if (source->type == FUNCTION_TYPE) {
+        Function::copyExceptBranch(source,dest);
+        return;
+    }
+    */
+    
+    if (has_inner_branch(dest))
+        return;
+
+    copy_value(source, dest);
+}
+
 void steal_value(Term* source, Term* dest)
 {
     assert_type(source, dest->type);

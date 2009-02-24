@@ -79,6 +79,11 @@ void test_duplicate_nested_dont_make_extra_terms()
     test_assert(dupe["inner"]->state->asBranch().numTerms() == 1);
 }
 
+void test_duplicate_subroutine()
+{
+
+}
+
 void find_name_in_outer_branch()
 {
     Branch branch;

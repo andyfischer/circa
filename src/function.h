@@ -59,6 +59,7 @@ struct Function
     void setInputModified(int index, bool value);
 
     // Hosted functions
+    static void copyExceptBranch(Term* source, Term* dest);
     static void copy(Term* source, Term* dest);
     static void remapPointers(Term* term, ReferenceMap const& map);
     static void visitPointers(Term* term, PointerVisitor& visitor);

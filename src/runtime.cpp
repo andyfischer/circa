@@ -211,15 +211,19 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
 {
     Term* term = create_term(branch, source->function, source->inputs);
 
-    copy_value(source, term);
+    if (copyBranches)
+        copy_value(source, term);
+    else
+        copy_value_but_dont_copy_inner_branch(source,term);
+
     term->properties.import(source->properties);
     term->syntaxHints = source->syntaxHints;
 
     if (source->state != NULL) {
-        if (!is_branch(source->state) || copyBranches) {
+        if (copyBranches && !has_inner_branch(source))
             copy_value(source->state, term->state);
-            term->state->properties.import(source->state->properties);
-        }
+
+        term->state->properties.import(source->state->properties);
     }
         
     return term;
