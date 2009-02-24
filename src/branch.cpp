@@ -334,7 +334,6 @@ void migrate_term(Term* source, Term* dest)
     
     // Stateful value migration
     if (is_value(dest) && dest->isStateful()) {
-        std::cout << "migrating state: " << dest->name << std::endl;
         copy_value(source, dest);
     }
 }
