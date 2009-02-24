@@ -80,20 +80,24 @@ void Function::copyExceptBranch(Term* sourceTerm, Term* destTerm)
 
     dest = Function();
 
-    dest.inputTypes =      source.inputTypes;
-    dest.inputProperties = source.inputProperties;
-    dest.outputType =      source.outputType;
-    dest.stateType =       source.stateType;
-    dest.pureFunction =    source.pureFunction;
-    dest.hasSideEffects =  source.hasSideEffects;
-    dest.variableArgs =    source.variableArgs;
-    dest.name =            source.name;
-    dest.evaluate =        source.evaluate;
-    dest.startControlFlowIterator =        source.startControlFlowIterator;
-    dest.feedbackAccumulationFunction =    source.feedbackAccumulationFunction;
-    dest.feedbackPropogateFunction =       source.feedbackPropogateFunction;
-    dest.generateCppFunction =             source.generateCppFunction;
-    dest.printCircaSourceFunction =        source.printCircaSourceFunction;
+#define field(f) dest.f = source.f
+
+    field(inputTypes);
+    field(inputProperties);
+    field(outputType);
+    field(stateType);
+    field(pureFunction);
+    field(hasSideEffects);
+    field(variableArgs);
+    field(name);
+    field(evaluate);
+    field(startControlFlowIterator);
+    field(feedbackAccumulationFunction);
+    field(feedbackPropogateFunction);
+    field(generateCppFunction);
+    field(printCircaSourceFunction);
+
+#undef field
 }
 
 void Function::copy(Term* sourceTerm, Term* destTerm)

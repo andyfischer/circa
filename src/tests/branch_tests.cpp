@@ -81,7 +81,26 @@ void test_duplicate_nested_dont_make_extra_terms()
 
 void test_duplicate_subroutine()
 {
+    Branch branch;
+    Function& func = as_function(create_value(&branch, FUNCTION_TYPE, "func"));
 
+    func.name = "func";
+    func.subroutineBranch.eval("a = 1");
+
+    Branch dupe;
+    duplicate_branch(branch, dupe);
+
+    test_assert(dupe.containsName("func"));
+
+    Function& dupedFunc = as_function(dupe["func"]);
+
+    // make sure the value portion of func was copied
+    test_assert(dupedFunc.name == "func");
+
+    // make sure subroutine didn't get double copied
+    test_assert(dupedFunc.subroutineBranch.numTerms() == 1);
+    test_assert(dupedFunc.subroutineBranch[0]->asInt() == 1);
+    test_assert(dupedFunc.subroutineBranch["a"] == dupedFunc.subroutineBranch[0]);
 }
 
 void find_name_in_outer_branch()
@@ -159,6 +178,7 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_nested);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_nested_dont_make_extra_terms);
+    REGISTER_TEST_CASE(branch_tests::test_duplicate_subroutine);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
     REGISTER_TEST_CASE(branch_tests::test_startBranch);
     REGISTER_TEST_CASE(branch_tests::test_migrate);
