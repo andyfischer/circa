@@ -73,16 +73,17 @@ ENV.Default(circaBinary)
 ############################## cgame ###############################
 
 CASDL_ENV = Environment()
+
+# import path so that we will find the correct sdl-config
+CASDL_ENV['ENV']['PATH'] = os.environ['PATH']
+
 CASDL_ENV.ParseConfig('sdl-config --cflags')
 CASDL_ENV.ParseConfig('sdl-config --libs')
 
 CASDL_ENV.Append(LIBS = ['SDL_gfx'])
 CASDL_ENV.Append(CPPFLAGS=['-ggdb'])
-CASDL_ENV.Append(CPPPATH = "src")
+CASDL_ENV.Append(CPPPATH=['src'])
 CASDL_ENV.Append(LIBPATH = "lib")
 CASDL_ENV.Append(LIBS = ['circa'])
 
-# Temp: This build result should go in the cgame folder, but this causes problems.
-# Probably fixed by upgrading SCons
-CASDL_ENV.Program('cgm', ['cgame/main.cpp'], ['circa'])
-CASDL_ENV.Command('bin/cgame', 'cgm', Copy("$TARGET", "$SOURCE"))
+CASDL_ENV.Program('cgame/cgm', 'cgame/main.cpp')
