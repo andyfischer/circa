@@ -99,9 +99,8 @@ void test_reference()
 
     as_ref(myref) = a;
 
-    //FIXME
-    //test_equals(list_all_pointers(myref),
-    //    RefList(myref->function, REF_TYPE, a));
+    RefList refs = reference_iterator_to_list(start_reference_iterator(myref));
+    test_equals(refs, RefList(a));
 
     ReferenceMap myMap;
     myMap[a] = b;
@@ -110,18 +109,16 @@ void test_reference()
 
     test_assert(as_ref(myref) == b);
 
-    //FIXME
-    //test_equals(list_all_pointers(myref),
-    //    RefList(myref->function, REF_TYPE, b));
+    refs = reference_iterator_to_list(start_reference_iterator(myref));
+    test_equals(refs, RefList(b));
 
     myMap[b] = NULL;
     remap_pointers(myref, myMap);
 
     test_assert(as_ref(myref) == NULL);
 
-    //FIXME
-    //test_equals(list_all_pointers(myref),
-    //    RefList(myref->function, REF_TYPE));
+    refs = reference_iterator_to_list(start_reference_iterator(myref));
+    test_equals(refs, RefList(NULL));
 }
 
 void test_builtin_equals()
