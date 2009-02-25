@@ -12,7 +12,6 @@ std::string get_short_local_name(Term* term);
 std::string term_to_raw_string(Term* term);
 void print_raw_term(Term* term, std::ostream &output);
 void print_raw_branch(Branch& branch, std::ostream &output);
-RefList list_all_pointers(Term* term);
 void print_terms(RefList const& list, std::ostream &output);
 bool is_equivalent(Term* target, Term* function, RefList const& inputs);
 Term* find_equivalent(Term* function, RefList const& inputs);

@@ -26,10 +26,4 @@ void RefList::remapPointers(ReferenceMap const& map)
         _items[i] = map.getRemapped(_items[i]);
 }
 
-void RefList::visitPointers(PointerVisitor &visitor)
-{
-    for (unsigned int i=0; i < _items.size(); i++)
-        visitor.visitPointer(_items[i]);
-}
-
 } // namespace circa

@@ -237,7 +237,6 @@ void initialize_builtin_types(Branch& kernel)
 
     VOID_TYPE = create_empty_type(kernel, "void");
     REF_TYPE = import_type<Ref>(kernel, "Ref");
-    as_type(REF_TYPE).visitPointers = Ref::visit_pointers;
     as_type(REF_TYPE).remapPointers = Ref::remap_pointers;
     as_type(REF_TYPE).startPointerIterator = Ref::start_pointer_iterator;
 

@@ -20,11 +20,6 @@ void Ref::set(Term* target)
         remove_referencer(previousTarget, this);
 }
 
-void Ref::visit_pointers(Term* term, PointerVisitor& visitor)
-{
-    visitor.visitPointer(as_ref(term));
-}
-
 void Ref::remap_pointers(Term* term, ReferenceMap const& map)
 {
     as_ref(term) = map.getRemapped(as_ref(term));

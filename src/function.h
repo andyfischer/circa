@@ -62,7 +62,6 @@ struct Function
     static void copyExceptBranch(Term* source, Term* dest);
     static void copy(Term* source, Term* dest);
     static void remapPointers(Term* term, ReferenceMap const& map);
-    static void visitPointers(Term* term, PointerVisitor& visitor);
     static void subroutine_call_evaluate(Term* caller);
 };
 
