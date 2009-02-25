@@ -244,20 +244,20 @@ void evaluate_file(Branch& branch, std::string const& filename)
     string_value(branch, filename, get_name_for_attribute("source-file"));
 }
 
-PointerIterator*
-Branch::start_pointer_iterator(Term* term)
+ReferenceIterator*
+Branch::start_reference_iterator(Term* term)
 {
-    return new BranchExternalPointerIterator((Branch*) term->value);
+    return new BranchExternalReferenceIterator((Branch*) term->value);
 }
 
-PointerIterator* start_branch_iterator(Branch* branch)
+ReferenceIterator* start_branch_iterator(Branch* branch)
 {
     return new BranchIterator(branch);
 }
 
-PointerIterator* start_branch_pointer_iterator(Branch* branch)
+ReferenceIterator* start_branch_reference_iterator(Branch* branch)
 {
-    return new BranchExternalPointerIterator(branch);
+    return new BranchExternalReferenceIterator(branch);
 }
 
 Term* find_named(Branch* branch, std::string const& name)

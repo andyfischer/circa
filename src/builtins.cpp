@@ -119,7 +119,7 @@ void bootstrap_kernel()
     as_type(TYPE_TYPE).dealloc = cpp_importing::templated_dealloc<Type>;
     as_type(TYPE_TYPE).copy = Type::type_copy;
     as_type(TYPE_TYPE).remapPointers = Type::typeRemapPointers;
-    as_type(TYPE_TYPE).startPointerIterator = Type::typeStartPointerIterator;
+    as_type(TYPE_TYPE).startReferenceIterator = Type::typeStartReferenceIterator;
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Implant the Type type
@@ -185,7 +185,7 @@ void initialize_constants()
     BRANCH_TYPE = import_type<Branch>(*KERNEL, "Branch");
     as_type(BRANCH_TYPE).copy = Branch::copy;
     as_type(BRANCH_TYPE).remapPointers = Branch::hosted_remap_pointers;
-    as_type(BRANCH_TYPE).startPointerIterator = Branch::start_pointer_iterator;
+    as_type(BRANCH_TYPE).startReferenceIterator = Branch::start_reference_iterator;
 
     import_type<Dictionary>(*KERNEL, "Dictionary");
 

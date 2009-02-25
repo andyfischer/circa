@@ -7,6 +7,7 @@
 
 #include "ref_list.h"
 #include "term_namespace.h"
+#include "reference_iterator.h"
 
 namespace circa {
 
@@ -27,7 +28,9 @@ struct Branch
     int numTerms() const { return _terms.count(); }
 
     Term* get(int index) const { return _terms[index]; }
+    Ref& get(int index) { return _terms[index]; }
     Term* operator[](int index) const { return _terms[index]; }
+    Ref& operator[](int index) { return _terms[index]; }
 
     void append(Term* term);
 
@@ -77,7 +80,7 @@ struct Branch
     static void dealloc(void* data);
     static void copy(Term* source, Term* dest);
     static void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
-    static PointerIterator* start_pointer_iterator(Term* term);
+    static ReferenceIterator* start_reference_iterator(Term* term);
 };
 
 bool is_branch(Term* term);
@@ -85,8 +88,8 @@ Branch& as_branch(Term* term);
 std::string get_name_for_attribute(std::string attribute);
 void duplicate_branch(Branch& source, Branch& dest);
 void evaluate_file(Branch& branch, std::string const& filename);
-PointerIterator* start_branch_iterator(Branch* branch);
-PointerIterator* start_branch_pointer_iterator(Branch* branch);
+ReferenceIterator* start_branch_iterator(Branch* branch);
+ReferenceIterator* start_branch_reference_iterator(Branch* branch);
 
 Term* find_term_by_id(Branch& branch, unsigned int id);
 Term* find_named(Branch* branch, std::string const& name);

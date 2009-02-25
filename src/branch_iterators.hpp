@@ -2,10 +2,11 @@
 
 #include "branch.h"
 #include "introspection.h"
+#include "term_reference_iterator.h"
 
 namespace circa {
 
-class BranchIterator : public PointerIterator
+class BranchIterator : public ReferenceIterator
 {
     Branch* _branch;
     int _index;
@@ -17,13 +18,13 @@ public:
         postAdvance();
     }
 
-    Term* current()
+    virtual Ref& current()
     {
         assert(!finished());
         return _branch->get(_index);
     }
 
-    void advance()
+    virtual void advance()
     {
         assert(!finished());
         _index++;
@@ -36,21 +37,21 @@ public:
             _branch = NULL;
     }
 
-    bool finished()
+    virtual bool finished()
     {
         return _branch == NULL;
     }
 };
 
-class BranchExternalPointerIterator : public PointerIterator
+class BranchExternalReferenceIterator : public ReferenceIterator
 {
 private:
     Branch* _branch;
     int _index;
-    TermExternalPointersIterator* _nestedIterator;
+    TermReferenceIterator* _nestedIterator;
 
 public:
-    BranchExternalPointerIterator(Branch* branch)
+    BranchExternalReferenceIterator(Branch* branch)
       : _branch(branch),
         _index(0),
         _nestedIterator(NULL)
@@ -59,7 +60,7 @@ public:
             // Already finished.
             _branch = NULL;
         } else {
-            _nestedIterator = new TermExternalPointersIterator(_branch->get(0));
+            _nestedIterator = new TermReferenceIterator(_branch->get(0));
             advanceIfStateIsInvalid();
 
             while (!finished() && !shouldExposePointer(current()))
@@ -67,7 +68,7 @@ public:
         }
     }
 
-    virtual Term* current()
+    virtual Ref& current()
     {
         assert(!finished());
         return _nestedIterator->current();
@@ -115,7 +116,7 @@ private:
                 return;
             }
 
-            _nestedIterator = new TermExternalPointersIterator(_branch->get(_index));
+            _nestedIterator = new TermReferenceIterator(_branch->get(_index));
         }
     }
 
@@ -133,22 +134,24 @@ private:
     }
 };
 
-class BranchControlFlowIterator : public PointerIterator
+class BranchControlFlowIterator : public ReferenceIterator
 {
     BranchIterator _branchIterator;
-    PointerIterator* _nestedIterator;
+    ReferenceIterator* _nestedIterator;
 
 public:
     BranchControlFlowIterator(Branch* branch)
       : _branchIterator(branch), _nestedIterator(NULL)
     {
         if (!_branchIterator.finished()) {
-            _nestedIterator = start_control_flow_iterator(_branchIterator.current());
+            //FIXME
+            _nestedIterator = NULL;
+            //_nestedIterator = start_control_flow_iterator(_branchIterator.current());
             advanceIfStateIsInvalid();
         }
     }
 
-    Term* current()
+    virtual Ref& current()
     {
         if (_nestedIterator == NULL)
             return _branchIterator.current();
@@ -156,7 +159,7 @@ public:
             return _nestedIterator->current();
     }
 
-    void advance()
+    virtual void advance()
     {
         if (_nestedIterator != NULL)
             _nestedIterator->advance();
@@ -166,7 +169,7 @@ public:
         advanceIfStateIsInvalid();
     }
 
-    bool finished()
+    virtual bool finished()
     {
         return _branchIterator.finished();
     }
@@ -181,7 +184,9 @@ private:
             _branchIterator.advance();
             if (_branchIterator.finished())
                 return;
-            _nestedIterator = start_control_flow_iterator(_branchIterator.current());
+            //FIXME
+            _nestedIterator = NULL;
+            //_nestedIterator = start_control_flow_iterator(_branchIterator.current());
         }
     }
 };

@@ -25,20 +25,20 @@ void Ref::remap_pointers(Term* term, ReferenceMap const& map)
     as_ref(term) = map.getRemapped(as_ref(term));
 }
 
-class ReferencePointerIterator : public PointerIterator
+class ReferenceIteratorForReferenceType : public ReferenceIterator
 {
 private:
     Term* _containingTerm;
 
 public:
-    ReferencePointerIterator(Term* containingTerm)
+    ReferenceIteratorForReferenceType(Term* containingTerm)
       : _containingTerm(containingTerm)
     {
         if (_containingTerm->value == NULL)
             _containingTerm = NULL;
     }
 
-    virtual Term* current()
+    virtual Ref& current()
     {
         assert(!finished());
         return as_ref(_containingTerm);
@@ -53,9 +53,9 @@ public:
     }
 };
 
-PointerIterator* Ref::start_pointer_iterator(Term* term)
+ReferenceIterator* Ref::start_reference_iterator(Term* term)
 {
-    return new ReferencePointerIterator(term);
+    return new ReferenceIteratorForReferenceType(term);
 }
 
 } // namespace circa
