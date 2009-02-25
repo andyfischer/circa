@@ -5,7 +5,6 @@
 #include "builtins.h"
 #include "builtin_types.h"
 #include "cpp_importing.h"
-#include "pointer_iterator.h"
 #include "runtime.h"
 #include "set.h"
 #include "values.h"
@@ -238,7 +237,7 @@ void initialize_builtin_types(Branch& kernel)
     VOID_TYPE = create_empty_type(kernel, "void");
     REF_TYPE = import_type<Ref>(kernel, "Ref");
     as_type(REF_TYPE).remapPointers = Ref::remap_pointers;
-    as_type(REF_TYPE).startPointerIterator = Ref::start_pointer_iterator;
+    as_type(REF_TYPE).startReferenceIterator = Ref::start_reference_iterator;
 
     import_type<RefList>(kernel, "Tuple");
     import_type<Branch>(kernel, "Branch");

@@ -92,14 +92,14 @@ void subroutine_binding_input_names()
     test_assert(find_named(&as_function(mysub).subroutineBranch,"a") != NULL);
 }
 
-void pointer_iterator()
+void reference_iterator()
 {
     Function func;
     func.inputTypes.append(BOOL_TYPE);
     func.inputTypes.append(INT_TYPE);
     func.outputType = STRING_TYPE;
 
-    PointerIterator* it = start_function_pointer_iterator(&func);
+    ReferenceIterator* it = start_function_reference_iterator(&func);
 
     test_assert(it->current() == BOOL_TYPE);
     it->advance();
@@ -112,7 +112,7 @@ void pointer_iterator()
 
     // Try with no input types
     func.inputTypes.clear();
-    it = start_function_pointer_iterator(&func);
+    it = start_function_reference_iterator(&func);
     test_assert(it->current() == STRING_TYPE);
     it->advance();
     test_assert(it->finished());
@@ -125,7 +125,7 @@ void register_tests()
     //REGISTER_TEST_CASE(function_tests::using_apply); FIXME
     //REGISTER_TEST_CASE(function_tests::external_pointers); FIXME
     REGISTER_TEST_CASE(function_tests::subroutine_binding_input_names);
-    REGISTER_TEST_CASE(function_tests::pointer_iterator);
+    REGISTER_TEST_CASE(function_tests::reference_iterator);
 }
 
 } // namespace function_tests

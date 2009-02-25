@@ -9,7 +9,6 @@
 
 #include "branch.h"
 #include "builtins.h"
-#include "pointer_iterator.h"
 #include "reference_iterator.h"
 #include "ref.h"
 #include "ref_map.h"
@@ -29,7 +28,6 @@ struct Type
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
     typedef bool (*LessThanFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
-    typedef PointerIterator* (*StartPointerIteratorFunc)(Term* term);
     typedef ReferenceIterator* (*StartReferenceIteratorFunc)(Term* term);
     typedef void (*UpdateOwner)(Term* term);
     typedef std::string (*ToStringFunc)(Term* term);
@@ -59,7 +57,6 @@ struct Type
     EqualsFunc equals;
     LessThanFunc lessThan;
     RemapPointersFunc remapPointers;
-    StartPointerIteratorFunc startPointerIterator;
     StartReferenceIteratorFunc startReferenceIterator;
     UpdateOwner updateOwner;
     ToStringFunc toString;
@@ -92,7 +89,6 @@ struct Type
         equals(NULL),
         lessThan(NULL),
         remapPointers(NULL),
-        startPointerIterator(NULL),
         startReferenceIterator(NULL),
         updateOwner(NULL),
         toString(NULL),
@@ -127,7 +123,7 @@ struct Type
 
     static void type_copy(Term* source, Term* dest);
     static void typeRemapPointers(Term *term, ReferenceMap const& map);
-    static PointerIterator* typeStartPointerIterator(Term* term);
+    static ReferenceIterator* typeStartReferenceIterator(Term* term);
 };
 
 bool is_type(Term* term);
@@ -154,7 +150,6 @@ Type& create_compound_type(Branch& branch, std::string const& name);
 std::string to_string(Term* term);
 std::string to_source_string(Term* term);
 
-PointerIterator* start_pointer_iterator(Term*);
 ReferenceIterator* start_reference_iterator(Term* term);
 
 // Fetch the const function for this type

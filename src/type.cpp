@@ -12,7 +12,7 @@ void Type::makeCompoundType(std::string const& name)
     alloc = Branch::alloc;
     dealloc = Branch::dealloc;
     copy = Branch::copy;
-    startPointerIterator = Branch::start_pointer_iterator;
+    startReferenceIterator = Branch::start_reference_iterator;
 }
 
 bool Type::isCompoundType()
@@ -177,20 +177,20 @@ void Type::name_accessor(Term* caller)
     as_string(caller) = as_type(caller->input(0)).name;
 }
 
-class TypePointerIterator : public PointerIterator
+class TypeReferenceIterator : public ReferenceIterator
 {
 private:
     Type* _type;
     int _fieldIndex;
 
 public:
-    TypePointerIterator(Type* type)
+    TypeReferenceIterator(Type* type)
       : _type(type), _fieldIndex(0)
     {
         advanceIfStateIsInvalid();
     }
 
-    virtual Term* current()
+    virtual Ref& current()
     {
         return _type->fields[_fieldIndex].type;
     }
@@ -215,9 +215,9 @@ private:
     }
 };
 
-PointerIterator* Type::typeStartPointerIterator(Term* term)
+ReferenceIterator* Type::typeStartReferenceIterator(Term* term)
 {
-    return new TypePointerIterator(&as_type(term));
+    return new TypeReferenceIterator(&as_type(term));
 }
 
 std::string to_string(Term* term)
@@ -241,19 +241,6 @@ std::string to_source_string(Term* term)
     } else {
         return func(term);
     }
-}
-
-PointerIterator* start_pointer_iterator(Term* term)
-{
-    Type& type = as_type(term->type);
-
-    if (type.startPointerIterator == NULL)
-        return NULL;
-
-    if (term->value == NULL)
-        return NULL;
-
-    return type.startPointerIterator(term);
 }
 
 ReferenceIterator* start_reference_iterator(Term* term)

@@ -62,30 +62,22 @@ void compound_types()
     test_assert(get_field(inst1,"myint")->asInt() == 5);
 }
 
-/*
-void compound_types2()
-{
-    Type type;
-
-}
-*/
-
 void type_iterator()
 {
     Branch branch;
     Term *t = branch.eval("t = Type()");
     Type &type = as_type(t);
 
-    PointerIterator *it;
+    ReferenceIterator *it;
 
-    it = start_pointer_iterator(t);
+    it = start_reference_iterator(t);
     test_assert(it->finished());
     delete it;
 
     type.addField(INT_TYPE, "int1");
     type.addField(STRING_TYPE, "int1");
 
-    it = start_pointer_iterator(t);
+    it = start_reference_iterator(t);
     test_assert(it->current() == INT_TYPE);
     it->advance();
     test_assert(it->current() == STRING_TYPE);

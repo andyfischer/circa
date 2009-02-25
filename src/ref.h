@@ -79,7 +79,7 @@ struct Ref
     }
 
     static void remap_pointers(Term* term, ReferenceMap const& map);
-    static PointerIterator* start_pointer_iterator(Term* term);
+    static ReferenceIterator* start_reference_iterator(Term* term);
 };
 
 } // namespace circa

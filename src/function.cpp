@@ -183,14 +183,14 @@ Branch& get_subroutine_branch(Term* term)
     return as_function(term).subroutineBranch;
 }
 
-class FunctionPointerIterator : public PointerIterator
+class FunctionPointerIterator : public ReferenceIterator
 {
 private:
     enum Step { INPUT_TYPES, OUTPUT_TYPE, STATE_TYPE, SUBROUTINE_BRANCH };
     Function* _function;
     Step _step;
     int _inputIndex;
-    PointerIterator *_subroutineBranchIterator;
+    ReferenceIterator *_subroutineBranchIterator;
 public:
     FunctionPointerIterator(Function* function)
       : _function(function),
@@ -201,7 +201,7 @@ public:
         advanceIfStateIsInvalid();
     }
 
-    virtual Term* current()
+    virtual Ref& current()
     {
         assert(!finished());
 
@@ -239,7 +239,7 @@ public:
             break;
         case STATE_TYPE:
             _step = SUBROUTINE_BRANCH;
-            _subroutineBranchIterator = start_branch_pointer_iterator(&_function->subroutineBranch);
+            _subroutineBranchIterator = start_branch_reference_iterator(&_function->subroutineBranch);
             if (_subroutineBranchIterator == NULL)
                 _function = NULL;
             break;
@@ -278,19 +278,9 @@ private:
     }
 };
 
-PointerIterator* start_function_pointer_iterator(Function* function)
+ReferenceIterator* start_function_reference_iterator(Function* function)
 {
     return new FunctionPointerIterator(function);
-}
-
-PointerIterator* start_control_flow_iterator(Term* term)
-{
-    Function &func = as_function(term->function);
-
-    if (func.startControlFlowIterator == NULL)
-        return NULL;
-
-    return func.startControlFlowIterator(term);
 }
 
 } // namespace circa

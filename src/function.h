@@ -7,6 +7,7 @@
 
 #include "term.h"
 #include "branch.h"
+#include "reference_iterator.h"
 
 namespace circa {
 
@@ -16,7 +17,7 @@ namespace circa {
 struct Function
 {
     typedef void (*EvaluateFunc)(Term* caller);
-    typedef PointerIterator* (*PointerIteratorFunc)(Term* caller);
+    typedef ReferenceIterator* (*ReferenceIteratorFunc)(Term* caller);
 
     struct InputProperties {
         std::string name;
@@ -29,8 +30,8 @@ struct Function
 
     RefList inputTypes;
     InputPropertiesList inputProperties;
-    Term* outputType;
-    Term* stateType;
+    Ref outputType;
+    Ref stateType;
 
     bool pureFunction;
     bool hasSideEffects;
@@ -42,7 +43,7 @@ struct Function
 
     // Code
     EvaluateFunc evaluate;
-    PointerIteratorFunc startControlFlowIterator;
+    ReferenceIteratorFunc startControlFlowIterator;
 
     // External functions
     Ref feedbackAccumulationFunction;
@@ -74,11 +75,7 @@ std::string get_placeholder_name_for_index(int index);
 
 Branch& call_subroutine(Branch& branch, std::string const& functionName);
 Branch& get_subroutine_branch(Term* term);
-PointerIterator* start_function_pointer_iterator(Function* function);
-
-// Call the start_control_flow_iterator function for this term's function,
-// and return the new iterator. Returns NULL if there is no such function.
-PointerIterator* start_control_flow_iterator(Term* term);
+ReferenceIterator* start_function_reference_iterator(Function* function);
 
 } // namespace circa
 

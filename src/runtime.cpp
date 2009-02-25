@@ -358,7 +358,7 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     // would almost definitely lead to errors.
     assert(!map.contains(NULL));
 
-    for (int i=0; i < term->inputs.count(); i++) {
+    for (unsigned int i=0; i < term->inputs.count(); i++) {
         Term* orig = term->inputs[i];
         Term* remap = map.getRemapped(orig);
     }

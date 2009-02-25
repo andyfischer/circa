@@ -17,7 +17,7 @@ void simple()
     Term *two = branch.eval("two = 2.0");
     Term *t = branch.eval("a = add(one,two)");
 
-    TermExternalPointersIterator it(t);
+    TermReferenceIterator it(t);
 
     test_assert(it.current() == one);
     it.advance();
@@ -36,7 +36,7 @@ void no_inputs()
 
     Term *one = branch.eval("one = 1.0");
 
-    TermExternalPointersIterator it(one);
+    TermReferenceIterator it(one);
 
     test_assert(it.current()->function == VALUE_FUNCTION_GENERATOR);
     it.advance();

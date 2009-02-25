@@ -33,7 +33,7 @@ void test_reference()
     as_ref(r) = s;
     test_assert(as_ref(r) == s);
 
-    PointerIterator* it = start_pointer_iterator(r);
+    ReferenceIterator* it = start_reference_iterator(r);
 
     test_assert(it->current() == s);
 
