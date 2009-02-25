@@ -17,4 +17,12 @@ RefList reference_iterator_to_list(ReferenceIterator& iterator)
     return result;
 }
 
+RefList reference_iterator_to_list(ReferenceIterator* iterator)
+{
+    RefList result = reference_iterator_to_list(*iterator);
+    delete iterator;
+    iterator = NULL;
+    return result;
+}
+
 } // namespace circa
