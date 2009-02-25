@@ -87,8 +87,7 @@ void TermReferenceIterator::advanceIfStateIsInvalid()
 
         _step = INSIDE_VALUE;
         _stepIndex = 0;
-        //FIXME
-        //_nestedIterator = start_pointer_iterator(_term);
+        _nestedIterator = start_reference_iterator(_term);
 
         if (_nestedIterator == NULL) {
             _term = NULL;

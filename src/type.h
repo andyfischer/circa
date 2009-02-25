@@ -10,6 +10,7 @@
 #include "branch.h"
 #include "builtins.h"
 #include "pointer_iterator.h"
+#include "reference_iterator.h"
 #include "ref.h"
 #include "ref_map.h"
 #include "term.h"
@@ -29,6 +30,7 @@ struct Type
     typedef bool (*LessThanFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
     typedef PointerIterator* (*StartPointerIteratorFunc)(Term* term);
+    typedef ReferenceIterator* (*StartReferenceIteratorFunc)(Term* term);
     typedef void (*UpdateOwner)(Term* term);
     typedef std::string (*ToStringFunc)(Term* term);
     typedef std::string (*ToSourceStringFunc)(Term* term);
@@ -58,6 +60,7 @@ struct Type
     LessThanFunc lessThan;
     RemapPointersFunc remapPointers;
     StartPointerIteratorFunc startPointerIterator;
+    StartReferenceIteratorFunc startReferenceIterator;
     UpdateOwner updateOwner;
     ToStringFunc toString;
     ToStringFunc toSourceString;
@@ -89,6 +92,8 @@ struct Type
         equals(NULL),
         lessThan(NULL),
         remapPointers(NULL),
+        startPointerIterator(NULL),
+        startReferenceIterator(NULL),
         updateOwner(NULL),
         toString(NULL),
         toSourceString(NULL),
@@ -150,6 +155,7 @@ std::string to_string(Term* term);
 std::string to_source_string(Term* term);
 
 PointerIterator* start_pointer_iterator(Term*);
+ReferenceIterator* start_reference_iterator(Term* term);
 
 // Fetch the const function for this type
 Term* get_value_function(Term* type);

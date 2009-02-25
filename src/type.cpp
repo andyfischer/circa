@@ -256,6 +256,19 @@ PointerIterator* start_pointer_iterator(Term* term)
     return type.startPointerIterator(term);
 }
 
+ReferenceIterator* start_reference_iterator(Term* term)
+{
+    Type& type = as_type(term->type);
+
+    if (type.startReferenceIterator == NULL)
+        return NULL;
+
+    if (term->value == NULL)
+        return NULL;
+
+    return type.startReferenceIterator(term);
+}
+
 Term* get_value_function(Term* typeTerm)
 {
     Type& type = as_type(typeTerm);
