@@ -4,7 +4,6 @@
 #define CIRCA_RUNTIME_INCLUDED
 
 #include "common_headers.h"
-#include "pointer_visitor.h"
 
 namespace circa {
 
@@ -56,7 +55,6 @@ void change_function(Term* term, Term* new_function);
 
 void remap_pointers(Term* term, ReferenceMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
-void visit_pointers(Term* term, PointerVisitor &visitor);
 
 } // namespace circa
 

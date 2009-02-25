@@ -114,27 +114,6 @@ void print_terms(RefList const& list, std::ostream &output)
     }
 }
 
-RefList list_all_pointers(Term* term)
-{
-    RefList result;
-
-    struct AppendPointersToList : PointerVisitor
-    {
-        RefList& list;
-        AppendPointersToList(RefList &_list) : list(_list) {}
-
-        virtual void visitPointer(Term* term) {
-            if (term != NULL)
-                list.appendUnique(term);
-        }
-    };
-
-    AppendPointersToList visitor(result);
-    visit_pointers(term, visitor);
-
-    return result;
-}
-
 bool function_allows_term_reuse(Function &function)
 {
     if ((function.stateType != VOID_TYPE) && (function.stateType != NULL))

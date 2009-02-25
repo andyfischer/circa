@@ -11,7 +11,6 @@
 #include "common_headers.h"
 
 #include "ref.h"
-#include "pointer_visitor.h"
 
 namespace circa {
 
@@ -181,7 +180,6 @@ public:
     }
 
     void remapPointers(ReferenceMap const& map);
-    void visitPointers(PointerVisitor &visitor);
 };
 
 } // namespace circa

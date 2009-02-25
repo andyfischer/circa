@@ -7,14 +7,14 @@ state bool down_pressed
 state bool left_pressed
 state bool right_pressed
 
-front_dist = 18.0
+front_dist = 30.0
 back_angle = 2.5
 
 function redraw()
-    ship_y = 300.0
+    ship_y = 400.0
 
     if up_pressed
-        ship_y = 400.0
+        ship_y = 100.0
     end
 
     ship_facing = PI*2

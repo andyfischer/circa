@@ -380,18 +380,6 @@ void remap_pointers(Term* term, ReferenceMap const& map)
         remap_pointers(term->state, map);
 }
 
-void visit_pointers(Term* term, PointerVisitor &visitor)
-{
-    Type& type = as_type(term->type);
-
-    term->inputs.visitPointers(visitor);
-    visitor.visitPointer(term->function);
-    visitor.visitPointer(term->type);
-
-    if (type.visitPointers != NULL)
-        type.visitPointers(term, visitor);
-}
-
 void remap_pointers(Term* term, Term* original, Term* replacement)
 {
     assert_good_pointer(term);

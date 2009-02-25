@@ -5,7 +5,6 @@
 #include "branch.h"
 #include "builtins.h"
 #include "function.h"
-#include "pointer_visitor.h"
 #include "runtime.h"
 #include "syntax.h"
 #include "tokenizer.h"

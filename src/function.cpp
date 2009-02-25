@@ -117,15 +117,6 @@ void Function::remapPointers(Term* term, ReferenceMap const& map)
     func.subroutineBranch.remapPointers(map);
 }
 
-void Function::visitPointers(Term* term, PointerVisitor& visitor)
-{
-    Function &func = as_function(term);
-    func.inputTypes.visitPointers(visitor);
-    visitor.visitPointer(func.outputType);
-    visitor.visitPointer(func.stateType);
-    func.subroutineBranch.visitPointers(visitor);
-}
-
 void initialize_as_subroutine(Function& func)
 {
     func.evaluate = Function::subroutine_call_evaluate;

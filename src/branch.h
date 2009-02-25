@@ -5,8 +5,6 @@
 
 #include "common_headers.h"
 
-#include "pointer_iterator.h"
-#include "pointer_visitor.h"
 #include "ref_list.h"
 #include "term_namespace.h"
 
@@ -60,9 +58,6 @@ struct Branch
     // Remap pointers
     void remapPointers(ReferenceMap const& map);
 
-    // Visit pointers
-    void visitPointers(PointerVisitor& visitor);
-
     void clear();
 
     // Evaluate this branch.
@@ -82,7 +77,6 @@ struct Branch
     static void dealloc(void* data);
     static void copy(Term* source, Term* dest);
     static void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
-    static void hosted_visit_pointers(Term* caller, PointerVisitor& visitor);
     static PointerIterator* start_pointer_iterator(Term* term);
 };
 

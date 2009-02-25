@@ -108,36 +108,6 @@ void Branch::remapPointers(ReferenceMap const& map)
     }
 }
 
-void Branch::visitPointers(PointerVisitor& visitor)
-{
-    struct VisitPointerIfOutsideBranch : PointerVisitor
-    {
-        Branch *branch;
-        PointerVisitor &visitor;
-
-        VisitPointerIfOutsideBranch(Branch *_branch, PointerVisitor &_visitor)
-            : branch(_branch), visitor(_visitor) {}
-
-        virtual void visitPointer(Term* term)
-        {
-            if (term == NULL)
-                return;
-            if (term->owningBranch != branch)
-                visitor.visitPointer(term);
-        }
-    };
-
-    VisitPointerIfOutsideBranch myVisitor(this, visitor);
-
-    for (unsigned int i = 0; i < _terms.count(); i++) {
-        Term* term = _terms[i];
-        if (term == NULL)
-            continue;
-
-        visit_pointers(term, myVisitor);
-    }
-}
-
 void
 Branch::clear()
 {
@@ -198,12 +168,6 @@ void
 Branch::hosted_remap_pointers(Term* caller, ReferenceMap const& map)
 {
     as_branch(caller).remapPointers(map);
-}
-
-void
-Branch::hosted_visit_pointers(Term* caller, PointerVisitor& visitor)
-{
-    as_branch(caller).visitPointers(visitor);
 }
 
 bool is_branch(Term* term)

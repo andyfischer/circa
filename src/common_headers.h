@@ -22,7 +22,6 @@ namespace circa {
 
 struct Branch;
 struct Function;
-struct PointerVisitor;
 struct PointerIterator;
 struct Term;
 struct Type;

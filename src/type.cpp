@@ -172,15 +172,6 @@ void Type::typeRemapPointers(Term *term, ReferenceMap const& map)
     }
 }
 
-void Type::typeVisitPointers(Term *term, PointerVisitor &visitor)
-{
-    Type &type = as_type(term);
-
-    for (unsigned int field_i=0; field_i < type.fields.size(); field_i++) {
-        visitor.visitPointer(type.fields[field_i].type);
-    }
-}
-
 void Type::name_accessor(Term* caller)
 {
     as_string(caller) = as_type(caller->input(0)).name;
