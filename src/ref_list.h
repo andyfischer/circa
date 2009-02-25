@@ -154,7 +154,7 @@ public:
 
     Term* operator[](unsigned int index) const { return get(index); }
 
-    Term*& operator[](unsigned int index)
+    Ref& operator[](unsigned int index)
     {
         return _items[index];
     }
