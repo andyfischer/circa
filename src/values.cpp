@@ -76,16 +76,20 @@ void copy_value(Term* source, Term* dest)
 
 void copy_value_but_dont_copy_inner_branch(Term* source, Term* dest)
 {
-    // Special case: functions. Need to copy a bunch of data, but not the
-    // subroutineBranch.
+    // Temp: Do a type specialization if dest has type 'any'.
+    // This should be removed once type inference rules are smarter.
+    if (dest->type == ANY_TYPE)
+        specialize_type(dest, source->type);
 
     assert_type(source, dest->type);
 
+    // Special case for functions
     if (source->type == FUNCTION_TYPE) {
         Function::copyExceptBranch(source,dest);
         return;
     }
     
+    // Otherwise, do nothing for types with branches
     if (has_inner_branch(dest))
         return;
 
