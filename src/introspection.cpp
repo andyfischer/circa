@@ -12,6 +12,12 @@ bool is_value(Term* term)
     return term->function->function == VALUE_FUNCTION_GENERATOR;
 }
 
+bool is_stateful(Term* term)
+{
+    assert_good_pointer(term);
+    return term->function == get_global("stateful-value");
+}
+
 bool has_inner_branch(Term* term)
 {
     return get_inner_branch(term) != NULL;

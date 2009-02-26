@@ -65,8 +65,7 @@ void subroutine_binding_input_names()
 {
     Branch branch;
 
-    Term* mysub = branch.eval(
-            "mysub = subroutine-create('mysub', tuple(int), void)");
+    Term* mysub = branch.eval("mysub = subroutine-create('mysub', tuple(int), void)");
     test_assert(mysub != NULL);
 
     mysub = branch.eval("function-name-input(@mysub, 0, 'a')");
