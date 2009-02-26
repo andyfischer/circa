@@ -150,6 +150,7 @@ void bootstrap_kernel()
     as_type(FUNCTION_TYPE).dealloc = cpp_importing::templated_dealloc<Function>;
     as_type(FUNCTION_TYPE).copy = Function::copy;
     as_type(FUNCTION_TYPE).remapPointers = Function::remapPointers;
+    as_type(FUNCTION_TYPE).startReferenceIterator = Function::start_reference_iterator;
     KERNEL->bindName(FUNCTION_TYPE, "Function");
 
     // Implant Function type
