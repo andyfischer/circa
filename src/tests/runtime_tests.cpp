@@ -149,14 +149,13 @@ void test_create_duplicate()
 {
     Branch branch;
 
-    Term* a = branch.eval("a = 5");
-    a->setIsStateful(true);
+    Term* a = branch.eval("state int a = 5");
 
     Term* b = create_duplicate(&branch, a);
 
     test_assert(a->function == b->function);
     test_assert(a->type == b->type);
-    test_assert(b->isStateful());
+    test_assert(is_stateful(b));
 }
 
 void register_tests()
@@ -164,7 +163,6 @@ void register_tests()
     REGISTER_TEST_CASE(runtime_tests::test_create_value);
     REGISTER_TEST_CASE(runtime_tests::test_int_value);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
-    //REGISTER_TEST_CASE(runtime_tests::test_find_existing_equivalent); FIXME
     REGISTER_TEST_CASE(runtime_tests::var_function_reuse);
     REGISTER_TEST_CASE(runtime_tests::null_input_errors);
     REGISTER_TEST_CASE(runtime_tests::test_eval_as);

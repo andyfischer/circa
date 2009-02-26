@@ -541,8 +541,7 @@ void old_update_if_statement_joining_terms(Term* if_statement)
             Term* joining = apply_function(&joiningTermsBranch, "if-expr",
                     RefList(conditionTerm, posVersion, negVersion));
 
-            // Bind these names in the outer branch. This is probably dangerous
-            // and should be changed
+            // Bind these names in the outer branch.
             outerBranch.bindName(joining, name);
         }
     }
@@ -569,8 +568,11 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     Term* type = find_named(&branch, typeName);
     assert(type != NULL);
 
-    Term* result = create_value(&branch, type, name);
-    result->setIsStateful(true);
+    Term* result = apply_function(&branch, get_global("stateful-value"), RefList());
+    change_type(result, type);
+
+    //Term* result = create_value(&branch, type, name);
+    //result->setIsStateful(true);
 
     if (initialValue != NULL)
         copy_value(initialValue, result);

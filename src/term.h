@@ -71,6 +71,8 @@ struct Term
 
     std::string toString();
 
+    bool hasValue();
+
     // Returns the named property
     Term* property(std::string const& name) const;
 
@@ -84,9 +86,6 @@ struct Term
     void clearError();
     void pushError(std::string const& message);
     std::string getErrorMessage() const;
-
-    bool isStateful() const;
-    void setIsStateful(bool value);
 
     // Convenience accessors
     int& asInt();

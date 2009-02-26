@@ -187,8 +187,7 @@ void test_stateful_value_decl()
     Branch branch;
     Term* a = parser::compile(branch, parser::statement, "state int a");
 
-    test_assert(is_value(a));
-    test_assert(a->isStateful());
+    test_assert(is_stateful(a));
     test_assert(a->type == INT_TYPE);
 }
 

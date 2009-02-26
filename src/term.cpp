@@ -52,6 +52,12 @@ Term::toString()
     return to_string(this);
 }
 
+bool
+Term::hasValue()
+{
+    return value == NULL;
+}
+
 Term* Term::property(std::string const& name) const
 {
     return properties[name];
@@ -102,20 +108,6 @@ std::string Term::getErrorMessage() const
         return as_string(property("error"));
     else
         return "";
-}
-
-bool Term::isStateful() const
-{
-    if (hasProperty("stateful"))
-        return as_bool(property("stateful"));
-    else
-        return false;
-}
-
-void Term::setIsStateful(bool value)
-{
-    addProperty("stateful", BOOL_TYPE);
-    as_bool(property("stateful")) = value;
 }
 
 int& Term::asInt()

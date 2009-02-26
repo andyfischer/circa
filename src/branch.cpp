@@ -297,7 +297,7 @@ void migrate_term(Term* source, Term* dest)
     } 
     
     // Stateful value migration
-    if (is_value(dest) && dest->isStateful()) {
+    if (is_stateful(source) && is_stateful(dest)) {
         copy_value(source, dest);
     }
 }
