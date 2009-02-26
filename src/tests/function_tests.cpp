@@ -56,27 +56,9 @@ void external_pointers()
     as_function(function).inputTypes = RefList(INT_TYPE, INT_TYPE);
     as_function(function).outputType = STRING_TYPE;
 
-    //FIXME
-    /*test_equals(list_all_pointers(function), RefList(
-            function->function,
-            FUNCTION_TYPE,
-            INT_TYPE,
-            STRING_TYPE));*/
-
-    function = branch.eval(
-            "subroutine-create(\"mysub\",tuple(float,float),bool)");
-
-    //FIXME
-    /*test_equals(list_all_pointers(function), RefList(
-            function->input(0),
-            function->input(1), // a list of (float,float)
-            BOOL_TYPE,
-            get_global("subroutine-create"),
-            FUNCTION_TYPE,
-            FLOAT_TYPE,
-            BRANCH_TYPE,
-            get_value_function(FLOAT_TYPE)
-            ));*/
+    RefList refs = reference_iterator_to_list(start_reference_iterator(function));
+    
+    test_equals(refs, RefList(INT_TYPE, INT_TYPE, STRING_TYPE));
 }
 
 void subroutine_binding_input_names()
@@ -123,7 +105,7 @@ void register_tests()
 {
     REGISTER_TEST_CASE(function_tests::create);
     //REGISTER_TEST_CASE(function_tests::using_apply); FIXME
-    //REGISTER_TEST_CASE(function_tests::external_pointers); FIXME
+    REGISTER_TEST_CASE(function_tests::external_pointers);
     REGISTER_TEST_CASE(function_tests::subroutine_binding_input_names);
     REGISTER_TEST_CASE(function_tests::reference_iterator);
 }

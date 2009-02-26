@@ -178,12 +178,18 @@ Function::subroutine_call_evaluate(Term* caller)
     }
 }
 
+ReferenceIterator*
+Function::start_reference_iterator(Term* term)
+{
+    return start_function_reference_iterator(&as_function(term));
+}
+
 Branch& get_subroutine_branch(Term* term)
 {
     return as_function(term).subroutineBranch;
 }
 
-class FunctionPointerIterator : public ReferenceIterator
+class FunctionReferenceIterator : public ReferenceIterator
 {
 private:
     enum Step { INPUT_TYPES, OUTPUT_TYPE, STATE_TYPE, SUBROUTINE_BRANCH };
@@ -192,7 +198,7 @@ private:
     int _inputIndex;
     ReferenceIterator *_subroutineBranchIterator;
 public:
-    FunctionPointerIterator(Function* function)
+    FunctionReferenceIterator(Function* function)
       : _function(function),
         _step(INPUT_TYPES),
         _inputIndex(0),
@@ -280,7 +286,7 @@ private:
 
 ReferenceIterator* start_function_reference_iterator(Function* function)
 {
-    return new FunctionPointerIterator(function);
+    return new FunctionReferenceIterator(function);
 }
 
 } // namespace circa
