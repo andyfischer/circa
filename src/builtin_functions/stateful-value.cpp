@@ -9,10 +9,18 @@ namespace stateful_value_function {
     {
         // Copy our value from the bottom of this branch, if it is ready.
         Term* bottom = caller->owningBranch->getNamed(caller->name);
-        if (bottom == caller)
-            return;
 
-        if (!caller->hasValue())
+        if (bottom == caller) {
+            return;
+        }
+
+        if (!caller->hasValue()) {
+            return;
+        }
+
+        // Temp, ignore terms with wrong type. This check should be
+        // removed when we have proper type specialization.
+        if (bottom->type != caller->type)
             return;
 
         copy_value(bottom, caller);
@@ -20,8 +28,7 @@ namespace stateful_value_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate,
-            "stateful-value() -> any");
+        import_function(kernel, evaluate, "stateful-value() -> any");
     }
 }
 }

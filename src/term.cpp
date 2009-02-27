@@ -55,7 +55,7 @@ Term::toString()
 bool
 Term::hasValue()
 {
-    return value == NULL;
+    return value != NULL;
 }
 
 Term* Term::property(std::string const& name) const
