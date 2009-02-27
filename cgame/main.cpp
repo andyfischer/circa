@@ -136,8 +136,6 @@ int main( int argc, char* args[] )
     circa::Branch script_main;
     circa::evaluate_file(script_main, filename);
 
-    circa::print_raw_branch(script_main, std::cout);
-
     //Initialize all SDL subsystems
     if( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
     {
