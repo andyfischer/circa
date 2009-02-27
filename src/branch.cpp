@@ -286,43 +286,35 @@ Term*& branch_get_outer_scope(Branch& branch)
     return as_ref(branch[get_name_for_attribute("outer_scope")]);
 }
 
-void migrate_terms(Branch& source, Branch& dest);
-
-void migrate_term(Term* source, Term* dest)
-{
-    // Branch migration
-    if (has_inner_branch(source)) {
-        migrate_terms(*get_inner_branch(source),*get_inner_branch(dest));
-        return;
-    } 
-    
-    // Stateful value migration
-    if (is_stateful(source) && is_stateful(dest)) {
-        copy_value(source, dest);
-    }
-}
-
 void migrate_terms(Branch& source, Branch& dest)
 {
     TermNamespace::iterator it;
     for (it = source.names.begin(); it != source.names.end(); ++it)
     {
         std::string name = it->first;
-        Term* originalTerm = it->second;
+        Term* sourceTerm = it->second;
 
         // Skip if name isn't in dest
         if (!dest.names.contains(name)) {
             continue;
         }
 
-        Term* targetTerm = dest[name];
+        Term* destTerm = dest.findFirstBinding(name);
 
         // Skip if type doesn't match
-        if (originalTerm->type != targetTerm->type) {
+        if (sourceTerm->type != destTerm->type) {
             continue;
         }
 
-        migrate_term(originalTerm, targetTerm);
+        // Branch migration
+        if (has_inner_branch(sourceTerm)) {
+            migrate_terms(*get_inner_branch(sourceTerm),*get_inner_branch(destTerm));
+        } 
+        
+        // Stateful value migration
+        else if (is_stateful(sourceTerm) && is_stateful(destTerm)) {
+            copy_value(sourceTerm, destTerm);
+        }
     }
 }
 

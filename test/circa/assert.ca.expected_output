@@ -1,1 +1,2 @@
-Error occured: Assert failed on line: assert(false)
+Error occured: On term #210: assert(false)
+Assert failed

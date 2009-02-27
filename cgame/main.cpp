@@ -158,10 +158,13 @@ int main( int argc, char* args[] )
             script_main["mouse_y"]->asFloat() = event.motion.y;
         } else if (event.type == SDL_KEYDOWN) {
             switch(event.key.keysym.sym) {
+            case SDLK_4:
+                std::cout << "Script contents:" << std::endl;
+                print_raw_branch(script_main, std::cout);
+                break;
             case SDLK_5:
                 circa::reload_branch_from_file(script_main);
-                std::cout << "Script reloaded, new contents:" << std::endl;
-                print_raw_branch(script_main, std::cout);
+                std::cout << "Script reloaded" << std::endl;
                 break;
             case SDLK_UP:
                 script_main["up_pressed"]->asBool() = true; break;
@@ -186,7 +189,7 @@ int main( int argc, char* args[] )
         }
 
         try {
-            circa::get_subroutine_branch(script_main["redraw"]).eval();
+            script_main.eval();
         } catch (std::exception &e) {
             std::cout << e.what() << std::endl;
             return 0;

@@ -9,43 +9,42 @@ state bool right_pressed
 
 front_dist = 30.0
 back_angle = 2.5
-ship_speed = 3.0
+ship_speed = 1.0
+turn_speed = 0.025
 
-function redraw()
-    state float ship_x = 200.0
-    state float ship_y = 200.0
+state float ship_x = 200.0
+state float ship_y = 200.0
 
-    state float ship_facing = PI*2
+state float ship_facing = PI*2
 
-    if up_pressed
-        ship_x = ship_x + ship_speed * cos(ship_facing)
-        ship_y = ship_y + ship_speed * sin(ship_facing)
-    end
+--if up_pressed
+    ship_x = ship_x + ship_speed * cos(ship_facing)
+    ship_y = ship_y + ship_speed * sin(ship_facing)
+--end
 
-    if left_pressed
-        ship_facing = ship_facing - .05 * PI
-    end
-
-    if right_pressed
-        ship_facing = ship_facing + .05 * PI
-    end
-
-    fill_rectangle(0,0,640,480, 0xffffff)
-
-    a_x = ship_x + front_dist * cos(ship_facing)
-    a_y = ship_y + front_dist * sin(ship_facing)
-
-    b_x = ship_x + front_dist * cos(ship_facing + back_angle)
-    b_y = ship_y + front_dist * sin(ship_facing + back_angle)
-
-    c_x = ship_x - front_dist * cos(ship_facing)
-    c_y = ship_y - front_dist * sin(ship_facing)
-
-    d_x = ship_x + front_dist * cos(ship_facing - back_angle)
-    d_y = ship_y + front_dist * sin(ship_facing - back_angle)
-
-    line_to(a_x, a_y, b_x, b_y, 0)
-    line_to(b_x, b_y, c_x, c_y, 0)
-    line_to(c_x, c_y, d_x, d_y, 0)
-    line_to(d_x, d_y, a_x, a_y, 0)
+if left_pressed
+    ship_facing = ship_facing - turn_speed * PI
 end
+
+if right_pressed
+    ship_facing = ship_facing + turn_speed * PI
+end
+
+fill_rectangle(0,0,640,480, 0xffffff)
+
+a_x = ship_x + front_dist * cos(ship_facing)
+a_y = ship_y + front_dist * sin(ship_facing)
+
+b_x = ship_x + front_dist * cos(ship_facing + back_angle)
+b_y = ship_y + front_dist * sin(ship_facing + back_angle)
+
+c_x = ship_x - (front_dist - 20.0) * cos(ship_facing)
+c_y = ship_y - (front_dist - 20.0) * sin(ship_facing)
+
+d_x = ship_x + front_dist * cos(ship_facing - back_angle)
+d_y = ship_y + front_dist * sin(ship_facing - back_angle)
+
+line_to(a_x, a_y, b_x, b_y, 0)
+line_to(b_x, b_y, c_x, c_y, 0)
+line_to(c_x, c_y, d_x, d_y, 0)
+line_to(d_x, d_y, a_x, a_y, 0)
