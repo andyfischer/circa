@@ -9,17 +9,27 @@ state bool right_pressed
 
 front_dist = 30.0
 back_angle = 2.5
+ship_speed = 3.0
 
 function redraw()
-    state float ship_y = 400.0
+    state float ship_x = 200.0
+    state float ship_y = 200.0
+
+    state float ship_facing = PI*2
 
     if up_pressed
-        ship_y = ship_y - 5.0
+        ship_x = ship_x + ship_speed * cos(ship_facing)
+        ship_y = ship_y + ship_speed * sin(ship_facing)
     end
 
-    ship_facing = PI*2
+    if left_pressed
+        ship_facing = ship_facing - .05 * PI
+    end
 
-    ship_x = mouse_x
+    if right_pressed
+        ship_facing = ship_facing + .05 * PI
+    end
+
     fill_rectangle(0,0,640,480, 0xffffff)
 
     a_x = ship_x + front_dist * cos(ship_facing)
