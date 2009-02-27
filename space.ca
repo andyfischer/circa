@@ -14,7 +14,7 @@ function redraw()
     ship_y = 400.0
 
     if up_pressed
-        ship_y = 100.0
+        ship_y = ship_y - 5.0
     end
 
     ship_facing = PI*2
