@@ -568,14 +568,13 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     Term* type = find_named(&branch, typeName);
     assert(type != NULL);
 
-    Term* result = apply_function(&branch, get_global("stateful-value"), RefList());
+    Term* result = apply_function(&branch, get_global("stateful-value"), RefList(), name);
     change_type(result, type);
-
-    //Term* result = create_value(&branch, type, name);
-    //result->setIsStateful(true);
 
     if (initialValue != NULL)
         copy_value(initialValue, result);
+    else
+        alloc_value(result);
 
     return result;
 }

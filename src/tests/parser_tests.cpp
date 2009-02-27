@@ -189,6 +189,14 @@ void test_stateful_value_decl()
 
     test_assert(is_stateful(a));
     test_assert(a->type == INT_TYPE);
+    test_assert(branch["a"] == a);
+    test_assert(a->value != NULL);
+
+    Term* b = parser::compile(branch, parser::statement, "state float b = 5.0");
+    test_assert(is_stateful(b));
+    test_assert(b->type == FLOAT_TYPE);
+    test_assert(branch["b"] == b);
+    test_assert(as_float(b) == 5.0);
 }
 
 void test_arrow_concatenation()
