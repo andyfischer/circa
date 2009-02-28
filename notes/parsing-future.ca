@@ -1,3 +1,5 @@
+-- This file is a "wish list" of syntax patterns. As in, it would be cool if the
+-- following code actually worked. (it doesn't right now)
 
 tokenize('(') := LPAREN
 tokenize(')') := RPAREN

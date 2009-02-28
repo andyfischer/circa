@@ -1,4 +1,0 @@
-
-add.generateCppCode := function(any x) -> string {
-    return format("%s + %s", x.input(0).name, x.input(1).name)
-}
