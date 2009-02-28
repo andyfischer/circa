@@ -7,10 +7,12 @@ state bool down_pressed
 state bool left_pressed
 state bool right_pressed
 
-front_dist = 30.0
+front_dist = 20.0
+back_dist = 4.0
 back_angle = 2.5
 ship_speed = 1.0
 turn_speed = 0.04
+max_speed = 5.0
 
 state float ship_x = 200.0
 state float ship_y = 200.0
@@ -19,15 +21,15 @@ state float ship_facing = PI*2
 state float ship_speed = 0.0
 
 if up_pressed
-    ship_speed = ship_speed + 0.1
+    ship_speed = ship_speed + 0.5
 end
 
-if down_pressed
+if not(up_pressed)
     ship_speed = ship_speed - 0.1
 end
 
-ship_speed = min(ship_speed, 3.0)
-ship_speed = max(ship_speed, -0.5)
+ship_speed = min(ship_speed, max_speed)
+ship_speed = max(ship_speed, 0.0)
 
 ship_x = ship_x + ship_speed * cos(ship_facing)
 ship_y = ship_y + ship_speed * sin(ship_facing)
@@ -40,7 +42,7 @@ if right_pressed
     ship_facing = ship_facing + turn_speed * PI
 end
 
-fill_rectangle(0,0,640,480, 0xffffff)
+fill_rectangle(0,0,640,480, 0xfffffffe)
 
 a_x = ship_x + front_dist * cos(ship_facing)
 a_y = ship_y + front_dist * sin(ship_facing)
@@ -48,8 +50,8 @@ a_y = ship_y + front_dist * sin(ship_facing)
 b_x = ship_x + front_dist * cos(ship_facing + back_angle)
 b_y = ship_y + front_dist * sin(ship_facing + back_angle)
 
-c_x = ship_x - (front_dist - 20.0) * cos(ship_facing)
-c_y = ship_y - (front_dist - 20.0) * sin(ship_facing)
+c_x = ship_x - back_dist * cos(ship_facing)
+c_y = ship_y - back_dist * sin(ship_facing)
 
 d_x = ship_x + front_dist * cos(ship_facing - back_angle)
 d_y = ship_y + front_dist * sin(ship_facing - back_angle)
