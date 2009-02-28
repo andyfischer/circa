@@ -898,7 +898,7 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 Term* literal_integer(Branch& branch, TokenStream& tokens)
 {
     std::string text = tokens.consume(INTEGER);
-    int value = strtol(text.c_str(), NULL, 0);
+    int value = strtoul(text.c_str(), NULL, 0);
     Term* term = int_value(branch, value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     return term;
@@ -907,7 +907,7 @@ Term* literal_integer(Branch& branch, TokenStream& tokens)
 Term* literal_hex(Branch& branch, TokenStream& tokens)
 {
     std::string text = tokens.consume(HEX_INTEGER);
-    int value = strtol(text.c_str(), NULL, 0);
+    int value = strtoul(text.c_str(), NULL, 0);
     Term* term = int_value(branch, value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     return term;
