@@ -2,7 +2,7 @@
 
 #include "circa.h"
 
-#define EXTENDED_LOGGING 0
+#define EXTENDED_LOGGING false
 
 namespace circa {
 namespace stateful_value_function {
@@ -40,7 +40,7 @@ namespace stateful_value_function {
         // removed when we have proper type specialization.
         if (bottom->type != caller->type) {
             if (EXTENDED_LOGGING)
-                std::cout << "type doesn't match" << std::endl;
+                std::cout << "type doesn't match for: " << caller->name << std::endl;
             return;
         }
 
