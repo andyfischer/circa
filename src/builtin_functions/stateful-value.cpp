@@ -24,9 +24,15 @@ namespace stateful_value_function {
             return;
         }
 
-        if (!caller->hasValue()) {
+        if (!bottom->hasValue()) {
             if (EXTENDED_LOGGING)
-                std::cout << "caller has no value" << std::endl;
+                std::cout << "bottom has no value" << std::endl;
+            return;
+        }
+
+        if (bottom->needsUpdate) {
+            if (EXTENDED_LOGGING)
+                std::cout << "bottom needs update" << std::endl;
             return;
         }
 

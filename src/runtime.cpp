@@ -24,6 +24,7 @@ Term* create_term(Branch* branch, Term* function, RefList const& inputs)
         branch->append(term);
 
     term->function = function;
+    term->needsUpdate = true;
 
     Function& functionData = as_function(function);
 
