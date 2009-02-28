@@ -1,7 +1,3 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2009) and may not
-be redestributed without written permission.*/
-
-//The headers
 #include "SDL/SDL.h"
 #include "SDL_gfxPrimitives.h"
 
@@ -9,7 +5,6 @@ be redestributed without written permission.*/
 
 #include "circa.h"
 
-//The attributes of the screen
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
@@ -18,28 +13,28 @@ SDL_Surface* SCREEN = NULL;
 
 void load_image(circa::Term* caller)
 {
-    //Temporary storage for the image that's loaded
+    // Temporary storage for the image that's loaded
     SDL_Surface* loadedImage = NULL;
 
-    //The optimized image that will be used
+    // The optimized image that will be used
     SDL_Surface* optimizedImage = NULL;
 
     std::string filename = circa::as_string(caller->input(0));
 
-    //Load the image
+    // Load the image
     loadedImage = SDL_LoadBMP( filename.c_str() );
 
-    //If nothing went wrong in loading the image
+    // If nothing went wrong in loading the image
     if( loadedImage != NULL )
     {
-        //Create an optimized image
+        // Create an optimized image
         optimizedImage = SDL_DisplayFormat( loadedImage );
 
-        //Free the old image
+        // Free the old image
         SDL_FreeSurface( loadedImage );
     }
 
-    //Return the optimized image
+    // Return the optimized image
     circa::as<SDL_Surface*>(caller) = optimizedImage;
 }
 
@@ -50,14 +45,14 @@ void apply_surface(circa::Term* caller)
     int x = circa::as_int(caller->input(2));
     int y = circa::as_int(caller->input(3));
 
-    //Make a temporary rectangle to hold the offsets
+    // Make a temporary rectangle to hold the offsets
     SDL_Rect offset;
 
-    //Give the offsets to the rectangle
+    // Give the offsets to the rectangle
     offset.x = x;
     offset.y = y;
 
-    //Blit the surface
+    // Blit the surface
     SDL_BlitSurface( source, NULL, destination, &offset );
 }
 
@@ -78,7 +73,7 @@ void fill_rectangle(circa::Term* caller)
         (int) as_float(caller->input(1)),
         (int) as_float(caller->input(2)),
         (int) as_float(caller->input(3)),
-        as_int(caller->input(4)));
+        (unsigned int) as_int(caller->input(4)));
 }
 
 void line_to(circa::Term* caller)
@@ -115,15 +110,13 @@ int main( int argc, char* args[] )
     circa::import_function(*circa::KERNEL, fill_rectangle,
             "fill_rectangle(float,float,float,float,int)");
 
-    //Set up the screen
+    // Set up the screen
     SCREEN = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT,
             SCREEN_BPP, SDL_SWSURFACE );
 
-    //If there was an error in setting up the screen
+    // If there was an error in setting up the screen
     if( SCREEN == NULL )
-    {
         return 1;
-    }
 
     std::string filename;
     if (argc > 1)
@@ -136,22 +129,21 @@ int main( int argc, char* args[] )
     circa::Branch script_main;
     circa::evaluate_file(script_main, filename);
 
-    //Initialize all SDL subsystems
-    if( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
-    {
+    // Initialize all SDL subsystems
+    if( SDL_Init( SDL_INIT_EVERYTHING ) == -1)
         return 1;
-    }
 
-    //Set the window caption
+    // Set the window caption
     SDL_WM_SetCaption( "Hello World", NULL );
 
     // Main loop
-    while (true) {
+    bool continueMainLoop = true;
+    while (continueMainLoop) {
         SDL_Event event;
         SDL_PollEvent(&event);
 
         if (event.type == SDL_QUIT)
-            break;
+            continueMainLoop = false;
 
         if (event.type == SDL_MOUSEMOTION) {
             script_main["mouse_x"]->asFloat() = event.motion.x;
@@ -174,6 +166,8 @@ int main( int argc, char* args[] )
                 script_main["left_pressed"]->asBool() = true; break;
             case SDLK_RIGHT:
                 script_main["right_pressed"]->asBool() = true; break;
+            case SDLK_ESCAPE:
+                continueMainLoop = false; break;
             }
         } else if (event.type == SDL_KEYUP) {
             switch(event.key.keysym.sym) {
@@ -195,19 +189,17 @@ int main( int argc, char* args[] )
             return 0;
         }
 
-        //Update the screen
+        // Update the screen
         if( SDL_Flip(SCREEN) == -1 )
-        {
             return 1;
-        }
 
         SDL_Delay( 10 );
     }
 
-    //Free the surfaces
+    // Free the surfaces
     script_main.eval("SDL_FreeSurface(background)");
 
-    //Quit SDL
+    // Quit SDL
     SDL_Quit();
 
     return 0;
