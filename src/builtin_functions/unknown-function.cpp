@@ -19,6 +19,7 @@ namespace unknown_function_function {
         as_function(main_func).stateType = STRING_TYPE;
         as_function(main_func).pureFunction = false;
         as_function(main_func).hasSideEffects = true;
+        as_function(main_func).variableArgs = true;
 
         UNKNOWN_FUNCTION = main_func;
     }

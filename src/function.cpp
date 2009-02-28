@@ -38,7 +38,7 @@ void Function::appendInput(Term* type, std::string const& name)
 Function::InputProperties&
 Function::getInputProperties(unsigned int index)
 {
-    assert(index < inputTypes.count());
+    assert(variableArgs || index < inputTypes.count());
 
     // check to grow inputProperties
     while ((index+1) > inputProperties.size()) {
