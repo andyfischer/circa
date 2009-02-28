@@ -10,17 +10,27 @@ state bool right_pressed
 front_dist = 30.0
 back_angle = 2.5
 ship_speed = 1.0
-turn_speed = 0.025
+turn_speed = 0.04
 
 state float ship_x = 200.0
 state float ship_y = 200.0
-
 state float ship_facing = PI*2
 
---if up_pressed
-    ship_x = ship_x + ship_speed * cos(ship_facing)
-    ship_y = ship_y + ship_speed * sin(ship_facing)
---end
+state float ship_speed = 0.0
+
+if up_pressed
+    ship_speed = ship_speed + 0.1
+end
+
+if down_pressed
+    ship_speed = ship_speed - 0.1
+end
+
+ship_speed = min(ship_speed, 3.0)
+ship_speed = max(ship_speed, -0.5)
+
+ship_x = ship_x + ship_speed * cos(ship_facing)
+ship_y = ship_y + ship_speed * sin(ship_facing)
 
 if left_pressed
     ship_facing = ship_facing - turn_speed * PI

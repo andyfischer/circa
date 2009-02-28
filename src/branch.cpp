@@ -315,7 +315,6 @@ void migrate_terms(Branch& source, Branch& dest)
             
             // Stateful value migration
             else if (is_stateful(sourceTerm) && is_stateful(destTerm)) {
-                std::cout << "migrating state: " << sourceTerm->name << std::endl;
                 copy_value(sourceTerm, destTerm);
             }
         }
