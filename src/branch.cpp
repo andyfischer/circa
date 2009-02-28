@@ -233,6 +233,9 @@ void duplicate_branch(Branch& source, Branch& dest)
         Term* term = dest.get(index);
         remap_pointers(term, newTermMap);
     }
+
+    dest.names = source.names;
+    dest.names.remapPointers(newTermMap);
 }
 
 void evaluate_file(Branch& branch, std::string const& filename)

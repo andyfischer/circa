@@ -90,6 +90,18 @@ std::string term_to_raw_string(Term* term)
     return output.str();
 }
 
+std::string branch_namespace_to_string(Branch& branch)
+{
+    std::stringstream out;
+
+    TermNamespace::iterator it;
+    for (it = branch.names.begin(); it != branch.names.end(); ++it) {
+        out << it->first << ": #" << it->second->globalID << "\n";
+    }
+
+    return out.str();
+}
+
 // Deprecated
 void print_raw_term(Term* term, std::ostream& strm)
 {
