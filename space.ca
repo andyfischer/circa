@@ -17,10 +17,10 @@ state float ship_y = 200.0
 
 state float ship_facing = PI*2
 
---if up_pressed
+if up_pressed
     ship_x = ship_x + ship_speed * cos(ship_facing)
     ship_y = ship_y + ship_speed * sin(ship_facing)
---end
+end
 
 if left_pressed
     ship_facing = ship_facing - turn_speed * PI

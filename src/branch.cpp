@@ -291,32 +291,33 @@ Term*& branch_get_outer_scope(Branch& branch)
 
 void migrate_terms(Branch& source, Branch& dest)
 {
-    TermNamespace::iterator it;
-    for (it = source.names.begin(); it != source.names.end(); ++it)
-    {
-        std::string name = it->first;
-        Term* sourceTerm = it->second;
+    // Iterate over every term in 'source' and compare each with
+    // every term in 'dest'. Lots of room for optimization here.
+    for (int sourceIndex=0; sourceIndex < source.numTerms(); sourceIndex++) {
+        for (int destIndex=0; destIndex < dest.numTerms(); destIndex++) {
+            Term* sourceTerm = source[sourceIndex];
+            Term* destTerm = dest[destIndex];
 
-        // Skip if name isn't in dest
-        if (!dest.names.contains(name)) {
-            continue;
-        }
+            if (sourceTerm == NULL) continue;
+            if (destTerm == NULL) continue;
 
-        Term* destTerm = dest.findFirstBinding(name);
+            if (sourceTerm->name == "") continue;
+            if (sourceTerm->name != destTerm->name) continue;
+            if (sourceTerm->type != destTerm->type) continue;
+            if (sourceTerm->function != destTerm->function) continue;
 
-        // Skip if type doesn't match
-        if (sourceTerm->type != destTerm->type) {
-            continue;
-        }
+            // At this point, they match
 
-        // Branch migration
-        if (has_inner_branch(sourceTerm)) {
-            migrate_terms(*get_inner_branch(sourceTerm),*get_inner_branch(destTerm));
-        } 
-        
-        // Stateful value migration
-        else if (is_stateful(sourceTerm) && is_stateful(destTerm)) {
-            copy_value(sourceTerm, destTerm);
+            // Branch migration
+            if (has_inner_branch(sourceTerm)) {
+                migrate_terms(*get_inner_branch(sourceTerm),*get_inner_branch(destTerm));
+            } 
+            
+            // Stateful value migration
+            else if (is_stateful(sourceTerm) && is_stateful(destTerm)) {
+                std::cout << "migrating state: " << sourceTerm->name << std::endl;
+                copy_value(sourceTerm, destTerm);
+            }
         }
     }
 }
