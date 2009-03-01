@@ -263,6 +263,18 @@ void test_implicit_copy_by_identifier()
     test_assert(b->input(0) == a);
 }
 
+void test_rebinding_infix_operator()
+{
+    Branch branch;
+    branch.eval("i = 1.0");
+    Term* i = branch.eval("i += 1.0");
+
+    test_assert(branch["i"] == i);
+    test_assert(i->function == ADD_FUNC);
+    test_assert(i->name == "i");
+    test_assert(i->input(0)->name == "i");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -283,6 +295,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_dot_concatenation);
     REGISTER_TEST_CASE(parser_tests::test_syntax_hints);
     REGISTER_TEST_CASE(parser_tests::test_implicit_copy_by_identifier);
+    REGISTER_TEST_CASE(parser_tests::test_rebinding_infix_operator);
 }
 
 } // namespace parser_tests

@@ -673,34 +673,50 @@ int get_infix_precedence(int match)
     }
 }
 
-std::string get_infix_function_name(std::string const& infix)
+void get_infix_function_details(std::string const& infix,
+        std::string& functionName, bool& isRebinding)
 {
+    isRebinding = false;
+
     if (infix == "+")
-        return "add";
+        functionName = "add";
     else if (infix == "-")
-        return "sub";
+        functionName = "sub";
     else if (infix == "*")
-        return "mult";
+        functionName = "mult";
     else if (infix == "/")
-        return "div";
+        functionName = "div";
     else if (infix == "<")
-        return "less-than";
+        functionName = "less-than";
     else if (infix == "<=")
-        return "less-than-eq";
+        functionName = "less-than-eq";
     else if (infix == ">")
-        return "greater-than";
+        functionName = "greater-than";
     else if (infix == ">=")
-        return "greater-than-eq";
+        functionName = "greater-than-eq";
     else if (infix == "==")
-        return "equals";
+        functionName = "equals";
     else if (infix == "||")
-        return "or";
+        functionName = "or";
     else if (infix == "&&")
-        return "and";
+        functionName = "and";
     else if (infix == ":=")
-        return "apply-feedback";
+        functionName = "apply-feedback";
+    else if (infix == "+=") {
+        functionName = "add";
+        isRebinding = true;
+    } else if (infix == "-=") {
+        functionName = "sub";
+        isRebinding = true;
+    } else if (infix == "*=") {
+        functionName = "mult";
+        isRebinding = true;
+    } else if (infix == "/=") {
+        functionName = "div";
+        isRebinding = true;
+    }
     else
-        return "#unrecognized";
+        functionName = "#unrecognized";
 }
 
 Term* infix_expression(Branch& branch, TokenStream& tokens)
@@ -790,7 +806,12 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
         } else {
             Term* rightExpr = infix_expression_nested(branch, tokens, precedence+1);
 
-            std::string functionName = get_infix_function_name(operatorStr);
+            std::string functionName;
+            bool isRebinding;
+            get_infix_function_details(operatorStr, functionName, isRebinding);
+
+            if (isRebinding && leftExpr->name == "")
+                throw std::runtime_error("Left side of " + functionName + " must be an identifier");
 
             result = find_and_apply_function(branch, functionName, RefList(leftExpr, rightExpr));
             result->syntaxHints.declarationStyle = TermSyntaxHints::INFIX;
@@ -801,6 +822,10 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             result->syntaxHints.getInputSyntax(0).followingWhitespace = preOperatorWhitespace;
             result->syntaxHints.getInputSyntax(1).preWhitespace = postOperatorWhitespace;
+
+            if (isRebinding) {
+                branch.bindName(result, leftExpr->name);
+            }
         }
 
         leftExpr = result;
