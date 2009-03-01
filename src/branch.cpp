@@ -74,6 +74,19 @@ void Branch::removeTerm(std::string const& name)
     _terms.remove(term);
 }
 
+void Branch::remove(int index)
+{
+    if (index >= (int) _terms.count())
+        return;
+
+    Term* term = _terms[index];
+
+    if (term != NULL && term->name != "" && names[term->name] == term)
+        names.remove(term->name);
+
+    _terms.remove(index);
+}
+
 Term* Branch::findFirstBinding(std::string const& name) const
 {
     for (unsigned int i = 0; i < _terms.count(); i++) {
@@ -172,7 +185,7 @@ Branch::hosted_remap_pointers(Term* caller, ReferenceMap const& map)
 
 bool is_branch(Term* term)
 {
-    return as_type(term->type).isCompoundType() || term->type == BRANCH_TYPE;
+    return as_type(term->type).alloc == Branch::alloc;
 }
 
 Branch& as_branch(Term* term)

@@ -6,7 +6,6 @@
 #include "builtin_types.h"
 #include "cpp_importing.h"
 #include "runtime.h"
-#include "set.h"
 #include "values.h"
 
 #include "builtin_types/map.hpp"
@@ -123,69 +122,57 @@ namespace primitives {
 
 } // namespace primitives
 
-bool
-Set::contains(Term* value)
-{
-    std::vector<Term*>::iterator it;
-    for (it = members.begin(); it != members.end(); ++it) {
-        if (values_equal(value, *it))
-            return true;
-    }
-    return false;
-}
-
-void
-Set::add(Term* value)
-{
-    if (contains(value))
-        return;
-
-    Term* duplicatedValue = create_value(NULL, value->type);
-    copy_value(value, duplicatedValue);
-    members.push_back(duplicatedValue);
-}
-
-void
-Set::remove(Term* value) 
-{
-    std::vector<Term*>::iterator it;
-    for (it = members.begin(); it != members.end(); ++it) {
-        if (values_equal(value, *it)) {
-
-            delete *it;
-            members.erase(it);
-            return;
+namespace set_t {
+    bool contains(Branch& branch, Term* value)
+    {
+        for (int i=0; i < branch.numTerms(); i++) {
+            if (values_equal(value, branch[i]))
+                return true;
         }
-    }
-}
-
-void
-Set::clear()
-{
-    std::vector<Term*>::iterator it;
-    for (it = members.begin(); it != members.end(); ++it) {
-        delete *it;
+        return false;
     }
 
-    members.clear();
-}
+    void add(Branch& branch, Term* value)
+    {
+        if (contains(branch, value))
+            return;
 
-void
-Set::hosted_add(Term* caller)
-{
-    recycle_value(caller->input(0), caller);
-    Set& set = as<Set>(caller);
-    set.add(caller->input(1));
-}
+        Term* duplicatedValue = create_value(&branch, value->type);
+        copy_value(value, duplicatedValue);
+    }
 
-void
-Set::hosted_remove(Term* caller)
-{
-    recycle_value(caller->input(0), caller);
-    Set& set = as<Set>(caller);
-    set.remove(caller->input(1));
-}
+    void remove(Branch& branch, Term* value) 
+    {
+        /*
+        std::vector<Term*>::iterator it;
+        for (it = members.begin(); it != members.end(); ++it) {
+            if (values_equal(value, *it)) {
 
+                delete *it;
+                members.erase(it);
+                return;
+            }
+        }
+        */
+    }
+
+    void hosted_add(Term* caller)
+    {
+        recycle_value(caller->input(0), caller);
+        Branch& branch = as_branch(caller);
+        add(branch, caller->input(1));
+    }
+
+    void hosted_remove(Term* caller)
+    {
+        /*
+        recycle_value(caller->input(0), caller);
+        Set& set = as<Set>(caller);
+        set.remove(caller->input(1));
+        */
+    }
+
+/*
 std::string
 Set::to_string(Term* caller)
 {
@@ -203,6 +190,9 @@ Set::to_string(Term* caller)
 
     return output.str();
 }
+*/
+
+} // namespace set_t
 
 void initialize_builtin_types(Branch& kernel)
 {
@@ -245,11 +235,12 @@ void initialize_builtin_types(Branch& kernel)
 
     import_member_function(TYPE_TYPE, Type::name_accessor, "name(Type) -> string");
 
-    Term* set_type = import_type<Set>(kernel, "Set");
-    as_type(set_type).toString = Set::to_string;
+    Term* set_type = create_empty_type(kernel, "Set");
+    as_type(set_type).makeCompoundType("Set");
+    //as_type(set_type).toString = Set::to_string;
 
-    import_member_function(set_type, Set::hosted_add, "function add(Set, any) -> Set");
-    import_member_function(set_type, Set::hosted_remove, "function remove(Set, any) -> Set");
+    import_member_function(set_type, set_t::hosted_add, "function add(Set, any) -> Set");
+    import_member_function(set_type, set_t::hosted_remove, "function remove(Set, any) -> Set");
 }
 
 } // namespace circa

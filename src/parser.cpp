@@ -761,6 +761,9 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                 function = find_named(&branch, functionName);
             }
 
+            if (function == NULL)
+                throw std::runtime_error("function not found: " + functionName);
+
             assert(function != NULL);
 
             RefList inputs(leftExpr);

@@ -1,10 +1,6 @@
 // Copyright 2008 Paul Hodge
 
-#include "branch.h"
-#include "builtins.h"
 #include "circa.h"
-#include "set.h"
-#include "term_namespace.h"
 
 namespace circa {
 namespace get_branch_bound_names_function {

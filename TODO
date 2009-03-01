@@ -6,6 +6,8 @@
 - Source reproduction. (currently this has many bugs)
 X Infix-assignment operators, like +=
 - Feedback (current support is very limited)
+- Vector type
+- Function overloading
 
 # Cgame features #
 

@@ -15,7 +15,6 @@
 #include "references.h"
 #include "reference_iterator.h"
 #include "runtime.h"
-#include "set.h"
 #include "syntax.h"
 #include "term.h"
 #include "term_reference_iterator.h"
