@@ -87,6 +87,29 @@ void reference_type_deletion_bug()
     test_assert(INT_TYPE->type != NULL);
 }
 
+void test_set()
+{
+    Branch branch;
+
+    Term* s = branch.eval("s = Set()");
+
+    test_assert(is_branch(s));
+    test_assert(as_branch(s).numTerms() == 0);
+
+    s = branch.eval("s.add(1)");
+    test_assert(as_branch(s).numTerms() == 1);
+    test_assert(as_branch(s)[0]->asInt() == 1);
+
+    s = branch.eval("s.add(1)");
+    test_assert(as_branch(s).numTerms() == 1);
+
+    s = branch.eval("s.add(2)");
+    test_assert(as_branch(s).numTerms() == 2);
+
+    //s = branch.eval("s.remove(1)");
+    //test_assert(as_branch(s).numTerms() == 1);
+    //test_assert(as_branch(s)[0]->asInt() == 2);
+}
 
 void register_tests()
 {
@@ -94,6 +117,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_type_tests::test_reference);
     REGISTER_TEST_CASE(builtin_type_tests::builtin_types);
     REGISTER_TEST_CASE(builtin_type_tests::reference_type_deletion_bug);
+    REGISTER_TEST_CASE(builtin_type_tests::test_set);
 }
 
 } // namespace builtin_type_tests

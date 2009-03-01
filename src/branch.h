@@ -36,6 +36,8 @@ struct Branch
 
     void removeTerm(std::string const& name);
 
+    void remove(int index);
+
     // Returns true if there is a term with the given name
     bool containsName(std::string const& name) const
     {

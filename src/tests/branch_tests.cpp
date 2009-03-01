@@ -7,6 +7,21 @@
 namespace circa {
 namespace branch_tests {
 
+void test_remove()
+{
+    Branch branch;
+
+    create_value(&branch, INT_TYPE, "a");
+
+    test_assert(branch.numTerms() == 1);
+    test_assert(branch.containsName("a"));
+
+    branch.remove(0);
+
+    test_assert(branch.numTerms() == 0);
+    test_assert(!branch.containsName("a"));
+}
+
 void test_duplicate()
 {
     Branch original;
@@ -175,6 +190,7 @@ void test_migrate2()
 
 void register_tests()
 {
+    REGISTER_TEST_CASE(branch_tests::test_remove);
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_nested);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_nested_dont_make_extra_terms);

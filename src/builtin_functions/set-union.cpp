@@ -1,13 +1,14 @@
 // Copyright 2008 Andrew Fischer
 
 #include "circa.h"
-#include "set.h"
 
 namespace circa {
 namespace set_union_function {
 
     void evaluate(Term* caller)
     {
+        /*
+        FIXME
         Set &result = as<Set>(caller);
 
         for (int inputIndex=0; inputIndex < caller->numInputs(); inputIndex++) {
@@ -19,6 +20,7 @@ namespace set_union_function {
                 result.add(*it);
             }
         }
+        */
     }
 
     void setup(Branch& kernel)

@@ -1,19 +1,21 @@
 // Copyright 2008 Andrew Fischer
 
 #include "circa.h"
-#include "set.h"
 
 namespace circa {
 namespace set_function {
 
     void evaluate(Term* caller)
     {
+        /*
+        FIXME
         Set &result = as<Set>(caller);
         result.clear();
 
         for (int index=0; index < caller->numInputs(); index++) {
             result.add(caller->input(index));
         }
+        */
     }
 
     void setup(Branch& kernel)
