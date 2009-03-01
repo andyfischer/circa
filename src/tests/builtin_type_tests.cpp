@@ -106,9 +106,9 @@ void test_set()
     s = branch.eval("s.add(2)");
     test_assert(as_branch(s).numTerms() == 2);
 
-    //s = branch.eval("s.remove(1)");
-    //test_assert(as_branch(s).numTerms() == 1);
-    //test_assert(as_branch(s)[0]->asInt() == 2);
+    s = branch.eval("s.remove(1)");
+    test_assert(as_branch(s).numTerms() == 1);
+    test_assert(as_branch(s)[0]->asInt() == 2);
 }
 
 void register_tests()

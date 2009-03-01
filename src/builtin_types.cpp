@@ -143,17 +143,13 @@ namespace set_t {
 
     void remove(Branch& branch, Term* value) 
     {
-        /*
-        std::vector<Term*>::iterator it;
-        for (it = members.begin(); it != members.end(); ++it) {
-            if (values_equal(value, *it)) {
+        for (int index=0; index < branch.numTerms(); index++) {
+            if (values_equal(value, branch[index])) {
 
-                delete *it;
-                members.erase(it);
+                branch.remove(index);
                 return;
             }
         }
-        */
     }
 
     void hosted_add(Term* caller)
@@ -165,11 +161,9 @@ namespace set_t {
 
     void hosted_remove(Term* caller)
     {
-        /*
         recycle_value(caller->input(0), caller);
-        Set& set = as<Set>(caller);
-        set.remove(caller->input(1));
-        */
+        Branch& branch = as_branch(caller);
+        remove(branch, caller->input(1));
     }
 
 /*
