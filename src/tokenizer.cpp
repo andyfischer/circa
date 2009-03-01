@@ -324,7 +324,12 @@ void top_level_consume_token(TokenizeContext &context)
             break; // fall through
         case '+':
             context.consume();
-            context.pushResult(PLUS);
+            if (context.next() == '=') {
+                context.consume();
+                context.pushResult(PLUS_EQUALS);
+            } else {
+                context.pushResult(PLUS);
+            }
             return;
         case '-':
             if (is_number(context.next(1)) || context.next(1) == '.') {
@@ -343,6 +348,13 @@ void top_level_consume_token(TokenizeContext &context)
                 context.consume();
                 context.consume();
                 context.pushResult(DOUBLE_MINUS);
+                return;
+            }
+
+            if (context.next(1) == '=') {
+                context.consume();
+                context.consume();
+                context.pushResult(MINUS_EQUALS);
                 return;
             }
 

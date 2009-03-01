@@ -1,15 +1,11 @@
 
 # Core language features #
 
-Type specialization. Figure out the type of generic expressions (such as if-expr) before runtime.
-
-Loops over collections
-
-Source reproduction. (currently this has many bugs)
-
-Infix-assignment operators, like +=
-
-Feedback (current support is very limited)
+- Type specialization. Figure out the type of generic expressions (such as if-expr) before runtime.
+- Loops over collections
+- Source reproduction. (currently this has many bugs)
+X Infix-assignment operators, like +=
+- Feedback (current support is very limited)
 
 # Cgame features #
 
