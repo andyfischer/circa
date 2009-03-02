@@ -201,6 +201,17 @@ void test_for()
     Branch branch;
 }
 
+void test_list()
+{
+    Branch branch;
+    Term* l = branch.eval("l = list(1,2,\"foo\")");
+
+    test_assert(is_branch(l));
+    test_assert(as_branch(l)[0]->asInt() == 1);
+    test_assert(as_branch(l)[1]->asInt() == 2);
+    test_assert(as_branch(l)[2]->asString() == "foo");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
@@ -214,6 +225,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_map);
     REGISTER_TEST_CASE(builtin_function_tests::test_if_statement);
     REGISTER_TEST_CASE(builtin_function_tests::test_alias);
+    REGISTER_TEST_CASE(builtin_function_tests::test_list);
 }
 
 } // namespace builtin_function_tests

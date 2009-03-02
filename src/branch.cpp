@@ -190,7 +190,7 @@ bool is_branch(Term* term)
 
 Branch& as_branch(Term* term)
 {
-    if (!as_type(term->type).isCompoundType())
+    if (!is_branch(term))
         assert_type(term, BRANCH_TYPE);
     assert(term->value != NULL);
     return *((Branch*) term->value);

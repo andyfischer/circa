@@ -12,6 +12,7 @@ void Type::makeCompoundType(std::string const& name)
     alloc = Branch::alloc;
     dealloc = Branch::dealloc;
     copy = Branch::copy;
+    remapPointers = Branch::hosted_remap_pointers;
     startReferenceIterator = Branch::start_reference_iterator;
 }
 

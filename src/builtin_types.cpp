@@ -231,8 +231,11 @@ void initialize_builtin_types(Branch& kernel)
     as_type(REF_TYPE).startReferenceIterator = Ref::start_reference_iterator;
 
     import_type<RefList>(kernel, "Tuple");
-    import_type<Branch>(kernel, "Branch");
     import_type<Map>(kernel, "Map");
+
+    BRANCH_TYPE = create_empty_type(kernel, "Branch");
+    as_type(BRANCH_TYPE).makeCompoundType("Branch");
+    assert(as_type(BRANCH_TYPE).alloc == Branch::alloc);
 
     import_member_function(TYPE_TYPE, Type::name_accessor, "name(Type) -> string");
 
