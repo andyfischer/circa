@@ -9,7 +9,7 @@ namespace branch_function {
 
     void evaluate(Term* caller)
     {
-        Branch& branch = as<Branch>(caller->state);
+        Branch& branch = as_branch(caller->state);
         evaluate_branch(branch);
     }
 

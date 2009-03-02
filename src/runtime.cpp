@@ -104,14 +104,14 @@ void evaluate_term(Term* term)
         Term* input = term->inputs[inputIndex];
         Function::InputProperties inputProps = func.getInputProperties(effectiveIndex);
          
-        if (input == NULL) {
+        if (input == NULL && !inputProps.meta) {
             std::stringstream message;
             message << "Input " << inputIndex << " is NULL";
             error_occured(term, message.str());
             return;
         }
 
-        if (input->value == NULL) {
+        if (input->value == NULL && !inputProps.meta) {
             std::stringstream message;
             message << "Input " << inputIndex << " has NULL value";
             error_occured(term, message.str());

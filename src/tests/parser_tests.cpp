@@ -275,6 +275,22 @@ void test_rebinding_infix_operator()
     test_assert(i->input(0)->name == "i");
 }
 
+void test_if_joining_on_bool()
+{
+    // The following code once had a bug where if-expr wouldn't work
+    // if one of its inputs was missing value.
+    Branch branch;
+    Term* s = branch.eval("hey = true");
+
+    test_assert(s->value != NULL);
+
+    branch.eval("if false\nhey = false\nend");
+
+    branch.eval();
+
+    test_assert(branch["hey"]->asBool() == true);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -296,6 +312,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_syntax_hints);
     REGISTER_TEST_CASE(parser_tests::test_implicit_copy_by_identifier);
     REGISTER_TEST_CASE(parser_tests::test_rebinding_infix_operator);
+    REGISTER_TEST_CASE(parser_tests::test_if_joining_on_bool);
 }
 
 } // namespace parser_tests
