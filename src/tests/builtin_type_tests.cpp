@@ -109,6 +109,28 @@ void test_set()
     s = branch.eval("s.remove(1)");
     test_assert(as_branch(s).numTerms() == 1);
     test_assert(as_branch(s)[0]->asInt() == 2);
+
+    // check that things are copied by value
+    Term* val = branch.eval("val = 5");
+    s = branch.eval("s.add(val)");
+
+    test_assert(as_branch(s)[1]->asInt() == 5);
+    as_int(val) = 6;
+    test_assert(as_branch(s)[1]->asInt() == 5);
+}
+
+void test_list()
+{
+    Branch branch;
+
+    Term* l = branch.eval("l = List()");
+
+    test_assert(is_branch(l));
+    test_assert(as_branch(l).numTerms() == 0);
+
+    l = branch.eval("l.append(2)");
+    test_assert(as_branch(l).numTerms() == 1);
+    test_assert(as_branch(l)[0]->asInt() == 2);
 }
 
 void register_tests()
@@ -118,6 +140,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_type_tests::builtin_types);
     REGISTER_TEST_CASE(builtin_type_tests::reference_type_deletion_bug);
     REGISTER_TEST_CASE(builtin_type_tests::test_set);
+    REGISTER_TEST_CASE(builtin_type_tests::test_list);
 }
 
 } // namespace builtin_type_tests
