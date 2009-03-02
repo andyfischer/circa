@@ -183,11 +183,6 @@ namespace var_function {
 
 void initialize_constants()
 {
-    BRANCH_TYPE = import_type<Branch>(*KERNEL, "Branch");
-    as_type(BRANCH_TYPE).copy = Branch::copy;
-    as_type(BRANCH_TYPE).remapPointers = Branch::hosted_remap_pointers;
-    as_type(BRANCH_TYPE).startReferenceIterator = Branch::start_reference_iterator;
-
     import_type<Dictionary>(*KERNEL, "Dictionary");
 
     VAR_INT = get_value_function(INT_TYPE);
