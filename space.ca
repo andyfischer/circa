@@ -6,6 +6,7 @@ state bool up_pressed
 state bool down_pressed
 state bool left_pressed
 state bool right_pressed
+state bool space_pressed
 
 front_dist = 20.0
 back_dist = 4.0
@@ -31,8 +32,8 @@ end
 ship_speed = min(ship_speed, max_speed)
 ship_speed = max(ship_speed, 0.0)
 
-ship_x = ship_x + ship_speed * cos(ship_facing)
-ship_y = ship_y + ship_speed * sin(ship_facing)
+ship_x += ship_speed * cos(ship_facing)
+ship_y += ship_speed * sin(ship_facing)
 
 if left_pressed
     ship_facing -= turn_speed * PI
@@ -43,6 +44,42 @@ if right_pressed
 end
 
 fill_rectangle(0,0,640,480, 0xfffffffe)
+
+state float bullet_x = 0.0
+state float bullet_y = 0.0
+state bool bullet_active = false
+state float bullet_facing = 0.0
+bullet_speed = 8.0
+bullet_size = 3.0
+
+if space_pressed && not(bullet_active)
+    bullet_active = true
+    bullet_facing = ship_facing
+    bullet_x = ship_x
+    bullet_y = ship_y
+end
+
+bullet_x += bullet_speed * cos(bullet_facing)
+bullet_y += bullet_speed * sin(bullet_facing)
+
+if bullet_active
+    bullet_1_x = bullet_x + bullet_size * cos(0)
+    bullet_1_x = bullet_y + bullet_size * sin(0)
+
+    bullet_2_x = bullet_x + bullet_size * cos(PI/2.0)
+    bullet_2_y = bullet_y + bullet_size * sin(PI/2.0)
+
+    bullet_3_x = bullet_x - back_dist * cos(PI)
+    bullet_3_y = bullet_y - back_dist * sin(PI)
+
+    bullet_4_x = bullet_x + bullet_size * cos(3.0 * PI / 2.0)
+    bullet_4_y = bullet_y + bullet_size * sin(3.0 * PI / 2.0)
+
+    line_to(bullet_1_x, bullet_1_y, bullet_2_x, bullet_2_y, 0)
+    line_to(bullet_2_x, bullet_2_y, bullet_3_x, bullet_3_y, 0)
+    line_to(bullet_3_x, bullet_3_y, bullet_4_x, bullet_4_y, 0)
+    line_to(bullet_4_x, bullet_4_y, bullet_1_x, bullet_1_y, 0)
+end
 
 a_x = ship_x + front_dist * cos(ship_facing)
 a_y = ship_y + front_dist * sin(ship_facing)

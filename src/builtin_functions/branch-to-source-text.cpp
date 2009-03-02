@@ -9,7 +9,7 @@ namespace branch_to_source_text_function {
 
     void evaluate(Term* caller)
     {
-        Branch& branch = as<Branch>(caller->input(0));
+        Branch& branch = as_branch(caller->input(0));
         std::stringstream result;
 
         for (int i=0; i < branch.numTerms(); i++) {
