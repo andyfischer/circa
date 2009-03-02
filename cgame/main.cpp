@@ -166,6 +166,8 @@ int main( int argc, char* args[] )
                 script_main["left_pressed"]->asBool() = true; break;
             case SDLK_RIGHT:
                 script_main["right_pressed"]->asBool() = true; break;
+            case SDLK_SPACE:
+                script_main["space_pressed"]->asBool() = true; break;
             case SDLK_ESCAPE:
                 continueMainLoop = false; break;
             }
@@ -179,6 +181,8 @@ int main( int argc, char* args[] )
                 script_main["left_pressed"]->asBool() = false; break;
             case SDLK_RIGHT:
                 script_main["right_pressed"]->asBool() = false; break;
+            case SDLK_SPACE:
+                script_main["space_pressed"]->asBool() = false; break;
             }
         }
 
