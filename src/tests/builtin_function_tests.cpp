@@ -196,6 +196,11 @@ void test_alias()
     test_assert(as_int(a) == 55);
 }
 
+void test_for()
+{
+    Branch branch;
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
