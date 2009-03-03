@@ -357,61 +357,6 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
     return result;
 }
 
-Term* old_if_block(Branch& branch, TokenStream& tokens)
-{
-    tokens.consume(IF);
-    possible_whitespace(tokens);
-
-    Term* condition = infix_expression(branch, tokens);
-    assert(condition != NULL);
-
-    condition->syntaxHints.occursInsideAnExpression = true;
-    recursively_mark_terms_as_occuring_inside_an_expression(condition);
-
-    possible_whitespace(tokens);
-    possible_newline(tokens);
-
-    Term* result = apply_function(&branch, IF_STATEMENT, RefList(condition));
-    result->syntaxHints.declarationStyle = TermSyntaxHints::IF_STATEMENT;
-    Branch& posBranch = as_branch(result->state->field(0));
-    Branch& negBranch = as_branch(result->state->field(1));
-    Branch& joiningTermsBranch = as_branch(result->state->field(2));
-
-    posBranch.outerScope = &branch;
-    negBranch.outerScope = &branch;
-    joiningTermsBranch.outerScope = &branch;
-
-    Branch *target = &posBranch;
-
-    while (!tokens.nextIs(END)) {
-
-        std::string prespace = possible_whitespace(tokens);
-
-        if (tokens.nextIs(ELSE)) {
-            tokens.consume(ELSE);
-            possible_newline(tokens);
-            assert(target != &negBranch);
-            target = &negBranch;
-        } if (tokens.nextIs(END)) {
-            break;
-        } else {
-            Term* term = statement(*target, tokens);
-            prepend_whitespace(term, prespace);
-        }
-    }
-
-    tokens.consume(END);
-    possible_whitespace(tokens);
-    possible_newline(tokens);
-
-    remove_compilation_attrs(posBranch);
-    remove_compilation_attrs(negBranch);
-
-    old_update_if_statement_joining_terms(result);
-
-    return result;
-}
-
 Term* if_block(Branch& branch, TokenStream& tokens)
 {
     tokens.consume(IF);
@@ -492,59 +437,6 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     }
 
     return result;
-}
-
-void old_update_if_statement_joining_terms(Term* if_statement)
-{
-    Term* conditionTerm = if_statement->input(0);
-    Branch& posBranch = as_branch(if_statement->state->field(0));
-    Branch& negBranch = as_branch(if_statement->state->field(1));
-    Branch& joiningTermsBranch = as_branch(if_statement->state->field(2));
-    Branch& outerBranch = *posBranch.outerScope;
-    
-    // Get a list of all names bound in either branch
-    std::set<std::string> boundNames;
-
-    {
-        TermNamespace::const_iterator it;
-        for (it = posBranch.names.begin(); it != posBranch.names.end(); ++it)
-            boundNames.insert(it->first);
-        for (it = negBranch.names.begin(); it != negBranch.names.end(); ++it)
-            boundNames.insert(it->first);
-    }
-
-    // Ignore any names which are not bound in the outer branch
-    {
-        std::set<std::string>::iterator it;
-        for (it = boundNames.begin(); it != boundNames.end();)
-        {
-            if (find_named(&outerBranch, *it) == NULL)
-                boundNames.erase(it++);
-            else
-                ++it;
-        }
-    }
-
-    joiningTermsBranch.clear();
-
-    // For each name, create a joining term
-    {
-        std::set<std::string>::const_iterator it;
-        for (it = boundNames.begin(); it != boundNames.end(); ++it)
-        {
-            std::string const& name = *it;
-
-            Term* outerVersion = find_named(&outerBranch, name);
-            Term* posVersion = posBranch.containsName(name) ? posBranch[name] : outerVersion;
-            Term* negVersion = negBranch.containsName(name) ? negBranch[name] : outerVersion;
-
-            Term* joining = apply_function(&joiningTermsBranch, "if-expr",
-                    RefList(conditionTerm, posVersion, negVersion));
-
-            // Bind these names in the outer branch.
-            outerBranch.bindName(joining, name);
-        }
-    }
 }
 
 Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
@@ -851,18 +743,21 @@ Term* atom(Branch& branch, TokenStream& tokens)
     if (tokens.nextIs(STRING))
         return literal_string(branch, tokens);
 
-    // literal float?
-    if (tokens.nextIs(FLOAT))
-        return literal_float(branch, tokens);
-
     // literal hex?
     if (tokens.nextIs(HEX_INTEGER))
         return literal_hex(branch, tokens);
 
+    // literal float?
+    if (tokens.nextIs(FLOAT))
+        return literal_float(branch, tokens);
+
+    // literal branch?
+    if (tokens.nextIs(LBRACE))
+        return literal_branch(branch, tokens);
+
     // identifier?
-    if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AMPERSAND)) {
+    if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AMPERSAND))
         return identifier(branch, tokens);
-    }
 
     // parenthesized expression?
     if (tokens.nextIs(LPAREN)) {
@@ -872,6 +767,7 @@ Term* atom(Branch& branch, TokenStream& tokens)
         result->syntaxHints.parens += 1;
         return result;
     }
+
 
     std::cout << tokens.next().text;
 
@@ -969,6 +865,15 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     Term* term = string_value(branch, text);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     return term;
+}
+
+Term* literal_branch(Branch& branch, TokenStream& tokens)
+{
+    tokens.consume(LBRACE);
+    
+    // TODO
+
+    return NULL;
 }
 
 Term* identifier(Branch& branch, TokenStream& tokens)

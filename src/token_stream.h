@@ -38,22 +38,6 @@ struct TokenStream
         currentIndex = 0;
     }
 
-    void stripWhitespace()
-    {
-        int deleteCount = 0;
-
-        for (int i=0; i < (int) tokens.size(); i++) {
-
-            if (tokens[i].match == tokenizer::WHITESPACE) {
-                deleteCount++;
-            } else if (deleteCount > 0) {
-                tokens[i - deleteCount] = tokens[i];
-            }
-        }
-
-        tokens.resize(tokens.size() - deleteCount);
-    }
-
     tokenizer::TokenInstance const& next(int lookahead=0) const;
 
     bool nextIs(int match, int lookahead=0) const
