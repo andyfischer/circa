@@ -41,6 +41,8 @@ void reproduce_source() {
     round_trip_source("coersion = 1 + 2");
     round_trip_source("complex = 1 + 2 + 3.0 + 4.0");
     round_trip_source("assert(false)");
+    round_trip_source("if true\nx = 1\nend");
+    round_trip_source("if 5.0 > 3.0\n  print('hey')\nend");
     //round_trip_source("complex = (4.0 + 3.0) + 2.0");
 
     // whitespace tests
