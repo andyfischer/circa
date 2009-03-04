@@ -102,6 +102,18 @@ std::string get_term_source(Term* term)
 
         result << "end";
         return result.str();
+    } else if (term->function == STATEFUL_VALUE_FUNC) {
+        result << "state ";
+        result << as_type(term->type).name << " ";
+        result << term->name;
+
+        // check for initial value
+        if (term->state->type != ANY_TYPE) {
+            result << " = ";
+            result << to_string(term->state);
+        }
+
+        return result.str();
     }
 
     // add possible name binding
