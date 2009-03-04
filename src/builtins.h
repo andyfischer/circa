@@ -39,7 +39,7 @@ extern Term* ALIAS_FUNC;
 extern Term* COMMENT_FUNC;
 extern Term* INT_TO_FLOAT_FUNC;
 extern Term* COPY_FUNC;
-extern Term* IF_STATEMENT;
+extern Term* IF_FUNC;
 
 Term* get_global(std::string name);
 void empty_evaluate_function(Term* caller);

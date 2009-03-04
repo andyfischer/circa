@@ -145,42 +145,6 @@ void test_map()
     test_assert(branch.eval("ages('Absalom')")->asInt() == 205);
 }
 
-void test_if_statement()
-{
-    Branch branch;
-
-    Term* condition = branch.eval("cond = bool()");
-    Term* if_statement = branch.eval("if_s = if-statement(cond)");
-
-    as_bool(condition) = true;
-
-    Branch &positiveBranch = as_branch(if_statement->state->field(0));
-    Branch &negativeBranch = as_branch(if_statement->state->field(1));
-
-    Term* posTerm = positiveBranch.compile("x = 1.0 + 1.0");
-    Term* negTerm = negativeBranch.compile("x = 1.0 + 1.0");
-
-    dealloc_value(posTerm);
-    dealloc_value(negTerm);
-
-    test_assert(posTerm->value == NULL);
-    test_assert(negTerm->value == NULL);
-
-    evaluate_branch(branch);
-
-    test_assert(as_float(posTerm) == 2.0);
-    test_assert(negTerm->value == NULL);
-
-    dealloc_value(posTerm);
-
-    as_bool(condition) = false;
-
-    evaluate_branch(branch);
-
-    test_assert(posTerm->value == NULL);
-    test_assert(as_float(negTerm) == 2.0);
-}
-
 void test_alias()
 {
     Branch branch;
@@ -225,7 +189,6 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_reference);
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_map);
-    REGISTER_TEST_CASE(builtin_function_tests::test_if_statement);
     REGISTER_TEST_CASE(builtin_function_tests::test_alias);
     REGISTER_TEST_CASE(builtin_function_tests::test_list);
 }
