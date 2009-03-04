@@ -45,6 +45,7 @@ Term* COMMENT_FUNC = NULL;
 Term* INT_TO_FLOAT_FUNC = NULL;
 Term* COPY_FUNC = NULL;
 Term* IF_FUNC = NULL;
+Term* STATEFUL_VALUE_FUNC = NULL;
 
 void empty_evaluate_function(Term*) { }
 void empty_alloc_function(Term*) { }

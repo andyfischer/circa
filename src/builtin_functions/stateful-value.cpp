@@ -49,7 +49,8 @@ namespace stateful_value_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "stateful-value() -> any");
+        STATEFUL_VALUE_FUNC = import_function(kernel, evaluate, "stateful-value() -> any");
+        as_function(STATEFUL_VALUE_FUNC).stateType = ANY_TYPE; // state contains initial value
     }
 }
 }

@@ -463,8 +463,10 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     Term* result = apply_function(&branch, get_global("stateful-value"), RefList(), name);
     change_type(result, type);
 
-    if (initialValue != NULL)
+    if (initialValue != NULL) {
         copy_value(initialValue, result);
+        copy_value(initialValue, result->state); // store initial value in state
+    }
     else
         alloc_value(result);
 
