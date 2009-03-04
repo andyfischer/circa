@@ -870,10 +870,19 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
 Term* literal_branch(Branch& branch, TokenStream& tokens)
 {
     tokens.consume(LBRACE);
-    
-    // TODO
 
-    return NULL;
+    Term* resultTerm = create_value(&branch, BRANCH_TYPE);
+    Branch& result = as_branch(resultTerm);
+
+    while (!tokens.nextNonWhitespaceIs(RBRACE)) {
+        infix_expression(result, tokens);
+        possible_whitespace(tokens);
+
+        if (tokens.nextIs(COMMA))
+            tokens.consume(COMMA);
+    }
+
+    return resultTerm;
 }
 
 Term* identifier(Branch& branch, TokenStream& tokens)
