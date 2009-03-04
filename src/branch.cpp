@@ -103,7 +103,7 @@ void Branch::bindName(Term* term, std::string name)
 {
     names.bind(term, name);
 
-    if (term->name != "") {
+    if (term->name != "" && term->name != name) {
         throw std::runtime_error(std::string("term already has name: ")+term->name);
     }
 

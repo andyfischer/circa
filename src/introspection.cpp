@@ -15,7 +15,7 @@ bool is_value(Term* term)
 bool is_stateful(Term* term)
 {
     assert_good_pointer(term);
-    return term->function == get_global("stateful-value");
+    return term->function == STATEFUL_VALUE_FUNC;
 }
 
 bool has_inner_branch(Term* term)
