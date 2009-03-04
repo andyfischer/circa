@@ -66,12 +66,19 @@ bool should_print_term_source_line(Term* term)
 
 std::string get_term_source(Term* term)
 {
+    const bool VERBOSE_LOGGING = false;
+
+    if (VERBOSE_LOGGING)
+        std::cout << "get_term_source on " << term->name << std::endl;
+
     std::stringstream result;
 
     result << term->syntaxHints.preWhitespace;
 
     // handle special cases
     if (term->function == COMMENT_FUNC) {
+        if (VERBOSE_LOGGING)
+            std::cout << "handled as comment" << std::endl;
         std::string comment = get_comment_string(term);
         if (comment == "")
             return "";
@@ -81,6 +88,8 @@ std::string get_term_source(Term* term)
         }
         
     } else if (is_value(term) && term->type == FUNCTION_TYPE) {
+        if (VERBOSE_LOGGING)
+            std::cout << "handled as function" << std::endl;
         Function &definedFunc = as_function(term);
 
         std::stringstream result;
@@ -93,6 +102,8 @@ std::string get_term_source(Term* term)
 
         return result.str();
     } else if (term->function == IF_FUNC) {
+        if (VERBOSE_LOGGING)
+            std::cout << "handled as if" << std::endl;
         result << "if ";
         result << get_source_of_input(term, 0);
         result << "\n";
@@ -102,7 +113,10 @@ std::string get_term_source(Term* term)
 
         result << "end";
         return result.str();
+
     } else if (term->function == STATEFUL_VALUE_FUNC) {
+        if (VERBOSE_LOGGING)
+            std::cout << "handled as stateful value" << std::endl;
         result << "state ";
         result << as_type(term->type).name << " ";
         result << term->name;
@@ -110,7 +124,7 @@ std::string get_term_source(Term* term)
         // check for initial value
         if (term->state->type != ANY_TYPE) {
             result << " = ";
-            result << to_string(term->state);
+            result << to_source_string(term->state);
         }
 
         return result.str();

@@ -212,6 +212,8 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
 {
     Term* term = create_term(branch, source->function, source->inputs);
 
+    term->name = source->name;
+
     if (copyBranches)
         copy_value(source, term);
     else

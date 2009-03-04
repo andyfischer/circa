@@ -460,7 +460,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     Term* type = find_named(&branch, typeName);
     assert(type != NULL);
 
-    Term* result = apply_function(&branch, get_global("stateful-value"), RefList(), name);
+    Term* result = apply_function(&branch, STATEFUL_VALUE_FUNC, RefList(), name);
     change_type(result, type);
 
     if (initialValue != NULL) {
