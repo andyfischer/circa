@@ -365,7 +365,8 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     Term* condition = infix_expression(branch, tokens);
     assert(condition != NULL);
 
-    condition->syntaxHints.occursInsideAnExpression = true;
+    if (condition->name == "")
+        condition->syntaxHints.occursInsideAnExpression = true;
     recursively_mark_terms_as_occuring_inside_an_expression(condition);
 
     possible_whitespace(tokens);
@@ -453,6 +454,9 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         tokens.consume(EQUALS);
         possible_whitespace(tokens);
         initialValue = infix_expression(branch, tokens);
+
+        initialValue->syntaxHints.occursInsideAnExpression = true;
+        recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
     }
 
     possible_newline(tokens);
@@ -461,6 +465,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     assert(type != NULL);
 
     Term* result = apply_function(&branch, STATEFUL_VALUE_FUNC, RefList(), name);
+    result->syntaxHints.declarationStyle = TermSyntaxHints::SPECIFIC_TO_FUNCTION;
     change_type(result, type);
 
     if (initialValue != NULL) {
@@ -494,8 +499,10 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     // If this item is just an identifier, and we're trying to rename it,
     // create an implicit call to 'copy'.
-    if (result->name != "" && name != "")
+    if (result->name != "" && name != "") {
         result = apply_function(&branch, COPY_FUNC, RefList(result));
+        result->syntaxHints.declarationStyle = TermSyntaxHints::SPECIFIC_TO_FUNCTION;
+    }
 
     std::string pendingRebind = pop_pending_rebind(branch);
 
