@@ -633,14 +633,15 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
     if (precedence > HIGHEST_INFIX_PRECEDENCE)
         return atom(branch, tokens);
 
+    std::string preWhitespace = possible_whitespace(tokens);
+
     Term* leftExpr = infix_expression_nested(branch, tokens, precedence+1);
 
-    std::string preOperatorWhitespace = possible_whitespace(tokens);
+    prepend_whitespace(leftExpr, preWhitespace);
+    append_whitespace(leftExpr, possible_whitespace(tokens));
 
     while (!tokens.finished() && get_infix_precedence(tokens.next().match) == precedence) {
         std::string operatorStr = tokens.consume();
-
-        //std::cout << "before " << operatorStr << ", '" << preOperatorWhitespace << "'" << std::endl;
 
         std::string postOperatorWhitespace = possible_whitespace(tokens);
 
@@ -726,7 +727,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             set_input_syntax(result, 0, leftExpr);
             set_input_syntax(result, 1, rightExpr);
 
-            result->syntaxHints.getInputSyntax(0).followingWhitespace = preOperatorWhitespace;
+            //result->syntaxHints.getInputSyntax(0).followingWhitespace = preOperatorWhitespace;
             result->syntaxHints.getInputSyntax(1).preWhitespace = postOperatorWhitespace;
 
             if (isRebinding) {
@@ -742,50 +743,59 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
 Term* atom(Branch& branch, TokenStream& tokens)
 {
+    std::string preWhitespace = possible_whitespace(tokens);
+
+    Term* result = NULL;
+
     // function call?
     if (tokens.nextIs(IDENTIFIER) && tokens.nextIs(LPAREN, 1))
-        return function_call(branch, tokens);
+        result = function_call(branch, tokens);
 
     // literal integer?
-    if (tokens.nextIs(INTEGER))
-        return literal_integer(branch, tokens);
+    else if (tokens.nextIs(INTEGER))
+        result = literal_integer(branch, tokens);
 
     // literal string?
-    if (tokens.nextIs(STRING))
-        return literal_string(branch, tokens);
+    else if (tokens.nextIs(STRING))
+        result = literal_string(branch, tokens);
 
     // literal hex?
-    if (tokens.nextIs(HEX_INTEGER))
-        return literal_hex(branch, tokens);
+    else if (tokens.nextIs(HEX_INTEGER))
+        result = literal_hex(branch, tokens);
 
     // literal float?
-    if (tokens.nextIs(FLOAT))
-        return literal_float(branch, tokens);
+    else if (tokens.nextIs(FLOAT))
+        result = literal_float(branch, tokens);
 
     // literal branch?
-    if (tokens.nextIs(LBRACE))
-        return literal_branch(branch, tokens);
+    else if (tokens.nextIs(LBRACE))
+        result = literal_branch(branch, tokens);
 
     // identifier?
-    if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AMPERSAND))
-        return identifier(branch, tokens);
+    else if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AMPERSAND))
+        result = identifier(branch, tokens);
 
     // parenthesized expression?
-    if (tokens.nextIs(LPAREN)) {
+    else if (tokens.nextIs(LPAREN)) {
         tokens.consume(LPAREN);
-        Term* result = infix_expression(branch, tokens);
+        result = infix_expression(branch, tokens);
         tokens.consume(RPAREN);
         result->syntaxHints.parens += 1;
-        return result;
+    }
+    else {
+
+        std::cout << tokens.next().text;
+
+        throw std::runtime_error("unrecognized expression at " 
+            + tokens.next().locationAsString());
+
+        return NULL; // unreachable
     }
 
+    prepend_whitespace(result, preWhitespace);
+    append_whitespace(result, possible_whitespace(tokens));
 
-    std::cout << tokens.next().text;
-
-    throw std::runtime_error("unrecognized expression at " 
-        + tokens.next().locationAsString());
-
-    return NULL; // unreachable
+    return result;
 }
 
 Term* function_call(Branch& branch, TokenStream& tokens)
