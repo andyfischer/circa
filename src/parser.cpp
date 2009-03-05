@@ -464,13 +464,16 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     Term* type = find_named(&branch, typeName);
     assert(type != NULL);
 
-    Term* result = apply_function(&branch, STATEFUL_VALUE_FUNC, RefList(), name);
+    RefList inputs;
+    if (initialValue != NULL)
+        inputs.append(initialValue);
+
+    Term* result = apply_function(&branch, STATEFUL_VALUE_FUNC, inputs, name);
     result->syntaxHints.declarationStyle = TermSyntaxHints::SPECIFIC_TO_FUNCTION;
     change_type(result, type);
 
     if (initialValue != NULL) {
         copy_value(initialValue, result);
-        copy_value(initialValue, result->state); // store initial value in state
     }
     else
         alloc_value(result);

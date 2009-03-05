@@ -116,9 +116,9 @@ std::string get_term_source(Term* term)
         result << term->name;
 
         // check for initial value
-        if (term->state->type != ANY_TYPE) {
+        if (term->numInputs() > 0) {
             result << " = ";
-            result << to_source_string(term->state);
+            result << get_source_of_input(term, 0);
         }
 
         return result.str();
