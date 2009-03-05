@@ -76,6 +76,7 @@ struct TermSyntaxHints
     std::string preWhitespace;
     std::string followingWhitespace;
     IntegerFormat integerFormat;
+    int floatDecimalFigures;
 
     TermSyntaxHints() :
         line(0),
@@ -84,7 +85,8 @@ struct TermSyntaxHints
         declarationStyle(UNKNOWN_DECLARATION_STYLE),
         parens(0),
         occursInsideAnExpression(false),
-        integerFormat(DECIMAL)
+        integerFormat(DECIMAL),
+        floatDecimalFigures(0)
     {}
 
     InputSyntax& getInputSyntax(unsigned int index) {

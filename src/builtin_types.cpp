@@ -86,7 +86,7 @@ namespace primitives {
             // This will need to be revisited.
             std::stringstream strm;
             strm.setf(std::ios::fixed, std::ios::floatfield);
-            strm.precision(1);
+            strm.precision(term->syntaxHints.floatDecimalFigures);
             strm << as_float(term);
 
             if (term->hasProperty("mutability")

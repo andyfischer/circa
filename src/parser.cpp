@@ -848,8 +848,23 @@ Term* literal_hex(Branch& branch, TokenStream& tokens)
 Term* literal_float(Branch& branch, TokenStream& tokens)
 {
     std::string text = tokens.consume(FLOAT);
+
+    // be lazy and parse the actual number with atof
     float value = atof(text.c_str());
+
+    // figure out how many decimal places this number has
+    bool foundDecimal = false;
+    int decimalFigures = 0;
+
+    for (int i=0; i < text.length(); i++) {
+        if (text[i] == '.')
+            foundDecimal = true;
+        else if (foundDecimal)
+            decimalFigures++;
+    }
+
     Term* term = float_value(branch, value);
+    term->syntaxHints.floatDecimalFigures = decimalFigures;
 
     float mutability = 0.0;
 
