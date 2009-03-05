@@ -52,6 +52,11 @@ struct TermSyntaxHints
         SPECIFIC_TO_FUNCTION
     };
 
+    enum IntegerFormat {
+        DECIMAL,
+        HEX
+    };
+
     typedef std::vector<InputSyntax> InputSyntaxList;
 
     // Members:
@@ -70,6 +75,7 @@ struct TermSyntaxHints
     std::string functionName;
     std::string preWhitespace;
     std::string followingWhitespace;
+    IntegerFormat integerFormat;
 
     TermSyntaxHints() :
         line(0),
@@ -77,7 +83,8 @@ struct TermSyntaxHints
         endChar(0),
         declarationStyle(UNKNOWN_DECLARATION_STYLE),
         parens(0),
-        occursInsideAnExpression(false)
+        occursInsideAnExpression(false),
+        integerFormat(DECIMAL)
     {}
 
     InputSyntax& getInputSyntax(unsigned int index) {

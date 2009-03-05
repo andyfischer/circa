@@ -843,6 +843,7 @@ Term* literal_integer(Branch& branch, TokenStream& tokens)
     int value = strtoul(text.c_str(), NULL, 0);
     Term* term = int_value(branch, value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    term->syntaxHints.integerFormat = TermSyntaxHints::DECIMAL;
     return term;
 }
 
@@ -852,6 +853,7 @@ Term* literal_hex(Branch& branch, TokenStream& tokens)
     int value = strtoul(text.c_str(), NULL, 0);
     Term* term = int_value(branch, value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    term->syntaxHints.integerFormat = TermSyntaxHints::HEX;
     return term;
 }
 
