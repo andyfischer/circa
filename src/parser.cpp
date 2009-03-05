@@ -574,50 +574,50 @@ int get_infix_precedence(int match)
     }
 }
 
-void get_infix_function_details(std::string const& infix,
-        std::string& functionName, bool& isRebinding)
+bool is_infix_operator_rebinding(std::string const& infix)
 {
-    isRebinding = false;
+    return (infix == "+="
+        || infix == "-="
+        || infix == "*="
+        || infix == "/=");
+}
 
+std::string get_function_for_infix(std::string const& infix)
+{
     if (infix == "+")
-        functionName = "add";
+        return "add";
     else if (infix == "-")
-        functionName = "sub";
+        return "sub";
     else if (infix == "*")
-        functionName = "mult";
+        return "mult";
     else if (infix == "/")
-        functionName = "div";
+        return "div";
     else if (infix == "<")
-        functionName = "less-than";
+        return "less-than";
     else if (infix == "<=")
-        functionName = "less-than-eq";
+        return "less-than-eq";
     else if (infix == ">")
-        functionName = "greater-than";
+        return "greater-than";
     else if (infix == ">=")
-        functionName = "greater-than-eq";
+        return "greater-than-eq";
     else if (infix == "==")
-        functionName = "equals";
+        return "equals";
     else if (infix == "||")
-        functionName = "or";
+        return "or";
     else if (infix == "&&")
-        functionName = "and";
+        return "and";
     else if (infix == ":=")
-        functionName = "apply-feedback";
-    else if (infix == "+=") {
-        functionName = "add";
-        isRebinding = true;
-    } else if (infix == "-=") {
-        functionName = "sub";
-        isRebinding = true;
-    } else if (infix == "*=") {
-        functionName = "mult";
-        isRebinding = true;
-    } else if (infix == "/=") {
-        functionName = "div";
-        isRebinding = true;
-    }
+        return "apply-feedback";
+    else if (infix == "+=")
+        return "add";
+    else if (infix == "-=")
+        return "sub";
+    else if (infix == "*=")
+        return "mult";
+    else if (infix == "/=")
+        return "div";
     else
-        functionName = "#unrecognized";
+        return "#unrecognized";
 }
 
 Term* infix_expression(Branch& branch, TokenStream& tokens)
@@ -710,9 +710,8 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
         } else {
             Term* rightExpr = infix_expression_nested(branch, tokens, precedence+1);
 
-            std::string functionName;
-            bool isRebinding;
-            get_infix_function_details(operatorStr, functionName, isRebinding);
+            std::string functionName = get_function_for_infix(operatorStr);
+            bool isRebinding = is_infix_operator_rebinding(operatorStr);
 
             if (isRebinding && leftExpr->name == "")
                 throw std::runtime_error("Left side of " + functionName + " must be an identifier");
