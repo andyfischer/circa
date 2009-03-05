@@ -2,13 +2,7 @@
 
 #include "common_headers.h"
 
-#include "builtins.h"
-#include "branch.h"
-#include "function.h"
-#include "introspection.h"
-#include "syntax.h"
-#include "term.h"
-#include "type.h"
+#include "circa.h"
 
 namespace circa {
 
@@ -134,10 +128,20 @@ std::string get_term_source(Term* term)
         return result.str();
     }
 
+    // for an infix rebinding, don't use the normal "name = " prefix
+    if ((term->syntaxHints.declarationStyle == TermSyntaxHints::INFIX)
+            && parser::is_infix_operator_rebinding(term->syntaxHints.functionName))
+    {
+        result << term->name << " " << term->syntaxHints.functionName;
+        result << get_source_of_input(term, 1);
+        return result.str();
+    }
+
     // add possible name binding
     if (term->name != "") {
         result << term->name << " = ";
     }
+
 
     for (int p=0; p < term->syntaxHints.parens; p++)
         result << "(";
