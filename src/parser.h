@@ -47,7 +47,7 @@ Term* find_and_apply_function(Branch& branch,
 void push_pending_rebind(Branch& branch, std::string const& name);
 std::string pop_pending_rebind(Branch& branch);
 void remove_compilation_attrs(Branch& branch);
-void old_update_if_statement_joining_terms(Term* if_statement);
+bool is_infix_operator_rebinding(std::string const& infix);
 
 } // namespace parser
 } // namespace circa
