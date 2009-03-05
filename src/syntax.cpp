@@ -177,7 +177,7 @@ std::string get_term_source(Term* term)
 
         case TermSyntaxHints::INFIX:
         {
-            result << get_source_of_input(term, 0) << " ";
+            result << get_source_of_input(term, 0);
             result << term->syntaxHints.functionName;
             result << get_source_of_input(term, 1);
         }
