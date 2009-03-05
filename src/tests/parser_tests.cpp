@@ -304,21 +304,22 @@ void test_literal_branch()
     test_assert(as_branch(val)[1]->asInt() == 2);
 }
 
-void test_atom_whitespace()
-{
-    Branch branch;
-
-    Term* term = parser::compile(branch, parser::atom, "  add(1,2)   ");
-
-    test_assert(term->syntaxHints.preWhitespace == "  ");
-    test_assert(term->syntaxHints.followingWhitespace == "   ");
-}
-
 void test_infix_whitespace()
 {
     Branch branch;
+    branch.eval("a = 1");
+    branch.eval("b = 1");
 
-    Term* term = parser::compile(branch, parser::infix_expression, "  1 + 2 ");
+    Term* term = parser::compile(branch, parser::infix_expression, "  a + b");
+    test_assert(term->syntaxHints.preWhitespace == "  ");
+    test_assert(term->syntaxHints.getInputSyntax(0).followingWhitespace == " ");
+    test_assert(term->syntaxHints.getInputSyntax(1).preWhitespace == " ");
+
+    term = parser::compile(branch, parser::infix_expression, "5+3");
+    test_assert(term->syntaxHints.preWhitespace == "");
+    test_assert(term->syntaxHints.getInputSyntax(0).followingWhitespace == "");
+    test_assert(term->syntaxHints.getInputSyntax(1).preWhitespace == "");
+    test_assert(term->syntaxHints.followingWhitespace == "");
 }
 
 void register_tests()
@@ -344,7 +345,6 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_rebinding_infix_operator);
     REGISTER_TEST_CASE(parser_tests::test_if_joining_on_bool);
     REGISTER_TEST_CASE(parser_tests::test_literal_branch);
-    REGISTER_TEST_CASE(parser_tests::test_atom_whitespace);
     REGISTER_TEST_CASE(parser_tests::test_infix_whitespace);
 }
 

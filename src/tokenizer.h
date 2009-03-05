@@ -72,6 +72,7 @@ const int RETURN = 51;
 const int WHITESPACE = 26;
 const int NEWLINE = 27;
 const int UNRECOGNIZED = 28;
+const int EOF_TOKEN = 52;
 
 const char* getMatchText(int match);
 void tokenize(std::string const &input, TokenList &results);

@@ -40,6 +40,8 @@ struct TokenStream
 
     tokenizer::TokenInstance const& next(int lookahead=0) const;
 
+    int nextNonWhitespace(int lookahead=0) const;
+
     bool nextIs(int match, int lookahead=0) const
     {
         if ((this->currentIndex + lookahead) >= tokens.size())
