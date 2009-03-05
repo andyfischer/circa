@@ -13,13 +13,13 @@ void test_comment()
     parser::compile(branch, parser::statement, "-- this is a comment");
 
     test_assert(branch[0]->function == COMMENT_FUNC);
-    test_equals(branch[0]->state->field(0)->asString(), " this is a comment");
+    test_equals(branch[0]->state->field(0)->asString(), "-- this is a comment");
     test_assert(branch.numTerms() == 1);
 
     parser::compile(branch, parser::statement, "--");
     test_assert(branch.numTerms() == 2);
     test_assert(branch[1]->function == COMMENT_FUNC);
-    test_equals(branch[1]->state->field(0)->asString(), "");
+    test_equals(branch[1]->state->field(0)->asString(), "--");
 }
 
 void test_blank_line()

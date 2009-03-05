@@ -21,13 +21,13 @@ const char* getMatchText(int match)
         case HEX_INTEGER: return "HEX_INTEGER";
         case FLOAT: return "FLOAT";
         case STRING: return "STRING";
+        case COMMENT: return "COMMENT";
         case DOT: return ".";
         case STAR: return "*";
         case QUESTION: return "?";
         case SLASH: return "/";
         case PLUS: return "+";
         case MINUS: return "-";
-        case DOUBLE_MINUS: return "--";
         case LTHAN: return "<";
         case LTHANEQ: return "<=";
         case GTHAN: return ">";
@@ -135,6 +135,7 @@ struct TokenizeContext
 void top_level_consume_token(TokenizeContext &context);
 void consume_identifier(TokenizeContext &context);
 void consume_whitespace(TokenizeContext &context);
+void consume_comment(TokenizeContext& context);
 void consume_number(TokenizeContext &context);
 void consume_hex_number(TokenizeContext &context);
 void consume_string_literal(TokenizeContext &context);
@@ -171,6 +172,11 @@ bool is_acceptable_inside_identifier(char c)
 bool is_whitespace(char c)
 {
     return c == ' ' || c == '\t';
+}
+
+bool is_newline(char c)
+{
+    return c == '\n';
 }
 
 bool try_to_consume_keyword(TokenizeContext& context, int keyword)
@@ -345,9 +351,7 @@ void top_level_consume_token(TokenizeContext &context)
             }
 
             if (context.next(1) == '-') {
-                context.consume();
-                context.consume();
-                context.pushResult(DOUBLE_MINUS);
+                consume_comment(context);
                 return;
             }
 
@@ -427,6 +431,24 @@ void consume_whitespace(TokenizeContext &context)
     }
 
     context.pushResult(WHITESPACE, text.str());
+}
+
+void consume_comment(TokenizeContext& context)
+{
+    std::stringstream text;
+
+    // consume the -- part
+    text << context.consume();
+    text << context.consume();
+
+    while (!context.finished() && !is_newline(context.next()))
+        text << context.consume();
+
+    // throw away the newline
+    if (!context.finished())
+        context.consume();
+
+    context.pushResult(COMMENT, text.str());
 }
 
 void consume_number(TokenizeContext &context)
