@@ -128,6 +128,10 @@ std::string get_term_source(Term* term)
         }
 
         return result.str();
+    } else if (term->function == COPY_FUNC) {
+        result << term->name << " = ";
+        result << term->input(0)->name;
+        return result.str();
     }
 
     // add possible name binding
