@@ -44,7 +44,6 @@ const int QUESTION = 33;
 const int SLASH = 11;
 const int PLUS = 12;
 const int MINUS = 13;
-const int DOUBLE_MINUS = 36;
 const int LTHAN = 14;
 const int LTHANEQ = 15;
 const int GTHAN = 16;
@@ -71,6 +70,7 @@ const int RETURN = 51;
 
 const int WHITESPACE = 26;
 const int NEWLINE = 27;
+const int COMMENT = 53;
 const int UNRECOGNIZED = 28;
 const int EOF_TOKEN = 52;
 

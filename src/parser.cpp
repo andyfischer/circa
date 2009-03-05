@@ -152,8 +152,8 @@ Term* statement(Branch& branch, TokenStream& tokens)
 
     Term* result = NULL;
 
-    // Comment line
-    if (tokens.nextIs(DOUBLE_MINUS)) {
+    // Comment
+    if (tokens.nextIs(COMMENT)) {
         result = comment_statement(branch, tokens);
         assert(result != NULL);
     }
@@ -202,22 +202,10 @@ Term* statement(Branch& branch, TokenStream& tokens)
 
 Term* comment_statement(Branch& branch, TokenStream& tokens)
 {
-    std::stringstream commentText;
-    tokens.consume(DOUBLE_MINUS);
-
-    // Throw away the rest of this line
-    while (!tokens.finished()) {
-        if (tokens.nextIs(NEWLINE)) {
-            tokens.consume(NEWLINE);
-            break;
-        }
-
-        commentText << tokens.next().text;
-        tokens.consume();
-    }
+    std::string commentText = tokens.consume(COMMENT);
 
     Term* result = apply_function(&branch, COMMENT_FUNC, RefList());
-    as_string(result->state->field(0)) = commentText.str();
+    as_string(result->state->field(0)) = commentText;
     result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     return result;
 }
