@@ -638,9 +638,11 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
     Term* leftExpr = infix_expression_nested(branch, tokens, precedence+1);
 
     prepend_whitespace(leftExpr, preWhitespace);
-    append_whitespace(leftExpr, possible_whitespace(tokens));
 
-    while (!tokens.finished() && get_infix_precedence(tokens.next().match) == precedence) {
+    while (!tokens.finished() && get_infix_precedence(tokens.nextNonWhitespace()) == precedence) {
+
+        std::string preOperatorWhitespace = possible_whitespace(tokens);
+
         std::string operatorStr = tokens.consume();
 
         std::string postOperatorWhitespace = possible_whitespace(tokens);
@@ -727,7 +729,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             set_input_syntax(result, 0, leftExpr);
             set_input_syntax(result, 1, rightExpr);
 
-            //result->syntaxHints.getInputSyntax(0).followingWhitespace = preOperatorWhitespace;
+            result->syntaxHints.getInputSyntax(0).followingWhitespace = preOperatorWhitespace;
             result->syntaxHints.getInputSyntax(1).preWhitespace = postOperatorWhitespace;
 
             if (isRebinding) {
@@ -743,8 +745,6 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
 Term* atom(Branch& branch, TokenStream& tokens)
 {
-    std::string preWhitespace = possible_whitespace(tokens);
-
     Term* result = NULL;
 
     // function call?
@@ -791,9 +791,6 @@ Term* atom(Branch& branch, TokenStream& tokens)
 
         return NULL; // unreachable
     }
-
-    prepend_whitespace(result, preWhitespace);
-    append_whitespace(result, possible_whitespace(tokens));
 
     return result;
 }
