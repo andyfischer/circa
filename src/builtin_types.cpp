@@ -60,6 +60,16 @@ namespace primitives {
             strm << as_int(term);
             return strm.str();
         }
+
+        std::string to_source_string(Term* term)
+        {
+            std::stringstream strm;
+            if (term->syntaxHints.integerFormat == TermSyntaxHints::HEX)
+                strm << "0x" << std::hex;
+
+            strm << as_int(term);
+            return strm.str();
+        }
     }
 
     namespace float_t {
@@ -206,7 +216,7 @@ void initialize_builtin_types(Branch& kernel)
     as_type(INT_TYPE).equals = cpp_importing::templated_equals<int>;
     as_type(INT_TYPE).lessThan = cpp_importing::templated_lessThan<int>;
     as_type(INT_TYPE).toString = primitives::int_t::to_string;
-    as_type(INT_TYPE).toSourceString = primitives::int_t::to_string;
+    as_type(INT_TYPE).toSourceString = primitives::int_t::to_source_string;
 
     FLOAT_TYPE = import_type<float>(kernel, "float");
     as_type(FLOAT_TYPE).equals = cpp_importing::templated_equals<float>;
