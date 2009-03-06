@@ -170,25 +170,21 @@ namespace set_t {
         }
     }
 
-/*
-std::string
-Set::to_string(Term* caller)
-{
-    Set &set = as<Set>(caller);
-    std::vector<Term*>::iterator it;
-    std::stringstream output;
-    bool first = true;
-    output << "{";
-    for (it = set.members.begin(); it != set.members.end(); ++it) {
-        if (!first) output << ", ";
-        output << (*it)->toString();
-        first = false;
-    }
-    output << "}";
+    std::string to_string(Term* caller)
+    {
+        Branch &set = as_branch(caller);
+        std::stringstream output;
+        bool first = true;
+        output << "{";
+        for (int i=0; i < set.numTerms(); i++) {
+            if (!first) output << ", ";
+            output << set[i]->toString();
+            first = false;
+        }
+        output << "}";
 
-    return output.str();
-}
-*/
+        return output.str();
+    }
 
 } // namespace set_t
 
@@ -251,6 +247,7 @@ void initialize_builtin_types(Branch& kernel)
 
     Term* set_type = create_empty_type(kernel, "Set");
     as_type(set_type).makeCompoundType("Set");
+    as_type(set_type).toString = set_t::to_string;
     import_member_function(set_type, set_t::add, "function add(Set, any) -> Set");
     import_member_function(set_type, set_t::remove, "function remove(Set, any) -> Set");
 
