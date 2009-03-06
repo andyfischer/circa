@@ -216,7 +216,8 @@ std::string get_branch_source(Branch& branch)
 
         result << get_term_source(term);
 
-        if (i+1 < branch.numTerms()) {
+        if ((i+1 < branch.numTerms())
+               /* && !term->syntaxHints.endsFile*/) {
             result << "\n";
         }
     }

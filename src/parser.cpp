@@ -486,7 +486,11 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     }
 
     Term* result = infix_expression(branch, tokens);
-    possible_newline(tokens);
+
+    if (tokens.finished())
+        result->syntaxHints.endsFile = true;
+    else
+        possible_newline(tokens); // this should always consume newline
 
     // If this item is just an identifier, and we're trying to rename it,
     // create an implicit call to 'copy'.
