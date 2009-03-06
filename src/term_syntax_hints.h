@@ -78,6 +78,9 @@ struct TermSyntaxHints
     IntegerFormat integerFormat;
     int floatDecimalFigures;
 
+    // true if this term is the last in the file, and there's no trailing newline.
+    bool endsFile; 
+
     TermSyntaxHints() :
         line(0),
         startChar(0),
@@ -86,7 +89,8 @@ struct TermSyntaxHints
         parens(0),
         occursInsideAnExpression(false),
         integerFormat(DECIMAL),
-        floatDecimalFigures(0)
+        floatDecimalFigures(0),
+        endsFile(false)
     {}
 
     InputSyntax& getInputSyntax(unsigned int index) {
