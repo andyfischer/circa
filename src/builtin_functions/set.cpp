@@ -7,15 +7,12 @@ namespace set_function {
 
     void evaluate(Term* caller)
     {
-        /*
-        FIXME
-        Set &result = as<Set>(caller);
+        Branch &result = as_branch(caller);
         result.clear();
 
         for (int index=0; index < caller->numInputs(); index++) {
-            result.add(caller->input(index));
+            set_t::add(result, caller->input(index));
         }
-        */
     }
 
     void setup(Branch& kernel)

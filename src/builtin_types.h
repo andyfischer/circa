@@ -9,6 +9,10 @@
 
 namespace circa {
 
+namespace set_t {
+    void add(Branch& branch, Term* value);
+}
+
 void initialize_builtin_types(Branch& kernel);
 
 } // namespace circa

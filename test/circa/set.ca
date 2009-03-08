@@ -22,6 +22,8 @@ s.to-string.print
 left = set(1,2,4)
 right = set(4,5)
 
+left.to-string.print
+
 u = set-union(left,right)
 
 u.to-string.print

@@ -7,20 +7,16 @@ namespace set_union_function {
 
     void evaluate(Term* caller)
     {
-        /*
-        FIXME
-        Set &result = as<Set>(caller);
+        Branch &result = as_branch(caller);
+        result.clear();
 
         for (int inputIndex=0; inputIndex < caller->numInputs(); inputIndex++) {
-            Set &input = as<Set>(caller->input(inputIndex));
+            Branch &input = as_branch(caller->input(inputIndex));
 
-            std::vector<Term*>::iterator it;
-
-            for (it = input.members.begin(); it != input.members.end(); ++it) {
-                result.add(*it);
+            for (int i=0; i < result.numTerms(); i++) {
+                set_t::add(result, input[i]);
             }
         }
-        */
     }
 
     void setup(Branch& kernel)
