@@ -142,17 +142,21 @@ namespace set_t {
         return false;
     }
 
-    void add(Term* caller)
+    void add(Branch& branch, Term* value)
     {
-        recycle_value(caller->input(0), caller);
-        Branch& branch = as_branch(caller);
-        Term* value = caller->input(1);
-       
         if (contains(branch, value))
             return;
 
         Term* duplicated_value = create_value(&branch, value->type);
         copy_value(value, duplicated_value);
+    }
+
+    void hosted_add(Term* caller)
+    {
+        recycle_value(caller->input(0), caller);
+        Branch& branch = as_branch(caller);
+        Term* value = caller->input(1);
+        add(branch, value);
     }
 
     void remove(Term* caller)
@@ -248,7 +252,7 @@ void initialize_builtin_types(Branch& kernel)
     Term* set_type = create_empty_type(kernel, "Set");
     as_type(set_type).makeCompoundType("Set");
     as_type(set_type).toString = set_t::to_string;
-    import_member_function(set_type, set_t::add, "function add(Set, any) -> Set");
+    import_member_function(set_type, set_t::hosted_add, "function add(Set, any) -> Set");
     import_member_function(set_type, set_t::remove, "function remove(Set, any) -> Set");
 
     Term* list_type = create_empty_type(kernel, "List");
