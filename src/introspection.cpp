@@ -261,5 +261,28 @@ void print_compile_errors(Branch& branch, std::ostream& output)
     }
 }
 
+void recursive_append_influencing_values(Term* term, RefList& list)
+{
+    for (int i=0; i < term->numInputs(); i++) {
+        Term* input = term->input(i);
+
+        if (input == NULL)
+            continue;
+
+        if (is_value(input) || is_stateful(input))
+            list.append(input);
+        else
+            recursive_append_influencing_values(input, list);
+    }
+}
+
+RefList get_influencing_values(Term* term)
+{
+    RefList result;
+
+    recursive_append_influencing_values(term, result);
+
+    return result;
+}
 
 } // namespace circa
