@@ -62,6 +62,11 @@ c_y = ship_y - back_dist * sin(ship_facing)
 d_x = ship_x + front_dist * cos(ship_facing - back_angle)
 d_y = ship_y + front_dist * sin(ship_facing - back_angle)
 
+point(a_x, a_y)
+point(b_x, b_y)
+point(c_x, c_y)
+point(d_x, d_y)
+
 line_to(a_x, a_y, b_x, b_y, 0)
 line_to(b_x, b_y, c_x, c_y, 0)
 line_to(c_x, c_y, d_x, d_y, 0)
