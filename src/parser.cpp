@@ -860,7 +860,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     bool foundDecimal = false;
     int decimalFigures = 0;
 
-    for (int i=0; i < text.length(); i++) {
+    for (unsigned int i=0; i < text.length(); i++) {
         if (text[i] == '.')
             foundDecimal = true;
         else if (foundDecimal)

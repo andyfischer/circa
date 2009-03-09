@@ -122,7 +122,6 @@ void draw_highlight()
     if (HIGHLIGHT == NULL)
         return;
 
-
     float x = as_float(HIGHLIGHT->input(0));
     float y = as_float(HIGHLIGHT->input(1));
 
@@ -165,7 +164,7 @@ int main( int argc, char* args[] )
         return 1;
 
     // Set the window caption
-    SDL_WM_SetCaption( "Hello World", NULL );
+    SDL_WM_SetCaption( "CGame", NULL );
 
     // Main loop
     bool continueMainLoop = true;
@@ -181,6 +180,8 @@ int main( int argc, char* args[] )
             SCRIPT_MAIN["mouse_y"]->asFloat() = event.motion.y;
             MOUSE_X = event.motion.x;
             MOUSE_Y = event.motion.y;
+            update_highlight();
+
         } else if (event.type == SDL_KEYDOWN) {
             switch(event.key.keysym.sym) {
             case SDLK_4:
@@ -200,7 +201,28 @@ int main( int argc, char* args[] )
             case SDLK_RIGHT:
                 SCRIPT_MAIN["right_pressed"]->asBool() = true; break;
             case SDLK_SPACE:
-                SCRIPT_MAIN["space_pressed"]->asBool() = true; break;
+                SCRIPT_MAIN["space_pressed"]->asBool() = true;
+
+                if (HIGHLIGHT != NULL) {
+
+                    circa::RefList influencers = circa::get_influencing_values(HIGHLIGHT);
+
+                    for (int i=0; i < influencers.count(); i++) {
+                        if (influencers[i]->name == "")
+                            influencers[i] = NULL;
+                    }
+
+                    influencers.removeNulls();
+
+                    circa::sort_by_name(influencers);
+
+                    std::cout << "influencers:" << std::endl;
+                    for (int i=0; i < influencers.count(); i++) {
+                        std::cout << "  " << influencers[i]->name << std::endl;
+                    }
+                }
+
+                break;
             case SDLK_ESCAPE:
                 continueMainLoop = false; break;
             }
@@ -222,7 +244,6 @@ int main( int argc, char* args[] )
         try {
             SCRIPT_MAIN.eval();
 
-            update_highlight();
             draw_highlight();
 
         } catch (std::exception &e) {

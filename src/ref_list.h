@@ -16,10 +16,8 @@ namespace circa {
 
 struct RefList
 {
-private:
     std::vector<Ref> _items;
  
-public:
     explicit RefList() { }
 
     // Convenience constructors
@@ -181,6 +179,8 @@ public:
 
     void remapPointers(ReferenceMap const& map);
 };
+
+void sort_by_name(RefList& list);
 
 } // namespace circa
 
