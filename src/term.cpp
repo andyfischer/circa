@@ -30,7 +30,7 @@ Term::~Term()
     // Clear references
     std::vector<Ref*>::iterator it;
     for (it = refs.begin(); it != refs.end(); ++it) {
-        (*it)->_target = NULL;
+        (*it)->_t = NULL;
     }
 }
 

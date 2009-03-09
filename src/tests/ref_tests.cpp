@@ -11,7 +11,7 @@ void test_basic()
 {
     Ref ref;
 
-    test_assert(ref._target == NULL);
+    test_assert(ref._t == NULL);
     test_assert(ref._owner == NULL);
 
     Term* t = new Term();
@@ -20,14 +20,14 @@ void test_basic()
 
     ref = t;
 
-    test_assert(ref._target == t);
+    test_assert(ref._t == t);
     test_assert(t->refs.size() == 1);
     test_assert(t->refs[0] == &ref);
     test_assert( ((Term*) ref) == t);
 
     ref = NULL;
 
-    test_assert(ref._target == NULL);
+    test_assert(ref._t == NULL);
     test_assert(t->refs.size() == 0);
 }
 
@@ -41,14 +41,14 @@ void test_copy()
 
     Ref copy(ref);
 
-    test_assert(copy._target == t);
+    test_assert(copy._t == t);
     test_assert(t->refs.size() == 2);
     test_assert(t->refs[0] == &ref);
     test_assert(t->refs[1] == &copy);
 
     Ref another_copy(NULL);
     another_copy = copy;
-    test_assert(another_copy._target == t);
+    test_assert(another_copy._t == t);
     test_assert(t->refs.size() == 3);
     test_assert(t->refs[2] == &another_copy);
 }
@@ -104,7 +104,7 @@ void test_safe_term_deletion()
 
     delete t;
 
-    test_assert(ref._target == NULL);
+    test_assert(ref._t == NULL);
     test_assert(list[0] == NULL);
     test_assert(list[1] == NULL);
 }
