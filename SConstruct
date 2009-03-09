@@ -87,3 +87,5 @@ CASDL_ENV.Append(LIBPATH = "lib")
 CASDL_ENV.Append(LIBS = ['circa'])
 
 CASDL_ENV.Program('bin/cgame', 'cgame/main.cpp')
+
+CASDL_ENV.Alias('cgame', 'bin/cgame')

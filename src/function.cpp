@@ -80,24 +80,24 @@ void Function::copyExceptBranch(Term* sourceTerm, Term* destTerm)
 
     dest = Function();
 
-#define field(f) dest.f = source.f
+#define copy_field(f) dest.f = source.f
 
-    field(inputTypes);
-    field(inputProperties);
-    field(outputType);
-    field(stateType);
-    field(pureFunction);
-    field(hasSideEffects);
-    field(variableArgs);
-    field(name);
-    field(evaluate);
-    field(startControlFlowIterator);
-    field(feedbackAccumulationFunction);
-    field(feedbackPropogateFunction);
-    field(generateCppFunction);
-    field(printCircaSourceFunction);
+    copy_field(inputTypes);
+    copy_field(inputProperties);
+    copy_field(outputType);
+    copy_field(stateType);
+    copy_field(pureFunction);
+    copy_field(hasSideEffects);
+    copy_field(variableArgs);
+    copy_field(name);
+    copy_field(evaluate);
+    copy_field(startControlFlowIterator);
+    copy_field(feedbackAccumulationFunction);
+    copy_field(feedbackPropogateFunction);
+    copy_field(generateCppFunction);
+    copy_field(printCircaSourceFunction);
 
-#undef field
+#undef copy_field
 }
 
 void Function::copy(Term* sourceTerm, Term* destTerm)
@@ -176,6 +176,11 @@ Function::subroutine_call_evaluate(Term* caller)
         assert(outputPlaceholder != NULL);
         recycle_value(outputPlaceholder, caller);
     }
+}
+
+Term* create_empty_function(Branch& branch, std::string const& header)
+{
+    return parser::compile(branch, parser::function_from_header, header);
 }
 
 ReferenceIterator*
