@@ -269,6 +269,9 @@ void recursive_append_influencing_values(Term* term, RefList& list)
         if (input == NULL)
             continue;
 
+        if (list.contains(input))
+            continue;
+
         if (is_value(input) || is_stateful(input))
             list.append(input);
         else

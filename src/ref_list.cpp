@@ -26,4 +26,14 @@ void RefList::remapPointers(ReferenceMap const& map)
         _items[i] = map.getRemapped(_items[i]);
 }
 
+bool compare_by_name(Ref left, Ref right)
+{
+    return left->name < right->name;
+}
+
+void sort_by_name(RefList& list)
+{
+    std::sort(list._items.begin(), list._items.end(), compare_by_name);
+}
+
 } // namespace circa
