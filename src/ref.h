@@ -13,17 +13,17 @@ namespace circa {
 
 struct Ref
 {
-    Term* _target;
+    Term* _t;
     Term* _owner;
 
     Ref()
-      : _target(NULL),
+      : _t(NULL),
         _owner(NULL)
     {
     }
 
     Ref(Term *initialValue)
-      : _target(NULL),
+      : _t(NULL),
         _owner(NULL)
     {
         set(initialValue);
@@ -31,10 +31,10 @@ struct Ref
 
     // Copy constructor
     Ref(Ref const& copy)
-      : _target(NULL),
+      : _t(NULL),
         _owner(copy._owner)
     {
-        set(copy._target);
+        set(copy._t);
     }
 
     ~Ref()
@@ -46,7 +46,7 @@ struct Ref
     Ref& operator=(Ref const& rhs)
     {
         _owner = rhs._owner;
-        set(rhs._target);
+        set(rhs._t);
         return *this;
     }
 
@@ -60,27 +60,30 @@ struct Ref
 
     bool operator==(Term* t) const
     {
-        return _target == t;
+        return _t == t;
     }
 
     operator Term*() const
     {
-        return _target;
+        return _t;
     }
 
     operator Term*&()
     {
-        return _target;
+        return _t;
     }
 
     Term* operator->()
     {
-        return _target;
+        return _t;
     }
 
     static void remap_pointers(Term* term, ReferenceMap const& map);
     static ReferenceIterator* start_reference_iterator(Term* term);
 };
+
+void remove_referencer(Term* term, Ref* ref);
+void delete_term(Term* term);
 
 } // namespace circa
 
