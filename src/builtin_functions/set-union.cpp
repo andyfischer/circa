@@ -13,9 +13,8 @@ namespace set_union_function {
         for (int inputIndex=0; inputIndex < caller->numInputs(); inputIndex++) {
             Branch &input = as_branch(caller->input(inputIndex));
 
-            for (int i=0; i < result.numTerms(); i++) {
+            for (int i=0; i < input.numTerms(); i++)
                 set_t::add(result, input[i]);
-            }
         }
     }
 
