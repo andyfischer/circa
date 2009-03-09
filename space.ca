@@ -11,7 +11,7 @@ state bool left_pressed
 state bool right_pressed
 state bool space_pressed
 
-front_dist = 20.0
+ship_size = 20.0
 back_dist = 4.0
 back_angle = 2.5
 ship_speed = 1.0
@@ -50,17 +50,17 @@ if right_pressed
 end
 
 -- Draw the ship
-a_x = ship_x + front_dist * cos(ship_facing)
-a_y = ship_y + front_dist * sin(ship_facing)
+a_x = ship_x + ship_size * cos(ship_facing)
+a_y = ship_y + ship_size * sin(ship_facing)
 
-b_x = ship_x + front_dist * cos(ship_facing + back_angle)
-b_y = ship_y + front_dist * sin(ship_facing + back_angle)
+b_x = ship_x + ship_size * cos(ship_facing + back_angle)
+b_y = ship_y + ship_size * sin(ship_facing + back_angle)
 
 c_x = ship_x - back_dist * cos(ship_facing)
 c_y = ship_y - back_dist * sin(ship_facing)
 
-d_x = ship_x + front_dist * cos(ship_facing - back_angle)
-d_y = ship_y + front_dist * sin(ship_facing - back_angle)
+d_x = ship_x + ship_size * cos(ship_facing - back_angle)
+d_y = ship_y + ship_size * sin(ship_facing - back_angle)
 
 point(a_x, a_y)
 point(b_x, b_y)
@@ -110,4 +110,3 @@ if bullet_active
     line_to(bullet_3_x, bullet_3_y, bullet_4_x, bullet_4_y, 0)
     line_to(bullet_4_x, bullet_4_y, bullet_1_x, bullet_1_y, 0)
 end
-
