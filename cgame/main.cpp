@@ -8,8 +8,15 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
+const float HIGHLIGHT_MIN_DIST = 5.0;
+
+int MOUSE_X = 0;
+int MOUSE_Y = 0;
 
 SDL_Surface* SCREEN = NULL;
+circa::Term* POINT_FUNC = NULL;
+circa::Branch SCRIPT_MAIN;
+circa::Term* HIGHLIGHT = NULL;
 
 void load_image(circa::Term* caller)
 {
@@ -86,23 +93,46 @@ void line_to(circa::Term* caller)
         as_int(caller->input(4)));
 }
 
-void SDL_FreeSurface_c(circa::Term* caller)
+void update_highlight()
 {
-    SDL_Surface* surface = circa::as<SDL_Surface*>(caller->input(0));
+    float closestDist = 0;
+    HIGHLIGHT = NULL;
+
+    for (circa::CodeIterator it(&SCRIPT_MAIN); !it.finished(); it.advance()) {
+        if (it->function == POINT_FUNC) {
+            float x = as_float(it->input(0));
+            float y = as_float(it->input(1));
+            float dist_x = MOUSE_X - x;
+            float dist_y = MOUSE_Y - y;
+            float dist = sqrt(dist_x*dist_x + dist_y*dist_y);
+
+            if (dist > HIGHLIGHT_MIN_DIST)
+                continue;
+
+            if ((dist < closestDist) || HIGHLIGHT == NULL) {
+                HIGHLIGHT = *it;
+                closestDist = dist;
+            }
+        }
+    }
+}
+
+void draw_highlight()
+{
+    if (HIGHLIGHT == NULL)
+        return;
+
+
+    float x = as_float(HIGHLIGHT->input(0));
+    float y = as_float(HIGHLIGHT->input(1));
+
+    circleColor(SCREEN, x, y, HIGHLIGHT_MIN_DIST, 0);
 }
 
 int main( int argc, char* args[] )
 {
     circa::initialize();
 
-    circa::import_type<SDL_Surface*>(*circa::KERNEL, "SDL_Surface");
-
-    circa::import_function(*circa::KERNEL, load_image,
-            "load-image(string) -> SDL_Surface");
-    circa::import_function(*circa::KERNEL, apply_surface,
-            "apply-surface(SDL_Surface,SDL_Surface,int,int)");
-    circa::import_function(*circa::KERNEL, SDL_FreeSurface_c,
-            "SDL_FreeSurface(SDL_Surface)");
     circa::import_function(*circa::KERNEL, line_to,
             "line_to(float,float,float,float,int)");
     circa::import_function(*circa::KERNEL, rectangle,
@@ -110,8 +140,7 @@ int main( int argc, char* args[] )
     circa::import_function(*circa::KERNEL, fill_rectangle,
             "fill_rectangle(float,float,float,float,int)");
 
-    circa::Term* pointFunc = circa::create_empty_function(*circa::KERNEL,
-            "point(float,float)");
+    POINT_FUNC = circa::create_empty_function(*circa::KERNEL, "point(float,float)");
 
     // Set up the screen
     SCREEN = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT,
@@ -129,8 +158,7 @@ int main( int argc, char* args[] )
 
     std::cout << "loading file: " << filename << std::endl;
 
-    circa::Branch script_main;
-    circa::evaluate_file(script_main, filename);
+    circa::evaluate_file(SCRIPT_MAIN, filename);
 
     // Initialize all SDL subsystems
     if( SDL_Init( SDL_INIT_EVERYTHING ) == -1)
@@ -149,48 +177,54 @@ int main( int argc, char* args[] )
             continueMainLoop = false;
 
         if (event.type == SDL_MOUSEMOTION) {
-            script_main["mouse_x"]->asFloat() = event.motion.x;
-            script_main["mouse_y"]->asFloat() = event.motion.y;
+            SCRIPT_MAIN["mouse_x"]->asFloat() = event.motion.x;
+            SCRIPT_MAIN["mouse_y"]->asFloat() = event.motion.y;
+            MOUSE_X = event.motion.x;
+            MOUSE_Y = event.motion.y;
         } else if (event.type == SDL_KEYDOWN) {
             switch(event.key.keysym.sym) {
             case SDLK_4:
                 std::cout << "Script contents:" << std::endl;
-                print_raw_branch(script_main, std::cout);
+                print_raw_branch(SCRIPT_MAIN, std::cout);
                 break;
             case SDLK_5:
-                circa::reload_branch_from_file(script_main);
+                circa::reload_branch_from_file(SCRIPT_MAIN);
                 std::cout << "Script reloaded" << std::endl;
                 break;
             case SDLK_UP:
-                script_main["up_pressed"]->asBool() = true; break;
+                SCRIPT_MAIN["up_pressed"]->asBool() = true; break;
             case SDLK_DOWN:
-                script_main["down_pressed"]->asBool() = true; break;
+                SCRIPT_MAIN["down_pressed"]->asBool() = true; break;
             case SDLK_LEFT:
-                script_main["left_pressed"]->asBool() = true; break;
+                SCRIPT_MAIN["left_pressed"]->asBool() = true; break;
             case SDLK_RIGHT:
-                script_main["right_pressed"]->asBool() = true; break;
+                SCRIPT_MAIN["right_pressed"]->asBool() = true; break;
             case SDLK_SPACE:
-                script_main["space_pressed"]->asBool() = true; break;
+                SCRIPT_MAIN["space_pressed"]->asBool() = true; break;
             case SDLK_ESCAPE:
                 continueMainLoop = false; break;
             }
         } else if (event.type == SDL_KEYUP) {
             switch(event.key.keysym.sym) {
             case SDLK_UP:
-                script_main["up_pressed"]->asBool() = false; break;
+                SCRIPT_MAIN["up_pressed"]->asBool() = false; break;
             case SDLK_DOWN:
-                script_main["down_pressed"]->asBool() = false; break;
+                SCRIPT_MAIN["down_pressed"]->asBool() = false; break;
             case SDLK_LEFT:
-                script_main["left_pressed"]->asBool() = false; break;
+                SCRIPT_MAIN["left_pressed"]->asBool() = false; break;
             case SDLK_RIGHT:
-                script_main["right_pressed"]->asBool() = false; break;
+                SCRIPT_MAIN["right_pressed"]->asBool() = false; break;
             case SDLK_SPACE:
-                script_main["space_pressed"]->asBool() = false; break;
+                SCRIPT_MAIN["space_pressed"]->asBool() = false; break;
             }
         }
 
         try {
-            script_main.eval();
+            SCRIPT_MAIN.eval();
+
+            update_highlight();
+            draw_highlight();
+
         } catch (std::exception &e) {
             std::cout << e.what() << std::endl;
             return 0;
@@ -202,9 +236,6 @@ int main( int argc, char* args[] )
 
         SDL_Delay( 10 );
     }
-
-    // Free the surfaces
-    script_main.eval("SDL_FreeSurface(background)");
 
     // Quit SDL
     SDL_Quit();
