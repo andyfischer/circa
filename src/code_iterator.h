@@ -19,7 +19,6 @@ public:
     void reset(Branch* branch);
     Term* current();
     void advance();
-    void postAdvance();
 
     Term* operator*() { return current(); }
     Term* operator->() { return current(); }
@@ -36,6 +35,9 @@ public:
         else
             return _subBranch->depth() + 1;
     }
+
+private:
+    void postAdvance();
 };
     
 } // namespace circa

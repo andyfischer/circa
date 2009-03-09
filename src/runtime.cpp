@@ -82,12 +82,8 @@ void evaluate_term(Term* term)
 
     Function& func = as_function(term->function);
 
-    if (func.evaluate == NULL) {
-        std::stringstream message;
-        message << "Function '" << func.name << "' has no evaluate function";
-        error_occured(term, message.str());
+    if (func.evaluate == NULL)
         return;
-    }
 
     // Check each input. Make sure:
     //  1) it is not null
