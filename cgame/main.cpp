@@ -110,6 +110,9 @@ int main( int argc, char* args[] )
     circa::import_function(*circa::KERNEL, fill_rectangle,
             "fill_rectangle(float,float,float,float,int)");
 
+    circa::Term* pointFunc = circa::create_empty_function(*circa::KERNEL,
+            "point(float,float)");
+
     // Set up the screen
     SCREEN = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT,
             SCREEN_BPP, SDL_SWSURFACE );
