@@ -20,7 +20,7 @@ struct Branch
     // Points to a Branch which is our outer scope.
     Branch* outerScope;
 
-    Branch() : outerScope(NULL) {}
+    Branch();
     ~Branch();
 
     Branch& operator=(Branch const& b);

@@ -8,6 +8,11 @@
 
 namespace circa {
 
+Branch::Branch()
+  : outerScope(NULL)
+{
+}
+
 Branch::~Branch()
 {
     // Dealloc_value on all non-types
