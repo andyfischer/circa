@@ -1,15 +1,13 @@
 // Copyright 2008 Andrew Fischer
 
-#ifndef CIRCA_TERM_LIST_INCLUDED
-#define CIRCA_TERM_LIST_INCLUDED
+#ifndef CIRCA_REF_LIST_INCLUDED
+#define CIRCA_REF_LIST_INCLUDED
 
 // RefList
 //
-// A list of weak Term pointers.
-//
+// A list of Term references
 
 #include "common_headers.h"
-
 #include "ref.h"
 
 namespace circa {
@@ -74,7 +72,6 @@ struct RefList
         append(term8);
     }
 
-    size_t count() const { return _items.size(); }
     void append(Term* term)
     {
         _items.push_back(term);
@@ -98,8 +95,7 @@ struct RefList
     void setAt(unsigned int index, Term* term)
     {
         // Check for a previous bug
-        if (index > 1000000)
-            throw std::runtime_error("index too big in setAt");
+        assert(index < 1000000);
 
         // Make sure there are enough blank elements in the list
         while (_items.size() <= index) {
@@ -109,7 +105,7 @@ struct RefList
         _items[index] = term;
     }
 
-    // Remove 'term' from this list
+    // Remove 'term' from this list. 'term' may be NULL.
     void remove(Term* term)
     {
         std::vector<Ref>::iterator it;
@@ -128,13 +124,10 @@ struct RefList
         _items.erase(_items.begin() + index);
     }
 
-    void removeNulls()
-    {
-        remove((Term*)NULL);
-    }
-
+    void removeNulls() { remove((Term*)NULL); }
     void clear() { _items.clear(); }
 
+    size_t count() const { return _items.size(); }
     Term* get(unsigned int index) const
     {
         if (index >= _items.size())
@@ -151,11 +144,7 @@ struct RefList
     }
 
     Term* operator[](unsigned int index) const { return get(index); }
-
-    Ref& operator[](unsigned int index)
-    {
-        return _items[index];
-    }
+    Ref& operator[](unsigned int index) { return _items[index]; }
 
     bool operator==(RefList const& b)
     {

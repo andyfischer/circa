@@ -8,19 +8,7 @@ namespace read_text_file_function {
     void evaluate(Term* caller)
     {
         std::string filename = as_string(caller->input(0));
-        std::ifstream file;
-        file.open(filename.c_str(), std::ios::in);
-        std::stringstream contents;
-        std::string line;
-        bool firstLine = true;
-        while (std::getline(file, line)) {
-            if (!firstLine)
-                contents << "\n";
-            contents << line;
-            firstLine = false;
-        }
-        file.close();
-        as_string(caller) = contents.str();
+        as_string(caller) = read_text_file(filename);
     }
 
     void setup(Branch& kernel)
