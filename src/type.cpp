@@ -153,6 +153,14 @@ Type& create_compound_type(Branch& branch, std::string const& name)
     return as_type(term);
 }
 
+bool equals(Term* a, Term* b)
+{
+    if (a->type != b->type)
+        return false;
+
+    return as_type(a->type).equals(a,b);
+}
+
 std::string Type::to_string(Term *caller)
 {
     return std::string("<Type " + as_type(caller).name + ">");

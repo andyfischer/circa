@@ -147,6 +147,8 @@ void* alloc_from_type(Term* typeTerm);
 
 Type& create_compound_type(Branch& branch, std::string const& name);
 
+// Functions which are dispatched based on type
+bool equals(Term* a, Term* b);
 std::string to_string(Term* term);
 std::string to_source_string(Term* term);
 

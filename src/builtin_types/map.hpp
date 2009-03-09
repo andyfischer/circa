@@ -42,7 +42,7 @@ struct Map {
     Pair* findPair(Term* key) {
         std::vector<Pair>::iterator it;
         for (it = _pairs.begin(); it != _pairs.end(); ++it) {
-            if (values_equal(key, it->key))
+            if (equals(key, it->key))
                 return &*it;
         }
         return NULL;

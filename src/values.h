@@ -25,8 +25,6 @@ void dealloc_value(Term* term);
 
 void update_owner(Term* term);
 
-bool values_equal(Term* a, Term* b);
-
 // Create a new value term with the given type.
 // 'branch' may be NULL.
 Term* create_value(Branch* branch, Term* type, std::string const& name="");
