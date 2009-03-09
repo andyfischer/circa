@@ -124,14 +124,6 @@ void update_owner(Term* term)
     type.updateOwner(term);
 }
 
-bool values_equal(Term* a, Term* b)
-{
-    if (a->type != b->type)
-        return false;
-
-    return as_type(a->type).equals(a,b);
-}
-
 Term* create_value(Branch* branch, Term* type, std::string const& name)
 {
     assert(type != NULL);

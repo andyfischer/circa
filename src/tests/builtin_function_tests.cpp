@@ -43,8 +43,8 @@ void test_int()
     Term* another_four = int_value(branch, 4);
     Term* five = int_value(branch, 5);
 
-    test_assert(values_equal(four, another_four));
-    test_assert(!values_equal(four, five));
+    test_assert(equals(four, another_four));
+    test_assert(!equals(four, five));
 
     test_assert(four->toString() == "4");
 }
@@ -60,8 +60,8 @@ void test_float()
     Term* point_one_again = float_value(branch, .1);
     Term* point_two = float_value(branch, 0.2);
 
-    test_assert(values_equal(point_one, point_one_again));
-    test_assert(values_equal(point_two, point_two));
+    test_assert(equals(point_one, point_one_again));
+    test_assert(equals(point_two, point_two));
 
     test_assert(point_one->toString() == "0.1");
 }

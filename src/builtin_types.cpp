@@ -136,7 +136,7 @@ namespace set_t {
     bool contains(Branch& branch, Term* value)
     {
         for (int i=0; i < branch.numTerms(); i++) {
-            if (values_equal(value, branch[i]))
+            if (equals(value, branch[i]))
                 return true;
         }
         return false;
@@ -166,7 +166,7 @@ namespace set_t {
         Term* value = caller->input(1);
 
         for (int index=0; index < branch.numTerms(); index++) {
-            if (values_equal(value, branch[index])) {
+            if (equals(value, branch[index])) {
 
                 branch.remove(index);
                 return;
