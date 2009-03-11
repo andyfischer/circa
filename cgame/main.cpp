@@ -10,6 +10,9 @@ const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
 const float HIGHLIGHT_MIN_DIST = 5.0;
 
+bool KEY_DOWN[SDLK_LAST];
+bool RECENTLY_PRESSED_KEY[SDLK_LAST];
+
 int MOUSE_X = 0;
 int MOUSE_Y = 0;
 bool INFLUENCE_LIST_ENABLED = false;
@@ -19,49 +22,24 @@ circa::Term* POINT_FUNC = NULL;
 circa::Term* HIGHLIGHT = NULL;
 circa::Branch SCRIPT_MAIN;
 
-void load_image(circa::Term* caller)
+void initialize_keydown()
 {
-    // Temporary storage for the image that's loaded
-    SDL_Surface* loadedImage = NULL;
-
-    // The optimized image that will be used
-    SDL_Surface* optimizedImage = NULL;
-
-    std::string filename = circa::as_string(caller->input(0));
-
-    // Load the image
-    loadedImage = SDL_LoadBMP( filename.c_str() );
-
-    // If nothing went wrong in loading the image
-    if( loadedImage != NULL )
-    {
-        // Create an optimized image
-        optimizedImage = SDL_DisplayFormat( loadedImage );
-
-        // Free the old image
-        SDL_FreeSurface( loadedImage );
+    for (int i=0; i < SDLK_LAST; i++) {
+        KEY_DOWN[i] = false;
+        RECENTLY_PRESSED_KEY[i] = false;
     }
-
-    // Return the optimized image
-    circa::as<SDL_Surface*>(caller) = optimizedImage;
 }
 
-void apply_surface(circa::Term* caller)
+void key_down(circa::Term* caller)
 {
-    SDL_Surface* destination = circa::as<SDL_Surface*>(caller->input(0));
-    SDL_Surface* source = circa::as<SDL_Surface*>(caller->input(1));
-    int x = circa::as_int(caller->input(2));
-    int y = circa::as_int(caller->input(3));
+    int i = caller->input(0)->asInt();
+    caller->asBool() = KEY_DOWN[i];
+}
 
-    // Make a temporary rectangle to hold the offsets
-    SDL_Rect offset;
-
-    // Give the offsets to the rectangle
-    offset.x = x;
-    offset.y = y;
-
-    // Blit the surface
-    SDL_BlitSurface( source, NULL, destination, &offset );
+void key_pressed(circa::Term* caller)
+{
+    int i = caller->input(0)->asInt();
+    caller->asBool() = RECENTLY_PRESSED_KEY[i];
 }
 
 void rectangle(circa::Term* caller)
@@ -161,6 +139,8 @@ void draw_influencers()
 
 int main( int argc, char* args[] )
 {
+    initialize_keydown();
+
     circa::initialize();
 
     circa::import_function(*circa::KERNEL, line_to,
@@ -215,7 +195,8 @@ int main( int argc, char* args[] )
             if (!INFLUENCE_LIST_ENABLED)
                 update_highlight();
 
-        } else if (event.type == SDL_KEYDOWN) {
+        } else if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_ALT)) {
+            // Alt key
             switch(event.key.keysym.sym) {
             case SDLK_4:
                 std::cout << "Script contents:" << std::endl;
@@ -225,6 +206,9 @@ int main( int argc, char* args[] )
                 circa::reload_branch_from_file(SCRIPT_MAIN);
                 std::cout << "Script reloaded" << std::endl;
                 break;
+            }
+        } else if (event.type == SDL_KEYDOWN) {
+            switch (event.key.keysym.sym) {
             case SDLK_UP:
                 SCRIPT_MAIN["up_pressed"]->asBool() = true; break;
             case SDLK_DOWN:
@@ -235,6 +219,8 @@ int main( int argc, char* args[] )
                 SCRIPT_MAIN["right_pressed"]->asBool() = true; break;
             case SDLK_SPACE:
                 SCRIPT_MAIN["space_pressed"]->asBool() = true; break;
+            case SDLK_ESCAPE:
+                continueMainLoop = false; break;
             case SDLK_i:
                 update_highlight();
                 if (HIGHLIGHT != NULL)
@@ -242,8 +228,9 @@ int main( int argc, char* args[] )
                 else
                     INFLUENCE_LIST_ENABLED = false;
                 break;
-            case SDLK_ESCAPE:
-                continueMainLoop = false; break;
+            case SDLK_1:
+                //toggle_influencer
+                break;
             }
         } else if (event.type == SDL_KEYUP) {
             switch(event.key.keysym.sym) {
