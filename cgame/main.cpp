@@ -12,6 +12,7 @@ const float HIGHLIGHT_MIN_DIST = 5.0;
 
 int MOUSE_X = 0;
 int MOUSE_Y = 0;
+bool INFLUENCE_LIST_ENABLED = false;
 
 SDL_Surface* SCREEN = NULL;
 circa::Term* POINT_FUNC = NULL;
@@ -95,6 +96,9 @@ void line_to(circa::Term* caller)
 
 void update_highlight()
 {
+    if (INFLUENCE_LIST_ENABLED)
+        return;
+
     float closestDist = 0;
     HIGHLIGHT = NULL;
 
@@ -126,6 +130,36 @@ void draw_highlight()
     float y = as_float(HIGHLIGHT->input(1));
 
     circleColor(SCREEN, x, y, HIGHLIGHT_MIN_DIST, 0);
+}
+
+void draw_influencers()
+{
+    if (INFLUENCE_LIST_ENABLED && (HIGHLIGHT != NULL)) {
+        if (HIGHLIGHT != NULL) {
+
+            circa::RefList influencers = circa::get_influencing_values(HIGHLIGHT);
+
+            for (int i=0; i < influencers.count(); i++) {
+                if (influencers[i]->name == "")
+                    influencers[i] = NULL;
+            }
+
+            influencers.removeNulls();
+
+            circa::sort_by_name(influencers);
+
+            // background rect
+            int rect_width = 8 * 20;
+            int rect_height = 9 * influencers.count();
+            int rect_top = SCREEN_HEIGHT - rect_height;
+            boxColor(SCREEN, 0, rect_top, rect_width, SCREEN_HEIGHT, 0xfffffd);
+
+            for (int i=0; i < influencers.count(); i++) {
+                int y = rect_top + i*9;
+                stringColor(SCREEN, 0, y, influencers[i]->name.c_str(), 0xff);
+            }
+        }
+    }
 }
 
 int main( int argc, char* args[] )
@@ -201,27 +235,12 @@ int main( int argc, char* args[] )
             case SDLK_RIGHT:
                 SCRIPT_MAIN["right_pressed"]->asBool() = true; break;
             case SDLK_SPACE:
-                SCRIPT_MAIN["space_pressed"]->asBool() = true;
-
-                if (HIGHLIGHT != NULL) {
-
-                    circa::RefList influencers = circa::get_influencing_values(HIGHLIGHT);
-
-                    for (int i=0; i < influencers.count(); i++) {
-                        if (influencers[i]->name == "")
-                            influencers[i] = NULL;
-                    }
-
-                    influencers.removeNulls();
-
-                    circa::sort_by_name(influencers);
-
-                    std::cout << "influencers:" << std::endl;
-                    for (int i=0; i < influencers.count(); i++) {
-                        std::cout << "  " << influencers[i]->name << std::endl;
-                    }
-                }
-
+                SCRIPT_MAIN["space_pressed"]->asBool() = true; break;
+            case SDLK_i:
+                INFLUENCE_LIST_ENABLED = false;
+                update_highlight();
+                if (HIGHLIGHT != NULL)
+                    INFLUENCE_LIST_ENABLED = true;
                 break;
             case SDLK_ESCAPE:
                 continueMainLoop = false; break;
@@ -245,6 +264,7 @@ int main( int argc, char* args[] )
             SCRIPT_MAIN.eval();
 
             draw_highlight();
+            draw_influencers();
 
         } catch (std::exception &e) {
             std::cout << e.what() << std::endl;
@@ -263,4 +283,3 @@ int main( int argc, char* args[] )
 
     return 0;
 }
-
