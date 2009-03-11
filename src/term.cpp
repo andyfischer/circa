@@ -85,6 +85,40 @@ void Term::removeProperty(std::string const& name)
     properties.remove(name);
 }
 
+bool& Term::boolProperty(std::string const& name)
+{
+    Term* t = addProperty(name, BOOL_TYPE);
+    return as_bool(t);
+}
+int& Term::intProperty(std::string const& name)
+{
+    Term* t = addProperty(name, INT_TYPE);
+    return as_int(t);
+}
+float& Term::floatProperty(std::string const& name)
+{
+    Term* t = addProperty(name, FLOAT_TYPE);
+    return as_float(t);
+}
+
+bool Term::boolPropertyOptional(std::string const& name, bool defaultValue)
+{
+    if (hasProperty(name)) return boolProperty(name);
+    else return defaultValue;
+}
+
+float Term::floatPropertyOptional(std::string const& name, float defaultValue)
+{
+    if (hasProperty(name)) return floatProperty(name);
+    else return defaultValue;
+}
+
+int Term::intPropertyOptional(std::string const& name, int defaultValue)
+{
+    if (hasProperty(name)) return intProperty(name);
+    else return defaultValue;
+}
+
 bool Term::hasError() const
 {
     return hasProperty("error");
