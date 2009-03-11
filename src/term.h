@@ -80,7 +80,15 @@ struct Term
     Term* addProperty(std::string const& name, Term* type);
     void removeProperty(std::string const& name);
 
-    // Property accessors
+    bool& boolProperty(std::string const& name);
+    int& intProperty(std::string const& name);
+    float& floatProperty(std::string const& name);
+
+    bool boolPropertyOptional(std::string const& name, bool defaultValue);
+    float floatPropertyOptional(std::string const& name, float defaultValue);
+    int intPropertyOptional(std::string const& name, int defaultValue);
+
+    // Accessors for specific properties
 
     bool hasError() const;
     void clearError();
