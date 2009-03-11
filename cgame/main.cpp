@@ -18,13 +18,22 @@ int MOUSE_Y = 0;
 bool INFLUENCE_LIST_ENABLED = false;
 
 SDL_Surface* SCREEN = NULL;
-circa::Term* POINT_FUNC = NULL;
-circa::Term* HIGHLIGHT = NULL;
+circa::Ref POINT_FUNC = NULL;
+circa::Ref HIGHLIGHT = NULL;
 circa::Branch SCRIPT_MAIN;
 bool CONTINUE_MAIN_LOOP = true;
 
 circa::RefList INFLUENCE_LIST;
 circa::RefList TERMS_SELECTED_FOR_TRAINING;
+
+bool drag_in_progress = false;
+circa::Ref drag_target;
+
+int previous_mouse_x = 0;
+int previous_mouse_y = 0;
+
+int mouse_movement_x = 0;
+int mouse_movement_y = 0;
 
 void initialize_keydown()
 {
@@ -217,7 +226,6 @@ int main( int argc, char* args[] )
     (*circa::KERNEL)["KEY_SPACE"]->boolProperty("dont_train") = true;
     (*circa::KERNEL)["PI"]->boolProperty("dont_train") = true;
 
-
     circa::import_function(*circa::KERNEL, line_to,
             "line_to(float,float,float,float,int)");
     circa::import_function(*circa::KERNEL, rectangle,
@@ -250,7 +258,7 @@ int main( int argc, char* args[] )
         return 1;
 
     // Set the window caption
-    SDL_WM_SetCaption( "CGame", NULL );
+    SDL_WM_SetCaption( "Circa Game Editor", NULL );
 
     // Main loop
     while (CONTINUE_MAIN_LOOP) {
@@ -267,9 +275,15 @@ int main( int argc, char* args[] )
             SCRIPT_MAIN["mouse_y"]->asFloat() = event.motion.y;
             MOUSE_X = event.motion.x;
             MOUSE_Y = event.motion.y;
+            mouse_movement_x = event.motion.x;
+            mouse_movement_y = event.motion.y;
 
             if (!INFLUENCE_LIST_ENABLED)
                 update_highlight();
+
+            if (drag_in_progress) {
+
+            }
 
         } else if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_ALT)) {
             // Alt key
@@ -294,6 +308,14 @@ int main( int argc, char* args[] )
 
         } else if (event.type == SDL_KEYUP) {
             KEY_DOWN[event.key.keysym.sym] = false;
+        } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            if (HIGHLIGHT != NULL) {
+                drag_in_progress = true;
+                drag_target = HIGHLIGHT;
+            }
+        } else if (event.type == SDL_MOUSEBUTTONUP) {
+            drag_in_progress = false;
+            drag_target = NULL;
         }
 
         try {
