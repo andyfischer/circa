@@ -11,7 +11,7 @@ const int SCREEN_BPP = 32;
 const float HIGHLIGHT_MIN_DIST = 5.0;
 
 bool KEY_DOWN[SDLK_LAST];
-bool RECENTLY_PRESSED_KEY[SDLK_LAST];
+std::set<int> KEY_JUST_PRESSED;
 
 int MOUSE_X = 0;
 int MOUSE_Y = 0;
@@ -26,7 +26,6 @@ void initialize_keydown()
 {
     for (int i=0; i < SDLK_LAST; i++) {
         KEY_DOWN[i] = false;
-        RECENTLY_PRESSED_KEY[i] = false;
     }
 }
 
@@ -39,7 +38,7 @@ void key_down(circa::Term* caller)
 void key_pressed(circa::Term* caller)
 {
     int i = caller->input(0)->asInt();
-    caller->asBool() = RECENTLY_PRESSED_KEY[i];
+    caller->asBool() = KEY_JUST_PRESSED.find(i) != KEY_JUST_PRESSED.end();
 }
 
 void rectangle(circa::Term* caller)
@@ -143,6 +142,13 @@ int main( int argc, char* args[] )
 
     circa::initialize();
 
+    circa::import_function(*circa::KERNEL, key_down, "key_down(int) -> bool");
+    circa::import_function(*circa::KERNEL, key_pressed, "key_pressed(int) -> bool");
+    circa::int_value(*circa::KERNEL, SDLK_UP, "KEY_UP");
+    circa::int_value(*circa::KERNEL, SDLK_DOWN, "KEY_DOWN");
+    circa::int_value(*circa::KERNEL, SDLK_LEFT, "KEY_LEFT");
+    circa::int_value(*circa::KERNEL, SDLK_RIGHT, "KEY_RIGHT");
+    circa::int_value(*circa::KERNEL, SDLK_SPACE, "KEY_SPACE");
     circa::import_function(*circa::KERNEL, line_to,
             "line_to(float,float,float,float,int)");
     circa::import_function(*circa::KERNEL, rectangle,
@@ -180,6 +186,8 @@ int main( int argc, char* args[] )
     // Main loop
     bool continueMainLoop = true;
     while (continueMainLoop) {
+        KEY_JUST_PRESSED.clear();
+
         SDL_Event event;
         SDL_PollEvent(&event);
 
@@ -208,17 +216,13 @@ int main( int argc, char* args[] )
                 break;
             }
         } else if (event.type == SDL_KEYDOWN) {
+
+            if (!KEY_DOWN[event.key.keysym.sym])
+                KEY_JUST_PRESSED.insert(event.key.keysym.sym);
+
+            KEY_DOWN[event.key.keysym.sym] = true;
+
             switch (event.key.keysym.sym) {
-            case SDLK_UP:
-                SCRIPT_MAIN["up_pressed"]->asBool() = true; break;
-            case SDLK_DOWN:
-                SCRIPT_MAIN["down_pressed"]->asBool() = true; break;
-            case SDLK_LEFT:
-                SCRIPT_MAIN["left_pressed"]->asBool() = true; break;
-            case SDLK_RIGHT:
-                SCRIPT_MAIN["right_pressed"]->asBool() = true; break;
-            case SDLK_SPACE:
-                SCRIPT_MAIN["space_pressed"]->asBool() = true; break;
             case SDLK_ESCAPE:
                 continueMainLoop = false; break;
             case SDLK_i:
@@ -233,18 +237,7 @@ int main( int argc, char* args[] )
                 break;
             }
         } else if (event.type == SDL_KEYUP) {
-            switch(event.key.keysym.sym) {
-            case SDLK_UP:
-                SCRIPT_MAIN["up_pressed"]->asBool() = false; break;
-            case SDLK_DOWN:
-                SCRIPT_MAIN["down_pressed"]->asBool() = false; break;
-            case SDLK_LEFT:
-                SCRIPT_MAIN["left_pressed"]->asBool() = false; break;
-            case SDLK_RIGHT:
-                SCRIPT_MAIN["right_pressed"]->asBool() = false; break;
-            case SDLK_SPACE:
-                SCRIPT_MAIN["space_pressed"]->asBool() = false; break;
-            }
+            KEY_DOWN[event.key.keysym.sym] = false;
         }
 
         try {

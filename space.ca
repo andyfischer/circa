@@ -5,11 +5,6 @@ fill_rectangle(0,0,640,480, 0xfffffffe)
 -- mouse & key states are passed in from cgame
 state float mouse_x
 state float mouse_y
-state bool up_pressed
-state bool down_pressed
-state bool left_pressed
-state bool right_pressed
-state bool space_pressed
 
 ship_size = 20.0
 back_dist = 4.0
@@ -25,11 +20,11 @@ state float ship_facing = PI*2
 state float ship_speed = 0.0
 
 -- accelerate if up is pressed, decellerate if not
-if up_pressed
+if key_down(KEY_UP)
     ship_speed += 0.5
 end
 
-if not(up_pressed)
+if not(key_down(KEY_UP))
     ship_speed -= 0.1
 end
 
@@ -41,11 +36,11 @@ ship_x += ship_speed * cos(ship_facing)
 ship_y += ship_speed * sin(ship_facing)
 
 -- turn ship
-if left_pressed
+if key_down(KEY_LEFT)
     ship_facing -= turn_speed * PI
 end
 
-if right_pressed
+if key_down(KEY_RIGHT)
     ship_facing += turn_speed * PI
 end
 
@@ -83,7 +78,7 @@ bullet_size = 3.0
 bullet_x += bullet_speed * cos(bullet_facing)
 bullet_y += bullet_speed * sin(bullet_facing)
 
-if space_pressed
+if key_pressed(KEY_SPACE)
     -- shoot a new bullet
     bullet_active = true
     bullet_facing = ship_facing
