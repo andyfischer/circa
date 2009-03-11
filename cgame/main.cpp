@@ -21,6 +21,10 @@ SDL_Surface* SCREEN = NULL;
 circa::Term* POINT_FUNC = NULL;
 circa::Term* HIGHLIGHT = NULL;
 circa::Branch SCRIPT_MAIN;
+bool CONTINUE_MAIN_LOOP = true;
+
+circa::RefList INFLUENCE_LIST;
+circa::RefList TERMS_SELECTED_FOR_TRAINING;
 
 void initialize_keydown()
 {
@@ -95,6 +99,54 @@ void update_highlight()
     }
 }
 
+void update_influence_list()
+{
+    INFLUENCE_LIST = circa::get_influencing_values(HIGHLIGHT);
+
+    for (int i=0; i < INFLUENCE_LIST.count(); i++) {
+
+        circa::Term* term = INFLUENCE_LIST[i];
+
+        if (term->name == "")
+            INFLUENCE_LIST[i] = NULL;
+
+        if (term->boolPropertyOptional("dont_train", false))
+            INFLUENCE_LIST[i] = NULL;
+    }
+
+    INFLUENCE_LIST.removeNulls();
+
+    circa::sort_by_name(INFLUENCE_LIST);
+}
+
+void draw_influence_list()
+{
+    if (!INFLUENCE_LIST_ENABLED) return;
+    if (HIGHLIGHT == NULL) return;
+
+    // background rect
+    int rect_width = 8 * 30;
+    int item_height = 9;
+    int rect_height = item_height * INFLUENCE_LIST.count();
+    int rect_top = SCREEN_HEIGHT - rect_height;
+    boxColor(SCREEN, 0, rect_top, rect_width, SCREEN_HEIGHT, 0xbbbbffff);
+
+    for (int i=0; i < INFLUENCE_LIST.count(); i++) {
+        circa::Term* term = INFLUENCE_LIST[i];
+        int y = rect_top + i*item_height;
+
+        // draw a box if this term is selected for training
+        if (TERMS_SELECTED_FOR_TRAINING.contains(term)) {
+            boxColor(SCREEN, 0, y, rect_width, y + 9, 0xffffaaff);
+        }
+
+        std::string text = term->name + " = " + term->toString();
+
+        stringColor(SCREEN, 0, y, text.c_str(), 0xff);
+
+    }
+}
+
 void draw_highlight()
 {
     if (HIGHLIGHT == NULL)
@@ -106,33 +158,41 @@ void draw_highlight()
     circleColor(SCREEN, x, y, HIGHLIGHT_MIN_DIST, 0);
 }
 
-void draw_influencers()
+void toggle_influencer(int index)
 {
-    if (INFLUENCE_LIST_ENABLED && (HIGHLIGHT != NULL)) {
-        if (HIGHLIGHT != NULL) {
+    if (index >= INFLUENCE_LIST.count()) return;
+    circa::Term* term = INFLUENCE_LIST[index];
+    if (TERMS_SELECTED_FOR_TRAINING.contains(term))
+        TERMS_SELECTED_FOR_TRAINING.remove(term);
+    else
+        TERMS_SELECTED_FOR_TRAINING.appendUnique(term);
+}
 
-            circa::RefList influencers = circa::get_influencing_values(HIGHLIGHT);
+void handle_key_press(int key)
+{
+    switch (key) {
 
-            for (int i=0; i < influencers.count(); i++) {
-                if (influencers[i]->name == "")
-                    influencers[i] = NULL;
-            }
+    case SDLK_ESCAPE: CONTINUE_MAIN_LOOP = false; break;
 
-            influencers.removeNulls();
+    case SDLK_i:
+        update_highlight();
+        if (HIGHLIGHT != NULL)
+            INFLUENCE_LIST_ENABLED = true;
+        else
+            INFLUENCE_LIST_ENABLED = false;
+        update_influence_list();
+        break;
 
-            circa::sort_by_name(influencers);
-
-            // background rect
-            int rect_width = 8 * 20;
-            int rect_height = 9 * influencers.count();
-            int rect_top = SCREEN_HEIGHT - rect_height;
-            boxColor(SCREEN, 0, rect_top, rect_width, SCREEN_HEIGHT, 0xfffffd);
-
-            for (int i=0; i < influencers.count(); i++) {
-                int y = rect_top + i*9;
-                stringColor(SCREEN, 0, y, influencers[i]->name.c_str(), 0xff);
-            }
-        }
+    case SDLK_1: toggle_influencer(0); break;
+    case SDLK_2: toggle_influencer(1); break;
+    case SDLK_3: toggle_influencer(2); break;
+    case SDLK_4: toggle_influencer(3); break;
+    case SDLK_5: toggle_influencer(4); break;
+    case SDLK_6: toggle_influencer(5); break;
+    case SDLK_7: toggle_influencer(6); break;
+    case SDLK_8: toggle_influencer(7); break;
+    case SDLK_9: toggle_influencer(8); break;
+    case SDLK_0: toggle_influencer(9); break;
     }
 }
 
@@ -149,6 +209,15 @@ int main( int argc, char* args[] )
     circa::int_value(*circa::KERNEL, SDLK_LEFT, "KEY_LEFT");
     circa::int_value(*circa::KERNEL, SDLK_RIGHT, "KEY_RIGHT");
     circa::int_value(*circa::KERNEL, SDLK_SPACE, "KEY_SPACE");
+
+    (*circa::KERNEL)["KEY_UP"]->boolProperty("dont_train") = true;
+    (*circa::KERNEL)["KEY_DOWN"]->boolProperty("dont_train") = true;
+    (*circa::KERNEL)["KEY_LEFT"]->boolProperty("dont_train") = true;
+    (*circa::KERNEL)["KEY_RIGHT"]->boolProperty("dont_train") = true;
+    (*circa::KERNEL)["KEY_SPACE"]->boolProperty("dont_train") = true;
+    (*circa::KERNEL)["PI"]->boolProperty("dont_train") = true;
+
+
     circa::import_function(*circa::KERNEL, line_to,
             "line_to(float,float,float,float,int)");
     circa::import_function(*circa::KERNEL, rectangle,
@@ -184,15 +253,14 @@ int main( int argc, char* args[] )
     SDL_WM_SetCaption( "CGame", NULL );
 
     // Main loop
-    bool continueMainLoop = true;
-    while (continueMainLoop) {
+    while (CONTINUE_MAIN_LOOP) {
         KEY_JUST_PRESSED.clear();
 
         SDL_Event event;
         SDL_PollEvent(&event);
 
         if (event.type == SDL_QUIT)
-            continueMainLoop = false;
+            CONTINUE_MAIN_LOOP = false;
 
         if (event.type == SDL_MOUSEMOTION) {
             SCRIPT_MAIN["mouse_x"]->asFloat() = event.motion.x;
@@ -217,25 +285,13 @@ int main( int argc, char* args[] )
             }
         } else if (event.type == SDL_KEYDOWN) {
 
-            if (!KEY_DOWN[event.key.keysym.sym])
+            if (!KEY_DOWN[event.key.keysym.sym]) {
                 KEY_JUST_PRESSED.insert(event.key.keysym.sym);
+                handle_key_press(event.key.keysym.sym);
+            }
 
             KEY_DOWN[event.key.keysym.sym] = true;
 
-            switch (event.key.keysym.sym) {
-            case SDLK_ESCAPE:
-                continueMainLoop = false; break;
-            case SDLK_i:
-                update_highlight();
-                if (HIGHLIGHT != NULL)
-                    INFLUENCE_LIST_ENABLED = true;
-                else
-                    INFLUENCE_LIST_ENABLED = false;
-                break;
-            case SDLK_1:
-                //toggle_influencer
-                break;
-            }
         } else if (event.type == SDL_KEYUP) {
             KEY_DOWN[event.key.keysym.sym] = false;
         }
@@ -244,7 +300,7 @@ int main( int argc, char* args[] )
             SCRIPT_MAIN.eval();
 
             draw_highlight();
-            draw_influencers();
+            draw_influence_list();
 
         } catch (std::exception &e) {
             std::cout << e.what() << std::endl;
