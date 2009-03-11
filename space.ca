@@ -2,7 +2,7 @@
 -- paint background
 fill_rectangle(0,0,640,480, 0xfffffffe)
 
--- mouse & key states are passed in from cgame
+-- mouse positions are passed in from cgame
 state float mouse_x
 state float mouse_y
 
