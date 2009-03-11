@@ -16,8 +16,8 @@ bool INFLUENCE_LIST_ENABLED = false;
 
 SDL_Surface* SCREEN = NULL;
 circa::Term* POINT_FUNC = NULL;
-circa::Branch SCRIPT_MAIN;
 circa::Term* HIGHLIGHT = NULL;
+circa::Branch SCRIPT_MAIN;
 
 void load_image(circa::Term* caller)
 {
@@ -96,9 +96,6 @@ void line_to(circa::Term* caller)
 
 void update_highlight()
 {
-    if (INFLUENCE_LIST_ENABLED)
-        return;
-
     float closestDist = 0;
     HIGHLIGHT = NULL;
 
@@ -214,7 +211,9 @@ int main( int argc, char* args[] )
             SCRIPT_MAIN["mouse_y"]->asFloat() = event.motion.y;
             MOUSE_X = event.motion.x;
             MOUSE_Y = event.motion.y;
-            update_highlight();
+
+            if (!INFLUENCE_LIST_ENABLED)
+                update_highlight();
 
         } else if (event.type == SDL_KEYDOWN) {
             switch(event.key.keysym.sym) {
@@ -237,10 +236,11 @@ int main( int argc, char* args[] )
             case SDLK_SPACE:
                 SCRIPT_MAIN["space_pressed"]->asBool() = true; break;
             case SDLK_i:
-                INFLUENCE_LIST_ENABLED = false;
                 update_highlight();
                 if (HIGHLIGHT != NULL)
                     INFLUENCE_LIST_ENABLED = true;
+                else
+                    INFLUENCE_LIST_ENABLED = false;
                 break;
             case SDLK_ESCAPE:
                 continueMainLoop = false; break;
