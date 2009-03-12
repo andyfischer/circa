@@ -24,7 +24,6 @@ circa::Branch SCRIPT_MAIN;
 bool CONTINUE_MAIN_LOOP = true;
 
 circa::RefList INFLUENCE_LIST;
-circa::RefList TERMS_SELECTED_FOR_TRAINING;
 
 bool drag_in_progress = false;
 circa::Ref drag_target;
@@ -150,7 +149,7 @@ void draw_influence_list()
         int y = rect_top + i*item_height;
 
         // draw a box if this term is selected for training
-        if (TERMS_SELECTED_FOR_TRAINING.contains(term)) {
+        if (term->boolPropertyOptional("trainable", false)) {
             boxColor(SCREEN, 0, y, rect_width, y + 9, 0xffffaaff);
         }
 
@@ -176,10 +175,8 @@ void toggle_influencer(int index)
 {
     if (index >= INFLUENCE_LIST.count()) return;
     circa::Term* term = INFLUENCE_LIST[index];
-    if (TERMS_SELECTED_FOR_TRAINING.contains(term))
-        TERMS_SELECTED_FOR_TRAINING.remove(term);
-    else
-        TERMS_SELECTED_FOR_TRAINING.appendUnique(term);
+
+    term->boolProperty("trainable") = !term->boolPropertyOptional("trainable", false);
 }
 
 void handle_key_press(int key)
@@ -297,8 +294,8 @@ int main( int argc, char* args[] )
                 circa::Term* targetX = circa::float_value(tempBranch, targetX_value);
                 circa::Term* targetY = circa::float_value(tempBranch, targetY_value);
 
-                circa::generate_training(tempBranch, subjectX, targetX, TERMS_SELECTED_FOR_TRAINING);
-                circa::generate_training(tempBranch, subjectY, targetY, TERMS_SELECTED_FOR_TRAINING);
+                circa::generate_training(tempBranch, subjectX, targetX);
+                circa::generate_training(tempBranch, subjectY, targetY);
             }
 
         } else if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_ALT)) {
