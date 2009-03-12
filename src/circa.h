@@ -20,6 +20,7 @@
 #include "testing.h"
 #include "tokenizer.h"
 #include "token_stream.h"
+#include "training.h"
 #include "type.h"
 #include "utils.h"
 #include "values.h"
