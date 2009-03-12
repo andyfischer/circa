@@ -12,6 +12,7 @@ Function::Function()
     variableArgs(false),
     evaluate(NULL),
     startControlFlowIterator(NULL),
+    generateTraining(NULL),
     feedbackAccumulationFunction(NULL),
     feedbackPropogateFunction(NULL),
     generateCppFunction(NULL),

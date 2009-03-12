@@ -59,11 +59,42 @@ namespace add_function {
         evaluate_branch(myBranch);
     }
 
+    void generate_training(Branch& branch, Term* subject, Term* target, RefList& trainableList)
+    {
+        // find the # of trainable inputs
+        int numTrainableInputs = 0;
+
+        for (int i=0; i < subject->numInputs(); i++) {
+            if (trainableList.contains(subject->input(i)))
+                numTrainableInputs++;
+        }
+
+        // if there are no trainable inputs, nothing to do
+        // (perhaps we could spit out a warning or something)
+        if (numTrainableInputs == 0)
+            return;
+
+        // if there is one trainable input, just pass this target directly on
+        if (numTrainableInputs == 1) {
+            Term* trainableInput = NULL;
+            for (int i=0; i < subject->numInputs(); i++) {
+                if (trainableList.contains(subject->input(i))) {
+                    trainableInput = subject->input(i);
+                    break;
+                }
+            }
+
+            // todo..
+
+        }
+    }
+
     void setup(Branch& kernel)
     {
         Term* main_func = import_function(kernel, evaluate,
                 "function add(float,float) -> float");
         as_function(main_func).pureFunction = true;
+        as_function(main_func).generateTraining = generate_training;
 
         Term* fp_func = import_function(kernel, feedback_propogate,
                 "function add-feedback-propogate(any,any)");

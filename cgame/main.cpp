@@ -110,6 +110,11 @@ void update_highlight()
 
 void update_influence_list()
 {
+    if (HIGHLIGHT == NULL) {
+        INFLUENCE_LIST.clear();
+        return;
+    }
+
     INFLUENCE_LIST = circa::get_influencing_values(HIGHLIGHT);
 
     for (int i=0; i < INFLUENCE_LIST.count(); i++) {
@@ -282,7 +287,18 @@ int main( int argc, char* args[] )
                 update_highlight();
 
             if (drag_in_progress) {
+                circa::Term* subjectX = drag_target->input(0);
+                circa::Term* subjectY = drag_target->input(1);
 
+                float targetX_value = circa::as_float(subjectX) + mouse_movement_x;
+                float targetY_value = circa::as_float(subjectY) + mouse_movement_y;
+
+                circa::Branch tempBranch;
+                circa::Term* targetX = circa::float_value(tempBranch, targetX_value);
+                circa::Term* targetY = circa::float_value(tempBranch, targetY_value);
+
+                circa::generate_training(tempBranch, subjectX, targetX, TERMS_SELECTED_FOR_TRAINING);
+                circa::generate_training(tempBranch, subjectY, targetY, TERMS_SELECTED_FOR_TRAINING);
             }
 
         } else if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_ALT)) {
