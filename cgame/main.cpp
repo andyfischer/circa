@@ -287,15 +287,14 @@ int main( int argc, char* args[] )
                 circa::Term* subjectX = drag_target->input(0);
                 circa::Term* subjectY = drag_target->input(1);
 
-                float targetX_value = circa::as_float(subjectX) + mouse_movement_x;
-                float targetY_value = circa::as_float(subjectY) + mouse_movement_y;
-
                 circa::Branch tempBranch;
-                circa::Term* targetX = circa::float_value(tempBranch, targetX_value);
-                circa::Term* targetY = circa::float_value(tempBranch, targetY_value);
 
-                circa::generate_training(tempBranch, subjectX, targetX);
-                circa::generate_training(tempBranch, subjectY, targetY);
+                circa::generate_training(tempBranch, subjectX,
+                        circa::float_value(tempBranch, mouse_movement_x));
+                circa::generate_training(tempBranch, subjectY,
+                        circa::float_value(tempBranch, mouse_movement_y));
+                
+                // todo..
             }
 
         } else if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_ALT)) {

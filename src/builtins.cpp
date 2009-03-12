@@ -50,6 +50,11 @@ Term* STATEFUL_VALUE_FUNC = NULL;
 void empty_evaluate_function(Term*) { }
 void empty_alloc_function(Term*) { }
 
+void value_function_generate_training(Branch& branch, Term* subject, Term* delta)
+{
+
+}
+
 void value_function_generator(Term* caller)
 {
     assert(caller->input(0) != NULL);

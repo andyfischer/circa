@@ -59,7 +59,7 @@ namespace add_function {
         evaluate_branch(myBranch);
     }
 
-    void generate_training(Branch& branch, Term* subject, Term* target)
+    void generateTraining(Branch& branch, Term* subject, Term* delta)
     {
         // find the # of trainable inputs
         int numTrainableInputs = 0;
@@ -74,7 +74,7 @@ namespace add_function {
         if (numTrainableInputs == 0)
             return;
 
-        // if there is one trainable input, just pass this target directly on
+        // if there is one trainable input, just pass this delta directly on
         if (numTrainableInputs == 1) {
             Term* trainableInput = NULL;
             for (int i=0; i < subject->numInputs(); i++) {
@@ -84,9 +84,11 @@ namespace add_function {
                 }
             }
 
-            // todo..
-
+            generate_training(branch, trainableInput, delta);
+            return;
         }
+
+        std::cout << "todo" << std::endl;
     }
 
     void setup(Branch& kernel)
@@ -94,7 +96,7 @@ namespace add_function {
         Term* main_func = import_function(kernel, evaluate,
                 "function add(float,float) -> float");
         as_function(main_func).pureFunction = true;
-        as_function(main_func).generateTraining = generate_training;
+        as_function(main_func).generateTraining = generateTraining;
 
         Term* fp_func = import_function(kernel, feedback_propogate,
                 "function add-feedback-propogate(any,any)");
