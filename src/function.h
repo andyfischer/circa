@@ -18,7 +18,7 @@ struct Function
 {
     typedef void (*EvaluateFunc)(Term* caller);
     typedef ReferenceIterator* (*ReferenceIteratorFunc)(Term* caller);
-    typedef void (*GenerateTrainingFunc)(Branch& branch, Term* subject, Term* goal);
+    typedef void (*GenerateTrainingFunc)(Branch& branch, Term* subject, Term* delta);
 
     struct InputProperties {
         std::string name;
