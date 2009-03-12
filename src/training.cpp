@@ -6,13 +6,13 @@
 
 namespace circa {
 
-void generate_training(Branch& branch, Term* subject, Term* goal, RefList& trainableTerms)
+void generate_training(Branch& branch, Term* subject, Term* goal)
 {
     Function& targetsFunction = as_function(subject->function);
 
     if (targetsFunction.generateTraining != NULL)
     {
-        targetsFunction.generateTraining(branch, subject, goal, trainableTerms);
+        targetsFunction.generateTraining(branch, subject, goal);
     } else {
         std::cout << "warn: function " << targetsFunction.name <<
             " doesn't have a generateTraining function" << std::endl;

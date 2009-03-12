@@ -59,13 +59,13 @@ namespace add_function {
         evaluate_branch(myBranch);
     }
 
-    void generate_training(Branch& branch, Term* subject, Term* target, RefList& trainableList)
+    void generate_training(Branch& branch, Term* subject, Term* target)
     {
         // find the # of trainable inputs
         int numTrainableInputs = 0;
 
         for (int i=0; i < subject->numInputs(); i++) {
-            if (trainableList.contains(subject->input(i)))
+            if (subject->input(i)->boolPropertyOptional("trainable", false))
                 numTrainableInputs++;
         }
 
@@ -78,7 +78,7 @@ namespace add_function {
         if (numTrainableInputs == 1) {
             Term* trainableInput = NULL;
             for (int i=0; i < subject->numInputs(); i++) {
-                if (trainableList.contains(subject->input(i))) {
+                if (subject->input(i)->boolPropertyOptional("trainable", false)) {
                     trainableInput = subject->input(i);
                     break;
                 }
