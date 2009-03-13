@@ -39,6 +39,7 @@ Term* UNKNOWN_FUNCTION = NULL;
 Term* UNKNOWN_IDENTIFIER_FUNC = NULL;
 Term* APPLY_FEEDBACK = NULL;
 Term* ADD_FUNC = NULL;
+Term* SUB_FUNC = NULL;
 Term* MULT_FUNC = NULL;
 Term* ALIAS_FUNC = NULL;
 Term* COMMENT_FUNC = NULL;
@@ -218,7 +219,6 @@ void initialize_builtin_functions(Branch* kernel)
 {
     setup_builtin_functions(*kernel);
 
-    ADD_FUNC = kernel->getNamed("add");
     MULT_FUNC = kernel->getNamed("mult");
     COPY_FUNC = kernel->getNamed("copy");
 

@@ -59,7 +59,7 @@ namespace add_function {
         evaluate_branch(myBranch);
     }
 
-    void generateTraining(Branch& branch, Term* subject, Term* delta)
+    void generateTraining(Branch& branch, Term* subject, Term* desired)
     {
         // find the # of trainable inputs
         int numTrainableInputs = 0;
@@ -73,6 +73,9 @@ namespace add_function {
         // (perhaps we could spit out a warning or something)
         if (numTrainableInputs == 0)
             return;
+
+        // delta is just current - desired
+        Term* delta = apply_function(&branch, SUB_FUNC, RefList(subject, desired));
 
         // if there is one trainable input, just pass this delta directly on
         if (numTrainableInputs == 1) {
@@ -93,15 +96,15 @@ namespace add_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
+        ADD_FUNC = import_function(kernel, evaluate,
                 "function add(float,float) -> float");
-        as_function(main_func).pureFunction = true;
-        as_function(main_func).generateTraining = generateTraining;
+        as_function(ADD_FUNC).pureFunction = true;
+        as_function(ADD_FUNC).generateTraining = generateTraining;
 
         Term* fp_func = import_function(kernel, feedback_propogate,
                 "function add-feedback-propogate(any,any)");
         as_function(fp_func).stateType = BRANCH_TYPE;
-        as_function(main_func).feedbackPropogateFunction = fp_func;
+        as_function(ADD_FUNC).feedbackPropogateFunction = fp_func;
     }
 }
 }
