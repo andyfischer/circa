@@ -8,7 +8,19 @@ namespace circa {
 
 bool is_trainable(Term* term)
 {
-    return term->boolPropertyOptional("trainable", false);
+    return term->boolPropertyOptional("trainable", false)
+        || term->boolPropertyOptional("derived-trainable", false);
+}
+
+void update_derived_trainables(Branch& branch)
+{
+    for (CodeIterator it(&branch); !it.finished(); it.advance()) {
+        // if any of our inputs are trainable then mark us as derived-trainable
+        for (int i=0; i < it->numInputs(); i++) {
+            if (is_trainable(it->input(i)))
+                it->boolProperty("derived-trainable") = true;
+        }
+    }
 }
 
 void generate_training(Branch& branch, Term* subject, Term* desired)

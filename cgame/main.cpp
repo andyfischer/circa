@@ -149,14 +149,12 @@ void draw_influence_list()
         int y = rect_top + i*item_height;
 
         // draw a box if this term is selected for training
-        if (is_trainable(term)) {
+        if (is_trainable(term))
             boxColor(SCREEN, 0, y, rect_width, y + 9, 0xffffaaff);
-        }
 
         std::string text = term->name + " = " + term->toString();
 
         stringColor(SCREEN, 0, y, text.c_str(), 0xff);
-
     }
 }
 
@@ -177,6 +175,7 @@ void toggle_influencer(int index)
     circa::Term* term = INFLUENCE_LIST[index];
 
     term->boolProperty("trainable") = !is_trainable(term);
+    update_derived_trainables(SCRIPT_MAIN);
 }
 
 void handle_key_press(int key)
@@ -227,14 +226,7 @@ void handle_dragging()
 
 void post_script_load(circa::Branch& script)
 {
-    // Mark all terms which aren't values as trainable. Not sure how this should be
-    // handled long-term.
-
-    for (circa::CodeIterator it(&script); !it.finished(); it.advance())
-    {
-        if (!is_value(*it) && !is_stateful(*it))
-            it->boolProperty("trainable") = true;
-    }
+    update_derived_trainables(script);
 }
 
 int main( int argc, char* args[] )

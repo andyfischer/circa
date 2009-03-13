@@ -83,7 +83,7 @@ namespace add_function {
         // pass delta to each trainable input
         for (int i=0; i < subject->numInputs(); i++) {
             Term* input = subject->input(i);
-            if (is_trainable(input))
+            if (is_trainable(input)) {
                 Term* inputDesired = apply_function(&branch, ADD_FUNC, RefList(input, delta));
                 generate_training(branch, input, inputDesired);
             }
