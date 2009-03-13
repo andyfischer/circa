@@ -207,6 +207,36 @@ void handle_key_press(int key)
     }
 }
 
+void handle_dragging()
+{
+    if (!drag_in_progress)
+        return;
+
+    circa::Term* subjectX = drag_target->input(0);
+    circa::Term* subjectY = drag_target->input(1);
+
+    circa::Branch tempBranch;
+
+    circa::Term* desiredX = circa::float_value(tempBranch, MOUSE_X);
+    circa::Term* desiredY = circa::float_value(tempBranch, MOUSE_Y);
+    circa::generate_training(tempBranch, subjectX, desiredX);
+    circa::generate_training(tempBranch, subjectY, desiredY);
+
+    evaluate_branch(tempBranch);
+}
+
+void post_script_load(circa::Branch& script)
+{
+    // Mark all terms which aren't values as trainable. Not sure how this should be
+    // handled long-term.
+
+    for (circa::CodeIterator it(&script); !it.finished(); it.advance())
+    {
+        if (!is_value(*it) && !is_stateful(*it))
+            it->boolProperty("trainable") = true;
+    }
+}
+
 int main( int argc, char* args[] )
 {
     initialize_keydown();
@@ -254,6 +284,7 @@ int main( int argc, char* args[] )
     std::cout << "loading file: " << filename << std::endl;
 
     circa::evaluate_file(SCRIPT_MAIN, filename);
+    post_script_load(SCRIPT_MAIN);
 
     // Initialize all SDL subsystems
     if( SDL_Init( SDL_INIT_EVERYTHING ) == -1)
@@ -283,19 +314,6 @@ int main( int argc, char* args[] )
             if (!INFLUENCE_LIST_ENABLED)
                 update_highlight();
 
-            if (drag_in_progress) {
-                circa::Term* subjectX = drag_target->input(0);
-                circa::Term* subjectY = drag_target->input(1);
-
-                circa::Branch tempBranch;
-
-                circa::generate_training(tempBranch, subjectX,
-                        circa::float_value(tempBranch, mouse_movement_x));
-                circa::generate_training(tempBranch, subjectY,
-                        circa::float_value(tempBranch, mouse_movement_y));
-                
-                // todo..
-            }
 
         } else if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_ALT)) {
             // Alt key
@@ -306,6 +324,7 @@ int main( int argc, char* args[] )
                 break;
             case SDLK_5:
                 circa::reload_branch_from_file(SCRIPT_MAIN);
+                post_script_load(SCRIPT_MAIN);
                 std::cout << "Script reloaded" << std::endl;
                 break;
             }
@@ -331,6 +350,8 @@ int main( int argc, char* args[] )
         }
 
         try {
+            handle_dragging();
+
             SCRIPT_MAIN.eval();
 
             draw_highlight();
