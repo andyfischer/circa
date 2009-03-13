@@ -149,7 +149,7 @@ void draw_influence_list()
         int y = rect_top + i*item_height;
 
         // draw a box if this term is selected for training
-        if (term->boolPropertyOptional("trainable", false)) {
+        if (is_trainable(term)) {
             boxColor(SCREEN, 0, y, rect_width, y + 9, 0xffffaaff);
         }
 
@@ -176,7 +176,7 @@ void toggle_influencer(int index)
     if (index >= INFLUENCE_LIST.count()) return;
     circa::Term* term = INFLUENCE_LIST[index];
 
-    term->boolProperty("trainable") = !term->boolPropertyOptional("trainable", false);
+    term->boolProperty("trainable") = !is_trainable(term);
 }
 
 void handle_key_press(int key)

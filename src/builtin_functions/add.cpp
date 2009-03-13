@@ -65,7 +65,7 @@ namespace add_function {
         int numTrainableInputs = 0;
 
         for (int i=0; i < subject->numInputs(); i++)
-            if (subject->input(i)->boolPropertyOptional("trainable", false))
+            if (is_trainable(subject->input(i)))
                 numTrainableInputs++;
 
         // if there are no trainable inputs, nothing to do
@@ -83,7 +83,7 @@ namespace add_function {
         // pass delta to each trainable input
         for (int i=0; i < subject->numInputs(); i++) {
             Term* input = subject->input(i);
-            if (input->boolPropertyOptional("trainable", false)) {
+            if (is_trainable(input))
                 Term* inputDesired = apply_function(&branch, ADD_FUNC, RefList(input, delta));
                 generate_training(branch, input, inputDesired);
             }
