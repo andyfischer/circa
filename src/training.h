@@ -7,6 +7,7 @@
 
 namespace circa {
 
+bool is_trainable(Term* term);
 void generate_training(Branch& branch, Term* subject, Term* desired);
 
 } // namespace circa

@@ -82,8 +82,8 @@ std::string term_to_raw_string(Term* term)
     if (term->type != VOID_TYPE)
         output << " -> " << typeName;
 
-    if (is_value(term))
-        output << " :: " << term->toString();
+    if (term->value != NULL)
+        output << " == " << term->toString();
 
     //if (term->hasError()) output << " *" << term->getErrorMessage() << "*";
 
@@ -118,7 +118,7 @@ void print_raw_branch(Branch& branch, std::ostream &output)
         for (int i=0; i < indent; i++)
             output << "  ";
 
-        print_raw_term(term, output);
+        output << term_to_raw_string(term) << std::endl;
 
         if (get_inner_branch(term) != NULL)
             indent++;

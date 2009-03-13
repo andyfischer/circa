@@ -64,13 +64,11 @@ namespace add_function {
         // find the # of trainable inputs
         int numTrainableInputs = 0;
 
-        for (int i=0; i < subject->numInputs(); i++) {
+        for (int i=0; i < subject->numInputs(); i++)
             if (subject->input(i)->boolPropertyOptional("trainable", false))
                 numTrainableInputs++;
-        }
 
         // if there are no trainable inputs, nothing to do
-        // (perhaps we could spit out a warning or something)
         if (numTrainableInputs == 0)
             return;
 

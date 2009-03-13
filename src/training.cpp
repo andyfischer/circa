@@ -6,6 +6,11 @@
 
 namespace circa {
 
+bool is_trainable(Term* term)
+{
+    return term->boolPropertyOptional("trainable", false);
+}
+
 void generate_training(Branch& branch, Term* subject, Term* desired)
 {
     Function& targetsFunction = as_function(subject->function);
