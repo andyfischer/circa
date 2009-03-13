@@ -218,6 +218,7 @@ void handle_dragging()
 
     circa::Term* desiredX = circa::float_value(tempBranch, MOUSE_X);
     circa::Term* desiredY = circa::float_value(tempBranch, MOUSE_Y);
+
     circa::generate_training(tempBranch, subjectX, desiredX);
     circa::generate_training(tempBranch, subjectY, desiredY);
 
