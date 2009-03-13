@@ -379,4 +379,20 @@ void reload_branch_from_file(Branch& branch)
     migrate_branch(replacement, branch);
 }
 
+void persist_results_for_stateful_terms(Branch& branch)
+{
+    for (int i=0; i < branch.numTerms(); i++) {
+        if (is_stateful(branch[i])) {
+            Term* term = branch[i];
+
+            if (term->name == "")
+                continue;
+
+            Term* result = branch[term->name];
+
+            copy_value(result, term);
+        }
+    }
+}
+
 } // namespace circa
