@@ -4,6 +4,7 @@
 #define CIRCA_COMMON_HEADERS_INCLUDED
 
 #include <cassert>
+#include <cmath>
 #include <cstdio>
 #include <exception>
 #include <fstream>

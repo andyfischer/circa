@@ -168,7 +168,7 @@ void draw_highlight()
     float x = as_float(HIGHLIGHT->input(0));
     float y = as_float(HIGHLIGHT->input(1));
 
-    circleColor(SCREEN, x, y, HIGHLIGHT_MIN_DIST, 0);
+    circleColor(SCREEN, (int) x, (int) y, (int) HIGHLIGHT_MIN_DIST, 0);
 }
 
 void toggle_influencer(int index)
