@@ -12,9 +12,8 @@ namespace sub_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
-                "function sub(float,float) -> float");
-        as_function(main_func).pureFunction = true;
+        SUB_FUNC = import_function(kernel, evaluate, "function sub(float,float) -> float");
+        as_function(SUB_FUNC).pureFunction = true;
     }
 }
 } // namespace circa

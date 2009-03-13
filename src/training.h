@@ -7,7 +7,7 @@
 
 namespace circa {
 
-void generate_training(Branch& branch, Term* subject, Term* delta);
+void generate_training(Branch& branch, Term* subject, Term* desired);
 
 } // namespace circa
 
