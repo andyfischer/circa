@@ -19,6 +19,30 @@ state float ship_y = 200.0
 state float ship_facing = PI*2
 state float ship_speed = 0.0
 
+-- Draw the ship
+a_x = ship_x + ship_size * cos(ship_facing)
+a_y = ship_y + ship_size * sin(ship_facing)
+
+b_x = ship_x + ship_size * cos(ship_facing + back_angle)
+b_y = ship_y + ship_size * sin(ship_facing + back_angle)
+
+c_x = ship_x - back_dist * cos(ship_facing)
+c_y = ship_y - back_dist * sin(ship_facing)
+
+d_x = ship_x + ship_size * cos(ship_facing - back_angle)
+d_y = ship_y + ship_size * sin(ship_facing - back_angle)
+
+point(a_x, a_y)
+point(b_x, b_y)
+point(c_x, c_y)
+point(d_x, d_y)
+
+line_to(a_x, a_y, b_x, b_y, 0)
+line_to(b_x, b_y, c_x, c_y, 0)
+line_to(c_x, c_y, d_x, d_y, 0)
+line_to(d_x, d_y, a_x, a_y, 0)
+
+
 -- accelerate if up is pressed, decellerate if not
 if key_down(KEY_UP)
     ship_speed += 0.5
@@ -44,28 +68,6 @@ if key_down(KEY_RIGHT)
     ship_facing += turn_speed * PI
 end
 
--- Draw the ship
-a_x = ship_x + ship_size * cos(ship_facing)
-a_y = ship_y + ship_size * sin(ship_facing)
-
-b_x = ship_x + ship_size * cos(ship_facing + back_angle)
-b_y = ship_y + ship_size * sin(ship_facing + back_angle)
-
-c_x = ship_x - back_dist * cos(ship_facing)
-c_y = ship_y - back_dist * sin(ship_facing)
-
-d_x = ship_x + ship_size * cos(ship_facing - back_angle)
-d_y = ship_y + ship_size * sin(ship_facing - back_angle)
-
-point(a_x, a_y)
-point(b_x, b_y)
-point(c_x, c_y)
-point(d_x, d_y)
-
-line_to(a_x, a_y, b_x, b_y, 0)
-line_to(b_x, b_y, c_x, c_y, 0)
-line_to(c_x, c_y, d_x, d_y, 0)
-line_to(d_x, d_y, a_x, a_y, 0)
 
 -- State of the active bullet
 state float bullet_x = 0.0

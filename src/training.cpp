@@ -16,10 +16,15 @@ void update_derived_trainables(Branch& branch)
 {
     for (CodeIterator it(&branch); !it.finished(); it.advance()) {
         // if any of our inputs are trainable then mark us as derived-trainable
+        bool found = false;
         for (int i=0; i < it->numInputs(); i++) {
-            if (is_trainable(it->input(i)))
-                it->boolProperty("derived-trainable") = true;
+            if (is_trainable(it->input(i))) {
+                found = true;
+                break;
+            }
         }
+
+        it->boolProperty("derived-trainable") = found;
     }
 }
 
