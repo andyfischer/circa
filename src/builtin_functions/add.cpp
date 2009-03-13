@@ -74,24 +74,22 @@ namespace add_function {
         if (numTrainableInputs == 0)
             return;
 
-        // delta is just current - desired
-        Term* delta = apply_function(&branch, SUB_FUNC, RefList(subject, desired));
+        // delta is just desired - current
+        Term* delta = apply_function(&branch, SUB_FUNC, RefList(desired, subject));
 
-        // if there is one trainable input, just pass this delta directly on
-        if (numTrainableInputs == 1) {
-            Term* trainableInput = NULL;
-            for (int i=0; i < subject->numInputs(); i++) {
-                if (subject->input(i)->boolPropertyOptional("trainable", false)) {
-                    trainableInput = subject->input(i);
-                    break;
-                }
-            }
-
-            generate_training(branch, trainableInput, delta);
-            return;
+        // if there are multiple trainable inputs, divide up delta
+        if (numTrainableInputs > 1) {
+            delta = apply_function(&branch, DIV_FUNC, RefList(delta, float_value(branch, numTrainableInputs)));
         }
 
-        std::cout << "todo" << std::endl;
+        // pass delta to each trainable input
+        for (int i=0; i < subject->numInputs(); i++) {
+            Term* input = subject->input(i);
+            if (input->boolPropertyOptional("trainable", false)) {
+                Term* inputDesired = apply_function(&branch, ADD_FUNC, RefList(input, delta));
+                generate_training(branch, input, inputDesired);
+            }
+        }
     }
 
     void setup(Branch& kernel)

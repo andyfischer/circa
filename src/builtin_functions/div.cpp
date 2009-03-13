@@ -12,9 +12,8 @@ namespace div_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
-                "function div(float,float) -> float");
-        as_function(main_func).pureFunction = true;
+        DIV_FUNC = import_function(kernel, evaluate, "function div(float,float) -> float");
+        as_function(DIV_FUNC).pureFunction = true;
     }
 }
 } // namespace circa
