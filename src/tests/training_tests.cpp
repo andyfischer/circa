@@ -50,7 +50,7 @@ void train_mult()
 {
     Branch branch;
     Term* a = branch.eval("a = 2.0");
-    Term* b = branch.eval("b = 3.0");
+    /*Term* b =*/ branch.eval("b = 3.0");
     Term* c = branch.eval("c = mult(a, b)");
 
     a->boolProperty("trainable") = true;
