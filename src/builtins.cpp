@@ -41,19 +41,21 @@ Term* APPLY_FEEDBACK = NULL;
 Term* ADD_FUNC = NULL;
 Term* SUB_FUNC = NULL;
 Term* MULT_FUNC = NULL;
+Term* DIV_FUNC = NULL;
 Term* ALIAS_FUNC = NULL;
 Term* COMMENT_FUNC = NULL;
 Term* INT_TO_FLOAT_FUNC = NULL;
 Term* COPY_FUNC = NULL;
 Term* IF_FUNC = NULL;
 Term* STATEFUL_VALUE_FUNC = NULL;
+Term* ASSIGN_FUNC = NULL;
 
 void empty_evaluate_function(Term*) { }
 void empty_alloc_function(Term*) { }
 
-void value_function_generate_training(Branch& branch, Term* subject, Term* delta)
+void value_function_generate_training(Branch& branch, Term* subject, Term* desired)
 {
-
+    apply_function(&branch, ASSIGN_FUNC, RefList(desired, subject));
 }
 
 void value_function_generator(Term* caller)
@@ -66,6 +68,7 @@ void value_function_generator(Term* caller)
     output.outputType = caller->input(0);
     output.pureFunction = false;
     output.evaluate = empty_evaluate_function;
+    output.generateTraining = value_function_generate_training;
     output.feedbackPropogateFunction = VALUE_FUNCTION_FEEDBACK_ASSIGN;
 }
 
