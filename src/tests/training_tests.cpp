@@ -25,6 +25,7 @@ void train_addition1()
 
     test_equals(as_float(a), 2.0);
 }
+
 void train_addition2()
 {
     Branch branch;
@@ -45,10 +46,28 @@ void train_addition2()
     test_equals(as_float(b), 2.5);
 }
 
+void train_mult()
+{
+    Branch branch;
+    Term* a = branch.eval("a = 2.0");
+    Term* b = branch.eval("b = 3.0");
+    Term* c = branch.eval("c = mult(a, b)");
+
+    a->boolProperty("trainable") = true;
+    c->boolProperty("trainable") = true;
+
+    Branch training;
+    generate_training(training, c, training.eval("9.0"));
+    evaluate_branch(training);
+
+    test_equals(as_float(a), 3.0);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(train_addition1);
     REGISTER_TEST_CASE(train_addition2);
+    REGISTER_TEST_CASE(train_mult);
 }
 
 } // namespace training_tests
