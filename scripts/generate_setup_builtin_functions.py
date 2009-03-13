@@ -56,6 +56,7 @@ void setup_builtin_functions(Branch& kernel)
 }
 
 } // namespace circa
+
 """
 
 if __name__ == "__main__":
