@@ -223,6 +223,8 @@ void handle_dragging()
     circa::generate_training(tempBranch, subjectY, desiredY);
 
     evaluate_branch(tempBranch);
+
+    print_raw_branch(tempBranch, std::cout);
 }
 
 void post_script_load(circa::Branch& script)
