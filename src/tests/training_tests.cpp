@@ -63,11 +63,26 @@ void train_mult()
     test_equals(as_float(a), 3.0);
 }
 
+void train_sin()
+{
+    Branch branch;
+    Term* a = branch.eval("a = 0.0");
+    Term* b = branch.eval("b = sin(a)");
+
+    a->boolProperty("trainable") = true;
+    b->boolProperty("trainable") = true;
+
+    Branch training;
+    generate_training(training, b, training.eval("1.0"));
+    evaluate_branch(training);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(train_addition1);
     REGISTER_TEST_CASE(train_addition2);
     REGISTER_TEST_CASE(train_mult);
+    REGISTER_TEST_CASE(train_sin);
 }
 
 } // namespace training_tests
