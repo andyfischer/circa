@@ -25,6 +25,11 @@ namespace mult_function {
 
         Term* delta = apply_function(&branch, SUB_FUNC, RefList(desired, subject));
 
+        if (numTrainableInputs > 1) {
+            delta = apply_function(&branch, DIV_FUNC, RefList(delta,
+                        float_value(branch, numTrainableInputs)));
+        }
+
         // for each input, send a delta divided by the product of all other inputs
         for (int i=0; i < subject->numInputs(); i++) {
             Term* input = subject->input(i);

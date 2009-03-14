@@ -13,7 +13,11 @@ namespace sin_function {
 
     void generateTraining(Branch& branch, Term* subject, Term* desired)
     {
+        std::cout << "sin gt:" << std::endl;
+        std::cout << "subject = " << as_float(subject) << std::endl;
+        std::cout << "desired = " << as_float(desired) << std::endl;
         Term* inputDesired = float_value(branch, asin(as_float(desired)));
+        std::cout << "desired_in = " << as_float(inputDesired) << std::endl;
         generate_training(branch, subject->input(0), inputDesired);
     }
 
