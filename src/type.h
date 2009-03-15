@@ -10,7 +10,7 @@
 #include "branch.h"
 #include "builtins.h"
 #include "reference_iterator.h"
-#include "ref.h"
+#include "references.h"
 #include "ref_map.h"
 #include "term.h"
 #include "term_namespace.h"

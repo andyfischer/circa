@@ -1,7 +1,7 @@
 // Copyright 2008 Andrew Fischer
 
-#ifndef CIRCA_REF_INCLUDED
-#define CIRCA_REF_INCLUDED
+#ifndef CIRCA_REFERENCES_INCLUDED
+#define CIRCA_REFERENCES_INCLUDED
 
 // Ref
 //
@@ -14,25 +14,18 @@ namespace circa {
 struct Ref
 {
     Term* _t;
-    Term* _owner;
 
     Ref()
-      : _t(NULL),
-        _owner(NULL)
-    {
-    }
+      : _t(NULL)
+    {}
 
-    Ref(Term *initialValue)
-      : _t(NULL),
-        _owner(NULL)
+    Ref(Term *initialValue) : _t(NULL)
     {
         set(initialValue);
     }
 
     // Copy constructor
-    Ref(Ref const& copy)
-      : _t(NULL),
-        _owner(copy._owner)
+    Ref(Ref const& copy) : _t(NULL)
     {
         set(copy._t);
     }
@@ -45,7 +38,6 @@ struct Ref
     // Assignment copy
     Ref& operator=(Ref const& rhs)
     {
-        _owner = rhs._owner;
         set(rhs._t);
         return *this;
     }
