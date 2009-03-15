@@ -51,7 +51,6 @@ struct Branch
     }
 
     // Find the first term with the given name binding.
-    // This is kind of confusing. Might be good to revist this system.
     Term* findFirstBinding(std::string const& name) const;
 
     // Convenience syntax for getNamed
@@ -73,9 +72,6 @@ struct Branch
 
     // Evaluate the given statement, return the result term.
     Term* eval(std::string const& statement);
-
-    // Start a sub-branch with the given name
-    Branch& startBranch(std::string const& name);
 
     // Hosted functions
     static void* alloc(Term* type);
