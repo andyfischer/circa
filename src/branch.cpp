@@ -150,13 +150,6 @@ Branch::compile(std::string const& statement)
     return parser::compile_statement(*this, statement);
 }
 
-Branch& Branch::startBranch(std::string const& name)
-{
-    Term* result = create_value(this, BRANCH_TYPE, name);
-    as_branch(result).outerScope = this;
-    return as_branch(result);
-}
-
 void* Branch::alloc(Term* typeTerm)
 {
     Branch* branch = new Branch();

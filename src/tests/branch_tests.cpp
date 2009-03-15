@@ -134,17 +134,6 @@ void find_name_in_outer_branch()
     test_assert(find_named(&as_branch(inner_branch), "a") == a);
 }
 
-void test_startBranch()
-{
-    Branch branch;
-
-    Term* a = branch.eval("a = 1");
-
-    Branch& sub = branch.startBranch("sub");
-
-    test_assert(find_named(&sub, "a") == a);
-}
-
 void test_migrate()
 {
     Branch orig, replace;
@@ -196,7 +185,6 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_duplicate_nested_dont_make_extra_terms);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_subroutine);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
-    REGISTER_TEST_CASE(branch_tests::test_startBranch);
     REGISTER_TEST_CASE(branch_tests::test_migrate);
     REGISTER_TEST_CASE(branch_tests::test_migrate2);
 }
