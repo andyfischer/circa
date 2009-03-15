@@ -364,7 +364,7 @@ void remap_pointers(Term* term, ReferenceMap const& map)
 
     for (unsigned int i=0; i < term->inputs.count(); i++) {
         Term* orig = term->inputs[i];
-        Term* remap = map.getRemapped(orig);
+        /*Term* remap =*/ map.getRemapped(orig);
     }
 
     term->inputs.remapPointers(map);

@@ -8,7 +8,7 @@
 // A list of Term references
 
 #include "common_headers.h"
-#include "ref.h"
+#include "references.h"
 
 namespace circa {
 

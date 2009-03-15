@@ -12,7 +12,6 @@ void test_basic()
     Ref ref;
 
     test_assert(ref._t == NULL);
-    test_assert(ref._owner == NULL);
 
     Term* t = new Term();
 
