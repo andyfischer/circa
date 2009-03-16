@@ -130,21 +130,6 @@ void test_runtime_type_error()
     test_assert(term->hasError());
 }
 
-void test_recycle_with_multiple_users()
-{
-    Branch branch;
-    Term* a = branch.compile("a = if-expr(true, 1, 2)");
-    Term* x = branch.compile("x = if-expr(true, a, 3)");
-    Term* y = branch.compile("y = if-expr(true, a, 3)");
-
-    evaluate_branch(branch);
-
-    test_assert(a->users.count() == 2);
-    test_assert(as_int(a) == 1);
-    test_assert(as_int(x) == 1);
-    test_assert(as_int(y) == 1);
-}
-
 void test_create_duplicate()
 {
     Branch branch;
@@ -167,9 +152,6 @@ void register_tests()
     REGISTER_TEST_CASE(runtime_tests::null_input_errors);
     REGISTER_TEST_CASE(runtime_tests::test_eval_as);
     REGISTER_TEST_CASE(runtime_tests::test_runtime_type_error);
-#if TRACK_USERS
-    REGISTER_TEST_CASE(runtime_tests::test_recycle_with_multiple_users);
-#endif
     REGISTER_TEST_CASE(runtime_tests::test_create_duplicate);
 }
 

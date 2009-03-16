@@ -57,9 +57,6 @@ struct Term
     // Dynamic properties
     Branch properties;
 
-    // 'users' are terms which are using us as an input or as a function.
-    RefList users;
-
     // Objects which are pointing to us
     std::vector<Ref*> refs;
 
