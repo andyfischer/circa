@@ -86,7 +86,7 @@ std::string pop_pending_rebind(Branch& branch)
 
     if (branch.contains(attrname)) {
         std::string result = as_string(branch[attrname]);
-        branch.removeTerm(get_name_for_attribute("comp-pending-rebind"));
+        branch.remove(get_name_for_attribute("comp-pending-rebind"));
         return result;
     } else {
         return "";
@@ -95,7 +95,7 @@ std::string pop_pending_rebind(Branch& branch)
 
 void remove_compilation_attrs(Branch& branch)
 {
-    branch.removeTerm(get_name_for_attribute("comp-pending-rebind"));
+    branch.remove(get_name_for_attribute("comp-pending-rebind"));
 }
 
 Term* find_and_apply_function(Branch& branch,

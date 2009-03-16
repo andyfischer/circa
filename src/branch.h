@@ -34,12 +34,7 @@ struct Branch
 
     void append(Term* term);
 
-    void removeTerm(std::string const& name);
-
-    void remove(std::string const& name)
-    {
-        removeTerm(name);
-    }
+    void remove(std::string const& name);
 
     void remove(int index);
 

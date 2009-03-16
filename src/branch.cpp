@@ -68,7 +68,7 @@ void Branch::append(Term* term)
     _terms.append(term);
 }
 
-void Branch::removeTerm(std::string const& name)
+void Branch::remove(std::string const& name)
 {
     if (!names.contains(name))
         return;
