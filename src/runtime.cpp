@@ -317,15 +317,6 @@ Term* eval_function(Branch& branch, std::string const& functionName,
     return eval_function(branch, function, inputs);
 }
 
-void change_function(Term* term, Term* new_function)
-{
-    assert_good_pointer(term);
-
-    assert_type(new_function, FUNCTION_TYPE);
-
-    term->function = new_function;
-}
-
 void remap_pointers(Term* term, ReferenceMap const& map)
 {
     assert_good_pointer(term);
