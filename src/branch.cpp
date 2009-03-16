@@ -265,12 +265,6 @@ Branch::start_reference_iterator(Term* term)
     return new BranchExternalReferenceIterator((Branch*) term->value);
 }
 
-ReferenceIterator* start_branch_iterator(Branch* branch)
-{
-    std::cout << "start_branch_iterator" << std::endl;
-    return new BranchIterator(branch);
-}
-
 ReferenceIterator* start_branch_reference_iterator(Branch* branch)
 {
     std::cout << "start_branch_reference_iterator" << std::endl;

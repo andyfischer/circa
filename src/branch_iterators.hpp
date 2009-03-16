@@ -6,43 +6,6 @@
 
 namespace circa {
 
-class BranchIterator : public ReferenceIterator
-{
-    Branch* _branch;
-    int _index;
-
-public:
-    BranchIterator(Branch* branch)
-      : _branch(branch), _index(0)
-    {
-        postAdvance();
-    }
-
-    virtual Ref& current()
-    {
-        assert(!finished());
-        return _branch->get(_index);
-    }
-
-    virtual void advance()
-    {
-        assert(!finished());
-        _index++;
-        postAdvance();
-    }
-
-    void postAdvance()
-    {
-        if (_index >= _branch->numTerms())
-            _branch = NULL;
-    }
-
-    virtual bool finished()
-    {
-        return _branch == NULL;
-    }
-};
-
 class BranchExternalReferenceIterator : public ReferenceIterator
 {
 private:
