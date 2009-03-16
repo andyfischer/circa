@@ -174,26 +174,7 @@ Term* find_equivalent(Term* function, RefList const& inputs)
         return NULL;
     }
 
-    // Check users of each input
-    for (unsigned int input_i=0; input_i < inputs.count(); input_i++) {
-        Term* input = inputs[input_i];
-        if (input == NULL)
-            continue;
-
-        for (unsigned int user_i=0; user_i < input->users.count(); user_i++) {
-            Term* user = input->users[user_i];
-
-            if (is_equivalent(user, function, inputs))
-                return user;
-        }
-    }
-
-    // Check users of function
-    for (unsigned int i=0; i < function->users.count(); i++) {
-        Term* user = function->users[i];
-        if (is_equivalent(user, function, inputs))
-            return user;
-    }
+    // FIXME
 
     return NULL;
 }

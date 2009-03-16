@@ -197,16 +197,6 @@ void set_input(Term* term, int index, Term* input)
         term->syntaxHints.getInputSyntax(index).bySource();
     else
         term->syntaxHints.getInputSyntax(index).byName(input->name);
-
-#if TRACK_USERS
-    if (input != NULL) {
-        assert_good_pointer(input);
-        input->users.appendUnique(term);
-    }
-
-    if (previousInput != NULL && !is_actually_using(previousInput, term))
-        previousInput->users.remove(term);
-#endif
 }
 
 Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
