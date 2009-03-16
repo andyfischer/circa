@@ -14,10 +14,13 @@ void Ref::set(Term* target)
     _t = target;
 
     if (_t != NULL)
-        _t->refs.push_back(this);
+        _t->refCount++;
 
-    if (previousTarget != NULL)
-        remove_referencer(previousTarget, this);
+    if (previousTarget != NULL) {
+        previousTarget->refCount--;
+        if (previousTarget->refCount == 0)
+            delete_term(previousTarget);
+    }
 }
 
 void Ref::remap_pointers(Term* term, ReferenceMap const& map)
@@ -58,43 +61,18 @@ ReferenceIterator* Ref::start_reference_iterator(Term* term)
     return new ReferenceIteratorForReferenceType(term);
 }
 
-void remove_referencer(Term* term, Ref* ref)
-{
-    assert_good_pointer(term);
-
-    std::vector<Ref*>::iterator it;
-    for (it = term->refs.begin(); it != term->refs.end();) {
-        if (*it == ref) {
-            it = term->refs.erase(it);
-        } else {
-            ++it;
-        }
-    }
-
-    if (term->refs.size() == 0)
-        delete_term(term);
-}
-
 void delete_term(Term* term)
 {
     assert_good_pointer(term);
 
-    if (term->state != NULL)
-        delete_term(term->state);
-    term->state = NULL;
-
     dealloc_value(term);
 
-    // Clear references
-    std::vector<Ref*>::iterator it;
-    for (it = term->refs.begin(); it != term->refs.end(); ++it) {
-        (*it)->_t = NULL;
-    }
+    assert(term->refCount == 0);
 
-    term->refs.clear();
     term->inputs.clear();
     term->type = NULL;
     term->function = NULL;
+    term->state = NULL;
 
 #if DEBUG_CHECK_FOR_BAD_POINTERS
     DEBUG_GOOD_POINTER_SET.erase(term);

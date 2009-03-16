@@ -57,8 +57,8 @@ struct Term
     // Dynamic properties
     Branch properties;
 
-    // Objects which are pointing to us
-    std::vector<Ref*> refs;
+    // Reference count
+    int refCount;
 
     Term();
     ~Term();

@@ -16,7 +16,8 @@ Term::Term()
     owningBranch(NULL),
     ownsValue(true),
     stealingOk(true),
-    needsUpdate(true)
+    needsUpdate(true),
+    refCount(0)
 {
     globalID = gNextGlobalID++;
 
@@ -27,11 +28,6 @@ Term::Term()
 
 Term::~Term()
 {
-    // Clear references
-    std::vector<Ref*>::iterator it;
-    for (it = refs.begin(); it != refs.end(); ++it) {
-        (*it)->_t = NULL;
-    }
 }
 
 Term*
