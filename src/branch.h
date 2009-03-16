@@ -78,7 +78,6 @@ struct Branch
     static void dealloc(void* data);
     static void copy(Term* source, Term* dest);
     static void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
-    static ReferenceIterator* start_reference_iterator(Term* term);
 };
 
 bool is_branch(Term* term);

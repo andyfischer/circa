@@ -13,7 +13,6 @@ void Type::makeCompoundType(std::string const& name)
     dealloc = Branch::dealloc;
     copy = Branch::copy;
     remapPointers = Branch::hosted_remap_pointers;
-    startReferenceIterator = Branch::start_reference_iterator;
 }
 
 bool Type::isCompoundType()
