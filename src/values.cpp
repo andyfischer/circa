@@ -9,7 +9,6 @@ namespace circa {
 void alloc_value(Term* term)
 {
     term->value = alloc_from_type(term->type);
-    update_owner(term);
 }
 
 void dealloc_value(Term* term)
@@ -107,21 +106,6 @@ void steal_value(Term* source, Term* dest)
 
     source->value = NULL;
     source->needsUpdate = true;
-
-    update_owner(dest);
-}
-
-void update_owner(Term* term)
-{
-    if (term->value == NULL)
-        return;
-
-    Type &type = as_type(term->type);
-
-    if (type.updateOwner == NULL)
-        return;
-
-    type.updateOwner(term);
 }
 
 Term* create_value(Branch* branch, Term* type, std::string const& name)
