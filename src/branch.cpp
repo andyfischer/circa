@@ -240,10 +240,8 @@ void duplicate_branch(Branch& source, Branch& dest)
     duplicate_branch_nested(newTermMap, source, dest);
 
     // Remap pointers
-    for (int index=0; index < dest.numTerms(); index++) {
-        Term* term = dest.get(index);
-        remap_pointers(term, newTermMap);
-    }
+    for (int i=0; i < dest.numTerms(); i++)
+        remap_pointers(dest[i], newTermMap);
 
     dest.names = source.names;
     dest.names.remapPointers(newTermMap);

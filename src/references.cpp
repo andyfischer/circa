@@ -116,14 +116,15 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     term->inputs.remapPointers(map);
     term->function = map.getRemapped(term->function);
 
+    if (map.getRemapped(term->type) != term->type)
+        std::cout << "warn: in remap_pointers, remapping type is not yet supported" << std::endl;
+
     if ((term->value != NULL)
             && term->type != NULL
             && (as_type(term->type).remapPointers != NULL)) {
 
         as_type(term->type).remapPointers(term, map);
     }
-
-    term->type = map.getRemapped(term->type);
 
     if (term->state != NULL)
         remap_pointers(term->state, map);
@@ -133,7 +134,7 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
 {
     assert_good_pointer(term);
     assert_good_pointer(original);
-    assert(replacement != NULL);
+    assert(original != NULL);
 
     ReferenceMap map;
     map[original] = replacement;
