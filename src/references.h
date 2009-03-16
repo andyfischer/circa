@@ -3,10 +3,6 @@
 #ifndef CIRCA_REFERENCES_INCLUDED
 #define CIRCA_REFERENCES_INCLUDED
 
-// Ref
-//
-// Maintains a safe weak pointer to a Term.
-
 #include "common_headers.h"
 
 namespace circa {
@@ -74,7 +70,6 @@ struct Ref
     static ReferenceIterator* start_reference_iterator(Term* term);
 };
 
-void remove_referencer(Term* term, Ref* ref);
 void delete_term(Term* term);
 void remap_pointers(Term* term, ReferenceMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
