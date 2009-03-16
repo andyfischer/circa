@@ -86,7 +86,6 @@ Branch& as_branch(Term* term);
 std::string get_name_for_attribute(std::string attribute);
 void duplicate_branch(Branch& source, Branch& dest);
 void evaluate_file(Branch& branch, std::string const& filename);
-ReferenceIterator* start_branch_iterator(Branch* branch);
 ReferenceIterator* start_branch_reference_iterator(Branch* branch);
 
 Term* find_term_by_id(Branch& branch, unsigned int id);
