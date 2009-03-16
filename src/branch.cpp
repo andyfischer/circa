@@ -258,16 +258,8 @@ void evaluate_file(Branch& branch, std::string const& filename)
     string_value(branch, filename, get_name_for_attribute("source-file"));
 }
 
-ReferenceIterator*
-Branch::start_reference_iterator(Term* term)
-{
-    std::cout << "start_reference_iterator" << std::endl;
-    return new BranchExternalReferenceIterator((Branch*) term->value);
-}
-
 ReferenceIterator* start_branch_reference_iterator(Branch* branch)
 {
-    std::cout << "start_branch_reference_iterator" << std::endl;
     return new BranchExternalReferenceIterator(branch);
 }
 
