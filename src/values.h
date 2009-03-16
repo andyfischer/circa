@@ -23,8 +23,6 @@ void steal_value(Term* source, Term* dest);
 
 void dealloc_value(Term* term);
 
-void update_owner(Term* term);
-
 // Create a new value term with the given type.
 // 'branch' may be NULL.
 Term* create_value(Branch* branch, Term* type, std::string const& name="");

@@ -29,7 +29,6 @@ struct Type
     typedef bool (*LessThanFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
     typedef ReferenceIterator* (*StartReferenceIteratorFunc)(Term* term);
-    typedef void (*UpdateOwner)(Term* term);
     typedef std::string (*ToStringFunc)(Term* term);
     typedef std::string (*ToSourceStringFunc)(Term* term);
 
@@ -58,7 +57,6 @@ struct Type
     LessThanFunc lessThan;
     RemapPointersFunc remapPointers;
     StartReferenceIteratorFunc startReferenceIterator;
-    UpdateOwner updateOwner;
     ToStringFunc toString;
     ToStringFunc toSourceString;
     ToStringFunc getCppTypeName;
@@ -90,7 +88,6 @@ struct Type
         lessThan(NULL),
         remapPointers(NULL),
         startReferenceIterator(NULL),
-        updateOwner(NULL),
         toString(NULL),
         toSourceString(NULL),
         getCppTypeName(NULL),
