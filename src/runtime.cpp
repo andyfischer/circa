@@ -220,14 +220,12 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
     else
         copy_value_but_dont_copy_inner_branch(source,term);
 
-    term->properties.import(source->properties);
+    duplicate_branch(source->properties, term->properties);
     term->syntaxHints = source->syntaxHints;
 
     if (source->state != NULL) {
         if (copyBranches && !has_inner_branch(source))
             copy_value(source->state, term->state);
-
-        term->state->properties.import(source->state->properties);
     }
         
     return term;

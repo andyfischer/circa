@@ -55,7 +55,7 @@ struct Term
     TermSyntaxHints syntaxHints;
 
     // Dynamic properties
-    Dictionary properties;
+    Branch properties;
 
     // 'users' are terms which are using us as an input or as a function.
     RefList users;

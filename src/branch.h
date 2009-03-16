@@ -36,12 +36,22 @@ struct Branch
 
     void removeTerm(std::string const& name);
 
+    void remove(std::string const& name)
+    {
+        removeTerm(name);
+    }
+
     void remove(int index);
 
     // Returns true if there is a term with the given name
     bool containsName(std::string const& name) const
     {
         return names.contains(name);
+    }
+
+    bool contains(std::string const& name) const
+    {
+        return containsName(name);
     }
 
     // Get the term with the given name.
