@@ -277,7 +277,7 @@ ReferenceIterator* start_branch_reference_iterator(Branch* branch)
 Term* find_named(Branch* branch, std::string const& name)
 {
     if (branch != NULL) {
-        if (branch->containsName(name))
+        if (branch->contains(name))
             return branch->getNamed(name);
 
         return find_named(branch->outerScope, name);
@@ -288,7 +288,7 @@ Term* find_named(Branch* branch, std::string const& name)
 
 bool branch_has_outer_scope(Branch& branch)
 {
-    return branch.containsName(get_name_for_attribute("outer_scope"));
+    return branch.contains(get_name_for_attribute("outer_scope"));
 }
 
 Term*& branch_get_outer_scope(Branch& branch)

@@ -172,7 +172,7 @@ Function::subroutine_call_evaluate(Term* caller)
     evaluate_branch(branch);
 
     // Copy output
-    if (branch.containsName(OUTPUT_PLACEHOLDER_NAME)) {
+    if (branch.contains(OUTPUT_PLACEHOLDER_NAME)) {
         Term* outputPlaceholder = branch[OUTPUT_PLACEHOLDER_NAME];
         assert(outputPlaceholder != NULL);
         recycle_value(outputPlaceholder, caller);

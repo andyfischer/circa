@@ -14,12 +14,12 @@ void test_remove()
     create_value(&branch, INT_TYPE, "a");
 
     test_assert(branch.numTerms() == 1);
-    test_assert(branch.containsName("a"));
+    test_assert(branch.contains("a"));
 
     branch.remove(0);
 
     test_assert(branch.numTerms() == 0);
-    test_assert(!branch.containsName("a"));
+    test_assert(!branch.contains("a"));
 }
 
 void test_duplicate()
@@ -105,7 +105,7 @@ void test_duplicate_subroutine()
     Branch dupe;
     duplicate_branch(branch, dupe);
 
-    test_assert(dupe.containsName("func"));
+    test_assert(dupe.contains("func"));
 
     Function& dupedFunc = as_function(dupe["func"]);
 

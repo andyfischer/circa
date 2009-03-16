@@ -15,7 +15,7 @@ public:
         _term = create_value(NULL, INT_TYPE);
     }
     Int(Branch &branch, std::string const& name="") {
-        if (name != "" && branch.containsName(name)) {
+        if (name != "" && branch.contains(name)) {
             _term = branch.findFirstBinding(name);
 
             assert(_term->type == INT_TYPE);
@@ -46,7 +46,7 @@ public:
         _term = create_value(NULL, FLOAT_TYPE);
     }
     Float(Branch &branch, std::string const& name="") {
-        if (name != "" && branch.containsName(name)) {
+        if (name != "" && branch.contains(name)) {
             _term = branch.findFirstBinding(name);
 
             assert(_term->type == FLOAT_TYPE);
@@ -77,7 +77,7 @@ public:
         _term = create_value(NULL, BOOL_TYPE);
     }
     Bool(Branch &branch, std::string const& name="") {
-        if (name != "" && branch.containsName(name)) {
+        if (name != "" && branch.contains(name)) {
             _term = branch.findFirstBinding(name);
 
             assert(_term->type == BOOL_TYPE);
