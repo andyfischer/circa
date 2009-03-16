@@ -168,13 +168,16 @@ bool is_equivalent(Term* target, Term* function, RefList const& inputs)
     return true;
 }
 
-Term* find_equivalent(Term* function, RefList const& inputs)
+Term* find_equivalent(Branch& branch, Term* function, RefList const& inputs)
 {
     if (!function_allows_term_reuse(as_function(function))) {
         return NULL;
     }
 
-    // FIXME
+    for (int i=0; i < branch.numTerms(); i++) {
+        if (is_equivalent(branch[i], function, inputs))
+            return branch[i];
+    }
 
     return NULL;
 }
