@@ -2,10 +2,7 @@
 
 #include "common_headers.h"
 
-#include "builtins.h"
-#include "debug.h"
-#include "runtime.h"
-#include "term.h"
+#include "circa.h"
 
 namespace circa {
 

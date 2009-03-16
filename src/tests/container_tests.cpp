@@ -3,7 +3,6 @@
 #include "common_headers.h"
 
 #include "builtins.h"
-#include "dictionary.h"
 #include "testing.h"
 #include "term.h"
 #include "term_namespace.h"
@@ -59,43 +58,10 @@ void test_list()
     test_assert(list.count() == 0);
 }
 
-void test_dictionary()
-{
-    Dictionary dict;
-
-    test_assert(!dict.contains("a"));
-
-    dict.addSlot("a", INT_TYPE);
-    as_int(dict["a"]) = 4;
-    dict.addSlot("b", INT_TYPE);
-    as_int(dict["b"]) = 6;
-
-    test_assert(dict.contains("a"));
-    test_assert(dict.contains("b"));
-
-    test_assert(as_int(dict["a"]) == 4);
-    test_assert(as_int(dict["b"]) == 6);
-
-    dict.clear();
-
-    test_assert(!dict.contains("a"));
-    test_assert(!dict.contains("b"));
-
-    // duplication
-    dict.addSlot("a", INT_TYPE);
-    as_int(dict["a"]) = 55;
-    Dictionary dup;
-    dup.import(dict);
-    test_assert(dup.contains("a"));
-    test_assert(dup["a"] != dict["a"]);
-    test_assert(as_int(dup["a"]) == 55);
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(container_tests::test_namespace);
     REGISTER_TEST_CASE(container_tests::test_list);
-    REGISTER_TEST_CASE(container_tests::test_dictionary);
 }
 
 } // namespace container_tests

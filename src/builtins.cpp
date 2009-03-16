@@ -193,8 +193,6 @@ namespace var_function {
 
 void initialize_constants()
 {
-    import_type<Dictionary>(*KERNEL, "Dictionary");
-
     VAR_INT = get_value_function(INT_TYPE);
     VAR_FLOAT = get_value_function(FLOAT_TYPE);
     VAR_STRING = get_value_function(STRING_TYPE);

@@ -5,7 +5,7 @@
 
 #include "common_headers.h"
 
-#include "dictionary.h"
+#include "branch.h"
 #include "references.h"
 #include "ref_list.h"
 #include "term_syntax_hints.h"

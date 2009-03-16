@@ -12,16 +12,6 @@
 namespace circa {
 namespace builtin_type_tests {
 
-void test_dictionary()
-{
-    Branch branch;
-    Term *d = branch.eval("d = Dictionary()");
-    test_assert(d != NULL);
-    as<Dictionary>(d);
-
-    // todo: add more here
-}
-
 void test_reference()
 {
     Branch branch;
@@ -135,7 +125,6 @@ void test_list()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(builtin_type_tests::test_dictionary);
     REGISTER_TEST_CASE(builtin_type_tests::test_reference);
     REGISTER_TEST_CASE(builtin_type_tests::builtin_types);
     REGISTER_TEST_CASE(builtin_type_tests::reference_type_deletion_bug);
