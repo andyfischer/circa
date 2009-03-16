@@ -77,7 +77,7 @@ Term* Term::addProperty(std::string const& name, Term* type)
         return property(name);
     }
 
-    return properties.addSlot(name, type);
+    return create_value(&properties, type, name);
 }
 
 void Term::removeProperty(std::string const& name)
