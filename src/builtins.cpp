@@ -74,7 +74,7 @@ void value_function_generator(Term* caller)
 
 Term* get_global(std::string name)
 {
-    if (KERNEL->containsName(name))
+    if (KERNEL->contains(name))
         return KERNEL->getNamed(name);
 
     return NULL;

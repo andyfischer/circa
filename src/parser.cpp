@@ -74,7 +74,7 @@ void push_pending_rebind(Branch& branch, std::string const& name)
 {
     std::string attrname = get_name_for_attribute("comp-pending-rebind");
 
-    if (branch.containsName(attrname))
+    if (branch.contains(attrname))
         throw std::runtime_error("pending rebind already exists");
 
     string_value(branch, name, attrname);
@@ -84,7 +84,7 @@ std::string pop_pending_rebind(Branch& branch)
 {
     std::string attrname = get_name_for_attribute("comp-pending-rebind");
 
-    if (branch.containsName(attrname)) {
+    if (branch.contains(attrname)) {
         std::string result = as_string(branch[attrname]);
         branch.removeTerm(get_name_for_attribute("comp-pending-rebind"));
         return result;
