@@ -221,22 +221,6 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
     return term;
 }
 
-bool is_actually_using(Term* user, Term* usee)
-{
-    assert_good_pointer(user);
-    assert_good_pointer(usee);
-
-    if (user->function == usee)
-        return true;
-
-    for (unsigned int i=0; i < user->inputs.count(); i++) {
-        if (user->inputs[i] == usee)
-            return true;
-    }
-
-    return false;
-}
-
 Term* possibly_coerce_term(Branch* branch, Term* original, Term* expectedType)
 {
     // (In the future, we will have more complicated coersion rules)
