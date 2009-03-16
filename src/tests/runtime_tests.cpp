@@ -47,7 +47,7 @@ void test_misc()
     test_assert(FUNCTION_TYPE->type == TYPE_TYPE);
 }
 
-void test_find_existing_equivalent()
+void test_find_equivalent()
 {
     Branch branch;
 
@@ -58,17 +58,9 @@ void test_find_existing_equivalent()
 
     test_assert(is_equivalent(addition, add_func, RefList(a,b)));
 
-    test_assert(addition == find_equivalent(add_func, RefList(a,b)));
+    test_assert(addition == find_equivalent(branch, add_func, RefList(a,b)));
 
-    test_assert(NULL == find_equivalent(add_func, RefList(b,a)));
-
-    Term* another_addition = branch.eval("add(a,b)");
-
-    test_assert(addition == another_addition);
-
-    Term* a_different_addition = branch.eval("add(b,a)");
-
-    test_assert(addition != a_different_addition);
+    test_assert(NULL == find_equivalent(branch, add_func, RefList(b,a)));
 }
 
 void var_function_reuse()
@@ -148,6 +140,7 @@ void register_tests()
     REGISTER_TEST_CASE(runtime_tests::test_create_value);
     REGISTER_TEST_CASE(runtime_tests::test_int_value);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
+    REGISTER_TEST_CASE(runtime_tests::test_find_equivalent);
     REGISTER_TEST_CASE(runtime_tests::var_function_reuse);
     REGISTER_TEST_CASE(runtime_tests::null_input_errors);
     REGISTER_TEST_CASE(runtime_tests::test_eval_as);
