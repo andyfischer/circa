@@ -27,6 +27,7 @@ bool has_compile_errors(Branch& branch);
 std::vector<std::string> get_compile_errors(Branch& branch);
 void print_compile_errors(Branch& branch, std::ostream& output);
 RefList get_influencing_values(Term* term);
+RefList get_involved_terms(RefList inputs, RefList outputs);
 
 }
 

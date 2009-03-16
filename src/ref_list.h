@@ -128,6 +128,7 @@ struct RefList
     void clear() { _items.clear(); }
 
     size_t count() const { return _items.size(); }
+    bool empty() const { return _items.empty(); }
     Term* get(unsigned int index) const
     {
         if (index >= _items.size())

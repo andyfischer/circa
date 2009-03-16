@@ -282,11 +282,11 @@ int main( int argc, char* args[] )
     post_script_load(SCRIPT_MAIN);
 
     // Initialize all SDL subsystems
-    if( SDL_Init( SDL_INIT_EVERYTHING ) == -1)
+    if( SDL_Init(SDL_INIT_EVERYTHING) == -1)
         return 1;
 
     // Set the window caption
-    SDL_WM_SetCaption( "Circa Game Editor", NULL );
+    SDL_WM_SetCaption("Circa Game Editor", NULL );
 
     // Main loop
     while (CONTINUE_MAIN_LOOP) {
@@ -346,9 +346,7 @@ int main( int argc, char* args[] )
 
         try {
             handle_dragging();
-
             SCRIPT_MAIN.eval();
-
             draw_highlight();
             draw_influence_list();
 
