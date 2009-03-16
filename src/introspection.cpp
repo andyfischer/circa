@@ -288,4 +288,58 @@ RefList get_influencing_values(Term* term)
     return result;
 }
 
+RefList get_involved_terms(RefList inputs, RefList outputs)
+{
+    std::vector<RefList> stack;
+
+    // Step 1, search upwards from outputs. Maintain a stack of searched terms
+    stack.push_back(outputs);
+    RefList searched = outputs;
+
+    while (!stack.back().empty()) {
+        RefList &top = stack.back();
+
+        RefList new_layer;
+
+        for (unsigned int i=0; i < top.count(); i++) {
+            for (int input_i=0; input_i < top[i]->numInputs(); input_i++) {
+                Term* input = top[i]->input(input_i);
+                
+                if (searched.contains(input))
+                    continue;
+
+                if (inputs.contains(input))
+                    continue;
+
+                new_layer.append(input);
+            }
+        }
+
+        stack.push_back(new_layer);
+    }
+
+    RefList result;
+    result.appendAll(inputs);
+
+    // Step 2, descend down our stack, and append any descendents of things
+    // inside 'results'
+    while (!stack.empty()) {
+        RefList &layer = stack.back();
+
+        for (unsigned int i=0; i < layer.count(); i++) {
+            Term* term = layer[i];
+            for (int input_i=0; input_i < term->numInputs(); input_i++) {
+                Term* input = term->input(input_i);
+
+                if (result.contains(input))
+                    result.append(term);
+            }
+        }
+
+        stack.pop_back();
+    }
+
+    return result;
+}
+
 } // namespace circa
