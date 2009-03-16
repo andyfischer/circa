@@ -47,8 +47,6 @@ Term* eval_function(Branch& branch,
                     std::string const& functionName,
                     RefList const& inputs);
 
-void change_function(Term* term, Term* new_function);
-
 void remap_pointers(Term* term, ReferenceMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
 
