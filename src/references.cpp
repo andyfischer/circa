@@ -105,4 +105,40 @@ void delete_term(Term* term)
 #endif
 }
 
+void remap_pointers(Term* term, ReferenceMap const& map)
+{
+    assert_good_pointer(term);
+
+    // make sure this map doesn't try to remap NULL, because such a thing
+    // would almost definitely lead to errors.
+    assert(!map.contains(NULL));
+
+    term->inputs.remapPointers(map);
+    term->function = map.getRemapped(term->function);
+
+    if ((term->value != NULL)
+            && term->type != NULL
+            && (as_type(term->type).remapPointers != NULL)) {
+
+        as_type(term->type).remapPointers(term, map);
+    }
+
+    term->type = map.getRemapped(term->type);
+
+    if (term->state != NULL)
+        remap_pointers(term->state, map);
+}
+
+void remap_pointers(Term* term, Term* original, Term* replacement)
+{
+    assert_good_pointer(term);
+    assert_good_pointer(original);
+    assert(replacement != NULL);
+
+    ReferenceMap map;
+    map[original] = replacement;
+    remap_pointers(term, map);
+}
+
+
 } // namespace circa

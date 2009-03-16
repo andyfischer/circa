@@ -76,6 +76,8 @@ struct Ref
 
 void remove_referencer(Term* term, Ref* ref);
 void delete_term(Term* term);
+void remap_pointers(Term* term, ReferenceMap const& map);
+void remap_pointers(Term* term, Term* original, Term* replacement);
 
 } // namespace circa
 
