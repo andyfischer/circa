@@ -18,6 +18,22 @@ bool is_stateful(Term* term)
     return term->function == STATEFUL_VALUE_FUNC;
 }
 
+bool is_actually_using(Term* user, Term* usee)
+{
+    assert_good_pointer(user);
+    assert_good_pointer(usee);
+
+    if (user->function == usee)
+        return true;
+
+    for (unsigned int i=0; i < user->inputs.count(); i++) {
+        if (user->inputs[i] == usee)
+            return true;
+    }
+
+    return false;
+}
+
 bool has_inner_branch(Term* term)
 {
     return get_inner_branch(term) != NULL;

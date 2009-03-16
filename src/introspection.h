@@ -7,6 +7,11 @@ namespace circa {
 
 bool is_value(Term* term);
 bool is_stateful(Term* term);
+
+// Check the function and inputs of 'user', returns whether they are actually
+// using 'usee'.
+bool is_actually_using(Term* user, Term* usee);
+
 bool has_inner_branch(Term* term);
 Branch* get_inner_branch(Term* term);
 std::string get_short_local_name(Term* term);

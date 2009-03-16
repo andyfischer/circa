@@ -26,10 +26,6 @@ void set_input(Term* term, int index, Term* input);
 // caller will do this. This functionality is used by duplicate_branch
 Term* create_duplicate(Branch* branch, Term* source, bool copyBranches=true);
 
-// Check the function and inputs of 'user', returns whether they are actually
-// using 'usee'.
-bool is_actually_using(Term* user, Term* usee);
-
 // Examine 'function' and 'inputs' and returns a result term. A few things
 // may happen here:
 //  1. We might re-use an existing term
