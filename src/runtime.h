@@ -15,7 +15,7 @@ void error_occured(Term* errorTerm, std::string const& message);
 
 // Create a term with the given function and inputs.
 // This function does not do any magic; it (attempts) to use your exact function and 
-// exact inputs. You may want to instead use apply_function(), which does some
+// exact inputs. You may want to instead use apply(), which does some
 // helpful magic.
 Term* create_term(Branch* branch, Term* function, RefList const& inputs);
 
@@ -32,14 +32,14 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches=true);
 //  2. 'function' might be a type, in which case we create a value of this type.
 //  3. We might specialize an overloaded function
 //  4. We might coerce inputs to a different type.
-Term* apply_function(Branch* branch, Term* function, RefList const& inputs, std::string const& name="");
+Term* apply(Branch* branch, Term* function, RefList const& inputs, std::string const& name="");
 
-// Find the named function in this branch, and then call the above apply_function.
-Term* apply_function(Branch* branch,
+// Find the named function in this branch, and then call the above apply.
+Term* apply(Branch* branch,
                      std::string const& functionName, 
                      RefList const& inputs);
 
-// Perform 'apply_function' and then evaluate the result.
+// Perform 'apply' and then evaluate the result.
 Term* eval_function(Branch& branch, Term* function, RefList const& inputs);
 
 // Find the named function in this branch, and then do the above 'eval_function'.

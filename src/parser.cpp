@@ -98,7 +98,7 @@ void remove_compilation_attrs(Branch& branch)
     branch.remove(get_name_for_attribute("comp-pending-rebind"));
 }
 
-Term* find_and_apply_function(Branch& branch,
+Term* find_and_apply(Branch& branch,
         std::string const& functionName,
         RefList inputs)
 {
@@ -106,14 +106,12 @@ Term* find_and_apply_function(Branch& branch,
 
     // If function is not found, produce an instance of unknown-function
     if (function == NULL) {
-        Term* result = apply_function(&branch,
-                                      UNKNOWN_FUNCTION,
-                                      inputs);
+        Term* result = apply(&branch, UNKNOWN_FUNCTION, inputs);
         as_string(result->state) = functionName;
         return result;
     }
 
-    return apply_function(&branch, function, inputs);
+    return apply(&branch, function, inputs);
 }
 
 void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
@@ -204,7 +202,7 @@ Term* comment_statement(Branch& branch, TokenStream& tokens)
 {
     std::string commentText = tokens.consume(COMMENT);
 
-    Term* result = apply_function(&branch, COMMENT_FUNC, RefList());
+    Term* result = apply(&branch, COMMENT_FUNC, RefList());
     as_string(result->state->field(0)) = commentText;
     result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
     return result;
@@ -215,7 +213,7 @@ Term* blank_line(Branch& branch, TokenStream& tokens)
     if (!tokens.finished())
         tokens.consume(NEWLINE);
 
-    Term* result = apply_function(&branch, COMMENT_FUNC, RefList());
+    Term* result = apply(&branch, COMMENT_FUNC, RefList());
     as_string(result->state->field(0)) = "";
     result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
 
@@ -360,7 +358,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
     possible_newline(tokens);
 
-    Term* result = apply_function(&branch, get_global("if"), RefList(condition));
+    Term* result = apply(&branch, get_global("if"), RefList(condition));
     result->syntaxHints.declarationStyle = TermSyntaxHints::IF_STATEMENT;
     Branch& innerBranch = as_branch(result->state);
     innerBranch.outerScope = &branch;
@@ -383,7 +381,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     remove_compilation_attrs(innerBranch);
 
     // Create the joining branch
-    Term* joining = apply_function(&branch, get_global("branch"), RefList(), "#joining");
+    Term* joining = apply(&branch, get_global("branch"), RefList(), "#joining");
     Branch& joiningBranch = as_branch(joining->state);
 
     // Get a list of all names bound in this branch
@@ -417,7 +415,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             Term* outerVersion = find_named(&branch, name);
             Term* innerVersion = innerBranch[name];
 
-            Term* joining = apply_function(&joiningBranch, "if-expr",
+            Term* joining = apply(&joiningBranch, "if-expr",
                     RefList(condition, innerVersion, outerVersion));
 
             // Bind these names in the outer branch
@@ -456,7 +454,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     if (initialValue != NULL)
         inputs.append(initialValue);
 
-    Term* result = apply_function(&branch, STATEFUL_VALUE_FUNC, inputs, name);
+    Term* result = apply(&branch, STATEFUL_VALUE_FUNC, inputs, name);
     result->syntaxHints.declarationStyle = TermSyntaxHints::SPECIFIC_TO_FUNCTION;
     change_type(result, type);
 
@@ -495,7 +493,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     // If this item is just an identifier, and we're trying to rename it,
     // create an implicit call to 'copy'.
     if (result->name != "" && name != "") {
-        result = apply_function(&branch, COPY_FUNC, RefList(result));
+        result = apply(&branch, COPY_FUNC, RefList(result));
         result->syntaxHints.declarationStyle = TermSyntaxHints::SPECIFIC_TO_FUNCTION;
     }
 
@@ -683,7 +681,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                 tokens.consume(RPAREN);
             }
 
-            result = apply_function(&branch, function, inputs);
+            result = apply(&branch, function, inputs);
 
             if (memberFunctionCall && leftExpr->name != "") {
                 branch.bindName(result, leftExpr->name);
@@ -699,7 +697,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             RefList inputs(leftExpr);
 
-            result = find_and_apply_function(branch, functionName, inputs);
+            result = find_and_apply(branch, functionName, inputs);
 
             result->syntaxHints.declarationStyle = TermSyntaxHints::ARROW_CONCATENATION;
 
@@ -714,7 +712,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             if (isRebinding && leftExpr->name == "")
                 throw std::runtime_error("Left side of " + functionName + " must be an identifier");
 
-            result = find_and_apply_function(branch, functionName, RefList(leftExpr, rightExpr));
+            result = find_and_apply(branch, functionName, RefList(leftExpr, rightExpr));
             result->syntaxHints.declarationStyle = TermSyntaxHints::INFIX;
             result->syntaxHints.functionName = operatorStr;
 
@@ -820,7 +818,7 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
     tokens.consume(RPAREN);
     
-    Term* result = find_and_apply_function(branch, functionName, inputs);
+    Term* result = find_and_apply(branch, functionName, inputs);
 
     result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
     result->syntaxHints.functionName = functionName;
@@ -929,7 +927,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
 
     // If not found, create an instance of unknown-identifier
     if (result == NULL) {
-        result = apply_function(&branch, UNKNOWN_IDENTIFIER_FUNC, RefList());
+        result = apply(&branch, UNKNOWN_IDENTIFIER_FUNC, RefList());
         as_string(result->state) = id;
         branch.bindName(result, id);
     }

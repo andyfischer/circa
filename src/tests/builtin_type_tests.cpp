@@ -67,7 +67,7 @@ void reference_type_deletion_bug()
     // the thing it was pointed to.
     Branch *branch = new Branch();
 
-    Term* myref = apply_function(branch, REF_TYPE, RefList());
+    Term* myref = apply(branch, REF_TYPE, RefList());
 
     myref->asRef() = INT_TYPE;
 

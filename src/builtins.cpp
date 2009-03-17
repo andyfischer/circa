@@ -55,7 +55,7 @@ void empty_alloc_function(Term*) { }
 
 void value_function_generate_training(Branch& branch, Term* subject, Term* desired)
 {
-    apply_function(&branch, ASSIGN_FUNC, RefList(desired, subject));
+    apply(&branch, ASSIGN_FUNC, RefList(desired, subject));
 }
 
 void value_function_generator(Term* caller)
@@ -198,17 +198,17 @@ void initialize_constants()
     VAR_STRING = get_value_function(STRING_TYPE);
     VAR_BOOL = get_value_function(BOOL_TYPE);
 
-    CONSTANT_TRUE = apply_function(KERNEL, BOOL_TYPE, RefList());
+    CONSTANT_TRUE = apply(KERNEL, BOOL_TYPE, RefList());
     as_bool(CONSTANT_TRUE) = true;
     CONSTANT_TRUE->stealingOk = false;
     KERNEL->bindName(CONSTANT_TRUE, "true");
 
-    CONSTANT_FALSE = apply_function(KERNEL, BOOL_TYPE, RefList());
+    CONSTANT_FALSE = apply(KERNEL, BOOL_TYPE, RefList());
     as_bool(CONSTANT_FALSE) = false;
     CONSTANT_FALSE->stealingOk = false;
     KERNEL->bindName(CONSTANT_FALSE, "false");
 
-    Term* pi = apply_function(KERNEL, FLOAT_TYPE, RefList());
+    Term* pi = apply(KERNEL, FLOAT_TYPE, RefList());
     as_float(pi) = 3.14159;
     KERNEL->bindName(pi, "PI");
 

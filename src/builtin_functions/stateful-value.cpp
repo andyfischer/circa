@@ -11,7 +11,7 @@ namespace stateful_value_function {
 
     void generateTraining(Branch& branch, Term* subject, Term* desired)
     {
-        apply_function(&branch, ASSIGN_FUNC, RefList(desired, subject));
+        apply(&branch, ASSIGN_FUNC, RefList(desired, subject));
     }
 
     void setup(Branch& kernel)

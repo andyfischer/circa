@@ -23,10 +23,10 @@ namespace mult_function {
         if (numTrainableInputs == 0)
             return;
 
-        Term* delta = apply_function(&branch, SUB_FUNC, RefList(desired, subject));
+        Term* delta = apply(&branch, SUB_FUNC, RefList(desired, subject));
 
         if (numTrainableInputs > 1) {
-            delta = apply_function(&branch, DIV_FUNC, RefList(delta,
+            delta = apply(&branch, DIV_FUNC, RefList(delta,
                         float_value(branch, numTrainableInputs)));
         }
 
@@ -39,8 +39,8 @@ namespace mult_function {
             // this "product of all other inputs" assumes that we only have 2 inputs
             Term* divisor = i == 0 ? subject->input(1) : subject->input(0);
 
-            Term* inputDelta = apply_function(&branch, DIV_FUNC, RefList(delta, divisor));
-            Term* inputDesired = apply_function(&branch, ADD_FUNC, RefList(input, inputDelta));
+            Term* inputDelta = apply(&branch, DIV_FUNC, RefList(delta, divisor));
+            Term* inputDesired = apply(&branch, ADD_FUNC, RefList(input, inputDelta));
 
             generate_training(branch, input, inputDesired);
         }

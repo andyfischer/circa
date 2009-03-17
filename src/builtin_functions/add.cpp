@@ -52,7 +52,7 @@ namespace add_function {
     
             Term* input = target->inputs[i];
     
-            apply_function(&myBranch, APPLY_FEEDBACK,
+            apply(&myBranch, APPLY_FEEDBACK,
                 RefList(input, float_value(myBranch, as_float(input) + inputDelta)));
         }
     
@@ -73,18 +73,18 @@ namespace add_function {
             return;
 
         // delta is just desired - current
-        Term* delta = apply_function(&branch, SUB_FUNC, RefList(desired, subject));
+        Term* delta = apply(&branch, SUB_FUNC, RefList(desired, subject));
 
         // if there are multiple trainable inputs, divide up delta
         if (numTrainableInputs > 1) {
-            delta = apply_function(&branch, DIV_FUNC, RefList(delta, float_value(branch, numTrainableInputs)));
+            delta = apply(&branch, DIV_FUNC, RefList(delta, float_value(branch, numTrainableInputs)));
         }
 
         // pass delta to each trainable input
         for (int i=0; i < subject->numInputs(); i++) {
             Term* input = subject->input(i);
             if (is_trainable(input)) {
-                Term* inputDesired = apply_function(&branch, ADD_FUNC, RefList(input, delta));
+                Term* inputDesired = apply(&branch, ADD_FUNC, RefList(input, delta));
                 generate_training(branch, input, inputDesired);
             }
         }
