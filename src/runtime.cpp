@@ -230,13 +230,13 @@ Term* possibly_coerce_term(Branch* branch, Term* original, Term* expectedType)
 
     // Coerce from int to float
     if (original->type == INT_TYPE && expectedType == FLOAT_TYPE) {
-        return apply_function(branch, INT_TO_FLOAT_FUNC, RefList(original));
+        return apply(branch, INT_TO_FLOAT_FUNC, RefList(original));
     }
 
     return original;
 }
 
-Term* apply_function(Branch* branch, Term* function, RefList const& _inputs, std::string const& name)
+Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string const& name)
 {
     // Make a local copy of _inputs
     RefList inputs = _inputs;
@@ -288,7 +288,7 @@ Term* apply_function(Branch* branch, Term* function, RefList const& _inputs, std
     return result;
 }
 
-Term* apply_function(Branch* branch,
+Term* apply(Branch* branch,
                      std::string const& functionName, 
                      RefList const& inputs)
 {
@@ -296,12 +296,12 @@ Term* apply_function(Branch* branch,
     if (function == NULL)
         throw std::runtime_error(std::string("function not found: ")+functionName);
 
-    return apply_function(branch, function, inputs);
+    return apply(branch, function, inputs);
 }
 
 Term* eval_function(Branch& branch, Term* function, RefList const& inputs)
 {
-    Term* result = apply_function(&branch, function, inputs);
+    Term* result = apply(&branch, function, inputs);
     evaluate_term(result);
     return result;
 }

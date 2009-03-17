@@ -41,7 +41,7 @@ std::string possible_newline(TokenStream& tokens);
 std::string possible_whitespace_or_newline(TokenStream& tokens);
 
 // Helper functions:
-Term* find_and_apply_function(Branch& branch,
+Term* find_and_apply(Branch& branch,
         std::string const& functionName,
         RefList inputs);
 void push_pending_rebind(Branch& branch, std::string const& name);

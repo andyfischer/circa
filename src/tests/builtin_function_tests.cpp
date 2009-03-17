@@ -164,7 +164,7 @@ void test_for()
 {
     Branch branch;
     //Term* l = branch.eval("l = list(1,2,3)");
-    //Term* f = apply_function(&branch, get_global("for"), RefList(l));
+    //Term* f = apply(&branch, get_global("for"), RefList(l));
 }
 
 void test_list()
