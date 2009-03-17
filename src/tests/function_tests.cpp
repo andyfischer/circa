@@ -47,20 +47,6 @@ void using_apply()
     test_assert(as_float(result2) == 15.0);
 }
 
-void external_pointers()
-{
-    Branch branch;
-
-    Term* function = create_value(&branch, FUNCTION_TYPE);
-
-    as_function(function).inputTypes = RefList(INT_TYPE, INT_TYPE);
-    as_function(function).outputType = STRING_TYPE;
-
-    RefList refs = reference_iterator_to_list(start_reference_iterator(function));
-    
-    test_equals(refs, RefList(INT_TYPE, INT_TYPE, STRING_TYPE));
-}
-
 void subroutine_binding_input_names()
 {
     Branch branch;
@@ -73,40 +59,10 @@ void subroutine_binding_input_names()
     test_assert(find_named(&as_function(mysub).subroutineBranch,"a") != NULL);
 }
 
-void reference_iterator()
-{
-    Function func;
-    func.inputTypes.append(BOOL_TYPE);
-    func.inputTypes.append(INT_TYPE);
-    func.outputType = STRING_TYPE;
-
-    ReferenceIterator* it = start_function_reference_iterator(&func);
-
-    test_assert(it->current() == BOOL_TYPE);
-    it->advance();
-    test_assert(it->current() == INT_TYPE);
-    it->advance();
-    test_assert(it->current() == STRING_TYPE);
-    it->advance();
-    test_assert(it->finished());
-    delete it;
-
-    // Try with no input types
-    func.inputTypes.clear();
-    it = start_function_reference_iterator(&func);
-    test_assert(it->current() == STRING_TYPE);
-    it->advance();
-    test_assert(it->finished());
-    delete it;
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(function_tests::create);
-    //REGISTER_TEST_CASE(function_tests::using_apply); FIXME
-    REGISTER_TEST_CASE(function_tests::external_pointers);
     REGISTER_TEST_CASE(function_tests::subroutine_binding_input_names);
-    REGISTER_TEST_CASE(function_tests::reference_iterator);
 }
 
 } // namespace function_tests
