@@ -67,7 +67,7 @@ void unsafe_change_type(Term *term, Term *type)
 {
     assert(type != NULL);
 
-    if (term->value == NULL) {
+    if (!is_value_alloced(term)) {
         change_type(term, type);
         return;
     }
@@ -83,7 +83,7 @@ void change_type(Term *term, Term *typeTerm)
         return;
 
     // if term->value is not NULL, it's a possible memory leak
-    assert(term->value == NULL);
+    assert(!is_value_alloced(term));
 
     term->type = typeTerm;
 
@@ -234,7 +234,7 @@ std::string to_string(Term* term)
 
     if (func == NULL)
         return "<" + as_type(term->type).name + " has no toString func>";
-    else if (term->value == NULL)
+    else if (!is_value_alloced(term))
         return "<NULL>";
     else
         return func(term);
@@ -258,7 +258,7 @@ ReferenceIterator* start_reference_iterator(Term* term)
     if (type.startReferenceIterator == NULL)
         return NULL;
 
-    if (term->value == NULL)
+    if (!is_value_alloced(term))
         return NULL;
 
     return type.startReferenceIterator(term);

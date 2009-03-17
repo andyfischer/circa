@@ -107,7 +107,7 @@ void evaluate_term(Term* term)
             return;
         }
 
-        if (input->value == NULL && !inputProps.meta) {
+        if (!is_value_alloced(input) && !inputProps.meta) {
             std::stringstream message;
             message << "Input " << inputIndex << " has NULL value";
             error_occured(term, message.str());
@@ -138,9 +138,8 @@ void evaluate_term(Term* term)
     }
     
     // Make sure we have an allocated value. Allocate one if necessary
-    if (term->value == NULL) {
+    if (!is_value_alloced(term))
         alloc_value(term);
-    }
 
     // Execute the function
     try {

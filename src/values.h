@@ -23,6 +23,8 @@ void steal_value(Term* source, Term* dest);
 
 void dealloc_value(Term* term);
 
+bool is_value_alloced(Term* term);
+
 // Create a new value term with the given type.
 // 'branch' may be NULL.
 Term* create_value(Branch* branch, Term* type, std::string const& name="");
