@@ -13,13 +13,13 @@ void alloc_value(Term* term)
 
 void dealloc_value(Term* term)
 {
-    if (term->value == NULL)
+    if (!is_value_alloced(term))
         return;
 
     if (term->type == NULL)
         return;
 
-    if (term->type->value == NULL)
+    if (!is_value_alloced(term->type))
         throw std::runtime_error("type is undefined");
 
     if (term->ownsValue) {
@@ -31,6 +31,12 @@ void dealloc_value(Term* term)
     }
 
     term->value = NULL;
+}
+
+bool is_value_alloced(Term* term)
+{
+    // Future: return true for in-place values, when those are implemented.
+    return term->value != NULL;
 }
 
 void recycle_value(Term* source, Term* dest)
@@ -60,7 +66,7 @@ void copy_value(Term* source, Term* dest)
 
     assert_type(source, dest->type);
 
-    if (dest->value == NULL)
+    if (!is_value_alloced(dest))
         alloc_value(dest);
 
     Type::CopyFunc copy = as_type(source->type).copy;

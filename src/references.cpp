@@ -37,7 +37,7 @@ public:
     ReferenceIteratorForReferenceType(Term* containingTerm)
       : _containingTerm(containingTerm)
     {
-        if (_containingTerm->value == NULL)
+        if (!is_value_alloced(_containingTerm))
             _containingTerm = NULL;
     }
 

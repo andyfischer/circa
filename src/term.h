@@ -33,6 +33,9 @@ struct Term
     // Persisted internal value. Owned by us.
     Ref state;
 
+    // Our name binding.
+    std::string name;
+
     // The branch that owns this term.
     Branch* owningBranch;
 
@@ -41,9 +44,6 @@ struct Term
 
     // If true, recycle_value is allowed to steal our value.
     bool stealingOk;
-
-    // Our name binding.
-    std::string name;
 
     // True if this term's value is out-of-date
     bool needsUpdate;
