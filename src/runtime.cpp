@@ -185,8 +185,6 @@ void set_input(Term* term, int index, Term* input)
 {
     assert_good_pointer(term);
 
-    // Term* previousInput = term->inputs.get(index);
-
     term->inputs.setAt(index, input);
 
     // Update syntax hints
@@ -282,19 +280,18 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     // Create the term
     Term* result = create_term(branch, function, inputs);
 
+    // Bind name, if given
     if (name != "" && branch != NULL)
         branch->bindName(result, name);
 
     return result;
 }
 
-Term* apply(Branch* branch,
-                     std::string const& functionName, 
-                     RefList const& inputs)
+Term* apply(Branch* branch, std::string const& functionName, RefList const& inputs)
 {
     Term* function = find_named(branch,functionName);
     if (function == NULL)
-        throw std::runtime_error(std::string("function not found: ")+functionName);
+        throw std::runtime_error("function not found: "+functionName);
 
     return apply(branch, function, inputs);
 }
@@ -311,7 +308,7 @@ Term* eval_function(Branch& branch, std::string const& functionName,
 {
     Term* function = find_named(&branch,functionName);
     if (function == NULL)
-        throw std::runtime_error(std::string("function not found: ")+functionName);
+        throw std::runtime_error("function not found: "+functionName);
 
     return eval_function(branch, function, inputs);
 }
