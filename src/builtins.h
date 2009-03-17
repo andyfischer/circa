@@ -32,6 +32,7 @@ extern Term* CONSTANT_TRUE;
 extern Term* CONSTANT_FALSE;
 extern Term* UNKNOWN_FUNCTION;
 extern Term* UNKNOWN_IDENTIFIER_FUNC;
+extern Term* UNKNOWN_TYPE_FUNC;
 extern Term* APPLY_FEEDBACK;
 extern Term* ADD_FUNC;
 extern Term* SUB_FUNC;

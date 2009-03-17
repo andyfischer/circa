@@ -131,6 +131,12 @@ void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
     }
 }
 
+Term* create_unknown_type(Branch& branch, std::string const& name)
+{
+    Term* result = apply(&branch, UNKNOWN_TYPE_FUNC, RefList());
+    as_string(result->state) = name;
+    return result;
+}
 
 // Parsing functions:
 
@@ -255,7 +261,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
         Term* typeTerm = find_named(&branch, type);
 
         if (typeTerm == NULL)
-            throw std::runtime_error("couldn't find type: " + type);
+            typeTerm = create_unknown_type(branch, type);
 
         func.appendInput(typeTerm, name);
 
@@ -274,14 +280,13 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
         Term* outputType = find_named(&branch, outputTypeName);
 
         if (outputType == NULL)
-            throw std::runtime_error("couldn't find type: " + outputTypeName);
+            outputType = create_unknown_type(branch, outputTypeName);
 
         func.outputType = outputType;
     }
 
     possible_whitespace(tokens);
     possible_newline(tokens);
-    
 
     return result;
 }
@@ -448,7 +453,9 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     possible_newline(tokens);
 
     Term* type = find_named(&branch, typeName);
-    assert(type != NULL);
+
+    if (type == NULL)
+        type = create_unknown_type(branch, typeName);
 
     RefList inputs;
     if (initialValue != NULL)

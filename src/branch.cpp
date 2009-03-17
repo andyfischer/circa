@@ -370,6 +370,9 @@ void persist_results_for_stateful_terms(Branch& branch)
 
             Term* result = branch[term->name];
 
+            if (result == term)
+                continue;
+
             copy_value(result, term);
         }
     }
