@@ -216,6 +216,10 @@ void check_for_compile_error(Term* term, std::string& errorMessage)
 {
     if (term->function == UNKNOWN_FUNCTION) {
         errorMessage = std::string("Unknown function: " + as_string(term->state));
+    } else if (term->function == UNKNOWN_TYPE_FUNC) {
+        errorMessage = std::string("Unknown type: " + as_string(term->state));
+    } else if (term->function == UNKNOWN_IDENTIFIER_FUNC) {
+        errorMessage = std::string("Unknown identifier: " + as_string(term->state));
     }
 }
 

@@ -87,12 +87,6 @@ void change_type(Term *term, Term *typeTerm)
 
     term->type = typeTerm;
 
-    Type& type = as_type(typeTerm);
-
-    if (type.alloc == NULL) {
-        throw std::runtime_error(std::string("type ") + type.name + " has no alloc function");
-    }
-
     alloc_value(term);
 }
 
@@ -128,13 +122,18 @@ void empty_duplicate_function(Term*,Term*) {}
 
 }
 
+void setup_empty_type(Type& type)
+{
+    type.alloc = type_private::empty_allocate;
+    type.dealloc = type_private::empty_dealloc;
+    type.copy = type_private::empty_duplicate_function;
+}
+
 Term* create_empty_type(Branch& branch, std::string name)
 {
     Term* term = create_value(&branch, TYPE_TYPE);
     Type& type = as_type(term);
-    type.alloc = type_private::empty_allocate;
-    type.dealloc = type_private::empty_dealloc;
-    type.copy = type_private::empty_duplicate_function;
+    setup_empty_type(type);
     type.name = name;
     branch.bindName(term, name);
     return term;
@@ -142,7 +141,11 @@ Term* create_empty_type(Branch& branch, std::string name)
 
 void* alloc_from_type(Term* typeTerm)
 {
-    return as_type(typeTerm).alloc(typeTerm);
+    Type& type = as_type(typeTerm);
+    if (type.alloc == NULL)
+        return NULL;
+
+    return type.alloc(typeTerm);
 }
 
 Type& create_compound_type(Branch& branch, std::string const& name)
