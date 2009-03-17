@@ -174,16 +174,6 @@ void token_stream_to_string()
             "WHITESPACE \" \", FLOAT \"0.123\"]}");
 }
 
-void hosted_tokenize()
-{
-    Branch branch;
-    Term* result = branch.eval("\"hi + 0.123\" -> tokenize -> to-string");
-
-    test_assert(as_string(result) == 
-            "{index: 0, tokens: [IDENTIFIER \"hi\", WHITESPACE \" \", + \"+\", "
-            "WHITESPACE \" \", FLOAT \"0.123\"]}");
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers);
@@ -195,7 +185,6 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
     REGISTER_TEST_CASE(tokenizer_tests::token_stream_to_string);
-    REGISTER_TEST_CASE(tokenizer_tests::hosted_tokenize);
 }
 
 } // namespace tokenizer_tests

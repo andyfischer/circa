@@ -218,10 +218,10 @@ void test_arrow_concatenation2()
 {
     Branch branch;
     Term* a = parser::compile(branch, parser::statement,
-        "\"hello\" -> tokenize -> to-string");
+        "0.0 -> cos -> to-string");
 
-    test_assert(branch[0]->asString() == "hello");
-    test_equals(branch[1]->function->name, "tokenize");
+    test_assert(branch[0]->asFloat() == 0.0);
+    test_equals(branch[1]->function->name, "cos");
     test_assert(branch[1]->input(0) == branch[0]);
     test_equals(branch[2]->function->name, "to-string");
     test_assert(branch[2]->input(0) == branch[1]);
