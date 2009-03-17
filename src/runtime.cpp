@@ -42,7 +42,7 @@ Term* create_term(Branch* branch, Term* function, RefList const& inputs)
     Term* stateType = functionData.stateType;
     if (stateType != NULL) {
         if (!is_type(stateType))
-            throw std::runtime_error(outputType->name + " is not a type");
+            throw std::runtime_error(stateType->name + " is not a type");
         term->state = create_value(NULL, stateType);
     }
 
