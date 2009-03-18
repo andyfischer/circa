@@ -31,6 +31,13 @@ void assert_type(Term *term, Term *type)
 {
     assert(term != NULL);
 
+    // Allow for compound types to be considered the same.
+    // Later there can be more complicated type checking.
+
+    if (type != NULL &&
+            as_type(term->type).isCompoundType() && as_type(type).isCompoundType())
+        return;
+
     if (term->type != type) {
         std::stringstream err;
         err << "assert_type failed, expected " << as_type(type).name;
@@ -47,8 +54,11 @@ bool is_type(Term* term)
 
 Type& as_type(Term *term)
 {
-    assert_type(term, TYPE_TYPE);
     assert(term->value != NULL);
+
+    // don't use assert_type here because assert_type uses as_type
+    assert(term->type == TYPE_TYPE);
+
     return *((Type*) term->value);
 }
 
