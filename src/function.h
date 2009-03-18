@@ -66,7 +66,6 @@ struct Function
     static void copy(Term* source, Term* dest);
     static void remapPointers(Term* term, ReferenceMap const& map);
     static void subroutine_call_evaluate(Term* caller);
-    static ReferenceIterator* start_reference_iterator(Term* term);
 };
 
 bool is_function(Term* term);
