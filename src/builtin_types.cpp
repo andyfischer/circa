@@ -97,10 +97,6 @@ namespace primitives {
     }
 
     namespace string_t {
-        std::string to_string(Term* term)
-        {
-            return as_string(term);
-        }
 
         std::string to_source_string(Term* term)
         {
@@ -209,7 +205,7 @@ void initialize_builtin_types(Branch& kernel)
 {
     STRING_TYPE = import_type<std::string>(kernel, "string");
     as_type(STRING_TYPE).equals = cpp_importing::templated_equals<std::string>;
-    as_type(STRING_TYPE).toString = primitives::string_t::to_string;
+    as_type(STRING_TYPE).toString = primitives::string_t::to_source_string;
     as_type(STRING_TYPE).toSourceString = primitives::string_t::to_source_string;
 
     INT_TYPE = import_type<int>(kernel, "int");
