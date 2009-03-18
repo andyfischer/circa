@@ -36,9 +36,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens);
 Term* literal_string(Branch& branch, TokenStream& tokens);
 Term* literal_branch(Branch& branch, TokenStream& tokens);
 Term* identifier(Branch& branch, TokenStream& tokens);
-std::string possible_whitespace(TokenStream& tokens);
-std::string possible_newline(TokenStream& tokens);
-std::string possible_whitespace_or_newline(TokenStream& tokens);
+
 
 // Helper functions:
 Term* find_and_apply(Branch& branch,
@@ -48,6 +46,10 @@ void push_pending_rebind(Branch& branch, std::string const& name);
 std::string pop_pending_rebind(Branch& branch);
 void remove_compilation_attrs(Branch& branch);
 bool is_infix_operator_rebinding(std::string const& infix);
+std::string possible_whitespace(TokenStream& tokens);
+std::string possible_newline(TokenStream& tokens);
+std::string possible_whitespace_or_newline(TokenStream& tokens);
+void consume_statement_end(TokenStream& tokens, Term* term);
 
 } // namespace parser
 } // namespace circa

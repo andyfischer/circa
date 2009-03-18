@@ -349,6 +349,9 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
 
     tokens.consume(RBRACE);
 
+    possible_whitespace(tokens);
+    consume_statement_end(tokens, result);
+
     return result;
 }
 
@@ -493,10 +496,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     Term* result = infix_expression(branch, tokens);
 
-    if (tokens.finished())
-        result->syntaxHints.endsFile = true;
-    else
-        possible_newline(tokens); // this should always consume newline
+    consume_statement_end(tokens, result);
 
     // If this item is just an identifier, and we're trying to rename it,
     // create an implicit call to 'copy'.
@@ -971,6 +971,14 @@ std::string possible_whitespace_or_newline(TokenStream& tokens)
         output << tokens.consume();
 
     return output.str();
+}
+
+void consume_statement_end(TokenStream& tokens, Term* term)
+{
+    if (tokens.finished())
+        term->syntaxHints.endsFile = true;
+    else
+        tokens.consume(NEWLINE);
 }
 
 } // namespace parser
