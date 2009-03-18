@@ -1,0 +1,3 @@
+cd $CIRCA_HOME
+circa tests/$1.ca
+circa tests/$1.ca > tests/expected/$1.ca.expected_output
