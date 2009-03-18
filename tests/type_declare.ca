@@ -15,4 +15,4 @@ type Composite {
 }
 
 c = Composite()
-
+c -> to-string -> print

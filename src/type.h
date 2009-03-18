@@ -109,6 +109,11 @@ struct Type
         return -1;
     }
 
+    int numFields() const
+    {
+        return (int) fields.size();
+    }
+
     void makeCompoundType(std::string const& name);
     bool isCompoundType();
 
@@ -121,6 +126,7 @@ struct Type
     static void type_copy(Term* source, Term* dest);
     static void typeRemapPointers(Term *term, ReferenceMap const& map);
     static ReferenceIterator* typeStartReferenceIterator(Term* term);
+    static std::string type_to_string(Term* term);
 };
 
 bool is_type(Term* term);
@@ -144,6 +150,7 @@ Term* create_empty_type(Branch& branch, std::string name);
 void* alloc_from_type(Term* typeTerm);
 
 Type& create_compound_type(Branch& branch, std::string const& name);
+std::string compound_type_to_string(Term* caller);
 
 // Functions which are dispatched based on type
 bool equals(Term* a, Term* b);

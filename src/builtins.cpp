@@ -127,11 +127,13 @@ void bootstrap_kernel()
     TYPE_TYPE->type = TYPE_TYPE;
     TYPE_TYPE->value = new Type();
 
+    as_type(TYPE_TYPE).name = "Type";
     as_type(TYPE_TYPE).alloc = cpp_importing::templated_alloc<Type>;
     as_type(TYPE_TYPE).dealloc = cpp_importing::templated_dealloc<Type>;
     as_type(TYPE_TYPE).copy = Type::type_copy;
     as_type(TYPE_TYPE).remapPointers = Type::typeRemapPointers;
     as_type(TYPE_TYPE).startReferenceIterator = Type::typeStartReferenceIterator;
+    as_type(TYPE_TYPE).toString = Type::type_to_string;
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Implant the Type type
