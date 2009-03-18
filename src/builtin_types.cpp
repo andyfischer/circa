@@ -54,14 +54,8 @@ void*& as_void_ptr(Term* term)
 
 namespace primitives {
     namespace int_t {
-        std::string to_string(Term* term)
-        {
-            std::stringstream strm;
-            strm << as_int(term);
-            return strm.str();
-        }
 
-        std::string to_source_string(Term* term)
+        std::string to_string(Term* term)
         {
             std::stringstream strm;
             if (term->syntaxHints.integerFormat == TermSyntaxHints::HEX)
@@ -73,14 +67,8 @@ namespace primitives {
     }
 
     namespace float_t {
-        std::string to_string(Term* term)
-        {
-            std::stringstream strm;
-            strm << as_float(term);
-            return strm.str();
-        }
 
-        std::string to_source_string(Term* term)
+        std::string to_string(Term* term)
         {
             // Figuring out how many decimal places to show is a hard problem.
             // This will need to be revisited.
@@ -98,7 +86,7 @@ namespace primitives {
 
     namespace string_t {
 
-        std::string to_source_string(Term* term)
+        std::string to_string(Term* term)
         {
             return std::string("'") + as_string(term) + "'";
         }
@@ -205,20 +193,20 @@ void initialize_builtin_types(Branch& kernel)
 {
     STRING_TYPE = import_type<std::string>(kernel, "string");
     as_type(STRING_TYPE).equals = cpp_importing::templated_equals<std::string>;
-    as_type(STRING_TYPE).toString = primitives::string_t::to_source_string;
-    as_type(STRING_TYPE).toSourceString = primitives::string_t::to_source_string;
+    as_type(STRING_TYPE).toString = primitives::string_t::to_string;
+    as_type(STRING_TYPE).toSourceString = primitives::string_t::to_string;
 
     INT_TYPE = import_type<int>(kernel, "int");
     as_type(INT_TYPE).equals = cpp_importing::templated_equals<int>;
     as_type(INT_TYPE).lessThan = cpp_importing::templated_lessThan<int>;
     as_type(INT_TYPE).toString = primitives::int_t::to_string;
-    as_type(INT_TYPE).toSourceString = primitives::int_t::to_source_string;
+    as_type(INT_TYPE).toSourceString = primitives::int_t::to_string;
 
     FLOAT_TYPE = import_type<float>(kernel, "float");
     as_type(FLOAT_TYPE).equals = cpp_importing::templated_equals<float>;
     as_type(FLOAT_TYPE).lessThan = cpp_importing::templated_lessThan<float>;
     as_type(FLOAT_TYPE).toString = primitives::float_t::to_string;
-    as_type(FLOAT_TYPE).toSourceString = primitives::float_t::to_source_string;
+    as_type(FLOAT_TYPE).toSourceString = primitives::float_t::to_string;
 
     BOOL_TYPE = import_type<bool>(kernel, "bool");
     as_type(BOOL_TYPE).equals = cpp_importing::templated_equals<bool>;
