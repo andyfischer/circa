@@ -62,6 +62,25 @@ void compound_types()
     test_assert(get_field(inst1,"myint")->asInt() == 5);
 }
 
+void type_declaration()
+{
+    Branch branch;
+    Term* myType = branch.eval("type MyType { string a, int b } ");
+
+    test_assert(as_type(myType).numFields() == 2);
+    test_assert(as_type(myType).fields[0].name == "a");
+    test_assert(as_type(myType).fields[0].type == STRING_TYPE);
+    test_assert(as_type(myType).fields[1].name == "b");
+    test_assert(as_type(myType).fields[1].type == INT_TYPE);
+
+    test_assert(as_type(myType).alloc != NULL);
+    test_assert(as_type(myType).copy != NULL);
+
+    Term* instance = branch.eval("mt = MyType()");
+
+    test_assert(is_value_alloced(instance));
+}
+
 void type_iterator()
 {
     Branch branch;
@@ -89,6 +108,7 @@ void type_iterator()
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
+    REGISTER_TEST_CASE(type_tests::type_declaration);
     REGISTER_TEST_CASE(type_tests::type_iterator);
 }
 
