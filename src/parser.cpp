@@ -342,7 +342,12 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
             throw std::runtime_error("couldn't find type: " + fieldTypeName);
 
         type.addField(fieldType, fieldName);
+
+        if (tokens.nextIs(COMMA))
+            tokens.consume(COMMA);
     }
+
+    tokens.consume(RBRACE);
 
     return result;
 }
