@@ -777,11 +777,13 @@ Term* atom(Branch& branch, TokenStream& tokens)
     }
     else {
 
-        std::cout << tokens.next().text;
-
         result = apply(&branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
         as_string(result->state) = "unrecognized expression at " 
             + tokens.next().locationAsString();
+
+        tokens.consume();
+
+        // todo: throw away tokens until end of line
     }
 
     return result;
