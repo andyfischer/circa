@@ -164,7 +164,6 @@ void bootstrap_kernel()
     as_type(FUNCTION_TYPE).dealloc = cpp_importing::templated_dealloc<Function>;
     as_type(FUNCTION_TYPE).copy = Function::copy;
     as_type(FUNCTION_TYPE).remapPointers = Function::remapPointers;
-    as_type(FUNCTION_TYPE).startReferenceIterator = Function::start_reference_iterator;
     KERNEL->bindName(FUNCTION_TYPE, "Function");
 
     // Implant Function type
@@ -215,9 +214,6 @@ void initialize_constants()
     Term* pi = apply(KERNEL, FLOAT_TYPE, RefList());
     as_float(pi) = 3.14159;
     KERNEL->bindName(pi, "PI");
-
-    Term* tokenStreamType = import_type<TokenStream>(*KERNEL, "TokenStream");
-    register_cpp_toString<TokenStream>(tokenStreamType);
 }
 
 void initialize_builtin_functions(Branch* kernel)
