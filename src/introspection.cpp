@@ -220,6 +220,8 @@ void check_for_compile_error(Term* term, std::string& errorMessage)
         errorMessage = std::string("Unknown type: " + as_string(term->state));
     } else if (term->function == UNKNOWN_IDENTIFIER_FUNC) {
         errorMessage = std::string("Unknown identifier: " + as_string(term->state));
+    } else if (term->function == UNRECOGNIZED_EXPRESSION_FUNC) {
+        errorMessage = std::string("Unrecognized expression: " + as_string(term->state));
     }
 }
 
