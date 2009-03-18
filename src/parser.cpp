@@ -131,10 +131,15 @@ void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
     }
 }
 
-Term* create_unknown_type(Branch& branch, std::string const& name)
+Term* find_type(Branch& branch, std::string const& name)
 {
-    Term* result = apply(&branch, UNKNOWN_TYPE_FUNC, RefList());
-    as_string(result->state) = name;
+    Term* result = find_named(&branch, name);
+
+    if (result == NULL) {
+        Term* result = apply(&branch, UNKNOWN_TYPE_FUNC, RefList());
+        as_string(result->state) = name;
+    }   
+
     return result;
 }
 
@@ -258,10 +263,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
             name = get_placeholder_name_for_index(func.inputProperties.size());
         }
 
-        Term* typeTerm = find_named(&branch, type);
-
-        if (typeTerm == NULL)
-            typeTerm = create_unknown_type(branch, type);
+        Term* typeTerm = find_type(branch, type);
 
         func.appendInput(typeTerm, name);
 
@@ -277,10 +279,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
         tokens.consume(RIGHT_ARROW);
         possible_whitespace(tokens);
         std::string outputTypeName = tokens.consume(IDENTIFIER);
-        Term* outputType = find_named(&branch, outputTypeName);
-
-        if (outputType == NULL)
-            outputType = create_unknown_type(branch, outputTypeName);
+        Term* outputType = find_type(branch, outputTypeName);
 
         func.outputType = outputType;
     }
@@ -452,10 +451,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 
     possible_newline(tokens);
 
-    Term* type = find_named(&branch, typeName);
-
-    if (type == NULL)
-        type = create_unknown_type(branch, typeName);
+    Term* type = find_type(branch, typeName);
 
     RefList inputs;
     if (initialValue != NULL)
@@ -783,10 +779,9 @@ Term* atom(Branch& branch, TokenStream& tokens)
 
         std::cout << tokens.next().text;
 
-        throw std::runtime_error("unrecognized expression at " 
-            + tokens.next().locationAsString());
-
-        return NULL; // unreachable
+        result = apply(&branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
+        as_string(result->state) = "unrecognized expression at " 
+            + tokens.next().locationAsString();
     }
 
     return result;
