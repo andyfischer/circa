@@ -13,7 +13,8 @@ def run_test(filename):
     Returns: True if we succeeded, a string error message if we failed.
     """
 
-    return test_helper.compare_command_against_file('circa '+filename, filename+'.expected_output')
+    return test_helper.compare_command_against_file('circa '+filename,
+            'expected/'+filename+'.expected_output')
 
 if __name__ == "__main__":
     filename = sys.argv[1]
