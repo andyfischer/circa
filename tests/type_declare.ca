@@ -1,7 +1,5 @@
 
-type ArrayIndex = int
-type unsafe_string = string
-type vector { int x, int y }
+--type vector { int x, int y }
 
 type MyClass {
   int a,
@@ -15,3 +13,6 @@ type Composite {
   MyClass myClass2,
   string name,
 }
+
+c = Composite()
+
