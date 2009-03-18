@@ -13,6 +13,7 @@ void Type::makeCompoundType(std::string const& name)
     dealloc = Branch::dealloc;
     copy = Branch::copy;
     remapPointers = Branch::hosted_remap_pointers;
+    toString = compound_type_to_string;
 }
 
 bool Type::isCompoundType()
@@ -155,6 +156,23 @@ Type& create_compound_type(Branch& branch, std::string const& name)
     return as_type(term);
 }
 
+std::string compound_type_to_string(Term* caller)
+{
+    std::stringstream out;
+    out << "{ ";
+
+    Branch& value = as_branch(caller);
+
+    for (int i=0; i < value.numTerms(); i++) {
+        if (i != 0)
+            out << ", ";
+        out << to_string(value[i]);
+    }
+
+    out << " }";
+    return out.str();
+}
+
 bool equals(Term* a, Term* b)
 {
     if (a->type != b->type)
@@ -229,6 +247,24 @@ private:
 ReferenceIterator* Type::typeStartReferenceIterator(Term* term)
 {
     return new TypeReferenceIterator(&as_type(term));
+}
+
+std::string Type::type_to_string(Term* term)
+{
+    std::stringstream out;
+
+    out << "Type { ";
+
+    Type& type = as_type(term);
+
+    for (int i=0; i < type.numFields(); i++) {
+        if (i != 0)
+            out << ", ";
+        out << as_type(type.fields[i].type).name << " " << type.fields[i].name;
+    }
+
+    out << " }";
+    return out.str();
 }
 
 std::string to_string(Term* term)
