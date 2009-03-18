@@ -916,6 +916,9 @@ Term* literal_branch(Branch& branch, TokenStream& tokens)
             tokens.consume(COMMA);
     }
 
+    possible_whitespace(tokens);
+    tokens.consume(RBRACE);
+
     return resultTerm;
 }
 
