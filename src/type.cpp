@@ -27,7 +27,7 @@ Type::addMemberFunction(Term* function, std::string const &name)
     this->memberFunctions.bind(function, name);
 }
 
-void assert_type(Term *term, Term *type)
+bool type_matches(Term *term, Term *type)
 {
     assert(term != NULL);
 
@@ -36,9 +36,18 @@ void assert_type(Term *term, Term *type)
 
     if (type != NULL &&
             as_type(term->type).isCompoundType() && as_type(type).isCompoundType())
-        return;
+        return true;
 
-    if (term->type != type) {
+    if (term->type != type)
+        return false;
+
+    return true;
+}
+
+void assert_type(Term *term, Term *type)
+{
+    if (!type_matches(term, type))
+    {
         std::stringstream err;
         err << "assert_type failed, expected " << as_type(type).name;
         err << ", found " << as_type(term->type).name;

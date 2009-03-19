@@ -51,6 +51,7 @@ Term* COPY_FUNC = NULL;
 Term* IF_FUNC = NULL;
 Term* STATEFUL_VALUE_FUNC = NULL;
 Term* ASSIGN_FUNC = NULL;
+Term* SET_FIELD_FUNC = NULL;
 
 void empty_evaluate_function(Term*) { }
 void empty_alloc_function(Term*) { }

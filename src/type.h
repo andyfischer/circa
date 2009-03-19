@@ -131,6 +131,8 @@ Type& as_type(Term* term);
 
 Term* quick_create_type(Branch& branch, std::string name="");
 
+bool type_matches(Term *term, Term *type);
+
 // Throw an exception if term is not an instance of type
 void assert_type(Term* term, Term* type);
 

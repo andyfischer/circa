@@ -2,16 +2,9 @@
 
 #include "common_headers.h"
 
-#include "branch.h"
-#include "builtins.h"
-#include "function.h"
-#include "runtime.h"
-#include "syntax.h"
-#include "tokenizer.h"
-#include "type.h"
-#include "values.h"
+#include "circa.h"
 
-#include "parser.h"
+#include "hosted_types.h"
 
 namespace circa {
 namespace parser {
@@ -496,23 +489,28 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     // scan this line for an = operator
     int equals_operator_loc = search_line_for_token(tokens, EQUALS);
 
+    StringList names;
+    bool hasNameRebinding = false;
+
     if (equals_operator_loc != -1) {
         // Parse name binding(s)
-        // ...
-    }
-    
-    bool isNameBinding = tokens.nextIs(tokenizer::IDENTIFIER)
-        && (tokens.nextIs(tokenizer::EQUALS, 1)
-                || (tokens.nextIs(tokenizer::WHITESPACE,1)
-                    && (tokens.nextIs(tokenizer::EQUALS,2))));
 
-    // check for name binding
-    std::string name;
-    if (isNameBinding) {
-        name = tokens.consume(tokenizer::IDENTIFIER);
+        while (true) {
+            names.append(tokens.consume(IDENTIFIER));
+
+            if (!tokens.nextIs(DOT))
+                break;
+
+            tokens.consume(DOT);
+        }
+
         possible_whitespace(tokens);
+
         tokens.consume(EQUALS);
+
         possible_whitespace(tokens);
+
+        hasNameRebinding = true;
     }
 
     Term* result = infix_expression(branch, tokens);
@@ -521,28 +519,34 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     // If this item is just an identifier, and we're trying to rename it,
     // create an implicit call to 'copy'.
-    if (result->name != "" && name != "") {
+    if (result->name != "" && hasNameRebinding) {
         result = apply(&branch, COPY_FUNC, RefList(result));
         result->syntaxHints.declarationStyle = TermSyntaxHints::SPECIFIC_TO_FUNCTION;
     }
 
-    std::string pendingRebind = pop_pending_rebind(branch);
-
-    if (pendingRebind != "") {
-        if (name != "") {
-            throw std::runtime_error("term has both a name and a pending rebind: "
-                    + name + "," + pendingRebind);
-        }
-
-        name = pendingRebind;
-    }
-
-    if (name != "")
-        branch.bindName(result, name);
-
     // Go through all of our terms, if they don't have names then assume they
     // were created just for us. Update the syntax hints to reflect this.
     recursively_mark_terms_as_occuring_inside_an_expression(result);
+
+    std::string pendingRebind = pop_pending_rebind(branch);
+
+    if (pendingRebind != "")
+        branch.bindName(result, pendingRebind);
+
+    if (names.length() == 1)
+        branch.bindName(result, names[0]);
+    else if (names.length() == 2) {
+
+        // Field assignment
+        Term* object = branch[names[0]];
+        result = apply(&branch, SET_FIELD_FUNC,
+                RefList(object, string_value(branch, names[1]), result));
+
+        branch.bindName(result, names[0]);
+
+    } else if (names.length() > 2) {
+        throw std::runtime_error("not yet supported: bind names with more than one .");
+    }
 
     return result;
 }
