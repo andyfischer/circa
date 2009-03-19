@@ -15,9 +15,9 @@ namespace branch_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
+        BRANCH_FUNC = import_function(kernel, evaluate,
                 "function branch()");
-        as_function(main_func).stateType = BRANCH_TYPE;
+        as_function(BRANCH_FUNC).stateType = BRANCH_TYPE;
     }
 }
 }
