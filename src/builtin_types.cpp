@@ -73,13 +73,14 @@ namespace primitives {
             // Figuring out how many decimal places to show is a hard problem.
             // This will need to be revisited.
             std::stringstream strm;
+
             strm.setf(std::ios::fixed, std::ios::floatfield);
             strm.precision(term->syntaxHints.floatDecimalFigures);
             strm << as_float(term);
 
-            if (term->hasProperty("mutability")
-                    && term->property("mutability")->asFloat() == 1.0)
+            if (term->floatPropertyOptional("mutability", 0.0) > 0.5)
                 strm << "?";
+
             return strm.str();
         }
     }

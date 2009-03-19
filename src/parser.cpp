@@ -545,7 +545,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         branch.bindName(result, names[0]);
 
     } else if (names.length() > 2) {
-        throw std::runtime_error("not yet supported: bind names with more than one .");
+        throw std::runtime_error("not yet supported: bind names with more than two qualified names.");
     }
 
     return result;
