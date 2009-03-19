@@ -42,8 +42,6 @@ Term* evaluate_statement(Branch& branch, std::string const& input)
     return result;
 }
 
-// Helper functions:
-
 void set_input_syntax(Term* term, int index, Term* input)
 {
     TermSyntaxHints::InputSyntax& syntax = term->syntaxHints.getInputSyntax(index);
