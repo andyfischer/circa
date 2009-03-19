@@ -490,7 +490,6 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     int equals_operator_loc = search_line_for_token(tokens, EQUALS);
 
     StringList names;
-    bool hasNameRebinding = false;
 
     if (equals_operator_loc != -1) {
         // Parse name binding(s)
@@ -509,8 +508,6 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         tokens.consume(EQUALS);
 
         possible_whitespace(tokens);
-
-        hasNameRebinding = true;
     }
 
     Term* result = infix_expression(branch, tokens);
@@ -519,7 +516,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     // If this item is just an identifier, and we're trying to rename it,
     // create an implicit call to 'copy'.
-    if (result->name != "" && hasNameRebinding) {
+    if (result->name != "" && names.length() > 0) {
         result = apply(&branch, COPY_FUNC, RefList(result));
         result->syntaxHints.declarationStyle = TermSyntaxHints::SPECIFIC_TO_FUNCTION;
     }
