@@ -16,9 +16,8 @@ namespace copy_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
-                "function copy(any) -> any");
-        as_function(main_func).pureFunction = true;
+        COPY_FUNC = import_function(kernel, evaluate, "function copy(any) -> any");
+        as_function(COPY_FUNC).pureFunction = true;
     }
 }
 }

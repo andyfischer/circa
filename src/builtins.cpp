@@ -54,7 +54,6 @@ Term* ASSIGN_FUNC = NULL;
 Term* SET_FIELD_FUNC = NULL;
 
 void empty_evaluate_function(Term*) { }
-void empty_alloc_function(Term*) { }
 
 void value_function_generate_training(Branch& branch, Term* subject, Term* desired)
 {
@@ -220,12 +219,6 @@ void initialize_constants()
 void initialize_builtin_functions(Branch* kernel)
 {
     setup_builtin_functions(*kernel);
-
-    MULT_FUNC = kernel->getNamed("mult");
-    COPY_FUNC = kernel->getNamed("copy");
-
-    assert(ADD_FUNC != NULL);
-    assert(MULT_FUNC != NULL);
 
     VALUE_FUNCTION_FEEDBACK_ASSIGN = import_function(*kernel,
         var_function::feedback_assign, "var-function-feedback-assign(any,any)");
