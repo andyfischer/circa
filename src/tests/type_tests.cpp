@@ -47,19 +47,6 @@ void compound_types()
     Term* inst1_astr = branch.eval("get-field(inst1, 'astr')");
     test_assert(inst1_astr != NULL);
     test_assert(!inst1_astr->hasError());
-    
-    // test get_field
-    test_assert(get_field(inst1,"myint") != NULL);
-    test_assert(get_field(inst1,"myint")->value != NULL);
-    get_field(inst1,"myint")->asInt() = 5;
-    branch.eval("get-field(inst1, 'myint')");
-    test_assert(branch.eval("get-field(inst1, 'myint')")->asInt() == 5);
-
-    Term* inst2 = branch.eval("inst2 = type1()");
-
-    test_assert(get_field(inst1,"myint") != get_field(inst2,"myint"));
-    get_field(inst2,"myint")->asInt() = 7;
-    test_assert(get_field(inst1,"myint")->asInt() == 5);
 }
 
 void type_declaration()

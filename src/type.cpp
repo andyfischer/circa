@@ -121,16 +121,6 @@ void specialize_type(Term *term, Term *type)
     change_type(term, type);
 }
 
-Term* get_field(Term *term, std::string const& fieldName)
-{
-    return as_branch(term)[fieldName];
-}
-
-Term* get_field(Term *term, int index)
-{
-    return as_branch(term)[index];
-}
-
 namespace type_private {
 
 void* empty_allocate(Term*)
