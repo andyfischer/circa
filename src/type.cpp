@@ -6,16 +6,6 @@
 
 namespace circa {
 
-void Type::makeCompoundType(std::string const& name)
-{
-    this->name = name;
-    alloc = Branch::alloc;
-    dealloc = Branch::dealloc;
-    copy = Branch::copy;
-    remapPointers = Branch::hosted_remap_pointers;
-    toString = compound_type_to_string;
-}
-
 bool Type::isCompoundType()
 {
     return alloc == Branch::alloc;
@@ -70,6 +60,7 @@ Type& as_type(Term *term)
 
     return *((Type*) term->value);
 }
+
 
 Term* quick_create_type(Branch& branch, std::string name)
 {
@@ -149,6 +140,15 @@ Term* create_empty_type(Branch& branch, std::string name)
     return term;
 }
 
+void initialize_compound_type(Type& type)
+{
+    type.alloc = Branch::alloc;
+    type.dealloc = Branch::dealloc;
+    type.copy = Branch::copy;
+    type.remapPointers = Branch::hosted_remap_pointers;
+    type.toString = compound_type_to_string;
+}
+
 void* alloc_from_type(Term* typeTerm)
 {
     Type& type = as_type(typeTerm);
@@ -158,11 +158,12 @@ void* alloc_from_type(Term* typeTerm)
     return type.alloc(typeTerm);
 }
 
-Type& create_compound_type(Branch& branch, std::string const& name)
+Term* create_compound_type(Branch& branch, std::string const& name)
 {
     Term* term = create_value(&branch, TYPE_TYPE, name);
-    as_type(term).makeCompoundType(name);
-    return as_type(term);
+    initialize_compound_type(as_type(term));
+    branch.bindName(term, name);
+    return term;
 }
 
 std::string compound_type_to_string(Term* caller)

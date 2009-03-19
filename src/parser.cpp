@@ -309,8 +309,8 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
 
     Term* result = create_value(&branch, TYPE_TYPE, name);
     Type& type = as_type(result);
-
-    type.makeCompoundType(name);
+    initialize_compound_type(type);
+    type.name = name;
 
     possible_whitespace_or_newline(tokens);
 

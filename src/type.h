@@ -111,7 +111,6 @@ struct Type
         return (int) fields.size();
     }
 
-    void makeCompoundType(std::string const& name);
     bool isCompoundType();
 
     void addMemberFunction(Term* function, std::string const& name);
@@ -129,12 +128,12 @@ struct Type
 bool is_type(Term* term);
 Type& as_type(Term* term);
 
-Term* quick_create_type(Branch& branch, std::string name="");
-
 bool type_matches(Term *term, Term *type);
 
 // Throw an exception if term is not an instance of type
 void assert_type(Term* term, Term* type);
+
+Term* quick_create_type(Branch& branch, std::string name="");
 
 void unsafe_change_type(Term* term, Term* type);
 void change_type(Term* term, Term* type);
@@ -142,10 +141,11 @@ void specialize_type(Term* term, Term* type);
 
 void setup_empty_type(Type& type);
 Term* create_empty_type(Branch& branch, std::string name);
+void initialize_compound_type(Type& type);
 
 void* alloc_from_type(Term* typeTerm);
 
-Type& create_compound_type(Branch& branch, std::string const& name);
+Term* create_compound_type(Branch& branch, std::string const& name);
 std::string compound_type_to_string(Term* caller);
 
 // Functions which are dispatched based on type

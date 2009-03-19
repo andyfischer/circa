@@ -228,20 +228,17 @@ void initialize_builtin_types(Branch& kernel)
     import_type<RefList>(kernel, "Tuple");
     import_type<Map>(kernel, "Map");
 
-    BRANCH_TYPE = create_empty_type(kernel, "Branch");
-    as_type(BRANCH_TYPE).makeCompoundType("Branch");
+    BRANCH_TYPE = create_compound_type(kernel, "Branch");
     assert(as_type(BRANCH_TYPE).alloc == Branch::alloc);
 
     import_member_function(TYPE_TYPE, Type::name_accessor, "name(Type) -> string");
 
-    Term* set_type = create_empty_type(kernel, "Set");
-    as_type(set_type).makeCompoundType("Set");
+    Term* set_type = create_compound_type(kernel, "Set");
     as_type(set_type).toString = set_t::to_string;
     import_member_function(set_type, set_t::hosted_add, "function add(Set, any) -> Set");
     import_member_function(set_type, set_t::remove, "function remove(Set, any) -> Set");
 
-    Term* list_type = create_empty_type(kernel, "List");
-    as_type(list_type).makeCompoundType("List");
+    Term* list_type = create_compound_type(kernel, "List");
     import_member_function(list_type, list_t::append, "function append(List, any) -> List");
 }
 
