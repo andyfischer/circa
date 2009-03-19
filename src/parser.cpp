@@ -361,7 +361,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
     possible_newline(tokens);
 
-    Term* result = apply(&branch, get_global("if"), RefList(condition));
+    Term* result = apply(&branch, IF_FUNC, RefList(condition));
     result->syntaxHints.declarationStyle = TermSyntaxHints::IF_STATEMENT;
     Branch& innerBranch = as_branch(result->state);
     innerBranch.outerScope = &branch;
@@ -384,7 +384,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     remove_compilation_attrs(innerBranch);
 
     // Create the joining branch
-    Term* joining = apply(&branch, get_global("branch"), RefList(), "#joining");
+    Term* joining = apply(&branch, BRANCH_FUNC, RefList(), "#joining");
     Branch& joiningBranch = as_branch(joining->state);
 
     // Get a list of all names bound in this branch

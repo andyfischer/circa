@@ -47,6 +47,7 @@ extern Term* IF_FUNC;
 extern Term* STATEFUL_VALUE_FUNC;
 extern Term* ASSIGN_FUNC;
 extern Term* SET_FIELD_FUNC;
+extern Term* BRANCH_FUNC;
 
 Term* get_global(std::string name);
 void empty_evaluate_function(Term* caller);

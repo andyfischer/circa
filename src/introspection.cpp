@@ -41,13 +41,13 @@ bool has_inner_branch(Term* term)
 
 Branch* get_inner_branch(Term* term)
 {
-    if (is_value(term) && term->type == get_global("Function"))
+    if (is_value(term) && term->type == FUNCTION_TYPE)
         return &as_function(term).subroutineBranch;
 
-    if (term->function == get_global("branch"))
+    if (term->function == BRANCH_FUNC)
         return &as_branch(term->state);
 
-    if (term->function == get_global("if"))
+    if (term->function == IF_FUNC)
         return &as_branch(term->state);
 
     return NULL;
