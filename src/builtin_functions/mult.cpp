@@ -48,10 +48,10 @@ namespace mult_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
+        MULT_FUNC = import_function(kernel, evaluate,
                 "function mult(float,float) -> float");
-        as_function(main_func).pureFunction = true;
-        as_function(main_func).generateTraining = generateTraining;
+        as_function(MULT_FUNC).pureFunction = true;
+        as_function(MULT_FUNC).generateTraining = generateTraining;
     }
 }
 } // namespace circa
