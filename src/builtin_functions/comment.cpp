@@ -25,8 +25,8 @@ namespace comment_function {
                 "function comment()");
         as_function(main_func).pureFunction = true;
 
-        Type& stateType = create_compound_type(kernel, "comment::State");
-        stateType.addField(STRING_TYPE, "str");
+        Term* stateT = create_compound_type(kernel, "comment::State");
+        as_type(stateT).addField(STRING_TYPE, "str");
 
         as_function(main_func).stateType = kernel["comment::State"];
 

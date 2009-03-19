@@ -9,7 +9,8 @@ namespace create_compound_type_function {
     {
         std::string name = as_string(caller->input(0));
         Type& output = as_type(caller);
-        output.makeCompoundType(name);
+        initialize_compound_type(output);
+        output.name = name;
     }
 
     void setup(Branch& kernel)
