@@ -282,7 +282,7 @@ int main( int argc, char* args[] )
     post_script_load(SCRIPT_MAIN);
 
     // Initialize all SDL subsystems
-    if( SDL_Init(SDL_INIT_EVERYTHING) == -1)
+    if( SDL_Init(SDL_INIT_TIMER & SDL_INIT_VIDEO & SDL_INIT_JOYSTICK & SDL_INIT_EVENTTHREAD) == -1)
         return 1;
 
     // Set the window caption

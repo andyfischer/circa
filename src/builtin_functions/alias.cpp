@@ -1,7 +1,6 @@
 // Copyright 2008 Andrew Fischer
 
-#include "builtins.h"
-#include "circa.h"
+#include <circa.h>
 
 namespace circa {
 namespace alias_function {

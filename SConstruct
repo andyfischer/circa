@@ -12,13 +12,34 @@ generate_cpp_registration.do_register_all_tests(
 
 ENV = Environment(tools = ["default"], toolpath=".")
 
-ENV.Append(CPPFLAGS=['-ggdb'])
-ENV.Append(CPPFLAGS=['-Wall'])
+POSIX = os.name == 'posix'
+WINDOWS = os.name == 'nt'
+
+if POSIX:
+    ENV.Append(CPPFLAGS=['-ggdb'])
+    ENV.Append(CPPFLAGS=['-Wall'])
+
+if WINDOWS:
+    ENV.Append(CPPFLAGS=['/EHsc'])
+    ENV.Append(CPPFLAGS=['/RTC1'])
+    ENV.Append(CPPFLAGS=['/Wp64'])
+    ENV.Append(CPPFLAGS=['/MTd'])
+    ENV.Append(CPPFLAGS=['/Gm'])
+    ENV.Append(CPPFLAGS=['/Zi'])
+    ENV.Append(LIBS = ['libcmtd'])
+    ENV.Append(LINKFLAGS=['/NODEFAULTLIB:libc.lib'])
+    ENV.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrt.lib'])
+    ENV.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrtd.lib'])
+    ENV.Append(LINKFLAGS=['/NODEFAULTLIB:libcd.lib'])
+    ENV.Append(LINKFLAGS=['/NODEFAULTLIB:libcmt.lib'])
+    ENV.Append(LINKFLAGS=['/SUBSYSTEM:CONSOLE'])
+    ENV.Append(LINKFLAGS=['/MACHINE:X86'])
+
 
 ENV.Append(CPPDEFINES = ["_DEBUG"])
 ENV.Append(CPPDEFINES = ["DEBUG"])
 
-ENV.BuildDir('build/src', 'src',duplicate=0)
+ENV.BuildDir('build/src', 'src')
 ENV.Append(CPPPATH = ['src'])
 
 if not os.path.exists('build'):
@@ -40,6 +61,7 @@ def source_directory(dir, excludes=[]):
 
         global BUILD_FILES
         full_path = full_path.replace("src","build/src")
+
         BUILD_FILES.append(full_path)
 
 def source_directory_into_one_cpp(dir, name):
@@ -58,12 +80,12 @@ def source_directory_into_one_cpp(dir, name):
     global BUILD_FILES
     BUILD_FILES.append(generated_filename)
 
-source_directory('src', excludes=['test_program.cpp', 'main.cpp'])
+source_directory('src', excludes=['main.cpp', 'src/main.cpp'])
 source_directory_into_one_cpp('src/tests', 'all_tests')
 source_directory_into_one_cpp('src/builtin_functions', 'all_builtin_functions')
 
 circa_slib = ENV.StaticLibrary('lib/circa', BUILD_FILES)
-circa_so = ENV.SharedLibrary('lib/circa', BUILD_FILES)
+# circa_so = ENV.SharedLibrary('lib/circa', BUILD_FILES)
 
 circaBinary = ENV.Program('bin/circa', 'build/src/main.cpp', LIBS=[circa_slib])
 
@@ -77,11 +99,11 @@ CASDL_ENV = Environment()
 # import path so that we will find the correct sdl-config
 CASDL_ENV['ENV']['PATH'] = os.environ['PATH']
 
-CASDL_ENV.ParseConfig('sdl-config --cflags')
-CASDL_ENV.ParseConfig('sdl-config --libs')
+if POSIX:
+    CASDL_ENV.ParseConfig('sdl-config --cflags')
+    CASDL_ENV.ParseConfig('sdl-config --libs')
 
 CASDL_ENV.Append(LIBS = ['SDL_gfx'])
-CASDL_ENV.Append(CPPFLAGS=['-ggdb'])
 CASDL_ENV.Append(CPPPATH=['src'])
 CASDL_ENV.Append(LIBPATH = "lib")
 CASDL_ENV.Append(LIBS = ['circa'])

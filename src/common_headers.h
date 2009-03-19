@@ -3,6 +3,14 @@
 #ifndef CIRCA_COMMON_HEADERS_INCLUDED
 #define CIRCA_COMMON_HEADERS_INCLUDED
 
+#ifdef WINDOWS
+
+#undef max
+#undef min
+
+#endif
+
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstdio>
@@ -23,7 +31,7 @@ namespace circa {
 
 struct Branch;
 struct Function;
-struct ReferenceIterator;
+class ReferenceIterator;
 struct Term;
 struct Type;
 struct Ref;

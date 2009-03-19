@@ -2,16 +2,7 @@
 
 #include "common_headers.h"
 
-#include "cpp_importing.h"
-#include "testing.h"
-#include "branch.h"
-#include "builtins.h"
-#include "function.h"
-#include "introspection.h"
-#include "runtime.h"
-#include "term.h"
-#include "type.h"
-#include "values.h"
+#include <circa.h>
 
 namespace circa {
 namespace builtin_function_tests {
