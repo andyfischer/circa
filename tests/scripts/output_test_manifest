@@ -1,9 +1,9 @@
 assert.ca
 boolean.ca
+compound_type.ca
 feedback.ca
 infix.ca
 lessthan.ca
 set.ca
 subroutine.ca
-type_declare.ca
 unknown_function.ca
