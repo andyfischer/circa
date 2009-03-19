@@ -11,9 +11,6 @@ namespace get_field_function {
         Term* field = as_branch(caller->input(0))[fieldName];
         specialize_type(caller, field->type);
 
-        if (field->stealingOk)
-            std::cout << "warning: stealing from a field" << std::endl;
-
         recycle_value(field, caller);
     }
 

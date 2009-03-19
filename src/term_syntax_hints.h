@@ -89,7 +89,7 @@ struct TermSyntaxHints
         parens(0),
         occursInsideAnExpression(false),
         integerFormat(DECIMAL),
-        floatDecimalFigures(0),
+        floatDecimalFigures(1),
         endsFile(false)
     {}
 
