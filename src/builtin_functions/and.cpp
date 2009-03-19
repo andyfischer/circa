@@ -1,6 +1,6 @@
 // Copyright 2008 Paul Hodge
 
-#include "circa.h"
+#include <circa.h>
 
 namespace circa {
 namespace and_function {

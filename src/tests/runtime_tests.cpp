@@ -1,15 +1,6 @@
 // Copyright 2008 Paul Hodge
 
-#include "branch.h"
-#include "builtins.h"
-#include "cpp_importing.h"
-#include "introspection.h"
-#include "runtime.h"
-#include "testing.h"
-#include "term.h"
-#include "type.h"
-#include "ref_list.h"
-#include "values.h"
+#include <circa.h>
 
 namespace circa {
 namespace runtime_tests {
