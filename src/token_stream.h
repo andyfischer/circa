@@ -13,12 +13,6 @@ struct TokenStream
 {
     tokenizer::TokenList tokens;
     unsigned int currentIndex;
-    std::set<const char*> skipSet;
-
-    TokenStream()
-      : currentIndex(0)
-    {
-    }
 
     TokenStream(tokenizer::TokenList const& _tokens)
       : tokens(_tokens), currentIndex(0)
@@ -37,6 +31,8 @@ struct TokenStream
         tokenizer::tokenize(input, tokens);
         currentIndex = 0;
     }
+
+    int length() const { return (int) tokens.size(); }
 
     tokenizer::TokenInstance const& next(int lookahead=0) const;
 

@@ -476,8 +476,31 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     return result;
 }
 
+int search_line_for_token(TokenStream& tokens, int target)
+{
+    int lookahead = 0;
+
+    while (!tokens.nextIs(NEWLINE, lookahead) && lookahead < tokens.length())
+    {
+        if (tokens.nextIs(target, lookahead))
+            return lookahead;
+
+        lookahead++;
+    }
+
+    return -1;
+}
+
 Term* expression_statement(Branch& branch, TokenStream& tokens)
 {
+    // scan this line for an = operator
+    int equals_operator_loc = search_line_for_token(tokens, EQUALS);
+
+    if (equals_operator_loc != -1) {
+        // Parse name binding(s)
+        // ...
+    }
+    
     bool isNameBinding = tokens.nextIs(tokenizer::IDENTIFIER)
         && (tokens.nextIs(tokenizer::EQUALS, 1)
                 || (tokens.nextIs(tokenizer::WHITESPACE,1)
