@@ -8,7 +8,7 @@ namespace get_field_function {
     void evaluate(Term* caller)
     {
         std::string fieldName = as_string(caller->input(1));
-        Term* field = get_field(caller->input(0), fieldName);
+        Term* field = as_branch(caller->input(0))[fieldName];
         specialize_type(caller, field->type);
 
         if (field->stealingOk)

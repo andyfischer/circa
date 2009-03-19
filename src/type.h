@@ -140,9 +140,6 @@ void unsafe_change_type(Term* term, Term* type);
 void change_type(Term* term, Term* type);
 void specialize_type(Term* term, Term* type);
 
-Term* get_field(Term *term, std::string const& fieldName);
-Term* get_field(Term *term, int index);
-
 void setup_empty_type(Type& type);
 Term* create_empty_type(Branch& branch, std::string name);
 
