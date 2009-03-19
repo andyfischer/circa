@@ -59,7 +59,7 @@ bool check_valid_type(Function &func, int index, Term* term)
     if (expectedType == ANY_TYPE)
         return true;
 
-    return term->type == expectedType;
+    return type_matches(term, expectedType);
 }
 
 void evaluate_term(Term* term)
