@@ -14,10 +14,16 @@ namespace set_field_function {
         recycle_value(caller->input(2), as_branch(caller)[fieldName]);
     }
 
+    Term* specializeType(Term* caller)
+    {
+        return caller->input(0)->type;
+    }
+
     void setup(Branch& kernel)
     {
         SET_FIELD_FUNC = import_function(kernel, evaluate,
-                "function set-field(List, string, any) -> List");
+                "function set-field(any, any) -> any");
+        as_function(SET_FIELD_FUNC).specializeType = specializeType;
         as_function(SET_FIELD_FUNC).pureFunction = true;
     }
 }

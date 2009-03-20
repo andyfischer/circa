@@ -7,9 +7,8 @@ namespace get_field_function {
 
     void evaluate(Term* caller)
     {
-        std::string fieldName = as_string(caller->input(1));
-        Term* field = as_branch(caller->input(0))[fieldName];
-        specialize_type(caller, field->type);
+        int index = as_int(caller->state);
+        Term* field = as_branch(caller->input(0))[index];
 
         recycle_value(field, caller);
     }
@@ -17,7 +16,8 @@ namespace get_field_function {
     void setup(Branch& kernel)
     {
         GET_FIELD_FUNC = import_function(kernel, evaluate,
-                "function get-field(any,string) -> any");
+                "function get-field(any) -> any");
+        as_function(GET_FIELD_FUNC).stateType = INT_TYPE;
         as_function(GET_FIELD_FUNC).pureFunction = true;
     }
 }

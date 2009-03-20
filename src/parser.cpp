@@ -680,13 +680,6 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             // Check member functions first
             Type& lhsType = as_type(leftExpr->type);
 
-            bool isMemberFunctionCall = false;
-            bool isFieldAccess = false;
-
-            //std::cout << "looking for: " << rhsIdent << std::endl;
-            //std::cout << lhsType.findField(rhsIdent) << std::endl;
-            //std::cout << leftExpr->type->toString() << std::endl;
-
             // Field access is not very robust right now. We currently decide at compile-time
             // whether to do a member function call or a get-field, and this decision is
             // not perfect. The proper thing would be to always do get-field and then allow
@@ -700,55 +693,75 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             // First, look for this field as a member function
             if (lhsType.memberFunctions.contains(rhsIdent)) {
                 function = lhsType.memberFunctions[rhsIdent];
-                isMemberFunctionCall = true;
+
+                // Consume inputs
+                RefList inputs(leftExpr);
+                if (tokens.nextIs(LPAREN)) {
+
+                    tokens.consume(LPAREN);
+
+                    while (!tokens.nextIs(RPAREN)) {
+                        possible_whitespace(tokens);
+                        Term* input = infix_expression(branch, tokens);
+                        inputs.append(input);
+                        possible_whitespace(tokens);
+
+                        if (!tokens.nextIs(RPAREN))
+                            tokens.consume(COMMA);
+                    }
+                    tokens.consume(RPAREN);
+                }
+
+                result = apply(&branch, function, inputs);
+
+                if (leftExpr->name != "")
+                    branch.bindName(result, leftExpr->name);
 
             // Next, if this type defines this field
             } else if (lhsType.findField(rhsIdent) != -1) {
-                function = GET_FIELD_FUNC;
-                assert(function != NULL);
-                isFieldAccess = true;
+
+                result = apply(&branch, GET_FIELD_FUNC, RefList(leftExpr));
+                as_int(result->state) = lhsType.findField(rhsIdent);
+
+                
+                
 
             // Next, allow for dynamic lookup on a compound type
-            } else if (lhsType.isCompoundType()) {
+            /*} else if (lhsType.isCompoundType()) {
                 function = GET_FIELD_FUNC;
                 assert(function != NULL);
                 isFieldAccess = true;
+            */
 
             // Finally, look for this function in our local scope
             } else {
                 function = find_named(&branch, rhsIdent);
+
                 if (function == NULL)
                     throw std::runtime_error("function not found: " + rhsIdent);
-            }
 
-            assert(function != NULL);
+                // Consume inputs
+                RefList inputs(leftExpr);
+                if (tokens.nextIs(LPAREN)) {
 
-            RefList inputs(leftExpr);
+                    tokens.consume(LPAREN);
 
-            // Look for inputs
-            if (isFieldAccess) {
-                inputs.append(string_value(branch, rhsIdent));
+                    while (!tokens.nextIs(RPAREN)) {
+                        possible_whitespace(tokens);
+                        Term* input = infix_expression(branch, tokens);
+                        inputs.append(input);
+                        possible_whitespace(tokens);
 
-            } else if (tokens.nextIs(LPAREN)) {
-
-                tokens.consume(LPAREN);
-
-                while (!tokens.nextIs(RPAREN)) {
-                    possible_whitespace(tokens);
-                    Term* input = infix_expression(branch, tokens);
-                    inputs.append(input);
-                    possible_whitespace(tokens);
-
-                    if (!tokens.nextIs(RPAREN))
-                        tokens.consume(COMMA);
+                        if (!tokens.nextIs(RPAREN))
+                            tokens.consume(COMMA);
+                    }
+                    tokens.consume(RPAREN);
                 }
-                tokens.consume(RPAREN);
-            }
 
-            result = apply(&branch, function, inputs);
+                result = apply(&branch, function, inputs);
 
-            if (isMemberFunctionCall && leftExpr->name != "") {
-                branch.bindName(result, leftExpr->name);
+                if (leftExpr->name != "")
+                    branch.bindName(result, leftExpr->name);
             }
 
             result->syntaxHints.declarationStyle = TermSyntaxHints::DOT_CONCATENATION;
