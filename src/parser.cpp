@@ -687,20 +687,39 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             //std::cout << lhsType.findField(rhsIdent) << std::endl;
             //std::cout << leftExpr->type->toString() << std::endl;
 
-            if (lhsType.findField(rhsIdent) != -1) {
+            // Field access is not very robust right now. We currently decide at compile-time
+            // whether to do a member function call or a get-field, and this decision is
+            // not perfect. The proper thing would be to always do get-field and then allow
+            // for a call to a by-value function.
+
+            // Another problem is that we allow for the syntax value.function, where 'function'
+            // is not defined on value's type, but instead is just available from our local
+            // scope. This is totally confusing and is incompatible with dynamic name-based field
+            // access.
+
+            // First, look for this field as a member function
+            if (lhsType.memberFunctions.contains(rhsIdent)) {
+                function = lhsType.memberFunctions[rhsIdent];
+                isMemberFunctionCall = true;
+
+            // Next, if this type defines this field
+            } else if (lhsType.findField(rhsIdent) != -1) {
                 function = GET_FIELD_FUNC;
                 assert(function != NULL);
                 isFieldAccess = true;
 
-            } else if (lhsType.memberFunctions.contains(rhsIdent)) {
-                function = lhsType.memberFunctions[rhsIdent];
-                isMemberFunctionCall = true;
+            // Next, allow for dynamic lookup on a compound type
+            } else if (lhsType.isCompoundType()) {
+                function = GET_FIELD_FUNC;
+                assert(function != NULL);
+                isFieldAccess = true;
+
+            // Finally, look for this function in our local scope
             } else {
                 function = find_named(&branch, rhsIdent);
+                if (function == NULL)
+                    throw std::runtime_error("function not found: " + rhsIdent);
             }
-
-            if (function == NULL)
-                throw std::runtime_error("function not found: " + rhsIdent);
 
             assert(function != NULL);
 
