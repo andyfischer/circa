@@ -683,11 +683,9 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             bool isMemberFunctionCall = false;
             bool isFieldAccess = false;
 
-            std::cout << "looking for: " << rhsIdent << std::endl;
-
-            std::cout << lhsType.findField(rhsIdent) << std::endl;
-
-            std::cout << leftExpr->type->toString() << std::endl;
+            //std::cout << "looking for: " << rhsIdent << std::endl;
+            //std::cout << lhsType.findField(rhsIdent) << std::endl;
+            //std::cout << leftExpr->type->toString() << std::endl;
 
             if (lhsType.findField(rhsIdent) != -1) {
                 function = GET_FIELD_FUNC;
