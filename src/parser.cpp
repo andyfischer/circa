@@ -536,8 +536,10 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
         // Field assignment
         Term* object = branch[names[0]];
-        result = apply(&branch, SET_FIELD_FUNC,
-                RefList(object, string_value(branch, names[1]), result));
+        int fieldIndex = as_type(object->type).findFieldIndex(names[1]);
+        assert(fieldIndex != -1);
+        result = apply(&branch, SET_FIELD_FUNC, RefList(object, result));
+        as_int(result->state) = fieldIndex;
 
         branch.bindName(result, names[0]);
 
@@ -718,13 +720,12 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                     branch.bindName(result, leftExpr->name);
 
             // Next, if this type defines this field
-            } else if (lhsType.findField(rhsIdent) != -1) {
+            } else if (lhsType.findFieldIndex(rhsIdent) != -1) {
 
                 result = apply(&branch, GET_FIELD_FUNC, RefList(leftExpr));
-                as_int(result->state) = lhsType.findField(rhsIdent);
+                as_int(result->state) = lhsType.findFieldIndex(rhsIdent);
 
-                
-                
+                specialize_type(result, lhsType[rhsIdent].type);
 
             // Next, allow for dynamic lookup on a compound type
             /*} else if (lhsType.isCompoundType()) {

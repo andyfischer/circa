@@ -97,7 +97,16 @@ struct Type
         fields.push_back(Field(type,name));
     }
 
-    int findField(std::string const& name)
+    Field& operator[](std::string const& fieldName) {
+        for (int i=0; i < (int) fields.size(); i++) {
+            if (fields[i].name == fieldName)
+                return fields[i];
+        }
+
+        throw std::runtime_error("field not found: " + fieldName);
+    }
+
+    int findFieldIndex(std::string const& name)
     {
         for (int i=0; i < (int) fields.size(); i++) {
             if (fields[i].name == name)

@@ -7,11 +7,10 @@ namespace set_field_function {
 
     void evaluate(Term* caller)
     {
-        std::string fieldName = as_string(caller->input(1));
-
+        int index = as_int(caller->state);
         recycle_value(caller->input(0), caller);
 
-        recycle_value(caller->input(2), as_branch(caller)[fieldName]);
+        recycle_value(caller->input(1), as_branch(caller)[index]);
     }
 
     Term* specializeType(Term* caller)
@@ -23,6 +22,7 @@ namespace set_field_function {
     {
         SET_FIELD_FUNC = import_function(kernel, evaluate,
                 "function set-field(any, any) -> any");
+        as_function(SET_FIELD_FUNC).stateType = INT_TYPE;
         as_function(SET_FIELD_FUNC).specializeType = specializeType;
         as_function(SET_FIELD_FUNC).pureFunction = true;
     }
