@@ -28,7 +28,18 @@ Term* create_term(Branch* branch, Term* function, RefList const& inputs)
 
     Function& functionData = as_function(function);
 
+    // Initialize inputs
+    for (unsigned int i=0; i < inputs.count(); i++)
+        set_input(term, i, inputs[i]);
+
     Term* outputType = functionData.outputType;
+
+    // Check if this function has a specializeType function
+    if (functionData.specializeType != NULL) {
+        outputType = functionData.specializeType(term);
+        if (outputType == NULL)
+            throw std::runtime_error("result of specializeType is NULL");
+    }
 
     if (outputType == NULL)
         throw std::runtime_error("outputType is NULL");
@@ -46,8 +57,6 @@ Term* create_term(Branch* branch, Term* function, RefList const& inputs)
         term->state = create_value(NULL, stateType);
     }
 
-    for (unsigned int i=0; i < inputs.count(); i++)
-        set_input(term, i, inputs[i]);
 
     return term;
 }
