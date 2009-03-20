@@ -41,6 +41,8 @@ bool is_value_alloced(Term* term)
 
 void recycle_value(Term* source, Term* dest)
 {
+    assert(source != NULL);
+    assert(dest != NULL);
     assert_type(source, dest->type);
 
     // Usually don't steal. Later, as an optimization, we will sometimes steal.

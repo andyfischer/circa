@@ -22,10 +22,10 @@ void compound_types()
     test_assert(as_type(MyType).fields.size() == 2);
     test_assert(as_type(MyType).fields[0].name == "myint");
     test_assert(as_type(MyType).fields[0].type == INT_TYPE);
-    test_assert(as_type(MyType).findField("myint") == 0);
+    test_assert(as_type(MyType).findFieldIndex("myint") == 0);
     test_assert(as_type(MyType).fields[1].name == "astr");
     test_assert(as_type(MyType).fields[1].type == STRING_TYPE);
-    test_assert(as_type(MyType).findField("astr") == 1);
+    test_assert(as_type(MyType).findFieldIndex("astr") == 1);
 
     // instanciation
     Term* inst = branch.eval("inst = MyType()");
