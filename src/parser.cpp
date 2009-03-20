@@ -672,31 +672,48 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
         if (operatorStr == ".") {
             // dot concatenated call
 
-            std::string functionName = tokens.consume(IDENTIFIER);
+            std::string rhsIdent = tokens.consume(IDENTIFIER);
 
             // Try to find this function
             Term* function = NULL;
            
             // Check member functions first
-            Type& leftExprType = as_type(leftExpr->type);
+            Type& lhsType = as_type(leftExpr->type);
 
-            bool memberFunctionCall = false;
-            if (leftExprType.memberFunctions.contains(functionName)) {
-                function = leftExprType.memberFunctions[functionName];
-                memberFunctionCall = true;
+            bool isMemberFunctionCall = false;
+            bool isFieldAccess = false;
+
+            std::cout << "looking for: " << rhsIdent << std::endl;
+
+            std::cout << lhsType.findField(rhsIdent) << std::endl;
+
+            std::cout << leftExpr->type->toString() << std::endl;
+
+            if (lhsType.findField(rhsIdent) != -1) {
+                function = GET_FIELD_FUNC;
+                assert(function != NULL);
+                isFieldAccess = true;
+
+            } else if (lhsType.memberFunctions.contains(rhsIdent)) {
+                function = lhsType.memberFunctions[rhsIdent];
+                isMemberFunctionCall = true;
             } else {
-                function = find_named(&branch, functionName);
+                function = find_named(&branch, rhsIdent);
             }
 
             if (function == NULL)
-                throw std::runtime_error("function not found: " + functionName);
+                throw std::runtime_error("function not found: " + rhsIdent);
 
             assert(function != NULL);
 
             RefList inputs(leftExpr);
 
             // Look for inputs
-            if (tokens.nextIs(LPAREN)) {
+            if (isFieldAccess) {
+                inputs.append(string_value(branch, rhsIdent));
+
+            } else if (tokens.nextIs(LPAREN)) {
+
                 tokens.consume(LPAREN);
 
                 while (!tokens.nextIs(RPAREN)) {
@@ -713,7 +730,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             result = apply(&branch, function, inputs);
 
-            if (memberFunctionCall && leftExpr->name != "") {
+            if (isMemberFunctionCall && leftExpr->name != "") {
                 branch.bindName(result, leftExpr->name);
             }
 
