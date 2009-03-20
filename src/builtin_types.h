@@ -13,6 +13,8 @@ namespace set_t {
     void add(Branch& branch, Term* value);
 }
 
+bool is_string(Term* term);
+
 void initialize_builtin_types(Branch& kernel);
 
 } // namespace circa

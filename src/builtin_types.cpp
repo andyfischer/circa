@@ -2,11 +2,7 @@
 
 #include "common_headers.h"
 
-#include "builtins.h"
-#include "builtin_types.h"
-#include "cpp_importing.h"
-#include "runtime.h"
-#include "values.h"
+#include "circa.h"
 
 #include "builtin_types/map.hpp"
 
@@ -38,6 +34,12 @@ std::string& as_string(Term* term)
     assert_type(term, STRING_TYPE);
     assert(term->value != NULL);
     return *((std::string*) term->value);
+}
+
+// todo: add these for all primitives
+bool is_string(Term* term)
+{
+    return term->type == STRING_TYPE;
 }
 
 Ref& as_ref(Term* term)

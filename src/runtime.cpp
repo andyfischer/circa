@@ -35,6 +35,8 @@ Term* create_term(Branch* branch, Term* function, RefList const& inputs)
     Term* outputType = functionData.outputType;
 
     // Check if this function has a specializeType function
+    // Side note: maybe we should do this step later. Doing it here means that we can only
+    // specialize on inputs, but it might be cool to specialize on state too.
     if (functionData.specializeType != NULL) {
         outputType = functionData.specializeType(term);
         if (outputType == NULL)
@@ -56,7 +58,6 @@ Term* create_term(Branch* branch, Term* function, RefList const& inputs)
             throw std::runtime_error(stateType->name + " is not a type");
         term->state = create_value(NULL, stateType);
     }
-
 
     return term;
 }

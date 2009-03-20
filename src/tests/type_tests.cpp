@@ -16,37 +16,45 @@ void compound_types()
 {
     Branch branch;
 
-    Term* type1 = branch.eval("type1 = create-compound-type('type1')");
-    test_assert(type1 != NULL);
-    test_assert(is_type(type1));
+    Term* MyType = branch.eval("type MyType { int myint, string astr }");
+    test_assert(MyType != NULL);
+    test_assert(is_type(MyType));
+    test_assert(as_type(MyType).fields.size() == 2);
+    test_assert(as_type(MyType).fields[0].name == "myint");
+    test_assert(as_type(MyType).fields[0].type == INT_TYPE);
+    test_assert(as_type(MyType).findField("myint") == 0);
+    test_assert(as_type(MyType).fields[1].name == "astr");
+    test_assert(as_type(MyType).fields[1].type == STRING_TYPE);
+    test_assert(as_type(MyType).findField("astr") == 1);
 
-    type1 = branch.eval("compound-type-append-field(@type1, int, 'myint')");
-    test_assert(is_type(type1));
-    test_assert(as_type(type1).fields.size() == 1);
-    test_assert(as_type(type1).fields[0].name == "myint");
-    test_assert(as_type(type1).fields[0].type == INT_TYPE);
-    test_assert(as_type(type1).findField("myint") == 0);
+    // instanciation
+    Term* inst = branch.eval("inst = MyType()");
+    test_assert(inst != NULL);
+    test_assert(inst->type = MyType);
+    test_assert(inst->value != NULL);
+    test_assert(as_branch(inst)[0]->asInt() == 0);
+    test_assert(as_branch(inst)[1]->asString() == "");
 
-    type1 = branch.eval("compound-type-append-field(@type1, string, 'astr')");
-    test_assert(is_type(type1));
-    test_assert(as_type(type1).fields.size() == 2);
-    test_assert(as_type(type1).fields[1].name == "astr");
-    test_assert(as_type(type1).fields[1].type == STRING_TYPE);
-    test_assert(as_type(type1).findField("astr") == 1);
+    // field access on a brand new type
+    Term* astr = branch.eval("inst.astr");
 
-    Term* inst1 = branch.eval("inst1 = type1()");
-    test_assert(inst1 != NULL);
-    test_assert(inst1->type = type1);
-    test_assert(inst1->value != NULL);
+    test_assert(is_string(astr));
+    test_equals(as_string(astr), "");
 
-    // test get-field function
-    Term* inst1_myint = branch.eval("get-field(inst1, 'myint')");
+    // field assignment
+    Term *inst2 = branch.eval("inst.astr = 'hello'");
+    test_assert(as_branch(inst2)[1]->asString() == "hello");
+    test_assert(inst2->type == MyType); // type specialization
+
+    // field access of recently assigned value
+    // TODO
+    /*Term* inst1_myint = branch.eval("inst.myint");
     test_assert(inst1_myint != NULL);
     test_assert(!inst1_myint->hasError());
 
-    Term* inst1_astr = branch.eval("get-field(inst1, 'astr')");
+    Term* inst1_astr = branch.eval("inst.astr");
     test_assert(inst1_astr != NULL);
-    test_assert(!inst1_astr->hasError());
+    test_assert(!inst1_astr->hasError());*/
 }
 
 void type_declaration()

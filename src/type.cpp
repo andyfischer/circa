@@ -21,6 +21,10 @@ bool type_matches(Term *term, Term *type)
 {
     assert(term != NULL);
 
+    // any type matches anything
+    if (type == ANY_TYPE)
+        return true;
+
     // Allow for compound types to be considered the same.
     // Later there can be more complicated type checking.
 
@@ -103,9 +107,8 @@ void change_type(Term *term, Term *typeTerm)
 
 void specialize_type(Term *term, Term *type)
 {
-    if (term->type == type) {
+    if (term->type == type)
         return;
-    }
 
     assert_type(term, ANY_TYPE);
 
