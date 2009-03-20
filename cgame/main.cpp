@@ -18,7 +18,7 @@ int MOUSE_Y = 0;
 bool INFLUENCE_LIST_ENABLED = false;
 
 SDL_Surface* SCREEN = NULL;
-circa::Ref POINT_FUNC = NULL;
+circa::Ref DRAGGABLE_FUNC = NULL;
 circa::Ref HIGHLIGHT = NULL;
 circa::Branch SCRIPT_MAIN;
 bool CONTINUE_MAIN_LOOP = true;
@@ -53,16 +53,6 @@ void key_pressed(circa::Term* caller)
     caller->asBool() = KEY_JUST_PRESSED.find(i) != KEY_JUST_PRESSED.end();
 }
 
-void rectangle(circa::Term* caller)
-{
-    rectangleColor(SCREEN,
-        (int) as_float(caller->input(0)),
-        (int) as_float(caller->input(1)),
-        (int) as_float(caller->input(2)),
-        (int) as_float(caller->input(3)),
-        as_int(caller->input(4)));
-}
-
 void fill_rectangle(circa::Term* caller)
 {
     boxColor(SCREEN,
@@ -83,13 +73,27 @@ void line_to(circa::Term* caller)
         as_int(caller->input(4)));
 }
 
+namespace sdl_hosted {
+
+void _aalineColor(circa::Term* caller)
+{
+    aalineColor(SCREEN,
+        (int) as_float(caller->input(0)),
+        (int) as_float(caller->input(1)),
+        (int) as_float(caller->input(2)),
+        (int) as_float(caller->input(3)),
+        as_int(caller->input(4)));
+}
+
+} // namespace sdl_hosted
+
 void update_highlight()
 {
     float closestDist = 0;
     HIGHLIGHT = NULL;
 
     for (circa::CodeIterator it(&SCRIPT_MAIN); !it.finished(); it.advance()) {
-        if (it->function == POINT_FUNC) {
+        if (it->function == DRAGGABLE_FUNC) {
             float x = as_float(it->input(0));
             float y = as_float(it->input(1));
             float dist_x = MOUSE_X - x;
@@ -238,6 +242,8 @@ int main( int argc, char* args[] )
 
     circa::initialize();
 
+    circa::KERNEL->eval("type Point { float x, float y }");
+
     circa::import_function(*circa::KERNEL, key_down, "key_down(int) -> bool");
     circa::import_function(*circa::KERNEL, key_pressed, "key_pressed(int) -> bool");
     circa::int_value(*circa::KERNEL, SDLK_UP, "KEY_UP");
@@ -253,18 +259,17 @@ int main( int argc, char* args[] )
     (*circa::KERNEL)["KEY_SPACE"]->boolProperty("dont_train") = true;
     (*circa::KERNEL)["PI"]->boolProperty("dont_train") = true;
 
-    circa::import_function(*circa::KERNEL, line_to,
-            "line_to(float,float,float,float,int)");
-    circa::import_function(*circa::KERNEL, rectangle,
-            "rectangle(float,float,float,float,int)");
+    circa::import_function(*circa::KERNEL, line_to, "line_to(float,float,float,float,int)");
     circa::import_function(*circa::KERNEL, fill_rectangle,
             "fill_rectangle(float,float,float,float,int)");
 
-    POINT_FUNC = circa::create_empty_function(*circa::KERNEL, "point(float,float)");
+    circa::import_function(*circa::KERNEL, sdl_hosted::_aalineColor,
+            "sdl::lineColor(float,float,float,float,int)");
+
+    DRAGGABLE_FUNC = circa::create_empty_function(*circa::KERNEL, "draggable(Point)");
 
     // Set up the screen
-    SCREEN = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT,
-            SCREEN_BPP, SDL_SWSURFACE );
+    SCREEN = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE );
 
     // If there was an error in setting up the screen
     if( SCREEN == NULL )

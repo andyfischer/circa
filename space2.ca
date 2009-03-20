@@ -1,0 +1,66 @@
+
+function line-to(Point a, Point b, int color)
+    sdl::lineColor(a.x, a.y, b.x, b.y, color)
+end
+
+-- paint background
+fill_rectangle(0,0,640,480, 0xfffffffe)
+
+ship_size = 20.0
+back_dist = 4.0
+back_angle = 2.5
+ship_speed = 1.0
+turn_speed = 0.04
+max_speed = 5.0
+
+-- the state of the ship
+state Point ship_center = { 200.0, 200.0 }
+state float ship_facing = PI*2
+state float ship_speed = 0.0
+
+Point ship_front, ship_l, ship_r, ship_back
+
+ship_front.x = ship_center.x + ship_size * cos(ship_facing)
+ship_front.y = ship_center.y + ship_size * sin(ship_facing)
+ship_l.x = ship_center.x + ship_size * cos(ship_facing)
+ship_l.y = ship_center.y + ship_size * sin(ship_facing)
+ship_r.x = ship_center.x + ship_size * cos(ship_facing)
+ship_r.y = ship_center.y + ship_size * sin(ship_facing)
+ship_back.x = ship_center.x + ship_size * cos(ship_facing)
+ship_back.y = ship_center.y + ship_size * sin(ship_facing)
+
+draggable(ship_front)
+draggable(ship_l)
+draggable(ship_r)
+draggable(ship_back)
+
+line-to(ship_front, ship_l, 0)
+line-to(ship_l, ship_back, 0)
+line-to(ship_back, ship_r, 0)
+line-to(ship_r, ship_front, 0)
+
+-- accelerate if up is pressed, decellerate if not
+if key_down(KEY_UP)
+    ship_speed += 0.5
+end
+
+if not(key_down(KEY_UP))
+    ship_speed -= 0.1
+end
+
+ship_speed = min(ship_speed, max_speed)
+ship_speed = max(ship_speed, 0.0)
+
+-- move ship
+ship_center.x += ship_speed * cos(ship_facing)
+ship_center.y += ship_speed * sin(ship_facing)
+
+-- turn ship
+if key_down(KEY_LEFT)
+    ship_facing -= turn_speed * PI
+end
+
+if key_down(KEY_RIGHT)
+    ship_facing += turn_speed * PI
+end
+
