@@ -11,6 +11,7 @@ Function::Function()
     hasSideEffects(false),
     variableArgs(false),
     evaluate(NULL),
+    specializeType(NULL),
     startControlFlowIterator(NULL),
     generateTraining(NULL),
     feedbackAccumulationFunction(NULL),

@@ -17,6 +17,7 @@ namespace circa {
 struct Function
 {
     typedef void (*EvaluateFunc)(Term* caller);
+    typedef Term* (*SpecializeTypeFunc)(Term* caller);
     typedef ReferenceIterator* (*ReferenceIteratorFunc)(Term* caller);
     typedef void (*GenerateTrainingFunc)(Branch& branch, Term* subject, Term* desired);
 
@@ -44,6 +45,7 @@ struct Function
 
     // Code
     EvaluateFunc evaluate;
+    SpecializeTypeFunc specializeType;
     ReferenceIteratorFunc startControlFlowIterator;
     GenerateTrainingFunc generateTraining;
 

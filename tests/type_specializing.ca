@@ -1,0 +1,6 @@
+
+a = 1.0
+b = 2.0
+c = if-expr(true, a, b)
+
+-- TODO: check that c has type float

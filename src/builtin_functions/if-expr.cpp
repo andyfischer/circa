@@ -21,6 +21,16 @@ namespace if_expr_function {
         recycle_value(caller->inputs[index], caller);
     }
 
+    Term* specializeType(Term* caller)
+    {
+        // if inputs 1 and 2 have the same type, we can use that
+        if (caller->input(1)->type == caller->input(2)->type)
+            return caller->input(1)->type;
+
+        // Otherwise return any. We might want to signal an error here
+        return ANY_TYPE;
+    }
+
     void generateTraining(Branch& branch, Term* subject, Term* desired)
     {
         if (as_bool(subject->input(0)))
@@ -33,6 +43,7 @@ namespace if_expr_function {
     {
         Term* main_func = import_function(kernel, evaluate,
                 "function if-expr(bool,any,any) -> any");
+        as_function(main_func).specializeType = specializeType;
         as_function(main_func).pureFunction = true;
         as_function(main_func).setInputMeta(1, true);
         as_function(main_func).setInputMeta(2, true);
