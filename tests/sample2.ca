@@ -1,0 +1,109 @@
+
+-- paint background
+fill_rectangle(0,0,640,480, 0xfffffffe)
+
+-- mouse positions are passed in from cgame
+state float mouse_x
+state float mouse_y
+
+ship_size = 20.0
+back_dist = 4.0
+back_angle = 2.5
+ship_speed = 1.0
+turn_speed = 0.04
+max_speed = 5.0
+
+-- the state of the ship
+state float ship_x = 200.0
+state float ship_y = 200.0
+state float ship_facing = PI*2
+state float ship_speed = 0.0
+
+-- Draw the ship
+a_x = ship_x + ship_size * cos(ship_facing)
+a_y = ship_y + ship_size * sin(ship_facing)
+
+b_x = ship_x + ship_size * cos(ship_facing + back_angle)
+b_y = ship_y + ship_size * sin(ship_facing + back_angle)
+
+c_x = ship_x - back_dist * cos(ship_facing)
+c_y = ship_y - back_dist * sin(ship_facing)
+
+d_x = ship_x + ship_size * cos(ship_facing - back_angle)
+d_y = ship_y + ship_size * sin(ship_facing - back_angle)
+
+point(a_x, a_y)
+point(b_x, b_y)
+point(c_x, c_y)
+point(d_x, d_y)
+
+line_to(a_x, a_y, b_x, b_y, 0)
+line_to(b_x, b_y, c_x, c_y, 0)
+line_to(c_x, c_y, d_x, d_y, 0)
+line_to(d_x, d_y, a_x, a_y, 0)
+
+
+-- accelerate if up is pressed, decellerate if not
+if key_down(KEY_UP)
+    ship_speed += 0.5
+end
+
+if not(key_down(KEY_UP))
+    ship_speed -= 0.1
+end
+
+ship_speed = min(ship_speed, max_speed)
+ship_speed = max(ship_speed, 0.0)
+
+-- move ship
+ship_x += ship_speed * cos(ship_facing)
+ship_y += ship_speed * sin(ship_facing)
+
+-- turn ship
+if key_down(KEY_LEFT)
+    ship_facing -= turn_speed * PI
+end
+
+if key_down(KEY_RIGHT)
+    ship_facing += turn_speed * PI
+end
+
+
+-- State of the active bullet
+state float bullet_x = 0.0
+state float bullet_y = 0.0
+state bool bullet_active = false
+state float bullet_facing = 0.0
+bullet_speed = 8.0
+bullet_size = 3.0
+
+bullet_x += bullet_speed * cos(bullet_facing)
+bullet_y += bullet_speed * sin(bullet_facing)
+
+if key_pressed(KEY_SPACE)
+    -- shoot a new bullet
+    bullet_active = true
+    bullet_facing = ship_facing
+    bullet_x = ship_x
+    bullet_y = ship_y
+end
+
+-- Draw bullet, if active
+if bullet_active
+    bullet_1_x = bullet_x + bullet_size * cos(0)
+    bullet_1_y = bullet_y + bullet_size * sin(0)
+
+    bullet_2_x = bullet_x + bullet_size * cos(PI/2.0)
+    bullet_2_y = bullet_y + bullet_size * sin(PI/2.0)
+
+    bullet_3_x = bullet_x + bullet_size * cos(PI)
+    bullet_3_y = bullet_y + bullet_size * sin(PI)
+
+    bullet_4_x = bullet_x + bullet_size * cos(3.0 * PI / 2.0)
+    bullet_4_y = bullet_y + bullet_size * sin(3.0 * PI / 2.0)
+
+    line_to(bullet_1_x, bullet_1_y, bullet_2_x, bullet_2_y, 0)
+    line_to(bullet_2_x, bullet_2_y, bullet_3_x, bullet_3_y, 0)
+    line_to(bullet_3_x, bullet_3_y, bullet_4_x, bullet_4_y, 0)
+    line_to(bullet_4_x, bullet_4_y, bullet_1_x, bullet_1_y, 0)
+end

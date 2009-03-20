@@ -25,6 +25,7 @@ extern Term* COPY_FUNC;
 extern Term* DIV_FUNC;
 extern Term* FLOAT_TYPE;
 extern Term* FUNCTION_TYPE;
+extern Term* GET_FIELD_FUNC;
 extern Term* IF_FUNC;
 extern Term* INT_TO_FLOAT_FUNC;
 extern Term* INT_TYPE;
