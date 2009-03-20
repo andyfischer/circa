@@ -743,6 +743,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
                 // Consume inputs
                 RefList inputs(leftExpr);
+
                 if (tokens.nextIs(LPAREN)) {
 
                     tokens.consume(LPAREN);
@@ -760,9 +761,6 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                 }
 
                 result = apply(&branch, function, inputs);
-
-                if (leftExpr->name != "")
-                    branch.bindName(result, leftExpr->name);
             }
 
             result->syntaxHints.declarationStyle = TermSyntaxHints::DOT_CONCATENATION;
