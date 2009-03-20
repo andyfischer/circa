@@ -37,7 +37,6 @@ void compound_types()
 
     // field access on a brand new type
     Term* astr = branch.eval("inst.astr");
-
     test_assert(is_string(astr));
     test_equals(as_string(astr), "");
 
@@ -47,14 +46,9 @@ void compound_types()
     test_assert(inst2->type == MyType); // type specialization
 
     // field access of recently assigned value
-    // TODO
-    /*Term* inst1_myint = branch.eval("inst.myint");
-    test_assert(inst1_myint != NULL);
-    test_assert(!inst1_myint->hasError());
-
-    Term* inst1_astr = branch.eval("inst.astr");
-    test_assert(inst1_astr != NULL);
-    test_assert(!inst1_astr->hasError());*/
+    Term* astr2 = branch.eval("inst.astr");
+    test_assert(is_string(astr2));
+    test_equals(as_string(astr2), "hello");
 }
 
 void type_declaration()
