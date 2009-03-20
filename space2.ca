@@ -1,4 +1,7 @@
 
+state float mouse_x
+state float mouse_y
+
 function line-to(Point a, Point b, int color)
     sdl::lineColor(a.x, a.y, b.x, b.y, color)
 end
@@ -24,8 +27,8 @@ ship_front.x = ship_center.x + ship_size * cos(ship_facing)
 ship_front.y = ship_center.y + ship_size * sin(ship_facing)
 ship_l.x = ship_center.x + ship_size * cos(ship_facing)
 ship_l.y = ship_center.y + ship_size * sin(ship_facing)
-ship_r.x = ship_center.x + ship_size * cos(ship_facing)
-ship_r.y = ship_center.y + ship_size * sin(ship_facing)
+ship_r.x = ship_center.x + ship_size * cos(ship_facing * -1.0)
+ship_r.y = ship_center.y + ship_size * sin(ship_facing * -1.0)
 ship_back.x = ship_center.x + ship_size * cos(ship_facing)
 ship_back.y = ship_center.y + ship_size * sin(ship_facing)
 
