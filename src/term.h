@@ -80,10 +80,12 @@ struct Term
     bool& boolProperty(std::string const& name);
     int& intProperty(std::string const& name);
     float& floatProperty(std::string const& name);
+    std::string& stringProperty(std::string const& name);
 
     bool boolPropertyOptional(std::string const& name, bool defaultValue);
     float floatPropertyOptional(std::string const& name, float defaultValue);
     int intPropertyOptional(std::string const& name, int defaultValue);
+    std::string stringPropertyOptional(std::string const& name, std::string const& defaultValue);
 
     // Accessors for specific properties
 

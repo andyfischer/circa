@@ -52,11 +52,6 @@ struct TermSyntaxHints
         SPECIFIC_TO_FUNCTION
     };
 
-    enum IntegerFormat {
-        DECIMAL,
-        HEX
-    };
-
     typedef std::vector<InputSyntax> InputSyntaxList;
 
     // Members:
@@ -75,10 +70,6 @@ struct TermSyntaxHints
     std::string functionName;
     std::string preWhitespace;
     std::string followingWhitespace;
-    IntegerFormat integerFormat;
-
-    // true if this term is the last in the file, and there's no trailing newline.
-    bool endsFile; 
 
     TermSyntaxHints() :
         line(0),
@@ -86,9 +77,7 @@ struct TermSyntaxHints
         endChar(0),
         declarationStyle(UNKNOWN_DECLARATION_STYLE),
         parens(0),
-        occursInsideAnExpression(false),
-        integerFormat(DECIMAL),
-        endsFile(false)
+        occursInsideAnExpression(false)
     {}
 
     InputSyntax& getInputSyntax(unsigned int index) {

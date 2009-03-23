@@ -96,6 +96,11 @@ float& Term::floatProperty(std::string const& name)
     Term* t = addProperty(name, FLOAT_TYPE);
     return as_float(t);
 }
+std::string& Term::stringProperty(std::string const& name)
+{
+    Term* t = addProperty(name, STRING_TYPE);
+    return as_string(t);
+}
 
 bool Term::boolPropertyOptional(std::string const& name, bool defaultValue)
 {
@@ -112,6 +117,11 @@ float Term::floatPropertyOptional(std::string const& name, float defaultValue)
 int Term::intPropertyOptional(std::string const& name, int defaultValue)
 {
     if (hasProperty(name)) return intProperty(name);
+    else return defaultValue;
+}
+std::string Term::stringPropertyOptional(std::string const& name, std::string const& defaultValue)
+{
+    if (hasProperty(name)) return stringProperty(name);
     else return defaultValue;
 }
 

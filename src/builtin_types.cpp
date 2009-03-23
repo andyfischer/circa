@@ -60,7 +60,7 @@ namespace primitives {
         std::string to_string(Term* term)
         {
             std::stringstream strm;
-            if (term->syntaxHints.integerFormat == TermSyntaxHints::HEX)
+            if (term->stringPropertyOptional("syntaxHints:integerFormat", "") == "hex")
                 strm << "0x" << std::hex;
 
             strm << as_int(term);
@@ -77,7 +77,7 @@ namespace primitives {
             std::stringstream strm;
 
             strm.setf(std::ios::fixed, std::ios::floatfield);
-            strm.precision(term->floatPropertyOptional("inputSyntax:decimalFigures", 1));
+            strm.precision(term->floatPropertyOptional("syntaxHints:decimalFigures", 1));
             strm << as_float(term);
 
             if (term->floatPropertyOptional("mutability", 0.0) > 0.5)

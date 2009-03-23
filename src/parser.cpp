@@ -910,7 +910,7 @@ Term* literal_integer(Branch& branch, TokenStream& tokens)
     int value = strtoul(text.c_str(), NULL, 0);
     Term* term = int_value(branch, value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    term->syntaxHints.integerFormat = TermSyntaxHints::DECIMAL;
+    term->stringProperty("syntaxHints:integerFormat") = "dec";
     return term;
 }
 
@@ -920,7 +920,7 @@ Term* literal_hex(Branch& branch, TokenStream& tokens)
     int value = strtoul(text.c_str(), NULL, 0);
     Term* term = int_value(branch, value);
     term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-    term->syntaxHints.integerFormat = TermSyntaxHints::HEX;
+    term->stringProperty("syntaxHints:integerFormat") = "hex";
     return term;
 }
 
@@ -943,7 +943,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     }
 
     Term* term = float_value(branch, value);
-    term->floatProperty("inputSyntax:decimalFigures") = decimalFigures;
+    term->floatProperty("syntaxHints:decimalFigures") = decimalFigures;
 
     float mutability = 0.0;
 
@@ -1044,7 +1044,7 @@ std::string possible_whitespace_or_newline(TokenStream& tokens)
 void consume_statement_end(TokenStream& tokens, Term* term)
 {
     if (tokens.finished())
-        term->syntaxHints.endsFile = true;
+        term->boolProperty("syntaxHints:endsFile") = true;
     else
         tokens.consume(NEWLINE);
 }
