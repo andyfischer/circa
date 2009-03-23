@@ -54,7 +54,6 @@ void test_float()
     test_assert(equals(point_one, point_one_again));
     test_assert(equals(point_two, point_two));
 
-    point_one->syntaxHints.floatDecimalFigures = 1;
     test_equals(point_one->toString(), "0.1");
 }
 
