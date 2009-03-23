@@ -77,7 +77,7 @@ namespace primitives {
             std::stringstream strm;
 
             strm.setf(std::ios::fixed, std::ios::floatfield);
-            strm.precision(term->syntaxHints.floatDecimalFigures);
+            strm.precision(term->floatPropertyOptional("inputSyntax:decimalFigures", 1));
             strm << as_float(term);
 
             if (term->floatPropertyOptional("mutability", 0.0) > 0.5)

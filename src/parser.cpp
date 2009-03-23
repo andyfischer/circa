@@ -943,7 +943,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     }
 
     Term* term = float_value(branch, value);
-    term->syntaxHints.floatDecimalFigures = decimalFigures;
+    term->floatProperty("inputSyntax:decimalFigures") = decimalFigures;
 
     float mutability = 0.0;
 

@@ -76,7 +76,6 @@ struct TermSyntaxHints
     std::string preWhitespace;
     std::string followingWhitespace;
     IntegerFormat integerFormat;
-    int floatDecimalFigures;
 
     // true if this term is the last in the file, and there's no trailing newline.
     bool endsFile; 
@@ -89,7 +88,6 @@ struct TermSyntaxHints
         parens(0),
         occursInsideAnExpression(false),
         integerFormat(DECIMAL),
-        floatDecimalFigures(1),
         endsFile(false)
     {}
 
