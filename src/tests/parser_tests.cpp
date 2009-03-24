@@ -311,15 +311,15 @@ void test_infix_whitespace()
     branch.eval("b = 1");
 
     Term* term = parser::compile(branch, parser::infix_expression, "  a + b");
-    test_assert(term->syntaxHints.preWhitespace == "  ");
+    test_assert(term->stringProperty("syntaxHints:preWhitespace") == "  ");
     test_assert(term->syntaxHints.getInputSyntax(0).followingWhitespace == " ");
     test_assert(term->syntaxHints.getInputSyntax(1).preWhitespace == " ");
 
     term = parser::compile(branch, parser::infix_expression, "5+3");
-    test_assert(term->syntaxHints.preWhitespace == "");
+    test_assert(term->stringProperty("syntaxHints:preWhitespace") == "");
     test_assert(term->syntaxHints.getInputSyntax(0).followingWhitespace == "");
     test_assert(term->syntaxHints.getInputSyntax(1).preWhitespace == "");
-    test_assert(term->syntaxHints.followingWhitespace == "");
+    test_assert(term->stringProperty("syntaxHints:followingWhitespace") == "");
 }
 
 void register_tests()

@@ -41,24 +41,9 @@ struct TermSyntaxHints
         }
     };
 
-    enum DeclarationStyle {
-        UNKNOWN_DECLARATION_STYLE=0,
-        FUNCTION_CALL,
-        INFIX,
-        DOT_CONCATENATION,
-        ARROW_CONCATENATION,
-        LITERAL_VALUE,
-        IF_STATEMENT,
-        SPECIFIC_TO_FUNCTION
-    };
-
     typedef std::vector<InputSyntax> InputSyntaxList;
 
     // Members:
-    int line;
-    int startChar;
-    int endChar;
-    DeclarationStyle declarationStyle;
     InputSyntaxList inputSyntax;
     
     // This way of storing parens is error-prone, because we can't reproduce
@@ -66,14 +51,7 @@ struct TermSyntaxHints
     // Perhaps we can store parens with preWhitespace ?
     int parens;
 
-    std::string preWhitespace;
-    std::string followingWhitespace;
-
     TermSyntaxHints() :
-        line(0),
-        startChar(0),
-        endChar(0),
-        declarationStyle(UNKNOWN_DECLARATION_STYLE),
         parens(0)
     {}
 

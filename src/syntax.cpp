@@ -52,7 +52,7 @@ bool should_print_term_source_line(Term* term)
     if (term->boolPropertyOptional("syntaxHints:nestedExpression", false))
         return false;
 
-    if (term->syntaxHints.declarationStyle == TermSyntaxHints::UNKNOWN_DECLARATION_STYLE)
+    if (term->stringPropertyOptional("syntaxHints:declarationStyle", "") == "")
         return false;
 
     return true;
@@ -67,7 +67,7 @@ std::string get_term_source(Term* term)
 
     std::stringstream result;
 
-    result << term->syntaxHints.preWhitespace;
+    result << term->stringPropertyOptional("syntaxHints:preWhitespace", "");
 
     // handle special cases
     if (term->function == COMMENT_FUNC) {
@@ -129,7 +129,7 @@ std::string get_term_source(Term* term)
     }
 
     // for an infix rebinding, don't use the normal "name = " prefix
-    if ((term->syntaxHints.declarationStyle == TermSyntaxHints::INFIX)
+    if ((term->stringPropertyOptional("syntaxHints:declarationStyle", "") == "infix")
             && parser::is_infix_operator_rebinding(
                 term->stringProperty("syntaxHints:functionName")))
     {
@@ -148,53 +148,36 @@ std::string get_term_source(Term* term)
         result << "(";
 
     // add the declaration syntax
-    switch (term->syntaxHints.declarationStyle) {
-        case TermSyntaxHints::FUNCTION_CALL:
-        {
-            result << term->stringProperty("syntaxHints:functionName") << "(";
+    std::string declarationStyle = term->stringPropertyOptional("syntaxHints:declarationStyle", "");
 
-            for (int i=0; i < term->numInputs(); i++) {
-                if (i > 0) result << ",";
-                result << get_source_of_input(term, i);
-            }
+    if (declarationStyle == "function-call") {
+        result << term->stringProperty("syntaxHints:functionName") << "(";
 
-            result << ")";
+        for (int i=0; i < term->numInputs(); i++) {
+            if (i > 0) result << ",";
+            result << get_source_of_input(term, i);
         }
-        break;
+        result << ")";
 
-        case TermSyntaxHints::LITERAL_VALUE:
-        {
-            result << to_source_string(term);
-        }
-        break;
+    } else if (declarationStyle == "literal") {
+        result << to_source_string(term);
 
-        case TermSyntaxHints::DOT_CONCATENATION:
-        {
-            result << get_source_of_input(term, 0);
-            result << ".";
-            result << term->function->name;
-        }
-        break;
-
-        case TermSyntaxHints::INFIX:
-        {
-            result << get_source_of_input(term, 0);
-            result << term->stringProperty("syntaxHints:functionName");
-            result << get_source_of_input(term, 1);
-        }
-        break;
-
-        case TermSyntaxHints::UNKNOWN_DECLARATION_STYLE:
-        {
-            // result << "(!error, unknown declaration style)";
-        }
-        break;
+    } else if (declarationStyle == "dot-concat") {
+        result << get_source_of_input(term, 0);
+        result << ".";
+        result << term->function->name;
+    } else if (declarationStyle == "infix") {
+        result << get_source_of_input(term, 0);
+        result << term->stringProperty("syntaxHints:functionName");
+        result << get_source_of_input(term, 1);
+    } else {
+        // result << "(!error, unknown declaration style)";
     }
 
     for (int p=0; p < term->syntaxHints.parens; p++)
         result << ")";
 
-    result << term->syntaxHints.followingWhitespace;
+    result << term->stringPropertyOptional("syntaxHints:followingWhitespace", "");
 
     return result.str();
 }
