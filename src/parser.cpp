@@ -870,7 +870,7 @@ Term* atom(Branch& branch, TokenStream& tokens)
         tokens.consume(LPAREN);
         result = infix_expression(branch, tokens);
         tokens.consume(RPAREN);
-        result->syntaxHints.parens += 1;
+        result->intProperty("syntaxHints:parens") += 1;
     }
     else {
 
