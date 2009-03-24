@@ -179,6 +179,11 @@ Term* statement(Branch& branch, TokenStream& tokens)
         result = if_block(branch, tokens);
     }
 
+    // For block
+    else if (tokens.nextIs(FOR)) {
+        result = for_block(branch, tokens);
+    }
+
     // Stateful value decl
     else if (tokens.nextIs(STATE)) {
         result = stateful_value_decl(branch, tokens);
@@ -366,16 +371,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     Branch& innerBranch = as_branch(result->state);
     innerBranch.outerScope = &branch;
 
-    while (!tokens.nextIs(END)) {
-        std::string prespace = possible_whitespace(tokens);
-
-        if (tokens.nextIs(END)) {
-            break;
-        } else {
-            Term* term = statement(innerBranch, tokens);
-            prepend_whitespace(term, prespace);
-        }
-    }
+    consume_branch_until_end(innerBranch, tokens);
 
     tokens.consume(END);
     possible_whitespace(tokens);
@@ -442,8 +438,18 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     tokens.consume(COLON);
 
     Term* listExpr = infix_expression(branch, tokens);
+    possible_whitespace(tokens);
+    tokens.consume(NEWLINE);
 
-    return NULL;
+    Term* forTerm = apply(&branch, FOR_FUNC, RefList(listExpr));
+
+    consume_branch_until_end(as_branch(forTerm->state), tokens);
+
+    tokens.consume(END);
+    possible_whitespace(tokens);
+    tokens.consume(NEWLINE);
+
+    return forTerm;
 }
 
 Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
@@ -1065,6 +1071,20 @@ void consume_statement_end(TokenStream& tokens, Term* term)
         term->boolProperty("syntaxHints:endsFile") = true;
     else
         tokens.consume(NEWLINE);
+}
+
+void consume_branch_until_end(Branch& branch, TokenStream& tokens)
+{
+    while (!tokens.nextIs(END)) {
+        std::string prespace = possible_whitespace(tokens);
+
+        if (tokens.nextIs(END)) {
+            break;
+        } else {
+            Term* term = statement(branch, tokens);
+            prepend_whitespace(term, prespace);
+        }
+    }
 }
 
 } // namespace parser

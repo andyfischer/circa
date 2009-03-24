@@ -48,6 +48,7 @@ std::string possible_whitespace(TokenStream& tokens);
 std::string possible_newline(TokenStream& tokens);
 std::string possible_whitespace_or_newline(TokenStream& tokens);
 void consume_statement_end(TokenStream& tokens, Term* term);
+void consume_branch_until_end(Branch& branch, TokenStream& tokens);
 
 } // namespace parser
 } // namespace circa

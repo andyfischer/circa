@@ -24,6 +24,7 @@ extern Term* CONSTANT_FALSE;
 extern Term* COPY_FUNC;
 extern Term* DIV_FUNC;
 extern Term* FLOAT_TYPE;
+extern Term* FOR_FUNC;
 extern Term* FUNCTION_TYPE;
 extern Term* GET_FIELD_FUNC;
 extern Term* IF_FUNC;
