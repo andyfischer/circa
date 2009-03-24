@@ -25,11 +25,6 @@ void dealloc_value(Term* term);
 
 bool is_value_alloced(Term* term);
 
-// Create a new value term with the given type.
-// 'branch' may be NULL.
-Term* create_value(Branch* branch, Term* type, std::string const& name="");
-Term* create_value(Branch* branch, std::string const& typeName, std::string const& name="");
-
 Term* import_value(Branch& branch, Term* type, void* initialValue, std::string const& name="");
 Term* import_value(Branch& branch, std::string const& typeName, void* initialValue, std::string const& name="");
 

@@ -116,39 +116,6 @@ void steal_value(Term* source, Term* dest)
     source->needsUpdate = true;
 }
 
-Term* create_value(Branch* branch, Term* type, std::string const& name)
-{
-    assert(type != NULL);
-    if (branch == NULL)
-        assert(name == "");
-    assert(is_type(type));
-
-    Term *var_function = get_value_function(type);
-    Term *term = create_term(branch, var_function, RefList());
-
-    alloc_value(term);
-
-    term->needsUpdate = false;
-    term->stealingOk = false;
-    //term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
-
-    if (name != "")
-        branch->bindName(term, name);
-
-    return term;
-}
-
-Term* create_value(Branch* branch, std::string const& typeName, std::string const& name)
-{
-    Term *type = NULL;
-
-    type = find_named(branch, typeName);
-
-    if (type == NULL)
-        throw std::runtime_error(std::string("Couldn't find type: ")+typeName);
-
-    return create_value(branch, type, name);
-}
 
 Term* import_value(Branch& branch, Term* type, void* initialValue, std::string const& name)
 {
