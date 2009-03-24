@@ -38,7 +38,7 @@ std::string statement_to_cpp(Term* term)
         out << type_id_to_cpp(term->type) << " " << term->name << " = ";
     }
 
-    out << term->syntaxHints.functionName << "(";
+    out << term->stringProperty("syntaxHints:functionName") << "(";
 
     for (int i=0; i < term->numInputs(); i++) {
         if (i > 0) out << ", ";

@@ -249,7 +249,7 @@ void test_syntax_hints()
     Branch branch;
     Term* t = parser::compile(branch, parser::function_call, "assert(false)");
 
-    test_assert(t->syntaxHints.functionName == "assert");
+    test_assert(t->stringProperty("syntaxHints:functionName") == "assert");
     test_assert(t->syntaxHints.getInputSyntax(0).style
             == TermSyntaxHints::InputSyntax::BY_NAME);
     test_assert(t->syntaxHints.getInputSyntax(0).name == "false");
