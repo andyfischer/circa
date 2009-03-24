@@ -84,12 +84,12 @@ void test_floats()
     test_assert(results.size() == 12);
 }
 
-void test_symbols()
+void test_symbols1()
 {
     token::TokenList results;
-    token::tokenize(",()=?][<=>=<>", results);
+    token::tokenize(",()=?][<=>=", results);
 
-    test_assert(results.size() == 11);
+    test_assert(results.size() == 9);
     test_assert(results[0].text == ",");
     test_assert(results[0].match == token::COMMA);
     test_assert(results[1].text == "(");
@@ -108,26 +108,37 @@ void test_symbols()
     test_assert(results[7].match == token::LTHANEQ);
     test_assert(results[8].text == ">=");
     test_assert(results[8].match == token::GTHANEQ);
-    test_assert(results[9].text == "<");
-    test_assert(results[9].match == token::LTHAN);
-    test_assert(results[10].text == ">");
-    test_assert(results[10].match == token::GTHAN);
+}
+
+void test_symbols2()
+{
+    token::TokenList results;
+    token::tokenize("<>:", results);
+    test_assert(results.size() == 3);
+    test_assert(results[0].text == "<");
+    test_assert(results[0].match == token::LTHAN);
+    test_assert(results[1].text == ">");
+    test_assert(results[1].match == token::GTHAN);
+    test_assert(results[2].text == ":");
+    test_assert(results[2].match == token::COLON);
 }
 
 void test_keywords()
 {
     token::TokenList results;
-    token::tokenize("end,if,else,state", results);
+    token::tokenize("end,if,else,for,state", results);
 
-    test_assert(results.size() == 7);
+    test_assert(results.size() == 9);
     test_assert(results[0].text == "end");
     test_assert(results[0].match == token::END);
     test_assert(results[2].text == "if");
     test_assert(results[2].match == token::IF);
     test_assert(results[4].text == "else");
     test_assert(results[4].match == token::ELSE);
-    test_assert(results[6].text == "state");
-    test_assert(results[6].match == token::STATE);
+    test_assert(results[6].text == "for");
+    test_assert(results[6].match == token::FOR);
+    test_assert(results[8].text == "state");
+    test_assert(results[8].match == token::STATE);
 }
 
 void test_identifiers_that_look_like_keywords()
@@ -179,7 +190,8 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers);
     REGISTER_TEST_CASE(tokenizer_tests::test_integers);
     REGISTER_TEST_CASE(tokenizer_tests::test_floats);
-    REGISTER_TEST_CASE(tokenizer_tests::test_symbols);
+    REGISTER_TEST_CASE(tokenizer_tests::test_symbols1);
+    REGISTER_TEST_CASE(tokenizer_tests::test_symbols2);
     REGISTER_TEST_CASE(tokenizer_tests::test_keywords);
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers_that_look_like_keywords);
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
