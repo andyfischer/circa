@@ -49,7 +49,7 @@ std::string get_source_of_input(Term* term, int inputIndex)
 
 bool should_print_term_source_line(Term* term)
 {
-    if (term->syntaxHints.occursInsideAnExpression)
+    if (term->boolPropertyOptional("syntaxHints:nestedExpression", false))
         return false;
 
     if (term->syntaxHints.declarationStyle == TermSyntaxHints::UNKNOWN_DECLARATION_STYLE)

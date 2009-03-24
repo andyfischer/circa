@@ -66,7 +66,6 @@ struct TermSyntaxHints
     // Perhaps we can store parens with preWhitespace ?
     int parens;
 
-    bool occursInsideAnExpression;
     std::string functionName;
     std::string preWhitespace;
     std::string followingWhitespace;
@@ -76,8 +75,7 @@ struct TermSyntaxHints
         startChar(0),
         endChar(0),
         declarationStyle(UNKNOWN_DECLARATION_STYLE),
-        parens(0),
-        occursInsideAnExpression(false)
+        parens(0)
     {}
 
     InputSyntax& getInputSyntax(unsigned int index) {
