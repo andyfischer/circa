@@ -790,7 +790,8 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             result = find_and_apply(branch, functionName, RefList(leftExpr, rightExpr));
             result->syntaxHints.declarationStyle = TermSyntaxHints::INFIX;
-            result->syntaxHints.functionName = operatorStr;
+
+            result->stringProperty("syntaxHints:functionName") = operatorStr;
 
             set_input_syntax(result, 0, leftExpr);
             set_input_syntax(result, 1, rightExpr);
@@ -898,7 +899,7 @@ Term* function_call(Branch& branch, TokenStream& tokens)
     Term* result = find_and_apply(branch, functionName, inputs);
 
     result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
-    result->syntaxHints.functionName = functionName;
+    result->stringProperty("syntaxHints:functionName") = functionName;
     result->syntaxHints.inputSyntax = inputSyntaxList;
 
     return result;

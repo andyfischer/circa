@@ -130,9 +130,10 @@ std::string get_term_source(Term* term)
 
     // for an infix rebinding, don't use the normal "name = " prefix
     if ((term->syntaxHints.declarationStyle == TermSyntaxHints::INFIX)
-            && parser::is_infix_operator_rebinding(term->syntaxHints.functionName))
+            && parser::is_infix_operator_rebinding(
+                term->stringProperty("syntaxHints:functionName")))
     {
-        result << term->name << " " << term->syntaxHints.functionName;
+        result << term->name << " " << term->stringProperty("syntaxHints:functionName");
         result << get_source_of_input(term, 1);
         return result.str();
     }
@@ -150,7 +151,7 @@ std::string get_term_source(Term* term)
     switch (term->syntaxHints.declarationStyle) {
         case TermSyntaxHints::FUNCTION_CALL:
         {
-            result << term->syntaxHints.functionName << "(";
+            result << term->stringProperty("syntaxHints:functionName") << "(";
 
             for (int i=0; i < term->numInputs(); i++) {
                 if (i > 0) result << ",";
@@ -178,7 +179,7 @@ std::string get_term_source(Term* term)
         case TermSyntaxHints::INFIX:
         {
             result << get_source_of_input(term, 0);
-            result << term->syntaxHints.functionName;
+            result << term->stringProperty("syntaxHints:functionName");
             result << get_source_of_input(term, 1);
         }
         break;

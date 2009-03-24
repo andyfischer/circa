@@ -66,7 +66,6 @@ struct TermSyntaxHints
     // Perhaps we can store parens with preWhitespace ?
     int parens;
 
-    std::string functionName;
     std::string preWhitespace;
     std::string followingWhitespace;
 
