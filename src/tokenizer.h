@@ -48,6 +48,7 @@ const int LTHAN = 14;
 const int LTHANEQ = 15;
 const int GTHAN = 16;
 const int GTHANEQ = 17;
+const int COLON = 54;
 const int DOUBLE_EQUALS = 18;
 const int NOT_EQUALS = 19;
 const int EQUALS = 20;
@@ -65,6 +66,7 @@ const int TYPE = 50;
 const int END = 37;
 const int IF = 41;
 const int ELSE = 42;
+const int FOR = 55;
 const int STATE = 48;
 const int RETURN = 51;
 

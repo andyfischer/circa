@@ -32,6 +32,7 @@ const char* getMatchText(int match)
         case LTHANEQ: return "<=";
         case GTHAN: return ">";
         case GTHANEQ: return ">=";
+        case COLON: return ":";
         case DOUBLE_EQUALS: return "==";
         case NOT_EQUALS: return "!=";
         case EQUALS: return "=";
@@ -48,6 +49,7 @@ const char* getMatchText(int match)
         case END: return "end";
         case IF: return "if";
         case ELSE: return "else";
+        case FOR: return "for";
         case STATE: return "state";
         case FUNCTION: return "function";
         case TYPE: return "type";
@@ -213,6 +215,7 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, END)) return;
         if (try_to_consume_keyword(context, IF)) return;
         if (try_to_consume_keyword(context, ELSE)) return;
+        if (try_to_consume_keyword(context, FOR)) return;
         if (try_to_consume_keyword(context, STATE)) return;
         if (try_to_consume_keyword(context, RETURN)) return;
 
@@ -327,7 +330,9 @@ void top_level_consume_token(TokenizeContext &context)
                 context.pushResult(COLON_EQUALS);
                 return;
             }
-            break; // fall through
+
+            context.pushResult(COLON);
+            return;
         case '+':
             context.consume();
             if (context.next() == '=') {

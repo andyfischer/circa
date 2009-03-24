@@ -429,6 +429,23 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     return result;
 }
 
+Term* for_block(Branch& branch, TokenStream& tokens)
+{
+    tokens.consume(FOR);
+
+    possible_whitespace(tokens);
+
+    std::string iterator_name = tokens.consume(IDENTIFIER);
+
+    possible_whitespace(tokens);
+
+    tokens.consume(COLON);
+
+    Term* listExpr = infix_expression(branch, tokens);
+
+    return NULL;
+}
+
 Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 {
     tokens.consume(STATE);

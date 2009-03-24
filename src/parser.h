@@ -23,6 +23,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens);
 Term* function_decl(Branch& branch, TokenStream& tokens);
 Term* type_decl(Branch& branch, TokenStream& tokens);
 Term* if_block(Branch& branch, TokenStream& tokens);
+Term* for_block(Branch& branch, TokenStream& tokens);
 Term* stateful_value_decl(Branch& branch, TokenStream& tokens);
 Term* expression_statement(Branch& branch, TokenStream& tokens);
 Term* return_statement(Branch& branch, TokenStream& tokens);
