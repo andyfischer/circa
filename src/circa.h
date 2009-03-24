@@ -1,6 +1,7 @@
 // Copyright 2008 Paul Hodge
 
 #include "branch.h"
+#include "building.h"
 #include "builtins.h"
 #include "builtin_types.h"
 #include "code_iterator.h"
