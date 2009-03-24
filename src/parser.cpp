@@ -116,7 +116,7 @@ void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
         if (input->name != "")
             continue;
 
-        input->syntaxHints.occursInsideAnExpression = true;
+        input->boolProperty("syntaxHints:nestedExpression") = true;
 
         recursively_mark_terms_as_occuring_inside_an_expression(input);
     }
@@ -355,7 +355,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     assert(condition != NULL);
 
     if (condition->name == "")
-        condition->syntaxHints.occursInsideAnExpression = true;
+        condition->boolProperty("syntaxHints:nestedExpression") = true;
     recursively_mark_terms_as_occuring_inside_an_expression(condition);
 
     possible_whitespace(tokens);
@@ -444,7 +444,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         possible_whitespace(tokens);
         initialValue = infix_expression(branch, tokens);
 
-        initialValue->syntaxHints.occursInsideAnExpression = true;
+        initialValue->boolProperty("syntaxHints:nestedExpression") = true;
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
     }
 
