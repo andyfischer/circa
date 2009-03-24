@@ -144,7 +144,8 @@ std::string get_term_source(Term* term)
     }
 
 
-    for (int p=0; p < term->syntaxHints.parens; p++)
+    int numParens = term->intPropertyOptional("syntaxHints:parens", 0);
+    for (int p=0; p < numParens; p++)
         result << "(";
 
     // add the declaration syntax
@@ -174,7 +175,7 @@ std::string get_term_source(Term* term)
         // result << "(!error, unknown declaration style)";
     }
 
-    for (int p=0; p < term->syntaxHints.parens; p++)
+    for (int p=0; p < numParens; p++)
         result << ")";
 
     result << term->stringPropertyOptional("syntaxHints:followingWhitespace", "");

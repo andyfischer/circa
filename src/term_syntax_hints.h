@@ -46,14 +46,7 @@ struct TermSyntaxHints
     // Members:
     InputSyntaxList inputSyntax;
     
-    // This way of storing parens is error-prone, because we can't reproduce
-    // source if the user has 2 or more sets of parens with whitespace between them.
-    // Perhaps we can store parens with preWhitespace ?
-    int parens;
-
-    TermSyntaxHints() :
-        parens(0)
-    {}
+    TermSyntaxHints() {}
 
     InputSyntax& getInputSyntax(unsigned int index) {
         while (index >= inputSyntax.size())
