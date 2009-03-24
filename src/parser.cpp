@@ -50,15 +50,15 @@ void set_input_syntax(Term* term, int index, Term* input)
 void prepend_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
-        term->syntaxHints.preWhitespace = 
-            whitespace + term->syntaxHints.preWhitespace;
+        term->stringProperty("syntaxHints:preWhitespace") = 
+            whitespace + term->stringProperty("syntaxHints:preWhitespace");
 }
 
 void append_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
-        term->syntaxHints.followingWhitespace = 
-            whitespace + term->syntaxHints.followingWhitespace;
+        term->stringProperty("syntaxHints:followingWhitespace") = 
+            whitespace + term->stringProperty("syntaxHints:followingWhitespace");
 }
 
 void push_pending_rebind(Branch& branch, std::string const& name)
@@ -211,7 +211,7 @@ Term* comment_statement(Branch& branch, TokenStream& tokens)
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
     as_string(result->state->field(0)) = commentText;
-    result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    result->stringProperty("syntaxHints:declarationStyle") = "literal";
     return result;
 }
 
@@ -222,7 +222,7 @@ Term* blank_line(Branch& branch, TokenStream& tokens)
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
     as_string(result->state->field(0)) = "";
-    result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    result->stringProperty("syntaxHints:declarationStyle") = "literal";
 
     return result;
 }
@@ -237,7 +237,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
     tokens.consume(LPAREN);
 
     Term* result = create_value(&branch, FUNCTION_TYPE, functionName);
-    result->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    result->stringProperty("syntaxHints:declarationStyle") = "literal";
     Function& func = as_function(result);
 
     func.name = functionName;
@@ -367,7 +367,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     possible_newline(tokens);
 
     Term* result = apply(&branch, IF_FUNC, RefList(condition));
-    result->syntaxHints.declarationStyle = TermSyntaxHints::IF_STATEMENT;
+    result->stringProperty("syntaxHints:declarationStyle") = "if-statement";
     Branch& innerBranch = as_branch(result->state);
     innerBranch.outerScope = &branch;
 
@@ -480,7 +480,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         inputs.append(initialValue);
 
     Term* result = apply(&branch, STATEFUL_VALUE_FUNC, inputs, name);
-    result->syntaxHints.declarationStyle = TermSyntaxHints::SPECIFIC_TO_FUNCTION;
+    result->stringProperty("syntaxHints:declarationStyle") = "function-specific";
     change_type(result, type);
 
     if (initialValue != NULL) {
@@ -541,7 +541,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     // create an implicit call to 'copy'.
     if (result->name != "" && names.length() > 0) {
         result = apply(&branch, COPY_FUNC, RefList(result));
-        result->syntaxHints.declarationStyle = TermSyntaxHints::SPECIFIC_TO_FUNCTION;
+        result->stringProperty("syntaxHints:declarationStyle") = "function-specific";
     }
 
     // Go through all of our terms, if they don't have names then assume they
@@ -786,7 +786,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                 result = apply(&branch, function, inputs);
             }
 
-            result->syntaxHints.declarationStyle = TermSyntaxHints::DOT_CONCATENATION;
+            result->stringProperty("syntaxHints:declarationStyle") = "dot-concat";
 
             set_input_syntax(result, 0, leftExpr);
 
@@ -798,7 +798,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             result = find_and_apply(branch, functionName, inputs);
 
-            result->syntaxHints.declarationStyle = TermSyntaxHints::ARROW_CONCATENATION;
+            result->stringProperty("syntaxHints:declarationStyle") = "arrow-concat";
 
             set_input_syntax(result, 0, leftExpr);
 
@@ -812,7 +812,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                 throw std::runtime_error("Left side of " + functionName + " must be an identifier");
 
             result = find_and_apply(branch, functionName, RefList(leftExpr, rightExpr));
-            result->syntaxHints.declarationStyle = TermSyntaxHints::INFIX;
+            result->stringProperty("syntaxHints:declarationStyle") = "infix";
 
             result->stringProperty("syntaxHints:functionName") = operatorStr;
 
@@ -921,7 +921,7 @@ Term* function_call(Branch& branch, TokenStream& tokens)
     
     Term* result = find_and_apply(branch, functionName, inputs);
 
-    result->syntaxHints.declarationStyle = TermSyntaxHints::FUNCTION_CALL;
+    result->stringProperty("syntaxHints:declarationStyle") = "function-call";
     result->stringProperty("syntaxHints:functionName") = functionName;
     result->syntaxHints.inputSyntax = inputSyntaxList;
 
@@ -933,7 +933,7 @@ Term* literal_integer(Branch& branch, TokenStream& tokens)
     std::string text = tokens.consume(INTEGER);
     int value = strtoul(text.c_str(), NULL, 0);
     Term* term = int_value(branch, value);
-    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    term->stringProperty("syntaxHints:declarationStyle") = "literal";
     term->stringProperty("syntaxHints:integerFormat") = "dec";
     return term;
 }
@@ -943,7 +943,7 @@ Term* literal_hex(Branch& branch, TokenStream& tokens)
     std::string text = tokens.consume(HEX_INTEGER);
     int value = strtoul(text.c_str(), NULL, 0);
     Term* term = int_value(branch, value);
-    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    term->stringProperty("syntaxHints:declarationStyle") = "literal";
     term->stringProperty("syntaxHints:integerFormat") = "hex";
     return term;
 }
@@ -977,7 +977,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     }
 
     term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
-    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    term->stringProperty("syntaxHints:declarationStyle") = "literal";
     return term;
 }
 
@@ -989,7 +989,7 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     text = text.substr(1, text.length()-2);
 
     Term* term = string_value(branch, text);
-    term->syntaxHints.declarationStyle = TermSyntaxHints::LITERAL_VALUE;
+    term->stringProperty("syntaxHints:declarationStyle") = "literal";
     return term;
 }
 
