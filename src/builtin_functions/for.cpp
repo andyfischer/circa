@@ -7,7 +7,6 @@ namespace for_function {
 
     void evaluate(Term* caller)
     {
-        Branch& inner = as_branch(caller);
         Branch& series = as_branch(caller->input(0));
 
         /*

@@ -447,7 +447,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     tokens.consume(END);
     possible_whitespace(tokens);
-    tokens.consume(NEWLINE);
+    consume_statement_end(tokens, forTerm);
 
     return forTerm;
 }
