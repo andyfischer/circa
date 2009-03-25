@@ -307,7 +307,9 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
 Term* type_decl(Branch& branch, TokenStream& tokens)
 {
-    tokens.consume(TYPE);
+    if (tokens.nextIs(TYPE))
+        tokens.consume(TYPE);
+
     possible_whitespace(tokens);
 
     std::string name = tokens.consume(IDENTIFIER);
@@ -430,12 +432,14 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     tokens.consume(FOR);
 
     possible_whitespace(tokens);
-
+    std::string iterator_type_name = tokens.consume(IDENTIFIER);
+    possible_whitespace(tokens);
     std::string iterator_name = tokens.consume(IDENTIFIER);
-
     possible_whitespace(tokens);
 
     tokens.consume(COLON);
+
+    Term* iterator_type = find_type(branch, iterator_type_name);
 
     Term* listExpr = infix_expression(branch, tokens);
     possible_whitespace(tokens);
@@ -443,7 +447,14 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     Term* forTerm = apply(&branch, FOR_FUNC, RefList(listExpr));
 
-    consume_branch_until_end(as_branch(forTerm->state), tokens);
+    as_string(forTerm->state->field(0)) = iterator_name;
+
+    Branch& innerBranch = as_branch(forTerm->state->field(1));
+    innerBranch.outerScope = &branch;
+
+    create_value(&innerBranch, iterator_type, iterator_name);
+
+    consume_branch_until_end(innerBranch, tokens);
 
     tokens.consume(END);
     possible_whitespace(tokens);
