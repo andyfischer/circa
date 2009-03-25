@@ -10,12 +10,12 @@ namespace execution_tests {
 
 std::vector<std::string> gSpyResults;
 
-void spy_function(Term * caller)
+void spy_function(Term* caller)
 {
     gSpyResults.push_back(as_string(caller->input(0)));
 }
 
-void i_only_throw_errors(Term * caller)
+void i_only_throw_errors(Term* caller)
 {
     error_occured(caller, "error");
 }

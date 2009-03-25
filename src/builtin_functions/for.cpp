@@ -9,23 +9,25 @@ namespace for_function {
     {
         Branch& series = as_branch(caller->input(0));
 
-        /*
-        std::string iterator_name = as_string(inner[iterated_variable_name()]);
-        Term* iterator = inner[iterator_name];
+        std::string iteratorName = as_string(caller->state->field(0));
+
+        Branch& branch = as_branch(caller->state->field(1));
+
+        Term* iterator = branch[iteratorName];
         assert(iterator != NULL);
 
         for (int i=0; i < series.numTerms(); i++) {
             copy_value(series[i], iterator);
-            evaluate_branch(inner);
+            evaluate_branch(branch);
         }
-        */
     }
 
     void setup(Branch& kernel)
     {
         FOR_FUNC = import_function(kernel, evaluate, "function for(List)");
         as_function(FOR_FUNC).pureFunction = true;
-        as_function(FOR_FUNC).stateType = BRANCH_TYPE;
+        as_function(FOR_FUNC).stateType = create_type(&kernel,
+            "type For::State { string iteratorName, Branch contents }");
     }
 }
 } // namespace circa

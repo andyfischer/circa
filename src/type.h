@@ -167,6 +167,8 @@ ReferenceIterator* start_reference_iterator(Term* term);
 // Fetch the const function for this type
 Term* get_value_function(Term* type);
 
+Term* create_type(Branch* branch, std::string const& decl);
+
 } // namespace circa
 
 #endif
