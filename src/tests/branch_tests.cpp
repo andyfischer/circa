@@ -36,10 +36,10 @@ void test_duplicate()
 
     duplicate_branch(original, duplicate);
 
-    Term* term1_duplicate = duplicate.getNamed("term1");
+    Term* term1_duplicate = duplicate["term1"];
     test_assert(term1_duplicate != NULL);
 
-    Term* term2_duplicate = duplicate.getNamed("term two");
+    Term* term2_duplicate = duplicate["term two"];
 
     test_assert(as_int(term1_duplicate) == 5);
     test_assert(as_string(term2_duplicate) == "yarn");
@@ -66,8 +66,8 @@ void test_duplicate_nested()
     Branch dupe;
     duplicate_branch(branch, dupe);
 
-    Term* inner_i = dupe["inner"]->state->asBranch()["i"];
-    Term* inner_j = dupe["inner"]->state->asBranch()["j"];
+    Term* inner_i = dupe["inner"]->state->field("i");
+    Term* inner_j = dupe["inner"]->state->field("j");
 
     test_assert(inner_i != NULL);
     test_assert(inner_j != NULL);
@@ -85,7 +85,7 @@ void test_duplicate_nested_dont_make_extra_terms()
     // this test case looks for a bug where nested branches have
     // too many terms after duplication
     Branch orig;
-    Branch& inner = orig.eval("inner = branch()")->state->asBranch();
+    Branch& inner = as_branch(orig.eval("inner = branch()")->state);
     inner.eval("i = 2");
 
     Branch dupe;

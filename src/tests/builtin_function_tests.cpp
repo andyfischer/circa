@@ -151,13 +151,6 @@ void test_alias()
     test_assert(as_int(a) == 55);
 }
 
-void test_for()
-{
-    Branch branch;
-    //Term* l = branch.eval("l = list(1,2,3)");
-    //Term* f = apply(&branch, get_global("for"), RefList(l));
-}
-
 void test_list()
 {
     Branch branch;

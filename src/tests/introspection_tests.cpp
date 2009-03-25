@@ -72,7 +72,6 @@ void test_get_involved_terms()
     test_equals(subtree, RefList(a,c,d));
 }
 
-
 void register_tests()
 {
     REGISTER_TEST_CASE(introspection_tests::test_is_value);
