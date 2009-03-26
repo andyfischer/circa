@@ -40,9 +40,9 @@ def print_results():
         for failure in FAILURES:
             print failure
 
-for file in test_helper.readFileAsLines('scripts/output_test_manifest'):
+for file in test_helper.readFileAsLines('manifests/output_tests'):
     do_output_test(file)
-for file in test_helper.readFileAsLines('scripts/source_repro_test_manifest'):
+for file in test_helper.readFileAsLines('manifests/source_repro'):
     do_source_reproduction_test(file)
 
 print_results()
