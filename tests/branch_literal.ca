@@ -1,0 +1,15 @@
+
+-- simple
+{1, 2, 3} -> to-string -> print
+
+-- identifiers
+a = "hey"
+b = "ho"
+{a,b} -> to-string -> print
+
+-- in a function
+function my_func(int a, int b)
+  {a,b} -> to-string -> print
+end
+
+my_func(42, 12)

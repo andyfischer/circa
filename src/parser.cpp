@@ -1022,6 +1022,7 @@ Term* literal_branch(Branch& branch, TokenStream& tokens)
 
     Term* resultTerm = create_value(&branch, BRANCH_TYPE);
     Branch& result = as_branch(resultTerm);
+    result.outerScope = &branch;
 
     while (!tokens.nextNonWhitespaceIs(RBRACE)) {
         infix_expression(result, tokens);
@@ -1058,6 +1059,10 @@ Term* identifier(Branch& branch, TokenStream& tokens)
         as_string(result->state) = id;
         branch.bindName(result, id);
     }
+
+    // If this term doesn't live in our branch, create a copy
+    /*if (result->owningBranch != &branch)
+        result = apply(&branch, COPY_FUNC, RefList(result));*/
 
     return result;
 }
