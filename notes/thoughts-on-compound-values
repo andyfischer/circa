@@ -1,0 +1,62 @@
+
+
+Each compound value is a Branch composed of a bunch of Terms. This is probably a good idea.
+
+Right now the current strategy is that the inner terms are "hidden". We can get and set them,
+but there aren't any connections maintained to them.
+
+These inner terms will be referred to as "field terms"
+
+An alternative strategy would be to make these inner terms wide open. This would mean:
+ - Each individual term would have a proper function, which describes how it was formed.
+ - Terms which use field terms could use them directly, instead of going through a get-field
+   function.
+
+
+Pros / Cons of "hidden field" terms.
+
+Con: Training is more complicated, we need to understand how to send training signals across
+     a get-field or set-field. We can do this, but why even have this boundary if it can
+     be "trivially" crossed? Any reasons to have this boundary are just things that will
+     make training more fragile.
+Con: Code has unnecessary get-field and set-field functions
+
+Pros / Cons of wide open field terms:
+
+Con: How do we store the high-level list comprehension? Surely someone will care about that.
+Con: Branch duplication more complicated.
+Con: We can't dealloc the value of a compound type (although we can dealloc on the field terms)
+     Not a real problem, just a performance concern.
+Con: Given a term which uses a field term, how do we find the list comprehension involved?
+
+
+In these different areas, which one wins?
+
+Basic implementation complexity:
+
+hidden-field wins here. But I think that solving the second problem could be a good
+thing for the rest of the code. If we create a generalized list-comprehension strategy, then
+this would be very powerful. This could solve the (yet unsolved) problems of looping.
+
+Introspection:
+
+The hidden-field method is more complex to get working, because we need to understand
+(and hide) the get-field and set-field functions. The wide-open method is more natural,
+and easily gives us a variable-level tour of dataflow. There still needs to be a way to
+see the high-level comprehension operation.
+
+Refactoring:
+
+The hidden-field method is better here. We need to keep track of *how* a field is accessed.
+(although our current convention of having get-field store an index is flawed, it needs
+to store the original name).
+
+But I think this is less of a problem then it seems. To support a refactoring where we want
+to rely on the name rather than the term, we always have to do something weird. We have
+to do something weird for plain identifiers (namely, store a note on the syntax hints).
+The above problem can be solved in exactly the same way. So this is not a real problem.
+
+Training:
+
+Made easier without get-field and set-field functions. Although.. how can training affect
+the high-level comprehension operation?
