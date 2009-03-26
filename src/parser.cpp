@@ -757,7 +757,12 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
                 result = apply(&branch, function, inputs);
 
-                if (leftExpr->name != "")
+                // If this is a modifying member function, then rebind the name to this
+                // result.
+                // Note: currently this check is flawed. The only check we do to see if this
+                // is a modifying member function, is if the result type is the same. There
+                // should be a more explicit way of storing this.
+                if ((result->type == inputs[0]->type) && leftExpr->name != "")
                     branch.bindName(result, leftExpr->name);
 
             // Next, if this type defines this field

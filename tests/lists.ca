@@ -1,12 +1,12 @@
 
 l = list(1,2)
 
--- test list-join
-list-join(list(1,2),list(3,4)).to-string.print
-list-join(list(4),list(3,2,1)).to-string.print
--- list-join(list(5),list(6),list(7),list(8)).to-string.print
+print(l -> to-string)
+print(l.count() -> to-string)
+print(l -> to-string)
 
--- test list-remove-duplicates
-list(1,2,3).list-remove-duplicates.to-string.print
-list(5,5,5,6,6,7,5,8,9,8).list-remove-duplicates.to-string.print
-list(1,1,1).list-remove-duplicates.to-string.print
+l.append(3)
+
+print(l -> to-string)
+print(l.count() -> to-string)
+
