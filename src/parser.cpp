@@ -430,10 +430,14 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 Term* for_block(Branch& branch, TokenStream& tokens)
 {
     tokens.consume(FOR);
-
     possible_whitespace(tokens);
+
+    tokens.consume(LPAREN);
+    possible_whitespace(tokens);
+
     std::string iterator_type_name = tokens.consume(IDENTIFIER);
     possible_whitespace(tokens);
+
     std::string iterator_name = tokens.consume(IDENTIFIER);
     possible_whitespace(tokens);
 
@@ -442,6 +446,9 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Term* iterator_type = find_type(branch, iterator_type_name);
 
     Term* listExpr = infix_expression(branch, tokens);
+    possible_whitespace(tokens);
+
+    tokens.consume(RPAREN);
     possible_whitespace(tokens);
     tokens.consume(NEWLINE);
 
