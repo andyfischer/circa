@@ -20,7 +20,7 @@ void test_simple()
     import_function(branch, spy_function, "function spy(int)");
     gSpyResults.clear();
 
-    branch.compile("for int i : range(5)\nspy(i)\nend");
+    branch.compile("for (int i : range(5))\nspy(i)\nend");
 
     evaluate_branch(branch);
 
