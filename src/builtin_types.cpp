@@ -190,6 +190,11 @@ namespace list_t {
         copy_value(value, duplicated_value);
     }
 
+    void count(Term* caller)
+    {
+        as_int(caller) = as_branch(caller->input(0)).numTerms();
+    }
+
 } // namespace list_t
 
 void initialize_builtin_types(Branch& kernel)
@@ -232,6 +237,7 @@ void initialize_builtin_types(Branch& kernel)
 
     BRANCH_TYPE = create_compound_type(kernel, "Branch");
     assert(as_type(BRANCH_TYPE).alloc == Branch::alloc);
+    import_member_function(BRANCH_TYPE, list_t::append, "function append(Branch, any) -> Branch");
 
     import_member_function(TYPE_TYPE, Type::name_accessor, "name(Type) -> string");
 
@@ -242,6 +248,7 @@ void initialize_builtin_types(Branch& kernel)
 
     Term* list_type = create_compound_type(kernel, "List");
     import_member_function(list_type, list_t::append, "function append(List, any) -> List");
+    import_member_function(list_type, list_t::count, "function count(List) -> int");
 }
 
 } // namespace circa
