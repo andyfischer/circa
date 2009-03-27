@@ -15,8 +15,6 @@ namespace set_t {
 
 bool is_string(Term* term);
 
-void initialize_builtin_types(Branch& kernel);
-
 } // namespace circa
 
 #endif
