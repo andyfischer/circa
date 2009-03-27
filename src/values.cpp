@@ -173,7 +173,7 @@ Term* bool_value(Branch* branch, bool b, std::string const& name)
 
 Term* create_alias(Branch* branch, Term* term)
 {
-    return eval_function(branch, ALIAS_FUNC, RefList(term));
+    return apply_and_eval(branch, ALIAS_FUNC, RefList(term));
 }
 
 } // namespace circa
