@@ -47,7 +47,6 @@ extern Term* VALUE_FUNCTION_GENERATOR;
 extern Term* VOID_TYPE;
 extern Term* VOID_PTR_TYPE;
 
-Term* get_global(std::string name);
 void empty_evaluate_function(Term* caller);
 void initialize();
 void shutdown();

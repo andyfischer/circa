@@ -4,6 +4,14 @@
 
 namespace circa {
 
+Term* get_global(std::string name)
+{
+    if (KERNEL->contains(name))
+        return KERNEL->getNamed(name);
+
+    return NULL;
+}
+
 bool check_valid_type(Function &func, int index, Term* term)
 {
     Term* expectedType = func.inputTypes[index];
