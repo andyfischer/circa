@@ -253,7 +253,7 @@ void evaluate_file(Branch& branch, std::string const& filename)
 
     parser::compile(branch, parser::statement_list, fileContents);
 
-    string_value(branch, filename, get_name_for_attribute("source-file"));
+    string_value(&branch, filename, get_name_for_attribute("source-file"));
 }
 
 ReferenceIterator* start_branch_reference_iterator(Branch* branch)

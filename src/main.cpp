@@ -74,7 +74,7 @@ int circa_main(std::vector<std::string> args)
     try
     {
         Branch workspace;
-        string_value(workspace, args[0], "filename");
+        string_value(&workspace, args[0], "filename");
 
         Term* evaluated_file = workspace.eval("evaluate-file(filename)");
         if (evaluated_file->hasError()) {

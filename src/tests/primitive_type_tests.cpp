@@ -11,8 +11,8 @@ namespace primitive_type_tests {
 void strings()
 {
     Branch branch;
-    Term* str1 = string_value(branch, "one");
-    Term* str2 = string_value(branch, "two");
+    Term* str1 = string_value(&branch, "one");
+    Term* str2 = string_value(&branch, "two");
 
     test_assert(as_string(str1) == "one");
     test_assert(as_string(str2) == "two");

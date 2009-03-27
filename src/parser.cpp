@@ -68,7 +68,7 @@ void push_pending_rebind(Branch& branch, std::string const& name)
     if (branch.contains(attrname))
         throw std::runtime_error("pending rebind already exists");
 
-    string_value(branch, name, attrname);
+    string_value(&branch, name, attrname);
 }
 
 std::string pop_pending_rebind(Branch& branch)
@@ -955,7 +955,7 @@ Term* literal_integer(Branch& branch, TokenStream& tokens)
 {
     std::string text = tokens.consume(INTEGER);
     int value = strtoul(text.c_str(), NULL, 0);
-    Term* term = int_value(branch, value);
+    Term* term = int_value(&branch, value);
     term->stringProperty("syntaxHints:declarationStyle") = "literal";
     term->stringProperty("syntaxHints:integerFormat") = "dec";
     return term;
@@ -965,7 +965,7 @@ Term* literal_hex(Branch& branch, TokenStream& tokens)
 {
     std::string text = tokens.consume(HEX_INTEGER);
     int value = strtoul(text.c_str(), NULL, 0);
-    Term* term = int_value(branch, value);
+    Term* term = int_value(&branch, value);
     term->stringProperty("syntaxHints:declarationStyle") = "literal";
     term->stringProperty("syntaxHints:integerFormat") = "hex";
     return term;
@@ -989,7 +989,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
             decimalFigures++;
     }
 
-    Term* term = float_value(branch, value);
+    Term* term = float_value(&branch, value);
     term->floatProperty("syntaxHints:decimalFigures") = decimalFigures;
 
     float mutability = 0.0;
@@ -1011,7 +1011,7 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     // strip quote marks
     text = text.substr(1, text.length()-2);
 
-    Term* term = string_value(branch, text);
+    Term* term = string_value(&branch, text);
     term->stringProperty("syntaxHints:declarationStyle") = "literal";
     return term;
 }

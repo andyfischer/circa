@@ -20,10 +20,10 @@ void test_create_value()
 void test_int_value()
 {
     Branch branch;
-    Term *term = int_value(branch, -2);
+    Term *term = int_value(&branch, -2);
     test_assert(as_int(term) == -2);
 
-    Term *term2 = int_value(branch, 154, "george");
+    Term *term2 = int_value(&branch, 154, "george");
     test_assert(term2 == branch.getNamed("george"));
     test_assert(term2->name == "george");
     test_assert(as_int(term2) == 154);
@@ -63,8 +63,8 @@ void var_function_reuse()
 
     test_assert(function == function2);
 
-    Term* a = int_value(branch, 3);
-    Term* b = int_value(branch, 4);
+    Term* a = int_value(&branch, 3);
+    Term* b = int_value(&branch, 4);
 
     test_assert(a->function == b->function);
 }
@@ -73,7 +73,7 @@ void null_input_errors()
 {
     Branch branch;
 
-    Term* one = float_value(branch, 1.0);
+    Term* one = float_value(&branch, 1.0);
 
     Term* term1 = apply(&branch, ADD_FUNC, RefList(NULL, one));
     evaluate_term(term1);

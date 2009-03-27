@@ -44,7 +44,6 @@ namespace add_function {
     
         float total_delta = as_float(desired) - as_float(target);
     
-    
         for (int i=0; i < numInputs; i++) {
             float mutability = get_mutability(target->input(i));
 
@@ -53,7 +52,7 @@ namespace add_function {
             Term* input = target->inputs[i];
     
             apply(&myBranch, APPLY_FEEDBACK,
-                RefList(input, float_value(myBranch, as_float(input) + inputDelta)));
+                RefList(input, float_value(&myBranch, as_float(input) + inputDelta)));
         }
     
         evaluate_branch(myBranch);
@@ -77,7 +76,7 @@ namespace add_function {
 
         // if there are multiple trainable inputs, divide up delta
         if (numTrainableInputs > 1) {
-            delta = apply(&branch, DIV_FUNC, RefList(delta, float_value(branch, numTrainableInputs)));
+            delta = apply(&branch, DIV_FUNC, RefList(delta, float_value(&branch, numTrainableInputs)));
         }
 
         // pass delta to each trainable input
