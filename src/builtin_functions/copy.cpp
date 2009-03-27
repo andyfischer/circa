@@ -7,10 +7,6 @@ namespace copy_function {
 
     void evaluate(Term* caller)
     {
-        // remove this when type parametrezation is in
-        if (caller->input(0)->type != caller->type)
-            specialize_type(caller, caller->input(0)->type);
-
         copy_value(caller->input(0), caller);
     }
 
