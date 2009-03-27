@@ -16,6 +16,9 @@ void test_var_feedback()
 
     test_assert(as_int(a) == 1);
 
+    test_assert(a->function == as_type(INT_TYPE).valueFunction);
+    test_assert(as_function(a->function).feedbackPropogateFunction != NULL);
+
     Term* apply_feedback = branch.eval("apply-feedback(a, 2)");
 
     if (apply_feedback->hasError()) {

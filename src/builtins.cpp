@@ -50,10 +50,6 @@ Term* UNKNOWN_TYPE_FUNC = NULL;
 Term* UNRECOGNIZED_EXPRESSION_FUNC = NULL;
 Term* VALUE_FUNCTION_GENERATOR = NULL;
 Term* VALUE_FUNCTION_FEEDBACK_ASSIGN = NULL;
-Term* VAR_INT = NULL;
-Term* VAR_FLOAT = NULL;
-Term* VAR_STRING = NULL;
-Term* VAR_BOOL = NULL;
 Term* VOID_TYPE = NULL;
 Term* VOID_PTR_TYPE = NULL;
 
@@ -62,6 +58,17 @@ void empty_evaluate_function(Term*) { }
 void value_function_generate_training(Branch& branch, Term* subject, Term* desired)
 {
     apply(&branch, ASSIGN_FUNC, RefList(desired, subject));
+}
+
+namespace var_function {
+
+    void feedback_assign(Term* caller)
+    {
+        Term* target = caller->input(0);
+        Term* desired = caller->input(1);
+
+        copy_value(desired, target);
+    }
 }
 
 void value_function_generator(Term* caller)
@@ -187,24 +194,8 @@ void bootstrap_kernel()
     TYPE_TYPE->needsUpdate = false;
 }
 
-namespace var_function {
-
-    void feedback_assign(Term* caller)
-    {
-        Term* target = caller->input(0);
-        Term* desired = caller->input(1);
-
-        copy_value(desired, target);
-    }
-}
-
 void initialize_constants()
 {
-    VAR_INT = get_value_function(INT_TYPE);
-    VAR_FLOAT = get_value_function(FLOAT_TYPE);
-    VAR_STRING = get_value_function(STRING_TYPE);
-    VAR_BOOL = get_value_function(BOOL_TYPE);
-
     CONSTANT_TRUE = apply(KERNEL, BOOL_TYPE, RefList());
     as_bool(CONSTANT_TRUE) = true;
     CONSTANT_TRUE->stealingOk = false;
@@ -215,30 +206,32 @@ void initialize_constants()
     CONSTANT_FALSE->stealingOk = false;
     KERNEL->bindName(CONSTANT_FALSE, "false");
 
-    Term* pi = apply(KERNEL, FLOAT_TYPE, RefList());
-    as_float(pi) = 3.14159;
-    KERNEL->bindName(pi, "PI");
+    float_value(KERNEL, 3.141592654, "PI");
 }
 
 void initialize_builtin_functions(Branch* kernel)
 {
     setup_builtin_functions(*kernel);
 
-    VALUE_FUNCTION_FEEDBACK_ASSIGN = import_function(*kernel,
+    VALUE_FUNCTION_FEEDBACK_ASSIGN = import_function(*KERNEL,
         var_function::feedback_assign, "var-function-feedback-assign(any,any)");
 
-    as_function(VAR_INT).feedbackPropogateFunction = VALUE_FUNCTION_FEEDBACK_ASSIGN;
-    as_function(VAR_FLOAT).feedbackPropogateFunction = VALUE_FUNCTION_FEEDBACK_ASSIGN;
-    as_function(VAR_BOOL).feedbackPropogateFunction = VALUE_FUNCTION_FEEDBACK_ASSIGN;
-    as_function(VAR_STRING).feedbackPropogateFunction = VALUE_FUNCTION_FEEDBACK_ASSIGN;
+    as_function(get_value_function(INT_TYPE)).feedbackPropogateFunction = 
+        VALUE_FUNCTION_FEEDBACK_ASSIGN;
+    as_function(get_value_function(FLOAT_TYPE)).feedbackPropogateFunction = 
+        VALUE_FUNCTION_FEEDBACK_ASSIGN;
+    as_function(get_value_function(BOOL_TYPE)).feedbackPropogateFunction = 
+        VALUE_FUNCTION_FEEDBACK_ASSIGN;
+    as_function(get_value_function(STRING_TYPE)).feedbackPropogateFunction = 
+        VALUE_FUNCTION_FEEDBACK_ASSIGN;
 }
 
 void initialize()
 {
     bootstrap_kernel();
     initialize_builtin_types(*KERNEL);
-    initialize_constants();
     initialize_builtin_functions(KERNEL);
+    initialize_constants();
 }
 
 void shutdown()

@@ -44,11 +44,6 @@ extern Term* UNKNOWN_IDENTIFIER_FUNC;
 extern Term* UNKNOWN_TYPE_FUNC;
 extern Term* UNRECOGNIZED_EXPRESSION_FUNC;
 extern Term* VALUE_FUNCTION_GENERATOR;
-extern Term* VALUE_FUNCTION_FEEDBACK_ASSIGN;
-extern Term* VAR_INT;
-extern Term* VAR_FLOAT;
-extern Term* VAR_STRING;
-extern Term* VAR_BOOL;
 extern Term* VOID_TYPE;
 extern Term* VOID_PTR_TYPE;
 

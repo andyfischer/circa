@@ -25,10 +25,8 @@ void test_remove()
 void test_duplicate()
 {
     Branch original;
-    Term* term1 = apply(&original, VAR_INT, RefList());
-    Term* term2 = apply(&original, VAR_STRING, RefList());
-    as_int(term1) = 5;
-    as_string(term2) = "yarn";
+    Term* term1 = int_value(&original, 5);
+    Term* term2 = string_value(&original, "yarn");
     original.bindName(term1, "term1");
     original.bindName(term2, "term two");
 
