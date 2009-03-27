@@ -2,12 +2,7 @@
 
 #include "common_headers.h"
 
-#include "builtin_types.h"
-#include "branch.h"
-#include "builtins.h"
-#include "runtime.h"
-#include "testing.h"
-#include "type.h"
+#include "circa.h"
 
 namespace circa {
 namespace type_tests {

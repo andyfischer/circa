@@ -51,6 +51,9 @@ void empty_evaluate_function(Term* caller);
 void initialize();
 void shutdown();
 
+namespace set_t {
+    void add(Branch& branch, Term* value);
+}
 
 } // namespace circa
 
