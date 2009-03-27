@@ -12,7 +12,7 @@ struct StringList {
     Branch data;
 
     void append(std::string const& str) {
-        string_value(data, str);
+        string_value(&data, str);
     }
 
     std::string& operator[](int index) {

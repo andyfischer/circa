@@ -27,7 +27,7 @@ namespace mult_function {
 
         if (numTrainableInputs > 1) {
             delta = apply(&branch, DIV_FUNC, RefList(delta,
-                        float_value(branch, numTrainableInputs)));
+                        float_value(&branch, numTrainableInputs)));
         }
 
         // for each input, send a delta divided by the product of all other inputs

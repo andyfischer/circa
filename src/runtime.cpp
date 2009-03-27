@@ -133,17 +133,17 @@ void error_occured(Term* errorTerm, std::string const& message)
     errorTerm->pushError(message);
 }
 
-Term* eval_function(Branch& branch, Term* function, RefList const& inputs)
+Term* eval_function(Branch* branch, Term* function, RefList const& inputs)
 {
-    Term* result = apply(&branch, function, inputs);
+    Term* result = apply(branch, function, inputs);
     evaluate_term(result);
     return result;
 }
 
-Term* eval_function(Branch& branch, std::string const& functionName,
+Term* eval_function(Branch* branch, std::string const& functionName,
         RefList const &inputs)
 {
-    Term* function = find_named(&branch,functionName);
+    Term* function = find_named(branch,functionName);
     if (function == NULL)
         throw std::runtime_error("function not found: "+functionName);
 

@@ -11,16 +11,16 @@ void test_math()
 {
     Branch branch;
 
-    Term* two = float_value(branch, 2);
-    Term* three = float_value(branch, 3);
-    Term* negative_one = float_value(branch, -1);
+    Term* two = float_value(&branch, 2);
+    Term* three = float_value(&branch, 3);
+    Term* negative_one = float_value(&branch, -1);
 
-    test_assert(as_float(eval_function(branch, ADD_FUNC, RefList(two,three))) == 5);
-    test_assert(as_float(eval_function(branch, ADD_FUNC, RefList(two,negative_one))) == 1);
+    test_assert(as_float(eval_function(&branch, ADD_FUNC, RefList(two,three))) == 5);
+    test_assert(as_float(eval_function(&branch, ADD_FUNC, RefList(two,negative_one))) == 1);
 
-    eval_function(branch, MULT_FUNC, RefList(two,three));
-    test_assert(as_float(eval_function(branch, MULT_FUNC, RefList(two,three))) == 6);
-    test_assert(as_float(eval_function(branch, MULT_FUNC, RefList(negative_one,three))) == -3);
+    eval_function(&branch, MULT_FUNC, RefList(two,three));
+    test_assert(as_float(eval_function(&branch, MULT_FUNC, RefList(two,three))) == 6);
+    test_assert(as_float(eval_function(&branch, MULT_FUNC, RefList(negative_one,three))) == -3);
 }
 
 void test_int()
@@ -30,9 +30,9 @@ void test_int()
     test_assert(as_type(INT_TYPE).equals != NULL);
     test_assert(as_type(INT_TYPE).toString != NULL);
 
-    Term* four = int_value(branch, 4);
-    Term* another_four = int_value(branch, 4);
-    Term* five = int_value(branch, 5);
+    Term* four = int_value(&branch, 4);
+    Term* another_four = int_value(&branch, 4);
+    Term* five = int_value(&branch, 5);
 
     test_assert(equals(four, another_four));
     test_assert(!equals(four, five));
@@ -47,9 +47,9 @@ void test_float()
     test_assert(as_type(FLOAT_TYPE).equals != NULL);
     test_assert(as_type(FLOAT_TYPE).toString != NULL);
 
-    Term* point_one = float_value(branch, .1);
-    Term* point_one_again = float_value(branch, .1);
-    Term* point_two = float_value(branch, 0.2);
+    Term* point_one = float_value(&branch, .1);
+    Term* point_one_again = float_value(&branch, .1);
+    Term* point_two = float_value(&branch, 0.2);
 
     test_assert(equals(point_one, point_one_again));
     test_assert(equals(point_two, point_two));
@@ -61,8 +61,7 @@ void test_string()
 {
     Branch branch;
 
-    test_equals(as_string(branch.eval("concat(\"hello \", \"world\")")),
-            "hello world");
+    test_equals(as_string(branch.eval("concat(\"hello \", \"world\")")), "hello world");
 }
 
 void test_concat()
