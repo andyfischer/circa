@@ -6,9 +6,15 @@
 
 namespace circa {
 
+bool owns_value(Term* term)
+{
+    return term->function != ALIAS_FUNC;
+}
+
 void alloc_value(Term* term)
 {
-    term->value = alloc_from_type(term->type);
+    if (owns_value(term))
+        term->value = alloc_from_type(term->type);
 }
 
 void dealloc_value(Term* term)
@@ -22,7 +28,8 @@ void dealloc_value(Term* term)
     if (!is_value_alloced(term->type))
         throw std::runtime_error("type is undefined");
 
-    if (term->ownsValue) {
+    // Special case: don't call dealloc on functions which don't "own" the value
+    if (owns_value(term)) {
         if (as_type(term->type).dealloc == NULL)
             throw std::runtime_error("type " + as_type(term->type).name
                 + " has no dealloc function");
@@ -124,7 +131,7 @@ Term* import_value(Branch* branch, Term* type, void* initialValue, std::string c
     Term *term = create_term(branch, var_function, RefList());
 
     term->value = initialValue;
-    term->ownsValue = false;
+    //term->ownsValue = false;
     term->stealingOk = false;
 
     if (name != "" && branch != NULL)
