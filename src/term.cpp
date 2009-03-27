@@ -14,7 +14,6 @@ static unsigned int gNextGlobalID = 1;
 Term::Term()
   : value(NULL),
     owningBranch(NULL),
-    ownsValue(true),
     stealingOk(true),
     needsUpdate(true),
     refCount(0)

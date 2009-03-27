@@ -39,9 +39,6 @@ struct Term
     // The branch that owns this term.
     Branch* owningBranch;
 
-    // Whether this term owns our value. Usually this is true.
-    bool ownsValue;
-
     // If true, recycle_value is allowed to steal our value.
     bool stealingOk;
 
