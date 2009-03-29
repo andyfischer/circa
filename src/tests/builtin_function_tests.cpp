@@ -87,7 +87,7 @@ void test_reference()
     Term* a = create_value(&branch, INT_TYPE);
     Term* b = create_value(&branch, INT_TYPE);
 
-    as_ref(myref) = a;
+    deref(myref) = a;
 
     RefList refs = reference_iterator_to_list(start_reference_iterator(myref));
     test_equals(refs, RefList(a));
@@ -97,7 +97,7 @@ void test_reference()
 
     remap_pointers(myref, myMap);
 
-    test_assert(as_ref(myref) == b);
+    test_assert(deref(myref) == b);
 
     refs = reference_iterator_to_list(start_reference_iterator(myref));
     test_equals(refs, RefList(b));
@@ -105,7 +105,7 @@ void test_reference()
     myMap[b] = NULL;
     remap_pointers(myref, myMap);
 
-    test_assert(as_ref(myref) == NULL);
+    test_assert(deref(myref) == NULL);
 
     refs = reference_iterator_to_list(start_reference_iterator(myref));
     test_equals(refs, RefList(NULL));

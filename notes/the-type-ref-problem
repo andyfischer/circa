@@ -1,0 +1,24 @@
+
+Problem:
+
+We should be using copy() for all identifiers, when the target of that identifier is not in
+the current scope.
+
+Reason: to support using identifiers in literal branches.
+
+Problem: mentioning a type by identifier is problematic. We don't want to copy the entire type
+object.
+
+Need a way to pass an argument by reference instead of by value.
+
+How to do this?
+
+1) Function signature can specify 'ref' for arguments
+2) Certain types can be turned into ref types
+
+I think #2 might make the most sense for our world. We don't like references/aliasing.
+
+------------------------------------------------------------------------------------
+
+Point = Type(float,float)
+state Point p

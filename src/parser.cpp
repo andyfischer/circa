@@ -1061,8 +1061,11 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     }
 
     // If this term doesn't live in our branch, create a copy
-    /*if (result->owningBranch != &branch)
-        result = apply(&branch, COPY_FUNC, RefList(result));*/
+    // TEMP: disabled
+    bool createCopy = false;//(result->owningBranch != &branch);
+
+    if (createCopy)
+        result = apply(&branch, COPY_FUNC, RefList(result));
 
     return result;
 }

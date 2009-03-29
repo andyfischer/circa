@@ -25,7 +25,7 @@ void Ref::set(Term* target)
 
 void Ref::remap_pointers(Term* term, ReferenceMap const& map)
 {
-    as_ref(term) = map.getRemapped(as_ref(term));
+    deref(term) = map.getRemapped(deref(term));
 }
 
 class ReferenceIteratorForReferenceType : public ReferenceIterator
@@ -44,7 +44,7 @@ public:
     virtual Ref& current()
     {
         assert(!finished());
-        return as_ref(_containingTerm);
+        return deref(_containingTerm);
     }
     virtual void advance()
     {

@@ -14,15 +14,15 @@ void test_reference()
     Term *s = branch.eval("s = 1.0");
     Term *t = branch.eval("t = 1.0");
 
-    test_assert(as_ref(r) == NULL);
-    as_ref(r) = s;
-    test_assert(as_ref(r) == s);
+    test_assert(deref(r) == NULL);
+    deref(r) = s;
+    test_assert(deref(r) == s);
 
     ReferenceIterator* it = start_reference_iterator(r);
 
     test_assert(it->current() == s);
 
-    as_ref(r) = t;
+    deref(r) = t;
 
     test_assert(it->current() == t);
 

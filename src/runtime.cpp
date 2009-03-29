@@ -192,7 +192,7 @@ bool is_string(Term* term)
     return term->type == STRING_TYPE;
 }
 
-Ref& as_ref(Term* term)
+Ref& deref(Term* term)
 {
     assert_type(term, REF_TYPE);
     return *((Ref*) term->value);
@@ -203,6 +203,5 @@ void*& as_void_ptr(Term* term)
     assert_type(term, VOID_PTR_TYPE);
     return term->value;
 }
-
 
 } // namespace circa
