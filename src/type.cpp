@@ -6,11 +6,6 @@
 
 namespace circa {
 
-bool Type::isCompoundType()
-{
-    return alloc == Branch::alloc;
-}
-
 void
 Type::addMemberFunction(Term* function, std::string const &name)
 {
@@ -28,8 +23,8 @@ bool type_matches(Term *term, Term *type)
     // Allow for compound types to be considered the same.
     // Later there can be more complicated type checking.
 
-    if (type != NULL &&
-            as_type(term->type).isCompoundType() && as_type(type).isCompoundType())
+    if (type != NULL && is_compound_type(as_type(term->type))
+            && is_compound_type(as_type(type)))
         return true;
 
     if (term->type != type)
@@ -65,6 +60,10 @@ Type& as_type(Term *term)
     return *((Type*) term->value);
 }
 
+bool is_compound_type(Type const& type)
+{
+    return type.alloc == Branch::alloc;
+}
 
 Term* quick_create_type(Branch& branch, std::string name)
 {

@@ -131,6 +131,7 @@ struct Type
 
 bool is_type(Term* term);
 Type& as_type(Term* term);
+bool is_compound_type(Type const& type);
 
 bool type_matches(Term *term, Term *type);
 
