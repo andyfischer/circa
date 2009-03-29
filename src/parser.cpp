@@ -774,7 +774,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                 specialize_type(result, lhsType[rhsIdent].type);
 
             // Next, allow for dynamic lookup on a compound type
-            /*} else if (lhsType.isCompoundType()) {
+            /*} else if (is_compound_type(lhsType)) {
                 function = GET_FIELD_FUNC;
                 assert(function != NULL);
                 isFieldAccess = true;
