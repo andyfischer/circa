@@ -40,12 +40,6 @@ bool templated_lessThan(Term* a, Term* b)
     return (*(reinterpret_cast<T*>(a->value))) < (*(reinterpret_cast<T*>(b->value)));
 }
 
-template <class T>
-std::string templated_toString(Term* term)
-{
-    return reinterpret_cast<T*>(term->value)->toString();
-}
-
 } // namespace cpp_importing
 
 // Public functions
@@ -63,25 +57,15 @@ Term* import_type(Branch& branch, std::string name="")
 }
 
 template <class T>
-void register_cpp_toString(Term* type)
-{
-    as_type(type).toString = cpp_importing::templated_toString<T>;
-}
-
-template <class T>
 T& as(Term* term)
 {
     Type& type = as_type(term->type);
 
     if (type.cppTypeInfo == NULL)
-        throw std::runtime_error(std::string("type ") + type.name
-                + " is not a C++ type");
+        throw std::runtime_error("type "+type.name+" is not a C++ type");
 
-    if (*type.cppTypeInfo != typeid(T)) {
-        std::stringstream error;
-        error << "C++ type mismatch, existing data has type " << type.name;
-        throw std::runtime_error(error.str());
-    }
+    if (*type.cppTypeInfo != typeid(T))
+        throw std::runtime_error("C++ type mismatch, existing data has type "+type.name);
 
     return *((T*) term->value);
 }
