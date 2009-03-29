@@ -323,6 +323,7 @@ void initialize_builtin_types(Branch& kernel)
 {
     STRING_TYPE = import_type<std::string>(kernel, "string");
     as_type(STRING_TYPE).equals = cpp_importing::templated_equals<std::string>;
+    as_type(STRING_TYPE).lessThan = cpp_importing::templated_lessThan<std::string>;
     as_type(STRING_TYPE).toString = primitives::string_t::to_string;
     as_type(STRING_TYPE).toSourceString = primitives::string_t::to_string;
 

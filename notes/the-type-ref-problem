@@ -22,3 +22,25 @@ I think #2 might make the most sense for our world. We don't like references/ali
 
 Point = Type(float,float)
 state Point p
+
+------------------------------------------------------------------------------------
+
+The Reference Problem
+
+1) Need to be able to share the same object across different parts of the code
+2) Need to preserve object identity for comparison purposes
+
+Aliasing solves #1 but is not a good solution for #2
+
+I would like it if we could get rid of aliasing altogether
+
+Possible solution: wrap types into a managed pointer
+
+For every type T:
+
+  Create a Reference type:
+    
+     class Reference<T> {
+       int refCount;
+       T* data;
+     }
