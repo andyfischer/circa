@@ -171,7 +171,7 @@ bool& Term::asBool()
 
 Ref& Term::asRef()
 {
-    return as_ref(this);
+    return deref(this);
 }
 
 Branch& Term::asBranch()

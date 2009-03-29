@@ -27,7 +27,7 @@ int& as_int(Term*);
 float& as_float(Term*);
 bool& as_bool(Term*);
 std::string& as_string(Term*);
-Ref& as_ref(Term*);
+Ref& deref(Term*);
 bool is_string(Term* term);
 
 } // namespace circa
