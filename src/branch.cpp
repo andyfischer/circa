@@ -50,7 +50,7 @@ Branch::~Branch()
 
 Branch& Branch::operator=(Branch const& b)
 {
-    // Const hack because not everything is const-correct
+    // Const cast because duplicate_branch is not const-correct
     Branch& b_unconst = const_cast<Branch&>(b);
 
     clear();
@@ -86,7 +86,7 @@ void Branch::remove(int index)
 
     Term* term = _terms[index];
 
-    if (term != NULL && term->name != "" && names[term->name] == term)
+    if (term != NULL && (term->name != "") && (names[term->name] == term))
         names.remove(term->name);
 
     _terms.remove(index);
@@ -108,9 +108,8 @@ void Branch::bindName(Term* term, std::string name)
 {
     names.bind(term, name);
 
-    if (term->name != "" && term->name != name) {
-        throw std::runtime_error(std::string("term already has name: ")+term->name);
-    }
+    if (term->name != "" && term->name != name)
+        throw std::runtime_error("term already has name: "+term->name);
 
     term->name = name;
 }
@@ -129,6 +128,9 @@ void Branch::remapPointers(ReferenceMap const& map)
 void
 Branch::clear()
 {
+    for (unsigned int i=0; i < _terms.count(); i++)
+        _terms[i]->owningBranch = NULL;
+
     _terms.clear();
     names.clear();
 }
