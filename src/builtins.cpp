@@ -124,18 +124,6 @@ namespace primitives {
         }
     }
 
-    namespace ptr_t {
-        std::string get_cpp_type_name(Term* term)
-        {
-            Type& type = as_type(term);
-
-            if (type.parameters[0] == ANY_TYPE)
-                return "void*";
-            else
-                return type_id_to_cpp(type.parameters[0]) + "*";
-        }
-    }
-
 } // namespace primitives
 
 namespace set_t {
@@ -358,7 +346,6 @@ void initialize_builtin_types(Branch& kernel)
     ANY_TYPE = create_empty_type(kernel, "any");
 
     VOID_PTR_TYPE = import_type<void*>(kernel, "void_ptr");
-    as_type(VOID_PTR_TYPE).getCppTypeName = primitives::ptr_t::get_cpp_type_name;
     as_type(VOID_PTR_TYPE).parameters.append(ANY_TYPE);
 
     VOID_TYPE = create_empty_type(kernel, "void");
