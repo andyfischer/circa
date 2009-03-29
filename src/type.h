@@ -44,9 +44,6 @@ struct Type
     // is accessed as a C++ type. Otherwise, this is optional.
     const std::type_info *cppTypeInfo;
 
-    // C++ type name
-    std::string cppTypeName;
-
     // Functions
     AllocFunc alloc;
     DeallocFunc dealloc;
@@ -57,7 +54,6 @@ struct Type
     StartReferenceIteratorFunc startReferenceIterator;
     ToStringFunc toString;
     ToStringFunc toSourceString;
-    ToStringFunc getCppTypeName;
 
     // Stores our value function
     Ref valueFunction;
@@ -87,7 +83,6 @@ struct Type
         startReferenceIterator(NULL),
         toString(NULL),
         toSourceString(NULL),
-        getCppTypeName(NULL),
         valueFunction(NULL)
     {
     }
