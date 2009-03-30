@@ -76,7 +76,7 @@ struct Branch
     // Hosted functions
     static void* alloc(Term* type);
     static void dealloc(void* data);
-    static void copy(Term* source, Term* dest);
+    static void assign(Term* source, Term* dest);
     static void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
 };
 

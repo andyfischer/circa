@@ -55,8 +55,8 @@ void recycle_value(Term* source, Term* dest)
     // Usually don't steal. Later, as an optimization, we will sometimes steal.
     bool steal = false;
 
-    // Steal if this type has no copy function
-    if (as_type(source->type).copy == NULL)
+    // Steal if this type has no assign function
+    if (as_type(source->type).assign == NULL)
         steal = true;
 
     if (steal) {
@@ -78,14 +78,12 @@ void copy_value(Term* source, Term* dest)
     if (!is_value_alloced(dest))
         alloc_value(dest);
 
-    Type::CopyFunc copy = as_type(source->type).copy;
+    Type::AssignFunc assign = as_type(source->type).assign;
 
-    if (copy == NULL)
-        throw std::runtime_error(std::string("type ") + as_type(source->type).name
-                + " has no copy function");
+    if (assign == NULL)
+        throw std::runtime_error("type "+as_type(source->type).name+" has no assign function");
 
-
-    copy(source, dest);
+    assign(source, dest);
 }
 
 void copy_value_but_dont_copy_inner_branch(Term* source, Term* dest)

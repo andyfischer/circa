@@ -171,7 +171,7 @@ void Branch::dealloc(void* data)
     delete (Branch*) data;
 }
 
-void Branch::copy(Term* source, Term* dest)
+void Branch::assign(Term* source, Term* dest)
 {
     as_branch(dest).clear();
     duplicate_branch(as_branch(source), as_branch(dest));
