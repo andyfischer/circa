@@ -58,7 +58,7 @@ void type_declaration()
     test_assert(as_type(myType).fields[1].type == INT_TYPE);
 
     test_assert(as_type(myType).alloc != NULL);
-    test_assert(as_type(myType).copy != NULL);
+    test_assert(as_type(myType).assign != NULL);
 
     Term* instance = branch.eval("mt = MyType()");
 

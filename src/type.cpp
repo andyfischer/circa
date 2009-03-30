@@ -129,7 +129,7 @@ void setup_empty_type(Type& type)
 {
     type.alloc = type_private::empty_allocate;
     type.dealloc = type_private::empty_dealloc;
-    type.copy = type_private::empty_duplicate_function;
+    type.assign = type_private::empty_duplicate_function;
 }
 
 Term* create_empty_type(Branch& branch, std::string name)
@@ -146,7 +146,7 @@ void initialize_compound_type(Type& type)
 {
     type.alloc = Branch::alloc;
     type.dealloc = Branch::dealloc;
-    type.copy = Branch::copy;
+    type.assign = Branch::assign;
     type.remapPointers = Branch::hosted_remap_pointers;
     type.toString = compound_type_to_string;
 }
@@ -208,7 +208,7 @@ void Type::type_dealloc(void* data)
     delete reinterpret_cast<Type*>(data);
 }
 
-void Type::type_copy(Term* source, Term* dest)
+void Type::type_assign(Term* source, Term* dest)
 {
     as_type(dest) = as_type(source);
 }

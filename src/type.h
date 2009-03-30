@@ -23,7 +23,7 @@ struct Type
     typedef void* (*AllocFunc)(Term* typeTerm);
     typedef void (*DeallocFunc)(void* data);
     typedef void (*DuplicateFunc)(Term* src, Term* dest);
-    typedef void (*CopyFunc)(Term* src, Term* dest);
+    typedef void (*AssignFunc)(Term* src, Term* dest);
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
     typedef bool (*LessThanFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
@@ -47,7 +47,7 @@ struct Type
     // Functions
     AllocFunc alloc;
     DeallocFunc dealloc;
-    CopyFunc copy;
+    AssignFunc assign;
     EqualsFunc equals;
     LessThanFunc lessThan;
     RemapPointersFunc remapPointers;
@@ -125,7 +125,7 @@ struct Type
 
     static void* type_alloc(Term* type);
     static void type_dealloc(void* data);
-    static void type_copy(Term* source, Term* dest);
+    static void type_assign(Term* source, Term* dest);
     static void typeRemapPointers(Term *term, ReferenceMap const& map);
     static ReferenceIterator* typeStartReferenceIterator(Term* term);
     static std::string type_to_string(Term* term);

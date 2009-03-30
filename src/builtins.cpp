@@ -266,7 +266,7 @@ void bootstrap_kernel()
     typeType->name = "Type";
     typeType->alloc = Type::type_alloc;
     typeType->dealloc = Type::type_dealloc;
-    typeType->copy = Type::type_copy;
+    typeType->assign = Type::type_assign;
     typeType->remapPointers = Type::typeRemapPointers;
     typeType->startReferenceIterator = Type::typeStartReferenceIterator;
     typeType->toString = Type::type_to_string;
@@ -298,7 +298,7 @@ void bootstrap_kernel()
     as_type(FUNCTION_TYPE).name = "Function";
     as_type(FUNCTION_TYPE).alloc = cpp_importing::templated_alloc<Function>;
     as_type(FUNCTION_TYPE).dealloc = cpp_importing::templated_dealloc<Function>;
-    as_type(FUNCTION_TYPE).copy = Function::copy;
+    as_type(FUNCTION_TYPE).assign = Function::assign;
     as_type(FUNCTION_TYPE).remapPointers = Function::remapPointers;
     KERNEL->bindName(FUNCTION_TYPE, "Function");
 

@@ -51,7 +51,7 @@ Term* import_type(Branch& branch, std::string name="")
     Type& type = as_type(term);
     type.alloc = cpp_importing::templated_alloc<T>;
     type.dealloc = cpp_importing::templated_dealloc<T>;
-    type.copy = cpp_importing::templated_assign<T>;
+    type.assign = cpp_importing::templated_assign<T>;
     type.cppTypeInfo = &typeid(T);
     return term;
 }

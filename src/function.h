@@ -65,7 +65,7 @@ struct Function
 
     // Hosted functions
     static void copyExceptBranch(Term* source, Term* dest);
-    static void copy(Term* source, Term* dest);
+    static void assign(Term* source, Term* dest);
     static void remapPointers(Term* term, ReferenceMap const& map);
     static void subroutine_call_evaluate(Term* caller);
 };

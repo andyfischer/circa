@@ -102,7 +102,7 @@ void Function::copyExceptBranch(Term* sourceTerm, Term* destTerm)
 #undef copy_field
 }
 
-void Function::copy(Term* sourceTerm, Term* destTerm)
+void Function::assign(Term* sourceTerm, Term* destTerm)
 {
     Function::copyExceptBranch(sourceTerm, destTerm);
     Function &source = as_function(sourceTerm);
