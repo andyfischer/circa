@@ -20,9 +20,9 @@ void create()
 
     test_assert(is_function(sub));
     test_assert(as_function(sub).name == "my-sub");
-    test_assert(as_function(sub).inputTypes[0] == INT_TYPE);
+    test_assert(identity_equals(as_function(sub).inputTypes[0], INT_TYPE));
     test_assert(as_function(sub).inputTypes.count() == 1);
-    test_assert(as_function(sub).outputType == STRING_TYPE);
+    test_assert(identity_equals(as_function(sub).outputType, STRING_TYPE));
 }
 
 void using_apply()

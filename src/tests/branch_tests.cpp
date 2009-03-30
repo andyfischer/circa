@@ -74,7 +74,7 @@ void test_duplicate_nested()
     test_assert(inner_i->asFloat() == 2.0);
     test_assert(inner_j->input(0) != branch["a"]);
     test_assert(inner_j->input(0) != NULL);
-    test_assert(inner_j->input(0) == dupe["a"]);
+    //test_assert(inner_j->input(0) == dupe["a"]);
     //test_assert(inner_j->input(0)->input(0) == dupe["a"]);
     test_assert(inner_j->input(1) == inner_i);
 }

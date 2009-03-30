@@ -72,6 +72,8 @@ struct Type
     // Syntax hints
     TypeSyntaxHints syntaxHints;
 
+    int refCount;
+
     Type() :
         name(""),
         cppTypeInfo(NULL),
@@ -83,7 +85,8 @@ struct Type
         startReferenceIterator(NULL),
         toString(NULL),
         toSourceString(NULL),
-        valueFunction(NULL)
+        valueFunction(NULL),
+        refCount(0)
     {
     }
 
@@ -156,6 +159,7 @@ Term* create_compound_type(Branch& branch, std::string const& name);
 std::string compound_type_to_string(Term* caller);
 
 // Functions which are dispatched based on type
+bool identity_equals(Term* a, Term* b);
 bool equals(Term* a, Term* b);
 std::string to_string(Term* term);
 std::string to_source_string(Term* term);
