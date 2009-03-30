@@ -20,7 +20,7 @@ void test_duplicate()
     void* a_addr = a->value;
     //void* b_addr = b->value;
 
-    copy_value(a, b);
+    assign_value(a, b);
 
     test_assert(as_int(b) == 2);
     test_assert(b->value != a_addr);
@@ -44,7 +44,7 @@ void test_assign()
     void* a_addr = a->value;
     void* b_addr = b->value;
 
-    copy_value(a, b);
+    assign_value(a, b);
 
     test_assert(as_int(b) == 2);
     test_assert(b->value != a_addr);

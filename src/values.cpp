@@ -31,8 +31,7 @@ void dealloc_value(Term* term)
     // Special case: don't call dealloc on functions which don't "own" the value
     if (owns_value(term)) {
         if (as_type(term->type).dealloc == NULL)
-            throw std::runtime_error("type " + as_type(term->type).name
-                + " has no dealloc function");
+            throw std::runtime_error("type "+as_type(term->type).name+" has no dealloc function");
 
         as_type(term->type).dealloc(term->value);
     }
@@ -46,27 +45,7 @@ bool is_value_alloced(Term* term)
     return term->value != NULL;
 }
 
-void recycle_value(Term* source, Term* dest)
-{
-    assert(source != NULL);
-    assert(dest != NULL);
-    assert_type(source, dest->type);
-
-    // Usually don't steal. Later, as an optimization, we will sometimes steal.
-    bool steal = false;
-
-    // Steal if this type has no assign function
-    if (as_type(source->type).assign == NULL)
-        steal = true;
-
-    if (steal) {
-        steal_value(source, dest);
-    } else {
-        copy_value(source, dest);
-    }
-}
-
-void copy_value(Term* source, Term* dest)
+void assign_value(Term* source, Term* dest)
 {
     // Temp: Do a type specialization if dest has type 'any'.
     // This should be removed once type inference rules are smarter.
@@ -86,7 +65,7 @@ void copy_value(Term* source, Term* dest)
     assign(source, dest);
 }
 
-void copy_value_but_dont_copy_inner_branch(Term* source, Term* dest)
+void assign_value_but_dont_copy_inner_branch(Term* source, Term* dest)
 {
     // Temp: Do a type specialization if dest has type 'any'.
     // This should be removed once type inference rules are smarter.
@@ -105,22 +84,8 @@ void copy_value_but_dont_copy_inner_branch(Term* source, Term* dest)
     if (has_inner_branch(dest))
         return;
 
-    copy_value(source, dest);
+    assign_value(source, dest);
 }
-
-void steal_value(Term* source, Term* dest)
-{
-    assert_type(source, dest->type);
-
-    // if 'dest' has a value, delete it
-    dealloc_value(dest);
-
-    dest->value = source->value;
-
-    source->value = NULL;
-    source->needsUpdate = true;
-}
-
 
 Term* import_value(Branch* branch, Term* type, void* initialValue, std::string const& name)
 {

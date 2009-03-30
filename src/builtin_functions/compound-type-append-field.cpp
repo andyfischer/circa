@@ -7,7 +7,7 @@ namespace compound_type_append_field_function {
 
     void evaluate(Term* caller)
     {
-        recycle_value(caller->input(0), caller);
+        assign_value(caller->input(0), caller);
         Type& output = as_type(caller);
         as_type(caller->input(1));
         Term* fieldType = caller->input(1);

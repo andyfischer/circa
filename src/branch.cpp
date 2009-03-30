@@ -315,7 +315,7 @@ void migrate_terms(Branch& source, Branch& dest)
             
             // Stateful value migration
             else if (is_stateful(sourceTerm) && is_stateful(destTerm)) {
-                copy_value(sourceTerm, destTerm);
+                assign_value(sourceTerm, destTerm);
             }
         }
     }
@@ -375,7 +375,7 @@ void persist_results_for_stateful_terms(Branch& branch)
             if (result == term)
                 continue;
 
-            copy_value(result, term);
+            assign_value(result, term);
         }
     }
 }

@@ -17,7 +17,7 @@ void strings()
     test_assert(as_string(str1) == "one");
     test_assert(as_string(str2) == "two");
     
-    copy_value(str1,str2);
+    assign_value(str1,str2);
 
     test_assert(as_string(str1) == "one");
     test_assert(as_string(str2) == "one");

@@ -502,7 +502,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     change_type(result, type);
 
     if (initialValue != NULL) {
-        copy_value(initialValue, result);
+        assign_value(initialValue, result);
     }
     else
         alloc_value(result);

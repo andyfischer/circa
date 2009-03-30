@@ -17,7 +17,7 @@ namespace for_function {
         assert(iterator != NULL);
 
         for (int i=0; i < series.numTerms(); i++) {
-            copy_value(series[i], iterator);
+            assign_value(series[i], iterator);
             evaluate_branch(branch);
         }
     }
