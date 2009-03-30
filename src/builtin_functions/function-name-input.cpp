@@ -8,7 +8,7 @@ namespace function_name_input_function {
 
     void evaluate(Term* caller)
     {
-        recycle_value(caller->input(0), caller);
+        assign_value(caller->input(0), caller);
         int index = as_int(caller->input(1));
         std::string name = as_string(caller->input(2));
         Function& sub = as_function(caller);

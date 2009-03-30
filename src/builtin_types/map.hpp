@@ -25,13 +25,13 @@ struct Map {
         Pair *existing = findPair(key);
 
         Term* duplicatedValue = create_value(NULL, value->type);
-        copy_value(value, duplicatedValue);
+        assign_value(value, duplicatedValue);
 
         if (existing != NULL) {
             existing->value = duplicatedValue;
         } else {
             Term* duplicatedKey = create_value(NULL, key->type);
-            copy_value(key, duplicatedKey);
+            assign_value(key, duplicatedKey);
             Pair newPair;
             newPair.key = duplicatedKey;
             newPair.value = duplicatedValue;

@@ -7,7 +7,7 @@ namespace branch_append_function {
 
     void evaluate(Term* caller)
     {
-        recycle_value(caller->input(0), caller);
+        assign_value(caller->input(0), caller);
         create_duplicate(&as_branch(caller), caller->input(1));
     }
 

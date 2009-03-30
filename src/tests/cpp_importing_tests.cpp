@@ -29,7 +29,7 @@ int Type1::gInstanceCount = 0;
 
 void append_string__evaluate(Term* term)
 {
-    recycle_value(term->input(0), term);
+    assign_value(term->input(0), term);
     as<Type1>(term).myString += as_string(term->input(1));
 }
 

@@ -10,7 +10,7 @@ namespace get_field_function {
         int index = as_int(caller->state);
         Term* field = as_branch(caller->input(0))[index];
 
-        recycle_value(field, caller);
+        assign_value(field, caller);
     }
 
     void setup(Branch& kernel)

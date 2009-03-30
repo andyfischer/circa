@@ -8,7 +8,7 @@ namespace subroutine_apply_function {
 
     void evaluate(Term* caller)
     {
-        recycle_value(caller->input(0), caller);
+        assign_value(caller->input(0), caller);
         std::string input = as_string(caller->input(1));
 
         Function& sub = as_function(caller);

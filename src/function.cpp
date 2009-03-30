@@ -167,7 +167,7 @@ Function::subroutine_call_evaluate(Term* caller)
 
         assert(inputTerm != NULL);
 
-        recycle_value(caller->inputs[input], inputTerm);
+        assign_value(caller->inputs[input], inputTerm);
     }
 
     evaluate_branch(branch);
@@ -176,7 +176,7 @@ Function::subroutine_call_evaluate(Term* caller)
     if (branch.contains(OUTPUT_PLACEHOLDER_NAME)) {
         Term* outputPlaceholder = branch[OUTPUT_PLACEHOLDER_NAME];
         assert(outputPlaceholder != NULL);
-        recycle_value(outputPlaceholder, caller);
+        assign_value(outputPlaceholder, caller);
     }
 }
 

@@ -69,7 +69,7 @@ namespace var_function {
         Term* target = caller->input(0);
         Term* desired = caller->input(1);
 
-        copy_value(desired, target);
+        assign_value(desired, target);
     }
 }
 
@@ -142,12 +142,12 @@ namespace set_t {
             return;
 
         Term* duplicated_value = create_value(&branch, value->type);
-        copy_value(value, duplicated_value);
+        assign_value(value, duplicated_value);
     }
 
     void hosted_add(Term* caller)
     {
-        recycle_value(caller->input(0), caller);
+        assign_value(caller->input(0), caller);
         Branch& branch = as_branch(caller);
         Term* value = caller->input(1);
         add(branch, value);
@@ -155,7 +155,7 @@ namespace set_t {
 
     void remove(Term* caller)
     {
-        recycle_value(caller->input(0), caller);
+        assign_value(caller->input(0), caller);
         Branch& branch = as_branch(caller);
         Term* value = caller->input(1);
 
@@ -190,11 +190,11 @@ namespace list_t {
 
     void append(Term* caller)
     {
-        recycle_value(caller->input(0), caller);
+        assign_value(caller->input(0), caller);
         Branch& branch = as_branch(caller);
         Term* value = caller->input(1);
         Term* duplicated_value = create_value(&branch, value->type);
-        copy_value(value, duplicated_value);
+        assign_value(value, duplicated_value);
     }
 
     void count(Term* caller)

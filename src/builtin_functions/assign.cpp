@@ -13,7 +13,7 @@ namespace assign_function {
         if (value->type != target->type)
             specialize_type(target, value->type);
 
-        copy_value(value, target);
+        assign_value(value, target);
     }
 
     void setup(Branch& kernel)

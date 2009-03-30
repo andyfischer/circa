@@ -18,7 +18,7 @@ namespace if_expr_function {
         }
 
         change_type(caller, result->type);
-        recycle_value(caller->inputs[index], caller);
+        assign_value(caller->inputs[index], caller);
     }
 
     Term* specializeType(Term* caller)

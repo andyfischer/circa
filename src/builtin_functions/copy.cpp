@@ -7,7 +7,7 @@ namespace copy_function {
 
     void evaluate(Term* caller)
     {
-        copy_value(caller->input(0), caller);
+        assign_value(caller->input(0), caller);
     }
 
     Term* specializeType(Term* caller)
