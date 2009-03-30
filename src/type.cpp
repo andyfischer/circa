@@ -27,7 +27,7 @@ bool type_matches(Term *term, Term *type)
             && is_compound_type(as_type(type)))
         return true;
 
-    if (term->type != type)
+    if (!identity_equals(term->type, type))
         return false;
 
     return true;
@@ -185,6 +185,11 @@ std::string compound_type_to_string(Term* caller)
     return out.str();
 }
 
+bool identity_equals(Term* a, Term* b)
+{
+    return a->value == b->value;
+}
+
 bool equals(Term* a, Term* b)
 {
     if (a->type != b->type)
@@ -205,12 +210,25 @@ void* Type::type_alloc(Term* type)
 
 void Type::type_dealloc(void* data)
 {
-    delete reinterpret_cast<Type*>(data);
+    // delete reinterpret_cast<Type*>(data);
 }
 
 void Type::type_assign(Term* source, Term* dest)
 {
-    as_type(dest) = as_type(source);
+    Type* sourceValue = (Type*) source->value;
+    Type* destValue = (Type*) dest->value;
+
+    if (sourceValue == destValue)
+        return;
+
+    dest->value = sourceValue;
+
+    if (sourceValue != NULL)
+        sourceValue->refCount++;
+    
+    if (destValue != NULL) {
+        // todo, delete Type objects when they are no longer needed
+    }
 }
 
 void Type::typeRemapPointers(Term *term, ReferenceMap const& map)

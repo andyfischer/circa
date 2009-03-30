@@ -845,9 +845,8 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             result->syntaxHints.getInputSyntax(0).followingWhitespace = preOperatorWhitespace;
             result->syntaxHints.getInputSyntax(1).preWhitespace = postOperatorWhitespace;
 
-            if (isRebinding) {
+            if (isRebinding)
                 branch.bindName(result, leftExpr->name);
-            }
         }
 
         leftExpr = result;
@@ -1061,11 +1060,14 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     }
 
     // If this term doesn't live in our branch, create a copy
-    // TEMP: disabled
-    bool createCopy = false;//(result->owningBranch != &branch);
+    bool createCopy = (result->owningBranch != &branch);
 
-    if (createCopy)
+    if (createCopy) {
+        std::string name = result->name;
         result = apply(&branch, COPY_FUNC, RefList(result));
+        if (name != "")
+            branch.bindName(result, name);
+    }
 
     return result;
 }
