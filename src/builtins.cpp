@@ -261,15 +261,15 @@ void bootstrap_kernel()
     TYPE_TYPE->owningBranch = KERNEL;
     TYPE_TYPE->function = constTypeFunc;
     TYPE_TYPE->type = TYPE_TYPE;
-    TYPE_TYPE->value = new Type();
-
-    as_type(TYPE_TYPE).name = "Type";
-    as_type(TYPE_TYPE).alloc = cpp_importing::templated_alloc<Type>;
-    as_type(TYPE_TYPE).dealloc = cpp_importing::templated_dealloc<Type>;
-    as_type(TYPE_TYPE).copy = Type::type_copy;
-    as_type(TYPE_TYPE).remapPointers = Type::typeRemapPointers;
-    as_type(TYPE_TYPE).startReferenceIterator = Type::typeStartReferenceIterator;
-    as_type(TYPE_TYPE).toString = Type::type_to_string;
+    Type* typeType = new Type();
+    TYPE_TYPE->value = typeType;
+    typeType->name = "Type";
+    typeType->alloc = Type::type_alloc;
+    typeType->dealloc = Type::type_dealloc;
+    typeType->copy = Type::type_copy;
+    typeType->remapPointers = Type::typeRemapPointers;
+    typeType->startReferenceIterator = Type::typeStartReferenceIterator;
+    typeType->toString = Type::type_to_string;
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Implant the Type type
