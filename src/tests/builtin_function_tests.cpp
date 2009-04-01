@@ -135,21 +135,6 @@ void test_map()
     test_assert(branch.eval("ages('Absalom')")->asInt() == 205);
 }
 
-void test_alias()
-{
-    Branch branch;
-
-    Term *five = branch.eval("five = 5");
-    Term *a = branch.eval("a = alias(five)");
-
-    test_assert(a);
-    test_assert(as_int(a) == 5);
-
-    as_int(five) = 55;
-
-    test_assert(as_int(a) == 55);
-}
-
 void test_list()
 {
     Branch branch;
@@ -172,7 +157,6 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_reference);
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_map);
-    REGISTER_TEST_CASE(builtin_function_tests::test_alias);
     REGISTER_TEST_CASE(builtin_function_tests::test_list);
 }
 

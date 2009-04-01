@@ -6,15 +6,9 @@
 
 namespace circa {
 
-bool owns_value(Term* term)
-{
-    return term->function != ALIAS_FUNC;
-}
-
 void alloc_value(Term* term)
 {
-    if (owns_value(term))
-        term->value = alloc_from_type(term->type);
+    term->value = alloc_from_type(term->type);
 }
 
 void dealloc_value(Term* term)
@@ -28,13 +22,10 @@ void dealloc_value(Term* term)
     if (!is_value_alloced(term->type))
         throw std::runtime_error("type is undefined");
 
-    // Special case: don't call dealloc on functions which don't "own" the value
-    if (owns_value(term)) {
-        if (as_type(term->type).dealloc == NULL)
-            throw std::runtime_error("type "+as_type(term->type).name+" has no dealloc function");
+    if (as_type(term->type).dealloc == NULL)
+        throw std::runtime_error("type "+as_type(term->type).name+" has no dealloc function");
 
-        as_type(term->type).dealloc(term->value);
-    }
+    as_type(term->type).dealloc(term->value);
 
     term->value = NULL;
 }
@@ -139,11 +130,6 @@ Term* bool_value(Branch* branch, bool b, std::string const& name)
     Term* term = create_value(branch, BOOL_TYPE, name);
     as_bool(term) = b;
     return term;
-}
-
-Term* create_alias(Branch* branch, Term* term)
-{
-    return apply_and_eval(branch, ALIAS_FUNC, RefList(term));
 }
 
 } // namespace circa
