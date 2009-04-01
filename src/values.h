@@ -24,7 +24,6 @@ Term* int_value(Branch* branch, int i, std::string const& name="");
 Term* float_value(Branch* branch, float f, std::string const& name="");
 Term* bool_value(Branch* branch, bool b, std::string const& name="");
 
-
 } // namespace circa
 
 #endif

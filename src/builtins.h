@@ -11,7 +11,6 @@ extern Branch* KERNEL;
 
 extern Term* ASSIGN_FUNC;
 extern Term* ADD_FUNC;
-extern Term* ALIAS_FUNC;
 extern Term* ANY_TYPE;
 extern Term* APPLY_FEEDBACK;
 extern Term* BOOL_TYPE;
