@@ -60,14 +60,6 @@ void set_input(Term* term, int index, Term* input)
     assert_good_pointer(term);
 
     term->inputs.setAt(index, input);
-
-    // Update syntax hints
-    if (input == NULL)
-        term->syntaxHints.getInputSyntax(index).unknownStyle();
-    else if (input->name == "")
-        term->syntaxHints.getInputSyntax(index).bySource();
-    else
-        term->syntaxHints.getInputSyntax(index).byName(input->name);
 }
 
 Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
