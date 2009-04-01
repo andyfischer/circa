@@ -220,8 +220,8 @@ void handle_dragging()
 
     circa::Branch tempBranch;
 
-    circa::Term* desiredX = circa::float_value(tempBranch, MOUSE_X);
-    circa::Term* desiredY = circa::float_value(tempBranch, MOUSE_Y);
+    circa::Term* desiredX = circa::float_value(&tempBranch, MOUSE_X);
+    circa::Term* desiredY = circa::float_value(&tempBranch, MOUSE_Y);
 
     circa::generate_training(tempBranch, subjectX, desiredX);
     circa::generate_training(tempBranch, subjectY, desiredY);
@@ -246,11 +246,11 @@ int main( int argc, char* args[] )
 
     circa::import_function(*circa::KERNEL, key_down, "key_down(int) -> bool");
     circa::import_function(*circa::KERNEL, key_pressed, "key_pressed(int) -> bool");
-    circa::int_value(*circa::KERNEL, SDLK_UP, "KEY_UP");
-    circa::int_value(*circa::KERNEL, SDLK_DOWN, "KEY_DOWN");
-    circa::int_value(*circa::KERNEL, SDLK_LEFT, "KEY_LEFT");
-    circa::int_value(*circa::KERNEL, SDLK_RIGHT, "KEY_RIGHT");
-    circa::int_value(*circa::KERNEL, SDLK_SPACE, "KEY_SPACE");
+    circa::int_value(circa::KERNEL, SDLK_UP, "KEY_UP");
+    circa::int_value(circa::KERNEL, SDLK_DOWN, "KEY_DOWN");
+    circa::int_value(circa::KERNEL, SDLK_LEFT, "KEY_LEFT");
+    circa::int_value(circa::KERNEL, SDLK_RIGHT, "KEY_RIGHT");
+    circa::int_value(circa::KERNEL, SDLK_SPACE, "KEY_SPACE");
 
     (*circa::KERNEL)["KEY_UP"]->boolProperty("dont_train") = true;
     (*circa::KERNEL)["KEY_DOWN"]->boolProperty("dont_train") = true;
