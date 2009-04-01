@@ -369,6 +369,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     possible_newline(tokens);
 
     Term* result = apply(&branch, IF_FUNC, RefList(condition));
+    set_input_syntax(result, 0, condition);
     result->stringProperty("syntaxHints:declarationStyle") = "if-statement";
     Branch& innerBranch = as_branch(result->state);
     innerBranch.outerScope = &branch;
@@ -498,6 +499,10 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         inputs.append(initialValue);
 
     Term* result = apply(&branch, STATEFUL_VALUE_FUNC, inputs, name);
+
+    if (inputs.count() > 0)
+        set_input_syntax(result, 0, inputs[0]);
+
     result->stringProperty("syntaxHints:declarationStyle") = "function-specific";
     change_type(result, type);
 
