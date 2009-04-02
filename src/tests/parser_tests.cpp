@@ -257,10 +257,10 @@ void test_syntax_hints()
     test_equals(t->stringProperty("syntaxHints:functionName"), "concat");
     test_equals(get_input_syntax_hint(t, 0, "style"), "by-value");
     test_equals(get_input_syntax_hint(t, 0, "preWhitespace"), "");
-    test_equals(get_input_syntax_hint(t, 0, "followingWhitespace"), "");
+    test_equals(get_input_syntax_hint(t, 0, "postWhitespace"), "");
     test_equals(get_input_syntax_hint(t, 1, "style"), "by-value");
     test_equals(get_input_syntax_hint(t, 1, "preWhitespace"), " ");
-    test_equals(get_input_syntax_hint(t, 1, "followingWhitespace"), "");
+    test_equals(get_input_syntax_hint(t, 1, "postWhitespace"), "");
 }
 
 void test_implicit_copy_by_identifier()
@@ -320,14 +320,14 @@ void test_infix_whitespace()
 
     Term* term = parser::compile(branch, parser::infix_expression, "  a + b");
     test_equals(term->stringProperty("syntaxHints:preWhitespace"), "  ");
-    test_equals(get_input_syntax_hint(term, 0, "followingWhitespace"), " ");
+    test_equals(get_input_syntax_hint(term, 0, "postWhitespace"), " ");
     test_equals(get_input_syntax_hint(term, 1, "preWhitespace"), " ");
 
     term = parser::compile(branch, parser::infix_expression, "5+3");
     test_assert(term->stringProperty("syntaxHints:preWhitespace") == "");
     test_equals(get_input_syntax_hint(term, 0, "postWhitespace"), "");
     test_equals(get_input_syntax_hint(term, 1, "preWhitespace"), "");
-    test_assert(term->stringProperty("syntaxHints:followingWhitespace") == "");
+    test_assert(term->stringProperty("syntaxHints:postWhitespace") == "");
 }
 
 void register_tests()

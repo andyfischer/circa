@@ -55,8 +55,8 @@ void prepend_whitespace(Term* term, std::string const& whitespace)
 void append_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
-        term->stringProperty("syntaxHints:followingWhitespace") = 
-            whitespace + term->stringProperty("syntaxHints:followingWhitespace");
+        term->stringProperty("syntaxHints:postWhitespace") = 
+            whitespace + term->stringProperty("syntaxHints:postWhitespace");
 }
 
 void push_pending_rebind(Branch& branch, std::string const& name)
@@ -848,7 +848,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             set_input_syntax(result, 0, leftExpr);
             set_input_syntax(result, 1, rightExpr);
 
-            get_input_syntax_hint(result, 0, "followingWhitespace") = preOperatorWhitespace;
+            get_input_syntax_hint(result, 0, "postWhitespace") = preOperatorWhitespace;
             get_input_syntax_hint(result, 1, "preWhitespace") = postOperatorWhitespace;
 
             if (isRebinding)
