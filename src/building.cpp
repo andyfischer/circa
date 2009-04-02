@@ -74,7 +74,6 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
         assign_value_but_dont_copy_inner_branch(source,term);
 
     duplicate_branch(source->properties, term->properties);
-    term->syntaxHints = source->syntaxHints;
 
     if (source->state != NULL) {
         if (copyBranches && !has_inner_branch(source))
