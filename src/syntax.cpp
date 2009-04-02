@@ -36,7 +36,7 @@ std::string get_source_of_input(Term* term, int inputIndex)
         result << "(!unknown)";
     }
 
-    result << get_input_syntax_hint(term, inputIndex, "followingWhitespace");
+    result << get_input_syntax_hint(term, inputIndex, "postWhitespace");
 
     return result.str();
 }
@@ -81,7 +81,7 @@ std::string get_term_source(Term* term)
 
         // todo: dispatch based on type
         return Function::toSourceString(term)
-            + term->stringPropertyOptional("syntaxHints:followingWhitespace", "");
+            + term->stringPropertyOptional("syntaxHints:postWhitespace", "");
     } else if (term->function == IF_FUNC) {
         if (VERBOSE_LOGGING)
             std::cout << "handled as if" << std::endl;
@@ -164,7 +164,7 @@ std::string get_term_source(Term* term)
     for (int p=0; p < numParens; p++)
         result << ")";
 
-    result << term->stringPropertyOptional("syntaxHints:followingWhitespace", "");
+    result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
 
     return result.str();
 }
