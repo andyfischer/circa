@@ -93,6 +93,7 @@ std::string get_term_source(Term* term)
         result << get_branch_source(branch);
 
         result << "end";
+        result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
         return result.str();
 
     } else if (term->function == STATEFUL_VALUE_FUNC) {
@@ -108,10 +109,13 @@ std::string get_term_source(Term* term)
             result << get_source_of_input(term, 0);
         }
 
+        result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
+
         return result.str();
     } else if (term->function == COPY_FUNC) {
         result << term->name << " = ";
         result << term->input(0)->name;
+        result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
         return result.str();
     }
 
@@ -122,6 +126,7 @@ std::string get_term_source(Term* term)
     {
         result << term->name << " " << term->stringProperty("syntaxHints:functionName");
         result << get_source_of_input(term, 1);
+        result << term->stringProperty("syntaxHints:postWhitespace");
         return result.str();
     }
 

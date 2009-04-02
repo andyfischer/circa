@@ -449,9 +449,9 @@ void consume_comment(TokenizeContext& context)
     while (!context.finished() && !is_newline(context.next()))
         text << context.consume();
 
-    // throw away the newline
+    // consume the newline
     if (!context.finished())
-        context.consume();
+        text << context.consume();
 
     context.pushResult(COMMENT, text.str());
 }
