@@ -16,8 +16,7 @@ Function::Function()
     generateTraining(NULL),
     feedbackAccumulationFunction(NULL),
     feedbackPropogateFunction(NULL),
-    generateCppFunction(NULL),
-    printCircaSourceFunction(NULL)
+    generateCppFunction(NULL)
 {
 }
 
@@ -97,7 +96,6 @@ void Function::copyExceptBranch(Term* sourceTerm, Term* destTerm)
     copy_field(feedbackAccumulationFunction);
     copy_field(feedbackPropogateFunction);
     copy_field(generateCppFunction);
-    copy_field(printCircaSourceFunction);
 
 #undef copy_field
 }

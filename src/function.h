@@ -53,7 +53,6 @@ struct Function
     Ref feedbackAccumulationFunction;
     Ref feedbackPropogateFunction;
     Ref generateCppFunction;
-    Ref printCircaSourceFunction;
 
     Function();
 
