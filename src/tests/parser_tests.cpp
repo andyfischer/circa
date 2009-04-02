@@ -261,6 +261,9 @@ void test_syntax_hints()
     test_equals(get_input_syntax_hint(t, 1, "style"), "by-value");
     test_equals(get_input_syntax_hint(t, 1, "preWhitespace"), " ");
     test_equals(get_input_syntax_hint(t, 1, "postWhitespace"), "");
+
+    t = parser::compile(branch, parser::statement, "x = true\n");
+    test_equals(t->stringProperty("syntaxHints:postWhitespace"), "\n");
 }
 
 void test_implicit_copy_by_identifier()

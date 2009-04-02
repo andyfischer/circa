@@ -206,7 +206,6 @@ Term* statement(Branch& branch, TokenStream& tokens)
 Term* comment_statement(Branch& branch, TokenStream& tokens)
 {
     std::string commentText = tokens.consume(COMMENT);
-    commentText += possible_newline(tokens);
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
     as_string(result->state->field(0)) = commentText;
@@ -367,7 +366,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     recursively_mark_terms_as_occuring_inside_an_expression(condition);
 
     possible_whitespace(tokens);
-    possible_newline(tokens);
+    tokens.consume(NEWLINE);
 
     Term* result = apply(&branch, IF_FUNC, RefList(condition));
     set_input_syntax(result, 0, condition);
@@ -378,8 +377,9 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     consume_branch_until_end(innerBranch, tokens);
 
     tokens.consume(END);
-    possible_whitespace(tokens);
-    possible_newline(tokens);
+
+    append_whitespace(result, possible_whitespace(tokens));
+    append_whitespace(result, possible_newline(tokens));
 
     remove_compilation_attrs(innerBranch);
 
@@ -491,7 +491,6 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
     }
 
-    possible_newline(tokens);
 
     Term* type = find_type(branch, typeName);
 
@@ -512,6 +511,8 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     }
     else
         alloc_value(result);
+
+    append_whitespace(result, possible_newline(tokens));
 
     return result;
 }
@@ -559,14 +560,14 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     Term* result = infix_expression(branch, tokens);
 
-    append_whitespace(result, possible_newline(tokens));
-
     // If this item is just an identifier, and we're trying to rename it,
     // create an implicit call to 'copy'.
     if (result->name != "" && names.length() > 0) {
         result = apply(&branch, COPY_FUNC, RefList(result));
         result->stringProperty("syntaxHints:declarationStyle") = "function-specific";
     }
+
+    append_whitespace(result, possible_newline(tokens));
 
     // Go through all of our terms, if they don't have names then assume they
     // were created just for us. Update the syntax hints to reflect this.
@@ -603,7 +604,7 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     Term* result = infix_expression(branch, tokens);
-    possible_newline(tokens);
+    append_whitespace(result, possible_newline(tokens));
 
     branch.bindName(result, "#return");
     
@@ -955,7 +956,6 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
         index++;
     }
-
 
     tokens.consume(RPAREN);
     
