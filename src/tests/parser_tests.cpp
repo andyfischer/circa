@@ -28,7 +28,7 @@ void test_blank_line()
     parser::compile(branch, parser::statement, "");
     test_assert(branch.numTerms() == 1);
     test_assert(branch[0]->function == COMMENT_FUNC);
-    test_equals(branch[0]->state->field(0)->asString(), "");
+    test_equals(branch[0]->state->field(0)->asString(), "\n");
 }
 
 void test_literal_integer()

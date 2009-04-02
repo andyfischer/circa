@@ -57,6 +57,7 @@ struct Function
     Function();
 
     Term* inputType(int index);
+    int numInputs();
     void appendInput(Term* type, std::string const& name);
     InputProperties& getInputProperties(unsigned int index);
     void setInputMeta(int index, bool value);
@@ -67,6 +68,7 @@ struct Function
     static void assign(Term* source, Term* dest);
     static void remapPointers(Term* term, ReferenceMap const& map);
     static void subroutine_call_evaluate(Term* caller);
+    static std::string toSourceString(Term* source);
 };
 
 bool is_function(Term* term);

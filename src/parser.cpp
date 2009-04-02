@@ -206,6 +206,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
 Term* comment_statement(Branch& branch, TokenStream& tokens)
 {
     std::string commentText = tokens.consume(COMMENT);
+    commentText += possible_newline(tokens);
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
     as_string(result->state->field(0)) = commentText;
@@ -219,7 +220,7 @@ Term* blank_line(Branch& branch, TokenStream& tokens)
         tokens.consume(NEWLINE);
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
-    as_string(result->state->field(0)) = "";
+    as_string(result->state->field(0)) = "\n";
     result->stringProperty("syntaxHints:declarationStyle") = "literal";
 
     return result;
@@ -299,6 +300,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     }
 
     tokens.consume(END);
+
+    append_whitespace(result, possible_newline(tokens));
 
     return result;
 }
@@ -556,7 +559,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     Term* result = infix_expression(branch, tokens);
 
-    consume_statement_end(tokens, result);
+    append_whitespace(result, possible_newline(tokens));
 
     // If this item is just an identifier, and we're trying to rename it,
     // create an implicit call to 'copy'.

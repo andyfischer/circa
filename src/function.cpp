@@ -29,6 +29,11 @@ Function::inputType(int index)
         return inputTypes[index];
 }
 
+int Function::numInputs()
+{
+    return inputTypes.count();
+}
+
 void Function::appendInput(Term* type, std::string const& name)
 {
     inputTypes.append(type);
@@ -176,6 +181,32 @@ Function::subroutine_call_evaluate(Term* caller)
         assert(outputPlaceholder != NULL);
         assign_value(outputPlaceholder, caller);
     }
+}
+
+std::string
+Function::toSourceString(Term* term)
+{
+    Function &func = as_function(term);
+
+    std::stringstream result;
+
+    result << "function " << func.name << "(";
+
+    for (int i=0; i < func.numInputs(); i++) {
+        if (i > 0) result << ", ";
+        result << func.inputType(i)->name;
+
+        if (func.getInputProperties(i).name != "")
+            result << " " << func.getInputProperties(i).name;
+    }
+
+    result << ")\n";
+
+    result << get_branch_source(func.subroutineBranch);
+    
+    result << "end";
+
+    return result.str();
 }
 
 Term* create_empty_function(Branch& branch, std::string const& header)
