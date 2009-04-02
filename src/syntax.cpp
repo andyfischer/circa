@@ -78,17 +78,10 @@ std::string get_term_source(Term* term)
     } else if (is_value(term) && term->type == FUNCTION_TYPE) {
         if (VERBOSE_LOGGING)
             std::cout << "handled as function" << std::endl;
-        Function &definedFunc = as_function(term);
 
-        std::stringstream result;
-
-        result << "function " << definedFunc.name << "()\n";
-
-        result << get_branch_source(definedFunc.subroutineBranch) << "\n";
-        
-        result << "end";
-
-        return result.str();
+        // todo: dispatch based on type
+        return Function::toSourceString(term)
+            + term->stringPropertyOptional("syntaxHints:followingWhitespace", "");
     } else if (term->function == IF_FUNC) {
         if (VERBOSE_LOGGING)
             std::cout << "handled as if" << std::endl;
@@ -97,7 +90,7 @@ std::string get_term_source(Term* term)
         result << "\n";
 
         Branch& branch = *get_inner_branch(term);
-        result << get_branch_source(branch) << "\n";
+        result << get_branch_source(branch);
 
         result << "end";
         return result.str();
@@ -136,7 +129,6 @@ std::string get_term_source(Term* term)
     if (term->name != "") {
         result << term->name << " = ";
     }
-
 
     int numParens = term->intPropertyOptional("syntaxHints:parens", 0);
     for (int p=0; p < numParens; p++)
@@ -194,9 +186,6 @@ std::string get_branch_source(Branch& branch)
             continue;
 
         result << get_term_source(term);
-
-        if ((i+1 < branch.numTerms()))
-            result << "\n";
     }
 
     return result.str();
