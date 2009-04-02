@@ -146,6 +146,21 @@ Branch::eval(std::string const& statement)
     return parser::evaluate_statement(*this, statement);
 }
 
+std::string Branch::toString()
+{
+    std::stringstream out;
+    out << "{ ";
+    for (int i=0; i < numTerms(); i++) {
+        Term* term = get(i);
+        if (i > 0) out << ", ";
+        if (term->name != "")
+            out << term->name << ": ";
+        out << term->toString();
+    }
+    out << " }";
+    return out.str();
+}
+
 Term*
 Branch::compile(std::string const& statement)
 {

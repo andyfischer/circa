@@ -6,6 +6,13 @@
 
 namespace circa {
 
+std::string& get_input_syntax_hint(Term* term, int index, std::string const& field)
+{
+    std::stringstream fieldName;
+    fieldName << "syntaxHints:input-" << index << ":" << field;
+    return term->stringProperty(fieldName.str());
+}
+
 std::string get_source_of_input(Term* term, int inputIndex)
 {
     Term* input = term->input(inputIndex);
@@ -14,36 +21,23 @@ std::string get_source_of_input(Term* term, int inputIndex)
     if (input != NULL && input->function == INT_TO_FLOAT_FUNC) {
         input = input->input(0);
     }
-    
-    TermSyntaxHints::InputSyntax& inputSyntax = 
-        term->syntaxHints.getInputSyntax(inputIndex);
 
     std::stringstream result;
 
-    result << inputSyntax.preWhitespace;
+    result << get_input_syntax_hint(term, inputIndex, "preWhitespace");
 
-    switch (inputSyntax.style) {
-        case TermSyntaxHints::InputSyntax::BY_SOURCE:
-        {
-            result << get_term_source(input);
-        }
-        break;
+    std::string style = get_input_syntax_hint(term, inputIndex, "style");
 
-        case TermSyntaxHints::InputSyntax::BY_NAME:
-        {
-            result << term->syntaxHints.getInputSyntax(inputIndex).name;
-        }
-        break;
-
-        case TermSyntaxHints::InputSyntax::UNKNOWN_STYLE:
-        default:
-        {
-            result << "(!unknown)";
-        }
-        break;
+    if (style == "by-value") {
+        result << get_term_source(input);
+    } else if (style == "by-name") {
+        result << get_input_syntax_hint(term, inputIndex, "name");
+    } else {
+        result << "(!unknown)";
     }
 
-    result << inputSyntax.followingWhitespace;
+    result << get_input_syntax_hint(term, inputIndex, "followingWhitespace");
+
     return result.str();
 }
 

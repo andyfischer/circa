@@ -5,6 +5,7 @@
 
 namespace circa {
 
+std::string& get_input_syntax_hint(Term* term, int index, std::string const& field);
 std::string get_source_of_input(Term* term, int inputIndex);
 std::string get_term_source(Term* term);
 std::string get_comment_string(Term* term);

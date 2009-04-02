@@ -37,13 +37,11 @@ Term* evaluate_statement(Branch& branch, std::string const& input)
 
 void set_input_syntax(Term* term, int index, Term* input)
 {
-    TermSyntaxHints::InputSyntax& syntax = term->syntaxHints.getInputSyntax(index);
     if (input->name == "") {
-        syntax.style = TermSyntaxHints::InputSyntax::BY_SOURCE;
-        syntax.name = "";
+        get_input_syntax_hint(term, index, "style") = "by-value";
     } else {
-        syntax.style = TermSyntaxHints::InputSyntax::BY_NAME;
-        syntax.name = input->name;
+        get_input_syntax_hint(term, index, "style") = "by-name";
+        get_input_syntax_hint(term, index, "name") = input->name;
     }
 }
 
@@ -847,8 +845,8 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             set_input_syntax(result, 0, leftExpr);
             set_input_syntax(result, 1, rightExpr);
 
-            result->syntaxHints.getInputSyntax(0).followingWhitespace = preOperatorWhitespace;
-            result->syntaxHints.getInputSyntax(1).preWhitespace = postOperatorWhitespace;
+            get_input_syntax_hint(result, 0, "followingWhitespace") = preOperatorWhitespace;
+            get_input_syntax_hint(result, 1, "preWhitespace") = postOperatorWhitespace;
 
             if (isRebinding)
                 branch.bindName(result, leftExpr->name);
@@ -913,6 +911,14 @@ Term* atom(Branch& branch, TokenStream& tokens)
     return result;
 }
 
+struct PendingInputSyntax {
+    int index;
+    std::string field;
+    std::string value;
+    PendingInputSyntax(int i, std::string f, std::string v)
+        : index(i), field(f), value(v) {}
+};
+
 Term* function_call(Branch& branch, TokenStream& tokens)
 {
     std::string functionName = tokens.consume(IDENTIFIER);
@@ -920,27 +926,31 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
     RefList inputs;
 
-    TermSyntaxHints::InputSyntaxList inputSyntaxList;
+    std::vector<PendingInputSyntax> pis;
 
+    int index = 0;
     while (!tokens.nextIs(RPAREN)) {
-        TermSyntaxHints::InputSyntax inputSyntax;
 
-        inputSyntax.preWhitespace = possible_whitespace(tokens);
+        std::string preWhitespace = possible_whitespace(tokens);
         Term* term = infix_expression(branch, tokens);
-        inputSyntax.followingWhitespace = possible_whitespace(tokens);
+        std::string postWhitespace = possible_whitespace(tokens);
+
+        pis.push_back(PendingInputSyntax(index, "preWhitespace", preWhitespace));
+        pis.push_back(PendingInputSyntax(index, "postWhitespace", postWhitespace));
 
         inputs.append(term);
 
         if (term->name == "")
-            inputSyntax.bySource();
+            pis.push_back(PendingInputSyntax(index, "style", "by-value"));
         else {
-            inputSyntax.byName(term->name);
+            pis.push_back(PendingInputSyntax(index, "style", "by-name"));
+            pis.push_back(PendingInputSyntax(index, "name", term->name));
         }
 
         if (!tokens.nextIs(RPAREN))
             tokens.consume(COMMA);
 
-        inputSyntaxList.push_back(inputSyntax);
+        index++;
     }
 
 
@@ -950,7 +960,10 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
     result->stringProperty("syntaxHints:declarationStyle") = "function-call";
     result->stringProperty("syntaxHints:functionName") = functionName;
-    result->syntaxHints.inputSyntax = inputSyntaxList;
+
+    std::vector<PendingInputSyntax>::const_iterator it;
+    for (it = pis.begin(); it != pis.end(); ++it)
+        get_input_syntax_hint(result, it->index, it->field) = it->value;
 
     return result;
 }

@@ -8,7 +8,6 @@
 #include "branch.h"
 #include "references.h"
 #include "ref_list.h"
-#include "term_syntax_hints.h"
 
 namespace circa {
 
@@ -47,9 +46,6 @@ struct Term
 
     // A globally unique ID
     unsigned int globalID;
-
-    // Syntax hints, used for source code reproduction
-    TermSyntaxHints syntaxHints;
 
     // Dynamic properties
     Branch properties;

@@ -73,6 +73,8 @@ struct Branch
     // Evaluate the given statement, return the result term.
     Term* eval(std::string const& statement);
 
+    std::string toString();
+
     // Hosted functions
     static void* alloc(Term* type);
     static void dealloc(void* data);
