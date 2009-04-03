@@ -63,58 +63,27 @@ std::string get_term_source(Term* term)
 
     result << term->stringPropertyOptional("syntaxHints:preWhitespace", "");
 
-    // handle special cases
-    if (term->function == COMMENT_FUNC) {
-        if (VERBOSE_LOGGING)
-            std::cout << "handled as comment" << std::endl;
-        std::string comment = get_comment_string(term);
-        if (comment == "")
-            return "";
-        else {
-            result << comment;
+    // for values, check if the type has a toSourceString function
+    if (is_value(term)) {
+        if (as_type(term->type).toSourceString != NULL) {
+            bool prependNameBinding = true;
+
+            // for certain types, don't write "name =" in front
+            if (term->type == FUNCTION_TYPE)
+                prependNameBinding = false;
+
+            if (prependNameBinding && term->name != "")
+                result << term->name << " = ";
+
+            result << as_type(term->type).toSourceString(term);
+            result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
             return result.str();
         }
-        
-    } else if (is_value(term) && term->type == FUNCTION_TYPE) {
-        if (VERBOSE_LOGGING)
-            std::cout << "handled as function" << std::endl;
+    }
 
-        // todo: dispatch based on type
-        return Function::toSourceString(term)
-            + term->stringPropertyOptional("syntaxHints:postWhitespace", "");
-    } else if (term->function == IF_FUNC) {
-        if (VERBOSE_LOGGING)
-            std::cout << "handled as if" << std::endl;
-        result << "if ";
-        result << get_source_of_input(term, 0);
-        result << "\n";
-
-        Branch& branch = *get_inner_branch(term);
-        result << get_branch_source(branch);
-
-        result << "end";
-        result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
-        return result.str();
-
-    } else if (term->function == STATEFUL_VALUE_FUNC) {
-        if (VERBOSE_LOGGING)
-            std::cout << "handled as stateful value" << std::endl;
-        result << "state ";
-        result << as_type(term->type).name << " ";
-        result << term->name;
-
-        // check for initial value
-        if (term->numInputs() > 0) {
-            result << " = ";
-            result << get_source_of_input(term, 0);
-        }
-
-        result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
-
-        return result.str();
-    } else if (term->function == COPY_FUNC) {
-        result << term->name << " = ";
-        result << term->input(0)->name;
+    // check if this function has a toSourceString function
+    if (as_function(term->function).toSourceString != NULL) {
+        result << as_function(term->function).toSourceString(term);
         result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
         return result.str();
     }
@@ -131,9 +100,8 @@ std::string get_term_source(Term* term)
     }
 
     // add possible name binding
-    if (term->name != "") {
+    if (term->name != "")
         result << term->name << " = ";
-    }
 
     int numParens = term->intPropertyOptional("syntaxHints:parens", 0);
     for (int p=0; p < numParens; p++)

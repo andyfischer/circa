@@ -20,6 +20,7 @@ struct Function
     typedef Term* (*SpecializeTypeFunc)(Term* caller);
     typedef ReferenceIterator* (*ReferenceIteratorFunc)(Term* caller);
     typedef void (*GenerateTrainingFunc)(Branch& branch, Term* subject, Term* desired);
+    typedef std::string (*ToSourceString)(Term* term);
 
     struct InputProperties {
         std::string name;
@@ -48,6 +49,7 @@ struct Function
     SpecializeTypeFunc specializeType;
     ReferenceIteratorFunc startControlFlowIterator;
     GenerateTrainingFunc generateTraining;
+    ToSourceString toSourceString;
 
     // External functions
     Ref feedbackAccumulationFunction;
@@ -68,7 +70,7 @@ struct Function
     static void assign(Term* source, Term* dest);
     static void remapPointers(Term* term, ReferenceMap const& map);
     static void subroutine_call_evaluate(Term* caller);
-    static std::string toSourceString(Term* source);
+    static std::string functionToSourceString(Term* source);
 };
 
 bool is_function(Term* term);

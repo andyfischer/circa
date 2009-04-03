@@ -9,6 +9,21 @@ namespace stateful_value_function {
     {
     }
 
+    std::string toSourceString(Term* term)
+    {
+        std::stringstream result;
+        result << "state ";
+        result << as_type(term->type).name << " ";
+        result << term->name;
+
+        // check for initial value
+        if (term->numInputs() > 0) {
+            result << " = ";
+            result << get_source_of_input(term, 0);
+        }
+        return result.str();
+    }
+
     void generateTraining(Branch& branch, Term* subject, Term* desired)
     {
         apply(&branch, ASSIGN_FUNC, RefList(desired, subject));
@@ -18,6 +33,7 @@ namespace stateful_value_function {
     {
         STATEFUL_VALUE_FUNC = import_function(kernel, evaluate, "stateful-value(any) -> any");
         as_function(STATEFUL_VALUE_FUNC).generateTraining = generateTraining;
+        as_function(STATEFUL_VALUE_FUNC).toSourceString = toSourceString;
     }
 }
 }

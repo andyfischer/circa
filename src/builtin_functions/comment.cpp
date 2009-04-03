@@ -19,6 +19,11 @@ namespace comment_function {
     {
     }
 
+    std::string toSourceString(Term* term)
+    {
+        return get_comment_string(term);
+    }
+
     void setup(Branch& kernel)
     {
         Term* main_func = import_function(kernel, evaluate,
@@ -29,6 +34,7 @@ namespace comment_function {
         as_type(stateT).addField(STRING_TYPE, "str");
 
         as_function(main_func).stateType = kernel["comment::State"];
+        as_function(main_func).toSourceString = toSourceString;
 
         COMMENT_FUNC = main_func;
     }

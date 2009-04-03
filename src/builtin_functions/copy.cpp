@@ -15,11 +15,20 @@ namespace copy_function {
         return caller->input(0)->type;
     }
 
+    std::string toSourceString(Term* term)
+    {
+        std::stringstream result;
+        result << term->name << " = ";
+        result << term->input(0)->name;
+        return result.str();
+    }
+
     void setup(Branch& kernel)
     {
         COPY_FUNC = import_function(kernel, evaluate, "function copy(any) -> any");
         as_function(COPY_FUNC).pureFunction = true;
         as_function(COPY_FUNC).specializeType = specializeType;
+        as_function(COPY_FUNC).toSourceString = toSourceString;
     }
 }
 }
