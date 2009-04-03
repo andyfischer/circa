@@ -16,7 +16,8 @@ Function::Function()
     generateTraining(NULL),
     feedbackAccumulationFunction(NULL),
     feedbackPropogateFunction(NULL),
-    generateCppFunction(NULL)
+    generateCppFunction(NULL),
+    toSourceString(NULL)
 {
 }
 
@@ -184,7 +185,7 @@ Function::subroutine_call_evaluate(Term* caller)
 }
 
 std::string
-Function::toSourceString(Term* term)
+Function::functionToSourceString(Term* term)
 {
     Function &func = as_function(term);
 

@@ -324,7 +324,9 @@ std::string to_source_string(Term* term)
     Type::ToSourceStringFunc func = as_type(term->type).toSourceString;
 
     if (func == NULL) {
-        throw std::runtime_error("No toSourceString function defined");
+        throw std::runtime_error("No toSourceString function defined on type: "
+                + as_type(term->type).name);
+        return ""; // unreachable
     } else {
         return func(term);
     }
