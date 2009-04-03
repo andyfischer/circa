@@ -385,7 +385,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     // Create the joining branch
     Term* joining = apply(&branch, BRANCH_FUNC, RefList(), "#joining");
-    Branch& joiningBranch = as_branch(joining->state);
+    Branch& joiningBranch = *get_inner_branch(joining);
 
     // Get a list of all names bound in this branch
     std::set<std::string> boundNames;
@@ -1040,7 +1040,7 @@ Term* literal_branch(Branch& branch, TokenStream& tokens)
 {
     tokens.consume(LBRACE);
 
-    Term* resultTerm = create_value(&branch, BRANCH_TYPE);
+    Term* resultTerm = apply(&branch, BRANCH_FUNC, RefList());
     Branch& result = as_branch(resultTerm);
     result.outerScope = &branch;
 
