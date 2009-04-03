@@ -45,7 +45,7 @@ Branch* get_inner_branch(Term* term)
         return &as_function(term).subroutineBranch;
 
     if (term->function == BRANCH_FUNC)
-        return &as_branch(term->state);
+        return &as_branch(term);
 
     if (term->function == IF_FUNC)
         return &as_branch(term->state);

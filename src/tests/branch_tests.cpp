@@ -56,7 +56,7 @@ void test_duplicate_nested()
 {
     Branch branch;
     branch.eval("a = 1.0");
-    Branch& inner = branch.eval("inner = branch()")->state->asBranch();
+    Branch& inner = branch.eval("inner = branch()")->asBranch();
     inner.outerScope = &branch;
     inner.eval("i = 2.0");
     inner.eval("j = add(a,i)");
@@ -64,8 +64,8 @@ void test_duplicate_nested()
     Branch dupe;
     duplicate_branch(branch, dupe);
 
-    Term* inner_i = dupe["inner"]->state->field("i");
-    Term* inner_j = dupe["inner"]->state->field("j");
+    Term* inner_i = dupe["inner"]->field("i");
+    Term* inner_j = dupe["inner"]->field("j");
 
     test_assert(inner_i != NULL);
     test_assert(inner_j != NULL);
@@ -84,13 +84,13 @@ void test_duplicate_nested_dont_make_extra_terms()
     // this test case looks for a bug where nested branches have
     // too many terms after duplication
     Branch orig;
-    Branch& inner = as_branch(orig.eval("inner = branch()")->state);
+    Branch& inner = as_branch(orig.eval("inner = branch()"));
     inner.eval("i = 2");
 
     Branch dupe;
     duplicate_branch(orig, dupe);
 
-    test_assert(dupe["inner"]->state->asBranch().numTerms() == 1);
+    test_assert(dupe["inner"]->asBranch().numTerms() == 1);
 }
 
 void test_duplicate_subroutine()

@@ -9,15 +9,14 @@ namespace branch_function {
 
     void evaluate(Term* caller)
     {
-        Branch& branch = as_branch(caller->state);
+        Branch& branch = as_branch(caller);
         evaluate_branch(branch);
     }
 
     void setup(Branch& kernel)
     {
         BRANCH_FUNC = import_function(kernel, evaluate,
-                "function branch()");
-        as_function(BRANCH_FUNC).stateType = BRANCH_TYPE;
+                "function branch() -> Branch");
     }
 }
 }
