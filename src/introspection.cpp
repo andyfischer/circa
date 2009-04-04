@@ -50,6 +50,9 @@ Branch* get_inner_branch(Term* term)
     if (term->function == IF_FUNC)
         return &as_branch(term->state);
 
+    if (term->function == FOR_FUNC)
+        return &as_branch(term->state->field("contents"));
+
     return NULL;
 }
 
