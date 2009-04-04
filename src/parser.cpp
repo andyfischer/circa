@@ -13,11 +13,24 @@ using namespace circa::tokenizer;
 
 const int HIGHEST_INFIX_PRECEDENCE = 8;
 
-Term* compile(Branch& branch, ParsingStep step, std::string const& input)
+Ref compile(Branch* branch, ParsingStep step, std::string const& input)
 {
+    // if branch is NULL, use a temporary branch
+    bool temporaryBranch = false;
+    if (branch == NULL) {
+        branch = new Branch();
+        temporaryBranch = true;
+    }
+
     TokenStream tokens(input);
-    Term* result = step(branch, tokens);
-    remove_compilation_attrs(branch);
+    Ref result = step(*branch, tokens);
+    remove_compilation_attrs(*branch);
+
+    if (temporaryBranch) {
+        branch->clear();
+        delete branch;
+    }
+
     return result;
 }
 
