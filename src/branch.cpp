@@ -268,7 +268,7 @@ void evaluate_file(Branch& branch, std::string const& filename)
 {
     std::string fileContents = read_text_file(filename);
 
-    parser::compile(branch, parser::statement_list, fileContents);
+    parser::compile(&branch, parser::statement_list, fileContents);
 
     string_value(&branch, filename, get_name_for_attribute("source-file"));
 }

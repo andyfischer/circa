@@ -14,10 +14,10 @@ Function::Function()
     specializeType(NULL),
     startControlFlowIterator(NULL),
     generateTraining(NULL),
+    toSourceString(NULL),
     feedbackAccumulationFunction(NULL),
     feedbackPropogateFunction(NULL),
-    generateCppFunction(NULL),
-    toSourceString(NULL)
+    generateCppFunction(NULL)
 {
 }
 
@@ -212,7 +212,7 @@ Function::functionToSourceString(Term* term)
 
 Term* create_empty_function(Branch& branch, std::string const& header)
 {
-    return parser::compile(branch, parser::function_from_header, header);
+    return parser::compile(&branch, parser::function_from_header, header);
 }
 
 Branch& get_subroutine_branch(Term* term)
