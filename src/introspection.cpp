@@ -121,34 +121,23 @@ std::string branch_namespace_to_string(Branch& branch)
     return out.str();
 }
 
-// Deprecated
-void print_raw_term(Term* term, std::ostream& strm)
+std::string branch_to_string_raw(Branch& branch)
 {
-    strm << term_to_raw_string(term) << std::endl;
-}
-
-void print_raw_branch(Branch& branch, std::ostream &output)
-{
+    std::stringstream out;
     for (CodeIterator it(&branch); !it.finished(); it.advance()) {
         Term* term = it.current();
 
         int indent = it.depth();
 
         for (int i=0; i < indent; i++)
-            output << "  ";
+            out << "  ";
 
-        output << term_to_raw_string(term) << std::endl;
+        out << term_to_raw_string(term) << std::endl;
 
         if (get_inner_branch(term) != NULL)
             indent++;
     }
-}
-
-void print_terms(RefList const& list, std::ostream &output)
-{
-    for (unsigned int i=0; i < list.count(); i++) {
-        print_raw_term(list[i], output);
-    }
+    return out.str();
 }
 
 bool function_allows_term_reuse(Function &function)
