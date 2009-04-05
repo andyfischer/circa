@@ -1,0 +1,46 @@
+
+-- simple test
+for (int i : range(5))
+  i -> to-string -> print
+end
+
+-- iterate over a collection
+names = {"absalom", "biddleson", "cairne"}
+for (string name : names)
+  name -> print
+end
+
+-- iterate with a stateful value
+for (int i : range(4))
+  state string result = ''
+  result = concat(i -> to-string, result)
+  result -> print
+end
+
+-- TODO: modify an outer value from within the for-loop
+
+-- if statement inside a for loop
+for (int i : range(5))
+  if i == 3
+    print('if passed')
+  end
+end
+
+-- for loop inside an if statement
+if true
+   for (int i : {1})
+      print('if2 passed')
+   end
+end
+
+-- for loop inside a function
+function look_for_3(List numbers)
+  for (int i : numbers)
+    if i == 3
+      print("inside function passed")
+    end
+  end
+end
+
+--FIXME
+--look_for_3({1,2,3,4,5})
