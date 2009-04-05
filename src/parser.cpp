@@ -469,9 +469,9 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     Term* forTerm = apply(&branch, FOR_FUNC, RefList(listExpr));
 
-    as_string(forTerm->state->field(0)) = iterator_name;
+    as_string(forTerm->state->field("iteratorName")) = iterator_name;
 
-    Branch& innerBranch = as_branch(forTerm->state->field(1));
+    Branch& innerBranch = as_branch(forTerm->state->field("contents"));
     innerBranch.outerScope = &branch;
 
     create_value(&innerBranch, iterator_type, iterator_name);

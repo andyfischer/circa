@@ -9,7 +9,7 @@ namespace for_function {
     {
         Branch& series = as_branch(caller->input(0));
 
-        std::string iteratorName = as_string(caller->state->field(0));
+        std::string iteratorName = as_string(caller->state->field("iteratorName"));
 
         Branch& branch = as_branch(caller->state->field(1));
 
