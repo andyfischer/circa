@@ -1,0 +1,42 @@
+Doing a survey of syntax used in other languages. Here are some thoughts that relate to Circa:
+
+Using {} for blocks?
+  There seems to be some universal feeling that this is used for heavyweight languages
+  People like 'end' in Ruby
+
+names have no type in Ruby
+  We work the same way. It's good.
+  Though it might be nice to have a compiler hint pass that warns when a name changes type
+
+Array literals
+  [] or {} ?
+  Prefer []
+
+Everything is an expression
+  Probably a good thing
+
+Method names ending in ? or !
+  This is a Rubyism that they can keep
+  Planning on using the ? mark for other purposes
+
+
+For loops
+  for i in list
+  for i : list
+  for (i in list)
+  for (i : list)
+  for Type i in list
+  for Type i : list
+
+Type labels
+  int myInt
+  myInt::int
+  myInt [::int]
+  myInt [t:int]
+  for i [::int] in list
+  for (i [::int] in list)
+
+Method chaining
+  Important to make this easy
+  blah().foo().baz()
+  blah.foo.baz
