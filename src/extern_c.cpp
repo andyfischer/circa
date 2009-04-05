@@ -28,12 +28,10 @@ const char* term_to_raw_string(Term* term)
     return result.c_str();
 }
 
-const char* print_raw_branch(Branch* branch)
+const char* branch_to_string_raw(Branch* branch)
 {
     static std::string result;
-    std::stringstream sstream;
-    circa::print_raw_branch(*branch, sstream);
-    result = sstream.str();
+    result = circa::branch_to_string_raw(*branch);
     return result.c_str();
 }
 
