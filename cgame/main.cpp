@@ -228,7 +228,7 @@ void handle_dragging()
 
     evaluate_branch(tempBranch);
 
-    print_raw_branch(tempBranch, std::cout);
+    std::cout << branch_to_string_raw(tempBranch) << std::endl;
 }
 
 void post_script_load(circa::Branch& script)
@@ -320,7 +320,7 @@ int main( int argc, char* args[] )
             switch(event.key.keysym.sym) {
             case SDLK_4:
                 std::cout << "Script contents:" << std::endl;
-                print_raw_branch(SCRIPT_MAIN, std::cout);
+                std::cout << branch_to_string_raw(SCRIPT_MAIN);
                 break;
             case SDLK_5:
                 circa::reload_branch_from_file(SCRIPT_MAIN);
