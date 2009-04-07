@@ -7,7 +7,6 @@
 
 #include "term.h"
 #include "branch.h"
-#include "reference_iterator.h"
 
 namespace circa {
 
@@ -85,8 +84,6 @@ Branch& call_subroutine(Branch& branch, std::string const& functionName);
 Branch& get_subroutine_branch(Term* term);
 
 Term* create_empty_function(Branch& branch, std::string const& header);
-
-ReferenceIterator* start_function_reference_iterator(Function* function);
 
 } // namespace circa
 

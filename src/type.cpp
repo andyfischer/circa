@@ -246,49 +246,6 @@ void Type::name_accessor(Term* caller)
     as_string(caller) = as_type(caller->input(0)).name;
 }
 
-class TypeReferenceIterator : public ReferenceIterator
-{
-private:
-    Type* _type;
-    int _fieldIndex;
-
-public:
-    TypeReferenceIterator(Type* type)
-      : _type(type), _fieldIndex(0)
-    {
-        advanceIfStateIsInvalid();
-    }
-
-    virtual Ref& current()
-    {
-        return _type->fields[_fieldIndex].type;
-    }
-
-    virtual void advance()
-    {
-        _fieldIndex++;
-        advanceIfStateIsInvalid();
-    }
-
-    virtual bool finished()
-    {
-        return _type == NULL;
-    }
-private:
-    void advanceIfStateIsInvalid()
-    {
-        if (_fieldIndex >= (int) _type->fields.size()) {
-            // finished
-            _type = NULL;
-        }
-    }
-};
-
-ReferenceIterator* Type::typeStartReferenceIterator(Term* term)
-{
-    return new TypeReferenceIterator(&as_type(term));
-}
-
 std::string Type::type_to_string(Term* term)
 {
     std::stringstream out;
@@ -330,19 +287,6 @@ std::string to_source_string(Term* term)
     } else {
         return func(term);
     }
-}
-
-ReferenceIterator* start_reference_iterator(Term* term)
-{
-    Type& type = as_type(term->type);
-
-    if (type.startReferenceIterator == NULL)
-        return NULL;
-
-    if (!is_value_alloced(term))
-        return NULL;
-
-    return type.startReferenceIterator(term);
 }
 
 Term* get_value_function(Term* typeTerm)

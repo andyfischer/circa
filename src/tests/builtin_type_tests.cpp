@@ -10,26 +10,18 @@ namespace builtin_type_tests {
 void test_reference()
 {
     Branch branch;
-    Term *r = branch.eval("r = Ref()");
-    Term *s = branch.eval("s = 1.0");
-    Term *t = branch.eval("t = 1.0");
 
-    test_assert(deref(r) == NULL);
-    deref(r) = s;
-    test_assert(deref(r) == s);
+    Term* r1 = create_value(&branch, REF_TYPE);
+    Term* a = create_value(&branch, INT_TYPE);
+    Term* r2 = create_value(&branch, REF_TYPE);
 
-    ReferenceIterator* it = start_reference_iterator(r);
+    deref(r1) = a;
 
-    test_assert(it->current() == s);
+    test_assert(deref(r1) == a);
 
-    deref(r) = t;
+    assign_value(r1, r2);
 
-    test_assert(it->current() == t);
-
-    it->advance();
-    test_assert(it->finished());
-
-    delete it;
+    test_assert(deref(r2) == a);
 }
 
 void builtin_types()

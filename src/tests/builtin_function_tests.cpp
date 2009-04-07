@@ -79,38 +79,6 @@ void test_bool()
     test_assert(as_string(branch.eval("if-expr(false, 'a', 'b')")) == "b");
 }
 
-void test_reference()
-{
-    Branch branch;
-
-    Term* myref = create_value(&branch, REF_TYPE);
-    Term* a = create_value(&branch, INT_TYPE);
-    Term* b = create_value(&branch, INT_TYPE);
-
-    deref(myref) = a;
-
-    RefList refs = reference_iterator_to_list(start_reference_iterator(myref));
-    test_equals(refs, RefList(a));
-
-    ReferenceMap myMap;
-    myMap[a] = b;
-
-    remap_pointers(myref, myMap);
-
-    test_assert(deref(myref) == b);
-
-    refs = reference_iterator_to_list(start_reference_iterator(myref));
-    test_equals(refs, RefList(b));
-
-    myMap[b] = NULL;
-    remap_pointers(myref, myMap);
-
-    test_assert(deref(myref) == NULL);
-
-    refs = reference_iterator_to_list(start_reference_iterator(myref));
-    test_equals(refs, RefList(NULL));
-}
-
 void test_builtin_equals()
 {
     test_assert(eval_as<bool>("equals(1,1)"));
@@ -154,7 +122,6 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_string);
     REGISTER_TEST_CASE(builtin_function_tests::test_concat);
     REGISTER_TEST_CASE(builtin_function_tests::test_bool);
-    REGISTER_TEST_CASE(builtin_function_tests::test_reference);
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_map);
     REGISTER_TEST_CASE(builtin_function_tests::test_list);
