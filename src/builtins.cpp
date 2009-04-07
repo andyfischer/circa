@@ -267,7 +267,6 @@ void bootstrap_kernel()
     typeType->dealloc = Type::type_dealloc;
     typeType->assign = Type::type_assign;
     typeType->remapPointers = Type::typeRemapPointers;
-    typeType->startReferenceIterator = Type::typeStartReferenceIterator;
     typeType->toString = Type::type_to_string;
     KERNEL->bindName(TYPE_TYPE, "Type");
 
@@ -352,7 +351,6 @@ void initialize_builtin_types(Branch& kernel)
     VOID_TYPE = create_empty_type(kernel, "void");
     REF_TYPE = import_type<Ref>(kernel, "Ref");
     as_type(REF_TYPE).remapPointers = Ref::remap_pointers;
-    as_type(REF_TYPE).startReferenceIterator = Ref::start_reference_iterator;
 
     import_type<RefList>(kernel, "Tuple");
     import_type<Map>(kernel, "Map");

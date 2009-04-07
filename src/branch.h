@@ -7,7 +7,6 @@
 
 #include "ref_list.h"
 #include "term_namespace.h"
-#include "reference_iterator.h"
 
 namespace circa {
 
@@ -88,7 +87,6 @@ std::string get_name_for_attribute(std::string attribute);
 void duplicate_branch(Branch& source, Branch& dest);
 
 void evaluate_file(Branch& branch, std::string const& filename);
-ReferenceIterator* start_branch_reference_iterator(Branch* branch);
 
 Term* find_term_by_id(Branch& branch, unsigned int id);
 Term* find_named(Branch* branch, std::string const& name);

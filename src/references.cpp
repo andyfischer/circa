@@ -28,39 +28,6 @@ void Ref::remap_pointers(Term* term, ReferenceMap const& map)
     deref(term) = map.getRemapped(deref(term));
 }
 
-class ReferenceIteratorForReferenceType : public ReferenceIterator
-{
-private:
-    Term* _containingTerm;
-
-public:
-    ReferenceIteratorForReferenceType(Term* containingTerm)
-      : _containingTerm(containingTerm)
-    {
-        if (!is_value_alloced(_containingTerm))
-            _containingTerm = NULL;
-    }
-
-    virtual Ref& current()
-    {
-        assert(!finished());
-        return deref(_containingTerm);
-    }
-    virtual void advance()
-    {
-        _containingTerm = NULL;
-    }
-    virtual bool finished()
-    {
-        return _containingTerm == NULL;
-    }
-};
-
-ReferenceIterator* Ref::start_reference_iterator(Term* term)
-{
-    return new ReferenceIteratorForReferenceType(term);
-}
-
 void delete_term(Term* term)
 {
     assert_good_pointer(term);

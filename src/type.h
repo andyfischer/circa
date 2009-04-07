@@ -9,7 +9,6 @@
 
 #include "branch.h"
 #include "builtins.h"
-#include "reference_iterator.h"
 #include "references.h"
 #include "ref_map.h"
 #include "term.h"
@@ -27,7 +26,6 @@ struct Type
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
     typedef bool (*LessThanFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
-    typedef ReferenceIterator* (*StartReferenceIteratorFunc)(Term* term);
     typedef std::string (*ToStringFunc)(Term* term);
     typedef std::string (*ToSourceStringFunc)(Term* term);
 
@@ -51,7 +49,6 @@ struct Type
     EqualsFunc equals;
     LessThanFunc lessThan;
     RemapPointersFunc remapPointers;
-    StartReferenceIteratorFunc startReferenceIterator;
     ToStringFunc toString;
     ToStringFunc toSourceString;
 
@@ -82,7 +79,6 @@ struct Type
         equals(NULL),
         lessThan(NULL),
         remapPointers(NULL),
-        startReferenceIterator(NULL),
         toString(NULL),
         toSourceString(NULL),
         valueFunction(NULL),
@@ -130,7 +126,6 @@ struct Type
     static void type_dealloc(void* data);
     static void type_assign(Term* source, Term* dest);
     static void typeRemapPointers(Term *term, ReferenceMap const& map);
-    static ReferenceIterator* typeStartReferenceIterator(Term* term);
     static std::string type_to_string(Term* term);
 };
 
@@ -163,8 +158,6 @@ bool identity_equals(Term* a, Term* b);
 bool equals(Term* a, Term* b);
 std::string to_string(Term* term);
 std::string to_source_string(Term* term);
-
-ReferenceIterator* start_reference_iterator(Term* term);
 
 // Fetch the const function for this type
 Term* get_value_function(Term* type);
