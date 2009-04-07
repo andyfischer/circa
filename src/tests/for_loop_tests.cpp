@@ -32,9 +32,29 @@ void test_simple()
     test_assert(gSpyResults[4] == 4);
 }
 
+void test_subroutine_call()
+{
+    Branch branch;
+
+    Term* sub = branch.compile("function myfunc()\nfor (int i : range(5))\ni\nend\nend");
+
+    Term* forTerm = as_function(sub).subroutineBranch[2];
+
+    test_assert(forTerm->function == FOR_FUNC);
+
+    test_equals("i", as_string(forTerm->state->field("iteratorName")));
+
+    Term* call = branch.compile("myfunc()");
+    initialize_subroutine_call(call);
+    Term* forTermInsideCall = as_branch(call->state)[2];
+    test_assert(forTermInsideCall->function == FOR_FUNC);
+    test_equals("i", as_string(forTermInsideCall->state->field("iteratorName")));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(for_loop_tests::test_simple);
+    REGISTER_TEST_CASE(for_loop_tests::test_subroutine_call);
 }
 
 } // for_loop_tests

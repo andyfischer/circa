@@ -111,7 +111,8 @@ void test_duplicate_subroutine()
     // make sure the value portion of func was copied
     test_assert(dupedFunc.name == "func");
 
-    // make sure subroutine didn't get double copied
+    // make sure subroutine was properly copied
+    test_assert(dupedFunc.subroutineBranch.numTerms() > 0);
     test_assert(dupedFunc.subroutineBranch.numTerms() == 1);
     test_assert(dupedFunc.subroutineBranch[0]->asInt() == 1);
     test_assert(dupedFunc.subroutineBranch["a"] == dupedFunc.subroutineBranch[0]);
