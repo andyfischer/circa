@@ -101,7 +101,12 @@ std::string term_to_raw_string(Term* term)
     if (term->type != VOID_TYPE)
         output << " -> " << typeName;
 
-    if (term->value != NULL)
+    bool showValue = term->value != NULL;
+
+    if (get_inner_branch(term) != NULL)
+        showValue = false;
+
+    if (showValue)
         output << " == " << term->toString();
 
     //if (term->hasError()) output << " *" << term->getErrorMessage() << "*";

@@ -239,10 +239,21 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
 
         newTermMap[source_term] = dest_term;
 
-        if (has_inner_branch(source_term)) {
+        // if output or state is a branch, duplicate them
+        if (is_branch(source_term)) {
+            as_branch(dest_term).clear();
+            duplicate_branch_nested(newTermMap, as_branch(source_term), as_branch(dest_term));
+        }
+
+        if (source_term->state != NULL && is_branch(source_term->state)) {
+            as_branch(dest_term->state).clear();
+            duplicate_branch_nested(newTermMap, as_branch(source_term->state), as_branch(dest_term->state));
+        }
+
+        // Special case for Function. These guys have a branch inside their value.
+        if (source_term->type == FUNCTION_TYPE)
             duplicate_branch_nested(newTermMap, *get_inner_branch(source_term),
                     *get_inner_branch(dest_term));
-        }
 
         // Copy names
         if (source_term->name != "")
