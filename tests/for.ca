@@ -42,5 +42,4 @@ function look_for_3(List numbers)
   end
 end
 
---FIXME
---look_for_3({1,2,3,4,5})
+look_for_3({1,2,3,4,5})
