@@ -25,6 +25,7 @@ Ref compile(Branch* branch, ParsingStep step, std::string const& input)
     TokenStream tokens(input);
     Ref result = step(*branch, tokens);
     remove_compilation_attrs(*branch);
+    wrap_up_branch(*branch);
 
     if (temporaryBranch) {
         branch->clear();
@@ -98,6 +99,26 @@ std::string pop_pending_rebind(Branch& branch)
 void remove_compilation_attrs(Branch& branch)
 {
     branch.remove(get_name_for_attribute("comp-pending-rebind"));
+}
+
+void wrap_up_branch(Branch& branch)
+{
+    // Create assign() terms that persist the results of every stateful value
+    for (int i=0; i < branch.numTerms(); i++) {
+        if (is_stateful(branch[i])) {
+            Term* term = branch[i];
+
+            if (term->name == "")
+                continue;
+
+            Term* result = branch[term->name];
+
+            if (result == term)
+                continue;
+
+            apply(&branch, ASSIGN_FUNC, RefList(result, term));
+        }
+    }
 }
 
 Term* find_and_apply(Branch& branch,
@@ -1152,6 +1173,8 @@ void consume_branch_until_end(Branch& branch, TokenStream& tokens)
             prepend_whitespace(term, prespace);
         }
     }
+
+    wrap_up_branch(branch);
 }
 
 } // namespace parser
