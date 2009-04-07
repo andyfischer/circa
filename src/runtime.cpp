@@ -126,11 +126,6 @@ void evaluate_branch(Branch& branch, Term* errorListener)
             return;
         }
     }
-
-    // TODO: Instead of calling this function, stateful terms should have an 
-    // 'assign' function generated at the bottom of the branch, which puts the
-    // result back into the stateful-value term.
-    persist_results_for_stateful_terms(branch);
 }
 
 void error_occured(Term* errorTerm, std::string const& message)
