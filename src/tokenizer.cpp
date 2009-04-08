@@ -54,6 +54,7 @@ const char* getMatchText(int match)
         case FUNCTION: return "function";
         case TYPE: return "type";
         case RETURN: return "return";
+        case IN: return "in";
         case UNRECOGNIZED: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -218,6 +219,7 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, FOR)) return;
         if (try_to_consume_keyword(context, STATE)) return;
         if (try_to_consume_keyword(context, RETURN)) return;
+        if (try_to_consume_keyword(context, IN)) return;
 
         consume_identifier(context);
         return;

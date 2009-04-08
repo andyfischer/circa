@@ -69,6 +69,7 @@ const int ELSE = 42;
 const int FOR = 55;
 const int STATE = 48;
 const int RETURN = 51;
+const int IN = 56;
 
 const int WHITESPACE = 26;
 const int NEWLINE = 27;

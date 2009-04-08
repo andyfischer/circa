@@ -17,7 +17,7 @@ function draw-popup(float x, float y, List names)
   total_width = 300.0 + padding_x
   total_height = item_height * names.count() + padding_y * 2
 
-  for (string name : names)
+  for name in names
       fill-rectangle(x, y, x+total_width, y+total_height, 0)
       draw-text(name, x, y, 0)
   end

@@ -63,19 +63,9 @@ void fill_rectangle(circa::Term* caller)
         (unsigned int) as_int(caller->input(4)));
 }
 
-void line_to(circa::Term* caller)
-{
-    aalineColor(SCREEN,
-        (int) as_float(caller->input(0)),
-        (int) as_float(caller->input(1)),
-        (int) as_float(caller->input(2)),
-        (int) as_float(caller->input(3)),
-        as_int(caller->input(4)));
-}
-
 namespace sdl_hosted {
 
-void _aalineColor(circa::Term* caller)
+void line(circa::Term* caller)
 {
     aalineColor(SCREEN,
         (int) as_float(caller->input(0)),
@@ -259,12 +249,10 @@ int main( int argc, char* args[] )
     (*circa::KERNEL)["KEY_SPACE"]->boolProperty("dont_train") = true;
     (*circa::KERNEL)["PI"]->boolProperty("dont_train") = true;
 
-    circa::import_function(*circa::KERNEL, line_to, "line_to(float,float,float,float,int)");
     circa::import_function(*circa::KERNEL, fill_rectangle,
             "fill_rectangle(float,float,float,float,int)");
 
-    circa::import_function(*circa::KERNEL, sdl_hosted::_aalineColor,
-            "sdl::lineColor(float,float,float,float,int)");
+    circa::import_function(*circa::KERNEL, sdl_hosted::line, "line(float,float,float,float,int)");
 
     DRAGGABLE_FUNC = circa::create_empty_function(*circa::KERNEL, "draggable(Point)");
 
@@ -304,7 +292,7 @@ int main( int argc, char* args[] )
             CONTINUE_MAIN_LOOP = false;
 
         if (event.type == SDL_MOUSEMOTION) {
-            SCRIPT_MAIN["mouse_x"]->asFloat() = event.motion.x;
+            /*SCRIPT_MAIN["mouse_x"]->asFloat() = event.motion.x;
             SCRIPT_MAIN["mouse_y"]->asFloat() = event.motion.y;
             MOUSE_X = event.motion.x;
             MOUSE_Y = event.motion.y;
@@ -313,6 +301,8 @@ int main( int argc, char* args[] )
 
             if (!INFLUENCE_LIST_ENABLED)
                 update_highlight();
+
+                */
 
 
         } else if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_ALT)) {
