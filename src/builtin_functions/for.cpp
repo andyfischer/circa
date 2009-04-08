@@ -25,10 +25,25 @@ namespace for_function {
         }
     }
 
+    std::string toSourceString(Term* term)
+    {
+        std::stringstream result;
+        result << "for ";
+        result << as_string(term->state->field("iteratorName"));
+        result << " in";
+        result << get_term_source(term->input(0));
+        result << "\n";
+        result << get_branch_source(as_branch(term->state->field("contents")));
+        result << "end";
+
+        return result.str();
+    }
+
     void setup(Branch& kernel)
     {
         FOR_FUNC = import_function(kernel, evaluate, "function for(List)");
         as_function(FOR_FUNC).pureFunction = true;
+        as_function(FOR_FUNC).toSourceString = toSourceString;
         as_function(FOR_FUNC).stateType = create_type(&kernel,
             "type For::State { string iteratorName, Branch contents, Branch inputs }");
     }

@@ -139,16 +139,16 @@ Term* find_and_apply(Branch& branch,
 
 void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
 {
+    if (term->name != "")
+        return;
+
+    term->boolProperty("syntaxHints:nestedExpression") = true;
+
     for (int i=0; i < term->numInputs(); i++) {
         Term* input = term->input(i);
 
         if (input == NULL)
             continue;
-
-        if (input->name != "")
-            continue;
-
-        input->boolProperty("syntaxHints:nestedExpression") = true;
 
         recursively_mark_terms_as_occuring_inside_an_expression(input);
     }
@@ -395,8 +395,6 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     Term* condition = infix_expression(branch, tokens);
     assert(condition != NULL);
 
-    if (condition->name == "")
-        condition->boolProperty("syntaxHints:nestedExpression") = true;
     recursively_mark_terms_as_occuring_inside_an_expression(condition);
 
     possible_whitespace(tokens);
@@ -474,12 +472,14 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     tokens.consume(IN);
 
     Term* listExpr = infix_expression(branch, tokens);
+    recursively_mark_terms_as_occuring_inside_an_expression(listExpr);
     possible_whitespace(tokens);
 
     possible_whitespace(tokens);
     tokens.consume(NEWLINE);
 
     Term* forTerm = apply(&branch, FOR_FUNC, RefList(listExpr));
+    forTerm->stringProperty("syntaxHints:declarationStyle") = "function-specific";
 
     as_string(forTerm->state->field("iteratorName")) = iterator_name;
 
@@ -543,8 +543,6 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         tokens.consume(EQUALS);
         possible_whitespace(tokens);
         initialValue = infix_expression(branch, tokens);
-
-        initialValue->boolProperty("syntaxHints:nestedExpression") = true;
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
     }
 
@@ -617,6 +615,9 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     Term* result = infix_expression(branch, tokens);
 
+    for (int i=0; i < result->numInputs(); i++)
+        recursively_mark_terms_as_occuring_inside_an_expression(result->input(i));
+
     // If this item is just an identifier, and we're trying to rename it,
     // create an implicit call to 'copy'.
     if (result->name != "" && names.length() > 0) {
@@ -625,10 +626,6 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     }
 
     append_whitespace(result, possible_newline(tokens));
-
-    // Go through all of our terms, if they don't have names then assume they
-    // were created just for us. Update the syntax hints to reflect this.
-    recursively_mark_terms_as_occuring_inside_an_expression(result);
 
     std::string pendingRebind = pop_pending_rebind(branch);
 

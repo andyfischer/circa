@@ -11,7 +11,7 @@ end
 
 function draw-popup(float x, float y, List names)
   concat('called draw-popup: ', {x,y,names} -> to-string) -> print
-  padding_x = 5.0
+  padding_x = 5
   padding_y = 5.0
   item_height = 15.0
   total_width = 300.0 + padding_x
