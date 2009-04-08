@@ -711,40 +711,23 @@ bool is_infix_operator_rebinding(std::string const& infix)
 
 std::string get_function_for_infix(std::string const& infix)
 {
-    if (infix == "+")
-        return "add";
-    else if (infix == "-")
-        return "sub";
-    else if (infix == "*")
-        return "mult";
-    else if (infix == "/")
-        return "div";
-    else if (infix == "<")
-        return "less-than";
-    else if (infix == "<=")
-        return "less-than-eq";
-    else if (infix == ">")
-        return "greater-than";
-    else if (infix == ">=")
-        return "greater-than-eq";
-    else if (infix == "==")
-        return "equals";
-    else if (infix == "||")
-        return "or";
-    else if (infix == "&&")
-        return "and";
-    else if (infix == ":=")
-        return "apply-feedback";
-    else if (infix == "+=")
-        return "add";
-    else if (infix == "-=")
-        return "sub";
-    else if (infix == "*=")
-        return "mult";
-    else if (infix == "/=")
-        return "div";
-    else
-        return "#unrecognized";
+    if (infix == "+") return "add";
+    else if (infix == "-") return "sub";
+    else if (infix == "*") return "mult";
+    else if (infix == "/") return "div";
+    else if (infix == "<") return "less-than";
+    else if (infix == "<=") return "less-than-eq";
+    else if (infix == ">") return "greater-than";
+    else if (infix == ">=") return "greater-than-eq";
+    else if (infix == "==") return "equals";
+    else if (infix == "||") return "or";
+    else if (infix == "&&") return "and";
+    else if (infix == ":=") return "apply-feedback";
+    else if (infix == "+=") return "add";
+    else if (infix == "-=") return "sub";
+    else if (infix == "*=") return "mult";
+    else if (infix == "/=") return "div";
+    else return "#unrecognized";
 }
 
 Term* infix_expression(Branch& branch, TokenStream& tokens)
