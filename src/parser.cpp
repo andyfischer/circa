@@ -876,15 +876,17 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
         } else if (operatorStr == "->") {
             std::string functionName = tokens.consume(IDENTIFIER);
-            possible_whitespace(tokens);
 
             RefList inputs(leftExpr);
 
             result = find_and_apply(branch, functionName, inputs);
 
             result->stringProperty("syntaxHints:declarationStyle") = "arrow-concat";
+            result->stringProperty("syntaxHints:functionName") = functionName;
 
             set_input_syntax(result, 0, leftExpr);
+            get_input_syntax_hint(result, 0, "postWhitespace") = preOperatorWhitespace;
+            get_input_syntax_hint(result, 1, "preWhitespace") = postOperatorWhitespace;
 
         } else {
             Term* rightExpr = infix_expression_nested(branch, tokens, precedence+1);
@@ -897,7 +899,6 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             result = find_and_apply(branch, functionName, RefList(leftExpr, rightExpr));
             result->stringProperty("syntaxHints:declarationStyle") = "infix";
-
             result->stringProperty("syntaxHints:functionName") = operatorStr;
 
             set_input_syntax(result, 0, leftExpr);

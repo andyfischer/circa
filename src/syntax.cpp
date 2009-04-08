@@ -121,7 +121,6 @@ std::string get_term_source(Term* term)
 
     } else if (declarationStyle == "literal") {
         result << to_source_string(term);
-
     } else if (declarationStyle == "dot-concat") {
         result << get_source_of_input(term, 0);
         result << ".";
@@ -130,6 +129,11 @@ std::string get_term_source(Term* term)
         result << get_source_of_input(term, 0);
         result << term->stringProperty("syntaxHints:functionName");
         result << get_source_of_input(term, 1);
+    } else if (declarationStyle == "arrow-concat") {
+        result << get_source_of_input(term, 0);
+        result << "->";
+        result << get_input_syntax_hint(term, 1, "preWhitespace");
+        result << term->stringProperty("syntaxHints:functionName");
     } else {
         // result << "(!error, unknown declaration style)";
     }
