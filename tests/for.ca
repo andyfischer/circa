@@ -17,7 +17,12 @@ for (int i : range(4))
   result -> print
 end
 
--- TODO: modify an outer value from within the for-loop
+-- modify an outside value
+x = 10.0
+for (int i : range(4))
+  x += 2.0
+end
+x -> to-string -> print
 
 -- if statement inside a for loop
 for (int i : range(5))
