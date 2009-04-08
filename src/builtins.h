@@ -30,6 +30,7 @@ extern Term* IF_FUNC;
 extern Term* INT_TO_FLOAT_FUNC;
 extern Term* INT_TYPE;
 extern Term* LIST_TYPE;
+extern Term* LIST_FUNC;
 extern Term* MAP_TYPE;
 extern Term* MULT_FUNC;
 extern Term* REF_TYPE;

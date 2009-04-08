@@ -1,5 +1,5 @@
 
-l = list(1,2)
+l = [1,2]
 
 print(l -> to-string)
 print(l.count() -> to-string)
@@ -9,4 +9,7 @@ l.append(3)
 
 print(l -> to-string)
 print(l.count() -> to-string)
+
+[1,2,3] -> to-string -> print
+
 
