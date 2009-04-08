@@ -106,7 +106,7 @@ if POSIX:
 CASDL_ENV.Append(LIBS = ['SDL_gfx'])
 CASDL_ENV.Append(CPPPATH=['src'])
 CASDL_ENV.Append(LIBPATH = "lib")
-CASDL_ENV.Append(LIBS = ['circa'])
+CASDL_ENV.Append(LIBS = [circa_slib])
 
 CASDL_ENV.Program('bin/cgame', 'cgame/main.cpp')
 

@@ -92,7 +92,7 @@ std::string term_to_raw_string(Term* term)
     for (unsigned int input_index=0; input_index < term->inputs.count(); input_index++) {
         Term* input = term->inputs[input_index];
         if (!first_input) output << ", ";
-        output << get_short_local_name(input);
+        output << "#" << input->globalID;
         first_input = false;
     }
 
