@@ -16,7 +16,7 @@ Branch::~Branch()
     // Dealloc_value on all non-types
     for (unsigned int i = 0; i < _terms.count(); i++)
     {
-        Term *term = _terms[i];
+        Ref term = _terms[i];
 
         if (term == NULL)
             continue;
