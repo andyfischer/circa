@@ -11,14 +11,17 @@ namespace for_function {
 
         std::string iteratorName = as_string(caller->state->field("iteratorName"));
 
-        Branch& branch = as_branch(caller->state->field(1));
+        evaluate_branch(as_branch(caller->state->field("inputs")));
 
-        Term* iterator = branch[iteratorName];
+        Branch& contents = as_branch(caller->state->field("contents"));
+
+        Term* iterator = contents[iteratorName];
         assert(iterator != NULL);
 
         for (int i=0; i < series.numTerms(); i++) {
+
             assign_value(series[i], iterator);
-            evaluate_branch(branch);
+            evaluate_branch(contents);
         }
     }
 
@@ -27,7 +30,7 @@ namespace for_function {
         FOR_FUNC = import_function(kernel, evaluate, "function for(List)");
         as_function(FOR_FUNC).pureFunction = true;
         as_function(FOR_FUNC).stateType = create_type(&kernel,
-            "type For::State { string iteratorName, Branch contents }");
+            "type For::State { string iteratorName, Branch contents, Branch inputs }");
     }
 }
 } // namespace circa

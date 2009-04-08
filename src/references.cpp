@@ -86,5 +86,4 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
     remap_pointers(term, map);
 }
 
-
 } // namespace circa

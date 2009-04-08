@@ -499,6 +499,38 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     consume_branch_until_end(innerBranch, tokens);
 
+    Branch& inputsBranch = as_branch(forTerm->state->field("inputs"));
+
+    // Check for rebound names
+    TermNamespace::iterator it;
+    for (it = innerBranch.names.begin(); it != innerBranch.names.end(); ++it) {
+
+        // Ignore names that aren't bound in the outer branch
+        std::string name = it->first;
+        Term* outer = find_named(&branch, name);
+        Term* result = innerBranch[name];
+        if (outer == NULL)
+            continue;
+
+        // Ignore terms that are just a simple copy of the outer branch
+        if (result->function == COPY_FUNC && result->input(0) == outer)
+            continue;
+
+        // Create a copy() in inputs
+        Term* copy = apply(&inputsBranch, COPY_FUNC, RefList(outer));
+
+        // Remap innerBranch to use this copy instead
+        ReferenceMap remap;
+        remap[outer] = copy;
+        innerBranch.remapPointers(remap);
+
+        // Create an assign() that brings the result value back up to our copy
+        apply(&innerBranch, ASSIGN_FUNC, RefList(result, copy));
+
+        // Bind name in external branch
+        branch.bindName(result, name);
+    }
+
     tokens.consume(END);
     possible_whitespace(tokens);
     consume_statement_end(tokens, forTerm);
