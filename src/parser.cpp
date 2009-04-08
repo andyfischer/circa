@@ -924,6 +924,10 @@ Term* atom(Branch& branch, TokenStream& tokens)
     else if (tokens.nextIs(FLOAT))
         result = literal_float(branch, tokens);
 
+    // literal list?
+    else if (tokens.nextIs(LBRACKET))
+        result = literal_list(branch, tokens);
+
     // literal branch?
     else if (tokens.nextIs(LBRACE))
         result = literal_branch(branch, tokens);
@@ -1094,6 +1098,26 @@ Term* literal_branch(Branch& branch, TokenStream& tokens)
     tokens.consume(RBRACE);
 
     return resultTerm;
+}
+
+Term* literal_list(Branch& branch, TokenStream& tokens)
+{
+    tokens.consume(LBRACKET);
+
+    RefList terms;
+
+    while (!tokens.nextNonWhitespaceIs(RBRACKET)) {
+        terms.append(infix_expression(branch, tokens));
+        possible_whitespace(tokens);
+        if (tokens.nextIs(COMMA))
+            tokens.consume(COMMA);
+    }
+
+    possible_whitespace(tokens);
+    tokens.consume(RBRACKET);
+
+    Term* result = apply(&branch, LIST_FUNC, terms);
+    return result;
 }
 
 Term* identifier(Branch& branch, TokenStream& tokens)

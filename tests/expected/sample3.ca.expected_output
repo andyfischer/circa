@@ -1,4 +1,4 @@
-called draw-popup: { 30.0, 30.0, { 'Button1', 'Button2', 'Button3' } }
+called draw-popup: { 30.0, 30.0, ['Button1','Button2','Button3'] }
 called fill-rectangle: { 30.0, 30.0, 335.0, 85.0, 0 }
 called draw-text: { 'Button1', 30.0, 30.0, 0 }
 called fill-rectangle: { 30.0, 30.0, 335.0, 85.0, 0 }

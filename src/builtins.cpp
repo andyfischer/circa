@@ -37,6 +37,7 @@ Term* IF_FUNC = NULL;
 Term* INT_TO_FLOAT_FUNC = NULL;
 Term* INT_TYPE = NULL;
 Term* LIST_TYPE = NULL;
+Term* LIST_FUNC = NULL;
 Term* MAP_TYPE = NULL;
 Term* MULT_FUNC = NULL;
 Term* REF_TYPE = NULL;
@@ -171,12 +172,10 @@ namespace set_t {
     {
         Branch &set = as_branch(caller);
         std::stringstream output;
-        bool first = true;
         output << "{";
         for (int i=0; i < set.numTerms(); i++) {
-            if (!first) output << ", ";
+            if (i > 0) output << ", ";
             output << set[i]->toString();
-            first = false;
         }
         output << "}";
 
@@ -186,6 +185,19 @@ namespace set_t {
 } // namespace set_t
 
 namespace list_t {
+
+    std::string to_string(Term* caller)
+    {
+        std::stringstream out;
+        out << "[";
+        Branch& branch = as_branch(caller);
+        for (int i=0; i < branch.numTerms(); i++) {
+            if (i > 0) out << ",";
+            out << branch[i]->toString();
+        }
+        out << "]";
+        return out.str();
+    }
 
     void append(Term* caller)
     {
@@ -366,9 +378,10 @@ void initialize_builtin_types(Branch& kernel)
     import_member_function(set_type, set_t::hosted_add, "function add(Set, any) -> Set");
     import_member_function(set_type, set_t::remove, "function remove(Set, any) -> Set");
 
-    Term* list_type = create_compound_type(kernel, "List");
-    import_member_function(list_type, list_t::append, "function append(List, any) -> List");
-    import_member_function(list_type, list_t::count, "function count(List) -> int");
+    LIST_TYPE = create_compound_type(kernel, "List");
+    as_type(LIST_TYPE).toString = list_t::to_string;
+    import_member_function(LIST_TYPE, list_t::append, "function append(List, any) -> List");
+    import_member_function(LIST_TYPE, list_t::count, "function count(List) -> int");
 }
 
 void initialize_builtin_functions(Branch& kernel)

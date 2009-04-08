@@ -53,7 +53,7 @@ void key_pressed(circa::Term* caller)
     caller->asBool() = KEY_JUST_PRESSED.find(i) != KEY_JUST_PRESSED.end();
 }
 
-void fill_rectangle(circa::Term* caller)
+void box(circa::Term* caller)
 {
     boxColor(SCREEN,
         (int) as_float(caller->input(0)),
@@ -249,8 +249,8 @@ int main( int argc, char* args[] )
     (*circa::KERNEL)["KEY_SPACE"]->boolProperty("dont_train") = true;
     (*circa::KERNEL)["PI"]->boolProperty("dont_train") = true;
 
-    circa::import_function(*circa::KERNEL, fill_rectangle,
-            "fill_rectangle(float,float,float,float,int)");
+    circa::import_function(*circa::KERNEL, box,
+            "box(float,float,float,float,int)");
 
     circa::import_function(*circa::KERNEL, sdl_hosted::line, "line(float,float,float,float,int)");
 
