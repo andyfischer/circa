@@ -46,7 +46,7 @@ bool should_print_term_source_line(Term* term)
     if (term->boolPropertyOptional("syntaxHints:nestedExpression", false))
         return false;
 
-    if (term->stringPropertyOptional("syntaxHints:declarationStyle", "") == "")
+    if (term->boolPropertyOptional("syntaxHints:hidden", false))
         return false;
 
     return true;
