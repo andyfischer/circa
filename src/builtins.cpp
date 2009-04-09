@@ -380,6 +380,7 @@ void initialize_builtin_types(Branch& kernel)
 
     LIST_TYPE = create_compound_type(kernel, "List");
     as_type(LIST_TYPE).toString = list_t::to_string;
+    as_type(LIST_TYPE).toSourceString = list_t::to_string;
     import_member_function(LIST_TYPE, list_t::append, "function append(List, any) -> List");
     import_member_function(LIST_TYPE, list_t::count, "function count(List) -> int");
 }

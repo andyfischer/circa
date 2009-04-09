@@ -958,11 +958,27 @@ Term* atom(Branch& branch, TokenStream& tokens)
 }
 
 struct PendingInputSyntax {
-    int index;
-    std::string field;
-    std::string value;
-    PendingInputSyntax(int i, std::string f, std::string v)
-        : index(i), field(f), value(v) {}
+    struct Input {
+        int index;
+        std::string field;
+        std::string value;
+        Input(int i, std::string const& f, std::string const& v)
+            : index(i), field(f), value(v) {}
+    };
+
+    void set(int index, std::string const& field, std::string const& value)
+    {
+        mPending.push_back(Input(index, field, value));
+    }
+
+    void apply(Term* term)
+    {
+        std::vector<Input>::const_iterator it;
+        for (it = mPending.begin(); it != mPending.end(); ++it)
+            get_input_syntax_hint(term, it->index, it->field) = it->value;
+    }
+
+    std::vector<Input> mPending;
 };
 
 Term* function_call(Branch& branch, TokenStream& tokens)
@@ -972,7 +988,7 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
     RefList inputs;
 
-    std::vector<PendingInputSyntax> pis;
+    PendingInputSyntax pis;
 
     int index = 0;
     while (!tokens.nextIs(RPAREN)) {
@@ -981,16 +997,16 @@ Term* function_call(Branch& branch, TokenStream& tokens)
         Term* term = infix_expression(branch, tokens);
         std::string postWhitespace = possible_whitespace(tokens);
 
-        pis.push_back(PendingInputSyntax(index, "preWhitespace", preWhitespace));
-        pis.push_back(PendingInputSyntax(index, "postWhitespace", postWhitespace));
+        pis.set(index, "preWhitespace", preWhitespace);
+        pis.set(index, "postWhitespace", postWhitespace);
 
         inputs.append(term);
 
         if (term->name == "")
-            pis.push_back(PendingInputSyntax(index, "style", "by-value"));
+            pis.set(index, "style", "by-value");
         else {
-            pis.push_back(PendingInputSyntax(index, "style", "by-name"));
-            pis.push_back(PendingInputSyntax(index, "name", term->name));
+            pis.set(index, "style", "by-name");
+            pis.set(index, "name", term->name);
         }
 
         if (!tokens.nextIs(RPAREN))
@@ -1006,9 +1022,7 @@ Term* function_call(Branch& branch, TokenStream& tokens)
     result->stringProperty("syntaxHints:declarationStyle") = "function-call";
     result->stringProperty("syntaxHints:functionName") = functionName;
 
-    std::vector<PendingInputSyntax>::const_iterator it;
-    for (it = pis.begin(); it != pis.end(); ++it)
-        get_input_syntax_hint(result, it->index, it->field) = it->value;
+    pis.apply(result);
 
     return result;
 }
@@ -1106,17 +1120,34 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 
     RefList terms;
 
+    PendingInputSyntax pis;
+
+    int index = 0;
     while (!tokens.nextNonWhitespaceIs(RBRACKET)) {
-        terms.append(infix_expression(branch, tokens));
-        possible_whitespace(tokens);
+        Term* term = infix_expression(branch, tokens);
+        terms.append(term);
+        std::string postWs = possible_whitespace(tokens);
+
         if (tokens.nextIs(COMMA))
-            tokens.consume(COMMA);
+            postWs += tokens.consume(COMMA);
+
+        if (term->name == "")
+            pis.set(index, "style", "by-value");
+        else {
+            pis.set(index, "style", "by-name");
+            pis.set(index, "name", term->name);
+        }
+
+        pis.set(index, "postWhitespace", postWs);
+        index++;
     }
 
     possible_whitespace(tokens);
     tokens.consume(RBRACKET);
 
     Term* result = apply(&branch, LIST_FUNC, terms);
+    pis.apply(result);
+    result->stringProperty("syntaxHints:declarationStyle") = "function-specific";
     return result;
 }
 

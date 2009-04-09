@@ -13,3 +13,6 @@ print(l.count() -> to-string)
 [1,2,3] -> to-string -> print
 
 
+-- omitting commas
+l = [1 2 3]
+l -> to-string -> print

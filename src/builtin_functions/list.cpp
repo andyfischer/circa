@@ -13,12 +13,24 @@ namespace list_function {
         }
     }
 
+    std::string toSourceString(Term* caller) {
+        std::stringstream out;
+        if (caller->name != "")
+            out << caller->name << " = ";
+        out << "[";
+        for (int i=0; i < caller->numInputs(); i++)
+            out << get_source_of_input(caller, i);
+        out << "]";
+        return out.str();
+    }
+
     void setup(Branch& kernel)
     {
         LIST_FUNC = import_function(kernel, evaluate,
                 "function list(any) -> List");
         as_function(LIST_FUNC).variableArgs = true;
         as_function(LIST_FUNC).pureFunction = true;
+        as_function(LIST_FUNC).toSourceString = toSourceString;
     }
 }
 }
