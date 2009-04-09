@@ -96,6 +96,7 @@ Term*& branch_get_outer_scope(Branch& branch);
 
 void migrate_branch(Branch& replacement, Branch& target);
 void reload_branch_from_file(Branch& branch);
+void persist_branch_to_file(Branch& branch);
 
 } // namespace circa
 

@@ -4,8 +4,6 @@
 
 #include "circa.h"
 
-#include "hosted_types.h"
-
 namespace circa {
 namespace parser {
 

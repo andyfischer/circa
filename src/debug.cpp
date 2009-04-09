@@ -7,12 +7,26 @@
 namespace circa {
 
 #if DEBUG_CHECK_FOR_BAD_POINTERS
-std::set<Term*> DEBUG_GOOD_POINTER_SET;
+std::set<Term*> *DEBUG_GOOD_POINTER_SET = NULL;
 #endif
+
+void register_good_pointer(Term* term)
+{
+    if (DEBUG_GOOD_POINTER_SET == NULL)
+        DEBUG_GOOD_POINTER_SET = new std::set<Term*>();
+    DEBUG_GOOD_POINTER_SET->insert(term);
+}
+
+void unregister_good_pointer(Term* term)
+{
+    DEBUG_GOOD_POINTER_SET->erase(term);
+}
 
 bool is_bad_pointer(Term* term)
 {
-    return DEBUG_GOOD_POINTER_SET.find(term) == DEBUG_GOOD_POINTER_SET.end();
+    if (DEBUG_GOOD_POINTER_SET == NULL)
+        DEBUG_GOOD_POINTER_SET = new std::set<Term*>();
+    return DEBUG_GOOD_POINTER_SET->find(term) == DEBUG_GOOD_POINTER_SET->end();
 }
 
 void assert_good_pointer(Term* term)

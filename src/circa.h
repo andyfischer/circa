@@ -7,6 +7,7 @@
 #include "cpp_importing.h"
 #include "debug.h"
 #include "function.h"
+#include "hosted_types.h"
 #include "importing.h"
 #include "introspection.h"
 #include "parser.h"
