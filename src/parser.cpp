@@ -415,6 +415,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     // Create the joining branch
     Term* joining = apply(&branch, BRANCH_FUNC, RefList(), "#joining");
+    joining->boolProperty("syntaxHints:hidden") = true;
     Branch& joiningBranch = *get_inner_branch(joining);
 
     // Get a list of all names bound in this branch
@@ -621,6 +622,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     if (result->name != "" && names.length() > 0) {
         result = apply(&branch, COPY_FUNC, RefList(result));
         result->stringProperty("syntaxHints:declarationStyle") = "function-specific";
+        //result->boolProperty("syntaxHints:hidden") = true;
     }
 
     append_whitespace(result, possible_newline(tokens));
@@ -1167,6 +1169,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     // If not found, create an instance of unknown-identifier
     if (result == NULL) {
         result = apply(&branch, UNKNOWN_IDENTIFIER_FUNC, RefList());
+        result->boolProperty("syntaxHints:hidden") = true;
         as_string(result->state) = id;
         branch.bindName(result, id);
     }
@@ -1177,6 +1180,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     if (createCopy) {
         std::string name = result->name;
         result = apply(&branch, COPY_FUNC, RefList(result));
+        result->boolProperty("syntaxHints:hidden") = true;
         if (name != "")
             branch.bindName(result, name);
     }

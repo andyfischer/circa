@@ -296,26 +296,14 @@ int main( int argc, char* args[] )
             CONTINUE_MAIN_LOOP = false;
 
         if (event.type == SDL_MOUSEMOTION) {
-            /*SCRIPT_MAIN["mouse_x"]->asFloat() = event.motion.x;
-            SCRIPT_MAIN["mouse_y"]->asFloat() = event.motion.y;
             mouse_x = event.motion.x;
             mouse_y = event.motion.y;
             mouse_movement_x = event.motion.x;
             mouse_movement_y = event.motion.y;
 
-            if (!INFLUENCE_LIST_ENABLED)
-                update_highlight();
-
-                */
-
-
         } else if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_ALT)) {
             // Alt key
             switch(event.key.keysym.sym) {
-            case SDLK_4:
-                std::cout << "Script contents:" << std::endl;
-                std::cout << branch_to_string_raw(SCRIPT_MAIN);
-                break;
             case SDLK_5:
                 circa::reload_branch_from_file(SCRIPT_MAIN);
                 post_script_load(SCRIPT_MAIN);
@@ -328,6 +316,10 @@ int main( int argc, char* args[] )
             case SDLK_s:
                 circa::persist_branch_to_file(SCRIPT_MAIN);
                 std::cout << "Saved" << std::endl;
+                break;
+
+            case SDLK_p:
+                std::cout << branch_to_string_raw(SCRIPT_MAIN);
                 break;
             }
             
