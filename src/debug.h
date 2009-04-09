@@ -19,12 +19,10 @@ namespace circa {
 // deemed a good pointer, just because the new Term occupies the same
 // memory that a previous Term did. The drawback to this option is
 // of course, unbounded memory consumption.
-#define DEBUG_NEVER_DELETE_TERMS 1
+#define DEBUG_NEVER_DELETE_TERMS 0
 
-#if DEBUG_CHECK_FOR_BAD_POINTERS
-extern std::set<Term*> DEBUG_GOOD_POINTER_SET;
-#endif
-
+void register_good_pointer(Term* term);
+void unregister_good_pointer(Term* term);
 bool is_bad_pointer(Term* term);
 void assert_good_pointer(Term* term);
 

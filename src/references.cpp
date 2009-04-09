@@ -41,9 +41,7 @@ void delete_term(Term* term)
     term->function = NULL;
     term->state = NULL;
 
-#if DEBUG_CHECK_FOR_BAD_POINTERS
-    DEBUG_GOOD_POINTER_SET.erase(term);
-#endif
+    unregister_good_pointer(term);
 
 #if !DEBUG_NEVER_DELETE_TERMS
     delete term;

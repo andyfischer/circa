@@ -20,5 +20,13 @@ std::string read_text_file(std::string const& filename)
     file.close();
     return contents.str();
 }
+
+void write_text_file(std::string const& filename, std::string const& contents)
+{
+    std::ofstream file;
+    file.open(filename.c_str(), std::ios::out);
+    file << contents;
+    file.close();
+}
     
 } // namespace circa

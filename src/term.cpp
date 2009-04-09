@@ -20,9 +20,7 @@ Term::Term()
 {
     globalID = gNextGlobalID++;
 
-#if DEBUG_CHECK_FOR_BAD_POINTERS
-    DEBUG_GOOD_POINTER_SET.insert(this);
-#endif
+    register_good_pointer(this);
 }
 
 Term::~Term()

@@ -13,8 +13,8 @@ const float HIGHLIGHT_MIN_DIST = 5.0;
 bool KEY_DOWN[SDLK_LAST];
 std::set<int> KEY_JUST_PRESSED;
 
-int MOUSE_X = 0;
-int MOUSE_Y = 0;
+int mouse_x = 0;
+int mouse_y = 0;
 bool INFLUENCE_LIST_ENABLED = false;
 
 SDL_Surface* SCREEN = NULL;
@@ -33,6 +33,9 @@ int previous_mouse_y = 0;
 
 int mouse_movement_x = 0;
 int mouse_movement_y = 0;
+
+int drag_start_x = 0;
+int drag_start_y = 0;
 
 void initialize_keydown()
 {
@@ -86,8 +89,8 @@ void update_highlight()
         if (it->function == DRAGGABLE_FUNC) {
             float x = as_float(it->input(0));
             float y = as_float(it->input(1));
-            float dist_x = MOUSE_X - x;
-            float dist_y = MOUSE_Y - y;
+            float dist_x = mouse_x - x;
+            float dist_y = mouse_y - y;
             float dist = sqrt(dist_x*dist_x + dist_y*dist_y);
 
             if (dist > HIGHLIGHT_MIN_DIST)
@@ -200,6 +203,7 @@ void handle_key_press(int key)
     }
 }
 
+/*
 void handle_dragging()
 {
     if (!drag_in_progress)
@@ -210,8 +214,8 @@ void handle_dragging()
 
     circa::Branch tempBranch;
 
-    circa::Term* desiredX = circa::float_value(&tempBranch, MOUSE_X);
-    circa::Term* desiredY = circa::float_value(&tempBranch, MOUSE_Y);
+    circa::Term* desiredX = circa::float_value(&tempBranch, mouse_x);
+    circa::Term* desiredY = circa::float_value(&tempBranch, mouse_y);
 
     circa::generate_training(tempBranch, subjectX, desiredX);
     circa::generate_training(tempBranch, subjectY, desiredY);
@@ -219,7 +223,7 @@ void handle_dragging()
     evaluate_branch(tempBranch);
 
     std::cout << branch_to_string_raw(tempBranch) << std::endl;
-}
+}*/
 
 void post_script_load(circa::Branch& script)
 {
@@ -294,8 +298,8 @@ int main( int argc, char* args[] )
         if (event.type == SDL_MOUSEMOTION) {
             /*SCRIPT_MAIN["mouse_x"]->asFloat() = event.motion.x;
             SCRIPT_MAIN["mouse_y"]->asFloat() = event.motion.y;
-            MOUSE_X = event.motion.x;
-            MOUSE_Y = event.motion.y;
+            mouse_x = event.motion.x;
+            mouse_y = event.motion.y;
             mouse_movement_x = event.motion.x;
             mouse_movement_y = event.motion.y;
 
@@ -318,6 +322,15 @@ int main( int argc, char* args[] )
                 std::cout << "Script reloaded" << std::endl;
                 break;
             }
+        } else if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL)) {
+            // Control key
+            switch(event.key.keysym.sym) {
+            case SDLK_s:
+                circa::persist_branch_to_file(SCRIPT_MAIN);
+                std::cout << "Saved" << std::endl;
+                break;
+            }
+            
         } else if (event.type == SDL_KEYDOWN) {
 
             if (!KEY_DOWN[event.key.keysym.sym]) {
@@ -330,17 +343,26 @@ int main( int argc, char* args[] )
         } else if (event.type == SDL_KEYUP) {
             KEY_DOWN[event.key.keysym.sym] = false;
         } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-            if (HIGHLIGHT != NULL) {
-                drag_in_progress = true;
-                drag_target = HIGHLIGHT;
-            }
+            drag_in_progress = true;
+            drag_start_x = mouse_x;
+            drag_start_y = mouse_y;
         } else if (event.type == SDL_MOUSEBUTTONUP) {
+            // draw a line
+            if (drag_in_progress) {
+                std::cout << "drawing a line" << std::endl;
+                circa::apply(&SCRIPT_MAIN, "line", circa::RefList(
+                            circa::float_value(&SCRIPT_MAIN, drag_start_x),
+                            circa::float_value(&SCRIPT_MAIN, drag_start_y),
+                            circa::float_value(&SCRIPT_MAIN, mouse_x),
+                            circa::float_value(&SCRIPT_MAIN, mouse_y),
+                            circa::int_value(&SCRIPT_MAIN, 0)));
+            }
+
             drag_in_progress = false;
             drag_target = NULL;
         }
 
         try {
-            handle_dragging();
             SCRIPT_MAIN.eval();
             draw_highlight();
             draw_influence_list();

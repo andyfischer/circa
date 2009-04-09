@@ -10,6 +10,7 @@
 namespace circa {
 
 std::string read_text_file(std::string const& filename);
+void write_text_file(std::string const& filename, std::string const& contents);
 
 } // namespace circa
 

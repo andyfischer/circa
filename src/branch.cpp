@@ -13,36 +13,6 @@ Branch::Branch()
 
 Branch::~Branch()
 {
-    // Dealloc_value on all non-types
-    for (unsigned int i = 0; i < _terms.count(); i++)
-    {
-        Ref term = _terms[i];
-
-        if (term == NULL)
-            continue;
-
-        assert_good_pointer(term);
-
-        if (term->type != TYPE_TYPE)
-            dealloc_value(term);
-
-        if (term->state != NULL)
-            dealloc_value(term->state);
-    }
-
-    // Delete everybody
-    for (unsigned int i = 0; i < _terms.count(); i++)
-    {
-        Term *term = _terms[i];
-        if (term == NULL)
-            continue;
-
-        assert_good_pointer(term);
-
-        dealloc_value(term);
-        term->owningBranch = NULL;
-    }
-
     _terms.clear();
 }
 
@@ -378,6 +348,13 @@ void reload_branch_from_file(Branch& branch)
     evaluate_file(replacement, filename);
 
     migrate_branch(replacement, branch);
+}
+
+void persist_branch_to_file(Branch& branch)
+{
+    std::string filename = as_string(branch[get_name_for_attribute("source-file")]);
+
+    write_text_file(filename, get_branch_source(branch) + "\n");
 }
 
 } // namespace circa
