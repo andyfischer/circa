@@ -72,6 +72,27 @@ def strip_extra_blank_lines(s):
 
     return "\n".join(result)
 
+def load_file(filename):
+    f = open(filename)
+    contents = f.read()
+    f.close()
+    return contents
+
+def read_file_as_lines(filename):
+    contents = load_file(filename)
+
+    def myFilter(line):
+        # remove blank lines
+        if line == '': return False
+
+        # remove commented lines
+        if line[0] == '#': return False
+
+        return True
+
+    return filter(myFilter, contents.split('\n'))
+
+
 if __name__ == '__main__':
     test_str1 = """
     This 
@@ -84,7 +105,6 @@ if __name__ == '__main__':
          Another
             test
     """
-
 
     print normalize_indent(test_str1, '')
     print normalize_indent(test_str1, '   ')
