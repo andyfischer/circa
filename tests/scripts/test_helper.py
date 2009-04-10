@@ -31,10 +31,16 @@ def load_file(filename):
 def readFileAsLines(filename):
     contents = load_file(filename)
 
-    def filterBlanks(line):
-        return line != ''
+    def myFilter(line):
+        # remove blank lines
+        if line == '': return False
 
-    return filter(filterBlanks, contents.split('\n'))
+        # remove commented lines
+        if line[0] == '#': return False
+
+        return True
+
+    return filter(myFilter, contents.split('\n'))
 
 def compare_command_against_file(command, filename):
     """

@@ -1,5 +1,0 @@
-
-type Point {
-  float x
-  float y
-}

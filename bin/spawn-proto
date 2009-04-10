@@ -1,0 +1,3 @@
+cd $CIRCA_HOME
+echo "$1" >> build_apps
+cp -r $2 $1

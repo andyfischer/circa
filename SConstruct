@@ -1,6 +1,8 @@
 
 import os, sys, glob 
 
+from scripts.Utils import *
+
 # generate setup_builtin_functions.cpp and register_all_tests.cpp
 from scripts import generate_cpp_registration
 generate_cpp_registration.do_builtin_functions(
@@ -92,22 +94,22 @@ circaBinary = ENV.Program('bin/circa', 'build/src/main.cpp', LIBS=[circa_slib])
 ENV.SetOption('num_jobs', 2)
 ENV.Default(circaBinary)
 
-############################## cgame ###############################
+########################### SDL-based apps ###############################
 
-CASDL_ENV = Environment()
+SDL_ENV = Environment()
 
 # import path so that we will find the correct sdl-config
-CASDL_ENV['ENV']['PATH'] = os.environ['PATH']
+SDL_ENV['ENV']['PATH'] = os.environ['PATH']
 
 if POSIX:
-    CASDL_ENV.ParseConfig('sdl-config --cflags')
-    CASDL_ENV.ParseConfig('sdl-config --libs')
+    SDL_ENV.ParseConfig('sdl-config --cflags')
+    SDL_ENV.ParseConfig('sdl-config --libs')
 
-CASDL_ENV.Append(LIBS = ['SDL_gfx'])
-CASDL_ENV.Append(CPPPATH=['src'])
-CASDL_ENV.Append(LIBPATH = "lib")
-CASDL_ENV.Append(LIBS = [circa_slib])
+SDL_ENV.Append(LIBS = ['SDL_gfx'])
+SDL_ENV.Append(CPPPATH=['src'])
+SDL_ENV.Append(LIBPATH = "lib")
+SDL_ENV.Append(LIBS = [circa_slib])
 
-CASDL_ENV.Program('bin/cgame', 'cgame/main.cpp')
-
-CASDL_ENV.Alias('cgame', 'bin/cgame')
+for app_name in read_file_as_lines('build_apps'):
+    SDL_ENV.Program('bin/'+app_name, app_name+'/main.cpp')
+    SDL_ENV.Alias(app_name, 'bin/'+app_name)
