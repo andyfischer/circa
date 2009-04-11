@@ -1,10 +1,12 @@
-Doing a survey of syntax used in other languages. Here are some thoughts that relate to Circa:
+This file contains various thoughts on Circa's syntax
 
 Using {} for blocks?
   There seems to be some universal feeling that this is used for heavyweight languages
   People like 'end' in Ruby
+  With Circa we want to be more readable, so let's go with end
 
-names have no type in Ruby
+names have no type
+  Ruby and Python are like this
   We work the same way. It's good.
   Though it might be nice to have a compiler hint pass that warns when a name changes type
 

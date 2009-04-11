@@ -1,3 +1,22 @@
 background(0xeeeeeeff)
 
-shape([[4.0,4.0], [40.0,4.0], [20.0,30.0]], 0xff0000ff)
+type Point { float x, float y }
+
+function p2c(float angle, float radius, Point center) -> Point
+  return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
+end
+
+center = [100.0, 100.0]
+
+long_rad = 20.0
+short_rad = 10.0
+
+function step_to_angle(int step) -> float
+  return step / 10.0 * PI * 2
+end
+
+points = [ p2c(step_to_angle(0), long_rad, center), p2c(step_to_angle(1), short_rad, center), p2c(step_to_angle(2), long_rad, center), p2c(step_to_angle(3), short_rad, center), p2c(step_to_angle(4), long_rad, center), p2c(step_to_angle(5), short_rad, center), p2c(step_to_angle(6), long_rad, center), p2c(step_to_angle(7), short_rad, center), p2c(step_to_angle(8), long_rad, center), p2c(step_to_angle(9), short_rad, center)]
+
+points -> to-string -> print
+
+shape(points, 0xff0000ff)
