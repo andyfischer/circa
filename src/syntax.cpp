@@ -69,7 +69,7 @@ std::string get_term_source(Term* term)
             bool prependNameBinding = true;
 
             // for certain types, don't write "name =" in front
-            if (term->type == FUNCTION_TYPE)
+            if (term->type == FUNCTION_TYPE || term->type == TYPE_TYPE)
                 prependNameBinding = false;
 
             if (prependNameBinding && term->name != "")

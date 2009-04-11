@@ -115,14 +115,9 @@ void specialize_type(Term *term, Term *type)
 }
 
 namespace type_private {
-
-void* empty_allocate(Term*)
-{
-    return NULL;
-}
-void empty_dealloc(void*) {}
-void empty_duplicate_function(Term*,Term*) {}
-
+    void* empty_allocate(Term*) { return NULL; }
+    void empty_dealloc(void*) {}
+    void empty_duplicate_function(Term*,Term*) {}
 }
 
 void setup_empty_type(Type& type)
@@ -249,10 +244,9 @@ void Type::name_accessor(Term* caller)
 std::string Type::type_to_string(Term* term)
 {
     std::stringstream out;
-
-    out << "Type { ";
-
     Type& type = as_type(term);
+
+    out << "type " << type.name << " { ";
 
     for (int i=0; i < type.numFields(); i++) {
         if (i != 0)

@@ -280,6 +280,7 @@ void bootstrap_kernel()
     typeType->assign = Type::type_assign;
     typeType->remapPointers = Type::typeRemapPointers;
     typeType->toString = Type::type_to_string;
+    typeType->toSourceString = Type::type_to_string;
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Implant the Type type
