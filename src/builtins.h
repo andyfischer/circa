@@ -13,6 +13,7 @@ extern Term* ASSIGN_FUNC;
 extern Term* ADD_FUNC;
 extern Term* ANY_TYPE;
 extern Term* APPLY_FEEDBACK;
+extern Term* AVERAGE_FUNC;
 extern Term* BOOL_TYPE;
 extern Term* BRANCH_FUNC;
 extern Term* BRANCH_TYPE;
