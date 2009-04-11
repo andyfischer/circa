@@ -4,6 +4,11 @@ Using {} for blocks?
   There seems to be some universal feeling that this is used for heavyweight languages
   People like 'end' in Ruby
   With Circa we want to be more readable, so let's go with end
+  Ruby uses {} for lambdas, this would be cool
+
+{} for data structures?
+  Yes, we can use it for both dictionaries and for code blocks, since those are stored in
+  the same way.
 
 names have no type
   Ruby and Python are like this
@@ -13,16 +18,18 @@ names have no type
 Array literals
   [] or {} ?
   Prefer []
+  Perhaps () ? (aka Lisp)
 
 Everything is an expression
   Probably a good thing
+  This is already how we work under the hood, the only change would be for functions like
+  branch(), for(), if(), etc, to return a value.
 
 Method names ending in ? or !
   This is a Rubyism that they can keep
   Planning on using the ? mark for other purposes
 
-
-For loops
+For loop syntax?
   for i in list
   for i : list
   for (i in list)
@@ -33,12 +40,52 @@ For loops
 Type labels
   int myInt
   myInt::int
+  myInt:int
+  myInt : int
   myInt [::int]
   myInt [t:int]
   for i [::int] in list
   for (i [::int] in list)
 
+  Favorite is name : type
+
 Method chaining
   Important to make this easy
   blah().foo().baz()
-  blah.foo.baz
+  blah.foo.baz -- omit the ()s as in Ruby. This would be nice
+
+Omitting , or ; or newlines
+  In Lua, you can write this: 1+2 3*4 print('a')
+  and it will be unambiguously parsed, even though expressions are not seperated
+  by ; or , or anything. This would be nice. I think it would mean that certain
+  forms of syntax become impossible, but let's definitely explore this.
+
+Lispy data structures
+  Lisp makes it easy to write lists..
+  (1 2 3)
+  (1 2 (3 4) 5 6)
+
+  We also have a code-as-data thing, so it would be nice to have a unified syntax
+  where you represent lists, data structures, and pieces of code in all the same
+  way.
+  
+  But we don't want to get too lispy. Let's keep the syntax function(args) instead
+  of (function args).
+
+  Also, let's keep using {} for dictionaries and code blocks.
+   
+  So.. what are all the edge cases?
+
+  function(arg)
+  function(arg1 arg2)
+  function((list))
+  function(arg1 (list1 list2) arg2)
+  (list1)
+  ((nested list?))
+  (a + b) * c
+  (1 2 * 4) * 3
+  (+ * +) <-- illegal
+  (list1,) <-- necessary?
+
+  So.. the biggest collision is when we optionally put ()s around something to
+  impose an order of operations.
