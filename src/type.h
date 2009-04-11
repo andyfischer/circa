@@ -125,7 +125,7 @@ struct Type
     static void* type_alloc(Term* type);
     static void type_dealloc(void* data);
     static void type_assign(Term* source, Term* dest);
-    static void typeRemapPointers(Term *term, ReferenceMap const& map);
+    static void typeRemapPointers(Term* term, ReferenceMap const& map);
     static std::string type_to_string(Term* term);
 };
 

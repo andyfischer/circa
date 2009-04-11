@@ -379,8 +379,8 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
 
     tokens.consume(RBRACE);
 
-    possible_whitespace(tokens);
-    consume_statement_end(tokens, result);
+    append_whitespace(result, possible_whitespace(tokens));
+    append_whitespace(result, possible_newline(tokens));
 
     return result;
 }

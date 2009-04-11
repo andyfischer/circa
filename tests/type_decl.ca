@@ -1,0 +1,7 @@
+
+type Point { float x, float y }
+-- a comment
+
+type Vector3 { float x, float y, float z }
+
+-- another comment

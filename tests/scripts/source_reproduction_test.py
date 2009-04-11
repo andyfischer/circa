@@ -12,4 +12,4 @@ if __name__ == "__main__":
     if result is not True:
         print result
     else:
-        print "Suceess"
+        print "Success"
