@@ -77,12 +77,47 @@ void train_sin()
     evaluate_branch(training);
 }
 
+void test_refresh_training_branch()
+{
+    Branch branch;
+
+    Term* a = branch.eval("a = 1.0");
+    Term* b = branch.eval("b = 2.0");
+    branch.eval("c = add(a, b)");
+    branch.eval("feedback(c, 4.0)");
+    a->boolProperty("trainable") = true;
+    b->boolProperty("trainable") = true;
+
+    refresh_training_branch(branch);
+
+    test_assert(branch.contains(TRAINING_BRANCH_NAME));
+    Branch& trainingBranch = as_branch(branch[TRAINING_BRANCH_NAME]);
+
+    bool foundAssignToA = false;
+    bool foundAssignToB = false;
+    for (int i=0; i < trainingBranch.numTerms(); i++) {
+        Term* term = trainingBranch[i];
+        if (term->function == ASSIGN_FUNC) {
+            if (term->input(1) == a)
+                foundAssignToA = true;
+            else if (term->input(1) == b)
+                foundAssignToB = true;
+            else
+                // there shouldn't be any other assign()s in there
+                test_assert(false);
+        }
+    }
+    test_assert(foundAssignToA);
+    test_assert(foundAssignToB);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(train_addition1);
     REGISTER_TEST_CASE(train_addition2);
     REGISTER_TEST_CASE(train_mult);
     REGISTER_TEST_CASE(train_sin);
+    REGISTER_TEST_CASE(test_refresh_training_branch);
 }
 
 } // namespace training_tests

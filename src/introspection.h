@@ -3,6 +3,11 @@
 #ifndef CIRCA_INTROSPECTION_INCLUDED
 #define CIRCA_INTROSPECTION_INCLUDED
 
+// introspection.h
+//
+// Functions for doing various queries on code. These functions should be mostly
+// side-effect free.
+
 namespace circa {
 
 bool is_value(Term* term);
@@ -25,6 +30,9 @@ bool has_compile_errors(Branch& branch);
 std::vector<std::string> get_compile_errors(Branch& branch);
 void print_compile_errors(Branch& branch, std::ostream& output);
 RefList get_influencing_values(Term* term);
+
+// Get a list of the set of terms which descent from 'inputs', and which have 'outputs'
+// as descendants.
 RefList get_involved_terms(RefList inputs, RefList outputs);
 
 }

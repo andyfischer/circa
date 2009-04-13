@@ -7,9 +7,11 @@
 
 namespace circa {
 
+extern const std::string TRAINING_BRANCH_NAME;
+
 bool is_trainable(Term* term);
-void update_derived_trainables(Branch& branch);
 void generate_training(Branch& branch, Term* subject, Term* desired);
+void refresh_training_branch(Branch& branch);
 
 } // namespace circa
 
