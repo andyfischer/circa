@@ -1,10 +1,10 @@
 
 import os, sys, glob 
 
-from scripts.Utils import *
+from tools.Utils import *
 
 # generate setup_builtin_functions.cpp and register_all_tests.cpp
-from scripts import generate_cpp_registration
+from tools import generate_cpp_registration
 generate_cpp_registration.do_builtin_functions(
     'src/builtin_functions',
     'src/setup_builtin_functions.cpp')
@@ -89,7 +89,7 @@ source_directory_into_one_cpp('src/builtin_functions', 'all_builtin_functions')
 circa_slib = ENV.StaticLibrary('lib/circa', BUILD_FILES)
 # circa_so = ENV.SharedLibrary('lib/circa', BUILD_FILES)
 
-circaBinary = ENV.Program('bin/circa', 'build/src/main.cpp', LIBS=[circa_slib])
+circaBinary = ENV.Program('build/bin/circa', 'build/src/main.cpp', LIBS=[circa_slib])
 
 ENV.SetOption('num_jobs', 2)
 ENV.Default(circaBinary)
@@ -111,5 +111,5 @@ SDL_ENV.Append(LIBPATH = "lib")
 SDL_ENV.Append(LIBS = [circa_slib])
 
 for app_name in read_file_as_lines('build_apps'):
-    SDL_ENV.Program('bin/'+app_name, app_name+'/main.cpp')
-    SDL_ENV.Alias(app_name, 'bin/'+app_name)
+    SDL_ENV.Program('build/bin/'+app_name, app_name+'/main.cpp')
+    SDL_ENV.Alias(app_name, 'build/bin/'+app_name)

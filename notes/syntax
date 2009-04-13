@@ -16,9 +16,15 @@ names have no type
   Though it might be nice to have a compiler hint pass that warns when a name changes type
 
 Array literals
-  [] or {} ?
-  Prefer []
-  Perhaps () ? (aka Lisp)
+  [] or {}?
+  Prefer []   [1 2 3]
+  Perhaps ()? (1 2 3)
+
+Array access
+  Everybody uses name[index]
+  Got any better ideas? Not really
+  Note that there is a possible collision if we have space-seperated lists, and we use []
+  for array literals. This: [foo [1] 2] would mean something different than: [foo[1] 2]
 
 Everything is an expression
   Probably a good thing
