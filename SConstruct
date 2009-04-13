@@ -1,5 +1,5 @@
 
-import os, sys, glob 
+import os, sys
 
 from tools.Utils import *
 
@@ -22,21 +22,14 @@ if POSIX:
     ENV.Append(CPPFLAGS=['-Wall'])
 
 if WINDOWS:
-    ENV.Append(CPPFLAGS=['/EHsc'])
-    ENV.Append(CPPFLAGS=['/RTC1'])
-    ENV.Append(CPPFLAGS=['/Wp64'])
-    ENV.Append(CPPFLAGS=['/MTd'])
-    ENV.Append(CPPFLAGS=['/Gm'])
-    ENV.Append(CPPFLAGS=['/Zi'])
+    ENV.Append(CPPFLAGS=['/EHsc /RTC1 /Wp64 /MTd /Gm /Zi'.split()])
     ENV.Append(LIBS = ['libcmtd'])
     ENV.Append(LINKFLAGS=['/NODEFAULTLIB:libc.lib'])
     ENV.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrt.lib'])
     ENV.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrtd.lib'])
     ENV.Append(LINKFLAGS=['/NODEFAULTLIB:libcd.lib'])
     ENV.Append(LINKFLAGS=['/NODEFAULTLIB:libcmt.lib'])
-    ENV.Append(LINKFLAGS=['/SUBSYSTEM:CONSOLE'])
-    ENV.Append(LINKFLAGS=['/MACHINE:X86'])
-
+    ENV.Append(LINKFLAGS=['/SUBSYSTEM:CONSOLE /MACHINE:X86'.split()])
 
 ENV.Append(CPPDEFINES = ["_DEBUG"])
 ENV.Append(CPPDEFINES = ["DEBUG"])
