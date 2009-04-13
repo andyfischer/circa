@@ -6,13 +6,15 @@
 
 namespace circa {
 
+const std::string TRAINING_BRANCH_NAME = "#training";
+
 bool is_trainable(Term* term)
 {
     return term->boolPropertyOptional("trainable", false)
         || term->boolPropertyOptional("derived-trainable", false);
 }
 
-void update_derived_trainables(Branch& branch)
+void update_derived_trainable_properties(Branch& branch)
 {
     for (CodeIterator it(&branch); !it.finished(); it.advance()) {
         // if any of our inputs are trainable then mark us as derived-trainable
@@ -40,6 +42,30 @@ void generate_training(Branch& branch, Term* subject, Term* desired)
             " doesn't have a generateTraining function" << std::endl;
         return;
     }
+}
+
+void refresh_training_branch(Branch& branch)
+{
+    update_derived_trainable_properties(branch);
+
+    // Check if '#training' branch exists. Create if it doesn't exist
+    if (!branch.contains(TRAINING_BRANCH_NAME)) {
+        apply(&branch, BRANCH_FUNC, RefList(), TRAINING_BRANCH_NAME);
+    }
+
+    Branch& trainingBranch = as_branch(branch[TRAINING_BRANCH_NAME]);
+
+    trainingBranch.clear();
+
+    // Generate training for every feedback() function in this branch
+    for (int i = 0; i < branch.numTerms(); i++) {
+        Term* term = branch[i];
+        if (term->function == FEEDBACK_FUNC) {
+            generate_training(trainingBranch, term->input(0), term->input(1));
+        }
+    }
+
+    // TODO: Normalize trainingBranch
 }
 
 } // namespace circa

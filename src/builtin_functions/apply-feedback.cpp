@@ -2,6 +2,8 @@
 
 #include <circa.h>
 
+// This function is deprecated
+
 namespace circa {
 namespace apply_feedback_function {
 

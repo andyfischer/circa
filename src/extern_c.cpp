@@ -1,5 +1,10 @@
 // Copyright 2008 Andrew Fischer
 
+// extern_c.cpp
+//
+// In this file, we provide various public functions in an extern "C" block, so that this library
+// can be loaded as a C library. (for example, with Python's ctypes)
+
 #include "circa.h"
 
 using namespace circa;

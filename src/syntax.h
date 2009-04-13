@@ -3,6 +3,10 @@
 #ifndef CIRCA_SOURCE_INCLUDED
 #define CIRCA_SOURCE_INCLUDED
 
+// syntax.h
+//
+// Various functions for dealing with syntax preservation and reproduction
+
 namespace circa {
 
 std::string& get_input_syntax_hint(Term* term, int index, std::string const& field);
