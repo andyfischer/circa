@@ -34,8 +34,8 @@ struct Branch
     void append(Term* term);
 
     void remove(std::string const& name);
-
     void remove(int index);
+    void removeNulls();
 
     // Returns true if there is a term with the given name
     bool contains(std::string const& name) const

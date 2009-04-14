@@ -14,6 +14,20 @@ bool is_trainable(Term* term)
         || term->boolPropertyOptional("derived-trainable", false);
 }
 
+void generate_training(Branch& branch, Term* subject, Term* desired)
+{
+    Function& targetsFunction = as_function(subject->function);
+
+    if (targetsFunction.generateTraining != NULL)
+    {
+        targetsFunction.generateTraining(branch, subject, desired);
+    } else {
+        std::cout << "warn: function " << targetsFunction.name <<
+            " doesn't have a generateTraining function" << std::endl;
+        return;
+    }
+}
+
 void update_derived_trainable_properties(Branch& branch)
 {
     for (CodeIterator it(&branch); !it.finished(); it.advance()) {
@@ -30,18 +44,53 @@ void update_derived_trainable_properties(Branch& branch)
     }
 }
 
-void generate_training(Branch& branch, Term* subject, Term* desired)
+void normalize_training_branch(Branch& branch)
 {
-    Function& targetsFunction = as_function(subject->function);
+    // Look for any terms that have multiple assign() functions, and combine them with
+    // a feedback-accumulator to one assign()
+    
+    // First, make a map of every assigned-to term and the index of every related 
+    // assign() term
+    std::map<Term*, std::vector<int> > termToAssignTerms;
 
-    if (targetsFunction.generateTraining != NULL)
-    {
-        targetsFunction.generateTraining(branch, subject, desired);
-    } else {
-        std::cout << "warn: function " << targetsFunction.name <<
-            " doesn't have a generateTraining function" << std::endl;
-        return;
+    for (int i=0; i < branch.numTerms(); i++) {
+        Term* term = branch[i];
+        if (term->function == ASSIGN_FUNC) {
+            Term* target = term->input(1);
+            termToAssignTerms[target].push_back(i);
+        }
     }
+
+    // Then, iterate over assigned-to terms
+    std::map<Term*, std::vector<int> >::const_iterator it;
+    for (it = termToAssignTerms.begin(); it != termToAssignTerms.end(); ++it) {
+        int assignCount = (int) it->second.size();
+        if (assignCount > 1) {
+
+            Term* target = it->first;
+
+            // Remove all of the assign() terms, and make a list of terms to send
+            // to the feedback-accumulator
+            std::vector<int>::const_iterator index_it;
+            RefList accumulatorInputs;
+
+            for (index_it = it->second.begin(); index_it != it->second.end(); ++index_it) {
+                int index = *index_it;
+                assert(branch[index] != NULL);
+                accumulatorInputs.append(branch[index]->input(0));
+                branch[index] = NULL;
+            }
+
+            // Create a call to their feedback-accumulator
+            // TODO: Should probably choose the accumulator func based on type
+            Term* accumulator = apply(&branch, AVERAGE_FUNC, accumulatorInputs);
+
+            // assign() this
+            apply(&branch, ASSIGN_FUNC, RefList(accumulator, target));
+        }
+    }
+
+    branch.removeNulls();
 }
 
 void refresh_training_branch(Branch& branch)
@@ -65,7 +114,7 @@ void refresh_training_branch(Branch& branch)
         }
     }
 
-    // TODO: Normalize trainingBranch
+    normalize_training_branch(trainingBranch);
 }
 
 } // namespace circa
