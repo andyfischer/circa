@@ -1,1 +1,1 @@
-typeof(1) -> to-string -> print
+typeof(1) -> to_string -> print

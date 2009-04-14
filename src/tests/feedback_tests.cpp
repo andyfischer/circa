@@ -19,7 +19,7 @@ void test_var_feedback()
     test_assert(a->function == as_type(INT_TYPE).valueFunction);
     test_assert(as_function(a->function).feedbackPropogateFunction != NULL);
 
-    Term* apply_feedback = branch.eval("apply-feedback(a, 2)");
+    Term* apply_feedback = branch.eval("apply_feedback(a, 2)");
 
     if (apply_feedback->hasError()) {
         std::cout << apply_feedback->getErrorMessage() << std::endl;
@@ -31,7 +31,7 @@ void test_var_feedback()
     // test string
     Term* str = branch.eval("str = \"sofa\"?");
     test_assert(as_string(str) == "sofa");
-    branch.eval("apply-feedback(str, \"lamp\")");
+    branch.eval("apply_feedback(str, \"lamp\")");
     test_assert(as_string(str) == "lamp");
 }
 
@@ -40,7 +40,7 @@ void test_add_feedback()
     Branch branch;
     Term* a = branch.eval("a = 1.0?");
     branch.eval("sum = add(a,a)");
-    branch.eval("apply-feedback(sum, 3.0)");
+    branch.eval("apply_feedback(sum, 3.0)");
 
     test_assert(as_float(a) == 1.5);
 }

@@ -1,7 +1,7 @@
 
 -- simple test
 for i in range(5)
-  i -> to-string -> print
+  i -> to_string -> print
 end
 
 -- iterate over a collection
@@ -13,7 +13,7 @@ end
 -- iterate with a stateful value
 for i in range(4)
   state string result = ''
-  result = concat(i -> to-string, result)
+  result = concat(i -> to_string, result)
   result -> print
 end
 
@@ -22,7 +22,7 @@ x = 10.0
 for i in range(4)
   x += 2.0
 end
-x -> to-string -> print
+x -> to_string -> print
 
 -- if statement inside a for loop
 for i in range(5)

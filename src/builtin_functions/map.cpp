@@ -67,7 +67,7 @@ namespace map_function {
         as_function(main_func).stateType = kernel["Map"];
 
         FEEDBACK_PROPOGATE = import_function(kernel, feedback_propogate::evaluate,
-                "function map-feedback(any, any)");
+                "function map_feedback(any, any)");
         as_function(FEEDBACK_PROPOGATE).setInputMeta(0, true);
     }
 }

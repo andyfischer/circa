@@ -24,7 +24,7 @@ namespace greater_than_function {
     void setup(Branch& kernel)
     {
         Term* main_func = import_function(kernel, evaluate,
-                "function greater-than(any,any) -> bool");
+                "function greater_than(any,any) -> bool");
         as_function(main_func).pureFunction = true;
     }
 }

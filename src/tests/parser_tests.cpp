@@ -175,7 +175,7 @@ void test_function_decl()
     test_assert(funcbranch[3]->input(1) == funcbranch[1]);
     test_assert(funcbranch[3]->input(1) == funcbranch[1]);
     test_assert(funcbranch[4]->asInt() == 3);
-    test_equals(funcbranch[5]->function->name, "greater-than");
+    test_equals(funcbranch[5]->function->name, "greater_than");
     test_assert(funcbranch[5]->input(0) == funcbranch[2]);
     test_assert(funcbranch[5]->input(1) == funcbranch[4]);
     test_equals(funcbranch[5]->name, "#return");
@@ -204,11 +204,11 @@ void test_stateful_value_decl()
 void test_arrow_concatenation()
 {
     Branch branch;
-    Term* a = parser::compile(&branch, parser::statement, "1 -> to-string");
+    Term* a = parser::compile(&branch, parser::statement, "1 -> to_string");
 
     test_assert(branch[0]->asInt() == 1);
     test_assert(branch[1] == a);
-    test_equals(branch[1]->function->name, "to-string");
+    test_equals(branch[1]->function->name, "to_string");
     test_assert(branch[1]->input(0) == branch[0]);
     test_assert(branch[1]->type == STRING_TYPE);
     test_assert(branch.numTerms() == 2);
@@ -218,12 +218,12 @@ void test_arrow_concatenation2()
 {
     Branch branch;
     Term* a = parser::compile(&branch, parser::statement,
-        "0.0 -> cos -> to-string");
+        "0.0 -> cos -> to_string");
 
     test_assert(branch[0]->asFloat() == 0.0);
     test_equals(branch[1]->function->name, "cos");
     test_assert(branch[1]->input(0) == branch[0]);
-    test_equals(branch[2]->function->name, "to-string");
+    test_equals(branch[2]->function->name, "to_string");
     test_assert(branch[2]->input(0) == branch[1]);
     test_assert(branch[2] == a);
     test_assert(branch.numTerms() == 3);
@@ -290,7 +290,7 @@ void test_rebinding_infix_operator()
 
 void test_if_joining_on_bool()
 {
-    // The following code once had a bug where if-expr wouldn't work
+    // The following code once had a bug where if_expr wouldn't work
     // if one of its inputs was missing value.
     Branch branch;
     Term* s = branch.eval("hey = true");

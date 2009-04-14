@@ -16,7 +16,7 @@ namespace evaluate_file_function {
     void setup(Branch& kernel)
     {
         /*Term* main_func = */import_function(kernel, evaluate,
-                "function evaluate-file(string) -> Branch");
+                "function evaluate_file(string) -> Branch");
     }
 }
 } // namespace circa

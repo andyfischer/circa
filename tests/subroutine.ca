@@ -9,9 +9,9 @@ function square(float a) -> float
     return mult(a,a)
 end
 
-print(concat("Four squared is ", square(4.0).to-string))
+print(concat("Four squared is ", square(4.0).to_string))
 
 five_squared = square(5.0)
 
-print(concat("Five squared is ", five_squared.to-string))
+print(concat("Five squared is ", five_squared.to_string))
 

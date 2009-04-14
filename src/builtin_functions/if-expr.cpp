@@ -42,7 +42,7 @@ namespace if_expr_function {
     void setup(Branch& kernel)
     {
         Term* main_func = import_function(kernel, evaluate,
-                "function if-expr(bool,any,any) -> any");
+                "function if_expr(bool,any,any) -> any");
         as_function(main_func).specializeType = specializeType;
         as_function(main_func).pureFunction = true;
         as_function(main_func).setInputMeta(1, true);

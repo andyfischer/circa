@@ -14,7 +14,7 @@ namespace branch_append_function {
     void setup(Branch& kernel)
     {
         Term* main_func = import_function(kernel, evaluate,
-                "function branch-append(Branch, any) -> Branch");
+                "function branch_append(Branch, any) -> Branch");
         as_function(main_func).pureFunction = true;
     }
 }

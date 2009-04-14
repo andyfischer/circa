@@ -1,15 +1,15 @@
 
 -- simple
-{1, 2, 3} -> to-string -> print
+{1, 2, 3} -> to_string -> print
 
 -- identifiers
 a = "hey"
 b = "ho"
-{a,b} -> to-string -> print
+{a,b} -> to_string -> print
 
 -- in a function
 function my_func(int a, int b)
-  {a,b} -> to-string -> print
+  {a,b} -> to_string -> print
 end
 
 my_func(42, 12)

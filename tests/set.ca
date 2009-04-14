@@ -2,28 +2,28 @@ s = Set()
 
 s.add(1)
 
-s.to-string.print
+s.to_string.print
 
 s.add(2)
 s.add(3)
 
-s.to-string.print
+s.to_string.print
 
 s.remove(2)
 
-s.to-string.print
+s.to_string.print
 
 s.add(2)
 s.add(2)
 s.add(2)
 
-s.to-string.print
+s.to_string.print
 
 left = set(1,2,4)
 right = set(4,5)
 
-left.to-string.print
+left.to_string.print
 
-u = set-union(left,right)
+u = set_union(left,right)
 
-u.to-string.print
+u.to_string.print

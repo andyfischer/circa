@@ -76,7 +76,7 @@ int circa_main(std::vector<std::string> args)
         Branch workspace;
         string_value(&workspace, args[0], "filename");
 
-        Term* evaluated_file = workspace.eval("evaluate-file(filename)");
+        Term* evaluated_file = workspace.eval("evaluate_file(filename)");
         if (evaluated_file->hasError()) {
             std::cout << "Parsing error: " << evaluated_file->getErrorMessage()
                 << std::endl;
