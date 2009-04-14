@@ -1,4 +1,4 @@
 cd $CIRCA_HOME
-echo "$1" >> build_apps
-cp -r $2 $1
-sed -i '' s/$2/$1/g $1/*
+echo "$2" >> build_apps
+cp -r $1 $2
+sed -i '' s/$1/$2/g $2/*
