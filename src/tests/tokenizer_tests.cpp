@@ -18,7 +18,7 @@ namespace tokenizer_tests {
 void test_identifiers()
 {
     token::TokenList results;
-    token::tokenize("word has_underscore has-hyphen,hasnumbers183", results);
+    token::tokenize("word has_underscore has_hyphen,hasnumbers183", results);
 
     test_assert(results.size() == 7);
 
@@ -30,7 +30,7 @@ void test_identifiers()
     test_assert(results[2].match == token::IDENTIFIER);
     test_assert(results[3].text == " ");
     test_assert(results[3].match == token::WHITESPACE);
-    test_assert(results[4].text == "has-hyphen");
+    test_assert(results[4].text == "has_hyphen");
     test_assert(results[4].match == token::IDENTIFIER);
     test_assert(results[5].text == ",");
     test_assert(results[5].match == token::COMMA);

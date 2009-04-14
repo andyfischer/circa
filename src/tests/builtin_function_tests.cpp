@@ -75,8 +75,8 @@ void test_bool()
 {
     Branch branch;
 
-    test_assert(as_string(branch.eval("if-expr(true, 'a', 'b')")) == "a");
-    test_assert(as_string(branch.eval("if-expr(false, 'a', 'b')")) == "b");
+    test_assert(as_string(branch.eval("if_expr(true, 'a', 'b')")) == "a");
+    test_assert(as_string(branch.eval("if_expr(false, 'a', 'b')")) == "b");
 }
 
 void test_builtin_equals()

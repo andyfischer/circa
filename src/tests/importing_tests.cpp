@@ -20,12 +20,12 @@ void test_import_c()
     Branch branch;
 
     Term* func_as_term = import_function(branch, my_imported_function,
-            "function my-imported-func(int,int) -> int");
+            "function my_imported_func(int,int) -> int");
 
     test_assert(as_function(func_as_term).outputType == INT_TYPE);
     test_assert(as_function(func_as_term).stateType == VOID_TYPE);
 
-    Term* result = branch.eval("my-imported-func(4,5)");
+    Term* result = branch.eval("my_imported_func(4,5)");
 
     test_assert(as_int(result) == 9);
 }

@@ -14,7 +14,7 @@ void create()
 {
     Branch branch;
 
-    Term* sub = branch.eval("sub = subroutine-create('my-sub', tuple(int), string)");
+    Term* sub = branch.eval("sub = subroutine_create('my-sub', tuple(int), string)");
 
     test_assert(!sub->hasError());
 
@@ -29,9 +29,9 @@ void using_apply()
 {
     Branch branch;
 
-    branch.eval("sub = subroutine-create('s', tuple(float), float)");
-    branch.eval("function-name-input(@sub, 0, 'x')");
-    branch.eval("subroutine-apply(@sub, \"return add(mult(x,2.0),5.0)\")");
+    branch.eval("sub = subroutine_create('s', tuple(float), float)");
+    branch.eval("function_name_input(@sub, 0, 'x')");
+    branch.eval("subroutine_apply(@sub, \"return add(mult(x,2.0),5.0)\")");
 
     // now run it
     Term* result = branch.eval("result = sub(2.0)");
@@ -51,10 +51,10 @@ void subroutine_binding_input_names()
 {
     Branch branch;
 
-    Term* mysub = branch.eval("mysub = subroutine-create('mysub', tuple(int), void)");
+    Term* mysub = branch.eval("mysub = subroutine_create('mysub', tuple(int), void)");
     test_assert(mysub != NULL);
 
-    mysub = branch.eval("function-name-input(@mysub, 0, 'a')");
+    mysub = branch.eval("function_name_input(@mysub, 0, 'a')");
 
     test_assert(find_named(&as_function(mysub).subroutineBranch,"a") != NULL);
 }

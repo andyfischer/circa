@@ -1,18 +1,18 @@
 
 simple = 1
 simple := 2
-print(concat('should be two: ', simple.to-string))
+print(concat('should be two: ', simple.to_string))
 
 x = 1.0?
 x + 1.0 := 4.0
-print(concat('should be three: ', x.to-string))
+print(concat('should be three: ', x.to_string))
 
 x = 1.0?
 1.0 + x := 5.0
-print(concat('should be four: ', x.to-string))
+print(concat('should be four: ', x.to_string))
 
 x = 1.0?
 y = 1.0?
 x + y := 3.0
-print(concat('should be 1.5: ', x.to-string))
-print(concat('should be 1.5: ', y.to-string))
+print(concat('should be 1.5: ', x.to_string))
+print(concat('should be 1.5: ', y.to_string))

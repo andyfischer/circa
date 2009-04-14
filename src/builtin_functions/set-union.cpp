@@ -21,7 +21,7 @@ namespace set_union_function {
     void setup(Branch& kernel)
     {
         Term* main_func = import_function(kernel, evaluate,
-                "function set-union(Set) -> Set");
+                "function set_union(Set) -> Set");
         as_function(main_func).pureFunction = true;
         as_function(main_func).variableArgs = true;
     }

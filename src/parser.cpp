@@ -449,7 +449,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             Term* outerVersion = find_named(&branch, name);
             Term* innerVersion = innerBranch[name];
 
-            Term* joining = apply(&joiningBranch, "if-expr",
+            Term* joining = apply(&joiningBranch, "if_expr",
                     RefList(condition, innerVersion, outerVersion));
 
             // Bind these names in the outer branch
@@ -715,14 +715,14 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "-") return "sub";
     else if (infix == "*") return "mult";
     else if (infix == "/") return "div";
-    else if (infix == "<") return "less-than";
-    else if (infix == "<=") return "less-than-eq";
-    else if (infix == ">") return "greater-than";
-    else if (infix == ">=") return "greater-than-eq";
+    else if (infix == "<") return "less_than";
+    else if (infix == "<=") return "less_than-eq";
+    else if (infix == ">") return "greater_than";
+    else if (infix == ">=") return "greater_than_eq";
     else if (infix == "==") return "equals";
     else if (infix == "||") return "or";
     else if (infix == "&&") return "and";
-    else if (infix == ":=") return "apply-feedback";
+    else if (infix == ":=") return "apply_feedback";
     else if (infix == "+=") return "add";
     else if (infix == "-=") return "sub";
     else if (infix == "*=") return "mult";
@@ -768,8 +768,8 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             Type& lhsType = as_type(leftExpr->type);
 
             // Field access is not very robust right now. We currently decide at compile-time
-            // whether to do a member function call or a get-field, and this decision is
-            // not perfect. The proper thing would be to always do get-field and then allow
+            // whether to do a member function call or a get_field, and this decision is
+            // not perfect. The proper thing would be to always do get_field and then allow
             // for a call to a by-value function.
 
             // Another problem is that we allow for the syntax value.function, where 'function'
@@ -1166,7 +1166,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
 
     Term* result = find_named(&branch, id);
 
-    // If not found, create an instance of unknown-identifier
+    // If not found, create an instance of unknown_identifier
     if (result == NULL) {
         result = apply(&branch, UNKNOWN_IDENTIFIER_FUNC, RefList());
         result->boolProperty("syntaxHints:hidden") = true;

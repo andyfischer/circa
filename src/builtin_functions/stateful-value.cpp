@@ -31,7 +31,7 @@ namespace stateful_value_function {
 
     void setup(Branch& kernel)
     {
-        STATEFUL_VALUE_FUNC = import_function(kernel, evaluate, "stateful-value(any) -> any");
+        STATEFUL_VALUE_FUNC = import_function(kernel, evaluate, "stateful_value(any) -> any");
         as_function(STATEFUL_VALUE_FUNC).generateTraining = generateTraining;
         as_function(STATEFUL_VALUE_FUNC).toSourceString = toSourceString;
     }

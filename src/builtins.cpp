@@ -393,7 +393,7 @@ void initialize_builtin_functions(Branch& kernel)
     setup_builtin_functions(kernel);
 
     VALUE_FUNCTION_FEEDBACK_ASSIGN = import_function(kernel,
-        var_function::feedback_assign, "var-function-feedback-assign(any,any)");
+        var_function::feedback_assign, "var_function_feedback_assign(any,any)");
 
     as_function(get_value_function(INT_TYPE)).feedbackPropogateFunction = 
         VALUE_FUNCTION_FEEDBACK_ASSIGN;

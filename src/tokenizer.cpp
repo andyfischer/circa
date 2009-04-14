@@ -422,9 +422,18 @@ void consume_identifier(TokenizeContext &context)
 {
     std::stringstream text;
 
+    bool deprecated = false;
+
     while (is_acceptable_inside_identifier(context.next())) {
+        if (context.next() == '-')
+            deprecated = true;
         text << context.consume();
     }
+
+    // TODO: Remove this, once we're sure that dashes are really gone
+    if (deprecated)
+        std::cout << "warning, dashes are no longer allowed in idents: "
+            << text.str() << std::endl;
 
     context.pushResult(IDENTIFIER, text.str());
 }

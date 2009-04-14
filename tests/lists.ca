@@ -1,18 +1,18 @@
 
 l = [1,2]
 
-print(l -> to-string)
-print(l.count() -> to-string)
-print(l -> to-string)
+print(l -> to_string)
+print(l.count() -> to_string)
+print(l -> to_string)
 
 l.append(3)
 
-print(l -> to-string)
-print(l.count() -> to-string)
+print(l -> to_string)
+print(l.count() -> to_string)
 
-[1,2,3] -> to-string -> print
+[1,2,3] -> to_string -> print
 
 
 -- omitting commas
 l = [1 2 3]
-l -> to-string -> print
+l -> to_string -> print

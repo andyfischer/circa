@@ -1,16 +1,16 @@
 
 
-function fill-rectangle(float x1, float y1, float x2, float y2, int color)
-  concat('called fill-rectangle: ', {x1, y1, x2, y2, color} -> to-string) -> print
+function fill_rectangle(float x1, float y1, float x2, float y2, int color)
+  concat('called fill_rectangle: ', {x1, y1, x2, y2, color} -> to_string) -> print
 end
 
-function draw-text(string text, float x, float y, int color)
-  concat('called draw-text: ', {text, x, y, color} -> to-string) -> print
+function draw_text(string text, float x, float y, int color)
+  concat('called draw_text: ', {text, x, y, color} -> to_string) -> print
 end
 
 
-function draw-popup(float x, float y, List names)
-  concat('called draw-popup: ', {x,y,names} -> to-string) -> print
+function draw_popup(float x, float y, List names)
+  concat('called draw_popup: ', {x,y,names} -> to_string) -> print
   padding_x = 5
   padding_y = 5.0
   item_height = 15.0
@@ -18,10 +18,10 @@ function draw-popup(float x, float y, List names)
   total_height = item_height * names.count() + padding_y * 2
 
   for name in names
-      fill-rectangle(x, y, x+total_width, y+total_height, 0)
-      draw-text(name, x, y, 0)
+      fill_rectangle(x, y, x+total_width, y+total_height, 0)
+      draw_text(name, x, y, 0)
   end
 end
 
 names = {"Button1", "Button2", "Button3"}
-draw-popup(30.0, 30.0, names)
+draw_popup(30.0, 30.0, names)

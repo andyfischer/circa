@@ -24,7 +24,7 @@ void init_test_functions(Branch& branch)
 {
     import_function(branch, spy_function, "function spy(string)");
     import_function(branch, i_only_throw_errors,
-            "function i-only-throw-errors() -> string");
+            "function i_only_throw_errors() -> string");
 }
 
 void test_simple()
@@ -55,7 +55,7 @@ void blocked_by_error()
     gSpyResults.clear();
 
     Term *spy_1 = branch.compile("spy('1')");
-    Term *error = branch.compile("e = i-only-throw-errors()");
+    Term *error = branch.compile("e = i_only_throw_errors()");
     Term *spy_errored = branch.compile("spy(e)");
 
     test_assert(gSpyResults.size() == 0);
