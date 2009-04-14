@@ -109,6 +109,33 @@ void test_refresh_training_branch()
     }
     test_assert(foundAssignToA);
     test_assert(foundAssignToB);
+
+    // now run our branch
+    evaluate_branch(branch);
+
+    test_assert(a->asFloat() == 1.5);
+    test_assert(b->asFloat() == 2.5);
+}
+
+void test_refresh_training_branch2()
+{
+    // make sure that refresh_training_branch is properly normalizing assign() functions
+    Branch branch;
+    branch.eval("a = 1.0");
+    branch.eval("feedback(a, 2.0)");
+    branch.eval("feedback(a, 3.0)");
+    refresh_training_branch(branch);
+
+    Branch& tbranch = as_branch(branch[TRAINING_BRANCH_NAME]);
+    int assignCount = 0;
+
+    for (int i=0; i < tbranch.numTerms(); i++) {
+        if (tbranch[i]->function == ASSIGN_FUNC)
+            assignCount++;
+    }
+
+    test_assert(assignCount > 0);
+    test_assert(assignCount == 1);
 }
 
 void register_tests()
@@ -118,6 +145,7 @@ void register_tests()
     REGISTER_TEST_CASE(train_mult);
     REGISTER_TEST_CASE(train_sin);
     REGISTER_TEST_CASE(test_refresh_training_branch);
+    REGISTER_TEST_CASE(test_refresh_training_branch2);
 }
 
 } // namespace training_tests

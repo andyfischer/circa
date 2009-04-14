@@ -54,10 +54,16 @@ void Branch::remove(int index)
 
     Term* term = _terms[index];
 
+    // remove name binding if necessary
     if (term != NULL && (term->name != "") && (names[term->name] == term))
         names.remove(term->name);
 
     _terms.remove(index);
+}
+
+void Branch::removeNulls()
+{
+    _terms.removeNulls();
 }
 
 Term* Branch::findFirstBinding(std::string const& name) const
