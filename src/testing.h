@@ -29,9 +29,15 @@ struct TestCase {
 
     std::string name;
     TestExecuteFunction execute;
+    bool failed;
+
+    TestCase()
+      : execute(NULL), failed(false)
+    {
+    }
 
     TestCase(std::string const& _name, TestExecuteFunction _execute)
-      : name(_name), execute(_execute)
+      : name(_name), execute(_execute), failed(false)
     {
     }
 };
@@ -40,9 +46,11 @@ extern std::vector<TestCase> gTestCases;
 
 #define REGISTER_TEST_CASE(f) gTestCases.push_back(TestCase(#f,f))
 
-void run_test(std::string const& testName);
+void run_test_named(std::string const& testName);
 void run_all_tests();
 std::vector<std::string> list_all_test_names();
+std::string get_current_test_name();
+void declare_current_test_failed();
 
 } // namespace circa
 

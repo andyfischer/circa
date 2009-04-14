@@ -9,6 +9,8 @@ namespace circa {
 
 std::vector<TestCase> gTestCases;
 
+TestCase gCurrentTestCase;
+
 // this function is defined in register_all_tests.cpp
 void register_all_tests();
 
@@ -96,9 +98,14 @@ void _test_equals_function(std::string a, std::string b,
 bool run_test_catching(TestCase& testCase)
 {
     try {
+        gCurrentTestCase = testCase;
         testCase.execute();
+
+        // the test code may declare itself failed
+        bool result = !gCurrentTestCase.failed;
+
         post_test_sanity_check();
-        return true;
+        return result;
     }
     catch (std::runtime_error const& err) {
         std::cout << "Error white running test case " << testCase.name << std::endl;
@@ -109,14 +116,16 @@ bool run_test_catching(TestCase& testCase)
 
 bool run_test(TestCase& testCase)
 {
+    gCurrentTestCase = testCase;
+
     testCase.execute();
 
     post_test_sanity_check();
 
-    return true;
+    return !gCurrentTestCase.failed;
 }
 
-void run_test(std::string const& testName)
+void run_test_named(std::string const& testName)
 {
     register_all_tests();
 
@@ -173,6 +182,16 @@ std::vector<std::string> list_all_test_names()
         output.push_back(it->name);
 
     return output;
+}
+
+std::string get_current_test_name()
+{
+    return gCurrentTestCase.name;
+}
+
+void declare_current_test_failed()
+{
+    gCurrentTestCase.failed = true;
 }
 
 }
