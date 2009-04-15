@@ -294,6 +294,8 @@ Term* get_value_function(Term* typeTerm)
     Term* result = apply_and_eval(NULL, VALUE_FUNCTION_GENERATOR, RefList(typeTerm));
     assert(result->input(0) == typeTerm);
 
+    result->name = as_function(result).name;
+
     // Save this result on the type, for future calls
     type.valueFunction = result;
 

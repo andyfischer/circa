@@ -79,12 +79,10 @@ std::string term_to_raw_string(Term* term)
     std::string funcName = get_short_local_name(term->function);
     std::string typeName = term->type->name;
 
-    output << "#" << term->globalID;
+    output << "#" << term->globalID << " ";
 
     if (name != "")
-        output << " [" << name << "]";
-
-    output << ": ";
+        output << "'" << name << "' ";
 
     output << funcName << "(";
 
@@ -99,7 +97,7 @@ std::string term_to_raw_string(Term* term)
     output << ")";
 
     if (term->type != VOID_TYPE)
-        output << " -> " << typeName;
+        output << " : " << typeName;
 
     bool showValue = term->value != NULL;
 
