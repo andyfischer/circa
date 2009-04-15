@@ -25,7 +25,7 @@ void CodeIterator::reset(Branch* branch)
 
     postAdvance();
 }
-    
+
 Term* CodeIterator::current()
 {
     assert(!finished());
