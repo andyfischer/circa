@@ -231,7 +231,9 @@ Term* statement(Branch& branch, TokenStream& tokens)
     }
 
     prepend_whitespace(result, preWhitespace);
+
     append_whitespace(result, possible_whitespace(tokens));
+    append_whitespace(result, possible_newline(tokens));
 
     return result;
 }
@@ -333,8 +335,6 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     tokens.consume(END);
 
-    append_whitespace(result, possible_newline(tokens));
-
     return result;
 }
 
@@ -380,9 +380,6 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
 
     tokens.consume(RBRACE);
 
-    append_whitespace(result, possible_whitespace(tokens));
-    append_whitespace(result, possible_newline(tokens));
-
     return result;
 }
 
@@ -406,13 +403,9 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     innerBranch.outerScope = &branch;
 
     consume_branch_until_end(innerBranch, tokens);
+    remove_compilation_attrs(innerBranch);
 
     tokens.consume(END);
-
-    append_whitespace(result, possible_whitespace(tokens));
-    append_whitespace(result, possible_newline(tokens));
-
-    remove_compilation_attrs(innerBranch);
 
     // Create the joining branch
     Term* joining = apply(&branch, BRANCH_FUNC, RefList(), "#joining");
@@ -567,9 +560,6 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     else
         alloc_value(result);
 
-    append_whitespace(result, possible_whitespace(tokens));
-    append_whitespace(result, possible_newline(tokens));
-
     return result;
 }
 
@@ -624,11 +614,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     if (result->name != "" && names.length() > 0) {
         result = apply(&branch, COPY_FUNC, RefList(result));
         result->stringProperty("syntaxHints:declarationStyle") = "function-specific";
-        //result->boolProperty("syntaxHints:hidden") = true;
     }
-
-    append_whitespace(result, possible_whitespace(tokens));
-    append_whitespace(result, possible_newline(tokens));
 
     std::string pendingRebind = pop_pending_rebind(branch);
 
@@ -661,7 +647,6 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     Term* result = infix_expression(branch, tokens);
-    append_whitespace(result, possible_newline(tokens));
 
     branch.bindName(result, "#return");
     
