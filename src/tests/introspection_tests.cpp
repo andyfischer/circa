@@ -119,6 +119,10 @@ void reproduce_infix() {
     round_trip_source("coersion = 1 + 2");
     round_trip_source("complex = 1 + 2 + 3.0 + 4.0");
     round_trip_source("   5 + 4");
+    round_trip_source("5    + 4");
+    round_trip_source("5 +    4");
+    round_trip_source("5 + 4   ");
+    round_trip_source("5+4");
     //round_trip_source("complex = (4.0 + 3.0) + 2.0");
     finish_source_repro_category();
 }

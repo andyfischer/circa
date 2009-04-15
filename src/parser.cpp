@@ -815,12 +815,13 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             // Next, if this type defines this field
             } else if (lhsType.findFieldIndex(rhsIdent) != -1) {
 
-                result = apply(&branch, GET_FIELD_FUNC, RefList(leftExpr));
-                as_int(result->state) = lhsType.findFieldIndex(rhsIdent);
+                result = apply(&branch, GET_FIELD_BY_NAME_FUNC, RefList(leftExpr));
+                as_string(result->state) = rhsIdent;
 
                 specialize_type(result, lhsType[rhsIdent].type);
 
             // Next, allow for dynamic lookup on a compound type
+            // (currently disabled)
             /*} else if (is_compound_type(lhsType)) {
                 function = GET_FIELD_FUNC;
                 assert(function != NULL);
