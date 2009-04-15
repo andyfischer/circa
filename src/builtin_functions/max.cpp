@@ -14,8 +14,7 @@ namespace max_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
-                "function max(float,float) -> float");
+        Term* main_func = import_function(kernel, evaluate, "max(float,float) -> float");
         as_function(main_func).pureFunction = true;
     }
 }

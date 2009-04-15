@@ -17,8 +17,7 @@ namespace write_text_file_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
-                "function write_text_file(string, string)");
+        Term* main_func = import_function(kernel, evaluate, "write_text_file(string, string)");
         as_function(main_func).pureFunction = false;
     }
 }

@@ -26,8 +26,7 @@ namespace comment_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
-                "function comment()");
+        Term* main_func = import_function(kernel, evaluate, "comment()");
         as_function(main_func).pureFunction = true;
 
         Term* stateT = create_compound_type(kernel, "comment::State");

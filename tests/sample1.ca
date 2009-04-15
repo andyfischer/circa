@@ -2,7 +2,7 @@
 --screen = SDL_Surface()
 background = load_image('background.bmp')
 
-function redraw()
+def redraw()
     apply_surface(screen, background, 0, 0)
 
     mouse_x = 3.0

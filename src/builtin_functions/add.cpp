@@ -91,13 +91,12 @@ namespace add_function {
 
     void setup(Branch& kernel)
     {
-        ADD_FUNC = import_function(kernel, evaluate,
-                "function add(float,float) -> float");
+        ADD_FUNC = import_function(kernel, evaluate, "add(float,float) -> float");
         as_function(ADD_FUNC).pureFunction = true;
         as_function(ADD_FUNC).generateTraining = generateTraining;
 
         Term* fp_func = import_function(kernel, feedback_propogate,
-                "function add_feedback_propogate(any,any)");
+                "add_feedback_propogate(any,any)");
         as_function(fp_func).stateType = BRANCH_TYPE;
         as_function(ADD_FUNC).feedbackPropogateFunction = fp_func;
     }

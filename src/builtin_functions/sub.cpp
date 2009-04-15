@@ -12,7 +12,7 @@ namespace sub_function {
 
     void setup(Branch& kernel)
     {
-        SUB_FUNC = import_function(kernel, evaluate, "function sub(float,float) -> float");
+        SUB_FUNC = import_function(kernel, evaluate, "sub(float,float) -> float");
         as_function(SUB_FUNC).pureFunction = true;
     }
 }

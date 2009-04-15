@@ -39,7 +39,7 @@ if true
 end
 
 -- for loop inside a function
-function look_for_3(List numbers)
+def look_for_3(List numbers)
   for i in numbers
     if i == 3
       print("inside function passed")

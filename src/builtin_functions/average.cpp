@@ -21,8 +21,7 @@ namespace average_function {
 
     void setup(Branch& kernel)
     {
-        AVERAGE_FUNC = import_function(kernel, evaluate,
-                "function average(float) -> float");
+        AVERAGE_FUNC = import_function(kernel, evaluate, "average(float) -> float");
         as_function(AVERAGE_FUNC).pureFunction = true;
         as_function(AVERAGE_FUNC).variableArgs = true;
     }

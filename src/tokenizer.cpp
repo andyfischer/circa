@@ -51,7 +51,7 @@ const char* get_token_text(int match)
         case ELSE: return "else";
         case FOR: return "for";
         case STATE: return "state";
-        case FUNCTION: return "function";
+        case DEF: return "def";
         case TYPE: return "type";
         case RETURN: return "return";
         case IN: return "in";
@@ -212,7 +212,7 @@ void top_level_consume_token(TokenizeContext &context)
 {
     if (is_letter(context.next()) || context.next() == '_') {
 
-        if (try_to_consume_keyword(context, FUNCTION)) return;
+        if (try_to_consume_keyword(context, DEF)) return;
         if (try_to_consume_keyword(context, TYPE)) return;
         if (try_to_consume_keyword(context, END)) return;
         if (try_to_consume_keyword(context, IF)) return;

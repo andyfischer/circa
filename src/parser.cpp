@@ -195,7 +195,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
     }
 
     // Function decl
-    else if (tokens.nextIs(FUNCTION)) {
+    else if (tokens.nextIs(DEF)) {
         result = function_decl(branch, tokens);
     }
 
@@ -262,8 +262,8 @@ Term* blank_line(Branch& branch, TokenStream& tokens)
 
 Term* function_from_header(Branch& branch, TokenStream& tokens)
 {
-    if (tokens.nextIs(FUNCTION))
-        tokens.consume(FUNCTION);
+    if (tokens.nextIs(DEF))
+        tokens.consume(DEF);
     possible_whitespace(tokens);
     std::string functionName = tokens.consume(IDENTIFIER);
     possible_whitespace(tokens);

@@ -12,8 +12,7 @@ namespace print_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
-                "function print(string)");
+        Term* main_func = import_function(kernel, evaluate, "print(string)");
         as_function(main_func).pureFunction = false;
     }
 }

@@ -34,8 +34,7 @@ namespace apply_feedback_function {
 
     void setup(Branch& kernel)
     {
-        APPLY_FEEDBACK = import_function(kernel, evaluate,
-                "function apply_feedback(any,any)");
+        APPLY_FEEDBACK = import_function(kernel, evaluate, "apply_feedback(any,any)");
         as_function(APPLY_FEEDBACK).setInputMeta(0,true);
         as_function(APPLY_FEEDBACK).stateType = BRANCH_TYPE;
     }

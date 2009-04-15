@@ -31,7 +31,7 @@ namespace if_function {
 
     void setup(Branch& kernel)
     {
-        IF_FUNC = import_function(kernel, evaluate, "function if(bool)");
+        IF_FUNC = import_function(kernel, evaluate, "if(bool)");
         as_function(IF_FUNC).stateType = BRANCH_TYPE;
         as_function(IF_FUNC).toSourceString = toSourceString;
     }
