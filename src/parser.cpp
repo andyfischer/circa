@@ -974,6 +974,22 @@ struct PendingInputSyntax {
         mPending.push_back(Input(index, field, value));
     }
 
+    void append(int index, std::string const& field, std::string const& value)
+    {
+        // try to find a matching entry
+        std::vector<Input>::iterator it;
+
+        for (it = mPending.begin(); it != mPending.end(); ++it) {
+            if (it->index == index && it->field == field) {
+                it->value += value;
+                return;
+            }
+        }
+
+        // otherwise make a new one
+        set(index, field, value);
+    }
+
     void apply(Term* term)
     {
         std::vector<Input>::const_iterator it;
@@ -1012,8 +1028,8 @@ Term* function_call(Branch& branch, TokenStream& tokens)
             pis.set(index, "name", term->name);
         }
 
-        if (!tokens.nextIs(RPAREN))
-            tokens.consume(COMMA);
+        if (tokens.nextIs(COMMA))
+            pis.append(index, "postWhitespace", tokens.consume(COMMA));
 
         index++;
     }

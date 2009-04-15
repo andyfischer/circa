@@ -257,7 +257,7 @@ void test_syntax_hints()
     test_equals(t->stringProperty("syntaxHints:functionName"), "concat");
     test_equals(get_input_syntax_hint(t, 0, "style"), "by-value");
     test_equals(get_input_syntax_hint(t, 0, "preWhitespace"), "");
-    test_equals(get_input_syntax_hint(t, 0, "postWhitespace"), "");
+    test_equals(get_input_syntax_hint(t, 0, "postWhitespace"), ",");
     test_equals(get_input_syntax_hint(t, 1, "style"), "by-value");
     test_equals(get_input_syntax_hint(t, 1, "preWhitespace"), " ");
     test_equals(get_input_syntax_hint(t, 1, "postWhitespace"), "");
