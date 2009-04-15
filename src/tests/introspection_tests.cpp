@@ -127,6 +127,14 @@ void reproduce_infix() {
     finish_source_repro_category();
 }
 
+void reproduce_rebinding_operator() {
+    round_trip_source("a += 1");
+    round_trip_source("a *= 5*3+1");
+    round_trip_source("  a -= 5*3+1");
+    round_trip_source("a /= 5*3+1  ");
+    finish_source_repro_category();
+}
+
 void reproduce_dot_concat() {
     round_trip_source("'hello'.print");
     round_trip_source("   'hey'.print");
@@ -177,6 +185,7 @@ void register_tests()
     REGISTER_TEST_CASE(introspection_tests::reproduce_stateful_values);
     REGISTER_TEST_CASE(introspection_tests::reproduce_function_calls);
     REGISTER_TEST_CASE(introspection_tests::reproduce_infix);
+    REGISTER_TEST_CASE(introspection_tests::reproduce_rebinding_operator);
     REGISTER_TEST_CASE(introspection_tests::reproduce_dot_concat);
     REGISTER_TEST_CASE(introspection_tests::reproduce_if);
     REGISTER_TEST_CASE(introspection_tests::reproduce_lists);
