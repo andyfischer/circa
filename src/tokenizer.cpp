@@ -139,6 +139,7 @@ void top_level_consume_token(TokenizeContext &context);
 void consume_identifier(TokenizeContext &context);
 void consume_whitespace(TokenizeContext &context);
 void consume_comment(TokenizeContext& context);
+bool match_number(TokenizeContext &context);
 void consume_number(TokenizeContext &context);
 void consume_hex_number(TokenizeContext &context);
 void consume_string_literal(TokenizeContext &context);
@@ -236,7 +237,7 @@ void top_level_consume_token(TokenizeContext &context)
         return;
     }
 
-    if (is_number(context.next())) {
+    if (match_number(context)) {
         consume_number(context);
         return;
     }
@@ -295,10 +296,6 @@ void top_level_consume_token(TokenizeContext &context)
             context.pushResult(NEWLINE, "\n");
             return;
         case '.':
-            if (is_number(context.next(1))) {
-                consume_number(context);
-                return;
-            }
             context.consume();
             context.pushResult(DOT);
             return;
@@ -345,11 +342,6 @@ void top_level_consume_token(TokenizeContext &context)
             }
             return;
         case '-':
-            if (is_number(context.next(1)) || context.next(1) == '.') {
-                consume_number(context);
-                return;
-            }
-            
             if (context.next(1) == '>') {
                 context.consume();
                 context.consume();
@@ -465,6 +457,22 @@ void consume_comment(TokenizeContext& context)
         text << context.consume();
 
     context.pushResult(COMMENT, text.str());
+}
+
+bool match_number(TokenizeContext &context)
+{
+    int lookahead = 0;
+
+    if (context.next(lookahead) == '-')
+        lookahead++;
+
+    if (context.next(lookahead) == '.')
+        lookahead++;
+
+    if (is_number(context.next(lookahead)))
+        return true;
+
+    return false;
 }
 
 void consume_number(TokenizeContext &context)
