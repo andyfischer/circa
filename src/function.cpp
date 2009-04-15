@@ -191,7 +191,7 @@ Function::functionToSourceString(Term* term)
 
     std::stringstream result;
 
-    result << "function " << func.name << "(";
+    result << "def " << func.name << "(";
 
     for (int i=0; i < func.numInputs(); i++) {
         if (i > 0) result << ", ";

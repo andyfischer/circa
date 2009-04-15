@@ -60,14 +60,13 @@ namespace map_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
-                "function map(Type,Type) -> Function");
+        Term* main_func = import_function(kernel, evaluate, "map(Type,Type) -> Function");
         as_function(main_func).pureFunction = true;
 
         as_function(main_func).stateType = kernel["Map"];
 
         FEEDBACK_PROPOGATE = import_function(kernel, feedback_propogate::evaluate,
-                "function map_feedback(any, any)");
+                "map_feedback(any, any)");
         as_function(FEEDBACK_PROPOGATE).setInputMeta(0, true);
     }
 }

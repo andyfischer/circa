@@ -18,7 +18,7 @@ namespace assign_function {
 
     void setup(Branch& kernel)
     {
-        ASSIGN_FUNC = import_function(kernel, evaluate, "function assign(any, any)");
+        ASSIGN_FUNC = import_function(kernel, evaluate, "assign(any, any)");
         as_function(ASSIGN_FUNC).pureFunction = false;
     }
 }

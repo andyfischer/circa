@@ -60,7 +60,7 @@ const int RIGHT_ARROW = 37;
 const int DOUBLE_AMPERSAND = 38;
 const int DOUBLE_VERTICAL_BAR = 39;
 
-const int FUNCTION = 51;
+const int DEF = 51;
 const int TYPE = 52;
 const int END = 53;
 const int IF = 54;

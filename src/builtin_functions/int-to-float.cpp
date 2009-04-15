@@ -14,8 +14,7 @@ namespace int_to_float_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
-                "function int_to_float(int) -> float");
+        Term* main_func = import_function(kernel, evaluate, "int_to_float(int) -> float");
         as_function(main_func).pureFunction = true;
 
         INT_TO_FLOAT_FUNC = main_func;

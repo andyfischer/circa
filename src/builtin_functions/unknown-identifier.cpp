@@ -12,8 +12,7 @@ namespace unknown_identifier_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
-                "function unknown_identifier() -> any");
+        Term* main_func = import_function(kernel, evaluate, "unknown_identifier() -> any");
         as_function(main_func).stateType = STRING_TYPE;
         as_function(main_func).pureFunction = false;
         as_function(main_func).hasSideEffects = true;

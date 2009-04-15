@@ -15,8 +15,7 @@ namespace branch_function {
 
     void setup(Branch& kernel)
     {
-        BRANCH_FUNC = import_function(kernel, evaluate,
-                "function branch() -> Branch");
+        BRANCH_FUNC = import_function(kernel, evaluate, "branch() -> Branch");
     }
 }
 }

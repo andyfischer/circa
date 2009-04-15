@@ -14,8 +14,7 @@ namespace min_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate,
-                "function min(float,float) -> float");
+        Term* main_func = import_function(kernel, evaluate, "min(float,float) -> float");
         as_function(main_func).pureFunction = true;
     }
 }

@@ -373,20 +373,20 @@ void initialize_builtin_types(Branch& kernel)
 
     BRANCH_TYPE = create_compound_type(kernel, "Branch");
     assert(as_type(BRANCH_TYPE).alloc == Branch::alloc);
-    import_member_function(BRANCH_TYPE, list_t::append, "function append(Branch, any) -> Branch");
+    import_member_function(BRANCH_TYPE, list_t::append, "append(Branch, any) -> Branch");
 
     import_member_function(TYPE_TYPE, Type::name_accessor, "name(Type) -> string");
 
     Term* set_type = create_compound_type(kernel, "Set");
     as_type(set_type).toString = set_t::to_string;
-    import_member_function(set_type, set_t::hosted_add, "function add(Set, any) -> Set");
-    import_member_function(set_type, set_t::remove, "function remove(Set, any) -> Set");
+    import_member_function(set_type, set_t::hosted_add, "add(Set, any) -> Set");
+    import_member_function(set_type, set_t::remove, "remove(Set, any) -> Set");
 
     LIST_TYPE = create_compound_type(kernel, "List");
     as_type(LIST_TYPE).toString = list_t::to_string;
     as_type(LIST_TYPE).toSourceString = list_t::to_string;
-    import_member_function(LIST_TYPE, list_t::append, "function append(List, any) -> List");
-    import_member_function(LIST_TYPE, list_t::count, "function count(List) -> int");
+    import_member_function(LIST_TYPE, list_t::append, "append(List, any) -> List");
+    import_member_function(LIST_TYPE, list_t::count, "count(List) -> int");
 }
 
 void initialize_builtin_functions(Branch& kernel)

@@ -13,7 +13,7 @@ namespace typeof_function {
 
     void setup(Branch& kernel)
     {
-        Term* func = import_function(kernel, evaluate, "function typeof(any) -> Type");
+        Term* func = import_function(kernel, evaluate, "typeof(any) -> Type");
         as_function(func).pureFunction = true;
     }
 }

@@ -41,7 +41,7 @@ namespace for_function {
 
     void setup(Branch& kernel)
     {
-        FOR_FUNC = import_function(kernel, evaluate, "function for(List)");
+        FOR_FUNC = import_function(kernel, evaluate, "for(List)");
         as_function(FOR_FUNC).pureFunction = true;
         as_function(FOR_FUNC).toSourceString = toSourceString;
         as_function(FOR_FUNC).stateType = create_type(&kernel,

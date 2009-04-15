@@ -17,7 +17,7 @@ void spy_function(Term* caller)
 void test_simple()
 {
     Branch branch;
-    import_function(branch, spy_function, "function spy(int)");
+    import_function(branch, spy_function, "spy(int)");
     gSpyResults.clear();
 
     branch.compile("for i in range(5)\nspy(i)\nend");
@@ -36,7 +36,7 @@ void test_subroutine_call()
 {
     Branch branch;
 
-    Term* sub = branch.compile("function myfunc()\nfor i in range(5)\ni\nend\nend");
+    Term* sub = branch.compile("def myfunc()\nfor i in range(5)\ni\nend\nend");
 
     Term* forTerm = as_function(sub).subroutineBranch[2];
 
