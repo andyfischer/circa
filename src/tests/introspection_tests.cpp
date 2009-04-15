@@ -95,11 +95,14 @@ void reproduce_function_calls() {
     round_trip_source("concat('a', 'b')");
     round_trip_source("   concat('a', 'b')");
     round_trip_source("b = concat('a', 'b')");
+    round_trip_source("  b = concat('a', 'b')");
     round_trip_source("assert(false)");
     round_trip_source("add(1.0, 2.0)");
     round_trip_source("add(1, 2)");
     round_trip_source("add(1,2)");
-    //round_trip_source("add(1 2)");
+    round_trip_source("add(1 2)");
+    round_trip_source("add(1 2 3 4)");
+    round_trip_source("add(   1   2,3 4  )");
     round_trip_source("  add(1,2)");
     round_trip_source("add(1,2)  ");
     round_trip_source("d = add(1.0, 2.0)");
