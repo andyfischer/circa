@@ -107,6 +107,10 @@ void reproduce_function_calls() {
     round_trip_source("add(1,2)  ");
     round_trip_source("d = add(1.0, 2.0)");
     round_trip_source("  d = add(1.0, 2.0)");
+    round_trip_source("  d   =   add(1 2)");
+    round_trip_source("d= add(1 2)");
+    round_trip_source("d=add(1 2)");
+    round_trip_source("d=   add(1 2)");
     finish_source_repro_category();
 }
 
@@ -123,7 +127,9 @@ void reproduce_infix() {
     round_trip_source("5 +    4");
     round_trip_source("5 + 4   ");
     round_trip_source("5+4");
-    //round_trip_source("complex = (4.0 + 3.0) + 2.0");
+    round_trip_source("complex = (4.0 + 3.0) + 2.0");
+    //round_trip_source("complex =  (  4 + 3)  + 2.0");
+    //round_trip_source("complex = (4 + 3  ) + 2.0");
     finish_source_repro_category();
 }
 

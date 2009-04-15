@@ -100,8 +100,12 @@ std::string get_term_source(Term* term)
     }
 
     // add possible name binding
-    if (term->name != "")
-        result << term->name << " = ";
+    if (term->name != "") {
+        result << term->name;
+        result << term->stringPropertyOptional("syntaxHints:preEqualsSpace", " ");
+        result << "=";
+        result << term->stringPropertyOptional("syntaxHints:postEqualsSpace", " ");
+    }
 
     int numParens = term->intPropertyOptional("syntaxHints:parens", 0);
     for (int p=0; p < numParens; p++)
@@ -134,8 +138,6 @@ std::string get_term_source(Term* term)
         result << "->";
         result << get_input_syntax_hint(term, 1, "preWhitespace");
         result << term->stringProperty("syntaxHints:functionName");
-    } else {
-        // result << "(!error, unknown declaration style)";
     }
 
     for (int p=0; p < numParens; p++)
