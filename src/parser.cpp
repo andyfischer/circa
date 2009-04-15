@@ -481,7 +481,6 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     Term* result = apply(&branch, IF_FUNC, RefList(condition));
     set_input_syntax(result, 0, condition);
-    result->stringProperty("syntaxHints:declarationStyle") = "if-statement";
     Branch& innerBranch = as_branch(result->state);
     innerBranch.outerScope = &branch;
 
@@ -555,7 +554,6 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     tokens.consume(NEWLINE);
 
     Term* forTerm = apply(&branch, FOR_FUNC, RefList(listExpr));
-    forTerm->stringProperty("syntaxHints:declarationStyle") = "function-specific";
 
     as_string(forTerm->state->field("iteratorName")) = iterator_name;
 
@@ -620,7 +618,6 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
     }
 
-
     Term* type = find_type(branch, typeName);
 
     RefList inputs;
@@ -632,7 +629,6 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     if (inputs.count() > 0)
         set_input_syntax(result, 0, inputs[0]);
 
-    result->stringProperty("syntaxHints:declarationStyle") = "function-specific";
     change_type(result, type);
 
     if (initialValue != NULL) {
@@ -666,6 +662,9 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     StringList names;
 
+    std::string preEqualsSpace = " ";
+    std::string postEqualsSpace = " ";
+
     if (equals_operator_loc != -1) {
         // Parse name binding(s)
 
@@ -678,11 +677,9 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
             tokens.consume(DOT);
         }
 
-        possible_whitespace(tokens);
-
+        preEqualsSpace = possible_whitespace(tokens);
         tokens.consume(EQUALS);
-
-        possible_whitespace(tokens);
+        postEqualsSpace = possible_whitespace(tokens);
     }
 
     Term* result = infix_expression(branch, tokens);
@@ -694,8 +691,12 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     // create an implicit call to 'copy'.
     if (result->name != "" && names.length() > 0) {
         result = apply(&branch, COPY_FUNC, RefList(result));
-        result->stringProperty("syntaxHints:declarationStyle") = "function-specific";
     }
+
+    if (preEqualsSpace != " ")
+        result->stringProperty("syntaxHints:preEqualsSpace") = preEqualsSpace;
+    if (postEqualsSpace != " ")
+        result->stringProperty("syntaxHints:postEqualsSpace") = postEqualsSpace;
 
     std::string pendingRebind = pop_pending_rebind(branch);
 
@@ -999,9 +1000,12 @@ Term* atom(Branch& branch, TokenStream& tokens)
         as_string(result->state) = "unrecognized expression at " 
             + tokens.next().locationAsString();
 
-        tokens.consume();
+        // throw away tokens until end of line
+        while (!tokens.nextIs(NEWLINE) && !tokens.finished())
+            tokens.consume();
 
-        // todo: throw away tokens until end of line
+        // throw away the last NEWLINE
+        tokens.consume();
     }
 
     return result;
