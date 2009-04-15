@@ -224,7 +224,7 @@ void value_function_generator(Term* caller)
 
     Function& output = as_function(caller);
     Type& type = as_type(caller->input(0));
-    output.name = "value-" + type.name;
+    output.name = type.name + "_value";
     output.outputType = caller->input(0);
     output.pureFunction = false;
     output.evaluate = empty_evaluate_function;
