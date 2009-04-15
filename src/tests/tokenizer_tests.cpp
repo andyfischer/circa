@@ -113,14 +113,16 @@ void test_symbols1()
 void test_symbols2()
 {
     token::TokenList results;
-    token::tokenize("<>:", results);
-    test_assert(results.size() == 3);
+    token::tokenize("<>:;", results);
+    test_assert(results.size() == 4);
     test_assert(results[0].text == "<");
     test_assert(results[0].match == token::LTHAN);
     test_assert(results[1].text == ">");
     test_assert(results[1].match == token::GTHAN);
     test_assert(results[2].text == ":");
     test_assert(results[2].match == token::COLON);
+    test_assert(results[3].text == ";");
+    test_assert(results[3].match == token::SEMICOLON);
 }
 
 void test_keywords()

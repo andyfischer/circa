@@ -44,6 +44,7 @@ const char* get_token_text(int match)
         case RIGHT_ARROW: return "->";
         case DOUBLE_AMPERSAND: return "&&";
         case DOUBLE_VERTICAL_BAR: return "||";
+        case SEMICOLON: return ";";
         case WHITESPACE: return "WHITESPACE";
         case NEWLINE: return "NEWLINE";
         case END: return "end";
@@ -386,8 +387,8 @@ void top_level_consume_token(TokenizeContext &context)
             return;
 
         case '|':
-            context.consume();
-            if (context.next() == '|') {
+            if (context.next(1) == '|') {
+                context.consume();
                 context.consume();
                 context.pushResult(DOUBLE_VERTICAL_BAR);
                 return;
@@ -395,10 +396,18 @@ void top_level_consume_token(TokenizeContext &context)
             break;
 
         case '&':
-            context.consume();
-            if (context.next() == '&') {
+            if (context.next(1) == '&') {
+                context.consume();
                 context.consume();
                 context.pushResult(DOUBLE_AMPERSAND);
+                return;
+            }
+            break;
+
+        case ';':
+            if (context.next() == ';') {
+                context.consume();
+                context.pushResult(SEMICOLON);
                 return;
             }
             break;
