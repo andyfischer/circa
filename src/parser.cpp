@@ -164,6 +164,84 @@ Term* find_type(Branch& branch, std::string const& name)
     return result;
 }
 
+// This structure stores the syntax hints for list-like syntax. It exists because
+// you usually don't have a comprehension term while you are parsing the list
+// arguments, so you need to temporarily store syntax hints until you create one.
+struct ListSyntaxHints {
+    struct Input {
+        int index;
+        std::string field;
+        std::string value;
+        Input(int i, std::string const& f, std::string const& v)
+            : index(i), field(f), value(v) {}
+    };
+
+    void set(int index, std::string const& field, std::string const& value)
+    {
+        mPending.push_back(Input(index, field, value));
+    }
+
+    void append(int index, std::string const& field, std::string const& value)
+    {
+        // try to find a matching entry
+        std::vector<Input>::iterator it;
+
+        for (it = mPending.begin(); it != mPending.end(); ++it) {
+            if (it->index == index && it->field == field) {
+                it->value += value;
+                return;
+            }
+        }
+
+        // otherwise make a new one
+        set(index, field, value);
+    }
+
+    void apply(Term* term)
+    {
+        std::vector<Input>::const_iterator it;
+        for (it = mPending.begin(); it != mPending.end(); ++it)
+            get_input_syntax_hint(term, it->index, it->field) = it->value;
+    }
+
+    std::vector<Input> mPending;
+};
+
+// Consumes a list of terms that are separated by spaces, or commas, or semicolons.
+// The result terms are appened to list_out. The syntax hints are appended to
+// hints_out. (you should apply these syntax hints to the resulting comprehension
+// term)
+//
+// This is used to parse the syntax of function arguments, member function arguments,
+// and literal lists.
+void consume_list_arguments(Branch& branch, TokenStream& tokens,
+        RefList& list_out, ListSyntaxHints& hints_out)
+{
+    int index = 0;
+    while (!tokens.nextIs(RPAREN) && !tokens.nextIs(RBRACKET)) {
+
+        hints_out.set(index, "preWhitespace", possible_whitespace(tokens));
+        Term* term = infix_expression(branch, tokens);
+        hints_out.set(index, "postWhitespace", possible_whitespace(tokens));
+
+        list_out.append(term);
+
+        if (term->name == "")
+            hints_out.set(index, "style", "by-value");
+        else {
+            hints_out.set(index, "style", "by-name");
+            hints_out.set(index, "name", term->name);
+        }
+
+        if (tokens.nextIs(COMMA))
+            hints_out.append(index, "postWhitespace", tokens.consume(COMMA));
+        else if (tokens.nextIs(SEMICOLON))
+            hints_out.append(index, "postWhitespace", tokens.consume(SEMICOLON));
+
+        index++;
+    }
+}
+
 // Parsing functions:
 
 Term* statement_list(Branch& branch, TokenStream& tokens)
@@ -772,19 +850,11 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
                 // Consume inputs
                 RefList inputs(leftExpr);
+                ListSyntaxHints listHints;
+
                 if (tokens.nextIs(LPAREN)) {
-
                     tokens.consume(LPAREN);
-
-                    while (!tokens.nextIs(RPAREN)) {
-                        possible_whitespace(tokens);
-                        Term* input = infix_expression(branch, tokens);
-                        inputs.append(input);
-                        possible_whitespace(tokens);
-
-                        if (!tokens.nextIs(RPAREN))
-                            tokens.consume(COMMA);
-                    }
+                    consume_list_arguments(branch, tokens, inputs, listHints);
                     tokens.consume(RPAREN);
                 }
 
@@ -939,46 +1009,6 @@ Term* atom(Branch& branch, TokenStream& tokens)
     return result;
 }
 
-struct PendingInputSyntax {
-    struct Input {
-        int index;
-        std::string field;
-        std::string value;
-        Input(int i, std::string const& f, std::string const& v)
-            : index(i), field(f), value(v) {}
-    };
-
-    void set(int index, std::string const& field, std::string const& value)
-    {
-        mPending.push_back(Input(index, field, value));
-    }
-
-    void append(int index, std::string const& field, std::string const& value)
-    {
-        // try to find a matching entry
-        std::vector<Input>::iterator it;
-
-        for (it = mPending.begin(); it != mPending.end(); ++it) {
-            if (it->index == index && it->field == field) {
-                it->value += value;
-                return;
-            }
-        }
-
-        // otherwise make a new one
-        set(index, field, value);
-    }
-
-    void apply(Term* term)
-    {
-        std::vector<Input>::const_iterator it;
-        for (it = mPending.begin(); it != mPending.end(); ++it)
-            get_input_syntax_hint(term, it->index, it->field) = it->value;
-    }
-
-    std::vector<Input> mPending;
-};
-
 Term* function_call(Branch& branch, TokenStream& tokens)
 {
     std::string functionName = tokens.consume(IDENTIFIER);
@@ -986,32 +1016,8 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
     RefList inputs;
 
-    PendingInputSyntax pis;
-
-    int index = 0;
-    while (!tokens.nextIs(RPAREN)) {
-
-        std::string preWhitespace = possible_whitespace(tokens);
-        Term* term = infix_expression(branch, tokens);
-        std::string postWhitespace = possible_whitespace(tokens);
-
-        pis.set(index, "preWhitespace", preWhitespace);
-        pis.set(index, "postWhitespace", postWhitespace);
-
-        inputs.append(term);
-
-        if (term->name == "")
-            pis.set(index, "style", "by-value");
-        else {
-            pis.set(index, "style", "by-name");
-            pis.set(index, "name", term->name);
-        }
-
-        if (tokens.nextIs(COMMA))
-            pis.append(index, "postWhitespace", tokens.consume(COMMA));
-
-        index++;
-    }
+    ListSyntaxHints listHints;
+    consume_list_arguments(branch, tokens, inputs, listHints);
 
     tokens.consume(RPAREN);
     
@@ -1020,7 +1026,7 @@ Term* function_call(Branch& branch, TokenStream& tokens)
     result->stringProperty("syntaxHints:declarationStyle") = "function-call";
     result->stringProperty("syntaxHints:functionName") = functionName;
 
-    pis.apply(result);
+    listHints.apply(result);
 
     return result;
 }
@@ -1102,8 +1108,7 @@ Term* literal_branch(Branch& branch, TokenStream& tokens)
         infix_expression(result, tokens);
         possible_whitespace(tokens);
 
-        if (tokens.nextIs(COMMA))
-            tokens.consume(COMMA);
+        possible_list_seperator(tokens);
     }
 
     possible_whitespace(tokens);
@@ -1117,35 +1122,13 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
     tokens.consume(LBRACKET);
 
     RefList terms;
+    ListSyntaxHints listHints;
+    consume_list_arguments(branch, tokens, terms, listHints);
 
-    PendingInputSyntax pis;
-
-    int index = 0;
-    while (!tokens.nextNonWhitespaceIs(RBRACKET)) {
-        Term* term = infix_expression(branch, tokens);
-        terms.append(term);
-        std::string postWs = possible_whitespace(tokens);
-
-        if (tokens.nextIs(COMMA))
-            postWs += tokens.consume(COMMA);
-
-        if (term->name == "")
-            pis.set(index, "style", "by-value");
-        else {
-            pis.set(index, "style", "by-name");
-            pis.set(index, "name", term->name);
-        }
-
-        pis.set(index, "postWhitespace", postWs);
-        index++;
-    }
-
-    possible_whitespace(tokens);
     tokens.consume(RBRACKET);
 
     Term* result = apply(&branch, LIST_FUNC, terms);
-    pis.apply(result);
-    result->stringProperty("syntaxHints:declarationStyle") = "function-specific";
+    listHints.apply(result);
     return result;
 }
 
@@ -1210,6 +1193,15 @@ std::string possible_whitespace_or_newline(TokenStream& tokens)
         output << tokens.consume();
 
     return output.str();
+}
+
+std::string possible_list_seperator(TokenStream& tokens)
+{
+    if (tokens.nextIs(COMMA))
+        return tokens.consume();
+    else if (tokens.nextIs(SEMICOLON))
+        return tokens.consume();
+    return "";
 }
 
 void consume_statement_end(TokenStream& tokens, Term* term)
