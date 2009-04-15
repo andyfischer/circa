@@ -75,7 +75,7 @@ void reproduce_simple_values() {
     round_trip_source("-55");
     round_trip_source("0x102030");
     round_trip_source("   1");
-    //round_trip_source("1  ");
+    round_trip_source("1  ");
     round_trip_source("0.123");
     //round_trip_source(".123");
     //round_trip_source("-.123");
@@ -97,7 +97,13 @@ void reproduce_function_calls() {
     round_trip_source("b = concat('a', 'b')");
     round_trip_source("assert(false)");
     round_trip_source("add(1.0, 2.0)");
+    round_trip_source("add(1, 2)");
+    round_trip_source("add(1,2)");
+    //round_trip_source("add(1 2)");
+    round_trip_source("  add(1,2)");
+    round_trip_source("add(1,2)  ");
     round_trip_source("d = add(1.0, 2.0)");
+    round_trip_source("  d = add(1.0, 2.0)");
     finish_source_repro_category();
 }
 
@@ -127,6 +133,21 @@ void reproduce_if() {
     finish_source_repro_category();
 }
 
+void reproduce_lists() {
+    round_trip_source("[]");
+    round_trip_source("  []");
+    round_trip_source("[1]");
+    round_trip_source("[1,2]");
+    round_trip_source("[1 2]");
+    round_trip_source("[ 1 2]");
+    round_trip_source("[1 2 ]");
+    round_trip_source("[1 , 2]");
+    round_trip_source("[ 1 , 2 ]");
+    round_trip_source(" [1,2]");
+    round_trip_source("[1,2] ");
+    finish_source_repro_category();
+}
+
 void test_get_involved_terms()
 {
     Branch branch;
@@ -151,6 +172,7 @@ void register_tests()
     REGISTER_TEST_CASE(introspection_tests::reproduce_infix);
     REGISTER_TEST_CASE(introspection_tests::reproduce_dot_concat);
     REGISTER_TEST_CASE(introspection_tests::reproduce_if);
+    REGISTER_TEST_CASE(introspection_tests::reproduce_lists);
     REGISTER_TEST_CASE(introspection_tests::test_get_involved_terms);
 }
 
