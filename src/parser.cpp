@@ -709,10 +709,8 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
         // Field assignment
         Term* object = branch[names[0]];
-        int fieldIndex = as_type(object->type).findFieldIndex(names[1]);
-        assert(fieldIndex != -1);
-        result = apply(&branch, SET_FIELD_FUNC, RefList(object, result));
-        as_int(result->state) = fieldIndex;
+        result = apply(&branch, SET_FIELD_BY_NAME_FUNC, RefList(object, result));
+        as_string(result->state) = names[1];
 
         branch.bindName(result, names[0]);
 
