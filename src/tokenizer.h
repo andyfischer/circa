@@ -59,6 +59,7 @@ const int COLON_EQUALS = 36;
 const int RIGHT_ARROW = 37;
 const int DOUBLE_AMPERSAND = 38;
 const int DOUBLE_VERTICAL_BAR = 39;
+const int SEMICOLON = 40;
 
 const int DEF = 51;
 const int TYPE = 52;

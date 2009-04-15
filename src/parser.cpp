@@ -233,7 +233,12 @@ Term* statement(Branch& branch, TokenStream& tokens)
     prepend_whitespace(result, preWhitespace);
 
     append_whitespace(result, possible_whitespace(tokens));
-    append_whitespace(result, possible_newline(tokens));
+
+    // Consume a newline or ;
+    if (tokens.nextIs(NEWLINE))
+        append_whitespace(result, tokens.consume(NEWLINE));
+    else if (tokens.nextIs(SEMICOLON))
+        append_whitespace(result, tokens.consume(SEMICOLON));
 
     return result;
 }
