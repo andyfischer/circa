@@ -599,8 +599,6 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     }
 
     tokens.consume(END);
-    possible_whitespace(tokens);
-    consume_statement_end(tokens, forTerm);
 
     return forTerm;
 }
@@ -1108,7 +1106,10 @@ Term* literal_branch(Branch& branch, TokenStream& tokens)
         infix_expression(result, tokens);
         possible_whitespace(tokens);
 
-        possible_list_seperator(tokens);
+        if (tokens.nextIs(COMMA))
+            tokens.consume();
+        else if (tokens.nextIs(SEMICOLON))
+            tokens.consume();
     }
 
     possible_whitespace(tokens);
@@ -1193,23 +1194,6 @@ std::string possible_whitespace_or_newline(TokenStream& tokens)
         output << tokens.consume();
 
     return output.str();
-}
-
-std::string possible_list_seperator(TokenStream& tokens)
-{
-    if (tokens.nextIs(COMMA))
-        return tokens.consume();
-    else if (tokens.nextIs(SEMICOLON))
-        return tokens.consume();
-    return "";
-}
-
-void consume_statement_end(TokenStream& tokens, Term* term)
-{
-    if (tokens.finished())
-        term->boolProperty("syntaxHints:endsFile") = true;
-    else
-        tokens.consume(NEWLINE);
 }
 
 void consume_branch_until_end(Branch& branch, TokenStream& tokens)
