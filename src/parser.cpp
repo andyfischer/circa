@@ -231,6 +231,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
     }
 
     prepend_whitespace(result, preWhitespace);
+    append_whitespace(result, possible_whitespace(tokens));
 
     return result;
 }
@@ -566,6 +567,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     else
         alloc_value(result);
 
+    append_whitespace(result, possible_whitespace(tokens));
     append_whitespace(result, possible_newline(tokens));
 
     return result;
@@ -625,6 +627,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         //result->boolProperty("syntaxHints:hidden") = true;
     }
 
+    append_whitespace(result, possible_whitespace(tokens));
     append_whitespace(result, possible_newline(tokens));
 
     std::string pendingRebind = pop_pending_rebind(branch);
