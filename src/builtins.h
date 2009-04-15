@@ -28,6 +28,7 @@ extern Term* FLOAT_TYPE;
 extern Term* FOR_FUNC;
 extern Term* FUNCTION_TYPE;
 extern Term* GET_FIELD_FUNC;
+extern Term* GET_FIELD_BY_NAME_FUNC;
 extern Term* IF_FUNC;
 extern Term* INT_TO_FLOAT_FUNC;
 extern Term* INT_TYPE;
