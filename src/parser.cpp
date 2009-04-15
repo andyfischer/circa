@@ -647,7 +647,6 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     Term* result = infix_expression(branch, tokens);
-
     branch.bindName(result, "#return");
     
     return result;
@@ -691,10 +690,7 @@ int get_infix_precedence(int match)
 
 bool is_infix_operator_rebinding(std::string const& infix)
 {
-    return (infix == "+="
-        || infix == "-="
-        || infix == "*="
-        || infix == "/=");
+    return (infix == "+=" || infix == "-=" || infix == "*=" || infix == "/=");
 }
 
 std::string get_function_for_infix(std::string const& infix)
@@ -804,14 +800,6 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                 as_string(result->state) = rhsIdent;
 
                 specialize_type(result, lhsType[rhsIdent].type);
-
-            // Next, allow for dynamic lookup on a compound type
-            // (currently disabled)
-            /*} else if (is_compound_type(lhsType)) {
-                function = GET_FIELD_FUNC;
-                assert(function != NULL);
-                isFieldAccess = true;
-            */
 
             // Finally, look for this function in our local scope
             } else {
