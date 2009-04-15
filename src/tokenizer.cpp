@@ -5,7 +5,7 @@
 namespace circa {
 namespace tokenizer {
 
-const char* getMatchText(int match)
+const char* get_token_text(int match)
 {
     switch (match) {
         case LPAREN: return "(";
@@ -63,7 +63,7 @@ const char* getMatchText(int match)
 std::string TokenInstance::toString() const
 {
     std::stringstream out;
-    out << getMatchText(match) << " \"" << text << "\"";
+    out << get_token_text(match) << " \"" << text << "\"";
     return out.str();
 }
 
@@ -120,7 +120,7 @@ struct TokenizeContext
 
     void pushResult(int match, std::string text = "") {
         if (text == "" && match != STRING)
-            text = getMatchText(match);
+            text = get_token_text(match);
 
         TokenInstance instance;
         instance.match = match;
@@ -184,7 +184,7 @@ bool is_newline(char c)
 
 bool try_to_consume_keyword(TokenizeContext& context, int keyword)
 {
-    const char* str = getMatchText(keyword);
+    const char* str = get_token_text(keyword);
     int str_len = strlen(str);
 
     // Check if every letter matches
