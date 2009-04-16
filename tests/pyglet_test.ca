@@ -1,5 +1,0 @@
-
-python_import_functions('extensions/CircaPyglet.py')
-
-pyglet_window()
-
