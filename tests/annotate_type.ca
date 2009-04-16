@@ -1,9 +1,14 @@
 
+
 type Point { float x, float y }
 
+-- try annotate_type() function
 l = [1.0,2.0]
+l_anno = annotate_type(l,Point)
+typeof(l_anno) -> print
 
-la = annotate_type(l,Point)
-typeof(la) -> print
-la.x -> print
-la.y -> print
+print(l_anno.x ',' l_anno.y)
+
+-- now try : operator, which should have the same effect
+b = [5.0 3.0] : Point
+print(b.x ',' b.y)
