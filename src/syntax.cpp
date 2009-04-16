@@ -128,7 +128,8 @@ std::string get_term_source(Term* term)
     } else if (declarationStyle == "dot-concat") {
         result << get_source_of_input(term, 0);
         result << ".";
-        result << term->function->name;
+        std::string actualFunctionName = term->function->name;
+        result << term->stringPropertyOptional("syntaxHints:functionName", actualFunctionName);
     } else if (declarationStyle == "infix") {
         result << get_source_of_input(term, 0);
         result << term->stringProperty("syntaxHints:functionName");
