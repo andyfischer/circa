@@ -47,6 +47,7 @@ const int LTHAN = 24;
 const int LTHANEQ = 25;
 const int GTHAN = 26;
 const int GTHANEQ = 27;
+const int PERCENT = 41;
 const int COLON = 28;
 const int DOUBLE_EQUALS = 29;
 const int NOT_EQUALS = 30;

@@ -1,0 +1,31 @@
+mouse_x = 0.0
+mouse_y = 0.0
+
+background(0xeeeeeeff)
+
+type Point { float x, float y }
+
+def p2c(float angle, float radius, Point center) -> Point
+  return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
+end
+
+center = [100.0, 100.0]
+
+long_rad = 20.0
+short_rad = 10.0
+
+def step_to_angle(int step) -> float
+  return (step - 0.5) / 10.0 * PI * 2
+end
+
+points = range(10)
+
+for step in points
+  rad = long_rad
+  if (step % 2) == 1
+    rad = short_rad
+  end
+  step = p2c(step_to_angle(step), rad, center)
+end
+
+shape(points, 0xff0000ff)
