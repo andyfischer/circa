@@ -1,11 +1,30 @@
 arrow-concat.ca
 assert.ca
+average.ca
 boolean.ca
+# branch_literal.ca
 comparison.ca
+# compound_type.ca
 feedback.ca
-sample1.ca
-sample2.ca
+# for.ca
+# get-field-in-sub.ca
+# if.ca
+# if_scoping.ca
 infix.ca
 lessthan.ca
+# lists.ca
+map.ca
+math.ca
+# module-to-source.ca
+# multiline.ca
+sample1.ca
+sample2.ca
+# sample3.ca
+# set.ca
+# subroutine.ca
 type_decl.ca
+type_specializing.ca
 typeof.ca
+unknown_function.ca
+# unknown_type.ca
+# whitespace.ca

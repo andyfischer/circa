@@ -1,5 +1,0 @@
---mod = load-module(cl-arg(2))
-
---print(module-to-source(mod))
-
-cl-arg(2) -> load-module -> module-to-source -> print

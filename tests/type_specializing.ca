@@ -1,6 +1,7 @@
 
 a = 1.0
 b = 2.0
-c = if-expr(true, a, b)
+c = if_expr(true, a, b)
 
--- TODO: check that c has type float
+-- make sure that c has type float. This should be true at compile-time.
+typeof(c) -> print
