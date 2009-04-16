@@ -11,6 +11,7 @@ extern Branch* KERNEL;
 
 extern Term* ASSIGN_FUNC;
 extern Term* ADD_FUNC;
+extern Term* ANNOTATE_TYPE_FUNC;
 extern Term* ANY_TYPE;
 extern Term* APPLY_FEEDBACK;
 extern Term* AVERAGE_FUNC;
