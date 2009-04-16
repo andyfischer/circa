@@ -118,6 +118,15 @@ void test_duplicate_subroutine()
     test_assert(dupedFunc.subroutineBranch["a"] == dupedFunc.subroutineBranch[0]);
 }
 
+void test_duplicate_get_field_by_name()
+{
+    Branch branch;
+    branch.eval("type mytype { int a }");
+    branch.eval("");
+    //apply(&branch, GET_FIELD_BY_NAME_FUNC, 
+    //TODO
+}
+
 void find_name_in_outer_branch()
 {
     Branch branch;
@@ -184,6 +193,7 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_duplicate_nested);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_nested_dont_make_extra_terms);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_subroutine);
+    REGISTER_TEST_CASE(branch_tests::test_duplicate_get_field_by_name);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
     REGISTER_TEST_CASE(branch_tests::test_migrate);
     REGISTER_TEST_CASE(branch_tests::test_migrate2);
