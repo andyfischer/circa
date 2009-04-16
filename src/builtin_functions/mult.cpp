@@ -7,7 +7,7 @@ namespace mult_function {
 
     void evaluate(Term* caller)
     {
-        as_float(caller) = as_float(caller->input(0)) * as_float(caller->input(1));
+        as_float(caller) = to_float(caller->input(0)) * to_float(caller->input(1));
     }
 
     void generateTraining(Branch& branch, Term* subject, Term* desired)

@@ -167,6 +167,16 @@ float& as_float(Term* term)
     return *((float*) term->value);
 }
 
+float to_float(Term* term)
+{
+    if (term->type == FLOAT_TYPE)
+        return as_float(term);
+    else if (term->type == INT_TYPE)
+        return as_int(term);
+    else
+        throw std::runtime_error("Type mismatch in to_float");
+}
+
 bool& as_bool(Term* term)
 {
     assert_type(term, BOOL_TYPE);
