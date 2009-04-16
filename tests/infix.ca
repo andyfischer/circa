@@ -1,7 +1,7 @@
 
-(1.0 + 4.0).to_string.print
-(5.0 - 2.0).to_string.print
-(2.0*3.0).to_string.print
-(5.0/2.5).to_string.print
---(5 > 3).to_string.print
-(3 == 2).to_string.print
+(1.0 + 4.0) -> print
+(5.0 - 2.0) -> print
+(2.0*3.0) -> print
+(5.0/2.5) -> print
+--(5 > 3) -> print
+(3 == 2) -> print

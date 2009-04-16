@@ -8,8 +8,9 @@ namespace set_field_by_name_function {
     void evaluate(Term* caller)
     {
         std::string name = as_string(caller->state);
+        int index = as_type(caller->input(0)->type).findFieldIndex(name);
         assign_value(caller->input(0), caller);
-        assign_value(caller->input(1), as_branch(caller)[name]);
+        assign_value(caller->input(1), as_branch(caller)[index]);
     }
 
     Term* specializeType(Term* caller)

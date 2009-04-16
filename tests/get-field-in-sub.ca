@@ -1,0 +1,12 @@
+
+type Point {float x, float y}
+
+def mysub(Point p) -> int
+  p -> print
+  p.x -> print
+  typeof(p) -> print
+end
+
+state Point p
+
+mysub([1.0 2.0])

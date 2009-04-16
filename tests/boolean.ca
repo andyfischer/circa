@@ -1,17 +1,16 @@
 
 -- Check 'true' and 'false' constants
-print(concat('should be true: ', true.to_string))
-print(concat('should be false: ', false.to_string))
+print('should be true: ', true)
+print('should be false: ', false)
 
 -- and
-print(concat('and(true,true): ', and(true,true).to_string))
-print(concat('and(true,false): ', and(true,false).to_string))
-print(concat('and(false,true): ', and(false,true).to_string))
-print(concat('and(false,false): ', and(false,false).to_string))
+print('and(true,true): ', and(true,true))
+print('and(true,false): ', and(true,false))
+print('and(false,true): ', and(false,true))
+print('and(false,false): ', and(false,false))
 
 -- or
-print(concat('or(true,true): ', or(true,true).to_string))
-print(concat('or(true,false): ', or(true,false).to_string))
-print(concat('or(false,true): ', or(false,true).to_string))
-print(concat('or(false,false): ', or(false,false).to_string))
-
+print('or(true,true): ', or(true,true))
+print('or(true,false): ', or(true,false))
+print('or(false,true): ', or(false,true))
+print('or(false,false): ', or(false,false))

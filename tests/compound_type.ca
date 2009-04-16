@@ -15,7 +15,7 @@ type Composite {
 }
 
 c = Composite()
-c -> to_string -> print
+c -> print
 
 v = Vector()
 
@@ -25,4 +25,4 @@ v = Vector()
 v.x = 5.0
 v.y = 6.0
 
-v -> to_string -> print
+v -> print
