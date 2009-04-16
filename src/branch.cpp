@@ -78,6 +78,18 @@ Term* Branch::findFirstBinding(std::string const& name) const
     return NULL;
 }
 
+Term* Branch::findLastBinding(std::string const& name) const
+{
+    for (int i = _terms.count()-1; i >= 0; i--) {
+        if (_terms[i] == NULL)
+            continue;
+        if (_terms[i]->name == name)
+            return _terms[i];
+    }
+
+    return NULL;
+}
+
 void Branch::bindName(Term* term, std::string name)
 {
     names.bind(term, name);

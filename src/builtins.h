@@ -59,6 +59,10 @@ namespace set_t {
     void add(Branch& branch, Term* value);
 }
 
+namespace list_t {
+    void append(Branch& branch, Term* value);
+}
+
 } // namespace circa
 
 #endif

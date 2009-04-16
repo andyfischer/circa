@@ -595,6 +595,19 @@ Term* for_block(Branch& branch, TokenStream& tokens)
         branch.bindName(result, name);
     }
 
+    // Check if the iterator is rebound. This means we treat our loop
+    // as a mapping function.
+    Term* iteratorResult = innerBranch.findLastBinding(iterator_name);
+    if (innerBranch.findFirstBinding(iterator_name) != iteratorResult)
+    {
+        if (listExpr->name == "")
+            throw std::runtime_error("Can't rebind an iterator on an anonymous list");
+
+        // Copy results to outer scope
+        Term* results = apply(&branch, COPY_FUNC, RefList(forTerm->state->field("results")));
+        branch.bindName(results, listExpr->name);
+    }
+
     tokens.consume(END);
 
     return forTerm;
