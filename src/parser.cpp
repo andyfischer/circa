@@ -550,7 +550,6 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     recursively_mark_terms_as_occuring_inside_an_expression(listExpr);
     possible_whitespace(tokens);
 
-    possible_whitespace(tokens);
     tokens.consume(NEWLINE);
 
     Term* forTerm = apply(&branch, FOR_FUNC, RefList(listExpr));
@@ -739,6 +738,7 @@ int get_infix_precedence(int match)
             return 8;
         case tokenizer::STAR:
         case tokenizer::SLASH:
+        case tokenizer::PERCENT:
             return 7;
         case tokenizer::PLUS:
         case tokenizer::MINUS:
@@ -779,6 +779,7 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "-") return "sub";
     else if (infix == "*") return "mult";
     else if (infix == "/") return "div";
+    else if (infix == "%") return "mod";
     else if (infix == "<") return "less_than";
     else if (infix == "<=") return "less_than-eq";
     else if (infix == ">") return "greater_than";
