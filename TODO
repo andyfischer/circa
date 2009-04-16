@@ -1,30 +1,17 @@
 
-# Core language features #
+Required features before public exposure:
+- Parsing errors not handled well (we usually crash)
+  * need to display location of compile errors
+- Support optional type annotations
+- Cool graphical demo
 
-X Type specialization. Figure out the type of generic expressions (such as if-expr) before runtime.
-X Loops over collections
-- Source reproduction. (currently this has many bugs)
-X Infix-assignment operators, like +=
-- Feedback (current support is very limited)
-- Vector type
-X Function overloading
+Need to have soon:
+- Type coersion is very poor, especially int-to-float and float-to-int
+- Loose static typing is strange. Need to work this out.
+- Parametrized types, lists and stuff
 
-# Cgame features #
-
-Dataflow inspection / modification
- - Picking
- - Get a list of all the variables that influenced the position of something
- - UI element that displays the above list
- - Keybindings to toggle which values to modify
- - Mouse-dragging mode to send feedback to modifyable values
-
-Save to source
-
-Detect file modification
-
-Keybindings for snapshotting
-
-HUD UI elements
- - Display short status messages
-
-Cairo integration for HUD
+Other todos:
+- LLVM integration. Need to investigate this enough to learn what it would look like.
+- Access and edit properties from circa
+- Lambdas
+- C reproduction.
