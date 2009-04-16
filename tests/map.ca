@@ -1,17 +1,17 @@
 
-my-map = map(int,int)
+my_map = map(int,int)
 
-my-map(5) := 3
-print(concat('should be 3: ', my-map(5).to_string))
+my_map(5) := 3
+print('should be 3: ', my_map(5))
 
-my-map(3) := 1
-print(concat('should be 1: ', my-map(3).to_string))
+my_map(3) := 1
+print('should be 1: ', my_map(3))
 
-string-map = map(string,int)
-string-map('key1') := 5
-print(concat('should be 5: ', string-map('key1')))
+string_map = map(string,int)
+string_map('key1') := 5
+print('should be 5: ', string_map('key1'))
 
-int-map = map(int,string)
-int-map(18) := 'apple'
-print(concat('should be apple: ', int-map(18)))
+int_map = map(int,string)
+int_map(18) := 'apple'
+print('should be apple: ', int_map(18))
 

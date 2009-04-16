@@ -1,12 +1,15 @@
 arrow-concat.ca
 average.ca
 boolean.ca
+branch_literal.ca
+comparison.ca
 compound_type.ca
 feedback.ca
 for.ca
 infix.ca
 lessthan.ca
 lists.ca
+math.ca
 sample1.ca
 sample2.ca
 sample3.ca
