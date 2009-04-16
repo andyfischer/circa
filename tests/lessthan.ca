@@ -1,10 +1,10 @@
 
 print('integers:')
-(1 < 2).to_string.print
-(2 < 2).to_string.print
-(3 < 2).to_string.print
+(1 < 2) -> print
+(2 < 2) -> print
+(3 < 2) -> print
 
 print('floats:')
-(1.0 < 2.0).to_string.print
-(2.0 < 2.0).to_string.print
-(3.0 < 2.0).to_string.print
+(1.0 < 2.0) -> print
+(2.0 < 2.0) -> print
+(3.0 < 2.0) -> print

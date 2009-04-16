@@ -1,11 +1,11 @@
 
 -- simple test
 for i in range(5)
-  i -> to_string -> print
+  i -> print
 end
 
 -- iterate over a collection
-names = {"absalom", "biddleson", "cairne"}
+names = ["absalom", "biddleson", "cairne"]
 for name in names
   name -> print
 end
@@ -14,7 +14,7 @@ end
 for i in range(4)
   state string result = ''
   result = concat(i -> to_string, result)
-  result -> print
+  print(result)
 end
 
 -- modify an outside value
@@ -22,7 +22,7 @@ x = 10.0
 for i in range(4)
   x += 2.0
 end
-x -> to_string -> print
+x -> print
 
 -- if statement inside a for loop
 for i in range(5)
@@ -33,7 +33,7 @@ end
 
 -- for loop inside an if statement
 if true
-   for i in {1}
+   for i in [1]
       print('if2 passed')
    end
 end
@@ -47,4 +47,4 @@ def look_for_3(List numbers)
   end
 end
 
-look_for_3({1,2,3,4,5})
+look_for_3([1,2,3,4,5])
