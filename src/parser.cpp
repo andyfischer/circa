@@ -9,8 +9,6 @@ namespace parser {
 
 using namespace circa::tokenizer;
 
-const int HIGHEST_INFIX_PRECEDENCE = 8;
-
 Ref compile(Branch* branch, ParsingStep step, std::string const& input)
 {
     // if branch is NULL, use a temporary branch
@@ -744,10 +742,14 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     return result;
 }
 
+const int HIGHEST_INFIX_PRECEDENCE = 9;
+
 int get_infix_precedence(int match)
 {
     switch(match) {
         case tokenizer::DOT:
+            return 9;
+        case tokenizer::COLON:
             return 8;
         case tokenizer::STAR:
         case tokenizer::SLASH:
@@ -805,6 +807,7 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "-=") return "sub";
     else if (infix == "*=") return "mult";
     else if (infix == "/=") return "div";
+    else if (infix == ":") return "annotate_type";
     else return "#unrecognized";
 }
 
