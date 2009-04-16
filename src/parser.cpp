@@ -887,6 +887,8 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
                 specialize_type(result, lhsType[rhsIdent].type);
 
+                result->stringProperty("syntaxHints:functionName") = rhsIdent;
+
             // Finally, look for this function in our local scope
             } else {
                 function = find_named(&branch, rhsIdent);
