@@ -8,7 +8,7 @@ b = "ho"
 {a,b} -> to_string -> print
 
 -- in a function
-function my_func(int a, int b)
+def my_func(int a, int b)
   {a,b} -> to_string -> print
 end
 

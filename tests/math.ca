@@ -1,22 +1,22 @@
 
 -- addition
-print(concat('one plus two is ', 1+2))
-print(concat('5.5 plus 2.2 is ', 5.5+2.2))
+print('one plus two is ', 1+2)
+print('5.5 plus 2.2 is ', 5.5+2.2)
 
 -- subtraction
-print(concat('two minus one is ', 2 - 1))
-print(concat('one minus two is ', 1 - 2))
+print('two minus one is ', 2 - 1)
+print('one minus two is ', 1 - 2)
 
 -- multiplication
-print(concat('two times three is ', 2 * 3))
+print('two times three is ', 2 * 3)
 
 -- division
-print(concat('eight divided by four is ', 8 / 4))
+print('eight divided by four is ', 8 / 4)
 
 -- Operator precedence
-print(concat('1 + 2 * 3 = ', 1 + 2 * 3))
-print(concat('1 * 2 + 3 = ', 1 * 2 + 3))
-print(concat('5 - 4 + 3 = ', 5 - 4 + 3))
-print(concat('1 - 2 * 3 = ', 1 - 2 * 3))
-print(concat('1 + 4 / 2 = ', 1 + 4 * 2))
-print(concat('1 - 4 / 2 = ', 1 - 4 * 2))
+print('1 + 2 * 3 = ', 1 + 2 * 3)
+print('1 * 2 + 3 = ', 1 * 2 + 3)
+print('5 - 4 + 3 = ', 5 - 4 + 3)
+print('1 - 2 * 3 = ', 1 - 2 * 3)
+print('1 + 4 / 2 = ', 1 + 4 * 2)
+print('1 - 4 / 2 = ', 1 - 4 * 2)

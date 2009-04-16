@@ -10,31 +10,31 @@ if (3 < 5)
     print('3 > 5')
 end
 
-if (1 + 2 > 2)
+if (1 + 2 > 2.0)
     print('1 + 2 > 2')
 end
 
-if (1 + 2 < 2)
+if (1 + 2 < 2.0)
     print('Fail: 1 + 2 < 2')
 end
 
-if (1 + 2 >= 2)
+if (1 + 2 >= 2.0)
     print('1 + 2 >= 2')
 end
-if (1 + 2 >= 3)
+if (1 + 2 >= 3.0)
     print('1 + 2 >= 3')
 end
-if (1 + 2 >= 4)
+if (1 + 2 >= 4.0)
     print('Fail: 1 + 2 >= 4')
 end
 
-if (3 + 6 <= 10)
+if (3 + 6 <= 10.0)
     print('3 + 6 >= 10')
 end
-if (3 + 6 <= 9)
+if (3 + 6 <= 9.0)
     print('3 + 6 >= 9')
 end
-if (3 + 6 <= 8)
+if (3 + 6 <= 8.0)
     print('Fail: 3 + 6 >= 8')
 end
 
