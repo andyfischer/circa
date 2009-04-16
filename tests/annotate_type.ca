@@ -1,0 +1,9 @@
+
+type Point { float x, float y }
+
+l = [1.0,2.0]
+
+la = annotate_type(l,Point)
+typeof(la) -> print
+la.x -> print
+la.y -> print
