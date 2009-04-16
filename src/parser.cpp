@@ -385,8 +385,8 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
 
     possible_whitespace(tokens);
 
-    if (tokens.nextIs(RIGHT_ARROW)) {
-        tokens.consume(RIGHT_ARROW);
+    if (tokens.nextIs(COLON) || tokens.nextIs(RIGHT_ARROW)) {
+        tokens.consume();
         possible_whitespace(tokens);
         std::string outputTypeName = tokens.consume(IDENTIFIER);
         Term* outputType = find_type(branch, outputTypeName);
