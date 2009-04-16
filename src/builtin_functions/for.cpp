@@ -15,13 +15,21 @@ namespace for_function {
 
         Branch& contents = as_branch(caller->state->field("contents"));
 
-        Term* iterator = contents[iteratorName];
+        Term* iterator = contents.findFirstBinding(iteratorName);
         assert(iterator != NULL);
 
-        for (int i=0; i < series.numTerms(); i++) {
+        Term* iteratorResult = contents.findLastBinding(iteratorName);
 
+        as_branch(caller->state->field("results")).clear();
+
+        for (int i=0; i < series.numTerms(); i++) {
             assign_value(series[i], iterator);
             evaluate_branch(contents);
+
+            // Save the iterator result, if we are doing a mapping
+            if (iterator != iteratorResult) {
+                list_t::append(as_branch(caller->state->field("results")), iteratorResult);
+            }
         }
     }
 
@@ -45,7 +53,12 @@ namespace for_function {
         as_function(FOR_FUNC).pureFunction = true;
         as_function(FOR_FUNC).toSourceString = toSourceString;
         as_function(FOR_FUNC).stateType = create_type(&kernel,
-            "type For::State { string iteratorName, Branch contents, Branch inputs }");
+            "type For::State { "
+                "string iteratorName, "
+                "Branch contents, "
+                "Branch inputs, "
+                "Branch results "
+                "}");
     }
 }
 } // namespace circa

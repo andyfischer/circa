@@ -203,13 +203,18 @@ namespace list_t {
         return out.str();
     }
 
+    void append(Branch& branch, Term* value)
+    {
+        Term* duplicated_value = create_value(&branch, value->type);
+        assign_value(value, duplicated_value);
+    }
+
     void append(Term* caller)
     {
         assign_value(caller->input(0), caller);
         Branch& branch = as_branch(caller);
         Term* value = caller->input(1);
-        Term* duplicated_value = create_value(&branch, value->type);
-        assign_value(value, duplicated_value);
+        append(branch, value);
     }
 
     void count(Term* caller)
