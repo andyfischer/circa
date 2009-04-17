@@ -65,10 +65,51 @@ void type_declaration()
     test_assert(is_value_alloced(instance));
 }
 
+void test_value_matches_type()
+{
+    Branch branch;
+
+    Term* a = int_value(&branch, 5);
+    test_assert(value_matches_type(a, INT_TYPE));
+    test_assert(!value_matches_type(a, FLOAT_TYPE));
+    test_assert(!value_matches_type(a, STRING_TYPE));
+    test_assert(value_matches_type(a, ANY_TYPE));
+
+    Term* t1 = branch.eval("type t1 { int a, float b }");
+    Term* t2 = branch.eval("type t2 { int a }");
+    Term* t3 = branch.eval("type t3 { int a, float b, string c }");
+    Term* t4 = branch.eval("type t4 { float a, int b }");
+
+    Term* v1 = branch.eval("[1, 2.0]");
+    test_assert(value_matches_type(v1, t1));
+    test_assert(!value_matches_type(v1, t2));
+    test_assert(!value_matches_type(v1, t3));
+    test_assert(!value_matches_type(v1, t4));
+
+    Term* v2 = branch.eval("['hello' 2.0]");
+    test_assert(!value_matches_type(v2, t1));
+    test_assert(!value_matches_type(v2, t2));
+    test_assert(!value_matches_type(v2, t3));
+    test_assert(!value_matches_type(v2, t4));
+
+    Term* v3 = branch.eval("[1]");
+    test_assert(!value_matches_type(v3, t1));
+    test_assert(value_matches_type(v3, t2));
+    test_assert(!value_matches_type(v3, t3));
+    test_assert(!value_matches_type(v3, t4));
+    
+    Term* v4 = branch.eval("[]");
+    test_assert(!value_matches_type(v4, t1));
+    test_assert(!value_matches_type(v4, t2));
+    test_assert(!value_matches_type(v4, t3));
+    test_assert(!value_matches_type(v4, t4));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
     REGISTER_TEST_CASE(type_tests::type_declaration);
+    REGISTER_TEST_CASE(type_tests::test_value_matches_type);
 }
 
 } // namespace type_tests

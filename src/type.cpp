@@ -50,6 +50,16 @@ bool is_type(Term* term)
     return term->type == TYPE_TYPE;
 }
 
+bool is_compound_type(Type const& type)
+{
+    return type.alloc == Branch::alloc;
+}
+
+bool is_compound_type(Term* type)
+{
+    return is_compound_type(as_type(type));
+}
+
 Type& as_type(Term *term)
 {
     assert(term->value != NULL);
@@ -60,9 +70,40 @@ Type& as_type(Term *term)
     return *((Type*) term->value);
 }
 
-bool is_compound_type(Type const& type)
+typedef bool (*TermComparisonFunc)(Term*,Term*);
+
+bool value_matches_type(Term* valueTerm, Term* type, TermComparisonFunc comparison)
 {
-    return type.alloc == Branch::alloc;
+    // Everything matches against 'any'
+    if (type == ANY_TYPE)
+        return true;
+
+    // If 'type' is primitive then use the comparison function
+    if (!is_compound_type(type))
+        return comparison(valueTerm->type, type);
+
+    // Type is a compound type, make sure value is too
+    if (!is_compound_type(valueTerm->type))
+        return false;
+
+    Branch& value = as_branch(valueTerm);
+
+    // Check if the # of elements matches
+    if (value.numTerms() != (int) as_type(type).fields.size())
+        return false;
+
+    // Check each element
+    for (int i=0; i < value.numTerms(); i++) {
+        if (!value_matches_type(value[i], as_type(type).fields[i].type, comparison))
+            return false;
+    }
+
+    return true;
+}
+
+bool value_is_coercable_to_type(Term* valueTerm, Term* type)
+{
+
 }
 
 Term* quick_create_type(Branch& branch, std::string name)

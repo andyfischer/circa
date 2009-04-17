@@ -390,7 +390,6 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
         possible_whitespace(tokens);
         std::string outputTypeName = tokens.consume(IDENTIFIER);
         Term* outputType = find_type(branch, outputTypeName);
-
         func.outputType = outputType;
     }
 
