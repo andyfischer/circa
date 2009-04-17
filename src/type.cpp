@@ -101,9 +101,9 @@ bool value_matches_type(Term* valueTerm, Term* type, TermComparisonFunc comparis
     return true;
 }
 
-bool value_is_coercable_to_type(Term* valueTerm, Term* type)
+bool value_matches_type(Term* valueTerm, Term* type)
 {
-
+    return value_matches_type(valueTerm, type, identity_equals);
 }
 
 Term* quick_create_type(Branch& branch, std::string name)
