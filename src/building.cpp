@@ -83,22 +83,6 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
     return term;
 }
 
-Term* possibly_coerce_term(Branch* branch, Term* original, Term* expectedType)
-{
-    // (In the future, we will have more complicated coersion rules)
-    
-    // Ignore NULL
-    if (original == NULL)
-        return original;
-
-    // Coerce from int to float
-    if (original->type == INT_TYPE && expectedType == FLOAT_TYPE) {
-        return apply(branch, INT_TO_FLOAT_FUNC, RefList(original));
-    }
-
-    return original;
-}
-
 Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string const& name)
 {
     // Make a local copy of _inputs
@@ -134,13 +118,7 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
         inputs = memberFunctionInputs;
     }
 
-    Function& functionData = as_function(function);
-
-    // Possibly coerce inputs
-    for (unsigned int i=0; i < inputs.count(); i++) {
-        inputs.setAt(i, possibly_coerce_term(branch, inputs[i],
-                functionData.inputType(i)));
-    }
+    //Function& functionData = as_function(function);
 
     // Create the term
     Term* result = create_term(branch, function, inputs);

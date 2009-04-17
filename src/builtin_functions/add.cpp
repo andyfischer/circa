@@ -16,7 +16,7 @@ namespace add_function {
         if (!term->hasProperty("mutability"))
             return 1.0;
 
-        return as_float(term->property("mutability"));
+        return to_float(term->property("mutability"));
     }
 
     void feedback_propogate(Term* caller)
@@ -42,7 +42,7 @@ namespace add_function {
             return;
         }
     
-        float total_delta = as_float(desired) - as_float(target);
+        float total_delta = to_float(desired) - to_float(target);
     
         for (int i=0; i < numInputs; i++) {
             float mutability = get_mutability(target->input(i));
@@ -52,7 +52,7 @@ namespace add_function {
             Term* input = target->inputs[i];
     
             apply(&myBranch, APPLY_FEEDBACK,
-                RefList(input, float_value(&myBranch, as_float(input) + inputDelta)));
+                RefList(input, float_value(&myBranch, to_float(input) + inputDelta)));
         }
     
         evaluate_branch(myBranch);

@@ -17,11 +17,6 @@ std::string get_source_of_input(Term* term, int inputIndex)
 {
     Term* input = term->input(inputIndex);
 
-    // Special case: ignore functions that were inserted by coersion
-    if (input != NULL && input->function == INT_TO_FLOAT_FUNC) {
-        input = input->input(0);
-    }
-
     std::stringstream result;
 
     result << get_input_syntax_hint(term, inputIndex, "preWhitespace");
