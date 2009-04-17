@@ -25,6 +25,7 @@ Term* apply_and_eval(Branch* branch,
 
 int& as_int(Term*);
 float& as_float(Term*);
+void set_float(Term*,float);
 float to_float(Term*);
 bool& as_bool(Term*);
 std::string& as_string(Term*);
