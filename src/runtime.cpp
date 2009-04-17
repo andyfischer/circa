@@ -12,11 +12,15 @@ Term* get_global(std::string name)
     return NULL;
 }
 
+// TODO: Replace this with value_matches_type
 bool check_valid_type(Function &func, int index, Term* term)
 {
     Term* expectedType = func.inputTypes[index];
 
     if (expectedType == ANY_TYPE)
+        return true;
+
+    if (expectedType == FLOAT_TYPE && term->type == INT_TYPE)
         return true;
 
     return type_matches(term, expectedType);
@@ -165,13 +169,6 @@ float& as_float(Term* term)
     assert_type(term, FLOAT_TYPE);
     assert(term->value != NULL);
     return *((float*) term->value);
-}
-
-void set_float(Term* term,float value)
-{
-    assert_type(term, FLOAT_TYPE);
-    assert(term->value != NULL);
-    *((float*) term->value) = value;
 }
 
 float to_float(Term* term)
