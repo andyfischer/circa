@@ -2,11 +2,7 @@
 
 #include "common_headers.h"
 
-#include "testing.h"
-#include "cpp_importing.h"
-#include "branch.h"
-#include "builtins.h"
-#include "values.h"
+#include <circa.h>
 
 namespace circa {
 namespace cpp_importing_tests {
