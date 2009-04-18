@@ -153,8 +153,6 @@ void setup_empty_type(Type& type);
 Term* create_empty_type(Branch& branch, std::string name);
 void initialize_compound_type(Type& type);
 
-void* alloc_from_type(Term* typeTerm);
-
 Term* create_compound_type(Branch& branch, std::string const& name);
 std::string compound_type_to_string(Term* caller);
 
