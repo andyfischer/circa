@@ -93,6 +93,10 @@ bool value_fits_type(Term* valueTerm, Term* type)
     if (!is_compound_type(valueTerm->type))
         return false;
 
+    // Every compound type matches against List
+    if (identity_equals(type, LIST_TYPE))
+        return true;
+
     Branch& value = as_branch(valueTerm);
 
     // Check if the # of elements matches
