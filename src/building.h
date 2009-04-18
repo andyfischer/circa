@@ -24,14 +24,22 @@ void set_input(Term* term, int index, Term* input);
 Term* apply(Branch* branch, Term* function, RefList const& inputs, std::string const& name="");
 
 // Find the named function in this branch, and then call the above apply.
-Term* apply(Branch* branch,
-                     std::string const& functionName, 
-                     RefList const& inputs);
+Term* apply(Branch* branch, std::string const& functionName, 
+                 RefList const& inputs, std::string const& name="");
 
 // Create a new value term with the given type.
 // 'branch' may be NULL.
 Term* create_value(Branch* branch, Term* type, std::string const& name="");
 Term* create_value(Branch* branch, std::string const& typeName, std::string const& name="");
+
+// Import values
+Term* import_value(Branch* branch, Term* type, void* initialValue, std::string const& name="");
+Term* import_value(Branch* branch, std::string const& typeName, void* initialValue, std::string const& name="");
+
+Term* string_value(Branch* branch, std::string const& s, std::string const& name="");
+Term* int_value(Branch* branch, int i, std::string const& name="");
+Term* float_value(Branch* branch, float f, std::string const& name="");
+Term* bool_value(Branch* branch, bool b, std::string const& name="");
 
 } // namespace circa
 
