@@ -320,7 +320,7 @@ void bootstrap_kernel()
     FUNCTION_TYPE->owningBranch = KERNEL;
     FUNCTION_TYPE->function = constTypeFunc;
     FUNCTION_TYPE->type = TYPE_TYPE;
-    FUNCTION_TYPE->value = alloc_from_type(TYPE_TYPE);
+    FUNCTION_TYPE->value = new Type();
     as_type(FUNCTION_TYPE).name = "Function";
     as_type(FUNCTION_TYPE).alloc = cpp_importing::templated_alloc<Function>;
     as_type(FUNCTION_TYPE).dealloc = cpp_importing::templated_dealloc<Function>;

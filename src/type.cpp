@@ -194,15 +194,6 @@ void initialize_compound_type(Type& type)
     type.toString = compound_type_to_string;
 }
 
-void* alloc_from_type(Term* typeTerm)
-{
-    Type& type = as_type(typeTerm);
-    if (type.alloc == NULL)
-        return NULL;
-
-    return type.alloc(typeTerm);
-}
-
 Term* create_compound_type(Branch& branch, std::string const& name)
 {
     Term* term = create_value(&branch, TYPE_TYPE, name);
@@ -333,7 +324,11 @@ std::string to_source_string(Term* term)
 
 void alloc_value(Term* term)
 {
-    term->value = alloc_from_type(term->type);
+    Type& type = as_type(term->type);
+    if (type.alloc == NULL)
+        term->value = NULL;
+    else
+        term->value = type.alloc(term->type);
 }
 
 void dealloc_value(Term* term)
@@ -405,7 +400,6 @@ void assign_value_but_dont_copy_inner_branch(Term* source, Term* dest)
 
     assign_value(source, dest);
 }
-
 
 Term* get_value_function(Term* typeTerm)
 {
