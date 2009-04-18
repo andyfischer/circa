@@ -5,29 +5,73 @@
 namespace circa {
 namespace runtime_tests {
 
-void test_create_value()
-{
-    Branch branch;
-    Term *term = create_value(&branch, INT_TYPE);
-    test_assert(term->type == INT_TYPE);
-    test_assert(term->value != NULL);
+std::vector<std::string> gSpyResults;
 
-    term = create_value(&branch, BRANCH_TYPE);
-    test_assert(term->value != NULL);
-    // test_assert(as_branch(term).owningTerm == term);
+void spy_function(Term* caller)
+{
+    gSpyResults.push_back(as_string(caller->input(0)));
 }
 
-void test_int_value()
+void i_only_throw_errors(Term* caller)
+{
+    error_occured(caller, "error");
+}
+
+void init_test_functions(Branch& branch)
+{
+    import_function(branch, spy_function, "spy(string)");
+    import_function(branch, i_only_throw_errors, "i_only_throw_errors() -> string");
+}
+
+void test_simple()
 {
     Branch branch;
-    Term *term = int_value(&branch, -2);
-    test_assert(as_int(term) == -2);
+    init_test_functions(branch);
 
-    Term *term2 = int_value(&branch, 154, "george");
-    test_assert(term2 == branch.getNamed("george"));
-    test_assert(term2->name == "george");
-    test_assert(as_int(term2) == 154);
+    gSpyResults.clear();
+
+    branch.compile("spy('1')");
+    branch.compile("spy('2')");
+    branch.compile("spy('3')");
+
+    test_assert(gSpyResults.size() == 0);
+
+    evaluate_branch(branch);
+
+    test_assert(gSpyResults[0] == "1");
+    test_assert(gSpyResults[1] == "2");
+    test_assert(gSpyResults[2] == "3");
 }
+
+void blocked_by_error()
+{
+    Branch branch;
+    init_test_functions(branch);
+
+    gSpyResults.clear();
+
+    Term *spy_1 = branch.compile("spy('1')");
+    Term *error = branch.compile("e = i_only_throw_errors()");
+    Term *spy_errored = branch.compile("spy(e)");
+
+    test_assert(gSpyResults.size() == 0);
+
+    bool threw = false;
+    try {
+        evaluate_branch(branch);
+    } catch (std::runtime_error const& e) {
+        threw = true;
+    }
+
+    test_assert(threw);
+
+    test_assert(gSpyResults.size() == 1);
+    test_assert(gSpyResults[0] == "1");
+    test_assert(!spy_1->hasError());
+    test_assert(error->hasError());
+    test_assert(spy_errored->needsUpdate);
+}
+
 
 void test_misc()
 {
@@ -36,22 +80,6 @@ void test_misc()
 
     test_assert(is_type(FUNCTION_TYPE));
     test_assert(FUNCTION_TYPE->type == TYPE_TYPE);
-}
-
-void test_find_equivalent()
-{
-    Branch branch;
-
-    Term* add_func = branch.eval("add");
-    Term* a = branch.eval("a = 1.0");
-    Term* b = branch.eval("b = 1.0");
-    Term* addition = branch.eval("add(a,b)");
-
-    test_assert(is_equivalent(addition, add_func, RefList(a,b)));
-
-    test_assert(addition == find_equivalent(branch, add_func, RefList(a,b)));
-
-    test_assert(NULL == find_equivalent(branch, add_func, RefList(b,a)));
 }
 
 void var_function_reuse()
@@ -113,30 +141,15 @@ void test_runtime_type_error()
     test_assert(term->hasError());
 }
 
-void test_create_duplicate()
-{
-    Branch branch;
-
-    Term* a = branch.eval("state int a = 5");
-
-    Term* b = create_duplicate(&branch, a);
-
-    test_assert(a->function == b->function);
-    test_assert(a->type == b->type);
-    test_assert(is_stateful(b));
-}
-
 void register_tests()
 {
-    REGISTER_TEST_CASE(runtime_tests::test_create_value);
-    REGISTER_TEST_CASE(runtime_tests::test_int_value);
+    REGISTER_TEST_CASE(runtime_tests::test_simple);
+    REGISTER_TEST_CASE(runtime_tests::blocked_by_error);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
-    REGISTER_TEST_CASE(runtime_tests::test_find_equivalent);
     REGISTER_TEST_CASE(runtime_tests::var_function_reuse);
     REGISTER_TEST_CASE(runtime_tests::null_input_errors);
     REGISTER_TEST_CASE(runtime_tests::test_eval_as);
     REGISTER_TEST_CASE(runtime_tests::test_runtime_type_error);
-    REGISTER_TEST_CASE(runtime_tests::test_create_duplicate);
 }
 
 } // namespace runtime_tests
