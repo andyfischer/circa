@@ -93,6 +93,12 @@ namespace primitives {
 
     namespace float_t {
 
+        void assign(Term* source, Term* dest)
+        {
+            // Allow coercion
+            as_float(dest) = to_float(source);
+        }
+
         std::string to_string(Term* term)
         {
             // Figuring out how many decimal places to show is a hard problem.
@@ -355,6 +361,7 @@ void initialize_builtin_types(Branch& kernel)
     as_type(INT_TYPE).toSourceString = primitives::int_t::to_string;
 
     FLOAT_TYPE = import_type<float>(kernel, "float");
+    as_type(FLOAT_TYPE).assign = primitives::float_t::assign;
     as_type(FLOAT_TYPE).equals = cpp_importing::templated_equals<float>;
     as_type(FLOAT_TYPE).lessThan = cpp_importing::templated_lessThan<float>;
     as_type(FLOAT_TYPE).toString = primitives::float_t::to_string;

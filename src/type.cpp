@@ -70,40 +70,43 @@ Type& as_type(Term *term)
     return *((Type*) term->value);
 }
 
-typedef bool (*TermComparisonFunc)(Term*,Term*);
-
-bool value_matches_type(Term* valueTerm, Term* type, TermComparisonFunc comparison)
+bool value_fits_type(Term* valueTerm, Term* type)
 {
+    // Always match if they have the same exact type
+    if (identity_equals(valueTerm->type, type))
+        return true;
+
     // Everything matches against 'any'
     if (type == ANY_TYPE)
         return true;
 
-    // If 'type' is primitive then use the comparison function
-    if (!is_compound_type(type))
-        return comparison(valueTerm->type, type);
+    // Coercion: ints fit in floats
+    if ((valueTerm->type == INT_TYPE) && type == FLOAT_TYPE)
+        return true;
 
-    // Type is a compound type, make sure value is too
+    // Otherwise, primitive types must fit exactly
+    // Reject since they did not pass the above checks
+    if (!is_compound_type(type))
+        return false;
+
+    // If 'type' is a compound type, make sure value is too
     if (!is_compound_type(valueTerm->type))
         return false;
 
     Branch& value = as_branch(valueTerm);
 
     // Check if the # of elements matches
+    // TODO: Relax this check for lists
     if (value.numTerms() != (int) as_type(type).fields.size())
         return false;
 
     // Check each element
     for (int i=0; i < value.numTerms(); i++) {
-        if (!value_matches_type(value[i], as_type(type).fields[i].type, comparison))
+        if (!value_fits_type(value[i], as_type(type).fields[i].type))
             return false;
     }
 
     return true;
-}
-
-bool value_matches_type(Term* valueTerm, Term* type)
-{
-    return value_matches_type(valueTerm, type, identity_equals);
 }
 
 Term* quick_create_type(Branch& branch, std::string name)
@@ -263,7 +266,7 @@ void Type::type_assign(Term* source, Term* dest)
         sourceValue->refCount++;
     
     if (destValue != NULL) {
-        // todo, delete Type objects when they are no longer needed
+        // TODO: delete Type objects when they are no longer needed
     }
 }
 
