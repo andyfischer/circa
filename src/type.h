@@ -159,10 +159,15 @@ Term* create_compound_type(Branch& branch, std::string const& name);
 std::string compound_type_to_string(Term* caller);
 
 // Functions which are dispatched based on type
+bool is_value_alloced(Term* term);
+void alloc_value(Term* term);
+void dealloc_value(Term* term);
 bool identity_equals(Term* a, Term* b);
 bool equals(Term* a, Term* b);
 std::string to_string(Term* term);
 std::string to_source_string(Term* term);
+void assign_value(Term* source, Term* dest);
+void assign_value_but_dont_copy_inner_branch(Term* source, Term* dest);
 
 // Fetch the const function for this type
 Term* get_value_function(Term* type);

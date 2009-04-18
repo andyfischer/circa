@@ -2,15 +2,10 @@
 
 #include "common_headers.h"
 
-#include "testing.h"
-#include "builtins.h"
-#include "introspection.h"
-#include "syntax.h"
-#include "values.h"
+#include <circa.h>
 
 namespace circa {
 namespace introspection_tests {
-
 
 void test_is_value()
 {
