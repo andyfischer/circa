@@ -59,12 +59,12 @@ void assign_value(Term* source, Term* dest)
 
 void assign_value_but_dont_copy_inner_branch(Term* source, Term* dest)
 {
-    // Temp: Do a type specialization if dest has type 'any'.
-    // This should be removed once type inference rules are smarter.
+    // Do a type specialization if dest has type 'any'.
+    // This might be removed once type inference rules are smarter.
     if (dest->type == ANY_TYPE)
         specialize_type(dest, source->type);
 
-    assert_type(source, dest->type);
+    assert(value_fits_type(source, dest->type));
 
     // Special case for functions
     if (source->type == FUNCTION_TYPE) {
