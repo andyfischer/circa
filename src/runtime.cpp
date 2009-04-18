@@ -12,20 +12,6 @@ Term* get_global(std::string name)
     return NULL;
 }
 
-// TODO: Replace this with value_matches_type
-bool check_valid_type(Function &func, int index, Term* term)
-{
-    Term* expectedType = func.inputTypes[index];
-
-    if (expectedType == ANY_TYPE)
-        return true;
-
-    if (expectedType == FLOAT_TYPE && term->type == INT_TYPE)
-        return true;
-
-    return type_matches(term, expectedType);
-}
-
 void evaluate_term(Term* term)
 {
     if (term == NULL)
@@ -86,7 +72,7 @@ void evaluate_term(Term* term)
         }
         
         // Check type
-        if (!check_valid_type(func, effectiveIndex, input)) {
+        if (!value_fits_type(input, func.inputTypes[effectiveIndex])) {
             std::stringstream message;
             message << "Runtime type error: input " << inputIndex << " has type "
                 << as_type(input->type).name;
