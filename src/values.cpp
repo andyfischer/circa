@@ -44,7 +44,7 @@ void assign_value(Term* source, Term* dest)
     if (dest->type == ANY_TYPE)
         specialize_type(dest, source->type);
 
-    assert_type(source, dest->type);
+    assert(value_fits_type(source, dest->type));
 
     if (!is_value_alloced(dest))
         alloc_value(dest);

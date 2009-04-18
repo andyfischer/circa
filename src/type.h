@@ -138,10 +138,10 @@ bool type_matches(Term *term, Term *type);
 // Throw an exception if term is not an instance of type
 void assert_type(Term* term, Term* type);
 
-// Returns whether the value in valueTerm matches this type.
-// There are other functions which do the same thing, but they are all
-// deprecated. This one is newest.
-bool value_matches_type(Term* valueTerm, Term* type);
+// Returns whether the value in valueTerm fits this type.
+// This function allows for coercion (ints fit in floats)
+// We also allow for compound types to be reinterpreted
+bool value_fits_type(Term* valueTerm, Term* type);
 
 Term* quick_create_type(Branch& branch, std::string name="");
 
