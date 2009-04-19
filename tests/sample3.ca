@@ -23,5 +23,5 @@ def draw_popup(float x, float y, List names)
   end
 end
 
-names = {"Button1", "Button2", "Button3"}
+names = ["Button1", "Button2", "Button3"]
 draw_popup(30.0, 30.0, names)

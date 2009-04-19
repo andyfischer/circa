@@ -995,8 +995,8 @@ Term* atom(Branch& branch, TokenStream& tokens)
         result = literal_list(branch, tokens);
 
     // literal branch?
-    else if (tokens.nextIs(LBRACE))
-        result = literal_branch(branch, tokens);
+    // disabled
+    //else if (tokens.nextIs(LBRACE))
 
     // identifier?
     else if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AMPERSAND))
@@ -1113,30 +1113,6 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     return term;
 }
 
-Term* literal_branch(Branch& branch, TokenStream& tokens)
-{
-    tokens.consume(LBRACE);
-
-    Term* resultTerm = apply(&branch, BRANCH_FUNC, RefList());
-    Branch& result = as_branch(resultTerm);
-    result.outerScope = &branch;
-
-    while (!tokens.nextNonWhitespaceIs(RBRACE)) {
-        infix_expression(result, tokens);
-        possible_whitespace(tokens);
-
-        if (tokens.nextIs(COMMA))
-            tokens.consume();
-        else if (tokens.nextIs(SEMICOLON))
-            tokens.consume();
-    }
-
-    possible_whitespace(tokens);
-    tokens.consume(RBRACE);
-
-    return resultTerm;
-}
-
 Term* literal_list(Branch& branch, TokenStream& tokens)
 {
     tokens.consume(LBRACKET);
@@ -1173,17 +1149,6 @@ Term* identifier(Branch& branch, TokenStream& tokens)
         result->boolProperty("syntaxHints:hidden") = true;
         as_string(result->state) = id;
         branch.bindName(result, id);
-    }
-
-    // If this term doesn't live in our branch, create a copy
-    //bool createCopy = (result->owningBranch != &branch);
-
-    if (0) {
-        std::string name = result->name;
-        result = apply(&branch, COPY_FUNC, RefList(result));
-        result->boolProperty("syntaxHints:hidden") = true;
-        if (name != "")
-            branch.bindName(result, name);
     }
 
     return result;
