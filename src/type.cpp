@@ -371,10 +371,10 @@ void assign_value(Term* source, Term* dest)
     if (!is_value_alloced(dest))
         alloc_value(dest);
 
-    Type::AssignFunc assign = as_type(source->type).assign;
+    Type::AssignFunc assign = as_type(dest->type).assign;
 
     if (assign == NULL)
-        throw std::runtime_error("type "+as_type(source->type).name+" has no assign function");
+        throw std::runtime_error("type "+as_type(dest->type).name+" has no assign function");
 
     assign(source, dest);
 }

@@ -31,10 +31,23 @@ void builtin_objects()
     test_assert(find_named(KERNEL,"bool") == BOOL_TYPE);
 }
 
+void assign_int_to_float()
+{
+    Branch branch;
+    Term* source = branch.eval("1");
+    Term* dest = branch.eval("2.0");
+
+    assign_value(source, dest);
+
+    test_assert(is_float(dest));
+    test_equals(as_float(dest), 1.0);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(primitive_type_tests::strings);
     REGISTER_TEST_CASE(primitive_type_tests::builtin_objects);
+    REGISTER_TEST_CASE(primitive_type_tests::assign_int_to_float);
 }
 
 } // namespace primitive_type_tests

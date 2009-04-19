@@ -181,7 +181,21 @@ std::string& as_string(Term* term)
     return *((std::string*) term->value);
 }
 
-// todo: add these for all primitives
+bool is_int(Term* term)
+{
+    return term->type == INT_TYPE;
+}
+
+bool is_float(Term* term)
+{
+    return term->type == FLOAT_TYPE;
+}
+
+bool is_bool(Term* term)
+{
+    return term->type == BOOL_TYPE;
+}
+
 bool is_string(Term* term)
 {
     return term->type == STRING_TYPE;
