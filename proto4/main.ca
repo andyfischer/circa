@@ -1,0 +1,36 @@
+
+-- std functions
+
+mouse_x = 0.0
+mouse_y = 0.0
+
+--background(0xeeeeeeff)
+
+type Point { float x, float y }
+
+def p2c(float angle, float radius, Point center) : Point
+  return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
+end
+
+def add_points(Point a, Point b) : Point
+  return [a.x + b.x, a.y + b.y]
+end
+
+-- our code
+
+buttons = ["Button1", "Button2", "Button3"]
+
+loc = [40 40] : Point
+
+button_size = [100 20] : Point
+--total_h = button_size = buttons.length()
+
+current_y = loc.y
+for button in buttons
+  button_loc = [loc.x, current_y] : Point
+  print('loc=' loc)
+  print('loc.x=' loc.x)
+  print(button_loc)
+  --box(button_loc.x, button_loc.y, button_loc.x + button_size.x, button_loc.y + button_size.y)
+  --current_y += button_size.y + 1
+end
