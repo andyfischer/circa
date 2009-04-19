@@ -10,10 +10,6 @@ namespace assign_function {
         Term* value = caller->input(0);
         Term* target = caller->input(1);
 
-        // TODO: This can probably be removed
-        if (value->type != target->type)
-            specialize_type(target, value->type);
-
         assign_value(value, target);
     }
 
