@@ -44,14 +44,15 @@ std::string
 TokenStream::consume(int match)
 {
     if (finished())
-        std::runtime_error(std::string("Unexpected EOF while looking for ") + tokenizer::get_token_text(match));
+        throw std::runtime_error(std::string("Unexpected EOF while looking for ")
+                + tokenizer::get_token_text(match));
 
     if ((match != -1) && next().match != match) {
         std::stringstream msg;
         msg << "Unexpected token (expected " << tokenizer::get_token_text(match)
             << ", found " << tokenizer::get_token_text(next().match)
             << " '" << next().text << "')";
-        std::runtime_error(msg.str());
+        throw std::runtime_error(msg.str());
     }
 
     return tokens[currentIndex++].text;

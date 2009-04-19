@@ -346,7 +346,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
     if (tokens.nextIs(DEF))
         tokens.consume(DEF);
     possible_whitespace(tokens);
-    std::string functionName = tokens.consume(IDENTIFIER);
+    std::string functionName = tokens.consume();
     possible_whitespace(tokens);
     tokens.consume(LPAREN);
 
