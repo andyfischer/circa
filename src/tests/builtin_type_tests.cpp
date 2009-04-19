@@ -74,6 +74,7 @@ void test_set()
     test_assert(as_branch(s).numTerms() == 0);
 
     s = branch.eval("s.add(1)");
+
     test_assert(as_branch(s).numTerms() == 1);
     test_assert(as_branch(s)[0]->asInt() == 1);
 

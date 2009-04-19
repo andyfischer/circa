@@ -151,8 +151,7 @@ namespace set_t {
         if (contains(branch, value))
             return;
 
-        Term* duplicated_value = create_value(&branch, value->type);
-        assign_value(value, duplicated_value);
+        create_duplicate(&branch, value);
     }
 
     void hosted_add(Term* caller)
