@@ -186,6 +186,42 @@ void test_migrate2()
     test_assert(orig["a"]->asInt() == 3);
 }
 
+void test_assign()
+{
+    Branch branch;
+
+    branch.eval("type Mytype { int a, float b }");
+
+    // Assign a value that will require coercion
+    Term* dest = branch.eval("Mytype()");
+    Term* source = branch.eval("[3 4]");
+    Term* dest0 = as_branch(dest)[0];
+    Term* dest1 = as_branch(dest)[1];
+    assign_value(source, dest);
+    test_assert(is_int(dest0));
+    test_assert(as_int(dest0) == 3);
+    test_assert(is_float(dest1));
+    test_equals(as_float(dest1), 4);
+    // Verify that 'dest' has the same terms
+    test_assert(dest0 == as_branch(dest)[0]);
+    test_assert(dest1 == as_branch(dest)[1]);
+
+    // Assign a value with more elements
+    dest = branch.eval("[1]");
+    dest0 = as_branch(dest)[0];
+    test_assert(as_int(dest0) == 1);
+
+    source = branch.eval("[7 8 9]");
+
+    assign_value(source, dest);
+
+    test_assert(as_branch(dest).numTerms() == 3);
+    test_assert(dest0 == as_branch(dest)[0]);
+    test_assert(as_int(dest0) == 7);
+    test_assert(as_int(as_branch(dest)[1]) == 8);
+    test_assert(as_int(as_branch(dest)[2]) == 9);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_remove);
@@ -197,6 +233,7 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
     REGISTER_TEST_CASE(branch_tests::test_migrate);
     REGISTER_TEST_CASE(branch_tests::test_migrate2);
+    REGISTER_TEST_CASE(branch_tests::test_assign);
 }
 
 } // namespace branch_tests
