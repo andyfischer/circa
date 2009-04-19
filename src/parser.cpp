@@ -1176,9 +1176,9 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     }
 
     // If this term doesn't live in our branch, create a copy
-    bool createCopy = (result->owningBranch != &branch);
+    //bool createCopy = (result->owningBranch != &branch);
 
-    if (createCopy) {
+    if (0) {
         std::string name = result->name;
         result = apply(&branch, COPY_FUNC, RefList(result));
         result->boolProperty("syntaxHints:hidden") = true;

@@ -3,7 +3,6 @@ arrow-concat.ca
 # assert.ca
 average.ca
 boolean.ca
-branch_literal.ca
 comparison.ca
 compound_type.ca
 feedback.ca
