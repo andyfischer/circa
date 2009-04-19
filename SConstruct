@@ -104,5 +104,5 @@ SDL_ENV.Append(LIBPATH = "lib")
 SDL_ENV.Append(LIBS = [circa_slib])
 
 for app_name in read_file_as_lines('build_apps'):
-    SDL_ENV.Program('build/bin/'+app_name, app_name+'/main.cpp')
-    SDL_ENV.Alias(app_name, 'build/bin/'+app_name)
+    prog = SDL_ENV.Program(app_name+'/bin', app_name+'/main.cpp')
+    SDL_ENV.Alias(app_name, prog)
