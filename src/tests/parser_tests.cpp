@@ -304,17 +304,6 @@ void test_if_joining_on_bool()
     test_assert(branch["hey"]->asBool() == true);
 }
 
-void test_literal_branch()
-{
-    Branch branch;
-    Term* val = branch.eval("val = {1,2}");
-
-    test_assert(is_branch(val));
-    test_assert(as_branch(val).numTerms() == 2);
-    test_assert(as_branch(val)[0]->asInt() == 1);
-    test_assert(as_branch(val)[1]->asInt() == 2);
-}
-
 void test_infix_whitespace()
 {
     Branch branch;
@@ -355,7 +344,6 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_implicit_copy_by_identifier);
     REGISTER_TEST_CASE(parser_tests::test_rebinding_infix_operator);
     REGISTER_TEST_CASE(parser_tests::test_if_joining_on_bool);
-    REGISTER_TEST_CASE(parser_tests::test_literal_branch);
     REGISTER_TEST_CASE(parser_tests::test_infix_whitespace);
 }
 
