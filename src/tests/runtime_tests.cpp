@@ -135,9 +135,12 @@ void test_runtime_type_error()
     // this test might become invalid when compile-time type checking is added
     Branch branch;
     Term* term = branch.eval("add('hello', true)");
-
     evaluate_term(term);
+    test_assert(term->hasError());
 
+    // try wrong # of arguments
+    term = branch.eval("add(1)");
+    evaluate_term(term);
     test_assert(term->hasError());
 }
 

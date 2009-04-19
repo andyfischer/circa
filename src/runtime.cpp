@@ -35,6 +35,15 @@ void evaluate_term(Term* term)
     if (func.evaluate == NULL)
         return;
 
+    // Check # of inputs
+    if (!func.variableArgs && term->inputs.count() != func.numInputs()) {
+        std::stringstream msg;
+        msg << "Wrong number of inputs (found " << term->inputs.count();
+        msg << ", expected " << func.numInputs() << ")";
+        error_occured(term, msg.str());
+        return;
+    }
+
     // Check each input. Make sure:
     //  1) it is not null
     //  2) it is up-to-date
