@@ -172,10 +172,29 @@ void Branch::dealloc(void* data)
     delete (Branch*) data;
 }
 
-void Branch::assign(Term* source, Term* dest)
+void Branch::assign(Term* sourceTerm, Term* destTerm)
 {
-    as_branch(dest).clear();
-    duplicate_branch(as_branch(source), as_branch(dest));
+    Branch& source = as_branch(sourceTerm);
+    Branch& dest = as_branch(destTerm);
+
+    // Assign terms as necessary
+    int numTermsToAssign = std::min(source.numTerms(), dest.numTerms());
+
+    for (int i=0; i < numTermsToAssign; i++) {
+        assign_value(source[i], dest[i]);
+    }
+
+    // Add terms if necessary
+    for (int i=dest.numTerms(); i < source.numTerms(); i++) {
+        create_duplicate(&dest, source[i]);
+    }
+
+    // Remove terms if necessary
+    for (int i=source.numTerms(); i < dest.numTerms(); i++) {
+        dest[i] = NULL;
+    }
+
+    dest.removeNulls();
 }
 
 void

@@ -20,9 +20,10 @@ c -> print
 v = Vector()
 
 -- make sure v has correct type
-
-
 v.x = 5.0
 v.y = 6.0
 
 v -> print
+
+print("v.x = " v.x)
+print("v.y = " v.y)
