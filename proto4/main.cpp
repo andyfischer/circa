@@ -92,6 +92,12 @@ void shape(circa::Term* caller)
     filledPolygonColor(SCREEN, vx, vy, list.numTerms(), caller->input(1)->asInt());
 }
 
+void drawText(circa::Term* caller)
+{
+    stringColor(SCREEN, caller->input(0)->asFloat(), caller->input(1)->asFloat(),
+            caller->input(2)->asString().c_str(), caller->input(3)->asInt());
+}
+
 } // namespace sdl_hosted
 
 void handle_key_press(SDL_Event event, int key)
@@ -137,6 +143,7 @@ int main( int argc, char* args[] )
     circa::import_function(*circa::KERNEL, sdl_hosted::line, "line(float,float,float,float,int)");
     circa::import_function(*circa::KERNEL, sdl_hosted::background, "background(int)");
     circa::import_function(*circa::KERNEL, sdl_hosted::shape, "shape(List,int)");
+    circa::import_function(*circa::KERNEL, sdl_hosted::drawText, "drawText(float,float, string, int)");
 
     // Set up the screen
     SCREEN = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE );
