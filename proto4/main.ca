@@ -4,7 +4,7 @@
 mouse_x = 0.0
 mouse_y = 0.0
 
---background(0xeeeeeeff)
+background(0xeeeeeeff)
 
 type Point { float x, float y }
 
@@ -31,6 +31,6 @@ for button in buttons
   print('loc=' loc)
   print('loc.x=' loc.x)
   print(button_loc)
-  --box(button_loc.x, button_loc.y, button_loc.x + button_size.x, button_loc.y + button_size.y)
-  --current_y += button_size.y + 1
+  box(button_loc.x, button_loc.y, button_loc.x + button_size.x, button_loc.y + button_size.y)
+  current_y += button_size.y + 1
 end
