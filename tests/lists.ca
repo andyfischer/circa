@@ -12,7 +12,6 @@ print(l.count() -> to_string)
 
 [1,2,3] -> to_string -> print
 
-
 -- omitting commas
 l = [1 2 3]
 l -> to_string -> print
