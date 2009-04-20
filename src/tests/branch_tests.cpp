@@ -145,45 +145,35 @@ void find_name_in_outer_branch()
 
 void test_migrate()
 {
-    Branch orig, replace;
+    Branch dest, source;
 
-    /*Term* a =*/ orig.eval("a = 1");
+    Term* a = dest.eval("state int a = 1");
+    source.eval("state int a = 2");
 
-    replace.eval("a = 2");
+    migrate_values(source, dest);
 
-    migrate_branch(replace, orig);
-
-    // Test that the 'orig' terms are the same terms
-    // (Disabled)
-    //test_assert(orig["a"] == a);
+    // Test that the 'dest' terms are the same terms
+    test_assert(dest["a"] == a);
 
     // Test that the value was transferred
-    test_assert(orig["a"]->asInt() == 2);
+    test_assert(dest["a"]->asInt() == 2);
 }
 
 void test_migrate2()
 {
     // In this test, we migrate with 1 term added and 1 term removed.
-    Branch orig, replace;
+    Branch source, dest;
 
-    Term* a = orig.eval("a = 1");
-    Term* b = orig.eval("b = 2");
+    Term* a = dest.eval("state int a = 1");
+    Term* b = dest.eval("state int b = 2");
 
-    Term* a2 = replace.eval("a = 3");
-    Term* c = replace.eval("c = 4");
+    Term* a2 = source.eval("state int a = 3");
+    Term* c = source.eval("state int c = 4");
 
-    // Sanity check our branches
-    test_assert(orig[0] == a);
-    test_assert(orig[1] == b);
-    test_assert(replace[0] == a2);
-    test_assert(replace[1] == c);
+    migrate_values(source, dest);
 
-    migrate_branch(replace, orig);
-
-    // Term preservation is disabled
-    //test_assert(orig[0] == a);
-    test_assert(orig[1]->name == "c");
-    test_assert(orig["a"]->asInt() == 3);
+    test_assert(dest["a"] == a);
+    test_assert(dest["a"]->asInt() == 3);
 }
 
 void test_assign()

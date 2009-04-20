@@ -316,7 +316,7 @@ Term*& branch_get_outer_scope(Branch& branch)
     return deref(branch[get_name_for_attribute("outer_scope")]);
 }
 
-void migrate_terms(Branch& source, Branch& dest)
+void migrate_values(Branch& source, Branch& dest)
 {
     // Iterate over every term in 'source' and compare each with
     // every term in 'dest'. Lots of room for optimization here.
@@ -337,7 +337,7 @@ void migrate_terms(Branch& source, Branch& dest)
 
             // Branch migration
             if (has_inner_branch(sourceTerm)) {
-                migrate_terms(*get_inner_branch(sourceTerm),*get_inner_branch(destTerm));
+                migrate_values(*get_inner_branch(sourceTerm),*get_inner_branch(destTerm));
             } 
             
             // Stateful value migration
@@ -348,41 +348,16 @@ void migrate_terms(Branch& source, Branch& dest)
     }
 }
 
-void migrate_branch(Branch& replacement, Branch& target)
-{
-    // The goal:
-    //
-    // Modify 'target' so that it is roughly equivalent to 'replacement',
-    // but with as much state preserved as possible.
-    //
-    // The algorithm:
-    //
-    // 1. Copy 'target' to a temporary branch 'original'
-    // 2. Overwrite 'target' with the contents of 'replacement'
-    // 3. For every term in 'original', look for a match inside 'replacement'.
-    //    A 'match' is defined loosely on purpose, because we want to allow for
-    //    any amount of cleverness. But at a minimum, if two terms have the same
-    //    name, then they match.
-    // 4. If a match is found, completely replace the relevant term inside
-    //    'target' with the matching term from 'original'.
-    // 5. Discard 'original'.
-    //
-
-    Branch original_target;
-    duplicate_branch(target, original_target);
-
-    target.clear();
-    duplicate_branch(replacement, target);
-
-    migrate_terms(original_target, target);
-}
-
 void reload_branch_from_file(Branch& branch)
 {
+    Branch original;
+    duplicate_branch(branch, original);
+
+    branch.clear();
+
     std::string filename = as_string(branch[get_name_for_attribute("source-file")]);
-    Branch replacement;
-    evaluate_file(replacement, filename);
-    migrate_branch(replacement, branch);
+    evaluate_file(branch, filename);
+    migrate_values(original, branch);
 }
 
 void persist_branch_to_file(Branch& branch)
