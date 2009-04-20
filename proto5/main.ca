@@ -1,0 +1,38 @@
+
+-- std functions
+
+mouse_x = 0.0
+mouse_y = 0.0
+
+background(0xeeeeeeff)
+
+type Point { float x, float y }
+
+def p2c(float angle, float radius, Point center) : Point
+  return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
+end
+
+def add_points(Point a, Point b) : Point
+  return [a.x + b.x, a.y + b.y]
+end
+
+-- our code
+
+type Star { Point loc, float rot, float size }
+
+def draw_star(Star star)
+  radius = star.size
+  inner_radius = radius / 2
+
+  points = range(10)
+  for p in points
+    rad = radius
+    if p % 2 == 0
+      rad = inner_radius
+    end
+    p = p2c(p * 10 / PI * 2 + star.rot, rad, star.loc)
+  end
+  shape(points, 0xff0000ff)
+end
+
+draw_star([[10,10] 0 40] : Star)
