@@ -27,7 +27,8 @@ int circa_main(std::vector<std::string> args)
 
     if (args.size() == 0) {
         run_all_tests();
-        goto shutdown;
+        shutdown();
+        return 0;
     }
 
     if (args[0] == "-e") {
@@ -44,7 +45,8 @@ int circa_main(std::vector<std::string> args)
         Branch workspace;
         Term* result = workspace.eval(command.str());
         std::cout << result->toString() << std::endl;
-        goto shutdown;
+        shutdown();
+        return 0;
     }
 
     if (args[0] == "--list-tests") {
@@ -54,7 +56,8 @@ int circa_main(std::vector<std::string> args)
         for (it = testNames.begin(); it != testNames.end(); ++it) {
             std::cout << *it << std::endl;
         }
-        goto shutdown;
+        shutdown();
+        return 0;
     }
 
     if (args[0] == "-p") {
@@ -71,50 +74,38 @@ int circa_main(std::vector<std::string> args)
         }
     }
 
-    try
-    {
-        Branch workspace;
-        string_value(&workspace, args[0], "filename");
+    Branch workspace;
+    string_value(&workspace, args[0], "filename");
 
-        Term* evaluated_file = workspace.eval("evaluate_file(filename)");
-        if (evaluated_file->hasError()) {
-            std::cout << "Parsing error: " << evaluated_file->getErrorMessage()
-                << std::endl;
-        }
-        Branch& branch = as_branch(evaluated_file);
+    Term* evaluated_file = workspace.eval("evaluate_file(filename)");
+    if (evaluated_file->hasError()) {
+        std::cout << "Parsing error: " << evaluated_file->getErrorMessage()
+            << std::endl;
+    }
+    Branch& branch = as_branch(evaluated_file);
 
-        if (justPrintBranch) {
-            std::cout << branch_to_string_raw(branch);
-        }
-
-        else if (justPrintSource) {
-            std::cout << get_branch_source(branch) << std::endl;
-        }
-
-        else if (has_compile_errors(branch)) {
-            print_compile_errors(branch, std::cout);
-        } else {
-
-            Term* error_listener = new Term();
-
-            evaluate_branch(branch, error_listener);
-
-            if (error_listener->hasError()) {
-                std::cout << "Error occured: " << error_listener->getErrorMessage() << std::endl;
-            }
-
-            // print_runtime_errors(branch, std::cout);
-        }
-
-    } catch (std::runtime_error const& err)
-    {
-        std::cout << "Top level exception:\n";
-        std::cout << err.what() << std::endl;
+    if (justPrintBranch) {
+        std::cout << branch_to_string_raw(branch);
     }
 
-shutdown:
+    else if (justPrintSource) {
+        std::cout << get_branch_source(branch) << std::endl;
+    }
+
+    else if (has_compile_errors(branch)) {
+        print_compile_errors(branch, std::cout);
+    } else {
+
+        Term* error_listener = new Term();
+
+        evaluate_branch(branch, error_listener);
+
+        if (error_listener->hasError()) {
+            std::cout << "Error occured: " << error_listener->getErrorMessage() << std::endl;
+        }
+    }
+
     shutdown();
-    
     return 0;
 }
 

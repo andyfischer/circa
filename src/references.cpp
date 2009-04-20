@@ -59,8 +59,8 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     term->inputs.remapPointers(map);
     term->function = map.getRemapped(term->function);
 
-    if (map.getRemapped(term->type) != term->type)
-        std::cout << "warn: in remap_pointers, remapping type is not yet supported" << std::endl;
+    // TODO, changeType as necessary
+    term->type = map.getRemapped(term->type);
 
     if ((term->value != NULL)
             && term->type != NULL

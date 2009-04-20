@@ -380,18 +380,14 @@ void migrate_branch(Branch& replacement, Branch& target)
 void reload_branch_from_file(Branch& branch)
 {
     std::string filename = as_string(branch[get_name_for_attribute("source-file")]);
-
     Branch replacement;
-
     evaluate_file(replacement, filename);
-
     migrate_branch(replacement, branch);
 }
 
 void persist_branch_to_file(Branch& branch)
 {
     std::string filename = as_string(branch[get_name_for_attribute("source-file")]);
-
     write_text_file(filename, get_branch_source(branch) + "\n");
 }
 
