@@ -350,12 +350,13 @@ void migrate_values(Branch& source, Branch& dest)
 
 void reload_branch_from_file(Branch& branch)
 {
+    std::string filename = as_string(branch[get_name_for_attribute("source-file")]);
+
     Branch original;
     duplicate_branch(branch, original);
 
     branch.clear();
 
-    std::string filename = as_string(branch[get_name_for_attribute("source-file")]);
     evaluate_file(branch, filename);
     migrate_values(original, branch);
 }
