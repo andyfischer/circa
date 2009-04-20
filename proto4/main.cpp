@@ -195,6 +195,7 @@ int main( int argc, char* args[] )
                 circa::reload_branch_from_file(SCRIPT_MAIN);
                 refresh_training_branch(SCRIPT_MAIN);
                 std::cout << "Script reloaded" << std::endl;
+                std::cout << circa::branch_to_string_raw(SCRIPT_MAIN) << std::endl;
                 break;
             }
         } else if (event.type == SDL_KEYDOWN) {

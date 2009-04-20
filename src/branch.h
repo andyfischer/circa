@@ -97,7 +97,7 @@ Term* find_named(Branch* branch, std::string const& name);
 bool branch_has_outer_scope(Branch& branch);
 Term*& branch_get_outer_scope(Branch& branch);
 
-void migrate_branch(Branch& replacement, Branch& target);
+void migrate_values(Branch& source, Branch& dest);
 void reload_branch_from_file(Branch& branch);
 void persist_branch_to_file(Branch& branch);
 

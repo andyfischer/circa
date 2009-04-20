@@ -36,7 +36,7 @@ void evaluate_term(Term* term)
         return;
 
     // Check # of inputs
-    if (!func.variableArgs && term->inputs.count() != func.numInputs()) {
+    if (!func.variableArgs && ((int)term->inputs.count() != func.numInputs())) {
         std::stringstream msg;
         msg << "Wrong number of inputs (found " << term->inputs.count();
         msg << ", expected " << func.numInputs() << ")";
