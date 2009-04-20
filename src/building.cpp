@@ -76,7 +76,7 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
     duplicate_branch(source->properties, term->properties);
 
     if (source->state != NULL) {
-        if (copyBranches && !has_inner_branch(source))
+        if (copyBranches || !has_inner_branch(source))
             assign_value(source->state, term->state);
     }
         
