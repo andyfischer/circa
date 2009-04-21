@@ -218,9 +218,9 @@ void consume_list_arguments(Branch& branch, TokenStream& tokens,
     int index = 0;
     while (!tokens.nextIs(RPAREN) && !tokens.nextIs(RBRACKET)) {
 
-        hints_out.set(index, "preWhitespace", possible_whitespace(tokens));
+        hints_out.set(index, "preWhitespace", possible_whitespace_or_newline(tokens));
         Term* term = infix_expression(branch, tokens);
-        hints_out.set(index, "postWhitespace", possible_whitespace(tokens));
+        hints_out.set(index, "postWhitespace", possible_whitespace_or_newline(tokens));
 
         list_out.append(term);
 

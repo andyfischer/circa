@@ -7,7 +7,10 @@ namespace add_function {
 
     void evaluate(Term* caller)
     {
-        as_float(caller) = to_float(caller->input(0)) + to_float(caller->input(1));
+        float result = 0.0;
+        for (int i=0; i < caller->numInputs(); i++)
+            result += to_float(caller->input(i));
+        as_float(caller) = result;
     }
 
     float get_mutability(Term* term)
@@ -94,6 +97,7 @@ namespace add_function {
         ADD_FUNC = import_function(kernel, evaluate, "add(float,float) -> float");
         as_function(ADD_FUNC).pureFunction = true;
         as_function(ADD_FUNC).generateTraining = generateTraining;
+        as_function(ADD_FUNC).variableArgs = true;
 
         Term* fp_func = import_function(kernel, feedback_propogate,
                 "add_feedback_propogate(any,any)");
