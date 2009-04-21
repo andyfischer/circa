@@ -14,6 +14,7 @@ static unsigned int gNextGlobalID = 1;
 Term::Term()
   : value(NULL),
     owningBranch(NULL),
+    hasError(false),
     stealingOk(true),
     needsUpdate(true),
     refCount(0)
@@ -122,19 +123,9 @@ std::string Term::stringPropertyOptional(std::string const& name, std::string co
     else return defaultValue;
 }
 
-bool Term::hasError() const
+void Term::attachErrorMessage(std::string const& message)
 {
-    return hasProperty("error");
-}
-
-void Term::clearError()
-{
-    if (hasProperty("error"))
-        removeProperty("error");
-}
-
-void Term::pushError(std::string const& message)
-{
+    hasError = true;
     addProperty("error", STRING_TYPE);
     as_string(property("error")) = message;
 }

@@ -38,7 +38,10 @@ struct Term
     // The branch that owns this term.
     Branch* owningBranch;
 
+    bool hasError;
+
     // If true, assign_value is allowed to steal our value.
+    // Deprecated
     bool stealingOk;
 
     // True if this term's value is out-of-date
@@ -82,9 +85,7 @@ struct Term
 
     // Accessors for specific properties
 
-    bool hasError() const;
-    void clearError();
-    void pushError(std::string const& message);
+    void attachErrorMessage(std::string const& message);
     std::string getErrorMessage() const;
 
     // Convenience accessors

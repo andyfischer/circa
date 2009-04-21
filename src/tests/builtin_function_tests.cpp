@@ -88,7 +88,7 @@ void test_builtin_equals()
 
     Branch branch;
     Term* term = branch.eval("equals(5.0, add)");
-    test_assert(term->hasError());
+    test_assert(term->hasError);
 }
 
 void test_map()

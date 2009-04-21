@@ -21,7 +21,7 @@ void test_var_feedback()
 
     Term* apply_feedback = branch.eval("apply_feedback(a, 2)");
 
-    if (apply_feedback->hasError()) {
+    if (apply_feedback->hasError) {
         std::cout << apply_feedback->getErrorMessage() << std::endl;
         test_assert(false);
     }

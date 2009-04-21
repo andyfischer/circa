@@ -247,7 +247,7 @@ int main( int argc, char* args[] )
         if( SDL_Flip(SCREEN) == -1 )
             return 1;
 
-        SDL_Delay( 10 );
+        SDL_Delay(10);
     }
 
     // Quit SDL

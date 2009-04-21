@@ -17,7 +17,7 @@ void evaluate_term(Term* term)
     if (term == NULL)
         throw std::runtime_error("term is NULL");
 
-    term->clearError();
+    term->hasError = false;
 
     // Check function
     if (term->function == NULL) {
@@ -73,7 +73,7 @@ void evaluate_term(Term* term)
             return;
         }
 
-        if (input->hasError() && !inputProps.meta) {
+        if (input->hasError && !inputProps.meta) {
             std::stringstream message;
             message << "Input " << inputIndex << " has an error";
             error_occured(term, message.str());
@@ -118,7 +118,7 @@ void evaluate_branch(Branch& branch, Term* errorListener)
 		Term* term = branch.get(index);
         evaluate_term(term);
 
-        if (term->hasError()) {
+        if (term->hasError) {
             std::stringstream out;
             out << "On term " << term_to_raw_string(term) << "\n" << term->getErrorMessage();
             error_occured(errorListener, out.str());
@@ -134,7 +134,8 @@ void error_occured(Term* errorTerm, std::string const& message)
         return;
     }
 
-    errorTerm->pushError(message);
+    errorTerm->hasError = true;
+    errorTerm->attachErrorMessage(message);
 }
 
 Term* apply_and_eval(Branch* branch, Term* function, RefList const& inputs)
