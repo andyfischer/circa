@@ -86,8 +86,8 @@ void shape(circa::Term* caller)
 
     circa::Branch& list = circa::as_branch(caller->input(0));
     for (int i=0; i < list.numTerms(); i++) {
-        vx[i] = list[i]->field(0)->asFloat();
-        vy[i] = list[i]->field(1)->asFloat();
+        vx[i] = circa::to_float(list[i]->field(0));
+        vy[i] = circa::to_float(list[i]->field(1));
     }
     filledPolygonColor(SCREEN, vx, vy, list.numTerms(), caller->input(1)->asInt());
 }

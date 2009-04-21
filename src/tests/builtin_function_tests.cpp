@@ -114,6 +114,23 @@ void test_list()
     test_assert(as_branch(l)[2]->asString() == "foo");
 }
 
+void test_range()
+{
+    Branch branch;
+    Term* t = branch.eval("range(5)");
+
+    test_assert(as_branch(t).numTerms() == 5);
+    for (int i=0; i < 5; i++)
+        test_assert(as_int(as_branch(t)[i]) == i);
+
+    // there was once a bug where the result list would grow on every call
+    evaluate_term(t);
+    evaluate_term(t);
+    evaluate_term(t);
+    evaluate_term(t);
+    test_assert(as_branch(t).numTerms() == 5);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
@@ -125,6 +142,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_map);
     REGISTER_TEST_CASE(builtin_function_tests::test_list);
+    REGISTER_TEST_CASE(builtin_function_tests::test_range);
 }
 
 } // namespace builtin_function_tests

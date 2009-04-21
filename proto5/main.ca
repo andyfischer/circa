@@ -30,9 +30,13 @@ def draw_star(Star star)
     if p % 2 == 0
       rad = inner_radius
     end
-    p = p2c(p * 10 / PI * 2 + star.rot, rad, star.loc)
+    p = p2c(p * 2*PI / 10 + star.rot, rad, star.loc)
   end
   shape(points, 0xff0000ff)
 end
 
-draw_star([[10,10] 0 40] : Star)
+stars = [[[mouse_x,100] 0 40] [[mouse_y,100] 0 40]]
+
+for star in stars
+  draw_star(star)
+end
