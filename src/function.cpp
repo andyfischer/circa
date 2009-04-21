@@ -32,7 +32,7 @@ Function::inputType(int index)
 
 int Function::numInputs()
 {
-    return inputTypes.count();
+    return (int) inputTypes.count();
 }
 
 void Function::appendInput(Term* type, std::string const& name)

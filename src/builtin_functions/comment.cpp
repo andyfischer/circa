@@ -1,9 +1,6 @@
 // Copyright 2008 Paul Hodge
 
-#include "branch.h"
-#include "builtins.h"
-#include "importing.h"
-#include "type.h"
+#include "circa.h"
 
 namespace circa {
 namespace comment_function {
