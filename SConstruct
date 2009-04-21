@@ -12,27 +12,29 @@ generate_cpp_registration.do_register_all_tests(
     'src/tests',
     'src/register_all_tests.cpp')
 
-ENV = Environment(tools = ["default"], toolpath=".")
+ROOT = Environment(tools = ["default"], toolpath=".")
 
 POSIX = os.name == 'posix'
 WINDOWS = os.name == 'nt'
 
 if POSIX:
-    ENV.Append(CPPFLAGS=['-ggdb'])
-    ENV.Append(CPPFLAGS=['-Wall'])
+    ROOT.Append(CPPFLAGS=['-ggdb'])
+    ROOT.Append(CPPFLAGS=['-Wall'])
 
 if WINDOWS:
-    ENV.Append(CPPFLAGS=['/EHsc /RTC1 /Wp64 /MTd /Gm /Zi'.split()])
-    ENV.Append(LIBS = ['libcmtd'])
-    ENV.Append(LINKFLAGS=['/NODEFAULTLIB:libc.lib'])
-    ENV.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrt.lib'])
-    ENV.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrtd.lib'])
-    ENV.Append(LINKFLAGS=['/NODEFAULTLIB:libcd.lib'])
-    ENV.Append(LINKFLAGS=['/NODEFAULTLIB:libcmt.lib'])
-    ENV.Append(LINKFLAGS=['/SUBSYSTEM:CONSOLE /MACHINE:X86'.split()])
+    ROOT.Append(CPPFLAGS=['/EHsc /RTC1 /Wp64 /MTd /Gm /Zi'.split()])
+    ROOT.Append(LIBS = ['libcmtd'])
+    ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:libc.lib'])
+    ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrt.lib'])
+    ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrtd.lib'])
+    ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:libcd.lib'])
+    ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:libcmt.lib'])
+    ROOT.Append(LINKFLAGS=['/SUBSYSTEM:CONSOLE /MACHINE:X86'.split()])
 
-ENV.Append(CPPDEFINES = ["_DEBUG"])
-ENV.Append(CPPDEFINES = ["DEBUG"])
+ROOT.Append(CPPDEFINES = ["_DEBUG"])
+ROOT.Append(CPPDEFINES = ["DEBUG"])
+
+ENV = ROOT.Clone()
 
 ENV.BuildDir('build/src', 'src')
 ENV.Append(CPPPATH = ['src'])
@@ -44,6 +46,8 @@ def write_text_file(path, contents):
     f = open(path, 'w')
     f.write(contents)
     f.close()
+
+path_join = os.path.join
 
 BUILD_FILES = []
 
@@ -79,30 +83,35 @@ source_directory('src', excludes=['main.cpp', 'src/main.cpp'])
 source_directory_into_one_cpp('src/tests', 'all_tests')
 source_directory_into_one_cpp('src/builtin_functions', 'all_builtin_functions')
 
-circa_slib = ENV.StaticLibrary('lib/circa', BUILD_FILES)
-# circa_so = ENV.SharedLibrary('lib/circa', BUILD_FILES)
+circa_staticlib = ENV.StaticLibrary('build/bin/circa', BUILD_FILES)
 
-circaBinary = ENV.Program('build/bin/circa', 'build/src/main.cpp', LIBS=[circa_slib])
+circaBinary = ENV.Program('build/bin/circa', 'build/src/main.cpp', LIBS=[circa_staticlib])
 
 ENV.SetOption('num_jobs', 2)
 ENV.Default(circaBinary)
 
 ########################### SDL-based apps ###############################
 
-SDL_ENV = Environment()
-
-# import path so that we will find the correct sdl-config
-SDL_ENV['ENV']['PATH'] = os.environ['PATH']
+SDL_ENV = ROOT.Clone()
 
 if POSIX:
+    # import path so that we will find the correct sdl-config
+    SDL_ENV['ENV']['PATH'] = os.environ['PATH']
     SDL_ENV.ParseConfig('sdl-config --cflags')
     SDL_ENV.ParseConfig('sdl-config --libs')
+    SDL_ENV.Append(LIBS = ['SDL_gfx'])
 
-SDL_ENV.Append(LIBS = ['SDL_gfx'])
+elif WINDOWS:
+    SDL_ENV.Append(CPPPATH=['SDL/include'])
+    SDL_ENV.Append(CPPPATH=['SDL_gfx'])
+    SDL_ENV.Append(LIBS=['SDL/lib/SDL.lib'])
+    SDL_ENV.Append(LIBS=['SDL/lib/SDLmain.lib'])
+    SDL_ENV.Append(LIBS=['SDL_gfx/VisualC/Release/SDL_gfx.lib'])
+
+
 SDL_ENV.Append(CPPPATH=['src'])
-SDL_ENV.Append(LIBPATH = "lib")
-SDL_ENV.Append(LIBS = [circa_slib])
+SDL_ENV.Append(LIBS = [circa_staticlib])
 
 for app_name in read_file_as_lines('build_apps'):
-    prog = SDL_ENV.Program(app_name+'/bin', app_name+'/main.cpp')
+    prog = SDL_ENV.Program(path_join(app_name,'bin'), path_join(app_name,'main.cpp'))
     SDL_ENV.Alias(app_name, prog)

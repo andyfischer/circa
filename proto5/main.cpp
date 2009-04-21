@@ -1,4 +1,6 @@
-#include "SDL/SDL.h"
+// Copyright 2008 Paul Hodge
+
+#include "SDL.h"
 #include "SDL_gfxPrimitives.h"
 
 #include <string>

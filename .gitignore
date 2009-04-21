@@ -15,12 +15,15 @@ bin/cgame
 *.obj
 *.lib
 *.exe
+*.dll
 
 # project file artifacts:
 circa.xcodeproj/*.mode1v3
 circa.xcodeproj/*.pbxuser
 circa.1
 *.ilk
+*.idb
+*.exp
 *.exe.manifest
 *.pdb
 *.suo
