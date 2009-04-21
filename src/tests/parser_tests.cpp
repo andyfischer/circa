@@ -185,7 +185,7 @@ void test_function_decl()
 void test_stateful_value_decl()
 {
     Branch branch;
-    Term* a = parser::compile(&branch, parser::statement, "state int a");
+    Term* a = parser::compile(&branch, parser::statement, "state a : int");
 
     test_assert(is_stateful(a));
     test_assert(a->name == "a");
@@ -193,12 +193,19 @@ void test_stateful_value_decl()
     test_assert(branch["a"] == a);
     test_assert(a->value != NULL);
 
-    Term* b = parser::compile(&branch, parser::statement, "state float b = 5.0");
+    Term* b = parser::compile(&branch, parser::statement, "state b = 5.0");
     test_assert(b->name == "b");
     test_assert(is_stateful(b));
     test_assert(b->type == FLOAT_TYPE);
     test_assert(branch["b"] == b);
-    test_assert(as_float(b) == 5.0);
+    test_equals(as_float(b), 5.0);
+
+    Term* c = parser::compile(&branch, parser::statement, "state c :float = 7.5");
+    test_assert(c->name == "c");
+    test_assert(is_stateful(c));
+    test_assert(c->type == FLOAT_TYPE);
+    test_assert(branch["c"] == c);
+    test_equals(as_float(c), 7.5);
 }
 
 void test_arrow_concatenation()

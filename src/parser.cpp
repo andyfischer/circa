@@ -614,10 +614,17 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 {
     tokens.consume(STATE);
     possible_whitespace(tokens);
-    std::string typeName = tokens.consume(IDENTIFIER);
-    possible_whitespace(tokens);
     std::string name = tokens.consume(IDENTIFIER);
     possible_whitespace(tokens);
+
+    // type annotation
+    std::string typeName;
+    if (tokens.nextIs(COLON)) {
+        tokens.consume();
+        possible_whitespace(tokens);
+        typeName = tokens.consume(IDENTIFIER);
+        possible_whitespace(tokens);
+    }
 
     Term* initialValue = NULL;
     if (tokens.nextIs(EQUALS)) {
@@ -626,8 +633,6 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         initialValue = infix_expression(branch, tokens);
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
     }
-
-    Term* type = find_type(branch, typeName);
 
     RefList inputs;
     if (initialValue != NULL)
@@ -638,11 +643,13 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     if (inputs.count() > 0)
         set_input_syntax(result, 0, inputs[0]);
 
-    change_type(result, type);
-
-    if (initialValue != NULL) {
-        assign_value(initialValue, result);
+    if (typeName != "") {
+        Term* type = find_type(branch, typeName);
+        change_type(result, type);
     }
+
+    if (initialValue != NULL)
+        assign_value(initialValue, result);
     else
         alloc_value(result);
 

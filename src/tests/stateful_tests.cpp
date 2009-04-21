@@ -10,7 +10,7 @@ namespace stateful_tests {
 void stateful_value_evaluation()
 {
     Branch branch;
-    Term *i = branch.eval("state float i = 2.0");
+    Term *i = branch.eval("state i = 2.0");
     branch.eval("i = i + 1.0");
     parser::wrap_up_branch(branch);
 

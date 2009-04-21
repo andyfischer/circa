@@ -147,8 +147,8 @@ void test_migrate()
 {
     Branch dest, source;
 
-    Term* a = dest.eval("state int a = 1");
-    source.eval("state int a = 2");
+    Term* a = dest.eval("state a = 1");
+    source.eval("state a = 2");
 
     migrate_values(source, dest);
 
@@ -164,11 +164,11 @@ void test_migrate2()
     // In this test, we migrate with 1 term added and 1 term removed.
     Branch source, dest;
 
-    Term* a = dest.eval("state int a = 1");
-    Term* b = dest.eval("state int b = 2");
+    Term* a = dest.eval("state a = 1");
+    /*Term* b =*/ dest.eval("state b = 2");
 
-    Term* a2 = source.eval("state int a = 3");
-    Term* c = source.eval("state int c = 4");
+    /*Term* a2 =*/ source.eval("state a = 3");
+    /*Term* c =*/ source.eval("state c = 4");
 
     migrate_values(source, dest);
 
