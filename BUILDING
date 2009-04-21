@@ -1,0 +1,18 @@
+
+Dependencies:
+  Scons
+  Python (for SCons)
+  SDL-devel
+  SDL_gfx
+
+ALL PLATFORMS:
+
+1. Install SCons
+2. Install SDL-devel (Windows users, see instructions below)
+3. Bring up a command line, and enter the command 'scons'
+
+WINDOWS BUILD:
+
+Download SDL-devel-1.2.13-VC8.zip from http://www.libsdl.org/release/SDL-devel-1.2.13-VC8.zip
+
+Unzip the contents into the project's folder, and rename this folder to just SDL.
