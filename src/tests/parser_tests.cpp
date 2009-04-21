@@ -329,6 +329,21 @@ void test_infix_whitespace()
     test_assert(term->stringProperty("syntaxHints:postWhitespace") == "");
 }
 
+void test_list_arguments()
+{
+    Branch branch;
+    Term *t = branch.eval("add(1 2 3)");
+    test_assert(as_int(t->input(0)) == 1);
+    test_assert(as_int(t->input(1)) == 2);
+    test_assert(as_int(t->input(2)) == 3);
+
+    t = branch.eval("add(5\n 6 , 7;8)");
+    test_assert(as_int(t->input(0)) == 5);
+    test_assert(as_int(t->input(1)) == 6);
+    test_assert(as_int(t->input(2)) == 7);
+    test_assert(as_int(t->input(3)) == 8);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -352,6 +367,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_rebinding_infix_operator);
     REGISTER_TEST_CASE(parser_tests::test_if_joining_on_bool);
     REGISTER_TEST_CASE(parser_tests::test_infix_whitespace);
+    REGISTER_TEST_CASE(parser_tests::test_list_arguments);
 }
 
 } // namespace parser_tests

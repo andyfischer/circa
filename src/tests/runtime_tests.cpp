@@ -139,7 +139,7 @@ void test_runtime_type_error()
     test_assert(term->hasError());
 
     // try wrong # of arguments
-    term = branch.eval("add(1)");
+    term = branch.eval("div(1)");
     evaluate_term(term);
     test_assert(term->hasError());
 }
