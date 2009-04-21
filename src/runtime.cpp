@@ -84,7 +84,7 @@ void evaluate_term(Term* term)
         if (!value_fits_type(input, func.inputTypes[effectiveIndex])) {
             std::stringstream message;
             message << "Runtime type error: input " << inputIndex << " has type "
-                << as_type(input->type).name;
+                << input->type->name;
             error_occured(term, message.str());
             return;
         }
