@@ -1,4 +1,0 @@
-
-function Type_to_string(Type type) -> string
-  return concat("<Type ", type.name, ">")
-end
