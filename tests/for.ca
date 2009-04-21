@@ -12,7 +12,7 @@ end
 
 -- iterate with a stateful value
 for i in range(4)
-  state string result = ''
+  state result = ''
   result = concat(i -> to_string, result)
   print(result)
 end

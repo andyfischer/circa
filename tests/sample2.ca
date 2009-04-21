@@ -3,8 +3,8 @@
 fill_rectangle(0,0,640,480, 0xfffffffe)
 
 -- mouse positions are passed in from cgame
-state float mouse_x
-state float mouse_y
+state mouse_x:float
+state mouse_y:float
 
 ship_size = 20.0
 back_dist = 4.0
@@ -14,10 +14,10 @@ turn_speed = 0.04
 max_speed = 5.0
 
 -- the state of the ship
-state float ship_x = 200.0
-state float ship_y = 200.0
-state float ship_facing = PI*2
-state float ship_speed = 0.0
+state ship_x = 200.0
+state ship_y = 200.0
+state ship_facing = PI*2
+state ship_speed = 0.0
 
 -- Draw the ship
 a_x = ship_x + ship_size * cos(ship_facing)
@@ -70,10 +70,10 @@ end
 
 
 -- State of the active bullet
-state float bullet_x = 0.0
-state float bullet_y = 0.0
-state bool bullet_active = false
-state float bullet_facing = 0.0
+state bullet_x = 0.0
+state bullet_y = 0.0
+state bullet_active = false
+state bullet_facing = 0.0
 bullet_speed = 8.0
 bullet_size = 3.0
 
