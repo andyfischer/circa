@@ -1,13 +1,12 @@
 
 Required features before public exposure:
 - Parsing errors not handled well (we usually crash)
-  * need to display location of compile errors
-- Support optional type annotations
+  - need to display location of compile errors
+X Support optional type annotations
 - Cool graphical demo
 
 Need to have soon:
-- Type coersion is very poor, especially int-to-float and float-to-int
-- Loose static typing is strange. Need to work this out.
+X Type coersion is very poor, especially int-to-float and float-to-int
 - Parametrized types, lists and stuff
 
 Other todos:
