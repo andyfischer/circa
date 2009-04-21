@@ -12,6 +12,7 @@ const int SCREEN_BPP = 32;
 bool KEY_DOWN[SDLK_LAST];
 std::set<int> KEY_JUST_PRESSED;
 
+bool mouse_just_pressed = false;
 int mouse_x = 0;
 int mouse_y = 0;
 
@@ -98,6 +99,11 @@ void drawText(circa::Term* caller)
             caller->input(2)->asString().c_str(), caller->input(3)->asInt());
 }
 
+void mouse_pressed(circa::Term* caller)
+{
+    circa::as_bool(caller) = mouse_just_pressed;
+}
+
 } // namespace sdl_hosted
 
 void handle_key_press(SDL_Event event, int key)
@@ -149,6 +155,7 @@ int main( int argc, char* args[] )
     circa::import_function(*circa::KERNEL, sdl_hosted::background, "background(int)");
     circa::import_function(*circa::KERNEL, sdl_hosted::shape, "shape(List,int)");
     circa::import_function(*circa::KERNEL, sdl_hosted::drawText, "drawText(float,float, string, int)");
+    circa::import_function(*circa::KERNEL, sdl_hosted::mouse_pressed, "mouse_pressed() : bool");
 
     // Set up the screen
     SCREEN = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE );
@@ -183,11 +190,11 @@ int main( int argc, char* args[] )
         SDL_PollEvent(&event);
 
         circa::as_float(SCRIPT_MAIN["time"]) = SDL_GetTicks() / 1000.0;
+        mouse_just_pressed = false;
 
-        if (event.type == SDL_QUIT)
+        if (event.type == SDL_QUIT) {
             CONTINUE_MAIN_LOOP = false;
-
-        if (event.type == SDL_MOUSEMOTION) {
+        } else if (event.type == SDL_MOUSEMOTION) {
             mouse_x = event.motion.x;
             mouse_y = event.motion.y;
             mouse_movement_x = event.motion.x;
@@ -207,7 +214,7 @@ int main( int argc, char* args[] )
         } else if (event.type == SDL_KEYUP) {
             KEY_DOWN[event.key.keysym.sym] = false;
         } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-            drag_in_progress = true;
+            mouse_just_pressed = true;
             drag_start_x = mouse_x;
             drag_start_y = mouse_y;
         } else if (event.type == SDL_MOUSEBUTTONUP) {

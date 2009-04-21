@@ -98,6 +98,9 @@ void Function::copyExceptBranch(Term* sourceTerm, Term* destTerm)
     copy_field(variableArgs);
     copy_field(name);
     copy_field(evaluate);
+    copy_field(specializeType);
+    copy_field(generateTraining);
+    copy_field(toSourceString);
     copy_field(startControlFlowIterator);
     copy_field(feedbackAccumulationFunction);
     copy_field(feedbackPropogateFunction);
