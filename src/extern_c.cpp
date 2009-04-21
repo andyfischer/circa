@@ -40,7 +40,7 @@ const char* branch_to_string_raw(Branch* branch)
     return result.c_str();
 }
 
-int term_num_inputs(Term* term) { return term->inputs.count(); }
+int term_num_inputs(Term* term) { return (int) term->inputs.count(); }
 Term* term_get_input(Term* term, int i) { return term->inputs[i]; }
 
 const char* term_get_name(Term* term)

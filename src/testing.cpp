@@ -73,7 +73,7 @@ void _test_equals_function(float a, float b,
         const char* aText, const char* bText,
         int line, const char* file)
 {
-    const float EPSILON = 0.0001;
+    const float EPSILON = 0.0001f;
 
     if (fabs(a-b) > EPSILON) {
         std::stringstream msg;

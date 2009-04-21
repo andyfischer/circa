@@ -129,8 +129,10 @@ void evaluate_branch(Branch& branch, Term* errorListener)
 
 void error_occured(Term* errorTerm, std::string const& message)
 {
-    if (errorTerm == NULL)
+    if (errorTerm == NULL) {
         throw std::runtime_error(message);
+        return;
+    }
 
     errorTerm->pushError(message);
 }

@@ -424,7 +424,7 @@ void initialize_constants(Branch& kernel)
     CONSTANT_FALSE->stealingOk = false;
     KERNEL->bindName(CONSTANT_FALSE, "false");
 
-    float_value(&kernel, 3.141592654, "PI");
+    float_value(&kernel, 3.141592654f, "PI");
 }
 
 void initialize()

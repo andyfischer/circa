@@ -59,7 +59,7 @@ void blocked_by_error()
     bool threw = false;
     try {
         evaluate_branch(branch);
-    } catch (std::runtime_error const& e) {
+    } catch (std::runtime_error const&) {
         threw = true;
     }
 

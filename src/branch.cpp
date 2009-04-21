@@ -80,7 +80,7 @@ Term* Branch::findFirstBinding(std::string const& name) const
 
 Term* Branch::findLastBinding(std::string const& name) const
 {
-    for (int i = _terms.count()-1; i >= 0; i--) {
+    for (size_t i = _terms.count()-1; i >= 0; i--) {
         if (_terms[i] == NULL)
             continue;
         if (_terms[i]->name == name)
