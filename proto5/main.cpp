@@ -182,6 +182,8 @@ int main( int argc, char* args[] )
         SDL_Event event;
         SDL_PollEvent(&event);
 
+        circa::as_float(SCRIPT_MAIN["time"]) = SDL_GetTicks() / 1000.0;
+
         if (event.type == SDL_QUIT)
             CONTINUE_MAIN_LOOP = false;
 
