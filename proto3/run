@@ -1,2 +1,0 @@
-cd $CIRCA_HOME
-scons proto3 && build/bin/proto3 $*

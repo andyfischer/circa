@@ -1,8 +1,8 @@
 
 -- std functions
 
-state float mouse_x = 0.0
-state float mouse_y = 0.0
+state mouse_x = 0.0
+state mouse_y = 0.0
 
 background(0xeeeeeeff)
 

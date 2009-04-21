@@ -59,7 +59,7 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     term->inputs.remapPointers(map);
     term->function = map.getRemapped(term->function);
 
-    // TODO, changeType as necessary
+    // TODO, call changeType if our type is changed
     term->type = map.getRemapped(term->type);
 
     if ((term->value != NULL)
