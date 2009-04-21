@@ -77,7 +77,7 @@ T eval_as(std::string const& statement)
 
     Term* result_term = branch.eval(statement);
 
-    if (result_term->hasError())
+    if (result_term->hasError)
         throw std::runtime_error(result_term->getErrorMessage());
 
     return as<T>(result_term);

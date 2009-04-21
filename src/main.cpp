@@ -78,7 +78,7 @@ int circa_main(std::vector<std::string> args)
     string_value(&workspace, args[0], "filename");
 
     Term* evaluated_file = workspace.eval("evaluate_file(filename)");
-    if (evaluated_file->hasError()) {
+    if (evaluated_file->hasError) {
         std::cout << "Parsing error: " << evaluated_file->getErrorMessage()
             << std::endl;
     }
@@ -100,7 +100,7 @@ int circa_main(std::vector<std::string> args)
 
         evaluate_branch(branch, error_listener);
 
-        if (error_listener->hasError()) {
+        if (error_listener->hasError) {
             std::cout << "Error occured: " << error_listener->getErrorMessage() << std::endl;
         }
     }

@@ -33,7 +33,7 @@ void _test_assert_function(Term* term, int line, const char* file)
         throw std::runtime_error(msg.str());
     }
 
-    if (term->hasError()) {
+    if (term->hasError) {
         std::stringstream msg;
         msg << term->getErrorMessage() << std::endl;
         msg << "Occured in " << file << ", line " << line << std::endl;

@@ -67,8 +67,8 @@ void blocked_by_error()
 
     test_assert(gSpyResults.size() == 1);
     test_assert(gSpyResults[0] == "1");
-    test_assert(!spy_1->hasError());
-    test_assert(error->hasError());
+    test_assert(!spy_1->hasError);
+    test_assert(error->hasError);
     test_assert(spy_errored->needsUpdate);
 }
 
@@ -105,23 +105,22 @@ void null_input_errors()
 
     Term* term1 = apply(&branch, ADD_FUNC, RefList(NULL, one));
     evaluate_term(term1);
-    test_assert(term1->hasError());
+    test_assert(term1->hasError);
     test_assert(term1->getErrorMessage() == "Input 0 is NULL");
 
     term1->function = NULL;
     evaluate_term(term1);
-    test_assert(term1->hasError());
+    test_assert(term1->hasError);
     test_assert(term1->getErrorMessage() == "Function is NULL");
 
     Term* term2 = apply(&branch, ADD_FUNC, RefList(one, NULL));
     evaluate_term(term2);
-    test_assert(term2->hasError());
+    test_assert(term2->hasError);
     test_assert(term2->getErrorMessage() == "Input 1 is NULL");
 
     set_input(term2, 1, one);
     evaluate_term(term2);
-    test_assert(!term2->hasError());
-    test_assert(term2->getErrorMessage() == "");
+    test_assert(!term2->hasError);
     test_assert(term2->asFloat() == 2.0);
 }
 
@@ -136,12 +135,12 @@ void test_runtime_type_error()
     Branch branch;
     Term* term = branch.eval("add('hello', true)");
     evaluate_term(term);
-    test_assert(term->hasError());
+    test_assert(term->hasError);
 
     // try wrong # of arguments
     term = branch.eval("div(1)");
     evaluate_term(term);
-    test_assert(term->hasError());
+    test_assert(term->hasError);
 }
 
 void register_tests()
