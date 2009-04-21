@@ -294,7 +294,6 @@ void bootstrap_kernel()
     typeType->assign = Type::type_assign;
     typeType->remapPointers = Type::typeRemapPointers;
     typeType->toString = Type::type_to_string;
-    typeType->toSourceString = Type::type_to_string;
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Implant the Type type
@@ -325,7 +324,7 @@ void bootstrap_kernel()
     as_type(FUNCTION_TYPE).dealloc = cpp_importing::templated_dealloc<Function>;
     as_type(FUNCTION_TYPE).assign = Function::assign;
     as_type(FUNCTION_TYPE).remapPointers = Function::remapPointers;
-    as_type(FUNCTION_TYPE).toSourceString = Function::functionToSourceString;
+    as_type(FUNCTION_TYPE).toString = Function::functionToSourceString;
     KERNEL->bindName(FUNCTION_TYPE, "Function");
 
     // Implant Function type
@@ -351,25 +350,21 @@ void initialize_builtin_types(Branch& kernel)
     as_type(STRING_TYPE).equals = cpp_importing::templated_equals<std::string>;
     as_type(STRING_TYPE).lessThan = cpp_importing::templated_lessThan<std::string>;
     as_type(STRING_TYPE).toString = primitives::string_t::to_string;
-    as_type(STRING_TYPE).toSourceString = primitives::string_t::to_string;
 
     INT_TYPE = import_type<int>(kernel, "int");
     as_type(INT_TYPE).equals = cpp_importing::templated_equals<int>;
     as_type(INT_TYPE).lessThan = cpp_importing::templated_lessThan<int>;
     as_type(INT_TYPE).toString = primitives::int_t::to_string;
-    as_type(INT_TYPE).toSourceString = primitives::int_t::to_string;
 
     FLOAT_TYPE = import_type<float>(kernel, "float");
     as_type(FLOAT_TYPE).assign = primitives::float_t::assign;
     as_type(FLOAT_TYPE).equals = cpp_importing::templated_equals<float>;
     as_type(FLOAT_TYPE).lessThan = cpp_importing::templated_lessThan<float>;
     as_type(FLOAT_TYPE).toString = primitives::float_t::to_string;
-    as_type(FLOAT_TYPE).toSourceString = primitives::float_t::to_string;
 
     BOOL_TYPE = import_type<bool>(kernel, "bool");
     as_type(BOOL_TYPE).equals = cpp_importing::templated_equals<bool>;
     as_type(BOOL_TYPE).toString = primitives::bool_t::to_string;
-    as_type(BOOL_TYPE).toSourceString = primitives::bool_t::to_string;
 
     ANY_TYPE = create_empty_type(kernel, "any");
 
@@ -396,7 +391,6 @@ void initialize_builtin_types(Branch& kernel)
 
     LIST_TYPE = create_compound_type(kernel, "List");
     as_type(LIST_TYPE).toString = list_t::to_string;
-    as_type(LIST_TYPE).toSourceString = list_t::to_string;
     import_member_function(LIST_TYPE, list_t::append, "append(List, any) -> List");
     import_member_function(LIST_TYPE, list_t::count, "count(List) -> int");
 }

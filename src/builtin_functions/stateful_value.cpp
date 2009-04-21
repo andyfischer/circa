@@ -14,7 +14,6 @@ namespace stateful_value_function {
         std::stringstream result;
         result << "state ";
         result << term->name;
-        std::cout << "name = " << term->name << std::endl;
 
         // check for initial value
         if (term->numInputs() > 0) {
