@@ -58,9 +58,9 @@ std::string get_term_source(Term* term)
 
     result << term->stringPropertyOptional("syntaxHints:preWhitespace", "");
 
-    // for values, check if the type has a toSourceString function
+    // for values, check if the type has a toString function
     if (is_value(term)) {
-        if (as_type(term->type).toSourceString != NULL) {
+        if (as_type(term->type).toString != NULL) {
             bool prependNameBinding = true;
 
             // for certain types, don't write "name =" in front
@@ -70,7 +70,7 @@ std::string get_term_source(Term* term)
             if (prependNameBinding && term->name != "")
                 result << term->name << " = ";
 
-            result << as_type(term->type).toSourceString(term);
+            result << as_type(term->type).toString(term);
             result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
             return result.str();
         }
@@ -118,8 +118,6 @@ std::string get_term_source(Term* term)
         }
         result << ")";
 
-    } else if (declarationStyle == "literal") {
-        result << to_source_string(term);
     } else if (declarationStyle == "dot-concat") {
         result << get_source_of_input(term, 0);
         result << ".";

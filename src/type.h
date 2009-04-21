@@ -27,7 +27,6 @@ struct Type
     typedef bool (*LessThanFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
     typedef std::string (*ToStringFunc)(Term* term);
-    typedef std::string (*ToSourceStringFunc)(Term* term);
 
     struct Field {
         Ref type;
@@ -50,7 +49,6 @@ struct Type
     LessThanFunc lessThan;
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
-    ToStringFunc toSourceString;
 
     // Stores our value function
     Ref valueFunction;
@@ -80,7 +78,6 @@ struct Type
         lessThan(NULL),
         remapPointers(NULL),
         toString(NULL),
-        toSourceString(NULL),
         valueFunction(NULL),
         refCount(0)
     {
@@ -163,7 +160,6 @@ void dealloc_value(Term* term);
 bool identity_equals(Term* a, Term* b);
 bool equals(Term* a, Term* b);
 std::string to_string(Term* term);
-std::string to_source_string(Term* term);
 void assign_value(Term* source, Term* dest);
 void assign_value_but_dont_copy_inner_branch(Term* source, Term* dest);
 
