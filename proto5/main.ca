@@ -39,10 +39,14 @@ def draw_star(Star star)
     end
     p = p2c((p + 0.5) * 2*PI / 10 + star.rot + time*star.speed, rad, star.loc)
   end
-  shape(points, 0xff0000ff)
+  shape(points, 0xff3399ff)
 end
 
-stars = [[[mouse_x,100] .3 40 1.0] [[mouse_y,100] .1 40 1.2]]
+state stars = []
+
+if mouse_pressed()
+  stars.append([[mouse_x mouse_y] .3 40 1])
+end
 
 for star in stars
   draw_star(star)
