@@ -366,7 +366,12 @@ void assign_value(Term* source, Term* dest)
     if (dest->type == ANY_TYPE)
         specialize_type(dest, source->type);
 
-    assert(value_fits_type(source, dest->type));
+    if (!value_fits_type(source, dest->type)) {
+        std::stringstream err;
+        err << "In assign_value, element of type " << source->type->name <<
+            " doesn't fit in type " << dest->type->name;
+        throw std::runtime_error(err.str());
+    }
 
     if (!is_value_alloced(dest))
         alloc_value(dest);

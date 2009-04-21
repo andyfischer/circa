@@ -23,6 +23,11 @@ namespace for_function {
         as_branch(caller->state->field("results")).clear();
 
         for (int i=0; i < series.numTerms(); i++) {
+            if (!value_fits_type(series[i], iterator->type)) {
+                error_occured(caller, "Internal error in for(): can't assign this element to iterator");
+                return;
+            }
+
             assign_value(series[i], iterator);
             evaluate_branch(contents);
 
