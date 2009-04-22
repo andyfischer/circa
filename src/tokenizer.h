@@ -61,6 +61,7 @@ const int RIGHT_ARROW = 37;
 const int DOUBLE_AMPERSAND = 38;
 const int DOUBLE_VERTICAL_BAR = 39;
 const int SEMICOLON = 40;
+const int ELLIPSIS = 42;
 
 const int DEF = 51;
 const int TYPE = 52;
