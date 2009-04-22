@@ -1,0 +1,51 @@
+-- Copyright 2008 Andrew Fischer
+
+-- std functions
+
+state mouse_x = 0.0
+state mouse_y = 0.0
+state time = 0.0
+
+background(0xeeeeeeff)
+
+type Point { float x, float y }
+
+-- p2c: polar to cartesian
+def p2c(float angle, float radius, Point center) : Point
+  return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
+end
+
+-- our code
+
+type Star {
+    Point loc
+    float rot
+    float size
+    float speed
+}
+
+def draw_star(Star star)
+  radius = star.size
+  inner_radius = radius / 2
+
+  points = range(10)
+  for p in points
+    rad = radius
+    if p % 2 == 0
+      rad = inner_radius
+    end
+    p = p2c((p + 0.5) * 2*PI / 10 + star.rot + time*star.speed, rad, star.loc)
+  end
+  shape(points, 0xff3399ff)
+end
+
+state stars = []
+
+if mouse_pressed()
+  speed = .8 + rand() * .4
+  stars.append([[mouse_x mouse_y] .3 40 speed])
+end
+
+for star in stars
+  draw_star(star)
+end
