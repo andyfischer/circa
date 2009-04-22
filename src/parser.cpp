@@ -377,6 +377,12 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
 
         func.appendInput(typeTerm, name);
 
+        // Variable args when ... is appended
+        if (tokens.nextIs(ELLIPSIS)) {
+            tokens.consume();
+            func.variableArgs = true;
+        }
+
         if (!tokens.nextIs(RPAREN))
             tokens.consume(COMMA);
     }
