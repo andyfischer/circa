@@ -19,7 +19,7 @@ math.ca
 # module-to-source.ca
 # multiline.ca
 sample1.ca
-sample2.ca
+#sample2.ca
 # sample3.ca
 # set.ca
 # subroutine.ca

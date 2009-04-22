@@ -10,6 +10,11 @@ namespace assign_function {
         Term* value = caller->input(0);
         Term* target = caller->input(1);
 
+        /*if (!is_value(target)) {
+            error_occured(caller, "assign() tried to modify a non-value");
+            return;
+        }*/
+
         assign_value(value, target);
     }
 

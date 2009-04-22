@@ -60,20 +60,23 @@ std::string get_term_source(Term* term)
 
     // for values, check if the type has a toString function
     if (is_value(term)) {
-        if (as_type(term->type).toString != NULL) {
-            bool prependNameBinding = true;
+        if (is_stateful(term))
+            result << "state ";
 
-            // for certain types, don't write "name =" in front
-            if (term->type == FUNCTION_TYPE || term->type == TYPE_TYPE)
-                prependNameBinding = false;
+        bool prependNameBinding = true;
 
-            if (prependNameBinding && term->name != "")
-                result << term->name << " = ";
+        // for certain types, don't write "name =" in front
+        if (term->type == FUNCTION_TYPE || term->type == TYPE_TYPE)
+            prependNameBinding = false;
 
-            result << as_type(term->type).toString(term);
-            result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
-            return result.str();
-        }
+        if (prependNameBinding && term->name != "")
+            result << term->name << " = ";
+
+        assert(as_type(term->type).toString != NULL);
+
+        result << as_type(term->type).toString(term);
+        result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
+        return result.str();
     }
 
     // check if this function has a toSourceString function
