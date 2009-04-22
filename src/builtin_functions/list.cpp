@@ -6,11 +6,24 @@ namespace circa {
 namespace list_function {
 
     void evaluate(Term* caller) {
-        as_branch(caller).clear();
+        Branch& dest = as_branch(caller);
 
-        for (unsigned int i=0; i < caller->inputs.count(); i++) {
-            create_duplicate(&as_branch(caller), caller->input(i));
+        int numTermsToAssign = std::min(caller->numInputs(), dest.numTerms());
+
+        for (int i=0; i < numTermsToAssign; i++) {
+            assign_value(caller->input(i), dest[i]);
         }
+
+        // Add terms if necessary
+        for (int i=dest.numTerms(); i < caller->numInputs(); i++) {
+            create_duplicate(&dest, caller->input(i));
+        }
+
+        // Remove terms if necessary
+        for (int i=caller->numInputs(); i < dest.numTerms(); i++) {
+            dest[i] = NULL;
+        }
+        dest.removeNulls();
     }
 
     std::string toSourceString(Term* caller) {
