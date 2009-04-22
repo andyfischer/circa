@@ -94,7 +94,7 @@ namespace add_function {
 
     void setup(Branch& kernel)
     {
-        ADD_FUNC = import_function(kernel, evaluate, "add(float,float) -> float");
+        ADD_FUNC = import_function(kernel, evaluate, "add(float,float) : float");
         as_function(ADD_FUNC).pureFunction = true;
         as_function(ADD_FUNC).generateTraining = generateTraining;
         as_function(ADD_FUNC).variableArgs = true;

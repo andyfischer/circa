@@ -12,7 +12,7 @@ namespace div_function {
 
     void setup(Branch& kernel)
     {
-        DIV_FUNC = import_function(kernel, evaluate, "div(float,float) -> float");
+        DIV_FUNC = import_function(kernel, evaluate, "div(float,float) : float");
         as_function(DIV_FUNC).pureFunction = true;
     }
 }
