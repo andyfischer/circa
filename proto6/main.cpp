@@ -7,8 +7,8 @@
 
 #include "circa.h"
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+int SCREEN_WIDTH = 640;
+int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
 
 bool KEY_DOWN[SDLK_LAST];
@@ -139,10 +139,12 @@ void handle_key_press(SDL_Event event, int key)
 
 int main( int argc, char* args[] )
 {
+    // Initialize stuff
     initialize_keydown();
 
     circa::initialize();
 
+    // Import functions
     circa::import_function(*circa::KERNEL, key_down, "key_down(int) -> bool");
     circa::import_function(*circa::KERNEL, key_pressed, "key_pressed(int) -> bool");
     circa::int_value(circa::KERNEL, SDLK_UP, "KEY_UP");
@@ -158,26 +160,31 @@ int main( int argc, char* args[] )
     circa::import_function(*circa::KERNEL, sdl_hosted::drawText, "drawText(float,float, string, int)");
     circa::import_function(*circa::KERNEL, sdl_hosted::mouse_pressed, "mouse_pressed() : bool");
 
-    // Set up the screen
-    SCREEN = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE );
-
-    // If there was an error in setting up the screen
-    if( SCREEN == NULL )
-        return 1;
-
+    // Load the target script
     std::string filename;
-    if (argc > 1)
-        filename = args[1];
-    else
-        filename = "proto6/main.ca";
+    if (argc > 1) filename = args[1];
+    else filename = "proto6/main.ca";
 
-    std::cout << "loading file: " << filename << std::endl;
+    std::cout << "Loading file: " << filename << std::endl;
 
     circa::evaluate_file(SCRIPT_MAIN, filename);
     refresh_training_branch(SCRIPT_MAIN);
 
-    // Initialize all SDL subsystems
-    if( SDL_Init(SDL_INIT_TIMER & SDL_INIT_VIDEO & SDL_INIT_JOYSTICK & SDL_INIT_EVENTTHREAD) == -1)
+    // See if this script defined SCREEN_WIDTH or SCREEN_HEIGHT
+    if (SCRIPT_MAIN.contains("SCREEN_WIDTH"))
+        SCREEN_WIDTH = circa::to_float(SCRIPT_MAIN["SCREEN_WIDTH"]);
+    if (SCRIPT_MAIN.contains("SCREEN_HEIGHT"))
+        SCREEN_HEIGHT = circa::to_float(SCRIPT_MAIN["SCREEN_HEIGHT"]);
+
+    // Create the SDL surface
+    SCREEN = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE );
+
+    // If there was an error in setting up the screen
+    if (SCREEN == NULL)
+        return 1;
+
+    // Initialize desired SDL subsystems
+    if (SDL_Init(SDL_INIT_TIMER & SDL_INIT_VIDEO & SDL_INIT_JOYSTICK & SDL_INIT_EVENTTHREAD) == -1)
         return 1;
 
     // Set the window caption
