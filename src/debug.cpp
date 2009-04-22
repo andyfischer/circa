@@ -12,22 +12,28 @@ std::set<Term*> *DEBUG_GOOD_POINTER_SET = NULL;
 
 void register_good_pointer(Term* term)
 {
+#if DEBUG_CHECK_FOR_BAD_POINTERS
     if (DEBUG_GOOD_POINTER_SET == NULL)
         DEBUG_GOOD_POINTER_SET = new std::set<Term*>();
     DEBUG_GOOD_POINTER_SET->insert(term);
+#endif
 }
 
 void unregister_good_pointer(Term* term)
 {
+#if DEBUG_CHECK_FOR_BAD_POINTERS
     DEBUG_GOOD_POINTER_SET->erase(term);
+#endif
 }
 
+#if DEBUG_CHECK_FOR_BAD_POINTERS
 bool is_bad_pointer(Term* term)
 {
     if (DEBUG_GOOD_POINTER_SET == NULL)
         DEBUG_GOOD_POINTER_SET = new std::set<Term*>();
     return DEBUG_GOOD_POINTER_SET->find(term) == DEBUG_GOOD_POINTER_SET->end();
 }
+#endif
 
 void assert_good_pointer(Term* term)
 {

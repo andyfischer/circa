@@ -57,7 +57,7 @@ void evaluate_term(Term* term)
             effectiveIndex = 0;
 
         Term* input = term->inputs[inputIndex];
-        Function::InputProperties inputProps = func.getInputProperties(effectiveIndex);
+        Function::InputProperties& inputProps = func.getInputProperties(effectiveIndex);
          
         if (input == NULL && !inputProps.meta) {
             std::stringstream message;

@@ -12,7 +12,7 @@ namespace circa {
 //
 // It's recommended that you never use is_bad_pointer, because this
 // would be easy to abuse. Instead, use assert_good_pointer.
-#define DEBUG_CHECK_FOR_BAD_POINTERS 1
+#define DEBUG_CHECK_FOR_BAD_POINTERS 0
 
 // Enabling this flag causes us to never actually delete Term objects.
 // This removes the possibility that a bad pointer will mistakenly be
@@ -23,8 +23,11 @@ namespace circa {
 
 void register_good_pointer(Term* term);
 void unregister_good_pointer(Term* term);
-bool is_bad_pointer(Term* term);
 void assert_good_pointer(Term* term);
+
+#if DEBUG_CHECK_FOR_BAD_POINTERS
+bool is_bad_pointer(Term* term);
+#endif
 
 // Perform a bunch of checks to see if this term is healthy, and all its related
 // data is consistent.
