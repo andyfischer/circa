@@ -29,9 +29,6 @@ bool drag_in_progress = false;
 int previous_mouse_x = 0;
 int previous_mouse_y = 0;
 
-int mouse_movement_x = 0;
-int mouse_movement_y = 0;
-
 int drag_start_x = 0;
 int drag_start_y = 0;
 
@@ -194,15 +191,20 @@ int main( int argc, char* args[] )
         circa::as_float(SCRIPT_MAIN["time"]) = SDL_GetTicks() / 1000.0;
         mouse_just_pressed = false;
 
-        if (event.type == SDL_QUIT) {
-            CONTINUE_MAIN_LOOP = false;
-        } else if (event.type == SDL_MOUSEMOTION) {
+        // Consume all mouse-motion events here, so that they don't clog up our event queue
+        // TODO: should probably consume all events until SDL_PollEvent returns false
+        while (event.type == SDL_MOUSEMOTION) {
             mouse_x = event.motion.x;
             mouse_y = event.motion.y;
-            mouse_movement_x = event.motion.x;
-            mouse_movement_y = event.motion.y;
-            circa::as_float(SCRIPT_MAIN["mouse_x"]) = mouse_x;
-            circa::as_float(SCRIPT_MAIN["mouse_y"]) = mouse_y;
+            if (!SDL_PollEvent(&event))
+                break;
+        }
+
+        circa::as_float(SCRIPT_MAIN["mouse_x"]) = mouse_x;
+        circa::as_float(SCRIPT_MAIN["mouse_y"]) = mouse_y;
+
+        if (event.type == SDL_QUIT) {
+            CONTINUE_MAIN_LOOP = false;
 
         } else if (event.type == SDL_KEYDOWN) {
 
