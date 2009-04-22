@@ -113,8 +113,9 @@ void test_symbols1()
 void test_symbols2()
 {
     token::TokenList results;
-    token::tokenize("<>:;%", results);
-    test_assert(results.size() == 5);
+    token::tokenize("<>:;%...", results);
+    std::cout << results.size();
+    test_assert(results.size() == 6);
     test_assert(results[0].text == "<");
     test_assert(results[0].match == token::LTHAN);
     test_assert(results[1].text == ">");
@@ -125,6 +126,8 @@ void test_symbols2()
     test_assert(results[3].match == token::SEMICOLON);
     test_assert(results[4].text == "%");
     test_assert(results[4].match == token::PERCENT);
+    test_assert(results[5].text == "...");
+    test_assert(results[5].match == token::ELLIPSIS);
 }
 
 void test_keywords()

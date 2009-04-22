@@ -46,6 +46,7 @@ const char* get_token_text(int match)
         case DOUBLE_AMPERSAND: return "&&";
         case DOUBLE_VERTICAL_BAR: return "||";
         case SEMICOLON: return ";";
+        case ELLIPSIS: return "...";
         case WHITESPACE: return "WHITESPACE";
         case NEWLINE: return "NEWLINE";
         case END: return "end";
@@ -299,6 +300,14 @@ void top_level_consume_token(TokenizeContext &context)
             return;
         case '.':
             context.consume();
+
+            if ((context.next(0) == '.') && (context.next(1) == '.')) {
+                context.consume();
+                context.consume();
+                context.pushResult(ELLIPSIS);
+                return;
+            }
+
             context.pushResult(DOT);
             return;
         case '?':
