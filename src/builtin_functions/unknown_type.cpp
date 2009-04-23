@@ -16,7 +16,6 @@ namespace unknown_type_function {
         as_function(UNKNOWN_TYPE_FUNC).stateType = STRING_TYPE;
         as_function(UNKNOWN_TYPE_FUNC).pureFunction = false;
         as_function(UNKNOWN_TYPE_FUNC).hasSideEffects = true;
-        as_function(UNKNOWN_TYPE_FUNC).variableArgs = true;
     }
 }
 }
