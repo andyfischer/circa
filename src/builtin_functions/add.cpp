@@ -98,8 +98,6 @@ namespace add_function {
         as_function(ADD_FUNC).pureFunction = true;
         as_function(ADD_FUNC).generateTraining = generateTraining;
 
-        assert(as_function(ADD_FUNC).variableArgs == true);
-
         Term* fp_func = import_function(kernel, feedback_propogate,
                 "add_feedback_propogate(any,any)");
         as_function(fp_func).stateType = BRANCH_TYPE;
