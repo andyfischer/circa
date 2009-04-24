@@ -114,7 +114,6 @@ void test_symbols2()
 {
     token::TokenList results;
     token::tokenize("<>:;%...", results);
-    std::cout << results.size();
     test_assert(results.size() == 6);
     test_assert(results[0].text == "<");
     test_assert(results[0].match == token::LTHAN);
