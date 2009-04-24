@@ -69,6 +69,53 @@ void append_whitespace(Term* term, std::string const& whitespace)
             whitespace + term->stringProperty("syntaxHints:postWhitespace");
 }
 
+void include_location(Term* term, Token& tok)
+{
+    bool prepend;
+
+    // Prepend if lineStart/colStart are not yet defined
+    if (!term->hasProperty("lineStart")
+        || !term->hasProperty("colStart"))
+        prepend = true;
+
+    // Prepend if lineStart is before ours
+    else if (tok.lineStart < term->intProperty("lineStart"))
+        prepend = true;
+
+    // Prepend if lineStart is equal and colStart is before ours
+    else if ((tok.lineStart == term->intProperty("lineStart"))
+             && (tok.colStart < term->intProperty("colStart")))
+        prepend = true;
+
+    // Otherwise, don't prepend
+    else
+        prepend = false;
+
+    if (prepend) {
+        term->intProperty("lineStart") = tok.lineStart;
+        term->intProperty("colStart") = tok.colStart;
+    }
+
+    // Do the same thing for appending
+    bool append;
+
+    if (!term->hasProperty("lineEnd")
+        || !term->hasProperty("colEnd"))
+        append = true;
+    else if (tok.lineEnd > term->intProperty("lineEnd"))
+        append = true;
+    else if ((tok.lineEnd == term->intProperty("lineEnd"))
+             && (tok.colEnd > term->intProperty("colEnd")))
+        append = true;
+    else
+        append = false;
+
+    if (append) {
+        term->intProperty("lineEnd") = tok.lineEnd;
+        term->intProperty("colEnd") = tok.colEnd;
+    }
+}
+
 void push_pending_rebind(Branch& branch, std::string const& name)
 {
     std::string attrname = get_name_for_attribute("comp-pending-rebind");
@@ -1054,15 +1101,16 @@ Term* atom(Branch& branch, TokenStream& tokens)
     else {
 
         result = apply(&branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
-        /*as_string(result->state) = "unrecognized expression at " 
-           + tokens.next().locationAsString();*/
 
         // throw away tokens until end of line
+        std::stringstream errorline;
         while (!tokens.nextIs(NEWLINE) && !tokens.finished())
-            tokens.consume();
+            errorline << tokens.consume();
 
         // throw away the last NEWLINE
         tokens.consume();
+
+        as_string(result->state) = errorline.str();
     }
 
     return result;
@@ -1092,8 +1140,9 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
 Term* literal_integer(Branch& branch, TokenStream& tokens)
 {
-    std::string text = tokens.consume(INTEGER);
-    int value = strtoul(text.c_str(), NULL, 0);
+    assert(tokens.nextIs(INTEGER));
+    Token tok = tokens.consumet();
+    int value = strtoul(tok.text.c_str(), NULL, 0);
     Term* term = int_value(&branch, value);
     term->stringProperty("syntaxHints:declarationStyle") = "literal";
     term->stringProperty("syntaxHints:integerFormat") = "dec";
@@ -1102,17 +1151,21 @@ Term* literal_integer(Branch& branch, TokenStream& tokens)
 
 Term* literal_hex(Branch& branch, TokenStream& tokens)
 {
-    std::string text = tokens.consume(HEX_INTEGER);
-    int value = strtoul(text.c_str(), NULL, 0);
+    assert(tokens.nextIs(HEX_INTEGER));
+    Token tok = tokens.consumet();
+    int value = strtoul(tok.text.c_str(), NULL, 0);
     Term* term = int_value(&branch, value);
     term->stringProperty("syntaxHints:declarationStyle") = "literal";
     term->stringProperty("syntaxHints:integerFormat") = "hex";
+    include_location(term, tok);
     return term;
 }
 
 Term* literal_float(Branch& branch, TokenStream& tokens)
 {
-    std::string text = tokens.consume(FLOAT);
+    assert(tokens.nextIs(FLOAT));
+    Token tok = tokens.consumet();
+    std::string text = tok.text;
 
     // be lazy and parse the actual number with atof
     float value = atof(text.c_str());
@@ -1140,18 +1193,24 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
 
     term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
     term->stringProperty("syntaxHints:declarationStyle") = "literal";
+    include_location(term, tok);
     return term;
 }
 
 Term* literal_string(Branch& branch, TokenStream& tokens)
 {
-    std::string text = tokens.consume(STRING);
+    assert(tokens.nextIs(STRING));
+
+    Token tok = tokens.consumet();
+
+    std::string text = tok.text;
 
     // strip quote marks
     text = text.substr(1, text.length()-2);
 
     Term* term = string_value(&branch, text);
     term->stringProperty("syntaxHints:declarationStyle") = "literal";
+    include_location(term, tok);
     return term;
 }
 
@@ -1174,24 +1233,29 @@ Term* identifier(Branch& branch, TokenStream& tokens)
 {
     bool rebind = false;
     if (tokens.nextIs(AMPERSAND)) {
-        tokens.consume(AMPERSAND);
+        tokens.consume();
         rebind = true;
     }
 
-    std::string id = tokens.consume(IDENTIFIER);
+    assert(tokens.nextIs(IDENTIFIER));
+
+    Token id = tokens.consumet();
 
     if (rebind)
-        push_pending_rebind(branch, id);
+        push_pending_rebind(branch, id.text);
 
-    Term* result = find_named(&branch, id);
+    Term* result = find_named(&branch, id.text);
 
     // If not found, create an instance of unknown_identifier
     if (result == NULL) {
         result = apply(&branch, UNKNOWN_IDENTIFIER_FUNC, RefList());
         result->boolProperty("syntaxHints:hidden") = true;
-        as_string(result->state) = id;
-        branch.bindName(result, id);
+        as_string(result->state) = id.text;
+        branch.bindName(result, id.text);
     }
+
+    assert(result != NULL);
+    include_location(result, id);
 
     return result;
 }

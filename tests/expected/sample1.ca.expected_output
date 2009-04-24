@@ -1,1 +1,2 @@
-Unknown function: load_image
+1 compile error:
+(5,26) Unknown function: load_image

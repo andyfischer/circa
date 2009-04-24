@@ -47,6 +47,7 @@ struct TokenStream
     }
 
     std::string consume(int match = -1);
+    tokenizer::Token const& consumet();
 
     bool nextNonWhitespaceIs(int match, int lookahead=0) const
     {
