@@ -9,7 +9,6 @@ namespace greater_than_eq_function {
     {
         Term* input0 = caller->input(0);
         Term* input1 = caller->input(1);
-        assert(input0->type == input1->type);
 
         Type &type = as_type(input0->type);
 
