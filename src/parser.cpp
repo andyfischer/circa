@@ -1054,8 +1054,8 @@ Term* atom(Branch& branch, TokenStream& tokens)
     else {
 
         result = apply(&branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
-        as_string(result->state) = "unrecognized expression at " 
-            + tokens.next().locationAsString();
+        /*as_string(result->state) = "unrecognized expression at " 
+           + tokens.next().locationAsString();*/
 
         // throw away tokens until end of line
         while (!tokens.nextIs(NEWLINE) && !tokens.finished())

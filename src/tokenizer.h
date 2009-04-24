@@ -12,13 +12,15 @@ struct TokenInstance
 {
     int match;
     std::string text;
-    int line;
-    int character;
+    int lineStart;
+    int lineEnd;
+    int colStart;
+    int colEnd;
 
-    TokenInstance() : match(0), line(0), character(0) {}
+    TokenInstance() : match(0), lineStart(0), lineEnd(0),
+       colStart(0), colEnd(0) {}
 
     std::string toString() const;
-    std::string locationAsString() const;
 };
 
 typedef std::vector<TokenInstance> TokenList;

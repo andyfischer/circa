@@ -191,6 +191,35 @@ void token_stream_to_string()
             "WHITESPACE \" \", FLOAT \"0.123\"]}");
 }
 
+bool token_location_equals(token::TokenInstance& inst, int colStart, int colEnd, int lineStart, int lineEnd)
+{
+    return (inst.colStart == colStart) && (inst.colEnd == colEnd) && (inst.lineStart == lineStart) && (inst.lineEnd == lineEnd);
+}
+
+void test_locations()
+{
+    token::TokenList results;
+    token::tokenize("hello 1234", results);
+
+    test_assert(results.size() == 3);
+    test_assert(token_location_equals(results[0], 0, 5, 0, 0));
+    test_assert(token_location_equals(results[1], 5, 6, 0, 0));
+    test_assert(token_location_equals(results[2], 6, 10, 0, 0));
+
+    // Now try with some newlines
+    results.clear();
+    token::tokenize("hey  \n87654+\n\n1", results);
+    test_assert(results.size() == 8);
+    test_assert(token_location_equals(results[0], 0, 3, 0, 0));
+    test_assert(token_location_equals(results[1], 3, 5, 0, 0));
+    test_assert(token_location_equals(results[2], 5, 6, 0, 0)); // newline
+    test_assert(token_location_equals(results[3], 0, 5, 1, 1));
+    test_assert(token_location_equals(results[4], 5, 6, 1, 1));
+    test_assert(token_location_equals(results[5], 6, 7, 1, 1)); // newline
+    test_assert(token_location_equals(results[6], 0, 1, 2, 2)); // newline
+    test_assert(token_location_equals(results[7], 0, 1, 3, 3));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers);
@@ -203,6 +232,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
     REGISTER_TEST_CASE(tokenizer_tests::token_stream_to_string);
+    REGISTER_TEST_CASE(tokenizer_tests::test_locations);
 }
 
 } // namespace tokenizer_tests
