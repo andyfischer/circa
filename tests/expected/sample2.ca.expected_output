@@ -1,18 +1,19 @@
-Unknown function: fill_rectangle
-Unknown function: point
-Unknown function: point
-Unknown function: point
-Unknown function: point
-Unknown function: line_to
-Unknown function: line_to
-Unknown function: line_to
-Unknown function: line_to
-Unknown identifier: KEY_UP
-Unknown function: key_down
-Unknown function: key_down
-Unknown identifier: KEY_LEFT
-Unknown function: key_down
-Unknown identifier: KEY_RIGHT
-Unknown function: key_down
-Unknown identifier: KEY_SPACE
-Unknown function: key_pressed
+18 compile errors:
+(unknown-line,unknown-col) Unknown function: fill_rectangle
+(unknown-line,unknown-col) Unknown function: point
+(unknown-line,unknown-col) Unknown function: point
+(unknown-line,unknown-col) Unknown function: point
+(unknown-line,unknown-col) Unknown function: point
+(unknown-line,unknown-col) Unknown function: line_to
+(unknown-line,unknown-col) Unknown function: line_to
+(unknown-line,unknown-col) Unknown function: line_to
+(unknown-line,unknown-col) Unknown function: line_to
+(46,12) Unknown identifier: KEY_UP
+(unknown-line,unknown-col) Unknown function: key_down
+(unknown-line,unknown-col) Unknown function: key_down
+(62,12) Unknown identifier: KEY_LEFT
+(unknown-line,unknown-col) Unknown function: key_down
+(66,12) Unknown identifier: KEY_RIGHT
+(unknown-line,unknown-col) Unknown function: key_down
+(82,15) Unknown identifier: KEY_SPACE
+(unknown-line,unknown-col) Unknown function: key_pressed

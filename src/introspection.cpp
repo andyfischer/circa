@@ -215,58 +215,66 @@ void print_runtime_errors(Branch& branch, std::ostream& output)
     }
 }
 
-void check_for_compile_error(Term* term, std::string& errorMessage)
+bool has_compile_error(Term* term)
 {
-    if (term->function == UNKNOWN_FUNCTION) {
-        errorMessage = std::string("Unknown function: " + as_string(term->state));
-    } else if (term->function == UNKNOWN_TYPE_FUNC) {
-        errorMessage = std::string("Unknown type: " + as_string(term->state));
-    } else if (term->function == UNKNOWN_IDENTIFIER_FUNC) {
-        errorMessage = std::string("Unknown identifier: " + as_string(term->state));
-    } else if (term->function == UNRECOGNIZED_EXPRESSION_FUNC) {
-        errorMessage = std::string("Unrecognized expression: " + as_string(term->state));
-    }
+    return ((term->function == UNKNOWN_FUNCTION)
+        || (term->function == UNKNOWN_TYPE_FUNC)
+        || (term->function == UNKNOWN_IDENTIFIER_FUNC)
+        || (term->function == UNRECOGNIZED_EXPRESSION_FUNC));
 }
 
-bool has_compile_errors(Branch& branch)
+int count_compile_errors(Branch& branch)
 {
-    for (int i=0; i < branch.numTerms(); i++) {
-        Term* term = branch[i];
-        std::string message;
-        check_for_compile_error(term, message);
-        if (message != "")
-            return true;
-    }
-    return false;
+    int result = 0;
+
+    for (int i=0; i < branch.numTerms(); i++)
+        if (has_compile_error(branch[i]))
+            result++;
+
+    return result;
 }
 
-std::vector<std::string> get_compile_errors(Branch& branch)
+std::string get_short_location(Term* term)
 {
-    std::vector<std::string> results;
+    std::stringstream out;
+    out << "(";
+    if (term->hasProperty("lineStart")) out << term->intProperty("lineStart");
+    else out << "unknown-line";
+    out << ",";
+    if (term->hasProperty("colStart")) out << term->intProperty("colStart");
+    else out << "unknown-col";
+    out << ")";
+    return out.str();
+}
 
-    for (int i=0; i < branch.numTerms(); i++) {
-        Term* term = branch[i];
-        std::string message;
+std::string get_compile_error_message(Term* term)
+{
+    if (!has_compile_error(term))
+        return "";
 
-        check_for_compile_error(term, message);
+    std::stringstream out;
 
-        if (message != "")
-            results.push_back(message);
-    }
+    out << get_short_location(term) << " ";
 
-    return results;
+    if (term->function == UNKNOWN_FUNCTION)
+        out << "Unknown function: " << as_string(term->state);
+    else if (term->function == UNKNOWN_TYPE_FUNC)
+        out << "Unknown type: " << as_string(term->state);
+    else if (term->function == UNKNOWN_IDENTIFIER_FUNC)
+        out << "Unknown identifier: " << as_string(term->state);
+    else if (term->function == UNRECOGNIZED_EXPRESSION_FUNC)
+        out << "Unrecognized expression: " << as_string(term->state);
+
+    return out.str();
 }
 
 void print_compile_errors(Branch& branch, std::ostream& output)
 {
     for (int i=0; i < branch.numTerms(); i++) {
         Term* term = branch[i];
-        std::string message;
 
-        check_for_compile_error(term, message);
-
-        if (message != "")
-            output << message << std::endl;
+        if (has_compile_error(term))
+            output << get_compile_error_message(term) << std::endl;
     }
 }
 

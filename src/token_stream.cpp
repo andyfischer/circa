@@ -58,6 +58,16 @@ TokenStream::consume(int match)
     return tokens[currentIndex++].text;
 }
 
+tokenizer::Token const&
+TokenStream::consumet()
+{
+    if (finished())
+        // maybe we should handle this more gracefully
+        throw std::runtime_error("Unexpected EOF");
+
+    return tokens[currentIndex++];
+}
+
 std::string
 TokenStream::toString() const
 {
