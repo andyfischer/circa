@@ -191,7 +191,7 @@ void token_stream_to_string()
             "WHITESPACE \" \", FLOAT \"0.123\"]}");
 }
 
-bool token_location_equals(token::TokenInstance& inst, int colStart, int colEnd, int lineStart, int lineEnd)
+bool token_location_equals(token::Token& inst, int colStart, int colEnd, int lineStart, int lineEnd)
 {
     return (inst.colStart == colStart) && (inst.colEnd == colEnd) && (inst.lineStart == lineStart) && (inst.lineEnd == lineEnd);
 }

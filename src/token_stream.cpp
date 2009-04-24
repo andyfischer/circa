@@ -6,7 +6,7 @@
 
 namespace circa {
 
-tokenizer::TokenInstance const&
+tokenizer::Token const&
 TokenStream::next(int lookahead) const
 {
     unsigned int i = this->currentIndex + lookahead;
