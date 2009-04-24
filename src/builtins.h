@@ -36,6 +36,7 @@ extern Term* LIST_TYPE;
 extern Term* LIST_FUNC;
 extern Term* MAP_TYPE;
 extern Term* MULT_FUNC;
+extern Term* NOT_FUNC;
 extern Term* REF_TYPE;
 extern Term* SET_FIELD_FUNC;
 extern Term* SET_FIELD_BY_NAME_FUNC;

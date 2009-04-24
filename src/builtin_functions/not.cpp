@@ -12,8 +12,8 @@ namespace not_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "not(bool) -> bool");
-        as_function(main_func).pureFunction = true;
+        NOT_FUNC = import_function(kernel, evaluate, "not(bool) -> bool");
+        as_function(NOT_FUNC).pureFunction = true;
     }
 }
 }
