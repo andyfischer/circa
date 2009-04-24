@@ -173,7 +173,7 @@ bool is_hexadecimal_digit(char c)
 
 bool is_acceptable_inside_identifier(char c)
 {
-    return is_letter(c) || is_number(c) || c == '_' || c == '-' || c == ':';
+    return is_letter(c) || is_number(c) || c == '_' || c == ':';
 }
 
 bool is_whitespace(char c)
@@ -438,18 +438,9 @@ void consume_identifier(TokenizeContext &context)
 {
     std::stringstream text;
 
-    bool deprecated = false;
-
     while (is_acceptable_inside_identifier(context.next())) {
-        if (context.next() == '-')
-            deprecated = true;
         text << context.consume();
     }
-
-    // TODO: Remove this, once we're sure that dashes are really gone
-    if (deprecated)
-        std::cout << "warning, dashes are no longer allowed in idents: "
-            << text.str() << std::endl;
 
     context.pushResult(IDENTIFIER, text.str());
 }
