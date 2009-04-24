@@ -34,7 +34,7 @@ struct TokenStream
 
     int length() const { return (int) tokens.size(); }
 
-    tokenizer::TokenInstance const& next(int lookahead=0) const;
+    tokenizer::Token const& next(int lookahead=0) const;
 
     int nextNonWhitespace(int lookahead=0) const;
 

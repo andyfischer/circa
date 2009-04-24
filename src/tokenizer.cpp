@@ -63,7 +63,7 @@ const char* get_token_text(int match)
     }
 }
 
-std::string TokenInstance::toString() const
+std::string Token::toString() const
 {
     std::stringstream out;
     out << get_token_text(match) << " \"" << text << "\"";
@@ -76,9 +76,9 @@ struct TokenizeContext
     int nextIndex;
     int linePosition;
     int charPosition;
-    std::vector<TokenInstance> &results;
+    std::vector<Token> &results;
 
-    TokenizeContext(std::string const &_input, std::vector<TokenInstance> &_results)
+    TokenizeContext(std::string const &_input, std::vector<Token> &_results)
         : input(_input),
           nextIndex(0),
           linePosition(0),
@@ -118,7 +118,7 @@ struct TokenizeContext
         if (text == "" && match != STRING)
             text = get_token_text(match);
 
-        TokenInstance instance;
+        Token instance;
         instance.match = match;
         instance.text = text;
 
@@ -127,7 +127,7 @@ struct TokenizeContext
             instance.lineStart = 0;
             instance.colStart = 0;
         } else {
-            TokenInstance& prevToken = results[results.size()-1];
+            Token& prevToken = results[results.size()-1];
             if (prevToken.match == NEWLINE) {
                 instance.lineStart = prevToken.lineEnd + 1;
                 instance.colStart = 0;

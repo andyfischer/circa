@@ -8,7 +8,7 @@
 namespace circa {
 namespace tokenizer {
 
-struct TokenInstance
+struct Token
 {
     int match;
     std::string text;
@@ -17,13 +17,13 @@ struct TokenInstance
     int colStart;
     int colEnd;
 
-    TokenInstance() : match(0), lineStart(0), lineEnd(0),
+    Token() : match(0), lineStart(0), lineEnd(0),
        colStart(0), colEnd(0) {}
 
     std::string toString() const;
 };
 
-typedef std::vector<TokenInstance> TokenList;
+typedef std::vector<Token> TokenList;
 
 const int IDENTIFIER = 1;
 const int INTEGER = 2;
