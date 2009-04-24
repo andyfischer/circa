@@ -12,7 +12,7 @@ namespace sub_i_function {
 
     void setup(Branch& kernel)
     {
-        Term* func = import_function(kernel, evaluate, "sub(int,int) : int");
+        Term* func = import_function(kernel, evaluate, "sub_i(int,int) : int");
         as_function(func).pureFunction = true;
     }
 }

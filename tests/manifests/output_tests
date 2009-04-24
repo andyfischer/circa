@@ -6,9 +6,10 @@ boolean.ca
 comparison.ca
 compound_type.ca
 feedback.ca
+fib.ca
 for.ca
 # get-field-in-sub.ca
-# if.ca
+if.ca
 # if_scoping.ca
 infix.ca
 lessthan.ca
