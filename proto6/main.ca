@@ -34,7 +34,6 @@ type TreeSegment {
 }
 
 def tree_segment(TreeSegment segment)
-  -- jitter doesn't work correctly atm
   state jitter = rand()*.1
   segment_height = 40.0
   direction = segment.direction + jitter

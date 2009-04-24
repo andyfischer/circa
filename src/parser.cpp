@@ -490,6 +490,22 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     consume_branch_until_end(innerBranch, tokens);
     remove_compilation_attrs(innerBranch);
 
+    Term* elseResult = NULL;
+
+    // possibly consume an 'else' block
+    if (tokens.nextIs(ELSE)) {
+        tokens.consume(ELSE);
+
+        Term* notCondition = apply(&branch, NOT_FUNC, RefList(condition));
+
+        elseResult = apply(&branch, IF_FUNC, RefList(notCondition));
+        Branch& elseInnerBranch = as_branch(elseResult->state);
+        elseInnerBranch.outerScope = &branch;
+
+        consume_branch_until_end(elseInnerBranch, tokens);
+        remove_compilation_attrs(elseInnerBranch);
+    }
+
     tokens.consume(END);
 
     // Create the joining branch
@@ -504,6 +520,12 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         TermNamespace::const_iterator it;
         for (it = innerBranch.names.begin(); it != innerBranch.names.end(); ++it)
             boundNames.insert(it->first);
+
+        if (elseResult != NULL) {
+            Branch& elseInnerBranch = as_branch(elseResult->state);
+            for (it = elseInnerBranch.names.begin(); it != elseInnerBranch.names.end(); ++it)
+                boundNames.insert(it->first);
+        }
     }
 
     // Ignore any names which are not bound in the outer branch
@@ -526,10 +548,17 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             std::string const& name = *it;
 
             Term* outerVersion = find_named(&branch, name);
-            Term* innerVersion = innerBranch[name];
+            Term* positiveVersion = outerVersion;
+            Term* negativeVersion = outerVersion;
+
+            if (innerBranch.contains(name))
+                positiveVersion = innerBranch[name];
+
+            if (elseResult != NULL && as_branch(elseResult->state).contains(name))
+                negativeVersion = as_branch(elseResult->state)[name];
 
             Term* joining = apply(&joiningBranch, "if_expr",
-                    RefList(condition, innerVersion, outerVersion));
+                    RefList(condition, positiveVersion, negativeVersion));
 
             // Bind these names in the outer branch
             branch.bindName(joining, name);
@@ -1195,10 +1224,10 @@ std::string possible_whitespace_or_newline(TokenStream& tokens)
 
 void consume_branch_until_end(Branch& branch, TokenStream& tokens)
 {
-    while (!tokens.nextIs(END)) {
+    while (!tokens.finished()) {
         std::string prespace = possible_whitespace(tokens);
 
-        if (tokens.nextIs(END)) {
+        if (tokens.nextIs(END) || tokens.nextIs(ELSE)) {
             break;
         } else {
             Term* term = statement(branch, tokens);
