@@ -6,6 +6,8 @@ state mouse_x = 0.0
 state mouse_y = 0.0
 state time = 0.0
 
+HALF_PI = PI / 2.0
+
 background(0xeeeeeeff)
 
 type Point { float x, float y }
@@ -15,40 +17,40 @@ def p2c(float angle, float radius, Point center) : Point
   return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
 end
 
+def point_add(Point a, Point b) :Point
+  return [a.x + b.x, a.y + b.y]
+end
+
 -- our code
 
-SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 480
+SCREEN_WIDTH = 480
+SCREEN_HEIGHT = 600
 
-type Star {
-    Point loc
-    float rot
-    float size
-    float speed
+type TreeSegment {
+  Point baseLoc
+  float direction
+  float depth
+  float width
 }
 
-def draw_star(Star star)
-  radius = star.size
-  inner_radius = radius / 2
+def tree_segment(TreeSegment segment)
+  -- jitter doesn't work correctly atm
+  state jitter = rand()*.1
+  segment_height = 40.0
+  direction = segment.direction + jitter
+  a = p2c(direction - HALF_PI, segment.width, segment.baseLoc)
+  b = p2c(direction + HALF_PI, segment.width, segment.baseLoc)
+  c = p2c(direction, segment_height, a)
+  d = p2c(direction, segment_height, b)
+  next_center = p2c(direction, segment_height, segment.baseLoc)
+  shape([a b d c] 0x440101ff)
 
-  points = range(10)
-  for p in points
-    rad = radius
-    if p % 2 == 0
-      rad = inner_radius
-    end
-    p = p2c((p + 0.5) * 2*PI / 10 + star.rot + time*star.speed, rad, star.loc)
+  if segment.depth < 3.0
+      tree_segment([next_center segment.direction - 0.4 segment.depth+1 segment.width - .4])
+      tree_segment([next_center segment.direction + 0.4 segment.depth+1 segment.width - .41])
   end
-  shape(points, 0xff3399ff)
 end
 
-state stars = []
+starting_width = 3.0
 
-if mouse_pressed()
-  speed = .8 + rand() * .4
-  stars.append([[mouse_x mouse_y] .3 40 speed])
-end
-
-for star in stars
-  draw_star(star)
-end
+tree_segment([[200 300] 0-HALF_PI 0 starting_width])
