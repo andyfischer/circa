@@ -237,14 +237,32 @@ int count_compile_errors(Branch& branch)
 std::string get_short_location(Term* term)
 {
     std::stringstream out;
-    out << "(";
+    std::string filename = get_source_filename(term);
+    if (filename != "")
+        out << get_source_filename(term) << ":";
     if (term->hasProperty("lineStart")) out << term->intProperty("lineStart");
     else out << "unknown-line";
     out << ",";
     if (term->hasProperty("colStart")) out << term->intProperty("colStart");
     else out << "unknown-col";
-    out << ")";
     return out.str();
+}
+
+std::string get_source_filename(Term* term)
+{
+    if (term->owningBranch == NULL)
+        return "";
+
+    Branch* branch = term->owningBranch;
+
+    while (branch != NULL) {
+        if (branch->contains(get_name_for_attribute("source-file")))
+            return as_string(branch->getNamed(get_name_for_attribute("source-file")));
+
+        branch = branch->outerScope;
+    }
+
+    return "";
 }
 
 std::string get_compile_error_message(Term* term)
@@ -254,7 +272,7 @@ std::string get_compile_error_message(Term* term)
 
     std::stringstream out;
 
-    out << get_short_location(term) << " ";
+    out << get_short_location(term) << ": ";
 
     if (term->function == UNKNOWN_FUNCTION)
         out << "Unknown function: " << as_string(term->state);

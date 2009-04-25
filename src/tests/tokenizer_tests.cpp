@@ -202,22 +202,22 @@ void test_locations()
     token::tokenize("hello 1234", results);
 
     test_assert(results.size() == 3);
-    test_assert(token_location_equals(results[0], 0, 5, 0, 0));
-    test_assert(token_location_equals(results[1], 5, 6, 0, 0));
-    test_assert(token_location_equals(results[2], 6, 10, 0, 0));
+    test_assert(token_location_equals(results[0], 0, 5, 1, 1));
+    test_assert(token_location_equals(results[1], 5, 6, 1, 1));
+    test_assert(token_location_equals(results[2], 6, 10, 1, 1));
 
     // Now try with some newlines
     results.clear();
     token::tokenize("hey  \n87654+\n\n1", results);
     test_assert(results.size() == 8);
-    test_assert(token_location_equals(results[0], 0, 3, 0, 0));
-    test_assert(token_location_equals(results[1], 3, 5, 0, 0));
-    test_assert(token_location_equals(results[2], 5, 6, 0, 0)); // newline
-    test_assert(token_location_equals(results[3], 0, 5, 1, 1));
-    test_assert(token_location_equals(results[4], 5, 6, 1, 1));
-    test_assert(token_location_equals(results[5], 6, 7, 1, 1)); // newline
-    test_assert(token_location_equals(results[6], 0, 1, 2, 2)); // newline
-    test_assert(token_location_equals(results[7], 0, 1, 3, 3));
+    test_assert(token_location_equals(results[0], 0, 3, 1, 1));
+    test_assert(token_location_equals(results[1], 3, 5, 1, 1));
+    test_assert(token_location_equals(results[2], 5, 6, 1, 1)); // newline
+    test_assert(token_location_equals(results[3], 0, 5, 2, 2));
+    test_assert(token_location_equals(results[4], 5, 6, 2, 2));
+    test_assert(token_location_equals(results[5], 6, 7, 2, 2)); // newline
+    test_assert(token_location_equals(results[6], 0, 1, 3, 3)); // newline
+    test_assert(token_location_equals(results[7], 0, 1, 4, 4));
 }
 
 void register_tests()

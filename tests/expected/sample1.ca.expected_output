@@ -1,2 +1,2 @@
 1 compile error:
-(5,26) Unknown function: load_image
+sample1.ca:6,26: Unknown function: load_image

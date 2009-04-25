@@ -81,7 +81,7 @@ struct TokenizeContext
     TokenizeContext(std::string const &_input, std::vector<Token> &_results)
         : input(_input),
           nextIndex(0),
-          linePosition(0),
+          linePosition(1),
           charPosition(0),
           results(_results)
     {
@@ -124,7 +124,7 @@ struct TokenizeContext
 
         // Record where this token started
         if (results.size() == 0) {
-            instance.lineStart = 0;
+            instance.lineStart = 1;
             instance.colStart = 0;
         } else {
             Token& prevToken = results[results.size()-1];
