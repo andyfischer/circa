@@ -1,3 +1,6 @@
+# submodules:
+gh-pages
+
 # generated files:
 src/setup_builtin_functions.cpp
 src/register_all_tests.cpp
