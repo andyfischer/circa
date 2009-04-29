@@ -728,12 +728,10 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     if (typeName != "") {
         Term* type = find_type(branch, typeName);
         change_type(result, type);
+        //alloc_value(result);
+    } else if (initialValue != NULL) {
+        change_type(result, initialValue->type);
     }
-
-    if (initialValue != NULL)
-        assign_value(initialValue, result);
-    else
-        alloc_value(result);
 
     return result;
 }

@@ -21,9 +21,20 @@ void stateful_value_evaluation()
     test_equals(as_float(i), 4.0);
 }
 
+void initialize_from_expression()
+{
+    Branch branch;
+    branch.eval("a = 1 + 2");
+    branch.eval("b = a * 2");
+    Term *c = branch.eval("state c = b");
+
+    test_equals(as_float(c), 6);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_tests::stateful_value_evaluation);
+    REGISTER_TEST_CASE(stateful_tests::initialize_from_expression);
 }
 
 } // namespace stateful_tests
