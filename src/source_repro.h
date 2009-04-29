@@ -1,11 +1,11 @@
 // Copyright 2008 Andrew Fischer
 
-#ifndef CIRCA_SOURCE_INCLUDED
-#define CIRCA_SOURCE_INCLUDED
+#ifndef CIRCA_SOURCE_REPRO_INCLUDED
+#define CIRCA_SOURCE_REPRO_INCLUDED
 
-// syntax.h
+// source_repro.h
 //
-// Various functions for dealing with syntax preservation and reproduction
+// Various functions for reproducing source text.
 
 namespace circa {
 
@@ -18,4 +18,4 @@ std::string get_branch_source(Branch& branch);
 
 }
 
-#endif // CIRCA_SOURCE_INCLUDED
+#endif

@@ -13,7 +13,7 @@
 #include "parser.h"
 #include "references.h"
 #include "runtime.h"
-#include "syntax.h"
+#include "source_repro.h"
 #include "term.h"
 #include "testing.h"
 #include "tokenizer.h"
