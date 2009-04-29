@@ -59,10 +59,25 @@ void subroutine_binding_input_names()
     test_assert(find_named(&as_function(mysub).subroutineBranch,"a") != NULL);
 }
 
+void subroutine_stateful_term()
+{
+    Branch branch;
+    branch.eval("def mysub()\nstate a :float = 0\na += 1\nend");
+    Term* call = branch.eval("mysub()");
+    test_assert(!call->hasError);
+    Term* a_inside_call = as_branch(call->state)["a"];
+    test_equals(as_float(a_inside_call), 1);
+    evaluate_term(call);
+    test_equals(as_float(a_inside_call), 2);
+    evaluate_term(call);
+    test_equals(as_float(a_inside_call), 3);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(function_tests::create);
     REGISTER_TEST_CASE(function_tests::subroutine_binding_input_names);
+    REGISTER_TEST_CASE(function_tests::subroutine_stateful_term);
 }
 
 } // namespace function_tests

@@ -34,8 +34,11 @@ type TreeSegment {
 }
 
 def tree_segment(TreeSegment segment)
-  state jitter = rand()*.1
-  segment_height = 40.0
+  state jitter = (rand() - .5) *.3
+  state age = 0.0
+  age += 0.01
+  print('age:' age)
+  segment_height = 40.0 * age
   direction = segment.direction + jitter
   a = p2c(direction - HALF_PI, segment.width, segment.baseLoc)
   b = p2c(direction + HALF_PI, segment.width, segment.baseLoc)
