@@ -32,6 +32,8 @@ int previous_mouse_y = 0;
 int drag_start_x = 0;
 int drag_start_y = 0;
 
+long prev_sdl_ticks = 0;
+
 void initialize_keydown()
 {
     for (int i=0; i < SDLK_LAST; i++) {
@@ -190,6 +192,8 @@ int main( int argc, char* args[] )
     // Set the window caption
     SDL_WM_SetCaption("proto6", NULL);
 
+    prev_sdl_ticks = SDL_GetTicks();
+
     // Main loop
     while (CONTINUE_MAIN_LOOP) {
         KEY_JUST_PRESSED.clear();
@@ -237,7 +241,13 @@ int main( int argc, char* args[] )
             }
         } // finish event loop
 
-        circa::as_float(SCRIPT_MAIN["time"]) = SDL_GetTicks() / 1000.0;
+        long ticks = SDL_GetTicks();
+
+        circa::as_float(SCRIPT_MAIN["elapsed"]) = (ticks - prev_sdl_ticks) / 1000.0;
+        circa::as_float(SCRIPT_MAIN["time"]) = ticks / 1000.0;
+
+        prev_sdl_ticks = ticks;
+
         circa::as_float(SCRIPT_MAIN["mouse_x"]) = mouse_x;
         circa::as_float(SCRIPT_MAIN["mouse_y"]) = mouse_y;
 
