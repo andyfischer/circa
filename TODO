@@ -1,15 +1,18 @@
 
-Required features before public exposure:
+BUGS:
+
+- Prefix operators. Need to support -x
 - Parsing errors not handled well (we usually crash)
   - need to display location of compile errors
-X Support optional type annotations
-- Cool graphical demo
+- Recursive functions have terrible performance. We must be doing something wrong
+- Ambiguity with lists and x -y (this could mean [(x - y)] or [x, -y])
+- migrate_values has terrible performance
 
-Need to have soon:
-X Type coersion is very poor, especially int-to-float and float-to-int
+IMPORTANT THINGS:
+- Cool graphical demo
 - Parametrized types, lists and stuff
 
-Other todos:
+FUTURE THINGS:
 - LLVM integration. Need to investigate this enough to learn what it would look like.
 - Access and edit properties from circa
 - Lambdas
