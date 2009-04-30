@@ -27,6 +27,7 @@ button_size = [100 20] : Point
 
 font_height = 8
 current_y = loc.y
+
 for button in buttons
   button_loc = [loc.x, current_y] : Point
   box(button_loc.x, button_loc.y, button_loc.x + button_size.x, button_loc.y + button_size.y, 0x00ff00ff)
