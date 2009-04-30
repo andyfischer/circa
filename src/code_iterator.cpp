@@ -5,14 +5,14 @@
 namespace circa {
 
 CodeIterator::CodeIterator(Branch* branch)
-  : _topBranch(branch), _topIndex(0), _subBranch(NULL)
+  : _topBranch(branch), _topIndex(0), _nestedIterator(NULL)
 {
     postAdvance();
 }
 
 CodeIterator::~CodeIterator()
 {
-    delete _subBranch;
+    delete _nestedIterator;
 }
 
 void CodeIterator::reset(Branch* branch)
@@ -20,8 +20,8 @@ void CodeIterator::reset(Branch* branch)
     _topBranch = branch;
     _topIndex = 0;
 
-    delete _subBranch;
-    _subBranch = NULL;
+    delete _nestedIterator;
+    _nestedIterator = NULL;
 
     postAdvance();
 }
@@ -29,8 +29,8 @@ void CodeIterator::reset(Branch* branch)
 Term* CodeIterator::current()
 {
     assert(!finished());
-    if (_subBranch != NULL)
-        return _subBranch->current();
+    if (_nestedIterator != NULL)
+        return _nestedIterator->current();
     else
         return _topBranch->get(_topIndex);
 }
@@ -38,15 +38,15 @@ Term* CodeIterator::current()
 void CodeIterator::advance()
 {
     assert(!finished());
-    if (_subBranch != NULL)
-        _subBranch->advance();
+    if (_nestedIterator != NULL)
+        _nestedIterator->advance();
 
     else {
         // Check to start a sub-branch
         Branch* innerBranch = get_inner_branch(current());
 
         if (innerBranch != NULL) {
-            _subBranch = new CodeIterator(innerBranch);
+            _nestedIterator = new CodeIterator(innerBranch);
         } else {
             _topIndex++;
         }
@@ -56,10 +56,10 @@ void CodeIterator::advance()
 
 void CodeIterator::postAdvance()
 {
-    if (_subBranch != NULL) {
-        if (_subBranch->finished()) {
-            delete _subBranch;
-            _subBranch = NULL;
+    if (_nestedIterator != NULL) {
+        if (_nestedIterator->finished()) {
+            delete _nestedIterator;
+            _nestedIterator = NULL;
             _topIndex++;
             postAdvance();
         }
