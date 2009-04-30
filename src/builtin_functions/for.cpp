@@ -58,7 +58,7 @@ namespace for_function {
         as_function(FOR_FUNC).pureFunction = true;
         as_function(FOR_FUNC).toSourceString = toSourceString;
         as_function(FOR_FUNC).stateType = create_type(&kernel,
-            "type For::State { "
+            "type for__state { "
                 "string iteratorName, "
                 "Branch contents, "
                 "Branch inputs, "

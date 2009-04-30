@@ -4,9 +4,12 @@ BUGS:
 - Prefix operators. Need to support -x
 - Parsing errors not handled well (we usually crash)
   - need to display location of compile errors
-- Recursive functions have terrible performance. We must be doing something wrong
 - Ambiguity with lists and x -y (this could mean [(x - y)] or [x, -y])
 - migrate_values has terrible performance
+- When rebinding names inside 'if', need to handle names which are rebound in both sides (but
+  not yet bound in outer branch)
+- Need array access[0] operator
+- Need elif
 
 IMPORTANT THINGS:
 - Cool graphical demo
