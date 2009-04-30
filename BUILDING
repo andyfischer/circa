@@ -13,6 +13,6 @@ ALL PLATFORMS:
 
 WINDOWS BUILD:
 
-Download SDL-devel-1.2.13-VC8.zip from http://www.libsdl.org/release/SDL-devel-1.2.13-VC8.zip
+Download the file SDL_deps.zip from http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip
 
-Unzip the contents into the project's folder, and rename this folder to just SDL.
+Unzip the contents into the 'circa' folder
