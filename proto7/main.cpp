@@ -34,6 +34,8 @@ int drag_start_y = 0;
 
 long prev_sdl_ticks = 0;
 
+circa::Ref THING_JUST_CLICKED;
+
 void initialize_keydown()
 {
     for (int i=0; i < SDLK_LAST; i++) {
@@ -100,9 +102,9 @@ void drawText(circa::Term* caller)
             caller->input(2)->asString().c_str(), caller->input(3)->asInt());
 }
 
-void mouse_pressed(circa::Term* caller)
+void mouse_clicked(circa::Term* caller)
 {
-    circa::as_bool(caller) = mouse_just_pressed;
+    circa::as_bool(caller) = caller == THING_JUST_CLICKED;
 }
 
 } // namespace sdl_hosted
@@ -160,12 +162,12 @@ int main( int argc, char* args[] )
     circa::import_function(*circa::KERNEL, sdl_hosted::background, "background(int)");
     circa::import_function(*circa::KERNEL, sdl_hosted::shape, "shape(List,int)");
     circa::import_function(*circa::KERNEL, sdl_hosted::drawText, "drawText(float,float, string, int)");
-    circa::import_function(*circa::KERNEL, sdl_hosted::mouse_pressed, "mouse_pressed() : bool");
+    circa::import_function(*circa::KERNEL, sdl_hosted::mouse_clicked, "mouse_clicked(List) : bool");
 
     // Load the target script
     std::string filename;
     if (argc > 1) filename = args[1];
-    else filename = "proto6/main.ca";
+    else filename = "proto7/main.ca";
 
     std::cout << "Loading file: " << filename << std::endl;
 
@@ -190,7 +192,7 @@ int main( int argc, char* args[] )
         return 1;
 
     // Set the window caption
-    SDL_WM_SetCaption("proto6", NULL);
+    SDL_WM_SetCaption("proto7", NULL);
 
     prev_sdl_ticks = SDL_GetTicks();
 

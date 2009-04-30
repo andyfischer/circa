@@ -193,7 +193,7 @@ bool is_hexadecimal_digit(char c)
 
 bool is_acceptable_inside_identifier(char c)
 {
-    return is_letter(c) || is_number(c) || c == '_' || c == ':';
+    return is_letter(c) || is_number(c) || c == '_';
 }
 
 bool is_whitespace(char c)
@@ -220,6 +220,7 @@ bool try_to_consume_keyword(TokenizeContext& context, int keyword)
     // Check that this is really the end of the word
     if (is_acceptable_inside_identifier(context.next(str_len)))
         return false;
+
 
     // Keyword matches, now consume it
     for (int i=0; i < str_len; i++) {
@@ -457,6 +458,8 @@ void top_level_consume_token(TokenizeContext &context)
 void consume_identifier(TokenizeContext &context)
 {
     std::stringstream text;
+
+    bool deprecated = false;
 
     while (is_acceptable_inside_identifier(context.next()))
         text << context.consume();

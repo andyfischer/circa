@@ -1,12 +1,12 @@
--- Copyright 2008 Andrew Fischer
+-- Copyright 2009 Andrew Fischer
 
 -- std functions
 
+-- these values are passed to us from main.cpp
 state mouse_x = 0.0
 state mouse_y = 0.0
 state time = 0.0
-
-HALF_PI = PI / 2.0
+state elapsed = 0.0
 
 background(0xeeeeeeff)
 
@@ -23,36 +23,44 @@ end
 
 -- our code
 
+def interp(float progress, float e) :float
+  return min(progress / e, 1.0)
+end
+
 SCREEN_WIDTH = 480
 SCREEN_HEIGHT = 600
 
-type TreeSegment {
-  Point baseLoc
-  float direction
-  float depth
-  float width
-}
 
-def tree_segment(TreeSegment segment)
+def tree_segment(Point base, float direction, float width, float depth)
   state jitter = (rand() - .5) *.3
-  state age = 0.0
-  age += 0.01
-  print('age:' age)
-  segment_height = 40.0 * age
-  direction = segment.direction + jitter
-  a = p2c(direction - HALF_PI, segment.width, segment.baseLoc)
-  b = p2c(direction + HALF_PI, segment.width, segment.baseLoc)
-  c = p2c(direction, segment_height, a)
-  d = p2c(direction, segment_height, b)
-  next_center = p2c(direction, segment_height, segment.baseLoc)
-  shape([a b d c] 0x440101ff)
+  state max_length = 20 + 30 * rand()
+  state age = 1.0
+  age += elapsed
+  seg_length = 20.0 * log(age)
+  min(@seg_length, max_length)
+  --direction = direction + jitter
+  bottom_width = width * interp(age, 8)
 
-  if segment.depth < 3.0
-      tree_segment([next_center segment.direction - 0.4 segment.depth+1 segment.width - .4])
-      tree_segment([next_center segment.direction + 0.4 segment.depth+1 segment.width - .41])
+  has_branches = (seg_length > .4*max_length) && depth < 4.0
+
+  top_width = width * interp(age, 11)
+  if_expr(has_branches, @top_width, 0.0)
+
+  l = p2c(direction - HALF_PI, bottom_width, base)
+  r = p2c(direction + HALF_PI, bottom_width, base)
+  next_center = p2c(direction, seg_length, base)
+  l2 = p2c(direction - HALF_PI, top_width, next_center)
+  r2 = p2c(direction + HALF_PI, top_width, next_center)
+  shape([l r r2 l2] 0x440101ff)
+
+  if has_branches
+    state l_jitter = rand() * .2
+    state r_jitter = rand() * .2
+    l_branch = tree_segment(next_center, direction - l_jitter - .3, width - .4, depth+1)
+    r_branch = tree_segment(next_center, direction + r_jitter + .3, width - .4, depth+1)
   end
 end
 
 starting_width = 3.0
 
-tree_segment([[200 300] 0-HALF_PI 0 starting_width])
+root = tree_segment([200 300], 0-HALF_PI, starting_width, 0)

@@ -473,7 +473,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 Term* type_decl(Branch& branch, TokenStream& tokens)
 {
     if (tokens.nextIs(TYPE))
-        tokens.consume(TYPE);
+        tokens.consume();
 
     possible_whitespace(tokens);
 

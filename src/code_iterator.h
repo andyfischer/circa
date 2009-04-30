@@ -11,7 +11,7 @@ class CodeIterator
 {
     Branch* _topBranch;
     int _topIndex;
-    CodeIterator* _subBranch;
+    CodeIterator* _nestedIterator;
 
 public:
     CodeIterator(Branch* branch);
@@ -30,10 +30,10 @@ public:
 
     int depth()
     {
-        if (_subBranch == NULL)
+        if (_nestedIterator == NULL)
             return 0;
         else
-            return _subBranch->depth() + 1;
+            return _nestedIterator->depth() + 1;
     }
 
 private:
