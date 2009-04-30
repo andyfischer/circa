@@ -1,12 +1,12 @@
--- Copyright 2008 Paul Hodge
+-- Copyright 2009 Paul Hodge
 
 -- std functions
 
+-- these values are passed to us from main.cpp
 state mouse_x = 0.0
 state mouse_y = 0.0
 state time = 0.0
-
-HALF_PI = PI / 2.0
+state elapsed = 0.0
 
 background(0xeeeeeeff)
 
@@ -23,6 +23,10 @@ end
 
 -- our code
 
+def interp(float progress, float e) :float
+  return min(progress / e, 1.0)
+end
+
 SCREEN_WIDTH = 480
 SCREEN_HEIGHT = 600
 
@@ -35,19 +39,22 @@ type TreeSegment {
 
 def tree_segment(TreeSegment segment)
   state jitter = (rand() - .5) *.3
-  state age = 0.0
-  age += 0.01
-  print('age:' age)
-  segment_height = 40.0 * age
+  state max_length = 20 + 30 * rand()
+  state age = 1.0
+  age += elapsed
+  seg_length = 20.0 * log(age)
+  min(@seg_length, max_length)
   direction = segment.direction + jitter
-  a = p2c(direction - HALF_PI, segment.width, segment.baseLoc)
-  b = p2c(direction + HALF_PI, segment.width, segment.baseLoc)
-  c = p2c(direction, segment_height, a)
-  d = p2c(direction, segment_height, b)
-  next_center = p2c(direction, segment_height, segment.baseLoc)
+  bottom_width = segment.width * interp(age, 8)
+  top_width = segment.width * interp(age, 11)
+  a = p2c(direction - HALF_PI, bottom_width, segment.baseLoc)
+  b = p2c(direction + HALF_PI, bottom_width, segment.baseLoc)
+  c = p2c(direction, seg_length, a)
+  d = p2c(direction, seg_length, b)
+  next_center = p2c(direction, seg_length, segment.baseLoc)
   shape([a b d c] 0x440101ff)
 
-  if segment.depth < 3.0
+  if (seg_length > .4*max_length) && segment.depth < 3.0
       tree_segment([next_center segment.direction - 0.4 segment.depth+1 segment.width - .4])
       tree_segment([next_center segment.direction + 0.4 segment.depth+1 segment.width - .41])
   end

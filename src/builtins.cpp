@@ -426,6 +426,7 @@ void initialize_constants(Branch& kernel)
     KERNEL->bindName(CONSTANT_FALSE, "false");
 
     float_value(&kernel, 3.141592654f, "PI");
+    float_value(&kernel, 3.141592654f / 2.0, "HALF_PI");
 }
 
 void initialize()
