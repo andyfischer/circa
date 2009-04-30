@@ -10,7 +10,7 @@ namespace if_expr_function {
         int index = as_bool(caller->input(0)) ? 1 : 2;
         Term *result = caller->inputs[index];
 
-        if (result->needsUpdate || !is_value_alloced(result)) {
+        if (!is_value_alloced(result)) {
             std::stringstream out;
             out << "input " << index << " not ready";
             error_occured(caller, out.str());
