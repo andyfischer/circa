@@ -393,7 +393,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     // Create the joining branch
     Term* joining = apply(&branch, BRANCH_FUNC, RefList(), "#joining");
-    joining->boolProperty("syntaxHints:hidden") = true;
+    source_set_hidden(joining, true);
     Branch& joiningBranch = *get_inner_branch(joining);
 
     // Get a list of all names bound in this branch
@@ -460,6 +460,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     tokens.consume(IN);
+    possible_whitespace(tokens);
 
     Term* listExpr = infix_expression(branch, tokens);
     recursively_mark_terms_as_occuring_inside_an_expression(listExpr);
@@ -468,13 +469,16 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     tokens.consume(NEWLINE);
 
     Term* forTerm = apply(&branch, FOR_FUNC, RefList(listExpr));
+    set_input_syntax(forTerm, 0, listExpr);
 
     as_string(forTerm->state->field("iteratorName")) = iterator_name;
 
     Branch& innerBranch = as_branch(forTerm->state->field("contents"));
     innerBranch.outerScope = &branch;
 
-    create_value(&innerBranch, ANY_TYPE, iterator_name);
+    // Create iterator variable
+    Term* iterator = create_value(&innerBranch, ANY_TYPE, iterator_name);
+    source_set_hidden(iterator, true);
 
     consume_branch_until_end(innerBranch, tokens);
 
@@ -520,6 +524,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
         // Copy results to outer scope
         Term* results = apply(&branch, COPY_FUNC, RefList(forTerm->state->field("results")));
+        source_set_hidden(results, true);
         branch.bindName(results, listExpr->name);
     }
 
@@ -544,17 +549,15 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         possible_whitespace(tokens);
     }
 
+    RefList inputs;
     Term* initialValue = NULL;
     if (tokens.nextIs(EQUALS)) {
         tokens.consume(EQUALS);
         possible_whitespace(tokens);
         initialValue = infix_expression(branch, tokens);
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
-    }
-
-    RefList inputs;
-    if (initialValue != NULL)
         inputs.append(initialValue);
+    }
 
     Term* result = apply(&branch, STATEFUL_VALUE_FUNC, inputs, name);
 
@@ -1083,7 +1086,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     // If not found, create an instance of unknown_identifier
     if (result == NULL) {
         result = apply(&branch, UNKNOWN_IDENTIFIER_FUNC, RefList());
-        result->boolProperty("syntaxHints:hidden") = true;
+        source_set_hidden(result, true);
         as_string(result->state) = id.text;
         branch.bindName(result, id.text);
     }

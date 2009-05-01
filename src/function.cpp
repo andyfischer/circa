@@ -39,7 +39,8 @@ void Function::appendInput(Term* type, std::string const& name)
 {
     inputTypes.append(type);
     getInputProperties(inputTypes.count()-1).name = name;
-    create_value(&subroutineBranch, type, name);
+    Term* placeholder = create_value(&subroutineBranch, type, name);
+    source_set_hidden(placeholder, true);
 }
 
 Function::InputProperties&
@@ -204,7 +205,12 @@ Function::functionToSourceString(Term* term)
             result << " " << func.getInputProperties(i).name;
     }
 
-    result << ")\n";
+    result << ")";
+
+    if (func.outputType != VOID_TYPE)
+        result << " : " << func.outputType->name;
+
+    result << "\n";
 
     result << get_branch_source(func.subroutineBranch);
     

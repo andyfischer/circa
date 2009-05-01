@@ -168,4 +168,9 @@ Term* find_type(Branch& branch, std::string const& name)
     return result;
 }
 
+void source_set_hidden(Term* term, bool hidden)
+{
+    term->boolProperty("syntaxHints:hidden") = hidden;
+}
+
 } // namespace circa
