@@ -24,6 +24,12 @@ def mouse_in(Box b) : bool
   return (b.x1 < mouse_x) && (b.x2 > mouse_x) && (b.y1 < mouse_y) && (b.y2 > mouse_y)
 end
 
+_point_highlight_dist = 10.0
+def highlight_point(Point p)
+  fill_circle(p.x p.y _point_highlight_dist 0xccffcc55)
+  circle(p.x p.y _point_highlight_dist 0xffffff55)
+end
+
 -- our code
 
 buttons = ["Button1", "Button2", "Button3"]
