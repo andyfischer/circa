@@ -11,6 +11,7 @@
 #include "importing.h"
 #include "introspection.h"
 #include "parser.h"
+#include "parser_util.h"
 #include "references.h"
 #include "runtime.h"
 #include "source_repro.h"
