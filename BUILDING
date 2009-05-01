@@ -5,14 +5,21 @@ Dependencies:
   SDL-devel
   SDL_gfx
 
-ALL PLATFORMS:
+LINUX:
 
-1. Install SCons
-2. Install SDL-devel (Windows users, see instructions below)
-3. Bring up a command line, and enter the command 'scons'
+0. Using your package manager, install SCons, SDL-devel and SDL_gfx
+1. In a terminal, run the command: scons.
+
+MAC:
+
+0. Install MacPorts from www.macports.org
+1. In Terminal, enter the command: sudo port install SCons SDL-devel SDL_gfx
+2. In Terminal, from the Circa project folder, enter the command: scons .
 
 WINDOWS BUILD:
 
-Download SDL-devel-1.2.13-VC8.zip from http://www.libsdl.org/release/SDL-devel-1.2.13-VC8.zip
-
-Unzip the contents into the project's folder, and rename this folder to just SDL.
+0. Install SCons from here: www.scons.org
+1. Download the file SDL_deps.zip from http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip
+2. Unzip the contents into the project's folder
+3. Open a command prompt in this folder
+4. Run the command: scons .

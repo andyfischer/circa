@@ -3,6 +3,10 @@ import os, sys
 
 from tools.Utils import *
 
+def fatal(msg):
+    print "fatal:",msg
+    exit(1)
+
 # generate setup_builtin_functions.cpp and register_all_tests.cpp
 from tools import generate_cpp_registration
 generate_cpp_registration.do_builtin_functions(
@@ -102,16 +106,35 @@ if POSIX:
     SDL_ENV.Append(LIBS = ['SDL_gfx'])
 
 elif WINDOWS:
-    SDL_ENV.Append(CPPPATH=['SDL/include'])
-    SDL_ENV.Append(CPPPATH=['SDL_gfx'])
-    SDL_ENV.Append(LIBS=['SDL/lib/SDL.lib'])
-    SDL_ENV.Append(LIBS=['SDL/lib/SDLmain.lib'])
-    SDL_ENV.Append(LIBS=['SDL_gfx/VisualC/Release/SDL_gfx.lib'])
+    def look_for_required_dep_folder(folder):
+        if not os.path.exists(folder):
+            print "I couldn't find the folder "+folder+'/'
+
+            # check for a common mistake with unzipping
+            if os.path.exists('SDL_deps/SDL_deps'):
+                print "However, I did find the folder SDL_deps/SDL_deps/, which means that"
+                print "your unzipper may have created an extra folder. Try moving the nested"
+                print "SDL_deps/ folder up one level, into the project directory."
+            else:
+                print "Make sure to download the file SDL_deps.zip from:"
+                print "http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip"
+                print "and unzip it into this project folder."
+            exit(1)
+
+    look_for_required_dep_folder('SDL_deps')
+    look_for_required_dep_folder('SDL_deps/SDL-1.2.13')
+    look_for_required_dep_folder('SDL_deps/SDL_gfx-2.0.19')
+
+    SDL_ENV.Append(CPPPATH=['SDL_deps/SDL-1.2.13/include'])
+    SDL_ENV.Append(CPPPATH=['SDL_deps/SDL_gfx-2.0.19'])
+    SDL_ENV.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDL.lib'])
+    SDL_ENV.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDLmain.lib'])
+    SDL_ENV.Append(LIBS=['SDL_deps/SDL_gfx-2.0.19/VisualC/Release/SDL_gfx.lib'])
 
 
 SDL_ENV.Append(CPPPATH=['src'])
 SDL_ENV.Append(LIBS = [circa_staticlib])
 
-for app_name in read_file_as_lines('build_apps'):
-    prog = SDL_ENV.Program(path_join(app_name,'bin'), path_join(app_name,'main.cpp'))
+for app_name in ["proto5", "proto6"]:
+    prog = SDL_ENV.Program(path_join(app_name,'app'), app_name+'/main.cpp')
     SDL_ENV.Alias(app_name, prog)
