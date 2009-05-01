@@ -230,6 +230,13 @@ namespace list_t {
 
 } // namespace list_t
 
+namespace any_t {
+    std::string to_string(Term* caller)
+    {
+        return "<any>";
+    }
+} // namespace any_t
+
 void value_function_generator(Term* caller)
 {
     assert(caller->input(0) != NULL);
@@ -368,6 +375,7 @@ void initialize_builtin_types(Branch& kernel)
     as_type(BOOL_TYPE).toString = primitives::bool_t::to_string;
 
     ANY_TYPE = create_empty_type(kernel, "any");
+    as_type(ANY_TYPE).toString = any_t::to_string;
 
     VOID_PTR_TYPE = import_type<void*>(kernel, "void_ptr");
     as_type(VOID_PTR_TYPE).parameters.append(ANY_TYPE);
