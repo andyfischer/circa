@@ -39,11 +39,6 @@ Term* literal_list(Branch& branch, TokenStream& tokens);
 Term* identifier(Branch& branch, TokenStream& tokens);
 
 // Helper functions:
-Term* find_and_apply(Branch& branch, std::string const& functionName, RefList inputs);
-void push_pending_rebind(Branch& branch, std::string const& name);
-std::string pop_pending_rebind(Branch& branch);
-void remove_compilation_attrs(Branch& branch);
-void wrap_up_branch(Branch& branch);
 bool is_infix_operator_rebinding(std::string const& infix);
 std::string possible_whitespace(TokenStream& tokens);
 std::string possible_newline(TokenStream& tokens);
