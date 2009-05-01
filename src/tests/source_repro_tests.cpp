@@ -19,8 +19,8 @@ void round_trip_source(std::string statement)
     result.expected = statement;
 
     Branch branch;
-    Term *t = branch.compile(statement);
-    result.actual = get_term_source(t);
+    parser::compile(&branch, parser::statement_list, statement);
+    result.actual = get_branch_source(branch);
     result.passed = result.expected == result.actual;
     gSourceReproResults.push_back(result);
 }
@@ -70,13 +70,12 @@ void reproduce_simple_values() {
 }
 
 void reproduce_stateful_values() {
-    /*
-    FIXME
-    round_trip_source("state i:int");
-    round_trip_source("state b = 2");
-    round_trip_source("  state i:int");
+    round_trip_source("state i");
+    round_trip_source("state i = 1");
+    round_trip_source("state i = 5*3+1");
+    //round_trip_source("state i:int");
+    //round_trip_source("  state i:int");
     finish_source_repro_category();
-    */
 }
 
 void reproduce_function_calls() {
@@ -157,6 +156,24 @@ void reproduce_lists() {
     finish_source_repro_category();
 }
 
+void reproduce_for_loop() {
+    round_trip_source("for x in range(1)\nend");
+    round_trip_source("  for x in range(1)\nend");
+    round_trip_source("for x in [5]\nend");
+    round_trip_source("for x in [1  ,2 ;3 ]\nend");
+    round_trip_source("for x in [1]\n   print(x)\nend");
+    round_trip_source("l = [1]\nfor x in l\nend");
+    round_trip_source("l = [1]\nfor x in l\n  x += 3\nend");
+    finish_source_repro_category();
+}
+
+void reproduce_function_decl() {
+    round_trip_source("def hi()\nend");
+    round_trip_source("def hi2() : int\nend");
+    round_trip_source("def hi3(int a)\nend");
+    finish_source_repro_category();
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_tests::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_stateful_values);
@@ -166,6 +183,8 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_tests::reproduce_dot_concat);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_if);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_lists);
+    REGISTER_TEST_CASE(source_repro_tests::reproduce_for_loop);
+    REGISTER_TEST_CASE(source_repro_tests::reproduce_function_decl);
 }
 
 } // namespace source_repro_tests

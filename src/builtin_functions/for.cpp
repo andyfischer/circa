@@ -43,8 +43,8 @@ namespace for_function {
         std::stringstream result;
         result << "for ";
         result << as_string(term->state->field("iteratorName"));
-        result << " in";
-        result << get_term_source(term->input(0));
+        result << " in ";
+        result << get_source_of_input(term,0);
         result << "\n";
         result << get_branch_source(as_branch(term->state->field("contents")));
         result << "end";

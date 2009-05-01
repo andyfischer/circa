@@ -287,7 +287,7 @@ void evaluate_file(Branch& branch, std::string const& filename)
     parser::compile(&branch, parser::statement_list, fileContents);
 
     Term* sourceFile = string_value(&branch, filename, get_name_for_attribute("source-file"));
-    sourceFile->boolProperty("syntaxHints:hidden") = true;
+    source_set_hidden(sourceFile, true);
 }
 
 Term* find_named(Branch* branch, std::string const& name)

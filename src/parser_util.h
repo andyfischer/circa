@@ -18,6 +18,7 @@ void push_pending_rebind(Branch& branch, std::string const& name);
 std::string pop_pending_rebind(Branch& branch);
 void remove_compilation_attrs(Branch& branch);
 void wrap_up_branch(Branch& branch);
+void source_set_hidden(Term* term, bool hidden);
 
 } // namespace circa
 
