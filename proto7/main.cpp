@@ -1,11 +1,12 @@
 // Copyright 2008 Andrew Fischer
 
 #include "SDL.h"
-#include "SDL_gfxPrimitives.h"
 
 #include <string>
 
 #include "circa.h"
+
+#include "sdl_wrapper.cpp"
 
 int SCREEN_WIDTH = 640;
 int SCREEN_HEIGHT = 480;
@@ -55,59 +56,10 @@ void key_pressed(circa::Term* caller)
     caller->asBool() = KEY_JUST_PRESSED.find(i) != KEY_JUST_PRESSED.end();
 }
 
-namespace sdl_hosted {
-
-void box(circa::Term* caller)
-{
-    boxColor(SCREEN,
-        (int) as_float(caller->input(0)),
-        (int) as_float(caller->input(1)),
-        (int) as_float(caller->input(2)),
-        (int) as_float(caller->input(3)),
-        (unsigned int) as_int(caller->input(4)));
-}
-
-void line(circa::Term* caller)
-{
-    aalineColor(SCREEN,
-        (int) as_float(caller->input(0)),
-        (int) as_float(caller->input(1)),
-        (int) as_float(caller->input(2)),
-        (int) as_float(caller->input(3)),
-        as_int(caller->input(4)));
-}
-
-void background(circa::Term* caller)
-{
-    boxColor(SCREEN, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
-            as_int(caller->input(0)));
-}
-
-void shape(circa::Term* caller)
-{
-    static Sint16 vx[500];
-    static Sint16 vy[500];
-
-    circa::Branch& list = circa::as_branch(caller->input(0));
-    for (int i=0; i < list.numTerms(); i++) {
-        vx[i] = circa::to_float(list[i]->field(0));
-        vy[i] = circa::to_float(list[i]->field(1));
-    }
-    filledPolygonColor(SCREEN, vx, vy, list.numTerms(), caller->input(1)->asInt());
-}
-
-void drawText(circa::Term* caller)
-{
-    stringColor(SCREEN, caller->input(0)->asFloat(), caller->input(1)->asFloat(),
-            caller->input(2)->asString().c_str(), caller->input(3)->asInt());
-}
-
 void mouse_clicked(circa::Term* caller)
 {
     circa::as_bool(caller) = caller == THING_JUST_CLICKED;
 }
-
-} // namespace sdl_hosted
 
 void handle_key_press(SDL_Event event, int key)
 {
@@ -149,20 +101,15 @@ int main( int argc, char* args[] )
     circa::initialize();
 
     // Import functions
-    circa::import_function(*circa::KERNEL, key_down, "key_down(int) -> bool");
-    circa::import_function(*circa::KERNEL, key_pressed, "key_pressed(int) -> bool");
+    circa::import_function(*circa::KERNEL, key_down, "key_down(int) : bool");
+    circa::import_function(*circa::KERNEL, key_pressed, "key_pressed(int) : bool");
     circa::int_value(circa::KERNEL, SDLK_UP, "KEY_UP");
     circa::int_value(circa::KERNEL, SDLK_DOWN, "KEY_DOWN");
     circa::int_value(circa::KERNEL, SDLK_LEFT, "KEY_LEFT");
     circa::int_value(circa::KERNEL, SDLK_RIGHT, "KEY_RIGHT");
     circa::int_value(circa::KERNEL, SDLK_SPACE, "KEY_SPACE");
-
-    circa::import_function(*circa::KERNEL, sdl_hosted::box, "box(float,float,float,float,int)");
-    circa::import_function(*circa::KERNEL, sdl_hosted::line, "line(float,float,float,float,int)");
-    circa::import_function(*circa::KERNEL, sdl_hosted::background, "background(int)");
-    circa::import_function(*circa::KERNEL, sdl_hosted::shape, "shape(List,int)");
-    circa::import_function(*circa::KERNEL, sdl_hosted::drawText, "drawText(float,float, string, int)");
-    circa::import_function(*circa::KERNEL, sdl_hosted::mouse_clicked, "mouse_clicked(List) : bool");
+    circa::import_function(*circa::KERNEL, mouse_clicked, "mouse_clicked(List) : bool");
+    sdl_wrapper::register_functions(*circa::KERNEL);
 
     // Load the target script
     std::string filename;
