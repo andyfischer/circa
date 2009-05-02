@@ -91,7 +91,7 @@ TokenStream::getPosition() const
 void
 TokenStream::resetPosition(int loc)
 {
-    assert(loc >= 0 && ((unsigned)loc < tokens.size()));
+    assert(loc >= 0);
     currentIndex = loc;
 }
 
