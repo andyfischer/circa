@@ -1,0 +1,68 @@
+
+PARSING PROCESS
+
+Step 1: Scan the entire input for fatal parsing errors.
+
+When there's a compile error, we want to fail gracefully. It would be nice to return
+a bunch of code which is mostly correct, but only has a few error terms.
+
+Step 1: Search for totally unrecoverable errors. Reject entire string
+  - This section can include unmatched block start/ends, like a 'for' with no 'end'
+    Any attempt to parse a string like that will probably be completely wrong
+
+Step 2: Parse and create terms. Individual terms can result in errors, but we try to
+  recover from errors, and smoothly parse the entire input.
+
+This section lists every possible compile error:
+Accurate as of 5/1/09
+
+(Errors which currently throw exceptions)
+
+[2] Can't rebind an iterator on an anonymous list
+  for x in [1]\nx = 2\nend
+
+[3] Can't bind a name with more than two dots
+  a.b.c = 1
+
+[4] Left side of rebinding operator must be an ident
+  1 += 2
+
+(Errors which currently expect the token_stream to throw)
+
+[5] def myfunc%
+[6] def myfunc(%
+[7] def myfunc(int %
+[8] def myfunc(int) : %
+[9] def myfunc(int) EOF
+[10] type %
+[11] type mytype %
+[12] type mytype { %
+[13] type mytype { int %
+[14] type mytype { int a EOF
+[15] if EOF
+[16] if true EOF
+[17] if true else EOF
+[18] if true else else
+[19] for %
+[20] for x %
+[21] for x in EOF
+[22] for x in [1]EOF
+[23] state %
+[24] state x = EOF
+[25] 1 2 3 = 4
+[26] a.b 1 2 3 = 4
+[27] return EOF
+[28] a.0
+[29] [].append(%
+[30] 1 -> %
+[31] (1 + 2 EOF
+[32] add %
+[33] add(%
+[34] [ EOF
+(and more after this)
+
+(Situations which don't currently report an error (and should))
+
+[201] def %
+[202] if 'poop'
+[203] for x in 'poop'

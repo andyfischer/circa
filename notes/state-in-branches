@@ -18,3 +18,24 @@ OPTIMIZATION
 At some point, we'll need to optimize this. We can't go around copying the entirety
 of a for loop block for every iteration. Need to design it so that we only copy the
 stateful things.
+
+REQUIREMENTS
+
+For every branch, we can have a stateful component of that branch.
+When calling a branch, we must be able to do these things cheaply:
+ 1. Implant values for inputs
+ 2. Implant values for state
+ 3. Extract output
+
+What is a cheap way to implant values?
+
+ACCESSING A FUNCTION'S STATE
+
+Can we write this?
+
+function stateful_func()
+  state i:int = 1
+end
+
+call = stateful_func()
+print(call.i)
