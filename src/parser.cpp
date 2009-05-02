@@ -594,8 +594,14 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
 Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
+
     tokens.consume(STATE);
     possible_whitespace(tokens);
+
+    if (!tokens.nextIs(IDENTIFIER))
+        return compile_error_for_line(branch, tokens, startPosition);
+
     std::string name = tokens.consume(IDENTIFIER);
     possible_whitespace(tokens);
 
@@ -604,6 +610,10 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     if (tokens.nextIs(COLON)) {
         tokens.consume();
         possible_whitespace(tokens);
+
+        if (!tokens.nextIs(IDENTIFIER))
+            return compile_error_for_line(branch, tokens, startPosition);
+
         typeName = tokens.consume(IDENTIFIER);
         possible_whitespace(tokens);
     }
@@ -649,6 +659,8 @@ int search_line_for_token(TokenStream& tokens, int target)
 
 Term* expression_statement(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
+
     // scan this line for an = operator
     int equals_operator_loc = search_line_for_token(tokens, EQUALS);
 
@@ -661,7 +673,12 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         // Parse name binding(s)
 
         while (true) {
-            names.append(tokens.consume(IDENTIFIER));
+            if (!tokens.nextIs(IDENTIFIER))
+                return compile_error_for_line(branch, tokens, startPosition);
+
+            std::string name = tokens.consume(IDENTIFIER);
+
+            names.append(name);
 
             if (!tokens.nextIs(DOT))
                 break;
@@ -670,6 +687,10 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         }
 
         preEqualsSpace = possible_whitespace(tokens);
+
+        if (!tokens.nextIs(EQUALS))
+            compile_error_for_line(branch, tokens, startPosition);
+
         tokens.consume(EQUALS);
         postEqualsSpace = possible_whitespace(tokens);
     }
@@ -996,6 +1017,8 @@ Term* atom(Branch& branch, TokenStream& tokens)
 
 Term* function_call(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
+
     std::string functionName = tokens.consume(IDENTIFIER);
     tokens.consume(LPAREN);
 
@@ -1003,6 +1026,9 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
     ListSyntaxHints listHints;
     consume_list_arguments(branch, tokens, inputs, listHints);
+
+    if (!tokens.nextIs(RPAREN))
+        return compile_error_for_line(branch, tokens, startPosition);
 
     tokens.consume(RPAREN);
     
@@ -1094,11 +1120,16 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
 
 Term* literal_list(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
+
     tokens.consume(LBRACKET);
 
     RefList terms;
     ListSyntaxHints listHints;
     consume_list_arguments(branch, tokens, terms, listHints);
+
+    if (!tokens.nextIs(RBRACKET))
+        return compile_error_for_line(branch, tokens, startPosition);
 
     tokens.consume(RBRACKET);
 
