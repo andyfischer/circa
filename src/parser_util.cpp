@@ -175,7 +175,7 @@ void source_set_hidden(Term* term, bool hidden)
     term->boolProperty("syntaxHints:hidden") = hidden;
 }
 
-std::string consume_line_for_error(TokenStream &tokens, int start)
+std::string consume_line(TokenStream &tokens, int start)
 {
     assert(start <= tokens.getPosition());
 
@@ -188,12 +188,33 @@ std::string consume_line_for_error(TokenStream &tokens, int start)
         line << tokens.consume();
 
     // throw out trailing newline
-    tokens.consume();
+    if (!tokens.finished())
+        tokens.consume();
 
     // make sure we passed our original position
-    assert(tokens.getPosition() > originalPosition);
+    assert(tokens.getPosition() >= originalPosition);
 
     return line.str();
+}
+
+Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start)
+{
+    std::string line = consume_line(tokens, start);
+
+    Term* result = apply(&branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
+    as_string(result->state) = line;
+
+    return result;
+}
+
+Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start)
+{
+    std::string line = consume_line(tokens, start);
+
+    change_function(existing, UNRECOGNIZED_EXPRESSION_FUNC);
+    as_string(existing->state) = line;
+
+    return existing;
 }
 
 } // namespace circa

@@ -217,13 +217,26 @@ Term* blank_line(Branch& branch, TokenStream& tokens)
 
 Term* function_from_header(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
+
     if (tokens.nextIs(DEF))
         tokens.consume();
 
     possible_whitespace(tokens);
+
+    if (!tokens.nextIs(IDENTIFIER)
+            // A few builtin functions have names which are keywords:
+            && !tokens.nextIs(FOR) && !tokens.nextIs(IF))
+        return compile_error_for_line(branch, tokens, startPosition);
+
     std::string functionName = tokens.consume();
+
     possible_whitespace(tokens);
-    tokens.consume(LPAREN);
+
+    if (!tokens.nextIs(LPAREN))
+        return compile_error_for_line(branch, tokens, startPosition);
+
+    tokens.consume();
 
     Term* result = create_value(&branch, FUNCTION_TYPE, functionName);
     result->stringProperty("syntaxHints:declarationStyle") = "literal";
@@ -284,6 +297,10 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
 Term* function_decl(Branch& branch, TokenStream& tokens)
 {
     Term* result = function_from_header(branch, tokens);
+
+    if (has_compile_error(result))
+        return result;
+
     Function& func = as_function(result);
 
     initialize_as_subroutine(func);

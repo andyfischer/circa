@@ -220,7 +220,7 @@ void test_locations()
     test_assert(token_location_equals(results[7], 0, 1, 4, 4));
 }
 
-void test_consume_line_for_error()
+void test_consume_line()
 {
     TokenStream tokens("for in $#!$#@ 151 poop \nfin");
 
@@ -239,7 +239,7 @@ void test_consume_line_for_error()
     tokens.consumet();
 
     // now freak out
-    std::string errorline = consume_line_for_error(tokens, startPosition);
+    std::string errorline = consume_line(tokens, startPosition);
 
     test_equals(errorline, "in $#!$#@ 151 poop ");
     test_assert(tokens.nextIs(token::IDENTIFIER));
@@ -259,7 +259,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
     REGISTER_TEST_CASE(tokenizer_tests::token_stream_to_string);
     REGISTER_TEST_CASE(tokenizer_tests::test_locations);
-    REGISTER_TEST_CASE(tokenizer_tests::test_consume_line_for_error);
+    REGISTER_TEST_CASE(tokenizer_tests::test_consume_line);
 }
 
 } // namespace tokenizer_tests
