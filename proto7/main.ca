@@ -47,7 +47,8 @@ highlight_color = 0x555555ff
 current_y = loc.y
 for button in buttons
   button_loc = [loc.x, current_y] : Point
-  b = [button_loc.x, button_loc.y, button_loc.x+button_size.x, button_loc.y+button_size.y]:Box
+  b = [button_loc.x, button_loc.y, button_loc.x+button_size.x,
+       button_loc.y+button_size.y]:Box
 
   color = 0
   if mouse_in(b)
@@ -56,9 +57,9 @@ for button in buttons
     color = normal_color
   end
 
-  --if mouse_clicked(b)
-    --print('clicked: ' button)
-  --end
+  if mouse_clicked(b)
+    print('clicked: ' button)
+  end
     
   box(b.x1 b.y1 b.x2 b.y2 color)
   drawText(button_loc.x + 3, button_loc.y + (button_size.y - font_height) / 2, button, 0x000000ff)

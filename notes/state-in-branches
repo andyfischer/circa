@@ -1,0 +1,20 @@
+
+So we have this idea that you can have persistent state associated with control flow.
+
+Like, if you call a stateful function twice, then some piece of memory is allocated for
+each call.
+
+In initial experiments, this is a really cool feature. Drawing a fractal tree became
+absurdly easy. It's likely that it will help with other things too.
+
+Right now, this works for function calls.
+
+TODO
+It doesn't work for for-loops. It should. Each iteration of a for-loop should have
+a separate branch.
+
+OPTIMIZATION
+
+At some point, we'll need to optimize this. We can't go around copying the entirety
+of a for loop block for every iteration. Need to design it so that we only copy the
+stateful things.

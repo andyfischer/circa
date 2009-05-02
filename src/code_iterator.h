@@ -23,6 +23,8 @@ public:
     Term* operator*() { return current(); }
     Term* operator->() { return current(); }
 
+    void operator++() { advance(); }
+
     bool finished()
     {
         return _topBranch == NULL;

@@ -6,6 +6,8 @@
 
 #include "circa.h"
 
+using namespace circa;
+
 #include "sdl_wrapper.cpp"
 
 int SCREEN_WIDTH = 640;
@@ -15,9 +17,8 @@ const int SCREEN_BPP = 32;
 bool KEY_DOWN[SDLK_LAST];
 std::set<int> KEY_JUST_PRESSED;
 
-bool mouse_just_pressed = false;
-int mouse_x = 0;
-int mouse_y = 0;
+int MOUSE_X = 0;
+int MOUSE_Y = 0;
 
 SDL_Surface* SCREEN = NULL;
 circa::Branch SCRIPT_MAIN;
@@ -27,8 +28,8 @@ circa::RefList INFLUENCE_LIST;
 
 bool drag_in_progress = false;
 
-int previous_mouse_x = 0;
-int previous_mouse_y = 0;
+int previous_MOUSE_X = 0;
+int previous_MOUSE_Y = 0;
 
 int drag_start_x = 0;
 int drag_start_y = 0;
@@ -36,6 +37,8 @@ int drag_start_y = 0;
 long prev_sdl_ticks = 0;
 
 circa::Ref THING_JUST_CLICKED;
+
+circa::Ref MOUSE_CLICKED_FUNCTION;
 
 void initialize_keydown()
 {
@@ -93,6 +96,26 @@ void handle_key_press(SDL_Event event, int key)
     }
 }
 
+Term* find_mouse_clicked(Branch& branch, int mouse_x, int mouse_y)
+{
+    Term* result = NULL;
+
+    // todo: use an iterator that only descends down active branches
+    for (circa::CodeIterator it(&branch); !it.finished(); ++it) {
+        if (it->function == MOUSE_CLICKED_FUNCTION) {
+            Term* box = it->input(0);
+            if ((as_branch(box)[0]->asFloat() < mouse_x) &&
+                (as_branch(box)[1]->asFloat() < mouse_y) &&
+                (as_branch(box)[2]->asFloat() > mouse_y) &&
+                (as_branch(box)[3]->asFloat() > mouse_y)) {
+                result = *it;
+            }
+        }
+    }
+
+    return result;
+}
+
 int main( int argc, char* args[] )
 {
     // Initialize stuff
@@ -108,7 +131,8 @@ int main( int argc, char* args[] )
     circa::int_value(circa::KERNEL, SDLK_LEFT, "KEY_LEFT");
     circa::int_value(circa::KERNEL, SDLK_RIGHT, "KEY_RIGHT");
     circa::int_value(circa::KERNEL, SDLK_SPACE, "KEY_SPACE");
-    circa::import_function(*circa::KERNEL, mouse_clicked, "mouse_clicked(List) : bool");
+    MOUSE_CLICKED_FUNCTION = circa::import_function(
+        *circa::KERNEL, mouse_clicked, "mouse_clicked(List) : bool");
     sdl_wrapper::register_functions(*circa::KERNEL);
 
     // Load the target script
@@ -147,8 +171,6 @@ int main( int argc, char* args[] )
     while (CONTINUE_MAIN_LOOP) {
         KEY_JUST_PRESSED.clear();
 
-        mouse_just_pressed = false;
-
         // Consume all events
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -168,9 +190,11 @@ int main( int argc, char* args[] )
             } else if (event.type == SDL_KEYUP) {
                 KEY_DOWN[event.key.keysym.sym] = false;
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-                mouse_just_pressed = true;
-                drag_start_x = mouse_x;
-                drag_start_y = mouse_y;
+                drag_start_x = MOUSE_X;
+                drag_start_y = MOUSE_Y;
+
+                THING_JUST_CLICKED = find_mouse_clicked(SCRIPT_MAIN, MOUSE_X, MOUSE_Y);
+
             } else if (event.type == SDL_MOUSEBUTTONUP) {
                 // draw a line
                 if (drag_in_progress) {
@@ -178,15 +202,15 @@ int main( int argc, char* args[] )
                     circa::apply(&SCRIPT_MAIN, "line", circa::RefList(
                                 circa::float_value(&SCRIPT_MAIN, drag_start_x),
                                 circa::float_value(&SCRIPT_MAIN, drag_start_y),
-                                circa::float_value(&SCRIPT_MAIN, mouse_x),
-                                circa::float_value(&SCRIPT_MAIN, mouse_y),
+                                circa::float_value(&SCRIPT_MAIN, MOUSE_X),
+                                circa::float_value(&SCRIPT_MAIN, MOUSE_Y),
                                 circa::int_value(&SCRIPT_MAIN, 0)));
                 }
 
                 drag_in_progress = false;
             } else if (event.type == SDL_MOUSEMOTION) {
-                mouse_x = event.motion.x;
-                mouse_y = event.motion.y;
+                MOUSE_X = event.motion.x;
+                MOUSE_Y = event.motion.y;
             }
         } // finish event loop
 
@@ -197,8 +221,8 @@ int main( int argc, char* args[] )
 
         prev_sdl_ticks = ticks;
 
-        circa::as_float(SCRIPT_MAIN["mouse_x"]) = mouse_x;
-        circa::as_float(SCRIPT_MAIN["mouse_y"]) = mouse_y;
+        circa::as_float(SCRIPT_MAIN["mouse_x"]) = MOUSE_X;
+        circa::as_float(SCRIPT_MAIN["mouse_y"]) = MOUSE_Y;
 
         try {
             SCRIPT_MAIN.eval();

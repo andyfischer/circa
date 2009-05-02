@@ -1,2 +1,2 @@
 cd $CIRCA_HOME
-scons proto7 && proto7/bin $*
+scons proto7 && proto7/app $*

@@ -135,6 +135,6 @@ elif WINDOWS:
 SDL_ENV.Append(CPPPATH=['src'])
 SDL_ENV.Append(LIBS = [circa_staticlib])
 
-for app_name in ["proto5", "proto6"]:
+for app_name in read_file_as_lines('build_apps'):
     prog = SDL_ENV.Program(path_join(app_name,'app'), app_name+'/main.cpp')
     SDL_ENV.Alias(app_name, prog)
