@@ -9,14 +9,8 @@ Term* apply_with_syntax(Branch& branch, Term* function, RefList inputs)
 {
     Term* result = apply(&branch, function, inputs);
 
-    for (unsigned i=0; i < inputs.count(); i++) {
-        if (inputs[i]->name == "") {
-            get_input_syntax_hint(result, i, "style") = "by-value";
-        } else {
-            get_input_syntax_hint(result, i, "style") = "by-name";
-            get_input_syntax_hint(result, i, "name") = inputs[i]->name;
-        }
-    }
+    // At this point, we used to do some syntax-preservation stuff
+    // But it turned out we don't need to
 
     return result;
 }
