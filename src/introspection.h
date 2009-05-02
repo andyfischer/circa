@@ -26,7 +26,6 @@ std::string branch_to_string_raw(Branch& branch);
 bool is_equivalent(Term* target, Term* function, RefList const& inputs);
 Term* find_equivalent(Branch& branch, Term* function, RefList const& inputs);
 void print_runtime_errors(Branch& branch, std::ostream& output);
-bool has_compile_errors(Branch& branch);
 int count_compile_errors(Branch& branch);
 std::string get_short_location(Term* term);
 std::string get_source_filename(Term* term);

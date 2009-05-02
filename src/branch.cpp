@@ -1,7 +1,5 @@
 // Copyright 2008 Andrew Fischer
 
-#include "common_headers.h"
-
 #include "circa.h"
 
 namespace circa {
