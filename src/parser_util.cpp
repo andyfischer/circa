@@ -4,18 +4,6 @@
 
 namespace circa {
 
-// Calls apply() and then looks at each input to update the syntax hints on your result term
-Term* apply_with_syntax(Branch& branch, Term* function, RefList inputs)
-{
-    Term* result = apply(&branch, function, inputs);
-
-    // At this point, we used to do some syntax-preservation stuff
-    // But it turned out we don't need to
-
-    return result;
-}
-
-
 void prepend_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
@@ -138,7 +126,7 @@ Term* find_and_apply(Branch& branch,
         return result;
     }
 
-    return apply_with_syntax(branch, function, inputs);
+    return apply(&branch, function, inputs);
 }
 
 void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
