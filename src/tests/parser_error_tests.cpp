@@ -59,6 +59,8 @@ void register_every_possible_parse_error()
     register_input("for x in %");
     register_input("for x in [1]");
     register_input("state");
+    register_input("state i:%");
+    register_input("state i:");
     register_input("state %");
     register_input("state x = ");
     register_input("1 = 2");
@@ -85,7 +87,7 @@ void test_every_parse_error()
 
     std::vector<TestInput>::iterator it;
 
-    bool anyHadProblems = false;
+    int problemCount = 0;
 
     for (it = TEST_INPUTS.begin(); it != TEST_INPUTS.end(); ++it) {
         TestInput &input = *it;
@@ -96,18 +98,20 @@ void test_every_parse_error()
             parser::compile(&branch, parser::statement_list, input.text);
         } catch (std::exception const&) {
             input.exceptionThrown = true;
-            anyHadProblems = true;
+            problemCount++;
             continue;
         }
 
         if (count_compile_errors(branch) == 0) {
             input.failedToCauseError = true;
-            anyHadProblems = true;
+            problemCount++;
         }
     }
 
-    if (anyHadProblems) {
-        std::cout << "Encountered problems in parser_error_tests:" << std::endl;
+    if (problemCount > 0) {
+        std::cout << "Encountered " << problemCount << " problem";
+        std::cout << (problemCount == 1 ? "" : "s");
+        std::cout << " in parser_error_tests:" << std::endl;
         for (it = TEST_INPUTS.begin(); it != TEST_INPUTS.end(); ++it) {
             if (it->exceptionThrown)
                 std::cout << "[EXCEPTION]";
