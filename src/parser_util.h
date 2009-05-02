@@ -18,7 +18,15 @@ void push_pending_rebind(Branch& branch, std::string const& name);
 std::string pop_pending_rebind(Branch& branch);
 void remove_compilation_attrs(Branch& branch);
 void wrap_up_branch(Branch& branch);
+
+// Mark the given term as hidden from source reproduction.
 void source_set_hidden(Term* term, bool hidden);
+
+// Consume tokens starting at 'start' and ending at something which might
+// be the end of the statement. Return line as a string. The name mentions
+// _for_error because this should probably only be used for recovering from
+// a parse error.
+std::string consume_line_for_error(TokenStream &tokens, int start);
 
 } // namespace circa
 

@@ -175,4 +175,25 @@ void source_set_hidden(Term* term, bool hidden)
     term->boolProperty("syntaxHints:hidden") = hidden;
 }
 
+std::string consume_line_for_error(TokenStream &tokens, int start)
+{
+    assert(start <= tokens.getPosition());
+
+    int originalPosition = tokens.getPosition();
+
+    tokens.resetPosition(start);
+
+    std::stringstream line;
+    while (!tokens.nextIs(tokenizer::NEWLINE) && !tokens.finished())
+        line << tokens.consume();
+
+    // throw out trailing newline
+    tokens.consume();
+
+    // make sure we passed our original position
+    assert(tokens.getPosition() > originalPosition);
+
+    return line.str();
+}
+
 } // namespace circa
