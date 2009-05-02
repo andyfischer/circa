@@ -25,7 +25,9 @@ void source_set_hidden(Term* term, bool hidden);
 // Consume tokens starting at 'start' and ending at something which might
 // be the end of the statement. Return line as string. This should probably
 // only be used for handling parse errrors.
-std::string consume_line(TokenStream &tokens, int start);
+// If 'positionRecepient' is not NULL then we will include the positions of the
+// consumed tokens in its syntax hints.
+std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient=NULL);
 
 // Consume the nearby line, return a newly created compile-error term.
 Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start);

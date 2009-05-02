@@ -175,7 +175,7 @@ void source_set_hidden(Term* term, bool hidden)
     term->boolProperty("syntaxHints:hidden") = hidden;
 }
 
-std::string consume_line(TokenStream &tokens, int start)
+std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient)
 {
     assert(start <= tokens.getPosition());
 
@@ -184,8 +184,12 @@ std::string consume_line(TokenStream &tokens, int start)
     tokens.resetPosition(start);
 
     std::stringstream line;
-    while (!tokens.nextIs(tokenizer::NEWLINE) && !tokens.finished())
-        line << tokens.consume();
+    while (!tokens.nextIs(tokenizer::NEWLINE) && !tokens.finished()) {
+        tokenizer::Token tok = tokens.consumet();
+        if (positionRecepient != NULL)
+            include_location(positionRecepient, tok);
+        line << tok.text;
+    }
 
     // throw out trailing newline
     if (!tokens.finished())
@@ -199,20 +203,16 @@ std::string consume_line(TokenStream &tokens, int start)
 
 Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start)
 {
-    std::string line = consume_line(tokens, start);
-
     Term* result = apply(&branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
-    as_string(result->state) = line;
+    as_string(result->state) = consume_line(tokens, start, result);
 
     return result;
 }
 
 Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start)
 {
-    std::string line = consume_line(tokens, start);
-
     change_function(existing, UNRECOGNIZED_EXPRESSION_FUNC);
-    as_string(existing->state) = line;
+    as_string(existing->state) = consume_line(tokens, start, existing);
 
     return existing;
 }
