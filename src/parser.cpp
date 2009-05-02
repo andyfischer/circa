@@ -362,8 +362,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
     tokens.consume(NEWLINE);
 
-    Term* result = apply(&branch, IF_FUNC, RefList(condition));
-    set_input_syntax(result, 0, condition);
+    Term* result = apply_with_syntax(branch, IF_FUNC, RefList(condition));
     Branch& innerBranch = as_branch(result->state);
     innerBranch.outerScope = &branch;
 
@@ -465,8 +464,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     tokens.consume(NEWLINE);
 
-    Term* forTerm = apply(&branch, FOR_FUNC, RefList(listExpr));
-    set_input_syntax(forTerm, 0, listExpr);
+    Term* forTerm = apply_with_syntax(branch, FOR_FUNC, RefList(listExpr));
 
     as_string(forTerm->state->field("iteratorName")) = iterator_name;
 
@@ -556,10 +554,8 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         inputs.append(initialValue);
     }
 
-    Term* result = apply(&branch, STATEFUL_VALUE_FUNC, inputs, name);
-
-    if (inputs.count() > 0)
-        set_input_syntax(result, 0, inputs[0]);
+    Term* result = apply_with_syntax(branch, STATEFUL_VALUE_FUNC, inputs);
+    branch.bindName(result, name);
 
     if (typeName != "") {
         Term* type = find_type(branch, typeName);
@@ -794,7 +790,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                     tokens.consume(RPAREN);
                 }
 
-                result = apply(&branch, function, inputs);
+                result = apply_with_syntax(branch, function, inputs);
 
                 // If this is a modifying member function, then rebind the name to this
                 // result.
@@ -807,7 +803,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             // Next, if this type defines this field
             } else if (lhsType.findFieldIndex(rhsIdent) != -1) {
 
-                result = apply(&branch, GET_FIELD_BY_NAME_FUNC, RefList(leftExpr));
+                result = apply_with_syntax(branch, GET_FIELD_BY_NAME_FUNC, RefList(leftExpr));
                 as_string(result->state) = rhsIdent;
                 specialize_type(result, lhsType[rhsIdent].type);
 
@@ -835,12 +831,10 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                     tokens.consume(RPAREN);
                 }
 
-                result = apply(&branch, function, inputs);
+                result = apply_with_syntax(branch, function, inputs);
             }
 
             result->stringProperty("syntaxHints:declarationStyle") = "dot-concat";
-
-            set_input_syntax(result, 0, leftExpr);
 
         } else if (operatorStr == "->") {
             std::string functionName = tokens.consume(IDENTIFIER);
@@ -852,7 +846,6 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             result->stringProperty("syntaxHints:declarationStyle") = "arrow-concat";
             result->stringProperty("syntaxHints:functionName") = functionName;
 
-            set_input_syntax(result, 0, leftExpr);
             get_input_syntax_hint(result, 0, "postWhitespace") = preOperatorWhitespace;
             get_input_syntax_hint(result, 1, "preWhitespace") = postOperatorWhitespace;
 
@@ -868,9 +861,6 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             result = find_and_apply(branch, functionName, RefList(leftExpr, rightExpr));
             result->stringProperty("syntaxHints:declarationStyle") = "infix";
             result->stringProperty("syntaxHints:functionName") = operatorStr;
-
-            set_input_syntax(result, 0, leftExpr);
-            set_input_syntax(result, 1, rightExpr);
 
             get_input_syntax_hint(result, 0, "postWhitespace") = preOperatorWhitespace;
             get_input_syntax_hint(result, 1, "preWhitespace") = postOperatorWhitespace;
