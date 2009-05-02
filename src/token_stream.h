@@ -59,8 +59,8 @@ struct TokenStream
         return (currentIndex >= tokens.size());
     }
 
-    int getLocation() const;
-    void resetLocation(int loc); 
+    int getPosition() const;
+    void resetPosition(int loc); 
     std::string toString() const;
 };
 

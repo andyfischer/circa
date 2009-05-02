@@ -83,13 +83,13 @@ TokenStream::nextNonWhitespaceIs(int match, int lookahead) const
 }
 
 int
-TokenStream::getLocation() const
+TokenStream::getPosition() const
 {
     return currentIndex;
 }
 
 void
-TokenStream::resetLocation(int loc)
+TokenStream::resetPosition(int loc)
 {
     assert(loc >= 0 && ((unsigned)loc < tokens.size()));
     currentIndex = loc;

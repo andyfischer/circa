@@ -220,6 +220,32 @@ void test_locations()
     test_assert(token_location_equals(results[7], 0, 1, 4, 4));
 }
 
+void test_consume_line_for_error()
+{
+    TokenStream tokens("for in $#!$#@ 151 poop \nfin");
+
+    // happily consume 'for' and some whitespace
+    test_assert(tokens.nextIs(token::FOR));
+    tokens.consumet();
+    test_assert(tokens.nextIs(token::WHITESPACE));
+    tokens.consumet();
+
+    int startPosition = tokens.getPosition();
+
+    // happily consume some more stuff
+    test_assert(tokens.nextIs(token::IN));
+    tokens.consumet();
+    test_assert(tokens.nextIs(token::WHITESPACE));
+    tokens.consumet();
+
+    // now freak out
+    std::string errorline = consume_line_for_error(tokens, startPosition);
+
+    test_equals(errorline, "in $#!$#@ 151 poop ");
+    test_assert(tokens.nextIs(token::IDENTIFIER));
+    test_assert(tokens.next().text == "fin");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers);
@@ -233,6 +259,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
     REGISTER_TEST_CASE(tokenizer_tests::token_stream_to_string);
     REGISTER_TEST_CASE(tokenizer_tests::test_locations);
+    REGISTER_TEST_CASE(tokenizer_tests::test_consume_line_for_error);
 }
 
 } // namespace tokenizer_tests
