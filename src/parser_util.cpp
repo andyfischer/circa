@@ -4,15 +4,23 @@
 
 namespace circa {
 
-void set_input_syntax(Term* term, int index, Term* input)
+// Calls apply() and then looks at each input to update the syntax hints on your result term
+Term* apply_with_syntax(Branch& branch, Term* function, RefList inputs)
 {
-    if (input->name == "") {
-        get_input_syntax_hint(term, index, "style") = "by-value";
-    } else {
-        get_input_syntax_hint(term, index, "style") = "by-name";
-        get_input_syntax_hint(term, index, "name") = input->name;
+    Term* result = apply(&branch, function, inputs);
+
+    for (unsigned i=0; i < inputs.count(); i++) {
+        if (inputs[i]->name == "") {
+            get_input_syntax_hint(result, i, "style") = "by-value";
+        } else {
+            get_input_syntax_hint(result, i, "style") = "by-name";
+            get_input_syntax_hint(result, i, "name") = inputs[i]->name;
+        }
     }
+
+    return result;
 }
+
 
 void prepend_whitespace(Term* term, std::string const& whitespace)
 {
@@ -136,7 +144,7 @@ Term* find_and_apply(Branch& branch,
         return result;
     }
 
-    return apply(&branch, function, inputs);
+    return apply_with_syntax(branch, function, inputs);
 }
 
 void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)

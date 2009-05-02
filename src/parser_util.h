@@ -7,7 +7,7 @@ namespace circa {
 
 namespace tokenizer { class Token; }
 
-void set_input_syntax(Term* term, int index, Term* input);
+Term* apply_with_syntax(Branch& branch, Term* function, RefList inputs);
 void prepend_whitespace(Term* term, std::string const& whitespace);
 void append_whitespace(Term* term, std::string const& whitespace);
 void include_location(Term* term, tokenizer::Token& tok);
