@@ -144,8 +144,8 @@ void change_type(Term *term, Term *typeTerm)
     if (term->type == typeTerm)
         return;
 
-    // if term->value is not NULL, it's a possible memory leak
-    assert(!is_value_alloced(term));
+    if (term->type != NULL)
+        dealloc_value(term);
 
     term->type = typeTerm;
 

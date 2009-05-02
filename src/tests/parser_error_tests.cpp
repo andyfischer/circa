@@ -114,7 +114,7 @@ void test_every_parse_error()
             else if (it->failedToCauseError)
                 std::cout << "[NO ERROR] ";
             else 
-                std::cout << "[Correct]  ";
+                std::cout << "[Success]  ";
 
             std::cout << " " << it->text << std::endl;
         }

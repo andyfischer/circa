@@ -100,7 +100,7 @@ void consume_list_arguments(Branch& branch, TokenStream& tokens,
         RefList& list_out, ListSyntaxHints& hints_out)
 {
     int index = 0;
-    while (!tokens.nextIs(RPAREN) && !tokens.nextIs(RBRACKET)) {
+    while (!tokens.nextIs(RPAREN) && !tokens.nextIs(RBRACKET) && !tokens.finished()) {
 
         hints_out.set(index, "preWhitespace", possible_whitespace_or_newline(tokens));
         Term* term = infix_expression(branch, tokens);
@@ -246,16 +246,20 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
     func.stateType = VOID_TYPE;
     func.outputType = VOID_TYPE;
 
-    while (!tokens.nextIs(RPAREN))
+    while (!tokens.nextIs(RPAREN) && !tokens.finished())
     {
         possible_whitespace(tokens);
-        std::string type = tokens.consume(IDENTIFIER);
+
+        if (!tokens.nextIs(IDENTIFIER))
+            return compile_error_for_line(result, tokens, startPosition);
+
+        std::string type = tokens.consume();
         possible_whitespace(tokens);
 
         std::string name;
         
         if (tokens.nextIs(IDENTIFIER)) {
-            name = tokens.consume(IDENTIFIER);
+            name = tokens.consume();
             possible_whitespace(tokens);
         } else {
             name = get_placeholder_name_for_index(func.inputProperties.size());
@@ -271,8 +275,12 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
             func.variableArgs = true;
         }
 
-        if (!tokens.nextIs(RPAREN))
+        if (!tokens.nextIs(RPAREN)) {
+            if (!tokens.nextIs(COMMA))
+                return compile_error_for_line(result, tokens, startPosition);
+
             tokens.consume(COMMA);
+        }
     }
 
     assert(tokens.nextIs(RPAREN));
@@ -283,7 +291,11 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
     if (tokens.nextIs(COLON) || tokens.nextIs(RIGHT_ARROW)) {
         tokens.consume();
         possible_whitespace(tokens);
-        std::string outputTypeName = tokens.consume(IDENTIFIER);
+
+        if (!tokens.nextIs(IDENTIFIER))
+            return compile_error_for_line(result, tokens, startPosition);
+
+        std::string outputTypeName = tokens.consume();
         Term* outputType = find_type(branch, outputTypeName);
         func.outputType = outputType;
     }
@@ -296,6 +308,8 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
 
 Term* function_decl(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
+
     Term* result = function_from_header(branch, tokens);
 
     if (has_compile_error(result))
@@ -311,19 +325,27 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     consume_branch_until_end(func.subroutineBranch, tokens);
     remove_compilation_attrs(func.subroutineBranch);
 
-    tokens.consume(END);
+    if (!tokens.nextIs(END))
+        return compile_error_for_line(result, tokens, startPosition);
+
+    tokens.consume();
 
     return result;
 }
 
 Term* type_decl(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
+
     if (tokens.nextIs(TYPE))
         tokens.consume();
 
     possible_whitespace(tokens);
 
-    std::string name = tokens.consume(IDENTIFIER);
+    if (!tokens.nextIs(IDENTIFIER))
+        return compile_error_for_line(branch, tokens, startPosition);
+
+    std::string name = tokens.consume();
 
     Term* result = create_value(&branch, TYPE_TYPE, name);
     Type& type = as_type(result);
@@ -332,7 +354,10 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
 
     possible_whitespace_or_newline(tokens);
 
-    tokens.consume(LBRACE);
+    if (!tokens.nextIs(LBRACE))
+        return compile_error_for_line(result, tokens, startPosition);
+
+    tokens.consume();
 
     while (!tokens.nextIs(RBRACE)) {
         possible_whitespace_or_newline(tokens);
@@ -340,8 +365,15 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
         if (tokens.nextIs(RBRACE))
             break;
 
+        if (!tokens.nextIs(IDENTIFIER))
+            return compile_error_for_line(result, tokens, startPosition);
+
         std::string fieldTypeName = tokens.consume(IDENTIFIER);
         possible_whitespace(tokens);
+
+        if (!tokens.nextIs(IDENTIFIER))
+            return compile_error_for_line(result, tokens, startPosition);
+
         std::string fieldName = tokens.consume(IDENTIFIER);
         possible_whitespace_or_newline(tokens);
 
@@ -350,17 +382,18 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
         type.addField(fieldType, fieldName);
 
         if (tokens.nextIs(COMMA))
-            tokens.consume();
+            tokens.consume(COMMA);
     }
 
-    assert(tokens.nextIs(RBRACE));
-    tokens.consume();
+    tokens.consume(RBRACE);
 
     return result;
 }
 
 Term* if_block(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
+
     tokens.consume(IF);
     possible_whitespace(tokens);
 
@@ -370,6 +403,10 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     recursively_mark_terms_as_occuring_inside_an_expression(condition);
 
     possible_whitespace(tokens);
+
+    if (!tokens.nextIs(NEWLINE))
+        return compile_error_for_line(branch, tokens, startPosition);
+
     tokens.consume(NEWLINE);
 
     Term* result = apply(&branch, IF_FUNC, RefList(condition));
@@ -383,7 +420,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     // possibly consume an 'else' block
     if (tokens.nextIs(ELSE)) {
-        tokens.consume();
+        tokens.consume(ELSE);
 
         Term* notCondition = apply(&branch, NOT_FUNC, RefList(condition));
 
@@ -394,6 +431,9 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         consume_branch_until_end(elseInnerBranch, tokens);
         remove_compilation_attrs(elseInnerBranch);
     }
+
+    if (!tokens.nextIs(END))
+        return compile_error_for_line(branch, tokens, startPosition);
 
     tokens.consume(END);
 
@@ -459,11 +499,19 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
 Term* for_block(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
+
     tokens.consume(FOR);
     possible_whitespace(tokens);
 
+    if (!tokens.nextIs(IDENTIFIER))
+        return compile_error_for_line(branch, tokens, startPosition);
+
     std::string iterator_name = tokens.consume(IDENTIFIER);
     possible_whitespace(tokens);
+
+    if (!tokens.nextIs(IN))
+        return compile_error_for_line(branch, tokens, startPosition);
 
     tokens.consume(IN);
     possible_whitespace(tokens);
@@ -471,6 +519,9 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Term* listExpr = infix_expression(branch, tokens);
     recursively_mark_terms_as_occuring_inside_an_expression(listExpr);
     possible_whitespace(tokens);
+
+    if (!tokens.nextIs(NEWLINE))
+        return compile_error_for_line(branch, tokens, startPosition);
 
     tokens.consume(NEWLINE);
 
@@ -486,6 +537,9 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     source_set_hidden(iterator, true);
 
     consume_branch_until_end(innerBranch, tokens);
+
+    if (!tokens.nextIs(END))
+        return compile_error_for_line(branch, tokens, startPosition);
 
     tokens.consume(END);
 
@@ -887,6 +941,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
 Term* atom(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
     Term* result = NULL;
 
     // function call?
@@ -923,24 +978,17 @@ Term* atom(Branch& branch, TokenStream& tokens)
 
     // parenthesized expression?
     else if (tokens.nextIs(LPAREN)) {
-        tokens.consume();
+        tokens.consume(LPAREN);
         result = infix_expression(branch, tokens);
+
+        if (!tokens.nextIs(RPAREN))
+            return compile_error_for_line(result, tokens, startPosition);
         tokens.consume(RPAREN);
         result->intProperty("syntaxHints:parens") += 1;
     }
     else {
 
-        result = apply(&branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
-
-        // throw away tokens until end of line
-        std::stringstream errorline;
-        while (!tokens.nextIs(NEWLINE) && !tokens.finished())
-            errorline << tokens.consume();
-
-        // throw away the last NEWLINE
-        tokens.consume();
-
-        as_string(result->state) = errorline.str();
+        return compile_error_for_line(branch, tokens, startPosition);
     }
 
     return result;

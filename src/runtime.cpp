@@ -165,9 +165,10 @@ void change_function(Term* term, Term* newFunction)
     // possibly remove state
     if (func.stateType == NULL)
         term->state = NULL;
-    else {
+    else if (term->state == NULL)
+        term->state = create_value(NULL, func.stateType);
+    else
         change_type(term->state, func.stateType);
-    }
 }
 
 int& as_int(Term* term)
