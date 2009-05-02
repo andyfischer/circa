@@ -51,24 +51,7 @@ struct TokenStream
 
     bool nextNonWhitespaceIs(int match, int lookahead=0) const
     {
-        int index = this->currentIndex;
-
-        while (true) {
-
-            if (index >= (int) tokens.size())
-                return false;
-
-            if (tokens[index].match == tokenizer::WHITESPACE) {
-                index++;
-                continue;
-            }
-
-            if (lookahead == 0)
-                return tokens[index].match == match;
-
-            lookahead--;
-            index++;
-        }
+        return nextNonWhitespace(lookahead) == match;
     }
 
     bool finished() const
