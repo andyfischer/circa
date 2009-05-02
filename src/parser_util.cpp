@@ -168,6 +168,18 @@ Term* find_type(Branch& branch, std::string const& name)
     return result;
 }
 
+Term* find_function(Branch& branch, std::string const& name)
+{
+    Term* result = find_named(&branch, name);
+
+    if (result == NULL) {
+        Term* result = apply(&branch, UNKNOWN_FUNCTION, RefList());
+        as_string(result->state) = name;
+    }   
+
+    return result;
+}
+
 void source_set_hidden(Term* term, bool hidden)
 {
     term->boolProperty("syntaxHints:hidden") = hidden;

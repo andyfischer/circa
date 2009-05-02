@@ -14,6 +14,7 @@ void include_location(Term* term, tokenizer::Token& tok);
 Term* find_and_apply(Branch& branch, std::string const& functionName, RefList inputs);
 void recursively_mark_terms_as_occuring_inside_an_expression(Term* term);
 Term* find_type(Branch& branch, std::string const& name);
+Term* find_function(Branch& branch, std::string const& name);
 void push_pending_rebind(Branch& branch, std::string const& name);
 std::string pop_pending_rebind(Branch& branch);
 void remove_compilation_attrs(Branch& branch);

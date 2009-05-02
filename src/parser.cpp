@@ -116,9 +116,9 @@ void consume_list_arguments(Branch& branch, TokenStream& tokens,
         }
 
         if (tokens.nextIs(COMMA))
-            hints_out.append(index, "postWhitespace", tokens.consume(COMMA));
+            hints_out.append(index, "postWhitespace", tokens.consume());
         else if (tokens.nextIs(SEMICOLON))
-            hints_out.append(index, "postWhitespace", tokens.consume(SEMICOLON));
+            hints_out.append(index, "postWhitespace", tokens.consume());
 
         index++;
     }
@@ -196,9 +196,9 @@ Term* statement(Branch& branch, TokenStream& tokens)
 
     // Consume a newline or ;
     if (tokens.nextIs(NEWLINE))
-        append_whitespace(result, tokens.consume(NEWLINE));
+        append_whitespace(result, tokens.consume());
     else if (tokens.nextIs(SEMICOLON))
-        append_whitespace(result, tokens.consume(SEMICOLON));
+        append_whitespace(result, tokens.consume());
 
     return result;
 }
@@ -209,7 +209,6 @@ Term* comment_statement(Branch& branch, TokenStream& tokens)
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
     as_string(result->state->field(0)) = commentText;
-    result->stringProperty("syntaxHints:declarationStyle") = "literal";
     return result;
 }
 
@@ -220,15 +219,14 @@ Term* blank_line(Branch& branch, TokenStream& tokens)
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
     as_string(result->state->field(0)) = "\n";
-    result->stringProperty("syntaxHints:declarationStyle") = "literal";
-
     return result;
 }
 
 Term* function_from_header(Branch& branch, TokenStream& tokens)
 {
     if (tokens.nextIs(DEF))
-        tokens.consume(DEF);
+        tokens.consume();
+
     possible_whitespace(tokens);
     std::string functionName = tokens.consume();
     possible_whitespace(tokens);
@@ -271,7 +269,8 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
             tokens.consume(COMMA);
     }
 
-    tokens.consume(RPAREN);
+    assert(tokens.nextIs(RPAREN));
+    tokens.consume();
 
     possible_whitespace(tokens);
 
@@ -336,18 +335,16 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
         std::string fieldName = tokens.consume(IDENTIFIER);
         possible_whitespace_or_newline(tokens);
 
-        Term* fieldType = find_named(&branch, fieldTypeName);
-
-        if (fieldType == NULL)
-            throw std::runtime_error("couldn't find type: " + fieldTypeName);
+        Term* fieldType = find_type(branch, fieldTypeName);
 
         type.addField(fieldType, fieldName);
 
         if (tokens.nextIs(COMMA))
-            tokens.consume(COMMA);
+            tokens.consume();
     }
 
-    tokens.consume(RBRACE);
+    assert(tokens.nextIs(RBRACE));
+    tokens.consume();
 
     return result;
 }
@@ -377,7 +374,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     // possibly consume an 'else' block
     if (tokens.nextIs(ELSE)) {
-        tokens.consume(ELSE);
+        tokens.consume();
 
         Term* notCondition = apply(&branch, NOT_FUNC, RefList(condition));
 
@@ -482,6 +479,8 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     consume_branch_until_end(innerBranch, tokens);
 
+    tokens.consume(END);
+
     Branch& inputsBranch = as_branch(forTerm->state->field("inputs"));
 
     // Check for rebound names
@@ -528,8 +527,6 @@ Term* for_block(Branch& branch, TokenStream& tokens)
         branch.bindName(results, listExpr->name);
     }
 
-    tokens.consume(END);
-
     return forTerm;
 }
 
@@ -552,7 +549,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     RefList inputs;
     Term* initialValue = NULL;
     if (tokens.nextIs(EQUALS)) {
-        tokens.consume(EQUALS);
+        tokens.consume();
         possible_whitespace(tokens);
         initialValue = infix_expression(branch, tokens);
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
@@ -792,7 +789,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                 ListSyntaxHints listHints;
 
                 if (tokens.nextIs(LPAREN)) {
-                    tokens.consume(LPAREN);
+                    tokens.consume();
                     consume_list_arguments(branch, tokens, inputs, listHints);
                     tokens.consume(RPAREN);
                 }
@@ -818,17 +815,13 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             // Finally, look for this function in our local scope
             } else {
-                function = find_named(&branch, rhsIdent);
-
-                if (function == NULL)
-                    throw std::runtime_error("function not found: " + rhsIdent);
+                function = find_function(branch, rhsIdent);
 
                 // Consume inputs
                 RefList inputs(leftExpr);
 
                 if (tokens.nextIs(LPAREN)) {
-
-                    tokens.consume(LPAREN);
+                    tokens.consume();
 
                     while (!tokens.nextIs(RPAREN)) {
                         possible_whitespace(tokens);
@@ -930,7 +923,7 @@ Term* atom(Branch& branch, TokenStream& tokens)
 
     // parenthesized expression?
     else if (tokens.nextIs(LPAREN)) {
-        tokens.consume(LPAREN);
+        tokens.consume();
         result = infix_expression(branch, tokens);
         tokens.consume(RPAREN);
         result->intProperty("syntaxHints:parens") += 1;
@@ -1024,7 +1017,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     float mutability = 0.0;
 
     if (tokens.nextIs(QUESTION)) {
-        tokens.consume(QUESTION);
+        tokens.consume();
         mutability = 1.0;
     }
 
