@@ -38,27 +38,29 @@ struct TokenStream
 
     int nextNonWhitespace(int lookahead=0) const;
 
-    bool nextIs(int match, int lookahead=0) const
-    {
-        if ((this->currentIndex + lookahead) >= tokens.size())
-            return false;
-            
-        return next(lookahead).match == match;
-    }
+    bool nextIs(int match, int lookahead=0) const;
 
+    // Consume the next token and return its text contents. If match is not -1, then throw
+    // an exception if the consumed token is not the same as match.
+    // This method is deprecated for two reasons:
+    //  1) Throwing exceptions is a bad way to handle errors
+    //  2) We throw out token-location information by just returning a string.
+    // Use consumet() instead.
     std::string consume(int match = -1);
+
+    // Consume the next token and return it. This method is the recommended replacement
+    // for consume()
     tokenizer::Token const& consumet();
 
-    bool nextNonWhitespaceIs(int match, int lookahead=0) const
-    {
-        return nextNonWhitespace(lookahead) == match;
-    }
+    bool nextNonWhitespaceIs(int match, int lookahead=0) const;
 
     bool finished() const
     {
         return (currentIndex >= tokens.size());
     }
 
+    int getLocation() const;
+    void resetLocation(int loc); 
     std::string toString() const;
 };
 

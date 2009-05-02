@@ -355,7 +355,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
     tokens.consume(NEWLINE);
 
-    Term* result = apply_with_syntax(branch, IF_FUNC, RefList(condition));
+    Term* result = apply(&branch, IF_FUNC, RefList(condition));
     Branch& innerBranch = as_branch(result->state);
     innerBranch.outerScope = &branch;
 
@@ -457,7 +457,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     tokens.consume(NEWLINE);
 
-    Term* forTerm = apply_with_syntax(branch, FOR_FUNC, RefList(listExpr));
+    Term* forTerm = apply(&branch, FOR_FUNC, RefList(listExpr));
 
     as_string(forTerm->state->field("iteratorName")) = iterator_name;
 
@@ -547,7 +547,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         inputs.append(initialValue);
     }
 
-    Term* result = apply_with_syntax(branch, STATEFUL_VALUE_FUNC, inputs);
+    Term* result = apply(&branch, STATEFUL_VALUE_FUNC, inputs);
     branch.bindName(result, name);
 
     if (typeName != "") {
@@ -783,7 +783,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                     tokens.consume(RPAREN);
                 }
 
-                result = apply_with_syntax(branch, function, inputs);
+                result = apply(&branch, function, inputs);
 
                 // If this is a modifying member function, then rebind the name to this
                 // result.
@@ -796,7 +796,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             // Next, if this type defines this field
             } else if (lhsType.findFieldIndex(rhsIdent) != -1) {
 
-                result = apply_with_syntax(branch, GET_FIELD_BY_NAME_FUNC, RefList(leftExpr));
+                result = apply(&branch, GET_FIELD_BY_NAME_FUNC, RefList(leftExpr));
                 as_string(result->state) = rhsIdent;
                 specialize_type(result, lhsType[rhsIdent].type);
 
@@ -824,7 +824,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                     tokens.consume(RPAREN);
                 }
 
-                result = apply_with_syntax(branch, function, inputs);
+                result = apply(&branch, function, inputs);
             }
 
             result->stringProperty("syntaxHints:declarationStyle") = "dot-concat";

@@ -40,6 +40,14 @@ TokenStream::nextNonWhitespace(int lookahead) const
     }
 }
 
+bool TokenStream::nextIs(int match, int lookahead) const
+{
+    if ((this->currentIndex + lookahead) >= tokens.size())
+        return false;
+        
+    return next(lookahead).match == match;
+}
+
 std::string
 TokenStream::consume(int match)
 {
@@ -66,6 +74,25 @@ TokenStream::consumet()
         throw std::runtime_error("Unexpected EOF");
 
     return tokens[currentIndex++];
+}
+
+bool
+TokenStream::nextNonWhitespaceIs(int match, int lookahead) const
+{
+    return nextNonWhitespace(lookahead) == match;
+}
+
+int
+TokenStream::getLocation() const
+{
+    return currentIndex;
+}
+
+void
+TokenStream::resetLocation(int loc)
+{
+    assert(loc >= 0 && ((unsigned)loc < tokens.size()));
+    currentIndex = loc;
 }
 
 std::string
