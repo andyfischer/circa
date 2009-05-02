@@ -108,13 +108,6 @@ void consume_list_arguments(Branch& branch, TokenStream& tokens,
 
         list_out.append(term);
 
-        if (term->name == "")
-            hints_out.set(index, "style", "by-value");
-        else {
-            hints_out.set(index, "style", "by-name");
-            hints_out.set(index, "name", term->name);
-        }
-
         if (tokens.nextIs(COMMA))
             hints_out.append(index, "postWhitespace", tokens.consume());
         else if (tokens.nextIs(SEMICOLON))

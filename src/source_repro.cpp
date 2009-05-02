@@ -21,14 +21,12 @@ std::string get_source_of_input(Term* term, int inputIndex)
 
     result << get_input_syntax_hint(term, inputIndex, "preWhitespace");
 
-    std::string style = get_input_syntax_hint(term, inputIndex, "style");
+    bool byValue = input->name == "";
 
-    if (style == "by-value") {
+    if (byValue) {
         result << get_term_source(input);
-    } else if (style == "by-name") {
-        result << get_input_syntax_hint(term, inputIndex, "name");
     } else {
-        result << "(!unknown)";
+        result << input->name;
     }
 
     result << get_input_syntax_hint(term, inputIndex, "postWhitespace");
