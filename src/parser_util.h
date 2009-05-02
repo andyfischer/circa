@@ -23,10 +23,16 @@ void wrap_up_branch(Branch& branch);
 void source_set_hidden(Term* term, bool hidden);
 
 // Consume tokens starting at 'start' and ending at something which might
-// be the end of the statement. Return line as a string. The name mentions
-// _for_error because this should probably only be used for recovering from
-// a parse error.
-std::string consume_line_for_error(TokenStream &tokens, int start);
+// be the end of the statement. Return line as string. This should probably
+// only be used for handling parse errrors.
+std::string consume_line(TokenStream &tokens, int start);
+
+// Consume the nearby line, return a newly created compile-error term.
+Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start);
+
+// Consume the nearby line, convert 'existing' into a compile-error term, and
+// return it.
+Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start);
 
 } // namespace circa
 

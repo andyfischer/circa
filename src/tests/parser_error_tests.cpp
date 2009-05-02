@@ -85,7 +85,7 @@ void test_every_parse_error()
 
     std::vector<TestInput>::iterator it;
 
-    bool anyHadProblems = true;
+    bool anyHadProblems = false;
 
     for (it = TEST_INPUTS.begin(); it != TEST_INPUTS.end(); ++it) {
         TestInput &input = *it;
@@ -100,7 +100,7 @@ void test_every_parse_error()
             continue;
         }
 
-        if (count_compile_errors(branch) != 0) {
+        if (count_compile_errors(branch) == 0) {
             input.failedToCauseError = true;
             anyHadProblems = true;
         }
@@ -112,9 +112,9 @@ void test_every_parse_error()
             if (it->exceptionThrown)
                 std::cout << "[EXCEPTION]";
             else if (it->failedToCauseError)
-                std::cout << "[NO ERROR ]";
+                std::cout << "[NO ERROR] ";
             else 
-                std::cout << "[Correct  ]";
+                std::cout << "[Correct]  ";
 
             std::cout << " " << it->text << std::endl;
         }

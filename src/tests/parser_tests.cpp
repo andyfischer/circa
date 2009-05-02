@@ -340,6 +340,15 @@ void test_list_arguments()
     test_assert(as_int(t->input(3)) == 8);
 }
 
+void test_function_decl_parse_error()
+{
+    Branch branch;
+    Term* t = branch.eval("def !@#$");
+
+    test_assert(t->function == UNRECOGNIZED_EXPRESSION_FUNC);
+    test_assert(has_compile_error(t));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -364,6 +373,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_if_joining_on_bool);
     REGISTER_TEST_CASE(parser_tests::test_infix_whitespace);
     REGISTER_TEST_CASE(parser_tests::test_list_arguments);
+    REGISTER_TEST_CASE(parser_tests::test_function_decl_parse_error);
 }
 
 } // namespace parser_tests
