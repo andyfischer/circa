@@ -689,7 +689,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         preEqualsSpace = possible_whitespace(tokens);
 
         if (!tokens.nextIs(EQUALS))
-            compile_error_for_line(branch, tokens, startPosition);
+            return compile_error_for_line(branch, tokens, startPosition);
 
         tokens.consume(EQUALS);
         postEqualsSpace = possible_whitespace(tokens);
@@ -821,6 +821,8 @@ Term* infix_expression(Branch& branch, TokenStream& tokens)
 
 Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedence)
 {
+    int startPosition = tokens.getPosition();
+
     if (precedence > HIGHEST_INFIX_PRECEDENCE)
         return atom(branch, tokens);
 
@@ -842,6 +844,9 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
         if (operatorStr == ".") {
             // dot concatenated call
+
+            if (!tokens.nextIs(IDENTIFIER))
+                return compile_error_for_line(branch, tokens, startPosition);
 
             std::string rhsIdent = tokens.consume(IDENTIFIER);
 
@@ -872,6 +877,10 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                 if (tokens.nextIs(LPAREN)) {
                     tokens.consume();
                     consume_list_arguments(branch, tokens, inputs, listHints);
+
+                    if (!tokens.nextIs(RPAREN))
+                        return compile_error_for_line(branch, tokens, startPosition);
+
                     tokens.consume(RPAREN);
                 }
 
@@ -922,6 +931,9 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             result->stringProperty("syntaxHints:declarationStyle") = "dot-concat";
 
         } else if (operatorStr == "->") {
+            if (!tokens.nextIs(IDENTIFIER))
+                return compile_error_for_line(branch, tokens, startPosition);
+
             std::string functionName = tokens.consume(IDENTIFIER);
 
             RefList inputs(leftExpr);
