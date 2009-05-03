@@ -42,13 +42,13 @@ void test_subroutine_call()
 
     test_assert(forTerm->function == FOR_FUNC);
 
-    test_equals("i", as_string(forTerm->state->field("iteratorName")));
+    test_equals("i", get_for_loop_iterator(forTerm)->name);
 
     Term* call = branch.compile("myfunc()");
     initialize_subroutine_call(call);
     Term* forTermInsideCall = as_branch(call->state)[2];
     test_assert(forTermInsideCall->function == FOR_FUNC);
-    test_equals("i", as_string(forTermInsideCall->state->field("iteratorName")));
+    test_equals("i", get_for_loop_iterator(forTermInsideCall)->name);
 }
 
 void test_state()

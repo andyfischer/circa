@@ -6,8 +6,7 @@ namespace circa {
 
 Term* get_for_loop_iterator(Term* loopTerm)
 {
-    std::string name = as_branch(loopTerm->state)["iteratorName"]->asString();
-    return loopTerm->state->asBranch()["contents"]->asBranch()[name];
+    return loopTerm->state->asBranch()["contents"]->asBranch()[0];
 }
 
 } // namespace circa
