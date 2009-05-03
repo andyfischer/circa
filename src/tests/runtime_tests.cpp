@@ -143,6 +143,11 @@ void test_runtime_type_error()
     test_assert(term->hasError);
 }
 
+void test_resize_list()
+{
+    // TODO
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(runtime_tests::test_simple);

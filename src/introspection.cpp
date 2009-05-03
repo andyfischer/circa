@@ -55,7 +55,7 @@ Branch* get_inner_branch(Term* term)
         return &as_branch(term->state);
 
     if (term->function == FOR_FUNC)
-        return &as_branch(term->state->field("contents"));
+        return &get_for_loop_code(term);
 
     return NULL;
 }

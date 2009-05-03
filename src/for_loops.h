@@ -7,7 +7,9 @@
 
 namespace circa {
 
-Term* get_for_loop_iterator(Term* loopTerm);
+Term* get_for_loop_iterator(Term* forTerm);
+Branch& get_for_loop_code(Term* forTerm);
+void evaluate_for_loop(Term* forTerm, Term* listTerm);
 
 } // namespace circa
 
