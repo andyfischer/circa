@@ -527,8 +527,6 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     Term* forTerm = apply(&branch, FOR_FUNC, RefList(listExpr));
 
-    as_string(forTerm->state->field("iteratorName")) = iterator_name;
-
     Branch& innerBranch = as_branch(forTerm->state->field("contents"));
     innerBranch.outerScope = &branch;
 
