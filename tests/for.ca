@@ -10,19 +10,13 @@ for name in names
   name -> print
 end
 
--- iterate with a stateful value
-for i in range(4)
-  state result = ''
-  result = concat(i -> to_string, result)
-  print(result)
-end
 
--- modify an outside value
-x = 10.0
-for i in range(4)
-  x += 2.0
-end
-x -> print
+-- disabled: modify an outside value
+--x = 10.0
+--for i in range(4)
+  --x += 2.0
+--end
+--x -> print
 
 -- if statement inside a for loop
 for i in range(5)

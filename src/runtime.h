@@ -26,6 +26,9 @@ Term* apply_and_eval(Branch* branch,
 // Change this term to have the given function
 void change_function(Term* term, Term* newFunction);
 
+// Resize this list term, making sure that each element is a type of 'type'.
+void resize_list(Branch& list, int numElements, Term* type);
+
 int& as_int(Term*);
 float& as_float(Term*);
 float to_float(Term*);

@@ -527,7 +527,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     Term* forTerm = apply(&branch, FOR_FUNC, RefList(listExpr));
 
-    Branch& innerBranch = as_branch(forTerm->state->field("contents"));
+    Branch& innerBranch = get_for_loop_code(forTerm);
     innerBranch.outerScope = &branch;
 
     // Create iterator variable
@@ -541,7 +541,9 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     tokens.consume(END);
 
-    Branch& inputsBranch = as_branch(forTerm->state->field("inputs"));
+    /*
+    Branch& inputsBranch = apply(&innerBranch, BRANCH_FUNC, RefList())->asBranch();
+    inputsBranch.outerScope = &innerBranch;
 
     // Check for rebound names
     TermNamespace::iterator it;
@@ -572,6 +574,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
         // Bind name in external branch
         branch.bindName(result, name);
     }
+    */
 
     return forTerm;
 }

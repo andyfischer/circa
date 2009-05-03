@@ -171,6 +171,22 @@ void change_function(Term* term, Term* newFunction)
         change_type(term->state, func.stateType);
 }
 
+void resize_list(Branch& list, int numElements, Term* type)
+{
+    // Add terms if necessary
+    for (int i=list.numTerms(); i < numElements; i++)
+        create_value(&list, type);
+
+    // Remove terms if necessary
+    bool anyRemoved = false;
+    for (int i=numElements; i < list.numTerms(); i++) {
+        anyRemoved = true;
+        list[i] = NULL;
+    }
+
+    list.removeNulls();
+}
+
 int& as_int(Term* term)
 {
     assert_type(term, INT_TYPE);
