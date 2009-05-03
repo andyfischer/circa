@@ -9,18 +9,12 @@ namespace for_function {
     {
         Branch& series = as_branch(caller->input(0));
 
-        std::string iteratorName = as_string(caller->state->field("iteratorName"));
-
         evaluate_branch(as_branch(caller->state->field("inputs")));
 
         Branch& contents = as_branch(caller->state->field("contents"));
 
-        Term* iterator = contents.findFirstBinding(iteratorName);
+        Term* iterator = get_for_loop_iterator(caller);
         assert(iterator != NULL);
-
-        Term* iteratorResult = contents.findLastBinding(iteratorName);
-
-        as_branch(caller->state->field("results")).clear();
 
         for (int i=0; i < series.numTerms(); i++) {
             if (!value_fits_type(series[i], iterator->type)) {
@@ -30,11 +24,6 @@ namespace for_function {
 
             assign_value(series[i], iterator);
             evaluate_branch(contents);
-
-            // Save the iterator result, if we are doing a mapping
-            if (iterator != iteratorResult) {
-                list_t::append(as_branch(caller->state->field("results")), iteratorResult);
-            }
         }
     }
 
@@ -42,7 +31,7 @@ namespace for_function {
     {
         std::stringstream result;
         result << "for ";
-        result << as_string(term->state->field("iteratorName"));
+        result << get_for_loop_iterator(term)->name;
         result << " in ";
         result << get_source_of_input(term,0);
         result << "\n";

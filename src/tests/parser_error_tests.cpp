@@ -1,4 +1,4 @@
-// Copyright 2008 Paul Hodge
+// Copyright 2009 Paul Hodge
 
 #include <circa.h>
 

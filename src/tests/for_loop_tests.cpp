@@ -51,10 +51,25 @@ void test_subroutine_call()
     test_equals("i", as_string(forTermInsideCall->state->field("iteratorName")));
 }
 
+void test_state()
+{
+    Branch branch;
+
+    // Make sure that each iteration of the loop has a different copy of stateful values
+    Term* loop = branch.compile("for i in [1 2]\nstate s:int\ns = i\nend");
+
+    evaluate_term(loop);
+
+    test_assert(is_branch(loop->state));
+
+    // TODO
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(for_loop_tests::test_simple);
     REGISTER_TEST_CASE(for_loop_tests::test_subroutine_call);
+    REGISTER_TEST_CASE(for_loop_tests::test_state);
 }
 
 } // for_loop_tests

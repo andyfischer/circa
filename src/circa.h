@@ -6,6 +6,7 @@
 #include "code_iterator.h"
 #include "cpp_importing.h"
 #include "debug.h"
+#include "for_loops.h"
 #include "function.h"
 #include "hosted_types.h"
 #include "importing.h"
