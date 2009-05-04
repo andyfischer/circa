@@ -13,10 +13,10 @@ end
 
 -- modify an outside value
 x = 10.0
-for i in range(4)
+for i in range(3)
   x += 2.0
 end
-x -> print
+print('should be 16.0: ' x)
 
 -- if statement inside a for loop
 for i in range(5)

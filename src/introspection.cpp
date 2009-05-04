@@ -392,6 +392,10 @@ void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string
         if (result->function == COPY_FUNC && result->input(0) == outer)
             continue;
 
+        // Ignore compiler-generated terms. This seems like a bad method
+        if (name[0] == '#')
+            continue;
+
         names.push_back(name);
     }
 }
