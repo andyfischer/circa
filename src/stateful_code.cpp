@@ -40,4 +40,16 @@ void persist_state_from_branch(Branch& branch, Term* state)
     }
 }
 
+void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
+{
+    for (int i=0; i < branch.numTerms(); i++) {
+        Term* term = branch[i];
+
+        if (!is_stateful(term))
+            continue;
+
+        create_value(&type, term->type, term->name);
+    }
+}
+
 } // namespace circa
