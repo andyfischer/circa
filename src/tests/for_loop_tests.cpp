@@ -56,13 +56,15 @@ void test_state()
     Branch branch;
 
     // Make sure that each iteration of the loop has a different copy of stateful values
-    Term* loop = branch.compile("for i in [1 2]\nstate s:int\ns = i\nend");
+    Term* loop = branch.compile("for i in [1 2]\nstate s = unique_id()\nend");
 
     evaluate_term(loop);
 
-    test_assert(is_branch(loop->state));
-
-    // TODO
+    Term* s_iter0 = get_for_loop_state(loop, 0)["s"];
+    Term* s_iter1 = get_for_loop_state(loop, 1)["s"];
+    test_assert(s_iter0 != NULL);
+    test_assert(s_iter1 != NULL);
+    test_assert(as_int(s_iter0) != as_int(s_iter1));
 }
 
 void register_tests()

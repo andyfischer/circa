@@ -14,6 +14,11 @@ Branch& get_for_loop_code(Term* forTerm)
     return forTerm->state->field("code")->asBranch();
 }
 
+Branch& get_for_loop_state(Term* forTerm, int index)
+{
+    return forTerm->state->field("_state")->field(index)->asBranch();
+}
+
 void evaluate_for_loop(Term* forTerm, Term* listTerm)
 {
     Branch& codeBranch = get_for_loop_code(forTerm);
