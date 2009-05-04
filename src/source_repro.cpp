@@ -94,7 +94,10 @@ std::string get_term_source(Term* term)
     }
 
     // add possible name binding
-    if (term->name != "") {
+    if (term->name == "#return") {
+        result << "return ";
+    }
+    else if (term->name != "") {
         result << term->name;
         result << term->stringPropertyOptional("syntaxHints:preEqualsSpace", " ");
         result << "=";
