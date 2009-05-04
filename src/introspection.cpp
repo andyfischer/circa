@@ -377,4 +377,23 @@ RefList get_involved_terms(RefList inputs, RefList outputs)
     return result;
 }
 
+void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string> &names)
+{
+    TermNamespace::iterator it;
+    for (it = branch.names.begin(); it != branch.names.end(); ++it) {
+        // Ignore names that aren't bound in the outer branch
+        std::string name = it->first;
+        Term* outer = find_named(branch.outerScope, name);
+        if (outer == NULL)
+            continue;
+
+        // Ignore terms that are just a simple copy
+        Term* result = branch[name];
+        if (result->function == COPY_FUNC && result->input(0) == outer)
+            continue;
+
+        names.push_back(name);
+    }
+}
+
 } // namespace circa

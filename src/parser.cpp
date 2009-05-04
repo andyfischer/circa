@@ -534,6 +534,8 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Term* iterator = create_value(&innerBranch, ANY_TYPE, iterator_name);
     source_set_hidden(iterator, true);
 
+    setup_for_loop_pre_code(forTerm);
+
     consume_branch_until_end(innerBranch, tokens);
 
     if (!tokens.nextIs(END))
@@ -541,40 +543,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     tokens.consume(END);
 
-    /*
-    Branch& inputsBranch = apply(&innerBranch, BRANCH_FUNC, RefList())->asBranch();
-    inputsBranch.outerScope = &innerBranch;
-
-    // Check for rebound names
-    TermNamespace::iterator it;
-    for (it = innerBranch.names.begin(); it != innerBranch.names.end(); ++it) {
-
-        // Ignore names that aren't bound in the outer branch
-        std::string name = it->first;
-        Term* outer = find_named(&branch, name);
-        Term* result = innerBranch[name];
-        if (outer == NULL)
-            continue;
-
-        // Ignore terms that are just a simple copy of the outer branch
-        if (result->function == COPY_FUNC && result->input(0) == outer)
-            continue;
-
-        // Create a copy() in inputs
-        Term* copy = apply(&inputsBranch, COPY_FUNC, RefList(outer));
-
-        // Remap innerBranch to use this copy instead
-        ReferenceMap remap;
-        remap[outer] = copy;
-        innerBranch.remapPointers(remap);
-
-        // Create an assign() that brings the result value back up to our copy
-        apply(&innerBranch, ASSIGN_FUNC, RefList(result, copy));
-
-        // Bind name in external branch
-        branch.bindName(result, name);
-    }
-    */
+    setup_for_loop_post_code(forTerm);
 
     return forTerm;
 }

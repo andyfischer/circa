@@ -43,6 +43,7 @@ font_height = 8
 
 normal_color = 0x00ff00ff
 highlight_color = 0x555555ff
+click_color = 0xff00ffff
 
 current_y = loc.y
 for button in buttons
@@ -57,8 +58,14 @@ for button in buttons
     color = normal_color
   end
 
+  state clicked = false
   if mouse_clicked(b)
+    clicked = true
     print('clicked: ' button)
+  end
+
+  if clicked
+    color = click_color
   end
     
   box(b.x1 b.y1 b.x2 b.y2 color)

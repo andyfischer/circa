@@ -11,12 +11,12 @@ for name in names
 end
 
 
--- disabled: modify an outside value
---x = 10.0
---for i in range(4)
-  --x += 2.0
---end
---x -> print
+-- modify an outside value
+x = 10.0
+for i in range(4)
+  x += 2.0
+end
+x -> print
 
 -- if statement inside a for loop
 for i in range(5)
@@ -31,6 +31,7 @@ if true
       print('if2 passed')
    end
 end
+
 
 -- for loop inside a function
 def look_for_3(List numbers)
