@@ -16,12 +16,6 @@ bool is_value(Term* term)
     return term->function->function == VALUE_FUNCTION_GENERATOR;
 }
 
-bool is_stateful(Term* term)
-{
-    assert_good_pointer(term);
-    return term->function == STATEFUL_VALUE_FUNC;
-}
-
 bool is_actually_using(Term* user, Term* usee)
 {
     assert_good_pointer(user);
