@@ -11,7 +11,6 @@
 namespace circa {
 
 bool is_value(Term* term);
-bool is_stateful(Term* term);
 
 // Check the function and inputs of 'user', returns whether they are actually
 // using 'usee'.

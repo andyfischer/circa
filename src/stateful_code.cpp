@@ -4,6 +4,11 @@
 
 namespace circa {
 
+bool is_stateful(Term* term)
+{
+    return term->function == STATEFUL_VALUE_FUNC;
+}
+
 void load_state_into_branch(Term* state, Branch& branch)
 {
     Branch& stateBranch = as_branch(state);
