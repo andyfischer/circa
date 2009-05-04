@@ -32,6 +32,7 @@ std::string get_short_location(Term* term);
 std::string get_source_filename(Term* term);
 void print_compile_errors(Branch& branch, std::ostream& output);
 RefList get_influencing_values(Term* term);
+void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string> &names);
 
 // Get a list of the set of terms which descent from 'inputs', and which have 'outputs'
 // as descendants.

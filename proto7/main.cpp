@@ -19,6 +19,9 @@ std::set<int> KEY_JUST_PRESSED;
 
 int MOUSE_X = 0;
 int MOUSE_Y = 0;
+bool MOUSE_JUST_CLICKED = false;
+int MOUSE_CLICK_FOUND_ID = 0;
+int MOUSE_CLICK_ACCEPTED_ID = 0;
 
 SDL_Surface* SCREEN = NULL;
 circa::Branch SCRIPT_MAIN;
@@ -61,7 +64,23 @@ void key_pressed(circa::Term* caller)
 
 void mouse_clicked(circa::Term* caller)
 {
-    circa::as_bool(caller) = caller == THING_JUST_CLICKED;
+    static int unassignedId = 1;
+
+    // check to give this term an ID
+    if (as_int(caller->state) == 0)
+        as_int(caller->state) = unassignedId++;
+
+    // check if we just clicked this thing
+    Term* box = caller->input(0);
+    if (MOUSE_JUST_CLICKED &&
+        (as_branch(box)[0]->asFloat() < MOUSE_X) &&
+        (as_branch(box)[1]->asFloat() < MOUSE_Y) &&
+        (as_branch(box)[2]->asFloat() > MOUSE_X) &&
+        (as_branch(box)[3]->asFloat() > MOUSE_Y)) {
+        MOUSE_CLICK_FOUND_ID = as_int(caller->state);
+    }
+    
+    as_bool(caller) = as_int(caller->state) == MOUSE_CLICK_ACCEPTED_ID;
 }
 
 void handle_key_press(SDL_Event event, int key)
@@ -96,6 +115,7 @@ void handle_key_press(SDL_Event event, int key)
     }
 }
 
+/*
 Term* find_mouse_clicked(Branch& branch, int mouse_x, int mouse_y)
 {
     Term* result = NULL;
@@ -115,6 +135,7 @@ Term* find_mouse_clicked(Branch& branch, int mouse_x, int mouse_y)
 
     return result;
 }
+*/
 
 int main( int argc, char* args[] )
 {
@@ -133,6 +154,7 @@ int main( int argc, char* args[] )
     circa::int_value(circa::KERNEL, SDLK_SPACE, "KEY_SPACE");
     MOUSE_CLICKED_FUNCTION = circa::import_function(
         *circa::KERNEL, mouse_clicked, "mouse_clicked(List) : bool");
+    circa::as_function(MOUSE_CLICKED_FUNCTION).stateType = circa::INT_TYPE;
     sdl_wrapper::register_functions(*circa::KERNEL);
 
     // Load the target script
@@ -170,6 +192,9 @@ int main( int argc, char* args[] )
     // Main loop
     while (CONTINUE_MAIN_LOOP) {
         KEY_JUST_PRESSED.clear();
+        MOUSE_JUST_CLICKED = false;
+        MOUSE_CLICK_ACCEPTED_ID = MOUSE_CLICK_FOUND_ID;
+        MOUSE_CLICK_FOUND_ID = 0;
 
         // Consume all events
         SDL_Event event;
@@ -193,7 +218,9 @@ int main( int argc, char* args[] )
                 drag_start_x = MOUSE_X;
                 drag_start_y = MOUSE_Y;
 
-                THING_JUST_CLICKED = find_mouse_clicked(SCRIPT_MAIN, MOUSE_X, MOUSE_Y);
+                MOUSE_JUST_CLICKED = true;
+
+                //THING_JUST_CLICKED = find_mouse_clicked(SCRIPT_MAIN, MOUSE_X, MOUSE_Y);
 
             } else if (event.type == SDL_MOUSEBUTTONUP) {
                 // draw a line

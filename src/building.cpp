@@ -8,8 +8,10 @@ Term* create_term(Branch* branch, Term* function, RefList const& inputs)
 {
     assert_good_pointer(function);
 
-    if (!is_function(function))
+    if (!is_function(function)) {
+        assert(false);
         throw std::runtime_error("in create_term, 2nd arg to create_term must be a function");
+    }
 
     Term* term = new Term();
 
@@ -46,7 +48,7 @@ Term* create_term(Branch* branch, Term* function, RefList const& inputs)
 
     // Create state (if a state type is defined)
     Term* stateType = functionData.stateType;
-    if (stateType != NULL) {
+    if (stateType != NULL && stateType != VOID_TYPE) {
         if (!is_type(stateType))
             throw std::runtime_error(stateType->name + " is not a type");
         term->state = create_value(NULL, stateType);

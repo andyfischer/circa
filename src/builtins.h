@@ -31,6 +31,7 @@ extern Term* FUNCTION_TYPE;
 extern Term* GET_FIELD_FUNC;
 extern Term* GET_FIELD_BY_NAME_FUNC;
 extern Term* IF_FUNC;
+extern Term* IF_EXPR_FUNC;
 extern Term* INT_TYPE;
 extern Term* LIST_TYPE;
 extern Term* LIST_FUNC;
