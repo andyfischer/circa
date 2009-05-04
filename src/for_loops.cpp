@@ -50,8 +50,8 @@ void setup_for_loop_post_code(Term* forTerm)
         // undo remap
         ifexpr->inputs[1] = outerVersion;
 
-        // Bind this in outer scope
-        apply(get_for_loop_code(forTerm).outerScope, COPY_FUNC, RefList(ifexpr));
+        // Bind inner version to outer scope
+        apply(get_for_loop_code(forTerm).outerScope, COPY_FUNC, RefList(innerVersion), name);
     }
 }
 
@@ -72,26 +72,30 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
         Branch& iterationBranch = get_for_loop_state(forTerm, i);
         
         if (iterationBranch.numTerms() == 0) {
-            //get_type_from_branches_stateful_terms(codeBranch, iterationBranch);
-            duplicate_branch(codeBranch, iterationBranch);
+            get_type_from_branches_stateful_terms(codeBranch, iterationBranch);
         }
     }
 
     for (int i=0; i < numIterations; i++) {
-        Branch& iterationBranch = get_for_loop_state(forTerm, i);
 
-        as_bool(iterationBranch["#is_first_iteration"]) = i == 0;
+        as_bool(codeBranch["#is_first_iteration"]) = i == 0;
 
         // Inject iterator value
-        Term* iterator = iterationBranch[0];
+        Term* iterator = codeBranch[0];
         if (!value_fits_type(listTerm->field(i), iterator->type)) {
             error_occured(forTerm, "Internal error in evaluate_for_loop: can't assign this element to iterator");
             return;
         }
         assign_value(listTerm->field(i), iterator);
 
+        // Inject stateful terms
+        load_state_into_branch(stateBranch[i], codeBranch);
+
         // Evaluate
-        evaluate_branch(iterationBranch);
+        evaluate_branch(codeBranch);
+
+        // Persist stateful terms
+        persist_state_from_branch(codeBranch, stateBranch[i]);
     }
 }
 
