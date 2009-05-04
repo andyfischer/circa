@@ -70,6 +70,7 @@ void initialize_from_expression()
 
     test_equals(as_float(c), 6);
 }
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_load_and_save);
