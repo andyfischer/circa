@@ -53,9 +53,6 @@ void setup_for_loop_post_code(Term* forTerm)
         // Bind this in outer scope
         apply(get_for_loop_code(forTerm).outerScope, COPY_FUNC, RefList(ifexpr));
     }
-    // Problem: when #is_first_iteration is false, the ifexpr tries to pull
-    // from a value that was not evaluated yet. It should pull from the
-    // previous's branch's value.
 }
 
 void evaluate_for_loop(Term* forTerm, Term* listTerm)
@@ -63,18 +60,21 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
     Branch& codeBranch = get_for_loop_code(forTerm);
     Branch& stateBranch = forTerm->state->field("_state")->asBranch();
 
+    // Make sure state has the correct number of iterations
+
     int numIterations = as_branch(listTerm).numTerms();
 
     resize_list(stateBranch, as_branch(listTerm).numTerms(), BRANCH_TYPE);
 
-    // Set up state: duplicate code once for each iteration. This should
-    // be optimized.
+    // Initialize state for any uninitialized slots
     for (int i=0; i < numIterations; i++) {
 
         Branch& iterationBranch = get_for_loop_state(forTerm, i);
         
-        if (iterationBranch.numTerms() == 0)
+        if (iterationBranch.numTerms() == 0) {
+            //get_type_from_branches_stateful_terms(codeBranch, iterationBranch);
             duplicate_branch(codeBranch, iterationBranch);
+        }
     }
 
     for (int i=0; i < numIterations; i++) {
