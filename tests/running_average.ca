@@ -1,0 +1,12 @@
+
+def running_average(float sample) : float
+    state num_samples = 0.0
+    state total = 0.0
+    num_samples += 1
+    total += sample
+    return total / num_samples
+end
+
+for x in [1 2 3 4 5 6 7 8 1 1 1 1 1 1]
+  print(running_average(x))
+end
