@@ -84,4 +84,14 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
     remap_pointers(term, map);
 }
 
+void remap_pointers(Branch& branch, Term* original, Term* replacement)
+{
+    ReferenceMap map;
+    map[original] = replacement;
+
+    for (int i=0; i < branch.numTerms(); i++) {
+        remap_pointers(branch[i], map);
+    }
+}
+
 } // namespace circa

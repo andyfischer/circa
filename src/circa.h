@@ -15,6 +15,7 @@
 #include "parser_util.h"
 #include "references.h"
 #include "runtime.h"
+#include "stateful_code.h"
 #include "source_repro.h"
 #include "term.h"
 #include "testing.h"

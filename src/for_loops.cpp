@@ -42,8 +42,20 @@ void setup_for_loop_post_code(Term* forTerm)
         Term* outerVersion = get_for_loop_code(forTerm).outerScope->getNamed(name);
         Term* innerVersion = get_for_loop_code(forTerm)[name];
 
-        apply(&rebound, IF_EXPR_FUNC, RefList(isFirstIteration, outerVersion, innerVersion));
+        Term* ifexpr = apply(&rebound, IF_EXPR_FUNC,
+                RefList(isFirstIteration, outerVersion, innerVersion));
+
+        remap_pointers(get_for_loop_code(forTerm), outerVersion, ifexpr);
+
+        // undo remap
+        ifexpr->inputs[1] = outerVersion;
+
+        // Bind this in outer scope
+        apply(get_for_loop_code(forTerm).outerScope, COPY_FUNC, RefList(ifexpr));
     }
+    // Problem: when #is_first_iteration is false, the ifexpr tries to pull
+    // from a value that was not evaluated yet. It should pull from the
+    // previous's branch's value.
 }
 
 void evaluate_for_loop(Term* forTerm, Term* listTerm)
@@ -58,8 +70,6 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
     // Set up state: duplicate code once for each iteration. This should
     // be optimized.
     for (int i=0; i < numIterations; i++) {
-        // Set up state: duplicate code once for each iteration. This should
-        // be optimized.
 
         Branch& iterationBranch = get_for_loop_state(forTerm, i);
         
@@ -70,8 +80,7 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
     for (int i=0; i < numIterations; i++) {
         Branch& iterationBranch = get_for_loop_state(forTerm, i);
 
-        if (iterationBranch.contains("#is_first_iteration"))
-            as_bool(iterationBranch["#is_first_iteration"]) = i == 0;
+        as_bool(iterationBranch["#is_first_iteration"]) = i == 0;
 
         // Inject iterator value
         Term* iterator = iterationBranch[0];
