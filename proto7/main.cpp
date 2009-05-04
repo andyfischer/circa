@@ -66,8 +66,11 @@ void mouse_clicked(circa::Term* caller)
 {
     static int unassignedId = 1;
 
+    int id = as_int(caller->state);
+    //std::cout << "id = " << id << std::endl;
+    
     // check to give this term an ID
-    if (as_int(caller->state) == 0)
+    if (id == 0)
         as_int(caller->state) = unassignedId++;
 
     // check if we just clicked this thing
@@ -77,10 +80,13 @@ void mouse_clicked(circa::Term* caller)
         (as_branch(box)[1]->asFloat() < MOUSE_Y) &&
         (as_branch(box)[2]->asFloat() > MOUSE_X) &&
         (as_branch(box)[3]->asFloat() > MOUSE_Y)) {
-        MOUSE_CLICK_FOUND_ID = as_int(caller->state);
+        MOUSE_CLICK_FOUND_ID = id;
     }
     
-    as_bool(caller) = as_int(caller->state) == MOUSE_CLICK_ACCEPTED_ID;
+    as_bool(caller) = id == MOUSE_CLICK_ACCEPTED_ID;
+
+    //std::cout << "MOUSE_CLICK_ACCEPTED_ID = " << MOUSE_CLICK_ACCEPTED_ID << std::endl;
+    //std::cout << "MOUSE_CLICK_FOUND_ID = " << MOUSE_CLICK_FOUND_ID << std::endl;
 }
 
 void handle_key_press(SDL_Event event, int key)
