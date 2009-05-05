@@ -26,7 +26,7 @@ namespace add_function {
     {
         Term* target = caller->input(0);
         Term* desired = caller->input(1);
-        Branch& myBranch = as_branch(caller->state);
+        Branch& myBranch = as_branch(caller);
         myBranch.clear();
 
         int numInputs = target->inputs.count();
@@ -99,8 +99,7 @@ namespace add_function {
         as_function(ADD_FUNC).generateTraining = generateTraining;
 
         Term* fp_func = import_function(kernel, feedback_propogate,
-                "add_feedback_propogate(any,any)");
-        as_function(fp_func).stateType = BRANCH_TYPE;
+                "add_feedback_propogate(any,any) : Branch");
         as_function(ADD_FUNC).feedbackPropogateFunction = fp_func;
     }
 }

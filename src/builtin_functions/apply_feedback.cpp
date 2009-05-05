@@ -9,7 +9,7 @@ namespace apply_feedback_function {
 
     void evaluate(Term* caller)
     {
-        Branch &branch = as_branch(caller->state);
+        Branch &branch = as_branch(caller);
         branch.clear();
 
         Term* target = caller->input(0);
@@ -34,9 +34,8 @@ namespace apply_feedback_function {
 
     void setup(Branch& kernel)
     {
-        APPLY_FEEDBACK = import_function(kernel, evaluate, "apply_feedback(any,any)");
+        APPLY_FEEDBACK = import_function(kernel, evaluate, "apply_feedback(any,any) : Branch");
         as_function(APPLY_FEEDBACK).setInputMeta(0,true);
-        as_function(APPLY_FEEDBACK).stateType = BRANCH_TYPE;
     }
 }
 }
