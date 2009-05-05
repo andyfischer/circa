@@ -200,7 +200,8 @@ Term* comment_statement(Branch& branch, TokenStream& tokens)
     std::string commentText = tokens.consume(COMMENT);
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
-    as_string(result->state->field(0)) = commentText;
+    result->stringProperty("comment") = commentText;
+
     return result;
 }
 
@@ -210,7 +211,7 @@ Term* blank_line(Branch& branch, TokenStream& tokens)
         tokens.consume(NEWLINE);
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
-    as_string(result->state->field(0)) = "\n";
+    result->stringProperty("comment") = "\n";
     return result;
 }
 

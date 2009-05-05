@@ -146,7 +146,7 @@ std::string get_term_source(Term* term)
 
 std::string get_comment_string(Term* term)
 {
-    return as_string(term->state->field(0));
+    return term->stringProperty("comment");
 }
 
 std::string get_branch_source(Branch& branch)
