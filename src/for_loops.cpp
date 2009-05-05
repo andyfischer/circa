@@ -11,12 +11,12 @@ Term* get_for_loop_iterator(Term* forTerm)
 
 Branch& get_for_loop_code(Term* forTerm)
 {
-    return forTerm->state->field("code")->asBranch();
+    return forTerm->field("code")->asBranch();
 }
 
 Branch& get_for_loop_state(Term* forTerm, int index)
 {
-    return forTerm->state->field("_state")->field(index)->asBranch();
+    return forTerm->field("_state")->field(index)->asBranch();
 }
 
 void setup_for_loop_pre_code(Term* forTerm)
@@ -58,7 +58,7 @@ void setup_for_loop_post_code(Term* forTerm)
 void evaluate_for_loop(Term* forTerm, Term* listTerm)
 {
     Branch& codeBranch = get_for_loop_code(forTerm);
-    Branch& stateBranch = forTerm->state->field("_state")->asBranch();
+    Branch& stateBranch = forTerm->field("_state")->asBranch();
 
     // Make sure state has the correct number of iterations
 
