@@ -7,7 +7,7 @@ namespace get_field_by_name_function {
 
     void evaluate(Term* caller)
     {
-        std::string name = as_string(caller->state);
+        std::string name = caller->stringProperty("field-name");
         int index = as_type(caller->input(0)->type).findFieldIndex(name);
         if (index == -1) {
             error_occured(caller, "field not found: " + name);
@@ -21,7 +21,6 @@ namespace get_field_by_name_function {
     {
         GET_FIELD_BY_NAME_FUNC = import_function(kernel, evaluate,
                 "get_field_by_name(any) -> any");
-        as_function(GET_FIELD_BY_NAME_FUNC).stateType = STRING_TYPE;
         as_function(GET_FIELD_BY_NAME_FUNC).pureFunction = true;
     }
 }
