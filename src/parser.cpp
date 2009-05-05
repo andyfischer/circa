@@ -856,7 +856,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             } else if (lhsType.findFieldIndex(rhsIdent) != -1) {
 
                 result = apply(&branch, GET_FIELD_BY_NAME_FUNC, RefList(leftExpr));
-                as_string(result->state) = rhsIdent;
+                result->stringProperty("field-name") = rhsIdent;
                 specialize_type(result, lhsType[rhsIdent].type);
 
                 result->stringProperty("syntaxHints:functionName") = rhsIdent;
