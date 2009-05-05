@@ -1,2 +1,3 @@
+Warning, calling an unknown function: nonexistant_function
 1 compile error:
-unknown_function.ca:unknown-line,unknown-col: Unknown function: nonexistant_function
+unknown-line,unknown-col: Unknown function: nonexistant_function
