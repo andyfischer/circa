@@ -7,8 +7,6 @@
 
 #include "circa.h"
 
-#include "builtin_types/map.hpp"
-
 namespace circa {
 
 // setup_builtin_functions is defined in setup_builtin_functions.cpp
@@ -386,7 +384,6 @@ void initialize_builtin_types(Branch& kernel)
     as_type(REF_TYPE).remapPointers = Ref::remap_pointers;
 
     import_type<RefList>(kernel, "Tuple");
-    import_type<Map>(kernel, "Map");
 
     BRANCH_TYPE = create_compound_type(kernel, "Branch");
     assert(as_type(BRANCH_TYPE).alloc == Branch::alloc);
