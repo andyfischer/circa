@@ -46,7 +46,7 @@ Branch* get_inner_branch(Term* term)
         return &as_branch(term);
 
     if (term->function == IF_FUNC)
-        return &as_branch(term->state);
+        return &as_branch(term);
 
     if (term->function == FOR_FUNC)
         return &get_for_loop_code(term);
