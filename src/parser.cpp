@@ -409,7 +409,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     tokens.consume(NEWLINE);
 
     Term* result = apply(&branch, IF_FUNC, RefList(condition));
-    Branch& innerBranch = as_branch(result->state);
+    Branch& innerBranch = as_branch(result);
     innerBranch.outerScope = &branch;
 
     consume_branch_until_end(innerBranch, tokens);
@@ -424,7 +424,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         Term* notCondition = apply(&branch, NOT_FUNC, RefList(condition));
 
         elseResult = apply(&branch, IF_FUNC, RefList(notCondition));
-        Branch& elseInnerBranch = as_branch(elseResult->state);
+        Branch& elseInnerBranch = as_branch(elseResult);
         elseInnerBranch.outerScope = &branch;
 
         consume_branch_until_end(elseInnerBranch, tokens);
@@ -450,7 +450,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             boundNames.insert(it->first);
 
         if (elseResult != NULL) {
-            Branch& elseInnerBranch = as_branch(elseResult->state);
+            Branch& elseInnerBranch = as_branch(elseResult);
             for (it = elseInnerBranch.names.begin(); it != elseInnerBranch.names.end(); ++it)
                 boundNames.insert(it->first);
         }
@@ -482,8 +482,8 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             if (innerBranch.contains(name))
                 positiveVersion = innerBranch[name];
 
-            if (elseResult != NULL && as_branch(elseResult->state).contains(name))
-                negativeVersion = as_branch(elseResult->state)[name];
+            if (elseResult != NULL && as_branch(elseResult).contains(name))
+                negativeVersion = as_branch(elseResult)[name];
 
             Term* joining = apply(&joiningBranch, "if_expr",
                     RefList(condition, positiveVersion, negativeVersion));
