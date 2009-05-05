@@ -21,9 +21,9 @@ Branch* new_branch()
     return new Branch();
 }
 
-void evaluate_file(Branch* branch, const char* filename)
+void parse_file(Branch* branch, const char* filename)
 {
-    circa::evaluate_file(*branch, filename);
+    circa::parse_file(*branch, filename);
 }
 
 const char* term_to_raw_string(Term* term)

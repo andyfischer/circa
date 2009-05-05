@@ -278,7 +278,7 @@ void duplicate_branch(Branch& source, Branch& dest)
     dest.names.remapPointers(newTermMap);
 }
 
-void evaluate_file(Branch& branch, std::string const& filename)
+void parse_file(Branch& branch, std::string const& filename)
 {
     std::string fileContents = read_text_file(filename);
 
@@ -355,7 +355,7 @@ void reload_branch_from_file(Branch& branch)
 
     branch.clear();
 
-    evaluate_file(branch, filename);
+    parse_file(branch, filename);
     migrate_values(original, branch);
 }
 

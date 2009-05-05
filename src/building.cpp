@@ -108,9 +108,11 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
 
         Type& type = as_type(function->type);
 
-        if (!type.memberFunctions.contains(""))
+        if (!type.memberFunctions.contains("")) {
+            assert(false);
             throw std::runtime_error(std::string("Term ") + function->toString()
                     + " is not a type, and has no default function");
+        }
 
         RefList memberFunctionInputs;
         memberFunctionInputs.append(function);
