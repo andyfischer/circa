@@ -45,7 +45,6 @@ Term* evaluate_statement(Branch& branch, std::string const& input)
     return result;
 }
 
-
 // This structure stores the syntax hints for list-like syntax. It exists because
 // you usually don't have a comprehension term while you are parsing the list
 // arguments, so you need to temporarily store syntax hints until you create one.
@@ -573,6 +572,9 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         typeName = tokens.consume(IDENTIFIER);
         possible_whitespace(tokens);
     }
+
+    // Side note: I think it might make sense for the syntax "state i = 0" to have a different
+    // function than just "state i", since the two things act pretty differently.
 
     RefList inputs;
     Term* initialValue = NULL;
