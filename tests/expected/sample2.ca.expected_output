@@ -1,3 +1,19 @@
-Warning, calling an unknown function: fill_rectangle
-1 compile error:
-unknown-line,unknown-col: Unknown function: fill_rectangle
+18 compile errors:
+sample2.ca:unknown-line,unknown-col: Unknown function: fill_rectangle
+sample2.ca:unknown-line,unknown-col: Unknown function: point
+sample2.ca:unknown-line,unknown-col: Unknown function: point
+sample2.ca:unknown-line,unknown-col: Unknown function: point
+sample2.ca:unknown-line,unknown-col: Unknown function: point
+sample2.ca:unknown-line,unknown-col: Unknown function: line_to
+sample2.ca:unknown-line,unknown-col: Unknown function: line_to
+sample2.ca:unknown-line,unknown-col: Unknown function: line_to
+sample2.ca:unknown-line,unknown-col: Unknown function: line_to
+sample2.ca:47,12: Unknown identifier: KEY_UP
+sample2.ca:unknown-line,unknown-col: Unknown function: key_down
+sample2.ca:unknown-line,unknown-col: Unknown function: key_down
+sample2.ca:63,12: Unknown identifier: KEY_LEFT
+sample2.ca:unknown-line,unknown-col: Unknown function: key_down
+sample2.ca:67,12: Unknown identifier: KEY_RIGHT
+sample2.ca:unknown-line,unknown-col: Unknown function: key_down
+sample2.ca:83,15: Unknown identifier: KEY_SPACE
+sample2.ca:unknown-line,unknown-col: Unknown function: key_pressed

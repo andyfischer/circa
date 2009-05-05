@@ -209,14 +209,6 @@ void print_runtime_errors(Branch& branch, std::ostream& output)
     }
 }
 
-bool has_compile_error(Term* term)
-{
-    return ((term->function == UNKNOWN_FUNCTION)
-        || (term->function == UNKNOWN_TYPE_FUNC)
-        || (term->function == UNKNOWN_IDENTIFIER_FUNC)
-        || (term->function == UNRECOGNIZED_EXPRESSION_FUNC));
-}
-
 int count_compile_errors(Branch& branch)
 {
     int result = 0;
@@ -259,6 +251,14 @@ std::string get_source_filename(Term* term)
     return "";
 }
 
+bool has_compile_error(Term* term)
+{
+    return ((term->function->function == UNKNOWN_FUNCTION)
+        || (term->type->function == UNKNOWN_TYPE_FUNC)
+        || (term->function == UNKNOWN_IDENTIFIER_FUNC)
+        || (term->function == UNRECOGNIZED_EXPRESSION_FUNC));
+}
+
 std::string get_compile_error_message(Term* term)
 {
     if (!has_compile_error(term))
@@ -268,10 +268,10 @@ std::string get_compile_error_message(Term* term)
 
     out << get_short_location(term) << ": ";
 
-    if (term->function == UNKNOWN_FUNCTION)
-        out << "Unknown function: " << term->stringProperty("message");
-    else if (term->function == UNKNOWN_TYPE_FUNC)
-        out << "Unknown type: " << term->stringProperty("message");
+    if (term->function->function == UNKNOWN_FUNCTION)
+        out << "Unknown function: " << term->function->stringProperty("message");
+    else if (term->type->function == UNKNOWN_TYPE_FUNC)
+        out << "Unknown type: " << term->type->stringProperty("message");
     else if (term->function == UNKNOWN_IDENTIFIER_FUNC)
         out << "Unknown identifier: " << term->stringProperty("message");
     else if (term->function == UNRECOGNIZED_EXPRESSION_FUNC)

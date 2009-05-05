@@ -74,31 +74,28 @@ int circa_main(std::vector<std::string> args)
         }
     }
 
-    Branch workspace;
-    string_value(&workspace, args[0], "filename");
-
-    Term* evaluated_file = workspace.eval("evaluate_file(filename)");
-    Branch& branch = as_branch(evaluated_file);
+    Branch main_branch;
+    parse_file(main_branch, args[0]);
 
     if (justPrintBranch) {
-        std::cout << branch_to_string_raw(branch);
+        std::cout << branch_to_string_raw(main_branch);
     }
 
     else if (justPrintSource) {
-        std::cout << get_branch_source(branch) << std::endl;
+        std::cout << get_branch_source(main_branch) << std::endl;
     }
 
-    else if (count_compile_errors(branch) > 0) {
-        int count = count_compile_errors(branch);
+    else if (count_compile_errors(main_branch) > 0) {
+        int count = count_compile_errors(main_branch);
         std::cout << count << " compile error";
         if (count != 1) std::cout << "s";
         std::cout << ":" << std::endl;
-        print_compile_errors(branch, std::cout);
+        print_compile_errors(main_branch, std::cout);
     } else {
 
         Term* error_listener = new Term();
 
-        evaluate_branch(branch, error_listener);
+        evaluate_branch(main_branch, error_listener);
 
         if (error_listener->hasError) {
             std::cout << "Error occured: " << error_listener->getErrorMessage() << std::endl;
