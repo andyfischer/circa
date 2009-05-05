@@ -681,7 +681,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         // Field assignment
         Term* object = branch[names[0]];
         result = apply(&branch, SET_FIELD_BY_NAME_FUNC, RefList(object, result));
-        as_string(result->state) = names[1];
+        result->stringProperty("field-name") = names[1];
 
         branch.bindName(result, names[0]);
 
