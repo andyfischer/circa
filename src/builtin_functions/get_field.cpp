@@ -15,9 +15,10 @@ namespace get_field_function {
 
     void setup(Branch& kernel)
     {
+    /*
         GET_FIELD_FUNC = import_function(kernel, evaluate, "get_field(any) -> any");
-        as_function(GET_FIELD_FUNC).stateType = INT_TYPE;
         as_function(GET_FIELD_FUNC).pureFunction = true;
+    */
     }
 }
 }

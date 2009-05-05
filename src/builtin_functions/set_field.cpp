@@ -20,10 +20,11 @@ namespace set_field_function {
 
     void setup(Branch& kernel)
     {
+    /*
         SET_FIELD_FUNC = import_function(kernel, evaluate, "set_field(any, any) -> any");
-        as_function(SET_FIELD_FUNC).stateType = INT_TYPE;
         as_function(SET_FIELD_FUNC).specializeType = specializeType;
         as_function(SET_FIELD_FUNC).pureFunction = true;
+    */
     }
 }
 }
