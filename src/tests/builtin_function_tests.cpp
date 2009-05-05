@@ -91,18 +91,6 @@ void test_builtin_equals()
     test_assert(term->hasError);
 }
 
-void test_map()
-{
-    Branch branch;
-
-    branch.eval("ages = map(string, int)");
-    branch.eval("ages('Henry') := 11");
-    branch.eval("ages('Absalom') := 205");
-
-    test_assert(branch.eval("ages('Henry')")->asInt() == 11);
-    test_assert(branch.eval("ages('Absalom')")->asInt() == 205);
-}
-
 void test_list()
 {
     Branch branch;
@@ -140,7 +128,6 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_concat);
     REGISTER_TEST_CASE(builtin_function_tests::test_bool);
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
-    REGISTER_TEST_CASE(builtin_function_tests::test_map);
     REGISTER_TEST_CASE(builtin_function_tests::test_list);
     REGISTER_TEST_CASE(builtin_function_tests::test_range);
 }
