@@ -269,13 +269,13 @@ std::string get_compile_error_message(Term* term)
     out << get_short_location(term) << ": ";
 
     if (term->function == UNKNOWN_FUNCTION)
-        out << "Unknown function: " << as_string(term->state);
+        out << "Unknown function: " << term->stringProperty("message");
     else if (term->function == UNKNOWN_TYPE_FUNC)
-        out << "Unknown type: " << as_string(term->state);
+        out << "Unknown type: " << term->stringProperty("message");
     else if (term->function == UNKNOWN_IDENTIFIER_FUNC)
-        out << "Unknown identifier: " << as_string(term->state);
+        out << "Unknown identifier: " << term->stringProperty("message");
     else if (term->function == UNRECOGNIZED_EXPRESSION_FUNC)
-        out << "Unrecognized expression: " << as_string(term->state);
+        out << "Unrecognized expression: " << term->stringProperty("message");
 
     return out.str();
 }

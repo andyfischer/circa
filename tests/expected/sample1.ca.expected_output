@@ -1,2 +1,3 @@
+Warning, calling an unknown function: load_image
 1 compile error:
-sample1.ca:6,26: Unknown function: load_image
+unknown-line,unknown-col: Unknown function: load_image

@@ -1129,7 +1129,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     if (result == NULL) {
         result = apply(&branch, UNKNOWN_IDENTIFIER_FUNC, RefList());
         source_set_hidden(result, true);
-        as_string(result->state) = id.text;
+        result->stringProperty("message") = id.text;
         branch.bindName(result, id.text);
     }
 

@@ -117,14 +117,7 @@ Term* find_and_apply(Branch& branch,
         std::string const& functionName,
         RefList inputs)
 {
-    Term* function = find_named(&branch, functionName);
-
-    // If function is not found, produce an instance of unknown-function
-    if (function == NULL) {
-        Term* result = apply(&branch, UNKNOWN_FUNCTION, inputs);
-        as_string(result->state) = functionName;
-        return result;
-    }
+    Term* function = find_function(branch, functionName);
 
     return apply(&branch, function, inputs);
 }
@@ -151,8 +144,8 @@ Term* find_type(Branch& branch, std::string const& name)
     Term* result = find_named(&branch, name);
 
     if (result == NULL) {
-        Term* result = apply(&branch, UNKNOWN_TYPE_FUNC, RefList());
-        as_string(result->state) = name;
+        result = apply(&branch, UNKNOWN_TYPE_FUNC, RefList());
+        result->stringProperty("message") = name;
     }   
 
     return result;
@@ -163,8 +156,8 @@ Term* find_function(Branch& branch, std::string const& name)
     Term* result = find_named(&branch, name);
 
     if (result == NULL) {
-        Term* result = apply(&branch, UNKNOWN_FUNCTION, RefList());
-        as_string(result->state) = name;
+        result = apply(&branch, UNKNOWN_FUNCTION, RefList());
+        result->stringProperty("message") = name;
     }   
 
     return result;
@@ -204,7 +197,7 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
 Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start)
 {
     Term* result = apply(&branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
-    as_string(result->state) = consume_line(tokens, start, result);
+    result->stringProperty("message") = consume_line(tokens, start, result);
 
     return result;
 }
@@ -212,7 +205,7 @@ Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start)
 Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start)
 {
     change_function(existing, UNRECOGNIZED_EXPRESSION_FUNC);
-    as_string(existing->state) = consume_line(tokens, start, existing);
+    existing->stringProperty("message") = consume_line(tokens, start, existing);
 
     return existing;
 }
