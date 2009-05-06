@@ -145,7 +145,30 @@ void test_runtime_type_error()
 
 void test_resize_list()
 {
-    // TODO
+    Branch list;
+
+    int_value(&list, 1, "a");
+    int_value(&list, 2, "b");
+
+    resize_list(list, 4, INT_TYPE);
+
+    test_assert(list.numTerms() == 4);
+    test_assert(list[0]->asInt() == 1);
+    test_assert(list[0]->name == "a");
+    test_assert(list[1]->asInt() == 2);
+    test_assert(list[1]->name == "b");
+    test_assert(list[2]->asInt() == 0);
+    test_assert(list[3]->asInt() == 0);
+
+    resize_list(list, 1, INT_TYPE);
+    test_assert(list.numTerms() == 1);
+    test_assert(list[0]->asInt() == 1);
+    test_assert(list[0]->name == "a");
+
+    resize_list(list, 3, STRING_TYPE);
+    test_assert(list.numTerms() == 3);
+    test_assert(list[1]->type == STRING_TYPE);
+    test_assert(list[2]->type == STRING_TYPE);
 }
 
 void register_tests()
@@ -157,6 +180,7 @@ void register_tests()
     REGISTER_TEST_CASE(runtime_tests::null_input_errors);
     REGISTER_TEST_CASE(runtime_tests::test_eval_as);
     REGISTER_TEST_CASE(runtime_tests::test_runtime_type_error);
+    REGISTER_TEST_CASE(runtime_tests::test_resize_list);
 }
 
 } // namespace runtime_tests

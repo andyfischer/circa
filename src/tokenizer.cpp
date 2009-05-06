@@ -459,8 +459,6 @@ void consume_identifier(TokenizeContext &context)
 {
     std::stringstream text;
 
-    bool deprecated = false;
-
     while (is_acceptable_inside_identifier(context.next()))
         text << context.consume();
 
