@@ -699,7 +699,7 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     Term* result = infix_expression(branch, tokens);
-    branch.bindName(result, "#return");
+    branch.bindName(result, OUTPUT_PLACEHOLDER_NAME);
     
     return result;
 }

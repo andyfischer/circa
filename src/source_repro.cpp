@@ -94,7 +94,7 @@ std::string get_term_source(Term* term)
     }
 
     // add possible name binding
-    if (term->name == "#return") {
+    if (term->name == OUTPUT_PLACEHOLDER_NAME) {
         result << "return ";
     }
     else if (term->name != "") {
