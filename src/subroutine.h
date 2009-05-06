@@ -7,7 +7,7 @@ namespace circa {
 
 bool is_subroutine(Term* term);
 void initialize_as_subroutine(Function& func);
-void initialize_subroutine_call(Term* term);
+void initialize_subroutine_state(Term* term);
 Branch& call_subroutine(Branch& branch, std::string const& functionName);
 Branch& get_subroutine_branch(Term* term);
 
