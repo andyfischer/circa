@@ -171,7 +171,7 @@ int main( int argc, char* args[] )
 
     std::cout << "loading file: " << filename << std::endl;
 
-    circa::evaluate_file(SCRIPT_MAIN, filename);
+    circa::parse_file(SCRIPT_MAIN, filename);
     refresh_training_branch(SCRIPT_MAIN);
 
     // Initialize all SDL subsystems

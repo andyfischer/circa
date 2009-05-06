@@ -225,11 +225,6 @@ std::string& as_string(Term* term)
     return *((std::string*) term->value);
 }
 
-float& as_float(Term* term, int input)
-{
-    return as_float(term->input(input));
-}
-
 bool is_int(Term* term)
 {
     return term->type == INT_TYPE;

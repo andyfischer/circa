@@ -35,9 +35,6 @@ float to_float(Term*);
 bool& as_bool(Term*);
 std::string& as_string(Term*);
 
-// convenience methods to access inputs
-float& as_float(Term*, int input);
-
 Ref& deref(Term*);
 bool is_int(Term* term);
 bool is_float(Term* term);
