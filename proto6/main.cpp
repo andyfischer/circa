@@ -169,7 +169,7 @@ int main( int argc, char* args[] )
 
     std::cout << "Loading file: " << filename << std::endl;
 
-    circa::evaluate_file(SCRIPT_MAIN, filename);
+    circa::parse_file(SCRIPT_MAIN, filename);
     refresh_training_branch(SCRIPT_MAIN);
 
     // See if this script defined SCREEN_WIDTH or SCREEN_HEIGHT
