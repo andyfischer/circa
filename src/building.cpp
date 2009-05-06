@@ -103,26 +103,13 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
         function = get_value_function(function);
     }
 
-    // If 'function' is not really a function, see if we can treat it like a function
-    else if (!is_function(function)) {
-
-        Type& type = as_type(function->type);
-
-        if (!type.memberFunctions.contains("")) {
-            assert(false);
-            throw std::runtime_error(std::string("Term ") + function->toString()
-                    + " is not a type, and has no default function");
-        }
-
-        RefList memberFunctionInputs;
-        memberFunctionInputs.append(function);
-        memberFunctionInputs.appendAll(inputs);
-
-        function = type.memberFunctions[""];
-        inputs = memberFunctionInputs;
+    // If 'function' is a subroutine, then create a container for its state
+    if (is_subroutine(function))
+    {
+        //std::cout << "is subroutine: " << function->name << std::endl;
     }
 
-    //Function& functionData = as_function(function);
+    assert(is_function(function));
 
     // Create the term
     Term* result = create_term(branch, function, inputs);

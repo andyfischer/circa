@@ -39,8 +39,6 @@ void Function::appendInput(Term* type, std::string const& name)
 {
     inputTypes.append(type);
     getInputProperties(inputTypes.count()-1).name = name;
-    Term* placeholder = create_value(&subroutineBranch, type, name);
-    source_set_hidden(placeholder, true);
 }
 
 Function::InputProperties&
@@ -76,6 +74,11 @@ Function& as_function(Term* term)
     assert_type(term, FUNCTION_TYPE);
     assert(term->value != NULL);
     return *((Function*) term->value);
+}
+
+bool is_subroutine(Term* term)
+{
+    return is_function(term) && as_function(term).subroutineBranch.numTerms() > 0;
 }
 
 void Function::copyExceptBranch(Term* sourceTerm, Term* destTerm)
@@ -131,6 +134,11 @@ void initialize_as_subroutine(Function& func)
 {
     func.evaluate = Function::subroutine_call_evaluate;
     func.stateType = BRANCH_TYPE;
+
+    for (int input=0; input < func.numInputs(); input++) {
+        Term *placeholder = create_value(&func.subroutineBranch, func.inputType(input), func.getInputProperties(input).name);
+        source_set_hidden(placeholder, true);
+    }
 }
 
 std::string get_placeholder_name_for_index(int index)

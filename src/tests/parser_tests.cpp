@@ -178,7 +178,7 @@ void test_function_decl()
     test_equals(funcbranch[5]->function->name, "greater_than");
     test_assert(funcbranch[5]->input(0) == funcbranch[2]);
     test_assert(funcbranch[5]->input(1) == funcbranch[4]);
-    test_equals(funcbranch[5]->name, "#return");
+    test_equals(funcbranch[5]->name, OUTPUT_PLACEHOLDER_NAME);
     test_assert(funcbranch.numTerms() == 6);
 }
 

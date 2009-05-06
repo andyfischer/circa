@@ -11,7 +11,7 @@
 namespace circa {
 
 #define INPUT_PLACEHOLDER_PREFIX "#input-"
-#define OUTPUT_PLACEHOLDER_NAME "#return"
+#define OUTPUT_PLACEHOLDER_NAME "#out"
 
 struct Function
 {
@@ -74,6 +74,8 @@ struct Function
 
 bool is_function(Term* term);
 Function& as_function(Term*);
+
+bool is_subroutine(Term* term);
 
 void initialize_as_subroutine(Function& func);
 
