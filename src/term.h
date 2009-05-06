@@ -70,15 +70,15 @@ struct Term
     Term* addProperty(std::string const& name, Term* type);
     void removeProperty(std::string const& name);
 
-    bool& boolProperty(std::string const& name);
-    int& intProperty(std::string const& name);
-    float& floatProperty(std::string const& name);
-    std::string& stringProperty(std::string const& name);
+    bool& boolProp(std::string const& name);
+    int& intProp(std::string const& name);
+    float& floatProp(std::string const& name);
+    std::string& stringProp(std::string const& name);
 
-    bool boolPropertyOptional(std::string const& name, bool defaultValue);
-    float floatPropertyOptional(std::string const& name, float defaultValue);
-    int intPropertyOptional(std::string const& name, int defaultValue);
-    std::string stringPropertyOptional(std::string const& name, std::string const& defaultValue);
+    bool boolPropOptional(std::string const& name, bool defaultValue);
+    float floatPropOptional(std::string const& name, float defaultValue);
+    int intPropOptional(std::string const& name, int defaultValue);
+    std::string stringPropOptional(std::string const& name, std::string const& defaultValue);
 
     // Accessors for specific properties
 

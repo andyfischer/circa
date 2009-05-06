@@ -218,10 +218,10 @@ std::string get_short_location(Term* term)
     std::string filename = get_source_filename(term);
     if (filename != "")
         out << get_source_filename(term) << ":";
-    if (term->hasProperty("lineStart")) out << term->intProperty("lineStart");
+    if (term->hasProperty("lineStart")) out << term->intProp("lineStart");
     else out << "unknown-line";
     out << ",";
-    if (term->hasProperty("colStart")) out << term->intProperty("colStart");
+    if (term->hasProperty("colStart")) out << term->intProp("colStart");
     else out << "unknown-col";
     return out.str();
 }
@@ -261,13 +261,13 @@ std::string get_compile_error_message(Term* term)
     out << get_short_location(term) << ": ";
 
     if (term->function->function == UNKNOWN_FUNCTION)
-        out << "Unknown function: " << term->function->stringProperty("message");
+        out << "Unknown function: " << term->function->stringProp("message");
     else if (term->type->function == UNKNOWN_TYPE_FUNC)
-        out << "Unknown type: " << term->type->stringProperty("message");
+        out << "Unknown type: " << term->type->stringProp("message");
     else if (term->function == UNKNOWN_IDENTIFIER_FUNC)
-        out << "Unknown identifier: " << term->stringProperty("message");
+        out << "Unknown identifier: " << term->stringProp("message");
     else if (term->function == UNRECOGNIZED_EXPRESSION_FUNC)
-        out << "Unrecognized expression: " << term->stringProperty("message");
+        out << "Unrecognized expression: " << term->stringProp("message");
 
     return out.str();
 }

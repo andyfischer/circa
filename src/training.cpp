@@ -10,8 +10,8 @@ const std::string TRAINING_BRANCH_NAME = "#training";
 
 bool is_trainable(Term* term)
 {
-    return term->boolPropertyOptional("trainable", false)
-        || term->boolPropertyOptional("derived-trainable", false);
+    return term->boolPropOptional("trainable", false)
+        || term->boolPropOptional("derived-trainable", false);
 }
 
 void generate_training(Branch& branch, Term* subject, Term* desired)
@@ -40,7 +40,7 @@ void update_derived_trainable_properties(Branch& branch)
             }
         }
 
-        it->boolProperty("derived-trainable") = found;
+        it->boolProp("derived-trainable") = found;
     }
 }
 

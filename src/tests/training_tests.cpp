@@ -13,8 +13,8 @@ void train_addition1()
     Term* a = branch.eval("a = 1.0");
     Term* b = branch.eval("b = add(a, 2.0)");
 
-    a->boolProperty("trainable") = true;
-    b->boolProperty("trainable") = true;
+    a->boolProp("trainable") = true;
+    b->boolProp("trainable") = true;
 
     Branch tbranch;
     generate_training(tbranch, b, tbranch.eval("4.0"));
@@ -33,9 +33,9 @@ void train_addition2()
     Term* b = branch.eval("b = 2.0");
     Term* c = branch.eval("c = add(a, b)");
 
-    a->boolProperty("trainable") = true;
-    b->boolProperty("trainable") = true;
-    c->boolProperty("trainable") = true;
+    a->boolProp("trainable") = true;
+    b->boolProp("trainable") = true;
+    c->boolProp("trainable") = true;
 
     Branch tbranch;
     generate_training(tbranch, c, tbranch.eval("4.0"));
@@ -53,8 +53,8 @@ void train_mult()
     /*Term* b =*/ branch.eval("b = 3.0");
     Term* c = branch.eval("c = mult(a, b)");
 
-    a->boolProperty("trainable") = true;
-    c->boolProperty("trainable") = true;
+    a->boolProp("trainable") = true;
+    c->boolProp("trainable") = true;
 
     Branch training;
     generate_training(training, c, training.eval("9.0"));
@@ -69,8 +69,8 @@ void train_sin()
     Term* a = branch.eval("a = 0.0");
     Term* b = branch.eval("b = sin(a)");
 
-    a->boolProperty("trainable") = true;
-    b->boolProperty("trainable") = true;
+    a->boolProp("trainable") = true;
+    b->boolProp("trainable") = true;
 
     Branch training;
     generate_training(training, b, training.eval("1.0"));
@@ -85,8 +85,8 @@ void test_refresh_training_branch()
     Term* b = branch.eval("b = 2.0");
     branch.eval("c = add(a, b)");
     branch.eval("feedback(c, 4.0)");
-    a->boolProperty("trainable") = true;
-    b->boolProperty("trainable") = true;
+    a->boolProp("trainable") = true;
+    b->boolProp("trainable") = true;
 
     refresh_training_branch(branch);
 

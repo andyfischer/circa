@@ -10,9 +10,9 @@ namespace stateful_value_function {
         // check if we should initialize our value
         if ((caller->numInputs() > 0) &&
                 // FIXME: Shouldn't use a property for this
-                !caller->boolPropertyOptional("initialized", false)) {
+                !caller->boolPropOptional("initialized", false)) {
             assign_value(caller->input(0), caller);
-            caller->boolProperty("initialized") = true;
+            caller->boolProp("initialized") = true;
         }
     }
 
