@@ -13,13 +13,13 @@ void test_comment()
     parser::compile(&branch, parser::statement, "-- this is a comment");
 
     test_assert(branch[0]->function == COMMENT_FUNC);
-    test_equals(branch[0]->stringProperty("comment"), "-- this is a comment");
+    test_equals(branch[0]->stringProp("comment"), "-- this is a comment");
     test_assert(branch.numTerms() == 1);
 
     parser::compile(&branch, parser::statement, "--");
     test_assert(branch.numTerms() == 2);
     test_assert(branch[1]->function == COMMENT_FUNC);
-    test_equals(branch[1]->stringProperty("comment"), "--");
+    test_equals(branch[1]->stringProp("comment"), "--");
 }
 
 void test_blank_line()
@@ -28,7 +28,7 @@ void test_blank_line()
     parser::compile(&branch, parser::statement, "");
     test_assert(branch.numTerms() == 1);
     test_assert(branch[0]->function == COMMENT_FUNC);
-    test_equals(branch[0]->stringProperty("comment"), "\n");
+    test_equals(branch[0]->stringProp("comment"), "\n");
 }
 
 void test_literal_integer()
@@ -257,17 +257,17 @@ void test_syntax_hints()
     Branch branch;
     Term* t = parser::compile(&branch, parser::function_call, "assert(false)");
 
-    test_equals(t->stringProperty("syntaxHints:functionName"), "assert");
+    test_equals(t->stringProp("syntaxHints:functionName"), "assert");
 
     t = parser::compile(&branch, parser::function_call, "concat('a', 'b')");
-    test_equals(t->stringProperty("syntaxHints:functionName"), "concat");
+    test_equals(t->stringProp("syntaxHints:functionName"), "concat");
     test_equals(get_input_syntax_hint(t, 0, "preWhitespace"), "");
     test_equals(get_input_syntax_hint(t, 0, "postWhitespace"), ",");
     test_equals(get_input_syntax_hint(t, 1, "preWhitespace"), " ");
     test_equals(get_input_syntax_hint(t, 1, "postWhitespace"), "");
 
     t = parser::compile(&branch, parser::statement, "x = true\n");
-    test_equals(t->stringProperty("syntaxHints:postWhitespace"), "\n");
+    test_equals(t->stringProp("syntaxHints:postWhitespace"), "\n");
 }
 
 void test_implicit_copy_by_identifier()
@@ -315,15 +315,15 @@ void test_infix_whitespace()
     branch.eval("b = 1");
 
     Term* term = parser::compile(&branch, parser::infix_expression, "  a + b");
-    test_equals(term->stringProperty("syntaxHints:preWhitespace"), "  ");
+    test_equals(term->stringProp("syntaxHints:preWhitespace"), "  ");
     test_equals(get_input_syntax_hint(term, 0, "postWhitespace"), " ");
     test_equals(get_input_syntax_hint(term, 1, "preWhitespace"), " ");
 
     term = parser::compile(&branch, parser::infix_expression, "5+3");
-    test_assert(term->stringProperty("syntaxHints:preWhitespace") == "");
+    test_assert(term->stringProp("syntaxHints:preWhitespace") == "");
     test_equals(get_input_syntax_hint(term, 0, "postWhitespace"), "");
     test_equals(get_input_syntax_hint(term, 1, "preWhitespace"), "");
-    test_assert(term->stringProperty("syntaxHints:postWhitespace") == "");
+    test_assert(term->stringProp("syntaxHints:postWhitespace") == "");
 }
 
 void test_list_arguments()

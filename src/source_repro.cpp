@@ -10,7 +10,7 @@ std::string& get_input_syntax_hint(Term* term, int index, std::string const& fie
 {
     std::stringstream fieldName;
     fieldName << "syntaxHints:input-" << index << ":" << field;
-    return term->stringProperty(fieldName.str());
+    return term->stringProp(fieldName.str());
 }
 
 std::string get_source_of_input(Term* term, int inputIndex)
@@ -36,10 +36,10 @@ std::string get_source_of_input(Term* term, int inputIndex)
 
 bool should_print_term_source_line(Term* term)
 {
-    if (term->boolPropertyOptional("syntaxHints:nestedExpression", false))
+    if (term->boolPropOptional("syntaxHints:nestedExpression", false))
         return false;
 
-    if (term->boolPropertyOptional("syntaxHints:hidden", false))
+    if (term->boolPropOptional("syntaxHints:hidden", false))
         return false;
 
     return true;
@@ -54,7 +54,7 @@ std::string get_term_source(Term* term)
 
     std::stringstream result;
 
-    result << term->stringPropertyOptional("syntaxHints:preWhitespace", "");
+    result << term->stringPropOptional("syntaxHints:preWhitespace", "");
 
     // for values, check if the type has a toString function
     if (is_value(term) && !is_stateful(term)) {
@@ -71,25 +71,25 @@ std::string get_term_source(Term* term)
         assert(as_type(term->type).toString != NULL);
 
         result << as_type(term->type).toString(term);
-        result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
+        result << term->stringPropOptional("syntaxHints:postWhitespace", "");
         return result.str();
     }
 
     // check if this function has a toSourceString function
     if (as_function(term->function).toSourceString != NULL) {
         result << as_function(term->function).toSourceString(term);
-        result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
+        result << term->stringPropOptional("syntaxHints:postWhitespace", "");
         return result.str();
     }
 
     // for an infix rebinding, don't use the normal "name = " prefix
-    if ((term->stringPropertyOptional("syntaxHints:declarationStyle", "") == "infix")
+    if ((term->stringPropOptional("syntaxHints:declarationStyle", "") == "infix")
             && parser::is_infix_operator_rebinding(
-                term->stringProperty("syntaxHints:functionName")))
+                term->stringProp("syntaxHints:functionName")))
     {
-        result << term->name << " " << term->stringProperty("syntaxHints:functionName");
+        result << term->name << " " << term->stringProp("syntaxHints:functionName");
         result << get_source_of_input(term, 1);
-        result << term->stringProperty("syntaxHints:postWhitespace");
+        result << term->stringProp("syntaxHints:postWhitespace");
         return result.str();
     }
 
@@ -99,20 +99,20 @@ std::string get_term_source(Term* term)
     }
     else if (term->name != "") {
         result << term->name;
-        result << term->stringPropertyOptional("syntaxHints:preEqualsSpace", " ");
+        result << term->stringPropOptional("syntaxHints:preEqualsSpace", " ");
         result << "=";
-        result << term->stringPropertyOptional("syntaxHints:postEqualsSpace", " ");
+        result << term->stringPropOptional("syntaxHints:postEqualsSpace", " ");
     }
 
-    int numParens = term->intPropertyOptional("syntaxHints:parens", 0);
+    int numParens = term->intPropOptional("syntaxHints:parens", 0);
     for (int p=0; p < numParens; p++)
         result << "(";
 
     // add the declaration syntax
-    std::string declarationStyle = term->stringPropertyOptional("syntaxHints:declarationStyle", "");
+    std::string declarationStyle = term->stringPropOptional("syntaxHints:declarationStyle", "");
 
     if (declarationStyle == "function-call") {
-        result << term->stringProperty("syntaxHints:functionName") << "(";
+        result << term->stringProp("syntaxHints:functionName") << "(";
 
         for (int i=0; i < term->numInputs(); i++) {
             // don't show the hidden state input for subroutines
@@ -127,29 +127,29 @@ std::string get_term_source(Term* term)
         result << get_source_of_input(term, 0);
         result << ".";
         std::string actualFunctionName = term->function->name;
-        result << term->stringPropertyOptional("syntaxHints:functionName", actualFunctionName);
+        result << term->stringPropOptional("syntaxHints:functionName", actualFunctionName);
     } else if (declarationStyle == "infix") {
         result << get_source_of_input(term, 0);
-        result << term->stringProperty("syntaxHints:functionName");
+        result << term->stringProp("syntaxHints:functionName");
         result << get_source_of_input(term, 1);
     } else if (declarationStyle == "arrow-concat") {
         result << get_source_of_input(term, 0);
         result << "->";
         result << get_input_syntax_hint(term, 1, "preWhitespace");
-        result << term->stringProperty("syntaxHints:functionName");
+        result << term->stringProp("syntaxHints:functionName");
     }
 
     for (int p=0; p < numParens; p++)
         result << ")";
 
-    result << term->stringPropertyOptional("syntaxHints:postWhitespace", "");
+    result << term->stringPropOptional("syntaxHints:postWhitespace", "");
 
     return result.str();
 }
 
 std::string get_comment_string(Term* term)
 {
-    return term->stringProperty("comment");
+    return term->stringProp("comment");
 }
 
 std::string get_branch_source(Branch& branch)

@@ -200,7 +200,7 @@ Term* comment_statement(Branch& branch, TokenStream& tokens)
     std::string commentText = tokens.consume(COMMENT);
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
-    result->stringProperty("comment") = commentText;
+    result->stringProp("comment") = commentText;
 
     return result;
 }
@@ -211,7 +211,7 @@ Term* blank_line(Branch& branch, TokenStream& tokens)
         tokens.consume(NEWLINE);
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
-    result->stringProperty("comment") = "\n";
+    result->stringProp("comment") = "\n";
     return result;
 }
 
@@ -239,7 +239,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
     tokens.consume();
 
     Term* result = create_value(&branch, FUNCTION_TYPE, functionName);
-    result->stringProperty("syntaxHints:declarationStyle") = "literal";
+    result->stringProp("syntaxHints:declarationStyle") = "literal";
     Function& func = as_function(result);
 
     func.name = functionName;
@@ -679,9 +679,9 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     }
 
     if (preEqualsSpace != " ")
-        result->stringProperty("syntaxHints:preEqualsSpace") = preEqualsSpace;
+        result->stringProp("syntaxHints:preEqualsSpace") = preEqualsSpace;
     if (postEqualsSpace != " ")
-        result->stringProperty("syntaxHints:postEqualsSpace") = postEqualsSpace;
+        result->stringProp("syntaxHints:postEqualsSpace") = postEqualsSpace;
 
     std::string pendingRebind = pop_pending_rebind(branch);
 
@@ -695,7 +695,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         // Field assignment
         Term* object = branch[names[0]];
         result = apply(&branch, SET_FIELD_BY_NAME_FUNC, RefList(object, result));
-        result->stringProperty("field-name") = names[1];
+        result->stringProp("field-name") = names[1];
 
         branch.bindName(result, names[0]);
 
@@ -870,10 +870,10 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             } else if (lhsType.findFieldIndex(rhsIdent) != -1) {
 
                 result = apply(&branch, GET_FIELD_BY_NAME_FUNC, RefList(leftExpr));
-                result->stringProperty("field-name") = rhsIdent;
+                result->stringProp("field-name") = rhsIdent;
                 specialize_type(result, lhsType[rhsIdent].type);
 
-                result->stringProperty("syntaxHints:functionName") = rhsIdent;
+                result->stringProp("syntaxHints:functionName") = rhsIdent;
 
             // Finally, look for this function in our local scope
             } else {
@@ -900,7 +900,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                 result = apply(&branch, function, inputs);
             }
 
-            result->stringProperty("syntaxHints:declarationStyle") = "dot-concat";
+            result->stringProp("syntaxHints:declarationStyle") = "dot-concat";
 
         } else if (operatorStr == "->") {
             if (!tokens.nextIs(IDENTIFIER))
@@ -912,8 +912,8 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             result = find_and_apply(branch, functionName, inputs);
 
-            result->stringProperty("syntaxHints:declarationStyle") = "arrow-concat";
-            result->stringProperty("syntaxHints:functionName") = functionName;
+            result->stringProp("syntaxHints:declarationStyle") = "arrow-concat";
+            result->stringProp("syntaxHints:functionName") = functionName;
 
             get_input_syntax_hint(result, 0, "postWhitespace") = preOperatorWhitespace;
             get_input_syntax_hint(result, 1, "preWhitespace") = postOperatorWhitespace;
@@ -928,8 +928,8 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                 throw std::runtime_error("Left side of " + functionName + " must be an identifier");
 
             result = find_and_apply(branch, functionName, RefList(leftExpr, rightExpr));
-            result->stringProperty("syntaxHints:declarationStyle") = "infix";
-            result->stringProperty("syntaxHints:functionName") = operatorStr;
+            result->stringProp("syntaxHints:declarationStyle") = "infix";
+            result->stringProp("syntaxHints:functionName") = operatorStr;
 
             get_input_syntax_hint(result, 0, "postWhitespace") = preOperatorWhitespace;
             get_input_syntax_hint(result, 1, "preWhitespace") = postOperatorWhitespace;
@@ -989,7 +989,7 @@ Term* atom(Branch& branch, TokenStream& tokens)
         if (!tokens.nextIs(RPAREN))
             return compile_error_for_line(result, tokens, startPosition);
         tokens.consume(RPAREN);
-        result->intProperty("syntaxHints:parens") += 1;
+        result->intProp("syntaxHints:parens") += 1;
     }
     else {
 
@@ -1018,8 +1018,8 @@ Term* function_call(Branch& branch, TokenStream& tokens)
     
     Term* result = find_and_apply(branch, functionName, inputs);
 
-    result->stringProperty("syntaxHints:declarationStyle") = "function-call";
-    result->stringProperty("syntaxHints:functionName") = functionName;
+    result->stringProp("syntaxHints:declarationStyle") = "function-call";
+    result->stringProp("syntaxHints:functionName") = functionName;
 
     listHints.apply(result);
 
@@ -1032,8 +1032,8 @@ Term* literal_integer(Branch& branch, TokenStream& tokens)
     Token tok = tokens.consumet();
     int value = strtoul(tok.text.c_str(), NULL, 0);
     Term* term = int_value(&branch, value);
-    term->stringProperty("syntaxHints:declarationStyle") = "literal";
-    term->stringProperty("syntaxHints:integerFormat") = "dec";
+    term->stringProp("syntaxHints:declarationStyle") = "literal";
+    term->stringProp("syntaxHints:integerFormat") = "dec";
     return term;
 }
 
@@ -1043,8 +1043,8 @@ Term* literal_hex(Branch& branch, TokenStream& tokens)
     Token tok = tokens.consumet();
     int value = strtoul(tok.text.c_str(), NULL, 0);
     Term* term = int_value(&branch, value);
-    term->stringProperty("syntaxHints:declarationStyle") = "literal";
-    term->stringProperty("syntaxHints:integerFormat") = "hex";
+    term->stringProp("syntaxHints:declarationStyle") = "literal";
+    term->stringProp("syntaxHints:integerFormat") = "hex";
     include_location(term, tok);
     return term;
 }
@@ -1070,7 +1070,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     }
 
     Term* term = float_value(&branch, value);
-    term->floatProperty("syntaxHints:decimalFigures") = decimalFigures;
+    term->floatProp("syntaxHints:decimalFigures") = decimalFigures;
 
     float mutability = 0.0;
 
@@ -1080,7 +1080,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     }
 
     term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
-    term->stringProperty("syntaxHints:declarationStyle") = "literal";
+    term->stringProp("syntaxHints:declarationStyle") = "literal";
     include_location(term, tok);
     return term;
 }
@@ -1097,7 +1097,7 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     text = text.substr(1, text.length()-2);
 
     Term* term = string_value(&branch, text);
-    term->stringProperty("syntaxHints:declarationStyle") = "literal";
+    term->stringProp("syntaxHints:declarationStyle") = "literal";
     include_location(term, tok);
     return term;
 }
@@ -1143,7 +1143,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     if (result == NULL) {
         result = apply(&branch, UNKNOWN_IDENTIFIER_FUNC, RefList());
         source_set_hidden(result, true);
-        result->stringProperty("message") = id.text;
+        result->stringProp("message") = id.text;
         branch.bindName(result, id.text);
     }
 

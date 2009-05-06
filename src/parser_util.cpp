@@ -7,15 +7,15 @@ namespace circa {
 void prepend_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
-        term->stringProperty("syntaxHints:preWhitespace") = 
-            whitespace + term->stringProperty("syntaxHints:preWhitespace");
+        term->stringProp("syntaxHints:preWhitespace") = 
+            whitespace + term->stringProp("syntaxHints:preWhitespace");
 }
 
 void append_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
-        term->stringProperty("syntaxHints:postWhitespace") = 
-            whitespace + term->stringProperty("syntaxHints:postWhitespace");
+        term->stringProp("syntaxHints:postWhitespace") = 
+            whitespace + term->stringProp("syntaxHints:postWhitespace");
 }
 
 void include_location(Term* term, tokenizer::Token& tok)
@@ -28,12 +28,12 @@ void include_location(Term* term, tokenizer::Token& tok)
         prepend = true;
 
     // Prepend if lineStart is before ours
-    else if (tok.lineStart < term->intProperty("lineStart"))
+    else if (tok.lineStart < term->intProp("lineStart"))
         prepend = true;
 
     // Prepend if lineStart is equal and colStart is before ours
-    else if ((tok.lineStart == term->intProperty("lineStart"))
-             && (tok.colStart < term->intProperty("colStart")))
+    else if ((tok.lineStart == term->intProp("lineStart"))
+             && (tok.colStart < term->intProp("colStart")))
         prepend = true;
 
     // Otherwise, don't prepend
@@ -41,8 +41,8 @@ void include_location(Term* term, tokenizer::Token& tok)
         prepend = false;
 
     if (prepend) {
-        term->intProperty("lineStart") = tok.lineStart;
-        term->intProperty("colStart") = tok.colStart;
+        term->intProp("lineStart") = tok.lineStart;
+        term->intProp("colStart") = tok.colStart;
     }
 
     // Do the same thing for appending
@@ -51,17 +51,17 @@ void include_location(Term* term, tokenizer::Token& tok)
     if (!term->hasProperty("lineEnd")
         || !term->hasProperty("colEnd"))
         append = true;
-    else if (tok.lineEnd > term->intProperty("lineEnd"))
+    else if (tok.lineEnd > term->intProp("lineEnd"))
         append = true;
-    else if ((tok.lineEnd == term->intProperty("lineEnd"))
-             && (tok.colEnd > term->intProperty("colEnd")))
+    else if ((tok.lineEnd == term->intProp("lineEnd"))
+             && (tok.colEnd > term->intProp("colEnd")))
         append = true;
     else
         append = false;
 
     if (append) {
-        term->intProperty("lineEnd") = tok.lineEnd;
-        term->intProperty("colEnd") = tok.colEnd;
+        term->intProp("lineEnd") = tok.lineEnd;
+        term->intProp("colEnd") = tok.colEnd;
     }
 }
 
@@ -127,7 +127,7 @@ void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
     if (term->name != "")
         return;
 
-    term->boolProperty("syntaxHints:nestedExpression") = true;
+    term->boolProp("syntaxHints:nestedExpression") = true;
 
     for (int i=0; i < term->numInputs(); i++) {
         Term* input = term->input(i);
@@ -145,7 +145,7 @@ Term* find_type(Branch& branch, std::string const& name)
 
     if (result == NULL) {
         result = apply(&branch, UNKNOWN_TYPE_FUNC, RefList());
-        result->stringProperty("message") = name;
+        result->stringProp("message") = name;
     }   
 
     return result;
@@ -157,7 +157,7 @@ Term* find_function(Branch& branch, std::string const& name)
 
     if (result == NULL) {
         result = apply(&branch, UNKNOWN_FUNCTION, RefList());
-        result->stringProperty("message") = name;
+        result->stringProp("message") = name;
     }   
 
     return result;
@@ -165,7 +165,7 @@ Term* find_function(Branch& branch, std::string const& name)
 
 void source_set_hidden(Term* term, bool hidden)
 {
-    term->boolProperty("syntaxHints:hidden") = hidden;
+    term->boolProp("syntaxHints:hidden") = hidden;
 }
 
 std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient)
@@ -197,7 +197,7 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
 Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start)
 {
     Term* result = apply(&branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
-    result->stringProperty("message") = consume_line(tokens, start, result);
+    result->stringProp("message") = consume_line(tokens, start, result);
 
     return result;
 }
@@ -205,7 +205,7 @@ Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start)
 Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start)
 {
     change_function(existing, UNRECOGNIZED_EXPRESSION_FUNC);
-    existing->stringProperty("message") = consume_line(tokens, start, existing);
+    existing->stringProp("message") = consume_line(tokens, start, existing);
 
     return existing;
 }

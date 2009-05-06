@@ -79,47 +79,47 @@ void Term::removeProperty(std::string const& name)
     properties.remove(name);
 }
 
-bool& Term::boolProperty(std::string const& name)
+bool& Term::boolProp(std::string const& name)
 {
     Term* t = addProperty(name, BOOL_TYPE);
     return as_bool(t);
 }
-int& Term::intProperty(std::string const& name)
+int& Term::intProp(std::string const& name)
 {
     Term* t = addProperty(name, INT_TYPE);
     return as_int(t);
 }
-float& Term::floatProperty(std::string const& name)
+float& Term::floatProp(std::string const& name)
 {
     Term* t = addProperty(name, FLOAT_TYPE);
     return as_float(t);
 }
-std::string& Term::stringProperty(std::string const& name)
+std::string& Term::stringProp(std::string const& name)
 {
     Term* t = addProperty(name, STRING_TYPE);
     return as_string(t);
 }
 
-bool Term::boolPropertyOptional(std::string const& name, bool defaultValue)
+bool Term::boolPropOptional(std::string const& name, bool defaultValue)
 {
-    if (hasProperty(name)) return boolProperty(name);
+    if (hasProperty(name)) return boolProp(name);
     else return defaultValue;
 }
 
-float Term::floatPropertyOptional(std::string const& name, float defaultValue)
+float Term::floatPropOptional(std::string const& name, float defaultValue)
 {
-    if (hasProperty(name)) return floatProperty(name);
+    if (hasProperty(name)) return floatProp(name);
     else return defaultValue;
 }
 
-int Term::intPropertyOptional(std::string const& name, int defaultValue)
+int Term::intPropOptional(std::string const& name, int defaultValue)
 {
-    if (hasProperty(name)) return intProperty(name);
+    if (hasProperty(name)) return intProp(name);
     else return defaultValue;
 }
-std::string Term::stringPropertyOptional(std::string const& name, std::string const& defaultValue)
+std::string Term::stringPropOptional(std::string const& name, std::string const& defaultValue)
 {
-    if (hasProperty(name)) return stringProperty(name);
+    if (hasProperty(name)) return stringProp(name);
     else return defaultValue;
 }
 
