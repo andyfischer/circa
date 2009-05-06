@@ -46,14 +46,6 @@ Term* create_term(Branch* branch, Term* function, RefList const& inputs)
 
     change_type(term, outputType);
 
-    // Create state (if a state type is defined)
-    Term* stateType = functionData.stateType;
-    if (stateType != NULL && stateType != VOID_TYPE) {
-        if (!is_type(stateType))
-            throw std::runtime_error(stateType->name + " is not a type");
-        term->state = create_value(NULL, stateType);
-    }
-
     return term;
 }
     
@@ -77,11 +69,6 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
 
     duplicate_branch(source->properties, term->properties);
 
-    if (source->state != NULL) {
-        if (copyBranches || !has_inner_branch(source))
-            assign_value(source->state, term->state);
-    }
-        
     return term;
 }
 

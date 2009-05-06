@@ -23,7 +23,6 @@ void test_import_c()
             "my_imported_func(int,int) -> int");
 
     test_assert(as_function(func_as_term).outputType == INT_TYPE);
-    test_assert(as_function(func_as_term).stateType == VOID_TYPE);
 
     Term* result = branch.eval("my_imported_func(4,5)");
 

@@ -39,7 +39,6 @@ void delete_term(Term* term)
     term->inputs.clear();
     term->type = NULL;
     term->function = NULL;
-    term->state = NULL;
 
     unregister_good_pointer(term);
 
@@ -68,9 +67,6 @@ void remap_pointers(Term* term, ReferenceMap const& map)
 
         as_type(term->type).remapPointers(term, map);
     }
-
-    if (term->state != NULL)
-        remap_pointers(term->state, map);
 }
 
 void remap_pointers(Term* term, Term* original, Term* replacement)

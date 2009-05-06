@@ -7,10 +7,12 @@ namespace set_field_function {
 
     void evaluate(Term* caller)
     {
+        /*
         int index = as_int(caller->state);
         assign_value(caller->input(0), caller);
 
         assign_value(caller->input(1), as_branch(caller)[index]);
+        */
     }
 
     Term* specializeType(Term* caller)

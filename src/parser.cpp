@@ -243,7 +243,6 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
     Function& func = as_function(result);
 
     func.name = functionName;
-    func.stateType = VOID_TYPE;
     func.outputType = VOID_TYPE;
 
     while (!tokens.nextIs(RPAREN) && !tokens.finished())

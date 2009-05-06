@@ -7,10 +7,12 @@ namespace get_field_function {
 
     void evaluate(Term* caller)
     {
+        /*
         int index = as_int(caller->state);
         Term* field = as_branch(caller->input(0))[index];
 
         assign_value(field, caller);
+        */
     }
 
     void setup(Branch& kernel)
