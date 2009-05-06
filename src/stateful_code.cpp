@@ -9,6 +9,11 @@ bool is_stateful(Term* term)
     return term->function == STATEFUL_VALUE_FUNC;
 }
 
+void set_stateful(Term* term, bool value)
+{
+    term->boolProperty("stateful") = value;
+}
+
 void load_state_into_branch(Term* state, Branch& branch)
 {
     Branch& stateBranch = as_branch(state);
@@ -55,6 +60,19 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
 
         create_value(&type, term->type, term->name);
     }
+}
+
+bool has_hidden_state(Function& func)
+{
+    return func.hiddenStateType != NULL && func.hiddenStateType != VOID_TYPE;
+}
+
+Term* get_hidden_state_for_call(Term* term)
+{
+    if (has_hidden_state(as_function(term->function)))
+        return term->input(0);
+    else
+        return NULL;
 }
 
 } // namespace circa
