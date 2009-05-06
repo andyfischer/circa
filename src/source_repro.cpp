@@ -116,7 +116,7 @@ std::string get_term_source(Term* term)
 
         for (int i=0; i < term->numInputs(); i++) {
             // don't show the hidden state input for subroutines
-            if (is_subroutine(term->function) && i == 0)
+            if (has_hidden_state(as_function(term->function)) && i == 0)
                 continue;
 
             result << get_source_of_input(term, i);

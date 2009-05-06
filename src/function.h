@@ -33,6 +33,7 @@ struct Function
     RefList inputTypes;
     InputPropertiesList inputProperties;
     Ref outputType;
+    Ref hiddenStateType;
 
     bool pureFunction;
     bool hasSideEffects;

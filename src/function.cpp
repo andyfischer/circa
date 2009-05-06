@@ -6,6 +6,7 @@ namespace circa {
 
 Function::Function()
   : outputType(NULL),
+    hiddenStateType(NULL),
     pureFunction(false),
     hasSideEffects(false),
     variableArgs(false),

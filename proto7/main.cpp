@@ -66,15 +66,16 @@ void mouse_clicked(circa::Term* caller)
 {
     static int unassignedId = 1;
 
-    int id = as_int(caller->state);
-    //std::cout << "id = " << id << std::endl;
+    int& id = get_hidden_state_for_call(caller)->asInt();
     
     // check to give this term an ID
     if (id == 0)
-        as_int(caller->state) = unassignedId++;
+        id = unassignedId++;
+
+    std::cout << "id = " << id << std::endl;
 
     // check if we just clicked this thing
-    Term* box = caller->input(0);
+    Term* box = caller->input(1);
     if (MOUSE_JUST_CLICKED &&
         (as_branch(box)[0]->asFloat() < MOUSE_X) &&
         (as_branch(box)[1]->asFloat() < MOUSE_Y) &&
@@ -84,9 +85,6 @@ void mouse_clicked(circa::Term* caller)
     }
     
     as_bool(caller) = id == MOUSE_CLICK_ACCEPTED_ID;
-
-    //std::cout << "MOUSE_CLICK_ACCEPTED_ID = " << MOUSE_CLICK_ACCEPTED_ID << std::endl;
-    //std::cout << "MOUSE_CLICK_FOUND_ID = " << MOUSE_CLICK_FOUND_ID << std::endl;
 }
 
 void handle_key_press(SDL_Event event, int key)
@@ -159,8 +157,7 @@ int main( int argc, char* args[] )
     circa::int_value(circa::KERNEL, SDLK_RIGHT, "KEY_RIGHT");
     circa::int_value(circa::KERNEL, SDLK_SPACE, "KEY_SPACE");
     MOUSE_CLICKED_FUNCTION = circa::import_function(
-        *circa::KERNEL, mouse_clicked, "mouse_clicked(List) : bool");
-    circa::as_function(MOUSE_CLICKED_FUNCTION).stateType = circa::INT_TYPE;
+        *circa::KERNEL, mouse_clicked, "mouse_clicked(state int, List) : bool");
     sdl_wrapper::register_functions(*circa::KERNEL);
 
     // Load the target script

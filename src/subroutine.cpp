@@ -19,6 +19,10 @@ void initialize_as_subroutine(Function& func)
         source_set_hidden(placeholder, true);
     }
 
+    func.hiddenStateType = BRANCH_TYPE;
+
+    assert(has_hidden_state(func)); // sanity check
+
     func.prependInput(BRANCH_TYPE, "#state");
 }
 

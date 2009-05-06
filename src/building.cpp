@@ -90,11 +90,12 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
         function = get_value_function(function);
     }
 
-    // If 'function' is a subroutine, then create a container for its state
-    if (is_subroutine(function))
+    // If 'function' has hidden state, then create a container for that state
+    if (has_hidden_state(as_function(function)))
     {
-        Term* stateContainer = create_value(branch, BRANCH_TYPE);
+        Term* stateContainer = create_value(branch, as_function(function).hiddenStateType);
         source_set_hidden(stateContainer, true);
+        set_stateful(stateContainer, true);
         inputs.prepend(stateContainer);
     }
 

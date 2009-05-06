@@ -247,7 +247,17 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
 
     while (!tokens.nextIs(RPAREN) && !tokens.finished())
     {
+        bool isHiddenStateArgument = false;
+
         possible_whitespace(tokens);
+
+        // check for 'state' keyword
+        if (tokens.nextIs(STATE)) {
+            tokens.consume(STATE);
+            possible_whitespace(tokens);
+            isHiddenStateArgument = true;
+        }
+
 
         if (!tokens.nextIs(IDENTIFIER))
             return compile_error_for_line(result, tokens, startPosition);
@@ -267,6 +277,9 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
         Term* typeTerm = find_type(branch, type);
 
         func.appendInput(typeTerm, name);
+
+        if (isHiddenStateArgument)
+            func.hiddenStateType = typeTerm;
 
         // Variable args when ... is appended
         if (tokens.nextIs(ELLIPSIS)) {
