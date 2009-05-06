@@ -12,7 +12,6 @@ bool is_subroutine(Term* term)
 void initialize_as_subroutine(Function& func)
 {
     func.evaluate = Function::subroutine_call_evaluate;
-    func.stateType = BRANCH_TYPE;
 
     for (int input=0; input < func.numInputs(); input++) {
         Term *placeholder = create_value(&func.subroutineBranch,

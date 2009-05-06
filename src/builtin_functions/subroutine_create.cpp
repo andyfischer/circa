@@ -21,7 +21,6 @@ namespace subroutine_create_function {
         sub.inputTypes = as<RefList>(caller->input(1));
 
         sub.outputType = caller->input(2);
-        sub.stateType = BRANCH_TYPE;
 
         // Create input placeholders
         for (unsigned int index=0; index < sub.inputTypes.count(); index++) {

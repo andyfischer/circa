@@ -29,9 +29,6 @@ struct Term
     // Our function: the thing that takes our inputs (and possibly state), and produces a value.
     Ref function;
 
-    // Persisted internal value. Owned by us.
-    Ref state;
-
     // Our name binding.
     std::string name;
 

@@ -6,7 +6,6 @@ namespace circa {
 
 Function::Function()
   : outputType(NULL),
-    stateType(NULL),
     pureFunction(false),
     hasSideEffects(false),
     variableArgs(false),
@@ -99,7 +98,6 @@ void Function::copyExceptBranch(Term* sourceTerm, Term* destTerm)
     copy_field(inputTypes);
     copy_field(inputProperties);
     copy_field(outputType);
-    copy_field(stateType);
     copy_field(pureFunction);
     copy_field(hasSideEffects);
     copy_field(variableArgs);
@@ -129,7 +127,6 @@ void Function::remapPointers(Term* term, ReferenceMap const& map)
     Function &func = as_function(term);
     func.inputTypes.remapPointers(map);
     func.outputType = map.getRemapped(func.outputType);
-    func.stateType = map.getRemapped(func.stateType);
     func.subroutineBranch.remapPointers(map);
 }
 

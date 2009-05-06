@@ -134,11 +134,6 @@ std::string branch_to_string_raw(Branch& branch)
 
         out << term_to_raw_string(term) << std::endl;
 
-        if (term->state != NULL) {
-            for (int i=0; i < indent; i++) out << "  ";
-            out << "  state: " << term_to_raw_string(term->state) << std::endl;
-        }
-
         if (get_inner_branch(term) != NULL)
             indent++;
     }
@@ -147,9 +142,6 @@ std::string branch_to_string_raw(Branch& branch)
 
 bool function_allows_term_reuse(Function &function)
 {
-    if ((function.stateType != VOID_TYPE) && (function.stateType != NULL))
-        return false;
-
     if (!function.pureFunction)
         return false;
 
