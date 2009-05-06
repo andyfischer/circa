@@ -121,10 +121,20 @@ void test_duplicate_subroutine()
 void test_duplicate_get_field_by_name()
 {
     Branch branch;
-    branch.eval("type mytype { int a }");
-    branch.eval("");
-    //apply(&branch, GET_FIELD_BY_NAME_FUNC, 
-    //TODO
+    branch.eval("type mytype { int f }");
+    branch.eval("v = mytype()");
+    Term* b = branch.eval("b = v.f");
+
+    test_assert(b->function == GET_FIELD_BY_NAME_FUNC);
+    test_equals(b->stringProperty("field-name"), "f");
+
+    Branch duped_branch;
+    duplicate_branch(branch, duped_branch);
+
+    b = duped_branch["b"];
+
+    test_assert(b->function == GET_FIELD_BY_NAME_FUNC);
+    test_equals(b->stringProperty("field-name"), "f");
 }
 
 void find_name_in_outer_branch()
