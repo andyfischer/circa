@@ -15,12 +15,15 @@ void initialize_as_subroutine(Function& func)
     func.stateType = BRANCH_TYPE;
 
     for (int input=0; input < func.numInputs(); input++) {
-        Term *placeholder = create_value(&func.subroutineBranch, func.inputType(input), func.getInputProperties(input).name);
+        Term *placeholder = create_value(&func.subroutineBranch,
+                func.inputType(input), func.getInputProperties(input).name);
         source_set_hidden(placeholder, true);
     }
+
+    func.prependInput(BRANCH_TYPE, "#state");
 }
 
-void initialize_subroutine_call(Term* term)
+void initialize_subroutine_state(Term* term)
 {
     Function &def = as_function(term->function);
 
@@ -31,10 +34,10 @@ void initialize_subroutine_call(Term* term)
 void
 Function::subroutine_call_evaluate(Term* caller)
 {
-    Branch &branch = as_branch(caller->state);
+    Branch &branch = as_branch(caller->input(0));
 
     if (branch.numTerms() == 0)
-        initialize_subroutine_call(caller);
+        initialize_subroutine_state(caller);
 
     Function &sub = as_function(caller->function);
 
@@ -47,7 +50,7 @@ Function::subroutine_call_evaluate(Term* caller)
     }
 
     // Implant inputs
-    for (unsigned int input=0; input < sub.inputTypes.count(); input++) {
+    for (unsigned int input=1; input < sub.inputTypes.count(); input++) {
 
         std::string inputName = sub.getInputProperties(input).name;
 

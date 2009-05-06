@@ -41,6 +41,14 @@ void Function::appendInput(Term* type, std::string const& name)
     getInputProperties(inputTypes.count()-1).name = name;
 }
 
+void Function::prependInput(Term* type, std::string const& name)
+{
+    InputProperties props;
+    props.name = name;
+    inputTypes.prepend(type);
+    inputProperties.insert(inputProperties.begin(), props);
+}
+
 Function::InputProperties&
 Function::getInputProperties(unsigned int index)
 {
@@ -142,12 +150,19 @@ Function::functionToSourceString(Term* term)
 
     result << "def " << func.name << "(";
 
+    bool first = true;
     for (int i=0; i < func.numInputs(); i++) {
-        if (i > 0) result << ", ";
+        std::string name = func.getInputProperties(i).name;
+
+        if (name == "#state")
+            continue;
+
+        if (!first) result << ", ";
+        first = false;
         result << func.inputType(i)->name;
 
         if (func.getInputProperties(i).name != "")
-            result << " " << func.getInputProperties(i).name;
+            result << " " << name;
     }
 
     result << ")";

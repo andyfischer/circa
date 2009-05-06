@@ -81,6 +81,11 @@ struct RefList
             throw std::runtime_error("too many items");
     }
 
+    void prepend(Term* term)
+    {
+        _items.insert(_items.begin(), term);
+    }
+
     // Add 'term' to this list, if it's not in the list already
     void appendUnique(Term* term)
     {

@@ -60,6 +60,7 @@ struct Function
     Term* inputType(int index);
     int numInputs();
     void appendInput(Term* type, std::string const& name);
+    void prependInput(Term* type, std::string const& name);
     InputProperties& getInputProperties(unsigned int index);
     void setInputMeta(int index, bool value);
     void setInputModified(int index, bool value);
