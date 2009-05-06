@@ -17,6 +17,7 @@
 #include "runtime.h"
 #include "stateful_code.h"
 #include "source_repro.h"
+#include "subroutine.h"
 #include "term.h"
 #include "testing.h"
 #include "tokenizer.h"
