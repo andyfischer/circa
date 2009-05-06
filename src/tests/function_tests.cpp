@@ -44,9 +44,8 @@ void subroutine_stateful_term()
 
     // Make sure that stateful terms work correctly
     Term* call = branch.eval("mysub()");
-    std::cout << call->getErrorMessage();
     test_assert(!call->hasError);
-    Term* a_inside_call = as_branch(call->state)["a"];
+    Term* a_inside_call = get_state_for_subroutine_call(call)["a"];
     test_equals(as_float(a_inside_call), 1);
     evaluate_term(call);
     test_equals(as_float(a_inside_call), 2);
@@ -56,7 +55,7 @@ void subroutine_stateful_term()
     // Make sure that subsequent calls to this subroutine don't share
     // the same stateful value.
     Term* another_call = branch.eval("mysub()");
-    Term* a_inside_another_call = as_branch(another_call->state)["a"];
+    Term* a_inside_another_call = get_state_for_subroutine_call(another_call)["a"];
     test_assert(a_inside_call != a_inside_another_call);
     test_equals(as_float(a_inside_another_call), 1);
     evaluate_term(another_call);
@@ -68,7 +67,7 @@ void register_tests()
 {
     REGISTER_TEST_CASE(function_tests::create);
     REGISTER_TEST_CASE(function_tests::subroutine_binding_input_names);
-    //FIXME REGISTER_TEST_CASE(function_tests::subroutine_stateful_term);
+    REGISTER_TEST_CASE(function_tests::subroutine_stateful_term);
 }
 
 } // namespace function_tests
