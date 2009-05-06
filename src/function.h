@@ -75,15 +75,7 @@ struct Function
 bool is_function(Term* term);
 Function& as_function(Term*);
 
-bool is_subroutine(Term* term);
-
-void initialize_as_subroutine(Function& func);
-
 std::string get_placeholder_name_for_index(int index);
-
-void initialize_subroutine_call(Term* term);
-Branch& call_subroutine(Branch& branch, std::string const& functionName);
-Branch& get_subroutine_branch(Term* term);
 
 Term* create_empty_function(Branch& branch, std::string const& header);
 
