@@ -115,7 +115,10 @@ std::string get_term_source(Term* term)
         result << term->stringProperty("syntaxHints:functionName") << "(";
 
         for (int i=0; i < term->numInputs(); i++) {
-            //if (i > 0) result << ",";
+            // don't show the hidden state input for subroutines
+            if (is_subroutine(term->function) && i == 0)
+                continue;
+
             result << get_source_of_input(term, i);
         }
         result << ")";

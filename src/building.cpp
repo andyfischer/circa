@@ -106,8 +106,8 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     // If 'function' is a subroutine, then create a container for its state
     if (is_subroutine(function))
     {
-        std::cout << "is subroutine: " << function->name << std::endl;
-        Term* stateContainer = create_value(branch, BRANCH_TYPE, function->name + "_state");
+        Term* stateContainer = create_value(branch, BRANCH_TYPE);
+        source_set_hidden(stateContainer, true);
         inputs.prepend(stateContainer);
     }
 

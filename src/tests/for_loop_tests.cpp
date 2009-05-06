@@ -32,26 +32,6 @@ void test_simple()
     test_assert(gSpyResults[4] == 4);
 }
 
-void test_subroutine_call()
-{
-    /*
-    Branch branch;
-
-    Term* sub = branch.compile("def myfunc()\nfor i in range(5)\ni\nend\nend");
-
-    Term* forTerm = as_function(sub).subroutineBranch[2];
-
-    test_assert(forTerm->function == FOR_FUNC);
-
-    test_equals("i", get_for_loop_iterator(forTerm)->name);
-
-    Term* call = branch.compile("myfunc()");
-    Term* forTermInsideCall = as_branch(call->state)[2];
-    test_assert(forTermInsideCall->function == FOR_FUNC);
-    test_equals("i", get_for_loop_iterator(forTermInsideCall)->name);
-    */
-}
-
 void test_state()
 {
     Branch branch;
@@ -75,7 +55,6 @@ void test_state()
 void register_tests()
 {
     REGISTER_TEST_CASE(for_loop_tests::test_simple);
-    REGISTER_TEST_CASE(for_loop_tests::test_subroutine_call);
     //FIXME REGISTER_TEST_CASE(for_loop_tests::test_state);
 }
 

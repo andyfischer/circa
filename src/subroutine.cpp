@@ -23,21 +23,20 @@ void initialize_as_subroutine(Function& func)
     func.prependInput(BRANCH_TYPE, "#state");
 }
 
-void initialize_subroutine_state(Term* term)
+void initialize_subroutine_state(Term* term, Branch& state)
 {
     Function &def = as_function(term->function);
-
-    as_branch(term->state).clear();
-    duplicate_branch(def.subroutineBranch, as_branch(term->state));
+    state.clear();
+    duplicate_branch(def.subroutineBranch, state);
 }
 
 void
 Function::subroutine_call_evaluate(Term* caller)
 {
-    Branch &branch = as_branch(caller->input(0));
+    Branch &branch = get_state_for_subroutine_call(caller);
 
     if (branch.numTerms() == 0)
-        initialize_subroutine_state(caller);
+        initialize_subroutine_state(caller, branch);
 
     Function &sub = as_function(caller->function);
 
@@ -71,9 +70,9 @@ Function::subroutine_call_evaluate(Term* caller)
     }
 }
 
-Branch& get_subroutine_branch(Term* term)
+Branch& get_state_for_subroutine_call(Term* term)
 {
-    return as_function(term).subroutineBranch;
+    return as_branch(term->input(0));
 }
 
 } // namespace circa
