@@ -1,27 +1,5 @@
--- Copyright 2009 Paul Hodge
-
--- std functions
-
--- these values are passed to us from main.cpp
-state mouse_x = 0.0
-state mouse_y = 0.0
-state time = 0.0
-state elapsed = 0.0
 
 background(0xeeeeeeff)
-
-type Point { float x, float y }
-
--- p2c: polar to cartesian
-def p2c(float angle, float radius, Point center) : Point
-  return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
-end
-
-def point_add(Point a, Point b) :Point
-  return [a.x + b.x, a.y + b.y]
-end
-
--- our code
 
 def interp(float progress, float e) :float
   return min(progress / e, 1.0)
@@ -29,7 +7,6 @@ end
 
 SCREEN_WIDTH = 480
 SCREEN_HEIGHT = 600
-
 
 def tree_segment(Point base, float direction, float width, float depth)
   state jitter = (rand() - .5) *.3

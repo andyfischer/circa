@@ -88,6 +88,7 @@ struct Term
     // Convenience accessors
     int& asInt();
     float& asFloat();
+    float toFloat();
     std::string& asString();
     bool& asBool();
     Ref& asRef();

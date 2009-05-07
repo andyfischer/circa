@@ -24,7 +24,8 @@ int MOUSE_CLICK_FOUND_ID = 0;
 int MOUSE_CLICK_ACCEPTED_ID = 0;
 
 SDL_Surface* SCREEN = NULL;
-circa::Branch SCRIPT_MAIN;
+Branch* SCRIPT_ROOT = NULL;
+Branch* USERS_BRANCH = NULL;
 bool CONTINUE_MAIN_LOOP = true;
 
 circa::RefList INFLUENCE_LIST;
@@ -39,9 +40,8 @@ int drag_start_y = 0;
 
 long prev_sdl_ticks = 0;
 
-circa::Ref THING_JUST_CLICKED;
-
-circa::Ref MOUSE_CLICKED_FUNCTION;
+Ref THING_JUST_CLICKED;
+Ref MOUSE_CLICKED_FUNCTION;
 
 void initialize_keydown()
 {
@@ -104,17 +104,16 @@ void handle_key_press(SDL_Event event, int key)
     if (event.key.keysym.mod & KMOD_CTRL) {
         switch(event.key.keysym.sym) {
         case SDLK_s:
-            circa::persist_branch_to_file(SCRIPT_MAIN);
+            circa::persist_branch_to_file(*USERS_BRANCH);
             std::cout << "Saved" << std::endl;
             break;
 
         case SDLK_p:
-            std::cout << branch_to_string_raw(SCRIPT_MAIN);
+            std::cout << branch_to_string_raw(*USERS_BRANCH);
             break;
 
         case SDLK_r:
-            circa::reload_branch_from_file(SCRIPT_MAIN);
-            refresh_training_branch(SCRIPT_MAIN);
+            circa::reload_branch_from_file(*USERS_BRANCH);
             break;
 
         default: break;
@@ -129,35 +128,39 @@ int main( int argc, char* args[] )
 
     circa::initialize();
 
+    SCRIPT_ROOT = &create_branch(circa::KERNEL, "c2d_root");
+
     // Import functions
-    circa::import_function(*circa::KERNEL, key_down, "key_down(int) : bool");
-    circa::import_function(*circa::KERNEL, key_pressed, "key_pressed(int) : bool");
-    circa::int_value(circa::KERNEL, SDLK_UP, "KEY_UP");
-    circa::int_value(circa::KERNEL, SDLK_DOWN, "KEY_DOWN");
-    circa::int_value(circa::KERNEL, SDLK_LEFT, "KEY_LEFT");
-    circa::int_value(circa::KERNEL, SDLK_RIGHT, "KEY_RIGHT");
-    circa::int_value(circa::KERNEL, SDLK_SPACE, "KEY_SPACE");
+    circa::import_function(*SCRIPT_ROOT, key_down, "key_down(int) : bool");
+    circa::import_function(*SCRIPT_ROOT, key_pressed, "key_pressed(int) : bool");
+    circa::int_value(SCRIPT_ROOT, SDLK_UP, "KEY_UP");
+    circa::int_value(SCRIPT_ROOT, SDLK_DOWN, "KEY_DOWN");
+    circa::int_value(SCRIPT_ROOT, SDLK_LEFT, "KEY_LEFT");
+    circa::int_value(SCRIPT_ROOT, SDLK_RIGHT, "KEY_RIGHT");
+    circa::int_value(SCRIPT_ROOT, SDLK_SPACE, "KEY_SPACE");
     MOUSE_CLICKED_FUNCTION = circa::import_function(
-        *circa::KERNEL, mouse_clicked, "mouse_clicked(state int, List) : bool");
+        *SCRIPT_ROOT, mouse_clicked, "mouse_clicked(state int, List) : bool");
     circa::import_function(*circa::KERNEL, mouse_pressed, "mouse_pressed() : bool");
 
-    sdl_wrapper::register_functions(*circa::KERNEL);
+    sdl_wrapper::register_functions(*SCRIPT_ROOT);
 
-    // Load the target script
-    std::string filename;
-    if (argc > 1) filename = args[1];
-    else filename = "proto7/main.ca";
+    // Load runtime.ca
+    parse_file(*SCRIPT_ROOT, "c2d/runtime.ca");
 
-    std::cout << "Loading file: " << filename << std::endl;
+    // Load user's script
+    USERS_BRANCH = &SCRIPT_ROOT->get("users_branch")->asBranch();
 
-    circa::parse_file(SCRIPT_MAIN, filename);
-    refresh_training_branch(SCRIPT_MAIN);
+    if (argc > 1) {
+        std::string filename = args[1];
+        std::cout << "Loading file: " << filename << std::endl;
+        circa::parse_file(*USERS_BRANCH, filename);
+    }
 
-    // See if this script defined SCREEN_WIDTH or SCREEN_HEIGHT
-    if (SCRIPT_MAIN.contains("SCREEN_WIDTH"))
-        SCREEN_WIDTH = circa::to_float(SCRIPT_MAIN["SCREEN_WIDTH"]);
-    if (SCRIPT_MAIN.contains("SCREEN_HEIGHT"))
-        SCREEN_HEIGHT = circa::to_float(SCRIPT_MAIN["SCREEN_HEIGHT"]);
+    // Check if they defined SCREEN_WIDTH or SCREEN_HEIGHT
+    if (USERS_BRANCH->contains("SCREEN_WIDTH"))
+        SCREEN_WIDTH = USERS_BRANCH->get("SCREEN_WIDTH")->toFloat();
+    if (USERS_BRANCH->contains("SCREEN_HEIGHT"))
+        SCREEN_HEIGHT = USERS_BRANCH->get("SCREEN_HEIGHT")->toFloat();
 
     // Create the SDL surface
     SCREEN = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE );
@@ -206,18 +209,16 @@ int main( int argc, char* args[] )
 
                 MOUSE_JUST_CLICKED = true;
 
-                //THING_JUST_CLICKED = find_mouse_clicked(SCRIPT_MAIN, MOUSE_X, MOUSE_Y);
-
             } else if (event.type == SDL_MOUSEBUTTONUP) {
                 // draw a line
                 if (drag_in_progress) {
                     std::cout << "drawing a line" << std::endl;
-                    circa::apply(&SCRIPT_MAIN, "line", circa::RefList(
-                                circa::float_value(&SCRIPT_MAIN, drag_start_x),
-                                circa::float_value(&SCRIPT_MAIN, drag_start_y),
-                                circa::float_value(&SCRIPT_MAIN, MOUSE_X),
-                                circa::float_value(&SCRIPT_MAIN, MOUSE_Y),
-                                circa::int_value(&SCRIPT_MAIN, 0)));
+                    circa::apply(USERS_BRANCH, "line", circa::RefList(
+                                circa::float_value(USERS_BRANCH, drag_start_x),
+                                circa::float_value(USERS_BRANCH, drag_start_y),
+                                circa::float_value(USERS_BRANCH, MOUSE_X),
+                                circa::float_value(USERS_BRANCH, MOUSE_Y),
+                                circa::int_value(USERS_BRANCH, 0)));
                 }
 
                 drag_in_progress = false;
@@ -229,16 +230,16 @@ int main( int argc, char* args[] )
 
         long ticks = SDL_GetTicks();
 
-        circa::as_float(SCRIPT_MAIN["elapsed"]) = (ticks - prev_sdl_ticks) / 1000.0;
-        circa::as_float(SCRIPT_MAIN["time"]) = ticks / 1000.0;
+        SCRIPT_ROOT->get("elapsed")->asFloat() = (ticks - prev_sdl_ticks) / 1000.0;
+        SCRIPT_ROOT->get("time")->asFloat() = ticks / 1000.0;
 
         prev_sdl_ticks = ticks;
 
-        circa::as_float(SCRIPT_MAIN["mouse_x"]) = MOUSE_X;
-        circa::as_float(SCRIPT_MAIN["mouse_y"]) = MOUSE_Y;
+        SCRIPT_ROOT->get("mouse_x")->asFloat() = MOUSE_X;
+        SCRIPT_ROOT->get("mouse_y")->asFloat() = MOUSE_Y;
 
         try {
-            SCRIPT_MAIN.eval();
+            SCRIPT_ROOT->eval();
 
         } catch (std::exception &e) {
             std::cout << e.what() << std::endl;

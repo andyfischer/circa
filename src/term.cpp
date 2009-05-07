@@ -148,6 +148,11 @@ float& Term::asFloat()
     return as_float(this);
 }
 
+float Term::toFloat()
+{
+    return to_float(this);
+}
+
 std::string& Term::asString()
 {
     return as_string(this);
