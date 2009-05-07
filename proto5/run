@@ -1,2 +1,0 @@
-cd $CIRCA_HOME
-scons proto5 && proto5/bin $*
