@@ -46,20 +46,22 @@ void function_with_hidden_state_term()
 void test_load_and_save()
 {
     Branch branch;
-    Term* statefulTerm = branch.eval("state i = 1");
-    Term* value = create_value(NULL, BRANCH_TYPE);
-    Term* value_i = create_value(&as_branch(value), INT_TYPE, "i");
+    Term* statefulTerm = branch.eval("state i:int");
+    as_int(statefulTerm) = 1;
+
+    Branch state;
+    Term* value_i = create_value(&state, INT_TYPE, "i");
     as_int(value_i) = 5;
 
     test_assert(as_int(statefulTerm) == 1);
 
-    load_state_into_branch(value, branch);
+    load_state_into_branch(state, branch);
 
     test_assert(as_int(statefulTerm) == 5);
 
     as_int(statefulTerm) = 11;
 
-    persist_state_from_branch(branch, value);
+    persist_state_from_branch(branch, state);
 
     test_assert(as_int(value_i) == 11);
 }
@@ -131,6 +133,46 @@ void one_time_assignment()
     test_assert(as_int(s) == 5);
 }
 
+int NEXT_UNIQUE_OUTPUT = 0;
+
+void _unique_output(Term* caller)
+{
+    as_int(caller) = NEXT_UNIQUE_OUTPUT;
+    NEXT_UNIQUE_OUTPUT++;
+}
+
+std::vector<int> SPY_RESULTS;
+
+void _spy(Term* caller)
+{
+    SPY_RESULTS.push_back(as_int(caller->input(0)));
+}
+
+void one_time_assignment_inside_for_loop()
+{
+    Branch branch;
+
+    import_function(branch, _unique_output, "unique_output() : int");
+    import_function(branch, _spy, "spy(int)");
+    branch.compile("for i in [1 1 1]\nstate s = unique_output()\nspy(s)\nend");
+
+    SPY_RESULTS.clear();
+    evaluate_branch(branch);
+
+    test_assert(SPY_RESULTS.size() == 3);
+    test_assert(SPY_RESULTS[0] == 0);
+    test_assert(SPY_RESULTS[1] == 1);
+    test_assert(SPY_RESULTS[2] == 2);
+
+    SPY_RESULTS.clear();
+    evaluate_branch(branch);
+
+    test_assert(SPY_RESULTS.size() == 3);
+    test_assert(SPY_RESULTS[0] == 0);
+    test_assert(SPY_RESULTS[1] == 1);
+    test_assert(SPY_RESULTS[2] == 2);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_simple);
@@ -140,6 +182,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::stateful_value_evaluation);
     REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment);
+    REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
 }
 
 } // namespace stateful_code_tests

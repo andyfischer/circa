@@ -14,39 +14,35 @@ void set_stateful(Term* term, bool value)
     term->boolProp("stateful") = value;
 }
 
-void load_state_into_branch(Term* state, Branch& branch)
+void load_state_into_branch(Branch& state, Branch& branch)
 {
-    Branch& stateBranch = as_branch(state);
+    int read = 0;
 
-    for (int i=0; i < stateBranch.numTerms(); i++) {
-        Term* term = stateBranch[i];
+    for (int i=0; i < branch.numTerms(); i++) {
+        Term* term = branch[i];
 
-        std::string name = term->name;
-
-        if (name == "")
+        if (!is_stateful(term))
             continue;
 
-        Term* destination = branch.findFirstBinding(name);
+        if (read > state.numTerms())
+            return;
 
-        assign_value(term, destination);
+        assign_value(state[read++], branch[i]);
     }
 }
 
-void persist_state_from_branch(Branch& branch, Term* state)
+void persist_state_from_branch(Branch& branch, Branch& state)
 {
-    Branch& stateBranch = as_branch(state);
+    state.clear();
 
-    for (int i=0; i < stateBranch.numTerms(); i++) {
-        Term* term = stateBranch[i];
+    for (int i=0; i < branch.numTerms(); i++) {
+        Term* term = branch[i];
 
-        std::string name = term->name;
-
-        if (name == "")
+        if (!is_stateful(term))
             continue;
 
-        Term* source = branch[name];
-
-        assign_value(source, term);
+        Term* state_dup = create_value(&state, term->type, term->name);
+        assign_value(term, state_dup);
     }
 }
 
