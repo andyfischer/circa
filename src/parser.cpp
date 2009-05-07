@@ -599,8 +599,6 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         possible_whitespace(tokens);
         Term* initialValue = infix_expression(branch, tokens);
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
-        inputs.append(initialValue);
-
         result = apply(&branch, ONE_TIME_ASSIGN_FUNC, RefList(initialValue));
 
     } else {

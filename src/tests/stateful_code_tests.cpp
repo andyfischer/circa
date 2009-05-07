@@ -13,6 +13,11 @@ void test_simple()
     Term* i = branch.eval("state i :int");
     test_assert(is_stateful(i));
     test_assert(i->type == INT_TYPE);
+
+    Term* j = branch.eval("state i = 0");
+    test_assert(is_stateful(j));
+    test_assert(j->function == ONE_TIME_ASSIGN_FUNC);
+    test_assert(j->type == INT_TYPE);
 }
 
 void _empty_evaluate(Term*) {}
@@ -61,6 +66,7 @@ void test_load_and_save()
 
 void test_get_type_from_branches_stateful_terms()
 {
+    /*
     Branch branch;
     branch.eval("a = 0");
     branch.eval("state b = 2.2");
@@ -76,6 +82,7 @@ void test_get_type_from_branches_stateful_terms()
     test_assert(type[0]->type == FLOAT_TYPE);
     test_assert(is_value(type[0]));
     test_assert(type[1]->type == BOOL_TYPE);
+    */
 }
 
 void stateful_value_evaluation()

@@ -10,9 +10,6 @@ bool is_value(Term* term)
 {
     assert_good_pointer(term);
 
-    if (is_stateful(term))
-        return true;
-
     return term->function->function == VALUE_FUNCTION_GENERATOR;
 }
 

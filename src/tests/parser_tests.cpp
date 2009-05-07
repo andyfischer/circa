@@ -197,6 +197,7 @@ void test_stateful_value_decl()
     Term* b = parser::compile(&branch, parser::statement, "state b = 5.0");
     test_assert(b->name == "b");
     test_assert(is_stateful(b));
+
     test_assert(b->type == FLOAT_TYPE);
     test_assert(branch["b"] == b);
     test_assert(as_float(b) != 5.0); // shouldn't have this value yet

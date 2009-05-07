@@ -15,6 +15,12 @@ namespace assign_function {
             return;
         }*/
 
+        if (!value_fits_type(value, target->type)) {
+            error_occured(caller, "Tried to assign a " + value->type->name + " to a "
+                    + target->type->name);
+            return;
+        }
+
         assign_value(value, target);
     }
 

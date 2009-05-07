@@ -6,12 +6,12 @@ namespace circa {
 
 bool is_stateful(Term* term)
 {
-    return term->boolPropertyOptional("stateful", false);
+    return term->boolPropOptional("stateful", false);
 }
 
 void set_stateful(Term* term, bool value)
 {
-    term->boolProperty("stateful") = value;
+    term->boolProp("stateful") = value;
 }
 
 void load_state_into_branch(Term* state, Branch& branch)
