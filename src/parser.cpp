@@ -573,6 +573,8 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     std::string name = tokens.consume(IDENTIFIER);
     possible_whitespace(tokens);
 
+    Term* type = ANY_TYPE;
+
     // type annotation
     std::string typeName;
     if (tokens.nextIs(COLON)) {
@@ -584,32 +586,30 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 
         typeName = tokens.consume(IDENTIFIER);
         possible_whitespace(tokens);
+
+        type = find_type(branch, typeName);
     }
 
-    // Side note: I think it might make sense for the syntax "state i = 0" to have a different
-    // function than just "state i", since the two things act pretty differently.
+    Term* result = NULL;
 
-    RefList inputs;
-    Term* initialValue = NULL;
     if (tokens.nextIs(EQUALS)) {
+
+        // state i = initial_value
         tokens.consume();
         possible_whitespace(tokens);
-        initialValue = infix_expression(branch, tokens);
+        Term* initialValue = infix_expression(branch, tokens);
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
         inputs.append(initialValue);
+
+        result = apply(&branch, ONE_TIME_ASSIGN_FUNC, RefList(initialValue));
+
+    } else {
+        // state i
+        result = create_value(&branch, type);
     }
 
-    Term* result = apply(&branch, STATEFUL_VALUE_FUNC, inputs);
     branch.bindName(result, name);
-
     set_stateful(result, true);
-
-    if (typeName != "") {
-        Term* type = find_type(branch, typeName);
-        change_type(result, type);
-    } else if (initialValue != NULL) {
-        change_type(result, initialValue->type);
-    }
 
     return result;
 }
