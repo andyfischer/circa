@@ -56,8 +56,14 @@ std::string get_term_source(Term* term)
 
     result << term->stringPropOptional("syntaxHints:preWhitespace", "");
 
+    // for a stateful value, just write "state <name>"
+    if (is_value(term) && is_stateful(term)) {
+        result << "state " << term->name;
+        return result.str();
+    }
+
     // for values, check if the type has a toString function
-    if (is_value(term) && !is_stateful(term)) {
+    if (is_value(term)) {
 
         bool prependNameBinding = true;
 

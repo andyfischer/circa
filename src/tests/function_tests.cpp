@@ -16,7 +16,7 @@ void create()
 
     Term* sub = branch.eval("sub = subroutine_create('my-sub', tuple(int), string)");
 
-    test_assert(!sub->hasError);
+    test_assert(sub);
 
     test_assert(is_function(sub));
     test_assert(as_function(sub).name == "my-sub");
@@ -40,11 +40,11 @@ void subroutine_binding_input_names()
 void subroutine_stateful_term()
 {
     Branch branch;
-    branch.eval("def mysub()\nstate a :float = 0\na += 1\nend");
+    branch.eval("def mysub()\nstate a :float = 0.0\na += 1\nend");
 
     // Make sure that stateful terms work correctly
     Term* call = branch.eval("mysub()");
-    test_assert(!call->hasError);
+    test_assert(call);
     Term* a_inside_call = get_state_for_subroutine_call(call)["a"];
     test_equals(as_float(a_inside_call), 1);
     evaluate_term(call);
