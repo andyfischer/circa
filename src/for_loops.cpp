@@ -89,13 +89,13 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
         assign_value(listTerm->field(i), iterator);
 
         // Inject stateful terms
-        load_state_into_branch(stateBranch[i], codeBranch);
+        load_state_into_branch(stateBranch[i]->asBranch(), codeBranch);
 
         // Evaluate
         evaluate_branch(codeBranch);
 
         // Persist stateful terms
-        persist_state_from_branch(codeBranch, stateBranch[i]);
+        persist_state_from_branch(codeBranch, stateBranch[i]->asBranch());
     }
 }
 
