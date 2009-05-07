@@ -31,6 +31,21 @@ struct Branch
     Term* operator[](int index) const { return _terms[index]; }
     Ref& operator[](int index) { return _terms[index]; }
 
+    // Get the term with the given name.
+    Term* getNamed(std::string const& name) const
+    {
+        return names[name];
+    }
+
+    // Convenience syntax for getNamed
+    Term* operator[](std::string const& name) const { return getNamed(name); }
+
+    // Alternate version of getNamed
+    Term* get(std::string const& name) const
+    {
+        return names[name];
+    }
+
     void append(Term* term);
 
     void remove(std::string const& name);
@@ -43,20 +58,12 @@ struct Branch
         return names.contains(name);
     }
 
-    // Get the term with the given name.
-    Term* getNamed(std::string const& name) const
-    {
-        return names[name];
-    }
-
     // Find the first term with the given name binding.
     Term* findFirstBinding(std::string const& name) const;
 
     // Find the last term with the given name binding.
     Term* findLastBinding(std::string const& name) const;
 
-    // Convenience syntax for getNamed
-    Term* operator[](std::string const& name) const { return getNamed(name); }
 
     // Bind a name to a term
     void bindName(Term* term, std::string name);
@@ -87,6 +94,9 @@ struct Branch
 bool is_branch(Term* term);
 Branch& as_branch(Term* term);
 std::string get_name_for_attribute(std::string attribute);
+
+Branch& create_branch(Branch* owner, std::string const& name);
+
 void duplicate_branch(Branch& source, Branch& dest);
 
 void parse_file(Branch& branch, std::string const& filename);

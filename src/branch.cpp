@@ -259,6 +259,13 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
     }
 }
 
+Branch& create_branch(Branch* owner, std::string const& name)
+{
+    Term* term = create_value(owner, BRANCH_TYPE, name);
+    as_branch(term).outerScope = owner;
+    return as_branch(term);
+}
+
 void duplicate_branch(Branch& source, Branch& dest)
 {
     ReferenceMap newTermMap;

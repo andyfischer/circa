@@ -108,6 +108,10 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     if (name != "" && branch != NULL)
         branch->bindName(result, name);
 
+    // Temporary hack
+    if (function == BRANCH_FUNC)
+        as_branch(result).outerScope = branch;
+
     return result;
 }
 
