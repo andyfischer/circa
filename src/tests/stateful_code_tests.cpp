@@ -156,7 +156,9 @@ void one_time_assignment_inside_for_loop()
     import_function(branch, _spy, "spy(int)");
     branch.compile("for i in [1 1 1]\nstate s = unique_output()\nspy(s)\nend");
 
+    NEXT_UNIQUE_OUTPUT = 0;
     SPY_RESULTS.clear();
+
     evaluate_branch(branch);
 
     test_assert(SPY_RESULTS.size() == 3);
@@ -173,6 +175,35 @@ void one_time_assignment_inside_for_loop()
     test_assert(SPY_RESULTS[2] == 2);
 }
 
+void state_inside_lots_of_nested_functions()
+{
+    Branch branch;
+
+    import_function(branch, _unique_output, "unique_output() : int");
+    import_function(branch, _spy, "spy(int)");
+
+    branch.compile("def func1()\nstate s = unique_output()\nspy(s)\nend");
+    branch.compile("def func2()\nfunc1()\nend");
+    branch.compile("def func3()\nfunc2()\nend");
+    branch.compile("def func4()\nfunc3()\nend");
+
+    NEXT_UNIQUE_OUTPUT = 11;
+    SPY_RESULTS.clear();
+
+    Term* call1 = branch.compile("func4()");
+    evaluate_branch(branch);
+
+    test_assert(SPY_RESULTS.size() == 1);
+    test_assert(SPY_RESULTS[0] == 11);
+
+    SPY_RESULTS.clear();
+
+    evaluate_branch(branch);
+
+    test_assert(SPY_RESULTS.size() == 1);
+    test_assert(SPY_RESULTS[0] == 11);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_simple);
@@ -183,6 +214,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment);
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
+    REGISTER_TEST_CASE(stateful_code_tests::state_inside_lots_of_nested_functions);
 }
 
 } // namespace stateful_code_tests

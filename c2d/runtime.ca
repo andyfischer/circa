@@ -22,4 +22,11 @@ def highlight_point(Point p)
   circle(p.x p.y _point_highlight_dist 0xffffff55)
 end
 
+_closest_draggable_point = 0
+
+def draggable_point(Point p)
+  state id = unique_id()
+end
+
+-- in main.cpp, we load the user's script into this branch:
 users_branch = branch()
