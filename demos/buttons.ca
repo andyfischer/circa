@@ -46,7 +46,12 @@ highlight_color = 0x555555ff
 click_color = 0xff00ffff
 
 current_y = loc.y
+
+state clicked_button = 0
+
 for button in buttons
+  state id = unique_id()
+
   button_loc = [loc.x, current_y] : Point
   b = [button_loc.x, button_loc.y, button_loc.x+button_size.x,
        button_loc.y+button_size.y]:Box
@@ -58,13 +63,11 @@ for button in buttons
     color = normal_color
   end
 
-  state clicked = false
   if mouse_clicked(b)
-    clicked = true
-    print('clicked: ' button)
+    clicked_button = id
   end
 
-  if clicked
+  if clicked_button == id
     color = click_color
   end
     
