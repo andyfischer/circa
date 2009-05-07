@@ -5,7 +5,7 @@ end
 
 print_success(0.0)
 
-def square(float a) -> float
+def square(float a) : float
     return mult(a,a)
 end
 

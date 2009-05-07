@@ -32,7 +32,7 @@ namespace branch_to_source_text_function {
     void setup(Branch& kernel)
     {
         Term* main_func = import_function(kernel, evaluate,
-                "branch_to_source_text(Branch) -> string");
+                "branch_to_source_text(Branch) : string");
         as_function(main_func).pureFunction = true;
     }
 }

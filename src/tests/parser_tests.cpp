@@ -146,7 +146,7 @@ void test_function_decl()
 {
     Branch branch;
     Term* funcTerm = parser::compile(&branch, parser::statement,
-            "def Myfunc(string what, string hey, int yo) -> bool\n"
+            "def Myfunc(string what, string hey, int yo) : bool\n"
             "  whathey = concat(what,hey)\n"
             "  return yo > 3\n"
             "end");

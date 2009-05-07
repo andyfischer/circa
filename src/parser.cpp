@@ -300,8 +300,8 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
 
     possible_whitespace(tokens);
 
-    if (tokens.nextIs(COLON) || tokens.nextIs(RIGHT_ARROW)) {
-        tokens.consume();
+    if (tokens.nextIs(COLON)) {
+        tokens.consume(COLON);
         possible_whitespace(tokens);
 
         if (!tokens.nextIs(IDENTIFIER))

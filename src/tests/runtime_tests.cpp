@@ -20,7 +20,7 @@ void i_only_throw_errors(Term* caller)
 void init_test_functions(Branch& branch)
 {
     import_function(branch, spy_function, "spy(string)");
-    import_function(branch, i_only_throw_errors, "i_only_throw_errors() -> string");
+    import_function(branch, i_only_throw_errors, "i_only_throw_errors() : string");
 }
 
 void test_simple()
