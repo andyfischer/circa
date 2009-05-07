@@ -602,10 +602,11 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     Term* result = apply(&branch, STATEFUL_VALUE_FUNC, inputs);
     branch.bindName(result, name);
 
+    set_stateful(result, true);
+
     if (typeName != "") {
         Term* type = find_type(branch, typeName);
         change_type(result, type);
-        //alloc_value(result);
     } else if (initialValue != NULL) {
         change_type(result, initialValue->type);
     }
