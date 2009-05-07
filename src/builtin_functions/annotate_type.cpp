@@ -26,7 +26,7 @@ namespace annotate_type_function {
 
     void setup(Branch& kernel)
     {
-        ANNOTATE_TYPE_FUNC = import_function(kernel, evaluate, "annotate_type(any,Type) -> any");
+        ANNOTATE_TYPE_FUNC = import_function(kernel, evaluate, "annotate_type(any,Type) : any");
         as_function(ANNOTATE_TYPE_FUNC).specializeType = specializeType;
     }
 }

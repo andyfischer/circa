@@ -15,7 +15,7 @@ namespace create_compound_type_function {
 
     void setup(Branch& kernel)
     {
-        Term* main = import_function(kernel, evaluate, "create_compound_type(string) -> Type");
+        Term* main = import_function(kernel, evaluate, "create_compound_type(string) : Type");
         as_function(main).pureFunction = true;
     }
 }

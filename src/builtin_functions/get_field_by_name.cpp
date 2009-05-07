@@ -20,7 +20,7 @@ namespace get_field_by_name_function {
     void setup(Branch& kernel)
     {
         GET_FIELD_BY_NAME_FUNC = import_function(kernel, evaluate,
-                "get_field_by_name(any) -> any");
+                "get_field_by_name(any) : any");
         as_function(GET_FIELD_BY_NAME_FUNC).pureFunction = true;
     }
 }

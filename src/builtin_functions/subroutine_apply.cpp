@@ -19,7 +19,7 @@ namespace subroutine_apply_function {
     void setup(Branch& kernel)
     {
         import_function(kernel, evaluate,
-            "subroutine_apply(Function, string) -> Function");
+            "subroutine_apply(Function, string) : Function");
     }
 }
 }

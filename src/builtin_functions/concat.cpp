@@ -16,7 +16,7 @@ namespace concat_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "concat(string...) -> string");
+        Term* main_func = import_function(kernel, evaluate, "concat(string...) : string");
         as_function(main_func).pureFunction = true;
     }
 }
