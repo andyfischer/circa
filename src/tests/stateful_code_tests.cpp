@@ -7,6 +7,37 @@
 namespace circa {
 namespace stateful_code_tests {
 
+void test_simple()
+{
+    Branch branch;
+    Term* i = branch.eval("state i :int");
+    test_assert(is_stateful(i));
+    test_assert(i->type == INT_TYPE);
+}
+
+void _empty_evaluate(Term*) {}
+
+void function_with_hidden_state_term()
+{
+    Branch branch;
+    Term* myfunc = import_function(branch, _empty_evaluate, "myfunc(state int)");
+    Term* call_1 = branch.eval("myfunc()");
+    Term* call_1_state = get_hidden_state_for_call(call_1);
+
+    test_assert(branch[0] == myfunc);
+    test_assert(branch[1] == call_1_state);
+    test_assert(branch[2] == call_1);
+    test_assert(is_stateful(call_1_state));
+    test_assert(!is_stateful(call_1));
+
+    Term* call_2 = branch.eval("myfunc()");
+    Term* call_2_state = get_hidden_state_for_call(call_2);
+
+    test_assert(is_stateful(call_2_state));
+    test_assert(!is_stateful(call_2));
+    test_assert(call_1_state != call_2_state);
+}
+
 void test_load_and_save()
 {
     Branch branch;
@@ -73,6 +104,8 @@ void initialize_from_expression()
 
 void register_tests()
 {
+    REGISTER_TEST_CASE(stateful_code_tests::test_simple);
+    REGISTER_TEST_CASE(stateful_code_tests::function_with_hidden_state_term);
     REGISTER_TEST_CASE(stateful_code_tests::test_load_and_save);
     REGISTER_TEST_CASE(stateful_code_tests::test_get_type_from_branches_stateful_terms);
     REGISTER_TEST_CASE(stateful_code_tests::stateful_value_evaluation);

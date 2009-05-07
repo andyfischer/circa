@@ -6,7 +6,7 @@ namespace circa {
 
 bool is_stateful(Term* term)
 {
-    return term->function == STATEFUL_VALUE_FUNC;
+    return term->boolPropertyOptional("stateful", false);
 }
 
 void set_stateful(Term* term, bool value)
