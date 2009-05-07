@@ -87,6 +87,11 @@ void mouse_clicked(circa::Term* caller)
     as_bool(caller) = id == MOUSE_CLICK_ACCEPTED_ID;
 }
 
+void mouse_pressed(circa::Term* caller)
+{
+    as_bool(caller) = MOUSE_JUST_CLICKED;
+}
+
 void handle_key_press(SDL_Event event, int key)
 {
     // unmodified keys
@@ -119,28 +124,6 @@ void handle_key_press(SDL_Event event, int key)
     }
 }
 
-/*
-Term* find_mouse_clicked(Branch& branch, int mouse_x, int mouse_y)
-{
-    Term* result = NULL;
-
-    // todo: use an iterator that only descends down active branches
-    for (circa::CodeIterator it(&branch); !it.finished(); ++it) {
-        if (it->function == MOUSE_CLICKED_FUNCTION) {
-            Term* box = it->input(0);
-            if ((as_branch(box)[0]->asFloat() < mouse_x) &&
-                (as_branch(box)[1]->asFloat() < mouse_y) &&
-                (as_branch(box)[2]->asFloat() > mouse_y) &&
-                (as_branch(box)[3]->asFloat() > mouse_y)) {
-                result = *it;
-            }
-        }
-    }
-
-    return result;
-}
-*/
-
 int main( int argc, char* args[] )
 {
     // Initialize stuff
@@ -158,6 +141,8 @@ int main( int argc, char* args[] )
     circa::int_value(circa::KERNEL, SDLK_SPACE, "KEY_SPACE");
     MOUSE_CLICKED_FUNCTION = circa::import_function(
         *circa::KERNEL, mouse_clicked, "mouse_clicked(state int, List) : bool");
+    circa::import_function(*circa::KERNEL, mouse_pressed, "mouse_pressed() : bool");
+
     sdl_wrapper::register_functions(*circa::KERNEL);
 
     // Load the target script

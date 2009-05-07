@@ -4,6 +4,7 @@
 
 state mouse_x = 0.0
 state mouse_y = 0.0
+state elapsed = 0.0
 state time = 0.0
 
 background(0xeeeeeeff)
@@ -38,6 +39,7 @@ def draw_star(Star star)
     if p % 2 == 0
       rad = inner_radius
     end
+    -- this is currently broken, it requires the ability to remap a for-loop iterator
     p = p2c((p + 0.5) * 2*PI / 10 + star.rot + time*star.speed, rad, star.loc)
   end
   shape(points, 0xff3399ff)
