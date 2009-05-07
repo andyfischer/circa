@@ -135,6 +135,5 @@ elif WINDOWS:
 SDL_ENV.Append(CPPPATH=['src'])
 SDL_ENV.Append(LIBS = [circa_staticlib])
 
-for app_name in read_file_as_lines('build_apps'):
-    prog = SDL_ENV.Program(path_join(app_name,'app'), app_name+'/main.cpp')
-    SDL_ENV.Alias(app_name, prog)
+c2d_bin = SDL_ENV.Program('build/bin/c2d', 'c2d/main.cpp')
+SDL_ENV.Alias('c2d', c2d_bin)

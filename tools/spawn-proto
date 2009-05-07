@@ -1,4 +1,0 @@
-cd $CIRCA_HOME
-echo "$2" >> build_apps
-cp -r $1 $2
-sed -i '' s/$1/$2/g $2/*
