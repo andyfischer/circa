@@ -66,12 +66,11 @@ void test_load_and_save()
 
 void test_get_type_from_branches_stateful_terms()
 {
-    /*
     Branch branch;
     branch.eval("a = 0");
-    branch.eval("state b = 2.2");
+    branch.eval("state b:float");
     branch.eval("c = 'hello'");
-    branch.eval("state d = false");
+    branch.eval("state d:bool");
 
     Branch type;
     
@@ -82,7 +81,6 @@ void test_get_type_from_branches_stateful_terms()
     test_assert(type[0]->type == FLOAT_TYPE);
     test_assert(is_value(type[0]));
     test_assert(type[1]->type == BOOL_TYPE);
-    */
 }
 
 void stateful_value_evaluation()
@@ -109,6 +107,30 @@ void initialize_from_expression()
     test_equals(as_float(c), 6);
 }
 
+void one_time_assignment()
+{
+    Branch branch;
+    Term* a = int_value(&branch, 3, "a");
+    Term* s = branch.compile("state s = a");
+
+    // change value before evaluate_branch, to make sure it's not stored
+    // at compile time.
+    as_int(a) = 5;
+    evaluate_branch(branch);
+    test_assert(s);
+    test_assert(as_int(s) == 5);
+
+    // now make sure a subsequent evaluation doesn't change 's'
+    as_int(a) = 7;
+    evaluate_branch(branch);
+    test_assert(s);
+    test_assert(as_int(s) == 5);
+    as_int(a) = 9;
+    evaluate_branch(branch);
+    test_assert(s);
+    test_assert(as_int(s) == 5);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_simple);
@@ -117,6 +139,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::test_get_type_from_branches_stateful_terms);
     REGISTER_TEST_CASE(stateful_code_tests::stateful_value_evaluation);
     REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);
+    REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment);
 }
 
 } // namespace stateful_code_tests
