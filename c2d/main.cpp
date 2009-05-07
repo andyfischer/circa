@@ -72,8 +72,6 @@ void mouse_clicked(circa::Term* caller)
     if (id == 0)
         id = unassignedId++;
 
-    std::cout << "id = " << id << std::endl;
-
     // check if we just clicked this thing
     Term* box = caller->input(1);
     if (MOUSE_JUST_CLICKED &&

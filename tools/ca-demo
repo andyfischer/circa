@@ -1,0 +1,3 @@
+cd $CIRCA_HOME
+scons c2d
+c2d demos/$1.ca
