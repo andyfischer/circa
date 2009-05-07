@@ -1,0 +1,19 @@
+a = 1.0
+
+a := 2.0
+
+print('a: ' a)
+
+b = 'goodbye'
+b := 'hello'
+print(b)
+
+c = 5
+
+def modify_c(int i)
+  c := i
+end
+
+print('c: ' c)
+modify_c(3)
+print('c: ' c)
