@@ -108,7 +108,7 @@ void wrap_up_branch(Branch& branch)
             if (result == term)
                 continue;
 
-            apply(&branch, ASSIGN_FUNC, RefList(result, term));
+            apply(&branch, ASSIGN_FUNC, RefList(term, result));
         }
     }
 }

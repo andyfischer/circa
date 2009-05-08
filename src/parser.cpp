@@ -775,7 +775,7 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "==") return "equals";
     else if (infix == "||") return "or";
     else if (infix == "&&") return "and";
-    else if (infix == ":=") return "apply_feedback";
+    else if (infix == ":=") return "assign";
     else if (infix == "+=") return "add";
     else if (infix == "-=") return "sub";
     else if (infix == "*=") return "mult";
