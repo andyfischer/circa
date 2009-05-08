@@ -31,12 +31,12 @@ namespace if_expr_function {
         return ANY_TYPE;
     }
 
-    void generateTraining(Branch& branch, Term* subject, Term* desired)
+    void generateFeedback(Branch& branch, Term* subject, Term* desired)
     {
         if (as_bool(subject->input(0)))
-            generate_training(branch, subject->input(1), desired);
+            generate_feedback(branch, subject->input(1), desired);
         else
-            generate_training(branch, subject->input(2), desired);
+            generate_feedback(branch, subject->input(2), desired);
     }
 
     void setup(Branch& kernel)
@@ -46,7 +46,7 @@ namespace if_expr_function {
         as_function(IF_EXPR_FUNC).pureFunction = true;
         as_function(IF_EXPR_FUNC).setInputMeta(1, true);
         as_function(IF_EXPR_FUNC).setInputMeta(2, true);
-        as_function(IF_EXPR_FUNC).generateTraining = generateTraining;
+        as_function(IF_EXPR_FUNC).generateFeedback = generateFeedback;
     }
 }
 }

@@ -17,7 +17,7 @@ void train_addition1()
     b->boolProp("trainable") = true;
 
     Branch tbranch;
-    generate_training(tbranch, b, tbranch.eval("4.0"));
+    generate_feedback(tbranch, b, tbranch.eval("4.0"));
 
     test_equals(as_float(a), 1.0);
 
@@ -38,7 +38,7 @@ void train_addition2()
     c->boolProp("trainable") = true;
 
     Branch tbranch;
-    generate_training(tbranch, c, tbranch.eval("4.0"));
+    generate_feedback(tbranch, c, tbranch.eval("4.0"));
 
     evaluate_branch(tbranch);
 
@@ -57,7 +57,7 @@ void train_mult()
     c->boolProp("trainable") = true;
 
     Branch training;
-    generate_training(training, c, training.eval("9.0"));
+    generate_feedback(training, c, training.eval("9.0"));
     evaluate_branch(training);
 
     test_equals(as_float(a), 3.0);
@@ -73,7 +73,7 @@ void train_sin()
     b->boolProp("trainable") = true;
 
     Branch training;
-    generate_training(training, b, training.eval("1.0"));
+    generate_feedback(training, b, training.eval("1.0"));
     evaluate_branch(training);
 }
 

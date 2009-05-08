@@ -61,7 +61,7 @@ namespace add_function {
         evaluate_branch(myBranch);
     }
 
-    void generateTraining(Branch& branch, Term* subject, Term* desired)
+    void generateFeedback(Branch& branch, Term* subject, Term* desired)
     {
         // find the # of trainable inputs
         int numTrainableInputs = 0;
@@ -87,7 +87,7 @@ namespace add_function {
             Term* input = subject->input(i);
             if (is_trainable(input)) {
                 Term* inputDesired = apply(&branch, ADD_FUNC, RefList(input, delta));
-                generate_training(branch, input, inputDesired);
+                generate_feedback(branch, input, inputDesired);
             }
         }
     }
@@ -96,7 +96,7 @@ namespace add_function {
     {
         ADD_FUNC = import_function(kernel, evaluate, "add(float...) : float");
         as_function(ADD_FUNC).pureFunction = true;
-        as_function(ADD_FUNC).generateTraining = generateTraining;
+        as_function(ADD_FUNC).generateFeedback = generateFeedback;
 
         Term* fp_func = import_function(kernel, feedback_propogate,
                 "add_feedback_propogate(any,any) : Branch");

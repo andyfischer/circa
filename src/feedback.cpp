@@ -19,16 +19,16 @@ void set_trainable(Term* term, bool value)
     term->boolProp("trainable") = value;
 }
 
-void generate_training(Branch& branch, Term* subject, Term* desired)
+void generate_feedback(Branch& branch, Term* subject, Term* desired)
 {
     Function& targetsFunction = as_function(subject->function);
 
-    if (targetsFunction.generateTraining != NULL)
+    if (targetsFunction.generateFeedback != NULL)
     {
-        targetsFunction.generateTraining(branch, subject, desired);
+        targetsFunction.generateFeedback(branch, subject, desired);
     } else {
         std::cout << "warn: function " << targetsFunction.name <<
-            " doesn't have a generateTraining function" << std::endl;
+            " doesn't have a generateFeedback function" << std::endl;
         return;
     }
 }
@@ -49,7 +49,7 @@ void update_derived_trainable_properties(Branch& branch)
     }
 }
 
-void normalize_training_branch(Branch& branch)
+void normalize_feedback_branch(Branch& branch)
 {
     // Look for any terms that have multiple assign() functions, and combine them with
     // a feedback-accumulator to one assign()
@@ -115,11 +115,11 @@ void refresh_training_branch(Branch& branch)
     for (int i = 0; i < branch.numTerms(); i++) {
         Term* term = branch[i];
         if (term->function == FEEDBACK_FUNC) {
-            generate_training(trainingBranch, term->input(0), term->input(1));
+            generate_feedback(trainingBranch, term->input(0), term->input(1));
         }
     }
 
-    normalize_training_branch(trainingBranch);
+    normalize_feedback_branch(trainingBranch);
 }
 
 } // namespace circa
