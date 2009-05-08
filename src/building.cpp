@@ -4,74 +4,6 @@
 
 namespace circa {
 
-Term* create_term(Branch* branch, Term* function, RefList const& inputs)
-{
-    assert_good_pointer(function);
-
-    if (!is_function(function)) {
-        assert(false);
-        throw std::runtime_error("in create_term, 2nd arg to create_term must be a function");
-    }
-
-    Term* term = new Term();
-
-    if (branch != NULL)
-        branch->append(term);
-
-    term->function = function;
-    term->needsUpdate = true;
-
-    Function& functionData = as_function(function);
-
-    // Initialize inputs
-    for (unsigned int i=0; i < inputs.count(); i++)
-        set_input(term, i, inputs[i]);
-
-    Term* outputType = functionData.outputType;
-
-    // Check if this function has a specializeType function
-    // Side note: maybe we should do this step later. Doing it here means that we can only
-    // specialize on inputs, but it might be cool to specialize on state too.
-    if (functionData.specializeType != NULL) {
-        outputType = functionData.specializeType(term);
-        if (outputType == NULL)
-            throw std::runtime_error("result of specializeType is NULL");
-    }
-
-    if (outputType == NULL)
-        throw std::runtime_error("outputType is NULL");
-        
-    if (!is_type(outputType))
-        throw std::runtime_error(outputType->name + " is not a type");
-
-    change_type(term, outputType);
-
-    return term;
-}
-    
-void set_input(Term* term, int index, Term* input)
-{
-    assert_good_pointer(term);
-
-    term->inputs.setAt(index, input);
-}
-
-Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
-{
-    Term* term = create_term(branch, source->function, source->inputs);
-
-    term->name = source->name;
-
-    if (copyBranches)
-        assign_value(source, term);
-    else
-        assign_value_but_dont_copy_inner_branch(source,term);
-
-    duplicate_branch(source->properties, term->properties);
-
-    return term;
-}
-
 Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string const& name)
 {
     // Make a local copy of _inputs
@@ -92,33 +24,82 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
         function = VALUE_FUNC;
     }
 
-    // If 'function' has hidden state, then create a container for that state
-    if (has_hidden_state(as_function(function)))
+    assert(is_function(function));
+
+    Function& func = as_function(function);
+
+    // If 'function' has hidden state, then create a container for that state, if needed
+    if (has_hidden_state(func) && ((int) inputs.count() < func.numInputs()))
     {
-        Term* stateContainer = create_value(branch, as_function(function).hiddenStateType);
+        Term* stateContainer = create_value(branch, func.hiddenStateType);
         source_set_hidden(stateContainer, true);
         set_stateful(stateContainer, true);
         inputs.prepend(stateContainer);
     }
 
-    assert(is_function(function));
-
     // Create the term
-    Term* result = create_term(branch, function, inputs);
+    Term* result = new Term();
 
-    // Bind name, if given
-    if (name != "" && branch != NULL)
-        branch->bindName(result, name);
+    if (branch != NULL) {
+        branch->append(result);
 
-    // Possible type specialization
+        if (name != "")
+            branch->bindName(result, name);
+    }
+
+    result->function = function;
+    result->needsUpdate = true;
+
+    // Initialize inputs
+    for (unsigned int i=0; i < inputs.count(); i++)
+        set_input(result, i, inputs[i]);
+
+    Term* outputType = func.outputType;
+
+    // Check if this function has a specializeType function
+    // Side note: maybe we should do this step later. Doing it here means that we can only
+    // specialize on inputs, but it might be cool to specialize on state too.
+    if (func.specializeType != NULL)
+        outputType = func.specializeType(result);
+
+    // If we were called with a type, then use that type
     if (valueType != NULL)
-        change_type(result, valueType);
+        outputType = valueType;
+
+    assert(outputType != NULL);
+    assert(is_type(outputType));
+
+    change_type(result, outputType);
 
     // Temporary hack
     if (function == BRANCH_FUNC)
         as_branch(result).outerScope = branch;
 
     return result;
+}
+
+void set_input(Term* term, int index, Term* input)
+{
+    assert_good_pointer(term);
+
+    term->inputs.setAt(index, input);
+}
+
+Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
+{
+    Term* term = apply(branch, source->function, source->inputs);
+    change_type(term, source->type);
+
+    term->name = source->name;
+
+    if (copyBranches)
+        assign_value(source, term);
+    else
+        assign_value_but_dont_copy_inner_branch(source,term);
+
+    duplicate_branch(source->properties, term->properties);
+
+    return term;
 }
 
 Term* apply(Branch* branch, std::string const& functionName, RefList const& inputs, std::string const& name)
@@ -133,20 +114,15 @@ Term* apply(Branch* branch, std::string const& functionName, RefList const& inpu
 Term* create_value(Branch* branch, Term* type, std::string const& name)
 {
     assert(type != NULL);
-    if (branch == NULL)
-        assert(name == "");
     assert(is_type(type));
 
-    Term *term = create_term(branch, VALUE_FUNC, RefList());
+    Term *term = apply(branch, VALUE_FUNC, RefList(), name);
     change_type(term, type);
 
     alloc_value(term);
 
     term->needsUpdate = false;
     term->stealingOk = false;
-
-    if (name != "")
-        branch->bindName(term, name);
 
     return term;
 }
@@ -166,10 +142,9 @@ Term* create_value(Branch* branch, std::string const& typeName, std::string cons
 Term* import_value(Branch* branch, Term* type, void* initialValue, std::string const& name)
 {
     assert(type != NULL);
-    Term *term = create_term(branch, VALUE_FUNC, RefList());
+    Term *term = create_value(branch, type);
 
     term->value = initialValue;
-    //term->ownsValue = false;
     term->stealingOk = false;
 
     if (name != "" && branch != NULL)
