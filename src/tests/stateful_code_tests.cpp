@@ -78,7 +78,7 @@ void test_get_type_from_branches_stateful_terms()
     
     get_type_from_branches_stateful_terms(branch, type);
 
-    test_assert(type.numTerms() == 2);
+    test_assert(type.length() == 2);
     test_assert(is_value(type[0]));
     test_assert(type[0]->type == FLOAT_TYPE);
     test_assert(is_value(type[0]));

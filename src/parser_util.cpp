@@ -96,7 +96,7 @@ void remove_compilation_attrs(Branch& branch)
 void wrap_up_branch(Branch& branch)
 {
     // Create assign() terms that persist the results of every stateful value
-    for (int i=0; i < branch.numTerms(); i++) {
+    for (int i=0; i < branch.length(); i++) {
         if (is_stateful(branch[i])) {
             Term* term = branch[i];
 

@@ -13,12 +13,12 @@ void test_remove()
 
     create_value(&branch, INT_TYPE, "a");
 
-    test_assert(branch.numTerms() == 1);
+    test_assert(branch.length() == 1);
     test_assert(branch.contains("a"));
 
     branch.remove(0);
 
-    test_assert(branch.numTerms() == 0);
+    test_assert(branch.length() == 0);
     test_assert(!branch.contains("a"));
 }
 
@@ -90,7 +90,7 @@ void test_duplicate_nested_dont_make_extra_terms()
     Branch dupe;
     duplicate_branch(orig, dupe);
 
-    test_assert(dupe["inner"]->asBranch().numTerms() == 1);
+    test_assert(dupe["inner"]->asBranch().length() == 1);
 }
 
 void test_duplicate_subroutine()
@@ -112,8 +112,8 @@ void test_duplicate_subroutine()
     test_assert(dupedFunc.name == "func");
 
     // make sure subroutine was properly copied
-    test_assert(dupedFunc.subroutineBranch.numTerms() > 0);
-    test_assert(dupedFunc.subroutineBranch.numTerms() == 1);
+    test_assert(dupedFunc.subroutineBranch.length() > 0);
+    test_assert(dupedFunc.subroutineBranch.length() == 1);
     test_assert(dupedFunc.subroutineBranch[0]->asInt() == 1);
     test_assert(dupedFunc.subroutineBranch["a"] == dupedFunc.subroutineBranch[0]);
 }
@@ -215,7 +215,7 @@ void test_assign()
 
     assign_value(source, dest);
 
-    test_assert(as_branch(dest).numTerms() == 3);
+    test_assert(as_branch(dest).length() == 3);
     test_assert(dest0 == as_branch(dest)[0]);
     test_assert(as_int(dest0) == 7);
     test_assert(as_int(as_branch(dest)[1]) == 8);

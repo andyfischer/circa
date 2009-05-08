@@ -85,7 +85,7 @@ void remap_pointers(Branch& branch, Term* original, Term* replacement)
     ReferenceMap map;
     map[original] = replacement;
 
-    for (int i=0; i < branch.numTerms(); i++) {
+    for (int i=0; i < branch.length(); i++) {
         remap_pointers(branch[i], map);
     }
 }

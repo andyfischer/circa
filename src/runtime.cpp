@@ -113,7 +113,7 @@ void evaluate_term(Term* term)
 
 void evaluate_branch(Branch& branch, Term* errorListener)
 {
-    int count = branch.numTerms();
+    int count = branch.length();
     for (int index=0; index < count; index++) {
 		Term* term = branch.get(index);
         evaluate_term(term);
@@ -166,12 +166,12 @@ void change_function(Term* term, Term* newFunction)
 void resize_list(Branch& list, int numElements, Term* type)
 {
     // Add terms if necessary
-    for (int i=list.numTerms(); i < numElements; i++)
+    for (int i=list.length(); i < numElements; i++)
         create_value(&list, type);
 
     // Remove terms if necessary
     bool anyRemoved = false;
-    for (int i=numElements; i < list.numTerms(); i++) {
+    for (int i=numElements; i < list.length(); i++) {
         anyRemoved = true;
         list[i] = NULL;
     }

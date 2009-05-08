@@ -50,7 +50,7 @@ void sanity_check_term(Term* term)
 
 void sanity_check_the_world()
 {
-    for (int i=0; i < KERNEL->numTerms(); i++) {
+    for (int i=0; i < KERNEL->length(); i++) {
         Term* term = KERNEL->get(i);
         sanity_check_term(term);
     }

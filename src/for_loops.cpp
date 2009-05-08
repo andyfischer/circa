@@ -62,16 +62,16 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
 
     // Make sure state has the correct number of iterations
 
-    int numIterations = as_branch(listTerm).numTerms();
+    int numIterations = as_branch(listTerm).length();
 
-    resize_list(stateBranch, as_branch(listTerm).numTerms(), BRANCH_TYPE);
+    resize_list(stateBranch, as_branch(listTerm).length(), BRANCH_TYPE);
 
     // Initialize state for any uninitialized slots
     for (int i=0; i < numIterations; i++) {
 
         Branch& iterationBranch = get_for_loop_state(forTerm, i);
         
-        if (iterationBranch.numTerms() == 0) {
+        if (iterationBranch.length() == 0) {
             get_type_from_branches_stateful_terms(codeBranch, iterationBranch);
         }
     }
