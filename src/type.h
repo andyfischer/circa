@@ -78,7 +78,6 @@ struct Type
         lessThan(NULL),
         remapPointers(NULL),
         toString(NULL),
-        valueFunction(NULL),
         refCount(0)
     {
     }
@@ -162,9 +161,6 @@ bool equals(Term* a, Term* b);
 std::string to_string(Term* term);
 void assign_value(Term* source, Term* dest);
 void assign_value_but_dont_copy_inner_branch(Term* source, Term* dest);
-
-// Fetch the const function for this type
-Term* get_value_function(Term* type);
 
 Term* create_type(Branch* branch, std::string const& decl);
 

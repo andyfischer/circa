@@ -82,21 +82,6 @@ void test_misc()
     test_assert(FUNCTION_TYPE->type == TYPE_TYPE);
 }
 
-void var_function_reuse()
-{
-    Branch branch;
-
-    Term* function = get_value_function(INT_TYPE);
-    Term* function2 = get_value_function(INT_TYPE);
-
-    test_assert(function == function2);
-
-    Term* a = int_value(&branch, 3);
-    Term* b = int_value(&branch, 4);
-
-    test_assert(a->function == b->function);
-}
-
 void null_input_errors()
 {
     Branch branch;
@@ -176,7 +161,6 @@ void register_tests()
     REGISTER_TEST_CASE(runtime_tests::test_simple);
     REGISTER_TEST_CASE(runtime_tests::blocked_by_error);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
-    REGISTER_TEST_CASE(runtime_tests::var_function_reuse);
     REGISTER_TEST_CASE(runtime_tests::null_input_errors);
     REGISTER_TEST_CASE(runtime_tests::test_eval_as);
     REGISTER_TEST_CASE(runtime_tests::test_runtime_type_error);

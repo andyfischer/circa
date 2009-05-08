@@ -82,12 +82,14 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
         evaluate_term(function);
 
     // Check if 'function' is actually a type
+    Term* valueType = NULL;
     if (is_type(function))
     {
         if (inputs.count() != 0)
             throw std::runtime_error("Inputs in constructor function is not yet supported");
 
-        function = get_value_function(function);
+        valueType = function;
+        function = VALUE_FUNC;
     }
 
     // If 'function' has hidden state, then create a container for that state
@@ -107,6 +109,10 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     // Bind name, if given
     if (name != "" && branch != NULL)
         branch->bindName(result, name);
+
+    // Possible type specialization
+    if (valueType != NULL)
+        change_type(result, valueType);
 
     // Temporary hack
     if (function == BRANCH_FUNC)
@@ -131,8 +137,8 @@ Term* create_value(Branch* branch, Term* type, std::string const& name)
         assert(name == "");
     assert(is_type(type));
 
-    Term *var_function = get_value_function(type);
-    Term *term = create_term(branch, var_function, RefList());
+    Term *term = create_term(branch, VALUE_FUNC, RefList());
+    change_type(term, type);
 
     alloc_value(term);
 
@@ -160,8 +166,7 @@ Term* create_value(Branch* branch, std::string const& typeName, std::string cons
 Term* import_value(Branch* branch, Term* type, void* initialValue, std::string const& name)
 {
     assert(type != NULL);
-    Term *var_function = get_value_function(type);
-    Term *term = create_term(branch, var_function, RefList());
+    Term *term = create_term(branch, VALUE_FUNC, RefList());
 
     term->value = initialValue;
     //term->ownsValue = false;
@@ -221,7 +226,8 @@ void rewrite_as_value(Branch& branch, int index, Term* type)
     } else {
         Term* term = branch[index];
 
-        change_function(term, get_value_function(type));
+        change_function(term, VALUE_FUNC);
+        change_type(term, type);
         term->inputs = RefList();
         alloc_value(term);
     }

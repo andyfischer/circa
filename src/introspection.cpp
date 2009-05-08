@@ -10,7 +10,7 @@ bool is_value(Term* term)
 {
     assert_good_pointer(term);
 
-    return term->function->function == VALUE_FUNCTION_GENERATOR;
+    return term->function == VALUE_FUNC;
 }
 
 bool is_actually_using(Term* user, Term* usee)

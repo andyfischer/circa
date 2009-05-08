@@ -49,7 +49,7 @@ extern Term* UNKNOWN_FUNCTION;
 extern Term* UNKNOWN_IDENTIFIER_FUNC;
 extern Term* UNKNOWN_TYPE_FUNC;
 extern Term* UNRECOGNIZED_EXPRESSION_FUNC;
-extern Term* VALUE_FUNCTION_GENERATOR;
+extern Term* VALUE_FUNC;
 extern Term* VOID_TYPE;
 extern Term* VOID_PTR_TYPE;
 

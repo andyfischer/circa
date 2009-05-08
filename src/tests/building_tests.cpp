@@ -55,7 +55,7 @@ void test_rewrite_as_value()
     rewrite_as_value(branch, 1, FLOAT_TYPE);
 
     test_assert(b->type == FLOAT_TYPE);
-    test_assert(b->function == get_value_function(FLOAT_TYPE));
+    test_assert(b->function == VALUE_FUNC);
     test_assert(is_value(b));
 
     // add new term
