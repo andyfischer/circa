@@ -5,9 +5,6 @@
 
 namespace circa {
 
-// Create a term with the given function and inputs.
-Term* create_term(Branch* branch, Term* function, RefList const& inputs);
-
 // Create a duplicate of the given term
 // If 'copyBranches' is false, don't copy branch state. It's assumed that the
 // caller will do this. This functionality is used by duplicate_branch
