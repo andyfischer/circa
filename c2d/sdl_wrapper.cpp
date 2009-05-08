@@ -76,7 +76,7 @@ void drawText(circa::Term* caller)
 void register_functions(circa::Branch& branch)
 {
     circa::import_function(branch, box, "box(float,float,float,float,int)");
-    circa::import_function(branch, line, "line(float,float,float,float,int)");
+    circa::import_function(branch, line, "sdl_line(float,float,float,float,int)");
     circa::import_function(branch, circle, "circle(float,float,float,int)");
     circa::import_function(branch, filledcircle, "fill_circle(float,float,float,int)");
     circa::import_function(branch, background, "background(int)");
