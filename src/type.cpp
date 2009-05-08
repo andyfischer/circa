@@ -394,25 +394,6 @@ void assign_value_but_dont_copy_inner_branch(Term* source, Term* dest)
     assign_value(source, dest);
 }
 
-Term* get_value_function(Term* typeTerm)
-{
-    Type& type = as_type(typeTerm);
-
-    // Check to use an existing value
-    if (type.valueFunction != NULL)
-        return type.valueFunction;
-
-    Term* result = apply_and_eval(NULL, VALUE_FUNCTION_GENERATOR, RefList(typeTerm));
-    assert(result->input(0) == typeTerm);
-
-    result->name = as_function(result).name;
-
-    // Save this result on the type, for future calls
-    type.valueFunction = result;
-
-    return result;
-}
-
 Term* create_type(Branch* branch, std::string const& decl)
 {
     return parser::compile(branch, parser::type_decl, decl);

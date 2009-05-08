@@ -54,26 +54,16 @@ Term* UNKNOWN_FUNCTION = NULL;
 Term* UNKNOWN_IDENTIFIER_FUNC = NULL;
 Term* UNKNOWN_TYPE_FUNC = NULL;
 Term* UNRECOGNIZED_EXPRESSION_FUNC = NULL;
-Term* VALUE_FUNCTION_GENERATOR = NULL;
-Term* VALUE_FUNCTION_FEEDBACK_ASSIGN = NULL;
+Term* VALUE_FUNC = NULL;
 Term* VOID_TYPE = NULL;
 Term* VOID_PTR_TYPE = NULL;
 
 void empty_evaluate_function(Term*) { }
 
-void value_function_generate_feedback(Branch& branch, Term* subject, Term* desired)
-{
-    apply(&branch, ASSIGN_FUNC, RefList(subject, desired));
-}
-
-namespace var_function {
-
-    void feedback_assign(Term* caller)
+namespace value_function {
+    void generate_feedback(Branch& branch, Term* subject, Term* desired)
     {
-        Term* target = caller->input(0);
-        Term* desired = caller->input(1);
-
-        assign_value(desired, target);
+        apply(&branch, ASSIGN_FUNC, RefList(subject, desired));
     }
 }
 
@@ -236,30 +226,12 @@ namespace any_t {
     }
 } // namespace any_t
 
-void value_function_generator(Term* caller)
-{
-    assert(caller->input(0) != NULL);
-
-    Function& output = as_function(caller);
-    Type& type = as_type(caller->input(0));
-    output.name = type.name + "_value";
-    output.outputType = caller->input(0);
-    output.pureFunction = false;
-    output.evaluate = empty_evaluate_function;
-    output.generateFeedback = value_function_generate_feedback;
-    output.feedbackPropogateFunction = VALUE_FUNCTION_FEEDBACK_ASSIGN;
-}
-
 void bootstrap_kernel()
 {
-    // This is a crazy function. We need to create the 5 core functions in our system,
-    // all of which need to reference each other or themselves.
-    //
     // Here is what we need to create:
     //
-    // var-function-generator(Type) -> Function
-    //    Given a type, returns a function which is a 'plain value' function. This term
-    //    has function const-Function.
+    // value() -> any
+    //    Function used for all values
     // const-Type() -> Type
     //    Function which returns a Type value. This is created by var-function-generator
     // const-Function() -> Function
@@ -271,19 +243,20 @@ void bootstrap_kernel()
 
     KERNEL = new Branch();
 
-    // Create var-function-generator function
-    VALUE_FUNCTION_GENERATOR = new Term();
-    VALUE_FUNCTION_GENERATOR->owningBranch = KERNEL;
-    VALUE_FUNCTION_GENERATOR->value = new Function();
-    as_function(VALUE_FUNCTION_GENERATOR).name = "value-function-generator";
-    as_function(VALUE_FUNCTION_GENERATOR).pureFunction = true;
-    as_function(VALUE_FUNCTION_GENERATOR).evaluate = value_function_generator;
-    KERNEL->bindName(VALUE_FUNCTION_GENERATOR, "value-function-generator");
+    // Create value function
+    VALUE_FUNC = new Term();
+    VALUE_FUNC->owningBranch = KERNEL;
+    VALUE_FUNC->value = new Function();
+    as_function(VALUE_FUNC).name = "value";
+    as_function(VALUE_FUNC).pureFunction = true;
+    as_function(VALUE_FUNC).evaluate = empty_evaluate_function;
+    as_function(VALUE_FUNC).generateFeedback = value_function::generate_feedback;
+    KERNEL->bindName(VALUE_FUNC, "value");
 
     // Create const-Type function
     Term* constTypeFunc = new Term();
     constTypeFunc->owningBranch = KERNEL;
-    constTypeFunc->function = VALUE_FUNCTION_GENERATOR;
+    constTypeFunc->function = VALUE_FUNC;
     constTypeFunc->value = new Function();
     as_function(constTypeFunc).name = "const-Type";
     as_function(constTypeFunc).pureFunction = true;
@@ -305,20 +278,16 @@ void bootstrap_kernel()
 
     // Implant the Type type
     set_input(constTypeFunc, 0, TYPE_TYPE);
-    as_function(VALUE_FUNCTION_GENERATOR).inputTypes.setAt(0, TYPE_TYPE);
     as_function(constTypeFunc).outputType = TYPE_TYPE;
 
     // Create const-Function function
     Term* constFuncFunc = new Term();
     constFuncFunc->owningBranch = KERNEL;
-    constFuncFunc->function = VALUE_FUNCTION_GENERATOR;
+    constFuncFunc->function = VALUE_FUNC;
     constFuncFunc->value = new Function();
     as_function(constFuncFunc).name = "const-Function";
     as_function(constFuncFunc).pureFunction = true;
     KERNEL->bindName(constFuncFunc, "const-Function");
-
-    // Implant const-Function
-    VALUE_FUNCTION_GENERATOR->function = constFuncFunc;
 
     // Create Function type
     FUNCTION_TYPE = new Term();
@@ -335,16 +304,25 @@ void bootstrap_kernel()
     KERNEL->bindName(FUNCTION_TYPE, "Function");
 
     // Implant Function type
-    set_input(VALUE_FUNCTION_GENERATOR, 0, TYPE_TYPE);
     set_input(constFuncFunc, 0, FUNCTION_TYPE);
-    VALUE_FUNCTION_GENERATOR->type = FUNCTION_TYPE;
+    VALUE_FUNC->type = FUNCTION_TYPE;
     constFuncFunc->type = FUNCTION_TYPE;
     constTypeFunc->type = FUNCTION_TYPE;
-    as_function(VALUE_FUNCTION_GENERATOR).outputType = FUNCTION_TYPE;
     as_function(constFuncFunc).outputType = FUNCTION_TYPE;
 
+    // Create Any type
+    ANY_TYPE = new Term();
+    ANY_TYPE->owningBranch = KERNEL;
+    ANY_TYPE->function = VALUE_FUNC;
+    ANY_TYPE->type = TYPE_TYPE;
+    ANY_TYPE->value = new Type();
+    as_type(ANY_TYPE).name = "any";
+    KERNEL->bindName(ANY_TYPE, "any");
+
+    as_function(VALUE_FUNC).outputType = ANY_TYPE;
+
     // Don't let these terms get updated
-    VALUE_FUNCTION_GENERATOR->needsUpdate = false;
+    VALUE_FUNC->needsUpdate = false;
     constFuncFunc->needsUpdate = false;
     constTypeFunc->needsUpdate = false;
     FUNCTION_TYPE->needsUpdate = false;
@@ -376,6 +354,8 @@ void initialize_builtin_types(Branch& kernel)
     ANY_TYPE = create_empty_type(kernel, "any");
     as_type(ANY_TYPE).toString = any_t::to_string;
 
+    as_function(VALUE_FUNC).outputType = ANY_TYPE;
+
     VOID_PTR_TYPE = import_type<void*>(kernel, "void_ptr");
     as_type(VOID_PTR_TYPE).parameters.append(ANY_TYPE);
 
@@ -406,17 +386,6 @@ void initialize_builtin_functions(Branch& kernel)
 {
     setup_builtin_functions(kernel);
 
-    VALUE_FUNCTION_FEEDBACK_ASSIGN = import_function(kernel,
-        var_function::feedback_assign, "var_function_feedback_assign(any,any)");
-
-    as_function(get_value_function(INT_TYPE)).feedbackPropogateFunction = 
-        VALUE_FUNCTION_FEEDBACK_ASSIGN;
-    as_function(get_value_function(FLOAT_TYPE)).feedbackPropogateFunction = 
-        VALUE_FUNCTION_FEEDBACK_ASSIGN;
-    as_function(get_value_function(BOOL_TYPE)).feedbackPropogateFunction = 
-        VALUE_FUNCTION_FEEDBACK_ASSIGN;
-    as_function(get_value_function(STRING_TYPE)).feedbackPropogateFunction = 
-        VALUE_FUNCTION_FEEDBACK_ASSIGN;
 }
 
 void initialize_constants(Branch& kernel)
