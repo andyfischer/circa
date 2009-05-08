@@ -90,10 +90,10 @@ void evaluate_term(Term* term)
         }
 
         // Possibly evaluate this input if needed
-        if (!inputProps.meta && input->needsUpdate) {
+        /*if (!inputProps.meta && input->needsUpdate) {
             assert(term != input); // prevent infinite recursion
             evaluate_term(input);
-        }
+        }*/
     }
     
     // Make sure we have an allocated value. Allocate one if necessary
@@ -103,7 +103,6 @@ void evaluate_term(Term* term)
     // Execute the function
     try {
         func.evaluate(term);
-        term->needsUpdate = false;
     }
     catch (std::exception const& err)
     {

@@ -157,6 +157,7 @@ Term* find_function(Branch& branch, std::string const& name)
 
     if (result == NULL) {
         result = apply(&branch, UNKNOWN_FUNCTION, RefList());
+        evaluate_term(result);
         result->stringProp("message") = name;
     }   
 

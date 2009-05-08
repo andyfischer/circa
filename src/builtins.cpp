@@ -320,13 +320,6 @@ void bootstrap_kernel()
     KERNEL->bindName(ANY_TYPE, "any");
 
     as_function(VALUE_FUNC).outputType = ANY_TYPE;
-
-    // Don't let these terms get updated
-    VALUE_FUNC->needsUpdate = false;
-    constFuncFunc->needsUpdate = false;
-    constTypeFunc->needsUpdate = false;
-    FUNCTION_TYPE->needsUpdate = false;
-    TYPE_TYPE->needsUpdate = false;
 }
 
 void initialize_builtin_types(Branch& kernel)
@@ -392,12 +385,10 @@ void initialize_constants(Branch& kernel)
 {
     CONSTANT_TRUE = apply(&kernel, BOOL_TYPE, RefList());
     as_bool(CONSTANT_TRUE) = true;
-    CONSTANT_TRUE->stealingOk = false;
     KERNEL->bindName(CONSTANT_TRUE, "true");
 
     CONSTANT_FALSE = apply(&kernel, BOOL_TYPE, RefList());
     as_bool(CONSTANT_FALSE) = false;
-    CONSTANT_FALSE->stealingOk = false;
     KERNEL->bindName(CONSTANT_FALSE, "false");
 
     float_value(&kernel, 3.141592654f, "PI");
