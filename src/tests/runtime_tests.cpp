@@ -69,7 +69,6 @@ void blocked_by_error()
     test_assert(gSpyResults[0] == "1");
     test_assert(!spy_1->hasError);
     test_assert(error->hasError);
-    test_assert(spy_errored->needsUpdate);
 }
 
 

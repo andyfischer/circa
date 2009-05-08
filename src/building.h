@@ -46,4 +46,3 @@ void rewrite_as_value(Branch& branch, int index, Term* type);
 } // namespace circa
 
 #endif
-

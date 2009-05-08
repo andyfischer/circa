@@ -9,10 +9,6 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     // Make a local copy of _inputs
     RefList inputs = _inputs;
 
-    // Evaluate this function if needed
-    if (function->needsUpdate)
-        evaluate_term(function);
-
     // Check if 'function' is actually a type
     Term* valueType = NULL;
     if (is_type(function))
@@ -48,7 +44,6 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     }
 
     result->function = function;
-    result->needsUpdate = true;
 
     // Initialize inputs
     for (unsigned int i=0; i < inputs.count(); i++)
@@ -121,9 +116,6 @@ Term* create_value(Branch* branch, Term* type, std::string const& name)
 
     alloc_value(term);
 
-    term->needsUpdate = false;
-    term->stealingOk = false;
-
     return term;
 }
 
@@ -145,7 +137,6 @@ Term* import_value(Branch* branch, Term* type, void* initialValue, std::string c
     Term *term = create_value(branch, type);
 
     term->value = initialValue;
-    term->stealingOk = false;
 
     if (name != "" && branch != NULL)
         branch->bindName(term, name);

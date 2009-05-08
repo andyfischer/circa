@@ -37,13 +37,6 @@ struct Term
 
     bool hasError;
 
-    // If true, assign_value is allowed to steal our value.
-    // Deprecated
-    bool stealingOk;
-
-    // True if this term's value is out-of-date
-    bool needsUpdate;
-
     // A globally unique ID
     unsigned int globalID;
 

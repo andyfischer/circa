@@ -40,8 +40,14 @@ Term* compile_statement(Branch& branch, std::string const& input)
 
 Term* evaluate_statement(Branch& branch, std::string const& input)
 {
+    int previousLastIndex = branch.length();
+
     Term* result = compile_statement(branch, input);
-    evaluate_term(result);
+
+    // Evaluate all terms that were just created
+    for (int i=previousLastIndex; i < branch.length(); i++)
+        evaluate_term(branch[i]);
+
     return result;
 }
 
