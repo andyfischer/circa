@@ -190,7 +190,7 @@ void state_inside_lots_of_nested_functions()
     NEXT_UNIQUE_OUTPUT = 11;
     SPY_RESULTS.clear();
 
-    Term* call1 = branch.compile("func4()");
+    /*Term* call =*/ branch.compile("func4()");
     evaluate_branch(branch);
 
     test_assert(SPY_RESULTS.size() == 1);
