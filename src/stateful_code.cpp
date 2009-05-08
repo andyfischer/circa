@@ -24,25 +24,24 @@ void load_state_into_branch(Branch& state, Branch& branch)
         if (!is_stateful(term))
             continue;
 
-        if (read > state.numTerms())
+        if (read >= state.numTerms())
             return;
 
-        assign_value(state[read++], branch[i]);
+        assign_value(state[read++], term);
     }
 }
 
 void persist_state_from_branch(Branch& branch, Branch& state)
 {
-    state.clear();
-
+    int write = 0;
     for (int i=0; i < branch.numTerms(); i++) {
         Term* term = branch[i];
 
         if (!is_stateful(term))
             continue;
 
-        Term* state_dup = create_value(&state, term->type, term->name);
-        assign_value(term, state_dup);
+        rewrite_as_value(state, write, term->type);
+        assign_value(term, state[write++]);
     }
 }
 

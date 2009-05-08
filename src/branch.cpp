@@ -28,10 +28,11 @@ Branch& Branch::operator=(Branch const& b)
 
 void Branch::append(Term* term)
 {
-    assert_good_pointer(term);
-    assert(term->owningBranch == NULL);
-    term->owningBranch = this;
     _terms.append(term);
+    if (term != NULL) {
+        assert(term->owningBranch == NULL);
+        term->owningBranch = this;
+    }
 }
 
 void Branch::remove(std::string const& name)

@@ -211,4 +211,20 @@ Term* bool_value(Branch* branch, bool b, std::string const& name)
     return term;
 }
 
+void rewrite_as_value(Branch& branch, int index, Term* type)
+{
+    while (index > branch.numTerms())
+        branch.append(NULL);
+
+    if (index >= branch.numTerms()) {
+        create_value(&branch, type);
+    } else {
+        Term* term = branch[index];
+
+        change_function(term, get_value_function(type));
+        term->inputs = RefList();
+        alloc_value(term);
+    }
+}
+
 } // namespace circa
