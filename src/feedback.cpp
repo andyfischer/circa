@@ -14,6 +14,11 @@ bool is_trainable(Term* term)
         || term->boolPropOptional("derived-trainable", false);
 }
 
+void set_trainable(Term* term, bool value)
+{
+    term->boolProp("trainable") = value;
+}
+
 void generate_training(Branch& branch, Term* subject, Term* desired)
 {
     Function& targetsFunction = as_function(subject->function);
@@ -56,7 +61,7 @@ void normalize_training_branch(Branch& branch)
     for (int i=0; i < branch.numTerms(); i++) {
         Term* term = branch[i];
         if (term->function == ASSIGN_FUNC) {
-            Term* target = term->input(1);
+            Term* target = term->input(0);
             termToAssignTerms[target].push_back(i);
         }
     }

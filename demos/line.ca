@@ -1,3 +1,3 @@
 
 background(0xffffffff)
-line([5 5] [20 20] 0x000000ff)
+line([20.0 20.0] [40.0 40.0] 0x000000ff)

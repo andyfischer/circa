@@ -63,7 +63,7 @@ void empty_evaluate_function(Term*) { }
 
 void value_function_generate_training(Branch& branch, Term* subject, Term* desired)
 {
-    apply(&branch, ASSIGN_FUNC, RefList(desired, subject));
+    apply(&branch, ASSIGN_FUNC, RefList(subject, desired));
 }
 
 namespace var_function {

@@ -7,13 +7,10 @@ namespace assign_function {
 
     void evaluate(Term* caller)
     {
-        Term* value = caller->input(0);
-        Term* target = caller->input(1);
-
-        /*if (!is_value(target)) {
-            error_occured(caller, "assign() tried to modify a non-value");
-            return;
-        }*/
+        // Target is on left, value on right.
+        // This is a little confusing b/c the C function is backwards
+        Term* value = caller->input(1);
+        Term* target = caller->input(0);
 
         if (!value_fits_type(value, target->type)) {
             error_occured(caller, "Tried to assign a " + value->type->name + " to a "

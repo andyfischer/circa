@@ -98,9 +98,9 @@ void test_refresh_training_branch()
     for (int i=0; i < trainingBranch.numTerms(); i++) {
         Term* term = trainingBranch[i];
         if (term->function == ASSIGN_FUNC) {
-            if (term->input(1) == a)
+            if (term->input(0) == a)
                 foundAssignToA = true;
-            else if (term->input(1) == b)
+            else if (term->input(0) == b)
                 foundAssignToB = true;
             else
                 // there shouldn't be any other assign()s in there
