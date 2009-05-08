@@ -135,7 +135,7 @@ std::string Branch::toString()
 {
     std::stringstream out;
     out << "{ ";
-    for (int i=0; i < numTerms(); i++) {
+    for (int i=0; i < length(); i++) {
         Term* term = get(i);
         if (i > 0) out << ", ";
         if (term->name != "")
@@ -177,19 +177,19 @@ void Branch::assign(Term* sourceTerm, Term* destTerm)
     Branch& dest = as_branch(destTerm);
 
     // Assign terms as necessary
-    int numTermsToAssign = std::min(source.numTerms(), dest.numTerms());
+    int lengthToAssign = std::min(source.length(), dest.length());
 
-    for (int i=0; i < numTermsToAssign; i++) {
+    for (int i=0; i < lengthToAssign; i++) {
         assign_value(source[i], dest[i]);
     }
 
     // Add terms if necessary
-    for (int i=dest.numTerms(); i < source.numTerms(); i++) {
+    for (int i=dest.length(); i < source.length(); i++) {
         create_duplicate(&dest, source[i]);
     }
 
     // Remove terms if necessary
-    for (int i=source.numTerms(); i < dest.numTerms(); i++) {
+    for (int i=source.length(); i < dest.length(); i++) {
         dest[i] = NULL;
     }
 
@@ -236,7 +236,7 @@ Term* find_term_by_id(Branch& branch, unsigned int id)
 void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& dest)
 {
     // Duplicate every term
-    for (int index=0; index < source.numTerms(); index++) {
+    for (int index=0; index < source.length(); index++) {
         Term* source_term = source.get(index);
 
         Term* dest_term = create_duplicate(&dest, source_term, false);
@@ -274,7 +274,7 @@ void duplicate_branch(Branch& source, Branch& dest)
     duplicate_branch_nested(newTermMap, source, dest);
 
     // Remap pointers
-    for (int i=0; i < dest.numTerms(); i++)
+    for (int i=0; i < dest.length(); i++)
         remap_pointers(dest[i], newTermMap);
 
     dest.names = source.names;
@@ -321,8 +321,8 @@ void migrate_values(Branch& source, Branch& dest)
 {
     // Iterate over every term in 'source' and compare each with
     // every term in 'dest'. Lots of room for optimization here.
-    for (int sourceIndex=0; sourceIndex < source.numTerms(); sourceIndex++) {
-        for (int destIndex=0; destIndex < dest.numTerms(); destIndex++) {
+    for (int sourceIndex=0; sourceIndex < source.length(); sourceIndex++) {
+        for (int destIndex=0; destIndex < dest.length(); destIndex++) {
             Term* sourceTerm = source[sourceIndex];
             Term* destTerm = dest[destIndex];
 

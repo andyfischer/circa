@@ -213,10 +213,10 @@ Term* bool_value(Branch* branch, bool b, std::string const& name)
 
 void rewrite_as_value(Branch& branch, int index, Term* type)
 {
-    while (index > branch.numTerms())
+    while (index > branch.length())
         branch.append(NULL);
 
-    if (index >= branch.numTerms()) {
+    if (index >= branch.length()) {
         create_value(&branch, type);
     } else {
         Term* term = branch[index];

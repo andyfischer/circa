@@ -152,7 +152,7 @@ void test_resize_list()
 
     resize_list(list, 4, INT_TYPE);
 
-    test_assert(list.numTerms() == 4);
+    test_assert(list.length() == 4);
     test_assert(list[0]->asInt() == 1);
     test_assert(list[0]->name == "a");
     test_assert(list[1]->asInt() == 2);
@@ -161,12 +161,12 @@ void test_resize_list()
     test_assert(list[3]->asInt() == 0);
 
     resize_list(list, 1, INT_TYPE);
-    test_assert(list.numTerms() == 1);
+    test_assert(list.length() == 1);
     test_assert(list[0]->asInt() == 1);
     test_assert(list[0]->name == "a");
 
     resize_list(list, 3, STRING_TYPE);
-    test_assert(list.numTerms() == 3);
+    test_assert(list.length() == 3);
     test_assert(list[1]->type == STRING_TYPE);
     test_assert(list[2]->type == STRING_TYPE);
 }

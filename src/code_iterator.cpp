@@ -65,7 +65,7 @@ void CodeIterator::postAdvance()
         }
 
     } else {
-        if (_topIndex >= _topBranch->numTerms())
+        if (_topIndex >= _topBranch->length())
             _topBranch = NULL;
     }
 }

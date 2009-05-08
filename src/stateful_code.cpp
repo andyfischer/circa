@@ -18,13 +18,13 @@ void load_state_into_branch(Branch& state, Branch& branch)
 {
     int read = 0;
 
-    for (int i=0; i < branch.numTerms(); i++) {
+    for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
 
         if (!is_stateful(term))
             continue;
 
-        if (read >= state.numTerms())
+        if (read >= state.length())
             return;
 
         assign_value(state[read++], term);
@@ -34,7 +34,7 @@ void load_state_into_branch(Branch& state, Branch& branch)
 void persist_state_from_branch(Branch& branch, Branch& state)
 {
     int write = 0;
-    for (int i=0; i < branch.numTerms(); i++) {
+    for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
 
         if (!is_stateful(term))
@@ -47,7 +47,7 @@ void persist_state_from_branch(Branch& branch, Branch& state)
 
 void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
 {
-    for (int i=0; i < branch.numTerms(); i++) {
+    for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
 
         if (!is_stateful(term))

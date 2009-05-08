@@ -71,21 +71,21 @@ void test_set()
     Term* s = branch.eval("s = Set()");
 
     test_assert(is_branch(s));
-    test_assert(as_branch(s).numTerms() == 0);
+    test_assert(as_branch(s).length() == 0);
 
     s = branch.eval("s.add(1)");
 
-    test_assert(as_branch(s).numTerms() == 1);
+    test_assert(as_branch(s).length() == 1);
     test_assert(as_branch(s)[0]->asInt() == 1);
 
     s = branch.eval("s.add(1)");
-    test_assert(as_branch(s).numTerms() == 1);
+    test_assert(as_branch(s).length() == 1);
 
     s = branch.eval("s.add(2)");
-    test_assert(as_branch(s).numTerms() == 2);
+    test_assert(as_branch(s).length() == 2);
 
     s = branch.eval("s.remove(1)");
-    test_assert(as_branch(s).numTerms() == 1);
+    test_assert(as_branch(s).length() == 1);
     test_assert(as_branch(s)[0]->asInt() == 2);
 
     // check that things are copied by value
@@ -104,10 +104,10 @@ void test_list()
     Term* l = branch.eval("l = List()");
 
     test_assert(is_branch(l));
-    test_assert(as_branch(l).numTerms() == 0);
+    test_assert(as_branch(l).length() == 0);
 
     l = branch.eval("l.append(2)");
-    test_assert(as_branch(l).numTerms() == 1);
+    test_assert(as_branch(l).length() == 1);
     test_assert(as_branch(l)[0]->asInt() == 2);
 }
 

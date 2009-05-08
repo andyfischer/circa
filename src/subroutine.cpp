@@ -6,7 +6,7 @@ namespace circa {
 
 bool is_subroutine(Term* term)
 {
-    return is_function(term) && as_function(term).subroutineBranch.numTerms() > 0;
+    return is_function(term) && as_function(term).subroutineBranch.length() > 0;
 }
 
 void initialize_as_subroutine(Function& func)
@@ -38,7 +38,7 @@ Function::subroutine_call_evaluate(Term* caller)
 {
     Branch &branch = get_state_for_subroutine_call(caller);
 
-    if (branch.numTerms() == 0)
+    if (branch.length() == 0)
         initialize_subroutine_state(caller, branch);
 
     Function &sub = as_function(caller->function);

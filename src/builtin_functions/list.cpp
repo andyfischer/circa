@@ -8,19 +8,19 @@ namespace list_function {
     void evaluate(Term* caller) {
         Branch& dest = as_branch(caller);
 
-        int numTermsToAssign = std::min(caller->numInputs(), dest.numTerms());
+        int lengthToAssign = std::min(caller->numInputs(), dest.length());
 
-        for (int i=0; i < numTermsToAssign; i++) {
+        for (int i=0; i < lengthToAssign; i++) {
             assign_value(caller->input(i), dest[i]);
         }
 
         // Add terms if necessary
-        for (int i=dest.numTerms(); i < caller->numInputs(); i++) {
+        for (int i=dest.length(); i < caller->numInputs(); i++) {
             create_duplicate(&dest, caller->input(i));
         }
 
         // Remove terms if necessary
-        for (int i=caller->numInputs(); i < dest.numTerms(); i++) {
+        for (int i=caller->numInputs(); i < dest.length(); i++) {
             dest[i] = NULL;
         }
         dest.removeNulls();

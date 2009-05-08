@@ -162,7 +162,7 @@ std::string get_branch_source(Branch& branch)
 {
     std::stringstream result;
 
-    for (int i=0; i < branch.numTerms(); i++) {
+    for (int i=0; i < branch.length(); i++) {
 
         Term* term = branch[i];
 

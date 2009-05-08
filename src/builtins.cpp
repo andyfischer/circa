@@ -139,7 +139,7 @@ namespace primitives {
 namespace set_t {
     bool contains(Branch& branch, Term* value)
     {
-        for (int i=0; i < branch.numTerms(); i++) {
+        for (int i=0; i < branch.length(); i++) {
             if (equals(value, branch[i]))
                 return true;
         }
@@ -168,7 +168,7 @@ namespace set_t {
         Branch& branch = as_branch(caller);
         Term* value = caller->input(1);
 
-        for (int index=0; index < branch.numTerms(); index++) {
+        for (int index=0; index < branch.length(); index++) {
             if (equals(value, branch[index])) {
 
                 branch.remove(index);
@@ -182,7 +182,7 @@ namespace set_t {
         Branch &set = as_branch(caller);
         std::stringstream output;
         output << "{";
-        for (int i=0; i < set.numTerms(); i++) {
+        for (int i=0; i < set.length(); i++) {
             if (i > 0) output << ", ";
             output << set[i]->toString();
         }
@@ -200,7 +200,7 @@ namespace list_t {
         std::stringstream out;
         out << "[";
         Branch& branch = as_branch(caller);
-        for (int i=0; i < branch.numTerms(); i++) {
+        for (int i=0; i < branch.length(); i++) {
             if (i > 0) out << ",";
             out << branch[i]->toString();
         }
@@ -224,7 +224,7 @@ namespace list_t {
 
     void count(Term* caller)
     {
-        as_int(caller) = as_branch(caller->input(0)).numTerms();
+        as_int(caller) = as_branch(caller->input(0)).length();
     }
 
 } // namespace list_t

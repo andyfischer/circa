@@ -58,7 +58,7 @@ void normalize_feedback_branch(Branch& branch)
     // assign() term
     std::map<Term*, std::vector<int> > termToAssignTerms;
 
-    for (int i=0; i < branch.numTerms(); i++) {
+    for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
         if (term->function == ASSIGN_FUNC) {
             Term* target = term->input(0);
@@ -112,7 +112,7 @@ void refresh_training_branch(Branch& branch)
     trainingBranch.clear();
 
     // Generate training for every feedback() function in this branch
-    for (int i = 0; i < branch.numTerms(); i++) {
+    for (int i = 0; i < branch.length(); i++) {
         Term* term = branch[i];
         if (term->function == FEEDBACK_FUNC) {
             generate_feedback(trainingBranch, term->input(0), term->input(1));

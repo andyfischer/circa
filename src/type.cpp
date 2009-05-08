@@ -101,11 +101,11 @@ bool value_fits_type(Term* valueTerm, Term* type)
 
     // Check if the # of elements matches
     // TODO: Relax this check for lists
-    if (value.numTerms() != (int) as_type(type).fields.size())
+    if (value.length() != (int) as_type(type).fields.size())
         return false;
 
     // Check each element
-    for (int i=0; i < value.numTerms(); i++) {
+    for (int i=0; i < value.length(); i++) {
         if (!value_fits_type(value[i], as_type(type).fields[i].type))
             return false;
     }
@@ -209,7 +209,7 @@ std::string compound_type_to_string(Term* caller)
 
     Branch& value = as_branch(caller);
 
-    for (int i=0; i < value.numTerms(); i++) {
+    for (int i=0; i < value.length(); i++) {
         if (i != 0)
             out << ", ";
         out << to_string(value[i]);

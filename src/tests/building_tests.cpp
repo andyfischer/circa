@@ -60,14 +60,14 @@ void test_rewrite_as_value()
 
     // add new term
     rewrite_as_value(branch, 2, INT_TYPE);
-    test_assert(branch.numTerms() == 3);
+    test_assert(branch.length() == 3);
     Term* c = branch[2];
     test_assert(is_value(c));
     test_assert(c->type == INT_TYPE);
 
     // add a new term such that we need to create NULLs
     rewrite_as_value(branch, 5, STRING_TYPE);
-    test_assert(branch.numTerms() == 6);
+    test_assert(branch.length() == 6);
     test_assert(branch[3] == NULL);
     test_assert(branch[4] == NULL);
     test_assert(is_value(branch[5]));

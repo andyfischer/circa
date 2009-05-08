@@ -95,7 +95,7 @@ void test_refresh_training_branch()
 
     bool foundAssignToA = false;
     bool foundAssignToB = false;
-    for (int i=0; i < trainingBranch.numTerms(); i++) {
+    for (int i=0; i < trainingBranch.length(); i++) {
         Term* term = trainingBranch[i];
         if (term->function == ASSIGN_FUNC) {
             if (term->input(0) == a)
@@ -129,7 +129,7 @@ void test_refresh_training_branch2()
     Branch& tbranch = as_branch(branch[TRAINING_BRANCH_NAME]);
     int assignCount = 0;
 
-    for (int i=0; i < tbranch.numTerms(); i++) {
+    for (int i=0; i < tbranch.length(); i++) {
         if (tbranch[i]->function == ASSIGN_FUNC)
             assignCount++;
     }

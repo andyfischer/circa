@@ -113,7 +113,7 @@ struct StringList {
     }
 
     int length() {
-        return data.numTerms();
+        return data.length();
     }
 };
 

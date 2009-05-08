@@ -176,7 +176,7 @@ Term* find_equivalent(Branch& branch, Term* function, RefList const& inputs)
         return NULL;
     }
 
-    for (int i=0; i < branch.numTerms(); i++) {
+    for (int i=0; i < branch.length(); i++) {
         if (is_equivalent(branch[i], function, inputs))
             return branch[i];
     }
@@ -186,7 +186,7 @@ Term* find_equivalent(Branch& branch, Term* function, RefList const& inputs)
 
 void print_runtime_errors(Branch& branch, std::ostream& output)
 {
-    for (int i=0; i < branch.numTerms(); i++) {
+    for (int i=0; i < branch.length(); i++) {
         Term *term = branch[i];
 
         if (term == NULL)
@@ -202,7 +202,7 @@ int count_compile_errors(Branch& branch)
 {
     int result = 0;
 
-    for (int i=0; i < branch.numTerms(); i++)
+    for (int i=0; i < branch.length(); i++)
         if (has_compile_error(branch[i]))
             result++;
 
@@ -271,7 +271,7 @@ std::string get_compile_error_message(Term* term)
 
 void print_compile_errors(Branch& branch, std::ostream& output)
 {
-    for (int i=0; i < branch.numTerms(); i++) {
+    for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
 
         if (has_compile_error(term))
