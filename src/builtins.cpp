@@ -61,7 +61,7 @@ Term* VOID_PTR_TYPE = NULL;
 
 void empty_evaluate_function(Term*) { }
 
-void value_function_generate_training(Branch& branch, Term* subject, Term* desired)
+void value_function_generate_feedback(Branch& branch, Term* subject, Term* desired)
 {
     apply(&branch, ASSIGN_FUNC, RefList(subject, desired));
 }
@@ -246,7 +246,7 @@ void value_function_generator(Term* caller)
     output.outputType = caller->input(0);
     output.pureFunction = false;
     output.evaluate = empty_evaluate_function;
-    output.generateTraining = value_function_generate_training;
+    output.generateFeedback = value_function_generate_feedback;
     output.feedbackPropogateFunction = VALUE_FUNCTION_FEEDBACK_ASSIGN;
 }
 

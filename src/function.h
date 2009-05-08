@@ -47,7 +47,7 @@ struct Function
     EvaluateFunc evaluate;
     SpecializeTypeFunc specializeType;
     ReferenceIteratorFunc startControlFlowIterator;
-    GenerateTrainingFunc generateTraining;
+    GenerateTrainingFunc generateFeedback;
     ToSourceString toSourceString;
 
     // External functions

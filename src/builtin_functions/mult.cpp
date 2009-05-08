@@ -10,7 +10,7 @@ namespace mult_function {
         as_float(caller) = to_float(caller->input(0)) * to_float(caller->input(1));
     }
 
-    void generateTraining(Branch& branch, Term* subject, Term* desired)
+    void generateFeedback(Branch& branch, Term* subject, Term* desired)
     {
         // find the # of trainable inputs
         int numTrainableInputs = 0;
@@ -42,7 +42,7 @@ namespace mult_function {
             Term* inputDelta = apply(&branch, DIV_FUNC, RefList(delta, divisor));
             Term* inputDesired = apply(&branch, ADD_FUNC, RefList(input, inputDelta));
 
-            generate_training(branch, input, inputDesired);
+            generate_feedback(branch, input, inputDesired);
         }
     }
 
@@ -50,7 +50,7 @@ namespace mult_function {
     {
         MULT_FUNC = import_function(kernel, evaluate, "mult(float,float) : float");
         as_function(MULT_FUNC).pureFunction = true;
-        as_function(MULT_FUNC).generateTraining = generateTraining;
+        as_function(MULT_FUNC).generateFeedback = generateFeedback;
     }
 }
 } // namespace circa

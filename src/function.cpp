@@ -13,7 +13,7 @@ Function::Function()
     evaluate(NULL),
     specializeType(NULL),
     startControlFlowIterator(NULL),
-    generateTraining(NULL),
+    generateFeedback(NULL),
     toSourceString(NULL),
     feedbackAccumulationFunction(NULL),
     feedbackPropogateFunction(NULL),
@@ -105,7 +105,7 @@ void Function::copyExceptBranch(Term* sourceTerm, Term* destTerm)
     copy_field(name);
     copy_field(evaluate);
     copy_field(specializeType);
-    copy_field(generateTraining);
+    copy_field(generateFeedback);
     copy_field(toSourceString);
     copy_field(startControlFlowIterator);
     copy_field(feedbackAccumulationFunction);
