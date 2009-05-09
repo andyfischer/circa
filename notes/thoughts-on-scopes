@@ -1,0 +1,79 @@
+
+Need some plan for scopes
+
+Restrictions?
+
+* Nested branches can always access things in above branches
+
+int a
+{
+  b = a  -- b can access 'a'
+}
+
+* Can a function-definition branch access things outside the function?
+    Not sure of this yet.
+
+int a
+def f()
+  b = a
+end
+
+* Generally can't access things in other nested branches
+{
+  int a
+}
+b = a  -- can't access 'a' here
+
+{
+  int a
+}
+{
+  b = a -- can't access 'a' here
+}
+
+* Some exceptions, like Python allows this:
+if
+  a = 1
+else
+  a = 2
+end
+b = a  -- 'a' is bound in this level
+
+* How do we properly expose things in lower branches to higher branches? Right now we allow
+  the Branch to bind names to anything, but this is error prone. Perhaps we need our old
+  mischevious friend, the alias() function.
+
+if(cond) = {
+  pos = {
+    a = 1
+  }
+  neg = {
+    a = 2
+  }
+  joining = {
+    a = if-expr(cond, pos.a, neg.a)
+  }
+}
+a = alias(if.joining.a)
+
+* Note that the current implementation will have problems if you try to do a name
+  loopup in the middle of an existing function.
+
+* Okay anyway. Those are the rules. So now we need some kind of 'import' or 'namespace' to
+get around those rules.
+
+{
+  loaded_scripts {
+      (some_script)
+      (some_other_script)
+  }
+}
+user {
+  import some_script
+}
+
+* Syntax?
+    Most people just use namespace.identifier
+
+* How are namespaces stored? Maybe a Namespace type?
+* How do we record which namespace was used for a given thing?
