@@ -1,0 +1,31 @@
+
+Hey, we probably need a way to have control flow. Been punting on this so far.
+
+* Types of control flow operations:
+
+  - Block-level 'break'
+    Named break?
+  - Function-level 'return'
+  - Program-level 'exit'
+  - Loops
+  - Goto
+
+
+* How do we do feedback on code that has breaks?
+
+function(inputs)
+  if(cond)
+    return result
+end
+
+func(x) := y
+
+Need to know if (cond) was true or not
+
+The solution would be to check every single return statement, and see which execution condition
+was true.
+
+Maybe do a hybrid of execution / dataflow (like everything else we do)
+
+The actual return value could be represented as if-exprs, but we could allow for a 'break' statement
+to cancel further execution.
