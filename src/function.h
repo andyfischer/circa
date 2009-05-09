@@ -50,11 +50,6 @@ struct Function
     GenerateTrainingFunc generateFeedback;
     ToSourceString toSourceString;
 
-    // External functions
-    Ref feedbackAccumulationFunction;
-    Ref feedbackPropogateFunction;
-    Ref generateCppFunction;
-
     Function();
 
     Term* inputType(int index);

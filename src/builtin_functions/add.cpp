@@ -13,54 +13,6 @@ namespace add_function {
         as_float(caller) = result;
     }
 
-    float get_mutability(Term* term)
-    {
-        // temp:
-        if (!term->hasProperty("mutability"))
-            return 1.0;
-
-        return to_float(term->property("mutability"));
-    }
-
-    void feedback_propogate(Term* caller)
-    {
-        Term* target = caller->input(0);
-        Term* desired = caller->input(1);
-        Branch& myBranch = as_branch(caller);
-        myBranch.clear();
-
-        int numInputs = target->inputs.count();
-
-        if (numInputs == 0)
-            return;
-
-        // find the total of input mutability
-        float totalInputMutability = 0.0;
-        for (int i=0; i < numInputs; i++) {
-            totalInputMutability += get_mutability(target->input(i));
-        }
-
-        if (totalInputMutability == 0.0) {
-            error_occured(caller, "no inputs are mutable");
-            return;
-        }
-    
-        float total_delta = to_float(desired) - to_float(target);
-    
-        for (int i=0; i < numInputs; i++) {
-            float mutability = get_mutability(target->input(i));
-
-            float inputDelta = total_delta * mutability / totalInputMutability;
-    
-            Term* input = target->inputs[i];
-    
-            apply(&myBranch, APPLY_FEEDBACK,
-                RefList(input, float_value(&myBranch, to_float(input) + inputDelta)));
-        }
-    
-        evaluate_branch(myBranch);
-    }
-
     void generateFeedback(Branch& branch, Term* subject, Term* desired)
     {
         // find the # of trainable inputs
@@ -97,10 +49,6 @@ namespace add_function {
         ADD_FUNC = import_function(kernel, evaluate, "add(float...) : float");
         as_function(ADD_FUNC).pureFunction = true;
         as_function(ADD_FUNC).generateFeedback = generateFeedback;
-
-        Term* fp_func = import_function(kernel, feedback_propogate,
-                "add_feedback_propogate(any,any) : Branch");
-        as_function(ADD_FUNC).feedbackPropogateFunction = fp_func;
     }
 }
 }
