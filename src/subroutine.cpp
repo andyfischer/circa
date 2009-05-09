@@ -14,8 +14,10 @@ void initialize_as_subroutine(Function& func)
     func.evaluate = Function::subroutine_call_evaluate;
 
     for (int input=0; input < func.numInputs(); input++) {
-        Term *placeholder = create_value(&func.subroutineBranch,
-                func.inputType(input), func.getInputProperties(input).name);
+        std::string name = func.getInputProperties(input).name;
+        Term *placeholder = apply(&func.subroutineBranch, INPUT_PLACEHOLDER_FUNC,
+            RefList(), name);
+        change_type(placeholder, func.inputType(input));
         source_set_hidden(placeholder, true);
     }
 
@@ -71,6 +73,19 @@ Function::subroutine_call_evaluate(Term* caller)
         assert(outputPlaceholder != NULL);
         assign_value(outputPlaceholder, caller);
     }
+}
+
+void subroutine_feedback(Branch& branch, Term* subject, Term* desired)
+{
+    Function& func = as_function(subject);
+
+    Term* out = func.subroutineBranch[OUTPUT_PLACEHOLDER_NAME];
+
+    Branch& subBranch = create_branch(&branch);
+
+    generate_feedback(subBranch, out, desired);
+
+    // TODO: feedback from outputs to outside this call
 }
 
 Branch& get_state_for_subroutine_call(Term* term)

@@ -33,6 +33,7 @@ extern Term* GET_FIELD_BY_NAME_FUNC;
 extern Term* IF_FUNC;
 extern Term* IF_EXPR_FUNC;
 extern Term* INT_TYPE;
+extern Term* INPUT_PLACEHOLDER_FUNC;
 extern Term* LIST_TYPE;
 extern Term* LIST_FUNC;
 extern Term* MAP_TYPE;

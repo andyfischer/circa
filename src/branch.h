@@ -95,7 +95,7 @@ bool is_branch(Term* term);
 Branch& as_branch(Term* term);
 std::string get_name_for_attribute(std::string attribute);
 
-Branch& create_branch(Branch* owner, std::string const& name);
+Branch& create_branch(Branch* owner, std::string const& name="");
 
 void duplicate_branch(Branch& source, Branch& dest);
 
