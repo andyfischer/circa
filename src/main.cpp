@@ -11,19 +11,7 @@ int circa_main(std::vector<std::string> args)
 {
     initialize();
 
-    // load args into kernel
-    /*List *cl_args = new List();
-    
-    for (unsigned int i=0; i < args.size(); i++) {
-        cl_args->append(args[i]);
-    }
-
-    import_value(*KERNEL, LIST_TYPE, cl_args, "cl-args");*/
-
     args.erase(args.begin());
-
-    bool justPrintBranch = false;
-    bool justPrintSource = false;
 
     if (args.size() == 0) {
         run_all_tests();
@@ -31,6 +19,7 @@ int circa_main(std::vector<std::string> args)
         return 0;
     }
 
+    // Eval mode
     if (args[0] == "-e") {
         args.erase(args.begin());
         std::stringstream command;
@@ -60,37 +49,41 @@ int circa_main(std::vector<std::string> args)
         return 0;
     }
 
+    // Show compiled code
     if (args[0] == "-p") {
-        justPrintBranch = true;
-        args.erase(args.begin());
+        Branch branch;
+        parse_file(branch, args[1]);
+        std::cout << branch_to_string_raw(branch);
+        return 0;
     }
 
+    // Reproduce source
     if (args[0] == "-s") {
-        justPrintSource = true;
-        args.erase(args.begin());
-
-        if (justPrintBranch) {
-            // todo: fatal
-        }
+        Branch branch;
+        parse_file(branch, args[1]);
+        std::cout << get_branch_source(branch) << std::endl;
+        return 0;
     }
 
+    // Show feedback code
+    if (args[0] == "-f") {
+        Branch branch;
+        parse_file(branch, args[1]);
+        //TODO
+        return 0;
+    }
+
+    // Otherwise, run script
     Branch main_branch;
     parse_file(main_branch, args[0]);
 
-    if (justPrintBranch) {
-        std::cout << branch_to_string_raw(main_branch);
-    }
-
-    else if (justPrintSource) {
-        std::cout << get_branch_source(main_branch) << std::endl;
-    }
-
-    else if (count_compile_errors(main_branch) > 0) {
+    if (count_compile_errors(main_branch) > 0) {
         int count = count_compile_errors(main_branch);
         std::cout << count << " compile error";
         if (count != 1) std::cout << "s";
         std::cout << ":" << std::endl;
         print_compile_errors(main_branch, std::cout);
+        return 1;
     } else {
 
         Term* error_listener = new Term();
@@ -99,6 +92,7 @@ int circa_main(std::vector<std::string> args)
 
         if (error_listener->hasError) {
             std::cout << "Error occured: " << error_listener->getErrorMessage() << std::endl;
+            return 1;
         }
     }
 
