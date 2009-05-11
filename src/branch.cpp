@@ -5,7 +5,8 @@
 namespace circa {
 
 Branch::Branch()
-  : outerScope(NULL)
+  : outerScope(NULL),
+    owningTerm(NULL)
 {
 }
 
@@ -220,6 +221,17 @@ std::string get_name_for_attribute(std::string attribute)
     return "#attr:" + attribute;
 }
 
+Branch* get_outer_scope(Branch& branch)
+{
+    return branch.outerScope;
+    /*
+    TODO
+    if (branch.owningTerm == NULL)
+        return NULL;
+    return branch.owningTerm->owningBranch;
+    */
+}
+
 Term* find_term_by_id(Branch& branch, unsigned int id)
 {
     for (CodeIterator it(&branch); !it.finished(); it.advance()) {
@@ -297,24 +309,10 @@ Term* find_named(Branch* branch, std::string const& name)
         if (branch->contains(name))
             return branch->getNamed(name);
 
-        return find_named(branch->outerScope, name);
+        return find_named(get_outer_scope(*branch), name);
     }
 
     return get_global(name);
-}
-
-bool branch_has_outer_scope(Branch& branch)
-{
-    return branch.contains(get_name_for_attribute("outer_scope"));
-}
-
-Term*& branch_get_outer_scope(Branch& branch)
-{
-    if (!branch_has_outer_scope(branch))
-        return deref(create_value(&branch, REF_TYPE,
-                                    get_name_for_attribute("outer_scope")));
-
-    return deref(branch[get_name_for_attribute("outer_scope")]);
 }
 
 void migrate_values(Branch& source, Branch& dest)

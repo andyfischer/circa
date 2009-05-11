@@ -1,4 +1,4 @@
-// Copyright 2008 Paul Hodge
+// Copyright 2009 Paul Hodge
 
 #include "circa.h"
 
@@ -69,5 +69,19 @@ void CodeIterator::postAdvance()
             _topBranch = NULL;
     }
 }
+
+class BranchIterator
+{
+    RefList branchStack;
+    std::vector<int> indexStack;
+    bool backwards;
+
+    BranchIterator(Branch& branch)
+      : backwards(false)
+    {
+        branchStack.append(branch.owningTerm);
+        indexStack.push_back(0);
+    }
+};
 
 } // namespace circa

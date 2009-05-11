@@ -348,6 +348,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     tokens.consume();
 
+    assert(is_value(result));
+
     return result;
 }
 

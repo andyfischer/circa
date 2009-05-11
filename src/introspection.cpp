@@ -36,7 +36,7 @@ bool has_inner_branch(Term* term)
 
 Branch* get_inner_branch(Term* term)
 {
-    if (is_value(term) && term->type == FUNCTION_TYPE)
+    if (term->type == FUNCTION_TYPE)
         return &as_function(term).subroutineBranch;
 
     if (term->function == BRANCH_FUNC)
@@ -234,7 +234,7 @@ std::string get_source_filename(Term* term)
         if (branch->contains(get_name_for_attribute("source-file")))
             return as_string(branch->getNamed(get_name_for_attribute("source-file")));
 
-        branch = branch->outerScope;
+        branch = get_outer_scope(*branch);
     }
 
     return "";
@@ -366,7 +366,7 @@ void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string
     for (it = branch.names.begin(); it != branch.names.end(); ++it) {
         // Ignore names that aren't bound in the outer branch
         std::string name = it->first;
-        Term* outer = find_named(branch.outerScope, name);
+        Term* outer = find_named(get_outer_scope(branch), name);
         if (outer == NULL)
             continue;
 

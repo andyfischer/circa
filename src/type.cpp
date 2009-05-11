@@ -311,9 +311,14 @@ void alloc_value(Term* term)
 {
     Type& type = as_type(term->type);
     if (type.alloc == NULL)
+        // todo: should this happen?
         term->value = NULL;
-    else
+    else {
         term->value = type.alloc(term->type);
+
+        if (is_branch(term))
+            as_branch(term).owningTerm = term;
+    }
 }
 
 void dealloc_value(Term* term)
