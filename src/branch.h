@@ -19,6 +19,9 @@ struct Branch
     // Points to a Branch which is our outer scope.
     Branch* outerScope;
 
+    // Points to the Term which owns this branch as a value.
+    Term* owningTerm;
+
     Branch();
     ~Branch();
 
@@ -94,6 +97,7 @@ struct Branch
 bool is_branch(Term* term);
 Branch& as_branch(Term* term);
 std::string get_name_for_attribute(std::string attribute);
+Branch* get_outer_scope(Branch& branch);
 
 Branch& create_branch(Branch* owner, std::string const& name="");
 
@@ -103,9 +107,6 @@ void parse_file(Branch& branch, std::string const& filename);
 
 Term* find_term_by_id(Branch& branch, unsigned int id);
 Term* find_named(Branch* branch, std::string const& name);
-
-bool branch_has_outer_scope(Branch& branch);
-Term*& branch_get_outer_scope(Branch& branch);
 
 void migrate_values(Branch& source, Branch& dest);
 void reload_branch_from_file(Branch& branch);
