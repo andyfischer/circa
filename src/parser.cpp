@@ -428,6 +428,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     tokens.consume(NEWLINE);
 
     Term* result = apply(&branch, IF_FUNC, RefList(condition));
+    alloc_value(result);
     Branch& innerBranch = as_branch(result);
     innerBranch.outerScope = &branch;
 
@@ -441,8 +442,8 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         tokens.consume(ELSE);
 
         Term* notCondition = apply(&branch, NOT_FUNC, RefList(condition));
-
         elseResult = apply(&branch, IF_FUNC, RefList(notCondition));
+        alloc_value(elseResult);
         Branch& elseInnerBranch = as_branch(elseResult);
         elseInnerBranch.outerScope = &branch;
 
@@ -457,6 +458,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     // Create the joining branch
     Term* joining = apply(&branch, BRANCH_FUNC, RefList(), "#joining");
+    alloc_value(joining);
     source_set_hidden(joining, true);
     Branch& joiningBranch = *get_inner_branch(joining);
 
@@ -544,6 +546,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     tokens.consume(NEWLINE);
 
     Term* forTerm = apply(&branch, FOR_FUNC, RefList(listExpr));
+    alloc_value(forTerm);
 
     Branch& innerBranch = get_for_loop_code(forTerm);
     innerBranch.outerScope = &branch;
@@ -606,6 +609,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         Term* initialValue = infix_expression(branch, tokens);
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
         result = apply(&branch, ONE_TIME_ASSIGN_FUNC, RefList(initialValue));
+        alloc_value(result);
 
     } else {
         // state i

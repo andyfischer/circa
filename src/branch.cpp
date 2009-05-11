@@ -244,7 +244,7 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
         newTermMap[source_term] = dest_term;
 
         // if output is a branch, duplicate it
-        if (is_branch(source_term)) {
+        if (is_branch(source_term) && is_value_alloced(source_term)) {
             as_branch(dest_term).clear();
             duplicate_branch_nested(newTermMap, as_branch(source_term), as_branch(dest_term));
         }

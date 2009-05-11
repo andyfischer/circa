@@ -20,4 +20,12 @@ Term* import_member_function(Term* type, Function::EvaluateFunc evaluate, std::s
     return result;
 }
 
+Term* expose_value(Branch& branch, int* value, std::string const& name)
+{
+    apply(&branch, VALUE_FUNC, RefList(), name);
+
+
+}
+
+
 } // namespace circa

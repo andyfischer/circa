@@ -148,8 +148,6 @@ void change_type(Term *term, Term *typeTerm)
         dealloc_value(term);
 
     term->type = typeTerm;
-
-    alloc_value(term);
 }
 
 void specialize_type(Term *term, Term *type)
