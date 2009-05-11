@@ -1,9 +1,4 @@
 
-state mouse_x = 0.0
-state mouse_y = 0.0
-state elapsed = 0.0
-state time = 0.0
-
 type Point { float x, float y }
 type Box { float x1, float y1, float x2, float y2 }
 

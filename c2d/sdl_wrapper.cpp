@@ -59,12 +59,12 @@ void shape(circa::Term* caller)
     static Sint16 vy[500];
 
     circa::Branch& list = circa::as_branch(caller->input(0));
-    for (int i=0; i < list.numTerms(); i++) {
+    for (int i=0; i < list.length(); i++) {
         vx[i] = circa::to_float(list[i]->field(0));
         vy[i] = circa::to_float(list[i]->field(1));
     }
-    aapolygonColor(SCREEN, vx, vy, list.numTerms(), caller->input(1)->asInt());
-    filledPolygonColor(SCREEN, vx, vy, list.numTerms(), caller->input(1)->asInt());
+    aapolygonColor(SCREEN, vx, vy, list.length(), caller->input(1)->asInt());
+    filledPolygonColor(SCREEN, vx, vy, list.length(), caller->input(1)->asInt());
 }
 
 void drawText(circa::Term* caller)
