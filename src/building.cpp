@@ -67,8 +67,10 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     change_type(result, outputType);
 
     // Temporary hack
-    if (function == BRANCH_FUNC)
+    if (function == BRANCH_FUNC) {
+        alloc_value(result);
         as_branch(result).outerScope = branch;
+    }
 
     return result;
 }
@@ -87,10 +89,13 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
 
     term->name = source->name;
 
-    if (copyBranches)
-        assign_value(source, term);
-    else
-        assign_value_but_dont_copy_inner_branch(source,term);
+    if (source->value != NULL) {
+        alloc_value(term);
+        if (copyBranches)
+            assign_value(source, term);
+        else
+            assign_value_but_dont_copy_inner_branch(source,term);
+    }
 
     duplicate_branch(source->properties, term->properties);
 
@@ -113,7 +118,6 @@ Term* create_value(Branch* branch, Term* type, std::string const& name)
 
     Term *term = apply(branch, VALUE_FUNC, RefList(), name);
     change_type(term, type);
-
     alloc_value(term);
 
     return term;

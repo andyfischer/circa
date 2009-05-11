@@ -384,13 +384,11 @@ void initialize_builtin_functions(Branch& kernel)
 
 void initialize_constants(Branch& kernel)
 {
-    CONSTANT_TRUE = apply(&kernel, BOOL_TYPE, RefList());
+    CONSTANT_TRUE = create_value(&kernel, BOOL_TYPE, "true");
     as_bool(CONSTANT_TRUE) = true;
-    KERNEL->bindName(CONSTANT_TRUE, "true");
 
-    CONSTANT_FALSE = apply(&kernel, BOOL_TYPE, RefList());
+    CONSTANT_FALSE = create_value(&kernel, BOOL_TYPE, "false");
     as_bool(CONSTANT_FALSE) = false;
-    KERNEL->bindName(CONSTANT_FALSE, "false");
 
     float_value(&kernel, 3.141592654f, "PI");
     float_value(&kernel, 3.141592654f / 2.0, "HALF_PI");
