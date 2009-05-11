@@ -38,6 +38,8 @@ int previous_MOUSE_Y = 0;
 int drag_start_x = 0;
 int drag_start_y = 0;
 
+float TIME = 0;
+float ELAPSED = 0;
 long prev_sdl_ticks = 0;
 
 Ref THING_JUST_CLICKED;
@@ -129,6 +131,12 @@ int main( int argc, char* args[] )
     circa::initialize();
 
     SCRIPT_ROOT = &create_branch(circa::KERNEL, "c2d_root");
+
+    // Import constants
+    expose_value(SCRIPT_ROOT, &MOUSE_X, "mouse_x");
+    expose_value(SCRIPT_ROOT, &MOUSE_Y, "mouse_y");
+    expose_value(SCRIPT_ROOT, &TIME, "time");
+    expose_value(SCRIPT_ROOT, &ELAPSED, "elapsed");
 
     // Import functions
     circa::import_function(*SCRIPT_ROOT, key_down, "key_down(int) : bool");
@@ -230,13 +238,10 @@ int main( int argc, char* args[] )
 
         long ticks = SDL_GetTicks();
 
-        SCRIPT_ROOT->get("elapsed")->asFloat() = (ticks - prev_sdl_ticks) / 1000.0;
-        SCRIPT_ROOT->get("time")->asFloat() = ticks / 1000.0;
+        ELAPSED = (ticks - prev_sdl_ticks) / 1000.0;
+        TIME = ticks / 1000.0;
 
         prev_sdl_ticks = ticks;
-
-        SCRIPT_ROOT->get("mouse_x")->asFloat() = MOUSE_X;
-        SCRIPT_ROOT->get("mouse_y")->asFloat() = MOUSE_Y;
 
         try {
             SCRIPT_ROOT->eval();
