@@ -70,6 +70,8 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
         as_branch(result).outerScope = branch;
     }
 
+    assert(function->name != "#attr:function-def");
+
     return result;
 }
 
@@ -199,6 +201,18 @@ void rewrite_as_value(Branch& branch, int index, Term* type)
         term->inputs = RefList();
         alloc_value(term);
     }
+}
+
+void rename(Term* term, std::string const& name)
+{
+    if ((term->owningBranch != NULL) &&
+            (term->owningBranch->getNamed(term->name) == term)) {
+        term->owningBranch->names.remove(term->name);
+        term->name = "";
+        term->owningBranch->bindName(term, name);
+    }
+
+    term->name = name;
 }
 
 } // namespace circa

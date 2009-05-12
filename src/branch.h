@@ -67,7 +67,6 @@ struct Branch
     // Find the last term with the given name binding.
     Term* findLastBinding(std::string const& name) const;
 
-
     // Bind a name to a term
     void bindName(Term* term, std::string name);
 
