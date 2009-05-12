@@ -1,9 +1,9 @@
 // Copyright 2008 Paul Hodge
 
 #include "branch.h"
+#include "branch_iterator.h"
 #include "building.h"
 #include "builtins.h"
-#include "code_iterator.h"
 #include "cpp_importing.h"
 #include "debug.h"
 #include "feedback.h"

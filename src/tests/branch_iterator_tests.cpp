@@ -3,7 +3,7 @@
 #include <circa.h>
 
 namespace circa {
-namespace code_iterator_tests {
+namespace branch_iterator_tests {
 
 void test_simple()
 {
@@ -12,7 +12,7 @@ void test_simple()
     Term* a = branch.eval("a = 1");
     Term* b = branch.eval("b = 2");
 
-    CodeIterator it(&branch);
+    BranchIterator it(branch);
 
     test_assert(it.current() == a);
     it.advance();
@@ -22,7 +22,7 @@ void test_simple()
 
     Term* sub = branch.compile("def func()\nc = 3\nd = 4\nend");
 
-    it.reset(&branch);
+    it.reset(branch);
 
     test_assert(it.current() == a);
     it.advance();
@@ -41,7 +41,7 @@ void test_simple()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(code_iterator_tests::test_simple);
+    REGISTER_TEST_CASE(branch_iterator_tests::test_simple);
 }
 
 }

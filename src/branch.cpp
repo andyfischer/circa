@@ -230,7 +230,7 @@ Branch* get_outer_scope(Branch& branch)
 
 Term* find_term_by_id(Branch& branch, unsigned int id)
 {
-    for (CodeIterator it(&branch); !it.finished(); it.advance()) {
+    for (BranchIterator it(branch); !it.finished(); it.advance()) {
         if (*it == NULL)
             continue;
 
