@@ -21,10 +21,10 @@ Branch& get_for_loop_state(Term* forTerm, int index)
 
 void setup_for_loop_pre_code(Term* forTerm)
 {
-    Term* r = apply(&get_for_loop_code(forTerm), BRANCH_FUNC, RefList(), "#rebound");
+    create_branch(&get_for_loop_code(forTerm), "#rebound");
     Term* ifi = create_value(&get_for_loop_code(forTerm), BOOL_TYPE, "#is_first_iteration");
 
-    source_set_hidden(r, true);
+    source_set_hidden(get_for_loop_code(forTerm).getNamed("#rebound"), true);
     source_set_hidden(ifi, true);
 }
 
@@ -39,7 +39,8 @@ void setup_for_loop_post_code(Term* forTerm)
 
     for (unsigned i=0; i < reboundNames.size(); i++) {
         std::string name = reboundNames[i];
-        Term* outerVersion = get_for_loop_code(forTerm).outerScope->getNamed(name);
+        Branch& outerScope = *forTerm->owningBranch;
+        Term* outerVersion = outerScope.getNamed(name);
         Term* innerVersion = get_for_loop_code(forTerm)[name];
 
         Term* ifexpr = apply(&rebound, IF_EXPR_FUNC,
@@ -51,7 +52,7 @@ void setup_for_loop_post_code(Term* forTerm)
         ifexpr->inputs[1] = outerVersion;
 
         // Bind inner version to outer scope
-        apply(get_for_loop_code(forTerm).outerScope, COPY_FUNC, RefList(innerVersion), name);
+        apply(&outerScope, COPY_FUNC, RefList(innerVersion), name);
     }
 }
 

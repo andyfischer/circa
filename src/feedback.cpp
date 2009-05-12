@@ -103,9 +103,8 @@ void refresh_training_branch(Branch& branch)
     update_derived_trainable_properties(branch);
 
     // Check if '#training' branch exists. Create if it doesn't exist
-    if (!branch.contains(TRAINING_BRANCH_NAME)) {
-        apply(&branch, BRANCH_FUNC, RefList(), TRAINING_BRANCH_NAME);
-    }
+    if (!branch.contains(TRAINING_BRANCH_NAME))
+        create_branch(&branch, TRAINING_BRANCH_NAME);
 
     Branch& trainingBranch = as_branch(branch[TRAINING_BRANCH_NAME]);
 

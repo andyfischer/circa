@@ -442,7 +442,6 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     Term* result = apply(&branch, IF_FUNC, RefList(condition));
     alloc_value(result);
     Branch& innerBranch = as_branch(result);
-    innerBranch.outerScope = &branch;
 
     consume_branch_until_end(innerBranch, tokens);
     remove_compilation_attrs(innerBranch);
@@ -457,7 +456,6 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         elseResult = apply(&branch, IF_FUNC, RefList(notCondition));
         alloc_value(elseResult);
         Branch& elseInnerBranch = as_branch(elseResult);
-        elseInnerBranch.outerScope = &branch;
 
         consume_branch_until_end(elseInnerBranch, tokens);
         remove_compilation_attrs(elseInnerBranch);
@@ -567,7 +565,6 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     alloc_value(forTerm);
 
     Branch& innerBranch = get_for_loop_code(forTerm);
-    innerBranch.outerScope = &branch;
 
     // Create iterator variable
     Term* iterator = create_value(&innerBranch, ANY_TYPE, iterator_name);

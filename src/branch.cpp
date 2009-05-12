@@ -5,8 +5,7 @@
 namespace circa {
 
 Branch::Branch()
-  : outerScope(NULL),
-    owningTerm(NULL)
+  : owningTerm(NULL)
 {
 }
 
@@ -224,10 +223,6 @@ std::string get_name_for_attribute(std::string attribute)
 
 Branch* get_outer_scope(Branch& branch)
 {
-    // TODO: remove this:
-    if (branch.outerScope != NULL)
-        return branch.outerScope;
-
     if (branch.owningTerm == NULL)
         return NULL;
     return branch.owningTerm->owningBranch;
@@ -262,13 +257,6 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
             duplicate_branch_nested(newTermMap, as_branch(source_term), as_branch(dest_term));
         }
 
-        // Special case for Function. These guys have a branch inside their value.
-        /*
-        if (source_term->type == FUNCTION_TYPE)
-            duplicate_branch_nested(newTermMap, *get_inner_branch(source_term),
-                    *get_inner_branch(dest_term));
-                    */
-
         // Copy names
         if (source_term->name != "")
             dest.bindName(dest_term, source_term->name);
@@ -277,8 +265,8 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
 
 Branch& create_branch(Branch* owner, std::string const& name)
 {
-    Term* term = create_value(owner, BRANCH_TYPE, name);
-    as_branch(term).outerScope = owner;
+    Term* term = apply(owner, BRANCH_FUNC, RefList(), name);
+    alloc_value(term);
     return as_branch(term);
 }
 
