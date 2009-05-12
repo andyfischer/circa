@@ -22,10 +22,7 @@ Branch& get_for_loop_state(Term* forTerm, int index)
 void setup_for_loop_pre_code(Term* forTerm)
 {
     create_branch(&get_for_loop_code(forTerm), "#rebound");
-    Term* ifi = create_value(&get_for_loop_code(forTerm), BOOL_TYPE, "#is_first_iteration");
-
-    source_set_hidden(get_for_loop_code(forTerm).getNamed("#rebound"), true);
-    source_set_hidden(ifi, true);
+    create_value(&get_for_loop_code(forTerm), BOOL_TYPE, "#is_first_iteration");
 }
 
 void setup_for_loop_post_code(Term* forTerm)

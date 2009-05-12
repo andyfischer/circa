@@ -342,7 +342,6 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     // Remove the name that function_from_header applied
     rename(functionDef, get_name_for_attribute("function-def"));
-    source_set_hidden(functionDef, true);
 
     initialize_subroutine(result);
 
@@ -469,7 +468,6 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     // Create the joining branch
     Term* joining = apply(&branch, BRANCH_FUNC, RefList(), "#joining");
     alloc_value(joining);
-    source_set_hidden(joining, true);
     Branch& joiningBranch = *get_inner_branch(joining);
 
     // Get a list of all names bound in this branch
