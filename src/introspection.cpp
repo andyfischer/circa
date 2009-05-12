@@ -29,6 +29,13 @@ bool is_actually_using(Term* user, Term* usee)
     return false;
 }
 
+std::string format_global_id(Term* term)
+{
+    std::stringstream out;
+    out << "$" << std::hex << term->globalID;
+    return out.str();
+}
+
 std::string get_short_local_name(Term* term)
 {
     if (term == NULL)
@@ -36,9 +43,7 @@ std::string get_short_local_name(Term* term)
     if (term->name != "")
         return term->name;
 
-    std::stringstream stream;
-    stream << "#" << term->globalID;
-    return stream.str();
+    return format_global_id(term);
 }
 
 std::string term_to_raw_string(Term* term)
@@ -52,7 +57,7 @@ std::string term_to_raw_string(Term* term)
     std::string funcName = get_short_local_name(term->function);
     std::string typeName = term->type->name;
 
-    output << "#" << term->globalID << " ";
+    output << format_global_id(term) << " ";
 
     if (name != "")
         output << "'" << name << "' ";
@@ -63,7 +68,7 @@ std::string term_to_raw_string(Term* term)
     for (unsigned int input_index=0; input_index < term->inputs.count(); input_index++) {
         Term* input = term->inputs[input_index];
         if (!first_input) output << ", ";
-        output << "#" << input->globalID;
+        output << format_global_id(input);
         first_input = false;
     }
 
@@ -89,7 +94,7 @@ std::string branch_namespace_to_string(Branch& branch)
 
     TermNamespace::iterator it;
     for (it = branch.names.begin(); it != branch.names.end(); ++it) {
-        out << it->first << ": #" << it->second->globalID << "\n";
+        out << it->first << ": " << format_global_id(it->second) << "\n";
     }
 
     return out.str();
