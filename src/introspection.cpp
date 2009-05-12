@@ -102,8 +102,6 @@ std::string term_to_raw_string(Term* term)
     if (showValue)
         output << " == " << term->toString();
 
-    //if (term->hasError()) output << " *" << term->getErrorMessage() << "*";
-
     return output.str();
 }
 
@@ -122,7 +120,7 @@ std::string branch_namespace_to_string(Branch& branch)
 std::string branch_to_string_raw(Branch& branch)
 {
     std::stringstream out;
-    for (CodeIterator it(&branch); !it.finished(); it.advance()) {
+    for (BranchIterator it(branch); !it.finished(); it.advance()) {
         Term* term = it.current();
 
         int indent = it.depth();

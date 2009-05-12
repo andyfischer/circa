@@ -35,7 +35,7 @@ void generate_feedback(Branch& branch, Term* subject, Term* desired)
 
 void update_derived_trainable_properties(Branch& branch)
 {
-    for (CodeIterator it(&branch); !it.finished(); it.advance()) {
+    for (BranchIterator it(branch); !it.finished(); it.advance()) {
         // if any of our inputs are trainable then mark us as derived-trainable
         bool found = false;
         for (int i=0; i < it->numInputs(); i++) {
