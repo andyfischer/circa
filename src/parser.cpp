@@ -226,7 +226,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
 
     if (tokens.nextIs(DEF))
-        tokens.consume();
+        tokens.consume(DEF);
 
     possible_whitespace(tokens);
 
@@ -263,7 +263,6 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
             possible_whitespace(tokens);
             isHiddenStateArgument = true;
         }
-
 
         if (!tokens.nextIs(IDENTIFIER))
             return compile_error_for_line(result, tokens, startPosition);
@@ -334,9 +333,14 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     Term* functionDef = function_from_header(subBranch, tokens);
 
-    if (has_compile_error(functionDef))
-        return functionDef;
+    if (has_compile_error(functionDef)) {
+        std::string message = functionDef->stringProp("message");
+        change_function(result, UNRECOGNIZED_EXPRESSION_FUNC);
+        result->stringProp("message") = message;
+        return result;
+    }
 
+    // Remove the name that function_from_header applied
     functionDef->name = "";
     subBranch.bindName(functionDef, get_name_for_attribute("function-def"));
 
@@ -490,7 +494,13 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         std::set<std::string>::iterator it;
         for (it = boundNames.begin(); it != boundNames.end();)
         {
-            if (find_named(&branch, *it) == NULL)
+            std::string const& name = *it;
+
+            if (find_named(&branch, name) == NULL)
+                boundNames.erase(it++);
+
+            // Also ignore hidden names
+            else if ((name[0] == '#') && (name != OUTPUT_PLACEHOLDER_NAME))
                 boundNames.erase(it++);
             else
                 ++it;

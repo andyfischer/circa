@@ -68,7 +68,9 @@ std::string get_term_source(Term* term)
         bool prependNameBinding = true;
 
         // for certain types, don't write "name =" in front
-        if (term->type == FUNCTION_TYPE || term->type == TYPE_TYPE)
+        if (term->type == FUNCTION_TYPE
+                || term->type == TYPE_TYPE
+                || term->type == SUBROUTINE_TYPE)
             prependNameBinding = false;
 
         if (prependNameBinding && term->name != "")
@@ -82,8 +84,8 @@ std::string get_term_source(Term* term)
     }
 
     // check if this function has a toSourceString function
-    if (as_function(term->function).toSourceString != NULL) {
-        result << as_function(term->function).toSourceString(term);
+    if (get_function_data(term->function).toSourceString != NULL) {
+        result << get_function_data(term->function).toSourceString(term);
         result << term->stringPropOptional("syntaxHints:postWhitespace", "");
         return result.str();
     }
@@ -122,7 +124,7 @@ std::string get_term_source(Term* term)
 
         for (int i=0; i < term->numInputs(); i++) {
             // don't show the hidden state input for subroutines
-            if (has_hidden_state(as_function(term->function)) && i == 0)
+            if (has_hidden_state(get_function_data(term->function)) && i == 0)
                 continue;
 
             result << get_source_of_input(term, i);
