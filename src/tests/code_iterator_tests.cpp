@@ -20,15 +20,7 @@ void test_simple()
     it.advance();
     test_assert(it.finished());
 
-    Term* funcTerm = create_value(&branch, FUNCTION_TYPE);
-    Function &func = as_function(funcTerm);
-
-    /*
-    FIXME
-    Term* c = func.subroutineBranch.eval("c = 3");
-    Term* d = func.subroutineBranch.eval("d = 4");
-
-    Term* e = branch.eval("e = 5");
+    Term* sub = branch.compile("def func()\nc = 3\nd = 4\nend");
 
     it.reset(&branch);
 
@@ -36,16 +28,15 @@ void test_simple()
     it.advance();
     test_assert(it.current() == b);
     it.advance();
-    test_assert(it.current() == funcTerm);
+    test_assert(it.current() == sub);
     it.advance();
-    test_assert(it.current() == c);
+    test_assert(it.current() == sub->asBranch()[0]);
     it.advance();
-    test_assert(it.current() == d);
+    test_assert(it.current() == sub->asBranch()[1]);
     it.advance();
-    test_assert(it.current() == e);
+    test_assert(it.current() == sub->asBranch()[2]);
     it.advance();
     test_assert(it.finished());
-    */
 }
 
 void register_tests()
