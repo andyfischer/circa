@@ -300,9 +300,9 @@ void bootstrap_kernel()
     as_type(FUNCTION_TYPE).name = "Function";
     as_type(FUNCTION_TYPE).alloc = cpp_importing::templated_alloc<Function>;
     as_type(FUNCTION_TYPE).dealloc = cpp_importing::templated_dealloc<Function>;
-    as_type(FUNCTION_TYPE).assign = Function::assign;
-    as_type(FUNCTION_TYPE).remapPointers = Function::remapPointers;
-    as_type(FUNCTION_TYPE).toString = Function::functionToSourceString;
+    as_type(FUNCTION_TYPE).assign = function_t::assign;
+    as_type(FUNCTION_TYPE).remapPointers = function_t::remapPointers;
+    as_type(FUNCTION_TYPE).toString = function_t::to_string;
     KERNEL->bindName(FUNCTION_TYPE, "Function");
 
     // Implant Function type

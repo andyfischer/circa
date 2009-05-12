@@ -62,11 +62,13 @@ struct Function
 
     // Hosted functions
     static void copyExceptBranch(Term* source, Term* dest);
-    static void assign(Term* source, Term* dest);
-    static void remapPointers(Term* term, ReferenceMap const& map);
-    static void subroutine_call_evaluate(Term* caller);
-    static std::string functionToSourceString(Term* source);
 };
+
+namespace function_t {
+    void assign(Term* source, Term* dest);
+    void remapPointers(Term* term, ReferenceMap const& map);
+    std::string to_string(Term* term);
+}
 
 bool is_function(Term* term);
 Function& as_function(Term*);

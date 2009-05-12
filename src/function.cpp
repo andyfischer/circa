@@ -69,6 +69,47 @@ void Function::setInputModified(int index, bool value)
     getInputProperties(index).modified = value;
 }
 
+namespace function_t {
+    void assign(Term* sourceTerm, Term* destTerm)
+    {
+        assert(is_function(sourceTerm));
+        assert(is_function(destTerm));
+
+        Function &source = as_function(sourceTerm);
+        Function &dest = as_function(destTerm);
+
+        dest = Function();
+
+        #define copy_field(f) dest.f = source.f
+
+        copy_field(inputTypes);
+        copy_field(inputProperties);
+        copy_field(outputType);
+        copy_field(pureFunction);
+        copy_field(hasSideEffects);
+        copy_field(variableArgs);
+        copy_field(name);
+        copy_field(evaluate);
+        copy_field(specializeType);
+        copy_field(generateFeedback);
+        copy_field(toSourceString);
+        copy_field(startControlFlowIterator);
+
+        #undef copy_field
+    }
+
+    void remapPointers(Term* term, ReferenceMap const& map)
+    {
+        Function &func = as_function(term);
+        func.inputTypes.remapPointers(map);
+        func.outputType = map.getRemapped(func.outputType);
+    }
+    std::string to_string(Term* term)
+    {
+        return "<Function " + as_function(term).name + ">";
+    }
+}
+
 bool is_function(Term* term)
 {
     return term->type == FUNCTION_TYPE;
@@ -81,97 +122,11 @@ Function& as_function(Term* term)
     return *((Function*) term->value);
 }
 
-void Function::copyExceptBranch(Term* sourceTerm, Term* destTerm)
-{
-    assert(is_function(sourceTerm));
-    assert(is_function(destTerm));
-
-    Function &source = as_function(sourceTerm);
-    Function &dest = as_function(destTerm);
-
-    dest = Function();
-
-#define copy_field(f) dest.f = source.f
-
-    copy_field(inputTypes);
-    copy_field(inputProperties);
-    copy_field(outputType);
-    copy_field(pureFunction);
-    copy_field(hasSideEffects);
-    copy_field(variableArgs);
-    copy_field(name);
-    copy_field(evaluate);
-    copy_field(specializeType);
-    copy_field(generateFeedback);
-    copy_field(toSourceString);
-    copy_field(startControlFlowIterator);
-
-#undef copy_field
-}
-
-void Function::assign(Term* sourceTerm, Term* destTerm)
-{
-    Function::copyExceptBranch(sourceTerm, destTerm);
-    Function &source = as_function(sourceTerm);
-    Function &dest = as_function(destTerm);
-    //duplicate_branch(source.subroutineBranch, dest.subroutineBranch);
-}
-
-void Function::remapPointers(Term* term, ReferenceMap const& map)
-{
-    Function &func = as_function(term);
-    func.inputTypes.remapPointers(map);
-    func.outputType = map.getRemapped(func.outputType);
-    //func.subroutineBranch.remapPointers(map);
-}
-
-
 std::string get_placeholder_name_for_index(int index)
 {
     std::stringstream sstream;
     sstream << INPUT_PLACEHOLDER_PREFIX << index;
     return sstream.str();
-}
-
-std::string
-Function::functionToSourceString(Term* term)
-{
-    /*
-    Function &func = as_function(term);
-
-    std::stringstream result;
-
-    result << "def " << func.name << "(";
-
-    bool first = true;
-    for (int i=0; i < func.numInputs(); i++) {
-        std::string name = func.getInputProperties(i).name;
-
-        if (name == "#state")
-            continue;
-
-        if (!first) result << ", ";
-        first = false;
-        result << func.inputType(i)->name;
-
-        if (func.getInputProperties(i).name != "")
-            result << " " << name;
-    }
-
-    result << ")";
-
-    if (func.outputType != VOID_TYPE)
-        result << " : " << func.outputType->name;
-
-    result << "\n";
-
-    result << get_branch_source(func.subroutineBranch);
-    
-    result << "end";
-
-    return result.str();
-    */
-    return "";
 }
 
 Term* create_empty_function(Branch& branch, std::string const& header)

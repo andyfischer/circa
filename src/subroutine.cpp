@@ -67,7 +67,7 @@ void initialize_subroutine(Term* term)
 {
     Branch& branch = as_branch(term);
     Function& func = get_subroutines_function_def(term);
-    func.evaluate = Function::subroutine_call_evaluate;
+    func.evaluate = subroutine_call_evaluate;
 
     for (int input=0; input < func.numInputs(); input++) {
         std::string name = func.getInputProperties(input).name;
@@ -90,8 +90,7 @@ void initialize_subroutine_state(Term* term, Branch& state)
     duplicate_branch(as_branch(term->function), state);
 }
 
-void
-Function::subroutine_call_evaluate(Term* caller)
+void subroutine_call_evaluate(Term* caller)
 {
     Branch &branch = get_state_for_subroutine_call(caller);
 
