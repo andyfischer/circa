@@ -22,8 +22,7 @@ namespace if_function {
         result << get_source_of_input(term, 0);
         result << "\n";
 
-        Branch& branch = *get_inner_branch(term);
-        result << get_branch_source(branch);
+        result << get_branch_source(as_branch(term));
 
         result << "end";
         return result.str();

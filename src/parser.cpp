@@ -466,9 +466,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     tokens.consume(END);
 
     // Create the joining branch
-    Term* joining = apply(&branch, BRANCH_FUNC, RefList(), "#joining");
-    alloc_value(joining);
-    Branch& joiningBranch = *get_inner_branch(joining);
+    Branch& joiningBranch = create_branch(&branch, "#joining");
 
     // Get a list of all names bound in this branch
     std::set<std::string> boundNames;
