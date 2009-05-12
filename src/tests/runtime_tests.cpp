@@ -52,7 +52,7 @@ void blocked_by_error()
 
     Term *spy_1 = branch.compile("spy('1')");
     Term *error = branch.compile("e = i_only_throw_errors()");
-    Term *spy_errored = branch.compile("spy(e)");
+    Term *spy_blocked = branch.compile("spy(e)");
 
     test_assert(gSpyResults.size() == 0);
 
@@ -69,6 +69,7 @@ void blocked_by_error()
     test_assert(gSpyResults[0] == "1");
     test_assert(!spy_1->hasError);
     test_assert(error->hasError);
+    test_assert(!is_value_alloced(spy_blocked));
 }
 
 

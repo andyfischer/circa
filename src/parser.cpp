@@ -342,6 +342,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     // Remove the name that function_from_header applied
     rename(functionDef, get_name_for_attribute("function-def"));
+    source_set_hidden(functionDef, true);
 
     initialize_subroutine(result);
 

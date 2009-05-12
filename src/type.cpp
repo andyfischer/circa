@@ -384,12 +384,6 @@ void assign_value_but_dont_copy_inner_branch(Term* source, Term* dest)
 
     assert(value_fits_type(source, dest->type));
 
-    // Special case for functions
-    if (source->type == FUNCTION_TYPE) {
-        Function::copyExceptBranch(source,dest);
-        return;
-    }
-    
     // Otherwise, do nothing for types with branches
     if (has_inner_branch(dest))
         return;
