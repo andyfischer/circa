@@ -29,28 +29,6 @@ bool is_actually_using(Term* user, Term* usee)
     return false;
 }
 
-bool has_inner_branch(Term* term)
-{
-    return get_inner_branch(term) != NULL;
-}
-
-Branch* get_inner_branch(Term* term)
-{
-    if (term->type == SUBROUTINE_TYPE)
-        return &as_branch(term);
-
-    if (term->function == BRANCH_FUNC)
-        return &as_branch(term);
-
-    if (term->function == IF_FUNC)
-        return &as_branch(term);
-
-    if (term->function == FOR_FUNC)
-        return &get_for_loop_code(term);
-
-    return NULL;
-}
-
 std::string get_short_local_name(Term* term)
 {
     if (term == NULL)
@@ -96,7 +74,7 @@ std::string term_to_raw_string(Term* term)
 
     bool showValue = term->value != NULL;
 
-    if (get_inner_branch(term) != NULL)
+    if (is_branch(term))
         showValue = false;
 
     if (showValue)
@@ -128,9 +106,6 @@ std::string branch_to_string_raw(Branch& branch)
         for (int i=0; i < indent; i++) out << "  ";
 
         out << term_to_raw_string(term) << std::endl;
-
-        if (get_inner_branch(term) != NULL)
-            indent++;
     }
     return out.str();
 }

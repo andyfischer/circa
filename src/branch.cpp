@@ -326,8 +326,9 @@ void migrate_values(Branch& source, Branch& dest)
             // At this point, they match
 
             // Branch migration
-            if (has_inner_branch(sourceTerm)) {
-                migrate_values(*get_inner_branch(sourceTerm),*get_inner_branch(destTerm));
+            if (is_branch(sourceTerm)) {
+                assert(is_branch(destTerm));
+                migrate_values(as_branch(sourceTerm), as_branch(destTerm));
             } 
             
             // Stateful value migration

@@ -43,7 +43,6 @@ namespace subroutine_t {
 
         return result.str();
     }
-
 }
 
 bool is_subroutine(Term* term)
