@@ -95,30 +95,29 @@ void test_duplicate_nested_dont_make_extra_terms()
 
 void test_duplicate_subroutine()
 {
-    /*
-    FIXME
     Branch branch;
-    Function& func = as_function(create_value(&branch, FUNCTION_TYPE, "func"));
 
-    func.name = "func";
-    func.subroutineBranch.eval("a = 1");
+    Term* func = branch.eval("def func()\na = 1\nend");
+
+    // sanity check:
+    test_assert(get_function_data(func).name == "func");
+    test_assert(branch.contains("func"));
 
     Branch dupe;
     duplicate_branch(branch, dupe);
 
     test_assert(dupe.contains("func"));
 
-    Function& dupedFunc = as_function(dupe["func"]);
+    Term* dupedFunc = dupe["func"];
+    test_assert(get_function_data(dupedFunc).name == "func");
 
-    // make sure the value portion of func was copied
-    test_assert(dupedFunc.name == "func");
+    test_assert(is_branch(dupedFunc));
 
-    // make sure subroutine was properly copied
-    test_assert(dupedFunc.subroutineBranch.length() > 0);
-    test_assert(dupedFunc.subroutineBranch.length() == 1);
-    test_assert(dupedFunc.subroutineBranch[0]->asInt() == 1);
-    test_assert(dupedFunc.subroutineBranch["a"] == dupedFunc.subroutineBranch[0]);
-    */
+    test_assert(as_branch(func).length() == as_branch(dupedFunc).length());
+    test_assert(as_branch(func)[1]->function == as_branch(dupedFunc)[1]->function);
+    test_assert(as_branch(func)[1]->type == as_branch(dupedFunc)[1]->type);
+    test_assert(as_branch(func)[1]->asInt() == as_branch(dupedFunc)[1]->asInt());
+    test_assert(as_branch(dupedFunc)[1] == as_branch(dupedFunc)["a"]);
 }
 
 void test_duplicate_get_field_by_name()
