@@ -49,6 +49,7 @@ Term* REF_TYPE = NULL;
 Term* SET_FIELD_FUNC = NULL;
 Term* SET_FIELD_BY_NAME_FUNC = NULL;
 Term* SUB_FUNC = NULL;
+Term* SUBROUTINE_TYPE = NULL;
 Term* STRING_TYPE = NULL;
 Term* TYPE_TYPE = NULL;
 Term* UNKNOWN_FUNCTION = NULL;
@@ -374,6 +375,8 @@ void initialize_builtin_types(Branch& kernel)
     as_type(LIST_TYPE).toString = list_t::to_string;
     import_member_function(LIST_TYPE, list_t::append, "append(List, any) : List");
     import_member_function(LIST_TYPE, list_t::count, "count(List) : int");
+
+    register_subroutine_type(kernel);
 }
 
 void initialize_builtin_functions(Branch& kernel)

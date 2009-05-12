@@ -4,18 +4,74 @@
 
 namespace circa {
 
-bool is_subroutine(Term* term)
-{
-    return is_function(term) && as_function(term).subroutineBranch.length() > 0;
+namespace subroutine_t {
+
+    std::string to_string(Term* term)
+    {
+        Branch& branch = as_branch(term);
+        Function& func = get_subroutines_function_def(term);
+
+        std::stringstream result;
+
+        result << "def " << func.name << "(";
+
+        bool first = true;
+        for (int i=0; i < func.numInputs(); i++) {
+            std::string name = func.getInputProperties(i).name;
+
+            if (name == "#state")
+                continue;
+
+            if (!first) result << ", ";
+            first = false;
+            result << func.inputType(i)->name;
+
+            if (func.getInputProperties(i).name != "")
+                result << " " << name;
+        }
+
+        result << ")";
+
+        if (func.outputType != VOID_TYPE)
+            result << " : " << func.outputType->name;
+
+        result << "\n";
+
+        result << get_branch_source(branch);
+        
+        result << "end";
+
+        return result.str();
+    }
+
 }
 
-void initialize_as_subroutine(Function& func)
+bool is_subroutine(Term* term)
 {
+    return term->type == SUBROUTINE_TYPE && (SUBROUTINE_TYPE != NULL);
+}
+
+Function& get_subroutines_function_def(Term* term)
+{
+    assert(is_subroutine(term));
+    return as_function(as_branch(term)[get_name_for_attribute("function-def")]);
+}
+
+void register_subroutine_type(Branch& kernel)
+{
+    SUBROUTINE_TYPE = create_compound_type(kernel, "Subroutine");
+    as_type(SUBROUTINE_TYPE).toString = subroutine_t::to_string;
+}
+
+void initialize_subroutine(Term* term)
+{
+    Branch& branch = as_branch(term);
+    Function& func = get_subroutines_function_def(term);
     func.evaluate = Function::subroutine_call_evaluate;
 
     for (int input=0; input < func.numInputs(); input++) {
         std::string name = func.getInputProperties(input).name;
-        Term *placeholder = apply(&func.subroutineBranch, INPUT_PLACEHOLDER_FUNC,
+        Term *placeholder = apply(&branch, INPUT_PLACEHOLDER_FUNC,
             RefList(), name);
         change_type(placeholder, func.inputType(input));
         source_set_hidden(placeholder, true);
@@ -30,9 +86,8 @@ void initialize_as_subroutine(Function& func)
 
 void initialize_subroutine_state(Term* term, Branch& state)
 {
-    Function &def = as_function(term->function);
-    state.clear();
-    duplicate_branch(def.subroutineBranch, state);
+    assert(is_subroutine(term->function));
+    duplicate_branch(as_branch(term->function), state);
 }
 
 void
@@ -43,7 +98,7 @@ Function::subroutine_call_evaluate(Term* caller)
     if (branch.length() == 0)
         initialize_subroutine_state(caller, branch);
 
-    Function &sub = as_function(caller->function);
+    Function &sub = get_function_data(caller->function);
 
     if (sub.inputTypes.count() != caller->inputs.count()) {
         std::stringstream msg;
@@ -79,11 +134,13 @@ void subroutine_feedback(Branch& branch, Term* subject, Term* desired)
 {
     Function& func = as_function(subject);
 
+    /*
     Term* out = func.subroutineBranch[OUTPUT_PLACEHOLDER_NAME];
 
     Branch& subBranch = create_branch(&branch);
 
     generate_feedback(subBranch, out, desired);
+    */
 
     // TODO: feedback from outputs to outside this call
 }

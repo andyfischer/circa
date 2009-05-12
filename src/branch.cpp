@@ -223,13 +223,13 @@ std::string get_name_for_attribute(std::string attribute)
 
 Branch* get_outer_scope(Branch& branch)
 {
-    return branch.outerScope;
-    /*
-    TODO
+    // TODO: remove this:
+    if (branch.outerScope != NULL)
+        return branch.outerScope;
+
     if (branch.owningTerm == NULL)
         return NULL;
     return branch.owningTerm->owningBranch;
-    */
 }
 
 Term* find_term_by_id(Branch& branch, unsigned int id)
@@ -262,9 +262,11 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
         }
 
         // Special case for Function. These guys have a branch inside their value.
+        /*
         if (source_term->type == FUNCTION_TYPE)
             duplicate_branch_nested(newTermMap, *get_inner_branch(source_term),
                     *get_inner_branch(dest_term));
+                    */
 
         // Copy names
         if (source_term->name != "")

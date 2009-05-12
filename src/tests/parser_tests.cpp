@@ -151,7 +151,7 @@ void test_function_decl()
             "  return yo > 3\n"
             "end");
 
-    Function& func = as_function(funcTerm);
+    Function& func = get_subroutines_function_def(funcTerm);
 
     test_equals(funcTerm->name, "Myfunc");
     test_equals(func.name, "Myfunc");
@@ -165,22 +165,23 @@ void test_function_decl()
     test_assert(func.getInputProperties(3).name == "yo");
     test_assert(func.outputType == BOOL_TYPE);
 
-    Branch& funcbranch = func.subroutineBranch;
+    Branch& funcbranch = as_branch(funcTerm);
 
-    test_equals(funcbranch[0]->name, "what");
-    test_equals(funcbranch[1]->name, "hey");
-    test_equals(funcbranch[2]->name, "yo");
-    test_equals(funcbranch[3]->name, "whathey");
-    test_equals(funcbranch[3]->function->name, "concat");
-    test_assert(funcbranch[3]->input(0) == funcbranch[0]);
-    test_assert(funcbranch[3]->input(1) == funcbranch[1]);
-    test_assert(funcbranch[3]->input(1) == funcbranch[1]);
-    test_assert(funcbranch[4]->asInt() == 3);
-    test_equals(funcbranch[5]->function->name, "greater_than");
-    test_assert(funcbranch[5]->input(0) == funcbranch[2]);
-    test_assert(funcbranch[5]->input(1) == funcbranch[4]);
-    test_equals(funcbranch[5]->name, OUTPUT_PLACEHOLDER_NAME);
-    test_assert(funcbranch.length() == 6);
+    // index 0 has the function definition
+    test_equals(funcbranch[1]->name, "what");
+    test_equals(funcbranch[2]->name, "hey");
+    test_equals(funcbranch[3]->name, "yo");
+    test_equals(funcbranch[4]->name, "whathey");
+    test_equals(funcbranch[4]->function->name, "concat");
+    test_assert(funcbranch[4]->input(0) == funcbranch[1]);
+    test_assert(funcbranch[4]->input(1) == funcbranch[2]);
+    test_assert(funcbranch[4]->input(1) == funcbranch[2]);
+    test_assert(funcbranch[5]->asInt() == 3);
+    test_equals(funcbranch[6]->function->name, "greater_than");
+    test_assert(funcbranch[6]->input(0) == funcbranch[3]);
+    test_assert(funcbranch[6]->input(1) == funcbranch[5]);
+    test_equals(funcbranch[6]->name, OUTPUT_PLACEHOLDER_NAME);
+    test_assert(funcbranch.length() == 7);
 }
 
 void test_stateful_value_decl()

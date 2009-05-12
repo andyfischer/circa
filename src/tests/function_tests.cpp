@@ -14,27 +14,20 @@ void create()
 {
     Branch branch;
 
-    Term* sub = branch.eval("sub = subroutine_create('my-sub', tuple(int), string)");
+    Term* sub = branch.eval("def mysub(int) : string\nend");
 
     test_assert(sub);
+    test_assert(is_subroutine(sub));
 
-    test_assert(is_function(sub));
-    test_assert(as_function(sub).name == "my-sub");
-    test_assert(identity_equals(as_function(sub).inputTypes[0], INT_TYPE));
-    test_assert(as_function(sub).inputTypes.count() == 1);
-    test_assert(identity_equals(as_function(sub).outputType, STRING_TYPE));
-}
+    Function& func = get_subroutines_function_def(sub);
 
-void subroutine_binding_input_names()
-{
-    Branch branch;
+    test_assert(func.name == "mysub");
 
-    Term* mysub = branch.eval("mysub = subroutine_create('mysub', tuple(int), void)");
-    test_assert(mysub != NULL);
-
-    mysub = branch.eval("function_name_input(@mysub, 0, 'a')");
-
-    test_assert(find_named(&as_function(mysub).subroutineBranch,"a") != NULL);
+    // the inputs are [Branch int] because we assume that every
+    // subroutine has hidden state
+    test_assert(identity_equals(func.inputTypes[1], INT_TYPE));
+    test_assert(func.inputTypes.count() == 2);
+    test_assert(identity_equals(func.outputType, STRING_TYPE));
 }
 
 void subroutine_stateful_term()
@@ -66,7 +59,6 @@ void subroutine_stateful_term()
 void register_tests()
 {
     REGISTER_TEST_CASE(function_tests::create);
-    REGISTER_TEST_CASE(function_tests::subroutine_binding_input_names);
     REGISTER_TEST_CASE(function_tests::subroutine_stateful_term);
 }
 

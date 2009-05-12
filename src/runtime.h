@@ -8,6 +8,7 @@
 namespace circa {
 
 Term* get_global(std::string name);
+Function& get_function_data(Term* function);
 
 void evaluate_term(Term* term);
 void evaluate_branch(Branch& branch, Term* errorListener=NULL);

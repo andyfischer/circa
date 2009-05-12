@@ -328,27 +328,33 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
-    Term* result = function_from_header(branch, tokens);
+    Term* result = create_value(&branch, SUBROUTINE_TYPE);
 
-    if (has_compile_error(result))
-        return result;
+    Branch& subBranch = as_branch(result);
 
-    Function& func = as_function(result);
+    Term* functionDef = function_from_header(subBranch, tokens);
 
-    initialize_as_subroutine(func);
+    if (has_compile_error(functionDef))
+        return functionDef;
 
-    // allow access to outer scope. This is dangerous and should be revisited.
-    func.subroutineBranch.outerScope = &branch;
+    functionDef->name = "";
+    subBranch.bindName(functionDef, get_name_for_attribute("function-def"));
 
-    consume_branch_until_end(func.subroutineBranch, tokens);
-    remove_compilation_attrs(func.subroutineBranch);
+    initialize_subroutine(result);
+
+    consume_branch_until_end(subBranch, tokens);
+    remove_compilation_attrs(subBranch);
 
     if (!tokens.nextIs(END))
         return compile_error_for_line(result, tokens, startPosition);
 
-    tokens.consume();
+    tokens.consume(END);
+
+    Function& func = as_function(functionDef);
+    branch.bindName(result, func.name);
 
     assert(is_value(result));
+    assert(is_subroutine(result));
 
     return result;
 }
