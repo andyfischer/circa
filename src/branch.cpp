@@ -92,11 +92,12 @@ Term* Branch::findLastBinding(std::string const& name) const
 
 void Branch::bindName(Term* term, std::string name)
 {
-    names.bind(term, name);
-
-    if (term->name != "" && term->name != name)
+    if (term->name != "" && term->name != name) {
+        assert(false);
         throw std::runtime_error("term already has name: "+term->name);
+    }
 
+    names.bind(term, name);
     term->name = name;
 }
 

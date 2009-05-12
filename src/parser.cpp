@@ -341,8 +341,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     }
 
     // Remove the name that function_from_header applied
-    functionDef->name = "";
-    subBranch.bindName(functionDef, get_name_for_attribute("function-def"));
+    rename(functionDef, get_name_for_attribute("function-def"));
 
     initialize_subroutine(result);
 
