@@ -64,14 +64,6 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
 
     change_type(result, outputType);
 
-    // Temporary hack
-    if (function == BRANCH_FUNC) {
-        alloc_value(result);
-        as_branch(result).outerScope = branch;
-    }
-
-    assert(function->name != "#attr:function-def");
-
     return result;
 }
 

@@ -57,7 +57,6 @@ void test_duplicate_nested()
     Branch branch;
     branch.eval("a = 1.0");
     Branch& inner = branch.eval("inner = branch()")->asBranch();
-    inner.outerScope = &branch;
     inner.eval("i = 2.0");
     inner.eval("j = add(a,i)");
 
@@ -149,8 +148,6 @@ void find_name_in_outer_branch()
 
     Term* inner_branch = as_branch(outer_branch).eval("Branch()");
     alloc_value(inner_branch);
-
-    as_branch(inner_branch).outerScope = &as_branch(outer_branch);
 
     test_assert(find_named(&as_branch(inner_branch), "a") == a);
 }

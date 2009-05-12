@@ -16,9 +16,6 @@ struct Branch
 
     TermNamespace names;
 
-    // Points to a Branch which is our outer scope.
-    Branch* outerScope;
-
     // Points to the Term which owns this branch as a value.
     Term* owningTerm;
 
