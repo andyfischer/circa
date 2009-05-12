@@ -20,9 +20,7 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
         function = VALUE_FUNC;
     }
 
-    assert(is_function(function));
-
-    Function& func = as_function(function);
+    Function& func = get_function_data(function);
 
     // If 'function' has hidden state, then create a container for that state, if needed
     if (has_hidden_state(func) && ((int) inputs.count() < func.numInputs()))

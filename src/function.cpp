@@ -114,7 +114,7 @@ void Function::assign(Term* sourceTerm, Term* destTerm)
     Function::copyExceptBranch(sourceTerm, destTerm);
     Function &source = as_function(sourceTerm);
     Function &dest = as_function(destTerm);
-    duplicate_branch(source.subroutineBranch, dest.subroutineBranch);
+    //duplicate_branch(source.subroutineBranch, dest.subroutineBranch);
 }
 
 void Function::remapPointers(Term* term, ReferenceMap const& map)
@@ -122,7 +122,7 @@ void Function::remapPointers(Term* term, ReferenceMap const& map)
     Function &func = as_function(term);
     func.inputTypes.remapPointers(map);
     func.outputType = map.getRemapped(func.outputType);
-    func.subroutineBranch.remapPointers(map);
+    //func.subroutineBranch.remapPointers(map);
 }
 
 
@@ -136,6 +136,7 @@ std::string get_placeholder_name_for_index(int index)
 std::string
 Function::functionToSourceString(Term* term)
 {
+    /*
     Function &func = as_function(term);
 
     std::stringstream result;
@@ -169,6 +170,8 @@ Function::functionToSourceString(Term* term)
     result << "end";
 
     return result.str();
+    */
+    return "";
 }
 
 Term* create_empty_function(Branch& branch, std::string const& header)

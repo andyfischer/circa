@@ -12,6 +12,14 @@ Term* get_global(std::string name)
     return NULL;
 }
 
+Function& get_function_data(Term* function)
+{
+    if (is_subroutine(function))
+        return get_subroutines_function_def(function);
+    else
+        return as_function(function);
+}
+
 void evaluate_term(Term* term)
 {
     if (term == NULL)
@@ -25,12 +33,7 @@ void evaluate_term(Term* term)
         return;
     }
 
-    if (!is_function(term->function)) {
-        error_occured(term, "term->function is not a function");
-        return;
-    }
-
-    Function& func = as_function(term->function);
+    Function& func = get_function_data(term->function);
 
     if (func.evaluate == NULL)
         return;

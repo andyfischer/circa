@@ -9,21 +9,23 @@ namespace circa {
 
 struct Ref
 {
-    Term* _t;
+    // Super short name for this field because we often need to type it into
+    // the debugger.
+    Term* t;
 
     Ref()
-      : _t(NULL)
+      : t(NULL)
     {}
 
-    Ref(Term *initialValue) : _t(NULL)
+    Ref(Term *initialValue) : t(NULL)
     {
         set(initialValue);
     }
 
     // Copy constructor
-    Ref(Ref const& copy) : _t(NULL)
+    Ref(Ref const& copy) : t(NULL)
     {
-        set(copy._t);
+        set(copy.t);
     }
 
     ~Ref()
@@ -34,7 +36,7 @@ struct Ref
     // Assignment copy
     Ref& operator=(Ref const& rhs)
     {
-        set(rhs._t);
+        set(rhs.t);
         return *this;
     }
 
@@ -46,24 +48,24 @@ struct Ref
         return *this;
     }
 
-    bool operator==(Term* t) const
+    bool operator==(Term* _t) const
     {
         return _t == t;
     }
 
     operator Term*() const
     {
-        return _t;
+        return t;
     }
 
     operator Term*&()
     {
-        return _t;
+        return t;
     }
 
     Term* operator->()
     {
-        return _t;
+        return t;
     }
 
     static void remap_pointers(Term* term, ReferenceMap const& map);

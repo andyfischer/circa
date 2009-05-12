@@ -36,8 +36,8 @@ bool has_inner_branch(Term* term)
 
 Branch* get_inner_branch(Term* term)
 {
-    if (term->type == FUNCTION_TYPE)
-        return &as_function(term).subroutineBranch;
+    if (term->type == SUBROUTINE_TYPE)
+        return &as_branch(term);
 
     if (term->function == BRANCH_FUNC)
         return &as_branch(term);

@@ -6,15 +6,15 @@ namespace circa {
 
 void Ref::set(Term* target)
 {
-    if (_t == target)
+    if (t == target)
         return;
 
-    Term* previousTarget = _t;
+    Term* previousTarget = t;
 
-    _t = target;
+    t = target;
 
-    if (_t != NULL)
-        _t->refCount++;
+    if (t != NULL)
+        t->refCount++;
 
     if (previousTarget != NULL) {
         previousTarget->refCount--;

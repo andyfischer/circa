@@ -44,6 +44,7 @@ extern Term* REF_TYPE;
 extern Term* SET_FIELD_FUNC;
 extern Term* SET_FIELD_BY_NAME_FUNC;
 extern Term* SUB_FUNC;
+extern Term* SUBROUTINE_TYPE;
 extern Term* STRING_TYPE;
 extern Term* TYPE_TYPE;
 extern Term* UNKNOWN_FUNCTION;

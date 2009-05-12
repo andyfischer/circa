@@ -41,7 +41,7 @@ struct Function
 
     std::string name;
 
-    Branch subroutineBranch;
+    //Branch subroutineBranch;
 
     // Code
     EvaluateFunc evaluate;
