@@ -42,6 +42,9 @@ bool should_print_term_source_line(Term* term)
     if (term->boolPropOptional("syntaxHints:hidden", false))
         return false;
 
+    if ((term->name.length() > 0) && term->name[0] == '#')
+        return false;
+
     return true;
 }
 
