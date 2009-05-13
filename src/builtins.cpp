@@ -31,6 +31,7 @@ Term* COPY_FUNC = NULL;
 Term* DESIRED_VALUE_FEEDBACK = NULL;
 Term* DIV_FUNC = NULL;
 Term* FEEDBACK_FUNC = NULL;
+Term* FEEDBACK_TYPE = NULL;
 Term* FLOAT_TYPE = NULL;
 Term* FOR_FUNC = NULL;
 Term* FUNCTION_TYPE = NULL;
@@ -67,6 +68,11 @@ namespace value_function {
     void generate_feedback(Branch& branch, Term* subject, Term* desired)
     {
         apply(&branch, ASSIGN_FUNC, RefList(subject, desired));
+    }
+    void generate_feedback_new(Branch& branch, FeedbackOperation& operation, Term* target)
+    {
+        apply(&branch, ASSIGN_FUNC, RefList(target,
+                    operation.getFeedback(target, DESIRED_VALUE_FEEDBACK)));
     }
 }
 
@@ -378,12 +384,7 @@ void initialize_builtin_types(Branch& kernel)
     import_member_function(LIST_TYPE, list_t::count, "count(List) : int");
 
     register_subroutine_type(kernel);
-}
-
-void initialize_builtin_functions(Branch& kernel)
-{
-    setup_builtin_functions(kernel);
-
+    feedback_register_constants(kernel);
 }
 
 void initialize_constants(Branch& kernel)
@@ -402,7 +403,7 @@ void initialize()
 {
     bootstrap_kernel();
     initialize_builtin_types(*KERNEL);
-    initialize_builtin_functions(*KERNEL);
+    setup_builtin_functions(*KERNEL);
     initialize_constants(*KERNEL);
 }
 

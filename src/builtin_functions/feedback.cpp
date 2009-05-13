@@ -12,7 +12,7 @@ namespace feedback_function {
 
     void setup(Branch& kernel)
     {
-        FEEDBACK_FUNC = import_function(kernel, evaluate, "feedback(any,any)");
+        FEEDBACK_FUNC = import_function(kernel, evaluate, "feedback(any,any,any)");
         as_function(FEEDBACK_FUNC).setInputMeta(0, true);
     }
 }

@@ -11,9 +11,20 @@ extern const std::string TRAINING_BRANCH_NAME;
 
 struct FeedbackOperation
 {
+    struct FeedbackEntry {
+        Ref target;
+        Ref value;
+        Ref type;
+        FeedbackEntry(Term* _target, Term* _value, Term* _type)
+          : target(_target), value(_value), type(_type) {}
+    };
 
-    // Get a term that represents the feedback for this target. If there are 
-    // multiple sources of feedback for this term, we will create an accumulator term.
+    typedef std::vector<FeedbackEntry> PendingFeedbackList;
+    typedef std::map<Term*, PendingFeedbackList> PendingFeedbackMap;
+
+    PendingFeedbackMap _pending;
+
+    // Get a term that represents the feedback for this target.
     Term* getFeedback(Term* target, Term* type);
 
     // Send feedback to the given term
@@ -28,6 +39,10 @@ void set_trainable(Term* term, bool value);
 void generate_feedback(Branch& branch, Term* subject, Term* desired);
 void refresh_training_branch(Branch& branch);
 void refresh_training_branch_new(Branch& branch);
+
+Term* accumulate_feedback(Branch& branch, FeedbackOperation& operation,
+        Term* target, Term* feedbackType, Term* accumulateFunction);
+void feedback_register_constants(Branch& kernel);
 
 } // namespace circa
 
