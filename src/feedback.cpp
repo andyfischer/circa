@@ -8,10 +8,10 @@ namespace circa {
 
 const std::string TRAINING_BRANCH_NAME = "#training";
 
-Term* FeedbackOperation::getFeedback(Term* target, Term* type)
+RefList FeedbackOperation::getFeedback(Term* target, Term* type)
 {
     if (!hasPendingFeedback(target))
-        return NULL;
+        return RefList();
 
     PendingFeedbackList &list = _pending[target];
 
@@ -26,14 +26,7 @@ Term* FeedbackOperation::getFeedback(Term* target, Term* type)
         values.append(it->value);
     }
 
-    if (values.count() == 0)
-        return NULL;
-
-    if (values.count() > 1)
-        std::cout << "warning: FeedbackOperation::getFeedback wants to return multiple terms"
-            << std::endl;
-
-    return values[0];
+    return values;
 }
 
 void FeedbackOperation::sendFeedback(Term* target, Term* value, Term* type)
@@ -62,20 +55,6 @@ bool is_trainable(Term* term)
 void set_trainable(Term* term, bool value)
 {
     term->boolProp("trainable") = value;
-}
-
-void generate_feedback(Branch& branch, Term* subject, Term* desired)
-{
-    Function& targetsFunction = as_function(subject->function);
-
-    if (targetsFunction.generateFeedback != NULL)
-    {
-        targetsFunction.generateFeedback(branch, subject, desired);
-    } else {
-        std::cout << "warn: function " << targetsFunction.name <<
-            " doesn't have a generateFeedback function" << std::endl;
-        return;
-    }
 }
 
 void update_derived_trainable_properties(Branch& branch)
@@ -152,29 +131,6 @@ void refresh_training_branch(Branch& branch)
         create_branch(&branch, TRAINING_BRANCH_NAME);
 
     Branch& trainingBranch = as_branch(branch[TRAINING_BRANCH_NAME]);
-
-    trainingBranch.clear();
-
-    // Generate training for every feedback() function in this branch
-    for (int i = 0; i < branch.length(); i++) {
-        Term* term = branch[i];
-        if (term->function == FEEDBACK_FUNC) {
-            generate_feedback(trainingBranch, term->input(0), term->input(1));
-        }
-    }
-
-    normalize_feedback_branch(trainingBranch);
-}
-
-void refresh_training_branch_new(Branch& branch)
-{
-    update_derived_trainable_properties(branch);
-
-    // Check if '#training' branch exists. Create if it doesn't exist
-    if (!branch.contains(TRAINING_BRANCH_NAME))
-        create_branch(&branch, TRAINING_BRANCH_NAME);
-
-    Branch& trainingBranch = as_branch(branch[TRAINING_BRANCH_NAME]);
     trainingBranch.clear();
 
     FeedbackOperation operation;
@@ -183,48 +139,94 @@ void refresh_training_branch_new(Branch& branch)
     for (BranchIterator it(branch, true); !it.finished(); ++it) {
         Term* term = *it;
 
-        // Check for generate_feedback()
+        // Check for feedback(), which does nothing but create a feedback signal
         if (term->function == FEEDBACK_FUNC) {
             Term* target = term->input(0);
             Term* value = term->input(1);
-            Term* type = term->input(2);
-            operation.sendFeedback(target, value, type);
+            operation.sendFeedback(target, value, DESIRED_VALUE_FEEDBACK);
             continue;
         }
 
-        // Skip term if there's no pending feedback
-        if (!operation.hasPendingFeedback(term)) {
+        // Skip term if it's not trainable
+        if (!is_trainable(term))
+            continue;
+
+        // Skip if it has no pending feedback
+        if (!operation.hasPendingFeedback(term))
+            continue;
+
+        Term* feedbackFunc = as_function(term->function).feedbackFunc;
+
+        // Skip term if it has no feedback function
+        if (feedbackFunc == NULL) {
+            std::cout << "warning: function " << term->function->name
+                << " has no feedback function." << std::endl;
             continue;
         }
 
-        // Make sure this function has a generateFeedback function
-        if (get_function_data(term->function).generateFeedbackNew == NULL) {
-            std::cout << "warning: function " << term->function->name << " has no generateFeedback";
-            continue;
-        }
+        // Count the number of trainable inputs
+        int numTrainableInputs = 0;
+        for (int i=0; i < term->numInputs(); i++)
+            if (is_trainable(term->input(i)))
+                numTrainableInputs++;
 
-        get_function_data(term->function).generateFeedbackNew(trainingBranch, operation, term);
+        // Skip this term if it has no numTrainableInputs. As an exception, don't skip functions
+        // with 0 inputs. (this includes value())
+        if (numTrainableInputs == 0 && (term->numInputs() > 0))
+            continue;
+
+        // Apply feedback function
+        RefList feedbackValues = operation.getFeedback(term, DESIRED_VALUE_FEEDBACK);
+
+        // TODO: accumulate desired value
+        Term* desiredValue = feedbackValues[0];
+
+        if (term->numInputs() == 0) {
+            // Just create a feedback term. This is probably an assign() for a value()
+            apply(&trainingBranch, feedbackFunc, RefList(term, desiredValue));
+
+        } else if (term->numInputs() == 1) {
+            // Create a feedback term with only 1 output
+            Term* feedback = apply(&trainingBranch, feedbackFunc, RefList(term, desiredValue));
+            operation.sendFeedback(term->input(0), feedback, DESIRED_VALUE_FEEDBACK);
+
+        } else if (term->numInputs() > 1) {
+
+            // If the term has multiple inputs, then the feedback term will have multiple outputs
+
+            // Inputs to feedback func are [originalTerm, desiredValue]
+
+            Term* feedback = apply(&trainingBranch, feedbackFunc, RefList(term, desiredValue));
+            alloc_value(feedback);
+
+            // Resize the output of 'feedback' so that there is one output term per input
+            resize_list(as_branch(feedback), term->numInputs(), ANY_TYPE);
+
+            // For each input which is trainable, send this feedback to it
+            for (int i=0; i < term->numInputs(); i++) {
+                Term* input = term->input(i);
+                if (!is_trainable(input))
+                    continue;
+
+                Term* outgoingFeedback = as_branch(feedback)[i];
+
+                // Set the weight on this term so that the sum weight for all outputs is 1
+                set_feedback_weight(outgoingFeedback, 1.0 / numTrainableInputs);
+
+                operation.sendFeedback(input, outgoingFeedback, DESIRED_VALUE_FEEDBACK);
+            }
+        }
     }
 }
 
-Term* accumulate_feedback(Branch& branch, FeedbackOperation& operation,
-        Term* target, Term* feedbackType, Term* accumulateFunction)
+float get_feedback_weight(Term* term)
 {
-    assert(target != NULL);
-    assert(feedbackType != NULL);
-    assert(accumulateFunction != NULL);
+    return term->floatPropOptional("feedback-weight", 0);
+}
 
-    /*
-    RefList values = operation.getFeedback(target, feedbackType);
-
-    if (values.count() == 0)
-        return NULL;
-    else if (values.count() == 1)
-        return values[0];
-    else
-        return apply(&branch, accumulateFunction, values);
-        */
-    return NULL;
+void set_feedback_weight(Term* term, float weight)
+{
+    term->floatProp("feedback-weight") = weight;
 }
 
 void feedback_register_constants(Branch& kernel)

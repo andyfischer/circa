@@ -65,7 +65,7 @@ int circa_main(std::vector<std::string> args)
         return 0;
     }
 
-    // Show feedback code
+    // Do a feedback test
     if (args[0] == "-f") {
         Branch branch;
         parse_file(branch, args[1]);
@@ -73,8 +73,18 @@ int circa_main(std::vector<std::string> args)
         Branch &trainable_names = branch["_trainable"]->asBranch();
         for (int i=0; i < trainable_names.length(); i++)
             set_trainable(branch[trainable_names[i]->asString()], true);
-        refresh_training_branch_new(branch);
+        refresh_training_branch(branch);
+
+        std::cout << std::endl;
+        std::cout << "-- Before evaluation:" << std::endl;
         std::cout << branch_to_string_raw(branch);
+
+        evaluate_branch(branch);
+
+        std::cout << std::endl;
+        std::cout << "-- After evaluation:" << std::endl;
+        std::cout << get_branch_source(branch) << std::endl;
+
         return 0;
     }
 

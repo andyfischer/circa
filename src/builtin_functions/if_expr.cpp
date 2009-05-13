@@ -31,6 +31,7 @@ namespace if_expr_function {
         return ANY_TYPE;
     }
 
+    /*
     void generateFeedback(Branch& branch, Term* subject, Term* desired)
     {
         if (as_bool(subject->input(0)))
@@ -38,6 +39,7 @@ namespace if_expr_function {
         else
             generate_feedback(branch, subject->input(2), desired);
     }
+    */
 
     void setup(Branch& kernel)
     {
@@ -46,7 +48,6 @@ namespace if_expr_function {
         as_function(IF_EXPR_FUNC).pureFunction = true;
         as_function(IF_EXPR_FUNC).setInputMeta(1, true);
         as_function(IF_EXPR_FUNC).setInputMeta(2, true);
-        as_function(IF_EXPR_FUNC).generateFeedback = generateFeedback;
     }
 }
 }

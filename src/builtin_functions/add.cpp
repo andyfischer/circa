@@ -13,66 +13,24 @@ namespace add_function {
         as_float(caller) = result;
     }
 
-    void generateFeedback(Branch& branch, Term* subject, Term* desired)
+    void feedback_evaluate(Term* caller)
     {
-        // find the # of trainable inputs
-        int numTrainableInputs = 0;
+        Term* target = caller->input(0);
+        float desired = to_float(caller->input(1));
 
-        for (int i=0; i < subject->numInputs(); i++)
-            if (is_trainable(subject->input(i)))
-                numTrainableInputs++;
+        float delta = desired - to_float(target);
 
-        // if there are no trainable inputs, nothing to do
-        if (numTrainableInputs == 0)
-            return;
+        Branch& outputList = as_branch(caller);
+        for (int i=0; i < outputList.length(); i++) {
+            Term* output = outputList[i];
+            Term* outputTarget = target->input(i);
+            float balanced_delta = delta * get_feedback_weight(output);
+            specialize_type(output, FLOAT_TYPE);
+            alloc_value(output);
+            as_float(output) = to_float(outputTarget) + balanced_delta;
 
-        // delta is just desired - current
-        Term* delta = apply(&branch, SUB_FUNC, RefList(desired, subject));
-
-        // if there are multiple trainable inputs, divide up delta
-        if (numTrainableInputs > 1) {
-            delta = apply(&branch, DIV_FUNC, RefList(delta, float_value(&branch, numTrainableInputs)));
-        }
-
-        // pass delta to each trainable input
-        for (int i=0; i < subject->numInputs(); i++) {
-            Term* input = subject->input(i);
-            if (is_trainable(input)) {
-                Term* inputDesired = apply(&branch, ADD_FUNC, RefList(input, delta));
-                generate_feedback(branch, input, inputDesired);
-            }
-        }
-    }
-
-    void generateFeedbackNew(Branch& branch, FeedbackOperation& operation, Term* subject)
-    {
-        // find the # of trainable inputs
-        int numTrainableInputs = 0;
-
-        for (int i=0; i < subject->numInputs(); i++)
-            if (is_trainable(subject->input(i)))
-                numTrainableInputs++;
-
-        // if there are no trainable inputs, nothing to do
-        if (numTrainableInputs == 0)
-            return;
-
-        // Compute delta as desired - current
-        Ref desired = operation.getFeedback(subject, DESIRED_VALUE_FEEDBACK);
-        Term* delta = apply(&branch, SUB_FUNC, RefList(desired, subject));
-
-        // if there are multiple trainable inputs, divide up delta
-        if (numTrainableInputs > 1) {
-            delta = apply(&branch, DIV_FUNC, RefList(delta, float_value(&branch, numTrainableInputs)));
-        }
-
-        // pass delta to each trainable input
-        for (int i=0; i < subject->numInputs(); i++) {
-            Term* input = subject->input(i);
-            if (is_trainable(input)) {
-                Term* inputDesired = apply(&branch, ADD_FUNC, RefList(input, delta));
-                operation.sendFeedback(input, inputDesired, DESIRED_VALUE_FEEDBACK);
-            }
+            //std::cout << "for " << format_global_id(output) << ", weight = "
+            //    << get_feedback_weight(output) << ", delta = " << delta << std::endl;
         }
     }
 
@@ -80,8 +38,8 @@ namespace add_function {
     {
         ADD_FUNC = import_function(kernel, evaluate, "add(float...) : float");
         as_function(ADD_FUNC).pureFunction = true;
-        as_function(ADD_FUNC).generateFeedback = generateFeedback;
-        as_function(ADD_FUNC).generateFeedbackNew = generateFeedbackNew;
+        as_function(ADD_FUNC).feedbackFunc = 
+            import_function(kernel, feedback_evaluate, "add_feedback(any, float) : Branch");
     }
 }
 }

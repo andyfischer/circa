@@ -13,7 +13,6 @@ Function::Function()
     evaluate(NULL),
     specializeType(NULL),
     startControlFlowIterator(NULL),
-    generateFeedback(NULL),
     toSourceString(NULL)
 {
 }
@@ -91,9 +90,9 @@ namespace function_t {
         copy_field(name);
         copy_field(evaluate);
         copy_field(specializeType);
-        copy_field(generateFeedback);
         copy_field(toSourceString);
         copy_field(startControlFlowIterator);
+        copy_field(feedbackFunc);
 
         #undef copy_field
     }
