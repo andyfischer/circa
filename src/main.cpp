@@ -83,6 +83,10 @@ int circa_main(std::vector<std::string> args)
 
         std::cout << std::endl;
         std::cout << "-- After evaluation:" << std::endl;
+        std::cout << branch_to_string_raw(branch);
+
+        std::cout << std::endl;
+        std::cout << "-- Code result:" << std::endl;
         std::cout << get_branch_source(branch) << std::endl;
 
         return 0;

@@ -205,10 +205,13 @@ void refresh_training_branch(Branch& branch)
             // For each input which is trainable, send this feedback to it
             for (int i=0; i < term->numInputs(); i++) {
                 Term* input = term->input(i);
-                if (!is_trainable(input))
-                    continue;
 
                 Term* outgoingFeedback = as_branch(feedback)[i];
+                specialize_type(outgoingFeedback, FLOAT_TYPE);
+                alloc_value(outgoingFeedback);
+
+                if (!is_trainable(input))
+                    continue;
 
                 // Set the weight on this term so that the sum weight for all outputs is 1
                 set_feedback_weight(outgoingFeedback, 1.0 / numTrainableInputs);

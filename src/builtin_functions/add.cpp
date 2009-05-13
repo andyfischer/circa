@@ -25,8 +25,6 @@ namespace add_function {
             Term* output = outputList[i];
             Term* outputTarget = target->input(i);
             float balanced_delta = delta * get_feedback_weight(output);
-            specialize_type(output, FLOAT_TYPE);
-            alloc_value(output);
             as_float(output) = to_float(outputTarget) + balanced_delta;
 
             //std::cout << "for " << format_global_id(output) << ", weight = "

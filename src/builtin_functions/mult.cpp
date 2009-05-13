@@ -10,48 +10,42 @@ namespace mult_function {
         as_float(caller) = to_float(caller->input(0)) * to_float(caller->input(1));
     }
 
-    /*
-    void generateFeedback(Branch& branch, Term* subject, Term* desired)
+    void feedback_evaluate(Term* caller)
     {
-        // find the # of trainable inputs
-        int numTrainableInputs = 0;
+        Term* target = caller->input(0);
+        float desired = to_float(caller->input(1));
 
-        for (int i=0; i < subject->numInputs(); i++)
-            if (is_trainable(subject->input(i)))
-                numTrainableInputs++;
-
-        // if there are no trainable inputs, nothing to do
-        if (numTrainableInputs == 0)
-            return;
-
-        Term* delta = apply(&branch, SUB_FUNC, RefList(desired, subject));
-
-        if (numTrainableInputs > 1) {
-            delta = apply(&branch, DIV_FUNC, RefList(delta,
-                        float_value(&branch, numTrainableInputs)));
-        }
+        float delta = desired - to_float(target);
 
         // for each input, send a delta divided by the product of all other inputs
-        for (int i=0; i < subject->numInputs(); i++) {
-            Term* input = subject->input(i);
-            if (!is_trainable(input))
+        Branch& outputList = as_branch(caller);
+        for (int i=0; i < outputList.length(); i++) {
+            Term* output = outputList[i];
+            Term* outputTarget = target->input(i);
+            float balanced_delta = delta * get_feedback_weight(output);
+
+            // Compute a product of all other inputs
+            float divisor = i == 0 ? to_float(target->input(1)) : to_float(target->input(0));
+
+            // If this product is too close to 0 then give up. We can't solve x = a * 0
+            if (fabs(divisor) < 0.0001) {
+                as_float(output) = to_float(outputTarget);
                 continue;
+            }
 
-            // this "product of all other inputs" assumes that we only have 2 inputs
-            Term* divisor = i == 0 ? subject->input(1) : subject->input(0);
+            //std::cout << "divisor = " << divisor << ", delta = " << balanced_delta << std::endl;
 
-            Term* inputDelta = apply(&branch, DIV_FUNC, RefList(delta, divisor));
-            Term* inputDesired = apply(&branch, ADD_FUNC, RefList(input, inputDelta));
-
-            generate_feedback(branch, input, inputDesired);
+            // Otherwise, to solve for x = a * b, tell a that it should be closer to x / b
+            as_float(output) = to_float(outputTarget) + balanced_delta / divisor;
         }
     }
-    */
 
     void setup(Branch& kernel)
     {
         MULT_FUNC = import_function(kernel, evaluate, "mult(float,float) : float");
         as_function(MULT_FUNC).pureFunction = true;
+        as_function(MULT_FUNC).feedbackFunc = 
+            import_function(kernel, feedback_evaluate, "mult_feedback(any, float) : Branch");
     }
 }
 } // namespace circa
