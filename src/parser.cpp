@@ -1138,6 +1138,9 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 
     Term* result = apply(&branch, LIST_FUNC, terms);
     listHints.apply(result);
+
+    evaluate_term(result);
+
     return result;
 }
 

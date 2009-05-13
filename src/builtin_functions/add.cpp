@@ -58,7 +58,7 @@ namespace add_function {
             return;
 
         // Compute delta as desired - current
-        Term* desired = operation.getFeedback(subject, DESIRED_VALUE_FEEDBACK);
+        Ref desired = operation.getFeedback(subject, DESIRED_VALUE_FEEDBACK);
         Term* delta = apply(&branch, SUB_FUNC, RefList(desired, subject));
 
         // if there are multiple trainable inputs, divide up delta

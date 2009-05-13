@@ -10,19 +10,47 @@ const std::string TRAINING_BRANCH_NAME = "#training";
 
 Term* FeedbackOperation::getFeedback(Term* target, Term* type)
 {
-    // TODO
-    return NULL;
+    if (!hasPendingFeedback(target))
+        return NULL;
+
+    PendingFeedbackList &list = _pending[target];
+
+    // Make a list of values which match this type
+    RefList values;
+
+    PendingFeedbackList::const_iterator it;
+    for (it = list.begin(); it != list.end(); ++it) {
+        if (it->type != type)
+            continue;
+
+        values.append(it->value);
+    }
+
+    if (values.count() == 0)
+        return NULL;
+
+    if (values.count() > 1)
+        std::cout << "warning: FeedbackOperation::getFeedback wants to return multiple terms"
+            << std::endl;
+
+    return values[0];
 }
 
 void FeedbackOperation::sendFeedback(Term* target, Term* value, Term* type)
 {
-    // TODO
+    FeedbackEntry entry(target,value,type);
+    _pending[target].push_back(entry);
 }
 
 bool FeedbackOperation::hasPendingFeedback(Term* target)
 {
-    // TODO
-    return false;
+    if (_pending.find(target) == _pending.end())
+        return false;
+
+    if (_pending[target].size() == 0)
+        return false;
+
+    return true;
 }
 
 bool is_trainable(Term* term)
@@ -138,11 +166,6 @@ void refresh_training_branch(Branch& branch)
     normalize_feedback_branch(trainingBranch);
 }
 
-void coalesce_feedback(FeedbackOperation& operation, Term* term)
-{
-    // TODO
-}
-
 void refresh_training_branch_new(Branch& branch)
 {
     update_derived_trainable_properties(branch);
@@ -170,8 +193,9 @@ void refresh_training_branch_new(Branch& branch)
         }
 
         // Skip term if there's no pending feedback
-        if (!operation.hasPendingFeedback(term))
+        if (!operation.hasPendingFeedback(term)) {
             continue;
+        }
 
         // Make sure this function has a generateFeedback function
         if (get_function_data(term->function).generateFeedbackNew == NULL) {
@@ -179,9 +203,34 @@ void refresh_training_branch_new(Branch& branch)
             continue;
         }
 
-        coalesce_feedback(operation, term);
         get_function_data(term->function).generateFeedbackNew(trainingBranch, operation, term);
     }
+}
+
+Term* accumulate_feedback(Branch& branch, FeedbackOperation& operation,
+        Term* target, Term* feedbackType, Term* accumulateFunction)
+{
+    assert(target != NULL);
+    assert(feedbackType != NULL);
+    assert(accumulateFunction != NULL);
+
+    /*
+    RefList values = operation.getFeedback(target, feedbackType);
+
+    if (values.count() == 0)
+        return NULL;
+    else if (values.count() == 1)
+        return values[0];
+    else
+        return apply(&branch, accumulateFunction, values);
+        */
+    return NULL;
+}
+
+void feedback_register_constants(Branch& kernel)
+{
+    FEEDBACK_TYPE = create_empty_type(kernel, "FeedbackType");
+    DESIRED_VALUE_FEEDBACK = create_value(&kernel, FEEDBACK_TYPE, "desired_value");
 }
 
 } // namespace circa

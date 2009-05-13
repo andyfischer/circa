@@ -26,6 +26,7 @@ extern Term* COPY_FUNC;
 extern Term* DESIRED_VALUE_FEEDBACK;
 extern Term* DIV_FUNC;
 extern Term* FEEDBACK_FUNC;
+extern Term* FEEDBACK_TYPE;
 extern Term* FLOAT_TYPE;
 extern Term* FOR_FUNC;
 extern Term* FUNCTION_TYPE;

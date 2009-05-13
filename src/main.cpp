@@ -69,7 +69,12 @@ int circa_main(std::vector<std::string> args)
     if (args[0] == "-f") {
         Branch branch;
         parse_file(branch, args[1]);
-        //TODO
+
+        Branch &trainable_names = branch["_trainable"]->asBranch();
+        for (int i=0; i < trainable_names.length(); i++)
+            set_trainable(branch[trainable_names[i]->asString()], true);
+        refresh_training_branch_new(branch);
+        std::cout << branch_to_string_raw(branch);
         return 0;
     }
 
