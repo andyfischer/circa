@@ -10,6 +10,7 @@ namespace mult_function {
         as_float(caller) = to_float(caller->input(0)) * to_float(caller->input(1));
     }
 
+    /*
     void generateFeedback(Branch& branch, Term* subject, Term* desired)
     {
         // find the # of trainable inputs
@@ -45,12 +46,12 @@ namespace mult_function {
             generate_feedback(branch, input, inputDesired);
         }
     }
+    */
 
     void setup(Branch& kernel)
     {
         MULT_FUNC = import_function(kernel, evaluate, "mult(float,float) : float");
         as_function(MULT_FUNC).pureFunction = true;
-        as_function(MULT_FUNC).generateFeedback = generateFeedback;
     }
 }
 } // namespace circa

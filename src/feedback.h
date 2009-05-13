@@ -24,8 +24,8 @@ struct FeedbackOperation
 
     PendingFeedbackMap _pending;
 
-    // Get a term that represents the feedback for this target.
-    Term* getFeedback(Term* target, Term* type);
+    // Get a list of feedback terms for this term
+    RefList getFeedback(Term* target, Term* type);
 
     // Send feedback to the given term
     void sendFeedback(Term* target, Term* value, Term* type);
@@ -36,13 +36,12 @@ struct FeedbackOperation
 
 bool is_trainable(Term* term);
 void set_trainable(Term* term, bool value);
-void generate_feedback(Branch& branch, Term* subject, Term* desired);
 void refresh_training_branch(Branch& branch);
-void refresh_training_branch_new(Branch& branch);
 
-Term* accumulate_feedback(Branch& branch, FeedbackOperation& operation,
-        Term* target, Term* feedbackType, Term* accumulateFunction);
 void feedback_register_constants(Branch& kernel);
+
+float get_feedback_weight(Term* term);
+void set_feedback_weight(Term* term, float weight);
 
 } // namespace circa
 

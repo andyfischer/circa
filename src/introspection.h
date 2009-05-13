@@ -16,6 +16,7 @@ bool is_value(Term* term);
 // using 'usee'.
 bool is_actually_using(Term* user, Term* usee);
 
+std::string format_global_id(Term* term);
 std::string get_short_local_name(Term* term);
 std::string term_to_raw_string(Term* term);
 std::string branch_namespace_to_string(Branch& branch);

@@ -64,18 +64,6 @@ Term* VOID_PTR_TYPE = NULL;
 
 void empty_evaluate_function(Term*) { }
 
-namespace value_function {
-    void generate_feedback(Branch& branch, Term* subject, Term* desired)
-    {
-        apply(&branch, ASSIGN_FUNC, RefList(subject, desired));
-    }
-    void generate_feedback_new(Branch& branch, FeedbackOperation& operation, Term* target)
-    {
-        apply(&branch, ASSIGN_FUNC, RefList(target,
-                    operation.getFeedback(target, DESIRED_VALUE_FEEDBACK)));
-    }
-}
-
 namespace primitives {
     namespace int_t {
 
@@ -259,7 +247,6 @@ void bootstrap_kernel()
     as_function(VALUE_FUNC).name = "value";
     as_function(VALUE_FUNC).pureFunction = true;
     as_function(VALUE_FUNC).evaluate = empty_evaluate_function;
-    as_function(VALUE_FUNC).generateFeedback = value_function::generate_feedback;
     KERNEL->bindName(VALUE_FUNC, "value");
 
     // Create const-Type function
@@ -397,6 +384,8 @@ void initialize_constants(Branch& kernel)
 
     float_value(&kernel, 3.141592654f, "PI");
     float_value(&kernel, 3.141592654f / 2.0, "HALF_PI");
+
+    as_function(VALUE_FUNC).feedbackFunc = ASSIGN_FUNC;
 }
 
 void initialize()

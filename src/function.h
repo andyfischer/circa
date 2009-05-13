@@ -18,8 +18,6 @@ struct Function
     typedef void (*EvaluateFunc)(Term* caller);
     typedef Term* (*SpecializeTypeFunc)(Term* caller);
     typedef ReferenceIterator* (*ReferenceIteratorFunc)(Term* caller);
-    typedef void (*GenerateTrainingFunc)(Branch& branch, Term* subject, Term* desired);
-    typedef void (*GenerateTrainingFuncNew)(Branch& branch, FeedbackOperation& operation, Term* subject);
     typedef std::string (*ToSourceString)(Term* term);
 
     struct InputProperties {
@@ -42,15 +40,14 @@ struct Function
 
     std::string name;
 
-    //Branch subroutineBranch;
-
     // Code
     EvaluateFunc evaluate;
     SpecializeTypeFunc specializeType;
     ReferenceIteratorFunc startControlFlowIterator;
-    GenerateTrainingFunc generateFeedback;
-    GenerateTrainingFuncNew generateFeedbackNew;
     ToSourceString toSourceString;
+
+    // Associated terms
+    Ref feedbackFunc;
 
     Function();
 
