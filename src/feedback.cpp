@@ -8,6 +8,23 @@ namespace circa {
 
 const std::string TRAINING_BRANCH_NAME = "#training";
 
+Term* FeedbackOperation::getFeedback(Term* target, Term* type)
+{
+    // TODO
+    return NULL;
+}
+
+void FeedbackOperation::sendFeedback(Term* target, Term* value, Term* type)
+{
+    // TODO
+}
+
+bool FeedbackOperation::hasPendingFeedback(Term* target)
+{
+    // TODO
+    return false;
+}
+
 bool is_trainable(Term* term)
 {
     return term->boolPropOptional("trainable", false)
@@ -119,6 +136,52 @@ void refresh_training_branch(Branch& branch)
     }
 
     normalize_feedback_branch(trainingBranch);
+}
+
+void coalesce_feedback(FeedbackOperation& operation, Term* term)
+{
+    // TODO
+}
+
+void refresh_training_branch_new(Branch& branch)
+{
+    update_derived_trainable_properties(branch);
+
+    // Check if '#training' branch exists. Create if it doesn't exist
+    if (!branch.contains(TRAINING_BRANCH_NAME))
+        create_branch(&branch, TRAINING_BRANCH_NAME);
+
+    Branch& trainingBranch = as_branch(branch[TRAINING_BRANCH_NAME]);
+    trainingBranch.clear();
+
+    FeedbackOperation operation;
+
+    // Iterate backwards through the code
+    for (BranchIterator it(branch, true); !it.finished(); ++it) {
+        Term* term = *it;
+
+        // Check for generate_feedback()
+        if (term->function == FEEDBACK_FUNC) {
+            Term* target = term->input(0);
+            Term* value = term->input(1);
+            Term* type = term->input(2);
+            operation.sendFeedback(target, value, type);
+            continue;
+        }
+
+        // Skip term if there's no pending feedback
+        if (!operation.hasPendingFeedback(term))
+            continue;
+
+        // Make sure this function has a generateFeedback function
+        if (get_function_data(term->function).generateFeedbackNew == NULL) {
+            std::cout << "warning: function " << term->function->name << " has no generateFeedback";
+            continue;
+        }
+
+        coalesce_feedback(operation, term);
+        get_function_data(term->function).generateFeedbackNew(trainingBranch, operation, term);
+    }
 }
 
 } // namespace circa
