@@ -23,6 +23,7 @@ extern Term* COMMENT_FUNC;
 extern Term* CONSTANT_TRUE;
 extern Term* CONSTANT_FALSE;
 extern Term* COPY_FUNC;
+extern Term* DESIRED_VALUE_FEEDBACK;
 extern Term* DIV_FUNC;
 extern Term* FEEDBACK_FUNC;
 extern Term* FLOAT_TYPE;

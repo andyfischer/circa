@@ -19,6 +19,7 @@ struct Function
     typedef Term* (*SpecializeTypeFunc)(Term* caller);
     typedef ReferenceIterator* (*ReferenceIteratorFunc)(Term* caller);
     typedef void (*GenerateTrainingFunc)(Branch& branch, Term* subject, Term* desired);
+    typedef void (*GenerateTrainingFuncNew)(Branch& branch, FeedbackOperation& operation, Term* subject);
     typedef std::string (*ToSourceString)(Term* term);
 
     struct InputProperties {
@@ -48,6 +49,7 @@ struct Function
     SpecializeTypeFunc specializeType;
     ReferenceIteratorFunc startControlFlowIterator;
     GenerateTrainingFunc generateFeedback;
+    GenerateTrainingFuncNew generateFeedbackNew;
     ToSourceString toSourceString;
 
     Function();
@@ -59,9 +61,6 @@ struct Function
     InputProperties& getInputProperties(unsigned int index);
     void setInputMeta(int index, bool value);
     void setInputModified(int index, bool value);
-
-    // Hosted functions
-    static void copyExceptBranch(Term* source, Term* dest);
 };
 
 namespace function_t {
