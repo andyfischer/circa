@@ -58,6 +58,8 @@ const char* get_token_text(int match)
         case TYPE: return "type";
         case RETURN: return "return";
         case IN: return "in";
+        case TRUE_TOKEN: return "true";
+        case FALSE_TOKEN: return "false";
         case UNRECOGNIZED: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -245,6 +247,8 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, STATE)) return;
         if (try_to_consume_keyword(context, RETURN)) return;
         if (try_to_consume_keyword(context, IN)) return;
+        if (try_to_consume_keyword(context, TRUE_TOKEN)) return;
+        if (try_to_consume_keyword(context, FALSE_TOKEN)) return;
 
         consume_identifier(context);
         return;

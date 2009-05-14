@@ -1,0 +1,8 @@
+
+_trainable = ['a', 'b']
+
+a = 4
+feedback(if_expr(true, a, 5), 5)
+
+b = 3
+feedback(if_expr(false, b, 1), 1)

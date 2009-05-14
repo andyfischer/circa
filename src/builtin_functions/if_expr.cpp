@@ -27,19 +27,32 @@ namespace if_expr_function {
         if (caller->input(1)->type == caller->input(2)->type)
             return caller->input(1)->type;
 
-        // Otherwise return any. We might want to signal an error here
+        // Otherwise return any. (we might want to signal an error here)
         return ANY_TYPE;
     }
 
-    /*
-    void generateFeedback(Branch& branch, Term* subject, Term* desired)
+    void feedback_evaluate(Term* caller)
     {
-        if (as_bool(subject->input(0)))
-            generate_feedback(branch, subject->input(1), desired);
-        else
-            generate_feedback(branch, subject->input(2), desired);
+        Term* target = caller->input(0);
+        Term* desired = caller->input(1);
+        Branch& output = as_branch(caller);
+
+        // if_expr(cond, pos, neg)
+        //
+        // For cond, don't try to send feedback
+        assign_value(target->input(0), output[0]);
+
+        // For pos and neg, pass along the feedback that we have received,
+        // depending on the value of cond
+        bool cond = target->input(0)->asBool();
+
+        int indexUsed = cond ? 1 : 2;
+
+        for (int i=1; i < 2; i++) {
+            Term* signal = (i == indexUsed) ? desired : target->input(i);
+            assign_value(signal, output[i]);
+        }
     }
-    */
 
     void setup(Branch& kernel)
     {
@@ -48,6 +61,8 @@ namespace if_expr_function {
         as_function(IF_EXPR_FUNC).pureFunction = true;
         as_function(IF_EXPR_FUNC).setInputMeta(1, true);
         as_function(IF_EXPR_FUNC).setInputMeta(2, true);
+        as_function(IF_EXPR_FUNC).feedbackFunc = 
+            import_function(kernel, feedback_evaluate, "if_expr_feedback(any, any) : Branch");
     }
 }
 }

@@ -36,6 +36,7 @@ def run(functionsDirectory, outputFilename):
 
     output_file = open(outputFilename, 'w')
     output_file.write(output)
+    output_file.write("\n")
     output_file.close()
 
 

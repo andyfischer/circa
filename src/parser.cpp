@@ -980,6 +980,10 @@ Term* atom(Branch& branch, TokenStream& tokens)
     else if (tokens.nextIs(STRING))
         result = literal_string(branch, tokens);
 
+    // literal bool?
+    else if (tokens.nextIs(TRUE_TOKEN) || tokens.nextIs(FALSE_TOKEN))
+        result = literal_bool(branch, tokens);
+
     // literal hex?
     else if (tokens.nextIs(HEX_INTEGER))
         result = literal_hex(branch, tokens);
@@ -1117,6 +1121,17 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
 
     Term* term = string_value(&branch, text);
     term->stringProp("syntaxHints:declarationStyle") = "literal";
+    include_location(term, tok);
+    return term;
+}
+
+Term* literal_bool(Branch& branch, TokenStream& tokens)
+{
+    bool value = tokens.nextIs(TRUE_TOKEN);
+
+    Token tok = tokens.consumet();
+
+    Term* term = bool_value(&branch, value);
     include_location(term, tok);
     return term;
 }
