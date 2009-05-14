@@ -117,7 +117,7 @@ bool is_function(Term* term)
 Function& as_function(Term* term)
 {
     assert_type(term, FUNCTION_TYPE);
-    assert(term->value != NULL);
+    alloc_value(term);
     return *((Function*) term->value);
 }
 

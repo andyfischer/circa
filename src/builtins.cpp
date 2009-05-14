@@ -243,19 +243,21 @@ void bootstrap_kernel()
     // Create value function
     VALUE_FUNC = new Term();
     VALUE_FUNC->owningBranch = KERNEL;
-    VALUE_FUNC->value = new Function();
-    as_function(VALUE_FUNC).name = "value";
-    as_function(VALUE_FUNC).pureFunction = true;
-    as_function(VALUE_FUNC).evaluate = empty_evaluate_function;
+    Function* valueFunc = new Function();
+    VALUE_FUNC->value = valueFunc;
+    valueFunc->name = "value";
+    valueFunc->pureFunction = true;
+    valueFunc->evaluate = empty_evaluate_function;
     KERNEL->bindName(VALUE_FUNC, "value");
 
     // Create const-Type function
     Term* constTypeFunc = new Term();
     constTypeFunc->owningBranch = KERNEL;
     constTypeFunc->function = VALUE_FUNC;
-    constTypeFunc->value = new Function();
-    as_function(constTypeFunc).name = "const-Type";
-    as_function(constTypeFunc).pureFunction = true;
+    Function* constTypeFuncValue = new Function();
+    constTypeFunc->value = constTypeFuncValue;
+    constTypeFuncValue->name = "const-Type";
+    constTypeFuncValue->pureFunction = true;
 
     // Create Type type
     TYPE_TYPE = new Term();
@@ -274,15 +276,16 @@ void bootstrap_kernel()
 
     // Implant the Type type
     set_input(constTypeFunc, 0, TYPE_TYPE);
-    as_function(constTypeFunc).outputType = TYPE_TYPE;
+    constTypeFuncValue->outputType = TYPE_TYPE;
 
     // Create const-Function function
     Term* constFuncFunc = new Term();
     constFuncFunc->owningBranch = KERNEL;
     constFuncFunc->function = VALUE_FUNC;
-    constFuncFunc->value = new Function();
-    as_function(constFuncFunc).name = "const-Function";
-    as_function(constFuncFunc).pureFunction = true;
+    Function* constFuncFuncValue = new Function();
+    constFuncFunc->value = constFuncFuncValue;
+    constFuncFuncValue->name = "const-Function";
+    constFuncFuncValue->pureFunction = true;
     KERNEL->bindName(constFuncFunc, "const-Function");
 
     // Create Function type

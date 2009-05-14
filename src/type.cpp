@@ -62,6 +62,7 @@ bool is_compound_type(Term* type)
 
 Type& as_type(Term *term)
 {
+    // don't call alloc_value because that calls as_type
     assert(term->value != NULL);
 
     // don't use assert_type here because assert_type uses as_type
@@ -309,7 +310,11 @@ std::string to_string(Term* term)
 
 void alloc_value(Term* term)
 {
+    if (term->value != NULL)
+        return;
+
     Type& type = as_type(term->type);
+
     if (type.alloc == NULL)
         // todo: should this happen?
         term->value = NULL;
