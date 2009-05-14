@@ -88,14 +88,28 @@ void train_sin()
 {
     Branch branch;
     Term* a = branch.eval("a = 0.0");
-    Term* b = branch.eval("b = sin(a)");
+    branch.eval("feedback(sin(a), 1)");
 
-    a->boolProp("trainable") = true;
-    b->boolProp("trainable") = true;
+    set_trainable(a, true);
 
-    Branch training;
-    //generate_feedback(training, b, training.eval("1.0"));
-    evaluate_branch(training);
+    refresh_training_branch(branch);
+    evaluate_branch(branch);
+
+    test_equals(as_float(a), M_PI / 2.0);
+}
+
+void train_cos()
+{
+    Branch branch;
+    Term* a = branch.eval("a = 5.0");
+    branch.eval("feedback(cos(a), 1)");
+
+    set_trainable(a, true);
+
+    refresh_training_branch(branch);
+    evaluate_branch(branch);
+
+    test_equals(as_float(a), 0);
 }
 
 void feedback_across_function()
@@ -112,7 +126,6 @@ void feedback_across_function()
 
 void feedback_operation()
 {
-    /* FIXME
     FeedbackOperation operation;
     Branch branch;
     Term* a = branch.eval("1");
@@ -128,7 +141,6 @@ void feedback_operation()
 
     test_assert(list.count() == 1);
     test_assert(list[0] == b);
-    */
 }
 
 void register_tests()
@@ -137,9 +149,8 @@ void register_tests()
     REGISTER_TEST_CASE(feedback_tests::train_addition2);
     REGISTER_TEST_CASE(feedback_tests::train_mult);
     REGISTER_TEST_CASE(feedback_tests::train_if_expr);
-    //REGISTER_TEST_CASE(feedback_tests::train_sin);
-    //FIXME REGISTER_TEST_CASE(feedback_tests::test_refresh_training_branch);
-    //FIXME REGISTER_TEST_CASE(feedback_tests::test_refresh_training_branch2);
+    REGISTER_TEST_CASE(feedback_tests::train_sin);
+    REGISTER_TEST_CASE(feedback_tests::train_cos);
     REGISTER_TEST_CASE(feedback_tests::feedback_operation);
 }
 
