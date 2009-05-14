@@ -136,5 +136,6 @@ elif WINDOWS:
 SDL_ENV.Append(CPPPATH=['src'])
 SDL_ENV.Append(LIBS = [circa_staticlib])
 
-c2d_bin = SDL_ENV.Program('build/bin/c2d', 'c2d/main.cpp')
-SDL_ENV.Alias('c2d', c2d_bin)
+cuttlefish_bin = SDL_ENV.Program('build/bin/cfsh', 'cuttlefish/main.cpp')
+SDL_ENV.Alias('cuttlefish', cuttlefish_bin)
+SDL_ENV.Alias('cfsh', cuttlefish_bin)
