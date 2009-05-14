@@ -74,6 +74,8 @@ const int FOR = 56;
 const int STATE = 57;
 const int RETURN = 58;
 const int IN = 59;
+const int TRUE_TOKEN = 60;
+const int FALSE_TOKEN = 61;
 
 const int WHITESPACE = 70;
 const int NEWLINE = 71;

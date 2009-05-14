@@ -49,6 +49,7 @@ if not os.path.exists('build'):
 def write_text_file(path, contents):
     f = open(path, 'w')
     f.write(contents)
+    f.write("\n")
     f.close()
 
 path_join = os.path.join

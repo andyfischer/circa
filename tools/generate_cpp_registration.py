@@ -18,6 +18,7 @@ def substitute(template, **subs):
 def write_text_file(filename, contents):
     output_file = open(filename, 'w')
     output_file.write(contents)
+    output_file.write("\n")
     output_file.close()
 
 def do_builtin_functions(directory, outputFile):

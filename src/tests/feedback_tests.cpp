@@ -59,6 +59,31 @@ void train_mult()
     test_equals(to_float(a), 2.0);
 }
 
+void train_if_expr()
+{
+    Branch branch;
+    Term* a = branch.eval("a = 1");
+    branch.eval("b = 1");
+    Term* cond = branch.eval("cond = true");
+    branch.eval("c = if_expr(cond, a, b)");
+    branch.eval("feedback(c, 5)");
+
+    set_trainable(a, true);
+
+    refresh_training_branch(branch);
+    evaluate_branch(branch);
+
+    test_assert(a->asInt() == 5);
+
+    // try changing cond
+    a->asInt() = 1;
+    cond->asBool() = false;
+
+    evaluate_branch(branch);
+
+    test_assert(a->asInt() == 1);
+}
+
 void train_sin()
 {
     Branch branch;
@@ -111,6 +136,7 @@ void register_tests()
     REGISTER_TEST_CASE(feedback_tests::train_addition1);
     REGISTER_TEST_CASE(feedback_tests::train_addition2);
     REGISTER_TEST_CASE(feedback_tests::train_mult);
+    REGISTER_TEST_CASE(feedback_tests::train_if_expr);
     //REGISTER_TEST_CASE(feedback_tests::train_sin);
     //FIXME REGISTER_TEST_CASE(feedback_tests::test_refresh_training_branch);
     //FIXME REGISTER_TEST_CASE(feedback_tests::test_refresh_training_branch2);
