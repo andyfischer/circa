@@ -376,8 +376,8 @@ void initialize_builtin_types(Branch& kernel)
 
 void initialize_constants(Branch& kernel)
 {
-    float_value(&kernel, 3.141592654f, "PI");
-    float_value(&kernel, 3.141592654f / 2.0, "HALF_PI");
+    float_value(&kernel, M_PI, "PI");
+    float_value(&kernel, M_PI / 2.0, "HALF_PI");
 
     as_function(VALUE_FUNC).feedbackFunc = ASSIGN_FUNC;
 }
