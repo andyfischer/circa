@@ -153,7 +153,7 @@ int main( int argc, char* args[] )
     sdl_wrapper::register_functions(*SCRIPT_ROOT);
 
     // Load runtime.ca
-    parse_file(*SCRIPT_ROOT, "c2d/runtime.ca");
+    parse_file(*SCRIPT_ROOT, "cuttlefish/runtime.ca");
 
     // Load user's script
     USERS_BRANCH = &SCRIPT_ROOT->get("users_branch")->asBranch();
@@ -182,7 +182,7 @@ int main( int argc, char* args[] )
         return 1;
 
     // Set the window caption
-    SDL_WM_SetCaption("proto7", NULL);
+    SDL_WM_SetCaption("Cuttlefish game engine", NULL);
 
     prev_sdl_ticks = SDL_GetTicks();
 
