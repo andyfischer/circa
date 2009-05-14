@@ -184,19 +184,20 @@ void resize_list(Branch& list, int numElements, Term* type)
 int& as_int(Term* term)
 {
     assert_type(term, INT_TYPE);
-    assert(term->value != NULL);
+    alloc_value(term);
     return *((int*) term->value);
 }
 
 float& as_float(Term* term)
 {
     assert_type(term, FLOAT_TYPE);
-    assert(term->value != NULL);
+    alloc_value(term);
     return *((float*) term->value);
 }
 
 float to_float(Term* term)
 {
+    alloc_value(term);
     if (term->type == FLOAT_TYPE)
         return as_float(term);
     else if (term->type == INT_TYPE)
@@ -208,14 +209,14 @@ float to_float(Term* term)
 bool& as_bool(Term* term)
 {
     assert_type(term, BOOL_TYPE);
-    assert(term->value != NULL);
+    alloc_value(term);
     return *((bool*) term->value);
 }
 
 std::string& as_string(Term* term)
 {
     assert_type(term, STRING_TYPE);
-    assert(term->value != NULL);
+    alloc_value(term);
     return *((std::string*) term->value);
 }
 
