@@ -37,11 +37,14 @@ if WINDOWS:
 
 ROOT.Append(CPPDEFINES = ["_DEBUG"])
 ROOT.Append(CPPDEFINES = ["DEBUG"])
+ROOT.SetOption('num_jobs', 2)
+Export('ROOT')
 
-ENV = ROOT.Clone()
+# Build Circa library
+CIRCA_ENV = ROOT.Clone()
 
-ENV.BuildDir('build/src', 'src')
-ENV.Append(CPPPATH = ['src'])
+CIRCA_ENV.BuildDir('build/src', 'src')
+CIRCA_ENV.Append(CPPPATH = ['src'])
 
 if not os.path.exists('build'):
     os.mkdir('build')
@@ -88,23 +91,22 @@ source_directory('src', excludes=['main.cpp', 'src/main.cpp'])
 source_directory_into_one_cpp('src/tests', 'all_tests')
 source_directory_into_one_cpp('src/builtin_functions', 'all_builtin_functions')
 
-circa_staticlib = ENV.StaticLibrary('build/bin/circa', BUILD_FILES)
+circa_staticlib = CIRCA_ENV.StaticLibrary('build/bin/circa', BUILD_FILES)
 
-circaBinary = ENV.Program('build/bin/circa', 'build/src/main.cpp', LIBS=[circa_staticlib])
+circaBinary = CIRCA_ENV.Program('build/bin/circa', 'build/src/main.cpp', LIBS=[circa_staticlib])
 
-ENV.SetOption('num_jobs', 2)
-ENV.Default(circaBinary)
+CIRCA_ENV.Default(circaBinary)
 
-########################### SDL-based apps ###############################
+########################### SDL-based targets ###############################
 
-SDL_ENV = ROOT.Clone()
+SDL_ROOT = ROOT.Clone()
 
 if POSIX:
     # import path so that we will find the correct sdl-config
-    SDL_ENV['ENV']['PATH'] = os.environ['PATH']
-    SDL_ENV.ParseConfig('sdl-config --cflags')
-    SDL_ENV.ParseConfig('sdl-config --libs')
-    SDL_ENV.Append(LIBS = ['SDL_gfx'])
+    SDL_ROOT['ENV']['PATH'] = os.environ['PATH']
+    SDL_ROOT.ParseConfig('sdl-config --cflags')
+    SDL_ROOT.ParseConfig('sdl-config --libs')
+    SDL_ROOT.Append(LIBS = ['SDL_gfx'])
 
 elif WINDOWS:
     def look_for_required_dep_folder(folder):
@@ -126,16 +128,23 @@ elif WINDOWS:
     look_for_required_dep_folder('SDL_deps/SDL-1.2.13')
     look_for_required_dep_folder('SDL_deps/SDL_gfx-2.0.19')
 
-    SDL_ENV.Append(CPPPATH=['SDL_deps/SDL-1.2.13/include'])
-    SDL_ENV.Append(CPPPATH=['SDL_deps/SDL_gfx-2.0.19'])
-    SDL_ENV.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDL.lib'])
-    SDL_ENV.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDLmain.lib'])
-    SDL_ENV.Append(LIBS=['SDL_deps/SDL_gfx-2.0.19/VisualC/Release/SDL_gfx.lib'])
+    SDL_ROOT.Append(CPPPATH=['SDL_deps/SDL-1.2.13/include'])
+    SDL_ROOT.Append(CPPPATH=['SDL_deps/SDL_gfx-2.0.19'])
+    SDL_ROOT.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDL.lib'])
+    SDL_ROOT.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDLmain.lib'])
+    SDL_ROOT.Append(LIBS=['SDL_deps/SDL_gfx-2.0.19/VisualC/Release/SDL_gfx.lib'])
 
 
-SDL_ENV.Append(CPPPATH=['src'])
-SDL_ENV.Append(LIBS = [circa_staticlib])
+SDL_ROOT.Append(CPPPATH=['#/src'])
+SDL_ROOT.Append(LIBS = [circa_staticlib])
 
-cuttlefish_bin = SDL_ENV.Program('build/bin/cfsh', 'cuttlefish/main.cpp')
-SDL_ENV.Alias('cuttlefish', cuttlefish_bin)
-SDL_ENV.Alias('cfsh', cuttlefish_bin)
+Export('SDL_ROOT')
+
+cuttlefish_bin = SDL_ROOT.Program('build/bin/cfsh', 'cuttlefish/main.cpp')
+SDL_ROOT.Alias('cuttlefish', cuttlefish_bin)
+SDL_ROOT.Alias('cfsh', cuttlefish_bin)
+
+# 'ptc', an optional app
+if os.path.exists('ptc'):
+  SConscript('ptc/build.scons')
+
