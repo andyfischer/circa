@@ -21,6 +21,10 @@ ROOT = Environment(tools = ["default"], toolpath=".")
 POSIX = os.name == 'posix'
 WINDOWS = os.name == 'nt'
 
+# Check for a Mac-like environment. On Macs, 'POSIX' is true, but there is
+# a little bit of special behavior for using frameworks.
+MAC = os.path.exists('/Library/Frameworks')
+
 if POSIX:
     ROOT.Append(CPPFLAGS=['-ggdb'])
     ROOT.Append(CPPFLAGS=['-Wall'])
@@ -108,7 +112,10 @@ if POSIX:
     SDL_ROOT.ParseConfig('sdl-config --libs')
     SDL_ROOT.Append(LIBS = ['SDL_gfx'])
 
-elif WINDOWS:
+    if MAC:
+        SDL_ROOT['FRAMEWORKS'] = ['OpenGL']
+
+if WINDOWS:
     def look_for_required_dep_folder(folder):
         if not os.path.exists(folder):
             print "I couldn't find the folder "+folder+'/'
@@ -146,5 +153,4 @@ SDL_ROOT.Alias('cfsh', cuttlefish_bin)
 
 # 'ptc', an optional app
 if os.path.exists('ptc'):
-  SConscript('ptc/build.scons')
-
+    SConscript('ptc/build.scons')

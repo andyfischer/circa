@@ -38,6 +38,11 @@ public:
     {
         return as<T>(_term);
     }
+
+    T& get()
+    {
+        return as<T>(_term);
+    }
 };
 
 typedef Accessor<int, &INT_TYPE> Int;
