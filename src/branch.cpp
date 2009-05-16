@@ -284,7 +284,7 @@ void duplicate_branch(Branch& source, Branch& dest)
     dest.names.remapPointers(newTermMap);
 }
 
-void parse_file(Branch& branch, std::string const& filename)
+void parse_script(Branch& branch, std::string const& filename)
 {
     std::string fileContents = read_text_file(filename);
 
@@ -292,6 +292,12 @@ void parse_file(Branch& branch, std::string const& filename)
 
     // record the filename
     string_value(&branch, filename, get_name_for_attribute("source-file"));
+}
+
+void evaluate_script(Branch& branch, std::string const& filename)
+{
+    parse_script(branch, filename);
+    evaluate_branch(branch);
 }
 
 Term* find_named(Branch* branch, std::string const& name)
@@ -348,7 +354,7 @@ void reload_branch_from_file(Branch& branch)
 
     branch.clear();
 
-    parse_file(branch, filename);
+    parse_script(branch, filename);
     migrate_values(original, branch);
 }
 

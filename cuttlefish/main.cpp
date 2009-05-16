@@ -153,7 +153,7 @@ int main( int argc, char* args[] )
     sdl_wrapper::register_functions(*SCRIPT_ROOT);
 
     // Load runtime.ca
-    parse_file(*SCRIPT_ROOT, "cuttlefish/runtime.ca");
+    parse_script(*SCRIPT_ROOT, "cuttlefish/runtime.ca");
 
     // Load user's script
     USERS_BRANCH = &SCRIPT_ROOT->get("users_branch")->asBranch();
@@ -161,7 +161,7 @@ int main( int argc, char* args[] )
     if (argc > 1) {
         std::string filename = args[1];
         std::cout << "Loading file: " << filename << std::endl;
-        circa::parse_file(*USERS_BRANCH, filename);
+        circa::parse_script(*USERS_BRANCH, filename);
     }
 
     // Check if they defined SCREEN_WIDTH or SCREEN_HEIGHT

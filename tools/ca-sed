@@ -1,5 +1,5 @@
 # example:
 # ca-sed s/apples/oranges/g
-#sed -i '' $* $CIRCA_HOME/src/*.cpp $CIRCA_HOME/src/*.h $CIRCA_HOME/src/tests/*.cpp $CIRCA_HOME/src/builtin_functions/*.cpp $CIRCA_HOME/tests/*.ca
+sed -i '' $* $CIRCA_HOME/src/*.cpp $CIRCA_HOME/src/*.h $CIRCA_HOME/src/tests/*.cpp $CIRCA_HOME/src/builtin_functions/*.cpp $CIRCA_HOME/tests/*.ca
 
-find $CIRCA_HOME/src -type f -exec sed --in-place $1 {} \;
+#find $CIRCA_HOME/src -type f -exec sed --in-place $1 {} \;

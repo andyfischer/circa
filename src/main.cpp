@@ -52,7 +52,7 @@ int circa_main(std::vector<std::string> args)
     // Show compiled code
     if (args[0] == "-p") {
         Branch branch;
-        parse_file(branch, args[1]);
+        parse_script(branch, args[1]);
         std::cout << branch_to_string_raw(branch);
         return 0;
     }
@@ -60,7 +60,7 @@ int circa_main(std::vector<std::string> args)
     // Reproduce source
     if (args[0] == "-s") {
         Branch branch;
-        parse_file(branch, args[1]);
+        parse_script(branch, args[1]);
         std::cout << get_branch_source(branch) << std::endl;
         return 0;
     }
@@ -68,7 +68,7 @@ int circa_main(std::vector<std::string> args)
     // Do a feedback test
     if (args[0] == "-f") {
         Branch branch;
-        parse_file(branch, args[1]);
+        parse_script(branch, args[1]);
 
         Branch &trainable_names = branch["_trainable"]->asBranch();
         for (int i=0; i < trainable_names.length(); i++)
@@ -94,7 +94,7 @@ int circa_main(std::vector<std::string> args)
 
     // Otherwise, run script
     Branch main_branch;
-    parse_file(main_branch, args[0]);
+    parse_script(main_branch, args[0]);
 
     if (count_compile_errors(main_branch) > 0) {
         int count = count_compile_errors(main_branch);
