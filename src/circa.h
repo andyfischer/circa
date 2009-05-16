@@ -5,6 +5,7 @@
 #include "building.h"
 #include "builtins.h"
 #include "cpp_importing.h"
+#include "cpp_convenience.h"
 #include "debug.h"
 #include "feedback.h"
 #include "for_loops.h"
