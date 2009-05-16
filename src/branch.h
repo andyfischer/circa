@@ -99,7 +99,8 @@ Branch& create_branch(Branch* owner, std::string const& name="");
 
 void duplicate_branch(Branch& source, Branch& dest);
 
-void parse_file(Branch& branch, std::string const& filename);
+void parse_script(Branch& branch, std::string const& filename);
+void evaluate_script(Branch& branch, std::string const& filename);
 
 Term* find_term_by_id(Branch& branch, unsigned int id);
 Term* find_named(Branch* branch, std::string const& name);
