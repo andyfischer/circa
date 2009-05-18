@@ -60,6 +60,7 @@ const int STAR_EQUALS = 34;
 const int SLASH_EQUALS = 35;
 const int COLON_EQUALS = 36;
 const int RIGHT_ARROW = 37;
+const int LEFT_ARROW = 43;
 const int DOUBLE_AMPERSAND = 38;
 const int DOUBLE_VERTICAL_BAR = 39;
 const int SEMICOLON = 40;

@@ -12,7 +12,7 @@ void train_addition1()
     Branch branch;
     Term* a = branch.eval("a = 1.0");
     branch.eval("b = add(a, 2.0)");
-    branch.eval("feedback(b, 4)");
+    branch.eval("b <- 4");
 
     set_trainable(a, true);
 
@@ -30,8 +30,7 @@ void train_addition2()
     Branch branch;
     Term* a = branch.eval("a = 1.0");
     Term* b = branch.eval("b = 2.0");
-    branch.eval("c = add(a, b)");
-    branch.eval("feedback(c, 4)");
+    branch.eval("add(a, b) <- 4");
 
     set_trainable(a, true);
     set_trainable(b, true);
@@ -48,8 +47,7 @@ void train_mult()
     Branch branch;
     Term* a = branch.eval("a = 1");
     branch.eval("b = 3");
-    branch.eval("c = mult(a, b)");
-    branch.eval("feedback(c, 6)");
+    branch.eval("mult(a, b) <- 6");
 
     set_trainable(a, true);
 
@@ -65,8 +63,7 @@ void train_if_expr()
     Term* a = branch.eval("a = 1");
     branch.eval("b = 1");
     Term* cond = branch.eval("cond = true");
-    branch.eval("c = if_expr(cond, a, b)");
-    branch.eval("feedback(c, 5)");
+    branch.eval("if_expr(cond, a, b) <- 5");
 
     set_trainable(a, true);
 
@@ -88,7 +85,7 @@ void train_sin()
 {
     Branch branch;
     Term* a = branch.eval("a = 0.0");
-    branch.eval("feedback(sin(a), 1)");
+    branch.eval("sin(a) <- 1");
 
     set_trainable(a, true);
 
@@ -102,7 +99,7 @@ void train_cos()
 {
     Branch branch;
     Term* a = branch.eval("a = 5.0");
-    branch.eval("feedback(cos(a), 1)");
+    branch.eval("cos(a) <- 1");
 
     set_trainable(a, true);
 
@@ -118,7 +115,7 @@ void feedback_across_function()
     Term* a = branch.eval("a = 1.0");
     branch.eval("def inv(float f) : float\nreturn 0 - f\nend");
     branch.eval("b = inv(a)");
-    branch.eval("feedback(b, -2.0)");
+    branch.eval("b <- -2.0");
 
     set_trainable(a, true);
     refresh_training_branch(branch);

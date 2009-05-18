@@ -771,6 +771,7 @@ int get_infix_precedence(int match)
         case tokenizer::RIGHT_ARROW:
             return 1;
         case tokenizer::COLON_EQUALS:
+        case tokenizer::LEFT_ARROW:
             return 0;
         default:
             return -1;
@@ -802,6 +803,7 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "*=") return "mult";
     else if (infix == "/=") return "div";
     else if (infix == ":") return "annotate_type";
+    else if (infix == "<-") return "feedback";
     else return "#unrecognized";
 }
 

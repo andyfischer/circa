@@ -43,6 +43,7 @@ const char* get_token_text(int match)
         case SLASH_EQUALS: return "/=";
         case COLON_EQUALS: return ":=";
         case RIGHT_ARROW: return "->";
+        case LEFT_ARROW: return "<-";
         case DOUBLE_AMPERSAND: return "&&";
         case DOUBLE_VERTICAL_BAR: return "||";
         case SEMICOLON: return ";";
@@ -406,6 +407,11 @@ void top_level_consume_token(TokenizeContext &context)
             if (context.next() == '=') {
                 context.consume();
                 context.push(LTHANEQ);
+                return;
+            }
+            if (context.next() == '-') {
+                context.consume();
+                context.push(LEFT_ARROW);
                 return;
             }
             context.push(LTHAN);
