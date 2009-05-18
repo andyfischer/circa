@@ -113,8 +113,8 @@ void test_symbols1()
 void test_symbols2()
 {
     token::TokenList results;
-    token::tokenize("<>:;%...", results);
-    test_assert(results.size() == 6);
+    token::tokenize("<>:;%...<-", results);
+    test_assert(results.size() == 7);
     test_assert(results[0].text == "<");
     test_assert(results[0].match == token::LTHAN);
     test_assert(results[1].text == ">");
@@ -127,6 +127,8 @@ void test_symbols2()
     test_assert(results[4].match == token::PERCENT);
     test_assert(results[5].text == "...");
     test_assert(results[5].match == token::ELLIPSIS);
+    test_assert(results[6].text == "<-");
+    test_assert(results[6].match == token::LEFT_ARROW);
 }
 
 void test_keywords()
