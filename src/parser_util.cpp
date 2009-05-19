@@ -178,7 +178,12 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
     tokens.resetPosition(start);
 
     std::stringstream line;
-    while (!tokens.nextIs(tokenizer::NEWLINE) && !tokens.finished()) {
+    while (!tokens.finished()) {
+
+        // If we've passed our originalPosition and reached a newline, then stop
+        if (tokens.getPosition() > originalPosition && tokens.nextIs(tokenizer::NEWLINE))
+            break;
+
         tokenizer::Token tok = tokens.consumet();
         if (positionRecepient != NULL)
             include_location(positionRecepient, tok);
