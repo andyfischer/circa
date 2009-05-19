@@ -38,6 +38,7 @@ if WINDOWS:
     ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:libcd.lib'])
     ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:libcmt.lib'])
     ROOT.Append(LINKFLAGS=['/SUBSYSTEM:CONSOLE /MACHINE:X86'.split()])
+    ROOT.Append(CPPDEFINES = ['WINDOWS'])
 
 ROOT.Append(CPPDEFINES = ["_DEBUG"])
 ROOT.Append(CPPDEFINES = ["DEBUG"])
@@ -103,6 +104,32 @@ CIRCA_ENV.Default(circaBinary)
 
 ########################### SDL-based targets ###############################
 
+def download_file_from_the_internets(url, filename):
+    print "Downloading "+url
+    import urllib
+    webFile = urllib.urlopen(url)
+    localFile = open(filename, 'wb')
+    localFile.write(webFile.read())
+    webFile.close()
+    localFile.close()
+
+def unzip_file(filename, dir):
+    print "Unzipping "+filename+" to "+dir
+    import zipfile
+
+    if not os.path.exists(dir): os.mkdir(dir)
+
+    zf = zipfile.ZipFile(filename)
+    for name in zf.namelist():
+        path = os.path.join(dir, name)
+        if name.endswith('/'):
+            if not os.path.exists(path): os.mkdir(path)
+        else:
+            f = open(path, 'wb')
+            f.write(zf.read(name))
+            f.close()
+
+
 SDL_ROOT = ROOT.Clone()
 
 if POSIX:
@@ -114,26 +141,17 @@ if POSIX:
 
     if MAC:
         SDL_ROOT['FRAMEWORKS'] = ['OpenGL']
+    else:
+        SDL_ROOT.Append(LIBS = ['OpenGL'])
 
 if WINDOWS:
-    def look_for_required_dep_folder(folder):
-        if not os.path.exists(folder):
-            print "I couldn't find the folder "+folder+'/'
 
-            # check for a common mistake with unzipping
-            if os.path.exists('SDL_deps/SDL_deps'):
-                print "However, I did find the folder SDL_deps/SDL_deps/, which means that"
-                print "your unzipper may have created an extra folder. Try moving the nested"
-                print "SDL_deps/ folder up one level, into the project directory."
-            else:
-                print "Make sure to download the file SDL_deps.zip from:"
-                print "http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip"
-                print "and unzip it into this project folder."
-            exit(1)
+    if not os.path.exists('SDL_deps'):
+        # download SDL_deps.zip from github site
+        download_file_from_the_internets('http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip',              'SDL_deps.zip')
 
-    look_for_required_dep_folder('SDL_deps')
-    look_for_required_dep_folder('SDL_deps/SDL-1.2.13')
-    look_for_required_dep_folder('SDL_deps/SDL_gfx-2.0.19')
+        # unzip it
+        unzip_file('SDL_deps.zip', '.')
 
     SDL_ROOT.Append(CPPPATH=['SDL_deps/SDL-1.2.13/include'])
     SDL_ROOT.Append(CPPPATH=['SDL_deps/SDL_gfx-2.0.19'])

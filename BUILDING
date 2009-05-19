@@ -1,14 +1,13 @@
 
-Dependencies:
-  Scons
-  Python (for SCons)
-  SDL-devel
-  SDL_gfx
-
 LINUX:
 
-0. Using your package manager, install SCons, SDL-devel and SDL_gfx
-1. In a terminal, run the command: scons.
+0. Install the following packages:
+     SCons
+     libsdl-dev
+     libsdl-image1.2-dev
+     SDL_gfx
+
+1. In a terminal, run the command: scons .
 
 MAC:
 
@@ -16,10 +15,10 @@ MAC:
 1. In Terminal, enter the command: sudo port install SCons SDL-devel SDL_gfx
 2. In Terminal, from the Circa project folder, enter the command: scons .
 
-WINDOWS BUILD:
+WINDOWS:
 
-0. Install SCons from here: www.scons.org
-1. Download the file SDL_deps.zip from http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip
-2. Unzip the contents into the project's folder
+0. Install Visual Studio. (this build has been tested with VC++ 2005)
+1. Install Python 2.6 from www.python.org
+2  Install SCons from here: www.scons.org
 3. Open a command prompt in this folder
 4. Run the command: scons .

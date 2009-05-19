@@ -8,9 +8,7 @@ src/register_all_tests.cpp
 # build results:
 build
 obj
-cgm
 bin/circa
-bin/cgame
 *.o
 *.so
 *.a
@@ -31,6 +29,10 @@ circa.1
 *.pdb
 *.suo
 .sconsign.dblite
+
+# dependencies
+SDL_deps
+SDL_deps.zip
 
 # miscellaneous
 tags
