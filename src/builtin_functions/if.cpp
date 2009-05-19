@@ -18,13 +18,19 @@ namespace if_function {
     std::string toSourceString(Term* term)
     {
         std::stringstream result;
-        result << "if ";
-        result << get_source_of_input(term, 0);
-        result << "\n";
+
+        if (!term->boolPropOptional("if:is-else", false)) {
+            result << "if";
+            result << " " << get_source_of_input(term, 0) << std::endl;
+        } else {
+            result << "else";
+        }
 
         result << get_branch_source(as_branch(term));
 
-        result << "end";
+        if (!term->boolPropOptional("if:has-following-else", false))
+            result << "end";
+
         return result.str();
     }
 
