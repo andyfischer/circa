@@ -115,6 +115,21 @@ std::string branch_to_string_raw(Branch& branch)
     return out.str();
 }
 
+std::string branch_to_string_raw_with_properties(Branch& branch)
+{
+    std::stringstream out;
+    for (BranchIterator it(branch); !it.finished(); it.advance()) {
+        Term* term = it.current();
+
+        int indent = it.depth();
+
+        for (int i=0; i < indent; i++) out << "  ";
+
+        out << term_to_raw_string(term) << " " << dict_t::to_string(term->properties) << std::endl;
+    }
+    return out.str();
+}
+
 bool function_allows_term_reuse(Function &function)
 {
     if (!function.pureFunction)

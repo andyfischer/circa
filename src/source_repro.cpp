@@ -34,18 +34,43 @@ std::string get_source_of_input(Term* term, int inputIndex)
     return result.str();
 }
 
+bool is_hidden(Term* term)
+{
+    if (term->boolPropOptional("syntaxHints:hidden", false))
+        return true;
+
+    if (term->name == "")
+        return false;
+
+    if (term->name == OUTPUT_PLACEHOLDER_NAME)
+        return false;
+
+    if (term->name[0] == '#')
+        return true;
+
+    return false;
+}
+
 bool should_print_term_source_line(Term* term)
 {
     if (term->boolPropOptional("syntaxHints:nestedExpression", false))
         return false;
 
-    if (term->boolPropOptional("syntaxHints:hidden", false))
-        return false;
+    return (!is_hidden(term));
+}
 
-    if ((term->name.length() > 0) && term->name[0] == '#')
-        return false;
-
-    return true;
+void prepend_name_binding(Term* term, std::stringstream& out)
+{
+    if (term->name == OUTPUT_PLACEHOLDER_NAME)
+        out << "return ";
+    else if (term->name == "")
+        return;
+    else {
+        out << term->name;
+        out << term->stringPropOptional("syntaxHints:preEqualsSpace", " ");
+        out << "=";
+        out << term->stringPropOptional("syntaxHints:postEqualsSpace", " ");
+    }
 }
 
 std::string get_term_source(Term* term)
@@ -68,16 +93,11 @@ std::string get_term_source(Term* term)
     // for values, check if the type has a toString function
     if (is_value(term)) {
 
-        bool prependNameBinding = true;
-
         // for certain types, don't write "name =" in front
-        if (term->type == FUNCTION_TYPE
-                || term->type == TYPE_TYPE
-                || term->type == SUBROUTINE_TYPE)
-            prependNameBinding = false;
-
-        if (prependNameBinding && term->name != "")
-            result << term->name << " = ";
+        if (term->type != FUNCTION_TYPE
+                && term->type != TYPE_TYPE
+                && term->type != SUBROUTINE_TYPE)
+            prepend_name_binding(term, result);
 
         assert(as_type(term->type).toString != NULL);
 
@@ -105,15 +125,7 @@ std::string get_term_source(Term* term)
     }
 
     // add possible name binding
-    if (term->name == OUTPUT_PLACEHOLDER_NAME) {
-        result << "return ";
-    }
-    else if (term->name != "") {
-        result << term->name;
-        result << term->stringPropOptional("syntaxHints:preEqualsSpace", " ");
-        result << "=";
-        result << term->stringPropOptional("syntaxHints:postEqualsSpace", " ");
-    }
+    prepend_name_binding(term, result);
 
     int numParens = term->intPropOptional("syntaxHints:parens", 0);
     for (int p=0; p < numParens; p++)

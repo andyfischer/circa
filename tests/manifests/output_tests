@@ -5,8 +5,7 @@ average.ca
 boolean.ca
 comparison.ca
 compound_type.ca
-feedback_operator.ca
-fib.ca
+# fib.ca
 for.ca
 # get-field-in-sub.ca
 if.ca

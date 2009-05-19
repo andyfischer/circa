@@ -69,6 +69,10 @@ namespace list_t {
     void append(Branch& branch, Term* value);
 }
 
+namespace dict_t {
+    std::string to_string(Branch& branch);
+}
+
 } // namespace circa
 
 #endif
