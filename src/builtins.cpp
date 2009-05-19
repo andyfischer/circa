@@ -236,8 +236,29 @@ namespace list_t {
 
 } // namespace list_t
 
+namespace dict_t {
+    std::string to_string(Branch& branch)
+    {
+        std::stringstream out;
+        out << "{";
+        for (int i=0; i < branch.length(); i++) {
+            Term* term = branch[i];
+            std::string name = term->name;
+            if (name == "")
+                name = "<anon>";
+
+            if (i != 0)
+                out << ", ";
+
+            out << name << ": " << to_string(term);
+        }
+        out << "}";
+        return out.str();
+    }
+}
+
 namespace any_t {
-    std::string to_string(Term* caller)
+    std::string to_string(Term* term)
     {
         return "<any>";
     }

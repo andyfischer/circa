@@ -57,6 +57,14 @@ int circa_main(std::vector<std::string> args)
         return 0;
     }
 
+    // Show compiled code with properties
+    if (args[0] == "-pp") {
+        Branch branch;
+        parse_script(branch, args[1]);
+        std::cout << branch_to_string_raw_with_properties(branch);
+        return 0;
+    }
+
     // Reproduce source
     if (args[0] == "-s") {
         Branch branch;

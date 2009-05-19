@@ -1,5 +1,5 @@
 
-type Point {float x, float y}
+type Point { float x, float y }
 
 def mysub(Point p) -> int
   p -> print
@@ -7,6 +7,6 @@ def mysub(Point p) -> int
   typeof(p) -> print
 end
 
-state Point p
+state p : Point
 
 mysub([1.0 2.0])
