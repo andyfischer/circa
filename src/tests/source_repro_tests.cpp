@@ -155,8 +155,11 @@ void reproduce_if() {
     round_trip_source("if 5.0 > 3.0\n  print('hey')\nend");
     round_trip_source("if true\nelse\nend");
     round_trip_source("  if true\nelse\nend");
-    //round_trip_source("if true  \nelse\nend");
-    //round_trip_source("if true\n  else\nend");
+    round_trip_source("if true  \nelse\nend");
+    round_trip_source("if true\n  else\nend");
+    round_trip_source("if true\nelse  \nend");
+    round_trip_source("if true\nelse\n  end");
+    round_trip_source("if true\nelse\nend  ");
     finish_source_repro_category();
 }
 

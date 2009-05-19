@@ -431,7 +431,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     recursively_mark_terms_as_occuring_inside_an_expression(condition);
 
-    possible_whitespace(tokens);
+    std::string postConditionWs = possible_whitespace(tokens);
 
     if (!tokens.nextIs(NEWLINE))
         return compile_error_for_line(branch, tokens, startPosition);
@@ -440,6 +440,9 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     Term* result = apply(&branch, IF_FUNC, RefList(condition));
     alloc_value(result);
+
+    get_input_syntax_hint(result, 0, "postWhitespace") = postConditionWs;
+    
     Branch& innerBranch = as_branch(result);
 
     consume_branch_until_end(innerBranch, tokens);
@@ -448,13 +451,18 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     Term* elseResult = NULL;
 
     // possibly consume an 'else' block
-    if (tokens.nextIs(ELSE)) {
+    if (tokens.nextNonWhitespaceIs(ELSE)) {
+
+        std::string preWs = possible_whitespace(tokens);
+
         tokens.consume(ELSE);
 
         Term* notCondition = apply(&branch, NOT_FUNC, RefList(condition));
         elseResult = apply(&branch, IF_FUNC, RefList(notCondition));
         alloc_value(elseResult);
         Branch& elseInnerBranch = as_branch(elseResult);
+
+        elseResult->stringProp("syntaxHints:preWhitespace") = preWs;
 
         consume_branch_until_end(elseInnerBranch, tokens);
         remove_compilation_attrs(elseInnerBranch);
@@ -463,10 +471,18 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         elseResult->boolProp("if:is-else") = true;
     }
 
+    possible_whitespace(tokens);
+
     if (!tokens.nextIs(END))
         return compile_error_for_line(branch, tokens, startPosition);
 
     tokens.consume(END);
+
+    // Consume any trailing whitespace. We can't rely on statement() to do this, because
+    // it might try to apply this whitespace to the first if() call.
+    if (elseResult != NULL) {
+        append_whitespace(elseResult, possible_whitespace(tokens));
+    }
 
     // Create the joining branch
     Branch& joiningBranch = create_branch(&branch, "#joining");
@@ -528,6 +544,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             branch.bindName(joining, name);
         }
     }
+
 
     return result;
 }
