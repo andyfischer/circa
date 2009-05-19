@@ -67,6 +67,7 @@ void test_floats()
     token::TokenList results;
     token::tokenize("1.0 16. .483 .123. -0.1 -.54", results);
 
+    test_assert(results.size() == 12);
     test_assert(results[0].text == "1.0");
     test_assert(results[0].match == token::FLOAT);
     test_assert(results[2].text == "16.");
@@ -81,7 +82,13 @@ void test_floats()
     test_assert(results[9].match == token::FLOAT);
     test_assert(results[11].text == "-.54");
     test_assert(results[11].match == token::FLOAT);
-    test_assert(results.size() == 12);
+
+    token::TokenList results2;
+    token::tokenize("5.200", results2);
+
+    test_assert(results2.size() == 1);
+    test_assert(results2[0].text == "5.200");
+    test_assert(results2[0].match == token::FLOAT);
 }
 
 void test_symbols1()

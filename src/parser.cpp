@@ -1080,22 +1080,12 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     Token tok = tokens.consumet();
     std::string text = tok.text;
 
-    // be lazy and parse the actual number with atof
+    // Parse value with atof
     float value = atof(text.c_str());
-
-    // figure out how many decimal places this number has
-    bool foundDecimal = false;
-    int decimalFigures = 0;
-
-    for (unsigned int i=0; i < text.length(); i++) {
-        if (text[i] == '.')
-            foundDecimal = true;
-        else if (foundDecimal)
-            decimalFigures++;
-    }
-
     Term* term = float_value(&branch, value);
-    term->floatProp("syntaxHints:decimalFigures") = decimalFigures;
+
+    // Store the original string
+    term->stringProp("float:original-format") = text;
 
     float mutability = 0.0;
 

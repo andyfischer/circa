@@ -47,6 +47,10 @@ void test_literal_float()
     test_assert(branch.length() == 1);
     test_assert(is_value(branch[0]));
     test_assert(branch[0]->asFloat() == 1.0);
+
+    Term* b = parser::compile(&branch, parser::statement_list, "5.200");
+    test_assert(b->type == FLOAT_TYPE);
+    test_assert(to_string(b) == "5.200");
 }
 
 void test_literal_string()
