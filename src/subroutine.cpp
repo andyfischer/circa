@@ -130,9 +130,10 @@ void subroutine_call_evaluate(Term* caller)
 
 void subroutine_feedback(Branch& branch, Term* subject, Term* desired)
 {
+    /*
+    TODO
     Function& func = as_function(subject);
 
-    /*
     Term* out = func.subroutineBranch[OUTPUT_PLACEHOLDER_NAME];
 
     Branch& subBranch = create_branch(&branch);

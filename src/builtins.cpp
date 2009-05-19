@@ -88,18 +88,38 @@ namespace primitives {
 
         std::string to_string(Term* term)
         {
-            // Figuring out how many decimal places to show is a hard problem.
-            // This will need to be revisited.
-            std::stringstream strm;
+            // Correctly formatting floats is a tricky problem.
 
-            strm.setf(std::ios::fixed, std::ios::floatfield);
-            strm.precision(term->floatPropOptional("syntaxHints:decimalFigures", 1));
+            // First, check if we know how the user typed this number. If this value
+            // still has the exact same value, then use the original formatting.
+            if (term->hasProperty("float:original-format")) {
+                std::string& originalFormat = term->stringProp("float:original-format");
+                float actual = as_float(term);
+                float original = atof(originalFormat.c_str());
+                if (actual == original) {
+                    return originalFormat;
+                }
+            }
+
+            // Otherwise, format the current value with naive formatting
+            std::stringstream strm;
             strm << as_float(term);
 
             if (term->floatPropOptional("mutability", 0.0) > 0.5)
                 strm << "?";
 
-            return strm.str();
+            std::string result = strm.str();
+
+            // Check this string and make sure there is a decimal point. If not, append one.
+            bool decimalFound = false;
+            for (unsigned i=0; i < result.length(); i++)
+                if (result[i] == '.')
+                    decimalFound = true;
+
+            if (!decimalFound)
+                return result + ".0";
+            else
+                return result;
         }
     }
 
