@@ -8,6 +8,9 @@
 #undef max
 #undef min
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #endif
 
 #include <algorithm>
