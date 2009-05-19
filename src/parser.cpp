@@ -458,6 +458,9 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
         consume_branch_until_end(elseInnerBranch, tokens);
         remove_compilation_attrs(elseInnerBranch);
+
+        result->boolProp("if:has-following-else") = true;
+        elseResult->boolProp("if:is-else") = true;
     }
 
     if (!tokens.nextIs(END))
@@ -1211,13 +1214,10 @@ std::string possible_whitespace_or_newline(TokenStream& tokens)
 void consume_branch_until_end(Branch& branch, TokenStream& tokens)
 {
     while (!tokens.finished()) {
-        std::string prespace = possible_whitespace(tokens);
-
-        if (tokens.nextIs(END) || tokens.nextIs(ELSE)) {
+        if (tokens.nextNonWhitespaceIs(END) || tokens.nextNonWhitespaceIs(ELSE)) {
             break;
         } else {
-            Term* term = statement(branch, tokens);
-            prepend_whitespace(term, prespace);
+            statement(branch, tokens);
         }
     }
 

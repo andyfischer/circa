@@ -13,6 +13,19 @@ struct SourceReproResult {
 
 std::vector<SourceReproResult> gSourceReproResults;
 
+std::string convert_real_newlines_to_escaped(std::string s)
+{
+    std::stringstream out;
+
+    for (unsigned i=0; i < s.length(); i++) {
+        if (s[i] == '\n')
+            out << "\\n";
+        else
+            out << s[i];
+    }
+    return out.str();
+}
+
 void round_trip_source(std::string statement)
 {
     SourceReproResult result;
@@ -22,6 +35,8 @@ void round_trip_source(std::string statement)
     parser::compile(&branch, parser::statement_list, statement);
     result.actual = get_branch_source(branch);
     result.passed = result.expected == result.actual;
+    result.actual = convert_real_newlines_to_escaped(result.actual);
+    result.expected = convert_real_newlines_to_escaped(result.expected);
     gSourceReproResults.push_back(result);
 }
 
@@ -35,13 +50,13 @@ void finish_source_repro_category()
 
     if (anyFailures) {
         std::cout << get_current_test_name() << " failed:" << std::endl;
-        std::cout << "(desired string is on the left, actual result is on right)" << std::endl;
+        std::cout << "(actual result is on left, desired string is on right)" << std::endl;
         for (unsigned i=0; i < gSourceReproResults.size(); i++) {
             SourceReproResult &result = gSourceReproResults[i];
             std::cout << (result.passed ? "[pass]" : "[FAIL]");
-            std::cout << " \"" << result.expected << "\" ";
+            std::cout << " \"" << result.actual << "\" ";
             std::cout << (result.passed ? "==" : "!=");
-            std::cout << " \"" << result.actual << "\"" << std::endl;
+            std::cout << " \"" << result.expected << "\"" << std::endl;
         }
         declare_current_test_failed();
     }
@@ -62,8 +77,8 @@ void reproduce_simple_values() {
     round_trip_source("   1");
     round_trip_source("1  ");
     round_trip_source("0.123");
-    //round_trip_source(".123");
-    //round_trip_source("-.123");
+    round_trip_source(".123");
+    round_trip_source("-.123");
     round_trip_source("5.2");
     round_trip_source("5.200");
     finish_source_repro_category();
@@ -138,6 +153,10 @@ void reproduce_dot_concat() {
 void reproduce_if() {
     round_trip_source("if true\nx = 1\nend");
     round_trip_source("if 5.0 > 3.0\n  print('hey')\nend");
+    round_trip_source("if true\nelse\nend");
+    round_trip_source("  if true\nelse\nend");
+    //round_trip_source("if true  \nelse\nend");
+    //round_trip_source("if true\n  else\nend");
     finish_source_repro_category();
 }
 
