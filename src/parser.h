@@ -17,7 +17,7 @@ Term* evaluate_statement(Branch& branch, std::string const& input);
 // Parsing steps:
 Term* statement_list(Branch& branch, TokenStream& tokens);
 Term* statement(Branch& branch, TokenStream& tokens);
-Term* comment_statement(Branch& branch, TokenStream& tokens);
+Term* comment(Branch& branch, TokenStream& tokens);
 Term* blank_line(Branch& branch, TokenStream& tokens);
 Term* function_from_header(Branch& branch, TokenStream& tokens);
 Term* function_decl(Branch& branch, TokenStream& tokens);
