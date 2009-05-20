@@ -70,7 +70,7 @@ namespace primitives {
         std::string to_string(Term* term)
         {
             std::stringstream strm;
-            if (term->stringPropOptional("syntaxHints:integerFormat", "") == "hex")
+            if (term->stringPropOptional("syntaxHints:integerFormat", "dec") == "hex")
                 strm << "0x" << std::hex;
 
             strm << as_int(term);

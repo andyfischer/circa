@@ -234,7 +234,6 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
     tokens.consume();
 
     Term* result = create_value(&branch, FUNCTION_TYPE, functionName);
-    result->stringProp("syntaxHints:declarationStyle") = "literal";
     Function& func = as_function(result);
 
     func.name = functionName;
@@ -1064,7 +1063,6 @@ Term* function_call(Branch& branch, TokenStream& tokens)
     
     Term* result = find_and_apply(branch, functionName, inputs);
 
-    result->stringProp("syntaxHints:declarationStyle") = "function-call";
     result->stringProp("syntaxHints:functionName") = functionName;
 
     listHints.apply(result);
@@ -1078,8 +1076,6 @@ Term* literal_integer(Branch& branch, TokenStream& tokens)
     Token tok = tokens.consumet();
     int value = strtoul(tok.text.c_str(), NULL, 0);
     Term* term = int_value(&branch, value);
-    term->stringProp("syntaxHints:declarationStyle") = "literal";
-    term->stringProp("syntaxHints:integerFormat") = "dec";
     return term;
 }
 
@@ -1089,7 +1085,6 @@ Term* literal_hex(Branch& branch, TokenStream& tokens)
     Token tok = tokens.consumet();
     int value = strtoul(tok.text.c_str(), NULL, 0);
     Term* term = int_value(&branch, value);
-    term->stringProp("syntaxHints:declarationStyle") = "literal";
     term->stringProp("syntaxHints:integerFormat") = "hex";
     include_location(term, tok);
     return term;
@@ -1116,7 +1111,6 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     }
 
     term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
-    term->stringProp("syntaxHints:declarationStyle") = "literal";
     include_location(term, tok);
     return term;
 }
@@ -1133,7 +1127,6 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     text = text.substr(1, text.length()-2);
 
     Term* term = string_value(&branch, text);
-    term->stringProp("syntaxHints:declarationStyle") = "literal";
     include_location(term, tok);
     return term;
 }
