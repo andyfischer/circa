@@ -194,9 +194,11 @@ Term* statement(Branch& branch, TokenStream& tokens)
 
     // Consume a newline or ;
     if (tokens.nextIs(NEWLINE))
-        append_whitespace(result, tokens.consume());
+        result->stringProp("syntaxHints:lineEnding") = tokens.consume();
     else if (tokens.nextIs(SEMICOLON))
-        append_whitespace(result, tokens.consume());
+        result->stringProp("syntaxHints:lineEnding") = tokens.consume();
+    else
+        result->stringProp("syntaxHints:lineEnding") = "";
 
     return result;
 }

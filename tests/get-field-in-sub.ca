@@ -1,7 +1,7 @@
 
 type Point { float x, float y }
 
-def mysub(Point p) -> int
+def mysub(Point p) : int
   p -> print
   p.x -> print
   typeof(p) -> print
