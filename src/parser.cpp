@@ -852,7 +852,6 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             result = find_and_apply(branch, functionName, inputs);
 
             result->stringProp("syntaxHints:declarationStyle") = "arrow-concat";
-            result->stringProp("syntaxHints:functionName") = functionName;
 
             get_input_syntax_hint(result, 0, "postWhitespace") = preOperatorWhitespace;
             get_input_syntax_hint(result, 1, "preWhitespace") = postOperatorWhitespace;
@@ -952,7 +951,6 @@ Term* dot_expression(Branch& branch, TokenStream& tokens)
         result->stringProp("field-name") = rhsIdent;
         specialize_type(result, lhsType[rhsIdent].type);
 
-        result->stringProp("syntaxHints:functionName") = rhsIdent;
         result->stringProp("syntaxHints:declarationStyle") = "dot-concat";
 
         return result;
@@ -1062,8 +1060,6 @@ Term* function_call(Branch& branch, TokenStream& tokens)
     tokens.consume(RPAREN);
     
     Term* result = find_and_apply(branch, functionName, inputs);
-
-    result->stringProp("syntaxHints:functionName") = functionName;
 
     listHints.apply(result);
 

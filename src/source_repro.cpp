@@ -154,9 +154,11 @@ std::string get_term_source(Term* term)
     std::string declarationStyle = term->stringPropOptional("syntaxHints:declarationStyle",
             "function-call");
 
+    std::string functionName = term->stringPropOptional("syntaxHints:functionName",
+            term->function->name);
+
     if (declarationStyle == "function-call") {
-        std::string defaultFunctionName = term->function->name;
-        result << term->stringPropOptional("syntaxHints:functionName", defaultFunctionName) << "(";
+        result << functionName << "(";
 
         for (int i=get_first_visible_input_index(term); i < term->numInputs(); i++)
             result << get_source_of_input(term, i);
@@ -166,17 +168,16 @@ std::string get_term_source(Term* term)
     } else if (declarationStyle == "dot-concat") {
         result << get_source_of_input(term, 0);
         result << ".";
-        std::string actualFunctionName = term->function->name;
-        result << term->stringPropOptional("syntaxHints:functionName", actualFunctionName);
+        result << functionName;
     } else if (declarationStyle == "infix") {
         result << get_source_of_input(term, 0);
-        result << term->stringProp("syntaxHints:functionName");
+        result << functionName;
         result << get_source_of_input(term, 1);
     } else if (declarationStyle == "arrow-concat") {
         result << get_source_of_input(term, 0);
         result << "->";
         result << get_input_syntax_hint(term, 1, "preWhitespace");
-        result << term->stringProp("syntaxHints:functionName");
+        result << functionName;
     }
 
     for (int p=0; p < numParens; p++)

@@ -261,19 +261,12 @@ void test_dot_concatenation()
 void test_syntax_hints()
 {
     Branch branch;
-    Term* t = parser::compile(&branch, parser::function_call, "assert(false)");
 
-    test_equals(t->stringProp("syntaxHints:functionName"), "assert");
-
-    t = parser::compile(&branch, parser::function_call, "concat('a', 'b')");
-    test_equals(t->stringProp("syntaxHints:functionName"), "concat");
+    Term* t = parser::compile(&branch, parser::function_call, "concat('a', 'b')");
     test_equals(get_input_syntax_hint(t, 0, "preWhitespace"), "");
     test_equals(get_input_syntax_hint(t, 0, "postWhitespace"), ",");
     test_equals(get_input_syntax_hint(t, 1, "preWhitespace"), " ");
     test_equals(get_input_syntax_hint(t, 1, "postWhitespace"), "");
-
-    t = parser::compile(&branch, parser::statement, "x = true\n");
-    //test_equals(t->stringProp("syntaxHints:postWhitespace"), "\n");
 }
 
 void test_implicit_copy_by_identifier()
