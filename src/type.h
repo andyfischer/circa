@@ -141,10 +141,6 @@ bool value_fits_type(Term* valueTerm, Term* type);
 
 Term* quick_create_type(Branch& branch, std::string name="");
 
-void unsafe_change_type(Term* term, Term* type);
-void change_type(Term* term, Term* type);
-void specialize_type(Term* term, Term* type);
-
 void setup_empty_type(Type& type);
 Term* create_empty_type(Branch& branch, std::string name);
 void initialize_compound_type(Type& type);

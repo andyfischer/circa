@@ -15,6 +15,7 @@
 #include "introspection.h"
 #include "parser.h"
 #include "parser_util.h"
+#include "refactoring.h"
 #include "references.h"
 #include "runtime.h"
 #include "stateful_code.h"

@@ -157,14 +157,6 @@ Term* apply_and_eval(Branch* branch, std::string const& functionName,
     return apply_and_eval(branch, function, inputs);
 }
 
-void change_function(Term* term, Term* newFunction)
-{
-    term->function = newFunction;
-
-    Function& func = as_function(newFunction);
-    change_type(term, func.outputType);
-}
-
 void resize_list(Branch& list, int numElements, Term* type)
 {
     // Add terms if necessary

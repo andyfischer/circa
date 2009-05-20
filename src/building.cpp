@@ -193,16 +193,4 @@ void rewrite_as_value(Branch& branch, int index, Term* type)
     }
 }
 
-void rename(Term* term, std::string const& name)
-{
-    if ((term->owningBranch != NULL) &&
-            (term->owningBranch->getNamed(term->name) == term)) {
-        term->owningBranch->names.remove(term->name);
-        term->name = "";
-        term->owningBranch->bindName(term, name);
-    }
-
-    term->name = name;
-}
-
 } // namespace circa

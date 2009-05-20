@@ -126,41 +126,6 @@ Term* quick_create_type(Branch& branch, std::string name)
     return term;
 }
 
-void unsafe_change_type(Term *term, Term *type)
-{
-    assert(type != NULL);
-
-    if (!is_value_alloced(term)) {
-        change_type(term, type);
-        return;
-    }
-
-    term->type = type;
-}
-
-void change_type(Term *term, Term *typeTerm)
-{
-    assert_type(typeTerm, TYPE_TYPE);
-
-    if (term->type == typeTerm)
-        return;
-
-    if (term->type != NULL)
-        dealloc_value(term);
-
-    term->type = typeTerm;
-}
-
-void specialize_type(Term *term, Term *type)
-{
-    if (term->type == type)
-        return;
-
-    assert_type(term, ANY_TYPE);
-
-    change_type(term, type);
-}
-
 namespace type_private {
     void* empty_allocate(Term*) { return NULL; }
     void empty_dealloc(void*) {}
