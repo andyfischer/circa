@@ -159,6 +159,7 @@ Term* find_function(Branch& branch, std::string const& name)
         result = apply(&branch, UNKNOWN_FUNCTION, RefList());
         evaluate_term(result);
         result->stringProp("message") = name;
+        source_set_hidden(result, true);
     }   
 
     return result;
