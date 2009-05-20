@@ -5,6 +5,7 @@
 
 #include "builtins.h"
 #include "cpp_importing.h"
+#include "refactoring.h"
 
 namespace circa {
 

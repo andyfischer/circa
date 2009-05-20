@@ -43,9 +43,6 @@ Term* bool_value(Branch* branch, bool b, std::string const& name="");
 // index, then add NULL terms until it does.
 void rewrite_as_value(Branch& branch, int index, Term* type);
 
-// Rename term, modify the name binding of the owning branch if necessary
-void rename(Term* term, std::string const& name);
-
 } // namespace circa
 
 #endif
