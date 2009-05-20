@@ -745,13 +745,11 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     return result;
 }
 
-const int HIGHEST_INFIX_PRECEDENCE = 9;
+const int HIGHEST_INFIX_PRECEDENCE = 8;
 
 int get_infix_precedence(int match)
 {
     switch(match) {
-        case tokenizer::DOT:
-            return 9;
         case tokenizer::COLON:
             return 8;
         case tokenizer::STAR:
@@ -826,7 +824,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
     int startPosition = tokens.getPosition();
 
     if (precedence > HIGHEST_INFIX_PRECEDENCE)
-        return atom(branch, tokens);
+        return dot_expression(branch, tokens);
 
     std::string preWhitespace = possible_whitespace(tokens);
 
@@ -844,95 +842,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
         Term* result = NULL;
 
-        if (operatorStr == ".") {
-            // dot concatenated call
-
-            if (!tokens.nextIs(IDENTIFIER))
-                return compile_error_for_line(branch, tokens, startPosition);
-
-            std::string rhsIdent = tokens.consume(IDENTIFIER);
-
-            // Try to find this function
-            Term* function = NULL;
-           
-            // Check member functions first
-            Type& lhsType = as_type(leftExpr->type);
-
-            // Field access is not very robust right now. We currently decide at compile-time
-            // whether to do a member function call or a get_field, and this decision is
-            // not perfect. The proper thing would be to always do get_field and then allow
-            // for a call to a by-value function.
-
-            // Another problem is that we allow for the syntax value.function, where 'function'
-            // is not defined on value's type, but instead is just available from our local
-            // scope. This is totally confusing and is incompatible with dynamic name-based field
-            // access.
-
-            // First, look for this field as a member function
-            if (lhsType.memberFunctions.contains(rhsIdent)) {
-                function = lhsType.memberFunctions[rhsIdent];
-
-                // Consume inputs
-                RefList inputs(leftExpr);
-                ListSyntaxHints listHints;
-
-                if (tokens.nextIs(LPAREN)) {
-                    tokens.consume();
-                    consume_list_arguments(branch, tokens, inputs, listHints);
-
-                    if (!tokens.nextIs(RPAREN))
-                        return compile_error_for_line(branch, tokens, startPosition);
-
-                    tokens.consume(RPAREN);
-                }
-
-                result = apply(&branch, function, inputs);
-
-                // If this is a modifying member function, then rebind the name to this
-                // result.
-                // Note: currently this check is flawed. The only check we do to see if this
-                // is a modifying member function, is if the result type is the same. There
-                // should be a more explicit way of storing this.
-                if ((result->type == inputs[0]->type) && leftExpr->name != "")
-                    branch.bindName(result, leftExpr->name);
-
-            // Next, if this type defines this field
-            } else if (lhsType.findFieldIndex(rhsIdent) != -1) {
-
-                result = apply(&branch, GET_FIELD_BY_NAME_FUNC, RefList(leftExpr));
-                result->stringProp("field-name") = rhsIdent;
-                specialize_type(result, lhsType[rhsIdent].type);
-
-                result->stringProp("syntaxHints:functionName") = rhsIdent;
-
-            // Finally, look for this function in our local scope
-            } else {
-                function = find_function(branch, rhsIdent);
-
-                // Consume inputs
-                RefList inputs(leftExpr);
-
-                if (tokens.nextIs(LPAREN)) {
-                    tokens.consume();
-
-                    while (!tokens.nextIs(RPAREN)) {
-                        possible_whitespace(tokens);
-                        Term* input = infix_expression(branch, tokens);
-                        inputs.append(input);
-                        possible_whitespace(tokens);
-
-                        if (!tokens.nextIs(RPAREN))
-                            tokens.consume(COMMA);
-                    }
-                    tokens.consume(RPAREN);
-                }
-
-                result = apply(&branch, function, inputs);
-            }
-
-            result->stringProp("syntaxHints:declarationStyle") = "dot-concat";
-
-        } else if (operatorStr == "->") {
+        if (operatorStr == "->") {
             if (!tokens.nextIs(IDENTIFIER))
                 return compile_error_for_line(branch, tokens, startPosition);
 
@@ -972,6 +882,108 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
     }
 
     return leftExpr;
+}
+
+Term* dot_expression(Branch& branch, TokenStream& tokens)
+{
+    int startPosition = tokens.getPosition();
+
+    Term* lhs = atom(branch, tokens);
+
+    if (!tokens.nextIs(DOT))
+        return lhs;
+
+    tokens.consume(DOT);
+
+    if (!tokens.nextIs(IDENTIFIER))
+        return compile_error_for_line(branch, tokens, startPosition);
+
+    std::string rhsIdent = tokens.consume(IDENTIFIER);
+
+    // Try to find this function
+    Term* function = NULL;
+   
+    // Check member functions first
+    Type& lhsType = as_type(lhs->type);
+
+    // Field access is not very robust right now. We currently decide at compile-time
+    // whether to do a member function call or a get_field, and this decision is
+    // not perfect. The proper thing would be to always do get_field and then allow
+    // for a call to a by-value function.
+
+    // Another problem is that we allow for the syntax value.function, where 'function'
+    // is not defined on value's type, but instead is just available from our local
+    // scope. This is totally confusing and is incompatible with dynamic name-based field
+    // access.
+
+    // First, look for this field as a member function
+    if (lhsType.memberFunctions.contains(rhsIdent)) {
+        function = lhsType.memberFunctions[rhsIdent];
+
+        // Consume inputs
+        RefList inputs(lhs);
+        ListSyntaxHints listHints;
+
+        if (tokens.nextIs(LPAREN)) {
+            tokens.consume();
+            consume_list_arguments(branch, tokens, inputs, listHints);
+
+            if (!tokens.nextIs(RPAREN))
+                return compile_error_for_line(branch, tokens, startPosition);
+
+            tokens.consume(RPAREN);
+        }
+
+        Term* result = apply(&branch, function, inputs);
+
+        // If this is a modifying member function, then rebind the name to this
+        // result.
+        // Note: currently this check is flawed. The only check we do to see if this
+        // is a modifying member function, is if the result type is the same. There
+        // should be a more explicit way of storing this.
+        if ((result->type == inputs[0]->type) && lhs->name != "")
+            branch.bindName(result, lhs->name);
+
+        return result;
+
+    // Next, if this type defines this field
+    } else if (lhsType.findFieldIndex(rhsIdent) != -1) {
+
+        Term* result = apply(&branch, GET_FIELD_BY_NAME_FUNC, RefList(lhs));
+        result->stringProp("field-name") = rhsIdent;
+        specialize_type(result, lhsType[rhsIdent].type);
+
+        result->stringProp("syntaxHints:functionName") = rhsIdent;
+        result->stringProp("syntaxHints:declarationStyle") = "dot-concat";
+
+        return result;
+
+    // Finally, look for this function in our local scope
+    } else {
+        function = find_function(branch, rhsIdent);
+
+        // Consume inputs
+        RefList inputs(lhs);
+
+        if (tokens.nextIs(LPAREN)) {
+            tokens.consume();
+
+            while (!tokens.nextIs(RPAREN)) {
+                possible_whitespace(tokens);
+                Term* input = infix_expression(branch, tokens);
+                inputs.append(input);
+                possible_whitespace(tokens);
+
+                if (!tokens.nextIs(RPAREN))
+                    tokens.consume(COMMA);
+            }
+            tokens.consume(RPAREN);
+        }
+
+        Term* result = apply(&branch, function, inputs);
+        result->stringProp("syntaxHints:declarationStyle") = "dot-concat";
+        return result;
+    }
 }
 
 Term* atom(Branch& branch, TokenStream& tokens)
