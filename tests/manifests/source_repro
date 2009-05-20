@@ -5,14 +5,14 @@ average.ca
 boolean.ca
 comparison.ca
 # compound_type.ca
-fib.ca
+#fib.ca
 # for.ca
-get-field-in-sub.ca
-if.ca
-if_scoping.ca
+#get-field-in-sub.ca
+#if.ca
+#if_scoping.ca
 infix.ca
 lessthan.ca
-lists.ca
+#lists.ca
 math.ca
 # module-to-source.ca
 # multiline.ca

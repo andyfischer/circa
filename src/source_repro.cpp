@@ -6,11 +6,27 @@
 
 namespace circa {
 
+int get_first_visible_input_index(Term* term)
+{
+    if (has_hidden_state(get_function_data(term->function)))
+        return 1;
+    else
+        return 0;
+}
+
 std::string& get_input_syntax_hint(Term* term, int index, std::string const& field)
 {
     std::stringstream fieldName;
     fieldName << "syntaxHints:input-" << index << ":" << field;
     return term->stringProp(fieldName.str());
+}
+
+std::string get_input_syntax_hint_optional(Term* term, int index, std::string const& field,
+        std::string const& defaultValue)
+{
+    std::stringstream fieldName;
+    fieldName << "syntaxHints:input-" << index << ":" << field;
+    return term->stringPropOptional(fieldName.str(), defaultValue);
 }
 
 std::string get_source_of_input(Term* term, int inputIndex)
@@ -19,7 +35,10 @@ std::string get_source_of_input(Term* term, int inputIndex)
 
     std::stringstream result;
 
-    result << get_input_syntax_hint(term, inputIndex, "preWhitespace");
+    std::string defaultPre = (inputIndex == get_first_visible_input_index(term)) ? "" : " ";
+    std::string defaultPost = (inputIndex+1 < term->numInputs()) ? "," : "";
+
+    result << get_input_syntax_hint_optional(term, inputIndex, "preWhitespace", defaultPre);
 
     bool byValue = input->name == "";
 
@@ -29,7 +48,7 @@ std::string get_source_of_input(Term* term, int inputIndex)
         result << input->name;
     }
 
-    result << get_input_syntax_hint(term, inputIndex, "postWhitespace");
+    result << get_input_syntax_hint_optional(term, inputIndex, "postWhitespace", defaultPost);
 
     return result.str();
 }
@@ -132,18 +151,16 @@ std::string get_term_source(Term* term)
         result << "(";
 
     // add the declaration syntax
-    std::string declarationStyle = term->stringPropOptional("syntaxHints:declarationStyle", "");
+    std::string declarationStyle = term->stringPropOptional("syntaxHints:declarationStyle",
+            "function-call");
 
     if (declarationStyle == "function-call") {
-        result << term->stringProp("syntaxHints:functionName") << "(";
+        std::string defaultFunctionName = term->function->name;
+        result << term->stringPropOptional("syntaxHints:functionName", defaultFunctionName) << "(";
 
-        for (int i=0; i < term->numInputs(); i++) {
-            // don't show the hidden state input for subroutines
-            if (has_hidden_state(get_function_data(term->function)) && i == 0)
-                continue;
-
+        for (int i=get_first_visible_input_index(term); i < term->numInputs(); i++)
             result << get_source_of_input(term, i);
-        }
+
         result << ")";
 
     } else if (declarationStyle == "dot-concat") {
@@ -186,7 +203,10 @@ std::string get_branch_source(Branch& branch)
         if (!should_print_term_source_line(term))
             continue;
 
-        result << get_term_source(term);
+        std::string defaultLineEnding = (i+1 == branch.length()) ? "" : "\n";
+
+        result << get_term_source(term) << term->stringPropOptional("syntaxHints:lineEnding",
+                defaultLineEnding);
     }
 
     return result.str();

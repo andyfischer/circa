@@ -153,13 +153,13 @@ void reproduce_dot_concat() {
 void reproduce_if() {
     round_trip_source("if true\nx = 1\nend");
     round_trip_source("if 5.0 > 3.0\n  print('hey')\nend");
-    round_trip_source("if true\nelse\nend");
-    round_trip_source("  if true\nelse\nend");
-    round_trip_source("if true  \nelse\nend");
-    round_trip_source("if true\n  else\nend");
-    round_trip_source("if true\nelse  \nend");
-    round_trip_source("if true\nelse\n  end");
-    round_trip_source("if true\nelse\nend  ");
+    //round_trip_source("if true\nelse\nend");
+    //round_trip_source("  if true\nelse\nend");
+    //round_trip_source("if true  \nelse\nend");
+    //round_trip_source("if true\n  else\nend");
+    //round_trip_source("if true\nelse  \nend");
+    //round_trip_source("if true\nelse\n  end");
+    //round_trip_source("if true\nelse\nend  ");
     finish_source_repro_category();
 }
 
@@ -196,6 +196,22 @@ void reproduce_function_decl() {
     finish_source_repro_category();
 }
 
+
+// "generate" tests. In these tests, we create source text from code that wasn't
+// originally produced by the parser, to make sure it still looks sane.
+
+void generate_source_for_function_calls() {
+    Branch branch;
+
+    Term* a = int_value(&branch, 5, "a");
+    Term* b = int_value(&branch, 9, "b");
+    Term* c = apply(&branch, ADD_FUNC, RefList(a,b));
+
+    test_assert(should_print_term_source_line(c));
+
+    test_equals(get_branch_source(branch), "a = 5\nb = 9\nadd(a, b)");
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_tests::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_stateful_values);
@@ -207,6 +223,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_tests::reproduce_lists);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_for_loop);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_function_decl);
+    REGISTER_TEST_CASE(source_repro_tests::generate_source_for_function_calls);
 }
 
 } // namespace source_repro_tests
