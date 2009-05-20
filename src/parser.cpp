@@ -1016,10 +1016,6 @@ Term* atom(Branch& branch, TokenStream& tokens)
     else if (tokens.nextIs(LBRACKET))
         result = literal_list(branch, tokens);
 
-    // literal branch?
-    // disabled
-    //else if (tokens.nextIs(LBRACE))
-
     // identifier?
     else if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AMPERSAND))
         result = identifier(branch, tokens);

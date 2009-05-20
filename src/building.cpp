@@ -83,10 +83,8 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
 
     if (source->value != NULL) {
         alloc_value(term);
-        if (copyBranches)
+        if (copyBranches || !is_branch(source))
             assign_value(source, term);
-        else
-            assign_value_but_dont_copy_inner_branch(source,term);
     }
 
     duplicate_branch(source->properties, term->properties);

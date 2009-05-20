@@ -160,7 +160,6 @@ bool identity_equals(Term* a, Term* b);
 bool equals(Term* a, Term* b);
 std::string to_string(Term* term);
 void assign_value(Term* source, Term* dest);
-void assign_value_but_dont_copy_inner_branch(Term* source, Term* dest);
 
 Term* create_type(Branch* branch, std::string const& decl);
 
