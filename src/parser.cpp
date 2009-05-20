@@ -94,9 +94,9 @@ struct ListSyntaxHints {
     std::vector<Input> mPending;
 };
 
-// Consumes a list of terms that are separated by spaces, or commas, or semicolons.
-// The result terms are appened to list_out. The syntax hints are appended to
-// hints_out. (you should apply these syntax hints to the resulting comprehension
+// Consumes a list of terms that are separated by either spaces, commas, semicolons,
+// or newlines. The result terms are appened to list_out. The syntax hints are appended
+// to hints_out. (you should apply these syntax hints to the resulting comprehension
 // term)
 //
 // This is used to parse the syntax of function arguments, member function arguments,
@@ -140,15 +140,9 @@ Term* statement(Branch& branch, TokenStream& tokens)
 
     Term* result = NULL;
 
-    // Comment
-    if (tokens.nextIs(COMMENT)) {
-        result = comment_statement(branch, tokens);
-        assert(result != NULL);
-    }
-
-    // Blank line
-    else if (tokens.finished() || tokens.nextIs(NEWLINE)) {
-        result = blank_line(branch, tokens);
+    // Comment (blank lines count as comments)
+    if (tokens.nextIs(COMMENT) || tokens.nextIs(NEWLINE)) {
+        result = comment(branch, tokens);
         assert(result != NULL);
     }
 
@@ -193,9 +187,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
     append_whitespace(result, possible_whitespace(tokens));
 
     // Consume a newline or ;
-    if (tokens.nextIs(NEWLINE))
-        result->stringProp("syntaxHints:lineEnding") = tokens.consume();
-    else if (tokens.nextIs(SEMICOLON))
+    if (tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON))
         result->stringProp("syntaxHints:lineEnding") = tokens.consume();
     else
         result->stringProp("syntaxHints:lineEnding") = "";
@@ -203,23 +195,18 @@ Term* statement(Branch& branch, TokenStream& tokens)
     return result;
 }
 
-Term* comment_statement(Branch& branch, TokenStream& tokens)
+Term* comment(Branch& branch, TokenStream& tokens)
 {
-    std::string commentText = tokens.consume(COMMENT);
+    std::string commentText;
+
+    if (tokens.nextIs(COMMENT))
+        commentText = tokens.consume(COMMENT);
+    else if (tokens.nextIs(NEWLINE))
+        commentText = tokens.consume(NEWLINE);
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
     result->stringProp("comment") = commentText;
 
-    return result;
-}
-
-Term* blank_line(Branch& branch, TokenStream& tokens)
-{
-    if (!tokens.finished())
-        tokens.consume(NEWLINE);
-
-    Term* result = apply(&branch, COMMENT_FUNC, RefList());
-    result->stringProp("comment") = "\n";
     return result;
 }
 
