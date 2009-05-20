@@ -379,22 +379,6 @@ void assign_value(Term* source, Term* dest)
     assign(source, dest);
 }
 
-void assign_value_but_dont_copy_inner_branch(Term* source, Term* dest)
-{
-    // Do a type specialization if dest has type 'any'.
-    // This might be removed once type inference rules are smarter.
-    if (dest->type == ANY_TYPE)
-        specialize_type(dest, source->type);
-
-    assert(value_fits_type(source, dest->type));
-
-    // Otherwise, do nothing for types with branches
-    if (is_branch(dest))
-        return;
-
-    assign_value(source, dest);
-}
-
 Term* create_type(Branch* branch, std::string const& decl)
 {
     return parser::compile(branch, parser::type_decl, decl);
