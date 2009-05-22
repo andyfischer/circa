@@ -69,26 +69,26 @@ void test_floats()
 
     test_assert(results.size() == 12);
     test_assert(results[0].text == "1.0");
-    test_assert(results[0].match == token::FLOAT);
+    test_assert(results[0].match == token::FLOAT_TOKEN);
     test_assert(results[2].text == "16.");
-    test_assert(results[2].match == token::FLOAT);
+    test_assert(results[2].match == token::FLOAT_TOKEN);
     test_assert(results[4].text == ".483");
-    test_assert(results[4].match == token::FLOAT);
+    test_assert(results[4].match == token::FLOAT_TOKEN);
     test_assert(results[6].text == ".123");
-    test_assert(results[6].match == token::FLOAT);
+    test_assert(results[6].match == token::FLOAT_TOKEN);
     test_assert(results[7].text == ".");
     test_assert(results[7].match == token::DOT);
     test_assert(results[9].text == "-0.1");
-    test_assert(results[9].match == token::FLOAT);
+    test_assert(results[9].match == token::FLOAT_TOKEN);
     test_assert(results[11].text == "-.54");
-    test_assert(results[11].match == token::FLOAT);
+    test_assert(results[11].match == token::FLOAT_TOKEN);
 
     token::TokenList results2;
     token::tokenize("5.200", results2);
 
     test_assert(results2.size() == 1);
     test_assert(results2[0].text == "5.200");
-    test_assert(results2[0].match == token::FLOAT);
+    test_assert(results2[0].match == token::FLOAT_TOKEN);
 }
 
 void test_symbols1()
@@ -188,7 +188,7 @@ void test_token_stream()
 
     test_assert(tstream.nextIs(tokenizer::INTEGER));
     test_assert(tstream.nextIs(tokenizer::WHITESPACE, 1));
-    test_assert(tstream.nextNonWhitespaceIs(tokenizer::FLOAT, 1));
+    test_assert(tstream.nextNonWhitespaceIs(tokenizer::FLOAT_TOKEN, 1));
 }
 
 void token_stream_to_string()
@@ -242,7 +242,7 @@ void test_consume_line()
     int startPosition = tokens.getPosition();
 
     // happily consume some more stuff
-    test_assert(tokens.nextIs(token::IN));
+    test_assert(tokens.nextIs(token::IN_TOKEN));
     tokens.consumet();
     test_assert(tokens.nextIs(token::WHITESPACE));
     tokens.consumet();
