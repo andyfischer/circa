@@ -550,10 +550,10 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     std::string iterator_name = tokens.consume(IDENTIFIER);
     possible_whitespace(tokens);
 
-    if (!tokens.nextIs(IN))
+    if (!tokens.nextIs(IN_TOKEN))
         return compile_error_for_line(branch, tokens, startPosition);
 
-    tokens.consume(IN);
+    tokens.consume(IN_TOKEN);
     possible_whitespace(tokens);
 
     Term* listExpr = infix_expression(branch, tokens);
@@ -1008,7 +1008,7 @@ Term* atom(Branch& branch, TokenStream& tokens)
         result = literal_hex(branch, tokens);
 
     // literal float?
-    else if (tokens.nextIs(FLOAT))
+    else if (tokens.nextIs(FLOAT_TOKEN))
         result = literal_float(branch, tokens);
 
     // literal list?
@@ -1086,7 +1086,7 @@ Term* literal_hex(Branch& branch, TokenStream& tokens)
 
 Term* literal_float(Branch& branch, TokenStream& tokens)
 {
-    assert(tokens.nextIs(FLOAT));
+    assert(tokens.nextIs(FLOAT_TOKEN));
     Token tok = tokens.consumet();
     std::string text = tok.text;
 

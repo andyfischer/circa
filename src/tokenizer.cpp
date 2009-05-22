@@ -19,7 +19,7 @@ const char* get_token_text(int match)
         case IDENTIFIER: return "IDENTIFIER";
         case INTEGER: return "INTEGER";
         case HEX_INTEGER: return "HEX_INTEGER";
-        case FLOAT: return "FLOAT";
+        case FLOAT_TOKEN: return "FLOAT";
         case STRING: return "STRING";
         case COMMENT: return "COMMENT";
         case DOT: return ".";
@@ -58,7 +58,7 @@ const char* get_token_text(int match)
         case DEF: return "def";
         case TYPE: return "type";
         case RETURN: return "return";
-        case IN: return "in";
+        case IN_TOKEN: return "in";
         case TRUE_TOKEN: return "true";
         case FALSE_TOKEN: return "false";
         case UNRECOGNIZED: return "UNRECOGNIZED";
@@ -247,7 +247,7 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, FOR)) return;
         if (try_to_consume_keyword(context, STATE)) return;
         if (try_to_consume_keyword(context, RETURN)) return;
-        if (try_to_consume_keyword(context, IN)) return;
+        if (try_to_consume_keyword(context, IN_TOKEN)) return;
         if (try_to_consume_keyword(context, TRUE_TOKEN)) return;
         if (try_to_consume_keyword(context, FALSE_TOKEN)) return;
 
@@ -551,7 +551,7 @@ void consume_number(TokenizeContext &context)
     }
 
     if (dot_encountered) {
-        context.push(FLOAT, text.str());
+        context.push(FLOAT_TOKEN, text.str());
     } else {
         context.push(INTEGER, text.str());
     }

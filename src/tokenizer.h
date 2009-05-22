@@ -28,7 +28,7 @@ typedef std::vector<Token> TokenList;
 const int IDENTIFIER = 1;
 const int INTEGER = 2;
 const int HEX_INTEGER = 3;
-const int FLOAT = 4;
+const int FLOAT_TOKEN = 4;
 const int STRING = 5;
 
 const int LPAREN = 10;
@@ -74,7 +74,7 @@ const int ELSE = 55;
 const int FOR = 56;
 const int STATE = 57;
 const int RETURN = 58;
-const int IN = 59;
+const int IN_TOKEN = 59;
 const int TRUE_TOKEN = 60;
 const int FALSE_TOKEN = 61;
 
