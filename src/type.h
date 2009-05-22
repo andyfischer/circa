@@ -28,13 +28,6 @@ struct Type
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
     typedef std::string (*ToStringFunc)(Term* term);
 
-    struct Field {
-        Ref type;
-        std::string name;
-        Field(Term* _type, std::string _name) : type(_type), name(_name) {}
-    };
-    typedef std::vector<Field> FieldList;
-
     std::string name;
 
     // C++ type info. This is only used to do runtime type checks, when the data
@@ -49,12 +42,8 @@ struct Type
     LessThanFunc lessThan;
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
-
-    // Stores our value function
-    Ref valueFunction;
     
-    // Fields, applies to compound types
-    FieldList fields;
+    Branch fields;
 
     // memberFunctions is a list of Functions which 'belong' to this type.
     // They are guaranteed to take an instance of this type as their first
@@ -84,22 +73,17 @@ struct Type
 
     void addField(Term* type, std::string const& name)
     {
-        fields.push_back(Field(type,name));
+        create_value(&fields, type, name);
     }
 
-    Field& operator[](std::string const& fieldName) {
-        for (int i=0; i < (int) fields.size(); i++) {
-            if (fields[i].name == fieldName)
-                return fields[i];
-        }
-
-        throw std::runtime_error("field not found: " + fieldName);
+    Term* operator[](std::string const& fieldName) {
+        return fields[fieldName];
     }
 
     int findFieldIndex(std::string const& name)
     {
-        for (int i=0; i < (int) fields.size(); i++) {
-            if (fields[i].name == name)
+        for (int i=0; i < (int) fields.length(); i++) {
+            if (fields[i]->name == name)
                 return i;
         }
         return -1;
@@ -107,7 +91,7 @@ struct Type
 
     int numFields() const
     {
-        return (int) fields.size();
+        return fields.length();
     }
 
     bool isCompoundType();

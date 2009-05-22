@@ -159,10 +159,10 @@ void* Branch::alloc(Term* typeTerm)
 
     // create a slot for each field
     Type& type = as_type(typeTerm);
-    int numFields = (int) type.fields.size();
+    int numFields = type.numFields();
 
     for (int f=0; f < numFields; f++)
-        create_value(branch, type.fields[f].type, type.fields[f].name);
+        create_value(branch, type.fields[f]->type, type.fields[f]->name);
 
     return branch;
 }

@@ -14,6 +14,12 @@ void set_stateful(Term* term, bool value)
     term->boolProp("stateful") = value;
 }
 
+bool is_function_stateful(Term* func)
+{
+    Term* stateType = as_function(func).hiddenStateType;
+    return (stateType != NULL && stateType != VOID_TYPE);
+}
+
 void load_state_into_branch(Branch& state, Branch& branch)
 {
     int read = 0;

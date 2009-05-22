@@ -945,7 +945,7 @@ Term* dot_expression(Branch& branch, TokenStream& tokens)
 
             result = apply(&branch, GET_FIELD_BY_NAME_FUNC, RefList(lhs));
             result->stringProp("field-name") = rhsIdent;
-            specialize_type(result, lhsType[rhsIdent].type);
+            specialize_type(result, lhsType[rhsIdent]->type);
 
             // Note: maybe this source reproduction should be handled inside get_field_by_name()
             result->stringProp("syntaxHints:declarationStyle") = "dot-concat";

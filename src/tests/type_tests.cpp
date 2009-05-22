@@ -14,12 +14,12 @@ void compound_types()
     Term* MyType = branch.eval("type MyType { int myint, string astr }");
     test_assert(MyType != NULL);
     test_assert(is_type(MyType));
-    test_assert(as_type(MyType).fields.size() == 2);
-    test_assert(as_type(MyType).fields[0].name == "myint");
-    test_assert(as_type(MyType).fields[0].type == INT_TYPE);
+    test_assert(as_type(MyType).fields.length() == 2);
+    test_assert(as_type(MyType).fields[0]->name == "myint");
+    test_assert(as_type(MyType).fields[0]->type == INT_TYPE);
     test_assert(as_type(MyType).findFieldIndex("myint") == 0);
-    test_assert(as_type(MyType).fields[1].name == "astr");
-    test_assert(as_type(MyType).fields[1].type == STRING_TYPE);
+    test_assert(as_type(MyType).fields[1]->name == "astr");
+    test_assert(as_type(MyType).fields[1]->type == STRING_TYPE);
     test_assert(as_type(MyType).findFieldIndex("astr") == 1);
 
     // instanciation
@@ -52,10 +52,10 @@ void type_declaration()
     Term* myType = branch.eval("type MyType { string a, int b } ");
 
     test_assert(as_type(myType).numFields() == 2);
-    test_assert(as_type(myType).fields[0].name == "a");
-    test_assert(as_type(myType).fields[0].type == STRING_TYPE);
-    test_assert(as_type(myType).fields[1].name == "b");
-    test_assert(as_type(myType).fields[1].type == INT_TYPE);
+    test_assert(as_type(myType).fields[0]->name == "a");
+    test_assert(as_type(myType).fields[0]->type == STRING_TYPE);
+    test_assert(as_type(myType).fields[1]->name == "b");
+    test_assert(as_type(myType).fields[1]->type == INT_TYPE);
 
     test_assert(as_type(myType).alloc != NULL);
     test_assert(as_type(myType).assign != NULL);

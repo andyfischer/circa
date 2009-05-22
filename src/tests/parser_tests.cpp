@@ -140,10 +140,10 @@ void test_type_decl()
     test_equals(type.name, "Mytype");
     test_equals(typeTerm->name, "Mytype");
 
-    test_assert(type.fields[0].type == INT_TYPE);
-    test_equals(type.fields[0].name, "a");
-    test_assert(type.fields[1].type == FLOAT_TYPE);
-    test_equals(type.fields[1].name, "b");
+    test_assert(type.fields[0]->type == INT_TYPE);
+    test_equals(type.fields[0]->name, "a");
+    test_assert(type.fields[1]->type == FLOAT_TYPE);
+    test_equals(type.fields[1]->name, "b");
 }
 
 void test_function_decl()
