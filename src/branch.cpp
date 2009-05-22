@@ -312,39 +312,6 @@ Term* find_named(Branch* branch, std::string const& name)
     return get_global(name);
 }
 
-void migrate_values(Branch& source, Branch& dest)
-{
-    // Iterate over every term in 'source' and compare each with
-    // every term in 'dest'. Lots of room for optimization here.
-    for (int sourceIndex=0; sourceIndex < source.length(); sourceIndex++) {
-        for (int destIndex=0; destIndex < dest.length(); destIndex++) {
-            Term* sourceTerm = source[sourceIndex];
-            Term* destTerm = dest[destIndex];
-
-            if (sourceTerm == NULL) continue;
-            if (destTerm == NULL) continue;
-
-            if (sourceTerm->name == "") continue;
-            if (sourceTerm->name != destTerm->name) continue;
-            if (sourceTerm->type != destTerm->type) continue;
-            if (sourceTerm->function != destTerm->function) continue;
-
-            // At this point, they match
-
-            // Branch migration
-            if (is_branch(sourceTerm)) {
-                assert(is_branch(destTerm));
-                migrate_values(as_branch(sourceTerm), as_branch(destTerm));
-            } 
-            
-            // Stateful value migration
-            else if (is_stateful(sourceTerm) && is_stateful(destTerm)) {
-                assign_value(sourceTerm, destTerm);
-            }
-        }
-    }
-}
-
 void reload_branch_from_file(Branch& branch)
 {
     std::string filename = as_string(branch[get_name_for_attribute("source-file")]);
@@ -355,7 +322,7 @@ void reload_branch_from_file(Branch& branch)
     branch.clear();
 
     parse_script(branch, filename);
-    migrate_values(original, branch);
+    migrate_stateful_values(original, branch);
 }
 
 void persist_branch_to_file(Branch& branch)

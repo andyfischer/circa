@@ -159,7 +159,7 @@ void test_migrate()
     Term* a = dest.eval("state a = 1");
     source.eval("state a = 2");
 
-    migrate_values(source, dest);
+    migrate_stateful_values(source, dest);
 
     // Test that the 'dest' terms are the same terms
     test_assert(dest["a"] == a);
@@ -179,7 +179,7 @@ void test_migrate2()
     /*Term* a2 =*/ source.eval("state a = 3");
     /*Term* c =*/ source.eval("state c = 4");
 
-    migrate_values(source, dest);
+    migrate_stateful_values(source, dest);
 
     test_assert(dest["a"] == a);
     test_assert(dest["a"]->asInt() == 3);

@@ -76,4 +76,48 @@ Term* get_hidden_state_for_call(Term* term)
         return NULL;
 }
 
+bool _terms_match_for_migration(Term* left, Term* right)
+{
+    if ((left->name == right->name) && (left->type == right->type))
+        return true;
+
+    return false;
+}
+
+void migrate_stateful_values(Branch& source, Branch& dest)
+{
+    // Figure out the mapping of source terms to dest terms
+    std::map<Term*,Term*> map;
+
+    // There are a lot of fancy algorithms we could do here. But for now, just
+    // iterate and check matching indexes.
+    
+    for (int index=0; index < source.length(); index++) {
+        if (index >= dest.length())
+            break;
+
+        Term* sourceTerm = source[index];
+        Term* destTerm = dest[index];
+
+        if (sourceTerm == NULL || destTerm == NULL)
+            continue;
+
+        if (!_terms_match_for_migration(sourceTerm, destTerm))
+            continue;
+
+        // At this point, they match
+
+        // Migrate inner branches
+        if (is_branch(sourceTerm)) {
+            assert(is_branch(destTerm));
+            migrate_stateful_values(as_branch(sourceTerm), as_branch(destTerm));
+        } 
+        
+        // Stateful value migration
+        else if (is_stateful(sourceTerm) && is_stateful(destTerm)) {
+            assign_value(sourceTerm, destTerm);
+        }
+    }
+}
+
 } // namespace circa
