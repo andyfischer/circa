@@ -23,4 +23,6 @@ bool has_hidden_state(Function& func);
 
 Term* get_hidden_state_for_call(Term* term);
 
+void migrate_stateful_values(Branch& source, Branch& dest);
+
 } // namespace circa

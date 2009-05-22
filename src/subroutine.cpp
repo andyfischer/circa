@@ -78,8 +78,6 @@ void initialize_subroutine(Term* term)
 
     func.hiddenStateType = BRANCH_TYPE;
 
-    assert(has_hidden_state(func)); // sanity check
-
     func.prependInput(BRANCH_TYPE, "#state");
 }
 
@@ -126,22 +124,6 @@ void subroutine_call_evaluate(Term* caller)
         assert(outputPlaceholder != NULL);
         assign_value(outputPlaceholder, caller);
     }
-}
-
-void subroutine_feedback(Branch& branch, Term* subject, Term* desired)
-{
-    /*
-    TODO
-    Function& func = as_function(subject);
-
-    Term* out = func.subroutineBranch[OUTPUT_PLACEHOLDER_NAME];
-
-    Branch& subBranch = create_branch(&branch);
-
-    generate_feedback(subBranch, out, desired);
-    */
-
-    // TODO: feedback from outputs to outside this call
 }
 
 Branch& get_state_for_subroutine_call(Term* term)
