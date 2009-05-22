@@ -102,12 +102,12 @@ bool value_fits_type(Term* valueTerm, Term* type)
 
     // Check if the # of elements matches
     // TODO: Relax this check for lists
-    if (value.length() != (int) as_type(type).fields.size())
+    if (value.length() != as_type(type).fields.length())
         return false;
 
     // Check each element
     for (int i=0; i < value.length(); i++) {
-        if (!value_fits_type(value[i], as_type(type).fields[i].type))
+        if (!value_fits_type(value[i], as_type(type).fields[i]->type))
             return false;
     }
 
@@ -233,10 +233,8 @@ void Type::typeRemapPointers(Term *term, ReferenceMap const& map)
 {
     Type &type = as_type(term);
 
-    for (unsigned int field_i=0; field_i < type.fields.size(); field_i++) {
-        Field &field = type.fields[field_i];
-        field.type = map.getRemapped(field.type);
-    }
+    for (int field_i=0; field_i < type.fields.length(); field_i++)
+        type.fields[field_i] = map.getRemapped(type.fields[field_i]);
 }
 
 void Type::name_accessor(Term* caller)
@@ -254,7 +252,7 @@ std::string Type::type_to_string(Term* term)
     for (int i=0; i < type.numFields(); i++) {
         if (i != 0)
             out << ", ";
-        out << as_type(type.fields[i].type).name << " " << type.fields[i].name;
+        out << as_type(type.fields[i]->type).name << " " << type.fields[i]->name;
     }
 
     out << " }";

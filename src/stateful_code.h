@@ -10,6 +10,8 @@ bool is_stateful(Term* term);
 
 void set_stateful(Term* term, bool value);
 
+bool is_function_stateful(Term* func);
+
 void load_state_into_branch(Branch& state, Branch& branch);
 void persist_state_from_branch(Branch& branch, Branch& state);
 void get_type_from_branches_stateful_terms(Branch& branch, Branch& type);
