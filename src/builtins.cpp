@@ -414,7 +414,9 @@ void initialize_builtin_types(Branch& kernel)
     import_member_function(LIST_TYPE, list_t::append, "append(List, any) : List");
     import_member_function(LIST_TYPE, list_t::count, "count(List) : int");
 
-    register_subroutine_type(kernel);
+    SUBROUTINE_TYPE = create_compound_type(kernel, "Subroutine");
+    as_type(SUBROUTINE_TYPE).toString = subroutine_t::to_string;
+
     feedback_register_constants(kernel);
 }
 
