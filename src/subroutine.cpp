@@ -131,4 +131,9 @@ Branch& get_state_for_subroutine_call(Term* term)
     return as_branch(term->input(0));
 }
 
+// to do proper value migration, todo:
+// check, is_value_for_subroutine_hidden_state?
+// check, is_subroutine_hidden_state_expanded?
+// call, expand_subroutine_hidden_state
+
 } // namespace circa
