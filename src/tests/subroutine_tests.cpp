@@ -5,6 +5,29 @@
 namespace circa {
 namespace subroutine_tests {
 
+void test_recursion()
+{
+    Branch branch;
+    Term* factorial = branch.eval(
+                "def factorial(int n) : int\n"
+                "  if (n < 2)\n"
+                "    return 1\n"
+                "  else\n"
+                "    return mult_i(n, factorial(add_i(n, -1)))\n"
+                "  end\n"
+                "end");
+
+    Term* fact_1 = branch.eval("factorial(1)");
+    test_assert(fact_1);
+
+    return; // FIXME
+
+    Term* fact_2 = branch.eval("factorial(2)");
+    test_assert(fact_2);
+
+    Term* p = branch.eval("print('factorial(2) = ' factorial(2))");
+}
+
 void subroutine_stateful_term()
 {
     Branch branch;
@@ -33,6 +56,7 @@ void subroutine_stateful_term()
 
 void register_tests()
 {
+    REGISTER_TEST_CASE(subroutine_tests::test_recursion);
     REGISTER_TEST_CASE(subroutine_tests::subroutine_stateful_term);
 }
 

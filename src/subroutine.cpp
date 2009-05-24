@@ -5,7 +5,6 @@
 namespace circa {
 
 namespace subroutine_t {
-
     std::string to_string(Term* term)
     {
         Branch& branch = as_branch(term);
@@ -56,12 +55,6 @@ Function& get_subroutines_function_def(Term* term)
     return as_function(as_branch(term)[get_name_for_attribute("function-def")]);
 }
 
-void register_subroutine_type(Branch& kernel)
-{
-    SUBROUTINE_TYPE = create_compound_type(kernel, "Subroutine");
-    as_type(SUBROUTINE_TYPE).toString = subroutine_t::to_string;
-}
-
 void initialize_subroutine(Term* term)
 {
     Branch& branch = as_branch(term);
@@ -77,7 +70,6 @@ void initialize_subroutine(Term* term)
     }
 
     func.hiddenStateType = BRANCH_TYPE;
-
     func.prependInput(BRANCH_TYPE, "#state");
 }
 
@@ -131,9 +123,21 @@ Branch& get_state_for_subroutine_call(Term* term)
     return as_branch(term->input(0));
 }
 
-// to do proper value migration, todo:
-// check, is_value_for_subroutine_hidden_state?
-// check, is_subroutine_hidden_state_expanded?
-// call, expand_subroutine_hidden_state
+bool is_subroutines_hidden_state(Term* term)
+{
+    // TODO
+    return false;
+}
+
+bool is_subroutines_hidden_state_expanded(Term* term)
+{
+    // TODO
+    return false;
+}
+
+void expand_subroutines_hidden_state(Term* term)
+{
+    // TODO
+}
 
 } // namespace circa
