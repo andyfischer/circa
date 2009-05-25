@@ -7,10 +7,14 @@ namespace if_function {
 
     void evaluate(Term* caller)
     {
+        Branch& contents = caller->asBranch();
         bool cond = as_bool(caller->input(0));
 
         if (cond) {
-            Branch& branch = as_branch(caller);
+            Branch& branch = contents["if"]->asBranch();
+            evaluate_branch(branch);
+        } else if (contents.contains("else")) {
+            Branch& branch = contents["else"]->asBranch();
             evaluate_branch(branch);
         }
     }
@@ -19,17 +23,22 @@ namespace if_function {
     {
         std::stringstream result;
 
-        if (!term->boolPropOptional("if:is-else", false)) {
-            result << "if";
-            result << " " << get_source_of_input(term, 0) << std::endl;
-        } else {
+        result << "if";
+        result << " " << get_source_of_input(term, 0) << std::endl;
+
+        Branch& contents = term->asBranch();
+
+        Branch& positiveBranch = contents["if"]->asBranch();
+
+        result << get_branch_source(positiveBranch);
+
+        if (contents.contains("else")) {
             result << "else";
+            Branch& elseBranch = contents["else"]->asBranch();
+            result << get_branch_source(elseBranch);
         }
 
-        result << get_branch_source(as_branch(term));
-
-        if (!term->boolPropOptional("if:has-following-else", false))
-            result << "end";
+        result << "end";
 
         return result.str();
     }
