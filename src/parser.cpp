@@ -431,32 +431,26 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     get_input_syntax_hint(result, 0, "postWhitespace") = postConditionWs;
     
-    Branch& innerBranch = as_branch(result);
+    Branch& contents = as_branch(result);
 
-    consume_branch_until_end(innerBranch, tokens);
-    remove_compilation_attrs(innerBranch);
+    Branch& positiveBranch = create_branch(&contents, "if");
 
-    Term* elseResult = NULL;
+    consume_branch_until_end(positiveBranch, tokens);
+    remove_compilation_attrs(positiveBranch);
 
-    // possibly consume an 'else' block
+    // Possibly consume an 'else' block
     if (tokens.nextNonWhitespaceIs(ELSE)) {
+
+        Branch& elseBranch = create_branch(&contents, "else");
 
         std::string preWs = possible_whitespace(tokens);
 
         tokens.consume(ELSE);
 
-        Term* notCondition = apply(&branch, NOT_FUNC, RefList(condition));
-        elseResult = apply(&branch, IF_FUNC, RefList(notCondition));
-        alloc_value(elseResult);
-        Branch& elseInnerBranch = as_branch(elseResult);
+        //elseResult->stringProp("syntaxHints:preWhitespace") = preWs;
 
-        elseResult->stringProp("syntaxHints:preWhitespace") = preWs;
-
-        consume_branch_until_end(elseInnerBranch, tokens);
-        remove_compilation_attrs(elseInnerBranch);
-
-        result->boolProp("if:has-following-else") = true;
-        elseResult->boolProp("if:is-else") = true;
+        consume_branch_until_end(elseBranch, tokens);
+        remove_compilation_attrs(elseBranch);
     }
 
     possible_whitespace(tokens);
@@ -466,73 +460,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     tokens.consume(END);
 
-    // Consume any trailing whitespace. We can't rely on statement() to do this, because
-    // it might try to apply this whitespace to the first if() call.
-    if (elseResult != NULL) {
-        append_whitespace(elseResult, possible_whitespace(tokens));
-    }
-
-    // Create the joining branch
-    Branch& joiningBranch = create_branch(&branch, "#joining");
-
-    // Get a list of all names bound in this branch
-    std::set<std::string> boundNames;
-
-    {
-        TermNamespace::const_iterator it;
-        for (it = innerBranch.names.begin(); it != innerBranch.names.end(); ++it)
-            boundNames.insert(it->first);
-
-        if (elseResult != NULL) {
-            Branch& elseInnerBranch = as_branch(elseResult);
-            for (it = elseInnerBranch.names.begin(); it != elseInnerBranch.names.end(); ++it)
-                boundNames.insert(it->first);
-        }
-    }
-
-    // Ignore any names which are not bound in the outer branch
-    {
-        std::set<std::string>::iterator it;
-        for (it = boundNames.begin(); it != boundNames.end();)
-        {
-            std::string const& name = *it;
-
-            if (find_named(&branch, name) == NULL)
-                boundNames.erase(it++);
-
-            // Also ignore hidden names
-            else if ((name[0] == '#') && (name != OUTPUT_PLACEHOLDER_NAME))
-                boundNames.erase(it++);
-            else
-                ++it;
-        }
-    }
-
-    // For each name, create a joining term
-    {
-        std::set<std::string>::const_iterator it;
-        for (it = boundNames.begin(); it != boundNames.end(); ++it)
-        {
-            std::string const& name = *it;
-
-            Term* outerVersion = find_named(&branch, name);
-            Term* positiveVersion = outerVersion;
-            Term* negativeVersion = outerVersion;
-
-            if (innerBranch.contains(name))
-                positiveVersion = innerBranch[name];
-
-            if (elseResult != NULL && as_branch(elseResult).contains(name))
-                negativeVersion = as_branch(elseResult)[name];
-
-            Term* joining = apply(&joiningBranch, "if_expr",
-                    RefList(condition, positiveVersion, negativeVersion));
-
-            // Bind these names in the outer branch
-            branch.bindName(joining, name);
-        }
-    }
-
+    update_if_block_joining_branch(result);
 
     return result;
 }
