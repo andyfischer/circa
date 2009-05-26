@@ -127,7 +127,7 @@ void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
     if (term->name != "")
         return;
 
-    term->boolProp("syntaxHints:nestedExpression") = true;
+    set_is_statement(term, false);
 
     for (int i=0; i < term->numInputs(); i++) {
         Term* input = term->input(i);

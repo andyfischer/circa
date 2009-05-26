@@ -207,9 +207,21 @@ void generate_source_for_function_calls() {
     Term* b = int_value(&branch, 9, "b");
     Term* c = apply(&branch, ADD_FUNC, RefList(a,b));
 
+    test_assert(should_print_term_source_line(a));
+    test_assert(should_print_term_source_line(b));
     test_assert(should_print_term_source_line(c));
-
     test_equals(get_branch_source(branch), "a = 5\nb = 9\nadd(a, b)");
+
+    // Same test with anonymous values
+    branch.clear();
+    Term* d = int_value(&branch, 3);
+    Term* e = int_value(&branch, 4);
+    Term* f = apply(&branch, ADD_FUNC, RefList(d,e));
+
+    test_assert(!should_print_term_source_line(d));
+    test_assert(!should_print_term_source_line(e));
+    test_assert(should_print_term_source_line(f));
+    test_equals(get_branch_source(branch), "add(3, 4)");
 }
 
 void register_tests() {

@@ -192,6 +192,9 @@ Term* statement(Branch& branch, TokenStream& tokens)
     else
         result->stringProp("syntaxHints:lineEnding") = "";
 
+    // Mark this term as a statement
+    set_is_statement(result, true);
+
     return result;
 }
 
@@ -446,8 +449,6 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         std::string preWs = possible_whitespace(tokens);
 
         tokens.consume(ELSE);
-
-        //elseResult->stringProp("syntaxHints:preWhitespace") = preWs;
 
         consume_branch_until_end(elseBranch, tokens);
         remove_compilation_attrs(elseBranch);

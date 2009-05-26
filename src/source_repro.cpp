@@ -72,10 +72,7 @@ bool is_hidden(Term* term)
 
 bool should_print_term_source_line(Term* term)
 {
-    if (term->boolPropOptional("syntaxHints:nestedExpression", false))
-        return false;
-
-    return (!is_hidden(term));
+    return is_statement(term) && !is_hidden(term);
 }
 
 void prepend_name_binding(Term* term, std::stringstream& out)
