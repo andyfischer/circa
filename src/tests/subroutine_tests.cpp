@@ -24,8 +24,7 @@ void test_return_from_conditional()
 void test_recursion()
 {
     Branch branch;
-    Term* factorial = branch.eval(
-                "def factorial(int n) : int\n"
+    branch.eval("def factorial(int n) : int\n"
                 "  if (n < 2)\n"
                 "    return 1\n"
                 "  else\n"
@@ -36,13 +35,19 @@ void test_recursion()
 
     Term* fact_1 = branch.eval("factorial(1)");
     test_assert(fact_1);
-
-    return;
+    test_equals(fact_1->asInt(), 1);
 
     Term* fact_2 = branch.eval("factorial(2)");
     test_assert(fact_2);
+    test_equals(fact_2->asInt(), 2);
 
-    Term* p = branch.eval("print('factorial(2) = ' factorial(2))");
+    Term* fact_3 = branch.eval("factorial(3)");
+    test_assert(fact_3);
+    test_equals(fact_3->asInt(), 6);
+
+    Term* fact_4 = branch.eval("factorial(4)");
+    test_assert(fact_4);
+    test_equals(fact_4->asInt(), 24);
 }
 
 void subroutine_stateful_term()
