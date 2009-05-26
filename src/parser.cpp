@@ -336,6 +336,12 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     initialize_subroutine(result);
 
+    // Bind this function's name immediately. Need to do this before parsing the branch,
+    // so that recursive calls will work.
+
+    Function& func = as_function(functionDef);
+    branch.bindName(result, func.name);
+
     consume_branch_until_end(subBranch, tokens);
     remove_compilation_attrs(subBranch);
 
@@ -343,9 +349,6 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         return compile_error_for_line(result, tokens, startPosition);
 
     tokens.consume(END);
-
-    Function& func = as_function(functionDef);
-    branch.bindName(result, func.name);
 
     assert(is_value(result));
     assert(is_subroutine(result));
