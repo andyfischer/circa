@@ -10,7 +10,7 @@ namespace get_field_by_name_function {
         std::string name = caller->stringProp("field-name");
         int index = as_type(caller->input(0)->type).findFieldIndex(name);
         if (index == -1) {
-            error_occured(caller, "field not found: " + name);
+            error_occurred(caller, "field not found: " + name);
             return;
         }
         Term* field = as_branch(caller->input(0))[index];

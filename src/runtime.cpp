@@ -29,7 +29,7 @@ void evaluate_term(Term* term)
 
     // Check function
     if (term->function == NULL) {
-        error_occured(term, "Function is NULL");
+        error_occurred(term, "Function is NULL");
         return;
     }
 
@@ -43,7 +43,7 @@ void evaluate_term(Term* term)
         std::stringstream msg;
         msg << "Wrong number of inputs (found " << term->inputs.count();
         msg << ", expected " << func.numInputs() << ")";
-        error_occured(term, msg.str());
+        error_occurred(term, msg.str());
         return;
     }
 
@@ -65,21 +65,21 @@ void evaluate_term(Term* term)
         if (input == NULL && !inputProps.meta) {
             std::stringstream message;
             message << "Input " << inputIndex << " is NULL";
-            error_occured(term, message.str());
+            error_occurred(term, message.str());
             return;
         }
 
         if (!is_value_alloced(input) && !inputProps.meta) {
             std::stringstream message;
             message << "Input " << inputIndex << " has NULL value";
-            error_occured(term, message.str());
+            error_occurred(term, message.str());
             return;
         }
 
         if (input->hasError && !inputProps.meta) {
             std::stringstream message;
             message << "Input " << inputIndex << " has an error";
-            error_occured(term, message.str());
+            error_occurred(term, message.str());
             return;
         }
         
@@ -88,7 +88,7 @@ void evaluate_term(Term* term)
             std::stringstream message;
             message << "Runtime type error: input " << inputIndex << " has type "
                 << input->type->name;
-            error_occured(term, message.str());
+            error_occurred(term, message.str());
             return;
         }
 
@@ -109,7 +109,7 @@ void evaluate_term(Term* term)
     }
     catch (std::exception const& err)
     {
-        error_occured(term, err.what());
+        error_occurred(term, err.what());
     }
 }
 
@@ -123,13 +123,13 @@ void evaluate_branch(Branch& branch, Term* errorListener)
         if (term->hasError) {
             std::stringstream out;
             out << "On term " << term_to_raw_string(term) << "\n" << term->getErrorMessage();
-            error_occured(errorListener, out.str());
+            error_occurred(errorListener, out.str());
             return;
         }
     }
 }
 
-void error_occured(Term* errorTerm, std::string const& message)
+void error_occurred(Term* errorTerm, std::string const& message)
 {
     if (errorTerm == NULL) {
         throw std::runtime_error(message);

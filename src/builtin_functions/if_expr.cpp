@@ -13,7 +13,7 @@ namespace if_expr_function {
         if (!is_value_alloced(result)) {
             std::stringstream out;
             out << "input " << index << " not ready";
-            error_occured(caller, out.str());
+            error_occurred(caller, out.str());
             return;
         }
 

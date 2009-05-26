@@ -13,7 +13,7 @@ namespace greater_than_function {
         Type &type = as_type(input0->type);
 
         if (type.lessThan == NULL) {
-            error_occured(caller, "greaterThan not defined");
+            error_occurred(caller, "greaterThan not defined");
             return;
         }
 

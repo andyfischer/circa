@@ -12,7 +12,7 @@ namespace annotate_type_function {
     void evaluate(Term* caller)
     {
         if (!value_fits_type(caller->input(0), caller->input(1))) {
-            error_occured(caller, "Type mismatch");
+            error_occurred(caller, "Type mismatch");
             return;
         }
 
