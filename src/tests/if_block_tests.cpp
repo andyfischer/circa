@@ -21,7 +21,6 @@ void test_if_joining()
     // Test that if a name is defined in both 'if' and 'else branches, that it gets defined 
     // in the outer scope.
     branch.eval("if true\nCardiff = 5\nelse\nCardiff = 11\nend");
-
     test_assert(branch.contains("Cardiff"));
 }
 

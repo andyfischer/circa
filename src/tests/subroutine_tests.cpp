@@ -5,6 +5,22 @@
 namespace circa {
 namespace subroutine_tests {
 
+void test_return_from_conditional()
+{
+    Branch branch;
+    branch.eval("def my_max(float a, float b) : float\n"
+                "  if (a < b)\n"
+                "    return b\n"
+                "  else\n"
+                "    return a\n"
+                "  end\n"
+                "end\n");
+
+    test_equals(branch.eval("my_max(3,8)")->asFloat(), 8);
+    test_equals(branch.eval("my_max(3,3)")->asFloat(), 3);
+    test_equals(branch.eval("my_max(11,0)")->asFloat(), 11);
+}
+
 void test_recursion()
 {
     Branch branch;
@@ -56,6 +72,7 @@ void subroutine_stateful_term()
 
 void register_tests()
 {
+    REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
     REGISTER_TEST_CASE(subroutine_tests::test_recursion);
     REGISTER_TEST_CASE(subroutine_tests::subroutine_stateful_term);
 }
