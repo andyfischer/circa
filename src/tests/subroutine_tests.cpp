@@ -29,14 +29,15 @@ void test_recursion()
                 "  if (n < 2)\n"
                 "    return 1\n"
                 "  else\n"
-                "    return mult_i(n, factorial(add_i(n, -1)))\n"
+                "    next_i = add_i(n, -1)\n"
+                "    return mult_i(n, factorial(next_i))\n"
                 "  end\n"
                 "end");
 
     Term* fact_1 = branch.eval("factorial(1)");
     test_assert(fact_1);
 
-    return; // FIXME
+    return;
 
     Term* fact_2 = branch.eval("factorial(2)");
     test_assert(fact_2);

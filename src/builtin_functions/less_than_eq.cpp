@@ -13,7 +13,7 @@ namespace less_than_eq_function {
         Type &type = as_type(input0->type);
 
         if (type.lessThan == NULL) {
-            error_occured(caller, "lessThan not defined");
+            error_occurred(caller, "lessThan not defined");
             return;
         }
 

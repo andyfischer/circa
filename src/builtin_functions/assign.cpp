@@ -18,7 +18,7 @@ namespace assign_function {
             change_type(target, FLOAT_TYPE);
 
         if (!value_fits_type(value, target->type)) {
-            error_occured(caller, "Tried to assign a " + value->type->name + " to a "
+            error_occurred(caller, "Tried to assign a " + value->type->name + " to a "
                     + target->type->name);
             return;
         }

@@ -81,7 +81,7 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
         // Inject iterator value
         Term* iterator = codeBranch[0];
         if (!value_fits_type(listTerm->field(i), iterator->type)) {
-            error_occured(forTerm, "Internal error in evaluate_for_loop: can't assign this element to iterator");
+            error_occurred(forTerm, "Internal error in evaluate_for_loop: can't assign this element to iterator");
             return;
         }
         assign_value(listTerm->field(i), iterator);

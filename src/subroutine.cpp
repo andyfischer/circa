@@ -92,7 +92,7 @@ void subroutine_call_evaluate(Term* caller)
         std::stringstream msg;
         msg << "Wrong number of inputs, expected: " << sub.inputTypes.count()
             << ", found: " << caller->inputs.count();
-        error_occured(caller, msg.str());
+        error_occurred(caller, msg.str());
         return;
     }
 
@@ -100,11 +100,8 @@ void subroutine_call_evaluate(Term* caller)
     for (unsigned int input=1; input < sub.inputTypes.count(); input++) {
 
         std::string inputName = sub.getInputProperties(input).name;
-
         Term* inputTerm = branch[inputName];
-
         assert(inputTerm != NULL);
-
         assign_value(caller->inputs[input], inputTerm);
     }
 
