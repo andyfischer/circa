@@ -126,11 +126,11 @@ bool is_subroutine_state_expanded(Term* term)
     return as_branch(term).length() > 0;
 }
 
-void expand_subroutines_hidden_state(Term* term, Term* state)
+void expand_subroutines_hidden_state(Term* call, Term* state)
 {
-    assert(is_subroutine(term->function));
+    assert(is_subroutine(call->function));
     assert(state != NULL);
-    duplicate_branch(as_branch(term->function), as_branch(state));
+    duplicate_branch(as_branch(call->function), as_branch(state));
 }
 
 } // namespace circa

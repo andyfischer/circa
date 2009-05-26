@@ -16,7 +16,7 @@ Branch& call_subroutine(Branch& branch, std::string const& functionName);
 void subroutine_call_evaluate(Term* caller);
 Term* get_state_for_subroutine_call(Term* term);
 bool is_subroutine_state_expanded(Term* term);
-void expand_subroutines_hidden_state(Term* term, Term* state);
+void expand_subroutines_hidden_state(Term* call, Term* state);
 
 } // namespace circa
 
