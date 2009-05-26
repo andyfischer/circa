@@ -76,6 +76,18 @@ void subroutine_stateful_term()
     test_equals(as_float(a_inside_call), 3);
 
     // Test accessing the subroutine's state in various ways
+    {
+        Term* call = branch.compile("mysub()");
+        Term* state = get_state_for_subroutine_call(call);
+        test_assert(state);
+        test_assert(!is_subroutine_state_expanded(state));
+        Branch& stateContents = state->asBranch();
+        test_assert(stateContents.length() == 0);
+        
+        expand_subroutines_hidden_state(call, state);
+        test_assert(is_subroutine_state_expanded(state));
+        test_assert(stateContents.contains("a"));
+    }
 }
 
 void register_tests()

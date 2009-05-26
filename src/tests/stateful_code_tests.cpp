@@ -43,6 +43,32 @@ void function_with_hidden_state_term()
     test_assert(call_1_state != call_2_state);
 }
 
+void subroutine_expansion_during_migrate()
+{
+    Branch branch;
+
+    branch.eval("def myfunc()\nstate i : int\nend");
+
+    Branch& source = create_branch(&branch, "source");
+    Branch& dest = create_branch(&branch, "dest");
+
+    Term* sourceCall = source.eval("myfunc()");
+    Term* destCall = dest.compile("myfunc()");
+
+    Term* sourceCallState = get_state_for_subroutine_call(sourceCall);
+    Term* destCallState = get_state_for_subroutine_call(destCall);
+
+    test_assert(is_subroutine_state_expanded(sourceCallState));
+    test_assert(!is_subroutine_state_expanded(destCallState));
+
+    sourceCallState->field("i")->asInt() = 111;
+
+    migrate_stateful_values(source, dest);
+
+    test_assert(is_subroutine_state_expanded(get_state_for_subroutine_call(destCall)));
+    test_assert(destCallState->field("i")->asInt() == 111);
+}
+
 void test_load_and_save()
 {
     Branch branch;
@@ -208,6 +234,7 @@ void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_simple);
     REGISTER_TEST_CASE(stateful_code_tests::function_with_hidden_state_term);
+    REGISTER_TEST_CASE(stateful_code_tests::subroutine_expansion_during_migrate);
     REGISTER_TEST_CASE(stateful_code_tests::test_load_and_save);
     REGISTER_TEST_CASE(stateful_code_tests::test_get_type_from_branches_stateful_terms);
     REGISTER_TEST_CASE(stateful_code_tests::stateful_value_evaluation);
