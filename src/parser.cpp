@@ -668,6 +668,11 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     Term* result = infix_expression(branch, tokens);
+
+    // If we're returning an identifier, then we need to insert a copy() term
+    if (result->name != "")
+        result = apply(&branch, COPY_FUNC, RefList(result));
+
     branch.bindName(result, OUTPUT_PLACEHOLDER_NAME);
     
     return result;
