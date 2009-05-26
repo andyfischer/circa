@@ -17,6 +17,8 @@ namespace if_function {
             Branch& branch = contents["else"]->asBranch();
             evaluate_branch(branch);
         }
+
+        evaluate_branch(contents["#joining"]->asBranch());
     }
 
     std::string toSourceString(Term* term)

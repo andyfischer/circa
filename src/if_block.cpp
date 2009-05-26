@@ -39,51 +39,61 @@ void update_if_block_joining_branch(Term* ifCall)
         }
     }
 
-    // Ignore any names which are not bound in the outer branch
     Branch* outerScope = ifCall->owningBranch;
     assert(outerScope != NULL);
 
+    // Filter which names we will join.
     for (std::set<std::string>::iterator it = boundNames.begin(); it != boundNames.end();)
     {
         std::string const& name = *it;
+        bool remove = false;
 
-        if (find_named(outerScope, name) == NULL)
-            boundNames.erase(it++);
+        // Ignore hidden names
+        if ((name[0] == '#') && (name != OUTPUT_PLACEHOLDER_NAME))
+            remove = true;
 
-        // Also ignore hidden names
-        else if ((name[0] == '#') && (name != OUTPUT_PLACEHOLDER_NAME))
+        // Don't ignore names which are defined in both branches
+        else if ((elseBranch != NULL)
+                && (positiveBranch.contains(name))
+                && (elseBranch->contains(name)))
+            remove = false;
+
+        // Otherwise, ignore names which are not defined in the outer scope
+        else if (find_named(outerScope, name) == NULL)
+            remove = true;
+
+        if (remove)
             boundNames.erase(it++);
         else
             ++it;
     }
 
     // For each name, create a joining term
+    for (std::set<std::string>::const_iterator it = boundNames.begin();
+            it != boundNames.end();
+            ++it)
     {
-        std::set<std::string>::const_iterator it;
-        for (it = boundNames.begin(); it != boundNames.end(); ++it)
-        {
-            std::string const& name = *it;
+        std::string const& name = *it;
 
-            Term* outerVersion = find_named(outerScope, name);
-            Term* positiveVersion = outerVersion;
-            Term* negativeVersion = outerVersion;
+        Term* outerVersion = find_named(outerScope, name);
+        Term* positiveVersion = outerVersion;
+        Term* negativeVersion = outerVersion;
 
-            if (positiveBranch.contains(name))
-                positiveVersion = positiveBranch[name];
+        if (positiveBranch.contains(name))
+            positiveVersion = positiveBranch[name];
 
-            if (elseBranch != NULL && elseBranch->contains(name))
-                negativeVersion = elseBranch->get(name);
+        if (elseBranch != NULL && elseBranch->contains(name))
+            negativeVersion = elseBranch->get(name);
 
-            Term* joining = apply(&joiningBranch, "if_expr",
-                    RefList(condition, positiveVersion, negativeVersion));
+        Term* joining = apply(&joiningBranch, "if_expr",
+                RefList(condition, positiveVersion, negativeVersion));
 
-            // Bind these names in the outer branch
-            // TODO: This only works when the if call is the last thing in this branch (ie,
-            // at parse time). It will cause problems if we call update_if_block_joining_branch
-            // at a later time and there have been other name bindings since then. Need a
-            // better solution for this.
-            branch.bindName(joining, name);
-        }
+        // Bind these names in the outer branch
+        // TODO: This only works when the if call is the last thing in this branch (ie,
+        // at parse time). It will cause problems if we call update_if_block_joining_branch
+        // at a later time and there have been other name bindings since then. Need a
+        // better solution for this.
+        outerScope->bindName(joining, name);
     }
 }
 
