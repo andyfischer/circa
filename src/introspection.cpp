@@ -29,6 +29,18 @@ bool is_actually_using(Term* user, Term* usee)
     return false;
 }
 
+void set_is_statement(Term* term, bool value)
+{
+    term->boolProp("statement") = value;
+}
+
+bool is_statement(Term* term)
+{
+    // the default for whether or not something is a statement is true, because
+    // that's what manually-created terms should be.
+    return term->boolPropOptional("statement", true);
+}
+
 std::string format_global_id(Term* term)
 {
     std::stringstream out;
