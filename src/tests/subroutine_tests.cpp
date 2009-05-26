@@ -58,7 +58,7 @@ void subroutine_stateful_term()
     // Make sure that stateful terms work correctly
     Term* call = branch.eval("mysub()");
     test_assert(call);
-    Term* a_inside_call = get_state_for_subroutine_call(call)["a"];
+    Term* a_inside_call = get_state_for_subroutine_call(call)->field("a");
     test_equals(as_float(a_inside_call), 1);
     evaluate_term(call);
     test_equals(as_float(a_inside_call), 2);
@@ -68,12 +68,14 @@ void subroutine_stateful_term()
     // Make sure that subsequent calls to this subroutine don't share
     // the same stateful value.
     Term* another_call = branch.eval("mysub()");
-    Term* a_inside_another_call = get_state_for_subroutine_call(another_call)["a"];
+    Term* a_inside_another_call = get_state_for_subroutine_call(another_call)->field("a");
     test_assert(a_inside_call != a_inside_another_call);
     test_equals(as_float(a_inside_another_call), 1);
     evaluate_term(another_call);
     test_equals(as_float(a_inside_another_call), 2);
     test_equals(as_float(a_inside_call), 3);
+
+    // Test accessing the subroutine's state in various ways
 }
 
 void register_tests()

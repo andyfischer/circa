@@ -73,18 +73,14 @@ void initialize_subroutine(Term* term)
     func.prependInput(BRANCH_TYPE, "#state");
 }
 
-void initialize_subroutine_state(Term* term, Branch& state)
-{
-    assert(is_subroutine(term->function));
-    duplicate_branch(as_branch(term->function), state);
-}
-
 void subroutine_call_evaluate(Term* caller)
 {
-    Branch &branch = get_state_for_subroutine_call(caller);
+    Term* hiddenState = get_state_for_subroutine_call(caller);
 
-    if (branch.length() == 0)
-        initialize_subroutine_state(caller, branch);
+    if (!is_subroutine_state_expanded(hiddenState))
+        expand_subroutines_hidden_state(caller, hiddenState);
+
+    Branch& branch = as_branch(hiddenState);
 
     Function &sub = get_function_data(caller->function);
 
@@ -115,26 +111,26 @@ void subroutine_call_evaluate(Term* caller)
     }
 }
 
-Branch& get_state_for_subroutine_call(Term* term)
+Term* get_state_for_subroutine_call(Term* term)
 {
-    return as_branch(term->input(0));
+    bool hasState = get_function_data(term->function).hiddenStateType != VOID_TYPE;
+
+    if (!hasState)
+        return NULL;
+
+    return term->input(0);
 }
 
-bool is_subroutines_hidden_state(Term* term)
+bool is_subroutine_state_expanded(Term* term)
 {
-    // TODO
-    return false;
+    return as_branch(term).length() > 0;
 }
 
-bool is_subroutines_hidden_state_expanded(Term* term)
+void expand_subroutines_hidden_state(Term* term, Term* state)
 {
-    // TODO
-    return false;
-}
-
-void expand_subroutines_hidden_state(Term* term)
-{
-    // TODO
+    assert(is_subroutine(term->function));
+    assert(state != NULL);
+    duplicate_branch(as_branch(term->function), as_branch(state));
 }
 
 } // namespace circa
