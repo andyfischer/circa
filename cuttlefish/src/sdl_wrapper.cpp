@@ -3,6 +3,8 @@
 #include "SDL.h"
 #include "SDL_gfxPrimitives.h"
 
+#include "circa.h"
+
 extern SDL_Surface* SCREEN;
 extern int SCREEN_WIDTH;
 extern int SCREEN_HEIGHT;

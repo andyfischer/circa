@@ -11,7 +11,7 @@ using namespace circa::tokenizer;
 
 float consume_float(TokenStream& tokens)
 {
-    return atof(tokens.consume(FLOAT).c_str());
+    return atof(tokens.consume(FLOAT_TOKEN).c_str());
 }
 
 int consume_int(TokenStream& tokens)
