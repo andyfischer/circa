@@ -160,14 +160,16 @@ if WINDOWS:
     SDL_ROOT.Append(LIBS=['#/SDL_deps/SDL_gfx-2.0.19/VisualC/Release/SDL_gfx.lib'])
 
 
-SDL_ROOT.Append(CPPPATH=['#/src'])
+SDL_ROOT.Append(CPPPATH=['#src'])
 SDL_ROOT.Append(LIBS = [circa_staticlib])
 
 Export('SDL_ROOT')
 
-cuttlefish_bin = SDL_ROOT.Program('build/bin/cfsh', 'cuttlefish/main.cpp')
-SDL_ROOT.Alias('cuttlefish', cuttlefish_bin)
-SDL_ROOT.Alias('cfsh', cuttlefish_bin)
+# Cuttlefish
+SConscript('cuttlefish/build.scons')
+#cuttlefish_bin = SDL_ROOT.Program('build/bin/cfsh', 'cuttlefish/main.cpp')
+#SDL_ROOT.Alias('cuttlefish', cuttlefish_bin)
+#SDL_ROOT.Alias('cfsh', cuttlefish_bin)
 
 # 'ptc', an optional app
 if os.path.exists('ptc'):

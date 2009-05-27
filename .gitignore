@@ -9,6 +9,7 @@ src/register_all_tests.cpp
 build
 obj
 bin/circa
+cuttlefish/app
 *.o
 *.so
 *.a

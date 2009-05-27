@@ -13,6 +13,6 @@ def get_source_files(dir):
         result.append(full_path)
     return result
 
-binary = SDL_ROOT.Program(target = 'app', source = get_source_files('.'))
+binary = SDL_ROOT.Program(target = 'app', source = get_source_files('src'))
 SDL_ROOT.Alias('cuttlefish', binary)
 SDL_ROOT.Alias('cfsh', binary)
