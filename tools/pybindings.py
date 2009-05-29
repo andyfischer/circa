@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+"""
+This script contains some experimental Python-to-Circa bindings using ctypes.
+This is very much a work in progress and it probably doesn't work at all right now.
+"""
+
 import readline
 import cmd, sys
 from ctypes import *
