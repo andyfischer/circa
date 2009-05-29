@@ -97,17 +97,16 @@ struct Type
     bool isCompoundType();
 
     void addMemberFunction(Term* function, std::string const& name);
-
-    // Hosted functions:
-    static std::string to_string(Term *caller);
-    static void name_accessor(Term* caller);
-
-    static void* type_alloc(Term* type);
-    static void type_dealloc(void* data);
-    static void type_assign(Term* source, Term* dest);
-    static void typeRemapPointers(Term* term, ReferenceMap const& map);
-    static std::string type_to_string(Term* term);
 };
+
+namespace type_t {
+    void* alloc(Term* type);
+    void dealloc(void* data);
+    std::string to_string(Term *caller);
+    void assign(Term* source, Term* dest);
+    void remap_pointers(Term *term, ReferenceMap const& map);
+    void name_accessor(Term* caller);
+}
 
 bool is_type(Term* term);
 Type& as_type(Term* term);

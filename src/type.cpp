@@ -196,68 +196,53 @@ bool equals(Term* a, Term* b)
     return as_type(a->type).equals(a,b);
 }
 
-std::string Type::to_string(Term *caller)
-{
-    return std::string("<Type " + as_type(caller).name + ">");
-}
-
-void* Type::type_alloc(Term* type)
-{
-    return new Type();
-}
-
-void Type::type_dealloc(void* data)
-{
-    // delete reinterpret_cast<Type*>(data);
-}
-
-void Type::type_assign(Term* source, Term* dest)
-{
-    Type* sourceValue = (Type*) source->value;
-    Type* destValue = (Type*) dest->value;
-
-    if (sourceValue == destValue)
-        return;
-
-    dest->value = sourceValue;
-
-    if (sourceValue != NULL)
-        sourceValue->refCount++;
-    
-    if (destValue != NULL) {
-        // TODO: delete Type objects when they are no longer needed
+namespace type_t {
+    void* alloc(Term* type)
+    {
+        return new Type();
     }
-}
-
-void Type::typeRemapPointers(Term *term, ReferenceMap const& map)
-{
-    Type &type = as_type(term);
-
-    for (int field_i=0; field_i < type.fields.length(); field_i++)
-        type.fields[field_i] = map.getRemapped(type.fields[field_i]);
-}
-
-void Type::name_accessor(Term* caller)
-{
-    as_string(caller) = as_type(caller->input(0)).name;
-}
-
-std::string Type::type_to_string(Term* term)
-{
-    std::stringstream out;
-    Type& type = as_type(term);
-
-    out << "type " << type.name << " { ";
-
-    for (int i=0; i < type.numFields(); i++) {
-        if (i != 0)
-            out << ", ";
-        out << as_type(type.fields[i]->type).name << " " << type.fields[i]->name;
+    void dealloc(void* data)
+    {
+        // FIXME
+        // delete reinterpret_cast<Type*>(data);
+    }
+    std::string to_string(Term *caller)
+    {
+        return std::string("<Type " + as_type(caller).name + ">");
     }
 
-    out << " }";
-    return out.str();
-}
+    void assign(Term* source, Term* dest)
+    {
+        Type* sourceValue = (Type*) source->value;
+        Type* destValue = (Type*) dest->value;
+
+        if (sourceValue == destValue)
+            return;
+
+        dest->value = sourceValue;
+
+        if (sourceValue != NULL)
+            sourceValue->refCount++;
+        
+        if (destValue != NULL) {
+            // TODO: delete Type objects when they are no longer needed
+        }
+    }
+
+    void remap_pointers(Term *term, ReferenceMap const& map)
+    {
+        Type &type = as_type(term);
+
+        for (int field_i=0; field_i < type.fields.length(); field_i++)
+            type.fields[field_i] = map.getRemapped(type.fields[field_i]);
+    }
+
+    void name_accessor(Term* caller)
+    {
+        as_string(caller) = as_type(caller->input(0)).name;
+    }
+
+} // namespace type_t
 
 std::string to_string(Term* term)
 {

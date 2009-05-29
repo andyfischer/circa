@@ -308,11 +308,11 @@ void bootstrap_kernel()
     Type* typeType = new Type();
     TYPE_TYPE->value = typeType;
     typeType->name = "Type";
-    typeType->alloc = Type::type_alloc;
-    typeType->dealloc = Type::type_dealloc;
-    typeType->assign = Type::type_assign;
-    typeType->remapPointers = Type::typeRemapPointers;
-    typeType->toString = Type::type_to_string;
+    typeType->alloc = type_t::alloc;
+    typeType->dealloc = type_t::dealloc;
+    typeType->assign = type_t::assign;
+    typeType->remapPointers = type_t::remap_pointers;
+    typeType->toString = type_t::to_string;
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Implant the Type type
@@ -402,7 +402,7 @@ void initialize_builtin_types(Branch& kernel)
     assert(as_type(BRANCH_TYPE).alloc == Branch::alloc);
     import_member_function(BRANCH_TYPE, list_t::append, "append(Branch, any) : Branch");
 
-    import_member_function(TYPE_TYPE, Type::name_accessor, "name(Type) : string");
+    import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) : string");
 
     Term* set_type = create_compound_type(kernel, "Set");
     as_type(set_type).toString = set_t::to_string;
