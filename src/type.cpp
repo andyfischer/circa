@@ -23,8 +23,8 @@ bool type_matches(Term *term, Term *type)
     // Allow for compound types to be considered the same.
     // Later there can be more complicated type checking.
 
-    if (type != NULL && is_compound_type(as_type(term->type))
-            && is_compound_type(as_type(type)))
+    if (type != NULL && is_compound_type(term->type)
+            && is_compound_type(type))
         return true;
 
     if (!identity_equals(term->type, type))
@@ -50,14 +50,15 @@ bool is_type(Term* term)
     return term->type == TYPE_TYPE;
 }
 
-bool is_compound_type(Type const& type)
+bool is_native_type(Term* type)
 {
-    return type.alloc == Branch::alloc;
+    // this could be improved
+    return as_type(type).alloc != Branch::alloc;
 }
 
 bool is_compound_type(Term* type)
 {
-    return is_compound_type(as_type(type));
+    return as_type(type).alloc == Branch::alloc;
 }
 
 Type& as_type(Term *term)
@@ -208,7 +209,27 @@ namespace type_t {
     }
     std::string to_string(Term *caller)
     {
-        return std::string("<Type " + as_type(caller).name + ">");
+        Type& type = as_type(caller);
+        if (is_native_type(caller))
+            return "<NativeType " + caller->name + ">";
+
+        // Generate source for a Type declaration
+        std::stringstream out;
+
+        out << "type " << caller->name << " { ";
+
+        for (int i=0; i < type.fields.length(); i++) {
+            Term* field = type.fields[i];
+            assert(field != NULL);
+            if (i != 0) out << ", ";
+            out << field->stringPropOptional("syntaxHints:preWhitespace","");
+            out << field->type->name << " ";
+            out << field->name;
+            out << field->stringPropOptional("syntaxHints:postWhitespace","");
+        }
+        out << " }";
+
+        return out.str();
     }
 
     void assign(Term* source, Term* dest)

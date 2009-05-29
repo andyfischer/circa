@@ -196,6 +196,11 @@ void reproduce_function_decl() {
     finish_source_repro_category();
 }
 
+void reproduce_type_decl() {
+    round_trip_source("type mytype { int a }");
+    round_trip_source("type mytype { int a, float b }");
+    finish_source_repro_category();
+}
 
 // "generate" tests. In these tests, we create source text from code that wasn't
 // originally produced by the parser, to make sure it still looks sane.
@@ -267,6 +272,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_tests::reproduce_lists);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_for_loop);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_function_decl);
+    REGISTER_TEST_CASE(source_repro_tests::reproduce_type_decl);
     REGISTER_TEST_CASE(source_repro_tests::generate_source_for_function_calls);
     REGISTER_TEST_CASE(source_repro_tests::generate_source_for_literal_list);
 }

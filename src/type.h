@@ -110,7 +110,8 @@ namespace type_t {
 
 bool is_type(Term* term);
 Type& as_type(Term* term);
-bool is_compound_type(Type const& type);
+bool is_compound_type(Term* type);
+bool is_native_type(Term* type);
 
 bool type_matches(Term *term, Term *type);
 

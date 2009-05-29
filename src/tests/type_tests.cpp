@@ -111,11 +111,35 @@ void test_value_fits_type()
     test_assert(value_fits_type(v5, t4)); // coercion again
 }
 
+void test_is_native_type()
+{
+    test_assert(is_native_type(INT_TYPE));
+    test_assert(is_native_type(STRING_TYPE));
+    test_assert(is_native_type(BOOL_TYPE));
+    test_assert(is_native_type(FLOAT_TYPE));
+    test_assert(is_native_type(TYPE_TYPE));
+    test_assert(is_native_type(FUNCTION_TYPE));
+}
+
+void test_to_string()
+{
+    // Test on some native types
+    test_equals(to_string(INT_TYPE), "<NativeType int>");
+    test_equals(to_string(FLOAT_TYPE), "<NativeType float>");
+    test_equals(to_string(BOOL_TYPE), "<NativeType bool>");
+    test_equals(to_string(STRING_TYPE), "<NativeType string>");
+    test_equals(to_string(TYPE_TYPE), "<NativeType Type>");
+
+    // to_string for compound types is handled in source_repro_tests.cpp
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
     REGISTER_TEST_CASE(type_tests::type_declaration);
     REGISTER_TEST_CASE(type_tests::test_value_fits_type);
+    REGISTER_TEST_CASE(type_tests::test_is_native_type);
+    REGISTER_TEST_CASE(type_tests::test_to_string);
 }
 
 } // namespace type_tests
