@@ -1,6 +1,12 @@
-Circa is a programming language designed to enable rapid development.
+Circa is a programming language designed for rapid development. Some features
+are: the ability to introspect and modify the code of a running program, builtin
+support for persistence and reloading, and the ability to generate (or recreate)
+source code text from compiled code.
 
-For more information about Circa and its features, visit http://andyfischer.github.com/circa
+There is a nice web site that talks about Circa in more detail here:
+http://andyfischer.github.com/circa
+
+Cuttlefish is an SDL-based game engine which tightly integrates with Circa.
 
 The current status of this project is pre-alpha. There are many known issues.
 It's not yet recommended for widespread consumption.
