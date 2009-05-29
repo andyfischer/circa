@@ -181,6 +181,12 @@ Term* bool_value(Branch* branch, bool b, std::string const& name)
     return term;
 }
 
+Branch& create_list(Branch* branch, std::string const& name)
+{
+    Term* term = create_value(branch, LIST_TYPE, name);
+    return as_branch(term);
+}
+
 void rewrite_as_value(Branch& branch, int index, Term* type)
 {
     while (index > branch.length())
