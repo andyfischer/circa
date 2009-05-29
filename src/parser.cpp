@@ -189,8 +189,6 @@ Term* statement(Branch& branch, TokenStream& tokens)
     // Consume a newline or ;
     if (tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON))
         result->stringProp("syntaxHints:lineEnding") = tokens.consume();
-    else
-        result->stringProp("syntaxHints:lineEnding") = "";
 
     // Mark this term as a statement
     set_is_statement(result, true);
