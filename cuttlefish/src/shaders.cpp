@@ -2,8 +2,11 @@
 
 #include "common_headers.h"
 
-#include "SDL_opengl.h"
+#include <SDL_opengl.h>
 
+#define SHADER_SUPPORT 0
+
+#if SHADER_SUPPORT
 GLuint load_shader(GLenum shaderType, std::string const& glslSource)
 {
     while (glGetError() != GL_NO_ERROR);
@@ -32,3 +35,4 @@ GLuint load_shader(GLenum shaderType, std::string const& glslSource)
 
     return shader;
 }
+#endif

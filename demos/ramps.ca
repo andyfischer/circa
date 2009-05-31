@@ -1,0 +1,16 @@
+
+background(0xeeeeeeff)
+
+block_width = 100
+
+def draw_piece(Point location, float rot)
+    half_block_width = block_width / 2
+
+    rotations = [rot-(PI*.75), rot-(PI*.25), rot+(PI*.25)]
+    
+    points = shape([[location.x-half_block_width location.y-half_block_width]
+            [location.x+half_block_width location.y-half_block_width]
+            [location.x-half_block_width location.y+half_block_width]] 0xff0000ff)
+end
+
+draw_piece([100 100], 0)
