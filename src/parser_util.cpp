@@ -182,7 +182,8 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
     while (!tokens.finished()) {
 
         // If we've passed our originalPosition and reached a newline, then stop
-        if (tokens.getPosition() > originalPosition && tokens.nextIs(tokenizer::NEWLINE))
+        if (tokens.getPosition() > originalPosition
+                && (tokens.nextIs(tokenizer::NEWLINE) || tokens.nextIs(tokenizer::SEMICOLON)))
             break;
 
         tokenizer::Token tok = tokens.consumet();

@@ -31,18 +31,11 @@ Ref compile(Branch* branch, ParsingStep step, std::string const& input)
     return result;
 }
 
-Term* compile_statement(Branch& branch, std::string const& input)
-{
-    TokenStream tokens(input);
-
-    return statement(branch, tokens);
-}
-
 Term* evaluate_statement(Branch& branch, std::string const& input)
 {
     int previousLastIndex = branch.length();
 
-    Term* result = compile_statement(branch, input);
+    Term* result = compile(&branch, parser::statement, input);
 
     // Evaluate all terms that were just created
     for (int i=previousLastIndex; i < branch.length(); i++)
@@ -141,7 +134,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
     Term* result = NULL;
 
     // Comment (blank lines count as comments)
-    if (tokens.nextIs(COMMENT) || tokens.nextIs(NEWLINE)) {
+    if (tokens.nextIs(COMMENT) || tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON)) {
         result = comment(branch, tokens);
         assert(result != NULL);
     }
@@ -198,12 +191,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
 
 Term* comment(Branch& branch, TokenStream& tokens)
 {
-    std::string commentText;
-
-    if (tokens.nextIs(COMMENT))
-        commentText = tokens.consume(COMMENT);
-    else if (tokens.nextIs(NEWLINE))
-        commentText = tokens.consume(NEWLINE);
+    std::string commentText = tokens.consume();
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
     result->stringProp("comment") = commentText;
@@ -425,10 +413,10 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     std::string postConditionWs = possible_whitespace(tokens);
 
-    if (!tokens.nextIs(NEWLINE))
+    if (!tokens.nextIs(NEWLINE) && !tokens.nextIs(SEMICOLON))
         return compile_error_for_line(branch, tokens, startPosition);
 
-    tokens.consume(NEWLINE);
+    tokens.consume();
 
     Term* result = apply(&branch, IF_FUNC, RefList(condition));
     alloc_value(result);
@@ -457,8 +445,13 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     possible_whitespace(tokens);
 
-    if (!tokens.nextIs(END))
+    if (!tokens.nextIs(END)) {
+        if (tokens.finished())
+            std::cout << "eof" << std::endl;
+        else
+        std::cout << "found: " << tokens.next().text << std::endl;
         return compile_error_for_line(branch, tokens, startPosition);
+    }
 
     tokens.consume(END);
 
