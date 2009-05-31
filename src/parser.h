@@ -11,7 +11,6 @@ typedef Term* (*ParsingStep)(Branch& branch, TokenStream& tokens);
 
 Ref compile(Branch* branch, ParsingStep step, std::string const& input);
 
-Term* compile_statement(Branch& branch, std::string const& input);
 Term* evaluate_statement(Branch& branch, std::string const& input);
 
 // Parsing steps:

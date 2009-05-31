@@ -115,7 +115,8 @@ void stateful_value_evaluation()
 {
     Branch branch;
     Term *i = branch.eval("state i = 2.0");
-    branch.eval("i = i + 1.0");
+
+    branch.compile("i = i + 1.0");
     wrap_up_branch(branch);
 
     test_equals(as_float(i), 2.0);

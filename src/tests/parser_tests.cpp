@@ -333,6 +333,39 @@ void test_function_decl_parse_error()
     test_assert(has_compile_error(t));
 }
 
+void test_semicolon_as_line_ending()
+{
+    Branch branch;
+    branch.compile("1;2;3");
+    test_assert(count_compile_errors(branch) == 0);
+    test_assert(branch.length() == 3);
+    test_assert(is_value(branch[0]));
+    test_assert(is_value(branch[1]));
+    test_assert(is_value(branch[2]));
+    test_assert(branch[0]->asInt() == 1);
+    test_assert(branch[1]->asInt() == 2);
+    test_assert(branch[2]->asInt() == 3);
+
+    branch.clear();
+    branch.compile("a = 1+2 ; b = mult(3,4) ; b -> print");
+    test_assert(count_compile_errors(branch) == 0);
+    test_assert(branch.length() == 7);
+    test_assert(branch["a"]->function == ADD_FUNC);
+    test_assert(branch["b"]->function == MULT_FUNC);
+
+    branch.clear();
+    branch.compile("cond = true; if cond; a = 1; else; a = 2; end");
+
+    print_compile_errors(branch, std::cout);
+    test_assert(count_compile_errors(branch) == 0);
+    evaluate_branch(branch);
+    test_assert(branch.contains("a"));
+    test_assert(branch["a"]->asInt() == 1);
+    branch["cond"]->asBool() = false;
+    evaluate_branch(branch);
+    test_assert(branch["a"]->asInt() == 2);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -357,6 +390,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_infix_whitespace);
     REGISTER_TEST_CASE(parser_tests::test_list_arguments);
     REGISTER_TEST_CASE(parser_tests::test_function_decl_parse_error);
+    REGISTER_TEST_CASE(parser_tests::test_semicolon_as_line_ending);
 }
 
 } // namespace parser_tests

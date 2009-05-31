@@ -149,7 +149,7 @@ std::string Branch::toString()
 Term*
 Branch::compile(std::string const& statement)
 {
-    return parser::compile_statement(*this, statement);
+    return parser::compile(this, parser::statement_list, statement);
 }
 
 void* Branch::alloc(Term* typeTerm)
