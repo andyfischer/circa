@@ -2,9 +2,9 @@
 
 #include "common_headers.h"
 
-#include "SDL.h"
-#include "SDL_image.h"
-#include "SDL_opengl.h"
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_opengl.h>
 
 GLenum get_texture_format(SDL_Surface *surface)
 {

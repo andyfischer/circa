@@ -1,12 +1,13 @@
 // Copyright 2008 Andrew Fischer
 
-#include <string>
+#include "common_headers.h"
 
-#include "SDL.h"
-#include "SDL_opengl.h"
+#include <SDL.h>
+#include <SDL_opengl.h>
 
-#include "circa.h"
+#include <circa.h>
 
+#include "gl_shapes.h"
 #include "input.h"
 #include "shaders.h"
 
@@ -21,16 +22,9 @@ Branch* SCRIPT_ROOT = NULL;
 Branch* USERS_BRANCH = NULL;
 bool CONTINUE_MAIN_LOOP = true;
 
-circa::RefList INFLUENCE_LIST;
-
-bool drag_in_progress = false;
-
 float TIME = 0;
 float ELAPSED = 0;
-long prev_sdl_ticks = 0;
-
-Ref THING_JUST_CLICKED;
-Ref MOUSE_CLICKED_FUNCTION;
+long PREV_SDL_TICKS = 0;
 
 void handle_key_press(SDL_Event event, int key)
 {
@@ -96,8 +90,9 @@ bool initialize_display()
 
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
- 
-    glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glDisable(GL_CULL_FACE);
+    glClearColor(0,0,0,0);
     glClearDepth(1000);
      
     glViewport( 0, 0, 640, 480 );
@@ -107,7 +102,7 @@ bool initialize_display()
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
      
-    glOrtho(0.0f, 640, 480, 0.0f, -1000.0f, 1000.0f);
+    glOrtho(0, 640, 480, 0, -1000.0f, 1000.0f);
         
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
@@ -115,6 +110,7 @@ bool initialize_display()
     return true;
 }
 
+/*
 void opengl_test()
 {
     static bool initialized = false;
@@ -145,7 +141,7 @@ void opengl_test()
     }
 
     glUseProgram(program);
-}
+}*/
 
 void main_loop()
 {
@@ -153,20 +149,19 @@ void main_loop()
 
     long ticks = SDL_GetTicks();
 
-    ELAPSED = (ticks - prev_sdl_ticks) / 1000.0;
+    ELAPSED = (ticks - PREV_SDL_TICKS) / 1000.0;
     TIME = ticks / 1000.0;
 
-    prev_sdl_ticks = ticks;
+    PREV_SDL_TICKS = ticks;
 
-    opengl_test();
-/*
+    glClear(GL_DEPTH_BUFFER_BIT);
+
     try {
         SCRIPT_ROOT->eval();
 
     } catch (std::exception &e) {
         std::cout << e.what() << std::endl;
     }
-*/
 
     // Update the screen
     SDL_GL_SwapBuffers();
@@ -183,6 +178,8 @@ int main( int argc, char* args[] )
 
     input::initialize(*SCRIPT_ROOT);
 
+    gl_shapes::register_functions(*SCRIPT_ROOT);
+
     // Import constants
     expose_value(SCRIPT_ROOT, &TIME, "time");
     expose_value(SCRIPT_ROOT, &ELAPSED, "elapsed");
@@ -196,14 +193,14 @@ int main( int argc, char* args[] )
     if (argc > 1) {
         std::string filename = args[1];
         std::cout << "Loading file: " << filename << std::endl;
-        circa::parse_script(*USERS_BRANCH, filename);
+        parse_script(*USERS_BRANCH, filename);
     }
 
     // Try to initialize display
     if (!initialize_display())
         return 1;
 
-    prev_sdl_ticks = SDL_GetTicks();
+    PREV_SDL_TICKS = SDL_GetTicks();
 
     // Main loop
     while (CONTINUE_MAIN_LOOP)

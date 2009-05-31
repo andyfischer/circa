@@ -137,7 +137,7 @@ if POSIX:
     SDL_ROOT['ENV']['PATH'] = os.environ['PATH']
     SDL_ROOT.ParseConfig('sdl-config --cflags')
     SDL_ROOT.ParseConfig('sdl-config --libs')
-    SDL_ROOT.Append(LIBS = ['SDL_gfx', 'SDL_image'])
+    SDL_ROOT.Append(LIBS = ['SDL_gfx','SDL_image'])
 
     if MAC:
         SDL_ROOT['FRAMEWORKS'] = ['OpenGL']
@@ -153,11 +153,11 @@ if WINDOWS:
         # unzip it
         unzip_file('SDL_deps.zip', '.')
 
-    SDL_ROOT.Append(CPPPATH=['#/SDL_deps/SDL-1.2.13/include'])
-    SDL_ROOT.Append(CPPPATH=['#/SDL_deps/SDL_gfx-2.0.19'])
-    SDL_ROOT.Append(LIBS=['#/SDL_deps/SDL-1.2.13/lib/SDL.lib'])
-    SDL_ROOT.Append(LIBS=['#/SDL_deps/SDL-1.2.13/lib/SDLmain.lib'])
-    SDL_ROOT.Append(LIBS=['#/SDL_deps/SDL_gfx-2.0.19/VisualC/Release/SDL_gfx.lib'])
+    SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL-1.2.13/include'])
+    SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL_gfx-2.0.19'])
+    SDL_ROOT.Append(LIBS=['#SDL_deps/SDL-1.2.13/lib/SDL.lib'])
+    SDL_ROOT.Append(LIBS=['#SDL_deps/SDL-1.2.13/lib/SDLmain.lib'])
+    SDL_ROOT.Append(LIBS=['#SDL_deps/SDL_gfx-2.0.19/VisualC/Release/SDL_gfx.lib'])
 
 
 SDL_ROOT.Append(CPPPATH=['#src'])
@@ -167,9 +167,6 @@ Export('SDL_ROOT')
 
 # Cuttlefish
 SConscript('cuttlefish/build.scons')
-#cuttlefish_bin = SDL_ROOT.Program('build/bin/cfsh', 'cuttlefish/main.cpp')
-#SDL_ROOT.Alias('cuttlefish', cuttlefish_bin)
-#SDL_ROOT.Alias('cfsh', cuttlefish_bin)
 
 # 'ptc', an optional app
 if os.path.exists('ptc'):
