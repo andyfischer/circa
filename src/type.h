@@ -24,7 +24,6 @@ struct Type
     typedef void (*DuplicateFunc)(Term* src, Term* dest);
     typedef void (*AssignFunc)(Term* src, Term* dest);
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
-    typedef bool (*LessThanFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
     typedef std::string (*ToStringFunc)(Term* term);
 
@@ -39,7 +38,6 @@ struct Type
     DeallocFunc dealloc;
     AssignFunc assign;
     EqualsFunc equals;
-    LessThanFunc lessThan;
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
     
@@ -64,7 +62,6 @@ struct Type
         alloc(NULL),
         dealloc(NULL),
         equals(NULL),
-        lessThan(NULL),
         remapPointers(NULL),
         toString(NULL),
         refCount(0)

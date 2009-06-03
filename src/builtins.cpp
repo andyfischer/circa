@@ -366,18 +366,15 @@ void initialize_builtin_types(Branch& kernel)
 {
     STRING_TYPE = import_type<std::string>(kernel, "string");
     as_type(STRING_TYPE).equals = cpp_importing::templated_equals<std::string>;
-    as_type(STRING_TYPE).lessThan = cpp_importing::templated_lessThan<std::string>;
     as_type(STRING_TYPE).toString = primitives::string_t::to_string;
 
     INT_TYPE = import_type<int>(kernel, "int");
     as_type(INT_TYPE).equals = cpp_importing::templated_equals<int>;
-    as_type(INT_TYPE).lessThan = cpp_importing::templated_lessThan<int>;
     as_type(INT_TYPE).toString = primitives::int_t::to_string;
 
     FLOAT_TYPE = import_type<float>(kernel, "float");
     as_type(FLOAT_TYPE).assign = primitives::float_t::assign;
     as_type(FLOAT_TYPE).equals = cpp_importing::templated_equals<float>;
-    as_type(FLOAT_TYPE).lessThan = cpp_importing::templated_lessThan<float>;
     as_type(FLOAT_TYPE).toString = primitives::float_t::to_string;
 
     BOOL_TYPE = import_type<bool>(kernel, "bool");
