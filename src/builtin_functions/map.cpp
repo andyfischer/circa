@@ -22,7 +22,7 @@ namespace map_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "map(Function,List) : List");
+        import_function(kernel, evaluate, "map(Function,List) : List");
     }
 }
 } // namespace circa

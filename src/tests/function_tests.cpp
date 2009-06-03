@@ -61,14 +61,11 @@ void test_inputs_fit_function()
 void overloaded_function()
 {
     Branch branch;
-    test_assert(find_named(&branch, "add") != NULL);
 
-    // TODO
-    return;
-
-    Term* my_add = branch.eval("def add(string s, int i) : string\nend");
-
-    test_assert(branch["add"]->type == OVERLOADED_FUNCTION_TYPE);
+    Term* i = branch.eval("add(1 2)");
+    test_equals(i->function->name, "add_i");
+    Term* f = branch.eval("add(1.0 2)");
+    test_equals(f->function->name, "add_f");
 }
 
 void register_tests()

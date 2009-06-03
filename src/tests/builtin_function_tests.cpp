@@ -134,6 +134,10 @@ void test_map()
     test_equals(result[2]->asFloat(), 9);
     test_equals(result[3]->asFloat(), 16);
     test_equals(result[4]->asFloat(), 25);
+
+    // Test with subroutines
+    branch.clear();
+    // TODO
 }
 
 void register_tests()
