@@ -45,6 +45,8 @@ Branch& create_list(Branch* branch, std::string const& name="");
 // index, then add NULL terms until it does.
 void rewrite_as_value(Branch& branch, int index, Term* type);
 
+//void rewrite(Branch& branch, int index, 
+
 } // namespace circa
 
 #endif
