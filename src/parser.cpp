@@ -222,7 +222,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
 
     tokens.consume();
 
-    Term* result = create_value(&branch, FUNCTION_TYPE, functionName);
+    Term* result = create_value(&branch, FUNCTION_TYPE);
     Function& func = as_function(result);
 
     func.name = functionName;
@@ -296,6 +296,8 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
 
     possible_whitespace(tokens);
     possible_newline(tokens);
+
+    result = name_function(branch, result, functionName);
 
     return result;
 }

@@ -47,6 +47,7 @@ Term* MAP_TYPE = NULL;
 Term* MULT_FUNC = NULL;
 Term* NOT_FUNC = NULL;
 Term* ONE_TIME_ASSIGN_FUNC = NULL;
+Term* OVERLOADED_FUNCTION_TYPE = NULL;
 Term* REF_TYPE = NULL;
 Term* SET_FIELD_FUNC = NULL;
 Term* SET_FIELD_BY_NAME_FUNC = NULL;
@@ -124,7 +125,6 @@ namespace primitives {
     }
 
     namespace string_t {
-
         std::string to_string(Term* term)
         {
             return std::string("'") + as_string(term) + "'";
@@ -255,7 +255,7 @@ namespace dict_t {
         out << "}";
         return out.str();
     }
-}
+} // namespace dict_t
 
 namespace any_t {
     std::string to_string(Term* term)
@@ -264,6 +264,10 @@ namespace any_t {
     }
 } // namespace any_t
 
+namespace overloaded_function_t {
+
+} // namespace overloaded_function_t
+
 void bootstrap_kernel()
 {
     // Here is what we need to create:
@@ -271,9 +275,9 @@ void bootstrap_kernel()
     // value() -> any
     //    Function used for all values
     // const-Type() -> Type
-    //    Function which returns a Type value. This is created by var-function-generator
+    //    Function which returns a Type value. This term has function value()
     // const-Function() -> Function
-    //    Function which returns a Function value. This is created by var-function-generator.
+    //    Function which returns a Function value. This term has function value()
     // Type Function
     //    Stores the Type object for functions. This term has function const-Type
     // Type Type
@@ -416,6 +420,8 @@ void initialize_builtin_types(Branch& kernel)
 
     SUBROUTINE_TYPE = create_compound_type(kernel, "Subroutine");
     as_type(SUBROUTINE_TYPE).toString = subroutine_t::to_string;
+
+    OVERLOADED_FUNCTION_TYPE = create_compound_type(kernel, "OverloadedFunction");
 
     feedback_register_constants(kernel);
 }

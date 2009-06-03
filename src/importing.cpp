@@ -6,7 +6,7 @@ namespace circa {
 
 Term* import_function(Branch& branch, Function::EvaluateFunc evaluate, std::string const& header)
 {
-    Term* result = create_empty_function(branch, header);
+    Term* result = parser::compile(&branch, parser::function_from_header, header);
     as_function(result).evaluate = evaluate;
     return result;
 }

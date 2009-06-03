@@ -121,6 +121,19 @@ Function& as_function(Term* term)
     return *((Function*) term->value);
 }
 
+Term* name_function(Branch& branch, Term* functionValue, std::string const& name)
+{
+    Term* existing = find_named(&branch, name);
+
+    if (existing == NULL) {
+        branch.bindName(functionValue, name);
+        return functionValue;
+    }
+
+    // Create an OverloadedFunction value
+    assert(false);
+}
+
 std::string get_placeholder_name_for_index(int index)
 {
     std::stringstream sstream;
@@ -128,9 +141,10 @@ std::string get_placeholder_name_for_index(int index)
     return sstream.str();
 }
 
-Term* create_empty_function(Branch& branch, std::string const& header)
+bool is_callable(Term* term)
 {
-    return parser::compile(&branch, parser::function_from_header, header);
+    return (term->type == FUNCTION_TYPE)
+        || (term->type == SUBROUTINE_TYPE);
 }
 
 } // namespace circa
