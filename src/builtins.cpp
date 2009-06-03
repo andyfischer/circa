@@ -264,10 +264,6 @@ namespace any_t {
     }
 } // namespace any_t
 
-namespace overloaded_function_t {
-
-} // namespace overloaded_function_t
-
 void bootstrap_kernel()
 {
     // Here is what we need to create:
@@ -426,6 +422,13 @@ void initialize_builtin_types(Branch& kernel)
     feedback_register_constants(kernel);
 }
 
+void setup_builtin_function_overloads(Branch& kernel)
+{
+    ADD_FUNC = create_value(&kernel, OVERLOADED_FUNCTION_TYPE, "add");
+    create_ref(&as_branch(ADD_FUNC), kernel["add_i"]);
+    create_ref(&as_branch(ADD_FUNC), kernel["add_f"]);
+}
+
 void initialize_constants(Branch& kernel)
 {
     float_value(&kernel, M_PI, "PI");
@@ -439,6 +442,7 @@ void initialize()
     bootstrap_kernel();
     initialize_builtin_types(*KERNEL);
     setup_builtin_functions(*KERNEL);
+    setup_builtin_function_overloads(*KERNEL);
     initialize_constants(*KERNEL);
 }
 

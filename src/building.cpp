@@ -20,6 +20,9 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
         function = VALUE_FUNC;
     }
 
+    // Check to specialize function
+    function = specialize_function(function, inputs);
+
     Function& func = get_function_data(function);
 
     // If 'function' has hidden state, then create a container for that state, if needed
@@ -103,7 +106,9 @@ Term* apply(Branch* branch, std::string const& functionName, RefList const& inpu
     if (function == NULL)
         throw std::runtime_error("function not found: "+functionName);
 
-    return apply(branch, function, inputs, name);
+    Term* result = apply(branch, function, inputs, name);
+    result->stringProp("syntaxHints:functionName") = functionName;
+    return result;
 }
 
 Term* create_value(Branch* branch, Term* type, std::string const& name)
@@ -178,6 +183,13 @@ Term* bool_value(Branch* branch, bool b, std::string const& name)
 {
     Term* term = create_value(branch, BOOL_TYPE, name);
     as_bool(term) = b;
+    return term;
+}
+
+Term* create_ref(Branch* branch, Term* ref, std::string const& name)
+{
+    Term* term = create_value(branch, REF_TYPE, name);
+    deref(term) = ref;
     return term;
 }
 

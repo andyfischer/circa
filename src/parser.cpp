@@ -297,7 +297,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
     possible_newline(tokens);
 
-    result = name_function(branch, result, functionName);
+    branch.bindName(result, functionName);
 
     return result;
 }
@@ -986,8 +986,9 @@ Term* function_call(Branch& branch, TokenStream& tokens)
     
     Term* result = find_and_apply(branch, functionName, inputs);
 
-    if (functionName != result->function->name)
+    if (functionName != result->function->name) {
         result->stringProp("syntaxHints:functionName") = functionName;
+    }
 
     listHints.apply(result);
 

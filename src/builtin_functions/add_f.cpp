@@ -3,7 +3,7 @@
 #include <circa.h>
 
 namespace circa {
-namespace add_function {
+namespace add_f_function {
 
     void evaluate(Term* caller)
     {
@@ -26,17 +26,14 @@ namespace add_function {
             Term* outputTarget = target->input(i);
             float balanced_delta = delta * get_feedback_weight(output);
             as_float(output) = to_float(outputTarget) + balanced_delta;
-
-            //std::cout << "for " << format_global_id(output) << ", weight = "
-            //    << get_feedback_weight(output) << ", delta = " << delta << std::endl;
         }
     }
 
     void setup(Branch& kernel)
     {
-        ADD_FUNC = import_function(kernel, evaluate, "add(float...) : float");
-        as_function(ADD_FUNC).pureFunction = true;
-        as_function(ADD_FUNC).feedbackFunc = 
+        Term* func = import_function(kernel, evaluate, "add_f(float...) : float");
+        as_function(func).pureFunction = true;
+        as_function(func).feedbackFunc = 
             import_function(kernel, feedback_evaluate, "add_feedback(any, float) : Branch");
     }
 }

@@ -69,14 +69,11 @@ namespace function_t {
 bool is_function(Term* term);
 Function& as_function(Term*);
 
-// This assigns the given name to this function, and returns a term that
-// represents the function. Because overloading might take place, the term
-// that you receive might be a brand new term.
-Term* name_function(Branch& branch, Term* functionValue, std::string const& name);
-
 std::string get_placeholder_name_for_index(int index);
 
 bool is_callable(Term* term);
+bool inputs_fit_function(Term* func, RefList const& inputs);
+Term* specialize_function(Term* func, RefList const& inputs);
 
 } // namespace circa
 

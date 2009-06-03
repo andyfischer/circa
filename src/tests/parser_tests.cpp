@@ -76,14 +76,14 @@ void test_name_binding()
 void test_function_call()
 {
     Branch branch;
-    parser::compile(&branch, parser::statement, "add(1.0,2.0)");
+    parser::compile(&branch, parser::statement, "add_f(1.0,2.0)");
     test_assert(branch.length() == 3);
     test_assert(is_value(branch[0]));
     test_assert(branch[0]->asFloat() == 1.0);
     test_assert(is_value(branch[1]));
     test_assert(branch[1]->asFloat() == 2.0);
 
-    test_assert(branch[2]->function == ADD_FUNC);
+    test_assert(branch[2]->function->name == "add_f");
     test_assert(branch[2]->input(0) == branch[0]);
     test_assert(branch[2]->input(1) == branch[1]);
 }
@@ -123,7 +123,7 @@ void test_infix()
     test_assert(branch.length() == 3);
     test_assert(branch[0]->asFloat() == 1.0);
     test_assert(branch[1]->asFloat() == 2.0);
-    test_assert(branch[2]->function == ADD_FUNC);
+    test_assert(branch[2]->function->name == "add_f");
     test_assert(branch[2]->input(0) == branch[0]);
     test_assert(branch[2]->input(1) == branch[1]);
 
@@ -286,7 +286,7 @@ void test_rebinding_infix_operator()
     Term* i = branch.eval("i += 1.0");
 
     test_assert(branch["i"] == i);
-    test_assert(i->function == ADD_FUNC);
+    test_assert(i->function->name == "add_f");
     test_assert(i->name == "i");
     test_assert(i->input(0)->name == "i");
 }
@@ -350,7 +350,7 @@ void test_semicolon_as_line_ending()
     branch.compile("a = 1+2 ; b = mult(3,4) ; b -> print");
     test_assert(count_compile_errors(branch) == 0);
     test_assert(branch.length() == 7);
-    test_assert(branch["a"]->function == ADD_FUNC);
+    test_assert(branch["a"]->function->name == "add_i");
     test_assert(branch["b"]->function == MULT_FUNC);
 
     branch.clear();
