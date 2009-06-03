@@ -6,19 +6,12 @@ namespace circa {
 
 Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string const& name)
 {
+    // Check if 'function' is actually a type
+    if (is_type(function))
+        return create_value(branch, function, name);
+
     // Make a local copy of _inputs
     RefList inputs = _inputs;
-
-    // Check if 'function' is actually a type
-    Term* valueType = NULL;
-    if (is_type(function))
-    {
-        if (inputs.count() != 0)
-            throw std::runtime_error("Inputs in constructor function is not yet supported");
-
-        valueType = function;
-        function = VALUE_FUNC;
-    }
 
     // Check to specialize function
     function = specialize_function(function, inputs);
@@ -57,10 +50,6 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     // specialize on inputs, but it might be cool to specialize on state too.
     if (func.specializeType != NULL)
         outputType = func.specializeType(result);
-
-    // If we were called with a type, then use that type
-    if (valueType != NULL)
-        outputType = valueType;
 
     assert(outputType != NULL);
     assert(is_type(outputType));
