@@ -20,6 +20,11 @@ Term* import_member_function(Term* type, Function::EvaluateFunc evaluate, std::s
     return result;
 }
 
+Term* import_function_overload(Term* overload, Function::EvaluateFunc evaluate, std::string const& header)
+{
+    return import_function(as_branch(overload), evaluate, header);
+}
+
 Term* expose_value(Branch* branch, void* value, Term* type, std::string const& name)
 {
     Term* term = apply(branch, VALUE_FUNC, RefList(), name);

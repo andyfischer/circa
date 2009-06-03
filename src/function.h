@@ -73,6 +73,7 @@ std::string get_placeholder_name_for_index(int index);
 
 bool is_callable(Term* term);
 bool inputs_fit_function(Term* func, RefList const& inputs);
+Term* create_overloaded_function(Branch* branch, std::string const& name);
 Term* specialize_function(Term* func, RefList const& inputs);
 
 } // namespace circa

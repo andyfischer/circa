@@ -5,25 +5,23 @@
 namespace circa {
 namespace greater_than_function {
 
-    void evaluate(Term* caller)
+    void evaluate_i(Term* caller)
     {
-        Term* input0 = caller->input(0);
-        Term* input1 = caller->input(1);
+        as_bool(caller) = as_int(caller->input(0)) > as_int(caller->input(1));
+    }
 
-        Type &type = as_type(input0->type);
-
-        if (type.lessThan == NULL) {
-            error_occurred(caller, "greaterThan not defined");
-            return;
-        }
-
-        as_bool(caller) = !type.lessThan(input0, input1);
+    void evaluate_f(Term* caller)
+    {
+        as_bool(caller) = to_float(caller->input(0)) > to_float(caller->input(1));
     }
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "greater_than(any,any) : bool");
-        as_function(main_func).pureFunction = true;
+        Term* main = create_overloaded_function(&kernel, "greater_than");
+        Term* gt_i = import_function_overload(main, evaluate_f, "greater_than(int,int) : bool");
+        as_function(gt_i).pureFunction = true;
+        Term* gt_f = import_function_overload(main, evaluate_f, "greater_than(float,float) : bool");
+        as_function(gt_f).pureFunction = true;
     }
 }
 }
