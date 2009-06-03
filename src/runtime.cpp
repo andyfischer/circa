@@ -232,6 +232,11 @@ bool is_string(Term* term)
     return term->type == STRING_TYPE;
 }
 
+bool is_ref(Term* term)
+{
+    return term->type == REF_TYPE;
+}
+
 Ref& deref(Term* term)
 {
     assert_type(term, REF_TYPE);

@@ -32,8 +32,9 @@ float& as_float(Term*);
 float to_float(Term*);
 bool& as_bool(Term*);
 std::string& as_string(Term*);
-
 Ref& deref(Term*);
+
+bool is_ref(Term* term);
 bool is_int(Term* term);
 bool is_float(Term* term);
 bool is_bool(Term* term);

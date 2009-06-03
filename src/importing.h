@@ -14,7 +14,11 @@ namespace circa {
 // Example function header: "function do-something(int, string) -> int"
 Term* import_function(Branch& branch, Function::EvaluateFunc func, std::string const& header);
 
-Term* import_member_function(Term* type, Function::EvaluateFunc evaluate, std::string const& headerText);
+Term* import_function_overload(Term* overload, Function::EvaluateFunc evaluate,
+        std::string const& header);
+
+Term* import_member_function(Term* type, Function::EvaluateFunc evaluate,
+        std::string const& headerText);
 
 // Import the given value into this branch with the given name. We won't allocate
 // a copy of this value, we'll use the address provided. The caller must ensure

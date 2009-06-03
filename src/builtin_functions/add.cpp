@@ -3,9 +3,17 @@
 #include <circa.h>
 
 namespace circa {
-namespace add_f_function {
+namespace add_function {
 
-    void evaluate(Term* caller)
+    void evaluate_i(Term* caller)
+    {
+        int result = 0;
+        for (int i=0; i < caller->numInputs(); i++)
+            result += as_int(caller->input(i));
+        as_int(caller) = result;
+    }
+
+    void evaluate_f(Term* caller)
     {
         float result = 0.0;
         for (int i=0; i < caller->numInputs(); i++)
@@ -31,10 +39,18 @@ namespace add_f_function {
 
     void setup(Branch& kernel)
     {
-        Term* func = import_function(kernel, evaluate, "add_f(float...) : float");
-        as_function(func).pureFunction = true;
-        as_function(func).feedbackFunc = 
+        ADD_FUNC = create_overloaded_function(&kernel, "add");
+
+        Term* add_i = import_function_overload(ADD_FUNC, evaluate_i, "add_i(int...) : int");
+        as_function(add_i).pureFunction = true;
+
+        Term* add_f = import_function_overload(ADD_FUNC, evaluate_f, "add_f(float...) : float");
+        as_function(add_f).pureFunction = true;
+        as_function(add_f).feedbackFunc = 
             import_function(kernel, feedback_evaluate, "add_feedback(any, float) : Branch");
+
+        kernel.bindName(add_f, "add_f");
+        kernel.bindName(add_i, "add_i");
     }
 }
 }

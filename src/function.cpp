@@ -164,13 +164,19 @@ bool inputs_fit_function(Term* func, RefList const& inputs)
     return true;
 }
 
+Term* create_overloaded_function(Branch* branch, std::string const& name)
+{
+    return create_value(branch, OVERLOADED_FUNCTION_TYPE, name);
+}
+
 Term* specialize_function(Term* func, RefList const& inputs)
 {
     if (func->type == OVERLOADED_FUNCTION_TYPE) {
         // Find a match among possible overloads
         Branch& overloads = as_branch(func);
         for (int i=0; i < overloads.length(); i++) {
-            Term* func = deref(overloads[i]);
+            Term* func = overloads[i];
+            if (is_ref(func)) func = deref(func);
             if (inputs_fit_function(func, inputs))
                 return func;
         }
