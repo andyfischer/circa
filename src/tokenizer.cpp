@@ -498,8 +498,8 @@ void consume_comment(TokenizeContext& context)
         text << context.consume();
 
     // consume the newline
-    if (!context.finished())
-        text << context.consume();
+    //if (!context.finished())
+    //    text << context.consume();
 
     context.push(COMMENT, text.str());
 }

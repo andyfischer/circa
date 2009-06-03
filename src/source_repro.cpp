@@ -194,6 +194,8 @@ std::string get_branch_source(Branch& branch)
 {
     std::stringstream result;
 
+    bool lineEndingNeeded = false;
+
     for (int i=0; i < branch.length(); i++) {
 
         Term* term = branch[i];
@@ -201,10 +203,17 @@ std::string get_branch_source(Branch& branch)
         if (!should_print_term_source_line(term))
             continue;
 
-        std::string defaultLineEnding = (i+1 == branch.length()) ? "" : "\n";
+        if (lineEndingNeeded) {
+            result << "\n";
+            lineEndingNeeded = false;
+        }
 
-        result << get_term_source(term) << term->stringPropOptional("syntaxHints:lineEnding",
-                defaultLineEnding);
+        result << get_term_source(term);
+        
+        if (term->hasProperty("syntaxHints:lineEnding"))
+            result << term->stringProp("syntaxHints:lineEnding");
+        else
+            lineEndingNeeded = true;
     }
 
     return result.str();

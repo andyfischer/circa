@@ -207,16 +207,16 @@ namespace type_t {
         // FIXME
         // delete reinterpret_cast<Type*>(data);
     }
-    std::string to_string(Term *caller)
+    std::string to_string(Term* term)
     {
-        Type& type = as_type(caller);
-        if (is_native_type(caller))
-            return "<NativeType " + caller->name + ">";
+        Type& type = as_type(term);
+        if (is_native_type(term))
+            return "<NativeType " + term->name + ">";
 
         // Generate source for a Type declaration
         std::stringstream out;
 
-        out << "type " << caller->name << " { ";
+        out << "type " << term->name << " { ";
 
         for (int i=0; i < type.fields.length(); i++) {
             Term* field = type.fields[i];

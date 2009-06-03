@@ -191,7 +191,10 @@ Term* statement(Branch& branch, TokenStream& tokens)
 
 Term* comment(Branch& branch, TokenStream& tokens)
 {
-    std::string commentText = tokens.consume();
+    std::string commentText;
+   
+    if (!tokens.nextIs(NEWLINE))
+        commentText = tokens.consume();
 
     Term* result = apply(&branch, COMMENT_FUNC, RefList());
     result->stringProp("comment") = commentText;
