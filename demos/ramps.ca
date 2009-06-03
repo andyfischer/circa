@@ -1,6 +1,16 @@
 
 background(0xeeeeeeff)
 
+def rotate_points_around(List points, Point center, float rot) : List
+    def rotate_point(Point point) : Point
+        point = point - center
+        point = [point.x * (cos(rot) + sin(rot)), point.y * (cos(rot) - sin(rot))]
+        point = point + center
+        return point
+    end
+    return map(rotate_point, points)
+end
+
 def draw_piece(Point location, float rot)
     shape = [[0 0] [1 0] [0 1]]
     rotate_around(@shape, [.5 .5] rot)

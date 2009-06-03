@@ -119,6 +119,23 @@ void test_range()
     test_assert(as_branch(t).length() == 5);
 }
 
+void test_map()
+{
+    Branch branch;
+    Term* t = branch.eval("map(sqr, [1 2 3 4 5])");
+
+    test_assert(t);
+
+    Branch& result = as_branch(t);
+
+    test_assert(result.length() == 5);
+    test_equals(result[0]->asFloat(), 1);
+    test_equals(result[1]->asFloat(), 4);
+    test_equals(result[2]->asFloat(), 9);
+    test_equals(result[3]->asFloat(), 16);
+    test_equals(result[4]->asFloat(), 25);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
@@ -130,6 +147,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_list);
     REGISTER_TEST_CASE(builtin_function_tests::test_range);
+    REGISTER_TEST_CASE(builtin_function_tests::test_map);
 }
 
 } // namespace builtin_function_tests
