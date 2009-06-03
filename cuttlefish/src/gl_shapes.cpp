@@ -25,7 +25,7 @@ void background(Term* caller)
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void shape(Term* caller)
+void gl_triangles(Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
     int color = caller->input(1)->asInt();
@@ -48,7 +48,7 @@ void shape(Term* caller)
 void register_functions(Branch& branch)
 {
     import_function(branch, background, "background(int)");
-    import_function(branch, shape, "shape(List, int)");
+    import_function(branch, gl_triangles, "gl_triangles(List, int)");
 }
 
 } // namespace gl_shapes
