@@ -36,10 +36,10 @@ void test_find_equivalent()
 {
     Branch branch;
 
-    Term* add_func = branch.eval("add");
+    Term* add_func = branch.eval("add_f");
     Term* a = branch.eval("a = 1.0");
     Term* b = branch.eval("b = 1.0");
-    Term* addition = branch.eval("add(a,b)");
+    Term* addition = branch.eval("add_f(a,b)");
 
     test_assert(is_equivalent(addition, add_func, RefList(a,b)));
 

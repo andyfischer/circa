@@ -118,7 +118,9 @@ void test_runtime_type_error()
 {
     // this test might become invalid when compile-time type checking is added
     Branch branch;
-    Term* term = branch.eval("add('hello', true)");
+    Term* a = branch.eval("a = 1");
+    Term* term = branch.eval("add(a, 2)");
+    change_type(a, STRING_TYPE);
     evaluate_term(term);
     test_assert(term->hasError);
 

@@ -121,19 +121,6 @@ Function& as_function(Term* term)
     return *((Function*) term->value);
 }
 
-Term* name_function(Branch& branch, Term* functionValue, std::string const& name)
-{
-    Term* existing = find_named(&branch, name);
-
-    if (existing == NULL) {
-        branch.bindName(functionValue, name);
-        return functionValue;
-    }
-
-    // Create an OverloadedFunction value
-    assert(false);
-}
-
 std::string get_placeholder_name_for_index(int index)
 {
     std::stringstream sstream;
@@ -141,10 +128,57 @@ std::string get_placeholder_name_for_index(int index)
     return sstream.str();
 }
 
+Term* function_get_input_type(Term* func, int index)
+{
+    Function& data = get_function_data(func);
+
+    if (data.variableArgs)
+        return data.inputType(0);
+    else
+        return data.inputType(index);
+}
+
 bool is_callable(Term* term)
 {
     return (term->type == FUNCTION_TYPE)
-        || (term->type == SUBROUTINE_TYPE);
+        || (term->type == SUBROUTINE_TYPE)
+        || (term->type == OVERLOADED_FUNCTION_TYPE);
+}
+
+bool inputs_fit_function(Term* func, RefList const& inputs)
+{
+    Function& data = get_function_data(func);
+
+    // Fail if wrong # of inputs
+    if (!data.variableArgs && (data.numInputs() != inputs.length()))
+        return false;
+
+    for (int i=0; i < inputs.length(); i++) {
+        Term* type = function_get_input_type(func, i);
+        if (inputs[i] == NULL)
+            continue;
+        if (!value_fits_type(inputs[i], type))
+            return false;
+    }
+
+    return true;
+}
+
+Term* specialize_function(Term* func, RefList const& inputs)
+{
+    if (func->type == OVERLOADED_FUNCTION_TYPE) {
+        // Find a match among possible overloads
+        Branch& overloads = as_branch(func);
+        for (int i=0; i < overloads.length(); i++) {
+            Term* func = deref(overloads[i]);
+            if (inputs_fit_function(func, inputs))
+                return func;
+        }
+
+        return UNKNOWN_FUNCTION;
+    } else {
+        return func;
+    }
 }
 
 } // namespace circa

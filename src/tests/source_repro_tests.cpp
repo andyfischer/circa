@@ -210,7 +210,7 @@ void generate_source_for_function_calls() {
 
     Term* a = int_value(&branch, 5, "a");
     Term* b = int_value(&branch, 9, "b");
-    Term* c = apply(&branch, ADD_FUNC, RefList(a,b));
+    Term* c = apply(&branch, "add", RefList(a,b));
 
     test_assert(should_print_term_source_line(a));
     test_assert(should_print_term_source_line(b));
@@ -221,7 +221,7 @@ void generate_source_for_function_calls() {
     branch.clear();
     Term* d = int_value(&branch, 3);
     Term* e = int_value(&branch, 4);
-    Term* f = apply(&branch, ADD_FUNC, RefList(d,e));
+    Term* f = apply(&branch, "add", RefList(d,e));
 
     test_assert(!should_print_term_source_line(d));
     test_assert(!should_print_term_source_line(e));
@@ -235,7 +235,7 @@ void generate_source_for_function_calls() {
     branch.compile("b = 2");
     a = int_value(&branch, 3, "c");
     b = int_value(&branch, 4, "d");
-    apply(&branch, ADD_FUNC, RefList(a,b));
+    apply(&branch, "add", RefList(a,b));
 
     test_equals(get_branch_source(branch), "a = 1\nb = 2\nc = 3\nd = 4\nadd(c, d)");
 }

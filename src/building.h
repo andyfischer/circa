@@ -37,7 +37,7 @@ Term* string_value(Branch* branch, std::string const& s, std::string const& name
 Term* int_value(Branch* branch, int i, std::string const& name="");
 Term* float_value(Branch* branch, float f, std::string const& name="");
 Term* bool_value(Branch* branch, bool b, std::string const& name="");
-
+Term* create_ref(Branch* branch, Term* ref, std::string const& name="");
 Branch& create_list(Branch* branch, std::string const& name="");
 
 // Make sure that branch[index] is a value with the given type. If that term exists and
