@@ -24,7 +24,7 @@ struct Branch
 
     Branch& operator=(Branch const& b);
 
-    int length() const { return (int) _terms.count(); }
+    int length() const { return _terms.length(); }
 
     Term* get(int index) const { return _terms[index]; }
     Ref& get(int index) { return _terms[index]; }

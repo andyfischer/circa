@@ -8,7 +8,7 @@ namespace circa {
 
 int get_first_visible_input_index(Term* term)
 {
-    if (has_hidden_state(get_function_data(term->function)))
+    if (function_has_hidden_state(term->function))
         return 1;
     else
         return 0;

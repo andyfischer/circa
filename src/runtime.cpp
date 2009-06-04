@@ -39,9 +39,9 @@ void evaluate_term(Term* term)
         return;
 
     // Check # of inputs
-    if (!func.variableArgs && ((int)term->inputs.count() != func.numInputs())) {
+    if (!func.variableArgs && (term->inputs.length() != func.numInputs())) {
         std::stringstream msg;
-        msg << "Wrong number of inputs (found " << term->inputs.count();
+        msg << "Wrong number of inputs (found " << term->inputs.length();
         msg << ", expected " << func.numInputs() << ")";
         error_occurred(term, msg.str());
         return;
@@ -53,7 +53,7 @@ void evaluate_term(Term* term)
     //  3) it has a non-null value
     //  4) it has no errors
     //  5) it has the correct type
-    for (unsigned int inputIndex=0; inputIndex < term->inputs.count(); inputIndex++)
+    for (unsigned int inputIndex=0; inputIndex < term->inputs.length(); inputIndex++)
     {
         int effectiveIndex = inputIndex;
         if (func.variableArgs)
@@ -115,8 +115,7 @@ void evaluate_term(Term* term)
 
 void evaluate_branch(Branch& branch, Term* errorListener)
 {
-    int count = branch.length();
-    for (int index=0; index < count; index++) {
+    for (int index=0; index < branch.length(); index++) {
 		Term* term = branch.get(index);
         evaluate_term(term);
 

@@ -24,7 +24,7 @@ void create()
     test_assert(func.name == "mysub");
 
     test_assert(identity_equals(func.inputTypes[0], INT_TYPE));
-    test_assert(func.inputTypes.count() == 1);
+    test_assert(func.inputTypes.length() == 1);
     test_assert(identity_equals(func.outputType, STRING_TYPE));
 }
 

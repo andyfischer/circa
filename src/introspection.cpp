@@ -21,7 +21,7 @@ bool is_actually_using(Term* user, Term* usee)
     if (user->function == usee)
         return true;
 
-    for (unsigned int i=0; i < user->inputs.count(); i++) {
+    for (int i=0; i < user->inputs.length(); i++) {
         if (user->inputs[i] == usee)
             return true;
     }
@@ -77,7 +77,7 @@ std::string term_to_raw_string(Term* term)
     output << funcName << "(";
 
     bool first_input = true;
-    for (unsigned int input_index=0; input_index < term->inputs.count(); input_index++) {
+    for (int input_index=0; input_index < term->inputs.length(); input_index++) {
         Term* input = term->inputs[input_index];
         if (!first_input) output << ", ";
         output << format_global_id(input);
@@ -161,9 +161,9 @@ bool is_equivalent(Term* target, Term* function, RefList const& inputs)
         return false;
 
     // Check inputs
-    unsigned int numInputs = target->inputs.count();
+    int numInputs = target->inputs.length();
 
-    if (numInputs != inputs.count())
+    if (numInputs != inputs.length())
         return false;
 
     for (unsigned int i=0; i < numInputs; i++) {
@@ -324,7 +324,7 @@ RefList get_involved_terms(RefList inputs, RefList outputs)
 
         RefList new_layer;
 
-        for (unsigned int i=0; i < top.count(); i++) {
+        for (int i=0; i < top.length(); i++) {
             for (int input_i=0; input_i < top[i]->numInputs(); input_i++) {
                 Term* input = top[i]->input(input_i);
                 
@@ -349,7 +349,7 @@ RefList get_involved_terms(RefList inputs, RefList outputs)
     while (!stack.empty()) {
         RefList &layer = stack.back();
 
-        for (unsigned int i=0; i < layer.count(); i++) {
+        for (int i=0; i < layer.length(); i++) {
             Term* term = layer[i];
             for (int input_i=0; input_i < term->numInputs(); input_i++) {
                 Term* input = term->input(input_i);

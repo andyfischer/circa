@@ -63,14 +63,15 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
     }
 }
 
-bool has_hidden_state(Function& func)
+bool function_has_hidden_state(Term* func)
 {
-    return func.hiddenStateType != NULL && func.hiddenStateType != VOID_TYPE;
+    Term* hiddenStateType = get_function_data(func).hiddenStateType;
+    return hiddenStateType != NULL && hiddenStateType != VOID_TYPE;
 }
 
 Term* get_hidden_state_for_call(Term* term)
 {
-    if (has_hidden_state(get_function_data(term->function))) {
+    if (function_has_hidden_state(term->function)) {
         assert(term->input(0) != NULL);
         return term->input(0);
     } else

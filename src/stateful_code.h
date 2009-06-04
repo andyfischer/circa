@@ -19,7 +19,7 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type);
 // If a function has 'hidden state', it means that every call to this function should
 // create a hidden stateful value term, and it should be passed as a hidden 0th argument.
 // The function call will probably modify this term during its call.
-bool has_hidden_state(Function& func);
+bool function_has_hidden_state(Term* func);
 
 Term* get_hidden_state_for_call(Term* term);
 

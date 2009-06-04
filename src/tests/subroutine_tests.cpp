@@ -63,7 +63,7 @@ void subroutine_stateful_term()
     Term* call = branch.eval("mysub()");
     test_assert(call);
     test_assert(get_function_data(branch["mysub"]).hiddenStateType != VOID_TYPE);
-    test_assert(has_hidden_state(get_function_data(branch["mysub"])));
+    test_assert(function_has_hidden_state(branch["mysub"]));
     test_assert(get_hidden_state_for_call(call) != NULL);
     Term* a_inside_call = get_hidden_state_for_call(call)->field("a");
     test_equals(as_float(a_inside_call), 1);

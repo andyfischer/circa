@@ -89,7 +89,7 @@ struct RefList
     // Add 'term' to this list, if it's not in the list already
     void appendUnique(Term* term)
     {
-        for (unsigned int i=0; i < count(); i++)
+        for (int i=0; i < length(); i++)
             if (get(i) == term)
                 return;
 
@@ -132,7 +132,6 @@ struct RefList
     void removeNulls() { remove((Term*)NULL); }
     void clear() { _items.clear(); }
 
-    size_t count() const { return _items.size(); } // TODO: remove count() in favor of length
     int length() const { return (int) _items.size(); }
     bool empty() const { return _items.empty(); }
     Term* get(unsigned int index) const
@@ -144,7 +143,7 @@ struct RefList
 
     bool contains(Term* term) const
     {
-        for (unsigned int i=0; i < count(); i++)
+        for (int i=0; i < length(); i++)
             if (get(i) == term)
                 return true;
         return false;
@@ -155,10 +154,10 @@ struct RefList
 
     bool operator==(RefList const& b)
     {
-        if (count() != b.count())
+        if (length() != b.length())
             return false;
 
-        for (unsigned int i=0; i < count(); i++)
+        for (int i=0; i < length(); i++)
             if (get(i) != b.get(i))
                 return false;
 
@@ -167,7 +166,7 @@ struct RefList
 
     int findIndex(Term* term)
     {
-        for (unsigned int i=0; i < count(); i++)
+        for (int i=0; i < length(); i++)
             if (_items[i] == term)
                 return i;
         return -1;

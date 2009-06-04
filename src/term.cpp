@@ -35,7 +35,7 @@ Term::input(int index) const
 int
 Term::numInputs() const
 {
-    return this->inputs.count();
+    return this->inputs.length();
 }
 
 std::string
