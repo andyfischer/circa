@@ -55,8 +55,8 @@ void subroutine_expansion_during_migrate()
     Term* sourceCall = source.eval("myfunc()");
     Term* destCall = dest.compile("myfunc()");
 
-    Term* sourceCallState = get_state_for_subroutine_call(sourceCall);
-    Term* destCallState = get_state_for_subroutine_call(destCall);
+    Term* sourceCallState = get_hidden_state_for_call(sourceCall);
+    Term* destCallState = get_hidden_state_for_call(destCall);
 
     test_assert(is_subroutine_state_expanded(sourceCallState));
     test_assert(!is_subroutine_state_expanded(destCallState));
@@ -65,7 +65,7 @@ void subroutine_expansion_during_migrate()
 
     migrate_stateful_values(source, dest);
 
-    test_assert(is_subroutine_state_expanded(get_state_for_subroutine_call(destCall)));
+    test_assert(is_subroutine_state_expanded(get_hidden_state_for_call(destCall)));
     test_assert(destCallState->field("i")->asInt() == 111);
 }
 
@@ -209,15 +209,21 @@ void state_inside_lots_of_nested_functions()
     import_function(branch, _unique_output, "unique_output() : int");
     import_function(branch, _spy, "spy(int)");
 
-    branch.compile("def func1()\nstate s = unique_output()\nspy(s)\nend");
-    branch.compile("def func2()\nfunc1()\nend");
-    branch.compile("def func3()\nfunc2()\nend");
-    branch.compile("def func4()\nfunc3()\nend");
+    Term* f1 = branch.compile("def func1()\nstate s = unique_output()\nspy(s)\nend");
+    Term* f2 = branch.compile("def func2()\nfunc1()\nend");
+    Term* f3 = branch.compile("def func3()\nfunc2()\nend");
+    Term* f4 = branch.compile("def func4()\nfunc3()\nend");
+
+    test_assert(function_has_hidden_state(f1));
+    test_assert(function_has_hidden_state(f2));
+    test_assert(function_has_hidden_state(f3));
+    test_assert(function_has_hidden_state(f4));
 
     NEXT_UNIQUE_OUTPUT = 11;
     SPY_RESULTS.clear();
 
-    /*Term* call =*/ branch.compile("func4()");
+    Term* call = branch.compile("func4()");
+    test_assert(call->numInputs() == 1);
     evaluate_branch(branch);
 
     test_assert(SPY_RESULTS.size() == 1);

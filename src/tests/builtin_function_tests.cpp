@@ -137,7 +137,19 @@ void test_map()
 
     // Test with subroutines
     branch.clear();
-    // TODO
+
+    branch.eval("def myfunc(float x):float\nreturn x + 5\nend");
+    return; // TODO
+    t = branch.eval("map(myfunc, [1 2 3 4 5])");
+    test_assert(t);
+
+    Branch& result2 = as_branch(t);
+    test_assert(result2.length() == 5);
+    test_equals(result2[0]->asFloat(), 6);
+    test_equals(result2[1]->asFloat(), 7);
+    test_equals(result2[2]->asFloat(), 8);
+    test_equals(result2[3]->asFloat(), 9);
+    test_equals(result2[4]->asFloat(), 10);
 }
 
 void register_tests()

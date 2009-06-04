@@ -14,7 +14,7 @@ void create()
 {
     Branch branch;
 
-    Term* sub = branch.eval("def mysub(int) : string\nend");
+    Term* sub = branch.eval("def mysub(int):string\nend");
 
     test_assert(sub);
     test_assert(is_subroutine(sub));
@@ -23,10 +23,8 @@ void create()
 
     test_assert(func.name == "mysub");
 
-    // the inputs are [Branch int] because we assume that every
-    // subroutine has hidden state
-    test_assert(identity_equals(func.inputTypes[1], INT_TYPE));
-    test_assert(func.inputTypes.count() == 2);
+    test_assert(identity_equals(func.inputTypes[0], INT_TYPE));
+    test_assert(func.inputTypes.count() == 1);
     test_assert(identity_equals(func.outputType, STRING_TYPE));
 }
 

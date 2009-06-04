@@ -18,6 +18,9 @@ void test_return_from_conditional()
 
     test_equals(branch.eval("my_max(3,8)")->asFloat(), 8);
     test_equals(branch.eval("my_max(3,3)")->asFloat(), 3);
+
+    branch.eval("my_max(11,0)");
+
     test_equals(branch.eval("my_max(11,0)")->asFloat(), 11);
 }
 
@@ -25,6 +28,7 @@ void test_recursion()
 {
     Branch branch;
     branch.eval("def factorial(int n) : int\n"
+                "  state i\n" // TODO: remove this
                 "  if (n < 2)\n"
                 "    return 1\n"
                 "  else\n"
@@ -58,7 +62,10 @@ void subroutine_stateful_term()
     // Make sure that stateful terms work correctly
     Term* call = branch.eval("mysub()");
     test_assert(call);
-    Term* a_inside_call = get_state_for_subroutine_call(call)->field("a");
+    test_assert(get_function_data(branch["mysub"]).hiddenStateType != VOID_TYPE);
+    test_assert(has_hidden_state(get_function_data(branch["mysub"])));
+    test_assert(get_hidden_state_for_call(call) != NULL);
+    Term* a_inside_call = get_hidden_state_for_call(call)->field("a");
     test_equals(as_float(a_inside_call), 1);
     evaluate_term(call);
     test_equals(as_float(a_inside_call), 2);
@@ -68,7 +75,7 @@ void subroutine_stateful_term()
     // Make sure that subsequent calls to this subroutine don't share
     // the same stateful value.
     Term* another_call = branch.eval("mysub()");
-    Term* a_inside_another_call = get_state_for_subroutine_call(another_call)->field("a");
+    Term* a_inside_another_call = get_hidden_state_for_call(another_call)->field("a");
     test_assert(a_inside_call != a_inside_another_call);
     test_equals(as_float(a_inside_another_call), 1);
     evaluate_term(another_call);
@@ -78,7 +85,7 @@ void subroutine_stateful_term()
     // Test accessing the subroutine's state in various ways
     {
         Term* call = branch.compile("mysub()");
-        Term* state = get_state_for_subroutine_call(call);
+        Term* state = get_hidden_state_for_call(call);
         test_assert(state);
         test_assert(!is_subroutine_state_expanded(state));
         Branch& stateContents = state->asBranch();
@@ -90,11 +97,23 @@ void subroutine_stateful_term()
     }
 }
 
+void initialize_state_type()
+{
+    Branch branch;
+
+    Term* a = branch.eval("def a():float\nreturn 1 + 1\nend");
+    test_assert(get_function_data(a).hiddenStateType == VOID_TYPE);
+
+    Term* b = branch.eval("def b()\nstate i\nend");
+    test_assert(get_function_data(b).hiddenStateType == BRANCH_TYPE);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
     REGISTER_TEST_CASE(subroutine_tests::test_recursion);
     REGISTER_TEST_CASE(subroutine_tests::subroutine_stateful_term);
+    REGISTER_TEST_CASE(subroutine_tests::initialize_state_type);
 }
 
 } // namespace refactoring_tests

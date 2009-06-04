@@ -69,18 +69,45 @@ void initialize_subroutine(Term* term)
         source_set_hidden(placeholder, true);
     }
 
-    func.hiddenStateType = BRANCH_TYPE;
-    func.prependInput(BRANCH_TYPE, "#state");
+    // Check if this subroutine has any hidden state
+    func.hiddenStateType = VOID_TYPE;
+}
+
+void subroutine_update_hidden_state_type(Term* sub)
+{
+    Branch& contents = as_branch(sub);
+    bool hasState = false;
+    for (int i=0; i < contents.length(); i++) {
+        if (contents[i] == NULL)
+            continue;
+        if (is_stateful(contents[i]))
+            hasState = true;
+        if (is_subroutine(contents[i]->function))
+            if (has_hidden_state(get_function_data(contents[i]->function)))
+                hasState = true;
+    }
+
+    Function& func = get_function_data(sub);
+    if (hasState) {
+        func.hiddenStateType = BRANCH_TYPE;
+        if ((func.numInputs() == 0)
+                || (func.numInputs() > 0 && (func.inputName(0) != "#state")))
+            func.prependInput(BRANCH_TYPE, "#state");
+    } else {
+        func.hiddenStateType = VOID_TYPE;
+    }
 }
 
 void subroutine_call_evaluate(Term* caller)
 {
-    Term* hiddenState = get_state_for_subroutine_call(caller);
+    Term* hiddenState = get_hidden_state_for_call(caller);
 
-    if (!is_subroutine_state_expanded(hiddenState))
+    if (hiddenState != NULL && !is_subroutine_state_expanded(hiddenState))
         expand_subroutines_hidden_state(caller, hiddenState);
 
-    Branch& branch = as_branch(hiddenState);
+    Branch& branch = (hiddenState == NULL) ?
+                         as_branch(caller->function)
+                         : as_branch(hiddenState);
 
     Function &sub = get_function_data(caller->function);
 
@@ -93,9 +120,12 @@ void subroutine_call_evaluate(Term* caller)
     }
 
     // Implant inputs
-    for (unsigned int input=1; input < sub.inputTypes.count(); input++) {
+    for (unsigned int input=0; input < sub.inputTypes.count(); input++) {
 
         std::string inputName = sub.getInputProperties(input).name;
+        if (inputName == "#state")
+            continue;
+
         Term* inputTerm = branch[inputName];
         assert(inputTerm != NULL);
         assign_value(caller->inputs[input], inputTerm);
@@ -111,18 +141,9 @@ void subroutine_call_evaluate(Term* caller)
     }
 }
 
-Term* get_state_for_subroutine_call(Term* term)
-{
-    bool hasState = get_function_data(term->function).hiddenStateType != VOID_TYPE;
-
-    if (!hasState)
-        return NULL;
-
-    return term->input(0);
-}
-
 bool is_subroutine_state_expanded(Term* term)
 {
+    assert(term != NULL);
     return as_branch(term).length() > 0;
 }
 
