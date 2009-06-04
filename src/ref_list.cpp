@@ -10,13 +10,13 @@ void RefList::appendAll(RefList const& list)
 {
     assert(&list != this);
 
-    for (unsigned int i=0; i < list.count(); i++)
+    for (int i=0; i < list.length(); i++)
         append(list[i]);
 }
 
 void RefList::remapPointers(ReferenceMap const& map)
 {
-    for (unsigned int i=0; i < _items.size(); i++)
+    for (int i=0; i < length(); i++)
         _items[i] = map.getRemapped(_items[i]);
 }
 

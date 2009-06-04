@@ -8,7 +8,7 @@ namespace concat_function {
     void evaluate(Term* caller)
     {
         std::stringstream out;
-        for (unsigned int index=0; index < caller->inputs.count(); index++) {
+        for (int index=0; index < caller->inputs.length(); index++) {
             out << as_string(caller->inputs[index]);
         }
         as_string(caller) = out.str();

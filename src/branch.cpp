@@ -48,7 +48,7 @@ void Branch::remove(std::string const& name)
 
 void Branch::remove(int index)
 {
-    if (index >= (int) _terms.count())
+    if (index >= _terms.length())
         return;
 
     Term* term = _terms[index];
@@ -67,7 +67,7 @@ void Branch::removeNulls()
 
 Term* Branch::findFirstBinding(std::string const& name) const
 {
-    for (unsigned int i = 0; i < _terms.count(); i++) {
+    for (int i = 0; i < _terms.length(); i++) {
         if (_terms[i] == NULL)
             continue;
         if (_terms[i]->name == name)
@@ -79,7 +79,7 @@ Term* Branch::findFirstBinding(std::string const& name) const
 
 Term* Branch::findLastBinding(std::string const& name) const
 {
-    for (size_t i = _terms.count()-1; i >= 0; i--) {
+    for (int i = _terms.length()-1; i >= 0; i--) {
         if (_terms[i] == NULL)
             continue;
         if (_terms[i]->name == name)
@@ -103,7 +103,7 @@ void Branch::remapPointers(ReferenceMap const& map)
 {
     names.remapPointers(map);
 
-    for (unsigned int i = 0; i < _terms.count(); i++) {
+    for (int i = 0; i < _terms.length(); i++) {
         Term* term = _terms[i];
         if (term != NULL)
             remap_pointers(term, map);
@@ -113,7 +113,7 @@ void Branch::remapPointers(ReferenceMap const& map)
 void
 Branch::clear()
 {
-    for (unsigned int i=0; i < _terms.count(); i++)
+    for (int i=0; i < _terms.length(); i++)
         _terms[i]->owningBranch = NULL;
 
     _terms.clear();

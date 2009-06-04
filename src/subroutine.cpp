@@ -83,15 +83,15 @@ void subroutine_update_hidden_state_type(Term* sub)
         if (is_stateful(contents[i]))
             hasState = true;
         if (is_subroutine(contents[i]->function))
-            if (has_hidden_state(get_function_data(contents[i]->function)))
+            if (function_has_hidden_state(contents[i]->function))
                 hasState = true;
     }
 
     Function& func = get_function_data(sub);
     if (hasState) {
         func.hiddenStateType = BRANCH_TYPE;
-        if ((func.numInputs() == 0)
-                || (func.numInputs() > 0 && (func.inputName(0) != "#state")))
+        bool alreadyHasStateInput = (func.numInputs() > 0) && (func.inputName(0) == "#state");
+        if (!alreadyHasStateInput)
             func.prependInput(BRANCH_TYPE, "#state");
     } else {
         func.hiddenStateType = VOID_TYPE;
@@ -111,16 +111,16 @@ void subroutine_call_evaluate(Term* caller)
 
     Function &sub = get_function_data(caller->function);
 
-    if (sub.inputTypes.count() != caller->inputs.count()) {
+    if (sub.inputTypes.length() != caller->inputs.length()) {
         std::stringstream msg;
-        msg << "Wrong number of inputs, expected: " << sub.inputTypes.count()
-            << ", found: " << caller->inputs.count();
+        msg << "Wrong number of inputs, expected: " << sub.inputTypes.length()
+            << ", found: " << caller->inputs.length();
         error_occurred(caller, msg.str());
         return;
     }
 
     // Implant inputs
-    for (unsigned int input=0; input < sub.inputTypes.count(); input++) {
+    for (unsigned int input=0; input < sub.inputTypes.length(); input++) {
 
         std::string inputName = sub.getInputProperties(input).name;
         if (inputName == "#state")

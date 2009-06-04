@@ -19,7 +19,7 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     Function& func = get_function_data(function);
 
     // If 'function' has hidden state, then create a container for that state, if needed
-    if (function_has_hidden_state(function) && ((int) inputs.count() < func.numInputs()))
+    if (function_has_hidden_state(function) && (inputs.length() < func.numInputs()))
     {
         Term* stateContainer = create_value(branch, func.hiddenStateType);
         source_set_hidden(stateContainer, true);
@@ -40,7 +40,7 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     result->function = function;
 
     // Initialize inputs
-    for (unsigned int i=0; i < inputs.count(); i++)
+    for (int i=0; i < inputs.length(); i++)
         set_input(result, i, inputs[i]);
 
     Term* outputType = func.outputType;

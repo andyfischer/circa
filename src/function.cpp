@@ -34,13 +34,13 @@ Function::inputName(int index)
 
 int Function::numInputs()
 {
-    return (int) inputTypes.count();
+    return inputTypes.length();
 }
 
 void Function::appendInput(Term* type, std::string const& name)
 {
     inputTypes.append(type);
-    getInputProperties(inputTypes.count()-1).name = name;
+    getInputProperties(inputTypes.length()-1).name = name;
 }
 
 void Function::prependInput(Term* type, std::string const& name)
@@ -52,12 +52,12 @@ void Function::prependInput(Term* type, std::string const& name)
 }
 
 Function::InputProperties&
-Function::getInputProperties(unsigned int index)
+Function::getInputProperties(int index)
 {
-    assert(variableArgs || index < inputTypes.count());
+    assert(variableArgs || index < inputTypes.length());
 
     // check to grow inputProperties
-    while ((index+1) > inputProperties.size()) {
+    while ((index+1) > (int) inputProperties.size()) {
         inputProperties.push_back(InputProperties());
     }
 
@@ -191,12 +191,6 @@ Term* specialize_function(Term* func, RefList const& inputs)
     } else {
         return func;
     }
-}
-
-bool function_has_hidden_state(Term* func)
-{
-    // TODO: make this more sane
-    return has_hidden_state(get_function_data(func));
 }
 
 } // namespace circa

@@ -53,14 +53,14 @@ void _test_equals_function(RefList const& a, RefList const& b,
 {
     std::stringstream msg;
 
-    if (a.count() != b.count()) {
+    if (a.length() != b.length()) {
         msg << "List equality fail in " << file << ", line " << line << std::endl;
-        msg << "  " << aText << " has " << a.count() << " items, ";
-        msg << bText << " has " << b.count() << " items.";
+        msg << "  " << aText << " has " << a.length() << " items, ";
+        msg << bText << " has " << b.length() << " items.";
         throw std::runtime_error(msg.str());
     }
 
-    for (unsigned int i=0; i < a.count(); i++) {
+    for (unsigned int i=0; i < a.length(); i++) {
         if (a[i] != b[i]) {
             msg << "List equality fail in " << file << ", line " << line << std::endl;
             msg << "  " << aText << " != " << bText << " (index " << i << " differs)";

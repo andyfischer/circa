@@ -130,13 +130,13 @@ void feedback_operation()
 
     RefList list = operation.getFeedback(a, DESIRED_VALUE_FEEDBACK);
 
-    test_assert(list.count() == 0);
+    test_assert(list.length() == 0);
 
     operation.sendFeedback(a, b, DESIRED_VALUE_FEEDBACK);
 
     list = operation.getFeedback(a, DESIRED_VALUE_FEEDBACK);
 
-    test_assert(list.count() == 1);
+    test_assert(list.length() == 1);
     test_assert(list[0] == b);
 }
 

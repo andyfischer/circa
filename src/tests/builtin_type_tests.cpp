@@ -138,11 +138,11 @@ void test_list2()
     Term* term = new Term();
     Term* term2 = new Term();
 
-    test_assert(list.count() == 0);
+    test_assert(list.length() == 0);
 
     list.append(term);
     list.append(term2);
-    test_assert(list.count() == 2);
+    test_assert(list.length() == 2);
     test_assert(list[0] == term);
     test_assert(list[1] == term2);
 
@@ -150,13 +150,13 @@ void test_list2()
     ReferenceMap remap;
     remap[term] = term3;
     list.remapPointers(remap);
-    test_assert(list.count() == 2);
+    test_assert(list.length() == 2);
     test_assert(list[0] == term3);
     test_assert(list[1] == term2);
 
     list.clear();
 
-    test_assert(list.count() == 0);
+    test_assert(list.length() == 0);
 }
 
 
