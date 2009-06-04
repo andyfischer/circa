@@ -156,10 +156,7 @@ Term* find_function(Branch& branch, std::string const& name)
     Term* result = find_named(&branch, name);
 
     if (result == NULL) {
-        result = apply(&branch, UNKNOWN_FUNCTION, RefList());
-        evaluate_term(result);
-        result->stringProp("message") = name;
-        source_set_hidden(result, true);
+        return UNKNOWN_FUNCTION;
     }   
 
     return result;

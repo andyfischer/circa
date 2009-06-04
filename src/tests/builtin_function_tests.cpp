@@ -151,6 +151,13 @@ void test_map()
     test_equals(result2[4]->asFloat(), 10);
 }
 
+void test_vectorized_funcs()
+{
+    Branch branch;
+    Term* t = branch.eval("[1 2 3] + [4 5 6]");
+    test_assert(t);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
@@ -163,6 +170,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_list);
     REGISTER_TEST_CASE(builtin_function_tests::test_range);
     REGISTER_TEST_CASE(builtin_function_tests::test_map);
+    REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs);
 }
 
 } // namespace builtin_function_tests

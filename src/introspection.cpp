@@ -166,7 +166,7 @@ bool is_equivalent(Term* target, Term* function, RefList const& inputs)
     if (numInputs != inputs.length())
         return false;
 
-    for (unsigned int i=0; i < numInputs; i++) {
+    for (int i=0; i < numInputs; i++) {
         if (target->inputs[i] != inputs[i]) {
             return false;
         }
@@ -247,7 +247,7 @@ std::string get_source_filename(Term* term)
 
 bool has_compile_error(Term* term)
 {
-    return ((term->function->function == UNKNOWN_FUNCTION)
+    return ((term->function == UNKNOWN_FUNCTION)
         || (term->type->function == UNKNOWN_TYPE_FUNC)
         || (term->function == UNKNOWN_IDENTIFIER_FUNC)
         || (term->function == UNRECOGNIZED_EXPRESSION_FUNC));
