@@ -70,9 +70,10 @@ bool has_hidden_state(Function& func)
 
 Term* get_hidden_state_for_call(Term* term)
 {
-    if (has_hidden_state(as_function(term->function)))
+    if (has_hidden_state(get_function_data(term->function))) {
+        assert(term->input(0) != NULL);
         return term->input(0);
-    else
+    } else
         return NULL;
 }
 
@@ -112,8 +113,8 @@ void migrate_stateful_values(Branch& source, Branch& dest)
         if ((sourceTerm->function->type == SUBROUTINE_TYPE)
                 && (destTerm->function->type == SUBROUTINE_TYPE))
         {
-            Term* sourceCallState = get_state_for_subroutine_call(sourceTerm);
-            Term* destCallState = get_state_for_subroutine_call(destTerm);
+            Term* sourceCallState = get_hidden_state_for_call(sourceTerm);
+            Term* destCallState = get_hidden_state_for_call(destTerm);
             if (is_subroutine_state_expanded(sourceCallState)
                     && !is_subroutine_state_expanded(destCallState))
                 expand_subroutines_hidden_state(destTerm, destCallState);

@@ -26,6 +26,12 @@ Function::inputType(int index)
         return inputTypes[index];
 }
 
+std::string const&
+Function::inputName(int index)
+{
+    return getInputProperties(index).name;
+}
+
 int Function::numInputs()
 {
     return (int) inputTypes.count();
@@ -185,6 +191,12 @@ Term* specialize_function(Term* func, RefList const& inputs)
     } else {
         return func;
     }
+}
+
+bool function_has_hidden_state(Term* func)
+{
+    // TODO: make this more sane
+    return has_hidden_state(get_function_data(func));
 }
 
 } // namespace circa

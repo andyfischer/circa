@@ -35,8 +35,8 @@ bool type_matches(Term *term, Term *type)
 
 void assert_type(Term *term, Term *type)
 {
-    if (!type_matches(term, type))
-    {
+    if (!type_matches(term, type)) {
+        assert(false);
         std::stringstream err;
         err << "assert_type failed, expected " << as_type(type).name;
         err << ", found " << as_type(term->type).name;

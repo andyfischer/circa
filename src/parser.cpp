@@ -344,6 +344,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     assert(is_value(result));
     assert(is_subroutine(result));
 
+    subroutine_update_hidden_state_type(result);
+
     return result;
 }
 

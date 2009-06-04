@@ -52,6 +52,7 @@ struct Function
     Function();
 
     Term* inputType(int index);
+    std::string const& inputName(int index);
     int numInputs();
     void appendInput(Term* type, std::string const& name);
     void prependInput(Term* type, std::string const& name);
@@ -75,6 +76,7 @@ bool is_callable(Term* term);
 bool inputs_fit_function(Term* func, RefList const& inputs);
 Term* create_overloaded_function(Branch* branch, std::string const& name);
 Term* specialize_function(Term* func, RefList const& inputs);
+bool function_has_hidden_state(Term* func);
 
 } // namespace circa
 

@@ -160,13 +160,12 @@ void test_function_decl()
     test_equals(funcTerm->name, "Myfunc");
     test_equals(func.name, "Myfunc");
 
-    // first input is used for state
+    test_assert(func.inputTypes[0] == STRING_TYPE);
+    test_assert(func.getInputProperties(0).name == "what");
     test_assert(func.inputTypes[1] == STRING_TYPE);
-    test_assert(func.getInputProperties(1).name == "what");
-    test_assert(func.inputTypes[2] == STRING_TYPE);
-    test_assert(func.getInputProperties(2).name == "hey");
-    test_assert(func.inputTypes[3] == INT_TYPE);
-    test_assert(func.getInputProperties(3).name == "yo");
+    test_assert(func.getInputProperties(1).name == "hey");
+    test_assert(func.inputTypes[2] == INT_TYPE);
+    test_assert(func.getInputProperties(2).name == "yo");
     test_assert(func.outputType == BOOL_TYPE);
 
     Branch& funcbranch = as_branch(funcTerm);
