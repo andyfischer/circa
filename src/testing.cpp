@@ -35,7 +35,16 @@ void _test_assert_function(Term* term, int line, const char* file)
 
     if (term->hasError) {
         std::stringstream msg;
+        msg << "Runtime error on term " << format_global_id(term) << std::endl;
         msg << term->getErrorMessage() << std::endl;
+        msg << "Occurred in " << file << ", line " << line << std::endl;
+        throw std::runtime_error(msg.str());
+    }
+
+    if (has_compile_error(term)) {
+        std::stringstream msg;
+        msg << "Compile error on term " << format_global_id(term) << std::endl;
+        msg << get_compile_error_message(term) << std::endl;
         msg << "Occurred in " << file << ", line " << line << std::endl;
         throw std::runtime_error(msg.str());
     }
@@ -60,7 +69,7 @@ void _test_equals_function(RefList const& a, RefList const& b,
         throw std::runtime_error(msg.str());
     }
 
-    for (unsigned int i=0; i < a.length(); i++) {
+    for (int i=0; i < a.length(); i++) {
         if (a[i] != b[i]) {
             msg << "List equality fail in " << file << ", line " << line << std::endl;
             msg << "  " << aText << " != " << bText << " (index " << i << " differs)";
