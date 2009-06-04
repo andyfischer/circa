@@ -139,7 +139,6 @@ void test_map()
     branch.clear();
 
     branch.eval("def myfunc(float x):float\nreturn x + 5\nend");
-    return; // TODO
     t = branch.eval("map(myfunc, [1 2 3 4 5])");
     test_assert(t);
 
