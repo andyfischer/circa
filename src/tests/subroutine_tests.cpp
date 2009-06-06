@@ -108,12 +108,25 @@ void initialize_state_type()
     test_assert(get_function_data(b).hiddenStateType == BRANCH_TYPE);
 }
 
+void shadow_input()
+{
+    Branch branch;
+
+    // Try having a name that shadows an input. This had a bug at one point
+    branch.eval("def f(int i):int\ni = 2\nreturn i\nend");
+
+    Term* a = branch.eval("f(1)");
+
+    test_assert(a->asInt() == 2);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
     REGISTER_TEST_CASE(subroutine_tests::test_recursion);
     REGISTER_TEST_CASE(subroutine_tests::subroutine_stateful_term);
     REGISTER_TEST_CASE(subroutine_tests::initialize_state_type);
+    REGISTER_TEST_CASE(subroutine_tests::shadow_input);
 }
 
 } // namespace refactoring_tests

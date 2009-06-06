@@ -170,7 +170,3 @@ Export('SDL_ROOT')
 
 # Cuttlefish
 SConscript('cuttlefish/build.scons')
-
-# 'ptc', an optional app
-if os.path.exists('ptc'):
-    SConscript('ptc/build.scons')
