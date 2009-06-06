@@ -6,6 +6,10 @@
 #include <SDL_image.h>
 #include <SDL_opengl.h>
 
+#include <circa.h>
+
+using namespace circa;
+
 GLenum get_texture_format(SDL_Surface *surface)
 {
     assert(surface);
@@ -28,13 +32,13 @@ GLenum get_texture_format(SDL_Surface *surface)
     }
 }
 
-GLuint load_image_to_texture(std::string const& filename)
+GLuint load_image_to_texture(std::string const& filename, Term* errorListener)
 {
     GLuint texid;
 
     SDL_Surface* surface = IMG_Load(filename.c_str());
     if (surface == NULL) {
-        std::cout << "failed to load " << filename << std::endl;
+        error_occurred(errorListener, "Error loading " + filename + ": " + SDL_GetError());
         return 0;
     }
 
@@ -50,3 +54,21 @@ GLuint load_image_to_texture(std::string const& filename)
 
     return texid;
 }
+
+namespace textures {
+
+void hosted_load_texture(Term* caller)
+{
+    if (as_int(caller) == 0) {
+        std::string filename = as_string(caller->input(0));
+        GLuint id = load_image_to_texture(filename, caller);
+        as_int(caller) = id;
+    }
+}
+
+void register_functions(circa::Branch& branch)
+{
+    import_function(branch, hosted_load_texture, "load_texture(string) : int");
+}
+
+} // namespace textures

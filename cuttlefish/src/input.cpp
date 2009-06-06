@@ -89,9 +89,30 @@ void capture_events()
 
 void handle_key_press(SDL_Event &event, int key)
 {
+    // Unmodified keys
     switch (key) {
         case SDLK_ESCAPE:
             CONTINUE_MAIN_LOOP = false;
+    }
+
+    // Control keys
+    if (event.key.keysym.mod & KMOD_CTRL) {
+        switch(event.key.keysym.sym) {
+        case SDLK_s:
+            circa::persist_branch_to_file(*USERS_BRANCH);
+            std::cout << "Saved" << std::endl;
+            break;
+
+        case SDLK_p:
+            std::cout << branch_to_string_raw(*USERS_BRANCH);
+            break;
+
+        case SDLK_r:
+            circa::reload_branch_from_file(*USERS_BRANCH);
+            break;
+
+        default: break;
+        }
     }
 }
 

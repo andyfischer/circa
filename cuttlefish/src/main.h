@@ -4,5 +4,6 @@
 #define CUTTLEFISH_MAIN_INCLUDED
 
 extern bool CONTINUE_MAIN_LOOP;
+extern circa::Branch* USERS_BRANCH;
 
 #endif

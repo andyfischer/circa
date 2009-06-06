@@ -30,14 +30,14 @@ if POSIX:
     ROOT.Append(CPPFLAGS=['-Wall'])
 
 if WINDOWS:
-    ROOT.Append(CPPFLAGS=['/EHsc /RTC1 /Wp64 /MTd /Gm /Zi'.split()])
+    ROOT.Append(CPPFLAGS=['/EHsc /RTC1 /Wp64 /MTd /Z7 /Od /TP'.split()])
     ROOT.Append(LIBS = ['libcmtd'])
     ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:libc.lib'])
     ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrt.lib'])
     ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrtd.lib'])
     ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:libcd.lib'])
     ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:libcmt.lib'])
-    ROOT.Append(LINKFLAGS=['/SUBSYSTEM:CONSOLE /MACHINE:X86'.split()])
+    ROOT.Append(LINKFLAGS=['/SUBSYSTEM:CONSOLE /MACHINE:X86 /DEBUG'.split()])
     ROOT.Append(CPPDEFINES = ['WINDOWS'])
 
 ROOT.Append(CPPDEFINES = ["_DEBUG"])

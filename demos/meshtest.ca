@@ -1,0 +1,8 @@
+
+background(0xffffffff)
+
+die = load_mesh("die.obj")
+tex = load_texture("die_smiley.png")
+
+draw_mesh(die, tex, [100 100 0], [10000 10000 1] [time*50 time*20 0])
+
