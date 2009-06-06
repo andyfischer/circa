@@ -169,6 +169,24 @@ void test_vectorized_funcs()
     test_assert(result[2]->asInt() == 9);
 }
 
+void test_vectorized_funcs_with_points()
+{
+    // This test is similar, but we define the type Point and see if
+    // vectorized functions work against that.
+    Branch branch;
+    
+    Term* point_t = branch.eval("type Point {float x, float y}");
+
+    Term* a = branch.eval("a = [1 0] : Point");
+
+    test_assert(a->type == point_t);
+
+    Term* b = branch.eval("a + [0 2]");
+
+    test_equals(b->field(0)->toFloat(), 1);
+    test_equals(b->field(1)->toFloat(), 2);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
@@ -182,6 +200,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_range);
     REGISTER_TEST_CASE(builtin_function_tests::test_map);
     REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs);
+    REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs_with_points);
 }
 
 } // namespace builtin_function_tests
