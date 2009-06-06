@@ -120,7 +120,7 @@ void subroutine_call_evaluate(Term* caller)
     }
 
     // Implant inputs
-    for (unsigned int input=0; input < sub.inputTypes.length(); input++) {
+    for (int input=0; input < sub.inputTypes.length(); input++) {
 
         std::string inputName = sub.getInputProperties(input).name;
         if (inputName == "#state")

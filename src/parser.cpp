@@ -336,6 +336,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     consume_branch_until_end(subBranch, tokens);
     remove_compilation_attrs(subBranch);
 
+    possible_whitespace(tokens);
+
     if (!tokens.nextIs(END))
         return compile_error_for_line(result, tokens, startPosition);
 

@@ -53,7 +53,7 @@ void evaluate_term(Term* term)
     //  3) it has a non-null value
     //  4) it has no errors
     //  5) it has the correct type
-    for (unsigned int inputIndex=0; inputIndex < term->inputs.length(); inputIndex++)
+    for (int inputIndex=0; inputIndex < term->inputs.length(); inputIndex++)
     {
         int effectiveIndex = inputIndex;
         if (func.variableArgs)

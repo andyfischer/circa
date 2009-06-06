@@ -3,6 +3,7 @@ arrow-concat.ca
 # assert.ca
 average.ca
 boolean.ca
+closure.ca
 comparison.ca
 compound_type.ca
 # fib.ca

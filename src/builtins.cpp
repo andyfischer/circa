@@ -422,11 +422,16 @@ void initialize_builtin_types(Branch& kernel)
 void post_setup_builtin_functions(Branch& kernel)
 {
     Branch& add_overloads = as_branch(ADD_FUNC);
-
     Term* add_v = create_duplicate(&add_overloads, kernel["vectorized"]);
     create_ref(&as_function(add_v).parameters, ADD_FUNC);
     rename(add_v, "add_v");
     kernel.bindName(add_v, "add_v");
+
+    Branch& sub_overloads = as_branch(SUB_FUNC);
+    Term* sub_v = create_duplicate(&sub_overloads, kernel["vectorized"]);
+    create_ref(&as_function(sub_v).parameters, SUB_FUNC);
+    rename(sub_v, "sub_v");
+    kernel.bindName(sub_v, "sub_v");
 }
 
 void initialize_constants(Branch& kernel)
