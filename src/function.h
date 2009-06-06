@@ -40,6 +40,8 @@ struct Function
 
     std::string name;
 
+    Branch parameters;
+
     // Code
     EvaluateFunc evaluate;
     SpecializeTypeFunc specializeType;

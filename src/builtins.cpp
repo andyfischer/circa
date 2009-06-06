@@ -419,6 +419,16 @@ void initialize_builtin_types(Branch& kernel)
     feedback_register_constants(kernel);
 }
 
+void post_setup_builtin_functions(Branch& kernel)
+{
+    Branch& add_overloads = as_branch(ADD_FUNC);
+
+    Term* add_v = create_duplicate(&add_overloads, kernel["vectorized"]);
+    create_ref(&as_function(add_v).parameters, ADD_FUNC);
+    rename(add_v, "add_v");
+    kernel.bindName(add_v, "add_v");
+}
+
 void initialize_constants(Branch& kernel)
 {
     float_value(&kernel, M_PI, "PI");
@@ -432,6 +442,7 @@ void initialize()
     bootstrap_kernel();
     initialize_builtin_types(*KERNEL);
     setup_builtin_functions(*KERNEL);
+    post_setup_builtin_functions(*KERNEL);
     initialize_constants(*KERNEL);
 }
 

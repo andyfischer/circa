@@ -156,6 +156,17 @@ void test_vectorized_funcs()
     Branch branch;
     Term* t = branch.eval("[1 2 3] + [4 5 6]");
     test_assert(t);
+    test_assert(is_branch(t));
+
+    Branch& result = as_branch(t);
+    
+    test_assert(result.length() == 3);
+    test_equals(result[0]->function->name, "add_i");
+    test_equals(result[1]->function->name, "add_i");
+    test_equals(result[2]->function->name, "add_i");
+    test_assert(result[0]->asInt() == 5);
+    test_assert(result[1]->asInt() == 7);
+    test_assert(result[2]->asInt() == 9);
 }
 
 void register_tests()
