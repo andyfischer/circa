@@ -19,7 +19,12 @@ namespace vectorize_vv_function {
 
         Branch& output = as_branch(caller);
 
+        // Check if our output value has been precreated but not initialized by us.
+        if (output.length() > 0 && output[0]->function == VALUE_FUNC)
+            output.clear();
+
         if (output.length() == 0) {
+            output.clear();
             for (int i=0; i < left.length(); i++)
                 apply(&output, func, RefList(left[i], right[i]));
         }
