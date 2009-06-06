@@ -1,4 +1,6 @@
 
+type Point { float x, float y}
+
 background(0xeeeeeeff)
 
 def rotate_points_around(List points, Point center, float rot) : List
