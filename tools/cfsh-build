@@ -1,0 +1,2 @@
+cd $CIRCA_HOME
+scons cfsh

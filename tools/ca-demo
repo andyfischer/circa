@@ -1,2 +1,2 @@
 cd $CIRCA_HOME
-scons cfsh && cuttlefish/app demos/$1.ca
+scons cfsh && build/bin/cfsh demos/$1.ca

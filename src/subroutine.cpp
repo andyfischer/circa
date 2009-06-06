@@ -126,7 +126,7 @@ void subroutine_call_evaluate(Term* caller)
         if (inputName == "#state")
             continue;
 
-        Term* inputTerm = branch[inputName];
+        Term* inputTerm = branch.findFirstBinding(inputName);
         assert(inputTerm != NULL);
         assign_value(caller->inputs[input], inputTerm);
     }
