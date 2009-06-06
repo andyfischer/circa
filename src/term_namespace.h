@@ -31,7 +31,11 @@ struct TermNamespace
 
     Term* operator[](std::string const& name) const
     {
-        return _map.find(name)->second;
+        StringToTermMap::const_iterator it = _map.find(name);
+        if (it == _map.end())
+            return NULL;
+        else
+            return it->second;
     }
 
     Term*& operator[](std::string const& name)

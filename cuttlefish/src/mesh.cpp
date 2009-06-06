@@ -111,7 +111,7 @@ void draw_mesh_immediate(Mesh& mesh)
     for (std::vector<Face>::const_iterator it = mesh.faces.begin(); it != mesh.faces.end(); ++it)
     {
         Face const& face = *it;
-        //glColor3f(1,1,1);
+        glColor3f(1,1,1);
         for (int i=0; i < 4; i++) {
             assert(face.vertex_index[i] >= 0);
             Vertex3f const& vert = mesh.vertices[face.vertex_index[i]];
@@ -122,4 +122,46 @@ void draw_mesh_immediate(Mesh& mesh)
         }
     }
     glEnd();
+}
+
+namespace mesh {
+
+void hosted_load_mesh(Term* caller)
+{
+    if (caller->asInt() == 0) {
+        Mesh mesh;
+        load_obj_file(caller->input(0)->asString(), mesh);
+        GLuint index = glGenLists(1);
+        glNewList(index, GL_COMPILE);
+        draw_mesh_immediate(mesh);
+        glEndList();
+        as_int(caller) = index;
+    }
+}
+
+void hosted_draw_mesh(Term* caller)
+{
+    GLuint list = caller->input(0)->asInt();
+    GLuint tex = caller->input(1)->asInt();
+    glBindTexture(GL_TEXTURE_2D, tex);
+    Branch& translation = caller->input(2)->asBranch();
+    Branch& scale = caller->input(3)->asBranch();
+    Branch& rotation = caller->input(4)->asBranch();
+
+    glPushMatrix();
+    glTranslatef(translation[0]->toFloat(),translation[1]->toFloat(),translation[2]->toFloat());
+    glScalef(scale[0]->toFloat(),scale[1]->toFloat(),scale[2]->toFloat());
+    glRotatef(rotation[0]->toFloat(), 1, 0, 0); // X
+    glRotatef(rotation[1]->toFloat(), 0, 1, 0); // Y
+    // Z is todo, need better maths
+    glCallList(list);
+    glPopMatrix();
+}
+
+void register_functions(circa::Branch& branch)
+{
+    import_function(branch, hosted_load_mesh, "load_mesh(string) : int");
+    import_function(branch, hosted_draw_mesh, "draw_mesh(int, int, List, List, List)");
+}
+
 }

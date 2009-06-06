@@ -9,7 +9,9 @@
 
 #include "gl_shapes.h"
 #include "input.h"
+#include "mesh.h"
 #include "shaders.h"
+#include "textures.h"
 
 using namespace circa;
 
@@ -25,37 +27,6 @@ bool CONTINUE_MAIN_LOOP = true;
 float TIME = 0;
 float ELAPSED = 0;
 long PREV_SDL_TICKS = 0;
-
-void handle_key_press(SDL_Event event, int key)
-{
-    // unmodified keys
-    switch (key) {
-
-    case SDLK_ESCAPE: CONTINUE_MAIN_LOOP = false; break;
-    default: break;
-
-    }
-
-    // Control keys
-    if (event.key.keysym.mod & KMOD_CTRL) {
-        switch(event.key.keysym.sym) {
-        case SDLK_s:
-            circa::persist_branch_to_file(*USERS_BRANCH);
-            std::cout << "Saved" << std::endl;
-            break;
-
-        case SDLK_p:
-            std::cout << branch_to_string_raw(*USERS_BRANCH);
-            break;
-
-        case SDLK_r:
-            circa::reload_branch_from_file(*USERS_BRANCH);
-            break;
-
-        default: break;
-        }
-    }
-}
 
 bool initialize_display()
 {
@@ -110,39 +81,6 @@ bool initialize_display()
     return true;
 }
 
-/*
-void opengl_test()
-{
-    static bool initialized = false;
-    static GLuint program = 0;
-
-    if (!initialized) {
-        GLuint vshader = load_shader(GL_VERTEX_SHADER,
-                "void main() {"
-                "     gl_Position = gl_ProjectionMatrix*(gl_ModelViewMatrix*gl_Vertex);"
-                "     gl_FrontColor = gl_Color;"
-                "}");
-
-        GLuint fshader = load_shader(GL_FRAGMENT_SHADER,
-                "void main() {"
-                "     gl_FragColor = gl_Color;"
-                "}");
-
-        program = glCreateProgram();
-        glAttachShader(program, vshader);
-        glAttachShader(program, fshader);
-        glLinkProgram(program);
-
-        GLint status;
-        glGetProgramiv(program, GL_LINK_STATUS, &status);
-        if (status == GL_FALSE) {
-            std::cout << "error linking program" << std::endl;
-        }
-    }
-
-    glUseProgram(program);
-}*/
-
 void main_loop()
 {
     input::capture_events();
@@ -179,13 +117,16 @@ int main( int argc, char* args[] )
     input::initialize(*SCRIPT_ROOT);
 
     gl_shapes::register_functions(*SCRIPT_ROOT);
+    mesh::register_functions(*SCRIPT_ROOT);
+    textures::register_functions(*SCRIPT_ROOT);
 
     // Import constants
     expose_value(SCRIPT_ROOT, &TIME, "time");
     expose_value(SCRIPT_ROOT, &ELAPSED, "elapsed");
 
     // Load runtime.ca
-    parse_script(*SCRIPT_ROOT, "cuttlefish/runtime.ca");
+    std::string circa_home = getenv("CIRCA_HOME");
+    parse_script(*SCRIPT_ROOT, circa_home + "/cuttlefish/runtime.ca");
 
     // Load user's script
     USERS_BRANCH = &SCRIPT_ROOT->get("users_branch")->asBranch();
