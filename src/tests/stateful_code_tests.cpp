@@ -133,7 +133,7 @@ void initialize_from_expression()
     branch.eval("b = a * 2");
     Term *c = branch.eval("state c = b");
 
-    test_equals(as_float(c), 6);
+    test_equals(to_float(c), 6);
 }
 
 void one_time_assignment()

@@ -354,7 +354,7 @@ void test_semicolon_as_line_ending()
     test_assert(count_compile_errors(branch) == 0);
     test_assert(branch.length() == 7);
     test_assert(branch["a"]->function->name == "add_i");
-    test_assert(branch["b"]->function == MULT_FUNC);
+    test_assert(branch["b"]->function->name == "mult_i");
 
     branch.clear();
     branch.compile("cond = true; if cond; a = 1; else; a = 2; end");

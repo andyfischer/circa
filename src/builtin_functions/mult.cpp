@@ -5,9 +5,14 @@
 namespace circa {
 namespace mult_function {
 
-    void evaluate(Term* caller)
+    void evaluate_f(Term* caller)
     {
         as_float(caller) = to_float(caller->input(0)) * to_float(caller->input(1));
+    }
+
+    void evaluate_i(Term* caller)
+    {
+        as_int(caller) = as_int(caller->input(0)) * as_int(caller->input(1));
     }
 
     void feedback_evaluate(Term* caller)
@@ -42,10 +47,17 @@ namespace mult_function {
 
     void setup(Branch& kernel)
     {
-        MULT_FUNC = import_function(kernel, evaluate, "mult(float,float) : float");
-        as_function(MULT_FUNC).pureFunction = true;
-        as_function(MULT_FUNC).feedbackFunc = 
+        MULT_FUNC = create_overloaded_function(&kernel, "mult");
+
+        Term* mult_i = import_function_overload(MULT_FUNC, evaluate_i, "mult_i(int,int) : int");
+
+        Term* mult_f = import_function_overload(MULT_FUNC, evaluate_f, "mult_f(float,float) : float");
+        as_function(mult_f).pureFunction = true;
+        as_function(mult_f).feedbackFunc = 
             import_function(kernel, feedback_evaluate, "mult_feedback(any, float) : Branch");
+
+        kernel.bindName(mult_i, "mult_i");
+        kernel.bindName(mult_f, "mult_f");
     }
 }
 } // namespace circa

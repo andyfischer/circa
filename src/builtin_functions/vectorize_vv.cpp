@@ -3,7 +3,12 @@
 #include "circa.h"
 
 namespace circa {
-namespace vectorized_function {
+namespace vectorize_vv_function {
+
+    Term* specializeType(Term* caller)
+    {
+        return caller->input(0)->type;
+    }
 
     void evaluate(Term* caller)
     {
@@ -24,7 +29,8 @@ namespace vectorized_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "vectorized(List,List) : List");
+        Term* func = import_function(kernel, evaluate, "vectorize_vv(List,List) : List");
+        as_function(func).specializeType = specializeType;
     }
 }
 } // namespace circa

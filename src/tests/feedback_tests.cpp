@@ -45,7 +45,7 @@ void train_addition2()
 void train_mult()
 {
     Branch branch;
-    Term* a = branch.eval("a = 1");
+    Term* a = branch.eval("a = 1.0");
     branch.eval("b = 3");
     branch.eval("mult(a, b) <- 6");
 
