@@ -237,6 +237,22 @@ void state_inside_lots_of_nested_functions()
     test_assert(SPY_RESULTS[0] == 11);
 }
 
+void migrate_subroutine_with_no_hidden_state()
+{
+    Branch source;
+    source.eval("def hello()\nend");
+    source.eval("hello()");
+
+    Branch dest;
+    dest.eval("def hello()\nend");
+    dest.eval("hello()");
+
+    migrate_stateful_values(source, dest);
+
+    // Nothing to test, except to make sure that the above call didn't SIGABRT
+    // (which it previously did)
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_simple);
@@ -249,6 +265,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment);
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
     REGISTER_TEST_CASE(stateful_code_tests::state_inside_lots_of_nested_functions);
+    REGISTER_TEST_CASE(stateful_code_tests::migrate_subroutine_with_no_hidden_state);
 }
 
 } // namespace stateful_code_tests

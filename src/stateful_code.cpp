@@ -116,12 +116,14 @@ void migrate_stateful_values(Branch& source, Branch& dest)
         {
             Term* sourceCallState = get_hidden_state_for_call(sourceTerm);
             Term* destCallState = get_hidden_state_for_call(destTerm);
-            if (is_subroutine_state_expanded(sourceCallState)
+            if (sourceCallState != NULL && destCallState != NULL) {
+                if (is_subroutine_state_expanded(sourceCallState)
                     && !is_subroutine_state_expanded(destCallState))
-                expand_subroutines_hidden_state(destTerm, destCallState);
+                    expand_subroutines_hidden_state(destTerm, destCallState);
 
-            // The loop just passed over these terms, so call migrate on them again.
-            migrate_stateful_values(as_branch(sourceCallState), as_branch(destCallState));
+                // The loop just passed over these terms, so call migrate on them again.
+                migrate_stateful_values(as_branch(sourceCallState), as_branch(destCallState));
+            }
         }
 
         // Migrate inner branches
