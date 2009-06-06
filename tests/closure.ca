@@ -1,0 +1,18 @@
+
+outside_value = 2
+
+def my_closure(float i) : float
+    return i * outside_value
+end
+
+print(map(my_closure, [1 2 3]))
+
+def my_func() : List
+    def my_inner_closure(float i) : float
+        return i + outside_value
+    end
+
+    return map(my_inner_closure, [5 6 7])
+end
+
+print(my_func())

@@ -185,6 +185,10 @@ void test_function_decl()
     test_assert(funcbranch[6]->input(1) == funcbranch[5]);
     test_equals(funcbranch[6]->name, OUTPUT_PLACEHOLDER_NAME);
     test_assert(funcbranch.length() == 7);
+
+    // This string once caused an error
+    Term* a = branch.eval("def f()\n  end");
+    test_assert(a);
 }
 
 void test_stateful_value_decl()

@@ -13,7 +13,7 @@ end
 
 def draw_piece(Point location, float rot)
     shape = [[0 0] [1 0] [0 1]]
-    rotate_around(@shape, [.5 .5] rot)
+    rotate_points_around(@shape, [.5 .5] rot)
     mult(@shape, 100)
     gl_triangles(shape, 0xffffffff)
 end
