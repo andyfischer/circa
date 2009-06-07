@@ -20,4 +20,4 @@ def draw_piece(Point location, float rot)
     gl_triangles(shape, 0xffffffff)
 end
 
-draw_piece([100 100], 0)
+draw_piece([100 100], time)

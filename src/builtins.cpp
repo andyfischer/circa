@@ -442,9 +442,6 @@ void post_setup_builtin_functions(Branch& kernel)
 
 void initialize_constants(Branch& kernel)
 {
-    float_value(&kernel, M_PI, "PI");
-    float_value(&kernel, M_PI / 2.0, "HALF_PI");
-
     as_function(VALUE_FUNC).feedbackFunc = ASSIGN_FUNC;
 }
 
