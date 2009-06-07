@@ -155,9 +155,8 @@ Term* find_function(Branch& branch, std::string const& name)
 {
     Term* result = find_named(&branch, name);
 
-    if (result == NULL) {
+    if (result == NULL)
         return UNKNOWN_FUNCTION;
-    }   
 
     return result;
 }

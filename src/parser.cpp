@@ -503,7 +503,15 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Branch& innerBranch = get_for_loop_code(forTerm);
 
     // Create iterator variable
-    Term* iterator = create_value(&innerBranch, ANY_TYPE, iterator_name);
+
+    // If possible, use the first term of the iterated list to find the type
+    // of the iterator variable. This is totally a hack and should be replaced
+    // when we have parametrized types.
+    Term* iterator_type = ANY_TYPE;
+    if (as_branch(listExpr).length() > 0)
+        iterator_type = as_branch(listExpr)[0]->type;
+
+    Term* iterator = create_value(&innerBranch, iterator_type, iterator_name);
     source_set_hidden(iterator, true);
 
     setup_for_loop_pre_code(forTerm);
