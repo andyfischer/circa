@@ -10,7 +10,7 @@ namespace rand_function {
         static bool seeded = false;
 
         if (!seeded) {
-
+            srand(time(0));
             seeded = true;
         }
 

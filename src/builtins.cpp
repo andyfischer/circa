@@ -434,10 +434,10 @@ void post_setup_builtin_functions(Branch& kernel)
     kernel.bindName(sub_v, "sub_v");
 
     Branch& mult_overloads = as_branch(MULT_FUNC);
-    Term* mult_v = create_duplicate(&mult_overloads, kernel["vectorize_vv"]);
-    create_ref(&as_function(mult_v).parameters, MULT_FUNC);
-    rename(mult_v, "mult_v");
-    kernel.bindName(mult_v, "mult_v");
+    Term* mult_s = create_duplicate(&mult_overloads, kernel["vectorize_vs"]);
+    create_ref(&as_function(mult_s).parameters, MULT_FUNC);
+    rename(mult_s, "mult_s");
+    kernel.bindName(mult_s, "mult_s");
 }
 
 void initialize_constants(Branch& kernel)
