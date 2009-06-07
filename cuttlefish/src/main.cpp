@@ -65,6 +65,7 @@ bool initialize_display()
     glDisable(GL_CULL_FACE);
     glClearColor(0,0,0,0);
     glClearDepth(1000);
+    glDepthFunc(GL_LEQUAL);
      
     glViewport( 0, 0, 640, 480 );
      

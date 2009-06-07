@@ -39,7 +39,6 @@ void gl_triangles(Term* caller)
 
     _unpack_gl_color(color);
     glBegin(GL_TRIANGLES);
-    _unpack_gl_color(color);
 
     for (int i=0; i < list.length(); i++) {
         float x = list[i]->field(0)->toFloat();
@@ -51,14 +50,14 @@ void gl_triangles(Term* caller)
     glEnd();
 }
 
-void gl_lines(Term* caller)
+void gl_line_strip(Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
     int color = caller->input(1)->asInt();
 
     _unpack_gl_color(color);
 
-    glStart(GL_LINES);
+    glBegin(GL_LINE_STRIP);
 
     for (int i=0; i < list.length(); i++) {
         float x = list[i]->field(0)->toFloat();
@@ -73,7 +72,7 @@ void register_functions(Branch& branch)
 {
     import_function(branch, background, "background(int)");
     import_function(branch, gl_triangles, "gl_triangles(List, int)");
-    import_function(branch, gl_lines, "gl_lines(List, int)");
+    import_function(branch, gl_line_strip, "gl_line_strip(List, int)");
 }
 
 } // namespace gl_shapes

@@ -1,12 +1,19 @@
 
-background(0xffffffff)
+type Point { float x, float y}
 
-def draw_point(Point p)
-  gl_triangles([p+[0 5] p+[-5 0] p+[5 0]] 0xffffffff)
-end
+background(0xffffffff)
 
 axis_center = [200 200] : Point
 
-for x in range(200)
-    x = 
+def map_point(float x) : Point
+  x = x - 200
+  y = sin(x / 100)*50
+  return [x y] + axis_center
 end
+
+-- draw the axis
+gl_line_strip([axis_center-[0 200] axis_center+[0 200]] 0x888888ff)
+gl_line_strip([axis_center-[200 0] axis_center+[200 0]] 0x888888ff)
+
+points = map(map_point, range(400))
+gl_line_strip(points, 0)
