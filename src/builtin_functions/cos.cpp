@@ -10,7 +10,8 @@ namespace cos_function {
     void evaluate(Term* caller)
     {
         float input = to_float(caller->input(0));
-        as_float(caller) = cos(input);
+        // Convert input from 0..1 to 0..2pi
+        as_float(caller) = cos(input * 2 * M_PI);
     }
 
     void feedback_evaluate(Term* caller)
@@ -24,7 +25,10 @@ namespace cos_function {
 
         // TODO: find a value that is in the same period as the target's input
 
-        as_float(caller) = std::acos(desired);
+        float result = std::acos(desired);
+
+        // Map result from radians into range of 0..1
+        as_float(caller) = result / (2 * M_PI);
     }
 
     void setup(Branch& kernel)

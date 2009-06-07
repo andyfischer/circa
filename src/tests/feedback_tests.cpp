@@ -92,7 +92,8 @@ void train_sin()
     refresh_training_branch(branch);
     evaluate_branch(branch);
 
-    test_equals(as_float(a), M_PI / 2.0);
+    // angles are in a range of 0..1. Otherwise this result would be PI/2
+    test_equals(as_float(a), 0.25);
 }
 
 void train_cos()
