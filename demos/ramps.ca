@@ -6,7 +6,7 @@ background(0xeeeeeeff)
 def rotate_points_around(List points, Point center, float rot) : List
     def rotate_point(Point point) : Point
         point = point - center
-        point = [point.x * (cos(rot) + sin(rot)), point.y * (cos(rot) - sin(rot))]
+        point = [point.x * (cos(rot) - sin(rot)), point.y * (cos(rot) + sin(rot))]
         point = point + center
         return point
     end
@@ -14,10 +14,14 @@ def rotate_points_around(List points, Point center, float rot) : List
 end
 
 def draw_piece(Point location, float rot)
-    shape = [[0 0] [1 0] [0 1]]
+    shape = [[0 0] [1 0] [1 2]]
     rotate_points_around(@shape, [.5 .5] rot)
     mult(@shape, 100)
-    gl_triangles(shape, 0xffffffff)
+    def add_location(Point p) : Point
+      return p + location
+    end
+    map(add_location, @shape)
+    gl_triangles(shape, 0xff0000ff)
 end
 
-draw_piece([100 100], time)
+draw_piece([200 200], time/8)
