@@ -52,10 +52,28 @@ void test_state()
     test_assert(as_int(s_iter0) != as_int(s_iter2));
 }
 
+void type_inference_for_iterator()
+{
+    Branch branch;
+    Term* loop = branch.compile("for i in [1]\nend");
+    Term* iterator = get_for_loop_iterator(loop);
+    test_assert(iterator->type == INT_TYPE);
+
+    // test a situation where we can't do inference
+    loop = branch.compile("for i in []\nend");
+    iterator = get_for_loop_iterator(loop);
+    test_assert(iterator->type == ANY_TYPE);
+
+    // test a situation where inference is required to parse the inner branch
+    loop = branch.compile("for i in [1]\ni = i * 2\nend");
+    Branch& inner_code = get_for_loop_code(loop);
+    test_assert(inner_code["i"]->function->name == "mult_i");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(for_loop_tests::test_simple);
-    //FIXME REGISTER_TEST_CASE(for_loop_tests::test_state);
+    REGISTER_TEST_CASE(for_loop_tests::type_inference_for_iterator);
 }
 
 } // for_loop_tests
