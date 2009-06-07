@@ -59,8 +59,8 @@ bool initialize_display()
 
     // Initialize GL state
 
-    glEnable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDisable(GL_CULL_FACE);
     glClearColor(0,0,0,0);

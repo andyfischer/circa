@@ -5,12 +5,8 @@ def draw_point(Point p)
   gl_triangles([p+[0 5] p+[-5 0] p+[5 0]] 0xffffffff)
 end
 
-def random_point(int i) : Point
-  return [rand() * 300, rand() * 300]
-end
+axis_center = [200 200] : Point
 
-state points = map(random_point, range(100))
-
-for point in points
-    draw_point(point)
+for x in range(200)
+    x = 
 end

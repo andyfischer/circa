@@ -10,7 +10,11 @@ namespace gl_shapes {
 
 void _unpack_gl_color(int color)
 {
-    glColor4i((color & 0xff000000) >> 24, (color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff);
+    float r = ((color & 0xff000000) >> 24) / 255.0;
+    float g = ((color & 0x00ff0000) >> 16) / 255.0;
+    float b = ((color & 0x0000ff00) >> 8) / 255.0;
+    float a = ((color & 0x000000ff) >> 0) / 255.0;
+    glColor4f(r,g,b,a);
 }
 
 void background(Term* caller)
@@ -30,8 +34,10 @@ void gl_triangles(Term* caller)
     Branch& list = caller->input(0)->asBranch();
     int color = caller->input(1)->asInt();
 
-    _unpack_gl_color(color);
+    glDisable(GL_TEXTURE);
+    glDisable(GL_TEXTURE_2D);
 
+    _unpack_gl_color(color);
     glBegin(GL_TRIANGLES);
     _unpack_gl_color(color);
 
@@ -45,10 +51,29 @@ void gl_triangles(Term* caller)
     glEnd();
 }
 
+void gl_lines(Term* caller)
+{
+    Branch& list = caller->input(0)->asBranch();
+    int color = caller->input(1)->asInt();
+
+    _unpack_gl_color(color);
+
+    glStart(GL_LINES);
+
+    for (int i=0; i < list.length(); i++) {
+        float x = list[i]->field(0)->toFloat();
+        float y = list[i]->field(1)->toFloat();
+        glVertex3f(x,y,0);
+    }
+    
+    glEnd();
+}
+
 void register_functions(Branch& branch)
 {
     import_function(branch, background, "background(int)");
     import_function(branch, gl_triangles, "gl_triangles(List, int)");
+    import_function(branch, gl_lines, "gl_lines(List, int)");
 }
 
 } // namespace gl_shapes
