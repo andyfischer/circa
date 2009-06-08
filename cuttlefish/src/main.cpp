@@ -25,7 +25,7 @@ Branch* USERS_BRANCH = NULL;
 bool CONTINUE_MAIN_LOOP = true;
 
 float TIME = 0;
-float ELAPSED = 0;
+float TIME_DELTA = 0;
 long PREV_SDL_TICKS = 0;
 
 bool initialize_display()
@@ -86,7 +86,7 @@ void main_loop()
 
     long ticks = SDL_GetTicks();
 
-    ELAPSED = (ticks - PREV_SDL_TICKS) / 1000.0;
+    TIME_DELTA = (ticks - PREV_SDL_TICKS) / 1000.0;
     TIME = ticks / 1000.0;
 
     PREV_SDL_TICKS = ticks;
@@ -121,7 +121,7 @@ int main( int argc, char* args[] )
 
     // Import constants
     expose_value(SCRIPT_ROOT, &TIME, "time");
-    expose_value(SCRIPT_ROOT, &ELAPSED, "elapsed");
+    expose_value(SCRIPT_ROOT, &TIME_DELTA, "time_delta");
 
     // Load runtime.ca
     std::string circa_home = getenv("CIRCA_HOME");

@@ -1,16 +1,19 @@
 
 type Point { float x, float y }
 
-WINDOW_WIDTH = 500
-WINDOW_HEIGHT = 400
+WINDOW_WIDTH = 510
+WINDOW_HEIGHT = 420
+
+tile_size = 30
+
+num_tiles_x = WINDOW_WIDTH / tile_size
+num_tiles_y = WINDOW_HEIGHT / tile_size
 
 -- draw the checkerboard in the background
-checker_width = 30
-checker_height = 30
-for x in range((WINDOW_WIDTH / checker_width) + 1)
-  for y in range((WINDOW_HEIGHT / checker_height) + 1)
-    box_tl = [x:int * checker_width, y:int * checker_height] : Point
-    box_br = box_tl + [checker_width, checker_height]
+for x in range(num_tiles_x)
+  for y in range(num_tiles_y)
+    box_tl = [x:int * tile_size, y:int * tile_size] : Point
+    box_br = box_tl + [tile_size, tile_size]
     box_tr = [box_br.x box_tl.y]
     box_bl = [box_tl.x box_br.y]
     color = if_expr((x:int+y:int) % 2 == 1, 0xeeeeeeff, 0xffffffff)
@@ -18,6 +21,7 @@ for x in range((WINDOW_WIDTH / checker_width) + 1)
   end
 end
 
+-- Helper function
 def rotate_points_around(List points, Point center, float rot) : List
     def rotate_point(Point point) : Point
         point = point - center
@@ -28,10 +32,12 @@ def rotate_points_around(List points, Point center, float rot) : List
     return map(rotate_point, points)
 end
 
-def draw_piece(Point location, float rot)
+type Piece { int x, int y, int rot }
+
+def draw_free_piece(Point location, float rot)
     shape = [[0 0] [1 0] [0 1]]
     rotate_points_around(@shape, [.5 .5] rot)
-    mult(@shape, 50)
+    mult(@shape, tile_size)
     def add_location(Point p) : Point
       return p + location
     end
@@ -39,4 +45,51 @@ def draw_piece(Point location, float rot)
     gl_triangles(shape, 0)
 end
 
-draw_piece([200 200], time/8)
+def draw_piece(Piece piece)
+  draw_free_piece([piece.x * tile_size, piece.y * tile_size] piece.rot/4.0)
+end
+
+state falling_piece = [5 0 0] : Piece
+state falling_piece_rot = 0
+state falling_piece_rot_display = 0.0
+state falling_piece_rot_display_target = 0.0
+state falling_piece_y = 0
+fall_speed = 20.0
+state tile_fall_distance = tile_size
+
+-- handle the falling tile
+tile_fall_distance -= fall_speed * time_delta
+if tile_fall_distance < 0
+  tile_fall_distance := tile_size
+  falling_piece_y := falling_piece_y + 1
+end
+
+-- keypresses for rotation
+if key_pressed(KEY_DOWN)
+  falling_piece_rot := (falling_piece_rot - 1) % 4
+end
+if key_pressed(KEY_UP)
+  falling_piece_rot := (falling_piece_rot + 1) % 4
+end
+
+falling_piece_rot_display_target = falling_piece_rot / 4.0
+
+def move_towards(float target, float current, float delta) : float
+  if abs(target - current) < delta
+    return target
+  else
+    if target > current
+      return current + delta
+    else
+      return current - delta
+    end
+  end
+end
+
+falling_piece_rot_display = move_towards(falling_piece_rot_display_target, falling_piece_rot_display, time_delta)
+
+-- draw falling tile
+draw_free_piece([falling_piece.x*tile_size falling_piece_y*tile_size - tile_fall_distance]
+                falling_piece_rot_display)
+
+fallen_pieces = []
