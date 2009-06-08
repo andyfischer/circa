@@ -50,7 +50,7 @@ void specialize_type(Term *term, Term *type)
 void rename(Term* term, std::string const& name)
 {
     if ((term->owningBranch != NULL) &&
-            (term->owningBranch->getNamed(term->name) == term)) {
+            (term->owningBranch->get(term->name) == term)) {
         term->owningBranch->names.remove(term->name);
         term->name = "";
         term->owningBranch->bindName(term, name);

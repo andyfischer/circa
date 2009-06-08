@@ -120,11 +120,6 @@ Branch::clear()
     names.clear();
 }
 
-void Branch::eval()
-{
-    evaluate_branch(*this);
-}
-
 Term*
 Branch::eval(std::string const& statement)
 {
@@ -303,7 +298,7 @@ Term* find_named(Branch* branch, std::string const& name)
 {
     if (branch != NULL) {
         if (branch->contains(name))
-            return branch->getNamed(name);
+            return branch->get(name);
 
         return find_named(get_outer_scope(*branch), name);
     }

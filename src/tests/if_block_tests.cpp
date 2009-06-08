@@ -35,7 +35,7 @@ void test_if_joining_on_bool()
 
     branch.eval("if false\nhey = false\nend");
 
-    branch.eval();
+    evaluate_branch(branch);
 
     test_assert(branch["hey"]->asBool() == true);
 }

@@ -37,7 +37,7 @@ void setup_for_loop_post_code(Term* forTerm)
     for (unsigned i=0; i < reboundNames.size(); i++) {
         std::string name = reboundNames[i];
         Branch& outerScope = *forTerm->owningBranch;
-        Term* outerVersion = outerScope.getNamed(name);
+        Term* outerVersion = outerScope.get(name);
         Term* innerVersion = get_for_loop_code(forTerm)[name];
 
         Term* ifexpr = apply(&rebound, IF_EXPR_FUNC,
