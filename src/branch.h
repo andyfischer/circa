@@ -31,32 +31,18 @@ struct Branch
     Term* operator[](int index) const { return _terms[index]; }
     Ref& operator[](int index) { return _terms[index]; }
 
-    // Get the term with the given name.
-    Term* getNamed(std::string const& name) const
-    {
-        return names[name];
-    }
+    // Get a term from a name binding.
+    Term* get(std::string const& name) const { return names[name]; }
+    Term* operator[](std::string const& name) const { return get(name); }
 
-    // Convenience syntax for getNamed
-    Term* operator[](std::string const& name) const { return getNamed(name); }
-
-    // Alternate version of getNamed
-    Term* get(std::string const& name) const
-    {
-        return names[name];
-    }
+    // Returns true if there is a term with the given name
+    bool contains(std::string const& name) const { return names.contains(name); }
 
     void append(Term* term);
 
     void remove(std::string const& name);
     void remove(int index);
     void removeNulls();
-
-    // Returns true if there is a term with the given name
-    bool contains(std::string const& name) const
-    {
-        return names.contains(name);
-    }
 
     // Find the first term with the given name binding.
     Term* findFirstBinding(std::string const& name) const;
@@ -71,9 +57,6 @@ struct Branch
     void remapPointers(ReferenceMap const& map);
 
     void clear();
-
-    // Evaluate this branch.
-    void eval();
 
     // Compile the given statement, return the result term.
     Term* compile(std::string const& statement);

@@ -24,7 +24,7 @@ void test_int_value()
     test_assert(as_int(term) == -2);
 
     Term *term2 = int_value(&branch, 154, "george");
-    test_assert(term2 == branch.getNamed("george"));
+    test_assert(term2 == branch.get("george"));
     test_assert(term2->name == "george");
     test_assert(as_int(term2) == 154);
 }

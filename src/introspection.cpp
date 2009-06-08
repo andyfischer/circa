@@ -237,7 +237,7 @@ std::string get_source_filename(Term* term)
 
     while (branch != NULL) {
         if (branch->contains(get_name_for_attribute("source-file")))
-            return as_string(branch->getNamed(get_name_for_attribute("source-file")));
+            return as_string(branch->get(get_name_for_attribute("source-file")));
 
         branch = get_outer_scope(*branch);
     }
