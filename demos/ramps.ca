@@ -1,21 +1,22 @@
 
 type Point { float x, float y }
 
-WINDOW_WIDTH = 400
-WINDOW_HEIGHT = 200
+WINDOW_WIDTH = 500
+WINDOW_HEIGHT = 400
 
 -- draw the checkerboard in the background
-checker_width = 10
-checker_height = 10
-for x in range(WINDOW_WIDTH / checker_width)
-  for y in range(WINDOW_HEIGHT / checker_height)
-    box_tl = [x * checker_width, y * checker_height] : Point
+checker_width = 30
+checker_height = 30
+for x in range((WINDOW_WIDTH / checker_width) + 1)
+  for y in range((WINDOW_HEIGHT / checker_height) + 1)
+    box_tl = [x:int * checker_width, y:int * checker_height] : Point
     box_br = box_tl + [checker_width, checker_height]
-    color = if-expr((x+y) % 2 == 1, 0xff0000ff, 0xffffffff)
-    gl_triangles([box_tl [box_tl.x box_br.y] [box_br.x box_tl.y]] color)
+    box_tr = [box_br.x box_tl.y]
+    box_bl = [box_tl.x box_br.y]
+    color = if_expr((x:int+y:int) % 2 == 1, 0xeeeeeeff, 0xffffffff)
+    gl_triangles([box_tl box_tr box_bl box_tr box_br box_bl] color)
   end
 end
---background(0xeeeeeeff)
 
 def rotate_points_around(List points, Point center, float rot) : List
     def rotate_point(Point point) : Point

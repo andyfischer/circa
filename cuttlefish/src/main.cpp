@@ -31,9 +31,6 @@ long PREV_SDL_TICKS = 0;
 bool initialize_display()
 {
     // Initialize the window
-    Branch windowSettings;
-    evaluate_script(windowSettings, "window.ca");
-
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
         return false;
@@ -42,8 +39,9 @@ bool initialize_display()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     // Create the surface
-    SCREEN = SDL_SetVideoMode(Int(windowSettings, "width", 640),
-            Int(windowSettings, "height", 480), 16, SDL_OPENGL | SDL_SWSURFACE);
+    circa::Int windowWidth(*USERS_BRANCH, "WINDOW_WIDTH", 640);
+    circa::Int windowHeight(*USERS_BRANCH, "WINDOW_HEIGHT", 480);
+    SCREEN = SDL_SetVideoMode(windowWidth, windowHeight, 16, SDL_OPENGL | SDL_SWSURFACE);
 
     if (SCREEN == NULL) {
         std::cerr << "SDL_SetVideoMode failed: " << std::endl;
@@ -55,7 +53,7 @@ bool initialize_display()
         return false;
 
     // Set window caption
-    SDL_WM_SetCaption(String(windowSettings, "title", "Untitled").get().c_str(), NULL);
+    SDL_WM_SetCaption(String(*USERS_BRANCH, "WINDOW_TITLE", "Untitled").get().c_str(), NULL);
 
     // Initialize GL state
 
@@ -67,14 +65,14 @@ bool initialize_display()
     glClearDepth(1000);
     glDepthFunc(GL_LEQUAL);
      
-    glViewport( 0, 0, 640, 480 );
+    glViewport(0, 0, windowWidth, windowHeight);
      
     glClear( GL_COLOR_BUFFER_BIT );
      
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
      
-    glOrtho(0, 640, 480, 0, -1000.0f, 1000.0f);
+    glOrtho(0, windowWidth, windowHeight, 0, -1000.0f, 1000.0f);
         
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
