@@ -1,12 +1,26 @@
 
-type Point { float x, float y}
+type Point { float x, float y }
 
-background(0xeeeeeeff)
+WINDOW_WIDTH = 400
+WINDOW_HEIGHT = 200
+
+-- draw the checkerboard in the background
+checker_width = 10
+checker_height = 10
+for x in range(WINDOW_WIDTH / checker_width)
+  for y in range(WINDOW_HEIGHT / checker_height)
+    box_tl = [x * checker_width, y * checker_height] : Point
+    box_br = box_tl + [checker_width, checker_height]
+    color = if-expr((x+y) % 2 == 1, 0xff0000ff, 0xffffffff)
+    gl_triangles([box_tl [box_tl.x box_br.y] [box_br.x box_tl.y]] color)
+  end
+end
+--background(0xeeeeeeff)
 
 def rotate_points_around(List points, Point center, float rot) : List
     def rotate_point(Point point) : Point
         point = point - center
-        point = [point.x * (cos(rot) - sin(rot)), point.y * (cos(rot) + sin(rot))]
+        point = [point.x*cos(rot) - point.y*sin(rot), point.x*sin(rot)+point.y*cos(rot)]
         point = point + center
         return point
     end
@@ -14,14 +28,14 @@ def rotate_points_around(List points, Point center, float rot) : List
 end
 
 def draw_piece(Point location, float rot)
-    shape = [[0 0] [1 0] [1 2]]
+    shape = [[0 0] [1 0] [0 1]]
     rotate_points_around(@shape, [.5 .5] rot)
-    mult(@shape, 100)
+    mult(@shape, 50)
     def add_location(Point p) : Point
       return p + location
     end
     map(add_location, @shape)
-    gl_triangles(shape, 0xff0000ff)
+    gl_triangles(shape, 0)
 end
 
 draw_piece([200 200], time/8)
