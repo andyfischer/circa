@@ -380,6 +380,17 @@ void test_unary_minus()
     test_equals(b->toFloat(), -1.0);
 }
 
+void test_array_index_access()
+{
+    Branch branch;
+    branch.eval("a = [1 2 3]");
+    Term* b = branch.eval("a[0]");
+
+    test_assert(b);
+    test_assert(b->function == GET_INDEX_FUNC);
+    test_assert(b->asInt() == 1);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -406,6 +417,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_function_decl_parse_error);
     REGISTER_TEST_CASE(parser_tests::test_semicolon_as_line_ending);
     REGISTER_TEST_CASE(parser_tests::test_unary_minus);
+    REGISTER_TEST_CASE(parser_tests::test_array_index_access);
 }
 
 } // namespace parser_tests

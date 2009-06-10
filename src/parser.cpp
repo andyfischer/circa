@@ -846,7 +846,7 @@ Term* dot_expression(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
-    Term* lhs = atom(branch, tokens);
+    Term* lhs = subscripted_atom(branch, tokens);
 
     while (tokens.nextIs(DOT)) {
 
@@ -940,6 +940,25 @@ Term* dot_expression(Branch& branch, TokenStream& tokens)
         lhs = result;
     }
     return lhs;
+}
+
+Term* subscripted_atom(Branch& branch, TokenStream& tokens)
+{
+    Term* result = atom(branch, tokens);
+
+    if (has_compile_error(result))
+        return result;
+
+    if (tokens.nextIs(LBRACKET)) {
+        tokens.consume(LBRACKET);
+
+        Term* subscript = infix_expression(branch, tokens);
+
+        tokens.consume(RBRACKET);
+
+        return apply(&branch, GET_INDEX_FUNC, RefList(result, subscript));
+    }
+    else return result;
 }
 
 Term* atom(Branch& branch, TokenStream& tokens)
