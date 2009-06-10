@@ -60,16 +60,16 @@ state tile_fall_distance = tile_size
 -- handle the falling tile
 tile_fall_distance -= fall_speed * time_delta
 if tile_fall_distance < 0
-  tile_fall_distance := tile_size
-  falling_piece_y := falling_piece_y + 1
+  tile_fall_distance = tile_size
+  falling_piece_y = falling_piece_y + 1
 end
 
 -- keypresses for rotation
 if key_pressed(KEY_DOWN)
-  falling_piece_rot := (falling_piece_rot - 1) % 4
+  falling_piece_rot = (falling_piece_rot - 1) % 4
 end
 if key_pressed(KEY_UP)
-  falling_piece_rot := (falling_piece_rot + 1) % 4
+  falling_piece_rot = (falling_piece_rot + 1) % 4
 end
 
 falling_piece_rot_display_target = falling_piece_rot / 4.0
