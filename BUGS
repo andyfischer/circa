@@ -1,8 +1,4 @@
 
- - Unary negation doesn't work.
-   Can't write this: a = 1; b = -a
-   (Negation does work on literals because it's included in the token)
-
  - Subtraction against a literal sometimes doesn't work (depending on if you added a space)
    Can't write this: 1-2
    The reason is that the tokenizer interprets this as two values, '1' and '-2'
