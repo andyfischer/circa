@@ -260,6 +260,8 @@ std::string get_compile_error_message(Term* term)
 
     std::stringstream out;
 
+    out << " " << term_to_raw_string(term) << " ";
+
     out << get_short_location(term) << ": ";
 
     if (term->function->function == UNKNOWN_FUNCTION)

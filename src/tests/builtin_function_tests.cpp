@@ -198,6 +198,17 @@ void test_vectorized_funcs_with_points()
     test_equals(b->field(1)->toFloat(), 2);
 }
 
+void test_if_expr_with_int_and_float()
+{
+    // This code once caused a bug
+    Branch branch;
+
+    Term* a = branch.eval("if_expr(true, 1, 1.0)");
+    test_assert(a->type != ANY_TYPE);
+    Term* b = branch.eval("if_expr(true, 1.0, 1)");
+    test_assert(b->type != ANY_TYPE);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
@@ -212,6 +223,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_map);
     REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs);
     REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs_with_points);
+    REGISTER_TEST_CASE(builtin_function_tests::test_if_expr_with_int_and_float);
 }
 
 } // namespace builtin_function_tests
