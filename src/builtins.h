@@ -30,7 +30,7 @@ extern Term* FEEDBACK_TYPE;
 extern Term* FLOAT_TYPE;
 extern Term* FOR_FUNC;
 extern Term* FUNCTION_TYPE;
-extern Term* GET_FIELD_FUNC;
+extern Term* GET_INDEX_FUNC;
 extern Term* GET_FIELD_BY_NAME_FUNC;
 extern Term* IF_FUNC;
 extern Term* IF_EXPR_FUNC;

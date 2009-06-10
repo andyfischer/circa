@@ -200,13 +200,30 @@ void test_vectorized_funcs_with_points()
 
 void test_if_expr_with_int_and_float()
 {
-    // This code once caused a bug
     Branch branch;
 
+    // This code once caused a bug
     Term* a = branch.eval("if_expr(true, 1, 1.0)");
     test_assert(a->type != ANY_TYPE);
     Term* b = branch.eval("if_expr(true, 1.0, 1)");
     test_assert(b->type != ANY_TYPE);
+}
+
+void test_get_index()
+{
+    Branch branch;
+
+    branch.eval("l = [1 2 3]");
+    Term* get = branch.eval("get_index(l, 0)");
+
+    test_assert(get);
+    test_assert(get->type == INT_TYPE);
+    test_assert(get->asInt() == 1);
+
+
+    branch.eval("l = []");
+    get = branch.eval("get_index(l, 5)");
+    test_assert(get->hasError);
 }
 
 void register_tests()
@@ -224,6 +241,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs);
     REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs_with_points);
     REGISTER_TEST_CASE(builtin_function_tests::test_if_expr_with_int_and_float);
+    REGISTER_TEST_CASE(builtin_function_tests::test_get_index);
 }
 
 } // namespace builtin_function_tests
