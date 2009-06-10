@@ -57,14 +57,14 @@ state falling_piece_y = 0
 fall_speed = 20.0
 state tile_fall_distance = tile_size
 
--- handle the falling tile
+-- Handle the falling tile
 tile_fall_distance -= fall_speed * time_delta
 if tile_fall_distance < 0
   tile_fall_distance = tile_size
   falling_piece_y = falling_piece_y + 1
 end
 
--- keypresses for rotation
+-- Keypresses for rotation
 if key_pressed(KEY_DOWN)
   falling_piece_rot = (falling_piece_rot - 1) % 4
 end
@@ -72,23 +72,9 @@ if key_pressed(KEY_UP)
   falling_piece_rot = (falling_piece_rot + 1) % 4
 end
 
-falling_piece_rot_display_target = falling_piece_rot / 4.0
+falling_piece_rot_display = falling_piece_rot / 4.0
 
-def move_towards(float target, float current, float delta) : float
-  if abs(target - current) < delta
-    return target
-  else
-    if target > current
-      return current + delta
-    else
-      return current - delta
-    end
-  end
-end
-
-falling_piece_rot_display = move_towards(falling_piece_rot_display_target, falling_piece_rot_display, time_delta)
-
--- draw falling tile
+-- Draw falling tile
 draw_free_piece([falling_piece.x*tile_size falling_piece_y*tile_size - tile_fall_distance]
                 falling_piece_rot_display)
 

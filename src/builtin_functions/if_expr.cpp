@@ -23,9 +23,18 @@ namespace if_expr_function {
 
     Term* specializeType(Term* caller)
     {
+        Term* left_type = caller->input(1)->type;
+        Term* right_type = caller->input(2)->type;
+
         // if inputs 1 and 2 have the same type, we can use that
-        if (caller->input(1)->type == caller->input(2)->type)
-            return caller->input(1)->type;
+        if (left_type == right_type)
+            return left_type;
+
+        // special case if one input is int and another is float
+        if ((left_type == INT_TYPE || left_type == FLOAT_TYPE)
+            && (right_type == INT_TYPE || right_type == FLOAT_TYPE))
+            return FLOAT_TYPE;
+
 
         // Otherwise return any. (we might want to signal an error here)
         return ANY_TYPE;

@@ -93,12 +93,7 @@ void main_loop()
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    try {
-        SCRIPT_ROOT->eval();
-
-    } catch (std::exception &e) {
-        std::cout << e.what() << std::endl;
-    }
+    evaluate_branch(*SCRIPT_ROOT);
 
     // Update the screen
     SDL_GL_SwapBuffers();
@@ -134,6 +129,16 @@ int main( int argc, char* args[] )
         std::string filename = args[1];
         std::cout << "Loading file: " << filename << std::endl;
         parse_script(*USERS_BRANCH, filename);
+
+        if (count_compile_errors(*USERS_BRANCH) > 0) {
+            int count = count_compile_errors(*USERS_BRANCH);
+            std::cout << count << " compile error";
+            if (count != 1) std::cout << "s";
+            std::cout << ":" << std::endl;
+            print_compile_errors(*USERS_BRANCH, std::cout);
+            std::cout << branch_to_string_raw(*USERS_BRANCH);
+            return 1;
+        }
     }
 
     // Try to initialize display

@@ -518,6 +518,8 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     consume_branch_until_end(innerBranch, tokens);
 
+    possible_whitespace(tokens);
+
     if (!tokens.nextIs(END))
         return compile_error_for_line(branch, tokens, startPosition);
 
