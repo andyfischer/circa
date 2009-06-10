@@ -49,7 +49,12 @@ def draw_piece(Piece piece)
   draw_free_piece([piece.x * tile_size, piece.y * tile_size] piece.rot/4.0)
 end
 
-state falling_piece = [5 0 0] : Piece
+piece_types = [
+    [[0 0 2] [1 0 3]],
+    [[0 0 2] [0 1 2] [0 1 0]]
+]
+
+state falling_piece = [[0 0 2] [1 0 3]]
 state falling_piece_rot = 0
 state falling_piece_rot_display = 0.0
 state falling_piece_rot_display_target = 0.0
@@ -75,7 +80,10 @@ end
 falling_piece_rot_display = falling_piece_rot / 4.0
 
 -- Draw falling tile
-draw_free_piece([falling_piece.x*tile_size falling_piece_y*tile_size - tile_fall_distance]
-                falling_piece_rot_display)
+for piece in falling_piece
+    piece = piece:Piece
+    draw_free_piece([piece.x*tile_size falling_piece_y*tile_size - tile_fall_distance]
+                falling_piece_rot_display+piece.rot/4.0)
+end
 
 fallen_pieces = []

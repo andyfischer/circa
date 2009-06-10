@@ -278,11 +278,9 @@ std::string get_compile_error_message(Term* term)
 
 void print_compile_errors(Branch& branch, std::ostream& output)
 {
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
-
-        if (has_compile_error(term))
-            output << get_compile_error_message(term) << std::endl;
+    for (BranchIterator it(branch); !it.finished(); ++it) {
+        if (has_compile_error(*it))
+            output << get_compile_error_message(*it) << std::endl;
     }
 }
 
