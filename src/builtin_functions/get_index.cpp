@@ -32,7 +32,7 @@ namespace get_index_function {
 
     void setup(Branch& kernel)
     {
-        GET_INDEX_FUNC = import_function(kernel, evaluate, "get_index(any, int) -> any");
+        GET_INDEX_FUNC = import_function(kernel, evaluate, "get_index(any, int) : any");
         as_function(GET_INDEX_FUNC).specializeType = specializeType;
     }
 }

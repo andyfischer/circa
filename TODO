@@ -1,6 +1,5 @@
 
 SPECIFIC THINGS:
- - Need array index access operator, ie this: array[i]
  - Need elif or elsif
  - Need a better way to write a literal color value
  - Need ternary operator
