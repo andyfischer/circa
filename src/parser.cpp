@@ -770,7 +770,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
     int startPosition = tokens.getPosition();
 
     if (precedence > HIGHEST_INFIX_PRECEDENCE)
-        return dot_expression(branch, tokens);
+        return unary_expression(branch, tokens);
 
     std::string preWhitespace = possible_whitespace(tokens);
 
@@ -827,6 +827,19 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
     }
 
     return leftExpr;
+}
+
+Term* unary_expression(Branch& branch, TokenStream& tokens)
+{
+    // int startPosition = tokens.getPosition();
+
+    if (tokens.nextIs(MINUS)) {
+        tokens.consume(MINUS);
+        Term* expr = dot_expression(branch, tokens);
+        return apply(&branch, NEG_FUNC, RefList(expr));
+    }
+
+    return dot_expression(branch, tokens);
 }
 
 Term* dot_expression(Branch& branch, TokenStream& tokens)

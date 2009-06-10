@@ -369,6 +369,17 @@ void test_semicolon_as_line_ending()
     test_assert(branch["a"]->asInt() == 2);
 }
 
+void test_unary_minus()
+{
+    Branch branch;
+    Term* a = branch.eval("a = 1");
+    Term* b = branch.eval("b = -a");
+
+    test_assert(b->function == NEG_FUNC);
+    test_assert(b->input(0) == a);
+    test_equals(b->toFloat(), -1.0);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -394,6 +405,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_list_arguments);
     REGISTER_TEST_CASE(parser_tests::test_function_decl_parse_error);
     REGISTER_TEST_CASE(parser_tests::test_semicolon_as_line_ending);
+    REGISTER_TEST_CASE(parser_tests::test_unary_minus);
 }
 
 } // namespace parser_tests

@@ -40,6 +40,7 @@ extern Term* LIST_TYPE;
 extern Term* LIST_FUNC;
 extern Term* MAP_TYPE;
 extern Term* MULT_FUNC;
+extern Term* NEG_FUNC;
 extern Term* NOT_FUNC;
 extern Term* ONE_TIME_ASSIGN_FUNC;
 extern Term* OVERLOADED_FUNCTION_TYPE;
