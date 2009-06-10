@@ -180,7 +180,9 @@ void Branch::assign(Term* sourceTerm, Term* destTerm)
 
     // Add terms if necessary
     for (int i=dest.length(); i < source.length(); i++) {
-        create_duplicate(&dest, source[i]);
+        Term* t = create_duplicate(&dest, source[i]);
+        if (source[i]->name != "")
+            dest.bindName(t, source[i]->name);
     }
 
     // Remove terms if necessary

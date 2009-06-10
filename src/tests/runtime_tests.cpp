@@ -125,7 +125,7 @@ void test_runtime_type_error()
     test_assert(term->hasError);
 
     // try wrong # of arguments
-    term = branch.eval("div(1)");
+    term = branch.eval("abs()");
     evaluate_term(term);
     test_assert(term->hasError);
 }
