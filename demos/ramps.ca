@@ -22,6 +22,12 @@ for x in range(num_tiles_x)
 end
 
 -- Helper function
+def rotate_point_around(Point point, Point center, float rot) : Point
+    point = point - center
+    point = [point.x*cos(rot) - point.y*sin(rot), point.x*sin(rot)+point.y*cos(rot)]
+    point = point + center
+    return point
+end
 def rotate_points_around(List points, Point center, float rot) : List
     def rotate_point(Point point) : Point
         point = point - center
@@ -77,13 +83,17 @@ if key_pressed(KEY_UP)
   falling_piece_rot = (falling_piece_rot + 1) % 4
 end
 
-falling_piece_rot_display = falling_piece_rot / 4.0
 
 -- Draw falling tile
 for piece in falling_piece
     piece = piece:Piece
-    draw_free_piece([piece.x*tile_size falling_piece_y*tile_size - tile_fall_distance]
-                falling_piece_rot_display+piece.rot/4.0)
+    position = [piece.x piece.y] : Point
+    mult(@position, tile_size)
+    rotate_point_around(@position, [0 0], falling_piece_rot/4.0)
+
+    position = [position.x position.y-tile_fall_distance+falling_piece_y*tile_size]
+    
+    draw_free_piece(position 0)
 end
 
 fallen_pieces = []
