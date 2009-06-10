@@ -22,6 +22,7 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type);
 bool function_has_hidden_state(Term* func);
 
 Term* get_hidden_state_for_call(Term* term);
+bool terms_match_for_migration(Term* left, Term* right);
 
 void migrate_stateful_values(Branch& source, Branch& dest);
 

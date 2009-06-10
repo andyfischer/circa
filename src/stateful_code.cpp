@@ -78,7 +78,7 @@ Term* get_hidden_state_for_call(Term* term)
         return NULL;
 }
 
-bool _terms_match_for_migration(Term* left, Term* right)
+bool terms_match_for_migration(Term* left, Term* right)
 {
     if ((left->name == right->name) && (left->type == right->type))
         return true;
@@ -88,9 +88,6 @@ bool _terms_match_for_migration(Term* left, Term* right)
 
 void migrate_stateful_values(Branch& source, Branch& dest)
 {
-    // Figure out the mapping of source terms to dest terms
-    std::map<Term*,Term*> map;
-
     // There are a lot of fancy algorithms we could do here. But for now, just
     // iterate and check matching indexes.
     
@@ -104,7 +101,7 @@ void migrate_stateful_values(Branch& source, Branch& dest)
         if (sourceTerm == NULL || destTerm == NULL)
             continue;
 
-        if (!_terms_match_for_migration(sourceTerm, destTerm))
+        if (!terms_match_for_migration(sourceTerm, destTerm))
             continue;
 
         // At this point, they match
@@ -126,8 +123,8 @@ void migrate_stateful_values(Branch& source, Branch& dest)
             }
         }
 
-        // Migrate inner branches
-        if (is_branch(sourceTerm)) {
+        // Migrate inner branches (but not branches that should be treated as values)
+        if (is_branch(sourceTerm) && !is_stateful(sourceTerm)) {
             assert(is_branch(destTerm));
             migrate_stateful_values(as_branch(sourceTerm), as_branch(destTerm));
         } 

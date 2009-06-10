@@ -47,7 +47,7 @@ void subroutine_expansion_during_migrate()
 {
     Branch branch;
 
-    branch.eval("def myfunc()\nstate i : int\nend");
+    branch.eval("def myfunc(); state i : int; end");
 
     Branch& source = create_branch(&branch, "source");
     Branch& dest = create_branch(&branch, "dest");
@@ -65,8 +65,9 @@ void subroutine_expansion_during_migrate()
 
     migrate_stateful_values(source, dest);
 
-    test_assert(is_subroutine_state_expanded(get_hidden_state_for_call(destCall)));
-    test_assert(destCallState->field("i")->asInt() == 111);
+    //test_assert(is_subroutine_state_expanded(get_hidden_state_for_call(destCall)));
+    test_assert(as_branch(destCallState).contains("i"));
+    test_assert(as_branch(destCallState)["i"]->asInt() == 111);
 }
 
 void test_load_and_save()
@@ -253,6 +254,30 @@ void migrate_subroutine_with_no_hidden_state()
     // (which it previously did)
 }
 
+void test_migrate_stateful_compound_value()
+{
+    Branch source;
+    Term* l_source = source.eval("state l = []");
+
+    int_value(&as_branch(l_source), 1);
+    int_value(&as_branch(l_source), 2);
+    int_value(&as_branch(l_source), 3);
+
+    Branch dest;
+    Term* l = dest.eval("state l = []");
+
+    test_assert(terms_match_for_migration(l_source, l));
+
+    migrate_stateful_values(source, dest);
+
+    test_assert(is_branch(l_source));
+    test_assert(is_branch(l));
+    test_assert(as_branch(l).length() == 3);
+    test_assert(as_branch(l)[0]->asInt() == 1);
+    test_assert(as_branch(l)[1]->asInt() == 2);
+    test_assert(as_branch(l)[2]->asInt() == 3);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_simple);
@@ -266,6 +291,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
     REGISTER_TEST_CASE(stateful_code_tests::state_inside_lots_of_nested_functions);
     REGISTER_TEST_CASE(stateful_code_tests::migrate_subroutine_with_no_hidden_state);
+    REGISTER_TEST_CASE(stateful_code_tests::test_migrate_stateful_compound_value);
 }
 
 } // namespace stateful_code_tests
