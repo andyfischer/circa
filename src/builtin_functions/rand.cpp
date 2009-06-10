@@ -2,6 +2,8 @@
 
 #include "circa.h"
 
+#include "time.h"
+
 namespace circa {
 namespace rand_function {
 

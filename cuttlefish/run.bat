@@ -1,4 +1,4 @@
 
 set PATH=%PATH%;%~dp0\..\SDL_deps\bin
 
-%~dp0\app.exe %*
+%~dp0\..\build\bin\cfsh.exe %*
