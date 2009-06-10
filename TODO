@@ -1,10 +1,10 @@
 
-BUGS:
-
-- Prefix operators. Need to support -x
-- Ambiguity with lists and x -y (this could mean [(x - y)] or [x, -y])
-- Need array access[0] operator
-- Need elif
+SPECIFIC THINGS:
+ - Need array index access operator, ie this: array[i]
+ - Need elif or elsif
+ - Need a better way to write a literal color value
+ - Need ternary operator
+ - Need a general-purpose way to have shared immutable values
 
 IMPORTANT THINGS:
 - Cool graphical demo
