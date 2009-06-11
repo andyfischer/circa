@@ -21,8 +21,7 @@ namespace to_string_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "to_string(any) : string");
-        as_function(main_func).pureFunction = true;
+        import_function(kernel, evaluate, "to_string(any) : string");
     }
 }
 } // namespace circa

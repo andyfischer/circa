@@ -23,7 +23,6 @@ namespace set_field_by_name_function {
         SET_FIELD_BY_NAME_FUNC = import_function(kernel, evaluate,
                 "set_field_by_name(any, any) : any");
         as_function(SET_FIELD_BY_NAME_FUNC).specializeType = specializeType;
-        as_function(SET_FIELD_BY_NAME_FUNC).pureFunction = true;
     }
 }
 }

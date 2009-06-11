@@ -288,7 +288,6 @@ void bootstrap_kernel()
     Function* valueFunc = new Function();
     VALUE_FUNC->value = valueFunc;
     valueFunc->name = "value";
-    valueFunc->pureFunction = true;
     valueFunc->evaluate = empty_evaluate_function;
     KERNEL->bindName(VALUE_FUNC, "value");
 
@@ -299,7 +298,6 @@ void bootstrap_kernel()
     Function* constTypeFuncValue = new Function();
     constTypeFunc->value = constTypeFuncValue;
     constTypeFuncValue->name = "const-Type";
-    constTypeFuncValue->pureFunction = true;
 
     // Create Type type
     TYPE_TYPE = new Term();
@@ -327,7 +325,6 @@ void bootstrap_kernel()
     Function* constFuncFuncValue = new Function();
     constFuncFunc->value = constFuncFuncValue;
     constFuncFuncValue->name = "const-Function";
-    constFuncFuncValue->pureFunction = true;
     KERNEL->bindName(constFuncFunc, "const-Function");
 
     // Create Function type

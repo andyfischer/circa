@@ -12,8 +12,7 @@ namespace mod_function {
 
     void setup(Branch& kernel)
     {
-        Term* func = import_function(kernel, evaluate, "mod(int,int) : int");
-        as_function(func).pureFunction = true;
+        import_function(kernel, evaluate, "mod(int,int) : int");
     }
 }
 } // namespace circa

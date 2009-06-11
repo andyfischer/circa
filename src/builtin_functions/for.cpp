@@ -28,7 +28,6 @@ namespace for_function {
     {
         create_type(&kernel, "type for__state { Branch code, List _state }");
         FOR_FUNC = import_function(kernel, evaluate, "for(List) : for__state");
-        as_function(FOR_FUNC).pureFunction = true;
         as_function(FOR_FUNC).toSourceString = toSourceString;
     }
 }

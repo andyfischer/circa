@@ -12,8 +12,7 @@ namespace log_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "log(float) : float");
-        as_function(main_func).pureFunction = true;
+        import_function(kernel, evaluate, "log(float) : float");
     }
 }
 }

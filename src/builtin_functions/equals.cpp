@@ -28,8 +28,7 @@ namespace equals_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "equals(any,any) : bool");
-        as_function(main_func).pureFunction = true;
+        import_function(kernel, evaluate, "equals(any,any) : bool");
     }
 }
 }

@@ -13,8 +13,7 @@ namespace sqr_function {
 
     void setup(Branch& kernel)
     {
-        Term* func = import_function(kernel, evaluate, "sqr(float) : float");
-        as_function(func).pureFunction = true;
+        import_function(kernel, evaluate, "sqr(float) : float");
     }
 }
 } // namespace circa

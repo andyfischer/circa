@@ -18,10 +18,8 @@ namespace greater_than_eq_function {
     void setup(Branch& kernel)
     {
         Term* main = create_overloaded_function(&kernel, "greater_than_eq");
-        Term* gt_i = import_function_overload(main, evaluate_f, "greater_than_eq(int,int) : bool");
-        as_function(gt_i).pureFunction = true;
-        Term* gt_f = import_function_overload(main, evaluate_f, "greater_than_eq(float,float) : bool");
-        as_function(gt_f).pureFunction = true;
+        import_function_overload(main, evaluate_f, "greater_than_eq(int,int) : bool");
+        import_function_overload(main, evaluate_f, "greater_than_eq(float,float) : bool");
     }
 }
 }

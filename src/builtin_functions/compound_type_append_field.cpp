@@ -17,8 +17,7 @@ namespace compound_type_append_field_function {
 
     void setup(Branch& kernel)
     {
-        Term* main = import_function(kernel, evaluate, "compound_type_append_field(Type,Type,string) : Type");
-        as_function(main).pureFunction = true;
+        import_function(kernel, evaluate, "compound_type_append_field(Type,Type,string) : Type");
     }
 }
 } // namespace circa

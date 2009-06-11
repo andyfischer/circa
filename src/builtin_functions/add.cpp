@@ -42,10 +42,8 @@ namespace add_function {
         ADD_FUNC = create_overloaded_function(&kernel, "add");
 
         Term* add_i = import_function_overload(ADD_FUNC, evaluate_i, "add_i(int...) : int");
-        as_function(add_i).pureFunction = true;
 
         Term* add_f = import_function_overload(ADD_FUNC, evaluate_f, "add_f(float...) : float");
-        as_function(add_f).pureFunction = true;
         as_function(add_f).feedbackFunc = 
             import_function(kernel, feedback_evaluate, "add_feedback(any, float) : Branch");
 

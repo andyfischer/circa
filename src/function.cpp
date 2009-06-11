@@ -7,8 +7,6 @@ namespace circa {
 Function::Function()
   : outputType(NULL),
     hiddenStateType(NULL),
-    pureFunction(false),
-    hasSideEffects(false),
     variableArgs(false),
     evaluate(NULL),
     specializeType(NULL),
@@ -90,8 +88,6 @@ namespace function_t {
         copy_field(inputTypes);
         copy_field(inputProperties);
         copy_field(outputType);
-        copy_field(pureFunction);
-        copy_field(hasSideEffects);
         copy_field(variableArgs);
         copy_field(name);
         copy_field(evaluate);

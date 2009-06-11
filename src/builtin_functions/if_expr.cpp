@@ -67,7 +67,6 @@ namespace if_expr_function {
     {
         IF_EXPR_FUNC = import_function(kernel, evaluate, "if_expr(bool,any,any) : any");
         as_function(IF_EXPR_FUNC).specializeType = specializeType;
-        as_function(IF_EXPR_FUNC).pureFunction = true;
         as_function(IF_EXPR_FUNC).setInputMeta(1, true);
         as_function(IF_EXPR_FUNC).setInputMeta(2, true);
         as_function(IF_EXPR_FUNC).feedbackFunc = 
