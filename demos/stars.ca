@@ -1,5 +1,7 @@
 -- Copyright 2008 Andrew Fischer
 
+type Point { float x, float y }
+
 type Star {
     Point loc
     float rot
@@ -7,28 +9,50 @@ type Star {
     float speed
 }
 
-def draw_star(Star star)
-  radius = star.size
-  inner_radius = radius / 2
+def p2c(float angle, float radius, Point center) : Point
+  return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
+end
 
-  points = range(10)
-  for p in points
-    rad = radius
-    if p % 2 == 0
-      rad = inner_radius
-    end
-    -- this is currently broken, it requires the ability to remap a for-loop iterator
-    p = p2c((p + 0.5) * 2*PI / 10 + star.rot + time*star.speed, rad, star.loc)
+star_color = 0xff3399ff
+state global_scale = 1.0
+
+background(0)
+
+def draw_star(Star star)
+  radius = star.size * global_scale : float
+  num_points = 5
+
+  rot = star.rot + time/5
+
+  def draw_tip(int index)
+    angle = (index+0.0) / num_points + rot
+    l_angle = (index+.5) / num_points + rot
+    r_angle = (index- .5) / num_points + rot
+    outer_point = p2c(angle, radius, star.loc)
+    l_point = p2c(l_angle, radius / 2, star.loc)
+    r_point = p2c(r_angle, radius / 2, star.loc)
+
+    gl_triangles([outer_point l_point star.loc star.loc r_point outer_point] star_color)
   end
-  shape(points, 0xff3399ff)
+
+  for t in range(num_points)
+    draw_tip(t)
+  end
 end
 
 state stars = []
 
 if mouse_pressed()
-  stars.append([[mouse_x mouse_y] .3 40 1])
+  stars.append([[mouse_x mouse_y] rand() 40 1])
 end
 
+if key_down(KEY_UP)
+  global_scale += time / 100
+end
+
+if key_down(KEY_DOWN)
+  global_scale -= time / 100
+end
 for star in stars
   draw_star(star)
 end
