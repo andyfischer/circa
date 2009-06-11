@@ -43,6 +43,7 @@ const int DOT = 18;
 const int STAR = 19;
 const int QUESTION = 20;
 const int SLASH = 21;
+const int DOUBLE_SLASH = 44;
 const int PLUS = 22;
 const int MINUS = 23;
 const int LTHAN = 24;

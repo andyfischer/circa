@@ -391,6 +391,26 @@ void test_array_index_access()
     test_assert(b->asInt() == 1);
 }
 
+void test_float_division()
+{
+    Branch branch;
+    Term* a = branch.eval("5 / 3");
+
+    test_assert(a->type == FLOAT_TYPE);
+    test_assert(a->function->name == "div");
+    test_equals(a->toFloat(), 5.0/3.0);
+}
+
+void test_integer_division()
+{
+    Branch branch;
+    Term* a = branch.eval("5 // 3");
+
+    test_assert(a->type == INT_TYPE);
+    test_assert(a->function->name == "div_i");
+    test_assert(a->asInt() == 1);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -418,6 +438,8 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_semicolon_as_line_ending);
     REGISTER_TEST_CASE(parser_tests::test_unary_minus);
     REGISTER_TEST_CASE(parser_tests::test_array_index_access);
+    REGISTER_TEST_CASE(parser_tests::test_float_division);
+    REGISTER_TEST_CASE(parser_tests::test_integer_division);
 }
 
 } // namespace parser_tests

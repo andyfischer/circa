@@ -25,14 +25,14 @@ def draw_star(Star star)
   rot = star.rot + time/5
 
   def draw_tip(int index)
-    angle = (index+0.0) / num_points + rot
+    angle = index / num_points + rot
     l_angle = (index+.5) / num_points + rot
     r_angle = (index- .5) / num_points + rot
     outer_point = p2c(angle, radius, star.loc)
     l_point = p2c(l_angle, radius / 2, star.loc)
     r_point = p2c(r_angle, radius / 2, star.loc)
 
-    gl_triangles([outer_point l_point star.loc star.loc r_point outer_point] star_color)
+    gl_triangles([outer_point l_point star.loc, star.loc r_point outer_point] star_color)
   end
 
   for t in range(num_points)
