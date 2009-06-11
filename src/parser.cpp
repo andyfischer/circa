@@ -700,6 +700,7 @@ int get_infix_precedence(int match)
             return 8;
         case tokenizer::STAR:
         case tokenizer::SLASH:
+        case tokenizer::DOUBLE_SLASH:
         case tokenizer::PERCENT:
             return 7;
         case tokenizer::PLUS:
@@ -742,6 +743,7 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "-") return "sub";
     else if (infix == "*") return "mult";
     else if (infix == "/") return "div";
+    else if (infix == "//") return "div_i";
     else if (infix == "%") return "mod";
     else if (infix == "<") return "less_than";
     else if (infix == "<=") return "less_than_eq";

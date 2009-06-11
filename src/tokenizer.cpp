@@ -26,6 +26,7 @@ const char* get_token_text(int match)
         case STAR: return "*";
         case QUESTION: return "?";
         case SLASH: return "/";
+        case DOUBLE_SLASH: return "//";
         case PLUS: return "+";
         case MINUS: return "-";
         case LTHAN: return "<";
@@ -355,6 +356,11 @@ void top_level_consume_token(TokenizeContext &context)
             if (context.next() == '=') {
                 context.consume();
                 context.push(SLASH_EQUALS);
+                return;
+            }
+            if (context.next() == '/') {
+                context.consume();
+                context.push(DOUBLE_SLASH);
                 return;
             }
             context.push(SLASH);
