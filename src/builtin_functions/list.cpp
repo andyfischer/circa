@@ -40,7 +40,6 @@ namespace list_function {
     void setup(Branch& kernel)
     {
         LIST_FUNC = import_function(kernel, evaluate, "list(any...) : List");
-        as_function(LIST_FUNC).pureFunction = true;
         as_function(LIST_FUNC).toSourceString = toSourceString;
     }
 }

@@ -13,7 +13,6 @@ namespace not_function {
     void setup(Branch& kernel)
     {
         NOT_FUNC = import_function(kernel, evaluate, "not(bool) : bool");
-        as_function(NOT_FUNC).pureFunction = true;
     }
 }
 }

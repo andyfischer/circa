@@ -13,7 +13,6 @@ namespace neg_function {
     void setup(Branch& kernel)
     {
         NEG_FUNC = import_function(kernel, evaluate, "neg(float):float");
-        as_function(NEG_FUNC).pureFunction = true;
     }
 }
 }

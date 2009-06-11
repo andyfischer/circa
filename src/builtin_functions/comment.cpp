@@ -17,7 +17,6 @@ namespace comment_function {
     void setup(Branch& kernel)
     {
         Term* main_func = import_function(kernel, evaluate, "comment()");
-        as_function(main_func).pureFunction = true;
         as_function(main_func).toSourceString = toSourceString;
 
         COMMENT_FUNC = main_func;

@@ -21,8 +21,7 @@ namespace rand_function {
 
     void setup(Branch& kernel)
     {
-        Term* func = import_function(kernel, evaluate, "rand() : float");
-        as_function(func).pureFunction = false;
+        import_function(kernel, evaluate, "rand() : float");
     }
 }
 } // namespace circa

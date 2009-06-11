@@ -18,8 +18,7 @@ namespace print_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "print(any...)");
-        as_function(main_func).pureFunction = false;
+        import_function(kernel, evaluate, "print(any...)");
     }
 }
 } // namespace circa

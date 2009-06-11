@@ -20,9 +20,7 @@ namespace sub_function {
         SUB_FUNC = create_overloaded_function(&kernel, "sub");
 
         Term* sub_i = import_function_overload(SUB_FUNC, evaluate_i, "sub_i(int,int):int");
-        as_function(sub_i).pureFunction = true;
         Term* sub_f = import_function_overload(SUB_FUNC, evaluate_f, "sub_f(float,float):float");
-        as_function(sub_f).pureFunction = true;
 
         kernel.bindName(sub_i, "sub_i");
         kernel.bindName(sub_f, "sub_f");

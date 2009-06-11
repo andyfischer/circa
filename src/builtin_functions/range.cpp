@@ -19,8 +19,7 @@ namespace range_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "range(int) : List");
-        as_function(main_func).pureFunction = true;
+        import_function(kernel, evaluate, "range(int) : List");
     }
 }
 } // namespace circa

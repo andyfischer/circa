@@ -144,8 +144,7 @@ std::string branch_to_string_raw_with_properties(Branch& branch)
 
 bool function_allows_term_reuse(Function &function)
 {
-    if (!function.pureFunction)
-        return false;
+    // TODO: return false if this function is not pure
 
     return true;
 }

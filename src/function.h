@@ -34,8 +34,6 @@ struct Function
     Ref outputType;
     Ref hiddenStateType;
 
-    bool pureFunction;
-    bool hasSideEffects;
     bool variableArgs;
 
     std::string name;
