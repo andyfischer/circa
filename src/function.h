@@ -43,7 +43,6 @@ struct Function
     // Code
     EvaluateFunc evaluate;
     SpecializeTypeFunc specializeType;
-    ReferenceIteratorFunc startControlFlowIterator;
     ToSourceString toSourceString;
 
     // Associated terms
