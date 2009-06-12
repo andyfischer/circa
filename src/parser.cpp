@@ -652,13 +652,24 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         branch.bindName(rexpr, lexpr->name);
     }
 
-    // Or, maybe this is a field assignment
+    // Or, maybe it was parsed as a field access. Turn this into a set_field
     else if (lexpr->function == GET_FIELD_FUNC) {
         // TODO: remove the get_field() term
         
         Term* object = lexpr->input(0);
 
         rexpr = apply(&branch, SET_FIELD_FUNC, RefList(object, lexpr->input(1), rexpr));
+
+        branch.bindName(rexpr, object->name);
+    }
+
+    // Or, maybe it was parsed as an index-based access. Turn this into a set_index
+    else if (lexpr->function == GET_INDEX_FUNC) {
+        // TODO: remove the get_index() term
+        
+        Term* object = lexpr->input(0);
+
+        rexpr = apply(&branch, SET_INDEX_FUNC, RefList(object, lexpr->input(1), rexpr));
 
         branch.bindName(rexpr, object->name);
     }

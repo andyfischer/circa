@@ -236,6 +236,12 @@ void test_set_index()
     test_assert(l2->field(0)->asInt() == 1);
     test_assert(l2->field(1)->asInt() == 5);
     test_assert(l2->field(2)->asInt() == 3);
+
+    Term* l3 = branch.eval("l[2] = 9");
+    test_assert(l3);
+    test_assert(l3->field(0)->asInt() == 1);
+    test_assert(l3->field(1)->asInt() == 5);
+    test_assert(l3->field(2)->asInt() == 9);
 }
 
 void register_tests()
