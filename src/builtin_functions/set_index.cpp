@@ -3,14 +3,13 @@
 #include "circa.h"
 
 namespace circa {
-namespace set_field_function {
+namespace set_index_function {
 
     void evaluate(Term* caller)
     {
         assign_value(caller->input(0), caller);
 
-        std::string name = caller->input(1)->asString();
-        int index = as_type(caller->input(0)->type).findFieldIndex(name);
+        int index = caller->input(1)->asInt();
         assign_value(caller->input(2), as_branch(caller)[index]);
     }
 
@@ -21,9 +20,9 @@ namespace set_field_function {
 
     void setup(Branch& kernel)
     {
-        SET_FIELD_FUNC = import_function(kernel, evaluate,
-                "set_field(any, string, any) : any");
-        as_function(SET_FIELD_FUNC).specializeType = specializeType;
+        SET_INDEX_FUNC = import_function(kernel, evaluate,
+                "set_index(any, int, any) : any");
+        as_function(SET_INDEX_FUNC).specializeType = specializeType;
     }
 }
 }
