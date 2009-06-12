@@ -35,6 +35,15 @@ void Branch::append(Term* term)
     }
 }
 
+void Branch::remove(Term* term)
+{
+    // remove name binding if necessary
+    if (term != NULL && (term->name != "") && (names[term->name] == term))
+        names.remove(term->name);
+
+    _terms.remove(term);
+}
+
 void Branch::remove(std::string const& name)
 {
     if (!names.contains(name))

@@ -37,6 +37,7 @@ void compound_types()
 
     // field assignment
     Term *inst2 = branch.eval("inst.astr = 'hello'");
+    test_assert(inst2);
     test_assert(as_branch(inst2)[1]->asString() == "hello");
     test_assert(inst2->type == MyType); // type specialization
 
