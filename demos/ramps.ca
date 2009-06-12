@@ -6,8 +6,8 @@ WINDOW_HEIGHT = 420
 
 tile_size = 30
 
-num_tiles_x = WINDOW_WIDTH / tile_size
-num_tiles_y = WINDOW_HEIGHT / tile_size
+num_tiles_x = WINDOW_WIDTH // tile_size
+num_tiles_y = WINDOW_HEIGHT // tile_size
 
 -- draw the checkerboard in the background
 for x in range(num_tiles_x)
@@ -64,6 +64,7 @@ state falling_piece = [[0 0 2] [1 0 3]]
 state falling_piece_rot = 0
 state falling_piece_rot_display = 0.0
 state falling_piece_rot_display_target = 0.0
+state falling_piece_x = 0
 state falling_piece_y = 0
 fall_speed = 20.0
 state tile_fall_distance = tile_size
@@ -82,7 +83,8 @@ end
 if key_pressed(KEY_UP)
   falling_piece_rot = (falling_piece_rot + 1) % 4
 end
-
+if key_pressed(KEY_LEFT); falling_piece_x -= 1 end
+if key_pressed(KEY_RIGHT); falling_piece_x += 1 end
 
 -- Draw falling tile
 for piece in falling_piece
@@ -91,9 +93,10 @@ for piece in falling_piece
     mult(@position, tile_size)
     rotate_point_around(@position, [0 0], falling_piece_rot/4.0)
 
-    position = [position.x position.y-tile_fall_distance+falling_piece_y*tile_size]
+    position = [position.x+falling_piece_x*tile_size
+                position.y-tile_fall_distance+falling_piece_y*tile_size]
     
-    draw_free_piece(position 0)
+    draw_free_piece(position piece.rot)
 end
 
 fallen_pieces = []
