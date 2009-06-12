@@ -213,7 +213,7 @@ bool is_newline(char c)
 bool try_to_consume_keyword(TokenizeContext& context, int keyword)
 {
     const char* str = get_token_text(keyword);
-    int str_len = strlen(str);
+    int str_len = (int) strlen(str);
 
     // Check if every letter matches
     for (int i=0; i < str_len; i++) {

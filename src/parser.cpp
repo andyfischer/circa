@@ -256,7 +256,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
             name = tokens.consume();
             possible_whitespace(tokens);
         } else {
-            name = get_placeholder_name_for_index(func.inputProperties.size());
+            name = get_placeholder_name_for_index((int) func.inputProperties.size());
         }
 
         Term* typeTerm = find_type(branch, type);
@@ -1078,7 +1078,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     std::string text = tok.text;
 
     // Parse value with atof
-    float value = atof(text.c_str());
+    float value = (float) atof(text.c_str());
     Term* term = float_value(&branch, value);
 
     // Store the original string

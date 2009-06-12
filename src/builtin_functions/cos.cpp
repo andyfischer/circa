@@ -2,8 +2,6 @@
 
 #include "circa.h"
 
-#include "math.h"
-
 namespace circa {
 namespace cos_function {
 

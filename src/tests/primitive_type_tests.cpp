@@ -54,7 +54,7 @@ void float_to_string()
 
     // Try changing a value, make sure that new value is printed
     Term* b = branch.eval("a = .1");
-    b->asFloat() = .123456;
+    b->asFloat() = .123456f;
     test_assert(to_string(b) == "0.123456");
 
     // Make sure that if we assign a float to a value which might get printed without

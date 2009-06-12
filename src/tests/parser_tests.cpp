@@ -375,7 +375,7 @@ void test_unary_minus()
     Term* a = branch.eval("a = 1");
     Term* b = branch.eval("b = -a");
 
-    test_assert(b->function == NEG_FUNC);
+    test_assert(b->function->name == "neg_i");
     test_assert(b->input(0) == a);
     test_equals(b->toFloat(), -1.0);
 }
@@ -398,7 +398,7 @@ void test_float_division()
 
     test_assert(a->type == FLOAT_TYPE);
     test_assert(a->function->name == "div");
-    test_equals(a->toFloat(), 5.0/3.0);
+    test_equals(a->toFloat(), 5.0f/3.0f);
 }
 
 void test_integer_division()

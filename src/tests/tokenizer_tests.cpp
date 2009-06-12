@@ -2,13 +2,7 @@
 
 #include "common_headers.h"
 
-#include "testing.h"
-#include "branch.h"
-#include "builtins.h"
-#include "term.h"
-#include "runtime.h"
-#include "tokenizer.h"
-#include "token_stream.h"
+#include "circa.h"
 
 namespace token = circa::tokenizer;
 

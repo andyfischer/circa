@@ -47,9 +47,9 @@ void test_float()
     test_assert(as_type(FLOAT_TYPE).equals != NULL);
     test_assert(as_type(FLOAT_TYPE).toString != NULL);
 
-    Term* point_one = float_value(&branch, .1);
-    Term* point_one_again = float_value(&branch, .1);
-    Term* point_two = float_value(&branch, 0.2);
+    Term* point_one = float_value(&branch, .1f);
+    Term* point_one_again = float_value(&branch, .1f);
+    Term* point_two = float_value(&branch, 0.2f);
 
     test_assert(equals(point_one, point_one_again));
     test_assert(equals(point_two, point_two));

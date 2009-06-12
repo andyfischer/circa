@@ -9,3 +9,6 @@
    Like this: point.x := 1
 
  - Types need to be passed by reference
+
+ - If a subroutine is declared with a return type that isn't a valid type, an assert is
+   blown trying to run the subroutine
