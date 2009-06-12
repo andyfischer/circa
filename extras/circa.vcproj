@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../src;../SDL/include;../SDL_gfx"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				PreprocessorDefinitions="WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,8 +61,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../SDL/lib/SDL.lib ../SDL/lib/SDLmain.lib ../SDL_gfx/VisualC/Debug/SDL_gfx.lib"
+				AdditionalDependencies="SDL.lib SDLmain.lib SDL_gfx.lib SDL_image.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;../SDL_deps/SDL-1.2.13/lib&quot;;&quot;../SDL_deps/SDL_gfx-2.0.19/VisualC/Release&quot;;&quot;../SDL_deps/SDL_image-1.2.7/VisualC/Release&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -117,7 +118,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WINDOWS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -135,7 +136,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="SDL.lib SDLmain.lib SDL_gfx.lib SDL_image.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;../SDL_deps/SDL-1.2.13/lib&quot;;&quot;../SDL_deps/SDL_gfx-2.0.19/VisualC/Release&quot;;&quot;../SDL_deps/SDL_image-1.2.7/VisualC/Release&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -176,13 +179,13 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-			<File
-				RelativePath="..\proto5\main.cpp"
-				>
-			</File>
 			<Filter
 				Name="builtin_functions"
 				>
+				<File
+					RelativePath="..\src\builtin_functions\abs.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\src\builtin_functions\add.cpp"
 					>
@@ -193,10 +196,6 @@
 				</File>
 				<File
 					RelativePath="..\src\builtin_functions\annotate_type.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\builtin_functions\apply_feedback.cpp"
 					>
 				</File>
 				<File
@@ -214,24 +213,6 @@
 				<File
 					RelativePath="..\src\builtin_functions\branch.cpp"
 					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\src\builtin_functions\branch_append.cpp"
@@ -270,11 +251,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\builtin_functions\equals.cpp"
+					RelativePath="..\src\builtin_functions\div_i.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\builtin_functions\evaluate_file.cpp"
+					RelativePath="..\src\builtin_functions\equals.cpp"
 					>
 				</File>
 				<File
@@ -286,19 +267,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\builtin_functions\function_get_input_name.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\builtin_functions\function_name_input.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\builtin_functions\get_field.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\builtin_functions\get_field_by_name.cpp"
+					RelativePath="..\src\builtin_functions\get_index.cpp"
 					>
 				</File>
 				<File
@@ -318,6 +291,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\builtin_functions\input_placeholder.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\builtin_functions\less_than.cpp"
 					>
 				</File>
@@ -327,6 +304,10 @@
 				</File>
 				<File
 					RelativePath="..\src\builtin_functions\list.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\builtin_functions\log.cpp"
 					>
 				</File>
 				<File
@@ -350,7 +331,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\builtin_functions\neg.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\builtin_functions\not.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\builtin_functions\one_time_assign.cpp"
 					>
 				</File>
 				<File
@@ -363,6 +352,10 @@
 				</File>
 				<File
 					RelativePath="..\src\builtin_functions\print.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\builtin_functions\rand.cpp"
 					>
 				</File>
 				<File
@@ -382,7 +375,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\builtin_functions\set_field_by_name.cpp"
+					RelativePath="..\src\builtin_functions\set_index.cpp"
 					>
 				</File>
 				<File
@@ -394,19 +387,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\builtin_functions\stateful_value.cpp"
+					RelativePath="..\src\builtin_functions\sqr.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\builtin_functions\sqrt.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\builtin_functions\sub.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\builtin_functions\subroutine_apply.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\builtin_functions\subroutine_create.cpp"
 					>
 				</File>
 				<File
@@ -426,6 +415,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\builtin_functions\unique_id.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\builtin_functions\unknown_function.cpp"
 					>
 				</File>
@@ -442,6 +435,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\builtin_functions\vectorize_vs.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\builtin_functions\vectorize_vv.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\builtin_functions\write_text_file.cpp"
 					>
 				</File>
@@ -449,6 +450,10 @@
 			<Filter
 				Name="tests"
 				>
+				<File
+					RelativePath="..\src\tests\branch_iterator_tests.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\src\tests\branch_tests.cpp"
 					>
@@ -466,7 +471,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\tests\code_iterator_tests.cpp"
+					RelativePath="..\src\tests\cpp_convenience_tests.cpp"
 					>
 				</File>
 				<File
@@ -486,11 +491,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\tests\if_block_tests.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\tests\importing_tests.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\tests\introspection_tests.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\tests\parser_error_tests.cpp"
 					>
 				</File>
 				<File
@@ -506,6 +519,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\tests\refactoring_tests.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\tests\runtime_tests.cpp"
 					>
 				</File>
@@ -514,15 +531,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\tests\stateful_tests.cpp"
+					RelativePath="..\src\tests\stateful_code_tests.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\tests\subroutine_tests.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\tests\tokenizer_tests.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\tests\training_tests.cpp"
 					>
 				</File>
 				<File
@@ -535,26 +552,40 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="generated"
-				>
-				<File
-					RelativePath="..\build\src\register_all_tests.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\build\src\setup_builtin_functions.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="core"
 				>
 				<File
 					RelativePath="..\src\branch.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\src\branch.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\branch_iterator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\branch_iterator.h"
 					>
 				</File>
 				<File
@@ -578,15 +609,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\code_iterator.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\code_iterator.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\common_headers.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\cpp_convenience.h"
 					>
 				</File>
 				<File
@@ -606,6 +633,40 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\feedback.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\src\feedback.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\for_loops.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\for_loops.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\function.cpp"
 					>
 				</File>
@@ -615,6 +676,14 @@
 				</File>
 				<File
 					RelativePath="..\src\hosted_types.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\if_block.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\if_block.h"
 					>
 				</File>
 				<File
@@ -634,6 +703,28 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\main.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath="..\src\output_stream.h"
 					>
 				</File>
@@ -643,6 +734,14 @@
 				</File>
 				<File
 					RelativePath="..\src\parser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\parser_util.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\parser_util.h"
 					>
 				</File>
 				<File
@@ -658,12 +757,42 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\refactoring.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\refactoring.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\references.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\references.h"
 					>
+				</File>
+				<File
+					RelativePath="..\src\register_all_tests.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\src\runtime.cpp"
@@ -674,11 +803,49 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\syntax.cpp"
+					RelativePath="..\src\setup_builtin_functions.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\src\source_repro.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\syntax.h"
+					RelativePath="..\src\source_repro.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\stateful_code.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\stateful_code.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\subroutine.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\subroutine.h"
 					>
 				</File>
 				<File
@@ -715,14 +882,6 @@
 				</File>
 				<File
 					RelativePath="..\src\tokenizer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\training.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\training.h"
 					>
 				</File>
 				<File

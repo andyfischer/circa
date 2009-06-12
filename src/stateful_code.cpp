@@ -138,8 +138,8 @@ void migrate_stateful_values(Branch& source, Branch& dest)
 
 void reset_stateful_values(Branch& branch)
 {
-    for (BranchIterator& it(branch); !it.finished(); ++it) {
-
+    for (BranchIterator it(branch); !it.finished(); ++it) {
+        // todo
     }
 }
 

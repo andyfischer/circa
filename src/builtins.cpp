@@ -97,7 +97,7 @@ namespace primitives {
             if (term->hasProperty("float:original-format")) {
                 std::string& originalFormat = term->stringProp("float:original-format");
                 float actual = as_float(term);
-                float original = atof(originalFormat.c_str());
+                float original = (float) atof(originalFormat.c_str());
                 if (actual == original) {
                     return originalFormat;
                 }

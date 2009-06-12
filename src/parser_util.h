@@ -5,7 +5,7 @@
 
 namespace circa {
 
-namespace tokenizer { class Token; }
+namespace tokenizer { struct Token; }
 
 void prepend_whitespace(Term* term, std::string const& whitespace);
 void append_whitespace(Term* term, std::string const& whitespace);
