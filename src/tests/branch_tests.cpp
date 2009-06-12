@@ -126,16 +126,14 @@ void test_duplicate_get_field_by_name()
     branch.eval("v = mytype()");
     Term* b = branch.eval("b = v.f");
 
-    test_assert(b->function == GET_FIELD_BY_NAME_FUNC);
-    test_equals(b->stringProp("field-name"), "f");
+    test_assert(b->function == GET_FIELD_FUNC);
 
     Branch duped_branch;
     duplicate_branch(branch, duped_branch);
 
     b = duped_branch["b"];
 
-    test_assert(b->function == GET_FIELD_BY_NAME_FUNC);
-    test_equals(b->stringProp("field-name"), "f");
+    test_assert(b->function == GET_FIELD_FUNC);
 }
 
 void find_name_in_outer_branch()
