@@ -12,6 +12,9 @@ void test_simple()
     Term* a = branch.eval("a = 1");
     Term* b = branch.eval("b = 2");
 
+    test_assert(a);
+    test_assert(b);
+
     BranchIterator it(branch);
 
     test_assert(it.current() == a);

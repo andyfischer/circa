@@ -602,77 +602,77 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
-    // scan this line for an = operator
-    int equals_operator_loc = search_line_for_token(tokens, EQUALS);
+    Term* expr = infix_expression(branch, tokens);
+    for (int i=0; i < expr->numInputs(); i++)
+        recursively_mark_terms_as_occuring_inside_an_expression(expr->input(i));
 
-    StringList names;
+    assert(expr != NULL);
 
-    std::string preEqualsSpace = " ";
-    std::string postEqualsSpace = " ";
+    // If the next thing is not an = operator, then finish up.
+    if (!tokens.nextNonWhitespaceIs(EQUALS)) {
 
-    if (equals_operator_loc != -1) {
-        // Parse name binding(s)
+        std::string pendingRebind = pop_pending_rebind(branch);
 
-        while (true) {
-            if (!tokens.nextIs(IDENTIFIER))
-                return compile_error_for_line(branch, tokens, startPosition);
+        if (pendingRebind != "")
+            branch.bindName(expr, pendingRebind);
 
-            std::string name = tokens.consume(IDENTIFIER);
-
-            names.append(name);
-
-            if (!tokens.nextIs(DOT))
-                break;
-
-            tokens.consume(DOT);
-        }
-
-        preEqualsSpace = possible_whitespace(tokens);
-
-        if (!tokens.nextIs(EQUALS))
-            return compile_error_for_line(branch, tokens, startPosition);
-
-        tokens.consume(EQUALS);
-        postEqualsSpace = possible_whitespace(tokens);
+        return expr;
     }
 
-    Term* result = infix_expression(branch, tokens);
+    // Otherwise, this is an assignment statement.
+    std::string preEqualsSpace = possible_whitespace(tokens);
+    tokens.consume(EQUALS);
+    std::string postEqualsSpace = possible_whitespace(tokens);
 
-    for (int i=0; i < result->numInputs(); i++)
-        recursively_mark_terms_as_occuring_inside_an_expression(result->input(i));
+    Term* lexpr = expr; // rename for clarity
+    Term* rexpr = infix_expression(branch, tokens);
+    for (int i=0; i < rexpr->numInputs(); i++)
+        recursively_mark_terms_as_occuring_inside_an_expression(rexpr->input(i));
 
-    // If this item is just an identifier, and we're trying to rename it,
-    // create an implicit call to 'copy'.
-    if (result->name != "" && names.length() > 0) {
-        result = apply(&branch, COPY_FUNC, RefList(result));
+    // If the rexpr is just an identifier, then create an implicit copy()
+    if (rexpr->name != "")
+        rexpr = apply(&branch, COPY_FUNC, RefList(rexpr));
+
+    rexpr->stringProp("syntaxHints:preEqualsSpace") = preEqualsSpace;
+    rexpr->stringProp("syntaxHints:postEqualsSpace") = postEqualsSpace;
+
+    // Now take a look at the lexpr.
+    
+    // If the name wasn't recognized, then it will create a call to unknown_function().
+    // Delete this.
+    if (lexpr->function == UNKNOWN_IDENTIFIER_FUNC) {
+        std::string name = lexpr->name;
+        branch.remove(lexpr);
+
+        branch.bindName(rexpr, name);
     }
 
-    if (preEqualsSpace != " ")
-        result->stringProp("syntaxHints:preEqualsSpace") = preEqualsSpace;
-    if (postEqualsSpace != " ")
-        result->stringProp("syntaxHints:postEqualsSpace") = postEqualsSpace;
-
-    std::string pendingRebind = pop_pending_rebind(branch);
-
-    if (pendingRebind != "")
-        branch.bindName(result, pendingRebind);
-
-    if (names.length() == 1)
-        branch.bindName(result, names[0]);
-    else if (names.length() == 2) {
-
-        // Field assignment
-        Term* object = branch[names[0]];
-        result = apply(&branch, SET_FIELD_BY_NAME_FUNC, RefList(object, result));
-        result->stringProp("field-name") = names[1];
-
-        branch.bindName(result, names[0]);
-
-    } else if (names.length() > 2) {
-        throw std::runtime_error("not yet supported: bind names with more than two qualified names.");
+    // Or, maybe the name already exists
+    else if (lexpr->name != "") {
+        branch.bindName(rexpr, lexpr->name);
     }
 
-    return result;
+    // Or, maybe this is a field assignment
+    else if (lexpr->function == GET_FIELD_BY_NAME_FUNC) {
+        // TODO: remove the get_field() term
+        
+        std::string fieldName = lexpr->stringProp("field-name");
+
+        Term* object = lexpr->input(0);
+
+        rexpr = apply(&branch, SET_FIELD_BY_NAME_FUNC, RefList(object, rexpr));
+
+        rexpr->stringProp("field-name") = fieldName;
+
+        branch.bindName(rexpr, object->name);
+    }
+
+    // If lexpr got parsed as something else, then it's an error
+    else {
+        return compile_error_for_line(rexpr, tokens, startPosition);
+    }
+
+    return rexpr;
 }
 
 Term* return_statement(Branch& branch, TokenStream& tokens)
@@ -716,7 +716,6 @@ int get_infix_precedence(int match)
         case tokenizer::DOUBLE_AMPERSAND:
         case tokenizer::DOUBLE_VERTICAL_BAR:
             return 4;
-        case tokenizer::EQUALS:
         case tokenizer::PLUS_EQUALS:
         case tokenizer::MINUS_EQUALS:
         case tokenizer::STAR_EQUALS:
