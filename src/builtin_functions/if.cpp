@@ -35,11 +35,13 @@ namespace if_function {
         result << get_branch_source(positiveBranch);
 
         if (contents.contains("else")) {
+            result << term->stringPropOptional("syntaxHints:whitespaceBeforeElse", "");
             result << "else";
             Branch& elseBranch = contents["else"]->asBranch();
             result << get_branch_source(elseBranch);
         }
 
+        result << term->stringPropOptional("syntaxHints:whitespaceBeforeEnd", "");
         result << "end";
 
         return result.str();

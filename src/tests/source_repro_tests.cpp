@@ -132,6 +132,7 @@ void reproduce_infix() {
     round_trip_source("complex = (4.0 + 3.0) + 2.0");
     //round_trip_source("complex =  (  4 + 3)  + 2.0");
     //round_trip_source("complex = (4 + 3  ) + 2.0");
+    //round_trip_source("a.x");
     finish_source_repro_category();
 }
 
@@ -153,13 +154,13 @@ void reproduce_dot_concat() {
 void reproduce_if() {
     round_trip_source("if true\nx = 1\nend");
     round_trip_source("if 5.0 > 3.0\n  print('hey')\nend");
-    //round_trip_source("if true\nelse\nend");
-    //round_trip_source("  if true\nelse\nend");
-    //round_trip_source("if true  \nelse\nend");
-    //round_trip_source("if true\n  else\nend");
-    //round_trip_source("if true\nelse  \nend");
-    //round_trip_source("if true\nelse\n  end");
-    //round_trip_source("if true\nelse\nend  ");
+    round_trip_source("if true\nelse\nend");
+    round_trip_source("  if true\nelse\nend");
+    round_trip_source("if true  \nelse\nend");
+    round_trip_source("if true\n  else\nend");
+    round_trip_source("if true\nelse  \nend");
+    round_trip_source("if true\nelse\n  end");
+    round_trip_source("if true\nelse\nend  ");
     finish_source_repro_category();
 }
 
@@ -189,10 +190,12 @@ void reproduce_for_loop() {
     finish_source_repro_category();
 }
 
-void reproduce_function_decl() {
+void reproduce_subroutine() {
     round_trip_source("def hi()\nend");
     round_trip_source("def hi2() : int\nend");
+    round_trip_source("def hi2():int\nend");
     round_trip_source("def hi3(int a)\nend");
+    round_trip_source("def hi4() : int\nreturn 1\nend");
     finish_source_repro_category();
 }
 
@@ -271,7 +274,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_tests::reproduce_if);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_lists);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_for_loop);
-    REGISTER_TEST_CASE(source_repro_tests::reproduce_function_decl);
+    REGISTER_TEST_CASE(source_repro_tests::reproduce_subroutine);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_type_decl);
     REGISTER_TEST_CASE(source_repro_tests::generate_source_for_function_calls);
     REGISTER_TEST_CASE(source_repro_tests::generate_source_for_literal_list);

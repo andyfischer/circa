@@ -283,11 +283,11 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
     assert(tokens.nextIs(RPAREN));
     tokens.consume();
 
-    possible_whitespace(tokens);
+    result->stringProp("syntaxHints:whitespacePreColon") = possible_whitespace(tokens);
 
     if (tokens.nextIs(COLON)) {
         tokens.consume(COLON);
-        possible_whitespace(tokens);
+        result->stringProp("syntaxHints:whitespacePostColon") = possible_whitespace(tokens);
 
         if (!tokens.nextIs(IDENTIFIER))
             return compile_error_for_line(result, tokens, startPosition);
@@ -324,6 +324,15 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     // Remove the name that function_from_header applied
     rename(functionDef, get_name_for_attribute("function-def"));
+
+    // Copy some syntax hints from the function def to the enclosing branch. Remove this
+    // once the data type is refactored.
+    if (functionDef->hasProperty("syntaxHints:whitespacePreColon"))
+        result->stringProp("syntaxHints:whitespacePreColon") =
+            functionDef->stringProp("syntaxHints:whitespacePreColon");
+    if (functionDef->hasProperty("syntaxHints:whitespacePostColon"))
+        result->stringProp("syntaxHints:whitespacePostColon") =
+            functionDef->stringProp("syntaxHints:whitespacePostColon");
 
     initialize_subroutine(result);
 
@@ -444,7 +453,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
         Branch& elseBranch = create_branch(&contents, "else");
 
-        std::string preWs = possible_whitespace(tokens);
+        result->stringProp("syntaxHints:whitespaceBeforeElse") = possible_whitespace(tokens);
 
         tokens.consume(ELSE);
 
@@ -452,13 +461,13 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         remove_compilation_attrs(elseBranch);
     }
 
-    possible_whitespace(tokens);
+    result->stringProp("syntaxHints:whitespaceBeforeEnd") = possible_whitespace(tokens);
 
     if (!tokens.nextIs(END)) {
         if (tokens.finished())
             std::cout << "eof" << std::endl;
         else
-        std::cout << "found: " << tokens.next().text << std::endl;
+            std::cout << "found: " << tokens.next().text << std::endl;
         return compile_error_for_line(branch, tokens, startPosition);
     }
 
