@@ -31,8 +31,12 @@ namespace subroutine_t {
 
         result << ")";
 
-        if (func.outputType != VOID_TYPE)
-            result << " : " << func.outputType->name;
+        if (func.outputType != VOID_TYPE) {
+            result << term->stringPropOptional("syntaxHints:whitespacePreColon", " ");
+            result << ":";
+            result << term->stringPropOptional("syntaxHints:whitespacePostColon", " ");
+            result << func.outputType->name;
+        }
 
         result << "\n";
 

@@ -23,12 +23,6 @@ for x in range(num_tiles_x)
 end
 
 -- Helper function
-def rotate_point_around(Point point, Point center, float rot) : Point
-    point = point - center
-    point = [point.x*cos(rot) - point.y*sin(rot), point.x*sin(rot)+point.y*cos(rot)]
-    point = point + center
-    return point
-end
 def rotate_points_around(List points, Point center, float rot) : List
     def rotate_point(Point point) : Point
         point = point - center
@@ -63,21 +57,17 @@ piece_types = [
 
 state falling_piece = [[0 0 2] [1 0 3]]
 state falling_piece_rot = 0
-state falling_piece_x = 0
+state falling_piece_x = 4
 state falling_piece_y = 0
 fall_speed = 20.0
 state tile_fall_distance = tile_size
 
--- Handle the falling group
-tile_fall_distance -= fall_speed * time_delta
-if tile_fall_distance < 0
-  tile_fall_distance = tile_size
-  falling_piece_y = falling_piece_y + 1
-end
+
 
 -- Keypresses for rotation
 if key_pressed(KEY_DOWN)
   falling_piece_rot = (falling_piece_rot - 1) % 4
+  if falling_piece_rot < 0; falling_piece_rot += 4; end
 end
 if key_pressed(KEY_UP)
   falling_piece_rot = (falling_piece_rot + 1) % 4
@@ -98,17 +88,11 @@ def rotate_around_i(Point_i point, int rotation) : Point_i
     return [-point.y point.x]
   end
   if rotation == 2
-    return [-point.x -point.y]
+    return [-point.x, -point.y]
   end
   if rotation == 3
-    return [point.y -point.x]
+    return [point.y, -point.x]
   end
-end
-
-test = [3 5]
-
-for i in range(4)
-    print('i: ' rotate_around_i(test i))
 end
 
 -- Position and rotate the falling group
@@ -122,11 +106,23 @@ end
 
 positioned_falling_group = map(positioned_falling_group, falling_piece)
 
+-- Update fall animation
+tile_fall_distance -= fall_speed * time_delta
+
+-- Check if the falling group has landed
+if tile_fall_distance < 0
+  tile_fall_distance = tile_size
+
+  -- 
+  falling_piece_y = falling_piece_y + 1
+
+
+end
+
 -- Draw falling tile
 for piece in positioned_falling_group
-    --piece = piece:Piece
-    draw_piece(piece)
-    --draw_free_piece([piece.x * tile_size, piece.y * tile_size - tile_fall_distance] piece.rot/4.0)
+    piece = piece:Piece
+    draw_free_piece([piece.x * tile_size, piece.y * tile_size - tile_fall_distance] piece.rot/4.0)
 end
 
 fallen_pieces = []
