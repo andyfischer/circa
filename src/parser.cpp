@@ -653,16 +653,12 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     }
 
     // Or, maybe this is a field assignment
-    else if (lexpr->function == GET_FIELD_BY_NAME_FUNC) {
+    else if (lexpr->function == GET_FIELD_FUNC) {
         // TODO: remove the get_field() term
         
-        std::string fieldName = lexpr->stringProp("field-name");
-
         Term* object = lexpr->input(0);
 
-        rexpr = apply(&branch, SET_FIELD_BY_NAME_FUNC, RefList(object, rexpr));
-
-        rexpr->stringProp("field-name") = fieldName;
+        rexpr = apply(&branch, SET_FIELD_FUNC, RefList(object, lexpr->input(1), rexpr));
 
         branch.bindName(rexpr, object->name);
     }
@@ -904,8 +900,7 @@ Term* dot_expression(Branch& branch, TokenStream& tokens)
         // Next, if this type defines this field
         } else if (lhsType.findFieldIndex(rhsIdent) != -1) {
 
-            result = apply(&branch, GET_FIELD_BY_NAME_FUNC, RefList(lhs));
-            result->stringProp("field-name") = rhsIdent;
+            result = apply(&branch, GET_FIELD_FUNC, RefList(lhs, string_value(&branch, rhsIdent)));
             specialize_type(result, lhsType[rhsIdent]->type);
 
             // Note: maybe this source reproduction should be handled inside get_field_by_name()

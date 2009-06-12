@@ -7,12 +7,10 @@ namespace set_field_function {
 
     void evaluate(Term* caller)
     {
-        /*
-        int index = as_int(caller->state);
         assign_value(caller->input(0), caller);
-
-        assign_value(caller->input(1), as_branch(caller)[index]);
-        */
+        std::string name = caller->input(1)->asString();
+        int index = as_type(caller->input(0)->type).findFieldIndex(name);
+        assign_value(caller->input(2), as_branch(caller)[index]);
     }
 
     Term* specializeType(Term* caller)
@@ -22,11 +20,9 @@ namespace set_field_function {
 
     void setup(Branch& kernel)
     {
-    /*
-        SET_FIELD_FUNC = import_function(kernel, evaluate, "set_field(any, any) -> any");
+        SET_FIELD_FUNC = import_function(kernel, evaluate,
+                "set_field(any, string, any) : any");
         as_function(SET_FIELD_FUNC).specializeType = specializeType;
-        as_function(SET_FIELD_FUNC).pureFunction = true;
-    */
     }
 }
 }
