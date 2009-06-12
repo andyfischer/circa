@@ -220,10 +220,22 @@ void test_get_index()
     test_assert(get->type == INT_TYPE);
     test_assert(get->asInt() == 1);
 
-
     branch.eval("l = []");
     get = branch.eval("get_index(l, 5)");
     test_assert(get->hasError);
+}
+
+void test_set_index()
+{
+    Branch branch;
+
+    branch.eval("l = [1 2 3]");
+    Term* l2 = branch.eval("set_index(@l, 1, 5)");
+
+    test_assert(l2);
+    test_assert(l2->field(0)->asInt() == 1);
+    test_assert(l2->field(1)->asInt() == 5);
+    test_assert(l2->field(2)->asInt() == 3);
 }
 
 void register_tests()
@@ -242,6 +254,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs_with_points);
     REGISTER_TEST_CASE(builtin_function_tests::test_if_expr_with_int_and_float);
     REGISTER_TEST_CASE(builtin_function_tests::test_get_index);
+    REGISTER_TEST_CASE(builtin_function_tests::test_set_index);
 }
 
 } // namespace builtin_function_tests
