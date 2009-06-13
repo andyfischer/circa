@@ -23,8 +23,10 @@ namespace if_expr_function {
 
     Term* specializeType(Term* caller)
     {
-        Term* left_type = caller->input(1)->type;
-        Term* right_type = caller->input(2)->type;
+        Term* left_type = ANY_TYPE;
+        Term* right_type = ANY_TYPE;
+        if (caller->input(1) != NULL) left_type = caller->input(1)->type;
+        if (caller->input(2) != NULL) right_type = caller->input(2)->type;
 
         // if inputs 1 and 2 have the same type, we can use that
         if (left_type == right_type)
