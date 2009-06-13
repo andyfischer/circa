@@ -9,6 +9,7 @@ tile_size = 30
 
 num_tiles_x = WINDOW_WIDTH // tile_size
 num_tiles_y = WINDOW_HEIGHT // tile_size
+num_tiles = num_tiles_x * num_tiles_y
 
 -- draw the checkerboard in the background
 for x in range(num_tiles_x)
@@ -34,6 +35,7 @@ def rotate_points_around(List points, Point center, float rot) : List
 end
 
 type Piece { int x, int y, int rot }
+type BoardPiece { int rot, bool filled }
 
 def draw_free_piece(Point location, float rot)
     shape = [[0 0] [1 0] [0 1]]
@@ -50,18 +52,32 @@ def draw_piece(Piece piece)
   draw_free_piece([piece.x * tile_size, piece.y * tile_size] piece.rot/4.0)
 end
 
+def board_index_to_loc(int index) : Point_i
+  return [index // num_tiles_y, index % num_tiles_y]
+end
+
+def initialize_board_piece(int index) : BoardPiece
+  loc = board_index_to_loc(index)
+  if loc.y < 8
+    return [0 false]
+  else
+    return [rand_i()%4 true]
+  end
+end
+
 piece_types = [
     [[0 0 2] [1 0 3]],
     [[0 0 2] [0 1 2] [0 1 0]]
 ]
 
-state falling_piece = [[0 0 2] [1 0 3]]
+state falling_group = [[0 1 2] [1 1 3]]
 state falling_piece_rot = 0
-state falling_piece_x = 4
-state falling_piece_y = 0
+state falling_group_x = 4
+state falling_group_y = 0
 fall_speed = 20.0
 state tile_fall_distance = tile_size
 
+state board = map(initialize_board_piece, range(num_tiles))
 
 
 -- Keypresses for rotation
@@ -72,39 +88,30 @@ end
 if key_pressed(KEY_UP)
   falling_piece_rot = (falling_piece_rot + 1) % 4
 end
-if key_pressed(KEY_LEFT); falling_piece_x -= 1 end
-if key_pressed(KEY_RIGHT); falling_piece_x += 1 end
+if key_pressed(KEY_LEFT); falling_group_x -= 1 end
+if key_pressed(KEY_RIGHT); falling_group_x += 1 end
 
-def rotate_around_i(Point_i point, int rotation) : Point_i
+def rotate_around_i(Point_i point, Point_i center, int rotation) : Point_i
   rotation = rotation % 4
   
-  -- Unfortunately, this line is necessary:
-  return [0 0]
+  result = [0 0]
+  point = point - center
 
   if rotation == 0
-    return [point.x point.y]
+    result = [point.x point.y]
   end
   if rotation == 1
-    return [-point.y point.x]
+    result = [-point.y point.x]
   end
   if rotation == 2
-    return [-point.x, -point.y]
+    result = [-point.x, -point.y]
   end
   if rotation == 3
-    return [point.y, -point.x]
+    result = [point.y, -point.x]
   end
+  
+  return result + center
 end
-
--- Position and rotate the falling group
-def positioned_falling_group(Piece piece) : Piece
-  x = piece.x
-  y = piece.y
-  pos = rotate_around_i([piece.x piece.y] falling_piece_rot)
-  pos = pos + [falling_piece_x falling_piece_y]
-  return [pos.x pos.y (piece.rot + falling_piece_rot) % 4]
-end
-
-positioned_falling_group = map(positioned_falling_group, falling_piece)
 
 -- Update fall animation
 tile_fall_distance -= fall_speed * time_delta
@@ -113,11 +120,21 @@ tile_fall_distance -= fall_speed * time_delta
 if tile_fall_distance < 0
   tile_fall_distance = tile_size
 
-  -- 
-  falling_piece_y = falling_piece_y + 1
-
-
+  falling_group_y = falling_group_y + 1
 end
+
+-- Position and rotate the falling group
+def position_falling_group(List group, int pos_x, int pos_y) : List
+  def position_piece(Piece piece) : Piece
+      pos = rotate_around_i([piece.x piece.y] [1 1] falling_piece_rot)
+      pos = pos + [pos_x pos_y]
+      return [pos.x pos.y (piece.rot + falling_piece_rot) % 4]
+  end
+  return map(position_piece, group)
+end
+
+positioned_falling_group = position_falling_group(falling_group,
+  falling_group_x, falling_group_y)
 
 -- Draw falling tile
 for piece in positioned_falling_group
@@ -125,4 +142,11 @@ for piece in positioned_falling_group
     draw_free_piece([piece.x * tile_size, piece.y * tile_size - tile_fall_distance] piece.rot/4.0)
 end
 
-fallen_pieces = []
+-- Draw board
+for index in range(num_tiles)
+  piece = board[index] : BoardPiece
+  loc = board_index_to_loc(index)
+  if piece.filled
+    draw_piece([loc.x loc.y piece.rot])
+  end
+end

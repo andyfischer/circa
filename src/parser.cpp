@@ -670,24 +670,28 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     // Or, maybe it was parsed as a field access. Turn this into a set_field
     else if (lexpr->function == GET_FIELD_FUNC) {
-        // TODO: remove the get_field() term
-        
         Term* object = lexpr->input(0);
+        Term* field = lexpr->input(1);
+        std::string name = object->name;
 
-        rexpr = apply(&branch, SET_FIELD_FUNC, RefList(object, lexpr->input(1), rexpr));
+        branch.remove(lexpr);
 
-        branch.bindName(rexpr, object->name);
+        rexpr = apply(&branch, SET_FIELD_FUNC, RefList(object, field, rexpr));
+
+        branch.bindName(rexpr, name);
     }
 
     // Or, maybe it was parsed as an index-based access. Turn this into a set_index
     else if (lexpr->function == GET_INDEX_FUNC) {
-        // TODO: remove the get_index() term
-        
         Term* object = lexpr->input(0);
+        Term* index = lexpr->input(1);
+        std::string name = object->name;
 
-        rexpr = apply(&branch, SET_INDEX_FUNC, RefList(object, lexpr->input(1), rexpr));
+        branch.remove(lexpr);
+        
+        rexpr = apply(&branch, SET_INDEX_FUNC, RefList(object, index, rexpr));
 
-        branch.bindName(rexpr, object->name);
+        branch.bindName(rexpr, name);
     }
 
     // If lexpr got parsed as something else, then it's an error
