@@ -149,7 +149,7 @@ Term* apply_and_eval(Branch* branch, Term* function, RefList const& inputs)
 Term* apply_and_eval(Branch* branch, std::string const& functionName,
         RefList const &inputs)
 {
-    Term* function = find_named(branch,functionName);
+    Term* function = find_named(branch, functionName);
     if (function == NULL)
         throw std::runtime_error("function not found: "+functionName);
 
