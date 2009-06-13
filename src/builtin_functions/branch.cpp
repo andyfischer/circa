@@ -13,9 +13,25 @@ namespace branch_function {
         evaluate_branch(branch);
     }
 
+    std::string toSourceString(Term* term) {
+
+        if (term->boolPropOptional("syntaxHints:literal-list", false)) {
+            std::stringstream out;
+            prepend_name_binding(term, out);
+            out << "[";
+            Branch& contents = as_branch(term);
+            out << get_branch_source(contents, "");
+            out << "]";
+            return out.str();
+        } else {
+            return get_term_source_default_formatting(term);
+        }
+    }
+
     void setup(Branch& kernel)
     {
         BRANCH_FUNC = import_function(kernel, evaluate, "branch() : Branch");
+        as_function(BRANCH_FUNC).toSourceString = toSourceString;
     }
 }
 }

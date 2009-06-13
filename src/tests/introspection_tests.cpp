@@ -32,27 +32,10 @@ void test_get_involved_terms()
     test_equals(subtree, RefList(a,c,d));
 }
 
-void test_find_equivalent()
-{
-    Branch branch;
-
-    Term* add_func = branch.eval("add_f");
-    Term* a = branch.eval("a = 1.0");
-    Term* b = branch.eval("b = 1.0");
-    Term* addition = branch.eval("add_f(a,b)");
-
-    test_assert(is_equivalent(addition, add_func, RefList(a,b)));
-
-    test_assert(addition == find_equivalent(branch, add_func, RefList(a,b)));
-
-    test_assert(NULL == find_equivalent(branch, add_func, RefList(b,a)));
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(introspection_tests::test_is_value);
     REGISTER_TEST_CASE(introspection_tests::test_get_involved_terms);
-    REGISTER_TEST_CASE(introspection_tests::test_find_equivalent);
 }
 
 } // namespace introspection_tests

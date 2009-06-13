@@ -18,7 +18,8 @@ namespace copy_function {
     std::string toSourceString(Term* term)
     {
         std::stringstream result;
-        result << term->name << " = ";
+        if (term->name != "")
+            result << term->name << " = ";
         result << term->input(0)->name;
         return result.str();
     }
