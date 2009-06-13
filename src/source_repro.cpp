@@ -129,6 +129,14 @@ std::string get_term_source(Term* term)
         return result.str();
     }
 
+    result << get_term_source_default_formatting(term);
+    return result.str();
+}
+
+std::string get_term_source_default_formatting(Term* term)
+{
+    std::stringstream result;
+
     // for an infix rebinding, don't use the normal "name = " prefix
     if ((term->stringPropOptional("syntaxHints:declarationStyle", "") == "infix")
             && parser::is_infix_operator_rebinding(
@@ -136,7 +144,7 @@ std::string get_term_source(Term* term)
     {
         result << term->name << " " << term->stringProp("syntaxHints:functionName");
         result << get_source_of_input(term, 1);
-        result << term->stringProp("syntaxHints:postWhitespace");
+        result << term->stringPropOptional("syntaxHints:postWhitespace", "");
         return result.str();
     }
 
@@ -190,11 +198,11 @@ std::string get_comment_string(Term* term)
     return term->stringProp("comment");
 }
 
-std::string get_branch_source(Branch& branch)
+std::string get_branch_source(Branch& branch, std::string const& defaultSeparator)
 {
     std::stringstream result;
 
-    bool lineEndingNeeded = false;
+    bool separatorNeeded = false;
 
     for (int i=0; i < branch.length(); i++) {
 
@@ -203,9 +211,9 @@ std::string get_branch_source(Branch& branch)
         if (!should_print_term_source_line(term))
             continue;
 
-        if (lineEndingNeeded) {
-            result << "\n";
-            lineEndingNeeded = false;
+        if (separatorNeeded) {
+            result << defaultSeparator;
+            separatorNeeded = false;
         }
 
         result << get_term_source(term);
@@ -213,7 +221,7 @@ std::string get_branch_source(Branch& branch)
         if (term->hasProperty("syntaxHints:lineEnding"))
             result << term->stringProp("syntaxHints:lineEnding");
         else
-            lineEndingNeeded = true;
+            separatorNeeded = true;
     }
 
     return result.str();

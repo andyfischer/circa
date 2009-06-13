@@ -42,6 +42,7 @@ void Branch::remove(Term* term)
         names.remove(term->name);
 
     _terms.remove(term);
+    term->owningBranch = NULL;
 }
 
 void Branch::remove(std::string const& name)
@@ -53,6 +54,7 @@ void Branch::remove(std::string const& name)
 
     names.remove(name);
     _terms.remove(term);
+    term->owningBranch = NULL;
 }
 
 void Branch::remove(int index)
@@ -67,6 +69,7 @@ void Branch::remove(int index)
         names.remove(term->name);
 
     _terms.remove(index);
+    term->owningBranch = NULL;
 }
 
 void Branch::removeNulls()

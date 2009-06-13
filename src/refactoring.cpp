@@ -59,4 +59,15 @@ void rename(Term* term, std::string const& name)
     term->name = name;
 }
 
+void steal_term(Term* _term, Branch& newHome)
+{
+    Ref term = _term;
+
+    if (term->owningBranch != NULL) {
+        term->owningBranch->remove(term);
+    }
+
+    newHome.append(term);
+}
+
 } // namespace circa

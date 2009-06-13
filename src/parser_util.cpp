@@ -15,7 +15,7 @@ void append_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
         term->stringProp("syntaxHints:postWhitespace") = 
-            whitespace + term->stringProp("syntaxHints:postWhitespace");
+            term->stringProp("syntaxHints:postWhitespace") + whitespace;
 }
 
 void include_location(Term* term, tokenizer::Token& tok)

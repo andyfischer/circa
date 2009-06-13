@@ -17,6 +17,10 @@ void specialize_type(Term* term, Term* type);
 // Rename term, modify the name binding of the owning branch if necessary
 void rename(Term* term, std::string const& name);
 
+// Remove this term from its owning branch, and add it to this branch instead.
+// This will create a NULL in the owning branch.
+void steal_term(Term* term, Branch& newHome);
+
 } // namespace circa
 
 #endif

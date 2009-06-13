@@ -11,10 +11,12 @@ namespace circa {
 
 std::string& get_input_syntax_hint(Term* term, int index, std::string const& field);
 std::string get_source_of_input(Term* term, int inputIndex);
+void prepend_name_binding(Term* term, std::stringstream& out);
 std::string get_term_source(Term* term);
+std::string get_term_source_default_formatting(Term* term);
 std::string get_comment_string(Term* term);
 bool should_print_term_source_line(Term* term);
-std::string get_branch_source(Branch& branch);
+std::string get_branch_source(Branch& branch, std::string const& defaultSeparator="\n");
 
 }
 

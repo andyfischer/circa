@@ -176,6 +176,9 @@ void reproduce_lists() {
     round_trip_source("[ 1 , 2 ]");
     round_trip_source(" [1,2]");
     round_trip_source("[1,2] ");
+    round_trip_source("[1\n2\n3\n] ");
+    round_trip_source("a = 1; [a]");
+    round_trip_source("a = 1; [a a,a;a\na]");
     finish_source_repro_category();
 }
 

@@ -46,6 +46,7 @@ bool is_infix_operator_rebinding(std::string const& infix);
 std::string possible_whitespace(TokenStream& tokens);
 std::string possible_newline(TokenStream& tokens);
 std::string possible_whitespace_or_newline(TokenStream& tokens);
+std::string possible_statement_ending(TokenStream& tokens);
 void consume_branch_until_end(Branch& branch, TokenStream& tokens);
 
 } // namespace parser

@@ -179,8 +179,8 @@ Term* statement(Branch& branch, TokenStream& tokens)
 
     append_whitespace(result, possible_whitespace(tokens));
 
-    // Consume a newline or ;
-    if (tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON))
+    // Consume a newline or ; or ,
+    if (tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON) || tokens.nextIs(COMMA))
         result->stringProp("syntaxHints:lineEnding") = tokens.consume();
 
     // Mark this term as a statement
@@ -611,7 +611,10 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
+    int prevBranchLength = branch.length();
     Term* expr = infix_expression(branch, tokens);
+    bool expr_is_new = branch.length() == prevBranchLength;
+
     for (int i=0; i < expr->numInputs(); i++)
         recursively_mark_terms_as_occuring_inside_an_expression(expr->input(i));
 
@@ -621,6 +624,10 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     if (!tokens.nextNonWhitespaceIs(EQUALS)) {
 
         std::string pendingRebind = pop_pending_rebind(branch);
+
+        // If the expr is just an identifier, then create an implicit copy()
+        if (expr->name != "" && expr_is_new)
+            expr = apply(&branch, COPY_FUNC, RefList(expr));
 
         if (pendingRebind != "")
             branch.bindName(expr, pendingRebind);
@@ -1138,19 +1145,40 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 
     tokens.consume(LBRACKET);
 
-    RefList terms;
-    ListSyntaxHints listHints;
-    consume_list_arguments(branch, tokens, terms, listHints);
+    Term* result = apply(NULL, BRANCH_FUNC, RefList());
+
+    while (!tokens.nextIs(RBRACKET) && !tokens.finished()) {
+
+        std::string preWhitespace = possible_whitespace_or_newline(tokens);
+
+        // Use the parent branch as the home for this statement. This way,
+        // if the statement creates extra terms, they aren't added to our list.
+        Term* term = infix_expression(branch, tokens);
+
+        bool implicitCopy = false;
+        if (term->name != "") {
+            // If this term is an identifier, then create an implicit copy
+            term = apply(&as_branch(result), COPY_FUNC, RefList(term));
+            implicitCopy = true;
+        }
+
+        prepend_whitespace(term, preWhitespace);
+        append_whitespace(term, possible_whitespace(tokens));
+        append_whitespace(term, possible_statement_ending(tokens));
+
+        // Take the result and steal it into the list branch
+        if (!implicitCopy)
+            steal_term(term, as_branch(result));
+    }
+
+    branch.append(result);
 
     if (!tokens.nextIs(RBRACKET))
-        return compile_error_for_line(branch, tokens, startPosition);
+        return compile_error_for_line(result, tokens, startPosition);
 
     tokens.consume(RBRACKET);
 
-    Term* result = apply(&branch, LIST_FUNC, terms);
-    listHints.apply(result);
-
-    evaluate_term(result);
+    result->boolProp("syntaxHints:literal-list") = true;
 
     return result;
 }
@@ -1210,6 +1238,14 @@ std::string possible_whitespace_or_newline(TokenStream& tokens)
         output << tokens.consume();
 
     return output.str();
+}
+
+std::string possible_statement_ending(TokenStream& tokens)
+{
+    if (tokens.nextIs(NEWLINE) || tokens.nextIs(COMMA) || tokens.nextIs(SEMICOLON))
+        return tokens.consume();
+    else
+        return "";
 }
 
 void consume_branch_until_end(Branch& branch, TokenStream& tokens)
