@@ -14,3 +14,5 @@
    a runtime abort trap.
 
  - Returning something in a subroutine with no return type declared, causes an abort trap
+
+ - Can't comment out something inside of a literal list

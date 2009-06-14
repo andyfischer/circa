@@ -62,7 +62,7 @@ end
 
 def initialize_board_piece(int index) : BoardPiece
   loc = board_index_to_loc(index)
-  if loc.y < 8
+  if loc.y < 12
     return [0 false]
   else
     return [rand_i()%4 true]
@@ -70,15 +70,22 @@ def initialize_board_piece(int index) : BoardPiece
 end
 
 piece_types = [
-    [[0 0 2] [1 0 3]],
-    [[0 0 2] [0 1 2] [0 1 0]]
+    [[0 1 2] [1 1 3]]
+    [[0 1 2] [1 1 0]]
+    [[0 1 2] [1 1 0] [0 1 0]]
 ]
+    --[[0 0 2] [0 1 2] [0 1 0]]
 
-state falling_group = [[0 1 2] [1 1 3]]
+def get_random_piece_type() : List
+  i = rand_i() % length(piece_types)
+  return piece_types[i]
+end
+
+state falling_group = get_random_piece_type()
 state falling_piece_rot = 0
 state falling_group_x = 4
 state falling_group_y = 0
-fall_speed = 70.0
+fall_speed = 80.0
 state tile_fall_distance = tile_size
 
 state board = map(initialize_board_piece, range(num_tiles))
@@ -157,6 +164,7 @@ if tile_fall_distance < 0
     end
 
     -- Reset falling group
+    falling_group = get_random_piece_type()
     falling_group_x = 5
     falling_group_y = 0
   end
@@ -164,12 +172,11 @@ if tile_fall_distance < 0
   falling_group_y = falling_group_y + 1
 end
 
--- Position and rotate the falling group
+-- Draw the current position of the falling group
 
 positioned_falling_group = position_falling_group(falling_group,
   falling_group_x, falling_group_y)
 
--- Draw falling tile
 for piece in positioned_falling_group
     piece = piece:Piece
     draw_free_piece([piece.x * tile_size, piece.y * tile_size - tile_fall_distance] piece.rot/4.0)
