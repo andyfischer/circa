@@ -25,8 +25,7 @@ std::string term_to_raw_string(Term* term);
 std::string branch_namespace_to_string(Branch& branch);
 std::string branch_to_string_raw(Branch& branch);
 std::string branch_to_string_raw_with_properties(Branch& branch);
-bool is_equivalent(Term* target, Term* function, RefList const& inputs);
-Term* find_equivalent(Branch& branch, Term* function, RefList const& inputs);
+
 void print_runtime_errors(Branch& branch, std::ostream& output);
 bool has_compile_error(Term* term);
 std::string get_compile_error_message(Term* term);

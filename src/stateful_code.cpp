@@ -16,7 +16,7 @@ void set_stateful(Term* term, bool value)
 
 bool is_function_stateful(Term* func)
 {
-    Term* stateType = as_function(func).hiddenStateType;
+    Term* stateType = function_get_hidden_state_type(func);
     return (stateType != NULL && stateType != VOID_TYPE);
 }
 
@@ -63,15 +63,9 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
     }
 }
 
-bool function_has_hidden_state(Term* func)
-{
-    Term* hiddenStateType = get_function_data(func).hiddenStateType;
-    return hiddenStateType != NULL && hiddenStateType != VOID_TYPE;
-}
-
 Term* get_hidden_state_for_call(Term* term)
 {
-    if (function_has_hidden_state(term->function)) {
+    if (is_function_stateful(term->function)) {
         assert(term->input(0) != NULL);
         return term->input(0);
     } else

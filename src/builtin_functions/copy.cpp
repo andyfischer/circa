@@ -27,8 +27,8 @@ namespace copy_function {
     void setup(Branch& kernel)
     {
         COPY_FUNC = import_function(kernel, evaluate, "copy(any) : any");
-        as_function(COPY_FUNC).specializeType = specializeType;
-        as_function(COPY_FUNC).toSourceString = toSourceString;
+        function_get_specialize_type(COPY_FUNC) = specializeType;
+        function_get_to_source_string(COPY_FUNC) = toSourceString;
     }
 }
 }

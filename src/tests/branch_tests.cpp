@@ -99,7 +99,7 @@ void test_duplicate_subroutine()
     Term* func = branch.eval("def func()\na = 1\nend");
 
     // sanity check:
-    test_assert(get_function_data(func).name == "func");
+    test_assert(function_get_name(func) == "func");
     test_assert(branch.contains("func"));
 
     Branch dupe;
@@ -108,7 +108,7 @@ void test_duplicate_subroutine()
     test_assert(dupe.contains("func"));
 
     Term* dupedFunc = dupe["func"];
-    test_assert(get_function_data(dupedFunc).name == "func");
+    test_assert(function_get_name(dupedFunc) == "func");
 
     test_assert(is_branch(dupedFunc));
 

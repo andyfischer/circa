@@ -23,7 +23,7 @@ namespace set_field_function {
     {
         SET_FIELD_FUNC = import_function(kernel, evaluate,
                 "set_field(any, string, any) : any");
-        as_function(SET_FIELD_FUNC).specializeType = specializeType;
+        function_get_specialize_type(SET_FIELD_FUNC) = specializeType;
     }
 }
 }

@@ -287,7 +287,7 @@ void bootstrap_kernel()
     VALUE_FUNC->owningBranch = KERNEL;
     Function* valueFunc = new Function();
     VALUE_FUNC->value = valueFunc;
-    valueFunc->name = "value";
+    valueFunc->_name = "value";
     valueFunc->evaluate = empty_evaluate_function;
     KERNEL->bindName(VALUE_FUNC, "value");
 
@@ -297,7 +297,7 @@ void bootstrap_kernel()
     constTypeFunc->function = VALUE_FUNC;
     Function* constTypeFuncValue = new Function();
     constTypeFunc->value = constTypeFuncValue;
-    constTypeFuncValue->name = "const-Type";
+    constTypeFuncValue->_name = "const-Type";
 
     // Create Type type
     TYPE_TYPE = new Term();
@@ -316,7 +316,7 @@ void bootstrap_kernel()
 
     // Implant the Type type
     set_input(constTypeFunc, 0, TYPE_TYPE);
-    constTypeFuncValue->outputType = TYPE_TYPE;
+    constTypeFuncValue->_outputType = TYPE_TYPE;
 
     // Create const-Function function
     Term* constFuncFunc = new Term();
@@ -324,7 +324,7 @@ void bootstrap_kernel()
     constFuncFunc->function = VALUE_FUNC;
     Function* constFuncFuncValue = new Function();
     constFuncFunc->value = constFuncFuncValue;
-    constFuncFuncValue->name = "const-Function";
+    constFuncFuncValue->_name = "const-Function";
     KERNEL->bindName(constFuncFunc, "const-Function");
 
     // Create Function type
@@ -346,7 +346,7 @@ void bootstrap_kernel()
     VALUE_FUNC->type = FUNCTION_TYPE;
     constFuncFunc->type = FUNCTION_TYPE;
     constTypeFunc->type = FUNCTION_TYPE;
-    as_function(constFuncFunc).outputType = FUNCTION_TYPE;
+    function_get_output_type(constFuncFunc) = FUNCTION_TYPE;
 
     // Create Any type
     ANY_TYPE = new Term();
@@ -357,7 +357,7 @@ void bootstrap_kernel()
     as_type(ANY_TYPE).name = "any";
     KERNEL->bindName(ANY_TYPE, "any");
 
-    as_function(VALUE_FUNC).outputType = ANY_TYPE;
+    function_get_output_type(VALUE_FUNC) = ANY_TYPE;
 }
 
 void initialize_builtin_types(Branch& kernel)
@@ -382,7 +382,7 @@ void initialize_builtin_types(Branch& kernel)
     ANY_TYPE = create_empty_type(kernel, "any");
     as_type(ANY_TYPE).toString = any_t::to_string;
 
-    as_function(VALUE_FUNC).outputType = ANY_TYPE;
+    function_get_output_type(VALUE_FUNC) = ANY_TYPE;
 
     VOID_PTR_TYPE = import_type<void*>(kernel, "void_ptr");
     as_type(VOID_PTR_TYPE).parameters.append(ANY_TYPE);

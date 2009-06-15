@@ -41,13 +41,5 @@ Term* literal_bool(Branch& branch, TokenStream& tokens);
 Term* literal_list(Branch& branch, TokenStream& tokens);
 Term* identifier(Branch& branch, TokenStream& tokens);
 
-// Helper functions:
-bool is_infix_operator_rebinding(std::string const& infix);
-std::string possible_whitespace(TokenStream& tokens);
-std::string possible_newline(TokenStream& tokens);
-std::string possible_whitespace_or_newline(TokenStream& tokens);
-std::string possible_statement_ending(TokenStream& tokens);
-void consume_branch_until_end(Branch& branch, TokenStream& tokens);
-
 } // namespace parser
 } // namespace circa

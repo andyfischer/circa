@@ -21,11 +21,11 @@ void create()
 
     Function& func = get_subroutines_function_def(sub);
 
-    test_assert(func.name == "mysub");
+    test_assert(function_get_name(sub) == "mysub");
 
     test_assert(identity_equals(func.inputTypes[0], INT_TYPE));
     test_assert(func.inputTypes.length() == 1);
-    test_assert(identity_equals(func.outputType, STRING_TYPE));
+    test_assert(identity_equals(function_get_output_type(sub), STRING_TYPE));
 }
 
 void test_is_callable()

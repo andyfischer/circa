@@ -19,10 +19,10 @@ void test_import_c()
 {
     Branch branch;
 
-    Term* func_as_term = import_function(branch, my_imported_function,
+    Term* func = import_function(branch, my_imported_function,
             "my_imported_func(int,int) : int");
 
-    test_assert(as_function(func_as_term).outputType == INT_TYPE);
+    test_assert(function_get_output_type(func) == INT_TYPE);
 
     Term* result = branch.eval("my_imported_func(4,5)");
 

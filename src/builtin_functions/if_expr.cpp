@@ -68,9 +68,9 @@ namespace if_expr_function {
     void setup(Branch& kernel)
     {
         IF_EXPR_FUNC = import_function(kernel, evaluate, "if_expr(bool,any,any) : any");
-        as_function(IF_EXPR_FUNC).specializeType = specializeType;
-        as_function(IF_EXPR_FUNC).setInputMeta(1, true);
-        as_function(IF_EXPR_FUNC).setInputMeta(2, true);
+        function_get_specialize_type(IF_EXPR_FUNC) = specializeType;
+        function_get_input_meta(IF_EXPR_FUNC, 1) = true;
+        function_get_input_meta(IF_EXPR_FUNC, 2) = true;
         as_function(IF_EXPR_FUNC).feedbackFunc = 
             import_function(kernel, feedback_evaluate, "if_expr_feedback(any, any) : Branch");
     }

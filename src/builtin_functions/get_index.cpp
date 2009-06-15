@@ -33,7 +33,7 @@ namespace get_index_function {
     void setup(Branch& kernel)
     {
         GET_INDEX_FUNC = import_function(kernel, evaluate, "get_index(any, int) : any");
-        as_function(GET_INDEX_FUNC).specializeType = specializeType;
+        function_get_specialize_type(GET_INDEX_FUNC) = specializeType;
     }
 }
 }

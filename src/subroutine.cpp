@@ -8,34 +8,34 @@ namespace subroutine_t {
     std::string to_string(Term* term)
     {
         Branch& branch = as_branch(term);
-        Function& func = get_subroutines_function_def(term);
 
         std::stringstream result;
 
-        result << "def " << func.name << "(";
+        result << "def " << function_get_name(term) << "(";
 
         bool first = true;
-        for (int i=0; i < func.numInputs(); i++) {
-            std::string name = func.getInputProperties(i).name;
+        int numInputs = function_num_inputs(term);
+        for (int i=0; i < numInputs; i++) {
+            std::string name = function_get_input_name(term, i);
 
             if (name == "#state")
                 continue;
 
             if (!first) result << ", ";
             first = false;
-            result << func.inputType(i)->name;
+            result << function_get_input_type(term, i)->name;
 
-            if (func.getInputProperties(i).name != "")
+            if (name != "")
                 result << " " << name;
         }
 
         result << ")";
 
-        if (func.outputType != VOID_TYPE) {
+        if (function_get_output_type(term) != VOID_TYPE) {
             result << term->stringPropOptional("syntaxHints:whitespacePreColon", " ");
             result << ":";
             result << term->stringPropOptional("syntaxHints:whitespacePostColon", " ");
-            result << func.outputType->name;
+            result << function_get_output_type(term)->name;
         }
 
         result << "\n";
@@ -65,16 +65,17 @@ void initialize_subroutine(Term* term)
     Function& func = get_subroutines_function_def(term);
     func.evaluate = subroutine_call_evaluate;
 
-    for (int input=0; input < func.numInputs(); input++) {
-        std::string name = func.getInputProperties(input).name;
+    int numInputs = function_num_inputs(term);
+    for (int input=0; input < numInputs; input++) {
+        std::string name = function_get_input_name(term, input);
         Term *placeholder = apply(&branch, INPUT_PLACEHOLDER_FUNC,
             RefList(), name);
-        change_type(placeholder, func.inputType(input));
+        Term* type = function_get_input_type(term, input);
+        change_type(placeholder, type);
         source_set_hidden(placeholder, true);
     }
 
-    // Check if this subroutine has any hidden state
-    func.hiddenStateType = VOID_TYPE;
+    function_get_hidden_state_type(term) = VOID_TYPE;
 }
 
 void subroutine_update_hidden_state_type(Term* sub)
@@ -87,18 +88,19 @@ void subroutine_update_hidden_state_type(Term* sub)
         if (is_stateful(contents[i]))
             hasState = true;
         if (is_subroutine(contents[i]->function))
-            if (function_has_hidden_state(contents[i]->function))
+            if (is_function_stateful(contents[i]->function))
                 hasState = true;
     }
 
     Function& func = get_function_data(sub);
     if (hasState) {
-        func.hiddenStateType = BRANCH_TYPE;
-        bool alreadyHasStateInput = (func.numInputs() > 0) && (func.inputName(0) == "#state");
+        function_get_hidden_state_type(sub) = BRANCH_TYPE;
+        bool alreadyHasStateInput = (function_num_inputs(sub) > 0)
+            && (function_get_input_name(sub, 0) == "#state");
         if (!alreadyHasStateInput)
             func.prependInput(BRANCH_TYPE, "#state");
     } else {
-        func.hiddenStateType = VOID_TYPE;
+        function_get_hidden_state_type(sub) = VOID_TYPE;
     }
 }
 

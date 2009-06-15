@@ -50,7 +50,7 @@ namespace if_function {
     void setup(Branch& kernel)
     {
         IF_FUNC = import_function(kernel, evaluate, "if(bool) : Branch");
-        as_function(IF_FUNC).toSourceString = toSourceString;
+        function_get_to_source_string(IF_FUNC) = toSourceString;
     }
 }
 }

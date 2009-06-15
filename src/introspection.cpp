@@ -142,52 +142,6 @@ std::string branch_to_string_raw_with_properties(Branch& branch)
     return out.str();
 }
 
-bool function_allows_term_reuse(Function &function)
-{
-    // TODO: return false if this function is not pure
-
-    return true;
-}
-
-bool is_equivalent(Term* target, Term* function, RefList const& inputs)
-{
-    assert_good_pointer(target);
-    assert_good_pointer(function);
-    if (target->function != function)
-        return false;
-
-    if (!function_allows_term_reuse(as_function(function)))
-        return false;
-
-    // Check inputs
-    int numInputs = target->inputs.length();
-
-    if (numInputs != inputs.length())
-        return false;
-
-    for (int i=0; i < numInputs; i++) {
-        if (target->inputs[i] != inputs[i]) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-Term* find_equivalent(Branch& branch, Term* function, RefList const& inputs)
-{
-    if (!function_allows_term_reuse(as_function(function))) {
-        return NULL;
-    }
-
-    for (int i=0; i < branch.length(); i++) {
-        if (is_equivalent(branch[i], function, inputs))
-            return branch[i];
-    }
-
-    return NULL;
-}
-
 void print_runtime_errors(Branch& branch, std::ostream& output)
 {
     for (BranchIterator it(branch); !it.finished(); ++it) {

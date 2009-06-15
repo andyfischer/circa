@@ -147,26 +147,26 @@ void test_type_decl()
 void test_function_decl()
 {
     Branch branch;
-    Term* funcTerm = parser::compile(&branch, parser::statement,
+    Term* func = parser::compile(&branch, parser::statement,
             "def Myfunc(string what, string hey, int yo) : bool\n"
             "  whathey = concat(what,hey)\n"
             "  return yo > 3\n"
             "end");
 
-    Function& func = get_subroutines_function_def(funcTerm);
+    Function& funcData = get_subroutines_function_def(func);
 
-    test_equals(funcTerm->name, "Myfunc");
-    test_equals(func.name, "Myfunc");
+    test_equals(func->name, "Myfunc");
+    test_equals(function_get_name(func), "Myfunc");
 
-    test_assert(func.inputTypes[0] == STRING_TYPE);
-    test_assert(func.getInputProperties(0).name == "what");
-    test_assert(func.inputTypes[1] == STRING_TYPE);
-    test_assert(func.getInputProperties(1).name == "hey");
-    test_assert(func.inputTypes[2] == INT_TYPE);
-    test_assert(func.getInputProperties(2).name == "yo");
-    test_assert(func.outputType == BOOL_TYPE);
+    test_assert(funcData.inputTypes[0] == STRING_TYPE);
+    test_assert(funcData.getInputProperties(0).name == "what");
+    test_assert(funcData.inputTypes[1] == STRING_TYPE);
+    test_assert(funcData.getInputProperties(1).name == "hey");
+    test_assert(funcData.inputTypes[2] == INT_TYPE);
+    test_assert(funcData.getInputProperties(2).name == "yo");
+    test_assert(function_get_output_type(func) == BOOL_TYPE);
 
-    Branch& funcbranch = as_branch(funcTerm);
+    Branch& funcbranch = as_branch(func);
 
     // index 0 has the function definition
     test_equals(funcbranch[1]->name, "what");
@@ -255,7 +255,7 @@ void test_dot_concatenation()
     test_assert(is_value(branch[0]));
     test_assert(is_value(branch[1]));
     test_assert(branch[1]->asInt() == 1);
-    test_equals(as_function(branch[2]->function).name, "add");
+    test_equals(function_get_name(branch[2]->function), "add");
     test_assert(branch["s"] == s);
 }
 

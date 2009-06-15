@@ -2,6 +2,8 @@
 
 #include "circa.h"
 
+using namespace circa::tokenizer;
+
 namespace circa {
 
 void prepend_whitespace(Term* term, std::string const& whitespace)
@@ -88,14 +90,16 @@ std::string pop_pending_rebind(Branch& branch)
     }
 }
 
-void remove_compilation_attrs(Branch& branch)
+void post_parse_branch(Branch& branch)
 {
-    branch.remove(get_name_for_attribute("comp-pending-rebind"));
-}
+    // Remove NULLs
+    branch.removeNulls();
 
-void wrap_up_branch(Branch& branch)
-{
-    // Create assign() terms that persist the results of every stateful value
+    // Remove temporary attributes
+    branch.remove(get_name_for_attribute("comp-pending-rebind"));
+
+    // For every stateful value, create assign() terms that persist the results
+    // onto the next iteration.
     for (int i=0; i < branch.length(); i++) {
         if (is_stateful(branch[i])) {
             Term* term = branch[i];
@@ -212,6 +216,58 @@ Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start)
     existing->stringProp("message") = consume_line(tokens, start, existing);
 
     return existing;
+}
+
+bool is_infix_operator_rebinding(std::string const& infix)
+{
+    return (infix == "+=" || infix == "-=" || infix == "*=" || infix == "/=");
+}
+
+std::string possible_whitespace(TokenStream& tokens)
+{
+    if (tokens.nextIs(WHITESPACE))
+        return tokens.consume(WHITESPACE);
+    else
+        return "";
+}
+
+std::string possible_newline(TokenStream& tokens)
+{
+    if (tokens.nextIs(NEWLINE))
+        return tokens.consume(NEWLINE);
+    else
+        return "";
+}
+
+std::string possible_whitespace_or_newline(TokenStream& tokens)
+{
+    std::stringstream output;
+
+    while (tokens.nextIs(NEWLINE) || tokens.nextIs(WHITESPACE))
+        output << tokens.consume();
+
+    return output.str();
+}
+
+std::string possible_statement_ending(TokenStream& tokens)
+{
+    if (tokens.nextIs(NEWLINE) || tokens.nextIs(COMMA) || tokens.nextIs(SEMICOLON))
+        return tokens.consume();
+    else
+        return "";
+}
+
+void consume_branch_until_end(Branch& branch, TokenStream& tokens)
+{
+    while (!tokens.finished()) {
+        if (tokens.nextNonWhitespaceIs(END) || tokens.nextNonWhitespaceIs(ELSE)) {
+            break;
+        } else {
+            parser::statement(branch, tokens);
+        }
+    }
+
+    post_parse_branch(branch);
 }
 
 } // namespace circa

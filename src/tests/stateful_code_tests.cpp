@@ -118,7 +118,6 @@ void stateful_value_evaluation()
     Term *i = branch.eval("state i = 2.0");
 
     branch.compile("i = i + 1.0");
-    wrap_up_branch(branch);
 
     test_equals(as_float(i), 2.0);
     evaluate_branch(branch);
@@ -215,10 +214,10 @@ void state_inside_lots_of_nested_functions()
     Term* f3 = branch.compile("def func3()\nfunc2()\nend");
     Term* f4 = branch.compile("def func4()\nfunc3()\nend");
 
-    test_assert(function_has_hidden_state(f1));
-    test_assert(function_has_hidden_state(f2));
-    test_assert(function_has_hidden_state(f3));
-    test_assert(function_has_hidden_state(f4));
+    test_assert(is_function_stateful(f1));
+    test_assert(is_function_stateful(f2));
+    test_assert(is_function_stateful(f3));
+    test_assert(is_function_stateful(f4));
 
     NEXT_UNIQUE_OUTPUT = 11;
     SPY_RESULTS.clear();
