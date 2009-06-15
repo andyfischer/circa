@@ -35,7 +35,7 @@ namespace vectorize_vs_function {
     void setup(Branch& kernel)
     {
         Term* func = import_function(kernel, evaluate, "vectorize_vs(List,any) : List");
-        as_function(func).specializeType = specializeType;
+        function_get_specialize_type(func) = specializeType;
     }
 }
 } // namespace circa

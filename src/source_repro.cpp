@@ -8,7 +8,7 @@ namespace circa {
 
 int get_first_visible_input_index(Term* term)
 {
-    if (function_has_hidden_state(term->function))
+    if (is_function_stateful(term->function))
         return 1;
     else
         return 0;
@@ -139,8 +139,7 @@ std::string get_term_source_default_formatting(Term* term)
 
     // for an infix rebinding, don't use the normal "name = " prefix
     if ((term->stringPropOptional("syntaxHints:declarationStyle", "") == "infix")
-            && parser::is_infix_operator_rebinding(
-                term->stringProp("syntaxHints:functionName")))
+            && is_infix_operator_rebinding(term->stringProp("syntaxHints:functionName")))
     {
         result << term->name << " " << term->stringProp("syntaxHints:functionName");
         result << get_source_of_input(term, 1);

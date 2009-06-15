@@ -39,10 +39,13 @@ void evaluate_term(Term* term)
         return;
 
     // Check # of inputs
-    if (!func.variableArgs && (term->inputs.length() != func.numInputs())) {
+    bool varArgs = function_get_variable_args(term->function);
+    int numInputs = function_num_inputs(term->function);
+
+    if (!varArgs && (term->inputs.length() != numInputs)) {
         std::stringstream msg;
         msg << "Wrong number of inputs (found " << term->inputs.length();
-        msg << ", expected " << func.numInputs() << ")";
+        msg << ", expected " << numInputs << ")";
         error_occurred(term, msg.str());
         return;
     }
@@ -56,7 +59,7 @@ void evaluate_term(Term* term)
     for (int inputIndex=0; inputIndex < term->inputs.length(); inputIndex++)
     {
         int effectiveIndex = inputIndex;
-        if (func.variableArgs)
+        if (varArgs)
             effectiveIndex = 0;
 
         Term* input = term->inputs[inputIndex];
@@ -91,12 +94,6 @@ void evaluate_term(Term* term)
             error_occurred(term, message.str());
             return;
         }
-
-        // Possibly evaluate this input if needed
-        /*if (!inputProps.meta && input->needsUpdate) {
-            assert(term != input); // prevent infinite recursion
-            evaluate_term(input);
-        }*/
     }
     
     // Make sure we have an allocated value. Allocate one if necessary

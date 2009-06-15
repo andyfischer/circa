@@ -31,12 +31,12 @@ struct Function
 
     RefList inputTypes;
     InputPropertiesList inputProperties;
-    Ref outputType;
-    Ref hiddenStateType;
+    Ref _outputType;
+    Ref _hiddenStateType;
 
-    bool variableArgs;
+    bool _variableArgs;
 
-    std::string name;
+    std::string _name;
 
     Branch parameters;
 
@@ -50,14 +50,9 @@ struct Function
 
     Function();
 
-    Term* inputType(int index);
-    std::string const& inputName(int index);
-    int numInputs();
     void appendInput(Term* type, std::string const& name);
     void prependInput(Term* type, std::string const& name);
     InputProperties& getInputProperties(int index);
-    void setInputMeta(int index, bool value);
-    void setInputModified(int index, bool value);
 };
 
 namespace function_t {
@@ -70,6 +65,21 @@ bool is_function(Term* term);
 Function& as_function(Term*);
 
 std::string get_placeholder_name_for_index(int index);
+
+std::string& function_get_name(Term* function);
+Ref& function_get_output_type(Term* function);
+Ref& function_get_hidden_state_type(Term* function);
+bool& function_get_variable_args(Term* function);
+Term* function_get_input_type(Term* function, int index);
+std::string const& function_get_input_name(Term* function, int index);
+bool& function_get_input_modified(Term* function, int index);
+bool& function_get_input_meta(Term* function, int index);
+
+Function::EvaluateFunc& function_get_evaluate(Term* function);
+Function::SpecializeTypeFunc& function_get_specialize_type(Term* function);
+Function::ToSourceString& function_get_to_source_string(Term* function);
+
+int function_num_inputs(Term* function);
 
 bool is_callable(Term* term);
 bool inputs_fit_function(Term* func, RefList const& inputs);

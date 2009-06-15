@@ -19,9 +19,9 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     Function& func = get_function_data(function);
 
     // If 'function' has hidden state, then create a container for that state, if needed
-    if (function_has_hidden_state(function) && (inputs.length() < func.numInputs()))
+    if (is_function_stateful(function) && (inputs.length() < function_num_inputs(function)))
     {
-        Term* stateContainer = create_value(branch, func.hiddenStateType);
+        Term* stateContainer = create_value(branch, function_get_hidden_state_type(function));
         source_set_hidden(stateContainer, true);
         set_stateful(stateContainer, true);
         inputs.prepend(stateContainer);
@@ -43,7 +43,7 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     for (int i=0; i < inputs.length(); i++)
         set_input(result, i, inputs[i]);
 
-    Term* outputType = func.outputType;
+    Term* outputType = function_get_output_type(function);
 
     // Check if this function has a specializeType function
     // Side note: maybe we should do this step later. Doing it here means that we can only

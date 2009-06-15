@@ -8,6 +8,8 @@
 namespace circa {
 
 Term* get_global(std::string name);
+
+// TODO: Move this into function.cpp (or delete it)
 Function& get_function_data(Term* function);
 
 void evaluate_term(Term* term);

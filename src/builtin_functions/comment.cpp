@@ -16,10 +16,8 @@ namespace comment_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "comment()");
-        as_function(main_func).toSourceString = toSourceString;
-
-        COMMENT_FUNC = main_func;
+        COMMENT_FUNC = import_function(kernel, evaluate, "comment()");
+        function_get_to_source_string(COMMENT_FUNC) = toSourceString;
     }
 }
 }

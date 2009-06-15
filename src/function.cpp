@@ -5,33 +5,13 @@
 namespace circa {
 
 Function::Function()
-  : outputType(NULL),
-    hiddenStateType(NULL),
-    variableArgs(false),
+  : _outputType(NULL),
+    _hiddenStateType(NULL),
+    _variableArgs(false),
     evaluate(NULL),
     specializeType(NULL),
     toSourceString(NULL)
 {
-}
-
-Term*
-Function::inputType(int index)
-{
-    if (variableArgs)
-        return inputTypes[0];
-    else
-        return inputTypes[index];
-}
-
-std::string const&
-Function::inputName(int index)
-{
-    return getInputProperties(index).name;
-}
-
-int Function::numInputs()
-{
-    return inputTypes.length();
 }
 
 void Function::appendInput(Term* type, std::string const& name)
@@ -51,7 +31,7 @@ void Function::prependInput(Term* type, std::string const& name)
 Function::InputProperties&
 Function::getInputProperties(int index)
 {
-    assert(variableArgs || index < inputTypes.length());
+    assert(_variableArgs || index < inputTypes.length());
 
     // check to grow inputProperties
     while ((index+1) > (int) inputProperties.size()) {
@@ -61,15 +41,7 @@ Function::getInputProperties(int index)
     return inputProperties[index];
 }
 
-void Function::setInputMeta(int index, bool value)
-{
-    getInputProperties(index).meta = value;
-}
 
-void Function::setInputModified(int index, bool value)
-{
-    getInputProperties(index).modified = value;
-}
 
 namespace function_t {
     void assign(Term* sourceTerm, Term* destTerm)
@@ -86,9 +58,10 @@ namespace function_t {
 
         copy_field(inputTypes);
         copy_field(inputProperties);
-        copy_field(outputType);
-        copy_field(variableArgs);
-        copy_field(name);
+        copy_field(_outputType);
+        copy_field(_hiddenStateType);
+        copy_field(_variableArgs);
+        copy_field(_name);
         copy_field(evaluate);
         copy_field(specializeType);
         copy_field(toSourceString);
@@ -101,11 +74,12 @@ namespace function_t {
     {
         Function &func = as_function(term);
         func.inputTypes.remapPointers(map);
-        func.outputType = map.getRemapped(func.outputType);
+        function_get_output_type(term) = 
+            map.getRemapped(function_get_output_type(term));
     }
     std::string to_string(Term* term)
     {
-        return "<Function " + as_function(term).name + ">";
+        return "<Function " + function_get_name(term) + ">";
     }
 }
 
@@ -128,14 +102,69 @@ std::string get_placeholder_name_for_index(int index)
     return sstream.str();
 }
 
+std::string& function_get_name(Term* function)
+{
+    return get_function_data(function)._name;
+}
+
+Ref& function_get_output_type(Term* function)
+{
+    return get_function_data(function)._outputType;
+}
+
+Ref& function_get_hidden_state_type(Term* function)
+{
+    return get_function_data(function)._hiddenStateType;
+}
+
+bool& function_get_variable_args(Term* function)
+{
+    return get_function_data(function)._variableArgs;
+}
+
+int function_num_inputs(Term* function)
+{
+    return get_function_data(function).inputProperties.size();
+}
+
+std::string const& function_get_input_name(Term* function, int index)
+{
+    return get_function_data(function).getInputProperties(index).name;
+}
+
+bool& function_get_input_meta(Term* function, int index)
+{
+    return get_function_data(function).getInputProperties(index).meta;
+}
+
+bool& function_get_input_modified(Term* function, int index)
+{
+    return get_function_data(function).getInputProperties(index).modified;
+}
+
 Term* function_get_input_type(Term* func, int index)
 {
     Function& data = get_function_data(func);
 
-    if (data.variableArgs)
-        return data.inputType(0);
+    if (function_get_variable_args(func))
+        return data.inputTypes[0];
     else
-        return data.inputType(index);
+        return data.inputTypes[index];
+}
+
+Function::EvaluateFunc& function_get_evaluate(Term* function)
+{
+    return get_function_data(function).evaluate;
+}
+
+Function::SpecializeTypeFunc& function_get_specialize_type(Term* function)
+{
+    return get_function_data(function).specializeType;
+}
+
+Function::ToSourceString& function_get_to_source_string(Term* function)
+{
+    return get_function_data(function).toSourceString;
 }
 
 bool is_callable(Term* term)
@@ -147,10 +176,10 @@ bool is_callable(Term* term)
 
 bool inputs_fit_function(Term* func, RefList const& inputs)
 {
-    Function& data = get_function_data(func);
+    bool varArgs = function_get_variable_args(func);
 
     // Fail if wrong # of inputs
-    if (!data.variableArgs && (data.numInputs() != inputs.length()))
+    if (!varArgs && (function_num_inputs(func) != inputs.length()))
         return false;
 
     for (int i=0; i < inputs.length(); i++) {

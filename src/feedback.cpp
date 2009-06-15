@@ -209,7 +209,7 @@ void refresh_training_branch(Branch& branch)
                 Term* outgoingFeedback = as_branch(feedback)[i];
 
                 // Initialize this field
-                specialize_type(outgoingFeedback, as_function(term->function).inputType(i));
+                specialize_type(outgoingFeedback, function_get_input_type(term->function, i));
                 alloc_value(outgoingFeedback);
 
                 if (!is_trainable(input))

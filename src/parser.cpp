@@ -20,8 +20,8 @@ Ref compile(Branch* branch, ParsingStep step, std::string const& input)
 
     TokenStream tokens(input);
     Ref result = step(*branch, tokens);
-    remove_compilation_attrs(*branch);
-    wrap_up_branch(*branch);
+
+    post_parse_branch(*branch);
 
     if (temporaryBranch) {
         branch->clear();
@@ -228,8 +228,8 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
     Term* result = create_value(&branch, FUNCTION_TYPE);
     Function& func = as_function(result);
 
-    func.name = functionName;
-    func.outputType = VOID_TYPE;
+    function_get_name(result) = functionName;
+    function_get_output_type(result) = VOID_TYPE;
 
     while (!tokens.nextIs(RPAREN) && !tokens.finished())
     {
@@ -256,7 +256,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
             name = tokens.consume();
             possible_whitespace(tokens);
         } else {
-            name = get_placeholder_name_for_index((int) func.inputProperties.size());
+            name = get_placeholder_name_for_index(function_num_inputs(result));
         }
 
         Term* typeTerm = find_type(branch, type);
@@ -264,12 +264,12 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
         func.appendInput(typeTerm, name);
 
         if (isHiddenStateArgument)
-            func.hiddenStateType = typeTerm;
+            function_get_hidden_state_type(result) = typeTerm;
 
         // Variable args when ... is appended
         if (tokens.nextIs(ELLIPSIS)) {
             tokens.consume();
-            func.variableArgs = true;
+            function_get_variable_args(result) = true;
         }
 
         if (!tokens.nextIs(RPAREN)) {
@@ -294,7 +294,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
 
         std::string outputTypeName = tokens.consume();
         Term* outputType = find_type(branch, outputTypeName);
-        func.outputType = outputType;
+        function_get_output_type(result) = outputType;
     }
 
     possible_whitespace(tokens);
@@ -339,11 +339,9 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     // Bind this function's name immediately. Need to do this before parsing the branch,
     // so that recursive calls will work.
 
-    Function& func = as_function(functionDef);
-    branch.bindName(result, func.name);
+    branch.bindName(result, function_get_name(functionDef));
 
     consume_branch_until_end(subBranch, tokens);
-    remove_compilation_attrs(subBranch);
 
     possible_whitespace(tokens);
 
@@ -446,7 +444,6 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     Branch& positiveBranch = create_branch(&contents, "if");
 
     consume_branch_until_end(positiveBranch, tokens);
-    remove_compilation_attrs(positiveBranch);
 
     // Possibly consume an 'else' block
     if (tokens.nextNonWhitespaceIs(ELSE)) {
@@ -458,7 +455,6 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         tokens.consume(ELSE);
 
         consume_branch_until_end(elseBranch, tokens);
-        remove_compilation_attrs(elseBranch);
     }
 
     result->stringProp("syntaxHints:whitespaceBeforeEnd") = possible_whitespace(tokens);
@@ -756,11 +752,6 @@ int get_infix_precedence(int match)
         default:
             return -1;
     }
-}
-
-bool is_infix_operator_rebinding(std::string const& infix)
-{
-    return (infix == "+=" || infix == "-=" || infix == "*=" || infix == "/=");
 }
 
 std::string get_function_for_infix(std::string const& infix)
@@ -1216,53 +1207,6 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     include_location(result, id);
 
     return result;
-}
-
-std::string possible_whitespace(TokenStream& tokens)
-{
-    if (tokens.nextIs(WHITESPACE))
-        return tokens.consume(WHITESPACE);
-    else
-        return "";
-}
-
-std::string possible_newline(TokenStream& tokens)
-{
-    if (tokens.nextIs(NEWLINE))
-        return tokens.consume(NEWLINE);
-    else
-        return "";
-}
-
-std::string possible_whitespace_or_newline(TokenStream& tokens)
-{
-    std::stringstream output;
-
-    while (tokens.nextIs(NEWLINE) || tokens.nextIs(WHITESPACE))
-        output << tokens.consume();
-
-    return output.str();
-}
-
-std::string possible_statement_ending(TokenStream& tokens)
-{
-    if (tokens.nextIs(NEWLINE) || tokens.nextIs(COMMA) || tokens.nextIs(SEMICOLON))
-        return tokens.consume();
-    else
-        return "";
-}
-
-void consume_branch_until_end(Branch& branch, TokenStream& tokens)
-{
-    while (!tokens.finished()) {
-        if (tokens.nextNonWhitespaceIs(END) || tokens.nextNonWhitespaceIs(ELSE)) {
-            break;
-        } else {
-            statement(branch, tokens);
-        }
-    }
-
-    wrap_up_branch(branch);
 }
 
 } // namespace parser
