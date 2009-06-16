@@ -22,10 +22,6 @@ Term::Term()
     register_good_pointer(this);
 }
 
-Term::~Term()
-{
-}
-
 Term*
 Term::input(int index) const
 {

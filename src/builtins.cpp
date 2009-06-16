@@ -30,6 +30,7 @@ Term* CONSTANT_FALSE = NULL;
 Term* COPY_FUNC = NULL;
 Term* DESIRED_VALUE_FEEDBACK = NULL;
 Term* DIV_FUNC = NULL;
+Term* DO_ONCE_FUNC = NULL;
 Term* FEEDBACK_FUNC = NULL;
 Term* FEEDBACK_TYPE = NULL;
 Term* FLOAT_TYPE = NULL;
@@ -394,7 +395,6 @@ void initialize_builtin_types(Branch& kernel)
     import_type<RefList>(kernel, "Tuple");
 
     BRANCH_TYPE = create_compound_type(kernel, "Branch");
-    assert(as_type(BRANCH_TYPE).alloc == Branch::alloc);
     import_member_function(BRANCH_TYPE, list_t::append, "append(Branch, any) : Branch");
 
     import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) : string");

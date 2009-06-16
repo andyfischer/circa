@@ -21,6 +21,7 @@ syn region circaString   start=+'+ end=+'+ skip=+\\'+
 
 " Keywords
 syn keyword circaKeyword def type end if else for state return in true false
+syn match circaKeyword "\<do\ once\>"
 
 " Comments
 syn region circaLineComment start="--" skip="\\$" end="$"

@@ -88,6 +88,11 @@ void test_list()
     test_assert(t2->refCount == 2);
 }
 
+void remap_properties()
+{
+    // TODO
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(ref_tests::test_basic);

@@ -137,9 +137,9 @@ void test_symbols2()
 void test_keywords()
 {
     token::TokenList results;
-    token::tokenize("end,if,else,for,state", results);
+    token::tokenize("end,if,else,for,state,do once", results);
 
-    test_assert(results.size() == 9);
+    test_assert(results.size() == 11);
     test_assert(results[0].text == "end");
     test_assert(results[0].match == token::END);
     test_assert(results[2].text == "if");
@@ -150,6 +150,8 @@ void test_keywords()
     test_assert(results[6].match == token::FOR);
     test_assert(results[8].text == "state");
     test_assert(results[8].match == token::STATE);
+    test_assert(results[10].text == "do once");
+    test_assert(results[10].match == token::DO_ONCE);
 }
 
 void test_identifiers_that_look_like_keywords()

@@ -159,6 +159,11 @@ Term* statement(Branch& branch, TokenStream& tokens)
         result = for_block(branch, tokens);
     }
 
+    // Do_once block
+    else if (tokens.nextIs(DO_ONCE)) {
+        result = do_once_block(branch, tokens);
+    }
+
     // Stateful value decl
     else if (tokens.nextIs(STATE)) {
         result = stateful_value_decl(branch, tokens);
@@ -535,6 +540,26 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     return forTerm;
 }
 
+Term* do_once_block(Branch& branch, TokenStream& tokens)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(DO_ONCE);
+
+    possible_whitespace(tokens);
+    possible_statement_ending(tokens);
+
+    Term* result = apply(&branch, DO_ONCE_FUNC, RefList());
+
+    consume_branch_until_end(as_branch(result), tokens);
+
+    possible_whitespace(tokens);
+
+    tokens.consume(END);
+
+    return result;
+}
+
 Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
@@ -565,25 +590,24 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         type = find_type(branch, typeName);
     }
 
-    Term* result = NULL;
+    Term* result = create_value(&branch, type, name);
+    set_stateful(result, true);
 
     if (tokens.nextIs(EQUALS)) {
-
-        // state i = initial_value
         tokens.consume();
         possible_whitespace(tokens);
-        Term* initialValue = infix_expression(branch, tokens);
+
+        Term* initialization = apply(&branch, DO_ONCE_FUNC, RefList());
+        source_set_hidden(initialization, true);
+
+        Term* initialValue = infix_expression(as_branch(initialization), tokens);
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
-        result = apply(&branch, ONE_TIME_ASSIGN_FUNC, RefList(initialValue));
-        alloc_value(result);
 
-    } else {
-        // state i
-        result = create_value(&branch, type);
+        apply(&as_branch(initialization), ASSIGN_FUNC, RefList(result, initialValue));
+
+        if (result->type == ANY_TYPE)
+            specialize_type(result, initialValue->type);
     }
-
-    branch.bindName(result, name);
-    set_stateful(result, true);
 
     return result;
 }

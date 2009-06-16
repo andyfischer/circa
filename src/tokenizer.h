@@ -78,6 +78,7 @@ const int RETURN = 58;
 const int IN_TOKEN = 59;
 const int TRUE_TOKEN = 60;
 const int FALSE_TOKEN = 61;
+const int DO_ONCE = 62;
 
 const int WHITESPACE = 70;
 const int NEWLINE = 71;

@@ -244,6 +244,28 @@ void test_set_index()
     test_assert(l3->field(2)->asInt() == 9);
 }
 
+void test_do_once()
+{
+    Branch branch;
+    Term* x = branch.eval("x = 1");
+    Term* t = branch.compile("do_once()");
+    t->asBranch().compile("assign(x,2)");
+
+    test_assert(as_int(x) == 1);
+
+    // the assign() inside do_once should modify x
+    evaluate_branch(branch);
+    test_assert(as_int(x) == 2);
+
+    // but if we call it again, it shouldn't do that any more
+    as_int(x) = 3;
+    evaluate_branch(branch);
+    test_assert(as_int(x) == 3);
+
+    branch.clear();
+
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
@@ -261,6 +283,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_if_expr_with_int_and_float);
     REGISTER_TEST_CASE(builtin_function_tests::test_get_index);
     REGISTER_TEST_CASE(builtin_function_tests::test_set_index);
+    REGISTER_TEST_CASE(builtin_function_tests::test_do_once);
 }
 
 } // namespace builtin_function_tests
