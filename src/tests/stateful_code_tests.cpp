@@ -16,7 +16,6 @@ void test_simple()
 
     Term* j = branch.eval("state i = 0");
     test_assert(is_stateful(j));
-    test_assert(j->function == ONE_TIME_ASSIGN_FUNC);
     test_assert(j->type == INT_TYPE);
 }
 

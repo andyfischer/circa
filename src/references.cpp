@@ -60,14 +60,21 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     term->function = map.getRemapped(term->function);
 
     // TODO, call changeType if our type is changed
-    term->type = map.getRemapped(term->type);
+    Term* newType = map.getRemapped(term->type);
+    if (term->type != newType)
+        change_type(term, newType);
 
+    // Remap on value
     if ((term->value != NULL)
             && term->type != NULL
             && (as_type(term->type).remapPointers != NULL)) {
 
         as_type(term->type).remapPointers(term, map);
     }
+
+    // Remap inside properties
+    for (int i=0; i < term->properties.length(); i++)
+        remap_pointers(term->properties[i], map);
 }
 
 void remap_pointers(Term* term, Term* original, Term* replacement)

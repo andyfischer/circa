@@ -62,6 +62,7 @@ const char* get_token_text(int match)
         case IN_TOKEN: return "in";
         case TRUE_TOKEN: return "true";
         case FALSE_TOKEN: return "false";
+        case DO_ONCE: return "do once";
         case UNRECOGNIZED: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -225,7 +226,6 @@ bool try_to_consume_keyword(TokenizeContext& context, int keyword)
     if (is_acceptable_inside_identifier(context.next(str_len)))
         return false;
 
-
     // Keyword matches, now consume it
     for (int i=0; i < str_len; i++) {
         context.consume();
@@ -251,6 +251,7 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, IN_TOKEN)) return;
         if (try_to_consume_keyword(context, TRUE_TOKEN)) return;
         if (try_to_consume_keyword(context, FALSE_TOKEN)) return;
+        if (try_to_consume_keyword(context, DO_ONCE)) return;
 
         consume_identifier(context);
         return;

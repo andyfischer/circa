@@ -33,7 +33,7 @@ function! GetCircaIndent()
   let ind = indent(lnum)
   let flag = 0
   let prevline = getline(lnum)
-  if prevline =~ '^\s*\(if\>\|for\>\|else\>\|def\>\)'
+  if prevline =~ '^\s*\(if\>\|for\>\|else\>\|def\>\|do\ once\>\)'
       let ind = ind + &shiftwidth
       let flag = 1
   endif

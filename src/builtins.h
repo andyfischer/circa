@@ -25,6 +25,7 @@ extern Term* CONSTANT_FALSE;
 extern Term* COPY_FUNC;
 extern Term* DESIRED_VALUE_FEEDBACK;
 extern Term* DIV_FUNC;
+extern Term* DO_ONCE_FUNC;
 extern Term* FEEDBACK_FUNC;
 extern Term* FEEDBACK_TYPE;
 extern Term* FLOAT_TYPE;
