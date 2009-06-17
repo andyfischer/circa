@@ -66,6 +66,7 @@ struct Term
     int& intProp(std::string const& name);
     float& floatProp(std::string const& name);
     std::string& stringProp(std::string const& name);
+    Ref& refProp(std::string const& name);
 
     bool boolPropOptional(std::string const& name, bool defaultValue);
     float floatPropOptional(std::string const& name, float defaultValue);

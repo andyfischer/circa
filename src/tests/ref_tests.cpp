@@ -90,7 +90,15 @@ void test_list()
 
 void remap_properties()
 {
-    // TODO
+    Branch branch;
+    Term* a = int_value(&branch, 1, "a");
+    Term* b = int_value(&branch, 2, "b");
+    b->refProp("test_property") = a;
+
+    Branch duplicate;
+    duplicate_branch(branch, duplicate);
+
+    test_assert(duplicate["b"]->refProp("test_property") == duplicate["a"]);
 }
 
 void register_tests()
@@ -99,6 +107,7 @@ void register_tests()
     REGISTER_TEST_CASE(ref_tests::test_copy);
     REGISTER_TEST_CASE(ref_tests::test_destroy);
     REGISTER_TEST_CASE(ref_tests::test_list);
+    REGISTER_TEST_CASE(ref_tests::remap_properties);
 }
 
 } // namespace ref_tests
