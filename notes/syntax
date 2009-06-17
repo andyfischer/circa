@@ -1,59 +1,47 @@
 This file contains various thoughts on Circa's syntax
 
-Using {} for blocks?
-  There seems to be some universal feeling that this is used for heavyweight languages
-  People like 'end' in Ruby
-  With Circa we want to be more readable, so let's go with end
-  Ruby uses {} for lambdas, this would be cool
-
-{} for data structures?
-  Yes, we can use it for both dictionaries and for code blocks, since those are stored in
-  the same way.
-
-names have no type
-  Ruby and Python are like this
+names have no explicit type or data, they just hang on (possibly multiple) terms
+  Similar to some dynamic languages
   We work the same way. It's good.
   Though it might be nice to have a compiler hint pass that warns when a name changes type
 
 Array literals
-  [] or {}?
-  Prefer []   [1 2 3]
-  Perhaps ()? (1 2 3)
+  Currently []
+  Commas are optional so we can write [1 2 3]
+  This is working well
 
 Array access
-  Everybody uses name[index]
+  Currently a[1]
   Got any better ideas? Not really
   Note that there is a possible collision if we have space-seperated lists, and we use []
   for array literals. This: [foo [1] 2] would mean something different than: [foo[1] 2]
 
-Everything is an expression
-  Probably a good thing
-  This is already how we work under the hood, the only change would be for functions like
-  branch(), for(), if(), etc, to return a value.
-
-Method names ending in ? or !
-  This is a Rubyism that they can keep
-  Planning on using the ? mark for other purposes
-
 For loop syntax?
-  for i in list
-  for i : list
-  for (i in list)
-  for (i : list)
-  for Type i in list
-  for Type i : list
+  Currently: for i in list
+  Seems weird to have a keyword 'in' for this one thing
+  Also should there be a way to specify the iterand's type?
+  Alternatives:
+    for i : list
+    for (i in list)
+    for (i : list)
+    for Type i in list
+    for Type i : list
 
-Type labels
-  int myInt
-  myInt::int
-  myInt:int
-  myInt : int
-  myInt [::int]
-  myInt [t:int]
-  for i [::int] in list
-  for (i [::int] in list)
-
-  Favorite is name : type
+Type annotation
+  Currently use : operator
+  Examples:
+    a = 1:int
+    b = [1 2] : Point
+  Haskell and some other languages use ::, though : seems to be more popular
+  Alternatives:
+    int myInt
+    myInt::int
+    myInt:int
+    myInt : int
+    myInt [::int]
+    myInt [t:int]
+    for i [::int] in list
+    for (i [::int] in list)
 
 Method chaining
   Important to make this easy
@@ -61,37 +49,23 @@ Method chaining
   blah.foo.baz -- omit the ()s as in Ruby. This would be nice
 
 Omitting , or ; or newlines
-  In Lua, you can write this: 1+2 3*4 print('a')
-  and it will be unambiguously parsed, even though expressions are not seperated
-  by ; or , or anything. This would be nice. I think it would mean that certain
-  forms of syntax become impossible, but let's definitely explore this.
+  Inspired from Lua. In Lua, you can write this: 1+2 3*4 print('a')
+  Creates confusion with - operator. This: [1 -2] is different than: [1 - 2]
 
-Lispy data structures
-  Lisp makes it easy to write lists..
-  (1 2 3)
-  (1 2 (3 4) 5 6)
-
-  We also have a code-as-data thing, so it would be nice to have a unified syntax
-  where you represent lists, data structures, and pieces of code in all the same
-  way.
-  
-  But we don't want to get too lispy. Let's keep the syntax function(args) instead
-  of (function args).
-
-  Also, let's keep using {} for dictionaries and code blocks.
-   
-  So.. what are all the edge cases?
-
-  function(arg)
-  function(arg1 arg2)
-  function((list))
-  function(arg1 (list1 list2) arg2)
-  (list1)
-  ((nested list?))
-  (a + b) * c
-  (1 2 * 4) * 3
-  (+ * +) <-- illegal
-  (list1,) <-- necessary?
-
-  So.. the biggest collision is when we optionally put ()s around something to
-  impose an order of operations.
+Lambdas
+  Most likely going to use {}s
+  Not sure how to indicate inputs
+  Also not sure how to specify return value (explicit or implicit return)
+  Some variations:
+    l = {x,y | x + y}
+    l = {x,y | return x + y}
+    l = { ->x ->y; return x + y}
+    l = {x:int, y:int | x + y}
+    l = {x:int, y:int | return x + y}
+    
+Multi-line lambdas
+  I like how easy it is to pass a block to a function call in Ruby
+  Possible example:
+    map(items) do |x|
+      x = x + 1
+    end

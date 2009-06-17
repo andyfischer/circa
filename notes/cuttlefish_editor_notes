@@ -1,0 +1,66 @@
+
+Cuttlefish Editor
+-----------------
+
+What basic operations to support?
+ - Load/save to source
+ - Reload source (preserving state)
+ - Reset state
+ - Snapshot state
+ - Save state to key, quick load/save
+ - Save state to a file
+
+Application
+ - Show code in separate window
+ - Support multiple resizable windows
+
+Source view
+ - Draw source with syntax highlighting
+ - Highlight selection
+
+Game view
+ - Click to select
+ - Highlight selection
+ - Drag
+
+Keyboard metaphors for movement:
+  - 'next' and 'previous' - context sensitive browsing
+  - 'parent' - input of current term
+  - 'child' - user of current term
+
+Browsing:
+  This is a context sensitive way to browse through multiple terms. There are
+  various commands which return a list (or iterator) of terms as a result, and
+  the keys to explore this list are the same.
+
+  Example usage:
+    1. User clicks 'parent' while on a term that has multiple inputs
+    2. Start browsing all inputs. Current selection goes to input 0
+    3. User clicks n,p to cycle through inputs
+  
+  Keys:
+    n,p : next, previous
+    1..9 : select by index
+    a : select all
+
+Code modification operations:
+  - Change value (for values)
+  - Change function
+  - Change type (when possible)
+  - Insert, delete, or change an input
+  - Rename
+  - Rewrite an expression from raw text
+
+Code creation operations:
+  - Create from raw text
+  - Create value
+      Need: name, type, value
+      Can probably have keys for specific values (like 'create-string', 'create-int')
+  - Call function
+      Need: name, function, inputs
+  - Declare subroutine
+      Need: name, input types, input names, output type, body
+  - Declare type
+      Need: name, field names, field types
+  - Insert comment
+  - Insert blank lines
