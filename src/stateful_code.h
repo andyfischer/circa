@@ -19,7 +19,7 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type);
 Term* get_hidden_state_for_call(Term* term);
 bool terms_match_for_migration(Term* left, Term* right);
 
-void reset_stateful_values(Branch& branch);
+void reset_state(Branch& branch);
 
 void migrate_stateful_values(Branch& source, Branch& dest);
 

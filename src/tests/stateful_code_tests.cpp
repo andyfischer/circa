@@ -276,6 +276,25 @@ void test_migrate_stateful_compound_value()
     test_assert(as_branch(l)[2]->asInt() == 3);
 }
 
+void test_reset_state()
+{
+    Branch branch;
+
+    Term* i = branch.eval("state i = 5");
+
+    test_assert(i->asInt() == 5);
+
+    as_int(i) = 11;
+
+    test_assert(i->asInt() == 11);
+
+    reset_state(branch);
+
+    evaluate_branch(branch);
+
+    test_assert(i->asInt() == 5);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_simple);
@@ -290,6 +309,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::state_inside_lots_of_nested_functions);
     REGISTER_TEST_CASE(stateful_code_tests::migrate_subroutine_with_no_hidden_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_migrate_stateful_compound_value);
+    REGISTER_TEST_CASE(stateful_code_tests::test_reset_state);
 }
 
 } // namespace stateful_code_tests

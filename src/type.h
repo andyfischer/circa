@@ -41,7 +41,7 @@ struct Type
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
     
-    Branch fields;
+    Branch prototype;
 
     // memberFunctions is a list of Functions which 'belong' to this type.
     // They are guaranteed to take an instance of this type as their first
@@ -70,17 +70,17 @@ struct Type
 
     void addField(Term* type, std::string const& name)
     {
-        create_value(&fields, type, name);
+        create_value(&prototype, type, name);
     }
 
     Term* operator[](std::string const& fieldName) {
-        return fields[fieldName];
+        return prototype[fieldName];
     }
 
     int findFieldIndex(std::string const& name)
     {
-        for (int i=0; i < (int) fields.length(); i++) {
-            if (fields[i]->name == name)
+        for (int i=0; i < (int) prototype.length(); i++) {
+            if (prototype[i]->name == name)
                 return i;
         }
         return -1;
@@ -88,7 +88,7 @@ struct Type
 
     int numFields() const
     {
-        return fields.length();
+        return prototype.length();
     }
 
     bool isCompoundType();
@@ -137,6 +137,7 @@ bool identity_equals(Term* a, Term* b);
 bool equals(Term* a, Term* b);
 std::string to_string(Term* term);
 void assign_value(Term* source, Term* dest);
+void assign_value_to_default(Term* term);
 
 Term* create_type(Branch* branch, std::string const& decl);
 

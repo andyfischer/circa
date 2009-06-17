@@ -14,12 +14,12 @@ void compound_types()
     Term* MyType = branch.eval("type MyType { int myint, string astr }");
     test_assert(MyType != NULL);
     test_assert(is_type(MyType));
-    test_assert(as_type(MyType).fields.length() == 2);
-    test_assert(as_type(MyType).fields[0]->name == "myint");
-    test_assert(as_type(MyType).fields[0]->type == INT_TYPE);
+    test_assert(as_type(MyType).prototype.length() == 2);
+    test_assert(as_type(MyType).prototype[0]->name == "myint");
+    test_assert(as_type(MyType).prototype[0]->type == INT_TYPE);
     test_assert(as_type(MyType).findFieldIndex("myint") == 0);
-    test_assert(as_type(MyType).fields[1]->name == "astr");
-    test_assert(as_type(MyType).fields[1]->type == STRING_TYPE);
+    test_assert(as_type(MyType).prototype[1]->name == "astr");
+    test_assert(as_type(MyType).prototype[1]->type == STRING_TYPE);
     test_assert(as_type(MyType).findFieldIndex("astr") == 1);
 
     // instanciation
@@ -53,10 +53,10 @@ void type_declaration()
     Term* myType = branch.eval("type MyType { string a, int b } ");
 
     test_assert(as_type(myType).numFields() == 2);
-    test_assert(as_type(myType).fields[0]->name == "a");
-    test_assert(as_type(myType).fields[0]->type == STRING_TYPE);
-    test_assert(as_type(myType).fields[1]->name == "b");
-    test_assert(as_type(myType).fields[1]->type == INT_TYPE);
+    test_assert(as_type(myType).prototype[0]->name == "a");
+    test_assert(as_type(myType).prototype[0]->type == STRING_TYPE);
+    test_assert(as_type(myType).prototype[1]->name == "b");
+    test_assert(as_type(myType).prototype[1]->type == INT_TYPE);
 
     test_assert(as_type(myType).alloc != NULL);
     test_assert(as_type(myType).assign != NULL);
@@ -134,6 +134,23 @@ void test_to_string()
     // to_string for compound types is handled in source_repro_tests.cpp
 }
 
+void test_default_values()
+{
+    Branch branch;
+
+    Term* i = int_value(&branch, 5);
+    assign_value_to_default(i);
+    test_assert(i->asInt() == 0);
+
+    Term* f = float_value(&branch, 5);
+    assign_value_to_default(f);
+    test_assert(f->asFloat() == 0);
+
+    Term* s = string_value(&branch, "hello");
+    assign_value_to_default(s);
+    test_assert(s->asString() == "");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
@@ -141,6 +158,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_value_fits_type);
     REGISTER_TEST_CASE(type_tests::test_is_native_type);
     REGISTER_TEST_CASE(type_tests::test_to_string);
+    REGISTER_TEST_CASE(type_tests::test_default_values);
 }
 
 } // namespace type_tests

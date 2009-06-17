@@ -130,10 +130,13 @@ void migrate_stateful_values(Branch& source, Branch& dest)
     }
 }
 
-void reset_stateful_values(Branch& branch)
+void reset_state(Branch& branch)
 {
     for (BranchIterator it(branch); !it.finished(); ++it) {
-        // todo
+        Term* term = *it;
+
+        if (is_stateful(term))
+            assign_value_to_default(term);
     }
 }
 

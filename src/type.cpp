@@ -103,12 +103,12 @@ bool value_fits_type(Term* valueTerm, Term* type)
 
     // Check if the # of elements matches
     // TODO: Relax this check for lists
-    if (value.length() != as_type(type).fields.length())
+    if (value.length() != as_type(type).prototype.length())
         return false;
 
     // Check each element
     for (int i=0; i < value.length(); i++) {
-        if (!value_fits_type(value[i], as_type(type).fields[i]->type))
+        if (!value_fits_type(value[i], as_type(type).prototype[i]->type))
             return false;
     }
 
@@ -218,8 +218,8 @@ namespace type_t {
 
         out << "type " << term->name << " { ";
 
-        for (int i=0; i < type.fields.length(); i++) {
-            Term* field = type.fields[i];
+        for (int i=0; i < type.prototype.length(); i++) {
+            Term* field = type.prototype[i];
             assert(field != NULL);
             if (i != 0) out << ", ";
             out << field->stringPropOptional("syntaxHints:preWhitespace","");
@@ -254,8 +254,8 @@ namespace type_t {
     {
         Type &type = as_type(term);
 
-        for (int field_i=0; field_i < type.fields.length(); field_i++)
-            type.fields[field_i] = map.getRemapped(type.fields[field_i]);
+        for (int field_i=0; field_i < type.prototype.length(); field_i++)
+            type.prototype[field_i] = map.getRemapped(type.prototype[field_i]);
     }
 
     void name_accessor(Term* caller)
@@ -289,6 +289,8 @@ void alloc_value(Term* term)
         term->value = NULL;
     else {
         term->value = type.alloc(term->type);
+
+        assign_value_to_default(term);
 
         if (is_branch(term))
             as_branch(term).owningTerm = term;
@@ -346,6 +348,22 @@ void assign_value(Term* source, Term* dest)
         throw std::runtime_error("type "+as_type(dest->type).name+" has no assign function");
 
     assign(source, dest);
+}
+
+void assign_value_to_default(Term* term)
+{
+    if (is_int(term))
+        as_int(term) = 0;
+    else if (is_float(term))
+        as_float(term) = 0;
+    else if (is_string(term))
+        as_string(term) = "";
+    else if (is_bool(term))
+        as_bool(term) = false;
+    else if (is_ref(term))
+        deref(term) = NULL;
+
+    // TODO: default values for other types
 }
 
 Term* create_type(Branch* branch, std::string const& decl)
