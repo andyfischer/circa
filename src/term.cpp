@@ -93,6 +93,11 @@ std::string& Term::stringProp(std::string const& name)
     Term* t = addProperty(name, STRING_TYPE);
     return as_string(t);
 }
+Ref& Term::refProp(std::string const& name)
+{
+    Term* t = addProperty(name, REF_TYPE);
+    return deref(t);
+}
 
 bool Term::boolPropOptional(std::string const& name, bool defaultValue)
 {

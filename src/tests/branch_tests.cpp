@@ -31,7 +31,6 @@ void test_duplicate()
     original.bindName(term2, "term two");
 
     Branch duplicate;
-
     duplicate_branch(original, duplicate);
 
     Term* term1_duplicate = duplicate["term1"];
