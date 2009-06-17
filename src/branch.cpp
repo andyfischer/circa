@@ -168,7 +168,7 @@ void* Branch::alloc(Term* typeTerm)
     int numFields = type.numFields();
 
     for (int f=0; f < numFields; f++)
-        create_value(branch, type.fields[f]->type, type.fields[f]->name);
+        create_value(branch, type.prototype[f]->type, type.prototype[f]->name);
 
     return branch;
 }

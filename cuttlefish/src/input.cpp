@@ -103,6 +103,11 @@ void handle_key_press(SDL_Event &event, int key)
             std::cout << "Saved" << std::endl;
             break;
 
+        case SDLK_e:
+            circa::reset_state(*USERS_BRANCH);
+            std::cout << "State has been reset" << std::endl;
+            break;
+
         case SDLK_p:
             std::cout << branch_to_string_raw(*USERS_BRANCH);
             break;
