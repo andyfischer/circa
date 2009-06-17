@@ -607,6 +607,8 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 
         if (result->type == ANY_TYPE)
             specialize_type(result, initialValue->type);
+
+        result->refProp("initializedBy") = initialValue;
     }
 
     return result;
