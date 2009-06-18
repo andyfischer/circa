@@ -29,6 +29,9 @@ void assert_good_pointer(Term* term);
 bool is_bad_pointer(Term* term);
 #endif
 
+// Setting this to true will abort trap on the next name lookup.
+extern bool DEBUG_TRAP_NAME_LOOKUP;
+
 // Perform a bunch of checks to see if this term is healthy, and all its related
 // data is consistent.
 void sanity_check_term(Term* term);

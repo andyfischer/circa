@@ -11,12 +11,17 @@ Term* get_for_loop_iterator(Term* forTerm)
 
 Branch& get_for_loop_code(Term* forTerm)
 {
-    return forTerm->field("code")->asBranch();
+    return forTerm->field(0)->asBranch();
 }
 
-Branch& get_for_loop_state(Term* forTerm, int index)
+Branch& get_for_loop_state(Term* forTerm)
 {
-    return forTerm->field("_state")->field(index)->asBranch();
+    return forTerm->field(1)->asBranch();
+}
+
+Branch& get_for_loop_iteration_state(Term* forTerm, int index)
+{
+    return get_for_loop_state(forTerm)[index]->asBranch();
 }
 
 void setup_for_loop_pre_code(Term* forTerm)
@@ -56,7 +61,7 @@ void setup_for_loop_post_code(Term* forTerm)
 void evaluate_for_loop(Term* forTerm, Term* listTerm)
 {
     Branch& codeBranch = get_for_loop_code(forTerm);
-    Branch& stateBranch = forTerm->field("_state")->asBranch();
+    Branch& stateBranch = get_for_loop_state(forTerm);
 
     // Make sure state has the correct number of iterations
 
@@ -67,7 +72,7 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
     // Initialize state for any uninitialized slots
     for (int i=0; i < numIterations; i++) {
 
-        Branch& iterationBranch = get_for_loop_state(forTerm, i);
+        Branch& iterationBranch = get_for_loop_iteration_state(forTerm, i);
         
         if (iterationBranch.length() == 0) {
             get_type_from_branches_stateful_terms(codeBranch, iterationBranch);
@@ -76,7 +81,10 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
 
     for (int i=0; i < numIterations; i++) {
 
-        as_bool(codeBranch["#is_first_iteration"]) = i == 0;
+        Term* isFirstIteration = codeBranch[2];
+        assert(isFirstIteration->name == "#is_first_iteration");
+
+        as_bool(isFirstIteration) = i == 0;
 
         // Inject iterator value
         Term* iterator = codeBranch[0];
