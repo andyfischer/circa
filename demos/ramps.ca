@@ -6,6 +6,24 @@ WINDOW_HEIGHT = 420
 
 tile_size = 30
 
+-- rotations
+NW = 0
+NE = 1
+SE = 2
+SW = 3
+
+def rotations_opposite(int x, int y) : bool
+  if x == NW
+    return y == SE
+  else if x == NE
+    return y == SW
+  else if x == SE
+    return y == NW
+  else x == SW
+    return y == NE
+  end end end
+end
+
 num_tiles_x = WINDOW_WIDTH // tile_size
 num_tiles_y = WINDOW_HEIGHT // tile_size
 num_tiles = num_tiles_x * num_tiles_y
@@ -34,7 +52,7 @@ def rotate_points_around(List points, Point center, float rot) : List
 end
 
 type Piece { int x, int y, int rot }
-type BoardPiece { int rot, bool filled }
+type BoardPiece { int rot, bool filled, bool square_filled }
 
 def draw_free_piece(Point location, float rot)
     shape = [[0 0] [1 0] [0 1]]
@@ -62,17 +80,18 @@ end
 def initialize_board_piece(int index) : BoardPiece
   loc = board_index_to_loc(index)
   if loc.y < 12
-    return [0 false]
+    return [0 false false]
   else
-    return [rand_i()%4 true]
+    return [rand_i()%4 true rand_i()%10 > 8]
   end
 end
 
 piece_types = [
-    [[0 1 2] [1 1 3]]
-    [[0 1 2] [1 1 0]]
-    [[0 1 2] [1 1 0] [0 1 0]]
+    [[0 1 SE]]
+    [[0 1 SE] [1 1 NW]]
+    [[0 1 SE] [1 1 NW] [0 1 NW]]
 ]
+    --[[0 1 SE] [1 1 SW]]
     --[[0 0 2] [0 1 2] [0 1 0]]
 
 def get_random_piece_type() : List
@@ -88,7 +107,6 @@ fall_speed = 80.0
 state tile_fall_distance = tile_size
 
 state board = map(initialize_board_piece, range(num_tiles))
-
 
 -- Keypresses for rotation
 if key_pressed(KEY_DOWN)
@@ -132,13 +150,23 @@ def position_falling_group(List group, int pos_x, int pos_y) : List
       pos = pos + [pos_x pos_y]
       return [pos.x pos.y (piece.rot + falling_piece_rot) % 4]
   end
-  return map(position_piece, group)
+  out = map(position_piece, group)
+  return out
 end
 
 def falling_group_collides(List group) : bool
   def piece_collides(Piece piece) : bool
     board_piece = board[board_loc_to_index([piece.x piece.y])] : BoardPiece
-    return board_piece.filled
+    if board_piece.square_filled
+      return true
+    else
+      if board_piece.filled
+        ro = rotations_opposite(piece.rot board_piece.rot)
+        return not(ro)
+      else
+        return false
+      end
+    end
   end
 
   return any_true(map(piece_collides, group))
@@ -159,7 +187,8 @@ if tile_fall_distance < 0
     -- Make this piece permanent
     for piece in positioned_falling_group
       piece = piece:Piece
-      board[board_loc_to_index([piece.x piece.y])] = [piece.rot true]
+      existing_board_piece = board[board_loc_to_index([piece.x piece.y])] : BoardPiece
+      board[board_loc_to_index([piece.x piece.y])] = [piece.rot true existing_board_piece.filled]
     end
 
     -- Reset falling group
@@ -187,5 +216,8 @@ for index in range(num_tiles)
   loc = board_index_to_loc(index)
   if piece.filled
     draw_piece([loc.x loc.y piece.rot])
+  end
+  if piece.square_filled
+    draw_piece([loc.x loc.y piece.rot + 2])
   end
 end

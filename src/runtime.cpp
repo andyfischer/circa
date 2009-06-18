@@ -160,9 +160,7 @@ void resize_list(Branch& list, int numElements, Term* type)
         create_value(&list, type);
 
     // Remove terms if necessary
-    bool anyRemoved = false;
     for (int i=numElements; i < list.length(); i++) {
-        anyRemoved = true;
         list[i] = NULL;
     }
 

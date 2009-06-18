@@ -3,7 +3,6 @@
 #include "common_headers.h"
 
 #include "circa.h"
-#include "testing.h"
 
 namespace circa {
 
@@ -47,6 +46,29 @@ void _test_assert_function(Term* term, int line, const char* file)
         msg << get_compile_error_message(term) << std::endl;
         msg << "Occurred in " << file << ", line " << line << std::endl;
         throw std::runtime_error(msg.str());
+    }
+}
+
+void _test_assert_function(Branch& branch, int line, const char* file)
+{
+    // Sanity check on every term in this branch
+    // Note that currently, we don't have many sanity checks. It would be nice
+    // to add some more.
+    for (BranchIterator it(branch); !it.finished(); ++it) {
+        Term* term = *it;
+
+        bool result = true;
+        std::string message;
+
+        if (is_subroutine(term))
+            result = sanity_check_subroutine(term, message);
+
+        if (!result) {
+            std::stringstream msg;
+            msg << "Sanity check fail at " << file << ", line " << line << std::endl;
+            msg << message << std::endl;
+            throw std::runtime_error(msg.str());
+        }
     }
 }
 

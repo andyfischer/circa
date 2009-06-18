@@ -166,4 +166,22 @@ void expand_subroutines_hidden_state(Term* call, Term* state)
     duplicate_branch(as_branch(call->function), as_branch(state));
 }
 
+bool sanity_check_subroutine(Term* sub, std::string& message)
+{
+    if (!is_subroutine(sub))
+        return true;
+
+    Branch& contents = as_branch(sub);
+
+    // If the subroutine has an #out term, then it must be the last one
+    if (contents.contains(OUTPUT_PLACEHOLDER_NAME)
+            && contents[contents.length()-1]->name != OUTPUT_PLACEHOLDER_NAME) {
+
+        message = "#out is bound, but the last term isn't named #out";
+        return false;
+    }
+
+    return true;
+}
+
 } // namespace circa

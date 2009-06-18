@@ -10,6 +10,7 @@ namespace circa {
 
 void _test_assert_function(bool condition, int line, const char* file);
 void _test_assert_function(Term* term, int line, const char* file);
+void _test_assert_function(Branch& branch, int line, const char* file);
 void _test_fail_function(int line, const char* file);
 void _test_equals_function(RefList const& a, RefList const& b,
         const char* aText, const char* bText, int line, const char* file);

@@ -348,6 +348,15 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     consume_branch_until_end(subBranch, tokens);
 
+    // If there is an #out term, then it needs to be the last term. If #out is a
+    // name binding into an inner branch then this might not be the case
+    if (subBranch.contains(OUTPUT_PLACEHOLDER_NAME) && 
+            subBranch[subBranch.length()-1]->name != OUTPUT_PLACEHOLDER_NAME) {
+        Term* copy = apply(&subBranch, COPY_FUNC, RefList(subBranch[OUTPUT_PLACEHOLDER_NAME]),
+                OUTPUT_PLACEHOLDER_NAME);
+        source_set_hidden(copy, true);
+    }
+
     possible_whitespace(tokens);
 
     if (!tokens.nextIs(END))

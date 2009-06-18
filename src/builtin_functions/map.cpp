@@ -11,11 +11,15 @@ namespace map_function {
         Branch& inputs = as_branch(caller->input(1));
         Branch& output = as_branch(caller);
 
-        if (output.length() == 0) {
-            for (int i=0; i < inputs.length(); i++) {
-                apply(&output, func, RefList(inputs[i]));
-            }
-        }
+        // Create term if necessary
+        for (int i=output.length(); i < inputs.length(); i++)
+            apply(&output, func, RefList(inputs[i]));
+
+        // Remove extra terms if necessary
+        for (int i=inputs.length(); i < output.length(); i++)
+            output[i] = NULL;
+
+        output.removeNulls();
 
         evaluate_branch(output);
     }

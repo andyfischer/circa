@@ -60,9 +60,8 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     term->function = map.getRemapped(term->function);
 
     // TODO, call changeType if our type is changed
-    Term* newType = map.getRemapped(term->type);
-    if (term->type != newType)
-        change_type(term, newType);
+    // This was implemented once, and it caused spurious crash bugs
+    // Term* newType = map.getRemapped(term->type);
 
     // Remap on value
     if ((term->value != NULL)

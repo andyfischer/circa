@@ -11,6 +11,7 @@ Branch::Branch()
 
 Branch::~Branch()
 {
+    names.clear();
     _terms.clear();
 }
 
