@@ -11,14 +11,18 @@ namespace if_function {
         bool cond = as_bool(caller->input(0));
 
         if (cond) {
-            Branch& branch = contents["if"]->asBranch();
-            evaluate_branch(branch);
+            Term* ifTerm = contents["if"];
+            assert(ifTerm != NULL);
+            evaluate_branch(as_branch(ifTerm));
         } else if (contents.contains("else")) {
-            Branch& branch = contents["else"]->asBranch();
-            evaluate_branch(branch);
+            Term* elseTerm = contents["else"];
+            assert(elseTerm != NULL);
+            evaluate_branch(as_branch(elseTerm));
         }
 
-        evaluate_branch(contents["#joining"]->asBranch());
+        Term* joiningTerm = contents["#joining"];
+        assert(joiningTerm != NULL);
+        evaluate_branch(as_branch(joiningTerm));
     }
 
     std::string toSourceString(Term* term)

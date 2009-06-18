@@ -16,6 +16,8 @@ void test_return_from_conditional()
                 "  end\n"
                 "end\n");
 
+    test_assert(branch);
+
     test_equals(branch.eval("my_max(3,8)")->asFloat(), 8);
     test_equals(branch.eval("my_max(3,3)")->asFloat(), 3);
 

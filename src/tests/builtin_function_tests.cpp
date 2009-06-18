@@ -122,11 +122,12 @@ void test_range()
 void test_map()
 {
     Branch branch;
-    Term* t = branch.eval("map(sqr, [1 2 3 4 5])");
+    Term* input_list = branch.eval("input_list = [1 2 3 4 5]");
+    Term* map_sqr = branch.eval("map(sqr, input_list)");
 
-    test_assert(t);
+    test_assert(map_sqr);
 
-    Branch& result = as_branch(t);
+    Branch& result = as_branch(map_sqr);
 
     test_assert(result.length() == 5);
     test_equals(result[0]->asFloat(), 1);
@@ -136,19 +137,32 @@ void test_map()
     test_equals(result[4]->asFloat(), 25);
 
     // Test with subroutines
-    branch.clear();
-
     branch.eval("def myfunc(float x):float\nreturn x + 5\nend");
-    t = branch.eval("map(myfunc, [1 2 3 4 5])");
-    test_assert(t);
+    Term* map_myfunc = branch.eval("map(myfunc, input_list)");
+    test_assert(map_myfunc);
 
-    Branch& result2 = as_branch(t);
+    Branch& result2 = as_branch(map_myfunc);
     test_assert(result2.length() == 5);
     test_equals(result2[0]->asFloat(), 6);
     test_equals(result2[1]->asFloat(), 7);
     test_equals(result2[2]->asFloat(), 8);
     test_equals(result2[3]->asFloat(), 9);
     test_equals(result2[4]->asFloat(), 10);
+
+    // Make sure that if the input list changes size, the size of the result
+    // list is adjusted too.
+
+    // Test shrinking the input list
+    resize_list(as_branch(input_list), 3, INT_TYPE);
+    evaluate_branch(branch);
+    test_assert(as_branch(map_sqr).length() == 3);
+    test_assert(as_branch(map_myfunc).length() == 3);
+
+    // Test growing the input list
+    resize_list(as_branch(input_list), 6, INT_TYPE);
+    evaluate_branch(branch);
+    test_assert(as_branch(map_sqr).length() == 6);
+    test_assert(as_branch(map_myfunc).length() == 6);
 }
 
 void test_vectorized_funcs()

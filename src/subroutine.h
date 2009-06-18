@@ -17,6 +17,7 @@ void subroutine_update_hidden_state_type(Term* sub);
 void subroutine_call_evaluate(Term* caller);
 bool is_subroutine_state_expanded(Term* term);
 void expand_subroutines_hidden_state(Term* call, Term* state);
+bool sanity_check_subroutine(Term* sub, std::string& message);
 
 } // namespace circa
 
