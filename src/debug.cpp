@@ -6,6 +6,8 @@
 
 namespace circa {
 
+bool DEBUG_TRAP_NAME_LOOKUP = false;
+
 #if DEBUG_CHECK_FOR_BAD_POINTERS
 std::set<Term*> *DEBUG_GOOD_POINTER_SET = NULL;
 #endif

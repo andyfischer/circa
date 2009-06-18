@@ -56,7 +56,9 @@ bool is_subroutine(Term* term)
 Function& get_subroutines_function_def(Term* term)
 {
     assert(is_subroutine(term));
-    return as_function(as_branch(term)[get_name_for_attribute("function-def")]);
+    Term* def = as_branch(term)[0];
+    test_assert(def->name == "#attr:function-def");
+    return as_function(def);
 }
 
 void initialize_subroutine(Term* term)
@@ -126,24 +128,28 @@ void subroutine_call_evaluate(Term* caller)
     }
 
     // Implant inputs
+    int implantIndex = 1; // skip #attr:function-def
     for (int input=0; input < sub.inputTypes.length(); input++) {
 
         std::string inputName = sub.getInputProperties(input).name;
         if (inputName == "#state")
             continue;
 
-        Term* inputTerm = branch.findFirstBinding(inputName);
-        assert(inputTerm != NULL);
-        assign_value(caller->inputs[input], inputTerm);
+        Term* term = branch[implantIndex++];
+
+        assert(term->name == inputName);
+        assert(term->function == INPUT_PLACEHOLDER_FUNC);
+
+        assign_value(caller->inputs[input], term);
     }
 
     evaluate_branch(branch);
 
     // Copy output
-    if (branch.contains(OUTPUT_PLACEHOLDER_NAME)) {
-        Term* outputPlaceholder = branch[OUTPUT_PLACEHOLDER_NAME];
-        assert(outputPlaceholder != NULL);
-        assign_value(outputPlaceholder, caller);
+    if (branch.length() > 0) {
+        Term* output = branch[branch.length()-1];
+        if (output->name == "#out")
+            assign_value(output, caller);
     }
 }
 

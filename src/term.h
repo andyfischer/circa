@@ -47,6 +47,7 @@ struct Term
     int refCount;
 
     Term();
+    ~Term();
 
     Term* input(int index) const;
     int numInputs() const;

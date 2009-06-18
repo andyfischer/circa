@@ -14,6 +14,7 @@
 #include "if_block.h"
 #include "importing.h"
 #include "introspection.h"
+#include "metrics.h"
 #include "parser.h"
 #include "parser_util.h"
 #include "refactoring.h"

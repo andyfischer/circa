@@ -41,9 +41,9 @@ void test_state()
 
     evaluate_term(loop);
 
-    Term* s_iter0 = get_for_loop_state(loop, 0)["s"];
-    Term* s_iter1 = get_for_loop_state(loop, 1)["s"];
-    Term* s_iter2 = get_for_loop_state(loop, 2)["s"];
+    Term* s_iter0 = get_for_loop_iteration_state(loop, 0)["s"];
+    Term* s_iter1 = get_for_loop_iteration_state(loop, 1)["s"];
+    Term* s_iter2 = get_for_loop_iteration_state(loop, 2)["s"];
     test_assert(s_iter0 != NULL);
     test_assert(s_iter1 != NULL);
     test_assert(s_iter2 != NULL);
