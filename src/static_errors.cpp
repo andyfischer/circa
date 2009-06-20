@@ -9,6 +9,31 @@ bool has_static_error(Term* term)
     return get_static_error(term) != SERROR_NO_ERROR;
 }
 
+StaticError get_static_error_for_index(Term* term, int index)
+{
+    int effectiveIndex = index;
+
+    bool varArgs = function_get_variable_args(term->function);
+    if (varArgs)
+        effectiveIndex = 0;
+
+    Term* input = term->inputs[index];
+    bool meta = function_get_input_meta(term->function, effectiveIndex);
+    Term* type = function_get_input_type(term->function, effectiveIndex);
+     
+    if (input == NULL && !meta)
+        return SERROR_NULL_INPUT_TERM;
+
+    if (input->hasError && !meta)
+        return SERROR_INPUT_HAS_ERROR;
+    
+    // Check type
+    if (!value_fits_type(input, type))
+        return SERROR_INPUT_TYPE_ERROR;
+
+    return SERROR_NO_ERROR;
+}
+
 StaticError get_static_error(Term* term)
 {
     bool varArgs = function_get_variable_args(term->function);
@@ -26,25 +51,10 @@ StaticError get_static_error(Term* term)
     //  - it has a non-null value
     //  - it has no errors
     //  - it has the correct type
-    for (int inputIndex=0; inputIndex < term->inputs.length(); inputIndex++)
-    {
-        int effectiveIndex = inputIndex;
-        if (varArgs)
-            effectiveIndex = 0;
-
-        Term* input = term->inputs[inputIndex];
-        bool meta = function_get_input_meta(term->function, effectiveIndex);
-        Term* type = function_get_input_type(term->function, effectiveIndex);
-         
-        if (input == NULL && !meta)
-            return SERROR_NULL_INPUT_TERM;
-
-        if (input->hasError && !meta)
-            return SERROR_INPUT_HAS_ERROR;
-        
-        // Check type
-        if (!value_fits_type(input, type))
-            return SERROR_INPUT_TYPE_ERROR;
+    for (int input=0; input < term->inputs.length(); input++) {
+        StaticError error = get_static_error_for_index(term, input);
+        if (error != SERROR_NO_ERROR)
+            return error;
     }
 
     // This next section includes expected parser failures
@@ -75,38 +85,51 @@ std::string get_static_error_message(Term* term)
     std::stringstream out;
 
     switch (error) {
-        case SERROR_NO_ERROR:
-            return "(no error)";
+    case SERROR_NO_ERROR:
+        return "(no error)";
 
-        case SERROR_NULL_FUNCTION:
-            return "Function is NULL";
+    case SERROR_NULL_FUNCTION:
+        return "Function is NULL";
 
-        case SERROR_WRONG_NUMBER_OF_INPUTS: {
-            int funcNumInputs = function_num_inputs(term->function);
-            out << "Wrong number of inputs (found " << term->inputs.length()
-                << ", expected " << funcNumInputs << ")";
-            return out.str();
+    case SERROR_WRONG_NUMBER_OF_INPUTS: {
+        int funcNumInputs = function_num_inputs(term->function);
+        out << "Wrong number of inputs (found " << term->inputs.length()
+            << ", expected " << funcNumInputs << ")";
+        return out.str();
+    }
+
+    case SERROR_NULL_INPUT_TERM:
+        return "(null input term)"; // TODO
+    case SERROR_INPUT_HAS_ERROR:
+        return "(input has error)"; // TODO
+    case SERROR_INPUT_TYPE_ERROR:
+    {
+        int errorIndex = -1;
+        for (int input=0; input < term->inputs.length(); input++) {
+            StaticError error = get_static_error_for_index(term, input);
+            if (error != SERROR_NO_ERROR)
+                errorIndex = input;
         }
 
-        case SERROR_NULL_INPUT_TERM:
-            return "(null input term)"; // TODO
-        case SERROR_INPUT_HAS_ERROR:
-            return "(input has error)"; // TODO
-        case SERROR_INPUT_TYPE_ERROR:
-            return "(input type error)"; // TODO
+        out << "Input type " << term->input(errorIndex)->type->name
+            << " doesn't fit in expected type "
+            << function_get_input_type(term->function, errorIndex)->name << " (in function "
+            << term->function->name << ")";
+        return out.str();
+    } 
 
-        case SERROR_UNKNOWN_FUNCTION:
-            out << "Unknown function: " << term->stringProp("syntaxHints:functionName");
-            return out.str();
-        case SERROR_UNKNOWN_TYPE:
-            out << "Unknown type: " << term->type->name;
-            return out.str();
-        case SERROR_UNKNOWN_IDENTIFIER:
-            out << "Unknown identifier: " << term->name;
-            return out.str();
-        case SERROR_UNRECGONIZED_EXPRESSION:
-            out << "Unrecognized expression: " << term->function->stringProp("message");
-            return out.str();
+    case SERROR_UNKNOWN_FUNCTION:
+        out << "Unknown function: " << term->stringProp("syntaxHints:functionName");
+        return out.str();
+    case SERROR_UNKNOWN_TYPE:
+        out << "Unknown type: " << term->type->name;
+        return out.str();
+    case SERROR_UNKNOWN_IDENTIFIER:
+        out << "Unknown identifier: " << term->name;
+        return out.str();
+    case SERROR_UNRECGONIZED_EXPRESSION:
+        out << "Unrecognized expression: " << term->function->stringProp("message");
+        return out.str();
 
     }
     

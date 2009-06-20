@@ -82,6 +82,10 @@ bool value_fits_type(Term* valueTerm, Term* type)
     if (type == ANY_TYPE)
         return true;
 
+    // Also, 'any' matches anything.
+    if (valueTerm->type == ANY_TYPE)
+        return true;
+
     // Coercion: ints fit in floats
     if ((valueTerm->type == INT_TYPE) && type == FLOAT_TYPE)
         return true;

@@ -1,2 +1,2 @@
 cd $CIRCA_HOME
-scons cfsh && build/bin/cfsh demos/$1.ca
+scons cfish && build/bin/cfish demos/$1.ca

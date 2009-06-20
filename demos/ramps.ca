@@ -62,7 +62,7 @@ def draw_free_piece(Point location, float rot)
       return p + location
     end
     map(add_location, @shape)
-    gl_triangles(shape, 0)
+    gl_triangles(shape, 0x440044ff)
 end
 
 def draw_piece(Piece piece)
