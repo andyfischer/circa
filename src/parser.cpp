@@ -320,7 +320,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     Term* functionDef = function_from_header(subBranch, tokens);
 
-    if (has_compile_error(functionDef)) {
+    if (has_static_error(functionDef)) {
         std::string message = functionDef->stringProp("message");
         change_function(result, UNRECOGNIZED_EXPRESSION_FUNC);
         result->stringProp("message") = message;
@@ -551,7 +551,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
 Term* do_once_block(Branch& branch, TokenStream& tokens)
 {
-    int startPosition = tokens.getPosition();
+    //int startPosition = tokens.getPosition();
 
     tokens.consume(DO_ONCE);
 
@@ -690,7 +690,6 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     if (lexpr->function == UNKNOWN_IDENTIFIER_FUNC) {
         std::string name = lexpr->name;
         branch.remove(lexpr);
-
         branch.bindName(rexpr, name);
     }
 
@@ -880,6 +879,8 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
         leftExpr = result;
     }
 
+    set_source_location(leftExpr, startPosition, tokens);
+
     return leftExpr;
 }
 
@@ -999,7 +1000,7 @@ Term* subscripted_atom(Branch& branch, TokenStream& tokens)
 {
     Term* result = atom(branch, tokens);
 
-    if (has_compile_error(result))
+    if (has_static_error(result))
         return result;
 
     if (tokens.nextIs(LBRACKET)) {
@@ -1066,6 +1067,8 @@ Term* atom(Branch& branch, TokenStream& tokens)
         return compile_error_for_line(branch, tokens, startPosition);
     }
 
+    set_source_location(result, startPosition, tokens);
+
     return result;
 }
 
@@ -1088,9 +1091,8 @@ Term* function_call(Branch& branch, TokenStream& tokens)
     
     Term* result = find_and_apply(branch, functionName, inputs);
 
-    if (functionName != result->function->name) {
+    if (functionName != result->function->name)
         result->stringProp("syntaxHints:functionName") = functionName;
-    }
 
     listHints.apply(result);
 
@@ -1099,29 +1101,29 @@ Term* function_call(Branch& branch, TokenStream& tokens)
 
 Term* literal_integer(Branch& branch, TokenStream& tokens)
 {
-    assert(tokens.nextIs(INTEGER));
-    Token tok = tokens.consumet();
-    int value = strtoul(tok.text.c_str(), NULL, 0);
+    int startPosition = tokens.getPosition();
+    std::string text = tokens.consume(INTEGER);
+    int value = strtoul(text.c_str(), NULL, 0);
     Term* term = int_value(&branch, value);
+    set_source_location(term, startPosition, tokens);
     return term;
 }
 
 Term* literal_hex(Branch& branch, TokenStream& tokens)
 {
-    assert(tokens.nextIs(HEX_INTEGER));
-    Token tok = tokens.consumet();
-    int value = strtoul(tok.text.c_str(), NULL, 0);
+    int startPosition = tokens.getPosition();
+    std::string text = tokens.consume(HEX_INTEGER);
+    int value = strtoul(text.c_str(), NULL, 0);
     Term* term = int_value(&branch, value);
     term->stringProp("syntaxHints:integerFormat") = "hex";
-    include_location(term, tok);
+    set_source_location(term, startPosition, tokens);
     return term;
 }
 
 Term* literal_float(Branch& branch, TokenStream& tokens)
 {
-    assert(tokens.nextIs(FLOAT_TOKEN));
-    Token tok = tokens.consumet();
-    std::string text = tok.text;
+    int startPosition = tokens.getPosition();
+    std::string text = tokens.consume(FLOAT_TOKEN);
 
     // Parse value with atof
     float value = (float) atof(text.c_str());
@@ -1138,12 +1140,13 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     }
 
     term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
-    include_location(term, tok);
+    set_source_location(term, startPosition, tokens);
     return term;
 }
 
 Term* literal_string(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
     assert(tokens.nextIs(STRING));
 
     Token tok = tokens.consumet();
@@ -1154,18 +1157,19 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     text = text.substr(1, text.length()-2);
 
     Term* term = string_value(&branch, text);
-    include_location(term, tok);
+    set_source_location(term, startPosition, tokens);
     return term;
 }
 
 Term* literal_bool(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
     bool value = tokens.nextIs(TRUE_TOKEN);
 
-    Token tok = tokens.consumet();
+    tokens.consume();
 
     Term* term = bool_value(&branch, value);
-    include_location(term, tok);
+    set_source_location(term, startPosition, tokens);
     return term;
 }
 
@@ -1210,37 +1214,37 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 
     result->boolProp("syntaxHints:literal-list") = true;
 
+    set_source_location(result, startPosition, tokens);
     return result;
 }
 
 Term* identifier(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
+
     bool rebind = false;
     if (tokens.nextIs(AMPERSAND)) {
         tokens.consume();
         rebind = true;
     }
 
-    assert(tokens.nextIs(IDENTIFIER));
-
-    Token id = tokens.consumet();
+    std::string id = tokens.consume(IDENTIFIER);
 
     if (rebind)
-        push_pending_rebind(branch, id.text);
+        push_pending_rebind(branch, id);
 
-    Term* result = find_named(&branch, id.text);
+    Term* result = find_named(&branch, id);
 
     // If not found, create an instance of unknown_identifier
     if (result == NULL) {
         result = apply(&branch, UNKNOWN_IDENTIFIER_FUNC, RefList());
         source_set_hidden(result, true);
-        result->stringProp("message") = id.text;
-        branch.bindName(result, id.text);
+        result->stringProp("message") = id;
+        branch.bindName(result, id);
     }
 
     assert(result != NULL);
-    include_location(result, id);
-
+    set_source_location(result, startPosition, tokens);
     return result;
 }
 

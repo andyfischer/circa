@@ -26,13 +26,8 @@ std::string branch_namespace_to_string(Branch& branch);
 std::string branch_to_string_raw(Branch& branch);
 std::string branch_to_string_raw_with_properties(Branch& branch);
 
-void print_runtime_errors(Branch& branch, std::ostream& output);
-bool has_compile_error(Term* term);
-std::string get_compile_error_message(Term* term);
-int count_compile_errors(Branch& branch);
 std::string get_short_location(Term* term);
 std::string get_source_filename(Term* term);
-void print_compile_errors(Branch& branch, std::ostream& output);
 RefList get_influencing_values(Term* term);
 void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string> &names);
 

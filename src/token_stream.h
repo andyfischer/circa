@@ -25,6 +25,11 @@ struct TokenStream
         tokenizer::tokenize(input, tokens);
     }
 
+    tokenizer::Token operator[](int index) {
+        return tokens[index];
+    }
+
+
     void reset(std::string const& input)
     {
         tokens.clear();

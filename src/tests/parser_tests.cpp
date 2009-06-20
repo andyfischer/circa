@@ -331,14 +331,14 @@ void test_function_decl_parse_error()
     Term* t = branch.eval("def !@#$");
 
     test_assert(t->function == UNRECOGNIZED_EXPRESSION_FUNC);
-    test_assert(has_compile_error(t));
+    test_assert(has_static_error(t));
 }
 
 void test_semicolon_as_line_ending()
 {
     Branch branch;
     branch.compile("1;2;3");
-    test_assert(count_compile_errors(branch) == 0);
+    test_assert(!has_static_errors(branch));
     test_assert(branch.length() == 3);
     test_assert(is_value(branch[0]));
     test_assert(is_value(branch[1]));
@@ -349,7 +349,7 @@ void test_semicolon_as_line_ending()
 
     branch.clear();
     branch.compile("a = 1+2 ; b = mult(3,4) ; b -> print");
-    test_assert(count_compile_errors(branch) == 0);
+    test_assert(!has_static_errors(branch));
     test_assert(branch.length() == 7);
     test_assert(branch["a"]->function->name == "add_i");
     test_assert(branch["b"]->function->name == "mult_i");
@@ -357,8 +357,7 @@ void test_semicolon_as_line_ending()
     branch.clear();
     branch.compile("cond = true; if cond; a = 1; else; a = 2; end");
 
-    print_compile_errors(branch, std::cout);
-    test_assert(count_compile_errors(branch) == 0);
+    test_assert(!has_static_errors(branch));
     evaluate_branch(branch);
     test_assert(branch.contains("a"));
     test_assert(branch["a"]->asInt() == 1);

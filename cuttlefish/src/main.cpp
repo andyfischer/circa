@@ -130,13 +130,8 @@ int main( int argc, char* args[] )
         std::cout << "Loading file: " << filename << std::endl;
         parse_script(*USERS_BRANCH, filename);
 
-        if (count_compile_errors(*USERS_BRANCH) > 0) {
-            int count = count_compile_errors(*USERS_BRANCH);
-            std::cout << count << " compile error";
-            if (count != 1) std::cout << "s";
-            std::cout << ":" << std::endl;
-            print_compile_errors(*USERS_BRANCH, std::cout);
-            std::cout << branch_to_string_raw(*USERS_BRANCH);
+        if (has_static_errors(*USERS_BRANCH)) {
+            print_static_errors_formatted(*USERS_BRANCH, std::cout);
             return 1;
         }
     }

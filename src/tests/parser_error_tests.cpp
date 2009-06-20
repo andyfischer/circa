@@ -102,7 +102,7 @@ void test_every_parse_error()
             continue;
         }
 
-        if (count_compile_errors(branch) == 0) {
+        if (count_static_errors(branch) == 0) {
             input.failedToCauseError = true;
             problemCount++;
         }

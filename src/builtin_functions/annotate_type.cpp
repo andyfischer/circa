@@ -21,7 +21,11 @@ namespace annotate_type_function {
 
     Term* specializeType(Term* caller)
     {
-        return caller->input(1);
+        Term* type = caller->input(1);
+        if (!is_type(type))
+            return ANY_TYPE;
+        else
+            return type;
     }
 
     void setup(Branch& kernel)

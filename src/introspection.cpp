@@ -156,17 +156,6 @@ void print_runtime_errors(Branch& branch, std::ostream& output)
     }
 }
 
-int count_compile_errors(Branch& branch)
-{
-    int result = 0;
-
-    for (BranchIterator it(branch); !it.finished(); ++it)
-        if (has_compile_error(*it))
-            result++;
-
-    return result;
-}
-
 std::string get_short_location(Term* term)
 {
     std::stringstream out;
@@ -174,10 +163,10 @@ std::string get_short_location(Term* term)
     if (filename != "")
         out << get_source_filename(term) << ":";
     if (term->hasProperty("lineStart")) out << term->intProp("lineStart");
-    else out << "unknown-line";
+    else out << "line?";
     out << ",";
     if (term->hasProperty("colStart")) out << term->intProp("colStart");
-    else out << "unknown-col";
+    else out << "col?";
     return out.str();
 }
 
@@ -196,45 +185,6 @@ std::string get_source_filename(Term* term)
     }
 
     return "";
-}
-
-bool has_compile_error(Term* term)
-{
-    return ((term->function == UNKNOWN_FUNCTION)
-        || (term->type->function == UNKNOWN_TYPE_FUNC)
-        || (term->function == UNKNOWN_IDENTIFIER_FUNC)
-        || (term->function == UNRECOGNIZED_EXPRESSION_FUNC));
-}
-
-std::string get_compile_error_message(Term* term)
-{
-    if (!has_compile_error(term))
-        return "";
-
-    std::stringstream out;
-
-    out << " " << term_to_raw_string(term) << " ";
-
-    out << get_short_location(term) << ": ";
-
-    if (term->function->function == UNKNOWN_FUNCTION)
-        out << "Unknown function: " << term->function->stringProp("message");
-    else if (term->type->function == UNKNOWN_TYPE_FUNC)
-        out << "Unknown type: " << term->type->stringProp("message");
-    else if (term->function == UNKNOWN_IDENTIFIER_FUNC)
-        out << "Unknown identifier: " << term->stringProp("message");
-    else if (term->function == UNRECOGNIZED_EXPRESSION_FUNC)
-        out << "Unrecognized expression: " << term->stringProp("message");
-
-    return out.str();
-}
-
-void print_compile_errors(Branch& branch, std::ostream& output)
-{
-    for (BranchIterator it(branch); !it.finished(); ++it) {
-        if (has_compile_error(*it))
-            output << get_compile_error_message(*it) << std::endl;
-    }
 }
 
 void recursive_append_influencing_values(Term* term, RefList& list)
