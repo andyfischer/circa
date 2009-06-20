@@ -56,7 +56,6 @@ bool initialize_display()
     SDL_WM_SetCaption(String(*USERS_BRANCH, "WINDOW_TITLE", "Untitled").get().c_str(), NULL);
 
     // Initialize GL state
-
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -64,6 +63,9 @@ bool initialize_display()
     glClearColor(0,0,0,0);
     glClearDepth(1000);
     glDepthFunc(GL_LEQUAL);
+
+    glEnable(GL_TEXTURE);
+    glEnable(GL_TEXTURE_2D);
      
     glViewport(0, 0, windowWidth, windowHeight);
      

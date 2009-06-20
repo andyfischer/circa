@@ -993,6 +993,8 @@ Term* dot_expression(Branch& branch, TokenStream& tokens)
 
         lhs = result;
     }
+
+    set_source_location(lhs, startPosition, tokens);
     return lhs;
 }
 

@@ -34,9 +34,6 @@ void gl_triangles(Term* caller)
     Branch& list = caller->input(0)->asBranch();
     int color = caller->input(1)->asInt();
 
-    glDisable(GL_TEXTURE);
-    glDisable(GL_TEXTURE_2D);
-
     _unpack_gl_color(color);
     glBegin(GL_TRIANGLES);
 
