@@ -20,6 +20,7 @@ void append_whitespace(Term* term, std::string const& whitespace)
             term->stringProp("syntaxHints:postWhitespace") + whitespace;
 }
 
+// Deprecated:
 void include_location(Term* term, tokenizer::Token& tok)
 {
     bool prepend;
@@ -65,6 +66,33 @@ void include_location(Term* term, tokenizer::Token& tok)
         term->intProp("lineEnd") = tok.lineEnd;
         term->intProp("colEnd") = tok.colEnd;
     }
+}
+
+void set_source_location(Term* term, int start, TokenStream& tokens)
+{
+    if (tokens.length() == 0) {
+        term->intProp("colStart") = 0;
+        term->intProp("lineStart") = 0;
+        term->intProp("colEnd") = 0;
+        term->intProp("lineEnd") = 0;
+        return;
+    }
+
+    if (start >= tokens.length()) {
+        // 'start' is at the end of the stream
+        term->intProp("colStart") = tokens[start-1].colEnd+1;
+        term->intProp("lineStart") = tokens[start-1].lineEnd;
+
+    } else {
+        term->intProp("colStart") = tokens[start].colStart;
+        term->intProp("lineStart") = tokens[start].lineStart;
+    }
+
+    int end = tokens.getPosition();
+    if (end >= tokens.length()) end = tokens.length()-1;
+
+    term->intProp("colEnd") = tokens[end].colEnd;
+    term->intProp("lineEnd") = tokens[end].lineEnd;
 }
 
 void push_pending_rebind(Branch& branch, std::string const& name)
@@ -148,8 +176,9 @@ Term* find_type(Branch& branch, std::string const& name)
     Term* result = find_named(&branch, name);
 
     if (result == NULL) {
-        result = apply(&branch, UNKNOWN_TYPE_FUNC, RefList());
-        result->stringProp("message") = name;
+        result = apply(&branch, UNKNOWN_TYPE_FUNC, RefList(), name);
+        evaluate_term(result);
+        assert(result->type == TYPE_TYPE);
     }   
 
     return result;
@@ -207,6 +236,8 @@ Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start)
     Term* result = apply(&branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
     result->stringProp("message") = consume_line(tokens, start, result);
 
+    assert(has_static_error(result));
+
     return result;
 }
 
@@ -214,6 +245,7 @@ Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start)
 {
     change_function(existing, UNRECOGNIZED_EXPRESSION_FUNC);
     existing->stringProp("message") = consume_line(tokens, start, existing);
+    assert(has_static_error(existing));
 
     return existing;
 }

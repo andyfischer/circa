@@ -40,10 +40,10 @@ void _test_assert_function(Term* term, int line, const char* file)
         throw std::runtime_error(msg.str());
     }
 
-    if (has_compile_error(term)) {
+    if (has_static_error(term)) {
         std::stringstream msg;
         msg << "Compile error on term " << format_global_id(term) << std::endl;
-        msg << get_compile_error_message(term) << std::endl;
+        msg << get_static_error_message(term) << std::endl;
         msg << "Occurred in " << file << ", line " << line << std::endl;
         throw std::runtime_error(msg.str());
     }

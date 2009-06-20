@@ -27,9 +27,10 @@ void evaluate_term(Term* term)
 
     term->hasError = false;
 
-    // Check function
-    if (term->function == NULL) {
-        error_occurred(term, "Function is NULL");
+    std::string errorMessage;
+
+    if (has_static_error(term)) {
+        error_occurred(term, get_static_error_message(term));
         return;
     }
 
@@ -37,64 +38,6 @@ void evaluate_term(Term* term)
 
     if (func.evaluate == NULL)
         return;
-
-    // Check # of inputs
-    bool varArgs = function_get_variable_args(term->function);
-    int numInputs = function_num_inputs(term->function);
-
-    if (!varArgs && (term->inputs.length() != numInputs)) {
-        std::stringstream msg;
-        msg << "Wrong number of inputs (found " << term->inputs.length();
-        msg << ", expected " << numInputs << ")";
-        error_occurred(term, msg.str());
-        return;
-    }
-
-    // Check each input. Make sure:
-    //  1) it is not null
-    //  2) it is up-to-date
-    //  3) it has a non-null value
-    //  4) it has no errors
-    //  5) it has the correct type
-    for (int inputIndex=0; inputIndex < term->inputs.length(); inputIndex++)
-    {
-        int effectiveIndex = inputIndex;
-        if (varArgs)
-            effectiveIndex = 0;
-
-        Term* input = term->inputs[inputIndex];
-        Function::InputProperties& inputProps = func.getInputProperties(effectiveIndex);
-         
-        if (input == NULL && !inputProps.meta) {
-            std::stringstream message;
-            message << "Input " << inputIndex << " is NULL";
-            error_occurred(term, message.str());
-            return;
-        }
-
-        if (!is_value_alloced(input) && !inputProps.meta) {
-            std::stringstream message;
-            message << "Input " << inputIndex << " has NULL value";
-            error_occurred(term, message.str());
-            return;
-        }
-
-        if (input->hasError && !inputProps.meta) {
-            std::stringstream message;
-            message << "Input " << inputIndex << " has an error";
-            error_occurred(term, message.str());
-            return;
-        }
-        
-        // Check type
-        if (!value_fits_type(input, func.inputTypes[effectiveIndex])) {
-            std::stringstream message;
-            message << "Runtime type error: input " << inputIndex << " has type "
-                << input->type->name;
-            error_occurred(term, message.str());
-            return;
-        }
-    }
     
     // Make sure we have an allocated value. Allocate one if necessary
     if (!is_value_alloced(term))

@@ -10,6 +10,7 @@ namespace tokenizer { struct Token; }
 void prepend_whitespace(Term* term, std::string const& whitespace);
 void append_whitespace(Term* term, std::string const& whitespace);
 void include_location(Term* term, tokenizer::Token& tok);
+void set_source_location(Term* term, int start, TokenStream& tokens);
 Term* find_and_apply(Branch& branch, std::string const& functionName, RefList inputs);
 void recursively_mark_terms_as_occuring_inside_an_expression(Term* term);
 

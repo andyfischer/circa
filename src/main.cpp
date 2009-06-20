@@ -131,12 +131,8 @@ int circa_main(std::vector<std::string> args)
     Branch main_branch;
     parse_script(main_branch, args[0]);
 
-    if (count_compile_errors(main_branch) > 0) {
-        int count = count_compile_errors(main_branch);
-        std::cout << count << " compile error";
-        if (count != 1) std::cout << "s";
-        std::cout << ":" << std::endl;
-        print_compile_errors(main_branch, std::cout);
+    if (has_static_errors(main_branch)) {
+        print_static_errors_formatted(main_branch, std::cout);
         return 1;
     } else {
 

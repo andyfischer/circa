@@ -21,6 +21,7 @@
 #include "references.h"
 #include "runtime.h"
 #include "stateful_code.h"
+#include "static_errors.h"
 #include "source_repro.h"
 #include "subroutine.h"
 #include "term.h"
