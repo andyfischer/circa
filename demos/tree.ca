@@ -1,5 +1,5 @@
 
-background(0xeeeeeeff)
+background(#eef)
 
 def interp(float progress, float e) :float
   return min(progress / e, 1.0)
@@ -12,7 +12,7 @@ def tree_segment(Point base, float direction, float width, float depth)
   state jitter = (rand() - .5) *.3
   state max_length = 20 + 30 * rand()
   state age = 1.0
-  age += elapsed
+  age += time_delta
   seg_length = 20.0 * log(age)
   min(@seg_length, max_length)
   --direction = direction + jitter
@@ -23,12 +23,12 @@ def tree_segment(Point base, float direction, float width, float depth)
   top_width = width * interp(age, 11)
   if_expr(has_branches, @top_width, 0.0)
 
-  l = p2c(direction - HALF_PI, bottom_width, base)
-  r = p2c(direction + HALF_PI, bottom_width, base)
+  l = p2c(direction - .5, bottom_width, base)
+  r = p2c(direction + .5, bottom_width, base)
   next_center = p2c(direction, seg_length, base)
-  l2 = p2c(direction - HALF_PI, top_width, next_center)
-  r2 = p2c(direction + HALF_PI, top_width, next_center)
-  shape([l r r2 l2] 0x440101ff)
+  l2 = p2c(direction - .5, top_width, next_center)
+  r2 = p2c(direction + .5, top_width, next_center)
+  gl_triangles([r l l2 l2 r2 r] #440101)
 
   if has_branches
     state l_jitter = rand() * .2
@@ -40,4 +40,4 @@ end
 
 starting_width = 3.0
 
-root = tree_segment([200 300], 0-HALF_PI, starting_width, 0)
+root = tree_segment([200 300], -.5, starting_width, 0)

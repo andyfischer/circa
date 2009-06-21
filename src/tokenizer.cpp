@@ -21,6 +21,7 @@ const char* get_token_text(int match)
         case HEX_INTEGER: return "HEX_INTEGER";
         case FLOAT_TOKEN: return "FLOAT";
         case STRING: return "STRING";
+        case COLOR: return "COLOR";
         case COMMENT: return "COMMENT";
         case DOT: return ".";
         case STAR: return "*";
@@ -171,6 +172,7 @@ bool match_number(TokenizeContext &context);
 void consume_number(TokenizeContext &context);
 void consume_hex_number(TokenizeContext &context);
 void consume_string_literal(TokenizeContext &context);
+void consume_color_literal(TokenizeContext &context);
 
 void tokenize(std::string const &input, TokenList &results)
 {
@@ -464,6 +466,10 @@ void top_level_consume_token(TokenizeContext &context)
                 return;
             }
             break;
+
+        case '#':
+            consume_color_literal(context);
+            return;
     }
 
     // Fall through, consume the next letter as UNRECOGNIZED
@@ -557,11 +563,10 @@ void consume_number(TokenizeContext &context)
         }
     }
 
-    if (dot_encountered) {
+    if (dot_encountered)
         context.push(FLOAT_TOKEN, text.str());
-    } else {
+    else
         context.push(INTEGER, text.str());
-    }
 }
 
 void consume_hex_number(TokenizeContext &context)
@@ -572,9 +577,8 @@ void consume_hex_number(TokenizeContext &context)
     text << context.consume();
     text << context.consume();
 
-    while (is_hexadecimal_digit(context.next())) {
+    while (is_hexadecimal_digit(context.next()))
         text << context.consume();
-    }
 
     context.push(HEX_INTEGER, text.str());
 }
@@ -587,14 +591,33 @@ void consume_string_literal(TokenizeContext &context)
     char quote_type = context.consume();
     text << quote_type;
 
-    while (context.next() != quote_type && !context.finished()) {
+    while (context.next() != quote_type && !context.finished())
         text << context.consume();
-    }
 
     // consume ending quote
     text << context.consume();
 
     context.push(STRING, text.str());
+}
+
+void consume_color_literal(TokenizeContext &context)
+{
+    std::stringstream text;
+
+    // consume #
+    text << context.consume();
+
+    while (is_hexadecimal_digit(context.next()))
+        text << context.consume();
+
+    // acceptable lengths are 3, 4, 6 or 8 characters (not including #)
+    std::string result = text.str();
+    int length = result.length() - 1;
+
+    if (length == 3 || length == 4 || length == 6 || length == 8)
+        context.push(COLOR, result);
+    else
+        context.push(UNRECOGNIZED, result);
 }
 
 } // namespace token

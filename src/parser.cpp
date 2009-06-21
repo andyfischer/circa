@@ -1046,6 +1046,10 @@ Term* atom(Branch& branch, TokenStream& tokens)
     else if (tokens.nextIs(FLOAT_TOKEN))
         result = literal_float(branch, tokens);
 
+    // literal color?
+    else if (tokens.nextIs(COLOR))
+        result = literal_color(branch, tokens);
+
     // literal list?
     else if (tokens.nextIs(LBRACKET))
         result = literal_list(branch, tokens);
@@ -1149,11 +1153,8 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
 Term* literal_string(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
-    assert(tokens.nextIs(STRING));
 
-    Token tok = tokens.consumet();
-
-    std::string text = tok.text;
+    std::string text = tokens.consume(STRING);
 
     // strip quote marks
     text = text.substr(1, text.length()-2);
@@ -1171,6 +1172,72 @@ Term* literal_bool(Branch& branch, TokenStream& tokens)
     tokens.consume();
 
     Term* term = bool_value(&branch, value);
+    set_source_location(term, startPosition, tokens);
+    return term;
+}
+
+int hex_digit_to_number(char digit)
+{
+    if (digit >= '0' && digit <= '9')
+        return digit - '0';
+
+    digit = toupper(digit);
+
+    if (digit == 'A') return 10;
+    if (digit == 'B') return 11;
+    if (digit == 'C') return 12;
+    if (digit == 'D') return 13;
+    if (digit == 'E') return 14;
+    if (digit == 'F') return 15;
+
+    return 0;
+}
+
+Term* literal_color(Branch& branch, TokenStream& tokens)
+{
+    int startPosition = tokens.getPosition();
+
+    std::string text = tokens.consume(COLOR);
+
+    // strip leading # sign
+    text = text.substr(1, text.length()-1);
+
+    // Side note: current behavior is to store colors as a packed int.
+    // In the future I would like to make Color a builtin compound type.
+
+    int value = 0;
+
+    if (text.length() == 3 || text.length() == 4) {
+        value += hex_digit_to_number(text[0]) * 0x11000000;
+        value += hex_digit_to_number(text[1]) * 0x00110000;
+        value += hex_digit_to_number(text[2]) * 0x00001100;
+
+        // optional alpha
+        if (text.length() == 3)
+            value += 0xff;
+        else
+            value += hex_digit_to_number(text[3]) * 0x00000011;
+    } else {
+        value += hex_digit_to_number(text[0]) * 0x10000000;
+        value += hex_digit_to_number(text[1]) * 0x01000000;
+        value += hex_digit_to_number(text[2]) * 0x00100000;
+        value += hex_digit_to_number(text[3]) * 0x00010000;
+        value += hex_digit_to_number(text[4]) * 0x00001000;
+        value += hex_digit_to_number(text[5]) * 0x00000100;
+
+        // optional alpha
+        if (text.length() == 6)
+            value += 0xff;
+        else {
+            value += hex_digit_to_number(text[6]) * 0x00000010;
+            value += hex_digit_to_number(text[7]) * 0x00000001;
+        }
+    }
+
+    Term* term = int_value(&branch, value);
+
+    term->stringProp("syntaxHints:integerFormat") = "color";
+
     set_source_location(term, startPosition, tokens);
     return term;
 }

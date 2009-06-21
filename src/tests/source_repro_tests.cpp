@@ -84,6 +84,23 @@ void reproduce_simple_values() {
     finish_source_repro_category();
 }
 
+void reproduce_boolean() {
+    round_trip_source("true");
+    round_trip_source("false");
+    round_trip_source("a = true");
+    round_trip_source("[false true false true]");
+    finish_source_repro_category();
+}
+
+void reproduce_color_literal() {
+    //TODO round_trip_source("#123");
+    //TODO round_trip_source("#fafa");
+    //TODO round_trip_source("#aabbcc");
+    round_trip_source("#aabbccdd");
+    round_trip_source("c = #aabbccdd");
+    finish_source_repro_category();
+}
+
 void reproduce_stateful_values() {
     round_trip_source("state i");
     round_trip_source("state i = 1");
@@ -269,6 +286,8 @@ void generate_source_for_literal_list() {
 
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_tests::reproduce_simple_values);
+    REGISTER_TEST_CASE(source_repro_tests::reproduce_boolean);
+    REGISTER_TEST_CASE(source_repro_tests::reproduce_color_literal);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_stateful_values);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_function_calls);
     REGISTER_TEST_CASE(source_repro_tests::reproduce_infix);

@@ -1,5 +1,5 @@
 
-background(0xeeeeeeff)
+background(#eef)
 
 buttons = ["Button1", "Button2", "Button3"]
 
@@ -10,9 +10,9 @@ button_size = [100 20] : Point
 
 font_height = 8
 
-normal_color = 0x00ff00ff
-highlight_color = 0x555555ff
-click_color = 0xff00ffff
+normal_color = #0f0
+highlight_color = #555
+click_color = #f0f
 
 current_y = loc.y
 
@@ -41,6 +41,6 @@ for button in buttons
   end
     
   box(b.x1 b.y1 b.x2 b.y2 color)
-  drawText(button_loc.x + 3, button_loc.y + (button_size.y - font_height) / 2, button, 0x000000ff)
+  drawText(button_loc.x + 3, button_loc.y + (button_size.y - font_height) / 2, button, #000)
   current_y += button_size.y + 9
 end

@@ -75,6 +75,8 @@ namespace primitives {
             std::stringstream strm;
             if (term->stringPropOptional("syntaxHints:integerFormat", "dec") == "hex")
                 strm << "0x" << std::hex;
+            else if (term->stringPropOptional("syntaxHints:integerFormat", "dec") == "color")
+                strm << "#" << std::hex;
 
             strm << as_int(term);
             return strm.str();
