@@ -39,6 +39,7 @@ Term* literal_hex(Branch& branch, TokenStream& tokens);
 Term* literal_float(Branch& branch, TokenStream& tokens);
 Term* literal_string(Branch& branch, TokenStream& tokens);
 Term* literal_bool(Branch& branch, TokenStream& tokens);
+Term* literal_color(Branch& branch, TokenStream& tokens);
 Term* literal_list(Branch& branch, TokenStream& tokens);
 Term* identifier(Branch& branch, TokenStream& tokens);
 

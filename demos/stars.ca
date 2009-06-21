@@ -13,10 +13,10 @@ def p2c(float angle, float radius, Point center) : Point
   return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
 end
 
-star_color = 0xff3399ff
+star_color = #f39
 state global_scale = 1.0
 
-background(0)
+background(#000)
 
 def draw_star(Star star)
   radius = star.size * global_scale : float

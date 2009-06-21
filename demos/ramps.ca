@@ -35,7 +35,7 @@ for x in range(num_tiles_x)
     box_br = box_tl + [tile_size, tile_size]
     box_tr = [box_br.x box_tl.y]
     box_bl = [box_tl.x box_br.y]
-    color = if_expr((x:int+y:int) % 2 == 1, 0xeeeeeeff, 0xffffffff)
+    color = if_expr((x:int+y:int) % 2 == 1, #eee, #fff)
     gl_triangles([box_tl box_tr box_bl box_tr box_br box_bl] color)
   end
 end
@@ -62,7 +62,7 @@ def draw_free_piece(Point location, float rot)
       return p + location
     end
     map(add_location, @shape)
-    gl_triangles(shape, 0x440044ff)
+    gl_triangles(shape, #404)
 end
 
 def draw_piece(Piece piece)

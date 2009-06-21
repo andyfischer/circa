@@ -233,17 +233,17 @@ void test_consume_line()
 
     // happily consume 'for' and some whitespace
     test_assert(tokens.nextIs(token::FOR));
-    tokens.consumet();
+    tokens.consume();
     test_assert(tokens.nextIs(token::WHITESPACE));
-    tokens.consumet();
+    tokens.consume();
 
     int startPosition = tokens.getPosition();
 
     // happily consume some more stuff
     test_assert(tokens.nextIs(token::IN_TOKEN));
-    tokens.consumet();
+    tokens.consume();
     test_assert(tokens.nextIs(token::WHITESPACE));
-    tokens.consumet();
+    tokens.consume();
 
     // now freak out
     std::string errorline = consume_line(tokens, startPosition);
@@ -251,6 +251,35 @@ void test_consume_line()
     test_equals(errorline, "in $#!$#@ 151 poop ");
     test_assert(tokens.nextIs(token::IDENTIFIER));
     test_assert(tokens.next().text == "fin");
+}
+
+void test_color_literal()
+{
+    TokenStream tokens("#faf");
+
+    test_assert(tokens.nextIs(token::COLOR));
+    test_equals(tokens.consume(), "#faf");
+    test_assert(tokens.finished());
+
+    tokens.reset("#119f");
+    test_assert(tokens.nextIs(token::COLOR));
+    test_equals(tokens.consume(), "#119f");
+    test_assert(tokens.finished());
+
+    tokens.reset("#ff1100");
+    test_assert(tokens.nextIs(token::COLOR));
+    test_equals(tokens.consume(), "#ff1100");
+
+    tokens.reset("#00112299");
+    test_assert(tokens.nextIs(token::COLOR));
+    test_equals(tokens.consume(), "#00112299");
+    test_assert(tokens.finished());
+
+    // test wrong # of characters
+    tokens.reset("#00111");
+    test_assert(tokens.nextIs(token::UNRECOGNIZED));
+    tokens.consume();
+    test_assert(tokens.finished());
 }
 
 void register_tests()
@@ -267,6 +296,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::token_stream_to_string);
     REGISTER_TEST_CASE(tokenizer_tests::test_locations);
     REGISTER_TEST_CASE(tokenizer_tests::test_consume_line);
+    REGISTER_TEST_CASE(tokenizer_tests::test_color_literal);
 }
 
 } // namespace tokenizer_tests

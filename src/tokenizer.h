@@ -30,6 +30,7 @@ const int INTEGER = 2;
 const int HEX_INTEGER = 3;
 const int FLOAT_TOKEN = 4;
 const int STRING = 5;
+const int COLOR = 6;
 
 const int LPAREN = 10;
 const int RPAREN = 11;

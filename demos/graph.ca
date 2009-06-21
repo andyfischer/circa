@@ -1,7 +1,7 @@
 
 type Point { float x, float y}
 
-background(0xffffffff)
+background(#fff)
 
 axis_center = [200 200] : Point
 
@@ -17,12 +17,12 @@ def map_point_cos(float x) : Point
 end
 
 -- draw the axis
-gl_line_strip([axis_center-[0 200] axis_center+[0 200]] 0x888888ff)
-gl_line_strip([axis_center-[200 0] axis_center+[200 0]] 0x888888ff)
+gl_line_strip([axis_center-[0 200] axis_center+[0 200]] #888)
+gl_line_strip([axis_center-[200 0] axis_center+[200 0]] #888)
 
 -- draw the function
 points = map(map_point, range(400))
-gl_line_strip(points, 0xff000000)
+gl_line_strip(points, #f00)
 
 points = map(map_point_cos, range(400))
-gl_line_strip(points, 0x00ff0000)
+gl_line_strip(points, #f00)
