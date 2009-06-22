@@ -6,6 +6,7 @@ LINUX:
      libsdl-dev
      libsdl-image1.2-dev
      SDL_gfx
+     libsdl_ttf
 
 1. In a terminal, run the command: scons .
 

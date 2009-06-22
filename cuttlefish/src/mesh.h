@@ -39,11 +39,10 @@ struct Mesh
     }
 };
 
-void load_obj_file(std::string const& filename, Mesh& mesh);
-void draw_mesh_immediate(Mesh& mesh);
-
 namespace mesh {
 
+void load_obj_file(std::string const& filename, Mesh& mesh);
+void draw_mesh_immediate(Mesh& mesh);
 void register_functions(circa::Branch& branch);
 
 }
