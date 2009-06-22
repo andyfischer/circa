@@ -20,54 +20,6 @@ void append_whitespace(Term* term, std::string const& whitespace)
             term->stringProp("syntaxHints:postWhitespace") + whitespace;
 }
 
-// Deprecated:
-void include_location(Term* term, tokenizer::Token& tok)
-{
-    bool prepend;
-
-    // Prepend if lineStart/colStart are not yet defined
-    if (!term->hasProperty("lineStart")
-        || !term->hasProperty("colStart"))
-        prepend = true;
-
-    // Prepend if lineStart is before ours
-    else if (tok.lineStart < term->intProp("lineStart"))
-        prepend = true;
-
-    // Prepend if lineStart is equal and colStart is before ours
-    else if ((tok.lineStart == term->intProp("lineStart"))
-             && (tok.colStart < term->intProp("colStart")))
-        prepend = true;
-
-    // Otherwise, don't prepend
-    else
-        prepend = false;
-
-    if (prepend) {
-        term->intProp("lineStart") = tok.lineStart;
-        term->intProp("colStart") = tok.colStart;
-    }
-
-    // Do the same thing for appending
-    bool append;
-
-    if (!term->hasProperty("lineEnd")
-        || !term->hasProperty("colEnd"))
-        append = true;
-    else if (tok.lineEnd > term->intProp("lineEnd"))
-        append = true;
-    else if ((tok.lineEnd == term->intProp("lineEnd"))
-             && (tok.colEnd > term->intProp("colEnd")))
-        append = true;
-    else
-        append = false;
-
-    if (append) {
-        term->intProp("lineEnd") = tok.lineEnd;
-        term->intProp("colEnd") = tok.colEnd;
-    }
-}
-
 void set_source_location(Term* term, int start, TokenStream& tokens)
 {
     if (tokens.length() == 0) {
@@ -215,10 +167,7 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
                 && (tokens.nextIs(tokenizer::NEWLINE) || tokens.nextIs(tokenizer::SEMICOLON)))
             break;
 
-        tokenizer::Token tok = tokens.consumet();
-        if (positionRecepient != NULL)
-            include_location(positionRecepient, tok);
-        line << tok.text;
+        line << tokens.consume();
     }
 
     // throw out trailing newline
@@ -227,6 +176,9 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
 
     // make sure we passed our original position
     assert(tokens.getPosition() >= originalPosition);
+
+    if (positionRecepient != NULL)
+        set_source_location(positionRecepient, start, tokens);
 
     return line.str();
 }

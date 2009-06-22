@@ -45,17 +45,11 @@ struct TokenStream
 
     bool nextIs(int match, int lookahead=0) const;
 
-    // Consume the next token and return its text contents. If match is not -1, then throw
-    // an exception if the consumed token is not the same as match.
-    // This method is deprecated for two reasons:
-    //  1) Throwing exceptions is a bad way to handle errors
-    //  2) We throw out token-location information by just returning a string.
-    // Use consumet() instead.
+    // Consume the next token and return its text contents. If a token match is provided,
+    // and the next token doesn't have this match, then we throw an exception. This check
+    // should only be used as a form of assert; an expected match failure should be
+    // caught ahead of time.
     std::string consume(int match = -1);
-
-    // Consume the next token and return it. This method is the recommended replacement
-    // for consume()
-    tokenizer::Token const& consumet();
 
     bool nextNonWhitespaceIs(int match, int lookahead=0) const;
 
