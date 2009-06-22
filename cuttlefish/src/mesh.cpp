@@ -9,6 +9,8 @@
 using namespace circa;
 using namespace circa::tokenizer;
 
+namespace mesh {
+
 float consume_float(TokenStream& tokens)
 {
     return atof(tokens.consume(FLOAT_TOKEN).c_str());
@@ -124,8 +126,6 @@ void draw_mesh_immediate(Mesh& mesh)
     glEnd();
 }
 
-namespace mesh {
-
 void hosted_load_mesh(Term* caller)
 {
     if (caller->asInt() == 0) {
@@ -164,4 +164,4 @@ void register_functions(circa::Branch& branch)
     import_function(branch, hosted_draw_mesh, "draw_mesh(int, int, List, List, List)");
 }
 
-}
+} // namespace mesh

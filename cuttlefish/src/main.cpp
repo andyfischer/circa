@@ -12,6 +12,7 @@
 #include "mesh.h"
 #include "shaders.h"
 #include "textures.h"
+#include "ttf.h"
 
 using namespace circa;
 
@@ -115,6 +116,7 @@ int main( int argc, char* args[] )
     gl_shapes::register_functions(*SCRIPT_ROOT);
     mesh::register_functions(*SCRIPT_ROOT);
     textures::register_functions(*SCRIPT_ROOT);
+    ttf::initialize(*SCRIPT_ROOT);
 
     // Import constants
     expose_value(SCRIPT_ROOT, &TIME, "time");
