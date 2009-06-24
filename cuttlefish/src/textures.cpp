@@ -8,6 +8,8 @@
 
 #include <circa.h>
 
+#include "textures.h"
+
 using namespace circa;
 
 GLenum get_texture_format(SDL_Surface *surface)
@@ -16,32 +18,42 @@ GLenum get_texture_format(SDL_Surface *surface)
     int nColors = surface->format->BytesPerPixel;
     if (nColors == 4) {
         // contains alpha channel
-        if (surface->format->Rmask == 0x000000ff)
+        if (surface->format->Rmask == 0x000000ff) {
             return GL_RGBA;
-        else
+        } else {
             return GL_BGRA;
+        }
     } else if (nColors == 3) {
         // no alpha channel
-        if (surface->format->Rmask == 0x000000ff)
+        if (surface->format->Rmask == 0x000000ff) {
             return GL_RGB;
-        else
+        } else {
             return GL_BGR;
+        }
     } else {
-        std::cout << "get_texture_format failed" << std::endl;
+        std::cout << "warning: get_texture_format failed, nColors = " << nColors << std::endl;
         return GL_RGBA;
     }
 }
 
 GLuint load_image_to_texture(std::string const& filename, Term* errorListener)
 {
-    GLuint texid;
-
     SDL_Surface* surface = IMG_Load(filename.c_str());
     if (surface == NULL) {
         error_occurred(errorListener, "Error loading " + filename + ": " + SDL_GetError());
         return 0;
     }
 
+    GLuint texid = load_surface_to_texture(surface);
+
+    SDL_FreeSurface(surface);
+
+    return texid;
+}
+
+GLuint load_surface_to_texture(SDL_Surface *surface)
+{
+    GLuint texid;
     glGenTextures(1, &texid);
     glBindTexture(GL_TEXTURE_2D, texid);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -49,8 +61,6 @@ GLuint load_image_to_texture(std::string const& filename, Term* errorListener)
     glTexImage2D(GL_TEXTURE_2D, 0, surface->format->BytesPerPixel,
             surface->w, surface->h, 0,
             get_texture_format(surface), GL_UNSIGNED_BYTE, surface->pixels);
-
-    SDL_FreeSurface(surface);
 
     return texid;
 }
@@ -66,9 +76,42 @@ void hosted_load_texture(Term* caller)
     }
 }
 
+void hosted_draw_image(Term* caller)
+{
+    std::string filename = caller->input(0)->asString();
+    float x1 = caller->input(1)->toFloat();
+    float y1 = caller->input(2)->toFloat();
+    float x2 = caller->input(3)->toFloat();
+    float y2 = caller->input(4)->toFloat();
+    Branch& output = as_branch(caller);
+
+    if (output[0]->asInt() == 0) {
+        output[0]->asInt() = load_image_to_texture(filename, caller);
+        if (caller->hasError) return;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, output[0]->asInt());
+
+    glBegin(GL_QUADS);
+
+    glTexCoord2d(0.0, 0.0);
+    glVertex3f(x1, y1, 0);
+    glTexCoord2d(1.0, 0.0);
+    glVertex3f(x2, y1,0);
+    glTexCoord2d(1.0, 1.0);
+    glVertex3f(x2, y2,0);
+    glTexCoord2d(0.0, 1.0);
+    glVertex3f(x1, y2,0);
+
+    glEnd();
+}
+
 void register_functions(circa::Branch& branch)
 {
     import_function(branch, hosted_load_texture, "load_texture(string) : int");
+    branch.eval("type draw_image__output { int tex_id }");
+    import_function(branch, hosted_draw_image,
+            "draw_image(string,float,float,float,float) : draw_image__output");
 }
 
 } // namespace textures
