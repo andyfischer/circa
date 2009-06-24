@@ -17,6 +17,8 @@ WINDOWS = os.name == 'nt'
 # a little bit of special behavior for using frameworks.
 MAC = os.path.exists('/Library/Frameworks')
 
+DEBUG = True
+
 # Common build flags
 if POSIX:
     ROOT.Append(CPPFLAGS=['-ggdb'])
@@ -25,10 +27,15 @@ if POSIX:
     ROOT.SetOption('num_jobs', 2)
 
 if WINDOWS:
-    ROOT.Append(CPPFLAGS='/EHsc /Wp64 /MD /Z7 /O2 /TP'.split())
-    ROOT.Append(LINKFLAGS='/SUBSYSTEM:CONSOLE /MACHINE:X86'.split())
     ROOT.Append(CPPDEFINES = ['WINDOWS'])
-    ROOT.Append(CPPDEFINES = ["NDEBUG"])
+    ROOT.Append(LINKFLAGS='/SUBSYSTEM:CONSOLE /MACHINE:X86'.split())
+    if DEBUG:
+        ROOT.Append(CPPFLAGS='/EHsc /W3 /Wp64 /MDd /Z7 /TP /Od'.split())
+        ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrt.lib', '/DEBUG'])
+        ROOT.Append(CPPDEFINES = ["DEBUG", "_DEBUG"])
+    else:
+        ROOT.Append(CPPFLAGS='/EHsc /W3 /Wp64 /MD /Z7 /O2 /TP'.split())
+        ROOT.Append(CPPDEFINES = ["NDEBUG"])
 
 Export('ROOT')
 
