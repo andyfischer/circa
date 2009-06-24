@@ -7,16 +7,8 @@ def fatal(msg):
     print "fatal:",msg
     exit(1)
 
-# generate setup_builtin_functions.cpp and register_all_tests.cpp
-from tools import generate_cpp_registration
-generate_cpp_registration.do_builtin_functions(
-    'src/builtin_functions',
-    'src/setup_builtin_functions.cpp')
-generate_cpp_registration.do_register_all_tests(
-    'src/tests',
-    'src/register_all_tests.cpp')
-
 ROOT = Environment(tools = ["default"], toolpath=".")
+if not os.path.exists('build'): os.mkdir('build')
 
 POSIX = os.name == 'posix'
 WINDOWS = os.name == 'nt'
@@ -25,34 +17,26 @@ WINDOWS = os.name == 'nt'
 # a little bit of special behavior for using frameworks.
 MAC = os.path.exists('/Library/Frameworks')
 
+# Common build flags
 if POSIX:
     ROOT.Append(CPPFLAGS=['-ggdb'])
     ROOT.Append(CPPFLAGS=['-Wall'])
+    ROOT.Append(CPPDEFINES = ["_DEBUG", "DEBUG"])
+    ROOT.SetOption('num_jobs', 2)
 
 if WINDOWS:
-    ROOT.Append(CPPFLAGS=['/EHsc /RTC1 /Wp64 /MTd /Z7 /Od /TP'.split()])
-    ROOT.Append(LIBS = ['libcmtd'])
-    ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:libc.lib'])
-    ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrt.lib'])
-    ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrtd.lib'])
-    ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:libcd.lib'])
-    ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:libcmt.lib'])
-    ROOT.Append(LINKFLAGS=['/SUBSYSTEM:CONSOLE /MACHINE:X86 /DEBUG'.split()])
+    ROOT.Append(CPPFLAGS='/EHsc /Wp64 /MD /Z7 /O2 /TP'.split())
+    ROOT.Append(LINKFLAGS='/SUBSYSTEM:CONSOLE /MACHINE:X86'.split())
     ROOT.Append(CPPDEFINES = ['WINDOWS'])
+    ROOT.Append(CPPDEFINES = ["NDEBUG"])
 
-ROOT.Append(CPPDEFINES = ["_DEBUG"])
-ROOT.Append(CPPDEFINES = ["DEBUG"])
-ROOT.SetOption('num_jobs', 2)
 Export('ROOT')
 
 # Build Circa library
 CIRCA_ENV = ROOT.Clone()
-
 CIRCA_ENV.BuildDir('build/src', 'src')
 CIRCA_ENV.Append(CPPPATH = ['src'])
 
-if not os.path.exists('build'):
-    os.mkdir('build')
 
 def write_text_file(path, contents):
     f = open(path, 'w')
@@ -63,6 +47,15 @@ def write_text_file(path, contents):
 path_join = os.path.join
 
 BUILD_FILES = []
+
+# generate setup_builtin_functions.cpp and register_all_tests.cpp
+from tools import generate_cpp_registration
+generate_cpp_registration.do_builtin_functions(
+    'src/builtin_functions',
+    'src/setup_builtin_functions.cpp')
+generate_cpp_registration.do_register_all_tests(
+    'src/tests',
+    'src/register_all_tests.cpp')
 
 def source_directory(dir, excludes=[]):
     for path in os.listdir(dir):
@@ -97,10 +90,9 @@ source_directory_into_one_cpp('src/tests', 'all_tests')
 source_directory_into_one_cpp('src/builtin_functions', 'all_builtin_functions')
 
 circa_staticlib = CIRCA_ENV.StaticLibrary('build/bin/circa', BUILD_FILES)
+circa_binary = CIRCA_ENV.Program('build/bin/circa', 'build/src/main.cpp', LIBS=[circa_staticlib])
 
-circaBinary = CIRCA_ENV.Program('build/bin/circa', 'build/src/main.cpp', LIBS=[circa_staticlib])
-
-CIRCA_ENV.Default(circaBinary)
+CIRCA_ENV.Default(circa_binary)
 
 ########################### SDL-based targets ###############################
 
@@ -129,7 +121,6 @@ def unzip_file(filename, dir):
             f.write(zf.read(name))
             f.close()
 
-
 SDL_ROOT = ROOT.Clone()
 
 if POSIX:
@@ -148,19 +139,21 @@ if WINDOWS:
     SDL_ROOT.Append(LIBS=['opengl32.lib'])
 
     if not os.path.exists('SDL_deps'):
-        # download SDL_deps.zip from github site
-        download_file_from_the_internets('http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip',              'SDL_deps.zip')
+        download_file_from_the_internets(
+            'http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip',
+            'SDL_deps.zip')
 
-        # unzip it
         unzip_file('SDL_deps.zip', '.')
 
     SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL-1.2.13/include'])
-    SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL_gfx-2.0.19'])
-    SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL_image-1.2.7'])
+    SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL_image-1.2.7/include'])
+    SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL_mixer-2.0.9/include'])
+    SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL_ttf-2.0.9/include'])
     SDL_ROOT.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDL.lib'])
     SDL_ROOT.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDLmain.lib'])
-    SDL_ROOT.Append(LIBS=['SDL_deps/SDL_gfx-2.0.19/VisualC/Release/SDL_gfx.lib'])
-    SDL_ROOT.Append(LIBS=['SDL_deps/SDL_image-1.2.7/VisualC/Release/SDL_image.lib'])
+    SDL_ROOT.Append(LIBS=['SDL_deps/SDL_image-1.2.7/lib/SDL_image.lib'])
+    SDL_ROOT.Append(LIBS=['SDL_deps/SDL_mixer-1.2.8/lib/SDL_mixer.lib'])
+    SDL_ROOT.Append(LIBS=['SDL_deps/SDL_ttf-2.0.9/lib/SDL_ttf.lib'])
 
 
 SDL_ROOT.Append(CPPPATH=['#src'])
