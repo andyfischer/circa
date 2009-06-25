@@ -4,6 +4,7 @@
 #include "branch_iterator.h"
 #include "building.h"
 #include "builtins.h"
+#include "codegen.h"
 #include "cpp_importing.h"
 #include "cpp_convenience.h"
 #include "debug.h"

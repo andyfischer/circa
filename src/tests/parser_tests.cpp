@@ -430,6 +430,13 @@ void test_literal_list()
     test_assert(as_branch(l)[2]->function->name == "sqrt");
 }
 
+void test_anonymous_type_in_subroutine_decl()
+{
+    Branch branch;
+    //branch.eval("def myfunc([int] a) : int\nend");
+
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -460,6 +467,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_float_division);
     REGISTER_TEST_CASE(parser_tests::test_integer_division);
     REGISTER_TEST_CASE(parser_tests::test_literal_list);
+    REGISTER_TEST_CASE(parser_tests::test_anonymous_type_in_subroutine_decl);
 }
 
 } // namespace parser_tests

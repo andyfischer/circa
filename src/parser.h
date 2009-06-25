@@ -21,6 +21,7 @@ Term* blank_line(Branch& branch, TokenStream& tokens);
 Term* function_from_header(Branch& branch, TokenStream& tokens);
 Term* function_decl(Branch& branch, TokenStream& tokens);
 Term* type_decl(Branch& branch, TokenStream& tokens);
+Term* anonymous_type_decl(Branch& branch, TokenStream& tokens);
 Term* if_block(Branch& branch, TokenStream& tokens);
 Term* for_block(Branch& branch, TokenStream& tokens);
 Term* do_once_block(Branch& branch, TokenStream& tokens);

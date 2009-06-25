@@ -34,16 +34,24 @@ void load_font(Term* term)
     as<TTF_Font*>(term) = result;
 }
 
+struct draw_text__output
+{
+    Term* _term;
+
+    draw_text__output(Term* term) : _term(term) {}
+
+    int& texid() { return _term->field(0)->asInt(); }
+    float& width() { return _term->field(1)->asFloat(); }
+    float& height() { return _term->field(2)->asFloat(); }
+};
+    
 void draw_text(Term* caller)
 {
-    Branch& output = as_branch(caller);
-    int& texid = output[0]->asInt();
-    float& width = output[1]->asFloat();
-    float& height = output[2]->asFloat();
+    draw_text__output output(caller);
     float x = caller->input(2)->toFloat();
     float y = caller->input(3)->toFloat();
 
-    if (texid == 0) {
+    if (output.texid() == 0) {
         // Render the text to a new surface, upload it as a texture, destroy the surface,
         // create the geometry, save the texture id.
 
@@ -54,27 +62,27 @@ void draw_text(Term* caller)
 
         SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), color);
 
-        texid = load_surface_to_texture(surface);
-        width = surface->w;
-        height = surface->h;
+        output.texid() = load_surface_to_texture(surface);
+        output.width() = surface->w;
+        output.height() = surface->h;
     }
 
-    glBindTexture(GL_TEXTURE_2D, texid);
+    glBindTexture(GL_TEXTURE_2D, output.texid());
 
     glBegin(GL_QUADS);
 
     glTexCoord2d(0.0, 0.0);
     glVertex3f(x, y, 0);
     glTexCoord2d(1.0, 0.0);
-    glVertex3f(x + width, y,0);
+    glVertex3f(x + output.width(), y,0);
     glTexCoord2d(1.0, 1.0);
-    glVertex3f(x + width, y + height,0);
+    glVertex3f(x + output.width(), y + output.height(),0);
     glTexCoord2d(0.0, 1.0);
-    glVertex3f(x, y + height,0);
+    glVertex3f(x, y + output.height(),0);
 
     glEnd();
 }
-    
+
 void initialize(circa::Branch& branch)
 {
     if (TTF_Init() == -1) {
