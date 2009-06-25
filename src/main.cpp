@@ -127,6 +127,21 @@ int circa_main(std::vector<std::string> args)
         return 0;
     }
 
+    // Generate cpp headers
+    if (args[0] == "-gh") {
+        Branch branch;
+        parse_script(branch, args[1]);
+
+        if (has_static_errors(branch)) {
+            print_static_errors_formatted(branch, std::cout);
+            return 1;
+        }
+
+        std::cout << generate_cpp_headers(branch);
+
+        return 0;
+    }
+
     // Otherwise, run script
     Branch main_branch;
     parse_script(main_branch, args[0]);

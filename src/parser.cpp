@@ -207,6 +207,31 @@ Term* comment(Branch& branch, TokenStream& tokens)
     return result;
 }
 
+Term* type_identifier_or_anonymous_type(Branch& branch, TokenStream& tokens)
+{
+    int startPosition = tokens.getPosition();
+
+    Term* term = NULL;
+
+    if (tokens.nextIs(LBRACKET)) {
+        term = anonymous_type_decl(branch, tokens);
+        if (has_static_error(term)) {
+            return compile_error_for_line(term, tokens, startPosition);
+        }
+
+    } else {
+
+        if (!tokens.nextIs(IDENTIFIER))
+            return compile_error_for_line(branch, tokens, startPosition);
+
+        std::string type = tokens.consume();
+
+        term = find_type(branch, type);
+    }
+
+    return term;
+}
+
 Term* function_from_header(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
@@ -249,22 +274,17 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
             isHiddenStateArgument = true;
         }
 
-        if (!tokens.nextIs(IDENTIFIER))
-            return compile_error_for_line(result, tokens, startPosition);
+        Term* typeTerm = type_identifier_or_anonymous_type(branch, tokens);
 
-        std::string type = tokens.consume();
         possible_whitespace(tokens);
-
-        std::string name;
         
+        std::string name;
         if (tokens.nextIs(IDENTIFIER)) {
             name = tokens.consume();
             possible_whitespace(tokens);
         } else {
             name = get_placeholder_name_for_index(function_num_inputs(result));
         }
-
-        Term* typeTerm = find_type(branch, type);
 
         func.appendInput(typeTerm, name);
 
@@ -294,12 +314,7 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
         tokens.consume(COLON);
         result->stringProp("syntaxHints:whitespacePostColon") = possible_whitespace(tokens);
 
-        if (!tokens.nextIs(IDENTIFIER))
-            return compile_error_for_line(result, tokens, startPosition);
-
-        std::string outputTypeName = tokens.consume();
-        Term* outputType = find_type(branch, outputTypeName);
-        function_get_output_type(result) = outputType;
+        function_get_output_type(result) = type_identifier_or_anonymous_type(branch, tokens);
     }
 
     possible_whitespace(tokens);
@@ -386,22 +401,38 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
 
     std::string name = tokens.consume();
 
-    Term* result = create_value(&branch, TYPE_TYPE, name);
+    Term* result = anonymous_type_decl(branch, tokens);
+
+    if (has_static_error(result))
+        return result;
+
+    branch.bindName(result, name);
+    as_type(result).name = name;
+
+    return result;
+}
+
+Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
+{
+    int startPosition = tokens.getPosition();
+
+    Term* result = create_value(&branch, TYPE_TYPE);
     Type& type = as_type(result);
     initialize_compound_type(type);
-    type.name = name;
 
     possible_whitespace_or_newline(tokens);
 
-    if (!tokens.nextIs(LBRACE))
+    if (!tokens.nextIs(LBRACE) && !tokens.nextIs(LBRACKET))
         return compile_error_for_line(result, tokens, startPosition);
+
+    int closingToken = tokens.nextIs(LBRACE) ? RBRACE : RBRACKET;
 
     tokens.consume();
 
-    while (!tokens.nextIs(RBRACE)) {
+    while (!tokens.nextIs(closingToken)) {
         possible_whitespace_or_newline(tokens);
 
-        if (tokens.nextIs(RBRACE))
+        if (tokens.nextIs(closingToken))
             break;
 
         if (!tokens.nextIs(IDENTIFIER))
@@ -410,10 +441,11 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
         std::string fieldTypeName = tokens.consume(IDENTIFIER);
         possible_whitespace(tokens);
 
-        if (!tokens.nextIs(IDENTIFIER))
-            return compile_error_for_line(result, tokens, startPosition);
+        std::string fieldName;
 
-        std::string fieldName = tokens.consume(IDENTIFIER);
+        if (tokens.nextIs(IDENTIFIER))
+            fieldName = tokens.consume(IDENTIFIER);
+
         possible_whitespace_or_newline(tokens);
 
         Term* fieldType = find_type(branch, fieldTypeName);
@@ -424,7 +456,7 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
             tokens.consume(COMMA);
     }
 
-    tokens.consume(RBRACE);
+    tokens.consume(closingToken);
 
     return result;
 }
