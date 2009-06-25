@@ -78,19 +78,20 @@ void hosted_load_texture(Term* caller)
 
 void hosted_draw_image(Term* caller)
 {
-    std::string filename = caller->input(0)->asString();
-    float x1 = caller->input(1)->toFloat();
-    float y1 = caller->input(2)->toFloat();
-    float x2 = caller->input(3)->toFloat();
-    float y2 = caller->input(4)->toFloat();
+    int& texid = caller->input(0)->asInt();
+    std::string filename = caller->input(1)->asString();
+    float x1 = caller->input(2)->toFloat();
+    float y1 = caller->input(3)->toFloat();
+    float x2 = caller->input(4)->toFloat();
+    float y2 = caller->input(5)->toFloat();
     Branch& output = as_branch(caller);
 
-    if (output[0]->asInt() == 0) {
-        output[0]->asInt() = load_image_to_texture(filename, caller);
+    if (texid == 0) {
+        texid = load_image_to_texture(filename, caller);
         if (caller->hasError) return;
     }
 
-    glBindTexture(GL_TEXTURE_2D, output[0]->asInt());
+    glBindTexture(GL_TEXTURE_2D, texid);
 
     glBegin(GL_QUADS);
 
@@ -109,9 +110,8 @@ void hosted_draw_image(Term* caller)
 void register_functions(circa::Branch& branch)
 {
     import_function(branch, hosted_load_texture, "load_texture(string) : int");
-    branch.eval("type draw_image__output { int tex_id }");
     import_function(branch, hosted_draw_image,
-            "draw_image(string,float,float,float,float) : draw_image__output");
+            "draw_image(state int texid, string filename, float,float,float,float)");
 }
 
 } // namespace textures

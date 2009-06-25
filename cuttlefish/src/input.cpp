@@ -34,24 +34,6 @@ void mouse_pressed(circa::Term* caller)
     as_bool(caller) = MOUSE_JUST_CLICKED;
 }
 
-void initialize(Branch& branch)
-{
-    for (int i=0; i < SDLK_LAST; i++) {
-        KEY_DOWN[i] = false;
-    }
-
-    circa::expose_value(&branch, &MOUSE_X, "mouse_x");
-    circa::expose_value(&branch, &MOUSE_Y, "mouse_y");
-    circa::import_function(branch, key_down, "key_down(int) : bool");
-    circa::import_function(branch, key_pressed, "key_pressed(int) : bool");
-    circa::import_function(branch, mouse_pressed, "mouse_pressed() : bool");
-    circa::int_value(&branch, SDLK_UP, "KEY_UP");
-    circa::int_value(&branch, SDLK_DOWN, "KEY_DOWN");
-    circa::int_value(&branch, SDLK_LEFT, "KEY_LEFT");
-    circa::int_value(&branch, SDLK_RIGHT, "KEY_RIGHT");
-    circa::int_value(&branch, SDLK_SPACE, "KEY_SPACE");
-}
-
 void capture_events()
 {
     KEY_JUST_PRESSED.clear();
@@ -119,6 +101,49 @@ void handle_key_press(SDL_Event &event, int key)
         default: break;
         }
     }
+}
+
+void region_clicked(Term* caller)
+{
+    //int& id = caller->input(0)->asInt();
+    Branch& region = caller->input(0)->asBranch();
+    float x1 = region[0]->toFloat();
+    float y1 = region[1]->toFloat();
+    float x2 = region[2]->toFloat();
+    float y2 = region[3]->toFloat();
+
+#if 0
+    if (id == 0) {
+        static next_id = 1;
+        id = next_id++;
+    }
+#endif
+
+    as_bool(caller) = (MOUSE_JUST_CLICKED
+        && x1 <= MOUSE_X
+        && y1 <= MOUSE_Y
+        && x2 >= MOUSE_X
+        && y2 >= MOUSE_Y);
+}
+
+void initialize(Branch& branch)
+{
+    for (int i=0; i < SDLK_LAST; i++) {
+        KEY_DOWN[i] = false;
+    }
+
+    expose_value(&branch, &MOUSE_X, "mouse_x");
+    expose_value(&branch, &MOUSE_Y, "mouse_y");
+    import_function(branch, key_down, "key_down(int) : bool");
+    import_function(branch, key_pressed, "key_pressed(int) : bool");
+    import_function(branch, mouse_pressed, "mouse_pressed() : bool");
+    int_value(&branch, SDLK_UP, "KEY_UP");
+    int_value(&branch, SDLK_DOWN, "KEY_DOWN");
+    int_value(&branch, SDLK_LEFT, "KEY_LEFT");
+    int_value(&branch, SDLK_RIGHT, "KEY_RIGHT");
+    int_value(&branch, SDLK_SPACE, "KEY_SPACE");
+
+    import_function(branch, region_clicked, "region_clicked(List region) : bool");
 }
 
 } // namespace input
