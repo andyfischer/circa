@@ -34,7 +34,6 @@ namespace circa {
 
 struct Branch;
 struct FeedbackOperation;
-struct Function;
 class ReferenceIterator;
 struct Term;
 struct Type;

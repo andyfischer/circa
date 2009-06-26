@@ -37,7 +37,6 @@ void register_every_possible_parse_error()
     register_input("def myfunc(int %");
     register_input("def myfunc(int) %");
     register_input("def myfunc(int) : %");
-    register_input("def myfunc(int)");
     register_input("type");
     register_input("type mytype");
     register_input("type mytype %");

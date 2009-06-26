@@ -23,8 +23,11 @@ DEBUG = True
 if POSIX:
     ROOT.Append(CPPFLAGS=['-ggdb'])
     ROOT.Append(CPPFLAGS=['-Wall'])
-    #ROOT.Append(CPPFLAGS=['-O3'])
-    #ROOT.Append(CPPDEFINES = ["_DEBUG", "DEBUG"])
+    if DEBUG:
+        ROOT.Append(CPPDEFINES = ["_DEBUG", "DEBUG"])
+    else:
+        ROOT.Append(CPPFLAGS=['-O3'])
+
     ROOT.SetOption('num_jobs', 2)
 
 if WINDOWS:

@@ -119,7 +119,6 @@ void test_is_native_type()
     test_assert(is_native_type(BOOL_TYPE));
     test_assert(is_native_type(FLOAT_TYPE));
     test_assert(is_native_type(TYPE_TYPE));
-    test_assert(is_native_type(FUNCTION_TYPE));
 }
 
 void test_to_string()

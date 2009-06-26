@@ -47,6 +47,7 @@ void assert_good_pointer(Term* term)
 
 void sanity_check_term(Term* term)
 {
+    // TODO: Add more checks here
     assert_good_pointer(term);
 }
 
@@ -56,6 +57,11 @@ void sanity_check_the_world()
         Term* term = KERNEL->get(i);
         sanity_check_term(term);
     }
+}
+
+void dump_branch(Branch& branch)
+{
+    std::cout << branch_to_string_raw(branch);
 }
 
 } // namespace circa

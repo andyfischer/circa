@@ -102,8 +102,8 @@ void migrate_stateful_values(Branch& source, Branch& dest)
 
         // If both terms are subroutine calls, and the source call is expanded, then
         // expand the dest call as well.
-        if ((sourceTerm->function->type == SUBROUTINE_TYPE)
-                && (destTerm->function->type == SUBROUTINE_TYPE))
+        if ((is_subroutine(sourceTerm->function))
+                && (is_subroutine(destTerm->function)))
         {
             Term* sourceCallState = get_hidden_state_for_call(sourceTerm);
             Term* destCallState = get_hidden_state_for_call(destTerm);

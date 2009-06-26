@@ -21,7 +21,7 @@ def rotations_opposite(int x, int y) : bool
     return y == NW
   else x == SW
     return y == NE
-  end end end
+  end end end -- todo: fix this
 end
 
 num_tiles_x = WINDOW_WIDTH // tile_size

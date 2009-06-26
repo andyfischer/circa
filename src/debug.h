@@ -3,6 +3,8 @@
 #ifndef CIRCA_DEBUG_INCLUDED
 #define CIRCA_DEBUG_INCLUDED
 
+#include "common_headers.h"
+
 namespace circa {
 
 // This flag helps identify pointers to deleted Terms. We keep a 
@@ -37,6 +39,9 @@ extern bool DEBUG_TRAP_NAME_LOOKUP;
 void sanity_check_term(Term* term);
 
 void sanity_check_the_world();
+
+// Spit out this branch's raw contents to std::cout
+void dump_branch(Branch& branch);
 
 } // namespace circa
 

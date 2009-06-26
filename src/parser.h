@@ -18,7 +18,6 @@ Term* statement_list(Branch& branch, TokenStream& tokens);
 Term* statement(Branch& branch, TokenStream& tokens);
 Term* comment(Branch& branch, TokenStream& tokens);
 Term* blank_line(Branch& branch, TokenStream& tokens);
-Term* function_from_header(Branch& branch, TokenStream& tokens);
 Term* function_decl(Branch& branch, TokenStream& tokens);
 Term* type_decl(Branch& branch, TokenStream& tokens);
 Term* anonymous_type_decl(Branch& branch, TokenStream& tokens);

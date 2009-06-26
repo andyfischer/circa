@@ -34,10 +34,12 @@ void test_simple()
     test_assert(it.current() == sub);
     it.advance();
     test_assert(it.current() == sub->asBranch()[0]);
+    it.advanceSkippingBranch(); // skip over 'attributes'
+    test_assert(it.current()->name == "c");
     it.advance();
-    test_assert(it.current() == sub->asBranch()[1]);
+    test_assert(it.current()->name == "d");
     it.advance();
-    test_assert(it.current() == sub->asBranch()[2]);
+    test_assert(it.current() == sub->asBranch()[3]); // output type
     it.advance();
     test_assert(it.finished());
 }

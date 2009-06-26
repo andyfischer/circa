@@ -25,6 +25,7 @@ public:
     bool finished();
     Term* current();
     void advance();
+    void advanceSkippingBranch();
     int depth();
 
     Term* operator*() { return current(); }

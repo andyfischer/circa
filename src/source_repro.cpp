@@ -117,9 +117,14 @@ std::string get_term_source(Term* term)
 
         // for certain types, don't write "name =" in front
         if (term->type != FUNCTION_TYPE
-                && term->type != TYPE_TYPE
-                && term->type != SUBROUTINE_TYPE)
+                && term->type != TYPE_TYPE)
             prepend_name_binding(term, result);
+
+        if (as_type(term->type).toString == NULL) {
+            std::stringstream out;
+            out << "Type " << term->type->name << " doesn't have a toString function";
+            throw std::runtime_error(out.str());
+        }
 
         assert(as_type(term->type).toString != NULL);
 
@@ -129,8 +134,8 @@ std::string get_term_source(Term* term)
     }
 
     // check if this function has a toSourceString function
-    if (get_function_data(term->function).toSourceString != NULL) {
-        result << get_function_data(term->function).toSourceString(term);
+    if (function_get_to_source_string(term->function) != NULL) {
+        result << function_get_to_source_string(term->function)(term);
         result << term->stringPropOptional("syntaxHints:postWhitespace", "");
         return result.str();
     }

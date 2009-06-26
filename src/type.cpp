@@ -36,7 +36,6 @@ bool type_matches(Term *term, Term *type)
 void assert_type(Term *term, Term *type)
 {
     if (!type_matches(term, type)) {
-        assert(false);
         std::stringstream err;
         err << "assert_type failed, expected " << as_type(type).name;
         err << ", found " << as_type(term->type).name;
@@ -245,13 +244,6 @@ namespace type_t {
             return;
 
         dest->value = sourceValue;
-
-        if (sourceValue != NULL)
-            sourceValue->refCount++;
-        
-        if (destValue != NULL) {
-            // TODO: delete Type objects when they are no longer needed
-        }
     }
 
     void remap_pointers(Term *term, ReferenceMap const& map)
@@ -365,7 +357,7 @@ void assign_value_to_default(Term* term)
     else if (is_bool(term))
         as_bool(term) = false;
     else if (is_ref(term))
-        deref(term) = NULL;
+        as_ref(term) = NULL;
 
     // TODO: default values for other types
 }

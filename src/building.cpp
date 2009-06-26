@@ -16,8 +16,6 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     // Check to specialize function
     function = specialize_function(function, inputs);
 
-    Function& func = get_function_data(function);
-
     // If 'function' has hidden state, then create a container for that state, if needed
     if (is_function_stateful(function) && (inputs.length() < function_num_inputs(function)))
     {
@@ -46,10 +44,9 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     Term* outputType = function_get_output_type(function);
 
     // Check if this function has a specializeType function
-    // Side note: maybe we should do this step later. Doing it here means that we can only
-    // specialize on inputs, but it might be cool to specialize on state too.
-    if (func.specializeType != NULL)
-        outputType = func.specializeType(result);
+    // Side note: maybe we should do this step a different way.
+    if (function_get_specialize_type(function) != NULL)
+        outputType = function_get_specialize_type(function)(result);
 
     assert(outputType != NULL);
     assert(is_type(outputType));
@@ -69,6 +66,19 @@ void set_input(Term* term, int index, Term* input)
     if (input != NULL && input->name == "") {
         set_is_statement(input, false);
     }
+}
+
+void rewrite(Term* term, Term* function, RefList const& inputs)
+{
+    change_function(term, function);
+    for (int i=0; i < inputs.length(); i++)
+        set_input(term, i, inputs[i]);
+    Term* outputType = function_get_output_type(function);
+
+    if (function_get_specialize_type(function) != NULL)
+        outputType = function_get_specialize_type(function)(term);
+
+    change_type(term, outputType);
 }
 
 Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
@@ -102,10 +112,20 @@ Term* apply(Branch* branch, std::string const& functionName, RefList const& inpu
 
 Term* create_value(Branch* branch, Term* type, std::string const& name)
 {
+    // This function should be safe to call while bootstrapping
+
     assert(type != NULL);
     assert(is_type(type));
 
-    Term *term = apply(branch, VALUE_FUNC, RefList(), name);
+    Term *term = new Term();
+    if (branch != NULL) {
+        branch->append(term);
+        if (name != "")
+            branch->bindName(term, name);
+    }
+
+    term->function = VALUE_FUNC;
+    term->type = type;
     change_type(term, type);
     alloc_value(term);
 
@@ -178,7 +198,7 @@ Term* bool_value(Branch* branch, bool b, std::string const& name)
 Term* create_ref(Branch* branch, Term* ref, std::string const& name)
 {
     Term* term = create_value(branch, REF_TYPE, name);
-    deref(term) = ref;
+    as_ref(term) = ref;
     return term;
 }
 

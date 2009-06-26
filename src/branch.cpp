@@ -36,6 +36,15 @@ void Branch::append(Term* term)
     }
 }
 
+void Branch::insert(int index, Term* term)
+{
+    _terms.insert(index, term);
+    if (term != NULL) {
+        assert(term->owningBranch == NULL);
+        term->owningBranch = this;
+    }
+}
+
 void Branch::remove(Term* term)
 {
     // remove name binding if necessary

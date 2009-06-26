@@ -15,13 +15,13 @@ void test_reference()
     Term* a = create_value(&branch, INT_TYPE);
     Term* r2 = create_value(&branch, REF_TYPE);
 
-    deref(r1) = a;
+    as_ref(r1) = a;
 
-    test_assert(deref(r1) == a);
+    test_assert(as_ref(r1) == a);
 
     assign_value(r1, r2);
 
-    test_assert(deref(r2) == a);
+    test_assert(as_ref(r2) == a);
 }
 
 void builtin_types()

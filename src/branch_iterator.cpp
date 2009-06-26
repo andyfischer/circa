@@ -45,7 +45,13 @@ void BranchIterator::advance()
         return;
     }
 
-    // otherwise, increment index
+    // otherwise, just advance. It's not really accurate to say that we are "skipping"
+    // any branches, because we just checked if there was one.
+    advanceSkippingBranch();
+}
+
+void BranchIterator::advanceSkippingBranch()
+{
     while (true) {
         Branch& branch = *_stack.back().branch;
         int& index = _stack.back().index;

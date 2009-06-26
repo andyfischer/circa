@@ -40,6 +40,8 @@ struct Branch
 
     void append(Term* term);
 
+    void insert(int index, Term* term);
+
     void remove(Term* term);
     void remove(std::string const& name);
     void remove(int index);

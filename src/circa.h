@@ -18,6 +18,7 @@
 #include "metrics.h"
 #include "parser.h"
 #include "parser_util.h"
+#include "primitives.h"
 #include "refactoring.h"
 #include "references.h"
 #include "runtime.h"
