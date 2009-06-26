@@ -155,7 +155,7 @@ void refresh_training_branch(Branch& branch)
         if (!operation.hasPendingFeedback(term))
             continue;
 
-        Term* feedbackFunc = as_function(term->function).feedbackFunc;
+        Term* feedbackFunc = function_get_feedback_func(term->function);
 
         // Skip term if it has no feedback function
         if (feedbackFunc == NULL) {

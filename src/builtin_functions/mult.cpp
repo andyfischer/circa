@@ -1,3 +1,4 @@
+//
 // Copyright 2008 Andrew Fischer
 
 #include "circa.h"
@@ -52,7 +53,8 @@ namespace mult_function {
         Term* mult_i = import_function_overload(MULT_FUNC, evaluate_i, "mult_i(int,int) : int");
 
         Term* mult_f = import_function_overload(MULT_FUNC, evaluate_f, "mult_f(float,float) : float");
-        as_function(mult_f).feedbackFunc = 
+
+        function_get_feedback_func(mult_f) = 
             import_function(kernel, feedback_evaluate, "mult_feedback(any, float) : Branch");
 
         kernel.bindName(mult_i, "mult_i");

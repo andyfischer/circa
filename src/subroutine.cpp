@@ -50,39 +50,13 @@ namespace subroutine_t {
 
 bool is_subroutine(Term* term)
 {
-    return term->type == SUBROUTINE_TYPE && (SUBROUTINE_TYPE != NULL);
+    return (term->type == FUNCTION_TYPE)
+        && function_get_evaluate(term) == subroutine_call_evaluate;
 }
 
-Function& get_subroutines_function_def(Term* term)
+void subroutine_update_hidden_state_type(Term* func)
 {
-    assert(is_subroutine(term));
-    Term* def = as_branch(term)[0];
-    test_assert(def->name == "#attr:function-def");
-    return as_function(def);
-}
-
-void initialize_subroutine(Term* term)
-{
-    Branch& branch = as_branch(term);
-    Function& func = get_subroutines_function_def(term);
-    func.evaluate = subroutine_call_evaluate;
-
-    int numInputs = function_num_inputs(term);
-    for (int input=0; input < numInputs; input++) {
-        std::string name = function_get_input_name(term, input);
-        Term *placeholder = apply(&branch, INPUT_PLACEHOLDER_FUNC,
-            RefList(), name);
-        Term* type = function_get_input_type(term, input);
-        change_type(placeholder, type);
-        source_set_hidden(placeholder, true);
-    }
-
-    function_get_hidden_state_type(term) = VOID_TYPE;
-}
-
-void subroutine_update_hidden_state_type(Term* sub)
-{
-    Branch& contents = as_branch(sub);
+    Branch& contents = as_branch(func);
     bool hasState = false;
     for (int i=0; i < contents.length(); i++) {
         if (contents[i] == NULL)
@@ -94,15 +68,18 @@ void subroutine_update_hidden_state_type(Term* sub)
                 hasState = true;
     }
 
-    Function& func = get_function_data(sub);
     if (hasState) {
-        function_get_hidden_state_type(sub) = BRANCH_TYPE;
-        bool alreadyHasStateInput = (function_num_inputs(sub) > 0)
-            && (function_get_input_name(sub, 0) == "#state");
-        if (!alreadyHasStateInput)
-            func.prependInput(BRANCH_TYPE, "#state");
+        function_get_hidden_state_type(func) = BRANCH_TYPE;
+        bool alreadyHasStateInput = (function_num_inputs(func) > 0)
+            && (function_get_input_name(func, 0) == "#state");
+        if (!alreadyHasStateInput) {
+            // Insert an input for state
+            contents.insert(1, new Term());
+            rewrite(contents[1], INPUT_PLACEHOLDER_FUNC, RefList());
+            contents.bindName(contents[1], "#state");
+        }
     } else {
-        function_get_hidden_state_type(sub) = VOID_TYPE;
+        function_get_hidden_state_type(func) = VOID_TYPE;
     }
 }
 
@@ -117,27 +94,25 @@ void subroutine_call_evaluate(Term* caller)
                          as_branch(caller->function)
                          : as_branch(hiddenState);
 
-    Function &sub = get_function_data(caller->function);
+    int num_inputs = function_num_inputs(caller->function);
 
-    if (sub.inputTypes.length() != caller->inputs.length()) {
+    if (num_inputs != caller->inputs.length()) {
         std::stringstream msg;
-        msg << "Wrong number of inputs, expected: " << sub.inputTypes.length()
+        msg << "Wrong number of inputs, expected: " << num_inputs
             << ", found: " << caller->inputs.length();
         error_occurred(caller, msg.str());
         return;
     }
 
     // Implant inputs
-    int implantIndex = 1; // skip #attr:function-def
-    for (int input=0; input < sub.inputTypes.length(); input++) {
+    for (int input=0; input < num_inputs; input++) {
 
-        std::string inputName = sub.getInputProperties(input).name;
+        std::string inputName = function_get_input_name(caller->function, input);
         if (inputName == "#state")
             continue;
 
-        Term* term = branch[implantIndex++];
+        Term* term = function_get_input_placeholder(caller->function, input);
 
-        assert(term->name == inputName);
         assert(term->function == INPUT_PLACEHOLDER_FUNC);
 
         assign_value(caller->inputs[input], term);
@@ -148,8 +123,8 @@ void subroutine_call_evaluate(Term* caller)
     // Copy output
     if (branch.length() > 0) {
         Term* output = branch[branch.length()-1];
-        if (output->name == "#out")
-            assign_value(output, caller);
+        assert(output->name == "#out");
+        assign_value(output, caller);
     }
 }
 
@@ -166,12 +141,12 @@ void expand_subroutines_hidden_state(Term* call, Term* state)
     duplicate_branch(as_branch(call->function), as_branch(state));
 }
 
-bool sanity_check_subroutine(Term* sub, std::string& message)
+bool sanity_check_subroutine(Term* func, std::string& message)
 {
-    if (!is_subroutine(sub))
+    if (!is_subroutine(func))
         return true;
 
-    Branch& contents = as_branch(sub);
+    Branch& contents = as_branch(func);
 
     // If the subroutine has an #out term, then it must be the last one
     if (contents.contains(OUTPUT_PLACEHOLDER_NAME)

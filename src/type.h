@@ -1,4 +1,4 @@
-// Copyright 2008 Andrew Fischer
+// Copyright 2009 Andrew Fischer
 
 #ifndef CIRCA_TYPE_INCLUDED
 #define CIRCA_TYPE_INCLUDED
@@ -13,7 +13,6 @@
 #include "ref_map.h"
 #include "term.h"
 #include "term_namespace.h"
-#include "type_syntax_hints.h"
 
 namespace circa {
 
@@ -51,11 +50,6 @@ struct Type
     // Type parameters
     RefList parameters;
 
-    // Syntax hints
-    TypeSyntaxHints syntaxHints;
-
-    int refCount;
-
     Type() :
         name(""),
         cppTypeInfo(NULL),
@@ -63,8 +57,7 @@ struct Type
         dealloc(NULL),
         equals(NULL),
         remapPointers(NULL),
-        toString(NULL),
-        refCount(0)
+        toString(NULL)
     {
     }
 

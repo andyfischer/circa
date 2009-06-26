@@ -3,7 +3,7 @@
 
 #include "common_headers.h"
 
-#include "function.h"
+#include "primitives.h"
 #include "token_stream.h"
 
 namespace circa {
@@ -12,12 +12,12 @@ namespace circa {
 // a header in Circa-syntax.
 //
 // Example function header: "function do-something(int, string) -> int"
-Term* import_function(Branch& branch, Function::EvaluateFunc func, std::string const& header);
+Term* import_function(Branch& branch, EvaluateFunc func, std::string const& header);
 
-Term* import_function_overload(Term* overload, Function::EvaluateFunc evaluate,
+Term* import_function_overload(Term* overload, EvaluateFunc evaluate,
         std::string const& header);
 
-Term* import_member_function(Term* type, Function::EvaluateFunc evaluate,
+Term* import_member_function(Term* type, EvaluateFunc evaluate,
         std::string const& headerText);
 
 // Import the given value into this branch with the given name. We won't allocate

@@ -139,6 +139,7 @@ void test_map()
     // Test with subroutines
     branch.eval("def myfunc(float x):float\nreturn x + 5\nend");
     Term* map_myfunc = branch.eval("map(myfunc, input_list)");
+
     test_assert(map_myfunc);
 
     Branch& result2 = as_branch(map_myfunc);

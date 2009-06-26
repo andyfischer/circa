@@ -232,7 +232,7 @@ Term* type_identifier_or_anonymous_type(Branch& branch, TokenStream& tokens)
     return term;
 }
 
-Term* function_from_header(Branch& branch, TokenStream& tokens)
+Term* function_decl(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
@@ -255,12 +255,13 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
 
     tokens.consume();
 
-    Term* result = create_value(&branch, FUNCTION_TYPE);
-    Function& func = as_function(result);
+    Term* result = create_value(&branch, FUNCTION_TYPE, functionName);
+    initialize_function_data(result);
+    Branch& contents = as_branch(result);
 
     function_get_name(result) = functionName;
-    function_get_output_type(result) = VOID_TYPE;
 
+    // Consume input arguments
     while (!tokens.nextIs(RPAREN) && !tokens.finished())
     {
         bool isHiddenStateArgument = false;
@@ -276,6 +277,9 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
 
         Term* typeTerm = type_identifier_or_anonymous_type(branch, tokens);
 
+        if (has_static_error(typeTerm))
+            return compile_error_for_line(result, tokens, startPosition);
+
         possible_whitespace(tokens);
         
         std::string name;
@@ -286,7 +290,10 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
             name = get_placeholder_name_for_index(function_num_inputs(result));
         }
 
-        func.appendInput(typeTerm, name);
+        // Create an input placeholder term
+        Term* input = apply(&contents, INPUT_PLACEHOLDER_FUNC, RefList(), name);
+        change_type(input, typeTerm);
+        source_set_hidden(input, true);
 
         if (isHiddenStateArgument)
             function_get_hidden_state_type(result) = typeTerm;
@@ -305,72 +312,57 @@ Term* function_from_header(Branch& branch, TokenStream& tokens)
         }
     }
 
+    if (!tokens.nextIs(RPAREN))
+        return compile_error_for_line(result, tokens, startPosition);
+
     assert(tokens.nextIs(RPAREN));
     tokens.consume();
 
+    // Output type
     result->stringProp("syntaxHints:whitespacePreColon") = possible_whitespace(tokens);
 
+    Term* outputType = VOID_TYPE;
     if (tokens.nextIs(COLON)) {
         tokens.consume(COLON);
         result->stringProp("syntaxHints:whitespacePostColon") = possible_whitespace(tokens);
 
-        function_get_output_type(result) = type_identifier_or_anonymous_type(branch, tokens);
+        outputType = type_identifier_or_anonymous_type(branch, tokens);
     }
+
+    if (!is_type(outputType))
+        return compile_error_for_line(result, tokens, startPosition);
 
     possible_whitespace(tokens);
     possible_newline(tokens);
 
-    branch.bindName(result, functionName);
-
-    return result;
-}
-
-Term* function_decl(Branch& branch, TokenStream& tokens)
-{
-    int startPosition = tokens.getPosition();
-
-    Term* result = create_value(&branch, SUBROUTINE_TYPE);
-
-    Branch& subBranch = as_branch(result);
-
-    Term* functionDef = function_from_header(subBranch, tokens);
-
-    if (has_static_error(functionDef)) {
-        std::string message = functionDef->stringProp("message");
-        change_function(result, UNRECOGNIZED_EXPRESSION_FUNC);
-        result->stringProp("message") = message;
+    // If we're out of tokens, then this is just an import_function call. Stop here.
+    if (tokens.finished()) {
+        // Add a term to hold our output type
+        create_value(&contents, outputType, OUTPUT_PLACEHOLDER_NAME);
         return result;
     }
 
-    // Remove the name that function_from_header applied
-    rename(functionDef, get_name_for_attribute("function-def"));
+    // Parse this as a subroutine call
 
-    // Copy some syntax hints from the function def to the enclosing branch. Remove this
-    // once the data type is refactored.
-    if (functionDef->hasProperty("syntaxHints:whitespacePreColon"))
-        result->stringProp("syntaxHints:whitespacePreColon") =
-            functionDef->stringProp("syntaxHints:whitespacePreColon");
-    if (functionDef->hasProperty("syntaxHints:whitespacePostColon"))
-        result->stringProp("syntaxHints:whitespacePostColon") =
-            functionDef->stringProp("syntaxHints:whitespacePostColon");
-
-    initialize_subroutine(result);
-
-    // Bind this function's name immediately. Need to do this before parsing the branch,
-    // so that recursive calls will work.
-
-    branch.bindName(result, function_get_name(functionDef));
-
-    consume_branch_until_end(subBranch, tokens);
+    consume_branch_until_end(contents, tokens);
 
     // If there is an #out term, then it needs to be the last term. If #out is a
     // name binding into an inner branch then this might not be the case
-    if (subBranch.contains(OUTPUT_PLACEHOLDER_NAME) && 
-            subBranch[subBranch.length()-1]->name != OUTPUT_PLACEHOLDER_NAME) {
-        Term* copy = apply(&subBranch, COPY_FUNC, RefList(subBranch[OUTPUT_PLACEHOLDER_NAME]),
+    if (contents.contains(OUTPUT_PLACEHOLDER_NAME) && 
+            contents[contents.length()-1]->name != OUTPUT_PLACEHOLDER_NAME) {
+        Term* copy = apply(&contents, COPY_FUNC, RefList(contents[OUTPUT_PLACEHOLDER_NAME]),
                 OUTPUT_PLACEHOLDER_NAME);
         source_set_hidden(copy, true);
+    } else if (!contents.contains(OUTPUT_PLACEHOLDER_NAME)) {
+        // If there's no #out term, then create an extra term to hold the output type
+        Term* term = create_value(&contents, outputType, OUTPUT_PLACEHOLDER_NAME);
+        source_set_hidden(term, true);
     }
+
+    // If the #out term doesn't have the same type as the declared type, then coerce it
+    Term* outTerm = contents[contents.length()-1];
+    if (outTerm->type != outputType)
+        outTerm = apply(&contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType), OUTPUT_PLACEHOLDER_NAME);
 
     possible_whitespace(tokens);
 
@@ -378,6 +370,10 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         return compile_error_for_line(result, tokens, startPosition);
 
     tokens.consume(END);
+
+    // Officially make this a subroutine
+    function_get_evaluate(result) = subroutine_call_evaluate;
+    function_get_to_source_string(result) = subroutine_t::to_string;
 
     assert(is_value(result));
     assert(is_subroutine(result));

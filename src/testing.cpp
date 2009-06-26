@@ -126,30 +126,29 @@ void _test_equals_function(std::string a, std::string b,
     }
 }
 
-bool run_test_catching(TestCase& testCase)
-{
-    try {
-        gCurrentTestCase = testCase;
-        testCase.execute();
-
-        // the test code may declare itself failed
-        bool result = !gCurrentTestCase.failed;
-
-        post_test_sanity_check();
-        return result;
-    }
-    catch (std::runtime_error const& err) {
-        std::cout << "Error white running test case " << testCase.name << std::endl;
-        std::cout << err.what() << std::endl;
-        return false;
-    }
-}
-
-bool run_test(TestCase& testCase)
+bool run_test(TestCase& testCase, bool catch_exceptions)
 {
     gCurrentTestCase = testCase;
 
-    testCase.execute();
+    if (catch_exceptions) {
+        try {
+            gCurrentTestCase = testCase;
+            testCase.execute();
+
+            // the test code may declare itself failed
+            bool result = !gCurrentTestCase.failed;
+
+            post_test_sanity_check();
+            return result;
+        }
+        catch (std::runtime_error const& err) {
+            std::cout << "Error white running test case " << testCase.name << std::endl;
+            std::cout << err.what() << std::endl;
+            return false;
+        }
+    } else {
+        testCase.execute();
+    }
 
     post_test_sanity_check();
 
@@ -163,7 +162,7 @@ void run_test_named(std::string const& testName)
     std::vector<TestCase>::iterator it;
     for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
         if (it->name == testName) {
-            bool result = run_test(*it);
+            bool result = run_test(*it, true);
             if (result)
                 std::cout << testName << " succeeded" << std::endl;
             return;
@@ -182,7 +181,7 @@ void run_all_tests()
     int failureCount = 0;
     std::vector<TestCase>::iterator it;
     for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
-        bool result = run_test(*it);
+        bool result = run_test(*it, false);
         if (result) successCount++;
         else failureCount++;
     }

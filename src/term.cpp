@@ -103,7 +103,7 @@ std::string& Term::stringProp(std::string const& name)
 Ref& Term::refProp(std::string const& name)
 {
     Term* t = addProperty(name, REF_TYPE);
-    return deref(t);
+    return as_ref(t);
 }
 
 bool Term::boolPropOptional(std::string const& name, bool defaultValue)
@@ -171,7 +171,7 @@ bool& Term::asBool()
 
 Ref& Term::asRef()
 {
-    return deref(this);
+    return as_ref(this);
 }
 
 Branch& Term::asBranch()

@@ -153,17 +153,15 @@ void test_function_decl()
             "  return yo > 3\n"
             "end");
 
-    Function& funcData = get_subroutines_function_def(func);
-
     test_equals(func->name, "Myfunc");
     test_equals(function_get_name(func), "Myfunc");
 
-    test_assert(funcData.inputTypes[0] == STRING_TYPE);
-    test_assert(funcData.getInputProperties(0).name == "what");
-    test_assert(funcData.inputTypes[1] == STRING_TYPE);
-    test_assert(funcData.getInputProperties(1).name == "hey");
-    test_assert(funcData.inputTypes[2] == INT_TYPE);
-    test_assert(funcData.getInputProperties(2).name == "yo");
+    test_assert(function_get_input_type(func, 0) == STRING_TYPE);
+    test_assert(function_get_input_name(func, 0) == "what");
+    test_assert(function_get_input_type(func, 1) == STRING_TYPE);
+    test_assert(function_get_input_name(func, 1) == "hey");
+    test_assert(function_get_input_type(func, 2) == INT_TYPE);
+    test_assert(function_get_input_name(func, 2) == "yo");
     test_assert(function_get_output_type(func) == BOOL_TYPE);
 
     Branch& funcbranch = as_branch(func);

@@ -31,8 +31,8 @@ namespace cos_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "cos(float) : float");
-        as_function(main_func).feedbackFunc = 
+        Term* func = import_function(kernel, evaluate, "cos(float) : float");
+        function_get_feedback_func(func) = 
             import_function(kernel, feedback_evaluate, "cos_feedback(any, float) : float");
     }
 }

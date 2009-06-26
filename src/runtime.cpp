@@ -12,14 +12,6 @@ Term* get_global(std::string name)
     return NULL;
 }
 
-Function& get_function_data(Term* function)
-{
-    if (is_subroutine(function))
-        return get_subroutines_function_def(function);
-    else
-        return as_function(function);
-}
-
 void evaluate_term(Term* term)
 {
     if (term == NULL)
@@ -34,9 +26,9 @@ void evaluate_term(Term* term)
         return;
     }
 
-    Function& func = get_function_data(term->function);
+    EvaluateFunc evaluate = function_get_evaluate(term->function);
 
-    if (func.evaluate == NULL)
+    if (evaluate == NULL)
         return;
     
     // Make sure we have an allocated value. Allocate one if necessary
@@ -45,7 +37,7 @@ void evaluate_term(Term* term)
 
     // Execute the function
     try {
-        func.evaluate(term);
+        evaluate(term);
     }
     catch (std::exception const& err)
     {
@@ -108,82 +100,6 @@ void resize_list(Branch& list, int numElements, Term* type)
     }
 
     list.removeNulls();
-}
-
-int& as_int(Term* term)
-{
-    assert_type(term, INT_TYPE);
-    alloc_value(term);
-    return *((int*) term->value);
-}
-
-float& as_float(Term* term)
-{
-    assert_type(term, FLOAT_TYPE);
-    alloc_value(term);
-    return *((float*) term->value);
-}
-
-float to_float(Term* term)
-{
-    alloc_value(term);
-    if (term->type == FLOAT_TYPE)
-        return as_float(term);
-    else if (term->type == INT_TYPE)
-        return (float) as_int(term);
-    else
-        throw std::runtime_error("Type mismatch in to_float");
-}
-
-bool& as_bool(Term* term)
-{
-    assert_type(term, BOOL_TYPE);
-    alloc_value(term);
-    return *((bool*) term->value);
-}
-
-std::string& as_string(Term* term)
-{
-    assert_type(term, STRING_TYPE);
-    alloc_value(term);
-    return *((std::string*) term->value);
-}
-
-bool is_int(Term* term)
-{
-    return term->type == INT_TYPE;
-}
-
-bool is_float(Term* term)
-{
-    return term->type == FLOAT_TYPE;
-}
-
-bool is_bool(Term* term)
-{
-    return term->type == BOOL_TYPE;
-}
-
-bool is_string(Term* term)
-{
-    return term->type == STRING_TYPE;
-}
-
-bool is_ref(Term* term)
-{
-    return term->type == REF_TYPE;
-}
-
-Ref& deref(Term* term)
-{
-    assert_type(term, REF_TYPE);
-    return *((Ref*) term->value);
-}
-
-void*& as_void_ptr(Term* term)
-{
-    assert_type(term, VOID_PTR_TYPE);
-    return term->value;
 }
 
 } // namespace circa

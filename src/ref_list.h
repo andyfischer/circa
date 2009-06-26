@@ -97,6 +97,12 @@ struct RefList
     }
 
     void appendAll(RefList const& list);
+
+    void insert(int index, Term* term)
+    {
+        _items.insert(_items.begin()+index, term);
+    }
+
     void setAt(unsigned int index, Term* term)
     {
         // Check for a previous bug
