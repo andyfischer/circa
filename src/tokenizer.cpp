@@ -55,6 +55,7 @@ const char* get_token_text(int match)
         case END: return "end";
         case IF: return "if";
         case ELSE: return "else";
+        case ELIF: return "elif";
         case FOR: return "for";
         case STATE: return "state";
         case DEF: return "def";
@@ -247,6 +248,7 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, END)) return;
         if (try_to_consume_keyword(context, IF)) return;
         if (try_to_consume_keyword(context, ELSE)) return;
+        if (try_to_consume_keyword(context, ELIF)) return;
         if (try_to_consume_keyword(context, FOR)) return;
         if (try_to_consume_keyword(context, STATE)) return;
         if (try_to_consume_keyword(context, RETURN)) return;

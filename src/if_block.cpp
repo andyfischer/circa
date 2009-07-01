@@ -97,4 +97,4 @@ void update_if_block_joining_branch(Term* ifCall)
     }
 }
 
-}
+} // namespace circa
