@@ -73,6 +73,7 @@ const int TYPE = 52;
 const int END = 53;
 const int IF = 54;
 const int ELSE = 55;
+const int ELIF = 63;
 const int FOR = 56;
 const int STATE = 57;
 const int RETURN = 58;
