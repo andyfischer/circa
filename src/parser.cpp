@@ -1017,6 +1017,11 @@ Term* dot_expression(Branch& branch, TokenStream& tokens)
 
             result = apply(&branch, function, inputs);
             result->stringProp("syntaxHints:declarationStyle") = "dot-concat";
+
+            if (function == UNKNOWN_FUNCTION) {
+                change_function(result, UNKNOWN_FIELD_FUNC);
+                result->stringProp("field-name") = rhsIdent;
+            }
         }
 
         lhs = result;

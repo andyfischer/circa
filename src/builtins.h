@@ -46,6 +46,7 @@ extern Term* SET_INDEX_FUNC;
 extern Term* SUB_FUNC;
 extern Term* TYPE_TYPE;
 extern Term* UNKNOWN_FUNCTION;
+extern Term* UNKNOWN_FIELD_FUNC;
 extern Term* UNKNOWN_IDENTIFIER_FUNC;
 extern Term* UNKNOWN_TYPE_FUNC;
 extern Term* UNRECOGNIZED_EXPRESSION_FUNC;

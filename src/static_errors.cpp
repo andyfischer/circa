@@ -75,6 +75,9 @@ StaticError get_static_error(Term* term)
     if (term->function == UNRECOGNIZED_EXPRESSION_FUNC)
         return SERROR_UNRECGONIZED_EXPRESSION;
 
+    if (term->function == UNKNOWN_FIELD_FUNC)
+        return SERROR_UNKNOWN_FIELD;
+
     return SERROR_NO_ERROR;
 }
 
@@ -126,6 +129,9 @@ std::string get_static_error_message(Term* term)
         return out.str();
     case SERROR_UNKNOWN_IDENTIFIER:
         out << "Unknown identifier: " << term->name;
+        return out.str();
+    case SERROR_UNKNOWN_FIELD:
+        out << "Unknown field: " << term->stringProp("field-name");
         return out.str();
     case SERROR_UNRECGONIZED_EXPRESSION:
         out << "Unrecognized expression: " << term->function->stringProp("message");
