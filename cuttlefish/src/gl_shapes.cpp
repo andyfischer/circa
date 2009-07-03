@@ -35,6 +35,7 @@ void gl_triangles(Term* caller)
     int color = caller->input(1)->asInt();
 
     _unpack_gl_color(color);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBegin(GL_TRIANGLES);
 
     for (int i=0; i < list.length(); i++) {

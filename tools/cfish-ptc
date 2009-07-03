@@ -1,0 +1,2 @@
+cd $CIRCA_HOME
+scons cfish && cd ptc && cfish ptc.ca

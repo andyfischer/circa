@@ -84,7 +84,6 @@ void hosted_draw_image(Term* caller)
     float y1 = caller->input(3)->toFloat();
     float x2 = caller->input(4)->toFloat();
     float y2 = caller->input(5)->toFloat();
-    Branch& output = as_branch(caller);
 
     if (texid == 0) {
         texid = load_image_to_texture(filename, caller);
@@ -92,6 +91,7 @@ void hosted_draw_image(Term* caller)
     }
 
     glBindTexture(GL_TEXTURE_2D, texid);
+    glColor4f(1,1,1,1);
 
     glBegin(GL_QUADS);
 
