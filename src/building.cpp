@@ -16,26 +16,29 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     // Check to specialize function
     function = specialize_function(function, inputs);
 
+    // Create the term
+    Term* result = new Term();
+    result->function = function;
+
     // If 'function' has hidden state, then create a container for that state, if needed
     if (is_function_stateful(function) && (inputs.length() < function_num_inputs(function)))
     {
-        Term* stateContainer = create_value(branch, function_get_hidden_state_type(function));
+        std::stringstream new_value_name;
+        new_value_name << "#hidden_state_for_" << format_global_id(result);
+        Term* stateContainer = create_value(branch, function_get_hidden_state_type(function),
+                new_value_name.str());
         source_set_hidden(stateContainer, true);
         set_stateful(stateContainer, true);
         inputs.prepend(stateContainer);
     }
 
-    // Create the term
-    Term* result = new Term();
-
+    // Add term to branch
     if (branch != NULL) {
         branch->append(result);
 
         if (name != "")
             branch->bindName(result, name);
     }
-
-    result->function = function;
 
     // Initialize inputs
     for (int i=0; i < inputs.length(); i++)

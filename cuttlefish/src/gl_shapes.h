@@ -9,6 +9,6 @@ namespace gl_shapes {
 
 void register_functions(circa::Branch& branch);
 
-}
+} // namespace gl_shapes
 
 #endif
