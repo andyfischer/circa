@@ -112,13 +112,13 @@ int main( int argc, char* args[] )
     // Initialize stuff
     circa::initialize();
 
-    SCRIPT_ROOT = &create_branch(circa::KERNEL, "c2d_root");
+    SCRIPT_ROOT = &create_branch(circa::KERNEL, "cuttlefish_main");
 
     input::initialize(*SCRIPT_ROOT);
 
-    gl_shapes::register_functions(*SCRIPT_ROOT);
-    mesh::register_functions(*SCRIPT_ROOT);
-    textures::register_functions(*SCRIPT_ROOT);
+    gl_shapes::initialize(*SCRIPT_ROOT);
+    mesh::initialize(*SCRIPT_ROOT);
+    textures::initialize(*SCRIPT_ROOT);
     ttf::initialize(*SCRIPT_ROOT);
 
     // Import constants
