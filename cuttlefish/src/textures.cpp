@@ -107,7 +107,7 @@ void hosted_image(Term* caller)
     glEnd();
 }
 
-void register_functions(circa::Branch& branch)
+void initialize(circa::Branch& branch)
 {
     import_function(branch, hosted_load_texture, "load_texture(string) : int");
     import_function(branch, hosted_image,

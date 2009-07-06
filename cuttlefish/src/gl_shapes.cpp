@@ -66,7 +66,7 @@ void gl_line_strip(Term* caller)
     glEnd();
 }
 
-void register_functions(Branch& branch)
+void initialize(Branch& branch)
 {
     import_function(branch, background, "background(int)");
     import_function(branch, gl_triangles, "gl_triangles(List, int)");
