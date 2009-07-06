@@ -76,7 +76,7 @@ void hosted_load_texture(Term* caller)
     }
 }
 
-void hosted_draw_image(Term* caller)
+void hosted_image(Term* caller)
 {
     int& texid = caller->input(0)->asInt();
     std::string filename = caller->input(1)->asString();
@@ -110,8 +110,8 @@ void hosted_draw_image(Term* caller)
 void register_functions(circa::Branch& branch)
 {
     import_function(branch, hosted_load_texture, "load_texture(string) : int");
-    import_function(branch, hosted_draw_image,
-            "draw_image(state int texid, string filename, float,float,float,float)");
+    import_function(branch, hosted_image,
+            "image(state int texid, string filename, float,float,float,float)");
 }
 
 } // namespace textures
