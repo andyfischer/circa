@@ -36,11 +36,11 @@ StaticError get_static_error_for_index(Term* term, int index)
 
 StaticError get_static_error(Term* term)
 {
-    bool varArgs = function_get_variable_args(term->function);
-    int funcNumInputs = function_num_inputs(term->function);
-
     if (term->function == NULL) 
         return SERROR_NULL_FUNCTION;
+
+    bool varArgs = function_get_variable_args(term->function);
+    int funcNumInputs = function_num_inputs(term->function);
 
     // Check # of inputs
     if (!varArgs && (term->inputs.length() != funcNumInputs))

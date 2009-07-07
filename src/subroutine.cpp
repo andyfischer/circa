@@ -90,9 +90,8 @@ void subroutine_call_evaluate(Term* caller)
     if (hiddenState != NULL && !is_subroutine_state_expanded(hiddenState))
         expand_subroutines_hidden_state(caller, hiddenState);
 
-    Branch& branch = (hiddenState == NULL) ?
-                         as_branch(caller->function)
-                         : as_branch(hiddenState);
+    Term* function = hiddenState == NULL ? (Term*) caller->function : hiddenState;
+    Branch& functionBranch = as_branch(function);
 
     int num_inputs = function_num_inputs(caller->function);
 
@@ -107,22 +106,24 @@ void subroutine_call_evaluate(Term* caller)
     // Implant inputs
     for (int input=0; input < num_inputs; input++) {
 
-        std::string inputName = function_get_input_name(caller->function, input);
-        if (inputName == "#state")
+        std::string inputName = function_get_input_name(function, input);
+        if (inputName == "#state") {
+            assert(input == 0);
             continue;
+        }
 
-        Term* term = function_get_input_placeholder(caller->function, input);
+        Term* term = function_get_input_placeholder(function, input);
 
         assert(term->function == INPUT_PLACEHOLDER_FUNC);
 
         assign_value(caller->inputs[input], term);
     }
 
-    evaluate_branch(branch);
+    evaluate_branch(functionBranch);
 
     // Copy output
-    if (branch.length() > 0) {
-        Term* output = branch[branch.length()-1];
+    if (functionBranch.length() > 0) {
+        Term* output = functionBranch[functionBranch.length()-1];
         assert(output->name == "#out");
         assign_value(output, caller);
     }
