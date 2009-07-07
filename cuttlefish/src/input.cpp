@@ -102,7 +102,7 @@ void handle_key_press(SDL_Event &event, int key)
     }
 }
 
-void region_clicked(Term* caller)
+void mouse_clicked(Term* caller)
 {
     //int& id = caller->input(0)->asInt();
     Branch& region = caller->input(0)->asBranch();
@@ -111,18 +111,25 @@ void region_clicked(Term* caller)
     float x2 = region[2]->toFloat();
     float y2 = region[3]->toFloat();
 
-#if 0
-    if (id == 0) {
-        static next_id = 1;
-        id = next_id++;
-    }
-#endif
-
     as_bool(caller) = (MOUSE_JUST_CLICKED
         && x1 <= MOUSE_X
         && y1 <= MOUSE_Y
         && x2 >= MOUSE_X
         && y2 >= MOUSE_Y);
+}
+
+void mouse_over(Term* caller)
+{
+    Branch& region = caller->input(0)->asBranch();
+    float x1 = region[0]->toFloat();
+    float y1 = region[1]->toFloat();
+    float x2 = region[2]->toFloat();
+    float y2 = region[3]->toFloat();
+
+    as_bool(caller) = x1 <= MOUSE_X
+        && y1 <= MOUSE_Y
+        && x2 >= MOUSE_X
+        && y2 >= MOUSE_Y;
 }
 
 void initialize(Branch& branch)
@@ -142,7 +149,8 @@ void initialize(Branch& branch)
     int_value(&branch, SDLK_RIGHT, "KEY_RIGHT");
     int_value(&branch, SDLK_SPACE, "KEY_SPACE");
 
-    import_function(branch, region_clicked, "region_clicked(List region) : bool");
+    import_function(branch, mouse_clicked, "mouse_clicked(List region) : bool");
+    import_function(branch, mouse_over, "mouse_over(List region) : bool");
 }
 
 } // namespace input

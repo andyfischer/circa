@@ -79,6 +79,7 @@ struct Branch
 bool is_branch(Term* term);
 Branch& as_branch(Term* term);
 std::string get_name_for_attribute(std::string attribute);
+Term* get_branch_attribute(Branch& branch, std::string const& attr);
 Branch* get_outer_scope(Branch& branch);
 
 Branch& create_branch(Branch* owner, std::string const& name="");
