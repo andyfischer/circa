@@ -239,6 +239,15 @@ std::string get_name_for_attribute(std::string attribute)
     return "#attr:" + attribute;
 }
 
+Term* get_branch_attribute(Branch& branch, std::string const& attr)
+{
+    std::string name = get_name_for_attribute(attr);
+    if (branch.contains(name))
+        return branch[name];
+    else
+        return NULL;
+}
+
 Branch* get_outer_scope(Branch& branch)
 {
     if (branch.owningTerm == NULL)
@@ -304,6 +313,8 @@ void duplicate_branch(Branch& source, Branch& dest)
 
 void parse_script(Branch& branch, std::string const& filename)
 {
+    std::cout << "parsing file: " << filename << std::endl;
+
     std::string fileContents = read_text_file(filename);
 
     parser::compile(&branch, parser::statement_list, fileContents);
