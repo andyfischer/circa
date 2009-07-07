@@ -77,12 +77,13 @@ void handle_key_press(SDL_Event &event, int key)
             CONTINUE_MAIN_LOOP = false;
 
         case SDLK_e:
-            circa::reset_state(*USERS_BRANCH);
+            reset_state(*USERS_BRANCH);
             break;
 
-        case SDLK_r:
-            circa::reload_branch_from_file(*USERS_BRANCH);
+        case SDLK_r: {
+            reload_branch_from_file(*USERS_BRANCH, std::cout);
             break;
+        }
     }
 
     // Control keys

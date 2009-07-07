@@ -313,8 +313,6 @@ void duplicate_branch(Branch& source, Branch& dest)
 
 void parse_script(Branch& branch, std::string const& filename)
 {
-    std::cout << "parsing file: " << filename << std::endl;
-
     std::string fileContents = read_text_file(filename);
 
     parser::compile(&branch, parser::statement_list, fileContents);
@@ -341,17 +339,23 @@ Term* find_named(Branch* branch, std::string const& name)
     return get_global(name);
 }
 
-void reload_branch_from_file(Branch& branch)
+bool reload_branch_from_file(Branch& branch, std::ostream &errors)
 {
     std::string filename = as_string(branch[get_name_for_attribute("source-file")]);
 
-    Branch original;
-    duplicate_branch(branch, original);
+    Branch replacement;
+    replacement.owningTerm = branch.owningTerm;
+    parse_script(replacement, filename);
 
+    if (has_static_errors(replacement)) {
+        print_static_errors_formatted(replacement, errors);
+        return false;
+    }
+
+    migrate_stateful_values(branch, replacement);
     branch.clear();
-
-    parse_script(branch, filename);
-    migrate_stateful_values(original, branch);
+    duplicate_branch(replacement, branch);
+    return true;
 }
 
 void persist_branch_to_file(Branch& branch)
