@@ -141,6 +141,14 @@ void specialization_to_output_type()
     test_equals(call->field(1)->toFloat(), 2.0);
 }
 
+void stateful_function_with_arguments()
+{
+    // This code once had a bug
+    Branch branch;
+    branch.eval("def myfunc(int i) : int\nstate s\nreturn i\nend");
+    Term* call = branch.eval("myfunc(5)");
+    test_assert(call->asInt() == 5);
+}
 
 void register_tests()
 {
@@ -150,6 +158,7 @@ void register_tests()
     REGISTER_TEST_CASE(subroutine_tests::initialize_state_type);
     REGISTER_TEST_CASE(subroutine_tests::shadow_input);
     REGISTER_TEST_CASE(subroutine_tests::specialization_to_output_type);
+    REGISTER_TEST_CASE(subroutine_tests::stateful_function_with_arguments);
 }
 
 } // namespace refactoring_tests
