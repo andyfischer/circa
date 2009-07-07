@@ -57,7 +57,6 @@ const char* to_string(Term* term)
 }
 
 Term* find_named(Branch* branch, const char* name) { return circa::find_named(branch, name); }
-void reload_branch_from_file(Branch* branch) { circa::reload_branch_from_file(*branch); }
 Term* find_term_by_id(Branch* branch, unsigned int i) { return find_term_by_id(*branch, i); }
 void evaluate_term(Term* term) { circa::evaluate_term(term); }
 
