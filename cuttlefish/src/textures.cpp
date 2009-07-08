@@ -69,11 +69,14 @@ namespace textures {
 
 void hosted_load_texture(Term* caller)
 {
-    if (as_int(caller) == 0) {
-        std::string filename = as_string(caller->input(0));
+    int& texid = caller->input(0)->asInt();
+
+    if (texid == 0) {
+        std::string filename = caller->input(1)->asString();
         GLuint id = load_image_to_texture(filename, caller);
-        as_int(caller) = id;
+        texid = id;
     }
+    caller->asInt() = texid;
 }
 
 void hosted_image(Term* caller)
@@ -109,7 +112,7 @@ void hosted_image(Term* caller)
 
 void initialize(circa::Branch& branch)
 {
-    import_function(branch, hosted_load_texture, "load_texture(string) : int");
+    import_function(branch, hosted_load_texture, "load_texture(state int, string) : int");
     import_function(branch, hosted_image,
             "image(state int texid, string filename, float,float,float,float)");
 }
