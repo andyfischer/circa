@@ -8,6 +8,7 @@ src/register_all_tests.cpp
 # build results:
 build
 obj
+deploy
 bin/circa
 cuttlefish/app
 *.o

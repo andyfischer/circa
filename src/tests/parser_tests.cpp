@@ -373,6 +373,17 @@ void test_unary_minus()
     test_assert(b->function->name == "neg_i");
     test_assert(b->input(0) == a);
     test_equals(b->toFloat(), -1.0);
+
+    // Sometimes, literals with a - sign are supposed to turn that into a minus operation
+    //TODO
+    //Term* c = branch.eval("2-1");
+    //test_assert(c->function->name == "sub_i");
+    //test_assert(c->asInt() == 1);
+
+    // Sometimes the - sign is part of the number
+    Term* d = branch.eval("-3");
+    test_assert(is_value(d));
+    test_assert(d->asInt() == -3);
 }
 
 void test_array_index_access()
@@ -432,7 +443,7 @@ void test_anonymous_type_in_subroutine_decl()
 {
     Branch branch;
     //branch.eval("def myfunc([int] a) : int\nend");
-
+    // TODO
 }
 
 void register_tests()
