@@ -2,6 +2,7 @@
 import os
 
 Import("SDL_ROOT")
+Import("WINDOWS")
 
 def get_source_files(dir):
     result = []
@@ -16,3 +17,9 @@ def get_source_files(dir):
 binary = SDL_ROOT.Program("#build/bin/cfish", source = get_source_files('src'))
 SDL_ROOT.Alias('cuttlefish', binary)
 SDL_ROOT.Alias('cfish', binary)
+
+if WINDOWS:
+    # Embed manifest
+    print "embedding manifest.."
+    SDL_ROOT.AddPostAction(binary,
+        'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;1')

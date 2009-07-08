@@ -17,7 +17,8 @@ WINDOWS = os.name == 'nt'
 # a little bit of special behavior for using frameworks.
 MAC = os.path.exists('/Library/Frameworks')
 
-DEBUG = True
+# Release-mode flag
+DEBUG = not ARGUMENTS.get('release', False)
 
 # Common build flags
 if POSIX:
@@ -42,6 +43,10 @@ if WINDOWS:
         ROOT.Append(CPPDEFINES = ["NDEBUG"])
 
 Export('ROOT')
+Export('WINDOWS')
+Export('MAC')
+Export('POSIX')
+Export('DEBUG')
 
 # Build Circa library
 CIRCA_ENV = ROOT.Clone()
@@ -102,6 +107,7 @@ source_directory_into_one_cpp('src/builtin_functions', 'all_builtin_functions')
 
 circa_staticlib = CIRCA_ENV.StaticLibrary('build/bin/circa', BUILD_FILES)
 circa_binary = CIRCA_ENV.Program('build/bin/circa', 'build/src/main.cpp', LIBS=[circa_staticlib])
+
 
 CIRCA_ENV.Default(circa_binary)
 
