@@ -16,10 +16,10 @@ void evaluate_branch(Branch& branch, Term* errorListener=NULL);
 void error_occurred(Term* errorTerm, std::string const& message);
 
 // Perform 'apply' and then evaluate the result.
-Term* apply_and_eval(Branch* branch, Term* function, RefList const& inputs);
+Term* apply_and_eval(Branch& branch, Term* function, RefList const& inputs);
 
 // Find the named function in this branch, and then do the above 'apply_and_eval'.
-Term* apply_and_eval(Branch* branch,
+Term* apply_and_eval(Branch& branch,
                     std::string const& functionName,
                     RefList const& inputs);
 

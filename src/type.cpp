@@ -120,7 +120,7 @@ bool value_fits_type(Term* valueTerm, Term* type)
 
 Term* quick_create_type(Branch& branch, std::string name)
 {
-    Term* term = create_value(&branch, TYPE_TYPE);
+    Term* term = create_value(branch, TYPE_TYPE);
 
     if (name != "") {
         as_type(term).name = name;
@@ -145,7 +145,7 @@ void setup_empty_type(Type& type)
 
 Term* create_empty_type(Branch& branch, std::string name)
 {
-    Term* term = create_value(&branch, TYPE_TYPE);
+    Term* term = create_value(branch, TYPE_TYPE);
     Type& type = as_type(term);
     setup_empty_type(type);
     type.name = name;
@@ -164,7 +164,7 @@ void initialize_compound_type(Type& type)
 
 Term* create_compound_type(Branch& branch, std::string const& name)
 {
-    Term* term = create_value(&branch, TYPE_TYPE, name);
+    Term* term = create_value(branch, TYPE_TYPE, name);
     initialize_compound_type(as_type(term));
     branch.bindName(term, name);
     return term;

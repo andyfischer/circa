@@ -8,11 +8,11 @@ namespace building_tests {
 void test_create_value()
 {
     Branch branch;
-    Term *term = create_value(&branch, INT_TYPE);
+    Term *term = create_value(branch, INT_TYPE);
     test_assert(term->type == INT_TYPE);
     test_assert(term->value != NULL);
 
-    term = create_value(&branch, BRANCH_TYPE);
+    term = create_value(branch, BRANCH_TYPE);
     test_assert(term->value != NULL);
     // test_assert(as_branch(term).owningTerm == term);
 }
@@ -20,10 +20,10 @@ void test_create_value()
 void test_int_value()
 {
     Branch branch;
-    Term *term = int_value(&branch, -2);
+    Term *term = int_value(branch, -2);
     test_assert(as_int(term) == -2);
 
-    Term *term2 = int_value(&branch, 154, "george");
+    Term *term2 = int_value(branch, 154, "george");
     test_assert(term2 == branch.get("george"));
     test_assert(term2->name == "george");
     test_assert(as_int(term2) == 154);
@@ -35,7 +35,7 @@ void test_create_duplicate()
 
     Term* a = branch.eval("state int a = 5");
 
-    Term* b = create_duplicate(&branch, a);
+    Term* b = create_duplicate(branch, a);
 
     test_assert(a->function == b->function);
     test_assert(a->type == b->type);
@@ -46,8 +46,8 @@ void test_rewrite_as_value()
 {
     Branch branch;
 
-    Term* a = create_value(&branch, INT_TYPE);
-    Term* b = apply(&branch, ADD_FUNC, RefList(a,a));
+    Term* a = create_value(branch, INT_TYPE);
+    Term* b = apply(branch, ADD_FUNC, RefList(a,a));
 
     test_assert(branch[1] == b);
 

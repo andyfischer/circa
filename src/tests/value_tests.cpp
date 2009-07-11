@@ -11,8 +11,8 @@ void test_duplicate()
 {
     Branch branch;
 
-    Term* a = create_value(&branch, INT_TYPE);
-    Term* b = create_value(&branch, INT_TYPE);
+    Term* a = create_value(branch, INT_TYPE);
+    Term* b = create_value(branch, INT_TYPE);
 
     as_int(a) = 2;
     as_int(b) = 3;
@@ -35,8 +35,8 @@ void test_assign()
 {
     Branch branch;
 
-    Term* a = create_value(&branch, INT_TYPE);
-    Term* b = create_value(&branch, INT_TYPE);
+    Term* a = create_value(branch, INT_TYPE);
+    Term* b = create_value(branch, INT_TYPE);
 
     as_int(a) = 2;
     as_int(b) = 3;

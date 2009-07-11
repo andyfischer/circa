@@ -70,7 +70,7 @@ void test_value_fits_type()
 {
     Branch branch;
 
-    Term* a = int_value(&branch, 5);
+    Term* a = int_value(branch, 5);
     test_assert(value_fits_type(a, INT_TYPE));
     test_assert(value_fits_type(a, FLOAT_TYPE));
     test_assert(!value_fits_type(a, STRING_TYPE));
@@ -137,15 +137,15 @@ void test_default_values()
 {
     Branch branch;
 
-    Term* i = int_value(&branch, 5);
+    Term* i = int_value(branch, 5);
     assign_value_to_default(i);
     test_assert(i->asInt() == 0);
 
-    Term* f = float_value(&branch, 5);
+    Term* f = float_value(branch, 5);
     assign_value_to_default(f);
     test_assert(f->asFloat() == 0);
 
-    Term* s = string_value(&branch, "hello");
+    Term* s = string_value(branch, "hello");
     assign_value_to_default(s);
     test_assert(s->asString() == "");
 }

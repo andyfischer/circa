@@ -11,8 +11,8 @@ namespace primitive_type_tests {
 void strings()
 {
     Branch branch;
-    Term* str1 = string_value(&branch, "one");
-    Term* str2 = string_value(&branch, "two");
+    Term* str1 = string_value(branch, "one");
+    Term* str2 = string_value(branch, "two");
 
     test_assert(as_string(str1) == "one");
     test_assert(as_string(str2) == "two");
@@ -25,10 +25,10 @@ void strings()
 
 void builtin_objects()
 {
-    test_assert(find_named(KERNEL,"int") == INT_TYPE);
-    test_assert(find_named(KERNEL,"float") == FLOAT_TYPE);
-    test_assert(find_named(KERNEL,"string") == STRING_TYPE);
-    test_assert(find_named(KERNEL,"bool") == BOOL_TYPE);
+    test_assert(find_named(*KERNEL,"int") == INT_TYPE);
+    test_assert(find_named(*KERNEL,"float") == FLOAT_TYPE);
+    test_assert(find_named(*KERNEL,"string") == STRING_TYPE);
+    test_assert(find_named(*KERNEL,"bool") == BOOL_TYPE);
 }
 
 void assign_int_to_float()

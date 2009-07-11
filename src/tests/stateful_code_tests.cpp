@@ -48,8 +48,8 @@ void subroutine_expansion_during_migrate()
 
     branch.eval("def myfunc(); state i : int; end");
 
-    Branch& source = create_branch(&branch, "source");
-    Branch& dest = create_branch(&branch, "dest");
+    Branch& source = create_branch(branch, "source");
+    Branch& dest = create_branch(branch, "dest");
 
     Term* sourceCall = source.eval("myfunc()");
     Term* destCall = dest.compile("myfunc()");
@@ -76,7 +76,7 @@ void test_load_and_save()
     as_int(statefulTerm) = 1;
 
     Branch state;
-    Term* value_i = create_value(&state, INT_TYPE, "i");
+    Term* value_i = create_value(state, INT_TYPE, "i");
     as_int(value_i) = 5;
 
     test_assert(as_int(statefulTerm) == 1);
@@ -138,7 +138,7 @@ void initialize_from_expression()
 void one_time_assignment()
 {
     Branch branch;
-    Term* a = int_value(&branch, 3, "a");
+    Term* a = int_value(branch, 3, "a");
     Term* s = branch.compile("state s = a");
 
     // change value before evaluate_branch, to make sure it's not stored
@@ -257,9 +257,9 @@ void test_migrate_stateful_compound_value()
     Branch source;
     Term* l_source = source.eval("state l = []");
 
-    int_value(&as_branch(l_source), 1);
-    int_value(&as_branch(l_source), 2);
-    int_value(&as_branch(l_source), 3);
+    int_value(as_branch(l_source), 1);
+    int_value(as_branch(l_source), 2);
+    int_value(as_branch(l_source), 3);
 
     Branch dest;
     Term* l = dest.eval("state l = []");

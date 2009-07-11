@@ -274,7 +274,11 @@ void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string
     for (it = branch.names.begin(); it != branch.names.end(); ++it) {
         // Ignore names that aren't bound in the outer branch
         std::string name = it->first;
-        Term* outer = find_named(get_outer_scope(branch), name);
+        Term* outer = NULL;
+        
+        if (get_outer_scope(branch) != NULL)
+            outer = find_named(*get_outer_scope(branch), name);
+
         if (outer == NULL)
             continue;
 

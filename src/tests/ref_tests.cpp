@@ -91,8 +91,8 @@ void test_list()
 void remap_properties()
 {
     Branch branch;
-    Term* a = int_value(&branch, 1, "a");
-    Term* b = int_value(&branch, 2, "b");
+    Term* a = int_value(branch, 1, "a");
+    Term* b = int_value(branch, 2, "b");
     b->refProp("test_property") = a;
 
     Branch duplicate;

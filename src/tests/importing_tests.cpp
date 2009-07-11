@@ -35,7 +35,7 @@ void test_expose_value()
 
     int a = 1;
 
-    expose_value(&branch, &a, "a");
+    expose_value(branch, &a, "a");
     Term* b = branch.eval("b = a + 2");
 
     test_assert(b);

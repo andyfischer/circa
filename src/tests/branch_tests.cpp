@@ -11,7 +11,7 @@ void test_remove()
 {
     Branch branch;
 
-    create_value(&branch, INT_TYPE, "a");
+    create_value(branch, INT_TYPE, "a");
 
     test_assert(branch.length() == 1);
     test_assert(branch.contains("a"));
@@ -25,8 +25,8 @@ void test_remove()
 void test_duplicate()
 {
     Branch original;
-    Term* term1 = int_value(&original, 5);
-    Term* term2 = string_value(&original, "yarn");
+    Term* term1 = int_value(original, 5);
+    Term* term2 = string_value(original, "yarn");
     original.bindName(term1, "term1");
     original.bindName(term2, "term two");
 
@@ -146,7 +146,7 @@ void find_name_in_outer_branch()
     Term* inner_branch = as_branch(outer_branch).eval("Branch()");
     alloc_value(inner_branch);
 
-    test_assert(find_named(&as_branch(inner_branch), "a") == a);
+    test_assert(find_named(as_branch(inner_branch), "a") == a);
 }
 
 void test_migrate()

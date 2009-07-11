@@ -17,7 +17,7 @@ namespace greater_than_function {
 
     void setup(Branch& kernel)
     {
-        Term* main = create_overloaded_function(&kernel, "greater_than");
+        Term* main = create_overloaded_function(kernel, "greater_than");
         import_function_overload(main, evaluate_f, "greater_than(int,int) : bool");
         import_function_overload(main, evaluate_f, "greater_than(float,float) : bool");
     }

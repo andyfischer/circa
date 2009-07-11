@@ -83,15 +83,13 @@ std::string get_name_for_attribute(std::string attribute);
 Term* get_branch_attribute(Branch& branch, std::string const& attr);
 Branch* get_outer_scope(Branch& branch);
 
-Branch& create_branch(Branch* owner, std::string const& name="");
-
 void duplicate_branch(Branch& source, Branch& dest);
 
 void parse_script(Branch& branch, std::string const& filename);
 void evaluate_script(Branch& branch, std::string const& filename);
 
 Term* find_term_by_id(Branch& branch, unsigned int id);
-Term* find_named(Branch* branch, std::string const& name);
+Term* find_named(Branch& branch, std::string const& name);
 
 bool reload_branch_from_file(Branch& branch, std::ostream& errors);
 void persist_branch_to_file(Branch& branch);

@@ -48,7 +48,7 @@ namespace mult_function {
 
     void setup(Branch& kernel)
     {
-        MULT_FUNC = create_overloaded_function(&kernel, "mult");
+        MULT_FUNC = create_overloaded_function(kernel, "mult");
 
         Term* mult_i = import_function_overload(MULT_FUNC, evaluate_i, "mult_i(int,int) : int");
 

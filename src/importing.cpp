@@ -25,7 +25,7 @@ Term* import_function_overload(Term* overload, EvaluateFunc evaluate, std::strin
     return import_function(as_branch(overload), evaluate, header);
 }
 
-Term* expose_value(Branch* branch, void* value, Term* type, std::string const& name)
+Term* expose_value(Branch& branch, void* value, Term* type, std::string const& name)
 {
     Term* term = apply(branch, VALUE_FUNC, RefList(), name);
     change_type(term, type);
@@ -34,11 +34,11 @@ Term* expose_value(Branch* branch, void* value, Term* type, std::string const& n
     return term;
 }
 
-Term* expose_value(Branch* branch, int* value, std::string const& name)
+Term* expose_value(Branch& branch, int* value, std::string const& name)
 {
     return expose_value(branch, value, INT_TYPE, name);
 }
-Term* expose_value(Branch* branch, float* value, std::string const& name)
+Term* expose_value(Branch& branch, float* value, std::string const& name)
 {
     return expose_value(branch, value, FLOAT_TYPE, name);
 }

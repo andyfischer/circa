@@ -39,7 +39,7 @@ namespace add_function {
 
     void setup(Branch& kernel)
     {
-        ADD_FUNC = create_overloaded_function(&kernel, "add");
+        ADD_FUNC = create_overloaded_function(kernel, "add");
 
         Term* add_i = import_function_overload(ADD_FUNC, evaluate_i, "add_i(int...) : int");
 

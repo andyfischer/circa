@@ -16,7 +16,7 @@ namespace list_function {
 
         // Add terms if necessary
         for (int i=dest.length(); i < caller->numInputs(); i++) {
-            create_duplicate(&dest, caller->input(i));
+            create_duplicate(dest, caller->input(i));
         }
 
         // Remove terms if necessary

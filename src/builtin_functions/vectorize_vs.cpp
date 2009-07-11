@@ -26,7 +26,7 @@ namespace vectorize_vs_function {
         if (output.length() == 0) {
             output.clear();
             for (int i=0; i < left.length(); i++)
-                apply(&output, func, RefList(left[i], right));
+                apply(output, func, RefList(left[i], right));
         }
 
         evaluate_branch(output);
