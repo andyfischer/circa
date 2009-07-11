@@ -37,7 +37,7 @@ void BranchIterator::advance()
     Term* term = current();
 
     // check to start an inner branch
-    if (is_branch(term)
+    if (term != NULL && is_branch(term)
             && is_value_alloced(term)
             && (as_branch(term).length() > 0)) {
         int firstIndex = _backwards ? as_branch(term).length() - 1 : 0;

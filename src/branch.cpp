@@ -45,6 +45,15 @@ void Branch::insert(int index, Term* term)
     }
 }
 
+void Branch::moveToEnd(Term* term)
+{
+    assert(term->owningBranch == this);
+    int index = _terms.findIndex(term);
+    assert(index >= 0);
+    _terms.append(term); // do this first so that the term doesn't lose references
+    _terms[index] = NULL;
+}
+
 void Branch::remove(Term* term)
 {
     // remove name binding if necessary

@@ -193,6 +193,7 @@ void test_assign()
     Term* source = branch.eval("[3 4]");
     Term* dest0 = as_branch(dest)[0];
     Term* dest1 = as_branch(dest)[1];
+
     assign_value(source, dest);
     test_assert(is_int(dest0));
     test_assert(as_int(dest0) == 3);

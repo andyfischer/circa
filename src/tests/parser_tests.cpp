@@ -423,8 +423,6 @@ void test_literal_list()
     Term* a = branch.eval("a = 1");
     Term* l = branch.eval("l = [1+2, a, sqrt(sqr(a))]");
 
-    //std::cout << branch_to_string_raw(branch);
-
     // Make sure that the extra values are created outside of the list
     // and in the proper order.
     test_assert(branch[0] == a);
