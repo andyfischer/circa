@@ -1281,7 +1281,7 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 
     tokens.consume(LBRACKET);
 
-    Term* result = apply(NULL, BRANCH_FUNC, RefList());
+    Term* result = apply(&branch, BRANCH_FUNC, RefList());
 
     while (!tokens.nextIs(RBRACKET) && !tokens.finished()) {
 
@@ -1307,14 +1307,14 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
             steal_term(term, as_branch(result));
     }
 
-    branch.append(result);
-
     if (!tokens.nextIs(RBRACKET))
         return compile_error_for_line(result, tokens, startPosition);
 
     tokens.consume(RBRACKET);
 
     result->boolProp("syntaxHints:literal-list") = true;
+
+    branch.moveToEnd(result);
 
     set_source_location(result, startPosition, tokens);
     return result;

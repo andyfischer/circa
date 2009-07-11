@@ -6,6 +6,8 @@ namespace circa {
 
 Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string const& name)
 {
+    assert(branch != NULL);
+
     // Check if 'function' is actually a type
     if (is_type(function))
         return create_value(branch, function, name);
