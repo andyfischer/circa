@@ -112,10 +112,10 @@ void normalize_feedback_branch(Branch& branch)
 
             // Create a call to their feedback-accumulator
             // TODO: Should probably choose the accumulator func based on type
-            Term* accumulator = apply(&branch, AVERAGE_FUNC, accumulatorInputs);
+            Term* accumulator = apply(branch, AVERAGE_FUNC, accumulatorInputs);
 
             // assign() this
-            apply(&branch, ASSIGN_FUNC, RefList(accumulator, target));
+            apply(branch, ASSIGN_FUNC, RefList(accumulator, target));
         }
     }
 
@@ -128,7 +128,7 @@ void refresh_training_branch(Branch& branch)
 
     // Check if '#training' branch exists. Create if it doesn't exist
     if (!branch.contains(TRAINING_BRANCH_NAME))
-        create_branch(&branch, TRAINING_BRANCH_NAME);
+        create_branch(branch, TRAINING_BRANCH_NAME);
 
     Branch& trainingBranch = as_branch(branch[TRAINING_BRANCH_NAME]);
     trainingBranch.clear();
@@ -183,11 +183,11 @@ void refresh_training_branch(Branch& branch)
 
         if (term->numInputs() == 0) {
             // Just create a feedback term. This is probably an assign() for a value()
-            apply(&trainingBranch, feedbackFunc, RefList(term, desiredValue));
+            apply(trainingBranch, feedbackFunc, RefList(term, desiredValue));
 
         } else if (term->numInputs() == 1) {
             // Create a feedback term with only 1 output
-            Term* feedback = apply(&trainingBranch, feedbackFunc, RefList(term, desiredValue));
+            Term* feedback = apply(trainingBranch, feedbackFunc, RefList(term, desiredValue));
             operation.sendFeedback(term->input(0), feedback, DESIRED_VALUE_FEEDBACK);
 
         } else if (term->numInputs() > 1) {
@@ -196,7 +196,7 @@ void refresh_training_branch(Branch& branch)
 
             // Inputs to feedback func are [originalTerm, desiredValue]
 
-            Term* feedback = apply(&trainingBranch, feedbackFunc, RefList(term, desiredValue));
+            Term* feedback = apply(trainingBranch, feedbackFunc, RefList(term, desiredValue));
             alloc_value(feedback);
 
             // Resize the output of 'feedback' so that there is one output term per input
@@ -237,7 +237,7 @@ void set_feedback_weight(Term* term, float weight)
 void feedback_register_constants(Branch& kernel)
 {
     FEEDBACK_TYPE = create_empty_type(kernel, "FeedbackType");
-    DESIRED_VALUE_FEEDBACK = create_value(&kernel, FEEDBACK_TYPE, "desired_value");
+    DESIRED_VALUE_FEEDBACK = create_value(kernel, FEEDBACK_TYPE, "desired_value");
 }
 
 } // namespace circa

@@ -18,7 +18,7 @@ void test_accessor()
     a = 3;
     test_assert(branch["a"]->asInt() == 3);
 
-    Term* b = create_value(&branch, INT_TYPE, "b");
+    Term* b = create_value(branch, INT_TYPE, "b");
     as_int(b) = 8;
     Int b_accessor(branch, "b", 3);
     test_assert(b_accessor == 8);

@@ -76,7 +76,7 @@ namespace set_t {
         if (contains(branch, value))
             return;
 
-        create_duplicate(&branch, value);
+        create_duplicate(branch, value);
     }
 
     void hosted_add(Term* caller)
@@ -135,7 +135,7 @@ namespace list_t {
 
     void append(Branch& branch, Term* value)
     {
-        Term* duplicated_value = create_value(&branch, value->type);
+        Term* duplicated_value = create_value(branch, value->type);
         assign_value(value, duplicated_value);
     }
 
@@ -252,20 +252,20 @@ void initialize_builtin_types(Branch& kernel)
 void post_setup_builtin_functions(Branch& kernel)
 {
     Branch& add_overloads = as_branch(ADD_FUNC);
-    Term* add_v = create_duplicate(&add_overloads, kernel["vectorize_vv"]);
-    create_ref(&function_get_parameters(add_v), ADD_FUNC);
+    Term* add_v = create_duplicate(add_overloads, kernel["vectorize_vv"]);
+    create_ref(function_get_parameters(add_v), ADD_FUNC);
     rename(add_v, "add_v");
     kernel.bindName(add_v, "add_v");
 
     Branch& sub_overloads = as_branch(SUB_FUNC);
-    Term* sub_v = create_duplicate(&sub_overloads, kernel["vectorize_vv"]);
-    create_ref(&function_get_parameters(sub_v), SUB_FUNC);
+    Term* sub_v = create_duplicate(sub_overloads, kernel["vectorize_vv"]);
+    create_ref(function_get_parameters(sub_v), SUB_FUNC);
     rename(sub_v, "sub_v");
     kernel.bindName(sub_v, "sub_v");
 
     Branch& mult_overloads = as_branch(MULT_FUNC);
-    Term* mult_s = create_duplicate(&mult_overloads, kernel["vectorize_vs"]);
-    create_ref(&function_get_parameters(mult_s), MULT_FUNC);
+    Term* mult_s = create_duplicate(mult_overloads, kernel["vectorize_vs"]);
+    create_ref(function_get_parameters(mult_s), MULT_FUNC);
     rename(mult_s, "mult_s");
     kernel.bindName(mult_s, "mult_s");
 
@@ -281,7 +281,7 @@ void initialize()
     initialize_function_data(VALUE_FUNC);
     
     // Define output type
-    create_value(&as_branch(VALUE_FUNC), ANY_TYPE);
+    create_value(as_branch(VALUE_FUNC), ANY_TYPE);
 
     // Declare input_placeholder first because it's used while compiling functions
     //INPUT_PLACEHOLDER_FUNC = create_value(KERNEL, FUNCTION_TYPE, "input_placeholder");

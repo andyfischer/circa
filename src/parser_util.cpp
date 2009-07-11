@@ -54,7 +54,7 @@ void push_pending_rebind(Branch& branch, std::string const& name)
     if (branch.contains(attrname))
         throw std::runtime_error("pending rebind already exists");
 
-    string_value(&branch, name, attrname);
+    string_value(branch, name, attrname);
 }
 
 std::string pop_pending_rebind(Branch& branch)
@@ -92,7 +92,7 @@ void post_parse_branch(Branch& branch)
             if (result == term)
                 continue;
 
-            apply(&branch, ASSIGN_FUNC, RefList(term, result));
+            apply(branch, ASSIGN_FUNC, RefList(term, result));
         }
     }
 }
@@ -103,7 +103,7 @@ Term* find_and_apply(Branch& branch,
 {
     Term* function = find_function(branch, functionName);
 
-    return apply(&branch, function, inputs);
+    return apply(branch, function, inputs);
 }
 
 void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
@@ -125,10 +125,10 @@ void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
 
 Term* find_type(Branch& branch, std::string const& name)
 {
-    Term* result = find_named(&branch, name);
+    Term* result = find_named(branch, name);
 
     if (result == NULL) {
-        result = apply(&branch, UNKNOWN_TYPE_FUNC, RefList(), name);
+        result = apply(branch, UNKNOWN_TYPE_FUNC, RefList(), name);
         evaluate_term(result);
         assert(result->type == TYPE_TYPE);
     }   
@@ -138,7 +138,7 @@ Term* find_type(Branch& branch, std::string const& name)
 
 Term* find_function(Branch& branch, std::string const& name)
 {
-    Term* result = find_named(&branch, name);
+    Term* result = find_named(branch, name);
 
     if (result == NULL)
         return UNKNOWN_FUNCTION;
@@ -185,7 +185,7 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
 
 Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start)
 {
-    Term* result = apply(&branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
+    Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
     result->stringProp("message") = consume_line(tokens, start, result);
 
     assert(has_static_error(result));

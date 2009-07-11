@@ -4,10 +4,8 @@
 
 namespace circa {
 
-Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string const& name)
+Term* apply(Branch& branch, Term* function, RefList const& _inputs, std::string const& name)
 {
-    assert(branch != NULL);
-
     // Check if 'function' is actually a type
     if (is_type(function))
         return create_value(branch, function, name);
@@ -35,12 +33,10 @@ Term* apply(Branch* branch, Term* function, RefList const& _inputs, std::string 
     }
 
     // Add term to branch
-    if (branch != NULL) {
-        branch->append(result);
+    branch.append(result);
 
-        if (name != "")
-            branch->bindName(result, name);
-    }
+    if (name != "")
+        branch.bindName(result, name);
 
     // Initialize inputs
     for (int i=0; i < inputs.length(); i++)
@@ -86,7 +82,7 @@ void rewrite(Term* term, Term* function, RefList const& inputs)
     change_type(term, outputType);
 }
 
-Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
+Term* create_duplicate(Branch& branch, Term* source, bool copyBranches)
 {
     Term* term = apply(branch, source->function, source->inputs);
     change_type(term, source->type);
@@ -104,9 +100,9 @@ Term* create_duplicate(Branch* branch, Term* source, bool copyBranches)
     return term;
 }
 
-Term* apply(Branch* branch, std::string const& functionName, RefList const& inputs, std::string const& name)
+Term* apply(Branch& branch, std::string const& functionName, RefList const& inputs, std::string const& name)
 {
-    Term* function = find_named(branch,functionName);
+    Term* function = find_named(branch, functionName);
     if (function == NULL)
         throw std::runtime_error("function not found: "+functionName);
 
@@ -115,19 +111,16 @@ Term* apply(Branch* branch, std::string const& functionName, RefList const& inpu
     return result;
 }
 
-Term* create_value(Branch* branch, Term* type, std::string const& name)
+Term* create_value(Branch& branch, Term* type, std::string const& name)
 {
-    // This function should be safe to call while bootstrapping
-
+    // This function is safe to call while bootstrapping.
     assert(type != NULL);
     assert(is_type(type));
 
     Term *term = new Term();
-    if (branch != NULL) {
-        branch->append(term);
-        if (name != "")
-            branch->bindName(term, name);
-    }
+    branch.append(term);
+    if (name != "")
+        branch.bindName(term, name);
 
     term->function = VALUE_FUNC;
     term->type = type;
@@ -137,9 +130,9 @@ Term* create_value(Branch* branch, Term* type, std::string const& name)
     return term;
 }
 
-Term* create_value(Branch* branch, std::string const& typeName, std::string const& name)
+Term* create_value(Branch& branch, std::string const& typeName, std::string const& name)
 {
-    Term *type = NULL;
+    Term* type = NULL;
 
     type = find_named(branch, typeName);
 
@@ -149,20 +142,20 @@ Term* create_value(Branch* branch, std::string const& typeName, std::string cons
     return create_value(branch, type, name);
 }
 
-Term* import_value(Branch* branch, Term* type, void* initialValue, std::string const& name)
+Term* import_value(Branch& branch, Term* type, void* initialValue, std::string const& name)
 {
     assert(type != NULL);
     Term *term = create_value(branch, type);
 
     term->value = initialValue;
 
-    if (name != "" && branch != NULL)
-        branch->bindName(term, name);
+    if (name != "")
+        branch.bindName(term, name);
 
     return term;
 }
 
-Term* import_value(Branch* branch, std::string const& typeName, void* initialValue, std::string const& name)
+Term* import_value(Branch& branch, std::string const& typeName, void* initialValue, std::string const& name)
 {
     Term* type = find_named(branch, typeName);
 
@@ -172,44 +165,51 @@ Term* import_value(Branch* branch, std::string const& typeName, void* initialVal
     return import_value(branch, type, initialValue, name);
 }
 
-Term* string_value(Branch* branch, std::string const& s, std::string const& name)
+Term* string_value(Branch& branch, std::string const& s, std::string const& name)
 {
     Term* term = create_value(branch, STRING_TYPE, name);
     as_string(term) = s;
     return term;
 }
 
-Term* int_value(Branch* branch, int i, std::string const& name)
+Term* int_value(Branch& branch, int i, std::string const& name)
 {
     Term* term = create_value(branch, INT_TYPE, name);
     as_int(term) = i;
     return term;
 }
 
-Term* float_value(Branch* branch, float f, std::string const& name)
+Term* float_value(Branch& branch, float f, std::string const& name)
 {
     Term* term = create_value(branch, FLOAT_TYPE, name);
     as_float(term) = f;
     return term;
 }
 
-Term* bool_value(Branch* branch, bool b, std::string const& name)
+Term* bool_value(Branch& branch, bool b, std::string const& name)
 {
     Term* term = create_value(branch, BOOL_TYPE, name);
     as_bool(term) = b;
     return term;
 }
 
-Term* create_ref(Branch* branch, Term* ref, std::string const& name)
+Term* create_ref(Branch& branch, Term* ref, std::string const& name)
 {
     Term* term = create_value(branch, REF_TYPE, name);
     as_ref(term) = ref;
     return term;
 }
 
-Branch& create_list(Branch* branch, std::string const& name)
+Branch& create_list(Branch& branch, std::string const& name)
 {
     Term* term = create_value(branch, LIST_TYPE, name);
+    return as_branch(term);
+}
+
+Branch& create_branch(Branch& owner, std::string const& name)
+{
+    Term* term = apply(owner, BRANCH_FUNC, RefList(), name);
+    alloc_value(term);
     return as_branch(term);
 }
 
@@ -219,7 +219,7 @@ void rewrite_as_value(Branch& branch, int index, Term* type)
         branch.append(NULL);
 
     if (index >= branch.length()) {
-        create_value(&branch, type);
+        create_value(branch, type);
     } else {
         Term* term = branch[index];
 

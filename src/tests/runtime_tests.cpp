@@ -108,8 +108,8 @@ void test_resize_list()
 {
     Branch list;
 
-    int_value(&list, 1, "a");
-    int_value(&list, 2, "b");
+    int_value(list, 1, "a");
+    int_value(list, 2, "b");
 
     resize_list(list, 4, INT_TYPE);
 

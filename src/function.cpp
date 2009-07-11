@@ -46,17 +46,17 @@ void initialize_function_data(Term* term)
 
     Branch& contents = as_branch(term);
 
-    Term* attributesTerm = create_value(&contents, BRANCH_TYPE, "attributes");
+    Term* attributesTerm = create_value(contents, BRANCH_TYPE, "attributes");
     source_set_hidden(attributesTerm, true);
     Branch& attributes = as_branch(attributesTerm);
-    string_value(&attributes, "", "name");
-    create_ref(&attributes, NULL, "hidden_state_type");
-    bool_value(&attributes, false, "variable_args");
-    create_value(&attributes, EVALUATE_THUNK_TYPE, "native_evaluate");
-    create_value(&attributes, SPECIALIZE_THUNK_TYPE, "native_specialize");
-    create_value(&attributes, TO_STRING_THUNK_TYPE, "native_to_string");
-    create_ref(&attributes, NULL, "feedback_func");
-    create_value(&attributes, LIST_TYPE, "parameters");
+    string_value(attributes, "", "name");
+    create_ref(attributes, NULL, "hidden_state_type");
+    bool_value(attributes, false, "variable_args");
+    create_value(attributes, EVALUATE_THUNK_TYPE, "native_evaluate");
+    create_value(attributes, SPECIALIZE_THUNK_TYPE, "native_specialize");
+    create_value(attributes, TO_STRING_THUNK_TYPE, "native_to_string");
+    create_ref(attributes, NULL, "feedback_func");
+    create_value(attributes, LIST_TYPE, "parameters");
 }
 
 std::string& function_get_name(Term* function)
@@ -175,7 +175,7 @@ bool inputs_fit_function(Term* func, RefList const& inputs)
     return true;
 }
 
-Term* create_overloaded_function(Branch* branch, std::string const& name)
+Term* create_overloaded_function(Branch& branch, std::string const& name)
 {
     return create_value(branch, OVERLOADED_FUNCTION_TYPE, name);
 }

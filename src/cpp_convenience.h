@@ -25,7 +25,7 @@ public:
                 as<T>(_term) = defaultValue;
             }
         } else {
-            _term = create_value(&branch, *type, name);
+            _term = create_value(branch, *type, name);
             as<T>(_term) = defaultValue;
         }
     }

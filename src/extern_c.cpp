@@ -4,6 +4,10 @@
 //
 // In this file, we provide various public functions in an extern "C" block, so that this library
 // can be loaded as a C library. (for example, with Python's ctypes)
+// 
+// This file is mostly abandoned; there are very few functions exposed here. It might
+// be ressurrected in the future.
+
 
 #include "circa.h"
 
@@ -56,7 +60,6 @@ const char* to_string(Term* term)
     return result.c_str();
 }
 
-Term* find_named(Branch* branch, const char* name) { return circa::find_named(branch, name); }
 Term* find_term_by_id(Branch* branch, unsigned int i) { return find_term_by_id(*branch, i); }
 void evaluate_term(Term* term) { circa::evaluate_term(term); }
 

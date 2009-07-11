@@ -12,7 +12,7 @@ void update_if_block_joining_branch(Term* ifCall)
 
     // Create the joining branch if necessary
     if (!branch.contains("#joining"))
-        create_branch(&branch, "#joining");
+        create_branch(branch, "#joining");
 
     Term* condition = ifCall->input(0);
     Branch& positiveBranch = branch["if"]->asBranch();
@@ -59,7 +59,7 @@ void update_if_block_joining_branch(Term* ifCall)
             remove = false;
 
         // Otherwise, ignore names which are not defined in the outer scope
-        else if (find_named(outerScope, name) == NULL)
+        else if (find_named(*outerScope, name) == NULL)
             remove = true;
 
         if (remove)
@@ -75,7 +75,7 @@ void update_if_block_joining_branch(Term* ifCall)
     {
         std::string const& name = *it;
 
-        Term* outerVersion = find_named(outerScope, name);
+        Term* outerVersion = find_named(*outerScope, name);
         Term* positiveVersion = outerVersion;
         Term* negativeVersion = outerVersion;
 
@@ -85,7 +85,7 @@ void update_if_block_joining_branch(Term* ifCall)
         if (elseBranch != NULL && elseBranch->contains(name))
             negativeVersion = elseBranch->get(name);
 
-        Term* joining = apply(&joiningBranch, "if_expr",
+        Term* joining = apply(joiningBranch, "if_expr",
                 RefList(condition, positiveVersion, negativeVersion));
 
         // Bind these names in the outer branch

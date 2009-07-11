@@ -12,7 +12,7 @@ namespace range_function {
         Branch& branch = as_branch(caller);
         branch.clear();
         for (unsigned int i=0; i < max; i++) {
-            Term* v = create_value(&branch, INT_TYPE);
+            Term* v = create_value(branch, INT_TYPE);
             as_int(v) = i;
         }
     }

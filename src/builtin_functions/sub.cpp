@@ -17,7 +17,7 @@ namespace sub_function {
 
     void setup(Branch& kernel)
     {
-        SUB_FUNC = create_overloaded_function(&kernel, "sub");
+        SUB_FUNC = create_overloaded_function(kernel, "sub");
 
         Term* sub_i = import_function_overload(SUB_FUNC, evaluate_i, "sub_i(int,int):int");
         Term* sub_f = import_function_overload(SUB_FUNC, evaluate_f, "sub_f(float,float):float");

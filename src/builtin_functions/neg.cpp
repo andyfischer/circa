@@ -17,7 +17,7 @@ namespace neg_function {
 
     void setup(Branch& kernel)
     {
-        NEG_FUNC = create_overloaded_function(&kernel, "neg");
+        NEG_FUNC = create_overloaded_function(kernel, "neg");
 
         import_function_overload(NEG_FUNC, evaluate_i, "neg_i(int):int");
         import_function_overload(NEG_FUNC, evaluate_f, "neg_f(float):float");

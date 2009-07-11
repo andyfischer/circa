@@ -8,7 +8,7 @@ namespace branch_append_function {
     void evaluate(Term* caller)
     {
         assign_value(caller->input(0), caller);
-        create_duplicate(&as_branch(caller), caller->input(1));
+        create_duplicate(as_branch(caller), caller->input(1));
     }
 
     void setup(Branch& kernel)

@@ -13,7 +13,7 @@ namespace map_function {
 
         // Create term if necessary
         for (int i=output.length(); i < inputs.length(); i++)
-            apply(&output, func, RefList(inputs[i]));
+            apply(output, func, RefList(inputs[i]));
 
         // Remove extra terms if necessary
         for (int i=inputs.length(); i < output.length(); i++)

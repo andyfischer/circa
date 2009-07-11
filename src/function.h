@@ -46,7 +46,7 @@ int function_num_inputs(Term* function);
 
 bool is_callable(Term* term);
 bool inputs_fit_function(Term* func, RefList const& inputs);
-Term* create_overloaded_function(Branch* branch, std::string const& name);
+Term* create_overloaded_function(Branch& branch, std::string const& name);
 Term* specialize_function(Term* func, RefList const& inputs);
 
 } // namespace circa

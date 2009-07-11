@@ -187,7 +187,7 @@ void* Branch::alloc(Term* typeTerm)
     int numFields = type.numFields();
 
     for (int f=0; f < numFields; f++)
-        create_value(branch, type.prototype[f]->type, type.prototype[f]->name);
+        create_value(*branch, type.prototype[f]->type, type.prototype[f]->name);
 
     return branch;
 }
@@ -211,7 +211,7 @@ void Branch::assign(Term* sourceTerm, Term* destTerm)
 
     // Add terms if necessary
     for (int i=dest.length(); i < source.length(); i++) {
-        Term* t = create_duplicate(&dest, source[i]);
+        Term* t = create_duplicate(dest, source[i]);
         if (source[i]->name != "")
             dest.bindName(t, source[i]->name);
     }
@@ -283,7 +283,7 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
     for (int index=0; index < source.length(); index++) {
         Term* source_term = source.get(index);
 
-        Term* dest_term = create_duplicate(&dest, source_term, false);
+        Term* dest_term = create_duplicate(dest, source_term, false);
 
         newTermMap[source_term] = dest_term;
 
@@ -297,13 +297,6 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
         if (source_term->name != "")
             dest.bindName(dest_term, source_term->name);
     }
-}
-
-Branch& create_branch(Branch* owner, std::string const& name)
-{
-    Term* term = apply(owner, BRANCH_FUNC, RefList(), name);
-    alloc_value(term);
-    return as_branch(term);
 }
 
 void duplicate_branch(Branch& source, Branch& dest)
@@ -327,7 +320,7 @@ void parse_script(Branch& branch, std::string const& filename)
     parser::compile(&branch, parser::statement_list, fileContents);
 
     // record the filename
-    string_value(&branch, filename, get_name_for_attribute("source-file"));
+    string_value(branch, filename, get_name_for_attribute("source-file"));
 }
 
 void evaluate_script(Branch& branch, std::string const& filename)
@@ -336,16 +329,17 @@ void evaluate_script(Branch& branch, std::string const& filename)
     evaluate_branch(branch);
 }
 
-Term* find_named(Branch* branch, std::string const& name)
+Term* find_named(Branch& branch, std::string const& name)
 {
-    if (branch != NULL) {
-        if (branch->contains(name))
-            return branch->get(name);
+    if (branch.contains(name))
+        return branch[name];
 
-        return find_named(get_outer_scope(*branch), name);
-    }
+    Branch* outerScope = get_outer_scope(branch);
 
-    return get_global(name);
+    if (outerScope == NULL)
+        return get_global(name);
+    else
+        return find_named(*outerScope, name);
 }
 
 bool reload_branch_from_file(Branch& branch, std::ostream &errors)

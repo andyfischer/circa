@@ -11,9 +11,9 @@ void test_is_value()
 {
     Branch branch;
 
-    test_assert(is_value(create_value(&branch, INT_TYPE)));
-    test_assert(is_value(create_value(&branch, STRING_TYPE)));
-    test_assert(is_value(create_value(&branch, BOOL_TYPE)));
+    test_assert(is_value(create_value(branch, INT_TYPE)));
+    test_assert(is_value(create_value(branch, STRING_TYPE)));
+    test_assert(is_value(create_value(branch, BOOL_TYPE)));
     test_assert(!is_value(branch.eval("1 + 2")));
 }
 

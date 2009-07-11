@@ -71,14 +71,14 @@ void error_occurred(Term* errorTerm, std::string const& message)
     errorTerm->attachErrorMessage(message);
 }
 
-Term* apply_and_eval(Branch* branch, Term* function, RefList const& inputs)
+Term* apply_and_eval(Branch& branch, Term* function, RefList const& inputs)
 {
     Term* result = apply(branch, function, inputs);
     evaluate_term(result);
     return result;
 }
 
-Term* apply_and_eval(Branch* branch, std::string const& functionName,
+Term* apply_and_eval(Branch& branch, std::string const& functionName,
         RefList const &inputs)
 {
     Term* function = find_named(branch, functionName);
@@ -92,7 +92,7 @@ void resize_list(Branch& list, int numElements, Term* type)
 {
     // Add terms if necessary
     for (int i=list.length(); i < numElements; i++)
-        create_value(&list, type);
+        create_value(list, type);
 
     // Remove terms if necessary
     for (int i=numElements; i < list.length(); i++) {

@@ -59,7 +59,7 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
         if (!is_stateful(term))
             continue;
 
-        create_value(&type, term->type, term->name);
+        create_value(type, term->type, term->name);
     }
 }
 

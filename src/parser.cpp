@@ -201,7 +201,7 @@ Term* comment(Branch& branch, TokenStream& tokens)
     if (!tokens.nextIs(NEWLINE))
         commentText = tokens.consume();
 
-    Term* result = apply(&branch, COMMENT_FUNC, RefList());
+    Term* result = apply(branch, COMMENT_FUNC, RefList());
     result->stringProp("comment") = commentText;
 
     return result;
@@ -255,7 +255,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     tokens.consume();
 
-    Term* result = create_value(&branch, FUNCTION_TYPE, functionName);
+    Term* result = create_value(branch, FUNCTION_TYPE, functionName);
     initialize_function_data(result);
     Branch& contents = as_branch(result);
 
@@ -291,7 +291,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         }
 
         // Create an input placeholder term
-        Term* input = apply(&contents, INPUT_PLACEHOLDER_FUNC, RefList(), name);
+        Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, RefList(), name);
         change_type(input, typeTerm);
         source_set_hidden(input, true);
 
@@ -338,7 +338,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     // If we're out of tokens, then this is just an import_function call. Stop here.
     if (tokens.finished()) {
         // Add a term to hold our output type
-        create_value(&contents, outputType, OUTPUT_PLACEHOLDER_NAME);
+        create_value(contents, outputType, OUTPUT_PLACEHOLDER_NAME);
         return result;
     }
 
@@ -350,19 +350,19 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     // name binding into an inner branch then this might not be the case
     if (contents.contains(OUTPUT_PLACEHOLDER_NAME) && 
             contents[contents.length()-1]->name != OUTPUT_PLACEHOLDER_NAME) {
-        Term* copy = apply(&contents, COPY_FUNC, RefList(contents[OUTPUT_PLACEHOLDER_NAME]),
+        Term* copy = apply(contents, COPY_FUNC, RefList(contents[OUTPUT_PLACEHOLDER_NAME]),
                 OUTPUT_PLACEHOLDER_NAME);
         source_set_hidden(copy, true);
     } else if (!contents.contains(OUTPUT_PLACEHOLDER_NAME)) {
         // If there's no #out term, then create an extra term to hold the output type
-        Term* term = create_value(&contents, outputType, OUTPUT_PLACEHOLDER_NAME);
+        Term* term = create_value(contents, outputType, OUTPUT_PLACEHOLDER_NAME);
         source_set_hidden(term, true);
     }
 
     // If the #out term doesn't have the same type as the declared type, then coerce it
     Term* outTerm = contents[contents.length()-1];
     if (outTerm->type != outputType)
-        outTerm = apply(&contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType), OUTPUT_PLACEHOLDER_NAME);
+        outTerm = apply(contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType), OUTPUT_PLACEHOLDER_NAME);
 
     possible_whitespace(tokens);
 
@@ -412,7 +412,7 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
-    Term* result = create_value(&branch, TYPE_TYPE);
+    Term* result = create_value(branch, TYPE_TYPE);
     Type& type = as_type(result);
     initialize_compound_type(type);
 
@@ -476,21 +476,21 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     tokens.consume();
 
-    Term* result = apply(&branch, IF_FUNC, RefList(condition));
+    Term* result = apply(branch, IF_FUNC, RefList(condition));
     alloc_value(result);
 
     get_input_syntax_hint(result, 0, "postWhitespace") = postConditionWs;
     
     Branch& contents = as_branch(result);
 
-    Branch& positiveBranch = create_branch(&contents, "if");
+    Branch& positiveBranch = create_branch(contents, "if");
 
     consume_branch_until_end(positiveBranch, tokens);
 
     // Possibly consume an 'else' block
     if (tokens.nextNonWhitespaceIs(ELSE)) {
 
-        Branch& elseBranch = create_branch(&contents, "else");
+        Branch& elseBranch = create_branch(contents, "else");
 
         result->stringProp("syntaxHints:whitespaceBeforeElse") = possible_whitespace(tokens);
 
@@ -544,7 +544,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     tokens.consume(NEWLINE);
 
-    Term* forTerm = apply(&branch, FOR_FUNC, RefList(listExpr));
+    Term* forTerm = apply(branch, FOR_FUNC, RefList(listExpr));
     alloc_value(forTerm);
 
     Branch& innerBranch = get_for_loop_code(forTerm);
@@ -558,7 +558,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     if (as_branch(listExpr).length() > 0)
         iterator_type = as_branch(listExpr)[0]->type;
 
-    Term* iterator = create_value(&innerBranch, iterator_type, iterator_name);
+    Term* iterator = create_value(innerBranch, iterator_type, iterator_name);
     source_set_hidden(iterator, true);
 
     setup_for_loop_pre_code(forTerm);
@@ -586,7 +586,7 @@ Term* do_once_block(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
     possible_statement_ending(tokens);
 
-    Term* result = apply(&branch, DO_ONCE_FUNC, RefList());
+    Term* result = apply(branch, DO_ONCE_FUNC, RefList());
 
     consume_branch_until_end(as_branch(result), tokens);
 
@@ -627,20 +627,20 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         type = find_type(branch, typeName);
     }
 
-    Term* result = create_value(&branch, type, name);
+    Term* result = create_value(branch, type, name);
     set_stateful(result, true);
 
     if (tokens.nextIs(EQUALS)) {
         tokens.consume();
         possible_whitespace(tokens);
 
-        Term* initialization = apply(&branch, DO_ONCE_FUNC, RefList());
+        Term* initialization = apply(branch, DO_ONCE_FUNC, RefList());
         source_set_hidden(initialization, true);
 
         Term* initialValue = infix_expression(as_branch(initialization), tokens);
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
 
-        apply(&as_branch(initialization), ASSIGN_FUNC, RefList(result, initialValue));
+        apply(as_branch(initialization), ASSIGN_FUNC, RefList(result, initialValue));
 
         if (result->type == ANY_TYPE)
             specialize_type(result, initialValue->type);
@@ -686,7 +686,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
         // If the expr is just an identifier, then create an implicit copy()
         if (expr->name != "" && expr_is_new)
-            expr = apply(&branch, COPY_FUNC, RefList(expr));
+            expr = apply(branch, COPY_FUNC, RefList(expr));
 
         if (pendingRebind != "")
             branch.bindName(expr, pendingRebind);
@@ -706,7 +706,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     // If the rexpr is just an identifier, then create an implicit copy()
     if (rexpr->name != "")
-        rexpr = apply(&branch, COPY_FUNC, RefList(rexpr));
+        rexpr = apply(branch, COPY_FUNC, RefList(rexpr));
 
     rexpr->stringProp("syntaxHints:preEqualsSpace") = preEqualsSpace;
     rexpr->stringProp("syntaxHints:postEqualsSpace") = postEqualsSpace;
@@ -734,7 +734,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
         branch.remove(lexpr);
 
-        rexpr = apply(&branch, SET_FIELD_FUNC, RefList(object, field, rexpr));
+        rexpr = apply(branch, SET_FIELD_FUNC, RefList(object, field, rexpr));
 
         branch.bindName(rexpr, name);
     }
@@ -747,7 +747,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
         branch.remove(lexpr);
         
-        rexpr = apply(&branch, SET_INDEX_FUNC, RefList(object, index, rexpr));
+        rexpr = apply(branch, SET_INDEX_FUNC, RefList(object, index, rexpr));
 
         branch.bindName(rexpr, name);
     }
@@ -769,7 +769,7 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
 
     // If we're returning an identifier, then we need to insert a copy() term
     if (result->name != "")
-        result = apply(&branch, COPY_FUNC, RefList(result));
+        result = apply(branch, COPY_FUNC, RefList(result));
 
     branch.bindName(result, OUTPUT_PLACEHOLDER_NAME);
     
@@ -919,7 +919,7 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
     if (tokens.nextIs(MINUS)) {
         tokens.consume(MINUS);
         Term* expr = dot_expression(branch, tokens);
-        return apply(&branch, NEG_FUNC, RefList(expr));
+        return apply(branch, NEG_FUNC, RefList(expr));
     }
 
     return dot_expression(branch, tokens);
@@ -973,7 +973,7 @@ Term* dot_expression(Branch& branch, TokenStream& tokens)
                 tokens.consume(RPAREN);
             }
 
-            result = apply(&branch, function, inputs);
+            result = apply(branch, function, inputs);
 
             // If this is a modifying member function, then rebind the name to this
             // result.
@@ -986,7 +986,7 @@ Term* dot_expression(Branch& branch, TokenStream& tokens)
         // Next, if this type defines this field
         } else if (lhsType.findFieldIndex(rhsIdent) != -1) {
 
-            result = apply(&branch, GET_FIELD_FUNC, RefList(lhs, string_value(&branch, rhsIdent)));
+            result = apply(branch, GET_FIELD_FUNC, RefList(lhs, string_value(branch, rhsIdent)));
             specialize_type(result, lhsType[rhsIdent]->type);
 
             // Note: maybe this source reproduction should be handled inside get_field_by_name()
@@ -1015,7 +1015,7 @@ Term* dot_expression(Branch& branch, TokenStream& tokens)
                 tokens.consume(RPAREN);
             }
 
-            result = apply(&branch, function, inputs);
+            result = apply(branch, function, inputs);
             result->stringProp("syntaxHints:declarationStyle") = "dot-concat";
 
             if (function == UNKNOWN_FUNCTION) {
@@ -1045,7 +1045,7 @@ Term* subscripted_atom(Branch& branch, TokenStream& tokens)
 
         tokens.consume(RBRACKET);
 
-        return apply(&branch, GET_INDEX_FUNC, RefList(result, subscript));
+        return apply(branch, GET_INDEX_FUNC, RefList(result, subscript));
     }
     else return result;
 }
@@ -1143,7 +1143,7 @@ Term* literal_integer(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
     std::string text = tokens.consume(INTEGER);
     int value = strtoul(text.c_str(), NULL, 0);
-    Term* term = int_value(&branch, value);
+    Term* term = int_value(branch, value);
     set_source_location(term, startPosition, tokens);
     return term;
 }
@@ -1153,7 +1153,7 @@ Term* literal_hex(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
     std::string text = tokens.consume(HEX_INTEGER);
     int value = strtoul(text.c_str(), NULL, 0);
-    Term* term = int_value(&branch, value);
+    Term* term = int_value(branch, value);
     term->stringProp("syntaxHints:integerFormat") = "hex";
     set_source_location(term, startPosition, tokens);
     return term;
@@ -1166,7 +1166,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
 
     // Parse value with atof
     float value = (float) atof(text.c_str());
-    Term* term = float_value(&branch, value);
+    Term* term = float_value(branch, value);
 
     // Store the original string
     term->stringProp("float:original-format") = text;
@@ -1192,7 +1192,7 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     // strip quote marks
     text = text.substr(1, text.length()-2);
 
-    Term* term = string_value(&branch, text);
+    Term* term = string_value(branch, text);
     set_source_location(term, startPosition, tokens);
     return term;
 }
@@ -1204,7 +1204,7 @@ Term* literal_bool(Branch& branch, TokenStream& tokens)
 
     tokens.consume();
 
-    Term* term = bool_value(&branch, value);
+    Term* term = bool_value(branch, value);
     set_source_location(term, startPosition, tokens);
     return term;
 }
@@ -1267,7 +1267,7 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
         }
     }
 
-    Term* term = int_value(&branch, value);
+    Term* term = int_value(branch, value);
 
     term->stringProp("syntaxHints:integerFormat") = "color";
 
@@ -1281,7 +1281,7 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 
     tokens.consume(LBRACKET);
 
-    Term* result = apply(&branch, BRANCH_FUNC, RefList());
+    Term* result = apply(branch, BRANCH_FUNC, RefList());
 
     while (!tokens.nextIs(RBRACKET) && !tokens.finished()) {
 
@@ -1294,7 +1294,7 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
         bool implicitCopy = false;
         if (term->name != "") {
             // If this term is an identifier, then create an implicit copy
-            term = apply(&as_branch(result), COPY_FUNC, RefList(term));
+            term = apply(as_branch(result), COPY_FUNC, RefList(term));
             implicitCopy = true;
         }
 
@@ -1335,11 +1335,11 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     if (rebind)
         push_pending_rebind(branch, id);
 
-    Term* result = find_named(&branch, id);
+    Term* result = find_named(branch, id);
 
     // If not found, create an instance of unknown_identifier
     if (result == NULL) {
-        result = apply(&branch, UNKNOWN_IDENTIFIER_FUNC, RefList());
+        result = apply(branch, UNKNOWN_IDENTIFIER_FUNC, RefList());
         source_set_hidden(result, true);
         result->stringProp("message") = id;
         branch.bindName(result, id);

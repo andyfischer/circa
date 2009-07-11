@@ -26,8 +26,8 @@ Branch& get_for_loop_iteration_state(Term* forTerm, int index)
 
 void setup_for_loop_pre_code(Term* forTerm)
 {
-    create_branch(&get_for_loop_code(forTerm), "#rebound");
-    create_value(&get_for_loop_code(forTerm), BOOL_TYPE, "#is_first_iteration");
+    create_branch(get_for_loop_code(forTerm), "#rebound");
+    create_value(get_for_loop_code(forTerm), BOOL_TYPE, "#is_first_iteration");
 }
 
 void setup_for_loop_post_code(Term* forTerm)
@@ -42,10 +42,10 @@ void setup_for_loop_post_code(Term* forTerm)
     for (unsigned i=0; i < reboundNames.size(); i++) {
         std::string name = reboundNames[i];
         Branch& outerScope = *forTerm->owningBranch;
-        Term* outerVersion = find_named(&outerScope, name);
+        Term* outerVersion = find_named(outerScope, name);
         Term* innerVersion = get_for_loop_code(forTerm)[name];
 
-        Term* ifexpr = apply(&rebound, IF_EXPR_FUNC,
+        Term* ifexpr = apply(rebound, IF_EXPR_FUNC,
                 RefList(isFirstIteration, outerVersion, innerVersion));
 
         remap_pointers(get_for_loop_code(forTerm), outerVersion, ifexpr);
@@ -54,7 +54,7 @@ void setup_for_loop_post_code(Term* forTerm)
         ifexpr->inputs[1] = outerVersion;
 
         // Bind inner version to outer scope
-        apply(&outerScope, COPY_FUNC, RefList(innerVersion), name);
+        apply(outerScope, COPY_FUNC, RefList(innerVersion), name);
     }
 }
 
