@@ -141,14 +141,22 @@ def rotate_around_i(Point_i point, Point_i center, int rotation) : Point_i
   return result + center
 end
 
+def rotate_falling_group(List group, int rot) : List
+    def rotate_piece(Piece piece) : Piece
+        pos = rotate_around_i([piece.x piece.y] [1 1] rot)
+        return [pos.x pos.y (piece.rot + rot)%4]
+    end
+    return map(rotate_piece, group)
+end
+
 -- Update fall animation
 tile_fall_distance -= fall_speed * time_delta
 
 def position_falling_group(List group, int pos_x, int pos_y) : List
+  group = rotate_falling_group(group, falling_piece_rot)
   def position_piece(Piece piece) : Piece
-      pos = rotate_around_i([piece.x piece.y] [1 1] falling_piece_rot)
-      pos = pos + [pos_x pos_y]
-      return [pos.x pos.y (piece.rot + falling_piece_rot) % 4]
+      pos = [piece.x + pos_x, piece.y + pos_y] : Point_i
+      return [pos.x pos.y piece.rot]
   end
   out = map(position_piece, group)
   return out
@@ -201,7 +209,6 @@ if tile_fall_distance < 0
 end
 
 -- Draw the current position of the falling group
-
 positioned_falling_group = position_falling_group(falling_group,
   falling_group_x, falling_group_y)
 

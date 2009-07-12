@@ -89,8 +89,8 @@ bool value_fits_type(Term* valueTerm, Term* type)
     if ((valueTerm->type == INT_TYPE) && type == FLOAT_TYPE)
         return true;
 
-    // Otherwise, primitive types must fit exactly
-    // Reject since they did not pass the above checks
+    // Otherwise, primitive types must fit exactly.
+    // So if this is a primitive type, reject it.
     if (!is_compound_type(type))
         return false;
 
@@ -98,9 +98,10 @@ bool value_fits_type(Term* valueTerm, Term* type)
     if (!is_compound_type(valueTerm->type))
         return false;
 
-    // Every compound type matches against List
-    if (identity_equals(type, LIST_TYPE))
-        return true;
+    // Every compound type matches against List or Branch
+    // TODO: revise this once the type hierarchy is nailed down.
+    if (identity_equals(type, LIST_TYPE)) return true;
+    if (identity_equals(type, BRANCH_TYPE)) return true;
 
     Branch& value = as_branch(valueTerm);
 
