@@ -8,33 +8,27 @@ namespace circa {
 
 void update_if_block_joining_branch(Term* ifCall)
 {
-    Branch& branch = ifCall->asBranch();
+    Branch& contents = ifCall->asBranch();
 
-    // Create the joining branch if necessary
-    if (!branch.contains("#joining"))
-        create_branch(branch, "#joining");
+    // Create the joining contents if necessary
+    if (!contents.contains("#joining"))
+        create_branch(contents, "#joining");
 
-    Term* condition = ifCall->input(0);
-    Branch& positiveBranch = branch["if"]->asBranch();
-    Branch& joiningBranch = branch["#joining"]->asBranch();
+    Branch& joining = contents["#joining"]->asBranch();
+    joining.clear();
 
-    joiningBranch.clear();
+    // This is used later.
+    Term* satisfiedIndex = int_value(joining, 0, "#satisfiedIndex");
 
-    // 'else' branch is optional
-    Branch* elseBranch = NULL;
-    if (branch.contains("else"))
-        elseBranch = &branch["else"]->asBranch();
-
-    // Get a list of all names bound in this branch
+    // Find the set of all names bound in every branch.
     std::set<std::string> boundNames;
 
     {
-        TermNamespace::const_iterator it;
-        for (it = positiveBranch.names.begin(); it != positiveBranch.names.end(); ++it)
-            boundNames.insert(it->first);
+        for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
+            Branch& branch = contents[branch_index]->asBranch();
 
-        if (elseBranch != NULL) {
-            for (it = elseBranch->names.begin(); it != elseBranch->names.end(); ++it)
+            TermNamespace::const_iterator it;
+            for (it = branch.names.begin(); it != branch.names.end(); ++it)
                 boundNames.insert(it->first);
         }
     }
@@ -42,58 +36,68 @@ void update_if_block_joining_branch(Term* ifCall)
     Branch* outerScope = ifCall->owningBranch;
     assert(outerScope != NULL);
 
-    // Filter which names we will join.
+    // Filter out some names from boundNames.
     for (std::set<std::string>::iterator it = boundNames.begin(); it != boundNames.end();)
     {
         std::string const& name = *it;
-        bool remove = false;
 
         // Ignore hidden names
-        if ((name[0] == '#') && (name != OUTPUT_PLACEHOLDER_NAME))
-            remove = true;
+        if ((name[0] == '#') && (name != OUTPUT_PLACEHOLDER_NAME)) {
+            boundNames.erase(it++);
+            continue;
+        }
 
-        // Don't ignore names which are defined in both branches
-        else if ((elseBranch != NULL)
-                && (positiveBranch.contains(name))
-                && (elseBranch->contains(name)))
-            remove = false;
+        // We only rebind names that are either 1) already bound in the outer scope, or
+        // 2) bound in every possible branch.
+        
+        bool boundInOuterScope = find_named(*outerScope, name) != NULL;
 
-        // Otherwise, ignore names which are not defined in the outer scope
-        else if (find_named(*outerScope, name) == NULL)
-            remove = true;
+        int numberOfBranchesWithThisName = 0;
+        bool boundInEveryBranch = true;
 
-        if (remove)
+        for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
+            if (contents[branch_index]->asBranch().contains(name))
+                numberOfBranchesWithThisName++;
+            else
+                boundInEveryBranch = false;
+        }
+
+        if (!boundInOuterScope && !boundInEveryBranch)
             boundNames.erase(it++);
         else
             ++it;
     }
 
-    // For each name, create a joining term
+    // For each name, create a term that selects the correct version of this name.
     for (std::set<std::string>::const_iterator it = boundNames.begin();
             it != boundNames.end();
             ++it)
     {
         std::string const& name = *it;
 
-        Term* outerVersion = find_named(*outerScope, name);
-        Term* positiveVersion = outerVersion;
-        Term* negativeVersion = outerVersion;
+        // Make a list where we find the corresponding term for this name in each branch.
+        RefList selections;
 
-        if (positiveBranch.contains(name))
-            positiveVersion = positiveBranch[name];
+        for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
+            Branch& branch = contents[branch_index]->asBranch();
 
-        if (elseBranch != NULL && elseBranch->contains(name))
-            negativeVersion = elseBranch->get(name);
+            if (branch.contains(name))
+                selections.append(branch[name]);
+            else
+                selections.append(find_named(*outerScope, name));
+        }
 
-        Term* joining = apply(joiningBranch, "if_expr",
-                RefList(condition, positiveVersion, negativeVersion));
+        Term* selection_list = apply(joining, LIST_FUNC, selections);
 
-        // Bind these names in the outer branch
+        Term* joiningTerm = apply(joining, GET_INDEX_FUNC,
+                RefList(selection_list, satisfiedIndex), name);
+
+        // Bind this names in the outer branch
         // TODO: This only works when the if call is the last thing in this branch (ie,
         // at parse time). It will cause problems if we call update_if_block_joining_branch
         // at a later time and there have been other name bindings since then. Need a
         // better solution for this.
-        outerScope->bindName(joining, name);
+        outerScope->bindName(joiningTerm, name);
     }
 }
 

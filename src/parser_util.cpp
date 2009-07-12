@@ -244,7 +244,9 @@ std::string possible_statement_ending(TokenStream& tokens)
 void consume_branch_until_end(Branch& branch, TokenStream& tokens)
 {
     while (!tokens.finished()) {
-        if (tokens.nextNonWhitespaceIs(END) || tokens.nextNonWhitespaceIs(ELSE)) {
+        if (tokens.nextNonWhitespaceIs(END)
+                || tokens.nextNonWhitespaceIs(ELSE)
+                || tokens.nextNonWhitespaceIs(ELIF)) {
             break;
         } else {
             parser::statement(branch, tokens);

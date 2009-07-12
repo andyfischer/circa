@@ -461,55 +461,74 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(IF);
-    possible_whitespace(tokens);
-
-    Term* condition = infix_expression(branch, tokens);
-    assert(condition != NULL);
-
-    recursively_mark_terms_as_occuring_inside_an_expression(condition);
-
-    std::string postConditionWs = possible_whitespace(tokens);
-
-    if (!tokens.nextIs(NEWLINE) && !tokens.nextIs(SEMICOLON))
-        return compile_error_for_line(branch, tokens, startPosition);
-
-    tokens.consume();
-
-    Term* result = apply(branch, IF_FUNC, RefList(condition));
+    Term* result = apply(branch, IF_BLOCK_FUNC, RefList());
     alloc_value(result);
-
-    get_input_syntax_hint(result, 0, "postWhitespace") = postConditionWs;
-    
     Branch& contents = as_branch(result);
 
-    Branch& positiveBranch = create_branch(contents, "if");
+    bool firstIteration = true;
+    bool encounteredElse = false;
 
-    consume_branch_until_end(positiveBranch, tokens);
+    while (true) {
+        // Consume 'if' or 'elif' or 'else'.
+        
+        std::string leadingWhitespace = possible_whitespace(tokens);
+        int leadingToken = tokens.next().match;
 
-    // Possibly consume an 'else' block
-    if (tokens.nextNonWhitespaceIs(ELSE)) {
-
-        Branch& elseBranch = create_branch(contents, "else");
-
-        result->stringProp("syntaxHints:whitespaceBeforeElse") = possible_whitespace(tokens);
-
-        tokens.consume(ELSE);
-
-        consume_branch_until_end(elseBranch, tokens);
-    }
-
-    result->stringProp("syntaxHints:whitespaceBeforeEnd") = possible_whitespace(tokens);
-
-    if (!tokens.nextIs(END)) {
-        if (tokens.finished())
-            std::cout << "eof" << std::endl;
+        // First iteration should always be 'if'
+        if (firstIteration)
+            assert(leadingToken == IF);
         else
-            std::cout << "found: " << tokens.next().text << std::endl;
-        return compile_error_for_line(branch, tokens, startPosition);
+            assert(leadingToken != IF);
+
+        // Otherwise expect 'elif' or 'else'
+        assert(leadingToken == IF || leadingToken == ELIF || leadingToken == ELSE);
+        tokens.consume();
+
+        bool expectCondition = (leadingToken == IF || leadingToken == ELIF);
+
+        if (expectCondition) {
+            possible_whitespace(tokens);
+            Term* condition = infix_expression(branch, tokens);
+            assert(condition != NULL);
+            recursively_mark_terms_as_occuring_inside_an_expression(condition);
+
+            Term* block = apply(contents, IF_FUNC, RefList(condition));
+            get_input_syntax_hint(block, 0, "postWhitespace") = possible_whitespace(tokens);
+
+            if (!tokens.nextIs(NEWLINE) && !tokens.nextIs(SEMICOLON))
+                return compile_error_for_line(result, tokens, startPosition);
+            tokens.consume();
+
+            consume_branch_until_end(block->asBranch(), tokens);
+        } else {
+            // Create an 'else' block
+            encounteredElse = true;
+            Branch& elseBranch = create_branch(contents, "else");
+            ((Term*)elseBranch)->stringProp("syntaxHints:preWhitespace") = leadingWhitespace;
+            consume_branch_until_end(elseBranch, tokens);
+        }
+
+        // If we just did an 'else' then the next thing must be 'end'
+        if (leadingToken == ELSE && !tokens.nextNonWhitespaceIs(END))
+            return compile_error_for_line(result, tokens, startPosition);
+
+        if (tokens.nextNonWhitespaceIs(END)) {
+            result->stringProp("syntaxHints:whitespaceBeforeEnd") = possible_whitespace(tokens);
+            tokens.consume(END);
+            break;
+        }
+
+        firstIteration = false;
     }
 
-    tokens.consume(END);
+    // If we didn't encounter an 'else' block, then create an empty one.
+    if (!encounteredElse) {
+        Branch& branch = create_branch(contents, "else");
+        source_set_hidden(branch, true);
+    }
+
+    // Move the if_block term to be after the condition terms
+    branch.moveToEnd(result);
 
     update_if_block_joining_branch(result);
 
