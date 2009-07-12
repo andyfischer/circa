@@ -139,16 +139,16 @@ void initialize(Branch& branch)
         KEY_DOWN[i] = false;
     }
 
-    expose_value(&branch, &MOUSE_X, "mouse_x");
-    expose_value(&branch, &MOUSE_Y, "mouse_y");
+    expose_value(branch, &MOUSE_X, "mouse_x");
+    expose_value(branch, &MOUSE_Y, "mouse_y");
     import_function(branch, key_down, "key_down(int) : bool");
     import_function(branch, key_pressed, "key_pressed(int) : bool");
     import_function(branch, mouse_pressed, "mouse_pressed() : bool");
-    int_value(&branch, SDLK_UP, "KEY_UP");
-    int_value(&branch, SDLK_DOWN, "KEY_DOWN");
-    int_value(&branch, SDLK_LEFT, "KEY_LEFT");
-    int_value(&branch, SDLK_RIGHT, "KEY_RIGHT");
-    int_value(&branch, SDLK_SPACE, "KEY_SPACE");
+    int_value(branch, SDLK_UP, "KEY_UP");
+    int_value(branch, SDLK_DOWN, "KEY_DOWN");
+    int_value(branch, SDLK_LEFT, "KEY_LEFT");
+    int_value(branch, SDLK_RIGHT, "KEY_RIGHT");
+    int_value(branch, SDLK_SPACE, "KEY_SPACE");
 
     import_function(branch, mouse_clicked, "mouse_clicked(List region) : bool");
     import_function(branch, mouse_over, "mouse_over(List region) : bool");

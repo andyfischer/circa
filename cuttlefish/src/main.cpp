@@ -112,7 +112,7 @@ int main( int argc, char* args[] )
     // Initialize stuff
     circa::initialize();
 
-    SCRIPT_ROOT = &create_branch(circa::KERNEL, "cuttlefish_main");
+    SCRIPT_ROOT = &create_branch(*circa::KERNEL, "cuttlefish_main");
 
     input::initialize(*SCRIPT_ROOT);
 
@@ -122,8 +122,8 @@ int main( int argc, char* args[] )
     ttf::initialize(*SCRIPT_ROOT);
 
     // Import constants
-    expose_value(SCRIPT_ROOT, &TIME, "time");
-    expose_value(SCRIPT_ROOT, &TIME_DELTA, "time_delta");
+    expose_value(*SCRIPT_ROOT, &TIME, "time");
+    expose_value(*SCRIPT_ROOT, &TIME_DELTA, "time_delta");
 
     // Load runtime.ca
     std::string circa_home = getenv("CIRCA_HOME");
