@@ -9,6 +9,7 @@
 
 #include "gl_shapes.h"
 #include "input.h"
+#include "main.h"
 #include "mesh.h"
 #include "shaders.h"
 #include "textures.h"
@@ -28,6 +29,9 @@ bool CONTINUE_MAIN_LOOP = true;
 float TIME = 0;
 float TIME_DELTA = 0;
 long PREV_SDL_TICKS = 0;
+
+bool PAUSED = false;
+PauseReason PAUSE_REASON;
 
 bool initialize_display()
 {
@@ -90,16 +94,29 @@ void main_loop()
 {
     input::capture_events();
 
-    long ticks = SDL_GetTicks();
+    if (!PAUSED) {
 
-    TIME_DELTA = (ticks - PREV_SDL_TICKS) / 1000.0;
-    TIME = ticks / 1000.0;
+        long ticks = SDL_GetTicks();
 
-    PREV_SDL_TICKS = ticks;
+        TIME_DELTA = (ticks - PREV_SDL_TICKS) / 1000.0;
+        TIME = ticks / 1000.0;
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+        PREV_SDL_TICKS = ticks;
 
-    evaluate_branch(*SCRIPT_ROOT);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        static Ref errorListener = new Term();
+        errorListener->hasError = false;
+
+        evaluate_branch(*SCRIPT_ROOT, errorListener);
+
+        if (errorListener->hasError) {
+            std::cout << "Runtime error:" << std::endl;
+            std::cout << errorListener->getErrorMessage() << std::endl;
+            PAUSED = true;
+            PAUSE_REASON = RUNTIME_ERROR;
+        }
+    }
 
     // Update the screen
     SDL_GL_SwapBuffers();

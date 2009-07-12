@@ -17,19 +17,19 @@ int MOUSE_X = 0;
 int MOUSE_Y = 0;
 bool MOUSE_JUST_CLICKED = false;
 
-void key_down(circa::Term* caller)
+void key_down(Term* caller)
 {
     int i = caller->input(0)->asInt();
     caller->asBool() = KEY_DOWN[i];
 }
 
-void key_pressed(circa::Term* caller)
+void key_pressed(Term* caller)
 {
     int i = caller->input(0)->asInt();
     caller->asBool() = KEY_JUST_PRESSED.find(i) != KEY_JUST_PRESSED.end();
 }
 
-void mouse_pressed(circa::Term* caller)
+void mouse_pressed(Term* caller)
 {
     as_bool(caller) = MOUSE_JUST_CLICKED;
 }
@@ -78,12 +78,24 @@ void handle_key_press(SDL_Event &event, int key)
 
         case SDLK_e:
             reset_state(*USERS_BRANCH);
+            if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
+                PAUSED = false;
             break;
 
-        case SDLK_r: {
+        case SDLK_r:
             reload_branch_from_file(*USERS_BRANCH, std::cout);
+            if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
+                PAUSED = false;
             break;
-        }
+
+        case SDLK_p:
+            if (PAUSED) {
+                PAUSED = false;
+            } else {
+                PAUSED = true;
+                PAUSE_REASON = USER_REQUEST;
+            }
+            break;
     }
 
     // Control keys

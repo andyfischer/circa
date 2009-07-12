@@ -124,7 +124,9 @@ void migrate_stateful_values(Branch& source, Branch& dest)
         } 
         
         // Stateful value migration
-        else if (is_stateful(sourceTerm) && is_stateful(destTerm)) {
+        else if (is_stateful(sourceTerm)
+                    && is_stateful(destTerm)
+                    && is_value_alloced(sourceTerm)) {
             assign_value(sourceTerm, destTerm);
         }
     }
