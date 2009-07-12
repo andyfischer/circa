@@ -80,7 +80,10 @@ std::string term_to_raw_string(Term* term)
     for (int input_index=0; input_index < term->inputs.length(); input_index++) {
         Term* input = term->inputs[input_index];
         if (!first_input) output << ", ";
-        output << format_global_id(input);
+        if (input == NULL)
+            output << "NULL";
+        else
+            output << format_global_id(input);
         first_input = false;
     }
 

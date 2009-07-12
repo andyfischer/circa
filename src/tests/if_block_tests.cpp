@@ -40,10 +40,52 @@ void test_if_joining_on_bool()
     test_assert(branch["hey"]->asBool() == true);
 }
 
+void test_if_elif_else()
+{
+    Branch branch;
+
+    branch.eval("if true; a = 1; elif true; a = 2; else; a = 3; end");
+
+    test_assert(branch.contains("a"));
+    test_assert(branch["a"]->asInt() == 1);
+
+    branch.eval("if false; b = 'apple'; elif false; b = 'orange'; else; b = 'pineapple'; end");
+    test_assert(branch.contains("b"));
+    test_assert(branch["b"]->asString() == "pineapple");
+
+    // try one without 'else'
+    branch.clear();
+    branch.eval("c = 0");
+    branch.eval("if false; c = 7; elif true; c = 8; end");
+    test_assert(branch.contains("c"));
+    test_assert(branch["c"]->asInt() == 8);
+
+    // try with some more complex conditions
+    branch.clear();
+    branch.eval("x = 5");
+    branch.eval("if x > 6; compare = 1; elif x < 6; compare = -1; else; compare = 0; end");
+
+    dump_branch(branch);
+    test_assert(branch.contains("compare"));
+    test_assert(branch["compare"]->asInt() == -1);
+}
+
+void test_dont_always_rebind_inner_names()
+{
+    Branch branch;
+    branch.eval("if false; b = 1; elif false; c = 1; elif false; d = 1; else; e = 1; end");
+    test_assert(!branch.contains("b"));
+    test_assert(!branch.contains("c"));
+    test_assert(!branch.contains("d"));
+    test_assert(!branch.contains("e"));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(if_block_tests::test_if_joining);
-    REGISTER_TEST_CASE(if_block_tests::test_if_joining_on_bool);
+    REGISTER_TEST_CASE(if_block_tests::test_if_joining);
+    REGISTER_TEST_CASE(if_block_tests::test_if_elif_else);
+    REGISTER_TEST_CASE(if_block_tests::test_dont_always_rebind_inner_names);
 }
 
 } // namespace if_block_tests

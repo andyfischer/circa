@@ -35,6 +35,9 @@ struct Branch
     Term* get(std::string const& name) const { return names[name]; }
     Term* operator[](std::string const& name) const { return get(name); }
 
+    // Overload to conveniently pass this branch via its owningTerm
+    operator Term*() { return owningTerm; }
+
     // Returns true if there is a term with the given name
     bool contains(std::string const& name) const { return names.contains(name); }
 

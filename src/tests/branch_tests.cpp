@@ -219,6 +219,18 @@ void test_assign()
     test_assert(as_int(as_branch(dest)[2]) == 9);
 }
 
+void term_pointer_operator_overload()
+{
+    Branch branch;
+
+    test_assert(((Term*) branch) == NULL);
+
+    Term* b = apply(branch, BRANCH_FUNC, RefList());
+    Branch& b_asbranch = as_branch(b);
+
+    test_assert(((Term*) b_asbranch) == b);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_remove);
@@ -231,6 +243,7 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_migrate);
     REGISTER_TEST_CASE(branch_tests::test_migrate2);
     REGISTER_TEST_CASE(branch_tests::test_assign);
+    REGISTER_TEST_CASE(branch_tests::term_pointer_operator_overload);
 }
 
 } // namespace branch_tests
