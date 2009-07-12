@@ -295,6 +295,20 @@ void test_reset_state()
     test_assert(i->asInt() == 5);
 }
 
+void try_to_migrate_value_that_isnt_allocced()
+{
+    // This code once caused a crash
+    Branch source, dest;
+    Term* i = int_value(source, 5, "i");
+    set_stateful(i, true);
+    dealloc_value(i);
+
+    Term* dest_i = int_value(dest, 4, "i");
+    set_stateful(dest_i, true);
+
+    migrate_stateful_values(source, dest);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_simple);
@@ -310,6 +324,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::migrate_subroutine_with_no_hidden_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_migrate_stateful_compound_value);
     REGISTER_TEST_CASE(stateful_code_tests::test_reset_state);
+    REGISTER_TEST_CASE(stateful_code_tests::try_to_migrate_value_that_isnt_allocced);
 }
 
 } // namespace stateful_code_tests
