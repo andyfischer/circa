@@ -79,12 +79,155 @@ void test_dont_always_rebind_inner_names()
     test_assert(!branch.contains("e"));
 }
 
+std::vector<std::string> gSpyResults;
+
+void spy_function(Term* caller)
+{
+    gSpyResults.push_back(as_string(caller->input(0)));
+}
+
+void test_execution()
+{
+    Branch branch;
+    import_function(branch, spy_function, "spy(string)");
+    gSpyResults.clear();
+
+    // Start off with some simple expressions
+    branch.eval("if true\nspy('Success 1')\nend");
+    branch.eval("if false\nspy('Fail')\nend");
+    branch.eval("if (1 + 2) > 1\nspy('Success 2')\nend");
+    branch.eval("if (1 + 2) < 1\nspy('Fail')\nend");
+    branch.eval("if true; spy('Success 3'); end");
+    branch.eval("if false; spy('Fail'); end");
+
+    test_assert(branch);
+    test_assert(gSpyResults.size() == 3);
+    test_equals(gSpyResults[0], "Success 1");
+    test_equals(gSpyResults[1], "Success 2");
+    test_equals(gSpyResults[2], "Success 3");
+    gSpyResults.clear();
+    
+    // Use 'else'
+    branch.eval("if true; spy('Success 1'); else; spy('Fail'); end");
+    branch.eval("if false; spy('Fail'); else; spy('Success 2'); end");
+    branch.eval("if true; spy('Success 3-1')\n spy('Success 3-2')\n spy('Success 3-3')\n"
+                "else; spy('Fail'); end");
+    branch.eval("if false; spy('Fail')\n spy('Fail 2')\n"
+                "else; spy('Success 4-1')\n spy('Success 4-2')\n spy('Success 4-3')\n end");
+    test_assert(branch);
+    test_assert(gSpyResults.size() == 8);
+    test_equals(gSpyResults[0], "Success 1");
+    test_equals(gSpyResults[1], "Success 2");
+    test_equals(gSpyResults[2], "Success 3-1");
+    test_equals(gSpyResults[3], "Success 3-2");
+    test_equals(gSpyResults[4], "Success 3-3");
+    test_equals(gSpyResults[5], "Success 4-1");
+    test_equals(gSpyResults[6], "Success 4-2");
+    test_equals(gSpyResults[7], "Success 4-3");
+    gSpyResults.clear();
+
+    // Do some nested blocks
+
+    branch.eval("if true; if false; spy('Error!'); else; spy('Nested 1'); end;"
+                "else; spy('Error!'); end");
+    test_assert(branch);
+    test_assert(gSpyResults.size() == 1);
+    test_equals(gSpyResults[0], "Nested 1");
+    gSpyResults.clear();
+
+    branch.eval("if false; spy('Error!'); else; if false; spy('Error!');"
+                "else; spy('Nested 2'); end; end");
+    test_assert(branch);
+    test_assert(gSpyResults.size() == 1);
+    test_equals(gSpyResults[0], "Nested 2");
+    gSpyResults.clear();
+    
+    branch.eval("if false; spy('Error!');"
+                "else; if true; spy('Nested 3'); else; spy('Error!'); end; end");
+    test_assert(branch);
+    test_assert(gSpyResults.size() == 1);
+    test_equals(gSpyResults[0], "Nested 3");
+    gSpyResults.clear();
+
+    branch.eval("if true; if false; spy('Error!'); else; spy('Nested 4'); end;"
+                "else; spy('Error!'); end");
+    test_assert(branch);
+    test_assert(gSpyResults.size() == 1);
+    test_equals(gSpyResults[0], "Nested 4");
+    gSpyResults.clear();
+
+    branch.eval(
+    "if (false)\n"
+        "spy('Error!')\n"
+    "else\n"
+        "if (true)\n"
+            "if (false)\n"
+                "spy('Error!')\n"
+            "else\n"
+                "if (false)\n"
+                    "spy('Error!')\n"
+                "else\n"
+                    "if (true)\n"
+                        "spy('Nested 5')\n"
+                    "else\n"
+                        "spy('Error!')\n"
+                    "end\n"
+                "end\n"
+            "end\n"
+        "else\n"
+            "spy('Error!')\n"
+        "end\n"
+    "end");
+    test_assert(branch);
+    test_assert(gSpyResults.size() == 1);
+    test_equals(gSpyResults[0], "Nested 5");
+    gSpyResults.clear();
+}
+
+void test_execution_with_elif()
+{
+    Branch branch;
+    import_function(branch, spy_function, "spy(string)");
+    gSpyResults.clear();
+
+    branch.eval("x = 5");
+
+    branch.eval("if x > 5; spy('Fail');"
+                "elif x < 5; spy('Fail');"
+                "elif x == 5; spy('Success');"
+                "else; spy('Fail'); end");
+    test_assert(branch);
+    test_assert(gSpyResults.size() == 1);
+    test_equals(gSpyResults[0], "Success");
+    gSpyResults.clear();
+}
+
+void test_parse_with_no_line_endings()
+{
+    Branch branch;
+
+    branch.eval("a = 4");
+    branch.eval("if a < 5 a = 5 end");
+    test_assert(branch);
+    test_assert(branch["a"]->asInt() == 5);
+
+    branch.eval("if a > 7 a = 5 else a = 3 end");
+    test_assert(branch);
+    test_assert(branch["a"]->asInt() == 3);
+
+    branch.eval("if a == 2 a = 1 elif a == 3 a = 9 else a = 2 end");
+    test_assert(branch);
+    test_assert(branch["a"]->asInt() == 9);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(if_block_tests::test_if_joining);
-    REGISTER_TEST_CASE(if_block_tests::test_if_joining);
     REGISTER_TEST_CASE(if_block_tests::test_if_elif_else);
     REGISTER_TEST_CASE(if_block_tests::test_dont_always_rebind_inner_names);
+    REGISTER_TEST_CASE(if_block_tests::test_execution);
+    REGISTER_TEST_CASE(if_block_tests::test_execution_with_elif);
+    REGISTER_TEST_CASE(if_block_tests::test_parse_with_no_line_endings);
 }
 
 } // namespace if_block_tests
