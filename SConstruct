@@ -143,8 +143,11 @@ SDL_ROOT = ROOT.Clone()
 if POSIX:
     # import path so that we will find the correct sdl-config
     SDL_ROOT['ENV']['PATH'] = os.environ['PATH']
-    SDL_ROOT.ParseConfig('sdl-config --cflags')
-    SDL_ROOT.ParseConfig('sdl-config --libs')
+    try:
+        SDL_ROOT.ParseConfig('sdl-config --cflags')
+        SDL_ROOT.ParseConfig('sdl-config --libs')
+    except OSError:
+        pass
     SDL_ROOT.Append(LIBS = ['SDL_gfx','SDL_image','SDL_ttf'])
 
     if MAC:

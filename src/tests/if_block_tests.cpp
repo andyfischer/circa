@@ -65,7 +65,6 @@ void test_if_elif_else()
     branch.eval("x = 5");
     branch.eval("if x > 6; compare = 1; elif x < 6; compare = -1; else; compare = 0; end");
 
-    dump_branch(branch);
     test_assert(branch.contains("compare"));
     test_assert(branch["compare"]->asInt() == -1);
 }
