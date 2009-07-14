@@ -1,5 +1,7 @@
 // Copyright 2008 Paul Hodge
 
+#include "common_headers.h"
+
 #include "tokenizer.h"
 
 namespace circa {

@@ -44,7 +44,6 @@ void test_recursion()
     test_equals(fact_1->asInt(), 1);
 
     Term* fact_2 = branch.eval("factorial(2)");
-    dump_branch(branch);
     test_assert(fact_2);
     test_equals(fact_2->asInt(), 2);
 
