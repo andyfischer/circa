@@ -472,6 +472,10 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         // Consume 'if' or 'elif' or 'else'.
         
         std::string leadingWhitespace = possible_whitespace(tokens);
+
+        if (tokens.finished())
+            return compile_error_for_line(result, tokens, startPosition);
+
         int leadingToken = tokens.next().match;
 
         // First iteration should always be 'if'
@@ -495,9 +499,8 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             Term* block = apply(contents, IF_FUNC, RefList(condition));
             get_input_syntax_hint(block, 0, "postWhitespace") = possible_whitespace(tokens);
 
-            if (!tokens.nextIs(NEWLINE) && !tokens.nextIs(SEMICOLON))
-                return compile_error_for_line(result, tokens, startPosition);
-            tokens.consume();
+            if (tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON))
+                tokens.consume();
 
             consume_branch_until_end(block->asBranch(), tokens);
         } else {
