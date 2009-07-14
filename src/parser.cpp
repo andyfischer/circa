@@ -471,7 +471,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     while (true) {
         // Consume 'if' or 'elif' or 'else'.
         
-        std::string leadingWhitespace = possible_whitespace(tokens);
+        std::string preKeywordWhitespace = possible_whitespace(tokens);
 
         if (tokens.finished())
             return compile_error_for_line(result, tokens, startPosition);
@@ -497,6 +497,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             recursively_mark_terms_as_occuring_inside_an_expression(condition);
 
             Term* block = apply(contents, IF_FUNC, RefList(condition));
+            block->stringProp("syntaxHints:preWhitespace") = preKeywordWhitespace;
             get_input_syntax_hint(block, 0, "postWhitespace") = possible_whitespace(tokens);
 
             if (tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON))
@@ -507,7 +508,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             // Create an 'else' block
             encounteredElse = true;
             Branch& elseBranch = create_branch(contents, "else");
-            ((Term*)elseBranch)->stringProp("syntaxHints:preWhitespace") = leadingWhitespace;
+            ((Term*)elseBranch)->stringProp("syntaxHints:preWhitespace") = preKeywordWhitespace;
             consume_branch_until_end(elseBranch, tokens);
         }
 
