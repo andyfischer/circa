@@ -54,21 +54,28 @@ namespace if_block_function {
     {
         std::stringstream result;
 
-        result << "if";
-        result << " " << get_source_of_input(term->field(0), 0) << std::endl;
 
-        Branch& contents = term->asBranch();
+        Branch& contents = as_branch(term);
 
-        Branch& positiveBranch = contents[0]->asBranch();
+        for (int branch_index=0; branch_index < contents.length(); branch_index++) {
+            Term* branch_term = contents[branch_index];
 
-        result << get_branch_source(positiveBranch);
+            if (is_hidden(branch_term))
+                continue;
 
-        Term* elseTerm = contents["else"];
-        if (!is_hidden(elseTerm)) {
-            result << elseTerm->stringPropOptional("syntaxHints:preWhitespace", "");
-            result << "else";
-            Branch& elseBranch = contents["else"]->asBranch();
-            result << get_branch_source(elseBranch);
+            result << branch_term->stringPropOptional("syntaxHints:preWhitespace", "");
+
+            if (branch_index == 0) {
+                result << "if ";
+                result << get_source_of_input(branch_term, 0) << std::endl;
+            } else if (branch_index < (contents.length()-2)) {
+                result << "elif ";
+                result << get_source_of_input(branch_term, 0) << std::endl;
+            }
+            else
+                result << "else";
+
+            result << get_branch_source(as_branch(branch_term));
         }
 
         result << term->stringPropOptional("syntaxHints:whitespaceBeforeEnd", "");

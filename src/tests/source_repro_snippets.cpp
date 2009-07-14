@@ -184,6 +184,12 @@ void reproduce_if() {
     round_trip_source("if true\nelse  \nend");
     round_trip_source("if true\nelse\n  end");
     round_trip_source("if true\nelse\nend  ");
+    round_trip_source("if true\nelif true\nend  ");
+    round_trip_source("if true\n  elif true\nend");
+    round_trip_source("if true\nelif true  \nend");
+    round_trip_source("if true\nelif true\nelse\nend");
+    round_trip_source("if true\nelif true\n  else\nend");
+    round_trip_source("if 1 > 2\nprint('hi')\nelif 2 > 3\n  elif 3 > 4\nprint('hello')\nend");
     finish_source_repro_category();
 }
 
