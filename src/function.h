@@ -14,9 +14,8 @@ namespace circa {
 #define OUTPUT_PLACEHOLDER_NAME "#out"
 
 namespace function_t {
-    void assign(Term* source, Term* dest);
-    void remapPointers(Term* term, ReferenceMap const& map);
     std::string to_string(Term* term);
+    bool check_invariants(Term* term, std::stringstream* output);
 }
 
 bool is_function(Term* term);

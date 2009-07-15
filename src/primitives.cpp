@@ -26,6 +26,7 @@ Term* STD_TYPE_INFO_TYPE = NULL;
 Term* EVALUATE_THUNK_TYPE = NULL;
 Term* SPECIALIZE_THUNK_TYPE = NULL;
 Term* TO_STRING_THUNK_TYPE = NULL;
+Term* CHECK_INVARIANTS_FUNC_TYPE = NULL;
 
 int& as_int(Term* term)
 {
@@ -127,6 +128,12 @@ ToSourceStringFunc& as_to_source_string_thunk(Term* term)
 {
     assert(term->type == TO_STRING_THUNK_TYPE);
     return ((ToSourceStringFunc&) term->value);
+}
+
+CheckInvariantsFunc& as_check_invariants_thunk(Term* term)
+{
+    assert(term->type == CHECK_INVARIANTS_FUNC_TYPE);
+    return ((CheckInvariantsFunc&) term->value);
 }
 
 bool is_int(Term* term)
@@ -281,6 +288,7 @@ void initialize_primitive_types(Branch& kernel)
     EVALUATE_THUNK_TYPE = import_pointer_type<EvaluateFunc>(kernel, "EvaluateThunk");
     SPECIALIZE_THUNK_TYPE = import_pointer_type<SpecializeTypeFunc>(kernel, "SpecializeThunk");
     TO_STRING_THUNK_TYPE = import_pointer_type<ToSourceStringFunc>(kernel, "ToSourceStringThunk");
+    CHECK_INVARIANTS_FUNC_TYPE = import_pointer_type<CheckInvariantsFunc>(kernel, "CheckInvariantsThunk");
 }
 
 } // namespace circa
