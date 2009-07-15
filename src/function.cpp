@@ -9,6 +9,25 @@ namespace function_t {
     {
         return "<Function " + function_get_name(term) + ">";
     }
+
+    bool check_invariants(Term* func, std::stringstream* output)
+    {
+        if (!is_subroutine(func))
+            return true;
+
+        Branch& contents = as_branch(func);
+
+        // If the subroutine has an #out term, then it must be the last one
+        if (contents.contains(OUTPUT_PLACEHOLDER_NAME)
+                && contents[contents.length()-1]->name != OUTPUT_PLACEHOLDER_NAME) {
+
+            if (output != NULL)
+                *output << "#out is bound, but the last term isn't named #out";
+            return false;
+        }
+
+        return true;
+    }
 }
 
 bool is_function(Term* term)
