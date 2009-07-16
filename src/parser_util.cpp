@@ -72,11 +72,11 @@ std::string pop_pending_rebind(Branch& branch)
 
 void post_parse_branch(Branch& branch)
 {
-    // Remove NULLs
-    branch.removeNulls();
-
     // Remove temporary attributes
     branch.remove(get_name_for_attribute("comp-pending-rebind"));
+
+    // Remove NULLs
+    branch.removeNulls();
 
     // For every stateful value, create assign() terms that persist the results
     // onto the next iteration.

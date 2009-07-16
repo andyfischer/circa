@@ -146,6 +146,12 @@ int main( int argc, char* args[] )
     std::string circa_home = getenv("CIRCA_HOME");
     parse_script(*SCRIPT_ROOT, circa_home + "/cuttlefish/runtime.ca");
 
+    if (has_static_errors(*SCRIPT_ROOT)) {
+        std::cout << "Errors in runtime.ca:" << std::endl;
+        print_static_errors_formatted(*SCRIPT_ROOT, std::cout);
+        return 1;
+    }
+
     // Load user's script
     USERS_BRANCH = &SCRIPT_ROOT->get("users_branch")->asBranch();
 

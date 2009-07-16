@@ -43,7 +43,7 @@ end
 state stars = []
 
 if mouse_pressed()
-  stars.append([[mouse_x mouse_y] rand() 40 1])
+  stars.append([mouse rand() 40 1])
 end
 
 if key_down(KEY_UP)

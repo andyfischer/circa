@@ -151,8 +151,8 @@ void initialize(Branch& branch)
         KEY_DOWN[i] = false;
     }
 
-    expose_value(branch, &MOUSE_X, "mouse_x");
-    expose_value(branch, &MOUSE_Y, "mouse_y");
+    expose_value(branch, &MOUSE_X, "_mouse_x");
+    expose_value(branch, &MOUSE_Y, "_mouse_y");
     import_function(branch, key_down, "key_down(int) : bool");
     import_function(branch, key_pressed, "key_pressed(int) : bool");
     import_function(branch, mouse_pressed, "mouse_pressed() : bool");

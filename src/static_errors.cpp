@@ -6,6 +6,9 @@ namespace circa {
 
 bool has_static_error(Term* term)
 {
+    if (term == NULL)
+        return false; // maybe this should be an error
+
     return get_static_error(term) != SERROR_NO_ERROR;
 }
 

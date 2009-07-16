@@ -125,7 +125,8 @@ void subroutine_call_evaluate(Term* caller)
     if (functionBranch.length() > 0) {
         Term* output = functionBranch[functionBranch.length()-1];
         assert(output->name == "#out");
-        assign_value(output, caller);
+        if (output->type != VOID_TYPE)
+            assign_value(output, caller);
     }
 }
 
