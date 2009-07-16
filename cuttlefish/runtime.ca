@@ -2,50 +2,16 @@
 type Point { float x, float y }
 type Box { float x1, float y1, float x2, float y2 }
 
+-- Wrap up mouse position into a point (values are passed in from input.cpp)
+mouse = [_mouse_x _mouse_y] : Point
+
 def mouse_in(Box b) : bool
-  return (b.x1 < mouse_x) && (b.x2 > mouse_x) && (b.y1 < mouse_y) && (b.y2 > mouse_y)
+  return (b.x1 < mouse.x) && (b.x2 > mouse.x) && (b.y1 < mouse.y) && (b.y2 > mouse.y)
 end
 
 -- p2c: polar to cartesian
 def p2c(float angle, float radius, Point center) : Point
   return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
-end
-
-def point_distance(Point a, Point b) : float
-  return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
-end
-
-_point_highlight_dist = 5.0
-
-def highlight_point(Point p)
-  fill_circle(p.x p.y _point_highlight_dist 0xccffcc55)
-  circle(p.x p.y _point_highlight_dist 0x000000ff)
-end
-
-_closest_draggable_point = 0
-_closest_draggable_point_distance = 0.0
-
--- this is weird but necessary
-_closest_draggable_point := 0
-
-def draggable_point(Point p)
-  state id = unique_id()
-  dist = point_distance(p [mouse_x mouse_y])
-  if (dist < _point_highlight_dist) && ((dist < _closest_draggable_point_distance) || (_closest_draggable_point == 0))
-    _closest_draggable_point := id
-    _closest_draggable_point_distance := dist
-  end
-
-  if _closest_draggable_point == id
-    highlight_point(p)
-  end
-end
-
-def line(Point a, Point b, int color)
-  --print('line: ' a b color)
-  draggable_point(a)
-  draggable_point(b)
-  sdl_line(a.x a.y b.x b.y color)
 end
 
 -- in main.cpp, we load the user's script into this branch:

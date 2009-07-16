@@ -206,7 +206,8 @@ void Branch::assign(Term* sourceTerm, Term* destTerm)
     int lengthToAssign = std::min(source.length(), dest.length());
 
     for (int i=0; i < lengthToAssign; i++) {
-        assign_value(source[i], dest[i]);
+        if (is_value_alloced(source[i]))
+            assign_value(source[i], dest[i]);
     }
 
     // Add terms if necessary

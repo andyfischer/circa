@@ -89,6 +89,9 @@ void update_if_block_joining_branch(Term* ifCall)
 
         Term* selection_list = apply(joining, LIST_FUNC, selections);
 
+        // Populate this list immediately so that type inference can work
+        evaluate_term(selection_list);
+
         Term* joiningTerm = apply(joining, GET_INDEX_FUNC,
                 RefList(selection_list, satisfiedIndex), name);
 

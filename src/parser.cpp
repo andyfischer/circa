@@ -562,6 +562,9 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     recursively_mark_terms_as_occuring_inside_an_expression(listExpr);
     possible_whitespace(tokens);
 
+    if (!is_branch(listExpr))
+        return compile_error_for_line(branch, tokens, startPosition);
+
     if (!tokens.nextIs(NEWLINE))
         return compile_error_for_line(branch, tokens, startPosition);
 
@@ -662,6 +665,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 
         Term* initialValue = infix_expression(as_branch(initialization), tokens);
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
+        post_parse_branch(as_branch(initialization));
 
         apply(as_branch(initialization), ASSIGN_FUNC, RefList(result, initialValue));
 

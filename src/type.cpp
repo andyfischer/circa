@@ -324,6 +324,8 @@ bool is_value_alloced(Term* term)
 
 void assign_value(Term* source, Term* dest)
 {
+    assert(is_value_alloced(source));
+
     // Do a type specialization if dest has type 'any'.
     // This might be removed once type inference rules are smarter.
     if (dest->type == ANY_TYPE)
