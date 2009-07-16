@@ -1,17 +1,47 @@
-Circa is a programming language designed for rapid development. Some features
-are: the ability to introspect and modify the code of a running program, builtin
-support for persistence and reloading, and the ability to generate (or recreate)
-source code text from compiled code.
+The goal of this project is to create a programming environment that is fun and efficient,
+where you can directly see and interact with the code you are editing.
 
-There is a nice web site that talks about Circa in more detail here:
-http://andyfischer.github.com/circa
+There are two elements: Circa, a programming language; and Cuttlefish, a cross-platform
+graphical tool for creating Circa code.
 
-Cuttlefish is an SDL-based game engine which tightly integrates with Circa.
+Features of Circa are:
 
-The current status of this project is pre-alpha. There are many known issues.
-It's not yet recommended for widespread consumption.
+ - Live coding. The user can examine and modify code while it is running. There's no need
+   to restart the program to make changes.
 
-The design and implementation was started in 2007 by Paul Hodge.
+ - Code is primarily saved as text, in a human-readable format that looks like a modern
+   programming language.
 
-This project is available to the public under the MIT licence. See the LICENSE
+ - Traditional visual programming (with a dataflow diagram that has lots of boxes and
+   arrows) is supported.
+
+ - Editing text files at runtime is also supported. The system can handle arbitrary
+   changes to the source code of a running program. The current state of the program is
+   preserved across a reload (as much as possible).
+
+ - The format of compiled code is as canonical and simple as possible. It should be easy
+   to introspect on code, and to reason about the code, without actually running it.
+
+ - It should be easy to write tools which help the user create or modify code in novel
+   ways. For example, imagine a drawing program, where the user clicks and drags to draw
+   a square, and the end result is a small program with a "draw_square()" call.
+
+ - Non-goal. Circa is not a general-purpose language.
+
+ - Non-goal. Circa is not very expressive. If you have prior programming experience, then
+   you will probably find it limiting. Many programming constructs (such as unbounded
+   loops or arbitrary side effects) are not allowed because they make the code harder to
+   reason about. Turing-completeness is not a requirement for us.
+
+A few implementation details:
+ - Static typing with partial type inference. Has an 'any' type
+ - Dataflow-based
+ - Implemented in C++
+
+Current status: Nearing an alpha release. There are currently a few working demos, but
+there are too many bugs and not enough neat features.
+
+This project is Copyright (c) 2007-2009 Paul Hodge.
+
+The entire project is available to the public under the MIT licence. See the LICENSE
 file for more information.
