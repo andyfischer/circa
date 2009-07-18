@@ -110,8 +110,10 @@ void assert_type(Term* term, Term* type);
 
 // Returns whether the value in valueTerm fits this type.
 // This function allows for coercion (ints fit in floats)
-// We also allow for compound types to be reinterpreted
-bool value_fits_type(Term* valueTerm, Term* type);
+// We also allow for compound types to be reinterpreted.
+// If errorReason is not null, and if this function returns false, then
+// we'll assign a descriptive message to errorReason.
+bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason=NULL);
 
 Term* quick_create_type(Branch& branch, std::string name="");
 

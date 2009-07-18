@@ -1,6 +1,6 @@
 
 sample_branch = begin
-   type Image { String name }
+   type Image { string name }
    def draw_image(Image image, int x, int y)
        print("Drawing image " image.name " at: " x "," y)
    end
