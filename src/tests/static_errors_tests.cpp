@@ -34,13 +34,13 @@ void test_unknown_func()
 
 void test_unknown_type()
 {
-    // TODO
-#if 0
     Branch branch;
-    Term* t = branch.eval("i = 2 : RhinosPerCubicSecond");
+    branch.eval("type T { X x }");
+    Term* t = branch[0];
+    test_assert(t->name == "X");
+    test_assert(t->function == UNKNOWN_TYPE_FUNC);
     test_assert(get_static_error(t) == SERROR_UNKNOWN_TYPE);
-    test_equals(get_static_error_message(t), "Unknown type: RhinosPerCubicSecond");
-#endif
+    test_equals(get_static_error_message(t), "Unknown type: X");
 }
 
 void test_unknown_identifier()

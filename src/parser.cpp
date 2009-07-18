@@ -402,6 +402,8 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
     if (has_static_error(result))
         return result;
 
+    branch.moveToEnd(result);
+
     branch.bindName(result, name);
     as_type(result).name = name;
 
