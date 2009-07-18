@@ -12,7 +12,10 @@ namespace annotate_type_function {
     void evaluate(Term* caller)
     {
         if (!value_fits_type(caller->input(0), caller->input(1))) {
-            error_occurred(caller, "Type mismatch");
+            std::stringstream message;
+            message << "A value of type " << caller->input(0)->type->name;
+            message << " doesn't fit in type " << caller->input(1)->name;
+            error_occurred(caller, message.str());
             return;
         }
 

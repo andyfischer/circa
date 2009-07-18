@@ -41,6 +41,7 @@ Term* literal_string(Branch& branch, TokenStream& tokens);
 Term* literal_bool(Branch& branch, TokenStream& tokens);
 Term* literal_color(Branch& branch, TokenStream& tokens);
 Term* literal_list(Branch& branch, TokenStream& tokens);
+Term* plain_branch(Branch& branch, TokenStream& tokens);
 Term* identifier(Branch& branch, TokenStream& tokens);
 
 } // namespace parser

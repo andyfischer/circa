@@ -1,0 +1,13 @@
+
+sample_branch = begin
+   type Image { String name }
+   def draw_image(Image image, int x, int y)
+       print("Drawing image " image.name " at: " x "," y)
+   end
+
+   cat = ["cat.jpg"] : Image
+   dog = ["dog.jpg"] : Image
+
+   draw_image(cat, 10, 10)
+   draw_image(dog, 40, 10)
+end

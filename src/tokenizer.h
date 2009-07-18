@@ -70,6 +70,7 @@ const int ELLIPSIS = 42;
 
 const int DEF = 51;
 const int TYPE = 52;
+const int BEGIN = 64;
 const int END = 53;
 const int IF = 54;
 const int ELSE = 55;

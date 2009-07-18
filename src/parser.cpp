@@ -1114,6 +1114,10 @@ Term* atom(Branch& branch, TokenStream& tokens)
     else if (tokens.nextIs(LBRACKET))
         result = literal_list(branch, tokens);
 
+    // plain branch?
+    else if (tokens.nextIs(BEGIN))
+        result = plain_branch(branch, tokens);
+
     // identifier?
     else if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AMPERSAND))
         result = identifier(branch, tokens);
@@ -1344,6 +1348,22 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
     branch.moveToEnd(result);
 
     set_source_location(result, startPosition, tokens);
+    return result;
+}
+
+Term* plain_branch(Branch& branch, TokenStream& tokens)
+{
+    //int startPosition = tokens.getPosition();
+
+    tokens.consume(BEGIN);
+
+    Term* result = create_branch(branch);
+
+    consume_branch_until_end(as_branch(result), tokens);
+
+    possible_whitespace(tokens);
+    tokens.consume(END);
+
     return result;
 }
 

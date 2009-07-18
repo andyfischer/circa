@@ -54,6 +54,7 @@ const char* get_token_text(int match)
         case ELLIPSIS: return "...";
         case WHITESPACE: return "WHITESPACE";
         case NEWLINE: return "NEWLINE";
+        case BEGIN: return "begin";
         case END: return "end";
         case IF: return "if";
         case ELSE: return "else";
@@ -247,6 +248,7 @@ void top_level_consume_token(TokenizeContext &context)
 
         if (try_to_consume_keyword(context, DEF)) return;
         if (try_to_consume_keyword(context, TYPE)) return;
+        if (try_to_consume_keyword(context, BEGIN)) return;
         if (try_to_consume_keyword(context, END)) return;
         if (try_to_consume_keyword(context, IF)) return;
         if (try_to_consume_keyword(context, ELSE)) return;
