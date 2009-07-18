@@ -71,7 +71,7 @@ Type& as_type(Term *term)
     return *((Type*) term->value);
 }
 
-bool value_fits_type(Term* valueTerm, Term* type)
+bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
 {
     // Always match if they have the same exact type
     if (identity_equals(valueTerm->type, type))
@@ -91,29 +91,52 @@ bool value_fits_type(Term* valueTerm, Term* type)
 
     // Otherwise, primitive types must fit exactly.
     // So if this is a primitive type, reject it.
-    if (!is_compound_type(type))
+    if (!is_compound_type(type)) {
+        if (errorReason != NULL)
+            *errorReason = "type is primitive, expected exact match";
         return false;
+    }
 
     // If 'type' is a compound type, make sure value is too
-    if (!is_compound_type(valueTerm->type))
+    if (!is_compound_type(valueTerm->type)) {
+        if (errorReason != NULL)
+            *errorReason = "value is primitive, type is compound";
         return false;
+    }
 
     // Every compound type matches against List or Branch
-    // TODO: revise this once the type hierarchy is nailed down.
-    if (identity_equals(type, LIST_TYPE)) return true;
-    if (identity_equals(type, BRANCH_TYPE)) return true;
+    // TODO: revise this once there is a real type hierarchy
+    if (identity_equals(type, LIST_TYPE))
+        return true;
+    if (identity_equals(type, BRANCH_TYPE))
+        return true;
 
     Branch& value = as_branch(valueTerm);
 
     // Check if the # of elements matches
     // TODO: Relax this check for lists
-    if (value.length() != as_type(type).prototype.length())
+    if (value.length() != as_type(type).prototype.length()) {
+        if (errorReason != NULL) {
+            std::stringstream error;
+            error << "value has " << value.length() << " elements, type has "
+                << as_type(type).prototype.length();
+            *errorReason = error.str();
+        }
         return false;
+    }
 
     // Check each element
     for (int i=0; i < value.length(); i++) {
-        if (!value_fits_type(value[i], as_type(type).prototype[i]->type))
+        if (!value_fits_type(value[i], as_type(type).prototype[i]->type, errorReason)) {
+
+            if (errorReason != NULL) {
+                std::stringstream error;
+                error << "element " << i << " did not fit:\n" << *errorReason;
+                *errorReason = error.str();
+            }
+
             return false;
+        }
     }
 
     return true;
