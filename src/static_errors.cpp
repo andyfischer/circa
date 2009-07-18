@@ -67,7 +67,7 @@ StaticError get_static_error(Term* term)
         return SERROR_UNKNOWN_FUNCTION;
 
     // Unknown type
-    if (term->type == UNKNOWN_TYPE_FUNC)
+    if (term->function == UNKNOWN_TYPE_FUNC)
         return SERROR_UNKNOWN_TYPE;
 
     // Unknown identifier
@@ -128,7 +128,7 @@ std::string get_static_error_message(Term* term)
         out << "Unknown function: " << term->stringProp("syntaxHints:functionName");
         return out.str();
     case SERROR_UNKNOWN_TYPE:
-        out << "Unknown type: " << term->type->name;
+        out << "Unknown type: " << term->name;
         return out.str();
     case SERROR_UNKNOWN_IDENTIFIER:
         out << "Unknown identifier: " << term->name;
