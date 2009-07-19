@@ -167,13 +167,6 @@ void reproduce_rebinding_operator() {
     finish_source_repro_category();
 }
 
-void reproduce_dot_concat() {
-    round_trip_source("'hello'.print");
-    round_trip_source("   'hey'.print");
-    round_trip_source("c = 'hello'.print");
-    finish_source_repro_category();
-}
-
 void reproduce_if() {
     round_trip_source("if true\nx = 1\nend");
     round_trip_source("if 5.0 > 3.0\n  print('hey')\nend");
@@ -245,7 +238,6 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_function_calls);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_infix);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebinding_operator);
-    REGISTER_TEST_CASE(source_repro_snippets::reproduce_dot_concat);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_if);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_lists);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_for_loop);

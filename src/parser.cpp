@@ -1022,35 +1022,10 @@ Term* dot_expression(Branch& branch, TokenStream& tokens)
             result->stringProp("syntaxHints:declarationStyle") = "dot-concat";
             result->stringProp("syntaxHints:functionName") = rhsIdent;
 
-        // Finally, look for this function in our local scope
+        // Otherwise, give up
         } else {
-            Term* function = find_function(branch, rhsIdent);
-
-            // Consume inputs
-            RefList inputs(lhs);
-
-            if (tokens.nextIs(LPAREN)) {
-                tokens.consume();
-
-                while (!tokens.nextIs(RPAREN)) {
-                    possible_whitespace(tokens);
-                    Term* input = infix_expression(branch, tokens);
-                    inputs.append(input);
-                    possible_whitespace(tokens);
-
-                    if (!tokens.nextIs(RPAREN))
-                        tokens.consume(COMMA);
-                }
-                tokens.consume(RPAREN);
-            }
-
-            result = apply(branch, function, inputs);
-            result->stringProp("syntaxHints:declarationStyle") = "dot-concat";
-
-            if (function == UNKNOWN_FUNCTION) {
-                change_function(result, UNKNOWN_FIELD_FUNC);
-                result->stringProp("field-name") = rhsIdent;
-            }
+            result = apply(branch, UNKNOWN_FIELD_FUNC, RefList());
+            result->stringProp("field-name") = rhsIdent;
         }
 
         lhs = result;
@@ -1355,7 +1330,7 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 
 Term* plain_branch(Branch& branch, TokenStream& tokens)
 {
-    //int startPosition = tokens.getPosition();
+    int startPosition = tokens.getPosition();
 
     tokens.consume(BEGIN);
 
@@ -1364,6 +1339,10 @@ Term* plain_branch(Branch& branch, TokenStream& tokens)
     consume_branch_until_end(as_branch(result), tokens);
 
     possible_whitespace(tokens);
+
+    if (!tokens.nextIs(END))
+        return compile_error_for_line(result, tokens, startPosition);
+
     tokens.consume(END);
 
     return result;
