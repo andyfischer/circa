@@ -947,21 +947,20 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
 
     if (tokens.nextIs(MINUS)) {
         tokens.consume(MINUS);
-        Term* expr = dot_expression(branch, tokens);
+        Term* expr = dot_separated_identifier(branch, tokens);
         return apply(branch, NEG_FUNC, RefList(expr));
     }
 
-    return dot_expression(branch, tokens);
+    return subscripted_atom(branch, tokens);
 }
 
-Term* dot_expression(Branch& branch, TokenStream& tokens)
+Term* dot_separated_identifier(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
-    Term* lhs = subscripted_atom(branch, tokens);
+    Term* lhs = identifier(branch, tokens);
 
     while (tokens.nextIs(DOT)) {
-
         tokens.consume(DOT);
 
         if (!tokens.nextIs(IDENTIFIER))
@@ -971,21 +970,29 @@ Term* dot_expression(Branch& branch, TokenStream& tokens)
 
         Term* result = NULL;
 
-        // Check member functions first
-        Type& lhsType = as_type(lhs->type);
-
         // Field access is not very robust right now. We currently decide at compile-time
         // whether to do a member function call or a get_field, and this decision is
         // not perfect. The proper thing would be to always do get_field and then allow
         // for a call to a by-value function.
 
-        // Another problem is that we allow for the syntax value.function, where 'function'
-        // is not defined on value's type, but instead is just available from our local
-        // scope. This is totally confusing and is incompatible with dynamic name-based field
-        // access.
+        Type& lhsType = as_type(lhs->type);
 
-        // First, look for this field as a member function
-        if (lhsType.memberFunctions.contains(rhsIdent)) {
+        // Check if the LHS is a namespace
+        if (lhs->type == NAMESPACE_TYPE) {
+
+            Branch& contents = as_branch(lhs);
+
+            if (!contents.contains(rhsIdent)) {
+                return lhs;
+
+            } else {
+
+                result = contents[rhsIdent];
+            }
+        }
+
+        // Check if the RHS is a member function
+        else if (lhsType.memberFunctions.contains(rhsIdent)) {
             Term* function = lhsType.memberFunctions[rhsIdent];
 
             // Consume inputs
@@ -1095,9 +1102,13 @@ Term* atom(Branch& branch, TokenStream& tokens)
     else if (tokens.nextIs(BEGIN))
         result = plain_branch(branch, tokens);
 
+    // namespace?
+    else if (tokens.nextIs(NAMESPACE))
+        result = namespace_block(branch, tokens);
+
     // identifier?
     else if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AMPERSAND))
-        result = identifier(branch, tokens);
+        result = dot_separated_identifier(branch, tokens);
 
     // parenthesized expression?
     else if (tokens.nextIs(LPAREN)) {
@@ -1348,6 +1359,31 @@ Term* plain_branch(Branch& branch, TokenStream& tokens)
     return result;
 }
 
+Term* namespace_block(Branch& branch, TokenStream& tokens)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(NAMESPACE);
+
+    possible_whitespace(tokens);
+
+    std::string name = tokens.consume(IDENTIFIER);
+
+    Term* result = create_value(branch, NAMESPACE_TYPE, name);
+
+    consume_branch_until_end(as_branch(result), tokens);
+
+    possible_whitespace(tokens);
+
+    if (!tokens.nextIs(END))
+        return compile_error_for_line(result, tokens, startPosition);
+
+    tokens.consume(END);
+
+    return result;
+
+}
+
 Term* identifier(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
@@ -1360,7 +1396,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
 
     std::string id = tokens.consume(IDENTIFIER);
 
-    if (rebind)
+    if (rebind) 
         push_pending_rebind(branch, id);
 
     Term* result = find_named(branch, id);

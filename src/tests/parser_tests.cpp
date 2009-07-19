@@ -445,6 +445,19 @@ void test_anonymous_type_in_subroutine_decl()
     // TODO
 }
 
+void test_namespace()
+{
+    Branch branch;
+    Term* ns = branch.eval("namespace ns; a = 1; b = 2; end");
+
+    test_assert(ns->type == NAMESPACE_TYPE);
+    test_assert(as_branch(ns).contains("a"));
+    test_assert(as_branch(ns).contains("b"));
+
+    Term* a = branch.eval("ns.a");
+    test_assert(a->asInt() == 1);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -476,6 +489,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_integer_division);
     REGISTER_TEST_CASE(parser_tests::test_literal_list);
     REGISTER_TEST_CASE(parser_tests::test_anonymous_type_in_subroutine_decl);
+    REGISTER_TEST_CASE(parser_tests::test_namespace);
 }
 
 } // namespace parser_tests
