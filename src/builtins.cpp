@@ -290,17 +290,15 @@ void initialize()
     
     // Define output type
     create_value(as_branch(VALUE_FUNC), ANY_TYPE);
-
-    // Declare input_placeholder first because it's used while compiling functions
-    //INPUT_PLACEHOLDER_FUNC = create_value(KERNEL, FUNCTION_TYPE, "input_placeholder");
-    INPUT_PLACEHOLDER_FUNC = import_function(*KERNEL, empty_evaluate_function,
-            "input_placeholder() : any");
-    //function_get_input_placeholder(INPUT_PLACEHOLDER_FUNC, 0)->function = INPUT_PLACEHOLDER_FUNC;
-    
-
     function_get_output_type(VALUE_FUNC) = ANY_TYPE;
 
+    // Declare input_placeholder first because it's used while compiling functions
+    INPUT_PLACEHOLDER_FUNC = import_function(*KERNEL, empty_evaluate_function,
+            "input_placeholder() : any");
+
     initialize_builtin_types(*KERNEL);
+
+    setup_primitive_types();
     setup_builtin_functions(*KERNEL);
     post_setup_builtin_functions(*KERNEL);
 }

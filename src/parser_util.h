@@ -39,11 +39,13 @@ void source_set_hidden(Term* term, bool hidden);
 std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient=NULL);
 
 // Consume the nearby line, return a newly created compile-error term.
-Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start);
+Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start,
+        std::string const& message="");
 
 // Consume the nearby line, convert 'existing' into a compile-error term, and
 // return it.
-Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start);
+Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start,
+        std::string const& message="");
 
 // Helper functions:
 bool is_infix_operator_rebinding(std::string const& infix);

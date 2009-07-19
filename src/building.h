@@ -41,6 +41,7 @@ Term* bool_value(Branch& branch, bool b, std::string const& name="");
 Term* create_ref(Branch& branch, Term* ref, std::string const& name="");
 Branch& create_list(Branch& branch, std::string const& name="");
 Branch& create_branch(Branch& owner, std::string const& name="");
+Branch& create_namespace(Branch&, std::string const& name);
 
 // Make sure that branch[index] is a value with the given type. If that term exists and
 // has a different function or type, then change it. If the branch doesn't have that
