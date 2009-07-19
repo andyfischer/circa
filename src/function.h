@@ -10,7 +10,7 @@
 
 namespace circa {
 
-#define INPUT_PLACEHOLDER_PREFIX "#input-"
+#define INPUT_PLACEHOLDER_PREFIX "#input_"
 #define OUTPUT_PLACEHOLDER_NAME "#out"
 
 namespace function_t {
