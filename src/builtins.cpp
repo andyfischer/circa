@@ -43,6 +43,7 @@ Term* LIST_TYPE = NULL;
 Term* LIST_FUNC = NULL;
 Term* MAP_TYPE = NULL;
 Term* MULT_FUNC = NULL;
+Term* NAMESPACE_TYPE = NULL;
 Term* NEG_FUNC = NULL;
 Term* NOT_FUNC = NULL;
 Term* ONE_TIME_ASSIGN_FUNC = NULL;
@@ -223,6 +224,10 @@ void bootstrap_kernel()
     // Initialize Value func
     VALUE_FUNC->type = FUNCTION_TYPE;
     alloc_value(VALUE_FUNC);
+
+    // Initialize List type, it's needed soon
+    LIST_TYPE = create_compound_type(*KERNEL, "List");
+    as_type(LIST_TYPE).toString = list_t::to_string;
 }
 
 void initialize_builtin_types(Branch& kernel)
@@ -241,9 +246,11 @@ void initialize_builtin_types(Branch& kernel)
     import_member_function(set_type, set_t::hosted_add, "add(Set, any) : Set");
     import_member_function(set_type, set_t::remove, "remove(Set, any) : Set");
 
-    as_type(LIST_TYPE).toString = list_t::to_string;
+    // LIST_TYPE was created in bootstrap_kernel
     import_member_function(LIST_TYPE, list_t::append, "append(List, any) : List");
     import_member_function(LIST_TYPE, list_t::count, "count(List) : int");
+
+    NAMESPACE_TYPE = create_compound_type(kernel, "Namespace");
 
     OVERLOADED_FUNCTION_TYPE = create_compound_type(kernel, "OverloadedFunction");
 

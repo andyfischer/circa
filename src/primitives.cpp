@@ -275,15 +275,13 @@ void initialize_primitive_types(Branch& kernel)
     as_type(BOOL_TYPE).equals = cpp_importing::templated_equals<bool>;
     as_type(BOOL_TYPE).toString = bool_t::to_string;
 
-    ANY_TYPE = create_empty_type(kernel, "any");
-    as_type(ANY_TYPE).toString = any_t::to_string;
-
-    REF_TYPE = import_type<Ref>(kernel, "Ref");
+    REF_TYPE = import_type<Ref>(kernel, "ref");
     as_type(REF_TYPE).remapPointers = Ref::remap_pointers;
 
-    VOID_TYPE = create_empty_type(kernel, "void");
+    // ANY_TYPE was created in bootstrap_kernel
+    as_type(ANY_TYPE).toString = any_t::to_string;
 
-    LIST_TYPE = create_compound_type(kernel, "List");
+    VOID_TYPE = create_empty_type(kernel, "void");
 
     EVALUATE_THUNK_TYPE = import_pointer_type<EvaluateFunc>(kernel, "EvaluateThunk");
     SPECIALIZE_THUNK_TYPE = import_pointer_type<SpecializeTypeFunc>(kernel, "SpecializeThunk");
