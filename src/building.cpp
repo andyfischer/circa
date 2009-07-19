@@ -213,6 +213,11 @@ Branch& create_branch(Branch& owner, std::string const& name)
     return as_branch(term);
 }
 
+Branch& create_namespace(Branch& branch, std::string const& name)
+{
+    return as_branch(create_value(branch, NAMESPACE_TYPE, name));
+}
+
 void rewrite_as_value(Branch& branch, int index, Term* type)
 {
     while (index > branch.length())

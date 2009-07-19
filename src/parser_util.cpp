@@ -144,6 +144,9 @@ Term* find_function(Branch& branch, std::string const& name)
     if (result == NULL)
         return UNKNOWN_FUNCTION;
 
+    if (!is_callable(result))
+        return UNKNOWN_FUNCTION;
+
     return result;
 }
 
@@ -184,20 +187,34 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
     return line.str();
 }
 
-Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start)
+Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start,
+        std::string const& message)
 {
     Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
-    result->stringProp("message") = consume_line(tokens, start, result);
+
+    std::string line = consume_line(tokens, start, result);
+
+    if (message == "")
+        result->stringProp("message") = line;
+    else
+        result->stringProp("message") = message;
 
     assert(has_static_error(result));
 
     return result;
 }
 
-Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start)
+Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start,
+        std::string const& message)
 {
     change_function(existing, UNRECOGNIZED_EXPRESSION_FUNC);
-    existing->stringProp("message") = consume_line(tokens, start, existing);
+    std::string line = consume_line(tokens, start, existing);
+
+    if (message == "")
+        existing->stringProp("message") = line;
+    else
+        existing->stringProp("message") = message;
+
     assert(has_static_error(existing));
 
     return existing;

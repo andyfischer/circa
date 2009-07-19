@@ -947,100 +947,13 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
 
     if (tokens.nextIs(MINUS)) {
         tokens.consume(MINUS);
-        Term* expr = dot_separated_identifier(branch, tokens);
+        Term* expr = subscripted_atom(branch, tokens);
         return apply(branch, NEG_FUNC, RefList(expr));
     }
 
     return subscripted_atom(branch, tokens);
 }
 
-Term* dot_separated_identifier(Branch& branch, TokenStream& tokens)
-{
-    int startPosition = tokens.getPosition();
-
-    Term* lhs = identifier(branch, tokens);
-
-    while (tokens.nextIs(DOT)) {
-        tokens.consume(DOT);
-
-        if (!tokens.nextIs(IDENTIFIER))
-            return compile_error_for_line(branch, tokens, startPosition);
-
-        std::string rhsIdent = tokens.consume(IDENTIFIER);
-
-        Term* result = NULL;
-
-        // Field access is not very robust right now. We currently decide at compile-time
-        // whether to do a member function call or a get_field, and this decision is
-        // not perfect. The proper thing would be to always do get_field and then allow
-        // for a call to a by-value function.
-
-        Type& lhsType = as_type(lhs->type);
-
-        // Check if the LHS is a namespace
-        if (lhs->type == NAMESPACE_TYPE) {
-
-            Branch& contents = as_branch(lhs);
-
-            if (!contents.contains(rhsIdent)) {
-                return lhs;
-
-            } else {
-
-                result = contents[rhsIdent];
-            }
-        }
-
-        // Check if the RHS is a member function
-        else if (lhsType.memberFunctions.contains(rhsIdent)) {
-            Term* function = lhsType.memberFunctions[rhsIdent];
-
-            // Consume inputs
-            RefList inputs(lhs);
-            ListSyntaxHints listHints;
-
-            if (tokens.nextIs(LPAREN)) {
-                tokens.consume();
-                consume_list_arguments(branch, tokens, inputs, listHints);
-
-                if (!tokens.nextIs(RPAREN))
-                    return compile_error_for_line(branch, tokens, startPosition);
-
-                tokens.consume(RPAREN);
-            }
-
-            result = apply(branch, function, inputs);
-
-            // If this is a modifying member function, then rebind the name to this
-            // result.
-            // Note: currently this check is flawed. The only check we do to see if this
-            // is a modifying member function, is if the result type is the same. There
-            // should be a more explicit way of storing this.
-            if ((result->type == inputs[0]->type) && lhs->name != "")
-                branch.bindName(result, lhs->name);
-
-        // Next, if this type defines this field
-        } else if (lhsType.findFieldIndex(rhsIdent) != -1) {
-
-            result = apply(branch, GET_FIELD_FUNC, RefList(lhs, string_value(branch, rhsIdent)));
-            specialize_type(result, lhsType[rhsIdent]->type);
-
-            // Note: maybe this source reproduction should be handled inside get_field_by_name()
-            result->stringProp("syntaxHints:declarationStyle") = "dot-concat";
-            result->stringProp("syntaxHints:functionName") = rhsIdent;
-
-        // Otherwise, give up
-        } else {
-            result = apply(branch, UNKNOWN_FIELD_FUNC, RefList());
-            result->stringProp("field-name") = rhsIdent;
-        }
-
-        lhs = result;
-    }
-
-    set_source_location(lhs, startPosition, tokens);
-    return lhs;
-}
 
 Term* subscripted_atom(Branch& branch, TokenStream& tokens)
 {
@@ -1334,7 +1247,6 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
     result->boolProp("syntaxHints:literal-list") = true;
 
     branch.moveToEnd(result);
-
     set_source_location(result, startPosition, tokens);
     return result;
 }
@@ -1342,46 +1254,154 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 Term* plain_branch(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
-
     tokens.consume(BEGIN);
-
     Term* result = create_branch(branch);
-
     consume_branch_until_end(as_branch(result), tokens);
-
     possible_whitespace(tokens);
 
     if (!tokens.nextIs(END))
         return compile_error_for_line(result, tokens, startPosition);
 
     tokens.consume(END);
-
     return result;
 }
 
 Term* namespace_block(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
-
     tokens.consume(NAMESPACE);
-
     possible_whitespace(tokens);
-
     std::string name = tokens.consume(IDENTIFIER);
-
     Term* result = create_value(branch, NAMESPACE_TYPE, name);
-
     consume_branch_until_end(as_branch(result), tokens);
-
     possible_whitespace(tokens);
 
     if (!tokens.nextIs(END))
         return compile_error_for_line(result, tokens, startPosition);
 
     tokens.consume(END);
-
     return result;
+}
 
+Term* dot_separated_identifier(Branch& branch, TokenStream& tokens)
+{
+    int startPosition = tokens.getPosition();
+
+    Term* lhs = identifier(branch, tokens);
+
+    if (has_static_error(lhs))
+        return lhs;
+
+    std::stringstream fullName;
+
+    fullName << lhs->name;
+
+    while (tokens.nextIs(DOT)) {
+        tokens.consume(DOT);
+
+        if (!tokens.nextIs(IDENTIFIER))
+            return compile_error_for_line(branch, tokens, startPosition);
+
+        std::string rhsIdent = tokens.consume(IDENTIFIER);
+
+        fullName << "." << rhsIdent;
+
+        Term* result = NULL;
+
+        // Field access is not very robust right now. We currently decide at compile-time
+        // whether to do a member function call or a get_field, and this decision is
+        // not perfect. The proper thing would be to always do get_field and then allow
+        // for a call to a by-value function.
+
+        Type& lhsType = as_type(lhs->type);
+
+        // Check if the LHS is a namespace
+        if (lhs->type == NAMESPACE_TYPE) {
+
+            Branch& contents = as_branch(lhs);
+
+            if (!contents.contains(rhsIdent)) {
+                return compile_error_for_line(branch, tokens, startPosition,
+                        "Couldn't find: " + fullName.str());
+
+            } else {
+                result = contents[rhsIdent];
+            }
+
+            if (tokens.nextIs(LPAREN)) {
+
+                if (!is_function(result)) {
+                    return compile_error_for_line(branch, tokens, startPosition,
+                        "Not a function: " + fullName.str());
+                }
+
+                RefList inputs;
+                ListSyntaxHints listHints;
+
+                tokens.consume(LPAREN);
+                consume_list_arguments(branch, tokens, inputs, listHints);
+
+                if (!tokens.nextIs(RPAREN))
+                    return compile_error_for_line(branch, tokens, startPosition);
+
+                tokens.consume(RPAREN);
+
+                result = apply(branch, result, inputs);
+                listHints.apply(result);
+                return result;
+            }
+        }
+
+        // Check if the RHS is a member function
+        else if (lhsType.memberFunctions.contains(rhsIdent)) {
+            Term* function = lhsType.memberFunctions[rhsIdent];
+
+            // Consume inputs
+            RefList inputs(lhs);
+            ListSyntaxHints listHints;
+
+            if (tokens.nextIs(LPAREN)) {
+                tokens.consume(LPAREN);
+                consume_list_arguments(branch, tokens, inputs, listHints);
+
+                if (!tokens.nextIs(RPAREN))
+                    return compile_error_for_line(branch, tokens, startPosition);
+
+                tokens.consume(RPAREN);
+            }
+
+            result = apply(branch, function, inputs);
+            listHints.apply(result);
+
+            // If this is a modifying member function, then rebind the name to this
+            // result.
+            // Note: currently this check is flawed. The only check we do to see if this
+            // is a modifying member function, is if the result type is the same. There
+            // should be a more explicit way of storing this.
+            if ((result->type == inputs[0]->type) && lhs->name != "")
+                branch.bindName(result, lhs->name);
+
+        // Next, if this type defines this field
+        } else if (lhsType.findFieldIndex(rhsIdent) != -1) {
+
+            result = apply(branch, GET_FIELD_FUNC, RefList(lhs, string_value(branch, rhsIdent)));
+            specialize_type(result, lhsType[rhsIdent]->type);
+
+            // Note: maybe this source reproduction should be handled inside get_field_by_name()
+            result->stringProp("syntaxHints:declarationStyle") = "dot-concat";
+            result->stringProp("syntaxHints:functionName") = rhsIdent;
+
+        // Otherwise, give up
+        } else {
+            result = apply(branch, UNKNOWN_FIELD_FUNC, RefList());
+            result->stringProp("field-name") = rhsIdent;
+        }
+
+        lhs = result;
+    }
+
+    set_source_location(lhs, startPosition, tokens);
+    return lhs;
 }
 
 Term* identifier(Branch& branch, TokenStream& tokens)

@@ -450,12 +450,25 @@ void test_namespace()
     Branch branch;
     Term* ns = branch.eval("namespace ns; a = 1; b = 2; end");
 
+    test_assert(branch);
     test_assert(ns->type == NAMESPACE_TYPE);
     test_assert(as_branch(ns).contains("a"));
     test_assert(as_branch(ns).contains("b"));
 
     Term* a = branch.eval("ns.a");
     test_assert(a->asInt() == 1);
+
+    branch.clear();
+    ns = branch.eval("namespace ns; def myfunc(int a) : int; return a+1; end; end");
+    Term* c = branch.eval("c = ns.myfunc(4)");
+    test_assert(branch);
+    test_assert(c->asInt() == 5);
+
+    branch.clear();
+    ns = branch.eval("namespace ns1; namespace ns2; x = 12; end; end");
+    Term* x = branch.eval("ns1.ns2.x");
+    test_assert(branch);
+    test_assert(x->asInt() == 12);
 }
 
 void register_tests()

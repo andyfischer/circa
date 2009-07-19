@@ -256,8 +256,48 @@ namespace any_t {
     }
 }
 
+namespace ref_t {
+    std::string to_string(Term* term)
+    {
+        Term* t = as_ref(term);
+        if (t == NULL)
+            return "NULL";
+        else
+            return format_global_id(t);
+    }
+
+    void get_name(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL)
+            error_occurred(caller, "NULL reference");
+        as_string(caller) = t->name;
+    }
+    void get_function(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL)
+            error_occurred(caller, "NULL reference");
+        as_ref(caller) = t->function;
+    }
+    void hosted_typeof(Term* caller)
+    {
+        dump_branch(*caller->owningBranch);
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL)
+            error_occurred(caller, "NULL reference");
+        as_ref(caller) = t->type;
+        dump_branch(*caller->owningBranch);
+    }
+}
+
 void initialize_primitive_types(Branch& kernel)
 {
+    EVALUATE_THUNK_TYPE = import_pointer_type<EvaluateFunc>(kernel, "EvaluateThunk");
+    SPECIALIZE_THUNK_TYPE = import_pointer_type<SpecializeTypeFunc>(kernel, "SpecializeThunk");
+    TO_STRING_THUNK_TYPE = import_pointer_type<ToSourceStringFunc>(kernel, "ToSourceStringThunk");
+    CHECK_INVARIANTS_FUNC_TYPE = import_pointer_type<CheckInvariantsFunc>(kernel, "CheckInvariantsThunk");
+
     STRING_TYPE = import_type<std::string>(kernel, "string");
     as_type(STRING_TYPE).equals = cpp_importing::templated_equals<std::string>;
     as_type(STRING_TYPE).toString = string_t::to_string;
@@ -277,16 +317,19 @@ void initialize_primitive_types(Branch& kernel)
 
     REF_TYPE = import_type<Ref>(kernel, "ref");
     as_type(REF_TYPE).remapPointers = Ref::remap_pointers;
+    as_type(REF_TYPE).toString = ref_t::to_string;
 
     // ANY_TYPE was created in bootstrap_kernel
     as_type(ANY_TYPE).toString = any_t::to_string;
 
     VOID_TYPE = create_empty_type(kernel, "void");
+}
 
-    EVALUATE_THUNK_TYPE = import_pointer_type<EvaluateFunc>(kernel, "EvaluateThunk");
-    SPECIALIZE_THUNK_TYPE = import_pointer_type<SpecializeTypeFunc>(kernel, "SpecializeThunk");
-    TO_STRING_THUNK_TYPE = import_pointer_type<ToSourceStringFunc>(kernel, "ToSourceStringThunk");
-    CHECK_INVARIANTS_FUNC_TYPE = import_pointer_type<CheckInvariantsFunc>(kernel, "CheckInvariantsThunk");
+void setup_primitive_types()
+{
+    import_member_function(REF_TYPE, ref_t::get_name, "name(ref) : string");
+    import_member_function(REF_TYPE, ref_t::hosted_typeof, "typeof(ref) : ref");
+    import_member_function(REF_TYPE, ref_t::get_function, "function(ref) : ref");
 }
 
 } // namespace circa
