@@ -30,7 +30,7 @@ Term* return_statement(Branch& branch, TokenStream& tokens);
 Term* infix_expression(Branch& branch, TokenStream& tokens);
 Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedence);
 Term* unary_expression(Branch& branch, TokenStream& tokens);
-Term* dot_expression(Branch& branch, TokenStream& tokens);
+Term* dot_separated_identifier(Branch& branch, TokenStream& tokens);
 Term* subscripted_atom(Branch& branch, TokenStream& tokens);
 Term* atom(Branch& branch, TokenStream& tokens);
 Term* function_call(Branch& branch, TokenStream& tokens);
@@ -42,6 +42,7 @@ Term* literal_bool(Branch& branch, TokenStream& tokens);
 Term* literal_color(Branch& branch, TokenStream& tokens);
 Term* literal_list(Branch& branch, TokenStream& tokens);
 Term* plain_branch(Branch& branch, TokenStream& tokens);
+Term* namespace_block(Branch& branch, TokenStream& tokens);
 Term* identifier(Branch& branch, TokenStream& tokens);
 
 } // namespace parser

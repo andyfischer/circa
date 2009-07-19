@@ -39,9 +39,7 @@ namespace subroutine_t {
         }
 
         result << "\n";
-
         result << get_branch_source(branch);
-        
         result << "end";
 
         return result.str();
