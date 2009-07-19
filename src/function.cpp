@@ -48,12 +48,12 @@ void initialize_function_data(Term* term)
       {
         [0] attributes {
           [0] string name
-          [1] Ref hidden_state_type
+          [1] ref hidden_state_type
           [2] bool variable_args
           [3] EvaluateFunc native_evaluate
           [4] SpecializeTypeFunc native_specialize_type
           [5] ToSourceStringFunc native_to_source_string
-          [6] Ref feedback_func
+          [6] ref feedback_func
           [7] List parameters
         }
         [1..num_inputs] input terms
