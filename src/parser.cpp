@@ -1373,12 +1373,10 @@ Term* dot_separated_identifier(Branch& branch, TokenStream& tokens)
             result = apply(branch, function, inputs);
             listHints.apply(result);
 
-            // If this is a modifying member function, then rebind the name to this
-            // result.
-            // Note: currently this check is flawed. The only check we do to see if this
-            // is a modifying member function, is if the result type is the same. There
-            // should be a more explicit way of storing this.
-            if ((result->type == inputs[0]->type) && lhs->name != "")
+            // Check if the first input has a "use-as-output" property. If so, rebind
+            // this object's name to the result of this function.
+            if (lhs->name != "" && function_t::get_input_placeholder(function, 0)
+                        ->boolPropOptional("use-as-output", false))
                 branch.bindName(result, lhs->name);
 
         // Next, if this type defines this field

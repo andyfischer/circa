@@ -265,7 +265,6 @@ namespace ref_t {
         else
             return format_global_id(t);
     }
-
     void get_name(Term* caller)
     {
         Term* t = caller->input(0)->asRef();
@@ -282,12 +281,10 @@ namespace ref_t {
     }
     void hosted_typeof(Term* caller)
     {
-        dump_branch(*caller->owningBranch);
         Term* t = caller->input(0)->asRef();
         if (t == NULL)
             error_occurred(caller, "NULL reference");
         as_ref(caller) = t->type;
-        dump_branch(*caller->owningBranch);
     }
 }
 

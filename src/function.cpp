@@ -62,7 +62,7 @@ namespace function_t {
         return i - 1;
     }
 
-    Term*& get_input_placeholder(Term* func, int index)
+    Term* get_input_placeholder(Term* func, int index)
     {
         return as_branch(func)[index + 1];
     }
