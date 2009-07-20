@@ -134,8 +134,8 @@ std::string get_term_source(Term* term)
     }
 
     // check if this function has a toSourceString function
-    if (function_get_to_source_string(term->function) != NULL) {
-        result << function_get_to_source_string(term->function)(term);
+    if (function_t::get_to_source_string(term->function) != NULL) {
+        result << function_t::get_to_source_string(term->function)(term);
         result << term->stringPropOptional("syntaxHints:postWhitespace", "");
         return result.str();
     }

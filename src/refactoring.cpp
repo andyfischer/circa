@@ -8,7 +8,7 @@ void change_function(Term* term, Term* newFunction)
 {
     term->function = newFunction;
 
-    change_type(term, function_get_output_type(newFunction));
+    change_type(term, function_t::get_output_type(newFunction));
 }
 
 void unsafe_change_type(Term *term, Term *type)

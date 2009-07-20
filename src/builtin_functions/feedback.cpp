@@ -13,7 +13,7 @@ namespace feedback_function {
     void setup(Branch& kernel)
     {
         FEEDBACK_FUNC = import_function(kernel, evaluate, "feedback(any,any)");
-        function_set_input_meta(FEEDBACK_FUNC, 0, true);
+        function_t::set_input_meta(FEEDBACK_FUNC, 0, true);
     }
 }
 }

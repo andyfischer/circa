@@ -12,7 +12,7 @@ namespace vectorize_vs_function {
 
     void evaluate(Term* caller)
     {
-        Term* func = function_get_parameters(caller->function)[0]->asRef();
+        Term* func = function_t::get_parameters(caller->function)[0]->asRef();
 
         Branch& left = as_branch(caller->input(0));
         Term* right = caller->input(1);
@@ -35,7 +35,7 @@ namespace vectorize_vs_function {
     void setup(Branch& kernel)
     {
         Term* func = import_function(kernel, evaluate, "vectorize_vs(List,any) : List");
-        function_get_specialize_type(func) = specializeType;
+        function_t::get_specialize_type(func) = specializeType;
     }
 }
 } // namespace circa

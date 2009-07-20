@@ -32,7 +32,7 @@ namespace cos_function {
     void setup(Branch& kernel)
     {
         Term* func = import_function(kernel, evaluate, "cos(float) : float");
-        function_get_feedback_func(func) = 
+        function_t::get_feedback_func(func) = 
             import_function(kernel, feedback_evaluate, "cos_feedback(any, float) : float");
     }
 }

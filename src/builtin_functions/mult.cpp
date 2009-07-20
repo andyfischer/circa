@@ -54,7 +54,7 @@ namespace mult_function {
 
         Term* mult_f = import_function_overload(MULT_FUNC, evaluate_f, "mult_f(float,float) : float");
 
-        function_get_feedback_func(mult_f) = 
+        function_t::get_feedback_func(mult_f) = 
             import_function(kernel, feedback_evaluate, "mult_feedback(any, float) : Branch");
 
         kernel.bindName(mult_i, "mult_i");

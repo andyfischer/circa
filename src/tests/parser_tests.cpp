@@ -154,15 +154,15 @@ void test_function_decl()
             "end");
 
     test_equals(func->name, "Myfunc");
-    test_equals(function_get_name(func), "Myfunc");
+    test_equals(function_t::get_name(func), "Myfunc");
 
-    test_assert(function_get_input_type(func, 0) == STRING_TYPE);
-    test_assert(function_get_input_name(func, 0) == "what");
-    test_assert(function_get_input_type(func, 1) == STRING_TYPE);
-    test_assert(function_get_input_name(func, 1) == "hey");
-    test_assert(function_get_input_type(func, 2) == INT_TYPE);
-    test_assert(function_get_input_name(func, 2) == "yo");
-    test_assert(function_get_output_type(func) == BOOL_TYPE);
+    test_assert(function_t::get_input_type(func, 0) == STRING_TYPE);
+    test_assert(function_t::get_input_name(func, 0) == "what");
+    test_assert(function_t::get_input_type(func, 1) == STRING_TYPE);
+    test_assert(function_t::get_input_name(func, 1) == "hey");
+    test_assert(function_t::get_input_type(func, 2) == INT_TYPE);
+    test_assert(function_t::get_input_name(func, 2) == "yo");
+    test_assert(function_t::get_output_type(func) == BOOL_TYPE);
 
     Branch& funcbranch = as_branch(func);
 
@@ -253,7 +253,7 @@ void test_dot_concatenation()
     test_assert(is_value(branch[0]));
     test_assert(is_value(branch[1]));
     test_assert(branch[1]->asInt() == 1);
-    test_equals(function_get_name(branch[2]->function), "add");
+    test_equals(function_t::get_name(branch[2]->function), "add");
     test_assert(branch["s"] == s);
 }
 

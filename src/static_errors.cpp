@@ -16,13 +16,13 @@ StaticError get_static_error_for_index(Term* term, int index)
 {
     int effectiveIndex = index;
 
-    bool varArgs = function_get_variable_args(term->function);
+    bool varArgs = function_t::get_variable_args(term->function);
     if (varArgs)
         effectiveIndex = 0;
 
     Term* input = term->inputs[index];
-    bool meta = function_get_input_meta(term->function, effectiveIndex);
-    Term* type = function_get_input_type(term->function, effectiveIndex);
+    bool meta = function_t::get_input_meta(term->function, effectiveIndex);
+    Term* type = function_t::get_input_type(term->function, effectiveIndex);
      
     if (input == NULL && !meta)
         return SERROR_NULL_INPUT_TERM;
@@ -42,8 +42,8 @@ StaticError get_static_error(Term* term)
     if (term->function == NULL) 
         return SERROR_NULL_FUNCTION;
 
-    bool varArgs = function_get_variable_args(term->function);
-    int funcNumInputs = function_num_inputs(term->function);
+    bool varArgs = function_t::get_variable_args(term->function);
+    int funcNumInputs = function_t::num_inputs(term->function);
 
     // Check # of inputs
     if (!varArgs && (term->inputs.length() != funcNumInputs))
@@ -98,7 +98,7 @@ std::string get_static_error_message(Term* term)
         return "Function is NULL";
 
     case SERROR_WRONG_NUMBER_OF_INPUTS: {
-        int funcNumInputs = function_num_inputs(term->function);
+        int funcNumInputs = function_t::num_inputs(term->function);
         out << "Wrong number of inputs (found " << term->inputs.length()
             << ", expected " << funcNumInputs << ")";
         return out.str();
@@ -119,7 +119,7 @@ std::string get_static_error_message(Term* term)
 
         out << "Input type " << term->input(errorIndex)->type->name
             << " doesn't fit in expected type "
-            << function_get_input_type(term->function, errorIndex)->name << " (in function "
+            << function_t::get_input_type(term->function, errorIndex)->name << " (in function "
             << term->function->name << ")";
         return out.str();
     } 

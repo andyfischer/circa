@@ -259,7 +259,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     initialize_function_data(result);
     Branch& contents = as_branch(result);
 
-    function_get_name(result) = functionName;
+    function_t::get_name(result) = functionName;
 
     // Consume input arguments
     while (!tokens.nextIs(RPAREN) && !tokens.finished())
@@ -287,7 +287,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
             name = tokens.consume();
             possible_whitespace(tokens);
         } else {
-            name = get_placeholder_name_for_index(function_num_inputs(result));
+            name = get_placeholder_name_for_index(function_t::num_inputs(result));
         }
 
         // Create an input placeholder term
@@ -296,12 +296,12 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         source_set_hidden(input, true);
 
         if (isHiddenStateArgument)
-            function_get_hidden_state_type(result) = typeTerm;
+            function_t::get_hidden_state_type(result) = typeTerm;
 
         // Variable args when ... is appended
         if (tokens.nextIs(ELLIPSIS)) {
             tokens.consume();
-            function_get_variable_args(result) = true;
+            function_t::get_variable_args(result) = true;
         }
 
         if (!tokens.nextIs(RPAREN)) {
@@ -372,8 +372,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     tokens.consume(END);
 
     // Officially make this a subroutine
-    function_get_evaluate(result) = subroutine_call_evaluate;
-    function_get_to_source_string(result) = subroutine_t::to_string;
+    function_t::get_evaluate(result) = subroutine_call_evaluate;
+    function_t::get_to_source_string(result) = subroutine_t::to_string;
 
     assert(is_value(result));
     assert(is_subroutine(result));

@@ -33,7 +33,7 @@ namespace sin_function {
     void setup(Branch& kernel)
     {
         Term* main_func = import_function(kernel, evaluate, "sin(float) : float");
-        function_get_feedback_func(main_func) = 
+        function_t::get_feedback_func(main_func) = 
             import_function(kernel, feedback_evaluate, "sin_feedback(any, float) : float");
     }
 }

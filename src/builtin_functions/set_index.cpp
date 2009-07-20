@@ -22,7 +22,7 @@ namespace set_index_function {
     {
         SET_INDEX_FUNC = import_function(kernel, evaluate,
                 "set_index(any, int, any) : any");
-        function_get_specialize_type(SET_INDEX_FUNC) = specializeType;
+        function_t::get_specialize_type(SET_INDEX_FUNC) = specializeType;
     }
 }
 }

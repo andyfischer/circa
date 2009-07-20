@@ -11,19 +11,19 @@ namespace subroutine_t {
 
         std::stringstream result;
 
-        result << "def " << function_get_name(term) << "(";
+        result << "def " << function_t::get_name(term) << "(";
 
         bool first = true;
-        int numInputs = function_num_inputs(term);
+        int numInputs = function_t::num_inputs(term);
         for (int i=0; i < numInputs; i++) {
-            std::string name = function_get_input_name(term, i);
+            std::string name = function_t::get_input_name(term, i);
 
             if (name == "#state")
                 continue;
 
             if (!first) result << ", ";
             first = false;
-            result << function_get_input_type(term, i)->name;
+            result << function_t::get_input_type(term, i)->name;
 
             if (name != "")
                 result << " " << name;
@@ -31,11 +31,11 @@ namespace subroutine_t {
 
         result << ")";
 
-        if (function_get_output_type(term) != VOID_TYPE) {
+        if (function_t::get_output_type(term) != VOID_TYPE) {
             result << term->stringPropOptional("syntaxHints:whitespacePreColon", " ");
             result << ":";
             result << term->stringPropOptional("syntaxHints:whitespacePostColon", " ");
-            result << function_get_output_type(term)->name;
+            result << function_t::get_output_type(term)->name;
         }
 
         result << "\n";
@@ -49,7 +49,7 @@ namespace subroutine_t {
 bool is_subroutine(Term* term)
 {
     return (term->type == FUNCTION_TYPE)
-        && function_get_evaluate(term) == subroutine_call_evaluate;
+        && function_t::get_evaluate(term) == subroutine_call_evaluate;
 }
 
 void subroutine_update_hidden_state_type(Term* func)
@@ -67,9 +67,9 @@ void subroutine_update_hidden_state_type(Term* func)
     }
 
     if (hasState) {
-        function_get_hidden_state_type(func) = BRANCH_TYPE;
-        bool alreadyHasStateInput = (function_num_inputs(func) > 0)
-            && (function_get_input_name(func, 0) == "#state");
+        function_t::get_hidden_state_type(func) = BRANCH_TYPE;
+        bool alreadyHasStateInput = (function_t::num_inputs(func) > 0)
+            && (function_t::get_input_name(func, 0) == "#state");
         if (!alreadyHasStateInput) {
             // Insert an input for state
             contents.insert(1, new Term());
@@ -77,7 +77,7 @@ void subroutine_update_hidden_state_type(Term* func)
             contents.bindName(contents[1], "#state");
         }
     } else {
-        function_get_hidden_state_type(func) = VOID_TYPE;
+        function_t::get_hidden_state_type(func) = VOID_TYPE;
     }
 }
 
@@ -91,7 +91,7 @@ void subroutine_call_evaluate(Term* caller)
     Term* function = hiddenState == NULL ? (Term*) caller->function : hiddenState;
     Branch& functionBranch = as_branch(function);
 
-    int num_inputs = function_num_inputs(caller->function);
+    int num_inputs = function_t::num_inputs(caller->function);
 
     if (num_inputs != caller->inputs.length()) {
         std::stringstream msg;
@@ -104,13 +104,13 @@ void subroutine_call_evaluate(Term* caller)
     // Implant inputs
     for (int input=0; input < num_inputs; input++) {
 
-        std::string inputName = function_get_input_name(function, input);
+        std::string inputName = function_t::get_input_name(function, input);
         if (inputName == "#state") {
             assert(input == 0);
             continue;
         }
 
-        Term* term = function_get_input_placeholder(function, input);
+        Term* term = function_t::get_input_placeholder(function, input);
 
         assert(term->function == INPUT_PLACEHOLDER_FUNC);
 

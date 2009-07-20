@@ -45,7 +45,7 @@ namespace add_function {
 
         Term* add_f = import_function_overload(ADD_FUNC, evaluate_f, "add_f(float...) : float");
 
-        function_get_feedback_func(add_f) =
+        function_t::get_feedback_func(add_f) =
             import_function(kernel, feedback_evaluate, "add_feedback(any, float) : Branch");
 
         kernel.bindName(add_f, "add_f");

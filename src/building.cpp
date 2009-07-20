@@ -21,11 +21,11 @@ Term* apply(Branch& branch, Term* function, RefList const& _inputs, std::string 
     result->function = function;
 
     // If 'function' has hidden state, then create a container for that state, if needed
-    if (is_function_stateful(function) && (inputs.length() < function_num_inputs(function)))
+    if (is_function_stateful(function) && (inputs.length() < function_t::num_inputs(function)))
     {
         std::stringstream new_value_name;
         new_value_name << "#hidden_state_for_" << format_global_id(result);
-        Term* stateContainer = create_value(branch, function_get_hidden_state_type(function),
+        Term* stateContainer = create_value(branch, function_t::get_hidden_state_type(function),
                 new_value_name.str());
         source_set_hidden(stateContainer, true);
         set_stateful(stateContainer, true);
@@ -42,12 +42,12 @@ Term* apply(Branch& branch, Term* function, RefList const& _inputs, std::string 
     for (int i=0; i < inputs.length(); i++)
         set_input(result, i, inputs[i]);
 
-    Term* outputType = function_get_output_type(function);
+    Term* outputType = function_t::get_output_type(function);
 
     // Check if this function has a specializeType function
     // Side note: maybe we should do this step a different way.
-    if (function_get_specialize_type(function) != NULL)
-        outputType = function_get_specialize_type(function)(result);
+    if (function_t::get_specialize_type(function) != NULL)
+        outputType = function_t::get_specialize_type(function)(result);
 
     assert(outputType != NULL);
     assert(is_type(outputType));
@@ -74,10 +74,10 @@ void rewrite(Term* term, Term* function, RefList const& inputs)
     change_function(term, function);
     for (int i=0; i < inputs.length(); i++)
         set_input(term, i, inputs[i]);
-    Term* outputType = function_get_output_type(function);
+    Term* outputType = function_t::get_output_type(function);
 
-    if (function_get_specialize_type(function) != NULL)
-        outputType = function_get_specialize_type(function)(term);
+    if (function_t::get_specialize_type(function) != NULL)
+        outputType = function_t::get_specialize_type(function)(term);
 
     change_type(term, outputType);
 }

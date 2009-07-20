@@ -155,7 +155,7 @@ void refresh_training_branch(Branch& branch)
         if (!operation.hasPendingFeedback(term))
             continue;
 
-        Term* feedbackFunc = function_get_feedback_func(term->function);
+        Term* feedbackFunc = function_t::get_feedback_func(term->function);
 
         // Skip term if it has no feedback function
         if (feedbackFunc == NULL) {
@@ -209,7 +209,7 @@ void refresh_training_branch(Branch& branch)
                 Term* outgoingFeedback = as_branch(feedback)[i];
 
                 // Initialize this field
-                specialize_type(outgoingFeedback, function_get_input_type(term->function, i));
+                specialize_type(outgoingFeedback, function_t::get_input_type(term->function, i));
                 alloc_value(outgoingFeedback);
 
                 if (!is_trainable(input))
