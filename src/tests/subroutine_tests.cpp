@@ -64,7 +64,7 @@ void subroutine_stateful_term()
     // Make sure that stateful terms work correctly
     Term* call = branch.eval("mysub()");
     test_assert(call);
-    test_assert(function_get_hidden_state_type(branch["mysub"]) != VOID_TYPE);
+    test_assert(function_t::get_hidden_state_type(branch["mysub"]) != VOID_TYPE);
     test_assert(is_function_stateful(branch["mysub"]));
     test_assert(get_hidden_state_for_call(call) != NULL);
     Term* a_inside_call = get_hidden_state_for_call(call)->field("a");
@@ -104,10 +104,10 @@ void initialize_state_type()
     Branch branch;
 
     Term* a = branch.eval("def a():float\nreturn 1 + 1\nend");
-    test_assert(function_get_hidden_state_type(a) == VOID_TYPE);
+    test_assert(function_t::get_hidden_state_type(a) == VOID_TYPE);
 
     Term* b = branch.eval("def b()\nstate i\nend");
-    test_assert(function_get_hidden_state_type(b) == BRANCH_TYPE);
+    test_assert(function_t::get_hidden_state_type(b) == BRANCH_TYPE);
 }
 
 void shadow_input()
@@ -131,7 +131,7 @@ void specialization_to_output_type()
     Term* point = branch.eval("type Point { float x, float y }");
     Term* a = branch.eval("def a() : Point\nreturn [1 2]\nend");
 
-    test_assert(function_get_output_type(a) == point);
+    test_assert(function_t::get_output_type(a) == point);
 
     // Make sure that the return value is preserved. This had a bug too
     Term* call = branch.eval("a()");

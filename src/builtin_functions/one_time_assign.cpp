@@ -24,7 +24,7 @@ namespace one_time_assign_function {
     {
         ONE_TIME_ASSIGN_FUNC = import_function(kernel, evaluate,
                 "one_time_assign(state bool, any) : any");
-        function_get_specialize_type(ONE_TIME_ASSIGN_FUNC) = specializeType;
+        function_t::get_specialize_type(ONE_TIME_ASSIGN_FUNC) = specializeType;
     }
 }
 }

@@ -17,7 +17,7 @@ void set_stateful(Term* term, bool value)
 bool is_function_stateful(Term* func)
 {
     assert(is_function(func));
-    Term* stateType = function_get_hidden_state_type(func);
+    Term* stateType = function_t::get_hidden_state_type(func);
     return (stateType != NULL && stateType != VOID_TYPE);
 }
 

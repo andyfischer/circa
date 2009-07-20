@@ -31,7 +31,7 @@ namespace branch_function {
     void setup(Branch& kernel)
     {
         BRANCH_FUNC = import_function(kernel, evaluate, "branch() : Branch");
-        function_get_to_source_string(BRANCH_FUNC) = toSourceString;
+        function_t::get_to_source_string(BRANCH_FUNC) = toSourceString;
     }
 }
 }

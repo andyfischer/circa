@@ -26,7 +26,7 @@ void evaluate_term(Term* term)
         return;
     }
 
-    EvaluateFunc evaluate = function_get_evaluate(term->function);
+    EvaluateFunc evaluate = function_t::get_evaluate(term->function);
 
     if (evaluate == NULL)
         return;

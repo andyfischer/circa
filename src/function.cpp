@@ -7,7 +7,7 @@ namespace circa {
 namespace function_t {
     std::string to_string(Term* term)
     {
-        return "<Function " + function_get_name(term) + ">";
+        return "<Function " + function_t::get_name(term) + ">";
     }
 
     bool check_invariants(Term* func, std::stringstream* output)
@@ -28,7 +28,98 @@ namespace function_t {
 
         return true;
     }
-}
+
+    std::string& get_name(Term* function)
+    {
+        return function->field(0)->field(0)->asString();
+    }
+
+    Ref& get_output_type(Term* function)
+    {
+        Branch& contents = as_branch(function);
+        return contents[contents.length()-1]->type;
+    }
+
+    Ref& get_hidden_state_type(Term* function)
+    {
+        return function->field(0)->field(1)->asRef();
+    }
+
+    bool& get_variable_args(Term* function)
+    {
+        return function->field(0)->field(2)->asBool();
+    }
+
+    int num_inputs(Term* function)
+    {
+        Branch& contents = as_branch(function);
+        int i = 1;
+
+        while (i < contents.length()
+                && contents[i] != NULL
+                && contents[i]->function == INPUT_PLACEHOLDER_FUNC)
+            i++;
+        return i - 1;
+    }
+
+    Term*& get_input_placeholder(Term* func, int index)
+    {
+        return as_branch(func)[index + 1];
+    }
+
+    std::string const& get_input_name(Term* func, int index)
+    {
+        return function_t::get_input_placeholder(func, index)->name;
+    }
+
+    bool get_input_meta(Term* func, int index)
+    {
+        return function_t::get_input_placeholder(func, index)->boolPropOptional("meta", false);
+    }
+
+    void set_input_meta(Term* func, int index, bool value)
+    {
+        function_t::get_input_placeholder(func, index)->boolProp("meta") = value;
+    }
+
+    bool get_input_modified(Term* func, int index)
+    {
+        return function_t::get_input_placeholder(func, index)->boolPropOptional("modified", false);
+    }
+
+    Term* get_input_type(Term* func, int index)
+    {
+        if (function_t::get_variable_args(func))
+            index = 0;
+
+        return function_t::get_input_placeholder(func, index)->type;
+    }
+
+    EvaluateFunc& get_evaluate(Term* func)
+    {
+        return as_evaluate_thunk(func->field(0)->field(3));
+    }
+
+    SpecializeTypeFunc& get_specialize_type(Term* func)
+    {
+        return as_specialize_type_thunk(func->field(0)->field(4));
+    }
+
+    ToSourceStringFunc& get_to_source_string(Term* func)
+    {
+        return as_to_source_string_thunk(func->field(0)->field(5));
+    }
+
+    Ref& get_feedback_func(Term* func)
+    {
+        return as_ref(func->field(0)->field(6));
+    }
+
+    Branch& get_parameters(Term* func)
+    {
+        return as_branch(func->field(0)->field(7));
+    }
+} // namespace function_t
 
 bool is_function(Term* term)
 {
@@ -78,96 +169,6 @@ void initialize_function_data(Term* term)
     create_value(attributes, LIST_TYPE, "parameters");
 }
 
-std::string& function_get_name(Term* function)
-{
-    return function->field(0)->field(0)->asString();
-}
-
-Ref& function_get_output_type(Term* function)
-{
-    Branch& contents = as_branch(function);
-    return contents[contents.length()-1]->type;
-}
-
-Ref& function_get_hidden_state_type(Term* function)
-{
-    return function->field(0)->field(1)->asRef();
-}
-
-bool& function_get_variable_args(Term* function)
-{
-    return function->field(0)->field(2)->asBool();
-}
-
-int function_num_inputs(Term* function)
-{
-    Branch& contents = as_branch(function);
-    int i = 1;
-
-    while (i < contents.length()
-            && contents[i] != NULL
-            && contents[i]->function == INPUT_PLACEHOLDER_FUNC)
-        i++;
-    return i - 1;
-}
-
-Term*& function_get_input_placeholder(Term* func, int index)
-{
-    return as_branch(func)[index + 1];
-}
-
-std::string const& function_get_input_name(Term* func, int index)
-{
-    return function_get_input_placeholder(func, index)->name;
-}
-
-bool function_get_input_meta(Term* func, int index)
-{
-    return function_get_input_placeholder(func, index)->boolPropOptional("meta", false);
-}
-
-void function_set_input_meta(Term* func, int index, bool value)
-{
-    function_get_input_placeholder(func, index)->boolProp("meta") = value;
-}
-
-bool function_get_input_modified(Term* func, int index)
-{
-    return function_get_input_placeholder(func, index)->boolPropOptional("modified", false);
-}
-
-Term* function_get_input_type(Term* func, int index)
-{
-    if (function_get_variable_args(func))
-        index = 0;
-
-    return function_get_input_placeholder(func, index)->type;
-}
-
-EvaluateFunc& function_get_evaluate(Term* func)
-{
-    return as_evaluate_thunk(func->field(0)->field(3));
-}
-
-SpecializeTypeFunc& function_get_specialize_type(Term* func)
-{
-    return as_specialize_type_thunk(func->field(0)->field(4));
-}
-
-ToSourceStringFunc& function_get_to_source_string(Term* func)
-{
-    return as_to_source_string_thunk(func->field(0)->field(5));
-}
-
-Ref& function_get_feedback_func(Term* func)
-{
-    return as_ref(func->field(0)->field(6));
-}
-
-Branch& function_get_parameters(Term* func)
-{
-    return as_branch(func->field(0)->field(7));
-}
 
 bool is_callable(Term* term)
 {
@@ -178,14 +179,14 @@ bool is_callable(Term* term)
 
 bool inputs_fit_function(Term* func, RefList const& inputs)
 {
-    bool varArgs = function_get_variable_args(func);
+    bool varArgs = function_t::get_variable_args(func);
 
     // Fail if wrong # of inputs
-    if (!varArgs && (function_num_inputs(func) != inputs.length()))
+    if (!varArgs && (function_t::num_inputs(func) != inputs.length()))
         return false;
 
     for (int i=0; i < inputs.length(); i++) {
-        Term* type = function_get_input_type(func, i);
+        Term* type = function_t::get_input_type(func, i);
         if (inputs[i] == NULL)
             continue;
         if (!value_fits_type(inputs[i], type))

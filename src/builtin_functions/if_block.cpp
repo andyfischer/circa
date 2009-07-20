@@ -87,7 +87,7 @@ namespace if_block_function {
     void setup(Branch& kernel)
     {
         IF_BLOCK_FUNC = import_function(kernel, evaluate, "if_block() : Branch");
-        function_get_to_source_string(IF_BLOCK_FUNC) = toSourceString;
+        function_t::get_to_source_string(IF_BLOCK_FUNC) = toSourceString;
     }
 }
 }
