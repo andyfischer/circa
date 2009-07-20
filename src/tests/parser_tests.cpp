@@ -246,8 +246,10 @@ void test_dot_concatenation()
 {
     Branch branch;
 
-    parser::compile(&branch, parser::statement, "s = Set()");
-    Term *s = parser::compile(&branch, parser::statement, "s.add(1)");
+    branch.eval("s = Set()");
+
+    // This function should rebind 's'
+    Term *s = branch.eval("s.add(1)");
 
     test_assert(branch.length() == 3);
     test_assert(is_value(branch[0]));

@@ -243,8 +243,10 @@ void initialize_builtin_types(Branch& kernel)
 
     Term* set_type = create_compound_type(kernel, "Set");
     as_type(set_type).toString = set_t::to_string;
-    import_member_function(set_type, set_t::hosted_add, "add(Set, any) : Set");
-    import_member_function(set_type, set_t::remove, "remove(Set, any) : Set");
+    Term* set_add = import_member_function(set_type, set_t::hosted_add, "add(Set, any) : Set");
+    function_t::get_input_placeholder(set_add, 0)->boolProp("use-as-output") = true;
+    Term* set_remove = import_member_function(set_type, set_t::remove, "remove(Set, any) : Set");
+    function_t::get_input_placeholder(set_remove, 0)->boolProp("use-as-output") = true;
 
     // LIST_TYPE was created in bootstrap_kernel
     import_member_function(LIST_TYPE, list_t::append, "append(List, any) : List");
