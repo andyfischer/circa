@@ -79,6 +79,8 @@ void register_every_possible_parse_error()
     register_input("add( %");
     register_input("add(1");
     register_input("[");
+    register_input("a = []; a[");
+    register_input("a = [1]; a[0");
 }
 
 void test_every_parse_error()

@@ -104,7 +104,7 @@ state falling_piece_rot = 0
 state falling_group_x = 4
 state falling_group_y = 0
 fall_speed = 80.0
-state tile_fall_distance = tile_size
+state float tile_fall_distance = tile_size
 
 state board = map(initialize_board_piece, range(num_tiles))
 

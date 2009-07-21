@@ -249,7 +249,9 @@ void initialize_builtin_types(Branch& kernel)
     function_t::get_input_placeholder(set_remove, 0)->boolProp("use-as-output") = true;
 
     // LIST_TYPE was created in bootstrap_kernel
-    import_member_function(LIST_TYPE, list_t::append, "append(List, any) : List");
+    Term* list_append =
+        import_member_function(LIST_TYPE, list_t::append, "append(List, any) : List");
+    function_t::get_input_placeholder(list_append, 0)->boolProp("use-as-output") = true;
     import_member_function(LIST_TYPE, list_t::count, "count(List) : int");
 
     NAMESPACE_TYPE = create_compound_type(kernel, "Namespace");
