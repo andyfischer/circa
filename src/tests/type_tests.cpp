@@ -150,6 +150,26 @@ void test_default_values()
     test_assert(s->asString() == "");
 }
 
+void type_inference_for_get_index()
+{
+    Branch branch;
+    branch.eval("l = [1 2 3]");
+    Term* x = branch.compile("x = l[0]");
+    test_assert(branch);
+    test_assert(x->type == INT_TYPE);
+
+    branch.clear();
+    branch.eval("l = [1 2.0 3]");
+    x = branch.compile("x = l[0]");
+    test_assert(branch);
+    test_assert(x->type == FLOAT_TYPE);
+
+    branch.clear();
+    branch.eval("l = [1 2.0 'three']");
+    x = branch.compile("x = l[0]");
+    test_assert(x->type == ANY_TYPE);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
@@ -158,6 +178,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_is_native_type);
     REGISTER_TEST_CASE(type_tests::test_to_string);
     REGISTER_TEST_CASE(type_tests::test_default_values);
+    REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
 }
 
 } // namespace type_tests

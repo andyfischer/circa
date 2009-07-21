@@ -115,6 +115,10 @@ void assert_type(Term* term, Term* type);
 // we'll assign a descriptive message to errorReason.
 bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason=NULL);
 
+// Returns a common type, which is guaranteed to hold all the types in this
+// list. Currently, this is not very sophisticated.
+Term* find_common_type(RefList& list);
+
 Term* quick_create_type(Branch& branch, std::string name="");
 
 void setup_empty_type(Type& type);

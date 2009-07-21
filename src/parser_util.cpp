@@ -191,23 +191,14 @@ Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start,
         std::string const& message)
 {
     Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
-
-    std::string line = consume_line(tokens, start, result);
-
-    if (message == "")
-        result->stringProp("message") = line;
-    else
-        result->stringProp("message") = message;
-
-    assert(has_static_error(result));
-
-    return result;
+    return compile_error_for_line(result, tokens, start, message);
 }
 
 Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start,
         std::string const& message)
 {
-    change_function(existing, UNRECOGNIZED_EXPRESSION_FUNC);
+    if (existing->function != UNRECOGNIZED_EXPRESSION_FUNC)
+        change_function(existing, UNRECOGNIZED_EXPRESSION_FUNC);
     std::string line = consume_line(tokens, start, existing);
 
     if (message == "")
