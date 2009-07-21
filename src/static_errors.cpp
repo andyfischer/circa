@@ -137,7 +137,7 @@ std::string get_static_error_message(Term* term)
         out << "Unknown field: " << term->stringProp("field-name");
         return out.str();
     case SERROR_UNRECGONIZED_EXPRESSION:
-        out << "Unrecognized expression: " << term->function->stringProp("message");
+        out << "Unrecognized expression: " << term->stringProp("message");
         return out.str();
 
     }

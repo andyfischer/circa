@@ -23,23 +23,8 @@ namespace if_expr_function {
 
     Term* specializeType(Term* caller)
     {
-        Term* left_type = ANY_TYPE;
-        Term* right_type = ANY_TYPE;
-        if (caller->input(1) != NULL) left_type = caller->input(1)->type;
-        if (caller->input(2) != NULL) right_type = caller->input(2)->type;
-
-        // if inputs 1 and 2 have the same type, we can use that
-        if (left_type == right_type)
-            return left_type;
-
-        // special case if one input is int and another is float
-        if ((left_type == INT_TYPE || left_type == FLOAT_TYPE)
-            && (right_type == INT_TYPE || right_type == FLOAT_TYPE))
-            return FLOAT_TYPE;
-
-
-        // Otherwise return any. (we might want to signal an error here)
-        return ANY_TYPE;
+        RefList choices(caller->input(1), caller->input(2));
+        return find_common_type(choices);
     }
 
     void feedback_evaluate(Term* caller)

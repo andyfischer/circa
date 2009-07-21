@@ -142,6 +142,38 @@ bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
     return true;
 }
 
+Term* find_common_type(RefList& list)
+{
+    if (list.length() == 0)
+        return ANY_TYPE;
+
+    bool all_equal = true;
+    for (int i=1; i < list.length(); i++) {
+        if (list[0] != list[i]) {
+            all_equal = false;
+            break;
+        }
+    }
+
+    if (all_equal)
+        return list[0];
+
+    // Special case, allow ints to go into floats
+    bool all_are_ints_or_floats = true;
+    for (int i=0; i < list.length(); i++) {
+        if ((list[i] != INT_TYPE) && (list[i] != FLOAT_TYPE)) {
+            all_are_ints_or_floats = false;
+            break;
+        }
+    }
+
+    if (all_are_ints_or_floats)
+        return FLOAT_TYPE;
+
+    // Otherwise give up
+    return ANY_TYPE;
+}
+
 Term* quick_create_type(Branch& branch, std::string name)
 {
     Term* term = create_value(branch, TYPE_TYPE);
