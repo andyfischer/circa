@@ -638,10 +638,16 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     std::string name = tokens.consume(IDENTIFIER);
     possible_whitespace(tokens);
 
-    Term* type = ANY_TYPE;
-
-    // type annotation
     std::string typeName;
+
+    // check for "state <type> <name>" syntax
+    if (tokens.nextIs(IDENTIFIER)) {
+        typeName = name;
+        name = tokens.consume(IDENTIFIER);
+        possible_whitespace(tokens);
+    }
+
+    // check for "state <name> : <type>" syntax. This style is deprecated
     if (tokens.nextIs(COLON)) {
         tokens.consume();
         possible_whitespace(tokens);
@@ -651,9 +657,11 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 
         typeName = tokens.consume(IDENTIFIER);
         possible_whitespace(tokens);
-
-        type = find_type(branch, typeName);
     }
+
+    Term* type = ANY_TYPE;
+    if (typeName != "")
+        type = find_type(branch, typeName);
 
     Term* result = create_value(branch, type, name);
     set_stateful(result, true);
@@ -954,9 +962,10 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
     return subscripted_atom(branch, tokens);
 }
 
-
 Term* subscripted_atom(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
+
     Term* result = atom(branch, tokens);
 
     if (has_static_error(result))
@@ -966,6 +975,9 @@ Term* subscripted_atom(Branch& branch, TokenStream& tokens)
         tokens.consume(LBRACKET);
 
         Term* subscript = infix_expression(branch, tokens);
+
+        if (!tokens.nextIs(RBRACKET))
+            return compile_error_for_line(branch, tokens, startPosition, "Expected ]");
 
         tokens.consume(RBRACKET);
 
