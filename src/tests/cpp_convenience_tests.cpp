@@ -29,9 +29,32 @@ void test_accessor()
     test_assert(as_int(b) == 11);
 }
 
+void test_as()
+{
+    Branch branch;
+    branch.eval("i = 5");
+    branch.eval("f = 11.0");
+    branch.eval("b = true");
+
+    test_assert(as<int>(branch["i"]) == 5);
+    test_assert(as<float>(branch["f"]) == 11.0);
+    test_assert(as<bool>(branch["b"]));
+}
+
+void test_eval()
+{
+    test_assert(eval<int>("1 + 1") == 2);
+    test_equals(eval<float>("6 * 1.5"), 9);
+    test_assert(!eval<bool>("and(true,false)"));
+    test_assert(eval<bool>("or(true,false)"));
+    test_assert(eval<std::string>("concat('123','456')") == "123456");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(cpp_convenience_tests::test_accessor);
+    REGISTER_TEST_CASE(cpp_convenience_tests::test_as);
+    REGISTER_TEST_CASE(cpp_convenience_tests::test_eval);
 }
 
 }

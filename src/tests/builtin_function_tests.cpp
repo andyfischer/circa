@@ -68,7 +68,7 @@ void test_concat()
 {
     Branch branch;
 
-    test_assert(eval_as<std::string>("concat('a ', 'b', ' c')") == "a b c");
+    test_assert(eval<std::string>("concat('a ', 'b', ' c')") == "a b c");
 }
 
 void test_bool()
@@ -81,10 +81,10 @@ void test_bool()
 
 void test_builtin_equals()
 {
-    test_assert(eval_as<bool>("equals(1,1)"));
-    test_assert(!eval_as<bool>("equals(1,2)"));
-    test_assert(eval_as<bool>("equals('hello','hello')"));
-    test_assert(!eval_as<bool>("equals('hello','goodbye')"));
+    test_assert(eval<bool>("equals(1,1)"));
+    test_assert(!eval<bool>("equals(1,2)"));
+    test_assert(eval<bool>("equals('hello','hello')"));
+    test_assert(!eval<bool>("equals('hello','goodbye')"));
 
     Branch branch;
     Term* term = branch.eval("equals(5.0, add)");

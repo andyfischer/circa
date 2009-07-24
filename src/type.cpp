@@ -371,7 +371,7 @@ bool is_value_alloced(Term* term)
 {
     Type& type = as_type(term->type);
 
-    if (!type.isObject)
+    if (!type.isPointer)
         return true;
     else
         return term->value != NULL;
