@@ -53,7 +53,7 @@ bool raw_value_less_than(Term* a, Term* b);
 template <class T>
 Term* import_type(Branch& branch, std::string name="")
 {
-    Term* term = quick_create_type(branch, name);
+    Term* term = create_type(branch, name);
     Type& type = as_type(term);
     type.alloc = cpp_importing::templated_alloc<T>;
     type.dealloc = cpp_importing::templated_dealloc<T>;
@@ -65,7 +65,7 @@ Term* import_type(Branch& branch, std::string name="")
 template <class T>
 Term* import_pointer_type(Branch& branch, std::string name="")
 {
-    Term* term = quick_create_type(branch, name);
+    Term* term = create_type(branch, name);
     Type& type = as_type(term);
     type.alloc = cpp_importing::pointer_alloc;
     type.dealloc = cpp_importing::pointer_dealloc;

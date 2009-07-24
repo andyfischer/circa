@@ -320,7 +320,7 @@ void initialize_primitive_types(Branch& kernel)
     as_type(STRING_TYPE).equals = cpp_importing::templated_equals<std::string>;
     as_type(STRING_TYPE).toString = string_t::to_string;
 
-    INT_TYPE = quick_create_type(kernel, "int");
+    INT_TYPE = create_type(kernel, "int");
     Type& int_type = as_type(INT_TYPE);
     int_type.alloc = zero_alloc;
     int_type.assign = shallow_assign;
@@ -328,7 +328,7 @@ void initialize_primitive_types(Branch& kernel)
     int_type.toString = int_t::to_string;
     int_type.isPointer = false;
 
-    FLOAT_TYPE = quick_create_type(kernel, "float");
+    FLOAT_TYPE = create_type(kernel, "float");
     Type& float_type = as_type(FLOAT_TYPE);
     float_type.alloc = zero_alloc;
     float_type.assign = float_t::assign;
@@ -336,7 +336,7 @@ void initialize_primitive_types(Branch& kernel)
     float_type.toString = float_t::to_string;
     float_type.isPointer = false;
 
-    BOOL_TYPE = quick_create_type(kernel, "bool");
+    BOOL_TYPE = create_type(kernel, "bool");
     Type& bool_type = as_type(BOOL_TYPE);
     bool_type.alloc = zero_alloc;
     bool_type.assign = shallow_assign;

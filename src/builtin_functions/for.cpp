@@ -26,7 +26,7 @@ namespace for_function {
 
     void setup(Branch& kernel)
     {
-        create_type(&kernel, "type for__state { Branch code, List _state }");
+        declare_type(&kernel, "type for__state { Branch code, List _state }");
         FOR_FUNC = import_function(kernel, evaluate, "for(List) : for__state");
         function_t::get_to_source_string(FOR_FUNC) = toSourceString;
     }

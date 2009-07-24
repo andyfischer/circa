@@ -51,8 +51,7 @@ bool is_type(Term* term)
 
 bool is_native_type(Term* type)
 {
-    // this could be improved
-    return as_type(type).alloc != Branch::alloc;
+    return !is_compound_type(type);
 }
 
 bool is_compound_type(Term* type)
@@ -174,7 +173,7 @@ Term* find_common_type(RefList& list)
     return ANY_TYPE;
 }
 
-Term* quick_create_type(Branch& branch, std::string name)
+Term* create_type(Branch& branch, std::string name)
 {
     Term* term = create_value(branch, TYPE_TYPE);
 
@@ -188,29 +187,26 @@ Term* quick_create_type(Branch& branch, std::string name)
 
 namespace type_private {
     void* empty_allocate(Term*) { return NULL; }
-    void empty_dealloc(void*) {}
     void empty_duplicate_function(Term*,Term*) {}
 }
 
-void setup_empty_type(Type& type)
+void initialize_empty_type(Term* term)
 {
+    Type& type = as_type(term);
     type.alloc = type_private::empty_allocate;
-    type.dealloc = type_private::empty_dealloc;
     type.assign = type_private::empty_duplicate_function;
 }
 
 Term* create_empty_type(Branch& branch, std::string name)
 {
-    Term* term = create_value(branch, TYPE_TYPE);
-    Type& type = as_type(term);
-    setup_empty_type(type);
-    type.name = name;
-    branch.bindName(term, name);
-    return term;
+    Term* type = create_type(branch, name);
+    initialize_empty_type(type);
+    return type;
 }
 
-void initialize_compound_type(Type& type)
+void initialize_compound_type(Term* term)
 {
+    Type& type = as_type(term);
     type.alloc = Branch::alloc;
     type.dealloc = Branch::dealloc;
     type.assign = Branch::assign;
@@ -220,9 +216,8 @@ void initialize_compound_type(Type& type)
 
 Term* create_compound_type(Branch& branch, std::string const& name)
 {
-    Term* term = create_value(branch, TYPE_TYPE, name);
-    initialize_compound_type(as_type(term));
-    branch.bindName(term, name);
+    Term* term = create_type(branch, name);
+    initialize_compound_type(term);
     return term;
 }
 
@@ -420,7 +415,7 @@ void assign_value_to_default(Term* term)
     // TODO: default values for other types
 }
 
-Term* create_type(Branch* branch, std::string const& decl)
+Term* declare_type(Branch* branch, std::string const& decl)
 {
     return parser::compile(branch, parser::type_decl, decl);
 }
