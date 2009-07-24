@@ -18,8 +18,8 @@ namespace circa {
 
 struct Type
 {
-    typedef void* (*AllocFunc)(Term* typeTerm);
-    typedef void (*DeallocFunc)(void* data);
+    typedef void (*AllocFunc)(Term* type, Term* term);
+    typedef void (*DeallocFunc)(Term* type, Term* term);
     typedef void (*DuplicateFunc)(Term* src, Term* dest);
     typedef void (*AssignFunc)(Term* src, Term* dest);
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
@@ -95,8 +95,8 @@ struct Type
 };
 
 namespace type_t {
-    void* alloc(Term* type);
-    void dealloc(void* data);
+    void alloc(Term* type, Term* term);
+    void dealloc(Term* type, Term* term);
     std::string to_string(Term *caller);
     void assign(Term* source, Term* dest);
     void remap_pointers(Term *term, ReferenceMap const& map);

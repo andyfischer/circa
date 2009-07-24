@@ -5,13 +5,9 @@
 namespace circa {
 namespace cpp_importing {
 
-void* pointer_alloc(Term* typeTerm)
+void pointer_alloc(Term* type, Term* term)
 {
-    return NULL;
-}
-
-void pointer_dealloc(void* data)
-{
+    term->value = NULL;
 }
 
 void raw_value_assign(Term* a, Term* b)

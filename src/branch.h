@@ -74,8 +74,8 @@ struct Branch
     std::string toString();
 
     // Hosted functions
-    static void* alloc(Term* type);
-    static void dealloc(void* data);
+    static void alloc(Term* type, Term* t);
+    static void dealloc(Term* type, Term* t);
     static void assign(Term* source, Term* dest);
     static void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
 };
