@@ -178,7 +178,7 @@ Branch::compile(std::string const& statement)
     return parser::compile(this, parser::statement_list, statement);
 }
 
-void* Branch::alloc(Term* typeTerm)
+void Branch::alloc(Term* typeTerm, Term* term)
 {
     Branch* branch = new Branch();
 
@@ -189,12 +189,12 @@ void* Branch::alloc(Term* typeTerm)
     for (int f=0; f < numFields; f++)
         create_value(*branch, type.prototype[f]->type, type.prototype[f]->name);
 
-    return branch;
+    term->value = branch;
 }
 
-void Branch::dealloc(void* data)
+void Branch::dealloc(Term* type, Term* term)
 {
-    delete (Branch*) data;
+    delete (Branch*) term->value;
 }
 
 void Branch::assign(Term* sourceTerm, Term* destTerm)

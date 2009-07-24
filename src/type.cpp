@@ -186,7 +186,7 @@ Term* create_type(Branch& branch, std::string name)
 }
 
 namespace type_private {
-    void* empty_allocate(Term*) { return NULL; }
+    void empty_allocate(Term* type, Term* term) { term->value = NULL; }
     void empty_duplicate_function(Term*,Term*) {}
 }
 
@@ -252,11 +252,11 @@ bool equals(Term* a, Term* b)
 }
 
 namespace type_t {
-    void* alloc(Term* type)
+    void alloc(Term* type, Term* term)
     {
-        return new Type();
+        term->value = new Type();
     }
-    void dealloc(void* data)
+    void dealloc(Term* type, Term* term)
     {
         // FIXME
         // delete reinterpret_cast<Type*>(data);
@@ -334,7 +334,7 @@ void alloc_value(Term* term)
         // todo: should this happen?
         term->value = NULL;
     else {
-        term->value = type.alloc(term->type);
+        type.alloc(term->type, term);
 
         assign_value_to_default(term);
 
@@ -357,7 +357,7 @@ void dealloc_value(Term* term)
     }
 
     if (type.dealloc != NULL)
-        type.dealloc(term->value);
+        type.dealloc(term->type, term);
 
     term->value = NULL;
 }

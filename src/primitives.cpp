@@ -38,11 +38,10 @@ bool shallow_equals(Term* a, Term* b)
     return b->value == a->value;
 }
 
-void* zero_alloc(Term *a)
+void zero_alloc(Term *type, Term* t)
 {
-    return 0;
+    t->value = 0;
 }
-
 
 std::string& as_string(Term* term)
 {
