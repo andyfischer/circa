@@ -8,9 +8,8 @@ namespace create_compound_type_function {
     void evaluate(Term* caller)
     {
         std::string name = as_string(caller->input(0));
-        Type& output = as_type(caller);
-        initialize_compound_type(output);
-        output.name = name;
+        initialize_compound_type(caller);
+        as_type(caller).name = name;
     }
 
     void setup(Branch& kernel)

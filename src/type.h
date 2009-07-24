@@ -124,13 +124,13 @@ bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason=NULL)
 // list. Currently, this is not very sophisticated.
 Term* find_common_type(RefList& list);
 
-Term* quick_create_type(Branch& branch, std::string name="");
-
-void setup_empty_type(Type& type);
+Term* create_type(Branch& branch, std::string name="");
 Term* create_empty_type(Branch& branch, std::string name);
-void initialize_compound_type(Type& type);
-
 Term* create_compound_type(Branch& branch, std::string const& name);
+
+void initialize_empty_type(Term* term);
+void initialize_compound_type(Term* term);
+
 std::string compound_type_to_string(Term* caller);
 
 // Functions which are dispatched based on type
@@ -143,7 +143,7 @@ std::string to_string(Term* term);
 void assign_value(Term* source, Term* dest);
 void assign_value_to_default(Term* term);
 
-Term* create_type(Branch* branch, std::string const& decl);
+Term* declare_type(Branch* branch, std::string const& decl);
 
 } // namespace circa
 

@@ -415,8 +415,8 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
 
     Term* result = create_value(branch, TYPE_TYPE);
+    initialize_compound_type(result);
     Type& type = as_type(result);
-    initialize_compound_type(type);
 
     possible_whitespace_or_newline(tokens);
 
