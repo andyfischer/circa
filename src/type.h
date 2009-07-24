@@ -28,6 +28,10 @@ struct Type
 
     std::string name;
 
+    // Whether a value should be treated like a pointer. alloc_value will often be called automatically
+    // if a term's value is 0.
+    bool isObject;
+
     // C++ type info. This is only used to do runtime type checks, when the data
     // is accessed as a C++ type. Otherwise, this is optional.
     const std::type_info *cppTypeInfo;
@@ -52,6 +56,7 @@ struct Type
 
     Type() :
         name(""),
+        isObject(true),
         cppTypeInfo(NULL),
         alloc(NULL),
         dealloc(NULL),

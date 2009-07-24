@@ -29,6 +29,7 @@ void test_import_c()
     test_assert(as_int(result) == 9);
 }
 
+#if 0
 void test_expose_value()
 {
     Branch branch;
@@ -47,11 +48,11 @@ void test_expose_value()
 
     test_equals(to_float(b), 12);
 }
+#endif
 
 void register_tests()
 {
     REGISTER_TEST_CASE(importing_tests::test_import_c);
-    REGISTER_TEST_CASE(importing_tests::test_expose_value);
 }
 
 } // namespace importing_tests

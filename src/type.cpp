@@ -331,8 +331,7 @@ std::string to_string(Term* term)
 
 void alloc_value(Term* term)
 {
-    if (term->value != NULL)
-        return;
+    if (is_value_alloced(term)) return;
 
     Type& type = as_type(term->type);
 
@@ -351,11 +350,10 @@ void alloc_value(Term* term)
 
 void dealloc_value(Term* term)
 {
-    if (!is_value_alloced(term))
-        return;
+    if (term->type == NULL) return;
+    if (!is_value_alloced(term)) return;
 
-    if (term->type == NULL)
-        return;
+    Type& type = as_type(term->type);
 
     if (!is_value_alloced(term->type)) {
         std::cout << "warning in dealloc_value, type is undefined" << std::endl;
@@ -363,18 +361,20 @@ void dealloc_value(Term* term)
         return;
     }
 
-    if (as_type(term->type).dealloc == NULL)
-        throw std::runtime_error("type "+as_type(term->type).name+" has no dealloc function");
-
-    as_type(term->type).dealloc(term->value);
+    if (type.dealloc != NULL)
+        type.dealloc(term->value);
 
     term->value = NULL;
 }
 
 bool is_value_alloced(Term* term)
 {
-    // Future: return true for in-place values, when those are implemented.
-    return term->value != NULL;
+    Type& type = as_type(term->type);
+
+    if (!type.isObject)
+        return true;
+    else
+        return term->value != NULL;
 }
 
 void assign_value(Term* source, Term* dest)

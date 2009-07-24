@@ -20,6 +20,7 @@ Term* import_function_overload(Term* overload, EvaluateFunc evaluate,
 Term* import_member_function(Term* type, EvaluateFunc evaluate,
         std::string const& headerText);
 
+#if 0
 // Import the given value into this branch with the given name. We won't allocate
 // a copy of this value, we'll use the address provided. The caller must ensure
 // that this memory is accessible for the lifetime of this term.
@@ -27,6 +28,7 @@ Term* expose_value(Branch& branch, void* value, Term* type, std::string const& n
 
 Term* expose_value(Branch& branch, int* value, std::string const& name="");
 Term* expose_value(Branch& branch, float* value, std::string const& name="");
+#endif
 
 }
 

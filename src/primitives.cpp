@@ -28,18 +28,19 @@ Term* SPECIALIZE_THUNK_TYPE = NULL;
 Term* TO_STRING_THUNK_TYPE = NULL;
 Term* CHECK_INVARIANTS_FUNC_TYPE = NULL;
 
-int& as_int(Term* term)
+void shallow_assign(Term* a, Term* b)
 {
-    assert(term->type == INT_TYPE);
-    alloc_value(term);
-    return *((int*) term->value);
+    b->value = a->value;
 }
 
-float& as_float(Term* term)
+bool shallow_equals(Term* a, Term* b)
 {
-    assert(term->type == FLOAT_TYPE);
-    alloc_value(term);
-    return *((float*) term->value);
+    return b->value == a->value;
+}
+
+void* zero_alloc(Term *a)
+{
+    return 0;
 }
 
 bool& as_bool(Term* term)
@@ -136,16 +137,6 @@ CheckInvariantsFunc& as_check_invariants_thunk(Term* term)
     return ((CheckInvariantsFunc&) term->value);
 }
 
-bool is_int(Term* term)
-{
-    return term->type == INT_TYPE;
-}
-
-bool is_float(Term* term)
-{
-    return term->type == FLOAT_TYPE;
-}
-
 bool is_bool(Term* term)
 {
     return term->type == BOOL_TYPE;
@@ -187,12 +178,29 @@ namespace int_t {
     }
 }
 
+int& as_int(Term* term)
+{
+    assert(term->type == INT_TYPE);
+    alloc_value(term);
+    return (int&) term->value;
+}
+
+bool is_int(Term* term)
+{
+    return term->type == INT_TYPE;
+}
+
 namespace float_t {
 
     void assign(Term* source, Term* dest)
     {
         // Allow coercion
         as_float(dest) = to_float(source);
+    }
+
+    bool equals(Term* a, Term* b)
+    {
+        return to_float(a) == to_float(b);
     }
 
     std::string to_string(Term* term)
@@ -230,6 +238,18 @@ namespace float_t {
         else
             return result;
     }
+}
+
+float& as_float(Term* term)
+{
+    assert(term->type == FLOAT_TYPE);
+    alloc_value(term);
+    return (float&) term->value;
+}
+
+bool is_float(Term* term)
+{
+    return term->type == FLOAT_TYPE;
 }
 
 namespace string_t {
@@ -299,14 +319,21 @@ void initialize_primitive_types(Branch& kernel)
     as_type(STRING_TYPE).equals = cpp_importing::templated_equals<std::string>;
     as_type(STRING_TYPE).toString = string_t::to_string;
 
-    INT_TYPE = import_type<int>(kernel, "int");
-    as_type(INT_TYPE).equals = cpp_importing::templated_equals<int>;
-    as_type(INT_TYPE).toString = int_t::to_string;
+    INT_TYPE = quick_create_type(kernel, "int");
+    Type& int_type = as_type(INT_TYPE);
+    int_type.alloc = zero_alloc;
+    int_type.assign = shallow_assign;
+    int_type.equals = shallow_equals;
+    int_type.toString = int_t::to_string;
+    int_type.isObject = false;
 
-    FLOAT_TYPE = import_type<float>(kernel, "float");
-    as_type(FLOAT_TYPE).assign = float_t::assign;
-    as_type(FLOAT_TYPE).equals = cpp_importing::templated_equals<float>;
-    as_type(FLOAT_TYPE).toString = float_t::to_string;
+    FLOAT_TYPE = quick_create_type(kernel, "float");
+    Type& float_type = as_type(FLOAT_TYPE);
+    float_type.alloc = zero_alloc;
+    float_type.assign = float_t::assign;
+    float_type.equals = float_t::equals;
+    float_type.toString = float_t::to_string;
+    float_type.isObject = false;
 
     BOOL_TYPE = import_type<bool>(kernel, "bool");
     as_type(BOOL_TYPE).equals = cpp_importing::templated_equals<bool>;

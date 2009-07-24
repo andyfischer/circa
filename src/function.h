@@ -16,6 +16,8 @@ namespace circa {
 namespace function_t {
     std::string to_string(Term* term);
     bool check_invariants(Term* term, std::stringstream* output);
+
+    // accessors
     std::string& get_name(Term* function);
     Ref& get_output_type(Term* function);
     Ref& get_hidden_state_type(Term* function);
