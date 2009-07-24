@@ -10,7 +10,7 @@
 
 namespace circa {
 
-template <class T, Term** type>
+template <class T, Term** type, T& (accessorFunc)(Term*) >
 class Accessor {
     Ref _term;
 
@@ -22,35 +22,35 @@ public:
 
             if (_term->type != *type) {
                 change_type(_term, *type);
-                as<T>(_term) = defaultValue;
+                accessorFunc(_term) = defaultValue;
             }
         } else {
             _term = create_value(branch, *type, name);
-            as<T>(_term) = defaultValue;
+            accessorFunc(_term) = defaultValue;
         }
     }
 
     Accessor& operator=(T const& rhs)
     {
-        as<T>(_term) = rhs;
+        accessorFunc(_term) = rhs;
         return *this;
     }
 
     operator T&()
     {
-        return as<T>(_term);
+        return accessorFunc(_term);
     }
 
     T& get()
     {
-        return as<T>(_term);
+        return accessorFunc(_term);
     }
 };
 
-typedef Accessor<int, &INT_TYPE> Int;
-typedef Accessor<float, &FLOAT_TYPE> Float;
-typedef Accessor<bool, &BOOL_TYPE> Bool;
-typedef Accessor<std::string, &STRING_TYPE> String;
+typedef Accessor<int, &INT_TYPE, as_int> Int;
+typedef Accessor<float, &FLOAT_TYPE, as_float> Float;
+typedef Accessor<bool, &BOOL_TYPE, as_bool> Bool;
+typedef Accessor<std::string, &STRING_TYPE, as_string> String;
 
 } // namespace circa
 

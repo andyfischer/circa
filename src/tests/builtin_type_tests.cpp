@@ -27,16 +27,16 @@ void test_reference()
 void builtin_types()
 {
     test_assert(as_type(INT_TYPE).alloc != NULL);
-    test_assert(as_type(INT_TYPE).dealloc != NULL);
+    //test_assert(as_type(INT_TYPE).dealloc != NULL);
     test_assert(as_type(INT_TYPE).equals != NULL);
     test_assert(as_type(FLOAT_TYPE).alloc != NULL);
-    test_assert(as_type(FLOAT_TYPE).dealloc != NULL);
+    //test_assert(as_type(FLOAT_TYPE).dealloc != NULL);
     test_assert(as_type(FLOAT_TYPE).equals != NULL);
     test_assert(as_type(STRING_TYPE).alloc != NULL);
     test_assert(as_type(STRING_TYPE).dealloc != NULL);
     test_assert(as_type(STRING_TYPE).equals != NULL);
     test_assert(as_type(BOOL_TYPE).alloc != NULL);
-    test_assert(as_type(BOOL_TYPE).dealloc != NULL);
+    //test_assert(as_type(BOOL_TYPE).dealloc != NULL);
     test_assert(as_type(BOOL_TYPE).equals != NULL);
     test_assert(as_type(TYPE_TYPE).alloc != NULL);
     test_assert(as_type(TYPE_TYPE).dealloc != NULL);

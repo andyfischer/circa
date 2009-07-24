@@ -196,7 +196,7 @@ void test_stateful_value_decl()
     test_assert(a->name == "a");
     test_assert(a->type == INT_TYPE);
     test_assert(branch["a"] == a);
-    test_assert(a->value != NULL);
+    test_assert(is_value_alloced(a));
 
     Term* b = parser::compile(&branch, parser::statement, "state b = 5.0");
     test_assert(b->name == "b");
