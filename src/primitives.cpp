@@ -43,12 +43,6 @@ void* zero_alloc(Term *a)
     return 0;
 }
 
-bool& as_bool(Term* term)
-{
-    assert(term->type == BOOL_TYPE);
-    alloc_value(term);
-    return *((bool*) term->value);
-}
 
 std::string& as_string(Term* term)
 {
@@ -135,11 +129,6 @@ CheckInvariantsFunc& as_check_invariants_thunk(Term* term)
 {
     assert(term->type == CHECK_INVARIANTS_FUNC_TYPE);
     return ((CheckInvariantsFunc&) term->value);
-}
-
-bool is_bool(Term* term)
-{
-    return term->type == BOOL_TYPE;
 }
 
 bool is_string(Term* term)
@@ -269,6 +258,18 @@ namespace bool_t {
     }
 }
 
+bool& as_bool(Term* term)
+{
+    assert(term->type == BOOL_TYPE);
+    alloc_value(term);
+    return (bool&) term->value;
+}
+
+bool is_bool(Term* term)
+{
+    return term->type == BOOL_TYPE;
+}
+
 namespace any_t {
     std::string to_string(Term* term)
     {
@@ -325,7 +326,7 @@ void initialize_primitive_types(Branch& kernel)
     int_type.assign = shallow_assign;
     int_type.equals = shallow_equals;
     int_type.toString = int_t::to_string;
-    int_type.isObject = false;
+    int_type.isPointer = false;
 
     FLOAT_TYPE = quick_create_type(kernel, "float");
     Type& float_type = as_type(FLOAT_TYPE);
@@ -333,11 +334,15 @@ void initialize_primitive_types(Branch& kernel)
     float_type.assign = float_t::assign;
     float_type.equals = float_t::equals;
     float_type.toString = float_t::to_string;
-    float_type.isObject = false;
+    float_type.isPointer = false;
 
-    BOOL_TYPE = import_type<bool>(kernel, "bool");
-    as_type(BOOL_TYPE).equals = cpp_importing::templated_equals<bool>;
-    as_type(BOOL_TYPE).toString = bool_t::to_string;
+    BOOL_TYPE = quick_create_type(kernel, "bool");
+    Type& bool_type = as_type(BOOL_TYPE);
+    bool_type.alloc = zero_alloc;
+    bool_type.assign = shallow_assign;
+    bool_type.equals = shallow_equals;
+    bool_type.toString = bool_t::to_string;
+    bool_type.isPointer = false;
 
     REF_TYPE = import_type<Ref>(kernel, "ref");
     as_type(REF_TYPE).remapPointers = Ref::remap_pointers;

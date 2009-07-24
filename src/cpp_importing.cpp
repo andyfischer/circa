@@ -30,4 +30,5 @@ bool raw_value_less_than(Term* a, Term* b)
 }
 
 } // namespace cpp_importing
+
 } // namespace circa

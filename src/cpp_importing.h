@@ -75,44 +75,6 @@ Term* import_pointer_type(Branch& branch, std::string name="")
     return term;
 }
 
-template <class T>
-T& as(Term* term)
-{
-    Type& type = as_type(term->type);
-
-    if (type.cppTypeInfo == NULL)
-        throw std::runtime_error("type "+type.name+" is not a C++ type");
-
-    if (*type.cppTypeInfo != typeid(T))
-        throw std::runtime_error("C++ type mismatch, existing data has type "+type.name);
-
-    return *((T*) term->value);
-}
-
-template <class T>
-T eval_as(std::string const& statement)
-{
-    Branch branch;
-
-    Term* result_term = branch.eval(statement);
-
-    if (result_term->hasError)
-        throw std::runtime_error(result_term->getErrorMessage());
-
-    return as<T>(result_term);
-}
-
-template <class T>
-T eval_as(Branch &branch, std::string const& statement)
-{
-    Term* result = branch.eval(statement);
-
-    if (result->hasError())
-        throw std::runtime_error(result->getErrorMessage());
-
-    return as<T>(result);
-}
-
 } // namespace circa
 
 #endif
