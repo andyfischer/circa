@@ -1,0 +1,7 @@
+
+background(#eee)
+
+x = 50
+draw_box([x,50,x+10,60] #0f0)
+
+value_tweaker.set_targets([get_ref(x)])

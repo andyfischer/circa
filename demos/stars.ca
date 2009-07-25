@@ -32,7 +32,7 @@ def draw_star(Star star)
     l_point = p2c(l_angle, radius / 2, star.loc)
     r_point = p2c(r_angle, radius / 2, star.loc)
 
-    gl_triangles([outer_point l_point star.loc, star.loc r_point outer_point] star_color)
+    gl.triangles([outer_point l_point star.loc, star.loc r_point outer_point] star_color)
   end
 
   for t in range(num_points)

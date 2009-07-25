@@ -10,7 +10,7 @@ namespace branch_function {
     void evaluate(Term* caller)
     {
         Branch& branch = as_branch(caller);
-        evaluate_branch(branch);
+        evaluate_branch(branch, caller);
     }
 
     std::string toSourceString(Term* term) {

@@ -14,5 +14,41 @@ def p2c(float angle, float radius, Point center) : Point
   return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
 end
 
+def draw_box(Box box, int color)
+    nw = [box.x1 box.y1]
+    ne = [box.x2 box.y1]
+    sw = [box.x1 box.y2]
+    se = [box.x2 box.y2]
+    gl.triangles([nw ne se se sw nw] color)
+end
+
+--ui_font_medium = load_font("assets/sv_basic_manual/SVBasicManual.ttf", 12)
+
+
+-- TODO: put this in a separate file
+namespace value_tweaker
+    state List current_targets = []
+
+    def set_targets(List l)
+        current_targets := l
+    end
+
+    def button(ref r, Point loc)
+        --text = draw_text(ui_font_medium, r.name(), loc.x, loc.y, #fff)
+        --draw_box([loc.x loc.y, loc.x + text.width, loc.y + text.height], #f00)
+        print('drew button: ' r.name() loc)
+    end
+
+    -- draw current targets
+    y = 50
+    for target in current_targets
+        loc = [10,y]
+        button(target, loc)
+        y += 10
+    end
+
+end --namespace
+
 -- in main.cpp, we load the user's script into this branch:
 users_branch = branch()
+

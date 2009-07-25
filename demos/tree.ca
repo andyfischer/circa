@@ -28,7 +28,7 @@ def tree_segment(Point base, float direction, float width, float depth)
   next_center = p2c(direction, seg_length, base)
   l2 = p2c(direction - .5, top_width, next_center)
   r2 = p2c(direction + .5, top_width, next_center)
-  gl_triangles([r l l2 l2 r2 r] #440101)
+  gl.triangles([r l l2 l2 r2 r] #440101)
 
   if has_branches
     state l_jitter = rand() * .2

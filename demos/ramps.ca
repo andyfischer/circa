@@ -15,13 +15,13 @@ SW = 3
 def rotations_opposite(int x, int y) : bool
   if x == NW
     return y == SE
-  else if x == NE
+  elif x == NE
     return y == SW
-  else if x == SE
+  elif x == SE
     return y == NW
-  else x == SW
+  else
     return y == NE
-  end end end -- todo: fix this
+  end
 end
 
 num_tiles_x = WINDOW_WIDTH // tile_size
@@ -36,7 +36,7 @@ for x in range(num_tiles_x)
     box_tr = [box_br.x box_tl.y]
     box_bl = [box_tl.x box_br.y]
     color = if_expr((x:int+y:int) % 2 == 1, #eee, #fff)
-    gl_triangles([box_tl box_tr box_bl box_tr box_br box_bl] color)
+    gl.triangles([box_tl box_tr box_bl box_tr box_br box_bl] color)
   end
 end
 
@@ -62,7 +62,7 @@ def draw_free_piece(Point location, float rot)
       return p + location
     end
     map(add_location, @shape)
-    gl_triangles(shape, #404)
+    gl.triangles(shape, #404)
 end
 
 def draw_piece(Piece piece)
