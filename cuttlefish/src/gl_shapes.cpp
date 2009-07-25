@@ -69,8 +69,10 @@ void gl_line_strip(Term* caller)
 void initialize(Branch& branch)
 {
     import_function(branch, background, "background(int)");
-    import_function(branch, gl_triangles, "gl_triangles(List, int)");
-    import_function(branch, gl_line_strip, "gl_line_strip(List, int)");
+
+    Branch& gl_ns = create_namespace(branch, "gl");
+    import_function(gl_ns, gl_triangles, "triangles(List, int)");
+    import_function(gl_ns, gl_line_strip, "line_strip(List, int)");
 }
 
 } // namespace gl_shapes

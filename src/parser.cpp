@@ -1284,7 +1284,8 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
     tokens.consume(NAMESPACE);
     possible_whitespace(tokens);
     std::string name = tokens.consume(IDENTIFIER);
-    Term* result = create_value(branch, NAMESPACE_TYPE, name);
+    Term* result = apply(branch, BRANCH_FUNC, RefList(), name);
+    change_type(result, NAMESPACE_TYPE);
     consume_branch_until_end(as_branch(result), tokens);
     possible_whitespace(tokens);
 
@@ -1387,9 +1388,6 @@ Term* dot_separated_identifier(Branch& branch, TokenStream& tokens)
 
             // Check if the first input has a "use-as-output" property. If so, rebind
             // this object's name to the result of this function.
-            std::cout << "lhs->name: " << lhs->name << std::endl;
-            std::cout << function_t::get_input_placeholder(function, 0)
-                ->boolPropOptional("use-as-output", false) << std::endl;
             if (lhs->name != ""
                     && function_t::get_input_placeholder(function, 0)
                         ->boolPropOptional("use-as-output", false))
