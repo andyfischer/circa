@@ -10,48 +10,6 @@
 
 namespace circa {
 
-template <class T, Term** type, T& (accessorFunc)(Term*) >
-class Accessor {
-    Ref _term;
-
-public:
-    Accessor(Branch& branch, std::string const& name, T const& defaultValue)
-    {
-        if (branch.contains(name)) {
-            _term = branch[name];
-
-            if (_term->type != *type) {
-                change_type(_term, *type);
-                accessorFunc(_term) = defaultValue;
-            }
-        } else {
-            _term = create_value(branch, *type, name);
-            accessorFunc(_term) = defaultValue;
-        }
-    }
-
-    Accessor& operator=(T const& rhs)
-    {
-        accessorFunc(_term) = rhs;
-        return *this;
-    }
-
-    operator T&()
-    {
-        return accessorFunc(_term);
-    }
-
-    T& get()
-    {
-        return accessorFunc(_term);
-    }
-};
-
-typedef Accessor<int, &INT_TYPE, as_int> Int;
-typedef Accessor<float, &FLOAT_TYPE, as_float> Float;
-typedef Accessor<bool, &BOOL_TYPE, as_bool> Bool;
-typedef Accessor<std::string, &STRING_TYPE, as_string> String;
-
 template <class T>
 T& as(Term* term)
 {
@@ -71,6 +29,63 @@ template <> int& as(Term* term);
 template <> float& as(Term* term);
 template <> bool& as(Term* term);
 template <> std::string& as(Term* term);
+
+template <class T, Term** type>
+class Accessor {
+    Ref _term;
+
+public:
+    Accessor(Branch& branch, std::string const& name, T const& defaultValue)
+    {
+        if (branch.contains(name)) {
+            _term = branch[name];
+
+            if (_term->type != *type) {
+                change_type(_term, *type);
+                as<T>(_term) = defaultValue;
+            }
+        } else {
+            _term = create_value(branch, *type, name);
+            as<T>(_term) = defaultValue;
+        }
+    }
+
+    Accessor()
+    {
+    }
+
+    void reset(Term* term)
+    {
+        _term = term;
+    }
+
+    Accessor& operator=(Term* term)
+    {
+        reset(term);
+        return *this;
+    }
+
+    Accessor& operator=(T const& rhs)
+    {
+        as<T>(_term) = rhs;
+        return *this;
+    }
+
+    operator T&()
+    {
+        return as<T>(_term);
+    }
+
+    T& get()
+    {
+        return as<T>(_term);
+    }
+};
+
+typedef Accessor<int, &INT_TYPE> Int;
+typedef Accessor<float, &FLOAT_TYPE> Float;
+typedef Accessor<bool, &BOOL_TYPE> Bool;
+typedef Accessor<std::string, &STRING_TYPE> String;
 
 template <class T>
 T eval(std::string const& statement)

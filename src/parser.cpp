@@ -1387,7 +1387,11 @@ Term* dot_separated_identifier(Branch& branch, TokenStream& tokens)
 
             // Check if the first input has a "use-as-output" property. If so, rebind
             // this object's name to the result of this function.
-            if (lhs->name != "" && function_t::get_input_placeholder(function, 0)
+            std::cout << "lhs->name: " << lhs->name << std::endl;
+            std::cout << function_t::get_input_placeholder(function, 0)
+                ->boolPropOptional("use-as-output", false) << std::endl;
+            if (lhs->name != ""
+                    && function_t::get_input_placeholder(function, 0)
                         ->boolPropOptional("use-as-output", false))
                 branch.bindName(result, lhs->name);
 

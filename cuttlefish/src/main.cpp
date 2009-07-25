@@ -26,8 +26,8 @@ Branch* SCRIPT_ROOT = NULL;
 Branch* USERS_BRANCH = NULL;
 bool CONTINUE_MAIN_LOOP = true;
 
-float TIME = 0;
-float TIME_DELTA = 0;
+Float TIME;
+Float TIME_DELTA;
 long PREV_SDL_TICKS = 0;
 
 bool PAUSED = false;
@@ -139,8 +139,8 @@ int main( int argc, char* args[] )
     ttf::initialize(*SCRIPT_ROOT);
 
     // Import constants
-    expose_value(*SCRIPT_ROOT, &TIME, "time");
-    expose_value(*SCRIPT_ROOT, &TIME_DELTA, "time_delta");
+    TIME = float_value(*SCRIPT_ROOT, 0, "time");
+    TIME_DELTA = float_value(*SCRIPT_ROOT, 0, "time_delta");
 
     // Load runtime.ca
     std::string circa_home = getenv("CIRCA_HOME");

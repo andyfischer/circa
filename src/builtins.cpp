@@ -237,7 +237,9 @@ void initialize_builtin_types(Branch& kernel)
 
     import_type<RefList>(kernel, "Tuple");
 
-    import_member_function(BRANCH_TYPE, list_t::append, "append(Branch, any) : Branch");
+    Term* branch_append = 
+        import_member_function(BRANCH_TYPE, list_t::append, "append(Branch, any) : Branch");
+    function_t::get_input_placeholder(branch_append, 0)->boolProp("use-as-output") = true;
 
     import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) : string");
 
