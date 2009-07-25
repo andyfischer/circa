@@ -8,6 +8,14 @@
 namespace circa {
 namespace primitive_type_tests {
 
+void non_pointer_values()
+{
+    Branch branch;
+    Term* i = branch.eval("1");
+    test_assert((void*) &as_int(i) == &i->value);
+    test_assert((void*) &as<int>(i) == &i->value);
+}
+
 void strings()
 {
     Branch branch;
@@ -67,6 +75,7 @@ void float_to_string()
 
 void register_tests()
 {
+    REGISTER_TEST_CASE(primitive_type_tests::non_pointer_values);
     REGISTER_TEST_CASE(primitive_type_tests::strings);
     REGISTER_TEST_CASE(primitive_type_tests::builtin_objects);
     REGISTER_TEST_CASE(primitive_type_tests::assign_int_to_float);

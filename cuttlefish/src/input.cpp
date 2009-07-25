@@ -1,7 +1,7 @@
 // Copyright 2008 Paul Hodge
 
-#include "SDL.h"
 #include "circa.h"
+#include "SDL.h"
 
 #include "input.h"
 #include "main.h"
@@ -13,9 +13,9 @@ namespace input {
 bool KEY_DOWN[SDLK_LAST];
 std::set<int> KEY_JUST_PRESSED;
 
-int MOUSE_X = 0;
-int MOUSE_Y = 0;
-bool MOUSE_JUST_CLICKED = false;
+Int MOUSE_X;
+Int MOUSE_Y;
+bool MOUSE_JUST_CLICKED;
 
 void key_down(Term* caller)
 {
@@ -151,8 +151,8 @@ void initialize(Branch& branch)
         KEY_DOWN[i] = false;
     }
 
-    expose_value(branch, &MOUSE_X, "_mouse_x");
-    expose_value(branch, &MOUSE_Y, "_mouse_y");
+    MOUSE_X = int_value(branch, 0, "_mouse_x");
+    MOUSE_Y = int_value(branch, 0, "_mouse_y");
     import_function(branch, key_down, "key_down(int) : bool");
     import_function(branch, key_pressed, "key_pressed(int) : bool");
     import_function(branch, mouse_pressed, "mouse_pressed() : bool");
