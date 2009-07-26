@@ -32,10 +32,19 @@ void test_get_involved_terms()
     test_equals(subtree, RefList(a,c,d));
 }
 
+void test_term_to_raw_string()
+{
+    // Test that term_to_raw_string doesn't die if a term has a NULL function or type.
+    Term* term = new Term();
+
+    term_to_raw_string(term);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(introspection_tests::test_is_value);
     REGISTER_TEST_CASE(introspection_tests::test_get_involved_terms);
+    REGISTER_TEST_CASE(introspection_tests::test_term_to_raw_string);
 }
 
 } // namespace introspection_tests

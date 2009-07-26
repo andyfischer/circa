@@ -66,9 +66,11 @@ std::string term_to_raw_string(Term* term)
     std::stringstream output;
 
     std::string name = term->name;
-    std::string funcName = get_short_local_name(term->function);
-    std::string typeName = term->type->name;
-
+    std::string funcName = term->function == NULL ? "<NULL function>"
+        : get_short_local_name(term->function);
+    std::string typeName = term->type == NULL ? "<NULL type>"
+        : term->type->name;
+   
     output << format_global_id(term) << " ";
 
     if (name != "")
@@ -89,12 +91,11 @@ std::string term_to_raw_string(Term* term)
 
     output << ")";
 
-    if (term->type != VOID_TYPE)
-        output << " : " << typeName;
+    output << " : " << typeName;
 
     bool showValue = term->value != NULL;
 
-    if (is_branch(term))
+    if (term->type == NULL || is_branch(term))
         showValue = false;
 
     if (showValue)
