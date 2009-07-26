@@ -327,6 +327,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         result->stringProp("syntaxHints:whitespacePostColon") = possible_whitespace(tokens);
 
         outputType = type_identifier_or_anonymous_type(branch, tokens);
+        assert(outputType != NULL);
     }
 
     if (!is_type(outputType))

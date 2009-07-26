@@ -34,10 +34,14 @@ namespace function_t {
         return function->field(0)->field(0)->asString();
     }
 
-    Ref& get_output_type(Term* function)
+    Term* get_output_type(Term* function)
     {
         Branch& contents = as_branch(function);
-        return contents[contents.length()-1]->type;
+        Term* last_term = contents[contents.length()-1];
+        if (last_term->name == OUTPUT_PLACEHOLDER_NAME)
+            return last_term->type;
+        else
+            return VOID_TYPE;
     }
 
     Ref& get_hidden_state_type(Term* function)
@@ -153,6 +157,13 @@ void initialize_function_data(Term* term)
         [n-1] output term, type is significant
       }
     */
+
+    /* Side note: currently it is kind of awkward to have the last term define
+     * the output type. This causes ugliness in a few places. For one, it means
+     * that we can't check a function's output type while we are still building it.
+     * There are also some backflips required to make sure that the #out term is
+     * last. Probably should revisit this.
+     */
 
     Branch& contents = as_branch(term);
 

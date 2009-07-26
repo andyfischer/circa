@@ -19,7 +19,7 @@ namespace function_t {
 
     // accessors
     std::string& get_name(Term* function);
-    Ref& get_output_type(Term* function);
+    Term* get_output_type(Term* function);
     Ref& get_hidden_state_type(Term* function);
     bool& get_variable_args(Term* function);
     Term* get_input_placeholder(Term* function, int index);

@@ -44,6 +44,8 @@ Term* apply(Branch& branch, Term* function, RefList const& _inputs, std::string 
 
     Term* outputType = function_t::get_output_type(function);
 
+    assert(outputType != NULL);
+
     // Check if this function has a specializeType function
     // Side note: maybe we should do this step a different way.
     if (function_t::get_specialize_type(function) != NULL)

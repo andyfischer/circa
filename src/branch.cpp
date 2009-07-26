@@ -233,7 +233,8 @@ Branch::hosted_remap_pointers(Term* caller, ReferenceMap const& map)
 
 bool is_branch(Term* term)
 {
-    return as_type(term->type).alloc == Branch::alloc;
+    return (term->type != NULL) &&
+        (as_type(term->type).alloc == Branch::alloc);
 }
 
 Branch& as_branch(Term* term)

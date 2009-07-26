@@ -296,7 +296,6 @@ void initialize()
     
     // Define output type
     create_value(as_branch(VALUE_FUNC), ANY_TYPE);
-    function_t::get_output_type(VALUE_FUNC) = ANY_TYPE;
 
     // Declare input_placeholder first because it's used while compiling functions
     INPUT_PLACEHOLDER_FUNC = import_function(*KERNEL, empty_evaluate_function,
