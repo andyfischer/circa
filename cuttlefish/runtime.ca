@@ -27,29 +27,27 @@ end
 
 -- TODO: put this in a separate file
 namespace value_tweaker
+    state List current_targets = []
 
-    --state List current_targets = []
+    def set_targets(List l)
+        current_targets := l
+    end
 
-    --def set_targets(List l)
-        --current_targets := l
-    --end
---
-    --def button(ref r, Point loc)
+    def button(ref r, Point loc)
         --text = render_text(ui_font_medium, "Hello", #0f0)
-        --draw_box([loc.x loc.y, loc.x + text.width, loc.y + text.height], #f00)
+        draw_box([loc.x loc.y, loc.x + text.width, loc.y + text.height], #f00)
         --draw_rendered_text(text, loc.x loc.y)
         --print(text)
-        --print('drew button: ' r.name() loc)
-    --end
+        print('drew button: ' r.name() loc)
+    end
 
     -- draw current targets
-    --y = 50
-    --for target in current_targets
-        --loc = [10,y]
-        --button(target, loc)
-        --y += 10
-    --end
-
+    y = 50
+    for target in current_targets
+        loc = [10,y]
+        button(target, loc)
+        y += 10
+    end
 end --namespace
 
 -- in main.cpp, we load the user's script into this branch:

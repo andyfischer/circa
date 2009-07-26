@@ -244,14 +244,14 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     if (!tokens.nextIs(IDENTIFIER)
             // A few builtin functions have names which are keywords:
             && !tokens.nextIs(FOR) && !tokens.nextIs(IF))
-        return compile_error_for_line(branch, tokens, startPosition);
+        return compile_error_for_line(branch, tokens, startPosition, "Expected identifier");
 
     std::string functionName = tokens.consume();
 
     possible_whitespace(tokens);
 
     if (!tokens.nextIs(LPAREN))
-        return compile_error_for_line(branch, tokens, startPosition);
+        return compile_error_for_line(branch, tokens, startPosition, "Expected (");
 
     tokens.consume();
 
@@ -306,7 +306,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
         if (!tokens.nextIs(RPAREN)) {
             if (!tokens.nextIs(COMMA))
-                return compile_error_for_line(result, tokens, startPosition);
+                return compile_error_for_line(result, tokens, startPosition, "Expected ,");
 
             tokens.consume(COMMA);
         }
@@ -331,7 +331,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     }
 
     if (!is_type(outputType))
-        return compile_error_for_line(result, tokens, startPosition);
+        return compile_error_for_line(result, tokens, startPosition,
+                outputType->name +" is not a type");
 
     possible_whitespace(tokens);
     possible_newline(tokens);
@@ -368,7 +369,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     if (!tokens.nextIs(END))
-        return compile_error_for_line(result, tokens, startPosition);
+        return compile_error_for_line(result, tokens, startPosition, "Expected 'end'");
 
     tokens.consume(END);
 
@@ -1314,7 +1315,8 @@ Term* dot_separated_identifier(Branch& branch, TokenStream& tokens)
         tokens.consume(DOT);
 
         if (!tokens.nextIs(IDENTIFIER))
-            return compile_error_for_line(branch, tokens, startPosition);
+            return compile_error_for_line(branch, tokens, startPosition,
+                    "Expected identifier after .");
 
         std::string rhsIdent = tokens.consume(IDENTIFIER);
 
@@ -1422,8 +1424,9 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
 
     bool rebind = false;
+
     if (tokens.nextIs(AMPERSAND)) {
-        tokens.consume();
+        tokens.consume(AMPERSAND);
         rebind = true;
     }
 
