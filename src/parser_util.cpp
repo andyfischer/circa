@@ -22,6 +22,8 @@ void append_whitespace(Term* term, std::string const& whitespace)
 
 void set_source_location(Term* term, int start, TokenStream& tokens)
 {
+    assert(term != NULL);
+
     if (tokens.length() == 0) {
         term->intProp("colStart") = 0;
         term->intProp("lineStart") = 0;

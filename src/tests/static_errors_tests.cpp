@@ -49,15 +49,11 @@ void test_unknown_identifier()
     Term* t = branch.eval("charlie");
     test_assert(get_static_error(t) == SERROR_UNKNOWN_IDENTIFIER);
     test_equals(get_static_error_message(t), "Unknown identifier: charlie");
-}
 
-void test_unknown_field()
-{
-    Branch branch;
     branch.eval("a = 1");
-    Term* t = branch.eval("a.b");
-    test_assert(get_static_error(t) == SERROR_UNKNOWN_FIELD);
-    test_equals(get_static_error_message(t), "Unknown field: b");
+    t = branch.eval("a.b");
+    test_assert(get_static_error(t) == SERROR_UNKNOWN_IDENTIFIER);
+    test_equals(get_static_error_message(t), "Unknown identifier: a.b");
 }
 
 void register_tests()
@@ -67,7 +63,6 @@ void register_tests()
     REGISTER_TEST_CASE(static_errors_tests::test_unknown_func);
     REGISTER_TEST_CASE(static_errors_tests::test_unknown_type);
     REGISTER_TEST_CASE(static_errors_tests::test_unknown_identifier);
-    REGISTER_TEST_CASE(static_errors_tests::test_unknown_field);
 }
 
 } // namespace static_errors_tests
