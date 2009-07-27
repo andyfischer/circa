@@ -10,7 +10,7 @@ namespace stateful_code_tests {
 void test_simple()
 {
     Branch branch;
-    Term* i = branch.eval("state i :int");
+    Term* i = branch.eval("state int i");
     test_assert(is_stateful(i));
     test_assert(i->type == INT_TYPE);
 
@@ -46,7 +46,7 @@ void subroutine_expansion_during_migrate()
 {
     Branch branch;
 
-    branch.eval("def myfunc(); state i : int; end");
+    branch.eval("def myfunc(); state int i; end");
 
     Branch& source = create_branch(branch, "source");
     Branch& dest = create_branch(branch, "dest");
@@ -72,7 +72,7 @@ void subroutine_expansion_during_migrate()
 void test_load_and_save()
 {
     Branch branch;
-    Term* statefulTerm = branch.eval("state i:int");
+    Term* statefulTerm = branch.eval("state int i");
     as_int(statefulTerm) = 1;
 
     Branch state;
@@ -96,9 +96,9 @@ void test_get_type_from_branches_stateful_terms()
 {
     Branch branch;
     branch.eval("a = 0");
-    branch.eval("state b:float");
+    branch.eval("state float b");
     branch.eval("c = 'hello'");
-    branch.eval("state d:bool");
+    branch.eval("state bool d");
 
     Branch type;
     

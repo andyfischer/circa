@@ -640,6 +640,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         possible_whitespace(tokens);
     }
 
+#if 0
     // check for "state <name> : <type>" syntax. This style is deprecated
     if (tokens.nextIs(COLON)) {
         tokens.consume();
@@ -651,6 +652,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         typeName = tokens.consume(IDENTIFIER);
         possible_whitespace(tokens);
     }
+#endif
 
     Term* type = ANY_TYPE;
     if (typeName != "")
@@ -1025,12 +1027,6 @@ Term* atom(Branch& branch, TokenStream& tokens)
     else if (tokens.nextIs(NAMESPACE))
         result = namespace_block(branch, tokens);
 
-    // identifier?
-    else if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AMPERSAND)) {
-        result = identifier(branch, tokens);
-        assert(result != NULL);
-    }
-
     // parenthesized expression?
     else if (tokens.nextIs(LPAREN)) {
         tokens.consume(LPAREN);
@@ -1252,12 +1248,16 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
     tokens.consume(NAMESPACE);
     possible_whitespace(tokens);
+
+    if (!tokens.nextIs(IDENTIFIER))
+        return compile_error_for_line(branch, tokens, startPosition, "Expected identifier after 'namespace'");
+
     std::string name = tokens.consume(IDENTIFIER);
     Term* result = apply(branch, BRANCH_FUNC, RefList(), name);
+    change_type(result, NAMESPACE_TYPE);
 
     result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 
-    change_type(result, NAMESPACE_TYPE);
     consume_branch_until_end(as_branch(result), tokens);
 
     result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
