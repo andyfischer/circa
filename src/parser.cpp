@@ -993,10 +993,11 @@ Term* atom(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
     Term* result = NULL;
 
-    // function call?
-    if (tokens.nextIs(IDENTIFIER) && tokens.nextIs(LPAREN, 1))
-        result = function_call(branch, tokens);
-
+    // identifier?
+    if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AMPERSAND)) {
+        result = identifier(branch, tokens);
+        assert(result != NULL);
+    }
     // literal integer?
     else if (tokens.nextIs(INTEGER))
         result = literal_integer(branch, tokens);
@@ -1055,33 +1056,6 @@ Term* atom(Branch& branch, TokenStream& tokens)
     }
 
     set_source_location(result, startPosition, tokens);
-
-    return result;
-}
-
-Term* function_call(Branch& branch, TokenStream& tokens)
-{
-    int startPosition = tokens.getPosition();
-
-    std::string functionName = tokens.consume(IDENTIFIER);
-    tokens.consume(LPAREN);
-
-    RefList inputs;
-
-    ListSyntaxHints listHints;
-    consume_list_arguments(branch, tokens, inputs, listHints);
-
-    if (!tokens.nextIs(RPAREN))
-        return compile_error_for_line(branch, tokens, startPosition);
-
-    tokens.consume(RPAREN);
-    
-    Term* result = find_and_apply(branch, functionName, inputs);
-
-    if (functionName != result->function->name)
-        result->stringProp("syntaxHints:functionName") = functionName;
-
-    listHints.apply(result);
 
     return result;
 }
@@ -1348,19 +1322,26 @@ Term* identifier(Branch& branch, TokenStream& tokens)
         push_pending_rebind(branch, ids[0]);
     }
 
+    Term* head = NULL;
+
     // Iterate through the dot-separated names and see what they refer to.
-    Term* head = find_named(branch, ids[0]);
-
-    if (head == NULL)
-        return unknown_identifier(branch, fullName.str());
-
-    for (unsigned name_index=1; name_index < ids.size(); name_index++) {
+    for (unsigned name_index=0; name_index < ids.size(); name_index++) {
         std::string& name = ids[name_index];
         RefList implicitCallInputs;
         bool rebindName = false;
 
+        // If this is the first name, then just lookup that name in our branch.
+        // (Otherwise, there are a bunch of fancy rules which assume that
+        // 'head' is not NULL)
+        if (name_index == 0) {
+            head = find_named(branch, name);
+
+            if (head == NULL)
+                return unknown_identifier(branch, name);
+        }
+
         // Check if the lhs is a namespace
-        if (head->type == NAMESPACE_TYPE) {
+        else if (head->type == NAMESPACE_TYPE) {
             Branch& namespaceContents = as_branch(head);
             if (!namespaceContents.contains(name))
                 return unknown_identifier(branch, fullName.str());
@@ -1386,8 +1367,6 @@ Term* identifier(Branch& branch, TokenStream& tokens)
         // Check if the lhs's type defines this name as a property
         else if (as_type(head->type).findFieldIndex(name) != -1) {
             head = apply(branch, GET_FIELD_FUNC, RefList(head, string_value(branch, name)));
-            //specialize_type(result, lhsType[rhsIdent]->type);
-
         }
 
         // Otherwise, give up
@@ -1396,7 +1375,16 @@ Term* identifier(Branch& branch, TokenStream& tokens)
         }
 
         // Now possibly turn this into a function call.
-        if (head->type == FUNCTION_TYPE) {
+        bool treatAsFunctionCall = is_callable(head);
+
+        // TEMP: Old behavior with no ()s was to return a pointer to the function.
+        // This is deprecated. However, allow this for now, because some code depends on it.
+
+        if ((ids.size() == 1) && (name_index == 0) && !tokens.nextIs(LPAREN)) {
+            treatAsFunctionCall = false;
+        }
+
+        if (treatAsFunctionCall) {
             Term* function = head;
             RefList inputs = implicitCallInputs;
             ListSyntaxHints listHints;
@@ -1414,14 +1402,18 @@ Term* identifier(Branch& branch, TokenStream& tokens)
             head = apply(branch, function, inputs);
             listHints.apply(head);
 
+            // Figure out the function's name.
+            std::stringstream functionName;
+            for (unsigned i=0; i <= name_index; i++) {
+                if (i > 0) functionName << ".";
+                functionName << ids[i];
+            }
+
+            if (head->function->name != functionName.str())
+                head->stringProp("syntaxHints:functionName") = functionName.str();
+
             if (rebindName)
                 branch.bindName(head, implicitCallInputs[0]->name);
-        }
-
-        // Check if this field was treated like a function, but it's not really a function
-        else if (tokens.nextIs(LPAREN) || implicitCallInputs.length() > 0) {
-            return compile_error_for_line(branch, tokens, startPosition,
-                "not a function: "+fullName.str()); // TODO: a better error
         }
     }
 

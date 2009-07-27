@@ -33,7 +33,6 @@ Term* unary_expression(Branch& branch, TokenStream& tokens);
 Term* dot_separated_identifier(Branch& branch, TokenStream& tokens);
 Term* subscripted_atom(Branch& branch, TokenStream& tokens);
 Term* atom(Branch& branch, TokenStream& tokens);
-Term* function_call(Branch& branch, TokenStream& tokens);
 Term* literal_integer(Branch& branch, TokenStream& tokens);
 Term* literal_hex(Branch& branch, TokenStream& tokens);
 Term* literal_float(Branch& branch, TokenStream& tokens);

@@ -263,7 +263,7 @@ void test_syntax_hints()
 {
     Branch branch;
 
-    Term* t = parser::compile(&branch, parser::function_call, "concat('a', 'b')");
+    Term* t = parser::compile(&branch, parser::statement, "concat('a', 'b')");
     test_equals(get_input_syntax_hint(t, 0, "preWhitespace"), "");
     test_equals(get_input_syntax_hint(t, 0, "postWhitespace"), ",");
     test_equals(get_input_syntax_hint(t, 1, "preWhitespace"), " ");
