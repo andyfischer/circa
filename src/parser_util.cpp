@@ -246,10 +246,17 @@ std::string possible_whitespace_or_newline(TokenStream& tokens)
 
 std::string possible_statement_ending(TokenStream& tokens)
 {
-    if (tokens.nextIs(NEWLINE) || tokens.nextIs(COMMA) || tokens.nextIs(SEMICOLON))
-        return tokens.consume();
-    else
-        return "";
+    std::stringstream result;
+    if (tokens.nextIs(WHITESPACE))
+        result << tokens.consume();
+
+    if (tokens.nextIs(COMMA) || tokens.nextIs(SEMICOLON))
+        result << tokens.consume();
+
+    if (tokens.nextIs(NEWLINE))
+        result << tokens.consume(NEWLINE);
+
+    return result.str();
 }
 
 void consume_branch_until_end(Branch& branch, TokenStream& tokens)

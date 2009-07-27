@@ -32,14 +32,15 @@ namespace subroutine_t {
         result << ")";
 
         if (function_t::get_output_type(term) != VOID_TYPE) {
-            result << term->stringPropOptional("syntaxHints:whitespacePreColon", " ");
+            result << term->stringPropOptional("syntaxHints:whitespacePreColon", "");
             result << ":";
             result << term->stringPropOptional("syntaxHints:whitespacePostColon", " ");
             result << function_t::get_output_type(term)->name;
         }
 
-        result << "\n";
+        result << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
         result << get_branch_source(branch);
+        result << term->stringPropOptional("syntaxHints:preEndWs", "");
         result << "end";
 
         return result.str();
