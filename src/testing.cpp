@@ -70,6 +70,13 @@ void _test_assert_function(Branch& branch, int line, const char* file)
             throw std::runtime_error(msg.str());
         }
     }
+
+    if (has_static_errors(branch)) {
+        std::stringstream msg;
+        msg << "Branch has errors at " << file << ", line " << line << std::endl;
+        print_static_errors_formatted(branch, msg);
+        throw std::runtime_error(msg.str());
+    }
 }
 
 void _test_fail_function(int line, const char* file)

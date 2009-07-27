@@ -75,6 +75,7 @@ void test_set()
 
     s = branch.eval("s.add(1)");
 
+    test_assert(branch);
     test_assert(as_branch(s).length() == 1);
     test_assert(as_branch(s)[0]->asInt() == 1);
 
