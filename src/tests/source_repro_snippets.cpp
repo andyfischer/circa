@@ -252,6 +252,20 @@ void reproduce_do_once() {
     finish_source_repro_category();
 }
 
+void reproduce_misc_blocks() {
+    round_trip_source("namespace ns\nend");
+    round_trip_source("namespace ns\nprint(1)\nend");
+    round_trip_source("namespace ns end");
+    round_trip_source("namespace ns 1 end");
+    round_trip_source("namespace ns; print(1)\nend");
+    round_trip_source("begin\nend");
+    round_trip_source("begin;end");
+    round_trip_source("begin;  ;end");
+    round_trip_source("begin;  end");
+    round_trip_source("blah = begin 1   end");
+    finish_source_repro_category();
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);
@@ -266,6 +280,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_subroutine);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_type_decl);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_do_once);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_misc_blocks);
 }
 
 } // namespace source_repro_snippets

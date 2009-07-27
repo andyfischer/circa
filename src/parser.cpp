@@ -1236,8 +1236,9 @@ Term* plain_branch(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
     tokens.consume(BEGIN);
     Term* result = create_branch(branch);
+    result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
     consume_branch_until_end(as_branch(result), tokens);
-    possible_whitespace(tokens);
+    result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
     if (!tokens.nextIs(END))
         return compile_error_for_line(result, tokens, startPosition);
@@ -1253,9 +1254,13 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
     std::string name = tokens.consume(IDENTIFIER);
     Term* result = apply(branch, BRANCH_FUNC, RefList(), name);
+
+    result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
+
     change_type(result, NAMESPACE_TYPE);
     consume_branch_until_end(as_branch(result), tokens);
-    possible_whitespace(tokens);
+
+    result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
     if (!tokens.nextIs(END))
         return compile_error_for_line(result, tokens, startPosition);
