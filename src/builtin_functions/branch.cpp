@@ -15,16 +15,32 @@ namespace branch_function {
 
     std::string toSourceString(Term* term) {
 
+        std::stringstream out;
+
         if (term->boolPropOptional("syntaxHints:literal-list", false)) {
-            std::stringstream out;
             prepend_name_binding(term, out);
             out << "[";
             Branch& contents = as_branch(term);
             out << get_branch_source(contents, "");
             out << "]";
             return out.str();
+        } else if (term->type == NAMESPACE_TYPE) {
+            out << "namespace ";
+            out << term->name;
+            out << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
+            out << get_branch_source(as_branch(term));
+            out << term->stringPropOptional("syntaxHints:preEndWs", "");
+            out << "end";
+            return out.str();
+            
         } else {
-            return get_term_source_default_formatting(term);
+            prepend_name_binding(term, out);
+            out << "begin";
+            out << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
+            out << get_branch_source(as_branch(term));
+            out << term->stringPropOptional("syntaxHints:preEndWs", "");
+            out << "end";
+            return out.str();
         }
     }
 
