@@ -58,11 +58,15 @@ void register_every_possible_parse_error()
     register_input("for x in %");
     register_input("for x in [1]");
     register_input("for x in 1\n");
+    register_input("namespace");
+    register_input("namespace %");
+    register_input("begin");
+    register_input("begin %");
     register_input("state");
-    register_input("state i:%");
-    register_input("state i:");
     register_input("state %");
     register_input("state x = ");
+    register_input("state int x = ");
+    register_input("state int %");
     register_input("1 = 2");
     register_input("1 2 3 = 4");
     register_input("a.b 3 4 = 4");

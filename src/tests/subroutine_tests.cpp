@@ -59,7 +59,7 @@ void test_recursion()
 void subroutine_stateful_term()
 {
     Branch branch;
-    branch.eval("def mysub()\nstate a :float = 0.0\na += 1\nend");
+    branch.eval("def mysub()\nstate a = 0.0\na += 1\nend");
 
     // Make sure that stateful terms work correctly
     Term* call = branch.eval("mysub()");
