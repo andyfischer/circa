@@ -82,6 +82,7 @@ void test_set()
     test_assert(as_branch(s).length() == 1);
 
     s = branch.eval("s.add(2)");
+    test_assert(branch);
     test_assert(as_branch(s).length() == 2);
 
     s = branch.eval("s.remove(1)");
