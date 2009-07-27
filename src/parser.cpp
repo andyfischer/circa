@@ -364,7 +364,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     // If the #out term doesn't have the same type as the declared type, then coerce it
     Term* outTerm = contents[contents.length()-1];
     if (outTerm->type != outputType)
-        outTerm = apply(contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType), OUTPUT_PLACEHOLDER_NAME);
+        outTerm = apply(contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType),
+                        OUTPUT_PLACEHOLDER_NAME);
 
     possible_whitespace(tokens);
 
@@ -575,18 +576,16 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     tokens.consume(NEWLINE);
 
     Term* forTerm = apply(branch, FOR_FUNC, RefList(listExpr));
-    alloc_value(forTerm);
 
     Branch& innerBranch = get_for_loop_code(forTerm);
 
     // Create iterator variable
 
-    // If possible, use the first term of the iterated list to find the type
-    // of the iterator variable. This is totally a hack and should be replaced
-    // when we have parametrized types.
-    Term* iterator_type = ANY_TYPE;
-    if (as_branch(listExpr).length() > 0)
-        iterator_type = as_branch(listExpr)[0]->type;
+    RefList listExprTypes;
+    for (int i=0; i < as_branch(listExpr).length(); i++)
+        listExprTypes.append(as_branch(listExpr)[i]->type);
+
+    Term* iterator_type = find_common_type(listExprTypes);
 
     Term* iterator = create_value(innerBranch, iterator_type, iterator_name);
     source_set_hidden(iterator, true);

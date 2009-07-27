@@ -68,6 +68,15 @@ void type_inference_for_iterator()
     loop = branch.compile("for i in [1]\ni = i * 2\nend");
     Branch& inner_code = get_for_loop_code(loop);
     test_assert(inner_code["i"]->function->name == "mult_i");
+
+    // test that we find a common type
+    loop = branch.compile("for i in [1 1.0]\nend");
+    iterator = get_for_loop_iterator(loop);
+    test_assert(iterator->type == FLOAT_TYPE);
+
+    loop = branch.compile("for i in [1 1.0 'string']\nend");
+    iterator = get_for_loop_iterator(loop);
+    test_assert(iterator->type == ANY_TYPE);
 }
 
 void register_tests()
