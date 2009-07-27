@@ -310,7 +310,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
             tokens.consume(COMMA);
         }
-    }
+    } // Done consuming input arguments
 
     if (!tokens.nextIs(RPAREN))
         return compile_error_for_line(result, tokens, startPosition);
@@ -319,10 +319,9 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     tokens.consume();
 
     // Output type
-    result->stringProp("syntaxHints:whitespacePreColon") = possible_whitespace(tokens);
-
     Term* outputType = VOID_TYPE;
-    if (tokens.nextIs(COLON)) {
+    if (tokens.nextNonWhitespaceIs(COLON)) {
+        result->stringProp("syntaxHints:whitespacePreColon") = possible_whitespace(tokens);
         tokens.consume(COLON);
         result->stringProp("syntaxHints:whitespacePostColon") = possible_whitespace(tokens);
 
@@ -334,8 +333,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         return compile_error_for_line(result, tokens, startPosition,
                 outputType->name +" is not a type");
 
-    possible_whitespace(tokens);
-    possible_newline(tokens);
+    result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 
     // If we're out of tokens, then this is just an import_function call. Stop here.
     if (tokens.finished()) {
@@ -367,7 +365,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         outTerm = apply(contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType),
                         OUTPUT_PLACEHOLDER_NAME);
 
-    possible_whitespace(tokens);
+    result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
     if (!tokens.nextIs(END))
         return compile_error_for_line(result, tokens, startPosition, "Expected 'end'");
@@ -565,19 +563,14 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     Term* listExpr = infix_expression(branch, tokens);
     recursively_mark_terms_as_occuring_inside_an_expression(listExpr);
-    possible_whitespace(tokens);
 
     if (!is_branch(listExpr))
-        return compile_error_for_line(branch, tokens, startPosition);
-
-    if (!tokens.nextIs(NEWLINE))
-        return compile_error_for_line(branch, tokens, startPosition);
-
-    tokens.consume(NEWLINE);
+        return compile_error_for_line(branch, tokens, startPosition, "Expected a list after 'in'");
 
     Term* forTerm = apply(branch, FOR_FUNC, RefList(listExpr));
-
     Branch& innerBranch = get_for_loop_code(forTerm);
+
+    forTerm->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 
     // Create iterator variable
 
@@ -594,7 +587,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     consume_branch_until_end(innerBranch, tokens);
 
-    possible_whitespace(tokens);
+    forTerm->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
     if (!tokens.nextIs(END))
         return compile_error_for_line(branch, tokens, startPosition);
@@ -612,14 +605,13 @@ Term* do_once_block(Branch& branch, TokenStream& tokens)
 
     tokens.consume(DO_ONCE);
 
-    possible_whitespace(tokens);
-    possible_statement_ending(tokens);
-
     Term* result = apply(branch, DO_ONCE_FUNC, RefList());
+
+    result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 
     consume_branch_until_end(as_branch(result), tokens);
 
-    possible_whitespace(tokens);
+    result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
     tokens.consume(END);
 
@@ -1220,7 +1212,6 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
         }
 
         prepend_whitespace(term, preWhitespace);
-        append_whitespace(term, possible_whitespace(tokens));
         append_whitespace(term, possible_statement_ending(tokens));
 
         // Take the result and steal it into the list branch

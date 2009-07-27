@@ -212,6 +212,12 @@ void reproduce_for_loop() {
     round_trip_source("for x in [1]\n   print(x)\nend");
     round_trip_source("l = [1]\nfor x in l\nend");
     round_trip_source("l = [1]\nfor x in l\n  x += 3\nend");
+    round_trip_source("for x in [1];end");
+    round_trip_source("for x in [1],end");
+    round_trip_source("for x in [1]    ;end");
+    round_trip_source("for x in [1];   end");
+    round_trip_source("for x in [1]   end");
+    round_trip_source("for x in [1] print(1)  end");
     finish_source_repro_category();
 }
 
@@ -221,12 +227,28 @@ void reproduce_subroutine() {
     round_trip_source("def hi2():int\nend");
     round_trip_source("def hi3(int a)\nend");
     round_trip_source("def hi4() : int\nreturn 1\nend");
+    round_trip_source("def hi():int;return 1;end");
+    round_trip_source("def hi():int  ;return 1;end");
+    round_trip_source("def hi();1;end");
+    round_trip_source("def hi() ;1;end");
+    round_trip_source("def hi(); 1;end");
+    round_trip_source("def hi()   end");
+    round_trip_source("def hi() 1  end");
     finish_source_repro_category();
 }
 
 void reproduce_type_decl() {
     round_trip_source("type mytype { int a }");
     round_trip_source("type mytype { int a, float b }");
+    finish_source_repro_category();
+}
+
+void reproduce_do_once() {
+    round_trip_source("do once\nend");
+    round_trip_source("do once\nprint(1)\nend");
+    round_trip_source("do once; print(1); end");
+    round_trip_source("do once , print(1); end");
+    round_trip_source("do once     end");
     finish_source_repro_category();
 }
 
@@ -243,6 +265,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_for_loop);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_subroutine);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_type_decl);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_do_once);
 }
 
 } // namespace source_repro_snippets

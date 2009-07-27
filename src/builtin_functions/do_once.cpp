@@ -15,9 +15,22 @@ namespace do_once_function {
         }
     }
 
+    std::string toSourceString(Term* term)
+    {
+        std::stringstream result;
+        result << "do once";
+        result << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
+        result << get_branch_source(as_branch(term));
+        result << term->stringPropOptional("syntaxHints:preEndWs", "");
+        result << "end";
+
+        return result.str();
+    }
+
     void setup(Branch& kernel)
     {
         DO_ONCE_FUNC = import_function(kernel, evaluate, "do_once(state bool) : Branch");
+        function_t::get_to_source_string(DO_ONCE_FUNC) = toSourceString;
     }
 }
 }

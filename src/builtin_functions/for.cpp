@@ -17,8 +17,9 @@ namespace for_function {
         result << get_for_loop_iterator(term)->name;
         result << " in ";
         result << get_source_of_input(term,0);
-        result << "\n";
+        result << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
         result << get_branch_source(get_for_loop_code(term));
+        result << term->stringPropOptional("syntaxHints:preEndWs", "");
         result << "end";
 
         return result.str();
