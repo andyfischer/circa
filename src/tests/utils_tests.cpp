@@ -11,6 +11,8 @@ void test_get_directory_for_filename()
 {
     test_equals(get_directory_for_filename("c:/My Documents/settings.txt"),
             "c:/My Documents");
+    test_equals(get_directory_for_filename("settings.txt"), ".");
+    test_equals(get_directory_for_filename("/settings.txt"), "/");
 }
 
 void register_tests()

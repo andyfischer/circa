@@ -31,9 +31,18 @@ void write_text_file(std::string const& filename, std::string const& contents)
 
 std::string get_directory_for_filename(std::string const& filename)
 {
-    // Should probably use boost::path or some other library here.
+    // Really should use boost::path or some other library here.
     size_t last_slash = filename.find_last_of("/");
-    return filename.substr(0, last_slash);
+
+    if (last_slash == filename.npos)
+        return ".";
+
+    if (last_slash == 0)
+        return "/";
+
+    std::string result = filename.substr(0, last_slash);
+
+    return result;
 }
     
 } // namespace circa
