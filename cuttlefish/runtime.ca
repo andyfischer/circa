@@ -22,7 +22,7 @@ def draw_box(Box box, int color)
     gl.triangles([nw ne se se sw nw] color)
 end
 
-ui_font_medium = load_font("assets/sv_basic_manual/SVBasicManual.ttf", 12)
+ui_font_medium = load_font("assets/sv_basic_manual/SVBasicManual.ttf", 16)
 
 
 -- TODO: put this in a separate file

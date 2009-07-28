@@ -1,0 +1,12 @@
+
+
+background(0x000)
+
+def draw_text(string s, Point loc, int size)
+    font = load_font("../cuttlefish/assets/sv_basic_manual/SVBasicManual.ttf", size)
+    text = render_text(font, s, #fff)
+    draw_rendered_text(text, loc.x, loc.y)
+end
+
+draw_text("Hello", [50 50], 52)
+draw_text("Hello", [50 100], 12)
