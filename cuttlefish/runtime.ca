@@ -26,29 +26,32 @@ ui_font_medium = load_font("assets/sv_basic_manual/SVBasicManual.ttf", 16)
 
 
 -- TODO: put this in a separate file
---namespace value_tweaker
-    --state List current_targets = []
---
-    --def set_targets(List l)
-        --current_targets := l
-    --end
---
-    --def button(ref r, Point loc)
-        --text = render_text(ui_font_medium, "Hello", #0f0)
-        --draw_box([loc.x loc.y, loc.x + text.width, loc.y + text.height], #f00)
-        --draw_rendered_text(text, loc.x loc.y)
-        --print(text)
-        --print('drew button: ' r.name() loc)
-    --end
+namespace value_tweaker
+    state List current_targets = []
+
+    def set_targets(List l)
+        current_targets := l
+    end
+
+    def button(ref r, Point loc)
+        text = render_text(ui_font_medium, "Hello", #000)
+        padding = 5.0
+        rect = [loc.x - padding, loc.y - padding,
+            loc.x + text.width + padding, loc.y + text.height + padding]
+        color = #f22
+        if mouse_in(rect) color = #f77 end
+        draw_box(rect, color)
+        draw_rendered_text(text, loc.x, loc.y)
+    end
 
     -- draw current targets
     --y = 50
-    --for target in current_targets
-        --loc = [10,y]
-        --button(target, loc)
+    for target in current_targets
+        loc = [10.0,10.0]
+        button(target, loc)
         --y += 10
-    --end
---end --namespace
+    end
+end --namespace
 
 -- in main.cpp, we load the user's script into this branch:
 users_branch = branch()
