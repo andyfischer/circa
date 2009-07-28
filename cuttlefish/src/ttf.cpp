@@ -23,11 +23,13 @@ SDL_Color unpack_sdl_color(int color)
 
 void load_font(Term* term)
 {
-    if (as<TTF_Font*>(term) != NULL)
+    if (as<TTF_Font*>(term->input(0)) != NULL) {
+        as<TTF_Font*>(term) = as<TTF_Font*>(term->input(0));
         return;
+    }
 
-    std::string path = term->input(0)->asString();
-    int pointSize = term->input(1)->asInt();
+    std::string path = term->input(1)->asString();
+    int pointSize = term->input(2)->asInt();
 
     path = get_source_file_location(*term->owningBranch) + "/" + path;
 
@@ -39,6 +41,7 @@ void load_font(Term* term)
         return;
     }
 
+    as<TTF_Font*>(term->input(0)) = result;
     as<TTF_Font*>(term) = result;
 }
 
@@ -149,7 +152,7 @@ void initialize(circa::Branch& branch)
 
     import_type<TTF_Font*>(branch, "TTF_Font");
 
-    import_function(branch, load_font, "load_font(string, int) : TTF_Font");
+    import_function(branch, load_font, "load_font(state TTF_Font, string, int) : TTF_Font");
     branch.eval("type RenderedText { int texid, float width, float height }");
     import_function(branch, draw_text,
         "draw_text(TTF_Font, string, float x, float y, int) : RenderedText");
