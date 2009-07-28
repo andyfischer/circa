@@ -292,6 +292,13 @@ namespace ref_t {
             error_occurred(caller, "NULL reference");
         as_string(caller) = t->name;
     }
+    void hosted_to_string(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL)
+            error_occurred(caller, "NULL reference");
+        as_string(caller) = circa::to_string(t);
+    }
     void get_function(Term* caller)
     {
         Term* t = caller->input(0)->asRef();
@@ -305,6 +312,34 @@ namespace ref_t {
         if (t == NULL)
             error_occurred(caller, "NULL reference");
         as_ref(caller) = t->type;
+    }
+    void tweak_value(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL)
+            error_occurred(caller, "NULL reference");
+        
+        float tweak_factor = caller->input(1)->toFloat();
+
+        if (t->type == FLOAT_TYPE) {
+            as_float(t) = as_float(t) * tweak_factor;
+
+        } else if (t->type == INT_TYPE) {
+            int newvalue = int(as_int(t) * tweak_factor);
+
+            // make sure we at least bump by 1
+            if (newvalue == as_int(t)) {
+                if (tweak_factor > 1)
+                    newvalue += 1;
+                else
+                    newvalue -= 1;
+            }
+
+            as_int(t) = newvalue;
+
+        } else {
+            std::cout << "warn: tweak_value called on a non-float: " << t->name << std::endl;
+        }
     }
 }
 
@@ -356,8 +391,10 @@ void initialize_primitive_types(Branch& kernel)
 void setup_primitive_types()
 {
     import_member_function(REF_TYPE, ref_t::get_name, "name(ref) : string");
+    import_member_function(REF_TYPE, ref_t::hosted_to_string, "to_string(ref) : string");
     import_member_function(REF_TYPE, ref_t::hosted_typeof, "typeof(ref) : ref");
     import_member_function(REF_TYPE, ref_t::get_function, "function(ref) : ref");
+    import_member_function(REF_TYPE, ref_t::tweak_value, "tweak_value(ref,float)");
 }
 
 } // namespace circa

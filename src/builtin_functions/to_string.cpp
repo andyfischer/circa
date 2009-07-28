@@ -8,15 +8,7 @@ namespace to_string_function {
     void evaluate(Term* caller)
     {
         Term* term = caller->input(0);
-        
-        Type::ToStringFunc func = as_type(term->type).toString;
-        
-        if (func == NULL) {
-            as_string(caller) = std::string("<" + as_type(term->type).name
-                    + " " + term->name + ">");
-        } else {
-            as_string(caller) = func(term);
-        }
+        as_string(caller) = to_string(term);
     }
 
     void setup(Branch& kernel)

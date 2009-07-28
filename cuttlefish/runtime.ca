@@ -34,20 +34,28 @@ namespace value_tweaker
     end
 
     def button(ref r, Point loc)
-        text = render_text(ui_font_medium, "Hello", #000)
+        text = concat(r.name ' = ' r.to_string)
+
+        text_sprite = render_text(ui_font_medium, text, #000)
         padding = 5.0
         rect = [loc.x - padding, loc.y - padding,
-            loc.x + text.width + padding, loc.y + text.height + padding]
+            loc.x + text_sprite.width + padding, loc.y + text_sprite.height + padding]
         color = #f22
         if mouse_in(rect) color = #f77 end
         draw_box(rect, color)
-        draw_rendered_text(text, loc.x, loc.y)
+        draw_rendered_text(text_sprite, loc.x, loc.y)
+
+        if mouse_wheel_up(rect)
+            r.tweak_value(0.9)
+        elif mouse_wheel_down(rect)
+            r.tweak_value(1.1)
+        end
     end
 
     -- draw current targets
     --y = 50
     for target in current_targets
-        loc = [10.0,10.0]
+        loc = [10 100]
         button(target, loc)
         --y += 10
     end

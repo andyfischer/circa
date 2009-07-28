@@ -15,7 +15,9 @@ std::set<int> KEY_JUST_PRESSED;
 
 Int MOUSE_X;
 Int MOUSE_Y;
-bool MOUSE_JUST_CLICKED;
+bool RECENT_MOUSE_DOWN;
+bool RECENT_MOUSE_WHEEL_UP;
+bool RECENT_MOUSE_WHEEL_DOWN;
 
 void key_down(Term* caller)
 {
@@ -31,13 +33,15 @@ void key_pressed(Term* caller)
 
 void mouse_pressed(Term* caller)
 {
-    as_bool(caller) = MOUSE_JUST_CLICKED;
+    as_bool(caller) = RECENT_MOUSE_DOWN;
 }
 
 void capture_events()
 {
     KEY_JUST_PRESSED.clear();
-    MOUSE_JUST_CLICKED = false;
+    RECENT_MOUSE_DOWN = false;
+    RECENT_MOUSE_WHEEL_UP = false;
+    RECENT_MOUSE_WHEEL_DOWN = false;
 
     // Consume all events
     SDL_Event event;
@@ -58,10 +62,18 @@ void capture_events()
         } else if (event.type == SDL_KEYUP) {
             KEY_DOWN[event.key.keysym.sym] = false;
         } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-
-            MOUSE_JUST_CLICKED = true;
+            if (event.button.button == SDL_BUTTON_LEFT)
+                RECENT_MOUSE_DOWN = true;
+            else if (event.button.button == SDL_BUTTON_WHEELUP)
+                RECENT_MOUSE_WHEEL_UP = true;
+            else if (event.button.button == SDL_BUTTON_WHEELDOWN)
+                RECENT_MOUSE_WHEEL_DOWN = true;
+            MOUSE_X = event.button.x;
+            MOUSE_Y = event.button.y;
 
         } else if (event.type == SDL_MOUSEBUTTONUP) {
+            MOUSE_X = event.button.x;
+            MOUSE_Y = event.button.y;
         } else if (event.type == SDL_MOUSEMOTION) {
             MOUSE_X = event.motion.x;
             MOUSE_Y = event.motion.y;
@@ -115,34 +127,34 @@ void handle_key_press(SDL_Event &event, int key)
     }
 }
 
+bool mouse_in(Branch& box)
+{
+    float x1 = box[0]->toFloat();
+    float y1 = box[1]->toFloat();
+    float x2 = box[2]->toFloat();
+    float y2 = box[3]->toFloat();
+    return x1 <= MOUSE_X && y1 <= MOUSE_Y
+        && x2 >= MOUSE_X && y2 >= MOUSE_Y;
+}
+
 void mouse_clicked(Term* caller)
 {
-    //int& id = caller->input(0)->asInt();
-    Branch& region = caller->input(0)->asBranch();
-    float x1 = region[0]->toFloat();
-    float y1 = region[1]->toFloat();
-    float x2 = region[2]->toFloat();
-    float y2 = region[3]->toFloat();
-
-    as_bool(caller) = (MOUSE_JUST_CLICKED
-        && x1 <= MOUSE_X
-        && y1 <= MOUSE_Y
-        && x2 >= MOUSE_X
-        && y2 >= MOUSE_Y);
+    as_bool(caller) = RECENT_MOUSE_DOWN && mouse_in(as_branch(caller->input(0)));
 }
 
 void mouse_over(Term* caller)
 {
-    Branch& region = caller->input(0)->asBranch();
-    float x1 = region[0]->toFloat();
-    float y1 = region[1]->toFloat();
-    float x2 = region[2]->toFloat();
-    float y2 = region[3]->toFloat();
+    as_bool(caller) = mouse_in(as_branch(caller->input(0)));
+}
 
-    as_bool(caller) = x1 <= MOUSE_X
-        && y1 <= MOUSE_Y
-        && x2 >= MOUSE_X
-        && y2 >= MOUSE_Y;
+void mouse_wheel_up(Term* caller)
+{
+    as_bool(caller) = RECENT_MOUSE_WHEEL_UP && mouse_in(as_branch(caller->input(0)));
+}
+
+void mouse_wheel_down(Term* caller)
+{
+    as_bool(caller) = RECENT_MOUSE_WHEEL_DOWN && mouse_in(as_branch(caller->input(0)));
 }
 
 void initialize(Branch& branch)
@@ -164,6 +176,8 @@ void initialize(Branch& branch)
 
     import_function(branch, mouse_clicked, "mouse_clicked(List region) : bool");
     import_function(branch, mouse_over, "mouse_over(List region) : bool");
+    import_function(branch, mouse_wheel_up, "mouse_wheel_up(List region) : bool");
+    import_function(branch, mouse_wheel_down, "mouse_wheel_down(List region) : bool");
 }
 
 } // namespace input
