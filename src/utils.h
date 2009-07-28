@@ -11,6 +11,7 @@ namespace circa {
 
 std::string read_text_file(std::string const& filename);
 void write_text_file(std::string const& filename, std::string const& contents);
+std::string get_directory_for_filename(std::string const& filename);
 
 } // namespace circa
 

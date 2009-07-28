@@ -10,6 +10,8 @@
 
 namespace circa {
 
+extern std::string SOURCE_FILE_ATTR;
+
 struct Branch
 {
     RefList _terms;
@@ -96,6 +98,7 @@ Term* find_named(Branch& branch, std::string const& name);
 
 bool reload_branch_from_file(Branch& branch, std::ostream& errors);
 void persist_branch_to_file(Branch& branch);
+std::string get_source_file_location(Branch& branch);
 
 } // namespace circa
 

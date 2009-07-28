@@ -4,6 +4,8 @@
 
 namespace circa {
 
+std::string SOURCE_FILE_ATTR = "#attr:source-file";
+
 Branch::Branch()
   : owningTerm(NULL)
 {
@@ -365,8 +367,27 @@ bool reload_branch_from_file(Branch& branch, std::ostream &errors)
 
 void persist_branch_to_file(Branch& branch)
 {
-    std::string filename = as_string(branch[get_name_for_attribute("source-file")]);
+    std::string filename = as_string(branch[SOURCE_FILE_ATTR]);
     write_text_file(filename, get_branch_source(branch) + "\n");
+}
+
+std::string get_source_file_location(Branch& branch)
+{
+    // Search upwards until we find a branch that has source-file defined.
+    
+    Branch* branch_p = &branch;
+
+    while (branch_p != NULL && !branch_p->contains(SOURCE_FILE_ATTR)) {
+        if (branch_p->owningTerm == NULL)
+            branch_p = NULL;
+        else
+            branch_p = branch_p->owningTerm->owningBranch;
+    }
+
+    if (branch_p == NULL)
+        return "";
+
+    return get_directory_for_filename(branch_p->get(SOURCE_FILE_ATTR)->asString());
 }
 
 } // namespace circa

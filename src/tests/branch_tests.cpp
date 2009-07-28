@@ -231,6 +231,14 @@ void term_pointer_operator_overload()
     test_assert(((Term*) b_asbranch) == b);
 }
 
+void test_get_source_file_location()
+{
+    Branch branch;
+    string_value(branch, "c:/a/b/something.ca", SOURCE_FILE_ATTR);
+
+    test_equals(get_source_file_location(branch), "c:/a/b");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_remove);
