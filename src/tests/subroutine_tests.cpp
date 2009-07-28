@@ -41,19 +41,19 @@ void test_recursion()
 
     Term* fact_1 = branch.eval("factorial(1)");
     test_assert(fact_1);
-    test_equals(fact_1->asInt(), 1);
+    test_assert(fact_1->asInt() == 1);
 
     Term* fact_2 = branch.eval("factorial(2)");
     test_assert(fact_2);
-    test_equals(fact_2->asInt(), 2);
+    test_assert(fact_2->asInt() == 2);
 
     Term* fact_3 = branch.eval("factorial(3)");
     test_assert(fact_3);
-    test_equals(fact_3->asInt(), 6);
+    test_assert(fact_3->asInt() == 6);
 
     Term* fact_4 = branch.eval("factorial(4)");
     test_assert(fact_4);
-    test_equals(fact_4->asInt(), 24);
+    test_assert(fact_4->asInt() == 24);
 }
 
 void subroutine_stateful_term()

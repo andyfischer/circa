@@ -74,8 +74,8 @@ void draw_text(Term* caller)
         SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), color);
 
         output.texid() = load_surface_to_texture(surface);
-        output.width() = surface->w;
-        output.height() = surface->h;
+        output.width() = float(surface->w);
+        output.height() = float(surface->h);
 
         SDL_FreeSurface(surface);
     }
@@ -112,8 +112,8 @@ void render_text(Term* caller)
         SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), color);
 
         output.texid() = load_surface_to_texture(surface);
-        output.width() = surface->w;
-        output.height() = surface->h;
+        output.width() = float(surface->w);
+        output.height() = float(surface->h);
 
         SDL_FreeSurface(surface);
     }
