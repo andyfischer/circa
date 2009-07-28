@@ -29,6 +29,8 @@ void load_font(Term* term)
     std::string path = term->input(0)->asString();
     int pointSize = term->input(1)->asInt();
 
+    path = get_source_file_location(*term->owningBranch) + "/" + path;
+
     TTF_Font* result = TTF_OpenFont(path.c_str(), pointSize);
     if (result == NULL) {
         std::stringstream err;
