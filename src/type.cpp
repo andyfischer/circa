@@ -316,8 +316,13 @@ std::string to_string(Term* term)
 {
     Type::ToStringFunc func = as_type(term->type).toString;
 
-    if (func == NULL)
-        return "<" + as_type(term->type).name + " has no toString func>";
+    if (func == NULL) {
+        // Generic to-string
+        std::stringstream result;
+        result << "<" << as_type(term->type).name << " 0x";
+        result << std::hex << term->value << ">";
+        return result.str();
+    }
     else if (!is_value_alloced(term))
         return "<NULL>";
     else

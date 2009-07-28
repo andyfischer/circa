@@ -17,8 +17,12 @@ WINDOWS = os.name == 'nt'
 # a little bit of special behavior for using frameworks.
 MAC = os.path.exists('/Library/Frameworks')
 
-# Release-mode flag
-DEBUG = not ARGUMENTS.get('release', False)
+DEBUG = not WINDOWS
+
+if ARGUMENTS.get('release', False):
+    DEBUG = False
+if ARGUMENTS.get('debug', False):
+    DEBUG = True
 
 # Common build flags
 if POSIX:

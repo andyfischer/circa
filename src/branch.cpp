@@ -387,7 +387,9 @@ std::string get_source_file_location(Branch& branch)
     if (branch_p == NULL)
         return "";
 
-    return get_directory_for_filename(branch_p->get(SOURCE_FILE_ATTR)->asString());
+    std::string file_location = branch_p->get(SOURCE_FILE_ATTR)->asString();
+
+    return get_directory_for_filename(file_location);
 }
 
 } // namespace circa
