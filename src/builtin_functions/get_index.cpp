@@ -23,7 +23,6 @@ namespace get_index_function {
     Term* specializeType(Term* caller)
     {
         // Type inference is hacky due to the lack of parametrized list types.
-        
         RefList inputTypes;
 
         Branch& inputList = caller->input(0)->asBranch();

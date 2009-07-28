@@ -170,6 +170,18 @@ void type_inference_for_get_index()
     test_assert(x->type == ANY_TYPE);
 }
 
+void type_inference_for_get_field()
+{
+    Branch branch;
+    branch.eval("type T { int a, float b }");
+
+    branch.eval("t = T()");
+    Term* a = branch.compile("a = t.a");
+    test_assert(a->type == INT_TYPE);
+    Term* b = branch.compile("b = t.b");
+    test_assert(b->type == FLOAT_TYPE);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
@@ -179,6 +191,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_to_string);
     REGISTER_TEST_CASE(type_tests::test_default_values);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
+    REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);
 }
 
 } // namespace type_tests
