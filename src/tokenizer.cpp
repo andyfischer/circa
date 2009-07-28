@@ -620,7 +620,7 @@ void consume_color_literal(TokenizeContext &context)
 
     // acceptable lengths are 3, 4, 6 or 8 characters (not including #)
     std::string result = text.str();
-    int length = result.length() - 1;
+    int length = int(result.length() - 1);
 
     if (length == 3 || length == 4 || length == 6 || length == 8)
         context.push(COLOR, result);

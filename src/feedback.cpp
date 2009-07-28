@@ -216,7 +216,7 @@ void refresh_training_branch(Branch& branch)
                     continue;
 
                 // Set the weight on this term so that the sum weight for all outputs is 1
-                set_feedback_weight(outgoingFeedback, 1.0 / numTrainableInputs);
+                set_feedback_weight(outgoingFeedback, 1.0f / numTrainableInputs);
 
                 operation.sendFeedback(input, outgoingFeedback, DESIRED_VALUE_FEEDBACK);
             }

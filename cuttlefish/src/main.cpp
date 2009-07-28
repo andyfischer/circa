@@ -15,6 +15,9 @@
 #include "textures.h"
 #include "ttf.h"
 
+// For getenv()
+#define _CRT_SECURE_NO_WARNINGS
+
 using namespace circa;
 
 int SCREEN_WIDTH = 640;
@@ -98,8 +101,8 @@ void main_loop()
 
         long ticks = SDL_GetTicks();
 
-        TIME_DELTA = (ticks - PREV_SDL_TICKS) / 1000.0;
-        TIME = ticks / 1000.0;
+        TIME_DELTA = (ticks - PREV_SDL_TICKS) / 1000.0f;
+        TIME = ticks / 1000.0f;
 
         PREV_SDL_TICKS = ticks;
 
