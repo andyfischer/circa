@@ -56,4 +56,3 @@ end
 for star in stars
   draw_star(star)
 end
-
