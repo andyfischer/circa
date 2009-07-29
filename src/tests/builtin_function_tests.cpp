@@ -278,7 +278,27 @@ void test_do_once()
     test_assert(as_int(x) == 3);
 
     branch.clear();
+}
 
+void test_changed()
+{
+    Branch branch;
+    Term* x = branch.compile("x = 5");
+    Term* changed = branch.compile("changed(x)");
+
+    evaluate_branch(branch);
+    test_assert(changed->asBool() == true);
+
+    evaluate_branch(branch);
+    test_assert(changed->asBool() == false);
+    evaluate_branch(branch);
+    test_assert(changed->asBool() == false);
+
+    as_int(x) = 6;
+    evaluate_branch(branch);
+    test_assert(changed->asBool() == true);
+    evaluate_branch(branch);
+    test_assert(changed->asBool() == false);
 }
 
 void register_tests()
@@ -299,6 +319,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_get_index);
     REGISTER_TEST_CASE(builtin_function_tests::test_set_index);
     REGISTER_TEST_CASE(builtin_function_tests::test_do_once);
+    REGISTER_TEST_CASE(builtin_function_tests::test_changed);
 }
 
 } // namespace builtin_function_tests
