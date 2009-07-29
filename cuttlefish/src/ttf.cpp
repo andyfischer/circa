@@ -54,6 +54,7 @@ struct RenderedText
     int& texid() { return _term->field(0)->asInt(); }
     float& width() { return _term->field(1)->asFloat(); }
     float& height() { return _term->field(2)->asFloat(); }
+    std::string& text() { return _term->field(3)->asString(); }
 };
     
 void draw_text(Term* caller)
@@ -98,24 +99,27 @@ void draw_text(Term* caller)
 
 void render_text(Term* caller)
 {
-    RenderedText output(caller);
+    RenderedText state(caller->input(0));
+    std::string text = caller->input(2)->asString();
 
-    if (output.texid() == 0) {
+    if (state.texid() == 0 || state.text() != text) {
         // Render the text to a new surface, upload it as a texture, destroy the surface,
         // save the texture id.
 
-        TTF_Font* font = as<TTF_Font*>(caller->input(0));
-        std::string text = caller->input(1)->asString();
-        SDL_Color color = unpack_sdl_color(caller->input(2)->asInt());
+        TTF_Font* font = as<TTF_Font*>(caller->input(1));
+        SDL_Color color = unpack_sdl_color(caller->input(3)->asInt());
         //SDL_Color bgcolor = {0, 0, 0, 0}; // todo
 
         SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), color);
 
-        output.texid() = load_surface_to_texture(surface);
-        output.width() = float(surface->w);
-        output.height() = float(surface->h);
+        state.texid() = load_surface_to_texture(surface);
+        state.width() = float(surface->w);
+        state.height() = float(surface->h);
+        state.text() = text;
 
         SDL_FreeSurface(surface);
+
+        assign_value(caller->input(0), caller);
     }
 }
 
@@ -153,11 +157,12 @@ void initialize(circa::Branch& branch)
     import_type<TTF_Font*>(branch, "TTF_Font");
 
     import_function(branch, load_font, "load_font(state TTF_Font, string, int) : TTF_Font");
-    branch.eval("type RenderedText { int texid, float width, float height }");
+    branch.eval("type RenderedText { int texid, float width, float height, string text }");
     import_function(branch, draw_text,
         "draw_text(TTF_Font, string, float x, float y, int) : RenderedText");
 
-    import_function(branch, render_text, "render_text(TTF_Font, string, int color) : RenderedText");
+    import_function(branch, render_text,
+            "render_text(state RenderedText, TTF_Font, string, int color) : RenderedText");
     import_function(branch, draw_rendered_text,
         "draw_rendered_text(RenderedText, float x, float y)");
 }
