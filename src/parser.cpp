@@ -1395,6 +1395,8 @@ Term* identifier(Branch& branch, TokenStream& tokens)
 
         if (nameLookupFailed)
             function = UNKNOWN_FUNCTION;
+        else if (!is_callable(function))
+            function = UNKNOWN_FUNCTION;
 
         RefList inputs = implicitCallInputs;
         ListSyntaxHints listHints;

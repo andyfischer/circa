@@ -2,5 +2,5 @@
 
 pushd .
 cd %CIRCA_HOME%
-scons cfish && cd demos && ..\cuttlefish\run.bat %*
+scons cfish && cd demos && call ..\cuttlefish\run.bat %*
 popd
