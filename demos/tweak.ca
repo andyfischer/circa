@@ -6,4 +6,4 @@ y = 50
 draw_box([x,y,x+50,y+50] #0f0)
 
 --value_tweaker.set_targets([get_ref(x)])
-value_tweaker.button(get_ref(y), [10 10])
+value_tweaker.button(get_ref(y), [10 200])
