@@ -1272,11 +1272,12 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
 Term* unknown_identifier(Branch& branch, std::string const& name)
 {
     Term* term = apply(branch, UNKNOWN_IDENTIFIER_FUNC, RefList(), name);
-    source_set_hidden(term, true);
+    set_is_statement(term, false);
     term->stringProp("message") = name;
     return term;
 }
 
+// TODO: This function is getting pretty gnarly and it could use refactoring.
 Term* identifier(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
@@ -1317,13 +1318,15 @@ Term* identifier(Branch& branch, TokenStream& tokens)
         push_pending_rebind(branch, ids[0]);
     }
 
+    bool nameLookupFailed = false;
     Term* head = NULL;
+    RefList implicitCallInputs;
+    bool rebindName = false;
 
     // Iterate through the dot-separated names and see what they refer to.
     for (unsigned name_index=0; name_index < ids.size(); name_index++) {
         std::string& name = ids[name_index];
-        RefList implicitCallInputs;
-        bool rebindName = false;
+        implicitCallInputs = RefList();
 
         // If this is the first name, then just lookup that name in our branch.
         // (Otherwise, there are a bunch of fancy rules which assume that
@@ -1331,15 +1334,19 @@ Term* identifier(Branch& branch, TokenStream& tokens)
         if (name_index == 0) {
             head = find_named(branch, name);
 
-            if (head == NULL)
-                return unknown_identifier(branch, name);
+            if (head == NULL) {
+                nameLookupFailed = true;
+                break;
+            }
         }
 
         // Check if the lhs is a namespace
         else if (head->type == NAMESPACE_TYPE) {
             Branch& namespaceContents = as_branch(head);
-            if (!namespaceContents.contains(name))
-                return unknown_identifier(branch, fullName.str());
+            if (!namespaceContents.contains(name)) {
+                nameLookupFailed = true;
+                break;
+            }
 
             head = namespaceContents[name];
         }
@@ -1366,57 +1373,64 @@ Term* identifier(Branch& branch, TokenStream& tokens)
 
         // Otherwise, give up
         else {
-            return unknown_identifier(branch, fullName.str());
+            nameLookupFailed = true;
+            break;
         }
 
-        // Now possibly turn this into a function call.
-        bool treatAsFunctionCall = is_callable(head);
+        // Now possibly turn this into an implicit function call.
+        bool implicitFunctionCall = is_callable(head) && (ids.size() > 2) &&
+            (name_index < (ids.size()-1));
 
-        // TEMP: Old behavior with no ()s was to return a pointer to the function.
-        // This is deprecated. However, allow this for now, because some code depends on it.
+        // TODO: Should remove the thing that says (ids.size() > 2). That part is there to
+        // old behavior where just typing a function name would reference that function
+        // instead of call it.
 
-        if ((ids.size() == 1) && (name_index == 0) && !tokens.nextIs(LPAREN)) {
-            treatAsFunctionCall = false;
-        }
-
-        if (treatAsFunctionCall) {
-            Term* function = head;
-            RefList inputs = implicitCallInputs;
-            ListSyntaxHints listHints;
-
-            if (tokens.nextIs(LPAREN)) {
-                tokens.consume(LPAREN);
-                consume_list_arguments(branch, tokens, inputs, listHints);
-
-                if (!tokens.nextIs(RPAREN))
-                    return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
-
-                tokens.consume(RPAREN);
-            }
-
-            head = apply(branch, function, inputs);
-            listHints.apply(head);
-
-            // Figure out the function's name.
-            std::stringstream functionName;
-            for (unsigned i=0; i <= name_index; i++) {
-                if (i > 0) functionName << ".";
-                functionName << ids[i];
-            }
-
-            if (head->function->name != functionName.str())
-                head->stringProp("syntaxHints:functionName") = functionName.str();
-
-            if (rebindName)
-                branch.bindName(head, implicitCallInputs[0]->name);
+        if (implicitFunctionCall) {
+            head = apply(branch, head, implicitCallInputs);
         }
     }
 
-    Term* result = head;
+    if (tokens.nextIs(LPAREN)) {
+        Term* function = head;
 
-    assert(result != NULL);
-    set_source_location(result, startPosition, tokens);
-    return result;
+        if (nameLookupFailed)
+            function = UNKNOWN_FUNCTION;
+
+        RefList inputs = implicitCallInputs;
+        ListSyntaxHints listHints;
+
+        if (tokens.nextIs(LPAREN)) {
+            tokens.consume(LPAREN);
+            consume_list_arguments(branch, tokens, inputs, listHints);
+
+            if (!tokens.nextIs(RPAREN))
+                return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
+
+            tokens.consume(RPAREN);
+        }
+
+        head = apply(branch, function, inputs);
+        listHints.apply(head);
+
+        if (head->function->name != fullName.str())
+            head->stringProp("syntaxHints:functionName") = fullName.str();
+
+        if (rebindName)
+            branch.bindName(head, implicitCallInputs[0]->name);
+    } else {
+        if (nameLookupFailed)
+            head = unknown_identifier(branch, fullName.str());
+        else if (is_callable(head) && ids.size() > 1) {
+            // Support name.function syntax to implicity call a function
+            head = apply(branch, head, implicitCallInputs);
+        }
+    }
+
+
+
+    assert(head != NULL);
+    set_source_location(head, startPosition, tokens);
+    return head;
 }
 
 } // namespace parser

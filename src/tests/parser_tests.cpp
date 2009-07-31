@@ -473,6 +473,17 @@ void test_namespace()
     test_assert(x->asInt() == 12);
 }
 
+void test_implicit_function_calls()
+{
+    Branch branch;
+    branch.eval("x = 1");
+    branch.eval("r = get_ref(x)");
+    test_assert(branch);
+    Term* s = branch.eval("r.name");
+    test_assert(branch);
+    test_assert(s->asString() == "x");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -505,6 +516,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_literal_list);
     REGISTER_TEST_CASE(parser_tests::test_anonymous_type_in_subroutine_decl);
     REGISTER_TEST_CASE(parser_tests::test_namespace);
+    REGISTER_TEST_CASE(parser_tests::test_implicit_function_calls);
 }
 
 } // namespace parser_tests

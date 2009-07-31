@@ -51,13 +51,13 @@ void test_unknown_identifier()
 {
     Branch branch;
     Term* t = branch.eval("charlie");
-    test_assert(get_static_error(t) == SERROR_UNKNOWN_IDENTIFIER);
     test_equals(get_static_error_message(t), "Unknown identifier: charlie");
+    test_assert(get_static_error(t) == SERROR_UNKNOWN_IDENTIFIER);
 
     branch.eval("a = 1");
     t = branch.eval("a.b");
-    test_assert(get_static_error(t) == SERROR_UNKNOWN_IDENTIFIER);
     test_equals(get_static_error_message(t), "Unknown identifier: a.b");
+    test_assert(get_static_error(t) == SERROR_UNKNOWN_IDENTIFIER);
 }
 
 void register_tests()

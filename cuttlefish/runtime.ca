@@ -24,10 +24,11 @@ end
 
 ui_font_medium = load_font("assets/sv_basic_manual/SVBasicManual.ttf", 16)
 
-
 -- TODO: put this in a separate file
 namespace value_tweaker
-    state List current_targets = []
+    i = 1
+
+    state List current_targets = [get_ref(i)]
 
     def set_targets(List l)
         current_targets := l
@@ -55,7 +56,7 @@ namespace value_tweaker
     -- draw current targets
     --y = 50
     for target in current_targets
-        loc = [10 100]
+        loc = [10 10]
         button(target, loc)
         --y += 10
     end

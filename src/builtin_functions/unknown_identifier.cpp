@@ -10,11 +10,15 @@ namespace unknown_identifier_function {
     {
     }
 
+    std::string toSourceString(Term* term)
+    {
+        return term->name;
+    }
+
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "unknown_identifier() : any");
-
-        UNKNOWN_IDENTIFIER_FUNC = main_func;
+        UNKNOWN_IDENTIFIER_FUNC = import_function(kernel, evaluate, "unknown_identifier() : any");
+        function_t::get_to_source_string(UNKNOWN_IDENTIFIER_FUNC) = toSourceString;
     }
 }
 }

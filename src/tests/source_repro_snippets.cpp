@@ -266,6 +266,14 @@ void reproduce_misc_blocks() {
     finish_source_repro_category();
 }
 
+void reproduce_with_parse_errors() {
+    round_trip_source("nonexistant_function()");
+    round_trip_source("nonexistant_function(1 2 3)");
+    round_trip_source("a.b");
+    round_trip_source("a.b()");
+    finish_source_repro_category();
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);
@@ -281,6 +289,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_type_decl);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_do_once);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_misc_blocks);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_with_parse_errors);
 }
 
 } // namespace source_repro_snippets
