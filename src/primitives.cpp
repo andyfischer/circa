@@ -288,36 +288,63 @@ namespace ref_t {
     void get_name(Term* caller)
     {
         Term* t = caller->input(0)->asRef();
-        if (t == NULL)
+        if (t == NULL) {
             error_occurred(caller, "NULL reference");
+            return;
+        }
         as_string(caller) = t->name;
     }
     void hosted_to_string(Term* caller)
     {
         Term* t = caller->input(0)->asRef();
-        if (t == NULL)
+        if (t == NULL) {
             error_occurred(caller, "NULL reference");
+            return;
+        }
         as_string(caller) = circa::to_string(t);
     }
     void get_function(Term* caller)
     {
         Term* t = caller->input(0)->asRef();
-        if (t == NULL)
+        if (t == NULL) {
             error_occurred(caller, "NULL reference");
+            return;
+        }
         as_ref(caller) = t->function;
     }
     void hosted_typeof(Term* caller)
     {
         Term* t = caller->input(0)->asRef();
-        if (t == NULL)
+        if (t == NULL) {
             error_occurred(caller, "NULL reference");
+            return;
+        }
         as_ref(caller) = t->type;
+    }
+    void assign(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+
+        Term* source = caller->input(1);
+
+        if (!is_assign_value_possible(source, t)) {
+            error_occurred(caller, "Can't assign (probably type mismatch)");
+            return;
+        }
+
+        assign_value(source, t);
     }
     void tweak_value(Term* caller)
     {
         Term* t = caller->input(0)->asRef();
-        if (t == NULL)
+        if (t == NULL) {
             error_occurred(caller, "NULL reference");
+            return;
+        }
         
         float tweak_factor = caller->input(1)->toFloat();
 
@@ -340,6 +367,29 @@ namespace ref_t {
         } else {
             std::cout << "warn: tweak_value called on a non-float: " << t->name << std::endl;
         }
+    }
+    void asint(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+        if (!is_int(t)) {
+            error_occurred(caller, "Not an int");
+            return;
+        }
+        as_int(caller) = as_int(t);
+    }
+    void asfloat(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+        
+        as_float(caller) = to_float(t);
     }
 }
 
@@ -394,7 +444,10 @@ void setup_primitive_types()
     import_member_function(REF_TYPE, ref_t::hosted_to_string, "to_string(ref) : string");
     import_member_function(REF_TYPE, ref_t::hosted_typeof, "typeof(ref) : ref");
     import_member_function(REF_TYPE, ref_t::get_function, "function(ref) : ref");
+    import_member_function(REF_TYPE, ref_t::assign, "assign(ref, any)");
     import_member_function(REF_TYPE, ref_t::tweak_value, "tweak_value(ref,float)");
+    import_member_function(REF_TYPE, ref_t::asint, "asint(ref) : int");
+    import_member_function(REF_TYPE, ref_t::asfloat, "asfloat(ref) : float");
 }
 
 } // namespace circa

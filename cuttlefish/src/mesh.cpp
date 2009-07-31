@@ -13,7 +13,7 @@ namespace mesh {
 
 float consume_float(TokenStream& tokens)
 {
-    return atof(tokens.consume(FLOAT_TOKEN).c_str());
+    return (float) atof(tokens.consume(FLOAT_TOKEN).c_str());
 }
 
 int consume_int(TokenStream& tokens)
