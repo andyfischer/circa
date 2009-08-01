@@ -8,7 +8,10 @@ namespace circa {
 
 int get_first_visible_input_index(Term* term)
 {
-    if (is_function_stateful(term->function))
+    if (get_input_syntax_hint(term, 0, "hidden") == "true")
+        return 1;
+
+    else if (is_function_stateful(term->function))
         return 1;
     else
         return 0;
@@ -173,12 +176,16 @@ std::string get_term_source_default_formatting(Term* term)
             term->function->name);
 
     if (declarationStyle == "function-call") {
-        result << functionName << "(";
+        result << functionName;
+
+        if (!term->boolPropOptional("syntaxHints:no-parens", false))
+            result << "(";
 
         for (int i=get_first_visible_input_index(term); i < term->numInputs(); i++)
             result << get_source_of_input(term, i);
 
-        result << ")";
+        if (!term->boolPropOptional("syntaxHints:no-parens", false))
+            result << ")";
 
     } else if (declarationStyle == "dot-concat") {
         result << get_source_of_input(term, 0);
