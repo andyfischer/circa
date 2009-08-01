@@ -1,31 +1,12 @@
 
-
--- TODO: put this in a separate file
-namespace tweak
-    def button(ref r, Point loc)
-        text = concat(r.name ' = ' r.to_string)
-
-        text_sprite = render_text(ui_font_medium, text, #000)
-        padding = 5.0
-        rect = [loc.x - padding, loc.y - padding,
-            loc.x + text_sprite.width + padding, loc.y + text_sprite.height + padding]
-        color = #ee3399
-        if mouse_in(rect) color = #ff44aa end
-        draw_box(rect, color)
-        draw_rendered_text(text_sprite, loc.x, loc.y)
-
-        if mouse_wheel_up(rect)
-            r.assign(r.asint - 5)
-        elif mouse_wheel_down(rect)
-            r.assign(r.asint + 5)
-        end
-    end
-end
+WINDOW_WIDTH = 400
+WINDOW_HEIGHT = 400
+WINDOW_TITLE = 'tweak.ca'
 
 background(#eee)
 
 x = 50
-y = 50
+y = 100
 draw_box([x,y,x+50,y+50] #ee3399)
 
-tweak.button(get_ref(y), [10 200])
+tweak.button(get_ref(y) [10 200])
