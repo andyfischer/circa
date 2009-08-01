@@ -114,8 +114,8 @@ void test_symbols1()
 void test_symbols2()
 {
     token::TokenList results;
-    token::tokenize("<>:;%...<-//", results);
-    test_assert(results.size() == 8);
+    token::tokenize("<>:;%...<-//&", results);
+    test_assert(results.size() == 9);
     test_assert(results[0].text == "<");
     test_assert(results[0].match == token::LTHAN);
     test_assert(results[1].text == ">");
@@ -132,6 +132,8 @@ void test_symbols2()
     test_assert(results[6].match == token::LEFT_ARROW);
     test_assert(results[7].text == "//");
     test_assert(results[7].match == token::DOUBLE_SLASH);
+    test_assert(results[8].text == "&");
+    test_assert(results[8].match == token::AMPERSAND);
 }
 
 void test_keywords()
