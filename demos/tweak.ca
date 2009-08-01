@@ -6,7 +6,7 @@ WINDOW_TITLE = 'tweak.ca'
 background(#eee)
 
 x = 50
-y = 100
+y = 0
 draw_box([x,y,x+50,y+50] #ee3399)
 
 tweak.button(get_ref(y) [10 200])

@@ -982,7 +982,7 @@ Term* atom(Branch& branch, TokenStream& tokens)
     Term* result = NULL;
 
     // identifier?
-    if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AMPERSAND)) {
+    if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AT_SIGN)) {
         result = identifier(branch, tokens);
         assert(result != NULL);
     }
@@ -1276,8 +1276,8 @@ Term* identifier(Branch& branch, TokenStream& tokens)
 
     bool rebind = false;
 
-    if (tokens.nextIs(AMPERSAND)) {
-        tokens.consume(AMPERSAND);
+    if (tokens.nextIs(AT_SIGN)) {
+        tokens.consume(AT_SIGN);
         rebind = true;
     }
 
