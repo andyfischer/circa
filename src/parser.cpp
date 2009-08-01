@@ -949,6 +949,12 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
         return apply(branch, NEG_FUNC, RefList(expr));
     }
 
+    if (tokens.nextIs(AMPERSAND)) {
+        tokens.consume(AMPERSAND);
+        Term* expr = subscripted_atom(branch, tokens);
+        return apply(branch, TO_REF_FUNC, RefList(expr));
+    }
+
     return subscripted_atom(branch, tokens);
 }
 

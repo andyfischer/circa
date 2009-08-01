@@ -462,7 +462,7 @@ void top_level_consume_token(TokenizeContext &context)
         case '&':
             context.consume();
 
-            if (context.next(1) == '&') {
+            if (context.next() == '&') {
                 context.consume();
                 context.push(DOUBLE_AMPERSAND);
                 return;
