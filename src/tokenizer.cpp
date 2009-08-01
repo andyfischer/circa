@@ -17,7 +17,7 @@ const char* get_token_text(int match)
         case LBRACKET: return "[";
         case RBRACKET: return "]";
         case COMMA: return ",";
-        case AMPERSAND: return "@";
+        case AT_SIGN: return "@";
         case IDENTIFIER: return "IDENTIFIER";
         case INTEGER: return "INTEGER";
         case HEX_INTEGER: return "HEX_INTEGER";
@@ -315,7 +315,7 @@ void top_level_consume_token(TokenizeContext &context)
             return;
         case '@':
             context.consume();
-            context.push(AMPERSAND);
+            context.push(AT_SIGN);
             return;
         case '=':
             context.consume();
