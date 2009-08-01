@@ -374,7 +374,6 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     // Officially make this a subroutine
     function_t::get_evaluate(result) = subroutine_call_evaluate;
-    function_t::get_to_source_string(result) = subroutine_t::to_string;
 
     assert(is_value(result));
     assert(is_subroutine(result));

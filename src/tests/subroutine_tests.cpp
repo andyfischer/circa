@@ -149,6 +149,16 @@ void stateful_function_with_arguments()
     test_assert(call->asInt() == 5);
 }
 
+void to_source_string()
+{
+    // This code once had a bug
+    Branch branch;
+    branch.eval("def f() end");
+    Term* c = branch.eval("f()");
+
+    test_equals(get_term_source(c), "f()");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
@@ -158,6 +168,7 @@ void register_tests()
     REGISTER_TEST_CASE(subroutine_tests::shadow_input);
     REGISTER_TEST_CASE(subroutine_tests::specialization_to_output_type);
     REGISTER_TEST_CASE(subroutine_tests::stateful_function_with_arguments);
+    REGISTER_TEST_CASE(subroutine_tests::to_source_string);
 }
 
 } // namespace refactoring_tests
