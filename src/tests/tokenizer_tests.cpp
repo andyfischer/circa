@@ -136,6 +136,15 @@ void test_symbols2()
     test_assert(results[8].match == token::AMPERSAND);
 }
 
+void test_symbols3()
+{
+    token::TokenList results;
+    token::tokenize("&&", results);
+    test_assert(results.size() == 1);
+    test_assert(results[0].text == "&&");
+    test_assert(results[0].match == token::DOUBLE_AMPERSAND);
+}
+
 void test_keywords()
 {
     token::TokenList results;
@@ -293,6 +302,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_floats);
     REGISTER_TEST_CASE(tokenizer_tests::test_symbols1);
     REGISTER_TEST_CASE(tokenizer_tests::test_symbols2);
+    REGISTER_TEST_CASE(tokenizer_tests::test_symbols3);
     REGISTER_TEST_CASE(tokenizer_tests::test_keywords);
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers_that_look_like_keywords);
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);

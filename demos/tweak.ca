@@ -9,4 +9,4 @@ x = 50
 y = 0
 draw_box([x,y,x+50,y+50] #ee3399)
 
-tweak.button(get_ref(y) [10 200])
+tweak.button(&y [10 200])

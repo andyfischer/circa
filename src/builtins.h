@@ -46,6 +46,7 @@ extern Term* OVERLOADED_FUNCTION_TYPE;
 extern Term* SET_FIELD_FUNC;
 extern Term* SET_INDEX_FUNC;
 extern Term* SUB_FUNC;
+extern Term* TO_REF_FUNC;
 extern Term* TYPE_TYPE;
 extern Term* UNKNOWN_FUNCTION;
 extern Term* UNKNOWN_FIELD_FUNC;

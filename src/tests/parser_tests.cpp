@@ -477,11 +477,21 @@ void test_implicit_function_calls()
 {
     Branch branch;
     branch.eval("x = 1");
-    branch.eval("r = get_ref(x)");
+    branch.eval("r = &x");
     test_assert(branch);
     Term* s = branch.eval("r.name");
     test_assert(branch);
     test_assert(s->asString() == "x");
+}
+
+void test_to_ref_operator()
+{
+    Branch branch;
+    Term* a = branch.eval("a = 1");
+    Term* r = branch.eval("r = &a");
+    test_assert(branch);
+    test_assert(is_ref(r));
+    test_assert(r->asRef() == a);
 }
 
 void register_tests()
@@ -517,6 +527,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_anonymous_type_in_subroutine_decl);
     REGISTER_TEST_CASE(parser_tests::test_namespace);
     REGISTER_TEST_CASE(parser_tests::test_implicit_function_calls);
+    REGISTER_TEST_CASE(parser_tests::test_to_ref_operator);
 }
 
 } // namespace parser_tests
