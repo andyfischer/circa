@@ -54,7 +54,6 @@ namespace if_block_function {
     {
         std::stringstream result;
 
-
         Branch& contents = as_branch(term);
 
         for (int branch_index=0; branch_index < contents.length(); branch_index++) {
@@ -67,10 +66,10 @@ namespace if_block_function {
 
             if (branch_index == 0) {
                 result << "if ";
-                result << get_source_of_input(branch_term, 0) << std::endl;
+                result << get_source_of_input(branch_term, 0);
             } else if (branch_index < (contents.length()-2)) {
                 result << "elif ";
-                result << get_source_of_input(branch_term, 0) << std::endl;
+                result << get_source_of_input(branch_term, 0);
             }
             else
                 result << "else";

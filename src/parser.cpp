@@ -185,8 +185,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
     append_whitespace(result, possible_whitespace(tokens));
 
     // Consume a newline or ; or ,
-    if (tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON) || tokens.nextIs(COMMA))
-        result->stringProp("syntaxHints:lineEnding") = tokens.consume();
+    result->stringProp("syntaxHints:lineEnding") = possible_statement_ending(tokens);
 
     // Mark this term as a statement
     set_is_statement(result, true);
@@ -500,10 +499,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
             Term* block = apply(contents, IF_FUNC, RefList(condition));
             block->stringProp("syntaxHints:preWhitespace") = preKeywordWhitespace;
-            get_input_syntax_hint(block, 0, "postWhitespace") = possible_whitespace(tokens);
-
-            if (tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON))
-                tokens.consume();
+            get_input_syntax_hint(block, 0, "postWhitespace") = possible_statement_ending(tokens);
 
             consume_branch_until_end(block->asBranch(), tokens);
         } else {
@@ -765,9 +761,9 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
         branch.remove(lexpr);
 
-        rexpr = apply(branch, SET_FIELD_FUNC, RefList(object, field, rexpr));
+        rexpr = apply(branch, SET_FIELD_FUNC, RefList(object, field, rexpr), name);
 
-        branch.bindName(rexpr, name);
+        get_input_syntax_hint(rexpr, 0, "postWhitespace") = "";
     }
 
     // Or, maybe it was parsed as an index-based access. Turn this into a set_index
@@ -1122,14 +1118,10 @@ int hex_digit_to_number(char digit)
     if (digit >= '0' && digit <= '9')
         return digit - '0';
 
-    digit = toupper(digit);
+    digit = tolower(digit);
 
-    if (digit == 'A') return 10;
-    if (digit == 'B') return 11;
-    if (digit == 'C') return 12;
-    if (digit == 'D') return 13;
-    if (digit == 'E') return 14;
-    if (digit == 'F') return 15;
+    if (digit >= 'a' && digit <= 'f')
+        return 10 + (digit - 'a');
 
     return 0;
 }
@@ -1178,6 +1170,7 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
     Term* term = int_value(branch, value);
 
     term->stringProp("syntaxHints:integerFormat") = "color";
+    term->intProp("syntaxHints:colorFormat") = text.length();
 
     set_source_location(term, startPosition, tokens);
     return term;
@@ -1321,11 +1314,16 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     Term* head = NULL;
     RefList implicitCallInputs;
     bool rebindName = false;
+    std::stringstream partialName;
 
     // Iterate through the dot-separated names and see what they refer to.
     for (unsigned name_index=0; name_index < ids.size(); name_index++) {
         std::string& name = ids[name_index];
         implicitCallInputs = RefList();
+
+        if (name_index > 0)
+            partialName << ".";
+        partialName << name;
 
         // If this is the first name, then just lookup that name in our branch.
         // (Otherwise, there are a bunch of fancy rules which assume that
@@ -1368,6 +1366,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
         // Check if the lhs's type defines this name as a property
         else if (as_type(head->type).findFieldIndex(name) != -1) {
             head = apply(branch, GET_FIELD_FUNC, RefList(head, string_value(branch, name)));
+            get_input_syntax_hint(head, 0, "postWhitespace") = "";
         }
 
         // Otherwise, give up
@@ -1386,6 +1385,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
 
         if (implicitFunctionCall) {
             head = apply(branch, head, implicitCallInputs);
+            head->stringProp("syntaxHints:declarationStyle") = "dot-concat";
         }
     }
 
@@ -1418,16 +1418,20 @@ Term* identifier(Branch& branch, TokenStream& tokens)
 
         if (rebindName)
             branch.bindName(head, implicitCallInputs[0]->name);
+
     } else {
         if (nameLookupFailed)
             head = unknown_identifier(branch, fullName.str());
         else if (is_callable(head) && ids.size() > 1) {
             // Support name.function syntax to implicity call a function
             head = apply(branch, head, implicitCallInputs);
+            head->boolProp("syntaxHints:no-parens") = true;
+            if (head->function->name != fullName.str())
+                head->stringProp("syntaxHints:functionName") = fullName.str();
+            for (int i=0; i < implicitCallInputs.length(); i++)
+                get_input_syntax_hint(head, i, "hidden") = "true";
         }
     }
-
-
 
     assert(head != NULL);
     set_source_location(head, startPosition, tokens);

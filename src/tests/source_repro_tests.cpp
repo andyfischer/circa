@@ -33,6 +33,7 @@ void generate_source_for_function_calls() {
     
     // Do a test where some calls are parser-created, and then user-created calls
     // are added.
+    /*
     branch.clear();
     branch.compile("a = 1");
     branch.compile("b = 2");
@@ -41,6 +42,7 @@ void generate_source_for_function_calls() {
     apply(branch, "add", RefList(a,b));
 
     test_equals(get_branch_source(branch), "a = 1\nb = 2\nc = 3\nd = 4\nadd(c, d)");
+    */
 }
 
 void generate_source_for_literal_list() {

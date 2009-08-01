@@ -30,12 +30,18 @@ namespace get_field_function {
         return ANY_TYPE;
     }
 
+    std::string toSourceString(Term* term)
+    {
+        std::string name = term->input(1)->asString();
+        return get_source_of_input(term, 0) + "." + name;
+    }
 
     void setup(Branch& kernel)
     {
         GET_FIELD_FUNC = import_function(kernel, evaluate,
                 "get_field_by_name(any, string) : any");
         function_t::get_specialize_type(GET_FIELD_FUNC) = specializeType;
+        function_t::get_to_source_string(GET_FIELD_FUNC) = toSourceString;
     }
 }
 }

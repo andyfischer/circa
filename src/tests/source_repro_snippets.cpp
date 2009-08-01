@@ -99,9 +99,9 @@ void reproduce_boolean() {
 }
 
 void reproduce_color_literal() {
-    //TODO round_trip_source("#123");
-    //TODO round_trip_source("#fafa");
-    //TODO round_trip_source("#aabbcc");
+    round_trip_source("#123");
+    round_trip_source("#fafa");
+    round_trip_source("#aabbcc");
     round_trip_source("#aabbccdd");
     round_trip_source("c = #aabbccdd");
     finish_source_repro_category();
@@ -136,6 +136,7 @@ void reproduce_function_calls() {
     round_trip_source("d= add(1 2)");
     round_trip_source("d=add(1 2)");
     round_trip_source("d=   add(1 2)");
+    round_trip_source("    text_sprite = render_text(ui_font_medium, text, #000)");
     finish_source_repro_category();
 }
 
@@ -169,6 +170,7 @@ void reproduce_rebinding_operator() {
 
 void reproduce_if() {
     round_trip_source("if true\nx = 1\nend");
+    round_trip_source("if true\n       1\nend");
     round_trip_source("if 5.0 > 3.0\n  print('hey')\nend");
     round_trip_source("if true\nelse\nend");
     round_trip_source("  if true\nelse\nend");
@@ -183,6 +185,7 @@ void reproduce_if() {
     round_trip_source("if true\nelif true\nelse\nend");
     round_trip_source("if true\nelif true\n  else\nend");
     round_trip_source("if 1 > 2\nprint('hi')\nelif 2 > 3\n  elif 3 > 4\nprint('hello')\nend");
+    round_trip_source("if true 1 2 3 end");
     finish_source_repro_category();
 }
 
@@ -249,6 +252,7 @@ void reproduce_do_once() {
     round_trip_source("do once; print(1); end");
     round_trip_source("do once , print(1); end");
     round_trip_source("do once     end");
+    round_trip_source("do once  1 2 3    end");
     finish_source_repro_category();
 }
 
@@ -274,6 +278,16 @@ void reproduce_with_parse_errors() {
     finish_source_repro_category();
 }
 
+void reproduce_dot_expressions() {
+    round_trip_source("r = get_ref(1); r.name");
+    round_trip_source("r = get_ref(1); r.asint");
+    round_trip_source("r = get_ref(1); r.asint + 5");
+    // These don't work because constructors are not reproduced
+    //round_trip_source("type T { float x }; t = T(); t.x");
+    //round_trip_source("type T { float x }; t = T(); t.x = 1.0");
+    finish_source_repro_category();
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);
@@ -290,6 +304,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_do_once);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_misc_blocks);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_with_parse_errors);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_dot_expressions);
 }
 
 } // namespace source_repro_snippets

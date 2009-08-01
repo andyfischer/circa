@@ -153,13 +153,58 @@ float to_float(Term* term)
 
 namespace int_t {
 
+    char number_to_hex_digit(int n) {
+        if (n >= 0 && n <= 9)
+            return '0' + n;
+
+        if (n >= 10 && n <= 16)
+            return 'a' + (n - 10);
+
+        return 'f';
+    }
+
+    std::string color_literal_to_string(Term* term)
+    {
+        int channels[4];
+
+        for (int c=0; c < 4; c++) {
+            channels[c] = (as_int(term) >> ((3-c)*8)) & 0xff;
+        }
+
+        bool valueHasAlpha = channels[3] != 0xff;
+
+        int specifiedDigits = term->intPropOptional("syntaxHints:colorFormat", 6);
+
+        int digitsPerChannel = (specifiedDigits == 6 || specifiedDigits == 8) ? 2 : 1;
+        bool specifyAlpha = valueHasAlpha || (specifiedDigits == 4 || specifiedDigits == 8);
+
+        std::stringstream out;
+
+        out << "#";
+
+        for (int c=0; c < 4; c++) {
+            if (c == 3 && !specifyAlpha)
+                break;
+
+            if (digitsPerChannel == 1)
+                out << number_to_hex_digit(channels[c] / 0x10);
+            else {
+                out << number_to_hex_digit(channels[c] / 0x10);
+                out << number_to_hex_digit(channels[c] % 0x10);
+            }
+        }
+
+        return out.str();
+    }
+
     std::string to_string(Term* term)
     {
+        if (term->stringPropOptional("syntaxHints:integerFormat", "dec") == "color")
+            return color_literal_to_string(term);
+
         std::stringstream strm;
         if (term->stringPropOptional("syntaxHints:integerFormat", "dec") == "hex")
             strm << "0x" << std::hex;
-        else if (term->stringPropOptional("syntaxHints:integerFormat", "dec") == "color")
-            strm << "#" << std::hex;
 
         strm << as_int(term);
         return strm.str();
