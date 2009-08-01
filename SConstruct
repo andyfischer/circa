@@ -157,7 +157,7 @@ if POSIX:
     if MAC:
         SDL_ROOT['FRAMEWORKS'] = ['OpenGL']
     else:
-        SDL_ROOT.Append(LIBS = ['OpenGL'])
+        SDL_ROOT.Append(LIBS = ['libGL'])
 
 if WINDOWS:
     SDL_ROOT.Append(LIBS=['opengl32.lib'])
