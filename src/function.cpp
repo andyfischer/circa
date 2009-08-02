@@ -168,7 +168,7 @@ void initialize_function_data(Term* term)
     Branch& contents = as_branch(term);
 
     Term* attributesTerm = create_value(contents, BRANCH_TYPE, "attributes");
-    source_set_hidden(attributesTerm, true);
+    set_source_hidden(attributesTerm, true);
     Branch& attributes = as_branch(attributesTerm);
     string_value(attributes, "", "name");
     create_ref(attributes, NULL, "hidden_state_type");
