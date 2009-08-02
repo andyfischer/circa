@@ -10,7 +10,7 @@ def test_file(filename):
 def test_all():
     tests_run = 0
     failures = []
-    for filename in glob.glob("*.ca"):
+    for filename in glob.glob(os.environ['CIRCA_HOME'] + "/samples/*.ca"):
         tests_run += 1
         result = test_file(filename)
         if result is not True:
@@ -26,7 +26,6 @@ def test_all():
             print failure
 
 if __name__ == "__main__":
-    os.chdir(os.environ['CIRCA_HOME'] + '/samples')
 
     if len(sys.argv) > 1:
         result = run_test(sys.argv[1])
