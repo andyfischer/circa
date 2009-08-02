@@ -84,6 +84,8 @@ void prepend_name_binding(Term* term, std::stringstream& out)
         out << "return ";
     else if (term->name == "")
         return;
+    else if (term->boolPropOptional("syntaxHints:implicitNameBinding", false))
+        return;
     else {
         out << term->name;
         out << term->stringPropOptional("syntaxHints:preEqualsSpace", " ");

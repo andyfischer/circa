@@ -1415,11 +1415,16 @@ Term* identifier(Branch& branch, TokenStream& tokens)
         head = apply(branch, function, inputs);
         listHints.apply(head);
 
+        for (int i=0; i < implicitCallInputs.length(); i++)
+            get_input_syntax_hint(head, i, "hidden") = "true";
+
         if (head->function->name != fullName.str())
             head->stringProp("syntaxHints:functionName") = fullName.str();
 
-        if (rebindName)
+        if (rebindName) {
             branch.bindName(head, implicitCallInputs[0]->name);
+            head->boolProp("syntaxHints:implicitNameBinding") = true;
+        }
 
     } else {
         if (nameLookupFailed)
