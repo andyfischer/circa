@@ -95,7 +95,7 @@ void post_parse_branch(Branch& branch)
                 continue;
 
             Term* assign = apply(branch, ASSIGN_FUNC, RefList(term, result));
-            source_set_hidden(assign, true);
+            set_source_hidden(assign, true);
         }
     }
 }
@@ -153,7 +153,7 @@ Term* find_function(Branch& branch, std::string const& name)
     return result;
 }
 
-void source_set_hidden(Term* term, bool hidden)
+void set_source_hidden(Term* term, bool hidden)
 {
     term->boolProp("syntaxHints:hidden") = hidden;
 }

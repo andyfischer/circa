@@ -292,7 +292,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         // Create an input placeholder term
         Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, RefList(), name);
         change_type(input, typeTerm);
-        source_set_hidden(input, true);
+        set_source_hidden(input, true);
 
         if (isHiddenStateArgument)
             function_t::get_hidden_state_type(result) = typeTerm;
@@ -351,11 +351,11 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
             contents[contents.length()-1]->name != OUTPUT_PLACEHOLDER_NAME) {
         Term* copy = apply(contents, COPY_FUNC, RefList(contents[OUTPUT_PLACEHOLDER_NAME]),
                 OUTPUT_PLACEHOLDER_NAME);
-        source_set_hidden(copy, true);
+        set_source_hidden(copy, true);
     } else if (!contents.contains(OUTPUT_PLACEHOLDER_NAME)) {
         // If there's no #out term, then create an extra term to hold the output type
         Term* term = create_value(contents, outputType, OUTPUT_PLACEHOLDER_NAME);
-        source_set_hidden(term, true);
+        set_source_hidden(term, true);
     }
 
     // If the #out term doesn't have the same type as the declared type, then coerce it
@@ -526,7 +526,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     // If we didn't encounter an 'else' block, then create an empty one.
     if (!encounteredElse) {
         Branch& branch = create_branch(contents, "else");
-        source_set_hidden(branch, true);
+        set_source_hidden(branch, true);
     }
 
     // Move the if_block term to be after the condition terms
@@ -576,7 +576,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Term* iterator_type = find_common_type(listExprTypes);
 
     Term* iterator = create_value(innerBranch, iterator_type, iterator_name);
-    source_set_hidden(iterator, true);
+    set_source_hidden(iterator, true);
 
     setup_for_loop_pre_code(forTerm);
 
@@ -653,7 +653,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         possible_whitespace(tokens);
 
         Term* initialization = apply(branch, DO_ONCE_FUNC, RefList());
-        source_set_hidden(initialization, true);
+        set_source_hidden(initialization, true);
 
         Term* initialValue = infix_expression(as_branch(initialization), tokens);
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);

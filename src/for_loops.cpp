@@ -55,7 +55,7 @@ void setup_for_loop_post_code(Term* forTerm)
 
         // Bind inner version to outer scope
         Term* copy = apply(outerScope, COPY_FUNC, RefList(innerVersion), name);
-        source_set_hidden(copy, true);
+        set_source_hidden(copy, true);
     }
 }
 

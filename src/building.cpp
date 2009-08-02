@@ -31,7 +31,7 @@ Term* apply(Branch& branch, Term* function, RefList const& _inputs, std::string 
         new_value_name << "#hidden_state_for_" << format_global_id(result);
         Term* stateContainer = create_value(branch, function_t::get_hidden_state_type(function),
                 new_value_name.str());
-        source_set_hidden(stateContainer, true);
+        set_source_hidden(stateContainer, true);
         set_stateful(stateContainer, true);
         inputs.prepend(stateContainer);
     }
