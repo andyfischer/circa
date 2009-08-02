@@ -105,17 +105,17 @@ else
 end
 
     
-if (false)
+if false
     print('Error!')
 else
-    if (true)
-        if (false)
+    if true
+        if false
             print('Error!')
         else
-            if (false)
+            if false
                 print('Error!')
             else
-                if (true)
+                if true
                     print('Nested 5')
                 else
                     print('Error!')
@@ -127,3 +127,31 @@ else
     end
 end
 
+-- One-liner
+if true print('One-liner 1') end
+if false print('Error!') end
+
+-- Use a term from an outer scope
+a = 'Outer scope success'
+if true print(a) end
+
+-- Rebinding, simple
+a = 1
+if true a = 2 end
+
+print('Should be two: ', a->to_string)
+
+b = 3
+if false
+  b = 4
+end
+print('Should be three: ', b->to_string)
+
+-- Rebinding, with else block
+c = 5
+if true
+  c = 6
+else
+  c = 7
+end
+print('Should be six: ', c->to_string)

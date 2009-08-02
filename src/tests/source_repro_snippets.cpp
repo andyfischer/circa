@@ -286,6 +286,7 @@ void reproduce_dot_expressions() {
     round_trip_source("r = &1; r.name");
     round_trip_source("r = &1; r.asint");
     round_trip_source("r = &1; r.asint + 5");
+    round_trip_source("l = []; l.append(1)");
     // These don't work because constructors are not reproduced
     //round_trip_source("type T { float x }; t = T(); t.x");
     //round_trip_source("type T { float x }; t = T(); t.x = 1.0");
