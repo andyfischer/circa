@@ -54,7 +54,8 @@ void setup_for_loop_post_code(Term* forTerm)
         ifexpr->inputs[1] = outerVersion;
 
         // Bind inner version to outer scope
-        apply(outerScope, COPY_FUNC, RefList(innerVersion), name);
+        Term* copy = apply(outerScope, COPY_FUNC, RefList(innerVersion), name);
+        source_set_hidden(copy, true);
     }
 }
 
