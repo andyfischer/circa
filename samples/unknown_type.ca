@@ -1,5 +1,0 @@
-
-function myfunc (foo, bar) -> baz
-end
-
-state foo i

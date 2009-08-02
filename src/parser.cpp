@@ -621,7 +621,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     if (!tokens.nextIs(IDENTIFIER))
-        return compile_error_for_line(branch, tokens, startPosition);
+        return compile_error_for_line(branch, tokens, startPosition, "Expected identifier after 'state'");
 
     std::string name = tokens.consume(IDENTIFIER);
     possible_whitespace(tokens);
@@ -638,6 +638,9 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     Term* type = ANY_TYPE;
     if (typeName != "")
         type = find_type(branch, typeName);
+
+    if (!is_type(type))
+        return compile_error_for_line(branch, tokens, startPosition, "Not a type: "+type->name);
 
     Term* result = create_value(branch, type, name);
     set_stateful(result, true);
