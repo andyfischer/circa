@@ -115,6 +115,7 @@ void reproduce_stateful_values() {
     round_trip_source("state i = 5*3+1");
     round_trip_source("state int i");
     round_trip_source("  state int i = 5");
+    round_trip_source("state int i; i += 1");
     finish_source_repro_category();
 }
 
