@@ -7,6 +7,6 @@ def mysub(Point p) : int
   typeof(p) -> print
 end
 
-state p : Point
+state Point p
 
 mysub([1.0 2.0])

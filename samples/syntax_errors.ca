@@ -1,8 +1,0 @@
--- unknown identifier
-print(a)
-
--- EOL on infix
-a = 1 +
-
--- EOF on function call
-a = add(1

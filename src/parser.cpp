@@ -635,26 +635,15 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         possible_whitespace(tokens);
     }
 
-#if 0
-    // check for "state <name> : <type>" syntax. This style is deprecated
-    if (tokens.nextIs(COLON)) {
-        tokens.consume();
-        possible_whitespace(tokens);
-
-        if (!tokens.nextIs(IDENTIFIER))
-            return compile_error_for_line(branch, tokens, startPosition);
-
-        typeName = tokens.consume(IDENTIFIER);
-        possible_whitespace(tokens);
-    }
-#endif
-
     Term* type = ANY_TYPE;
     if (typeName != "")
         type = find_type(branch, typeName);
 
     Term* result = create_value(branch, type, name);
     set_stateful(result, true);
+
+    if (typeName != "")
+        result->stringProp("syntaxHints:explicitType") = typeName;
 
     if (tokens.nextIs(EQUALS)) {
         tokens.consume();
@@ -1099,11 +1088,15 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
 
     std::string text = tokens.consume(STRING);
 
+    std::string quoteType = text.substr(0,1);
+
     // strip quote marks
     text = text.substr(1, text.length()-2);
 
     Term* term = string_value(branch, text);
     set_source_location(term, startPosition, tokens);
+    if (quoteType != "'")
+        term->stringProp("syntaxHints:quoteType") = quoteType;
     return term;
 }
 

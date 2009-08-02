@@ -87,6 +87,8 @@ void reproduce_simple_values() {
     round_trip_source("-.123");
     round_trip_source("5.2");
     round_trip_source("5.200");
+    round_trip_source("'string with single quotes'");
+    round_trip_source("\"string with double quotes\"");
     finish_source_repro_category();
 }
 
@@ -111,8 +113,8 @@ void reproduce_stateful_values() {
     round_trip_source("state i");
     round_trip_source("state i = 1");
     round_trip_source("state i = 5*3+1");
-    //round_trip_source("state i:int");
-    //round_trip_source("  state i:int");
+    round_trip_source("state int i");
+    round_trip_source("  state int i = 5");
     finish_source_repro_category();
 }
 
@@ -237,6 +239,8 @@ void reproduce_subroutine() {
     round_trip_source("def hi(); 1;end");
     round_trip_source("def hi()   end");
     round_trip_source("def hi() 1  end");
+    round_trip_source("def hi(int)  end");
+    round_trip_source("def hi(float, string, bool)  end");
     finish_source_repro_category();
 }
 

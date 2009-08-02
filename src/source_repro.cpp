@@ -103,9 +103,14 @@ std::string get_term_source(Term* term)
 
     result << term->stringPropOptional("syntaxHints:preWhitespace", "");
 
-    // for a stateful value, write "state <name>"
+    // for a stateful value, write "state <name>" or "state <type> <name>"
     if (is_value(term) && is_stateful(term)) {
-        result << "state " << term->name;
+        result << "state ";
+
+        if (term->hasProperty("syntaxHints:explicitType"))
+            result << term->stringProp("syntaxHints:explicitType") << " ";
+
+        result << term->name;
 
         if (term->hasProperty("initializedBy")) {
             result << " = ";
