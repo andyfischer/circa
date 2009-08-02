@@ -25,7 +25,7 @@ namespace subroutine_t {
             first = false;
             result << function_t::get_input_type(term, i)->name;
 
-            if (name != "")
+            if (name != "" && name[0] != '#')
                 result << " " << name;
         }
 

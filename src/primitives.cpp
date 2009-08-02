@@ -288,7 +288,8 @@ bool is_float(Term* term)
 namespace string_t {
     std::string to_string(Term* term)
     {
-        return std::string("'") + as_string(term) + "'";
+        std::string quoteType = term->stringPropOptional("syntaxHints:quoteType", "'");
+        return quoteType + as_string(term) + quoteType;
     }
 }
 
