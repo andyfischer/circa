@@ -23,8 +23,11 @@ void register_input(std::string const& in)
 }
 
 // This function (hopefully) lists every possible parse error.
-// These lines are interpreted as statement_lists. Many are errors simply because of an
-// unexpected EOF.
+//
+// The goal of this test is to make sure that for every error: 1) no exception
+// is thrown, and 2) it's detected as an error. The parsing code has a lot of
+// asserts, so it's common for a parser error to cause an assert fail. (this
+// shouldn't ever happen though)
 
 void register_every_possible_parse_error()
 {
@@ -37,6 +40,7 @@ void register_every_possible_parse_error()
     register_input("def myfunc(int %");
     register_input("def myfunc(int) %");
     register_input("def myfunc(int) : %");
+    register_input("def myfunc(foo, bar) : baz");
     register_input("type");
     register_input("type mytype");
     register_input("type mytype %");
@@ -67,6 +71,8 @@ void register_every_possible_parse_error()
     register_input("state x = ");
     register_input("state int x = ");
     register_input("state int %");
+    register_input("state foo x");
+    register_input("foo = 1; state foo x");
     register_input("1 = 2");
     register_input("1 2 3 = 4");
     register_input("a.b 3 4 = 4");
