@@ -235,10 +235,14 @@ bool try_to_consume_keyword(TokenizeContext& context, int keyword)
     if (is_acceptable_inside_identifier(context.next(str_len)))
         return false;
 
+    // Don't match as a keyword if the next character is (. This might be
+    // a bad idea.
+    if (context.next(str_len) == '(')
+        return false;
+
     // Keyword matches, now consume it
-    for (int i=0; i < str_len; i++) {
+    for (int i=0; i < str_len; i++)
         context.consume();
-    }
 
     context.push(keyword);
 

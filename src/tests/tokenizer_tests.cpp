@@ -269,29 +269,40 @@ void test_consume_line()
 void test_color_literal()
 {
     TokenStream tokens("#faf");
-
-    test_assert(tokens.nextIs(token::COLOR));
-    test_equals(tokens.consume(), "#faf");
+    test_equals(tokens.consume(token::COLOR), "#faf");
     test_assert(tokens.finished());
 
     tokens.reset("#119f");
-    test_assert(tokens.nextIs(token::COLOR));
-    test_equals(tokens.consume(), "#119f");
+    test_equals(tokens.consume(token::COLOR), "#119f");
     test_assert(tokens.finished());
 
     tokens.reset("#ff1100");
-    test_assert(tokens.nextIs(token::COLOR));
-    test_equals(tokens.consume(), "#ff1100");
+    test_equals(tokens.consume(token::COLOR), "#ff1100");
 
     tokens.reset("#00112299");
-    test_assert(tokens.nextIs(token::COLOR));
-    test_equals(tokens.consume(), "#00112299");
+    test_equals(tokens.consume(token::COLOR), "#00112299");
     test_assert(tokens.finished());
 
     // test wrong # of characters
     tokens.reset("#00111");
-    test_assert(tokens.nextIs(token::UNRECOGNIZED));
+    test_equals(tokens.consume(token::UNRECOGNIZED), "#00111");
+    test_assert(tokens.finished());
+}
+
+void test_keyword_followed_by_lparen()
+{
+    TokenStream tokens("if(");
+
+    test_assert(tokens.nextIs(token::IDENTIFIER));
+    test_equals(tokens.consume(), "if");
+    test_assert(tokens.nextIs(token::LPAREN));
     tokens.consume();
+    test_assert(tokens.finished());
+
+    tokens.reset("if (");
+    test_equals(tokens.consume(token::IF), "if");
+    test_equals(tokens.consume(token::WHITESPACE), " ");
+    test_equals(tokens.consume(token::LPAREN), "(");
     test_assert(tokens.finished());
 }
 
@@ -311,6 +322,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_locations);
     REGISTER_TEST_CASE(tokenizer_tests::test_consume_line);
     REGISTER_TEST_CASE(tokenizer_tests::test_color_literal);
+    REGISTER_TEST_CASE(tokenizer_tests::test_keyword_followed_by_lparen);
 }
 
 } // namespace tokenizer_tests
