@@ -33,6 +33,7 @@ extern Term* GET_FIELD_FUNC;
 extern Term* IF_FUNC;
 extern Term* IF_BLOCK_FUNC;
 extern Term* IF_EXPR_FUNC;
+extern Term* INCLUDE_FUNC;
 extern Term* INPUT_PLACEHOLDER_FUNC;
 extern Term* LIST_TYPE;
 extern Term* LIST_FUNC;

@@ -174,7 +174,12 @@ Term* statement(Branch& branch, TokenStream& tokens)
         result = return_statement(branch, tokens);
     }
 
-    // Expression statement
+    // Include statement
+    else if (tokens.nextIs(INCLUDE)) {
+        result = include_statement(branch, tokens);
+    }
+
+    // Otherwise, expression statement
     else {
         result = expression_statement(branch, tokens);
         assert(result != NULL);
@@ -242,7 +247,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     if (!tokens.nextIs(IDENTIFIER)
             // A few builtin functions have names which are keywords:
-            && !tokens.nextIs(FOR) && !tokens.nextIs(IF))
+            && !tokens.nextIs(FOR) && !tokens.nextIs(IF) && !tokens.nextIs(INCLUDE))
         return compile_error_for_line(branch, tokens, startPosition, "Expected identifier");
 
     std::string functionName = tokens.consume();
@@ -792,6 +797,40 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
 
     branch.bindName(result, OUTPUT_PLACEHOLDER_NAME);
     
+    return result;
+}
+
+Term* include_statement(Branch& branch, TokenStream& tokens)
+{
+    tokens.consume(INCLUDE);
+
+    int startPosition = tokens.getPosition();
+
+    possible_whitespace(tokens);
+
+    std::string filename;
+    if (tokens.nextIs(IDENTIFIER))
+        filename = tokens.consume(IDENTIFIER) + ".ca";
+    else if (tokens.nextIs(STRING)) {
+        filename = tokens.consume(STRING);
+        filename = filename.substr(1, filename.length()-2);
+    } else {
+        return compile_error_for_line(branch, tokens, startPosition,
+                "Expected identifier or string after 'include'");
+    }
+
+    Term* filenameTerm = string_value(branch, filename);
+    set_source_hidden(filenameTerm, true);
+
+    Term* result = apply(branch, INCLUDE_FUNC, RefList(filenameTerm));
+
+    // this code is duplicated inside builtin_functions/include.cpp
+    filename = get_source_file_location(branch) + "/" + filename;
+
+    parse_script(as_branch(result), filename);
+
+    expose_all_names(as_branch(result), branch);
+
     return result;
 }
 

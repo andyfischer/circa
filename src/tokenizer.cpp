@@ -70,6 +70,7 @@ const char* get_token_text(int match)
         case FALSE_TOKEN: return "false";
         case DO_ONCE: return "do once";
         case NAMESPACE: return "namespace";
+        case INCLUDE: return "include";
         case UNRECOGNIZED: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -263,6 +264,7 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, FALSE_TOKEN)) return;
         if (try_to_consume_keyword(context, DO_ONCE)) return;
         if (try_to_consume_keyword(context, NAMESPACE)) return;
+        if (try_to_consume_keyword(context, INCLUDE)) return;
 
         consume_identifier(context);
         return;
