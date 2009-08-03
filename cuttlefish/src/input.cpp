@@ -15,7 +15,8 @@ std::set<int> KEY_JUST_PRESSED;
 
 Int MOUSE_X;
 Int MOUSE_Y;
-bool RECENT_MOUSE_DOWN;
+bool LEFT_MOUSE_DOWN = false;
+bool RECENT_LEFT_MOUSE_DOWN;
 bool RECENT_MOUSE_WHEEL_UP;
 bool RECENT_MOUSE_WHEEL_DOWN;
 
@@ -31,15 +32,12 @@ void key_pressed(Term* caller)
     caller->asBool() = KEY_JUST_PRESSED.find(i) != KEY_JUST_PRESSED.end();
 }
 
-void mouse_pressed(Term* caller)
-{
-    as_bool(caller) = RECENT_MOUSE_DOWN;
-}
+
 
 void capture_events()
 {
     KEY_JUST_PRESSED.clear();
-    RECENT_MOUSE_DOWN = false;
+    RECENT_LEFT_MOUSE_DOWN = false;
     RECENT_MOUSE_WHEEL_UP = false;
     RECENT_MOUSE_WHEEL_DOWN = false;
 
@@ -62,9 +60,10 @@ void capture_events()
         } else if (event.type == SDL_KEYUP) {
             KEY_DOWN[event.key.keysym.sym] = false;
         } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-            if (event.button.button == SDL_BUTTON_LEFT)
-                RECENT_MOUSE_DOWN = true;
-            else if (event.button.button == SDL_BUTTON_WHEELUP)
+            if (event.button.button == SDL_BUTTON_LEFT) {
+                RECENT_LEFT_MOUSE_DOWN = true;
+                LEFT_MOUSE_DOWN = true;
+            } else if (event.button.button == SDL_BUTTON_WHEELUP)
                 RECENT_MOUSE_WHEEL_UP = true;
             else if (event.button.button == SDL_BUTTON_WHEELDOWN)
                 RECENT_MOUSE_WHEEL_DOWN = true;
@@ -74,6 +73,8 @@ void capture_events()
         } else if (event.type == SDL_MOUSEBUTTONUP) {
             MOUSE_X = event.button.x;
             MOUSE_Y = event.button.y;
+            if (event.button.button == SDL_BUTTON_LEFT)
+                LEFT_MOUSE_DOWN = false;
         } else if (event.type == SDL_MOUSEMOTION) {
             MOUSE_X = event.motion.x;
             MOUSE_Y = event.motion.y;
@@ -137,9 +138,17 @@ bool mouse_in(Branch& box)
         && x2 >= MOUSE_X && y2 >= MOUSE_Y;
 }
 
+void mouse_pressed(Term* caller)
+{
+    as_bool(caller) = LEFT_MOUSE_DOWN;
+}
+
 void mouse_clicked(Term* caller)
 {
-    as_bool(caller) = RECENT_MOUSE_DOWN && mouse_in(as_branch(caller->input(0)));
+    if (caller->numInputs() == 0)
+        as_bool(caller) = RECENT_LEFT_MOUSE_DOWN;
+    else
+        as_bool(caller) = RECENT_LEFT_MOUSE_DOWN && mouse_in(as_branch(caller->input(0)));
 }
 
 void mouse_over(Term* caller)
@@ -149,12 +158,18 @@ void mouse_over(Term* caller)
 
 void mouse_wheel_up(Term* caller)
 {
-    as_bool(caller) = RECENT_MOUSE_WHEEL_UP && mouse_in(as_branch(caller->input(0)));
+    if (caller->numInputs() == 0)
+        as_bool(caller) = RECENT_MOUSE_WHEEL_UP;
+    else
+        as_bool(caller) = RECENT_MOUSE_WHEEL_UP && mouse_in(as_branch(caller->input(0)));
 }
 
 void mouse_wheel_down(Term* caller)
 {
-    as_bool(caller) = RECENT_MOUSE_WHEEL_DOWN && mouse_in(as_branch(caller->input(0)));
+    if (caller->numInputs() == 0)
+        as_bool(caller) = RECENT_MOUSE_WHEEL_DOWN;
+    else
+        as_bool(caller) = RECENT_MOUSE_WHEEL_DOWN && mouse_in(as_branch(caller->input(0)));
 }
 
 void initialize(Branch& branch)
@@ -174,10 +189,19 @@ void initialize(Branch& branch)
     int_value(branch, SDLK_RIGHT, "KEY_RIGHT");
     int_value(branch, SDLK_SPACE, "KEY_SPACE");
 
-    import_function(branch, mouse_clicked, "mouse_clicked(List region) : bool");
     import_function(branch, mouse_over, "mouse_over(List region) : bool");
-    import_function(branch, mouse_wheel_up, "mouse_wheel_up(List region) : bool");
-    import_function(branch, mouse_wheel_down, "mouse_wheel_down(List region) : bool");
+
+    Term* mouse_clicked_func = create_overloaded_function(branch, "mouse_clicked");
+    import_function_overload(mouse_clicked_func, mouse_clicked, "mouse_clicked() : bool");
+    import_function_overload(mouse_clicked_func, mouse_clicked, "mouse_clicked(List region) : bool");
+
+    Term* mouse_wheel_up_func = create_overloaded_function(branch, "mouse_wheel_up");
+    import_function_overload(mouse_wheel_up_func, mouse_wheel_up, "mouse_wheel_up() : bool");
+    import_function_overload(mouse_wheel_up_func, mouse_wheel_up, "mouse_wheel_up(List region) : bool");
+
+    Term* mouse_wheel_down_func = create_overloaded_function(branch, "mouse_wheel_down");
+    import_function_overload(mouse_wheel_down_func, mouse_wheel_down, "mouse_wheel_down(List region) : bool");
+    import_function_overload(mouse_wheel_down_func, mouse_wheel_down, "mouse_wheel_down() : bool");
 }
 
 } // namespace input
