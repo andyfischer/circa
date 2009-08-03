@@ -319,12 +319,12 @@ void duplicate_branch(Branch& source, Branch& dest)
 
 void parse_script(Branch& branch, std::string const& filename)
 {
+    // record the filename
+    string_value(branch, filename, get_name_for_attribute("source-file"));
+
     std::string fileContents = read_text_file(filename);
 
     parser::compile(&branch, parser::statement_list, fileContents);
-
-    // record the filename
-    string_value(branch, filename, get_name_for_attribute("source-file"));
 }
 
 void evaluate_script(Branch& branch, std::string const& filename)
@@ -344,6 +344,19 @@ Term* find_named(Branch& branch, std::string const& name)
         return get_global(name);
     else
         return find_named(*outerScope, name);
+}
+
+void expose_all_names(Branch& source, Branch& destination)
+{
+    for (TermNamespace::iterator it = source.names.begin(); it != source.names.end(); ++it)
+    {
+        std::string const& name = it->first;
+        Term* term = it->second;
+        if (name == "") continue;
+        if (name[0] == '#') continue;
+
+        destination.bindName(term, name);
+    }
 }
 
 bool reload_branch_from_file(Branch& branch, std::ostream &errors)

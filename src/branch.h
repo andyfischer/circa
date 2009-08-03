@@ -95,6 +95,7 @@ void evaluate_script(Branch& branch, std::string const& filename);
 
 Term* find_term_by_id(Branch& branch, unsigned int id);
 Term* find_named(Branch& branch, std::string const& name);
+void expose_all_names(Branch& source, Branch& destination);
 
 bool reload_branch_from_file(Branch& branch, std::ostream& errors);
 void persist_branch_to_file(Branch& branch);
