@@ -9,14 +9,18 @@ namespace concat_function {
     {
         std::stringstream out;
         for (int index=0; index < caller->inputs.length(); index++) {
-            out << as_string(caller->inputs[index]);
+            Term* t = caller->inputs[index];
+            if (is_string(t))
+                out << as_string(caller->inputs[index]);
+            else
+                out << to_string(t);
         }
         as_string(caller) = out.str();
     }
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "concat(string...) : string");
+        import_function(kernel, evaluate, "concat(any...) : string");
     }
 }
 }

@@ -24,6 +24,11 @@ end
 
 ui_font_medium = load_font("assets/sv_basic_manual/SVBasicManual.ttf", 16)
 
+def draw_text(TTF_Font font, string text, int color, Point location)
+    sprite = render_text(font, text, color)
+    draw_rendered_text(sprite, location.x location.y)
+end
+
 -- TODO: put this in a separate file
 namespace tweak
     def button(ref r, Point loc)
