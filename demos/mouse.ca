@@ -1,5 +1,3 @@
--- Copyright 2008 Paul Hodge
-
 WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 400
 WINDOW_TITLE = 'tweak.ca'
@@ -19,7 +17,6 @@ end
 
 star_color = #f39
 state global_scale = 1.0
-
 
 def draw_star(Star star)
   radius = star.size * global_scale : float
@@ -45,8 +42,37 @@ end
 
 state stars = []
 
+-- Draw a black background
+background(#000)
+
+-- Draw an X where the mouse is
+begin
+  def draw_quad(List points, int color)
+      gl.triangles([points[0] points[1] points[2] points[2] points[3] points[0]] color)
+  end
+
+  cross_color = #f396
+  cross_thickness = 4.0
+  cross_length = 20.0
+
+  def draw_arm(float rot) : List
+      near_center = p2c(rot, cross_thickness, mouse)
+      near_l = p2c(rot - .25, cross_thickness/2, near_center)
+      near_r = p2c(rot + .25, cross_thickness/2, near_center)
+      far_center = p2c(rot, cross_length, mouse)
+      far_l = p2c(rot - .25, cross_thickness/2, far_center)
+      far_r = p2c(rot + .25, cross_thickness/2, far_center)
+      draw_quad([near_l far_l far_r near_r] cross_color)
+  end
+
+  for rot in [.25 .5 .75 1]
+      draw_arm(rot + -time)
+  end
+end
+
 -- Clicking will create a new spinning star
 if mouse_clicked()
+  -- Check if we clicked on an existing star
   stars.append([mouse rand() 40])
 end
 
@@ -56,9 +82,6 @@ if mouse_wheel_up()
 elif mouse_wheel_down()
     global_scale *= 0.9
 end
-
--- Draw a black background
-background(#000)
 
 -- Draw each star
 for star in stars

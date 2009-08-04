@@ -66,6 +66,24 @@ void gl_line_strip(Term* caller)
     glEnd();
 }
 
+void gl_line_loop(Term* caller)
+{
+    Branch& list = caller->input(0)->asBranch();
+    int color = caller->input(1)->asInt();
+
+    _unpack_gl_color(color);
+
+    glBegin(GL_LINE_LOOP);
+
+    for (int i=0; i < list.length(); i++) {
+        float x = list[i]->field(0)->toFloat();
+        float y = list[i]->field(1)->toFloat();
+        glVertex3f(x,y,0);
+    }
+    
+    glEnd();
+}
+
 void initialize(Branch& branch)
 {
     import_function(branch, background, "background(int)");
@@ -73,6 +91,7 @@ void initialize(Branch& branch)
     Branch& gl_ns = create_namespace(branch, "gl");
     import_function(gl_ns, gl_triangles, "triangles(List, int)");
     import_function(gl_ns, gl_line_strip, "line_strip(List, int)");
+    import_function(gl_ns, gl_line_loop, "line_loop(List, int)");
 }
 
 } // namespace gl_shapes

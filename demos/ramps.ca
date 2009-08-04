@@ -109,15 +109,15 @@ state float tile_fall_distance = tile_size
 state board = map(initialize_board_piece, range(num_tiles))
 
 -- Keypresses for rotation
-if key_pressed(KEY_DOWN)
+if key_pressed(DOWN)
   falling_piece_rot = (falling_piece_rot - 1) % 4
   if falling_piece_rot < 0; falling_piece_rot += 4; end
 end
-if key_pressed(KEY_UP)
+if key_pressed(UP)
   falling_piece_rot = (falling_piece_rot + 1) % 4
 end
-if key_pressed(KEY_LEFT); falling_group_x -= 1 end
-if key_pressed(KEY_RIGHT); falling_group_x += 1 end
+if key_pressed(LEFT); falling_group_x -= 1 end
+if key_pressed(RIGHT); falling_group_x += 1 end
 
 def rotate_around_i(Point_i point, Point_i center, int rotation) : Point_i
   rotation = rotation % 4

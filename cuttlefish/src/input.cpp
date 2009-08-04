@@ -183,11 +183,11 @@ void initialize(Branch& branch)
     import_function(branch, key_down, "key_down(int) : bool");
     import_function(branch, key_pressed, "key_pressed(int) : bool");
     import_function(branch, mouse_pressed, "mouse_pressed() : bool");
-    int_value(branch, SDLK_UP, "KEY_UP");
-    int_value(branch, SDLK_DOWN, "KEY_DOWN");
-    int_value(branch, SDLK_LEFT, "KEY_LEFT");
-    int_value(branch, SDLK_RIGHT, "KEY_RIGHT");
-    int_value(branch, SDLK_SPACE, "KEY_SPACE");
+    int_value(branch, SDLK_UP, "UP");
+    int_value(branch, SDLK_DOWN, "DOWN");
+    int_value(branch, SDLK_LEFT, "LEFT");
+    int_value(branch, SDLK_RIGHT, "RIGHT");
+    int_value(branch, SDLK_SPACE, "SPACE");
 
     import_function(branch, mouse_over, "mouse_over(List region) : bool");
 
