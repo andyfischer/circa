@@ -39,11 +39,11 @@ if WINDOWS:
     ROOT.Append(CPPDEFINES = ['WINDOWS'])
     ROOT.Append(LINKFLAGS='/SUBSYSTEM:CONSOLE /MACHINE:X86'.split())
     if DEBUG:
-        ROOT.Append(CPPFLAGS='/EHsc /W3 /Wp64 /MDd /Z7 /TP /Od'.split())
+        ROOT.Append(CPPFLAGS='/EHsc /W3 /MDd /Z7 /TP /Od'.split())
         ROOT.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrt.lib', '/DEBUG'])
         ROOT.Append(CPPDEFINES = ["DEBUG", "_DEBUG"])
     else:
-        ROOT.Append(CPPFLAGS='/EHsc /W3 /Wp64 /MD /Z7 /O2 /TP'.split())
+        ROOT.Append(CPPFLAGS='/EHsc /W3 /MD /Z7 /O2 /TP'.split())
         ROOT.Append(CPPDEFINES = ["NDEBUG"])
 
 Export('ROOT')

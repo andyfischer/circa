@@ -276,10 +276,14 @@ void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string
 {
     TermNamespace::iterator it;
     for (it = branch.names.begin(); it != branch.names.end(); ++it) {
-        // Ignore names that aren't bound in the outer branch
         std::string name = it->first;
+
+        // Ignore compiler-generated terms
+        if (name[0] == '#')
+            continue;
+
+        // Ignore names that aren't bound in the outer branch
         Term* outer = NULL;
-        
         if (get_outer_scope(branch) != NULL)
             outer = find_named(*get_outer_scope(branch), name);
 
@@ -289,10 +293,6 @@ void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string
         // Ignore terms that are just a simple copy
         Term* result = branch[name];
         if (result->function == COPY_FUNC && result->input(0) == outer)
-            continue;
-
-        // Ignore compiler-generated terms. This seems like a bad method
-        if (name[0] == '#')
             continue;
 
         names.push_back(name);
