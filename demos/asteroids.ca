@@ -1,0 +1,51 @@
+
+WINDOW_WIDTH = 300
+WINDOW_HEIGHT = 300
+WINDOW_TITLE = 'asteroids.ca'
+
+-- Convenience function: polar to cartesian
+def p2c(float angle, float radius, Point center) : Point
+  return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
+end
+
+def get_ship_start_point() : Point
+    return [WINDOW_WIDTH/2 WINDOW_HEIGHT/2]
+end
+
+type Ship {
+   Point loc
+   Point momentum
+   float facing
+}
+
+state Ship ship = [get_ship_start_point() [0 0] 0]
+rotation_speed = 0.7
+
+background(#000)
+
+-- Draw the ship
+begin
+    def ship_point(float rot, float dist) : Point
+        return p2c(rot + ship.facing, dist, ship.loc)
+    end
+    front_dist = 10.0
+    back_dist = 2.0
+    wing_dist = 9.0
+    wing_rot = .4
+    gl.line_loop([ship_point(0 front_dist) ship_point(wing_rot wing_dist)
+        ship_point(.5 back_dist) ship_point(-wing_rot wing_dist)] #fff)
+end
+
+-- Keyboard controls for rotation
+if key_down(LEFT)
+    ship.facing = ship.facing - rotation_speed * time_delta
+elif key_down(RIGHT)
+    ship.facing = ship.facing + rotation_speed * time_delta
+end
+
+-- Keyboard controls for acceleration
+if key_down(UP)
+    ship.momentum = ship.momentum + [cos(ship.facing) sin(ship.facing)] *time_delta
+end
+
+ship.loc = ship.loc + ship.momentum

@@ -1,4 +1,4 @@
-// Copyright 2008 Andrew Fischer
+// Copyright 2009 Andrew Fischer
 
 #include "common_headers.h"
 
@@ -52,7 +52,7 @@ bool initialize_display()
     SCREEN = SDL_SetVideoMode(windowWidth, windowHeight, 16, SDL_OPENGL | SDL_SWSURFACE);
 
     if (SCREEN == NULL) {
-        std::cerr << "SDL_SetVideoMode failed: " << std::endl;
+        std::cerr << "SDL_SetVideoMode failed: " << SDL_GetError() << std::endl;
         return false;
     }
 
