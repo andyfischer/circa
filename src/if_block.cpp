@@ -42,7 +42,7 @@ void update_if_block_joining_branch(Term* ifCall)
         std::string const& name = *it;
 
         // Ignore hidden names
-        if ((name[0] == '#') && (name != OUTPUT_PLACEHOLDER_NAME)) {
+        if ((name[0] == '#') && (name != "#out")) {
             boundNames.erase(it++);
             continue;
         }

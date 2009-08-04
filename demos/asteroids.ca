@@ -8,6 +8,11 @@ def p2c(float angle, float radius, Point center) : Point
   return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
 end
 
+-- Convenience function: magnitude of a 2d vector
+def magnitude(Point point) : float
+    return sqrt(sqr(point.x) + sqr(point.y))
+end
+
 def get_ship_start_point() : Point
     return [WINDOW_WIDTH/2 WINDOW_HEIGHT/2]
 end
@@ -18,8 +23,20 @@ type Ship {
    float facing
 }
 
+type Bullet {
+   float lifespan
+   Point loc
+   Point momentum
+}
+
+
 state Ship ship = [get_ship_start_point() [0 0] 0]
-rotation_speed = 0.7
+state List bullets = []
+rotation_speed = 0.9
+acceleration_rate = 0.1
+speed_limit = 1.5
+bullet_speed = 4.0
+bullet_width = 2.0
 
 background(#000)
 
@@ -45,7 +62,31 @@ end
 
 -- Keyboard controls for acceleration
 if key_down(UP)
-    ship.momentum = ship.momentum + [cos(ship.facing) sin(ship.facing)] *time_delta
+    ship.momentum = ship.momentum + [cos(ship.facing) sin(ship.facing)] * acceleration_rate
+end
+
+-- Enforce a speed limit on ship.momentum
+speed = magnitude(ship.momentum)
+
+if speed > speed_limit
+    ship.momentum = ship.momentum * (speed_limit / speed)
 end
 
 ship.loc = ship.loc + ship.momentum
+
+-- Press space to shoot a bullet
+if key_pressed(SPACE)
+    bullets.append([0 ship.loc [cos(ship.facing) sin(ship.facing)]] * bullet_speed)
+end
+
+-- Move bullets
+-- todo
+
+-- Draw bullets
+for bullet in bullets
+    bullet = bullet : Bullet
+    gl.line_loop([bullet.loc + [-bullet_width -bullet_width],
+                  bullet.loc + [bullet_width -bullet_width],
+                  bullet.loc + [bullet_width bullet_width],
+                  bullet.loc + [-bullet_width bullet_width]] #fff)
+end

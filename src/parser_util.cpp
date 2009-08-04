@@ -86,8 +86,8 @@ void post_parse_branch(Branch& branch)
         if (is_stateful(branch[i])) {
             Term* term = branch[i];
 
-            if (term->name == "")
-                continue;
+            if (term->name == "") continue;
+            if (term->name[0] == '#') continue;
 
             Term* result = branch[term->name];
 

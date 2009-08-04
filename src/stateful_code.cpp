@@ -4,6 +4,8 @@
 
 namespace circa {
 
+bool MIGRATE_STATEFUL_VALUES_VERBOSE = false;
+
 bool is_stateful(Term* term)
 {
     return term->boolPropOptional("stateful", false);
@@ -75,10 +77,19 @@ Term* get_hidden_state_for_call(Term* term)
 
 bool terms_match_for_migration(Term* left, Term* right)
 {
-    if ((left->name == right->name) && (left->type == right->type))
-        return true;
+    if (left->name != right->name) {
+        if (MIGRATE_STATEFUL_VALUES_VERBOSE)
+            std::cout << "reject, names don't match" << std::endl;
+        return false;
+    }
 
-    return false;
+    if (left->type != right->type) {
+        if (MIGRATE_STATEFUL_VALUES_VERBOSE)
+            std::cout << "reject, types aren't equal" << std::endl;
+        return false;
+    }
+
+    return true;
 }
 
 void migrate_stateful_values(Branch& source, Branch& dest)
@@ -87,6 +98,9 @@ void migrate_stateful_values(Branch& source, Branch& dest)
     // iterate and check matching indexes.
     
     for (int index=0; index < source.length(); index++) {
+        if (MIGRATE_STATEFUL_VALUES_VERBOSE)
+            std::cout << "checking index: " << index << std::endl;
+
         if (index >= dest.length())
             break;
 
@@ -103,8 +117,7 @@ void migrate_stateful_values(Branch& source, Branch& dest)
 
         // If both terms are subroutine calls, and the source call is expanded, then
         // expand the dest call as well.
-        if ((is_subroutine(sourceTerm->function))
-                && (is_subroutine(destTerm->function)))
+        if (is_subroutine(sourceTerm->function) && is_subroutine(destTerm->function))
         {
             Term* sourceCallState = get_hidden_state_for_call(sourceTerm);
             Term* destCallState = get_hidden_state_for_call(destTerm);
@@ -128,7 +141,14 @@ void migrate_stateful_values(Branch& source, Branch& dest)
         else if (is_stateful(sourceTerm)
                     && is_stateful(destTerm)
                     && is_value_alloced(sourceTerm)) {
+
+            if (MIGRATE_STATEFUL_VALUES_VERBOSE)
+                std::cout << "assigning value of " << to_string(sourceTerm) << std::endl;
+
             assign_value(sourceTerm, destTerm);
+        } else {
+            if (MIGRATE_STATEFUL_VALUES_VERBOSE)
+                std::cout << "nothing to do" << std::endl;
         }
     }
 }

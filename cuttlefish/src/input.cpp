@@ -32,8 +32,6 @@ void key_pressed(Term* caller)
     caller->asBool() = KEY_JUST_PRESSED.find(i) != KEY_JUST_PRESSED.end();
 }
 
-
-
 void capture_events()
 {
     KEY_JUST_PRESSED.clear();

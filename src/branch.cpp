@@ -335,6 +335,9 @@ void evaluate_script(Branch& branch, std::string const& filename)
 
 Term* find_named(Branch& branch, std::string const& name)
 {
+    assert(name != "");
+    assert(name == "#out" || name[0] != '#'); // We shouldn't ever lookup hidden names
+
     if (branch.contains(name))
         return branch[name];
 
@@ -373,6 +376,7 @@ bool reload_branch_from_file(Branch& branch, std::ostream &errors)
     }
 
     migrate_stateful_values(branch, replacement);
+
     branch.clear();
     duplicate_branch(replacement, branch);
     return true;

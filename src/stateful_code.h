@@ -23,4 +23,6 @@ void reset_state(Branch& branch);
 
 void migrate_stateful_values(Branch& source, Branch& dest);
 
+extern bool MIGRATE_STATEFUL_VALUES_VERBOSE;
+
 } // namespace circa
