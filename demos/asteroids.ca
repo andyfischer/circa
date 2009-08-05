@@ -85,8 +85,8 @@ end
 -- Draw bullets
 for bullet in bullets
     bullet = bullet : Bullet
-    gl.line_loop([bullet.loc + [-bullet_width -bullet_width],
-                  bullet.loc + [bullet_width -bullet_width],
-                  bullet.loc + [bullet_width bullet_width],
-                  bullet.loc + [-bullet_width bullet_width]] #fff)
+    gl.line_loop([bullet.loc + [-bullet_width, -bullet_width],
+                  bullet.loc + [bullet_width, -bullet_width],
+                  bullet.loc + [bullet_width, bullet_width],
+                  bullet.loc + [-bullet_width, bullet_width]] #fff)
 end

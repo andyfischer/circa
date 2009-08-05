@@ -193,6 +193,10 @@ void test_vectorized_funcs()
     test_equals(mult_result[0]->asFloat(), 11);
     test_equals(mult_result[1]->asFloat(), 22);
     test_equals(mult_result[2]->asFloat(), 33);
+
+    // Test error handling
+    t = branch.eval("[1 1 1] + [1 1]");
+    test_assert(t->hasError);
 }
 
 void test_vectorized_funcs_with_points()
