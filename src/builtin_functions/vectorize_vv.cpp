@@ -17,6 +17,14 @@ namespace vectorize_vv_function {
         Branch& left = as_branch(caller->input(0));
         Branch& right = as_branch(caller->input(1));
 
+        if (left.length() != right.length()) {
+            std::stringstream msg;
+            msg << "Input lists have different lengths (left has " << left.length();
+            msg << ", right has " << right.length() << ")";
+            error_occurred(caller, msg.str());
+            return;
+        }
+
         Branch& output = as_branch(caller);
 
         // Check if our output value has been precreated but not initialized by us.

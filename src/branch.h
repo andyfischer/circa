@@ -30,8 +30,8 @@ struct Branch
 
     Term* get(int index) const { return _terms[index]; }
     Ref& get(int index) { return _terms[index]; }
-    Term* operator[](int index) const { return _terms[index]; }
-    Ref& operator[](int index) { return _terms[index]; }
+    Term* operator[](int index) const { assert(index <= length()); return _terms[index]; }
+    Ref& operator[](int index) { assert(index <= length()); return _terms[index]; }
 
     // Get a term from a name binding.
     Term* get(std::string const& name) const { return names[name]; }
