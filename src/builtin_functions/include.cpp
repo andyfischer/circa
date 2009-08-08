@@ -33,8 +33,14 @@ namespace include_function {
             prev_modified = modifiedTime;
 
             Branch& contents = as_branch(caller);
+            Branch previous_contents;
+            duplicate_branch(contents, previous_contents);
+
             contents.clear();
             parse_script(contents, requested_filename);
+
+            if (previous_contents.length() > 0)
+                migrate_stateful_values(previous_contents, contents);
         }
     }
 
