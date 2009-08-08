@@ -1,2 +1,2 @@
 cd $CIRCA_HOME
-scons cfish
+scons plastic

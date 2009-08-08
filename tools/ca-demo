@@ -1,2 +1,2 @@
 cd $CIRCA_HOME
-scons cfish && build/bin/cfish demos/$1.ca
+scons plastic && build/bin/plas demos/$1.ca

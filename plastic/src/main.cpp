@@ -15,7 +15,7 @@
 #include "textures.h"
 #include "ttf.h"
 
-// For getenv()
+// Prevent warnings on getenv()
 #define _CRT_SECURE_NO_WARNINGS
 
 using namespace circa;
@@ -132,7 +132,7 @@ int main( int argc, char* args[] )
     // Initialize stuff
     circa::initialize();
 
-    SCRIPT_ROOT = &create_branch(*circa::KERNEL, "cuttlefish_main");
+    SCRIPT_ROOT = &create_branch(*circa::KERNEL, "plastic_main");
 
     input::initialize(*SCRIPT_ROOT);
 
@@ -147,7 +147,7 @@ int main( int argc, char* args[] )
 
     // Load runtime.ca
     std::string circa_home = getenv("CIRCA_HOME");
-    parse_script(*SCRIPT_ROOT, circa_home + "/cuttlefish/runtime.ca");
+    parse_script(*SCRIPT_ROOT, circa_home + "/plastic/runtime.ca");
 
     if (has_static_errors(*SCRIPT_ROOT)) {
         std::cout << "Errors in runtime.ca:" << std::endl;
