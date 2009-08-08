@@ -356,7 +356,7 @@ void expose_all_names(Branch& source, Branch& destination)
         std::string const& name = it->first;
         Term* term = it->second;
         if (name == "") continue;
-        if (name[0] == '#') continue;
+        if (name[0] == '#' && name != "#out") continue;
 
         destination.bindName(term, name);
     }
