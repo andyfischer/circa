@@ -83,7 +83,12 @@ bool terms_match_for_migration(Term* left, Term* right)
         return false;
     }
 
-    if (left->type != right->type) {
+    bool typesFit = left->type == right->type;
+
+    if (!typesFit)
+        typesFit = value_fits_type(left, right->type);
+      
+    if (!typesFit) {
         if (MIGRATE_STATEFUL_VALUES_VERBOSE)
             std::cout << "reject, types aren't equal" << std::endl;
         return false;
