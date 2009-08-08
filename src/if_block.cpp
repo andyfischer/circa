@@ -94,14 +94,10 @@ void update_if_block_joining_branch(Term* ifCall)
 
         Term* joiningTerm = apply(joining, GET_INDEX_FUNC,
                 RefList(selection_list, satisfiedIndex), name);
-
-        // Bind this names in the outer branch
-        // TODO: This only works when the if call is the last thing in this branch (ie,
-        // at parse time). It will cause problems if we call update_if_block_joining_branch
-        // at a later time and there have been other name bindings since then. Need a
-        // better solution for this.
-        outerScope->bindName(joiningTerm, name);
     }
+
+    // Expose all names in 'joining' branch.
+    expose_all_names(joining, *outerScope);
 }
 
 } // namespace circa
