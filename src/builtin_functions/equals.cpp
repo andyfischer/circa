@@ -7,14 +7,14 @@ namespace equals_function {
 
     void evaluate(Term* caller)
     {
-        Term *input0 = caller->input(0);
-        Term *input1 = caller->input(1);
-        if (input0->type != input1->type) {
+        Term *lhs = caller->input(0);
+        Term *rhs = caller->input(1);
+        if (lhs->type != rhs->type) {
             error_occurred(caller, "different types");
             return;
         }
 
-        Type &type = as_type(input0->type);
+        Type &type = as_type(lhs->type);
 
         if (type.equals == NULL) {
             std::stringstream error;
@@ -23,12 +23,21 @@ namespace equals_function {
             return;
         }
 
-        as_bool(caller) = type.equals(input0, input1);
+        as_bool(caller) = type.equals(lhs, rhs);
+    }
+
+    void evaluate_not(Term* caller)
+    {
+        evaluate(caller);
+
+        if (!caller->hasError)
+            as_bool(caller) = !as_bool(caller);
     }
 
     void setup(Branch& kernel)
     {
         import_function(kernel, evaluate, "equals(any,any) : bool");
+        import_function(kernel, evaluate_not, "not_equals(any,any) : bool");
     }
 }
 }

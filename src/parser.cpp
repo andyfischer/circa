@@ -894,6 +894,7 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "-=") return "sub";
     else if (infix == "*=") return "mult";
     else if (infix == "/=") return "div";
+    else if (infix == "!=") return "not_equals";
     else if (infix == ":") return "annotate_type";
     else if (infix == "<-") return "feedback";
     else return "#unrecognized";

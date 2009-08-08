@@ -139,10 +139,12 @@ void test_symbols2()
 void test_symbols3()
 {
     token::TokenList results;
-    token::tokenize("&&", results);
-    test_assert(results.size() == 1);
+    token::tokenize("&&!=", results);
+    test_assert(results.size() == 2);
     test_assert(results[0].text == "&&");
     test_assert(results[0].match == token::DOUBLE_AMPERSAND);
+    test_assert(results[1].text == "!=");
+    test_assert(results[1].match == token::NOT_EQUALS);
 }
 
 void test_keywords()
