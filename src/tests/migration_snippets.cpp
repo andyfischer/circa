@@ -71,9 +71,45 @@ void migrate_simple()
     test_migration("state i = 5", "state i = 4", "i == 5");
 }
 
+void migrate_across_user_defined_types()
+{
+    // Type T is defined the same way
+    test_migration("type T { int x } \n state T t = [1]",
+        "type T { int x } \n state T t = [2]",
+        "t.x == 1");
+
+    // Type T has the same data types, but with a different field name
+    test_migration("type T { int x } \n state T t = [1]",
+        "type T { int y } \n state T t = [2]",
+        "t.y == 1");
+}
+
+void migrate_misc()
+{
+    // This tests don't have a specific focus
+
+    // fixme
+    return;
+
+    test_migration("type Point { float x, float y }\n"
+                   "def get_ship_start_point() : Point\n return [50,50]\n end\n"
+                   "type Ship { Point loc, Point momentum, float facing }\n"
+                   "state Ship ship = [get_ship_start_point() [0 0] 0]\n"
+                   "ship = [[5 5] [1 1] 1]",
+
+                   "type Point { float x, float y }\n"
+                   "def get_ship_start_point() : Point\n return [50,50]\n end\n"
+                   "type Ship { Point loc, Point momentum, float facing }\n"
+                   "state Ship ship = [get_ship_start_point() [0 0] 0]\n",
+
+                   "ship.loc == [5 5], ship.momentum == [1 1], ship.facing == 1.0");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(migration_snippets::migrate_simple);
+    REGISTER_TEST_CASE(migration_snippets::migrate_across_user_defined_types);
+    REGISTER_TEST_CASE(migration_snippets::migrate_misc);
 }
 
 } // namespace migration_snippets
