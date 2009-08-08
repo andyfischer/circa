@@ -1,4 +1,4 @@
-// Copyright 2008 Andrew Fischer
+// Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
 #ifndef CIRCA__IF_BLOCK__INCLUDED
 #define CIRCA__IF_BLOCK__INCLUDED

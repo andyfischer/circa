@@ -1,4 +1,4 @@
-// Copyright 2009 Andrew Fischer
+// Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
 #ifndef CIRCA_STATIC_ERRORS_INCLUDED
 #define CIRCA_STATIC_ERRORS_INCLUDED

@@ -1,4 +1,4 @@
-// Copyright 2009 Andrew Fischer
+// Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
 #ifndef CIRCA_CPP_INTERFACE_INCLUDED
 #define CIRCA_CPP_INTERFACE_INCLUDED

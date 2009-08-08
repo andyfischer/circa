@@ -1,11 +1,8 @@
-// Copyright 2008 Andrew Fischer
+// Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
 #include "common_headers.h"
 
 #include "circa.h"
-#include "testing.h"
-#include "introspection.h"
-#include "runtime.h"
 
 namespace circa {
 namespace function_tests {

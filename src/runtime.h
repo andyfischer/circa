@@ -1,4 +1,4 @@
-// Copyright 2008 Andrew Fischer
+// Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
 #ifndef CIRCA_RUNTIME_INCLUDED
 #define CIRCA_RUNTIME_INCLUDED

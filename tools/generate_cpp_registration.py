@@ -68,7 +68,7 @@ def do_register_all_tests(directory, outputFile):
     write_text_file(outputFile, output)
 
 BUILTIN_FUNCTIONS_TEMPLATE = """
-// Copyright 2008 Andrew Fischer
+// Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
 // This file is generated during the build process.
 // You should probably not edit this file manually.
@@ -90,7 +90,7 @@ void setup_builtin_functions(Branch& kernel)
 """
 
 REGISTER_ALL_TESTS_TEMPLATE = """
-// Copyright 2008 Andrew Fischer
+// Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
 // This file is generated during the build process.
 // You should probably not edit this file manually.

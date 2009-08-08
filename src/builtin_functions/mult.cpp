@@ -1,5 +1,4 @@
-//
-// Copyright 2008 Andrew Fischer
+// Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
 #include "circa.h"
 

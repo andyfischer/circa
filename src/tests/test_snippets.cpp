@@ -1,4 +1,4 @@
-// Copyright 2009 Andrew Fischer
+// Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
 // In these tests, we have a bunch of "snippets" (small pieces of code). We execute
 // the code and then check that a list of assertions are true.

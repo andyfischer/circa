@@ -1,4 +1,4 @@
-// Copyright 2009 Andrew Fischer
+// Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
 #ifndef CIRCA_HOSTED_TYPES_INCLUDED
 #define CIRCA_HOSTED_TYPES_INCLUDED
