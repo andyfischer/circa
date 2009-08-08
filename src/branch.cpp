@@ -180,63 +180,69 @@ Branch::compile(std::string const& statement)
     return parser::compile(this, parser::statement_list, statement);
 }
 
-void Branch::alloc(Term* typeTerm, Term* term)
-{
-    Branch* branch = new Branch();
+namespace branch_t {
+    void alloc(Term* typeTerm, Term* term)
+    {
+        Branch* branch = new Branch();
 
-    // create a slot for each field
-    Type& type = as_type(typeTerm);
-    int numFields = type.numFields();
+        // create a slot for each field
+        Type& type = as_type(typeTerm);
+        int numFields = type.numFields();
 
-    for (int f=0; f < numFields; f++)
-        create_value(*branch, type.prototype[f]->type, type.prototype[f]->name);
+        for (int f=0; f < numFields; f++)
+            create_value(*branch, type.prototype[f]->type, type.prototype[f]->name);
 
-    term->value = branch;
-}
-
-void Branch::dealloc(Term* type, Term* term)
-{
-    delete (Branch*) term->value;
-}
-
-void Branch::assign(Term* sourceTerm, Term* destTerm)
-{
-    Branch& source = as_branch(sourceTerm);
-    Branch& dest = as_branch(destTerm);
-
-    // Assign terms as necessary
-    int lengthToAssign = std::min(source.length(), dest.length());
-
-    for (int i=0; i < lengthToAssign; i++) {
-        if (is_value_alloced(source[i]))
-            assign_value(source[i], dest[i]);
+        term->value = branch;
     }
 
-    // Add terms if necessary
-    for (int i=dest.length(); i < source.length(); i++) {
-        Term* t = create_duplicate(dest, source[i]);
-        if (source[i]->name != "")
-            dest.bindName(t, source[i]->name);
+    void dealloc(Term* type, Term* term)
+    {
+        delete (Branch*) term->value;
     }
 
-    // Remove terms if necessary
-    for (int i=source.length(); i < dest.length(); i++) {
-        dest[i] = NULL;
+    void assign(Term* sourceTerm, Term* destTerm)
+    {
+        Branch& source = as_branch(sourceTerm);
+        Branch& dest = as_branch(destTerm);
+
+        // Assign terms as necessary
+        int lengthToAssign = std::min(source.length(), dest.length());
+
+        for (int i=0; i < lengthToAssign; i++) {
+            if (is_value_alloced(source[i]))
+                assign_value(source[i], dest[i]);
+        }
+
+        // Add terms if necessary
+        for (int i=dest.length(); i < source.length(); i++) {
+            Term* t = create_duplicate(dest, source[i]);
+            if (source[i]->name != "")
+                dest.bindName(t, source[i]->name);
+        }
+
+        // Remove terms if necessary
+        for (int i=source.length(); i < dest.length(); i++) {
+            dest[i] = NULL;
+        }
+
+        dest.removeNulls();
     }
 
-    dest.removeNulls();
-}
+    void hosted_remap_pointers(Term* caller, ReferenceMap const& map)
+    {
+        as_branch(caller).remapPointers(map);
+    }
 
-void
-Branch::hosted_remap_pointers(Term* caller, ReferenceMap const& map)
-{
-    as_branch(caller).remapPointers(map);
+    void equals(Term* lhs, Term* rhs)
+    {
+        // TODO
+    }
 }
 
 bool is_branch(Term* term)
 {
     return (term->type != NULL) &&
-        (as_type(term->type).alloc == Branch::alloc);
+        (as_type(term->type).alloc == branch_t::alloc);
 }
 
 Branch& as_branch(Term* term)

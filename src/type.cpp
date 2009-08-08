@@ -56,7 +56,7 @@ bool is_native_type(Term* type)
 
 bool is_compound_type(Term* type)
 {
-    return as_type(type).alloc == Branch::alloc;
+    return as_type(type).alloc == branch_t::alloc;
 }
 
 Type& as_type(Term *term)
@@ -212,10 +212,10 @@ Term* create_empty_type(Branch& branch, std::string name)
 void initialize_compound_type(Term* term)
 {
     Type& type = as_type(term);
-    type.alloc = Branch::alloc;
-    type.dealloc = Branch::dealloc;
-    type.assign = Branch::assign;
-    type.remapPointers = Branch::hosted_remap_pointers;
+    type.alloc = branch_t::alloc;
+    type.dealloc = branch_t::dealloc;
+    type.assign = branch_t::assign;
+    type.remapPointers = branch_t::hosted_remap_pointers;
     type.toString = compound_type_to_string;
 }
 
