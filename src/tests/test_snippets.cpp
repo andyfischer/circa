@@ -71,8 +71,9 @@ void equals_snippets()
     test_snippet("", "'hello' != 'bye'");
     test_snippet("", "true == true");
     test_snippet("", "false != true");
-    //test_snippet("", "[1 1] == [1 1]");
-    //test_snippet("", "[1 1] != [1 2]");
+    test_snippet("", "[1 1] == [1 1]");
+    test_snippet("", "[1 1] != [1 2]");
+    test_snippet("", "[1 1 1] != [1 1]");
 }
 
 void register_tests()

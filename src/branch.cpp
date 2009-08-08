@@ -233,9 +233,21 @@ namespace branch_t {
         as_branch(caller).remapPointers(map);
     }
 
-    void equals(Term* lhs, Term* rhs)
+    bool equals(Term* lhsTerm, Term* rhsTerm)
     {
-        // TODO
+        Branch& lhs = as_branch(lhsTerm);
+        Branch& rhs = as_branch(rhsTerm);
+
+        if (lhs.length() != rhs.length())
+            return false;
+
+        for (int i=0; i < lhs.length(); i++) {
+
+            if (!circa::equals(lhs[i], rhs[i]))
+                return false;
+        }
+
+        return true;
     }
 }
 
