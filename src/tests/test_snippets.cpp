@@ -69,6 +69,10 @@ void equals_snippets()
     test_snippet("", "4.0 != 5.0");
     test_snippet("", "'hello' == 'hello'");
     test_snippet("", "'hello' != 'bye'");
+    test_snippet("", "true == true");
+    test_snippet("", "false != true");
+    //test_snippet("", "[1 1] == [1 1]");
+    //test_snippet("", "[1 1] != [1 2]");
 }
 
 void register_tests()
