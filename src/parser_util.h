@@ -1,3 +1,5 @@
+// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
+
 #ifndef CIRCA_PARSER_UTIL_INCLUDED
 #define CIRCA_PARSER_UTIL_INCLUDED
 

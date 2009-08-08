@@ -1,3 +1,5 @@
+// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
+
 #ifndef CIRCA_REFERENCE_MAP_INCLUDED
 #define CIRCA_REFERENCE_MAP_INCLUDED
 

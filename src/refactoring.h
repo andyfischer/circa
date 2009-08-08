@@ -1,4 +1,4 @@
-// Copyright 2008 Paul Hodge
+// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
 #ifndef CIRCA_REFACTORING_INCLUDED
 #define CIRCA_REFACTORING_INCLUDED

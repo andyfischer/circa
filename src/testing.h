@@ -1,4 +1,4 @@
-// Copyright 2008 Paul Hodge
+// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
 #ifndef CIRCA_TESTING_INCLUDED
 #define CIRCA_TESTING_INCLUDED

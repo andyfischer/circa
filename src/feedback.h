@@ -1,4 +1,4 @@
-// Copyright 2009 Paul Hodge
+// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
 #ifndef CIRCA_TRAINING_INCLUDED
 #define CIRCA_TRAINING_INCLUDED
