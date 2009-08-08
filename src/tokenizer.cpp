@@ -383,6 +383,15 @@ void top_level_consume_token(TokenizeContext &context)
             }
             context.push(SLASH);
             return;
+        case '!':
+            if (context.next(1) == '=') {
+                context.consume();
+                context.consume();
+                context.push(NOT_EQUALS);
+                return;
+            }
+            break;
+
         case ':':
             context.consume();
             if (context.next() == '=') {
