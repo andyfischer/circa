@@ -145,7 +145,7 @@ std::string to_string(Term* term);
 void assign_value(Term* source, Term* dest);
 void assign_value_to_default(Term* term);
 
-Term* declare_type(Branch* branch, std::string const& decl);
+Term* declare_type(Branch& branch, std::string const& decl);
 
 } // namespace circa
 

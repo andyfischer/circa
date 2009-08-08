@@ -1,27 +1,46 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
+#include <sys/stat.h>
+
 #include <circa.h>
 
 namespace circa {
 namespace include_function {
 
+    time_t get_modified_time(std::string const& filename)
+    {
+        struct stat s;
+        s.st_mtime = 0;
+
+        stat(filename.c_str(), &s);
+
+        return s.st_mtime;
+    }
+
+    void possibly_expand(Term* caller)
+    {
+        Term* state = caller->input(0);
+        std::string &prev_filename = state->field(0)->asString();
+        int &prev_modified = state->field(1)->asInt();
+
+        std::string &requested_filename = caller->input(1)->asString();
+
+        time_t modifiedTime = get_modified_time(requested_filename);
+
+        if (requested_filename != prev_filename
+                || prev_modified != modifiedTime) {
+            prev_filename = requested_filename;
+            prev_modified = modifiedTime;
+
+            Branch& contents = as_branch(caller);
+            contents.clear();
+            parse_script(contents, requested_filename);
+        }
+    }
+
     void evaluate(Term* caller)
     {
-        std::string filename = caller->input(0)->asString();
-
-        filename = get_source_file_location(*caller->owningBranch) + "/" + filename;
-
-        Branch& result = as_branch(caller);
-
-        Term* existing_source_file = get_branch_attribute(result, "source-file");
-
-        if (existing_source_file == NULL || (filename != existing_source_file->asString())) {
-            result.clear();
-            parse_script(result, filename);
-        }
-
-        assert(get_branch_attribute(result, "source-file")->asString() == filename);
-
+        possibly_expand(caller);
         evaluate_branch(as_branch(caller));
     }
 
@@ -32,7 +51,9 @@ namespace include_function {
 
     void setup(Branch& kernel)
     {
-        INCLUDE_FUNC = import_function(kernel, evaluate, "include(string filename) : Branch");
+        declare_type(kernel, "type _include_state { string filename, int time_modified }");
+        INCLUDE_FUNC = import_function(kernel, evaluate,
+                "include(state _include_state, string filename) : Branch");
         function_t::get_to_source_string(INCLUDE_FUNC) = toSourceString;
     }
 }

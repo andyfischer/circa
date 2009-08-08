@@ -426,9 +426,9 @@ void assign_value_to_default(Term* term)
     // TODO: default values for other types
 }
 
-Term* declare_type(Branch* branch, std::string const& decl)
+Term* declare_type(Branch& branch, std::string const& decl)
 {
-    return parser::compile(branch, parser::type_decl, decl);
+    return parser::compile(&branch, parser::type_decl, decl);
 }
 
 } // namespace circa

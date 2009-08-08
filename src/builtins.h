@@ -74,6 +74,11 @@ namespace dict_t {
     std::string to_string(Branch& branch);
 }
 
+// this is implemented in builtin_functions/include.cpp
+namespace include_function {
+    void possibly_expand(Term* caller);
+}
+
 } // namespace circa
 
 #endif
