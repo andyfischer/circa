@@ -824,10 +824,7 @@ Term* include_statement(Branch& branch, TokenStream& tokens)
 
     Term* result = apply(branch, INCLUDE_FUNC, RefList(filenameTerm));
 
-    // this code is duplicated inside builtin_functions/include.cpp
-    filename = get_source_file_location(branch) + "/" + filename;
-
-    parse_script(as_branch(result), filename);
+    include_function::possibly_expand(result);
 
     expose_all_names(as_branch(result), branch);
 
