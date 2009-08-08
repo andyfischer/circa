@@ -294,6 +294,12 @@ void reproduce_dot_expressions() {
     finish_source_repro_category();
 }
 
+void reproduce_unary() {
+    round_trip_source("a = 1; -a");
+    round_trip_source("a = 1.0; -a");
+    finish_source_repro_category();
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);
@@ -311,6 +317,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_misc_blocks);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_with_parse_errors);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_dot_expressions);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_unary);
 }
 
 } // namespace source_repro_snippets
