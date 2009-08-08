@@ -155,18 +155,17 @@ int main( int argc, char* args[] )
         return 1;
     }
 
-    // Load user's script
-    USERS_BRANCH = &SCRIPT_ROOT->get("users_branch")->asBranch();
+    // Inject the requested filename, so that the user's script will be loaded
+    String user_script_filename(*SCRIPT_ROOT, "user_script_filename", "");
+    if (argc > 1)
+        user_script_filename = args[1];
+    Term* users_branch = SCRIPT_ROOT->get("users_branch");
+    include_function::possibly_expand(users_branch);
+    USERS_BRANCH = &users_branch->asBranch();
 
-    if (argc > 1) {
-        std::string filename = args[1];
-        std::cout << "Loading file: " << filename << std::endl;
-        parse_script(*USERS_BRANCH, filename);
-
-        if (has_static_errors(*USERS_BRANCH)) {
-            print_static_errors_formatted(*USERS_BRANCH, std::cout);
-            return 1;
-        }
+    if (has_static_errors(*USERS_BRANCH)) {
+        print_static_errors_formatted(*USERS_BRANCH, std::cout);
+        return 1;
     }
 
     // Try to initialize display
