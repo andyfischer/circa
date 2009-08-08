@@ -1,7 +1,7 @@
 The goal of this project is to create a programming environment that is fun and efficient,
 where you can directly see and interact with the code you are editing.
 
-There are two elements: Circa, a programming language; and Cuttlefish, a cross-platform
+There are two elements: Circa, a programming language; and Plastic, a cross-platform
 graphical tool for creating Circa code.
 
 Features of Circa are:

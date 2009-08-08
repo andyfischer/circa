@@ -185,5 +185,5 @@ SDL_ROOT.Append(LIBS = [circa_staticlib])
 
 Export('SDL_ROOT')
 
-# Cuttlefish
-SConscript('cuttlefish/build.scons')
+# Build Plastic project
+SConscript('plastic/build.scons')

@@ -14,9 +14,8 @@ def get_source_files(dir):
         result.append(full_path)
     return result
 
-binary = SDL_ROOT.Program("#build/bin/cfish", source = get_source_files('src'))
-SDL_ROOT.Alias('cuttlefish', binary)
-SDL_ROOT.Alias('cfish', binary)
+binary = SDL_ROOT.Program("#build/bin/plas", source = get_source_files('src'))
+SDL_ROOT.Alias('plastic', binary)
 
 if WINDOWS:
     # Embed manifest
