@@ -75,12 +75,15 @@ struct Branch
 
     std::string toString();
 
-    // Hosted functions
-    static void alloc(Term* type, Term* t);
-    static void dealloc(Term* type, Term* t);
-    static void assign(Term* source, Term* dest);
-    static void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
 };
+
+// Hosted functions
+namespace branch_t {
+    void alloc(Term* type, Term* t);
+    void dealloc(Term* type, Term* t);
+    void assign(Term* source, Term* dest);
+    void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
+}
 
 bool is_branch(Term* term);
 Branch& as_branch(Term* term);
