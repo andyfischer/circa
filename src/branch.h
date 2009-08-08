@@ -81,7 +81,8 @@ struct Branch
 namespace branch_t {
     void alloc(Term* type, Term* t);
     void dealloc(Term* type, Term* t);
-    void assign(Term* source, Term* dest);
+    void assign(Term*, Term*);
+    bool equals(Term*, Term*);
     void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
 }
 

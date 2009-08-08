@@ -88,9 +88,6 @@ void migrate_misc()
 {
     // This tests don't have a specific focus
 
-    // fixme
-    return;
-
     test_migration("type Point { float x, float y }\n"
                    "def get_ship_start_point() : Point\n return [50,50]\n end\n"
                    "type Ship { Point loc, Point momentum, float facing }\n"
@@ -102,7 +99,7 @@ void migrate_misc()
                    "type Ship { Point loc, Point momentum, float facing }\n"
                    "state Ship ship = [get_ship_start_point() [0 0] 0]\n",
 
-                   "ship.loc == [5 5], ship.momentum == [1 1], ship.facing == 1.0");
+                   "ship.loc == [5.0 5.0], ship.momentum == [1.0 1.0], ship.facing == 1.0");
 }
 
 void register_tests()

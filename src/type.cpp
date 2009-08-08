@@ -216,6 +216,7 @@ void initialize_compound_type(Term* term)
     type.dealloc = branch_t::dealloc;
     type.assign = branch_t::assign;
     type.remapPointers = branch_t::hosted_remap_pointers;
+    type.equals = branch_t::equals;
     type.toString = compound_type_to_string;
 }
 
