@@ -69,6 +69,10 @@ void test_migration(std::string sourceCode, std::string destinationCode, std::st
 void migrate_simple()
 {
     test_migration("state i = 5", "state i = 4", "i == 5");
+
+    // Test specializing the destination type
+    test_migration("state i = 5", "state any i", "i == 5");
+    test_migration("state List i = [] \n i.append(1)", "state any i", "i == [1]");
 }
 
 void migrate_across_user_defined_types()
