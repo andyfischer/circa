@@ -124,7 +124,9 @@ void main_loop()
     // Update the screen
     SDL_GL_SwapBuffers();
 
-    SDL_Delay(5);
+    // Delay to limit framerate to 60 FPS
+    if (TIME_DELTA < (1.0 / 60.0))
+        SDL_Delay((1.0 / 60.0) - TIME_DELTA);
 }
 
 int main( int argc, char* args[] )

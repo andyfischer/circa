@@ -34,9 +34,10 @@ type Bullet {
 state Ship ship = [get_ship_start_point() [0 0] 0]
 state List bullets = []
 rotation_speed = 0.9
-acceleration_rate = 0.1
-speed_limit = 1.5
-bullet_speed = 2.0
+acceleration_rate = 0.015
+ship_drag = 0.995
+speed_limit = .6
+bullet_speed = 1.4
 bullet_width = 2.0
 
 --tweak.button(&bullet_speed, [5 50], 0.1)
@@ -65,6 +66,9 @@ end
 if key_down(UP)
     ship.momentum = ship.momentum + [cos(ship.facing) sin(ship.facing)] * acceleration_rate
 end
+
+-- Add drag
+ship.momentum = ship.momentum * ship_drag
 
 -- Enforce a speed limit on ship.momentum
 speed = magnitude(ship.momentum)
@@ -98,3 +102,4 @@ for bullet in bullets
     gl.line_loop(points #fff)
     --print('drawing bullet:' bullet)
 end
+
