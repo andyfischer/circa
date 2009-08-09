@@ -3,6 +3,8 @@ WINDOW_WIDTH = 300
 WINDOW_HEIGHT = 300
 WINDOW_TITLE = 'asteroids.ca'
 
+background(#000)
+
 -- Convenience function: polar to cartesian
 def p2c(float angle, float radius, Point center) : Point
   return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
@@ -18,27 +20,26 @@ def get_ship_start_point() : Point
 end
 
 type Ship {
-   Point loc
-   Point momentum
-   float facing
+    Point loc,
+    Point momentum,
+    float facing
 }
 
 type Bullet {
-   float lifespan
-   Point loc
-   Point momentum
+    float lifespan,
+    Point loc,
+    Point momentum
 }
-
 
 state Ship ship = [get_ship_start_point() [0 0] 0]
 state List bullets = []
 rotation_speed = 0.9
 acceleration_rate = 0.1
 speed_limit = 1.5
-bullet_speed = 4.0
+bullet_speed = 2.0
 bullet_width = 2.0
 
-background(#000)
+--tweak.button(&bullet_speed, [5 50], 0.1)
 
 -- Draw the ship
 begin
@@ -76,18 +77,24 @@ ship.loc = ship.loc + ship.momentum
 
 -- Press space to shoot a bullet
 if key_pressed(SPACE)
-    bullets.append([0 ship.loc [cos(ship.facing) sin(ship.facing)]] * bullet_speed)
+    bullets.append([0, ship.loc [cos(ship.facing) sin(ship.facing)] * bullet_speed] : Bullet)
 end
 
 -- Move bullets
--- todo
+def move_bullet(Bullet bullet) : Bullet
+    return [bullet.lifespan+time_delta, bullet.loc + bullet.momentum,
+        bullet.momentum]
+end
+
+map(move_bullet, @bullets)
 
 -- Draw bullets
 for bullet in bullets
     bullet = bullet : Bullet
-    gl.line_loop([bullet.loc + [-bullet_width, -bullet_width],
+    points = [bullet.loc + [-bullet_width, -bullet_width],
                   bullet.loc + [bullet_width, -bullet_width],
                   bullet.loc + [bullet_width, bullet_width],
-                  bullet.loc + [-bullet_width, bullet_width]] #fff)
+                  bullet.loc + [-bullet_width, bullet_width]]
+    gl.line_loop(points #fff)
     --print('drawing bullet:' bullet)
 end

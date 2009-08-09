@@ -31,7 +31,7 @@ end
 
 -- TODO: put this in a separate file
 namespace tweak
-    def button(ref r, Point loc)
+    def button(ref r, Point loc, float step)
         text = concat(r.name ' = ' r.to_string)
 
         text_sprite = render_text(ui_font_medium, text, #000)
@@ -44,9 +44,9 @@ namespace tweak
         draw_rendered_text(text_sprite, loc.x, loc.y)
 
         if mouse_wheel_up(rect)
-            r.assign(r.asint - 5)
+            r.assign(r.asfloat - step)
         elif mouse_wheel_down(rect)
-            r.assign(r.asint + 5)
+            r.assign(r.asfloat + step)
         end
     end
 end

@@ -145,6 +145,9 @@ void draw_rendered_text(Term* caller)
     glVertex3f(x, y + output.height(),0);
 
     glEnd();
+
+    // reset state
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void initialize(circa::Branch& branch)
