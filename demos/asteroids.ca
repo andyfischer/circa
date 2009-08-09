@@ -89,4 +89,5 @@ for bullet in bullets
                   bullet.loc + [bullet_width, -bullet_width],
                   bullet.loc + [bullet_width, bullet_width],
                   bullet.loc + [-bullet_width, bullet_width]] #fff)
+    --print('drawing bullet:' bullet)
 end

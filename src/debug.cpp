@@ -64,4 +64,9 @@ void dump_branch(Branch& branch)
     std::cout << branch_to_string_raw(branch);
 }
 
+void dump_branch_with_props(Branch& branch)
+{
+    std::cout << branch_to_string_raw_with_properties(branch);
+}
+
 } // namespace circa

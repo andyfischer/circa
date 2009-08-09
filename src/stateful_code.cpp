@@ -119,7 +119,7 @@ void migrate_stateful_values(Branch& source, Branch& dest)
             continue;
 
         // At this point, they match
-
+        
         // If both terms are subroutine calls, and the source call is expanded, then
         // expand the dest call as well.
         if (is_subroutine(sourceTerm->function) && is_subroutine(destTerm->function))
@@ -137,8 +137,8 @@ void migrate_stateful_values(Branch& source, Branch& dest)
         }
 
         // Migrate inner branches (but not branches that should be treated as values)
-        if (is_branch(sourceTerm) && !is_stateful(sourceTerm)) {
-            assert(is_branch(destTerm));
+        if (is_branch(sourceTerm) && !is_stateful(sourceTerm)
+                && is_branch(destTerm)) {
             migrate_stateful_values(as_branch(sourceTerm), as_branch(destTerm));
         } 
         
