@@ -5,20 +5,6 @@ WINDOW_TITLE = 'asteroids.ca'
 
 background(#000)
 
--- Convenience function: polar to cartesian
-def p2c(float angle, float radius, Point center) : Point
-  return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
-end
-
--- Convenience function: magnitude of a 2d vector
-def magnitude(Point point) : float
-    return sqrt(sqr(point.x) + sqr(point.y))
-end
-
-def get_ship_start_point() : Point
-    return [WINDOW_WIDTH/2 WINDOW_HEIGHT/2]
-end
-
 type Ship {
     Point loc,
     Point momentum,
@@ -31,13 +17,13 @@ type Bullet {
     Point momentum
 }
 
-state Ship ship = [get_ship_start_point() [0 0] 0]
+state Ship ship = [[WINDOW_WIDTH/2 WINDOW_HEIGHT/2] [0 0] 0]
 state List bullets = []
+accelration_per_s = 5.0
 rotation_speed = 0.9
-acceleration_rate = 0.015
-ship_drag = 0.995
-speed_limit = .6
-bullet_speed = 1.4
+ship_drag = 0.991
+speed_limit = 1.8
+bullet_speed = 3.0
 bullet_width = 2.0
 
 --tweak.button(&bullet_speed, [5 50], 0.1)
@@ -45,7 +31,7 @@ bullet_width = 2.0
 -- Draw the ship
 begin
     def ship_point(float rot, float dist) : Point
-        return p2c(rot + ship.facing, dist, ship.loc)
+        return polar(rot + ship.facing, dist, ship.loc)
     end
     front_dist = 10.0
     back_dist = 2.0
@@ -56,16 +42,23 @@ begin
 end
 
 -- Keyboard controls for rotation
+rotation = 0.0
 if key_down(LEFT)
-    ship.facing = ship.facing - rotation_speed * time_delta
+    rotation = -1
 elif key_down(RIGHT)
-    ship.facing = ship.facing + rotation_speed * time_delta
+    rotation = 1
 end
+ship.facing = ship.facing + rotation * rotation_speed * time_delta
 
 -- Keyboard controls for acceleration
+thrust = 0
 if key_down(UP)
-    ship.momentum = ship.momentum + [cos(ship.facing) sin(ship.facing)] * acceleration_rate
+    thrust = 1
+elif key_down(DOWN)
+    thrust = -1
 end
+
+ship.momentum = ship.momentum + [cos(ship.facing) sin(ship.facing)] * thrust * accelration_per_s * time_delta
 
 -- Add drag
 ship.momentum = ship.momentum * ship_drag
@@ -100,6 +93,4 @@ for bullet in bullets
                   bullet.loc + [bullet_width, bullet_width],
                   bullet.loc + [-bullet_width, bullet_width]]
     gl.line_loop(points #fff)
-    --print('drawing bullet:' bullet)
 end
-
