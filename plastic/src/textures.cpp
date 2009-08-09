@@ -62,6 +62,9 @@ GLuint load_surface_to_texture(SDL_Surface *surface)
             surface->w, surface->h, 0,
             get_texture_format(surface), GL_UNSIGNED_BYTE, surface->pixels);
 
+    // reset state
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     return texid;
 }
 
@@ -108,6 +111,9 @@ void hosted_image(Term* caller)
     glVertex3f(x1, y2,0);
 
     glEnd();
+
+    // reset state
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void initialize(circa::Branch& branch)
