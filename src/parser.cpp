@@ -363,8 +363,11 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     // If the #out term doesn't have the same type as the declared type, then coerce it
     Term* outTerm = contents[contents.length()-1];
-    if (outTerm->type != outputType)
-        outTerm = apply(contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType), "#out");
+    if (outTerm->type != outputType) {
+        outTerm = apply(contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType),
+                        OUTPUT_PLACEHOLDER_NAME);
+        set_source_hidden(outTerm, true);
+    }
 
     result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
@@ -419,7 +422,7 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
     initialize_compound_type(result);
     Type& type = as_type(result);
 
-    possible_whitespace_or_newline(tokens);
+    result->stringProp("syntaxHints:preLBracketWhitespace") = possible_whitespace_or_newline(tokens);
 
     if (!tokens.nextIs(LBRACE) && !tokens.nextIs(LBRACKET))
         return compile_error_for_line(result, tokens, startPosition);
@@ -428,8 +431,12 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
 
     tokens.consume();
 
+    result->stringProp("syntaxHints:postLBracketWhitespace") = possible_whitespace_or_newline(tokens);
+
+    Branch& prototype = type.prototype;
+
     while (!tokens.nextIs(closingToken)) {
-        possible_whitespace_or_newline(tokens);
+        std::string preWs = possible_whitespace_or_newline(tokens);
 
         if (tokens.nextIs(closingToken))
             break;
@@ -438,21 +445,22 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
             return compile_error_for_line(result, tokens, startPosition);
 
         std::string fieldTypeName = tokens.consume(IDENTIFIER);
-        possible_whitespace(tokens);
+
+        std::string postNameWs = possible_whitespace(tokens);
 
         std::string fieldName;
 
         if (tokens.nextIs(IDENTIFIER))
             fieldName = tokens.consume(IDENTIFIER);
 
-        possible_whitespace_or_newline(tokens);
 
         Term* fieldType = find_type(branch, fieldTypeName);
 
-        type.addField(fieldType, fieldName);
+        Term* field = create_value(prototype, fieldType, fieldName);
 
-        if (tokens.nextIs(COMMA))
-            tokens.consume(COMMA);
+        field->stringProp("syntaxHints:preWhitespace") = preWs;
+        field->stringProp("syntaxHints:postNameWs") = postNameWs;
+        field->stringProp("syntaxHints:postWhitespace") = possible_statement_ending(tokens);
     }
 
     tokens.consume(closingToken);

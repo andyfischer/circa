@@ -250,6 +250,7 @@ void reproduce_subroutine() {
 void reproduce_type_decl() {
     round_trip_source("type mytype { int a }");
     round_trip_source("type mytype { int a, float b }");
+    round_trip_source("type mytype { int   a, float     b }");
     round_trip_source("type mytype { \n int a, float b }");
     round_trip_source("type mytype { int a\nfloat b }");
     round_trip_source("type mytype { int a,\nfloat b }");

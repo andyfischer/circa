@@ -68,11 +68,6 @@ struct Type
     {
     }
 
-    void addField(Term* type, std::string const& name)
-    {
-        create_value(prototype, type, name);
-    }
-
     Term* operator[](std::string const& fieldName) {
         return prototype[fieldName];
     }
