@@ -276,18 +276,21 @@ namespace type_t {
         // Generate source for a Type declaration
         std::stringstream out;
 
-        out << "type " << term->name << " { ";
+        out << "type " << term->name;
+        out << term->stringPropOptional("syntaxHints:preLBracketWhitespace", " ");
+        out << "{";
+        out << term->stringPropOptional("syntaxHints:postLBracketWhitespace", " ");
 
         for (int i=0; i < type.prototype.length(); i++) {
             Term* field = type.prototype[i];
             assert(field != NULL);
-            if (i != 0) out << ", ";
             out << field->stringPropOptional("syntaxHints:preWhitespace","");
-            out << field->type->name << " ";
+            out << field->type->name;
+            out << field->stringPropOptional("syntaxHints:postNameWs"," ");
             out << field->name;
             out << field->stringPropOptional("syntaxHints:postWhitespace","");
         }
-        out << " }";
+        out << "}";
 
         return out.str();
     }
