@@ -1,0 +1,36 @@
+
+Operator-to-function map:
+
+| + | add |
+| - | sub |
+| * | mult |
+| / | div |
+| // | div_i |
+| % | mod |
+| < | less_than |
+| <= | less_than_eq |
+| > | greater_than |
+| >= | greater_than_eq |
+| == | equals |
+| || | or |
+| && | and |
+| := | assign |
+| += | add (rebind) |
+| -= | sub (rebind) |
+| *= | mult (rebind) |
+| /= | div (rebind) |
+| != | not_equals |
+| : | annotate_type |
+| <- | feedback |
+
+Precedence:
+
+| 8 | : |
+| 7 | * / // % |
+| 6 | + - |
+| 5 | < <= > >= == != |
+| 4 | && || |
+| 2 | += -= *= /= |
+| 1 | <- |
+| 0 | := |
+
