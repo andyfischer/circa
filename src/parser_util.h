@@ -1,5 +1,7 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
+// parser_util.cpp : Various utility functions used by the parser
+
 #ifndef CIRCA_PARSER_UTIL_INCLUDED
 #define CIRCA_PARSER_UTIL_INCLUDED
 

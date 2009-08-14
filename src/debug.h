@@ -1,5 +1,8 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
+// Various code for debugging purposes. This code shouldn't have an effect on a
+// release build.
+
 #ifndef CIRCA_DEBUG_INCLUDED
 #define CIRCA_DEBUG_INCLUDED
 

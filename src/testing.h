@@ -1,5 +1,7 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
+// testing.cpp : A mini-framework for running unit tests.
+
 #ifndef CIRCA_TESTING_INCLUDED
 #define CIRCA_TESTING_INCLUDED
 
@@ -32,15 +34,10 @@ struct TestCase {
     TestExecuteFunction execute;
     bool failed;
 
-    TestCase()
-      : execute(NULL), failed(false)
-    {
-    }
+    TestCase() : execute(NULL), failed(false) { }
 
     TestCase(std::string const& _name, TestExecuteFunction _execute)
-      : name(_name), execute(_execute), failed(false)
-    {
-    }
+      : name(_name), execute(_execute), failed(false) { }
 };
 
 extern std::vector<TestCase> gTestCases;

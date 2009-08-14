@@ -6,11 +6,6 @@ namespace circa {
 
 std::string SOURCE_FILE_ATTR = "#attr:source-file";
 
-Branch::Branch()
-  : owningTerm(NULL)
-{
-}
-
 Branch::~Branch()
 {
     names.clear();

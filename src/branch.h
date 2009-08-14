@@ -21,7 +21,7 @@ struct Branch
     // Points to the Term which owns this branch as a value.
     Term* owningTerm;
 
-    Branch();
+    Branch() : owningTerm(NULL) {}
     ~Branch();
 
     Branch& operator=(Branch const& b);
@@ -74,7 +74,6 @@ struct Branch
     Term* eval(std::string const& statement);
 
     std::string toString();
-
 };
 
 // Hosted functions
