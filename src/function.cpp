@@ -10,7 +10,7 @@ namespace function_t {
         return "<Function " + function_t::get_name(term) + ">";
     }
 
-    bool check_invariants(Term* func, std::stringstream* output)
+    bool check_invariants(Term* func, std::string* failureMessage)
     {
         if (!is_subroutine(func))
             return true;
@@ -21,8 +21,8 @@ namespace function_t {
         if (contents.contains(OUTPUT_PLACEHOLDER_NAME)
                 && contents[contents.length()-1]->name != OUTPUT_PLACEHOLDER_NAME) {
 
-            if (output != NULL)
-                *output << "#out is bound, but the last term isn't named #out";
+            if (failureMessage != NULL)
+                *failureMessage = "#out is bound, but the last term isn't named #out";
             return false;
         }
 

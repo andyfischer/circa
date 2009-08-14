@@ -43,6 +43,7 @@ struct Type
     EqualsFunc equals;
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
+    CheckInvariantsFunc checkInvariants;
     
     Branch prototype;
 
@@ -62,7 +63,8 @@ struct Type
         dealloc(NULL),
         equals(NULL),
         remapPointers(NULL),
-        toString(NULL)
+        toString(NULL),
+        checkInvariants(NULL)
     {
     }
 
@@ -135,7 +137,7 @@ void initialize_compound_type(Term* term);
 
 std::string compound_type_to_string(Term* caller);
 
-// Functions which are dispatched based on type
+// Functions which are dispatched based on type:
 bool is_value_alloced(Term* term);
 void alloc_value(Term* term);
 void dealloc_value(Term* term);
@@ -144,6 +146,7 @@ bool equals(Term* a, Term* b);
 std::string to_string(Term* term);
 void assign_value(Term* source, Term* dest);
 void assign_value_to_default(Term* term);
+bool check_invariants(Term* term, std::string* failureMessage = NULL);
 
 Term* declare_type(Branch& branch, std::string const& decl);
 

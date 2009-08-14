@@ -219,6 +219,7 @@ void bootstrap_kernel()
     // Create Function type
     FUNCTION_TYPE = create_compound_type(*KERNEL, "Function");
     as_type(FUNCTION_TYPE).toString = subroutine_t::to_string;
+    as_type(FUNCTION_TYPE).checkInvariants = function_t::check_invariants;
 
     // Create Branch type
     BRANCH_TYPE = create_compound_type(*KERNEL, "Branch");

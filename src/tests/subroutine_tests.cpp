@@ -177,5 +177,4 @@ void register_tests()
 }
 
 } // namespace refactoring_tests
-
 } // namespace circa

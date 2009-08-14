@@ -61,7 +61,7 @@ void _test_assert_function(Branch& branch, int line, const char* file)
         std::string message;
 
         if (is_subroutine(term))
-            result = function_t::check_invariants(term, NULL);
+            result = function_t::check_invariants(term, &message);
 
         if (!result) {
             std::stringstream msg;
