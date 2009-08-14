@@ -64,10 +64,7 @@ bool is_hidden(Term* term)
     if (term->name == "")
         return false;
 
-    if (term->name == OUTPUT_PLACEHOLDER_NAME)
-        return false;
-
-    if (term->name[0] == '#')
+    if (term->name[0] == '#' && term->name != "#out")
         return true;
 
     return false;
@@ -80,7 +77,7 @@ bool should_print_term_source_line(Term* term)
 
 void prepend_name_binding(Term* term, std::stringstream& out)
 {
-    if (term->name == OUTPUT_PLACEHOLDER_NAME)
+    if (term->name == "#out")
         out << "return ";
     else if (term->name == "")
         return;
