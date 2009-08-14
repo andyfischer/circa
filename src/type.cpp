@@ -362,7 +362,7 @@ void dealloc_value(Term* term)
     Type& type = as_type(term->type);
 
     if (!is_value_alloced(term->type)) {
-        std::cout << "warning in dealloc_value, type is undefined" << std::endl;
+        std::cout << "warn: in dealloc_value, type is undefined" << std::endl;
         term->value = NULL;
         return;
     }
@@ -424,6 +424,14 @@ void assign_value_to_default(Term* term)
         as_ref(term) = NULL;
 
     // TODO: default values for other types
+}
+
+bool check_invariants(Term* term, std::string* failureMessage)
+{
+    if (as_type(term->type).checkInvariants == NULL)
+        return true;
+
+    return as_type(term->type).checkInvariants(term, failureMessage);
 }
 
 Term* declare_type(Branch& branch, std::string const& decl)

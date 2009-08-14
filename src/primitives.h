@@ -21,7 +21,7 @@ typedef std::string (*ToStringFunc)(Term* term);
 typedef void (*EvaluateFunc)(Term* caller);
 typedef Term* (*SpecializeTypeFunc)(Term* caller);
 typedef std::string (*ToSourceStringFunc)(Term* term);
-typedef bool (*CheckInvariantsFunc)(Term* term, std::stringstream* output);
+typedef bool (*CheckInvariantsFunc)(Term* term, std::string* output);
 
 extern Term* ANY_TYPE;
 extern Term* BOOL_TYPE;

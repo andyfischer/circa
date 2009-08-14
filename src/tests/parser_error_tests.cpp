@@ -96,6 +96,7 @@ void register_every_possible_parse_error()
     register_input("a = [1]; a[0");
     register_input("a()");
     register_input("a = 1; a()");
+    register_input("def func() : NonexistantType end");
 }
 
 void test_every_parse_error()
