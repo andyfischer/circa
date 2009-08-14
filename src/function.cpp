@@ -18,8 +18,7 @@ namespace function_t {
         Branch& contents = as_branch(func);
 
         // If the subroutine has an #out term, then it must be the last one
-        if (contents.contains(OUTPUT_PLACEHOLDER_NAME)
-                && contents[contents.length()-1]->name != OUTPUT_PLACEHOLDER_NAME) {
+        if (contents.contains("#out") && contents[contents.length()-1]->name != "#out") {
 
             if (failureMessage != NULL)
                 *failureMessage = "#out is bound, but the last term isn't named #out";
@@ -38,7 +37,7 @@ namespace function_t {
     {
         Branch& contents = as_branch(function);
         Term* last_term = contents[contents.length()-1];
-        if (last_term->name == OUTPUT_PLACEHOLDER_NAME)
+        if (last_term->name == "#out")
             return last_term->type;
         else
             return VOID_TYPE;

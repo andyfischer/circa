@@ -342,7 +342,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     // If we're out of tokens, then this is just an import_function call. Stop here.
     if (tokens.finished()) {
         // Add a term to hold our output type
-        create_value(contents, outputType, OUTPUT_PLACEHOLDER_NAME);
+        create_value(contents, outputType, "#out");
         return result;
     }
 
@@ -352,22 +352,19 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     // If there is an #out term, then it needs to be the last term. If #out is a
     // name binding into an inner branch then this might not be the case
-    if (contents.contains(OUTPUT_PLACEHOLDER_NAME) && 
-            contents[contents.length()-1]->name != OUTPUT_PLACEHOLDER_NAME) {
-        Term* copy = apply(contents, COPY_FUNC, RefList(contents[OUTPUT_PLACEHOLDER_NAME]),
-                OUTPUT_PLACEHOLDER_NAME);
+    if (contents.contains("#out") && contents[contents.length()-1]->name != "#out") {
+        Term* copy = apply(contents, COPY_FUNC, RefList(contents["#out"]), "#out");
         set_source_hidden(copy, true);
-    } else if (!contents.contains(OUTPUT_PLACEHOLDER_NAME)) {
+    } else if (!contents.contains("#out")) {
         // If there's no #out term, then create an extra term to hold the output type
-        Term* term = create_value(contents, outputType, OUTPUT_PLACEHOLDER_NAME);
+        Term* term = create_value(contents, outputType, "#out");
         set_source_hidden(term, true);
     }
 
     // If the #out term doesn't have the same type as the declared type, then coerce it
     Term* outTerm = contents[contents.length()-1];
     if (outTerm->type != outputType)
-        outTerm = apply(contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType),
-                        OUTPUT_PLACEHOLDER_NAME);
+        outTerm = apply(contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType), "#out");
 
     result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
@@ -795,7 +792,7 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     if (result->name != "")
         result = apply(branch, COPY_FUNC, RefList(result));
 
-    branch.bindName(result, OUTPUT_PLACEHOLDER_NAME);
+    branch.bindName(result, "#out");
     
     return result;
 }
