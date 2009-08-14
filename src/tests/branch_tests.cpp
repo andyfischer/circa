@@ -255,5 +255,4 @@ void register_tests()
 }
 
 } // namespace branch_tests
-
 } // namespace circa

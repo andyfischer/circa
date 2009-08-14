@@ -1,5 +1,14 @@
 // Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
+// In this test, we have a bunch of snippets, where we try to reproduce every
+// possible parser error.
+//
+// The goal of this test is to make sure that for every error: 1) no exception
+// is thrown, and 2) it's detected as an error. 
+//
+// (1) is a pretty common bug, since the parsing code makes liberal use of assert()
+//
+
 #include <circa.h>
 
 namespace circa {
@@ -22,12 +31,6 @@ void register_input(std::string const& in)
     TEST_INPUTS.push_back(TestInput(in));
 }
 
-// This function (hopefully) lists every possible parse error.
-//
-// The goal of this test is to make sure that for every error: 1) no exception
-// is thrown, and 2) it's detected as an error. The parsing code has a lot of
-// asserts, so it's common for a parser error to cause an assert fail. (this
-// shouldn't ever happen though)
 
 void register_every_possible_parse_error()
 {

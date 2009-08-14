@@ -1,9 +1,6 @@
 
 SPECIFIC THINGS:
- - Need elif or elsif
- - Need a better way to write a literal color value
- - Need ternary operator
- - Need a general-purpose way to have shared immutable values
+ - Need an efficient + safe way to share output values across terms
 
 IMPORTANT THINGS:
 - Cool graphical demo

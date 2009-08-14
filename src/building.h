@@ -17,9 +17,10 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 Term* apply(Branch& branch, std::string const& functionName, 
                  RefList const& inputs, std::string const& name="");
 
+// Modify term so that it has the given function and inputs.
 void rewrite(Term* term, Term* function, RefList const& _inputs);
 
-// Create a duplicate of the given term
+// Create a duplicate of the given term.
 // If 'copyBranches' is false, don't copy branch state. It's assumed that the
 // caller will do this. This functionality is used by duplicate_branch
 Term* create_duplicate(Branch& branch, Term* source, bool copyBranches=true);
@@ -47,8 +48,6 @@ Branch& create_namespace(Branch&, std::string const& name);
 // has a different function or type, then change it. If the branch doesn't have that
 // index, then add NULL terms until it does.
 void rewrite_as_value(Branch& branch, int index, Term* type);
-
-//void rewrite(Branch& branch, int index, 
 
 } // namespace circa
 

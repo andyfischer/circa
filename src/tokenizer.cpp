@@ -97,8 +97,7 @@ struct TokenizeContext
           linePosition(1),
           charPosition(0),
           results(_results)
-    {
-    }
+    { }
 
     char next(int lookahead=0) const {
         unsigned int index = nextIndex + lookahead;

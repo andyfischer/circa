@@ -49,5 +49,5 @@ void register_tests()
     REGISTER_TEST_CASE(branch_iterator_tests::test_simple);
 }
 
-}
-}
+} // namespace branch_iterator_tests
+} // namespace circa
