@@ -45,10 +45,10 @@ void test_duplicate()
     as_int(term1) = 8;
     test_assert(as_int(term1_duplicate) == 5);
 
-    sanity_check_term(term1);
-    sanity_check_term(term2);
-    sanity_check_term(term1_duplicate);
-    sanity_check_term(term2_duplicate);
+    test_assert(term1);
+    test_assert(term2);
+    test_assert(term1_duplicate);
+    test_assert(term2_duplicate);
 }
 
 void test_duplicate_nested()

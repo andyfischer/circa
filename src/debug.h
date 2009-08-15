@@ -29,19 +29,10 @@ namespace circa {
 void register_good_pointer(Term* term);
 void unregister_good_pointer(Term* term);
 void assert_good_pointer(Term* term);
-
-#if DEBUG_CHECK_FOR_BAD_POINTERS
 bool is_bad_pointer(Term* term);
-#endif
 
 // Setting this to true will abort trap on the next name lookup.
 extern bool DEBUG_TRAP_NAME_LOOKUP;
-
-// Perform a bunch of checks to see if this term is healthy, and all its related
-// data is consistent.
-void sanity_check_term(Term* term);
-
-void sanity_check_the_world();
 
 // Spit out this branch's raw contents to std::cout
 void dump_branch(Branch& branch);

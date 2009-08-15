@@ -28,14 +28,16 @@ void unregister_good_pointer(Term* term)
 #endif
 }
 
-#if DEBUG_CHECK_FOR_BAD_POINTERS
 bool is_bad_pointer(Term* term)
 {
+#if DEBUG_CHECK_FOR_BAD_POINTERS
     if (DEBUG_GOOD_POINTER_SET == NULL)
         DEBUG_GOOD_POINTER_SET = new std::set<Term*>();
     return DEBUG_GOOD_POINTER_SET->find(term) == DEBUG_GOOD_POINTER_SET->end();
-}
+#else
+    return false;
 #endif
+}
 
 void assert_good_pointer(Term* term)
 {
@@ -43,20 +45,6 @@ void assert_good_pointer(Term* term)
     if (is_bad_pointer(term))
         throw std::runtime_error("assert_good_pointer failed (bad term pointer)");
 #endif
-}
-
-void sanity_check_term(Term* term)
-{
-    // TODO: Add more checks here
-    assert_good_pointer(term);
-}
-
-void sanity_check_the_world()
-{
-    for (int i=0; i < KERNEL->length(); i++) {
-        Term* term = KERNEL->get(i);
-        sanity_check_term(term);
-    }
 }
 
 void dump_branch(Branch& branch)
