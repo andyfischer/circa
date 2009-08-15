@@ -972,6 +972,22 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
     if (tokens.nextIs(MINUS)) {
         tokens.consume(MINUS);
         Term* expr = subscripted_atom(branch, tokens);
+
+        // If the minus sign is on a literal number, then just negate it,
+        // rather than introduce a neg() operation.
+        if (is_value(expr) && expr->name == "") {
+            if (is_int(expr)) {
+                as_int(expr) *= -1;
+                return expr;
+            }
+            else if (is_float(expr)) {
+                as_float(expr) *= -1.0f;
+                expr->stringProp("float:original-format") = "-" +
+                    expr->stringProp("float:original-format");
+                return expr;
+            }
+        }
+
         return apply(branch, NEG_FUNC, RefList(expr));
     }
 

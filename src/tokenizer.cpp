@@ -547,9 +547,6 @@ bool match_number(TokenizeContext &context)
 {
     int lookahead = 0;
 
-    if (context.next(lookahead) == '-')
-        lookahead++;
-
     if (context.next(lookahead) == '.')
         lookahead++;
 

@@ -35,9 +35,9 @@ void test_identifiers()
 void test_integers()
 {
     token::TokenList results;
-    token::tokenize("1 0 1234567890 -3 0x123", results);
+    token::tokenize("1 0 1234567890 0x123", results);
 
-    test_assert(results.size() == 9);
+    test_assert(results.size() == 7);
     test_assert(results[0].text == "1");
     test_assert(results[0].match == token::INTEGER);
     test_assert(results[1].text == " ");
@@ -50,18 +50,16 @@ void test_integers()
     test_assert(results[4].match == token::INTEGER);
     test_assert(results[5].text == " ");
     test_assert(results[5].match == token::WHITESPACE);
-    test_assert(results[6].text == "-3");
-    test_assert(results[6].match == token::INTEGER);
-    test_assert(results[8].text == "0x123");
-    test_assert(results[8].match == token::HEX_INTEGER);
+    test_assert(results[6].text == "0x123");
+    test_assert(results[6].match == token::HEX_INTEGER);
 }
 
 void test_floats()
 {
     token::TokenList results;
-    token::tokenize("1.0 16. .483 .123. -0.1 -.54", results);
+    token::tokenize("1.0 16. .483 .123.", results);
 
-    test_assert(results.size() == 12);
+    test_assert(results.size() == 8);
     test_assert(results[0].text == "1.0");
     test_assert(results[0].match == token::FLOAT_TOKEN);
     test_assert(results[2].text == "16.");
@@ -72,10 +70,6 @@ void test_floats()
     test_assert(results[6].match == token::FLOAT_TOKEN);
     test_assert(results[7].text == ".");
     test_assert(results[7].match == token::DOT);
-    test_assert(results[9].text == "-0.1");
-    test_assert(results[9].match == token::FLOAT_TOKEN);
-    test_assert(results[11].text == "-.54");
-    test_assert(results[11].match == token::FLOAT_TOKEN);
 
     token::TokenList results2;
     token::tokenize("5.200", results2);
