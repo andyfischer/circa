@@ -32,6 +32,12 @@ void _test_assert_function(Term* term, int line, const char* file)
         throw std::runtime_error(msg.str());
     }
 
+    if (is_bad_pointer(term)) {
+        std::stringstream msg;
+        msg << "Bad term pointer at " << file << ", line " << line;
+        throw std::runtime_error(msg.str());
+    }
+
     if (term->hasError) {
         std::stringstream msg;
         msg << "Runtime error on term " << format_global_id(term) << std::endl;
@@ -205,7 +211,6 @@ void run_all_tests()
 
 void post_test_sanity_check()
 {
-    sanity_check_the_world();
 }
 
 std::vector<std::string> list_all_test_names()
