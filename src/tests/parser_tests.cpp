@@ -379,16 +379,21 @@ void test_unary_minus()
     test_assert(b->input(0) == a);
     test_equals(b->toFloat(), -1.0);
 
+    Term* c = branch.eval("-1");
+    test_assert(is_value(c));
+    test_assert(c->asInt() == -1);
+    test_assert(to_string(c) == "-1");
+
     // Sometimes, literals with a - sign are supposed to turn that into a minus operation
-    //TODO
-    //Term* c = branch.eval("2-1");
-    //test_assert(c->function->name == "sub_i");
-    //test_assert(c->asInt() == 1);
+    Term* d = branch.eval("2-1");
+    //FIXME
+    //test_assert(d->function->name == "sub_i");
+    //test_assert(d->asInt() == 1);
 
     // Sometimes the - sign is part of the number
-    Term* d = branch.eval("-3");
-    test_assert(is_value(d));
-    test_assert(d->asInt() == -3);
+    Term* e = branch.eval("-3");
+    test_assert(is_value(e));
+    test_assert(e->asInt() == -3);
 }
 
 void test_array_index_access()
