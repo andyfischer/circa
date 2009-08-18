@@ -58,6 +58,9 @@ extern Term* VALUE_FUNC;
 extern Term* VOID_TYPE;
 extern Term* VOID_PTR_TYPE;
 
+// Get a named term from the global namespace.
+Term* get_global(std::string name);
+
 void empty_evaluate_function(Term* caller);
 void initialize();
 void shutdown();
