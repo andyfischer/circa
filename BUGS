@@ -1,8 +1,4 @@
 
- - Subtraction against a literal sometimes doesn't work (depending on if you added a space)
-   Can't write this: 1-2
-   The reason is that the tokenizer interprets this as two values, '1' and '-2'
-
  - Assignment operator should only be allowed to work on values
    Priority: Low (Assignment is discouraged)
 

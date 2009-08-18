@@ -379,21 +379,32 @@ void test_unary_minus()
     test_assert(b->input(0) == a);
     test_equals(b->toFloat(), -1.0);
 
+    // - on a literal value should just modify that value, and not create a neg() operation.
     Term* c = branch.eval("-1");
     test_assert(is_value(c));
     test_assert(c->asInt() == -1);
     test_assert(to_string(c) == "-1");
 
     // Sometimes, literals with a - sign are supposed to turn that into a minus operation
+    // This is the case if there are no spaces around the -
     Term* d = branch.eval("2-1");
-    //FIXME
-    //test_assert(d->function->name == "sub_i");
-    //test_assert(d->asInt() == 1);
+    test_assert(d->function->name == "sub_i");
+    test_assert(d->asInt() == 1);
 
-    // Sometimes the - sign is part of the number
-    Term* e = branch.eval("-3");
-    test_assert(is_value(e));
-    test_assert(e->asInt() == -3);
+    // Or if there are spaces on both sides of the -
+    Term* e = branch.eval("2 - 1");
+    test_assert(e->function->name == "sub_i");
+    test_assert(e->asInt() == 1);
+
+    // But if there's a space before the - and not after it, that should be parsed as
+    // two separate expressions.
+    branch.clear();
+    parser::compile(&branch, parser::statement_list, "2 -1");
+    test_assert(branch.length() == 2);
+    test_assert(is_int(branch[0]));
+    test_assert(as_int(branch[0]) == 2);
+    test_assert(is_int(branch[1]));
+    test_assert(as_int(branch[1]) == -1);
 }
 
 void test_array_index_access()
