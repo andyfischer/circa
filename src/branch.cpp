@@ -119,9 +119,8 @@ Term* Branch::findLastBinding(std::string const& name) const
 
 void Branch::bindName(Term* term, std::string name)
 {
-    if (term->name != "" && term->name != name) {
+    if (term->name != "" && term->name != name)
         throw std::runtime_error("term already has name: "+term->name);
-    }
 
     names.bind(term, name);
     term->name = name;
@@ -332,7 +331,7 @@ void duplicate_branch(Branch& source, Branch& dest)
 
 void parse_script(Branch& branch, std::string const& filename)
 {
-    // record the filename
+    // Record the filename
     string_value(branch, filename, get_name_for_attribute("source-file"));
 
     std::string fileContents = read_text_file(filename);

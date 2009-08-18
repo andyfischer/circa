@@ -36,7 +36,7 @@ void set_is_statement(Term* term, bool value)
 
 bool is_statement(Term* term)
 {
-    // the default for whether or not something is a statement is true, because
+    // The default for whether or not something is a statement is true, because
     // that's what manually-created terms should be.
     return term->boolPropOptional("statement", true);
 }

@@ -46,6 +46,9 @@ void initialize_function_data(Term* term);
 bool is_callable(Term* term);
 bool inputs_fit_function(Term* func, RefList const& inputs);
 Term* create_overloaded_function(Branch& branch, std::string const& name);
+
+// If func is overloaded, this returns an overload which is appropriate 'inputs'.
+// May return UNKNOWN_FUNCTION if none is found.
 Term* specialize_function(Term* func, RefList const& inputs);
 
 } // namespace circa

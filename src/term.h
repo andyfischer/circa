@@ -26,13 +26,13 @@ struct Term
     // Input terms
     RefList inputs;
 
-    // Our function: the thing that takes our inputs (and possibly state), and produces a value.
+    // Our function: the thing that takes our inputs and produces a value.
     Ref function;
 
     // Our name binding.
     std::string name;
 
-    // The branch that owns this term.
+    // The branch that owns this term. May be NULL
     Branch* owningBranch;
 
     bool hasError;

@@ -233,11 +233,19 @@ void bootstrap_kernel()
     as_type(LIST_TYPE).toString = list_t::to_string;
 }
 
+void pre_initialize_builtin_types(Branch& kernel)
+{
+    // Initialize data for Value function
+    initialize_function_data(VALUE_FUNC);
+    create_value(as_branch(VALUE_FUNC), ANY_TYPE);
+
+    // Declare input_placeholder first because it's used while compiling functions
+    INPUT_PLACEHOLDER_FUNC = import_function(kernel, empty_evaluate_function,
+            "input_placeholder() : any");
+}
+
 void initialize_builtin_types(Branch& kernel)
 {
-    VOID_PTR_TYPE = import_type<void*>(kernel, "void_ptr");
-    as_type(VOID_PTR_TYPE).parameters.append(ANY_TYPE);
-
     import_type<RefList>(kernel, "Tuple");
 
     Term* branch_append = 
@@ -294,15 +302,7 @@ void initialize()
     bootstrap_kernel();
     initialize_primitive_types(*KERNEL);
 
-    // Initialize data for Value function
-    initialize_function_data(VALUE_FUNC);
-    
-    // Define output type
-    create_value(as_branch(VALUE_FUNC), ANY_TYPE);
-
-    // Declare input_placeholder first because it's used while compiling functions
-    INPUT_PLACEHOLDER_FUNC = import_function(*KERNEL, empty_evaluate_function,
-            "input_placeholder() : any");
+    pre_initialize_builtin_types(*KERNEL);
 
     initialize_builtin_types(*KERNEL);
 
