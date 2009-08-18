@@ -146,8 +146,8 @@ void setup_builtin_types(Branch& kernel)
 
 void parse_builtin_types(Branch& kernel)
 {
-    declare_type(kernel, "type Point { float x, float y }");
-    declare_type(kernel, "type Box { float x1, float y1, float x2, float y2 }");
+    parse_type(kernel, "type Point { float x, float y }");
+    parse_type(kernel, "type Box { float x1, float y1, float x2, float y2 }");
 }
 
 } // namespace circa

@@ -434,7 +434,7 @@ bool check_invariants(Term* term, std::string* failureMessage)
     return as_type(term->type).checkInvariants(term, failureMessage);
 }
 
-Term* declare_type(Branch& branch, std::string const& decl)
+Term* parse_type(Branch& branch, std::string const& decl)
 {
     return parser::compile(&branch, parser::type_decl, decl);
 }
