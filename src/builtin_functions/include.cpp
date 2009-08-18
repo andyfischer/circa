@@ -57,7 +57,7 @@ namespace include_function {
 
     void setup(Branch& kernel)
     {
-        declare_type(kernel, "type _include_state { string filename, int time_modified }");
+        parse_type(kernel, "type _include_state { string filename, int time_modified }");
         INCLUDE_FUNC = import_function(kernel, evaluate,
                 "include(state _include_state, string filename) : Branch");
         function_t::get_to_source_string(INCLUDE_FUNC) = toSourceString;

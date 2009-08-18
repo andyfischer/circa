@@ -148,7 +148,7 @@ void assign_value(Term* source, Term* dest);
 void assign_value_to_default(Term* term);
 bool check_invariants(Term* term, std::string* failureMessage = NULL);
 
-Term* declare_type(Branch& branch, std::string const& decl);
+Term* parse_type(Branch& branch, std::string const& decl);
 
 } // namespace circa
 
