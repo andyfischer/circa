@@ -246,8 +246,6 @@ void pre_initialize_builtin_types(Branch& kernel)
 
 void initialize_builtin_types(Branch& kernel)
 {
-    import_type<RefList>(kernel, "Tuple");
-
     Term* branch_append = 
         import_member_function(BRANCH_TYPE, list_t::append, "append(Branch, any) : Branch");
     function_t::get_input_placeholder(branch_append, 0)->boolProp("use-as-output") = true;
@@ -270,8 +268,6 @@ void initialize_builtin_types(Branch& kernel)
     NAMESPACE_TYPE = create_compound_type(kernel, "Namespace");
 
     OVERLOADED_FUNCTION_TYPE = create_compound_type(kernel, "OverloadedFunction");
-
-    feedback_register_constants(kernel);
 }
 
 void post_setup_builtin_functions(Branch& kernel)
@@ -301,11 +297,9 @@ void initialize()
 {
     bootstrap_kernel();
     initialize_primitive_types(*KERNEL);
-
     pre_initialize_builtin_types(*KERNEL);
-
     initialize_builtin_types(*KERNEL);
-
+    feedback_register_constants(*KERNEL);
     setup_primitive_types();
     setup_builtin_functions(*KERNEL);
     post_setup_builtin_functions(*KERNEL);
