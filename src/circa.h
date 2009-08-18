@@ -3,6 +3,7 @@
 #include "branch.h"
 #include "branch_iterator.h"
 #include "building.h"
+#include "builtin_types.h"
 #include "builtins.h"
 #include "codegen.h"
 #include "cpp_importing.h"

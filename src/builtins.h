@@ -65,18 +65,6 @@ void empty_evaluate_function(Term* caller);
 void initialize();
 void shutdown();
 
-namespace set_t {
-    void add(Branch& branch, Term* value);
-}
-
-namespace list_t {
-    void append(Branch& branch, Term* value);
-}
-
-namespace dict_t {
-    std::string to_string(Branch& branch);
-}
-
 // this is implemented in builtin_functions/include.cpp
 namespace include_function {
     void possibly_expand(Term* caller);
