@@ -19,6 +19,7 @@ namespace dict_t {
 }
 
 void setup_builtin_types(Branch& kernel);
+void parse_builtin_types(Branch& kernel);
 
 }
 

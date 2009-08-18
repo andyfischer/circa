@@ -2,8 +2,6 @@ WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 400
 WINDOW_TITLE = 'tweak.ca'
 
-type Point { float x, float y }
-
 type Star {
     Point loc
     float rot
