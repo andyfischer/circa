@@ -45,7 +45,7 @@ void BranchIterator::advance()
         return;
     }
 
-    // otherwise, just advance. It's not really accurate to say that we are "skipping"
+    // Otherwise, just advance. PS, it's not really accurate to say that we are "skipping"
     // any branches, because we just checked if there was one.
     advanceSkippingBranch();
 }

@@ -1,0 +1,98 @@
+
+background(#000)
+
+type Ship {
+  Point loc
+  Point momentum
+  float facing
+}
+
+state Ship ship = [[300 300] [0 0] 0]
+
+-- Draw the ship
+begin
+  type ship_point { float angle, float dist }
+
+  def translate_point(ship_point p) : Point
+      return polar(p.angle + ship.facing, p.dist * 2, ship.loc)
+  end
+
+  points = map(translate_point, [[0 10] [.4 10] [.5 3] [.6 10]])
+
+  gl.line_loop(points, #fff)
+end
+
+-- Keyboard controls
+
+-- Spin the ship
+rotation = 0
+if key_down(LEFT)
+  rotation = -1
+elif key_down(RIGHT)
+  rotation = 1
+end
+
+ship.facing = ship.facing + rotation * time_delta
+
+-- Go forward/backward
+thrust = 0
+if key_down(UP)
+  thrust = 1
+elif key_down(DOWN)
+  thrust = -1
+end
+
+-- Drag
+ship.momentum = ship.momentum * 0.99
+
+ship.momentum = ship.momentum + [cos(ship.facing) sin(ship.facing)] * thrust * .15
+
+-- Speed limit
+speed = magnitude(ship.momentum)
+speed_limit = 4.0
+
+if speed > speed_limit
+  ship.momentum = ship.momentum * (speed_limit / speed)
+end
+
+-- Move ship based on momentum
+ship.loc = ship.loc + ship.momentum
+
+-- Space to shoot a bullet
+type Bullet {
+  Point loc
+  float facing
+}
+
+state List bullets = []
+
+if key_pressed(SPACE)
+  bullets.append([ship.loc ship.facing])
+end
+
+type Polar { float rotation, float dist }
+
+def polar_list(List list, Point center) : List
+  def f(Polar p) : Point
+    return polar(p.rotation, p.dist, center)
+  end
+  return map(f, list)
+end
+
+-- Draw bullets
+bullet_size = 3.5
+for bullet in bullets
+  bullet = bullet : Bullet
+
+  gl.line_loop(polar_list([[.25 bullet_size] [.5 bullet_size] [.75 bullet_size] [1 bullet_size]],
+    bullet.loc), #fff)
+end
+
+-- Move bullets
+bullet_speed = 5.0
+def move_bullet(Bullet bullet) : Bullet
+  bullet.loc = bullet.loc + [cos(bullet.facing) sin(bullet.facing)] * bullet_speed
+  return bullet
+end
+
+map(move_bullet, @bullets)

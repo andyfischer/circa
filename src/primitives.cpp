@@ -482,6 +482,9 @@ void initialize_primitive_types(Branch& kernel)
     as_type(ANY_TYPE).toString = any_t::to_string;
 
     VOID_TYPE = create_empty_type(kernel, "void");
+
+    VOID_PTR_TYPE = import_type<void*>(kernel, "void_ptr");
+    as_type(VOID_PTR_TYPE).parameters.append(ANY_TYPE);
 }
 
 void setup_primitive_types()

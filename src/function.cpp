@@ -179,7 +179,6 @@ void initialize_function_data(Term* term)
     create_value(attributes, LIST_TYPE, "parameters");
 }
 
-
 bool is_callable(Term* term)
 {
     return (term->type == FUNCTION_TYPE)
