@@ -133,10 +133,9 @@ void specialization_to_output_type()
     // than the implicit output type, then make sure that it uses the
     // declared type. This code once had a bug.
     Branch branch;
-    Term* point = branch.eval("type Point { float x, float y }");
     Term* a = branch.eval("def a() : Point\nreturn [1 2]\nend");
 
-    test_assert(function_t::get_output_type(a) == point);
+    test_assert(function_t::get_output_type(a)->name == "Point");
 
     // Make sure that the return value is preserved. This had a bug too
     Term* call = branch.eval("a()");

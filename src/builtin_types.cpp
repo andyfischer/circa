@@ -144,4 +144,10 @@ void setup_builtin_types(Branch& kernel)
     OVERLOADED_FUNCTION_TYPE = create_compound_type(kernel, "OverloadedFunction");
 }
 
+void parse_builtin_types(Branch& kernel)
+{
+    declare_type(kernel, "type Point { float x, float y }");
+    declare_type(kernel, "type Box { float x1, float y1, float x2, float y2 }");
+}
+
 } // namespace circa
