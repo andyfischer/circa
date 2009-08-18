@@ -4,14 +4,6 @@
 
 namespace circa {
 
-Term* get_global(std::string name)
-{
-    if (KERNEL->contains(name))
-        return KERNEL->get(name);
-
-    return NULL;
-}
-
 void evaluate_term(Term* term)
 {
     if (term == NULL)

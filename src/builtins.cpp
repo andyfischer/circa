@@ -63,6 +63,14 @@ Term* VALUE_FUNC = NULL;
 Term* VOID_TYPE = NULL;
 Term* VOID_PTR_TYPE = NULL;
 
+Term* get_global(std::string name)
+{
+    if (KERNEL->contains(name))
+        return KERNEL->get(name);
+
+    return NULL;
+}
+
 void empty_evaluate_function(Term*) { }
 
 namespace set_t {

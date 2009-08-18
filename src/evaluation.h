@@ -1,13 +1,11 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
-#ifndef CIRCA_RUNTIME_INCLUDED
-#define CIRCA_RUNTIME_INCLUDED
+#ifndef CIRCA_EVALUATION_INCLUDED
+#define CIRCA_EVALUATION_INCLUDED
 
 #include "common_headers.h"
 
 namespace circa {
-
-Term* get_global(std::string name);
 
 void evaluate_term(Term* term);
 void evaluate_branch(Branch& branch, Term* errorListener=NULL);
