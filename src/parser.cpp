@@ -914,6 +914,13 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
     while (!tokens.finished() && get_infix_precedence(tokens.nextNonWhitespace()) == precedence) {
 
+        // Special case: if we have an expression that looks like this:
+        // <lexpr><whitespace><hyphen><non-whitespace>
+        // Then don't parse it as an infix expression.
+        
+        if (tokens.nextIs(WHITESPACE) && tokens.nextIs(MINUS, 1) && !tokens.nextIs(WHITESPACE, 2))
+            break;
+
         std::string preOperatorWhitespace = possible_whitespace(tokens);
 
         std::string operatorStr = tokens.consume();
