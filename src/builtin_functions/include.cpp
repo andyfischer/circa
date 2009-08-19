@@ -30,7 +30,7 @@ namespace include_function {
         if (requested_filename != prev_filename
                 || prev_modified != modifiedTime) {
             prev_filename = requested_filename;
-            prev_modified = modifiedTime;
+            prev_modified = (int) modifiedTime;
 
             Branch& contents = as_branch(caller);
             Branch previous_contents;

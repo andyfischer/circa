@@ -207,6 +207,7 @@ void reproduce_lists() {
     round_trip_source("[1\n2\n3\n] ");
     round_trip_source("a = 1; [a]");
     round_trip_source("a = 1; [a a,a;a\na]");
+    round_trip_source("a = [0 0] + [cos(1) sin(1)]");
     finish_source_repro_category();
 }
 
@@ -242,12 +243,21 @@ void reproduce_subroutine() {
     round_trip_source("def hi() 1  end");
     round_trip_source("def hi(int)  end");
     round_trip_source("def hi(float, string, bool)  end");
+    round_trip_source("type Point { float x, float y }\ndef hi() : Point\nreturn [0 0]\nend");
     finish_source_repro_category();
 }
 
 void reproduce_type_decl() {
     round_trip_source("type mytype { int a }");
     round_trip_source("type mytype { int a, float b }");
+    round_trip_source("type mytype { \n int a, float b }");
+    round_trip_source("type mytype { int a\nfloat b }");
+    round_trip_source("type mytype { int a,\nfloat b }");
+    round_trip_source("type mytype { int a, float b \n}");
+    round_trip_source("type mytype    { int a, float b }");
+    round_trip_source("type mytype {   int a, float b }");
+    round_trip_source("type mytype { int a, float b }    ");
+    round_trip_source("type mytype {   } ");
     finish_source_repro_category();
 }
 
