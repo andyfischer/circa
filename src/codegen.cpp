@@ -34,7 +34,8 @@ std::string cpp_accessor_for_type(Term* term)
     for (int i=0; i < proto.length(); i++) {
         Term* field = proto[i];
         out << indent << get_cpp_type_name(field->type) << "& " << field->name << "() ";
-        out << "{ return " << get_cpp_type_accessor(field->type) << "(_term->field(" << i << ")); }\n";
+        out << "{ return " << get_cpp_type_accessor(field->type) << "(_term->field(" <<
+            i << ")); }\n";
     }
 
     out << "};\n";

@@ -160,12 +160,9 @@ void migrate_stateful_values(Branch& source, Branch& dest)
 
 void reset_state(Branch& branch)
 {
-    for (BranchIterator it(branch); !it.finished(); ++it) {
-        Term* term = *it;
-
-        if (is_stateful(term))
-            assign_value_to_default(term);
-    }
+    for (BranchIterator it(branch); !it.finished(); ++it)
+        if (is_stateful(*it))
+            assign_value_to_default(*it);
 }
 
 } // namespace circa

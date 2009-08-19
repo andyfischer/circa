@@ -68,10 +68,6 @@ struct Type
     {
     }
 
-    Term* operator[](std::string const& fieldName) {
-        return prototype[fieldName];
-    }
-
     int findFieldIndex(std::string const& name)
     {
         for (int i=0; i < (int) prototype.length(); i++) {
@@ -80,13 +76,6 @@ struct Type
         }
         return -1;
     }
-
-    int numFields() const
-    {
-        return prototype.length();
-    }
-
-    bool isCompoundType();
 
     void addMemberFunction(Term* function, std::string const& name);
 };
