@@ -76,19 +76,6 @@ void set_input(Term* term, int index, Term* input)
     }
 }
 
-void rewrite(Term* term, Term* function, RefList const& inputs)
-{
-    change_function(term, function);
-    for (int i=0; i < inputs.length(); i++)
-        set_input(term, i, inputs[i]);
-    Term* outputType = function_t::get_output_type(function);
-
-    if (function_t::get_specialize_type(function) != NULL)
-        outputType = function_t::get_specialize_type(function)(term);
-
-    change_type(term, outputType);
-}
-
 Term* create_duplicate(Branch& branch, Term* source, bool copyBranches)
 {
     Term* term = apply(branch, source->function, source->inputs);
@@ -144,32 +131,9 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
     type = find_named(branch, typeName);
 
     if (type == NULL)
-        throw std::runtime_error(std::string("Couldn't find type: ")+typeName);
-
-    return create_value(branch, type, name);
-}
-
-Term* import_value(Branch& branch, Term* type, void* initialValue, std::string const& name)
-{
-    assert(type != NULL);
-    Term *term = create_value(branch, type);
-
-    term->value = initialValue;
-
-    if (name != "")
-        branch.bindName(term, name);
-
-    return term;
-}
-
-Term* import_value(Branch& branch, std::string const& typeName, void* initialValue, std::string const& name)
-{
-    Term* type = find_named(branch, typeName);
-
-    if (type == NULL)
         throw std::runtime_error("Couldn't find type: "+typeName);
 
-    return import_value(branch, type, initialValue, name);
+    return create_value(branch, type, name);
 }
 
 Term* string_value(Branch& branch, std::string const& s, std::string const& name)
@@ -223,6 +187,19 @@ Branch& create_branch(Branch& owner, std::string const& name)
 Branch& create_namespace(Branch& branch, std::string const& name)
 {
     return as_branch(create_value(branch, NAMESPACE_TYPE, name));
+}
+
+void rewrite(Term* term, Term* function, RefList const& inputs)
+{
+    change_function(term, function);
+    for (int i=0; i < inputs.length(); i++)
+        set_input(term, i, inputs[i]);
+    Term* outputType = function_t::get_output_type(function);
+
+    if (function_t::get_specialize_type(function) != NULL)
+        outputType = function_t::get_specialize_type(function)(term);
+
+    change_type(term, outputType);
 }
 
 void rewrite_as_value(Branch& branch, int index, Term* type)
