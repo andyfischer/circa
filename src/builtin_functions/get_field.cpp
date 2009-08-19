@@ -25,7 +25,7 @@ namespace get_field_function {
         std::string& name = caller->input(1)->asString();
 
         if (type.findFieldIndex(name) != -1)
-            return type[name]->type;
+            return type.prototype[name]->type;
 
         return ANY_TYPE;
     }

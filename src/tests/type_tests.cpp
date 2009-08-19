@@ -52,7 +52,7 @@ void type_declaration()
     Branch branch;
     Term* myType = branch.eval("type MyType { string a, int b } ");
 
-    test_assert(as_type(myType).numFields() == 2);
+    test_assert(as_type(myType).prototype.length() == 2);
     test_assert(as_type(myType).prototype[0]->name == "a");
     test_assert(as_type(myType).prototype[0]->type == STRING_TYPE);
     test_assert(as_type(myType).prototype[1]->name == "b");

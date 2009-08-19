@@ -181,7 +181,7 @@ namespace branch_t {
 
         // create a slot for each field
         Type& type = as_type(typeTerm);
-        int numFields = type.numFields();
+        int numFields = type.prototype.length();
 
         for (int f=0; f < numFields; f++)
             create_value(*branch, type.prototype[f]->type, type.prototype[f]->name);
