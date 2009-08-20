@@ -70,10 +70,9 @@ struct Type
 
     int findFieldIndex(std::string const& name)
     {
-        for (int i=0; i < (int) prototype.length(); i++) {
+        for (int i=0; i < (int) prototype.length(); i++)
             if (prototype[i]->name == name)
                 return i;
-        }
         return -1;
     }
 
