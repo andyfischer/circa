@@ -364,8 +364,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     // If the #out term doesn't have the same type as the declared type, then coerce it
     Term* outTerm = contents[contents.length()-1];
     if (outTerm->type != outputType) {
-        outTerm = apply(contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType),
-                        OUTPUT_PLACEHOLDER_NAME);
+        outTerm = apply(contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType), "#out");
         set_source_hidden(outTerm, true);
     }
 
