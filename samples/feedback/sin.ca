@@ -1,5 +1,0 @@
-
-_trainable = ['a']
-
-a = 0
-feedback(sin(a), 1)

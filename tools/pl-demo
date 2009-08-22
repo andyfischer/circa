@@ -1,0 +1,2 @@
+cd $CIRCA_HOME
+scons plastic && build/bin/plas plastic/demos/$1.ca
