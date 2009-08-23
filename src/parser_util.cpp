@@ -6,6 +6,16 @@ using namespace circa::tokenizer;
 
 namespace circa {
 
+Term* apply_with_syntax(Branch& branch, Term* function, RefList inputs, std::string name)
+{
+    Term* result = apply(branch, function, inputs, name);
+
+    for (int i=0; i < result->numInputs(); i++)
+        recursively_mark_terms_as_occuring_inside_an_expression(result->input(i));
+
+    return result;
+}
+
 void prepend_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
@@ -274,5 +284,6 @@ void consume_branch_until_end(Branch& branch, TokenStream& tokens)
 
     post_parse_branch(branch);
 }
+
 
 } // namespace circa

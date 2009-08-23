@@ -83,7 +83,7 @@ def move_bullet(Bullet bullet) : Bullet
         bullet.momentum]
 end
 
-map(move_bullet, @bullets)
+bullets = map(move_bullet, bullets)
 
 -- Draw bullets
 for bullet in bullets

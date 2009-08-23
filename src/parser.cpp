@@ -734,7 +734,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     // If the rexpr is just an identifier, then create an implicit copy()
     if (rexpr->name != "")
-        rexpr = apply(branch, COPY_FUNC, RefList(rexpr));
+        rexpr = apply_with_syntax(branch, COPY_FUNC, RefList(rexpr));
 
     rexpr->stringProp("syntaxHints:preEqualsSpace") = preEqualsSpace;
     rexpr->stringProp("syntaxHints:postEqualsSpace") = postEqualsSpace;
@@ -762,7 +762,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
         branch.remove(lexpr);
 
-        rexpr = apply(branch, SET_FIELD_FUNC, RefList(object, field, rexpr), name);
+        rexpr = apply_with_syntax(branch, SET_FIELD_FUNC, RefList(object, field, rexpr), name);
 
         get_input_syntax_hint(rexpr, 0, "postWhitespace") = "";
     }
@@ -794,6 +794,9 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     Term* result = infix_expression(branch, tokens);
+
+    for (int i=0; i < result->numInputs(); i++)
+        recursively_mark_terms_as_occuring_inside_an_expression(result->input(i));
 
     // If we're returning an identifier, then we need to insert a copy() term
     if (result->name != "")
@@ -1144,7 +1147,8 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
         mutability = 1.0;
     }
 
-    term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
+    if (mutability != 0.0)
+        term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
     set_source_location(term, startPosition, tokens);
     return term;
 }
@@ -1257,6 +1261,8 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
         // Use the parent branch as the home for this statement. This way,
         // if the statement creates extra terms, they aren't added to our list.
         Term* term = infix_expression(branch, tokens);
+        for (int i=0; i < term->numInputs(); i++)
+            recursively_mark_terms_as_occuring_inside_an_expression(term->input(i));
 
         bool implicitCopy = false;
         if (term->name != "") {
@@ -1445,7 +1451,7 @@ Term* identifier(Branch& branch, TokenStream& tokens)
         bool implicitFunctionCall = is_callable(head) && (ids.size() > 2) &&
             (name_index < (ids.size()-1));
 
-        // TODO: Should remove the thing that says (ids.size() > 2). That part is there to
+        // TODO: Should remove the thing that says (ids.size() > 2). That part is there for
         // old behavior where just typing a function name would reference that function
         // instead of call it.
 

@@ -163,7 +163,7 @@ void reproduce_infix() {
     finish_source_repro_category();
 }
 
-void reproduce_rebinding_operator() {
+void reproduce_rebinding() {
     round_trip_source("a += 1");
     round_trip_source("a *= 5*3+1");
     round_trip_source("  a -= 5*3+1");
@@ -236,6 +236,7 @@ void reproduce_subroutine() {
     round_trip_source("def hi4() : int\nreturn 1\nend");
     round_trip_source("def hi():int;return 1;end");
     round_trip_source("def hi():int  ;return 1;end");
+    round_trip_source("def hi():int return add(sub(1,1),1) end");
     round_trip_source("def hi();1;end");
     round_trip_source("def hi() ;1;end");
     round_trip_source("def hi(); 1;end");
@@ -299,6 +300,7 @@ void reproduce_dot_expressions() {
     round_trip_source("r = &1; r.asint");
     round_trip_source("r = &1; r.asint + 5");
     round_trip_source("l = []; l.append(1)");
+    round_trip_source("l = [1.0 1.0] : Point; l.x = 2.0");
     // These don't work because constructors are not reproduced
     //round_trip_source("type T { float x }; t = T(); t.x");
     //round_trip_source("type T { float x }; t = T(); t.x = 1.0");
@@ -318,7 +320,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_stateful_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_function_calls);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_infix);
-    REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebinding_operator);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebinding);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_if);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_lists);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_for_loop);
