@@ -11,6 +11,8 @@ namespace circa {
 
 namespace tokenizer { struct Token; }
 
+Term* apply_with_syntax(Branch& branch, Term* function, RefList inputs, std::string name="");
+
 void prepend_whitespace(Term* term, std::string const& whitespace);
 void append_whitespace(Term* term, std::string const& whitespace);
 void set_source_location(Term* term, int start, TokenStream& tokens);

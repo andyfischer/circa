@@ -68,12 +68,6 @@ void set_input(Term* term, int index, Term* input)
 {
     assert_good_pointer(term);
     term->inputs.setAt(index, input);
-
-    // If this term is anonymous, check to update the 'statement' property. An anonymous
-    // term can't be a statement if it's used as an input.
-    if (input != NULL && input->name == "") {
-        set_is_statement(input, false);
-    }
 }
 
 Term* create_duplicate(Branch& branch, Term* source, bool copyBranches)
