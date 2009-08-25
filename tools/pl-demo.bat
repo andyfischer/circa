@@ -2,5 +2,5 @@
 
 pushd .
 cd %CIRCA_HOME%
-scons plastic && cd plastic\demos && call ..\plastic\run.bat %1.ca
+scons plastic && cd plastic\demos && call ..\run.bat %1.ca
 popd
