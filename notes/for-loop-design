@@ -37,4 +37,5 @@ Can think of this like a function.
 D_c = value(typeof(D))
 in innerBranch, remap D to D_c
 on for loop start, copy D to D_c
-at end of for loop, assign(D_result, D_c)
+at end of each loop, assign(D_result, D_c)
+after the last loop, assign(D_result, F)
