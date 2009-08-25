@@ -14,7 +14,9 @@ Array access
   Currently a[1]
   Got any better ideas? Not really
   Note that there is a possible collision if we have space-seperated lists, and we use []
-  for array literals. This: [foo [1] 2] would mean something different than: [foo[1] 2]
+  for array literals. This: [foo [1] 2] would mean something different than: [foo[1] 2].
+  But this is not so bad, we can just say that you can't have whitesapce between the foo and [1].
+  It looks weird anyway.
 
 For loop syntax?
   Currently: for i in list
@@ -33,6 +35,8 @@ Type annotation
     a = 1:int
     b = [1 2] : Point
   Haskell and some other languages use ::, though : seems to be more popular
+  It might be nice to use :: so that we can use : for something else.
+  ("Everyone wants the colon" - Larry Wall)
   Alternatives:
     int myInt
     myInt::int
@@ -65,7 +69,15 @@ Lambdas
     
 Multi-line lambdas
   I like how easy it is to pass a block to a function call in Ruby
-  Possible example:
+  Ideas:
     map(items) do |x|
+      x = x + 1
+    end
+
+    items = map(<block>, items)
+      x = x + 1
+    end
+
+    items = map(..., items)
       x = x + 1
     end

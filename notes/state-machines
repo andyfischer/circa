@@ -33,6 +33,8 @@ Normal execution:
  - Conditions
    - Problem: multiple conditions might be true, then what do we do?
 
+So there are different styles of state machines. Maybe we need to support multiple kinds.
+
 Condition-based scheme could be translated into an input-based scheme.
 Input-based scheme could be turned into conditions.
 But which should we use?
@@ -62,3 +64,4 @@ next(b,input) := if (input == 'c')
                    c
                  else
                    fail
+

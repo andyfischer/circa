@@ -55,20 +55,13 @@ def times_called() : int
     return count
 end
 
-def running_average(float sample) : float
-    state num_samples = 0
-    state total = 0
-    num_samples += 1
-    total += sample
-    return total / num_samples
-end
-
 IMPLEMENTATION THOUGHTS
 
 In a way, stateful terms is a substitute for object-oriented programming. Each stateful
-call can be considered an object. The members of the object are defined as the list
-of terms that we declared stateful. Each object has a 'call' function which we call on
-every evaluation.
+call can be considered an object. Given a piece of code, we can generate a definition for
+our stateful object (by concatenating the types of each stateful term). And each 'object'
+has an implicit "execute()" function, which performs some action and then updates the object's
+data.
 
 DESIRED FEATURES
 
@@ -81,4 +74,5 @@ end
 call = stateful_func()
 print(call.i) -- reach into stateful_func and access its state
 
-Can we have a way to explicitly reset state?
+Can we have a way to explicitly reset state? -- This one is something that I constantly wish
+I could do when writing code.

@@ -59,6 +59,10 @@ a = alias(if.joining.a)
 * Note that the current implementation will have problems if you try to do a name
   loopup in the middle of an existing function.
 
+* I think an alternative idea would be to allow terms to say that they expose their names.
+  This could be specified on functions. If a function exposes names, the name-search
+  algorithm would know to search inside them.
+
 * Okay anyway. Those are the rules. So now we need some kind of 'import' or 'namespace' to
 get around those rules.
 

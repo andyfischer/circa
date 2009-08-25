@@ -1,0 +1,22 @@
+
+In dataflow languages, it's common to think of a function which is a little
+black box that takes input and spits out an output. And in the middle, there
+is any amount of bookkeeping.
+
+However in the current system, this is hard. The code is set up so that there
+is no difference between a term's internal value, and its output. All terms
+are transparent this way.
+
+This problem keeps coming up, and it would be great to have a term be able to do
+this:
+
+
+some_term =
+{
+  ...
+  (bookkeeping)
+  #out = output()
+}
+
+Then when another term uses 'some_term', it should actually access the value that
+is inside '#out'.
