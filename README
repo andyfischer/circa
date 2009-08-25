@@ -1,45 +1,30 @@
 The goal of this project is to create a programming environment that is fun and efficient,
 where you can directly see and interact with the code you are editing.
 
-There are two elements: Circa, a programming language; and Plastic, a cross-platform
+There are two sub projects: Circa, a programming language; and Plastic, a cross-platform
 graphical tool for creating Circa code.
 
-Features of Circa are:
+Some features of Circa are:
 
- - Live coding. The user can examine and modify code while it is running. There's no need
-   to restart the program to make changes.
+ - Live coding. The user can examine and modify code while it is running.
+ - Visual programming is supported. There is a rich interface for writing tools which
+   examine or modify Circa code.
+ - Code is primarily saved as text, using syntax that is similar to other modern
+   programming languages.
+ - Editing text files at runtime is supported. The current state of the program is
+   preserved across a text file reload (as much as possible).
+ - Non-goal: Circa is not a general-purpose language; there are some styles of programming
+   which Circa would be very bad at.
 
- - Code is primarily saved as text, in a human-readable format that looks like a modern
-   programming language.
+Some implementation details:
 
- - Traditional visual programming (with a dataflow diagram that has lots of boxes and
-   arrows) is supported.
-
- - Editing text files at runtime is also supported. The system can handle arbitrary
-   changes to the source code of a running program. The current state of the program is
-   preserved across a reload (as much as possible).
-
- - The format of compiled code is as canonical and simple as possible. It should be easy
-   to introspect on code, and to reason about the code, without actually running it.
-
- - It should be easy to write tools which help the user create or modify code in novel
-   ways. For example, imagine a drawing program, where the user clicks and drags to draw
-   a square, and the end result is a small program with a "draw_square()" call.
-
- - Non-goal. Circa is not a general-purpose language.
-
- - Non-goal. Circa is not very expressive. If you have prior programming experience, then
-   you will probably find it limiting. Many programming constructs (such as unbounded
-   loops or arbitrary side effects) are not allowed because they make the code harder to
-   reason about. Turing-completeness is not a requirement for us.
-
-A few implementation details:
- - Static typing with partial type inference. Has an 'any' type
+ - Static structural typing with some type inference
  - Dataflow-based
  - Implemented in C++
+ - Plastic uses SDL and OpenGL for graphics
+ - Currently supported on: XP, OSX, Ubuntu
 
-Current status: Nearing an alpha release. There are currently a few working demos, but
-there are too many bugs and not enough neat features.
+Current status: Working on an alpha release.
 
 This project is Copyright (c) 2007-2009 Paul Hodge.
 
