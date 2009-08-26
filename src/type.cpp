@@ -244,6 +244,16 @@ std::string compound_type_to_string(Term* caller)
     return out.str();
 }
 
+Term* dereference(Term* term)
+{
+    if (term->type == CODE_TYPE) {
+        term = as_branch(term).last();
+        return dereference(term);
+    }
+
+    return term;
+}
+
 bool identity_equals(Term* a, Term* b)
 {
     return a->value == b->value;

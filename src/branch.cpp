@@ -253,8 +253,15 @@ bool is_branch(Term* term)
 
 Branch& as_branch(Term* term)
 {
-    if (!is_branch(term))
-        assert_type(term, BRANCH_TYPE);
+    assert(is_branch(term));
+    alloc_value(term);
+    return *((Branch*) term->value);
+}
+
+Branch& as_compound(Term* term)
+{
+    term = dereference(term);
+    assert(is_branch(term));
     alloc_value(term);
     return *((Branch*) term->value);
 }

@@ -45,6 +45,7 @@ void zero_alloc(Term *type, Term* t)
 
 std::string& as_string(Term* term)
 {
+    term = dereference(term);
     assert(term->type == STRING_TYPE);
     alloc_value(term);
     return *((std::string*) term->value);
@@ -52,6 +53,7 @@ std::string& as_string(Term* term)
 
 Ref& as_ref(Term* term)
 {
+    term = dereference(term);
     assert(term->type == REF_TYPE);
     return *((Ref*) term->value);
 }
@@ -108,24 +110,28 @@ const std::type_info*& as_std_type_info(Term* term)
 
 EvaluateFunc& as_evaluate_thunk(Term* term)
 {
+    term = dereference(term);
     assert(term->type == EVALUATE_THUNK_TYPE);
     return ((EvaluateFunc&) term->value);
 }
 
 SpecializeTypeFunc& as_specialize_type_thunk(Term* term)
 {
+    term = dereference(term);
     assert(term->type == SPECIALIZE_THUNK_TYPE);
     return ((SpecializeTypeFunc&) term->value);
 }
 
 ToSourceStringFunc& as_to_source_string_thunk(Term* term)
 {
+    term = dereference(term);
     assert(term->type == TO_STRING_THUNK_TYPE);
     return ((ToSourceStringFunc&) term->value);
 }
 
 CheckInvariantsFunc& as_check_invariants_thunk(Term* term)
 {
+    term = dereference(term);
     assert(term->type == CHECK_INVARIANTS_FUNC_TYPE);
     return ((CheckInvariantsFunc&) term->value);
 }
@@ -213,6 +219,7 @@ namespace int_t {
 
 int& as_int(Term* term)
 {
+    term = dereference(term);
     assert(term->type == INT_TYPE);
     alloc_value(term);
     return (int&) term->value;
@@ -275,6 +282,7 @@ namespace float_t {
 
 float& as_float(Term* term)
 {
+    term = dereference(term);
     assert(term->type == FLOAT_TYPE);
     alloc_value(term);
     return (float&) term->value;
@@ -305,6 +313,7 @@ namespace bool_t {
 
 bool& as_bool(Term* term)
 {
+    term = dereference(term);
     assert(term->type == BOOL_TYPE);
     alloc_value(term);
     return (bool&) term->value;
