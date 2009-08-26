@@ -248,6 +248,7 @@ Term* dereference(Term* term)
 {
     if (term->type == CODE_TYPE) {
         term = as_branch(term).last();
+        if (term == NULL) return NULL;
         return dereference(term);
     }
 
