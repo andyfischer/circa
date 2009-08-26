@@ -11,12 +11,12 @@ Term* get_for_loop_iterator(Term* forTerm)
 
 Branch& get_for_loop_code(Term* forTerm)
 {
-    return forTerm->field(0)->asBranch();
+    return forTerm->asBranch()[0]->asBranch();
 }
 
 Branch& get_for_loop_state(Term* forTerm)
 {
-    return forTerm->field(1)->asBranch();
+    return forTerm->asBranch()[1]->asBranch();
 }
 
 Branch& get_for_loop_iteration_state(Term* forTerm, int index)
@@ -89,11 +89,11 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
 
         // Inject iterator value
         Term* iterator = codeBranch[0];
-        if (!value_fits_type(listTerm->field(i), iterator->type)) {
+        if (!value_fits_type(listTerm->asBranch()[i], iterator->type)) {
             error_occurred(forTerm, "Internal error in evaluate_for_loop: can't assign this element to iterator");
             return;
         }
-        assign_value(listTerm->field(i), iterator);
+        assign_value(listTerm->asBranch()[i], iterator);
 
         // Inject stateful terms
         load_state_into_branch(stateBranch[i]->asBranch(), codeBranch);

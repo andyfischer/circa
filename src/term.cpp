@@ -179,14 +179,4 @@ Branch& Term::asBranch()
     return as_branch(this);
 }
 
-Term* Term::field(int index)
-{
-    return as_branch(this)[index];
-}
-
-Term* Term::field(std::string const& fieldName)
-{
-    return as_branch(this)[fieldName];
-}
-
 } // namespace circa

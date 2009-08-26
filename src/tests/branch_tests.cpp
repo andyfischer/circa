@@ -62,8 +62,8 @@ void test_duplicate_nested()
     Branch dupe;
     duplicate_branch(branch, dupe);
 
-    Term* inner_i = dupe["inner"]->field("i");
-    Term* inner_j = dupe["inner"]->field("j");
+    Term* inner_i = dupe["inner"]->asBranch()["i"];
+    Term* inner_j = dupe["inner"]->asBranch()["j"];
 
     test_assert(inner_i != NULL);
     test_assert(inner_j != NULL);

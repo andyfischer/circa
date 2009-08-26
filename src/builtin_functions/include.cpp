@@ -20,8 +20,8 @@ namespace include_function {
     void possibly_expand(Term* caller)
     {
         Term* state = caller->input(0);
-        std::string &prev_filename = state->field(0)->asString();
-        int &prev_modified = state->field(1)->asInt();
+        std::string &prev_filename = state->asBranch()[0]->asString();
+        int &prev_modified = state->asBranch()[1]->asInt();
 
         std::string &requested_filename = caller->input(1)->asString();
 
