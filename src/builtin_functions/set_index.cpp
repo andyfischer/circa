@@ -10,7 +10,7 @@ namespace set_index_function {
         assign_value(caller->input(0), caller);
 
         int index = caller->input(1)->asInt();
-        assign_value(caller->input(2), as_branch(caller)[index]);
+        assign_value(caller->input(2), as_compound(caller)[index]);
     }
 
     Term* specializeType(Term* caller)
