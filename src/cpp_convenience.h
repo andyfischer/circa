@@ -13,6 +13,8 @@ namespace circa {
 template <class T>
 T& as(Term* term)
 {
+    term = dereference(term);
+
     Type& type = as_type(term->type);
 
     if (type.cppTypeInfo == NULL)

@@ -182,6 +182,35 @@ void type_inference_for_get_field()
     test_assert(b->type == FLOAT_TYPE);
 }
 
+void test_dereference_on_code_type()
+{
+    Branch branch;
+
+    // Test an unnecessary dereference
+    Term* i = int_value(branch, 5);
+    test_assert(i == dereference(i));
+
+    Term* codeTerm = create_value(branch, CODE_TYPE);
+
+    // Dereference to nowhere
+    test_assert(dereference(codeTerm) == NULL);
+
+    Branch& code = as_branch(codeTerm);
+
+    Term* x = int_value(code, 5);
+    test_assert(dereference(codeTerm) == x);
+    test_assert(as_int(codeTerm) == 5);
+
+    // This test should be done for every primitive type
+    code.clear();
+    float_value(code, 4.2);
+    test_equals(as_float(codeTerm), 4.2);
+
+    code.clear();
+    string_value(code, "hi");
+    test_assert(as_string(codeTerm) == "hi");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
@@ -192,6 +221,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_default_values);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);
+    REGISTER_TEST_CASE(type_tests::test_dereference_on_code_type);
 }
 
 } // namespace type_tests

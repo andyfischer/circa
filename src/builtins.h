@@ -47,6 +47,7 @@ extern Term* UNRECOGNIZED_EXPRESSION_FUNC;
 extern Term* VALUE_FUNC;
 
 extern Term* BRANCH_TYPE;
+extern Term* CODE_TYPE;
 extern Term* FEEDBACK_TYPE;
 extern Term* FUNCTION_TYPE;
 extern Term* LIST_TYPE;

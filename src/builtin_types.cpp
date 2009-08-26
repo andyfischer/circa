@@ -140,8 +140,8 @@ void setup_builtin_types(Branch& kernel)
     import_member_function(LIST_TYPE, list_t::count, "count(List) : int");
 
     NAMESPACE_TYPE = create_compound_type(kernel, "Namespace");
-
     OVERLOADED_FUNCTION_TYPE = create_compound_type(kernel, "OverloadedFunction");
+    CODE_TYPE = create_compound_type(kernel, "Code");
 }
 
 void parse_builtin_types(Branch& kernel)

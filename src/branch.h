@@ -40,6 +40,8 @@ struct Branch
     // Overload to conveniently pass this branch via its owningTerm
     operator Term*() { return owningTerm; }
 
+    Term* last() { if (length() == 0) return NULL; else return _terms[length()-1]; }
+
     // Returns true if there is a term with the given name
     bool contains(std::string const& name) const { return names.contains(name); }
 
@@ -87,6 +89,10 @@ namespace branch_t {
 
 bool is_branch(Term* term);
 Branch& as_branch(Term* term);
+
+// Access as a compound value. This will perform dereference(), unlike as_branch()
+Branch& as_compound(Term* term);
+
 std::string get_name_for_attribute(std::string attribute);
 Term* get_branch_attribute(Branch& branch, std::string const& attr);
 Branch* get_outer_scope(Branch& branch);
