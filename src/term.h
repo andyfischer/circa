@@ -75,7 +75,6 @@ struct Term
     std::string stringPropOptional(std::string const& name, std::string const& defaultValue);
 
     // Accessors for specific properties
-
     void attachErrorMessage(std::string const& message);
     std::string getErrorMessage() const;
 
@@ -87,10 +86,6 @@ struct Term
     bool& asBool();
     Ref& asRef();
     Branch& asBranch();
-
-    // Accessors for compound types
-    Term* field(int index);
-    Term* field(std::string const& fieldName);
 };
 
 } // namespace circa

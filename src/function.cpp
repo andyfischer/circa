@@ -30,7 +30,7 @@ namespace function_t {
 
     std::string& get_name(Term* function)
     {
-        return function->field(0)->field(0)->asString();
+        return function->asBranch()[0]->asBranch()[0]->asString();
     }
 
     Term* get_output_type(Term* function)
@@ -45,12 +45,12 @@ namespace function_t {
 
     Ref& get_hidden_state_type(Term* function)
     {
-        return function->field(0)->field(1)->asRef();
+        return function->asBranch()[0]->asBranch()[1]->asRef();
     }
 
     bool& get_variable_args(Term* function)
     {
-        return function->field(0)->field(2)->asBool();
+        return function->asBranch()[0]->asBranch()[2]->asBool();
     }
 
     int num_inputs(Term* function)
@@ -100,27 +100,27 @@ namespace function_t {
 
     EvaluateFunc& get_evaluate(Term* func)
     {
-        return as_evaluate_thunk(func->field(0)->field(3));
+        return as_evaluate_thunk(func->asBranch()[0]->asBranch()[3]);
     }
 
     SpecializeTypeFunc& get_specialize_type(Term* func)
     {
-        return as_specialize_type_thunk(func->field(0)->field(4));
+        return as_specialize_type_thunk(func->asBranch()[0]->asBranch()[4]);
     }
 
     ToSourceStringFunc& get_to_source_string(Term* func)
     {
-        return as_to_source_string_thunk(func->field(0)->field(5));
+        return as_to_source_string_thunk(func->asBranch()[0]->asBranch()[5]);
     }
 
     Ref& get_feedback_func(Term* func)
     {
-        return as_ref(func->field(0)->field(6));
+        return as_ref(func->asBranch()[0]->asBranch()[6]);
     }
 
     Branch& get_parameters(Term* func)
     {
-        return as_branch(func->field(0)->field(7));
+        return as_branch(func->asBranch()[0]->asBranch()[7]);
     }
 } // namespace function_t
 

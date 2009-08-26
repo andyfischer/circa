@@ -60,7 +60,7 @@ void subroutine_expansion_during_migrate()
     test_assert(is_subroutine_state_expanded(sourceCallState));
     test_assert(!is_subroutine_state_expanded(destCallState));
 
-    sourceCallState->field("i")->asInt() = 111;
+    sourceCallState->asBranch()["i"]->asInt() = 111;
 
     migrate_stateful_values(source, dest);
 

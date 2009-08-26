@@ -213,8 +213,8 @@ void test_vectorized_funcs_with_points()
 
     Term* b = branch.eval("a + [0 2]");
 
-    test_equals(b->field(0)->toFloat(), 1);
-    test_equals(b->field(1)->toFloat(), 2);
+    test_equals(b->asBranch()[0]->toFloat(), 1);
+    test_equals(b->asBranch()[1]->toFloat(), 2);
 }
 
 void test_if_expr_with_int_and_float()
@@ -252,15 +252,15 @@ void test_set_index()
     Term* l2 = branch.eval("set_index(@l, 1, 5)");
 
     test_assert(l2);
-    test_assert(l2->field(0)->asInt() == 1);
-    test_assert(l2->field(1)->asInt() == 5);
-    test_assert(l2->field(2)->asInt() == 3);
+    test_assert(l2->asBranch()[0]->asInt() == 1);
+    test_assert(l2->asBranch()[1]->asInt() == 5);
+    test_assert(l2->asBranch()[2]->asInt() == 3);
 
     Term* l3 = branch.eval("l[2] = 9");
     test_assert(l3);
-    test_assert(l3->field(0)->asInt() == 1);
-    test_assert(l3->field(1)->asInt() == 5);
-    test_assert(l3->field(2)->asInt() == 9);
+    test_assert(l3->asBranch()[0]->asInt() == 1);
+    test_assert(l3->asBranch()[1]->asInt() == 5);
+    test_assert(l3->asBranch()[2]->asInt() == 9);
 }
 
 void test_do_once()

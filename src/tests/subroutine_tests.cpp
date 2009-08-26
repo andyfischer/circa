@@ -67,7 +67,7 @@ void subroutine_stateful_term()
     test_assert(function_t::get_hidden_state_type(branch["mysub"]) != VOID_TYPE);
     test_assert(is_function_stateful(branch["mysub"]));
     test_assert(get_hidden_state_for_call(call) != NULL);
-    Term* a_inside_first_call = get_hidden_state_for_call(call)->field("a");
+    Term* a_inside_first_call = get_hidden_state_for_call(call)->asBranch()["a"];
     test_equals(as_float(a_inside_first_call), 1);
     evaluate_term(call);
     test_equals(as_float(a_inside_first_call), 2);
@@ -79,7 +79,7 @@ void subroutine_stateful_term()
     a_inside_first_call->boolProp("break-on-assign") = true;
 
     Term* another_call = branch.eval("mysub()");
-    Term* a_inside_another_call = get_hidden_state_for_call(another_call)->field("a");
+    Term* a_inside_another_call = get_hidden_state_for_call(another_call)->asBranch()["a"];
 
     test_assert(a_inside_first_call != a_inside_another_call);
     test_equals(as_float(a_inside_first_call), 3);
@@ -140,8 +140,8 @@ void specialization_to_output_type()
     // Make sure that the return value is preserved. This had a bug too
     Term* call = branch.eval("a()");
     test_assert(as_branch(call).length() == 2);
-    test_equals(call->field(0)->toFloat(), 1.0);
-    test_equals(call->field(1)->toFloat(), 2.0);
+    test_equals(call->asBranch()[0]->toFloat(), 1.0);
+    test_equals(call->asBranch()[1]->toFloat(), 2.0);
 }
 
 void stateful_function_with_arguments()
