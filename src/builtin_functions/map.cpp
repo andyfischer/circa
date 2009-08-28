@@ -8,8 +8,8 @@ namespace map_function {
     void evaluate(Term* caller)
     {
         Term* func = caller->input(0);
-        Branch& inputs = as_compound(caller->input(1));
-        Branch& output = as_compound(caller);
+        Branch& inputs = as_branch(caller->input(1));
+        Branch& output = as_branch(caller);
 
         // Create term if necessary
         for (int i=output.length(); i < inputs.length(); i++)

@@ -90,9 +90,6 @@ namespace branch_t {
 bool is_branch(Term* term);
 Branch& as_branch(Term* term);
 
-// Access as a compound value. This will perform dereference(), unlike as_branch()
-Branch& as_compound(Term* term);
-
 std::string get_name_for_attribute(std::string attribute);
 Term* get_branch_attribute(Branch& branch, std::string const& attr);
 Branch* get_outer_scope(Branch& branch);

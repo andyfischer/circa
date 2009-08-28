@@ -15,7 +15,7 @@ namespace get_field_function {
             return;
         }
 
-        Term* field = as_compound(caller->input(0))[index];
+        Term* field = as_branch(caller->input(0))[index];
         assign_value(field, caller);
     }
 

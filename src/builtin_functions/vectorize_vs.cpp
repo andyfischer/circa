@@ -14,10 +14,10 @@ namespace vectorize_vs_function {
     {
         Term* func = function_t::get_parameters(caller->function)[0]->asRef();
 
-        Branch& left = as_compound(caller->input(0));
+        Branch& left = as_branch(caller->input(0));
         Term* right = caller->input(1);
 
-        Branch& output = as_compound(caller);
+        Branch& output = as_branch(caller);
 
         // Check if our output value has been precreated but not initialized by us.
         if (output.length() > 0 && output[0]->function == VALUE_FUNC)

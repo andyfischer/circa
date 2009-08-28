@@ -11,7 +11,7 @@ namespace set_field_function {
 
         std::string name = caller->input(1)->asString();
         int index = as_type(caller->input(0)->type).findFieldIndex(name);
-        assign_value(caller->input(2), as_compound(caller)[index]);
+        assign_value(caller->input(2), as_branch(caller)[index]);
     }
 
     Term* specializeType(Term* caller)
