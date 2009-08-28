@@ -17,6 +17,30 @@ type Bullet {
     Point momentum
 }
 
+def wrap_around_x(float x) : float
+    if x < 0
+        return x + WINDOW_WIDTH
+    elif x > WINDOW_WIDTH
+        return x - WINDOW_WIDTH
+    else
+        return x
+    end
+end
+
+def wrap_around_y(float y) : float
+    if y < 0
+        return y + WINDOW_HEIGHT
+    elif y > WINDOW_HEIGHT
+        return y - WINDOW_HEIGHT
+    else
+        return y
+    end
+end
+
+def wrap_around(Point p) : Point
+    return [wrap_around_x(p.x) wrap_around_y(p.y)]
+end
+
 state Ship ship = [[WINDOW_WIDTH/2 WINDOW_HEIGHT/2] [0 0] 0]
 state List bullets = []
 accelration_per_s = 5.0
@@ -26,7 +50,7 @@ speed_limit = 1.8
 bullet_speed = 3.0
 bullet_width = 2.0
 
---tweak.button(&bullet_speed, [5 50], 0.1)
+--tweak.button(&accelration_per_s, [5 50], 0.1)
 
 -- Draw the ship
 begin
@@ -70,7 +94,9 @@ if speed > speed_limit
     ship.momentum = ship.momentum * (speed_limit / speed)
 end
 
+-- Move ship
 ship.loc = ship.loc + ship.momentum
+ship.loc = wrap_around(ship.loc)
 
 -- Press space to shoot a bullet
 if key_pressed(SPACE)
@@ -79,11 +105,19 @@ end
 
 -- Move bullets
 def move_bullet(Bullet bullet) : Bullet
-    return [bullet.lifespan+time_delta, bullet.loc + bullet.momentum,
-        bullet.momentum]
+    loc = bullet.loc + bullet.momentum
+    loc = wrap_around(loc)
+    return [bullet.lifespan+time_delta, loc, bullet.momentum]
 end
 
 bullets = map(move_bullet, bullets)
+
+-- Remove old bullets
+def filter_bullet(Bullet bullet) : bool
+    return bullet.lifespan < 1.8
+end
+
+bullets = filter(bullets, map(filter_bullet, bullets))
 
 -- Draw bullets
 for bullet in bullets
