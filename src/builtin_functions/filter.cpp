@@ -29,6 +29,11 @@ namespace filter_function {
             }
         }
 
+        // Remove extra elements
+        for (int i=write; i < output.length(); i++)
+            output[i] = NULL;
+
+        output.removeNulls();
     }
 
     void setup(Branch& kernel)

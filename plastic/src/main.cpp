@@ -16,7 +16,7 @@
 #include "ttf.h"
 
 // Prevent warnings on getenv()
-#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS 1
 
 using namespace circa;
 
