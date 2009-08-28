@@ -51,10 +51,10 @@ struct RenderedText
 
     RenderedText(Term* term) : _term(term) {}
 
-    int& texid() { return _term->field(0)->asInt(); }
-    float& width() { return _term->field(1)->asFloat(); }
-    float& height() { return _term->field(2)->asFloat(); }
-    std::string& text() { return _term->field(3)->asString(); }
+    int& texid() { return _term->asBranch()[0]->asInt(); }
+    float& width() { return _term->asBranch()[1]->asFloat(); }
+    float& height() { return _term->asBranch()[2]->asFloat(); }
+    std::string& text() { return _term->asBranch()[3]->asString(); }
 };
     
 void draw_text(Term* caller)

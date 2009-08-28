@@ -39,8 +39,8 @@ void gl_triangles(Term* caller)
     glBegin(GL_TRIANGLES);
 
     for (int i=0; i < list.length(); i++) {
-        float x = list[i]->field(0)->toFloat();
-        float y = list[i]->field(1)->toFloat();
+        float x = list[i]->asBranch()[0]->toFloat();
+        float y = list[i]->asBranch()[1]->toFloat();
 
         glVertex3f(x,y,0);
     }
@@ -58,8 +58,8 @@ void gl_line_strip(Term* caller)
     glBegin(GL_LINE_STRIP);
 
     for (int i=0; i < list.length(); i++) {
-        float x = list[i]->field(0)->toFloat();
-        float y = list[i]->field(1)->toFloat();
+        float x = list[i]->asBranch()[0]->toFloat();
+        float y = list[i]->asBranch()[1]->toFloat();
         glVertex3f(x,y,0);
     }
     
@@ -76,8 +76,8 @@ void gl_line_loop(Term* caller)
     glBegin(GL_LINE_LOOP);
 
     for (int i=0; i < list.length(); i++) {
-        float x = list[i]->field(0)->toFloat();
-        float y = list[i]->field(1)->toFloat();
+        float x = list[i]->asBranch()[0]->toFloat();
+        float y = list[i]->asBranch()[1]->toFloat();
         glVertex3f(x,y,0);
     }
     
