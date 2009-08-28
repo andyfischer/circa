@@ -76,9 +76,19 @@ void equals_snippets()
     test_snippet("", "[1 1 1] != [1 1]");
 }
 
+void test_filter()
+{
+    test_snippet("a = filter([], [])", "a == []");
+    test_snippet("a = filter([1], [true])", "a == [1]");
+    test_snippet("a = filter([1], [false])", "a == []");
+    test_snippet("a = filter([1 2 3 4], [true false true false])", "a == [1 3]");
+    test_snippet("a = filter([1 2 3 4], [false true false true])", "a == [2 4]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
+    REGISTER_TEST_CASE(test_snippets::test_filter);
 }
 
 } // namespace test_snippets
