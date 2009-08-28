@@ -20,3 +20,12 @@ some_term =
 
 Then when another term uses 'some_term', it should actually access the value that
 is inside '#out'.
+
+---
+
+Final thoughts:
+
+This problem does keep coming up but I don't want to solve it. Having a separation
+between a term's outputs and contents is going to make lots of things more
+complicated. I think we can live without this fix, so far there have been various
+workarounds and we'll just keep finding workarounds.

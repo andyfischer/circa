@@ -7,7 +7,7 @@ namespace any_true_function {
 
     void evaluate(Term* caller)
     {
-        Branch& input = as_compound(caller->input(0));
+        Branch& input = as_branch(caller->input(0));
 
         bool result = false;
         for (int i=0; i < input.length(); i++)

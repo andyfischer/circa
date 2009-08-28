@@ -28,7 +28,7 @@ namespace add_function {
 
         float delta = desired - to_float(target);
 
-        Branch& outputList = as_compound(caller);
+        Branch& outputList = as_branch(caller);
         for (int i=0; i < outputList.length(); i++) {
             Term* output = outputList[i];
             Term* outputTarget = target->input(i);

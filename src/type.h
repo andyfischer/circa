@@ -120,10 +120,6 @@ void initialize_compound_type(Term* term);
 
 std::string compound_type_to_string(Term* caller);
 
-// Returns the term which should be used as this term's output. This is usually
-// the same term, but not always.
-Term* dereference(Term* term);
-
 // Functions which are dispatched based on type:
 bool is_value_alloced(Term* term);
 void alloc_value(Term* term);

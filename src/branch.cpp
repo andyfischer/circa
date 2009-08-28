@@ -258,14 +258,6 @@ Branch& as_branch(Term* term)
     return *((Branch*) term->value);
 }
 
-Branch& as_compound(Term* term)
-{
-    term = dereference(term);
-    assert(is_branch(term));
-    alloc_value(term);
-    return *((Branch*) term->value);
-}
-
 std::string get_name_for_attribute(std::string attribute)
 {
     return "#attr:" + attribute;
