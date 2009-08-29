@@ -31,6 +31,26 @@ def draw_text(TTF_Font font, string text, int color, Point location)
     draw_rendered_text(sprite, location.x location.y)
 end
 
+namespace fps_counter
+    state int framesElapsed = 0
+    state float timeStarted = time
+    state float lastRecoredFps = 0
+
+    framesPerSample = 30
+    earlySampleTime = .5
+
+    framesElapsed += 1
+    timeElapsed = time - timeStarted
+
+    if (framesElapsed > framesPerSample) || (timeElapsed > earlySampleTime)
+        lastRecoredFps = framesElapsed / timeElapsed
+        framesElapsed = 0
+        timeStarted = time
+    end
+end
+
+fps = fps_counter.lastRecoredFps
+
 -- TODO: put this in a separate file
 namespace tweak
     def button(ref r, Point loc, float step)
