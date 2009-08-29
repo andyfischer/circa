@@ -20,7 +20,7 @@ namespace rand_function {
     void evaluate(Term* caller)
     {
         seed_if_needed();
-        as_float(caller) = (float) rand() / 0x8fffffff;
+        as_float(caller) = (float) rand() / RAND_MAX;
     }
 
     void evaluate_i(Term* caller)
