@@ -57,7 +57,7 @@ def random_location() : Point
 end
 
 -- Draw a background full of stars
-for i in range(700)
+for i in range(1)
     state Point loc = random_location()
     state float intensity = rand()
     gl.line_loop([loc, loc+[.5 .5]] round(#111 * round(intensity*15)))

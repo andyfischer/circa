@@ -97,9 +97,9 @@ void main_loop()
 {
     input::capture_events();
 
-    if (!PAUSED) {
+    long ticks = SDL_GetTicks();
 
-        long ticks = SDL_GetTicks();
+    if (!PAUSED) {
 
         TIME_DELTA = (ticks - PREV_SDL_TICKS) / 1000.0f;
         TIME = ticks / 1000.0f;
@@ -124,9 +124,14 @@ void main_loop()
     // Update the screen
     SDL_GL_SwapBuffers();
 
+    long new_ticks = SDL_GetTicks();
+
     // Delay to limit framerate to 60 FPS
-    if (TIME_DELTA < (1.0 / 60.0))
-        SDL_Delay(((1.0 / 60.0) - TIME_DELTA) * 1000);
+    const long ticks_per_second = long(1.0 / 60.0 * 1000);
+    if ((new_ticks - ticks) < ticks_per_second) {
+        long delay = ticks_per_second - (new_ticks - ticks);
+        SDL_Delay(delay);
+    }
 }
 
 int main( int argc, char* args[] )
