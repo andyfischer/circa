@@ -885,7 +885,7 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "*") return "mult";
     else if (infix == "/") return "div";
     else if (infix == "//") return "div_i";
-    else if (infix == "%") return "mod";
+    else if (infix == "%") return "remainder";
     else if (infix == "<") return "less_than";
     else if (infix == "<=") return "less_than_eq";
     else if (infix == ">") return "greater_than";
