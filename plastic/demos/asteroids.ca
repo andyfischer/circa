@@ -52,6 +52,18 @@ bullet_width = 2.0
 
 --tweak.button(&accelration_per_s, [5 50], 0.1)
 
+def random_location() : Point
+    return [rand() * WINDOW_WIDTH, rand() * WINDOW_HEIGHT]
+end
+
+-- Draw a background full of stars
+
+for i in range(1000)
+    state Point loc = random_location()
+    state float intensity = rand()
+    gl.line_loop([loc, loc+[.5 .5]] round(#111 * intensity))
+end
+
 -- Draw the ship
 begin
     def ship_point(float rot, float dist) : Point
