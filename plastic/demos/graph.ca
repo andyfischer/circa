@@ -3,24 +3,26 @@ background(#fff)
 
 axis_center = [200 200] : Point
 
+
+
 def map_point(float x) : Point
   x = x - 200
-  y = sin(x / 100)*50
+  y = mod(x, 100)
   return [x 0-y] + axis_center
 end
 def map_point_cos(float x) : Point
   x = x - 200
-  y = cos(x / 100)*50
+  y = remainder(x,100) + 1
   return [x 0-y] + axis_center
 end
 
 -- draw the axis
-gl_line_strip([axis_center-[0 200] axis_center+[0 200]] #888)
-gl_line_strip([axis_center-[200 0] axis_center+[200 0]] #888)
+gl.line_strip([axis_center-[0 200] axis_center+[0 200]] #888)
+gl.line_strip([axis_center-[200 0] axis_center+[200 0]] #888)
 
 -- draw the function
 points = map(map_point, range(400))
-gl_line_strip(points, #f00)
+gl.line_strip(points, #f00)
 
 points = map(map_point_cos, range(400))
-gl_line_strip(points, #f00)
+gl.line_strip(points, #00f)
