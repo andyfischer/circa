@@ -1,13 +1,14 @@
 
-SPECIFIC THINGS:
+Tasks:
+
  - Need an efficient + safe way to share output values across terms
+ - Range syntax, like this: [1..100]
+ - Block syntax, like how it's easy to pass a block in ruby
+ - Colors need to be specified as lists
 
-IMPORTANT THINGS:
-- Cool graphical demo
-- Parametrized types, lists and stuff
-
-FUTURE THINGS:
-- LLVM integration. Need to investigate this enough to learn what it would look like.
-- Access and edit properties from circa
-- Lambdas
-- C reproduction.
+Big tasks:
+ - Cool graphical demo
+ - Parametrized types, lists and stuff
+ - LLVM integration. (need to investigate this enough to learn what it would look like)
+ - Access and edit properties from circa
+ - C reproduction.
