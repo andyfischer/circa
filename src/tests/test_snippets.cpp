@@ -76,6 +76,22 @@ void equals_snippets()
     test_snippet("", "[1 1 1] != [1 1]");
 }
 
+void test_modulo()
+{
+    test_snippet("", "1 % 2 == 1");
+    test_snippet("", "2 % 2 == 0");
+    test_snippet("", "3 % 2 == 1");
+    test_snippet("", "0 % 2 == 0");
+    test_snippet("", "-1 % 2 == -1");
+    test_snippet("", "mod(0, 2) == 0");
+    test_snippet("", "mod(1, 2) == 1");
+    test_snippet("", "mod(2, 2) == 0");
+    test_snippet("", "mod(-1, 2) == 1");
+    test_snippet("", "mod(0, 4) == 0");
+    test_snippet("", "mod(-1, 4) == 3");
+    test_snippet("", "mod(-2, 4) == 2");
+}
+
 void test_filter()
 {
     test_snippet("a = filter([], [])", "a == []");
@@ -88,6 +104,7 @@ void test_filter()
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
+    REGISTER_TEST_CASE(test_snippets::test_modulo);
     REGISTER_TEST_CASE(test_snippets::test_filter);
 }
 
