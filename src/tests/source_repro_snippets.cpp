@@ -189,6 +189,7 @@ void reproduce_if() {
     round_trip_source("if true\nelif true\n  else\nend");
     round_trip_source("if 1 > 2\nprint('hi')\nelif 2 > 3\n  elif 3 > 4\nprint('hello')\nend");
     round_trip_source("if true 1 2 3 end");
+    round_trip_source("if true;1 2 3 end");
     finish_source_repro_category();
 }
 
@@ -245,6 +246,8 @@ void reproduce_subroutine() {
     round_trip_source("def hi(int)  end");
     round_trip_source("def hi(float, string, bool)  end");
     round_trip_source("type Point { float x, float y }\ndef hi() : Point\nreturn [0 0]\nend");
+    round_trip_source("def hi() if true return 1 else return 2 end end");
+    round_trip_source("def hi() x = 1 if true return x else return x end end");
     finish_source_repro_category();
 }
 

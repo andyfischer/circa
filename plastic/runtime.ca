@@ -51,7 +51,7 @@ end
 
 fps = fps_counter.lastRecoredFps
 
--- TODO: put this in a separate file
+
 namespace tweak
     def button(ref r, Point loc, float step)
         text = concat(r.name ' = ' r.to_string)
@@ -76,3 +76,9 @@ end
 -- Load the user's script
 state string user_script_filename
 users_branch = include(user_script_filename)
+
+-- Draw HUD
+
+-- Draw fpses
+text_sprite = render_text(ui_font_medium, concat('fps: ' fps), #fff)
+draw_rendered_text(text_sprite, 10 280)
