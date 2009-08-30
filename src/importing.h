@@ -24,6 +24,9 @@ Term* import_function_overload(Term* overload, EvaluateFunc evaluate,
 Term* import_member_function(Term* type, EvaluateFunc evaluate,
         std::string const& headerText);
 
+// Install an evaluate function into an existing function object.
+void install_function(Term* function, EvaluateFunc evaluate);
+
 } // namespace circa
 
 #endif

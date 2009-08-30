@@ -25,4 +25,9 @@ Term* import_function_overload(Term* overload, EvaluateFunc evaluate, std::strin
     return import_function(as_branch(overload), evaluate, header);
 }
 
+void install_function(Term* function, EvaluateFunc evaluate)
+{
+    function_t::get_evaluate(function) = evaluate;
+}
+
 } // namespace circa
