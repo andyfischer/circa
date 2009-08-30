@@ -11,12 +11,14 @@ void evaluate_term(Term* term)
 
     term->hasError = false;
 
+    /*
     std::string errorMessage;
 
     if (has_static_error(term)) {
         error_occurred(term, get_static_error_message(term));
         return;
     }
+    */
 
     EvaluateFunc evaluate = function_t::get_evaluate(term->function);
 
@@ -78,20 +80,6 @@ Term* apply_and_eval(Branch& branch, std::string const& functionName,
         throw std::runtime_error("function not found: "+functionName);
 
     return apply_and_eval(branch, function, inputs);
-}
-
-void resize_list(Branch& list, int numElements, Term* type)
-{
-    // Add terms if necessary
-    for (int i=list.length(); i < numElements; i++)
-        create_value(list, type);
-
-    // Remove terms if necessary
-    for (int i=numElements; i < list.length(); i++) {
-        list[i] = NULL;
-    }
-
-    list.removeNulls();
 }
 
 } // namespace circa

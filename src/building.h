@@ -44,6 +44,9 @@ void rewrite(Term* term, Term* function, RefList const& _inputs);
 // index, then add NULL terms until it does.
 void rewrite_as_value(Branch& branch, int index, Term* type);
 
+// Resize this list term, making sure that each element is a type of 'type'.
+void resize_list(Branch& list, int numElements, Term* type);
+
 } // namespace circa
 
 #endif

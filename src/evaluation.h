@@ -21,9 +21,6 @@ Term* apply_and_eval(Branch& branch,
                     std::string const& functionName,
                     RefList const& inputs);
 
-// Resize this list term, making sure that each element is a type of 'type'.
-void resize_list(Branch& list, int numElements, Term* type);
-
 } // namespace circa
 
 #endif

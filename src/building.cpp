@@ -213,4 +213,21 @@ void rewrite_as_value(Branch& branch, int index, Term* type)
     }
 }
 
+void resize_list(Branch& list, int numElements, Term* type)
+{
+    // Add terms if necessary
+    for (int i=list.length(); i < numElements; i++)
+        create_value(list, type);
+
+    // Remove terms if necessary
+    bool anyRemoved = false;
+    for (int i=numElements; i < list.length(); i++) {
+        list[i] = NULL;
+        anyRemoved = true;
+    }
+
+    if (anyRemoved)
+        list.removeNulls();
+}
+
 } // namespace circa
