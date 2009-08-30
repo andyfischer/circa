@@ -30,10 +30,9 @@ Term* apply(Branch& branch, Term* function, RefList const& _inputs, std::string 
         std::stringstream new_value_name;
         new_value_name << "#hidden_state";
         if (name != "") new_value_name << "_for_" << name;
-        Term* stateContainer = create_value(branch, function_t::get_hidden_state_type(function),
+        Term* stateContainer = create_stateful_value(branch, function_t::get_hidden_state_type(function),
                 new_value_name.str());
         set_source_hidden(stateContainer, true);
-        set_stateful(stateContainer, true);
         inputs.prepend(stateContainer);
     }
 
@@ -128,6 +127,13 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
         throw std::runtime_error("Couldn't find type: "+typeName);
 
     return create_value(branch, type, name);
+}
+
+Term* create_stateful_value(Branch& branch, Term* type, std::string const& name)
+{
+    Term* t = create_value(branch, type, name);
+    t->function = STATEFUL_VALUE_FUNC;
+    return t;
 }
 
 Term* string_value(Branch& branch, std::string const& s, std::string const& name)

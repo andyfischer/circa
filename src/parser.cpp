@@ -651,8 +651,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     if (!is_type(type))
         return compile_error_for_line(branch, tokens, startPosition, "Not a type: "+type->name);
 
-    Term* result = create_value(branch, type, name);
-    set_stateful(result, true);
+    Term* result = create_stateful_value(branch, type, name);
 
     if (typeName != "")
         result->stringProp("syntaxHints:explicitType") = typeName;

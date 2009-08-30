@@ -26,6 +26,8 @@ void set_input(Term* term, int index, Term* input);
 Term* create_value(Branch& branch, Term* type, std::string const& name="");
 Term* create_value(Branch& branch, std::string const& typeName, std::string const& name="");
 
+Term* create_stateful_value(Branch& branch, Term* type, std::string const& name="");
+
 // Import values
 Term* string_value(Branch& branch, std::string const& s, std::string const& name="");
 Term* int_value(Branch& branch, int i, std::string const& name="");
