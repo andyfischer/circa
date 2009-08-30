@@ -91,6 +91,7 @@ void test_eval_as()
 
 void test_runtime_type_error()
 {
+#if 0
     // this test might become invalid when compile-time type checking is added
     Branch branch;
     Term* a = branch.eval("a = 1");
@@ -103,6 +104,7 @@ void test_runtime_type_error()
     term = branch.eval("abs()");
     evaluate_term(term);
     test_assert(term->hasError);
+#endif
 }
 
 void test_resize_list()

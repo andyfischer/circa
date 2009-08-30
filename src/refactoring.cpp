@@ -6,6 +6,9 @@ namespace circa {
 
 void change_function(Term* term, Term* newFunction)
 {
+    if (term->function == newFunction)
+        return;
+
     term->function = newFunction;
 
     change_type(term, function_t::get_output_type(newFunction));

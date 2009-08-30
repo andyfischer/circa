@@ -14,7 +14,7 @@ namespace ttf {
 
 SDL_Color unpack_sdl_color(int color)
 {
-    SDL_Color c;
+    SDL_Color c = {};
     c.r = ((color & 0xff000000) >> 24);
     c.g = ((color & 0x00ff0000) >> 16);
     c.b = ((color & 0x0000ff00) >> 8);

@@ -10,11 +10,11 @@ namespace range_function {
         unsigned int max = as_int(caller->input(0));
         
         Branch& branch = as_branch(caller);
-        branch.clear();
-        for (unsigned int i=0; i < max; i++) {
-            Term* v = create_value(branch, INT_TYPE);
-            as_int(v) = i;
-        }
+
+        resize_list(branch, max, INT_TYPE);
+        
+        for (unsigned int i=0; i < max; i++)
+            as_int(branch[i]) = i;
     }
 
     void setup(Branch& kernel)

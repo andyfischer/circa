@@ -17,7 +17,7 @@ WINDOWS = os.name == 'nt'
 # a little bit of special behavior for using frameworks.
 MAC = os.path.exists('/Library/Frameworks')
 
-DEBUG = False
+DEBUG = True
 
 if ARGUMENTS.get('release', False):
     DEBUG = False
