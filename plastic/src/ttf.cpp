@@ -159,15 +159,14 @@ void initialize(circa::Branch& branch)
 
     import_type<TTF_Font*>(branch, "TTF_Font");
 
-    import_function(branch, load_font, "load_font(state TTF_Font, string, int) : TTF_Font");
-    branch.eval("type RenderedText { int texid, float width, float height, string text }");
-    import_function(branch, draw_text,
-        "draw_text(TTF_Font, string, float x, float y, int) : RenderedText");
+}
 
-    import_function(branch, render_text,
-            "render_text(state RenderedText, TTF_Font, string, int color) : RenderedText");
-    import_function(branch, draw_rendered_text,
-        "draw_rendered_text(RenderedText, float x, float y)");
+void setup(Branch& branch)
+{
+    install_function(branch["text"]->asBranch()["load_font"], load_font);
+    install_function(branch["text"]->asBranch()["draw_text"], draw_text);
+    install_function(branch["text"]->asBranch()["render_text"], render_text);
+    install_function(branch["text"]->asBranch()["draw_rendered_text"], draw_rendered_text);
 }
 
 } // namespace ttf

@@ -6,6 +6,16 @@ def mouse_in(Box b) : bool
   return (b.x1 < mouse.x) && (b.x2 > mouse.x) && (b.y1 < mouse.y) && (b.y2 > mouse.y)
 end
 
+-- Text rendering functions
+namespace text
+    --type +native TTF_Font
+    type RenderedText { int texid, float width, float height, string text }
+    def load_font +native (state TTF_Font, string, int) : TTF_Font
+    def render_text +native (state RenderedText, TTF_Font, string, int color) : RenderedText
+    def draw_rendered_text +native (RenderedText, float x, float y)
+    def draw_text +native (TTF_Font, string, float x, float y, int color) : RenderedText
+end
+
 -- polar: polar to cartesian
 def polar(float angle, float radius, Point center) : Point
   return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
@@ -24,11 +34,11 @@ def draw_box(Box box, int color)
     gl.triangles([nw ne se se sw nw] color)
 end
 
-ui_font_medium = load_font("assets/sv_basic_manual/SVBasicManual.ttf", 16)
+ui_font_medium = text.load_font("assets/sv_basic_manual/SVBasicManual.ttf", 16)
 
-def draw_text(TTF_Font font, string text, int color, Point location)
-    sprite = render_text(font, text, color)
-    draw_rendered_text(sprite, location.x location.y)
+def draw_text(TTF_Font font, string str, int color, Point location)
+    sprite = text.render_text(font, str, color)
+    text.draw_rendered_text(sprite, location.x location.y)
 end
 
 namespace fps_counter
@@ -54,16 +64,16 @@ fps = fps_counter.lastRecoredFps
 
 namespace tweak
     def button(ref r, Point loc, float step)
-        text = concat(r.name ' = ' r.to_string)
+        str = concat(r.name ' = ' r.to_string)
 
-        text_sprite = render_text(ui_font_medium, text, #000)
+        text_sprite = text.render_text(ui_font_medium, str, #000)
         padding = 5.0
         rect = [loc.x - padding, loc.y - padding,
             loc.x + text_sprite.width + padding, loc.y + text_sprite.height + padding]
         color = #ee3399
         if mouse_in(rect) color = #ff44aa end
         draw_box(rect, color)
-        draw_rendered_text(text_sprite, loc.x, loc.y)
+        text.draw_rendered_text(text_sprite, loc.x, loc.y)
 
         if mouse_wheel_up(rect)
             r.assign(r.asfloat - step)
@@ -80,5 +90,5 @@ users_branch = include(user_script_filename)
 -- Draw HUD
 
 -- Draw fpses
-text_sprite = render_text(ui_font_medium, concat('fps: ' fps), #fff)
-draw_rendered_text(text_sprite, 10 280)
+text_sprite = text.render_text(ui_font_medium, concat('fps: ' fps), #fff)
+text.draw_rendered_text(text_sprite, 10 280)

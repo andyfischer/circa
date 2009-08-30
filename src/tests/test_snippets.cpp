@@ -76,6 +76,22 @@ void equals_snippets()
     test_snippet("", "[1 1 1] != [1 1]");
 }
 
+
+void test_abs()
+{
+    test_snippet("", "abs(7.0) == 7.0");
+    test_snippet("", "abs(-7.0) == 7.0");
+}
+
+void test_filter()
+{
+    test_snippet("a = filter([], [])", "a == []");
+    test_snippet("a = filter([1], [true])", "a == [1]");
+    test_snippet("a = filter([1], [false])", "a == []");
+    test_snippet("a = filter([1 2 3 4], [true false true false])", "a == [1 3]");
+    test_snippet("a = filter([1 2 3 4], [false true false true])", "a == [2 4]");
+}
+
 void test_modulo()
 {
     test_snippet("", "1 % 2 == 1");
@@ -92,20 +108,13 @@ void test_modulo()
     test_snippet("", "mod(-2, 4) == 2");
 }
 
-void test_filter()
-{
-    test_snippet("a = filter([], [])", "a == []");
-    test_snippet("a = filter([1], [true])", "a == [1]");
-    test_snippet("a = filter([1], [false])", "a == []");
-    test_snippet("a = filter([1 2 3 4], [true false true false])", "a == [1 3]");
-    test_snippet("a = filter([1 2 3 4], [false true false true])", "a == [2 4]");
-}
 
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
-    REGISTER_TEST_CASE(test_snippets::test_modulo);
+    REGISTER_TEST_CASE(test_snippets::test_abs);
     REGISTER_TEST_CASE(test_snippets::test_filter);
+    REGISTER_TEST_CASE(test_snippets::test_modulo);
 }
 
 } // namespace test_snippets

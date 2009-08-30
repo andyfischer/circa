@@ -156,6 +156,8 @@ int main( int argc, char* args[] )
     std::string circa_home = getenv("CIRCA_HOME");
     parse_script(*SCRIPT_ROOT, circa_home + "/plastic/runtime.ca");
 
+    ttf::setup(*SCRIPT_ROOT);
+
     if (has_static_errors(*SCRIPT_ROOT)) {
         std::cout << "Errors in runtime.ca:" << std::endl;
         print_static_errors_formatted(*SCRIPT_ROOT, std::cout);

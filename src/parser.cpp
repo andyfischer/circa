@@ -250,9 +250,24 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
             && !tokens.nextIs(FOR) && !tokens.nextIs(IF) && !tokens.nextIs(INCLUDE))
         return compile_error_for_line(branch, tokens, startPosition, "Expected identifier");
 
+    // Function name
     std::string functionName = tokens.consume();
-
     possible_whitespace(tokens);
+
+    bool isNative = false;
+
+    // Optional list of properties
+    while (tokens.nextIs(PLUS)) {
+        tokens.consume(PLUS);
+        std::string propName = tokens.consume(IDENTIFIER);
+        if (propName == "native")
+            isNative = true;
+        else
+            return compile_error_for_line(branch, tokens, startPosition,
+                    "Unsupported property: "+propName);
+
+        possible_whitespace(tokens);
+    }
 
     if (!tokens.nextIs(LPAREN))
         return compile_error_for_line(branch, tokens, startPosition, "Expected (");
@@ -339,8 +354,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 
-    // If we're out of tokens, then this is just an import_function call. Stop here.
-    if (tokens.finished()) {
+    // If we're out of tokens or if +native was used, then stop here.
+    if (isNative || tokens.finished()) {
         // Add a term to hold our output type
         create_value(contents, outputType, "#out");
         return result;
