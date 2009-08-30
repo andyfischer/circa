@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
 #include "circa.h"
-#include "introspection.h"
 
 namespace circa {
 namespace term_to_source_function {

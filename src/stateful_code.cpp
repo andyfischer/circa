@@ -8,12 +8,7 @@ bool MIGRATE_STATEFUL_VALUES_VERBOSE = false;
 
 bool is_stateful(Term* term)
 {
-    return term->boolPropOptional("stateful", false);
-}
-
-void set_stateful(Term* term, bool value)
-{
-    term->boolProp("stateful") = value;
+    return term->function == STATEFUL_VALUE_FUNC;
 }
 
 bool is_function_stateful(Term* func)

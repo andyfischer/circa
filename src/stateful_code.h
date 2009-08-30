@@ -8,8 +8,6 @@ namespace circa {
 // across a reload.
 bool is_stateful(Term* term);
 
-void set_stateful(Term* term, bool value);
-
 bool is_function_stateful(Term* func);
 
 void load_state_into_branch(Branch& state, Branch& branch);

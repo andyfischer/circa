@@ -299,12 +299,12 @@ void try_to_migrate_value_that_isnt_allocced()
 {
     // This code once caused a crash
     Branch source, dest;
-    Term* i = int_value(source, 5, "i");
-    set_stateful(i, true);
+    Term* i = create_stateful_value(source, INT_TYPE, "i");
+    as_int(i) = 5;
     dealloc_value(i);
 
-    Term* dest_i = int_value(dest, 4, "i");
-    set_stateful(dest_i, true);
+    Term* dest_i = create_stateful_value(dest, INT_TYPE, "i");
+    as_int(dest_i) = 4;
 
     migrate_stateful_values(source, dest);
 }
