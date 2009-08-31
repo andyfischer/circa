@@ -84,12 +84,31 @@ void gl_line_loop(Term* caller)
     glEnd();
 }
 
+void gl_points(Term* caller)
+{
+    Branch& list = caller->input(0)->asBranch();
+    int color = caller->input(1)->asInt();
+
+    _unpack_gl_color(color);
+
+    glBegin(GL_POINTS);
+
+    for (int i=0; i < list.length(); i++) {
+        float x = list[i]->asBranch()[0]->toFloat();
+        float y = list[i]->asBranch()[1]->toFloat();
+        glVertex3f(x + .5, y + .5, 0);
+    }
+    
+    glEnd();
+}
+
 void setup(Branch& branch)
 {
     install_function(branch["background"], background);
     install_function(branch["gl"]->asBranch()["triangles"], gl_triangles);
     install_function(branch["gl"]->asBranch()["line_strip"], gl_line_strip);
     install_function(branch["gl"]->asBranch()["line_loop"], gl_line_loop);
+    install_function(branch["gl"]->asBranch()["points"], gl_points);
 }
 
 } // namespace gl_shapes
