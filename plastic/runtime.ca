@@ -22,6 +22,7 @@ namespace gl
     def triangles +native (List, int)
     def line_strip +native (List, int)
     def line_loop +native (List, int)
+    def points +native (List, int)
 end
 
 def load_texture +native (state int, string) : int
