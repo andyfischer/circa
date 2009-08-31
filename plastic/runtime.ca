@@ -16,6 +16,20 @@ namespace text
     def draw_text +native (TTF_Font, string, float x, float y, int color) : RenderedText
 end
 
+-- GL functions
+def background +native (int)
+namespace gl
+    def triangles +native (List, int)
+    def line_strip +native (List, int)
+    def line_loop +native (List, int)
+end
+
+def load_texture +native (state int, string) : int
+def draw_image +native (state int texid, string filename, float,float,float,float)
+
+def load_mesh +native (string) : int
+def draw_mesh +native (int, int, List, List, List)
+
 -- polar: polar to cartesian
 def polar(float angle, float radius, Point center) : Point
   return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]

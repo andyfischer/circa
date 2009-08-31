@@ -9,7 +9,7 @@ GLuint load_surface_to_texture(SDL_Surface *surface);
 
 namespace textures {
 
-void initialize(circa::Branch& branch);
+void setup(circa::Branch& branch);
 
 } // namespace textures
 

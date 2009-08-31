@@ -7,7 +7,7 @@
 
 namespace gl_shapes {
 
-void initialize(circa::Branch& branch);
+void setup(circa::Branch& branch);
 
 } // namespace gl_shapes
 

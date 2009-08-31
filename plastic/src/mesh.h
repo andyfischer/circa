@@ -43,7 +43,7 @@ namespace mesh {
 
 void load_obj_file(std::string const& filename, Mesh& mesh);
 void draw_mesh_immediate(Mesh& mesh);
-void initialize(circa::Branch& branch);
+void setup(circa::Branch& branch);
 
 }
 

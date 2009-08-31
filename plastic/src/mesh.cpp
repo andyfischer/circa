@@ -158,10 +158,10 @@ void hosted_draw_mesh(Term* caller)
     glPopMatrix();
 }
 
-void initialize(circa::Branch& branch)
+void setup(circa::Branch& branch)
 {
-    import_function(branch, hosted_load_mesh, "load_mesh(string) : int");
-    import_function(branch, hosted_draw_mesh, "draw_mesh(int, int, List, List, List)");
+    install_function(branch["load_mesh"], hosted_load_mesh);
+    install_function(branch["draw_mesh"], hosted_draw_mesh);
 }
 
 } // namespace mesh
