@@ -116,11 +116,10 @@ void hosted_image(Term* caller)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void initialize(circa::Branch& branch)
+void setup(circa::Branch& branch)
 {
-    import_function(branch, hosted_load_texture, "load_texture(state int, string) : int");
-    import_function(branch, hosted_image,
-            "image(state int texid, string filename, float,float,float,float)");
+    install_function(branch["load_texture"], hosted_load_texture);
+    install_function(branch["draw_image"], hosted_image);
 }
 
 } // namespace textures

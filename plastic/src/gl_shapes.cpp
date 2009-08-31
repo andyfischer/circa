@@ -84,14 +84,12 @@ void gl_line_loop(Term* caller)
     glEnd();
 }
 
-void initialize(Branch& branch)
+void setup(Branch& branch)
 {
-    import_function(branch, background, "background(int)");
-
-    Branch& gl_ns = create_namespace(branch, "gl");
-    import_function(gl_ns, gl_triangles, "triangles(List, int)");
-    import_function(gl_ns, gl_line_strip, "line_strip(List, int)");
-    import_function(gl_ns, gl_line_loop, "line_loop(List, int)");
+    install_function(branch["background"], background);
+    install_function(branch["gl"]->asBranch()["triangles"], gl_triangles);
+    install_function(branch["gl"]->asBranch()["line_strip"], gl_line_strip);
+    install_function(branch["gl"]->asBranch()["line_loop"], gl_line_loop);
 }
 
 } // namespace gl_shapes

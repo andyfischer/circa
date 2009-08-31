@@ -142,10 +142,6 @@ int main( int argc, char* args[] )
     SCRIPT_ROOT = &create_branch(*circa::KERNEL, "plastic_main");
 
     input::initialize(*SCRIPT_ROOT);
-
-    gl_shapes::initialize(*SCRIPT_ROOT);
-    mesh::initialize(*SCRIPT_ROOT);
-    textures::initialize(*SCRIPT_ROOT);
     ttf::initialize(*SCRIPT_ROOT);
 
     // Import constants
@@ -156,6 +152,9 @@ int main( int argc, char* args[] )
     std::string circa_home = getenv("CIRCA_HOME");
     parse_script(*SCRIPT_ROOT, circa_home + "/plastic/runtime.ca");
 
+    mesh::setup(*SCRIPT_ROOT);
+    gl_shapes::setup(*SCRIPT_ROOT);
+    textures::setup(*SCRIPT_ROOT);
     ttf::setup(*SCRIPT_ROOT);
 
     if (has_static_errors(*SCRIPT_ROOT)) {
