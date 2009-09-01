@@ -12,12 +12,14 @@ using namespace circa;
 
 namespace ttf {
 
-SDL_Color unpack_sdl_color(int color)
+SDL_Color unpack_sdl_color(Term* colorTerm)
 {
+    Branch& color = as_branch(colorTerm);
     SDL_Color c = {};
-    c.r = ((color & 0xff000000) >> 24);
-    c.g = ((color & 0x00ff0000) >> 16);
-    c.b = ((color & 0x0000ff00) >> 8);
+    c.r = color[0]->asFloat() * 255.0;
+    c.g = color[1]->asFloat() * 255.0;
+    c.b = color[2]->asFloat() * 255.0;
+    // c.a = color[3]->asFloat() * 255.0;
     return c;
 }
 
@@ -107,7 +109,7 @@ void render_text(Term* caller)
         // save the texture id.
 
         TTF_Font* font = as<TTF_Font*>(caller->input(1));
-        SDL_Color color = unpack_sdl_color(caller->input(3)->asInt());
+        SDL_Color color = unpack_sdl_color(caller->input(3));
         //SDL_Color bgcolor = {0, 0, 0, 0}; // todo
 
         SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), color);

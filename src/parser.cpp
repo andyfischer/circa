@@ -1210,6 +1210,11 @@ int hex_digit_to_number(char digit)
     return 0;
 }
 
+int two_hex_digits_to_number(char digit1, char digit2)
+{
+    return hex_digit_to_number(digit1) * 16 + hex_digit_to_number(digit2);
+}
+
 Term* literal_color(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
@@ -1219,45 +1224,45 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
     // strip leading # sign
     text = text.substr(1, text.length()-1);
 
-    // Side note: current behavior is to store colors as a packed int.
-    // In the future I would like to make Color a builtin compound type.
+    Term* resultTerm = create_value(branch, COLOR_TYPE);
+    Branch& result = as_branch(resultTerm);
 
-    int value = 0;
+    float r = 0;
+    float g = 0;
+    float b = 0;
+    float a = 0;
 
     if (text.length() == 3 || text.length() == 4) {
-        value += hex_digit_to_number(text[0]) * 0x11000000;
-        value += hex_digit_to_number(text[1]) * 0x00110000;
-        value += hex_digit_to_number(text[2]) * 0x00001100;
+        r = hex_digit_to_number(text[0]) / 15.0;
+        g = hex_digit_to_number(text[1]) / 15.0;
+        b = hex_digit_to_number(text[2]) / 15.0;
 
         // optional alpha
         if (text.length() == 3)
-            value += 0xff;
+            a = 1.0;
         else
-            value += hex_digit_to_number(text[3]) * 0x00000011;
+            a = hex_digit_to_number(text[3]) / 15.0;
     } else {
-        value += hex_digit_to_number(text[0]) * 0x10000000;
-        value += hex_digit_to_number(text[1]) * 0x01000000;
-        value += hex_digit_to_number(text[2]) * 0x00100000;
-        value += hex_digit_to_number(text[3]) * 0x00010000;
-        value += hex_digit_to_number(text[4]) * 0x00001000;
-        value += hex_digit_to_number(text[5]) * 0x00000100;
+        r = two_hex_digits_to_number(text[0], text[1]) / 255.0;
+        g = two_hex_digits_to_number(text[2], text[3]) / 255.0;
+        b = two_hex_digits_to_number(text[4], text[5]) / 255.0;
 
         // optional alpha
         if (text.length() == 6)
-            value += 0xff;
-        else {
-            value += hex_digit_to_number(text[6]) * 0x00000010;
-            value += hex_digit_to_number(text[7]) * 0x00000001;
-        }
+            a = 1.0;
+        else
+            a = two_hex_digits_to_number(text[6], text[7]) / 255.0;
     }
 
-    Term* term = int_value(branch, value);
+    result[0]->asFloat() = r;
+    result[1]->asFloat() = g;
+    result[2]->asFloat() = b;
+    result[3]->asFloat() = a;
 
-    term->stringProp("syntaxHints:integerFormat") = "color";
-    term->intProp("syntaxHints:colorFormat") = text.length();
+    resultTerm->intProp("syntaxHints:colorFormat") = text.length();
 
-    set_source_location(term, startPosition, tokens);
-    return term;
+    set_source_location(resultTerm, startPosition, tokens);
+    return resultTerm;
 }
 
 Term* literal_list(Branch& branch, TokenStream& tokens)

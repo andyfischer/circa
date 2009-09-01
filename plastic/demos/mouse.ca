@@ -40,7 +40,7 @@ background(#000)
 
 -- Draw an X where the mouse is
 begin
-  def draw_quad(List points, int color)
+  def draw_quad(List points, Color color)
       gl.triangles([points[0] points[1] points[2] points[2] points[3] points[0]] color)
   end
 

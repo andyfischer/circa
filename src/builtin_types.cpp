@@ -118,6 +118,51 @@ namespace dict_t {
     }
 } // namespace dict_t
 
+namespace color_t {
+    char number_to_hex_digit(int n) {
+        if (n >= 0 && n <= 9)
+            return '0' + n;
+
+        if (n >= 10 && n <= 16)
+            return 'a' + (n - 10);
+
+        return 'f';
+    }
+
+    std::string to_string(Term* term)
+    {
+        Branch& value = as_branch(term);
+
+        bool valueHasAlpha = value[3]->asFloat() < 1.0;
+
+        int specifiedDigits = term->intPropOptional("syntaxHints:colorFormat", 6);
+
+        int digitsPerChannel = (specifiedDigits == 6 || specifiedDigits == 8) ? 2 : 1;
+        bool specifyAlpha = valueHasAlpha || (specifiedDigits == 4 || specifiedDigits == 8);
+
+        std::stringstream out;
+
+        out << "#";
+
+        for (int c=0; c < 4; c++) {
+            if (c == 3 && !specifyAlpha)
+                break;
+
+            double channel = std::min((double) value[c]->asFloat(), 1.0);
+
+            if (digitsPerChannel == 1)
+                out << number_to_hex_digit(int(channel * 15.0));
+            else {
+                int mod_255 = channel * 255.0;
+                out << number_to_hex_digit(mod_255 / 0x10);
+                out << number_to_hex_digit(mod_255 % 0x10);
+            }
+        }
+
+        return out.str();
+    }
+} // namespace color_t
+
 void setup_builtin_types(Branch& kernel)
 {
     Term* branch_append = 
@@ -148,6 +193,9 @@ void parse_builtin_types(Branch& kernel)
 {
     parse_type(kernel, "type Point { float x, float y }");
     parse_type(kernel, "type Box { float x1, float y1, float x2, float y2 }");
+    COLOR_TYPE = parse_type(kernel, "type Color { float r, float g, float b, float a }");
+
+    as_type(COLOR_TYPE).toString = color_t::to_string;
 }
 
 } // namespace circa
