@@ -8,23 +8,23 @@ using namespace circa;
 
 namespace gl_shapes {
 
-void _unpack_gl_color(int color)
+void _unpack_gl_color(Term* colorTerm)
 {
-    float r = ((color & 0xff000000) >> 24) / 255.0f;
-    float g = ((color & 0x00ff0000) >> 16) / 255.0f;
-    float b = ((color & 0x0000ff00) >> 8) / 255.0f;
-    float a = ((color & 0x000000ff) >> 0) / 255.0f;
-    glColor4f(r,g,b,a);
+    Branch& color = as_branch(colorTerm);
+    glColor4f(color[0]->asFloat(),
+                 color[1]->asFloat(),
+                 color[2]->asFloat(),
+                 color[3]->asFloat());
 }
 
 void background(Term* caller)
 {
-    int color = caller->input(0)->asInt();
+    Branch& color = caller->input(0)->asBranch();
 
-    glClearColor(((color & 0xff000000) >> 24) / 255.0f,
-              ((color & 0xff0000) >> 16) / 255.0f,
-              ((color & 0xff00) >> 8) / 255.0f,
-              (color & 0xff) / 255.0f);
+    glClearColor(color[0]->asFloat(),
+                 color[1]->asFloat(),
+                 color[2]->asFloat(),
+                 color[3]->asFloat());
 
     glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -32,7 +32,7 @@ void background(Term* caller)
 void gl_triangles(Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
-    int color = caller->input(1)->asInt();
+    Term* color = caller->input(1);
 
     _unpack_gl_color(color);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -51,7 +51,7 @@ void gl_triangles(Term* caller)
 void gl_line_strip(Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
-    int color = caller->input(1)->asInt();
+    Term* color = caller->input(1);
 
     _unpack_gl_color(color);
 
@@ -69,7 +69,7 @@ void gl_line_strip(Term* caller)
 void gl_line_loop(Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
-    int color = caller->input(1)->asInt();
+    Term* color = caller->input(1);
 
     _unpack_gl_color(color);
 
@@ -87,7 +87,7 @@ void gl_line_loop(Term* caller)
 void gl_points(Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
-    int color = caller->input(1)->asInt();
+    Term* color = caller->input(1);
 
     _unpack_gl_color(color);
 

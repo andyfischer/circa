@@ -93,7 +93,7 @@ std::string term_to_raw_string(Term* term)
 
     output << " : " << typeName;
 
-    bool showValue = term->value != NULL;
+    bool showValue = is_value_alloced(term);
 
     if (term->type == NULL || is_branch(term))
         showValue = false;
