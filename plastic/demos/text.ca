@@ -1,12 +1,12 @@
 
 
-background(0x000)
+background(#000)
 
 def draw_text(Point loc, int size)
-    font = load_font("../cuttlefish/assets/sv_basic_manual/SVBasicManual.ttf", size)
-    text = concat("Time: " to_string(time))
-    text_sprite = render_text(font, text, #fff)
-    draw_rendered_text(text_sprite, loc.x, loc.y)
+    font = text.load_font("../assets/sv_basic_manual/SVBasicManual.ttf", size)
+    str = concat("Time: " to_string(time))
+    text_sprite = text.render_text(font, str, #fff)
+    text.draw_rendered_text(text_sprite, loc.x, loc.y)
 end
 
 draw_text([50 50], 12)

@@ -13,7 +13,11 @@ namespace text
     def load_font +native (state TTF_Font, string, int) : TTF_Font
     def render_text +native (state RenderedText, TTF_Font, string, Color color) : RenderedText
     def draw_rendered_text +native (RenderedText, float x, float y)
-    def draw_text +native (TTF_Font, string, float x, float y, Color color) : RenderedText
+end
+
+def draw_text(TTF_Font font, string str, Color color, Point location)
+    sprite = text.render_text(font, str, color)
+    text.draw_rendered_text(sprite, location.x, location.y)
 end
 
 -- GL functions
@@ -51,10 +55,6 @@ end
 
 ui_font_medium = text.load_font("assets/sv_basic_manual/SVBasicManual.ttf", 16)
 
-def draw_text(TTF_Font font, string str, Color color, Point location)
-    sprite = text.render_text(font, str, color)
-    text.draw_rendered_text(sprite, location.x location.y)
-end
 
 namespace fps_counter
     state int framesElapsed = 0
