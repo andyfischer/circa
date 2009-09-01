@@ -152,6 +152,7 @@ int main( int argc, char* args[] )
     std::string circa_home = getenv("CIRCA_HOME");
     parse_script(*SCRIPT_ROOT, circa_home + "/plastic/runtime.ca");
 
+    input::setup(*SCRIPT_ROOT);
     mesh::setup(*SCRIPT_ROOT);
     gl_shapes::setup(*SCRIPT_ROOT);
     textures::setup(*SCRIPT_ROOT);

@@ -13,12 +13,14 @@ namespace input {
 bool KEY_DOWN[SDLK_LAST];
 std::set<int> KEY_JUST_PRESSED;
 
-Int MOUSE_X;
-Int MOUSE_Y;
+int MOUSE_X = 0;
+int MOUSE_Y = 0;
 bool LEFT_MOUSE_DOWN = false;
-bool RECENT_LEFT_MOUSE_DOWN;
-bool RECENT_MOUSE_WHEEL_UP;
-bool RECENT_MOUSE_WHEEL_DOWN;
+bool RECENT_LEFT_MOUSE_DOWN = false;
+bool RECENT_MOUSE_WHEEL_UP = false;
+bool RECENT_MOUSE_WHEEL_DOWN = false;
+
+Ref MOUSE_POSITION_TERM;
 
 void key_down(Term* caller)
 {
@@ -78,6 +80,9 @@ void capture_events()
             MOUSE_Y = event.motion.y;
         }
     } // finish event loop
+
+    MOUSE_POSITION_TERM->asBranch()[0]->asFloat() = MOUSE_X;
+    MOUSE_POSITION_TERM->asBranch()[1]->asFloat() = MOUSE_Y;
 }
 
 void handle_key_press(SDL_Event &event, int key)
@@ -176,8 +181,6 @@ void initialize(Branch& branch)
         KEY_DOWN[i] = false;
     }
 
-    MOUSE_X = int_value(branch, 0, "_mouse_x");
-    MOUSE_Y = int_value(branch, 0, "_mouse_y");
     import_function(branch, key_down, "key_down(int) : bool");
     import_function(branch, key_pressed, "key_pressed(int) : bool");
     import_function(branch, mouse_pressed, "mouse_pressed() : bool");
@@ -200,6 +203,11 @@ void initialize(Branch& branch)
     Term* mouse_wheel_down_func = create_overloaded_function(branch, "mouse_wheel_down");
     import_function_overload(mouse_wheel_down_func, mouse_wheel_down, "mouse_wheel_down(List region) : bool");
     import_function_overload(mouse_wheel_down_func, mouse_wheel_down, "mouse_wheel_down() : bool");
+}
+
+void setup(Branch& branch)
+{
+    MOUSE_POSITION_TERM = branch.findFirstBinding("mouse");
 }
 
 } // namespace input
