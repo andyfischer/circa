@@ -378,6 +378,11 @@ void dealloc_value(Term* term)
 
 bool is_value_alloced(Term* term)
 {
+    if (term->type == NULL) {
+        assert(term->value == NULL);
+        return false;
+    }
+
     Type& type = as_type(term->type);
 
     if (!type.isPointer)
