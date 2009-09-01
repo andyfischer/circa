@@ -59,7 +59,6 @@ namespace rand_function {
         Term* rand_term = create_overloaded_function(kernel, "rand");
         import_function_overload(rand_term, evaluate_f, "rand() : float");
         import_function_overload(rand_term, evaluate_f_range, "rand(float min,float max):float");
-        //import_function(kernel, evaluate_f, "rand() : float");
         import_function(kernel, evaluate_i, "rand_i() : int");
         //import_function(kernel, evaluate_i_i, "rand_i(int) : int");
     }
