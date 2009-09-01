@@ -17,10 +17,25 @@ namespace rand_function {
         }
     }
 
-    void evaluate(Term* caller)
+    void evaluate_f(Term* caller)
     {
         seed_if_needed();
         as_float(caller) = (float) rand() / RAND_MAX;
+    }
+
+    void evaluate_f_range(Term* caller)
+    {
+        seed_if_needed();
+        float r = (float) rand() / RAND_MAX;
+        float min = caller->input(0)->toFloat();
+        float max = caller->input(1)->toFloat();
+
+        if (min >= max) {
+            error_occurred(caller, "min is >= max");
+            return;
+        }
+
+        as_float(caller) = min + r * (max - min);
     }
 
     void evaluate_i(Term* caller)
@@ -41,7 +56,10 @@ namespace rand_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "rand() : float");
+        Term* rand_term = create_overloaded_function(kernel, "rand");
+        import_function_overload(rand_term, evaluate_f, "rand() : float");
+        import_function_overload(rand_term, evaluate_f_range, "rand(float min,float max):float");
+        //import_function(kernel, evaluate_f, "rand() : float");
         import_function(kernel, evaluate_i, "rand_i() : int");
         //import_function(kernel, evaluate_i_i, "rand_i(int) : int");
     }
