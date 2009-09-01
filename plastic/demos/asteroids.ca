@@ -17,28 +17,9 @@ type Bullet {
     Point momentum
 }
 
-def wrap_around_x(float x) : float
-    if x < 0
-        return x + WINDOW_WIDTH
-    elif x > WINDOW_WIDTH
-        return x - WINDOW_WIDTH
-    else
-        return x
-    end
-end
-
-def wrap_around_y(float y) : float
-    if y < 0
-        return y + WINDOW_HEIGHT
-    elif y > WINDOW_HEIGHT
-        return y - WINDOW_HEIGHT
-    else
-        return y
-    end
-end
-
+-- Return a point that is wrapped around the playable area
 def wrap_around(Point p) : Point
-    return [wrap_around_x(p.x) wrap_around_y(p.y)]
+    return [mod(p.x, WINDOW_WIDTH) mod(p.y, WINDOW_HEIGHT)]
 end
 
 state Ship ship = [[WINDOW_WIDTH/2 WINDOW_HEIGHT/2] [0 0] 0]
@@ -59,8 +40,8 @@ end
 -- Draw a background full of stars
 for i in range(700)
     state Point loc = random_location()
-    state float intensity = rand()
-    gl.points([loc] #fff)
+    state Color color = [rand(.2 .6) .3 rand(.5 1) 1] 
+    gl.points([loc] color)
 end
 
 -- Draw the ship
@@ -100,7 +81,6 @@ ship.momentum = ship.momentum * ship_drag
 
 -- Enforce a speed limit on ship.momentum
 speed = magnitude(ship.momentum)
-
 if speed > speed_limit
     ship.momentum = ship.momentum * (speed_limit / speed)
 end
@@ -128,6 +108,7 @@ def filter_bullet(Bullet bullet) : bool
     return bullet.lifespan < 1.8
 end
 
+-- This syntax is crazy, it should just be filter(filter_bullet, bullets)
 bullets = filter(bullets, map(filter_bullet, bullets))
 
 -- Draw bullets
