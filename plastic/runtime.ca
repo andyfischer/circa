@@ -1,6 +1,6 @@
 
 -- Wrap up mouse position into a point (values are passed in from input.cpp)
-mouse = [_mouse_x _mouse_y] : Point
+state Point mouse
 
 def mouse_in(Box b) : bool
   return (b.x1 < mouse.x) && (b.x2 > mouse.x) && (b.y1 < mouse.y) && (b.y2 > mouse.y)
