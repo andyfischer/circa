@@ -4,7 +4,6 @@ background(#fff)
 axis_center = [200 200] : Point
 
 
-
 def map_point(float x) : Point
   x = x - 200
   y = mod(x, 100)

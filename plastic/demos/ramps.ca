@@ -1,7 +1,6 @@
 type Point_i { int x, int y }
 
-WINDOW_WIDTH = 510
-WINDOW_HEIGHT = 420
+desired_window_size = [510 420]
 
 tile_size = 30
 
@@ -23,8 +22,8 @@ def rotations_opposite(int x, int y) : bool
   end
 end
 
-num_tiles_x = WINDOW_WIDTH // tile_size
-num_tiles_y = WINDOW_HEIGHT // tile_size
+num_tiles_x = window.width // tile_size
+num_tiles_y = window.height // tile_size
 num_tiles = num_tiles_x * num_tiles_y
 
 -- draw the checkerboard in the background

@@ -1,7 +1,6 @@
 
-WINDOW_WIDTH = 400
-WINDOW_HEIGHT = 400
-WINDOW_TITLE = 'tweak.ca'
+desired_window_size = [400 400]
+desired_window_title = 'tweak.ca'
 
 background(#eee)
 

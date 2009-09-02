@@ -1,6 +1,5 @@
-WINDOW_WIDTH = 400
-WINDOW_HEIGHT = 400
-WINDOW_TITLE = 'tweak.ca'
+desired_window_size = [400 400]
+desired_window_title = 'tweak.ca'
 
 type Star {
     Point loc
@@ -82,5 +81,5 @@ for star in stars
 end
 
 -- Draw some text showing the mouse position
-draw_text(ui_font_medium, concat("Mouse location: " mouse.x ' ' mouse.y) #fff [10 WINDOW_HEIGHT - 40])
-draw_text(ui_font_medium, concat("Pressed: " mouse_pressed()) #fff [10 WINDOW_HEIGHT - 20])
+draw_text(ui_font_medium, concat("Mouse location: " mouse.x ' ' mouse.y) #fff [10 window.height - 40])
+draw_text(ui_font_medium, concat("Pressed: " mouse_pressed()) #fff [10 window.height - 20])

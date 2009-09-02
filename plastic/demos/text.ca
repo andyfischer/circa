@@ -1,5 +1,4 @@
 
-
 background(#000)
 
 def draw_text(Point loc, int size)
