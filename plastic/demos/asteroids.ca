@@ -31,7 +31,7 @@ speed_limit = 1.8
 bullet_speed = 3.0
 bullet_width = 2.0
 
---tweak.button(&accelration_per_s, [5 50], 0.1)
+tweak.button(&accelration_per_s, [5 50], 0.1)
 
 def random_location() : Point
     return [rand() * WINDOW_WIDTH, rand() * WINDOW_HEIGHT]
