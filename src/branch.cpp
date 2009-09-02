@@ -351,35 +351,6 @@ void evaluate_script(Branch& branch, std::string const& filename)
     evaluate_branch(branch);
 }
 
-Term* find_named(Branch& branch, std::string const& name)
-{
-    assert(name != "");
-    assert(name == "#out" || name[0] != '#'); // We shouldn't ever lookup hidden names
-
-    if (branch.contains(name))
-        return branch[name];
-
-    Branch* outerScope = get_outer_scope(branch);
-
-    if (outerScope == NULL)
-        return get_global(name);
-    else
-        return find_named(*outerScope, name);
-}
-
-void expose_all_names(Branch& source, Branch& destination)
-{
-    for (TermNamespace::iterator it = source.names.begin(); it != source.names.end(); ++it)
-    {
-        std::string const& name = it->first;
-        Term* term = it->second;
-        if (name == "") continue;
-        if (name[0] == '#' && name != "#out") continue;
-
-        destination.bindName(term, name);
-    }
-}
-
 bool reload_branch_from_file(Branch& branch, std::ostream &errors)
 {
     std::string filename = get_branch_source_filename(branch);

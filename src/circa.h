@@ -18,6 +18,7 @@
 #include "importing.h"
 #include "introspection.h"
 #include "metrics.h"
+#include "names.h"
 #include "parser.h"
 #include "parser_util.h"
 #include "primitives.h"
