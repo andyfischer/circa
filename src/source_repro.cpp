@@ -114,6 +114,7 @@ std::string get_term_source(Term* term)
         if (term->hasProperty("initializedBy")) {
             result << " = ";
             result << get_term_source(term->refProp("initializedBy"));
+            result << term->stringPropOptional("syntaxHints:postWhitespace", "");
         }
 
         return result.str();

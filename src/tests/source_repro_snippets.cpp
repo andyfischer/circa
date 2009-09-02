@@ -112,6 +112,7 @@ void reproduce_color_literal() {
 void reproduce_stateful_values() {
     round_trip_source("state i");
     round_trip_source("state i = 1");
+    round_trip_source("state i = 1  ");
     round_trip_source("state i = 5*3+1");
     round_trip_source("state int i");
     round_trip_source("  state int i = 5");
