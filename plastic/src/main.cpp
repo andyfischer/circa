@@ -47,8 +47,14 @@ bool initialize_display()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     // Create the surface
-    circa::Int windowWidth(*USERS_BRANCH, "WINDOW_WIDTH", 640);
-    circa::Int windowHeight(*USERS_BRANCH, "WINDOW_HEIGHT", 480);
+    int windowWidth = 640;
+    int windowHeight = 640;
+
+    if (USERS_BRANCH->contains("desired_window_size")) {
+        windowWidth = (*USERS_BRANCH)["desired_window_size"]->asBranch()[0]->asInt();
+        windowHeight = (*USERS_BRANCH)["desired_window_size"]->asBranch()[1]->asInt();
+    }
+
     SCREEN = SDL_SetVideoMode(windowWidth, windowHeight, 16, SDL_OPENGL | SDL_SWSURFACE);
 
     if (SCREEN == NULL) {
@@ -56,12 +62,22 @@ bool initialize_display()
         return false;
     }
 
+    // Write window width & height to runtime.ca
+    (*SCRIPT_ROOT)["window"]->asBranch()["width"]->asInt() = windowWidth;
+    (*SCRIPT_ROOT)["window"]->asBranch()["height"]->asInt() = windowHeight;
+
     // Initialize desired SDL subsystems
     if (SDL_Init(SDL_INIT_TIMER & SDL_INIT_VIDEO & SDL_INIT_JOYSTICK & SDL_INIT_EVENTTHREAD) == -1)
         return false;
 
     // Set window caption
-    SDL_WM_SetCaption(String(*USERS_BRANCH, "WINDOW_TITLE", "Untitled").get().c_str(), NULL);
+    std::string windowTitle;
+    if (USERS_BRANCH->contains("desired_window_title"))
+        windowTitle = (*USERS_BRANCH)["desired_window_title"]->asString();
+    else
+        windowTitle = get_branch_source_filename(*USERS_BRANCH);
+
+    SDL_WM_SetCaption(windowTitle.c_str(), NULL);
 
     // Initialize GL state
     glEnable(GL_DEPTH_TEST);

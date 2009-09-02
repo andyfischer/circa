@@ -234,7 +234,7 @@ void term_pointer_operator_overload()
 void test_get_source_file_location()
 {
     Branch branch;
-    string_value(branch, "c:/a/b/something.ca", SOURCE_FILE_ATTR);
+    string_value(branch, "c:/a/b/something.ca", "attr:source-file");
 
     test_equals(get_source_file_location(branch), "c:/a/b");
 }

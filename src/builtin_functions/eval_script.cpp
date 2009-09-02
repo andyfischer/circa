@@ -12,14 +12,12 @@ namespace eval_script_function {
         std::string filename = caller->input(0)->asString();
         Branch& result = as_branch(caller);
 
-        Term* existing_source_file = get_branch_attribute(result, "source-file");
-
-        if (existing_source_file == NULL || (filename != existing_source_file->asString())) {
+        if (filename != get_branch_source_filename(result)) {
             result.clear();
             parse_script(result, filename);
         }
 
-        assert(get_branch_attribute(result, "source-file")->asString() == filename);
+        assert(get_branch_source_filename(result) == filename);
 
         evaluate_branch(result);
     }

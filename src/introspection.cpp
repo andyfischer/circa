@@ -182,8 +182,10 @@ std::string get_source_filename(Term* term)
     Branch* branch = term->owningBranch;
 
     while (branch != NULL) {
-        if (branch->contains(get_name_for_attribute("source-file")))
-            return as_string(branch->get(get_name_for_attribute("source-file")));
+        std::string filename = get_branch_source_filename(*branch);
+
+        if (filename != "")
+            return filename;
 
         branch = get_outer_scope(*branch);
     }

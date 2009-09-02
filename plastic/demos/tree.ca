@@ -5,8 +5,7 @@ def interp(float progress, float e) :float
   return min(progress / e, 1.0)
 end
 
-SCREEN_WIDTH = 480
-SCREEN_HEIGHT = 600
+desired_window_size = [480 600]
 
 def tree_segment(Point base, float direction, float width, float depth)
   state jitter = (rand() - .5) *.3

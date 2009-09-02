@@ -4,8 +4,6 @@
 
 namespace circa {
 
-std::string SOURCE_FILE_ATTR = "#attr:source-file";
-
 Branch::~Branch()
 {
     names.clear();
@@ -272,6 +270,15 @@ Term* get_branch_attribute(Branch& branch, std::string const& attr)
         return NULL;
 }
 
+std::string get_branch_source_filename(Branch& branch)
+{
+    Term* attr = get_branch_attribute(branch, "source-file");
+    if (attr == NULL)
+        return "";
+    else
+        return as_string(attr);
+}
+
 Branch* get_outer_scope(Branch& branch)
 {
     if (branch.owningTerm == NULL)
@@ -375,7 +382,7 @@ void expose_all_names(Branch& source, Branch& destination)
 
 bool reload_branch_from_file(Branch& branch, std::ostream &errors)
 {
-    std::string filename = as_string(branch[get_name_for_attribute("source-file")]);
+    std::string filename = get_branch_source_filename(branch);
 
     Branch replacement;
     replacement.owningTerm = branch.owningTerm;
@@ -395,17 +402,16 @@ bool reload_branch_from_file(Branch& branch, std::ostream &errors)
 
 void persist_branch_to_file(Branch& branch)
 {
-    std::string filename = as_string(branch[SOURCE_FILE_ATTR]);
+    std::string filename = get_branch_source_filename(branch);
     write_text_file(filename, get_branch_source(branch) + "\n");
 }
 
 std::string get_source_file_location(Branch& branch)
 {
     // Search upwards until we find a branch that has source-file defined.
-    
     Branch* branch_p = &branch;
 
-    while (branch_p != NULL && !branch_p->contains(SOURCE_FILE_ATTR)) {
+    while (branch_p != NULL && get_branch_source_filename(*branch_p) == "") {
         if (branch_p->owningTerm == NULL)
             branch_p = NULL;
         else
@@ -415,9 +421,7 @@ std::string get_source_file_location(Branch& branch)
     if (branch_p == NULL)
         return "";
 
-    std::string file_location = branch_p->get(SOURCE_FILE_ATTR)->asString();
-
-    return get_directory_for_filename(file_location);
+    return get_directory_for_filename(get_branch_source_filename(*branch_p));
 }
 
 } // namespace circa

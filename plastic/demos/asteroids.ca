@@ -1,7 +1,5 @@
 
-WINDOW_WIDTH = 300
-WINDOW_HEIGHT = 300
-WINDOW_TITLE = 'asteroids.ca'
+desired_window_size = [300 300]
 
 background(#000)
 
@@ -19,10 +17,10 @@ type Bullet {
 
 -- Return a point that is wrapped around the playable area
 def wrap_around(Point p) : Point
-    return [mod(p.x, WINDOW_WIDTH) mod(p.y, WINDOW_HEIGHT)]
+    return [mod(p.x, window.width) mod(p.y, window.height)]
 end
 
-state Ship ship = [[WINDOW_WIDTH/2 WINDOW_HEIGHT/2] [0 0] 0]
+state Ship ship = [[window.width/2 window.height/2] [0 0] 0]
 state List bullets = []
 accelration_per_s = 5.0
 rotation_speed = 0.9
@@ -34,7 +32,7 @@ bullet_width = 2.0
 tweak.button(&accelration_per_s, [5 50], 0.1)
 
 def random_location() : Point
-    return [rand() * WINDOW_WIDTH, rand() * WINDOW_HEIGHT]
+    return [rand() * window.width, rand() * window.height]
 end
 
 -- Draw a background full of stars
