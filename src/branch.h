@@ -53,6 +53,8 @@ struct Branch
     void remove(int index);
     void removeNulls();
 
+    void shorten(int newLength);
+
     // Find the first term with the given name binding.
     Term* findFirstBinding(std::string const& name) const;
 

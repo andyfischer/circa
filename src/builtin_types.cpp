@@ -163,6 +163,36 @@ namespace color_t {
     }
 } // namespace color_t
 
+namespace branch_inspector_t
+{
+    void get_configs(Term* caller)
+    {
+        Branch& object = caller->input(0)->asBranch();
+        Branch& target_branch = object[0]->asRef()->asBranch();
+        Branch& output = caller->asBranch();
+
+        int write = 0;
+        for (int i=0; i < target_branch.length(); i++) {
+            Term* t = target_branch[i];
+            if (t == NULL) continue;
+            if (t->name == "") continue;
+            if (!is_value(t)) continue;
+            if (is_stateful(t)) continue;
+
+            if (write >= output.length())
+                create_ref(output, t);
+            else
+                output[write]->asRef() = t;
+
+            write++;
+        }
+
+        if (write < output.length())
+            output.shorten(write);
+    }
+
+} // namespace branch_inspector_t
+
 void setup_builtin_types(Branch& kernel)
 {
     Term* branch_append = 
@@ -196,6 +226,10 @@ void parse_builtin_types(Branch& kernel)
     COLOR_TYPE = parse_type(kernel, "type Color { float r, float g, float b, float a }");
 
     as_type(COLOR_TYPE).toString = color_t::to_string;
+
+    Term* branch_inspector_type = parse_type(kernel, "type BranchInspector { ref target }");
+    import_member_function(branch_inspector_type, branch_inspector_t::get_configs,
+        "get_configs(BranchInspector) : List");
 }
 
 } // namespace circa
