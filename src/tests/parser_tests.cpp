@@ -45,14 +45,17 @@ void test_literal_integer()
 void test_literal_float()
 {
     Branch branch;
-    parser::compile(&branch, parser::statement, "1.0");
+    Term* a = parser::compile(&branch, parser::statement, "1.0");
     test_assert(branch.length() == 1);
-    test_assert(is_value(branch[0]));
-    test_assert(branch[0]->asFloat() == 1.0);
+    test_assert(branch[0] == a);
+    test_assert(is_value(a));
+    test_assert(a->asFloat() == 1.0);
+    test_equals(get_step(a), .1);
 
     Term* b = parser::compile(&branch, parser::statement_list, "5.200");
     test_assert(b->type == FLOAT_TYPE);
     test_assert(to_string(b) == "5.200");
+    test_equals(get_step(b), .001);
 }
 
 void test_literal_string()

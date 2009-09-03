@@ -49,6 +49,9 @@ void rewrite_as_value(Branch& branch, int index, Term* type);
 // Resize this list term, making sure that each element is a type of 'type'.
 void resize_list(Branch& list, int numElements, Term* type);
 
+void set_step(Term* term, float step);
+float get_step(Term* term);
+
 } // namespace circa
 
 #endif

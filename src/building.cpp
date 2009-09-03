@@ -236,4 +236,14 @@ void resize_list(Branch& list, int numElements, Term* type)
         list.removeNulls();
 }
 
+void set_step(Term* term, float step)
+{
+    term->floatProp("step") = step;
+}
+
+float get_step(Term* term)
+{
+    return term->floatPropOptional("step", 1.0);
+}
+
 } // namespace circa

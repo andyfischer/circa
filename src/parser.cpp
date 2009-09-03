@@ -1151,8 +1151,10 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     float value = (float) atof(text.c_str());
     Term* term = float_value(branch, value);
 
-    // Figure out the # of decimal figures
-
+    // Assign a default step value, using the # of decimal figures
+    int decimalFigures = get_number_of_decimal_figures(text);
+    float step = std::pow(0.1, decimalFigures);
+    set_step(term, step);
 
     // Store the original string
     term->stringProp("float:original-format") = text;
