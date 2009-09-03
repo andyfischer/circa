@@ -285,5 +285,25 @@ void consume_branch_until_end(Branch& branch, TokenStream& tokens)
     post_parse_branch(branch);
 }
 
+int get_number_of_decimal_figures(std::string const& str)
+{
+    bool dotFound = false;
+    int result = 0;
+
+    for (int i=0; str[i] != 0; i++) {
+        if (str[i] == '.') {
+            dotFound = true;
+            continue;
+        }
+
+        if (dotFound)
+            result++;
+    }
+
+    if (result == 0 && dotFound)
+        result = 1;
+
+    return result;
+}
 
 } // namespace circa
