@@ -227,7 +227,7 @@ void parse_builtin_types(Branch& kernel)
 
     as_type(COLOR_TYPE).toString = color_t::to_string;
 
-    Term* branch_inspector_type = parse_type(kernel, "type BranchInspector { ref target }");
+    Term* branch_inspector_type = parse_type(kernel, "type BranchInspector { Ref target }");
     import_member_function(branch_inspector_type, branch_inspector_t::get_configs,
         "get_configs(BranchInspector) : List");
 }

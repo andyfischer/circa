@@ -431,7 +431,7 @@ void initialize_primitive_types(Branch& kernel)
     bool_type.toString = bool_t::to_string;
     bool_type.isPointer = false;
 
-    REF_TYPE = import_type<Ref>(kernel, "ref");
+    REF_TYPE = import_type<Ref>(kernel, "Ref");
     as_type(REF_TYPE).remapPointers = Ref::remap_pointers;
     as_type(REF_TYPE).toString = ref_t::to_string;
     as_type(REF_TYPE).equals = ref_t::equals;
@@ -447,14 +447,14 @@ void initialize_primitive_types(Branch& kernel)
 
 void setup_primitive_types()
 {
-    import_member_function(REF_TYPE, ref_t::get_name, "name(ref) : string");
-    import_member_function(REF_TYPE, ref_t::hosted_to_string, "to_string(ref) : string");
-    import_member_function(REF_TYPE, ref_t::hosted_typeof, "typeof(ref) : ref");
-    import_member_function(REF_TYPE, ref_t::get_function, "function(ref) : ref");
-    import_member_function(REF_TYPE, ref_t::assign, "assign(ref, any)");
-    import_member_function(REF_TYPE, ref_t::tweak_value, "tweak_value(ref,float)");
-    import_member_function(REF_TYPE, ref_t::asint, "asint(ref) : int");
-    import_member_function(REF_TYPE, ref_t::asfloat, "asfloat(ref) : float");
+    import_member_function(REF_TYPE, ref_t::get_name, "name(Ref) : string");
+    import_member_function(REF_TYPE, ref_t::hosted_to_string, "to_string(Ref) : string");
+    import_member_function(REF_TYPE, ref_t::hosted_typeof, "typeof(Ref) : Ref");
+    import_member_function(REF_TYPE, ref_t::get_function, "function(Ref) : Ref");
+    import_member_function(REF_TYPE, ref_t::assign, "assign(Ref, any)");
+    import_member_function(REF_TYPE, ref_t::tweak_value, "tweak_value(Ref,float)");
+    import_member_function(REF_TYPE, ref_t::asint, "asint(Ref) : int");
+    import_member_function(REF_TYPE, ref_t::asfloat, "asfloat(Ref) : float");
 }
 
 } // namespace circa

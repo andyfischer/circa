@@ -86,7 +86,7 @@ fps = fps_counter.lastRecoredFps
 
 
 namespace tweak
-    def button(ref r, Point loc, float step)
+    def button(Ref r, Point loc, float step)
         str = concat(r.name ' = ' r.to_string)
 
         text_sprite = text.render_text(ui_font_medium, str, #000)

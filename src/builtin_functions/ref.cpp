@@ -20,7 +20,7 @@ namespace ref_function {
 
     void setup(Branch& kernel)
     {
-        TO_REF_FUNC = import_function(kernel, to_ref, "to_ref(any) : ref");
+        TO_REF_FUNC = import_function(kernel, to_ref, "to_ref(any) : Ref");
         function_t::get_to_source_string(TO_REF_FUNC) = toSourceString;
     }
 }
