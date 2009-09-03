@@ -18,7 +18,7 @@ namespace lang_function {
     void setup(Branch& kernel)
     {
         Branch& lang_ns = create_namespace(kernel, "lang");
-        import_function(lang_ns, field, "field(Branch,int) : ref");
+        import_function(lang_ns, field, "field(Branch,int) : Ref");
         import_function(lang_ns, num_fields, "num_fields(Branch) : int");
     }
 }

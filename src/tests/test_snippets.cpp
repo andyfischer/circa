@@ -117,7 +117,7 @@ void test_references()
 
     test_snippet("br = begin; a = 1; state b = 2; 3; end;"
                  "bi = [&br] : BranchInspector; cons = bi.get_configs();"
-                 "cons_0 = cons[0] : ref",
+                 "cons_0 = cons[0] : Ref",
                  "length(cons) == 1; cons_0.name == 'a'");
 }
 
