@@ -1,5 +1,5 @@
 
-desired_window_size = [300 300]
+desired_window_size = [500 300]
 
 background(#000)
 
@@ -26,10 +26,8 @@ accelration_per_s = 5.0
 rotation_speed = 0.9
 ship_drag = 0.991
 speed_limit = 1.8
-bullet_speed = 3.0
+bullet_speed = 5.0
 bullet_width = 2.0
-
-tweak.button(&accelration_per_s, [5 50], 0.1)
 
 def random_location() : Point
     return [rand() * window.width, rand() * window.height]
@@ -42,8 +40,7 @@ for i in range(700)
     gl.points([loc] color)
 end
 
--- Draw the ship
-begin
+namespace draw_ship
     def ship_point(float rot, float dist) : Point
         return polar(rot + ship.facing, dist, ship.loc)
     end

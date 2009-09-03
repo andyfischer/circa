@@ -189,6 +189,7 @@ void initialize(Branch& branch)
     int_value(branch, SDLK_LEFT, "LEFT");
     int_value(branch, SDLK_RIGHT, "RIGHT");
     int_value(branch, SDLK_SPACE, "SPACE");
+    int_value(branch, SDLK_b, "KEY_B");
 
     import_function(branch, mouse_over, "mouse_over(List region) : bool");
 

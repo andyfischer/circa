@@ -178,6 +178,11 @@ namespace branch_inspector_t
             if (t->name == "") continue;
             if (!is_value(t)) continue;
             if (is_stateful(t)) continue;
+            if (is_hidden(t)) continue;
+
+            // ignore branch-based types
+            if (is_branch(t)) continue;
+            if (is_type(t)) continue;
 
             if (write >= output.length())
                 create_ref(output, t);
