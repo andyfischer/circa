@@ -7,13 +7,13 @@ namespace range_function {
 
     void evaluate(Term* caller)
     {
-        unsigned int max = as_int(caller->input(0));
+        int max = as_int(caller->input(0));
         
         Branch& branch = as_branch(caller);
 
         resize_list(branch, max, INT_TYPE);
         
-        for (unsigned int i=0; i < max; i++)
+        for (int i=0; i < max; i++)
             as_int(branch[i]) = i;
     }
 
