@@ -61,6 +61,8 @@ std::string possible_whitespace_or_newline(TokenStream& tokens);
 std::string possible_statement_ending(TokenStream& tokens);
 void consume_branch_until_end(Branch& branch, TokenStream& tokens);
 
+int get_number_of_decimal_figures(std::string const& str);
+
 } // namespace circa
 
 #endif

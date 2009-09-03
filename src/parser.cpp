@@ -1151,6 +1151,9 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     float value = (float) atof(text.c_str());
     Term* term = float_value(branch, value);
 
+    // Figure out the # of decimal figures
+
+
     // Store the original string
     term->stringProp("float:original-format") = text;
 
@@ -1163,6 +1166,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
 
     if (mutability != 0.0)
         term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
+
     set_source_location(term, startPosition, tokens);
     return term;
 }
