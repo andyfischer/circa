@@ -239,6 +239,32 @@ void test_get_source_file_location()
     test_equals(get_source_file_location(branch), "c:/a/b");
 }
 
+void test_shorten()
+{
+    Branch branch;
+    int_value(branch, 5);
+    int_value(branch, 5);
+    int_value(branch, 5);
+
+    test_assert(branch.length() == 3);
+
+    branch.shorten(3);
+
+    test_assert(branch.length() == 3);
+
+    branch.shorten(1);
+
+    test_assert(branch.length() == 1);
+
+    branch.shorten(3);
+
+    test_assert(branch.length() == 1);
+
+    branch.shorten(0);
+
+    test_assert(branch.length() == 0);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_remove);
@@ -252,6 +278,7 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_migrate2);
     REGISTER_TEST_CASE(branch_tests::test_assign);
     REGISTER_TEST_CASE(branch_tests::term_pointer_operator_overload);
+    REGISTER_TEST_CASE(branch_tests::test_shorten);
 }
 
 } // namespace branch_tests

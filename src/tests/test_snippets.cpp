@@ -23,7 +23,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     parser::compile(&code, parser::statement_list, codeStr);
 
     if (has_static_errors(code)) {
-        std::cout << "In code snippet: " << codeStr;
+        std::cout << "In code snippet: " << codeStr << std::endl;
         print_static_errors_formatted(code, std::cout);
         declare_current_test_failed();
         return;
@@ -57,6 +57,8 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     if (boolean_statements_found == 0) {
         std::cout << "In " << get_current_test_name() << std::endl;
         std::cout << "no boolean statements found in: " << assertionsStr << std::endl;
+
+dump_branch(assertions);
         declare_current_test_failed();
     }
 }
@@ -108,6 +110,16 @@ void test_modulo()
     test_snippet("", "mod(-2, 4) == 2");
 }
 
+void test_references()
+{
+    test_snippet("a = 1; ra = &a", "ra.name == 'a'");
+    test_snippet("a = 1; ra = &a; rb = &a", "ra == rb");
+
+    test_snippet("br = begin; a = 1; state b = 2; 3; end;"
+                 "bi = [&br] : BranchInspector; cons = bi.get_configs();"
+                 "cons_0 = cons[0] : ref",
+                 "length(cons) == 1; cons_0.name == 'a'");
+}
 
 void register_tests()
 {
@@ -115,6 +127,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_abs);
     REGISTER_TEST_CASE(test_snippets::test_filter);
     REGISTER_TEST_CASE(test_snippets::test_modulo);
+    REGISTER_TEST_CASE(test_snippets::test_references);
 }
 
 } // namespace test_snippets

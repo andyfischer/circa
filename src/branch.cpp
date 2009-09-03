@@ -91,6 +91,14 @@ void Branch::removeNulls()
     _terms.removeNulls();
 }
 
+void Branch::shorten(int newLength)
+{
+    for (int i=newLength; i < length(); i++)
+        get(i) = NULL;
+
+    removeNulls();
+}
+
 Term* Branch::findFirstBinding(std::string const& name) const
 {
     for (int i = 0; i < _terms.length(); i++) {

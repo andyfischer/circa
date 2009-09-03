@@ -284,6 +284,10 @@ namespace ref_t {
         else
             return format_global_id(t);
     }
+    bool equals(Term* lhs, Term* rhs)
+    {
+        return as_ref(lhs) == as_ref(rhs);
+    }
     void get_name(Term* caller)
     {
         Term* t = caller->input(0)->asRef();
@@ -430,6 +434,7 @@ void initialize_primitive_types(Branch& kernel)
     REF_TYPE = import_type<Ref>(kernel, "ref");
     as_type(REF_TYPE).remapPointers = Ref::remap_pointers;
     as_type(REF_TYPE).toString = ref_t::to_string;
+    as_type(REF_TYPE).equals = ref_t::equals;
 
     // ANY_TYPE was created in bootstrap_kernel
     as_type(ANY_TYPE).toString = any_t::to_string;
