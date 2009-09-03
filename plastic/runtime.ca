@@ -86,7 +86,7 @@ fps = fps_counter.lastRecoredFps
 
 
 namespace tweak
-    def button(Ref r, Point loc, float step)
+    def button(Ref r, Point loc)
         str = concat(r.name ' = ' r.to_string)
 
         text_sprite = text.render_text(ui_font_medium, str, #000)
@@ -99,9 +99,9 @@ namespace tweak
         text.draw_rendered_text(text_sprite, loc.x, loc.y)
 
         if mouse_wheel_up(rect)
-            r.assign(r.asfloat - step)
+            r.tweak_up()
         elif mouse_wheel_down(rect)
-            r.assign(r.asfloat + step)
+            r.tweak_down()
         end
     end
 end
@@ -130,7 +130,7 @@ if toggle(key_pressed(KEY_B))
   x = 10
   y = 10
   for r in branch_inspector.get_configs()
-    tweak.button(r, [x y], 1.0)
+    tweak.button(r, [x y])
     y += 30
   end
 end

@@ -24,3 +24,6 @@
      f().y
    Also this doesn't work:
      (a).y
+
+ - When reloading a branch, we need to search the whole world for references to the 
+   old state, and update those references.
