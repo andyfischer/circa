@@ -53,20 +53,22 @@ namespace draw_ship
 end
 
 -- Keyboard controls for rotation
-rotation = 0.0
 if key_down(LEFT)
     rotation = -1
 elif key_down(RIGHT)
     rotation = 1
+else
+    rotation = 0
 end
 ship.facing = ship.facing + rotation * rotation_speed * time_delta
 
 -- Keyboard controls for acceleration
-thrust = 0
 if key_down(UP)
     thrust = 1
 elif key_down(DOWN)
     thrust = -1
+else
+    thrust = 0
 end
 
 ship.momentum = ship.momentum + [cos(ship.facing) sin(ship.facing)] * thrust * accelration_per_s * time_delta
@@ -99,8 +101,9 @@ end
 bullets = map(move_bullet, bullets)
 
 -- Remove old bullets
+bullet_max_lifespan = 1.8
 def filter_bullet(Bullet bullet) : bool
-    return bullet.lifespan < 1.8
+    return bullet.lifespan < bullet_max_lifespan
 end
 
 -- This syntax is crazy, it should just be filter(filter_bullet, bullets)
