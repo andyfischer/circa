@@ -182,6 +182,21 @@ void type_inference_for_get_field()
     test_assert(b->type == FLOAT_TYPE);
 }
 
+void test_is_value_allocced()
+{
+    // This test was written while chasing a bug (although it turned out
+    // to not capture the bug)
+    Branch branch;
+    Term* a = branch.eval("a = 0");
+    test_assert(is_value_alloced(a));
+
+    Term* ns = branch.eval("namespace ns; a = 0; end");
+    a = ns->asBranch()[0];
+    test_assert(is_value_alloced(a));
+
+    test_assert(!as_type(INT_TYPE).isPointer);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
@@ -192,6 +207,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_default_values);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);
+    REGISTER_TEST_CASE(type_tests::test_is_value_allocced);
 }
 
 } // namespace type_tests

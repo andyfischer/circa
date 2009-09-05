@@ -341,65 +341,23 @@ namespace ref_t {
 
         assign_value(source, t);
     }
-
-    // Deprecated:
-    void tweak_value(Term* caller)
+    void tweak(Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
             error_occurred(caller, "NULL reference");
             return;
         }
-        
-        float tweak_factor = caller->input(1)->toFloat();
 
-        if (t->type == FLOAT_TYPE) {
-            as_float(t) = as_float(t) * tweak_factor;
+        int steps = caller->input(1)->asInt();
 
-        } else if (t->type == INT_TYPE) {
-            int newvalue = int(as_int(t) * tweak_factor);
-
-            // make sure we at least bump by 1
-            if (newvalue == as_int(t)) {
-                if (tweak_factor > 1)
-                    newvalue += 1;
-                else
-                    newvalue -= 1;
-            }
-
-            as_int(t) = newvalue;
-
-        } else {
-            std::cout << "warn: tweak_value called on a non-float: " << t->name << std::endl;
-        }
-    }
-    void tweak_up(Term* caller)
-    {
-        Term* t = caller->input(0)->asRef();
-        if (t == NULL) {
-            error_occurred(caller, "NULL reference");
+        if (steps == 0)
             return;
-        }
 
         if (is_float(t))
-            as_float(t) += get_step(t);
+            as_float(t) += steps * get_step(t);
         else if (is_int(t))
-            as_int(t) += 1;
-        else
-            error_occurred(caller, "Ref is not an int or float");
-    }
-    void tweak_down(Term* caller)
-    {
-        Term* t = caller->input(0)->asRef();
-        if (t == NULL) {
-            error_occurred(caller, "NULL reference");
-            return;
-        }
-
-        if (is_float(t))
-            as_float(t) -= get_step(t);
-        else if (is_int(t))
-            as_int(t) -= 1;
+            as_int(t) += steps;
         else
             error_occurred(caller, "Ref is not an int or float");
     }
@@ -484,9 +442,7 @@ void setup_primitive_types()
     import_member_function(REF_TYPE, ref_t::hosted_typeof, "typeof(Ref) : Ref");
     import_member_function(REF_TYPE, ref_t::get_function, "function(Ref) : Ref");
     import_member_function(REF_TYPE, ref_t::assign, "assign(Ref, any)");
-    //import_member_function(REF_TYPE, ref_t::tweak_value, "tweak_value(Ref,float)");
-    import_member_function(REF_TYPE, ref_t::tweak_up, "tweak_up(Ref)");
-    import_member_function(REF_TYPE, ref_t::tweak_down, "tweak_down(Ref)");
+    import_member_function(REF_TYPE, ref_t::tweak, "tweak(Ref, int steps)");
     import_member_function(REF_TYPE, ref_t::asint, "asint(Ref) : int");
     import_member_function(REF_TYPE, ref_t::asfloat, "asfloat(Ref) : float");
 }
