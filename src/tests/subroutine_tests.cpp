@@ -62,12 +62,13 @@ void subroutine_stateful_term()
     branch.eval("def mysub()\nstate a = 0.0\na += 1\nend");
 
     // Make sure that stateful terms work correctly
-    Term* call = branch.eval("mysub()");
+    Term* call = branch.eval("call = mysub()");
     test_assert(call);
     test_assert(function_t::get_hidden_state_type(branch["mysub"]) != VOID_TYPE);
     test_assert(is_function_stateful(branch["mysub"]));
     test_assert(get_hidden_state_for_call(call) != NULL);
-    Term* a_inside_first_call = get_hidden_state_for_call(call)->asBranch()["a"];
+    
+    Term* a_inside_first_call = get_hidden_state_for_call(call)->asBranch()[0];
     test_equals(as_float(a_inside_first_call), 1);
     evaluate_term(call);
     test_equals(as_float(a_inside_first_call), 2);
@@ -76,10 +77,9 @@ void subroutine_stateful_term()
 
     // Make sure that subsequent calls to this subroutine don't share
     // the same stateful value.
-    a_inside_first_call->boolProp("break-on-assign") = true;
+    Term* another_call = branch.eval("another_call = mysub()");
 
-    Term* another_call = branch.eval("mysub()");
-    Term* a_inside_another_call = get_hidden_state_for_call(another_call)->asBranch()["a"];
+    Term* a_inside_another_call = get_hidden_state_for_call(another_call)->asBranch()[0];
 
     test_assert(a_inside_first_call != a_inside_another_call);
     test_equals(as_float(a_inside_first_call), 3);
@@ -100,7 +100,6 @@ void subroutine_stateful_term()
         
         expand_subroutines_hidden_state(call, state);
         test_assert(is_subroutine_state_expanded(state));
-        test_assert(stateContents.contains("a"));
     }
 }
 

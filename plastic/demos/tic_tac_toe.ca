@@ -71,5 +71,4 @@ def player_name(int p) : string
     else return "none" end
 end
 
-draw_text(ui_font_medium, concat("Current player: " player_name(current_player)), #fff, [10 300])
-
+draw_text(ui_font_medium, concat("Current player: " player_name(current_player)), #fff, [20 300])
