@@ -46,6 +46,3 @@ end
 
 board_state = [[empty empty empty] [empty empty empty] [empty empty empty]]
 
-
-
-

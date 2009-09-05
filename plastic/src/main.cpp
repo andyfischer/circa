@@ -182,8 +182,7 @@ int main( int argc, char* args[] )
 
     // Inject the requested filename, so that the user's script will be loaded
     String user_script_filename(*SCRIPT_ROOT, "user_script_filename", "");
-    if (argc > 1)
-        user_script_filename = args[1];
+    if (argc > 1) user_script_filename = args[1];
     Term* users_branch = SCRIPT_ROOT->get("users_branch");
     include_function::possibly_expand(users_branch);
     USERS_BRANCH = &users_branch->asBranch();
