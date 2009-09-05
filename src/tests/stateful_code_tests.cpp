@@ -309,6 +309,28 @@ void try_to_migrate_value_that_isnt_allocced()
     migrate_stateful_values(source, dest);
 }
 
+void bug_where_stateful_function_wouldnt_update_inputs()
+{
+    Branch branch;
+
+    branch.eval("def a() state i end");
+    branch.eval("def b(int i) : int; a(); return i; end");
+
+    test_assert(branch);
+
+    Term* x = branch.eval("x = 1");
+    Term* b_call = branch.eval("b(x)");
+
+    test_assert(b_call->asInt() == 1);
+
+    x->asInt() = 2;
+    evaluate_branch(branch);
+
+    dump_branch(branch);
+
+    test_assert(b_call->asInt() == 2);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_simple);
@@ -325,6 +347,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::test_migrate_stateful_compound_value);
     REGISTER_TEST_CASE(stateful_code_tests::test_reset_state);
     REGISTER_TEST_CASE(stateful_code_tests::try_to_migrate_value_that_isnt_allocced);
+    REGISTER_TEST_CASE(stateful_code_tests::bug_where_stateful_function_wouldnt_update_inputs);
 }
 
 } // namespace stateful_code_tests

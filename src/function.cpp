@@ -140,7 +140,7 @@ void initialize_function_data(Term* term)
 {
     /* A function is a branch with the following structures:
       {
-        [0] attributes {
+        [0] #attributes {
           [0] string name
           [1] ref hidden_state_type
           [2] bool variable_args
@@ -166,7 +166,7 @@ void initialize_function_data(Term* term)
 
     Branch& contents = as_branch(term);
 
-    Term* attributesTerm = create_value(contents, BRANCH_TYPE, "attributes");
+    Term* attributesTerm = create_value(contents, BRANCH_TYPE, "#attributes");
     set_source_hidden(attributesTerm, true);
     Branch& attributes = as_branch(attributesTerm);
     string_value(attributes, "", "name");
