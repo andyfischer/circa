@@ -1,0 +1,51 @@
+
+desired_window_size = [400 400]
+
+background(#10a)
+
+board_center = [150 150] : Point
+square_size = 70
+
+def norm(Point v) : Point
+    m = magnitude(v)
+    return [v.x / m, v.y / m]
+end
+
+def perpendicular(Point v) : Point
+    return [-v.y v.x]
+end
+
+
+def draw_thick_line(Point a, Point b, float width, Color color)
+    perp = perpendicular(norm(a - b)) * width
+    gl.triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
+end
+
+-- Draw the board
+board_line_thickness = 5.0
+board_left = board_center.x - square_size*3/2
+board_top = board_center.y - square_size*3/2
+board_right = board_center.x + square_size*3/2
+board_bot = board_center.y + square_size*3/2
+
+draw_thick_line([board_left + square_size, board_top],
+    [board_left + square_size, board_bot], board_line_thickness, #fff)
+draw_thick_line([board_right - square_size, board_top],
+    [board_right - square_size, board_bot], board_line_thickness, #fff)
+draw_thick_line([board_left, board_top + square_size],
+    [board_right, board_top + square_size], board_line_thickness, #fff)
+draw_thick_line([board_left, board_bot - square_size],
+    [board_right, board_bot - square_size], board_line_thickness, #fff)
+
+-- Board state
+namespace piece_state
+    empty = 0
+    x = 1
+    o = 2
+end
+
+board_state = [[empty empty empty] [empty empty empty] [empty empty empty]]
+
+
+
+
