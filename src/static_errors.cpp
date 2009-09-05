@@ -180,4 +180,11 @@ void print_static_errors_formatted(Branch& branch, std::ostream& output)
     } 
 }
 
+std::string get_static_errors_formatted(Branch& branch)
+{
+    std::stringstream strm;
+    print_static_errors_formatted(branch, strm);
+    return strm.str();
+}
+
 } // namespace circa

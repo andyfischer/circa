@@ -68,7 +68,8 @@ void shutdown();
 
 // this is implemented in builtin_functions/include.cpp
 namespace include_function {
-    void possibly_expand(Term* caller);
+    // Returns whether we reloaded
+    bool possibly_expand(Term* caller);
 }
 
 } // namespace circa

@@ -31,6 +31,7 @@ std::string get_static_error_message(Term* term);
 int count_static_errors(Branch& branch);
 bool has_static_errors(Branch& branch);
 void print_static_errors_formatted(Branch& branch, std::ostream& output);
+std::string get_static_errors_formatted(Branch& branch);
 
 } // namespace circa
 

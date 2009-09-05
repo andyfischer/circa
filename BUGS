@@ -27,3 +27,7 @@
 
  - When reloading a branch, we need to search the whole world for references to the 
    old state, and update those references.
+
+ - 'do once' needs to export name bindings
+
+ - stateful functions don't seem to update when the non-stateful input changes

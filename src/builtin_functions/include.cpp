@@ -17,7 +17,7 @@ namespace include_function {
         return s.st_mtime;
     }
 
-    void possibly_expand(Term* caller)
+    bool possibly_expand(Term* caller)
     {
         Term* state = caller->input(0);
         std::string &prev_filename = state->asBranch()[0]->asString();
@@ -41,13 +41,25 @@ namespace include_function {
 
             if (previous_contents.length() > 0)
                 migrate_stateful_values(previous_contents, contents);
+
+            return true;
         }
+
+        return false;
     }
 
     void evaluate(Term* caller)
     {
-        possibly_expand(caller);
-        evaluate_branch(as_branch(caller));
+        bool reloaded = possibly_expand(caller);
+
+        Branch& contents = as_branch(caller);
+
+        if (reloaded && has_static_errors(contents)) {
+            error_occurred(caller, get_static_errors_formatted(contents));
+
+        }
+
+        evaluate_branch(contents);
     }
 
     std::string toSourceString(Term* term)
