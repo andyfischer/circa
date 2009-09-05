@@ -88,7 +88,8 @@ void capture_events()
 void handle_key_press(SDL_Event &event, int key)
 {
     // Unmodified keys
-    switch (key) {
+    if (event.key.keysym.mod == 0) {
+        switch (key) {
         case SDLK_ESCAPE:
             CONTINUE_MAIN_LOOP = false;
 
@@ -112,6 +113,7 @@ void handle_key_press(SDL_Event &event, int key)
                 PAUSE_REASON = USER_REQUEST;
             }
             break;
+        }
     }
 
     // Control keys

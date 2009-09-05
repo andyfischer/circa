@@ -120,9 +120,8 @@ void render_text(Term* caller)
         state.text() = text;
 
         SDL_FreeSurface(surface);
-
-        assign_value(caller->input(0), caller);
     }
+    assign_value(caller->input(0), caller);
 }
 
 // This should be turned into a member function:

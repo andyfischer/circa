@@ -60,13 +60,12 @@ void subroutine_expansion_during_migrate()
     test_assert(is_subroutine_state_expanded(sourceCallState));
     test_assert(!is_subroutine_state_expanded(destCallState));
 
-    sourceCallState->asBranch()["i"]->asInt() = 111;
+    sourceCallState->asBranch()[0]->asInt() = 111;
 
     migrate_stateful_values(source, dest);
 
     //test_assert(is_subroutine_state_expanded(get_hidden_state_for_call(destCall)));
-    test_assert(as_branch(destCallState).contains("i"));
-    test_assert(as_branch(destCallState)["i"]->asInt() == 111);
+    test_assert(as_branch(destCallState)[0]->asInt() == 111);
 }
 
 void test_load_and_save()
@@ -325,8 +324,6 @@ void bug_where_stateful_function_wouldnt_update_inputs()
 
     x->asInt() = 2;
     evaluate_branch(branch);
-
-    dump_branch(branch);
 
     test_assert(b_call->asInt() == 2);
 }

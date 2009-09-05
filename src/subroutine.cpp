@@ -84,13 +84,14 @@ void subroutine_update_hidden_state_type(Term* func)
 
 void subroutine_call_evaluate(Term* caller)
 {
-    Term* hiddenState = get_hidden_state_for_call(caller);
-
-    if (hiddenState != NULL && !is_subroutine_state_expanded(hiddenState))
-        expand_subroutines_hidden_state(caller, hiddenState);
-
-    Term* function = hiddenState == NULL ? (Term*) caller->function : hiddenState;
+    Term* function = caller->function;
     Branch& functionBranch = as_branch(function);
+
+    // Load values into this function's stateful values. If this state has never been
+    // saved then this function will reset this function's stateful values.
+    Term* hiddenState = get_hidden_state_for_call(caller);
+    if (hiddenState != NULL)
+        load_state_into_branch(as_branch(hiddenState), functionBranch);
 
     int num_inputs = function_t::num_inputs(caller->function);
 
@@ -127,6 +128,10 @@ void subroutine_call_evaluate(Term* caller)
         if (output->type != VOID_TYPE)
             assign_value(output, caller);
     }
+
+    // Store state
+    if (hiddenState != NULL)
+        persist_state_from_branch(functionBranch, as_branch(hiddenState));
 }
 
 bool is_subroutine_state_expanded(Term* term)

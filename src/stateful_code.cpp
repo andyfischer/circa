@@ -21,17 +21,29 @@ bool is_function_stateful(Term* func)
 void load_state_into_branch(Branch& state, Branch& branch)
 {
     int read = 0;
+    int write = 0;
 
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    for (write = 0; write < branch.length(); write++) {
+        Term* destTerm = branch[write];
 
-        if (!is_stateful(term))
+        if (!is_stateful(destTerm))
             continue;
 
         if (read >= state.length())
-            return;
+            break;
 
-        assign_value(state[read++], term);
+        if (is_value_alloced(state[read]))
+            assign_value(state[read], destTerm);
+
+        read++;
+    }
+
+    // if there are remaining stateful terms in 'branch' which didn't get
+    // assigned, reset them.
+
+    for (; write < branch.length(); write++) {
+        if (is_stateful(branch[write]))
+            assign_value_to_default(branch[write]);
     }
 }
 
@@ -45,8 +57,17 @@ void persist_state_from_branch(Branch& branch, Branch& state)
             continue;
 
         rewrite_as_value(state, write, term->type);
-        assign_value(term, state[write++]);
+
+        if (is_value_alloced(term))
+            assign_value(term, state[write]);
+
+        write++;
+
+        // todo: possibly copy names as well
     }
+
+    if (write > state.length())
+        state.shorten(write);
 }
 
 void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
