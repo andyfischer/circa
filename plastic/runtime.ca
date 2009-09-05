@@ -24,8 +24,9 @@ namespace text
 end
 
 def draw_text(TTF_Font font, string str, Color color, Point location)
+    print('drawing text at:' location)
     sprite = text.render_text(font, str, color)
-    text.draw_rendered_text(sprite, location.x, location.y)
+    --text.draw_rendered_text(sprite, location.x, location.y)
 end
 
 -- GL functions
