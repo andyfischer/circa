@@ -20,6 +20,17 @@ namespace get_index_function {
         assign_value(input[index], caller);
     }
 
+    std::string toSourceString(Term* term)
+    {
+        std::stringstream out;
+
+        out << term->input(0)->name;
+        out << "[";
+        out << get_source_of_input(term, 1);
+        out << "]";
+        return out.str();
+    }
+
     Term* specializeType(Term* caller)
     {
         // Type inference is hacky due to the lack of parametrized list types.
@@ -37,6 +48,7 @@ namespace get_index_function {
     {
         GET_INDEX_FUNC = import_function(kernel, evaluate, "get_index(Branch, int) : any");
         function_t::get_specialize_type(GET_INDEX_FUNC) = specializeType;
+        function_t::get_to_source_string(GET_INDEX_FUNC) = toSourceString;
     }
 }
 }

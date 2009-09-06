@@ -1043,6 +1043,8 @@ Term* subscripted_atom(Branch& branch, TokenStream& tokens)
     if (tokens.nextIs(LBRACKET)) {
         tokens.consume(LBRACKET);
 
+        std::string postLbracketWs = possible_whitespace(tokens);
+
         Term* subscript = infix_expression(branch, tokens);
 
         if (!tokens.nextIs(RBRACKET))
@@ -1050,9 +1052,13 @@ Term* subscripted_atom(Branch& branch, TokenStream& tokens)
 
         tokens.consume(RBRACKET);
 
-        return apply(branch, GET_INDEX_FUNC, RefList(result, subscript));
+        result = apply(branch, GET_INDEX_FUNC, RefList(result, subscript));
+        get_input_syntax_hint(result, 1, "preWhitespace") = postLbracketWs;
+        return result;
     }
-    else return result;
+    else {
+        return result;
+    }
 }
 
 Term* atom(Branch& branch, TokenStream& tokens)

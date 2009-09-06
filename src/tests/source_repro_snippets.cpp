@@ -117,6 +117,7 @@ void reproduce_stateful_values() {
     round_trip_source("state int i");
     round_trip_source("  state int i = 5");
     round_trip_source("state int i; i += 1");
+    round_trip_source("a = 1; state int a_copy = a");
     finish_source_repro_category();
 }
 
@@ -283,6 +284,7 @@ void reproduce_misc_blocks() {
     round_trip_source("namespace ns end");
     round_trip_source("namespace ns 1 end");
     round_trip_source("namespace ns; print(1)\nend");
+    round_trip_source("namespace ns; a = 1; end; b = ns.a");
     round_trip_source("begin\nend");
     round_trip_source("begin;end");
     round_trip_source("begin;  ;end");
@@ -317,6 +319,11 @@ void reproduce_unary() {
     finish_source_repro_category();
 }
 
+void reproduce_bracket_syntax() {
+    round_trip_source("a = [1]; a[0]");
+    finish_source_repro_category();
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);
@@ -335,6 +342,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_with_parse_errors);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_dot_expressions);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_unary);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_bracket_syntax);
 }
 
 } // namespace source_repro_snippets
