@@ -88,32 +88,30 @@ void capture_events()
 void handle_key_press(SDL_Event &event, int key)
 {
     // Unmodified keys
-    if (event.key.keysym.mod == 0) {
-        switch (key) {
-        case SDLK_ESCAPE:
-            CONTINUE_MAIN_LOOP = false;
+    switch (key) {
+    case SDLK_ESCAPE:
+        CONTINUE_MAIN_LOOP = false;
 
-        case SDLK_e:
-            reset_state(*USERS_BRANCH);
-            if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
-                PAUSED = false;
-            break;
+    case SDLK_e:
+        reset_state(*USERS_BRANCH);
+        if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
+            PAUSED = false;
+        break;
 
-        case SDLK_r:
-            reload_branch_from_file(*USERS_BRANCH, std::cout);
-            if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
-                PAUSED = false;
-            break;
+    case SDLK_r:
+        reload_branch_from_file(*USERS_BRANCH, std::cout);
+        if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
+            PAUSED = false;
+        break;
 
-        case SDLK_p:
-            if (PAUSED) {
-                PAUSED = false;
-            } else {
-                PAUSED = true;
-                PAUSE_REASON = USER_REQUEST;
-            }
-            break;
+    case SDLK_p:
+        if (PAUSED) {
+            PAUSED = false;
+        } else {
+            PAUSED = true;
+            PAUSE_REASON = USER_REQUEST;
         }
+        break;
     }
 
     // Control keys

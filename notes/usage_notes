@@ -1,0 +1,9 @@
+
+This page contains notes from the front lines; ideas from actual usage
+
+Enum type would be great
+Ability to do dynamic typing is really helpful
+Often you want to have a reference to an item in a list. Possible to do this in a typesafe way? Can this be used as an lexpr?
+Switch expressions used constantly, maybe have 1 or more special syntaxes
+Fix how functions can be vectorized, currently it usually doesn't work
+Would be great to tweak constants inside of functions
