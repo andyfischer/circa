@@ -56,7 +56,8 @@ struct RenderedText
     int& texid() { return _term->asBranch()[0]->asInt(); }
     float& width() { return _term->asBranch()[1]->asFloat(); }
     float& height() { return _term->asBranch()[2]->asFloat(); }
-    std::string& text() { return _term->asBranch()[3]->asString(); }
+    Branch& color() { return _term->asBranch()[3]->asBranch(); }
+    std::string& text() { return _term->asBranch()[4]->asString(); }
 };
     
 void draw_text(Term* caller)

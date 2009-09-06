@@ -15,10 +15,18 @@ def perpendicular(Point v) : Point
     return [-v.y v.x]
 end
 
-
 def draw_thick_line(Point a, Point b, float width, Color color)
     perp = perpendicular(norm(a - b)) * width
     gl.triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
+end
+
+def draw_x(Point loc)
+    thickness = 3.0
+    dist = square_size * 0.4
+    draw_thick_line(loc - [dist dist], loc + [dist dist], thickness, #fff)
+    draw_thick_line(loc + [-dist dist], loc + [dist -dist], thickness, #fff)
+end
+def draw_o(Point loc)
 end
 
 -- Draw the board
@@ -71,4 +79,50 @@ def player_name(int p) : string
     else return "none" end
 end
 
-draw_text(ui_font_medium, concat("Current player: " player_name(current_player)), #fff, [20 300])
+def other_player(int p) : int
+    if p == player.x return player.o
+    else return player.x end
+end
+
+draw_text(ui_font_medium, concat("Current player: " player_name(current_player)), #fff, [20 320])
+
+chosen_space = []
+
+-- Draw each playable space
+for board_space in board_spaces
+    board_space = board_space : BoardSpace
+
+    loc = [board_space.x * square_size + board_left, board_space.y * square_size + board_top]
+    rect = [loc[0] loc[1] loc[0] + square_size loc[1] + square_size]
+
+    if board_space.owner == player.x
+        draw_x(board_space.center)
+    elif board_space.owner == player.o
+        draw_o(board_space.center)
+    end
+
+    playable = board_space.owner == player.none
+
+    if playable && mouse_over(rect)
+        draw_box(rect, #fff4)
+    end
+
+    if playable && mouse_clicked(rect)
+        chosen_space = board_space
+    end
+end
+
+if chosen_space != []
+    chosen_space = chosen_space : BoardSpace
+
+    -- Modify board_spaces in a silly way b/c the proper way doesn't work yet
+    def update_board_spaces(BoardSpace space) : BoardSpace
+        if space.x == chosen_space.x && space.y == chosen_space.y
+            space.owner = current_player
+        end
+        return space
+    end
+    board_spaces = map(update_board_spaces, board_spaces)
+    chosen_space = chosen_space : BoardSpace
+    current_player = other_player(current_player)
+end
