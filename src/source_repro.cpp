@@ -102,21 +102,10 @@ std::string get_term_source(Term* term)
 
     result << term->stringPropOptional("syntaxHints:preWhitespace", "");
 
-    // for a stateful value, write "state <name>" or "state <type> <name>"
-    if (is_value(term) && is_stateful(term)) {
-        result << "state ";
-
-        if (term->hasProperty("syntaxHints:explicitType"))
-            result << term->stringProp("syntaxHints:explicitType") << " ";
-
-        result << term->name;
-
-        if (term->hasProperty("initializedBy")) {
-            result << " = ";
-            result << get_term_source(term->refProp("initializedBy"));
-            result << term->stringPropOptional("syntaxHints:postWhitespace", "");
-        }
-
+    // check if this function has a toSourceString function
+    if (function_t::get_to_source_string(term->function) != NULL) {
+        result << function_t::get_to_source_string(term->function)(term);
+        result << term->stringPropOptional("syntaxHints:postWhitespace", "");
         return result.str();
     }
 
@@ -134,13 +123,6 @@ std::string get_term_source(Term* term)
         }
 
         result << as_type(term->type).toString(term);
-        result << term->stringPropOptional("syntaxHints:postWhitespace", "");
-        return result.str();
-    }
-
-    // check if this function has a toSourceString function
-    if (function_t::get_to_source_string(term->function) != NULL) {
-        result << function_t::get_to_source_string(term->function)(term);
         result << term->stringPropOptional("syntaxHints:postWhitespace", "");
         return result.str();
     }
