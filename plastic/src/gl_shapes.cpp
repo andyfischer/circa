@@ -102,6 +102,33 @@ void gl_points(Term* caller)
     glEnd();
 }
 
+void gl_circle(Term* caller)
+{
+    Branch& center = caller->input(0)->asBranch();
+    float x = center[0]->toFloat();
+    float y = center[1]->toFloat();
+    float radius = caller->input(1)->toFloat();
+    Term* color = caller->input(2);
+
+    _unpack_gl_color(color);
+
+    int control_points = int(radius);
+
+    glBegin(GL_TRIANGLE_FAN);
+
+    glVertex3f(x,y,0);
+
+    for (int i=0; i <= control_points; i++) {
+        float angle_0 = float(i) / control_points * M_PI * 2;
+        float angle_1 = float(i+1) / control_points * M_PI * 2;
+
+        glVertex3f(x + radius * std::cos(angle_0), y + radius * std::sin(angle_0), 0);
+        glVertex3f(x + radius * std::cos(angle_1), y + radius * std::sin(angle_1), 0);
+    }
+
+    glEnd();
+}
+
 void setup(Branch& branch)
 {
     install_function(branch["background"], background);
@@ -109,6 +136,7 @@ void setup(Branch& branch)
     install_function(branch["gl"]->asBranch()["line_strip"], gl_line_strip);
     install_function(branch["gl"]->asBranch()["line_loop"], gl_line_loop);
     install_function(branch["gl"]->asBranch()["points"], gl_points);
+    install_function(branch["gl"]->asBranch()["circle"], gl_circle);
 }
 
 } // namespace gl_shapes

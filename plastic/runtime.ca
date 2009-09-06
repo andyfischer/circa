@@ -35,6 +35,7 @@ namespace gl
     def line_strip +native (List, Color)
     def line_loop +native (List, Color)
     def points +native (List, Color)
+    def circle +native (Point loc, float radius, Color)
 end
 
 def load_texture +native (state int, string) : int

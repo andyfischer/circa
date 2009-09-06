@@ -1,7 +1,8 @@
 
 desired_window_size = [400 400]
 
-background(#10a)
+background_color = #10a
+background(background_color)
 
 board_center = [150 150] : Point
 square_size = 70
@@ -15,18 +16,28 @@ def perpendicular(Point v) : Point
     return [-v.y v.x]
 end
 
+-- this doesn't quite work how it should:
+def linear_fadein(float total_time) : float
+    state float time_started = time
+    elapsed = (time - time_started) / total_time
+    return min(elapsed, 1.0)
+end
+
 def draw_thick_line(Point a, Point b, float width, Color color)
     perp = perpendicular(norm(a - b)) * width
     gl.triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
 end
 
 def draw_x(Point loc)
-    thickness = 3.0
-    dist = square_size * 0.4
+    thickness = linear_fadein(5.0) * 4.0
+    dist = square_size * 0.35
     draw_thick_line(loc - [dist dist], loc + [dist dist], thickness, #fff)
     draw_thick_line(loc + [-dist dist], loc + [dist -dist], thickness, #fff)
 end
 def draw_o(Point loc)
+    radius = square_size * .35
+    gl.circle(loc, radius, #fff)
+    gl.circle(loc, radius - 6, background_color)
 end
 
 -- Draw the board
@@ -84,9 +95,52 @@ def other_player(int p) : int
     else return player.x end
 end
 
-draw_text(ui_font_medium, concat("Current player: " player_name(current_player)), #fff, [20 320])
+type WinnerInformation {
+    int player
+    Point line_a
+    Point line_b
+}
+
+def get_winner(List board_spaces) : WinnerInformation
+    def get_space(int x, int y) : BoardSpace
+        return board_spaces[x * 3 + y]
+    end
+    def owner(int x, int y) : int
+        s = get_space(x,y) return s.owner
+    end
+
+    result = WinnerInformation()
+    result := WinnerInformation() -- bad
+
+    -- Use assignment operator below because of lanaguage limitations. This is bad,
+    -- hopefully this gets rewritten after language improvements.
+
+    for i in range(3)
+        i = i : int
+        if owner(i, 0) != player.none && (owner(i, 0) == owner(i, 1)) && (owner(i, 0) == owner(i, 2))
+            line_x = board_left + (i+.5) * square_size
+            result := [owner(i, 0) [line_x board_top] [line_x board_bot]]
+        elif owner(0, i) != player.none && owner(0, i) == owner(1, i) && owner(0, i) == owner(2, i)
+            line_y = board_top + (i+.5)*square_size
+            result := [owner(0, i), [board_left line_y] [board_right line_y]] 
+        else
+        end
+    end
+
+    if owner(0, 0) != player.none && (owner(0, 0) == owner(1,1)) && (owner(0,0) == owner(2,2))
+        result := [owner(0,0) [board_left board_top] [board_right board_bot]]
+    end
+    if owner(2, 0) != player.none && (owner(2, 0) == owner(1,1)) && (owner(2,0) == owner(0,2))
+        result := [owner(2,0) [board_left board_bot] [board_right board_top]]
+    end
+
+    return result
+end
+
 
 chosen_space = []
+
+state moves_made = 0
 
 -- Draw each playable space
 for board_space in board_spaces
@@ -112,7 +166,11 @@ for board_space in board_spaces
     end
 end
 
+state winner_information = WinnerInformation()
+
 if chosen_space != []
+    moves_made += 1
+
     chosen_space = chosen_space : BoardSpace
 
     -- Modify board_spaces in a silly way b/c the proper way doesn't work yet
@@ -125,4 +183,21 @@ if chosen_space != []
     board_spaces = map(update_board_spaces, board_spaces)
     chosen_space = chosen_space : BoardSpace
     current_player = other_player(current_player)
+
+    -- Check if a player has won
+    winner = get_winner(board_spaces)
+
+    if winner.player != player.none
+        winner_information = winner
+    end
+end
+
+if winner_information.player != player.none
+    draw_thick_line(winner_information.line_a winner_information.line_b 5.0 #fff)
+    draw_text(ui_font_medium, concat(player_name(winner_information.player) " wins!"),
+        #fff, [20 340])
+elif moves_made == 9
+    draw_text(ui_font_medium, "Draw!", #fff, [20 340])
+else
+    draw_text(ui_font_medium, concat("Current player: " player_name(current_player)), #fff, [20 320])
 end
