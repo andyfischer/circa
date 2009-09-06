@@ -1,5 +1,6 @@
 # submodules:
 gh-pages
+circa-web
 
 # generated files:
 src/setup_builtin_functions.cpp
