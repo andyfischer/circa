@@ -12,6 +12,13 @@ Term* get_named(Branch& branch, std::string const& name);
 // then if found we'll look inside that for 'b', etc.
 Term* get_dot_separated_name(Branch& branch, std::string const& name);
 
+bool name_is_reachable_from(Term* term, Branch& branch);
+
+// Get a name of 'term' which is valid in 'branch'. This might simply return term's
+// name, or if term is inside a namespace or object, this would return a
+// dot-separated name.
+std::string get_relative_name(Branch& branch, Term* term);
+
 void expose_all_names(Branch& source, Branch& destination);
 
 } // namespace circa
