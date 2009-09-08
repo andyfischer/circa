@@ -29,5 +29,3 @@
    old state, and update those references.
 
  - 'do once' needs to export name bindings
-
- - stateful functions don't seem to update when the non-stateful input changes

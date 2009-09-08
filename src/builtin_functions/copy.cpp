@@ -19,7 +19,7 @@ namespace copy_function {
     {
         std::stringstream result;
         prepend_name_binding(term, result);
-        result << term->input(0)->name;
+        result << get_relative_name(term, term->input(0));
         return result.str();
     }
 

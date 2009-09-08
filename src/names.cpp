@@ -60,11 +60,14 @@ Term* get_dot_separated_name(Branch& branch, std::string const& name)
 
 Branch* get_parent_branch(Branch& branch)
 {
-    if (branch.owningTerm == NULL)
+    if (&branch == KERNEL)
         return NULL;
 
+    if (branch.owningTerm == NULL)
+        return KERNEL;
+
     if (branch.owningTerm->owningBranch == NULL)
-        return NULL;
+        return KERNEL;
 
     return branch.owningTerm->owningBranch;
 }
@@ -126,6 +129,14 @@ std::string get_relative_name(Branch& branch, Term* term)
     get_relative_name_recursive(branch, term, result);
 
     return result.str();
+}
+
+std::string get_relative_name(Term* location, Term* term)
+{
+    if (location->owningBranch == NULL)
+        return term->name;
+    else
+        return get_relative_name(*location->owningBranch, term);
 }
 
 void expose_all_names(Branch& source, Branch& destination)

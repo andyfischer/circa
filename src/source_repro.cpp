@@ -48,7 +48,7 @@ std::string get_source_of_input(Term* term, int inputIndex)
     if (byValue) {
         result << get_term_source(input);
     } else {
-        result << input->name;
+        result << get_relative_name(term, input);
     }
 
     result << get_input_syntax_hint_optional(term, inputIndex, "postWhitespace", defaultPost);
