@@ -58,6 +58,76 @@ Term* get_dot_separated_name(Branch& branch, std::string const& name)
     return get_dot_separated_name(as_branch(headTerm), tail);
 }
 
+Branch* get_parent_branch(Branch& branch)
+{
+    if (branch.owningTerm == NULL)
+        return NULL;
+
+    if (branch.owningTerm->owningBranch == NULL)
+        return NULL;
+
+    return branch.owningTerm->owningBranch;
+}
+
+Term* get_parent_term(Term* term)
+{
+    if (term->owningBranch == NULL)
+        return NULL;
+    if (term->owningBranch->owningTerm == NULL)
+        return NULL;
+
+    return term->owningBranch->owningTerm;
+}
+
+bool name_is_reachable_from(Term* term, Branch& branch)
+{
+    if (term->owningBranch == &branch)
+        return true;
+
+    Branch* parent = get_parent_branch(branch);
+
+    if (parent == NULL)
+        return false;
+
+    return name_is_reachable_from(term, *parent);
+}
+
+// Returns whether or not we succeeded
+bool get_relative_name_recursive(Branch& branch, Term* term, std::stringstream& output)
+{
+    if (name_is_reachable_from(term, branch)) {
+        output << term->name;
+        return true;
+    }
+
+    Term* parentTerm = get_parent_term(term);
+
+    if (parentTerm == NULL)
+        return false;
+
+    bool success = get_relative_name_recursive(branch, parentTerm, output);
+
+    if (success) {
+        output << "." << term->name;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+std::string get_relative_name(Branch& branch, Term* term)
+{
+    if (name_is_reachable_from(term, branch))
+        return term->name;
+
+    // Build a dot-separated name
+    std::stringstream result;
+
+    get_relative_name_recursive(branch, term, result);
+
+    return result.str();
+}
+
 void expose_all_names(Branch& source, Branch& destination)
 {
     for (TermNamespace::iterator it = source.names.begin(); it != source.names.end(); ++it)
