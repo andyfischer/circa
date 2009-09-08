@@ -23,7 +23,7 @@ namespace stateful_value_function {
             Term* initializedBy = term->refProp("initializedBy");
             out << " = ";
             if (initializedBy->name != "")
-                out << initializedBy->name;
+                out << get_relative_name(term, initializedBy);
             else
                 out << get_term_source(initializedBy);
         }

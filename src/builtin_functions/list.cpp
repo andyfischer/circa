@@ -30,8 +30,7 @@ namespace list_function {
 
     std::string toSourceString(Term* caller) {
         std::stringstream out;
-        if (caller->name != "")
-            out << caller->name << " = ";
+        prepend_name_binding(caller, out);
         out << "[";
         for (int i=0; i < caller->numInputs(); i++)
             out << get_source_of_input(caller, i);

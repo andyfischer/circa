@@ -24,7 +24,7 @@ namespace get_index_function {
     {
         std::stringstream out;
 
-        out << term->input(0)->name;
+        out << get_relative_name(term, term->input(0));
         out << "[";
         out << get_source_of_input(term, 1);
         out << "]";

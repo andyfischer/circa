@@ -18,6 +18,7 @@ bool name_is_reachable_from(Term* term, Branch& branch);
 // name, or if term is inside a namespace or object, this would return a
 // dot-separated name.
 std::string get_relative_name(Branch& branch, Term* term);
+std::string get_relative_name(Term* location, Term* term);
 
 void expose_all_names(Branch& source, Branch& destination);
 

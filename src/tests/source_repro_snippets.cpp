@@ -324,6 +324,14 @@ void reproduce_bracket_syntax() {
     finish_source_repro_category();
 }
 
+void reproduce_identifiers_inside_namespaces() {
+    round_trip_source("namespace a; namespace b; c = 1; end; end; add(4, a.b.c)");
+    round_trip_source("namespace a; namespace b; c = [1];end;end; print(a.b.c[0])");
+    round_trip_source("namespace a; namespace b; c = 1; end; end; [1 2 a.b.c]");
+    round_trip_source("namespace a; namespace b; c = 1; end; end; state i = a.b.c");
+    finish_source_repro_category();
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);
@@ -343,6 +351,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_dot_expressions);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_unary);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_bracket_syntax);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_identifiers_inside_namespaces);
 }
 
 } // namespace source_repro_snippets
