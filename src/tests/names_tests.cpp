@@ -62,12 +62,22 @@ void test_get_relative_name()
     test_equals(get_relative_name(c, c->input(1)), "Point");
 }
 
+void test_get_relative_name_from_hidden_branch()
+{
+    // This code once had a bug
+    Branch branch;
+    branch.eval("if true; a = 1; else; a = 2; end");
+
+    test_equals(get_relative_name(branch, branch["a"]), "a");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(names_tests::test_find_named);
     REGISTER_TEST_CASE(names_tests::test_get_dot_separated_name);
     REGISTER_TEST_CASE(names_tests::test_name_is_reachable_from);
     REGISTER_TEST_CASE(names_tests::test_get_relative_name);
+    REGISTER_TEST_CASE(names_tests::test_get_relative_name_from_hidden_branch);
 }
 
 } // namespace names_tests

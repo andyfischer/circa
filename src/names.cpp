@@ -108,6 +108,12 @@ bool get_relative_name_recursive(Branch& branch, Term* term, std::stringstream& 
     if (parentTerm == NULL)
         return false;
 
+    // Don't include the names of hidden branches
+    if (is_hidden(parentTerm)) {
+        output << term->name;
+        return true;
+    }
+
     bool success = get_relative_name_recursive(branch, parentTerm, output);
 
     if (success) {
