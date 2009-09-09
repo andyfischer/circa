@@ -1,0 +1,85 @@
+
+For loops are strange in a dataflow world
+
+In an imperative world, the innocent for loop can implement a huge
+variety of algorithms. The difference between those algorithms is
+much more obvious in a functional world.
+
+0. Completely innocent for loop
+ - No local rebinds
+ - No external rebinds
+
+for i in L
+  f(i)
+end
+
+This can be easily implemented with the map() function
+
+1. External rebind
+
+a = x
+for i in L
+  a = f(i)
+end
+
+(Note that the result of a is not used inside the loop)
+
+This can be simulated:
+
+for_loop_body: {
+  ...
+  a = ...
+}
+(bind a in outer scope)
+
+2. Internal rebind
+
+for i in L
+  a = f(a)
+end
+
+This requires 'a' to be copied on every iteration.
+
+----------------
+
+The following notes are old:
+
+
+Here's what we have:
+
+(Some chunk of code)
+
+     A B  C
+     |/   |
+     V    V
+     D    E
+
+(Then a for loop)
+
+ for(iterable)
+ -------------
+     D  
+     |
+     V
+     F
+ -------------
+
+ (Then the rest of the code:
+
+     F  E
+     |  |
+     V  V
+     G  H
+
+
+
+We want to take D and E, stick them in our loop, reapply the loop X times, then
+allow the rest of the code to use the results
+
+Can think of this like a function.
+
+D_c = value(typeof(D))
+in innerBranch, remap D to D_c
+on for loop start, copy D to D_c
+at end of each loop, assign(D_result, D_c)
+after the last loop, assign(D_result, F)
