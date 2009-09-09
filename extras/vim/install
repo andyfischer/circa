@@ -1,0 +1,2 @@
+ln syntax/circa.vim ~/.vim/syntax/circa.vim
+ln indent/circa.vim ~/.vim/indent/circa.vim

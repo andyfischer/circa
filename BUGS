@@ -28,4 +28,8 @@
  - When reloading a branch, we need to search the whole world for references to the 
    old state, and update those references.
 
- - 'do once' needs to export name bindings
+ - 'do once' needs to export name bindings. Maybe just make this syntactic sugar for if() ?
+
+ - Name conflicts with field access. This seems to have a bug:
+     a = Point()
+     x = a.x
