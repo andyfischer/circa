@@ -29,6 +29,14 @@
 
     Possible solution: only allow this syntax for 1-argment functions.
 
+  Alternatively, maybe this operator could just be used for name binding
+
+  <name>: <expression>
+  is the same as
+  <name> = <expression>
+
+  This version is closer to the meaning that someone would guess.
+
 ----------------
 
 *= operator for function application & renaming

@@ -81,10 +81,30 @@ void type_inference_for_iterator()
     test_assert(iterator->type == ANY_TYPE);
 }
 
+void test_rebind_external()
+{
+    Branch branch;
+    branch.eval("a = 0");
+    branch.eval("for i in [1]; a = 1; end");
+    test_assert(branch);
+    test_assert(branch["a"]->asInt() == 1);
+}
+
+void test_rebind_internally()
+{
+    Branch branch;
+    branch.eval("a = 0");
+    branch.eval("for i in [0 0 0]; a += 1; end");
+    test_assert(branch);
+    test_assert(branch["a"]->asInt() == 3);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(for_loop_tests::test_simple);
     REGISTER_TEST_CASE(for_loop_tests::type_inference_for_iterator);
+    REGISTER_TEST_CASE(for_loop_tests::test_rebind_external);
+    REGISTER_TEST_CASE(for_loop_tests::test_rebind_internally);
 }
 
 } // for_loop_tests
