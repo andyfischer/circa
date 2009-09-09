@@ -88,6 +88,7 @@ void test_rebind_external()
     branch.eval("for i in [1]; a = 1; end");
     test_assert(branch);
     test_assert(branch["a"]->asInt() == 1);
+
 }
 
 void test_rebind_internally()
@@ -97,6 +98,14 @@ void test_rebind_internally()
     branch.eval("for i in [0 0 0]; a += 1; end");
     test_assert(branch);
     test_assert(branch["a"]->asInt() == 3);
+
+    branch.eval("found_3 = false");
+    branch.eval("for n in [5 3 1 9 0]; if n == 3; found_3 = true; end; end");
+    test_assert(branch["found_3"]->asBool());
+
+    branch.eval("found_3 = false");
+    branch.eval("for n in [2 4 6 8]; if n == 3; found_3 = true; end; end");
+    test_assert(branch["found_3"]->asBool() == false);
 }
 
 void register_tests()
