@@ -192,6 +192,7 @@ void reproduce_if() {
     round_trip_source("if 1 > 2\nprint('hi')\nelif 2 > 3\n  elif 3 > 4\nprint('hello')\nend");
     round_trip_source("if true 1 2 3 end");
     round_trip_source("if true;1 2 3 end");
+    round_trip_source("if true; a = 1; else; a = 2; end; b = a"); // once had a bug
     finish_source_repro_category();
 }
 
