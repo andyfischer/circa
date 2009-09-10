@@ -118,8 +118,8 @@ void handle_key_press(SDL_Event &event, int key)
     if (event.key.keysym.mod & KMOD_CTRL) {
         switch (event.key.keysym.sym) {
         case SDLK_s:
-            circa::persist_branch_to_file(*USERS_BRANCH);
-            std::cout << "Saved" << std::endl;
+            persist_branch_to_file(*USERS_BRANCH);
+            std::cout << "saved to " << get_branch_source_filename(*USERS_BRANCH) << std::endl;
             break;
 
         case SDLK_p:

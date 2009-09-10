@@ -162,7 +162,7 @@ Branch::eval(std::string const& statement)
 std::string Branch::toString()
 {
     std::stringstream out;
-    out << "{ ";
+    out << "[";
     for (int i=0; i < length(); i++) {
         Term* term = get(i);
         if (i > 0) out << ", ";
@@ -170,7 +170,7 @@ std::string Branch::toString()
             out << term->name << ": ";
         out << term->toString();
     }
-    out << " }";
+    out << "]";
     return out.str();
 }
 

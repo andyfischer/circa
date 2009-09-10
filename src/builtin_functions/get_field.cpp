@@ -32,8 +32,11 @@ namespace get_field_function {
 
     std::string toSourceString(Term* term)
     {
-        std::string name = term->input(1)->asString();
-        return get_source_of_input(term, 0) + "." + name;
+        std::stringstream out;
+        prepend_name_binding(term, out);
+        out << get_source_of_input(term, 0);
+        out << "." << term->input(1)->asString();
+        return out.str();
     }
 
     void setup(Branch& kernel)

@@ -230,7 +230,7 @@ Term* create_compound_type(Branch& branch, std::string const& name)
 std::string compound_type_to_string(Term* caller)
 {
     std::stringstream out;
-    out << "{ ";
+    out << "[";
 
     Branch& value = as_branch(caller);
 
@@ -240,7 +240,7 @@ std::string compound_type_to_string(Term* caller)
         out << to_string(value[i]);
     }
 
-    out << " }";
+    out << "]";
     return out.str();
 }
 
