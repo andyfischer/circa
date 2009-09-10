@@ -39,6 +39,7 @@ struct Branch
     operator Term*() { return owningTerm; }
 
     Term* last() { if (length() == 0) return NULL; else return _terms[length()-1]; }
+    int findIndex(Term* term);
 
     // Returns true if there is a term with the given name
     bool contains(std::string const& name) const { return names.contains(name); }

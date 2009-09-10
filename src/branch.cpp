@@ -22,6 +22,14 @@ Branch& Branch::operator=(Branch const& b)
     return *this;
 }
 
+int Branch::findIndex(Term* term)
+{
+    for (int i=0; i < length(); i++) 
+        if (get(i) == term)
+            return i;
+    return -1;
+}
+
 void Branch::append(Term* term)
 {
     _terms.append(term);
@@ -51,12 +59,7 @@ void Branch::moveToEnd(Term* term)
 
 void Branch::remove(Term* term)
 {
-    // remove name binding if necessary
-    if (term != NULL && (term->name != "") && (names[term->name] == term))
-        names.remove(term->name);
-
-    _terms.remove(term);
-    term->owningBranch = NULL;
+    remove(findIndex(term));
 }
 
 void Branch::remove(std::string const& name)
@@ -66,9 +69,7 @@ void Branch::remove(std::string const& name)
 
     Term* term = names[name];
 
-    names.remove(name);
-    _terms.remove(term);
-    term->owningBranch = NULL;
+    remove(findIndex(term));
 }
 
 void Branch::remove(int index)
