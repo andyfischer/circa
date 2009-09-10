@@ -48,6 +48,29 @@ def rotate_points_around(List points, Point center, float rot) : List
     return map(rotate_point, points)
 end
 
+def rotate_around_i(Point_i point, Point_i center, int rotation) : Point_i
+  rotation = rotation % 4
+  
+  result = [0 0]
+  point = point - center
+
+  if rotation == 0
+    result = [point.x point.y]
+  end
+  if rotation == 1
+    result = [-point.y point.x]
+  end
+  if rotation == 2
+    result = [-point.x, -point.y]
+  end
+  if rotation == 3
+    result = [point.y, -point.x]
+  end
+  
+  return result + center
+end
+
+
 type Piece { int x, int y, int rot }
 type BoardPiece { int rot, bool filled, bool square_filled }
 
@@ -83,60 +106,31 @@ def initialize_board_piece(int index) : BoardPiece
   end
 end
 
+
 piece_types = [
     [[0 1 SE]]
     [[0 1 SE] [1 1 NW]]
     [[0 1 SE] [1 1 NW] [0 1 NW]]
 ]
-    --[[0 1 SE] [1 1 SW]]
-    --[[0 0 2] [0 1 2] [0 1 0]]
 
 def get_random_piece_type() : List
   i = rand_i() % length(piece_types)
   return piece_types[i]
 end
 
+type FallingGroupPosition {
+  int rot
+  int x
+  int y
+}
+
 state falling_group = get_random_piece_type()
-state falling_piece_rot = 0
-state falling_group_x = 4
-state falling_group_y = 0
+state falling_group_pos = [0 4 0] : FallingGroupPosition
 fall_speed = 80.0
 state float tile_fall_distance = tile_size
 
 state board = map(initialize_board_piece, range(num_tiles))
 
--- Keypresses for rotation
-if key_pressed(DOWN)
-  falling_piece_rot = (falling_piece_rot - 1) % 4
-  if falling_piece_rot < 0; falling_piece_rot += 4; end
-end
-if key_pressed(UP)
-  falling_piece_rot = (falling_piece_rot + 1) % 4
-end
-if key_pressed(LEFT); falling_group_x -= 1 end
-if key_pressed(RIGHT); falling_group_x += 1 end
-
-def rotate_around_i(Point_i point, Point_i center, int rotation) : Point_i
-  rotation = rotation % 4
-  
-  result = [0 0]
-  point = point - center
-
-  if rotation == 0
-    result = [point.x point.y]
-  end
-  if rotation == 1
-    result = [-point.y point.x]
-  end
-  if rotation == 2
-    result = [-point.x, -point.y]
-  end
-  if rotation == 3
-    result = [point.y, -point.x]
-  end
-  
-  return result + center
-end
 
 def rotate_falling_group(List group, int rot) : List
     def rotate_piece(Piece piece) : Piece
@@ -146,20 +140,19 @@ def rotate_falling_group(List group, int rot) : List
     return map(rotate_piece, group)
 end
 
--- Update fall animation
-tile_fall_distance -= fall_speed * time_delta
 
-def position_falling_group(List group, int pos_x, int pos_y) : List
-  group = rotate_falling_group(group, falling_piece_rot)
+def position_falling_pieces(List group, FallingGroupPosition pos) : List
+  group = rotate_falling_group(group, pos.rot)
   def position_piece(Piece piece) : Piece
-      pos = [piece.x + pos_x, piece.y + pos_y] : Point_i
+      pos = [piece.x + pos.x, piece.y + pos.y] : Point_i
       return [pos.x pos.y piece.rot]
   end
   out = map(position_piece, group)
   return out
 end
 
-def falling_group_collides(List group) : bool
+
+def falling_pieces_collide(List group) : bool
   def piece_collides(Piece piece) : bool
     board_piece = board[board_loc_to_index([piece.x piece.y])] : BoardPiece
     if board_piece.square_filled
@@ -177,17 +170,43 @@ def falling_group_collides(List group) : bool
   return any_true(map(piece_collides, group))
 end
 
--- Move falling group down a notch
+def falling_group_collides(List group, FallingGroupPosition pos) : bool
+    return falling_pieces_collide(position_falling_pieces(group, pos))
+end
+
+-- User's movement of falling group
+users_movement = [0 0 0] : FallingGroupPosition
+if key_pressed(DOWN)
+  users_movement.rot = -1
+end
+if key_pressed(UP)
+  users_movement.rot = users_movement.rot + 1
+end
+
+if key_pressed(LEFT); users_movement.x = -1 end
+if key_pressed(RIGHT); users_movement.x = users_movement.x + 1 end
+
+users_requested_position = falling_group_pos + users_movement
+
+if not(falling_group_collides(falling_group, users_requested_position))
+    falling_group_pos = users_requested_position
+end
+
+
+-- Update fall animation
+tile_fall_distance -= fall_speed * time_delta
+
+
+
+-- Check to move falling group down a step
 if tile_fall_distance < 0
   tile_fall_distance = tile_size
 
   -- Check if the falling group has landed
-  next_falling_group_position = position_falling_group(falling_group,
-        falling_group_x, falling_group_y + 1)
+  next_falling_group_position = position_falling_pieces(falling_group, falling_group_pos)
 
-  if falling_group_collides(next_falling_group_position)
-    positioned_falling_group = position_falling_group(falling_group,
-      falling_group_x, falling_group_y)
+  if falling_pieces_collide(next_falling_group_position)
+    positioned_falling_group = position_falling_pieces(falling_group, falling_group_pos)
 
     -- Make this piece permanent
     for piece in positioned_falling_group
@@ -206,8 +225,7 @@ if tile_fall_distance < 0
 end
 
 -- Draw the current position of the falling group
-positioned_falling_group = position_falling_group(falling_group,
-  falling_group_x, falling_group_y)
+positioned_falling_group = position_falling_pieces(falling_group, falling_group_pos)
 
 for piece in positioned_falling_group
     piece = piece:Piece

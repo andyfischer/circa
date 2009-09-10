@@ -714,7 +714,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     int prevBranchLength = branch.length();
     Term* expr = infix_expression(branch, tokens);
-    bool expr_is_new = branch.length() == prevBranchLength;
+    bool expr_is_new = branch.length() != prevBranchLength;
 
     for (int i=0; i < expr->numInputs(); i++)
         recursively_mark_terms_as_occuring_inside_an_expression(expr->input(i));
@@ -727,7 +727,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         std::string pendingRebind = pop_pending_rebind(branch);
 
         // If the expr is just an identifier, then create an implicit copy()
-        if (expr->name != "" && expr_is_new)
+        if (expr->name != "" && !expr_is_new)
             expr = apply(branch, COPY_FUNC, RefList(expr));
 
         if (pendingRebind != "")
@@ -737,11 +737,20 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     }
 
     // Otherwise, this is an assignment statement.
+    Term* lexpr = expr; // rename for clarity
+
+    // If the name wasn't recognized, then it will create a call to unknown_identifier().
+    // Delete this before parsing the rexpr.
+    std::string new_name_binding = "";
+    if ((lexpr->function == UNKNOWN_IDENTIFIER_FUNC) && expr_is_new) {
+        new_name_binding = lexpr->name;
+        branch.remove(lexpr);
+    }
+
     std::string preEqualsSpace = possible_whitespace(tokens);
     tokens.consume(EQUALS);
     std::string postEqualsSpace = possible_whitespace(tokens);
 
-    Term* lexpr = expr; // rename for clarity
     Term* rexpr = infix_expression(branch, tokens);
     for (int i=0; i < rexpr->numInputs(); i++)
         recursively_mark_terms_as_occuring_inside_an_expression(rexpr->input(i));
@@ -755,12 +764,9 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     // Now take a look at the lexpr.
     
-    // If the name wasn't recognized, then it will create a call to unknown_function().
-    // Delete this.
-    if (lexpr->function == UNKNOWN_IDENTIFIER_FUNC) {
-        std::string name = lexpr->name;
-        branch.remove(lexpr);
-        branch.bindName(rexpr, name);
+    // Check to bind a new name
+    if (new_name_binding != "") {
+        branch.bindName(rexpr, new_name_binding);
     }
 
     // Or, maybe the name already exists
@@ -1372,7 +1378,6 @@ Term* unknown_identifier(Branch& branch, std::string const& name)
     return term;
 }
 
-// TODO: This function is getting pretty gnarly and it could use refactoring.
 Term* identifier(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
