@@ -159,6 +159,7 @@ end
 chosen_space = []
 
 state moves_made = 0
+state game_is_finished = false
 
 -- Draw each playable space
 for board_space in board_spaces
@@ -173,7 +174,7 @@ for board_space in board_spaces
         draw_o(board_space.center)
     end
 
-    playable = board_space.owner == player.none
+    playable = board_space.owner == player.none && not(game_is_finished)
 
     if playable && mouse_over(rect)
         draw_box(rect, #fff4)
@@ -214,8 +215,10 @@ if winner_information.player != player.none
     draw_thick_line(winner_information.line_a winner_information.line_b 5.0 #fff)
     draw_text(ui_font_medium, concat(player_name(winner_information.player) " wins!"),
         #fff, [20 340])
+    game_is_finished = true
 elif moves_made == 9
     draw_text(ui_font_medium, "Draw!", #fff, [20 340])
+    game_is_finished = true
 else
     draw_text(ui_font_medium, concat("Current player: " player_name(current_player)), #fff, [20 320])
 end
