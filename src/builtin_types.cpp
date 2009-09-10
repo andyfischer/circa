@@ -271,6 +271,7 @@ void setup_builtin_types(Branch& kernel)
 void parse_builtin_types(Branch& kernel)
 {
     parse_type(kernel, "type Point { float x, float y }");
+    parse_type(kernel, "type Point_i { int x, int y }");
     parse_type(kernel, "type Box { float x1, float y1, float x2, float y2 }");
     COLOR_TYPE = parse_type(kernel, "type Color { float r, float g, float b, float a }");
 

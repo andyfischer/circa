@@ -7,8 +7,6 @@ background(background_color)
 board_center = [150 150] : Point
 square_size = 70
 
-type Point_i { int x, int y }
-
 def norm(Point v) : Point
     m = magnitude(v)
     return [v.x / m, v.y / m]
@@ -211,8 +209,16 @@ if chosen_space != []
     end
 end
 
+
+def draw_thick_line_animated(Point a, Point b, float thickness, Color color, float time)
+    length = magnitude(b - a)
+    n = norm(b - a)
+    actual_b = a + n * linear_fadein(time) * length
+    draw_thick_line(a,actual_b,thickness,color)
+end
+
 if winner_information.player != player.none
-    draw_thick_line(winner_information.line_a winner_information.line_b 5.0 #fff)
+    draw_thick_line_animated(winner_information.line_a winner_information.line_b, 5.0, #fff, 1.0)
     draw_text(ui_font_medium, concat(player_name(winner_information.player) " wins!"),
         #fff, [20 340])
     game_is_finished = true

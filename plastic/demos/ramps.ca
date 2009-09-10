@@ -1,4 +1,3 @@
-type Point_i { int x, int y }
 
 desired_window_size = [510 420]
 
