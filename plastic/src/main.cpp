@@ -143,7 +143,8 @@ void main_loop()
     long new_ticks = SDL_GetTicks();
 
     // Delay to limit framerate to 60 FPS
-    const long ticks_per_second = long(1.0 / 60.0 * 1000);
+    const float target_fps = 60.0;
+    const long ticks_per_second = long(1.0 / target_fps * 1000);
     if ((new_ticks - ticks) < ticks_per_second) {
         long delay = ticks_per_second - (new_ticks - ticks);
         SDL_Delay(delay);
@@ -191,7 +192,7 @@ int main( int argc, char* args[] )
         print_static_errors_formatted(*USERS_BRANCH, std::cout);
         return 1;
     }
-
+    
     // Try to initialize display
     if (!initialize_display())
         return 1;

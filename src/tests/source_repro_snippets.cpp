@@ -131,6 +131,7 @@ void reproduce_function_calls() {
     round_trip_source("add(1, 2)");
     round_trip_source("add(1,2)");
     round_trip_source("add(1 2)");
+    round_trip_source("add(1\n)");
     round_trip_source("add(1 2 3 4)");
     round_trip_source("add(   1   2,3 4  )");
     round_trip_source("  add(1,2)");
@@ -142,6 +143,7 @@ void reproduce_function_calls() {
     round_trip_source("d=add(1 2)");
     round_trip_source("d=   add(1 2)");
     round_trip_source("    text_sprite = render_text(ui_font_medium, text, #000)");
+    round_trip_source("def f(int a, int b, int c); state s; end;   f(1, 2 3)"); // once had a bug
     finish_source_repro_category();
 }
 
@@ -307,10 +309,9 @@ void reproduce_dot_expressions() {
     round_trip_source("r = &1; r.asint");
     round_trip_source("r = &1; r.asint + 5");
     round_trip_source("l = []; l.append(1)");
-    round_trip_source("l = [1.0 1.0] : Point; l.x = 2.0");
-    // These don't work because constructors are not reproduced
-    //round_trip_source("type T { float x }; t = T(); t.x");
-    //round_trip_source("type T { float x }; t = T(); t.x = 1.0");
+    round_trip_source("t = Point(); t.x");
+    round_trip_source("t = Point(); t.x = 1.0");
+    round_trip_source("t = Point(); a = t.x");
     finish_source_repro_category();
 }
 
@@ -322,6 +323,7 @@ void reproduce_unary() {
 
 void reproduce_bracket_syntax() {
     round_trip_source("a = [1]; a[0]");
+    round_trip_source("a = [1]; b = a[0]");
     finish_source_repro_category();
 }
 

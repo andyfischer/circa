@@ -34,14 +34,21 @@ std::string get_input_syntax_hint_optional(Term* term, int index, std::string co
 
 std::string get_source_of_input(Term* term, int inputIndex)
 {
+    int firstVisible = get_first_visible_input_index(term);
+
+    if (inputIndex < firstVisible)
+        return "";
+
+    int visibleIndex = inputIndex - firstVisible;
+
     Term* input = term->input(inputIndex);
 
     std::stringstream result;
 
-    std::string defaultPre = (inputIndex == get_first_visible_input_index(term)) ? "" : " ";
+    std::string defaultPre = visibleIndex > 0 ? " " : "";
     std::string defaultPost = (inputIndex+1 < term->numInputs()) ? "," : "";
 
-    result << get_input_syntax_hint_optional(term, inputIndex, "preWhitespace", defaultPre);
+    result << get_input_syntax_hint_optional(term, visibleIndex, "preWhitespace", defaultPre);
 
     bool byValue = input->name == "";
 
@@ -51,7 +58,7 @@ std::string get_source_of_input(Term* term, int inputIndex)
         result << get_relative_name(term, input);
     }
 
-    result << get_input_syntax_hint_optional(term, inputIndex, "postWhitespace", defaultPost);
+    result << get_input_syntax_hint_optional(term, visibleIndex, "postWhitespace", defaultPost);
 
     return result.str();
 }
@@ -122,7 +129,12 @@ std::string get_term_source(Term* term)
             throw std::runtime_error(out.str());
         }
 
-        result << as_type(term->type).toString(term);
+        // Special constructor syntax
+        if (term->boolPropOptional("constructor", false))
+            result << term->type->name << "()";
+        else 
+            result << as_type(term->type).toString(term);
+
         result << term->stringPropOptional("syntaxHints:postWhitespace", "");
         return result.str();
     }
