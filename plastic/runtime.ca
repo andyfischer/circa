@@ -85,8 +85,8 @@ end
 fps = fps_counter.lastRecoredFps
 
 namespace tweak
-    def button(Ref r, Point loc)
-        str = concat(r.name ' = ' r.to_string)
+    def button(Ref r, Point loc, string name)
+        str = concat(name ' = ' r.to_string)
 
         text_sprite = text.render_text(ui_font_medium, str, #000)
         padding = 3.0
@@ -147,7 +147,7 @@ if toggle(key_pressed(KEY_B))
   branch_inspector = [users_branch_ref] : BranchInspector
   x = 10, y = 10
   for r in branch_inspector.get_configs()
-    tweak.button(r, [x y])
+    tweak.button(r, [x y], branch_inspector.get_relative_name(r))
     y += 24
   end
 end

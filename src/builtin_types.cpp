@@ -165,6 +165,20 @@ namespace color_t {
 
 namespace branch_inspector_t
 {
+    bool is_considered_config(Term* term)
+    {
+        if (term == NULL) return false;
+        if (term->name == "") return false;
+        if (!is_value(term)) return false;
+        if (is_stateful(term)) return false;
+        if (is_hidden(term)) return false;
+
+        // ignore branch-based types
+        if (is_branch(term)) return false;
+        if (is_type(term)) return false;
+
+        return true;
+    }
     void get_configs(Term* caller)
     {
         Branch& object = caller->input(0)->asBranch();
@@ -174,15 +188,8 @@ namespace branch_inspector_t
         int write = 0;
         for (int i=0; i < target_branch.length(); i++) {
             Term* t = target_branch[i];
-            if (t == NULL) continue;
-            if (t->name == "") continue;
-            if (!is_value(t)) continue;
-            if (is_stateful(t)) continue;
-            if (is_hidden(t)) continue;
-
-            // ignore branch-based types
-            if (is_branch(t)) continue;
-            if (is_type(t)) continue;
+            if (!is_considered_config(t))
+                continue;
 
             if (write >= output.length())
                 create_ref(output, t);
@@ -194,6 +201,43 @@ namespace branch_inspector_t
 
         if (write < output.length())
             output.shorten(write);
+    }
+    void get_configs_nested(Term* caller)
+    {
+        Branch& object = caller->input(0)->asBranch();
+        Branch& target_branch = object[0]->asRef()->asBranch();
+        Branch& output = caller->asBranch();
+
+        int write = 0;
+        for (BranchIterator it(target_branch); !it.finished(); it.advance()) {
+            Term* t = *it;
+            if (!is_considered_config(t))
+                continue;
+
+            if (write >= output.length())
+                create_ref(output, t);
+            else
+                output[write]->asRef() = t;
+
+            write++;
+        }
+
+        if (write < output.length())
+            output.shorten(write);
+    }
+
+    void get_relative_name(Term* caller)
+    {
+        Branch& object = caller->input(0)->asBranch();
+        Branch& target_branch = object[0]->asRef()->asBranch();
+        Term* target = caller->input(1)->asRef();
+
+        if (target == NULL) {
+            error_occurred(caller, "term is NULL");
+            return;
+        }
+
+        as_string(caller) = get_relative_name(target_branch, target);
     }
 
 } // namespace branch_inspector_t
@@ -235,6 +279,10 @@ void parse_builtin_types(Branch& kernel)
     Term* branch_inspector_type = parse_type(kernel, "type BranchInspector { Ref target }");
     import_member_function(branch_inspector_type, branch_inspector_t::get_configs,
         "get_configs(BranchInspector) : List");
+    import_member_function(branch_inspector_type, branch_inspector_t::get_configs_nested,
+        "get_configs_nested(BranchInspector) : List");
+    import_member_function(branch_inspector_type, branch_inspector_t::get_relative_name,
+        "get_relative_name(BranchInspector, Ref) : string");
 }
 
 } // namespace circa
