@@ -1,0 +1,16 @@
+.hl_type {
+	color: #0084FF;
+}
+
+.hl_param {
+	color: #ABE618;
+}
+
+
+.hl_paramdesc {
+	margin-left: 30px;
+}
+
+.hl_func {
+	color: #FF903B;
+}

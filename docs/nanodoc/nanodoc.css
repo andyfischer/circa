@@ -1,0 +1,221 @@
+
+body {
+	margin: 0px;
+	padding: 0px;
+	background-color: #3B3636;
+	color: #ffffff;
+	font-family: Tahoma, Verdana, sans-serif;
+	font-size: 12px;
+}
+
+#nanotitle {
+	padding: 0px 0px 0px 10px
+}	
+
+#nanohead {
+	padding: 10px 0px 10px 0px;
+	background-color: #000000;
+	color: #8FB837;
+	width: 100%;
+}
+
+.moduledetail {
+	background-color: #252323;
+	font-family: Tahoma, Verdana, sans-serif;
+	font-size: 12px;
+	padding: 5px 0px 35px 0px;
+	margin-left: 530px;
+	margin-right: 0px;
+}
+
+
+#nanobody {
+}
+
+#packages {
+	float: left;
+	background-color: #252323;
+	font-family: Tahoma, Verdana, sans-serif;
+	font-size: 12px;
+	width: 150px;
+	padding: 5px 5px 35px 5px;
+}
+
+.package_contents {
+	float: left;
+	background-color: #181717;
+	font-family: Tahoma, Verdana, sans-serif;
+	font-size: 12px;
+	width: 150px;
+	padding: 5px 5px 35px 5px;
+}
+
+
+.modulelist {
+	float: left;
+	background-color: #000000;
+	font-family: Tahoma, Verdana, sans-serif;
+	font-size: 12px;
+	width: 200px;
+	padding: 5px 5px 35px 5px;
+	margin-right: 10px;
+}
+
+#modulelisttitle2 {
+	padding: 15px 5px 0px 0px;
+	font-size: 12px;
+	margin-bottom: 10px;
+	color: #ffffff; 
+}
+
+
+#modulelisttitle {
+	text-align: right;
+	padding: 5px;
+	font-size: 12px;
+	margin-bottom: 10px;
+	color: #2586d7; 
+}
+
+#moduledetailtitle {
+	padding: 5px;
+	font-size: 12px;
+	margin-bottom: 10px;
+	color: #5A5A5A; 
+}
+
+#detailcontent {
+	padding: 10px;
+}
+
+
+.detailboxdesc {
+	background-color: #000000;
+	padding: 3px 3px 3px 10px;
+}
+
+.detailbox {
+	background-color: #181717;
+	padding: 10px;
+}
+
+#modulestitle {
+	text-align: right;
+	padding: 5px;
+	font-size: 12px;
+	margin-bottom: 10px;
+}
+
+#packagestitle {
+	text-align: right;
+	padding: 5px;
+	font-size: 12px;
+	margin-bottom: 10px;
+}
+
+#nanobutton {
+	background-color: #90bade;
+	font-size: 12px;
+	color: #333;
+}
+
+
+#nanobutton li a {
+		display: block;
+		padding: 5px 5px 5px 0.5em;
+		background-color: #2175bc;
+		color: #fff;
+		text-decoration: none;
+		width: 100%;
+}
+
+html>body #nanobutton li a {
+		width: auto;
+}
+
+#nanobutton li a:hover {
+		background-color: #2586d7;
+		color: #fff;
+}
+
+#nanobutton ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border: none;
+}
+		
+#nanobutton li {
+		border-bottom: 2px solid black;
+		margin: 0;
+}
+
+#nanolistbutton {
+	background-color: #000000;
+	font-size: 12px;
+	color: #333;
+}
+
+
+#nanolistbutton li a {
+		display: block;
+		padding: 2px 2px 2px 0.5em;
+		background-color: #181717;
+		color: #fff;
+		text-decoration: none;
+		width: 100%;
+}
+
+html>body #nanolistbutton li a {
+		width: auto;
+}
+
+#nanolistbutton li a:hover {
+		background-color: #2E2D2D;
+		color: #fff;
+}
+
+#nanolistbutton ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border: none;
+}
+		
+#nanolistbutton li {
+		border-bottom: 2px solid black;
+		margin: 0;
+}
+
+
+.hl_type_b {
+	color: #0084FF;
+	float: left;
+	padding-right: 10px;
+}
+
+.hl_param_b {
+	color: #ABE618;
+}
+
+.hl_type {
+	color: #0084FF;
+}
+
+.hl_param {
+	color: #ABE618;
+}
+
+.ptr {
+	float: left;
+}
+
+.hl_paramdesc {
+	margin-bottom: 8px;
+	padding-left: 20px;
+	color: #5A5A5A;
+}
+
+.hl_func {
+	color: #FF903B;
+}
