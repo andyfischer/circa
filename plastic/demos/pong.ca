@@ -1,0 +1,129 @@
+
+-- started at 3:47
+-- finished at 4:40
+
+desired_window_size = [500 400]
+
+background(#042304)
+
+def norm(Point v) : Point
+    m = magnitude(v)
+    return [v.x / m, v.y / m]
+end
+
+def perpendicular(Point v) : Point
+    return [-v.y v.x]
+end
+
+def draw_thick_line(Point a, Point b, float width, Color color)
+    perp = perpendicular(norm(a - b)) * width
+    gl.triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
+end
+
+def expand_box(Point loc, float width, float height) : Box
+    return [loc.x - width/2, loc.y - height/2, loc.x + width / 2, loc.y + height/2]
+end
+
+def rect_intersects_rect(Box rect_a, Box rect_b) : bool
+    intersects_on_x = (rect_a.x2 > rect_b.x1) && (rect_b.x2 > rect_a.x1)
+    intersects_on_y = (rect_a.y2 > rect_b.y1) && (rect_b.y2 > rect_a.y1)
+    return intersects_on_x && intersects_on_y
+end
+
+def rect_intersects_circle(Box rect, Point circle_loc, float circle_radius) : bool
+    -- TODO
+    return rect_intersects_rect(rect, expand_box(circle_loc, circle_radius, circle_radius))
+end
+
+def approach(float target, float step) : float
+    state current = target
+    if target > current
+        current += min(step, target - current)
+    elif target < current
+        current -= min(step, current - target)
+    end
+    return current
+end
+
+def random_initial_direction() : Point
+    if rand() > .5 serve = 1 else serve = -1 end
+    angle = rand() * .4 - .2
+    return [cos(angle) * serve, sin(angle)]
+end
+
+state Point ball_loc = [window.width/2, window.height/2]
+state Point ball_direction = random_initial_direction()
+state int players_points = 0
+state int ai_points = 0
+
+paddle_width = 60.0
+paddle_depth = 10.0
+
+-- player's paddle on left
+players_paddle_loc = [50 mouse.y] : Point
+players_paddle = expand_box(players_paddle_loc, paddle_depth, paddle_width)
+
+ai_speed = 3.0
+ai_paddle_loc = [window.width - 50, approach(ball_loc.y, ai_speed)] : Point
+ai_paddle = expand_box(ai_paddle_loc, paddle_depth, paddle_width)
+
+-- move ball
+ball_speed = 3.7
+ball_loc = ball_loc + ball_direction * ball_speed
+ball_radius = 8.5
+
+if ball_loc.x + ball_radius < 0
+    ai_points += 1
+    ball_loc = [window.width/2, window.height/2] : Point
+    ball_direction = random_initial_direction()
+elif (ball_loc.x - ball_radius) > window.width
+    players_points += 1
+    ball_loc = [window.width/2, window.height/2] : Point
+    ball_direction = random_initial_direction()
+end
+
+-- bounce balls off of top and bottom
+if (ball_loc.y + ball_radius) > window.height
+    ball_direction = [ball_direction.x -ball_direction.y] : Point
+elif (ball_loc.y - ball_radius) < 0
+    ball_direction = [ball_direction.x -ball_direction.y] : Point
+end
+
+def get_collision_vector(Box paddle, Point point) : Point
+    paddle_center_x = (paddle.x2 - paddle.x1) / 2 + paddle.x1
+    paddle_center_y = (paddle.y2 - paddle.y1) / 2 + paddle.y1
+    paddle_size = (paddle.y2 - paddle.y1)
+    collision_loc_on_paddle = (point.y - paddle_center_y) / paddle_size
+    angle = collision_loc_on_paddle * .3
+    v = [cos(angle) sin(angle)] : Point
+    return v
+end
+
+-- bounce ball off of paddles
+if rect_intersects_circle(players_paddle, ball_loc, ball_radius)
+    ball_direction = get_collision_vector(players_paddle, ball_loc)
+end
+if rect_intersects_circle(ai_paddle, ball_loc, ball_radius)
+    ball_direction = get_collision_vector(ai_paddle, ball_loc)
+    ball_direction = [-ball_direction.x ball_direction.y] : Point
+end
+
+-- draw paddles
+draw_box(players_paddle, #fff)
+draw_box(ai_paddle, #fff)
+
+ball_loc = ball_loc + ball_direction * ball_speed
+
+-- draw ball
+
+gl.circle(ball_loc, ball_radius, #fff)
+
+def draw_text_centered_y(TTF_Font font, string str, Color color, Point location)
+    render = text.render_text(font, str, color)
+    text.draw_rendered_text(render, location.x - render.width/2, location.y)
+end
+
+
+-- draw status
+draw_text_centered_y(ui_font_medium, concat('Score'), #fff, [window.width/2, 20])
+draw_text_centered_y(ui_font_medium, concat(players_points ' : ' ai_points), #fff, [window.width/2, 40])
