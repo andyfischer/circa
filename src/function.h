@@ -29,6 +29,7 @@ namespace function_t {
     void set_input_meta(Term* function, int index, bool value);
     Ref& get_feedback_func(Term* function);
     Branch& get_parameters(Term* func);
+    std::string& get_description(Term* func);
 
     EvaluateFunc& get_evaluate(Term* function);
     SpecializeTypeFunc& get_specialize_type(Term* function);
