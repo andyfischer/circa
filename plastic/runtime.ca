@@ -2,7 +2,7 @@
 -- Wrap up mouse position into a point (values are passed in from input.cpp)
 state Point mouse
 
-def mouse_in(Box b) : bool
+def mouse_in(Rect b) : bool
   return (b.x1 < mouse.x) && (b.x2 > mouse.x) && (b.y1 < mouse.y) && (b.y2 > mouse.y)
 end
 
@@ -54,7 +54,7 @@ def magnitude(Point point) : float
     return sqrt(sqr(point.x) + sqr(point.y))
 end
 
-def draw_box(Box box, Color color)
+def draw_box(Rect box, Color color)
     nw = [box.x1 box.y1]
     ne = [box.x2 box.y1]
     sw = [box.x1 box.y2]

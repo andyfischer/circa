@@ -23,7 +23,7 @@ for button in buttons
 
   button_loc = [loc.x, current_y] : Point
   b = [button_loc.x, button_loc.y, button_loc.x+button_size.x,
-       button_loc.y+button_size.y]:Box
+       button_loc.y+button_size.y] : Rect
 
   color = 0
   if mouse_in(b)
