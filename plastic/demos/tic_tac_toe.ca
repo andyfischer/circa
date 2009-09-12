@@ -7,27 +7,6 @@ background(background_color)
 board_center = [150 150] : Point
 square_size = 70
 
-def norm(Point v) : Point
-    m = magnitude(v)
-    return [v.x / m, v.y / m]
-end
-
-def perpendicular(Point v) : Point
-    return [-v.y v.x]
-end
-
--- this doesn't quite work how it should:
-def linear_fadein(float total_time) : float
-    state float time_started = time
-    elapsed = (time - time_started) / total_time
-    return min(elapsed, 1.0)
-end
-
-def draw_thick_line(Point a, Point b, float width, Color color)
-    perp = perpendicular(norm(a - b)) * width
-    gl.triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
-end
-
 def draw_x(Point loc)
     thickness = 4.0 -- linear_fadein(5.0) * 4.0
     dist = square_size * 0.35
@@ -208,7 +187,6 @@ if chosen_space != []
         winner_information = winner
     end
 end
-
 
 def draw_thick_line_animated(Point a, Point b, float thickness, Color color, float time)
     length = magnitude(b - a)

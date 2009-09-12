@@ -1,28 +1,7 @@
 
--- started at 3:47
--- finished at 4:40
-
 desired_window_size = [500 400]
 
 background(#042304)
-
-def norm(Point v) : Point
-    m = magnitude(v)
-    return [v.x / m, v.y / m]
-end
-
-def perpendicular(Point v) : Point
-    return [-v.y v.x]
-end
-
-def draw_thick_line(Point a, Point b, float width, Color color)
-    perp = perpendicular(norm(a - b)) * width
-    gl.triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
-end
-
-def expand_box(Point loc, float width, float height) : Rect
-    return [loc.x - width/2, loc.y - height/2, loc.x + width / 2, loc.y + height/2]
-end
 
 def rect_intersects_rect(Rect rect_a, Rect rect_b) : bool
     intersects_on_x = (rect_a.x2 > rect_b.x1) && (rect_b.x2 > rect_a.x1)
@@ -32,22 +11,7 @@ end
 
 def rect_intersects_circle(Rect rect, Point circle_loc, float circle_radius) : bool
     -- lazy
-    return rect_intersects_rect(rect, expand_box(circle_loc, circle_radius, circle_radius))
-end
-
-def approach(float target, float step) : float
-    state current = target
-    if target > current
-        current += min(step, target - current)
-    elif target < current
-        current -= min(step, current - target)
-    end
-    return current
-end
-
-def alternate_over_time(float period) : bool
-    state float time_started = time
-    return round((time - time_started) / period) % 2 == 0
+    return rect_intersects_rect(rect, expand_rect(circle_loc, circle_radius, circle_radius))
 end
 
 def random_initial_direction() : Point
@@ -64,16 +28,16 @@ state int ai_points = 0
 
 paddle_width = 60.0
 paddle_depth = 10.0
-ball_speed = 4.5
+ball_speed = 6.6
 ball_radius = 8.5
 
 -- player's paddle on left
 players_paddle_loc = [50 mouse.y] : Point
-players_paddle = expand_box(players_paddle_loc, paddle_depth, paddle_width)
+players_paddle = expand_rect(players_paddle_loc, paddle_depth, paddle_width)
 
-ai_speed = 3.0
+ai_speed = 3.5
 ai_paddle_loc = [window.width - 50, approach(ball_loc.y, ai_speed)] : Point
-ai_paddle = expand_box(ai_paddle_loc, paddle_depth, paddle_width)
+ai_paddle = expand_rect(ai_paddle_loc, paddle_depth, paddle_width)
 
 ball_is_being_introduced = (time - round_start_time) < 2.0
 
@@ -136,7 +100,6 @@ def draw_text_centered_y(TTF_Font font, string str, Color color, Point location)
     render = text.render_text(font, str, color)
     text.draw_rendered_text(render, location.x - render.width/2, location.y)
 end
-
 
 -- draw status
 draw_text_centered_y(ui_font_medium, concat('Score'), #fff, [window.width/2, 20])
