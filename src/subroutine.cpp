@@ -11,7 +11,10 @@ namespace subroutine_t {
 
         std::stringstream result;
 
-        result << "def " << function_t::get_name(term) << "(";
+        result << "def " << function_t::get_name(term);
+        if (is_native_function(term)) result << " +native ";
+
+        result << "(";
 
         bool first = true;
         int numInputs = function_t::num_inputs(term);
@@ -39,9 +42,12 @@ namespace subroutine_t {
         }
 
         result << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
-        result << get_branch_source(branch);
-        result << term->stringPropOptional("syntaxHints:preEndWs", "");
-        result << "end";
+
+        if (!is_native_function(term)) {
+            result << get_branch_source(branch);
+            result << term->stringPropOptional("syntaxHints:preEndWs", "");
+            result << "end";
+        }
 
         return result.str();
     }

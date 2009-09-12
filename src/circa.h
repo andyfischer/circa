@@ -34,3 +34,5 @@
 #include "token_stream.h"
 #include "type.h"
 #include "utils.h"
+
+#include "opt/generate_docs.h"

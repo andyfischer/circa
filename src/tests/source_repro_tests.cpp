@@ -95,10 +95,21 @@ void bug_reproducing_list_after_eval()
     test_equals(get_branch_source(branch), "[1 1] + [1 1]");
 }
 
+void death_reproducing_builtin_functions()
+{
+    // This once threw an exception
+    test_equals(get_term_source(KERNEL->get("assert")), "def assert +native (bool)");
+
+    for (int i=0; i < KERNEL->length(); i++)
+        if (is_function(KERNEL->get(i)))
+            get_term_source(KERNEL->get(i));
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_tests::generate_source_for_function_calls);
     REGISTER_TEST_CASE(source_repro_tests::generate_source_for_literal_list);
     REGISTER_TEST_CASE(source_repro_tests::bug_reproducing_list_after_eval);
+    REGISTER_TEST_CASE(source_repro_tests::death_reproducing_builtin_functions);
 }
 
 } // namespace source_repro_tests
