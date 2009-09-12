@@ -122,6 +122,11 @@ namespace function_t {
     {
         return as_branch(func->asBranch()[0]->asBranch()[7]);
     }
+
+    std::string& get_description(Term* func)
+    {
+        return as_string(func->asBranch()[0]->asBranch()[8]);
+    }
 } // namespace function_t
 
 bool is_function(Term* term)
@@ -149,6 +154,7 @@ void initialize_function_data(Term* term)
           [5] ToSourceStringFunc native_to_source_string
           [6] ref feedback_func
           [7] List parameters
+          [8] string description
         }
         [1..num_inputs] input terms
             .. each might have bool property 'modified' or 'meta'
@@ -177,6 +183,7 @@ void initialize_function_data(Term* term)
     create_value(attributes, TO_STRING_THUNK_TYPE, "native_to_string");
     create_ref(attributes, NULL, "feedback_func");
     create_value(attributes, LIST_TYPE, "parameters");
+    create_value(attributes, STRING_TYPE, "description");
 }
 
 bool is_callable(Term* term)
