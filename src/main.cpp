@@ -141,6 +141,15 @@ int circa_main(std::vector<std::string> args)
         return 0;
     }
 
+    // Generate docs
+    if (args[0] == "-gd") {
+        std::cout << "writing docs to " << args[1] << std::endl;
+        std::stringstream out;
+        generate_docs(*KERNEL, out);
+        write_text_file(args[1], out.str());
+        return 0;
+    }
+
     // Otherwise, run script
     Branch main_branch;
     parse_script(main_branch, args[0]);

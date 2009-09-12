@@ -61,12 +61,23 @@ void overloaded_function()
     test_equals(f->function->name, "add_f");
 }
 
+void test_is_native_function()
+{
+    test_assert(is_native_function(KERNEL->get("assert")));
+
+    Branch branch;
+    Term* f = branch.eval("def f() end");
+
+    test_assert(!is_native_function(f));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(function_tests::create);
     REGISTER_TEST_CASE(function_tests::test_is_callable);
     REGISTER_TEST_CASE(function_tests::test_inputs_fit_function);
     REGISTER_TEST_CASE(function_tests::overloaded_function);
+    REGISTER_TEST_CASE(function_tests::test_is_native_function);
 }
 
 } // namespace function_tests

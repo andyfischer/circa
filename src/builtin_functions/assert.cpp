@@ -14,7 +14,7 @@ namespace assert_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "assert(bool)");
+        import_function(kernel, evaluate, "assert +native (bool)");
     }
 }
 }

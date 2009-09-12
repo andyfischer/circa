@@ -210,6 +210,11 @@ Term* create_overloaded_function(Branch& branch, std::string const& name)
     return create_value(branch, OVERLOADED_FUNCTION_TYPE, name);
 }
 
+bool is_native_function(Term* func)
+{
+    return function_t::get_evaluate(func) != subroutine_call_evaluate;
+}
+
 Term* specialize_function(Term* func, RefList const& inputs)
 {
     if (func->type == OVERLOADED_FUNCTION_TYPE) {

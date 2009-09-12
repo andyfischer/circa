@@ -253,6 +253,10 @@ void reproduce_subroutine() {
     round_trip_source("type Point { float x, float y }\ndef hi() : Point\nreturn [0 0]\nend");
     round_trip_source("def hi() if true return 1 else return 2 end end");
     round_trip_source("def hi() x = 1 if true return x else return x end end");
+    round_trip_source("def my_native +native ()");
+    round_trip_source("def my_native +native ()   ");
+    round_trip_source("def my_native +native (int)");
+    round_trip_source("def my_native +native (int) : int");
     finish_source_repro_category();
 }
 
