@@ -354,9 +354,13 @@ namespace ref_t {
         if (steps == 0)
             return;
 
-        if (is_float(t))
-            as_float(t) += steps * get_step(t);
-        else if (is_int(t))
+        if (is_float(t)) {
+            float step = get_step(t);
+
+            // do the math like this so that rounding errors are not accumulated
+            as_float(t) = (round(as_float(t) / step) + steps) * step;
+
+        } else if (is_int(t))
             as_int(t) += steps;
         else
             error_occurred(caller, "Ref is not an int or float");
