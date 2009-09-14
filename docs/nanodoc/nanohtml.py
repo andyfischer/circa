@@ -1,5 +1,15 @@
 
-from xml.dom.minidom import parse
+"""
+
+Json document is layed out like this:
+
+headers
+  title
+packages
+  name
+  contents
+
+"""
 
 def to_ident(name):
     return name.strip(' ()').lower()
@@ -29,7 +39,7 @@ def makeHTML(dom):
     html += "\t\t<script type=\"text/javascript\" src=\"nanodoc.js\"></script>"
     html += "\t</head>\n"
     html += "\t<body>\n"
-    html += "\t\t<div id=\"nanohead\"><div id=\"nanotitle\">" + dom['title'] + "</div></div>\n"
+    html += "\t\t<div id=\"nanohead\"><div id=\"nanotitle\">" + dom['headers']['title'] + "</div></div>\n"
     html += "\t\t<div id=\"nanobody\">\n"
 
     html += "<div id=\"packages\">"
@@ -144,15 +154,26 @@ def makeHTML(dom):
     html += "\t</html>\n"
     return html
 
+from optparse import OptionParser
+options = OptionParser()
+options.add_option('--dom', dest = 'dom_filename')
+options.add_option('--output', dest = 'output_filename')
+(cl_options, cl_args) = options.parse_args()
 
-dom = {'title':'Circa+Plastic',
-          'packages':[{'name':'(builtins)',
-                    'contents':[{'name':'add', 'function':True}
-                               ]
-                     }
-                    ]
-        }
+def load_json_dom(filename):
+    f = open(filename, 'r')
+    file_contents = f.read()
+    f.close()
 
-f = open("my_index.html", "w")
-f.write(makeHTML(dom))
-f.close()
+    import json
+    dom = json.loads(file_contents)
+    return dom
+
+def write_text_file(filename, contents):
+    output_file = open(filename, 'w')
+    output_file.write(contents)
+    output_file.write("\n")
+
+dom = load_json_dom(cl_options.dom_filename)
+html = makeHTML(dom)
+write_text_file(cl_options.output_filename, html)

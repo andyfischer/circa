@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd $CIRCA_HOME
+scons && circa -gd docs.json.temp && python docs/nanodoc/nanohtml.py --dom docs.json.temp --output docs/nanodoc/index.html
+rm docs.json.temp
