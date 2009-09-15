@@ -46,10 +46,14 @@ body {
 	background-color: #181717;
 	font-family: Tahoma, Verdana, sans-serif;
 	font-size: 12px;
-	width: 150px;
+	width: 360px;
 	padding: 5px 5px 35px 5px;
 }
 
+.package_contents_bar {
+    width: 170px;
+	padding: 5px 5px 5px 5px;
+}
 
 .modulelist {
 	float: left;
