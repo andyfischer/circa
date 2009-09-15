@@ -50,15 +50,15 @@ def makeHTML(dom):
 
     html = ""
     
-    html += "<html>\n"
-    html += "\t<head>\n"
-    html += "\t\t<title>nanodoc</title>\n"
-    html += "\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"nanodoc.css\" />\n"
-    html += "\t\t<script type=\"text/javascript\" src=\"nanodoc.js\"></script>"
+    html += '<html>\n'
+    html += '\t<head>\n'
+    html += '\t\t<title>nanodoc</title>\n'
+    html += '\t\t<link rel="stylesheet" type="text/css" href="nanodoc.css" />\n'
+    html += '\t\t<script type="text/javascript" src="nanodoc.js"></script>'
     html += "\t</head>\n"
     html += "\t<body>\n"
-    html += "\t\t<div id=\"nanohead\"><div id=\"nanotitle\">" + dom['headers']['title'] + "</div></div>\n"
-    html += "\t\t<div id=\"nanobody\">\n"
+    html += '\t\t<div id="nanohead"><div id="nanotitle">' + dom['headers']['title'] + ' API documentation</div></div>\n'
+    html += '\t\t<div id="nanobody">\n'
 
     html += packageListHTML(all_packages())
 
