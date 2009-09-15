@@ -341,6 +341,11 @@ namespace ref_t {
 
         assign_value(source, t);
     }
+
+    int round(double a) {
+        return int(a + 0.5);
+    }
+
     void tweak(Term* caller)
     {
         Term* t = caller->input(0)->asRef();
