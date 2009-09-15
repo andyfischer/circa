@@ -14,6 +14,24 @@ packages
 def to_ident(name):
     return name.strip(' ()').lower()
 
+def packageListHTML(packages):
+    html = "<div id=\"packages\">"
+    html += "<div id=\"packagestitle\">Packages</div>"
+    html += "<div id=\"nanobutton\">"
+    html += "<ul>"
+    
+    # Leftmost column: one item for each package
+    for package in packages:
+        name = package['name']
+        html += ("<li><a href=\"javascript:showPackageContents('%s_contents')\">%s</a></li>"
+                % (to_ident(name), name))
+
+    html += "</ul>"
+    html += "</div>"
+    html += "</div>"
+    html += "\n"
+    return html
+
 def makeHTML(dom):
 
     def all_packages():
@@ -42,30 +60,19 @@ def makeHTML(dom):
     html += "\t\t<div id=\"nanohead\"><div id=\"nanotitle\">" + dom['headers']['title'] + "</div></div>\n"
     html += "\t\t<div id=\"nanobody\">\n"
 
-    html += "<div id=\"packages\">"
-    html += "<div id=\"packagestitle\">Packages</div>"
-    html += "<div id=\"nanobutton\">"
-    html += "<ul>"
-    
-    # Leftmost column: one item for each package
-    for module in all_packages():
-        name = module['name']
-        html += ("<li><a href=\"javascript:showPackageContents('%s_contents')\">%s</a></li>"
-                % (to_ident(name), name))
+    html += packageListHTML(all_packages())
 
-    html += "</ul>"
-    html += "</div>"
-    html += "</div>"
-    html += "\n"
-
-    # 2nd column: contents of packages
+    # 2nd and 3rd columns: contents of packages
     for package in all_packages():
-        package_name = module['name']
+        package_name = package['name']
 
         html += ("<div style=\"display:none\" class=\"package_contents\" id=\"%s_contents\">"
                 % to_ident(package_name))
         html += "<div id=\"modulestitle\">%s</div>" % package_name
         html += "<div id=\"nanobutton\">"
+
+        html += '<div class="package_contents_bar" style="float:left">'
+
         html += "<ul>"
 
         for item in package['contents']:
@@ -74,9 +81,25 @@ def makeHTML(dom):
             html += ("<li><a href=\"javascript:showSubContents('%s_sub')\">%s</a></li>"
                     % (to_ident(item_name), item_name))
         html += "</ul>"
+
+        html += "</div>"
+
+        html += '<div class="package_contents_bar" style="float:right">'
+
+        html += "<ul>"
+
+        for item in package['contents']:
+            item_name = item['name']
+
+            html += ("<li><a href=\"javascript:showSubContents('%s_sub')\">%s</a></li>"
+                    % (to_ident(item_name), item_name))
+        html += "</ul>"
+
+        html += "</div>"
+
         html += "</div>"
         html += "</div>"
-    
+
     html += "\n"
 
     # Rightmost item: actual documentation
