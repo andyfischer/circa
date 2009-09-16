@@ -32,6 +32,9 @@ namespace subroutine_t {
                 result << " " << name;
         }
 
+        if (function_t::get_variable_args(term))
+            result << "...";
+
         result << ")";
 
         if (function_t::get_output_type(term) != VOID_TYPE) {
