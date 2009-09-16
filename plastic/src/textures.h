@@ -1,7 +1,7 @@
-// Copyright 2008 Andrew Fischer
+// Copyright (c) 2007-2009 Andrew Fischer. All rights reserved
 
-#ifndef CUTTLEFISH_TEXTURES_INCLUDED
-#define CUTTLEFISH_TEXTURES_INCLUDED
+#ifndef PLASTIC_TEXTURES_INCLUDED
+#define PLASTIC_TEXTURES_INCLUDED
 
 GLenum get_texture_format(SDL_Surface *surface);
 GLuint load_image_to_texture(std::string const& filename, circa::Term *errorListener);

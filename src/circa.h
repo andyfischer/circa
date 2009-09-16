@@ -1,11 +1,14 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
+#include "common_headers.h"
+
 #include "branch.h"
 #include "branch_iterator.h"
 #include "building.h"
 #include "builtin_types.h"
 #include "builtins.h"
 #include "codegen.h"
+#include "command_line.h"
 #include "cpp_importing.h"
 #include "cpp_convenience.h"
 #include "debug.h"

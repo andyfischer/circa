@@ -1,7 +1,7 @@
-// Copyright 2008 Andrew Fischer
+// Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
-#ifndef CUTTLEFISH_MAIN_INCLUDED
-#define CUTTLEFISH_MAIN_INCLUDED
+#ifndef PLASTIC_MAIN_INCLUDED
+#define PLASTIC_MAIN_INCLUDED
 
 extern bool CONTINUE_MAIN_LOOP;
 extern circa::Branch* USERS_BRANCH;

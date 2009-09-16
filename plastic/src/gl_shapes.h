@@ -1,7 +1,7 @@
-// Copyright 2008 Andrew Fischer
+// Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
-#ifndef CUTTLEFISH_GL_SHAPES_INCLUDED
-#define CUTTLEFISH_GL_SHAPES_INCLUDED
+#ifndef PLASTIC_GL_SHAPES_INCLUDED
+#define PLASTIC_GL_SHAPES_INCLUDED
 
 #include "circa.h"
 
