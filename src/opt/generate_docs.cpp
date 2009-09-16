@@ -4,6 +4,28 @@
 
 namespace circa {
 
+bool hidden_from_documentation(Term* term)
+{
+    return (term->name == "annotate_type")
+        || (term->name == "add_feedback")
+        || (term->name == "sin_feedback")
+        || (term->name == "cos_feedback")
+        || (term->name == "if_feedback")
+        || (term->name == "mult_feedback")
+        || (term->name == "eval_script")
+        || (term->name == "stateful_value")
+        || (term->name == "if_block")
+        || (term->name == "if")
+        || (term->name == "input_placeholder")
+        || (term->name == "if_expr_feedback")
+        || (term->name == "term_to_source")
+        || (term->name == "unknown_field")
+        || (term->name == "unknown_function")
+        || (term->name == "unknown_identifier")
+        || (term->name == "unrecognized_expr")
+        || (term->name == "unknown_type");
+}
+
 void generate_docs_for_function(Term* func, std::stringstream &out)
 {
     std::string description = function_t::get_description(func);
@@ -13,7 +35,7 @@ void generate_docs_for_function(Term* func, std::stringstream &out)
     out << ", \"function\":true";
     out << ", \"return_type\": \"" << function_t::get_output_type(func)->name << "\"";
     out << ", \"declaration\": \"" << get_term_source(func) << "\"";
-    out << ", \"description\": \"" << description << "\"";
+    out << ", \"comments\": \"" << description << "\"";
     out << "}";
 }
 
@@ -30,6 +52,8 @@ void generate_docs(Branch& branch, std::stringstream &out)
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
         if (term == NULL) continue;
+        if (is_hidden(term)) continue;
+        if (hidden_from_documentation(term)) continue;
         if (is_function(term)) {
             if (needs_comma) out << ",\n";
             generate_docs_for_function(term, out);

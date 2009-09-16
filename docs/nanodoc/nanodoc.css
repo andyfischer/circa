@@ -125,7 +125,7 @@ body {
 
 #nanobutton li a {
 		display: block;
-		padding: 5px 5px 5px 0.5em;
+		padding: 3px 5px 3px 0.5em;
 		background-color: #dd2288;
 		color: #fff;
 		text-decoration: none;
@@ -190,6 +190,13 @@ html>body #nanolistbutton li a {
 		margin: 0;
 }
 
+.detail_declaration {
+	color: #0084FF;
+}
+
+.detail_comments {
+	color: #5A5A5A;
+}
 
 .hl_type_b {
 	color: #0084FF;

@@ -32,11 +32,48 @@ def packageListHTML(packages):
     html += "\n"
     return html
 
-def makeHTML(dom):
+def itemListHTML(items):
+    html = "<ul>"
 
-    def all_packages():
-        for module in dom['packages']:
-            yield module
+    for item in items:
+        item_name = item['name']
+
+        html += ('<li><a href="javascript:showSubContents(\'%s_sub\')">%s</a></li>\n'
+                % (to_ident(item_name), item_name))
+
+    html += "</ul>"
+    return html
+
+def compareItems(lhs, rhs):
+    return cmp(lhs['name'], rhs['name'])
+
+def divideListIntoTwo(l):
+    left_list = []
+    right_list = []
+    left = True
+    for i in l:
+        if left: left_list.append(i)
+        else: right_list.append(i)
+        left = not left
+    return (left_list, right_list)
+
+def detailHTML(item):
+    name = item['name']
+
+    html = '<div style="display:none" class="moduledetail" id="%s_sub">' % to_ident(name)
+    html += '<div id="moduledetailtitle">%s</div>' % name
+
+    html += '<div id="detailcontent">\n'
+    html += '<span class="detail_declaration">%s</span>\n' % item['declaration']
+    html += '<p>'
+    html += '<span class="detail_comments">%s</span>\n' % item['comments']
+
+    html += "</div>"
+    html += "</div>"
+
+    return html
+
+def makeHTML(dom):
 
     def all_module_contents():
         for module in dom['packages']:
@@ -47,6 +84,10 @@ def makeHTML(dom):
         for item in all_module_contents():
             if 'function' in item:
                 yield item
+
+    all_packages = [package for package in dom['packages']]
+
+    # remove hidden functions
 
     html = ""
     
@@ -60,10 +101,10 @@ def makeHTML(dom):
     html += '\t\t<div id="nanohead"><div id="nanotitle">' + dom['headers']['title'] + ' API documentation</div></div>\n'
     html += '\t\t<div id="nanobody">\n'
 
-    html += packageListHTML(all_packages())
+    html += packageListHTML(all_packages)
 
     # 2nd and 3rd columns: contents of packages
-    for package in all_packages():
+    for package in all_packages:
         package_name = package['name']
 
         html += ("<div style=\"display:none\" class=\"package_contents\" id=\"%s_contents\">"
@@ -71,81 +112,36 @@ def makeHTML(dom):
         html += "<div id=\"modulestitle\">%s</div>" % package_name
         html += "<div id=\"nanobutton\">"
 
-        html += '<div class="package_contents_bar" style="float:left">'
+        # split up contents into 2 lists
+        contents = list(package['contents'])
 
-        html += "<ul>"
+        contents.sort(compareItems)
 
-        for item in package['contents']:
-            item_name = item['name']
+        (left_list, right_list) = divideListIntoTwo(contents)
 
-            html += ("<li><a href=\"javascript:showSubContents('%s_sub')\">%s</a></li>"
-                    % (to_ident(item_name), item_name))
-        html += "</ul>"
-
+        html += '<div class="package_contents_bar" style="float:left">\n'
+        html += itemListHTML(left_list)
         html += "</div>"
 
-        html += '<div class="package_contents_bar" style="float:right">'
-
-        html += "<ul>"
-
-        for item in package['contents']:
-            item_name = item['name']
-
-            html += ("<li><a href=\"javascript:showSubContents('%s_sub')\">%s</a></li>"
-                    % (to_ident(item_name), item_name))
-        html += "</ul>"
-
+        html += '<div class="package_contents_bar" style="float:right">\n'
+        html += itemListHTML(right_list)
         html += "</div>"
 
         html += "</div>"
         html += "</div>"
 
+        html += "\n"
     html += "\n"
 
     # Rightmost item: actual documentation
-
     for func in all_functions():
-        name = func['name']
-        type_name = "Type"
-
-        html += "<div style=\"display:none\" class=\"moduledetail\" id=\"%s_sub\">" % to_ident(name)
-        html +=    "<div id=\"moduledetailtitle\">%s</div>" % name
-
-        html += "<div id=\"detailcontent\"> <span class=\"hl_type\">%s</span> %s<span class=\"hl_func\">%s </span>" % (type_name, "", name)
-        html += "("
-        paramdescs = ""
-        params = []
-        description = ""
-        returns = ""
-        if len(params) > 0:
-            params_html = []
-            for subitem in item.getElementsByTagName('param'):
-                if subitem.attributes["isPtr"].value == "True":
-                    ptrFlag = "*"
-                else:
-                    ptrFlag = ""
-                params_html.append("<span class=\"hl_type\">%s</span> %s<span class=\"hl_param\">%s</span>" % (type_name, "", name))
-                paramdescs += "<div class=\"hl_type_b\">%s</div><div class=\"ptr\">%s</div><div class=\"hl_param_b\">%s</div><div class=\"hl_paramdesc\">%s</div>" % (type_name, "", name, "")
-            html += ", ".join(params_html)
-        html += ")</div>"
-        
-        if description:
-            html +=    "<div id=\"detailcontent\"><div class=\"detailboxdesc\"> Description</div> <div class=\"detailbox\">%s.</div></div>" % description
-    
-        if returns:
-            html +=    "<div id=\"detailcontent\"><div class=\"detailboxdesc\"> Return value</div> <div class=\"detailbox\">%s.</div></div>" % returns
-    
-        if len(paramdescs) > 0:
-            html += "<div id=\"detailcontent\"><div class=\"detailboxdesc\"> Parameters</div><div class=\"detailbox\">"
-            html += paramdescs
-            html += "</div></div>"
-        html += "</div>"
+        html += detailHTML(func)
+        html += '\n'
 
     html += "\n"
 
-    return html
-
-    for item in dom.documentElement.getElementsByTagName('struct'):
+    if False:
+      for item in dom.documentElement.getElementsByTagName('struct'):
         html += "<div style=\"display:none\" class=\"moduledetail\" id=\"%s_sub\">" % (item.attributes["name"].value.strip(" ").lower())
         html +=    "<div id=\"moduledetailtitle\">%s</div>" % (item.attributes["name"].value)
         html += "<div id=\"detailcontent\"> <span class=\"hl_type\">typedef struct</span> {<br/>"
