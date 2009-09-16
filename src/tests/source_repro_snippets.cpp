@@ -257,6 +257,7 @@ void reproduce_subroutine() {
     round_trip_source("def my_native +native ()   ");
     round_trip_source("def my_native +native (int)");
     round_trip_source("def my_native +native (int) : int");
+    round_trip_source("def my_func(int...) : int end");
     finish_source_repro_category();
 }
 
