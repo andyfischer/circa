@@ -15,8 +15,8 @@ type Window {
 window = Window()
 
 -- Text rendering functions
+type TTF_Font {} -- native
 namespace text
-    --type +native TTF_Font
     type RenderedText { int texid, float width, float height, Color color, string text }
     def load_font +native (state TTF_Font, string, int) : TTF_Font
     def render_text +native (state RenderedText, TTF_Font, string, Color color) : RenderedText

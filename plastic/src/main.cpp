@@ -40,7 +40,6 @@ bool initialize_plastic()
     SCRIPT_ROOT = &create_branch(*circa::KERNEL, "plastic_main");
 
     input::initialize(*SCRIPT_ROOT);
-    ttf::initialize(*SCRIPT_ROOT);
 
     // Import constants
     TIME = float_value(*SCRIPT_ROOT, 0, "time");

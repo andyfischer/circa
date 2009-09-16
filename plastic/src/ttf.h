@@ -5,9 +5,6 @@
 
 namespace ttf {
 
-// called before loading runtime.ca
-void initialize(circa::Branch& branch);
-
 // called after loading runtime.ca
 void setup(circa::Branch& branch);
 

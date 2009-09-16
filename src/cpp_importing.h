@@ -50,14 +50,20 @@ bool raw_value_less_than(Term* a, Term* b);
 // Public functions
 
 template <class T>
-Term* import_type(Branch& branch, std::string name="")
+void import_type(Term* term)
 {
-    Term* term = create_type(branch, name);
     Type& type = as_type(term);
     type.alloc = cpp_importing::templated_alloc<T>;
     type.dealloc = cpp_importing::templated_dealloc<T>;
     type.assign = cpp_importing::templated_assign<T>;
     type.cppTypeInfo = &typeid(T);
+}
+
+template <class T>
+Term* import_type(Branch& branch, std::string name="")
+{
+    Term* term = create_type(branch, name);
+    import_type<T>(term);
     return term;
 }
 

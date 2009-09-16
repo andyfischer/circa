@@ -96,7 +96,7 @@ void gl_points(Term* caller)
     for (int i=0; i < list.length(); i++) {
         float x = list[i]->asBranch()[0]->toFloat();
         float y = list[i]->asBranch()[1]->toFloat();
-        glVertex3f(x + .5, y + .5, 0);
+        glVertex3f(x + 0.5f, y + 0.5f, 0);
     }
     
     glEnd();

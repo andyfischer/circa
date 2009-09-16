@@ -152,18 +152,14 @@ void draw_rendered_text(Term* caller)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void initialize(circa::Branch& branch)
-{
-    import_type<TTF_Font*>(branch, "TTF_Font");
-}
-
 void setup(Branch& branch)
 {
     if (TTF_Init() == -1) {
         std::cout << "TTF_Init failed with error: " << TTF_GetError();
         return;
     }
-    
+
+    import_type<TTF_Font*>(branch["TTF_Font"]);
     install_function(branch["text"]->asBranch()["load_font"], load_font);
     //install_function(branch["text"]->asBranch()["draw_text"], draw_text);
     install_function(branch["text"]->asBranch()["render_text"], render_text);
