@@ -1,4 +1,4 @@
-// Copyright 2008 Paul Hodge
+// Copyright (c) 2007-2009 Paul Hodge. All rights reserved
 
 #include "common_headers.h"
 

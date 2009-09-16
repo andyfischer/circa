@@ -1,4 +1,4 @@
-// Copyright 2009 Paul Hodge
+// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
 #include "common_headers.h"
 
@@ -15,13 +15,9 @@
 #include "textures.h"
 #include "ttf.h"
 
-// Prevent warnings on getenv()
-#define _CRT_SECURE_NO_WARNINGS 1
 
 using namespace circa;
 
-int SCREEN_WIDTH = 640;
-int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
 
 SDL_Surface* SCREEN = NULL;
@@ -36,6 +32,39 @@ long PREV_SDL_TICKS = 0;
 bool PAUSED = false;
 PauseReason PAUSE_REASON;
 
+bool initialize_plastic()
+{
+    // Initialize Circa
+    circa::initialize();
+
+    SCRIPT_ROOT = &create_branch(*circa::KERNEL, "plastic_main");
+
+    input::initialize(*SCRIPT_ROOT);
+    ttf::initialize(*SCRIPT_ROOT);
+
+    // Import constants
+    TIME = float_value(*SCRIPT_ROOT, 0, "time");
+    TIME_DELTA = float_value(*SCRIPT_ROOT, 0, "time_delta");
+
+    // Load runtime.ca
+    std::string circa_home = getenv("CIRCA_HOME");
+    parse_script(*SCRIPT_ROOT, circa_home + "/plastic/runtime.ca");
+
+    input::setup(*SCRIPT_ROOT);
+    mesh::setup(*SCRIPT_ROOT);
+    gl_shapes::setup(*SCRIPT_ROOT);
+    textures::setup(*SCRIPT_ROOT);
+    ttf::setup(*SCRIPT_ROOT);
+
+    if (has_static_errors(*SCRIPT_ROOT)) {
+        std::cout << "Errors in runtime.ca:" << std::endl;
+        print_static_errors_formatted(*SCRIPT_ROOT, std::cout);
+        return false;
+    }
+
+    return true;
+}
+
 bool initialize_display()
 {
     // Initialize the window
@@ -48,7 +77,7 @@ bool initialize_display()
 
     // Create the surface
     int windowWidth = 640;
-    int windowHeight = 640;
+    int windowHeight = 480;
 
     if (USERS_BRANCH->contains("desired_window_size")) {
         windowWidth = (*USERS_BRANCH)["desired_window_size"]->asBranch()[0]->asInt();
@@ -151,39 +180,17 @@ void main_loop()
     }
 }
 
-int main( int argc, char* args[] )
+int plastic_main(std::vector<std::string> args)
 {
-    // Initialize stuff
-    circa::initialize();
+    if (!initialize_plastic()) return 1;
 
-    SCRIPT_ROOT = &create_branch(*circa::KERNEL, "plastic_main");
-
-    input::initialize(*SCRIPT_ROOT);
-    ttf::initialize(*SCRIPT_ROOT);
-
-    // Import constants
-    TIME = float_value(*SCRIPT_ROOT, 0, "time");
-    TIME_DELTA = float_value(*SCRIPT_ROOT, 0, "time_delta");
-
-    // Load runtime.ca
-    std::string circa_home = getenv("CIRCA_HOME");
-    parse_script(*SCRIPT_ROOT, circa_home + "/plastic/runtime.ca");
-
-    input::setup(*SCRIPT_ROOT);
-    mesh::setup(*SCRIPT_ROOT);
-    gl_shapes::setup(*SCRIPT_ROOT);
-    textures::setup(*SCRIPT_ROOT);
-    ttf::setup(*SCRIPT_ROOT);
-
-    if (has_static_errors(*SCRIPT_ROOT)) {
-        std::cout << "Errors in runtime.ca:" << std::endl;
-        print_static_errors_formatted(*SCRIPT_ROOT, std::cout);
-        return 1;
-    }
+    // For no args, default action is to run tests
+    if (args.size() == 0)
+        return circa::run_command_line(args);
 
     // Inject the requested filename, so that the user's script will be loaded
     String user_script_filename(*SCRIPT_ROOT, "user_script_filename", "");
-    if (argc > 1) user_script_filename = args[1];
+    user_script_filename = args[0];
     Term* users_branch = SCRIPT_ROOT->get("users_branch");
     include_function::possibly_expand(users_branch);
     USERS_BRANCH = &users_branch->asBranch();
@@ -194,8 +201,7 @@ int main( int argc, char* args[] )
     }
     
     // Try to initialize display
-    if (!initialize_display())
-        return 1;
+    if (!initialize_display()) return 1;
 
     PREV_SDL_TICKS = SDL_GetTicks();
 
@@ -207,4 +213,14 @@ int main( int argc, char* args[] )
     SDL_Quit();
 
     return 0;
+}
+
+int main( int argc, char* args[] )
+{
+    std::vector<std::string> argv;
+
+    for (int i = 1; i < argc; i++)
+        argv.push_back(args[i]);
+
+    return plastic_main(argv);
 }

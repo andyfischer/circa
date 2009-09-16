@@ -1,7 +1,7 @@
-// Copyright 2009 Paul Hodge
+// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
-#ifndef CUTTLEFISH_TTF_INCLUDED
-#define CUTTLEFISH_TTF_INCLUDED
+#ifndef PLASTIC_TTF_INCLUDED
+#define PLASTIC_TTF_INCLUDED
 
 namespace ttf {
 

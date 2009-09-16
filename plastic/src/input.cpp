@@ -1,4 +1,4 @@
-// Copyright 2008 Paul Hodge
+// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
 #include "circa.h"
 #include "SDL.h"
@@ -81,8 +81,8 @@ void capture_events()
         }
     } // finish event loop
 
-    MOUSE_POSITION_TERM->asBranch()[0]->asFloat() = MOUSE_X;
-    MOUSE_POSITION_TERM->asBranch()[1]->asFloat() = MOUSE_Y;
+    MOUSE_POSITION_TERM->asBranch()[0]->asFloat() = float(MOUSE_X);
+    MOUSE_POSITION_TERM->asBranch()[1]->asFloat() = float(MOUSE_Y);
 }
 
 void handle_key_press(SDL_Event &event, int key)

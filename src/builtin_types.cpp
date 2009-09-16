@@ -153,7 +153,7 @@ namespace color_t {
             if (digitsPerChannel == 1)
                 out << number_to_hex_digit(int(channel * 15.0));
             else {
-                int mod_255 = channel * 255.0;
+                int mod_255 = int(channel * 255.0);
                 out << number_to_hex_digit(mod_255 / 0x10);
                 out << number_to_hex_digit(mod_255 % 0x10);
             }

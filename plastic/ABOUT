@@ -1,4 +1,4 @@
 
-Cuttlefish is a game engine and prototyping tool that uses SDL.
+Plastic is a game engine and prototyping tool that uses SDL.
 We load scripts written in Circa, expose SDL bindings to them, and
 take advantage of the Circa library for live manipulation of code.

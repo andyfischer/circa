@@ -1,7 +1,7 @@
-// Copyright 2008 Paul Hodge
+// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
-#ifndef CUTTLEFISH_INPUT_INCLUDED
-#define CUTTLEFISH_INPUT_INCLUDED
+#ifndef PLASTIC_INPUT_INCLUDED
+#define PLASTIC_INPUT_INCLUDED
 
 namespace input {
 

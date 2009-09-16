@@ -1,7 +1,7 @@
-// Copyright 2008 Paul Hodge
+// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
-#ifndef CUTTLEFISH_SHADERS_INCLUDED
-#define CUTTLEFISH_SHADERS_INCLUDED
+#ifndef PLASTIC_SHADERS_INCLUDED
+#define PLASTIC_SHADERS_INCLUDED
 
 #define SHADER_SUPPORT 0
 

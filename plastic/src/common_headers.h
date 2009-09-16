@@ -1,9 +1,12 @@
-// Copyright 2008 Paul Hodge
+// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_COMMON_HEADERS_INCLUDED
-#define CIRCA_COMMON_HEADERS_INCLUDED
+#ifndef PLASTIC_COMMON_HEADERS_INCLUDED
+#define PLASTIC_COMMON_HEADERS_INCLUDED
 
 #ifdef WINDOWS
+
+// Prevent warnings on getenv()
+#define _CRT_SECURE_NO_WARNINGS 1
 
 #undef max
 #undef min

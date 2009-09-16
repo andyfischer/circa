@@ -1,7 +1,7 @@
-// Copyright 2009 Paul Hodge
+// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
-#ifndef CUTTLEFISH_MESH_INCLUDED
-#define CUTTLEFISH_MESH_INCLUDED
+#ifndef PLASTIC_MESH_INCLUDED
+#define PLASTIC_MESH_INCLUDED
 
 struct Vertex2f
 {
