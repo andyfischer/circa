@@ -198,7 +198,7 @@ int plastic_main(std::vector<std::string> args)
         print_static_errors_formatted(*USERS_BRANCH, std::cout);
         return 1;
     }
-    
+
     // Try to initialize display
     if (!initialize_display()) return 1;
 
