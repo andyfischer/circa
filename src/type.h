@@ -63,6 +63,7 @@ struct Type
         cppTypeInfo(NULL),
         alloc(NULL),
         dealloc(NULL),
+        assign(NULL),
         equals(NULL),
         remapPointers(NULL),
         toString(NULL),

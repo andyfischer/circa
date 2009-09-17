@@ -360,7 +360,7 @@ void alloc_value(Term* term)
     Type& type = as_type(term->type);
 
     if (type.alloc == NULL)
-        // todo: should this happen?
+        // this happens while bootstrapping
         term->value = NULL;
     else {
         type.alloc(term->type, term);
