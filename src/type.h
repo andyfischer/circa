@@ -54,6 +54,9 @@ struct Type
     // Type parameters
     RefList parameters;
 
+    // Attributes for this type. Stuff should be migrated here.
+    Branch attributes;
+
     Type() :
         name(""),
         isPointer(true),
@@ -85,6 +88,9 @@ namespace type_t {
     void assign(Term* source, Term* dest);
     void remap_pointers(Term *term, ReferenceMap const& map);
     void name_accessor(Term* caller);
+
+    // Accessors
+    Term* default_value(Term* type);
 }
 
 bool is_type(Term* term);

@@ -254,13 +254,21 @@ bool equals(Term* a, Term* b)
     if (a->type != b->type)
         return false;
 
-    return as_type(a->type).equals(a,b);
+    Type::EqualsFunc equals_func = as_type(a->type).equals;
+
+    if (equals_func == NULL)
+        throw std::runtime_error("type "+as_type(a->type).name+" has no equals function");
+
+    return equals_func(a,b);
 }
 
 namespace type_t {
     void alloc(Term* type, Term* term)
     {
         term->value = new Type();
+
+        // initialize attributes
+        create_value(as_type(term).attributes, ANY_TYPE, "defaultValue");
     }
     void dealloc(Term* type, Term* term)
     {
@@ -317,6 +325,13 @@ namespace type_t {
     void name_accessor(Term* caller)
     {
         as_string(caller) = as_type(caller->input(0)).name;
+    }
+
+    Term* default_value(Term* type)
+    {
+        Branch& attributes = as_type(type).attributes;
+        if (attributes.length() < 1) return NULL;
+        return attributes[0];
     }
 
 } // namespace type_t
@@ -433,7 +448,13 @@ void assign_value_to_default(Term* term)
     //else if (as_type(term->type).isPointer)
         //term->value = 0;
 
-    // TODO: default values for other types
+    // check if this type has a default value defined
+    Term* defaultValue = type_t::default_value(term->type);
+    if (defaultValue == NULL)
+        return;
+    if (defaultValue->type == ANY_TYPE)
+        return;
+    assign_value(defaultValue, term);
 }
 
 bool check_invariants(Term* term, std::string* failureMessage)
