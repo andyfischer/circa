@@ -226,6 +226,7 @@ void test_missing_functions()
 
     Term* t = create_type(branch);
     as_type(t).equals = NULL;
+    as_type(t).isPointer = false;
 
     Term* a = create_value(branch, t);
     Term* b = create_value(branch, t);
@@ -236,8 +237,8 @@ void test_missing_functions()
     test_assert(threw);
 
     threw = false;
-    //FIXME try { assign_value(a,b); } catch (std::runtime_error&) { threw = true; }
-    //test_assert(threw);
+    try { assign_value(a,b); } catch (std::runtime_error&) { threw = true; }
+    test_assert(threw);
 }
 
 void register_tests()
