@@ -30,4 +30,19 @@ void install_function(Term* function, EvaluateFunc evaluate)
     function_t::get_evaluate(function) = evaluate;
 }
 
+void shallow_assign(Term* a, Term* b)
+{
+    b->value = a->value;
+}
+
+bool shallow_equals(Term* a, Term* b)
+{
+    return a->value == b->value;
+}
+
+void zero_alloc(Term *type, Term* t)
+{
+    t->value = 0;
+}
+
 } // namespace circa

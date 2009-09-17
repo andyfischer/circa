@@ -28,21 +28,6 @@ Term* SPECIALIZE_THUNK_TYPE = NULL;
 Term* TO_STRING_THUNK_TYPE = NULL;
 Term* CHECK_INVARIANTS_FUNC_TYPE = NULL;
 
-void shallow_assign(Term* a, Term* b)
-{
-    b->value = a->value;
-}
-
-bool shallow_equals(Term* a, Term* b)
-{
-    return b->value == a->value;
-}
-
-void zero_alloc(Term *type, Term* t)
-{
-    t->value = 0;
-}
-
 std::string& as_string(Term* term)
 {
     assert(term->type == STRING_TYPE);

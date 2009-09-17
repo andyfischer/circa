@@ -137,7 +137,7 @@ void test_default_values()
 {
     Branch branch;
 
-    Term* i = int_value(branch, 5);
+    Term* i = int_value(branch, 5, "i");
     assign_value_to_default(i);
     test_assert(i->asInt() == 0);
 
@@ -148,6 +148,26 @@ void test_default_values()
     Term* s = string_value(branch, "hello");
     assign_value_to_default(s);
     test_assert(s->asString() == "");
+
+    Term* t = create_type(branch, "T");
+    as_type(t).alloc = zero_alloc;
+    as_type(t).assign = shallow_assign;
+    as_type(t).equals = shallow_equals;
+    as_type(t).isPointer = false;
+
+    test_assert(type_t::default_value(t) != NULL);
+    test_assert(type_t::default_value(t)->type == ANY_TYPE);
+
+    Term* t_value = create_value(branch, t);
+
+    t_value->value = (void*) 5;
+    assign_value(t_value, type_t::default_value(t));
+
+    Term* t_value_2 = create_value(branch, t);
+
+    assign_value_to_default(t_value_2);
+
+    test_assert(equals(t_value, t_value_2));
 }
 
 void type_inference_for_get_index()
@@ -197,6 +217,29 @@ void test_is_value_allocced()
     test_assert(!as_type(INT_TYPE).isPointer);
 }
 
+void test_missing_functions()
+{
+    // Make sure we don't die if we call a function which tries to dispatch to
+    // a function which is missing.
+
+    Branch branch;
+
+    Term* t = create_type(branch);
+    as_type(t).equals = NULL;
+
+    Term* a = create_value(branch, t);
+    Term* b = create_value(branch, t);
+
+    bool threw = false;
+
+    try { equals(a,b); } catch (std::runtime_error&) { threw = true; }
+    test_assert(threw);
+
+    threw = false;
+    //FIXME try { assign_value(a,b); } catch (std::runtime_error&) { threw = true; }
+    //test_assert(threw);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
@@ -208,6 +251,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);
     REGISTER_TEST_CASE(type_tests::test_is_value_allocced);
+    REGISTER_TEST_CASE(type_tests::test_missing_functions);
 }
 
 } // namespace type_tests

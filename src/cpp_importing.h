@@ -41,7 +41,6 @@ bool templated_lessThan(Term* a, Term* b)
 }
 
 void pointer_alloc(Term* type, Term* term);
-void raw_value_assign(Term* a, Term* b);
 bool raw_value_equals(Term* a, Term* b);
 bool raw_value_less_than(Term* a, Term* b);
 
@@ -75,8 +74,8 @@ void import_pointer_type(Term* term)
 {
     Type& type = as_type(term);
     type.alloc = cpp_importing::pointer_alloc;
-    type.assign = cpp_importing::raw_value_assign;
-    type.equals = cpp_importing::raw_value_equals;
+    type.assign = shallow_assign;
+    type.equals = shallow_equals;
     type.cppTypeInfo = &typeid(T);
     type.toString = NULL;
     type.remapPointers = NULL;
