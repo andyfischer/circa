@@ -20,7 +20,6 @@ struct Type
 {
     typedef void (*AllocFunc)(Term* type, Term* term);
     typedef void (*DeallocFunc)(Term* type, Term* term);
-    typedef void (*DuplicateFunc)(Term* src, Term* dest);
     typedef void (*AssignFunc)(Term* src, Term* dest);
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);

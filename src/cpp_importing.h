@@ -57,6 +57,9 @@ void import_type(Term* term)
     type.dealloc = cpp_importing::templated_dealloc<T>;
     type.assign = cpp_importing::templated_assign<T>;
     type.cppTypeInfo = &typeid(T);
+    type.toString = NULL;
+    type.remapPointers = NULL;
+    type.checkInvariants = NULL;
 }
 
 template <class T>
@@ -68,14 +71,23 @@ Term* import_type(Branch& branch, std::string name="")
 }
 
 template <class T>
-Term* import_pointer_type(Branch& branch, std::string name="")
+void import_pointer_type(Term* term)
 {
-    Term* term = create_type(branch, name);
     Type& type = as_type(term);
     type.alloc = cpp_importing::pointer_alloc;
     type.assign = cpp_importing::raw_value_assign;
     type.equals = cpp_importing::raw_value_equals;
     type.cppTypeInfo = &typeid(T);
+    type.toString = NULL;
+    type.remapPointers = NULL;
+    type.checkInvariants = NULL;
+}
+
+template <class T>
+Term* import_pointer_type(Branch& branch, std::string name="")
+{
+    Term* term = create_type(branch, name);
+    import_pointer_type<T>(term);
     return term;
 }
 

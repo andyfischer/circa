@@ -430,6 +430,8 @@ void assign_value_to_default(Term* term)
         as_bool(term) = false;
     else if (is_ref(term))
         as_ref(term) = NULL;
+    //else if (as_type(term->type).isPointer)
+        //term->value = 0;
 
     // TODO: default values for other types
 }
