@@ -52,7 +52,7 @@ namespace include_function {
 
     std::string toSourceString(Term* term)
     {
-        return "include " + term->input(0)->asString();
+        return "include " + get_source_of_input(term, 1);
     }
 
     void setup(Branch& kernel)

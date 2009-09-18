@@ -1,9 +1,8 @@
-#!/usr/bin/env python
 
 import os, sys
 import test_helper
 
-def test_file(filename):
+def run_test(filename):
     """
     Performs an output test on the given filename. This file should be a circa
     source code file, which we will execute. There should also be a file
@@ -17,11 +16,9 @@ def test_file(filename):
             'expected/'+filename+'.expected_output')
 
 if __name__ == "__main__":
-
-    if len(sys.argv) > 1:
-        filename = sys.argv[1]
-        result = test_file(filename)
-        if result is not True:
-            print result
-        else:
-            print "Suceess"
+    filename = sys.argv[1]
+    result = run_test(filename)
+    if result is not True:
+        print result
+    else:
+        print "Suceess"
