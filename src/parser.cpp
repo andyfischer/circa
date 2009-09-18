@@ -836,9 +836,7 @@ Term* include_statement(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     std::string filename;
-    if (tokens.nextIs(IDENTIFIER))
-        filename = tokens.consume(IDENTIFIER) + ".ca";
-    else if (tokens.nextIs(STRING)) {
+    if (tokens.nextIs(STRING)) {
         filename = tokens.consume(STRING);
         filename = filename.substr(1, filename.length()-2);
     } else {

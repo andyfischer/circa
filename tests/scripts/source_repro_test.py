@@ -5,12 +5,15 @@ import test_helper
 
 
 def test_file(filename):
-    return test_helper.compare_command_against_file('circa -s '+filename, filename)
+    try:
+        return test_helper.compare_command_against_file('circa -s '+filename, filename)
+    except Exception,e:
+        return "On file "+filename+": "+str(e)
 
 def test_all():
     tests_run = 0
     failures = []
-    for filename in glob.glob(os.environ['CIRCA_HOME'] + "/samples/*.ca"):
+    for filename in glob.glob(os.environ['CIRCA_HOME'] + "/tests/samples/*.ca"):
         tests_run += 1
         result = test_file(filename)
         if result is not True:

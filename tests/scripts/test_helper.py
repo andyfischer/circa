@@ -1,11 +1,13 @@
 
-import os
+import os, subprocess
+from subprocess import PIPE
 
 def run_command(command):
     """
     Run the given command, return everything that was printed to stdout.
     """
-    (stdin, stdout, stderr) = os.popen3(command)
+    proc = subprocess.Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
+    (stdin, stdout, stderr) = (proc.stdin, proc.stdout, proc.stderr)
 
     lines = []
 
@@ -59,7 +61,8 @@ def compare_command_against_file(command, filename):
 
     expectedOutput = load_file(filename)
 
-    (stdin, stdout, stderr) = os.popen3(command)
+    proc = subprocess.Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
+    (stdin, stdout, stderr) = (proc.stdin, proc.stdout, proc.stderr)
 
     numLines = 0
     for line in expectedOutput.split('\n'):
