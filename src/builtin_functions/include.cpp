@@ -1,21 +1,9 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
-#include <sys/stat.h>
-
 #include <circa.h>
 
 namespace circa {
 namespace include_function {
-
-    time_t get_modified_time(std::string const& filename)
-    {
-        struct stat s;
-        s.st_mtime = 0;
-
-        stat(filename.c_str(), &s);
-
-        return s.st_mtime;
-    }
 
     bool possibly_expand(Term* caller)
     {
