@@ -156,11 +156,12 @@ void test_default_values()
     as_type(t).isPointer = false;
 
     test_assert(type_t::default_value(t) != NULL);
-    test_assert(type_t::default_value(t)->type == ANY_TYPE);
+    test_assert(type_t::default_value(t)->type == VOID_TYPE);
 
     Term* t_value = create_value(branch, t);
 
     t_value->value = (void*) 5;
+    type_t::enable_default_value(t);
     assign_value(t_value, type_t::default_value(t));
 
     Term* t_value_2 = create_value(branch, t);

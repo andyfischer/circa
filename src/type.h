@@ -90,6 +90,8 @@ namespace type_t {
     void remap_pointers(Term *term, ReferenceMap const& map);
     void name_accessor(Term* caller);
 
+    void enable_default_value(Term* type);
+
     // Accessors
     Term* default_value(Term* type);
 }
