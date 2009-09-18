@@ -267,8 +267,9 @@ namespace type_t {
     {
         term->value = new Type();
 
-        // initialize attributes
-        create_value(as_type(term).attributes, ANY_TYPE, "defaultValue");
+        // initialize default value
+        if (VOID_TYPE != NULL)
+            create_value(as_type(term).attributes, VOID_TYPE, "defaultValue");
     }
     void dealloc(Term* type, Term* term)
     {
@@ -325,6 +326,12 @@ namespace type_t {
     void name_accessor(Term* caller)
     {
         as_string(caller) = as_type(caller->input(0)).name;
+    }
+
+    void enable_default_value(Term* type)
+    {
+        change_type(default_value(type), type);
+        alloc_value(default_value(type));
     }
 
     Term* default_value(Term* type)
@@ -445,16 +452,13 @@ void assign_value_to_default(Term* term)
         as_bool(term) = false;
     else if (is_ref(term))
         as_ref(term) = NULL;
-    //else if (as_type(term->type).isPointer)
-        //term->value = 0;
+    else {
 
-    // check if this type has a default value defined
-    Term* defaultValue = type_t::default_value(term->type);
-    if (defaultValue == NULL)
-        return;
-    if (defaultValue->type == ANY_TYPE)
-        return;
-    assign_value(defaultValue, term);
+        // check if this type has a default value defined
+        Term* defaultValue = type_t::default_value(term->type);
+        if (defaultValue != NULL && defaultValue->type != VOID_TYPE)
+            assign_value(defaultValue, term);
+    }
 }
 
 bool check_invariants(Term* term, std::string* failureMessage)
