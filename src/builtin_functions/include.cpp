@@ -44,7 +44,7 @@ namespace include_function {
 
         if (reloaded && has_static_errors(contents)) {
             error_occurred(caller, get_static_errors_formatted(contents));
-
+            return;
         }
 
         evaluate_branch(contents);
