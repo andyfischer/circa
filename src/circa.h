@@ -39,3 +39,4 @@
 #include "type.h"
 
 #include "opt/generate_docs.h"
+#include "opt/parse_command_line.h"
