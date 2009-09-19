@@ -24,14 +24,13 @@ def run_command(command):
 
     return '\n'.join(lines)
 
-def load_file(filename):
+def read_text_file(filename):
     f = open(filename)
     contents = f.read()
-    f.close()
     return contents
 
 def readFileAsLines(filename):
-    contents = load_file(filename)
+    contents = read_text_file(filename)
 
     def myFilter(line):
         # remove blank lines
@@ -59,7 +58,7 @@ def compare_command_against_file(command, filename):
     if not os.path.exists(filename):
         return "Couldn't find file: " + filename
 
-    expectedOutput = load_file(filename)
+    expectedOutput = read_text_file(filename)
 
     proc = subprocess.Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
     (stdin, stdout, stderr) = (proc.stdin, proc.stdout, proc.stderr)
