@@ -16,7 +16,7 @@ namespace if_function {
 
     void setup(Branch& kernel)
     {
-        IF_FUNC = import_function(kernel, evaluate, "if(bool) : Branch");
+        IF_FUNC = import_function(kernel, evaluate, "if(bool) : Code");
     }
 }
 }
