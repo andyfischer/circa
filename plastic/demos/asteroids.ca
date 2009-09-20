@@ -40,7 +40,7 @@ for i in range(700)
     gl.points([loc] color)
 end
 
-ship_size = 2.0
+ship_size = 1.2
 ship_front = 10.0
 ship_back = 5.5
 ship_wing_size = 11.4

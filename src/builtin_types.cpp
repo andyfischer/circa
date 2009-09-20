@@ -209,10 +209,24 @@ namespace branch_inspector_t
         Branch& output = caller->asBranch();
 
         int write = 0;
-        for (BranchIterator it(target_branch); !it.finished(); it.advance()) {
+        for (BranchIterator it(target_branch); !it.finished();) {
             Term* t = *it;
-            if (!is_considered_config(t))
+
+            if (is_branch(t)) {
+                // check if we should explore this branch
+                if ((t->type == CODE_TYPE || is_function(t))
+                        && !is_hidden(t) && t->name != "")
+                    it.advance();
+                else
+                    it.advanceSkippingBranch();
+                
                 continue;
+            }
+
+            if (!is_considered_config(t)) {
+                it.advance();
+                continue;
+            }
 
             if (write >= output.length())
                 create_ref(output, t);
@@ -220,6 +234,8 @@ namespace branch_inspector_t
                 output[write]->asRef() = t;
 
             write++;
+
+            it.advance();
         }
 
         if (write < output.length())

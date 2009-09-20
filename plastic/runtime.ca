@@ -190,7 +190,7 @@ if toggle(key_pressed(KEY_B))
   users_branch_ref = &users_branch
   branch_inspector = [users_branch_ref] : BranchInspector
   x = 10, y = 10
-  for r in branch_inspector.get_configs()
+  for r in branch_inspector.get_configs_nested()
     tweak.button(r, [x y], branch_inspector.get_relative_name(r))
     y += 24
   end
