@@ -3,8 +3,8 @@
 fill_rectangle(0,0,640,480, 0xfffffffe)
 
 -- mouse positions are passed in from cgame
-state float mouse_x
-state float mouse_y
+state number mouse_x
+state number mouse_y
 
 ship_size = 20.0
 back_dist = 4.0

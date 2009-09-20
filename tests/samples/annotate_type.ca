@@ -1,6 +1,6 @@
 
 
-type Point { float x, float y }
+type Point { number x, number y }
 
 -- try annotate_type() function
 l = [1.0,2.0]

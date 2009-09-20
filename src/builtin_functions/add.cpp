@@ -43,10 +43,10 @@ namespace add_function {
 
         Term* add_i = import_function_overload(ADD_FUNC, evaluate_i, "add_i(int...) : int");
 
-        Term* add_f = import_function_overload(ADD_FUNC, evaluate_f, "add_f(float...) : float");
+        Term* add_f = import_function_overload(ADD_FUNC, evaluate_f, "add_f(number...) : number");
 
         function_t::get_feedback_func(add_f) =
-            import_function(kernel, feedback_evaluate, "add_feedback(any, float) : Branch");
+            import_function(kernel, feedback_evaluate, "add_feedback(any, number) : Branch");
 
         kernel.bindName(add_f, "add_f");
         kernel.bindName(add_i, "add_i");

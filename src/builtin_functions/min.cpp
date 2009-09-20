@@ -14,7 +14,7 @@ namespace min_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "min(float,float) : float");
+        import_function(kernel, evaluate, "min(number,number) : number");
     }
 }
 } // namespace circa

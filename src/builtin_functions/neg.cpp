@@ -25,7 +25,7 @@ namespace neg_function {
         NEG_FUNC = create_overloaded_function(kernel, "neg");
 
         Term* neg_i = import_function_overload(NEG_FUNC, evaluate_i, "neg_i(int):int");
-        Term* neg_f = import_function_overload(NEG_FUNC, evaluate_f, "neg_f(float):float");
+        Term* neg_f = import_function_overload(NEG_FUNC, evaluate_f, "neg_f(number):number");
 
         function_t::get_to_source_string(neg_i) = toSourceString;
         function_t::get_to_source_string(neg_f) = toSourceString;

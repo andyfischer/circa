@@ -186,7 +186,7 @@ void test_assign()
 {
     Branch branch;
 
-    branch.eval("type Mytype { int a, float b }");
+    branch.eval("type Mytype { int a, number b }");
 
     // Assign a value that will require coercion
     Term* dest = branch.eval("Mytype()");

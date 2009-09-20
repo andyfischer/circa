@@ -1,13 +1,13 @@
 
 background(#eef)
 
-def interp(float progress, float e) :float
+def interp(number progress, number e) :number
   return min(progress / e, 1.0)
 end
 
 desired_window_size = [480 600]
 
-def tree_segment(Point base, float direction, float width, float depth)
+def tree_segment(Point base, number direction, number width, number depth)
   state jitter = (rand() - .5) *.3
   state max_length = 20 + 30 * rand()
   state age = 1.0

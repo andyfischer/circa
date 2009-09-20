@@ -95,7 +95,7 @@ void test_get_type_from_branches_stateful_terms()
 {
     Branch branch;
     branch.eval("a = 0");
-    branch.eval("state float b");
+    branch.eval("state number b");
     branch.eval("c = 'hello'");
     branch.eval("state bool d");
 

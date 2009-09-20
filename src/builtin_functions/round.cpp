@@ -12,7 +12,7 @@ namespace round_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "round(float) : int");
+        import_function(kernel, evaluate, "round(number) : int");
     }
 }
 }

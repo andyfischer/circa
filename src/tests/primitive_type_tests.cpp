@@ -34,7 +34,7 @@ void strings()
 void builtin_objects()
 {
     test_assert(find_named(*KERNEL,"int") == INT_TYPE);
-    test_assert(find_named(*KERNEL,"float") == FLOAT_TYPE);
+    test_assert(find_named(*KERNEL,"number") == FLOAT_TYPE);
     test_assert(find_named(*KERNEL,"string") == STRING_TYPE);
     test_assert(find_named(*KERNEL,"bool") == BOOL_TYPE);
 }

@@ -19,7 +19,7 @@ namespace less_than_function {
     {
         Term* main = create_overloaded_function(kernel, "less_than");
         import_function_overload(main, evaluate_f, "less_than(int,int) : bool");
-        import_function_overload(main, evaluate_f, "less_than(float,float) : bool");
+        import_function_overload(main, evaluate_f, "less_than(number,number) : bool");
     }
 }
 }

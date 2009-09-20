@@ -12,7 +12,7 @@ namespace sqrt_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "sqrt(float) : float");
+        import_function(kernel, evaluate, "sqrt(number) : number");
     }
 }
 } // namespace circa

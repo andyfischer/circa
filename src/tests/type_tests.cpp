@@ -76,10 +76,10 @@ void test_value_fits_type()
     test_assert(!value_fits_type(a, STRING_TYPE));
     test_assert(value_fits_type(a, ANY_TYPE));
 
-    Term* t1 = branch.eval("type t1 { int a, float b }");
+    Term* t1 = branch.eval("type t1 { int a, number b }");
     Term* t2 = branch.eval("type t2 { int a }");
-    Term* t3 = branch.eval("type t3 { int a, float b, string c }");
-    Term* t4 = branch.eval("type t4 { float a, int b }");
+    Term* t3 = branch.eval("type t3 { int a, number b, string c }");
+    Term* t4 = branch.eval("type t4 { number a, int b }");
 
     Term* v1 = branch.eval("[1, 2.0]");
     test_assert(value_fits_type(v1, t1));
@@ -125,7 +125,7 @@ void test_to_string()
 {
     // Test on some native types
     test_equals(to_string(INT_TYPE), "<NativeType int>");
-    test_equals(to_string(FLOAT_TYPE), "<NativeType float>");
+    test_equals(to_string(FLOAT_TYPE), "<NativeType number>");
     test_equals(to_string(BOOL_TYPE), "<NativeType bool>");
     test_equals(to_string(STRING_TYPE), "<NativeType string>");
     test_equals(to_string(TYPE_TYPE), "<NativeType Type>");
@@ -194,7 +194,7 @@ void type_inference_for_get_index()
 void type_inference_for_get_field()
 {
     Branch branch;
-    branch.eval("type T { int a, float b }");
+    branch.eval("type T { int a, number b }");
 
     branch.eval("t = T()");
     Term* a = branch.compile("a = t.a");

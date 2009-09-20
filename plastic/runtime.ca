@@ -17,10 +17,10 @@ window = Window()
 -- Text rendering functions
 type TTF_Font {} -- native
 namespace text
-    type RenderedText { int texid, float width, float height, Color color, string text }
+    type RenderedText { int texid, number width, number height, Color color, string text }
     def load_font +native (state TTF_Font, string, int) : TTF_Font
     def render_text +native (state RenderedText, TTF_Font, string, Color color) : RenderedText
-    def draw_rendered_text +native (RenderedText, float x, float y)
+    def draw_rendered_text +native (RenderedText, number x, number y)
 end
 
 def draw_text(TTF_Font font, string str, Color color, Point location)
@@ -35,11 +35,11 @@ namespace gl
     def line_strip +native (List, Color)
     def line_loop +native (List, Color)
     def points +native (List, Color)
-    def circle +native (Point loc, float radius, Color)
+    def circle +native (Point loc, number radius, Color)
 end
 
 def load_texture +native (state int, string) : int
-def draw_image +native (state int texid, string filename, float,float,float,float)
+def draw_image +native (state int texid, string filename, number,number,number,number)
 
 def load_mesh +native (string) : int
 def draw_mesh +native (int, int, List, List, List)
@@ -47,12 +47,12 @@ def draw_mesh +native (int, int, List, List, List)
 -- Math utility functions
 
 -- polar: polar to cartesian
-def polar(float angle, float radius, Point center) : Point
+def polar(number angle, number radius, Point center) : Point
     return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
 end
 
 -- magnitude of a 2d vector
-def magnitude(Point point) : float
+def magnitude(Point point) : number
     return sqrt(sqr(point.x) + sqr(point.y))
 end
 
@@ -65,7 +65,7 @@ def perpendicular(Point v) : Point
     return [-v.y v.x]
 end
 
-def expand_rect(Point loc, float width, float height) : Rect
+def expand_rect(Point loc, number width, number height) : Rect
     return [loc.x - width/2, loc.y - height/2, loc.x + width / 2, loc.y + height/2]
 end
 
@@ -79,14 +79,14 @@ def draw_box(Rect box, Color color)
     gl.triangles([nw ne se se sw nw] color)
 end
 
-def draw_thick_line(Point a, Point b, float width, Color color)
+def draw_thick_line(Point a, Point b, number width, Color color)
     perp = perpendicular(norm(a - b)) * width
     gl.triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
 end
 
 -- Stateful utils
 
-def approach(float target, float step) : float
+def approach(number target, number step) : number
     state current = target
     if target > current
         current += min(step, target - current)
@@ -96,8 +96,8 @@ def approach(float target, float step) : float
     return current
 end
 
-def alternate_over_time(float period) : bool
-    state float time_started = time
+def alternate_over_time(number period) : bool
+    state number time_started = time
     return round((time - time_started) / period) % 2 == 0
 end
 
@@ -107,8 +107,8 @@ def toggle(bool tog) : bool
   return on
 end
 
-def linear_fadein(float total_time) : float
-    state float time_started = time
+def linear_fadein(number total_time) : number
+    state number time_started = time
     elapsed = (time - time_started) / total_time
     return min(elapsed, 1.0)
 end
@@ -117,8 +117,8 @@ ui_font_medium = text.load_font("assets/sv_basic_manual/SVBasicManual.ttf", 16)
 
 namespace fps_counter
     state int framesElapsed = 0
-    state float timeStarted = time
-    state float lastRecoredFps = 0
+    state number timeStarted = time
+    state number lastRecoredFps = 0
 
     framesPerSample = 30
     earlySampleTime = .5

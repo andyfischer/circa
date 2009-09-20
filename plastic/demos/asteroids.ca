@@ -6,11 +6,11 @@ background(#000)
 type Ship {
     Point loc,
     Point momentum,
-    float facing
+    number facing
 }
 
 type Bullet {
-    float lifespan,
+    number lifespan,
     Point loc,
     Point direction
 }
@@ -46,7 +46,7 @@ ship_back = 5.5
 ship_wing_size = 11.4
 ship_wing_rot = .40
 namespace draw_ship
-    def ship_point(float rot, float dist) : Point
+    def ship_point(number rot, number dist) : Point
         return polar(rot + ship.facing, dist*ship_size, ship.loc)
     end
 

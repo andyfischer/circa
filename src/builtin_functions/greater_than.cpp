@@ -19,7 +19,7 @@ namespace greater_than_function {
     {
         Term* main = create_overloaded_function(kernel, "greater_than");
         import_function_overload(main, evaluate_f, "greater_than(int,int) : bool");
-        import_function_overload(main, evaluate_f, "greater_than(float,float) : bool");
+        import_function_overload(main, evaluate_f, "greater_than(number,number) : bool");
     }
 }
 }
