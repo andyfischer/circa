@@ -14,7 +14,7 @@ namespace max_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "max(float,float) : float");
+        import_function(kernel, evaluate, "max(number,number) : number");
     }
 }
 } // namespace circa

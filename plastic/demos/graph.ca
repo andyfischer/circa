@@ -4,12 +4,12 @@ background(#fff)
 axis_center = [200 200] : Point
 
 
-def map_point(float x) : Point
+def map_point(number x) : Point
   x = x - 200
   y = mod(x, 100)
   return [x 0-y] + axis_center
 end
-def map_point_cos(float x) : Point
+def map_point_cos(number x) : Point
   x = x - 200
   y = remainder(x,100) + 1
   return [x 0-y] + axis_center

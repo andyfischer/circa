@@ -38,7 +38,7 @@ for x in range(num_tiles_x)
 end
 
 -- Helper function
-def rotate_points_around(List points, Point center, float rot) : List
+def rotate_points_around(List points, Point center, number rot) : List
     def rotate_point(Point point) : Point
         point = point - center
         point = [point.x*cos(rot) - point.y*sin(rot), point.x*sin(rot)+point.y*cos(rot)]
@@ -74,7 +74,7 @@ end
 type Piece { int x, int y, int rot }
 type BoardPiece { int rot, bool filled, bool square_filled }
 
-def draw_free_piece(Point location, float rot)
+def draw_free_piece(Point location, number rot)
     shape = [[0 0] [1 0] [0 1]]
     rotate_points_around(@shape, [.5 .5] rot)
     mult(@shape, tile_size)
@@ -127,7 +127,7 @@ type FallingGroupPosition {
 state falling_group = get_random_piece_type()
 state falling_group_pos = [0 4 0] : FallingGroupPosition
 fall_speed = 80.0
-state float tile_fall_distance = tile_size
+state number tile_fall_distance = tile_size
 
 state board = map(initialize_board_piece, range(num_tiles))
 

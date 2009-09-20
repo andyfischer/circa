@@ -1,11 +1,11 @@
 
-def print_success(float)
+def print_success(number)
     print("Called print_success")
 end
 
 print_success(0.0)
 
-def square(float a) : float
+def square(number a) : number
     return mult(a,a)
 end
 

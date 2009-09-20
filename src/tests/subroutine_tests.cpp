@@ -8,7 +8,7 @@ namespace subroutine_tests {
 void test_return_from_conditional()
 {
     Branch branch;
-    branch.eval("def my_max(float a, float b) : float\n"
+    branch.eval("def my_max(number a, number b) : number\n"
                 "  if (a < b)\n"
                 "    return b\n"
                 "  else\n"
@@ -107,7 +107,7 @@ void initialize_state_type()
 {
     Branch branch;
 
-    Term* a = branch.eval("def a():float\nreturn 1 + 1\nend");
+    Term* a = branch.eval("def a():number\nreturn 1 + 1\nend");
     test_assert(function_t::get_hidden_state_type(a) == VOID_TYPE);
 
     Term* b = branch.eval("def b()\nstate i\nend");

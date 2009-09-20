@@ -137,7 +137,7 @@ void test_map()
     test_equals(result[4]->asFloat(), 25);
 
     // Test with subroutines
-    branch.eval("def myfunc(float x):float\nreturn x + 5\nend");
+    branch.eval("def myfunc(number x):number\nreturn x + 5\nend");
     Term* map_myfunc = branch.eval("map(myfunc, input_list)");
 
     test_assert(map_myfunc);
@@ -205,7 +205,7 @@ void test_vectorized_funcs_with_points()
     // vectorized functions work against that.
     Branch branch;
     
-    Term* point_t = branch.eval("type Point {float x, float y}");
+    Term* point_t = branch.eval("type Point {number x, number y}");
 
     Term* a = branch.eval("a = [1 0] : Point");
 

@@ -353,7 +353,7 @@ namespace ref_t {
         } else if (is_int(t))
             as_int(t) += steps;
         else
-            error_occurred(caller, "Ref is not an int or float");
+            error_occurred(caller, "Ref is not an int or number");
     }
     void asint(Term* caller)
     {
@@ -399,7 +399,7 @@ void initialize_primitive_types(Branch& kernel)
     int_type.toString = int_t::to_string;
     int_type.isPointer = false;
 
-    FLOAT_TYPE = create_type(kernel, "float");
+    FLOAT_TYPE = create_type(kernel, "number");
     Type& float_type = as_type(FLOAT_TYPE);
     float_type.alloc = zero_alloc;
     float_type.assign = float_t::assign;
@@ -438,7 +438,7 @@ void setup_primitive_types()
     import_member_function(REF_TYPE, ref_t::assign, "assign(Ref, any)");
     import_member_function(REF_TYPE, ref_t::tweak, "tweak(Ref, int steps)");
     import_member_function(REF_TYPE, ref_t::asint, "asint(Ref) : int");
-    import_member_function(REF_TYPE, ref_t::asfloat, "asfloat(Ref) : float");
+    import_member_function(REF_TYPE, ref_t::asfloat, "asfloat(Ref) : number");
 }
 
 } // namespace circa

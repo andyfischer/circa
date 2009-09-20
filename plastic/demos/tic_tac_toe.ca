@@ -188,7 +188,7 @@ if chosen_space != []
     end
 end
 
-def draw_thick_line_animated(Point a, Point b, float thickness, Color color, float time)
+def draw_thick_line_animated(Point a, Point b, number thickness, Color color, number time)
     length = magnitude(b - a)
     n = norm(b - a)
     actual_b = a + n * linear_fadein(time) * length

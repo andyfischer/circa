@@ -1,11 +1,11 @@
 
-type Vector { float x, float y }
+type Vector { number x, number y }
 
 type MyClass {
   int a,
   int b,
   string name,
-  float distance
+  number distance
 }
 
 type Composite {

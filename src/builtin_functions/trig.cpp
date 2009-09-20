@@ -57,13 +57,13 @@ namespace trig_function {
 
     void setup(Branch& kernel)
     {
-        Term* sin_func = import_function(kernel, evaluate_sin, "sin(float) : float");
+        Term* sin_func = import_function(kernel, evaluate_sin, "sin(number) : number");
         function_t::get_feedback_func(sin_func) = 
-            import_function(kernel, feedback_evaluate_sin, "sin_feedback(any, float) : float");
+            import_function(kernel, feedback_evaluate_sin, "sin_feedback(any, number) : number");
 
-        Term* cos_func = import_function(kernel, evaluate_cos, "cos(float) : float");
+        Term* cos_func = import_function(kernel, evaluate_cos, "cos(number) : number");
         function_t::get_feedback_func(cos_func) = 
-            import_function(kernel, feedback_evaluate_cos, "cos_feedback(any, float) : float");
+            import_function(kernel, feedback_evaluate_cos, "cos_feedback(any, number) : number");
     }
 }
 }

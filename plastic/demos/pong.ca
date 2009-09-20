@@ -9,7 +9,7 @@ def rect_intersects_rect(Rect rect_a, Rect rect_b) : bool
     return intersects_on_x && intersects_on_y
 end
 
-def rect_intersects_circle(Rect rect, Point circle_loc, float circle_radius) : bool
+def rect_intersects_circle(Rect rect, Point circle_loc, number circle_radius) : bool
     -- lazy
     return rect_intersects_rect(rect, expand_rect(circle_loc, circle_radius, circle_radius))
 end
@@ -22,7 +22,7 @@ end
 
 state Point ball_loc = [window.width/2, window.height/2]
 state Point ball_direction = random_initial_direction()
-state float round_start_time = time
+state number round_start_time = time
 state int players_points = 0
 state int ai_points = 0
 

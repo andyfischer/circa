@@ -249,8 +249,8 @@ void reproduce_subroutine() {
     round_trip_source("def hi()   end");
     round_trip_source("def hi() 1  end");
     round_trip_source("def hi(int)  end");
-    round_trip_source("def hi(float, string, bool)  end");
-    round_trip_source("type Point { float x, float y }\ndef hi() : Point\nreturn [0 0]\nend");
+    round_trip_source("def hi(number, string, bool)  end");
+    round_trip_source("type Point { number x, number y }\ndef hi() : Point\nreturn [0 0]\nend");
     round_trip_source("def hi() if true return 1 else return 2 end end");
     round_trip_source("def hi() x = 1 if true return x else return x end end");
     round_trip_source("def my_native +native ()");
@@ -263,15 +263,15 @@ void reproduce_subroutine() {
 
 void reproduce_type_decl() {
     round_trip_source("type mytype { int a }");
-    round_trip_source("type mytype { int a, float b }");
-    round_trip_source("type mytype { int   a, float     b }");
-    round_trip_source("type mytype { \n int a, float b }");
-    round_trip_source("type mytype { int a\nfloat b }");
-    round_trip_source("type mytype { int a,\nfloat b }");
-    round_trip_source("type mytype { int a, float b \n}");
-    round_trip_source("type mytype    { int a, float b }");
-    round_trip_source("type mytype {   int a, float b }");
-    round_trip_source("type mytype { int a, float b }    ");
+    round_trip_source("type mytype { int a, number b }");
+    round_trip_source("type mytype { int   a, number     b }");
+    round_trip_source("type mytype { \n int a, number b }");
+    round_trip_source("type mytype { int a\nnumber b }");
+    round_trip_source("type mytype { int a,\nnumber b }");
+    round_trip_source("type mytype { int a, number b \n}");
+    round_trip_source("type mytype    { int a, number b }");
+    round_trip_source("type mytype {   int a, number b }");
+    round_trip_source("type mytype { int a, number b }    ");
     round_trip_source("type mytype {   } ");
     finish_source_repro_category();
 }

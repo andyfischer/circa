@@ -3,15 +3,15 @@ desired_window_title = 'tweak.ca'
 
 type Star {
     Point loc
-    float rot
-    float size
+    number rot
+    number size
 }
 
 star_color = #f39
 state global_scale = 1.0
 
 def draw_star(Star star)
-  radius = star.size * global_scale : float
+  radius = star.size * global_scale : number
   num_points = 5
 
   rot = star.rot + time/5
@@ -47,7 +47,7 @@ begin
   cross_thickness = 4.0
   cross_length = 12.0
 
-  def draw_arm(float rot) : List
+  def draw_arm(number rot) : List
       near_center = polar(rot, cross_thickness, mouse)
       near_l = polar(rot - .25, cross_thickness/2, near_center)
       near_r = polar(rot + .25, cross_thickness/2, near_center)
