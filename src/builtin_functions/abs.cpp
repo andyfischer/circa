@@ -12,7 +12,8 @@ namespace abs_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "abs +native(number) : number");
+        import_function(kernel, evaluate, "abs(number n) : number;"
+                "'Return the absolute value of n' end");
     }
 }
 }

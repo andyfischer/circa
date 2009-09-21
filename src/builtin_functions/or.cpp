@@ -12,7 +12,8 @@ namespace or_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "or(bool,bool) : bool");
+        import_function(kernel, evaluate, "or(bool a, bool b) : bool;"
+            "'Return whether either a or b are true' end");
     }
 }
 } // namespace circa

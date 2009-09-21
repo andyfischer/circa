@@ -7,14 +7,14 @@ namespace assert_function {
 
     void evaluate(Term* caller)
     {
-        if (!as_bool(caller->input(0))) {
+        if (!as_bool(caller->input(0)))
             error_occurred(caller, "Assert failed");
-        }
     }
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "assert +native (bool)");
+        import_function(kernel, evaluate, "assert(bool condition);"
+            "'Raises a runtime error if condition is false' end");
     }
 }
 }

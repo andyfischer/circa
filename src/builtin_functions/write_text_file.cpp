@@ -17,7 +17,9 @@ namespace write_text_file_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "write_text_file(string, string)");
+        import_function(kernel, evaluate,
+            "write_text_file(string filename, string contents);"
+            "'Write contents to the given filename, overwriting any existing file' end");
     }
 }
 } // namespace circa
