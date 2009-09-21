@@ -117,7 +117,9 @@ def makeHTML(dom):
 
         contents.sort(compareItems)
 
-        (left_list, right_list) = divideListIntoTwo(contents)
+        contents_midpoint = len(contents)/2 + 1
+        left_list = contents[:contents_midpoint]
+        right_list = contents[contents_midpoint:]
 
         html += '<div class="package_contents_bar" style="float:left">\n'
         html += itemListHTML(left_list)

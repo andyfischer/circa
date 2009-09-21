@@ -173,6 +173,7 @@ void initialize()
     setup_builtin_functions(*KERNEL);
     post_setup_builtin_functions(*KERNEL);
     parse_builtin_types(*KERNEL);
+    initialize_kernel_documentation(*KERNEL);
 }
 
 void shutdown()

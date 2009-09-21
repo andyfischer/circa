@@ -8,6 +8,7 @@
 #include <circa.h>
 
 #include "gl_shapes.h"
+#include "docs.h"
 #include "input.h"
 #include "main.h"
 #include "mesh.h"
@@ -181,11 +182,20 @@ void main_loop()
 
 int plastic_main(std::vector<std::string> args)
 {
-    if (!initialize_plastic()) return 1;
-
     // For no args, default action is to run tests
     if (args.size() == 0)
         return circa::run_command_line(args);
+
+    if (!initialize_plastic()) return 1;
+
+    // Check to generate docs
+    if (args[0] == "-gd") {
+        std::cout << "writing docs to " << args[1] << std::endl;
+        std::stringstream out;
+        generate_plastic_docs(out);
+        write_text_file(args[1], out.str());
+        return 0;
+    }
 
     // Inject the requested filename, so that the user's script will be loaded
     String user_script_filename(*SCRIPT_ROOT, "user_script_filename", "");

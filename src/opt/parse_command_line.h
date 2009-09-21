@@ -3,6 +3,8 @@
 #ifndef CIRCA_PARSE_COMMAND_LINE_INCLUDED
 #define CIRCA_PARSE_COMMAND_LINE_INCLUDED
 
+// todo: need to detect and report parsing errors
+
 namespace circa {
 
 struct CommandLineParser
@@ -32,7 +34,6 @@ struct CommandLineParser
 
     std::vector<Option> _options;
 
-    // This stores non-option arguments.
     std::vector<std::string> remainingArgs;
 };
 
