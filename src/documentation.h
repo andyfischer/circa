@@ -7,7 +7,9 @@
 
 namespace circa {
 
-void generate_docs(Branch& branch, std::stringstream &out);
+void append_package_docs(std::stringstream& out, Branch& branch, std::string const& package_name);
+//void generate_docs(Branch& branch, std::stringstream &out);
+void initialize_kernel_documentation(Branch& KERNEL);
 
 } // namespace circa
 

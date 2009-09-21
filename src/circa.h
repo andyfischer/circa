@@ -12,6 +12,7 @@
 #include "cpp_importing.h"
 #include "cpp_convenience.h"
 #include "debug.h"
+#include "documentation.h"
 #include "evaluation.h"
 #include "feedback.h"
 #include "file_io.h"
@@ -38,5 +39,5 @@
 #include "token_stream.h"
 #include "type.h"
 
-#include "opt/generate_docs.h"
 #include "opt/parse_command_line.h"
+

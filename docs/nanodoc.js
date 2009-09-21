@@ -2,7 +2,7 @@
 function hidePackageContents() {
 	var divs = document.getElementsByTagName("div");
 	for(var i=0; i < divs.length; i++) {
-		if(divs[i].className == "modules")
+		if(divs[i].className == "package_contents")
 			divs[i].style.display = "none";
 	}
 }
