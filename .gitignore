@@ -34,7 +34,7 @@ circa.1
 .sconsign.dblite
 
 # generated docs
-docs/nanodoc/index.html
+docs/index.html
 
 # dependencies
 SDL_deps

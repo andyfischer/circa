@@ -71,6 +71,19 @@ void test_is_native_function()
     test_assert(!is_native_function(f));
 }
 
+void test_documentation_string()
+{
+    Branch branch;
+    Term* f = branch.eval("def f() 'docs' 1 + 2 end");
+    test_assert(function_t::get_documentation(f) == "docs");
+
+    Term* f2 = branch.eval("def f2() a = 'not docs' 1 + 2 end");
+    test_assert(function_t::get_documentation(f2) == "");
+
+    Term* f3 = branch.eval("def f2() print('not docs') 1 + 2 end");
+    test_assert(function_t::get_documentation(f3) == "");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(function_tests::create);
@@ -78,6 +91,7 @@ void register_tests()
     REGISTER_TEST_CASE(function_tests::test_inputs_fit_function);
     REGISTER_TEST_CASE(function_tests::overloaded_function);
     REGISTER_TEST_CASE(function_tests::test_is_native_function);
+    REGISTER_TEST_CASE(function_tests::test_documentation_string);
 }
 
 } // namespace function_tests

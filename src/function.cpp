@@ -10,6 +10,63 @@ namespace function_t {
         return "<Function " + function_t::get_name(term) + ">";
     }
 
+    std::string get_header_source(Term* term)
+    {
+        std::stringstream out;
+
+        out << function_t::get_name(term);
+        if (is_native_function(term)) out << " +native ";
+
+        out << "(";
+
+        bool first = true;
+        int numInputs = function_t::num_inputs(term);
+        for (int i=0; i < numInputs; i++) {
+            std::string name = function_t::get_input_name(term, i);
+
+            if (name == "#state")
+                continue;
+
+            if (!first) out << ", ";
+            first = false;
+            out << function_t::get_input_type(term, i)->name;
+
+            if (name != "" && name[0] != '#')
+                out << " " << name;
+        }
+
+        if (function_t::get_variable_args(term))
+            out << "...";
+
+        out << ")";
+
+        if (function_t::get_output_type(term) != VOID_TYPE) {
+            out << term->stringPropOptional("syntaxHints:whitespacePreColon", "");
+            out << ":";
+            out << term->stringPropOptional("syntaxHints:whitespacePostColon", " ");
+            out << function_t::get_output_type(term)->name;
+        }
+
+        return out.str();
+    }
+
+    std::string get_documentation(Term* term)
+    {
+        // A function can optionally have a documentation string. If present,
+        // it will be the first thing defined in the function, and it'll be
+        // anonymous and be a statement.
+        int expected_index = function_t::num_inputs(term) + 1;
+        Branch& contents = as_branch(term);
+
+        if (expected_index >= contents.length()) return "";
+        Term* possibleDocString = contents[expected_index];
+        if (possibleDocString->name != "") return "";
+        if (!is_string(possibleDocString)) return "";
+        if (!is_statement(possibleDocString)) return "";
+        if (!is_value(possibleDocString)) return "";
+        return as_string(possibleDocString);
+    }
+
     bool check_invariants(Term* func, std::string* failureMessage)
     {
         if (!is_subroutine(func))

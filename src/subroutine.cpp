@@ -11,38 +11,9 @@ namespace subroutine_t {
 
         std::stringstream result;
 
-        result << "def " << function_t::get_name(term);
-        if (is_native_function(term)) result << " +native ";
+        result << "def ";
 
-        result << "(";
-
-        bool first = true;
-        int numInputs = function_t::num_inputs(term);
-        for (int i=0; i < numInputs; i++) {
-            std::string name = function_t::get_input_name(term, i);
-
-            if (name == "#state")
-                continue;
-
-            if (!first) result << ", ";
-            first = false;
-            result << function_t::get_input_type(term, i)->name;
-
-            if (name != "" && name[0] != '#')
-                result << " " << name;
-        }
-
-        if (function_t::get_variable_args(term))
-            result << "...";
-
-        result << ")";
-
-        if (function_t::get_output_type(term) != VOID_TYPE) {
-            result << term->stringPropOptional("syntaxHints:whitespacePreColon", "");
-            result << ":";
-            result << term->stringPropOptional("syntaxHints:whitespacePostColon", " ");
-            result << function_t::get_output_type(term)->name;
-        }
+        result << function_t::get_header_source(term);
 
         result << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
 
