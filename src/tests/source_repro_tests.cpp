@@ -98,7 +98,7 @@ void bug_reproducing_list_after_eval()
 void death_reproducing_builtin_functions()
 {
     // This once threw an exception
-    test_equals(get_term_source(KERNEL->get("assert")), "def assert +native (bool)");
+    get_term_source(KERNEL->get("assert"));
 
     for (int i=0; i < KERNEL->length(); i++)
         if (is_function(KERNEL->get(i)))

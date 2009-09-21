@@ -74,9 +74,11 @@ void initialize_kernel_documentation(Branch& KERNEL)
 {
     hide_from_docs(KERNEL["annotate_type"]);
     hide_from_docs(KERNEL["add_feedback"]);
+    hide_from_docs(KERNEL["assign"]);
     hide_from_docs(KERNEL["branch"]);
     hide_from_docs(KERNEL["sin_feedback"]);
     hide_from_docs(KERNEL["comment"]);
+    hide_from_docs(KERNEL["copy"]);
     hide_from_docs(KERNEL["cos_feedback"]);
     hide_from_docs(KERNEL["feedback"]);
     hide_from_docs(KERNEL["for"]);
@@ -95,6 +97,7 @@ void initialize_kernel_documentation(Branch& KERNEL)
     hide_from_docs(KERNEL["term_to_source"]);
     hide_from_docs(KERNEL["to_ref"]);
     hide_from_docs(KERNEL["one_time_assign"]);
+    hide_from_docs(KERNEL["unique_id"]);
     hide_from_docs(KERNEL["unknown_field"]);
     hide_from_docs(KERNEL["unknown_function"]);
     hide_from_docs(KERNEL["unknown_identifier"]);
