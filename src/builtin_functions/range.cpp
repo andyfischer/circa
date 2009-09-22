@@ -19,7 +19,7 @@ namespace range_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "range(int) : List");
+        import_function(kernel, evaluate, "range(int n) : List; 'Return a list of integers from 0 to n' end");
     }
 }
 } // namespace circa

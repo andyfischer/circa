@@ -80,6 +80,7 @@ void initialize_kernel_documentation(Branch& KERNEL)
     hide_from_docs(KERNEL["comment"]);
     hide_from_docs(KERNEL["copy"]);
     hide_from_docs(KERNEL["cos_feedback"]);
+    hide_from_docs(KERNEL["do_once"]);
     hide_from_docs(KERNEL["feedback"]);
     hide_from_docs(KERNEL["for"]);
     hide_from_docs(KERNEL["get_field_by_name"]);

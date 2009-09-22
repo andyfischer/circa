@@ -21,7 +21,7 @@ namespace concat_function {
     void setup(Branch& kernel)
     {
         import_function(kernel, evaluate, "concat(any...) : string;"
-            "'Concatenate each input (converting to a string if necessary)' end");
+            "'Concatenate each input (converting to a string if necessary).' end");
     }
 }
 }

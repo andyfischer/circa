@@ -34,6 +34,7 @@ circa.1
 .sconsign.dblite
 
 # generated docs
+docs.json.temp
 docs/index.html
 
 # dependencies

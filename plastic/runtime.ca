@@ -3,6 +3,7 @@
 state Point mouse
 
 def mouse_in(Rect b) : bool
+  "Return whether the mouse is currently inside the given rect."
   return (b.x1 < mouse.x) && (b.x2 > mouse.x) && (b.y1 < mouse.y) && (b.y2 > mouse.y)
 end
 
@@ -18,31 +19,58 @@ window = Window()
 type TTF_Font {} -- native
 namespace text
     type RenderedText { int texid, number width, number height, Color color, string text }
-    def load_font +native (state TTF_Font, string, int) : TTF_Font
-    def render_text +native (state RenderedText, TTF_Font, string, Color color) : RenderedText
-    def draw_rendered_text +native (RenderedText, number x, number y)
+    def load_font(state TTF_Font, string filename, int size) : TTF_Font
+        "Load the given font"
+    end
+    def render_text(state RenderedText, TTF_Font font, string text, Color color) : RenderedText
+        "Render text and return a sprite that can be drawn with draw_rendered_text. This is useful if you want to know the width or height of the rendered text before drawing it."
+    end
+    def draw_rendered_text(RenderedText, number x, number y)
+        "Draw a sprite created with render_text."
+    end
 end
 
 def draw_text(TTF_Font font, string str, Color color, Point location)
+    "Render and draw a string."
     sprite = text.render_text(font, str, color)
     text.draw_rendered_text(sprite, location.x, location.y)
 end
 
 -- GL functions
-def background +native (Color)
+def background(Color)
+    "Fill the screen with the given color."
+end
 namespace gl
-    def triangles +native (List, Color)
-    def line_strip +native (List, Color)
-    def line_loop +native (List, Color)
-    def points +native (List, Color)
-    def circle +native (Point loc, number radius, Color)
+    def triangles(List, Color)
+        "Render a list of points as triangles."
+    end
+    def line_strip(List, Color)
+        "Render a list of points as a line strip."
+    end
+    def line_loop(List, Color)
+        "Render a list of points as a line loop."
+    end
+    def points(List, Color)
+        "Render a list of points."
+    end
+    def circle(Point loc, number radius, Color)
+        "Render a circle."
+    end
 end
 
-def load_texture +native (state int, string) : int
-def draw_image +native (state int texid, string filename, number,number,number,number)
+def load_texture(state int, string) : int
+end
 
-def load_mesh +native (string) : int
-def draw_mesh +native (int, int, List, List, List)
+def draw_image(state int texid, string filename, number x, number y, number width, number height)
+    "Draw an image."
+end
+
+def load_mesh(string filename) : int
+    "(experimental) Load a 3d mesh from an .obj file."
+end
+def draw_mesh(int mesh_id, int tex_id, Point translation, Point scale, Point rotation)
+    "(experimental) Draw a 3d mesh to the screen."
+end
 
 -- Math utility functions
 
@@ -65,13 +93,15 @@ def perpendicular(Point v) : Point
     return [-v.y v.x]
 end
 
-def expand_rect(Point loc, number width, number height) : Rect
-    return [loc.x - width/2, loc.y - height/2, loc.x + width / 2, loc.y + height/2]
+def expand_rect(Point center, number width, number height) : Rect
+    "Return a rectangle with the given center, width, and height"
+    return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
 end
 
 -- Drawing utils
 
 def draw_box(Rect box, Color color)
+    "Draw a filled rectangle."
     nw = [box.x1 box.y1]
     ne = [box.x2 box.y1]
     sw = [box.x1 box.y2]
@@ -80,6 +110,7 @@ def draw_box(Rect box, Color color)
 end
 
 def draw_thick_line(Point a, Point b, number width, Color color)
+    "Draw a thick line with the given thickness."
     perp = perpendicular(norm(a - b)) * width
     gl.triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
 end
@@ -87,6 +118,7 @@ end
 -- Stateful utils
 
 def approach(number target, number step) : number
+    "Stateful function, returns a result which approaches 'target'. Each frame, this function will change at most by 'step'"
     state current = target
     if target > current
         current += min(step, target - current)
@@ -97,17 +129,20 @@ def approach(number target, number step) : number
 end
 
 def alternate_over_time(number period) : bool
+    "Stateful function, alternates between true and false according to the given period."
     state number time_started = time
     return round((time - time_started) / period) % 2 == 0
 end
 
 def toggle(bool tog) : bool
+  "Stateful function, returns a boolean status. Every frame the function is called with (true), the status flips. Starts out false."
   state bool on = false
   if tog; on = not(on); end
   return on
 end
 
 def linear_fadein(number total_time) : number
+    "Stateful function, starts out at 0 and increases linearly. After 'total_time' has passed it will return 1.0 and stay there."
     state number time_started = time
     elapsed = (time - time_started) / total_time
     return min(elapsed, 1.0)
@@ -137,6 +172,7 @@ fps = fps_counter.lastRecoredFps
 
 namespace tweak
     def button(Ref r, Point loc, string name)
+        "Draw a button which displays the value of 'r', allowing the user to tweak that value using mouse input."
         str = concat(name ' = ' r.to_string)
 
         text_sprite = text.render_text(ui_font_medium, str, #000)
