@@ -1,5 +1,11 @@
 #!/bin/bash
 
 cd $CIRCA_HOME
-plas-build && plas -gd docs.json.temp && python docs/nanohtml.py --dom docs.json.temp --output docs/index.html
+#plas-build && plas -gd docs.json.temp
+
+python docs/nanohtml.py --dom docs.json.temp --output docs/index.html
 #rm docs.json.temp
+
+cp docs/nanodoc.css circa-web/home/docs
+cp docs/nanodoc.js circa-web/home/docs
+cp docs/index.html circa-web/home/docs
