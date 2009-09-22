@@ -314,8 +314,10 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         change_type(input, typeTerm);
         set_source_hidden(input, true);
 
-        if (isHiddenStateArgument)
+        if (isHiddenStateArgument) {
+            input->boolProp("state") = true;
             function_t::get_hidden_state_type(result) = typeTerm;
+        }
 
         // Variable args when ... is appended
         if (tokens.nextIs(ELLIPSIS)) {

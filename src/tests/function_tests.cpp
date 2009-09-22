@@ -84,6 +84,14 @@ void test_documentation_string()
     test_assert(function_t::get_documentation(f3) == "");
 }
 
+void test_bug_with_declaring_state_argument()
+{
+    Branch branch;
+    Term* f = branch.eval("def f(state int) end");
+
+    test_assert(function_t::get_hidden_state_type(f) == INT_TYPE);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(function_tests::create);
@@ -92,6 +100,7 @@ void register_tests()
     REGISTER_TEST_CASE(function_tests::overloaded_function);
     REGISTER_TEST_CASE(function_tests::test_is_native_function);
     REGISTER_TEST_CASE(function_tests::test_documentation_string);
+    REGISTER_TEST_CASE(function_tests::test_bug_with_declaring_state_argument);
 }
 
 } // namespace function_tests
