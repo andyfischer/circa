@@ -13,7 +13,7 @@ namespace abs_function {
     void setup(Branch& kernel)
     {
         import_function(kernel, evaluate, "abs(number n) : number;"
-                "'Return the absolute value of n' end");
+                "'Absolute value' end");
     }
 }
 }

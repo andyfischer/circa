@@ -14,7 +14,7 @@ namespace pow_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "pow(int,int) : int");
+        import_function(kernel, evaluate, "pow(int i, int x) : int; 'Returns i to the power of x' end");
     }
 }
 }

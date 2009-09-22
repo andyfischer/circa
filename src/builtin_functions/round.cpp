@@ -12,7 +12,7 @@ namespace round_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "round(number) : int");
+        import_function(kernel, evaluate, "round(number) : int; 'Round off the given number to the nearest integer' end");
     }
 }
 }

@@ -35,7 +35,6 @@ bool is_subroutine(Term* term)
 
 void subroutine_update_hidden_state_type(Term* func)
 {
-
     // Check if a stateful argument was declared
     Term* firstInput = function_t::get_input_placeholder(func, 0);
     if (firstInput != NULL && firstInput->boolPropOptional("state", false)) {
