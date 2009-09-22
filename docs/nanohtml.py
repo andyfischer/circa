@@ -93,12 +93,24 @@ def makeHTML(dom):
     
     html += '<html>\n'
     html += '\t<head>\n'
-    html += '\t\t<title>nanodoc</title>\n'
+    html += '\t\t<title>Circa+Plastic API docs</title>\n'
     html += '\t\t<link rel="stylesheet" type="text/css" href="nanodoc.css" />\n'
     html += '\t\t<script type="text/javascript" src="nanodoc.js"></script>'
     html += "\t</head>\n"
     html += "\t<body>\n"
-    html += '\t\t<div id="nanohead"><div id="nanotitle">' + dom['headers']['title'] + ' API documentation</div></div>\n'
+    html += '\t\t<div id="nanohead"><div id="nanotitle">' + dom['headers']['title'] + ' API documentation'
+    
+    html += """<span id="navigation_panel">
+    <span><a href="../index.html">home</a></span>
+    <span id="selected">docs</span>
+    <span><a href="http://github.com/andyfischer/circa">github home</a></span>
+    <span></span>
+    </div>"""
+    
+    html += '</div></div>\n'
+
+    html += '<div id="credit_link">This page was created with a modified version of <a href="http://code.google.com/p/nanodoc/">nanodoc</a></div>'
+
     html += '\t\t<div id="nanobody">\n'
 
     html += packageListHTML(all_packages)

@@ -20,6 +20,42 @@ body {
     font-size: 170%;
 }
 
+#navigation_panel {
+    position:absolute;
+    top:10px;
+    right:50px;
+    float:right;
+    height: 40px;
+    color:#fff;
+    font-size: 15px;
+}
+
+#navigation_panel span {
+    padding-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+    border-left: 1px solid #ccc;
+}
+#navigation_panel a { color: #eee; text-decoration:none; }
+#navigation_panel a:hover { color: #eee; }
+#navigation_panel a:visited { color: #eee; }
+#navigation_panel #selected { color: #888; }
+
+#credit_link {
+    position: absolute;
+    right: 10;
+    bottom: 10;
+    font-size: 16;
+    color: #555;
+    z-index:-1;
+}
+
+#credit_link a { color: #555; }
+#credit_link a:hover { color: #555; }
+#credit_link a:visited { color: #555; }
+#credit_link #selected { color: #555; }
+
 .moduledetail {
 	background-color: #252323;
 	font-family: Tahoma, Verdana, sans-serif;
