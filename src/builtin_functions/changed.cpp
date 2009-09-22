@@ -20,7 +20,7 @@ namespace changed_function {
 
     void setup(Branch& kernel)
     {
-        COMMENT_FUNC = import_function(kernel, evaluate, "changed +native (state any, any) : bool");
+        import_function(kernel, evaluate, "changed(state any, any) : bool; 'Returns whether the given input has changed since the last call.' end");
     }
 }
 }

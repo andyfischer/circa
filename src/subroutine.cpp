@@ -35,8 +35,16 @@ bool is_subroutine(Term* term)
 
 void subroutine_update_hidden_state_type(Term* func)
 {
-    Branch& contents = as_branch(func);
+
+    // Check if a stateful argument was declared
+    Term* firstInput = function_t::get_input_placeholder(func, 0);
+    if (firstInput != NULL && firstInput->boolPropOptional("state", false)) {
+        function_t::get_hidden_state_type(func) = firstInput->type;
+        return;
+    }
+
     bool hasState = false;
+    Branch& contents = as_branch(func);
     for (int i=0; i < contents.length(); i++) {
         if (contents[i] == NULL)
             continue;
