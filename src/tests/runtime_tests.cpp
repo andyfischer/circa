@@ -81,32 +81,6 @@ void test_misc()
     test_assert(FUNCTION_TYPE->type == TYPE_TYPE);
 }
 
-
-void test_eval_as()
-{
-#if 0
-    test_assert(eval_as<float>("add(1.0,2.0)") == 3);
-#endif
-}
-
-void test_runtime_type_error()
-{
-#if 0
-    // this test might become invalid when compile-time type checking is added
-    Branch branch;
-    Term* a = branch.eval("a = 1");
-    Term* term = branch.eval("add(a, 2)");
-    change_type(a, STRING_TYPE);
-    evaluate_term(term);
-    test_assert(term->hasError);
-
-    // try wrong # of arguments
-    term = branch.eval("abs()");
-    evaluate_term(term);
-    test_assert(term->hasError);
-#endif
-}
-
 void test_resize_list()
 {
     Branch list;
@@ -140,8 +114,6 @@ void register_tests()
     REGISTER_TEST_CASE(runtime_tests::test_simple);
     REGISTER_TEST_CASE(runtime_tests::blocked_by_error);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
-    REGISTER_TEST_CASE(runtime_tests::test_eval_as);
-    REGISTER_TEST_CASE(runtime_tests::test_runtime_type_error);
     REGISTER_TEST_CASE(runtime_tests::test_resize_list);
 }
 

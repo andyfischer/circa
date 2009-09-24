@@ -109,9 +109,6 @@ int run_command_line(std::vector<std::string> args)
         METRIC_NAMESPACE_LOOKUPS = 0;
         METRIC_NAMESPACE_BINDINGS = 0;
 
-        // temp
-        //DEBUG_TRAP_NAME_LOOKUP = true;
-
         evaluate_branch(branch);
 
         std::cout << "terms_created: " << METRIC_TERMS_CREATED << std::endl;
@@ -136,15 +133,6 @@ int run_command_line(std::vector<std::string> args)
 
         return 0;
     }
-
-    // Generate docs
-    /*if (args[0] == "-gd") {
-        std::cout << "writing docs to " << args[1] << std::endl;
-        std::stringstream out;
-        generate_docs(*KERNEL, out);
-        write_text_file(args[1], out.str());
-        return 0;
-    }*/
 
     // Otherwise, run script
     Branch main_branch;

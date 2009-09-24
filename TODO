@@ -32,20 +32,14 @@ Bugs:
 
  - 'do once' needs to export name bindings. Maybe just make this syntactic sugar for if() ?
 
- - Name conflicts with field access. This seems to have a bug:
-     a = Point()
-     x = a.x
-
-
 Tasks:
  - Need an efficient + safe way to share output values across terms
- - Range syntax, like this: [1..100]
+ - Range syntax, like this: [1..100] or 1..100
  - Block syntax, like how it's easy to pass a block in ruby
  - Better reporting of runtime errors (include source line)
 
 Big tasks:
- - Cool graphical demo
- - Parametrized types, lists and stuff
+ - Parametrized/generic types
  - LLVM integration. (need to investigate this enough to learn what it would look like)
  - Access and edit properties from circa
  - C reproduction.
