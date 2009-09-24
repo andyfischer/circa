@@ -16,7 +16,6 @@
 #include "textures.h"
 #include "ttf.h"
 
-
 using namespace circa;
 
 const int SCREEN_BPP = 32;
