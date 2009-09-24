@@ -39,6 +39,11 @@ namespace if_block_function {
             if (satisfied) {
                 evaluate_term(call);
                 satisfiedIndex = i;
+
+                if (call->hasError) {
+                    error_occurred(caller, call->getErrorMessage());
+                    return;
+                }
                 break;
             }
         }

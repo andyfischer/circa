@@ -31,7 +31,6 @@ void register_input(std::string const& in)
     TEST_INPUTS.push_back(TestInput(in));
 }
 
-
 void register_every_possible_parse_error()
 {
     TEST_INPUTS.clear();

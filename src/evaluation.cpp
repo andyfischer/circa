@@ -11,15 +11,6 @@ void evaluate_term(Term* term)
 
     term->hasError = false;
 
-    /*
-    std::string errorMessage;
-
-    if (has_static_error(term)) {
-        error_occurred(term, get_static_error_message(term));
-        return;
-    }
-    */
-
     EvaluateFunc evaluate = function_t::get_evaluate(term->function);
 
     if (evaluate == NULL)
