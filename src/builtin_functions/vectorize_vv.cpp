@@ -7,7 +7,10 @@ namespace vectorize_vv_function {
 
     Term* specializeType(Term* caller)
     {
-        return caller->input(0)->type;
+        if (is_branch(caller->input(0)))
+            return caller->input(0)->type;
+
+        return LIST_TYPE;
     }
 
     void evaluate(Term* caller)

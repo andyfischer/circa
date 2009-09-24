@@ -197,19 +197,17 @@ end
 tile_fall_distance -= fall_speed * time_delta
 
 
-
 -- Check to move falling group down a step
 if tile_fall_distance < 0
   tile_fall_distance = tile_size
 
   -- Check if the falling group has landed
-  next_falling_group_position = position_falling_pieces(falling_group, falling_group_pos)
+  next_falling_group_position = position_falling_pieces(falling_group, falling_group_pos + [0 0 1])
 
   if falling_pieces_collide(next_falling_group_position)
-    positioned_falling_group = position_falling_pieces(falling_group, falling_group_pos)
-
     -- Make this piece permanent
-    for piece in positioned_falling_group
+    falling_group_position = position_falling_pieces(falling_group, falling_group_pos)
+    for piece in falling_group_position
       piece = piece:Piece
       existing_board_piece = board[board_loc_to_index([piece.x piece.y])] : BoardPiece
       board[board_loc_to_index([piece.x piece.y])] = [piece.rot true existing_board_piece.filled]
@@ -217,11 +215,10 @@ if tile_fall_distance < 0
 
     -- Reset falling group
     falling_group = get_random_piece_type()
-    falling_group_x = 5
-    falling_group_y = 0
+    falling_group_pos = [0 4 0]
+  else
+    falling_group_pos = falling_group_pos + [0 0 1]
   end
-
-  falling_group_y = falling_group_y + 1
 end
 
 -- Draw the current position of the falling group
@@ -243,3 +240,58 @@ for index in range(num_tiles)
     draw_piece([loc.x loc.y piece.rot + 2])
   end
 end
+
+-- Handle creatures
+type Creature {
+  int tile_x,
+  int tile_y,
+  number tile_x_progress
+}
+
+state List creatures = []
+
+def repeating_signal(number period) : bool
+    state number time_till_next = period
+    time_till_next -= time_delta
+    if time_till_next < 0
+        time_till_next = period
+        return true
+    else
+        return false
+    end
+end
+
+def find_highest_tile_for_x(int tile_x) : int
+    -- this code is blah
+    found = 0
+    for i in range(num_tiles_y)
+        board_piece = board[board_loc_to_index([tile_x, i])] : BoardPiece
+        if board_piece.filled && found == 0
+            found = i
+        end
+    end
+    return found
+end
+
+-- Check to spawn a dude
+if repeating_signal(5)
+    new_creature = [0 find_highest_tile_for_x(0) 0]
+    creatures.append(new_creature)
+end
+
+creature_speed = .1
+def move_creature(Creature creature) : Creature
+    creature.tile_x_progress = creature.tile_x_progress + time * creature_speed
+    return creature
+end
+
+creatures = map(move_creature, creatures)
+
+for creature in creatures
+    creature = creature : Creature
+    x = creature.tile_x * tile_size + creature.tile_x_progress * tile_size
+    y = creature.tile_y * tile_size - tile_size / 2
+
+    gl.circle([x y] 15.0 #844)
+end
+

@@ -112,6 +112,15 @@ void handle_key_press(SDL_Event &event, int key)
             PAUSE_REASON = USER_REQUEST;
         }
         break;
+
+    // toggle low-power mode
+    case SDLK_l:
+        if (TARGET_FPS == 6)
+            TARGET_FPS = 60;
+        else
+            TARGET_FPS = 6;
+        std::cout << "target FPS = " << TARGET_FPS << std::endl;
+        break;
     }
 
     // Control keys

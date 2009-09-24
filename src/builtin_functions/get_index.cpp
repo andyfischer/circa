@@ -10,10 +10,15 @@ namespace get_index_function {
         Branch& input = caller->input(0)->asBranch();
         int index = caller->input(1)->asInt();
 
-        if (index >= input.length()) {
+        if (index >= input.length() || index < 0) {
             std::stringstream err;
-            err << "Index " << index << " is out of range";
+            err << "Index out of range: " << index;
             error_occurred(caller, err.str());
+            return;
+        }
+
+        if (!is_value_alloced(input[index])) {
+            error_occurred(caller, "Internal error: list element is not allocated");
             return;
         }
     
@@ -33,6 +38,9 @@ namespace get_index_function {
 
     Term* specializeType(Term* caller)
     {
+        if (!is_branch(caller->input(0)))
+            return ANY_TYPE;
+
         // Type inference is hacky due to the lack of parametrized list types.
         RefList inputTypes;
 

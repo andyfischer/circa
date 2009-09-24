@@ -29,6 +29,7 @@ bool CONTINUE_MAIN_LOOP = true;
 Float TIME;
 Float TIME_DELTA;
 long PREV_SDL_TICKS = 0;
+int TARGET_FPS = 60;
 
 bool PAUSED = false;
 PauseReason PAUSE_REASON;
@@ -171,9 +172,8 @@ void main_loop()
 
     long new_ticks = SDL_GetTicks();
 
-    // Delay to limit framerate to 60 FPS
-    const float target_fps = 60.0;
-    const long ticks_per_second = long(1.0 / target_fps * 1000);
+    // Delay to limit framerate
+    const long ticks_per_second = long(1.0 / TARGET_FPS * 1000);
     if ((new_ticks - ticks) < ticks_per_second) {
         long delay = ticks_per_second - (new_ticks - ticks);
         SDL_Delay(delay);
