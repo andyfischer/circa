@@ -40,7 +40,7 @@ namespace if_block_function {
                 evaluate_term(call);
                 satisfiedIndex = i;
 
-                if (call->hasError) {
+                if (call->hasError()) {
                     error_occurred(caller, call->getErrorMessage());
                     return;
                 }

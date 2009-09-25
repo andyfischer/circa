@@ -88,7 +88,7 @@ void test_builtin_equals()
 
     Branch branch;
     Term* term = branch.eval("equals(5.0, add)");
-    test_assert(term->hasError);
+    test_assert(term->hasError());
 }
 
 void test_list()
@@ -196,7 +196,7 @@ void test_vectorized_funcs()
 
     // Test error handling
     t = branch.eval("[1 1 1] + [1 1]");
-    test_assert(t->hasError);
+    test_assert(t->hasError());
 }
 
 void test_vectorized_funcs_with_points()
@@ -241,7 +241,7 @@ void test_get_index()
 
     branch.eval("l = []");
     get = branch.eval("get_index(l, 5)");
-    test_assert(get->hasError);
+    test_assert(get->hasError());
 }
 
 void test_set_index()

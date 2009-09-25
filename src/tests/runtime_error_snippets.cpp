@@ -29,7 +29,7 @@ void test_input(std::string const& in)
     } else {
         Term errorListener;
         evaluate_branch(branch, &errorListener);
-        result.runtimeError = errorListener.hasError;
+        result.runtimeError = errorListener.hasError();
     }
 
     gResults.push_back(result);

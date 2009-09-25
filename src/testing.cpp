@@ -38,7 +38,7 @@ void _test_assert_function(Term* term, int line, const char* file)
         throw std::runtime_error(msg.str());
     }
 
-    if (term->hasError) {
+    if (term->hasError()) {
         std::stringstream msg;
         msg << "Runtime error on term " << format_global_id(term) << std::endl;
         msg << term->getErrorMessage() << std::endl;
