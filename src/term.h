@@ -11,6 +11,8 @@
 
 namespace circa {
 
+const int TERM_FLAG_ERRORED = 0x1;
+
 struct List;
 
 struct Term
@@ -35,7 +37,8 @@ struct Term
     // The branch that owns this term. May be NULL
     Branch* owningBranch;
 
-    bool hasError;
+    // A set of boolean flags
+    unsigned flags;
 
     // A globally unique ID
     unsigned int globalID;
@@ -74,9 +77,13 @@ struct Term
     int intPropOptional(std::string const& name, int defaultValue);
     std::string stringPropOptional(std::string const& name, std::string const& defaultValue);
 
-    // Accessors for specific properties
+    // Accessors for specific properties:
     void attachErrorMessage(std::string const& message);
     std::string getErrorMessage() const;
+
+    // Flag accessors
+    bool hasError() const;
+    void setHasError(bool error);
 
     // Convenience accessors
     int& asInt();

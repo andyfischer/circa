@@ -31,7 +31,7 @@ namespace equals_function {
     {
         evaluate(caller);
 
-        if (!caller->hasError)
+        if (!caller->hasError())
             as_bool(caller) = !as_bool(caller);
     }
 

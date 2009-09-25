@@ -27,7 +27,7 @@ StaticError get_static_error_for_index(Term* term, int index)
     if (input == NULL && !meta)
         return SERROR_NULL_INPUT_TERM;
 
-    if (input->hasError && !meta)
+    if (input->hasError() && !meta)
         return SERROR_INPUT_HAS_ERROR;
     
     // Check type
