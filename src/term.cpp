@@ -144,6 +144,11 @@ std::string Term::getErrorMessage() const
         return "";
 }
 
+bool Term::hasErrorMessage() const
+{
+    return hasProperty("error");
+}
+
 bool
 Term::hasError() const
 {

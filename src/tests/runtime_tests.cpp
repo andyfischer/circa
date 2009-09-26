@@ -56,15 +56,9 @@ void blocked_by_error()
 
     test_assert(gSpyResults.size() == 0);
 
-    bool threw = false;
-    try {
-        evaluate_branch(branch);
-    } catch (std::runtime_error const&) {
-        threw = true;
-    }
-
-    test_assert(threw);
-
+    Term errorListener;
+    evaluate_branch(branch, &errorListener);
+    test_assert(errorListener.hasError());
     test_assert(gSpyResults.size() == 1);
     test_assert(gSpyResults[0] == "1");
     test_assert(!spy_1->hasError());

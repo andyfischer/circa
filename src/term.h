@@ -80,6 +80,7 @@ struct Term
     // Accessors for specific properties:
     void attachErrorMessage(std::string const& message);
     std::string getErrorMessage() const;
+    bool hasErrorMessage() const;
 
     // Flag accessors
     bool hasError() const;

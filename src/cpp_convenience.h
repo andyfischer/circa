@@ -7,6 +7,7 @@
 #include "cpp_importing.h"
 #include "refactoring.h"
 #include "primitives.h"
+#include "runtime_errors.h"
 
 namespace circa {
 
@@ -92,12 +93,12 @@ T eval(std::string const& statement)
 {
     Branch branch;
 
-    Term* result_term = branch.eval(statement);
+    Term* result = branch.eval(statement);
 
-    if (result_term->hasError())
-        throw std::runtime_error(result_term->getErrorMessage());
+    if (result->hasError())
+        throw std::runtime_error(result->getErrorMessage());
 
-    return as<T>(result_term);
+    return as<T>(result);
 }
 
 template <class T>

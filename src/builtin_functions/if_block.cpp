@@ -17,7 +17,6 @@ namespace if_block_function {
     //   [N-1] #joining = branch() 
     //
 
-
     void evaluate(Term* caller)
     {
         // Find the first if() call whose condition is true
@@ -41,7 +40,7 @@ namespace if_block_function {
                 satisfiedIndex = i;
 
                 if (call->hasError()) {
-                    error_occurred(caller, call->getErrorMessage());
+                    nested_error_occurred(caller);
                     return;
                 }
                 break;

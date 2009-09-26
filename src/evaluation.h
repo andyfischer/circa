@@ -10,9 +10,6 @@ namespace circa {
 void evaluate_term(Term* term);
 void evaluate_branch(Branch& branch, Term* errorListener=NULL);
 
-// Puts 'errorTerm' into an error state, with the given message.
-void error_occurred(Term* errorTerm, std::string const& message);
-
 // Perform 'apply' and then evaluate the result.
 Term* apply_and_eval(Branch& branch, Term* function, RefList const& inputs);
 
