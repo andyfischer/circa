@@ -106,7 +106,13 @@ void subroutine_call_evaluate(Term* caller)
         assign_value(caller->inputs[input], term);
     }
 
-    evaluate_branch(functionBranch);
+    Term errorListener;
+    evaluate_branch(functionBranch, &errorListener);
+
+    if (errorListener.hasError()) {
+        nested_error_occurred(caller);
+        return;
+    }
 
     // Copy output
     if (functionBranch.length() > 0) {

@@ -37,24 +37,12 @@ void evaluate_branch(Branch& branch, Term* errorListener)
         evaluate_term(term);
 
         if (term->hasError()) {
-            std::stringstream out;
-            out << "On term " << term_to_raw_string(term) << "\n" << term->getErrorMessage();
-            error_occurred(errorListener, out.str());
+            nested_error_occurred(errorListener);
             return;
         }
     }
 }
 
-void error_occurred(Term* errorTerm, std::string const& message)
-{
-    if (errorTerm == NULL) {
-        throw std::runtime_error(message);
-        return;
-    }
-
-    errorTerm->setHasError(true);
-    errorTerm->attachErrorMessage(message);
-}
 
 Term* apply_and_eval(Branch& branch, Term* function, RefList const& inputs)
 {

@@ -12,7 +12,7 @@ bool has_static_error(Term* term)
     return get_static_error(term) != SERROR_NO_ERROR;
 }
 
-StaticError get_static_error_for_index(Term* term, int index)
+static StaticError get_static_error_for_input_index(Term* term, int index)
 {
     int effectiveIndex = index;
 
@@ -55,7 +55,7 @@ StaticError get_static_error(Term* term)
     //  - it has no errors
     //  - it has the correct type
     for (int input=0; input < term->inputs.length(); input++) {
-        StaticError error = get_static_error_for_index(term, input);
+        StaticError error = get_static_error_for_input_index(term, input);
         if (error != SERROR_NO_ERROR)
             return error;
     }
@@ -112,7 +112,7 @@ std::string get_static_error_message(Term* term)
     {
         int errorIndex = -1;
         for (int input=0; input < term->inputs.length(); input++) {
-            StaticError error = get_static_error_for_index(term, input);
+            StaticError error = get_static_error_for_input_index(term, input);
             if (error != SERROR_NO_ERROR)
                 errorIndex = input;
         }

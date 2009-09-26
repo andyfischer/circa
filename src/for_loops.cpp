@@ -99,7 +99,13 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
         load_state_into_branch(stateBranch[i]->asBranch(), codeBranch);
 
         // Evaluate
-        evaluate_branch(codeBranch);
+        Term errorListener;
+        evaluate_branch(codeBranch, &errorListener);
+
+        if (errorListener.hasError()) {
+            nested_error_occurred(forTerm);
+            break;
+        }
 
         // Persist stateful terms
         persist_state_from_branch(codeBranch, stateBranch[i]->asBranch());

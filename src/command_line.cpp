@@ -148,7 +148,9 @@ int run_command_line(std::vector<std::string> args)
         evaluate_branch(main_branch, error_listener);
 
         if (error_listener->hasError()) {
-            std::cout << "Error occurred: " << error_listener->getErrorMessage() << std::endl;
+            std::cout << "Error occurred:\n";
+            print_runtime_error_formatted(main_branch, std::cout);
+            std::cout << std::endl;
             return 1;
         }
     }
