@@ -5,7 +5,8 @@
 namespace circa {
 
 BranchIterator::BranchIterator(Branch& branch, bool backwards)
-  : _backwards(backwards)
+  : _backwards(backwards),
+    _skipNextBranch(false)
 {
     reset(branch);
 }
@@ -34,9 +35,15 @@ void BranchIterator::advance()
 {
     assert(!finished());
 
+    if (_skipNextBranch) {
+        _skipNextBranch = false;
+        advanceSkippingBranch();
+        return;
+    }
+
     Term* term = current();
 
-    // check to start an inner branch
+    // Check to start an inner branch.
     if (term != NULL && is_branch(term)
             && is_value_alloced(term)
             && (as_branch(term).length() > 0)) {
