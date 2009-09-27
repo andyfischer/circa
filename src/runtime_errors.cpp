@@ -31,11 +31,11 @@ void print_runtime_error_formatted(Branch& branch, std::ostream& output)
 
             output << "[" << get_short_location(term) << "] ";
 
-            if (term->hasErrorMessage())
+            if (term->hasErrorMessage()) {
                 output << term->getErrorMessage();
-            else if (!is_branch(term))
+            } else if (!is_branch(term)) {
                 output << " (!!! missing error message)";
-            else {
+            } else {
                 output << "\n";
                 print_runtime_error_formatted(as_branch(term), output);
             }

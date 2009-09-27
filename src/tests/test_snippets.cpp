@@ -137,6 +137,14 @@ void test_references()
                  "length(cons) == 1; cons_0.name == 'a'");
 }
 
+void test_blocks()
+{
+    //test_snippet("if true end", "");
+    //test_snippet("if true; else; end", "");
+    //test_snippet("for i in [1] end", "");
+    test_snippet("def func() end", "");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
@@ -144,6 +152,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_filter);
     REGISTER_TEST_CASE(test_snippets::test_modulo);
     REGISTER_TEST_CASE(test_snippets::test_references);
+    REGISTER_TEST_CASE(test_snippets::test_blocks);
 }
 
 } // namespace test_snippets

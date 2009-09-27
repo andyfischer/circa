@@ -399,7 +399,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     assert(is_subroutine(result));
 
     subroutine_update_hidden_state_type(result);
-
+    set_source_location(result, startPosition, tokens);
     return result;
 }
 
@@ -559,7 +559,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     branch.moveToEnd(result);
 
     update_if_block_joining_branch(result);
-
+    set_source_location(result, startPosition, tokens);
     return result;
 }
 
@@ -616,7 +616,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     tokens.consume(END);
 
     setup_for_loop_post_code(forTerm);
-
+    set_source_location(forTerm, startPosition, tokens);
     return forTerm;
 }
 
