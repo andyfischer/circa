@@ -692,6 +692,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         result->refProp("initializedBy") = initialValue;
     }
 
+    set_source_location(result, startPosition, tokens);
     return result;
 }
 
@@ -1060,6 +1061,7 @@ Term* subscripted_atom(Branch& branch, TokenStream& tokens)
 
         result = apply(branch, GET_INDEX_FUNC, RefList(result, subscript));
         get_input_syntax_hint(result, 1, "preWhitespace") = postLbracketWs;
+        set_source_location(result, startPosition, tokens);
         return result;
     }
     else {

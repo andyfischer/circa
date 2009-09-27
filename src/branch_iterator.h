@@ -18,6 +18,7 @@ class BranchIterator
 
     std::vector<Frame> _stack;
     bool _backwards;
+    bool _skipNextBranch;
 
 public:
     BranchIterator(Branch& branch, bool backwards=false);
@@ -27,6 +28,9 @@ public:
     void advance();
     void advanceSkippingBranch();
     int depth();
+
+    // Next call to advance() will not explore a branch, if there is one.
+    void skipNextBranch() { _skipNextBranch = true; }
 
     Term* operator*() { return current(); }
     Term* operator->() { return current(); }

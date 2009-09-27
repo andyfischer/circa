@@ -17,6 +17,11 @@
 namespace circa {
 namespace test_snippets {
 
+bool has_source_location_defined(Term* term)
+{
+    return term->hasProperty("colStart") && term->hasProperty("lineStart");
+}
+
 void test_snippet(std::string codeStr, std::string assertionsStr)
 {
     Branch code;
@@ -27,6 +32,18 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         print_static_errors_formatted(code, std::cout);
         declare_current_test_failed();
         return;
+    }
+
+    // Check that the input code had properly defined source locations
+    for (BranchIterator it(code); !it.finished(); ++it) {
+        if (is_hidden(*it)) { it.skipNextBranch(); continue; }
+
+        if (!has_source_location_defined(*it)) {
+            std::cout << "Missing source location:" << std::endl;
+            std::cout << get_term_source(*it) << std::endl;
+            std::cout << branch_to_string_raw(code) << std::endl;
+            declare_current_test_failed();
+        }
     }
 
     Branch& assertions = create_branch(code, "assertions");
@@ -54,11 +71,10 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         }
     }
 
-    if (boolean_statements_found == 0) {
+    if (boolean_statements_found == 0 && assertionsStr != "") {
         std::cout << "In " << get_current_test_name() << std::endl;
         std::cout << "no boolean statements found in: " << assertionsStr << std::endl;
-
-dump_branch(assertions);
+        std::cout << branch_to_string_raw(code);
         declare_current_test_failed();
     }
 }
