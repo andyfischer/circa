@@ -6,13 +6,8 @@ axis_center = [200 200] : Point
 
 def map_point(number x) : Point
   x = x - 200
-  y = mod(x, 100)
-  return [x 0-y] + axis_center
-end
-def map_point_cos(number x) : Point
-  x = x - 200
-  y = remainder(x,100) + 1
-  return [x 0-y] + axis_center
+  y = sin(x/100) * 100
+  return [x y] + axis_center
 end
 
 -- draw the axis
@@ -22,6 +17,3 @@ gl.line_strip([axis_center-[200 0] axis_center+[200 0]] #888)
 -- draw the function
 points = map(map_point, range(400))
 gl.line_strip(points, #f00)
-
-points = map(map_point_cos, range(400))
-gl.line_strip(points, #00f)
