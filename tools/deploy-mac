@@ -20,12 +20,11 @@ rm $target/demos/meshtest.ca
 rm $target/demos/ramps.ca
 rm $target/demos/tree.ca
 
-cp /opt/local/lib/libSDL-1.2.0.dylib $target
-cp /opt/local/lib/libSDL_gfx.0.dylib $target
-cp /opt/local/lib/libSDL_image-1.2.0.dylib $target
-cp /opt/local/lib/libSDL_ttf-2.0.0.dylib $target
+cd $target
+mkdir bin
+mac_deploy_dylibs.py
 
 zip_file=$CIRCA_HOME/build/$version_name.zip
 rm $zip_file
-cd build/deploy
+cd $CIRCA_HOME/build/deploy
 zip -r $zip_file $version_name
