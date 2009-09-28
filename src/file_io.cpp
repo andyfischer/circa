@@ -57,7 +57,7 @@ time_t get_modified_time(std::string const& filename)
 
 std::string get_directory_for_filename(std::string const& filename)
 {
-    // Really should use boost::path or some other library here.
+    // Should probably use boost::path or some other library here.
     size_t last_slash = filename.find_last_of("/");
 
     if (last_slash == filename.npos)
@@ -69,6 +69,19 @@ std::string get_directory_for_filename(std::string const& filename)
     std::string result = filename.substr(0, last_slash);
 
     return result;
+}
+
+bool file_exists(std::string const& filename)
+{
+    // This could also be replaced by boost
+    FILE* fp = fopen(filename.c_str(), "r");
+    if (fp) {
+        // file exists
+        fclose(fp);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void install_fake_file_io(FileIORedirector* fakeObject)

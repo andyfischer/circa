@@ -18,6 +18,9 @@
 
 using namespace circa;
 
+// the filename of this binary, passed in as args[0]
+std::string BINARY_NAME;
+
 const int SCREEN_BPP = 32;
 
 SDL_Surface* SCREEN = NULL;
@@ -33,6 +36,16 @@ int TARGET_FPS = 60;
 bool PAUSED = false;
 PauseReason PAUSE_REASON;
 
+std::string find_runtime_file()
+{
+    char* circa_home = getenv("CIRCA_HOME");
+    if (circa_home == NULL) {
+        return get_directory_for_filename(BINARY_NAME) + "/runtime.ca";
+    } else {
+        return std::string(circa_home) + "/plastic/runtime.ca";
+    }
+}
+
 bool initialize_plastic()
 {
     // Initialize Circa
@@ -47,8 +60,12 @@ bool initialize_plastic()
     TIME_DELTA = float_value(*SCRIPT_ROOT, 0, "time_delta");
 
     // Load runtime.ca
-    std::string circa_home = getenv("CIRCA_HOME");
-    parse_script(*SCRIPT_ROOT, circa_home + "/plastic/runtime.ca");
+    std::string runtime_ca_path = find_runtime_file();
+    if (!file_exists(runtime_ca_path)) {
+        std::cout << "fatal: Couldn't find runtime.ca file" << std::endl;
+        return false;
+    }
+    parse_script(*SCRIPT_ROOT, runtime_ca_path);
 
     input::setup(*SCRIPT_ROOT);
     mesh::setup(*SCRIPT_ROOT);
@@ -195,6 +212,11 @@ int plastic_main(std::vector<std::string> args)
         return 0;
     }
 
+    if (!file_exists(args[0])) {
+        std::cout << "File not found: " << args[0] << std::endl;
+        return 1;
+    }
+
     // Inject the requested filename, so that the user's script will be loaded
     String user_script_filename(*SCRIPT_ROOT, "user_script_filename", "");
     user_script_filename = args[0];
@@ -224,6 +246,8 @@ int plastic_main(std::vector<std::string> args)
 
 int main( int argc, char* args[] )
 {
+    BINARY_NAME = args[0];
+
     std::vector<std::string> argv;
 
     for (int i = 1; i < argc; i++)
