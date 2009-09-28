@@ -153,14 +153,13 @@ void main_loop()
 
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        static Ref errorListener = new Term();
-        errorListener->hasError = false;
+        Term errorListener;
 
-        evaluate_branch(*SCRIPT_ROOT, errorListener);
+        evaluate_branch(*SCRIPT_ROOT, &errorListener);
 
-        if (errorListener->hasError) {
+        if (errorListener.hasError()) {
             std::cout << "Runtime error:" << std::endl;
-            std::cout << errorListener->getErrorMessage() << std::endl;
+            print_runtime_error_formatted(*SCRIPT_ROOT, std::cout);
             PAUSED = true;
             PAUSE_REASON = RUNTIME_ERROR;
         }
