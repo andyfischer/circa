@@ -93,7 +93,7 @@ void hosted_image(Term* caller)
 
     if (texid == 0) {
         texid = load_image_to_texture(filename, caller);
-        if (caller->hasError) return;
+        if (caller->hasError()) return;
     }
 
     glBindTexture(GL_TEXTURE_2D, texid);

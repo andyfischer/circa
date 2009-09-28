@@ -1,0 +1,13 @@
+
+cd $CIRCA_HOME
+scons plastic
+
+
+mkdir -p build/plastic.app
+rm -rf build/plastic.app/*
+mkdir -p build/plastic.app/Contents
+mkdir -p build/plastic.app/Contents/MacOS
+
+cp build/bin/plas build/plastic.app/Contents/MacOS/plastic
+cp plastic/mac/Info.plist build/plastic.app/Contents
+
