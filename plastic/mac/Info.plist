@@ -6,6 +6,8 @@
 	<string>English</string>
 	<key>CFBundleExecutable</key>
 	<string>plastic</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright 2009 Paul Hodge</string>
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>

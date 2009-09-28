@@ -1,0 +1,20 @@
+#!/bin/bash
+
+cd $CIRCA_HOME
+scons plastic
+
+target=build/deploy/osx_commandline_alpha1
+
+mkdir -p $target
+rm -rf $target/*
+
+cp build/bin/plas $target/plastic
+
+cp -r plastic/assets $target
+cp -r plastic/demos $target
+cp plastic/runtime.ca $target
+
+cp /opt/local/lib/libSDL-1.2.0.dylib $target
+cp /opt/local/lib/libSDL_gfx.0.dylib $target
+cp /opt/local/lib/libSDL_image-1.2.0.dylib $target
+cp /opt/local/lib/libSDL_ttf-2.0.0.dylib $target
