@@ -205,13 +205,16 @@ namespace branch_t {
     {
         Branch& source = as_branch(sourceTerm);
         Branch& dest = as_branch(destTerm);
+        bool strictTypes = destTerm->type != BRANCH_TYPE && destTerm->type != LIST_TYPE;
 
         // Assign terms as necessary
         int lengthToAssign = std::min(source.length(), dest.length());
 
         for (int i=0; i < lengthToAssign; i++) {
-            if (is_value_alloced(source[i]))
-                assign_value(source[i], dest[i]);
+            // Change type if necessary
+            if (!strictTypes && (source[i]->type != dest[i]->type))
+                change_type(dest[i], source[i]->type);
+            assign_value(source[i], dest[i]);
         }
 
         // Add terms if necessary
