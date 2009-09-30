@@ -26,6 +26,7 @@ void evaluate_term(Term* term)
     }
     catch (std::exception const& err)
     {
+        //std::cout << "exception on: " << format_global_id(term) << std::endl;
         error_occurred(term, err.what());
     }
 }

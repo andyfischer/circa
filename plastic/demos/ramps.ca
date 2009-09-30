@@ -248,8 +248,6 @@ type Creature {
   number tile_x_progress
 }
 
-state List creatures = []
-
 def repeating_signal(number period) : bool
     state number time_till_next = period
     time_till_next -= time_delta
@@ -273,15 +271,18 @@ def find_highest_tile_for_x(int tile_x) : int
     return found
 end
 
+
+state List creatures = []
+
 -- Check to spawn a dude
 if repeating_signal(5)
-    new_creature = [0 find_highest_tile_for_x(0) 0]
+    new_creature = [0 0 0] : Creature
     creatures.append(new_creature)
 end
 
-creature_speed = .1
+creature_speed = .3
 def move_creature(Creature creature) : Creature
-    creature.tile_x_progress = creature.tile_x_progress + time * creature_speed
+    creature.tile_x_progress = creature.tile_x_progress + time_delta * creature_speed
     return creature
 end
 
@@ -295,3 +296,5 @@ for creature in creatures
     gl.circle([x y] 15.0 #844)
 end
 
+tweak.button(&time [300 10] 'time')
+tweak.button(&time_delta [300 30] 'time_delta')
