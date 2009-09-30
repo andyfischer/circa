@@ -47,7 +47,7 @@ namespace include_function {
             return;
         }
 
-        evaluate_branch(contents);
+        evaluate_branch(contents, caller);
     }
 
     std::string toSourceString(Term* term)

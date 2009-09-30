@@ -76,23 +76,22 @@ void update_if_block_joining_branch(Term* ifCall)
         std::string const& name = *it;
 
         // Make a list where we find the corresponding term for this name in each branch.
-        RefList selections;
+        Term* selections = apply(joining, BRANCH_FUNC, RefList());
+        Branch& selectionsBranch = as_branch(selections);
 
         for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
             Branch& branch = contents[branch_index]->asBranch();
 
+            Term* selection = NULL;
             if (branch.contains(name))
-                selections.append(branch[name]);
+                selection = branch[name];
             else
-                selections.append(find_named(*outerScope, name));
+                selection = find_named(*outerScope, name);
+
+            apply(selectionsBranch, COPY_FUNC, RefList(selection));
         }
 
-        Term* selection_list = apply(joining, LIST_FUNC, selections);
-
-        // Populate this list immediately so that type inference can work
-        evaluate_term(selection_list);
-
-        apply(joining, GET_INDEX_FUNC, RefList(selection_list, satisfiedIndex), name);
+        apply(joining, GET_INDEX_FUNC, RefList(selections, satisfiedIndex), name);
     }
 
     // Expose all names in 'joining' branch.

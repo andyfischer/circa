@@ -17,7 +17,8 @@ void error_occurred(Term* errorTerm, std::string const& message)
 void nested_error_occurred(Term* errorTerm)
 {
     if (errorTerm == NULL)
-        return;
+        throw std::runtime_error("nested_error_occurred, no error listener");
+
     errorTerm->setHasError(true);
 }
 
