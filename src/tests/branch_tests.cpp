@@ -217,6 +217,15 @@ void test_assign()
     test_assert(as_int(dest0) == 7);
     test_assert(as_int(as_branch(dest)[1]) == 8);
     test_assert(as_int(as_branch(dest)[2]) == 9);
+
+    // Assign one list to another list- make sure that it doesn't type check
+    // the fields.
+    Term* a = branch.eval("a = [1 2.0 'hi']");
+    Term* b = branch.eval("b = ['bye' 4 1.0]");
+
+    test_assert(value_fits_type(a,b->type));
+    test_assert(value_fits_type(b,a->type));
+    assign_value(a, b);
 }
 
 void term_pointer_operator_overload()
