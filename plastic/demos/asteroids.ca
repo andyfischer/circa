@@ -26,12 +26,23 @@ accelration_per_s = 5.0
 rotation_speed = 0.9
 ship_drag = 0.991
 speed_limit = 1.8
-bullet_speed = 5.0
+bullet_speed = 200.0
 bullet_width = 2.0
 
 def random_location() : Point
     return [rand() * window.width, rand() * window.height]
 end
+
+def random_norm_vector() : Point
+    angle = rand()
+    return [cos(angle) sin(angle)]
+end
+
+def rotate_point(Point point, number rotation) : Point
+    return [point.x*cos(rotation) - point.y*sin(rotation),
+        point.x*sin(rotation)+point.y*cos(rotation)]
+end
+
 
 -- Draw a background full of stars
 for i in range(700)
@@ -97,7 +108,7 @@ end
 
 -- Move bullets
 def move_bullet(Bullet bullet) : Bullet
-    loc = bullet.loc + bullet.direction * bullet_speed
+    loc = bullet.loc + bullet.direction * bullet_speed * time_delta
     loc = wrap_around(loc)
     return [bullet.lifespan+time_delta, loc, bullet.direction]
 end
@@ -121,4 +132,59 @@ for bullet in bullets
                   bullet.loc + [bullet_width, bullet_width],
                   bullet.loc + [-bullet_width, bullet_width]]
     gl.line_loop(points #fff)
+end
+
+type Asteroid {
+  List edges
+  Point location
+  Point vel
+  number rotation
+  number rotation_vel
+}
+
+asteroid_collision_radius = 20.0
+
+def generate_asteroid() : Asteroid
+    num_edges = 10
+    def get_edge(int index) : Point
+        angle = index / num_edges
+        return polar(angle, rand() * 30.0 + 8.0, [0 0])
+    end
+
+    rotation = rand() * .2 - .1
+    return [map(get_edge, range(10)), random_location(), random_norm_vector()*10, 0, rotation]
+end
+
+-- move asteroids
+def move_asteroid(Asteroid asteroid) : Asteroid
+    asteroid.location = asteroid.location + asteroid.vel * time_delta
+    asteroid.rotation = asteroid.rotation + asteroid.rotation_vel * time_delta
+    asteroid.location = wrap_around(asteroid.location)
+    return asteroid
+end
+
+state List asteroids = [generate_asteroid() generate_asteroid() generate_asteroid()]
+
+asteroids = map(move_asteroid, asteroids)
+
+-- draw asteroids
+for asteroid in asteroids
+    asteroid = asteroid : Asteroid
+
+    def pos_edge(Point p) : Point
+        p = rotate_point(p, asteroid.rotation)
+        p = p + asteroid.location
+        return p
+    end
+    edges = map(pos_edge, asteroid.edges)
+
+    gl.line_loop(edges, #fff)
+    --gl.circle(asteroid.location, asteroid_collision_radius, #f00)
+end
+
+-- check for collisions of asteroids and bullets
+spawned_asteroids = []
+
+def check_asteroid_collision()
+
 end

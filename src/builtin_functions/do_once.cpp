@@ -10,7 +10,7 @@ namespace do_once_function {
         bool &done = caller->input(0)->asBool();
 
         if (!done) {
-            evaluate_branch(caller->asBranch());
+            evaluate_branch(caller->asBranch(), caller);
             done = true;
         }
     }
