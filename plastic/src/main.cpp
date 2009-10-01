@@ -177,6 +177,7 @@ void main_loop()
         if (errorListener.hasError()) {
             std::cout << "Runtime error:" << std::endl;
             print_runtime_error_formatted(*SCRIPT_ROOT, std::cout);
+            std::cout << std::endl;
             PAUSED = true;
             PAUSE_REASON = RUNTIME_ERROR;
         }

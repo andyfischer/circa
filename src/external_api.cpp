@@ -2,9 +2,7 @@
 
 #include "circa.h"
 
-using namespace circa;
-
-extern "C" {
+namespace circa {
 
 int int_input(Term* term, int index)
 {
@@ -13,7 +11,7 @@ int int_input(Term* term, int index)
 
 float float_input(Term* term, int index)
 {
-    return as_float(term->input(index));
+    return to_float(term->input(index));
 }
 
 bool bool_input(Term* term, int index)
@@ -26,4 +24,4 @@ const char* string_input(Term* term, int index)
     return as_string(term->input(index)).c_str();
 }
 
-} // extern "C"
+} // namespace circa

@@ -145,6 +145,27 @@ void test_blocks()
     test_snippet("def func() end", "");
 }
 
+void test_rounding()
+{
+    test_snippet("", "round(.1) == 0");
+    test_snippet("", "round(.4) == 0");
+    test_snippet("", "round(.6) == 1");
+    test_snippet("", "round(.9) == 1");
+    test_snippet("", "round(1.2) == 1");
+    test_snippet("", "round(-1.2) == -1");
+    test_snippet("", "floor(.1) == 0");
+    test_snippet("", "floor(.4) == 0");
+    test_snippet("", "floor(.6) == 0");
+    test_snippet("", "floor(.9) == 0");
+    test_snippet("", "floor(1.2) == 1");
+    test_snippet("", "floor(-1.2) == -2");
+    test_snippet("", "ceil(.1) == 1");
+    test_snippet("", "ceil(.4) == 1");
+    test_snippet("", "ceil(.9) == 1");
+    test_snippet("", "ceil(1.1) == 2");
+    test_snippet("", "ceil(-1.1) == -1");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
@@ -153,6 +174,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_modulo);
     REGISTER_TEST_CASE(test_snippets::test_references);
     REGISTER_TEST_CASE(test_snippets::test_blocks);
+    REGISTER_TEST_CASE(test_snippets::test_rounding);
 }
 
 } // namespace test_snippets
