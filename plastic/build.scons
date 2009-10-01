@@ -19,6 +19,5 @@ SDL_ROOT.Alias('plastic', binary)
 
 if WINDOWS:
     # Embed manifest
-    print "embedding manifest.."
     SDL_ROOT.AddPostAction(binary,
-        'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;1')
+        'mt.exe -nologo -manifest plastic/windows/plastic.manifest.xml -outputresource:$TARGET;1')
