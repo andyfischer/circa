@@ -245,6 +245,7 @@ type Creature {
   int tile_x,
   int tile_y,
   number tile_x_progress
+  int walking_dir
 }
 
 def repeating_signal(number period) : bool
@@ -276,21 +277,10 @@ state List creatures = []
 -- Check to spawn a dude
 time_between_creatures = 10
 if repeating_signal(time_between_creatures)
-    new_creature = [0 find_highest_tile_for_x(0) 0] : Creature
+    new_creature = [0 find_highest_tile_for_x(0) 0 1] : Creature
     creatures.append(new_creature)
 end
 
--- move creatures
-def move_creature(Creature creature) : Creature
-    speed = .3
-    creature.tile_x_progress = creature.tile_x_progress + time_delta * speed
-    creature.tile_x = creature.tile_x + round(creature.tile_x_progress)
-    creature.tile_x_progress = remainder(creature.tile_x_progress, 1)
-    print(creature)
-    return creature
-end
-
-creatures = map(move_creature, creatures)
 
 -- Figure out the path that creatures can walk on
 type PathSegment { Point l, Point r }
@@ -311,17 +301,49 @@ def get_path_segment(int tile_x) : PathSegment
 end
 
 path = map(get_path_segment, range(num_tiles_x))
-
 for segment in path
     segment = segment : PathSegment
     draw_thick_line(segment.l segment.r 2.0 #f00)
 end
+
+-- Move creatures
+def move_creature(Creature creature) : Creature
+    speed = .5
+    creature.tile_x_progress = creature.tile_x_progress + time_delta * speed * creature.walking_dir
+
+    finished_tile = (creature.tile_x_progress >= 1.0 && creature.walking_dir == 1) || (creature.tile_x_progress <= 0 && creature.walking_dir == -1)
+
+    if finished_tile
+        -- check if there is a wall here
+        this_path = path[creature.tile_x] : PathSegment
+        next_path = path[creature.tile_x + creature.walking_dir] : PathSegment
+
+        if creature.walking_dir == 1
+            close_point = this_path.r
+            next_point = next_path.l
+        else
+            close_point = this_path.l
+            next_point = next_path.r
+        end
+        if close_point.y > next_point.y
+            creature.walking_dir = creature.walking_dir * -1
+        else
+            creature.tile_x = creature.tile_x + creature.walking_dir
+            creature.tile_x_progress = creature.tile_x_progress - creature.walking_dir
+        end
+    end
+    return creature
+end
+
+creatures = map(move_creature, creatures)
+
 type PositionedCreature { number x, number y }
 
 def position_creature(Creature creature) : PositionedCreature
     path_segment = path[creature.tile_x] : PathSegment
 
-    return path_segment.l + (path_segment.r - path_segment.l) * creature.tile_x_progress
+    track_pos = path_segment.l + (path_segment.r - path_segment.l) * creature.tile_x_progress
+    return track_pos + [0 -tile_size/2]
 end
 
 for pos_creature in map(position_creature, creatures)

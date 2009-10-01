@@ -91,6 +91,7 @@ void handle_key_press(SDL_Event &event, int key)
     switch (key) {
     case SDLK_ESCAPE:
         CONTINUE_MAIN_LOOP = false;
+        break;
 
     case SDLK_e:
         reset_state(*USERS_BRANCH);
