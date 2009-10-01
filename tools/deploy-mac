@@ -12,13 +12,7 @@ rm -rf $target/*
 
 cp build/bin/plas $target/plastic
 
-cp -r plastic/assets $target
-cp plastic/runtime.ca $target
-
-cp -r plastic/demos $target
-rm $target/demos/meshtest.ca
-rm $target/demos/ramps.ca
-rm $target/demos/tree.ca
+deploy-plastic-assets $target
 
 cd $target
 mkdir bin
