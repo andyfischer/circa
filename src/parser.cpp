@@ -881,8 +881,10 @@ int get_infix_precedence(int match)
         case tokenizer::DOUBLE_EQUALS:
         case tokenizer::NOT_EQUALS:
             return 5;
-        case tokenizer::DOUBLE_AMPERSAND:
         case tokenizer::DOUBLE_VERTICAL_BAR:
+        case tokenizer::DOUBLE_AMPERSAND:
+        case tokenizer::AND:
+        case tokenizer::OR:
             return 4;
         case tokenizer::PLUS_EQUALS:
         case tokenizer::MINUS_EQUALS:
@@ -912,8 +914,8 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == ">") return "greater_than";
     else if (infix == ">=") return "greater_than_eq";
     else if (infix == "==") return "equals";
-    else if (infix == "||") return "or";
-    else if (infix == "&&") return "and";
+    else if (infix == "or") return "or";
+    else if (infix == "and") return "and";
     else if (infix == ":=") return "assign";
     else if (infix == "+=") return "add";
     else if (infix == "-=") return "sub";

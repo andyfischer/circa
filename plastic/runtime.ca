@@ -4,7 +4,7 @@ state Point mouse
 
 def mouse_in(Rect b) : bool
   "Return whether the mouse is currently inside the given rect."
-  return (b.x1 < mouse.x) && (b.x2 > mouse.x) && (b.y1 < mouse.y) && (b.y2 > mouse.y)
+  return (b.x1 < mouse.x) and (b.x2 > mouse.x) and (b.y1 < mouse.y) and (b.y2 > mouse.y)
 end
 
 -- Information about the current window
@@ -161,7 +161,7 @@ namespace fps_counter
     framesElapsed += 1
     timeElapsed = time - timeStarted
 
-    if (framesElapsed > framesPerSample) || (timeElapsed > earlySampleTime)
+    if (framesElapsed > framesPerSample) or (timeElapsed > earlySampleTime)
         lastRecoredFps = framesElapsed / timeElapsed
         framesElapsed = 0
         timeStarted = time

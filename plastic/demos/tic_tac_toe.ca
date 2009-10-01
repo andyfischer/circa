@@ -151,13 +151,13 @@ for board_space in board_spaces
         draw_o(board_space.center)
     end
 
-    playable = board_space.owner == player.none && not(game_is_finished)
+    playable = board_space.owner == player.none and not(game_is_finished)
 
-    if playable && mouse_over(rect)
+    if playable and mouse_over(rect)
         draw_box(rect, #fff4)
     end
 
-    if playable && mouse_clicked(rect)
+    if playable and mouse_clicked(rect)
         chosen_space = board_space
     end
 end
@@ -171,7 +171,7 @@ if chosen_space != []
 
     -- Modify board_spaces in a silly way b/c the proper way doesn't work yet
     def update_board_spaces(BoardSpace space) : BoardSpace
-        if space.x == chosen_space.x && space.y == chosen_space.y
+        if space.x == chosen_space.x and space.y == chosen_space.y
             space.owner = current_player
         end
         return space

@@ -166,6 +166,20 @@ void test_rounding()
     test_snippet("", "ceil(-1.1) == -1");
 }
 
+void test_boolean_ops()
+{
+    test_snippet("", "true and true)");
+    test_snippet("", "not(true and false)");
+    test_snippet("", "not(false and true)");
+    test_snippet("", "not(false and false)");
+    test_snippet("", "true or true");
+    test_snippet("", "false or true");
+    test_snippet("", "true or false");
+    test_snippet("", "not(false or false)");
+    test_snippet("", "true and true or false");
+    test_snippet("", "false and true or true");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
@@ -175,6 +189,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_references);
     REGISTER_TEST_CASE(test_snippets::test_blocks);
     REGISTER_TEST_CASE(test_snippets::test_rounding);
+    REGISTER_TEST_CASE(test_snippets::test_boolean_ops);
 }
 
 } // namespace test_snippets
