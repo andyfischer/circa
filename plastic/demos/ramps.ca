@@ -131,7 +131,6 @@ state number tile_fall_distance = tile_size
 
 state board = map(initialize_board_piece, range(num_tiles))
 
-
 def rotate_falling_group(List group, int rot) : List
     def rotate_piece(Piece piece) : Piece
         pos = rotate_around_i([piece.x piece.y] [1 1] rot)
@@ -194,7 +193,7 @@ end
 
 
 -- Update fall animation
-tile_fall_distance -= fall_speed * time_delta
+--tile_fall_distance -= fall_speed * time_delta
 
 
 -- Check to move falling group down a step
@@ -275,26 +274,57 @@ end
 state List creatures = []
 
 -- Check to spawn a dude
-if repeating_signal(5)
-    new_creature = [0 0 0] : Creature
+time_between_creatures = 10
+if repeating_signal(time_between_creatures)
+    new_creature = [0 find_highest_tile_for_x(0) 0] : Creature
     creatures.append(new_creature)
 end
 
-creature_speed = .3
+-- move creatures
 def move_creature(Creature creature) : Creature
-    creature.tile_x_progress = creature.tile_x_progress + time_delta * creature_speed
+    speed = .3
+    creature.tile_x_progress = creature.tile_x_progress + time_delta * speed
+    creature.tile_x = creature.tile_x + round(creature.tile_x_progress)
+    creature.tile_x_progress = remainder(creature.tile_x_progress, 1)
+    print(creature)
     return creature
 end
 
 creatures = map(move_creature, creatures)
 
-for creature in creatures
-    creature = creature : Creature
-    x = creature.tile_x * tile_size + creature.tile_x_progress * tile_size
-    y = creature.tile_y * tile_size - tile_size / 2
+-- Figure out the path that creatures can walk on
+type PathSegment { Point l, Point r }
 
-    gl.circle([x y] 15.0 #844)
+def get_path_segment(int tile_x) : PathSegment
+    tile_y = find_highest_tile_for_x(tile_x)
+    board_piece = board[board_loc_to_index([tile_x,tile_y])] : BoardPiece
+
+    x1 = tile_size*tile_x
+    x2 = tile_size*(tile_x+1)
+    if (board_piece.square_filled) || (board_piece.rot == NW) || (board_piece.rot == NE)
+        return [[x1, tile_y*tile_size], [x2, tile_y*tile_size]]
+    elif (board_piece.rot == SW)
+        return [[x1, (tile_y)*tile_size], [x2, (tile_y+1)*tile_size]]
+    else
+        return [[x1, (tile_y+1)*tile_size], [x2, tile_y*tile_size]]
+    end
 end
 
-tweak.button(&time [300 10] 'time')
-tweak.button(&time_delta [300 30] 'time_delta')
+path = map(get_path_segment, range(num_tiles_x))
+
+for segment in path
+    segment = segment : PathSegment
+    draw_thick_line(segment.l segment.r 2.0 #f00)
+end
+type PositionedCreature { number x, number y }
+
+def position_creature(Creature creature) : PositionedCreature
+    path_segment = path[creature.tile_x] : PathSegment
+
+    return path_segment.l + (path_segment.r - path_segment.l) * creature.tile_x_progress
+end
+
+for pos_creature in map(position_creature, creatures)
+    pos_creature = pos_creature : PositionedCreature
+    gl.circle([pos_creature.x pos_creature.y] 15.0 #844)
+end

@@ -14,6 +14,7 @@
 #include "debug.h"
 #include "documentation.h"
 #include "evaluation.h"
+#include "external_api.h"
 #include "feedback.h"
 #include "file_io.h"
 #include "for_loops.h"

@@ -21,7 +21,7 @@ namespace map_function {
 
         output.removeNulls();
 
-        evaluate_branch(output);
+        evaluate_branch(output, caller);
     }
 
     void setup(Branch& kernel)
