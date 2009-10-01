@@ -1,4 +1,10 @@
 
+Tests/bugs:
+  Test: Point + number, Point + int
+
+  Test throwing errors inside blocks and subroutines. Many errors show up with
+  'no error found'
+
 Bugs:
 
  - Assignment operator should only be allowed to work on values
