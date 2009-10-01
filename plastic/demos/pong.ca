@@ -4,9 +4,9 @@ desired_window_size = [500 400]
 background(#042304)
 
 def rect_intersects_rect(Rect rect_a, Rect rect_b) : bool
-    intersects_on_x = (rect_a.x2 > rect_b.x1) && (rect_b.x2 > rect_a.x1)
-    intersects_on_y = (rect_a.y2 > rect_b.y1) && (rect_b.y2 > rect_a.y1)
-    return intersects_on_x && intersects_on_y
+    intersects_on_x = (rect_a.x2 > rect_b.x1) and (rect_b.x2 > rect_a.x1)
+    intersects_on_y = (rect_a.y2 > rect_b.y1) and (rect_b.y2 > rect_a.y1)
+    return intersects_on_x and intersects_on_y
 end
 
 def rect_intersects_circle(Rect rect, Point circle_loc, number circle_radius) : bool
@@ -90,7 +90,7 @@ draw_box(players_paddle, #fff)
 draw_box(ai_paddle, #fff)
 
 -- draw ball
-show_ball = not(ball_is_being_introduced) || alternate_over_time(0.2)
+show_ball = not(ball_is_being_introduced) or alternate_over_time(0.2)
 
 if show_ball
     gl.circle(ball_loc, ball_radius, #fff)

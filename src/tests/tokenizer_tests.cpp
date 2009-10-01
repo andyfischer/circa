@@ -163,6 +163,18 @@ void test_keywords()
     test_assert(results[12].match == token::ELIF);
 }
 
+void test_keywords2()
+{
+    token::TokenList results;
+    token::tokenize("and or", results);
+
+    test_assert(results.size() == 3);
+    test_assert(results[0].text == "and");
+    test_assert(results[0].match == token::AND);
+    test_assert(results[2].text == "or");
+    test_assert(results[2].match == token::OR);
+}
+
 void test_identifiers_that_look_like_keywords()
 {
     token::TokenList results;
@@ -311,6 +323,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_symbols2);
     REGISTER_TEST_CASE(tokenizer_tests::test_symbols3);
     REGISTER_TEST_CASE(tokenizer_tests::test_keywords);
+    REGISTER_TEST_CASE(tokenizer_tests::test_keywords2);
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers_that_look_like_keywords);
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);

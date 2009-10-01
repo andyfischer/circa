@@ -264,7 +264,7 @@ def find_highest_tile_for_x(int tile_x) : int
     found = 0
     for i in range(num_tiles_y)
         board_piece = board[board_loc_to_index([tile_x, i])] : BoardPiece
-        if board_piece.filled && found == 0
+        if board_piece.filled and found == 0
             found = i
         end
     end
@@ -291,7 +291,7 @@ def get_path_segment(int tile_x) : PathSegment
 
     x1 = tile_size*tile_x
     x2 = tile_size*(tile_x+1)
-    if (board_piece.square_filled) || (board_piece.rot == NW) || (board_piece.rot == NE)
+    if (board_piece.square_filled) or (board_piece.rot == NW) or (board_piece.rot == NE)
         return [[x1, tile_y*tile_size], [x2, tile_y*tile_size]]
     elif (board_piece.rot == SW)
         return [[x1, (tile_y)*tile_size], [x2, (tile_y+1)*tile_size]]
@@ -311,7 +311,7 @@ def move_creature(Creature creature) : Creature
     speed = .5
     creature.tile_x_progress = creature.tile_x_progress + time_delta * speed * creature.walking_dir
 
-    finished_tile = (creature.tile_x_progress >= 1.0 && creature.walking_dir == 1) || (creature.tile_x_progress <= 0 && creature.walking_dir == -1)
+    finished_tile = (creature.tile_x_progress >= 1.0 and creature.walking_dir == 1) or (creature.tile_x_progress <= 0 and creature.walking_dir == -1)
 
     if finished_tile
         -- check if there is a wall here
