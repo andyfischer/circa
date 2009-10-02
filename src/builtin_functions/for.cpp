@@ -18,7 +18,7 @@ namespace for_function {
         result << " in ";
         result << get_source_of_input(term,0);
         result << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
-        result << get_branch_source(get_for_loop_code(term));
+        result << get_branch_source(as_branch(term));
         result << term->stringPropOptional("syntaxHints:preEndWs", "");
         result << "end";
 
@@ -27,9 +27,7 @@ namespace for_function {
 
     void setup(Branch& kernel)
     {
-        Term* forStateType = parse_type(kernel, "type for__state { Code code, List _state }");
-        rename(as_type(forStateType).prototype["_state"], "#state");
-        FOR_FUNC = import_function(kernel, evaluate, "for(List) : for__state");
+        FOR_FUNC = import_function(kernel, evaluate, "for(List) : Code");
         function_t::get_to_source_string(FOR_FUNC) = toSourceString;
     }
 }

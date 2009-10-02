@@ -589,12 +589,12 @@ Term* for_block(Branch& branch, TokenStream& tokens)
         return compile_error_for_line(branch, tokens, startPosition, "Expected a list after 'in'");
 
     Term* forTerm = apply(branch, FOR_FUNC, RefList(listExpr));
-    Branch& innerBranch = get_for_loop_code(forTerm);
+    Branch& innerBranch = as_branch(forTerm);
+    setup_for_loop_pre_code(forTerm);
 
     forTerm->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 
     // Create iterator variable
-
     RefList listExprTypes;
     for (int i=0; i < as_branch(listExpr).length(); i++)
         listExprTypes.append(as_branch(listExpr)[i]->type);
@@ -603,8 +603,6 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     Term* iterator = create_value(innerBranch, iterator_type, iterator_name);
     set_source_hidden(iterator, true);
-
-    setup_for_loop_pre_code(forTerm);
 
     consume_branch_until_end(innerBranch, tokens);
 

@@ -45,7 +45,8 @@ end
 
 
 -- Draw a background full of stars
-for i in range(700)
+num_stars = 700
+for i in range(num_stars)
     state Point loc = random_location()
     state Color color = [rand(.2 .6) .3 rand(.5 1) 1] 
     gl.points([loc] color)
@@ -140,19 +141,31 @@ type Asteroid {
   Point vel
   number rotation
   number rotation_vel
+  number size
 }
 
 asteroid_collision_radius = 20.0
+asteroid_starting_size = 30.0
+asteroid_num_edges = 10
 
-def generate_asteroid() : Asteroid
-    num_edges = 10
+def generate_asteroid(number size) : Asteroid
     def get_edge(int index) : Point
-        angle = index / num_edges
-        return polar(angle, rand() * 30.0 + 8.0, [0 0])
+        angle = index / asteroid_num_edges
+        return polar(angle, rand() * size + size/3, [0 0])
     end
 
     rotation = rand() * .2 - .1
-    return [map(get_edge, range(10)), random_location(), random_norm_vector()*10, 0, rotation]
+    return [map(get_edge, range(10)), random_location(), random_norm_vector()*10, 0, rotation size]
+end
+
+def generate_child_asteroid(Asteroid parent) : Asteroid
+    size = parent.size / 2
+    def get_edge(int index) : Point
+        angle = index / asteroid_num_edges
+        return polar(angle, rand() * size + size/3, [0 0])
+    end
+    rotation = rand() * .2 - .1
+    return [map(get_edge, range(10)), parent.location, random_norm_vector()*10, 0, rotation size]
 end
 
 -- move asteroids
@@ -163,7 +176,14 @@ def move_asteroid(Asteroid asteroid) : Asteroid
     return asteroid
 end
 
-state List asteroids = [generate_asteroid() generate_asteroid() generate_asteroid()]
+state List asteroids = []
+state bool initialized = false
+if not(initialized)
+    for i in range(3)
+        asteroids.append(generate_asteroid(asteroid_starting_size))
+    end
+    initialized = true
+end
 
 asteroids = map(move_asteroid, asteroids)
 
@@ -185,6 +205,27 @@ end
 -- check for collisions of asteroids and bullets
 spawned_asteroids = []
 
-def check_asteroid_collision()
-
+def point_distance(Point a, Point b) : number
+    return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
 end
+
+def check_asteroid_collision(Asteroid asteroid) : bool
+    collides = false
+    for bullet in bullets
+        bullet = bullet : Bullet
+        if point_distance(asteroid.location, bullet.loc) < asteroid_collision_radius
+            collides = true
+            spawned_asteroids.append(generate_child_asteroid(asteroid))
+            spawned_asteroids.append(generate_child_asteroid(asteroid))
+        end
+    end
+    return not(collides)
+end
+
+killed = map(check_asteroid_collision, asteroids)
+asteroids = filter(asteroids, killed)
+
+for spawn in spawned_asteroids
+    asteroids.append(spawn)
+end
+spawned_asteroids = []
