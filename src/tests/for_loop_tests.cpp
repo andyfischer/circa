@@ -68,7 +68,7 @@ void type_inference_for_iterator()
 
     // test a situation where inference is required to parse the inner branch
     loop = branch.compile("for i in [1]\ni = i * 2\nend");
-    Branch& inner_code = get_for_loop_code(loop);
+    Branch& inner_code = as_branch(loop);
     test_assert(inner_code["i"]->function->name == "mult_i");
 
     // test that we find a common type

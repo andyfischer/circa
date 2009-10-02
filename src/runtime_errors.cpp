@@ -4,7 +4,6 @@
 
 namespace circa {
 
-
 void error_occurred(Term* errorTerm, std::string const& message)
 {
     if (errorTerm == NULL)
@@ -12,8 +11,6 @@ void error_occurred(Term* errorTerm, std::string const& message)
 
     errorTerm->setHasError(true);
     errorTerm->attachErrorMessage(message);
-
-    std::cout << "error occurred: " << message << std::endl;
 }
 
 void nested_error_occurred(Term* errorTerm)

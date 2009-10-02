@@ -4,19 +4,18 @@
 
 namespace circa {
 
-Term* get_for_loop_iterator(Term* forTerm)
-{
-    return get_for_loop_code(forTerm)[0];
-}
+/* Organization of for loop contents:
+   [0] #state
+   [1] #is_first_iteration
+   [2] #rebinds
+   [3] iterator
+   [4 .. n-1] user's code
+*/
 
-Branch& get_for_loop_code(Term* forTerm)
-{
-    return forTerm->asBranch()[0]->asBranch();
-}
 
 Branch& get_for_loop_state(Term* forTerm)
 {
-    return forTerm->asBranch()[1]->asBranch();
+    return as_branch(forTerm)[0]->asBranch();
 }
 
 Branch& get_for_loop_iteration_state(Term* forTerm, int index)
@@ -24,31 +23,52 @@ Branch& get_for_loop_iteration_state(Term* forTerm, int index)
     return get_for_loop_state(forTerm)[index]->asBranch();
 }
 
+Term* get_for_loop_is_first_iteration(Term* forTerm)
+{
+    Branch& contents = as_branch(forTerm);
+    return contents[1];
+}
+
+Branch& get_for_loop_rebinds(Term* forTerm)
+{
+    Branch& contents = as_branch(forTerm);
+    return contents[2]->asBranch();
+}
+
+Term* get_for_loop_iterator(Term* forTerm)
+{
+    return as_branch(forTerm)[3];
+}
+
 void setup_for_loop_pre_code(Term* forTerm)
 {
-    create_branch(get_for_loop_code(forTerm), "#rebound");
-    create_value(get_for_loop_code(forTerm), BOOL_TYPE, "#is_first_iteration");
+    Branch& forContents = as_branch(forTerm);
+    create_list(forContents, "#state");
+    create_value(forContents, BOOL_TYPE, "#is_first_iteration");
+    create_branch(forContents, "#rebinds");
 }
 
 void setup_for_loop_post_code(Term* forTerm)
 {
+    Branch& forContents = as_branch(forTerm);
+    
     // Get a list of rebound names
     std::vector<std::string> reboundNames;
-    list_names_that_this_branch_rebinds(get_for_loop_code(forTerm), reboundNames);
+    list_names_that_this_branch_rebinds(forContents, reboundNames);
 
-    Branch& rebound = as_branch(get_for_loop_code(forTerm)["#rebound"]);
-    Term* isFirstIteration = get_for_loop_code(forTerm)["#is_first_iteration"];
+    Branch& rebinds = get_for_loop_rebinds(forTerm);
+    Term* isFirstIteration = get_for_loop_is_first_iteration(forTerm);
 
     for (unsigned i=0; i < reboundNames.size(); i++) {
         std::string name = reboundNames[i];
         Branch& outerScope = *forTerm->owningBranch;
         Term* outerVersion = find_named(outerScope, name);
-        Term* innerVersion = get_for_loop_code(forTerm)[name];
+        Term* innerVersion = forContents[name];
 
-        Term* ifexpr = apply(rebound, IF_EXPR_FUNC,
+        Term* ifexpr = apply(rebinds, IF_EXPR_FUNC,
                 RefList(isFirstIteration, outerVersion, innerVersion));
 
-        remap_pointers(get_for_loop_code(forTerm), outerVersion, ifexpr);
+        remap_pointers(forContents, outerVersion, ifexpr);
 
         // undo remap
         ifexpr->inputs[1] = outerVersion;
@@ -61,7 +81,7 @@ void setup_for_loop_post_code(Term* forTerm)
 
 void evaluate_for_loop(Term* forTerm, Term* listTerm)
 {
-    Branch& codeBranch = get_for_loop_code(forTerm);
+    Branch& codeBranch = as_branch(forTerm);
     Branch& stateBranch = get_for_loop_state(forTerm);
 
     // Make sure state has the correct number of iterations
@@ -82,13 +102,13 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
 
     for (int i=0; i < numIterations; i++) {
 
-        Term* isFirstIteration = codeBranch[2];
+        Term* isFirstIteration = get_for_loop_is_first_iteration(forTerm);
         assert(isFirstIteration->name == "#is_first_iteration");
 
         as_bool(isFirstIteration) = i == 0;
 
         // Inject iterator value
-        Term* iterator = codeBranch[0];
+        Term* iterator = get_for_loop_iterator(forTerm);
         if (!value_fits_type(listTerm->asBranch()[i], iterator->type)) {
             error_occurred(forTerm, "Internal error in evaluate_for_loop: can't assign this element to iterator");
             return;

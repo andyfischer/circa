@@ -141,7 +141,7 @@ void test_blocks()
 {
     //test_snippet("if true end", "");
     //test_snippet("if true; else; end", "");
-    //test_snippet("for i in [1] end", "");
+    test_snippet("for i in [1] end", "");
     test_snippet("def func() end", "");
 }
 
@@ -180,6 +180,12 @@ void test_boolean_ops()
     test_snippet("", "false and true or true");
 }
 
+void test_list_operations()
+{
+    test_snippet("l = []; for i in range(3); l.append(i); end", "l == [0 1 2]");
+    test_snippet("a = [3 2 1]; b = [];" "for item in a; b.append(item); end", "b == [3 2 1]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
@@ -190,6 +196,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_blocks);
     REGISTER_TEST_CASE(test_snippets::test_rounding);
     REGISTER_TEST_CASE(test_snippets::test_boolean_ops);
+    REGISTER_TEST_CASE(test_snippets::test_list_operations);
 }
 
 } // namespace test_snippets
