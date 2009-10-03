@@ -219,11 +219,12 @@ def check_asteroid_collision(Asteroid asteroid) : bool
             spawned_asteroids.append(generate_child_asteroid(asteroid))
         end
     end
-    return not(collides)
+    --return not(collides)
+    return true
 end
 
-killed = map(check_asteroid_collision, asteroids)
-asteroids = filter(asteroids, killed)
+alive = map(check_asteroid_collision, asteroids)
+asteroids = filter(asteroids, alive)
 
 for spawn in spawned_asteroids
     asteroids.append(spawn)

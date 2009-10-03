@@ -49,7 +49,16 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     Branch& assertions = create_branch(code, "assertions");
     parser::compile(&assertions, parser::statement_list, assertionsStr);
 
-    evaluate_branch(code);
+    Term errorListener;
+    evaluate_branch(code, &errorListener);
+
+    if (errorListener.hasError()) {
+        std::cout << "Runtime error in: " << get_current_test_name() << std::endl;
+        print_runtime_error_formatted(code, std::cout);
+        std::cout << std::endl;
+        declare_current_test_failed();
+        return;
+    }
 
     int boolean_statements_found = 0;
     for (int i=0; i < assertions.length(); i++) {
@@ -183,7 +192,9 @@ void test_boolean_ops()
 void test_list_operations()
 {
     test_snippet("l = []; for i in range(3); l.append(i); end", "l == [0 1 2]");
-    test_snippet("a = [3 2 1]; b = [];" "for item in a; b.append(item); end", "b == [3 2 1]");
+    test_snippet("a = [3 2 1]; b = [];for item in a; b.append(item); end", "b == [3 2 1]");
+    test_snippet("a = [2 4]; b = [1 3];for item in a; b.append(item); end", "b == [1 3 2 4]");
+    test_snippet("a = [1 2];for item in []; a.append(item); end", "a == [1 2]");
 }
 
 void register_tests()
