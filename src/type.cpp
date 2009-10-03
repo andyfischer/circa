@@ -174,6 +174,15 @@ Term* find_common_type(RefList& list)
     if (all_are_ints_or_floats)
         return FLOAT_TYPE;
 
+    // Another special case, if all types are branch based then use BRANCH_TYPE
+    bool all_are_compound = true;
+    for (int i=0; i < list.length(); i++)
+        if (!is_compound_type(list[i]))
+            all_are_compound = false;
+
+    if (all_are_compound)
+        return BRANCH_TYPE;
+
     // Otherwise give up
     return ANY_TYPE;
 }

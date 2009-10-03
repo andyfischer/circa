@@ -142,6 +142,7 @@ type Asteroid {
   number rotation
   number rotation_vel
   number size
+  number age
 }
 
 asteroid_collision_radius = 20.0
@@ -155,7 +156,7 @@ def generate_asteroid(number size) : Asteroid
     end
 
     rotation = rand() * .2 - .1
-    return [map(get_edge, range(10)), random_location(), random_norm_vector()*10, 0, rotation size]
+    return [map(get_edge, range(10)), random_location(), random_norm_vector()*10, 0, rotation size 0]
 end
 
 def generate_child_asteroid(Asteroid parent) : Asteroid
@@ -165,7 +166,7 @@ def generate_child_asteroid(Asteroid parent) : Asteroid
         return polar(angle, rand() * size + size/3, [0 0])
     end
     rotation = rand() * .2 - .1
-    return [map(get_edge, range(10)), parent.location, random_norm_vector()*10, 0, rotation size]
+    return [map(get_edge, range(10)), parent.location, random_norm_vector()*10, 0, rotation size 0]
 end
 
 -- move asteroids
@@ -173,6 +174,7 @@ def move_asteroid(Asteroid asteroid) : Asteroid
     asteroid.location = asteroid.location + asteroid.vel * time_delta
     asteroid.rotation = asteroid.rotation + asteroid.rotation_vel * time_delta
     asteroid.location = wrap_around(asteroid.location)
+    asteroid.age = asteroid.age + time_delta
     return asteroid
 end
 
@@ -203,30 +205,41 @@ for asteroid in asteroids
 end
 
 -- check for collisions of asteroids and bullets
-spawned_asteroids = []
 
 def point_distance(Point a, Point b) : number
     return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
 end
 
-def check_asteroid_collision(Asteroid asteroid) : bool
+
+filter_list = []
+spawned = []
+
+-- This code is crazy b/c of language problems
+for asteroid in asteroids
+    asteroid = asteroid : Asteroid
     collides = false
-    for bullet in bullets
-        bullet = bullet : Bullet
-        if point_distance(asteroid.location, bullet.loc) < asteroid_collision_radius
-            collides = true
-            spawned_asteroids.append(generate_child_asteroid(asteroid))
-            spawned_asteroids.append(generate_child_asteroid(asteroid))
+
+    if asteroid.age < .5
+        collides = false
+    else
+        for bullet in bullets
+            bullet = bullet : Bullet
+            if point_distance(asteroid.location, bullet.loc) < asteroid_collision_radius
+                collides = true
+            end
         end
     end
-    --return not(collides)
-    return true
+
+    filter_list.append(not(collides))
+
+    if collides and asteroid.size > 10
+        spawned.append(generate_child_asteroid(asteroid))
+    end
 end
 
-alive = map(check_asteroid_collision, asteroids)
-asteroids = filter(asteroids, alive)
 
-for spawn in spawned_asteroids
+asteroids = filter(asteroids, filter_list)
+
+for spawn in spawned
     asteroids.append(spawn)
 end
-spawned_asteroids = []
