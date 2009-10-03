@@ -117,7 +117,7 @@ bool is_assign_value_possible(Term* source, Term* dest);
 
 // Returns a common type, which is guaranteed to hold all the types in this
 // list. Currently, this is not very sophisticated.
-Term* find_common_type(RefList& list);
+Term* find_common_type(RefList const& list);
 
 Term* create_type(Branch& branch, std::string name="");
 Term* create_empty_type(Branch& branch, std::string name);

@@ -146,7 +146,7 @@ bool is_assign_value_possible(Term* source, Term* dest)
     return value_fits_type(source, dest->type);
 }
 
-Term* find_common_type(RefList& list)
+Term* find_common_type(RefList const& list)
 {
     if (list.length() == 0)
         return ANY_TYPE;
