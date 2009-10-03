@@ -88,7 +88,6 @@ void test_rebind_external()
     branch.eval("for i in [1]; a = 1; end");
     test_assert(branch);
     test_assert(branch["a"]->asInt() == 1);
-
 }
 
 void test_rebind_internally()
