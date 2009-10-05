@@ -166,16 +166,8 @@ def generate_child_asteroid(Asteroid parent) : Asteroid
         return polar(angle, rand() * size + size/3, [0 0])
     end
     rotation = rand() * .2 - .1
-    return [map(get_edge, range(10)), parent.location, random_norm_vector()*10, 0, rotation size 0]
-end
-
--- move asteroids
-def move_asteroid(Asteroid asteroid) : Asteroid
-    asteroid.location = asteroid.location + asteroid.vel * time_delta
-    asteroid.rotation = asteroid.rotation + asteroid.rotation_vel * time_delta
-    asteroid.location = wrap_around(asteroid.location)
-    asteroid.age = asteroid.age + time_delta
-    return asteroid
+    speed = rand()*20 + 20.0
+    return [map(get_edge, range(10)), parent.location, random_norm_vector()*speed, 0, rotation size 0]
 end
 
 state List asteroids = []
@@ -187,7 +179,14 @@ if not(initialized)
     initialized = true
 end
 
-asteroids = map(move_asteroid, asteroids)
+-- move asteroids
+for asteroid in @asteroids
+    asteroid = asteroid : Asteroid
+    asteroid.location = asteroid.location + asteroid.vel * time_delta
+    asteroid.rotation = asteroid.rotation + asteroid.rotation_vel * time_delta
+    asteroid.location = wrap_around(asteroid.location)
+    asteroid.age = asteroid.age + time_delta
+end
 
 -- draw asteroids
 for asteroid in asteroids
@@ -217,14 +216,11 @@ for asteroid in @asteroids
     asteroid = asteroid : Asteroid
     collides = false
 
-    if asteroid.age < .5
-        collides = false
-    else
-        for bullet in bullets
-            bullet = bullet : Bullet
-            if point_distance(asteroid.location, bullet.loc) < asteroid_collision_radius
-                collides = true
-            end
+    for bullet in @bullets
+        bullet = bullet : Bullet
+        if point_distance(asteroid.location, bullet.loc) < asteroid.size
+            collides = true
+            discard
         end
     end
 
@@ -234,6 +230,10 @@ for asteroid in @asteroids
 
     if collides and asteroid.size > 10
         spawned.append(generate_child_asteroid(asteroid))
+        spawned.append(generate_child_asteroid(asteroid))
+        if rand() > .5
+            spawned.append(generate_child_asteroid(asteroid))
+        end
     end
 end
 
