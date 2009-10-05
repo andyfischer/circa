@@ -179,6 +179,11 @@ Term* statement(Branch& branch, TokenStream& tokens)
         result = include_statement(branch, tokens);
     }
 
+    // Discard statement
+    else if (tokens.nextIs(DISCARD)) {
+        result = discard_statement(branch, tokens);
+    }
+
     // Otherwise, expression statement
     else {
         result = expression_statement(branch, tokens);
@@ -830,9 +835,9 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
 
 Term* include_statement(Branch& branch, TokenStream& tokens)
 {
-    tokens.consume(INCLUDE);
-
     int startPosition = tokens.getPosition();
+
+    tokens.consume(INCLUDE);
 
     possible_whitespace(tokens);
 
@@ -855,6 +860,23 @@ Term* include_statement(Branch& branch, TokenStream& tokens)
     expose_all_names(as_branch(result), branch);
 
     return result;
+}
+
+Term* discard_statement(Branch& branch, TokenStream& tokens)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(DISCARD);
+    
+    Term* enclosingForLoop = find_enclosing_for_loop(branch.owningTerm);
+
+    if (enclosingForLoop == NULL)
+        return compile_error_for_line(branch, tokens, startPosition,
+                "'discard' can only be used inside a for loop");
+
+    Term* term = apply(branch, DISCARD_FUNC, RefList(enclosingForLoop));
+
+    return term;
 }
 
 const int HIGHEST_INFIX_PRECEDENCE = 8;

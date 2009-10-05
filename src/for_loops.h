@@ -14,6 +14,8 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm);
 void setup_for_loop_pre_code(Term* forTerm);
 void setup_for_loop_post_code(Term* forTerm);
 
+Term* find_enclosing_for_loop(Term* term);
+
 } // namespace circa
 
 #endif // CIRCA_FOR_LOOPS_INCLUDED

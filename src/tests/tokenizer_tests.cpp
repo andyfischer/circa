@@ -166,13 +166,15 @@ void test_keywords()
 void test_keywords2()
 {
     token::TokenList results;
-    token::tokenize("and or", results);
+    token::tokenize("and or discard", results);
 
-    test_assert(results.size() == 3);
+    test_assert(results.size() == 5);
     test_assert(results[0].text == "and");
     test_assert(results[0].match == token::AND);
     test_assert(results[2].text == "or");
     test_assert(results[2].match == token::OR);
+    test_assert(results[4].text == "discard");
+    test_assert(results[4].match == token::DISCARD);
 }
 
 void test_identifiers_that_look_like_keywords()
