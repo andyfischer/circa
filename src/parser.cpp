@@ -884,9 +884,10 @@ Term* discard_statement(Branch& branch, TokenStream& tokens)
         return compile_error_for_line(branch, tokens, startPosition,
                 "'discard' can only be used inside a for loop");
 
-    Term* term = apply(branch, DISCARD_FUNC, RefList(enclosingForLoop));
+    Term* result = apply(branch, DISCARD_FUNC, RefList(enclosingForLoop));
 
-    return term;
+    set_source_location(result, startPosition, tokens);
+    return result;
 }
 
 const int HIGHEST_INFIX_PRECEDENCE = 8;

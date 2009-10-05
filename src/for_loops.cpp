@@ -240,6 +240,9 @@ void evaluate_for_loop(Term* forTerm)
             assign_value(iteratorResult, listOutputBr[listOutputWriteHead++]);
         }
     }
+
+    if (listOutput != NULL && as_branch(listOutput).length() > listOutputWriteHead)
+        as_branch(listOutput).shorten(listOutputWriteHead);
 }
 
 Term* find_enclosing_for_loop(Term* term)
