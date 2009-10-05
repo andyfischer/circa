@@ -3,12 +3,6 @@ desired_window_size = [500 400]
 
 background(#042304)
 
-def rect_intersects_rect(Rect rect_a, Rect rect_b) : bool
-    intersects_on_x = (rect_a.x2 > rect_b.x1) and (rect_b.x2 > rect_a.x1)
-    intersects_on_y = (rect_a.y2 > rect_b.y1) and (rect_b.y2 > rect_a.y1)
-    return intersects_on_x and intersects_on_y
-end
-
 def rect_intersects_circle(Rect rect, Point circle_loc, number circle_radius) : bool
     -- lazy
     return rect_intersects_rect(rect, expand_rect(circle_loc, circle_radius, circle_radius))
@@ -40,7 +34,6 @@ ai_paddle_loc = [window.width - 50, approach(ball_loc.y, ai_speed)] : Point
 ai_paddle = expand_rect(ai_paddle_loc, paddle_depth, paddle_width)
 
 ball_is_being_introduced = (time - round_start_time) < 2.0
-
 
 if ball_loc.x + ball_radius < 0
     ai_points += 1
