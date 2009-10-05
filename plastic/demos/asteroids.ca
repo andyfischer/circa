@@ -118,12 +118,12 @@ bullets = map(move_bullet, bullets)
 
 -- Remove old bullets
 bullet_max_lifespan = 1.8
-def filter_bullet(Bullet bullet) : bool
-    return bullet.lifespan < bullet_max_lifespan
+for bullet in @bullets
+    bullet = bullet : Bullet
+    if bullet.lifespan >= bullet_max_lifespan
+        discard
+    end
 end
-
--- This syntax is crazy, it should just be filter(filter_bullet, bullets)
-bullets = filter(bullets, map(filter_bullet, bullets))
 
 -- Draw bullets
 for bullet in bullets
@@ -211,11 +211,9 @@ def point_distance(Point a, Point b) : number
 end
 
 
-filter_list = []
 spawned = []
 
--- This code is crazy b/c of language problems
-for asteroid in asteroids
+for asteroid in @asteroids
     asteroid = asteroid : Asteroid
     collides = false
 
@@ -230,15 +228,14 @@ for asteroid in asteroids
         end
     end
 
-    filter_list.append(not(collides))
+    if collides
+        discard
+    end
 
     if collides and asteroid.size > 10
         spawned.append(generate_child_asteroid(asteroid))
     end
 end
-
-
-asteroids = filter(asteroids, filter_list)
 
 for spawn in spawned
     asteroids.append(spawn)

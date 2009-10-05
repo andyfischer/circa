@@ -198,6 +198,11 @@ void test_for_loops()
     test_snippet("a = [1 2];for item in []; a.append(item); end", "a == [1 2]");
     test_snippet("a = [1 2];for i in a; i += 1; end", "a == [1 2]");
     test_snippet("a = [1 2];for i in @a; i += 1; end", "a == [2 3]");
+    test_snippet("a = [1 2 3];for i in @a; discard; end", "a == []");
+    //test_snippet("a = [1 2 3];for i in @a; if i == 1 discard end end", "a == [2 3]");
+    //test_snippet("a = [1 2 3];for i in @a; if i == 2 discard end end", "a == [1 3]");
+    //test_snippet("a = [1 2 3];for i in @a; if i == 3 discard end end", "a == [1 2]");
+    //test_snippet("a = [1 2 3];for i in @a; i += 1 if i == 3 discard end end", "a == [2 4]");
 }
 
 void register_tests()
