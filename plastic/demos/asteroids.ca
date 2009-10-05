@@ -29,21 +29,6 @@ speed_limit = 1.8
 bullet_speed = 200.0
 bullet_width = 2.0
 
-def random_location() : Point
-    return [rand() * window.width, rand() * window.height]
-end
-
-def random_norm_vector() : Point
-    angle = rand()
-    return [cos(angle) sin(angle)]
-end
-
-def rotate_point(Point point, number rotation) : Point
-    return [point.x*cos(rotation) - point.y*sin(rotation),
-        point.x*sin(rotation)+point.y*cos(rotation)]
-end
-
-
 -- Draw a background full of stars
 num_stars = 700
 for i in range(num_stars)
@@ -204,11 +189,6 @@ for asteroid in asteroids
 end
 
 -- check for collisions of asteroids and bullets
-
-def point_distance(Point a, Point b) : number
-    return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
-end
-
 
 spawned = []
 

@@ -7,7 +7,7 @@ def mouse_in(Rect b) : bool
   return (b.x1 < mouse.x) and (b.x2 > mouse.x) and (b.y1 < mouse.y) and (b.y2 > mouse.y)
 end
 
--- Information about the current window
+-- Information about the current window (passed in from main.cpp)
 type Window {
    int width
    int height
@@ -81,21 +81,53 @@ end
 
 -- magnitude of a 2d vector
 def magnitude(Point point) : number
+    "Returns the magnitude, or the distance from [0,0] to this point."
     return sqrt(sqr(point.x) + sqr(point.y))
 end
 
+def point_distance(Point a, Point b) : number
+    "Returns the distance between a and b."
+    return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
+end
+
+def rotate_point(Point p, number rotation) : Point
+    "Rotate p around [0,0] by the given angle. Angles are specified in the range 0..1."
+    return [p.x*cos(rotation) - p.y*sin(rotation),
+        p.x*sin(rotation)+p.y*cos(rotation)]
+end
+
+def random_location() : Point
+    "Return a random point that is inside the boundaries of the window."
+    return [rand() * window.width, rand() * window.height]
+end
+
+def random_norm_vector() : Point
+    "Return a random normalized vector"
+    angle = rand()
+    return [cos(angle) sin(angle)]
+end
+
 def norm(Point v) : Point
+    "Returns v normalized to be along the unit circle."
     m = magnitude(v)
     return [v.x / m, v.y / m]
 end
 
 def perpendicular(Point v) : Point
-    return [-v.y v.x]
+    "Returns a vector that is perpendicular to v, rotated clockwise."
+    return [v.y -v.x]
 end
 
 def expand_rect(Point center, number width, number height) : Rect
-    "Return a rectangle with the given center, width, and height"
+    "Return a rectangle with the given center, width, and height."
     return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
+end
+
+def rect_intersects_rect(Rect rect_a, Rect rect_b) : bool
+    "Return whether the two rectangles intersect."
+    intersects_on_x = (rect_a.x2 > rect_b.x1) and (rect_b.x2 > rect_a.x1)
+    intersects_on_y = (rect_a.y2 > rect_b.y1) and (rect_b.y2 > rect_a.y1)
+    return intersects_on_x and intersects_on_y
 end
 
 -- Drawing utils
@@ -115,7 +147,7 @@ def draw_thick_line(Point a, Point b, number width, Color color)
     gl.triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
 end
 
--- Stateful utils
+-- Stateful functions
 
 def approach(number target, number step) : number
     "Stateful function, returns a result which approaches 'target'. Each frame, this function will change at most by 'step'"
