@@ -10,6 +10,7 @@ namespace circa {
      [0] #is_first_iteration
      [1] #any_iterations
      [2] #modify_list
+     [3] #discard_called
    [2] #rebinds
    [3] iterator
    [4 .. n-2] user's code
@@ -52,6 +53,11 @@ Term* get_for_loop_modify_list(Term* forTerm)
     return as_branch(forTerm)[1]->asBranch()[2];
 }
 
+Term* get_for_loop_discard_called(Term* forTerm)
+{
+    return as_branch(forTerm)[1]->asBranch()[3];
+}
+
 Branch& get_for_loop_rebinds_for_outer(Term* forTerm)
 {
     Branch& contents = as_branch(forTerm);
@@ -66,6 +72,7 @@ void setup_for_loop_pre_code(Term* forTerm)
     bool_value(attributes, false, "#is_first_iteration");
     bool_value(attributes, false, "#any_iterations");
     bool_value(attributes, false, "#modify_list");
+    bool_value(attributes, false, "#discard_called");
     create_branch(forContents, "#rebinds");
 }
 
@@ -167,7 +174,8 @@ void evaluate_for_loop(Term* forTerm)
     // Make sure state has the correct number of iterations
 
     int numIterations = as_branch(listTerm).length();
-    bool modifyList = get_for_loop_modify_list(forTerm);
+    bool modifyList = get_for_loop_modify_list(forTerm)->asBool();
+    bool& discardCalled = get_for_loop_discard_called(forTerm)->asBool();
 
     Term* listOutput = NULL;
     int listOutputWriteHead = 0;
@@ -199,6 +207,7 @@ void evaluate_for_loop(Term* forTerm)
 
     for (int i=0; i < numIterations; i++) {
         as_bool(isFirstIteration) = i == 0;
+        discardCalled = false;
 
         // Inject iterator value
         if (!value_fits_type(listTerm->asBranch()[i], iterator->type)) {
@@ -223,7 +232,7 @@ void evaluate_for_loop(Term* forTerm)
         persist_state_from_branch(codeBranch, stateBranch[i]->asBranch());
 
         // Possibly use this value to modify the list
-        if (listOutput != NULL) {
+        if (listOutput != NULL && !discardCalled) {
             Term* iteratorResult = codeBranch[iterator->name];
             Branch& listOutputBr = listOutput->asBranch();
             if (listOutputWriteHead >= listOutputBr.length())
