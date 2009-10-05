@@ -25,10 +25,17 @@ namespace for_function {
         return result.str();
     }
 
+    void evaluate_discard(Term* caller)
+    {
+
+    }
+
     void setup(Branch& kernel)
     {
         FOR_FUNC = import_function(kernel, evaluate, "for(List) : Code");
         function_t::get_to_source_string(FOR_FUNC) = toSourceString;
+
+        DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
     }
 }
 } // namespace circa

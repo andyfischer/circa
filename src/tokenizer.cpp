@@ -73,6 +73,7 @@ const char* get_token_text(int match)
         case INCLUDE: return "include";
         case AND: return "and";
         case OR: return "or";
+        case DISCARD: return "discard";
         case UNRECOGNIZED: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -272,6 +273,7 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, INCLUDE)) return;
         if (try_to_consume_keyword(context, AND)) return;
         if (try_to_consume_keyword(context, OR)) return;
+        if (try_to_consume_keyword(context, DISCARD)) return;
 
         consume_identifier(context);
         return;

@@ -18,6 +18,7 @@ extern Term* BRANCH_FUNC;
 extern Term* COMMENT_FUNC;
 extern Term* COPY_FUNC;
 extern Term* DESIRED_VALUE_FEEDBACK;
+extern Term* DISCARD_FUNC;
 extern Term* DIV_FUNC;
 extern Term* DO_ONCE_FUNC;
 extern Term* FEEDBACK_FUNC;

@@ -87,6 +87,7 @@ const int NAMESPACE = 65;
 const int INCLUDE = 66;
 const int AND = 67;
 const int OR = 68;
+const int DISCARD = 69;
 
 const int WHITESPACE = 70;
 const int NEWLINE = 71;

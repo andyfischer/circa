@@ -170,4 +170,20 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
     }
 }
 
+Term* find_enclosing_for_loop(Term* term)
+{
+    if (term == NULL)
+        return NULL;
+
+    if (term->function == FOR_FUNC) {
+        return term;
+    }
+
+    Branch* branch = term->owningBranch;
+    if (branch == NULL)
+        return NULL;
+
+    return find_enclosing_for_loop(branch->owningTerm);
+}
+
 } // namespace circa
