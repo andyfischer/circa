@@ -22,7 +22,8 @@ namespace for_function {
 
     void evaluate_discard(Term* caller)
     {
-
+        Term* forTerm = caller->input(0);
+        get_for_loop_discard_called(forTerm)->asBool() = true;
     }
 
     void setup(Branch& kernel)
