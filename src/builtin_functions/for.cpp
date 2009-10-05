@@ -5,11 +5,6 @@
 namespace circa {
 namespace for_function {
 
-    void evaluate(Term* caller)
-    {
-        evaluate_for_loop(caller, caller->input(0));
-    }
-
     std::string toSourceString(Term* term)
     {
         std::stringstream result;
@@ -32,7 +27,7 @@ namespace for_function {
 
     void setup(Branch& kernel)
     {
-        FOR_FUNC = import_function(kernel, evaluate, "for(List) : Code");
+        FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(List) : Code");
         function_t::get_to_source_string(FOR_FUNC) = toSourceString;
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");

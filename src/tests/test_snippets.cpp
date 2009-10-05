@@ -56,6 +56,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         std::cout << "Runtime error in: " << get_current_test_name() << std::endl;
         print_runtime_error_formatted(code, std::cout);
         std::cout << std::endl;
+        std::cout << branch_to_string_raw(code);
         declare_current_test_failed();
         return;
     }
@@ -189,12 +190,14 @@ void test_boolean_ops()
     test_snippet("", "false and true or true");
 }
 
-void test_list_operations()
+void test_for_loops()
 {
     test_snippet("l = []; for i in range(3); l.append(i); end", "l == [0 1 2]");
     test_snippet("a = [3 2 1]; b = [];for item in a; b.append(item); end", "b == [3 2 1]");
     test_snippet("a = [2 4]; b = [1 3];for item in a; b.append(item); end", "b == [1 3 2 4]");
     test_snippet("a = [1 2];for item in []; a.append(item); end", "a == [1 2]");
+    test_snippet("a = [1 2];for i in a; i += 1; end", "a == [1 2]");
+    test_snippet("a = [1 2];for i in @a; i += 1; end", "a == [2 3]");
 }
 
 void register_tests()
@@ -207,7 +210,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_blocks);
     REGISTER_TEST_CASE(test_snippets::test_rounding);
     REGISTER_TEST_CASE(test_snippets::test_boolean_ops);
-    REGISTER_TEST_CASE(test_snippets::test_list_operations);
+    REGISTER_TEST_CASE(test_snippets::test_for_loops);
 }
 
 } // namespace test_snippets
