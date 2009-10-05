@@ -587,6 +587,14 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     tokens.consume(IN_TOKEN);
     possible_whitespace(tokens);
 
+    // check for @ operator
+    bool foundAtOperator = false;
+    if (tokens.nextIs(AT_SIGN)) {
+        tokens.consume(AT_SIGN);
+        foundAtOperator = true;
+        possible_whitespace(tokens);
+    }
+
     Term* listExpr = infix_expression(branch, tokens);
     recursively_mark_terms_as_occuring_inside_an_expression(listExpr);
 
@@ -596,6 +604,8 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Term* forTerm = apply(branch, FOR_FUNC, RefList(listExpr));
     Branch& innerBranch = as_branch(forTerm);
     setup_for_loop_pre_code(forTerm);
+
+    get_for_loop_modify_list(forTerm)->asBool() = foundAtOperator;
 
     forTerm->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 

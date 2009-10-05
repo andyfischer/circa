@@ -6,14 +6,15 @@ namespace circa {
 
 /* Organization of for loop contents:
    [0] #state
-   [1] #is_first_iteration
+   [1] #attributes
+     [0] #is_first_iteration
+     [1] #any_iterations
+     [2] #modify_list
    [2] #rebinds
    [3] iterator
-   [4 .. n-3] user's code
-   [n-2] #any_iterations
+   [4 .. n-2] user's code
    [n-1] #rebinds_for_outer
 */
-
 
 Branch& get_for_loop_state(Term* forTerm)
 {
@@ -27,8 +28,7 @@ Branch& get_for_loop_iteration_state(Term* forTerm, int index)
 
 Term* get_for_loop_is_first_iteration(Term* forTerm)
 {
-    Branch& contents = as_branch(forTerm);
-    return contents[1];
+    return as_branch(forTerm)[1]->asBranch()[0];
 }
 
 Branch& get_for_loop_rebinds(Term* forTerm)
@@ -44,8 +44,12 @@ Term* get_for_loop_iterator(Term* forTerm)
 
 Term* get_for_loop_any_iterations(Term* forTerm)
 {
-    Branch& contents = as_branch(forTerm);
-    return contents[contents.length()-2];
+    return as_branch(forTerm)[1]->asBranch()[1];
+}
+
+Term* get_for_loop_modify_list(Term* forTerm)
+{
+    return as_branch(forTerm)[1]->asBranch()[2];
 }
 
 Branch& get_for_loop_rebinds_for_outer(Term* forTerm)
@@ -58,7 +62,10 @@ void setup_for_loop_pre_code(Term* forTerm)
 {
     Branch& forContents = as_branch(forTerm);
     create_list(forContents, "#state");
-    create_value(forContents, BOOL_TYPE, "#is_first_iteration");
+    Branch& attributes = create_branch(forContents, "#attributes");
+    bool_value(attributes, false, "#is_first_iteration");
+    bool_value(attributes, false, "#any_iterations");
+    bool_value(attributes, false, "#modify_list");
     create_branch(forContents, "#rebinds");
 }
 
@@ -84,13 +91,29 @@ void create_rebind_branch(Branch& rebinds, Branch& source, Term* rebindCondition
 void setup_for_loop_post_code(Term* forTerm)
 {
     Branch& forContents = as_branch(forTerm);
+    std::string listName = forTerm->input(0)->name;
+    Branch& outerScope = *forTerm->owningBranch;
 
     // Rebind any names that are used inside this for loop, using their
     // looped version.
     Branch& rebinds = get_for_loop_rebinds(forTerm);
-    create_rebind_branch(rebinds, forContents, get_for_loop_is_first_iteration(forTerm), true);
+    {
+        rebinds.clear();
 
-    Branch& outerScope = *forContents.owningTerm->owningBranch;
+        std::vector<std::string> reboundNames;
+        list_names_that_this_branch_rebinds(forContents, reboundNames);
+
+        for (unsigned i=0; i < reboundNames.size(); i++) {
+            std::string name = reboundNames[i];
+            if (name == listName)
+                continue;
+            Term* outerVersion = find_named(outerScope, name);
+            Term* innerVersion = forContents[name];
+
+            apply(rebinds, IF_EXPR_FUNC, RefList(get_for_loop_is_first_iteration(forTerm),
+                outerVersion, innerVersion), name);
+        }
+    }
 
     // Rewrite code to use these rebound versions
     for (int i=0; i < rebinds.length(); i++) {
@@ -106,21 +129,52 @@ void setup_for_loop_post_code(Term* forTerm)
     // Now do another rebinding, this one has copies that we expose outside of this branch.
     // If the for loop isn't executed at all then we use outer versions, similar to an if()
     // rebinding.
-    Term* anyIterations = create_value(forContents, BOOL_TYPE, "#any_iterations");
     Branch& rebindsForOuter = create_branch(forContents, "#rebinds_for_outer");
+    Term* anyIterations = get_for_loop_any_iterations(forTerm);
 
-    create_rebind_branch(rebindsForOuter, forContents, anyIterations, false);
+    {
+        rebindsForOuter.clear();
+
+        std::vector<std::string> reboundNames;
+        list_names_that_this_branch_rebinds(forContents, reboundNames);
+
+        for (unsigned i=0; i < reboundNames.size(); i++) {
+            std::string name = reboundNames[i];
+            if (name == listName)
+                continue;
+            Term* outerVersion = find_named(outerScope, name);
+            Term* innerVersion = forContents[name];
+
+            apply(rebindsForOuter, IF_EXPR_FUNC,
+                    RefList(anyIterations, innerVersion, outerVersion), name);
+        }
+    }
+
+    // Also, possibly rebind the list name.
+    if (get_for_loop_modify_list(forTerm)->asBool() && listName != "") {
+        create_value(rebindsForOuter, LIST_TYPE, listName);
+    }
+
     expose_all_names(rebindsForOuter, outerScope);
 }
 
-void evaluate_for_loop(Term* forTerm, Term* listTerm)
+void evaluate_for_loop(Term* forTerm)
 {
+    Term* listTerm = forTerm->input(0);
     Branch& codeBranch = as_branch(forTerm);
     Branch& stateBranch = get_for_loop_state(forTerm);
 
     // Make sure state has the correct number of iterations
 
     int numIterations = as_branch(listTerm).length();
+    bool modifyList = get_for_loop_modify_list(forTerm);
+
+    Term* listOutput = NULL;
+    int listOutputWriteHead = 0;
+
+    if (modifyList) {
+        listOutput = get_for_loop_rebinds_for_outer(forTerm)[listTerm->name];
+    }
 
     resize_list(stateBranch, as_branch(listTerm).length(), BRANCH_TYPE);
 
@@ -167,6 +221,15 @@ void evaluate_for_loop(Term* forTerm, Term* listTerm)
 
         // Persist stateful terms
         persist_state_from_branch(codeBranch, stateBranch[i]->asBranch());
+
+        // Possibly use this value to modify the list
+        if (listOutput != NULL) {
+            Term* iteratorResult = codeBranch[iterator->name];
+            Branch& listOutputBr = listOutput->asBranch();
+            if (listOutputWriteHead >= listOutputBr.length())
+                create_value(listOutputBr, iteratorResult->type);
+            assign_value(iteratorResult, listOutputBr[listOutputWriteHead++]);
+        }
     }
 }
 
@@ -175,9 +238,8 @@ Term* find_enclosing_for_loop(Term* term)
     if (term == NULL)
         return NULL;
 
-    if (term->function == FOR_FUNC) {
+    if (term->function == FOR_FUNC)
         return term;
-    }
 
     Branch* branch = term->owningBranch;
     if (branch == NULL)
