@@ -44,7 +44,6 @@ Term* literal_list(Branch& branch, TokenStream& tokens);
 Term* plain_branch(Branch& branch, TokenStream& tokens);
 Term* namespace_block(Branch& branch, TokenStream& tokens);
 Term* identifier_or_function_call(Branch& branch, TokenStream& tokens);
-Term* accessor(Branch& branch, TokenStream& tokens);
 
 } // namespace parser
 } // namespace circa

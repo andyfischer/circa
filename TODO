@@ -27,12 +27,6 @@ Bugs:
    Doesn't work: something.field += x
    Doesn't work: something.field[i] = x
 
- - Dot operator doesn't work after an expression.
-   This should try to get field 'a' from the result of 'f' but it doesn't work:
-     f().y
-   Also this doesn't work:
-     (a).y
-
  - When reloading a branch, we need to search the whole world for references to the 
    old state, and update those references.
 
