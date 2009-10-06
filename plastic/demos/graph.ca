@@ -15,5 +15,5 @@ gl.line_strip([axis_center-[0 200] axis_center+[0 200]] #888)
 gl.line_strip([axis_center-[200 0] axis_center+[200 0]] #888)
 
 -- draw the function
-points = map(map_point, range(400))
+points = map(map_point, 0..400)
 gl.line_strip(points, #f00)

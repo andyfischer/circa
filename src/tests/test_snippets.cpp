@@ -192,7 +192,7 @@ void test_boolean_ops()
 
 void test_for_loops()
 {
-    test_snippet("l = []; for i in range(3); l.append(i); end", "l == [0 1 2]");
+    test_snippet("l = []; for i in 0..3; l.append(i); end", "l == [0 1 2]");
     test_snippet("a = [3 2 1]; b = [];for item in a; b.append(item); end", "b == [3 2 1]");
     test_snippet("a = [2 4]; b = [1 3];for item in a; b.append(item); end", "b == [1 3 2 4]");
     test_snippet("a = [1 2];for item in []; a.append(item); end", "a == [1 2]");

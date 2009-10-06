@@ -26,8 +26,8 @@ num_tiles_y = window.height // tile_size
 num_tiles = num_tiles_x * num_tiles_y
 
 -- draw the checkerboard in the background
-for x in range(num_tiles_x)
-  for y in range(num_tiles_y)
+for x in 0..num_tiles_x
+  for y in 0..num_tiles_y
     box_tl = [x:int * tile_size, y:int * tile_size] : Point
     box_br = box_tl + [tile_size, tile_size]
     box_tr = [box_br.x box_tl.y]
@@ -129,7 +129,7 @@ state falling_group_pos = [0 4 0] : FallingGroupPosition
 fall_speed = 80.0
 state number tile_fall_distance = tile_size
 
-state board = map(initialize_board_piece, range(num_tiles))
+state board = map(initialize_board_piece, 0..num_tiles)
 
 def rotate_falling_group(List group, int rot) : List
     def rotate_piece(Piece piece) : Piece
@@ -229,7 +229,7 @@ for piece in positioned_falling_group
 end
 
 -- Draw board
-for index in range(num_tiles)
+for index in 0..num_tiles
   piece = board[index] : BoardPiece
   loc = board_index_to_loc(index)
   if piece.filled
@@ -262,7 +262,7 @@ end
 def find_highest_tile_for_x(int tile_x) : int
     -- this code is blah
     found = 0
-    for i in range(num_tiles_y)
+    for i in 0..num_tiles_y
         board_piece = board[board_loc_to_index([tile_x, i])] : BoardPiece
         if board_piece.filled and found == 0
             found = i
@@ -300,7 +300,7 @@ def get_path_segment(int tile_x) : PathSegment
     end
 end
 
-path = map(get_path_segment, range(num_tiles_x))
+path = map(get_path_segment, 0..num_tiles_x)
 for segment in path
     segment = segment : PathSegment
     draw_thick_line(segment.l segment.r 2.0 #f00)

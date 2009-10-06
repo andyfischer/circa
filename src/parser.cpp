@@ -895,6 +895,7 @@ int get_infix_precedence(int match)
 {
     switch(match) {
         case tokenizer::COLON:
+        case tokenizer::TWO_DOTS:
             return 8;
         case tokenizer::STAR:
         case tokenizer::SLASH:
@@ -954,6 +955,7 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "!=") return "not_equals";
     else if (infix == ":") return "annotate_type";
     else if (infix == "<-") return "feedback";
+    else if (infix == "..") return "range";
     else return "#unrecognized";
 }
 

@@ -7,19 +7,20 @@ namespace range_function {
 
     void evaluate(Term* caller)
     {
-        int max = as_int(caller->input(0));
+        int start = as_int(caller->input(0));
+        int max = as_int(caller->input(1));
         
         Branch& branch = as_branch(caller);
 
-        resize_list(branch, max, INT_TYPE);
+        resize_list(branch, max-start, INT_TYPE);
         
-        for (int i=0; i < max; i++)
+        for (int i=start; i < max; i++)
             as_int(branch[i]) = i;
     }
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "range(int n) : List; 'Return a list of integers from 0 to n' end");
+        import_function(kernel, evaluate, "range(int start, int max) : List; 'Return a list of integers from start to max-1' end");
     }
 }
 } // namespace circa
