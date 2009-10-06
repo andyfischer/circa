@@ -1108,7 +1108,7 @@ Term* atom(Branch& branch, TokenStream& tokens)
 
     // identifier?
     if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AT_SIGN)) {
-        result = identifier(branch, tokens);
+        result = identifier_or_function_call(branch, tokens);
         assert(result != NULL);
     }
     // literal integer?
@@ -1412,7 +1412,7 @@ Term* unknown_identifier(Branch& branch, std::string const& name)
     return term;
 }
 
-Term* identifier(Branch& branch, TokenStream& tokens)
+Term* identifier_or_function_call(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
@@ -1516,19 +1516,6 @@ Term* identifier(Branch& branch, TokenStream& tokens)
             nameLookupFailed = true;
             break;
         }
-
-        // Now possibly turn this into an implicit function call.
-        bool implicitFunctionCall = is_callable(head) && (ids.size() > 2) &&
-            (name_index < (ids.size()-1));
-
-        // TODO: Should remove the thing that says (ids.size() > 2). That part is there for
-        // old behavior where just typing a function name would reference that function
-        // instead of call it.
-
-        if (implicitFunctionCall) {
-            head = apply(branch, head, implicitCallInputs);
-            head->stringProp("syntaxHints:declarationStyle") = "dot-concat";
-        }
     }
 
     if (tokens.nextIs(LPAREN)) {
@@ -1583,6 +1570,42 @@ Term* identifier(Branch& branch, TokenStream& tokens)
     assert(head != NULL);
     set_source_location(head, startPosition, tokens);
     return head;
+}
+
+Term* accessor(Branch& branch, TokenStream& tokens)
+{
+    int startPosition = tokens.getPosition();
+    std::string ident = tokens.consume(IDENTIFIER);
+
+    Term* result = find_named(branch, ident);
+    if (result == NULL)
+        result = unknown_identifier(branch, ident);
+
+    // Array access syntax
+    if (tokens.nextIs(LBRACKET)) {
+        tokens.consume(LBRACKET);
+        Term* index = infix_expression(branch, tokens);
+
+        if (!tokens.nextIs(RBRACKET))
+            return compile_error_for_line(branch, tokens, startPosition, "Expected ]");
+
+        tokens.consume(RBRACKET);
+
+        result = apply(branch, GET_INDEX_FUNC, RefList(result, index));
+    } else if (tokens.nextIs(DOT)) {
+        tokens.consume(DOT);
+
+        if (!tokens.nextIs(IDENTIFIER))
+            return compile_error_for_line(branch, tokens, startPosition,
+                    "Expected identifier");
+
+        std::string rident = tokens.consume(IDENTIFIER);
+
+        result = apply(branch, GET_FIELD_FUNC, RefList(result,
+                    string_value(branch, rident)));
+    }
+
+    return result;
 }
 
 } // namespace parser
