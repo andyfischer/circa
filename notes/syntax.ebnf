@@ -1,0 +1,49 @@
+# This is not a strict definition, it omits things like whitespace.
+# It's also unfinished. Enjoy!
+
+statement_list = { statement }
+statement = comment
+          | function_decl
+          | type_decl
+          | if_block
+          | for_block
+          | do_once_block
+          | stateful_value_decl
+          | return_statement
+          | include_statement
+          | discard_statement
+          | expression_statement
+
+expression_statement = [ accessor '=' ] infix_expression_0
+
+accessor = identifier [ '[' infix_expression_0 ']' ] [ '.' accessor ]
+
+infix_expression_0 = infix_expression_1 [(':=' | '<-') infix_expression_0]
+infix_expression_1 = infix_expression_2 [('->') infix_expression_1]
+infix_expression_2 = infix_expression_3 [('+=' | '-=' | '*=' | '/=') infix_expression_2]
+infix_expression_3 = infix_expression_4
+infix_expression_4 = infix_expression_5 [('and' | 'or') infix_expression_4]
+infix_expression_5 = infix_expression_6 [('<=' | '<' | '>' | '>=') infix_expression_5]
+infix_expression_6 = infix_expression_7 [('+' | '-') infix_expression_6]
+infix_expression_7 = infix_expression_8 [('*' | '/' | '//') infix_expression_7]
+infix_expression_8 = unary_expression [(':') infix_expression_8]
+
+unary_expression = ('-' subscripted_atom) | ('@' subscripted_atom) | subscripted_atom
+
+subscripted_atom = atom [ '[' infix_expression_0 ']' ]
+
+atom = identifier_or_function_call
+     | literal_integer
+     | literal_string
+     | literal_bool
+     | literal_hex
+     | literal_float
+     | literal_color
+     | literal_list
+     | plain_branch
+     | namespace_block
+     | '(' infix_expression_0 ')'
+
+identifier_or_function_call = accessor [ '(' argument_list ')' ]
+
+argument_list = infix_expression_0 [',' argument_list]

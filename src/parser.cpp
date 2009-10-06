@@ -206,7 +206,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
 Term* comment(Branch& branch, TokenStream& tokens)
 {
     std::string commentText;
-   
+
     if (!tokens.nextIs(NEWLINE))
         commentText = tokens.consume();
 
@@ -473,7 +473,6 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
 
         if (tokens.nextIs(IDENTIFIER))
             fieldName = tokens.consume(IDENTIFIER);
-
 
         Term* fieldType = find_type(branch, fieldTypeName);
 
