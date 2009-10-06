@@ -52,6 +52,7 @@ const char* get_token_text(int match)
         case DOUBLE_AMPERSAND: return "&&";
         case DOUBLE_VERTICAL_BAR: return "||";
         case SEMICOLON: return ";";
+        case TWO_DOTS: return "..";
         case ELLIPSIS: return "...";
         case WHITESPACE: return "WHITESPACE";
         case NEWLINE: return "NEWLINE";
@@ -351,14 +352,18 @@ void top_level_consume_token(TokenizeContext &context)
         case '.':
             context.consume();
 
-            if ((context.next(0) == '.') && (context.next(1) == '.')) {
+            if (context.next(0) == '.') {
                 context.consume();
-                context.consume();
-                context.push(ELLIPSIS);
-                return;
-            }
 
-            context.push(DOT);
+                if (context.next(0) == '.') {
+                    context.consume();
+                    context.push(ELLIPSIS); 
+                } else {
+                    context.push(TWO_DOTS);
+                }
+            } else {
+                context.push(DOT);
+            }
             return;
         case '?':
             context.consume();
@@ -582,6 +587,11 @@ void consume_number(TokenizeContext &context)
             // If we've already encountered a dot, finish and don't consume
             // this one.
             if (dot_encountered)
+                break;
+
+            // Special case: if this dot is followed by another dot, then it should
+            // be tokenized as TWO_DOTS, so don't consume it here.
+            if (context.next(1) == '.')
                 break;
 
             text << context.consume();

@@ -77,6 +77,15 @@ void test_floats()
     test_assert(results2.size() == 1);
     test_assert(results2[0].text == "5.200");
     test_assert(results2[0].match == token::FLOAT_TOKEN);
+
+    // Make sure that it ignores two dots. There once was a bug where
+    // 0..1 would get parsed as 0. and then .1
+    token::TokenList dotted_results;
+    token::tokenize("0..1", dotted_results);
+    test_assert(dotted_results.size() == 3);
+    test_assert(dotted_results[0].match == token::INTEGER);
+    test_assert(dotted_results[1].match == token::TWO_DOTS);
+    test_assert(dotted_results[2].match == token::INTEGER);
 }
 
 void test_symbols1()
@@ -133,12 +142,14 @@ void test_symbols2()
 void test_symbols3()
 {
     token::TokenList results;
-    token::tokenize("&&!=", results);
-    test_assert(results.size() == 2);
+    token::tokenize("&&!=..", results);
+    test_assert(results.size() == 3);
     test_assert(results[0].text == "&&");
     test_assert(results[0].match == token::DOUBLE_AMPERSAND);
     test_assert(results[1].text == "!=");
     test_assert(results[1].match == token::NOT_EQUALS);
+    test_assert(results[2].text == "..");
+    test_assert(results[2].match == token::TWO_DOTS);
 }
 
 void test_keywords()

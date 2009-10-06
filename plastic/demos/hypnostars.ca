@@ -11,7 +11,7 @@ def random_star() : Star
 end
 
 num_stars = 500
-for star in range(num_stars)
+for star in 0..num_stars
     state angle = rand()
     state Star star = random_star()
     state Color color = random_color()

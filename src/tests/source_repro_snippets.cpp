@@ -218,8 +218,8 @@ void reproduce_lists() {
 }
 
 void reproduce_for_loop() {
-    round_trip_source("for x in range(1)\nend");
-    round_trip_source("  for x in range(1)\nend");
+    round_trip_source("for x in 0..1\nend");
+    round_trip_source("  for x in 0..1\nend");
     round_trip_source("for x in [5]\nend");
     round_trip_source("for x in [1  ,2 ;3 ]\nend");
     round_trip_source("for x in [1]\n   print(x)\nend");

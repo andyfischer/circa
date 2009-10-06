@@ -31,7 +31,7 @@ bullet_width = 2.0
 
 -- Draw a background full of stars
 num_stars = 700
-for i in range(num_stars)
+for i in 0..num_stars
     state Point loc = random_location()
     state Color color = [rand(.2 .6) .3 rand(.5 1) 1] 
     gl.points([loc] color)
@@ -141,7 +141,7 @@ def generate_asteroid(number size) : Asteroid
     end
 
     rotation = rand() * .2 - .1
-    return [map(get_edge, range(10)), random_location(), random_norm_vector()*10, 0, rotation size 0]
+    return [map(get_edge, 0..10), random_location(), random_norm_vector()*10, 0, rotation size 0]
 end
 
 def generate_child_asteroid(Asteroid parent) : Asteroid
@@ -152,13 +152,13 @@ def generate_child_asteroid(Asteroid parent) : Asteroid
     end
     rotation = rand() * .2 - .1
     speed = rand()*20 + 20.0
-    return [map(get_edge, range(10)), parent.location, random_norm_vector()*speed, 0, rotation size 0]
+    return [map(get_edge, 0..10), parent.location, random_norm_vector()*speed, 0, rotation size 0]
 end
 
 state List asteroids = []
 state bool initialized = false
 if not(initialized)
-    for i in range(3)
+    for i in 0..3
         asteroids.append(generate_asteroid(asteroid_starting_size))
     end
     initialized = true

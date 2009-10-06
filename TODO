@@ -14,9 +14,6 @@ Bugs:
    Like this: point.x := 1
    Priority: Low (Assignment is discouraged)
 
- - If a subroutine is declared with a return type that isn't a valid type, there's
-   a runtime abort trap.
-
  - Can't comment out something inside of a literal list
 
  - In an evaluation function, using to_float on something that is not a float, will cause
@@ -34,9 +31,7 @@ Bugs:
 
 Tasks:
  - Need an efficient + safe way to share output values across terms
- - Range syntax, like this: [1..100] or 1..100
  - Block syntax, like how it's easy to pass a block in ruby
- - Better reporting of runtime errors (include source line)
 
 Big tasks:
  - Parametrized/generic types

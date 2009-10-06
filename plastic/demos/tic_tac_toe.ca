@@ -50,8 +50,8 @@ type BoardSpace {
 
 def initialize_board_spaces() : List
     board_spaces = []
-    for x in range(3)
-        for y in range(3)
+    for x in 0..3
+        for y in 0..3
             board_spaces.append([player.none x y
                 [board_left + (x+.5) * square_size, board_top + (y+.5) * square_size]])
         end
@@ -106,7 +106,7 @@ def get_winner(List board_spaces) : WinnerInformation
 
     result = WinnerInformation()
 
-    for i in range(3)
+    for i in 0..3
         i = i : int
         horizontal_winner = is_winner_across_line([[i 0] [i 1] [i 2]])
         vertical_winner = is_winner_across_line([[0 i] [1 i] [2 i]])

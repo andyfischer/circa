@@ -27,7 +27,7 @@ def draw_star(Star star)
     gl.triangles([outer_point l_point star.loc, star.loc r_point outer_point] star_color)
   end
 
-  for t in range(num_points)
+  for t in 0..num_points
     draw_tip(t)
   end
 end

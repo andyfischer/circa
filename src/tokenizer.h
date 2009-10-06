@@ -67,6 +67,7 @@ const int AMPERSAND = 45;
 const int DOUBLE_AMPERSAND = 38;
 const int DOUBLE_VERTICAL_BAR = 39;
 const int SEMICOLON = 40;
+const int TWO_DOTS = 46;
 const int ELLIPSIS = 42;
 
 const int DEF = 51;

@@ -105,7 +105,7 @@ void test_list()
 void test_range()
 {
     Branch branch;
-    Term* t = branch.eval("range(5)");
+    Term* t = branch.eval("range(0,5)");
 
     test_assert(as_branch(t).length() == 5);
     for (int i=0; i < 5; i++)
