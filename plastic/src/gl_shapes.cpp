@@ -112,7 +112,8 @@ void gl_circle(Term* caller)
 
     _unpack_gl_color(color);
 
-    int control_points = int(radius);
+    int control_points = int(radius/3) + 10;
+    if (control_points < 15) control_points = 15;
 
     glBegin(GL_TRIANGLE_FAN);
 

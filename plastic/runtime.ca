@@ -130,6 +130,10 @@ def rect_intersects_rect(Rect rect_a, Rect rect_b) : bool
     return intersects_on_x and intersects_on_y
 end
 
+def random_color() : Color
+    return [rand() rand() rand() rand()]
+end
+
 -- Drawing utils
 
 def draw_box(Rect box, Color color)
