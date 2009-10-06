@@ -1,0 +1,23 @@
+
+type Star {
+  number size
+  Point location
+}
+
+background(#000)
+
+def random_star() : Star
+    return [rand()*8 random_location()]
+end
+
+num_stars = 500
+for star in range(num_stars)
+    state angle = rand()
+    state Star star = random_star()
+    state Color color = random_color()
+
+    gl.circle(star.location+[cos(angle) sin(angle)]*30 star.size color)
+
+    angle += time_delta
+    angle = mod(angle,1)
+end
