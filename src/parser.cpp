@@ -1070,14 +1070,15 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
     return subscripted_atom(branch, tokens);
 }
 
-Term* subscripted_atom(Branch& branch, TokenStream& tokens)
+// Tries to parse an index access or a field access, and returns a new term.
+// May return the same term, and may return a term with a static error.
+// Index access example:
+//   a[0]
+// Field access example:
+//   a.b 
+static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head)
 {
     int startPosition = tokens.getPosition();
-
-    Term* result = atom(branch, tokens);
-
-    if (has_static_error(result))
-        return result;
 
     if (tokens.nextIs(LBRACKET)) {
         tokens.consume(LBRACKET);
@@ -1091,14 +1092,43 @@ Term* subscripted_atom(Branch& branch, TokenStream& tokens)
 
         tokens.consume(RBRACKET);
 
-        result = apply(branch, GET_INDEX_FUNC, RefList(result, subscript));
+        Term* result = apply(branch, GET_INDEX_FUNC, RefList(head, subscript));
         get_input_syntax_hint(result, 1, "preWhitespace") = postLbracketWs;
         set_source_location(result, startPosition, tokens);
         return result;
-    }
-    else {
+
+    } else if (tokens.nextIs(DOT)) {
+        tokens.consume(DOT);
+
+        if (!tokens.nextIs(IDENTIFIER))
+            return compile_error_for_line(branch, tokens, startPosition,
+                    "Expected identifier after .");
+
+        std::string ident = tokens.consume(IDENTIFIER);
+        Term* identTerm = string_value(branch, ident);
+
+        Term* result = apply(branch, GET_FIELD_FUNC, RefList(head, identTerm));
+        set_source_location(result, startPosition, tokens);
         return result;
+    } else {
+        return head;
     }
+}
+
+Term* subscripted_atom(Branch& branch, TokenStream& tokens)
+{
+    //int startPosition = tokens.getPosition();
+
+    Term* result = atom(branch, tokens);
+
+    do {
+        Term* subscripted_result = possible_subscript(branch, tokens, result);
+        if (has_static_error(result))
+            return subscripted_result;
+        if (result == subscripted_result)
+            return result;
+        result = subscripted_result;
+    } while(true);
 }
 
 Term* atom(Branch& branch, TokenStream& tokens)
@@ -1570,42 +1600,6 @@ Term* identifier_or_function_call(Branch& branch, TokenStream& tokens)
     assert(head != NULL);
     set_source_location(head, startPosition, tokens);
     return head;
-}
-
-Term* accessor(Branch& branch, TokenStream& tokens)
-{
-    int startPosition = tokens.getPosition();
-    std::string ident = tokens.consume(IDENTIFIER);
-
-    Term* result = find_named(branch, ident);
-    if (result == NULL)
-        result = unknown_identifier(branch, ident);
-
-    // Array access syntax
-    if (tokens.nextIs(LBRACKET)) {
-        tokens.consume(LBRACKET);
-        Term* index = infix_expression(branch, tokens);
-
-        if (!tokens.nextIs(RBRACKET))
-            return compile_error_for_line(branch, tokens, startPosition, "Expected ]");
-
-        tokens.consume(RBRACKET);
-
-        result = apply(branch, GET_INDEX_FUNC, RefList(result, index));
-    } else if (tokens.nextIs(DOT)) {
-        tokens.consume(DOT);
-
-        if (!tokens.nextIs(IDENTIFIER))
-            return compile_error_for_line(branch, tokens, startPosition,
-                    "Expected identifier");
-
-        std::string rident = tokens.consume(IDENTIFIER);
-
-        result = apply(branch, GET_FIELD_FUNC, RefList(result,
-                    string_value(branch, rident)));
-    }
-
-    return result;
 }
 
 } // namespace parser

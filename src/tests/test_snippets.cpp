@@ -205,6 +205,12 @@ void test_for_loops()
     //test_snippet("a = [1 2 3];for i in @a; i += 1 if i == 3 discard end end", "a == [2 4]");
 }
 
+void test_subscripting()
+{
+    test_snippet("l = [[[1]]]", "l[0][0][0] == 1");
+    test_snippet("def return_point() : Point return [8 9] end", "return_point().x == 8");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
@@ -216,6 +222,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_rounding);
     REGISTER_TEST_CASE(test_snippets::test_boolean_ops);
     REGISTER_TEST_CASE(test_snippets::test_for_loops);
+    REGISTER_TEST_CASE(test_snippets::test_subscripting);
 }
 
 } // namespace test_snippets
