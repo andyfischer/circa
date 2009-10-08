@@ -14,13 +14,16 @@ void compound_types()
     Term* MyType = branch.eval("type MyType { int myint, string astr }");
     test_assert(MyType != NULL);
     test_assert(is_type(MyType));
-    test_assert(as_type(MyType).prototype.length() == 2);
-    test_assert(as_type(MyType).prototype[0]->name == "myint");
-    test_assert(as_type(MyType).prototype[0]->type == INT_TYPE);
-    test_assert(as_type(MyType).findFieldIndex("myint") == 0);
-    test_assert(as_type(MyType).prototype[1]->name == "astr");
-    test_assert(as_type(MyType).prototype[1]->type == STRING_TYPE);
-    test_assert(as_type(MyType).findFieldIndex("astr") == 1);
+    Branch& prototype = type_t::get_prototype(MyType);
+    test_assert(prototype.length() == 2);
+    test_assert(prototype[0]->name == "myint");
+    test_assert(prototype[0]->type == INT_TYPE);
+    test_assert(type_t::find_field_index(MyType,"myint") == 0);
+    test_assert(prototype[1]->name == "astr");
+    test_assert(prototype[1]->type == STRING_TYPE);
+    test_assert(type_t::find_field_index(MyType,"astr") == 1);
+
+    test_assert(type_t::find_field_index(MyType,"the_bodies") == -1);
 
     // instanciation
     Term* inst = branch.eval("inst = MyType()");
@@ -52,14 +55,15 @@ void type_declaration()
     Branch branch;
     Term* myType = branch.eval("type MyType { string a, int b } ");
 
-    test_assert(as_type(myType).prototype.length() == 2);
-    test_assert(as_type(myType).prototype[0]->name == "a");
-    test_assert(as_type(myType).prototype[0]->type == STRING_TYPE);
-    test_assert(as_type(myType).prototype[1]->name == "b");
-    test_assert(as_type(myType).prototype[1]->type == INT_TYPE);
+    Branch& prototype = type_t::get_prototype(myType);
+    test_assert(prototype.length() == 2);
+    test_assert(prototype[0]->name == "a");
+    test_assert(prototype[0]->type == STRING_TYPE);
+    test_assert(prototype[1]->name == "b");
+    test_assert(prototype[1]->type == INT_TYPE);
 
-    test_assert(as_type(myType).alloc != NULL);
-    test_assert(as_type(myType).assign != NULL);
+    test_assert(type_t::get_alloc_func(myType) != NULL);
+    test_assert(type_t::get_assign_func(myType) != NULL);
 
     Term* instance = branch.eval("mt = MyType()");
 
@@ -150,19 +154,19 @@ void test_default_values()
     test_assert(s->asString() == "");
 
     Term* t = create_type(branch, "T");
-    as_type(t).alloc = zero_alloc;
-    as_type(t).assign = shallow_assign;
-    as_type(t).equals = shallow_equals;
-    as_type(t).isPointer = false;
+    type_t::get_alloc_func(t) = zero_alloc;
+    type_t::get_assign_func(t) = shallow_assign;
+    type_t::get_equals_func(t) = shallow_equals;
+    type_t::get_is_pointer(t) = false;
 
-    test_assert(type_t::default_value(t) != NULL);
-    test_assert(type_t::default_value(t)->type == VOID_TYPE);
+    test_assert(type_t::get_default_value(t) != NULL);
+    test_assert(type_t::get_default_value(t)->type == VOID_TYPE);
 
     Term* t_value = create_value(branch, t);
 
     t_value->value = (void*) 5;
     type_t::enable_default_value(t);
-    assign_value(t_value, type_t::default_value(t));
+    assign_value(t_value, type_t::get_default_value(t));
 
     Term* t_value_2 = create_value(branch, t);
 
@@ -215,7 +219,7 @@ void test_is_value_allocced()
     a = ns->asBranch()[0];
     test_assert(is_value_alloced(a));
 
-    test_assert(!as_type(INT_TYPE).isPointer);
+    test_assert(!type_t::get_is_pointer(INT_TYPE));
 }
 
 void test_missing_functions()
@@ -226,8 +230,8 @@ void test_missing_functions()
     Branch branch;
 
     Term* t = create_type(branch);
-    as_type(t).equals = NULL;
-    as_type(t).isPointer = false;
+    type_t::get_equals_func(t) = NULL;
+    type_t::get_is_pointer(t) = false;
 
     Term* a = create_value(branch, t);
     Term* b = create_value(branch, t);

@@ -30,9 +30,9 @@ std::string cpp_accessor_for_type(Term* term)
     out << indent << get_cpp_type_name(term) << "(Term* term) : _term(term) {}\n";
     out << "\n";
 
-    Branch& proto = as_type(term).prototype;
-    for (int i=0; i < proto.length(); i++) {
-        Term* field = proto[i];
+    Branch& prototype = type_t::get_prototype(term);
+    for (int i=0; i < prototype.length(); i++) {
+        Term* field = prototype[i];
         out << indent << get_cpp_type_name(field->type) << "& " << field->name << "() ";
         out << "{ return " << get_cpp_type_accessor(field->type) << "(_term->field(" <<
             i << ")); }\n";

@@ -8,18 +8,19 @@
 namespace circa {
 
 // for Type:
-#if 0
-typedef void* (*AllocFunc)(Term* typeTerm);
-typedef void (*DeallocFunc)(void* data);
+typedef void (*AllocFunc)(Term* type, Term* term);
+typedef void (*DeallocFunc)(Term* type, Term* term);
 typedef void (*DuplicateFunc)(Term* src, Term* dest);
 typedef void (*AssignFunc)(Term* src, Term* dest);
 typedef bool (*EqualsFunc)(Term* src, Term* dest);
 typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
 typedef std::string (*ToStringFunc)(Term* term);
-#endif
 
+// for Function:
 typedef void (*EvaluateFunc)(Term* caller);
 typedef Term* (*SpecializeTypeFunc)(Term* caller);
+
+// common:
 typedef std::string (*ToSourceStringFunc)(Term* term);
 typedef bool (*CheckInvariantsFunc)(Term* term, std::string* output);
 
@@ -29,21 +30,23 @@ extern Term* FLOAT_TYPE;
 extern Term* INT_TYPE;
 extern Term* REF_TYPE;
 extern Term* STRING_TYPE;
-#if 0
+
+// for Type:
 extern Term* ALLOC_THUNK_TYPE;
 extern Term* DEALLOC_THUNK_TYPE;
 extern Term* DUPLICATE_THUNK_TYPE;
 extern Term* ASSIGN_THUNK_TYPE;
 extern Term* EQUALS_THUNK_TYPE;
 extern Term* REMAP_POINTERS_THUNK_TYPE;
-extern Term* TO_STRING_THUNK_TYPE;
 extern Term* STD_TYPE_INFO_TYPE;
-#endif
 
+// for Function:
 extern Term* EVALUATE_THUNK_TYPE;
 extern Term* SPECIALIZE_THUNK_TYPE;
+
+// common:
 extern Term* TO_STRING_THUNK_TYPE;
-extern Term* CHECK_INVARIANTS_FUNC_TYPE;
+extern Term* CHECK_INVARIANTS_THUNK_TYPE;
 
 int& as_int(Term*);
 float& as_float(Term*);
@@ -51,7 +54,7 @@ bool& as_bool(Term*);
 std::string& as_string(Term*);
 Ref& as_ref(Term*);
 
-#if 0
+// for Type:
 AllocFunc*& as_alloc_thunk(Term*);
 DeallocFunc*& as_dealloc_thunk(Term*);
 DuplicateFunc*& as_duplicate_thunk(Term*);
@@ -60,10 +63,12 @@ EqualsFunc*& as_equals_thunk(Term*);
 RemapPointersFunc*& as_remap_pointers_thunk(Term*);
 ToStringFunc*& as_to_string_thunk(Term*);
 const std::type_info*& as_std_type_info(Term*);
-#endif
 
+// for Function:
 EvaluateFunc& as_evaluate_thunk(Term*);
 SpecializeTypeFunc& as_specialize_type_thunk(Term*);
+
+// common:
 ToSourceStringFunc& as_to_source_string_thunk(Term*);
 CheckInvariantsFunc& as_check_invariants_thunk(Term*);
 

@@ -9,7 +9,8 @@ namespace get_field_function {
     {
         std::string name = caller->input(1)->asString();
 
-        int index = as_type(caller->input(0)->type).findFieldIndex(name);
+        int index = type_t::find_field_index(caller->input(0)->type, name);
+
         if (index == -1) {
             error_occurred(caller, "field not found: " + name);
             return;
@@ -21,11 +22,12 @@ namespace get_field_function {
 
     Term* specializeType(Term* caller)
     {
-        Type& type = as_type(caller->input(0)->type);
         std::string& name = caller->input(1)->asString();
 
-        if (type.findFieldIndex(name) != -1)
-            return type.prototype[name]->type;
+        Branch& type_prototype = type_t::get_prototype(caller->input(0)->type);
+
+        if (type_prototype.contains(name))
+            return type_prototype[name]->type;
 
         return ANY_TYPE;
     }

@@ -13,10 +13,10 @@ Term* import_function(Branch& branch, EvaluateFunc evaluate, std::string const& 
 
 Term* import_member_function(Term* type, EvaluateFunc evaluate, std::string const& header)
 {
-    Ref result = parser::compile(NULL, parser::function_decl, header);
+    Ref result = parser::compile(&type_t::get_member_functions(type),
+            parser::function_decl, header);
 
     function_t::get_evaluate(result) = evaluate;
-    as_type(type).addMemberFunction(result, function_t::get_name(result));
     return result;
 }
 

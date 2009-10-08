@@ -6,12 +6,6 @@
 
 namespace circa {
 
-void
-Type::addMemberFunction(Term* function, std::string const &name)
-{
-    this->memberFunctions.bind(function, name);
-}
-
 bool type_matches(Term *term, Term *type)
 {
     assert(term != NULL);
@@ -46,7 +40,7 @@ bool is_native_type(Term* type)
 
 bool is_compound_type(Term* type)
 {
-    return as_type(type).alloc == branch_t::alloc;
+    return type_t::get_alloc_func(type) == branch_t::alloc;
 }
 
 Type& as_type(Term *term)
@@ -104,11 +98,11 @@ bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
 
     // Check if the # of elements matches
     // TODO: Relax this check for lists
-    if (value.length() != as_type(type).prototype.length()) {
+    if (value.length() != type_t::get_prototype(type).length()) {
         if (errorReason != NULL) {
             std::stringstream error;
             error << "value has " << value.length() << " elements, type has "
-                << as_type(type).prototype.length();
+                << type_t::get_prototype(type).length();
             *errorReason = error.str();
         }
         return false;
@@ -116,7 +110,7 @@ bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
 
     // Check each element
     for (int i=0; i < value.length(); i++) {
-        if (!value_fits_type(value[i], as_type(type).prototype[i]->type, errorReason)) {
+        if (!value_fits_type(value[i], type_t::get_prototype(type)[i]->type, errorReason)) {
 
             if (errorReason != NULL) {
                 std::stringstream error;
@@ -184,20 +178,18 @@ namespace type_private {
 
 void initialize_empty_type(Term* term)
 {
-    Type& type = as_type(term);
-    type.alloc = type_private::empty_allocate;
-    type.assign = type_private::empty_duplicate_function;
+    type_t::get_alloc_func(term) = type_private::empty_allocate;
+    type_t::get_assign_func(term) = type_private::empty_duplicate_function;
 }
 
 void initialize_compound_type(Term* term)
 {
-    Type& type = as_type(term);
-    type.alloc = branch_t::alloc;
-    type.dealloc = branch_t::dealloc;
-    type.assign = branch_t::assign;
-    type.remapPointers = branch_t::hosted_remap_pointers;
-    type.equals = branch_t::equals;
-    type.toString = compound_type_to_string;
+    type_t::get_alloc_func(term) = branch_t::alloc;
+    type_t::get_dealloc_func(term) = branch_t::dealloc;
+    type_t::get_assign_func(term) = branch_t::assign;
+    type_t::get_remap_pointers_func(term) = branch_t::hosted_remap_pointers;
+    type_t::get_equals_func(term) = branch_t::equals;
+    type_t::get_to_string_func(term) = compound_type_to_string;
 }
 
 
@@ -228,10 +220,10 @@ bool equals(Term* a, Term* b)
     if (a->type != b->type)
         return false;
 
-    Type::EqualsFunc equals_func = as_type(a->type).equals;
+    EqualsFunc equals_func = type_t::get_equals_func(a->type);
 
     if (equals_func == NULL)
-        throw std::runtime_error("type "+as_type(a->type).name+" has no equals function");
+        throw std::runtime_error("type "+type_t::get_name(a->type)+" has no equals function");
 
     return equals_func(a,b);
 }
@@ -243,7 +235,7 @@ namespace type_t {
 
         // initialize default value
         if (VOID_TYPE != NULL)
-            create_value(as_type(term).attributes, VOID_TYPE, "defaultValue");
+            create_value(type_t::get_attributes(term), VOID_TYPE, "defaultValue");
     }
     void dealloc(Term* type, Term* term)
     {
@@ -252,7 +244,6 @@ namespace type_t {
     }
     std::string to_string(Term* term)
     {
-        Type& type = as_type(term);
         if (is_native_type(term))
             return "<NativeType " + term->name + ">";
 
@@ -264,8 +255,10 @@ namespace type_t {
         out << "{";
         out << term->stringPropOptional("syntaxHints:postLBracketWhitespace", " ");
 
-        for (int i=0; i < type.prototype.length(); i++) {
-            Term* field = type.prototype[i];
+        Branch& prototype = type_t::get_prototype(term);
+
+        for (int i=0; i < prototype.length(); i++) {
+            Term* field = prototype[i];
             assert(field != NULL);
             out << field->stringPropOptional("syntaxHints:preWhitespace","");
             out << field->type->name;
@@ -289,42 +282,98 @@ namespace type_t {
         dest->value = sourceValue;
     }
 
-    void remap_pointers(Term *term, ReferenceMap const& map)
+    void remap_pointers(Term *type, ReferenceMap const& map)
     {
-        Type &type = as_type(term);
+        Branch& prototype = type_t::get_prototype(type);
 
-        for (int field_i=0; field_i < type.prototype.length(); field_i++)
-            type.prototype[field_i] = map.getRemapped(type.prototype[field_i]);
+        for (int field_i=0; field_i < prototype.length(); field_i++)
+            prototype[field_i] = map.getRemapped(prototype[field_i]);
     }
 
     void name_accessor(Term* caller)
     {
-        as_string(caller) = as_type(caller->input(0)).name;
+        as_string(caller) = type_t::get_name(caller->input(0));
     }
 
     void enable_default_value(Term* type)
     {
-        change_type(default_value(type), type);
-        alloc_value(default_value(type));
+        change_type(get_default_value(type), type);
+        alloc_value(get_default_value(type));
     }
 
-    Term* default_value(Term* type)
+    std::string& get_name(Term* type)
+    {
+        return as_type(type).name;
+    }
+    bool& get_is_pointer(Term* type)
+    {
+        return as_type(type).isPointer;
+    }
+    const std::type_info*& get_std_type_info(Term* type)
+    {
+        return as_type(type).cppTypeInfo;
+    }
+    AllocFunc& get_alloc_func(Term* type)
+    {
+        return as_type(type).alloc;
+    }
+    DeallocFunc& get_dealloc_func(Term* type)
+    {
+        return as_type(type).dealloc;
+    }
+    AssignFunc& get_assign_func(Term* type)
+    {
+        return as_type(type).assign;
+    }
+    EqualsFunc& get_equals_func(Term* type)
+    {
+        return as_type(type).equals;
+    }
+    RemapPointersFunc& get_remap_pointers_func(Term* type)
+    {
+        return as_type(type).remapPointers;
+    }
+    ToStringFunc& get_to_string_func(Term* type)
+    {
+        return as_type(type).toString;
+    }
+    CheckInvariantsFunc& get_check_invariants_func(Term* type)
+    {
+        return as_type(type).checkInvariants;
+    }
+    Branch& get_prototype(Term* type)
+    {
+        return as_type(type).prototype;
+    }
+    Branch& get_attributes(Term* type)
+    {
+        return as_type(type).attributes;
+    }
+    Branch& get_member_functions(Term* type)
+    {
+        return as_type(type).memberFunctions;
+    }
+    Term* get_default_value(Term* type)
     {
         Branch& attributes = as_type(type).attributes;
         if (attributes.length() < 1) return NULL;
         return attributes[0];
+    }
+    int find_field_index(Term* type, std::string const& name)
+    {
+        return type_t::get_prototype(type).findIndex(name);
     }
 
 } // namespace type_t
 
 std::string to_string(Term* term)
 {
-    Type::ToStringFunc func = as_type(term->type).toString;
+    ToStringFunc func = type_t::get_to_string_func(term->type);
 
     if (func == NULL) {
         // Generic to-string
         std::stringstream result;
-        result << "<" << as_type(term->type).name << " 0x";
+        result << "<" << type_t::get_name(term->type) << " 0x";
         result << std::hex << term->value << ">";
         return result.str();
     }
@@ -338,13 +387,13 @@ void alloc_value(Term* term)
 {
     if (is_value_alloced(term)) return;
 
-    Type& type = as_type(term->type);
+    AllocFunc alloc = type_t::get_alloc_func(term->type);
 
-    if (type.alloc == NULL)
+    if (alloc == NULL)
         // this happens while bootstrapping
         term->value = NULL;
     else {
-        type.alloc(term->type, term);
+        alloc(term->type, term);
 
         assign_value_to_default(term);
 
@@ -358,7 +407,7 @@ void dealloc_value(Term* term)
     if (term->type == NULL) return;
     if (!is_value_alloced(term)) return;
 
-    Type& type = as_type(term->type);
+    DeallocFunc dealloc = type_t::get_dealloc_func(term->type);
 
     if (!is_value_alloced(term->type)) {
         std::cout << "warn: in dealloc_value, type is undefined" << std::endl;
@@ -366,8 +415,8 @@ void dealloc_value(Term* term)
         return;
     }
 
-    if (type.dealloc != NULL)
-        type.dealloc(term->type, term);
+    if (dealloc != NULL)
+        dealloc(term->type, term);
 
     term->value = NULL;
 }
@@ -379,9 +428,7 @@ bool is_value_alloced(Term* term)
         return false;
     }
 
-    Type& type = as_type(term->type);
-
-    if (!type.isPointer)
+    if (!type_t::get_is_pointer(term->type))
         return true;
     else
         return term->value != NULL;
@@ -409,10 +456,10 @@ void assign_value(Term* source, Term* dest)
     if (!is_value_alloced(dest))
         alloc_value(dest);
 
-    Type::AssignFunc assign = as_type(dest->type).assign;
+    AssignFunc assign = type_t::get_assign_func(dest->type);
 
     if (assign == NULL)
-        throw std::runtime_error("type "+as_type(dest->type).name+" has no assign function");
+        throw std::runtime_error("type "+type_t::get_name(dest->type)+" has no assign function");
 
     assign(source, dest);
 }
@@ -432,7 +479,7 @@ void assign_value_to_default(Term* term)
     else {
 
         // check if this type has a default value defined
-        Term* defaultValue = type_t::default_value(term->type);
+        Term* defaultValue = type_t::get_default_value(term->type);
         if (defaultValue != NULL && defaultValue->type != VOID_TYPE)
             assign_value(defaultValue, term);
     }
@@ -440,10 +487,10 @@ void assign_value_to_default(Term* term)
 
 bool check_invariants(Term* term, std::string* failureMessage)
 {
-    if (as_type(term->type).checkInvariants == NULL)
+    if (type_t::get_check_invariants_func(term->type) == NULL)
         return true;
 
-    return as_type(term->type).checkInvariants(term, failureMessage);
+    return type_t::get_check_invariants_func(term->type)(term, failureMessage);
 }
 
 Term* parse_type(Branch& branch, std::string const& decl)
