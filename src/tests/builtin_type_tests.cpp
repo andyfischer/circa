@@ -26,26 +26,21 @@ void test_reference()
 
 void builtin_types()
 {
-    test_assert(as_type(INT_TYPE).alloc != NULL);
-    //test_assert(as_type(INT_TYPE).dealloc != NULL);
-    test_assert(as_type(INT_TYPE).equals != NULL);
-    test_assert(as_type(FLOAT_TYPE).alloc != NULL);
-    //test_assert(as_type(FLOAT_TYPE).dealloc != NULL);
-    test_assert(as_type(FLOAT_TYPE).equals != NULL);
-    test_assert(as_type(STRING_TYPE).alloc != NULL);
-    test_assert(as_type(STRING_TYPE).dealloc != NULL);
-    test_assert(as_type(STRING_TYPE).equals != NULL);
-    test_assert(as_type(BOOL_TYPE).alloc != NULL);
-    //test_assert(as_type(BOOL_TYPE).dealloc != NULL);
-    test_assert(as_type(BOOL_TYPE).equals != NULL);
-    test_assert(as_type(TYPE_TYPE).alloc != NULL);
-    test_assert(as_type(TYPE_TYPE).dealloc != NULL);
-    //test_assert(as_type(TYPE_TYPE)->equals != NULL);
-    test_assert(as_type(FUNCTION_TYPE).alloc != NULL);
-    test_assert(as_type(FUNCTION_TYPE).dealloc != NULL);
-    test_assert(as_type(REF_TYPE).alloc != NULL);
-    test_assert(as_type(REF_TYPE).dealloc != NULL);
-    //test_assert(as_type(FUNCTION_TYPE)->equals != NULL);
+    test_assert(type_t::get_alloc_func(INT_TYPE) != NULL);
+    test_assert(type_t::get_equals_func(INT_TYPE) != NULL);
+    test_assert(type_t::get_alloc_func(FLOAT_TYPE) != NULL);
+    test_assert(type_t::get_equals_func(FLOAT_TYPE) != NULL);
+    test_assert(type_t::get_alloc_func(STRING_TYPE) != NULL);
+    test_assert(type_t::get_dealloc_func(STRING_TYPE) != NULL);
+    test_assert(type_t::get_equals_func(STRING_TYPE) != NULL);
+    test_assert(type_t::get_alloc_func(BOOL_TYPE) != NULL);
+    test_assert(type_t::get_equals_func(BOOL_TYPE) != NULL);
+    test_assert(type_t::get_alloc_func(TYPE_TYPE) != NULL);
+    test_assert(type_t::get_dealloc_func(TYPE_TYPE) != NULL);
+    test_assert(type_t::get_alloc_func(FUNCTION_TYPE) != NULL);
+    test_assert(type_t::get_dealloc_func(FUNCTION_TYPE) != NULL);
+    test_assert(type_t::get_alloc_func(REF_TYPE) != NULL);
+    test_assert(type_t::get_dealloc_func(REF_TYPE) != NULL);
 }
 
 void reference_type_deletion_bug()

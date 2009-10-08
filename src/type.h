@@ -18,13 +18,6 @@ namespace circa {
 
 struct Type
 {
-    typedef void (*AllocFunc)(Term* type, Term* term);
-    typedef void (*DeallocFunc)(Term* type, Term* term);
-    typedef void (*AssignFunc)(Term* src, Term* dest);
-    typedef bool (*EqualsFunc)(Term* src, Term* dest);
-    typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
-    typedef std::string (*ToStringFunc)(Term* term);
-
     std::string name;
 
     // Whether the term's value is a pointer. If it is, then we might check if its NULL to see if it
@@ -46,16 +39,16 @@ struct Type
     
     Branch prototype;
 
-    // memberFunctions is a list of Functions which 'belong' to this type.
-    // They are guaranteed to take an instance of this type as their first
-    // argument.
-    TermNamespace memberFunctions;
-
     // Type parameters
     RefList parameters;
 
-    // Attributes for this type. Stuff should be migrated here.
+    // Attributes for this type.
     Branch attributes;
+
+    // memberFunctions is a list of Functions which 'belong' to this type.
+    // They are guaranteed to take an instance of this type as their first
+    // argument.
+    Branch memberFunctions;
 
     Type() :
         name(""),
@@ -78,8 +71,6 @@ struct Type
                 return i;
         return -1;
     }
-
-    void addMemberFunction(Term* function, std::string const& name);
 };
 
 namespace type_t {
@@ -93,7 +84,22 @@ namespace type_t {
     void enable_default_value(Term* type);
 
     // Accessors
-    Term* default_value(Term* type);
+    std::string& get_name(Term* type);
+    bool& get_is_pointer(Term* type);
+    const std::type_info*& get_std_type_info(Term* type);
+    AllocFunc& get_alloc_func(Term* type);
+    DeallocFunc& get_dealloc_func(Term* type);
+    AssignFunc& get_assign_func(Term* type);
+    EqualsFunc& get_equals_func(Term* type);
+    RemapPointersFunc& get_remap_pointers_func(Term* type);
+    ToStringFunc& get_to_string_func(Term* type);
+    CheckInvariantsFunc& get_check_invariants_func(Term* type);
+    Branch& get_prototype(Term* type);
+    Branch& get_attributes(Term* type);
+    Branch& get_member_functions(Term* type);
+    Term* get_default_value(Term* type);
+
+    int find_field_index(Term* type, std::string const& name);
 }
 
 bool is_type(Term* term);

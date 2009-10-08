@@ -16,9 +16,6 @@ Bugs:
 
  - Can't comment out something inside of a literal list
 
- - In an evaluation function, using to_float on something that is not a float, will cause
-   an exception which is silently caught and ignored
-
  - Complex lvalues don't work.
   
    Doesn't work: something.field += x

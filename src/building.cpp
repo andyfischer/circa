@@ -197,7 +197,7 @@ Term* create_type(Branch& branch, std::string name)
     Term* term = create_value(branch, TYPE_TYPE);
 
     if (name != "") {
-        as_type(term).name = name;
+        type_t::get_name(term) = name;
         branch.bindName(term, name);
     }
 

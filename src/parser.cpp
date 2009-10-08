@@ -430,7 +430,7 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
     branch.moveToEnd(result);
 
     branch.bindName(result, name);
-    as_type(result).name = name;
+    type_t::get_name(result) = name;
 
     return result;
 }
@@ -441,7 +441,6 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
 
     Term* result = create_value(branch, TYPE_TYPE);
     initialize_compound_type(result);
-    Type& type = as_type(result);
 
     result->stringProp("syntaxHints:preLBracketWhitespace") = possible_whitespace_or_newline(tokens);
 
@@ -454,7 +453,7 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
 
     result->stringProp("syntaxHints:postLBracketWhitespace") = possible_whitespace_or_newline(tokens);
 
-    Branch& prototype = type.prototype;
+    Branch& prototype = type_t::get_prototype(result);
 
     while (!tokens.nextIs(closingToken)) {
         std::string preWs = possible_whitespace_or_newline(tokens);
@@ -1538,7 +1537,7 @@ Term* identifier_or_function_call(Branch& branch, TokenStream& tokens)
         }
 
         // Check if the lhs's type defines this name as a property
-        else if (as_type(head->type).findFieldIndex(name) != -1) {
+        else if (type_t::find_field_index(head->type, name) != -1) {
             head = apply(branch, GET_FIELD_FUNC, RefList(head, string_value(branch, name)));
             get_input_syntax_hint(head, 0, "postWhitespace") = "";
         }

@@ -267,7 +267,7 @@ void setup_builtin_types(Branch& kernel)
     import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) : string");
 
     Term* set_type = create_compound_type(kernel, "Set");
-    as_type(set_type).toString = set_t::to_string;
+    type_t::get_to_string_func(set_type) = set_t::to_string;
     Term* set_add = import_member_function(set_type, set_t::hosted_add, "add(Set, any) : Set");
     function_t::get_input_placeholder(set_add, 0)->boolProp("use-as-output") = true;
     Term* set_remove = import_member_function(set_type, set_t::remove, "remove(Set, any) : Set");
@@ -291,7 +291,7 @@ void parse_builtin_types(Branch& kernel)
     parse_type(kernel, "type Rect { number x1, number y1, number x2, number y2 }");
     COLOR_TYPE = parse_type(kernel, "type Color { number r, number g, number b, number a }");
 
-    as_type(COLOR_TYPE).toString = color_t::to_string;
+    type_t::get_to_string_func(COLOR_TYPE) = color_t::to_string;
 
     Term* branch_inspector_type = parse_type(kernel, "type BranchInspector { Ref target }");
     import_member_function(branch_inspector_type, branch_inspector_t::get_configs,

@@ -10,7 +10,13 @@ namespace set_field_function {
         assign_value(caller->input(0), caller);
 
         std::string name = caller->input(1)->asString();
-        int index = as_type(caller->input(0)->type).findFieldIndex(name);
+        int index = type_t::find_field_index(caller->input(0)->type, name);
+
+        if (index == 0) {
+            error_occurred(caller, "field not found: "+name);
+            return;
+        }
+
         assign_value(caller->input(2), as_branch(caller)[index]);
     }
 

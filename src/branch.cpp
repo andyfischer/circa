@@ -30,6 +30,17 @@ int Branch::findIndex(Term* term)
     return -1;
 }
 
+int Branch::findIndex(std::string const& name)
+{
+    for (int i=0; i < length(); i++) {
+        if (get(i) == NULL)
+            continue;
+        if (get(i)->name == name)
+            return i;
+    }
+    return -1;
+}
+
 void Branch::append(Term* term)
 {
     _terms.append(term);
@@ -187,11 +198,11 @@ namespace branch_t {
         Branch* branch = new Branch();
 
         // create a slot for each field
-        Type& type = as_type(typeTerm);
-        int numFields = type.prototype.length();
+        Branch& prototype = type_t::get_prototype(typeTerm);
+        int numFields = prototype.length();
 
         for (int f=0; f < numFields; f++)
-            create_value(*branch, type.prototype[f]->type, type.prototype[f]->name);
+            create_value(*branch, prototype[f]->type, prototype[f]->name);
 
         term->value = branch;
     }
@@ -258,7 +269,7 @@ namespace branch_t {
 bool is_branch(Term* term)
 {
     return (term->type != NULL) &&
-        (as_type(term->type).alloc == branch_t::alloc);
+        (type_t::get_alloc_func(term->type) == branch_t::alloc);
 }
 
 Branch& as_branch(Term* term)

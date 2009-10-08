@@ -12,28 +12,21 @@ Term* REF_TYPE = NULL;
 Term* STRING_TYPE = NULL;
 
 // thunks for Type:
-#if 0
 Term* ALLOC_THUNK_TYPE = NULL;
 Term* DEALLOC_THUNK_TYPE = NULL;
 Term* DUPLICATE_THUNK_TYPE = NULL;
 Term* ASSIGN_THUNK_TYPE = NULL;
 Term* EQUALS_THUNK_TYPE = NULL;
 Term* REMAP_POINTERS_THUNK_TYPE = NULL;
-//Term* TO_STRING_THUNK_TYPE = NULL;
 Term* STD_TYPE_INFO_TYPE = NULL;
-#endif
 
+// thunks for Function:
 Term* EVALUATE_THUNK_TYPE = NULL;
 Term* SPECIALIZE_THUNK_TYPE = NULL;
-Term* TO_STRING_THUNK_TYPE = NULL;
-Term* CHECK_INVARIANTS_FUNC_TYPE = NULL;
 
-std::string& as_string(Term* term)
-{
-    assert_type(term, STRING_TYPE);
-    alloc_value(term);
-    return *((std::string*) term->value);
-}
+// common thunks:
+Term* TO_STRING_THUNK_TYPE = NULL;
+Term* CHECK_INVARIANTS_THUNK_TYPE = NULL;
 
 Ref& as_ref(Term* term)
 {
@@ -41,7 +34,6 @@ Ref& as_ref(Term* term)
     return *((Ref*) term->value);
 }
 
-#if 0
 AllocFunc*& as_alloc_thunk(Term* term)
 {
     assert_type(term, ALLOC_THUNK_TYPE);
@@ -89,7 +81,6 @@ const std::type_info*& as_std_type_info(Term* term)
     assert_type(term, STD_TYPE_INFO_TYPE);
     return ((const std::type_info*&) term->value);
 }
-#endif
 
 EvaluateFunc& as_evaluate_thunk(Term* term)
 {
@@ -111,13 +102,8 @@ ToSourceStringFunc& as_to_source_string_thunk(Term* term)
 
 CheckInvariantsFunc& as_check_invariants_thunk(Term* term)
 {
-    assert_type(term, CHECK_INVARIANTS_FUNC_TYPE);
+    assert_type(term, CHECK_INVARIANTS_THUNK_TYPE);
     return ((CheckInvariantsFunc&) term->value);
-}
-
-bool is_string(Term* term)
-{
-    return term->type == STRING_TYPE;
 }
 
 bool is_ref(Term* term)
@@ -230,6 +216,18 @@ namespace string_t {
         std::string quoteType = term->stringPropOptional("syntaxHints:quoteType", "'");
         return quoteType + as_string(term) + quoteType;
     }
+}
+
+std::string& as_string(Term* term)
+{
+    assert_type(term, STRING_TYPE);
+    alloc_value(term);
+    return *((std::string*) term->value);
+}
+
+bool is_string(Term* term)
+{
+    return term->type == STRING_TYPE;
 }
 
 namespace bool_t {
@@ -386,7 +384,7 @@ void initialize_primitive_types(Branch& kernel)
     EVALUATE_THUNK_TYPE = import_pointer_type<EvaluateFunc>(kernel, "EvaluateThunk");
     SPECIALIZE_THUNK_TYPE = import_pointer_type<SpecializeTypeFunc>(kernel, "SpecializeThunk");
     TO_STRING_THUNK_TYPE = import_pointer_type<ToSourceStringFunc>(kernel, "ToSourceStringThunk");
-    CHECK_INVARIANTS_FUNC_TYPE = import_pointer_type<CheckInvariantsFunc>(kernel, "CheckInvariantsThunk");
+    CHECK_INVARIANTS_THUNK_TYPE = import_pointer_type<CheckInvariantsFunc>(kernel, "CheckInvariantsThunk");
 
     STRING_TYPE = import_type<std::string>(kernel, "string");
     as_type(STRING_TYPE).equals = cpp_importing::templated_equals<std::string>;
