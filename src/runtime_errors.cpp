@@ -48,4 +48,20 @@ void print_runtime_error_formatted(Branch& branch, std::ostream& output)
     output << "(!!! no error found)" << std::endl;
 }
 
+void assert_type(Term* term, Term* type)
+{
+    if (term->type != type) {
+        std::stringstream msg;
+        msg << "Expected " << as_type(type).name << ", found " << as_type(term->type).name;
+        native_type_mismatch(msg.str());
+    }
+}
+
+void native_type_mismatch(std::string const& message)
+{
+    //assert(false);
+    throw std::runtime_error(message);
+}
+
+
 } // namespace circa

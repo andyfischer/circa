@@ -177,18 +177,6 @@ Term* find_common_type(RefList const& list)
     return ANY_TYPE;
 }
 
-Term* create_type(Branch& branch, std::string name)
-{
-    Term* term = create_value(branch, TYPE_TYPE);
-
-    if (name != "") {
-        as_type(term).name = name;
-        branch.bindName(term, name);
-    }
-
-    return term;
-}
-
 namespace type_private {
     void empty_allocate(Term* type, Term* term) { term->value = NULL; }
     void empty_duplicate_function(Term*,Term*) {}
@@ -199,13 +187,6 @@ void initialize_empty_type(Term* term)
     Type& type = as_type(term);
     type.alloc = type_private::empty_allocate;
     type.assign = type_private::empty_duplicate_function;
-}
-
-Term* create_empty_type(Branch& branch, std::string name)
-{
-    Term* type = create_type(branch, name);
-    initialize_empty_type(type);
-    return type;
 }
 
 void initialize_compound_type(Term* term)
@@ -219,12 +200,6 @@ void initialize_compound_type(Term* term)
     type.toString = compound_type_to_string;
 }
 
-Term* create_compound_type(Branch& branch, std::string const& name)
-{
-    Term* term = create_type(branch, name);
-    initialize_compound_type(term);
-    return term;
-}
 
 std::string compound_type_to_string(Term* caller)
 {
@@ -469,21 +444,6 @@ bool check_invariants(Term* term, std::string* failureMessage)
         return true;
 
     return as_type(term->type).checkInvariants(term, failureMessage);
-}
-
-void assert_type(Term* term, Term* type)
-{
-    if (term->type != type) {
-        std::stringstream msg;
-        msg << "Expected " << as_type(type).name << ", found " << as_type(term->type).name;
-        native_type_mismatch(msg.str());
-    }
-}
-
-void native_type_mismatch(std::string const& message)
-{
-    //assert(false);
-    throw std::runtime_error(message);
 }
 
 Term* parse_type(Branch& branch, std::string const& decl)
