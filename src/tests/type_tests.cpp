@@ -251,6 +251,21 @@ void test_find_common_type()
     test_assert(find_common_type(RefList(KERNEL->get("Point"),KERNEL->get("Rect"))) == BRANCH_TYPE);
 }
 
+void _evaluate_type_error(Term* term)
+{
+    as_float(term) = to_float(term->input(0));
+}
+
+void test_type_error_in_a_native_call()
+{
+    Branch branch;
+
+    import_function(branch, _evaluate_type_error, "f(string) : float");
+
+    Term* t = branch.eval("f('hello')");
+    test_assert(t->hasError());
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
@@ -264,6 +279,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_is_value_allocced);
     REGISTER_TEST_CASE(type_tests::test_missing_functions);
     REGISTER_TEST_CASE(type_tests::test_find_common_type);
+    REGISTER_TEST_CASE(type_tests::test_type_error_in_a_native_call);
 }
 
 } // namespace type_tests

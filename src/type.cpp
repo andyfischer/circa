@@ -33,16 +33,6 @@ bool type_matches(Term *term, Term *type)
     return true;
 }
 
-void assert_type(Term *term, Term *type)
-{
-    if (!type_matches(term, type)) {
-        std::stringstream err;
-        err << "assert_type failed, expected " << as_type(type).name;
-        err << ", found " << as_type(term->type).name;
-        throw std::runtime_error(err.str());
-    }
-}
-
 bool is_type(Term* term)
 {
     assert(term != NULL);
@@ -479,6 +469,21 @@ bool check_invariants(Term* term, std::string* failureMessage)
         return true;
 
     return as_type(term->type).checkInvariants(term, failureMessage);
+}
+
+void assert_type(Term* term, Term* type)
+{
+    if (term->type != type) {
+        std::stringstream msg;
+        msg << "Expected " << as_type(type).name << ", found " << as_type(term->type).name;
+        native_type_mismatch(msg.str());
+    }
+}
+
+void native_type_mismatch(std::string const& message)
+{
+    //assert(false);
+    throw std::runtime_error(message);
 }
 
 Term* parse_type(Branch& branch, std::string const& decl)

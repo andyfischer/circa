@@ -30,88 +30,88 @@ Term* CHECK_INVARIANTS_FUNC_TYPE = NULL;
 
 std::string& as_string(Term* term)
 {
-    assert(term->type == STRING_TYPE);
+    assert_type(term, STRING_TYPE);
     alloc_value(term);
     return *((std::string*) term->value);
 }
 
 Ref& as_ref(Term* term)
 {
-    assert(term->type == REF_TYPE);
+    assert_type(term, REF_TYPE);
     return *((Ref*) term->value);
 }
 
 #if 0
 AllocFunc*& as_alloc_thunk(Term* term)
 {
-    assert(term->type == ALLOC_THUNK_TYPE);
+    assert_type(term, ALLOC_THUNK_TYPE);
     return ((AllocFunc*&) term->value);
 }
 
 DeallocFunc*& as_dealloc_thunk(Term* term)
 {
-    assert(term->type == ALLOC_THUNK_TYPE);
+    assert_type(term, DEALLOC_THUNK_TYPE);
     return ((DeallocFunc*&) term->value);
 }
 
 DuplicateFunc*& as_duplicate_thunk(Term* term)
 {
-    assert(term->type == DEALLOC_THUNK_TYPE);
+    assert_type(term, DUPLICATE_THUNK_TYPE);
     return ((DuplicateFunc*&) term->value);
 }
 
 AssignFunc*& as_assign_thunk(Term* term)
 {
-    assert(term->type == ASSIGN_THUNK_TYPE);
+    assert_type(term, ASSIGN_THUNK_TYPE);
     return ((AssignFunc*&) term->value);
 }
 
 EqualsFunc*& as_equals_thunk(Term* term)
 {
-    assert(term->type == EQUALS_THUNK_TYPE);
+    assert_type(term, EQUALS_THUNK_TYPE);
     return ((EqualsFunc*&) term->value);
 }
 
 RemapPointersFunc*& as_remap_pointers_thunk(Term* term)
 {
-    assert(term->type == REMAP_POINTERS_THUNK_TYPE);
+    assert_type(term, REMAP_POINTERS_THUNK_TYPE);
     return ((RemapPointersFunc*&) term->value);
 }
 
 ToStringFunc*& as_to_string_thunk(Term* term)
 {
-    assert(term->type == TO_STRING_THUNK_TYPE);
+    assert_type(term, TO_STRING_THUNK_TYPE);
     return ((ToStringFunc*&) term->value);
 }
 
 const std::type_info*& as_std_type_info(Term* term)
 {
-    assert(term->type == STD_TYPE_INFO_TYPE);
+    assert_type(term, STD_TYPE_INFO_TYPE);
     return ((const std::type_info*&) term->value);
 }
 #endif
 
 EvaluateFunc& as_evaluate_thunk(Term* term)
 {
-    assert(term->type == EVALUATE_THUNK_TYPE);
+    assert_type(term, EVALUATE_THUNK_TYPE);
     return ((EvaluateFunc&) term->value);
 }
 
 SpecializeTypeFunc& as_specialize_type_thunk(Term* term)
 {
-    assert(term->type == SPECIALIZE_THUNK_TYPE);
+    assert_type(term, SPECIALIZE_THUNK_TYPE);
     return ((SpecializeTypeFunc&) term->value);
 }
 
 ToSourceStringFunc& as_to_source_string_thunk(Term* term)
 {
-    assert(term->type == TO_STRING_THUNK_TYPE);
+    assert_type(term, TO_STRING_THUNK_TYPE);
     return ((ToSourceStringFunc&) term->value);
 }
 
 CheckInvariantsFunc& as_check_invariants_thunk(Term* term)
 {
-    assert(term->type == CHECK_INVARIANTS_FUNC_TYPE);
+    assert_type(term, CHECK_INVARIANTS_FUNC_TYPE);
     return ((CheckInvariantsFunc&) term->value);
 }
 
@@ -133,11 +133,12 @@ float to_float(Term* term)
     else if (term->type == INT_TYPE)
         return (float) as_int(term);
     else
-        throw std::runtime_error("Type mismatch in to_float");
+        native_type_mismatch("Type mismatch in to_float");
+
+    assert(false); // unreachable
 }
 
 namespace int_t {
-
     std::string to_string(Term* term)
     {
         std::stringstream strm;
@@ -151,7 +152,7 @@ namespace int_t {
 
 int& as_int(Term* term)
 {
-    assert(term->type == INT_TYPE);
+    assert_type(term,INT_TYPE);
     alloc_value(term);
     return (int&) term->value;
 }
@@ -213,7 +214,7 @@ namespace float_t {
 
 float& as_float(Term* term)
 {
-    assert(term->type == FLOAT_TYPE);
+    assert_type(term, FLOAT_TYPE);
     alloc_value(term);
     return (float&) term->value;
 }
@@ -243,7 +244,7 @@ namespace bool_t {
 
 bool& as_bool(Term* term)
 {
-    assert(term->type == BOOL_TYPE);
+    assert_type(term, BOOL_TYPE);
     alloc_value(term);
     return (bool&) term->value;
 }
