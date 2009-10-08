@@ -103,9 +103,6 @@ bool is_native_type(Term* type);
 
 bool type_matches(Term *term, Term *type);
 
-// Throw an exception if term is not an instance of type
-void assert_type(Term* term, Term* type);
-
 // Returns whether the value in valueTerm fits this type.
 // This function allows for coercion (ints fit in floats)
 // We also allow for compound types to be reinterpreted.
@@ -138,6 +135,10 @@ std::string to_string(Term* term);
 void assign_value(Term* source, Term* dest);
 void assign_value_to_default(Term* term);
 bool check_invariants(Term* term, std::string* failureMessage = NULL);
+
+// Signal that a type mismatch has occurred in native code:
+void native_type_mismatch(std::string const& message);
+void assert_type(Term* term, Term* type);
 
 Term* parse_type(Branch& branch, std::string const& decl);
 
