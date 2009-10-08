@@ -37,6 +37,9 @@ Term* create_ref(Branch& branch, Term* ref, std::string const& name="");
 Branch& create_list(Branch& branch, std::string const& name="");
 Branch& create_branch(Branch& owner, std::string const& name="");
 Branch& create_namespace(Branch&, std::string const& name);
+Term* create_type(Branch& branch, std::string name="");
+Term* create_empty_type(Branch& branch, std::string name);
+Term* create_compound_type(Branch& branch, std::string const& name);
 
 // Modify term so that it has the given function and inputs.
 void rewrite(Term* term, Term* function, RefList const& _inputs);

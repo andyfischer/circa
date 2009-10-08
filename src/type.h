@@ -116,10 +116,6 @@ bool is_assign_value_possible(Term* source, Term* dest);
 // list. Currently, this is not very sophisticated.
 Term* find_common_type(RefList const& list);
 
-Term* create_type(Branch& branch, std::string name="");
-Term* create_empty_type(Branch& branch, std::string name);
-Term* create_compound_type(Branch& branch, std::string const& name);
-
 void initialize_empty_type(Term* term);
 void initialize_compound_type(Term* term);
 
@@ -135,10 +131,6 @@ std::string to_string(Term* term);
 void assign_value(Term* source, Term* dest);
 void assign_value_to_default(Term* term);
 bool check_invariants(Term* term, std::string* failureMessage = NULL);
-
-// Signal that a type mismatch has occurred in native code:
-void native_type_mismatch(std::string const& message);
-void assert_type(Term* term, Term* type);
 
 Term* parse_type(Branch& branch, std::string const& decl);
 

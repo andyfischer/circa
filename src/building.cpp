@@ -192,6 +192,32 @@ Branch& create_namespace(Branch& branch, std::string const& name)
     return as_branch(create_value(branch, NAMESPACE_TYPE, name));
 }
 
+Term* create_type(Branch& branch, std::string name)
+{
+    Term* term = create_value(branch, TYPE_TYPE);
+
+    if (name != "") {
+        as_type(term).name = name;
+        branch.bindName(term, name);
+    }
+
+    return term;
+}
+
+Term* create_empty_type(Branch& branch, std::string name)
+{
+    Term* type = create_type(branch, name);
+    initialize_empty_type(type);
+    return type;
+}
+
+Term* create_compound_type(Branch& branch, std::string const& name)
+{
+    Term* term = create_type(branch, name);
+    initialize_compound_type(term);
+    return term;
+}
+
 void rewrite(Term* term, Term* function, RefList const& inputs)
 {
     change_function(term, function);

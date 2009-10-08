@@ -14,4 +14,8 @@ void print_runtime_error_formatted(Branch& branch, std::ostream& output);
 
 std::string get_runtime_error_formatted(Branch& branch);
 
+// Signal that a type mismatch has occurred in native code:
+void native_type_mismatch(std::string const& message);
+void assert_type(Term* term, Term* type);
+
 }
