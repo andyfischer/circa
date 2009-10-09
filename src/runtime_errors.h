@@ -10,12 +10,18 @@ void error_occurred(Term* errorTerm, std::string const& message);
 // a message.
 void nested_error_occurred(Term* errorTerm);
 
-void print_runtime_error_formatted(Branch& branch, std::ostream& output);
+bool has_runtime_error(Term* term);
+std::string get_runtime_error_message(Term* term);
 
+void print_runtime_error_formatted(Branch& branch, std::ostream& output);
 std::string get_runtime_error_formatted(Branch& branch);
 
 // Signal that a type mismatch has occurred in native code:
 void native_type_mismatch(std::string const& message);
 void assert_type(Term* term, Term* type);
+
+// Checks for either a static error or runtime error
+bool has_error(Term* term);
+std::string get_error_message(Term* term);
 
 }

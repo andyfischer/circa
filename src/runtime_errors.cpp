@@ -22,6 +22,16 @@ void nested_error_occurred(Term* errorTerm)
     errorTerm->setHasError(true);
 }
 
+bool has_runtime_error(Term* term)
+{
+    return term->hasError();
+
+}
+std::string get_runtime_error_message(Term* term)
+{
+    return term->getErrorMessage();
+}
+
 void print_runtime_error_formatted(Branch& branch, std::ostream& output)
 {
     // Find the error in this branch
@@ -63,5 +73,17 @@ void native_type_mismatch(std::string const& message)
     throw std::runtime_error(message);
 }
 
+bool has_error(Term* term)
+{
+    return has_static_error(term) || has_runtime_error(term);
+}
+
+std::string get_error_message(Term* term)
+{
+    if (has_static_error(term))
+        return get_static_error_message(term);
+    else
+        return get_runtime_error_message(term);
+}
 
 } // namespace circa
