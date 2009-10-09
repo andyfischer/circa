@@ -30,6 +30,7 @@
 #include "primitives.h"
 #include "refactoring.h"
 #include "references.h"
+#include "repl.h"
 #include "stateful_code.h"
 #include "static_errors.h"
 #include "source_repro.h"

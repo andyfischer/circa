@@ -68,6 +68,12 @@ int run_command_line(std::vector<std::string> args)
         return 0;
     }
 
+    // Start repl
+    if (args[0] == "-repl") {
+        start_repl();
+        return 0;
+    }
+
     // Do a feedback test
     if (args[0] == "-f") {
         Branch branch;
