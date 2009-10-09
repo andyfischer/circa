@@ -25,21 +25,33 @@ namespace set_t {
     void hosted_add(Term* caller)
     {
         assign_value(caller->input(0), caller);
-        Branch& branch = as_branch(caller);
+        Branch& contents = as_branch(caller);
         Term* value = caller->input(1);
-        add(branch, value);
+        add(contents, value);
+    }
+
+    void contains(Term* caller)
+    {
+        Branch& contents = as_branch(caller->input(0));
+        Term* target = caller->input(1);
+        for (int i=0; i < contents.length(); i++) {
+            if (equals(target, contents[i])) {
+                as_bool(caller) = true;
+                return;
+            }
+        }
+        as_bool(caller) = false;
     }
 
     void remove(Term* caller)
     {
         assign_value(caller->input(0), caller);
-        Branch& branch = as_branch(caller);
+        Branch& contents = as_branch(caller);
         Term* value = caller->input(1);
 
-        for (int index=0; index < branch.length(); index++) {
-            if (equals(value, branch[index])) {
-
-                branch.remove(index);
+        for (int index=0; index < contents.length(); index++) {
+            if (equals(value, contents[index])) {
+                contents.remove(index);
                 return;
             }
         }
@@ -272,6 +284,7 @@ void setup_builtin_types(Branch& kernel)
     function_t::get_input_placeholder(set_add, 0)->boolProp("use-as-output") = true;
     Term* set_remove = import_member_function(set_type, set_t::remove, "remove(Set, any) : Set");
     function_t::get_input_placeholder(set_remove, 0)->boolProp("use-as-output") = true;
+    import_member_function(set_type, set_t::contains, "contains(Set, any) : bool");
 
     // LIST_TYPE was created in bootstrap_kernel
     Term* list_append =

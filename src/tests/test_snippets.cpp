@@ -211,6 +211,15 @@ void test_subscripting()
     test_snippet("def return_point() : Point return [8 9] end", "return_point().x == 8");
 }
 
+void test_set()
+{
+    test_snippet("s = Set(); s.add(1)", "s.contains(1); to_string(s) == '{1}'");
+    test_snippet("s = Set()", "not(s.contains(1))");
+    test_snippet("s = Set(); s.add(1); s.add(2); s.remove(1)",
+            "not(s.contains(1)); s.contains(2)");
+    test_snippet("s = Set(); s.add(1); s.add(1)", "to_string(s) == '{1}'");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
@@ -223,6 +232,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_boolean_ops);
     REGISTER_TEST_CASE(test_snippets::test_for_loops);
     REGISTER_TEST_CASE(test_snippets::test_subscripting);
+    REGISTER_TEST_CASE(test_snippets::test_set);
 }
 
 } // namespace test_snippets
