@@ -744,8 +744,10 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         if (expr->name != "" && !expr_is_new)
             expr = apply(branch, COPY_FUNC, RefList(expr));
 
-        if (pendingRebind != "")
+        if (pendingRebind != "") {
             branch.bindName(expr, pendingRebind);
+            expr->stringProp("syntaxHints:rebindOperator") = pendingRebind;
+        }
 
         return expr;
     }
@@ -914,8 +916,6 @@ int get_infix_precedence(int match)
         case tokenizer::DOUBLE_EQUALS:
         case tokenizer::NOT_EQUALS:
             return 5;
-        case tokenizer::DOUBLE_VERTICAL_BAR:
-        case tokenizer::DOUBLE_AMPERSAND:
         case tokenizer::AND:
         case tokenizer::OR:
             return 4;

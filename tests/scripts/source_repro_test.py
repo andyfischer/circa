@@ -10,10 +10,16 @@ def test_file(filename):
     except Exception,e:
         return "On file "+filename+": "+str(e)
 
+def get_all_the_files_to_test():
+    for filename in glob.glob(os.environ['CIRCA_HOME'] + "/tests/samples/*.ca"):
+        yield filename
+    for filename in glob.glob(os.environ['CIRCA_HOME'] + "/plastic/demos/*.ca"):
+        yield filename
+
 def test_all():
     tests_run = 0
     failures = []
-    for filename in glob.glob(os.environ['CIRCA_HOME'] + "/tests/samples/*.ca"):
+    for filename in get_all_the_files_to_test():
         tests_run += 1
         result = test_file(filename)
         if result is not True:
