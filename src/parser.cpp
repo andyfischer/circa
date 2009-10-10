@@ -798,6 +798,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
         rexpr = apply_with_syntax(branch, SET_FIELD_FUNC, RefList(object, field, rexpr), name);
 
+        set_source_hidden(field, true);
         get_input_syntax_hint(rexpr, 0, "postWhitespace") = "";
     }
 
@@ -818,6 +819,8 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     else {
         return compile_error_for_line(rexpr, tokens, startPosition);
     }
+
+    set_source_location(rexpr, startPosition, tokens);
 
     return rexpr;
 }
