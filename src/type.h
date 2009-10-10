@@ -31,6 +31,7 @@ struct Type
     // Functions
     AllocFunc alloc;
     DeallocFunc dealloc;
+    AllocFunc initialize;
     AssignFunc assign;
     EqualsFunc equals;
     RemapPointersFunc remapPointers;
@@ -56,6 +57,7 @@ struct Type
         cppTypeInfo(NULL),
         alloc(NULL),
         dealloc(NULL),
+        initialize(NULL),
         assign(NULL),
         equals(NULL),
         remapPointers(NULL),
@@ -89,6 +91,7 @@ namespace type_t {
     const std::type_info*& get_std_type_info(Term* type);
     AllocFunc& get_alloc_func(Term* type);
     DeallocFunc& get_dealloc_func(Term* type);
+    AllocFunc& get_initialize_func(Term* type);
     AssignFunc& get_assign_func(Term* type);
     EqualsFunc& get_equals_func(Term* type);
     RemapPointersFunc& get_remap_pointers_func(Term* type);
