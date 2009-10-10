@@ -196,6 +196,21 @@ void main_loop()
     }
 }
 
+bool load_user_script_filename(std::string const& filename)
+{
+    if (!file_exists(filename)) {
+        std::cout << "File not found: " << filename << std::endl;
+        return false;
+    }
+
+    SCRIPT_ROOT->get("user_script_filename")->asString() = filename;
+    Term* users_branch = SCRIPT_ROOT->get("users_branch");
+    include_function::possibly_expand(users_branch);
+    USERS_BRANCH = &users_branch->asBranch();
+
+    return true;
+}
+
 int plastic_main(std::vector<std::string> args)
 {
     // For no args, default action is to run tests
@@ -213,22 +228,24 @@ int plastic_main(std::vector<std::string> args)
         return 0;
     }
 
-    if (!file_exists(args[0])) {
-        std::cout << "File not found: " << args[0] << std::endl;
-        return 1;
+    // Print compiled code
+    if (args[0] == "-p") {
+        if (!load_user_script_filename(args[1]))
+            return 1;
+        std::cout << branch_to_string_raw(*SCRIPT_ROOT);
+        return 0;
     }
 
-    // Inject the requested filename, so that the user's script will be loaded
-    String user_script_filename(*SCRIPT_ROOT, "user_script_filename", "");
-    user_script_filename = args[0];
-    Term* users_branch = SCRIPT_ROOT->get("users_branch");
-    include_function::possibly_expand(users_branch);
-    USERS_BRANCH = &users_branch->asBranch();
+    if (!load_user_script_filename(args[1]))
+        return 1;
 
     if (has_static_errors(*USERS_BRANCH)) {
         print_static_errors_formatted(*USERS_BRANCH, std::cout);
         return 1;
     }
+
+    // Check to dump compiled code:
+
 
     // Try to initialize display
     if (!initialize_display()) return 1;
