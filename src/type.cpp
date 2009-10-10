@@ -321,6 +321,10 @@ namespace type_t {
     {
         return as_type(type).dealloc;
     }
+    AllocFunc& get_initialize_func(Term* type)
+    {
+        return as_type(type).initialize;
+    }
     AssignFunc& get_assign_func(Term* type)
     {
         return as_type(type).assign;

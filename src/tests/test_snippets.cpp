@@ -220,6 +220,11 @@ void test_set()
     test_snippet("s = Set(); s.add(1); s.add(1)", "to_string(s) == '{1}'");
 }
 
+void test_map()
+{
+    test_snippet("m = Map(); m.add(1,2)", "m.contains(1); to_string(m) == '{1: 2}'");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
@@ -233,6 +238,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_for_loops);
     REGISTER_TEST_CASE(test_snippets::test_subscripting);
     REGISTER_TEST_CASE(test_snippets::test_set);
+    REGISTER_TEST_CASE(test_snippets::test_map);
 }
 
 } // namespace test_snippets

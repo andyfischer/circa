@@ -4,75 +4,6 @@
 
 namespace circa {
 
-namespace set_t {
-    bool contains(Branch& branch, Term* value)
-    {
-        for (int i=0; i < branch.length(); i++) {
-            if (equals(value, branch[i]))
-                return true;
-        }
-        return false;
-    }
-
-    void add(Branch& branch, Term* value)
-    {
-        if (contains(branch, value))
-            return;
-
-        create_duplicate(branch, value);
-    }
-
-    void hosted_add(Term* caller)
-    {
-        assign_value(caller->input(0), caller);
-        Branch& contents = as_branch(caller);
-        Term* value = caller->input(1);
-        add(contents, value);
-    }
-
-    void contains(Term* caller)
-    {
-        Branch& contents = as_branch(caller->input(0));
-        Term* target = caller->input(1);
-        for (int i=0; i < contents.length(); i++) {
-            if (equals(target, contents[i])) {
-                as_bool(caller) = true;
-                return;
-            }
-        }
-        as_bool(caller) = false;
-    }
-
-    void remove(Term* caller)
-    {
-        assign_value(caller->input(0), caller);
-        Branch& contents = as_branch(caller);
-        Term* value = caller->input(1);
-
-        for (int index=0; index < contents.length(); index++) {
-            if (equals(value, contents[index])) {
-                contents.remove(index);
-                return;
-            }
-        }
-    }
-
-    std::string to_string(Term* caller)
-    {
-        Branch &set = as_branch(caller);
-        std::stringstream output;
-        output << "{";
-        for (int i=0; i < set.length(); i++) {
-            if (i > 0) output << ", ";
-            output << set[i]->toString();
-        }
-        output << "}";
-
-        return output.str();
-    }
-
-} // namespace set_t
-
 namespace list_t {
 
     std::string to_string(Term* caller)
@@ -108,6 +39,171 @@ namespace list_t {
     }
 
 } // namespace list_t
+
+namespace set_t {
+    bool contains(Branch& branch, Term* value)
+    {
+        for (int i=0; i < branch.length(); i++)
+            if (equals(value, branch[i]))
+                return true;
+        return false;
+    }
+
+    void add(Branch& branch, Term* value)
+    {
+        if (contains(branch, value))
+            return;
+
+        create_duplicate(branch, value);
+    }
+
+    void hosted_add(Term* caller)
+    {
+        assign_value(caller->input(0), caller);
+        Branch& contents = as_branch(caller);
+        Term* value = caller->input(1);
+        add(contents, value);
+    }
+
+    void contains(Term* caller)
+    {
+        Branch& contents = as_branch(caller->input(0));
+        Term* target = caller->input(1);
+        as_bool(caller) = contains(contents, target);
+    }
+
+    void remove(Term* caller)
+    {
+        assign_value(caller->input(0), caller);
+        Branch& contents = as_branch(caller);
+        Term* value = caller->input(1);
+
+        for (int index=0; index < contents.length(); index++) {
+            if (equals(value, contents[index])) {
+                contents.remove(index);
+                return;
+            }
+        }
+    }
+
+    std::string to_string(Term* caller)
+    {
+        Branch &set = as_branch(caller);
+        std::stringstream output;
+        output << "{";
+        for (int i=0; i < set.length(); i++) {
+            if (i > 0) output << ", ";
+            output << set[i]->toString();
+        }
+        output << "}";
+
+        return output.str();
+    }
+
+} // namespace set_t
+
+namespace map_t {
+    int find_key_index(Branch& contents, Term* key)
+    {
+        Branch& keys = contents[0]->asBranch();
+
+        for (int i=0; i < keys.length(); i++)
+            if (equals(keys[i], key))
+                return i;
+        return -1;
+    }
+
+    void insert(Branch& contents, Term* key, Term* value)
+    {
+        Branch& keys = contents[0]->asBranch();
+        Branch& values = contents[1]->asBranch();
+
+        int index = find_key_index(contents, key);
+
+        if (index == -1) {
+            create_duplicate(keys, key);
+            create_duplicate(values, value);
+        } else {
+            assign_value(values[index], value);
+        }
+    }
+
+    void remove(Branch& contents, Term* key)
+    {
+        Branch& keys = contents[0]->asBranch();
+        Branch& values = contents[1]->asBranch();
+
+        int index = find_key_index(contents, key);
+
+        if (index != -1) {
+            keys[index] = NULL;
+            keys.removeNulls();
+            values[index] = NULL;
+            values.removeNulls();
+        }
+    }
+
+    Term* get(Branch& contents, Term* key)
+    {
+        Branch& values = contents[1]->asBranch();
+        int index = find_key_index(contents, key);
+
+        if (index == -1)
+            return NULL;
+        else
+            return values[index];
+    }
+
+    void contains(Term* caller)
+    {
+        as_bool(caller) = find_key_index(caller->input(0)->asBranch(), caller->input(1)) != -1;
+    }
+
+    void insert(Term *caller)
+    {
+        assign_value(caller->input(0), caller);
+        insert(caller->asBranch(), caller->input(1), caller->input(2));
+    }
+
+    void remove(Term* caller)
+    {
+        assign_value(caller->input(0), caller);
+        remove(caller->asBranch(), caller->input(1));
+    }
+
+    void get(Term* caller)
+    {
+        Term* key = caller->input(1);
+        Term* value = get(caller->input(0)->asBranch(), key);
+        if (value == NULL) {
+            error_occurred(caller, "Key not found: " + to_string(key));
+            return;
+        }
+
+        assign_value(value, caller);
+    }
+
+    std::string to_string(Term* term)
+    {
+        std::stringstream out;
+        out << "{";
+
+        Branch& contents = as_branch(term);
+        Branch& keys = contents[0]->asBranch();
+        Branch& values = contents[1]->asBranch();
+
+        for (int i=0; i < keys.length(); i++) {
+            if (i != 0)
+                out << ", ";
+            out << keys[i]->toString();
+            out << ": ";
+            out << values[i]->toString();
+        }
+
+        out << "}";
+        return out.str();
+    }
+} // namespace map_t
 
 namespace dict_t {
     std::string to_string(Branch& branch)
@@ -291,6 +387,20 @@ void setup_builtin_types(Branch& kernel)
         import_member_function(LIST_TYPE, list_t::append, "append(List, any) : List");
     function_t::get_input_placeholder(list_append, 0)->boolProp("use-as-output") = true;
     import_member_function(LIST_TYPE, list_t::count, "count(List) : int");
+
+    Term* map_type = create_compound_type(kernel, "Map");
+    type_t::get_to_string_func(map_type) = map_t::to_string;
+    Term* map_add = import_member_function(map_type, map_t::insert, "add(Map, any, any) : Map");
+    function_t::get_input_placeholder(map_add, 0)->boolProp("use-as-output") = true;
+    import_member_function(map_type, map_t::contains, "contains(Map, any) : bool");
+    Term* map_remove = import_member_function(map_type, map_t::remove, "remove(Map, any) : Map");
+    function_t::get_input_placeholder(map_remove, 0)->boolProp("use-as-output") = true;
+    import_member_function(map_type, map_t::get, "get(Map, any) : any");
+
+    type_t::enable_default_value(map_type);
+    Branch& map_default_value = type_t::get_default_value(map_type)->asBranch();
+    create_list(map_default_value);
+    create_list(map_default_value);
 
     NAMESPACE_TYPE = create_compound_type(kernel, "Namespace");
     OVERLOADED_FUNCTION_TYPE = create_compound_type(kernel, "OverloadedFunction");
