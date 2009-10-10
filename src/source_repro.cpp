@@ -50,6 +50,11 @@ std::string get_source_of_input(Term* term, int inputIndex)
 
     result << get_input_syntax_hint_optional(term, visibleIndex, "preWhitespace", defaultPre);
 
+    // possibly insert the @ operator. This is pretty flawed, it should be stored by index.
+    if (input->name != ""
+            && input->name == term->stringPropOptional("syntaxHints:rebindOperator",""))
+        result << "@";
+
     bool byValue = input->name == "";
 
     if (byValue) {
@@ -89,6 +94,8 @@ void prepend_name_binding(Term* term, std::stringstream& out)
     else if (term->name == "")
         return;
     else if (term->boolPropOptional("syntaxHints:implicitNameBinding", false))
+        return;
+    else if (term->hasProperty("syntaxHints:rebindOperator"))
         return;
     else {
         out << term->name;

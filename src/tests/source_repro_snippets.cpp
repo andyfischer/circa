@@ -340,6 +340,11 @@ void reproduce_identifiers_inside_namespaces() {
     finish_source_repro_category();
 }
 
+void reproduce_rebind_operator() {
+    round_trip_source("a = 1; add(@a, 2)");
+    finish_source_repro_category();
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);
@@ -360,6 +365,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_unary);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_bracket_syntax);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_identifiers_inside_namespaces);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebind_operator);
 }
 
 } // namespace source_repro_snippets

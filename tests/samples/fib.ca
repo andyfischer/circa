@@ -1,9 +1,7 @@
 
 def fib(int x) : int
-  -- This line is dumb but necessary for now:
-  return 0
 
-  if x == 0 || x == 1
+  if x == 0 or x == 1
     return 1
   else
     return add_i(fib(sub_i(x,1)) fib(sub_i(x,2)))
