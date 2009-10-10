@@ -162,7 +162,7 @@ void setup(Branch& branch)
     import_type<TTF_Font*>(branch["TTF_Font"]);
 
     type_t::enable_default_value(branch["TTF_Font"]);
-    as<TTF_Font*>(type_t::default_value(branch["TTF_Font"])) = 0;
+    as<TTF_Font*>(type_t::get_default_value(branch["TTF_Font"])) = 0;
 
     install_function(branch["text"]->asBranch()["load_font"], load_font);
     //install_function(branch["text"]->asBranch()["draw_text"], draw_text);
