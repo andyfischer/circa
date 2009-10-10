@@ -36,11 +36,23 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
 
     // Check that the input code had properly defined source locations
     for (BranchIterator it(code); !it.finished(); ++it) {
-        if (is_hidden(*it)) { it.skipNextBranch(); continue; }
 
-        if (!has_source_location_defined(*it)) {
-            std::cout << "Missing source location:" << std::endl;
-            std::cout << get_term_source(*it) << std::endl;
+        Term* term = *it;
+
+        if (is_hidden(term)) {
+            it.skipNextBranch();
+            continue;
+        }
+
+        if (is_value(term) && is_branch(term) && !is_function(term)) {
+            it.skipNextBranch();
+            continue;
+        }
+
+        if (!has_source_location_defined(term)) {
+            std::cout << "Missing source location (" << format_global_id(term)
+                << ")" << std::endl;
+            std::cout << get_term_source(term) << std::endl;
             std::cout << branch_to_string_raw(code) << std::endl;
             declare_current_test_failed();
         }
@@ -223,6 +235,14 @@ void test_set()
 void test_map()
 {
     test_snippet("m = Map(); m.add(1,2)", "m.contains(1); to_string(m) == '{1: 2}'");
+    test_snippet("m = Map(); m.add(1,2); m.add(3,4)", "m.get(1) == 2; m.get(3) == 4");
+    test_snippet("m = Map(); m.add('a','b')",
+        "m.contains('a'); m.remove('a'); not(m.contains('a'))");
+}
+
+void test_field_syntax()
+{
+    test_snippet("p = Point(); p.x = 5.0; p.y = 3.0", "p == [5.0 3.0]");
 }
 
 void register_tests()
@@ -239,6 +259,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_subscripting);
     REGISTER_TEST_CASE(test_snippets::test_set);
     REGISTER_TEST_CASE(test_snippets::test_map);
+    REGISTER_TEST_CASE(test_snippets::test_field_syntax);
 }
 
 } // namespace test_snippets

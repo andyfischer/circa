@@ -26,6 +26,8 @@ Bugs:
 
  - 'do once' needs to export name bindings. Maybe just make this syntactic sugar for if() ?
 
+ - typeof() should return a reference not a value
+
 Tasks:
  - Need an efficient + safe way to share output values across terms
  - Block syntax, like how it's easy to pass a block in ruby

@@ -12,7 +12,7 @@ namespace set_field_function {
         std::string name = caller->input(1)->asString();
         int index = type_t::find_field_index(caller->input(0)->type, name);
 
-        if (index == 0) {
+        if (index == -1) {
             error_occurred(caller, "field not found: "+name);
             return;
         }
