@@ -1,0 +1,6 @@
+
+background(#666)
+
+script = load_script('browser_sample.ca')
+
+

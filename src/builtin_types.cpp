@@ -287,10 +287,16 @@ namespace branch_inspector_t
 
         return true;
     }
+
+    Branch& get_target_branch(Term* caller)
+    {
+        Branch& mirrorObject = caller->input(0)->asBranch();
+        return mirrorObject[0]->asRef()->asBranch();
+    }
+
     void get_configs(Term* caller)
     {
-        Branch& object = caller->input(0)->asBranch();
-        Branch& target_branch = object[0]->asRef()->asBranch();
+        Branch& target_branch = get_target_branch(caller);
         Branch& output = caller->asBranch();
 
         int write = 0;
@@ -312,8 +318,7 @@ namespace branch_inspector_t
     }
     void get_configs_nested(Term* caller)
     {
-        Branch& object = caller->input(0)->asBranch();
-        Branch& target_branch = object[0]->asRef()->asBranch();
+        Branch& target_branch = get_target_branch(caller);
         Branch& output = caller->asBranch();
 
         int write = 0;
@@ -348,8 +353,7 @@ namespace branch_inspector_t
 
     void get_relative_name(Term* caller)
     {
-        Branch& object = caller->input(0)->asBranch();
-        Branch& target_branch = object[0]->asRef()->asBranch();
+        Branch& target_branch = get_target_branch(caller);
         Term* target = caller->input(1)->asRef();
 
         if (target == NULL) {
@@ -358,6 +362,21 @@ namespace branch_inspector_t
         }
 
         as_string(caller) = get_relative_name(target_branch, target);
+    }
+
+    void get_length(Term* caller)
+    {
+        Branch& target_branch = get_target_branch(caller);
+        as_int(caller) = target_branch.length();
+    }
+    void get_index(Term* caller)
+    {
+        Branch& target_branch = get_target_branch(caller);
+        int index = caller->input(1)->asInt();
+        if (index >= target_branch.length())
+            as_ref(caller) = NULL;
+        else
+            as_ref(caller) = target_branch[index];
     }
 
 } // namespace branch_inspector_t
@@ -401,6 +420,8 @@ void setup_builtin_types(Branch& kernel)
     NAMESPACE_TYPE = create_compound_type(kernel, "Namespace");
     OVERLOADED_FUNCTION_TYPE = create_compound_type(kernel, "OverloadedFunction");
     CODE_TYPE = create_compound_type(kernel, "Code");
+
+    BRANCH_MIRROR_TYPE = parse_type(kernel, "type BranchMirror { Ref target }");
 }
 
 void parse_builtin_types(Branch& kernel)
@@ -412,13 +433,16 @@ void parse_builtin_types(Branch& kernel)
 
     type_t::get_to_string_func(COLOR_TYPE) = color_t::to_string;
 
-    Term* branch_inspector_type = parse_type(kernel, "type BranchInspector { Ref target }");
-    import_member_function(branch_inspector_type, branch_inspector_t::get_configs,
-        "get_configs(BranchInspector) : List");
-    import_member_function(branch_inspector_type, branch_inspector_t::get_configs_nested,
-        "get_configs_nested(BranchInspector) : List");
-    import_member_function(branch_inspector_type, branch_inspector_t::get_relative_name,
-        "get_relative_name(BranchInspector, Ref) : string");
+    import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_configs,
+        "get_configs(BranchMirror) : List");
+    import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_configs_nested,
+        "get_configs_nested(BranchMirror) : List");
+    import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_relative_name,
+        "get_relative_name(BranchMirror, Ref) : string");
+    import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_length,
+        "length(BranchMirror) : int");
+    import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_index,
+        "get_index(BranchMirror, int) : Ref");
 }
 
 } // namespace circa

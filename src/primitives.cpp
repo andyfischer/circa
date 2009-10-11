@@ -377,6 +377,19 @@ namespace ref_t {
         
         as_float(caller) = to_float(t);
     }
+    void get_input(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+        int index = caller->input(1)->asInt();
+        if (index >= t->numInputs())
+            as_ref(caller) = NULL;
+        else
+            as_ref(caller) = t->input(index);
+    }
 }
 
 void initialize_primitive_types(Branch& kernel)
@@ -438,6 +451,7 @@ void setup_primitive_types()
     import_member_function(REF_TYPE, ref_t::tweak, "tweak(Ref, int steps)");
     import_member_function(REF_TYPE, ref_t::asint, "asint(Ref) : int");
     import_member_function(REF_TYPE, ref_t::asfloat, "asfloat(Ref) : number");
+    import_member_function(REF_TYPE, ref_t::get_input, "input(Ref, int) : Ref");
 }
 
 } // namespace circa
