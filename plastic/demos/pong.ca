@@ -26,32 +26,32 @@ ball_speed = 6.6
 ball_radius = 8.5
 
 -- player's paddle on left
-players_paddle_loc = [50 mouse.y] : Point
+players_paddle_loc = [50 mouse.y] :: Point
 players_paddle = expand_rect(players_paddle_loc, paddle_depth, paddle_width)
 
 ai_speed = 3.5
-ai_paddle_loc = [window.width - 50, approach(ball_loc.y, ai_speed)] : Point
+ai_paddle_loc = [window.width - 50, approach(ball_loc.y, ai_speed)] :: Point
 ai_paddle = expand_rect(ai_paddle_loc, paddle_depth, paddle_width)
 
 ball_is_being_introduced = (time - round_start_time) < 2.0
 
 if ball_loc.x + ball_radius < 0
     ai_points += 1
-    ball_loc = [window.width/2, window.height/2] : Point
+    ball_loc = [window.width/2, window.height/2] :: Point
     ball_direction = random_initial_direction()
     round_start_time = time
 elif (ball_loc.x - ball_radius) > window.width
     players_points += 1
-    ball_loc = [window.width/2, window.height/2] : Point
+    ball_loc = [window.width/2, window.height/2] :: Point
     ball_direction = random_initial_direction()
     round_start_time = time
 end
 
 -- bounce balls off of top and bottom
 if (ball_loc.y + ball_radius) > window.height
-    ball_direction = [ball_direction.x -ball_direction.y] : Point
+    ball_direction = [ball_direction.x -ball_direction.y] :: Point
 elif (ball_loc.y - ball_radius) < 0
-    ball_direction = [ball_direction.x -ball_direction.y] : Point
+    ball_direction = [ball_direction.x -ball_direction.y] :: Point
 end
 
 def get_collision_vector(Rect paddle, Point point) : Point
@@ -60,7 +60,7 @@ def get_collision_vector(Rect paddle, Point point) : Point
     paddle_size = (paddle.y2 - paddle.y1)
     collision_loc_on_paddle = (point.y - paddle_center_y) / paddle_size
     angle = collision_loc_on_paddle * .3
-    v = [cos(angle) sin(angle)] : Point
+    v = [cos(angle) sin(angle)] :: Point
     return v
 end
 
@@ -70,7 +70,7 @@ if rect_intersects_circle(players_paddle, ball_loc, ball_radius)
 end
 if rect_intersects_circle(ai_paddle, ball_loc, ball_radius)
     ball_direction = get_collision_vector(ai_paddle, ball_loc)
-    ball_direction = [-ball_direction.x ball_direction.y] : Point
+    ball_direction = [-ball_direction.x ball_direction.y] :: Point
 end
 
 -- move ball

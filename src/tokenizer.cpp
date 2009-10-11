@@ -38,6 +38,7 @@ const char* get_token_text(int match)
         case GTHANEQ: return ">=";
         case PERCENT: return "%";
         case COLON: return ":";
+        case DOUBLE_COLON: return "::";
         case DOUBLE_EQUALS: return "==";
         case NOT_EQUALS: return "!=";
         case EQUALS: return "=";
@@ -407,6 +408,11 @@ void top_level_consume_token(TokenizeContext &context)
             if (context.next() == '=') {
                 context.consume();
                 context.push(COLON_EQUALS);
+                return;
+            }
+            else if (context.next() == ':') {
+                context.consume();
+                context.push(DOUBLE_COLON);
                 return;
             }
 

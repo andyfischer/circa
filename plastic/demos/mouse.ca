@@ -11,7 +11,7 @@ star_color = #f39
 state global_scale = 1.0
 
 def draw_star(Star star)
-  radius = star.size * global_scale : number
+  radius = star.size * global_scale :: number
   num_points = 5
 
   rot = star.rot + time/5

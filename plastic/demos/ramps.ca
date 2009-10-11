@@ -28,11 +28,11 @@ num_tiles = num_tiles_x * num_tiles_y
 -- draw the checkerboard in the background
 for x in 0..num_tiles_x
   for y in 0..num_tiles_y
-    box_tl = [x:int * tile_size, y:int * tile_size] : Point
+    box_tl = [x::int * tile_size, y::int * tile_size] :: Point
     box_br = box_tl + [tile_size, tile_size]
     box_tr = [box_br.x box_tl.y]
     box_bl = [box_tl.x box_br.y]
-    color = if_expr((x:int+y:int) % 2 == 1, #eee, #fff)
+    color = if_expr((x::int+y::int) % 2 == 1, #eee, #fff)
     gl.triangles([box_tl box_tr box_bl box_tr box_br box_bl] color)
   end
 end
@@ -125,7 +125,7 @@ type FallingGroupPosition {
 }
 
 state falling_group = get_random_piece_type()
-state falling_group_pos = [0 4 0] : FallingGroupPosition
+state falling_group_pos = [0 4 0] :: FallingGroupPosition
 fall_speed = 80.0
 state number tile_fall_distance = tile_size
 
@@ -143,7 +143,7 @@ end
 def position_falling_pieces(List group, FallingGroupPosition pos) : List
   group = rotate_falling_group(group, pos.rot)
   def position_piece(Piece piece) : Piece
-      pos = [piece.x + pos.x, piece.y + pos.y] : Point_i
+      pos = [piece.x + pos.x, piece.y + pos.y] :: Point_i
       return [pos.x pos.y piece.rot]
   end
   out = map(position_piece, group)
@@ -153,7 +153,7 @@ end
 
 def falling_pieces_collide(List group) : bool
   def piece_collides(Piece piece) : bool
-    board_piece = board[board_loc_to_index([piece.x piece.y])] : BoardPiece
+    board_piece = board[board_loc_to_index([piece.x piece.y])] :: BoardPiece
     if board_piece.square_filled
       return true
     else
@@ -174,7 +174,7 @@ def falling_group_collides(List group, FallingGroupPosition pos) : bool
 end
 
 -- User's movement of falling group
-users_movement = [0 0 0] : FallingGroupPosition
+users_movement = [0 0 0] :: FallingGroupPosition
 if key_pressed(DOWN)
   users_movement.rot = -1
 end
@@ -207,9 +207,10 @@ if tile_fall_distance < 0
     -- Make this piece permanent
     falling_group_position = position_falling_pieces(falling_group, falling_group_pos)
     for piece in falling_group_position
-      piece = piece:Piece
-      existing_board_piece = board[board_loc_to_index([piece.x piece.y])] : BoardPiece
-      board[board_loc_to_index([piece.x piece.y])] = [piece.rot true existing_board_piece.filled]
+      piece = piece::Piece
+      existing_board_piece = board[board_loc_to_index([piece.x piece.y])] :: BoardPiece
+[piece.rot true existing_board_piece.filled]
+      board = set_index(board, board_loc_to_index([piece.x piece.y]), [piece.rot true existing_board_piece.filled])
     end
 
     -- Reset falling group
@@ -221,17 +222,17 @@ if tile_fall_distance < 0
 end
 
 -- Draw the current position of the falling group
-falling_group_pos = falling_group_pos : FallingGroupPosition
+falling_group_pos = falling_group_pos :: FallingGroupPosition
 positioned_falling_group = position_falling_pieces(falling_group, falling_group_pos)
 
 for piece in positioned_falling_group
-    piece = piece:Piece
+    piece = piece::Piece
     draw_free_piece([piece.x * tile_size, piece.y * tile_size - tile_fall_distance] piece.rot/4.0)
 end
 
 -- Draw board
 for index in 0..num_tiles
-  piece = board[index] : BoardPiece
+  piece = board[index] :: BoardPiece
   loc = board_index_to_loc(index)
   if piece.filled
     draw_piece([loc.x loc.y piece.rot])
@@ -264,7 +265,7 @@ def find_highest_tile_for_x(int tile_x) : int
     -- this code is blah
     found = 0
     for i in 0..num_tiles_y
-        board_piece = board[board_loc_to_index([tile_x, i])] : BoardPiece
+        board_piece = board[board_loc_to_index([tile_x, i])] :: BoardPiece
         if board_piece.filled and found == 0
             found = i
         end
@@ -278,7 +279,7 @@ state List creatures = []
 -- Check to spawn a dude
 time_between_creatures = 10
 if repeating_signal(time_between_creatures)
-    new_creature = [0 find_highest_tile_for_x(0) 0 1] : Creature
+    new_creature = [0 find_highest_tile_for_x(0) 0 1] :: Creature
     creatures.append(new_creature)
 end
 
@@ -287,15 +288,15 @@ end
 type PathSegment { Point l, Point r }
 
 def get_path_segment(int tile_x) : PathSegment
-    tile_y = find_highest_tile_for_x(tile_x)
-    board_piece = board[board_loc_to_index([tile_x,tile_y])] : BoardPiece
+    tile_y = (find_highest_tile_for_x(tile_x))
+    board_piece = board[board_loc_to_index([tile_x,tile_y])] :: BoardPiece
 
     x1 = tile_size*tile_x
     x2 = tile_size*(tile_x+1)
-    if (board_piece.square_filled) or (board_piece.rot == NW) or (board_piece.rot == NE)
+    if board_piece.square_filled or (board_piece.rot == NW) or (board_piece.rot == NE)
         return [[x1, tile_y*tile_size], [x2, tile_y*tile_size]]
     elif (board_piece.rot == SW)
-        return [[x1, (tile_y)*tile_size], [x2, (tile_y+1)*tile_size]]
+        return [[x1, tile_y*tile_size], [x2, (tile_y+1)*tile_size]]
     else
         return [[x1, (tile_y+1)*tile_size], [x2, tile_y*tile_size]]
     end
@@ -303,7 +304,7 @@ end
 
 path = map(get_path_segment, 0..num_tiles_x)
 for segment in path
-    segment = segment : PathSegment
+    segment = segment :: PathSegment
     draw_thick_line(segment.l segment.r 2.0 #f00)
 end
 
@@ -316,8 +317,8 @@ def move_creature(Creature creature) : Creature
 
     if finished_tile
         -- check if there is a wall here
-        this_path = path[creature.tile_x] : PathSegment
-        next_path = path[creature.tile_x + creature.walking_dir] : PathSegment
+        this_path = path[creature.tile_x] :: PathSegment
+        next_path = path[creature.tile_x + creature.walking_dir] :: PathSegment
 
         if creature.walking_dir == 1
             close_point = this_path.r
@@ -341,13 +342,13 @@ creatures = map(move_creature, creatures)
 type PositionedCreature { number x, number y }
 
 def position_creature(Creature creature) : PositionedCreature
-    path_segment = path[creature.tile_x] : PathSegment
+    path_segment = path[creature.tile_x] :: PathSegment
 
     track_pos = path_segment.l + (path_segment.r - path_segment.l) * creature.tile_x_progress
     return track_pos + [0 -tile_size/2]
 end
 
 for pos_creature in map(position_creature, creatures)
-    pos_creature = pos_creature : PositionedCreature
+    pos_creature = pos_creature :: PositionedCreature
     gl.circle([pos_creature.x pos_creature.y] 15.0 #844)
 end

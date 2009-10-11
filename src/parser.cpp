@@ -605,9 +605,8 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     get_for_loop_modify_list(forTerm)->asBool() = foundAtOperator;
 
-    if (foundAtOperator) {
+    if (foundAtOperator)
         forTerm->stringProp("syntaxHints:rebindOperator") = listExpr->name;
-    }
 
     forTerm->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 
@@ -902,7 +901,8 @@ const int HIGHEST_INFIX_PRECEDENCE = 8;
 int get_infix_precedence(int match)
 {
     switch(match) {
-        case tokenizer::COLON:
+        case tokenizer::COLON: // deprecated
+        case tokenizer::DOUBLE_COLON:
         case tokenizer::TWO_DOTS:
             return 8;
         case tokenizer::STAR:
@@ -959,7 +959,7 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "*=") return "mult";
     else if (infix == "/=") return "div";
     else if (infix == "!=") return "not_equals";
-    else if (infix == ":") return "annotate_type";
+    else if (infix == "::") return "annotate_type";
     else if (infix == "<-") return "feedback";
     else if (infix == "..") return "range";
     else return "#unrecognized";

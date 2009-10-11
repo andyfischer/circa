@@ -9,6 +9,6 @@ typeof(l_anno) -> print
 
 print(l_anno.x ',' l_anno.y)
 
--- now try : operator, which should have the same effect
-b = [5.0 3.0] : Point
+-- now try :: operator, which should have the same effect
+b = [5.0 3.0] :: Point
 print(b.x ',' b.y)
