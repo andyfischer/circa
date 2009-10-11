@@ -221,6 +221,7 @@ if tile_fall_distance < 0
 end
 
 -- Draw the current position of the falling group
+falling_group_pos = falling_group_pos : FallingGroupPosition
 positioned_falling_group = position_falling_pieces(falling_group, falling_group_pos)
 
 for piece in positioned_falling_group

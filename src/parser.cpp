@@ -605,6 +605,10 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     get_for_loop_modify_list(forTerm)->asBool() = foundAtOperator;
 
+    if (foundAtOperator) {
+        forTerm->stringProp("syntaxHints:rebindOperator") = listExpr->name;
+    }
+
     forTerm->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 
     // Create iterator variable

@@ -231,6 +231,7 @@ void reproduce_for_loop() {
     round_trip_source("for x in [1];   end");
     round_trip_source("for x in [1]   end");
     round_trip_source("for x in [1] print(1)  end");
+    round_trip_source("l = [1]; for x in @l x += 1 end");
     finish_source_repro_category();
 }
 
@@ -345,6 +346,11 @@ void reproduce_rebind_operator() {
     finish_source_repro_category();
 }
 
+void reproduce_discard_statement() {
+    round_trip_source("l = [1]; for i in l; discard; end");
+    finish_source_repro_category();
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);
@@ -366,6 +372,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_bracket_syntax);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_identifiers_inside_namespaces);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebind_operator);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_discard_statement);
 }
 
 } // namespace source_repro_snippets
