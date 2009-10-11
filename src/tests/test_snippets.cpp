@@ -169,8 +169,9 @@ void test_references()
             "mir.length() == 2");
 
     // test .get_index
-    test_snippet("a = 1; b = 2; br = [a b]; mir = branch_mirror(br); mir_0 = mir.get_index(0)",
-            "mir_0.asint() == 1");
+    test_snippet("a = 1; b = 2; br = [a b]; mir = branch_mirror(br);"
+            "mir_0 = mir.get_index(0); mir_1 = mir.get_index(1)",
+            "mir_0.asint() == 1; mir_1.asint() == 2");
 }
 
 void test_blocks()

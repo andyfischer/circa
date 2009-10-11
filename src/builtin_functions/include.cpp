@@ -26,7 +26,15 @@ namespace include_function {
             duplicate_branch(contents, previous_contents);
 
             contents.clear();
-            parse_script(contents, requested_filename);
+
+            std::string filename = get_path_relative_to_source(caller, requested_filename);
+
+            if (!file_exists(filename)) {
+                error_occurred(caller, "File not found: "+filename);
+                return;
+            }
+
+            parse_script(contents, filename);
 
             if (previous_contents.length() > 0)
                 migrate_stateful_values(previous_contents, contents);

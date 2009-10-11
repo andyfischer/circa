@@ -71,8 +71,24 @@ std::string get_directory_for_filename(std::string const& filename)
     return result;
 }
 
+std::string get_path_relative_to_source(Term* relativeTo, std::string const& path)
+{
+    if (relativeTo->owningBranch == NULL)
+        return path;
+
+    std::string scriptLocation = get_source_file_location(*relativeTo->owningBranch);
+
+    if (scriptLocation == "")
+        return path;
+
+    return scriptLocation + "/" + path;
+}
+
 bool file_exists(std::string const& filename)
 {
+    if (FAKE_FILE_IO != NULL)
+        return FAKE_FILE_IO->file_exists(filename);
+
     // This could also be replaced by boost
     FILE* fp = fopen(filename.c_str(), "r");
     if (fp) {

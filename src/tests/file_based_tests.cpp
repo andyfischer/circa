@@ -46,6 +46,10 @@ struct FakeFileSystem : FileIORedirector
         return _files[filename].last_modified;
     }
 
+    virtual bool file_exists(std::string const& filename)
+    {
+        return _files.find(filename) != _files.end();
+    }
 };
 
 void test_the_test()
