@@ -142,14 +142,16 @@ void test_symbols2()
 void test_symbols3()
 {
     token::TokenList results;
-    token::tokenize("&&!=..", results);
-    test_assert(results.size() == 3);
+    token::tokenize("&&!=..::", results);
+    test_assert(results.size() == 4);
     test_assert(results[0].text == "&&");
     test_assert(results[0].match == token::DOUBLE_AMPERSAND);
     test_assert(results[1].text == "!=");
     test_assert(results[1].match == token::NOT_EQUALS);
     test_assert(results[2].text == "..");
     test_assert(results[2].match == token::TWO_DOTS);
+    test_assert(results[3].text == "::");
+    test_assert(results[3].match == token::DOUBLE_COLON);
 }
 
 void test_keywords()

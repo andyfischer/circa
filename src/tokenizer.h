@@ -53,6 +53,7 @@ const int GTHAN = 26;
 const int GTHANEQ = 27;
 const int PERCENT = 41;
 const int COLON = 28;
+const int DOUBLE_COLON = 47;
 const int DOUBLE_EQUALS = 29;
 const int NOT_EQUALS = 30;
 const int EQUALS = 31;

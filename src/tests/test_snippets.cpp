@@ -154,8 +154,8 @@ void test_references()
     test_snippet("a = 1; ra = &a; rb = &a", "ra == rb");
 
     test_snippet("br = begin; a = 1; state b = 2; 3; end;"
-                 "bi = [&br] : BranchInspector; cons = bi.get_configs();"
-                 "cons_0 = cons[0] : Ref",
+                 "bi = [&br] :: BranchInspector; cons = bi.get_configs();"
+                 "cons_0 = cons[0] :: Ref",
                  "length(cons) == 1; cons_0.name == 'a'");
 }
 
