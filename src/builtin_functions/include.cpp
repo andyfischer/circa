@@ -5,7 +5,7 @@
 namespace circa {
 namespace include_function {
 
-    bool possibly_expand(Term* caller)
+    void load_script(Term* caller)
     {
         Term* state = caller->input(0);
         std::string &prev_filename = state->asBranch()[0]->asString();
@@ -15,6 +15,7 @@ namespace include_function {
 
         time_t modifiedTime = get_modified_time(requested_filename);
 
+        // Reload if the filename or modified-time has changed
         if (requested_filename != prev_filename
                 || prev_modified != modifiedTime) {
             prev_filename = requested_filename;
@@ -30,23 +31,21 @@ namespace include_function {
             if (previous_contents.length() > 0)
                 migrate_stateful_values(previous_contents, contents);
 
-            return true;
+            if (has_static_errors(contents)) {
+                error_occurred(caller, get_static_errors_formatted(contents));
+                return;
+            }
         }
-
-        return false;
     }
 
-    void evaluate(Term* caller)
+    void evaluate_include(Term* caller)
     {
-        bool reloaded = possibly_expand(caller);
+        load_script(caller);
+
+        if (caller->hasError())
+            return;
 
         Branch& contents = as_branch(caller);
-
-        if (reloaded && has_static_errors(contents)) {
-            error_occurred(caller, get_static_errors_formatted(contents));
-            return;
-        }
-
         evaluate_branch(contents, caller);
     }
 
@@ -57,10 +56,13 @@ namespace include_function {
 
     void setup(Branch& kernel)
     {
-        parse_type(kernel, "type _include_state { string filename, int time_modified }");
-        INCLUDE_FUNC = import_function(kernel, evaluate,
-                "include(state _include_state, string filename) : Branch");
+        parse_type(kernel, "type _file_signature { string filename, int time_modified }");
+        INCLUDE_FUNC = import_function(kernel, evaluate_include,
+                "include(state _file_signature, string filename) : Branch");
         function_t::get_to_source_string(INCLUDE_FUNC) = toSourceString;
+
+        import_function(kernel, load_script,
+            "load_script(state _file_signature, string filename) : Branch");
     }
 }
-}
+} // namespace circa

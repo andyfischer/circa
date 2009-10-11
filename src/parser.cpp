@@ -871,7 +871,7 @@ Term* include_statement(Branch& branch, TokenStream& tokens)
 
     Term* result = apply(branch, INCLUDE_FUNC, RefList(filenameTerm));
 
-    include_function::possibly_expand(result);
+    include_function::load_script(result);
 
     expose_all_names(as_branch(result), branch);
 
@@ -1019,6 +1019,9 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             Term* rightExpr = infix_expression_nested(branch, tokens, precedence+1);
 
             std::string functionName = get_function_for_infix(operatorStr);
+
+            assert(functionName != "#unrecognized");
+
             bool isRebinding = is_infix_operator_rebinding(operatorStr);
 
             if (isRebinding && leftExpr->name == "")
