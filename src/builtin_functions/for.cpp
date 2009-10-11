@@ -26,12 +26,18 @@ namespace for_function {
         get_for_loop_discard_called(forTerm)->asBool() = true;
     }
 
+    std::string discard_to_source_string(Term* term)
+    {
+        return "discard";
+    }
+
     void setup(Branch& kernel)
     {
         FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(List) : Code");
         function_t::get_to_source_string(FOR_FUNC) = toSourceString;
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
+        function_t::get_to_source_string(DISCARD_FUNC) = discard_to_source_string;
     }
 }
 } // namespace circa

@@ -236,7 +236,7 @@ int plastic_main(std::vector<std::string> args)
         return 0;
     }
 
-    if (!load_user_script_filename(args[1]))
+    if (!load_user_script_filename(args[0]))
         return 1;
 
     if (has_static_errors(*USERS_BRANCH)) {
