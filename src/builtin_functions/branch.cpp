@@ -1,8 +1,6 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
-#include "branch.h"
 #include "circa.h"
-#include "introspection.h"
 
 namespace circa {
 namespace branch_function {

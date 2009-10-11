@@ -49,6 +49,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
             continue;
         }
 
+#if 0
         if (!has_source_location_defined(term)) {
             std::cout << "Missing source location (" << format_global_id(term)
                 << ")" << std::endl;
@@ -56,6 +57,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
             std::cout << branch_to_string_raw(code) << std::endl;
             declare_current_test_failed();
         }
+#endif
     }
 
     Branch& assertions = create_branch(code, "assertions");
@@ -154,9 +156,21 @@ void test_references()
     test_snippet("a = 1; ra = &a; rb = &a", "ra == rb");
 
     test_snippet("br = begin; a = 1; state b = 2; 3; end;"
-                 "bi = [&br] :: BranchInspector; cons = bi.get_configs();"
+                 "bm = branch_mirror(br); cons = bm.get_configs();"
                  "cons_0 = cons[0] :: Ref",
                  "length(cons) == 1; cons_0.name == 'a'");
+
+    // test .input
+    test_snippet("a = 1; b = 2; c = add(a,b); c_ref = &c",
+            "c_ref.input(0) == &a; c_ref.input(1) == &b");
+
+    // test .length
+    test_snippet("br = [1 2]; mir = branch_mirror(br)",
+            "mir.length() == 2");
+
+    // test .get_index
+    test_snippet("a = 1; b = 2; br = [a b]; mir = branch_mirror(br); mir_0 = mir.get_index(0)",
+            "mir_0.asint() == 1");
 }
 
 void test_blocks()
