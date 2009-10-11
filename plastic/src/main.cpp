@@ -205,7 +205,7 @@ bool load_user_script_filename(std::string const& filename)
 
     SCRIPT_ROOT->get("user_script_filename")->asString() = filename;
     Term* users_branch = SCRIPT_ROOT->get("users_branch");
-    include_function::possibly_expand(users_branch);
+    include_function::load_script(users_branch);
     USERS_BRANCH = &users_branch->asBranch();
 
     return true;
