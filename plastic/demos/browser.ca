@@ -1,6 +1,12 @@
 
-background(#666)
+--background(#666)
 
 script = load_script('browser_sample.ca')
 
+mirror = branch_mirror(script)
 
+for i in 0..mirror.length()
+    ref = mirror.get_index(i)
+
+    print(ref.name())
+end
