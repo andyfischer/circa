@@ -40,6 +40,3 @@
 #include "tokenizer.h"
 #include "token_stream.h"
 #include "type.h"
-
-#include "opt/parse_command_line.h"
-
