@@ -105,7 +105,6 @@ def source_directory_into_one_cpp(dir, name):
     BUILD_FILES.append(generated_filename)
 
 source_directory('src', excludes=['main.cpp', 'src/main.cpp'])
-source_directory('src/opt')
 source_directory_into_one_cpp('src/tests', 'all_tests')
 source_directory_into_one_cpp('src/builtin_functions', 'all_builtin_functions')
 
