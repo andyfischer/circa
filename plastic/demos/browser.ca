@@ -6,7 +6,14 @@ script = load_script('browser_sample.ca')
 mirror = branch_mirror(script)
 contents = mirror.get_visible()
 
+
+term_to_location = Map()
+
 for ref in contents
     ref = ref :: Ref
+
+    -- Todo: Draggable box
+    -- Map of refs to locations
+    -- Arrows for inputs
     print(ref.name())
 end
