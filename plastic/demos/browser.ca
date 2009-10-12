@@ -4,9 +4,9 @@
 script = load_script('browser_sample.ca')
 
 mirror = branch_mirror(script)
+contents = mirror.get_visible()
 
-for i in 0..mirror.length()
-    ref = mirror.get_index(i)
-
+for ref in contents
+    ref = ref :: Ref
     print(ref.name())
 end
