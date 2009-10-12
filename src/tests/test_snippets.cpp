@@ -118,7 +118,6 @@ void equals_snippets()
     test_snippet("", "[1 1 1] != [1 1]");
 }
 
-
 void test_abs()
 {
     test_snippet("", "abs(7.0) == 7.0");
@@ -172,6 +171,8 @@ void test_references()
     test_snippet("a = 1; b = 2; br = [a b]; mir = branch_mirror(br);"
             "mir_0 = mir.get_index(0); mir_1 = mir.get_index(1)",
             "mir_0.asint() == 1; mir_1.asint() == 2");
+
+    test_snippet("a = add(1 2 3); a_ref = &a", "a_ref.num_inputs() == 3");
 }
 
 void test_blocks()

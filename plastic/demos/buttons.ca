@@ -45,7 +45,7 @@ for button in buttons
   current_y += button_size.y + 9
 end
 
-def draggable_rect(Point initial_location, Point size) : Point location
+def draggable_rect(Point initial_location, Point size) : Point
     state Point location = initial_location
     rect = [location.x, location.y, location.x+size.x, location.y+size.y]
     state currently_dragging = false
@@ -65,7 +65,7 @@ end
 def draw_draggable_box(Point initial_location)
     size = [100 50] :: Point
     location = draggable_rect(initial_location, size)
-    draw_box([location.x location.y location.x+size.x location.y+size.y] #normal_color)
+    draw_box([location.x location.y location.x+size.x location.y+size.y] normal_color)
 end
 
 draw_draggable_box([300 40])

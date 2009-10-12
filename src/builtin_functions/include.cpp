@@ -10,6 +10,7 @@ namespace include_function {
         Term* state = caller->input(0);
         std::string &prev_filename = state->asBranch()[0]->asString();
         int &prev_modified = state->asBranch()[1]->asInt();
+        Branch& contents = as_branch(caller);
 
         std::string &requested_filename = caller->input(1)->asString();
 
@@ -18,11 +19,13 @@ namespace include_function {
         time_t modifiedTime = get_modified_time(actual_filename);
 
         // Reload if the filename or modified-time has changed
-        if (requested_filename != prev_filename || prev_modified != modifiedTime) {
+        if (requested_filename != prev_filename
+                || prev_modified != modifiedTime
+                || contents.length() == 0)
+        {
             prev_filename = requested_filename;
             prev_modified = (int) modifiedTime;
 
-            Branch& contents = as_branch(caller);
             Branch previous_contents;
             duplicate_branch(contents, previous_contents);
 
