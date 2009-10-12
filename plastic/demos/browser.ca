@@ -1,19 +1,69 @@
 
---background(#666)
+background(#ccc)
 
 script = load_script('browser_sample.ca')
 
 mirror = branch_mirror(script)
 contents = mirror.get_visible()
 
-
 term_to_location = Map()
 
+def draggable_rect(Point initial_location, Point size) : Point
+    state Point location = initial_location
+    rect = [location.x, location.y, location.x+size.x, location.y+size.y]
+    state currently_dragging = false
+    state Point mouse_offset = [0 0]
+    if currently_dragging
+        location = mouse + mouse_offset
+        if not(mouse_pressed())
+            currently_dragging = false
+        end
+    elif mouse_clicked(rect)
+        currently_dragging = true
+        mouse_offset = location - mouse
+    end
+    return location
+end
+
+box_size = [100 20] :: Point
+
+-- Get locations for each box
+index = 0
 for ref in contents
     ref = ref :: Ref
 
-    -- Todo: Draggable box
-    -- Map of refs to locations
-    -- Arrows for inputs
-    print(ref.name())
+    initial_location = [10 10+index*45]
+
+    location = draggable_rect(initial_location, box_size)
+
+    term_to_location.add(ref, location)
+
+    index += 1
+end
+
+def draw_arrow(Point a, Point b)
+    draw_thick_line(a,b, 3.0, #000)
+end
+
+-- Draw arrows for each box
+for ref in contents
+    ref = ref :: Ref
+
+    this_loc = term_to_location.get(ref)::Point + [box_size.x/2, 0]
+
+    for i in 0..ref.num_inputs()
+        input = ref.input(i)
+
+        input_loc = term_to_location.get(input)::Point + [box_size.x/2, box_size.y]
+
+        draw_arrow(this_loc, input_loc)
+    end
+end
+
+-- Draw each box
+for ref in contents
+    ref = ref :: Ref
+    location = term_to_location.get(ref) :: Point
+    draw_box(expand_rect_tl(location, box_size), #00a)
+    draw_text(ui_font_medium, ref.name(), #fff, location + [5 2])
 end

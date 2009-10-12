@@ -123,6 +123,10 @@ def expand_rect(Point center, number width, number height) : Rect
     return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
 end
 
+def expand_rect_tl(Point topLeft, Point size) : Rect
+    return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
+end
+
 def rect_intersects_rect(Rect rect_a, Rect rect_b) : bool
     "Return whether the two rectangles intersect."
     intersects_on_x = (rect_a.x2 > rect_b.x1) and (rect_b.x2 > rect_a.x1)
