@@ -350,6 +350,28 @@ namespace branch_inspector_t
         if (write < output.length())
             output.shorten(write);
     }
+    void get_visible(Term* caller)
+    {
+        Branch& target_branch = get_target_branch(caller);
+        Branch& output = caller->asBranch();
+
+        int write = 0;
+        for (int i=0; i < target_branch.length(); i++) {
+            Term* t = target_branch[i];
+            if (is_hidden(t) || t->function == COMMENT_FUNC)
+                continue;
+
+            if (write >= output.length())
+                create_ref(output, t);
+            else
+                output[write]->asRef() = t;
+
+            write++;
+        }
+
+        if (write < output.length())
+            output.shorten(write);
+    }
 
     void get_relative_name(Term* caller)
     {
@@ -439,6 +461,8 @@ void parse_builtin_types(Branch& kernel)
         "get_configs_nested(BranchMirror) : List");
     import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_relative_name,
         "get_relative_name(BranchMirror, Ref) : string");
+    import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_visible,
+        "get_visible(BranchMirror) : List");
     import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_length,
         "length(BranchMirror) : int");
     import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_index,
