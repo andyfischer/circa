@@ -13,11 +13,12 @@ namespace include_function {
 
         std::string &requested_filename = caller->input(1)->asString();
 
-        time_t modifiedTime = get_modified_time(requested_filename);
+        std::string actual_filename = get_path_relative_to_source(caller, requested_filename);
+
+        time_t modifiedTime = get_modified_time(actual_filename);
 
         // Reload if the filename or modified-time has changed
-        if (requested_filename != prev_filename
-                || prev_modified != modifiedTime) {
+        if (requested_filename != prev_filename || prev_modified != modifiedTime) {
             prev_filename = requested_filename;
             prev_modified = (int) modifiedTime;
 
@@ -27,14 +28,12 @@ namespace include_function {
 
             contents.clear();
 
-            std::string filename = get_path_relative_to_source(caller, requested_filename);
-
-            if (!file_exists(filename)) {
-                error_occurred(caller, "File not found: "+filename);
+            if (!file_exists(actual_filename)) {
+                error_occurred(caller, "File not found: "+actual_filename);
                 return;
             }
 
-            parse_script(contents, filename);
+            parse_script(contents, actual_filename);
 
             if (previous_contents.length() > 0)
                 migrate_stateful_values(previous_contents, contents);
