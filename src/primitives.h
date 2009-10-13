@@ -83,7 +83,7 @@ float to_float(Term*);
 void initialize_primitive_types(Branch& kernel);
 
 // Do some more setup, after all the standard builtin types have been created.
-void setup_primitive_types();
+void post_setup_primitive_types();
 
 } // namespace circa
 

@@ -171,10 +171,10 @@ void initialize()
     pre_initialize_builtin_types(*KERNEL);
     setup_builtin_types(*KERNEL);
     feedback_register_constants(*KERNEL);
-    setup_primitive_types();
     setup_builtin_functions(*KERNEL);
     post_setup_builtin_functions(*KERNEL);
     parse_builtin_types(*KERNEL);
+    post_setup_primitive_types();
     initialize_kernel_documentation(*KERNEL);
 }
 
