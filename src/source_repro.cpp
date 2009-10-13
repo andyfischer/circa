@@ -32,6 +32,12 @@ std::string get_input_syntax_hint_optional(Term* term, int index, std::string co
     return term->stringPropOptional(fieldName.str(), defaultValue);
 }
 
+bool has_source_location_defined(Term* term)
+{
+    return term->hasProperty("colStart") && term->hasProperty("lineStart")
+        && term->hasProperty("colEnd") && term->hasProperty("lineEnd");
+}
+
 std::string get_source_of_input(Term* term, int inputIndex)
 {
     int firstVisible = get_first_visible_input_index(term);
