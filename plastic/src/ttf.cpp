@@ -106,6 +106,17 @@ void render_text(Term* caller)
     std::string text = caller->input(2)->asString();
 
     if (state.texid() == 0 || state.text() != text) {
+
+        state.text() = text;
+
+        // Clear results if text is empty
+        if (text == "") {
+            state.texid() = 0;
+            state.width() = 0;
+            state.height() = 0;
+            return;
+        }
+
         // Render the text to a new surface, upload it as a texture, destroy the surface,
         // save the texture id.
 
@@ -118,7 +129,6 @@ void render_text(Term* caller)
         state.texid() = load_surface_to_texture(surface);
         state.width() = float(surface->w);
         state.height() = float(surface->h);
-        state.text() = text;
 
         SDL_FreeSurface(surface);
     }
@@ -129,6 +139,10 @@ void render_text(Term* caller)
 void draw_rendered_text(Term* caller)
 {
     RenderedText output(caller->input(0));
+
+    if (output.texid() == 0)
+        return;
+
     float x = caller->input(1)->toFloat();
     float y = caller->input(2)->toFloat();
 
