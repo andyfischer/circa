@@ -17,11 +17,6 @@
 namespace circa {
 namespace test_snippets {
 
-bool has_source_location_defined(Term* term)
-{
-    return term->hasProperty("colStart") && term->hasProperty("lineStart");
-}
-
 void test_snippet(std::string codeStr, std::string assertionsStr)
 {
     Branch code;
@@ -48,16 +43,6 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
             it.skipNextBranch();
             continue;
         }
-
-#if 0
-        if (!has_source_location_defined(term)) {
-            std::cout << "Missing source location (" << format_global_id(term)
-                << ")" << std::endl;
-            std::cout << get_term_source(term) << std::endl;
-            std::cout << branch_to_string_raw(code) << std::endl;
-            declare_current_test_failed();
-        }
-#endif
     }
 
     Branch& assertions = create_branch(code, "assertions");

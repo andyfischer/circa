@@ -129,6 +129,7 @@ Term* statement_list(Branch& branch, TokenStream& tokens)
 
 Term* statement(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
     std::string preWhitespace = possible_whitespace(tokens);
 
     Term* result = NULL;
@@ -199,6 +200,8 @@ Term* statement(Branch& branch, TokenStream& tokens)
 
     // Mark this term as a statement
     set_is_statement(result, true);
+
+    set_source_location(result, startPosition, tokens);
 
     return result;
 }
@@ -1549,6 +1552,7 @@ Term* identifier_or_function_call(Branch& branch, TokenStream& tokens)
         // Check if the lhs's type defines this name as a property
         else if (type_t::find_field_index(head->type, name) != -1) {
             head = apply(branch, GET_FIELD_FUNC, RefList(head, string_value(branch, name)));
+            set_source_location(head, startPosition, tokens);
             get_input_syntax_hint(head, 0, "postWhitespace") = "";
         }
 
@@ -1601,6 +1605,8 @@ Term* identifier_or_function_call(Branch& branch, TokenStream& tokens)
             // Support name.function syntax to implicity call a function
             head = apply(branch, head, implicitCallInputs);
             head->boolProp("syntaxHints:no-parens") = true;
+            set_source_location(head, startPosition, tokens);
+
             if (head->function->name != fullName.str())
                 head->stringProp("syntaxHints:functionName") = fullName.str();
             for (int i=0; i < implicitCallInputs.length(); i++)
@@ -1609,7 +1615,6 @@ Term* identifier_or_function_call(Branch& branch, TokenStream& tokens)
     }
 
     assert(head != NULL);
-    set_source_location(head, startPosition, tokens);
     return head;
 }
 

@@ -33,30 +33,49 @@ void append_whitespace(Term* term, std::string const& whitespace)
 void set_source_location(Term* term, int start, TokenStream& tokens)
 {
     assert(term != NULL);
+    assert(tokens.length() != 0);
 
-    if (tokens.length() == 0) {
-        term->intProp("colStart") = 0;
-        term->intProp("lineStart") = 0;
-        term->intProp("colEnd") = 0;
-        term->intProp("lineEnd") = 0;
-        return;
-    }
+    int colStart = 0;
+    int lineStart = 0;
+    int colEnd = 0;
+    int lineEnd = 0;
 
     if (start >= tokens.length()) {
         // 'start' is at the end of the stream
-        term->intProp("colStart") = tokens[start-1].colEnd+1;
-        term->intProp("lineStart") = tokens[start-1].lineEnd;
+        colStart = tokens[start-1].colEnd+1;
+        lineStart = tokens[start-1].lineEnd;
 
     } else {
-        term->intProp("colStart") = tokens[start].colStart;
-        term->intProp("lineStart") = tokens[start].lineStart;
+        colStart = tokens[start].colStart;
+        lineStart = tokens[start].lineStart;
     }
 
     int end = tokens.getPosition();
     if (end >= tokens.length()) end = tokens.length()-1;
 
-    term->intProp("colEnd") = tokens[end].colEnd;
-    term->intProp("lineEnd") = tokens[end].lineEnd;
+    colEnd = tokens[end].colEnd;
+    lineEnd = tokens[end].lineEnd;
+
+    // Check if this term has an existing source location, and whether this
+    // new location includes the old location. If it doesn't, then leave
+    // the term untouched.
+
+    if (has_source_location_defined(term)) {
+        bool newStartPositionBeforeOld = lineStart < term->intProp("lineStart")
+            || (lineStart == term->intProp("lineStart")
+                    && colStart <= term->intProp("colStart"));
+        bool newEndPositionAfterOld = lineEnd > term->intProp("lineEnd")
+            || (lineEnd == term->intProp("lineEnd")
+                    && colEnd >= term->intProp("colEnd"));
+        if (!newStartPositionBeforeOld || !newEndPositionAfterOld)
+            return;
+    }
+
+    // Commit change
+    term->intProp("colStart") = colStart;
+    term->intProp("lineStart") = lineStart;
+    term->intProp("colEnd") = colEnd;
+    term->intProp("lineEnd") = lineEnd;
 }
 
 void push_pending_rebind(Branch& branch, std::string const& name)

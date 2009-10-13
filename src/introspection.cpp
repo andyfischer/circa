@@ -104,6 +104,11 @@ std::string term_to_raw_string(Term* term)
     return output.str();
 }
 
+std::string term_to_raw_string_with_properties(Term* term)
+{
+    return term_to_raw_string(term) + " " + dict_t::to_string(term->properties);
+}
+
 std::string branch_namespace_to_string(Branch& branch)
 {
     std::stringstream out;
@@ -141,7 +146,7 @@ std::string branch_to_string_raw_with_properties(Branch& branch)
 
         for (int i=0; i < indent; i++) out << "  ";
 
-        out << term_to_raw_string(term) << " " << dict_t::to_string(term->properties) << std::endl;
+        out << term_to_raw_string_with_properties(term) << std::endl;
     }
     return out.str();
 }

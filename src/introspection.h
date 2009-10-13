@@ -24,6 +24,7 @@ std::string format_global_id(Term* term);
 
 std::string get_short_local_name(Term* term);
 std::string term_to_raw_string(Term* term);
+std::string term_to_raw_string_with_properties(Term* term);
 std::string branch_namespace_to_string(Branch& branch);
 std::string branch_to_string_raw(Branch& branch);
 std::string branch_to_string_raw_with_properties(Branch& branch);
