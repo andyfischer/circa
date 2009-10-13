@@ -12,7 +12,6 @@ namespace trig_function {
         // Convert input from 0..1 to 0..2pi
         as_float(caller) = sin(float(input * 2 * M_PI));
     }
-
     void evaluate_cos(Term* caller)
     {
         float input = float_input(caller,0);
@@ -20,7 +19,13 @@ namespace trig_function {
         // Convert input from 0..1 to 0..2pi
         as_float(caller) = cos(float(input * 2 * M_PI));
     }
+    void evaluate_tan(Term* caller)
+    {
+        float input = float_input(caller,0);
 
+        // Convert input from 0..1 to 0..2pi
+        as_float(caller) = tan(float(input * 2 * M_PI));
+    }
     void evaluate_arcsin(Term* caller)
     {
         float input = float_input(caller,0);
@@ -31,6 +36,12 @@ namespace trig_function {
     {
         float input = float_input(caller,0);
         float result = acos(input);
+        as_float(caller) = result / float(2 * M_PI);
+    }
+    void evaluate_arctan(Term* caller)
+    {
+        float input = float_input(caller,0);
+        float result = atan(input);
         as_float(caller) = result / float(2 * M_PI);
     }
 
@@ -80,10 +91,14 @@ namespace trig_function {
         function_t::get_feedback_func(cos_func) = 
             import_function(kernel, feedback_evaluate_cos, "cos_feedback(any, number) : number");
 
+        import_function(kernel, evaluate_tan, "tan(number angle) : number;"
+            "'Trigonometric tan() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)' end");
         import_function(kernel, evaluate_arcsin, "arcsin(number) : number;"
-            "'Trigonometric arcsin() function.' end");
-        import_function(kernel, evaluate_arcsin, "arccos(number) : number;"
-            "'Trigonometric arccos() function.' end");
+            "'Trigonometric arcsin() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)' end");
+        import_function(kernel, evaluate_arccos, "arccos(number) : number;"
+            "'Trigonometric arccos() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)' end");
+        import_function(kernel, evaluate_arctan, "arctan(number) : number;"
+            "'Trigonometric arctan() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)' end");
     }
 } // namespace trig_function
 } // namespace circa

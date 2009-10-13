@@ -27,12 +27,18 @@ end
 
 box_size = [100 20] :: Point
 
+def initial_box_location(Ref ref) : Point
+    source_loc = ref.source_location()
+    --print(ref ' location: ' source_loc)
+    return [source_loc.x*5, source_loc.y*10]
+end
+
 -- Get locations for each box
 index = 0
 for ref in contents
     ref = ref :: Ref
 
-    initial_location = [10 10+index*45]
+    initial_location = initial_box_location(ref) --+ [0 20]*index
 
     location = draggable_rect(initial_location, box_size)
 

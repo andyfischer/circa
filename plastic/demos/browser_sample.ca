@@ -1,5 +1,31 @@
 
+-- draw flying stars a la Space Invaders
 
-a = 1
-b = 2
-c = add(a,b)
+background(#000)
+
+desired_window_size = [300 300]
+
+type Star {
+    Point position
+    number closeness
+}
+
+for i in 0..700
+    state Star star = [random_location() rand()]
+
+    camera_delta = 1.0 * time_delta
+
+
+    length = arcsin(2 * star.closeness)
+
+    y = star.position.y
+
+    y += 10*time_delta * (1.0 + 5*star.closeness)
+
+    mod(@y, window.height)
+
+    star.position = [star.position.x y]
+
+    gl.line_strip([star.position, star.position + [0 length]] #fff)
+end
+
