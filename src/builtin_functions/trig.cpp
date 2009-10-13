@@ -7,7 +7,7 @@ namespace trig_function {
 
     void evaluate_sin(Term* caller)
     {
-        float input = to_float(caller->input(0));
+        float input = float_input(caller,0);
 
         // Convert input from 0..1 to 0..2pi
         as_float(caller) = sin(float(input * 2 * M_PI));
@@ -15,16 +15,29 @@ namespace trig_function {
 
     void evaluate_cos(Term* caller)
     {
-        float input = to_float(caller->input(0));
+        float input = float_input(caller,0);
 
         // Convert input from 0..1 to 0..2pi
         as_float(caller) = cos(float(input * 2 * M_PI));
     }
 
+    void evaluate_arcsin(Term* caller)
+    {
+        float input = float_input(caller,0);
+        float result = asin(input);
+        as_float(caller) = result / float(2 * M_PI);
+    }
+    void evaluate_arccos(Term* caller)
+    {
+        float input = float_input(caller,0);
+        float result = acos(input);
+        as_float(caller) = result / float(2 * M_PI);
+    }
+
     void feedback_evaluate_sin(Term* caller)
     {
         // Term* target = caller->input(0);
-        float desired = caller->input(1)->toFloat();
+        float desired = float_input(caller, 1);
 
         // restrict input to -1..1
         if (desired > 1)
@@ -62,10 +75,15 @@ namespace trig_function {
         function_t::get_feedback_func(sin_func) = 
             import_function(kernel, feedback_evaluate_sin, "sin_feedback(any, number) : number");
 
-        Term* cos_func = import_function(kernel, evaluate_cos, "cos(number) : number;"
+        Term* cos_func = import_function(kernel, evaluate_cos, "cos(number angle) : number;"
             "'Trigonometric cos() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)' end");
         function_t::get_feedback_func(cos_func) = 
             import_function(kernel, feedback_evaluate_cos, "cos_feedback(any, number) : number");
+
+        import_function(kernel, evaluate_arcsin, "arcsin(number) : number;"
+            "'Trigonometric arcsin() function.' end");
+        import_function(kernel, evaluate_arcsin, "arccos(number) : number;"
+            "'Trigonometric arccos() function.' end");
     }
-}
-}
+} // namespace trig_function
+} // namespace circa

@@ -399,6 +399,17 @@ namespace ref_t {
         }
         as_int(caller) = t->numInputs();
     }
+    void get_source_location(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+        Branch& output = as_branch(caller);
+        output[0]->asInt() = t->intPropOptional("colStart", 0);
+        output[1]->asInt() = t->intPropOptional("lineStart", 0);
+    }
 }
 
 void initialize_primitive_types(Branch& kernel)
@@ -450,7 +461,7 @@ void initialize_primitive_types(Branch& kernel)
     as_type(VOID_PTR_TYPE).parameters.append(ANY_TYPE);
 }
 
-void setup_primitive_types()
+void post_setup_primitive_types()
 {
     import_member_function(REF_TYPE, ref_t::get_name, "name(Ref) : string");
     import_member_function(REF_TYPE, ref_t::hosted_to_string, "to_string(Ref) : string");
@@ -462,6 +473,8 @@ void setup_primitive_types()
     import_member_function(REF_TYPE, ref_t::asfloat, "asfloat(Ref) : number");
     import_member_function(REF_TYPE, ref_t::get_input, "input(Ref, int) : Ref");
     import_member_function(REF_TYPE, ref_t::num_inputs, "num_inputs(Ref) : int");
+    import_member_function(REF_TYPE, ref_t::get_source_location,
+            "source_location(Ref) : Point_i");
 }
 
 } // namespace circa
