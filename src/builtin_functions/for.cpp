@@ -5,13 +5,20 @@
 namespace circa {
 namespace for_function {
 
-    std::string toSourceString(Term* term)
+    std::string get_heading_source(Term* term)
     {
         std::stringstream result;
         result << "for ";
         result << get_for_loop_iterator(term)->name;
         result << " in ";
         result << get_source_of_input(term,0);
+        return result.str();
+    }
+
+    std::string toSourceString(Term* term)
+    {
+        std::stringstream result;
+        result << get_heading_source(term);
         result << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
         result << get_branch_source(as_branch(term));
         result << term->stringPropOptional("syntaxHints:preEndWs", "");

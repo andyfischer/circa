@@ -28,6 +28,8 @@ Bugs:
 
  - typeof() should return a reference not a value
 
+ - Should the user be able to specify names of blocks? (for,if)
+
 Tasks:
  - Need an efficient + safe way to share output values across terms
  - Block syntax, like how it's easy to pass a block in ruby
