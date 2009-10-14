@@ -72,9 +72,9 @@ void set_input(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 }
 
-Term* create_duplicate(Branch& branch, Term* source, bool copyBranches)
+Term* create_duplicate(Branch& branch, Term* source, std::string const& name, bool copyBranches)
 {
-    Term* term = apply(branch, source->function, source->inputs);
+    Term* term = apply(branch, source->function, source->inputs, name);
     change_type(term, source->type);
 
     term->name = source->name;

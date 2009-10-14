@@ -1,6 +1,5 @@
 
 Tests/bugs:
-  Test: Point + number, Point + int
 
   Test throwing errors inside blocks and subroutines. Many errors show up with
   'no error found'

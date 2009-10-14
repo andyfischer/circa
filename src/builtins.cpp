@@ -144,22 +144,20 @@ void pre_initialize_builtin_types(Branch& kernel)
 void post_setup_builtin_functions(Branch& kernel)
 {
     Branch& add_overloads = as_branch(ADD_FUNC);
-    Term* add_v = create_duplicate(add_overloads, kernel["vectorize_vv"]);
+    Term* add_v = create_duplicate(add_overloads, kernel["vectorize_vv"], "add_v");
     create_ref(function_t::get_parameters(add_v), ADD_FUNC);
-    rename(add_v, "add_v");
-    kernel.bindName(add_v, "add_v");
+    Term* add_s = create_duplicate(add_overloads, kernel["vectorize_vs"], "add_s");
+    create_ref(function_t::get_parameters(add_s), ADD_FUNC);
 
     Branch& sub_overloads = as_branch(SUB_FUNC);
-    Term* sub_v = create_duplicate(sub_overloads, kernel["vectorize_vv"]);
+    Term* sub_v = create_duplicate(sub_overloads, kernel["vectorize_vv"], "sub_v");
     create_ref(function_t::get_parameters(sub_v), SUB_FUNC);
-    rename(sub_v, "sub_v");
-    kernel.bindName(sub_v, "sub_v");
+    Term* sub_s = create_duplicate(sub_overloads, kernel["vectorize_vs"], "sub_s");
+    create_ref(function_t::get_parameters(sub_s), SUB_FUNC);
 
     Branch& mult_overloads = as_branch(MULT_FUNC);
-    Term* mult_s = create_duplicate(mult_overloads, kernel["vectorize_vs"]);
+    Term* mult_s = create_duplicate(mult_overloads, kernel["vectorize_vs"], "mult_s");
     create_ref(function_t::get_parameters(mult_s), MULT_FUNC);
-    rename(mult_s, "mult_s");
-    kernel.bindName(mult_s, "mult_s");
 
     function_t::get_feedback_func(VALUE_FUNC) = ASSIGN_FUNC;
 }
