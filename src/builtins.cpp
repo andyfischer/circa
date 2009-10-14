@@ -110,16 +110,16 @@ void bootstrap_kernel()
     ANY_TYPE->function = VALUE_FUNC;
     ANY_TYPE->type = TYPE_TYPE;
     ANY_TYPE->value = new Type();
-    as_type(ANY_TYPE).name = "any";
+    type_t::get_name(ANY_TYPE) = "any";
     KERNEL->bindName(ANY_TYPE, "any");
-
-    // Create Function type
-    FUNCTION_TYPE = create_compound_type(*KERNEL, "Function");
-    as_type(FUNCTION_TYPE).toString = subroutine_t::to_string;
-    as_type(FUNCTION_TYPE).checkInvariants = function_t::check_invariants;
 
     // Create Branch type
     BRANCH_TYPE = create_compound_type(*KERNEL, "Branch");
+
+    // Create Function type
+    FUNCTION_TYPE = create_compound_type(*KERNEL, "Function");
+    type_t::get_to_string_func(FUNCTION_TYPE) = subroutine_t::to_string;
+    type_t::get_check_invariants_func(FUNCTION_TYPE)= function_t::check_invariants;
 
     // Initialize Value func
     VALUE_FUNC->type = FUNCTION_TYPE;
@@ -128,6 +128,13 @@ void bootstrap_kernel()
     // Initialize List type, it's needed soon
     LIST_TYPE = create_compound_type(*KERNEL, "List");
     as_type(LIST_TYPE).toString = list_t::to_string;
+}
+
+void post_initialize_primitive_types(Branch& kernel)
+{
+    // Initialize a proper prototype for Function type
+    //type_t::enable_default_value(FUNCTION_TYPE);
+    //initialize_function_data(type_t::get_default_value(FUNCTION_TYPE));
 }
 
 void pre_initialize_builtin_types(Branch& kernel)
@@ -166,6 +173,7 @@ void initialize()
 {
     bootstrap_kernel();
     initialize_primitive_types(*KERNEL);
+    post_initialize_primitive_types(*KERNEL);
     pre_initialize_builtin_types(*KERNEL);
     setup_builtin_types(*KERNEL);
     feedback_register_constants(*KERNEL);
