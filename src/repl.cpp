@@ -7,6 +7,7 @@ namespace circa {
 void start_repl()
 {
     Branch replState;
+    bool displayRaw = false;
 
     while (true) {
         std::cout << "> ";
@@ -16,11 +17,23 @@ void start_repl()
         if (!std::getline(std::cin, input))
             break;
 
-        if (input == "exit")
+        if (input == "exit" || input == "/exit")
             break;
 
         if (input == "")
             continue;
+
+        if (input == "/raw") {
+            displayRaw = !displayRaw;
+            if (displayRaw) std::cout << "Displaying raw output" << std::endl;
+            else std::cout << "Not displaying raw output" << std::endl;
+            continue;
+        }
+
+        if (input == "/help") {
+            std::cout << "Special commands: /raw, /help, /exit" << std::endl;
+            continue;
+        }
 
         int previousHead = replState.length();
         parser::compile(&replState, parser::statement_list, input);
@@ -47,10 +60,17 @@ void start_repl()
         }
 
         // if there were any errors, erase the most recent results
-        if (anyErrors)
+        if (anyErrors) {
             replState.shorten(previousHead);
-        else
-            std::cout << to_string(replState[replState.length()-1]) << std::endl;
+            continue;
+        }
+
+        std::cout << to_string(replState[replState.length()-1]) << std::endl;
+
+        if (displayRaw) {
+            for (int i=previousHead; i < newHead; i++)
+                std::cout << term_to_raw_string(replState[i]) << std::endl;
+        }
     }
 }
 

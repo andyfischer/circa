@@ -28,6 +28,8 @@ void unsafe_change_type(Term *term, Term *type)
 
 void change_type(Term *term, Term *typeTerm)
 {
+    assert(term != NULL);
+    assert(typeTerm != NULL);
     assert_type(typeTerm, TYPE_TYPE);
 
     if (term->type == typeTerm)
