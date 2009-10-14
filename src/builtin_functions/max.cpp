@@ -9,7 +9,7 @@ namespace max_function {
 
     void evaluate(Term* caller)
     {
-        as_float(caller) = std::max(to_float(caller->input(0)), to_float(caller->input(1)));
+        as_float(caller) = std::max(float_input(caller,0), float_input(caller,1));
     }
 
     void setup(Branch& kernel)

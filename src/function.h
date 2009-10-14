@@ -10,8 +10,6 @@
 
 namespace circa {
 
-#define INPUT_PLACEHOLDER_PREFIX "#input_"
-
 namespace function_t {
     std::string to_string(Term* term);
     std::string get_header_source(Term* term);

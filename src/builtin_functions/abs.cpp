@@ -7,7 +7,7 @@ namespace abs_function {
 
     void evaluate(Term* caller)
     {
-        as_float(caller) = std::abs(to_float(caller->input(0)));
+        as_float(caller) = std::abs(float_input(caller,0));
     }
 
     void setup(Branch& kernel)

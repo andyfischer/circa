@@ -9,7 +9,7 @@ namespace add_function {
     {
         int result = 0;
         for (int i=0; i < caller->numInputs(); i++)
-            result += as_int(caller->input(i));
+            result += int_input(caller,i);
         as_int(caller) = result;
     }
 
@@ -17,14 +17,14 @@ namespace add_function {
     {
         float result = 0.0;
         for (int i=0; i < caller->numInputs(); i++)
-            result += to_float(caller->input(i));
+            result += float_input(caller,i);
         as_float(caller) = result;
     }
 
     void feedback_evaluate(Term* caller)
     {
         Term* target = caller->input(0);
-        float desired = to_float(caller->input(1));
+        float desired = float_input(caller,1);
 
         float delta = desired - to_float(target);
 
@@ -51,5 +51,5 @@ namespace add_function {
         kernel.bindName(add_f, "add_f");
         kernel.bindName(add_i, "add_i");
     }
-}
-}
+} // namespace add_function
+} // namespace circa

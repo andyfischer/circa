@@ -14,7 +14,7 @@ namespace average_function {
 
         float sum = 0;
         for (int i=0; i < caller->numInputs(); i++)
-            sum += to_float(caller->input(i));
+            sum += float_input(caller,i);
 
         as_float(caller) = sum / caller->numInputs();
     }
