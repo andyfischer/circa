@@ -328,7 +328,7 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
     for (int index=0; index < source.length(); index++) {
         Term* source_term = source.get(index);
 
-        Term* dest_term = create_duplicate(dest, source_term, false);
+        Term* dest_term = create_duplicate(dest, source_term, source_term->name, false);
 
         newTermMap[source_term] = dest_term;
 
@@ -337,10 +337,6 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
             as_branch(dest_term).clear();
             duplicate_branch_nested(newTermMap, as_branch(source_term), as_branch(dest_term));
         }
-
-        // Copy names
-        if (source_term->name != "")
-            dest.bindName(dest_term, source_term->name);
     }
 }
 

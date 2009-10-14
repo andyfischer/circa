@@ -246,6 +246,19 @@ void test_field_syntax()
     test_snippet("p = Point(); p.x = 5.0; p.y = 3.0", "p == [5.0 3.0]");
 }
 
+void test_vectorized_funcs()
+{
+    test_snippet("", "[1 2] + 3 == [4 5]");
+    test_snippet("", "[1 2] + 3.0 == [4.0 5.0]");
+    test_snippet("", "[1 2] + [10 10] == [11 12]");
+    test_snippet("", "[5 5 5] - [3 2 1] == [2 3 4]");
+    test_snippet("", "[5 5 5] - 6 == [-1 -1 -1]");
+    test_snippet("a = [2.0 2.0] :: Point; b = [4.0 4.0] :: Point", "a + b == [6.0 6.0]");
+    test_snippet("a = [2.0 2.0] :: Point; b = [4.0 4.0]", "a + b == [6.0 6.0]");
+    test_snippet("a = [2.0 2.0]; b = [4.0 4.0]", "a + b == [6.0 6.0]");
+    test_snippet("a = [2.0 2.0]; b = [4.0 4.0] :: Point", "a + b == [6.0 6.0]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
@@ -261,6 +274,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_set);
     REGISTER_TEST_CASE(test_snippets::test_map);
     REGISTER_TEST_CASE(test_snippets::test_field_syntax);
+    REGISTER_TEST_CASE(test_snippets::test_vectorized_funcs);
 }
 
 } // namespace test_snippets
