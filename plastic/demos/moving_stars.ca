@@ -10,7 +10,6 @@ type Star {
     number closeness
 }
 
-star_speed = 8.8
 num_stars = 400
 
 for i in 0..num_stars
@@ -18,10 +17,10 @@ for i in 0..num_stars
 
     length = arcsin(2 * star.closeness) * 100
 
+    speed = 8.8
+
     y = star.position.y
-
-    y += speed*time_delta * length
-
+    add(@y, speed*time_delta * length)
     mod(@y, window.height)
 
     star.position = [star.position.x y]

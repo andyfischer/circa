@@ -73,6 +73,10 @@ namespace include_function {
     void load_script(Term* caller);
 }
 
+namespace for_function {
+    std::string get_heading_source(Term* term);
+}
+
 } // namespace circa
 
 #endif

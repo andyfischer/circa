@@ -227,12 +227,10 @@ Term* type_identifier_or_anonymous_type(Branch& branch, TokenStream& tokens)
 
     if (tokens.nextIs(LBRACKET)) {
         term = anonymous_type_decl(branch, tokens);
-        if (has_static_error(term)) {
+        if (has_static_error(term))
             return compile_error_for_line(term, tokens, startPosition);
-        }
 
     } else {
-
         if (!tokens.nextIs(IDENTIFIER))
             return compile_error_for_line(branch, tokens, startPosition);
 
@@ -280,7 +278,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     if (!tokens.nextIs(LPAREN))
         return compile_error_for_line(branch, tokens, startPosition, "Expected (");
 
-    tokens.consume();
+    tokens.consume(LPAREN);
 
     Term* result = create_value(branch, FUNCTION_TYPE, functionName);
     initialize_function_data(result);
@@ -634,6 +632,10 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     setup_for_loop_post_code(forTerm);
     set_source_location(forTerm, startPosition, tokens);
+
+    // Use the heading as this term's name, for introspection
+    branch.bindName(forTerm, for_function::get_heading_source(forTerm));
+    
     return forTerm;
 }
 
@@ -904,7 +906,6 @@ const int HIGHEST_INFIX_PRECEDENCE = 8;
 int get_infix_precedence(int match)
 {
     switch(match) {
-        case tokenizer::COLON: // deprecated
         case tokenizer::DOUBLE_COLON:
         case tokenizer::TWO_DOTS:
             return 8;
