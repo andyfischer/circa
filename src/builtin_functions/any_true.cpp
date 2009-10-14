@@ -25,4 +25,4 @@ namespace any_true_function {
                 "'Return whether all of the items in l are true' end");
     }
 }
-}
+} // namespace circa

@@ -194,7 +194,7 @@ bool is_function(Term* term)
 std::string get_placeholder_name_for_index(int index)
 {
     std::stringstream sstream;
-    sstream << INPUT_PLACEHOLDER_PREFIX << index;
+    sstream << "#input_" << index;
     return sstream.str();
 }
 

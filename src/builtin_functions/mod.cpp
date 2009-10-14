@@ -5,16 +5,16 @@
 namespace circa {
 namespace mod_function {
 
-    // We compute mod() using floored division. This is different than C and many C-like
-    // languages. See this page for an explanation of the difference:
+    // We compute mod() using floored division. This is different than C and many
+    // C-like languages. See this page for an explanation of the difference:
     // http://en.wikipedia.org/wiki/Modulo_operation
     //
     // For a function that works the same as C's modulo, use remainder()
 
     void evaluate(Term* caller)
     {
-        int a = caller->input(0)->asInt();
-        int n = caller->input(1)->asInt();
+        int a = int_input(caller, 0);
+        int n = int_input(caller, 1);
 
         if (a >= 0)
             as_int(caller) = a % n;
@@ -24,8 +24,8 @@ namespace mod_function {
 
     void evaluate_f(Term* caller)
     {
-        float a = caller->input(0)->toFloat();
-        float n = caller->input(1)->toFloat();
+        float a = float_input(caller, 0);
+        float n = float_input(caller, 1);
 
         if (a >= 0)
             as_float(caller) = fmodf(a, n);

@@ -7,12 +7,12 @@ namespace sub_function {
 
     void evaluate_i(Term* caller)
     {
-        as_int(caller) = as_int(caller->input(0)) - as_int(caller->input(1));
+        as_int(caller) = int_input(caller,0) - int_input(caller,1);
     }
 
     void evaluate_f(Term* caller)
     {
-        as_float(caller) = to_float(caller->input(0)) - to_float(caller->input(1));
+        as_float(caller) = float_input(caller,0) - float_input(caller,1);
     }
 
     void setup(Branch& kernel)

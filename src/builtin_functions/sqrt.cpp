@@ -7,7 +7,7 @@ namespace sqrt_function {
 
     void evaluate(Term* caller)
     {
-        as_float(caller) = std::sqrt(caller->input(0)->toFloat());
+        as_float(caller) = std::sqrt(float_input(caller,0));
     }
 
     void setup(Branch& kernel)

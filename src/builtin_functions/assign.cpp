@@ -8,8 +8,9 @@ namespace assign_function {
     void evaluate(Term* caller)
     {
         // The thing we are changing is on the left, the desired value is on the right
-        // (This is a little confusing because the C function 'assign_value' is the other
-        // way around.);
+        // This is a little confusing because the C function 'assign_value' is the other
+        // way around. The reason we have this order is because the infix operator :=
+        // arranges its inputs as target := desired.
         Term* target = caller->input(0);
         Term* value = caller->input(1);
 
