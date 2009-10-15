@@ -59,7 +59,6 @@ extern Term* NAMESPACE_TYPE;
 extern Term* OVERLOADED_FUNCTION_TYPE;
 extern Term* TYPE_TYPE;
 extern Term* VOID_TYPE;
-extern Term* VOID_PTR_TYPE;
 
 // Get a named term from the global namespace.
 Term* get_global(std::string name);

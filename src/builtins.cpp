@@ -64,7 +64,6 @@ Term* MAP_TYPE = NULL;
 Term* OVERLOADED_FUNCTION_TYPE = NULL;
 Term* TYPE_TYPE = NULL;
 Term* VOID_TYPE = NULL;
-Term* VOID_PTR_TYPE = NULL;
 
 Term* get_global(std::string name)
 {
@@ -127,22 +126,25 @@ void bootstrap_kernel()
 
     // Initialize List type, it's needed soon
     LIST_TYPE = create_compound_type(*KERNEL, "List");
-    as_type(LIST_TYPE).toString = list_t::to_string;
+    type_t::get_to_string_func(LIST_TYPE) = list_t::to_string;
 }
 
 void post_initialize_primitive_types(Branch& kernel)
 {
     // Initialize a proper prototype for Function type
-    //type_t::enable_default_value(FUNCTION_TYPE);
-    //initialize_function_data(type_t::get_default_value(FUNCTION_TYPE));
+    initialize_function_prototype(type_t::get_prototype(FUNCTION_TYPE));
+
+    // Value function was created before we had a prototype
+    initialize_function_prototype(as_branch(VALUE_FUNC));
+    create_value(as_branch(VALUE_FUNC), ANY_TYPE);
+
+    // Initialize a proper prototype for Type
+    //Branch test;
+    //initialize_type_prototype(test);
 }
 
 void pre_initialize_builtin_types(Branch& kernel)
 {
-    // Initialize data for Value function
-    initialize_function_data(VALUE_FUNC);
-    create_value(as_branch(VALUE_FUNC), ANY_TYPE);
-
     // Declare input_placeholder first because it's used while compiling functions
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, empty_evaluate_function,
             "input_placeholder() : any");
@@ -152,19 +154,19 @@ void post_setup_builtin_functions(Branch& kernel)
 {
     Branch& add_overloads = as_branch(ADD_FUNC);
     Term* add_v = create_duplicate(add_overloads, kernel["vectorize_vv"], "add_v");
-    create_ref(function_t::get_parameters(add_v), ADD_FUNC);
+    ref_value(function_t::get_parameters(add_v), ADD_FUNC);
     Term* add_s = create_duplicate(add_overloads, kernel["vectorize_vs"], "add_s");
-    create_ref(function_t::get_parameters(add_s), ADD_FUNC);
+    ref_value(function_t::get_parameters(add_s), ADD_FUNC);
 
     Branch& sub_overloads = as_branch(SUB_FUNC);
     Term* sub_v = create_duplicate(sub_overloads, kernel["vectorize_vv"], "sub_v");
-    create_ref(function_t::get_parameters(sub_v), SUB_FUNC);
+    ref_value(function_t::get_parameters(sub_v), SUB_FUNC);
     Term* sub_s = create_duplicate(sub_overloads, kernel["vectorize_vs"], "sub_s");
-    create_ref(function_t::get_parameters(sub_s), SUB_FUNC);
+    ref_value(function_t::get_parameters(sub_s), SUB_FUNC);
 
     Branch& mult_overloads = as_branch(MULT_FUNC);
     Term* mult_s = create_duplicate(mult_overloads, kernel["vectorize_vs"], "mult_s");
-    create_ref(function_t::get_parameters(mult_s), MULT_FUNC);
+    ref_value(function_t::get_parameters(mult_s), MULT_FUNC);
 
     function_t::get_feedback_func(VALUE_FUNC) = ASSIGN_FUNC;
 }

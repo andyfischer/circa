@@ -43,7 +43,7 @@ bool is_function(Term* term);
 
 std::string get_placeholder_name_for_index(int index);
 
-void initialize_function_data(Term* term);
+void initialize_function_prototype(Branch& contents);
 
 bool is_callable(Term* term);
 bool inputs_fit_function(Term* func, RefList const& inputs);

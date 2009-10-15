@@ -62,7 +62,7 @@ void assert_type(Term* term, Term* type)
 {
     if (term->type != type) {
         std::stringstream msg;
-        msg << "Expected " << as_type(type).name << ", found " << as_type(term->type).name;
+        msg << "Expected " << type_t::get_name(type) << ", found " << type_t::get_name(term->type);
         native_type_mismatch(msg.str());
     }
 }

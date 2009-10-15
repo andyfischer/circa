@@ -136,7 +136,7 @@ std::string get_term_source(Term* term)
         if (term->type != FUNCTION_TYPE && term->type != TYPE_TYPE)
             prepend_name_binding(term, result);
 
-        if (as_type(term->type).toString == NULL) {
+        if (type_t::get_to_string_func(term->type) == NULL) {
             std::stringstream out;
             out << "Type " << term->type->name << " doesn't have a toString function";
             throw std::runtime_error(out.str());
@@ -146,7 +146,7 @@ std::string get_term_source(Term* term)
         if (term->boolPropOptional("constructor", false))
             result << term->type->name << "()";
         else 
-            result << as_type(term->type).toString(term);
+            result << type_t::get_to_string_func(term->type)(term);
 
         result << term->stringPropOptional("syntaxHints:postWhitespace", "");
         return result.str();

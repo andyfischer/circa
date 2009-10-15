@@ -159,8 +159,7 @@ void test_default_values()
     type_t::get_equals_func(t) = shallow_equals;
     type_t::get_is_pointer(t) = false;
 
-    test_assert(type_t::get_default_value(t) != NULL);
-    test_assert(type_t::get_default_value(t)->type == VOID_TYPE);
+    test_assert(type_t::get_default_value(t) == NULL);
 
     Term* t_value = create_value(branch, t);
 
