@@ -281,7 +281,6 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     tokens.consume(LPAREN);
 
     Term* result = create_value(branch, FUNCTION_TYPE, functionName);
-    initialize_function_data(result);
     Branch& contents = as_branch(result);
 
     function_t::get_name(result) = functionName;
@@ -634,7 +633,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     set_source_location(forTerm, startPosition, tokens);
 
     // Use the heading as this term's name, for introspection
-    branch.bindName(forTerm, for_function::get_heading_source(forTerm));
+    //FIXME branch.bindName(forTerm, for_function::get_heading_source(forTerm));
     
     return forTerm;
 }
@@ -1536,11 +1535,11 @@ Term* identifier_or_function_call(Branch& branch, TokenStream& tokens)
         }
         
         // Check if the name is a member function in the type of lhs
-        else if (as_type(head->type).memberFunctions.contains(name)) {
+        else if (type_t::get_member_functions(head->type).contains(name)) {
 
             implicitCallInputs = RefList(head);
 
-            Term* function = as_type(head->type).memberFunctions[name];
+            Term* function = type_t::get_member_functions(head->type)[name];
 
             if (head->name != ""
                     && function_t::get_input_placeholder(function, 0)

@@ -8,7 +8,7 @@ namespace invariant_tests {
 void test_functions()
 {
     // Make sure Function type has a checkInvariants.
-    test_assert(as_type(FUNCTION_TYPE).checkInvariants != NULL);
+    test_assert(type_t::get_check_invariants_func(FUNCTION_TYPE) != NULL);
 
     // In a subroutine, if there is an #out term, it should be last.
     Branch branch;

@@ -197,12 +197,9 @@ namespace branch_t {
     {
         Branch* branch = new Branch();
 
-        // create a slot for each field
         Branch& prototype = type_t::get_prototype(typeTerm);
-        int numFields = prototype.length();
 
-        for (int f=0; f < numFields; f++)
-            create_value(*branch, prototype[f]->type, prototype[f]->name);
+        duplicate_branch(prototype, *branch);
 
         term->value = branch;
     }

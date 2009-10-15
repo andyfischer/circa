@@ -138,15 +138,16 @@ void test_type_decl()
     Branch branch;
     Term* typeTerm = parser::compile(&branch, parser::statement,
             "type Mytype {\nint a\nnumber b\n}");
-    Type& type = as_type(typeTerm);
 
-    test_equals(type.name, "Mytype");
+    test_equals(type_t::get_name(typeTerm), "Mytype");
     test_equals(typeTerm->name, "Mytype");
 
-    test_assert(type.prototype[0]->type == INT_TYPE);
-    test_equals(type.prototype[0]->name, "a");
-    test_assert(type.prototype[1]->type == FLOAT_TYPE);
-    test_equals(type.prototype[1]->name, "b");
+    Branch& prototype = type_t::get_prototype(typeTerm);
+
+    test_assert(prototype[0]->type == INT_TYPE);
+    test_equals(prototype[0]->name, "a");
+    test_assert(prototype[1]->type == FLOAT_TYPE);
+    test_equals(prototype[1]->name, "b");
 }
 
 void test_function_decl()

@@ -55,13 +55,13 @@ std::string& as_string(Term*);
 Ref& as_ref(Term*);
 
 // for Type:
-AllocFunc*& as_alloc_thunk(Term*);
-DeallocFunc*& as_dealloc_thunk(Term*);
-DuplicateFunc*& as_duplicate_thunk(Term*);
-AssignFunc*& as_assign_thunk(Term*);
-EqualsFunc*& as_equals_thunk(Term*);
-RemapPointersFunc*& as_remap_pointers_thunk(Term*);
-ToStringFunc*& as_to_string_thunk(Term*);
+AllocFunc& as_alloc_thunk(Term*);
+DeallocFunc& as_dealloc_thunk(Term*);
+DuplicateFunc& as_duplicate_thunk(Term*);
+AssignFunc& as_assign_thunk(Term*);
+EqualsFunc& as_equals_thunk(Term*);
+RemapPointersFunc& as_remap_pointers_thunk(Term*);
+ToStringFunc& as_to_string_thunk(Term*);
 const std::type_info*& as_std_type_info(Term*);
 
 // for Function:

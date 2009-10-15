@@ -198,7 +198,7 @@ std::string get_placeholder_name_for_index(int index)
     return sstream.str();
 }
 
-void initialize_function_data(Term* term)
+void initialize_function_prototype(Branch& contents)
 {
     /* A function is a branch with the following structures:
       {
@@ -227,18 +227,16 @@ void initialize_function_data(Term* term)
      * last. Probably should revisit this.
      */
 
-    Branch& contents = as_branch(term);
-
     Term* attributesTerm = create_value(contents, BRANCH_TYPE, "#attributes");
     set_source_hidden(attributesTerm, true);
     Branch& attributes = as_branch(attributesTerm);
     string_value(attributes, "", "name");
-    create_ref(attributes, NULL, "hidden_state_type");
+    ref_value(attributes, NULL, "hidden_state_type");
     bool_value(attributes, false, "variable_args");
     create_value(attributes, EVALUATE_THUNK_TYPE, "native_evaluate");
     create_value(attributes, SPECIALIZE_THUNK_TYPE, "native_specialize");
     create_value(attributes, TO_STRING_THUNK_TYPE, "native_to_string");
-    create_ref(attributes, NULL, "feedback_func");
+    ref_value(attributes, NULL, "feedback_func");
     create_value(attributes, LIST_TYPE, "parameters");
     create_value(attributes, STRING_TYPE, "description");
 }

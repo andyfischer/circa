@@ -34,46 +34,46 @@ Ref& as_ref(Term* term)
     return *((Ref*) term->value);
 }
 
-AllocFunc*& as_alloc_thunk(Term* term)
+AllocFunc& as_alloc_thunk(Term* term)
 {
     assert_type(term, ALLOC_THUNK_TYPE);
-    return ((AllocFunc*&) term->value);
+    return ((AllocFunc&) term->value);
 }
 
-DeallocFunc*& as_dealloc_thunk(Term* term)
+DeallocFunc& as_dealloc_thunk(Term* term)
 {
     assert_type(term, DEALLOC_THUNK_TYPE);
-    return ((DeallocFunc*&) term->value);
+    return ((DeallocFunc&) term->value);
 }
 
-DuplicateFunc*& as_duplicate_thunk(Term* term)
+DuplicateFunc& as_duplicate_thunk(Term* term)
 {
     assert_type(term, DUPLICATE_THUNK_TYPE);
-    return ((DuplicateFunc*&) term->value);
+    return ((DuplicateFunc&) term->value);
 }
 
-AssignFunc*& as_assign_thunk(Term* term)
+AssignFunc& as_assign_thunk(Term* term)
 {
     assert_type(term, ASSIGN_THUNK_TYPE);
-    return ((AssignFunc*&) term->value);
+    return ((AssignFunc&) term->value);
 }
 
-EqualsFunc*& as_equals_thunk(Term* term)
+EqualsFunc& as_equals_thunk(Term* term)
 {
     assert_type(term, EQUALS_THUNK_TYPE);
-    return ((EqualsFunc*&) term->value);
+    return ((EqualsFunc&) term->value);
 }
 
-RemapPointersFunc*& as_remap_pointers_thunk(Term* term)
+RemapPointersFunc& as_remap_pointers_thunk(Term* term)
 {
     assert_type(term, REMAP_POINTERS_THUNK_TYPE);
-    return ((RemapPointersFunc*&) term->value);
+    return ((RemapPointersFunc&) term->value);
 }
 
-ToStringFunc*& as_to_string_thunk(Term* term)
+ToStringFunc& as_to_string_thunk(Term* term)
 {
     assert_type(term, TO_STRING_THUNK_TYPE);
-    return ((ToStringFunc*&) term->value);
+    return ((ToStringFunc&) term->value);
 }
 
 const std::type_info*& as_std_type_info(Term* term)
@@ -420,45 +420,47 @@ void initialize_primitive_types(Branch& kernel)
     CHECK_INVARIANTS_THUNK_TYPE = import_pointer_type<CheckInvariantsFunc>(kernel, "CheckInvariantsThunk");
 
     STRING_TYPE = import_type<std::string>(kernel, "string");
-    as_type(STRING_TYPE).equals = cpp_importing::templated_equals<std::string>;
-    as_type(STRING_TYPE).toString = string_t::to_string;
+    type_t::get_equals_func(STRING_TYPE) = cpp_importing::templated_equals<std::string>;
+    type_t::get_to_string_func(STRING_TYPE) = string_t::to_string;
 
     INT_TYPE = create_type(kernel, "int");
-    Type& int_type = as_type(INT_TYPE);
-    int_type.alloc = zero_alloc;
-    int_type.assign = shallow_assign;
-    int_type.equals = shallow_equals;
-    int_type.toString = int_t::to_string;
-    int_type.isPointer = false;
+    type_t::get_alloc_func(INT_TYPE) = zero_alloc;
+    type_t::get_assign_func(INT_TYPE) = shallow_assign;
+    type_t::get_equals_func(INT_TYPE) = shallow_equals;
+    type_t::get_to_string_func(INT_TYPE) = int_t::to_string;
+    type_t::get_is_pointer(INT_TYPE) = false;
 
     FLOAT_TYPE = create_type(kernel, "number");
-    Type& float_type = as_type(FLOAT_TYPE);
-    float_type.alloc = zero_alloc;
-    float_type.assign = float_t::assign;
-    float_type.equals = float_t::equals;
-    float_type.toString = float_t::to_string;
-    float_type.isPointer = false;
+    type_t::get_alloc_func(FLOAT_TYPE) = zero_alloc;
+    type_t::get_assign_func(FLOAT_TYPE) = float_t::assign; // revisit: can this be shallow_assign?
+    type_t::get_equals_func(FLOAT_TYPE) = float_t::equals;
+    type_t::get_to_string_func(FLOAT_TYPE) = float_t::to_string;
+    type_t::get_is_pointer(FLOAT_TYPE) = false;
 
     BOOL_TYPE = create_type(kernel, "bool");
-    Type& bool_type = as_type(BOOL_TYPE);
-    bool_type.alloc = zero_alloc;
-    bool_type.assign = shallow_assign;
-    bool_type.equals = shallow_equals;
-    bool_type.toString = bool_t::to_string;
-    bool_type.isPointer = false;
+    type_t::get_alloc_func(BOOL_TYPE) = zero_alloc;
+    type_t::get_assign_func(BOOL_TYPE) = shallow_assign;
+    type_t::get_equals_func(BOOL_TYPE) = shallow_equals;
+    type_t::get_to_string_func(BOOL_TYPE) = bool_t::to_string;
+    type_t::get_is_pointer(BOOL_TYPE) = false;
 
     REF_TYPE = import_type<Ref>(kernel, "Ref");
-    as_type(REF_TYPE).remapPointers = Ref::remap_pointers;
-    as_type(REF_TYPE).toString = ref_t::to_string;
-    as_type(REF_TYPE).equals = ref_t::equals;
+    type_t::get_remap_pointers_func(REF_TYPE) = Ref::remap_pointers;
+    type_t::get_to_string_func(REF_TYPE) = ref_t::to_string;
+    type_t::get_equals_func(REF_TYPE) = ref_t::equals;
 
     // ANY_TYPE was created in bootstrap_kernel
-    as_type(ANY_TYPE).toString = any_t::to_string;
+    type_t::get_to_string_func(ANY_TYPE) = any_t::to_string;
 
     VOID_TYPE = create_empty_type(kernel, "void");
 
-    VOID_PTR_TYPE = import_type<void*>(kernel, "void_ptr");
-    as_type(VOID_PTR_TYPE).parameters.append(ANY_TYPE);
+    //ALLOC_THUNK_TYPE = import_type<AllocFunc>(kernel, "AllocThunk");
+    //DEALLOC_THUNK_TYPE = import_type<DeallocFunc>(kernel, "DeallocThunk");
+    //DUPLICATE_THUNK_TYPE = import_type<DuplicateFunc>(kernel, "DuplicateThunk");
+    //ASSIGN_THUNK_TYPE = import_type<AssignFunc>(kernel, "AssignThunk");
+    //EQUALS_THUNK_TYPE = import_type<EqualsFunc>(kernel, "EqualsThunk");
+    //REMAP_POINTERS_THUNK_TYPE = import_type<RemapPointersFunc>(kernel, "RemapPointersThunk");
+    //TO_STRING_THUNK_TYPE = import_type<ToStringFunc>(kernel, "ToStringThunk");
 }
 
 void post_setup_primitive_types()

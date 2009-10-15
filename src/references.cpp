@@ -63,12 +63,14 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     // This was implemented once, and it caused spurious crash bugs
     // Term* newType = map.getRemapped(term->type);
 
+    RemapPointersFunc remapPointers = type_t::get_remap_pointers_func(term->type);
+
     // Remap on value
     if ((term->value != NULL)
             && term->type != NULL
-            && (as_type(term->type).remapPointers != NULL)) {
+            && (remapPointers)) {
 
-        as_type(term->type).remapPointers(term, map);
+        remapPointers(term, map);
     }
 
     // Remap inside properties

@@ -105,6 +105,8 @@ namespace type_t {
     int find_field_index(Term* type, std::string const& name);
 }
 
+void initialize_type_prototype(Branch& contents);
+
 bool is_type(Term* term);
 Type& as_type(Term* term);
 bool is_compound_type(Term* type);
