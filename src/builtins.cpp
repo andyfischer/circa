@@ -27,6 +27,7 @@ Term* DISCARD_FUNC = NULL;
 Term* DIV_FUNC = NULL;
 Term* DO_ONCE_FUNC = NULL;
 Term* FEEDBACK_FUNC = NULL;
+Term* FREEZE_FUNC = NULL;
 Term* FOR_FUNC = NULL;
 Term* GET_INDEX_FUNC = NULL;
 Term* GET_FIELD_FUNC = NULL;
@@ -136,11 +137,9 @@ void post_initialize_primitive_types(Branch& kernel)
 
     // Value function was created before we had a prototype
     initialize_function_prototype(as_branch(VALUE_FUNC));
-    create_value(as_branch(VALUE_FUNC), ANY_TYPE);
+    create_value(as_branch(VALUE_FUNC), ANY_TYPE, "#out");
 
-    // Initialize a proper prototype for Type
-    //Branch test;
-    //initialize_type_prototype(test);
+    assert(function_t::get_output_type(VALUE_FUNC) == ANY_TYPE);
 }
 
 void pre_initialize_builtin_types(Branch& kernel)

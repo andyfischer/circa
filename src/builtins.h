@@ -22,6 +22,7 @@ extern Term* DISCARD_FUNC;
 extern Term* DIV_FUNC;
 extern Term* DO_ONCE_FUNC;
 extern Term* FEEDBACK_FUNC;
+extern Term* FREEZE_FUNC;
 extern Term* FOR_FUNC;
 extern Term* GET_INDEX_FUNC;
 extern Term* GET_FIELD_FUNC;
@@ -68,6 +69,9 @@ void initialize();
 void shutdown();
 
 // this is implemented in builtin_functions/include.cpp
+namespace copy_function {
+    void evaluate(Term* caller);
+}
 namespace include_function {
     void load_script(Term* caller);
 }

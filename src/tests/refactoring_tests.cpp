@@ -35,8 +35,32 @@ void repro_source_after_rename()
     test_equals(get_term_source(myfunc_call), "my_renamed_func(555)");
 }
 
+void test_change_function()
+{
+    Branch branch;
+
+    // simple test
+    Term* a = branch.eval("add(3,3)");
+    evaluate_branch(branch);
+    test_assert(as_int(a) == 6);
+
+    change_function(a, as_branch(MULT_FUNC)["mult_i"]);
+    evaluate_branch(branch);
+    test_assert(as_int(a) == 9);
+
+    // Make sure that if we change an expression to value(), that its current
+    // value is preserved.
+    test_assert(function_t::get_output_type(VALUE_FUNC) == ANY_TYPE);
+    change_function(a, VALUE_FUNC);
+    test_assert(as_int(a) == 9);
+    test_assert(a->numInputs() == 0); // Should truncate inputs
+    evaluate_branch(branch);
+    test_assert(as_int(a) == 9);
+}
+
 void register_tests()
 {
+    REGISTER_TEST_CASE(refactoring_tests::test_change_function);
     REGISTER_TEST_CASE(refactoring_tests::repro_source_after_rename);
 }
 

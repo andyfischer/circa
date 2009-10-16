@@ -1184,7 +1184,7 @@ Term* atom(Branch& branch, TokenStream& tokens)
         result = literal_list(branch, tokens);
 
     // plain branch?
-    else if (tokens.nextIs(BEGIN))
+    else if (tokens.nextIs(BEGIN) || tokens.nextIs(LBRACE))
         result = plain_branch(branch, tokens);
 
     // namespace?
@@ -1409,16 +1409,25 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 Term* plain_branch(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
-    tokens.consume(BEGIN);
+
+    bool usingBeginEnd = tokens.nextIs(BEGIN);
+    if (usingBeginEnd) tokens.consume(BEGIN);
+    else tokens.consume(LBRACE);
+
     Term* result = create_branch(branch);
     result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
     consume_branch_until_end(as_branch(result), tokens);
     result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
-    if (!tokens.nextIs(END))
-        return compile_error_for_line(result, tokens, startPosition);
-
-    tokens.consume(END);
+    if (usingBeginEnd) {
+        if (!tokens.nextIs(END))
+            return compile_error_for_line(result, tokens, startPosition);
+        tokens.consume(END);
+    } else {
+        if (!tokens.nextIs(RBRACE))
+            return compile_error_for_line(result, tokens, startPosition);
+        tokens.consume(RBRACE);
+    }
     return result;
 }
 
