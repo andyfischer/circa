@@ -294,7 +294,8 @@ void consume_branch_until_end(Branch& branch, TokenStream& tokens)
     while (!tokens.finished()) {
         if (tokens.nextNonWhitespaceIs(END)
                 || tokens.nextNonWhitespaceIs(ELSE)
-                || tokens.nextNonWhitespaceIs(ELIF)) {
+                || tokens.nextNonWhitespaceIs(ELIF)
+                || tokens.nextNonWhitespaceIs(RBRACE)) {
             break;
         } else {
             parser::statement(branch, tokens);

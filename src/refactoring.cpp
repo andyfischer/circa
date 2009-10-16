@@ -6,12 +6,21 @@ namespace circa {
 
 void change_function(Term* term, Term* newFunction)
 {
+    assert(newFunction->type == FUNCTION_TYPE);
+
     if (term->function == newFunction)
         return;
 
     term->function = newFunction;
 
-    change_type(term, function_t::get_output_type(newFunction));
+    Term* newType = function_t::get_output_type(newFunction);
+    if (newType != ANY_TYPE)
+        change_type(term, newType);
+
+    // Check if we need to change the # of inputs
+    if (!function_t::get_variable_args(newFunction)) {
+        term->inputs.resize(function_t::num_inputs(newFunction));
+    }
 }
 
 void unsafe_change_type(Term *term, Term *type)

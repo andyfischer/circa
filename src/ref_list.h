@@ -178,6 +178,11 @@ struct RefList
         return -1;
     }
 
+    void resize(int newLength)
+    {
+        _items.resize(newLength);
+    }
+
     void remapPointers(ReferenceMap const& map);
 };
 

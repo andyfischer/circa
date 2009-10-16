@@ -33,7 +33,8 @@ Term* apply(Branch& branch, Term* function, RefList const& _inputs, std::string 
         std::stringstream new_value_name;
         new_value_name << "#hidden_state";
         if (name != "") new_value_name << "_for_" << name;
-        Term* stateContainer = create_stateful_value(branch, function_t::get_hidden_state_type(function),
+        Term* stateContainer = create_stateful_value(branch,
+                function_t::get_hidden_state_type(function),
                 new_value_name.str());
         set_source_hidden(stateContainer, true);
         inputs.prepend(stateContainer);
