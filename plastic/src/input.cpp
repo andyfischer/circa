@@ -133,7 +133,7 @@ void handle_key_press(SDL_Event &event, int key)
             break;
 
         case SDLK_p:
-            std::cout << branch_to_string_raw(*USERS_BRANCH);
+            std::cout << print_branch_raw(*USERS_BRANCH);
             break;
 
         default: break;

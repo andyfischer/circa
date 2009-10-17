@@ -10,34 +10,10 @@ namespace meta_function {
         return term->input(0)->type;
     }
 
-    void recursively_evaluate_inputs_inside_branch(Term* term, Branch* branch)
-    {
-        if (term->owningBranch != branch)
-            return;
-
-        evaluate_term(term);
-
-        for (int i=0; i < term->numInputs(); i++)
-            recursively_evaluate_inputs_inside_branch(term->input(i), branch);
-    }
-
-    void lift_closure(Term* caller)
+    void lift_closure_evaluate(Term* caller)
     {
         assign_value(caller->input(0), caller);
-
-        Branch& contents = as_branch(caller);
-
-        // TODO: Should do an evaluate_with_no_side_effects here (when it exists)
-
-        for (int i=0; i < contents.length(); i++) {
-            if (contents[i] == NULL) continue;
-            if (contents[i]->function == FREEZE_FUNC) {
-                Term* input = contents[i]->input(0);
-                // This is flawed (see above comment)
-                recursively_evaluate_inputs_inside_branch(input, contents[i]->owningBranch);
-
-            }
-        }
+        lift_closure(as_branch(caller));
     }
 
     void setup(Branch& kernel)
@@ -45,8 +21,7 @@ namespace meta_function {
         FREEZE_FUNC = import_function(kernel, copy_function::evaluate, "freeze(any) : any");
         function_t::get_specialize_type(FREEZE_FUNC) = freeze_specializeType;
 
-        Term* lc = import_function(kernel, lift_closure,
-                "lift_closure(Branch) : Branch");
+        import_function(kernel, lift_closure_evaluate, "lift_closure(Branch) : Branch");
     }
 
 } // namespace meta_function

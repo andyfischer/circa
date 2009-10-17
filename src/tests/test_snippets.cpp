@@ -55,7 +55,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         std::cout << "Runtime error in: " << get_current_test_name() << std::endl;
         print_runtime_error_formatted(code, std::cout);
         std::cout << std::endl;
-        std::cout << branch_to_string_raw(code);
+        std::cout << print_branch_raw(code);
         declare_current_test_failed();
         return;
     }
@@ -74,7 +74,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
             std::cout << "In " << get_current_test_name() << std::endl;
             std::cout << "assertion failed: " << get_term_source(assertions[i]) << std::endl;
             std::cout << "Compiled code: " << std::endl;
-            std::cout << branch_to_string_raw(code);
+            std::cout << print_branch_raw(code);
             declare_current_test_failed();
             return;
         }
@@ -83,7 +83,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     if (boolean_statements_found == 0 && assertionsStr != "") {
         std::cout << "In " << get_current_test_name() << std::endl;
         std::cout << "no boolean statements found in: " << assertionsStr << std::endl;
-        std::cout << branch_to_string_raw(code);
+        std::cout << print_branch_raw(code);
         declare_current_test_failed();
     }
 }

@@ -52,9 +52,9 @@ void test_migration(std::string sourceCode, std::string destinationCode, std::st
             std::cout << "In " << get_current_test_name() << std::endl;
             std::cout << "assertion failed: " << get_term_source(assertions[i]) << std::endl;
             std::cout << "Source:" << std::endl;
-            std::cout << branch_to_string_raw(source);
+            std::cout << print_branch_raw(source);
             std::cout << "Destination:" << std::endl;
-            std::cout << branch_to_string_raw(destination);
+            std::cout << print_branch_raw(destination);
             declare_current_test_failed();
             return;
         }

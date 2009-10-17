@@ -26,8 +26,8 @@ std::string get_short_local_name(Term* term);
 std::string term_to_raw_string(Term* term);
 std::string term_to_raw_string_with_properties(Term* term);
 std::string branch_namespace_to_string(Branch& branch);
-std::string branch_to_string_raw(Branch& branch);
-std::string branch_to_string_raw_with_properties(Branch& branch);
+std::string print_branch_raw(Branch& branch);
+std::string print_branch_raw_with_properties(Branch& branch);
 
 // Print a short source-code location for this term.
 std::string get_short_location(Term* term);
