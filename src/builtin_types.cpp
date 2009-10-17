@@ -417,7 +417,17 @@ namespace branch_mirror_t
 
         as_string(caller) = print_branch_raw(target_branch);
     }
-
+    void save(Term* caller)
+    {
+        Branch& target_branch = get_target_branch(caller);
+        dump_branch(target_branch);
+        persist_branch_to_file(target_branch);
+    }
+    void to_source(Term* caller)
+    {
+        Branch& target_branch = get_target_branch(caller);
+        as_string(caller) = get_branch_source(target_branch);
+    }
 
 } // namespace branch_mirror_t
 
@@ -486,9 +496,13 @@ void parse_builtin_types(Branch& kernel)
     import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_index,
         "get_index(BranchMirror, int) : Ref");
     import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::append_code,
-        "append_code(BranchMirror, Branch) : BranchMirror");
+        "append_code(BranchMirror, Branch)");
     import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::print_raw,
         "print_raw(BranchMirror) : string");
+    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::save,
+        "save(BranchMirror)");
+    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::to_source,
+        "to_source(BranchMirror) : string");
 }
 
 } // namespace circa

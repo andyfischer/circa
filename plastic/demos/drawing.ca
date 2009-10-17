@@ -9,4 +9,5 @@ end
 
 if mouse_clicked()
     document.append_code({ draw_circle(freeze(mouse)) })
+    document.save()
 end
