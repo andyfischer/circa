@@ -16,6 +16,7 @@ struct TermNamespace
     typedef std::map<std::string, Ref> StringToTermMap;
     typedef StringToTermMap::iterator iterator;
     typedef StringToTermMap::const_iterator const_iterator;
+
     StringToTermMap _map;
 
     bool contains(std::string s) const
@@ -69,6 +70,14 @@ struct TermNamespace
     void remove(std::string const& name)
     {
         _map.erase(name);
+    }
+
+    void append(TermNamespace& rhs)
+    {
+        StringToTermMap::const_iterator it;
+        for (it = rhs._map.begin(); it != rhs._map.end(); ++it) {
+            _map[it->first] = it->second;
+        }
     }
 
     iterator begin() { return _map.begin(); }

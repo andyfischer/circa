@@ -333,7 +333,8 @@ void duplicate_branch(Branch& source, Branch& dest)
     for (int i=0; i < dest.length(); i++)
         remap_pointers(dest[i], newTermMap);
 
-    dest.names = source.names;
+    // Include/overwrite names
+    dest.names.append(source.names);
     dest.names.remapPointers(newTermMap);
 }
 

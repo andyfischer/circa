@@ -104,5 +104,38 @@ void install_fake_file_io(FileIORedirector* fakeObject)
 {
     FAKE_FILE_IO = fakeObject;
 }
-    
+
+FakeFileSystem::FakeFileSystem() { install_fake_file_io(this); }
+FakeFileSystem::~FakeFileSystem() { install_fake_file_io(NULL); }
+
+std::string& FakeFileSystem::operator [] (std::string const& filename)
+{
+    return _files[filename].contents;
+}
+
+time_t& FakeFileSystem::last_modified(std::string const& filename)
+{
+    return _files[filename].last_modified;
+}
+
+std::string FakeFileSystem::read_text_file(std::string const& filename)
+{
+    return _files[filename].contents;
+}
+
+void FakeFileSystem::write_text_file(std::string const& filename, std::string const& contents)
+{
+    _files[filename].contents = contents;
+}
+
+time_t FakeFileSystem::get_modified_time(std::string const& filename)
+{
+    return _files[filename].last_modified;
+}
+
+bool FakeFileSystem::file_exists(std::string const& filename)
+{
+    return _files.find(filename) != _files.end();
+}
+
 } // namespace circa

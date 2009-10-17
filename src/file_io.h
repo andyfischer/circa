@@ -29,6 +29,30 @@ struct FileIORedirector {
 // Call this with NULL to reset it.
 void install_fake_file_io(FileIORedirector* fakeObject);
 
+// Class that implements FileIORedirector. This class installs itself on construction
+// and deletes itself afterwards.
+struct FakeFileSystem : FileIORedirector
+{
+    struct File {
+        std::string contents;
+        time_t last_modified;
+
+        File() : last_modified(0) {}
+    };
+
+    std::map<std::string, File> _files;
+
+    FakeFileSystem();
+    ~FakeFileSystem();
+
+    std::string& operator [] (std::string const& filename);
+    time_t& last_modified(std::string const& filename);
+    virtual std::string read_text_file(std::string const& filename);
+    virtual void write_text_file(std::string const& filename, std::string const& contents);
+    virtual time_t get_modified_time(std::string const& filename);
+    virtual bool file_exists(std::string const& filename);
+};
+
 } // namespace circa
 
 #endif
