@@ -1,0 +1,12 @@
+
+background(#000)
+
+document = branch_mirror(include('drawing_document.ca'))
+
+def draw_circle(Point location)
+    gl.circle(location, 15.0, #f00)
+end
+
+if mouse_clicked()
+    document.append_code({ draw_circle(freeze(mouse)) })
+end
