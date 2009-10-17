@@ -186,7 +186,7 @@ void test_snippet(std::string const& text)
             std::cout << failureReason;
             std::cout << "Final text:   " << text << std::endl;
             std::cout << "<<<" << std::endl;
-            std::cout << branch_to_string_raw_with_properties(branch);
+            std::cout << print_branch_raw_with_properties(branch);
             std::cout << ">>>" << std::endl;
             declare_current_test_failed();
             return;

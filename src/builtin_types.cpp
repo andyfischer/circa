@@ -271,7 +271,7 @@ namespace color_t {
     }
 } // namespace color_t
 
-namespace branch_inspector_t
+namespace branch_mirror_t
 {
     bool is_considered_config(Term* term)
     {
@@ -394,14 +394,32 @@ namespace branch_inspector_t
     void get_index(Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
-        int index = caller->input(1)->asInt();
+        int index = int_input(caller, 1);
         if (index >= target_branch.length())
             as_ref(caller) = NULL;
         else
             as_ref(caller) = target_branch[index];
     }
+    void append_code(Term* caller)
+    {
+        Branch& target_branch = get_target_branch(caller);
+        Branch& input = as_branch(caller->input(1));
 
-} // namespace branch_inspector_t
+        Branch temp_copy;
+        duplicate_branch(input, temp_copy);
+        lift_closure(temp_copy);
+
+        duplicate_branch(temp_copy, target_branch);
+    }
+    void print_raw(Term* caller)
+    {
+        Branch& target_branch = get_target_branch(caller);
+
+        as_string(caller) = print_branch_raw(target_branch);
+    }
+
+
+} // namespace branch_mirror_t
 
 void setup_builtin_types(Branch& kernel)
 {
@@ -455,18 +473,22 @@ void parse_builtin_types(Branch& kernel)
 
     type_t::get_to_string_func(COLOR_TYPE) = color_t::to_string;
 
-    import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_configs,
+    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_configs,
         "get_configs(BranchMirror) : List");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_configs_nested,
+    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_configs_nested,
         "get_configs_nested(BranchMirror) : List");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_relative_name,
+    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_relative_name,
         "get_relative_name(BranchMirror, Ref) : string");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_visible,
+    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_visible,
         "get_visible(BranchMirror) : List");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_length,
+    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_length,
         "length(BranchMirror) : int");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_inspector_t::get_index,
+    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_index,
         "get_index(BranchMirror, int) : Ref");
+    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::append_code,
+        "append_code(BranchMirror, Branch) : BranchMirror");
+    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::print_raw,
+        "print_raw(BranchMirror) : string");
 }
 
 } // namespace circa
