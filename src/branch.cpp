@@ -276,23 +276,9 @@ Branch& as_branch(Term* term)
     return *((Branch*) term->value);
 }
 
-std::string get_name_for_attribute(std::string attribute)
-{
-    return "#attr:" + attribute;
-}
-
-Term* get_branch_attribute(Branch& branch, std::string const& attr)
-{
-    std::string name = get_name_for_attribute(attr);
-    if (branch.contains(name))
-        return branch[name];
-    else
-        return NULL;
-}
-
 std::string get_branch_source_filename(Branch& branch)
 {
-    Term* attr = get_branch_attribute(branch, "source-file");
+    Term* attr = branch["#attr:source-file"];
     if (attr == NULL)
         return "";
     else
@@ -354,7 +340,7 @@ void duplicate_branch(Branch& source, Branch& dest)
 void parse_script(Branch& branch, std::string const& filename)
 {
     // Record the filename
-    string_value(branch, filename, get_name_for_attribute("source-file"));
+    string_value(branch, filename, "#attr:source-file");
 
     std::string fileContents = read_text_file(filename);
 

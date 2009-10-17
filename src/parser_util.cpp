@@ -80,7 +80,7 @@ void set_source_location(Term* term, int start, TokenStream& tokens)
 
 void push_pending_rebind(Branch& branch, std::string const& name)
 {
-    std::string attrname = get_name_for_attribute("comp-pending-rebind");
+    std::string attrname = "#attr:comp-pending-rebind";
 
     if (branch.contains(attrname))
         throw std::runtime_error("pending rebind already exists");
@@ -90,11 +90,11 @@ void push_pending_rebind(Branch& branch, std::string const& name)
 
 std::string pop_pending_rebind(Branch& branch)
 {
-    std::string attrname = get_name_for_attribute("comp-pending-rebind");
+    std::string attrname = "#attr:comp-pending-rebind";
 
     if (branch.contains(attrname)) {
         std::string result = as_string(branch[attrname]);
-        branch.remove(get_name_for_attribute("comp-pending-rebind"));
+        branch.remove("#attr:comp-pending-rebind");
         return result;
     } else {
         return "";
@@ -104,7 +104,7 @@ std::string pop_pending_rebind(Branch& branch)
 void post_parse_branch(Branch& branch)
 {
     // Remove temporary attributes
-    branch.remove(get_name_for_attribute("comp-pending-rebind"));
+    branch.remove("#attr:comp-pending-rebind");
 
     // Remove NULLs
     branch.removeNulls();
