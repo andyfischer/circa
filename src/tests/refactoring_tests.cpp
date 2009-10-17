@@ -58,10 +58,26 @@ void test_change_function()
     test_assert(as_int(a) == 9);
 }
 
+void repro_source_after_append_code()
+{
+    Branch branch;
+
+    Term* target = branch.eval("target = {}");
+
+    branch.eval("bm = branch_mirror(target)");
+
+    branch.eval("bm.append_code({ 1  +  1 })");
+
+    test_equals(get_branch_source(as_branch(target)), "1  +  1 ");
+    //std::cout << get_branch_source(as_branch(target)) << std::endl;
+    //dump_branch(as_branch(target));
+}
+
 void register_tests()
 {
-    REGISTER_TEST_CASE(refactoring_tests::test_change_function);
     REGISTER_TEST_CASE(refactoring_tests::repro_source_after_rename);
+    REGISTER_TEST_CASE(refactoring_tests::test_change_function);
+    REGISTER_TEST_CASE(refactoring_tests::repro_source_after_append_code);
 }
 
 } // namespace refactoring_tests

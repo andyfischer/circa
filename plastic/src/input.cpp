@@ -107,8 +107,10 @@ void handle_key_press(SDL_Event &event, int key)
 
     case SDLK_p:
         if (PAUSED) {
+            std::cout << "Unpaused" << std::endl;
             PAUSED = false;
         } else {
+            std::cout << "Paused" << std::endl;
             PAUSED = true;
             PAUSE_REASON = USER_REQUEST;
         }
