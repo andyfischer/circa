@@ -28,9 +28,38 @@ void test_lift_closure()
     test_assert(as_int(sub_freeze_a) == 1);
 }
 
+void save_code_generated_with_reflection()
+{
+    FakeFileSystem files;
+    files["included.ca"] = "";
+
+    Branch branch;
+    Term* b = branch.eval("b = include('included.ca')");
+    test_equals(b->asBranch()["#attr:source-file"]->asString(), "included.ca");
+
+    branch.eval("bm = branch_mirror(b)");
+    branch.eval("def my_function() end");
+
+    test_assert(b->asBranch().contains("#attr:source-file"));
+    test_equals(b->asBranch()["#attr:source-file"]->asString(), "included.ca");
+
+    branch.eval("bm.append_code({my_function()})");
+
+    // there was once a bug here:
+    test_assert(b->asBranch().contains("#attr:source-file"));
+    test_equals(b->asBranch()["#attr:source-file"]->asString(), "included.ca");
+
+    branch.eval("bm.append_code({my_function()})");
+    branch.eval("bm.append_code({my_function()})");
+    branch.eval("bm.save()");
+
+    test_equals(files["included.ca"], "my_function()\nmy_function()\nmy_function()\n");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(metaprogramming_tests::test_lift_closure);
+    REGISTER_TEST_CASE(metaprogramming_tests::save_code_generated_with_reflection);
 }
 
 } // namespace metaprogramming_tests

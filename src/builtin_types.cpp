@@ -405,11 +405,22 @@ namespace branch_mirror_t
         Branch& target_branch = get_target_branch(caller);
         Branch& input = as_branch(caller->input(1));
 
+        if (input.length() == 0)
+            return;
+
+        int previousLast = target_branch.length();
+
         Branch temp_copy;
         duplicate_branch(input, temp_copy);
         lift_closure(temp_copy);
 
         duplicate_branch(temp_copy, target_branch);
+
+        if (previousLast > 0)
+            target_branch[previousLast-1]->removeProperty("syntaxHints:lineEnding");
+        // Strip trailing whitespace after the last term so that the resulting
+        // source looks better.
+        target_branch[target_branch.length()-1]->removeProperty("syntaxHints:lineEnding");
     }
     void print_raw(Term* caller)
     {
@@ -420,7 +431,6 @@ namespace branch_mirror_t
     void save(Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
-        dump_branch(target_branch);
         persist_branch_to_file(target_branch);
     }
     void to_source(Term* caller)
