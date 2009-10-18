@@ -4,6 +4,8 @@
 
 #include <circa.h>
 
+#include "plastic.h"
+
 using namespace circa;
 
 namespace gl_shapes {
@@ -11,22 +13,22 @@ namespace gl_shapes {
 void _unpack_gl_color(Term* colorTerm)
 {
     Branch& color = as_branch(colorTerm);
-    glColor4f(color[0]->asFloat(),
-                 color[1]->asFloat(),
-                 color[2]->asFloat(),
-                 color[3]->asFloat());
+    glColor4f(color[0]->asFloat(), color[1]->asFloat(),
+                 color[2]->asFloat(), color[3]->asFloat());
 }
 
 void background(Term* caller)
 {
+    gl_clear_error();
+
     Branch& color = caller->input(0)->asBranch();
 
-    glClearColor(color[0]->asFloat(),
-                 color[1]->asFloat(),
-                 color[2]->asFloat(),
-                 color[3]->asFloat());
+    glClearColor(color[0]->asFloat(), color[1]->asFloat(),
+            color[2]->asFloat(), color[3]->asFloat());
 
     glClear(GL_COLOR_BUFFER_BIT);
+
+    gl_check_error(caller);
 }
 
 void gl_triangles(Term* caller)
@@ -46,6 +48,8 @@ void gl_triangles(Term* caller)
     }
 
     glEnd();
+
+    gl_check_error(caller);
 }
 
 void gl_line_strip(Term* caller)
@@ -64,6 +68,8 @@ void gl_line_strip(Term* caller)
     }
     
     glEnd();
+
+    gl_check_error(caller);
 }
 
 void gl_line_loop(Term* caller)
@@ -82,6 +88,8 @@ void gl_line_loop(Term* caller)
     }
     
     glEnd();
+
+    gl_check_error(caller);
 }
 
 void gl_points(Term* caller)
@@ -100,6 +108,8 @@ void gl_points(Term* caller)
     }
     
     glEnd();
+
+    gl_check_error(caller);
 }
 
 void gl_circle(Term* caller)
@@ -128,6 +138,8 @@ void gl_circle(Term* caller)
     }
 
     glEnd();
+
+    gl_check_error(caller);
 }
 
 void setup(Branch& branch)

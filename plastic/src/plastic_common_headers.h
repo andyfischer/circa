@@ -47,4 +47,18 @@ struct ReferenceMap;
 
 } // namespace circa
 
+#define NO_SDL_GLEXT
+#include <SDL.h>
+#include <SDL_opengl.h>
+
+#ifdef __APPLE__
+    #include <OpenGL/glu.h>
+    #include <OpenGL/glext.h>
+#else
+    #include <GL/glu.h>
+    #include <GL/glext.h>
+    #include <GL/glx.h>
+    #include <GL/glxext.h>
+#endif
+
 #endif

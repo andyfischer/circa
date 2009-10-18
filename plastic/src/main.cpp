@@ -1,20 +1,8 @@
 // Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
-#include "common_headers.h"
-
-#include <SDL.h>
-#include <SDL_opengl.h>
-
 #include <circa.h>
 
-#include "gl_shapes.h"
-#include "docs.h"
-#include "input.h"
-#include "main.h"
-#include "mesh.h"
-#include "shaders.h"
-#include "textures.h"
-#include "ttf.h"
+#include "plastic.h"
 
 using namespace circa;
 
@@ -33,17 +21,30 @@ Float TIME_DELTA;
 long PREV_SDL_TICKS = 0;
 int TARGET_FPS = 60;
 
+int WINDOW_WIDTH = 0;
+int WINDOW_HEIGHT = 0;
+
 bool PAUSED = false;
 PauseReason PAUSE_REASON;
 
-std::string find_runtime_file()
+std::string get_home_directory()
 {
     char* circa_home = getenv("CIRCA_HOME");
     if (circa_home == NULL) {
-        return get_directory_for_filename(BINARY_NAME) + "/runtime.ca";
+        return get_directory_for_filename(BINARY_NAME);
     } else {
-        return std::string(circa_home) + "/plastic/runtime.ca";
+        return std::string(circa_home) + "/plastic";
     }
+}
+
+std::string find_runtime_file()
+{
+    return get_home_directory() + "/runtime.ca";
+}
+
+std::string find_asset_file(std::string const& filename)
+{
+    return get_home_directory() + "/" + filename;
 }
 
 bool initialize_plastic()
@@ -67,6 +68,7 @@ bool initialize_plastic()
     }
     parse_script(*SCRIPT_ROOT, runtime_ca_path);
 
+    postprocess_functions::setup(*SCRIPT_ROOT);
     input::setup(*SCRIPT_ROOT);
     mesh::setup(*SCRIPT_ROOT);
     gl_shapes::setup(*SCRIPT_ROOT);
@@ -93,15 +95,15 @@ bool initialize_display()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     // Create the surface
-    int windowWidth = 640;
-    int windowHeight = 480;
+    WINDOW_WIDTH = 640;
+    WINDOW_HEIGHT = 480;
 
     if (USERS_BRANCH->contains("desired_window_size")) {
-        windowWidth = (*USERS_BRANCH)["desired_window_size"]->asBranch()[0]->asInt();
-        windowHeight = (*USERS_BRANCH)["desired_window_size"]->asBranch()[1]->asInt();
+        WINDOW_WIDTH = (*USERS_BRANCH)["desired_window_size"]->asBranch()[0]->asInt();
+        WINDOW_HEIGHT = (*USERS_BRANCH)["desired_window_size"]->asBranch()[1]->asInt();
     }
 
-    SCREEN = SDL_SetVideoMode(windowWidth, windowHeight, 16, SDL_OPENGL | SDL_SWSURFACE);
+    SCREEN = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 16, SDL_OPENGL | SDL_SWSURFACE);
 
     if (SCREEN == NULL) {
         std::cerr << "SDL_SetVideoMode failed: " << SDL_GetError() << std::endl;
@@ -109,12 +111,15 @@ bool initialize_display()
     }
 
     // Write window width & height to runtime.ca
-    (*SCRIPT_ROOT)["window"]->asBranch()["width"]->asInt() = windowWidth;
-    (*SCRIPT_ROOT)["window"]->asBranch()["height"]->asInt() = windowHeight;
+    (*SCRIPT_ROOT)["window"]->asBranch()["width"]->asInt() = WINDOW_WIDTH;
+    (*SCRIPT_ROOT)["window"]->asBranch()["height"]->asInt() = WINDOW_HEIGHT;
 
     // Initialize desired SDL subsystems
-    if (SDL_Init(SDL_INIT_TIMER & SDL_INIT_VIDEO & SDL_INIT_JOYSTICK & SDL_INIT_EVENTTHREAD) == -1)
+    if (SDL_Init(SDL_INIT_TIMER & SDL_INIT_VIDEO
+                & SDL_INIT_JOYSTICK & SDL_INIT_EVENTTHREAD) == -1) {
+        std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
         return false;
+    }
 
     // Set window caption
     std::string windowTitle;
@@ -126,6 +131,9 @@ bool initialize_display()
     SDL_WM_SetCaption(windowTitle.c_str(), NULL);
 
     // Initialize GL state
+    gl_clear_error();
+    Term errorListener;
+
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glPolygonMode(GL_FRONT, GL_FILL);
@@ -133,24 +141,27 @@ bool initialize_display()
     glClearColor(0,0,0,0);
     glClearDepth(1000);
     glDepthFunc(GL_LEQUAL);
-
-    glEnable(GL_TEXTURE);
     glEnable(GL_TEXTURE_2D);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-     
-    glViewport(0, 0, windowWidth, windowHeight);
-     
-    glClear( GL_COLOR_BUFFER_BIT );
+
+    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
      
     glMatrixMode( GL_PROJECTION );
-    glLoadIdentity();
-     
-    glOrtho(0, windowWidth, windowHeight, 0, -1000.0f, 1000.0f);
-        
+    glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1000.0f, 1000.0f);
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
+
+    glClear( GL_COLOR_BUFFER_BIT );
+
+    gl_check_error(&errorListener, " (initialize display)");
+
+    if (errorListener.hasError()) {
+        std::cerr << "GL error during initialization: "
+            << get_runtime_error_message(&errorListener) << std::endl;
+        return false;
+    }
 
     return true;
 }
@@ -161,6 +172,9 @@ void main_loop()
 
     long ticks = SDL_GetTicks();
 
+    gl_clear_error();
+
+    // Evaluate script
     if (!PAUSED) {
 
         TIME_DELTA = (ticks - PREV_SDL_TICKS) / 1000.0f;
@@ -181,6 +195,18 @@ void main_loop()
             PAUSED = true;
             PAUSE_REASON = RUNTIME_ERROR;
         }
+    }
+
+    // Temp code for testing:
+    //glViewport(0, 0, dest_surface.width, dest_surface.height);
+    //glMatrixMode(GL_PROJECTION);
+    //glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1000.0f, 1000.0f);
+    //glMatrixMode(GL_MODELVIEW);
+
+    Term errorListener;
+    gl_check_error(&errorListener, " (uncaught)");
+    if (errorListener.hasError()) {
+        std::cout << "uncaught: " << get_runtime_error_message(&errorListener) << std::endl;
     }
 
     // Update the screen
@@ -238,9 +264,6 @@ int plastic_main(std::vector<std::string> args)
         print_static_errors_formatted(*USERS_BRANCH, std::cout);
         return 1;
     }
-
-    // Check to dump compiled code:
-
 
     // Try to initialize display
     if (!initialize_display()) return 1;

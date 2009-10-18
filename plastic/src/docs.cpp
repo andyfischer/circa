@@ -1,7 +1,8 @@
 // Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
 #include "circa.h"
-#include "main.h"
+
+#include "plastic.h"
 
 using namespace circa;
 
