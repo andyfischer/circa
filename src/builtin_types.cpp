@@ -416,10 +416,10 @@ namespace branch_mirror_t
 
         duplicate_branch(temp_copy, target_branch);
 
+        // Strip trailing whitespace after the formally-last and newly-last terms
+        // so that the resulting source looks better.
         if (previousLast > 0)
             target_branch[previousLast-1]->removeProperty("syntaxHints:lineEnding");
-        // Strip trailing whitespace after the last term so that the resulting
-        // source looks better.
         target_branch[target_branch.length()-1]->removeProperty("syntaxHints:lineEnding");
     }
     void print_raw(Term* caller)

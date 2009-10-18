@@ -8,6 +8,7 @@
 
 #include <circa.h>
 
+#include "gl_common.h"
 #include "textures.h"
 
 using namespace circa;
@@ -80,6 +81,8 @@ void hosted_load_texture(Term* caller)
         texid = id;
     }
     caller->asInt() = texid;
+
+    gl_check_error(caller);
 }
 
 void hosted_image(Term* caller)
@@ -114,6 +117,8 @@ void hosted_image(Term* caller)
 
     // reset state
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    gl_check_error(caller);
 }
 
 void setup(circa::Branch& branch)

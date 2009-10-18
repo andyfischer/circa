@@ -5,6 +5,7 @@
 #include <SDL_opengl.h>
 #include <SDL_ttf.h>
 
+#include "gl_common.h"
 #include "textures.h"
 #include "ttf.h"
 
@@ -98,6 +99,8 @@ void draw_text(Term* caller)
     glVertex3f(x, y + output.height(),0);
 
     glEnd();
+
+    gl_check_error(caller);
 }
 
 void render_text(Term* caller)
@@ -135,7 +138,6 @@ void render_text(Term* caller)
     assign_value(caller->input(0), caller);
 }
 
-// This should be turned into a member function:
 void draw_rendered_text(Term* caller)
 {
     RenderedText output(caller->input(0));
@@ -164,6 +166,8 @@ void draw_rendered_text(Term* caller)
 
     // reset state
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    gl_check_error(caller);
 }
 
 void setup(Branch& branch)
@@ -178,10 +182,12 @@ void setup(Branch& branch)
     type_t::enable_default_value(branch["TTF_Font"]);
     as<TTF_Font*>(type_t::get_default_value(branch["TTF_Font"])) = 0;
 
-    install_function(branch["text"]->asBranch()["load_font"], load_font);
-    //install_function(branch["text"]->asBranch()["draw_text"], draw_text);
-    install_function(branch["text"]->asBranch()["render_text"], render_text);
-    install_function(branch["text"]->asBranch()["draw_rendered_text"], draw_rendered_text);
+    Branch& text_ns = branch["text"]->asBranch();
+
+    install_function(text_ns["load_font"], load_font);
+    //install_function(text_ns["draw_text"], draw_text);
+    install_function(text_ns["render_text"], render_text);
+    install_function(text_ns["draw_rendered_text"], draw_rendered_text);
 }
 
 } // namespace ttf

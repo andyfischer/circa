@@ -1,38 +1,50 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
-#include "common_headers.h"
+#include "plastic.h"
 
-#include <SDL_opengl.h>
-
-#define SHADER_SUPPORT 0
-
-#if SHADER_SUPPORT
-GLuint load_shader(GLenum shaderType, std::string const& glslSource)
+GLuint load_shader(std::string const& vertFilename, std::string const& fragFilename)
 {
-    while (glGetError() != GL_NO_ERROR);
+    std::string vertText = circa::read_text_file(find_asset_file(vertFilename));
+    std::string fragText = circa::read_text_file(find_asset_file(fragFilename));
 
-    GLenum err = GL_NO_ERROR;
-
-    GLuint shader = glCreateShader(shaderType);
-    err = glGetError();
-    if (err != GL_NO_ERROR)
-        std::cout << "error after glCreateShader" << std::endl;
-
-    const char* glslSource_cstr = glslSource.c_str();
-    glShaderSource(shader, 1, (const GLchar**) &glslSource_cstr, NULL);
-
-    err = glGetError();
-    if (err != GL_NO_ERROR)
-        std::cout << "error after glShaderSource" << std::endl;
+    const char* vert = vertText.c_str();
+    const char* frag = fragText.c_str();
     
-    glCompileShader(shader);
+    GLchar buf[256];
+    GLuint vertShader, fragShader, program;
+    GLint success;
 
-    err = glGetError();
-    if (err != GL_NO_ERROR)
-        std::cout << "error after glCompileShader" << std::endl;
+    vertShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertShader, 1, (const GLchar**) &vert, 0);
+    glCompileShader(vertShader);
+    glGetShaderiv(vertShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(vertShader, sizeof(buf), 0, buf);
+        error("Unable to compile vertex shader.");
+    }
 
-    // TODO: use glGetShaderiv to get GL_COMPILE_STATUS
+    fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragShader, 1, (const GLchar**) &frag, 0);
+    glCompileShader(fragShader);
+    glGetShaderiv(fragShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(fragShader, sizeof(buf), 0, buf);
+        error("Unable to compile fragment shader.");
+    }
 
-    return shader;
+    program = glCreateProgram();
+    glAttachShader(program, vertShader);
+    glAttachShader(program, fragShader);
+
+    glLinkProgram(program);
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(program, sizeof(buf), 0, buf);
+        error("Unable to link shaders.\n");
+    }
+
+    return program;
 }
-#endif
