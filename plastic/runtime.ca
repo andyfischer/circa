@@ -260,15 +260,16 @@ namespace postprocess
         int height
     }
 
-    def hidden_surface(state Surface _state, int width, int height) : Surface
+    def make_surface(state Surface _state, int width, int height) : Surface
     end
 
-    def get_tex_id_for_main_surface(state int) : int
-    end
+    def bind_surface(Surface surface) : void end
+    def bind_main_surface() : void end
 
-    main_surface = [ get_tex_id_for_main_surface(), 0, window.width, window.height ] :: Surface
+    --def get_tex_id_for_main_surface(state int) : int end
+    --main_surface = [ get_tex_id_for_main_surface(), 0, window.width, window.height ] :: Surface
 
-    def copy_surface(Surface source, Surface dest, number alpha)
+    def draw_surface(Surface source, number alpha)
     end
 end
 

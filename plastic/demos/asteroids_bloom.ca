@@ -1,0 +1,8 @@
+
+pass0 = postprocess.make_surface(window.width,window.height)
+postprocess.bind_surface(pass0)
+
+include("asteroids.ca")
+
+postprocess.bind_main_surface()
+postprocess.draw_surface(pass0, .2)
