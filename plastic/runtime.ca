@@ -269,8 +269,8 @@ namespace postprocess
     --def get_tex_id_for_main_surface(state int) : int end
     --main_surface = [ get_tex_id_for_main_surface(), 0, window.width, window.height ] :: Surface
 
-    def draw_surface(Surface source, number alpha)
-    end
+    def draw_surface(Surface source, number alpha) end
+    def copy_surface(Surface source, Surface dest) end
 end
 
 -- Load the user's script

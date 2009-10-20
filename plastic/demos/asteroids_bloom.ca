@@ -1,8 +1,12 @@
-
 pass0 = postprocess.make_surface(window.width,window.height)
 postprocess.bind_surface(pass0)
 
 include("asteroids.ca")
 
+pass1 = postprocess.make_surface(window.width//4, window.height//4)
+postprocess.copy_surface(pass0, pass1);
+
 postprocess.bind_main_surface()
-postprocess.draw_surface(pass0, .2)
+
+postprocess.draw_surface(pass0, 1)
+postprocess.draw_surface(pass1, .2)

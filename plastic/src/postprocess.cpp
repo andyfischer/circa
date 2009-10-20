@@ -67,6 +67,17 @@ namespace postprocess_functions
         assign_value(caller->input(0), caller);
     }
 
+    void bind_surface(Surface& surface)
+    {
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surface.fbo_id);
+        glViewport(0, 0, surface.width, surface.height);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, surface.width, surface.height, 0, -1000.0f, 1000.0f);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+    }
+
     void draw_surface(Term* caller)
     {
         Surface source_surface(caller->input(0));
@@ -76,12 +87,15 @@ namespace postprocess_functions
         glBindTexture(GL_TEXTURE_2D, source_surface.tex_id);
 
         glColor4f(1,1,1,alpha);
+
+        int width = WINDOW_WIDTH;
+        int height = WINDOW_HEIGHT; 
         
         glBegin(GL_QUADS);
         glTexCoord2i(0, 1); glVertex2i(0, 0);
-        glTexCoord2i(1, 1); glVertex2i(source_surface.width, 0);
-        glTexCoord2i(1, 0); glVertex2i(source_surface.width, source_surface.height);
-        glTexCoord2i(0, 0); glVertex2i(0, source_surface.height);
+        glTexCoord2i(1, 1); glVertex2i(width, 0);
+        glTexCoord2i(1, 0); glVertex2i(width, height);
+        glTexCoord2i(0, 0); glVertex2i(0, height);
         glEnd();
 
         // Reset state
@@ -92,17 +106,32 @@ namespace postprocess_functions
         gl_check_error(caller);
     }
 
+    void copy_surface(Term* caller)
+    {
+        Surface source_surface(caller->input(0));
+        Surface dest_surface(caller->input(1));
+
+        bind_surface(dest_surface);
+
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, source_surface.tex_id);
+
+        glBegin(GL_QUADS);
+        glTexCoord2i(0, 1); glVertex2i(0, 0);
+        glTexCoord2i(1, 1); glVertex2i(dest_surface.width, 0);
+        glTexCoord2i(1, 0); glVertex2i(dest_surface.width, dest_surface.height);
+        glTexCoord2i(0, 0); glVertex2i(0, dest_surface.height);
+        glEnd();
+
+        // Reset state
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
     void bind_surface(Term* caller)
     {
         Surface surface(caller->input(0));
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surface.fbo_id);
-        glViewport(0, 0, surface.width, surface.height);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0, surface.width, surface.height, 0, -1000.0f, 1000.0f);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-
+        bind_surface(surface);
         gl_check_error(caller);
     }
 
@@ -126,6 +155,7 @@ namespace postprocess_functions
         install_function(postprocess_ns["draw_surface"], draw_surface);
         install_function(postprocess_ns["bind_surface"], bind_surface);
         install_function(postprocess_ns["bind_main_surface"], bind_main_surface);
+        install_function(postprocess_ns["copy_surface"], copy_surface);
     }
 
 } // namespace postprocess_functions
