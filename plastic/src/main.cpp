@@ -149,6 +149,7 @@ bool initialize_display()
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
      
     glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
     glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1000.0f, 1000.0f);
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
@@ -197,16 +198,10 @@ void main_loop()
         }
     }
 
-    // Temp code for testing:
-    //glViewport(0, 0, dest_surface.width, dest_surface.height);
-    //glMatrixMode(GL_PROJECTION);
-    //glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1000.0f, 1000.0f);
-    //glMatrixMode(GL_MODELVIEW);
-
     Term errorListener;
     gl_check_error(&errorListener, " (uncaught)");
     if (errorListener.hasError()) {
-        std::cout << "uncaught: " << get_runtime_error_message(&errorListener) << std::endl;
+        std::cout << get_runtime_error_message(&errorListener) << std::endl;
     }
 
     // Update the screen

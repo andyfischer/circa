@@ -220,9 +220,3 @@ end
 for spawn in spawned
     asteroids.append(spawn)
 end
-
-
--- temp:
---surf0 = bloom.hidden_surface(100,100)
---bloom.copy_surface(bloom.main_surface, surf0, 1.0)
---bloom.copy_surface(surf0, bloom.main_surface, .2)
