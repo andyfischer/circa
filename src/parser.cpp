@@ -1429,6 +1429,8 @@ Term* plain_branch(Branch& branch, TokenStream& tokens)
         if (!tokens.nextIs(RBRACE))
             return compile_error_for_line(result, tokens, startPosition);
         tokens.consume(RBRACE);
+
+        result->boolProp("syntaxHints:braces") = true;
     }
     return result;
 }

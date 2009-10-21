@@ -32,12 +32,20 @@ namespace branch_function {
             return out.str();
             
         } else {
+            bool usingBraces = term->boolPropOptional("syntaxHints:braces", false);
+
             prepend_name_binding(term, out);
-            out << "begin";
+
+            if (usingBraces) out << "{";
+            else out << "begin";
+
             out << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
             out << get_branch_source(as_branch(term));
             out << term->stringPropOptional("syntaxHints:preEndWs", "");
-            out << "end";
+
+            if (usingBraces) out << "}";
+            else out << "end";
+
             return out.str();
         }
     }

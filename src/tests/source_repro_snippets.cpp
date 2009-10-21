@@ -299,6 +299,11 @@ void reproduce_misc_blocks() {
     round_trip_source("begin;  ;end");
     round_trip_source("begin;  end");
     round_trip_source("blah = begin 1   end");
+    round_trip_source("{}");
+    round_trip_source("{  }");
+    round_trip_source("{1}");
+    round_trip_source("blah = {1}");
+    round_trip_source("blah = { print(1) print(2) }");
     finish_source_repro_category();
 }
 
