@@ -260,10 +260,14 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     // Function name
     std::string functionName = tokens.consume();
-    possible_whitespace(tokens);
+
+    Term* result = create_value(branch, FUNCTION_TYPE, functionName);
+
+    result->stringProp("syntaxHints:postNameWs") = possible_whitespace(tokens);
 
     bool isNative = false;
     bool isOverload = false;
+    Term* previousBind = branch[functionName]; // might be NULL, this is used for +overload
 
     // Optional list of properties
     while (tokens.nextIs(PLUS)) {
@@ -277,7 +281,9 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
             return compile_error_for_line(branch, tokens, startPosition,
                     "Unsupported property: "+propName);
 
-        possible_whitespace(tokens);
+        propName += possible_whitespace(tokens);
+
+        result->stringProp("syntaxHints:properties") += "+" + propName;
     }
 
     if (!tokens.nextIs(LPAREN))
@@ -285,7 +291,6 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     tokens.consume(LPAREN);
 
-    Term* result = create_value(branch, FUNCTION_TYPE, functionName);
     Branch& contents = as_branch(result);
 
     function_t::get_name(result) = functionName;
@@ -389,6 +394,34 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     assert(is_subroutine(result));
 
     set_source_location(result, startPosition, tokens);
+
+    // If this function was defined as a overload, then wrap up this result into
+    // an overload branch.
+    if (isOverload && previousBind != NULL) {
+        Term* recentFunction = result;
+
+        result = create_overloaded_function(branch, functionName);
+        Branch& overloads = as_branch(result);
+
+        // Insert aliases for existing overloads
+        if (previousBind->type == OVERLOADED_FUNCTION_TYPE) {
+            Branch& existingOverloads = as_branch(previousBind);
+
+            for (int i=0; i < existingOverloads.length(); i++) {
+                Term* alias = apply(overloads, ALIAS_FUNC, RefList(existingOverloads[i]));
+                evaluate_term(alias);
+            }
+        } else {
+            Term* alias = apply(overloads, ALIAS_FUNC, RefList(previousBind));
+            evaluate_term(alias);
+        }
+
+        Term* alias = apply(overloads, ALIAS_FUNC, RefList(recentFunction));
+        evaluate_term(alias);
+
+        set_source_hidden(result, true);
+    }
+
     return result;
 }
 

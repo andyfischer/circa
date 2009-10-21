@@ -254,11 +254,18 @@ void reproduce_subroutine() {
     round_trip_source("type Point { number x, number y }\ndef hi() : Point\nreturn [0 0]\nend");
     round_trip_source("def hi() if true return 1 else return 2 end end");
     round_trip_source("def hi() x = 1 if true return x else return x end end");
+    round_trip_source("def my_func(int...) : int end");
+}
+
+void reproduce_function_headers() {
+    round_trip_source("def my_native +overload () end");
+    round_trip_source("def my_native +overload() end");
+    round_trip_source("def my_native   +overload () end");
+    round_trip_source("def my_native +overload +native () end");
     round_trip_source("def my_native +native ()");
     round_trip_source("def my_native +native ()   ");
     round_trip_source("def my_native +native (int)");
     round_trip_source("def my_native +native (int) : int");
-    round_trip_source("def my_func(int...) : int end");
     finish_source_repro_category();
 }
 
@@ -368,6 +375,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_lists);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_for_loop);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_subroutine);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_function_headers);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_type_decl);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_do_once);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_misc_blocks);
