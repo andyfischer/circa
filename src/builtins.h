@@ -9,6 +9,7 @@ namespace circa {
 
 extern Branch* KERNEL;
 
+extern Term* ALIAS_FUNC;
 extern Term* ADD_FUNC;
 extern Term* ANNOTATE_TYPE_FUNC;
 extern Term* ASSIGN_FUNC;

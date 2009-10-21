@@ -14,6 +14,7 @@ void setup_builtin_functions(Branch&);
 
 Branch* KERNEL = NULL;
 
+Term* ALIAS_FUNC = NULL;
 Term* ASSIGN_FUNC = NULL;
 Term* ADD_FUNC = NULL;
 Term* ANNOTATE_TYPE_FUNC = NULL;

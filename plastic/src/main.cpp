@@ -198,6 +198,7 @@ void main_loop()
         }
     }
 
+    // Check for uncaught GL error
     Term errorListener;
     gl_check_error(&errorListener, " (uncaught)");
     if (errorListener.hasError()) {
@@ -286,3 +287,4 @@ int main( int argc, char* args[] )
 
     return plastic_main(argv);
 }
+
