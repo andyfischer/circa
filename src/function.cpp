@@ -274,7 +274,7 @@ Term* create_overloaded_function(Branch& branch, std::string const& name)
 
 bool is_native_function(Term* func)
 {
-    return function_t::get_evaluate(func) != subroutine_call_evaluate;
+    return function_t::get_evaluate(func) != subroutine_t::evaluate;
 }
 
 Term* specialize_function(Term* func, RefList const& inputs)

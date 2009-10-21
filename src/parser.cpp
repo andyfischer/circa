@@ -263,6 +263,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     bool isNative = false;
+    bool isOverload = false;
 
     // Optional list of properties
     while (tokens.nextIs(PLUS)) {
@@ -270,6 +271,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         std::string propName = tokens.consume(IDENTIFIER);
         if (propName == "native")
             isNative = true;
+        else if (propName == "overload")
+            isOverload = true;
         else
             return compile_error_for_line(branch, tokens, startPosition,
                     "Unsupported property: "+propName);
@@ -343,8 +346,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     if (!tokens.nextIs(RPAREN))
         return compile_error_for_line(result, tokens, startPosition);
 
-    assert(tokens.nextIs(RPAREN));
-    tokens.consume();
+    tokens.consume(RPAREN);
 
     // Output type
     Term* outputType = VOID_TYPE;
@@ -363,35 +365,17 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 
-    // If we're out of tokens or if +native was used, then stop here.
-    if (isNative || tokens.finished()) {
+    // If we're out of tokens, then stop here. This behavior is used when defining builtins.
+    if (tokens.finished()) {
         // Add a term to hold our output type
         create_value(contents, outputType, "#out");
         return result;
     }
 
     // Parse this as a subroutine call
-
     consume_branch_until_end(contents, tokens);
 
-    // If there is an #out term, then it needs to be the last term. If #out is a
-    // name binding into an inner branch then this might not be the case
-    if (contents.contains("#out") && contents[contents.length()-1]->name != "#out") {
-        Term* copy = apply(contents, COPY_FUNC, RefList(contents["#out"]), "#out");
-        set_source_hidden(copy, true);
-    } else if (!contents.contains("#out")) {
-        // If there's no #out term, then create an extra term to hold the output type
-        Term* term = create_value(contents, outputType, "#out");
-        set_source_hidden(term, true);
-    }
-
-    // If the #out term doesn't have the same type as the declared type, then coerce it
-    Term* outTerm = contents[contents.length()-1];
-    if (outTerm->type != outputType) {
-        outTerm = apply(contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType), "#out");
-        set_source_hidden(outTerm, true);
-    }
-
+    // Finish consuming tokens
     result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
     if (!tokens.nextIs(END))
@@ -399,13 +383,11 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     tokens.consume(END);
 
-    // Officially make this a subroutine
-    function_t::get_evaluate(result) = subroutine_call_evaluate;
+    finish_building_subroutine(result, outputType);
 
     assert(is_value(result));
     assert(is_subroutine(result));
 
-    subroutine_update_hidden_state_type(result);
     set_source_location(result, startPosition, tokens);
     return result;
 }

@@ -25,12 +25,98 @@ namespace subroutine_t {
 
         return result.str();
     }
+
+    void evaluate(Term* caller)
+    {
+        Term* function = caller->function;
+        Branch& functionBranch = as_branch(function);
+
+        // Load values into this function's stateful values. If this state has never been
+        // saved then this function will reset this function's stateful values.
+        Term* hiddenState = get_hidden_state_for_call(caller);
+        if (hiddenState != NULL)
+            load_state_into_branch(as_branch(hiddenState), functionBranch);
+
+        int num_inputs = function_t::num_inputs(caller->function);
+
+        if (num_inputs != caller->inputs.length()) {
+            std::stringstream msg;
+            msg << "Wrong number of inputs, expected: " << num_inputs
+                << ", found: " << caller->inputs.length();
+            error_occurred(caller, msg.str());
+            return;
+        }
+
+        // Implant inputs
+        for (int input=0; input < num_inputs; input++) {
+
+            std::string inputName = function_t::get_input_name(function, input);
+            if (inputName == "#state") {
+                assert(input == 0);
+                continue;
+            }
+
+            Term* term = function_t::get_input_placeholder(function, input);
+
+            assert(term->function == INPUT_PLACEHOLDER_FUNC);
+
+            assign_value(caller->inputs[input], term);
+        }
+
+        Term errorListener;
+        evaluate_branch(functionBranch, &errorListener);
+
+        if (errorListener.hasError()) {
+            nested_error_occurred(caller);
+            return;
+        }
+
+        // Copy output
+        if (functionBranch.length() > 0) {
+            Term* output = functionBranch[functionBranch.length()-1];
+            assert(output->name == "#out");
+            if (output->type != VOID_TYPE)
+                assign_value(output, caller);
+        }
+
+        // Store state
+        if (hiddenState != NULL)
+            persist_state_from_branch(functionBranch, as_branch(hiddenState));
+    }
 }
 
 bool is_subroutine(Term* term)
 {
     return (term->type == FUNCTION_TYPE)
-        && function_t::get_evaluate(term) == subroutine_call_evaluate;
+        && function_t::get_evaluate(term) == subroutine_t::evaluate;
+}
+
+void finish_building_subroutine(Term* sub, Term* outputType)
+{
+    Branch& contents = as_branch(sub);
+
+    // If there is an #out term, then it needs to be the last term. If #out is a
+    // name binding into an inner branch then this might not be the case
+    if (contents.contains("#out") && contents[contents.length()-1]->name != "#out") {
+        Term* copy = apply(contents, COPY_FUNC, RefList(contents["#out"]), "#out");
+        set_source_hidden(copy, true);
+    } else if (!contents.contains("#out")) {
+        // If there's no #out term, then create an extra term to hold the output type
+        Term* term = create_value(contents, outputType, "#out");
+        set_source_hidden(term, true);
+    }
+
+    // If the #out term doesn't have the same type as the declared type, then coerce it
+    Term* outTerm = contents[contents.length()-1];
+    if (outTerm->type != outputType) {
+        outTerm = apply(contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType), "#out");
+        set_source_hidden(outTerm, true);
+    }
+
+    // Install evaluate function
+    function_t::get_evaluate(sub) = subroutine_t::evaluate;
+
+    subroutine_update_hidden_state_type(sub);
 }
 
 void subroutine_update_hidden_state_type(Term* func)
@@ -67,64 +153,6 @@ void subroutine_update_hidden_state_type(Term* func)
     } else {
         function_t::get_hidden_state_type(func) = VOID_TYPE;
     }
-}
-
-void subroutine_call_evaluate(Term* caller)
-{
-    Term* function = caller->function;
-    Branch& functionBranch = as_branch(function);
-
-    // Load values into this function's stateful values. If this state has never been
-    // saved then this function will reset this function's stateful values.
-    Term* hiddenState = get_hidden_state_for_call(caller);
-    if (hiddenState != NULL)
-        load_state_into_branch(as_branch(hiddenState), functionBranch);
-
-    int num_inputs = function_t::num_inputs(caller->function);
-
-    if (num_inputs != caller->inputs.length()) {
-        std::stringstream msg;
-        msg << "Wrong number of inputs, expected: " << num_inputs
-            << ", found: " << caller->inputs.length();
-        error_occurred(caller, msg.str());
-        return;
-    }
-
-    // Implant inputs
-    for (int input=0; input < num_inputs; input++) {
-
-        std::string inputName = function_t::get_input_name(function, input);
-        if (inputName == "#state") {
-            assert(input == 0);
-            continue;
-        }
-
-        Term* term = function_t::get_input_placeholder(function, input);
-
-        assert(term->function == INPUT_PLACEHOLDER_FUNC);
-
-        assign_value(caller->inputs[input], term);
-    }
-
-    Term errorListener;
-    evaluate_branch(functionBranch, &errorListener);
-
-    if (errorListener.hasError()) {
-        nested_error_occurred(caller);
-        return;
-    }
-
-    // Copy output
-    if (functionBranch.length() > 0) {
-        Term* output = functionBranch[functionBranch.length()-1];
-        assert(output->name == "#out");
-        if (output->type != VOID_TYPE)
-            assign_value(output, caller);
-    }
-
-    // Store state
-    if (hiddenState != NULL)
-        persist_state_from_branch(functionBranch, as_branch(hiddenState));
 }
 
 bool is_subroutine_state_expanded(Term* term)
