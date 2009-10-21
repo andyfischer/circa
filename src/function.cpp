@@ -15,7 +15,10 @@ namespace function_t {
         std::stringstream out;
 
         out << function_t::get_name(term);
-        if (is_native_function(term)) out << " +native ";
+
+        out << term->stringPropOptional("syntaxHints:postNameWs", "");
+
+        out << term->stringPropOptional("syntaxHints:properties", "");
 
         out << "(";
 
