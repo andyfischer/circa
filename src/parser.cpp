@@ -175,10 +175,12 @@ Term* statement(Branch& branch, TokenStream& tokens)
         result = return_statement(branch, tokens);
     }
 
+#if 0
     // Include statement
     else if (tokens.nextIs(INCLUDE)) {
         result = include_statement(branch, tokens);
     }
+#endif
 
     // Discard statement
     else if (tokens.nextIs(DISCARD)) {

@@ -59,17 +59,19 @@ namespace include_function {
         evaluate_branch(contents, caller);
     }
 
+#if 0
     std::string toSourceString(Term* term)
     {
         return "include " + get_source_of_input(term, 1);
     }
+#endif
 
     void setup(Branch& kernel)
     {
         parse_type(kernel, "type _file_signature { string filename, int time_modified }");
         INCLUDE_FUNC = import_function(kernel, evaluate_include,
                 "include(state _file_signature, string filename) : Branch");
-        function_t::get_to_source_string(INCLUDE_FUNC) = toSourceString;
+        //function_t::get_to_source_string(INCLUDE_FUNC) = toSourceString;
 
         import_function(kernel, load_script,
             "load_script(state _file_signature, string filename) : Branch");
