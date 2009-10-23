@@ -13,7 +13,7 @@ namespace branch_mirror_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "branch_mirror(Branch branch) : BranchMirror");
+        import_function(kernel, evaluate, "branch_mirror(Branch branch) :: BranchMirror");
     }
 }
 }

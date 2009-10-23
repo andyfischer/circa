@@ -8,7 +8,7 @@ contents = mirror.get_visible()
 
 term_to_location = Map()
 
-def draggable_rect(Point initial_location, Point size) : Point
+def draggable_rect(Point initial_location, Point size) :: Point
     state Point location = initial_location
     rect = [location.x, location.y, location.x+size.x, location.y+size.y]
     state currently_dragging = false
@@ -27,7 +27,7 @@ end
 
 box_size = [100 20] :: Point
 
-def initial_box_location(Ref ref) : Point
+def initial_box_location(Ref ref) :: Point
     source_loc = ref.source_location()
     --print(ref ' location: ' source_loc)
     return [source_loc.x*5, source_loc.y*10]

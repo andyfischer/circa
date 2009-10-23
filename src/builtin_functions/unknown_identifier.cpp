@@ -17,7 +17,7 @@ namespace unknown_identifier_function {
 
     void setup(Branch& kernel)
     {
-        UNKNOWN_IDENTIFIER_FUNC = import_function(kernel, evaluate, "unknown_identifier() : any");
+        UNKNOWN_IDENTIFIER_FUNC = import_function(kernel, evaluate, "unknown_identifier() :: any");
         function_t::get_to_source_string(UNKNOWN_IDENTIFIER_FUNC) = toSourceString;
     }
 }

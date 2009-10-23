@@ -29,7 +29,7 @@ namespace do_once_function {
 
     void setup(Branch& kernel)
     {
-        DO_ONCE_FUNC = import_function(kernel, evaluate, "do_once(state bool) : Code");
+        DO_ONCE_FUNC = import_function(kernel, evaluate, "do_once(state bool) :: Code");
         function_t::get_to_source_string(DO_ONCE_FUNC) = toSourceString;
     }
 }

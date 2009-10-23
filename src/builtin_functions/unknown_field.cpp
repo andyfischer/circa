@@ -11,7 +11,7 @@ namespace unknown_field_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "unknown_field(any...) : any");
+        Term* main_func = import_function(kernel, evaluate, "unknown_field(any...) :: any");
 
         UNKNOWN_FIELD_FUNC = main_func;
     }

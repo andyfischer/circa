@@ -45,7 +45,7 @@ namespace function_t {
 
         if (function_t::get_output_type(term) != VOID_TYPE) {
             out << term->stringPropOptional("syntaxHints:whitespacePreColon", "");
-            out << ":";
+            out << "::";
             out << term->stringPropOptional("syntaxHints:whitespacePostColon", " ");
             out << function_t::get_output_type(term)->name;
         }

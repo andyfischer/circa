@@ -221,7 +221,7 @@ void test_for_loops()
 void test_subscripting()
 {
     test_snippet("l = [[[1]]]", "l[0][0][0] == 1");
-    test_snippet("def return_point() : Point return [8 9] end", "return_point().x == 8");
+    test_snippet("def return_point() :: Point return [8 9] end", "return_point().x == 8");
 }
 
 void test_set()

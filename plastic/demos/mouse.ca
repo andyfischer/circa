@@ -47,7 +47,7 @@ begin
   cross_thickness = 4.0
   cross_length = 12.0
 
-  def draw_arm(number rot) : List
+  def draw_arm(number rot) :: List
       near_center = polar(rot, cross_thickness, mouse)
       near_l = polar(rot - .25, cross_thickness/2, near_center)
       near_r = polar(rot + .25, cross_thickness/2, near_center)

@@ -48,7 +48,7 @@ type BoardSpace {
     Point center
 }
 
-def initialize_board_spaces() : List
+def initialize_board_spaces() :: List
     board_spaces = []
     for x in 0..3
         for y in 0..3
@@ -63,13 +63,13 @@ state board_spaces = initialize_board_spaces()
 
 state int current_player = player.x
 
-def player_name(int p) : string
+def player_name(int p) :: string
     if p == player.x return "X"
     elif p == player.o return "O"
     else return "none" end
 end
 
-def other_player(int p) : int
+def other_player(int p) :: int
     if p == player.x return player.o
     else return player.x end
 end
@@ -80,12 +80,12 @@ type WinnerInformation {
     Point line_b
 }
 
-def get_winner(List board_spaces) : WinnerInformation
-    def get_space(int x, int y) : BoardSpace
+def get_winner(List board_spaces) :: WinnerInformation
+    def get_space(int x, int y) :: BoardSpace
         return board_spaces[x * 3 + y]
     end
 
-    def is_winner_across_line(List positions) : int
+    def is_winner_across_line(List positions) :: int
         pos_0 = positions[0] :: Point_i
         all_match = true
         start_space = get_space(pos_0.x pos_0.y)
@@ -170,7 +170,7 @@ if chosen_space != []
     chosen_space = chosen_space :: BoardSpace
 
     -- Modify board_spaces in a silly way b/c the proper way doesn't work yet
-    def update_board_spaces(BoardSpace space) : BoardSpace
+    def update_board_spaces(BoardSpace space) :: BoardSpace
         if space.x == chosen_space.x and space.y == chosen_space.y
             space.owner = current_player
         end

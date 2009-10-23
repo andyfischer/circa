@@ -18,10 +18,10 @@ namespace meta_function {
 
     void setup(Branch& kernel)
     {
-        FREEZE_FUNC = import_function(kernel, copy_function::evaluate, "freeze(any) : any");
+        FREEZE_FUNC = import_function(kernel, copy_function::evaluate, "freeze(any) :: any");
         function_t::get_specialize_type(FREEZE_FUNC) = freeze_specializeType;
 
-        import_function(kernel, lift_closure_evaluate, "lift_closure(Branch) : Branch");
+        import_function(kernel, lift_closure_evaluate, "lift_closure(Branch) :: Branch");
     }
 
 } // namespace meta_function

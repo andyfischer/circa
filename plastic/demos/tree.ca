@@ -1,7 +1,7 @@
 
 background(#eef)
 
-def interp(number progress, number e) :number
+def interp(number progress, number e) ::number
   return min(progress / e, 1.0)
 end
 

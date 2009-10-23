@@ -40,7 +40,7 @@ namespace list_function {
 
     void setup(Branch& kernel)
     {
-        LIST_FUNC = import_function(kernel, evaluate, "list(any...) : List");
+        LIST_FUNC = import_function(kernel, evaluate, "list(any...) :: List");
         function_t::get_to_source_string(LIST_FUNC) = toSourceString;
     }
 }

@@ -13,7 +13,7 @@ namespace sqr_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "sqr(number) : number; 'Square function' end");
+        import_function(kernel, evaluate, "sqr(number) :: number; 'Square function' end");
     }
 }
 } // namespace circa

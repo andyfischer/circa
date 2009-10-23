@@ -70,11 +70,11 @@ namespace include_function {
     {
         parse_type(kernel, "type _file_signature { string filename, int time_modified }");
         INCLUDE_FUNC = import_function(kernel, evaluate_include,
-                "include(state _file_signature, string filename) : Branch");
+                "include(state _file_signature, string filename) :: Branch");
         //function_t::get_to_source_string(INCLUDE_FUNC) = toSourceString;
 
         import_function(kernel, load_script,
-            "load_script(state _file_signature, string filename) : Branch");
+            "load_script(state _file_signature, string filename) :: Branch");
     }
 }
 } // namespace circa

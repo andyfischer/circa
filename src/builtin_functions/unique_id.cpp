@@ -13,7 +13,7 @@ namespace unique_id_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "unique_id() : int");
+        import_function(kernel, evaluate, "unique_id() :: int");
     }
 }
 }

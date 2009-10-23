@@ -12,7 +12,7 @@ namespace and_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "and(bool a, bool b) : bool;"
+        import_function(kernel, evaluate, "and(bool a, bool b) :: bool;"
                 "'Return whether a and b are both true' end");
     }
 }

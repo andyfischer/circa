@@ -13,7 +13,7 @@ namespace term_to_source_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "term_to_source(any) : string");
+        Term* main_func = import_function(kernel, evaluate, "term_to_source(any) :: string");
         function_t::set_input_meta(main_func, 0, true);
     }
 }
