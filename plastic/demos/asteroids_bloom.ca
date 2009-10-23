@@ -8,5 +8,8 @@ postprocess.copy_surface(pass0, pass1);
 
 postprocess.bind_main_surface()
 
+
+gl.use_program("../assets/shaders/passv.glsl", "../assets/shaders/row5f.glsl")
+
 postprocess.draw_surface(pass0, 1)
 postprocess.draw_surface(pass1, .2)
