@@ -7,12 +7,12 @@ namespace log_function {
 
     void evaluate(Term* caller)
     {
-        as_float(caller) = std::log(to_float(caller->input(0)));
+        as_float(caller) = std::log(float_input(caller,0));
     }
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "log(number) : number;"
+        import_function(kernel, evaluate, "log(number) :: number;"
             "'Natural log function' end");
 
     }

@@ -11,7 +11,7 @@ void create()
 {
     Branch branch;
 
-    Term* func = branch.eval("def mysub(int):string\nend");
+    Term* func = branch.eval("def mysub(int)::string\nend");
 
     test_assert(func);
     test_assert(is_subroutine(func));

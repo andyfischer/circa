@@ -444,33 +444,33 @@ namespace branch_mirror_t
 void setup_builtin_types(Branch& kernel)
 {
     Term* branch_append = 
-        import_member_function(BRANCH_TYPE, list_t::append, "append(Branch, any) : Branch");
+        import_member_function(BRANCH_TYPE, list_t::append, "append(Branch, any) :: Branch");
     function_t::get_input_placeholder(branch_append, 0)->boolProp("use-as-output") = true;
 
-    import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) : string");
+    import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) :: string");
 
     Term* set_type = create_compound_type(kernel, "Set");
     type_t::get_to_string_func(set_type) = set_t::to_string;
-    Term* set_add = import_member_function(set_type, set_t::hosted_add, "add(Set, any) : Set");
+    Term* set_add = import_member_function(set_type, set_t::hosted_add, "add(Set, any) :: Set");
     function_t::get_input_placeholder(set_add, 0)->boolProp("use-as-output") = true;
-    Term* set_remove = import_member_function(set_type, set_t::remove, "remove(Set, any) : Set");
+    Term* set_remove = import_member_function(set_type, set_t::remove, "remove(Set, any) :: Set");
     function_t::get_input_placeholder(set_remove, 0)->boolProp("use-as-output") = true;
-    import_member_function(set_type, set_t::contains, "contains(Set, any) : bool");
+    import_member_function(set_type, set_t::contains, "contains(Set, any) :: bool");
 
     // LIST_TYPE was created in bootstrap_kernel
     Term* list_append =
-        import_member_function(LIST_TYPE, list_t::append, "append(List, any) : List");
+        import_member_function(LIST_TYPE, list_t::append, "append(List, any) :: List");
     function_t::get_input_placeholder(list_append, 0)->boolProp("use-as-output") = true;
-    import_member_function(LIST_TYPE, list_t::count, "count(List) : int");
+    import_member_function(LIST_TYPE, list_t::count, "count(List) :: int");
 
     Term* map_type = create_compound_type(kernel, "Map");
     type_t::get_to_string_func(map_type) = map_t::to_string;
-    Term* map_add = import_member_function(map_type, map_t::insert, "add(Map, any, any) : Map");
+    Term* map_add = import_member_function(map_type, map_t::insert, "add(Map, any, any) :: Map");
     function_t::get_input_placeholder(map_add, 0)->boolProp("use-as-output") = true;
-    import_member_function(map_type, map_t::contains, "contains(Map, any) : bool");
-    Term* map_remove = import_member_function(map_type, map_t::remove, "remove(Map, any) : Map");
+    import_member_function(map_type, map_t::contains, "contains(Map, any) :: bool");
+    Term* map_remove = import_member_function(map_type, map_t::remove, "remove(Map, any) :: Map");
     function_t::get_input_placeholder(map_remove, 0)->boolProp("use-as-output") = true;
-    import_member_function(map_type, map_t::get, "get(Map, any) : any");
+    import_member_function(map_type, map_t::get, "get(Map, any) :: any");
 
     type_t::enable_default_value(map_type);
     Branch& map_default_value = type_t::get_default_value(map_type)->asBranch();
@@ -494,25 +494,25 @@ void parse_builtin_types(Branch& kernel)
     type_t::get_to_string_func(COLOR_TYPE) = color_t::to_string;
 
     import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_configs,
-        "get_configs(BranchMirror) : List");
+        "get_configs(BranchMirror) :: List");
     import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_configs_nested,
-        "get_configs_nested(BranchMirror) : List");
+        "get_configs_nested(BranchMirror) :: List");
     import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_relative_name,
-        "get_relative_name(BranchMirror, Ref) : string");
+        "get_relative_name(BranchMirror, Ref) :: string");
     import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_visible,
-        "get_visible(BranchMirror) : List");
+        "get_visible(BranchMirror) :: List");
     import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_length,
-        "length(BranchMirror) : int");
+        "length(BranchMirror) :: int");
     import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_index,
-        "get_index(BranchMirror, int) : Ref");
+        "get_index(BranchMirror, int) :: Ref");
     import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::append_code,
         "append_code(BranchMirror, Branch)");
     import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::print_raw,
-        "print_raw(BranchMirror) : string");
+        "print_raw(BranchMirror) :: string");
     import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::save,
         "save(BranchMirror)");
     import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::to_source,
-        "to_source(BranchMirror) : string");
+        "to_source(BranchMirror) :: string");
 }
 
 } // namespace circa

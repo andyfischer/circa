@@ -17,8 +17,8 @@ namespace div_function {
 
     void setup(Branch& kernel)
     {
-        DIV_FUNC = import_function(kernel, evaluate_f, "div(number,number) : number");
-        import_function(kernel, evaluate_i, "div_i(int,int) : int");
+        DIV_FUNC = import_function(kernel, evaluate_f, "div(number,number) :: number");
+        import_function(kernel, evaluate_i, "div_i(int,int) :: int");
     }
 }
 } // namespace circa

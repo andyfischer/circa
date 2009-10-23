@@ -23,7 +23,7 @@ namespace one_time_assign_function {
     void setup(Branch& kernel)
     {
         ONE_TIME_ASSIGN_FUNC = import_function(kernel, evaluate,
-                "one_time_assign(state bool, any) : any");
+                "one_time_assign(state bool, any) :: any");
         function_t::get_specialize_type(ONE_TIME_ASSIGN_FUNC) = specializeType;
     }
 }

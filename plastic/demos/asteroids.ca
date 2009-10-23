@@ -16,7 +16,7 @@ type Bullet {
 }
 
 -- Return a point that is wrapped around the playable area
-def wrap_around(Point p) : Point
+def wrap_around(Point p) :: Point
     return [mod(p.x, window.width) mod(p.y, window.height)]
 end
 
@@ -43,7 +43,7 @@ ship_back = 5.5
 ship_wing_size = 11.4
 ship_wing_rot = .40
 namespace draw_ship
-    def ship_point(number rot, number dist) : Point
+    def ship_point(number rot, number dist) :: Point
         return polar(rot + ship.facing, dist*ship_size, ship.loc)
     end
 
@@ -93,7 +93,7 @@ if key_pressed(SPACE)
 end
 
 -- Move bullets
-def move_bullet(Bullet bullet) : Bullet
+def move_bullet(Bullet bullet) :: Bullet
     loc = bullet.loc + bullet.direction * bullet_speed * time_delta
     loc = wrap_around(loc)
     return [bullet.lifespan+time_delta, loc, bullet.direction]
@@ -134,8 +134,8 @@ asteroid_collision_radius = 20.0
 asteroid_starting_size = 30.0
 asteroid_num_edges = 10
 
-def generate_asteroid(number size) : Asteroid
-    def get_edge(int index) : Point
+def generate_asteroid(number size) :: Asteroid
+    def get_edge(int index) :: Point
         angle = index / asteroid_num_edges
         return polar(angle, rand() * size + size/3, [0 0])
     end
@@ -144,9 +144,9 @@ def generate_asteroid(number size) : Asteroid
     return [map(get_edge, 0..10), random_location(), random_norm_vector()*10, 0, rotation size 0]
 end
 
-def generate_child_asteroid(Asteroid parent) : Asteroid
+def generate_child_asteroid(Asteroid parent) :: Asteroid
     size = parent.size / 2
-    def get_edge(int index) : Point
+    def get_edge(int index) :: Point
         angle = index / asteroid_num_edges
         return polar(angle, rand() * size + size/3, [0 0])
     end
@@ -177,7 +177,7 @@ end
 for asteroid in asteroids
     asteroid = asteroid :: Asteroid
 
-    def pos_edge(Point p) : Point
+    def pos_edge(Point p) :: Point
         p = rotate_point(p, asteroid.rotation)
         p = p + asteroid.location
         return p

@@ -2,7 +2,7 @@
 -- Wrap up mouse position into a point (values are passed in from input.cpp)
 state Point mouse
 
-def mouse_in(Rect b) : bool
+def mouse_in(Rect b) :: bool
   "Return whether the mouse is currently inside the given rect."
   return (b.x1 < mouse.x) and (b.x2 > mouse.x) and (b.y1 < mouse.y) and (b.y2 > mouse.y)
 end
@@ -19,10 +19,10 @@ window = Window()
 type TTF_Font {} -- native
 namespace text
     type RenderedText { int texid, number width, number height, Color color, string text }
-    def load_font(state TTF_Font, string filename, int size) : TTF_Font
+    def load_font(state TTF_Font, string filename, int size) :: TTF_Font
         "Load the given font"
     end
-    def render_text(state RenderedText, TTF_Font font, string text, Color color) : RenderedText
+    def render_text(state RenderedText, TTF_Font font, string text, Color color) :: RenderedText
         "Render text and return a sprite that can be drawn with draw_rendered_text. This is useful if you want to know the width or height of the rendered text before drawing it."
     end
     def draw_rendered_text(RenderedText, number x, number y)
@@ -58,14 +58,14 @@ namespace gl
     end
 end
 
-def load_texture(state int, string) : int
+def load_texture(state int, string) :: int
 end
 
 def draw_image(state int texid, string filename, number x, number y, number width, number height)
     "Draw an image."
 end
 
-def load_mesh(string filename) : int
+def load_mesh(string filename) :: int
     "(experimental) Load a 3d mesh from an .obj file."
 end
 def draw_mesh(int mesh_id, int tex_id, Point translation, Point scale, Point rotation)
@@ -75,67 +75,67 @@ end
 -- Math utility functions
 
 -- polar: polar to cartesian
-def polar(number angle, number radius, Point center) : Point
+def polar(number angle, number radius, Point center) :: Point
     return [cos(angle) * radius + center.x, sin(angle) * radius + center.y]
 end
 
 -- magnitude of a 2d vector
-def magnitude(Point point) : number
+def magnitude(Point point) :: number
     "Returns the magnitude, or the distance from [0,0] to this point."
     return sqrt(sqr(point.x) + sqr(point.y))
 end
 
-def point_distance(Point a, Point b) : number
+def point_distance(Point a, Point b) :: number
     "Returns the distance between a and b."
     return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
 end
 
-def rotate_point(Point p, number rotation) : Point
+def rotate_point(Point p, number rotation) :: Point
     "Rotate p around [0,0] by the given angle. Angles are specified in the range 0..1."
     return [p.x*cos(rotation) - p.y*sin(rotation),
         p.x*sin(rotation)+p.y*cos(rotation)]
 end
 
-def random_location() : Point
+def random_location() :: Point
     "Return a random point that is inside the boundaries of the window."
     return [rand() * window.width, rand() * window.height]
 end
 
-def random_norm_vector() : Point
+def random_norm_vector() :: Point
     "Return a random normalized vector"
     angle = rand()
     return [cos(angle) sin(angle)]
 end
 
-def norm(Point v) : Point
+def norm(Point v) :: Point
     "Returns v normalized to be along the unit circle."
     m = magnitude(v)
     return [v.x / m, v.y / m]
 end
 
-def perpendicular(Point v) : Point
+def perpendicular(Point v) :: Point
     "Returns a vector that is perpendicular to v, rotated clockwise."
     return [v.y -v.x]
 end
 
-def expand_rect(Point center, number width, number height) : Rect
+def expand_rect(Point center, number width, number height) :: Rect
     "Return a rectangle with the given center, width, and height."
     return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
 end
 
-def expand_rect_tl(Point topLeft, Point size) : Rect
+def expand_rect_tl(Point topLeft, Point size) :: Rect
     return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
 end
 
-def rect_intersects_rect(Rect rect_a, Rect rect_b) : bool
+def rect_intersects_rect(Rect rect_a, Rect rect_b) :: bool
     "Return whether the two rectangles intersect."
     intersects_on_x = (rect_a.x2 > rect_b.x1) and (rect_b.x2 > rect_a.x1)
     intersects_on_y = (rect_a.y2 > rect_b.y1) and (rect_b.y2 > rect_a.y1)
     return intersects_on_x and intersects_on_y
 end
 
-def random_color() : Color
-    return [rand() rand() rand() rand()]
+def random_color() :: Color
+    return [rand() rand() rand() 1.0]
 end
 
 -- Drawing utils
@@ -157,7 +157,7 @@ end
 
 -- Stateful functions
 
-def approach(number target, number step) : number
+def approach(number target, number step) :: number
     "Stateful function, returns a result which approaches 'target'. Each frame, this function will change at most by 'step'"
     state current = target
     if target > current
@@ -168,20 +168,20 @@ def approach(number target, number step) : number
     return current
 end
 
-def alternate_over_time(number period) : bool
+def alternate_over_time(number period) :: bool
     "Stateful function, alternates between true and false according to the given period."
     state number time_started = time
     return round((time - time_started) / period) % 2 == 0
 end
 
-def toggle(bool tog) : bool
+def toggle(bool tog) :: bool
   "Stateful function, returns a boolean status. Every frame the function is called with (true), the status flips. Starts out false."
   state bool on = false
   if tog; on = not(on); end
   return on
 end
 
-def linear_fadein(number total_time) : number
+def linear_fadein(number total_time) :: number
     "Stateful function, starts out at 0 and increases linearly. After 'total_time' has passed it will return 1.0 and stay there."
     state number time_started = time
     elapsed = (time - time_started) / total_time
@@ -260,11 +260,11 @@ namespace postprocess
         int height
     }
 
-    def make_surface(state Surface _state, int width, int height) : Surface
+    def make_surface(state Surface _state, int width, int height) :: Surface
     end
 
-    def bind_surface(Surface surface) : void end
-    def bind_main_surface() : void end
+    def bind_surface(Surface surface) end
+    def bind_main_surface() end
 
     --def get_tex_id_for_main_surface(state int) : int end
     --main_surface = [ get_tex_id_for_main_surface(), 0, window.width, window.height ] :: Surface

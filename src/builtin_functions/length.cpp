@@ -12,7 +12,7 @@ namespace length_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "length(List) : int;"
+        import_function(kernel, evaluate, "length(List) :: int;"
             "'Return the number of items in the given list' end");
     }
 }

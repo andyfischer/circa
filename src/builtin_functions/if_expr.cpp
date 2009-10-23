@@ -7,7 +7,7 @@ namespace if_expr_function {
 
     void evaluate(Term* caller)
     {
-        int index = as_bool(caller->input(0)) ? 1 : 2;
+        int index = bool_input(caller,0) ? 1 : 2;
         Term *result = caller->inputs[index];
 
         if (!is_value_alloced(result)) {
@@ -57,7 +57,7 @@ namespace if_expr_function {
         function_t::set_input_meta(IF_EXPR_FUNC, 1, true);
         function_t::set_input_meta(IF_EXPR_FUNC, 2, true);
         function_t::get_feedback_func(IF_EXPR_FUNC) =
-            import_function(kernel, feedback_evaluate, "if_expr_feedback(any, any) : Branch");
+            import_function(kernel, feedback_evaluate, "if_expr_feedback(any, any) :: Branch");
     }
 }
 }

@@ -28,9 +28,9 @@ namespace round_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate_round, "round(number n) : int; 'Return the integer that is closest to n' end");
-        import_function(kernel, evaluate_floor, "floor(number n) : int; 'Return the closest integer that is less than n' end");
-        import_function(kernel, evaluate_ceil, "ceil(number n) : int; 'Return the closest integer that is greater than n' end");
+        import_function(kernel, evaluate_round, "round(number n) :: int; 'Return the integer that is closest to n' end");
+        import_function(kernel, evaluate_floor, "floor(number n) :: int; 'Return the closest integer that is less than n' end");
+        import_function(kernel, evaluate_ceil, "ceil(number n) :: int; 'Return the closest integer that is greater than n' end");
     }
 }
 }

@@ -355,9 +355,9 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     // Output type
     Term* outputType = VOID_TYPE;
-    if (tokens.nextNonWhitespaceIs(COLON)) {
+    if (tokens.nextNonWhitespaceIs(COLON) || tokens.nextNonWhitespaceIs(DOUBLE_COLON)) {
         result->stringProp("syntaxHints:whitespacePreColon") = possible_whitespace(tokens);
-        tokens.consume(COLON);
+        tokens.consume();
         result->stringProp("syntaxHints:whitespacePostColon") = possible_whitespace(tokens);
 
         outputType = type_identifier_or_anonymous_type(branch, tokens);

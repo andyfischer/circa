@@ -191,9 +191,9 @@ void initialize(Branch& branch)
         KEY_DOWN[i] = false;
     }
 
-    import_function(branch, key_down, "key_down(int) : bool");
-    import_function(branch, key_pressed, "key_pressed(int) : bool");
-    import_function(branch, mouse_pressed, "mouse_pressed() : bool");
+    import_function(branch, key_down, "key_down(int) :: bool");
+    import_function(branch, key_pressed, "key_pressed(int) :: bool");
+    import_function(branch, mouse_pressed, "mouse_pressed() :: bool");
     int_value(branch, SDLK_UP, "UP");
     int_value(branch, SDLK_DOWN, "DOWN");
     int_value(branch, SDLK_LEFT, "LEFT");
@@ -201,19 +201,19 @@ void initialize(Branch& branch)
     int_value(branch, SDLK_SPACE, "SPACE");
     int_value(branch, SDLK_b, "KEY_B");
 
-    import_function(branch, mouse_over, "mouse_over(List region) : bool");
+    import_function(branch, mouse_over, "mouse_over(List region) :: bool");
 
     Term* mouse_clicked_func = create_overloaded_function(branch, "mouse_clicked");
-    import_function_overload(mouse_clicked_func, mouse_clicked, "mouse_clicked() : bool");
-    import_function_overload(mouse_clicked_func, mouse_clicked, "mouse_clicked(List region) : bool");
+    import_function_overload(mouse_clicked_func, mouse_clicked, "mouse_clicked() :: bool");
+    import_function_overload(mouse_clicked_func, mouse_clicked, "mouse_clicked(List region) :: bool");
 
     Term* mouse_wheel_up_func = create_overloaded_function(branch, "mouse_wheel_up");
-    import_function_overload(mouse_wheel_up_func, mouse_wheel_up, "mouse_wheel_up() : bool");
-    import_function_overload(mouse_wheel_up_func, mouse_wheel_up, "mouse_wheel_up(List region) : bool");
+    import_function_overload(mouse_wheel_up_func, mouse_wheel_up, "mouse_wheel_up() :: bool");
+    import_function_overload(mouse_wheel_up_func, mouse_wheel_up, "mouse_wheel_up(List region) :: bool");
 
     Term* mouse_wheel_down_func = create_overloaded_function(branch, "mouse_wheel_down");
     import_function_overload(mouse_wheel_down_func, mouse_wheel_down, "mouse_wheel_down(List region) : bool");
-    import_function_overload(mouse_wheel_down_func, mouse_wheel_down, "mouse_wheel_down() : bool");
+    import_function_overload(mouse_wheel_down_func, mouse_wheel_down, "mouse_wheel_down() :: bool");
 }
 
 void setup(Branch& branch)

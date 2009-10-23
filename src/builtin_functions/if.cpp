@@ -8,7 +8,7 @@ namespace if_function {
     void evaluate(Term* caller)
     {
         Branch& contents = caller->asBranch();
-        bool cond = as_bool(caller->input(0));
+        bool cond = bool_input(caller,0);
 
         if (cond)
             evaluate_branch(contents, caller);
@@ -16,7 +16,7 @@ namespace if_function {
 
     void setup(Branch& kernel)
     {
-        IF_FUNC = import_function(kernel, evaluate, "if(bool) : Code");
+        IF_FUNC = import_function(kernel, evaluate, "if(bool) :: Code");
     }
 }
 }

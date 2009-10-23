@@ -14,7 +14,7 @@ namespace max_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "max(number,number) : number; 'Maximum of two numbers' end");
+        import_function(kernel, evaluate, "max(number,number) :: number; 'Maximum of two numbers' end");
     }
 }
 } // namespace circa

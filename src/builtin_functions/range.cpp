@@ -7,8 +7,8 @@ namespace range_function {
 
     void evaluate(Term* caller)
     {
-        int start = as_int(caller->input(0));
-        int max = as_int(caller->input(1));
+        int start = int_input(caller, 0);
+        int max = int_input(caller, 1);
         
         Branch& branch = as_branch(caller);
 
@@ -20,7 +20,7 @@ namespace range_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "range(int start, int max) : List; 'Return a list of integers from start to max-1' end");
+        import_function(kernel, evaluate, "range(int start, int max) :: List; 'Return a list of integers from start to max-1' end");
     }
 }
 } // namespace circa
