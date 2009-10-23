@@ -212,8 +212,10 @@ void initialize(Branch& branch)
     import_function_overload(mouse_wheel_up_func, mouse_wheel_up, "mouse_wheel_up(List region) :: bool");
 
     Term* mouse_wheel_down_func = create_overloaded_function(branch, "mouse_wheel_down");
-    import_function_overload(mouse_wheel_down_func, mouse_wheel_down, "mouse_wheel_down(List region) : bool");
-    import_function_overload(mouse_wheel_down_func, mouse_wheel_down, "mouse_wheel_down() :: bool");
+    import_function_overload(mouse_wheel_down_func, mouse_wheel_down,
+            "mouse_wheel_down(List region) :: bool");
+    import_function_overload(mouse_wheel_down_func, mouse_wheel_down,
+            "mouse_wheel_down() :: bool");
 }
 
 void setup(Branch& branch)
