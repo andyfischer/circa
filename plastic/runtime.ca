@@ -15,6 +15,19 @@ type Window {
 
 window = Window()
 
+-- Input
+def key_down(int key) :: bool end
+def key_pressed(int key) :: bool end
+def mouse_pressed() :: bool end
+def mouse_over(Rect region) :: bool end
+
+def mouse_clicked +overload () :: bool end
+def mouse_clicked +overload (Rect region) :: bool end
+def mouse_wheel_up +overload () :: bool end
+def mouse_wheel_up +overload (Rect region) :: bool end
+def mouse_wheel_down +overload () :: bool end
+def mouse_wheel_down +overload (Rect region) :: bool end
+
 -- Text rendering functions
 type TTF_Font {} -- native
 namespace text
