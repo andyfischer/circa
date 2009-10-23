@@ -12,7 +12,7 @@ namespace unknown_function_function {
 
     void setup(Branch& kernel)
     {
-        Term* main_func = import_function(kernel, evaluate, "unknown_function(any...) : any");
+        Term* main_func = import_function(kernel, evaluate, "unknown_function(any...) :: any");
 
         UNKNOWN_FUNCTION = main_func;
     }

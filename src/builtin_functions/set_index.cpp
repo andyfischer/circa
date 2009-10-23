@@ -21,7 +21,7 @@ namespace set_index_function {
     void setup(Branch& kernel)
     {
         SET_INDEX_FUNC = import_function(kernel, evaluate,
-                "set_index(any, int, any) : any");
+                "set_index(any, int, any) :: any");
         function_t::get_specialize_type(SET_INDEX_FUNC) = specializeType;
     }
 }

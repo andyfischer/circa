@@ -12,7 +12,7 @@ void test_functions()
 
     // In a subroutine, if there is an #out term, it should be last.
     Branch branch;
-    Term* func = branch.eval("def f() : int; return 1; end");
+    Term* func = branch.eval("def f() :: int; return 1; end");
     test_assert(check_invariants(func));
 
     int_value(as_branch(func), 5, "five");

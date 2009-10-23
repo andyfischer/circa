@@ -93,13 +93,13 @@ void migrate_misc()
     // This tests don't have a specific focus
 
     test_migration("type Point { number x, number y }\n"
-                   "def get_ship_start_point() : Point\n return [50,50]\n end\n"
+                   "def get_ship_start_point() :: Point\n return [50,50]\n end\n"
                    "type Ship { Point loc, Point momentum, number facing }\n"
                    "state Ship ship = [get_ship_start_point() [0 0] 0]\n"
                    "ship = [[5 5] [1 1] 1]",
 
                    "type Point { number x, number y }\n"
-                   "def get_ship_start_point() : Point\n return [50,50]\n end\n"
+                   "def get_ship_start_point() :: Point\n return [50,50]\n end\n"
                    "type Ship { Point loc, Point momentum, number facing }\n"
                    "state Ship ship = [get_ship_start_point() [0 0] 0]\n",
 

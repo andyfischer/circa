@@ -483,7 +483,7 @@ void test_namespace()
     test_assert(a->asInt() == 1);
 
     branch.clear();
-    ns = branch.eval("namespace ns; def myfunc(int a) : int; return a+1; end; end");
+    ns = branch.eval("namespace ns; def myfunc(int a) :: int; return a+1; end; end");
     Term* c = branch.eval("c = ns.myfunc(4)");
     test_assert(branch);
     test_assert(c->asInt() == 5);
