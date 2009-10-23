@@ -59,10 +59,45 @@ void test_include_function()
     test_assert(has_static_errors(incl->asBranch()));
 }
 
+void test_file_changed()
+{
+    Branch branch;
+    FakeFileSystem files;
+    files["x"] = "1";
+    files["y"] = "2";
+
+    Term* filename = branch.eval("filename = 'x'");
+    Term* changed = branch.eval("file_changed(filename)");
+
+    // First time through should always return true
+    test_assert(as_bool(changed));
+
+    // Subsequent call should return false
+    evaluate_term(changed);
+    test_assert(!as_bool(changed));
+    evaluate_term(changed);
+    test_assert(!as_bool(changed));
+
+    // Change the modified time
+    files.last_modified("x")++;
+    evaluate_term(changed);
+    test_assert(as_bool(changed));
+    evaluate_term(changed);
+    test_assert(!as_bool(changed));
+
+    // Change the filename
+    as_string(filename) = "y";
+    evaluate_term(changed);
+    test_assert(as_bool(changed));
+    evaluate_term(changed);
+    test_assert(!as_bool(changed));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(file_based_tests::test_the_test);
     REGISTER_TEST_CASE(file_based_tests::test_include_function);
+    REGISTER_TEST_CASE(file_based_tests::test_file_changed);
 }
 
 } // namespace file_based_tests

@@ -77,6 +77,10 @@ namespace include_function {
     void load_script(Term* caller);
 }
 
+namespace file_changed_function {
+    bool check(Term* fileSignature, std::string const& filename);
+}
+
 namespace for_function {
     std::string get_heading_source(Term* term);
 }

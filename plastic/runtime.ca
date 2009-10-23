@@ -69,6 +69,9 @@ namespace gl
     def circle(Point loc, number radius, Color)
         "Render a circle."
     end
+    def use_program(string vertexFilename, string fragFilename)
+        "Load and enable a GLSL shader."
+    end
 end
 
 def load_texture(state int, string) :: int
