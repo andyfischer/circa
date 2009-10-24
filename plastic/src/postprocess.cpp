@@ -67,6 +67,9 @@ namespace postprocess_functions
         assign_value(caller->input(0), caller);
     }
 
+    static int bound_surface_width = 0;
+    static int bound_surface_height = 0;
+
     void bind_surface(Surface& surface)
     {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surface.fbo_id);
@@ -76,21 +79,28 @@ namespace postprocess_functions
         glOrtho(0, surface.width, surface.height, 0, -1000.0f, 1000.0f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+
+        bound_surface_width = surface.width;
+        bound_surface_height = surface.height;
+    }
+
+    void bind_surface(Term* caller)
+    {
+        Surface surface(caller->input(0));
+        bind_surface(surface);
+        gl_check_error(caller);
     }
 
     void draw_surface(Term* caller)
     {
         Surface source_surface(caller->input(0));
-        float alpha = float_input(caller, 1);
 
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, source_surface.tex_id);
 
-        glColor4f(1,1,1,alpha);
+        int width = bound_surface_width;
+        int height = bound_surface_height;
 
-        int width = WINDOW_WIDTH;
-        int height = WINDOW_HEIGHT; 
-        
         glBegin(GL_QUADS);
         glTexCoord2i(0, 1); glVertex2i(0, 0);
         glTexCoord2i(1, 1); glVertex2i(width, 0);
@@ -101,7 +111,6 @@ namespace postprocess_functions
         // Reset state
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
-        glColor4f(1,1,1,1);
 
         gl_check_error(caller);
     }
@@ -128,33 +137,12 @@ namespace postprocess_functions
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    void bind_surface(Term* caller)
-    {
-        Surface surface(caller->input(0));
-        bind_surface(surface);
-        gl_check_error(caller);
-    }
-
-    void bind_main_surface(Term* caller)
-    {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-        glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1000.0f, 1000.0f);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-
-        gl_check_error(caller);
-    }
-
     void setup(Branch& kernel)
     {
         Branch& postprocess_ns = kernel["postprocess"]->asBranch();
         install_function(postprocess_ns["make_surface"], make_surface);
         install_function(postprocess_ns["draw_surface"], draw_surface);
         install_function(postprocess_ns["bind_surface"], bind_surface);
-        install_function(postprocess_ns["bind_main_surface"], bind_main_surface);
         install_function(postprocess_ns["copy_surface"], copy_surface);
     }
 

@@ -5,8 +5,13 @@
 namespace circa {
 namespace file_changed_function {
 
-    bool check(Term* fileSignature, std::string const& filename)
+    bool check(Term* errorListener, Term* fileSignature, std::string const& filename)
     {
+        if (!file_exists(filename)) {
+            error_occurred(errorListener, "File not found: " + filename);
+            return false;
+        }
+        
         std::string &prevFilename = fileSignature->asBranch()[0]->asString();
         int &prevModified = fileSignature->asBranch()[1]->asInt();
 
@@ -24,7 +29,9 @@ namespace file_changed_function {
 
     void evaluate(Term* caller)
     {
-        as_bool(caller) = check(caller->input(0), as_string(caller->input(1)));
+        std::string actual_filename = get_path_relative_to_source(caller,
+            caller->input(1)->asString());
+        as_bool(caller) = check(caller, caller->input(0), actual_filename);
     }
 
     void setup(Branch& kernel)

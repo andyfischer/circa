@@ -10,6 +10,8 @@ using namespace circa;
 
 namespace gl_shapes {
 
+GLint current_program = 0;
+
 void _unpack_gl_color(Term* colorTerm)
 {
     Branch& color = as_branch(colorTerm);
@@ -142,12 +144,21 @@ void gl_circle(Term* caller)
     gl_check_error(caller);
 }
 
-void use_program(Term* caller)
+void load_program(Term* caller)
 {
     std::string vertFilename =
         get_path_relative_to_source(caller, caller->input(0)->asString());
     std::string fragFilename =
         get_path_relative_to_source(caller, caller->input(1)->asString());
+
+    if (!file_exists(vertFilename)) {
+        error_occurred(caller, "File not found: " + vertFilename);
+        return;
+    }
+    if (!file_exists(fragFilename)) {
+        error_occurred(caller, "File not found: " + fragFilename);
+        return;
+    }
 
     std::string vertContents = read_text_file(vertFilename);
     const char* vertContentsCStr = vertContents.c_str();
@@ -194,12 +205,71 @@ void use_program(Term* caller)
         return;
     }
 
-    glUseProgram(program);
+    gl_check_error(caller);
+
+    as_int(caller) = program;
 }
 
-void clear_program(Term* caller)
+void use_program(Term* caller)
 {
-    glUseProgram(0);
+    current_program = int_input(caller, 0);
+    glUseProgram(current_program);
+    gl_check_error(caller);
+}
+
+void set_uniform(Term* caller)
+{
+    const char* name = string_input(caller, 0);
+    Term* input = caller->input(1);
+
+    GLint loc = glGetUniformLocation(current_program, name);
+
+    if (gl_check_error(caller))
+        return;
+
+    if (input->type == INT_TYPE)
+        glUniform1i(loc, as_int(input));
+    else if (input->type == FLOAT_TYPE)
+        glUniform1f(loc, as_float(input));
+    else if (is_branch(input)) {
+
+        Branch& contents = as_branch(input);
+        int list_length = contents.length();
+
+        if (contents[0]->type == FLOAT_TYPE) {
+            float* values = new float[list_length];
+
+            for (int i=0; i < list_length; i++)
+                values[i] = to_float(contents[i]);
+            glUniform1fv(loc, list_length, values);
+            delete[] values;
+        } else if (is_branch(contents[0])) {
+            int item_length = contents[0]->asBranch().length();
+
+            if (item_length != 2) {
+                error_occurred(caller, "Unsupported item length");
+                return;
+            }
+
+            float* values = new float[list_length*item_length];
+
+            int write = 0;
+
+            for (int i=0; i < list_length; i++)
+                for (int j=0; j < item_length; j++)
+                    values[write++] = contents[i]->asBranch()[j]->toFloat();
+
+            glUniform2fv(loc, write, values);
+
+            delete[] values;
+        }
+
+    } else {
+        error_occurred(caller, "Unsupported type: " + input->type->name);
+        return;
+    }
+
+    gl_check_error(caller);
 }
 
 void setup(Branch& branch)
@@ -211,8 +281,9 @@ void setup(Branch& branch)
     install_function(gl_ns["line_loop"], gl_line_loop);
     install_function(gl_ns["points"], gl_points);
     install_function(gl_ns["circle"], gl_circle);
+    install_function(gl_ns["load_program"], load_program);
     install_function(gl_ns["_use_program"], use_program);
-    install_function(gl_ns["clear_program"], clear_program);
+    install_function(gl_ns["set_uniform"], set_uniform);
 }
 
 } // namespace gl_shapes

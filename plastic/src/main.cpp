@@ -134,7 +134,7 @@ bool initialize_display()
     gl_clear_error();
     Term errorListener;
 
-    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glPolygonMode(GL_FRONT, GL_FILL);
     glDisable(GL_CULL_FACE);
@@ -184,6 +184,7 @@ void main_loop()
         PREV_SDL_TICKS = ticks;
 
         glClear(GL_DEPTH_BUFFER_BIT);
+        glUseProgram(0);
 
         Term errorListener;
 
