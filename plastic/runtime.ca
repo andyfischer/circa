@@ -69,16 +69,18 @@ namespace gl
     def circle(Point loc, number radius, Color)
         "Render a circle."
     end
-    def _use_program(string vertFile, string fragFile)
-    end
+    def load_program(string vertFile, string fragFile) :: int end
+    def _use_program(int prog_id) end
     def use_program(string vertexFilename, string fragFilename)
         "Load and enable a GLSL shader."
+        state int prog_id = 0
         if file_changed(vertexFilename) or file_changed(fragFilename)
-            _use_program(vertexFilename, fragFilename)
+            prog_id = load_program(vertexFilename, fragFilename)
         end
+        _use_program(prog_id)
     end
-    def clear_program()
-    end
+    def clear_program() end
+    def set_uniform(string name, any value) end
 end
 
 def load_texture(state int, string) :: int
@@ -283,17 +285,14 @@ namespace postprocess
         int height
     }
 
-    def make_surface(state Surface _state, int width, int height) :: Surface
-    end
-
+    def make_surface(state Surface _state, int width, int height) :: Surface end
     def bind_surface(Surface surface) end
-    def bind_main_surface() end
-
-    --def get_tex_id_for_main_surface(state int) : int end
-    --main_surface = [ get_tex_id_for_main_surface(), 0, window.width, window.height ] :: Surface
-
-    def draw_surface(Surface source, number alpha) end
+    def draw_surface(Surface source) end
     def copy_surface(Surface source, Surface dest) end
+
+    main_surface = [0 0 window.width window.height] :: Surface
+
+    def bind_main_surface() bind_surface(main_surface) end
 end
 
 -- Load the user's script
