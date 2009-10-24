@@ -142,14 +142,77 @@ void gl_circle(Term* caller)
     gl_check_error(caller);
 }
 
+void use_program(Term* caller)
+{
+    std::string vertFilename =
+        get_path_relative_to_source(caller, caller->input(0)->asString());
+    std::string fragFilename =
+        get_path_relative_to_source(caller, caller->input(1)->asString());
+
+    std::string vertContents = read_text_file(vertFilename);
+    const char* vertContentsCStr = vertContents.c_str();
+
+    GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertShader, 1, (const GLchar**) &vertContentsCStr, 0);
+    glCompileShader(vertShader);
+
+    GLint success;
+    glGetShaderiv(vertShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        GLchar error[256];
+        glGetShaderInfoLog(vertShader, sizeof(error), 0, error);
+        error_occurred(caller, error);
+        return;
+    }
+
+    std::string fragContents = read_text_file(fragFilename);
+    const char* fragContentsCStr = fragContents.c_str();
+
+    GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragShader, 1, (const GLchar**) &fragContentsCStr, 0);
+    glCompileShader(fragShader);
+
+    glGetShaderiv(fragShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        GLchar error[256];
+        glGetShaderInfoLog(fragShader, sizeof(error), 0, error);
+        error_occurred(caller, error);
+        return;
+    }
+
+    GLuint program = glCreateProgram();
+    glAttachShader(program, vertShader);
+    glAttachShader(program, fragShader);
+
+    glLinkProgram(program);
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        GLchar error[256];
+        glGetProgramInfoLog(program, sizeof(error), 0, error);
+        error_occurred(caller, error);
+        return;
+    }
+
+    glUseProgram(program);
+}
+
+void clear_program(Term* caller)
+{
+    glUseProgram(0);
+}
+
 void setup(Branch& branch)
 {
     install_function(branch["background"], background);
-    install_function(branch["gl"]->asBranch()["triangles"], gl_triangles);
-    install_function(branch["gl"]->asBranch()["line_strip"], gl_line_strip);
-    install_function(branch["gl"]->asBranch()["line_loop"], gl_line_loop);
-    install_function(branch["gl"]->asBranch()["points"], gl_points);
-    install_function(branch["gl"]->asBranch()["circle"], gl_circle);
+    Branch& gl_ns = branch["gl"]->asBranch();
+    install_function(gl_ns["triangles"], gl_triangles);
+    install_function(gl_ns["line_strip"], gl_line_strip);
+    install_function(gl_ns["line_loop"], gl_line_loop);
+    install_function(gl_ns["points"], gl_points);
+    install_function(gl_ns["circle"], gl_circle);
+    install_function(gl_ns["_use_program"], use_program);
+    install_function(gl_ns["clear_program"], clear_program);
 }
 
 } // namespace gl_shapes
