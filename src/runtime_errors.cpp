@@ -44,11 +44,14 @@ void print_runtime_error_formatted(Branch& branch, std::ostream& output)
 
             if (term->hasErrorMessage()) {
                 output << term->getErrorMessage();
-            } else if (!is_branch(term)) {
-                output << " (!!! missing error message)";
-            } else {
+            } else if (is_branch(term)) {
                 output << "\n";
                 print_runtime_error_formatted(as_branch(term), output);
+            } else if (is_subroutine(term->function)) {
+                output << "\n";
+                print_runtime_error_formatted(as_branch(term->function), output);
+            } else {
+                output << " (!!! missing error message)";
             }
 
             return;
