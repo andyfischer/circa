@@ -137,7 +137,7 @@ void initialize_from_expression()
 void one_time_assignment()
 {
     Branch branch;
-    Term* a = int_value(branch, 3, "a");
+    Term* a = create_int(branch, 3, "a");
     Term* s = branch.compile("state s = a");
 
     // change value before evaluate_branch, to make sure it's not stored
@@ -256,9 +256,9 @@ void test_migrate_stateful_compound_value()
     Branch source;
     Term* l_source = source.eval("state l = []");
 
-    int_value(as_branch(l_source), 1);
-    int_value(as_branch(l_source), 2);
-    int_value(as_branch(l_source), 3);
+    create_int(as_branch(l_source), 1);
+    create_int(as_branch(l_source), 2);
+    create_int(as_branch(l_source), 3);
 
     Branch dest;
     Term* l = dest.eval("state l = []");

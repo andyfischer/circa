@@ -14,7 +14,7 @@ void test_if_joining()
     test_assert(!branch.contains("apple"));
 
     // Test that a name which exists in the outer scope is rebound
-    Term* original_banana = int_value(branch, 10, "banana");
+    Term* original_banana = create_int(branch, 10, "banana");
     branch.eval("if true\nbanana = 15\nend");
     test_assert(branch["banana"] != original_banana);
 

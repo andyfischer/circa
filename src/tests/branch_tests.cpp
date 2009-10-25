@@ -25,8 +25,8 @@ void test_remove()
 void test_duplicate()
 {
     Branch original;
-    Term* term1 = int_value(original, 5);
-    Term* term2 = string_value(original, "yarn");
+    Term* term1 = create_int(original, 5);
+    Term* term2 = create_string(original, "yarn");
     original.bindName(term1, "term1");
     original.bindName(term2, "term two");
 
@@ -243,7 +243,7 @@ void term_pointer_operator_overload()
 void test_get_source_file_location()
 {
     Branch branch;
-    string_value(branch, "c:/a/b/something.ca", "attr:source-file");
+    create_string(branch, "c:/a/b/something.ca", "attr:source-file");
 
     test_equals(get_source_file_location(branch), "c:/a/b");
 }
@@ -251,9 +251,9 @@ void test_get_source_file_location()
 void test_shorten()
 {
     Branch branch;
-    int_value(branch, 5);
-    int_value(branch, 5);
-    int_value(branch, 5);
+    create_int(branch, 5);
+    create_int(branch, 5);
+    create_int(branch, 5);
 
     test_assert(branch.length() == 3);
 

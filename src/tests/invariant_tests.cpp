@@ -15,7 +15,7 @@ void test_functions()
     Term* func = branch.eval("def f() :: int; return 1; end");
     test_assert(check_invariants(func));
 
-    int_value(as_branch(func), 5, "five");
+    create_int(as_branch(func), 5, "five");
     test_assert(check_invariants(func) == false);
 }
 

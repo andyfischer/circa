@@ -14,7 +14,7 @@ struct StringList {
     Branch data;
 
     void append(std::string const& str) {
-        string_value(data, str);
+        create_string(data, str);
     }
 
     std::string& operator[](int index) {

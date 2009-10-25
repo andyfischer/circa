@@ -19,8 +19,8 @@ void non_pointer_values()
 void strings()
 {
     Branch branch;
-    Term* str1 = string_value(branch, "one");
-    Term* str2 = string_value(branch, "two");
+    Term* str1 = create_string(branch, "one");
+    Term* str2 = create_string(branch, "two");
 
     test_assert(as_string(str1) == "one");
     test_assert(as_string(str2) == "two");

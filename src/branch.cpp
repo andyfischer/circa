@@ -341,7 +341,7 @@ void duplicate_branch(Branch& source, Branch& dest)
 void parse_script(Branch& branch, std::string const& filename)
 {
     // Record the filename
-    string_value(branch, filename, "#attr:source-file");
+    create_string(branch, filename, "#attr:source-file");
 
     std::string fileContents = read_text_file(filename);
 

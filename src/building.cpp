@@ -140,35 +140,35 @@ Term* create_stateful_value(Branch& branch, Term* type, std::string const& name)
     return t;
 }
 
-Term* string_value(Branch& branch, std::string const& s, std::string const& name)
+Term* create_string(Branch& branch, std::string const& s, std::string const& name)
 {
     Term* term = create_value(branch, STRING_TYPE, name);
     as_string(term) = s;
     return term;
 }
 
-Term* int_value(Branch& branch, int i, std::string const& name)
+Term* create_int(Branch& branch, int i, std::string const& name)
 {
     Term* term = create_value(branch, INT_TYPE, name);
     as_int(term) = i;
     return term;
 }
 
-Term* float_value(Branch& branch, float f, std::string const& name)
+Term* create_float(Branch& branch, float f, std::string const& name)
 {
     Term* term = create_value(branch, FLOAT_TYPE, name);
     as_float(term) = f;
     return term;
 }
 
-Term* bool_value(Branch& branch, bool b, std::string const& name)
+Term* create_bool(Branch& branch, bool b, std::string const& name)
 {
     Term* term = create_value(branch, BOOL_TYPE, name);
     as_bool(term) = b;
     return term;
 }
 
-Term* ref_value(Branch& branch, Term* ref, std::string const& name)
+Term* create_ref(Branch& branch, Term* ref, std::string const& name)
 {
     Term* term = create_value(branch, REF_TYPE, name);
     as_ref(term) = ref;

@@ -199,12 +199,12 @@ void mouse_wheel_down(Term* caller)
 
 void initialize(Branch& branch)
 {
-    int_value(branch, SDLK_UP, "UP");
-    int_value(branch, SDLK_DOWN, "DOWN");
-    int_value(branch, SDLK_LEFT, "LEFT");
-    int_value(branch, SDLK_RIGHT, "RIGHT");
-    int_value(branch, SDLK_SPACE, "SPACE");
-    int_value(branch, SDLK_b, "KEY_B");
+    create_int(branch, SDLK_UP, "UP");
+    create_int(branch, SDLK_DOWN, "DOWN");
+    create_int(branch, SDLK_LEFT, "LEFT");
+    create_int(branch, SDLK_RIGHT, "RIGHT");
+    create_int(branch, SDLK_SPACE, "SPACE");
+    create_int(branch, SDLK_b, "KEY_B");
 }
 
 void setup(Branch& branch)

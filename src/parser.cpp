@@ -888,7 +888,7 @@ Term* include_statement(Branch& branch, TokenStream& tokens)
                 "Expected identifier or string after 'include'");
     }
 
-    Term* filenameTerm = string_value(branch, filename);
+    Term* filenameTerm = create_string(branch, filename);
     set_source_hidden(filenameTerm, true);
 
     Term* result = apply(branch, INCLUDE_FUNC, RefList(filenameTerm));
@@ -1137,7 +1137,7 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head)
                     "Expected identifier after .");
 
         std::string ident = tokens.consume(IDENTIFIER);
-        Term* identTerm = string_value(branch, ident);
+        Term* identTerm = create_string(branch, ident);
 
         Term* result = apply(branch, GET_FIELD_FUNC, RefList(head, identTerm));
         set_source_location(result, startPosition, tokens);
@@ -1234,7 +1234,7 @@ Term* literal_integer(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
     std::string text = tokens.consume(INTEGER);
     int value = strtoul(text.c_str(), NULL, 0);
-    Term* term = int_value(branch, value);
+    Term* term = create_int(branch, value);
     set_source_location(term, startPosition, tokens);
     return term;
 }
@@ -1244,7 +1244,7 @@ Term* literal_hex(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
     std::string text = tokens.consume(HEX_INTEGER);
     int value = strtoul(text.c_str(), NULL, 0);
-    Term* term = int_value(branch, value);
+    Term* term = create_int(branch, value);
     term->stringProp("syntaxHints:integerFormat") = "hex";
     set_source_location(term, startPosition, tokens);
     return term;
@@ -1257,7 +1257,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
 
     // Parse value with atof
     float value = (float) atof(text.c_str());
-    Term* term = float_value(branch, value);
+    Term* term = create_float(branch, value);
 
     // Assign a default step value, using the # of decimal figures
     int decimalFigures = get_number_of_decimal_figures(text);
@@ -1292,7 +1292,7 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     // strip quote marks
     text = text.substr(1, text.length()-2);
 
-    Term* term = string_value(branch, text);
+    Term* term = create_string(branch, text);
     set_source_location(term, startPosition, tokens);
     if (quoteType != "'")
         term->stringProp("syntaxHints:quoteType") = quoteType;
@@ -1306,7 +1306,7 @@ Term* literal_bool(Branch& branch, TokenStream& tokens)
 
     tokens.consume();
 
-    Term* term = bool_value(branch, value);
+    Term* term = create_bool(branch, value);
     set_source_location(term, startPosition, tokens);
     return term;
 }
@@ -1580,7 +1580,7 @@ Term* identifier_or_function_call(Branch& branch, TokenStream& tokens)
 
         // Check if the lhs's type defines this name as a property
         else if (type_t::find_field_index(head->type, name) != -1) {
-            head = apply(branch, GET_FIELD_FUNC, RefList(head, string_value(branch, name)));
+            head = apply(branch, GET_FIELD_FUNC, RefList(head, create_string(branch, name)));
             set_source_location(head, startPosition, tokens);
             get_input_syntax_hint(head, 0, "postWhitespace") = "";
         }
