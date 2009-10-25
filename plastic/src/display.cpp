@@ -22,15 +22,24 @@ bool initialize_display()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     // Create the surface
-    WINDOW_WIDTH = 640;
-    WINDOW_HEIGHT = 480;
+    int desiredWidth = 640;
+    int desiredHeight = 480;
 
     if (users_branch().contains("desired_window_size")) {
         WINDOW_WIDTH = users_branch()["desired_window_size"]->asBranch()[0]->asInt();
         WINDOW_HEIGHT = users_branch()["desired_window_size"]->asBranch()[1]->asInt();
     }
 
-    SCREEN = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 16, SDL_OPENGL | SDL_SWSURFACE);
+    return resize_display(desiredWidth, desiredHeight);
+}
+
+bool resize_display(int width, int height)
+{
+    WINDOW_WIDTH = width;
+    WINDOW_HEIGHT = height;
+
+    SCREEN = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 16,
+            SDL_OPENGL | SDL_SWSURFACE | SDL_RESIZABLE);
 
     if (SCREEN == NULL) {
         std::cerr << "SDL_SetVideoMode failed: " << SDL_GetError() << std::endl;
@@ -38,8 +47,8 @@ bool initialize_display()
     }
 
     // Write window width & height to runtime.ca
-    runtime_branch()["window"]->asBranch()["width"]->asInt() = WINDOW_WIDTH;
-    runtime_branch()["window"]->asBranch()["height"]->asInt() = WINDOW_HEIGHT;
+    runtime_branch()["window"]->asBranch()["width"]->asInt() = width;
+    runtime_branch()["window"]->asBranch()["height"]->asInt() = height;
 
     // Initialize desired SDL subsystems
     if (SDL_Init(SDL_INIT_TIMER & SDL_INIT_VIDEO
@@ -70,11 +79,11 @@ bool initialize_display()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glViewport(0, 0, width, height);
      
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-    glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1000.0f, 1000.0f);
+    glOrtho(0, width, height, 0, -1000.0f, 1000.0f);
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
 

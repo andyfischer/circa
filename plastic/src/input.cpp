@@ -43,10 +43,16 @@ void capture_events()
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
 
-        if (event.type == SDL_QUIT) {
+        switch (event.type) {
+        case SDL_QUIT:
             CONTINUE_MAIN_LOOP = false;
+            break;
 
-        } else if (event.type == SDL_KEYDOWN) {
+        case SDL_VIDEORESIZE:
+            resize_display(event.resize.w, event.resize.h);
+            break;
+
+        case SDL_KEYDOWN:
 
             if (!KEY_DOWN[event.key.keysym.sym]) {
                 KEY_JUST_PRESSED.insert(event.key.keysym.sym);
@@ -54,10 +60,13 @@ void capture_events()
             }
 
             KEY_DOWN[event.key.keysym.sym] = true;
+            break;
 
-        } else if (event.type == SDL_KEYUP) {
+        case SDL_KEYUP:
             KEY_DOWN[event.key.keysym.sym] = false;
-        } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            break;
+
+        case SDL_MOUSEBUTTONDOWN:
             if (event.button.button == SDL_BUTTON_LEFT) {
                 RECENT_LEFT_MOUSE_DOWN = true;
                 LEFT_MOUSE_DOWN = true;
@@ -67,15 +76,18 @@ void capture_events()
                 RECENT_MOUSE_WHEEL_DOWN = true;
             MOUSE_X = event.button.x;
             MOUSE_Y = event.button.y;
+            break;
 
-        } else if (event.type == SDL_MOUSEBUTTONUP) {
+        case SDL_MOUSEBUTTONUP:
             MOUSE_X = event.button.x;
             MOUSE_Y = event.button.y;
             if (event.button.button == SDL_BUTTON_LEFT)
                 LEFT_MOUSE_DOWN = false;
-        } else if (event.type == SDL_MOUSEMOTION) {
+            break;
+        case SDL_MOUSEMOTION:
             MOUSE_X = event.motion.x;
             MOUSE_Y = event.motion.y;
+            break;
         }
     } // finish event loop
 

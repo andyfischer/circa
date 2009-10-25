@@ -68,7 +68,7 @@ bool initialize_plastic()
     // Load runtime.ca
     std::string runtime_ca_path = find_runtime_file();
     if (!file_exists(runtime_ca_path)) {
-        std::cout << "fatal: Couldn't find runtime.ca file" << std::endl;
+        std::cerr << "fatal: Couldn't find runtime.ca file" << std::endl;
         return false;
     }
     parse_script(runtime_branch(), runtime_ca_path);
@@ -136,7 +136,7 @@ int plastic_main(std::vector<std::string> args)
 
     if (!initialize_plastic()) return 1;
 
-    // Check to generate docs
+    // -gd to generate docs
     if (args[0] == "-gd") {
         std::cout << "writing docs to " << args[1] << std::endl;
         std::stringstream out;
@@ -145,7 +145,7 @@ int plastic_main(std::vector<std::string> args)
         return 0;
     }
 
-    // Print compiled code
+    // -p to print raw compiled code
     if (args[0] == "-p") {
         if (!load_user_script_filename(args[1]))
             return 1;
