@@ -4,6 +4,7 @@
 
 #include "circa.h"
 
+#include "display.h"
 #include "docs.h"
 #include "gl_common.h"
 #include "gl_shapes.h"

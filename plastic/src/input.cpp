@@ -92,13 +92,13 @@ void handle_key_press(SDL_Event &event, int key)
         break;
 
     case SDLK_e:
-        reset_state(*USERS_BRANCH);
+        reset_state(users_branch());
         if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
             PAUSED = false;
         break;
 
     case SDLK_r:
-        reload_branch_from_file(*USERS_BRANCH, std::cout);
+        reload_branch_from_file(users_branch(), std::cout);
         if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
             PAUSED = false;
         break;
@@ -128,12 +128,12 @@ void handle_key_press(SDL_Event &event, int key)
     if (event.key.keysym.mod & KMOD_CTRL) {
         switch (event.key.keysym.sym) {
         case SDLK_s:
-            persist_branch_to_file(*USERS_BRANCH);
-            std::cout << "saved to " << get_branch_source_filename(*USERS_BRANCH) << std::endl;
+            persist_branch_to_file(users_branch());
+            std::cout << "saved to " << get_branch_source_filename(users_branch()) << std::endl;
             break;
 
         case SDLK_p:
-            std::cout << print_branch_raw(*USERS_BRANCH);
+            std::cout << print_branch_raw(users_branch());
             break;
 
         default: break;

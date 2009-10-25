@@ -89,4 +89,12 @@ std::string get_error_message(Term* term)
         return get_runtime_error_message(term);
 }
 
+void clear_error(Term* term)
+{
+    if (has_runtime_error(term)) {
+        term->setHasError(false);
+        term->removeProperty("error");
+    }
+}
+
 } // namespace circa

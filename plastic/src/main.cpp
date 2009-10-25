@@ -9,11 +9,9 @@ using namespace circa;
 // the filename of this binary, passed in as args[0]
 std::string BINARY_NAME;
 
-const int SCREEN_BPP = 32;
-
-SDL_Surface* SCREEN = NULL;
-Branch* SCRIPT_ROOT = NULL;
+Branch* RUNTIME_BRANCH = NULL;
 Branch* USERS_BRANCH = NULL;
+
 bool CONTINUE_MAIN_LOOP = true;
 
 Float TIME;
@@ -21,11 +19,18 @@ Float TIME_DELTA;
 long PREV_SDL_TICKS = 0;
 int TARGET_FPS = 60;
 
-int WINDOW_WIDTH = 0;
-int WINDOW_HEIGHT = 0;
-
 bool PAUSED = false;
 PauseReason PAUSE_REASON;
+
+circa::Branch& runtime_branch()
+{
+    return *RUNTIME_BRANCH;
+}
+
+circa::Branch& users_branch()
+{
+    return *USERS_BRANCH;
+}
 
 std::string get_home_directory()
 {
@@ -52,13 +57,13 @@ bool initialize_plastic()
     // Initialize Circa
     circa::initialize();
 
-    SCRIPT_ROOT = &create_branch(*circa::KERNEL, "plastic_main");
+    RUNTIME_BRANCH = &create_branch(*circa::KERNEL, "plastic_main");
 
-    input::initialize(*SCRIPT_ROOT);
+    input::initialize(runtime_branch());
 
     // Import constants
-    TIME = float_value(*SCRIPT_ROOT, 0, "time");
-    TIME_DELTA = float_value(*SCRIPT_ROOT, 0, "time_delta");
+    TIME = float_value(runtime_branch(), 0, "time");
+    TIME_DELTA = float_value(runtime_branch(), 0, "time_delta");
 
     // Load runtime.ca
     std::string runtime_ca_path = find_runtime_file();
@@ -66,101 +71,18 @@ bool initialize_plastic()
         std::cout << "fatal: Couldn't find runtime.ca file" << std::endl;
         return false;
     }
-    parse_script(*SCRIPT_ROOT, runtime_ca_path);
+    parse_script(runtime_branch(), runtime_ca_path);
 
-    postprocess_functions::setup(*SCRIPT_ROOT);
-    input::setup(*SCRIPT_ROOT);
-    mesh::setup(*SCRIPT_ROOT);
-    gl_shapes::setup(*SCRIPT_ROOT);
-    textures::setup(*SCRIPT_ROOT);
-    ttf::setup(*SCRIPT_ROOT);
+    postprocess_functions::setup(runtime_branch());
+    input::setup(runtime_branch());
+    mesh::setup(runtime_branch());
+    gl_shapes::setup(runtime_branch());
+    textures::setup(runtime_branch());
+    ttf::setup(runtime_branch());
 
-    if (has_static_errors(*SCRIPT_ROOT)) {
+    if (has_static_errors(runtime_branch())) {
         std::cout << "Errors in runtime.ca:" << std::endl;
-        print_static_errors_formatted(*SCRIPT_ROOT, std::cout);
-        return false;
-    }
-
-    return true;
-}
-
-bool initialize_display()
-{
-    // Initialize the window
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
-        return false;
-    }
-
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-    // Create the surface
-    WINDOW_WIDTH = 640;
-    WINDOW_HEIGHT = 480;
-
-    if (USERS_BRANCH->contains("desired_window_size")) {
-        WINDOW_WIDTH = (*USERS_BRANCH)["desired_window_size"]->asBranch()[0]->asInt();
-        WINDOW_HEIGHT = (*USERS_BRANCH)["desired_window_size"]->asBranch()[1]->asInt();
-    }
-
-    SCREEN = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 16, SDL_OPENGL | SDL_SWSURFACE);
-
-    if (SCREEN == NULL) {
-        std::cerr << "SDL_SetVideoMode failed: " << SDL_GetError() << std::endl;
-        return false;
-    }
-
-    // Write window width & height to runtime.ca
-    (*SCRIPT_ROOT)["window"]->asBranch()["width"]->asInt() = WINDOW_WIDTH;
-    (*SCRIPT_ROOT)["window"]->asBranch()["height"]->asInt() = WINDOW_HEIGHT;
-
-    // Initialize desired SDL subsystems
-    if (SDL_Init(SDL_INIT_TIMER & SDL_INIT_VIDEO
-                & SDL_INIT_JOYSTICK & SDL_INIT_EVENTTHREAD) == -1) {
-        std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
-        return false;
-    }
-
-    // Set window caption
-    std::string windowTitle;
-    if (USERS_BRANCH->contains("desired_window_title"))
-        windowTitle = (*USERS_BRANCH)["desired_window_title"]->asString();
-    else
-        windowTitle = get_branch_source_filename(*USERS_BRANCH);
-
-    SDL_WM_SetCaption(windowTitle.c_str(), NULL);
-
-    // Initialize GL state
-    gl_clear_error();
-    Term errorListener;
-
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
-    glPolygonMode(GL_FRONT, GL_FILL);
-    glDisable(GL_CULL_FACE);
-    glClearColor(0,0,0,0);
-    glClearDepth(1000);
-    glDepthFunc(GL_LEQUAL);
-    glEnable(GL_TEXTURE_2D);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-     
-    glMatrixMode( GL_PROJECTION );
-    glLoadIdentity();
-    glOrtho(0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, -1000.0f, 1000.0f);
-    glMatrixMode( GL_MODELVIEW );
-    glLoadIdentity();
-
-    glClear( GL_COLOR_BUFFER_BIT );
-
-    gl_check_error(&errorListener, " (initialize display)");
-
-    if (errorListener.hasError()) {
-        std::cerr << "GL error during initialization: "
-            << get_runtime_error_message(&errorListener) << std::endl;
+        print_static_errors_formatted(runtime_branch(), std::cout);
         return false;
     }
 
@@ -182,32 +104,9 @@ void main_loop()
         TIME = ticks / 1000.0f;
 
         PREV_SDL_TICKS = ticks;
-
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glUseProgram(0);
-
-        Term errorListener;
-
-        evaluate_branch(*SCRIPT_ROOT, &errorListener);
-
-        if (errorListener.hasError()) {
-            std::cout << "Runtime error:" << std::endl;
-            print_runtime_error_formatted(*SCRIPT_ROOT, std::cout);
-            std::cout << std::endl;
-            PAUSED = true;
-            PAUSE_REASON = RUNTIME_ERROR;
-        }
     }
 
-    // Check for uncaught GL error
-    Term errorListener;
-    gl_check_error(&errorListener, " (uncaught)");
-    if (errorListener.hasError()) {
-        std::cout << get_runtime_error_message(&errorListener) << std::endl;
-    }
-
-    // Update the screen
-    SDL_GL_SwapBuffers();
+    render_frame();
 
     long new_ticks = SDL_GetTicks();
 
@@ -221,8 +120,8 @@ void main_loop()
 
 bool load_user_script_filename(std::string const& filename)
 {
-    SCRIPT_ROOT->get("user_script_filename")->asString() = filename;
-    Term* users_branch = SCRIPT_ROOT->get("users_branch");
+    runtime_branch()["user_script_filename"]->asString() = filename;
+    Term* users_branch = runtime_branch()["users_branch"];
     include_function::load_script(users_branch);
     USERS_BRANCH = &users_branch->asBranch();
 
@@ -250,15 +149,15 @@ int plastic_main(std::vector<std::string> args)
     if (args[0] == "-p") {
         if (!load_user_script_filename(args[1]))
             return 1;
-        std::cout << print_branch_raw(*SCRIPT_ROOT);
+        std::cout << print_branch_raw(runtime_branch());
         return 0;
     }
 
     if (!load_user_script_filename(args[0]))
         return 1;
 
-    if (has_static_errors(*USERS_BRANCH)) {
-        print_static_errors_formatted(*USERS_BRANCH, std::cout);
+    if (has_static_errors(users_branch())) {
+        print_static_errors_formatted(users_branch(), std::cout);
         return 1;
     }
 

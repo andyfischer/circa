@@ -9,7 +9,7 @@ void evaluate_term(Term* term)
     if (term == NULL)
         throw std::runtime_error("term is NULL");
 
-    term->setHasError(false);
+    clear_error(term);
 
     EvaluateFunc evaluate = function_t::get_evaluate(term->function);
 
