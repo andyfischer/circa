@@ -24,4 +24,7 @@ void assert_type(Term* term, Term* type);
 bool has_error(Term* term);
 std::string get_error_message(Term* term);
 
+// Remove an error status
+void clear_error(Term* term);
+
 }
