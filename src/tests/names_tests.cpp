@@ -8,7 +8,7 @@ namespace names_tests {
 void test_find_named()
 {
     Branch branch;
-    Term* a = int_value(branch, 1, "a");
+    Term* a = create_int(branch, 1, "a");
 
     test_assert(find_named(branch, "a") == a);
     test_assert(find_named(branch, "b") == NULL);
@@ -32,7 +32,7 @@ void test_name_is_reachable_from()
 {
     Branch branch;
 
-    Term* a = int_value(branch, 5, "a");
+    Term* a = create_int(branch, 5, "a");
 
     test_assert(name_is_reachable_from(a, branch));
 
@@ -46,11 +46,11 @@ void test_name_is_reachable_from()
 void test_get_relative_name()
 {
     Branch branch;
-    Term* a = int_value(branch, 5, "A");
+    Term* a = create_int(branch, 5, "A");
     test_assert(get_relative_name(branch, a) == "A");
 
     Branch& ns = create_namespace(branch, "ns");
-    Term* b = int_value(ns, 5, "B");
+    Term* b = create_int(ns, 5, "B");
 
     test_assert(get_relative_name(ns, b) == "B");
     test_equals(get_relative_name(branch, b), "ns.B");

@@ -306,7 +306,7 @@ namespace branch_mirror_t
                 continue;
 
             if (write >= output.length())
-                ref_value(output, t);
+                create_ref(output, t);
             else
                 output[write]->asRef() = t;
 
@@ -340,7 +340,7 @@ namespace branch_mirror_t
                 continue;
 
             if (write >= output.length())
-                ref_value(output, t);
+                create_ref(output, t);
             else
                 output[write]->asRef() = t;
 
@@ -362,7 +362,7 @@ namespace branch_mirror_t
                 continue;
 
             if (write >= output.length())
-                ref_value(output, t);
+                create_ref(output, t);
             else
                 output[write]->asRef() = t;
 

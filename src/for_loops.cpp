@@ -69,10 +69,10 @@ void setup_for_loop_pre_code(Term* forTerm)
     Branch& forContents = as_branch(forTerm);
     create_list(forContents, "#state");
     Branch& attributes = create_branch(forContents, "#attributes");
-    bool_value(attributes, false, "#is_first_iteration");
-    bool_value(attributes, false, "#any_iterations");
-    bool_value(attributes, false, "#modify_list");
-    bool_value(attributes, false, "#discard_called");
+    create_bool(attributes, false, "#is_first_iteration");
+    create_bool(attributes, false, "#any_iterations");
+    create_bool(attributes, false, "#modify_list");
+    create_bool(attributes, false, "#discard_called");
     create_branch(forContents, "#rebinds");
 }
 

@@ -11,9 +11,9 @@ void test_math()
 {
     Branch branch;
 
-    Term* two = float_value(branch, 2);
-    Term* three = float_value(branch, 3);
-    Term* negative_one = float_value(branch, -1);
+    Term* two = create_float(branch, 2);
+    Term* three = create_float(branch, 3);
+    Term* negative_one = create_float(branch, -1);
 
     test_assert(as_float(apply_and_eval(branch, ADD_FUNC, RefList(two,three))) == 5);
     test_assert(as_float(apply_and_eval(branch, ADD_FUNC, RefList(two,negative_one))) == 1);
@@ -30,9 +30,9 @@ void test_int()
     test_assert(type_t::get_equals_func(INT_TYPE) != NULL);
     test_assert(type_t::get_to_string_func(INT_TYPE) != NULL);
 
-    Term* four = int_value(branch, 4);
-    Term* another_four = int_value(branch, 4);
-    Term* five = int_value(branch, 5);
+    Term* four = create_int(branch, 4);
+    Term* another_four = create_int(branch, 4);
+    Term* five = create_int(branch, 5);
 
     test_assert(equals(four, another_four));
     test_assert(!equals(four, five));
@@ -47,9 +47,9 @@ void test_float()
     test_assert(type_t::get_equals_func(FLOAT_TYPE) != NULL);
     test_assert(type_t::get_to_string_func(FLOAT_TYPE) != NULL);
 
-    Term* point_one = float_value(branch, .1f);
-    Term* point_one_again = float_value(branch, .1f);
-    Term* point_two = float_value(branch, 0.2f);
+    Term* point_one = create_float(branch, .1f);
+    Term* point_one_again = create_float(branch, .1f);
+    Term* point_two = create_float(branch, 0.2f);
 
     test_assert(equals(point_one, point_one_again));
     test_assert(equals(point_two, point_two));

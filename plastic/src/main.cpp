@@ -62,8 +62,8 @@ bool initialize_plastic()
     input::initialize(runtime_branch());
 
     // Import constants
-    TIME = float_value(runtime_branch(), 0, "time");
-    TIME_DELTA = float_value(runtime_branch(), 0, "time_delta");
+    TIME = create_float(runtime_branch(), 0, "time");
+    TIME_DELTA = create_float(runtime_branch(), 0, "time_delta");
 
     // Load runtime.ca
     std::string runtime_ca_path = find_runtime_file();

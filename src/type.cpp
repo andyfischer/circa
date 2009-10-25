@@ -32,8 +32,8 @@ void initialize_type_prototype(Branch& contents)
     Term* attributesTerm = create_value(contents, BRANCH_TYPE, "#attributes");
     set_source_hidden(attributesTerm, false);
     Branch& attributes = as_branch(attributesTerm);
-    string_value(attributes, "", "name");
-    bool_value(attributes, false, "isPointer");
+    create_string(attributes, "", "name");
+    create_bool(attributes, false, "isPointer");
     create_list(attributes, "parameters");
     create_void(attributes, "defaultValue");
     create_list(attributes, "memberFunctions");

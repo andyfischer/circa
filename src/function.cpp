@@ -233,13 +233,13 @@ void initialize_function_prototype(Branch& contents)
     Term* attributesTerm = create_value(contents, BRANCH_TYPE, "#attributes");
     set_source_hidden(attributesTerm, true);
     Branch& attributes = as_branch(attributesTerm);
-    string_value(attributes, "", "name");
-    ref_value(attributes, NULL, "hidden_state_type");
-    bool_value(attributes, false, "variable_args");
+    create_string(attributes, "", "name");
+    create_ref(attributes, NULL, "hidden_state_type");
+    create_bool(attributes, false, "variable_args");
     create_value(attributes, EVALUATE_THUNK_TYPE, "native_evaluate");
     create_value(attributes, SPECIALIZE_THUNK_TYPE, "native_specialize");
     create_value(attributes, TO_STRING_THUNK_TYPE, "native_to_string");
-    ref_value(attributes, NULL, "feedback_func");
+    create_ref(attributes, NULL, "feedback_func");
     create_value(attributes, LIST_TYPE, "parameters");
     create_value(attributes, STRING_TYPE, "description");
 }

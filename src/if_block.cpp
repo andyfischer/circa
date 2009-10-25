@@ -18,7 +18,7 @@ void update_if_block_joining_branch(Term* ifCall)
     joining.clear();
 
     // This is used later.
-    Term* satisfiedIndex = int_value(joining, 0, "#satisfiedIndex");
+    Term* satisfiedIndex = create_int(joining, 0, "#satisfiedIndex");
 
     // Find the set of all names bound in every branch.
     std::set<std::string> boundNames;

@@ -11,8 +11,8 @@ namespace source_repro_tests {
 void generate_source_for_function_calls() {
     Branch branch;
 
-    Term* a = int_value(branch, 5, "a");
-    Term* b = int_value(branch, 9, "b");
+    Term* a = create_int(branch, 5, "a");
+    Term* b = create_int(branch, 9, "b");
     Term* c = apply(branch, "add", RefList(a,b));
 
     test_assert(should_print_term_source_line(a));
@@ -22,8 +22,8 @@ void generate_source_for_function_calls() {
 
     // Same test with anonymous values
     branch.clear();
-    Term* d = int_value(branch, 3);
-    Term* e = int_value(branch, 4);
+    Term* d = create_int(branch, 3);
+    Term* e = create_int(branch, 4);
     /*Term* f =*/ apply(branch, "add", RefList(d,e));
 
     /*
@@ -38,8 +38,8 @@ void generate_source_for_function_calls() {
     branch.clear();
     branch.compile("a = 1");
     branch.compile("b = 2");
-    a = int_value(branch, 3, "c");
-    b = int_value(branch, 4, "d");
+    a = create_int(branch, 3, "c");
+    b = create_int(branch, 4, "d");
     apply(branch, "add", RefList(a,b));
 
     test_equals(get_branch_source(branch), "a = 1\nb = 2\nc = 3\nd = 4\nadd(c, d)");
@@ -53,15 +53,15 @@ void generate_source_for_literal_list() {
 
     test_equals(get_branch_source(branch), "a = []");
 
-    int_value(a, 5);
+    create_int(a, 5);
     test_equals(get_branch_source(branch), "a = [5]");
 
-    int_value(a, 100);
+    create_int(a, 100);
     test_equals(get_branch_source(branch), "a = [5,100]");
 
 /*
     branch.clear();
-    Term* apple = int_value(branch, 12, "apple");
+    Term* apple = create_int(branch, 12, "apple");
     create_list(&branch, "b").append(apple);
     test_equals(get_branch_source(branch), "apple = 12\nb = [apple]");
 */
