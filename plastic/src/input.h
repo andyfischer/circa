@@ -5,7 +5,6 @@
 
 namespace input {
 
-void initialize(circa::Branch& branch);
 void setup(circa::Branch& branch);
 void capture_events();
 void handle_key_press(SDL_Event &event, int key);

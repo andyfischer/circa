@@ -59,8 +59,6 @@ bool initialize_plastic()
 
     RUNTIME_BRANCH = &create_branch(*circa::KERNEL, "plastic_main");
 
-    input::initialize(runtime_branch());
-
     // Load runtime.ca
     std::string runtime_ca_path = find_runtime_file();
     if (!file_exists(runtime_ca_path)) {

@@ -32,6 +32,14 @@ def mouse_wheel_up +overload (Rect region) :: bool end
 def mouse_wheel_down +overload () :: bool end
 def mouse_wheel_down +overload (Rect region) :: bool end
 
+-- These are assigned in input.cpp
+UP = 0
+DOWN = 0
+LEFT = 0
+RIGHT = 0
+SPACE = 0
+KEY_B = 0
+
 -- Text rendering functions
 type TTF_Font {} -- native
 namespace text
