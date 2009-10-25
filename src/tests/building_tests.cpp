@@ -74,12 +74,30 @@ void test_rewrite_as_value()
     test_assert(branch[5]->type == STRING_TYPE);
 }
 
+void test_procure()
+{
+    Branch branch;
+    Term* a = procure_value(branch, INT_TYPE, "a");
+    procure_value(branch, INT_TYPE, "b");
+    test_assert(a->type == INT_TYPE);
+    test_assert(is_value(a));
+
+    Term* a_again = procure_value(branch, INT_TYPE, "a");
+    test_assert(a == a_again);
+
+    a_again = procure_value(branch, FLOAT_TYPE, "a");
+    test_assert(a == a_again);
+    test_assert(a->type == FLOAT_TYPE);
+    test_assert(is_value(a));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(building_tests::test_create_value);
     REGISTER_TEST_CASE(building_tests::test_create_int);
     REGISTER_TEST_CASE(building_tests::test_create_duplicate);
     REGISTER_TEST_CASE(building_tests::test_rewrite_as_value);
+    REGISTER_TEST_CASE(building_tests::test_procure);
 }
 
 } // namespace building_tests

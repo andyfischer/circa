@@ -1,4 +1,8 @@
 
+-- These values are passed in from main.cpp
+time = 0.0
+time_delta = 0.0
+
 -- Wrap up mouse position into a point (values are passed in from input.cpp)
 state Point mouse
 

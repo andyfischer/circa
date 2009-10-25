@@ -223,6 +223,31 @@ Term* create_compound_type(Branch& branch, std::string const& name)
     return term;
 }
 
+Term* procure_value(Branch& branch, Term* type, std::string const& name)
+{
+    Term* existing = branch[name];
+    if (existing == NULL)
+        existing = create_value(branch, type, name);
+    else
+        change_type(existing, type);
+    return existing;
+}
+
+int& procure_int(Branch& branch, std::string const& name)
+{
+    return as_int(procure_value(branch, INT_TYPE, name));
+}
+
+float& procure_float(Branch& branch, std::string const& name)
+{
+    return as_float(procure_value(branch, FLOAT_TYPE, name));
+}
+
+bool& procure_bool(Branch& branch, std::string const& name)
+{
+    return as_bool(procure_value(branch, BOOL_TYPE, name));
+}
+
 void rewrite(Term* term, Term* function, RefList const& inputs)
 {
     change_function(term, function);
