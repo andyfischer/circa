@@ -29,7 +29,7 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
 
 Term* create_stateful_value(Branch& branch, Term* type, std::string const& name="");
 
-// Import values
+// Create values with a specified value.
 Term* create_string(Branch& branch, std::string const& s, std::string const& name="");
 Term* create_int(Branch& branch, int i, std::string const& name="");
 Term* create_float(Branch& branch, float f, std::string const& name="");
@@ -42,6 +42,16 @@ Branch& create_namespace(Branch&, std::string const& name);
 Term* create_type(Branch& branch, std::string name="");
 Term* create_empty_type(Branch& branch, std::string name);
 Term* create_compound_type(Branch& branch, std::string const& name);
+
+// In this world, "procure" means "return the existing thing if it already exists, and
+// create it if it doesn't exist." Also we might modify the existing thing, such as
+// coercing to the correct type. These functions might have an effect on the branch, but
+// they are idempontent.
+Term* procure_value(Branch& branch, Term* type, std::string const& name);
+
+int& procure_int(Branch& branch, std::string const& name);
+float& procure_float(Branch& branch, std::string const& name);
+bool& procure_bool(Branch& branch, std::string const& name);
 
 // Modify term so that it has the given function and inputs.
 void rewrite(Term* term, Term* function, RefList const& _inputs);

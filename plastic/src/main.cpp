@@ -61,10 +61,6 @@ bool initialize_plastic()
 
     input::initialize(runtime_branch());
 
-    // Import constants
-    TIME = create_float(runtime_branch(), 0, "time");
-    TIME_DELTA = create_float(runtime_branch(), 0, "time_delta");
-
     // Load runtime.ca
     std::string runtime_ca_path = find_runtime_file();
     if (!file_exists(runtime_ca_path)) {
@@ -72,6 +68,10 @@ bool initialize_plastic()
         return false;
     }
     parse_script(runtime_branch(), runtime_ca_path);
+
+    // Fetch constants
+    TIME = procure_value(runtime_branch(), FLOAT_TYPE, "time");
+    TIME_DELTA = procure_value(runtime_branch(), FLOAT_TYPE, "time_delta");
 
     postprocess_functions::setup(runtime_branch());
     input::setup(runtime_branch());
