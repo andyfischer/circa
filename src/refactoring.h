@@ -21,6 +21,14 @@ void rename(Term* term, std::string const& name);
 // This will create a NULL in the owning branch.
 void steal_term(Term* term, Branch& newHome);
 
+// Modify term so that it has the given function and inputs.
+void rewrite(Term* term, Term* function, RefList const& _inputs);
+
+// Make sure that branch[index] is a value with the given type. If that term exists and
+// has a different function or type, then change it. If the branch doesn't have that
+// index, then add NULL terms until it does.
+void rewrite_as_value(Branch& branch, int index, Term* type);
+
 } // namespace circa
 
 #endif

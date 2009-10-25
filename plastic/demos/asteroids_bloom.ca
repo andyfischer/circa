@@ -21,3 +21,5 @@ postprocess.bind_main_surface()
 offset = 1/window.height
 gl.set_uniform("offsets", [[0 -2*offset] [0 -offset] [0 0] [0 offset] [0 2*offset]])
 postprocess.draw_surface(pass1)
+
+postprocess.draw_surface(pass0)

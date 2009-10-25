@@ -259,6 +259,14 @@ void test_vectorized_funcs()
     test_snippet("a = [2.0 2.0]; b = [4.0 4.0] :: Point", "a + b == [6.0 6.0]");
 }
 
+void test_color_arithmetic()
+{
+    test_snippet("", "#001122 == #001122");
+    test_snippet("", "#001122ff == #001122");
+    test_snippet("", "#001133 != #001122");
+    //test_snippet("", "#ff0000 + (#0000ff - #ff0000) * 0.5 == #880088");
+}
+
 void test_branch_value()
 {
     test_snippet("b = { 1 2 3 }", "b[0] == 1, b[1] == 2, b[2] == 3");
@@ -280,6 +288,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_map);
     REGISTER_TEST_CASE(test_snippets::test_field_syntax);
     REGISTER_TEST_CASE(test_snippets::test_vectorized_funcs);
+    REGISTER_TEST_CASE(test_snippets::test_color_arithmetic);
     REGISTER_TEST_CASE(test_snippets::test_branch_value);
 }
 
