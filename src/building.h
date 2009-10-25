@@ -43,23 +43,13 @@ Term* create_type(Branch& branch, std::string name="");
 Term* create_empty_type(Branch& branch, std::string name);
 Term* create_compound_type(Branch& branch, std::string const& name);
 
-// In this world, "procure" means "return the existing thing if it already exists, and
-// create it if it doesn't exist." Also we might modify the existing thing, such as
-// coercing to the correct type. These functions might have an effect on the branch, but
-// they are idempontent.
+// In this context, "procure" means "return the existing thing if it already exists, and
+// create it if it doesn't exist." Procure functions are idempotent.
 Term* procure_value(Branch& branch, Term* type, std::string const& name);
 
 int& procure_int(Branch& branch, std::string const& name);
 float& procure_float(Branch& branch, std::string const& name);
 bool& procure_bool(Branch& branch, std::string const& name);
-
-// Modify term so that it has the given function and inputs.
-void rewrite(Term* term, Term* function, RefList const& _inputs);
-
-// Make sure that branch[index] is a value with the given type. If that term exists and
-// has a different function or type, then change it. If the branch doesn't have that
-// index, then add NULL terms until it does.
-void rewrite_as_value(Branch& branch, int index, Term* type);
 
 // Resize this list term, making sure that each element is a type of 'type'.
 void resize_list(Branch& list, int numElements, Term* type);

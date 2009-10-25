@@ -83,4 +83,34 @@ void steal_term(Term* _term, Branch& newHome)
     newHome.append(term);
 }
 
+void rewrite(Term* term, Term* function, RefList const& inputs)
+{
+    change_function(term, function);
+    for (int i=0; i < inputs.length(); i++)
+        set_input(term, i, inputs[i]);
+    Term* outputType = function_t::get_output_type(function);
+
+    if (function_t::get_specialize_type(function) != NULL)
+        outputType = function_t::get_specialize_type(function)(term);
+
+    change_type(term, outputType);
+}
+
+void rewrite_as_value(Branch& branch, int index, Term* type)
+{
+    while (index > branch.length())
+        branch.append(NULL);
+
+    if (index >= branch.length()) {
+        create_value(branch, type);
+    } else {
+        Term* term = branch[index];
+
+        change_function(term, VALUE_FUNC);
+        change_type(term, type);
+        term->inputs = RefList();
+        alloc_value(term);
+    }
+}
+
 } // namespace circa

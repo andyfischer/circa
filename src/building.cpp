@@ -248,35 +248,6 @@ bool& procure_bool(Branch& branch, std::string const& name)
     return as_bool(procure_value(branch, BOOL_TYPE, name));
 }
 
-void rewrite(Term* term, Term* function, RefList const& inputs)
-{
-    change_function(term, function);
-    for (int i=0; i < inputs.length(); i++)
-        set_input(term, i, inputs[i]);
-    Term* outputType = function_t::get_output_type(function);
-
-    if (function_t::get_specialize_type(function) != NULL)
-        outputType = function_t::get_specialize_type(function)(term);
-
-    change_type(term, outputType);
-}
-
-void rewrite_as_value(Branch& branch, int index, Term* type)
-{
-    while (index > branch.length())
-        branch.append(NULL);
-
-    if (index >= branch.length()) {
-        create_value(branch, type);
-    } else {
-        Term* term = branch[index];
-
-        change_function(term, VALUE_FUNC);
-        change_type(term, type);
-        term->inputs = RefList();
-        alloc_value(term);
-    }
-}
 
 void resize_list(Branch& list, int numElements, Term* type)
 {
