@@ -197,16 +197,6 @@ void mouse_wheel_down(Term* caller)
         as_bool(caller) = RECENT_MOUSE_WHEEL_DOWN && mouse_in(as_branch(caller->input(0)));
 }
 
-void initialize(Branch& branch)
-{
-    procure_int(branch, "UP") = SDLK_UP;
-    procure_int(branch, "DOWN") = SDLK_DOWN;
-    procure_int(branch, "LEFT") = SDLK_LEFT;
-    procure_int(branch, "RIGHT") = SDLK_RIGHT;
-    procure_int(branch, "SPACE") = SDLK_SPACE;
-    procure_int(branch, "KEY_B") = SDLK_b;
-}
-
 void setup(Branch& branch)
 {
     for (int i=0; i < SDLK_LAST; i++)
@@ -225,6 +215,13 @@ void setup(Branch& branch)
     install_function(branch["mouse_wheel_up"]->asBranch()[1], mouse_wheel_up);
     install_function(branch["mouse_wheel_down"]->asBranch()[0], mouse_wheel_down);
     install_function(branch["mouse_wheel_down"]->asBranch()[1], mouse_wheel_down);
+
+    procure_int(branch, "UP") = SDLK_UP;
+    procure_int(branch, "DOWN") = SDLK_DOWN;
+    procure_int(branch, "LEFT") = SDLK_LEFT;
+    procure_int(branch, "RIGHT") = SDLK_RIGHT;
+    procure_int(branch, "SPACE") = SDLK_SPACE;
+    procure_int(branch, "KEY_B") = SDLK_b;
 }
 
 } // namespace input
