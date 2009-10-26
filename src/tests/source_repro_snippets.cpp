@@ -89,6 +89,7 @@ void reproduce_simple_values() {
     round_trip_source("5.200");
     round_trip_source("'string with single quotes'");
     round_trip_source("\"string with double quotes\"");
+    round_trip_source("<<<multiline string>>>");
     finish_source_repro_category();
 }
 

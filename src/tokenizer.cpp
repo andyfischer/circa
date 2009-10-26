@@ -55,6 +55,8 @@ const char* get_token_text(int match)
         case SEMICOLON: return ";";
         case TWO_DOTS: return "..";
         case ELLIPSIS: return "...";
+        case TRIPLE_LTHAN: return "<<<";
+        case TRIPLE_GTHAN: return ">>>";
         case WHITESPACE: return "WHITESPACE";
         case NEWLINE: return "NEWLINE";
         case BEGIN: return "begin";
@@ -183,6 +185,7 @@ bool match_number(TokenizeContext &context);
 void consume_number(TokenizeContext &context);
 void consume_hex_number(TokenizeContext &context);
 void consume_string_literal(TokenizeContext &context);
+void consume_triple_quoted_string_literal(TokenizeContext &context);
 void consume_color_literal(TokenizeContext &context);
 
 void tokenize(std::string const &input, TokenList &results)
@@ -452,6 +455,11 @@ void top_level_consume_token(TokenizeContext &context)
             return;
 
         case '<':
+            if (context.next(1) == '<' && context.next(2) == '<') {
+                consume_triple_quoted_string_literal(context);
+                return;
+            }
+
             context.consume();
             if (context.next() == '=') {
                 context.consume();
@@ -632,7 +640,7 @@ void consume_string_literal(TokenizeContext &context)
 {
     std::stringstream text;
 
-    // consume starting quote
+    // Consume starting quote, this can be ' or " or <<<
     char quote_type = context.consume();
     text << quote_type;
 
@@ -640,6 +648,27 @@ void consume_string_literal(TokenizeContext &context)
         text << context.consume();
 
     // consume ending quote
+    text << context.consume();
+
+    context.push(STRING, text.str());
+}
+
+void consume_triple_quoted_string_literal(TokenizeContext &context)
+{
+    std::stringstream text;
+
+    // Consume initial <<<
+    text << context.consume();
+    text << context.consume();
+    text << context.consume();
+
+    while (!context.finished() &&
+            !(context.next() == '>' && context.next(1) == '>' && context.next(2) == '>'))
+        text << context.consume();
+
+    // Consume closing >>>
+    text << context.consume();
+    text << context.consume();
     text << context.consume();
 
     context.push(STRING, text.str());

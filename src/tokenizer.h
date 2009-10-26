@@ -70,6 +70,8 @@ const int DOUBLE_VERTICAL_BAR = 39;
 const int SEMICOLON = 40;
 const int TWO_DOTS = 46;
 const int ELLIPSIS = 42;
+const int TRIPLE_LTHAN = 48;
+const int TRIPLE_GTHAN = 49;
 
 const int DEF = 51;
 const int TYPE = 52;
