@@ -1290,10 +1290,14 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     std::string quoteType = text.substr(0,1);
 
     // strip quote marks
-    text = text.substr(1, text.length()-2);
+    if (quoteType == "<")
+        text = text.substr(3, text.length()-6);
+    else
+        text = text.substr(1, text.length()-2);
 
     Term* term = create_string(branch, text);
     set_source_location(term, startPosition, tokens);
+
     if (quoteType != "'")
         term->stringProp("syntaxHints:quoteType") = quoteType;
     return term;

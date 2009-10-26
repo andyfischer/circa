@@ -209,11 +209,28 @@ void test_identifiers_that_look_like_keywords()
 void test_string_literal()
 {
     token::TokenList results;
-    token::tokenize("\"string literal\"", results);
+    token::tokenize("\"string literal\"'string2'", results);
 
-    test_assert(results.size() == 1);
+    test_assert(results.size() == 2);
     test_assert(results[0].text == "\"string literal\"");
     test_assert(results[0].match == token::STRING);
+    test_assert(results[1].text == "'string2'");
+    test_assert(results[1].match == token::STRING);
+}
+
+void test_triple_quote_string_literal()
+{
+    TokenStream tokens("<<<a string>>>");
+    test_equals(tokens.consume(token::STRING), "<<<a string>>>");
+    test_assert(tokens.finished());
+
+    tokens.reset("<<< hi > >> >>> >>>");
+    test_equals(tokens.consume(token::STRING), "<<< hi > >> >>>");
+    tokens.consume(token::WHITESPACE);
+    tokens.consume(token::GTHAN);
+    tokens.consume(token::GTHAN);
+    tokens.consume(token::GTHAN);
+    test_assert(tokens.finished());
 }
 
 void test_token_stream()
@@ -341,6 +358,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_keywords2);
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers_that_look_like_keywords);
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
+    REGISTER_TEST_CASE(tokenizer_tests::test_triple_quote_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
     REGISTER_TEST_CASE(tokenizer_tests::token_stream_to_string);
     REGISTER_TEST_CASE(tokenizer_tests::test_locations);

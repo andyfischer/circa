@@ -18,6 +18,7 @@ syn match circaFloat	"\<\%(0\|[1-9]\d*\%(_\d\+\)*\)\.\d\+\%(_\d\+\)*\>"					disp
 syn match circaFloat	"\<\%(0\|[1-9]\d*\%(_\d\+\)*\)\%(\.\d\+\%(_\d\+\)*\)\=\%([eE][-+]\=\d\+\%(_\d\+\)*\)\>"	display
 syn region circaString   start=+"+ end=+"+ skip=+\\"+
 syn region circaString   start=+'+ end=+'+ skip=+\\'+
+syn region circaString   start=+<<<+ end=+>>>+
 
 " Keywords
 syn keyword circaKeyword def type begin end if elif else for state return in true false namespace discard
