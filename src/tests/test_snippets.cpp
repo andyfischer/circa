@@ -270,6 +270,21 @@ void test_color_arithmetic()
 void test_branch_value()
 {
     test_snippet("b = { 1 2 3 }", "b[0] == 1, b[1] == 2, b[2] == 3");
+    //test_snippet("b = { apple = 1, bees = 2 }", "b.apple == 1, b.bees == 2");
+}
+
+void test_rebinding_operators()
+{
+    test_snippet("a = 1, a += 2", "a == 3");
+    test_snippet("a = [1 1]::Point, a += [4 4]","a == [5.0 5.0]");
+}
+
+void test_get_field_and_set_field()
+{
+    test_snippet("type A{int z} type B{A y} type C{B x} w = [[[3]]]::C",
+            "w.x.y.z == 3; get_field(w, 'x', 'y', 'z') == 3");
+    test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]::C",
+            "set_field(w, 5, 'x', 'y', 'z') == [[[5 4]]]::C");
 }
 
 void register_tests()
@@ -290,6 +305,8 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_vectorized_funcs);
     REGISTER_TEST_CASE(test_snippets::test_color_arithmetic);
     REGISTER_TEST_CASE(test_snippets::test_branch_value);
+    REGISTER_TEST_CASE(test_snippets::test_rebinding_operators);
+    REGISTER_TEST_CASE(test_snippets::test_get_field_and_set_field);
 }
 
 } // namespace test_snippets

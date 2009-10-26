@@ -1,0 +1,60 @@
+
+include("moving_stars.ca")
+
+-- Player's ship
+type PlayerShip {
+  number x
+}
+
+state PlayerShip player = [window.width/2]
+
+-- Keyboard control for player's ship
+horiz_thrust = 0
+if key_down(LEFT)
+    horiz_thrust = -1
+elif key_down(RIGHT)
+    horiz_thrust = 1
+end
+
+move_speed = 150.0
+
+player.x = player.x + horiz_thrust * move_speed * time_delta
+
+-- Draw player's ship
+player_y = window.height - 20
+
+ship_width = 9
+ship_height = 25
+ship_outline = [[-ship_width 0] [0 -ship_height] [ship_width 0]]
+
+for point in @ship_outline
+    point = point + [player.x player_y]
+end
+
+gl.line_loop(ship_outline #fff)
+
+type Bullet {
+  Point loc
+}
+
+-- Bullets
+state bullets = []
+
+if key_pressed(SPACE)
+    bullets.append([[player.x player_y - ship_height]])
+end
+
+-- Move bullets
+bullet_speed = 200.0
+for bullet in @bullets
+    bullet = bullet :: Bullet
+    bullet = [ [bullet.loc.x bullet.loc.y - bullet_speed * time_delta ]]
+end
+
+-- Draw bullets
+for bullet in bullets
+    bullet = bullet :: Bullet
+    bullet_outline = [[-5 0] [0 5] [5 0] [0 -5]]
+    for point in @bullet_outline point = point + bullet.loc end
+    gl.line_loop(bullet_outline, #fff)
+end

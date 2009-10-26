@@ -331,6 +331,8 @@ void reproduce_dot_expressions() {
     round_trip_source("t = Point(); t.x");
     round_trip_source("t = Point(); t.x = 1.0");
     round_trip_source("t = Point(); a = t.x");
+    round_trip_source("type A{int z} type B{A y} x = B(); x.y.z");
+    round_trip_source("type A{int z} type B{A y} x = B(); x.y.z = 5");
     finish_source_repro_category();
 }
 
