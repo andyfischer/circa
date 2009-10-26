@@ -7,29 +7,40 @@ namespace get_field_function {
 
     void evaluate(Term* caller)
     {
-        std::string name = caller->input(1)->asString();
+        Term* head = caller->input(0);
 
-        int index = type_t::find_field_index(caller->input(0)->type, name);
+        for (int nameIndex=1; nameIndex < caller->numInputs(); nameIndex++) {
+            std::string const& name = caller->input(nameIndex)->asString();
 
-        if (index == -1) {
-            error_occurred(caller, "field not found: " + name);
-            return;
+            int fieldIndex = type_t::find_field_index(head->type, name);
+
+            if (fieldIndex == -1) {
+                error_occurred(caller, "field not found: " + name);
+                return;
+            }
+
+            head = as_branch(head)[fieldIndex];
         }
 
-        Term* field = as_branch(caller->input(0))[index];
-        assign_value(field, caller);
+        assign_value(head, caller);
     }
 
     Term* specializeType(Term* caller)
     {
-        std::string& name = caller->input(1)->asString();
+        Term* head = caller->input(0);
 
-        Branch& type_prototype = type_t::get_prototype(caller->input(0)->type);
+        for (int nameIndex=1; nameIndex < caller->numInputs(); nameIndex++) {
+            std::string const& name = caller->input(1)->asString();
 
-        if (type_prototype.contains(name))
-            return type_prototype[name]->type;
+            Branch& type_prototype = type_t::get_prototype(head->type);
 
-        return ANY_TYPE;
+            if (!type_prototype.contains(name))
+                return ANY_TYPE;
+
+            head = type_prototype[name];
+        }
+
+        return head->type;
     }
 
     std::string toSourceString(Term* term)
@@ -44,7 +55,7 @@ namespace get_field_function {
     void setup(Branch& kernel)
     {
         GET_FIELD_FUNC = import_function(kernel, evaluate,
-                "get_field_by_name(any, string) :: any");
+                "get_field(any, string...) :: any");
         function_t::get_specialize_type(GET_FIELD_FUNC) = specializeType;
         function_t::get_to_source_string(GET_FIELD_FUNC) = toSourceString;
     }

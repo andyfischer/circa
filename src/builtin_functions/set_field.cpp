@@ -9,15 +9,21 @@ namespace set_field_function {
     {
         assign_value(caller->input(0), caller);
 
-        std::string name = caller->input(1)->asString();
-        int index = type_t::find_field_index(caller->input(0)->type, name);
+        Term* head = caller;
 
-        if (index == -1) {
-            error_occurred(caller, "field not found: "+name);
-            return;
+        for (int nameIndex=2; nameIndex < caller->numInputs(); nameIndex++) {
+            std::string name = caller->input(nameIndex)->asString();
+            int index = type_t::find_field_index(head->type, name);
+
+            if (index == -1) {
+                error_occurred(caller, "field not found: "+name);
+                return;
+            }
+
+            head = as_branch(head)[index];
         }
 
-        assign_value(caller->input(2), as_branch(caller)[index]);
+        assign_value(caller->input(1), head);
     }
 
     Term* specializeType(Term* caller)
@@ -30,16 +36,16 @@ namespace set_field_function {
         std::stringstream out;
         out << get_source_of_input(term, 0);
         out << ".";
-        out << term->input(1)->asString();
+        out << term->input(2)->asString();
         out << " =";
-        out << get_source_of_input(term, 2);
+        out << get_source_of_input(term, 1);
         return out.str();
     }
 
     void setup(Branch& kernel)
     {
         SET_FIELD_FUNC = import_function(kernel, evaluate,
-                "set_field(any, string, any) :: any");
+                "set_field(any, any, string...) :: any");
         function_t::get_specialize_type(SET_FIELD_FUNC) = specializeType;
         function_t::get_to_source_string(SET_FIELD_FUNC) = toSourceString;
     }

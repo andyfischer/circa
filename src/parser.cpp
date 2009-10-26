@@ -823,10 +823,11 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
         branch.remove(lexpr);
 
-        rexpr = apply_with_syntax(branch, SET_FIELD_FUNC, RefList(object, field, rexpr), name);
+        rexpr = apply_with_syntax(branch, SET_FIELD_FUNC, RefList(object, rexpr, field), name);
 
         set_source_hidden(field, true);
         get_input_syntax_hint(rexpr, 0, "postWhitespace") = "";
+        get_input_syntax_hint(rexpr, 1, "postWhitespace") = "";
     }
 
     // Or, maybe it was parsed as an index-based access. Turn this into a set_index
