@@ -49,6 +49,8 @@ bool is_callable(Term* term);
 bool inputs_fit_function(Term* func, RefList const& inputs);
 Term* create_overloaded_function(Branch& branch, std::string const& name);
 
+Term* function_get_specialized_output_type(Term* function, Term* call);
+
 bool is_native_function(Term* func);
 
 // If func is overloaded, this returns an overload which is appropriate for 'inputs'.

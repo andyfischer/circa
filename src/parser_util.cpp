@@ -140,6 +140,8 @@ Term* find_and_apply(Branch& branch,
 
 void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
 {
+    assert(term != NULL);
+
     if (term->name != "")
         return;
 

@@ -489,19 +489,28 @@ void test_namespace()
     test_assert(c->asInt() == 5);
 
     branch.clear();
-    ns = branch.eval("namespace ns1; namespace ns2; x = 12; end; end");
+    Term* ns1 = branch.eval("namespace ns1; namespace ns2; x = 12; end; end");
+
+    // Specific test of constant_fold_lexpr
+    Term* gf = branch.eval("hi = get_field(ns1, 'ns2', 'x')");
+    change_function(gf, LEXPR_FUNC);
+    test_assert(gf->input(0) == ns1);
+    gf = parser::constant_fold_lexpr(gf);
+    test_assert(gf->input(0) != ns1);
+    test_assert(gf == ns1->asBranch()["ns2"]->asBranch()["x"]);
+
     Term* x = branch.eval("ns1.ns2.x");
     test_assert(branch);
     test_assert(x->asInt() == 12);
 }
 
-void test_implicit_function_calls()
+void test_member_function_calls()
 {
     Branch branch;
     branch.eval("x = 1");
     branch.eval("r = &x");
     test_assert(branch);
-    Term* s = branch.eval("r.name");
+    Term* s = branch.eval("r.name()");
     test_assert(branch);
     test_assert(s->asString() == "x");
 }
@@ -514,6 +523,66 @@ void test_to_ref_operator()
     test_assert(branch);
     test_assert(is_ref(r));
     test_assert(r->asRef() == a);
+}
+
+void test_dot_separated_identifier()
+{
+#if 0
+    Branch branch;
+    Term* x = branch.eval("x = 1");
+    branch.eval("namespace a namespace b y = 44 end end");
+    branch.eval("type T { int w }");
+    branch.eval("namespace c v = T() end");
+
+    int branchLength = branch.length();
+
+    test_assert(x == parser::compile(&branch, parser::dot_separated_identifier, "x"));
+    test_assert(branchLength == branch.length());
+
+    Term* y = parser::compile(&branch, parser::dot_separated_identifier, "a.b.y");
+    test_assert(is_int(y));
+    test_assert(as_int(y) == 44);
+    test_assert(branchLength == branch.length());
+
+    Term* v = parser::compile(&branch, parser::dot_separated_identifier, "c.v.w");
+    test_assert(is_branch(v));
+    test_assert(branchLength == branch.length());
+#endif
+}
+
+void test_subscripted_atom()
+{
+    Branch branch;
+
+    branch.eval("a = 1");
+    parser::compile(&branch, parser::subscripted_atom, "a.b.c");
+}
+
+void test_lexpr()
+{
+    Branch branch;
+    Term* a = branch.eval("a = 1");
+    Term* ns = branch.eval("namespace ns b = 1 end");
+
+    Term* result = parser::compile(&branch, parser::identifier_or_lexpr, "a");
+    test_assert(result == a);
+
+    result = parser::compile(&branch, parser::identifier_or_lexpr, "ns.b");
+    test_assert(result->function == LEXPR_FUNC);
+    test_assert(result->input(0) == ns);
+    test_assert(result->input(1)->asString() == "b");
+
+    result = parser::constant_fold_lexpr(result);
+    test_assert(is_value(result));
+    test_assert(result == ns->asBranch()["b"]);
+
+    result = parser::compile(&branch, parser::identifier_or_lexpr, "xxx.b");
+    test_assert(result->function == UNKNOWN_IDENTIFIER_FUNC);
+    test_assert(result->name == "xxx.b");
+
+    result = parser::compile(&branch, parser::identifier_or_lexpr, "xxx.a.b.c");
+    test_assert(result->function == UNKNOWN_IDENTIFIER_FUNC);
+    test_assert(result->name == "xxx.a.b.c");
 }
 
 void register_tests()
@@ -548,8 +617,11 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_literal_list);
     REGISTER_TEST_CASE(parser_tests::test_anonymous_type_in_subroutine_decl);
     REGISTER_TEST_CASE(parser_tests::test_namespace);
-    REGISTER_TEST_CASE(parser_tests::test_implicit_function_calls);
+    REGISTER_TEST_CASE(parser_tests::test_member_function_calls);
     REGISTER_TEST_CASE(parser_tests::test_to_ref_operator);
+    REGISTER_TEST_CASE(parser_tests::test_dot_separated_identifier);
+    REGISTER_TEST_CASE(parser_tests::test_subscripted_atom);
+    REGISTER_TEST_CASE(parser_tests::test_lexpr);
 }
 
 } // namespace parser_tests

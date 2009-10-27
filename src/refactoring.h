@@ -29,6 +29,9 @@ void rewrite(Term* term, Term* function, RefList const& _inputs);
 // index, then add NULL terms until it does.
 void rewrite_as_value(Branch& branch, int index, Term* type);
 
+// Remove this term from its owning branch.
+void erase_term(Term* term);
+
 } // namespace circa
 
 #endif

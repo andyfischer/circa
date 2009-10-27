@@ -165,12 +165,6 @@ Branch::clear()
     names.clear();
 }
 
-Term*
-Branch::eval(std::string const& statement)
-{
-    return parser::evaluate_statement(*this, statement);
-}
-
 std::string Branch::toString()
 {
     std::stringstream out;
@@ -187,9 +181,15 @@ std::string Branch::toString()
 }
 
 Term*
-Branch::compile(std::string const& statement)
+Branch::compile(std::string const& code)
 {
-    return parser::compile(this, parser::statement_list, statement);
+    return parser::compile(this, parser::statement_list, code);
+}
+
+Term*
+Branch::eval(std::string const& code)
+{
+    return parser::evaluate(*this, parser::statement_list, code);
 }
 
 namespace branch_t {
@@ -274,6 +274,11 @@ Branch& as_branch(Term* term)
     assert(is_branch(term));
     alloc_value(term);
     return *((Branch*) term->value);
+}
+
+bool is_namespace(Term* term)
+{
+    return is_branch(term) && term->type == NAMESPACE_TYPE;
 }
 
 std::string get_branch_source_filename(Branch& branch)

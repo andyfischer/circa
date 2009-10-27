@@ -7,6 +7,11 @@ namespace get_index_function {
 
     void evaluate(Term* caller)
     {
+        if (!is_branch(caller->input(0))) {
+            error_occurred(caller, "Value is not indexable");
+            return;
+        }
+
         Branch& input = caller->input(0)->asBranch();
         int index = caller->input(1)->asInt();
 

@@ -43,6 +43,7 @@ void round_trip_source(std::string statement)
 
     Branch branch;
     parser::compile(&branch, parser::statement_list, statement);
+
     result.actual = get_branch_source(branch);
     result.passed = result.expected == result.actual;
     result.actual = convert_real_newlines_to_escaped(result.actual);
@@ -324,15 +325,15 @@ void reproduce_with_parse_errors() {
 }
 
 void reproduce_dot_expressions() {
-    round_trip_source("r = &1; r.name");
-    round_trip_source("r = &1; r.asint");
-    round_trip_source("r = &1; r.asint + 5");
+    round_trip_source("r = &1; r.name()");
+    round_trip_source("r = &1; r.asint()");
+    round_trip_source("r = &1; r.asint() + 5");
     round_trip_source("l = []; l.append(1)");
     round_trip_source("t = Point(); t.x");
     round_trip_source("t = Point(); t.x = 1.0");
     round_trip_source("t = Point(); a = t.x");
     round_trip_source("type A{int z} type B{A y} x = B(); x.y.z");
-    round_trip_source("type A{int z} type B{A y} x = B(); x.y.z = 5");
+    //round_trip_source("type A{int z} type B{A y} x = B(); x.y.z = 5");
     finish_source_repro_category();
 }
 

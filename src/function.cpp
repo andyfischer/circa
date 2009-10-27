@@ -275,6 +275,14 @@ Term* create_overloaded_function(Branch& branch, std::string const& name)
     return create_value(branch, OVERLOADED_FUNCTION_TYPE, name);
 }
 
+Term* function_get_specialized_output_type(Term* function, Term* call)
+{
+    Term* outputType = function_t::get_output_type(function);
+    if (function_t::get_specialize_type(function) != NULL)
+        outputType = function_t::get_specialize_type(function)(call);
+    return outputType;
+}
+
 bool is_native_function(Term* func)
 {
     return function_t::get_evaluate(func) != subroutine_t::evaluate;
