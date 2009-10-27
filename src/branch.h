@@ -95,6 +95,7 @@ namespace branch_t {
 
 bool is_branch(Term* term);
 Branch& as_branch(Term* term);
+bool is_namespace(Term* term);
 
 std::string get_branch_source_filename(Branch& branch);
 Branch* get_outer_scope(Branch& branch);

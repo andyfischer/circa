@@ -35,8 +35,8 @@ namespace set_field_function {
     {
         std::stringstream out;
         out << get_source_of_input(term, 0);
-        out << ".";
-        out << term->input(2)->asString();
+        for (int i=2; i < term->numInputs(); i++)
+            out << "." << term->input(i)->asString();
         out << " =";
         out << get_source_of_input(term, 1);
         return out.str();

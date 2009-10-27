@@ -47,8 +47,9 @@ namespace get_field_function {
     {
         std::stringstream out;
         prepend_name_binding(term, out);
-        out << get_source_of_input(term, 0);
-        out << "." << term->input(1)->asString();
+        out << get_relative_name(term, term->input(0));
+        for (int i=1; i < term->numInputs(); i++)
+            out << "." << term->input(i)->asString();
         return out.str();
     }
 

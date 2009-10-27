@@ -50,14 +50,7 @@ Term* apply(Branch& branch, Term* function, RefList const& _inputs, std::string 
     for (int i=0; i < inputs.length(); i++)
         set_input(result, i, inputs[i]);
 
-    Term* outputType = function_t::get_output_type(function);
-
-    assert(outputType != NULL);
-
-    // Check if this function has a specializeType function
-    // Side note: maybe we should do this step a different way.
-    if (function_t::get_specialize_type(function) != NULL)
-        outputType = function_t::get_specialize_type(function)(result);
+    Term* outputType = function_get_specialized_output_type(function, result);
 
     assert(outputType != NULL);
     assert(is_type(outputType));

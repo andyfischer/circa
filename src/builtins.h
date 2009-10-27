@@ -32,6 +32,7 @@ extern Term* IF_BLOCK_FUNC;
 extern Term* IF_EXPR_FUNC;
 extern Term* INCLUDE_FUNC;
 extern Term* INPUT_PLACEHOLDER_FUNC;
+extern Term* LEXPR_FUNC;
 extern Term* LIST_FUNC;
 extern Term* MAP_TYPE;
 extern Term* MULT_FUNC;

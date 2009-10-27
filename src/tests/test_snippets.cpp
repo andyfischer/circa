@@ -136,13 +136,13 @@ void test_modulo()
 
 void test_references()
 {
-    test_snippet("a = 1; ra = &a", "ra.name == 'a'");
+    test_snippet("a = 1; ra = &a", "ra.name() == 'a'");
     test_snippet("a = 1; ra = &a; rb = &a", "ra == rb");
 
     test_snippet("br = begin; a = 1; state b = 2; 3; end;"
                  "bm = branch_mirror(br); cons = bm.get_configs();"
                  "cons_0 = cons[0] :: Ref",
-                 "length(cons) == 1; cons_0.name == 'a'");
+                 "length(cons) == 1; cons_0.name() == 'a'");
 
     // test .input
     test_snippet("a = 1; b = 2; c = add(a,b); c_ref = &c",
@@ -285,6 +285,10 @@ void test_get_field_and_set_field()
             "w.x.y.z == 3; get_field(w, 'x', 'y', 'z') == 3");
     test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]::C",
             "set_field(w, 5, 'x', 'y', 'z') == [[[5 4]]]::C");
+    //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]::C",
+            //"w.x.y.z = 5; w == [[[5 4]]]::C");
+    //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]::C",
+            //"w.x.y.z += 1; w == [[[4 4]]]::C");
 }
 
 void register_tests()

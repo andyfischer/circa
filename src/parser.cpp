@@ -31,11 +31,11 @@ Ref compile(Branch* branch, ParsingStep step, std::string const& input)
     return result;
 }
 
-Term* evaluate_statement(Branch& branch, std::string const& input)
+Ref evaluate(Branch& branch, ParsingStep step, std::string const& input)
 {
     int previousLastIndex = branch.length();
 
-    Term* result = compile(&branch, parser::statement, input);
+    Term* result = compile(&branch, step, input);
 
     // Evaluate all terms that were just created
     for (int i=previousLastIndex; i < branch.length(); i++)
@@ -174,13 +174,6 @@ Term* statement(Branch& branch, TokenStream& tokens)
     else if (tokens.nextIs(RETURN)) {
         result = return_statement(branch, tokens);
     }
-
-#if 0
-    // Include statement
-    else if (tokens.nextIs(INCLUDE)) {
-        result = include_statement(branch, tokens);
-    }
-#endif
 
     // Discard statement
     else if (tokens.nextIs(DISCARD)) {
@@ -409,15 +402,15 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
             Branch& existingOverloads = as_branch(previousBind);
 
             for (int i=0; i < existingOverloads.length(); i++) {
-                Term* alias = apply(overloads, ALIAS_FUNC, RefList(existingOverloads[i]));
+                Term* alias = apply(overloads, COPY_FUNC, RefList(existingOverloads[i]));
                 evaluate_term(alias);
             }
         } else {
-            Term* alias = apply(overloads, ALIAS_FUNC, RefList(previousBind));
+            Term* alias = apply(overloads, COPY_FUNC, RefList(previousBind));
             evaluate_term(alias);
         }
 
-        Term* alias = apply(overloads, ALIAS_FUNC, RefList(recentFunction));
+        Term* alias = apply(overloads, COPY_FUNC, RefList(recentFunction));
         evaluate_term(alias);
 
         set_source_hidden(result, true);
@@ -751,9 +744,9 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
-    int prevBranchLength = branch.length();
+    int originalBranchLength = branch.length();
     Term* expr = infix_expression(branch, tokens);
-    bool expr_is_new = branch.length() != prevBranchLength;
+    bool expr_is_new = branch.length() != originalBranchLength;
 
     for (int i=0; i < expr->numInputs(); i++)
         recursively_mark_terms_as_occuring_inside_an_expression(expr->input(i));
@@ -776,6 +769,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
         return expr;
     }
+
 
     // Otherwise, this is an assignment statement.
     Term* lexpr = expr; // rename for clarity
@@ -1103,13 +1097,137 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
     return subscripted_atom(branch, tokens);
 }
 
+Term* constant_fold_lexpr(Term* call)
+{
+    if (call->function != LEXPR_FUNC)
+        return call;
+
+    while (call->numInputs() > 1) {
+
+        Term* head = call->input(0);
+
+        // Constant-fold a namespace access.
+        if (is_namespace(head)) {
+            Term* nameTerm = call->input(1);
+            std::string& name = nameTerm->asString();
+            Branch& ns = as_branch(head);
+
+            if (!ns.contains(name))
+                return call;
+
+            RefList newInputs(ns[name]);
+
+            for (int i=2; i < call->numInputs(); i++)
+                newInputs.append(call->input(i));
+
+            call->inputs = newInputs;
+
+            erase_term(nameTerm);
+
+        // If 'head' is an unknown identifier, then make this a more specific
+        // unknown identifier.
+        } else if (head->function == UNKNOWN_IDENTIFIER_FUNC) {
+            Term* nameTerm = call->input(1);
+            rename(head, head->name + "." + nameTerm->asString());
+            RefList newInputs(head);
+            for (int i=2; i < call->numInputs(); i++)
+                newInputs.append(call->input(i));
+
+            call->inputs = newInputs;
+            erase_term(nameTerm);
+
+        } else {
+            break;
+        }
+    }
+
+    // Check to remove the lexpr call
+    if (call->numInputs() <= 1) {
+        Term* result = call->input(0);
+        erase_term(call);
+        return result;
+    }
+
+    return call;
+}
+
+std::string lexpr_get_original_string(Term* lexpr)
+{
+    if (lexpr->function != LEXPR_FUNC)
+        return lexpr->name;
+
+    if (lexpr->numInputs() == 0)
+        return "";
+
+    std::stringstream out;
+    out << lexpr->input(0)->name;
+    for (int i=1; i < lexpr->numInputs(); i++)
+        out << "." << lexpr->input(i)->asString();
+    return out.str();
+}
+
+Term* function_call(Branch& branch, Term* function, RefList inputs)
+{
+    std::string originalName = lexpr_get_original_string(function);
+    function = constant_fold_lexpr(function);
+
+    // Check if 'function' is a lexpr. If so then parse this as a member function call.
+    if (function->function == LEXPR_FUNC) {
+        Term* lexprTerm = function;
+        Term* head = lexprTerm->input(0);
+        Term* fieldNameTerm = lexprTerm->input(1);
+        std::string& fieldName = fieldNameTerm->asString();
+        std::string nameRebind;
+
+        if (type_t::get_member_functions(head->type).contains(fieldName)) {
+            inputs.prepend(head);
+
+            function = type_t::get_member_functions(head->type)[fieldName];
+
+            if (head->name != ""
+                    && function_t::get_input_placeholder(function, 0)
+                        ->boolPropOptional("use-as-output", false))
+                nameRebind = head->name;
+
+            erase_term(fieldNameTerm);
+            erase_term(lexprTerm);
+
+            Term* result = apply(branch, function, inputs, nameRebind);
+            get_input_syntax_hint(result, 0, "hidden") = "true";
+            result->stringProp("syntaxHints:functionName") = originalName;
+
+            if (nameRebind != "")
+                result->boolProp("syntaxHints:implicitNameBinding") = true;
+
+            return result;
+
+        } else {
+            Term* result = apply(branch, UNKNOWN_FUNCTION, inputs);
+            result->stringProp("syntaxHints:functionName") = originalName;
+            return result;
+        }
+    } else {
+
+        if (!is_callable(function))
+            function = UNKNOWN_FUNCTION;
+
+        Term* result = apply(branch, function, inputs);
+
+        if (result->function->name != originalName)
+            result->stringProp("syntaxHints:functionName") = originalName;
+
+        return result;
+    }
+}
+
 // Tries to parse an index access or a field access, and returns a new term.
 // May return the same term, and may return a term with a static error.
 // Index access example:
 //   a[0]
 // Field access example:
 //   a.b 
-static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head)
+static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
+    bool& finished)
 {
     int startPosition = tokens.getPosition();
 
@@ -1125,9 +1243,12 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head)
 
         tokens.consume(RBRACKET);
 
+        head = constant_fold_lexpr(head);
+
         Term* result = apply(branch, GET_INDEX_FUNC, RefList(head, subscript));
         get_input_syntax_hint(result, 1, "preWhitespace") = postLbracketWs;
         set_source_location(result, startPosition, tokens);
+        finished = false;
         return result;
 
     } else if (tokens.nextIs(DOT)) {
@@ -1138,12 +1259,44 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head)
                     "Expected identifier after .");
 
         std::string ident = tokens.consume(IDENTIFIER);
-        Term* identTerm = create_string(branch, ident);
+        
+        // If 'head' is already a lexpr() term, then append this name.
+        if (head->function == LEXPR_FUNC) {
+            head->inputs.append(create_string(branch, ident));
 
-        Term* result = apply(branch, GET_FIELD_FUNC, RefList(head, identTerm));
-        set_source_location(result, startPosition, tokens);
+        // Otherwise, start a new lexpr()
+        } else {
+            head = apply(branch, LEXPR_FUNC, RefList(head, create_string(branch, ident)));
+            set_source_location(head, startPosition, tokens);
+        }
+        finished = false;
+        return head;
+
+    } else if (tokens.nextIs(LPAREN)) {
+
+        // Function call
+        Term* function = head;
+
+        tokens.consume(LPAREN);
+
+        RefList inputs;
+        ListSyntaxHints inputHints;
+        consume_list_arguments(branch, tokens, inputs, inputHints);
+
+        if (!tokens.nextIs(RPAREN))
+            return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
+
+        tokens.consume(RPAREN);
+
+        Term* result = function_call(branch, function, inputs);
+        inputHints.apply(result);
+
+        finished = false;
         return result;
+
     } else {
+
+        finished = true;
         return head;
     }
 }
@@ -1154,14 +1307,22 @@ Term* subscripted_atom(Branch& branch, TokenStream& tokens)
 
     Term* result = atom(branch, tokens);
 
-    do {
-        Term* subscripted_result = possible_subscript(branch, tokens, result);
+    bool finished = false;
+    while (!finished) {
+        result = possible_subscript(branch, tokens, result, finished);
+
         if (has_static_error(result))
-            return subscripted_result;
-        if (result == subscripted_result)
             return result;
-        result = subscripted_result;
-    } while(true);
+    };
+
+    result = constant_fold_lexpr(result);
+
+    // lexpr() is a parser temporary, if we haven't removed it already then
+    // make it legitimate by converting it to get_field().
+    if (result->function == LEXPR_FUNC)
+        change_function(result, GET_FIELD_FUNC);
+
+    return result;
 }
 
 Term* atom(Branch& branch, TokenStream& tokens)
@@ -1170,10 +1331,9 @@ Term* atom(Branch& branch, TokenStream& tokens)
     Term* result = NULL;
 
     // identifier?
-    if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AT_SIGN)) {
-        result = identifier_or_function_call(branch, tokens);
-        assert(result != NULL);
-    }
+    if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AT_SIGN))
+        result = identifier(branch, tokens);
+
     // literal integer?
     else if (tokens.nextIs(INTEGER))
         result = literal_integer(branch, tokens);
@@ -1490,15 +1650,79 @@ Term* unknown_identifier(Branch& branch, std::string const& name)
     return term;
 }
 
+Term* identifier_or_lexpr(Branch& branch, TokenStream& tokens)
+{
+    int startPosition = tokens.getPosition();
+
+    std::string id = tokens.consume(IDENTIFIER);
+
+    Term* head = find_named(branch, id);
+    if (head == NULL)
+        head = unknown_identifier(branch, id);
+
+    while (tokens.nextIs(DOT)) {
+        tokens.consume(DOT);
+
+        if (!tokens.nextIs(IDENTIFIER))
+            return compile_error_for_line(branch, tokens, startPosition,
+                    "Expected identifier after .");
+
+        id = tokens.consume(IDENTIFIER);
+
+        if (head->function == UNKNOWN_IDENTIFIER_FUNC) {
+            rename(head, head->name + "." + id);
+            continue;
+        }
+
+        Term* nameTerm = create_string(branch, id);
+
+        // If head is a lexpr(), then append this name.
+        if (head->function == LEXPR_FUNC) {
+            head->inputs.append(nameTerm);
+
+        // Otherwise, start a new lexpr
+        } else {
+            head = apply(branch, LEXPR_FUNC, RefList(head, nameTerm));
+            set_source_location(head, startPosition, tokens);
+        }
+
+        branch.moveToEnd(head);
+    }
+
+    return head;
+}
+
+Term* identifier(Branch& branch, TokenStream& tokens)
+{
+    bool rebindOperator = false;
+
+    if (tokens.nextIs(AT_SIGN)) {
+        tokens.consume(AT_SIGN);
+        rebindOperator = true;
+    }
+
+    std::string name = tokens.consume(IDENTIFIER);
+
+    Term* result = find_named(branch, name);
+
+    if (result == NULL)
+        result = unknown_identifier(branch, name);
+
+    if (rebindOperator)
+        push_pending_rebind(branch, name);
+
+    return result;
+}
+
 Term* identifier_or_function_call(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
-    bool rebind = false;
+    bool rebindOperator = false;
 
     if (tokens.nextIs(AT_SIGN)) {
         tokens.consume(AT_SIGN);
-        rebind = true;
+        rebindOperator = true;
     }
 
     // Consume a dot-separated list of identifiers
@@ -1522,7 +1746,7 @@ Term* identifier_or_function_call(Branch& branch, TokenStream& tokens)
 
     assert(ids.size() > 0);
 
-    if (rebind) {
+    if (rebindOperator) {
         if (ids.size() > 1)
             return compile_error_for_line(branch, tokens, startPosition,
                 "Rebind on dot-separated identifier is not yet supported");
@@ -1606,20 +1830,18 @@ Term* identifier_or_function_call(Branch& branch, TokenStream& tokens)
             function = UNKNOWN_FUNCTION;
 
         RefList inputs = implicitCallInputs;
-        ListSyntaxHints listHints;
+        ListSyntaxHints inputHints;
 
-        if (tokens.nextIs(LPAREN)) {
-            tokens.consume(LPAREN);
-            consume_list_arguments(branch, tokens, inputs, listHints);
+        tokens.consume(LPAREN);
+        consume_list_arguments(branch, tokens, inputs, inputHints);
 
-            if (!tokens.nextIs(RPAREN))
-                return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
+        if (!tokens.nextIs(RPAREN))
+            return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
 
-            tokens.consume(RPAREN);
-        }
+        tokens.consume(RPAREN);
 
         head = apply(branch, function, inputs);
-        listHints.apply(head);
+        inputHints.apply(head);
 
         for (int i=0; i < implicitCallInputs.length(); i++)
             get_input_syntax_hint(head, i, "hidden") = "true";

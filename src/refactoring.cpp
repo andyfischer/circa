@@ -13,14 +13,14 @@ void change_function(Term* term, Term* newFunction)
 
     term->function = newFunction;
 
-    Term* newType = function_t::get_output_type(newFunction);
+    // Check if we need to change the # of inputs
+    if (!function_t::get_variable_args(newFunction))
+        term->inputs.resize(function_t::num_inputs(newFunction));
+
+    Term* newType = function_get_specialized_output_type(newFunction, term);
+
     if (newType != ANY_TYPE)
         change_type(term, newType);
-
-    // Check if we need to change the # of inputs
-    if (!function_t::get_variable_args(newFunction)) {
-        term->inputs.resize(function_t::num_inputs(newFunction));
-    }
 }
 
 void unsafe_change_type(Term *term, Term *type)
@@ -111,6 +111,12 @@ void rewrite_as_value(Branch& branch, int index, Term* type)
         term->inputs = RefList();
         alloc_value(term);
     }
+}
+
+void erase_term(Term* term)
+{
+    if (term->owningBranch != NULL)
+        term->owningBranch->remove(term);
 }
 
 } // namespace circa

@@ -29,14 +29,28 @@ void test_migration(std::string sourceCode, std::string destinationCode, std::st
         return;
     }
 
-    evaluate_branch(source);
+    Term errorListener;
+    evaluate_branch(source, &errorListener);
+    if (errorListener.hasError()) {
+        std::cout << "In " << get_current_test_name() << std::endl;
+        print_runtime_error_formatted(source, std::cout);
+        declare_current_test_failed();
+        return;
+    }
 
     migrate_stateful_values(source, destination);
 
     Branch& assertions = create_branch(destination, "assertions");
     parser::compile(&assertions, parser::statement_list, assertionsCode);
 
-    evaluate_branch(destination);
+    evaluate_branch(destination, &errorListener);
+
+    if (errorListener.hasError()) {
+        std::cout << "In " << get_current_test_name() << std::endl;
+        print_runtime_error_formatted(destination, std::cout);
+        declare_current_test_failed();
+        return;
+    }
 
     int boolean_statements_found = 0;
     for (int i=0; i < assertions.length(); i++) {
