@@ -1332,7 +1332,7 @@ Term* atom(Branch& branch, TokenStream& tokens)
 
     // identifier?
     if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AT_SIGN))
-        result = identifier(branch, tokens);
+        result = identifier_or_lexpr(branch, tokens);
 
     // literal integer?
     else if (tokens.nextIs(INTEGER))
@@ -1654,6 +1654,13 @@ Term* identifier_or_lexpr(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
+    bool rebindOperator = false;
+
+    if (tokens.nextIs(AT_SIGN)) {
+        tokens.consume(AT_SIGN);
+        rebindOperator = true;
+    }
+
     std::string id = tokens.consume(IDENTIFIER);
 
     Term* head = find_named(branch, id);
@@ -1689,188 +1696,9 @@ Term* identifier_or_lexpr(Branch& branch, TokenStream& tokens)
         branch.moveToEnd(head);
     }
 
-    return head;
-}
-
-Term* identifier(Branch& branch, TokenStream& tokens)
-{
-    bool rebindOperator = false;
-
-    if (tokens.nextIs(AT_SIGN)) {
-        tokens.consume(AT_SIGN);
-        rebindOperator = true;
-    }
-
-    std::string name = tokens.consume(IDENTIFIER);
-
-    Term* result = find_named(branch, name);
-
-    if (result == NULL)
-        result = unknown_identifier(branch, name);
-
     if (rebindOperator)
-        push_pending_rebind(branch, name);
+        push_pending_rebind(branch, head->name);
 
-    return result;
-}
-
-Term* identifier_or_function_call(Branch& branch, TokenStream& tokens)
-{
-    int startPosition = tokens.getPosition();
-
-    bool rebindOperator = false;
-
-    if (tokens.nextIs(AT_SIGN)) {
-        tokens.consume(AT_SIGN);
-        rebindOperator = true;
-    }
-
-    // Consume a dot-separated list of identifiers
-    std::vector<std::string> ids;
-    std::stringstream fullName;
-
-    while (tokens.nextIs(IDENTIFIER)) {
-        std::string id = tokens.consume(IDENTIFIER);
-        ids.push_back(id);
-        fullName << id;
-
-        if (tokens.nextIs(DOT)) {
-            tokens.consume(DOT);
-            fullName << ".";
-
-            if (!tokens.nextIs(IDENTIFIER))
-                return compile_error_for_line(branch, tokens, startPosition,
-                    "Expected identifier after .");
-        }
-    }
-
-    assert(ids.size() > 0);
-
-    if (rebindOperator) {
-        if (ids.size() > 1)
-            return compile_error_for_line(branch, tokens, startPosition,
-                "Rebind on dot-separated identifier is not yet supported");
-
-        push_pending_rebind(branch, ids[0]);
-    }
-
-    bool nameLookupFailed = false;
-    Term* head = NULL;
-    RefList implicitCallInputs;
-    bool rebindName = false;
-    std::stringstream partialName;
-
-    // Iterate through the dot-separated names and see what they refer to.
-    for (unsigned name_index=0; name_index < ids.size(); name_index++) {
-        std::string& name = ids[name_index];
-        implicitCallInputs = RefList();
-
-        if (name_index > 0)
-            partialName << ".";
-        partialName << name;
-
-        // If this is the first name, then just lookup that name in our branch.
-        // (Otherwise, there are a bunch of fancy rules which assume that
-        // 'head' is not NULL)
-        if (name_index == 0) {
-            head = find_named(branch, name);
-
-            if (head == NULL) {
-                nameLookupFailed = true;
-                break;
-            }
-        }
-
-        // Check if the lhs is a namespace
-        else if (head->type == NAMESPACE_TYPE) {
-            Branch& namespaceContents = as_branch(head);
-            if (!namespaceContents.contains(name)) {
-                nameLookupFailed = true;
-                break;
-            }
-
-            head = namespaceContents[name];
-        }
-        
-        // Check if the name is a member function in the type of lhs
-        else if (type_t::get_member_functions(head->type).contains(name)) {
-
-            implicitCallInputs = RefList(head);
-
-            Term* function = type_t::get_member_functions(head->type)[name];
-
-            if (head->name != ""
-                    && function_t::get_input_placeholder(function, 0)
-                        ->boolPropOptional("use-as-output", false))
-                rebindName = true;
-
-            head = function;
-        }
-
-        // Check if the lhs's type defines this name as a property
-        else if (type_t::find_field_index(head->type, name) != -1) {
-            head = apply(branch, GET_FIELD_FUNC, RefList(head, create_string(branch, name)));
-            set_source_location(head, startPosition, tokens);
-            get_input_syntax_hint(head, 0, "postWhitespace") = "";
-        }
-
-        // Otherwise, give up
-        else {
-            nameLookupFailed = true;
-            break;
-        }
-    }
-
-    if (tokens.nextIs(LPAREN)) {
-        Term* function = head;
-
-        if (nameLookupFailed)
-            function = UNKNOWN_FUNCTION;
-        else if (!is_callable(function))
-            function = UNKNOWN_FUNCTION;
-
-        RefList inputs = implicitCallInputs;
-        ListSyntaxHints inputHints;
-
-        tokens.consume(LPAREN);
-        consume_list_arguments(branch, tokens, inputs, inputHints);
-
-        if (!tokens.nextIs(RPAREN))
-            return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
-
-        tokens.consume(RPAREN);
-
-        head = apply(branch, function, inputs);
-        inputHints.apply(head);
-
-        for (int i=0; i < implicitCallInputs.length(); i++)
-            get_input_syntax_hint(head, i, "hidden") = "true";
-
-        if (head->function->name != fullName.str())
-            head->stringProp("syntaxHints:functionName") = fullName.str();
-
-        if (rebindName) {
-            branch.bindName(head, implicitCallInputs[0]->name);
-            head->boolProp("syntaxHints:implicitNameBinding") = true;
-        }
-
-    } else {
-        if (nameLookupFailed)
-            head = unknown_identifier(branch, fullName.str());
-        else if (is_callable(head) && ids.size() > 1) {
-            // Support name.function syntax to implicity call a function
-            head = apply(branch, head, implicitCallInputs);
-            head->boolProp("syntaxHints:no-parens") = true;
-            set_source_location(head, startPosition, tokens);
-
-            if (head->function->name != fullName.str())
-                head->stringProp("syntaxHints:functionName") = fullName.str();
-            for (int i=0; i < implicitCallInputs.length(); i++)
-                get_input_syntax_hint(head, i, "hidden") = "true";
-        }
-    }
-
-    assert(head != NULL);
     return head;
 }
 
