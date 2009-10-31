@@ -1,5 +1,8 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
+#ifndef CIRCA_STATEFUL_CODE_INCLUDED
+#define CIRCA_STATEFUL_CODE_INCLUDED
+
 #include "common_headers.h"
 
 namespace circa {
@@ -24,3 +27,5 @@ void migrate_stateful_values(Branch& source, Branch& dest);
 extern bool MIGRATE_STATEFUL_VALUES_VERBOSE;
 
 } // namespace circa
+
+#endif

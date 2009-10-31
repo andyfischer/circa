@@ -107,12 +107,24 @@ void test_rebind_internally()
     test_assert(branch["found_3"]->asBool() == false);
 }
 
+void test_migrate_state()
+{
+    Branch branch;
+    branch.eval("for i in 0..3; state int s = i; end");
+
+    Branch state;
+    persist_state_from_branch(branch, state);
+
+    test_assert(state.length() > 0);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(for_loop_tests::test_simple);
     REGISTER_TEST_CASE(for_loop_tests::type_inference_for_iterator);
     REGISTER_TEST_CASE(for_loop_tests::test_rebind_external);
     REGISTER_TEST_CASE(for_loop_tests::test_rebind_internally);
+    REGISTER_TEST_CASE(for_loop_tests::test_migrate_state);
 }
 
 } // for_loop_tests
