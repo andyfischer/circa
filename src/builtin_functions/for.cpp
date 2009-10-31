@@ -11,7 +11,7 @@ namespace for_function {
         result << "for ";
         result << get_for_loop_iterator(term)->name;
         result << " in ";
-        result << get_source_of_input(term,0);
+        result << get_source_of_input(term, 1);
         return result.str();
     }
 
@@ -40,7 +40,7 @@ namespace for_function {
 
     void setup(Branch& kernel)
     {
-        FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(List) :: Code");
+        FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(state List, List) :: Code");
         function_t::get_to_source_string(FOR_FUNC) = toSourceString;
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");

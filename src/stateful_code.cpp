@@ -50,8 +50,8 @@ void load_state_into_branch(Branch& state, Branch& branch)
 void persist_state_from_branch(Branch& branch, Branch& state)
 {
     int write = 0;
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    for (int read=0; read < branch.length(); read++) {
+        Term* term = branch[read];
 
         if (!is_stateful(term))
             continue;

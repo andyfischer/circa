@@ -5,21 +5,20 @@
 namespace circa {
 
 /* Organization of for loop contents:
-   [0] #state
-   [1] #attributes
+   [0] #attributes
      [0] #is_first_iteration
      [1] #any_iterations
      [2] #modify_list
      [3] #discard_called
-   [2] #rebinds
-   [3] iterator
-   [4 .. n-2] user's code
+   [1] #rebinds
+   [2] iterator
+   [3 .. n-2] user's code
    [n-1] #rebinds_for_outer
 */
 
 Branch& get_for_loop_state(Term* forTerm)
 {
-    return as_branch(forTerm)[0]->asBranch();
+    return forTerm->input(0)->asBranch();
 }
 
 Branch& get_for_loop_iteration_state(Term* forTerm, int index)
@@ -27,35 +26,35 @@ Branch& get_for_loop_iteration_state(Term* forTerm, int index)
     return get_for_loop_state(forTerm)[index]->asBranch();
 }
 
-Term* get_for_loop_is_first_iteration(Term* forTerm)
-{
-    return as_branch(forTerm)[1]->asBranch()[0];
-}
-
 Branch& get_for_loop_rebinds(Term* forTerm)
 {
     Branch& contents = as_branch(forTerm);
-    return contents[2]->asBranch();
+    return contents[1]->asBranch();
 }
 
 Term* get_for_loop_iterator(Term* forTerm)
 {
-    return as_branch(forTerm)[3];
+    return as_branch(forTerm)[2];
+}
+
+Term* get_for_loop_is_first_iteration(Term* forTerm)
+{
+    return as_branch(forTerm)[0]->asBranch()[0];
 }
 
 Term* get_for_loop_any_iterations(Term* forTerm)
 {
-    return as_branch(forTerm)[1]->asBranch()[1];
+    return as_branch(forTerm)[0]->asBranch()[1];
 }
 
 Term* get_for_loop_modify_list(Term* forTerm)
 {
-    return as_branch(forTerm)[1]->asBranch()[2];
+    return as_branch(forTerm)[0]->asBranch()[2];
 }
 
 Term* get_for_loop_discard_called(Term* forTerm)
 {
-    return as_branch(forTerm)[1]->asBranch()[3];
+    return as_branch(forTerm)[0]->asBranch()[3];
 }
 
 Branch& get_for_loop_rebinds_for_outer(Term* forTerm)
@@ -67,7 +66,6 @@ Branch& get_for_loop_rebinds_for_outer(Term* forTerm)
 void setup_for_loop_pre_code(Term* forTerm)
 {
     Branch& forContents = as_branch(forTerm);
-    create_list(forContents, "#state");
     Branch& attributes = create_branch(forContents, "#attributes");
     create_bool(attributes, false, "#is_first_iteration");
     create_bool(attributes, false, "#any_iterations");
@@ -98,7 +96,7 @@ void create_rebind_branch(Branch& rebinds, Branch& source, Term* rebindCondition
 void setup_for_loop_post_code(Term* forTerm)
 {
     Branch& forContents = as_branch(forTerm);
-    std::string listName = forTerm->input(0)->name;
+    std::string listName = forTerm->input(1)->name;
     Branch& outerScope = *forTerm->owningBranch;
 
     // Rebind any names that are used inside this for loop, using their
@@ -167,7 +165,7 @@ void setup_for_loop_post_code(Term* forTerm)
 
 void evaluate_for_loop(Term* forTerm)
 {
-    Term* listTerm = forTerm->input(0);
+    Term* listTerm = forTerm->input(1);
     Branch& codeBranch = as_branch(forTerm);
     Branch& stateBranch = get_for_loop_state(forTerm);
 
@@ -180,11 +178,10 @@ void evaluate_for_loop(Term* forTerm)
     Term* listOutput = NULL;
     int listOutputWriteHead = 0;
 
-    if (modifyList) {
+    if (modifyList)
         listOutput = get_for_loop_rebinds_for_outer(forTerm)[listTerm->name];
-    }
 
-    resize_list(stateBranch, as_branch(listTerm).length(), BRANCH_TYPE);
+    resize_list(stateBranch, numIterations, BRANCH_TYPE);
 
     // Initialize state for any uninitialized slots
     for (int i=0; i < numIterations; i++) {
@@ -201,9 +198,8 @@ void evaluate_for_loop(Term* forTerm)
     Term* iterator = get_for_loop_iterator(forTerm);
     get_for_loop_any_iterations(forTerm)->asBool() = numIterations > 0;
 
-    if (numIterations == 0) {
+    if (numIterations == 0)
         evaluate_branch(get_for_loop_rebinds_for_outer(forTerm));
-    }
 
     for (int i=0; i < numIterations; i++) {
         as_bool(isFirstIteration) = i == 0;
