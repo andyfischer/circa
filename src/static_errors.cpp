@@ -119,7 +119,8 @@ std::string get_static_error_message(Term* term)
 
         out << "Input type " << term->input(errorIndex)->type->name
             << " doesn't fit in expected type "
-            << function_t::get_input_type(term->function, errorIndex)->name << " (in function "
+            << function_t::get_input_type(term->function, errorIndex)->name
+            << " (for arg " << errorIndex << " of function "
             << term->function->name << ")";
         return out.str();
     } 

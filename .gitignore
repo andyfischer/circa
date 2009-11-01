@@ -52,5 +52,6 @@ x.ca
 .DS_Store
 *.os
 ptc
+assemblee
 Box2D
 bricks.ca

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 import os
 
@@ -11,7 +12,7 @@ def main():
         os.mkdir('src/generated')
 
     # generate setup_builtin_functions.cpp and register_all_tests.cpp
-    from tools import generate_cpp_registration
+    import generate_cpp_registration
     generate_cpp_registration.do_builtin_functions(
         'src/builtin_functions',
         'src/generated/setup_builtin_functions.cpp')
