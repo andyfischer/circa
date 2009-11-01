@@ -7,15 +7,9 @@ namespace circa {
 Term* apply(Branch& branch, Term* function, RefList const& _inputs, std::string const& name)
 {
     assert(function != NULL);
-    if(!is_callable(function))
-        throw std::runtime_error("Function "+function->name+" is not callable");
 
-    // Check if 'function' is actually a type
-    if (is_type(function)) {
-        Term* result = create_value(branch, function, name);
-        result->boolProp("constructor") = true;
-        return result;
-    }
+    if (!is_callable(function))
+        throw std::runtime_error("Function "+function->name+" is not callable");
 
     // Make a local copy of _inputs
     RefList inputs = _inputs;

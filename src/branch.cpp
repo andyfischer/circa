@@ -10,18 +10,6 @@ Branch::~Branch()
     _terms.clear();
 }
 
-Branch& Branch::operator=(Branch const& b)
-{
-    // Const cast because duplicate_branch is not const-correct
-    Branch& b_unconst = const_cast<Branch&>(b);
-
-    clear();
-
-    duplicate_branch(b_unconst, *this);
-
-    return *this;
-}
-
 int Branch::findIndex(Term* term)
 {
     for (int i=0; i < length(); i++) 
@@ -254,7 +242,6 @@ namespace branch_t {
             return false;
 
         for (int i=0; i < lhs.length(); i++) {
-
             if (!circa::equals(lhs[i], rhs[i]))
                 return false;
         }
@@ -333,6 +320,8 @@ void duplicate_branch(Branch& source, Branch& dest)
     ReferenceMap newTermMap;
 
     duplicate_branch_nested(newTermMap, source, dest);
+
+    Timer timer;
 
     // Remap pointers
     for (int i=0; i < dest.length(); i++)
