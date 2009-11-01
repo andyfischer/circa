@@ -58,3 +58,51 @@ for bullet in bullets
     for point in @bullet_outline point = point + bullet.loc end
     gl.line_loop(bullet_outline, #fff)
 end
+
+-- Enemies
+type Enemy {
+    int x
+    int y
+}
+
+flock_space_x = 41.1
+flock_space_y = 28.7
+flock_count_x = 10
+flock_count_y = 3
+state flock_direction = 1
+state flock_offset0.0
+
+flock_total_width = flock_count_x*flock_space_x
+flock_total_height = flock_count_y*flock_space_y
+
+flock_left_x = (window.width - flock_total_width) / 2
+flock_top_y = 35.0
+
+def initialize_enemies() :: List
+    result = []
+    for x in 0..flock_count_x
+        for y in 0..flock_count_y
+            result.append([x y] :: Enemy)
+        end
+    end
+    return result
+end
+
+state enemies = initialize_enemies()
+
+def draw_enemy(Point loc)
+    height = 10.0
+    width = 10.0
+    lines = [[0 0] [0 height] [width height] [width 0]]
+    for line in @lines line += loc end
+    gl.line_loop(lines, #fff)
+end
+
+-- Draw enemies
+for enemy in enemies
+    enemy = enemy::Enemy
+
+    loc = [enemy.x * flock_space_x + flock_left_x,
+        enemy.y * flock_space_y + flock_top_y]
+    draw_enemy(loc)
+end
