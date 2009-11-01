@@ -348,7 +348,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     // Output type
     Term* outputType = VOID_TYPE;
-    assert(!tokens.nextNonWhitespaceIs(COLON));
+
     if (tokens.nextNonWhitespaceIs(DOUBLE_COLON)) {
         result->stringProp("syntaxHints:whitespacePreColon") = possible_whitespace(tokens);
         tokens.consume(DOUBLE_COLON);

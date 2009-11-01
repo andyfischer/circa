@@ -250,7 +250,7 @@ fps = fps_counter.lastRecoredFps
 namespace tweak
     def button(Ref r, Point loc, string name)
         "Draw a button which displays the value of 'r', allowing the user to tweak that value using mouse input."
-        str = concat(name ' = ' r.to_string)
+        str = concat(name ' = ' r.to_string())
 
         text_sprite = text.render_text(ui_font_medium, str, #000)
         padding = 3.0
@@ -314,8 +314,8 @@ users_branch = include(user_script_filename)
 -- Draw HUD
 
 -- Draw fpses
---text_sprite = text.render_text(ui_font_medium, concat('fps: ' fps), #fff)
---text.draw_rendered_text(text_sprite, 10 280)
+text_sprite = text.render_text(ui_font_medium, concat('fps: ' fps), #fff)
+text.draw_rendered_text(text_sprite, 10 280)
 
 -- Name selector
 if toggle(key_pressed(KEY_B))
