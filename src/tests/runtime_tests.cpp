@@ -14,7 +14,7 @@ void spy_function(Term* caller)
 
 void i_only_throw_errors(Term* caller)
 {
-    error_occurred(caller, "error");
+    error_occurred(caller, "i only throw errors");
 }
 
 void init_test_functions(Branch& branch)
@@ -66,6 +66,29 @@ void blocked_by_error()
     test_assert(!is_value_alloced(spy_blocked));
 }
 
+void error_message()
+{
+    Branch branch;
+    init_test_functions(branch);
+
+    branch.eval("def hey() i_only_throw_errors() end");
+
+    test_assert(!has_runtime_error(branch));
+
+    branch.eval("hey()");
+
+    test_assert(has_runtime_error(branch));
+
+    std::stringstream out;
+    print_runtime_error_formatted(branch, out);
+
+    if (out.str().find("!!! no error found") != std::string::npos) {
+        std::cout << "In runtime_tests::error_message:" << std::endl;
+        std::cout << out.str();
+        declare_current_test_failed();
+    }
+}
+
 void test_misc()
 {
     test_assert(is_type(TYPE_TYPE));
@@ -107,6 +130,7 @@ void register_tests()
 {
     REGISTER_TEST_CASE(runtime_tests::test_simple);
     REGISTER_TEST_CASE(runtime_tests::blocked_by_error);
+    REGISTER_TEST_CASE(runtime_tests::error_message);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
     REGISTER_TEST_CASE(runtime_tests::test_resize_list);
 }
