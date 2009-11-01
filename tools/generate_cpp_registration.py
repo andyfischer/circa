@@ -112,7 +112,3 @@ void register_all_tests()
 
 } // namespace circa
 """
-
-if __name__ == "__main__":
-    do_builtin_functions("../src/builtin_functions", "../src/setup_builtin_functions.cpp")
-    do_builtin_functions("../src/tests", "../src/register_all_tests.cpp")
