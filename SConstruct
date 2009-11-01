@@ -7,11 +7,12 @@ def fatal(msg):
     print "fatal:",msg
     exit(1)
 
-ROOT = Environment(tools = ["default"], toolpath=".")
-if not os.path.exists('build'): os.mkdir('build')
-
 POSIX = os.name == 'posix'
 WINDOWS = os.name == 'nt'
+
+ROOT = Environment(tools = ["default"], toolpath=".")
+
+if not os.path.exists('build'): os.mkdir('build')
 
 # Check for a Mac-like environment. On Macs, 'POSIX' is true, but there is
 # a little bit of special behavior for using frameworks.
