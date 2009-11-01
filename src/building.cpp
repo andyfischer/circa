@@ -4,25 +4,19 @@
 
 namespace circa {
 
-Term* apply(Branch& branch, Term* function, RefList const& _inputs, std::string const& name)
+Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string const& name)
 {
     assert(function != NULL);
 
     if (!is_callable(function))
         throw std::runtime_error("Function "+function->name+" is not callable");
 
-    // Make a local copy of _inputs
-    RefList inputs = _inputs;
-
     // Check to specialize function
     function = specialize_function(function, inputs);
 
-    // Create the term
-    Term* result = new Term();
-    result->function = function;
-
-    // If 'function' has hidden state, then create a container for that state, if needed
-    if (is_function_stateful(function) && (inputs.length() < function_t::num_inputs(function)))
+    // If 'function' has hidden state, create the necessary state.
+    if (is_function_stateful(function)
+            && (inputs.length() < function_t::num_inputs(function)))
     {
         std::stringstream new_value_name;
         new_value_name << "#hidden_state";
@@ -31,8 +25,17 @@ Term* apply(Branch& branch, Term* function, RefList const& _inputs, std::string 
                 function_t::get_hidden_state_type(function),
                 new_value_name.str());
         set_source_hidden(stateContainer, true);
-        inputs.prepend(stateContainer);
+
+        RefList newInputs(stateContainer);
+        for (int i=0; i < inputs.length(); i++)
+            newInputs.append(inputs[i]);
+
+        return apply(branch, function, newInputs, name);
     }
+
+    // Create the term
+    Term* result = new Term();
+    result->function = function;
 
     // Add term to branch
     branch.append(result);
@@ -64,8 +67,6 @@ Term* create_duplicate(Branch& branch, Term* source, std::string const& name, bo
 {
     Term* term = apply(branch, source->function, source->inputs, name);
     change_type(term, source->type);
-
-    term->name = source->name;
 
     if (source->value != NULL) {
         alloc_value(term);
