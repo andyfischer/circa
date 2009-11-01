@@ -3,8 +3,7 @@ gh-pages
 circa-web
 
 # generated files:
-src/setup_builtin_functions.cpp
-src/register_all_tests.cpp
+src/generated
 
 # build results:
 build
