@@ -228,18 +228,6 @@ void test_assign()
     assign_value(a, b);
 }
 
-void term_pointer_operator_overload()
-{
-    Branch branch;
-
-    test_assert(((Term*) branch) == NULL);
-
-    Term* b = apply(branch, BRANCH_FUNC, RefList());
-    Branch& b_asbranch = as_branch(b);
-
-    test_assert(((Term*) b_asbranch) == b);
-}
-
 void test_get_source_file_location()
 {
     Branch branch;
@@ -286,7 +274,6 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_migrate);
     REGISTER_TEST_CASE(branch_tests::test_migrate2);
     REGISTER_TEST_CASE(branch_tests::test_assign);
-    REGISTER_TEST_CASE(branch_tests::term_pointer_operator_overload);
     REGISTER_TEST_CASE(branch_tests::test_shorten);
 }
 

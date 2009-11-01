@@ -13,7 +13,7 @@ void test_migration(std::string sourceCode, std::string destinationCode, std::st
     parser::compile(&source, parser::statement_list, sourceCode);
 
     if (has_static_errors(source)) {
-        std::cout << "In code: " << source;
+        std::cout << "In code: " << sourceCode;
         print_static_errors_formatted(source, std::cout);
         declare_current_test_failed();
         return;
@@ -23,7 +23,7 @@ void test_migration(std::string sourceCode, std::string destinationCode, std::st
     parser::compile(&destination, parser::statement_list, destinationCode);
 
     if (has_static_errors(destination)) {
-        std::cout << "In code: " << destination;
+        std::cout << "In code: " << destinationCode;
         print_static_errors_formatted(destination, std::cout);
         declare_current_test_failed();
         return;
