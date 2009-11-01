@@ -9,7 +9,6 @@ namespace include_function {
 
     void load_script(Term* caller)
     {
-        Timer timer;
 
         Term* fileSignature = caller->input(0);
         Branch& contents = as_branch(caller);
@@ -22,8 +21,7 @@ namespace include_function {
         if (file_changed_function::check(caller, fileSignature, actual_filename)
                 || contents.length() == 0)
         {
-            if (PRINT_TIMING)
-                std::cout << "pre duplicate: " << timer << std::endl;
+            Timer timer;
 
             Branch previous_contents;
             duplicate_branch(contents, previous_contents);
