@@ -1208,9 +1208,16 @@ Term* function_call(Branch& branch, Term* function, RefList inputs)
         }
     } else {
 
+        if (is_type(function)) {
+            Term* result = create_value(branch, function);
+            result->boolProp("constructor") = true;
+
+            return result;
+        }
+        
         if (!is_callable(function))
             function = UNKNOWN_FUNCTION;
-
+       
         Term* result = apply(branch, function, inputs);
 
         if (result->function->name != originalName)

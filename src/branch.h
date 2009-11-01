@@ -22,8 +22,6 @@ struct Branch
     Branch() : owningTerm(NULL) {}
     ~Branch();
 
-    Branch& operator=(Branch const& b);
-
     int length() const { return _terms.length(); }
 
     Term* get(int index) const { return _terms[index]; }
@@ -82,6 +80,10 @@ struct Branch
     Term* eval(std::string const& statement);
 
     std::string toString();
+
+// Assignment operator is disabled
+private:
+    Branch& operator=(Branch const& b) { return *this; }
 };
 
 // Hosted functions

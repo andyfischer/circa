@@ -38,6 +38,7 @@
 #include "subroutine.h"
 #include "term.h"
 #include "testing.h"
+#include "timer.h"
 #include "tokenizer.h"
 #include "token_stream.h"
 #include "type.h"

@@ -5,11 +5,9 @@
 
 namespace circa {
 
-// Examine 'function' and 'inputs' and returns a result term. A few things
-// may happen here:
-//  1. 'function' might be a type, in which case we create a value of this type.
-//  2. We might specialize an overloaded function
-Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string const& name="");
+// Examine 'function' and 'inputs' and returns a result term.
+Term* apply(Branch& branch, Term* function, RefList const& inputs,
+    std::string const& name="");
 
 // Find the named function in this branch, and then call the above apply.
 Term* apply(Branch& branch, std::string const& functionName, 

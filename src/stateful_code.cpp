@@ -57,13 +57,12 @@ void persist_state_from_branch(Branch& branch, Branch& state)
             continue;
 
         rewrite_as_value(state, write, term->type);
+        rename(state[write], term->name);
 
         if (is_value_alloced(term))
             assign_value(term, state[write]);
 
         write++;
-
-        // todo: possibly copy names as well
     }
 
     if (write > state.length())
