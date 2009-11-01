@@ -95,6 +95,26 @@ namespace gl
     def set_uniform(string name, any value) end
 end
 
+namespace image
+    type Image {
+        string filename
+        int texid
+        int width
+        int height
+    }
+
+    def _load(string filename) :: Image end
+
+    def load(string filename) :: Image
+        state Image existing
+        if file_changed(filename)
+            existing = _load(filename)
+        end
+        return existing
+    end
+    def draw_clipped(Image image, Rect clip, Rect destination) end
+end
+
 def load_texture(state int, string) :: int
 end
 
