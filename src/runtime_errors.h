@@ -11,6 +11,7 @@ void error_occurred(Term* errorTerm, std::string const& message);
 void nested_error_occurred(Term* errorTerm);
 
 bool has_runtime_error(Term* term);
+bool has_runtime_error(Branch& branch);
 std::string get_runtime_error_message(Term* term);
 
 void print_runtime_error_formatted(Branch& branch, std::ostream& output);

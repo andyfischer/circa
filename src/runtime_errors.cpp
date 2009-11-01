@@ -25,8 +25,16 @@ void nested_error_occurred(Term* errorTerm)
 bool has_runtime_error(Term* term)
 {
     return term->hasError();
-
 }
+
+bool has_runtime_error(Branch& branch)
+{
+    for (int i=0; i < branch.length(); i++)
+        if (has_runtime_error(branch[i]))
+            return true;
+    return false;
+}
+
 std::string get_runtime_error_message(Term* term)
 {
     return term->getErrorMessage();

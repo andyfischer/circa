@@ -5,59 +5,35 @@
 namespace circa {
 namespace runtime_error_snippets {
 
-struct SnippetResult
-{
-    std::string text;
-    bool exceptionThrown;
-    bool parseError;
-    bool runtimeError;
-
-    SnippetResult() : exceptionThrown(false), parseError(false), runtimeError(false) {}
-};
-
-std::vector<SnippetResult> gResults;
-
 void test_input(std::string const& in)
 {
-    SnippetResult result;
-    result.text = in;
-
     Branch branch;
     parser::compile(&branch, parser::statement_list, in);
+
     if (has_static_errors(branch)) {
-        result.parseError = true;
-    } else {
-        Term errorListener;
-        evaluate_branch(branch, &errorListener);
-        result.runtimeError = errorListener.hasError();
+        std::cout << "In code snippet: " << in << std::endl;
+        print_static_errors_formatted(branch, std::cout);
+        dump_branch(branch);
+        declare_current_test_failed();
+        return;
     }
 
-    gResults.push_back(result);
-}
+    Term errorListener;
+    evaluate_branch(branch, &errorListener);
 
-void finish_category()
-{
-    bool anyFailures = false;
-    for (unsigned i=0; i < gResults.size(); i++) {
-        if (gResults[i].parseError)
-            anyFailures = true;
-        else if (!gResults[i].runtimeError)
-            anyFailures = true;
+    if (!errorListener.hasError()) {
+        std::cout << "No runtime error: " << in << std::endl;
+        dump_branch(branch);
+        declare_current_test_failed();
+        return;
     }
+    
+    std::stringstream formattedError;
+    print_runtime_error_formatted(branch, formattedError);
 
-    if (anyFailures) {
-        std::cout << get_current_test_name() << " failed:" << std::endl;
-
-        for (unsigned i=0; i < gResults.size(); i++) {
-            if (gResults[i].parseError)
-                std::cout << "[PARSE ERROR]";
-            else if (!gResults[i].runtimeError)
-                std::cout << "[NO RT ERROR]";
-            else
-                std::cout << "[  passed   ]";
-
-            std::cout << " " << gResults[i].text << std::endl;
-        }
+    if (formattedError.str().find("!!! no error found") != std::string::npos) {
+        std::cout << formattedError.str();
+        declare_current_test_failed();
     }
 }
 
@@ -67,7 +43,7 @@ void test_runtime_errors()
     test_input("if true assert(false) end");
     test_input("for i in [1] assert(false) end");
     test_input("def hey() assert(false) end; hey()");
-    finish_category();
+    test_input("def hey()::bool assert(false) return true end; if hey() end");
 }
 
 void register_tests()
