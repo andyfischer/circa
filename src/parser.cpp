@@ -546,7 +546,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             // Create an 'else' block
             encounteredElse = true;
             Branch& elseBranch = create_branch(contents, "else");
-            ((Term*)elseBranch)->stringProp("syntaxHints:preWhitespace") = preKeywordWhitespace;
+            (elseBranch.owningTerm)->stringProp("syntaxHints:preWhitespace") = preKeywordWhitespace;
             consume_branch_until_end(elseBranch, tokens);
         }
 
@@ -566,7 +566,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     // If we didn't encounter an 'else' block, then create an empty one.
     if (!encounteredElse) {
         Branch& branch = create_branch(contents, "else");
-        set_source_hidden(branch, true);
+        set_source_hidden(branch.owningTerm, true);
     }
 
     // Move the if_block term to be after the condition terms
@@ -1604,7 +1604,7 @@ Term* plain_branch(Branch& branch, TokenStream& tokens)
     if (usingBeginEnd) tokens.consume(BEGIN);
     else tokens.consume(LBRACE);
 
-    Term* result = create_branch(branch);
+    Term* result = create_branch(branch).owningTerm;
     result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
     consume_branch_until_end(as_branch(result), tokens);
     result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);

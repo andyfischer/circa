@@ -33,9 +33,6 @@ struct Branch
     Term* get(std::string const& name) const { return names[name]; }
     Term* operator[](std::string const& name) const { return get(name); }
 
-    // Overload to conveniently pass this branch via its owningTerm
-    operator Term*() { return owningTerm; }
-
     Term* last() { if (length() == 0) return NULL; else return _terms[length()-1]; }
 
     // Find the index of the given term, returns -1 if not found.
