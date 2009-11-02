@@ -9,7 +9,6 @@ namespace include_function {
 
     void load_script(Term* caller)
     {
-
         Term* fileSignature = caller->input(0);
         Branch& contents = as_branch(caller);
 

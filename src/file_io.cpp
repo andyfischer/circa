@@ -76,6 +76,10 @@ std::string get_path_relative_to_source(Term* relativeTo, std::string const& pat
     if (relativeTo->owningBranch == NULL)
         return path;
 
+    // Don't modify absolute paths
+    if (path.length() > 0 && path[0] == '/')
+        return path;
+
     std::string scriptLocation = get_source_file_location(*relativeTo->owningBranch);
 
     if (scriptLocation == "")

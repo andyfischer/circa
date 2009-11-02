@@ -7,7 +7,8 @@
 namespace circa {
 namespace migration_snippets {
 
-void test_migration(std::string sourceCode, std::string destinationCode, std::string assertionsCode)
+void test_migration(std::string sourceCode, std::string destinationCode,
+    std::string assertionsCode)
 {
     Branch source;
     parser::compile(&source, parser::statement_list, sourceCode);
