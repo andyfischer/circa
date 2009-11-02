@@ -1166,65 +1166,74 @@ std::string lexpr_get_original_string(Term* lexpr)
     return out.str();
 }
 
-Term* function_call(Branch& branch, Term* function, RefList inputs)
+Term* member_function_call(Branch& branch, Term* function, RefList const& _inputs,
+    std::string const& originalName)
+{
+    RefList inputs = _inputs;
+
+    Term* lexprTerm = function;
+    Term* head = lexprTerm->input(0);
+    Term* fieldNameTerm = lexprTerm->input(1);
+    std::string& fieldName = fieldNameTerm->asString();
+    std::string nameRebind;
+
+    if (type_t::get_member_functions(head->type).contains(fieldName)) {
+        inputs.prepend(head);
+
+        function = type_t::get_member_functions(head->type)[fieldName];
+
+        if (head->name != ""
+                && function_t::get_input_placeholder(function, 0)
+                    ->boolPropOptional("use-as-output", false))
+            nameRebind = head->name;
+
+        erase_term(fieldNameTerm);
+        erase_term(lexprTerm);
+
+        Term* result = apply(branch, function, inputs, nameRebind);
+        get_input_syntax_hint(result, 0, "hidden") = "true";
+        result->stringProp("syntaxHints:functionName") = originalName;
+
+        if (nameRebind != "")
+            result->boolProp("syntaxHints:implicitNameBinding") = true;
+
+        return result;
+    } else {
+        Term* result = apply(branch, UNKNOWN_FUNCTION, inputs);
+        result->stringProp("syntaxHints:functionName") = originalName;
+        return result;
+    }
+}
+
+Term* function_call(Branch& branch, Term* function, RefList const& inputs)
 {
     std::string originalName = lexpr_get_original_string(function);
     function = constant_fold_lexpr(function);
 
     // Check if 'function' is a lexpr. If so then parse this as a member function call.
-    if (function->function == LEXPR_FUNC) {
-        Term* lexprTerm = function;
-        Term* head = lexprTerm->input(0);
-        Term* fieldNameTerm = lexprTerm->input(1);
-        std::string& fieldName = fieldNameTerm->asString();
-        std::string nameRebind;
+    if (function->function == LEXPR_FUNC)
+        return member_function_call(branch, function, inputs, originalName);
 
-        if (type_t::get_member_functions(head->type).contains(fieldName)) {
-            inputs.prepend(head);
-
-            function = type_t::get_member_functions(head->type)[fieldName];
-
-            if (head->name != ""
-                    && function_t::get_input_placeholder(function, 0)
-                        ->boolPropOptional("use-as-output", false))
-                nameRebind = head->name;
-
-            erase_term(fieldNameTerm);
-            erase_term(lexprTerm);
-
-            Term* result = apply(branch, function, inputs, nameRebind);
-            get_input_syntax_hint(result, 0, "hidden") = "true";
-            result->stringProp("syntaxHints:functionName") = originalName;
-
-            if (nameRebind != "")
-                result->boolProp("syntaxHints:implicitNameBinding") = true;
-
-            return result;
-
-        } else {
-            Term* result = apply(branch, UNKNOWN_FUNCTION, inputs);
-            result->stringProp("syntaxHints:functionName") = originalName;
-            return result;
-        }
-    } else {
-
-        if (is_type(function)) {
-            Term* result = create_value(branch, function);
-            result->boolProp("constructor") = true;
-
-            return result;
-        }
-        
-        if (!is_callable(function))
-            function = UNKNOWN_FUNCTION;
-       
-        Term* result = apply(branch, function, inputs);
-
-        if (result->function->name != originalName)
-            result->stringProp("syntaxHints:functionName") = originalName;
+    if (is_type(function)) {
+        Term* result = create_value(branch, function);
+        result->boolProp("constructor") = true;
 
         return result;
     }
+    
+    if (!is_callable(function))
+        function = UNKNOWN_FUNCTION;
+   
+    Term* result = apply(branch, function, inputs);
+
+    if (result->function->name != originalName)
+        result->stringProp("syntaxHints:functionName") = originalName;
+
+    // Special case for include() function: expand the contents immediately.
+    if (result->function == INCLUDE_FUNC)
+        include_function::load_script(result);
+
+    return result;
 }
 
 // Tries to parse an index access or a field access, and returns a new term.

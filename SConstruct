@@ -18,7 +18,7 @@ if not os.path.exists('build'): os.mkdir('build')
 # a little bit of special behavior for using frameworks.
 MAC = os.path.exists('/Library/Frameworks')
 
-DEBUG = True
+DEBUG = False
 
 if ARGUMENTS.get('release', False):
     DEBUG = False

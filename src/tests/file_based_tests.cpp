@@ -27,11 +27,16 @@ void test_include_function()
 
     // Basic test, load our fake file.
     Branch branch;
-    Term* incl = branch.eval("include('file.ca')");
+    Term* incl = branch.compile("include('file.ca')");
 
     test_assert(is_branch(incl));
-    test_assert(incl->asBranch()["a"]->asInt() == 1);
-    test_equals(incl->asBranch()["#attr:source-file"]->asString(), "file.ca");
+    Branch& included = as_branch(incl);
+
+    // Make sure that the included file is loaded, even though the term wasn't evaluated.
+    test_assert(included.length() > 0);
+
+    test_assert(included["a"]->asInt() == 1);
+    test_equals(included["#attr:source-file"]->asString(), "file.ca");
 
     // Next, modify the file and reload.
     files["file.ca"] = "b = 2";
@@ -39,16 +44,16 @@ void test_include_function()
 
     evaluate_term(incl);
 
-    test_assert(!incl->asBranch().contains("a"));
-    test_assert(incl->asBranch()["b"]->asInt() == 2);
+    test_assert(!included.contains("a"));
+    test_assert(included["b"]->asInt() == 2);
 
     // Modify the file but don't modify the last_modified time, make sure that
     // it doesn't reload this time.
     files["file.ca"] = "c = 3";
     evaluate_term(incl);
-    test_assert(!incl->asBranch().contains("a"));
-    test_assert(!incl->asBranch().contains("c"));
-    test_assert(incl->asBranch()["b"]->asInt() == 2);
+    test_assert(!included.contains("a"));
+    test_assert(!included.contains("c"));
+    test_assert(included["b"]->asInt() == 2);
 
     // Modify the file with a script that has errors
     files["file.ca"] = "add(what what)";
