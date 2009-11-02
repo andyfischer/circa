@@ -112,7 +112,8 @@ namespace image
         end
         return existing
     end
-    def draw_clipped(Image image, Rect clip, Rect destination) end
+    def draw(Image image, Point destination) end
+    def draw_clipped(Image image, Rect clip, Point destination) end
 end
 
 def load_texture(state int, string) :: int
@@ -334,8 +335,11 @@ users_branch = include(user_script_filename)
 -- Draw HUD
 
 -- Draw fpses
-text_sprite = text.render_text(ui_font_medium, concat('fps: ' fps), #fff)
-text.draw_rendered_text(text_sprite, 10 280)
+draw_fps = false
+if draw_fps
+    text_sprite = text.render_text(ui_font_medium, concat('fps: ' fps), #fff)
+    text.draw_rendered_text(text_sprite, 10 280)
+end
 
 -- Name selector
 if toggle(key_pressed(KEY_B))

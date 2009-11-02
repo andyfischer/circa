@@ -72,6 +72,7 @@ bool initialize_plastic()
     TIME_DELTA = procure_value(runtime_branch(), FLOAT_TYPE, "time_delta");
 
     postprocess_functions::setup(runtime_branch());
+    image::setup(runtime_branch());
     input::setup(runtime_branch());
     mesh::setup(runtime_branch());
     gl_shapes::setup(runtime_branch());
