@@ -1,2 +1,2 @@
 cd $CIRCA_HOME
-scons plastic && build/bin/plas $*
+scons plastic build=release && build/bin/plas $*

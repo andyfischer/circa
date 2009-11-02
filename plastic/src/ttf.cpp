@@ -6,7 +6,7 @@
 #include <SDL_ttf.h>
 
 #include "gl_common.h"
-#include "textures.h"
+#include "sdl_utils.h"
 #include "ttf.h"
 
 using namespace circa;

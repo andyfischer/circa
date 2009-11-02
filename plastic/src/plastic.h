@@ -14,6 +14,7 @@
 #include "mesh.h"
 #include "plastic_main.h"
 #include "postprocess.h"
+#include "sdl_utils.h"
 #include "shaders.h"
 #include "textures.h"
 #include "ttf.h"
