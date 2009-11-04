@@ -50,6 +50,9 @@ namespace include_function {
                 error_occurred(caller, get_static_errors_formatted(contents));
                 return;
             }
+
+            if (caller->owningBranch != NULL)
+                expose_all_names(contents, *caller->owningBranch);
         }
     }
 

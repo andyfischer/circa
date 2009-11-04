@@ -1,2 +1,1 @@
-cd $CIRCA_HOME
-scons plastic build=release && build/bin/plas $*
+$CIRCA_HOME/plastic/tools/pl-build && $CIRCA_HOME/build/bin/plas $*
