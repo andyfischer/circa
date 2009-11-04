@@ -17,5 +17,6 @@ circa::Branch& users_branch();
 
 std::string find_runtime_file();
 std::string find_asset_file(std::string const& filename);
+bool evaluate_main_script();
 
 #endif

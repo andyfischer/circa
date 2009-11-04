@@ -106,19 +106,10 @@ void render_frame()
     glClear(GL_DEPTH_BUFFER_BIT);
     glUseProgram(0);
 
-    Term errorListener;
-    evaluate_branch(runtime_branch(), &errorListener);
-
-    if (errorListener.hasError()) {
-        std::cout << "Runtime error:" << std::endl;
-        print_runtime_error_formatted(runtime_branch(), std::cout);
-        std::cout << std::endl;
-        PAUSED = true;
-        PAUSE_REASON = RUNTIME_ERROR;
-        clear_error(&errorListener);
-    }
+    evaluate_main_script();
 
     // Check for uncaught GL error
+    Term errorListener;
     gl_check_error(&errorListener, " (uncaught)");
     if (errorListener.hasError()) {
         std::cout << get_runtime_error_message(&errorListener) << std::endl;

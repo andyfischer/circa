@@ -71,6 +71,11 @@ bool initialize_plastic()
     TIME = procure_value(runtime_branch(), FLOAT_TYPE, "time");
     TIME_DELTA = procure_value(runtime_branch(), FLOAT_TYPE, "time_delta");
 
+    return true;
+}
+
+bool initialize_builtin_functions()
+{
     postprocess_functions::setup(runtime_branch());
     image::setup(runtime_branch());
     input::setup(runtime_branch());
@@ -85,6 +90,23 @@ bool initialize_plastic()
         return false;
     }
 
+    return true;
+}
+
+bool evaluate_main_script()
+{
+    Term errorListener;
+    evaluate_branch(runtime_branch(), &errorListener);
+
+    if (errorListener.hasError()) {
+        std::cout << "Runtime error:" << std::endl;
+        print_runtime_error_formatted(runtime_branch(), std::cout);
+        std::cout << std::endl;
+        PAUSED = true;
+        PAUSE_REASON = RUNTIME_ERROR;
+        clear_error(&errorListener);
+        return false;
+    }
     return true;
 }
 
@@ -153,6 +175,25 @@ int plastic_main(std::vector<std::string> args)
         return 0;
     }
 
+    // -tr to do a test run of a script, without creating a display.
+    if (args[0] == "-tr") {
+        if (!load_user_script_filename(args[1]))
+            return 1;
+
+        if (has_static_errors(users_branch())) {
+            print_static_errors_formatted(users_branch(), std::cout);
+            return 1;
+        }
+
+        for (int i=0; i < 5; i++)
+            if (!evaluate_main_script())
+                return 1;
+
+        return 0;
+    }
+
+    // Normal operation, load the script file in argument 0.
+
     if (!load_user_script_filename(args[0]))
         return 1;
 
@@ -160,6 +201,8 @@ int plastic_main(std::vector<std::string> args)
         print_static_errors_formatted(users_branch(), std::cout);
         return 1;
     }
+
+    if (!initialize_builtin_functions()) return 1;
 
     // Try to initialize display
     if (!initialize_display()) return 1;

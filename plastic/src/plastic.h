@@ -12,7 +12,7 @@
 #include "input.h"
 #include "logs.h"
 #include "mesh.h"
-#include "plastic_main.h"
+#include "main.h"
 #include "postprocess.h"
 #include "sdl_utils.h"
 #include "shaders.h"
