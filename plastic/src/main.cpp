@@ -117,8 +117,9 @@ void main_loop()
     }
 }
 
-bool load_user_script_filename(std::string const& filename)
+bool load_user_script_filename(std::string const& _filename)
 {
+    std::string filename = get_absolute_path(_filename);
     runtime_branch()["user_script_filename"]->asString() = filename;
     Term* users_branch = runtime_branch()["users_branch"];
     include_function::load_script(users_branch);

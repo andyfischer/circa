@@ -71,13 +71,22 @@ std::string get_directory_for_filename(std::string const& filename)
     return result;
 }
 
+bool is_absolute_path(std::string const& path)
+{
+    if (path.length() >= 1 && path[0] == '/')
+        return true;
+    if (path.length() >= 2 && path[1] == ':')
+        return true;
+    return false;
+}
+
 std::string get_path_relative_to_source(Term* relativeTo, std::string const& path)
 {
     if (relativeTo->owningBranch == NULL)
         return path;
 
     // Don't modify absolute paths
-    if (path.length() > 0 && path[0] == '/')
+    if (is_absolute_path(path))
         return path;
 
     std::string scriptLocation = get_source_file_location(*relativeTo->owningBranch);
@@ -86,6 +95,17 @@ std::string get_path_relative_to_source(Term* relativeTo, std::string const& pat
         return path;
 
     return scriptLocation + "/" + path;
+}
+
+std::string get_absolute_path(std::string const& path)
+{
+    if (is_absolute_path(path))
+        return path;
+
+    char buf[512];
+    std::string cwd = getcwd(buf, 512);
+
+    return cwd + "/" + path;
 }
 
 bool file_exists(std::string const& filename)
