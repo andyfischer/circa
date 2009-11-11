@@ -28,9 +28,10 @@ namespace function_t {
     bool get_input_modified(Term* function, int index);
     bool get_input_meta(Term* function, int index);
     void set_input_meta(Term* function, int index, bool value);
+    Ref& get_previous_overload(Term* function);
     Ref& get_feedback_func(Term* function);
-    Branch& get_parameters(Term* func);
-    std::string& get_description(Term* func);
+    Branch& get_parameters(Term* function);
+    std::string& get_description(Term* function);
 
     EvaluateFunc& get_evaluate(Term* function);
     SpecializeTypeFunc& get_specialize_type(Term* function);
@@ -46,16 +47,15 @@ std::string get_placeholder_name_for_index(int index);
 void initialize_function_prototype(Branch& contents);
 
 bool is_callable(Term* term);
-bool inputs_fit_function(Term* func, RefList const& inputs);
+bool inputs_fit_function(Term* function, RefList const& inputs);
 Term* create_overloaded_function(Branch& branch, std::string const& name);
-
 Term* function_get_specialized_output_type(Term* function, Term* call);
 
-bool is_native_function(Term* func);
+bool is_native_function(Term* function);
 
-// If func is overloaded, this returns an overload which is appropriate for 'inputs'.
+// If function is overloaded, this returns an overload which is appropriate for 'inputs'.
 // May return UNKNOWN_FUNCTION if none is found.
-Term* specialize_function(Term* func, RefList const& inputs);
+Term* specialize_function(Term* function, RefList const& inputs);
 
 } // namespace circa
 

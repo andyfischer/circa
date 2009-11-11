@@ -59,6 +59,22 @@ void overloaded_function()
     test_equals(i->function->name, "add_i");
     Term* f = branch.eval("add(1.0 2)");
     test_equals(f->function->name, "add_f");
+
+    Term* myfunc_f = branch.eval("def myfunc +overload (number)::number return 2.0 end");
+    Term* myfunc_i = branch.eval("def myfunc +overload (int)::int return 1 end");
+
+    test_assert(branch);
+
+    Term* int_input = branch.eval("1");
+    Term* number_input = branch.eval("1.0");
+
+    test_assert(specialize_function(myfunc_i, RefList(int_input)) == myfunc_i);
+    test_assert(specialize_function(myfunc_i, RefList(number_input)) == myfunc_f);
+
+    branch.eval("myfunc(1) myfunc(1.0)");
+
+    test_assert(branch.eval("myfunc(1) == 1"));
+    test_assert(branch.eval("myfunc(1.0) == 2.0"));
 }
 
 void test_is_native_function()

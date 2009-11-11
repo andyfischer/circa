@@ -157,35 +157,33 @@ namespace function_t {
 
         return function_t::get_input_placeholder(func, index)->type;
     }
-
     EvaluateFunc& get_evaluate(Term* func)
     {
         return as_evaluate_thunk(func->asBranch()[0]->asBranch()[3]);
     }
-
     SpecializeTypeFunc& get_specialize_type(Term* func)
     {
         return as_specialize_type_thunk(func->asBranch()[0]->asBranch()[4]);
     }
-
     ToSourceStringFunc& get_to_source_string(Term* func)
     {
         return as_to_source_string_thunk(func->asBranch()[0]->asBranch()[5]);
     }
-
-    Ref& get_feedback_func(Term* func)
+    Ref& get_previous_overload(Term* func)
     {
         return as_ref(func->asBranch()[0]->asBranch()[6]);
     }
-
+    Ref& get_feedback_func(Term* func)
+    {
+        return as_ref(func->asBranch()[0]->asBranch()[7]);
+    }
     Branch& get_parameters(Term* func)
     {
-        return as_branch(func->asBranch()[0]->asBranch()[7]);
+        return as_branch(func->asBranch()[0]->asBranch()[8]);
     }
-
     std::string& get_description(Term* func)
     {
-        return as_string(func->asBranch()[0]->asBranch()[8]);
+        return as_string(func->asBranch()[0]->asBranch()[9]);
     }
 } // namespace function_t
 
@@ -212,9 +210,10 @@ void initialize_function_prototype(Branch& contents)
           [3] EvaluateFunc native_evaluate
           [4] SpecializeTypeFunc native_specialize_type
           [5] ToSourceStringFunc native_to_source_string
-          [6] ref feedback_func
-          [7] List parameters
-          [8] string description
+          [6] ref previous_overload
+          [7] ref feedback_func
+          [8] List parameters
+          [9] string description
         }
         [1..num_inputs] input terms
             .. each might have bool property 'modified' or 'meta'
@@ -239,6 +238,7 @@ void initialize_function_prototype(Branch& contents)
     create_value(attributes, EVALUATE_THUNK_TYPE, "native_evaluate");
     create_value(attributes, SPECIALIZE_THUNK_TYPE, "native_specialize");
     create_value(attributes, TO_STRING_THUNK_TYPE, "native_to_string");
+    create_ref(attributes, NULL, "previous_overload");
     create_ref(attributes, NULL, "feedback_func");
     create_value(attributes, LIST_TYPE, "parameters");
     create_value(attributes, STRING_TYPE, "description");
@@ -246,8 +246,8 @@ void initialize_function_prototype(Branch& contents)
 
 bool is_callable(Term* term)
 {
-    return (term->type == FUNCTION_TYPE)
-        || (term->type == OVERLOADED_FUNCTION_TYPE);
+    return (term->type == FUNCTION_TYPE
+            || term->type == OVERLOADED_FUNCTION_TYPE);
 }
 
 bool inputs_fit_function(Term* func, RefList const& inputs)
@@ -300,9 +300,15 @@ Term* specialize_function(Term* func, RefList const& inputs)
         }
 
         return UNKNOWN_FUNCTION;
-    } else {
-        return func;
     }
+
+    if (inputs_fit_function(func, inputs))
+        return func;
+
+    if (function_t::get_previous_overload(func) != NULL)
+        return specialize_function(function_t::get_previous_overload(func), inputs);
+
+    return func;
 }
 
 } // namespace circa
