@@ -4,11 +4,33 @@
 
 namespace circa {
 
+void print_usage()
+{
+    std::cout <<
+        "Usage:\n"
+        "  circa <filename>      : Evaluate the given Circa source file\n"
+        "  circa -test           : Run unit tests\n"
+        "  circa -e <expression> : Evaluate an expression on the command line\n"
+        "  circa -list-tests     : List every unit test name\n"
+        "  circa -p <filename>   : Show raw compiled form of a source file\n"
+        "  circa -pp <filename>  : Like -p but also print term properties\n"
+        "  circa -s <filename>   : Compile the source file and reproduce its source code\n"
+        "  circa -repl           : Start an interactive read-eval-print-loop\n";
+    std::cout << std::endl;
+}
+
 int run_command_line(std::vector<std::string> args)
 {
+    // No arguments, print usage
+    if (args.size() == 0) {
+        print_usage();
+        return 0;
+    }
+
     initialize();
 
-    if (args.size() == 0) {
+    // Run unit tests
+    if (args[0] == "-test") {
         run_all_tests();
         shutdown();
         return 0;
@@ -33,7 +55,7 @@ int run_command_line(std::vector<std::string> args)
         return 0;
     }
 
-    if (args[0] == "--list-tests") {
+    if (args[0] == "-list-tests") {
         std::vector<std::string> testNames = list_all_test_names();
 
         std::vector<std::string>::const_iterator it;
