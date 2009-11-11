@@ -193,7 +193,7 @@ void run_test_named(std::string const& testName)
     std::cout << "Couldn't find a test named: " << testName << std::endl;
 }
 
-void run_all_tests()
+bool run_all_tests()
 {
     register_all_tests();
 
@@ -215,6 +215,8 @@ void run_all_tests()
         std::string tests = failureCount == 1 ? "test" : "tests";
         std::cout << failureCount << " " << tests << " failed." << std::endl;
     }
+
+    return failureCount == 0;
 }
 
 void post_test_sanity_check()
