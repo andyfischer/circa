@@ -27,6 +27,7 @@ Term* import_function_overload(Term* overload, EvaluateFunc evaluate, std::strin
 
 void install_function(Term* function, EvaluateFunc evaluate)
 {
+    assert(is_function(function));
     function_t::get_evaluate(function) = evaluate;
 }
 

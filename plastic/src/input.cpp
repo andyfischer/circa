@@ -209,12 +209,15 @@ void setup(Branch& branch)
     install_function(branch["mouse_pressed"], mouse_pressed);
     install_function(branch["mouse_over"], mouse_over);
 
-    install_function(branch["mouse_clicked"]->asBranch()[0], mouse_clicked);
-    install_function(branch["mouse_clicked"]->asBranch()[1], mouse_clicked);
-    install_function(branch["mouse_wheel_up"]->asBranch()[0], mouse_wheel_up);
-    install_function(branch["mouse_wheel_up"]->asBranch()[1], mouse_wheel_up);
-    install_function(branch["mouse_wheel_down"]->asBranch()[0], mouse_wheel_down);
-    install_function(branch["mouse_wheel_down"]->asBranch()[1], mouse_wheel_down);
+    install_function(branch["mouse_clicked"], mouse_clicked);
+    install_function(function_t::get_previous_overload(branch["mouse_clicked"]),
+            mouse_clicked);
+    install_function(branch["mouse_wheel_up"], mouse_wheel_up);
+    install_function(function_t::get_previous_overload(branch["mouse_wheel_up"]),
+            mouse_wheel_up);
+    install_function(branch["mouse_wheel_down"], mouse_wheel_down);
+    install_function(function_t::get_previous_overload(branch["mouse_wheel_down"]),
+            mouse_wheel_down);
 
     procure_int(branch, "UP") = SDLK_UP;
     procure_int(branch, "DOWN") = SDLK_DOWN;
