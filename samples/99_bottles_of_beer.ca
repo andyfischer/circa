@@ -1,0 +1,17 @@
+
+def plural(int count) :: string
+    if count == 1, return ""
+    else return "s"
+    end
+end
+
+for count in 99..0
+    print(concat(count ' bottle' plural(count) ' of beer on the wall'))
+    print(concat(count ' bottle' plural(count) ' of beer...'))
+
+    next_count = count - 1
+
+    print('Take one down, pass it around')
+    print(concat(next_count ' bottle' plural(next_count) ' of beer on the wall'))
+    print()
+end

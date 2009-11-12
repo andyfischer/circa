@@ -298,6 +298,14 @@ void test_repeat()
     test_snippet("", "repeat(true, 3) == [true true true]");
 }
 
+void test_range()
+{
+    test_snippet("", "0..3 == [0 1 2]");
+    test_snippet("", "4..8 == [4 5 6 7]");
+    test_snippet("", "3..0 == [3 2 1]");
+    test_snippet("", "3..-2 == [3 2 1 0 -1]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
@@ -319,6 +327,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_rebinding_operators);
     REGISTER_TEST_CASE(test_snippets::test_get_field_and_set_field);
     REGISTER_TEST_CASE(test_snippets::test_repeat);
+    REGISTER_TEST_CASE(test_snippets::test_range);
 }
 
 } // namespace test_snippets

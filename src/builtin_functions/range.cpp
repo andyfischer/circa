@@ -12,10 +12,16 @@ namespace range_function {
         
         Branch& branch = as_branch(caller);
 
-        resize_list(branch, max-start, INT_TYPE);
+        int count = abs(max-start);
+        resize_list(branch, count, INT_TYPE);
+
+        int increment = start < max ? 1 : -1;
         
-        for (int i=start; i < max; i++)
-            as_int(branch[i]) = i;
+        int val = start;
+        for (int i=0; i < count; i++) {
+            as_int(branch[i]) = val;
+            val += increment;
+        }
     }
 
     void setup(Branch& kernel)
