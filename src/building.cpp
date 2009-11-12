@@ -237,6 +237,8 @@ bool& procure_bool(Branch& branch, std::string const& name)
 
 void resize_list(Branch& list, int numElements, Term* type)
 {
+    assert(numElements >= 0);
+
     // Add terms if necessary
     for (int i=list.length(); i < numElements; i++)
         create_value(list, type);
