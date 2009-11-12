@@ -83,8 +83,6 @@ namespace type_t {
     void remap_pointers(Term *term, ReferenceMap const& map);
     void name_accessor(Term* caller);
 
-    void enable_default_value(Term* type);
-
     // Accessors
     std::string& get_name(Term* type);
     bool& get_is_pointer(Term* type);
@@ -103,6 +101,8 @@ namespace type_t {
     Term* get_default_value(Term* type);
 
     int find_field_index(Term* type, std::string const& name);
+
+    void enable_default_value(Term* type);
 }
 
 void initialize_type_prototype(Branch& contents);

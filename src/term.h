@@ -57,8 +57,6 @@ struct Term
 
     std::string toString();
 
-    bool hasValue();
-
     // Returns the named property
     Term* property(std::string const& name) const;
 
@@ -76,11 +74,6 @@ struct Term
     float floatPropOptional(std::string const& name, float defaultValue);
     int intPropOptional(std::string const& name, int defaultValue);
     std::string stringPropOptional(std::string const& name, std::string const& defaultValue);
-
-    // Accessors for specific properties:
-    void attachErrorMessage(std::string const& message);
-    std::string getErrorMessage() const;
-    bool hasErrorMessage() const;
 
     // Flag accessors
     bool hasError() const;

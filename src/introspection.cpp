@@ -91,7 +91,7 @@ std::string term_to_raw_string(Term* term)
 
     output << ")";
 
-    output << " : " << typeName;
+    output << " :: " << typeName;
 
     bool showValue = is_value_alloced(term);
 
@@ -160,7 +160,7 @@ void print_runtime_errors(Branch& branch, std::ostream& output)
             continue;
 
         if (term->hasError()) {
-            output << "error on " << term->name << ": " << term->getErrorMessage() << std::endl;
+            output << "error on " << term->name << ": " << get_error_message(term) << std::endl;
         }
     }
 }

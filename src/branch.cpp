@@ -38,6 +38,15 @@ void Branch::append(Term* term)
     }
 }
 
+Term* Branch::appendNew()
+{
+    Term* term = alloc_term();
+    assert(term != NULL);
+    _terms.append(term);
+    term->owningBranch = this;
+    return term;
+}
+
 void Branch::insert(int index, Term* term)
 {
     _terms.insert(index, term);
@@ -184,12 +193,14 @@ namespace branch_t {
     void alloc(Term* typeTerm, Term* term)
     {
         Branch* branch = new Branch();
+        term->value = branch;
 
         Branch& prototype = type_t::get_prototype(typeTerm);
 
-        duplicate_branch(prototype, *branch);
-
-        term->value = branch;
+        for (int i=0; i < prototype.length(); i++) {
+            if (is_value(prototype[i]))
+                create_duplicate(*branch, prototype[i], prototype[i]->name);
+        }
     }
 
     void dealloc(Term* type, Term* term)

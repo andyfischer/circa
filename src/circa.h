@@ -37,6 +37,7 @@
 #include "source_repro.h"
 #include "subroutine.h"
 #include "term.h"
+#include "term_pool.h"
 #include "testing.h"
 #include "timer.h"
 #include "tokenizer.h"

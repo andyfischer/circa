@@ -47,12 +47,6 @@ Term::toString()
     return to_string(this);
 }
 
-bool
-Term::hasValue()
-{
-    return value != NULL;
-}
-
 Term* Term::property(std::string const& name) const
 {
     return properties[name];
@@ -127,26 +121,6 @@ std::string Term::stringPropOptional(std::string const& name, std::string const&
 {
     if (hasProperty(name)) return stringProp(name);
     else return defaultValue;
-}
-
-void Term::attachErrorMessage(std::string const& message)
-{
-    setHasError(true);
-    addProperty("error", STRING_TYPE);
-    as_string(property("error")) = message;
-}
-
-std::string Term::getErrorMessage() const
-{
-    if (hasProperty("error"))
-        return as_string(property("error"));
-    else
-        return "";
-}
-
-bool Term::hasErrorMessage() const
-{
-    return hasProperty("error");
 }
 
 bool

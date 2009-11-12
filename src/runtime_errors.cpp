@@ -10,7 +10,15 @@ void error_occurred(Term* errorTerm, std::string const& message)
         throw std::runtime_error(message);
 
     errorTerm->setHasError(true);
-    errorTerm->attachErrorMessage(message);
+    errorTerm->stringProp("error") = message;
+}
+
+void clear_error(Term* term)
+{
+    if (has_runtime_error(term)) {
+        term->setHasError(false);
+        term->removeProperty("error");
+    }
 }
 
 void nested_error_occurred(Term* errorTerm)
@@ -37,7 +45,7 @@ bool has_runtime_error(Branch& branch)
 
 std::string get_runtime_error_message(Term* term)
 {
-    return term->getErrorMessage();
+    return term->stringPropOptional("error", "");
 }
 
 void print_runtime_error_formatted(Branch& branch, std::ostream& output)
@@ -50,8 +58,8 @@ void print_runtime_error_formatted(Branch& branch, std::ostream& output)
 
             output << "[" << get_short_location(term) << "] ";
 
-            if (term->hasErrorMessage()) {
-                output << term->getErrorMessage();
+            if (has_error(term)) {
+                output << get_error_message(term);
             } else if (is_branch(term)) {
                 output << "\n";
                 print_runtime_error_formatted(as_branch(term), output);
@@ -95,14 +103,6 @@ std::string get_error_message(Term* term)
         return get_static_error_message(term);
     else
         return get_runtime_error_message(term);
-}
-
-void clear_error(Term* term)
-{
-    if (has_runtime_error(term)) {
-        term->setHasError(false);
-        term->removeProperty("error");
-    }
 }
 
 } // namespace circa

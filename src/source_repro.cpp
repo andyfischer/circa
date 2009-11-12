@@ -113,6 +113,7 @@ void prepend_name_binding(Term* term, std::stringstream& out)
 
 std::string get_term_source(Term* term)
 {
+    assert(term != NULL);
     const bool VERBOSE_LOGGING = false;
 
     if (VERBOSE_LOGGING)
