@@ -81,13 +81,13 @@ bool resize_display(int width, int height)
 
     glViewport(0, 0, width, height);
      
-    glMatrixMode( GL_PROJECTION );
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, width, height, 0, -1000.0f, 1000.0f);
-    glMatrixMode( GL_MODELVIEW );
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glClear( GL_COLOR_BUFFER_BIT );
+    glClear(GL_COLOR_BUFFER_BIT);
 
     Term errorListener;
     gl_check_error(&errorListener, " (initialize display)");

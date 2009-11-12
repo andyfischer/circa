@@ -21,17 +21,25 @@ void print_usage()
 
 int run_command_line(std::vector<std::string> args)
 {
-    // No arguments, print usage
+    initialize();
+
+    // No arguments, run tests
     if (args.size() == 0) {
-        print_usage();
+        run_all_tests();
+        shutdown();
         return 0;
     }
-
-    initialize();
 
     // Run unit tests
     if (args[0] == "-test") {
         run_all_tests();
+        shutdown();
+        return 0;
+    }
+
+    // Print help
+    if (args[0] == "-help") {
+        print_usage();
         shutdown();
         return 0;
     }
