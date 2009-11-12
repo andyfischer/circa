@@ -146,7 +146,7 @@ void subroutine_update_hidden_state_type(Term* func)
             && (function_t::get_input_name(func, 0) == "#state");
         if (!alreadyHasStateInput) {
             // Insert an input for state
-            contents.insert(1, new Term());
+            contents.insert(1, alloc_term());
             rewrite(contents[1], INPUT_PLACEHOLDER_FUNC, RefList());
             contents.bindName(contents[1], "#state");
         }

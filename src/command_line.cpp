@@ -179,11 +179,11 @@ int run_command_line(std::vector<std::string> args)
         return 1;
     } else {
 
-        Term* error_listener = new Term();
+        Term error_listener;
 
-        evaluate_branch(main_branch, error_listener);
+        evaluate_branch(main_branch, &error_listener);
 
-        if (error_listener->hasError()) {
+        if (error_listener.hasError()) {
             std::cout << "Error occurred:\n";
             print_runtime_error_formatted(main_branch, std::cout);
             std::cout << std::endl;

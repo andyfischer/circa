@@ -45,6 +45,7 @@ struct Branch
     bool contains(std::string const& name) const { return names.contains(name); }
 
     void append(Term* term);
+    Term* appendNew();
 
     void insert(int index, Term* term);
     void moveToEnd(Term* term);

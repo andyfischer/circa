@@ -34,11 +34,9 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     }
 
     // Create the term
-    Term* result = new Term();
-    result->function = function;
+    Term* result = branch.appendNew();
 
-    // Add term to branch
-    branch.append(result);
+    result->function = function;
 
     if (name != "")
         branch.bindName(result, name);
@@ -96,8 +94,8 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
     assert(type != NULL);
     assert(is_type(type));
 
-    Term *term = new Term();
-    branch.append(term);
+    Term *term = branch.appendNew();
+
     if (name != "")
         branch.bindName(term, name);
 

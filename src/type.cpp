@@ -8,6 +8,8 @@ namespace circa {
 
 void initialize_type_prototype(Branch& contents)
 {
+    // Type is not yet prototype-based, so this function isn't currently used.
+    
     /* Type has the following layout:
       {
         [0] #attributes {
@@ -110,14 +112,6 @@ namespace type_t {
         as_string(caller) = type_t::get_name(caller->input(0));
     }
 
-    void enable_default_value(Term* type)
-    {
-        if (get_default_value(type) == NULL)
-            create_value(type_t::get_attributes(type), VOID_TYPE, "defaultValue");
-        change_type(get_default_value(type), type);
-        alloc_value(get_default_value(type));
-    }
-
     std::string& get_name(Term* type)
     {
         return as_type(type).name;
@@ -183,6 +177,13 @@ namespace type_t {
     int find_field_index(Term* type, std::string const& name)
     {
         return type_t::get_prototype(type).findIndex(name);
+    }
+    void enable_default_value(Term* type)
+    {
+        if (get_default_value(type) == NULL)
+            create_value(type_t::get_attributes(type), VOID_TYPE, "defaultValue");
+        change_type(get_default_value(type), type);
+        alloc_value(get_default_value(type));
     }
 
 } // namespace type_t

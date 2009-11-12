@@ -87,13 +87,11 @@ void bootstrap_kernel()
     KERNEL = new Branch();
 
     // Create value function
-    VALUE_FUNC = new Term();
-    VALUE_FUNC->owningBranch = KERNEL;
+    VALUE_FUNC = KERNEL->appendNew();
     KERNEL->bindName(VALUE_FUNC, "value");
 
     // Create Type type
-    TYPE_TYPE = new Term();
-    TYPE_TYPE->owningBranch = KERNEL;
+    TYPE_TYPE = KERNEL->appendNew();
     TYPE_TYPE->function = VALUE_FUNC;
     TYPE_TYPE->type = TYPE_TYPE;
     Type* typeType = new Type();
@@ -107,8 +105,7 @@ void bootstrap_kernel()
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Create Any type
-    ANY_TYPE = new Term();
-    ANY_TYPE->owningBranch = KERNEL;
+    ANY_TYPE = KERNEL->appendNew();
     ANY_TYPE->function = VALUE_FUNC;
     ANY_TYPE->type = TYPE_TYPE;
     ANY_TYPE->value = new Type();
@@ -125,6 +122,7 @@ void bootstrap_kernel()
 
     // Initialize Value func
     VALUE_FUNC->type = FUNCTION_TYPE;
+    VALUE_FUNC->function = VALUE_FUNC;
     alloc_value(VALUE_FUNC);
 
     // Initialize List type, it's needed soon
