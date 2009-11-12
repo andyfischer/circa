@@ -63,29 +63,39 @@ void test_destroy()
 
 void test_list()
 {
-    RefList list;
-
-    Term* t1 = new Term();
-    Term* t2 = new Term();
-
-    list.append(t1);
-    list.append(t2);
+    Ref t1 = alloc_term();
+    Ref t2 = alloc_term();
 
     test_assert(t1->refCount == 1);
-    test_assert(t2->refCount == 1);
-
-    RefList another_list = list;
-    test_assert(t1->refCount == 2);
-    test_assert(t2->refCount == 2);
 
     {
-        RefList a_third_list = list;
-        test_assert(t1->refCount == 3);
-        test_assert(t2->refCount == 3);
+        RefList list;
+        list.append(t1);
+        list.append(t2);
+
+        test_assert(t1->refCount == 2);
+        test_assert(t2->refCount == 2);
+
+        {
+            RefList another_list = list;
+            test_assert(t1->refCount == 3);
+            test_assert(t2->refCount == 3);
+
+            {
+                RefList a_third_list = list;
+                test_assert(t1->refCount == 4);
+                test_assert(t2->refCount == 4);
+            }
+
+            test_assert(t1->refCount == 3);
+            test_assert(t2->refCount == 3);
+        }
+
+        test_assert(t1->refCount == 2);
+        test_assert(t2->refCount == 2);
     }
 
-    test_assert(t1->refCount == 2);
-    test_assert(t2->refCount == 2);
+    test_assert(t1->refCount == 1);
 }
 
 void remap_properties()

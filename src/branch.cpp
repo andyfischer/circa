@@ -91,8 +91,11 @@ void Branch::remove(int index)
     if (term != NULL && (term->name != "") && (names[term->name] == term))
         names.remove(term->name);
 
+    if (term != NULL)
+        term->owningBranch = NULL;
+
+    // Do this step last, it removes a reference and may cause Term to be deleted.
     _terms.remove(index);
-    term->owningBranch = NULL;
 }
 
 void Branch::removeNulls()

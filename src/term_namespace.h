@@ -50,7 +50,7 @@ struct TermNamespace
             return it->second;
     }
 
-    Term*& operator[](std::string const& name)
+    Ref& operator[](std::string const& name)
     {
         return _map[name];
     }
