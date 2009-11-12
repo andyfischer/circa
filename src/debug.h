@@ -15,8 +15,8 @@ namespace circa {
 // will check that the given piece of memory is valid. This option
 // comes with a performance penalty.
 //
-// It's recommended that you never use is_bad_pointer, because this
-// would be easy to abuse. Instead, use assert_good_pointer.
+// It's recommended that you don't write code that calls is_bad_pointer,
+// because this would be easy to abuse. Instead, use assert_good_pointer.
 #define DEBUG_CHECK_FOR_BAD_POINTERS 0
 
 // Enabling this flag causes us to never actually delete Term objects.

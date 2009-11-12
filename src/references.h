@@ -13,9 +13,7 @@ struct Ref
     // the debugger.
     Term* t;
 
-    Ref()
-      : t(NULL)
-    {}
+    Ref() : t(NULL) {}
 
     Ref(Term *initialValue) : t(NULL)
     {
@@ -54,11 +52,6 @@ struct Ref
     }
 
     operator Term*() const
-    {
-        return t;
-    }
-
-    operator Term*&()
     {
         return t;
     }

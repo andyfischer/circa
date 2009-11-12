@@ -17,6 +17,7 @@ void Ref::set(Term* target)
         t->refCount++;
 
     if (previousTarget != NULL) {
+        assert_good_pointer(previousTarget);
         previousTarget->refCount--;
         if (previousTarget->refCount == 0)
             delete_term(previousTarget);

@@ -38,6 +38,8 @@ void test_term_to_raw_string()
     Term* term = new Term();
 
     term_to_raw_string(term);
+
+    delete term;
 }
 
 void register_tests()
