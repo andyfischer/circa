@@ -291,6 +291,13 @@ void test_get_field_and_set_field()
             //"w.x.y.z += 1; w == [[[4 4]]]::C");
 }
 
+void test_repeat()
+{
+    test_snippet("", "repeat(1, 0) == []");
+    test_snippet("", "repeat(1, 1) == [1]");
+    test_snippet("", "repeat(true, 3) == [true true true]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
@@ -311,6 +318,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_branch_value);
     REGISTER_TEST_CASE(test_snippets::test_rebinding_operators);
     REGISTER_TEST_CASE(test_snippets::test_get_field_and_set_field);
+    REGISTER_TEST_CASE(test_snippets::test_repeat);
 }
 
 } // namespace test_snippets

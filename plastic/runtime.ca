@@ -113,7 +113,8 @@ namespace image
         return existing
     end
     def draw(Image image, Point destination) end
-    def draw_clipped(Image image, Rect clip, Point destination) end
+    def draw_clip(Image image, Rect clip, Point destination) end
+    def draw_clip +overload (Image image, Rect clip, Rect destination) end
 end
 
 def load_texture(state int, string) :: int

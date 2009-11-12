@@ -14,6 +14,9 @@ Term* find_named(Branch& branch, std::string const& name)
 
     Branch* outerScope = get_outer_scope(branch);
 
+    if (outerScope == &branch)
+        throw std::runtime_error("Branch's outer scope is a circular reference");
+
     if (outerScope == NULL)
         return get_global(name);
     else
