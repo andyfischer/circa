@@ -1,6 +1,6 @@
 // Copyright (c) 2007-2009 Paul Hodge. All rights reserved
 
-#include <SDL_image.h>
+#include <circa.h>
 
 #include "plastic.h"
 
@@ -66,7 +66,10 @@ void draw_image(Term* caller)
     Image image(caller->input(0));
     Point point(caller->input(1));
 
-    float x = point.x(), y = point.y(), width = image.width(), height = image.height();
+    float x = point.x();
+    float y = point.y();
+    float width = float(image.width());
+    float height = float(image.height());
 
     glBindTexture(GL_TEXTURE_2D, image.texid());
     glBegin(GL_QUADS);

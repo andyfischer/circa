@@ -103,7 +103,11 @@ std::string get_absolute_path(std::string const& path)
         return path;
 
     char buf[512];
+#ifdef WINDOWS
+    std::string cwd = _getcwd(buf, 512);
+#else
     std::string cwd = getcwd(buf, 512);
+#endif
 
     return cwd + "/" + path;
 }
@@ -113,7 +117,7 @@ bool file_exists(std::string const& filename)
     if (FAKE_FILE_IO != NULL)
         return FAKE_FILE_IO->file_exists(filename);
 
-    // This could also be replaced by boost
+    // This could also be replaced by boost::path
     FILE* fp = fopen(filename.c_str(), "r");
     if (fp) {
         // file exists

@@ -12,7 +12,7 @@ class EnvironmentSet():
     This class wraps around a set of Environments. You can make normal
     Environment calls on it, and each call will be dispatched to each
     env. There is also some support for string templating using build
-    names. Here we use this class for split debug/release builds.
+    names. We use this class for split debug/release builds.
     """
     def __init__(self, **namedEnvs):
         self.namedEnvs = namedEnvs
@@ -168,11 +168,14 @@ if WINDOWS:
     SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL_image-1.2.7/include'])
     SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL_mixer-2.0.9/include'])
     SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL_ttf-2.0.9/include'])
+    SDL_ROOT.Append(CPPPATH=['#plastic/deps/include'])
     SDL_ROOT.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDL.lib'])
     SDL_ROOT.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDLmain.lib'])
     SDL_ROOT.Append(LIBS=['SDL_deps/SDL_image-1.2.7/lib/SDL_image.lib'])
     SDL_ROOT.Append(LIBS=['SDL_deps/SDL_mixer-1.2.8/lib/SDL_mixer.lib'])
     SDL_ROOT.Append(LIBS=['SDL_deps/SDL_ttf-2.0.9/lib/SDL_ttf.lib'])
+    SDL_ROOT.Append(LIBS=['plastic/deps/lib/glew32.lib'])
+
 
 
 SDL_ROOT.Append(CPPPATH=['#src'])
