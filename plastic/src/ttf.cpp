@@ -60,48 +60,6 @@ struct RenderedText
     Branch& color() { return _term->asBranch()[3]->asBranch(); }
     std::string& text() { return _term->asBranch()[4]->asString(); }
 };
-    
-void draw_text(Term* caller)
-{
-    RenderedText output(caller);
-    float x = caller->input(2)->toFloat();
-    float y = caller->input(3)->toFloat();
-
-    if (output.texid() == 0) {
-        // Render the text to a new surface, upload it as a texture, destroy the surface,
-        // save the texture id.
-
-        TTF_Font* font = as<TTF_Font*>(caller->input(0));
-        std::string text = caller->input(1)->asString();
-        SDL_Color color = {-1,-1,-1, -1}; // todo
-        //SDL_Color bgcolor = {0, 0, 0, 0}; // todo
-
-        SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), color);
-
-        output.texid() = load_surface_to_texture(surface);
-        output.width() = float(surface->w);
-        output.height() = float(surface->h);
-
-        SDL_FreeSurface(surface);
-    }
-
-    glBindTexture(GL_TEXTURE_2D, output.texid());
-
-    glBegin(GL_QUADS);
-
-    glTexCoord2d(0.0, 0.0);
-    glVertex3f(x, y, 0);
-    glTexCoord2d(1.0, 0.0);
-    glVertex3f(x + output.width(), y,0);
-    glTexCoord2d(1.0, 1.0);
-    glVertex3f(x + output.width(), y + output.height(),0);
-    glTexCoord2d(0.0, 1.0);
-    glVertex3f(x, y + output.height(),0);
-
-    glEnd();
-
-    gl_check_error(caller);
-}
 
 void render_text(Term* caller)
 {
@@ -145,8 +103,8 @@ void draw_rendered_text(Term* caller)
     if (output.texid() == 0)
         return;
 
-    float x = caller->input(1)->toFloat();
-    float y = caller->input(2)->toFloat();
+    float x = caller->input(1)->asBranch()[0]->toFloat();
+    float y = caller->input(1)->asBranch()[1]->toFloat();
 
     glBindTexture(GL_TEXTURE_2D, output.texid());
     glColor4f(1,1,1,1);
@@ -185,7 +143,6 @@ void setup(Branch& branch)
     Branch& text_ns = branch["text"]->asBranch();
 
     install_function(text_ns["load_font"], load_font);
-    //install_function(text_ns["draw_text"], draw_text);
     install_function(text_ns["render_text"], render_text);
     install_function(text_ns["draw_rendered_text"], draw_rendered_text);
 }

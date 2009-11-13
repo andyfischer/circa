@@ -113,10 +113,10 @@ end
 -- Draw bullets
 for bullet in bullets
     bullet = bullet :: Bullet
-    points = [bullet.loc + [-bullet_width, -bullet_width],
-                  bullet.loc + [bullet_width, -bullet_width],
-                  bullet.loc + [bullet_width, bullet_width],
-                  bullet.loc + [-bullet_width, bullet_width]]
+    points = [bullet.loc + [-1 -1] * bullet_width,
+                  bullet.loc + [1 -1] * bullet_width,
+                  bullet.loc + [1 1] * bullet_width,
+                  bullet.loc + [-1 1] * bullet_width]
     gl.line_loop(points #fff)
 end
 
