@@ -43,6 +43,9 @@ void write_text_file(std::string const& filename, std::string const& contents)
 
 time_t get_modified_time(std::string const& filename)
 {
+    if (filename == "")
+        return 0;
+
     if (FAKE_FILE_IO != NULL)
         return FAKE_FILE_IO->get_modified_time(filename);
 
@@ -82,6 +85,10 @@ bool is_absolute_path(std::string const& path)
 
 std::string get_path_relative_to_source(Term* relativeTo, std::string const& path)
 {
+    // Don't modify a blank path
+    if (path == "")
+        return "";
+
     if (relativeTo->owningBranch == NULL)
         return path;
 

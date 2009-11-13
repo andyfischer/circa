@@ -86,7 +86,7 @@ bool initialize_builtin_functions()
 
     if (has_static_errors(runtime_branch())) {
         std::cout << "Errors in runtime.ca:" << std::endl;
-        print_static_errors_formatted(runtime_branch(), std::cout);
+        print_errors_formatted(runtime_branch(), std::cout);
         return false;
     }
 

@@ -7,7 +7,7 @@ namespace file_changed_function {
 
     bool check(Term* errorListener, Term* fileSignature, std::string const& filename)
     {
-        if (!file_exists(filename)) {
+        if (!file_exists(filename) && filename != "") {
             error_occurred(errorListener, "File not found: " + filename);
             return false;
         }

@@ -13,6 +13,8 @@ int WINDOW_HEIGHT = 0;
 
 bool initialize_display()
 {
+
+
     // Initialize the window
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
@@ -30,7 +32,19 @@ bool initialize_display()
         WINDOW_HEIGHT = users_branch()["desired_window_size"]->asBranch()[1]->asInt();
     }
 
-    return resize_display(desiredWidth, desiredHeight);
+    if (!resize_display(desiredWidth, desiredHeight))
+        return false;
+
+#ifdef WINDOWS
+    GLenum err = glewInit();
+
+    if (err != GLEW_OK) {
+        std::cerr << "glewInit failed: " << glewGetErrorString(err) << std::endl;
+        return false;
+    }
+#endif
+
+    return true;
 }
 
 bool resize_display(int width, int height)

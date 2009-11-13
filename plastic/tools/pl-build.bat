@@ -1,4 +1,4 @@
 pushd .
 cd %CIRCA_HOME%
-scons plastic
+call scons plastic
 popd

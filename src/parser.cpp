@@ -1210,7 +1210,7 @@ Term* function_call(Branch& branch, Term* function, RefList const& inputs)
         result->stringProp("syntaxHints:functionName") = originalName;
 
     // Special case for include() function: expand the contents immediately.
-    if (result->function == INCLUDE_FUNC)
+    if (result->function == INCLUDE_FUNC && result->input(1)->asString() != "")
         include_function::load_script(result);
 
     return result;

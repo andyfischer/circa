@@ -33,6 +33,10 @@ void assert_type(Term* term, Term* type);
 // Checks for either a static error or runtime error.
 bool has_error(Term* term);
 
+bool has_error(Branch& branch);
+
+void print_errors_formatted(Branch& branch, std::ostream& output);
+
 // Return either a static or runtime error message.
 std::string get_error_message(Term* term);
 
