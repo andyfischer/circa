@@ -50,7 +50,7 @@ namespace text
     def render_text(state RenderedText, TTF_Font font, string text, Color color) :: RenderedText
         "Render text and return a sprite that can be drawn with draw_rendered_text. This is useful if you want to know the width or height of the rendered text before drawing it."
     end
-    def draw_rendered_text(RenderedText, number x, number y)
+    def draw_rendered_text(RenderedText, Point loc)
         "Draw a sprite created with render_text."
     end
 end
@@ -58,7 +58,12 @@ end
 def draw_text(TTF_Font font, string str, Color color, Point location)
     "Render and draw a string."
     sprite = text.render_text(font, str, color)
-    text.draw_rendered_text(sprite, location.x, location.y)
+    text.draw_rendered_text(sprite, location)
+end
+
+def draw_text_centered(TTF_Font font, string str, Color color, Point location)
+    sprite = text.render_text(font, str, color)
+    text.draw_rendered_text(sprite, [location.x - sprite.width location.y])
 end
 
 -- GL functions
@@ -282,7 +287,7 @@ namespace tweak
         color = #ee3399
         if mouse_in(rect) color = #ff44aa end
         draw_box(rect, color)
-        text.draw_rendered_text(text_sprite, loc.x, loc.y)
+        text.draw_rendered_text(text_sprite, [loc.x loc.y])
 
         -- mouse wheel
         if mouse_wheel_up(rect)
@@ -339,7 +344,7 @@ users_branch = include(user_script_filename)
 draw_fps = false
 if draw_fps
     text_sprite = text.render_text(ui_font_medium, concat('fps: ' fps), #fff)
-    text.draw_rendered_text(text_sprite, 10 280)
+    text.draw_rendered_text(text_sprite, [10 280])
 end
 
 -- Name selector

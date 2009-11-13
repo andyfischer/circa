@@ -6,7 +6,7 @@ def draw_text(Point loc, int size)
     font = text.load_font("../assets/sv_basic_manual/SVBasicManual.ttf", size)
     str = concat("Time: " to_string(time))
     text_sprite = text.render_text(font, str, #fff)
-    text.draw_rendered_text(text_sprite, loc.x, loc.y)
+    text.draw_rendered_text(text_sprite, loc)
 end
 
 draw_text([50 50], 12)

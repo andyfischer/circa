@@ -22,7 +22,6 @@ suite = test_suite.TestSuite()
 def do_file(filename):
     suite.append(filename, lambda:run_execution_test(filename))
         
-do_file('assemblee/assemblee.ca')
 do_file('plastic/demos/asteroids.ca')
 do_file('plastic/demos/buttons.ca')
 do_file('plastic/demos/invaders.ca')

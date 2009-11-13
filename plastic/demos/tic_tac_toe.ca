@@ -115,7 +115,7 @@ def get_winner(List board_spaces) :: WinnerInformation
             result = [horizontal_winner [line_x board_top] [line_x board_bot]]
         elif vertical_winner != player.none
             line_y = board_top + (i+.5)*square_size
-            result = [vertical_winner, [board_left line_y] [board_right line_y]] 
+            result = [vertical_winner [board_left line_y] [board_right line_y]] 
         end
     end
 
@@ -131,7 +131,6 @@ def get_winner(List board_spaces) :: WinnerInformation
 
     return result
 end
-
 
 chosen_space = []
 
