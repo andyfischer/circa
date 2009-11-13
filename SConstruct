@@ -67,13 +67,11 @@ if POSIX:
 if WINDOWS:
     COMMON.Append(CPPDEFINES = ['WINDOWS'])
     COMMON.Append(LINKFLAGS='/SUBSYSTEM:CONSOLE /MACHINE:X86'.split())
-    if DEBUG:
-        COMMON.Append(CPPFLAGS='/EHsc /W3 /MDd /Z7 /TP /Od'.split())
-        COMMON.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrt.lib', '/DEBUG'])
-        COMMON.Append(CPPDEFINES = ["DEBUG", "_DEBUG"])
-    else:
-        COMMON.Append(CPPFLAGS='/EHsc /W3 /MD /Z7 /O2 /TP'.split())
-        COMMON.Append(CPPDEFINES = ["NDEBUG"])
+    DEBUG.Append(CPPFLAGS='/EHsc /W3 /MDd /Z7 /TP /Od'.split())
+    DEBUG.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrt.lib', '/DEBUG'])
+    DEBUG.Append(CPPDEFINES = ["DEBUG", "_DEBUG"])
+    RELEASE.Append(CPPFLAGS='/EHsc /W3 /MD /Z7 /O2 /TP'.split())
+    RELEASE.Append(CPPDEFINES = ["NDEBUG"])
 
 Export('WINDOWS')
 Export('MAC')

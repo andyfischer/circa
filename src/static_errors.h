@@ -30,6 +30,7 @@ StaticError get_static_error(Term* term);
 std::string get_static_error_message(Term* term);
 int count_static_errors(Branch& branch);
 bool has_static_errors(Branch& branch);
+void print_static_error_formatted(Term* term, std::ostream& output);
 void print_static_errors_formatted(Branch& branch, std::ostream& output);
 std::string get_static_errors_formatted(Branch& branch);
 

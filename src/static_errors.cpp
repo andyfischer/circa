@@ -165,6 +165,12 @@ bool has_static_errors(Branch& branch)
     return false;
 }
 
+void print_static_error_formatted(Term* term, std::ostream& output)
+{
+    output << "[" << get_short_location(term) << "] "
+        << get_static_error_message(term) << std::endl;
+}
+
 void print_static_errors_formatted(Branch& branch, std::ostream& output)
 {
     int count  = count_static_errors(branch);
@@ -174,10 +180,8 @@ void print_static_errors_formatted(Branch& branch, std::ostream& output)
     output << ":\n";
 
     for (BranchIterator it(branch); !it.finished(); ++it) {
-        if (has_static_error(*it)) {
-            output << "[" << get_short_location(*it) << "] "
-                << get_static_error_message(*it) << std::endl;
-        }
+        if (has_static_error(*it))
+            print_static_error_formatted(*it, output);
     } 
 }
 

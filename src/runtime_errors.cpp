@@ -48,28 +48,31 @@ std::string get_runtime_error_message(Term* term)
     return term->stringPropOptional("error", "");
 }
 
+void print_runtime_error_formatted(Term* term, std::ostream& output)
+{
+    output << "[" << get_short_location(term) << "] ";
+
+    if (has_error(term)) {
+        output << get_error_message(term);
+    } else if (is_branch(term)) {
+        output << "\n";
+        print_runtime_error_formatted(as_branch(term), output);
+    } else if (is_subroutine(term->function)) {
+        output << "\n";
+        print_runtime_error_formatted(as_branch(term->function), output);
+    } else {
+        output << " (!!! missing error message)";
+    }
+}
+
 void print_runtime_error_formatted(Branch& branch, std::ostream& output)
 {
     // Find the error in this branch
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
         if (term == NULL) continue;
-        if (term->hasError()) {
-
-            output << "[" << get_short_location(term) << "] ";
-
-            if (has_error(term)) {
-                output << get_error_message(term);
-            } else if (is_branch(term)) {
-                output << "\n";
-                print_runtime_error_formatted(as_branch(term), output);
-            } else if (is_subroutine(term->function)) {
-                output << "\n";
-                print_runtime_error_formatted(as_branch(term->function), output);
-            } else {
-                output << " (!!! missing error message)";
-            }
-
+        if (has_runtime_error(term)) {
+            print_runtime_error_formatted(term, output);
             return;
         }
     }
@@ -95,6 +98,28 @@ void native_type_mismatch(std::string const& message)
 bool has_error(Term* term)
 {
     return has_static_error(term) || has_runtime_error(term);
+}
+
+bool has_error(Branch& branch)
+{
+    for (int i=0; i < branch.length(); i++)
+        if (has_error(branch[i]))
+            return true;
+    return false;
+}
+
+void print_errors_formatted(Branch& branch, std::ostream& output)
+{
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (term == NULL) continue;
+        if (has_runtime_error(term)) {
+            print_runtime_error_formatted(term, output);
+            return;
+        }
+        if (has_static_error(term))
+            print_static_error_formatted(term, output);
+    }
 }
 
 std::string get_error_message(Term* term)

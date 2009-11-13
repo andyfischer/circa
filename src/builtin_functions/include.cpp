@@ -13,6 +13,7 @@ namespace include_function {
         Branch& contents = as_branch(caller);
 
         std::string &requested_filename = caller->input(1)->asString();
+
         std::string actual_filename =
             get_path_relative_to_source(caller, requested_filename);
 
