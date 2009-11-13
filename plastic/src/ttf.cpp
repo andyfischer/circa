@@ -17,9 +17,9 @@ SDL_Color unpack_sdl_color(Term* colorTerm)
 {
     Branch& color = as_branch(colorTerm);
     SDL_Color c = {};
-    c.r = color[0]->asFloat() * 255.0;
-    c.g = color[1]->asFloat() * 255.0;
-    c.b = color[2]->asFloat() * 255.0;
+    c.r = Uint8(color[0]->asFloat() * 255.0);
+    c.g = Uint8(color[1]->asFloat() * 255.0);
+    c.b = Uint8(color[2]->asFloat() * 255.0);
     // c.a = color[3]->asFloat() * 255.0;
     return c;
 }

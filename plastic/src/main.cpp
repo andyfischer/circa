@@ -147,6 +147,8 @@ bool load_user_script_filename(std::string const& _filename)
     include_function::load_script(users_branch);
     USERS_BRANCH = &users_branch->asBranch();
 
+    std::cout << "Loading script: " << filename << std::endl;
+
     return true;
 }
 

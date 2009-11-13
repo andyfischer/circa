@@ -1,7 +1,5 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
-#include <SDL_opengl.h>
-
 #include <circa.h>
 
 #include "plastic.h"

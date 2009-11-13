@@ -14,6 +14,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include <GL/glew.h>
+
 #endif
 
 #include <algorithm>
@@ -48,17 +50,16 @@ struct ReferenceMap;
 } // namespace circa
 
 #define NO_SDL_GLEXT
+
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <SDL_image.h>
 
 #ifdef __APPLE__
-    #include <OpenGL/glu.h>
-    #include <OpenGL/glext.h>
-#else
-    #include <GL/glu.h>
-    #include <GL/glext.h>
-    #include <GL/glx.h>
-    #include <GL/glxext.h>
+
+#include <OpenGL/glu.h>
+#include <OpenGL/glext.h>
+
 #endif
 
 #endif

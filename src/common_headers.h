@@ -10,6 +10,7 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <direct.h> 
 
 #endif
 
@@ -30,6 +31,7 @@
 #include <sstream>
 #include <typeinfo>
 #include <vector>
+
 
 namespace circa {
 

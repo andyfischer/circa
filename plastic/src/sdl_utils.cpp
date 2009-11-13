@@ -1,10 +1,7 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved
 
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_opengl.h>
-
 #include "plastic.h"
+
 #include "sdl_utils.h"
 
 using namespace circa;
