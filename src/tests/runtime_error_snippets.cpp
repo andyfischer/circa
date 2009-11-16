@@ -11,7 +11,7 @@ void test_input(std::string const& in)
     parser::compile(&branch, parser::statement_list, in);
 
     if (has_static_errors(branch)) {
-        std::cout << "In code snippet: " << in << std::endl;
+        std::cout << "In runtime error snippet: " << in << std::endl;
         print_static_errors_formatted(branch, std::cout);
         dump_branch(branch);
         declare_current_test_failed();
@@ -31,7 +31,10 @@ void test_input(std::string const& in)
     std::stringstream formattedError;
     print_runtime_error_formatted(branch, formattedError);
 
-    if (formattedError.str().find("!!! no error found") != std::string::npos) {
+    // Runtime error messages might contain this special string: !!!
+    // which means that something happened which shouldn't happen.
+    if (formattedError.str().find("!!!") != std::string::npos) {
+        std::cout << "In runtime error snippet: " << in << std::endl;
         std::cout << formattedError.str();
         declare_current_test_failed();
     }
@@ -44,6 +47,7 @@ void test_runtime_errors()
     test_input("for i in [1] assert(false) end");
     test_input("def hey() assert(false) end; hey()");
     test_input("def hey()::bool assert(false) return true end; if hey() end");
+    test_input("def hey()::List assert(false) return [] end; hey()");
 }
 
 void register_tests()

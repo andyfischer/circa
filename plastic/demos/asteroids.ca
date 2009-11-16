@@ -30,12 +30,12 @@ speed_limit = 1.8
 bullet_speed = 200.0
 bullet_width = 2.0
 
-
 ship_size = 1.2
 ship_front = 10.0
 ship_back = 5.5
 ship_wing_size = 11.4
 ship_wing_rot = .40
+
 namespace draw_ship
     def ship_point(number rot, number dist) :: Point
         return polar(rot + ship.facing) * dist*ship_size + ship.loc
@@ -149,6 +149,7 @@ def generate_child_asteroid(Asteroid parent) :: Asteroid
     return [map(get_edge, 0..10), parent.location, random_norm_vector()*speed, 0, rotation size 0]
 end
 
+
 state List asteroids = []
 state bool initialized = false
 if not(initialized)
@@ -182,8 +183,7 @@ for asteroid in asteroids
     --gl.circle(asteroid.location, asteroid_collision_radius, #f00)
 end
 
--- check for collisions of asteroids and bullets
-
+-- Check for collisions of asteroids and bullets
 spawned = []
 
 for asteroid in @asteroids
@@ -214,5 +214,3 @@ end
 for spawn in spawned
     asteroids.append(spawn)
 end
-
-
