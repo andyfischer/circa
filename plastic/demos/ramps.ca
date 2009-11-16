@@ -78,10 +78,9 @@ def draw_free_piece(Point location, number rot)
     shape = [[0 0] [1 0] [0 1]]
     rotate_points_around(@shape, [.5 .5] rot)
     mult(@shape, tile_size)
-    def add_location(Point p) : Point
-      return p + location
+    for p in @shape
+        p += location
     end
-    map(add_location, @shape)
     gl.triangles(shape, #404)
 end
 
@@ -283,7 +282,6 @@ if repeating_signal(time_between_creatures)
     creatures.append(new_creature)
 end
 
-
 -- Figure out the path that creatures can walk on
 type PathSegment { Point l, Point r }
 
@@ -294,15 +292,18 @@ def get_path_segment(int tile_x) :: PathSegment
     x1 = tile_size*tile_x
     x2 = tile_size*(tile_x+1)
     if board_piece.square_filled or (board_piece.rot == NW) or (board_piece.rot == NE)
-        return [[x1, tile_y*tile_size], [x2, tile_y*tile_size]]
+        result = [[x1, tile_y*tile_size], [x2, tile_y*tile_size]]
     elif (board_piece.rot == SW)
-        return [[x1, tile_y*tile_size], [x2, (tile_y+1)*tile_size]]
+        result = [[x1, tile_y*tile_size], [x2, (tile_y+1)*tile_size]]
     else
-        return [[x1, (tile_y+1)*tile_size], [x2, tile_y*tile_size]]
+        result = [[x1, (tile_y+1)*tile_size], [x2, tile_y*tile_size]]
     end
+
+    return result
 end
 
 path = map(get_path_segment, 0..num_tiles_x)
+
 for segment in path
     segment = segment :: PathSegment
     draw_thick_line(segment.l segment.r 2.0 #f00)
