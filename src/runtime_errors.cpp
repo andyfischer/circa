@@ -6,6 +6,8 @@ namespace circa {
 
 void error_occurred(Term* errorTerm, std::string const& message)
 {
+    std::cout << "error: " << message << std::endl;
+
     if (errorTerm == NULL)
         throw std::runtime_error(message);
 
@@ -52,11 +54,11 @@ void print_runtime_error_formatted(Term* term, std::ostream& output)
 {
     output << "[" << get_short_location(term) << "] ";
 
-    if (has_error(term)) {
-        output << get_error_message(term);
-    } else if (is_branch(term)) {
+    if (is_branch(term)) {
         output << "\n";
         print_runtime_error_formatted(as_branch(term), output);
+    } else if (has_error(term)) {
+        output << get_error_message(term);
     } else if (is_subroutine(term->function)) {
         output << "\n";
         print_runtime_error_formatted(as_branch(term->function), output);

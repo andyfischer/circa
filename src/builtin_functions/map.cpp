@@ -11,6 +11,11 @@ namespace map_function {
         Branch& inputs = as_branch(caller->input(1));
         Branch& output = as_branch(caller);
 
+        if(is_function_stateful(func)) {
+            error_occurred(caller, "map() not yet supported on a stateful function");
+            return;
+        }
+
         // Create term if necessary
         for (int i=output.length(); i < inputs.length(); i++)
             apply(output, func, RefList(inputs[i]));
