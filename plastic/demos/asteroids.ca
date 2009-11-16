@@ -2,6 +2,7 @@
 desired_window_size = [500 300]
 
 background(#000)
+include('drifting_stars.ca')
 
 type Ship {
     Point loc,
@@ -29,13 +30,6 @@ speed_limit = 1.8
 bullet_speed = 200.0
 bullet_width = 2.0
 
--- Draw a background full of stars
-num_stars = 700
-for i in 0..num_stars
-    state Point loc = random_location()
-    state Color color = [rand(.2 .6) .3 rand(.5 1) 1] 
-    gl.points([loc] color)
-end
 
 ship_size = 1.2
 ship_front = 10.0
@@ -44,7 +38,7 @@ ship_wing_size = 11.4
 ship_wing_rot = .40
 namespace draw_ship
     def ship_point(number rot, number dist) :: Point
-        return polar(rot + ship.facing, dist*ship_size, ship.loc)
+        return polar(rot + ship.facing) * dist*ship_size + ship.loc
     end
 
     gl.line_loop([ship_point(0 ship_front)
@@ -137,7 +131,7 @@ asteroid_num_edges = 10
 def generate_asteroid(number size) :: Asteroid
     def get_edge(int index) :: Point
         angle = index / asteroid_num_edges
-        return polar(angle, rand() * size + size/3, [0 0])
+        return polar(angle) * (rand() * size + size/3)
     end
 
     rotation = rand() * .2 - .1
@@ -148,7 +142,7 @@ def generate_child_asteroid(Asteroid parent) :: Asteroid
     size = parent.size / 2
     def get_edge(int index) :: Point
         angle = index / asteroid_num_edges
-        return polar(angle, rand() * size + size/3, [0 0])
+        return polar(angle) * rand() * size + size/3
     end
     rotation = rand() * .2 - .1
     speed = rand()*20 + 20.0

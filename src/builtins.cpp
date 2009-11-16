@@ -170,6 +170,10 @@ void post_setup_builtin_functions(Branch& kernel)
     Term* mult_s = create_duplicate(mult_overloads, kernel["vectorize_vs"], "mult_s");
     create_ref(function_t::get_parameters(mult_s), MULT_FUNC);
 
+    Branch& div_overloads = as_branch(DIV_FUNC);
+    Term* div_s = create_duplicate(div_overloads, kernel["vectorize_vs"], "div_s");
+    create_ref(function_t::get_parameters(div_s), DIV_FUNC);
+
     function_t::get_feedback_func(VALUE_FUNC) = ASSIGN_FUNC;
 }
 
