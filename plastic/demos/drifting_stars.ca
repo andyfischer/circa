@@ -1,0 +1,15 @@
+background(#000)
+
+drift = [time time]::Point
+
+-- Draw a background full of stars
+num_stars = 700
+for i in 0..num_stars
+    state Point loc = random_location()
+    draw_loc = loc + drift
+
+    draw_loc = [mod(draw_loc[0], window.width) mod(draw_loc[1], window.height)]
+    
+    state Color color = [rand(.2 .6) .3 rand(.5 1) 1] 
+    gl.points([draw_loc] color)
+end
