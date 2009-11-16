@@ -4,10 +4,146 @@
 
 namespace circa {
 
+void error_occurred(Term* errorTerm, std::string const& message)
+{
+    //std::cout << "error: " << message << std::endl;
+
+    if (errorTerm == NULL)
+        throw std::runtime_error(message);
+
+    errorTerm->setHasError(true);
+    errorTerm->stringProp("error") = message;
+}
+
+void assert_type(Term* term, Term* type)
+{
+    if (term->type != type) {
+        std::stringstream msg;
+        msg << "Expected " << type_t::get_name(type)
+            << ", found " << type_t::get_name(term->type);
+        native_type_mismatch(msg.str());
+    }
+}
+
+void native_type_mismatch(std::string const& message)
+{
+    //assert(false);
+    throw std::runtime_error(message);
+}
+
+void nested_error_occurred(Term* errorTerm)
+{
+    if (errorTerm == NULL)
+        throw std::runtime_error("nested_error_occurred, no error listener");
+
+    errorTerm->setHasError(true);
+}
+
+void clear_error(Term* term)
+{
+    if (has_runtime_error(term)) {
+        term->setHasError(false);
+        term->removeProperty("error");
+    }
+}
+
+bool has_runtime_error(Term* term)
+{
+    return term->hasError();
+}
+
+bool has_runtime_error_message(Term* term)
+{
+    return term->hasProperty("error");
+}
+
+std::string get_runtime_error_message(Term* term)
+{
+    return term->stringPropOptional("error", "");
+}
+
+bool has_runtime_error(Branch& branch)
+{
+    for (int i=0; i < branch.length(); i++)
+        if (has_runtime_error(branch[i]))
+            return true;
+    return false;
+}
+
+
+void print_runtime_error_formatted(Term* term, std::ostream& output)
+{
+    output << "[" << get_short_location(term) << "] ";
+
+    if (has_runtime_error(term) && has_runtime_error_message(term)) {
+        output << get_runtime_error_message(term);
+    } else if (has_static_error(term)) {
+        output << get_static_error_message(term);
+    } else if (is_subroutine(term->function)) {
+        output << "\n";
+        print_runtime_error_formatted(as_branch(term->function), output);
+    } else if (is_branch(term)) {
+        output << "\n";
+        print_runtime_error_formatted(as_branch(term), output);
+    } else {
+        output << " (!!! missing error message)";
+    }
+}
+
+void print_runtime_error_formatted(Branch& branch, std::ostream& output)
+{
+    // Find the error in this branch
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (term == NULL) continue;
+        if (has_runtime_error(term)) {
+            print_runtime_error_formatted(term, output);
+            return;
+        }
+    }
+
+    output << "(!!! no error found)" << std::endl;
+}
+
+bool has_error(Term* term)
+{
+    return has_static_error(term) || has_runtime_error(term);
+}
+
+bool has_error(Branch& branch)
+{
+    for (int i=0; i < branch.length(); i++)
+        if (has_error(branch[i]))
+            return true;
+    return false;
+}
+
+void print_errors_formatted(Branch& branch, std::ostream& output)
+{
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (term == NULL) continue;
+        if (has_runtime_error(term)) {
+            print_runtime_error_formatted(term, output);
+            return;
+        }
+        if (has_static_error(term))
+            print_static_error_formatted(term, output);
+    }
+}
+
+std::string get_error_message(Term* term)
+{
+    if (has_static_error(term))
+        return get_static_error_message(term);
+    else
+        return get_runtime_error_message(term);
+}
+
 bool has_static_error(Term* term)
 {
     if (term == NULL)
-        return false; // maybe this should be an error
+        return false;
 
     return get_static_error(term) != SERROR_NO_ERROR;
 }

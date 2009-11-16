@@ -5,9 +5,9 @@
 
 #include "builtins.h"
 #include "cpp_importing.h"
+#include "errors.h"
 #include "refactoring.h"
 #include "primitives.h"
-#include "runtime_errors.h"
 
 namespace circa {
 
