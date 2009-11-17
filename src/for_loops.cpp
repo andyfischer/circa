@@ -10,6 +10,7 @@ namespace circa {
      [1] #any_iterations
      [2] #modify_list
      [3] #discard_called
+     [4] #state_type
    [1] #rebinds
    [2] iterator
    [3 .. n-2] user's code
@@ -47,14 +48,19 @@ Term* get_for_loop_any_iterations(Term* forTerm)
     return as_branch(forTerm)[0]->asBranch()[1];
 }
 
-Term* get_for_loop_modify_list(Term* forTerm)
+bool& get_for_loop_modify_list(Term* forTerm)
 {
-    return as_branch(forTerm)[0]->asBranch()[2];
+    return as_branch(forTerm)[0]->asBranch()[2]->asBool();
 }
 
-Term* get_for_loop_discard_called(Term* forTerm)
+bool& get_for_loop_discard_called(Term* forTerm)
 {
-    return as_branch(forTerm)[0]->asBranch()[3];
+    return as_branch(forTerm)[0]->asBranch()[3]->asBool();
+}
+
+Ref& get_for_loop_state_type(Term* forTerm)
+{
+    return as_branch(forTerm)[0]->asBranch()[4]->asRef();
 }
 
 Branch& get_for_loop_rebinds_for_outer(Term* forTerm)
@@ -71,6 +77,7 @@ void setup_for_loop_pre_code(Term* forTerm)
     create_bool(attributes, false, "#any_iterations");
     create_bool(attributes, false, "#modify_list");
     create_bool(attributes, false, "#discard_called");
+    create_ref(attributes, VOID_TYPE, "#state_type");
     create_branch(forContents, "#rebinds");
 }
 
@@ -156,11 +163,22 @@ void setup_for_loop_post_code(Term* forTerm)
     }
 
     // Also, possibly rebind the list name.
-    if (get_for_loop_modify_list(forTerm)->asBool() && listName != "") {
+    if (get_for_loop_modify_list(forTerm) && listName != "") {
         create_value(rebindsForOuter, LIST_TYPE, listName);
     }
 
     expose_all_names(rebindsForOuter, outerScope);
+
+    // Figure out if this loop has any state
+    bool hasState = false;
+    for (int i=0; i < forContents.length(); i++) {
+        if (is_stateful(forContents[i])) {
+            hasState = true;
+            break;
+        }
+    }
+
+    get_for_loop_state_type(forTerm) = hasState ? BRANCH_TYPE : VOID_TYPE;
 }
 
 void evaluate_for_loop(Term* forTerm)
@@ -172,8 +190,8 @@ void evaluate_for_loop(Term* forTerm)
     // Make sure state has the correct number of iterations
 
     int numIterations = as_branch(listTerm).length();
-    bool modifyList = get_for_loop_modify_list(forTerm)->asBool();
-    bool& discardCalled = get_for_loop_discard_called(forTerm)->asBool();
+    bool modifyList = get_for_loop_modify_list(forTerm);
+    bool& discardCalled = get_for_loop_discard_called(forTerm);
 
     Term* listOutput = NULL;
     int listOutputWriteHead = 0;
