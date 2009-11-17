@@ -212,6 +212,7 @@ void test_for_loops()
     test_snippet("a = [1 2];for i in a; i += 1; end", "a == [1 2]");
     test_snippet("a = [1 2];for i in @a; i += 1; end", "a == [2 3]");
     test_snippet("a = [1 2 3];for i in @a; discard; end", "a == []");
+
     //test_snippet("a = [1 2 3];for i in @a; if i == 1 discard end end", "a == [2 3]");
     //test_snippet("a = [1 2 3];for i in @a; if i == 2 discard end end", "a == [1 3]");
     //test_snippet("a = [1 2 3];for i in @a; if i == 3 discard end end", "a == [1 2]");
@@ -239,6 +240,8 @@ void test_map()
     test_snippet("m = Map(); m.add(1,2); m.add(3,4)", "m.get(1) == 2; m.get(3) == 4");
     test_snippet("m = Map(); m.add('a','b')",
         "m.contains('a'); m.remove('a'); not(m.contains('a'))");
+
+    test_snippet("def f(int i)::int for i in [] return 0 end end; map(f, [0])", "");
 }
 
 void test_field_syntax()

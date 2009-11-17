@@ -594,7 +594,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Branch& innerBranch = as_branch(forTerm);
     setup_for_loop_pre_code(forTerm);
 
-    get_for_loop_modify_list(forTerm)->asBool() = foundAtOperator;
+    get_for_loop_modify_list(forTerm) = foundAtOperator;
 
     if (foundAtOperator)
         forTerm->stringProp("syntaxHints:rebindOperator") = listExpr->name;
