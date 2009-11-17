@@ -4,6 +4,42 @@
 
 namespace circa {
 
+void repl_evaluate_line(Branch& branch, std::string const& input, std::ostream& output)
+{
+    int previousHead = branch.length();
+    parser::compile(&branch, parser::statement_list, input);
+    int newHead = branch.length();
+
+    bool anyErrors = false;
+
+    for (int i=previousHead; i < newHead; i++) {
+        Term* result = branch[i];
+
+        if (has_error(result)) {
+            output << "error: " << get_error_message(result) << std::endl;
+            anyErrors = true;
+            break;
+        }
+
+        evaluate_term(result);
+
+        if (has_error(result)) {
+            output << "error: " << get_error_message(result) << std::endl;
+            anyErrors = true;
+            break;
+        }
+    }
+
+    // if there were any errors, erase the most recent results
+    if (anyErrors) {
+        branch.shorten(previousHead);
+        return;
+    }
+
+    // Print results of the last expression
+    output << to_string(branch[branch.length()-1]) << std::endl;
+}
+
 void start_repl()
 {
     Branch replState;
@@ -36,39 +72,10 @@ void start_repl()
         }
 
         int previousHead = replState.length();
-        parser::compile(&replState, parser::statement_list, input);
-        int newHead = replState.length();
-
-        bool anyErrors = false;
-
-        for (int i=previousHead; i < newHead; i++) {
-            Term* result = replState[i];
-
-            if (has_error(result)) {
-                std::cout << "error: " << get_error_message(result) << std::endl;
-                anyErrors = true;
-                break;
-            }
-
-            evaluate_term(result);
-
-            if (has_error(result)) {
-                std::cout << "error: " << get_error_message(result) << std::endl;
-                anyErrors = true;
-                break;
-            }
-        }
-
-        // if there were any errors, erase the most recent results
-        if (anyErrors) {
-            replState.shorten(previousHead);
-            continue;
-        }
-
-        std::cout << to_string(replState[replState.length()-1]) << std::endl;
+        repl_evaluate_line(replState, input, std::cout);
 
         if (displayRaw) {
-            for (int i=previousHead; i < newHead; i++)
+            for (int i=previousHead; i < replState.length(); i++)
                 std::cout << term_to_raw_string(replState[i]) << std::endl;
         }
     }
