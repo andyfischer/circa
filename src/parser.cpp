@@ -1430,7 +1430,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
 
     // Assign a default step value, using the # of decimal figures
     int decimalFigures = get_number_of_decimal_figures(text);
-    float step = std::pow(0.1, decimalFigures);
+    float step = (float) std::pow(0.1, decimalFigures);
     set_step(term, step);
 
     // Store the original string
@@ -1520,25 +1520,25 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
     float a = 0;
 
     if (text.length() == 3 || text.length() == 4) {
-        r = hex_digit_to_number(text[0]) / 15.0;
-        g = hex_digit_to_number(text[1]) / 15.0;
-        b = hex_digit_to_number(text[2]) / 15.0;
+        r = hex_digit_to_number(text[0]) / 15.0f;
+        g = hex_digit_to_number(text[1]) / 15.0f;
+        b = hex_digit_to_number(text[2]) / 15.0f;
 
         // optional alpha
         if (text.length() == 3)
             a = 1.0;
         else
-            a = hex_digit_to_number(text[3]) / 15.0;
+            a = hex_digit_to_number(text[3]) / 15.0f;
     } else {
-        r = two_hex_digits_to_number(text[0], text[1]) / 255.0;
-        g = two_hex_digits_to_number(text[2], text[3]) / 255.0;
-        b = two_hex_digits_to_number(text[4], text[5]) / 255.0;
+        r = two_hex_digits_to_number(text[0], text[1]) / 255.0f;
+        g = two_hex_digits_to_number(text[2], text[3]) / 255.0f;
+        b = two_hex_digits_to_number(text[4], text[5]) / 255.0f;
 
         // optional alpha
         if (text.length() == 6)
             a = 1.0;
         else
-            a = two_hex_digits_to_number(text[6], text[7]) / 255.0;
+            a = two_hex_digits_to_number(text[6], text[7]) / 255.0f;
     }
 
     result[0]->asFloat() = r;

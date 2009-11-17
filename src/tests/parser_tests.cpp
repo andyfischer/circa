@@ -50,12 +50,12 @@ void test_literal_float()
     test_assert(branch[0] == a);
     test_assert(is_value(a));
     test_assert(a->asFloat() == 1.0);
-    test_equals(get_step(a), .1);
+    test_equals(get_step(a), .1f);
 
     Term* b = parser::compile(&branch, parser::statement_list, "5.200");
     test_assert(b->type == FLOAT_TYPE);
     test_assert(to_string(b) == "5.200");
-    test_equals(get_step(b), .001);
+    test_equals(get_step(b), .001f);
 }
 
 void test_literal_string()

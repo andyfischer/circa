@@ -122,6 +122,7 @@ float to_float(Term* term)
         native_type_mismatch("Type mismatch in to_float");
 
     assert(false); // unreachable
+    return 0.0; // but msvc 7 complains
 }
 
 namespace int_t {

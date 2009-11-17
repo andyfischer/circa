@@ -12,7 +12,9 @@
 #include <math.h>
 #include <direct.h> 
 
-#endif
+#define _CRT_SECURE_NO_WARNINGS
+
+#endif // WINDOWS
 
 #include <algorithm>
 #include <cassert>
