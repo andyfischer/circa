@@ -24,7 +24,6 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
         Term* stateContainer = create_stateful_value(branch,
                 function_t::get_hidden_state_type(function),
                 new_value_name.str());
-        set_source_hidden(stateContainer, true);
 
         RefList newInputs(stateContainer);
         for (int i=0; i < inputs.length(); i++)
@@ -59,6 +58,12 @@ void set_input(Term* term, int index, Term* input)
 {
     assert_good_pointer(term);
     term->inputs.setAt(index, input);
+}
+
+void set_inputs(Term* term, RefList const& inputs)
+{
+    assert_good_pointer(term);
+    term->inputs = inputs;
 }
 
 Term* create_duplicate(Branch& branch, Term* source, std::string const& name, bool copyBranches)

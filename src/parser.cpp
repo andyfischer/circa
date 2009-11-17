@@ -590,7 +590,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     if (!is_branch(listExpr))
         return compile_error_for_line(branch, tokens, startPosition, "Expected a list after 'in'");
 
-    Term* forTerm = apply(branch, FOR_FUNC, RefList(listExpr));
+    Term* forTerm = apply(branch, FOR_FUNC, RefList(NULL, listExpr));
     Branch& innerBranch = as_branch(forTerm);
     setup_for_loop_pre_code(forTerm);
 
@@ -622,6 +622,18 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     setup_for_loop_post_code(forTerm);
     set_source_location(forTerm, startPosition, tokens);
+
+    // Check to create a state container
+    if (for_loop_has_state(forTerm)) {
+        Term* state = create_stateful_value(branch, get_for_loop_state_type(forTerm),
+                "#hidden_state_for_for_loop");
+
+        set_input(forTerm, 0, state);
+
+        branch.moveToEnd(forTerm);
+    }
+
+    get_input_syntax_hint(forTerm, 0, "hidden") = "true";
 
     // Use the heading as this term's name, for introspection
     //FIXME branch.bindName(forTerm, for_function::get_heading_source(forTerm));

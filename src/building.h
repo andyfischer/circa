@@ -20,6 +20,7 @@ Term* create_duplicate(Branch& branch, Term* source, std::string const& name="",
         bool copyBranches=true);
 
 void set_input(Term* term, int index, Term* input);
+void set_inputs(Term* term, RefList const& inputs);
 
 // Create a new value term with the given type.
 Term* create_value(Branch& branch, Term* type, std::string const& name="");
