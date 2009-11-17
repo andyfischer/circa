@@ -216,10 +216,16 @@ void test_lists()
     test_snippet("potatoes = ['potato' 'potato' 'potato']");
 }
 
+void test_blocks()
+{
+    test_snippet("def f() 1 2 3 end");
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_location_snippets::test_simple);
     REGISTER_TEST_CASE(source_location_snippets::test_identifiers);
     REGISTER_TEST_CASE(source_location_snippets::test_lists);
+    REGISTER_TEST_CASE(source_location_snippets::test_blocks);
 }
 
 } // namespace source_location_snippets

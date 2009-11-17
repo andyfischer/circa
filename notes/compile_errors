@@ -1,5 +1,5 @@
 
-PARSING PROCESS
+Rough sketch of handling compile errors:
 
 Step 1: Scan the entire input for fatal parsing errors.
 

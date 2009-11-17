@@ -2,9 +2,6 @@
 There are many different kinds of constancy. They include:
 
 Will this term always have the same output value?
- - This is the highest form of constantcy, since it means that we can collapse it.
 Will this term's inputs ever change?
 Will this term's function ever change?
-Will this term's state ever change?
 Will this term always exist?
-
