@@ -239,4 +239,3 @@ int main( int argc, char* args[] )
 
     return plastic_main(argv);
 }
-

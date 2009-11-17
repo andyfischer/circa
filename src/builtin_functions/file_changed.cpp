@@ -20,7 +20,7 @@ namespace file_changed_function {
         if (modifiedTime != prevModified
                 || filename != prevFilename) {
             prevFilename = filename;
-            prevModified = modifiedTime;
+            prevModified = (int) modifiedTime;
             return true;
         } else {
             return false;
