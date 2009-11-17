@@ -39,13 +39,13 @@ end
 
 -- Helper function
 def rotate_points_around(List points, Point center, number rot) :: List
-    def rotate_point(Point point) :: Point
+    for point in @points
+        point = point::Point
         point = point - center
         point = [point.x*cos(rot) - point.y*sin(rot), point.x*sin(rot)+point.y*cos(rot)]
         point = point + center
-        return point
     end
-    return map(rotate_point, points)
+    return points
 end
 
 def rotate_around_i(Point_i point, Point_i center, int rotation) :: Point_i
@@ -69,7 +69,6 @@ def rotate_around_i(Point_i point, Point_i center, int rotation) :: Point_i
   
   return result + center
 end
-
 
 type Piece { int x, int y, int rot }
 type BoardPiece { int rot, bool filled, bool square_filled }
@@ -131,11 +130,12 @@ state number tile_fall_distance = tile_size
 state board = map(initialize_board_piece, 0..num_tiles)
 
 def rotate_falling_group(List group, int rot) :: List
-    def rotate_piece(Piece piece) :: Piece
+    for piece in @group
+        piece = piece::Piece
         pos = rotate_around_i([piece.x piece.y] [1 1] rot)
-        return [pos.x pos.y (piece.rot + rot)%4]
+        piece = [pos.x pos.y (piece.rot + rot)%4]
     end
-    return map(rotate_piece, group)
+    return group
 end
 
 
@@ -192,8 +192,9 @@ end
 
 
 -- Update fall animation
---tile_fall_distance -= fall_speed * time_delta
+tile_fall_distance -= fall_speed * time_delta
 
+landed_falling_group = []
 
 -- Check to move falling group down a step
 if tile_fall_distance < 0
@@ -203,6 +204,7 @@ if tile_fall_distance < 0
   next_falling_group_position = position_falling_pieces(falling_group, falling_group_pos + [0 0 1])
 
   if falling_pieces_collide(next_falling_group_position)
+    landed_falling_group.append(next_falling_group_position)
     -- Make this piece permanent
     falling_group_position = position_falling_pieces(falling_group, falling_group_pos)
     for piece in falling_group_position
@@ -272,7 +274,6 @@ def find_highest_tile_for_x(int tile_x) :: int
     return found
 end
 
-
 state List creatures = []
 
 -- Check to spawn a dude
@@ -340,16 +341,57 @@ end
 
 creatures = map(move_creature, creatures)
 
-type PositionedCreature { number x, number y }
-
-def position_creature(Creature creature) :: PositionedCreature
+def position_creature(Creature creature) :: Point
     path_segment = path[creature.tile_x] :: PathSegment
 
     track_pos = path_segment.l + (path_segment.r - path_segment.l) * creature.tile_x_progress
     return track_pos + [0 -tile_size/2]
 end
 
-for pos_creature in map(position_creature, creatures)
-    pos_creature = pos_creature :: PositionedCreature
-    gl.circle([pos_creature.x pos_creature.y] 15.0 #844)
+creature_radius = 15.0
+creature_color = #844
+
+-- Draw creatures
+for pos in map(position_creature, creatures)
+    gl.circle(pos::Point creature_radius creature_color)
+end
+
+-- Kill creatures if the falling block touches them
+type KilledCreature { Point loc, number age }
+
+state dying_creatures = []
+
+for creature in @creatures
+    creature = creature::Creature
+    position = position_creature(creature)
+
+    collided = false
+    for landed_group in landed_falling_group
+        landed_group = landed_group::List
+        for piece in landed_group
+            piece = piece::Piece
+            if piece.x == creature.tile_x
+                collided = true
+            end
+        end
+    end
+
+    if collided
+        dying_creatures.append([position 0])
+        discard
+    end
+end
+
+-- Draw killed creatures
+for creature in @dying_creatures
+    creature = creature::KilledCreature
+    --color = creature_color + #000f * interpolate(1 0 3.0 creature.age)
+    color = #555
+    gl.circle(creature.loc creature_radius color)
+
+    if creature.age > 3.0
+        discard
+    end
+
+    creature = [creature.loc creature.age+td]
 end
