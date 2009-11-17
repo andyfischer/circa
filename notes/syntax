@@ -5,7 +5,7 @@ names have no explicit type or data, they just hang on (possibly multiple) terms
   We work the same way. It's good.
   Though it might be nice to have a compiler hint pass that warns when a name changes type
 
-Array literals
+Array expression
   Currently []
   Commas are optional so we can write [1 2 3]
   This is working well
@@ -17,6 +17,14 @@ Array access
   for array literals. This: [foo [1] 2] would mean something different than: [foo[1] 2].
   But this is not so bad, we can just say that you can't have whitesapce between the foo and [1].
   It looks weird anyway.
+
+Map expression
+  Probably with [] to match array expressions
+  {} is used for lambdas
+  Ideas:
+    ages = ['Sally' -> 20, 'Aberdeen' -> 80]
+    ages = ['Sally': 20, 'Aberdeen': 80]
+    ages = {'Sally' -> 20, 'Aberdeen' -> 80}
 
 For loop syntax?
   Currently: for i in list
@@ -30,11 +38,12 @@ For loop syntax?
     for Type i : list
 
 Type annotation
-  Currently use : operator
+  Currently :: operator
   Examples:
-    a = 1:int
-    b = [1 2] : Point
-  Haskell and some other languages use ::, though : seems to be more popular
+    a = 1::int
+    b = [1 2] :: Point
+  Actionscript uses :
+  Haskell and some other languages use ::
   It might be nice to use :: so that we can use : for something else.
   ("Everyone wants the colon" - Larry Wall)
   Alternatives:
@@ -48,9 +57,10 @@ Type annotation
     for (i [::int] in list)
 
 Method chaining
-  Important to make this easy
+  Would be nice to make this easy
   blah().foo().baz()
-  blah.foo.baz -- omit the ()s as in Ruby. This would be nice
+  blah.foo.baz -- omit the ()s as in Ruby
+  This might be nice. But then how to pass a function as a value?
 
 Omitting , or ; or newlines
   Inspired from Lua. In Lua, you can write this: 1+2 3*4 print('a')
@@ -59,16 +69,43 @@ Omitting , or ; or newlines
 Lambdas
   Most likely going to use {}s
   Not sure how to indicate inputs
-  Also not sure how to specify return value (explicit or implicit return)
+  Return value should probably just use the last statement, other languages use this and
+    it works fine for them.
   Some variations:
     l = {x,y | x + y}
     l = {x,y | return x + y}
     l = { ->x ->y; return x + y}
     l = {x:int, y:int | x + y}
     l = {x:int, y:int | return x + y}
+    l = {return ^x + ^y}
+    l = {^x + ^y}
+
+Curries
+  Would be rad
+  Maybe with the * symbol?
+  Example:
+    func = (* == 5)
+    func(5) == true
+
+Upvalue syntax
+  Generic way to say that a name is passed from above.
+  Makes lambdas really consise.
+  Could be used in other situations
+  Uses ^ symbol. Looks like this: add1 = {^x + 1}, add1(1) == 2
+  Can figure out placement based on the order of the ^ expressions, but this is only
+  a good idea for small bits of code. For larger code we can use named arguments.
+
+Optional upvalue
+  Need some syntax that can optionally use an upvalue, but provides a default if the
+  name is not found.
+  Ideas:
+    ^name or x
+    name = ^name or x
+    name = optional('name', x)
+    name = optional(^name, x)
     
 Multi-line lambdas
-  I like how easy it is to pass a block to a function call in Ruby
+  I like how easy it is to pass a block of code to a function call in Ruby
   Ideas:
     map(items) do |x|
       x = x + 1
@@ -81,3 +118,46 @@ Multi-line lambdas
     items = map(..., items)
       x = x + 1
     end
+
+    items = map(items):
+      x = x + 1
+    end
+
+  Could try lambda syntax. The draw back is that it's annoying to wrap ()s around it
+  (Or at least, it would be annoying if the lambda was longer)
+  items = map({^x + 1 }, items)
+  items = map(do ^x + 1 end, items)
+  items = map(: ^x + 1 end, items)
+  
+  Maybe the solution is to have a syntax where the trailing ) can be omitted
+
+  items = map(.., items) {^x + 1}
+  items = map(..., items) {^x + 1}
+
+  Could use this syntax in other places
+
+  write_string(.., loc, color) "This is an output string blah blah"
+
+  But all these ideas look too messy.
+
+Switch statement / pattern matching
+  Different use cases:
+    1. Check if a value is equal to a certain value
+    2. Check if a value is within a list of ranges
+    3. Check if an arbitrary expression is true
+    4. Check what type matches the input
+
+  Need an expression which means 'default'
+    Common choice for this is: _
+
+  switch() could be a function which takes a lambda as input
+  Combine with curry syntax:
+    result = switch(x == *)
+      5 -> "x is five"
+      _ -> "x is not five"
+    end
+
+    result = switch(x == *) [
+      5 -> "x is five"
+      _ -> "x is not five"
+    ]

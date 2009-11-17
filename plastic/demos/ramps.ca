@@ -190,7 +190,6 @@ if not(falling_group_collides(falling_group, users_requested_position))
     falling_group_pos = users_requested_position
 end
 
-
 -- Update fall animation
 tile_fall_distance -= fall_speed * time_delta
 
@@ -320,16 +319,27 @@ def move_creature(Creature creature) :: Creature
     if finished_tile
         -- check if there is a wall here
         this_path = path[creature.tile_x] :: PathSegment
-        next_path = path[creature.tile_x + creature.walking_dir] :: PathSegment
+        next_index = creature.tile_x + creature.walking_dir
+
+        if next_index < 0 or next_index >= num_tiles_x
+            -- Creature wants to walk off the edge of the map
+            next_path = [[100 100] [100 100]] :: PathSegment
+        else
+            next_path = path[next_index] :: PathSegment
+        end
 
         if creature.walking_dir == 1
+            -- Walking right
             close_point = this_path.r
             next_point = next_path.l
         else
+            -- Walking left
             close_point = this_path.l
             next_point = next_path.r
         end
+
         if close_point.y > next_point.y
+            -- Change direction if there isn't a smooth slope
             creature.walking_dir = creature.walking_dir * -1
         else
             creature.tile_x = creature.tile_x + creature.walking_dir

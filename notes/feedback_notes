@@ -29,8 +29,7 @@ When we create a feedback term:
  (Future: return a list instead of actually attaching things?)
 
 
-Note that many of these operations depend on the items being constant.
+Note that many of these operations assume that the items are constant.
 If they are not constant, this code will have to be modified to handle
 the situation where they change.
-
 
