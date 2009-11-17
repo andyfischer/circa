@@ -17,14 +17,22 @@ namespace circa {
    [n-1] #rebinds_for_outer
 */
 
-Branch& get_for_loop_state(Term* forTerm)
+Branch* get_for_loop_state(Term* forTerm)
 {
-    return forTerm->input(0)->asBranch();
+    if (get_for_loop_state_type(forTerm) == VOID_TYPE)
+        return NULL;
+
+    return &forTerm->input(0)->asBranch();
+}
+
+bool for_loop_has_state(Term* forTerm)
+{
+    return get_for_loop_state_type(forTerm) != VOID_TYPE;
 }
 
 Branch& get_for_loop_iteration_state(Term* forTerm, int index)
 {
-    return get_for_loop_state(forTerm)[index]->asBranch();
+    return get_for_loop_state(forTerm)->get(index)->asBranch();
 }
 
 Branch& get_for_loop_rebinds(Term* forTerm)
@@ -185,7 +193,7 @@ void evaluate_for_loop(Term* forTerm)
 {
     Term* listTerm = forTerm->input(1);
     Branch& codeBranch = as_branch(forTerm);
-    Branch& stateBranch = get_for_loop_state(forTerm);
+    Branch* stateBranch = get_for_loop_state(forTerm);
 
     // Make sure state has the correct number of iterations
 
@@ -199,15 +207,17 @@ void evaluate_for_loop(Term* forTerm)
     if (modifyList)
         listOutput = get_for_loop_rebinds_for_outer(forTerm)[listTerm->name];
 
-    resize_list(stateBranch, numIterations, BRANCH_TYPE);
+    if (stateBranch != NULL) {
+        resize_list(*stateBranch, numIterations, BRANCH_TYPE);
 
-    // Initialize state for any uninitialized slots
-    for (int i=0; i < numIterations; i++) {
+        // Initialize state for any uninitialized slots
+        for (int i=0; i < numIterations; i++) {
 
-        Branch& iterationBranch = get_for_loop_iteration_state(forTerm, i);
-        
-        if (iterationBranch.length() == 0) {
-            get_type_from_branches_stateful_terms(codeBranch, iterationBranch);
+            Branch& iterationBranch = get_for_loop_iteration_state(forTerm, i);
+            
+            if (iterationBranch.length() == 0) {
+                get_type_from_branches_stateful_terms(codeBranch, iterationBranch);
+            }
         }
     }
 
@@ -231,7 +241,8 @@ void evaluate_for_loop(Term* forTerm)
         assign_value(listTerm->asBranch()[i], iterator);
 
         // Inject stateful terms
-        load_state_into_branch(stateBranch[i]->asBranch(), codeBranch);
+        if (stateBranch != NULL)
+            load_state_into_branch(stateBranch->get(i)->asBranch(), codeBranch);
 
         // Evaluate
         Term errorListener;
@@ -243,7 +254,8 @@ void evaluate_for_loop(Term* forTerm)
         }
 
         // Persist stateful terms
-        persist_state_from_branch(codeBranch, stateBranch[i]->asBranch());
+        if (stateBranch != NULL)
+            persist_state_from_branch(codeBranch, stateBranch->get(i)->asBranch());
 
         // Possibly use this value to modify the list
         if (listOutput != NULL && !discardCalled) {

@@ -40,8 +40,9 @@ namespace for_function {
 
     void setup(Branch& kernel)
     {
-        FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(state List, List) :: Code");
+        FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(any _state, List) :: Code");
         function_t::get_to_source_string(FOR_FUNC) = toSourceString;
+        function_t::set_input_meta(FOR_FUNC, 0, true);
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
         function_t::get_to_source_string(DISCARD_FUNC) = discard_to_source_string;
