@@ -28,8 +28,8 @@ bool initialize_display()
     int desiredHeight = 480;
 
     if (users_branch().contains("desired_window_size")) {
-        WINDOW_WIDTH = users_branch()["desired_window_size"]->asBranch()[0]->asInt();
-        WINDOW_HEIGHT = users_branch()["desired_window_size"]->asBranch()[1]->asInt();
+        desiredWidth = users_branch()["desired_window_size"]->asBranch()[0]->asInt();
+        desiredHeight = users_branch()["desired_window_size"]->asBranch()[1]->asInt();
     }
 
     if (!resize_display(desiredWidth, desiredHeight))

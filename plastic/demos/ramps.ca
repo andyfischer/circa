@@ -25,7 +25,9 @@ num_tiles_x = window.width // tile_size
 num_tiles_y = window.height // tile_size
 num_tiles = num_tiles_x * num_tiles_y
 
--- draw the checkerboard in the background
+state rescued_creatures = 0
+
+-- Draw the checkerboard in the background
 for x in 0..num_tiles_x
   for y in 0..num_tiles_y
     box_tl = [x::int * tile_size, y::int * tile_size] :: Point
@@ -36,6 +38,24 @@ for x in 0..num_tiles_x
     gl.triangles([box_tl box_tr box_bl box_tr box_br box_bl] color)
   end
 end
+
+-- Draw the goal label
+small_font = text.load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 18)
+def draw_goal_label(Point loc)
+    draw_text_centered(small_font, "GOAL", #000, loc)
+    loc += [-15 20]
+    arrow_head = loc+[20 0]
+    gl.line_strip([loc arrow_head], #000)
+    gl.line_strip([arrow_head+[-5 -5] arrow_head arrow_head+[-5 5]] #000)
+end
+
+draw_goal_label([window.width - 50 window.height / 2])
+
+-- Draw # of points
+big_font = text.load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 40)
+draw_text_centered(big_font, concat('Rescued: ' rescued_creatures) #000
+    [window.width/2 20])
+
 
 -- Helper function
 def rotate_points_around(List points, Point center, number rot) :: List
@@ -310,7 +330,8 @@ for segment in path
 end
 
 -- Move creatures
-def move_creature(Creature creature) :: Creature
+for creature in @creatures
+    creature = creature::Creature
     speed = .5
     creature.tile_x_progress = creature.tile_x_progress + time_delta * speed * creature.walking_dir
 
@@ -321,35 +342,38 @@ def move_creature(Creature creature) :: Creature
         this_path = path[creature.tile_x] :: PathSegment
         next_index = creature.tile_x + creature.walking_dir
 
-        if next_index < 0 or next_index >= num_tiles_x
-            -- Creature wants to walk off the edge of the map
-            next_path = [[100 100] [100 100]] :: PathSegment
+        -- Check if the creature has made it to the right side of the screen
+        if next_index >= num_tiles_x
+            rescued_creatures += 1
+            discard
         else
-            next_path = path[next_index] :: PathSegment
-        end
+            if next_index < 0
+                -- Creature wants to walk off the edge of the map
+                next_path = [[100 100] [100 100]] :: PathSegment
+            else
+                next_path = path[next_index] :: PathSegment
+            end
 
-        if creature.walking_dir == 1
-            -- Walking right
-            close_point = this_path.r
-            next_point = next_path.l
-        else
-            -- Walking left
-            close_point = this_path.l
-            next_point = next_path.r
-        end
+            if creature.walking_dir == 1
+                -- Walking right
+                close_point = this_path.r
+                next_point = next_path.l
+            else
+                -- Walking left
+                close_point = this_path.l
+                next_point = next_path.r
+            end
 
-        if close_point.y > next_point.y
-            -- Change direction if there isn't a smooth slope
-            creature.walking_dir = creature.walking_dir * -1
-        else
-            creature.tile_x = creature.tile_x + creature.walking_dir
-            creature.tile_x_progress = creature.tile_x_progress - creature.walking_dir
+            if close_point.y > next_point.y
+                -- Change direction if there isn't a smooth slope
+                creature.walking_dir = creature.walking_dir * -1
+            else
+                creature.tile_x = creature.tile_x + creature.walking_dir
+                creature.tile_x_progress = creature.tile_x_progress - creature.walking_dir
+            end
         end
     end
-    return creature
 end
-
-creatures = map(move_creature, creatures)
 
 def position_creature(Creature creature) :: Point
     path_segment = path[creature.tile_x] :: PathSegment
