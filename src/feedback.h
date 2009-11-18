@@ -36,7 +36,9 @@ struct FeedbackOperation
 
 bool is_trainable(Term* term);
 void set_trainable(Term* term, bool value);
+void refresh_training_branch(Branch& branch, Branch& trainingBranch);
 void refresh_training_branch(Branch& branch);
+Branch& default_training_branch(Branch& branch);
 
 void feedback_register_constants(Branch& kernel);
 

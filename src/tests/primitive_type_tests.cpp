@@ -39,6 +39,13 @@ void builtin_objects()
     test_assert(find_named(*KERNEL,"bool") == BOOL_TYPE);
 }
 
+void test_void()
+{
+    Branch branch;
+    Term* v = create_void(branch);
+    test_equals(to_string(v), "<void>");
+}
+
 void assign_int_to_float()
 {
     Branch branch;
@@ -96,6 +103,7 @@ void register_tests()
     REGISTER_TEST_CASE(primitive_type_tests::non_pointer_values);
     REGISTER_TEST_CASE(primitive_type_tests::strings);
     REGISTER_TEST_CASE(primitive_type_tests::builtin_objects);
+    REGISTER_TEST_CASE(primitive_type_tests::test_void);
     REGISTER_TEST_CASE(primitive_type_tests::assign_int_to_float);
     REGISTER_TEST_CASE(primitive_type_tests::float_to_string);
     REGISTER_TEST_CASE(primitive_type_tests::test_ref_tweak);
