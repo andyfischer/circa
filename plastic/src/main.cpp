@@ -141,23 +141,22 @@ void main_loop()
 
 bool load_user_script_filename(std::string const& _filename)
 {
-    std::string filename = get_absolute_path(_filename);
-    runtime_branch()["user_script_filename"]->asString() = filename;
     Term* users_branch = runtime_branch()["users_branch"];
-    include_function::load_script(users_branch);
     USERS_BRANCH = &users_branch->asBranch();
 
-    std::cout << "Loading script: " << filename << std::endl;
+    if (_filename != "") {
+        std::string filename = get_absolute_path(_filename);
+        runtime_branch()["user_script_filename"]->asString() = filename;
+        std::cout << "Loading script: " << filename << std::endl;
+        
+        include_function::load_script(users_branch);
+    }
 
     return true;
 }
 
 int plastic_main(std::vector<std::string> args)
 {
-    // For no args, default action is to run tests
-    if (args.size() == 0)
-        return circa::run_command_line(args);
-
     if (!initialize_plastic()) return 1;
 
     // -gd to generate docs
@@ -195,8 +194,10 @@ int plastic_main(std::vector<std::string> args)
     }
 
     // Normal operation, load the script file in argument 0.
+    std::string filename;
+    if (args.size() > 0) filename = args[0];
 
-    if (!load_user_script_filename(args[0]))
+    if (!load_user_script_filename(filename))
         return 1;
 
     if (has_static_errors(users_branch())) {

@@ -1,0 +1,119 @@
+#!/usr/bin/env python
+
+import os, shutil, zipfile
+from glob import glob
+
+# ----------------------- Helper functions ------------------------
+
+def mkdir(path):
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+def recr_mkdir(path):
+    if not os.path.exists(path):
+        parent = os.path.split(path)[0]
+        if parent:
+            recr_mkdir(parent)
+        os.mkdir(path)
+
+def rm(path):
+    if not os.path.exists(path): return
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+    else:
+        os.remove(path)
+
+def rm_glob(pattern):
+    for file in glob(pattern):
+        rm(file)
+
+copy_file = shutil.copy
+copy_tree = shutil.copytree
+
+def copy_glob(pattern, dest):
+    for file in glob(pattern):
+        shutil.copy(file, dest)
+
+def walk(dir):
+    for (dirpath,dirnames,filenames) in os.walk(dir):
+        for filename in filenames:
+            yield os.path.join(dirpath,filename)
+
+def zip(dir, prefix):
+    import zipfile
+    zfile = zipfile.ZipFile(dir + '.zip', 'w')
+
+    for file in walk(dir):
+        file_in_archive = file[len(prefix):]
+        zfile.write(file, file_in_archive)
+
+# ------------------------------------------------------------
+
+
+global_version_name = 'alpha2'
+
+def deploy_assets(target_dir):
+    copy_tree('plastic/assets', target_dir+'/assets')
+    copy_file('plastic/runtime.ca', target_dir)
+    copy_tree('plastic/demos', target_dir+'/demos')
+
+    # remove some demos that aren't ready yet
+    rm(target_dir+'/demos/meshtest.ca')
+    rm(target_dir+'/demos/tree.ca')
+
+def deploy_windows():
+    version_name='plastic_win32_cl_'+global_version_name
+
+    target_dir='build/deploy/'+version_name
+    rm(target_dir)
+    recr_mkdir(target_dir)
+
+    copy_file('build/bin/plas.exe', target_dir+'/plastic.exe')
+
+    deploy_assets(target_dir)
+
+    #mkdir(target_dir+'/bin')
+    copy_glob('SDL_deps/bin/*', target_dir)
+    copy_glob('c:/WINDOWS/WinSxS/x86_Microsoft.VC80.CRT_1fc8b3b9a1e18e3b_8.0.50727.762_x-ww_6b128700/*.dll', target_dir)
+
+    zip(target_dir, prefix='build/deploy/')
+
+def deploy_mac():
+    version_name='plastic_osx_cl_'+global_version_name
+
+    target_dir='build/deploy/'+version_name
+    rm(target_dir)
+    recr_mkdir(target_dir)
+
+    copy_file('build/bin/plas', target_dir+'/plastic')
+
+    deploy_assets(target_dir)
+
+    mkdir(target_dir+'/bin')
+
+    dylibs = ['libSDL-1.2.0.dylib',
+        'libSDL_gfx.0.dylib',
+        'libSDL_image-1.2.0.dylib',
+        'libSDL_ttf-2.0.0.dylib',
+        'libfreetype.6.dylib',
+        'libz.1.dylib']
+
+    for dylib in dylibs:
+        old = '/opt/local/lib/'+dylib
+        new_relative = 'bin/'+dylib
+        new = target_dir+'/'+new_relative
+        copy_file(old, new)
+        os.system('install_name_tool -change %s %s %s' % (old,
+            '@loader_path/'+dylib, new))
+        os.system('install_name_tool -change %s %s %s' %
+            (old, '@loader_path/'+new_relative, target_dir+'/plastic'))
+
+    zip(target_dir, prefix='build/deploy/')
+
+if __name__ == '__main__':
+    os.chdir(os.environ['CIRCA_HOME'])
+    import sys
+    if sys.argv[1] == 'windows':
+        deploy_windows()
+    if sys.argv[1] == 'mac':
+        deploy_mac()

@@ -103,6 +103,11 @@ Optional upvalue
     name = ^name or x
     name = optional('name', x)
     name = optional(^name, x)
+    ^name = x
+    optional name = x
+    ^optional name = x
+
+  Favorite so far is: optional(^name, x)
     
 Multi-line lambdas
   I like how easy it is to pass a block of code to a function call in Ruby
