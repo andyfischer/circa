@@ -297,10 +297,23 @@ state List creatures = []
 
 -- Check to spawn a dude
 time_between_creatures = 10
-if repeating_signal(time_between_creatures)
+time_till_next_creature = time_between_creatures-mod(time, time_between_creatures)
+state prev_time_till_next = time_till_next_creature
+
+spawn = false
+if prev_time_till_next < time_till_next_creature
+    spawn = true
+end
+prev_time_till_next = time_till_next_creature
+
+if spawn
     new_creature = [0 find_highest_tile_for_x(0) 0 1] :: Creature
     creatures.append(new_creature)
 end
+
+draw_text(small_font, concat("Next dude in: " floor(time_till_next_creature)),
+    #000, [10 window.height/2])
+
 
 -- Figure out the path that creatures can walk on
 type PathSegment { Point l, Point r }
@@ -429,3 +442,4 @@ for creature in @dying_creatures
 
     creature = [creature.loc creature.age+td]
 end
+
