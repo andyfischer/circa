@@ -29,7 +29,7 @@ namespace vectorize_vs_function {
                 apply(output, func, RefList(left[i], right));
         }
 
-        evaluate_branch(output);
+        evaluate_branch(output, caller);
     }
 
     void setup(Branch& kernel)

@@ -49,9 +49,9 @@ end
 
 -- bounce balls off of top and bottom
 if (ball_loc.y + ball_radius) > window.height
-    ball_direction = ball_direction * [0 -1] :: Point
+    ball_direction = ball_direction * [1 -1] :: Point
 elif (ball_loc.y - ball_radius) < 0
-    ball_direction = ball_direction * [0 -1] :: Point
+    ball_direction = ball_direction * [1 -1] :: Point
 end
 
 def get_collision_vector(Rect paddle, Point point) :: Point
@@ -70,7 +70,7 @@ if rect_intersects_circle(players_paddle, ball_loc, ball_radius)
 end
 if rect_intersects_circle(ai_paddle, ball_loc, ball_radius)
     ball_direction = get_collision_vector(ai_paddle, ball_loc)
-    ball_direction = [-1 0] * ball_direction :: Point
+    ball_direction = [-1 1] * ball_direction :: Point
 end
 
 -- move ball

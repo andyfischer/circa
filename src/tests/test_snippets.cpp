@@ -260,6 +260,7 @@ void test_vectorized_funcs()
     test_snippet("a = [2.0 2.0] :: Point; b = [4.0 4.0]", "a + b == [6.0 6.0]");
     test_snippet("a = [2.0 2.0]; b = [4.0 4.0]", "a + b == [6.0 6.0]");
     test_snippet("a = [2.0 2.0]; b = [4.0 4.0] :: Point", "a + b == [6.0 6.0]");
+    test_snippet("", "[1 1]*[1 1] == [1 1]");
 }
 
 void test_color_arithmetic()
