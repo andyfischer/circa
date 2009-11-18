@@ -414,6 +414,13 @@ namespace ref_t {
     }
 }
 
+namespace void_t {
+    std::string to_string(Term*)
+    {
+        return "<void>";
+    }
+}
+
 void initialize_primitive_types(Branch& kernel)
 {
     EVALUATE_THUNK_TYPE = import_pointer_type<EvaluateFunc>(kernel, "EvaluateThunk");
@@ -455,6 +462,8 @@ void initialize_primitive_types(Branch& kernel)
     type_t::get_to_string_func(ANY_TYPE) = any_t::to_string;
 
     VOID_TYPE = create_empty_type(kernel, "void");
+    type_t::get_to_string_func(VOID_TYPE) = void_t::to_string;
+    type_t::get_is_pointer(VOID_TYPE) = false;
 
     //ALLOC_THUNK_TYPE = import_type<AllocFunc>(kernel, "AllocThunk");
     //DEALLOC_THUNK_TYPE = import_type<DeallocFunc>(kernel, "DeallocThunk");

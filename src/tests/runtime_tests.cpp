@@ -10,6 +10,7 @@ std::vector<std::string> gSpyResults;
 void spy_function(Term* caller)
 {
     gSpyResults.push_back(as_string(caller->input(0)));
+    as_bool(caller) = true;
 }
 
 void i_only_throw_errors(Term* caller)
@@ -19,7 +20,7 @@ void i_only_throw_errors(Term* caller)
 
 void init_test_functions(Branch& branch)
 {
-    import_function(branch, spy_function, "spy(string)");
+    import_function(branch, spy_function, "spy(string)::bool");
     import_function(branch, i_only_throw_errors, "i_only_throw_errors() :: string");
 }
 
@@ -63,7 +64,8 @@ void blocked_by_error()
     test_assert(gSpyResults[0] == "1");
     test_assert(!spy_1->hasError());
     test_assert(error->hasError());
-    test_assert(!is_value_alloced(spy_blocked));
+
+    test_assert(as_bool(spy_blocked) == false);
 }
 
 void error_message()

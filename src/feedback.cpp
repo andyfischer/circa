@@ -111,7 +111,7 @@ void normalize_feedback_branch(Branch& branch)
             }
 
             // Create a call to their feedback-accumulator
-            // TODO: Should probably choose the accumulator func based on type
+            // Should probably choose the accumulator func based on type or function
             Term* accumulator = apply(branch, AVERAGE_FUNC, accumulatorInputs);
 
             // assign() this
@@ -122,15 +122,9 @@ void normalize_feedback_branch(Branch& branch)
     branch.removeNulls();
 }
 
-void refresh_training_branch(Branch& branch)
+void refresh_training_branch(Branch& branch, Branch& trainingBranch)
 {
     update_derived_trainable_properties(branch);
-
-    // Check if '#training' branch exists. Create if it doesn't exist
-    if (!branch.contains(TRAINING_BRANCH_NAME))
-        create_branch(branch, TRAINING_BRANCH_NAME);
-
-    Branch& trainingBranch = as_branch(branch[TRAINING_BRANCH_NAME]);
     trainingBranch.clear();
 
     FeedbackOperation operation;
@@ -209,7 +203,8 @@ void refresh_training_branch(Branch& branch)
                 Term* outgoingFeedback = as_branch(feedback)[i];
 
                 // Initialize this field
-                specialize_type(outgoingFeedback, function_t::get_input_type(term->function, i));
+                specialize_type(outgoingFeedback,
+                        function_t::get_input_type(term->function, i));
                 alloc_value(outgoingFeedback);
 
                 if (!is_trainable(input))
@@ -222,6 +217,20 @@ void refresh_training_branch(Branch& branch)
             }
         }
     }
+}
+
+void refresh_training_branch(Branch& branch)
+{
+    refresh_training_branch(branch, default_training_branch(branch));
+}
+
+Branch& default_training_branch(Branch& branch)
+{
+    // Check if '#training' branch exists. Create if it doesn't exist
+    if (!branch.contains(TRAINING_BRANCH_NAME))
+        create_branch(branch, TRAINING_BRANCH_NAME);
+
+    return as_branch(branch[TRAINING_BRANCH_NAME]);
 }
 
 float get_feedback_weight(Term* term)

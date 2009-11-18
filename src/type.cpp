@@ -270,7 +270,6 @@ bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
     }
 
     // Every compound type matches against List or Branch
-    // TODO: revise this once there is a real type hierarchy
     if (identity_equals(type, LIST_TYPE))
         return true;
     if (identity_equals(type, BRANCH_TYPE))
