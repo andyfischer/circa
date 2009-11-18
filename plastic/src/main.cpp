@@ -87,6 +87,7 @@ bool initialize_builtin_functions()
     if (has_static_errors(runtime_branch())) {
         std::cout << "Errors in runtime.ca:" << std::endl;
         print_errors_formatted(runtime_branch(), std::cout);
+        std::cout << std::endl;
         return false;
     }
 
@@ -196,6 +197,11 @@ int plastic_main(std::vector<std::string> args)
     // Normal operation, load the script file in argument 0.
     std::string filename;
     if (args.size() > 0) filename = args[0];
+    else {
+        Term* default_script_filename = runtime_branch()["default_script_filename"];
+        evaluate_term(default_script_filename);
+        filename = default_script_filename->asString();
+    }
 
     if (!load_user_script_filename(filename))
         return 1;

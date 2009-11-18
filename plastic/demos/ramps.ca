@@ -1,5 +1,5 @@
 
-desired_window_size = [510 420]
+desired_window_size = [630 450]
 
 tile_size = 30
 
@@ -55,7 +55,6 @@ draw_goal_label([window.width - 50 window.height / 2])
 big_font = text.load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 40)
 draw_text_centered(big_font, concat('Rescued: ' rescued_creatures) #000
     [window.width/2 20])
-
 
 -- Helper function
 def rotate_points_around(List points, Point center, number rot) :: List

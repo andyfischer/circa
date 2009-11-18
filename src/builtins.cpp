@@ -167,6 +167,8 @@ void post_setup_builtin_functions(Branch& kernel)
     create_ref(function_t::get_parameters(sub_s), SUB_FUNC);
 
     Branch& mult_overloads = as_branch(MULT_FUNC);
+    Term* mult_v = create_duplicate(mult_overloads, kernel["vectorize_vv"], "mult_v");
+    create_ref(function_t::get_parameters(mult_v), MULT_FUNC);
     Term* mult_s = create_duplicate(mult_overloads, kernel["vectorize_vs"], "mult_s");
     create_ref(function_t::get_parameters(mult_s), MULT_FUNC);
 

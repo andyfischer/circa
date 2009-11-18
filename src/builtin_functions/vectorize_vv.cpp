@@ -40,7 +40,7 @@ namespace vectorize_vv_function {
                 apply(output, func, RefList(left[i], right[i]));
         }
 
-        evaluate_branch(output);
+        evaluate_branch(output, caller);
     }
 
     void setup(Branch& kernel)

@@ -6,8 +6,6 @@ namespace circa {
 
 void error_occurred(Term* errorTerm, std::string const& message)
 {
-    //std::cout << "error: " << message << std::endl;
-
     if (errorTerm == NULL)
         throw std::runtime_error(message);
 
@@ -33,8 +31,10 @@ void native_type_mismatch(std::string const& message)
 
 void nested_error_occurred(Term* errorTerm)
 {
-    if (errorTerm == NULL)
+    if (errorTerm == NULL) {
+        assert(false);
         throw std::runtime_error("nested_error_occurred, no error listener");
+    }
 
     errorTerm->setHasError(true);
 }
