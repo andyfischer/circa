@@ -8,7 +8,7 @@ src/generated
 # build results:
 build
 obj
-deploy
+/deploy
 bin/circa
 cuttlefish/app
 *.o
