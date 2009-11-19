@@ -198,7 +198,7 @@ def expand_rect(Point center, number width, number height) :: Rect
     return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
 end
 
-def expand_rect_tl(Point topLeft, Point size) :: Rect
+def to_rect(Point topLeft, Point size) :: Rect
     return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
 end
 
@@ -261,6 +261,29 @@ def linear_fadein(number total_time) :: number
     state number time_started = time
     elapsed = (time - time_started) / total_time
     return min(elapsed, 1.0)
+end
+
+def elapsed() :: number
+    "Stateful function, returns the number of seconds that has passed since this function was first called"
+    state number time_started = time
+    return time - time_started
+end
+
+def draggable_rect(Point initial_location, Point size) :: Point
+    state Point location = initial_location
+    rect = [location.x, location.y, location.x+size.x, location.y+size.y]
+    state currently_dragging = false
+    state Point mouse_offset = [0 0]
+    if currently_dragging
+        location = mouse + mouse_offset
+        if not(mouse_pressed())
+            currently_dragging = false
+        end
+    elif mouse_clicked(rect)
+        currently_dragging = true
+        mouse_offset = location - mouse
+    end
+    return location
 end
 
 ui_font_medium = text.load_font("assets/sv_basic_manual/SVBasicManual.ttf", 16)
