@@ -3,35 +3,24 @@ Tests/bugs:
 
 Bugs:
 
- - Assignment operator should only be allowed to work on values
-   Priority: Low (Assignment is discouraged)
-
- - Assignment to a field does not work
-   Like this: point.x := 1
-   Priority: Low (Assignment is discouraged)
-
  - Can't comment out something inside of a literal list
 
  - Complex lvalues don't work.
-  
-   Doesn't work: something.field += x
-   Doesn't work: something.field[i] = x
+     Doesn't work: something.field += x
+     Doesn't work: something.field[i] = x
 
  - When reloading a branch, we need to search the whole world for references to the 
    old state, and update those references.
 
  - 'do once' needs to export name bindings. Maybe just make this syntactic sugar for if() ?
 
- - typeof() should return a reference not a value
-
- - Should the user be able to specify names of blocks? (for,if)
-
 Tasks:
- - Need an efficient + safe way to share output values across terms
- - Block syntax, like how it's easy to pass a block in ruby
+ - Value sharing
+ - Lambdas
+ - Type should be branch-based
+ - Should the user be able to specify names of blocks? (for,if)
 
 Big tasks:
  - Parametrized/generic types
- - LLVM integration. (need to investigate this enough to learn what it would look like)
- - Access and edit properties from circa
+ - JIT compilation
  - C reproduction.

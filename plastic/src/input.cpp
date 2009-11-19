@@ -9,7 +9,7 @@ using namespace circa;
 namespace input {
 
 bool KEY_DOWN[SDLK_LAST];
-std::set<int> KEY_JUST_PRESSED;
+std::vector<SDL_keysym> KEY_JUST_PRESSED;
 
 int MOUSE_X = 0;
 int MOUSE_Y = 0;
@@ -20,6 +20,8 @@ bool RECENT_MOUSE_WHEEL_DOWN = false;
 
 Ref MOUSE_POSITION_TERM;
 
+void handle_key_press(SDL_Event &event, int key);
+
 void key_down(Term* caller)
 {
     int i = caller->input(0)->asInt();
@@ -28,8 +30,35 @@ void key_down(Term* caller)
 
 void key_pressed(Term* caller)
 {
-    int i = caller->input(0)->asInt();
-    caller->asBool() = KEY_JUST_PRESSED.find(i) != KEY_JUST_PRESSED.end();
+    if (is_int(caller->input(0))) {
+        int key = as_int(caller->input(0));
+        for (size_t index=0; index < KEY_JUST_PRESSED.size(); index++)  {
+            if (KEY_JUST_PRESSED[index].sym == key) {
+                caller->asBool() = true;
+                return;
+            }
+        }
+        caller->asBool() = false;
+        return;
+    }
+
+    if (is_string(caller->input(0))) {
+        std::string& key = caller->input(0)->asString();
+        if (key.length() != 1) {
+            error_occurred(caller, "Expected a string of length 1");
+            return;
+        }
+
+        for (size_t index=0; index < KEY_JUST_PRESSED.size(); index++)  {
+            if (key[0] == KEY_JUST_PRESSED[index].unicode) {
+                caller->asBool() = true;
+                return;
+            }
+        }
+            
+        caller->asBool() = false;
+        return;
+    }
 }
 
 void capture_events()
@@ -55,7 +84,7 @@ void capture_events()
         case SDL_KEYDOWN:
 
             if (!KEY_DOWN[event.key.keysym.sym]) {
-                KEY_JUST_PRESSED.insert(event.key.keysym.sym);
+                KEY_JUST_PRESSED.push_back(event.key.keysym);
                 handle_key_press(event, event.key.keysym.sym);
             }
 
@@ -206,6 +235,7 @@ void setup(Branch& branch)
 
     install_function(branch["key_down"], key_down);
     install_function(branch["key_pressed"], key_pressed);
+    install_function(function_t::get_previous_overload(branch["key_pressed"]), key_pressed);
     install_function(branch["mouse_pressed"], mouse_pressed);
     install_function(branch["mouse_over"], mouse_over);
 

@@ -66,6 +66,10 @@ void float_to_string()
     // formatting was used
     Term* a = branch.eval("a = -0.00000");
     test_assert(to_string(a) == "-0.00000");
+    a = branch.eval("a = .01020");
+    test_assert(to_string(a) == ".01020");
+    a = branch.eval("a = 00.00");
+    test_assert(to_string(a) == "00.00");
 
     // Try changing a value, make sure that new value is printed
     Term* b = branch.eval("a = .1");
