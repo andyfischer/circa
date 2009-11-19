@@ -1,8 +1,8 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved.
 
-#include <circa.h>
-
 #include "plastic.h"
+
+#include "ide.h"
 
 using namespace circa;
 
@@ -77,6 +77,7 @@ bool initialize_plastic()
 bool initialize_builtin_functions()
 {
     postprocess_functions::setup(runtime_branch());
+    ide::setup(runtime_branch());
     image::setup(runtime_branch());
     input::setup(runtime_branch());
     mesh::setup(runtime_branch());
@@ -212,8 +213,6 @@ int plastic_main(std::vector<std::string> args)
     }
 
     if (!initialize_builtin_functions()) return 1;
-
-    // Try to initialize display
     if (!initialize_display()) return 1;
 
     PREV_SDL_TICKS = SDL_GetTicks();
