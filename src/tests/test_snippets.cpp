@@ -308,6 +308,16 @@ void test_range()
     test_snippet("", "4..8 == [4 5 6 7]");
     test_snippet("", "3..0 == [3 2 1]");
     test_snippet("", "3..-2 == [3 2 1 0 -1]");
+    test_snippet("", "0..0 == []");
+    test_snippet("", "10..10 == []");
+    test_snippet("", "25..26 == [25]");
+    test_snippet("", "25..24 == [25]");
+}
+
+void test_stateful_code()
+{
+    test_snippet("def hi() state int i end; c = hi()", "inspect.get_state(c) == [0]");
+    test_snippet("def hi() state int i; i = 4 end; c = hi()", "inspect.get_state(c) == [4]");
 }
 
 void register_tests()
@@ -332,6 +342,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_get_field_and_set_field);
     REGISTER_TEST_CASE(test_snippets::test_repeat);
     REGISTER_TEST_CASE(test_snippets::test_range);
+    REGISTER_TEST_CASE(test_snippets::test_stateful_code);
 }
 
 } // namespace test_snippets

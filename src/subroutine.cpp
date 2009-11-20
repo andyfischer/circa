@@ -68,11 +68,10 @@ namespace subroutine_t {
 
         if (errorListener.hasError()) {
             nested_error_occurred(caller);
-            return;
         }
 
-        // Copy output
-        if (functionBranch.length() > 0) {
+        // No error occurred, copy output
+        else if (functionBranch.length() > 0) {
             Term* output = functionBranch[functionBranch.length()-1];
             assert(output->name == "#out");
             if (output->type != VOID_TYPE)
