@@ -328,6 +328,19 @@ void bug_where_stateful_function_wouldnt_update_inputs()
     test_assert(b_call->asInt() == 2);
 }
 
+void bug_where_state_wasnt_preserved_after_error()
+{
+    Branch branch;
+    branch.eval("def hi() state int i; i = 4; assert(false) end");
+
+    Term* t = branch.eval("t = hi()");
+
+    test_assert(get_hidden_state_for_call(t) != NULL);
+
+    // not working
+    //test_assert(get_hidden_state_for_call(t)->asBranch()[0]->asInt() == 4);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_simple);
@@ -345,6 +358,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::test_reset_state);
     REGISTER_TEST_CASE(stateful_code_tests::try_to_migrate_value_that_isnt_allocced);
     REGISTER_TEST_CASE(stateful_code_tests::bug_where_stateful_function_wouldnt_update_inputs);
+    REGISTER_TEST_CASE(stateful_code_tests::bug_where_state_wasnt_preserved_after_error);
 }
 
 } // namespace stateful_code_tests

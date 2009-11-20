@@ -6,6 +6,8 @@ namespace circa {
 
 void error_occurred(Term* errorTerm, std::string const& message)
 {
+    //std::cout << "error: " << message << std::endl;
+
     if (errorTerm == NULL)
         throw std::runtime_error(message);
 
