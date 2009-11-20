@@ -341,6 +341,13 @@ void bug_where_state_wasnt_preserved_after_error()
     //test_assert(get_hidden_state_for_call(t)->asBranch()[0]->asInt() == 4);
 }
 
+void bug_where_subroutine_reused_dirty_state()
+{
+    Branch branch;
+    branch.eval("def f() state i = unique_id() end");
+
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_simple);

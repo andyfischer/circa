@@ -13,8 +13,6 @@ int WINDOW_HEIGHT = 0;
 
 bool initialize_display()
 {
-
-
     // Initialize the window
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
@@ -43,6 +41,8 @@ bool initialize_display()
         return false;
     }
 #endif
+
+    SDL_EnableUNICODE(1);
 
     return true;
 }
