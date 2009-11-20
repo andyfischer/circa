@@ -74,3 +74,4 @@ def draggable_box(Point initial_location)
 end
 
 draggable_box([300 40])
+draggable_box([300 80])
