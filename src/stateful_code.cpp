@@ -83,11 +83,13 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
 
 Term* get_hidden_state_for_call(Term* term)
 {
-    if (is_function_stateful(term->function)) {
-        assert(term->input(0) != NULL);
-        return term->input(0);
-    } else
+    if (term->input(0) == NULL)
         return NULL;
+
+    if (!is_function_stateful(term->function))
+        return NULL;
+
+    return term->input(0);
 }
 
 bool terms_match_for_migration(Term* left, Term* right)

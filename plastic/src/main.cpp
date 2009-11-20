@@ -174,7 +174,7 @@ int plastic_main(std::vector<std::string> args)
     if (args[0] == "-p") {
         if (!load_user_script_filename(args[1]))
             return 1;
-        std::cout << print_branch_raw(runtime_branch());
+        std::cout << print_branch_raw(users_branch());
         return 0;
     }
 

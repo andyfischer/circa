@@ -12,7 +12,8 @@ void print_usage()
         "  circa -test           : Run unit tests\n"
         "  circa -e <expression> : Evaluate an expression on the command line\n"
         "  circa -list-tests     : List every unit test name\n"
-        "  circa -p <filename>   : Show raw compiled form of a source file\n"
+        "  circa -p <filename>   : Show the raw display of a source file\n"
+        "  circa -ep <filename>  : Evaluate a source file and then show raw display\n"
         "  circa -pp <filename>  : Like -p but also print term properties\n"
         "  circa -s <filename>   : Compile the source file and reproduce its source code\n"
         "  circa -repl           : Start an interactive read-eval-print-loop\n";
@@ -78,6 +79,18 @@ int run_command_line(std::vector<std::string> args)
     if (args[0] == "-p") {
         Branch branch;
         parse_script(branch, args[1]);
+        std::cout << print_branch_raw(branch);
+        return 0;
+    }
+
+    // Evaluate and show compiled code
+    if (args[0] == "-ep") {
+        Branch branch;
+        parse_script(branch, args[1]);
+
+        Term errorListener;
+        evaluate_branch(branch, &errorListener);
+
         std::cout << print_branch_raw(branch);
         return 0;
     }
