@@ -524,8 +524,17 @@ void assign_value_to_default(Term* term)
 
         // check if this type has a default value defined
         Term* defaultValue = type_t::get_default_value(term->type);
-        if (defaultValue != NULL && defaultValue->type != VOID_TYPE)
+        if (defaultValue != NULL && defaultValue->type != VOID_TYPE) {
             assign_value(defaultValue, term);
+            return;
+        }
+
+        // Otherwise, if it's branched-based, use the prototype
+        if (is_branch(term)) {
+            as_branch(term).clear();
+            duplicate_branch(type_t::get_prototype(term->type), as_branch(term));
+            return;
+        }
     }
 }
 

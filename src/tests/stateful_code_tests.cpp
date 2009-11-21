@@ -235,6 +235,25 @@ void state_inside_lots_of_nested_functions()
     test_assert(SPY_RESULTS[0] == 11);
 }
 
+void more_nested_state()
+{
+    Branch branch;
+
+    import_function(branch, _unique_output, "unique_output() :: int");
+
+    NEXT_UNIQUE_OUTPUT = 1;
+    branch.eval("def f() state i = unique_output() end");
+    branch.eval("def f2() f() end");
+
+    branch.eval("a = f()");
+    branch.eval("b = f2()");
+    branch.eval("c = f2()");
+
+    test_assert(branch.eval("inspect.get_state(a) == [1 true]"));
+    test_assert(branch.eval("inspect.get_state(b) == [[2 true]]"));
+    test_assert(branch.eval("inspect.get_state(c) == [[3 true]]"));
+}
+
 void migrate_subroutine_with_no_hidden_state()
 {
     Branch source;
@@ -248,7 +267,7 @@ void migrate_subroutine_with_no_hidden_state()
     migrate_stateful_values(source, dest);
 
     // Nothing to test, except to make sure that the above call didn't SIGABRT
-    // (which it previously did)
+    // (which it once did)
 }
 
 void test_migrate_stateful_compound_value()
@@ -341,11 +360,22 @@ void bug_where_state_wasnt_preserved_after_error()
     //test_assert(get_hidden_state_for_call(t)->asBranch()[0]->asInt() == 4);
 }
 
-void bug_where_subroutine_reused_dirty_state()
+void test_load_state_into_branch()
 {
     Branch branch;
-    branch.eval("def f() state i = unique_id() end");
 
+    Term* f = branch.eval("def f(int i) state s = i end");
+    branch.eval("def f2(int i) f(i) end");
+
+    // Dirty up f() with leftover state
+    branch.eval("f(5)");
+
+    Branch& f_contents = as_branch(f);
+    test_assert(f_contents["s"]->asInt() == 5);
+
+    Branch myState;
+    load_state_into_branch(myState, f_contents);
+    test_assert(f_contents["s"]->asInt() == 0);
 }
 
 void register_tests()
@@ -360,12 +390,14 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment);
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
     REGISTER_TEST_CASE(stateful_code_tests::state_inside_lots_of_nested_functions);
+    REGISTER_TEST_CASE(stateful_code_tests::more_nested_state);
     REGISTER_TEST_CASE(stateful_code_tests::migrate_subroutine_with_no_hidden_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_migrate_stateful_compound_value);
     REGISTER_TEST_CASE(stateful_code_tests::test_reset_state);
     REGISTER_TEST_CASE(stateful_code_tests::try_to_migrate_value_that_isnt_allocced);
     REGISTER_TEST_CASE(stateful_code_tests::bug_where_stateful_function_wouldnt_update_inputs);
     REGISTER_TEST_CASE(stateful_code_tests::bug_where_state_wasnt_preserved_after_error);
+    REGISTER_TEST_CASE(stateful_code_tests::test_load_state_into_branch);
 }
 
 } // namespace stateful_code_tests
