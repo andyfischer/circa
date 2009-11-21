@@ -34,8 +34,11 @@ namespace subroutine_t {
         // Load values into this function's stateful values. If this state has never been
         // saved then this function will reset this function's stateful values.
         Term* hiddenState = get_hidden_state_for_call(caller);
-        if (hiddenState != NULL)
+
+        if (hiddenState != NULL) {
             load_state_into_branch(as_branch(hiddenState), functionBranch);
+        }
+
 
         int num_inputs = function_t::num_inputs(caller->function);
 
@@ -79,8 +82,9 @@ namespace subroutine_t {
         }
 
         // Store state
-        if (hiddenState != NULL)
+        if (hiddenState != NULL) {
             persist_state_from_branch(functionBranch, as_branch(hiddenState));
+        }
     }
 }
 

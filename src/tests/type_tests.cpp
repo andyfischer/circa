@@ -174,6 +174,16 @@ void test_default_values()
     test_assert(equals(t_value, t_value_2));
 }
 
+void test_assign_compound_value_to_default()
+{
+    Branch branch;
+
+    Term* t = branch.eval("[1 2 3]");
+    assign_value_to_default(t);
+
+    test_assert(as_branch(t).length() == 0);
+}
+
 void type_inference_for_get_index()
 {
     Branch branch;
@@ -277,6 +287,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_is_native_type);
     REGISTER_TEST_CASE(type_tests::test_to_string);
     REGISTER_TEST_CASE(type_tests::test_default_values);
+    REGISTER_TEST_CASE(type_tests::test_assign_compound_value_to_default);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);
     REGISTER_TEST_CASE(type_tests::test_is_value_allocced);

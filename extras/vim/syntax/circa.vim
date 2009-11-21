@@ -10,6 +10,7 @@ elseif exists("b:current_syntax")
 endif
 
 " Literal values
+syn match circaColor    "#\([0-9]\|[a-f]\)*"
 syn match circaInteger	"\<0[xX]\x\+\%(_\x\+\)*\>"								display
 syn match circaInteger	"\<\%(0[dD]\)\=\%(0\|[1-9]\d*\%(_\d\+\)*\)\>"						display
 syn match circaInteger	"\<0[oO]\=\o\+\%(_\o\+\)*\>"								display
@@ -27,6 +28,7 @@ syn match circaKeyword "\<do\ once\>"
 " Comments
 syn region circaLineComment start="--" skip="\\$" end="$"
 
+hi def link circaColor          Number
 hi def link circaInteger        Number
 hi def link circaFloat          Number
 hi def link circaString         String

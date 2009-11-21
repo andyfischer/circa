@@ -19,7 +19,7 @@ def draw_star(Star star)
   def draw_tip(int index)
     angle = index / num_points + rot
     l_angle = (index+.5) / num_points + rot
-    r_angle = (index- .5) / num_points + rot
+    r_angle = (index-.5) / num_points + rot
     outer_point = polar(angle)*radius + star.loc
     l_point = polar(l_angle)*(radius / 2) + star.loc
     r_point = polar(r_angle)*(radius / 2) + star.loc
