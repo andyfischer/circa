@@ -17,4 +17,3 @@
 #include "sdl_utils.h"
 #include "shaders.h"
 #include "textures.h"
-#include "ttf.h"

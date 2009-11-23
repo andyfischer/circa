@@ -57,7 +57,7 @@ struct RenderedText
     int& texid() { return _term->asBranch()[0]->asInt(); }
     float& width() { return _term->asBranch()[1]->asFloat(); }
     float& height() { return _term->asBranch()[2]->asFloat(); }
-    Branch& color() { return _term->asBranch()[3]->asBranch(); }
+    Term* color() { return _term->asBranch()[3]; }
     std::string& text() { return _term->asBranch()[4]->asString(); }
 };
 
@@ -66,7 +66,9 @@ void render_text(Term* caller)
     RenderedText state(caller->input(0));
     std::string text = caller->input(2)->asString();
 
-    if (state.texid() == 0 || state.text() != text) {
+    bool changed_color = !branch_t::equals(state.color(), caller->input(3));
+
+    if (state.texid() == 0 || state.text() != text || changed_color) {
 
         state.text() = text;
 
@@ -82,9 +84,9 @@ void render_text(Term* caller)
         // save the texture id.
 
         TTF_Font* font = as<TTF_Font*>(caller->input(1));
-        SDL_Color color = unpack_sdl_color(caller->input(3));
         //SDL_Color bgcolor = {0, 0, 0, 0}; // todo
 
+        SDL_Color color = unpack_sdl_color(caller->input(3));
         SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), color);
 
         state.texid() = load_surface_to_texture(surface);

@@ -3,6 +3,7 @@
 #include "plastic.h"
 
 #include "ide.h"
+#include "ttf.h"
 
 using namespace circa;
 
