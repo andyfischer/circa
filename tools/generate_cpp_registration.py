@@ -21,7 +21,7 @@ def write_text_file(filename, contents):
     output_file.write("\n")
     output_file.close()
 
-def do_builtin_functions(directory, outputFile):
+def do_builtin_functions(directory):
 
     (files, functionNames) = list_cpp_files(directory)
 
@@ -45,9 +45,9 @@ def do_builtin_functions(directory, outputFile):
         predeclarations="\n".join(predeclarations),
         calls="\n    ".join(calls))
 
-    write_text_file(outputFile, output)
+    return output
 
-def do_register_all_tests(directory, outputFile):
+def do_register_all_tests(directory):
     (files, names) = list_cpp_files(directory)
 
     def makePredeclaration(name):
@@ -65,7 +65,7 @@ def do_register_all_tests(directory, outputFile):
             predeclarations = "\n".join(predeclarations),
             calls = "\n    ".join(calls))
 
-    write_text_file(outputFile, output)
+    return output
 
 BUILTIN_FUNCTIONS_TEMPLATE = """
 // Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
