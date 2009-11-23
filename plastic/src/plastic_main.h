@@ -19,4 +19,9 @@ std::string find_runtime_file();
 std::string find_asset_file(std::string const& filename);
 bool evaluate_main_script();
 
+// the filename of this binary, passed in as args[0]
+extern std::string BINARY_NAME;
+
+int plastic_main(std::vector<std::string> args);
+
 #endif

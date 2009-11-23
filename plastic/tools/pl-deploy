@@ -28,7 +28,9 @@ def rm_glob(pattern):
         rm(file)
 
 copy_file = shutil.copy
-copy_tree = shutil.copytree
+
+def copy_tree(source, dest):
+    os.system("cp -r "+source+" "+dest)
 
 def copy_glob(pattern, dest):
     for file in glob(pattern):
@@ -39,13 +41,17 @@ def walk(dir):
         for filename in filenames:
             yield os.path.join(dirpath,filename)
 
-def zip(dir, prefix):
+def zip(path, prefix):
     import zipfile
-    zfile = zipfile.ZipFile(dir + '.zip', 'w')
+    zfile = zipfile.ZipFile(path + '.zip', 'w')
 
-    for file in walk(dir):
-        file_in_archive = file[len(prefix):]
-        zfile.write(file, file_in_archive)
+    if os.path.isdir(path):
+        for file in walk(path):
+            path_in_archive = file[len(prefix):]
+            zfile.write(file, path_in_archive)
+    else:
+        path_in_archive = path[len(prefix):]
+        zfile.write(path, path_in_archive)
 
 # ------------------------------------------------------------
 
@@ -62,9 +68,10 @@ def deploy_assets(target_dir):
     rm(target_dir+'/demos/tree.ca')
 
 def deploy_windows():
+    os.chdir(os.environ['CIRCA_HOME'])
     version_name='plastic_win32_cl_'+global_version_name
 
-    target_dir='build/deploy/'+version_name
+    target_dir='deploy/'+version_name
     rm(target_dir)
     recr_mkdir(target_dir)
 
@@ -76,12 +83,13 @@ def deploy_windows():
     copy_glob('SDL_deps/bin/*', target_dir)
     copy_glob('c:/WINDOWS/WinSxS/x86_Microsoft.VC80.CRT_1fc8b3b9a1e18e3b_8.0.50727.762_x-ww_6b128700/*.dll', target_dir)
 
-    zip(target_dir, prefix='build/deploy/')
+    zip(target_dir, prefix='deploy/')
 
-def deploy_mac():
+def deploy_mac_cl(): # Deprecated
+    os.chdir(os.environ['CIRCA_HOME'])
     version_name='plastic_osx_cl_'+global_version_name
 
-    target_dir='build/deploy/'+version_name
+    target_dir='deploy/'+version_name
     rm(target_dir)
     recr_mkdir(target_dir)
 
@@ -108,12 +116,28 @@ def deploy_mac():
         os.system('install_name_tool -change %s %s %s' %
             (old, '@loader_path/'+new_relative, target_dir+'/plastic'))
 
-    zip(target_dir, prefix='build/deploy/')
+    zip(target_dir, prefix='deploy/')
+
+def deploy_mac_bundle():
+    os.chdir(os.environ['CIRCA_HOME'])
+    version_name='plastic_osx_'+global_version_name
+
+    bundle_target='deploy/'+version_name+'.app'
+    rm(bundle_target)
+    recr_mkdir('deploy')
+
+    copy_tree('plastic/mac/build/Release/plastic.app', bundle_target)
+
+    deploy_assets(bundle_target+'/Contents/MacOS')
+
+    zip(bundle_target, prefix='deploy/')
 
 if __name__ == '__main__':
-    os.chdir(os.environ['CIRCA_HOME'])
     import sys
     if sys.argv[1] == 'windows':
         deploy_windows()
     if sys.argv[1] == 'mac':
-        deploy_mac()
+        deploy_mac_bundle()
+    if sys.argv[1] == 'assets-only':
+        deploy_assets(sys.argv[2])
+

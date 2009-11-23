@@ -21,9 +21,8 @@ cuttlefish/app
 *.dll
 
 # project file artifacts:
-circa.xcodeproj/*.mode1v3
-circa.xcodeproj/*.pbxuser
-circa.1
+*.mode1v3
+*.pbxuser
 *.ilk
 *.idb
 *.exp
