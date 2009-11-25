@@ -250,14 +250,20 @@ def alternate_over_time(number period) :: bool
 end
 
 def toggle(bool tog) :: bool
-  "Stateful function, returns a boolean status. Every frame the function is called with (true), the status flips. Starts out false."
-  state bool on = false
-  if tog; on = not(on); end
-  return on
+    <<<
+    Stateful function, returns a boolean status. Every frame the function is called
+    with (true), the status flips. Starts out false.
+    >>>
+    state bool on = false
+    if tog; on = not(on); end
+    return on
 end
 
 def linear_fadein(number total_time) :: number
-    "Stateful function, starts out at 0 and increases linearly. After 'total_time' has passed it will return 1.0 and stay there."
+    <<<
+    Stateful function, starts out at 0 and increases linearly. After 'total_time'
+    has passed, it will return 1.0 and stay there.
+    >>>
     state number time_started = time
     elapsed = (time - time_started) / total_time
     return min(elapsed, 1.0)

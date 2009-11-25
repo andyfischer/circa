@@ -7,6 +7,20 @@
 namespace circa {
 namespace stateful_code_tests {
 
+void test_get_hidden_state_for_call()
+{
+    Branch branch;
+    branch.eval("def f() state i end");
+    Term* call = branch.eval("f()");
+    Term* hidden_state = branch[1];
+
+    test_assert(is_stateful(hidden_state));
+    test_assert(get_hidden_state_for_call(call) == hidden_state);
+    test_assert(get_hidden_state_for_call(hidden_state) == NULL);
+    test_assert(find_call_for_hidden_state(hidden_state) == call);
+    test_assert(find_call_for_hidden_state(call) == NULL);
+}
+
 void test_simple()
 {
     Branch branch;
@@ -378,8 +392,10 @@ void test_load_state_into_branch()
     test_assert(f_contents["s"]->asInt() == 0);
 }
 
+
 void register_tests()
 {
+    REGISTER_TEST_CASE(stateful_code_tests::test_get_hidden_state_for_call);
     REGISTER_TEST_CASE(stateful_code_tests::test_simple);
     REGISTER_TEST_CASE(stateful_code_tests::function_with_hidden_state_term);
     REGISTER_TEST_CASE(stateful_code_tests::subroutine_expansion_during_migrate);

@@ -6,11 +6,8 @@ circa-web
 src/generated
 
 # build results:
-build
-obj
+/build
 /deploy
-bin/circa
-cuttlefish/app
 *.o
 *.so
 *.a

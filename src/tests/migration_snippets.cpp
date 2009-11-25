@@ -14,7 +14,7 @@ void test_migration(std::string sourceCode, std::string destinationCode,
     parser::compile(&source, parser::statement_list, sourceCode);
 
     if (has_static_errors(source)) {
-        std::cout << "In code: " << sourceCode;
+        std::cout << "In code: " << sourceCode << std::endl;
         print_static_errors_formatted(source, std::cout);
         declare_current_test_failed();
         return;
@@ -24,7 +24,7 @@ void test_migration(std::string sourceCode, std::string destinationCode,
     parser::compile(&destination, parser::statement_list, destinationCode);
 
     if (has_static_errors(destination)) {
-        std::cout << "In code: " << destinationCode;
+        std::cout << "In code: " << destinationCode << std::endl;
         print_static_errors_formatted(destination, std::cout);
         declare_current_test_failed();
         return;
@@ -84,10 +84,6 @@ void test_migration(std::string sourceCode, std::string destinationCode,
 void migrate_simple()
 {
     test_migration("state i = 5", "state i = 4", "i == 5");
-
-    // Test specializing the destination type
-    test_migration("state i = 5", "state any i", "i == 5");
-    test_migration("state List i = [] \n i.append(1)", "state any i", "i == [1]");
 }
 
 void migrate_across_user_defined_types()
@@ -101,6 +97,17 @@ void migrate_across_user_defined_types()
     test_migration("type T { int x } \n state T t = [1]",
         "type T { int y } \n state T t = [2]",
         "t.y == 1");
+}
+
+void dont_migrate_across_different_types()
+{
+    //test_migration("state int i = 5", "state number f = 10", "f == 10"); fixme
+    test_migration("state int i; i = 5", "state number i", "i == 0");
+    test_migration("state Point p; p = [3 3]", "state Rect p", "p == [0.0 0.0 0.0 0.0]");
+
+    // fixme
+    //test_migration("def f1() state int i end; def f2(int i) state number n end; f1()",
+    //    "def f1() state int i end; def f2(int i) state number n end; f2(f1())", "");
 }
 
 void migrate_misc()
@@ -125,6 +132,7 @@ void register_tests()
 {
     REGISTER_TEST_CASE(migration_snippets::migrate_simple);
     REGISTER_TEST_CASE(migration_snippets::migrate_across_user_defined_types);
+    REGISTER_TEST_CASE(migration_snippets::dont_migrate_across_different_types);
     REGISTER_TEST_CASE(migration_snippets::migrate_misc);
 }
 
