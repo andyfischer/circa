@@ -49,10 +49,23 @@ UTILITY FUNCTIONS
 
 Stateful code can also open the doors to define some useful utility functions.
 
-def times_called() : int
-    state count = 0
-    count += 1
-    return count
+def elapsed() :: number
+    state number time_started = time
+    return time - time_started
+end
+def toggle(bool tog) :: bool
+    state bool on = false
+    if tog; on = not(on); end
+    return on
+end
+def approach(number target, number step) :: number
+    state current = target
+    if target > current
+        current += min(step, target - current)
+    elif target < current
+        current -= min(step, current - target)
+    end
+    return current
 end
 
 IMPLEMENTATION THOUGHTS
@@ -74,5 +87,6 @@ end
 call = stateful_func()
 print(call.i) -- reach into stateful_func and access its state
 
-Can we have a way to explicitly reset state? -- This one is something that I constantly wish
+Can we have a way to explicitly reset state? -- This one is something that I frequently wish
 I could do when writing code.
+

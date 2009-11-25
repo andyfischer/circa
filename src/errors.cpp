@@ -78,9 +78,9 @@ void print_runtime_error_formatted(Term* term, std::ostream& output)
     output << "[" << get_short_location(term) << "] ";
 
     if (has_runtime_error(term) && has_runtime_error_message(term)) {
-        output << get_runtime_error_message(term);
+        output << get_runtime_error_message(term) << "\n";
     } else if (has_static_error(term)) {
-        output << get_static_error_message(term);
+        output << get_static_error_message(term) << "\n";
     } else if (is_subroutine(term->function)) {
         output << "\n";
         print_runtime_error_formatted(as_branch(term->function), output);

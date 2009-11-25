@@ -92,6 +92,21 @@ Term* get_hidden_state_for_call(Term* term)
     return term->input(0);
 }
 
+Term* find_call_for_hidden_state(Term* term)
+{
+    if (term->owningBranch == NULL)
+        return NULL;
+
+    Branch& branch = *term->owningBranch;
+    for (int i=0; i < branch.length(); i++) {
+        if (branch[i] == NULL) continue;
+        if (branch[i]->input(0) == term)
+            return branch[i];
+    }
+
+    return NULL;
+}
+
 bool terms_match_for_migration(Term* left, Term* right)
 {
     if (left->name != right->name) {
@@ -102,7 +117,7 @@ bool terms_match_for_migration(Term* left, Term* right)
 
     bool typesFit = left->type == right->type;
 
-    if (!typesFit)
+    if (!typesFit && is_branch(left))
         typesFit = value_fits_type(left, right->type);
       
     if (!typesFit) {
@@ -110,6 +125,17 @@ bool terms_match_for_migration(Term* left, Term* right)
             std::cout << "reject, types aren't equal" << std::endl;
         return false;
     }
+
+    return true;
+}
+
+bool subroutines_match_for_migration(Term* leftFunc, Term* rightFunc)
+{
+    if (!is_subroutine(leftFunc)) return false;
+    if (!is_subroutine(rightFunc)) return false;
+
+    if (leftFunc->name != rightFunc->name)
+        return false;
 
     return true;
 }
@@ -139,7 +165,7 @@ void migrate_stateful_values(Branch& source, Branch& dest)
         
         // If both terms are subroutine calls, and the source call is expanded, then
         // expand the dest call as well.
-        if (is_subroutine(sourceTerm->function) && is_subroutine(destTerm->function))
+        if (subroutines_match_for_migration(sourceTerm->function, destTerm->function))
         {
             Term* sourceCallState = get_hidden_state_for_call(sourceTerm);
             Term* destCallState = get_hidden_state_for_call(destTerm);
