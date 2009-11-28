@@ -370,7 +370,8 @@ void bug_where_state_wasnt_preserved_after_error()
 
     test_assert(get_hidden_state_for_call(t) != NULL);
 
-    // not working
+    // not working because assert() prevents us from reaching the part where the
+    // stateful value is assigned back.
     //test_assert(get_hidden_state_for_call(t)->asBranch()[0]->asInt() == 4);
 }
 
@@ -392,6 +393,24 @@ void test_load_state_into_branch()
     test_assert(f_contents["s"]->asInt() == 0);
 }
 
+void test_terms_match_for_migration()
+{
+    Branch branch;
+    branch.eval("def f1() state int i end");
+    branch.eval("def f2() state int i end");
+    branch.eval("def f3() state number i end");
+
+    Term* call1 = branch.eval("f1()");
+    Term* call2 = branch.eval("f2()");
+
+    Term* state1 = get_hidden_state_for_call(call1);
+    Term* state2 = get_hidden_state_for_call(call2);
+
+    test_assert(is_stateful(state1));
+    test_assert(is_stateful(state2));
+
+    test_assert(!terms_match_for_migration(state1, state2));
+}
 
 void register_tests()
 {
@@ -414,6 +433,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::bug_where_stateful_function_wouldnt_update_inputs);
     REGISTER_TEST_CASE(stateful_code_tests::bug_where_state_wasnt_preserved_after_error);
     REGISTER_TEST_CASE(stateful_code_tests::test_load_state_into_branch);
+    REGISTER_TEST_CASE(stateful_code_tests::test_terms_match_for_migration);
 }
 
 } // namespace stateful_code_tests

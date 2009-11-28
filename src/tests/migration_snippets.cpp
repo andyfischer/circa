@@ -75,7 +75,7 @@ void test_migration(std::string sourceCode, std::string destinationCode,
         }
     }
 
-    if (boolean_statements_found == 0) {
+    if (boolean_statements_found == 0 && assertions.length() > 0) {
         std::cout << "In " << get_current_test_name() << std::endl;
         std::cout << "warn: no boolean statements found in: " << assertionsCode << std::endl;
     }
@@ -105,9 +105,10 @@ void dont_migrate_across_different_types()
     test_migration("state int i; i = 5", "state number i", "i == 0");
     test_migration("state Point p; p = [3 3]", "state Rect p", "p == [0.0 0.0 0.0 0.0]");
 
-    // fixme
-    //test_migration("def f1() state int i end; def f2(int i) state number n end; f1()",
-    //    "def f1() state int i end; def f2(int i) state number n end; f2(f1())", "");
+    test_migration("def f1()::int state int i; return i; end;"
+                   "def f2(int i) state number n end; f1()",
+                   "def f1()::int state int i; return i; end;"
+                   "def f2(int i) state number n end; f2(f1())", "");
 }
 
 void migrate_misc()

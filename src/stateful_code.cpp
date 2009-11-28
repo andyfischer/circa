@@ -6,6 +6,8 @@ namespace circa {
 
 bool MIGRATE_STATEFUL_VALUES_VERBOSE = false;
 
+bool subroutines_match_for_migration(Term* leftFunc, Term* rightFunc);
+
 bool is_stateful(Term* term)
 {
     return term->function == STATEFUL_VALUE_FUNC;
@@ -104,6 +106,14 @@ Term* find_call_for_hidden_state(Term* term)
     return adjacent;
 }
 
+bool functions_match_for_migration(Term* left, Term* right)
+{
+    if (left->function->name != right->function->name)
+        return false;
+
+    return true;
+}
+
 bool terms_match_for_migration(Term* left, Term* right)
 {
     if (left->name != right->name) {
@@ -120,6 +130,16 @@ bool terms_match_for_migration(Term* left, Term* right)
     if (!typesFit) {
         if (MIGRATE_STATEFUL_VALUES_VERBOSE)
             std::cout << "reject, types aren't equal" << std::endl;
+        return false;
+    }
+
+    Term* leftCall = find_call_for_hidden_state(left);
+    Term* rightCall = find_call_for_hidden_state(right);
+
+    if (leftCall != NULL && rightCall != NULL
+            && !functions_match_for_migration(leftCall, rightCall)) {
+        if (MIGRATE_STATEFUL_VALUES_VERBOSE)
+            std::cout << "reject, assoiciated calls have mismatched functions" << std::endl;
         return false;
     }
 
