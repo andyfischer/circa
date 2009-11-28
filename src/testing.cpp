@@ -65,11 +65,15 @@ void _test_assert_function(Term* term, int line, const char* file)
 
 void _test_assert_function(Branch& branch, int line, const char* file)
 {
+    if (!branch_check_invariants(branch, &std::cout)) {
+        declare_current_test_failed();
+        throw std::runtime_error("");
+    }
+
     // Sanity check on every term in this branch
-    // Note that currently, we don't have many sanity checks. It would be nice
-    // to add some more.
     for (BranchIterator it(branch); !it.finished(); ++it) {
         Term* term = *it;
+        if (term == NULL) continue;
 
         bool result = true;
         std::string message;

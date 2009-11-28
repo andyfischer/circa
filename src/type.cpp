@@ -104,7 +104,7 @@ namespace type_t {
         Branch& prototype = type_t::get_prototype(type);
 
         for (int field_i=0; field_i < prototype.length(); field_i++)
-            prototype[field_i] = map.getRemapped(prototype[field_i]);
+            prototype.set(field_i, map.getRemapped(prototype[field_i]));
     }
 
     void name_accessor(Term* caller)

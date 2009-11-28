@@ -98,13 +98,10 @@ Term* find_call_for_hidden_state(Term* term)
         return NULL;
 
     Branch& branch = *term->owningBranch;
-    for (int i=0; i < branch.length(); i++) {
-        if (branch[i] == NULL) continue;
-        if (branch[i]->input(0) == term)
-            return branch[i];
-    }
 
-    return NULL;
+    Term* adjacent = branch[branch.getIndex(term)+1];
+
+    return adjacent;
 }
 
 bool terms_match_for_migration(Term* left, Term* right)

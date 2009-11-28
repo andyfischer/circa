@@ -22,7 +22,7 @@ namespace map_function {
 
         // Remove extra terms if necessary
         for (int i=inputs.length(); i < output.length(); i++)
-            output[i] = NULL;
+            output.set(i, NULL);
 
         output.removeNulls();
 

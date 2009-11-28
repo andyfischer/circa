@@ -37,6 +37,9 @@ struct Term
     // The branch that owns this term. May be NULL
     Branch* owningBranch;
 
+    // The index that this term currently holds inside owningBranch
+    unsigned index;
+
     // A set of boolean flags
     unsigned flags;
 
