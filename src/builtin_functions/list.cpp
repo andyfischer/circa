@@ -22,7 +22,7 @@ namespace list_function {
 
         // Remove terms if necessary
         for (int i=caller->numInputs(); i < dest.length(); i++)
-            dest[i] = NULL;
+            dest.set(i, NULL);
 
         dest.removeNulls();
     }
@@ -53,7 +53,7 @@ namespace list_function {
 
         // Remove terms if necessary
         for (int i=repeatCount; i < dest.length(); i++)
-            dest[i] = NULL;
+            dest.set(i, NULL);
 
         dest.removeNulls();
     }

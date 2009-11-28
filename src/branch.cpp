@@ -10,7 +10,39 @@ Branch::~Branch()
     _terms.clear();
 }
 
-int Branch::findIndex(Term* term)
+int Branch::length() const
+{
+    return _terms.length();
+}
+
+bool Branch::contains(std::string const& name) const
+{
+    return names.contains(name);
+}
+
+Term* Branch::get(int index) const
+{
+    assert(index <= length());
+    return _terms[index];
+}
+
+Term* Branch::last() const
+{
+    if (length() == 0) return NULL;
+    else return _terms[length()-1];
+}
+
+int Branch::getIndex(Term* term) const
+{
+    assert(term != NULL);
+    assert(term->owningBranch == this);
+
+    //assert(term->index == debugFindIndex(term));
+
+    return term->index;
+}
+
+int Branch::debugFindIndex(Term* term) const
 {
     for (int i=0; i < length(); i++) 
         if (get(i) == term)
@@ -18,7 +50,7 @@ int Branch::findIndex(Term* term)
     return -1;
 }
 
-int Branch::findIndex(std::string const& name)
+int Branch::findIndex(std::string const& name) const
 {
     for (int i=0; i < length(); i++) {
         if (get(i) == NULL)
@@ -29,12 +61,41 @@ int Branch::findIndex(std::string const& name)
     return -1;
 }
 
+void Branch::set(int index, Term* term)
+{
+    assert(index <= length());
+    _terms[index] = term;
+    if (term != NULL) {
+        assert(term->owningBranch == NULL || term->owningBranch == this);
+        term->owningBranch = this;
+        term->index = index;
+    }
+
+    // TODO: update name bindings
+}
+
+void Branch::setNull(int index)
+{
+    assert(index <= length());
+    Term* term = _terms[index];
+    if (term != NULL) {
+        // remove name binding if necessary
+        if ((term->name != "") && (names[term->name] == term))
+            names.remove(term->name);
+
+        term->owningBranch = NULL;
+        term->index = 0;
+        _terms[index] = NULL;
+    }
+}
+
 void Branch::append(Term* term)
 {
     _terms.append(term);
     if (term != NULL) {
         assert(term->owningBranch == NULL);
         term->owningBranch = this;
+        term->index = _terms.length()-1;
     }
 }
 
@@ -44,30 +105,41 @@ Term* Branch::appendNew()
     assert(term != NULL);
     _terms.append(term);
     term->owningBranch = this;
+    term->index = _terms.length()-1;
     return term;
 }
 
 void Branch::insert(int index, Term* term)
 {
-    _terms.insert(index, term);
+    _terms.append(NULL);
+    for (int i=_terms.length()-1; i > index; i--) {
+        _terms[i] = _terms[i-1];
+        _terms[i]->index = i;
+    }
+    _terms[index] = term;
+
     if (term != NULL) {
         assert(term->owningBranch == NULL);
         term->owningBranch = this;
+        term->index = index;
     }
 }
 
 void Branch::moveToEnd(Term* term)
 {
+    assert(term != NULL);
     assert(term->owningBranch == this);
-    int index = _terms.findIndex(term);
-    assert(index >= 0);
+    assert(term->index >= 0);
+    int index = getIndex(term);
     _terms.append(term); // do this first so that the term doesn't lose references
     _terms[index] = NULL;
+    term->index = _terms.length()-1;
 }
 
 void Branch::remove(Term* term)
 {
-    remove(findIndex(term));
+    assert(term != NULL);
+    remove(getIndex(term));
 }
 
 void Branch::remove(std::string const& name)
@@ -76,37 +148,46 @@ void Branch::remove(std::string const& name)
         return;
 
     Term* term = names[name];
-
-    remove(findIndex(term));
+    remove(getIndex(term));
 }
 
 void Branch::remove(int index)
 {
-    if (index >= _terms.length())
-        return;
+    setNull(index);
 
-    Term* term = _terms[index];
-
-    // remove name binding if necessary
-    if (term != NULL && (term->name != "") && (names[term->name] == term))
-        names.remove(term->name);
-
-    if (term != NULL)
-        term->owningBranch = NULL;
-
-    // Do this step last, it removes a reference and may cause Term to be deleted.
-    _terms.remove(index);
+    for (int i=index; i < _terms.length()-1; i++) {
+        _terms[i] = _terms[i+1];
+        if (_terms[i] != NULL)
+            _terms[i]->index = i;
+    }
+    _terms.resize(_terms.length()-1);
 }
 
 void Branch::removeNulls()
 {
-    _terms.removeNulls();
+    int numDeleted = 0;
+    for (int i=0; i < _terms.length(); i++) {
+        if (_terms[i] == NULL) {
+            numDeleted++;
+        } else if (numDeleted > 0) {
+            _terms[i - numDeleted] = _terms[i];
+            _terms[i - numDeleted]->index = i - numDeleted;
+        }
+    }
+
+    if (numDeleted > 0)
+        _terms.resize(_terms.length() - numDeleted);
 }
 
 void Branch::shorten(int newLength)
 {
+    if (newLength == 0) {
+        clear();
+        return;
+    }
+
     for (int i=newLength; i < length(); i++)
-        get(i) = NULL;
+        set(i, NULL);
 
     removeNulls();
 }
@@ -158,8 +239,10 @@ void Branch::remapPointers(ReferenceMap const& map)
 void
 Branch::clear()
 {
-    for (int i=0; i < _terms.length(); i++)
+    for (int i=0; i < _terms.length(); i++) {
         _terms[i]->owningBranch = NULL;
+        _terms[i]->index = 0;
+    }
 
     _terms.clear();
     names.clear();
@@ -236,7 +319,7 @@ namespace branch_t {
 
         // Remove terms if necessary
         for (int i=source.length(); i < dest.length(); i++) {
-            dest[i] = NULL;
+            dest.set(i, NULL);
         }
 
         dest.removeNulls();
@@ -404,6 +487,30 @@ std::string get_source_file_location(Branch& branch)
         return "";
 
     return get_directory_for_filename(get_branch_source_filename(*branch_p));
+}
+
+bool branch_check_invariants(Branch& branch, std::ostream* output)
+{
+    bool success = true;
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (term == NULL) continue;
+        
+        // Check that the term's index is correct
+        if (term->index != (unsigned) i) {
+            success = false;
+            if (output != NULL)
+                *output<<"branch["<<i<<"] has wrong index ("<<term->index<<")" << std::endl;
+        }
+
+        // Check that owningBranch is correct
+        if (term->owningBranch != &branch) {
+            success = false;
+            if (output != NULL)
+                *output<<"branch["<<i<<"] has wrong owningBranch"<<std::endl;
+        }
+    }
+    return success;
 }
 
 } // namespace circa

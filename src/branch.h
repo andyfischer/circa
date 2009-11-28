@@ -22,46 +22,47 @@ struct Branch
     Branch() : owningTerm(NULL) {}
     ~Branch();
 
-    int length() const { return _terms.length(); }
+    int length() const;
 
-    Term* get(int index) const { return _terms[index]; }
-    Ref& get(int index) { return _terms[index]; }
-    Term* operator[](int index) const { assert(index <= length()); return _terms[index]; }
-    Ref& operator[](int index) { assert(index <= length()); return _terms[index]; }
+    // Returns true if there is a term with the given name
+    bool contains(std::string const& name) const;
+
+    Term* get(int index) const;
+    Term* operator[](int index) const { return get(index); }
 
     // Get a term from a name binding.
     Term* get(std::string const& name) const { return names[name]; }
     Term* operator[](std::string const& name) const { return get(name); }
 
-    Term* last() { if (length() == 0) return NULL; else return _terms[length()-1]; }
+    int getIndex(Term* term) const;
+    int debugFindIndex(Term* term) const;
 
-    // Find the index of the given term, returns -1 if not found.
-    int findIndex(Term* term);
-
-    // Find a term with the given name, returns -1 if not found.
-    int findIndex(std::string const& name);
-
-    // Returns true if there is a term with the given name
-    bool contains(std::string const& name) const { return names.contains(name); }
-
-    void append(Term* term);
-    Term* appendNew();
-
-    void insert(int index, Term* term);
-    void moveToEnd(Term* term);
-
-    void remove(Term* term);
-    void remove(std::string const& name);
-    void remove(int index);
-    void removeNulls();
-
-    void shorten(int newLength);
+    Term* last() const;
 
     // Find the first term with the given name binding.
     Term* findFirstBinding(std::string const& name) const;
 
     // Find the last term with the given name binding.
     Term* findLastBinding(std::string const& name) const;
+
+    // Find a term with the given name, returns -1 if not found.
+    int findIndex(std::string const& name) const;
+
+    void set(int index, Term* term);
+    void setNull(int index);
+
+    void insert(int index, Term* term);
+
+    void append(Term* term);
+    Term* appendNew();
+
+    void moveToEnd(Term* term);
+
+    void remove(Term* term);
+    void remove(std::string const& name);
+    void remove(int index);
+    void removeNulls();
+    void shorten(int newLength);
 
     // Bind a name to a term
     void bindName(Term* term, std::string name);
@@ -110,6 +111,8 @@ Term* find_term_by_id(Branch& branch, unsigned int id);
 bool reload_branch_from_file(Branch& branch, std::ostream& errors);
 void persist_branch_to_file(Branch& branch);
 std::string get_source_file_location(Branch& branch);
+
+bool branch_check_invariants(Branch& branch, std::ostream* output=NULL);
 
 } // namespace circa
 

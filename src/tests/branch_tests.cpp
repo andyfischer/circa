@@ -7,6 +7,72 @@
 namespace circa {
 namespace branch_tests {
 
+void test_insert()
+{
+    Branch branch;
+    Term* a = create_void(branch);
+
+    Term* b = alloc_term();
+
+    test_assert(branch.length() == 1);
+    test_assert(branch[0] == a);
+    
+    branch.insert(0, b);
+
+    test_assert(branch.length() == 2);
+    test_assert(branch[0] == b);
+    test_assert(branch[1] == a);
+
+    Term* c = alloc_term();
+    branch.insert(2, c);
+    test_assert(branch.length() == 3);
+    test_assert(branch[0] == b);
+    test_assert(branch[1] == a);
+    test_assert(branch[2] == c);
+
+    Term* d = alloc_term();
+    branch.insert(1, d);
+    test_assert(branch.length() == 4);
+    test_assert(branch[0] == b);
+    test_assert(branch[1] == d);
+    test_assert(branch[2] == a);
+    test_assert(branch[3] == c);
+
+    test_assert(branch_check_invariants(branch, &std::cout));
+}
+
+void test_check_invariants()
+{
+    Branch branch;
+    Term* t = branch.appendNew();
+    test_assert(branch_check_invariants(branch));
+    t->owningBranch = NULL;
+    test_assert(!branch_check_invariants(branch));
+
+    branch.clear();
+    t = branch.appendNew();
+    test_assert(branch_check_invariants(branch));
+    t->index = 5;
+    test_assert(!branch_check_invariants(branch));
+}
+
+void test_setNull()
+{
+    Branch branch;
+    Term* t = branch.appendNew();
+    branch.bindName(t, "a");
+    test_assert(branch.contains("a"));
+    test_assert(t->owningBranch == &branch);
+    test_assert(branch[0] == t);
+
+    branch.setNull(0);
+    test_assert(!branch.contains("a"));
+    test_assert(t->owningBranch == NULL);
+    test_assert(branch[0] == NULL);
+
+    test_assert(branch);
+}
+
 void test_remove()
 {
     Branch branch;
@@ -20,6 +86,41 @@ void test_remove()
 
     test_assert(branch.length() == 0);
     test_assert(!branch.contains("a"));
+    test_assert(branch);
+}
+
+void test_removeNulls()
+{
+    Branch branch;
+
+    branch.append(NULL);
+    test_assert(branch.length() == 1);
+    branch.removeNulls();
+    test_assert(branch.length() == 0);
+
+    branch.append(NULL);
+    branch.append(NULL);
+    branch.append(NULL);
+    branch.append(NULL);
+    test_assert(branch.length() == 4);
+    branch.removeNulls();
+    test_assert(branch.length() == 0);
+
+    Term* a = branch.appendNew();
+    branch.append(NULL);
+    Term* b = branch.appendNew();
+    branch.append(NULL);
+    Term* c = branch.appendNew();
+    branch.append(NULL);
+
+    test_assert(branch.length() == 6);
+    branch.removeNulls();
+    test_assert(branch.length() == 3);
+    test_assert(branch[0] == a);
+    test_assert(branch[1] == b);
+    test_assert(branch[2] == c);
+
+    test_assert(branch_check_invariants(branch, &std::cout));
 }
 
 void test_duplicate()
@@ -49,6 +150,9 @@ void test_duplicate()
     test_assert(term2);
     test_assert(term1_duplicate);
     test_assert(term2_duplicate);
+
+    test_assert(original);
+    test_assert(duplicate);
 }
 
 void test_duplicate_nested()
@@ -75,6 +179,9 @@ void test_duplicate_nested()
     //test_assert(inner_j->input(0) == dupe["a"]);
     //test_assert(inner_j->input(0)->input(0) == dupe["a"]);
     test_assert(inner_j->input(1) == inner_i);
+
+    test_assert(branch);
+    test_assert(dupe);
 }
 
 void test_duplicate_nested_dont_make_extra_terms()
@@ -89,6 +196,9 @@ void test_duplicate_nested_dont_make_extra_terms()
     duplicate_branch(orig, dupe);
 
     test_assert(dupe["inner"]->asBranch().length() == 1);
+
+    test_assert(orig);
+    test_assert(dupe);
 }
 
 void test_duplicate_subroutine()
@@ -116,6 +226,9 @@ void test_duplicate_subroutine()
     test_assert(as_branch(func)[1]->type == as_branch(dupedFunc)[1]->type);
     test_assert(as_branch(func)[1]->asInt() == as_branch(dupedFunc)[1]->asInt());
     test_assert(as_branch(dupedFunc)[1] == as_branch(dupedFunc)["a"]);
+
+    test_assert(branch);
+    test_assert(dupe);
 }
 
 void test_duplicate_get_field_by_name()
@@ -127,12 +240,15 @@ void test_duplicate_get_field_by_name()
 
     test_assert(b->function == GET_FIELD_FUNC);
 
-    Branch duped_branch;
-    duplicate_branch(branch, duped_branch);
+    Branch dupe;
+    duplicate_branch(branch, dupe);
 
-    b = duped_branch["b"];
+    b = dupe["b"];
 
     test_assert(b->function == GET_FIELD_FUNC);
+
+    test_assert(branch);
+    test_assert(dupe);
 }
 
 void find_name_in_outer_branch()
@@ -147,6 +263,8 @@ void find_name_in_outer_branch()
     alloc_value(inner_branch);
 
     test_assert(find_named(as_branch(inner_branch), "a") == a);
+
+    test_assert(branch);
 }
 
 void test_migrate()
@@ -163,6 +281,9 @@ void test_migrate()
 
     // Test that the value was transferred
     test_assert(dest["a"]->asInt() == 2);
+
+    test_assert(source);
+    test_assert(dest);
 }
 
 void test_migrate2()
@@ -180,6 +301,9 @@ void test_migrate2()
 
     test_assert(dest["a"] == a);
     test_assert(dest["a"]->asInt() == 3);
+
+    test_assert(source);
+    test_assert(dest);
 }
 
 void test_assign()
@@ -226,6 +350,8 @@ void test_assign()
     test_assert(value_fits_type(a,b->type));
     test_assert(value_fits_type(b,a->type));
     assign_value(a, b);
+
+    test_assert(branch);
 }
 
 void test_get_source_file_location()
@@ -234,6 +360,8 @@ void test_get_source_file_location()
     create_string(branch, "c:/a/b/something.ca", "attr:source-file");
 
     test_equals(get_source_file_location(branch), "c:/a/b");
+
+    test_assert(branch);
 }
 
 void test_shorten()
@@ -260,11 +388,17 @@ void test_shorten()
     branch.shorten(0);
 
     test_assert(branch.length() == 0);
+
+    test_assert(branch);
 }
 
 void register_tests()
 {
+    REGISTER_TEST_CASE(branch_tests::test_insert);
+    REGISTER_TEST_CASE(branch_tests::test_check_invariants);
+    REGISTER_TEST_CASE(branch_tests::test_setNull);
     REGISTER_TEST_CASE(branch_tests::test_remove);
+    REGISTER_TEST_CASE(branch_tests::test_removeNulls);
     REGISTER_TEST_CASE(branch_tests::test_duplicate);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_nested);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_nested_dont_make_extra_terms);

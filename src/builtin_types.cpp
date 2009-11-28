@@ -136,9 +136,9 @@ namespace map_t {
         int index = find_key_index(contents, key);
 
         if (index != -1) {
-            keys[index] = NULL;
+            keys.set(index, NULL);
             keys.removeNulls();
-            values[index] = NULL;
+            values.set(index, NULL);
             values.removeNulls();
         }
     }

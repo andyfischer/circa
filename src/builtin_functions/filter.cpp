@@ -31,7 +31,7 @@ namespace filter_function {
 
         // Remove extra elements
         for (int i=write; i < output.length(); i++)
-            output[i] = NULL;
+            output.set(i, NULL);
 
         output.removeNulls();
     }

@@ -107,7 +107,7 @@ void normalize_feedback_branch(Branch& branch)
                 int index = *index_it;
                 assert(branch[index] != NULL);
                 accumulatorInputs.append(branch[index]->input(0));
-                branch[index] = NULL;
+                branch.set(index, NULL);
             }
 
             // Create a call to their feedback-accumulator

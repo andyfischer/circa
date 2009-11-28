@@ -251,7 +251,7 @@ void resize_list(Branch& list, int numElements, Term* type)
     // Remove terms if necessary
     bool anyRemoved = false;
     for (int i=numElements; i < list.length(); i++) {
-        list[i] = NULL;
+        list.set(i, NULL);
         anyRemoved = true;
     }
 
