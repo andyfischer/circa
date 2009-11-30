@@ -26,13 +26,17 @@ namespace circa {
 // of course, unbounded memory consumption.
 #define DEBUG_NEVER_DELETE_TERMS 0
 
+// Setting this to true will make us abort trap on the next name lookup.
+extern bool DEBUG_TRAP_NAME_LOOKUP;
+
+// Setting this to true will make us abort trap on the next call to error_occurred()
+extern bool DEBUG_TRAP_ERROR_OCCURRED;
+
 void register_good_pointer(Term* term);
 void unregister_good_pointer(Term* term);
 void assert_good_pointer(Term* term);
 bool is_bad_pointer(Term* term);
 
-// Setting this to true will abort trap on the next name lookup.
-extern bool DEBUG_TRAP_NAME_LOOKUP;
 
 // Spit out this branch's raw contents to std::cout
 void dump_branch(Branch& branch);

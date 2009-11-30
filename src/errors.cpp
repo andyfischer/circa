@@ -8,6 +8,9 @@ void error_occurred(Term* errorTerm, std::string const& message)
 {
     //std::cout << "error: " << message << std::endl;
 
+    if (DEBUG_TRAP_ERROR_OCCURRED)
+        assert(false);
+
     if (errorTerm == NULL)
         throw std::runtime_error(message);
 
@@ -282,7 +285,6 @@ std::string get_static_error_message(Term* term)
     case SERROR_UNRECGONIZED_EXPRESSION:
         out << "Unrecognized expression: " << term->stringProp("message");
         return out.str();
-
     }
     
     assert(false);

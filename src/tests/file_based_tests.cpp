@@ -54,14 +54,26 @@ void test_include_function()
     test_assert(!included.contains("a"));
     test_assert(!included.contains("c"));
     test_assert(included["b"]->asInt() == 2);
+}
 
-    // Modify the file with a script that has errors
+void test_include_static_error_after_reload()
+{
+    FakeFileSystem files;
+    Branch branch;
+
+    files["file.ca"] = "add(1,1)";
+    branch.compile("include('file.ca')");
+
+    Term errorListener;
+    evaluate_branch(branch, &errorListener);
+
+    test_assert(!errorListener.hasError());
+
     files["file.ca"] = "add(what what)";
     files.last_modified("file.ca")++;
 
-    evaluate_term(incl);
-
-    test_assert(has_static_errors(incl->asBranch()));
+    evaluate_branch(branch, &errorListener);
+    test_assert(errorListener.hasError());
 }
 
 void test_file_changed()
@@ -102,6 +114,7 @@ void register_tests()
 {
     REGISTER_TEST_CASE(file_based_tests::test_the_test);
     REGISTER_TEST_CASE(file_based_tests::test_include_function);
+    REGISTER_TEST_CASE(file_based_tests::test_include_static_error_after_reload);
     REGISTER_TEST_CASE(file_based_tests::test_file_changed);
 }
 
