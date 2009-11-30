@@ -17,10 +17,10 @@ def run_execution_test(filename):
     else:
         return True
 
-suite = test_suite.TestSuite()
+suite = []
 
 def do_file(filename):
-    suite.append(filename, lambda:run_execution_test(filename))
+    suite.append(test_suite.TestCase(filename, lambda:run_execution_test(filename)))
         
 do_file('plastic/demos/asteroids.ca')
 do_file('plastic/demos/buttons.ca')
@@ -29,4 +29,4 @@ do_file('plastic/demos/mouse.ca')
 do_file('plastic/demos/pong.ca')
 
 if __name__=='__main__':
-    suite.run_and_print_results()
+    test_suite.run_and_print_results(suite)
