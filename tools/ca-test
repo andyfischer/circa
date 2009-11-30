@@ -1,2 +1,2 @@
-cd $CIRCA_HOME/tests
-scripts/run_all.py
+cd $CIRCA_HOME
+tests/all.py
