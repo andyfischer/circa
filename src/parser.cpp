@@ -636,7 +636,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     get_input_syntax_hint(forTerm, 0, "hidden") = "true";
 
     // Use the heading as this term's name, for introspection
-    //FIXME branch.bindName(forTerm, for_function::get_heading_source(forTerm));
+    //TODO branch.bindName(forTerm, for_function::get_heading_source(forTerm));
     
     return forTerm;
 }
