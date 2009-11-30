@@ -30,7 +30,6 @@ void test_recursion()
 {
     Branch branch;
     branch.eval("def factorial(int n) :: int\n"
-                "  state i\n" // TODO: remove this
                 "  if (n < 2)\n"
                 "    return 1\n"
                 "  else\n"
@@ -165,7 +164,7 @@ void to_source_string()
 void register_tests()
 {
     REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
-    //FIXME REGISTER_TEST_CASE(subroutine_tests::test_recursion);
+    //TODO REGISTER_TEST_CASE(subroutine_tests::test_recursion);
     REGISTER_TEST_CASE(subroutine_tests::subroutine_stateful_term);
     REGISTER_TEST_CASE(subroutine_tests::initialize_state_type);
     REGISTER_TEST_CASE(subroutine_tests::shadow_input);

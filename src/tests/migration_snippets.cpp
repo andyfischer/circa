@@ -101,9 +101,9 @@ void migrate_across_user_defined_types()
 
 void dont_migrate_across_different_types()
 {
-    //test_migration("state int i = 5", "state number f = 10", "f == 10"); fixme
+    //test_migration("state int i = 5", "state number f = 10", "f == 10"); TODO
     test_migration("state int i; i = 5", "state number i", "i == 0");
-    test_migration("state Point p; p = [3 3]", "state Rect p", "p == [0.0 0.0 0.0 0.0]");
+    test_migration("state Point p; p = [3 3]", "state Rect p", "p == [.0 .0 .0 .0]");
 
     test_migration("def f1()::int state int i; return i; end;"
                    "def f2(int i) state number n end; f1()",
