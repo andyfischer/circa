@@ -41,16 +41,19 @@ namespace include_function {
             if (PRINT_TIMING)
                 std::cout << "post parse: " << timer << std::endl;
 
+            if (has_static_errors(contents)) {
+                error_occurred(caller, get_static_errors_formatted(contents));
+                // Revert to previous
+                contents.clear();
+                duplicate_branch(previous_contents, contents);
+                return;
+            }
+
             if (previous_contents.length() > 0)
                 migrate_stateful_values(previous_contents, contents);
 
             if (PRINT_TIMING)
                 std::cout << "post migrate: " << timer << std::endl;
-
-            if (has_static_errors(contents)) {
-                error_occurred(caller, get_static_errors_formatted(contents));
-                return;
-            }
 
             if (caller->owningBranch != NULL)
                 expose_all_names(contents, *caller->owningBranch);

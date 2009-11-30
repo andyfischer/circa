@@ -26,14 +26,10 @@ void no_error()
 
 void test_unknown_func()
 {
-#if 0
-TODO: This code actually gives an unknown-identifier error
-
     Branch branch;
     Term* t = branch.eval("embiggen(1)");
     test_equals(get_static_error_message(t), "Unknown function: embiggen");
     test_assert(get_static_error(t) == SERROR_UNKNOWN_FUNCTION);
-#endif
 }
 
 void test_unknown_type()
@@ -45,6 +41,7 @@ void test_unknown_type()
     test_assert(t->function == UNKNOWN_TYPE_FUNC);
     test_equals(get_static_error_message(t), "Unknown type: X");
     test_assert(get_static_error(t) == SERROR_UNKNOWN_TYPE);
+    test_assert(has_static_errors(branch));
 }
 
 void test_unknown_identifier()
@@ -53,11 +50,15 @@ void test_unknown_identifier()
     Term* t = branch.eval("charlie");
     test_equals(get_static_error_message(t), "Unknown identifier: charlie");
     test_assert(get_static_error(t) == SERROR_UNKNOWN_IDENTIFIER);
+    test_assert(has_static_error(t));
+    test_assert(has_static_errors(branch));
 
+    branch.clear();
     t = branch.eval("a.b");
     //dump_branch(branch);
     test_equals(get_static_error_message(t), "Unknown identifier: a.b");
     test_assert(get_static_error(t) == SERROR_UNKNOWN_IDENTIFIER);
+    test_assert(has_static_errors(branch));
 }
 
 void register_tests()
