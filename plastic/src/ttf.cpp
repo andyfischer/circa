@@ -65,8 +65,9 @@ void render_text(Term* caller)
 {
     RenderedText state(caller->input(0));
     std::string text = caller->input(2)->asString();
+    Term* color = caller->input(3);
 
-    bool changed_color = !branch_t::equals(state.color(), caller->input(3));
+    bool changed_color = !branch_t::equals(state.color(), color);
 
     if (state.texid() == 0 || state.text() != text || changed_color) {
 
@@ -86,12 +87,13 @@ void render_text(Term* caller)
         TTF_Font* font = as<TTF_Font*>(caller->input(1));
         //SDL_Color bgcolor = {0, 0, 0, 0}; // todo
 
-        SDL_Color color = unpack_sdl_color(caller->input(3));
-        SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), color);
+        SDL_Color sdlColor = unpack_sdl_color(caller->input(3));
+        SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), sdlColor);
 
         state.texid() = load_surface_to_texture(surface);
         state.width() = float(surface->w);
         state.height() = float(surface->h);
+        assign_value(color, state.color());
 
         SDL_FreeSurface(surface);
     }
