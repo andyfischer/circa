@@ -82,6 +82,7 @@ def deploy_windows():
     #mkdir(target_dir+'/bin')
     copy_glob('SDL_deps/bin/*', target_dir)
     copy_glob('c:/WINDOWS/WinSxS/x86_Microsoft.VC80.CRT_1fc8b3b9a1e18e3b_8.0.50727.762_x-ww_6b128700/*.dll', target_dir)
+    copy_file('plastic/deps/bin/glew32.dll', target_dir)
 
     zip(target_dir, prefix='deploy/')
 
