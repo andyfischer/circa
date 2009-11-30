@@ -1,5 +1,10 @@
 // Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
+#ifdef WINDOWS
+// for fopen()
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <sys/stat.h>
 
 #include "circa.h"

@@ -12,8 +12,6 @@
 #include <math.h>
 #include <direct.h> 
 
-#define _CRT_SECURE_NO_WARNINGS
-
 #endif // WINDOWS
 
 #include <algorithm>

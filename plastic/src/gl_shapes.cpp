@@ -130,8 +130,8 @@ void gl_circle(Term* caller)
     glVertex3f(x,y,0);
 
     for (int i=0; i <= control_points; i++) {
-        float angle_0 = float(i) / control_points * M_PI * 2;
-        float angle_1 = float(i+1) / control_points * M_PI * 2;
+        float angle_0 = float(i / control_points * M_PI * 2);
+        float angle_1 = float((i+1) / control_points * M_PI * 2);
 
         glVertex3f(x + radius * std::cos(angle_0), y + radius * std::sin(angle_0), 0);
         glVertex3f(x + radius * std::cos(angle_1), y + radius * std::sin(angle_1), 0);
