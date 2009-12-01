@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os, subprocess, sys
-from scripts import test_suite
+import test_helper
 
 def run_execution_test(filename):
     """
@@ -13,14 +13,14 @@ def run_execution_test(filename):
         executable=os.environ["CIRCA_HOME"]+'/build/bin/plas')
 
     if result != 0:
-        return ""
+        return "" # should return an error message here
     else:
         return True
 
 suite = []
 
 def do_file(filename):
-    suite.append(test_suite.TestCase(filename, lambda:run_execution_test(filename)))
+    suite.append(test_helper.TestCase(filename, lambda:run_execution_test(filename)))
         
 do_file('plastic/demos/asteroids.ca')
 do_file('plastic/demos/buttons.ca')
@@ -29,4 +29,4 @@ do_file('plastic/demos/mouse.ca')
 do_file('plastic/demos/pong.ca')
 
 if __name__=='__main__':
-    test_suite.run_and_print_results(suite)
+    test_helper.run_tests_and_print_results(suite)

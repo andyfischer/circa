@@ -1,2 +1,2 @@
-Error occured: On term #206: assert(false)
-Assert failed
+Error occurred:
+[tests/samples/assert.ca:3,0] Assert failed

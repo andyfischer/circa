@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
-import plastic_tests
-from scripts import test_suite
+import plastic_tests, source_repro, output_tests
+import test_helper
 
-suite = plastic_tests.suite
+suite = []
+suite += plastic_tests.suite
+suite += source_repro.suite
+suite += output_tests.suite
 
 if __name__=='__main__':
-    test_suite.run_and_print_results(suite)
+    test_helper.run_tests_and_print_results(suite)
