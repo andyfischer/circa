@@ -1,14 +1,14 @@
 
 outside_value = 2
 
-def my_closure(number i) : number
+def my_closure(number i) :: number
     return i * outside_value
 end
 
 print(map(my_closure, [1 2 3]))
 
-def my_func() : List
-    def my_inner_closure(number i) : number
+def my_func() :: List
+    def my_inner_closure(number i) :: number
         return i + outside_value
     end
 
