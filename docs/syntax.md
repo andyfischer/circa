@@ -35,7 +35,7 @@ Examples:
 
 These create a value of type `number`.
 
-Exponent syntax is currently not supported (example: 1e9), but planned for the future.
+Exponent syntax is currently not supported (example: `1e9`), but planned for the future.
 
 Strings
 -------
@@ -59,6 +59,7 @@ Colors
 ------
 
 Has several different forms:
+
  * 3 hex digits (corresponding to red, green, blue)
  * 4 hex digits (as above, with 4th digit for alpha)
  * 6 hex digits (red, green, blue; two digits for each color)
@@ -68,7 +69,7 @@ Examples:
 
  * `#fff` (white)
  * `#f0f` (magenta)
- * `#00f8 (blue with 50% transparency)
+ * `#00f8` (blue with 50% transparency)
  * `#ff4f00` (International orange)
  * `#00ff0088` (Green with 50% transparency)
 
@@ -95,7 +96,7 @@ There's also the `->` operator for function call chaining. This takes the result
 Unary expressions
 -----------------
 
-There are three prefix operators:
+There are three unary prefix operators:
 
 <table>
 <tr>
@@ -135,10 +136,10 @@ We have the following infix operators:
  <tr><td>%</td>      <td>remainder</td><td>Modulo, truncated division</td><td>7</td></tr>
  <tr><td>+</td>      <td>add</td><td>Addition (overloaded)</td><td>6</td></tr>
  <tr><td>-</td>      <td>sub</td><td>Subtraction (overloaded)</td><td>6</td></tr>
- <tr><td><</td>      <td>less_than</td><td>Less-tdan comparison</td><td>5</td></tr>
- <tr><td><=</td>      <td>less_than_eq</td><td>Less-tdan-or-equals comparison</td><td>5</td></tr>
- <tr><td>></td>      <td>greater_than</td><td>Greater-tdan comparison</td><td>5</td></tr>
- <tr><td>>=</td>      <td>greater_than_eq</td><td>Greater-tdan-or-equals comparison</td><td>5</td></tr>
+ <tr><td><</td>      <td>less_than</td><td>Less-than comparison</td><td>5</td></tr>
+ <tr><td><=</td>      <td>less_than_eq</td><td>Less-than-or-equals comparison</td><td>5</td></tr>
+ <tr><td>></td>      <td>greater_than</td><td>Greater-than comparison</td><td>5</td></tr>
+ <tr><td>>=</td>      <td>greater_than_eq</td><td>Greater-than-or-equals comparison</td><td>5</td></tr>
  <tr><td>==</td>      <td>equals</td><td>Equality check</td><td>5</td></tr>
  <tr><td>!=</td>      <td>equals</td><td>Inequality check</td><td>5</td></tr>
  <tr><td>and</td>      <td>and</td><td>Logical and</td><td>4</td></tr>
@@ -211,7 +212,7 @@ Note that there must not be any whitespace between the expression on the left an
 If statement
 ------------
 
-An if statement is specified by the `if` keyword, followed by a conditional expression, followed by a list of statements, followed by the `end` keyword. The list of statements are executed if the conditional expression is true. Examples:
+An if-statement is specified by the `if` keyword, followed by a conditional expression, followed by a list of statements, followed by the `end` keyword. The list of statements are executed if the conditional expression is true. Examples:
 
     if mouse_pressed()
         print('The mouse is pressed')
@@ -223,7 +224,7 @@ Statements can be separated by line breaks, commas, or semicolons, but they are 
 
     if a > b print('a is higher') end
 
-An if statement can also have an `else` section, which is evaluated if the conditional expression is false. Examples:
+An if-statement can also have an `else` section, which is evaluated if the conditional expression is false. Examples:
 
     if a > b
         highest = a
@@ -244,7 +245,7 @@ There is also the `elif` keyword, which is followed by another conditional expre
 For statement
 -------------
 
-A for statement is specified by the `for` keyword. The first line has this syntax:
+A for-statement is specified by the `for` keyword. The first line has this syntax:
 
     for <iterator name> in <list expression>
 
@@ -254,7 +255,7 @@ which is followed by a list of expressions, and then the `end` keyword. Example:
         print('i is ' i)
     end
 
-When executing a for statement, it goes through each element in the list expression, binds that value to the iterator name, and executes the inner statements.
+When executing a for-statement, it goes through each element in the list expression, binds that value to the iterator name, and executes the inner statements.
 
 This piece of code:
 
@@ -273,7 +274,7 @@ has the following output:
 For statement with rebinding
 ----------------------------
 
-A for statement can also *rebind* the list expression using the `@` operator, which means that the inner code is allowed to modify each item, and the list name is rebinded to the modified list. Example:
+A for-statement can also *rebind* the list expression using the `@` operator, which means that the inner code is allowed to modify each item, and the list name is rebound to the modified list. Example:
 
     numbers = [0 1 2 3 4]
     for i in @numbers
@@ -283,7 +284,7 @@ A for statement can also *rebind* the list expression using the `@` operator, wh
 
 will print the result: `[0, 1, 4, 9, 16]`.
 
-A rebinding for statement can also use the special keyword `discard`, which means that it will remove the current element from the final list. The following code will find all the even numbers below 10:
+A rebinding for-statement can also use the special keyword `discard`, which means that it will remove the current element from the final list. The following code will find all the even numbers below 10:
 
     numbers = 0..10
     for i in @numbers 
