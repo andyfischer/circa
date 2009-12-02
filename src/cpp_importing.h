@@ -13,13 +13,21 @@ namespace cpp_importing {
 template <class T>
 void templated_alloc(Term* type, Term* term)
 {
-    term->value = new T();
+    // Use malloc() and memset(), this allows us to make sure that the value's memory
+    // is zeroed out before it is used.
+    void* data = malloc(sizeof(T));
+    memset(data, 0, sizeof(T));
+    new(data) T();
+    term->value = data;
 }
 
 template <class T>
 void templated_dealloc(Term* type, Term* term)
 {
-    delete reinterpret_cast<T*>(term->value);
+    // Placement delete because we used placement new above.
+    reinterpret_cast<T*>(term->value)->~T();
+    free((void*) term->value);
+    term->value = 0;
 }
 
 template <class T>
