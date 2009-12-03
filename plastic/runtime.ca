@@ -30,11 +30,17 @@ namespace ide
 end
 
 -- Input
+type Keypress {
+  string character
+  int code
+}
+
 def key_down(int key) :: bool end
 def key_pressed(int key) :: bool end
 def key_pressed +overload(string key) :: bool end
 def mouse_pressed() :: bool end
 def mouse_over(Rect region) :: bool end
+def recent_key_presses() :: List end
 
 def mouse_clicked +overload () :: bool end
 def mouse_clicked +overload (Rect region) :: bool end
@@ -42,6 +48,7 @@ def mouse_wheel_up +overload () :: bool end
 def mouse_wheel_up +overload (Rect region) :: bool end
 def mouse_wheel_down +overload () :: bool end
 def mouse_wheel_down +overload (Rect region) :: bool end
+
 
 -- These are assigned in input.cpp
 UP = 0
@@ -313,6 +320,8 @@ namespace fps_counter
 end
 
 fps = fps_counter.lastRecoredFps
+
+--include('stdlib/text_input.ca')
 
 namespace tweak
     def button(Ref r, Point loc, string name)

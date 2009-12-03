@@ -355,6 +355,7 @@ bool is_branch(Term* term)
 
 Branch& as_branch(Term* term)
 {
+    assert(term != NULL);
     assert(is_branch(term));
     alloc_value(term);
     return *((Branch*) term->value);

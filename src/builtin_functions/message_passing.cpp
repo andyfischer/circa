@@ -9,31 +9,31 @@ namespace message_passing_function {
 
     void evaluate_send(Term* caller)
     {
-        std::string& channel = caller->input(0)->asString();
+        std::string& channelName = caller->input(0)->asString();
         Branch& store = *messageStore;
 
-        // check if we need to add a queue for this channel
-        if (!store.contains(channel)) {
-            create_list(store, channel);
+        // check if we need to add a queue for this channelName
+        if (!store.contains(channelName)) {
+            create_list(store, channelName);
         }
 
-        Branch& queue = store[channel]->asBranch();
+        Branch& queue = store[channelName]->asBranch();
         duplicate_value(queue, caller->input(1));
     }
 
     void evaluate_receive(Term* caller)
     {
-        std::string& channel = caller->input(0)->asString();
+        std::string& channelName = caller->input(0)->asString();
         Branch& store = *messageStore;
         Branch& output = caller->asBranch();
 
         output.clear();
 
-        if (!store.contains(channel))
+        if (!store.contains(channelName))
             return;
 
-        assign_value(store[channel], caller);
-        store[channel]->asBranch().clear();
+        assign_value(store[channelName], caller);
+        store[channelName]->asBranch().clear();
     }
 
     void setup(Branch& kernel)
