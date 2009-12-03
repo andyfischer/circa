@@ -9,7 +9,7 @@ using namespace circa;
 namespace input {
 
 bool KEY_DOWN[SDLK_LAST];
-std::vector<SDL_keysym> KEY_JUST_PRESSED;
+std::vector<SDL_keysym> KEYS_JUST_PRESSED;
 
 int MOUSE_X = 0;
 int MOUSE_Y = 0;
@@ -32,8 +32,8 @@ void key_pressed(Term* caller)
 {
     if (is_int(caller->input(0))) {
         int key = as_int(caller->input(0));
-        for (size_t index=0; index < KEY_JUST_PRESSED.size(); index++)  {
-            if (KEY_JUST_PRESSED[index].sym == key) {
+        for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
+            if (KEYS_JUST_PRESSED[index].sym == key) {
                 caller->asBool() = true;
                 return;
             }
@@ -49,8 +49,8 @@ void key_pressed(Term* caller)
             return;
         }
 
-        for (size_t index=0; index < KEY_JUST_PRESSED.size(); index++)  {
-            if (key[0] == KEY_JUST_PRESSED[index].unicode) {
+        for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
+            if (key[0] == KEYS_JUST_PRESSED[index].unicode) {
                 caller->asBool() = true;
                 return;
             }
@@ -63,7 +63,7 @@ void key_pressed(Term* caller)
 
 void capture_events()
 {
-    KEY_JUST_PRESSED.clear();
+    KEYS_JUST_PRESSED.clear();
     RECENT_LEFT_MOUSE_DOWN = false;
     RECENT_MOUSE_WHEEL_UP = false;
     RECENT_MOUSE_WHEEL_DOWN = false;
@@ -84,7 +84,7 @@ void capture_events()
         case SDL_KEYDOWN:
 
             if (!KEY_DOWN[event.key.keysym.sym]) {
-                KEY_JUST_PRESSED.push_back(event.key.keysym);
+                KEYS_JUST_PRESSED.push_back(event.key.keysym);
                 handle_key_press(event, event.key.keysym.sym);
             }
 
@@ -182,6 +182,31 @@ void handle_key_press(SDL_Event &event, int key)
     }
 }
 
+void recent_key_presses(Term* caller)
+{
+    Branch& output = as_branch(caller);
+    output.clear();
+
+    for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++) {
+        Branch& item = create_list(output);
+        Uint16 key = KEYS_JUST_PRESSED[index].unicode;
+        char keyStr[2];
+        keyStr[1] = 0;
+
+        // check to see if the character is unprintable. This check is not that great.
+        if ((key & 0xf700) || key == 0x7f)
+            keyStr[0] = 0;
+        else
+            keyStr[0] = key;
+
+        // when pressing some special characters, SDL gives us some low numbers
+        // for the characters (such as 1 for up). Not sure of the 
+
+        create_string(item, std::string(keyStr));
+        create_int(item, KEYS_JUST_PRESSED[index].sym);
+    }
+}
+
 bool mouse_in(Branch& box)
 {
     float x1 = box[0]->toFloat();
@@ -236,6 +261,7 @@ void setup(Branch& branch)
     install_function(branch["key_down"], key_down);
     install_function(branch["key_pressed"], key_pressed);
     install_function(function_t::get_previous_overload(branch["key_pressed"]), key_pressed);
+    install_function(branch["recent_key_presses"], recent_key_presses);
     install_function(branch["mouse_pressed"], mouse_pressed);
     install_function(branch["mouse_over"], mouse_over);
 

@@ -1,0 +1,28 @@
+
+namespace text_input
+    type TextInputState {
+      string text
+      int cursor
+    }
+
+    def input_character(TextInputState st, Keypress keypress) :: TextInputState
+        if keypress.code == LEFT
+            if st.cursor > 0
+                st.cursor = st.cursor - 1
+            end
+        elif keypress.code == RIGHT
+            if st.cursor < st.text.length()
+                st.cursor = st.cursor + 1
+            end
+        end
+    end
+
+    def buffer(bool clear)
+        state string current_text
+        if clear
+            current_text = ""
+        else
+
+        end
+    end
+end

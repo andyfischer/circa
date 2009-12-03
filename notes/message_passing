@@ -1,0 +1,10 @@
+
+Need a high-level way of passing around data.
+
+Calling code says:
+
+send('channel.name', [1 2 3])
+
+Receiving code gets:
+
+messages = receive('channel.name')
