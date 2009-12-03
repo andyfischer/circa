@@ -11,7 +11,7 @@ namespace map_function {
         Branch& inputs = as_branch(caller->input(1));
         Branch& output = as_branch(caller);
 
-        if(is_function_stateful(func)) {
+        if (is_function_stateful(func)) {
             error_occurred(caller, "map() not yet supported on a stateful function");
             return;
         }
@@ -31,7 +31,7 @@ namespace map_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "map(any,List) :: List");
+        import_function(kernel, evaluate, "def map(any,List) :: List");
     }
 }
 } // namespace circa
