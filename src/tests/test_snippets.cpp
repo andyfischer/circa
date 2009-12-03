@@ -92,6 +92,9 @@ void test_strings()
 {
     test_snippet("", "''.length() == 0");
     test_snippet("", "'abc'.length() == 3");
+    test_snippet("", "'abc'.substr(0,0) == ''");
+    test_snippet("", "'abc'.substr(0,1) == 'a'");
+    test_snippet("", "'abc'.substr(1,3) == 'bc'");
 }
 
 void test_equals_snippets()

@@ -56,6 +56,7 @@ DOWN = 0
 LEFT = 0
 RIGHT = 0
 SPACE = 0
+DELETE = 0
 KEY_B = 0
 
 -- Text rendering functions
@@ -321,7 +322,7 @@ end
 
 fps = fps_counter.lastRecoredFps
 
---include('stdlib/text_input.ca')
+include('stdlib/text_input.ca')
 
 namespace tweak
     def button(Ref r, Point loc, string name)

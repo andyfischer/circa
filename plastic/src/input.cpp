@@ -281,6 +281,7 @@ void setup(Branch& branch)
     procure_int(branch, "RIGHT") = SDLK_RIGHT;
     procure_int(branch, "SPACE") = SDLK_SPACE;
     procure_int(branch, "KEY_B") = SDLK_b;
+    procure_int(branch, "DELETE") = SDLK_DELETE;
 }
 
 } // namespace input

@@ -11,10 +11,16 @@ namespace text_input
                 st.cursor = st.cursor - 1
             end
         elif keypress.code == RIGHT
-            if st.cursor < st.text.length()
+            st_text = st.text -- need to do this b/c of a parser bug
+            if st.cursor < st_text.length()
                 st.cursor = st.cursor + 1
             end
+        elif keypress.code == DELETE
+
+        else
+            st.text = concat(st.text, keypress.character)
         end
+        return st
     end
 
     def buffer(bool clear)
@@ -24,5 +30,13 @@ namespace text_input
         else
 
         end
+    end
+
+    def test()
+        state TextInputState tis
+        for key in recent_key_presses()
+            input_character(@tis, key)
+        end
+        print(tis)
     end
 end
