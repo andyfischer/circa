@@ -320,6 +320,14 @@ void test_stateful_code()
     test_snippet("def hi() state int i; i = 4 end; c = hi()", "inspect.get_state(c) == [4]");
 }
 
+void test_message_passing()
+{
+    test_snippet("send('test' 5) send('test' true) send('test' 2.0)",
+            "receive('test') == [5 true 2.0]");
+    test_snippet("send('test' 1) send('test2' 2) send('test' 3) send('test2', 4)",
+            "receive('test') == [1 3], receive('test2') == [2 4]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::equals_snippets);
@@ -343,6 +351,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_repeat);
     REGISTER_TEST_CASE(test_snippets::test_range);
     REGISTER_TEST_CASE(test_snippets::test_stateful_code);
+    REGISTER_TEST_CASE(test_snippets::test_message_passing);
 }
 
 } // namespace test_snippets

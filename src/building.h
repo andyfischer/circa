@@ -41,6 +41,7 @@ Branch& create_namespace(Branch&, std::string const& name);
 Term* create_type(Branch& branch, std::string name="");
 Term* create_empty_type(Branch& branch, std::string name);
 Term* create_compound_type(Branch& branch, std::string const& name);
+Term* duplicate_value(Branch& branch, Term* term);
 
 // In this context, "procure" means "return the existing thing if it already exists, and
 // create it if it doesn't exist." Procure functions are idempotent.

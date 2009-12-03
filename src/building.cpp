@@ -214,6 +214,13 @@ Term* create_compound_type(Branch& branch, std::string const& name)
     return term;
 }
 
+Term* duplicate_value(Branch& branch, Term* term)
+{
+    Term* dup = create_value(branch, term->type);
+    assign_value(term, dup);
+    return dup;
+}
+
 Term* procure_value(Branch& branch, Term* type, std::string const& name)
 {
     Term* existing = branch[name];
