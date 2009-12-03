@@ -223,6 +223,11 @@ namespace string_t {
     {
         as_int(term) = int(term->input(0)->asString().length());
     }
+
+    void substr(Term* term)
+    {
+        as_string(term) = as_string(term->input(0)).substr(int_input(term, 1), int_input(term, 2));
+    }
 }
 
 std::string& as_string(Term* term)
@@ -482,6 +487,7 @@ void initialize_primitive_types(Branch& kernel)
 void post_setup_primitive_types()
 {
     import_member_function(STRING_TYPE, string_t::length, "length(string)::int");
+    import_member_function(STRING_TYPE, string_t::substr, "substr(string,int,int)::string");
 
     import_member_function(REF_TYPE, ref_t::get_name, "name(Ref) :: string");
     import_member_function(REF_TYPE, ref_t::hosted_to_string, "to_string(Ref) :: string");
