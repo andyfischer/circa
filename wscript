@@ -16,13 +16,13 @@ def configure(conf):
     conf.env.CXXFLAGS = ['-Wall', '-ggdb']
 
     # testcase for variants, look below
-	#dbg = conf.env.copy()
-	#rel = conf.env.copy()
+    #dbg = conf.env.copy()
+    #rel = conf.env.copy()
 
-	#rel.set_variant('release')
-	#conf.set_env_name('release', rel)
-	#conf.setenv('release')
-	#conf.env.CXXFLAGS = ['-O2']
+    #rel.set_variant('release')
+    #conf.set_env_name('release', rel)
+    #conf.setenv('release')
+    #conf.env.CXXFLAGS = ['-O2']
 
 def source_files(dir):
     import os
@@ -42,10 +42,10 @@ def build(bld):
     circa_sources = ['src/'+file for file in circa_sources]
 
     bld.new_task_gen(
-		features = 'cxx cprogram',
-		source = circa_sources,
-		target = 'circa_app',
-		defines = '',
+        features = 'cxx cprogram',
+        source = circa_sources,
+        target = 'circa_app',
+        defines = '',
         includes = 'src',
         destfile = 'build/circa')
 
