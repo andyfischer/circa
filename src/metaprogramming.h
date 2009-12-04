@@ -3,7 +3,7 @@
 #ifndef CIRCA_METAPROGRAMMING_INCLUDED
 #define CIRCA_METAPROGRAMMING_INCLUDED
 
-#include "circa.h"
+#include "common_headers.h"
 
 namespace circa {
 

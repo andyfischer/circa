@@ -27,6 +27,8 @@ src/generated
 *.pdb
 *.suo
 .sconsign.dblite
+.lock-wscript
+tools/.waf*
 
 # generated docs
 docs.json.temp
