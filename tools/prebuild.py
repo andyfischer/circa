@@ -30,21 +30,32 @@ def main():
     write_text_file('src/generated/register_all_tests.cpp',
             generate_cpp_registration.do_register_all_tests('src/tests'))
 
-    def source_directory_into_one_cpp(dir, name):
-        generated_cpp = []
-        generated_filename = 'src/generated/'+name+'.cpp'
+    def source_files(dir):
         for path in os.listdir(dir):
-            full_path = os.path.join(dir,path)
-            if not os.path.isfile(full_path):
-                continue
+            if not os.path.isfile(os.path.join(dir,path)): continue
+            if not path.endswith('.cpp'): continue
+            yield path
 
-            generated_cpp.append("#include \"../" + full_path + "\"")
+    def builtin_function_cpps():
+        for file in source_files('src/builtin_functions'):
+            yield "builtin_functions/"+file
+    def test_cpps():
+        for file in source_files('src/tests'):
+            yield "tests/"+file
+    def library_sources():
+        for file in source_files('src'):
+            if file == 'main.cpp': continue
+            yield file
 
-        generated_cpp = "\n".join(generated_cpp)
-        write_text_file(generated_filename, generated_cpp)
+    def include_list(items):
+        generated_cpp = []
+        for item in items:
+            generated_cpp.append('#include "'+item+'"')
+        return "\n".join(generated_cpp)
 
-    source_directory_into_one_cpp('src/tests', 'all_tests')
-    source_directory_into_one_cpp('src/builtin_functions', 'all_builtin_functions')
+    write_text_file('src/generated/all_tests.cpp', include_list(test_cpps()))
+    write_text_file('src/generated/all_builtin_functions.cpp',
+            include_list(builtin_function_cpps()))
 
 if __name__ == '__main__':
     main()

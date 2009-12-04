@@ -1,6 +1,6 @@
 // Copyright (c) 2007-2009 Andrew Fischer. All rights reserved
 
-#include <circa.h>
+#include "circa.h"
 
 namespace circa {
 
