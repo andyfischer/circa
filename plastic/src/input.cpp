@@ -197,7 +197,7 @@ void recent_key_presses(Term* caller)
         if ((key & 0xf700) || key == 0x7f)
             keyStr[0] = 0;
         else
-            keyStr[0] = key;
+            keyStr[0] = char(key);
 
         // when pressing some special characters, SDL gives us some low numbers
         // for the characters (such as 1 for up). Not sure of the 

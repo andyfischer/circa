@@ -139,10 +139,17 @@ void setup(Branch& branch)
         return;
     }
 
-    import_type<TTF_Font*>(branch["TTF_Font"]);
+    Term* TTF_Font_t = branch["TTF_Font"];
 
-    type_t::enable_default_value(branch["TTF_Font"]);
-    as<TTF_Font*>(type_t::get_default_value(branch["TTF_Font"])) = 0;
+    // Dealloc existing TTF_Font values before we modify the type. This should probably
+    // be done automatically inside import_type.
+    for (BranchIterator it(branch); !it.finished(); ++it) {
+        if (it->type == TTF_Font_t)
+            dealloc_value(*it);
+    }
+
+    // Update the TTF_Font type
+    import_type<TTF_Font*>(TTF_Font_t);
 
     Branch& text_ns = branch["text"]->asBranch();
 

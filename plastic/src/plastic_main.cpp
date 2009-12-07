@@ -55,6 +55,8 @@ std::string find_asset_file(std::string const& filename)
 
 bool initialize_plastic()
 {
+    std::cout << "initialize_plastic()" << std::endl;
+
     // Initialize Circa
     circa::initialize();
 
@@ -163,8 +165,11 @@ int plastic_main(std::vector<std::string> args)
 {
     if (!initialize_plastic()) return 1;
 
+    std::string arg0;
+    if (args.size() > 0) arg0 = args[0];
+
     // -gd to generate docs
-    if (args[0] == "-gd") {
+    if (arg0 == "-gd") {
         std::cout << "writing docs to " << args[1] << std::endl;
         std::stringstream out;
         generate_plastic_docs(out);
@@ -173,7 +178,7 @@ int plastic_main(std::vector<std::string> args)
     }
 
     // -p to print raw compiled code
-    if (args[0] == "-p") {
+    if (arg0 == "-p") {
         if (!load_user_script_filename(args[1]))
             return 1;
         std::cout << print_branch_raw(users_branch());
@@ -181,7 +186,7 @@ int plastic_main(std::vector<std::string> args)
     }
 
     // -tr to do a test run of a script, without creating a display.
-    if (args[0] == "-tr") {
+    if (arg0 == "-tr") {
         if (!load_user_script_filename(args[1]))
             return 1;
 
@@ -198,9 +203,8 @@ int plastic_main(std::vector<std::string> args)
     }
 
     // Normal operation, load the script file in argument 0.
-    std::string filename;
-    if (args.size() > 0) filename = args[0];
-    else {
+    std::string filename = arg0;
+    if (filename == "") {
         Term* default_script_filename = runtime_branch()["default_script_filename"];
         evaluate_term(default_script_filename);
         filename = default_script_filename->asString();

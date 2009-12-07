@@ -45,7 +45,7 @@ def download_file_from_the_internets(url, filename):
 
 def unzip_file(filename, dir):
     print "Unzipping "+filename+" to "+dir
-    import zipfile
+    import os, zipfile
 
     if not os.path.exists(dir): os.mkdir(dir)
 
