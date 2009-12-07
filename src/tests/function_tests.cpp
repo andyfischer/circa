@@ -47,8 +47,8 @@ void test_inputs_fit_function()
     Term* b = branch.eval("1.0");
     RefList inputs(a,b);
 
-    test_assert(inputs_fit_function(as_branch(ADD_FUNC)["add_f"], inputs));
-    test_assert(!inputs_fit_function(as_branch(ADD_FUNC)["add_i"], inputs));
+    test_assert(inputs_fit_function(KERNEL->get("add_f"), inputs));
+    test_assert(!inputs_fit_function(KERNEL->get("add_i"), inputs));
 }
 
 void overloaded_function()

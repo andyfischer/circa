@@ -47,17 +47,17 @@ namespace mult_function {
 
     void setup(Branch& kernel)
     {
-        MULT_FUNC = create_overloaded_function(kernel, "mult");
+        Term* mult_i = import_function(kernel, evaluate_i, "mult_i(int,int) :: int");
 
-        Term* mult_i = import_function_overload(MULT_FUNC, evaluate_i, "mult_i(int,int) :: int");
-
-        Term* mult_f = import_function_overload(MULT_FUNC, evaluate_f, "mult_f(number,number) :: number");
+        Term* mult_f = import_function(kernel, evaluate_f, "mult_f(number,number) :: number");
 
         function_t::get_feedback_func(mult_f) = 
             import_function(kernel, feedback_evaluate, "mult_feedback(any, number) :: Branch");
 
-        kernel.bindName(mult_i, "mult_i");
-        kernel.bindName(mult_f, "mult_f");
+        MULT_FUNC = create_overloaded_function(kernel, "mult");
+
+        create_ref(as_branch(MULT_FUNC), mult_i);
+        create_ref(as_branch(MULT_FUNC), mult_f);
     }
 }
 } // namespace circa

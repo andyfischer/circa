@@ -20,11 +20,6 @@ Term* import_member_function(Term* type, EvaluateFunc evaluate, std::string cons
     return result;
 }
 
-Term* import_function_overload(Term* overload, EvaluateFunc evaluate, std::string const& header)
-{
-    return import_function(as_branch(overload), evaluate, header);
-}
-
 void install_function(Term* function, EvaluateFunc evaluate)
 {
     assert(is_function(function));

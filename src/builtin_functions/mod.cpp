@@ -35,9 +35,12 @@ namespace mod_function {
 
     void setup(Branch& kernel)
     {
+        Term* mod_i = import_function(kernel, evaluate, "mod_i(int,int) :: int");
+        Term* mod_f = import_function(kernel, evaluate_f, "mod_f(number,number) :: number");
+
         Term* main = create_overloaded_function(kernel, "mod");
-        import_function_overload(main, evaluate, "mod(int,int) :: int");
-        import_function_overload(main, evaluate_f, "mod(number,number) :: number");
+        create_ref(as_branch(main), mod_i);
+        create_ref(as_branch(main), mod_f);
     }
 }
 } // namespace circa

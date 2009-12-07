@@ -14,7 +14,7 @@ namespace function_t {
     {
         std::stringstream out;
 
-        out << function_t::get_name(term);
+        out << term->name;
 
         out << term->stringPropOptional("syntaxHints:postNameWs", "");
 

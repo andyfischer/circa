@@ -17,9 +17,13 @@ namespace less_than_eq_function {
 
     void setup(Branch& kernel)
     {
+        Term* lt_i = import_function(kernel, evaluate_i, "less_than_eq_i(int,int) :: bool");
+        Term* lt_f = import_function(kernel, evaluate_f, "less_than_eq_f(number,number) :: bool");
+
         Term* main = create_overloaded_function(kernel, "less_than_eq");
-        import_function_overload(main, evaluate_f, "less_than_eq(int,int) :: bool");
-        import_function_overload(main, evaluate_f, "less_than_eq(number,number) :: bool");
+
+        create_ref(as_branch(main), lt_i);
+        create_ref(as_branch(main), lt_f);
     }
 }
 }

@@ -23,9 +23,12 @@ namespace remainder_function {
 
     void setup(Branch& kernel)
     {
+        Term* rem_i = import_function(kernel, evaluate, "remainder_i(int,int) :: int");
+        Term* rem_f = import_function(kernel, evaluate_f, "remainder_f(number,number) :: number");
+
         Term* main = create_overloaded_function(kernel, "remainder");
-        import_function_overload(main, evaluate, "remainder(int,int) :: int");
-        import_function_overload(main, evaluate_f, "remainder(number,number) :: number");
+        create_ref(as_branch(main), rem_i);
+        create_ref(as_branch(main), rem_f);
     }
 }
 } // namespace circa

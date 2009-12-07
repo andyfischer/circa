@@ -44,7 +44,7 @@ void test_change_function()
     evaluate_branch(branch);
     test_assert(as_int(a) == 6);
 
-    change_function(a, as_branch(MULT_FUNC)["mult_i"]);
+    change_function(a, KERNEL->get("mult_i"));
     evaluate_branch(branch);
     test_assert(as_int(a) == 9);
 
