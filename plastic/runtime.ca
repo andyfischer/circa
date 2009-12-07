@@ -36,8 +36,9 @@ type Keypress {
 }
 
 def key_down(int key) :: bool end
-def key_pressed(int key) :: bool end
-def key_pressed +overload(string key) :: bool end
+def key_pressed_code(int key) :: bool end
+def key_pressed_char(string key) :: bool end
+key_pressed = [&key_pressed_code &key_pressed_char] :: OverloadedFunction
 def mouse_pressed() :: bool end
 def mouse_over(Rect region) :: bool end
 def recent_key_presses() :: List end
