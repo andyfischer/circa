@@ -41,7 +41,9 @@ void generate_docs_for_function(Term* func, std::stringstream &out)
     out << ", \"return_type\": \"" << function_t::get_output_type(func)->name << "\"";
     out << ", \"declaration\": \"" << header << "\"";
     //escape_string_for_json(get_term_source(func), out);
-    out << ", \"comments\": \"" << description << "\"";
+    out << ", \"comments\": \"";
+    escape_string_for_json(description, out);
+    out << "\"";
     out << "}";
 }
 
@@ -107,6 +109,5 @@ void initialize_kernel_documentation(Branch& KERNEL)
     hide_from_docs(KERNEL["vectorize_vs"]);
     hide_from_docs(KERNEL["vectorize_vv"]);
 }
-
 
 } // namespace circa

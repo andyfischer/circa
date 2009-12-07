@@ -30,6 +30,11 @@ namespace function_t {
             if (name == "#state")
                 continue;
 
+            Term* input = function_t::get_input_placeholder(term, i);
+
+            if (input->boolPropOptional("state", false))
+                out << "state ";
+
             if (!first) out << ", ";
             first = false;
             out << function_t::get_input_type(term, i)->name;
