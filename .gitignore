@@ -32,7 +32,7 @@ tools/.waf*
 
 # generated docs
 docs.json.temp
-docs/index.html
+docs/nanodoc/index.html
 
 # dependencies
 SDL_deps

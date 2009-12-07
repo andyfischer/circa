@@ -182,7 +182,7 @@ void test_function_decl()
     test_assert(funcbranch[4]->input(1) == funcbranch[2]);
     test_assert(funcbranch[4]->input(1) == funcbranch[2]);
     test_assert(funcbranch[5]->asInt() == 3);
-    test_equals(funcbranch[6]->function->name, "greater_than");
+    test_equals(funcbranch[6]->function->name, "greater_than_i");
     test_assert(funcbranch[6]->input(0) == funcbranch[3]);
     test_assert(funcbranch[6]->input(1) == funcbranch[5]);
     test_equals(funcbranch[6]->name, "#out");
@@ -428,7 +428,7 @@ void test_float_division()
     Term* a = branch.eval("5 / 3");
 
     test_assert(a->type == FLOAT_TYPE);
-    test_assert(a->function->name == "div");
+    test_equals(a->function->name, "div_f");
     test_equals(a->toFloat(), 5.0f/3.0f);
 }
 

@@ -154,27 +154,39 @@ void pre_initialize_builtin_types(Branch& kernel)
 
 void post_setup_builtin_functions(Branch& kernel)
 {
-    Branch& add_overloads = as_branch(ADD_FUNC);
-    Term* add_v = create_duplicate(add_overloads, kernel["vectorize_vv"], "add_v");
+    Term* add_v = create_duplicate(kernel, kernel["vectorize_vv"], "add_v");
     create_ref(function_t::get_parameters(add_v), ADD_FUNC);
-    Term* add_s = create_duplicate(add_overloads, kernel["vectorize_vs"], "add_s");
+    Term* add_s = create_duplicate(kernel, kernel["vectorize_vs"], "add_s");
     create_ref(function_t::get_parameters(add_s), ADD_FUNC);
 
-    Branch& sub_overloads = as_branch(SUB_FUNC);
-    Term* sub_v = create_duplicate(sub_overloads, kernel["vectorize_vv"], "sub_v");
+    // Add to add() overloads
+    create_ref(as_branch(ADD_FUNC), add_v);
+    create_ref(as_branch(ADD_FUNC), add_s);
+
+    Term* sub_v = create_duplicate(kernel, kernel["vectorize_vv"], "sub_v");
     create_ref(function_t::get_parameters(sub_v), SUB_FUNC);
-    Term* sub_s = create_duplicate(sub_overloads, kernel["vectorize_vs"], "sub_s");
+    Term* sub_s = create_duplicate(kernel, kernel["vectorize_vs"], "sub_s");
     create_ref(function_t::get_parameters(sub_s), SUB_FUNC);
 
-    Branch& mult_overloads = as_branch(MULT_FUNC);
-    Term* mult_v = create_duplicate(mult_overloads, kernel["vectorize_vv"], "mult_v");
+    // Add to sub() overloads
+    create_ref(as_branch(SUB_FUNC), sub_v);
+    create_ref(as_branch(SUB_FUNC), sub_s);
+
+    Term* mult_v = create_duplicate(kernel, kernel["vectorize_vv"], "mult_v");
     create_ref(function_t::get_parameters(mult_v), MULT_FUNC);
-    Term* mult_s = create_duplicate(mult_overloads, kernel["vectorize_vs"], "mult_s");
+    Term* mult_s = create_duplicate(kernel, kernel["vectorize_vs"], "mult_s");
     create_ref(function_t::get_parameters(mult_s), MULT_FUNC);
+
+    // Add to mult() overloads
+    create_ref(as_branch(MULT_FUNC), mult_v);
+    create_ref(as_branch(MULT_FUNC), mult_s);
 
     Branch& div_overloads = as_branch(DIV_FUNC);
     Term* div_s = create_duplicate(div_overloads, kernel["vectorize_vs"], "div_s");
     create_ref(function_t::get_parameters(div_s), DIV_FUNC);
+
+    // Add to div() overloads
+    create_ref(as_branch(DIV_FUNC), div_s);
 
     function_t::get_feedback_func(VALUE_FUNC) = ASSIGN_FUNC;
     VALUE_FUNC->boolProp("docs:hidden") = true;
