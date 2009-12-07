@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-VERSION='0.0.1'
+VERSION='0.2.0'
 APPNAME='circa'
-srcdir = 'src'
+srcdir = '.'
 blddir = 'build'
 
 def init():
@@ -13,16 +13,17 @@ def set_options(opt):
 
 def configure(conf):
     conf.check_tool('compiler_cxx')
-    conf.env.CXXFLAGS = ['-Wall', '-ggdb']
 
-    # testcase for variants, look below
-    #dbg = conf.env.copy()
-    #rel = conf.env.copy()
+    print 'cxx_name = ', conf.env.CXX_NAME
 
-    #rel.set_variant('release')
-    #conf.set_env_name('release', rel)
-    #conf.setenv('release')
-    #conf.env.CXXFLAGS = ['-O2']
+    if conf.env.CXX_NAME == 'gcc':
+        conf.env.CXXFLAGS = ['-ggdb', '-Wall']
+        conf.env.CXXDEFINES = 'DEBUG'
+    elif conf.env.CXX_NAME == 'msvc':
+        conf.env.CXXFLAGS = ['/EHsc', '/W3', '/MDd', '/Z7', '/TP', '/Od']
+        conf.env.CXXDEFINES = ['DEBUG', '_DEBUG', 'WINDOWS']
+    else:
+        print "C++ compiler not recognized:", conf.env.CXX_NAME
 
 def source_files(dir):
     import os
@@ -38,16 +39,13 @@ def build(bld):
     circa_sources = (source_files('src') +
         ['generated/'+file for file in source_files('src/generated')])
 
-    # todo: figure out how to properly specify src directory
     circa_sources = ['src/'+file for file in circa_sources]
 
     bld.new_task_gen(
         features = 'cxx cprogram',
         source = circa_sources,
-        target = 'circa_app',
-        defines = '',
-        includes = 'src',
-        destfile = 'build/circa')
+        target = 'circa',
+        includes = 'src')
 
 def shutdown():
     pass
