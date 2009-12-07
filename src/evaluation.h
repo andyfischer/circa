@@ -18,6 +18,13 @@ Term* apply_and_eval(Branch& branch,
                     std::string const& functionName,
                     RefList const& inputs);
 
+// Evaluates the given term, but doesn't evaluate any functions that have side effects.
+// This function will also recursively evaluate inputs if needed, but it won't go outside
+// of the current branch.
+void evaluate_without_side_effects(Term* term);
+
+bool has_been_evaluated(Term* term);
+
 } // namespace circa
 
 #endif

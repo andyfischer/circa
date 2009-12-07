@@ -275,6 +275,12 @@ bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
     if (identity_equals(type, BRANCH_TYPE))
         return true;
 
+    // Special case hack, also accept any compound type against OverloadedFunction
+    // (Need to have a way for a type to specify that it accepts a variable number of
+    // items)
+    if (identity_equals(type, OVERLOADED_FUNCTION_TYPE))
+        return true;
+
     Branch& value = as_branch(valueTerm);
 
     // Check if the # of elements matches

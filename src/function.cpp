@@ -298,10 +298,10 @@ Term* specialize_function(Term* func, RefList const& inputs)
         // Find a match among possible overloads
         Branch& overloads = as_branch(func);
         for (int i=0; i < overloads.length(); i++) {
-            Term* func = overloads[i];
-            if (is_ref(func)) func = as_ref(func);
-            if (inputs_fit_function(func, inputs))
-                return func;
+            Term* overload = overloads[i];
+            if (is_ref(overload)) overload = as_ref(overload);
+            if (inputs_fit_function(overload, inputs))
+                return overload;
         }
 
         return UNKNOWN_FUNCTION;

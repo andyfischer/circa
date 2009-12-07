@@ -259,8 +259,8 @@ void setup(Branch& branch)
     MOUSE_POSITION_TERM = branch.findFirstBinding("mouse");
 
     install_function(branch["key_down"], key_down);
-    install_function(branch["key_pressed"], key_pressed);
-    install_function(function_t::get_previous_overload(branch["key_pressed"]), key_pressed);
+    install_function(branch["key_pressed_code"], key_pressed);
+    install_function(branch["key_pressed_char"], key_pressed);
     install_function(branch["recent_key_presses"], recent_key_presses);
     install_function(branch["mouse_pressed"], mouse_pressed);
     install_function(branch["mouse_over"], mouse_over);

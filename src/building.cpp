@@ -11,6 +11,8 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     if (!is_callable(function))
         throw std::runtime_error("Function "+function->name+" is not callable");
 
+    evaluate_without_side_effects(function);
+
     // Check to specialize function
     function = specialize_function(function, inputs);
 
