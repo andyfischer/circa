@@ -9,6 +9,8 @@ namespace internal_function {
     {
         LEXPR_FUNC = import_function(kernel, empty_evaluate_function,
             "lexpr(any, string...) :: any");
+
+        LEXPR_FUNC->boolProp("docs:hidden") = true;
     }
 }
 }

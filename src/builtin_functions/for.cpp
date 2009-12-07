@@ -46,6 +46,7 @@ namespace for_function {
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
         function_t::get_to_source_string(DISCARD_FUNC) = discard_to_source_string;
+        DISCARD_FUNC->boolProp("docs:hidden") = true;
     }
 }
 } // namespace circa

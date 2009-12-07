@@ -177,6 +177,7 @@ void post_setup_builtin_functions(Branch& kernel)
     create_ref(function_t::get_parameters(div_s), DIV_FUNC);
 
     function_t::get_feedback_func(VALUE_FUNC) = ASSIGN_FUNC;
+    VALUE_FUNC->boolProp("docs:hidden") = true;
 }
 
 void initialize()

@@ -37,7 +37,7 @@ namespace file_changed_function {
     void setup(Branch& kernel)
     {
         import_function(kernel, evaluate,
-            "file_changed(state FileSignature,string filename) :: bool");
+            "file_changed(state FileSignature, string filename) :: bool");
     }
 }
 } // namespace circa

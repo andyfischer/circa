@@ -73,10 +73,10 @@ def detailHTML(item):
 
     return html
 
-def makeHTML(dom):
+def makeHTML(doc):
 
     def all_module_contents():
-        for module in dom['packages']:
+        for module in doc['packages']:
             for item in module['contents']:
                 yield item
 
@@ -85,7 +85,7 @@ def makeHTML(dom):
             if 'function' in item:
                 yield item
 
-    all_packages = [package for package in dom['packages']]
+    all_packages = [package for package in doc['packages']]
 
     # remove hidden functions
 
@@ -98,7 +98,7 @@ def makeHTML(dom):
     html += '\t\t<script type="text/javascript" src="nanodoc.js"></script>'
     html += "\t</head>\n"
     html += "\t<body>\n"
-    html += '\t\t<div id="nanohead"><div id="nanotitle">' + dom['headers']['title'] + ' API documentation'
+    html += '\t\t<div id="nanohead"><div id="nanotitle">' + doc['headers']['title'] + ' API documentation'
     
     html += """<span id="navigation_panel">
     <span><a href="../index.html">home</a></span>
@@ -155,7 +155,7 @@ def makeHTML(dom):
     html += "\n"
 
     if False:
-      for item in dom.documentElement.getElementsByTagName('struct'):
+      for item in doc.documentElement.getElementsByTagName('struct'):
         html += "<div style=\"display:none\" class=\"moduledetail\" id=\"%s_sub\">" % (item.attributes["name"].value.strip(" ").lower())
         html +=    "<div id=\"moduledetailtitle\">%s</div>" % (item.attributes["name"].value)
         html += "<div id=\"detailcontent\"> <span class=\"hl_type\">typedef struct</span> {<br/>"
@@ -189,24 +189,24 @@ def makeHTML(dom):
 
 from optparse import OptionParser
 options = OptionParser()
-options.add_option('--dom', dest = 'dom_filename')
+options.add_option('--doc', dest = 'doc_filename')
 options.add_option('--output', dest = 'output_filename')
 (cl_options, cl_args) = options.parse_args()
 
-def load_json_dom(filename):
+def load_json_doc(filename):
     f = open(filename, 'r')
     file_contents = f.read()
     f.close()
 
     import json
-    dom = json.loads(file_contents)
-    return dom
+    doc = json.loads(file_contents)
+    return doc
 
 def write_text_file(filename, contents):
     output_file = open(filename, 'w')
     output_file.write(contents)
     output_file.write("\n")
 
-dom = load_json_dom(cl_options.dom_filename)
-html = makeHTML(dom)
+doc = load_json_doc(cl_options.doc_filename)
+html = makeHTML(doc)
 write_text_file(cl_options.output_filename, html)

@@ -268,6 +268,7 @@ void reproduce_function_headers() {
     round_trip_source("def my_native +native ()   ");
     round_trip_source("def my_native +native (int)");
     round_trip_source("def my_native +native (int) :: int");
+    round_trip_source("def myfunc(state int i)");
     finish_source_repro_category();
 }
 

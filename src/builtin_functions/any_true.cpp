@@ -22,7 +22,7 @@ namespace any_true_function {
     void setup(Branch& kernel)
     {
         import_function(kernel, evaluate, "any_true(List l) :: bool;"
-                "'Return whether all of the items in l are true' end");
+                "'Return whether any of the items in l are true' end");
     }
 }
 } // namespace circa

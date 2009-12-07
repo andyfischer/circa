@@ -18,7 +18,8 @@ namespace print_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "print(any...)");
+        import_function(kernel, evaluate, "print(any...) "
+                "'Prints a line of text output to the console' end");
     }
 }
 } // namespace circa
