@@ -253,14 +253,12 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     // Function name
     std::string functionName = tokens.consume();
-    Term* previousBind = branch[functionName]; // might be NULL, this is used for +overload
 
     Term* result = create_value(branch, FUNCTION_TYPE, functionName);
 
     result->stringProp("syntaxHints:postNameWs") = possible_whitespace(tokens);
 
     bool isNative = false;
-    bool isOverload = false;
 
     // Optional list of properties
     while (tokens.nextIs(PLUS)) {
@@ -268,8 +266,6 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         std::string propName = tokens.consume(IDENTIFIER);
         if (propName == "native")
             isNative = true;
-        else if (propName == "overload")
-            isOverload = true;
         else
             return compile_error_for_line(branch, tokens, startPosition,
                     "Unsupported property: "+propName);
@@ -388,13 +384,6 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     assert(is_subroutine(result));
 
     set_source_location(result, startPosition, tokens);
-
-    assert(result != previousBind);
-
-    // If this function was defined as a overload, then check for an existing function
-    // to use as 'previous overload'
-    if (isOverload && previousBind != NULL)
-        function_t::get_previous_overload(result) = previousBind;
 
     return result;
 }

@@ -136,8 +136,8 @@ void setup(circa::Branch& branch)
     Branch& image_ns = branch["image"]->asBranch();
     install_function(image_ns["_load"], load_image);
     install_function(image_ns["draw"], draw_image);
-    install_function(function_t::get_previous_overload(image_ns["draw_clip"]), draw_image_clip);
-    install_function(image_ns["draw_clip"], draw_image_clip);
+    install_function(image_ns["draw_clip_p"], draw_image_clip);
+    install_function(image_ns["draw_clip_resized"], draw_image_clip);
 }
 
 } // namespace image

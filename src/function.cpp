@@ -174,10 +174,6 @@ namespace function_t {
     {
         return as_to_source_string_thunk(func->asBranch()[0]->asBranch()[5]);
     }
-    Ref& get_previous_overload(Term* func)
-    {
-        return as_ref(func->asBranch()[0]->asBranch()[6]);
-    }
     Ref& get_feedback_func(Term* func)
     {
         return as_ref(func->asBranch()[0]->asBranch()[7]);
@@ -215,7 +211,7 @@ void initialize_function_prototype(Branch& contents)
           [3] EvaluateFunc native_evaluate
           [4] SpecializeTypeFunc native_specialize_type
           [5] ToSourceStringFunc native_to_source_string
-          [6] ref previous_overload
+          [6] ref previous_overload (obsolete)
           [7] ref feedback_func
           [8] List parameters
           [9] string description
@@ -309,9 +305,6 @@ Term* specialize_function(Term* func, RefList const& inputs)
 
     if (inputs_fit_function(func, inputs))
         return func;
-
-    if (function_t::get_previous_overload(func) != NULL)
-        return specialize_function(function_t::get_previous_overload(func), inputs);
 
     return func;
 }
