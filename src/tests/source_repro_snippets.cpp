@@ -260,10 +260,6 @@ void reproduce_subroutine() {
 }
 
 void reproduce_function_headers() {
-    round_trip_source("def my_native +overload () end");
-    round_trip_source("def my_native +overload() end");
-    round_trip_source("def my_native   +overload () end");
-    round_trip_source("def my_native +overload +native () end");
     round_trip_source("def my_native +native ()");
     round_trip_source("def my_native +native ()   ");
     round_trip_source("def my_native +native (int)");

@@ -299,13 +299,73 @@ This prints the result: `[0, 2, 4, 6, 8]`
 Function declarations
 ---------------------
 
-A function can be declared with the `def` keyword. The first line can look like this: (the second version specifies a return type)
+A function can be declared with the `def` keyword. Example:
 
-    def <function-name>(<list of arguments>)
-    def <function-name>(<list of arguments>) :: <return-type>
+    def <function-name>(<list of arguments>) :: <optional-return-type>
+        (statements)
+    end
 
 An example:
 
     def pythag(number a, number b) :: number
         return sqrt(a*a + b*b)
     end
+
+The `::` in the header indicates that the function has a return type. This is optional:
+
+    def print_warning(string message)
+        print('warning: ' message)
+    end
+
+Once a function is declared, it can then be called like a normal function.
+
+    pythag(3, 4)           -- returns 5
+    print_warning('hi')    -- prints 'warning: hi'
+
+Compound types
+--------------
+
+Compound types can be declared using the `type` keyword, and providing a list of typed fields inside brackets. An example:
+
+    type Complex {
+        number real
+        number imag
+    }
+
+Fields can be seperated by commas, semicolons, or newlines:
+
+    type Triangle { Point a, Point b, Point c }
+
+A compound value can then be created using constructor syntax, or by taking an existing compound value and using the type annotation operator. (`::`).
+
+    complex_value = Complex()
+    complex_value = [1.0 0.0] :: Complex
+
+Side note, we don't currently support constructors with arguments (such as `Complex(1.0 0.0)`), but this is planned for a future version.
+
+Fields of a compound value can be accessed or assigned with the dot operator. Example:
+
+    real_part = complex_value.real
+    complex_value.imag = 1.0
+    
+
+Namespaces
+----------
+
+Code can be organized into a namespace. The syntax is:
+
+    namespace <name>
+        (statements)
+    end
+
+Example:
+
+    namespace web
+        def get_page(string url) :: string
+            ...
+        end
+    end
+
+To access something inside a namespace, use a dot-seperated identifier:
+
+    contents = web.get_page(url)
