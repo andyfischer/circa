@@ -30,7 +30,7 @@ speed_limit = 1.8
 bullet_speed = 200.0
 bullet_width = 2.0
 
-ship_size = 3.4
+ship_size = 1.2
 ship_front = 10.0
 ship_back = 6.4
 ship_wing_size = 11.4
