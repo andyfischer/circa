@@ -28,6 +28,7 @@ namespace function_t {
     bool get_input_modified(Term* function, int index);
     bool get_input_meta(Term* function, int index);
     void set_input_meta(Term* function, int index, bool value);
+    std::string& get_exposed_name_path(Term* function);
     Ref& get_feedback_func(Term* function);
     Branch& get_parameters(Term* function);
     std::string& get_description(Term* function);

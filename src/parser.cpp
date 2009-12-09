@@ -871,8 +871,6 @@ Term* include_statement(Branch& branch, TokenStream& tokens)
 
     include_function::load_script(result);
 
-    expose_all_names(as_branch(result), branch);
-
     return result;
 }
 

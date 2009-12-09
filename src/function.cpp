@@ -17,7 +17,6 @@ namespace function_t {
         out << term->name;
 
         out << term->stringPropOptional("syntaxHints:postNameWs", "");
-
         out << term->stringPropOptional("syntaxHints:properties", "");
 
         out << "(";
@@ -174,6 +173,10 @@ namespace function_t {
     {
         return as_to_source_string_thunk(func->asBranch()[0]->asBranch()[5]);
     }
+    std::string& get_exposed_name_path(Term* func)
+    {
+        return as_string(func->asBranch()[0]->asBranch()[6]);
+    }
     Ref& get_feedback_func(Term* func)
     {
         return as_ref(func->asBranch()[0]->asBranch()[7]);
@@ -211,7 +214,7 @@ void initialize_function_prototype(Branch& contents)
           [3] EvaluateFunc native_evaluate
           [4] SpecializeTypeFunc native_specialize_type
           [5] ToSourceStringFunc native_to_source_string
-          [6] ref previous_overload (obsolete)
+          [6] string exposed_name_path
           [7] ref feedback_func
           [8] List parameters
           [9] string description
@@ -239,7 +242,7 @@ void initialize_function_prototype(Branch& contents)
     create_value(attributes, EVALUATE_THUNK_TYPE, "native_evaluate");
     create_value(attributes, SPECIALIZE_THUNK_TYPE, "native_specialize");
     create_value(attributes, TO_STRING_THUNK_TYPE, "native_to_string");
-    create_ref(attributes, NULL, "previous_overload");
+    create_string(attributes, "", "exposed_name_path");
     create_ref(attributes, NULL, "feedback_func");
     create_value(attributes, LIST_TYPE, "parameters");
     create_value(attributes, STRING_TYPE, "description");

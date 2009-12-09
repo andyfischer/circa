@@ -76,8 +76,12 @@ namespace include_function {
         INCLUDE_FUNC = import_function(kernel, evaluate_include,
                 "include(state FileSignature, string filename) :: Branch");
 
-        import_function(kernel, load_script,
+        function_t::get_exposed_name_path(INCLUDE_FUNC) = ".";
+
+        Term* load_script_f = import_function(kernel, load_script,
             "load_script(state FileSignature, string filename) :: Branch");
+
+        function_t::get_exposed_name_path(load_script_f) = ".";
     }
 }
 } // namespace circa

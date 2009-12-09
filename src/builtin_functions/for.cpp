@@ -43,10 +43,13 @@ namespace for_function {
         FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(any _state, List) :: Code");
         function_t::get_to_source_string(FOR_FUNC) = toSourceString;
         function_t::set_input_meta(FOR_FUNC, 0, true);
+        function_t::get_exposed_name_path(FOR_FUNC) = "#rebinds_for_outer";
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
         function_t::get_to_source_string(DISCARD_FUNC) = discard_to_source_string;
         DISCARD_FUNC->boolProp("docs:hidden") = true;
+
+
     }
 }
 } // namespace circa

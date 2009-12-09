@@ -26,7 +26,6 @@ void evaluate_term(Term* term)
     }
     catch (std::exception const& err)
     {
-        //std::cout << "exception on: " << format_global_id(term) << std::endl;
         error_occurred(term, err.what());
     }
 }
@@ -43,7 +42,6 @@ void evaluate_branch(Branch& branch, Term* errorListener)
         }
     }
 }
-
 
 Term* apply_and_eval(Branch& branch, Term* function, RefList const& inputs)
 {

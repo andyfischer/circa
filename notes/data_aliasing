@@ -1,0 +1,20 @@
+
+Right now we duplicate tons of data and it's really inefficient.
+
+Need two kinds of optimizations:
+
+1) Data aliasing
+
+Values that are pointer-based and copy()ed should share the same objects, as long as
+their values can be shared safely.
+
+2) Value stealing
+
+Say we have:
+
+   a = some intermediate value
+   b = f(a)
+
+If we know that B is the only user of A, and we know that the function f() wants to
+output a value that is really similar to A, then B should *steal* the output value
+of A and use it as its output.
