@@ -1,9 +1,0 @@
-#!/bin/bash
-
-cp -r plastic/assets $target
-cp plastic/runtime.ca $target
-
-cp -r plastic/demos $1
-rm $1/demos/meshtest.ca
-rm $1/demos/ramps.ca
-rm $1/demos/tree.ca
