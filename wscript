@@ -14,8 +14,6 @@ def set_options(opt):
 def configure(conf):
     conf.check_tool('compiler_cxx')
 
-    print 'cxx_name = ', conf.env.CXX_NAME
-
     if conf.env.CXX_NAME == 'gcc':
         conf.env.CXXFLAGS = ['-ggdb', '-Wall']
         conf.env.CXXDEFINES = 'DEBUG'
@@ -41,6 +39,7 @@ def build(bld):
 
     circa_sources = ['src/'+file for file in circa_sources]
 
+    # standalone command-line tool
     bld.new_task_gen(
         features = 'cxx cprogram',
         source = circa_sources,

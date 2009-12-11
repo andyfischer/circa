@@ -1,15 +1,26 @@
 #!/usr/bin/env python
 
+"""
+
+This script goes out on the internets, downloads the various dependencies needed
+for Plastic, and reorganizes them into a build-friendly arrangement.
+
+"""
+
 import os, shutil
 
+download_dir = './download_cache'
+
 def download_file_from_the_internets(url, filename):
-    print "Downloading "+url+" to "+filename
+    destination_filename = os.path.join(download_dir, filename)
+    print "Downloading "+url+" to "+destination_filename
     import urllib
     webFile = urllib.urlopen(url)
     localFile = open(filename, 'wb')
     localFile.write(webFile.read())
     webFile.close()
     localFile.close()
+    return destination_filename
 
 def mkdir(path):
     parent_dir = os.path.dirname(path)
@@ -35,15 +46,15 @@ def unzip_file(filename, dir):
             f.close()
 
 
-download_dir = os.environ['CIRCA_HOME']+'/plastic/dependency_downloads'
-deploy_dir = os.environ['CIRCA_HOME']+'/plastic/deps'
 mkdir(download_dir)
-mkdir(deploy_dir)
 
 # glew
-glew_zip = download_dir+"/glew-win32.zip"
-download_file_from_the_internets("http://downloads.sourceforge.net/project/glew/glew/1.5.1/glew-1.5.1-win32.zip?use_mirror=softlayer", glew_zip)
+glew_zip = download_file_from_the_internets(
+        "http://downloads.sourceforge.net/project/glew/glew/1.5.1/glew-1.5.1-win32.zip?use_mirror=softlayer",
+        "glew-1.5.1.zip")
 unzip_file(glew_zip, download_dir)
 shutil.copytree(download_dir+'/glew/include', deploy_dir+'/include')
 shutil.copytree(download_dir+'/glew/lib', deploy_dir+'/lib')
 shutil.copytree(download_dir+'/glew/bin', deploy_dir+'/bin')
+
+
