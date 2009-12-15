@@ -21,7 +21,7 @@ namespace for_function {
         result << get_heading_source(term);
         result << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
         result << get_branch_source(as_branch(term));
-        result << term->stringPropOptional("syntaxHints:preEndWs", "");
+        result << term->stringPropOptional("syntaxHints:whitespaceBeforeEnd", "");
         result << "end";
 
         return result.str();

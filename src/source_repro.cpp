@@ -261,8 +261,20 @@ void print_branch_source(std::ostream& output, Term* term)
     parser::BranchSyntax branchSyntax = parser::BranchSyntax(
         term->intPropOptional("syntax:branchStyle", parser::BRANCH_SYNTAX_UNDEF));
 
-    if (branchSyntax == parser::BRANCH_SYNTAX_COLON)
+    switch (branchSyntax) {
+    case parser::BRANCH_SYNTAX_COLON:
         output << ":";
+        break;
+    case parser::BRANCH_SYNTAX_BRACE:
+        output << "{";
+        break;
+    case parser::BRANCH_SYNTAX_BEGIN:
+        output << "begin";
+        break;
+    case parser::BRANCH_SYNTAX_UNDEF:
+    case parser::BRANCH_SYNTAX_IMPLICIT_BEGIN:
+        break;
+    }
 
     std::string defaultSeparator = "\n";
 
@@ -288,9 +300,18 @@ void print_branch_source(std::ostream& output, Term* term)
 
     output << term->stringPropOptional("syntaxHints:preEndWs", "");
 
-    if (branchSyntax == parser::BRANCH_SYNTAX_UNDEF ||
-            branchSyntax == parser::BRANCH_SYNTAX_IMPLICIT_BEGIN)
+    switch (branchSyntax) {
+    case parser::BRANCH_SYNTAX_UNDEF:
+    case parser::BRANCH_SYNTAX_BEGIN:
+    case parser::BRANCH_SYNTAX_IMPLICIT_BEGIN:
         output << "end";
+        break;
+    case parser::BRANCH_SYNTAX_BRACE:
+        output << "}";
+        break;
+    case parser::BRANCH_SYNTAX_COLON:
+        break;
+    }
 }
 
 } // namespace circa

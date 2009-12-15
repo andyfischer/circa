@@ -75,8 +75,11 @@ void start_repl()
         repl_evaluate_line(replState, input, std::cout);
 
         if (displayRaw) {
-            for (int i=previousHead; i < replState.length(); i++)
+            for (int i=previousHead; i < replState.length(); i++) {
                 std::cout << term_to_raw_string(replState[i]) << std::endl;
+                if (is_branch(replState[i]))
+                    std::cout << print_branch_raw(as_branch(replState[i]));
+            }
         }
     }
 }

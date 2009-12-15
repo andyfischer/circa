@@ -364,8 +364,11 @@ void reproduce_discard_statement() {
     finish_source_repro_category();
 }
 
-void reproduce_significant_indentation() {
+void reproduce_branch_styles() {
+    round_trip_source("def hi():\n return 1\nhi()");
     round_trip_source("def hi()::int:\n return 1\nhi()");
+    round_trip_source("def hi() { 1 2 3 }");
+    round_trip_source("def hi() begin 1 2 3 end");
     finish_source_repro_category();
 }
 
@@ -392,6 +395,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_identifiers_inside_namespaces);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebind_operator);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_discard_statement);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_branch_styles);
 }
 
 } // namespace source_repro_snippets

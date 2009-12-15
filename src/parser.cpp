@@ -119,6 +119,8 @@ void consume_list_arguments(Branch& branch, TokenStream& tokens,
 
 void consume_branch(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
+
     // If the next token is : then consume with significant whitespace.
     if (tokens.nextIs(COLON)) {
         tokens.consume(COLON);
@@ -126,6 +128,16 @@ void consume_branch(Branch& branch, TokenStream& tokens)
             branch.owningTerm->intProp("syntax:branchStyle") = BRANCH_SYNTAX_COLON;
 
         return consume_branch_with_significant_whitespace(branch, tokens);
+    }
+
+    int branchStyle = BRANCH_SYNTAX_UNDEF;
+
+    if (tokens.nextIs(LBRACE)) {
+        tokens.consume(LBRACE);
+        branchStyle = BRANCH_SYNTAX_BRACE;
+    } else if (tokens.nextIs(BEGIN)) {
+        tokens.consume(BEGIN);
+        branchStyle = BRANCH_SYNTAX_BEGIN;
     }
 
     while (!tokens.finished()) {
@@ -137,6 +149,23 @@ void consume_branch(Branch& branch, TokenStream& tokens)
         } else {
             parser::statement(branch, tokens);
         }
+    }
+
+    if (branch.owningTerm != NULL)
+        branch.owningTerm->intProp("syntax:branchStyle") = branchStyle;
+
+    if (branchStyle == BRANCH_SYNTAX_BRACE) {
+        if (!tokens.nextIs(RBRACE)) {
+            compile_error_for_line(branch, tokens, startPosition);
+            return;
+        }
+        tokens.consume(RBRACE);
+    } else if (branchStyle == BRANCH_SYNTAX_BEGIN) {
+        if (!tokens.nextIs(END)) {
+            compile_error_for_line(branch, tokens, startPosition);
+            return;
+        }
+        tokens.consume(END);
     }
 
     post_parse_branch(branch);
@@ -671,12 +700,10 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     consume_branch(innerBranch, tokens);
 
-    forTerm->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
+    forTerm->stringProp("syntaxHints:whitespaceBeforeEnd") = possible_whitespace(tokens);
 
-    if (!tokens.nextIs(END))
-        return compile_error_for_line(branch, tokens, startPosition);
-
-    tokens.consume(END);
+    if (tokens.nextIs(END))
+        tokens.consume(END);
 
     setup_for_loop_post_code(forTerm);
     set_source_location(forTerm, startPosition, tokens);
