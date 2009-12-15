@@ -254,4 +254,43 @@ std::string get_branch_source(Branch& branch, std::string const& defaultSeparato
     return result.str();
 }
 
+void print_branch_source(std::ostream& output, Term* term)
+{
+    Branch& branch = as_branch(term);
+
+    parser::BranchSyntax branchSyntax = parser::BranchSyntax(
+        term->intPropOptional("syntax:branchStyle", parser::BRANCH_SYNTAX_UNDEF));
+
+    if (branchSyntax == parser::BRANCH_SYNTAX_COLON)
+        output << ":";
+
+    std::string defaultSeparator = "\n";
+
+    bool separatorNeeded = false;
+    for (int i=0; i < branch.length(); i++) {
+        Term* line = branch[i];
+
+        if (!should_print_term_source_line(line))
+            continue;
+
+        if (separatorNeeded) {
+            output << defaultSeparator;
+            separatorNeeded = false;
+        }
+
+        output << get_term_source(line);
+
+        if (line->hasProperty("syntaxHints:lineEnding"))
+            output << line->stringProp("syntaxHints:lineEnding");
+        else
+            separatorNeeded = true;
+    }
+
+    output << term->stringPropOptional("syntaxHints:preEndWs", "");
+
+    if (branchSyntax == parser::BRANCH_SYNTAX_UNDEF ||
+            branchSyntax == parser::BRANCH_SYNTAX_IMPLICIT_BEGIN)
+        output << "end";
+}
+
 } // namespace circa

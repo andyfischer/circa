@@ -44,6 +44,8 @@ Ref evaluate(Branch& branch, ParsingStep step, std::string const& input)
     return result;
 }
 
+// -------------------------- Utility functions -------------------------------
+
 // This structure stores the syntax hints for list-like syntax. It exists because
 // you usually don't have a comprehension term while you are parsing the list
 // arguments, so you need to temporarily store syntax hints until you create one.
@@ -115,7 +117,76 @@ void consume_list_arguments(Branch& branch, TokenStream& tokens,
     }
 }
 
-// Parsing functions:
+void consume_branch(Branch& branch, TokenStream& tokens)
+{
+    // If the next token is : then consume with significant whitespace.
+    if (tokens.nextIs(COLON)) {
+        tokens.consume(COLON);
+        if (branch.owningTerm != NULL)
+            branch.owningTerm->intProp("syntax:branchStyle") = BRANCH_SYNTAX_COLON;
+
+        return consume_branch_with_significant_whitespace(branch, tokens);
+    }
+
+    while (!tokens.finished()) {
+        if (tokens.nextNonWhitespaceIs(END)
+                || tokens.nextNonWhitespaceIs(ELSE)
+                || tokens.nextNonWhitespaceIs(ELIF)
+                || tokens.nextNonWhitespaceIs(RBRACE)) {
+            break;
+        } else {
+            parser::statement(branch, tokens);
+        }
+    }
+
+    post_parse_branch(branch);
+}
+
+void consume_branch_with_significant_whitespace(Branch& branch, TokenStream& tokens)
+{
+    // Parse statements until we find one that is not just whitespace
+
+    int indentationLevel = 0;
+
+    while (!tokens.finished()) {
+        Term* statement = parser::statement(branch, tokens);
+
+        bool justWhitespace = statement->function == COMMENT_FUNC;
+
+        if (justWhitespace) {
+            std::string& str = statement->stringProp("comment");
+            justWhitespace = str.find_first_of("--") == std::string::npos;
+        }
+
+        if (!justWhitespace) {
+            indentationLevel = statement->
+                stringPropOptional("syntaxHints:preWhitespace", "").length();
+            break;
+        }
+    }
+
+    // TODO: Error if indentation level is than or equal the owning branch.
+
+    while (!tokens.finished()) {
+
+        // Lookahead, check if the next line has the same indentation
+
+        int nextIndent = 0;
+        if (tokens.nextIs(WHITESPACE))
+            nextIndent = tokens.next().text.length();
+
+        // Check if the next line is just whitespace
+        bool justWhitespace = tokens.nextIs(NEWLINE)
+            || (tokens.nextIs(WHITESPACE) && tokens.nextIs(NEWLINE, 1));
+
+        if ((indentationLevel != nextIndent) && !justWhitespace)
+            break;
+
+        parser::statement(branch, tokens);
+    }
+}
+
+// ---------------------------- Parsing steps ---------------------------------
 
 Term* statement_list(Branch& branch, TokenStream& tokens)
 {
@@ -368,15 +439,13 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     }
 
     // Parse this as a subroutine call
-    consume_branch_until_end(contents, tokens);
+    consume_branch(contents, tokens);
 
     // Finish consuming tokens
     result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
-    if (!tokens.nextIs(END))
-        return compile_error_for_line(result, tokens, startPosition, "Expected 'end'");
-
-    tokens.consume(END);
+    if (tokens.nextIs(END))
+        tokens.consume(END);
 
     finish_building_subroutine(result, outputType);
 
@@ -510,13 +579,13 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             block->stringProp("syntaxHints:preWhitespace") = preKeywordWhitespace;
             get_input_syntax_hint(block, 0, "postWhitespace") = possible_statement_ending(tokens);
 
-            consume_branch_until_end(block->asBranch(), tokens);
+            consume_branch(block->asBranch(), tokens);
         } else {
             // Create an 'else' block
             encounteredElse = true;
             Branch& elseBranch = create_branch(contents, "else");
             (elseBranch.owningTerm)->stringProp("syntaxHints:preWhitespace") = preKeywordWhitespace;
-            consume_branch_until_end(elseBranch, tokens);
+            consume_branch(elseBranch, tokens);
         }
 
         // If we just did an 'else' then the next thing must be 'end'
@@ -600,7 +669,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Term* iterator = create_value(innerBranch, iterator_type, iterator_name);
     set_source_hidden(iterator, true);
 
-    consume_branch_until_end(innerBranch, tokens);
+    consume_branch(innerBranch, tokens);
 
     forTerm->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
@@ -640,7 +709,7 @@ Term* do_once_block(Branch& branch, TokenStream& tokens)
 
     result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 
-    consume_branch_until_end(as_branch(result), tokens);
+    consume_branch(as_branch(result), tokens);
 
     result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
@@ -1594,7 +1663,7 @@ Term* plain_branch(Branch& branch, TokenStream& tokens)
 
     Term* result = create_branch(branch).owningTerm;
     result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
-    consume_branch_until_end(as_branch(result), tokens);
+    consume_branch(as_branch(result), tokens);
     result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
     if (usingBeginEnd) {
@@ -1626,7 +1695,7 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
 
     result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 
-    consume_branch_until_end(as_branch(result), tokens);
+    consume_branch(as_branch(result), tokens);
 
     result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 

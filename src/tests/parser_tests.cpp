@@ -585,6 +585,77 @@ void test_lexpr()
     test_assert(result->name == "xxx.a.b.c");
 }
 
+void test_whitespace_after_statement()
+{
+    Branch branch;
+
+    branch.eval("a = 1\n\n");
+
+    // the 'a' term should have one newline after it, and the second newline
+    // should be a comment line.
+    test_assert(branch[0]->asInt() == 1);
+    test_assert(branch[0]->name == "a");
+    test_equals(branch[0]->stringProp("syntaxHints:lineEnding"), "\n");
+    test_assert(branch[1]->function == COMMENT_FUNC);
+    test_equals(branch[1]->stringProp("comment"), "");
+    test_equals(branch[1]->stringProp("syntaxHints:lineEnding"), "\n");
+
+    // Make sure that parser::statement only consumes one \n
+    branch.clear();
+    TokenStream tokens("a = 1\n\n");
+    Term* term = parser::statement(branch, tokens);
+    test_assert(term->function == VALUE_FUNC);
+    test_assert(term->name == "a");
+    test_assert(tokens.nextIs(tokenizer::NEWLINE));
+    tokens.consume();
+    test_assert(tokens.finished());
+}
+
+void test_significant_indentation()
+{
+    Branch branch;
+    branch.eval("def func():\n"
+                "  a = 1 + 2\n"
+                "  b = a + 1\n"
+                "c = 3 + 4");
+
+    Branch& funcBranch = as_branch(branch["func"]);
+
+    test_assert(funcBranch[1]->function == COMMENT_FUNC);
+    test_assert(funcBranch[2]->asInt() == 1);
+    test_assert(funcBranch[3]->asInt() == 2);
+    test_assert(funcBranch[4]->name == "a");
+    test_assert(funcBranch[6]->name == "b");
+    test_assert(funcBranch.length() == 8);
+
+    test_assert(branch[1]->asInt() == 3);
+    test_assert(branch[2]->asInt() == 4);
+    test_assert(branch[3]->name == "c");
+
+    branch.clear();
+
+    // Test with whitespace before the function body
+    branch.eval("def func()::int:\n"
+                "\n"
+                "  \n"
+                "    a = 2\n"
+                "    return a\n"
+                "b = func()");
+    test_assert(branch);
+    test_assert(branch["b"]->asInt() == 2);
+
+    branch.clear();
+
+    // Test with blank lines inside the function
+    branch.eval("def func()::int:\n"
+                "  a = 5\n"
+                "\n"          // <-- Blank line doesn't have same indent
+                "  return a\n"
+                "b = func()");
+    test_assert(branch);
+    test_assert(branch["b"]->asInt() == 5);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -622,6 +693,8 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_dot_separated_identifier);
     REGISTER_TEST_CASE(parser_tests::test_subscripted_atom);
     REGISTER_TEST_CASE(parser_tests::test_lexpr);
+    REGISTER_TEST_CASE(parser_tests::test_whitespace_after_statement);
+    REGISTER_TEST_CASE(parser_tests::test_significant_indentation);
 }
 
 } // namespace parser_tests

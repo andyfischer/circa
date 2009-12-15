@@ -1,11 +1,22 @@
 // Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
 
+#ifndef CIRCA_PARSER_INCLUDED
+#define CIRCA_PARSER_INCLUDED
+
 #include "common_headers.h"
 
 #include "token_stream.h"
 
 namespace circa {
 namespace parser {
+
+enum BranchSyntax {
+    BRANCH_SYNTAX_UNDEF=0,
+    BRANCH_SYNTAX_COLON=1,
+    BRANCH_SYNTAX_IMPLICIT_BEGIN=2,
+    BRANCH_SYNTAX_BEGIN=3,
+    BRANCH_SYNTAX_BRACE=4
+};
 
 typedef Term* (*ParsingStep)(Branch& branch, TokenStream& tokens);
 
@@ -47,5 +58,11 @@ Term* identifier_or_lexpr(Branch& branch, TokenStream& tokens);
 
 Term* constant_fold_lexpr(Term* call);
 
+// Helper functions:
+void consume_branch(Branch& branch, TokenStream& tokens);
+void consume_branch_with_significant_whitespace(Branch& branch, TokenStream& tokens);
+
 } // namespace parser
 } // namespace circa
+
+#endif

@@ -364,6 +364,11 @@ void reproduce_discard_statement() {
     finish_source_repro_category();
 }
 
+void reproduce_significant_indentation() {
+    round_trip_source("def hi()::int:\n return 1\nhi()");
+    finish_source_repro_category();
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);

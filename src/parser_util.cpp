@@ -221,7 +221,16 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
     return line.str();
 }
 
-Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start,
+Term* insert_compile_error(Branch& branch, TokenStream& tokens,
+        std::string const& message)
+{
+    Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
+    result->stringProp("message") = message;
+    set_source_location(result, tokens.getPosition(), tokens);
+    return result;
+}
+
+Term* compile_error_for_line(Branch& branch, TokenStream& tokens, int start,
         std::string const& message)
 {
     Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
@@ -289,22 +298,6 @@ std::string possible_statement_ending(TokenStream& tokens)
         result << tokens.consume(NEWLINE);
 
     return result.str();
-}
-
-void consume_branch_until_end(Branch& branch, TokenStream& tokens)
-{
-    while (!tokens.finished()) {
-        if (tokens.nextNonWhitespaceIs(END)
-                || tokens.nextNonWhitespaceIs(ELSE)
-                || tokens.nextNonWhitespaceIs(ELIF)
-                || tokens.nextNonWhitespaceIs(RBRACE)) {
-            break;
-        } else {
-            parser::statement(branch, tokens);
-        }
-    }
-
-    post_parse_branch(branch);
 }
 
 int get_number_of_decimal_figures(std::string const& str)

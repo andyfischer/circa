@@ -18,7 +18,11 @@ std::string get_term_source(Term* term);
 std::string get_term_source_default_formatting(Term* term);
 std::string get_comment_string(Term* term);
 bool should_print_term_source_line(Term* term);
+
+// Deprecated in favor of print_branch_source:
 std::string get_branch_source(Branch& branch, std::string const& defaultSeparator="\n");
+
+void print_branch_source(std::ostream& output, Term* term);
 
 }
 

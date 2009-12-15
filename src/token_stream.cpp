@@ -9,7 +9,7 @@ namespace circa {
 tokenizer::Token const&
 TokenStream::next(int lookahead) const
 {
-    unsigned int i = this->currentIndex + lookahead;
+    unsigned int i = this->_position + lookahead;
 
     if (i >= tokens.size())
         throw std::runtime_error("unexpected EOF");
@@ -20,7 +20,7 @@ TokenStream::next(int lookahead) const
 int
 TokenStream::nextNonWhitespace(int lookahead) const
 {
-    int index = this->currentIndex;
+    int index = this->_position;
 
     while (true) {
 
@@ -42,7 +42,7 @@ TokenStream::nextNonWhitespace(int lookahead) const
 
 bool TokenStream::nextIs(int match, int lookahead) const
 {
-    if ((this->currentIndex + lookahead) >= tokens.size())
+    if ((this->_position + lookahead) >= tokens.size())
         return false;
         
     return next(lookahead).match == match;
@@ -63,7 +63,7 @@ TokenStream::consume(int match)
         throw std::runtime_error(msg.str());
     }
 
-    return tokens[currentIndex++].text;
+    return tokens[_position++].text;
 }
 
 bool
@@ -75,14 +75,14 @@ TokenStream::nextNonWhitespaceIs(int match, int lookahead) const
 int
 TokenStream::getPosition() const
 {
-    return currentIndex;
+    return _position;
 }
 
 void
 TokenStream::resetPosition(int loc)
 {
     assert(loc >= 0);
-    currentIndex = loc;
+    _position = loc;
 }
 
 std::string
@@ -90,7 +90,7 @@ TokenStream::toString() const
 {
     std::stringstream out;
 
-    out << "{index: " << currentIndex << ", ";
+    out << "{index: " << _position << ", ";
     out << "tokens: [";
 
     bool first = true;
@@ -102,6 +102,15 @@ TokenStream::toString() const
     }
     out << "]}";
     return out.str();
+}
+
+void print_remaining_tokens(std::ostream& out, TokenStream& tokens)
+{
+    for (int i=0; i < tokens.remaining(); i++) {
+        if (i != 0) out << " ";
+        out << tokenizer::get_token_text(tokens.next(i).match);
+        out << "(" << tokens.next(i).text << ")";
+    }
 }
 
 } // namespace circa

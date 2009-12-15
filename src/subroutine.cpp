@@ -7,8 +7,6 @@ namespace circa {
 namespace subroutine_t {
     std::string to_string(Term* term)
     {
-        Branch& branch = as_branch(term);
-
         std::stringstream result;
 
         result << "def ";
@@ -17,11 +15,8 @@ namespace subroutine_t {
 
         result << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
 
-        if (!is_native_function(term)) {
-            result << get_branch_source(branch);
-            result << term->stringPropOptional("syntaxHints:preEndWs", "");
-            result << "end";
-        }
+        if (!is_native_function(term))
+            print_branch_source(result, term);
 
         return result.str();
     }

@@ -561,10 +561,6 @@ void consume_comment(TokenizeContext& context)
     while (!context.finished() && !is_newline(context.next()))
         text << context.consume();
 
-    // consume the newline
-    //if (!context.finished())
-    //    text << context.consume();
-
     context.push(COMMENT, text.str());
 }
 

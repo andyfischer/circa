@@ -12,15 +12,15 @@ namespace circa {
 struct TokenStream
 {
     tokenizer::TokenList tokens;
-    unsigned int currentIndex;
+    unsigned int _position;
 
     TokenStream(tokenizer::TokenList const& _tokens)
-      : tokens(_tokens), currentIndex(0)
+      : tokens(_tokens), _position(0)
     {
     }
 
     TokenStream(std::string const& input)
-      : currentIndex(0)
+      : _position(0)
     {
         tokenizer::tokenize(input, tokens);
     }
@@ -34,10 +34,11 @@ struct TokenStream
     {
         tokens.clear();
         tokenizer::tokenize(input, tokens);
-        currentIndex = 0;
+        _position = 0;
     }
 
     int length() const { return (int) tokens.size(); }
+    int remaining() const { return (int) tokens.size() - _position; }
 
     tokenizer::Token const& next(int lookahead=0) const;
 
@@ -55,13 +56,15 @@ struct TokenStream
 
     bool finished() const
     {
-        return (currentIndex >= tokens.size());
+        return (_position >= tokens.size());
     }
 
     int getPosition() const;
     void resetPosition(int loc); 
     std::string toString() const;
 };
+
+void print_remaining_tokens(std::ostream& stream, TokenStream& tokens);
 
 } // namespace circa
 
