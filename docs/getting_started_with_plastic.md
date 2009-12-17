@@ -26,6 +26,36 @@ While running Plastic, there are a few keyboard shortcuts that have special acti
 
 ### Creating
 
-Open up a text editor, and create a new file in this directory called 'test.ca' (or whatever you want to call it). Now launch Plastic using the command `plastic test.ca`.
+Open up a text editor, and create a new file in this directory called 'test.ca' (or whatever you want to call it). Now launch Plastic using the command `plastic test.ca`. The currently-recommended way to edit Plastic documents is to have a text editor and Plastic open at the same time.
 
-Work in progress..
+Now we'll get something on the screen. The first thing you'll want to do is fill the screen with a background, so that the previous frame is cleared. Add this line to your script:
+
+    background(#006)
+
+and hit save. The Plastic window should turn blue. You can use a different color here: the `#006` syntax is like CSS, it specifies the red, green, and blue parts of a color, using hexadecimal digits.
+
+Next we'll get some text on the screen. Add the following line to display a line of text:
+
+    draw_text(ui_font_medium, "Hello world", #fff, [200 200])
+
+When you hit save, you should see "Hello world" displayed in white. Here is what each of that function's arguments means:
+
+  * `ui_font_medium` - This is the font to use, ui_font_medium is loaded automatically inside runtime.ca. You can load a different font with `text.load_font`.
+  * `"Hello world"` - The text to display
+  * `#fff` - The text color, all white
+  * `[200 200]` - The position on the screen. Coordinates are specified in pixels, where the top left of the screen is [0 0].
+
+Once you have the draw_text function working, you can use that to experiment with some code. Change the `draw_text` line to be the following:
+
+    s = concat('1 + 1 =' 1 + 1)
+    draw_text(ui_font_medium, s, #fff, [200 200])
+
+You can then change the arguments to the `concat()` function and see what the results of any expression would be.
+
+### Handling errors
+
+If your code causes an error, you'll see a message show up in the console window used to launch Plastic. (In a future version, errors will be displayed in the main Plastic window). You should be able to fix the offending code; Plastic will reattempt to run it whenever the file is saved.
+
+### Work in progress
+
+This document is still a work in progress

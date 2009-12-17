@@ -88,10 +88,26 @@ Examples:
     background(#000)
     print('hi')
 
-There's also the `->` operator for function call chaining. This takes the result of the expression on the left and uses it as an input to the function name on the right. Examples:
+Right-apply syntax
+------------------
 
+The `->` operator calls the function on the right with the value on the left. Example:
     'hi' -> print
-    load_file() -> filter -> save
+is equivalent to:
+    print('hi')
+
+(This syntax only works for functions which take a single input; in a future version I'd like to add syntax for right-apply on functions with multiple inputs.)
+
+Typecasting
+-----------
+
+A type name can be called like a function, this will attempt to cast the input to the specified type.
+    a = number(1)
+    print(a)     -- prints 1.0
+
+Like function calls, you can also typecast with the right-apply operator (`->`):
+
+    a = 1 -> number
 
 Unary expressions
 -----------------
@@ -243,10 +259,10 @@ There is also the `elif` keyword, which is followed by another conditional expre
         print('a equals b')
     end
 
-For statement
+For loop
 -------------
 
-A for-statement is specified by the `for` keyword. The first line has this syntax:
+A for-loop is specified by the `for` keyword. The first line has this syntax:
 
     for <iterator name> in <list expression>
 
@@ -256,11 +272,11 @@ which is followed by a list of expressions, and then the `end` keyword. Example:
         print('i is ' i)
     end
 
-When executing a for-statement, it goes through each element in the list expression, binds that value to the iterator name, and executes the inner statements.
+When executing a for-loop, it goes through each element in the list expression, binds that value to the iterator name, and executes the inner statements.
 
 This piece of code:
 
-    for i in 0..5
+    for i in [0 1 2 3 4]
         print(i ' squared is ' i*i)
     end
 
@@ -272,10 +288,21 @@ has the following output:
     3 squared is 9
     4 squared is 16
 
-For statement with rebinding
+When iterating across a range of numbers, it's convenient to use the range operator (`..`). The range operator takes two integers and outputs a list of each integer within that range. The left input is included and the right input is excluded. Example:
+
+    a = 0..4
+    -- a is now equal to: [0 1 2 3]
+
+The above for-loop can be rewritten as:
+
+    for i in 0..5
+        print(i ' squared is ' i*i)
+    end
+
+For loop with rebinding
 ----------------------------
 
-A for-statement can also *rebind* the list expression using the `@` operator, which means that the inner code is allowed to modify each item, and the list name is rebound to the modified list. Example:
+A for-loop can also *rebind* the list expression using the `@` operator, which means that the inner code is allowed to modify each item, and the list name is rebound to the modified list. Example:
 
     numbers = [0 1 2 3 4]
     for i in @numbers
@@ -285,34 +312,33 @@ A for-statement can also *rebind* the list expression using the `@` operator, wh
 
 will print the result: `[0, 1, 4, 9, 16]`.
 
-A rebinding for-statement can also use the special keyword `discard`, which means that it will remove the current element from the final list. The following code will find all the even numbers below 10:
+A rebinding for-statement can use the special keyword `discard`, which means that it will remove the current element from the output. The following for-loop will discard any odd numbers from the `numbers` list:
 
     numbers = 0..10
+    -- numbers is now equal to [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     for i in @numbers 
         if i % 2 == 1
             discard
         end
     end
-    print(numbers)
-
-This prints the result: `[0, 2, 4, 6, 8]`
+    -- numbers is now equal to [0, 2, 4, 6, 8]
 
 Function declarations
 ---------------------
 
 A function can be declared with the `def` keyword. Example:
 
-    def <function-name>(<list of arguments>) :: <optional-return-type>
+    def <function-name>(<list of arguments>) -> <optional-return-type>
         (statements)
     end
 
 An example:
 
-    def pythag(number a, number b) :: number
+    def pythag(number a, number b) -> number
         return sqrt(a*a + b*b)
     end
 
-The `::` in the header indicates that the function has a return type. This is optional:
+The `->` in the header indicates that the function has a return type. This is optional:
 
     def print_warning(string message)
         print('warning: ' message)
@@ -337,10 +363,10 @@ Fields can be seperated by commas, semicolons, or newlines:
 
     type Triangle { Point a, Point b, Point c }
 
-A compound value can then be created using constructor syntax, or by taking an existing compound value and using the type annotation operator. (`::`).
+A compound value can then be created using constructor syntax, or by taking an existing compound value and casting it.
 
     complex_value = Complex()
-    complex_value = [1.0 0.0] :: Complex
+    complex_value = [1.0 0.0] -> Complex
 
 Side note, we don't currently support constructors with arguments (such as `Complex(1.0 0.0)`), but this is planned for a future version.
 
