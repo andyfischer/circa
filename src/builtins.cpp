@@ -146,7 +146,7 @@ void pre_initialize_builtin_types(Branch& kernel)
 {
     // Declare input_placeholder first because it's used while compiling functions
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, empty_evaluate_function,
-            "input_placeholder() :: any");
+            "input_placeholder() -> any");
 
     // FileSignature is used in some builtin functions
     parse_type(kernel, "type FileSignature { string filename, int time_modified }");

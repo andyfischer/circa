@@ -12,7 +12,7 @@ namespace abs_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "abs(number n) :: number;"
+        import_function(kernel, evaluate, "abs(number n) -> number;"
                 "'Absolute value' end");
     }
 }

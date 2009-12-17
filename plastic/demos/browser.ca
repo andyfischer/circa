@@ -8,7 +8,7 @@ contents = mirror.get_visible()
 
 term_to_location = Map()
 
-def draggable_rect(Point initial_location, Point size) :: Point
+def draggable_rect(Point initial_location, Point size) -> Point
     state Point location = initial_location
     rect = [location.x, location.y, location.x+size.x, location.y+size.y]
     state currently_dragging = false
@@ -27,7 +27,7 @@ end
 
 box_size = [100 20] -> Point
 
-def initial_box_location(Ref ref) :: Point
+def initial_box_location(Ref ref) -> Point
     source_loc = ref.source_location()
     --print(ref ' location: ' source_loc)
     return [source_loc.x*5, source_loc.y*10]
@@ -36,7 +36,7 @@ end
 -- Get locations for each box
 index = 0
 for ref in contents
-    ref = ref :: Ref
+    ref = ref -> Ref
 
     initial_location = initial_box_location(ref) --+ [0 20]*index
 
@@ -53,7 +53,7 @@ end
 
 -- Draw arrows for each box
 for ref in contents
-    ref = ref :: Ref
+    ref = ref -> Ref
 
     this_loc = term_to_location.get(ref)::Point + [box_size.x/2, 0]
 
@@ -68,8 +68,8 @@ end
 
 -- Draw each box
 for ref in contents
-    ref = ref :: Ref
-    location = term_to_location.get(ref) :: Point
+    ref = ref -> Ref
+    location = term_to_location.get(ref) -> Point
     draw_box(expand_rect_tl(location, box_size), #00a)
     draw_text(ui_font_medium, ref.name(), #fff, location + [5 2])
 end

@@ -39,11 +39,11 @@ namespace add_function {
 
     void setup(Branch& kernel)
     {
-        Term* add_i = import_function(kernel, evaluate_i, "add_i(int...) :: int");
-        Term* add_f = import_function(kernel, evaluate_f, "add_f(number...) :: number");
+        Term* add_i = import_function(kernel, evaluate_i, "add_i(int...) -> int");
+        Term* add_f = import_function(kernel, evaluate_f, "add_f(number...) -> number");
 
         function_t::get_feedback_func(add_f) =
-            import_function(kernel, feedback_evaluate, "add_feedback(any, number) :: Branch");
+            import_function(kernel, feedback_evaluate, "add_feedback(any, number) -> Branch");
 
         ADD_FUNC = create_overloaded_function(kernel, "add");
         create_ref(as_branch(ADD_FUNC), add_i);

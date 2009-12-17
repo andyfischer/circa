@@ -105,9 +105,9 @@ void dont_migrate_across_different_types()
     test_migration("state int i; i = 5", "state number i", "i == 0");
     test_migration("state Point p; p = [3 3]", "state Rect p", "p == [.0 .0 .0 .0]");
 
-    test_migration("def f1()::int state int i; return i; end;"
+    test_migration("def f1()->int state int i; return i; end;"
                    "def f2(int i) state number n end; f1()",
-                   "def f1()::int state int i; return i; end;"
+                   "def f1()->int state int i; return i; end;"
                    "def f2(int i) state number n end; f2(f1())", "");
 }
 
@@ -116,13 +116,13 @@ void migrate_misc()
     // This tests don't have a specific focus
 
     test_migration("type Point { number x, number y }\n"
-                   "def get_ship_start_point() :: Point\n return [50,50]\n end\n"
+                   "def get_ship_start_point() -> Point\n return [50,50]\n end\n"
                    "type Ship { Point loc, Point momentum, number facing }\n"
                    "state Ship ship = [get_ship_start_point() [0 0] 0]\n"
                    "ship = [[5 5] [1 1] 1]",
 
                    "type Point { number x, number y }\n"
-                   "def get_ship_start_point() :: Point\n return [50,50]\n end\n"
+                   "def get_ship_start_point() -> Point\n return [50,50]\n end\n"
                    "type Ship { Point loc, Point momentum, number facing }\n"
                    "state Ship ship = [get_ship_start_point() [0 0] 0]\n",
 

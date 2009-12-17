@@ -37,8 +37,8 @@ namespace equals_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "equals(any,any) :: bool");
-        import_function(kernel, evaluate_not, "not_equals(any,any) :: bool");
+        import_function(kernel, evaluate, "equals(any,any) -> bool");
+        import_function(kernel, evaluate_not, "not_equals(any,any) -> bool");
     }
 }
 }

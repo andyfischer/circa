@@ -17,7 +17,7 @@ namespace set_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "set(any...) :: Set");
+        import_function(kernel, evaluate, "set(any...) -> Set");
     }
 }
 }

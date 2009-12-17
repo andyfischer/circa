@@ -74,12 +74,12 @@ namespace include_function {
     void setup(Branch& kernel)
     {
         INCLUDE_FUNC = import_function(kernel, evaluate_include,
-                "include(state FileSignature, string filename) :: Branch");
+                "include(state FileSignature, string filename) -> Branch");
 
         function_t::get_exposed_name_path(INCLUDE_FUNC) = ".";
 
         Term* load_script_f = import_function(kernel, load_script,
-            "load_script(state FileSignature, string filename) :: Branch");
+            "load_script(state FileSignature, string filename) -> Branch");
 
         function_t::get_exposed_name_path(load_script_f) = ".";
     }

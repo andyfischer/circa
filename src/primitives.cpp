@@ -486,21 +486,21 @@ void initialize_primitive_types(Branch& kernel)
 
 void post_setup_primitive_types()
 {
-    import_member_function(STRING_TYPE, string_t::length, "length(string)::int");
-    import_member_function(STRING_TYPE, string_t::substr, "substr(string,int,int)::string");
+    import_member_function(STRING_TYPE, string_t::length, "length(string) -> int");
+    import_member_function(STRING_TYPE, string_t::substr, "substr(string,int,int) -> string");
 
-    import_member_function(REF_TYPE, ref_t::get_name, "name(Ref) :: string");
-    import_member_function(REF_TYPE, ref_t::hosted_to_string, "to_string(Ref) :: string");
-    import_member_function(REF_TYPE, ref_t::hosted_typeof, "typeof(Ref) :: Ref");
-    import_member_function(REF_TYPE, ref_t::get_function, "function(Ref) :: Ref");
+    import_member_function(REF_TYPE, ref_t::get_name, "name(Ref) -> string");
+    import_member_function(REF_TYPE, ref_t::hosted_to_string, "to_string(Ref) -> string");
+    import_member_function(REF_TYPE, ref_t::hosted_typeof, "typeof(Ref) -> Ref");
+    import_member_function(REF_TYPE, ref_t::get_function, "function(Ref) -> Ref");
     import_member_function(REF_TYPE, ref_t::assign, "assign(Ref, any)");
     import_member_function(REF_TYPE, ref_t::tweak, "tweak(Ref, int steps)");
-    import_member_function(REF_TYPE, ref_t::asint, "asint(Ref) :: int");
-    import_member_function(REF_TYPE, ref_t::asfloat, "asfloat(Ref) :: number");
-    import_member_function(REF_TYPE, ref_t::get_input, "input(Ref, int) :: Ref");
-    import_member_function(REF_TYPE, ref_t::num_inputs, "num_inputs(Ref) :: int");
+    import_member_function(REF_TYPE, ref_t::asint, "asint(Ref) -> int");
+    import_member_function(REF_TYPE, ref_t::asfloat, "asfloat(Ref) -> number");
+    import_member_function(REF_TYPE, ref_t::get_input, "input(Ref, int) -> Ref");
+    import_member_function(REF_TYPE, ref_t::num_inputs, "num_inputs(Ref) -> int");
     import_member_function(REF_TYPE, ref_t::get_source_location,
-            "source_location(Ref) :: Point_i");
+            "source_location(Ref) -> Point_i");
 }
 
 } // namespace circa

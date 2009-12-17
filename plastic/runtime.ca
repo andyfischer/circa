@@ -7,7 +7,7 @@ td = time_delta -- shorthand
 -- Wrap up mouse position into a point (values are passed in from input.cpp)
 state Point mouse
 
-def mouse_in(Rect b) :: bool
+def mouse_in(Rect b) -> bool
   "Return whether the mouse is currently inside the given rect."
   return (b.x1 < mouse.x) and (b.x2 > mouse.x) and (b.y1 < mouse.y) and (b.y2 > mouse.y)
 end
@@ -35,21 +35,21 @@ type Keypress {
   int code
 }
 
-def key_down(int key) :: bool end
-def key_pressed_code(int key) :: bool end
-def key_pressed_char(string key) :: bool end
+def key_down(int key) -> bool end
+def key_pressed_code(int key) -> bool end
+def key_pressed_char(string key) -> bool end
 key_pressed = [&key_pressed_code &key_pressed_char] -> OverloadedFunction
-def mouse_pressed() :: bool end
-def mouse_over(Rect region) :: bool end
-def recent_key_presses() :: List end
-def mouse_clicked_anywhere () :: bool end
-def mouse_clicked_region (Rect region) :: bool end
+def mouse_pressed() -> bool end
+def mouse_over(Rect region) -> bool end
+def recent_key_presses() -> List end
+def mouse_clicked_anywhere () -> bool end
+def mouse_clicked_region (Rect region) -> bool end
 mouse_clicked = [&mouse_clicked_anywhere &mouse_clicked_region] -> OverloadedFunction
-def mouse_wheel_up_anywhere () :: bool end
-def mouse_wheel_up_region (Rect region) :: bool end
+def mouse_wheel_up_anywhere () -> bool end
+def mouse_wheel_up_region (Rect region) -> bool end
 mouse_wheel_up = [&mouse_wheel_up_anywhere &mouse_wheel_up_region] -> OverloadedFunction
-def mouse_wheel_down_anywhere () :: bool end
-def mouse_wheel_down_region (Rect region) :: bool end
+def mouse_wheel_down_anywhere () -> bool end
+def mouse_wheel_down_region (Rect region) -> bool end
 mouse_wheel_down = [&mouse_wheel_down_anywhere &mouse_wheel_down_region] -> OverloadedFunction
 
 -- These are assigned in input.cpp
@@ -65,10 +65,10 @@ KEY_B = 0
 type TTF_Font {} -- native
 namespace text
     type RenderedText { int texid, number width, number height, Color color, string text }
-    def load_font(state TTF_Font, string filename, int size) :: TTF_Font
+    def load_font(state TTF_Font, string filename, int size) -> TTF_Font
         "Load the given font"
     end
-    def render_text(state RenderedText, TTF_Font font, string text, Color color) :: RenderedText
+    def render_text(state RenderedText, TTF_Font font, string text, Color color) -> RenderedText
         "Render text and return a sprite that can be drawn with draw_rendered_text. This is useful if you want to know the width or height of the rendered text before drawing it."
     end
     def draw_rendered_text(RenderedText, Point loc)
@@ -107,7 +107,7 @@ namespace gl
     def circle(Point loc, number radius, Color)
         "Render a circle."
     end
-    def load_program(string vertFile, string fragFile) :: int end
+    def load_program(string vertFile, string fragFile) -> int end
     def _use_program(int prog_id) end
     def use_program(string vertexFilename, string fragFilename)
         "Load and enable a GLSL shader."
@@ -129,9 +129,9 @@ namespace image
         int height
     }
 
-    def _load(string filename) :: Image end
+    def _load(string filename) -> Image end
 
-    def load(string filename) :: Image
+    def load(string filename) -> Image
         state Image existing
         if file_changed(filename)
             existing = _load(filename)
@@ -145,14 +145,14 @@ namespace image
     draw_clip = [&draw_clip_p &draw_clip_resized] -> OverloadedFunction
 end
 
-def load_texture(state int, string) :: int
+def load_texture(state int, string) -> int
 end
 
 def draw_image(state int texid, string filename, number x, number y, number width, number height)
     "Draw an image."
 end
 
-def load_mesh(string filename) :: int
+def load_mesh(string filename) -> int
     "(experimental) Load a 3d mesh from an .obj file."
 end
 def draw_mesh(int mesh_id, int tex_id, Point translation, Point scale, Point rotation)
@@ -162,66 +162,66 @@ end
 -- Math utility functions
 
 -- polar: polar to cartesian
-def polar(number angle) :: Point
+def polar(number angle) -> Point
     return [cos(angle) sin(angle)]
 end
 
 -- magnitude of a 2d vector
-def magnitude(Point point) :: number
+def magnitude(Point point) -> number
     "Returns the magnitude, or the distance from [0,0] to this point."
     return sqrt(sqr(point.x) + sqr(point.y))
 end
 
-def point_distance(Point a, Point b) :: number
+def point_distance(Point a, Point b) -> number
     "Returns the distance between a and b."
     return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
 end
 
-def rotate_point(Point p, number rotation) :: Point
+def rotate_point(Point p, number rotation) -> Point
     "Rotate p around [0,0] by the given angle. Angles are specified in the range 0..1."
     return [p.x*cos(rotation) - p.y*sin(rotation),
         p.x*sin(rotation)+p.y*cos(rotation)]
 end
 
-def random_location() :: Point
+def random_location() -> Point
     "Return a random point that is inside the boundaries of the window."
     return [rand() * window.width, rand() * window.height]
 end
 
-def random_norm_vector() :: Point
+def random_norm_vector() -> Point
     "Return a random normalized vector"
     angle = rand()
     return [cos(angle) sin(angle)]
 end
 
-def norm(Point v) :: Point
+def norm(Point v) -> Point
     "Returns v normalized to be along the unit circle."
     m = magnitude(v)
     return [v.x / m, v.y / m]
 end
 
-def perpendicular(Point v) :: Point
+def perpendicular(Point v) -> Point
     "Returns a vector that is perpendicular to v, rotated clockwise."
     return [v.y -v.x]
 end
 
-def expand_rect(Point center, number width, number height) :: Rect
+def expand_rect(Point center, number width, number height) -> Rect
     "Return a rectangle with the given center, width, and height."
     return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
 end
 
-def to_rect(Point topLeft, Point size) :: Rect
+def to_rect(Point topLeft, Point size) -> Rect
     return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
 end
 
-def rect_intersects_rect(Rect rect_a, Rect rect_b) :: bool
+def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool
     "Return whether the two rectangles intersect."
     intersects_on_x = (rect_a.x2 > rect_b.x1) and (rect_b.x2 > rect_a.x1)
     intersects_on_y = (rect_a.y2 > rect_b.y1) and (rect_b.y2 > rect_a.y1)
     return intersects_on_x and intersects_on_y
 end
 
-def random_color() :: Color
+def random_color() -> Color
     return [rand() rand() rand() 1.0]
 end
 
@@ -244,7 +244,7 @@ end
 
 -- Stateful functions
 
-def approach(number target, number step) :: number
+def approach(number target, number step) -> number
     "Stateful function, returns a result which approaches 'target'. Each frame, this function will change at most by 'step'"
     state current = target
     if target > current
@@ -255,13 +255,13 @@ def approach(number target, number step) :: number
     return current
 end
 
-def alternate_over_time(number period) :: bool
+def alternate_over_time(number period) -> bool
     "Stateful function, alternates between true and false according to the given period."
     state number time_started = time
     return round((time - time_started) / period) % 2 == 0
 end
 
-def toggle(bool tog) :: bool
+def toggle(bool tog) -> bool
     <<<
     Stateful function, returns a boolean status. Every frame the function is called
     with (true), the status flips. Starts out false.
@@ -271,7 +271,7 @@ def toggle(bool tog) :: bool
     return on
 end
 
-def linear_fadein(number total_time) :: number
+def linear_fadein(number total_time) -> number
     <<<
     Stateful function, starts out at 0 and increases linearly. After 'total_time'
     has passed, it will return 1.0 and stay there.
@@ -281,13 +281,13 @@ def linear_fadein(number total_time) :: number
     return min(elapsed, 1.0)
 end
 
-def elapsed() :: number
+def elapsed() -> number
     "Stateful function, returns the number of seconds that has passed since this function was first called"
     state number time_started = time
     return time - time_started
 end
 
-def draggable_rect(Point initial_location, Point size) :: Point
+def draggable_rect(Point initial_location, Point size) -> Point
     state Point location = initial_location
     rect = [location.x, location.y, location.x+size.x, location.y+size.y]
     state currently_dragging = false
@@ -378,7 +378,7 @@ namespace postprocess
         int height
     }
 
-    def make_surface(state Surface _state, int width, int height) :: Surface end
+    def make_surface(state Surface _state, int width, int height) -> Surface end
     def bind_surface(Surface surface) end
     def draw_surface(Surface source) end
     def copy_surface(Surface source, Surface dest) end

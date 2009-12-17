@@ -40,7 +40,7 @@ namespace for_function {
 
     void setup(Branch& kernel)
     {
-        FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(any _state, List) :: Code");
+        FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(any _state, List) -> Code");
         function_t::get_to_source_string(FOR_FUNC) = toSourceString;
         function_t::set_input_meta(FOR_FUNC, 0, true);
         function_t::get_exposed_name_path(FOR_FUNC) = "#rebinds_for_outer";

@@ -47,12 +47,12 @@ namespace mult_function {
 
     void setup(Branch& kernel)
     {
-        Term* mult_i = import_function(kernel, evaluate_i, "mult_i(int,int) :: int");
+        Term* mult_i = import_function(kernel, evaluate_i, "mult_i(int,int) -> int");
 
-        Term* mult_f = import_function(kernel, evaluate_f, "mult_f(number,number) :: number");
+        Term* mult_f = import_function(kernel, evaluate_f, "mult_f(number,number) -> number");
 
         function_t::get_feedback_func(mult_f) = 
-            import_function(kernel, feedback_evaluate, "mult_feedback(any, number) :: Branch");
+            import_function(kernel, feedback_evaluate, "mult_feedback(any, number) -> Branch");
 
         MULT_FUNC = create_overloaded_function(kernel, "mult");
 

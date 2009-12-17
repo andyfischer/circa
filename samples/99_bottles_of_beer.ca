@@ -1,5 +1,5 @@
 
-def plural(int count) :: string
+def plural(int count) -> string
     if count == 1, return ""
     else return "s"
     end

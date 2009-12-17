@@ -273,7 +273,7 @@ void test_type_error_in_a_native_call()
 {
     Branch branch;
 
-    import_function(branch, _evaluate_type_error, "f(string) :: float");
+    import_function(branch, _evaluate_type_error, "f(string) -> float");
 
     Term* t = branch.eval("f('hello')");
     test_assert(t->hasError());

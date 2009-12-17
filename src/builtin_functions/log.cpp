@@ -12,7 +12,7 @@ namespace log_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "log(number) :: number;"
+        import_function(kernel, evaluate, "log(number) -> number;"
             "'Natural log function' end");
 
     }

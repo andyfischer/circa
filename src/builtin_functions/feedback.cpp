@@ -21,7 +21,7 @@ namespace feedback_function {
         FEEDBACK_FUNC = import_function(kernel, evaluate, "feedback(any,any)");
         function_t::set_input_meta(FEEDBACK_FUNC, 0, true);
 
-        import_function(kernel, evaluate_apply_feedback, "apply_feedback(Branch branch)::Branch "
+        import_function(kernel, evaluate_apply_feedback, "apply_feedback(Branch branch)->Branch "
             "'Experimental, creates terms to apply feedback in the given branch' end");
     }
 }

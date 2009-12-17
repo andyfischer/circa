@@ -89,7 +89,7 @@ namespace if_block_function {
 
     void setup(Branch& kernel)
     {
-        IF_BLOCK_FUNC = import_function(kernel, evaluate, "if_block() :: Code");
+        IF_BLOCK_FUNC = import_function(kernel, evaluate, "if_block() -> Code");
         function_t::get_to_source_string(IF_BLOCK_FUNC) = toSourceString;
         function_t::get_exposed_name_path(IF_BLOCK_FUNC) = "#joining";
     }

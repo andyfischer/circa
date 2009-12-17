@@ -12,7 +12,7 @@ namespace sqrt_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "sqrt(number) :: number;"
+        import_function(kernel, evaluate, "sqrt(number) -> number;"
                 "'Square root' end");
     }
 }

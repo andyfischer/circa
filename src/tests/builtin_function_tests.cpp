@@ -137,7 +137,7 @@ void test_map()
     test_equals(result[4]->asFloat(), 25);
 
     // Test with subroutines
-    branch.eval("def myfunc(number x)::number\nreturn x + 5\nend");
+    branch.eval("def myfunc(number x) -> number\nreturn x + 5\nend");
     Term* map_myfunc = branch.eval("map(myfunc, input_list)");
 
     test_assert(map_myfunc);

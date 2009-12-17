@@ -41,7 +41,7 @@ namespace message_passing_function {
         messageStore = &create_branch(kernel, "#message_store");
 
         import_function(kernel, evaluate_send, "def send(string channel, any)");
-        import_function(kernel, evaluate_receive, "def receive(string channel)::List");
+        import_function(kernel, evaluate_receive, "def receive(string channel) -> List");
     }
 }
 }

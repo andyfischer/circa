@@ -41,7 +41,7 @@ void register_every_possible_parse_error()
     register_input("def myfunc(%");
     register_input("def myfunc(int %");
     register_input("def myfunc(int) %");
-    register_input("def myfunc(int) :: %");
+    register_input("def myfunc(int) -> %");
     register_input("def myfunc(foo, bar) : baz");
     register_input("type");
     register_input("type mytype");
@@ -95,7 +95,7 @@ void register_every_possible_parse_error()
     register_input("a = [1]; a[0");
     register_input("a()");
     register_input("a = 1; a()");
-    register_input("def func() :: NonexistantType end");
+    register_input("def func() -> NonexistantType end");
     register_input("nonexistant = nonexistant + 1");
 }
 

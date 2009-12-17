@@ -21,7 +21,7 @@ namespace average_function {
 
     void setup(Branch& kernel)
     {
-        AVERAGE_FUNC = import_function(kernel, evaluate, "average(number...) :: number;"
+        AVERAGE_FUNC = import_function(kernel, evaluate, "average(number...) -> number;"
                 "'Returns the average of all inputs.' end");
     }
 }

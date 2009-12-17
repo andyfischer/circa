@@ -17,8 +17,8 @@ namespace greater_than_function {
 
     void setup(Branch& kernel)
     {
-        Term* gt_i = import_function(kernel, evaluate_i, "greater_than_i(int,int) :: bool");
-        Term* gt_f = import_function(kernel, evaluate_f, "greater_than_f(number,number) :: bool");
+        Term* gt_i = import_function(kernel, evaluate_i, "greater_than_i(int,int) -> bool");
+        Term* gt_f = import_function(kernel, evaluate_f, "greater_than_f(number,number) -> bool");
 
         Term* main = create_overloaded_function(kernel, "greater_than");
 

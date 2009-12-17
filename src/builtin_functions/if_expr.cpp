@@ -52,12 +52,12 @@ namespace if_expr_function {
 
     void setup(Branch& kernel)
     {
-        IF_EXPR_FUNC = import_function(kernel, evaluate, "if_expr(bool condition, any pos, any neg) :: any; \"If 'condition' is true, returns 'pos'. Otherwise returns 'neg'. This function will probably get some special syntax in the future.\" end");
+        IF_EXPR_FUNC = import_function(kernel, evaluate, "if_expr(bool condition, any pos, any neg) -> any; \"If 'condition' is true, returns 'pos'. Otherwise returns 'neg'. This function will probably get some special syntax in the future.\" end");
         function_t::get_specialize_type(IF_EXPR_FUNC) = specializeType;
         function_t::set_input_meta(IF_EXPR_FUNC, 1, true);
         function_t::set_input_meta(IF_EXPR_FUNC, 2, true);
         function_t::get_feedback_func(IF_EXPR_FUNC) =
-            import_function(kernel, feedback_evaluate, "if_expr_feedback(any, any) :: Branch");
+            import_function(kernel, feedback_evaluate, "if_expr_feedback(any, any) -> Branch");
     }
 }
 }

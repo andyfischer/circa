@@ -239,13 +239,13 @@ void reproduce_for_loop() {
 
 void reproduce_subroutine() {
     round_trip_source("def hi()\nend");
-    round_trip_source("def hi2() :: int\nend");
-    round_trip_source("def hi2()::int\nend");
+    round_trip_source("def hi2() -> int\nend");
+    round_trip_source("def hi2()->int\nend");
     round_trip_source("def hi3(int a)\nend");
-    round_trip_source("def hi4() :: int\nreturn 1\nend");
-    round_trip_source("def hi()::int;return 1;end");
-    round_trip_source("def hi()::int  ;return 1;end");
-    round_trip_source("def hi()::int return add(sub(1,1),1) end");
+    round_trip_source("def hi4() -> int\nreturn 1\nend");
+    round_trip_source("def hi()->int;return 1;end");
+    round_trip_source("def hi()->int  ;return 1;end");
+    round_trip_source("def hi()->int return add(sub(1,1),1) end");
     round_trip_source("def hi();1;end");
     round_trip_source("def hi() ;1;end");
     round_trip_source("def hi(); 1;end");
@@ -253,17 +253,17 @@ void reproduce_subroutine() {
     round_trip_source("def hi() 1  end");
     round_trip_source("def hi(int)  end");
     round_trip_source("def hi(number, string, bool)  end");
-    round_trip_source("type Point { number x, number y }\ndef hi() :: Point\nreturn [0 0]\nend");
+    round_trip_source("type Point { number x, number y }\ndef hi() -> Point\nreturn [0 0]\nend");
     round_trip_source("def hi() if true return 1 else return 2 end end");
     round_trip_source("def hi() x = 1 if true return x else return x end end");
-    round_trip_source("def my_func(int...) :: int end");
+    round_trip_source("def my_func(int...) -> int end");
 }
 
 void reproduce_function_headers() {
     round_trip_source("def my_native +native ()");
     round_trip_source("def my_native +native ()   ");
     round_trip_source("def my_native +native (int)");
-    round_trip_source("def my_native +native (int) :: int");
+    round_trip_source("def my_native +native (int) -> int");
     round_trip_source("def myfunc(state int i)");
     finish_source_repro_category();
 }
@@ -366,7 +366,7 @@ void reproduce_discard_statement() {
 
 void reproduce_branch_styles() {
     round_trip_source("def hi():\n return 1\nhi()");
-    round_trip_source("def hi()::int:\n return 1\nhi()");
+    round_trip_source("def hi()->int:\n return 1\nhi()");
     round_trip_source("def hi() { 1 2 3 }");
     round_trip_source("def hi() begin 1 2 3 end");
     finish_source_repro_category();

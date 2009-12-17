@@ -56,10 +56,10 @@ namespace rand_function {
 
     void setup(Branch& kernel)
     {
-        Term* rand_f = import_function(kernel, evaluate_f, "rand_f() :: number");
-        Term* rand_range =
-            import_function(kernel, evaluate_f_range, "rand_range(number min,number max)::number");
-        import_function(kernel, evaluate_i, "rand_i() :: int");
+        Term* rand_f = import_function(kernel, evaluate_f, "rand_f() -> number");
+        Term* rand_range = import_function(kernel, evaluate_f_range,
+                "rand_range(number min,number max) -> number");
+        import_function(kernel, evaluate_i, "rand_i() -> int");
         //import_function(kernel, evaluate_i_i, "rand_i(int) : int");
         
         Term* rand_func = create_overloaded_function(kernel, "rand");

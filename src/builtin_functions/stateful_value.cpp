@@ -33,7 +33,7 @@ namespace stateful_value_function {
 
     void setup(Branch& kernel)
     {
-        STATEFUL_VALUE_FUNC = import_function(kernel, evaluate, "stateful_value() :: any");
+        STATEFUL_VALUE_FUNC = import_function(kernel, evaluate, "stateful_value() -> any");
         function_t::get_to_source_string(STATEFUL_VALUE_FUNC) = toSourceString;
     }
 }

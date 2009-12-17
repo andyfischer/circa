@@ -8,7 +8,7 @@ namespace internal_function {
     void setup(Branch& kernel)
     {
         LEXPR_FUNC = import_function(kernel, empty_evaluate_function,
-            "lexpr(any, string...) :: any");
+            "lexpr(any, string...) -> any");
 
         LEXPR_FUNC->boolProp("docs:hidden") = true;
     }

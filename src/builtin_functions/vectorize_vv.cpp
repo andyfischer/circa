@@ -45,7 +45,7 @@ namespace vectorize_vv_function {
 
     void setup(Branch& kernel)
     {
-        Term* func = import_function(kernel, evaluate, "vectorize_vv(List,List) :: List");
+        Term* func = import_function(kernel, evaluate, "vectorize_vv(List,List) -> List");
         function_t::get_specialize_type(func) = specializeType;
     }
 }

@@ -12,7 +12,7 @@ namespace not_function {
 
     void setup(Branch& kernel)
     {
-        NOT_FUNC = import_function(kernel, evaluate, "not(bool) :: bool");
+        NOT_FUNC = import_function(kernel, evaluate, "not(bool) -> bool");
     }
 }
 }

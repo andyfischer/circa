@@ -17,12 +17,12 @@ namespace div_function {
 
     void setup(Branch& kernel)
     {
-        Term* div_f = import_function(kernel, evaluate_f, "div_f(number,number) :: number");
+        Term* div_f = import_function(kernel, evaluate_f, "div_f(number,number) -> number");
 
         DIV_FUNC = create_overloaded_function(kernel, "div");
         create_ref(as_branch(DIV_FUNC), div_f);
 
-        import_function(kernel, evaluate_i, "div_i(int,int) :: int");
+        import_function(kernel, evaluate_i, "div_i(int,int) -> int");
     }
 }
 } // namespace circa

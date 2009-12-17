@@ -14,7 +14,7 @@ namespace min_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "min(number,number) :: number; 'Minimum of two numbers.' end");
+        import_function(kernel, evaluate, "min(number,number) -> number; 'Minimum of two numbers.' end");
     }
 }
 } // namespace circa

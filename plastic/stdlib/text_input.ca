@@ -5,7 +5,7 @@ namespace text_input
       int cursor
     }
 
-    def input_character(TextInputState st, Keypress keypress) :: TextInputState
+    def input_character(TextInputState st, Keypress keypress) -> TextInputState
         if keypress.code == LEFT
             if st.cursor > 0
                 st.cursor = st.cursor - 1

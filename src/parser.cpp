@@ -445,9 +445,12 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     // Output type
     Term* outputType = VOID_TYPE;
 
-    if (tokens.nextNonWhitespaceIs(DOUBLE_COLON)) {
+    if (tokens.nextNonWhitespaceIs(DOUBLE_COLON))
+        std::cout << "warning: :: in " << result->name << std::endl;
+
+    if (tokens.nextNonWhitespaceIs(RIGHT_ARROW)) {
         result->stringProp("syntaxHints:whitespacePreColon") = possible_whitespace(tokens);
-        tokens.consume(DOUBLE_COLON);
+        tokens.consume(RIGHT_ARROW);
         result->stringProp("syntaxHints:whitespacePostColon") = possible_whitespace(tokens);
 
         outputType = type_identifier_or_anonymous_type(branch, tokens);

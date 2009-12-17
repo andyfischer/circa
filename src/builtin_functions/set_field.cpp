@@ -45,7 +45,7 @@ namespace set_field_function {
     void setup(Branch& kernel)
     {
         SET_FIELD_FUNC = import_function(kernel, evaluate,
-                "set_field(any, any, string...) :: any");
+                "set_field(any, any, string...) -> any");
         function_t::get_specialize_type(SET_FIELD_FUNC) = specializeType;
         function_t::get_to_source_string(SET_FIELD_FUNC) = toSourceString;
     }

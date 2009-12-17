@@ -91,7 +91,7 @@ std::string term_to_raw_string(Term* term)
 
     output << ")";
 
-    output << " :: " << typeName;
+    output << " -> " << typeName;
 
     bool showValue = is_value_alloced(term);
 

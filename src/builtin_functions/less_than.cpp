@@ -17,8 +17,8 @@ namespace less_than_function {
 
     void setup(Branch& kernel)
     {
-        Term* lt_i = import_function(kernel, evaluate_i, "less_than_i(int,int) :: bool");
-        Term* lt_f = import_function(kernel, evaluate_f, "less_than_f(number,number) :: bool");
+        Term* lt_i = import_function(kernel, evaluate_i, "less_than_i(int,int) -> bool");
+        Term* lt_f = import_function(kernel, evaluate_f, "less_than_f(number,number) -> bool");
 
         Term* main = create_overloaded_function(kernel, "less_than");
 

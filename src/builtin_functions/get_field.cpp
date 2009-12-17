@@ -56,7 +56,7 @@ namespace get_field_function {
     void setup(Branch& kernel)
     {
         GET_FIELD_FUNC = import_function(kernel, evaluate,
-                "get_field(any, string...) :: any");
+                "get_field(any, string...) -> any");
         function_t::get_specialize_type(GET_FIELD_FUNC) = specializeType;
         function_t::get_to_source_string(GET_FIELD_FUNC) = toSourceString;
     }

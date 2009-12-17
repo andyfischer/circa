@@ -20,7 +20,7 @@ void test_import_c()
     Branch branch;
 
     Term* func = import_function(branch, my_imported_function,
-            "my_imported_func(int,int) :: int");
+            "my_imported_func(int,int) -> int");
 
     test_assert(function_t::get_output_type(func) == INT_TYPE);
 

@@ -20,7 +20,7 @@ namespace changed_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "changed(state any, any input) :: bool; 'Stateful function, returns whether the given input has changed since the last call.' end");
+        import_function(kernel, evaluate, "changed(state any, any input) -> bool; 'Stateful function, returns whether the given input has changed since the last call.' end");
     }
 }
 }

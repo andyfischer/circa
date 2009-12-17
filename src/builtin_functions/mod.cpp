@@ -35,8 +35,8 @@ namespace mod_function {
 
     void setup(Branch& kernel)
     {
-        Term* mod_i = import_function(kernel, evaluate, "mod_i(int,int) :: int");
-        Term* mod_f = import_function(kernel, evaluate_f, "mod_f(number,number) :: number");
+        Term* mod_i = import_function(kernel, evaluate, "mod_i(int,int) -> int");
+        Term* mod_f = import_function(kernel, evaluate_f, "mod_f(number,number) -> number");
 
         Term* main = create_overloaded_function(kernel, "mod");
         create_ref(as_branch(main), mod_i);

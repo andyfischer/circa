@@ -191,7 +191,7 @@ void one_time_assignment_inside_for_loop()
 {
     Branch branch;
 
-    import_function(branch, _unique_output, "unique_output() :: int");
+    import_function(branch, _unique_output, "unique_output() -> int");
     import_function(branch, _spy, "spy(int)");
     branch.compile("for i in [1 1 1]\nstate s = unique_output()\nspy(s)\nend");
 
@@ -218,7 +218,7 @@ void state_inside_lots_of_nested_functions()
 {
     Branch branch;
 
-    import_function(branch, _unique_output, "unique_output() :: int");
+    import_function(branch, _unique_output, "unique_output() -> int");
     import_function(branch, _spy, "spy(int)");
 
     Term* f1 = branch.compile("def func1()\nstate s = unique_output()\nspy(s)\nend");
@@ -253,7 +253,7 @@ void more_nested_state()
 {
     Branch branch;
 
-    import_function(branch, _unique_output, "unique_output() :: int");
+    import_function(branch, _unique_output, "unique_output() -> int");
 
     NEXT_UNIQUE_OUTPUT = 1;
     branch.eval("def f() state i = unique_output() end");
@@ -346,7 +346,7 @@ void bug_where_stateful_function_wouldnt_update_inputs()
     Branch branch;
 
     branch.eval("def a() state i end");
-    branch.eval("def b(int i) :: int; a(); return i; end");
+    branch.eval("def b(int i) -> int; a(); return i; end");
 
     test_assert(branch);
 

@@ -22,8 +22,8 @@ namespace neg_function {
 
     void setup(Branch& kernel)
     {
-        Term* neg_i = import_function(kernel, evaluate_i, "neg_i(int)::int");
-        Term* neg_f = import_function(kernel, evaluate_f, "neg_f(number)::number");
+        Term* neg_i = import_function(kernel, evaluate_i, "neg_i(int) -> int");
+        Term* neg_f = import_function(kernel, evaluate_f, "neg_f(number) -> number");
 
         function_t::get_to_source_string(neg_i) = toSourceString;
         function_t::get_to_source_string(neg_f) = toSourceString;

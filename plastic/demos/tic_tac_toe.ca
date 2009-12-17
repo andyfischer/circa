@@ -4,7 +4,7 @@ desired_window_size = [400 400]
 background_color = #10a
 background(background_color)
 
-board_center = [150 150] :: Point
+board_center = [150 150] -> Point
 square_size = 70
 
 def draw_x(Point loc)
@@ -48,7 +48,7 @@ type BoardSpace {
     Point center
 }
 
-def initialize_board_spaces() :: List
+def initialize_board_spaces() -> List
     board_spaces = []
     for x in 0..3
         for y in 0..3
@@ -63,13 +63,13 @@ state board_spaces = initialize_board_spaces()
 
 state int current_player = player.x
 
-def player_name(int p) :: string
+def player_name(int p) -> string
     if p == player.x return "X"
     elif p == player.o return "O"
     else return "none" end
 end
 
-def other_player(int p) :: int
+def other_player(int p) -> int
     if p == player.x return player.o
     else return player.x end
 end
@@ -80,18 +80,18 @@ type WinnerInformation {
     Point line_b
 }
 
-def get_winner(List board_spaces) :: WinnerInformation
-    def get_space(int x, int y) :: BoardSpace
+def get_winner(List board_spaces) -> WinnerInformation
+    def get_space(int x, int y) -> BoardSpace
         return board_spaces[x * 3 + y]
     end
 
-    def is_winner_across_line(List positions) :: int
-        pos_0 = positions[0] :: Point_i
+    def is_winner_across_line(List positions) -> int
+        pos_0 = positions[0] -> Point_i
         all_match = true
         start_space = get_space(pos_0.x pos_0.y)
         this_player = start_space.owner
         for pos in positions
-            pos = pos :: Point_i
+            pos = pos -> Point_i
             this_space = get_space(pos.x pos.y)
             if this_player != this_space.owner
                 all_match = false
@@ -107,7 +107,7 @@ def get_winner(List board_spaces) :: WinnerInformation
     result = WinnerInformation()
 
     for i in 0..3
-        i = i :: int
+        i = i -> int
         horizontal_winner = is_winner_across_line([[i 0] [i 1] [i 2]])
         vertical_winner = is_winner_across_line([[0 i] [1 i] [2 i]])
         if horizontal_winner != player.none
@@ -139,7 +139,7 @@ state game_is_finished = false
 
 -- Draw each playable space
 for board_space in board_spaces
-    board_space = board_space :: BoardSpace
+    board_space = board_space -> BoardSpace
 
     loc = [board_space.x * square_size + board_left, board_space.y * square_size + board_top]
     rect = [loc[0] loc[1] loc[0] + square_size loc[1] + square_size]
@@ -166,17 +166,17 @@ state winner_information = WinnerInformation()
 if chosen_space != []
     moves_made += 1
 
-    chosen_space = chosen_space :: BoardSpace
+    chosen_space = chosen_space -> BoardSpace
 
     -- Modify board_spaces in a silly way b/c the proper way doesn't work yet
-    def update_board_spaces(BoardSpace space) :: BoardSpace
+    def update_board_spaces(BoardSpace space) -> BoardSpace
         if space.x == chosen_space.x and space.y == chosen_space.y
             space.owner = current_player
         end
         return space
     end
     board_spaces = map(update_board_spaces, board_spaces)
-    chosen_space = chosen_space :: BoardSpace
+    chosen_space = chosen_space -> BoardSpace
     current_player = other_player(current_player)
 
     -- Check if a player has won

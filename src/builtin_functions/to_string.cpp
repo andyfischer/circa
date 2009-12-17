@@ -13,7 +13,7 @@ namespace to_string_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "to_string(any) :: string");
+        import_function(kernel, evaluate, "to_string(any) -> string");
     }
 }
 } // namespace circa

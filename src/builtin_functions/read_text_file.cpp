@@ -13,7 +13,7 @@ namespace read_text_file_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "read_text_file(string) :: string");
+        import_function(kernel, evaluate, "read_text_file(string) -> string");
     }
 }
 } // namespace circa

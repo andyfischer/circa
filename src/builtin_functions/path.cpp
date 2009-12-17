@@ -13,7 +13,7 @@ namespace path_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "def path(string) :: string");
+        import_function(kernel, evaluate, "def path(string) -> string");
     }
 }
 }
