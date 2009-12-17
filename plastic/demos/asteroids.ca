@@ -17,9 +17,8 @@ type Bullet {
 }
 
 -- Return a point that is wrapped around the playable area
-def wrap_around(Point p) -> Point
+def wrap_around(Point p) -> Point:
     return [mod(p.x, window.width) mod(p.y, window.height)]
-end
 
 state Ship ship = [[window.width/2 window.height/2] [0 0] 0]
 state List bullets = []
@@ -37,9 +36,8 @@ ship_wing_size = 11.4
 ship_wing_rot = .40
 
 namespace draw_ship
-    def ship_point(number rot, number dist) -> Point
+    def ship_point(number rot, number dist) -> Point:
         return polar(rot + ship.facing) * dist*ship_size + ship.loc
-    end
 
     gl.line_loop([ship_point(0 ship_front)
                   ship_point(ship_wing_rot ship_wing_size)

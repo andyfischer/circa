@@ -127,7 +127,9 @@ void consume_branch(Branch& branch, TokenStream& tokens)
         if (branch.owningTerm != NULL)
             branch.owningTerm->intProp("syntax:branchStyle") = BRANCH_SYNTAX_COLON;
 
-        return consume_branch_with_significant_whitespace(branch, tokens);
+        consume_branch_with_significant_indentation(branch, tokens);
+        post_parse_branch(branch);
+        return;
     }
 
     int branchStyle = BRANCH_SYNTAX_UNDEF;
@@ -166,12 +168,25 @@ void consume_branch(Branch& branch, TokenStream& tokens)
             return;
         }
         tokens.consume(END);
+    } else {
+        // Awful special case. Don't try to consume END while parsing an if-statement
+        if (branch.owningTerm != NULL && branch.owningTerm->owningBranch != NULL
+            && branch.owningTerm->owningBranch->owningTerm != NULL
+            && branch.owningTerm->owningBranch->owningTerm->function == IF_BLOCK_FUNC)
+            ; // blah
+        else {
+            if (!tokens.nextIs(END)) {
+                compile_error_for_line(branch, tokens, startPosition);
+                return;
+            }
+            tokens.consume(END);
+        }
     }
 
     post_parse_branch(branch);
 }
 
-void consume_branch_with_significant_whitespace(Branch& branch, TokenStream& tokens)
+void consume_branch_with_significant_indentation(Branch& branch, TokenStream& tokens)
 {
     // Parse statements until we find one that is not just whitespace
 
@@ -446,9 +461,6 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     // Output type
     Term* outputType = VOID_TYPE;
 
-    if (tokens.nextNonWhitespaceIs(DOUBLE_COLON))
-        std::cout << "warning: :: in " << result->name << std::endl;
-
     if (tokens.nextNonWhitespaceIs(RIGHT_ARROW)) {
         result->stringProp("syntaxHints:whitespacePreColon") = possible_whitespace(tokens);
         tokens.consume(RIGHT_ARROW);
@@ -473,12 +485,6 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     // Parse this as a subroutine call
     consume_branch(contents, tokens);
-
-    // Finish consuming tokens
-    result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
-
-    if (tokens.nextIs(END))
-        tokens.consume(END);
 
     finish_building_subroutine(result, outputType);
 
@@ -704,11 +710,6 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     consume_branch(innerBranch, tokens);
 
-    forTerm->stringProp("syntaxHints:whitespaceBeforeEnd") = possible_whitespace(tokens);
-
-    if (tokens.nextIs(END))
-        tokens.consume(END);
-
     setup_for_loop_post_code(forTerm);
     set_source_location(forTerm, startPosition, tokens);
 
@@ -741,11 +742,6 @@ Term* do_once_block(Branch& branch, TokenStream& tokens)
     result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 
     consume_branch(as_branch(result), tokens);
-
-    result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
-
-    if (tokens.nextIs(END))
-        tokens.consume(END);
 
     return result;
 }
@@ -1706,11 +1702,6 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
     result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
 
     consume_branch(as_branch(result), tokens);
-
-    result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
-
-    if (tokens.nextIs(END))
-        tokens.consume(END);
 
     return result;
 }

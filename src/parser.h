@@ -60,7 +60,7 @@ Term* constant_fold_lexpr(Term* call);
 
 // Helper functions:
 void consume_branch(Branch& branch, TokenStream& tokens);
-void consume_branch_with_significant_whitespace(Branch& branch, TokenStream& tokens);
+void consume_branch_with_significant_indentation(Branch& branch, TokenStream& tokens);
 
 } // namespace parser
 } // namespace circa
