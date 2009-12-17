@@ -21,7 +21,6 @@ namespace branch_function {
             Branch& contents = as_branch(term);
             out << get_branch_source(contents, "");
             out << "]";
-            return out.str();
         } else if (term->type == NAMESPACE_TYPE) {
             out << "namespace ";
             out << term->name;
@@ -29,25 +28,12 @@ namespace branch_function {
             out << get_branch_source(as_branch(term));
             out << term->stringPropOptional("syntaxHints:preEndWs", "");
             out << "end";
-            return out.str();
             
         } else {
-            bool usingBraces = term->boolPropOptional("syntaxHints:braces", false);
-
             prepend_name_binding(term, out);
-
-            if (usingBraces) out << "{";
-            else out << "begin";
-
-            out << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
-            out << get_branch_source(as_branch(term));
-            out << term->stringPropOptional("syntaxHints:preEndWs", "");
-
-            if (usingBraces) out << "}";
-            else out << "end";
-
-            return out.str();
+            print_branch_source(out, term);
         }
+        return out.str();
     }
 
     void setup(Branch& kernel)

@@ -68,9 +68,7 @@ void repro_source_after_append_code()
 
     branch.eval("bm.append_code({ 1  +  1 })");
 
-    test_equals(get_branch_source(as_branch(target)), "1  +  1 ");
-    //std::cout << get_branch_source(as_branch(target)) << std::endl;
-    //dump_branch(as_branch(target));
+    test_equals(get_branch_source(as_branch(target)), " 1  +  1 ");
 }
 
 void register_tests()

@@ -141,10 +141,10 @@ void consume_branch(Branch& branch, TokenStream& tokens)
     }
 
     while (!tokens.finished()) {
-        if (tokens.nextNonWhitespaceIs(END)
+        if (tokens.nextIs(END)
                 || tokens.nextNonWhitespaceIs(ELSE)
                 || tokens.nextNonWhitespaceIs(ELIF)
-                || tokens.nextNonWhitespaceIs(RBRACE)) {
+                || tokens.nextIs(RBRACE)) {
             break;
         } else {
             parser::statement(branch, tokens);
@@ -156,7 +156,7 @@ void consume_branch(Branch& branch, TokenStream& tokens)
 
     if (branchStyle == BRANCH_SYNTAX_BRACE) {
         if (!tokens.nextIs(RBRACE)) {
-            compile_error_for_line(branch, tokens, startPosition);
+            compile_error_for_line(branch, tokens, startPosition, "Expected: }");
             return;
         }
         tokens.consume(RBRACE);
@@ -235,7 +235,8 @@ Term* statement(Branch& branch, TokenStream& tokens)
     Term* result = NULL;
 
     // Comment (blank lines count as comments)
-    if (tokens.nextIs(COMMENT) || tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON)) {
+    if (tokens.nextIs(COMMENT) || tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON)
+            || tokens.nextIs(RBRACE) || tokens.nextIs(END)) {
         result = comment(branch, tokens);
         assert(result != NULL);
     }
@@ -305,7 +306,7 @@ Term* comment(Branch& branch, TokenStream& tokens)
 {
     std::string commentText;
 
-    if (!tokens.nextIs(NEWLINE))
+    if (tokens.nextIs(COMMENT))
         commentText = tokens.consume();
 
     Term* result = apply(branch, COMMENT_FUNC, RefList());
@@ -376,7 +377,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     }
 
     if (!tokens.nextIs(LPAREN))
-        return compile_error_for_line(branch, tokens, startPosition, "Expected (");
+        return compile_error_for_line(branch, tokens, startPosition, "Expected: (");
 
     tokens.consume(LPAREN);
 
@@ -431,7 +432,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
         if (!tokens.nextIs(RPAREN)) {
             if (!tokens.nextIs(COMMA))
-                return compile_error_for_line(result, tokens, startPosition, "Expected ,");
+                return compile_error_for_line(result, tokens, startPosition, "Expected: ,");
 
             tokens.consume(COMMA);
         }
@@ -743,7 +744,8 @@ Term* do_once_block(Branch& branch, TokenStream& tokens)
 
     result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
-    tokens.consume(END);
+    if (tokens.nextIs(END))
+        tokens.consume(END);
 
     return result;
 }
@@ -1327,7 +1329,7 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
         Term* subscript = infix_expression(branch, tokens);
 
         if (!tokens.nextIs(RBRACKET))
-            return compile_error_for_line(branch, tokens, startPosition, "Expected ]");
+            return compile_error_for_line(branch, tokens, startPosition, "Expected: ]");
 
         tokens.consume(RBRACKET);
 
@@ -1679,28 +1681,12 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 
 Term* plain_branch(Branch& branch, TokenStream& tokens)
 {
-    int startPosition = tokens.getPosition();
-
-    bool usingBeginEnd = tokens.nextIs(BEGIN);
-    if (usingBeginEnd) tokens.consume(BEGIN);
-    else tokens.consume(LBRACE);
+    //int startPosition = tokens.getPosition();
 
     Term* result = create_branch(branch).owningTerm;
-    result->stringProp("syntaxHints:postHeadingWs") = possible_statement_ending(tokens);
+
     consume_branch(as_branch(result), tokens);
-    result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
-    if (usingBeginEnd) {
-        if (!tokens.nextIs(END))
-            return compile_error_for_line(result, tokens, startPosition);
-        tokens.consume(END);
-    } else {
-        if (!tokens.nextIs(RBRACE))
-            return compile_error_for_line(result, tokens, startPosition);
-        tokens.consume(RBRACE);
-
-        result->boolProp("syntaxHints:braces") = true;
-    }
     return result;
 }
 
@@ -1723,10 +1709,9 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
 
     result->stringProp("syntaxHints:preEndWs") = possible_whitespace(tokens);
 
-    if (!tokens.nextIs(END))
-        return compile_error_for_line(result, tokens, startPosition);
+    if (tokens.nextIs(END))
+        tokens.consume(END);
 
-    tokens.consume(END);
     return result;
 }
 

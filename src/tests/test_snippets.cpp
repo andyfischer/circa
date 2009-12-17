@@ -8,7 +8,11 @@
 // 'assertions' as a subbranch in the 'code' branch. If there are any static errors,
 // then the test fails. Then we go through the 'assertions' branch, and we look
 // for any statements which return a boolean, and we make sure all of those have
-// evaluated to true. (if any are false, the test fails)
+// evaluated to true. (if any are false, the test fails).
+//
+// The 'code' section may be empty, you might do this if you can put the entire test
+// inside 'assertions'. The 'assertions' section may be empty, you might do this if
+// you're only interested whether 'code' causes an error.
 
 #include "common_headers.h"
 
@@ -337,6 +341,13 @@ void test_message_passing()
             "receive('test') == [1 3], receive('test2') == [2 4]");
 }
 
+void test_significant_indentation()
+{
+    test_snippet("namespace a:\n  b = 5", "a.b == 5");
+    test_snippet("l = 0..3, for i in @l:\n  i += 3", "l == [3 4 5]");
+    test_snippet("do once:\n a = 5", "");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -362,6 +373,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_range);
     REGISTER_TEST_CASE(test_snippets::test_stateful_code);
     REGISTER_TEST_CASE(test_snippets::test_message_passing);
+    REGISTER_TEST_CASE(test_snippets::test_significant_indentation);
 }
 
 } // namespace test_snippets
