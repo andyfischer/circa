@@ -8,10 +8,23 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 {
     assert(function != NULL);
 
-    if (!is_callable(function))
-        throw std::runtime_error("Function "+function->name+" is not callable");
-
     evaluate_without_side_effects(function);
+
+    // If 'function' is actually a type, create a value instead.
+    if (is_type(function)) {
+        if (inputs.length() == 0) {
+            Term* result = create_value(branch, function);
+            result->boolProp("constructor") = true;
+            return result;
+        } else if (inputs.length() == 1) {
+            Term* result = apply(branch, CAST_FUNC, inputs);
+            change_type(result, function);
+            return result;
+        }
+    }
+
+    if (!is_callable(function))
+        throw std::runtime_error("Term "+function->name+" is not callable");
 
     // Check to specialize function
     function = specialize_function(function, inputs);

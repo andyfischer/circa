@@ -34,6 +34,9 @@ def source_files(dir):
     return list(iter())
 
 def build(bld):
+    from tools import prebuild
+    prebuild.main()
+
     circa_sources = (source_files('src') +
         ['generated/'+file for file in source_files('src/generated')])
 

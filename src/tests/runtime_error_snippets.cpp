@@ -48,6 +48,8 @@ void test_runtime_errors()
     test_input("def hey() assert(false) end; hey()");
     test_input("def hey()::bool assert(false) return true end; if hey() end");
     test_input("def hey()::List assert(false) return [] end; hey()");
+
+    test_input("'string' -> number");
 }
 
 void register_tests()

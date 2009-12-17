@@ -18,6 +18,7 @@ extern Term* AVERAGE_FUNC;
 extern Term* BRANCH_FUNC;
 extern Term* COMMENT_FUNC;
 extern Term* COPY_FUNC;
+extern Term* CAST_FUNC;
 extern Term* DESIRED_VALUE_FEEDBACK;
 extern Term* DISCARD_FUNC;
 extern Term* DIV_FUNC;

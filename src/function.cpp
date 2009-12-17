@@ -251,7 +251,8 @@ void initialize_function_prototype(Branch& contents)
 bool is_callable(Term* term)
 {
     return (term->type == FUNCTION_TYPE
-            || term->type == OVERLOADED_FUNCTION_TYPE);
+            || term->type == OVERLOADED_FUNCTION_TYPE
+            || term->type == TYPE_TYPE);
 }
 
 bool inputs_fit_function(Term* func, RefList const& inputs)

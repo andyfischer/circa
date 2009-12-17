@@ -1101,6 +1101,9 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             result = find_and_apply(branch, functionName, inputs);
 
+            if (result->function->name != functionName)
+                result->stringProp("syntaxHints:functionName") = functionName;
+
             result->stringProp("syntaxHints:declarationStyle") = "arrow-concat";
 
             get_input_syntax_hint(result, 0, "postWhitespace") = preOperatorWhitespace;
@@ -1289,15 +1292,8 @@ Term* function_call(Branch& branch, Term* function, RefList const& inputs)
     if (function->function == LEXPR_FUNC)
         return member_function_call(branch, function, inputs, originalName);
 
-    if (is_type(function)) {
-        Term* result = create_value(branch, function);
-        result->boolProp("constructor") = true;
-        return result;
-    }
-    
-    if (!is_callable(function)) {
+    if (!is_callable(function))
         function = UNKNOWN_FUNCTION;
-    }
    
     Term* result = apply(branch, function, inputs);
 

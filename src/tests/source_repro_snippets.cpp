@@ -372,6 +372,13 @@ void reproduce_branch_styles() {
     finish_source_repro_category();
 }
 
+void reproduce_type_cast() {
+    round_trip_source("number(1)");
+    round_trip_source("Point([4 3])");
+    round_trip_source("1 -> number");
+    finish_source_repro_category();
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);
@@ -396,6 +403,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebind_operator);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_discard_statement);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_branch_styles);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_type_cast);
 }
 
 } // namespace source_repro_snippets
