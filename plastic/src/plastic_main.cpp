@@ -90,8 +90,7 @@ bool initialize_builtin_functions()
     ttf::setup(runtime_branch());
 
     if (has_static_errors(runtime_branch())) {
-        std::cout << "Errors in runtime.ca:" << std::endl;
-        print_errors_formatted(runtime_branch(), std::cout);
+        print_static_errors_formatted(runtime_branch(), std::cout);
         std::cout << std::endl;
         //dump_branch(runtime_branch());
         return false;

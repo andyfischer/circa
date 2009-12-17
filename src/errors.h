@@ -43,7 +43,6 @@ void print_runtime_error_formatted(Term* term, std::ostream& output);
 void print_runtime_error_formatted(Branch& branch, std::ostream& output);
 void print_static_error_formatted(Term* term, std::ostream& output);
 void print_static_errors_formatted(Branch& branch, std::ostream& output);
-void print_errors_formatted(Branch& branch, std::ostream& output);
 
 bool has_error(Term* term);
 bool has_error(Branch& branch);

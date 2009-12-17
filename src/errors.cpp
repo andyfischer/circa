@@ -123,20 +123,6 @@ bool has_error(Branch& branch)
     return false;
 }
 
-void print_errors_formatted(Branch& branch, std::ostream& output)
-{
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
-        if (term == NULL) continue;
-        if (has_runtime_error(term)) {
-            print_runtime_error_formatted(term, output);
-            return;
-        }
-        if (has_static_error(term))
-            print_static_error_formatted(term, output);
-    }
-}
-
 std::string get_error_message(Term* term)
 {
     if (has_static_error(term))
