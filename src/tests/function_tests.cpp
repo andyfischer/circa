@@ -126,7 +126,7 @@ void test_call_copied_function()
 void test_calling_manual_overloaded_function()
 {
     Branch branch;
-    Term* my_add = branch.eval("my_add = [&add_f &add_i] :: OverloadedFunction");
+    Term* my_add = branch.eval("my_add = [&add_f &add_i] -> OverloadedFunction");
 
     Term* two = branch.compile("2");
     RefList inputs(two, two);

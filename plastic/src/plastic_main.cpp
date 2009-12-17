@@ -93,6 +93,7 @@ bool initialize_builtin_functions()
         std::cout << "Errors in runtime.ca:" << std::endl;
         print_errors_formatted(runtime_branch(), std::cout);
         std::cout << std::endl;
+        //dump_branch(runtime_branch());
         return false;
     }
 

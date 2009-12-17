@@ -150,7 +150,7 @@ void test_references()
 
     test_snippet("br = begin; a = 1; state b = 2; 3; end;"
                  "bm = branch_mirror(br); cons = bm.get_configs();"
-                 "cons_0 = cons[0] :: Ref",
+                 "cons_0 = cons[0] -> Ref",
                  "length(cons) == 1; cons_0.name() == 'a'");
 
     // test .input
@@ -231,7 +231,7 @@ void test_for_loops()
 void test_subscripting()
 {
     test_snippet("l = [[[1]]]", "l[0][0][0] == 1");
-    test_snippet("def return_point() :: Point return [8 9] end", "return_point().x == 8");
+    //test_snippet("def return_point() -> Point return [8 9] end", "return_point().x == 8");
 }
 
 void test_set()
@@ -265,10 +265,10 @@ void test_vectorized_funcs()
     test_snippet("", "[1 2] + [10 10] == [11 12]");
     test_snippet("", "[5 5 5] - [3 2 1] == [2 3 4]");
     test_snippet("", "[5 5 5] - 6 == [-1 -1 -1]");
-    test_snippet("a = [2.0 2.0] :: Point; b = [4.0 4.0] :: Point", "a + b == [6.0 6.0]");
-    test_snippet("a = [2.0 2.0] :: Point; b = [4.0 4.0]", "a + b == [6.0 6.0]");
+    test_snippet("a = [2.0 2.0] -> Point; b = [4.0 4.0] -> Point", "a + b == [6.0 6.0]");
+    test_snippet("a = [2.0 2.0] -> Point; b = [4.0 4.0]", "a + b == [6.0 6.0]");
     test_snippet("a = [2.0 2.0]; b = [4.0 4.0]", "a + b == [6.0 6.0]");
-    test_snippet("a = [2.0 2.0]; b = [4.0 4.0] :: Point", "a + b == [6.0 6.0]");
+    test_snippet("a = [2.0 2.0]; b = [4.0 4.0] -> Point", "a + b == [6.0 6.0]");
     test_snippet("", "[1 1]*[1 1] == [1 1]");
 }
 
@@ -289,19 +289,19 @@ void test_branch_value()
 void test_rebinding_operators()
 {
     test_snippet("a = 1, a += 2", "a == 3");
-    test_snippet("a = [1 1]::Point, a += [4 4]","a == [5.0 5.0]");
+    test_snippet("a = [1 1]->Point, a += [4 4]","a == [5.0 5.0]");
 }
 
 void test_get_field_and_set_field()
 {
-    test_snippet("type A{int z} type B{A y} type C{B x} w = [[[3]]]::C",
+    test_snippet("type A{int z} type B{A y} type C{B x} w = [[[3]]]->C",
             "w.x.y.z == 3; get_field(w, 'x', 'y', 'z') == 3");
-    test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]::C",
-            "set_field(w, 5, 'x', 'y', 'z') == [[[5 4]]]::C");
-    //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]::C",
-            //"w.x.y.z = 5; w == [[[5 4]]]::C");
-    //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]::C",
-            //"w.x.y.z += 1; w == [[[4 4]]]::C");
+    test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]->C",
+            "set_field(w, 5, 'x', 'y', 'z') == [[[5 4]]]->C");
+    //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]->C",
+            //"w.x.y.z = 5; w == [[[5 4]]]->C");
+    //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]->C",
+            //"w.x.y.z += 1; w == [[[4 4]]]->C");
 }
 
 void test_repeat()

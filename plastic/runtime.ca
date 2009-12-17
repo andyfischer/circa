@@ -20,7 +20,7 @@ type Window {
 
 window = Window()
 
-window_size = [window.width window.height]::Point
+window_size = [window.width window.height]->Point
 
 -- ide - functions for controlling IDE behavior
 namespace ide
@@ -38,19 +38,19 @@ type Keypress {
 def key_down(int key) :: bool end
 def key_pressed_code(int key) :: bool end
 def key_pressed_char(string key) :: bool end
-key_pressed = [&key_pressed_code &key_pressed_char] :: OverloadedFunction
+key_pressed = [&key_pressed_code &key_pressed_char] -> OverloadedFunction
 def mouse_pressed() :: bool end
 def mouse_over(Rect region) :: bool end
 def recent_key_presses() :: List end
 def mouse_clicked_anywhere () :: bool end
 def mouse_clicked_region (Rect region) :: bool end
-mouse_clicked = [&mouse_clicked_anywhere &mouse_clicked_region] :: OverloadedFunction
+mouse_clicked = [&mouse_clicked_anywhere &mouse_clicked_region] -> OverloadedFunction
 def mouse_wheel_up_anywhere () :: bool end
 def mouse_wheel_up_region (Rect region) :: bool end
-mouse_wheel_up = [&mouse_wheel_up_anywhere &mouse_wheel_up_region] :: OverloadedFunction
+mouse_wheel_up = [&mouse_wheel_up_anywhere &mouse_wheel_up_region] -> OverloadedFunction
 def mouse_wheel_down_anywhere () :: bool end
 def mouse_wheel_down_region (Rect region) :: bool end
-mouse_wheel_down = [&mouse_wheel_down_anywhere &mouse_wheel_down_region] :: OverloadedFunction
+mouse_wheel_down = [&mouse_wheel_down_anywhere &mouse_wheel_down_region] -> OverloadedFunction
 
 -- These are assigned in input.cpp
 UP = 0
@@ -142,7 +142,7 @@ namespace image
     def draw_clip_p(Image image, Rect clip, Point destination) end
     def draw_clip_resized(Image image, Rect clip, Rect destination) end
 
-    draw_clip = [&draw_clip_p &draw_clip_resized] :: OverloadedFunction
+    draw_clip = [&draw_clip_p &draw_clip_resized] -> OverloadedFunction
 end
 
 def load_texture(state int, string) :: int
@@ -361,7 +361,7 @@ namespace tweak
         end
 
         if mouse_dragging
-            delta = (mouse - mouse_drag_previous_point) :: Point
+            delta = (mouse - mouse_drag_previous_point) -> Point
             mouse_drag_previous_point = mouse
             steps = round(delta.y)
             r.tweak(steps)
@@ -383,14 +383,14 @@ namespace postprocess
     def draw_surface(Surface source) end
     def copy_surface(Surface source, Surface dest) end
 
-    main_surface = [0 0 window.width window.height] :: Surface
+    main_surface = [0 0 window.width window.height] -> Surface
 
     def bind_main_surface() bind_surface(main_surface) end
 end
 
 -- Load the user's script
 
-default_script_filename = path("demos/ramps.ca")
+default_script_filename = path("demos/asteroids.ca")
 state string user_script_filename
 users_branch = include(user_script_filename)
 

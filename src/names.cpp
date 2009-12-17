@@ -129,6 +129,8 @@ bool get_relative_name_recursive(Branch& branch, Term* term, std::stringstream& 
 
 std::string get_relative_name(Branch& branch, Term* term)
 {
+    assert(term != NULL);
+
     if (name_is_reachable_from(term, branch))
         return term->name;
 

@@ -1,5 +1,5 @@
 
-l = [1,2] :: List
+l = [1,2] -> List
 
 print(l -> to_string)
 print(l.count() -> to_string)

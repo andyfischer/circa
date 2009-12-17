@@ -104,10 +104,11 @@ void finish_building_subroutine(Term* sub, Term* outputType)
         set_source_hidden(term, true);
     }
 
-    // If the #out term doesn't have the same type as the declared type, then coerce it
+    // If the #out term doesn't have the same type as the declared type, then cast it
     Term* outTerm = contents[contents.length()-1];
     if (outTerm->type != outputType) {
-        outTerm = apply(contents, ANNOTATE_TYPE_FUNC, RefList(outTerm, outputType), "#out");
+        outTerm = apply(contents, CAST_FUNC, RefList(outTerm), "#out");
+        change_type(outTerm, outputType);
         set_source_hidden(outTerm, true);
     }
 

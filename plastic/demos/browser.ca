@@ -25,7 +25,7 @@ def draggable_rect(Point initial_location, Point size) :: Point
     return location
 end
 
-box_size = [100 20] :: Point
+box_size = [100 20] -> Point
 
 def initial_box_location(Ref ref) :: Point
     source_loc = ref.source_location()

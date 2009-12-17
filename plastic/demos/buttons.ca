@@ -3,9 +3,9 @@ background(#eef)
 
 button_labels = ["Button1", "Button2", "Button3"]
 
-loc = [30 30] :: Point
+loc = [30 30] -> Point
 
-button_size = [100 20] :: Point
+button_size = [100 20] -> Point
 
 normal_color = #0f0
 highlight_color = #555
@@ -18,9 +18,9 @@ state clicked_button = 0
 for label in button_labels
   state id = unique_id()
 
-  button_loc = [loc.x, current_y] :: Point
+  button_loc = [loc.x, current_y] -> Point
   b = [button_loc.x, button_loc.y, button_loc.x+button_size.x,
-       button_loc.y+button_size.y] :: Rect
+       button_loc.y+button_size.y] -> Rect
 
   color = 0
   if mouse_in(b)
@@ -64,7 +64,7 @@ def draggable_rect(Point initial_location, Point size) :: Point
 end
 
 def draggable_box(Point initial_location)
-    size = [100 50] :: Point
+    size = [100 50] -> Point
     location = draggable_rect(initial_location, size)
     draw_box([location.x location.y location.x+size.x location.y+size.y] normal_color)
     

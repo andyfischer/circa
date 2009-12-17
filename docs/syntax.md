@@ -136,14 +136,15 @@ We have the following infix operators:
  <tr><td>%</td>      <td>remainder</td><td>Modulo, truncated division</td><td>7</td></tr>
  <tr><td>+</td>      <td>add</td><td>Addition (overloaded)</td><td>6</td></tr>
  <tr><td>-</td>      <td>sub</td><td>Subtraction (overloaded)</td><td>6</td></tr>
- <tr><td><</td>      <td>less_than</td><td>Less-than comparison</td><td>5</td></tr>
- <tr><td><=</td>      <td>less_than_eq</td><td>Less-than-or-equals comparison</td><td>5</td></tr>
- <tr><td>></td>      <td>greater_than</td><td>Greater-than comparison</td><td>5</td></tr>
- <tr><td>>=</td>      <td>greater_than_eq</td><td>Greater-than-or-equals comparison</td><td>5</td></tr>
- <tr><td>==</td>      <td>equals</td><td>Equality check</td><td>5</td></tr>
- <tr><td>!=</td>      <td>equals</td><td>Inequality check</td><td>5</td></tr>
- <tr><td>and</td>      <td>and</td><td>Logical and</td><td>4</td></tr>
- <tr><td>or</td>      <td>and</td><td>Logical or</td><td>4</td></tr>
+ <tr><td>-></td>      <td>(none)</td><td>Right-apply</td><td>5</td></tr>
+ <tr><td><</td>      <td>less_than</td><td>Less-than comparison</td><td>4</td></tr>
+ <tr><td><=</td>      <td>less_than_eq</td><td>Less-than-or-equals comparison</td><td>4</td></tr>
+ <tr><td>></td>      <td>greater_than</td><td>Greater-than comparison</td><td>4</td></tr>
+ <tr><td>>=</td>      <td>greater_than_eq</td><td>Greater-than-or-equals comparison</td><td>4</td></tr>
+ <tr><td>==</td>      <td>equals</td><td>Equality check</td><td>4</td></tr>
+ <tr><td>!=</td>      <td>equals</td><td>Inequality check</td><td>4</td></tr>
+ <tr><td>and</td>      <td>and</td><td>Logical and</td><td>3</td></tr>
+ <tr><td>or</td>      <td>and</td><td>Logical or</td><td>2</td></tr>
  <tr><td>+=</td>      <td>add</td><td>Rebinding add</td><td>2</td></tr>
  <tr><td>-=</td>      <td>sub</td><td>Rebinding sub</td><td>2</td></tr>
  <tr><td>*=</td>      <td>mult</td><td>Rebinding mult</td><td>2</td></tr>

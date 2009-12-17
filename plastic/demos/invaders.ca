@@ -47,7 +47,7 @@ end
 -- Move bullets
 bullet_speed = 200.0
 for bullet in @bullets
-    bullet = bullet :: Bullet
+    bullet = bullet -> Bullet
     bullet = [ [bullet.loc.x bullet.loc.y - bullet_speed * time_delta ]]
 end
 

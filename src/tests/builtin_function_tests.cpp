@@ -207,7 +207,7 @@ void test_vectorized_funcs_with_points()
     
     Term* point_t = branch.eval("type Point {number x, number y}");
 
-    Term* a = branch.eval("a = [1 0] :: Point");
+    Term* a = branch.eval("a = [1 0] -> Point");
 
     test_assert(a->type == point_t);
 

@@ -993,7 +993,6 @@ const int HIGHEST_INFIX_PRECEDENCE = 8;
 int get_infix_precedence(int match)
 {
     switch(match) {
-        case tokenizer::DOUBLE_COLON:
         case tokenizer::TWO_DOTS:
             return 8;
         case tokenizer::STAR:
@@ -1004,23 +1003,23 @@ int get_infix_precedence(int match)
         case tokenizer::PLUS:
         case tokenizer::MINUS:
             return 6;
+        case tokenizer::RIGHT_ARROW:
+            return 5;
         case tokenizer::LTHAN:
         case tokenizer::LTHANEQ:
         case tokenizer::GTHAN:
         case tokenizer::GTHANEQ:
         case tokenizer::DOUBLE_EQUALS:
         case tokenizer::NOT_EQUALS:
-            return 5;
+            return 4;
         case tokenizer::AND:
         case tokenizer::OR:
-            return 4;
+            return 3;
         case tokenizer::PLUS_EQUALS:
         case tokenizer::MINUS_EQUALS:
         case tokenizer::STAR_EQUALS:
         case tokenizer::SLASH_EQUALS:
             return 2;
-        case tokenizer::RIGHT_ARROW:
-            return 1;
         case tokenizer::COLON_EQUALS:
         case tokenizer::LEFT_ARROW:
             return 0;
@@ -1050,7 +1049,6 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "*=") return "mult";
     else if (infix == "/=") return "div";
     else if (infix == "!=") return "not_equals";
-    else if (infix == "::") return "annotate_type";
     else if (infix == "<-") return "feedback";
     else if (infix == "..") return "range";
     else return "#unrecognized";

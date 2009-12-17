@@ -56,10 +56,10 @@ void test_get_relative_name()
     test_equals(get_relative_name(branch, b), "ns.B");
 
     // This code once had a bug:
-    Term* c = branch.eval("[1 1] :: Point");
-    test_assert(c->function->name == "annotate_type");
-    test_assert(c->input(1)->name == "Point");
-    test_equals(get_relative_name(c, c->input(1)), "Point");
+    Term* c = branch.eval("[1 1] -> Point");
+    test_assert(c->function->name == "cast");
+    test_assert(c->type->name == "Point");
+    test_equals(get_relative_name(c, c->type), "Point");
 }
 
 void test_get_relative_name_from_hidden_branch()

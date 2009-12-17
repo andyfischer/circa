@@ -1,7 +1,7 @@
 
 background(#fff)
 
-axis_center = [200 200] :: Point
+axis_center = [200 200] -> Point
 
 
 def map_point(number x) :: Point

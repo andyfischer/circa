@@ -1,6 +1,6 @@
 background(#000)
 
-drift = [time time]::Point
+drift = [time time]->Point
 
 -- Draw a background full of stars
 num_stars = 700

@@ -83,7 +83,7 @@ ship.loc = wrap_around(ship.loc)
 
 -- Press space to shoot a bullet
 if key_pressed(SPACE)
-    bullets.append([0, ship.loc [cos(ship.facing) sin(ship.facing)]] :: Bullet)
+    bullets.append([0, ship.loc [cos(ship.facing) sin(ship.facing)]] -> Bullet)
 end
 
 -- Move bullets
@@ -98,7 +98,7 @@ bullets = map(move_bullet, bullets)
 -- Remove old bullets
 bullet_max_lifespan = 1.8
 for bullet in @bullets
-    bullet = bullet :: Bullet
+    bullet = bullet -> Bullet
     if bullet.lifespan >= bullet_max_lifespan
         discard
     end
@@ -106,7 +106,7 @@ end
 
 -- Draw bullets
 for bullet in bullets
-    bullet = bullet :: Bullet
+    bullet = bullet -> Bullet
     points = [bullet.loc + [-1 -1] * bullet_width,
                   bullet.loc + [1 -1] * bullet_width,
                   bullet.loc + [1 1] * bullet_width,
@@ -161,7 +161,7 @@ end
 
 -- move asteroids
 for asteroid in @asteroids
-    asteroid = asteroid :: Asteroid
+    asteroid = asteroid -> Asteroid
     asteroid.location = asteroid.location + asteroid.vel * time_delta
     asteroid.rotation = asteroid.rotation + asteroid.rotation_vel * time_delta
     asteroid.location = wrap_around(asteroid.location)
@@ -170,7 +170,7 @@ end
 
 -- draw asteroids
 for asteroid in asteroids
-    asteroid = asteroid :: Asteroid
+    asteroid = asteroid -> Asteroid
 
     def pos_edge(Point p) :: Point
         p = rotate_point(p, asteroid.rotation)
@@ -187,11 +187,11 @@ end
 spawned = []
 
 for asteroid in @asteroids
-    asteroid = asteroid :: Asteroid
+    asteroid = asteroid -> Asteroid
     collides = false
 
     for bullet in @bullets
-        bullet = bullet :: Bullet
+        bullet = bullet -> Bullet
         if point_distance(asteroid.location, bullet.loc) < asteroid.size
             collides = true
             discard
