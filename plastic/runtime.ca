@@ -63,50 +63,42 @@ KEY_B = 0
 
 -- Text rendering functions
 type TTF_Font {} -- native
-namespace text
+namespace text begin
     type RenderedText { int texid, number width, number height, Color color, string text }
     def load_font(state TTF_Font, string filename, int size) -> TTF_Font:
         "Load the given font"
     def render_text(state RenderedText, TTF_Font font, string text, Color color) -> RenderedText:
         "Render text and return a sprite that can be drawn with draw_rendered_text. This is useful if you want to know the width or height of the rendered text before drawing it."
-    def draw_rendered_text(RenderedText, Point loc)
+    def draw_rendered_text(RenderedText, Point loc):
         "Draw a sprite created with render_text."
-    end
 end
 
-def draw_text(TTF_Font font, string str, Color color, Point location)
+def draw_text(TTF_Font font, string str, Color color, Point location):
     "Render and draw a string."
     sprite = text.render_text(font, str, color)
     text.draw_rendered_text(sprite, location)
-end
 
-def draw_text_centered(TTF_Font font, string str, Color color, Point location)
+def draw_text_centered(TTF_Font font, string str, Color color, Point location):
     sprite = text.render_text(font, str, color)
     text.draw_rendered_text(sprite, [location.x - sprite.width/2 location.y])
-end
 
 -- GL functions
-def background(Color)
+def background(Color):
     "Fill the screen with the given color."
-end
-namespace gl
-    def triangles(List, Color)
+
+namespace gl begin
+    def triangles(List, Color):
         "Render a list of points as triangles."
-    end
-    def line_strip(List, Color)
+    def line_strip(List, Color):
         "Render a list of points as a line strip."
-    end
-    def line_loop(List, Color)
+    def line_loop(List, Color):
         "Render a list of points as a line loop."
-    end
-    def points(List, Color)
+    def points(List, Color):
         "Render a list of points."
-    end
-    def circle(Point loc, number radius, Color)
+    def circle(Point loc, number radius, Color):
         "Render a circle."
-    end
-    def load_program(string vertFile, string fragFile) -> int end
-    def _use_program(int prog_id) end
+    def load_program(string vertFile, string fragFile) -> int {}
+    def _use_program(int prog_id) {}
     def use_program(string vertexFilename, string fragFilename)
         "Load and enable a GLSL shader."
         state int prog_id = 0
@@ -115,11 +107,11 @@ namespace gl
         end
         _use_program(prog_id)
     end
-    def clear_program() end
-    def set_uniform(string name, any value) end
+    def clear_program() {}
+    def set_uniform(string name, any value) {}
 end
 
-namespace image
+namespace image begin
     type Image {
         string filename
         int texid
@@ -127,122 +119,103 @@ namespace image
         int height
     }
 
-    def _load(string filename) -> Image end
+    def _load(string filename) -> Image {}
 
-    def load(string filename) -> Image
+    def load(string filename) -> Image:
         state Image existing
         if file_changed(filename)
             existing = _load(filename)
         end
         return existing
-    end
-    def draw(Image image, Point destination) end
-    def draw_clip_p(Image image, Rect clip, Point destination) end
-    def draw_clip_resized(Image image, Rect clip, Rect destination) end
+    def draw(Image image, Point destination) {}
+    def draw_clip_p(Image image, Rect clip, Point destination) {}
+    def draw_clip_resized(Image image, Rect clip, Rect destination) {}
 
     draw_clip = [&draw_clip_p &draw_clip_resized] -> OverloadedFunction
 end
 
-def load_texture(state int, string) -> int
-end
+def load_texture(state int, string) -> int {}
 
-def draw_image(state int texid, string filename, number x, number y, number width, number height)
+def draw_image(state int texid, string filename, number x, number y, number width, number height):
     "Draw an image."
-end
 
-def load_mesh(string filename) -> int
+def load_mesh(string filename) -> int:
     "(experimental) Load a 3d mesh from an .obj file."
-end
-def draw_mesh(int mesh_id, int tex_id, Point translation, Point scale, Point rotation)
+def draw_mesh(int mesh_id, int tex_id, Point translation, Point scale, Point rotation):
     "(experimental) Draw a 3d mesh to the screen."
-end
 
 -- Math utility functions
 
 -- polar: polar to cartesian
-def polar(number angle) -> Point
+def polar(number angle) -> Point:
     return [cos(angle) sin(angle)]
-end
 
 -- magnitude of a 2d vector
-def magnitude(Point point) -> number
+def magnitude(Point point) -> number:
     "Returns the magnitude, or the distance from [0,0] to this point."
     return sqrt(sqr(point.x) + sqr(point.y))
-end
 
-def point_distance(Point a, Point b) -> number
+def point_distance(Point a, Point b) -> number:
     "Returns the distance between a and b."
     return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
-end
 
-def rotate_point(Point p, number rotation) -> Point
+def rotate_point(Point p, number rotation) -> Point:
     "Rotate p around [0,0] by the given angle. Angles are specified in the range 0..1."
     return [p.x*cos(rotation) - p.y*sin(rotation),
         p.x*sin(rotation)+p.y*cos(rotation)]
-end
 
-def random_location() -> Point
+def random_location() -> Point:
     "Return a random point that is inside the boundaries of the window."
     return [rand() * window.width, rand() * window.height]
-end
 
-def random_norm_vector() -> Point
+def random_norm_vector() -> Point:
     "Return a random normalized vector"
     angle = rand()
     return [cos(angle) sin(angle)]
-end
 
-def norm(Point v) -> Point
+def norm(Point v) -> Point:
     "Returns v normalized to be along the unit circle."
     m = magnitude(v)
     return [v.x / m, v.y / m]
-end
 
-def perpendicular(Point v) -> Point
+def perpendicular(Point v) -> Point:
     "Returns a vector that is perpendicular to v, rotated clockwise."
     return [v.y -v.x]
-end
 
-def expand_rect(Point center, number width, number height) -> Rect
+def expand_rect(Point center, number width, number height) -> Rect:
     "Return a rectangle with the given center, width, and height."
     return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
-end
 
-def to_rect(Point topLeft, Point size) -> Rect
+def to_rect(Point topLeft, Point size) -> Rect:
     return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
-end
 
-def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool
+def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool:
     "Return whether the two rectangles intersect."
     intersects_on_x = (rect_a.x2 > rect_b.x1) and (rect_b.x2 > rect_a.x1)
     intersects_on_y = (rect_a.y2 > rect_b.y1) and (rect_b.y2 > rect_a.y1)
     return intersects_on_x and intersects_on_y
-end
 
-def random_color() -> Color
+def random_color() -> Color:
     return [rand() rand() rand() 1.0]
-end
 
 -- Drawing utils
 
-def draw_box(Rect box, Color color)
+def draw_box(Rect box, Color color):
     "Draw a filled rectangle."
     nw = [box.x1 box.y1]
     ne = [box.x2 box.y1]
     sw = [box.x1 box.y2]
     se = [box.x2 box.y2]
     gl.triangles([nw ne se se sw nw] color)
-end
 
-def draw_thick_line(Point a, Point b, number width, Color color)
+def draw_thick_line(Point a, Point b, number width, Color color):
     "Draw a thick line with the given thickness."
     perp = perpendicular(norm(a - b)) * width
     gl.triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
-end
 
 -- Stateful functions
 
-def approach(number target, number step) -> number
+def approach(number target, number step) -> number:
     "Stateful function, returns a result which approaches 'target'. Each frame, this function will change at most by 'step'"
     state current = target
     if target > current
@@ -251,15 +224,13 @@ def approach(number target, number step) -> number
         current -= min(step, current - target)
     end
     return current
-end
 
-def alternate_over_time(number period) -> bool
+def alternate_over_time(number period) -> bool:
     "Stateful function, alternates between true and false according to the given period."
     state number time_started = time
     return round((time - time_started) / period) % 2 == 0
-end
 
-def toggle(bool tog) -> bool
+def toggle(bool tog) -> bool:
     <<<
     Stateful function, returns a boolean status. Every frame the function is called
     with (true), the status flips. Starts out false.
@@ -267,9 +238,8 @@ def toggle(bool tog) -> bool
     state bool on = false
     if tog; on = not(on); end
     return on
-end
 
-def linear_fadein(number total_time) -> number
+def linear_fadein(number total_time) -> number:
     <<<
     Stateful function, starts out at 0 and increases linearly. After 'total_time'
     has passed, it will return 1.0 and stay there.
@@ -277,15 +247,13 @@ def linear_fadein(number total_time) -> number
     state number time_started = time
     elapsed = (time - time_started) / total_time
     return min(elapsed, 1.0)
-end
 
-def elapsed() -> number
+def elapsed() -> number:
     "Stateful function, returns the number of seconds that has passed since this function was first called"
     state number time_started = time
     return time - time_started
-end
 
-def draggable_rect(Point initial_location, Point size) -> Point
+def draggable_rect(Point initial_location, Point size) -> Point:
     state Point location = initial_location
     rect = [location.x, location.y, location.x+size.x, location.y+size.y]
     state currently_dragging = false
@@ -300,7 +268,6 @@ def draggable_rect(Point initial_location, Point size) -> Point
         mouse_offset = location - mouse
     end
     return location
-end
 
 ui_font_medium = text.load_font("assets/sv_basic_manual/SVBasicManual.ttf", 16)
 
@@ -326,7 +293,7 @@ fps = fps_counter.lastRecoredFps
 
 include('stdlib/text_input.ca')
 
-namespace tweak
+namespace tweak begin
     def button(Ref r, Point loc, string name)
         "Draw a button which displays the value of 'r', allowing the user to tweak that value using mouse input."
         str = concat(name ' = ' r.to_string())
@@ -368,7 +335,7 @@ namespace tweak
 end
 
 -- Support for postprocess operations using FBOs
-namespace postprocess
+namespace postprocess begin
     type Surface {
         int tex_id
         int fbo_id
@@ -376,14 +343,14 @@ namespace postprocess
         int height
     }
 
-    def make_surface(state Surface _state, int width, int height) -> Surface end
-    def bind_surface(Surface surface) end
-    def draw_surface(Surface source) end
-    def copy_surface(Surface source, Surface dest) end
+    def make_surface(state Surface _state, int width, int height) -> Surface {}
+    def bind_surface(Surface surface) {}
+    def draw_surface(Surface source) {}
+    def copy_surface(Surface source, Surface dest) {}
 
     main_surface = [0 0 window.width window.height] -> Surface
 
-    def bind_main_surface() bind_surface(main_surface) end
+    def bind_main_surface(): bind_surface(main_surface)
 end
 
 -- Load the user's script
