@@ -6,12 +6,12 @@
 #include <SDL_ttf.h>
 
 #include "gl_common.h"
-#include "sdl_utils.h"
-#include "ttf.h"
+#include "image.h"
+#include "text.h"
 
 using namespace circa;
 
-namespace ttf {
+namespace text {
 
 SDL_Color unpack_sdl_color(Term* colorTerm)
 {
@@ -158,4 +158,4 @@ void setup(Branch& branch)
     install_function(text_ns["draw_rendered_text"], draw_rendered_text);
 }
 
-} // namespace ttf
+} // namespace text

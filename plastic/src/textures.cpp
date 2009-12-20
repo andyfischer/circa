@@ -9,7 +9,7 @@
 #include <circa.h>
 
 #include "gl_common.h"
-#include "sdl_utils.h"
+#include "image.h"
 #include "textures.h"
 
 using namespace circa;

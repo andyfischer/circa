@@ -3,7 +3,7 @@
 #include "plastic.h"
 
 #include "ide.h"
-#include "ttf.h"
+#include "text.h"
 
 using namespace circa;
 
@@ -87,7 +87,7 @@ bool initialize_builtin_functions()
     mesh::setup(runtime_branch());
     gl_shapes::setup(runtime_branch());
     textures::setup(runtime_branch());
-    ttf::setup(runtime_branch());
+    text::setup(runtime_branch());
 
     if (has_static_errors(runtime_branch())) {
         print_static_errors_formatted(runtime_branch(), std::cout);

@@ -24,9 +24,9 @@ window_size = [window.width window.height]->Point
 
 -- ide - functions for controlling IDE behavior
 namespace ide
-    def quit() end
-    def reset_state() end
-    def reload() end
+    def quit(): "Tell the IDE to shutdown"
+    def reset_state(): "Reset state for the current script"
+    def reload(): "Reload the current script immediately"
 end
 
 -- Input
