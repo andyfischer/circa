@@ -1677,8 +1677,6 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 
 Term* plain_branch(Branch& branch, TokenStream& tokens)
 {
-    //int startPosition = tokens.getPosition();
-
     Term* result = create_branch(branch).owningTerm;
 
     consume_branch(as_branch(result), tokens);
@@ -1693,7 +1691,8 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     if (!tokens.nextIs(IDENTIFIER))
-        return compile_error_for_line(branch, tokens, startPosition, "Expected identifier after 'namespace'");
+        return compile_error_for_line(branch, tokens, startPosition,
+            "Expected identifier after 'namespace'");
 
     std::string name = tokens.consume(IDENTIFIER);
     Term* result = apply(branch, BRANCH_FUNC, RefList(), name);

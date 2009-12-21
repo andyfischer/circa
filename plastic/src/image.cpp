@@ -102,15 +102,11 @@ bool has_indexed_color(SDL_Surface* surface)
     return surface->format->BitsPerPixel == 8;
 }
 
-int get_color_index(SDL_Surface* surface, int x, int y)
+unsigned int get_color_index(SDL_Surface* surface, int x, int y)
 {
     Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch
         + x * surface->format->BytesPerPixel;
     return *p;
-}
-
-SDL_Color get_color_from_index(SDL_Surface* surface, int index) {
-    return surface->format->palette->colors[index];
 }
 
 SDL_Surface* convert_indexed_color_to_true_color(SDL_Surface* surface)
@@ -124,8 +120,8 @@ SDL_Surface* convert_indexed_color_to_true_color(SDL_Surface* surface)
         Uint8 *p = (Uint8*) replacement->pixels
             + y * replacement->pitch + x * 4;
 
-        int index = get_color_index(surface, x, y);
-        SDL_Color color = get_color_from_index(surface, index);
+        unsigned int index = get_color_index(surface, x, y);
+        SDL_Color color = surface->format->palette->colors[index];
 
         if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
             p[0] = color.r;

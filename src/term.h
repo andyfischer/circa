@@ -12,6 +12,7 @@
 namespace circa {
 
 const int TERM_FLAG_ERRORED = 0x1;
+const int TERM_FLAG_SHARED_VALUE = 0x2;
 
 struct List;
 
