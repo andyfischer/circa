@@ -1389,8 +1389,6 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
 
 Term* subscripted_atom(Branch& branch, TokenStream& tokens)
 {
-    //int startPosition = tokens.getPosition();
-
     Term* result = atom(branch, tokens);
 
     bool finished = false;
@@ -1409,6 +1407,38 @@ Term* subscripted_atom(Branch& branch, TokenStream& tokens)
         change_function(result, GET_FIELD_FUNC);
 
     return result;
+}
+
+Term* qualified_identifier(Branch& branch, TokenStream& tokens)
+{
+    if (!tokens.nextIs(IDENTIFIER))
+        return NULL;
+
+    Term* head = NULL;
+
+    std::stringstream fullName;
+
+    while (!tokens.finished()) {
+        std::string name = tokens.consume(IDENTIFIER);
+        fullName << name;
+
+        if (head == NULL)
+            head = branch[name];
+        else
+            head = as_branch(head)[name];
+
+        if (head == NULL)
+            throw std::runtime_error("Name not found: " + fullName.str());
+
+        if (tokens.nextIs(COLON)) {
+            tokens.consume(COLON);
+            fullName << ":";
+        } else {
+            break;
+        }
+    }
+
+    return head;
 }
 
 Term* atom(Branch& branch, TokenStream& tokens)

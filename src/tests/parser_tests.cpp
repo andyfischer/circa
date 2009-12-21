@@ -656,6 +656,41 @@ void test_significant_indentation()
     test_assert(branch["b"]->asInt() == 5);
 }
 
+void test_qualified_identifier()
+{
+    Branch branch;
+    Term* apple = branch.compile("apple = 1");
+
+    test_assert(apple == parser::compile(&branch, parser::qualified_identifier, "apple"));
+
+    branch.compile("namespace fruits { pear = 2 }");
+
+    Term* pear = parser::compile(&branch, parser::qualified_identifier, "fruits:pear");
+    test_assert(pear->asInt() == 2);
+
+    branch.compile("namespace vegetables { namespace legumes { pea = 3 }}");
+
+    Term* pea = parser::compile(&branch, parser::qualified_identifier,
+            "vegetables:legumes:pea");
+    test_assert(pea->asInt() == 3);
+
+#if 0
+    // test unknown identifier
+    Term* unknown1 = parser::compile(&branch, parser::qualified_identifier, "artichoke");
+    test_assert(unknown1->function == UNKNOWN_IDENTIFIER_FUNC);
+
+    // unknown identifier in existing namespace
+    Term* unknown2 = parser::compile(&branch, parser::qualified_identifier, "vegetables:tomato");
+    test_assert(unknown2->function == UNKNOWN_IDENTIFIER_FUNC);
+    test_equals(get_relative_name(branch, unknown2), "vegetables:tomato");
+
+    // unknown identifier in unknown namespace
+    Term* unknown3 = parser::compile(&branch, parser::qualified_identifier, "grains:barley");
+    test_assert(unknown2->function == UNKNOWN_IDENTIFIER_FUNC);
+    test_equals(get_relative_name(branch, unknown3), "grains:barley");
+#endif
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -695,6 +730,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_lexpr);
     REGISTER_TEST_CASE(parser_tests::test_whitespace_after_statement);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation);
+    REGISTER_TEST_CASE(parser_tests::test_qualified_identifier);
 }
 
 } // namespace parser_tests

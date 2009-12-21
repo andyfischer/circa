@@ -44,6 +44,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 Term* unary_expression(Branch& branch, TokenStream& tokens);
 Term* function_call(Branch& branch, Term* function, RefList const& inputs);
 Term* subscripted_atom(Branch& branch, TokenStream& tokens);
+Term* qualified_identifier(Branch& branch, TokenStream& tokens);
 Term* atom(Branch& branch, TokenStream& tokens);
 Term* literal_integer(Branch& branch, TokenStream& tokens);
 Term* literal_hex(Branch& branch, TokenStream& tokens);
