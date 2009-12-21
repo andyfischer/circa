@@ -1,5 +1,5 @@
 
-class EnvironmentSet():
+class EnvironmentSet(object):
     """
     This class wraps around a set of Environments. You can make normal
     Environment calls on it, and each call will be dispatched to each
