@@ -14,6 +14,12 @@ struct TokenStream
     tokenizer::TokenList tokens;
     unsigned int _position;
 
+    TokenStream()
+      : _position(0)
+    {
+
+    }
+
     TokenStream(tokenizer::TokenList const& _tokens)
       : tokens(_tokens), _position(0)
     {
@@ -28,7 +34,6 @@ struct TokenStream
     tokenizer::Token operator[](int index) {
         return tokens[index];
     }
-
 
     void reset(std::string const& input)
     {

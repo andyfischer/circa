@@ -42,9 +42,8 @@ Term* discard_statement(Branch& branch, TokenStream& tokens);
 Term* infix_expression(Branch& branch, TokenStream& tokens);
 Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedence);
 Term* unary_expression(Branch& branch, TokenStream& tokens);
-Term* function_call(Branch& branch, Term* function, RefList const& inputs);
+Term* function_call(Branch& branch, Term* function, TokenStream& tokens);
 Term* subscripted_atom(Branch& branch, TokenStream& tokens);
-Term* qualified_identifier(Branch& branch, TokenStream& tokens);
 Term* atom(Branch& branch, TokenStream& tokens);
 Term* literal_integer(Branch& branch, TokenStream& tokens);
 Term* literal_hex(Branch& branch, TokenStream& tokens);
@@ -55,6 +54,7 @@ Term* literal_color(Branch& branch, TokenStream& tokens);
 Term* literal_list(Branch& branch, TokenStream& tokens);
 Term* plain_branch(Branch& branch, TokenStream& tokens);
 Term* namespace_block(Branch& branch, TokenStream& tokens);
+Term* qualified_identifier(Branch& branch, TokenStream& tokens);
 Term* identifier_or_lexpr(Branch& branch, TokenStream& tokens);
 
 Term* constant_fold_lexpr(Term* call);
@@ -62,6 +62,8 @@ Term* constant_fold_lexpr(Term* call);
 // Helper functions:
 void consume_branch(Branch& branch, TokenStream& tokens);
 void consume_branch_with_significant_indentation(Branch& branch, TokenStream& tokens);
+std::string qualified_identifier_str(TokenStream& tokens);
+bool matches_qualified_identifier(TokenStream& tokens);
 
 } // namespace parser
 } // namespace circa

@@ -658,37 +658,23 @@ void test_significant_indentation()
 
 void test_qualified_identifier()
 {
-    Branch branch;
-    Term* apple = branch.compile("apple = 1");
+    TokenStream tokens;
 
-    test_assert(apple == parser::compile(&branch, parser::qualified_identifier, "apple"));
+    tokens.reset("apple");
+    test_equals(parser::qualified_identifier_str(tokens), "apple");
+    tokens.reset("apple:pear");
+    test_equals(parser::qualified_identifier_str(tokens), "apple:pear");
+    tokens.reset("apple:pear:banana");
+    test_equals(parser::qualified_identifier_str(tokens), "apple:pear:banana");
 
-    branch.compile("namespace fruits { pear = 2 }");
+    tokens.reset("apple:");
+    test_equals(parser::qualified_identifier_str(tokens), "apple");
+    test_assert(tokens.nextIs(tokenizer::COLON));
 
-    Term* pear = parser::compile(&branch, parser::qualified_identifier, "fruits:pear");
-    test_assert(pear->asInt() == 2);
-
-    branch.compile("namespace vegetables { namespace legumes { pea = 3 }}");
-
-    Term* pea = parser::compile(&branch, parser::qualified_identifier,
-            "vegetables:legumes:pea");
-    test_assert(pea->asInt() == 3);
-
-#if 0
-    // test unknown identifier
-    Term* unknown1 = parser::compile(&branch, parser::qualified_identifier, "artichoke");
-    test_assert(unknown1->function == UNKNOWN_IDENTIFIER_FUNC);
-
-    // unknown identifier in existing namespace
-    Term* unknown2 = parser::compile(&branch, parser::qualified_identifier, "vegetables:tomato");
-    test_assert(unknown2->function == UNKNOWN_IDENTIFIER_FUNC);
-    test_equals(get_relative_name(branch, unknown2), "vegetables:tomato");
-
-    // unknown identifier in unknown namespace
-    Term* unknown3 = parser::compile(&branch, parser::qualified_identifier, "grains:barley");
-    test_assert(unknown2->function == UNKNOWN_IDENTIFIER_FUNC);
-    test_equals(get_relative_name(branch, unknown3), "grains:barley");
-#endif
+    tokens.reset("");
+    test_equals(parser::qualified_identifier_str(tokens), "");
+    tokens.reset("1");
+    test_equals(parser::qualified_identifier_str(tokens), "");
 }
 
 void register_tests()

@@ -89,34 +89,6 @@ struct ListSyntaxHints {
     std::vector<Input> mPending;
 };
 
-// Consumes a list of terms that are separated by either spaces, commas, semicolons,
-// or newlines. The result terms are appened to list_out. The syntax hints are appended
-// to hints_out. (you should apply these syntax hints to the resulting comprehension
-// term)
-//
-// This is used to parse the syntax of function arguments, member function arguments,
-// and literal lists.
-void consume_list_arguments(Branch& branch, TokenStream& tokens,
-        RefList& list_out, ListSyntaxHints& hints_out)
-{
-    int index = 0;
-    while (!tokens.nextIs(RPAREN) && !tokens.nextIs(RBRACKET) && !tokens.finished()) {
-
-        hints_out.set(index, "preWhitespace", possible_whitespace_or_newline(tokens));
-        Term* term = infix_expression(branch, tokens);
-        hints_out.set(index, "postWhitespace", possible_whitespace_or_newline(tokens));
-
-        list_out.append(term);
-
-        if (tokens.nextIs(COMMA))
-            hints_out.append(index, "postWhitespace", tokens.consume());
-        else if (tokens.nextIs(SEMICOLON))
-            hints_out.append(index, "postWhitespace", tokens.consume());
-
-        index++;
-    }
-}
-
 void consume_branch(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
@@ -1282,22 +1254,54 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
     }
 }
 
-Term* function_call(Branch& branch, Term* function, RefList const& inputs)
+Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(LPAREN);
+
+    RefList arguments;
+    ListSyntaxHints inputHints;
+
+    // Parse function arguments
+    int index = 0;
+    while (!tokens.nextIs(RPAREN) && !tokens.finished()) {
+
+        inputHints.set(index, "preWhitespace", possible_whitespace_or_newline(tokens));
+        Term* term = infix_expression(branch, tokens);
+        inputHints.set(index, "postWhitespace", possible_whitespace_or_newline(tokens));
+
+        arguments.append(term);
+
+        if (tokens.nextIs(COMMA) || tokens.nextIs(SEMICOLON))
+            inputHints.append(index, "postWhitespace", tokens.consume());
+
+        index++;
+    }
+    
+    //consume_list_arguments(branch, tokens, arguments, inputHints);
+
+    if (!tokens.nextIs(RPAREN))
+        return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
+
+    tokens.consume(RPAREN);
+    
     std::string originalName = lexpr_get_original_string(function);
     function = constant_fold_lexpr(function);
 
     // Check if 'function' is a lexpr. If so then parse this as a member function call.
     if (function->function == LEXPR_FUNC)
-        return member_function_call(branch, function, inputs, originalName);
+        return member_function_call(branch, function, arguments, originalName);
 
     if (!is_callable(function))
         function = UNKNOWN_FUNCTION;
    
-    Term* result = apply(branch, function, inputs);
+    Term* result = apply(branch, function, arguments);
 
     if (result->function->name != originalName)
         result->stringProp("syntaxHints:functionName") = originalName;
+
+    inputHints.apply(result);
 
     // Special case for include() function: expand the contents immediately.
     if (result->function == INCLUDE_FUNC && result->input(1)->asString() != "")
@@ -1361,22 +1365,7 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
     } else if (tokens.nextIs(LPAREN)) {
 
         // Function call
-        Term* function = head;
-
-        tokens.consume(LPAREN);
-
-        RefList inputs;
-        ListSyntaxHints inputHints;
-        consume_list_arguments(branch, tokens, inputs, inputHints);
-
-        if (!tokens.nextIs(RPAREN))
-            return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
-
-        tokens.consume(RPAREN);
-
-        Term* result = function_call(branch, function, inputs);
-        inputHints.apply(result);
-
+        Term* result = function_call(branch, head, tokens);
         finished = false;
         return result;
 
@@ -1409,36 +1398,14 @@ Term* subscripted_atom(Branch& branch, TokenStream& tokens)
     return result;
 }
 
-Term* qualified_identifier(Branch& branch, TokenStream& tokens)
+std::string qualified_identifier_str(TokenStream& tokens)
 {
-    if (!tokens.nextIs(IDENTIFIER))
-        return NULL;
-
-    Term* head = NULL;
-
-    std::stringstream fullName;
-
-    while (!tokens.finished()) {
-        std::string name = tokens.consume(IDENTIFIER);
-        fullName << name;
-
-        if (head == NULL)
-            head = branch[name];
-        else
-            head = as_branch(head)[name];
-
-        if (head == NULL)
-            throw std::runtime_error("Name not found: " + fullName.str());
-
-        if (tokens.nextIs(COLON)) {
-            tokens.consume(COLON);
-            fullName << ":";
-        } else {
-            break;
-        }
-    }
-
-    return head;
+    // this function is not very useful any more
+    if (tokens.nextIs(IDENTIFIER))
+        return tokens.consume(IDENTIFIER);
+    else if (tokens.nextIs(QUALIFIED_IDENTIFIER))
+        return tokens.consume(QUALIFIED_IDENTIFIER);
+    else return "";
 }
 
 Term* atom(Branch& branch, TokenStream& tokens)
@@ -1741,6 +1708,12 @@ Term* unknown_identifier(Branch& branch, std::string const& name)
     set_is_statement(term, false);
     term->stringProp("message") = name;
     return term;
+}
+
+Term* qualified_identifier(Branch& branch, TokenStream& tokens)
+{
+    std::string id = qualified_identifier_str(tokens);
+    return branch[id];
 }
 
 Term* identifier_or_lexpr(Branch& branch, TokenStream& tokens)

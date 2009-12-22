@@ -26,11 +26,12 @@ struct Token
 typedef std::vector<Token> TokenList;
 
 const int IDENTIFIER = 1;
-const int INTEGER = 2;
-const int HEX_INTEGER = 3;
-const int FLOAT_TOKEN = 4;
-const int STRING = 5;
-const int COLOR = 6;
+const int QUALIFIED_IDENTIFIER = 2;
+const int INTEGER = 3;
+const int HEX_INTEGER = 4;
+const int FLOAT_TOKEN = 5;
+const int STRING = 6;
+const int COLOR = 7;
 
 const int LPAREN = 10;
 const int RPAREN = 11;
