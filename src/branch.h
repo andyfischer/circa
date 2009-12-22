@@ -5,6 +5,7 @@
 
 #include "common_headers.h"
 
+#include "names.h"
 #include "ref_list.h"
 #include "term_namespace.h"
 
@@ -24,15 +25,15 @@ struct Branch
 
     int length() const;
 
-    // Returns true if there is a term with the given name
-    bool contains(std::string const& name) const;
-
     Term* get(int index) const;
     Term* operator[](int index) const { return get(index); }
 
     // Get a term from a name binding.
-    Term* get(std::string const& name) const { return names[name]; }
-    Term* operator[](std::string const& name) const { return get(name); }
+    inline Term* get(std::string const& name) const { return get_named(*this, name); }
+    inline Term* operator[](std::string const& name) const { return get_named(*this, name); }
+
+    // Returns true if there is a term with the given name
+    bool contains(std::string const& name) const;
 
     int getIndex(Term* term) const;
     int debugFindIndex(Term* term) const;
@@ -99,7 +100,7 @@ Branch& as_branch(Term* term);
 bool is_namespace(Term* term);
 
 std::string get_branch_source_filename(Branch& branch);
-Branch* get_outer_scope(Branch& branch);
+Branch* get_outer_scope(Branch const& branch);
 
 void duplicate_branch(Branch& source, Branch& dest);
 

@@ -60,11 +60,13 @@ bool Term::hasProperty(std::string const& name) const
 
 Term* Term::addProperty(std::string const& name, Term* type)
 {
-    if (hasProperty(name)) {
-        if (property(name)->type != type)
+    Term* existing = property(name);
+
+    if (existing != NULL) {
+        if (existing->type != type)
             throw std::runtime_error("Property "+name+" exists with different type");
 
-        return property(name);
+        return existing;
     }
 
     return create_value(properties, type, name);

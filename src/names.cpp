@@ -4,14 +4,16 @@
 
 namespace circa {
 
-Term* find_named(Branch& branch, std::string const& name)
+Term* find_named(Branch const& branch, std::string const& name)
 {
     assert(name != "");
     assert(name == "#out" || name[0] != '#'); // We shouldn't ever lookup hidden names
 
-    if (branch.contains(name))
-        return branch[name];
+    Term* result = get_named(branch, name);
+    if (result != NULL)
+        return result;
 
+    // Name not found in this branch, check the outer scope.
     Branch* outerScope = get_outer_scope(branch);
 
     if (outerScope == &branch)
@@ -23,42 +25,48 @@ Term* find_named(Branch& branch, std::string const& name)
         return find_named(*outerScope, name);
 }
 
-Term* get_named(Branch& branch, std::string const& name)
+Term* get_named(Branch const& branch, std::string const& name)
 {
-    if (branch.contains(name))
-        return branch[name];
-    else
-        return NULL;
-}
+    // First, check for an exact match
+    TermNamespace::const_iterator it;
+    it = branch.names.find(name);
+    if (it != branch.names.end())
+        return it->second;
+    
+    // 'name' can be a qualified name. Find the end of the first identifier, stopping
+    // at the : character or the end of string.
+    unsigned nameEnd = 0;
+    for (; name[nameEnd] != 0; nameEnd++) {
+        if (name[nameEnd] == ':')
+            break;
+    }
 
-Term* get_dot_separated_name(Branch& branch, std::string const& name)
-{
-    int dotPos = -1;
-    for (int i=0; name[i] != 0; i++) {
-        if (name[i] == '.') {
-            dotPos = i;
+    // Find this name in branch's namespace
+    Term* prefix = NULL;
+    for (it = branch.names.begin(); it != branch.names.end(); ++it) {
+        std::string const& namespaceName = it->first;
+        if (strncmp(name.c_str(), namespaceName.c_str(), nameEnd) == 0
+            && namespaceName.length() == nameEnd) {
+
+            // We found the part before the first :
+            prefix = it->second;
             break;
         }
     }
 
-    if (dotPos == -1)
-        return get_named(branch, name);
-
-    if (dotPos == 0)
+    // Give up if prefix not found
+    if (prefix == NULL)
         return NULL;
 
-    std::string head = name.substr(0, dotPos);
-    std::string tail = name.substr(dotPos+1, name.length());
-
-    if (!branch.contains(head))
+    // Give up if prefix does not refer to a branch
+    if (!is_branch(prefix))
         return NULL;
 
-    Term* headTerm = branch[head];
-
-    if (!is_branch(headTerm))
-        return NULL;
-
-    return get_dot_separated_name(as_branch(headTerm), tail);
+    // Recursively search inside prefix. Future: should do this without allocating
+    // a new string.
+    std::string suffix = name.substr(nameEnd+1, name.length());
+    
+    return get_named(as_branch(prefix), suffix);
 }
 
 Branch* get_parent_branch(Branch& branch)

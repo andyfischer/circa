@@ -17,7 +17,7 @@ int Branch::length() const
 
 bool Branch::contains(std::string const& name) const
 {
-    return names.contains(name);
+    return get(name) != NULL;
 }
 
 Term* Branch::get(int index) const
@@ -375,7 +375,7 @@ std::string get_branch_source_filename(Branch& branch)
         return as_string(attr);
 }
 
-Branch* get_outer_scope(Branch& branch)
+Branch* get_outer_scope(Branch const& branch)
 {
     if (branch.owningTerm == NULL)
         return NULL;

@@ -92,8 +92,10 @@ std::string pop_pending_rebind(Branch& branch)
 {
     std::string attrname = "#attr:comp-pending-rebind";
 
-    if (branch.contains(attrname)) {
-        std::string result = as_string(branch[attrname]);
+    Term* attrTerm = branch[attrname];
+
+    if (attrTerm != NULL) {
+        std::string result = as_string(attrTerm);
         branch.remove("#attr:comp-pending-rebind");
         return result;
     } else {

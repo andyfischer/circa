@@ -17,17 +17,6 @@ void test_find_named()
     test_assert(find_named(sub, "a") == a);
 }
 
-void test_get_dot_separated_name()
-{
-    Branch branch;
-    branch.eval("namespace a; b = 1; end");
-
-    test_assert(get_dot_separated_name(branch, "a.b") != NULL);
-    test_assert(get_dot_separated_name(branch, "a.b")->asInt() == 1);
-    test_assert(get_dot_separated_name(branch, "a.c") == NULL);
-    test_assert(get_dot_separated_name(branch, "b.a") == NULL);
-}
-
 void test_name_is_reachable_from()
 {
     Branch branch;
@@ -71,13 +60,27 @@ void test_get_relative_name_from_hidden_branch()
     test_equals(get_relative_name(branch, branch["a"]), "a");
 }
 
+void test_lookup_qualified_name()
+{
+    Branch branch;
+    Term* a = branch.eval("namespace a { b = 1 }");
+    Term* b = as_branch(a)["b"];
+
+    test_assert(b != NULL);
+    test_assert(branch["a:b"] == b);
+
+    Term* x = branch.eval("namespace x { namespace y { namespace z { w = 1 }}}");
+    Term* w = x->asBranch()["y"]->asBranch()["z"]->asBranch()["w"];
+    test_assert(branch["x:y:z:w"] == w);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(names_tests::test_find_named);
-    REGISTER_TEST_CASE(names_tests::test_get_dot_separated_name);
     REGISTER_TEST_CASE(names_tests::test_name_is_reachable_from);
     REGISTER_TEST_CASE(names_tests::test_get_relative_name);
     REGISTER_TEST_CASE(names_tests::test_get_relative_name_from_hidden_branch);
+    REGISTER_TEST_CASE(names_tests::test_lookup_qualified_name);
 }
 
 } // namespace names_tests

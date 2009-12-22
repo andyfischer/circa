@@ -84,6 +84,7 @@ struct TermNamespace
     iterator end() { return _map.end(); }
     const_iterator begin() const { return _map.begin(); }
     const_iterator end() const { return _map.end(); }
+    const_iterator find(std::string const& name) const { return _map.find(name); }
 
     void remapPointers(ReferenceMap const& remapping)
     {

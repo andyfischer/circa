@@ -4,13 +4,9 @@
 
 namespace circa {
 
-Term* find_named(Branch& branch, std::string const& name);
+Term* find_named(Branch const& branch, std::string const& name);
 
-Term* get_named(Branch& branch, std::string const& name);
-
-// Look for a dot separated name. Ie, with an input of a.b.c, we'll look for 'a',
-// then if found we'll look inside that for 'b', etc.
-Term* get_dot_separated_name(Branch& branch, std::string const& name);
+Term* get_named(Branch const& branch, std::string const& qualifiedName);
 
 bool name_is_reachable_from(Term* term, Branch& branch);
 
