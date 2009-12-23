@@ -42,7 +42,7 @@ void test_get_relative_name()
     Term* b = create_int(ns, 5, "B");
 
     test_assert(get_relative_name(ns, b) == "B");
-    test_equals(get_relative_name(branch, b), "ns.B");
+    test_equals(get_relative_name(branch, b), "ns:B");
 
     // This code once had a bug:
     Term* c = branch.eval("[1 1] -> Point");

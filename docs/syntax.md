@@ -143,7 +143,7 @@ We have the following infix operators:
  <th>Operator</th><th>Function name</th><th>Descrption</th><th>Precedence</th>
 </tr>
 <tr>
- <tr><td>.</td>      <td>get_field</td><td>Named field access, also used for namespace access</td><td>9</td></tr>
+ <tr><td>.</td>      <td>(multiple)</td><td>Named field access or member function call</td><td>9</td></tr>
  <tr><td>::</td>      <td>annotate_type</td><td>Specifies a value's type</td><td>8</td></tr>
  <tr><td>..</td>      <td>range</td><td>Range of integers</td><td>8</td></tr>
  <tr><td>*</td>      <td>mult</td><td>Multiplication (overloaded)</td><td>7</td></tr>
@@ -393,6 +393,6 @@ Example:
         end
     end
 
-To access something inside a namespace, use a dot-seperated identifier:
+To access something inside a namespace, use a colon-seperated identifier:
 
-    contents = web.get_page(url)
+    contents = web:get_page(url)

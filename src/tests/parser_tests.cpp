@@ -479,27 +479,19 @@ void test_namespace()
     test_assert(as_branch(ns).contains("a"));
     test_assert(as_branch(ns).contains("b"));
 
-    Term* a = branch.eval("ns.a");
+    Term* a = branch.eval("ns:a");
     test_assert(a->asInt() == 1);
 
     branch.clear();
     ns = branch.eval("namespace ns; def myfunc(int a) -> int; return a+1; end; end");
-    Term* c = branch.eval("c = ns.myfunc(4)");
+    Term* c = branch.eval("c = ns:myfunc(4)");
     test_assert(branch);
     test_assert(c->asInt() == 5);
 
     branch.clear();
-    Term* ns1 = branch.eval("namespace ns1; namespace ns2; x = 12; end; end");
+    branch.eval("namespace ns1; namespace ns2; x = 12; end; end");
 
-    // Specific test of constant_fold_lexpr
-    Term* gf = branch.eval("hi = get_field(ns1, 'ns2', 'x')");
-    change_function(gf, LEXPR_FUNC);
-    test_assert(gf->input(0) == ns1);
-    gf = parser::constant_fold_lexpr(gf);
-    test_assert(gf->input(0) != ns1);
-    test_assert(gf == ns1->asBranch()["ns2"]->asBranch()["x"]);
-
-    Term* x = branch.eval("ns1.ns2.x");
+    Term* x = branch.eval("ns1:ns2:x");
     test_assert(branch);
     test_assert(x->asInt() == 12);
 }
@@ -556,33 +548,6 @@ void test_subscripted_atom()
 
     branch.eval("a = 1");
     parser::compile(&branch, parser::subscripted_atom, "a.b.c");
-}
-
-void test_lexpr()
-{
-    Branch branch;
-    Term* a = branch.eval("a = 1");
-    Term* ns = branch.eval("namespace ns b = 1 end");
-
-    Term* result = parser::compile(&branch, parser::identifier_or_lexpr, "a");
-    test_assert(result == a);
-
-    result = parser::compile(&branch, parser::identifier_or_lexpr, "ns.b");
-    test_assert(result->function == LEXPR_FUNC);
-    test_assert(result->input(0) == ns);
-    test_assert(result->input(1)->asString() == "b");
-
-    result = parser::constant_fold_lexpr(result);
-    test_assert(is_value(result));
-    test_assert(result == ns->asBranch()["b"]);
-
-    result = parser::compile(&branch, parser::identifier_or_lexpr, "xxx.b");
-    test_assert(result->function == UNKNOWN_IDENTIFIER_FUNC);
-    test_assert(result->name == "xxx.b");
-
-    result = parser::compile(&branch, parser::identifier_or_lexpr, "xxx.a.b.c");
-    test_assert(result->function == UNKNOWN_IDENTIFIER_FUNC);
-    test_assert(result->name == "xxx.a.b.c");
 }
 
 void test_whitespace_after_statement()
@@ -713,7 +678,6 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_to_ref_operator);
     REGISTER_TEST_CASE(parser_tests::test_dot_separated_identifier);
     REGISTER_TEST_CASE(parser_tests::test_subscripted_atom);
-    REGISTER_TEST_CASE(parser_tests::test_lexpr);
     REGISTER_TEST_CASE(parser_tests::test_whitespace_after_statement);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation);
     REGISTER_TEST_CASE(parser_tests::test_qualified_identifier);

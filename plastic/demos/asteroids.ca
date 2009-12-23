@@ -39,7 +39,7 @@ namespace draw_ship
     def ship_point(number rot, number dist) -> Point:
         return polar(rot + ship.facing) * dist*ship_size + ship.loc
 
-    gl.line_loop([ship_point(0 ship_front)
+    gl:line_loop([ship_point(0 ship_front)
                   ship_point(ship_wing_rot ship_wing_size)
                   ship_point(.5 ship_back)
                   ship_point(-ship_wing_rot ship_wing_size)] #fff)
@@ -109,7 +109,7 @@ for bullet in bullets
                   bullet.loc + [1 -1] * bullet_width,
                   bullet.loc + [1 1] * bullet_width,
                   bullet.loc + [-1 1] * bullet_width]
-    gl.line_loop(points #fff)
+    gl:line_loop(points #fff)
 end
 
 type Asteroid {
@@ -177,8 +177,8 @@ for asteroid in asteroids
     end
     edges = map(pos_edge, asteroid.edges)
 
-    gl.line_loop(edges, #fff)
-    --gl.circle(asteroid.location, asteroid_collision_radius, #f00)
+    gl:line_loop(edges, #fff)
+    --gl:circle(asteroid.location, asteroid_collision_radius, #f00)
 end
 
 -- Check for collisions of asteroids and bullets

@@ -86,12 +86,12 @@ draw_box(ai_paddle, #fff)
 show_ball = not(ball_is_being_introduced) or alternate_over_time(0.2)
 
 if show_ball
-    gl.circle(ball_loc, ball_radius, #fff)
+    gl:circle(ball_loc, ball_radius, #fff)
 end
 
 def draw_text_centered_y(TTF_Font font, string str, Color color, Point location)
-    render = text.render_text(font, str, color)
-    text.draw_rendered_text(render, location - [render.width/2 0])
+    render = text:render_text(font, str, color)
+    text:draw_rendered_text(render, location - [render.width/2 0])
 end
 
 -- draw status

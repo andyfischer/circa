@@ -75,12 +75,12 @@ end
 
 def draw_text(TTF_Font font, string str, Color color, Point location):
     "Render and draw a string."
-    sprite = text.render_text(font, str, color)
-    text.draw_rendered_text(sprite, location)
+    sprite = text:render_text(font, str, color)
+    text:draw_rendered_text(sprite, location)
 
 def draw_text_centered(TTF_Font font, string str, Color color, Point location):
-    sprite = text.render_text(font, str, color)
-    text.draw_rendered_text(sprite, [location.x - sprite.width/2 location.y])
+    sprite = text:render_text(font, str, color)
+    text:draw_rendered_text(sprite, [location.x - sprite.width/2 location.y])
 
 -- GL functions
 def background(Color):
@@ -206,12 +206,12 @@ def draw_box(Rect box, Color color):
     ne = [box.x2 box.y1]
     sw = [box.x1 box.y2]
     se = [box.x2 box.y2]
-    gl.triangles([nw ne se se sw nw] color)
+    gl:triangles([nw ne se se sw nw] color)
 
 def draw_thick_line(Point a, Point b, number width, Color color):
     "Draw a thick line with the given thickness."
     perp = perpendicular(norm(a - b)) * width
-    gl.triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
+    gl:triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
 
 -- Stateful functions
 
@@ -269,7 +269,7 @@ def draggable_rect(Point initial_location, Point size) -> Point:
     end
     return location
 
-ui_font_medium = text.load_font("assets/sv_basic_manual/SVBasicManual.ttf", 16)
+ui_font_medium = text:load_font("assets/sv_basic_manual/SVBasicManual.ttf", 16)
 
 namespace fps_counter
     state int framesElapsed = 0
@@ -289,7 +289,7 @@ namespace fps_counter
     end
 end
 
-fps = fps_counter.lastRecoredFps
+fps = fps_counter:lastRecoredFps
 
 include('stdlib/text_input.ca')
 
@@ -298,7 +298,7 @@ namespace tweak begin
         "Draw a button which displays the value of 'r', allowing the user to tweak that value using mouse input."
         str = concat(name ' = ' r.to_string())
 
-        text_sprite = text.render_text(ui_font_medium, str, #000)
+        text_sprite = text:render_text(ui_font_medium, str, #000)
         padding = 3.0
         rect = [loc.x - padding, loc.y - padding,
             loc.x + text_sprite.width + padding,
@@ -306,7 +306,7 @@ namespace tweak begin
         color = #ee3399
         if mouse_in(rect) color = #ff44aa end
         draw_box(rect, color)
-        text.draw_rendered_text(text_sprite, [loc.x loc.y])
+        text:draw_rendered_text(text_sprite, [loc.x loc.y])
 
         -- mouse wheel
         if mouse_wheel_up(rect)
@@ -364,8 +364,8 @@ users_branch = include(user_script_filename)
 -- Draw fpses
 draw_fps = false
 if draw_fps
-    text_sprite = text.render_text(ui_font_medium, concat('fps: ' fps), #fff)
-    text.draw_rendered_text(text_sprite, [10 280])
+    text_sprite = text:render_text(ui_font_medium, concat('fps: ' fps), #fff)
+    text:draw_rendered_text(text_sprite, [10 280])
 end
 
 -- Name selector
@@ -373,7 +373,7 @@ if toggle(key_pressed(KEY_B))
   mirror = branch_mirror(users_branch)
   x = 10, y = 10
   for r in mirror.get_configs_nested()
-    tweak.button(r, [x y], mirror.get_relative_name(r))
+    tweak:button(r, [x y], mirror.get_relative_name(r))
     y += 24
   end
 end

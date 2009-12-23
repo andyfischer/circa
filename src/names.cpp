@@ -128,7 +128,7 @@ bool get_relative_name_recursive(Branch& branch, Term* term, std::stringstream& 
     bool success = get_relative_name_recursive(branch, parentTerm, output);
 
     if (success) {
-        output << "." << term->name;
+        output << ":" << term->name;
         return true;
     } else {
         return false;

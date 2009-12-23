@@ -263,9 +263,9 @@ void more_nested_state()
     branch.eval("b = f2()");
     branch.eval("c = f2()");
 
-    test_assert(branch.eval("inspect.get_state(a) == [1 true]"));
-    test_assert(branch.eval("inspect.get_state(b) == [[2 true]]"));
-    test_assert(branch.eval("inspect.get_state(c) == [[3 true]]"));
+    test_assert(branch.eval("inspect:get_state(a) == [1 true]"));
+    test_assert(branch.eval("inspect:get_state(b) == [[2 true]]"));
+    test_assert(branch.eval("inspect:get_state(c) == [[3 true]]"));
 }
 
 void migrate_subroutine_with_no_hidden_state()

@@ -18,3 +18,4 @@ Added Pythonic syntax for blocks with significant indentation.
     def pythag(number a, number b) -> number:
         return sqrt(sqr(a) sqr(b))
 
+Namespaced identifiers now use colons instead of dots

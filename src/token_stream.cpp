@@ -9,10 +9,13 @@ namespace circa {
 tokenizer::Token const&
 TokenStream::next(int lookahead) const
 {
-    unsigned int i = this->_position + lookahead;
+    int i = this->_position + lookahead;
 
-    if (i >= tokens.size())
-        throw std::runtime_error("unexpected EOF");
+    if (i >= (int) tokens.size())
+        throw std::runtime_error("index out of bounds");
+
+    if (i < 0)
+        throw std::runtime_error("index < 0");
 
     return tokens[i];
 }

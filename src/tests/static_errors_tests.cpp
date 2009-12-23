@@ -54,9 +54,9 @@ void test_unknown_identifier()
     test_assert(has_static_errors(branch));
 
     branch.clear();
-    t = branch.eval("a.b");
+    t = branch.eval("a:b");
     //dump_branch(branch);
-    test_equals(get_static_error_message(t), "Unknown identifier: a.b");
+    test_equals(get_static_error_message(t), "Unknown identifier: a:b");
     test_assert(get_static_error(t) == SERROR_UNKNOWN_IDENTIFIER);
     test_assert(has_static_errors(branch));
 }

@@ -11,5 +11,5 @@ for i in 0..num_stars
     draw_loc = [mod(draw_loc[0], window.width) mod(draw_loc[1], window.height)]
     
     state Color color = [rand(.2 .6) .3 rand(.5 1) 1] 
-    gl.points([draw_loc] color)
+    gl:points([draw_loc] color)
 end

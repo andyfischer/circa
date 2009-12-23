@@ -329,8 +329,8 @@ void test_range()
 
 void test_stateful_code()
 {
-    test_snippet("def hi() state int i end; c = hi()", "inspect.get_state(c) == [0]");
-    test_snippet("def hi() state int i; i = 4 end; c = hi()", "inspect.get_state(c) == [4]");
+    test_snippet("def hi() state int i end; c = hi()", "inspect:get_state(c) == [0]");
+    test_snippet("def hi() state int i; i = 4 end; c = hi()", "inspect:get_state(c) == [4]");
 }
 
 void test_message_passing()
@@ -343,7 +343,7 @@ void test_message_passing()
 
 void test_significant_indentation()
 {
-    test_snippet("namespace a:\n  b = 5", "a.b == 5");
+    test_snippet("namespace a:\n  b = 5", "a:b == 5");
     test_snippet("l = 0..3, for i in @l:\n  i += 3", "l == [3 4 5]");
     test_snippet("do once:\n a = 5", "");
 }

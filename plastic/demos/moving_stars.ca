@@ -28,9 +28,9 @@ for i in 0..num_stars
 
     color = #8888ff + (#ff8888 - #8888ff) * star.color_shift
 
-    gl.line_strip([star.position, star.position + [0 length]] color)
+    gl:line_strip([star.position, star.position + [0 length]] color)
 
     -- Draw twice for stars which wrap around vertically
-    gl.line_strip([star.position - [0 window.height], star.position + [0 length] - [0 window.height]] color)
+    gl:line_strip([star.position - [0 window.height], star.position + [0 length] - [0 window.height]] color)
 end
 

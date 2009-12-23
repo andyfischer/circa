@@ -89,6 +89,32 @@ struct ListSyntaxHints {
     std::vector<Input> mPending;
 };
 
+#if 0
+// This simple structure can tell you, after parsing an infix_expression, whether
+// you have just parsed a qualified_identifier. It knows this because
+// qualified_identifier is the only parsing step that doesn't create a new term.
+struct CheckForQualifiedIdentifier
+{
+    // Initialize this object immediately before calling infix_expression
+    CheckForQualifiedIdentifier(Branch& branch, TokenStream& tokens)
+      : _branch(branch)
+    {
+        _origLength = branch.length();
+        _origPosition = tokens.getPosition();
+    }
+
+    // Call this immediately after calling infix_expression
+    bool check()
+    {
+        return _branch.length() == _originalLength;
+    }
+
+    Branch& _branch;
+    int _origLength;
+    int _origPosition;
+};
+#endif
+
 void consume_branch(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
@@ -1161,6 +1187,8 @@ Term* constant_fold_lexpr(Term* call)
             std::string& name = nameTerm->asString();
             Branch& ns = as_branch(head);
 
+std::cout << "Deprecated namespace access: " << head->name << "." << name << std::endl;
+
             if (!ns.contains(name))
                 return call;
 
@@ -1268,7 +1296,14 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
     while (!tokens.nextIs(RPAREN) && !tokens.finished()) {
 
         inputHints.set(index, "preWhitespace", possible_whitespace_or_newline(tokens));
+        int origBranchLength = branch.length();
         Term* term = infix_expression(branch, tokens);
+
+        // Check if we just parsed a qualified identifier. If so, record the actual
+        // identifier string that was used.
+        if (branch.length() == origBranchLength)
+            ; // TODO, not needed yet
+
         inputHints.set(index, "postWhitespace", possible_whitespace_or_newline(tokens));
 
         arguments.append(term);
@@ -1285,6 +1320,11 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
 
     tokens.consume(RPAREN);
+
+#if 0
+    if (function->function == LEXPR_FUNC)
+        std::cout << "Deprecated namespace syntax: " << function->input(0)->name << std::endl;
+#endif
     
     std::string originalName = lexpr_get_original_string(function);
     function = constant_fold_lexpr(function);
@@ -1416,6 +1456,11 @@ Term* atom(Branch& branch, TokenStream& tokens)
     // identifier?
     if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AT_SIGN))
         result = identifier_or_lexpr(branch, tokens);
+
+    // qualified identifier?
+    // this is temp, should be combined with above step
+    else if (tokens.nextIs(QUALIFIED_IDENTIFIER))
+        result = qualified_identifier(branch, tokens);
 
     // literal integer?
     else if (tokens.nextIs(INTEGER))
@@ -1712,8 +1757,20 @@ Term* unknown_identifier(Branch& branch, std::string const& name)
 
 Term* qualified_identifier(Branch& branch, TokenStream& tokens)
 {
-    std::string id = qualified_identifier_str(tokens);
-    return branch[id];
+    std::string id;
+    if (tokens.nextIs(IDENTIFIER))
+        id = tokens.consume(IDENTIFIER);
+    else if (tokens.nextIs(QUALIFIED_IDENTIFIER))
+        id = tokens.consume(QUALIFIED_IDENTIFIER);
+    else 
+        throw std::runtime_error("qualified_identifier() expected ident");
+
+    Term* result = find_named(branch, id);
+
+    if (result == NULL)
+        return unknown_identifier(branch, id);
+
+    return result;
 }
 
 Term* identifier_or_lexpr(Branch& branch, TokenStream& tokens)

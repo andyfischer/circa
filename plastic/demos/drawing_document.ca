@@ -1,0 +1,3 @@
+ draw_circle([98.0, 263.0]) 
+ draw_circle([227.0, 291.0]) 
+ draw_circle([317.0, 192.0]) 

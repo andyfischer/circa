@@ -24,7 +24,7 @@ def draw_star(Star star)
     l_point = polar(l_angle)*(radius / 2) + star.loc
     r_point = polar(r_angle)*(radius / 2) + star.loc
 
-    gl.triangles([outer_point l_point star.loc, star.loc r_point outer_point] star_color)
+    gl:triangles([outer_point l_point star.loc, star.loc r_point outer_point] star_color)
   end
 
   for t in 0..num_points
@@ -40,7 +40,7 @@ background(#000)
 -- Draw an X where the mouse is
 begin
   def draw_quad(List points, Color color)
-      gl.triangles([points[0] points[1] points[2] points[2] points[3] points[0]] color)
+      gl:triangles([points[0] points[1] points[2] points[2] points[3] points[0]] color)
   end
 
   cross_color = #f396

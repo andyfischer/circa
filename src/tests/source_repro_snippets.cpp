@@ -299,7 +299,7 @@ void reproduce_misc_blocks() {
     round_trip_source("namespace ns end");
     round_trip_source("namespace ns 1 end");
     round_trip_source("namespace ns; print(1)\nend");
-    round_trip_source("namespace ns; a = 1; end; b = ns.a");
+    round_trip_source("namespace ns; a = 1; end; b = ns:a");
     round_trip_source("begin\nend");
     round_trip_source("begin;end");
     round_trip_source("begin;  ;end");
@@ -316,8 +316,8 @@ void reproduce_misc_blocks() {
 void reproduce_with_parse_errors() {
     round_trip_source("nonexistant_function()");
     round_trip_source("nonexistant_function(1 2 3)");
-    round_trip_source("a.b");
-    round_trip_source("a.b()");
+    round_trip_source("a:b");
+    round_trip_source("a:b()");
     finish_source_repro_category();
 }
 
@@ -347,10 +347,10 @@ void reproduce_bracket_syntax() {
 }
 
 void reproduce_identifiers_inside_namespaces() {
-    round_trip_source("namespace a; namespace b; c = 1; end; end; add(4, a.b.c)");
-    round_trip_source("namespace a; namespace b; c = [1];end;end; print(a.b.c[0])");
-    round_trip_source("namespace a; namespace b; c = 1; end; end; [1 2 a.b.c]");
-    round_trip_source("namespace a; namespace b; c = 1; end; end; state i = a.b.c");
+    round_trip_source("namespace a; namespace b; c = 1; end; end; add(4, a:b:c)");
+    round_trip_source("namespace a; namespace b; c = [1];end;end; print(a:b:c[0])");
+    round_trip_source("namespace a; namespace b; c = 1; end; end; [1 2 a:b:c]");
+    round_trip_source("namespace a; namespace b; c = 1; end; end; state i = a:b:c");
     finish_source_repro_category();
 }
 
