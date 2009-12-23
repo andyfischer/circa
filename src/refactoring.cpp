@@ -6,10 +6,10 @@ namespace circa {
 
 void change_function(Term* term, Term* newFunction)
 {
-    assert(newFunction->type == FUNCTION_TYPE);
-
     if (term->function == newFunction)
         return;
+
+    assert(newFunction->type == FUNCTION_TYPE);
 
     term->function = newFunction;
 

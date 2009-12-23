@@ -22,6 +22,8 @@ Term* create_duplicate(Branch& branch, Term* source, std::string const& name="",
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, RefList const& inputs);
 
+bool is_actually_using(Term* user, Term* usee);
+
 // Create a new value term with the given type.
 Term* create_value(Branch& branch, Term* type, std::string const& name="");
 Term* create_value(Branch& branch, std::string const& typeName, std::string const& name="");

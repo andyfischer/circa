@@ -133,9 +133,6 @@ void initialize_compound_type(Term* term);
 std::string compound_type_to_string(Term* caller);
 
 // Functions which are dispatched based on type:
-bool is_value_alloced(Term* term);
-void alloc_value(Term* term);
-void dealloc_value(Term* term);
 bool identity_equals(Term* a, Term* b);
 bool equals(Term* a, Term* b);
 std::string to_string(Term* term);

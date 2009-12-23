@@ -53,6 +53,9 @@ struct Term
     // Reference count
     int refCount;
 
+    // Terms which are using this term as an input.
+    RefList users;
+
     Term();
     ~Term();
 

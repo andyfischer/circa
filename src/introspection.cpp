@@ -13,22 +13,6 @@ bool is_value(Term* term)
     return term->function == VALUE_FUNC || term->function == STATEFUL_VALUE_FUNC;
 }
 
-bool is_actually_using(Term* user, Term* usee)
-{
-    assert_good_pointer(user);
-    assert_good_pointer(usee);
-
-    if (user->function == usee)
-        return true;
-
-    for (int i=0; i < user->inputs.length(); i++) {
-        if (user->inputs[i] == usee)
-            return true;
-    }
-
-    return false;
-}
-
 void set_is_statement(Term* term, bool value)
 {
     term->boolProp("statement") = value;

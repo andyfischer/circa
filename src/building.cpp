@@ -72,13 +72,50 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 void set_input(Term* term, int index, Term* input)
 {
     assert_good_pointer(term);
+
+    Ref previousInput = NULL;
+    if (index < term->numInputs())
+        previousInput = term->input(index);
+
     term->inputs.setAt(index, input);
+
+    // Add 'term' to the user list of input
+    if (input != NULL)
+        input->users.appendUnique(term);
+
+    // Check if we should remove 'term' from the user list of previousInput
+    if (previousInput != NULL && !is_actually_using(previousInput, term))
+        previousInput->users.remove(term);
 }
 
 void set_inputs(Term* term, RefList const& inputs)
 {
     assert_good_pointer(term);
+
+    RefList previousInputs = term->inputs;
+
     term->inputs = inputs;
+
+    // Add 'term' as a user to these new inputs
+    for (int i=0; i < inputs.length(); i++)
+        if (inputs[i] != NULL)
+            inputs[i]->users.appendUnique(term);
+
+    // Check to remove 'term' from user list of any previous inputs
+    for (int i=0; i < previousInputs.length(); i++) {
+        Term* previousInput = previousInputs[i];
+        if (previousInput != NULL && !is_actually_using(previousInput, term))
+            previousInput->users.remove(term);
+    }
+}
+
+bool is_actually_using(Term* user, Term* usee)
+{
+    for (int i=0; i < usee->numInputs(); i++)
+        if (usee->input(i) == user)
+            return true;
+
+    return false;
 }
 
 Term* create_duplicate(Branch& branch, Term* source, std::string const& name, bool copyBranches)

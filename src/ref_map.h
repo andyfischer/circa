@@ -14,13 +14,16 @@ struct ReferenceMap
     typedef std::map<Term*,Term*>::iterator iterator;
 
     explicit ReferenceMap() { }
+    Term* operator[](Term* key) const {
+        std::map<Term*,Term*>::const_iterator it = _map.find(key);
+        if (it == _map.end())
+            return NULL;
+        else
+            return it->second;
+    }
+
     Term*& operator[](Term* key) {
         return _map[key];
-    }
-    Term* operator[](Term* key) const {
-        if (!contains(key))
-            return NULL;
-        return _map.find(key)->second;
     }
 
     bool contains(Term* key) const {

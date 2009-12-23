@@ -108,6 +108,22 @@ void test_procure()
     test_assert(is_value(a));
 }
 
+void test_set_input()
+{
+    Term* a = alloc_term();
+    Term* b = alloc_term();
+
+    set_input(a, 0, b);
+
+    test_assert(a->input(0) == b);
+    test_assert(b->users[0] == a);
+}
+
+void test_user_list()
+{
+
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(building_tests::test_create_value);
@@ -116,6 +132,7 @@ void register_tests()
     REGISTER_TEST_CASE(building_tests::test_duplicate_value);
     REGISTER_TEST_CASE(building_tests::test_rewrite_as_value);
     REGISTER_TEST_CASE(building_tests::test_procure);
+    REGISTER_TEST_CASE(building_tests::test_set_input);
 }
 
 } // namespace building_tests

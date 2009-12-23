@@ -57,7 +57,9 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     // would almost definitely lead to errors.
     assert(!map.contains(NULL));
 
-    term->inputs.remapPointers(map);
+    for (int i=0; i < term->numInputs(); i++)
+        set_input(term, i, map.getRemapped(term->input(i)));
+
     term->function = map.getRemapped(term->function);
 
     // TODO, call changeType if our type is changed
