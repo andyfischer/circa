@@ -71,6 +71,18 @@ def deploy_assets(target_dir):
     rm(target_dir+'/demos/meshtest.ca')
     rm(target_dir+'/demos/tree.ca')
 
+def deploy_windows_cl():
+    os.chdir(os.environ['CIRCA_HOME'])
+    version_name='circa_win32_cl_'+global_version_name
+
+    target_dir='deploy/'+version_name
+    rm(target_dir)
+    recr_mkdir(target_dir)
+
+    copy_file('build/bin/circa.exe', target_dir)
+
+    zip(target_dir, prefix='deploy/')
+
 def deploy_windows():
     os.chdir(os.environ['CIRCA_HOME'])
     version_name='plastic_win32_cl_'+global_version_name
@@ -155,6 +167,7 @@ def deploy_mac_bundle():
 if __name__ == '__main__':
     import sys
     if sys.argv[1] == 'windows':
+        deploy_windows_cl()
         deploy_windows()
     if sys.argv[1] == 'mac':
         deploy_mac_cl()
