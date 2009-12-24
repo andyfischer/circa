@@ -1,20 +1,89 @@
 
 Right now we duplicate tons of data and it's really inefficient.
 
-Need two kinds of optimizations:
+Need a solution where terms can share data safely.
 
-1) Data aliasing
+There are a few different situations..
 
-Values that are pointer-based and copy()ed should share the same objects, as long as
-their values can be shared safely.
+Safely sharing data
+-------------------
 
-2) Value stealing
+When the copy() term is used, any copies should use the same piece of data.
+
+Reusing data
+------------
 
 Say we have:
 
    a = some intermediate value
    b = f(a)
 
-If we know that B is the only user of A, and we know that the function f() wants to
-output a value that is really similar to A, then B should *steal* the output value
-of A and use it as its output.
+If a's value is expensive to duplicate, then there should be an optimization where the
+output of b can steal or share a's value. Then b doesn't have to create a whole new
+copy. This is a little dangerous because then a's original output will be lost forever,
+so we should make sure that no one will need it.
+
+Stacks
+------
+
+Stacks are another problem that need solving, and the solution can hopefully be similar.
+
+Currently, values are associated with the code itself, which works okay in some situations.
+
+    program:
+        [ code,value;
+          code,value;
+          code,value;
+          ....
+        ]
+
+For function declarations, this situation gets funny because the values inside the function
+are reused on every function call. It usually doesn't make sense to access a temporary
+inside a function after it's been called, because it will just have a leftover value.
+
+    program:
+        [ function_def:
+            [ code,value;
+              code,value;
+              code,value;
+            ]
+          function_call;
+          function_call;
+          function_call;
+        ]
+
+One immediate problem is that recursion is impossible with this implementation.
+
+It makes sense to be able to separate the code from its value. Then the function_def would include
+some terms that refer to a stack position, and it would be impossible to call a subroutine without
+a stack.
+
+    program:
+        [ function_def:
+            [ code,value;
+              code,stack_ref;
+              code,stack_ref;
+            ]
+          function_call(stack);
+          function_call(stack);
+          function_call(stack);
+        ]
+
+Stacks and memory management
+----------------------------
+
+A stack might end up with an allocated value, and we need to clean that up when the stack
+is closed. To make this easier, a stack could just be a Branch that uses existing allocation
+rules.
+
+Implementation
+--------------
+
+def evaluate_subroutine(Branch function_def, Branch stack):
+    for code in function_def:
+        output_value = code->output_value
+        if is_stack_reference(output_value):
+            output_value = get_stack_value(stack, output_value)
+        evaluate_term(code, output_value)
+    .. cleanup?
+    .. steal output?
