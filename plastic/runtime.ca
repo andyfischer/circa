@@ -64,7 +64,7 @@ KEY_B = 0
 -- Text rendering functions
 type TTF_Font {} -- native
 namespace text begin
-    type RenderedText { int texid, number width, number height, Color color, string text }
+    type RenderedText { int texid, int width, int height, Color color, string text }
     def load_font(state TTF_Font, string filename, int size) -> TTF_Font:
         "Load the given font"
     def render_text(state RenderedText, TTF_Font font, string text, Color color) -> RenderedText:

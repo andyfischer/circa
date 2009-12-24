@@ -55,8 +55,8 @@ struct RenderedText
     RenderedText(Term* term) : _term(term) {}
 
     int& texid() { return _term->asBranch()[0]->asInt(); }
-    float& width() { return _term->asBranch()[1]->asFloat(); }
-    float& height() { return _term->asBranch()[2]->asFloat(); }
+    int& width() { return _term->asBranch()[1]->asInt(); }
+    int& height() { return _term->asBranch()[2]->asInt(); }
     Term* color() { return _term->asBranch()[3]; }
     std::string& text() { return _term->asBranch()[4]->asString(); }
 };
@@ -91,8 +91,8 @@ void render_text(Term* caller)
         SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), sdlColor);
 
         state.texid() = load_surface_to_texture(surface);
-        state.width() = float(surface->w);
-        state.height() = float(surface->h);
+        state.width() = surface->w;
+        state.height() = surface->h;
         assign_value(color, state.color());
 
         SDL_FreeSurface(surface);
@@ -107,8 +107,8 @@ void draw_rendered_text(Term* caller)
     if (output.texid() == 0)
         return;
 
-    float x = caller->input(1)->asBranch()[0]->toFloat();
-    float y = caller->input(1)->asBranch()[1]->toFloat();
+    int x = int(caller->input(1)->asBranch()[0]->toFloat());
+    int y = int(caller->input(1)->asBranch()[1]->toFloat());
 
     glBindTexture(GL_TEXTURE_2D, output.texid());
     glColor4f(1,1,1,1);
@@ -116,13 +116,13 @@ void draw_rendered_text(Term* caller)
     glBegin(GL_QUADS);
 
     glTexCoord2d(0.0, 0.0);
-    glVertex3f(x, y, 0);
+    glVertex3i(x, y, 0);
     glTexCoord2d(1.0, 0.0);
-    glVertex3f(x + output.width(), y,0);
+    glVertex3i(x + output.width(), y,0);
     glTexCoord2d(1.0, 1.0);
-    glVertex3f(x + output.width(), y + output.height(),0);
+    glVertex3i(x + output.width(), y + output.height(),0);
     glTexCoord2d(0.0, 1.0);
-    glVertex3f(x, y + output.height(),0);
+    glVertex3i(x, y + output.height(),0);
 
     glEnd();
 
