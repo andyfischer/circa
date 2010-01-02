@@ -7,13 +7,10 @@
 
 namespace circa {
 
-#if 0
-bool share_value(Term* original, Term* share);
-#endif
-
 bool is_value_alloced(Term* term);
 void alloc_value(Term* term);
 void dealloc_value(Term* term);
+void assign_value(Term* source, Term* dest);
 
 } // namespace circa
 

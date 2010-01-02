@@ -20,7 +20,9 @@ struct Branch
     // Points to the Term which owns this branch as a value.
     Term* owningTerm;
 
-    Branch() : owningTerm(NULL) {}
+    int _refCount;
+
+    Branch() : owningTerm(NULL), _refCount(0) {}
     ~Branch();
 
     int length() const;
@@ -92,7 +94,6 @@ namespace branch_t {
     void dealloc(Term* type, Term* t);
     void assign(Term*, Term*);
     bool equals(Term*, Term*);
-    void hosted_remap_pointers(Term* caller, ReferenceMap const& map);
 }
 
 bool is_branch(Term* term);

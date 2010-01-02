@@ -136,7 +136,6 @@ std::string compound_type_to_string(Term* caller);
 bool identity_equals(Term* a, Term* b);
 bool equals(Term* a, Term* b);
 std::string to_string(Term* term);
-void assign_value(Term* source, Term* dest);
 void assign_value_to_default(Term* term);
 bool check_invariants(Term* term, std::string* failureMessage = NULL);
 

@@ -64,6 +64,7 @@ int Branch::findIndex(std::string const& name) const
 void Branch::set(int index, Term* term)
 {
     assert(index <= length());
+    setNull(index);
     _terms[index] = term;
     if (term != NULL) {
         assert(term->owningBranch == NULL || term->owningBranch == this);
@@ -291,7 +292,10 @@ namespace branch_t {
 
     void dealloc(Term* type, Term* term)
     {
-        delete (Branch*) term->value;
+        Branch& branch = as_branch(term);
+        branch._refCount--;
+        if (branch._refCount <= 0)
+            delete (Branch*) term->value;
     }
 
     void assign(Term* sourceTerm, Term* destTerm)
@@ -325,9 +329,11 @@ namespace branch_t {
         dest.removeNulls();
     }
 
-    void hosted_remap_pointers(Term* caller, ReferenceMap const& map)
+    void assign_reference(Term* source, Term* dest)
     {
-        as_branch(caller).remapPointers(map);
+        assert(!is_value_alloced(dest));
+        dest->value = source->value;
+        as_branch(dest)._refCount++;
     }
 
     bool equals(Term* lhsTerm, Term* rhsTerm)

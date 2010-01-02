@@ -4,17 +4,6 @@
 
 namespace circa {
 
-#if 0
-bool share_value(Term* original, Term* share)
-{
-    assert(value_fits_type(share, original->type));
-
-    dealloc_value(share);
-    share->flags = share->flags | TERM_FLAG_SHARED_VALUE;
-    share->value = original->value;
-}
-#endif
-
 bool is_value_alloced(Term* term)
 {
     if (term->type == NULL) {
@@ -65,6 +54,36 @@ void dealloc_value(Term* term)
         dealloc(term->type, term);
 
     term->value = NULL;
+}
+
+void assign_value(Term* source, Term* dest)
+{
+    if (!is_value_alloced(source)) {
+        dealloc_value(dest);
+        return;
+    }
+
+    // Do a type specialization if dest has type 'any'.
+    // This might be removed once type inference rules are smarter.
+    if (dest->type == ANY_TYPE)
+        specialize_type(dest, source->type);
+
+    if (!value_fits_type(source, dest->type)) {
+        std::stringstream err;
+        err << "In assign_value, element of type " << source->type->name <<
+            " doesn't fit in type " << dest->type->name;
+        throw std::runtime_error(err.str());
+    }
+
+    if (!is_value_alloced(dest))
+        alloc_value(dest);
+
+    AssignFunc assign = type_t::get_assign_func(dest->type);
+
+    if (assign == NULL)
+        throw std::runtime_error("type "+type_t::get_name(dest->type)+" has no assign function");
+
+    assign(source, dest);
 }
 
 } // namespace circa

@@ -374,7 +374,6 @@ void initialize_compound_type(Term* term)
     type_t::get_alloc_func(term) = branch_t::alloc;
     type_t::get_dealloc_func(term) = branch_t::dealloc;
     type_t::get_assign_func(term) = branch_t::assign;
-    type_t::get_remap_pointers_func(term) = branch_t::hosted_remap_pointers;
     type_t::get_equals_func(term) = branch_t::equals;
     type_t::get_to_string_func(term) = compound_type_to_string;
 }
@@ -430,37 +429,6 @@ std::string to_string(Term* term)
         return "<NULL>";
     else
         return func(term);
-}
-
-
-void assign_value(Term* source, Term* dest)
-{
-    if (!is_value_alloced(source)) {
-        dealloc_value(dest);
-        return;
-    }
-
-    // Do a type specialization if dest has type 'any'.
-    // This might be removed once type inference rules are smarter.
-    if (dest->type == ANY_TYPE)
-        specialize_type(dest, source->type);
-
-    if (!value_fits_type(source, dest->type)) {
-        std::stringstream err;
-        err << "In assign_value, element of type " << source->type->name <<
-            " doesn't fit in type " << dest->type->name;
-        throw std::runtime_error(err.str());
-    }
-
-    if (!is_value_alloced(dest))
-        alloc_value(dest);
-
-    AssignFunc assign = type_t::get_assign_func(dest->type);
-
-    if (assign == NULL)
-        throw std::runtime_error("type "+type_t::get_name(dest->type)+" has no assign function");
-
-    assign(source, dest);
 }
 
 void assign_value_to_default(Term* term)
