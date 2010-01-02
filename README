@@ -4,6 +4,10 @@ where you can directly see and interact with the code you are editing.
 There are two sub projects: Circa, a programming language; and Plastic, a cross-platform
 graphical tool for creating Circa code.
 
+Circa/Plastic are currently alpha-level. Curious people, or people interested in hacking along,
+are welcome to try it out. People who want to use it for serious projects, or people who don't
+like bugs, are recommended to wait for a beta release.
+
 Some features of Circa are:
 
  - Live coding. The user can examine and modify code while it is running.
@@ -25,10 +29,5 @@ Some implementation details:
  - Plastic uses SDL and OpenGL for graphics
  - Currently supported on XP and OSX. A Linux port would probably not be hard.
 
-Current status: Working on an alpha release. The current code is not yet recommended for
-public consumption.
-
-This project is Copyright (c) 2007-2009 Paul Hodge.
-
-The entire project is available to the public under the MIT licence. See the LICENSE
-file for more information.
+This project is Copyright (c) 2007-2009 Paul Hodge. The contents are freely available to the
+public under the MIT licence. See the LICENSE file for more information.
