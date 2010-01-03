@@ -201,7 +201,7 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
         }
 
         if (!justWhitespace) {
-            indentationLevel = statement->
+            indentationLevel = (int) statement->
                 stringPropOptional("syntaxHints:preWhitespace", "").length();
             break;
         }
@@ -215,7 +215,7 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
 
         int nextIndent = 0;
         if (tokens.nextIs(WHITESPACE))
-            nextIndent = tokens.next().text.length();
+            nextIndent = (int) tokens.next().text.length();
 
         // Check if the next line is just whitespace
         bool justWhitespace = tokens.nextIs(NEWLINE)
@@ -1666,7 +1666,7 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
     result[2]->asFloat() = b;
     result[3]->asFloat() = a;
 
-    resultTerm->intProp("syntaxHints:colorFormat") = text.length();
+    resultTerm->intProp("syntaxHints:colorFormat") = (int) text.length();
 
     set_source_location(resultTerm, startPosition, tokens);
     return resultTerm;

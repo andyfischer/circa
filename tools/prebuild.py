@@ -17,6 +17,31 @@ def write_text_file(path, contents):
     f = open(path, 'w')
     f.write(contents)
     f.write("\n")
+    
+def download_file_from_the_internets(url, filename):
+    print "Downloading "+url
+    import urllib
+    webFile = urllib.urlopen(url)
+    localFile = open(filename, 'wb')
+    localFile.write(webFile.read())
+    webFile.close()
+    localFile.close()
+
+def unzip_file(filename, dir):
+    print "Unzipping "+filename+" to "+dir
+    import os, zipfile
+
+    if not os.path.exists(dir): os.mkdir(dir)
+
+    zf = zipfile.ZipFile(filename)
+    for name in zf.namelist():
+        path = os.path.join(dir, name)
+        if name.endswith('/'):
+            if not os.path.exists(path): os.mkdir(path)
+        else:
+            f = open(path, 'wb')
+            f.write(zf.read(name))
+            f.close()
 
 def main():
     if not os.path.exists('src/generated'):
@@ -56,6 +81,13 @@ def main():
     write_text_file('src/generated/all_tests.cpp', include_list(test_cpps()))
     write_text_file('src/generated/all_builtin_functions.cpp',
             include_list(builtin_function_cpps()))
+            
+    if not os.path.exists('SDL_deps'):
+        download_file_from_the_internets(
+            'http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip',
+            'SDL_deps.zip')
+
+        unzip_file('SDL_deps.zip', '.')
 
 if __name__ == '__main__':
     main()
