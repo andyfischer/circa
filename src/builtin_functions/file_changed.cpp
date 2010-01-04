@@ -12,15 +12,15 @@ namespace file_changed_function {
             return false;
         }
         
-        std::string &prevFilename = fileSignature->asBranch()[0]->asString();
-        int &prevModified = fileSignature->asBranch()[1]->asInt();
+        std::string &sigFilename = fileSignature->asBranch()[0]->asString();
+        int &sigModified = fileSignature->asBranch()[1]->asInt();
 
         time_t modifiedTime = get_modified_time(filename);
 
-        if (modifiedTime != prevModified
-                || filename != prevFilename) {
-            prevFilename = filename;
-            prevModified = (int) modifiedTime;
+        if (modifiedTime != sigModified
+                || filename != sigFilename) {
+            sigFilename = filename;
+            sigModified = (int) modifiedTime;
             return true;
         } else {
             return false;

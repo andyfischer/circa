@@ -55,8 +55,6 @@ std::string find_asset_file(std::string const& filename)
 
 bool initialize_plastic()
 {
-    std::cout << "initialize_plastic()" << std::endl;
-
     // Initialize Circa
     circa::initialize();
 
@@ -110,7 +108,6 @@ bool evaluate_main_script()
         std::cout << std::endl;
         PAUSED = true;
         PAUSE_REASON = RUNTIME_ERROR;
-        clear_error(&errorListener);
         return false;
     }
     return true;
@@ -156,6 +153,13 @@ bool load_user_script_filename(std::string const& _filename)
         std::cout << "Loading script: " << filename << std::endl;
         
         include_function::load_script(users_branch);
+
+        if (has_error(users_branch)) {
+            std::cout << "Error loading " << _filename << ":" << std::endl;
+            std::cout << get_runtime_error_message(users_branch) << std::endl;
+            PAUSED = true;
+            PAUSE_REASON = RUNTIME_ERROR;
+        }
     }
 
     return true;

@@ -18,8 +18,7 @@ namespace include_function {
             get_path_relative_to_source(caller, requested_filename);
 
         // Reload if the filename or modified-time has changed
-        if (file_changed_function::check(caller, fileSignature, actual_filename)
-                || contents.length() == 0)
+        if (file_changed_function::check(caller, fileSignature, actual_filename))
         {
             Timer timer;
 
