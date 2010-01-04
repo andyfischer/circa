@@ -374,19 +374,19 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     bool isNative = false;
 
-    // Optional list of properties
+    // Optional list of qualifiers
     while (tokens.nextIs(PLUS)) {
         tokens.consume(PLUS);
-        std::string propName = tokens.consume(IDENTIFIER);
-        if (propName == "native")
+        std::string qualifierName = tokens.consume(IDENTIFIER);
+        if (qualifierName == "native")
             isNative = true;
         else
             return compile_error_for_line(branch, tokens, startPosition,
-                    "Unsupported property: "+propName);
+                    "Unrecognized qualifier: "+qualifierName);
 
-        propName += possible_whitespace(tokens);
+        qualifierName += possible_whitespace(tokens);
 
-        result->stringProp("syntaxHints:properties") += "+" + propName;
+        result->stringProp("syntaxHints:properties") += "+" + qualifierName;
     }
 
     if (!tokens.nextIs(LPAREN))
@@ -439,8 +439,21 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
         // Variable args when ... is appended
         if (tokens.nextIs(ELLIPSIS)) {
-            tokens.consume();
+            tokens.consume(ELLIPSIS);
             function_t::get_variable_args(result) = true;
+        }
+
+        // Optional list of qualifiers
+        if (tokens.nextIs(PLUS)) {
+            tokens.consume(PLUS);
+            std::string qualifierName = tokens.consume(IDENTIFIER);
+            // TODO: store syntax hint
+            if (qualifierName == "ignore_error") {
+                input->boolProp("ignore_error") = true;
+            } else {
+                return compile_error_for_line(branch, tokens, startPosition,
+                    "Unrecognized qualifier: "+qualifierName);
+            }
         }
 
         if (!tokens.nextIs(RPAREN)) {

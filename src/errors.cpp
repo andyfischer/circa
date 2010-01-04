@@ -158,7 +158,10 @@ static StaticError get_static_error_for_input_index(Term* term, int index)
             return SERROR_NO_ERROR;
     }
 
-    if (input->hasError() && !meta)
+    bool inputIgnoresError = function_t::get_input_placeholder(term->function, effectiveIndex)
+            ->boolPropOptional("ignore_error", false);
+
+    if (input->hasError() && !meta && !inputIgnoresError)
         return SERROR_INPUT_HAS_ERROR;
     
     // Check type

@@ -43,6 +43,14 @@ def unzip_file(filename, dir):
             f.write(zf.read(name))
             f.close()
 
+def sync_windows_sdl_deps():
+    if not os.path.exists('SDL_deps'):
+        download_file_from_the_internets(
+            'http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip',
+            'SDL_deps.zip')
+
+        unzip_file('SDL_deps.zip', '.')
+
 def main():
     if not os.path.exists('src/generated'):
         os.mkdir('src/generated')
@@ -82,12 +90,6 @@ def main():
     write_text_file('src/generated/all_builtin_functions.cpp',
             include_list(builtin_function_cpps()))
             
-    if not os.path.exists('SDL_deps'):
-        download_file_from_the_internets(
-            'http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip',
-            'SDL_deps.zip')
-
-        unzip_file('SDL_deps.zip', '.')
 
 if __name__ == '__main__':
     main()

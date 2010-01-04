@@ -128,6 +128,20 @@ void test_resize_list()
     test_assert(list[2]->type == STRING_TYPE);
 }
 
+void function_that_ignores_errors()
+{
+    Branch branch;
+    Term* a = branch.eval("a = {}");
+    Term* mirror = branch.eval("branch_mirror(a)");
+
+    error_occurred(a, "test error");
+
+    test_assert(function_t::get_input_placeholder(mirror->function, 0)
+            ->boolPropOptional("ignore_error", false));
+
+    test_assert(!has_static_error(mirror));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(runtime_tests::test_simple);
@@ -135,6 +149,7 @@ void register_tests()
     REGISTER_TEST_CASE(runtime_tests::error_message);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
     REGISTER_TEST_CASE(runtime_tests::test_resize_list);
+    REGISTER_TEST_CASE(runtime_tests::function_that_ignores_errors);
 }
 
 } // namespace runtime_tests

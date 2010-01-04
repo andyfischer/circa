@@ -1,7 +1,7 @@
 
 import os, sys
 
-from tools import SconsHelper
+from tools import SconsHelper, prebuild
 
 def fatal(msg):
     print "fatal:",msg
@@ -94,14 +94,9 @@ if POSIX:
     else:   SDL_ROOT.Append(LIBS = ['libGL'])
 
 if WINDOWS:
+    prebuild.sync_windows_sdl_deps()
+
     SDL_ROOT.Append(LIBS=['opengl32.lib'])
-
-    if not os.path.exists('SDL_deps'):
-        SconsHelper.download_file_from_the_internets(
-            'http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip',
-            'SDL_deps.zip')
-
-        SconsHelper.unzip_file('SDL_deps.zip', '.')
 
     SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL-1.2.13/include'])
     SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL_image-1.2.7/include'])
