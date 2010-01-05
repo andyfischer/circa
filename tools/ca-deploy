@@ -60,7 +60,7 @@ def system(cmd):
 
 # ------------------------------------------------------------
 
-global_version_name = 'alpha2-1'
+global_version_name = 'alpha2-2'
 
 def deploy_assets(target_dir):
     copy_tree('plastic/assets', target_dir+'/assets')
@@ -89,15 +89,16 @@ def deploy_windows_cl():
 
     zip(target_dir, prefix='deploy/')
 
-def deploy_windows():
+def deploy_windows_debug():
     os.chdir(os.environ['CIRCA_HOME'])
-    version_name='plastic_win32_cl_'+global_version_name
+    version_name='plastic_win_'+global_version_name+'_debug'
 
     target_dir='deploy/'+version_name
     rm(target_dir)
     recr_mkdir(target_dir)
 
     copy_file('plastic/windows/Debug/plastic.exe', target_dir+'/plastic.exe')
+    copy_file('plastic/windows/Debug/plastic.pdb', target_dir+'/plastic.pdb')
     copy_tree('"c:/Program Files\Microsoft Visual Studio 9.0/VC/redist/x86/Microsoft.VC90.CRT"', target_dir)
     deploy_assets(target_dir)
 
