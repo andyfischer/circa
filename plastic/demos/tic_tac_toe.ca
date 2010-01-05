@@ -15,8 +15,8 @@ def draw_x(Point loc)
 end
 def draw_o(Point loc)
     radius = square_size * .35
-    gl.circle(loc, radius, #fff)
-    gl.circle(loc, radius - 6, background_color)
+    gl:circle(loc, radius, #fff)
+    gl:circle(loc, radius - 6, background_color)
 end
 
 -- Draw the board
@@ -52,7 +52,7 @@ def initialize_board_spaces() -> List
     board_spaces = []
     for x in 0..3
         for y in 0..3
-            board_spaces.append([player.none x y
+            board_spaces.append([player:none x y
                 [board_left + (x+.5) * square_size, board_top + (y+.5) * square_size]])
         end
     end
@@ -61,17 +61,17 @@ end
 
 state board_spaces = initialize_board_spaces()
 
-state int current_player = player.x
+state int current_player = player:x
 
 def player_name(int p) -> string
-    if p == player.x return "X"
-    elif p == player.o return "O"
+    if p == player:x return "X"
+    elif p == player:o return "O"
     else return "none" end
 end
 
 def other_player(int p) -> int
-    if p == player.x return player.o
-    else return player.x end
+    if p == player:x return player:o
+    else return player:x end
 end
 
 type WinnerInformation {
@@ -100,7 +100,7 @@ def get_winner(List board_spaces) -> WinnerInformation
         if all_match
             return this_player
         else
-            return player.none
+            return player:none
         end
     end
 
@@ -110,10 +110,10 @@ def get_winner(List board_spaces) -> WinnerInformation
         i = i -> int
         horizontal_winner = is_winner_across_line([[i 0] [i 1] [i 2]])
         vertical_winner = is_winner_across_line([[0 i] [1 i] [2 i]])
-        if horizontal_winner != player.none
+        if horizontal_winner != player:none
             line_x = board_left + (i+.5) * square_size
             result = [horizontal_winner [line_x board_top] [line_x board_bot]]
-        elif vertical_winner != player.none
+        elif vertical_winner != player:none
             line_y = board_top + (i+.5)*square_size
             result = [vertical_winner [board_left line_y] [board_right line_y]] 
         end
@@ -122,10 +122,10 @@ def get_winner(List board_spaces) -> WinnerInformation
     diagonal_winner_tl = is_winner_across_line([[0 0] [1 1] [2 2]])
     diagonal_winner_tr = is_winner_across_line([[2 0] [1 1] [0 2]])
 
-    if diagonal_winner_tl != player.none
+    if diagonal_winner_tl != player:none
         result = [diagonal_winner_tl [board_left board_top] [board_right board_bot]]
     end
-    if diagonal_winner_tr != player.none
+    if diagonal_winner_tr != player:none
         result = [diagonal_winner_tr [board_left board_bot] [board_right board_top]]
     end
 
@@ -144,13 +144,13 @@ for board_space in board_spaces
     loc = [board_space.x * square_size + board_left, board_space.y * square_size + board_top]
     rect = [loc[0] loc[1] loc[0] + square_size loc[1] + square_size]
 
-    if board_space.owner == player.x
+    if board_space.owner == player:x
         draw_x(board_space.center)
-    elif board_space.owner == player.o
+    elif board_space.owner == player:o
         draw_o(board_space.center)
     end
 
-    playable = board_space.owner == player.none and not(game_is_finished)
+    playable = board_space.owner == player:none and not(game_is_finished)
 
     if playable and mouse_over(rect)
         draw_box(rect, #fff4)
@@ -182,7 +182,7 @@ if chosen_space != []
     -- Check if a player has won
     winner = get_winner(board_spaces)
 
-    if winner.player != player.none
+    if winner.player != player:none
         winner_information = winner
     end
 end
@@ -194,7 +194,7 @@ def draw_thick_line_animated(Point a, Point b, number thickness, Color color, nu
     draw_thick_line(a,actual_b,thickness,color)
 end
 
-if winner_information.player != player.none
+if winner_information.player != player:none
     draw_thick_line_animated(winner_information.line_a winner_information.line_b, 5.0, #fff, 1.0)
     draw_text(ui_font_medium, concat(player_name(winner_information.player) " wins!"),
         #fff, [20 340])

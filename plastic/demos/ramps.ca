@@ -35,7 +35,7 @@ for x in 0..num_tiles_x
     box_tr = [box_br.x box_tl.y]
     box_bl = [box_tl.x box_br.y]
     color = if_expr((x::int+y::int) % 2 == 1, #eee, #fff)
-    gl.triangles([box_tl box_tr box_bl box_tr box_br box_bl] color)
+    gl:triangles([box_tl box_tr box_bl box_tr box_br box_bl] color)
   end
 end
 
@@ -45,8 +45,8 @@ def draw_goal_label(Point loc)
     draw_text_centered(small_font, "GOAL", #000, loc)
     loc += [-15 20]
     arrow_head = loc+[20 0]
-    gl.line_strip([loc arrow_head], #000)
-    gl.line_strip([arrow_head+[-5 -5] arrow_head arrow_head+[-5 5]] #000)
+    gl:line_strip([loc arrow_head], #000)
+    gl:line_strip([arrow_head+[-5 -5] arrow_head arrow_head+[-5 5]] #000)
 end
 
 draw_goal_label([window.width - 50 window.height / 2])

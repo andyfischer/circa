@@ -55,16 +55,21 @@ end
 for ref in contents
     ref = ref -> Ref
 
-    this_loc = term_to_location.get(ref)::Point + [box_size.x/2, 0]
+    this_loc = (term_to_location.get(ref)->Point) + [box_size.x/2, 0]
 
     for i in 0..ref.num_inputs()
         input = ref.input(i)
 
-        input_loc = term_to_location.get(input)::Point + [box_size.x/2, box_size.y]
+        input_loc = (term_to_location.get(input)->Point) + [box_size.x/2, box_size.y]
 
         draw_arrow(this_loc, input_loc)
     end
 end
+
+def expand_rect_tl(Point tl, Point size) -> Rect:
+    "Return a rectangle with the given center, width, and height."
+    br = tl + size
+    return [tl.x tl.y br.x br.y]
 
 -- Draw each box
 for ref in contents
