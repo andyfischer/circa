@@ -22,7 +22,7 @@ syn region circaString   start=+'+ end=+'+ skip=+\\'+
 syn region circaString   start=+<<<+ end=+>>>+
 
 " Keywords
-syn keyword circaKeyword def type begin end if elif else for state return in true false namespace discard
+syn keyword circaKeyword def type begin do end if elif else for state return in true false namespace discard
 syn match circaKeyword "\<do\ once\>"
 
 " Comments

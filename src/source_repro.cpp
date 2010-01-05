@@ -271,6 +271,9 @@ void print_branch_source(std::ostream& output, Term* term)
     case parser::BRANCH_SYNTAX_BEGIN:
         output << "begin";
         break;
+    case parser::BRANCH_SYNTAX_DO:
+        output << "do";
+        break;
     case parser::BRANCH_SYNTAX_UNDEF:
     case parser::BRANCH_SYNTAX_IMPLICIT_BEGIN:
         break;
@@ -304,6 +307,7 @@ void print_branch_source(std::ostream& output, Term* term)
     case parser::BRANCH_SYNTAX_UNDEF:
     case parser::BRANCH_SYNTAX_BEGIN:
     case parser::BRANCH_SYNTAX_IMPLICIT_BEGIN:
+    case parser::BRANCH_SYNTAX_DO:
         output << "end";
         break;
     case parser::BRANCH_SYNTAX_BRACE:

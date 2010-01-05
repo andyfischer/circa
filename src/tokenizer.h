@@ -77,6 +77,7 @@ const int TRIPLE_GTHAN = 49;
 const int DEF = 51;
 const int TYPE = 52;
 const int BEGIN = 64;
+const int DO = 70;
 const int END = 53;
 const int IF = 54;
 const int ELSE = 55;
@@ -94,10 +95,10 @@ const int AND = 67;
 const int OR = 68;
 const int DISCARD = 69;
 
-const int WHITESPACE = 70;
-const int NEWLINE = 71;
-const int COMMENT = 72;
-const int EOF_TOKEN = 73;
+const int WHITESPACE = 80;
+const int NEWLINE = 81;
+const int COMMENT = 82;
+const int EOF_TOKEN = 83;
 
 const int UNRECOGNIZED = 90;
 

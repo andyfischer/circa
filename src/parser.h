@@ -13,9 +13,10 @@ namespace parser {
 enum BranchSyntax {
     BRANCH_SYNTAX_UNDEF=0,
     BRANCH_SYNTAX_COLON=1,
-    BRANCH_SYNTAX_IMPLICIT_BEGIN=2,
-    BRANCH_SYNTAX_BEGIN=3,
-    BRANCH_SYNTAX_BRACE=4
+    BRANCH_SYNTAX_IMPLICIT_BEGIN=2, // deprecated
+    BRANCH_SYNTAX_BEGIN=3,          // deprecated
+    BRANCH_SYNTAX_BRACE=4,
+    BRANCH_SYNTAX_DO=5
 };
 
 typedef Term* (*ParsingStep)(Branch& branch, TokenStream& tokens);

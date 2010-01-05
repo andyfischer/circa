@@ -61,6 +61,7 @@ const char* get_token_text(int match)
         case WHITESPACE: return "WHITESPACE";
         case NEWLINE: return "NEWLINE";
         case BEGIN: return "begin";
+        case DO: return "do";
         case END: return "end";
         case IF: return "if";
         case ELSE: return "else";
@@ -274,7 +275,9 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, IN_TOKEN)) return;
         if (try_to_consume_keyword(context, TRUE_TOKEN)) return;
         if (try_to_consume_keyword(context, FALSE_TOKEN)) return;
-        if (try_to_consume_keyword(context, DO_ONCE)) return;
+        // check 'do once' before 'do'
+        if (try_to_consume_keyword(context, DO_ONCE)) return; 
+        if (try_to_consume_keyword(context, DO)) return;
         if (try_to_consume_keyword(context, NAMESPACE)) return;
         if (try_to_consume_keyword(context, INCLUDE)) return;
         if (try_to_consume_keyword(context, AND)) return;

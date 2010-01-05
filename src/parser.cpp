@@ -112,6 +112,9 @@ void consume_branch(Branch& branch, TokenStream& tokens)
     } else if (tokens.nextIs(BEGIN)) {
         tokens.consume(BEGIN);
         branchStyle = BRANCH_SYNTAX_BEGIN;
+    } else if (tokens.nextIs(DO)) {
+        tokens.consume(DO);
+        branchStyle = BRANCH_SYNTAX_DO;
     }
 
     while (!tokens.finished()) {
@@ -134,9 +137,9 @@ void consume_branch(Branch& branch, TokenStream& tokens)
             return;
         }
         tokens.consume(RBRACE);
-    } else if (branchStyle == BRANCH_SYNTAX_BEGIN) {
+    } else if (branchStyle == BRANCH_SYNTAX_BEGIN || branchStyle == BRANCH_SYNTAX_DO) {
         if (!tokens.nextIs(END)) {
-            compile_error_for_line(branch, tokens, startPosition);
+            compile_error_for_line(branch, tokens, startPosition, "Expected: end");
             return;
         }
         tokens.consume(END);

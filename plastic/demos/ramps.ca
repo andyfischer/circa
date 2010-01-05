@@ -9,7 +9,7 @@ NE = 1
 SE = 2
 SW = 3
 
-def rotations_opposite(int x, int y) -> bool
+def rotations_opposite(int x, int y) -> bool do
   if x == NW
     return y == SE
   elif x == NE
@@ -28,8 +28,8 @@ num_tiles = num_tiles_x * num_tiles_y
 state rescued_creatures = 0
 
 -- Draw the checkerboard in the background
-for x in 0..num_tiles_x
-  for y in 0..num_tiles_y
+for x in 0..num_tiles_x do
+  for y in 0..num_tiles_y do
     box_tl = [x->int * tile_size, y->int * tile_size] -> Point
     box_br = box_tl + [tile_size, tile_size]
     box_tr = [box_br.x box_tl.y]
@@ -41,7 +41,7 @@ end
 
 -- Draw the goal label
 small_font = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 18)
-def draw_goal_label(Point loc)
+def draw_goal_label(Point loc) do
     draw_text_centered(small_font, "GOAL", #000, loc)
     loc += [-15 20]
     arrow_head = loc+[20 0]
