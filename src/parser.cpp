@@ -1194,29 +1194,9 @@ Term* constant_fold_lexpr(Term* call)
 
         Term* head = call->input(0);
 
-        // Constant-fold a namespace access.
-        if (is_namespace(head)) {
-            Term* nameTerm = call->input(1);
-            std::string& name = nameTerm->asString();
-            Branch& ns = as_branch(head);
-
-std::cout << "Deprecated namespace access: " << head->name << "." << name << std::endl;
-
-            if (!ns.contains(name))
-                return call;
-
-            RefList newInputs(ns[name]);
-
-            for (int i=2; i < call->numInputs(); i++)
-                newInputs.append(call->input(i));
-
-            call->inputs = newInputs;
-
-            erase_term(nameTerm);
-
         // If 'head' is an unknown identifier, then make this a more specific
         // unknown identifier.
-        } else if (head->function == UNKNOWN_IDENTIFIER_FUNC) {
+        if (head->function == UNKNOWN_IDENTIFIER_FUNC) {
             Term* nameTerm = call->input(1);
             rename(head, head->name + "." + nameTerm->asString());
             RefList newInputs(head);
@@ -1241,18 +1221,18 @@ std::cout << "Deprecated namespace access: " << head->name << "." << name << std
     return call;
 }
 
-std::string lexpr_get_original_string(Term* lexpr)
+std::string dotted_name_get_original_string(Term* gfTerm)
 {
-    if (lexpr->function != LEXPR_FUNC)
-        return lexpr->name;
+    if (gfTerm->function != GET_FIELD_FUNC)
+        return gfTerm->name;
 
-    if (lexpr->numInputs() == 0)
+    if (gfTerm->numInputs() == 0)
         return "";
 
     std::stringstream out;
-    out << lexpr->input(0)->name;
-    for (int i=1; i < lexpr->numInputs(); i++)
-        out << "." << lexpr->input(i)->asString();
+    out << gfTerm->input(0)->name;
+    for (int i=1; i < gfTerm->numInputs(); i++)
+        out << "." << gfTerm->input(i)->asString();
     return out.str();
 }
 
@@ -1261,9 +1241,9 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
 {
     RefList inputs = _inputs;
 
-    Term* lexprTerm = function;
-    Term* head = lexprTerm->input(0);
-    Term* fieldNameTerm = lexprTerm->input(1);
+    Term* originalFunctionTerm = function;
+    Term* head = function->input(0);
+    Term* fieldNameTerm = function->input(1);
     std::string& fieldName = fieldNameTerm->asString();
     std::string nameRebind;
 
@@ -1278,7 +1258,7 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
             nameRebind = head->name;
 
         erase_term(fieldNameTerm);
-        erase_term(lexprTerm);
+        erase_term(originalFunctionTerm);
 
         Term* result = apply(branch, function, inputs, nameRebind);
         get_input_syntax_hint(result, 0, "hidden") = "true";
@@ -1333,17 +1313,11 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
 
     tokens.consume(RPAREN);
-
-#if 0
-    if (function->function == LEXPR_FUNC)
-        std::cout << "Deprecated namespace syntax: " << function->input(0)->name << std::endl;
-#endif
     
-    std::string originalName = lexpr_get_original_string(function);
-    function = constant_fold_lexpr(function);
+    std::string originalName = dotted_name_get_original_string(function);
 
-    // Check if 'function' is a lexpr. If so then parse this as a member function call.
-    if (function->function == LEXPR_FUNC)
+    // Check if 'function' is a get_field. If so then parse this as a member function call.
+    if (function->function == GET_FIELD_FUNC)
         return member_function_call(branch, function, arguments, originalName);
 
     if (!is_callable(function))
@@ -1403,13 +1377,13 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
 
         std::string ident = tokens.consume(IDENTIFIER);
         
-        // If 'head' is already a lexpr() term, then append this name.
-        if (head->function == LEXPR_FUNC) {
+        // If 'head' is already a get_field() term, then append this name.
+        if (head->function == GET_FIELD_FUNC) {
             head->inputs.append(create_string(branch, ident));
 
-        // Otherwise, start a new lexpr()
+        // Otherwise, start a new get_field()
         } else {
-            head = apply(branch, LEXPR_FUNC, RefList(head, create_string(branch, ident)));
+            head = apply(branch, GET_FIELD_FUNC, RefList(head, create_string(branch, ident)));
             set_source_location(head, startPosition, tokens);
         }
         finished = false;
@@ -1440,13 +1414,6 @@ Term* subscripted_atom(Branch& branch, TokenStream& tokens)
         if (has_static_error(result))
             return result;
     };
-
-    result = constant_fold_lexpr(result);
-
-    // lexpr() is a parser temporary, if we haven't removed it already then
-    // make it legitimate by converting it to get_field().
-    if (result->function == LEXPR_FUNC)
-        change_function(result, GET_FIELD_FUNC);
 
     return result;
 }
@@ -1803,6 +1770,7 @@ Term* identifier_or_lexpr(Branch& branch, TokenStream& tokens)
     if (head == NULL)
         head = unknown_identifier(branch, id);
 
+#if 0
     while (tokens.nextIs(DOT)) {
         tokens.consume(DOT);
 
@@ -1819,18 +1787,19 @@ Term* identifier_or_lexpr(Branch& branch, TokenStream& tokens)
 
         Term* nameTerm = create_string(branch, id);
 
-        // If head is a lexpr(), then append this name.
-        if (head->function == LEXPR_FUNC) {
+        // If head is a get_field(), then append this name.
+        if (head->function == GET_FIELD_FUNC) {
             head->inputs.append(nameTerm);
 
         // Otherwise, start a new lexpr
         } else {
-            head = apply(branch, LEXPR_FUNC, RefList(head, nameTerm));
+            head = apply(branch, GET_FIELD_FUNC, RefList(head, nameTerm));
             set_source_location(head, startPosition, tokens);
         }
 
         branch.moveToEnd(head);
     }
+#endif
 
     if (rebindOperator)
         push_pending_rebind(branch, head->name);

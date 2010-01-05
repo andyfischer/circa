@@ -1,2 +1,2 @@
 cd $CIRCA_HOME
-scons && circa -test
+waf build && circa -test

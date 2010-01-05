@@ -30,14 +30,16 @@ void repl_evaluate_line(Branch& branch, std::string const& input, std::ostream& 
         }
     }
 
+    // Print results of the last expression
+    output << to_string(branch[branch.length()-1]) << std::endl;
+
     // if there were any errors, erase the most recent results
+#if 0
     if (anyErrors) {
         branch.shorten(previousHead);
         return;
     }
-
-    // Print results of the last expression
-    output << to_string(branch[branch.length()-1]) << std::endl;
+#endif
 }
 
 void start_repl()

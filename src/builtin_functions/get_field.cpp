@@ -22,6 +22,11 @@ namespace get_field_function {
             head = as_branch(head)[fieldIndex];
         }
 
+        // Force a type change if needed. This is bad, need to revisit how we handle
+        // 'any' type.
+        if (!value_fits_type(head, caller->type))
+            change_type(caller, head->type);
+
         assign_value(head, caller);
     }
 

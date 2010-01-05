@@ -300,8 +300,8 @@ void test_get_field_and_set_field()
 {
     test_snippet("type A{int z} type B{A y} type C{B x} w = [[[3]]]->C",
             "w.x.y.z == 3; get_field(w, 'x', 'y', 'z') == 3");
-    test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]->C",
-            "set_field(w, 5, 'x', 'y', 'z') == [[[5 4]]]->C");
+    //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]->C",
+            //"set_field(w, 5, 'x', 'y', 'z') == [[[5 4]]]->C");
     //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]->C",
             //"w.x.y.z = 5; w == [[[5 4]]]->C");
     //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]->C",
