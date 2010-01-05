@@ -99,7 +99,7 @@ def draw_free_piece(Point location, number rot)
     for p in @shape
         p += location
     end
-    gl.triangles(shape, #404)
+    gl:triangles(shape, #404)
 end
 
 def draw_piece(Piece piece)

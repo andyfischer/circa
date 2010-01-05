@@ -1,7 +1,7 @@
 
 background(#eef)
 
-def interp(number progress, number e) ::number
+def interp(number progress, number e) -> number
   return min(progress / e, 1.0)
 end
 
@@ -27,7 +27,7 @@ def tree_segment(Point base, number direction, number width, number depth)
   next_center = polar(direction, seg_length, base)
   l2 = polar(direction - .5, top_width, next_center)
   r2 = polar(direction + .5, top_width, next_center)
-  gl.triangles([r l l2 l2 r2 r] #440101)
+  gl:triangles([r l l2 l2 r2 r] #440101)
 
   if has_branches
     state l_jitter = rand() * .2

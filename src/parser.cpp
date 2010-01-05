@@ -89,32 +89,6 @@ struct ListSyntaxHints {
     std::vector<Input> mPending;
 };
 
-#if 0
-// This simple structure can tell you, after parsing an infix_expression, whether
-// you have just parsed a qualified_identifier. It knows this because
-// qualified_identifier is the only parsing step that doesn't create a new term.
-struct CheckForQualifiedIdentifier
-{
-    // Initialize this object immediately before calling infix_expression
-    CheckForQualifiedIdentifier(Branch& branch, TokenStream& tokens)
-      : _branch(branch)
-    {
-        _origLength = branch.length();
-        _origPosition = tokens.getPosition();
-    }
-
-    // Call this immediately after calling infix_expression
-    bool check()
-    {
-        return _branch.length() == _originalLength;
-    }
-
-    Branch& _branch;
-    int _origLength;
-    int _origPosition;
-};
-#endif
-
 void consume_branch(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
@@ -1400,14 +1374,13 @@ Term* atom(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
     Term* result = NULL;
 
-    // identifier?
-    if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(AT_SIGN))
-        result = identifier_or_lexpr(branch, tokens);
+    // identifier with rebind?
+    if (tokens.nextIs(AT_SIGN) && tokens.nextIs(IDENTIFIER, 1))
+        result = identifier_with_rebind(branch, tokens);
 
-    // qualified identifier?
-    // this is temp, should be combined with above step
-    else if (tokens.nextIs(QUALIFIED_IDENTIFIER))
-        result = qualified_identifier(branch, tokens);
+    // identifier?
+    else if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(QUALIFIED_IDENTIFIER))
+        result = identifier(branch, tokens);
 
     // literal integer?
     else if (tokens.nextIs(INTEGER))
@@ -1704,7 +1677,7 @@ Term* unknown_identifier(Branch& branch, std::string const& name)
     return term;
 }
 
-Term* qualified_identifier(Branch& branch, TokenStream& tokens)
+Term* identifier(Branch& branch, TokenStream& tokens)
 {
     std::string id;
     if (tokens.nextIs(IDENTIFIER))
@@ -1712,17 +1685,16 @@ Term* qualified_identifier(Branch& branch, TokenStream& tokens)
     else if (tokens.nextIs(QUALIFIED_IDENTIFIER))
         id = tokens.consume(QUALIFIED_IDENTIFIER);
     else 
-        throw std::runtime_error("qualified_identifier() expected ident");
+        throw std::runtime_error("identifier() expected ident");
 
     Term* result = find_named(branch, id);
-
     if (result == NULL)
         return unknown_identifier(branch, id);
 
     return result;
 }
 
-Term* identifier_or_lexpr(Branch& branch, TokenStream& tokens)
+Term* identifier_with_rebind(Branch& branch, TokenStream& tokens)
 {
     //int startPosition = tokens.getPosition();
 
@@ -1738,37 +1710,6 @@ Term* identifier_or_lexpr(Branch& branch, TokenStream& tokens)
     Term* head = find_named(branch, id);
     if (head == NULL)
         head = unknown_identifier(branch, id);
-
-#if 0
-    while (tokens.nextIs(DOT)) {
-        tokens.consume(DOT);
-
-        if (!tokens.nextIs(IDENTIFIER))
-            return compile_error_for_line(branch, tokens, startPosition,
-                    "Expected identifier after .");
-
-        id = tokens.consume(IDENTIFIER);
-
-        if (head->function == UNKNOWN_IDENTIFIER_FUNC) {
-            rename(head, head->name + "." + id);
-            continue;
-        }
-
-        Term* nameTerm = create_string(branch, id);
-
-        // If head is a get_field(), then append this name.
-        if (head->function == GET_FIELD_FUNC) {
-            head->inputs.append(nameTerm);
-
-        // Otherwise, start a new lexpr
-        } else {
-            head = apply(branch, GET_FIELD_FUNC, RefList(head, nameTerm));
-            set_source_location(head, startPosition, tokens);
-        }
-
-        branch.moveToEnd(head);
-    }
-#endif
 
     if (rebindOperator)
         push_pending_rebind(branch, head->name);

@@ -16,7 +16,7 @@ for star in 0..num_stars
     state Star star = random_star()
     state Color color = random_color()
 
-    gl.circle(star.location+[cos(angle) sin(angle)]*30 star.size color)
+    gl:circle(star.location+[cos(angle) sin(angle)]*30 star.size color)
 
     angle += time_delta
     angle = mod(angle,1)
