@@ -244,12 +244,13 @@ Term* statement(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
     std::string preWhitespace = possible_whitespace(tokens);
+    bool foundWhitespace = preWhitespace != "";
 
     Term* result = NULL;
 
     // Comment (blank lines count as comments)
     if (tokens.nextIs(COMMENT) || tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON)
-            || tokens.nextIs(RBRACE) || tokens.nextIs(END)) {
+        || (foundWhitespace && (tokens.nextIs(RBRACE) || tokens.nextIs(END)))) {
         result = comment(branch, tokens);
         assert(result != NULL);
     }
@@ -311,6 +312,11 @@ Term* statement(Branch& branch, TokenStream& tokens)
     set_is_statement(result, true);
 
     set_source_location(result, startPosition, tokens);
+
+    // Avoid an infinite loop
+    if (startPosition == tokens.getPosition())
+        throw std::runtime_error("parser::statement is stuck, next token is: "
+                + tokens.next().text);
 
     return result;
 }
@@ -858,7 +864,6 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
         return expr;
     }
-
 
     // Otherwise, this is an assignment statement.
     Term* lexpr = expr; // rename for clarity
@@ -1451,8 +1456,10 @@ Term* atom(Branch& branch, TokenStream& tokens)
         result->intProp("syntaxHints:parens") += 1;
     }
     else {
-
-        return compile_error_for_line(branch, tokens, startPosition);
+        if (!tokens.finished())
+            tokens.consume();
+        return compile_error_for_line(branch, tokens, startPosition,
+            "Unrecognized expression");
     }
 
     set_source_location(result, startPosition, tokens);
