@@ -56,6 +56,7 @@
 				AdditionalLibraryDirectories="../deps/lib"
 				GenerateManifest="false"
 				ManifestFile=""
+				GenerateDebugInformation="true"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"

@@ -174,7 +174,7 @@ if __name__ == '__main__':
     import sys
     if sys.argv[1] == 'windows':
         deploy_windows_cl()
-        deploy_windows()
+        deploy_windows_debug()
     if sys.argv[1] == 'mac':
         deploy_mac_cl()
         deploy_mac_plastic_cl()
