@@ -1,6 +1,6 @@
 
 -- simple test
-for i in range(5)
+for i in 0..5
   i -> print
 end
 
@@ -13,13 +13,13 @@ end
 
 -- modify an outside value
 x = 10.0
-for i in range(3)
+for i in 0..3
   x += 2.0
 end
 print('should be 16.0: ' x)
 
 -- if statement inside a for loop
-for i in range(5)
+for i in 0..5
   if i == 3
     print('if passed')
   end
@@ -31,7 +31,6 @@ if true
       print('if2 passed')
    end
 end
-
 
 -- for loop inside a function
 def look_for_3(List numbers)

@@ -1,6 +1,14 @@
+-- stubs
+PI = 1
+UP = 2
+LEFT = 3
+RIGHT = 4
+SPACE = 5
+def point(any...) {}
+def line_to(any...) {}
+def key_down(any...) -> bool {}
+def key_pressed(any...) -> bool {}
 
--- paint background
-fill_rectangle(0,0,640,480, 0xfffffffe)
 
 -- mouse positions are passed in from cgame
 state number mouse_x
@@ -44,11 +52,11 @@ line_to(d_x, d_y, a_x, a_y, 0)
 
 
 -- accelerate if up is pressed, decellerate if not
-if key_down(KEY_UP)
+if key_down(UP)
     ship_speed += 0.5
 end
 
-if not(key_down(KEY_UP))
+if not(key_down(UP))
     ship_speed -= 0.1
 end
 
@@ -60,11 +68,11 @@ ship_x += ship_speed * cos(ship_facing)
 ship_y += ship_speed * sin(ship_facing)
 
 -- turn ship
-if key_down(KEY_LEFT)
+if key_down(LEFT)
     ship_facing -= turn_speed * PI
 end
 
-if key_down(KEY_RIGHT)
+if key_down(RIGHT)
     ship_facing += turn_speed * PI
 end
 
@@ -80,7 +88,7 @@ bullet_size = 3.0
 bullet_x += bullet_speed * cos(bullet_facing)
 bullet_y += bullet_speed * sin(bullet_facing)
 
-if key_pressed(KEY_SPACE)
+if key_pressed(SPACE)
     -- shoot a new bullet
     bullet_active = true
     bullet_facing = ship_facing

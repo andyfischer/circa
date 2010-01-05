@@ -34,10 +34,10 @@ namespace subroutine_t {
             load_state_into_branch(as_branch(hiddenState), functionBranch);
         }
 
-
+        bool varArgs = function_t::get_variable_args(caller->function);
         int num_inputs = function_t::num_inputs(caller->function);
 
-        if (num_inputs != caller->inputs.length()) {
+        if (!varArgs && (num_inputs != caller->inputs.length())) {
             std::stringstream msg;
             msg << "Wrong number of inputs, expected: " << num_inputs
                 << ", found: " << caller->inputs.length();
