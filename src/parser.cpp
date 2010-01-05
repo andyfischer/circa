@@ -1185,42 +1185,6 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
     return subscripted_atom(branch, tokens);
 }
 
-Term* constant_fold_lexpr(Term* call)
-{
-    if (call->function != LEXPR_FUNC)
-        return call;
-
-    while (call->numInputs() > 1) {
-
-        Term* head = call->input(0);
-
-        // If 'head' is an unknown identifier, then make this a more specific
-        // unknown identifier.
-        if (head->function == UNKNOWN_IDENTIFIER_FUNC) {
-            Term* nameTerm = call->input(1);
-            rename(head, head->name + "." + nameTerm->asString());
-            RefList newInputs(head);
-            for (int i=2; i < call->numInputs(); i++)
-                newInputs.append(call->input(i));
-
-            call->inputs = newInputs;
-            erase_term(nameTerm);
-
-        } else {
-            break;
-        }
-    }
-
-    // Check to remove the lexpr call
-    if (call->numInputs() <= 1) {
-        Term* result = call->input(0);
-        erase_term(call);
-        return result;
-    }
-
-    return call;
-}
-
 std::string dotted_name_get_original_string(Term* gfTerm)
 {
     if (gfTerm->function != GET_FIELD_FUNC)
@@ -1359,8 +1323,6 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
             return compile_error_for_line(branch, tokens, startPosition, "Expected: ]");
 
         tokens.consume(RBRACKET);
-
-        head = constant_fold_lexpr(head);
 
         Term* result = apply(branch, GET_INDEX_FUNC, RefList(head, subscript));
         get_input_syntax_hint(result, 1, "preWhitespace") = postLbracketWs;
@@ -1755,7 +1717,7 @@ Term* qualified_identifier(Branch& branch, TokenStream& tokens)
 
 Term* identifier_or_lexpr(Branch& branch, TokenStream& tokens)
 {
-    int startPosition = tokens.getPosition();
+    //int startPosition = tokens.getPosition();
 
     bool rebindOperator = false;
 

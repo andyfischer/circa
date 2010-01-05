@@ -57,8 +57,6 @@ Term* namespace_block(Branch& branch, TokenStream& tokens);
 Term* qualified_identifier(Branch& branch, TokenStream& tokens);
 Term* identifier_or_lexpr(Branch& branch, TokenStream& tokens);
 
-Term* constant_fold_lexpr(Term* call);
-
 // Helper functions:
 void consume_branch(Branch& branch, TokenStream& tokens);
 void consume_branch_with_significant_indentation(Branch& branch, TokenStream& tokens);
