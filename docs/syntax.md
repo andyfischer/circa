@@ -144,7 +144,7 @@ We have the following infix operators:
 </tr>
 <tr>
  <tr><td>.</td>      <td>(multiple)</td><td>Named field access or member function call</td><td>9</td></tr>
- <tr><td>::</td>      <td>annotate_type</td><td>Specifies a value's type</td><td>8</td></tr>
+ <tr><td>-></td>      <td>(none)</td><td>Right-apply</td><td>8</td></tr>
  <tr><td>..</td>      <td>range</td><td>Range of integers</td><td>8</td></tr>
  <tr><td>*</td>      <td>mult</td><td>Multiplication (overloaded)</td><td>7</td></tr>
  <tr><td>/</td>      <td>div</td><td>Division, floating-point</td><td>7</td></tr>
@@ -152,7 +152,6 @@ We have the following infix operators:
  <tr><td>%</td>      <td>remainder</td><td>Modulo, truncated division</td><td>7</td></tr>
  <tr><td>+</td>      <td>add</td><td>Addition (overloaded)</td><td>6</td></tr>
  <tr><td>-</td>      <td>sub</td><td>Subtraction (overloaded)</td><td>6</td></tr>
- <tr><td>-></td>      <td>(none)</td><td>Right-apply</td><td>5</td></tr>
  <tr><td><</td>      <td>less_than</td><td>Less-than comparison</td><td>4</td></tr>
  <tr><td><=</td>      <td>less_than_eq</td><td>Less-than-or-equals comparison</td><td>4</td></tr>
  <tr><td>></td>      <td>greater_than</td><td>Greater-than comparison</td><td>4</td></tr>

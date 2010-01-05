@@ -985,6 +985,7 @@ int get_infix_precedence(int match)
 {
     switch(match) {
         case tokenizer::TWO_DOTS:
+        case tokenizer::RIGHT_ARROW:
             return 8;
         case tokenizer::STAR:
         case tokenizer::SLASH:
@@ -994,8 +995,7 @@ int get_infix_precedence(int match)
         case tokenizer::PLUS:
         case tokenizer::MINUS:
             return 6;
-        case tokenizer::RIGHT_ARROW:
-            return 5;
+            //return 5;
         case tokenizer::LTHAN:
         case tokenizer::LTHANEQ:
         case tokenizer::GTHAN:

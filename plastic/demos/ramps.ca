@@ -30,17 +30,17 @@ state rescued_creatures = 0
 -- Draw the checkerboard in the background
 for x in 0..num_tiles_x
   for y in 0..num_tiles_y
-    box_tl = [x::int * tile_size, y::int * tile_size] -> Point
+    box_tl = [x->int * tile_size, y->int * tile_size] -> Point
     box_br = box_tl + [tile_size, tile_size]
     box_tr = [box_br.x box_tl.y]
     box_bl = [box_tl.x box_br.y]
-    color = if_expr((x::int+y::int) % 2 == 1, #eee, #fff)
+    color = if_expr((x->int+y->int) % 2 == 1, #eee, #fff)
     gl:triangles([box_tl box_tr box_bl box_tr box_br box_bl] color)
   end
 end
 
 -- Draw the goal label
-small_font = text.load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 18)
+small_font = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 18)
 def draw_goal_label(Point loc)
     draw_text_centered(small_font, "GOAL", #000, loc)
     loc += [-15 20]
@@ -52,14 +52,14 @@ end
 draw_goal_label([window.width - 50 window.height / 2])
 
 -- Draw # of points
-big_font = text.load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 40)
+big_font = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 40)
 draw_text_centered(big_font, concat('Rescued: ' rescued_creatures) #000
     [window.width/2 20])
 
 -- Helper function
 def rotate_points_around(List points, Point center, number rot) -> List
     for point in @points
-        point = point::Point
+        point = point->Point
         point = point - center
         point = [point.x*cos(rot) - point.y*sin(rot), point.x*sin(rot)+point.y*cos(rot)]
         point = point + center
@@ -150,7 +150,7 @@ state board = map(initialize_board_piece, 0..num_tiles)
 
 def rotate_falling_group(List group, int rot) -> List
     for piece in @group
-        piece = piece::Piece
+        piece = piece -> Piece
         pos = rotate_around_i([piece.x piece.y] [1 1] rot)
         piece = [pos.x pos.y (piece.rot + rot)%4]
     end
@@ -226,7 +226,7 @@ if tile_fall_distance < 0
     -- Make this piece permanent
     falling_group_position = position_falling_pieces(falling_group, falling_group_pos)
     for piece in falling_group_position
-      piece = piece::Piece
+      piece = piece -> Piece
       existing_board_piece = board[board_loc_to_index([piece.x piece.y])] -> BoardPiece
 [piece.rot true existing_board_piece.filled]
       board = set_index(board, board_loc_to_index([piece.x piece.y]), [piece.rot true existing_board_piece.filled])
@@ -245,7 +245,7 @@ falling_group_pos = falling_group_pos -> FallingGroupPosition
 positioned_falling_group = position_falling_pieces(falling_group, falling_group_pos)
 
 for piece in positioned_falling_group
-    piece = piece::Piece
+    piece = piece -> Piece
     draw_free_piece([piece.x * tile_size, piece.y * tile_size - tile_fall_distance] piece.rot/4.0)
 end
 
@@ -343,7 +343,7 @@ end
 
 -- Move creatures
 for creature in @creatures
-    creature = creature::Creature
+    creature = creature -> Creature
     speed = .5
     creature.tile_x_progress = creature.tile_x_progress + time_delta * speed * creature.walking_dir
 
@@ -399,7 +399,7 @@ creature_color = #844
 
 -- Draw creatures
 for pos in map(position_creature, creatures)
-    gl.circle(pos::Point creature_radius creature_color)
+    gl:circle(pos -> Point creature_radius creature_color)
 end
 
 -- Kill creatures if the falling block touches them
@@ -408,14 +408,14 @@ type KilledCreature { Point loc, number age }
 state dying_creatures = []
 
 for creature in @creatures
-    creature = creature::Creature
+    creature = creature->Creature
     position = position_creature(creature)
 
     collided = false
     for landed_group in landed_falling_group
-        landed_group = landed_group::List
+        landed_group = landed_group->List
         for piece in landed_group
-            piece = piece::Piece
+            piece = piece->Piece
             if piece.x == creature.tile_x
                 collided = true
             end
@@ -430,10 +430,10 @@ end
 
 -- Draw killed creatures
 for creature in @dying_creatures
-    creature = creature::KilledCreature
+    creature = creature->KilledCreature
     --color = creature_color + #000f * interpolate(1 0 3.0 creature.age)
     color = #555
-    gl.circle(creature.loc creature_radius color)
+    gl:circle(creature.loc creature_radius color)
 
     if creature.age > 3.0
         discard

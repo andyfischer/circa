@@ -82,8 +82,10 @@ void push_pending_rebind(Branch& branch, std::string const& name)
 {
     std::string attrname = "#attr:comp-pending-rebind";
 
-    if (branch.contains(attrname))
+    if (branch.contains(attrname)) {
+        dump_branch(branch);
         throw std::runtime_error("pending rebind already exists (name: " + name + ")");
+    }
 
     create_string(branch, name, attrname);
 }

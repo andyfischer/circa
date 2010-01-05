@@ -69,7 +69,7 @@ def deploy_assets(target_dir):
     copy_tree('plastic/stdlib', target_dir+'/stdlib')
 
     # remove some demos that aren't ready yet
-    unready_demos = ['browser.ca', 'invaders.ca', 'meshtest.ca', 'ramps.ca', 'text.ca', 'tree.ca']
+    unready_demos = ['browser.ca', 'invaders.ca', 'meshtest.ca', 'text.ca', 'tree.ca']
     for file in unready_demos:
         rm(target_dir+'/demos/'+file)
 
