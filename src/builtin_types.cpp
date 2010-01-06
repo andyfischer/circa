@@ -426,7 +426,7 @@ namespace branch_mirror_t
     {
         Branch& target_branch = get_target_branch(caller);
 
-        as_string(caller) = print_branch_raw(target_branch);
+        as_string(caller) = get_branch_raw(target_branch);
     }
     void save(Term* caller)
     {

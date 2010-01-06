@@ -67,9 +67,9 @@ void test_migration(std::string sourceCode, std::string destinationCode,
             std::cout << "In " << get_current_test_name() << std::endl;
             std::cout << "assertion failed: " << get_term_source(assertions[i]) << std::endl;
             std::cout << "Source:" << std::endl;
-            std::cout << print_branch_raw(source);
+            print_branch_raw(std::cout, source);
             std::cout << "Destination:" << std::endl;
-            std::cout << print_branch_raw(destination);
+            print_branch_raw(std::cout, destination);
             declare_current_test_failed();
             return;
         }

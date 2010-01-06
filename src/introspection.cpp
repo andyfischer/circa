@@ -42,12 +42,12 @@ std::string get_short_local_name(Term* term)
     return format_global_id(term);
 }
 
-std::string term_to_raw_string(Term* term)
+void print_term_raw_string(std::ostream& out, Term* term)
 {
-    if (term == NULL)
-        return "<NULL>";
-
-    std::stringstream output;
+    if (term == NULL) {
+        out << "<NULL>";
+        return;
+    }
 
     std::string name = term->name;
     std::string funcName = term->function == NULL ? "<NULL function>"
@@ -55,27 +55,27 @@ std::string term_to_raw_string(Term* term)
     std::string typeName = term->type == NULL ? "<NULL type>"
         : term->type->name;
    
-    output << format_global_id(term) << " ";
+    out << format_global_id(term) << " ";
 
     if (name != "")
-        output << "'" << name << "' ";
+        out << "'" << name << "' ";
 
-    output << funcName << "(";
+    out << funcName << "(";
 
     bool first_input = true;
     for (int input_index=0; input_index < term->inputs.length(); input_index++) {
         Term* input = term->inputs[input_index];
-        if (!first_input) output << ", ";
+        if (!first_input) out << ", ";
         if (input == NULL)
-            output << "NULL";
+            out << "NULL";
         else
-            output << format_global_id(input);
+            out << format_global_id(input);
         first_input = false;
     }
 
-    output << ")";
+    out << ")";
 
-    output << " -> " << typeName;
+    out << " -> " << typeName;
 
     bool showValue = is_value_alloced(term);
 
@@ -83,14 +83,26 @@ std::string term_to_raw_string(Term* term)
         showValue = false;
 
     if (showValue)
-        output << " == " << term->toString();
+        out << " == " << term->toString();
+}
 
-    return output.str();
+void print_term_raw_string_with_properties(std::ostream& out, Term* term)
+{
+    out << term_to_raw_string(term) + " " + dict_t::to_string(term->properties);
+}
+
+std::string term_to_raw_string(Term* term)
+{
+    std::stringstream out;
+    print_term_raw_string(out, term);
+    return out.str();
 }
 
 std::string term_to_raw_string_with_properties(Term* term)
 {
-    return term_to_raw_string(term) + " " + dict_t::to_string(term->properties);
+    std::stringstream out;
+    print_term_raw_string_with_properties(out, term);
+    return out.str();
 }
 
 std::string branch_namespace_to_string(Branch& branch)
@@ -105,9 +117,8 @@ std::string branch_namespace_to_string(Branch& branch)
     return out.str();
 }
 
-std::string print_branch_raw(Branch& branch)
+void print_branch_raw(std::ostream& out, Branch& branch)
 {
-    std::stringstream out;
     for (BranchIterator it(branch); !it.finished(); it.advance()) {
         Term* term = it.current();
 
@@ -115,14 +126,13 @@ std::string print_branch_raw(Branch& branch)
 
         for (int i=0; i < indent; i++) out << "  ";
 
-        out << term_to_raw_string(term) << std::endl;
+        print_term_raw_string(out, term);
+        out << std::endl;
     }
-    return out.str();
 }
 
-std::string print_branch_raw_with_properties(Branch& branch)
+void print_branch_raw_with_properties(std::ostream& out, Branch& branch)
 {
-    std::stringstream out;
     for (BranchIterator it(branch); !it.finished(); it.advance()) {
         Term* term = it.current();
 
@@ -130,8 +140,15 @@ std::string print_branch_raw_with_properties(Branch& branch)
 
         for (int i=0; i < indent; i++) out << "  ";
 
-        out << term_to_raw_string_with_properties(term) << std::endl;
+        print_term_raw_string_with_properties(out, term);
+        out << std::endl;
     }
+}
+
+std::string get_branch_raw(Branch& branch)
+{
+    std::stringstream out;
+    print_branch_raw(out, branch);
     return out.str();
 }
 

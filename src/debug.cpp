@@ -50,12 +50,12 @@ void assert_good_pointer(Term* term)
 
 void dump_branch(Branch& branch)
 {
-    std::cout << print_branch_raw(branch);
+    print_branch_raw(std::cout, branch);
 }
 
 void dump_branch_with_props(Branch& branch)
 {
-    std::cout << print_branch_raw_with_properties(branch);
+    print_branch_raw_with_properties(std::cout, branch);
 }
 
 } // namespace circa
