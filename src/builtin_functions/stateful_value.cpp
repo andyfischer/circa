@@ -14,8 +14,8 @@ namespace stateful_value_function {
         std::stringstream out;
         out << "state ";
 
-        if (term->hasProperty("syntaxHints:explicitType"))
-            out << term->stringProp("syntaxHints:explicitType") << " ";
+        if (term->hasProperty("syntax:explicitType"))
+            out << term->stringProp("syntax:explicitType") << " ";
 
         out << term->name;
 

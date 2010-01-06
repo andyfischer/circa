@@ -68,20 +68,20 @@ namespace type_t {
         std::stringstream out;
 
         out << "type " << term->name;
-        out << term->stringPropOptional("syntaxHints:preLBracketWhitespace", " ");
+        out << term->stringPropOptional("syntax:preLBracketWhitespace", " ");
         out << "{";
-        out << term->stringPropOptional("syntaxHints:postLBracketWhitespace", " ");
+        out << term->stringPropOptional("syntax:postLBracketWhitespace", " ");
 
         Branch& prototype = type_t::get_prototype(term);
 
         for (int i=0; i < prototype.length(); i++) {
             Term* field = prototype[i];
             assert(field != NULL);
-            out << field->stringPropOptional("syntaxHints:preWhitespace","");
+            out << field->stringPropOptional("syntax:preWhitespace","");
             out << field->type->name;
-            out << field->stringPropOptional("syntaxHints:postNameWs"," ");
+            out << field->stringPropOptional("syntax:postNameWs"," ");
             out << field->name;
-            out << field->stringPropOptional("syntaxHints:postWhitespace","");
+            out << field->stringPropOptional("syntax:postWhitespace","");
         }
         out << "}";
 

@@ -243,7 +243,7 @@ namespace color_t {
 
         bool valueHasAlpha = value[3]->asFloat() < 1.0;
 
-        int specifiedDigits = term->intPropOptional("syntaxHints:colorFormat", 6);
+        int specifiedDigits = term->intPropOptional("syntax:colorFormat", 6);
 
         int digitsPerChannel = (specifiedDigits == 6 || specifiedDigits == 8) ? 2 : 1;
         bool specifyAlpha = valueHasAlpha || (specifiedDigits == 4 || specifiedDigits == 8);
@@ -419,8 +419,8 @@ namespace branch_mirror_t
         // Strip trailing whitespace after the formally-last and newly-last terms
         // so that the resulting source looks better.
         if (previousLast > 0)
-            target_branch[previousLast-1]->removeProperty("syntaxHints:lineEnding");
-        target_branch[target_branch.length()-1]->removeProperty("syntaxHints:lineEnding");
+            target_branch[previousLast-1]->removeProperty("syntax:lineEnding");
+        target_branch[target_branch.length()-1]->removeProperty("syntax:lineEnding");
     }
     void print_raw(Term* caller)
     {

@@ -13,7 +13,7 @@ namespace subroutine_t {
 
         result << function_t::get_header_source(term);
 
-        result << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
+        result << term->stringPropOptional("syntax:postHeadingWs", "\n");
 
         if (!is_native_function(term))
             print_branch_source(result, term);

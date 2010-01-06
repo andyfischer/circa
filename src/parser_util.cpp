@@ -19,15 +19,15 @@ Term* apply_with_syntax(Branch& branch, Term* function, RefList inputs, std::str
 void prepend_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
-        term->stringProp("syntaxHints:preWhitespace") = 
-            whitespace + term->stringProp("syntaxHints:preWhitespace");
+        term->stringProp("syntax:preWhitespace") = 
+            whitespace + term->stringProp("syntax:preWhitespace");
 }
 
 void append_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
-        term->stringProp("syntaxHints:postWhitespace") = 
-            term->stringProp("syntaxHints:postWhitespace") + whitespace;
+        term->stringProp("syntax:postWhitespace") = 
+            term->stringProp("syntax:postWhitespace") + whitespace;
 }
 
 void set_source_location(Term* term, int start, TokenStream& tokens)
@@ -190,7 +190,7 @@ Term* find_function(Branch& branch, std::string const& name)
 
 void set_source_hidden(Term* term, bool hidden)
 {
-    term->boolProp("syntaxHints:hidden") = hidden;
+    term->boolProp("syntax:hidden") = hidden;
 }
 
 std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient)

@@ -19,9 +19,9 @@ namespace do_once_function {
     {
         std::stringstream result;
         result << "do once";
-        result << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
+        result << term->stringPropOptional("syntax:postHeadingWs", "\n");
         result << get_branch_source(as_branch(term));
-        result << term->stringPropOptional("syntaxHints:preEndWs", "");
+        result << term->stringPropOptional("syntax:preEndWs", "");
         result << "end";
 
         return result.str();

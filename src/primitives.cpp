@@ -129,7 +129,7 @@ namespace int_t {
     std::string to_string(Term* term)
     {
         std::stringstream strm;
-        if (term->stringPropOptional("syntaxHints:integerFormat", "dec") == "hex")
+        if (term->stringPropOptional("syntax:integerFormat", "dec") == "hex")
             strm << "0x" << std::hex;
 
         strm << as_int(term);
@@ -214,7 +214,7 @@ bool is_float(Term* term)
 namespace string_t {
     std::string to_string(Term* term)
     {
-        std::string quoteType = term->stringPropOptional("syntaxHints:quoteType", "'");
+        std::string quoteType = term->stringPropOptional("syntax:quoteType", "'");
         if (quoteType == "<") return "<<<" + as_string(term) + ">>>";
         else return quoteType + as_string(term) + quoteType;
     }

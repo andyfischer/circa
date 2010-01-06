@@ -79,7 +79,7 @@ struct SourceCodePainter
         int lineStart = term->intProp("lineStart");
 
         std::string termSource = get_term_source(term)
-            + term->stringPropOptional("syntaxHints:lineEnding", "");
+            + term->stringPropOptional("syntax:lineEnding", "");
 
         bool encounteredError = false;
 

@@ -66,7 +66,7 @@ namespace if_block_function {
             if (is_hidden(branch_term))
                 continue;
 
-            result << branch_term->stringPropOptional("syntaxHints:preWhitespace", "");
+            result << branch_term->stringPropOptional("syntax:preWhitespace", "");
 
             if (branch_index == 0) {
                 result << "if ";
@@ -81,7 +81,7 @@ namespace if_block_function {
             result << get_branch_source(as_branch(branch_term));
         }
 
-        result << term->stringPropOptional("syntaxHints:whitespaceBeforeEnd", "");
+        result << term->stringPropOptional("syntax:whitespaceBeforeEnd", "");
         result << "end";
 
         return result.str();

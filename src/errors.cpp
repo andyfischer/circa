@@ -260,7 +260,7 @@ std::string get_static_error_message(Term* term)
     } 
 
     case SERROR_UNKNOWN_FUNCTION:
-        out << "Unknown function: " << term->stringProp("syntaxHints:functionName");
+        out << "Unknown function: " << term->stringProp("syntax:functionName");
         return out.str();
     case SERROR_UNKNOWN_TYPE:
         out << "Unknown type: " << term->name;

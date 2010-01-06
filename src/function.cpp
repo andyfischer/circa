@@ -16,8 +16,8 @@ namespace function_t {
 
         out << term->name;
 
-        out << term->stringPropOptional("syntaxHints:postNameWs", "");
-        out << term->stringPropOptional("syntaxHints:properties", "");
+        out << term->stringPropOptional("syntax:postNameWs", "");
+        out << term->stringPropOptional("syntax:properties", "");
 
         out << "(";
 
@@ -48,9 +48,9 @@ namespace function_t {
         out << ")";
 
         if (function_t::get_output_type(term) != VOID_TYPE) {
-            out << term->stringPropOptional("syntaxHints:whitespacePreColon", "");
+            out << term->stringPropOptional("syntax:whitespacePreColon", "");
             out << "->";
-            out << term->stringPropOptional("syntaxHints:whitespacePostColon", " ");
+            out << term->stringPropOptional("syntax:whitespacePostColon", " ");
             out << function_t::get_output_type(term)->name;
         }
 

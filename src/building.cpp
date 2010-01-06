@@ -141,7 +141,7 @@ Term* apply(Branch& branch, std::string const& functionName, RefList const& inpu
         throw std::runtime_error("function not found: "+functionName);
 
     Term* result = apply(branch, function, inputs, name);
-    result->stringProp("syntaxHints:functionName") = functionName;
+    result->stringProp("syntax:functionName") = functionName;
     return result;
 }
 

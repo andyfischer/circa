@@ -15,7 +15,7 @@ namespace branch_function {
 
         std::stringstream out;
 
-        if (term->boolPropOptional("syntaxHints:literal-list", false)) {
+        if (term->boolPropOptional("syntax:literal-list", false)) {
             prepend_name_binding(term, out);
             out << "[";
             Branch& contents = as_branch(term);
@@ -24,9 +24,9 @@ namespace branch_function {
         } else if (term->type == NAMESPACE_TYPE) {
             out << "namespace ";
             out << term->name;
-            out << term->stringPropOptional("syntaxHints:postHeadingWs", "\n");
+            out << term->stringPropOptional("syntax:postHeadingWs", "\n");
             out << get_branch_source(as_branch(term));
-            out << term->stringPropOptional("syntaxHints:preEndWs", "");
+            out << term->stringPropOptional("syntax:preEndWs", "");
             out << "end";
             
         } else {

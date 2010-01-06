@@ -20,7 +20,7 @@ int get_first_visible_input_index(Term* term)
 std::string& get_input_syntax_hint(Term* term, int index, std::string const& field)
 {
     std::stringstream fieldName;
-    fieldName << "syntaxHints:input-" << index << ":" << field;
+    fieldName << "syntax:input-" << index << ":" << field;
     return term->stringProp(fieldName.str());
 }
 
@@ -28,7 +28,7 @@ std::string get_input_syntax_hint_optional(Term* term, int index, std::string co
         std::string const& defaultValue)
 {
     std::stringstream fieldName;
-    fieldName << "syntaxHints:input-" << index << ":" << field;
+    fieldName << "syntax:input-" << index << ":" << field;
     return term->stringPropOptional(fieldName.str(), defaultValue);
 }
 
@@ -58,7 +58,7 @@ std::string get_source_of_input(Term* term, int inputIndex)
 
     // possibly insert the @ operator. This is pretty flawed, it should be stored by index.
     if (input->name != ""
-            && input->name == term->stringPropOptional("syntaxHints:rebindOperator",""))
+            && input->name == term->stringPropOptional("syntax:rebindOperator",""))
         result << "@";
 
     bool byValue = input->name == "";
@@ -76,7 +76,7 @@ std::string get_source_of_input(Term* term, int inputIndex)
 
 bool is_hidden(Term* term)
 {
-    if (term->boolPropOptional("syntaxHints:hidden", false))
+    if (term->boolPropOptional("syntax:hidden", false))
         return true;
 
     if (term->name == "")
@@ -99,15 +99,15 @@ void prepend_name_binding(Term* term, std::stringstream& out)
         out << "return ";
     else if (term->name == "")
         return;
-    else if (term->boolPropOptional("syntaxHints:implicitNameBinding", false))
+    else if (term->boolPropOptional("syntax:implicitNameBinding", false))
         return;
-    else if (term->hasProperty("syntaxHints:rebindOperator"))
+    else if (term->hasProperty("syntax:rebindOperator"))
         return;
     else {
         out << term->name;
-        out << term->stringPropOptional("syntaxHints:preEqualsSpace", " ");
+        out << term->stringPropOptional("syntax:preEqualsSpace", " ");
         out << "=";
-        out << term->stringPropOptional("syntaxHints:postEqualsSpace", " ");
+        out << term->stringPropOptional("syntax:postEqualsSpace", " ");
     }
 }
 
@@ -121,12 +121,12 @@ std::string get_term_source(Term* term)
 
     std::stringstream result;
 
-    result << term->stringPropOptional("syntaxHints:preWhitespace", "");
+    result << term->stringPropOptional("syntax:preWhitespace", "");
 
     // check if this function has a toSourceString function
     if (function_t::get_to_source_string(term->function) != NULL) {
         result << function_t::get_to_source_string(term->function)(term);
-        result << term->stringPropOptional("syntaxHints:postWhitespace", "");
+        result << term->stringPropOptional("syntax:postWhitespace", "");
         return result.str();
     }
 
@@ -149,7 +149,7 @@ std::string get_term_source(Term* term)
         else 
             result << type_t::get_to_string_func(term->type)(term);
 
-        result << term->stringPropOptional("syntaxHints:postWhitespace", "");
+        result << term->stringPropOptional("syntax:postWhitespace", "");
         return result.str();
     }
 
@@ -162,39 +162,39 @@ std::string get_term_source_default_formatting(Term* term)
     std::stringstream result;
 
     // for an infix rebinding, don't use the normal "name = " prefix
-    if ((term->stringPropOptional("syntaxHints:declarationStyle", "") == "infix")
-            && is_infix_operator_rebinding(term->stringProp("syntaxHints:functionName")))
+    if ((term->stringPropOptional("syntax:declarationStyle", "") == "infix")
+            && is_infix_operator_rebinding(term->stringProp("syntax:functionName")))
     {
-        result << term->name << " " << term->stringProp("syntaxHints:functionName");
+        result << term->name << " " << term->stringProp("syntax:functionName");
         result << get_source_of_input(term, 1);
-        result << term->stringPropOptional("syntaxHints:postWhitespace", "");
+        result << term->stringPropOptional("syntax:postWhitespace", "");
         return result.str();
     }
 
     // add possible name binding
     prepend_name_binding(term, result);
 
-    int numParens = term->intPropOptional("syntaxHints:parens", 0);
+    int numParens = term->intPropOptional("syntax:parens", 0);
     for (int p=0; p < numParens; p++)
         result << "(";
 
     // add the declaration syntax
-    std::string declarationStyle = term->stringPropOptional("syntaxHints:declarationStyle",
+    std::string declarationStyle = term->stringPropOptional("syntax:declarationStyle",
             "function-call");
 
-    std::string functionName = term->stringPropOptional("syntaxHints:functionName",
+    std::string functionName = term->stringPropOptional("syntax:functionName",
             term->function->name);
 
     if (declarationStyle == "function-call") {
         result << functionName;
 
-        if (!term->boolPropOptional("syntaxHints:no-parens", false))
+        if (!term->boolPropOptional("syntax:no-parens", false))
             result << "(";
 
         for (int i=get_first_visible_input_index(term); i < term->numInputs(); i++)
             result << get_source_of_input(term, i);
 
-        if (!term->boolPropOptional("syntaxHints:no-parens", false))
+        if (!term->boolPropOptional("syntax:no-parens", false))
             result << ")";
 
     } else if (declarationStyle == "dot-concat") {
@@ -215,7 +215,7 @@ std::string get_term_source_default_formatting(Term* term)
     for (int p=0; p < numParens; p++)
         result << ")";
 
-    result << term->stringPropOptional("syntaxHints:postWhitespace", "");
+    result << term->stringPropOptional("syntax:postWhitespace", "");
 
     return result.str();
 }
@@ -245,8 +245,8 @@ std::string get_branch_source(Branch& branch, std::string const& defaultSeparato
 
         result << get_term_source(term);
         
-        if (term->hasProperty("syntaxHints:lineEnding"))
-            result << term->stringProp("syntaxHints:lineEnding");
+        if (term->hasProperty("syntax:lineEnding"))
+            result << term->stringProp("syntax:lineEnding");
         else
             separatorNeeded = true;
     }
@@ -295,13 +295,13 @@ void print_branch_source(std::ostream& output, Term* term)
 
         output << get_term_source(line);
 
-        if (line->hasProperty("syntaxHints:lineEnding"))
-            output << line->stringProp("syntaxHints:lineEnding");
+        if (line->hasProperty("syntax:lineEnding"))
+            output << line->stringProp("syntax:lineEnding");
         else
             separatorNeeded = true;
     }
 
-    output << term->stringPropOptional("syntaxHints:preEndWs", "");
+    output << term->stringPropOptional("syntax:preEndWs", "");
 
     switch (branchSyntax) {
     case parser::BRANCH_SYNTAX_UNDEF:

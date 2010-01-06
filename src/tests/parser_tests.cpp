@@ -305,15 +305,15 @@ void test_infix_whitespace()
     branch.eval("b = 1");
 
     Term* term = parser::compile(&branch, parser::infix_expression, "  a + b");
-    test_equals(term->stringProp("syntaxHints:preWhitespace"), "  ");
+    test_equals(term->stringProp("syntax:preWhitespace"), "  ");
     test_equals(get_input_syntax_hint(term, 0, "postWhitespace"), " ");
     test_equals(get_input_syntax_hint(term, 1, "preWhitespace"), " ");
 
     term = parser::compile(&branch, parser::infix_expression, "5+3");
-    test_assert(term->stringProp("syntaxHints:preWhitespace") == "");
+    test_assert(term->stringProp("syntax:preWhitespace") == "");
     test_equals(get_input_syntax_hint(term, 0, "postWhitespace"), "");
     test_equals(get_input_syntax_hint(term, 1, "preWhitespace"), "");
-    test_assert(term->stringProp("syntaxHints:postWhitespace") == "");
+    test_assert(term->stringProp("syntax:postWhitespace") == "");
 }
 
 void test_list_arguments()
@@ -560,10 +560,10 @@ void test_whitespace_after_statement()
     // should be a comment line.
     test_assert(branch[0]->asInt() == 1);
     test_assert(branch[0]->name == "a");
-    test_equals(branch[0]->stringProp("syntaxHints:lineEnding"), "\n");
+    test_equals(branch[0]->stringProp("syntax:lineEnding"), "\n");
     test_assert(branch[1]->function == COMMENT_FUNC);
     test_equals(branch[1]->stringProp("comment"), "");
-    test_equals(branch[1]->stringProp("syntaxHints:lineEnding"), "\n");
+    test_equals(branch[1]->stringProp("syntax:lineEnding"), "\n");
 
     // Make sure that parser::statement only consumes one \n
     branch.clear();
