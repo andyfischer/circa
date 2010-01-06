@@ -234,6 +234,12 @@ void reproduce_for_loop() {
     round_trip_source("for x in [1]   end");
     round_trip_source("for x in [1] print(1)  end");
     round_trip_source("l = [1]; for x in @l x += 1 end");
+    round_trip_source("for x in 0..1 do end");
+    round_trip_source("for x in 0..1 do   end");
+    round_trip_source("for x in 0..1 do  print(x)  end");
+    round_trip_source("for x in 0..1 {}");
+    round_trip_source("for x in 0..1 {   }");
+    round_trip_source("for x in 0..1 {  print(x)  }");
     finish_source_repro_category();
 }
 

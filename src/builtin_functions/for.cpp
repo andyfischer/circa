@@ -20,9 +20,8 @@ namespace for_function {
         std::stringstream result;
         result << get_heading_source(term);
         result << term->stringPropOptional("syntax:postHeadingWs", "\n");
-        result << get_branch_source(as_branch(term));
+        print_branch_source(result, term);
         result << term->stringPropOptional("syntax:whitespaceBeforeEnd", "");
-        result << "end";
 
         return result.str();
     }
