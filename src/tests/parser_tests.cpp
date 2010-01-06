@@ -621,6 +621,24 @@ void test_significant_indentation()
     test_assert(branch["b"]->asInt() == 5);
 }
 
+void test_sig_indent_one_liner()
+{
+    Branch branch;
+    branch.eval("def f(): 'avacado'\n  'burrito'\n'cheese'");
+    Branch& f_contents = as_branch(branch["f"]);
+    test_equals(f_contents[1]->asString(), "avacado");
+    test_assert(branch[1]->asString() == "burrito");
+    test_assert(branch[2]->asString() == "cheese");
+
+    branch.clear();
+    branch.eval("def g(): 1 2 3\n  4");
+    Branch& g_contents = as_branch(branch["g"]);
+    test_equals(g_contents[1]->asInt(), 1);
+    test_equals(g_contents[2]->asInt(), 2);
+    test_equals(g_contents[3]->asInt(), 3);
+    test_equals(branch[1]->asInt(), 4);
+}
+
 void test_qualified_identifier()
 {
     TokenStream tokens;
@@ -680,6 +698,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_subscripted_atom);
     REGISTER_TEST_CASE(parser_tests::test_whitespace_after_statement);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation);
+    REGISTER_TEST_CASE(parser_tests::test_sig_indent_one_liner);
     REGISTER_TEST_CASE(parser_tests::test_qualified_identifier);
 }
 

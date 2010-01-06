@@ -117,6 +117,14 @@ void consume_branch(Branch& branch, TokenStream& tokens)
         branchStyle = BRANCH_SYNTAX_DO;
     }
 
+    if (branchStyle == BRANCH_SYNTAX_UNDEF) {
+        //std::cout << "deprecated: undef" << std::endl;
+        //assert(false);
+    }
+    else if (branchStyle == BRANCH_SYNTAX_BEGIN) {
+        //std::cout << "deprecated: begin" << std::endl;
+    }
+
     while (!tokens.finished()) {
         if (tokens.nextIs(END)
                 || tokens.nextNonWhitespaceIs(ELSE)
@@ -161,31 +169,63 @@ void consume_branch(Branch& branch, TokenStream& tokens)
     post_parse_branch(branch);
 }
 
+bool just_whitespace(Term* term)
+{
+    if (term->function != COMMENT_FUNC)
+        return false;
+
+    std::string& commentStr = term->stringProp("comment");
+    return commentStr.find_first_of("--") == std::string::npos;
+}
+
 void consume_branch_with_significant_indentation(Branch& branch, TokenStream& tokens)
 {
-    // Parse statements until we find one that is not just whitespace
-
-    int indentationLevel = 0;
+    // Parse the line following the :
+    // We will either find stuff on this line (making this a one-liner), or
+    // we'll find nothing but whitespace.
+    bool foundNonWhitespaceAfterColon = false;
 
     while (!tokens.finished()) {
         Term* statement = parser::statement(branch, tokens);
 
-        bool justWhitespace = statement->function == COMMENT_FUNC;
+        std::string& lineEnding = statement->stringProp("syntaxHints:lineEnding");
+        bool hasNewline = lineEnding.find_first_of("\n") != std::string::npos;
 
-        if (justWhitespace) {
-            std::string& str = statement->stringProp("comment");
-            justWhitespace = str.find_first_of("--") == std::string::npos;
-        }
+        if (!just_whitespace(statement))
+            foundNonWhitespaceAfterColon = true;
 
-        if (!justWhitespace) {
-            indentationLevel = (int) statement->
-                stringPropOptional("syntaxHints:preWhitespace", "").length();
+        // If we hit a newline then move on to the next step
+        if (hasNewline) {
             break;
         }
     }
 
-    // TODO: Error if indentation level is than or equal the owning branch.
+    // If we found any expressions after the : then stop parsing here
+    // Example:
+    //    def f(): return 1 + 2
+    if (foundNonWhitespaceAfterColon)
+        return;
 
+    // Next, keep parsing until we hit an expression that is not just whitespace.
+    // The first non-whitespace will tell us the indentation level. It might take
+    // a few lines until we find it. Example:
+    //     def f():
+    //
+    //         return 1 + 2
+
+    int indentationLevel = 0;
+    while (!tokens.finished()) {
+        Term* statement = parser::statement(branch, tokens);
+
+        if (!just_whitespace(statement)) {
+            indentationLevel = int(statement->stringPropOptional(
+                "syntaxHints:preWhitespace", "").length());
+            break;
+        }
+    }
+
+    // Now keep parsing lines which have the same indentation level
+    // TODO: Error if we find a line that has greater indentation
     while (!tokens.finished()) {
 
         // Lookahead, check if the next line has the same indentation
