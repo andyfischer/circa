@@ -1,0 +1,49 @@
+
+With our naive dataflow-based world, there is tons of data duplication, and it's awful.
+
+# The problem #
+
+a = T()
+b = f(a)
+c = g(b)
+
+[ a ] -> [ b ] -> [ c ]
+
+Each intermediate step has a full copy of its value. In some situations, this turns out to be
+terrible.
+
+# Requirements #
+
+ * Introspection should be really easy. If a user is watching a piece of code, then they want
+   to see the values at each intermediate step.
+
+# Plan #
+
+Plan is to have different solutions for different data types.
+ - Some types (4-byte primitives) can just be copied constantly, no biggie.
+ - Some types can use persistent data structures, allowing each intermediate value to be
+   introspected, while still staying efficient.
+ - For types where a persistent structure doesn't make sense, or is too much work, then have
+   support for uniqueness types.
+
+# Persistent data structures #
+
+Advantages:
+ - Allows for each intermediate step to keep a separate 'copy' of data.
+ - More complicated to implement
+ - O(n) access time (for n intermediate steps) without compaction
+ - FP goodness
+
+# Uniqueness types #
+
+Compiler enforces rules that values can't be duplicated or referenced separately
+Example:
+      -- type A is unique
+      a = A()
+      b = a
+      print(a) -- error
+    
+Advantages:
+ - Easier to implement
+ - Better performance
+ - Probably the only option for foreign types

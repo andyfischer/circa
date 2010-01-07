@@ -1,5 +1,6 @@
 
 * Every term has a user-given string name. This name may be blank.
+
 * This name is not unique, even within the branch.
     But we do have special treatment for terms which share a name within a branch
 
@@ -10,4 +11,4 @@
 * It might be useful for each term to have a branch-local ID. That is, an ID which is unique
   within their branch.
 
-We could use the term's index for this purpose, but that might not be stable enough.
+    We could use the term's index for this purpose, but that might not be stable enough.

@@ -3,7 +3,8 @@ Notes:
 
 Overall goal to support training:
 
-Generate some network of terms that, when evaluated, causes training signals to be propagated upwards. Allow for each function to specify how its piece of the network is created.
+Generate some network of terms that, when evaluated, causes training signals to be propagated
+upwards. Allow for each function to specify how its piece of the network is created.
 
 Should this be a seperate code unit? Probably
 

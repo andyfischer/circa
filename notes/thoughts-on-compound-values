@@ -36,7 +36,7 @@ Basic implementation complexity:
 
 hidden-field wins here. But I think that solving the second problem could be a good
 thing for the rest of the code. If we create a generalized list-comprehension strategy, then
-this would be very powerful. This could solve the (yet unsolved) problems of looping.
+this would be very powerful.
 
 Introspection:
 

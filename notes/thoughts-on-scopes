@@ -11,12 +11,18 @@ int a
 }
 
 * Can a function-definition branch access things outside the function?
-    Not sure of this yet.
 
-int a
-def f()
-  b = a
-end
+   - Yes, this is very useful
+
+   - But, we can't modify things outside our scope (without doing some
+     magic to the function). Need to either support this, or give
+     warnings. Example:
+
+         a = 2
+         def f():
+             a = 3
+
+     User will think that the outside 'a' is modified.
 
 * Generally can't access things in other nested branches
 {
@@ -40,44 +46,22 @@ end
 b = a  -- 'a' is bound in this level
 
 * How do we properly expose things in lower branches to higher branches? Right now we allow
-  the Branch to bind names to anything, but this is error prone. Perhaps we need our old
-  mischevious friend, the alias() function.
+  the Branch to bind names to anything, but this happens at compile time and it needs to be
+  done in a way that it can be reproduced later.
 
-if(cond) = {
-  pos = {
-    a = 1
-  }
-  neg = {
-    a = 2
-  }
-  joining = {
-    a = if-expr(cond, pos.a, neg.a)
-  }
-}
-a = alias(if.joining.a)
+  Need some rules for this. Current plan is that every function has a expose_names field
+  which lets people know if it exposes any names.
 
-* Note that the current implementation will have problems if you try to do a name
-  loopup in the middle of an existing function.
+* Namespaces
 
-* I think an alternative idea would be to allow terms to say that they expose their names.
-  This could be specified on functions. If a function exposes names, the name-search
-  algorithm would know to search inside them.
+Defined using this syntax:
 
-* Okay anyway. Those are the rules. So now we need some kind of 'import' or 'namespace' to
-get around those rules.
+namespace ns:
+  a = 1
+  b = 2
 
-{
-  loaded_scripts {
-      (some_script)
-      (some_other_script)
-  }
-}
-user {
-  import some_script
-}
+An item inside a namespace is accessed with qualified name syntax:
+    c = ns:a
 
-* Syntax?
-    Most people just use namespace.identifier
-
-* How are namespaces stored? Maybe a Namespace type?
-* How do we record which namespace was used for a given thing?
+Colon operator can also potentially be used to other occasions when we want to reach into
+a block's code.

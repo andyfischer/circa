@@ -6,9 +6,8 @@ way that a user will specify that something can be persisted.
 
 A quick example. If I write a function like this:
 
-def myfunc()
+def myfunc():
     state i : int
-end
 
 Then this means that I want to save an integer for *every* call to this function.
 If I call this function three times:
@@ -49,16 +48,16 @@ UTILITY FUNCTIONS
 
 Stateful code can also open the doors to define some useful utility functions.
 
-def elapsed() :: number
+def elapsed() -> number do
     state number time_started = time
     return time - time_started
 end
-def toggle(bool tog) :: bool
+def toggle(bool tog) -> bool do
     state bool on = false
     if tog; on = not(on); end
     return on
 end
-def approach(number target, number step) :: number
+def approach(number target, number step) -> number do
     state current = target
     if target > current
         current += min(step, target - current)
@@ -80,12 +79,12 @@ DESIRED FEATURES
 
 Can we access a function's state in a different way? Like, can we write this:
 
-function stateful_func()
+function stateful_func():
   state i = 1
-end
 
 call = stateful_func()
 print(call.i) -- reach into stateful_func and access its state
+print(call:i) -- alternate syntax
 
 Can we have a way to explicitly reset state? -- This one is something that I frequently wish
 I could do when writing code.

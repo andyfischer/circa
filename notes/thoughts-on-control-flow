@@ -14,7 +14,7 @@ Hey, we probably need a way to have control flow. Been punting on this so far.
 * How do we do feedback on code that has breaks?
 
 function(inputs)
-  if(cond)
+  if (cond)
     return result
 end
 

@@ -28,4 +28,7 @@ Alternate plans:
     The caller is responsible for finding the term and storing the syntax. Also modify get_field
     so that it accepts a colon-separated name.
     
-Going to use plan #2
+Current plan:
+  identifier() function doesn't produce copy. If a parsing step is interested in a term's
+  original name, it can keep track of which tokens were consumed by the identifier() call,
+  and then it can backtrack and find the original string.

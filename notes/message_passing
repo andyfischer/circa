@@ -8,3 +8,16 @@ send('channel.name', [1 2 3])
 Receiving code gets:
 
 messages = receive('channel.name')
+
+ * How to display in a visual way? Incoming/outgoing messages should probably be some sort of
+   cloud icon.
+ * How to watch and see what is happening? Need some sort of history graph for sent messages.
+
+* Message passing is bad
+ - Code which can do the same thing without message passing is better, because it's easier
+   to introspect.
+ - Maybe an alternate syntax would be easier to introspect? Restrictions such as one sender,
+   one receiver, and ordering (send comes before receive) would each help.
+
+* How to discourage?
+ - Transform code to remove message pass?

@@ -17,12 +17,7 @@ Consequently, high-level implementation:
 
  - Can intermediate results be inspected?
  - Should we share values among terms? How important is that?
-   * How to share values?
+   * How to share values? Garbage collection?
 
  - What should the C binding look like?
-
-
-Shallow copies
- - How to store? Maybe store on function?
-
 

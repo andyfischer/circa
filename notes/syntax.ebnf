@@ -30,9 +30,10 @@ infix_expression_8 = unary_expression [(':') infix_expression_8]
 
 unary_expression = ('-' subscripted_atom) | ('@' subscripted_atom) | subscripted_atom
 
-subscripted_atom = atom [ '[' infix_expression_0 ']' ]
+subscripted_atom = atom [ ('[' infix_expression_0 ']') | ('(' argument_list ')') ]
 
-atom = identifier_or_function_call
+atom = identifier
+     | identifier_with_rebind
      | literal_integer
      | literal_string
      | literal_bool
@@ -44,6 +45,7 @@ atom = identifier_or_function_call
      | namespace_block
      | '(' infix_expression_0 ')'
 
-identifier_or_function_call = accessor [ '(' argument_list ')' ]
+identifier = identifier_token [ ':' identifier ]
+identifier_with_rebind = '@' identifier_token
 
-argument_list = infix_expression_0 [',' argument_list]
+argument_list = infix_expression_0 [ [','] argument_list]

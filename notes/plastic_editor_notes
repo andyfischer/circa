@@ -24,9 +24,9 @@ Game view
  - Drag
 
 Keyboard metaphors for movement:
-  - 'next' and 'previous' - context sensitive browsing
-  - 'parent' - input of current term
-  - 'child' - user of current term
+ - 'next' and 'previous' - context sensitive browsing
+ - 'parent' - input of current term
+ - 'child' - user of current term
 
 Browsing:
   This is a context sensitive way to browse through multiple terms. There are
@@ -50,6 +50,8 @@ Code modification operations:
   - Insert, delete, or change an input
   - Rename
   - Rewrite an expression from raw text
+  - Move expression
+  - Promote selection to function
 
 Code creation operations:
   - Create from raw text

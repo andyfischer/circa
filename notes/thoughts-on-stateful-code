@@ -18,12 +18,9 @@ Why do we have this difference? What would happen if we combined output and stat
 The following terms have state:
  - apply-feedback (branch). No output
  - comment (string). No output
- - get_field (int). Has output
- - get_field_by_name. (string). Has output
  - if (branch). No output
  - set_field (int)
  - stateful_value
- - unknown_function (and other compile errors)
 
 There is another thing we could split: const-state. Stuff that is specified at compile
 time, but is not changed. What's our plan for this? The solution here seems similar.
