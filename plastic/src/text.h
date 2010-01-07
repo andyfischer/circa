@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
+// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #ifndef PLASTIC_TEXT_INCLUDED
 #define PLASTIC_TEXT_INCLUDED

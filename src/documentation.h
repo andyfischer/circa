@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
+// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #ifndef CIRCA_GENERATE_DOCS_INCLUDED
 #define CIRCA_GENERATE_DOCS_INCLUDED

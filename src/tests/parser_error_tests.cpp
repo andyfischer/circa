@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
+// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 // In this test, we have a bunch of snippets, where we try to reproduce every
 // possible parser error.

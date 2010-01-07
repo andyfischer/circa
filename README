@@ -25,9 +25,9 @@ Some implementation details:
  - Static structural typing with some type inference
  - Dataflow-based
  - Implemented in C++
- - Interpreted execution; the plan is to eventually use LLVM for JIT
+ - Interpreted execution
  - Plastic uses SDL and OpenGL for graphics
  - Currently supported on XP and OSX. A Linux port would probably not be hard.
 
-This project is Copyright (c) 2007-2009 Paul Hodge. The contents are freely available to the
+This project is Copyright (c) 2007-2010 Paul Hodge. The contents are freely available to the
 public under the MIT licence. See the LICENSE file for more information.

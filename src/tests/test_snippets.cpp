@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
+// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 // In these tests, we have a bunch of "snippets" (small pieces of code). We execute
 // the code and then check that a list of assertions are true.

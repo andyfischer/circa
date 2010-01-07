@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
+// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 // Various code for debugging purposes. This code shouldn't have an effect on a
 // release build.
