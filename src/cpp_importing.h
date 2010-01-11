@@ -49,7 +49,6 @@ bool templated_lessThan(Term* a, Term* b)
 }
 
 void pointer_alloc(Term* type, Term* term);
-bool raw_value_equals(Term* a, Term* b);
 bool raw_value_less_than(Term* a, Term* b);
 
 } // namespace cpp_importing

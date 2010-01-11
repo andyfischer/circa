@@ -100,6 +100,16 @@ namespace set_t {
         return output.str();
     }
 
+    void setup(Branch& kernel) {
+        Term* set_type = create_compound_type(kernel, "Set");
+        type_t::get_to_string_func(set_type) = set_t::to_string;
+        Term* set_add = import_member_function(set_type, set_t::hosted_add, "add(Set, any) -> Set");
+        function_t::get_input_placeholder(set_add, 0)->boolProp("use-as-output") = true;
+        Term* set_remove = import_member_function(set_type, set_t::remove, "remove(Set, any) -> Set");
+        function_t::get_input_placeholder(set_remove, 0)->boolProp("use-as-output") = true;
+        import_member_function(set_type, set_t::contains, "contains(Set, any) -> bool");
+    }
+
 } // namespace set_t
 
 namespace map_t {
@@ -449,13 +459,7 @@ void setup_builtin_types(Branch& kernel)
 
     import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) -> string");
 
-    Term* set_type = create_compound_type(kernel, "Set");
-    type_t::get_to_string_func(set_type) = set_t::to_string;
-    Term* set_add = import_member_function(set_type, set_t::hosted_add, "add(Set, any) -> Set");
-    function_t::get_input_placeholder(set_add, 0)->boolProp("use-as-output") = true;
-    Term* set_remove = import_member_function(set_type, set_t::remove, "remove(Set, any) -> Set");
-    function_t::get_input_placeholder(set_remove, 0)->boolProp("use-as-output") = true;
-    import_member_function(set_type, set_t::contains, "contains(Set, any) -> bool");
+    set_t::setup(kernel);
 
     // LIST_TYPE was created in bootstrap_kernel
     Term* list_append =

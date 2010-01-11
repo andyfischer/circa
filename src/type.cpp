@@ -411,15 +411,27 @@ void assign_value_to_default(Term* term)
 
 bool check_invariants(Term* term, std::string* failureMessage)
 {
-    if (type_t::get_check_invariants_func(term->type) == NULL)
+    CheckInvariantsFunc checkInvariants = type_t::get_check_invariants_func(term->type);
+    if (checkInvariants == NULL)
         return true;
 
-    return type_t::get_check_invariants_func(term->type)(term, failureMessage);
+    return checkInvariants(term, failureMessage);
 }
 
 Term* parse_type(Branch& branch, std::string const& decl)
 {
     return parser::compile(&branch, parser::type_decl, decl);
 }
+
+namespace common_assign_funcs {
+
+void steal_value(Term* a, Term* b)
+{
+    dealloc_value(b);
+    b->value = a;
+    a->value = NULL;
+}
+
+} // namespace common_assign_funcs
 
 } // namespace circa
