@@ -89,25 +89,6 @@ void setup_for_loop_pre_code(Term* forTerm)
     create_branch(forContents, "#rebinds");
 }
 
-void create_rebind_branch(Branch& rebinds, Branch& source, Term* rebindCondition, bool outsidePositive)
-{
-    rebinds.clear();
-
-    std::vector<std::string> reboundNames;
-    list_names_that_this_branch_rebinds(source, reboundNames);
-
-    Branch& outerScope = *source.owningTerm->owningBranch;
-    for (unsigned i=0; i < reboundNames.size(); i++) {
-        std::string name = reboundNames[i];
-        Term* outerVersion = find_named(outerScope, name);
-        Term* innerVersion = source[name];
-
-        Term* pos = outsidePositive ? outerVersion : innerVersion;
-        Term* neg = outsidePositive ? innerVersion : outerVersion ;
-        apply(rebinds, IF_EXPR_FUNC, RefList(rebindCondition, pos, neg), name);
-    }
-}
-
 void setup_for_loop_post_code(Term* forTerm)
 {
     Branch& forContents = as_branch(forTerm);

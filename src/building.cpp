@@ -328,4 +328,23 @@ float get_step(Term* term)
     return term->floatPropOptional("step", 1.0);
 }
 
+void create_rebind_branch(Branch& rebinds, Branch& source, Term* rebindCondition, bool outsidePositive)
+{
+    rebinds.clear();
+
+    std::vector<std::string> reboundNames;
+    list_names_that_this_branch_rebinds(source, reboundNames);
+
+    Branch& outerScope = *source.owningTerm->owningBranch;
+    for (unsigned i=0; i < reboundNames.size(); i++) {
+        std::string name = reboundNames[i];
+        Term* outerVersion = find_named(outerScope, name);
+        Term* innerVersion = source[name];
+
+        Term* pos = outsidePositive ? outerVersion : innerVersion;
+        Term* neg = outsidePositive ? innerVersion : outerVersion ;
+        apply(rebinds, IF_EXPR_FUNC, RefList(rebindCondition, pos, neg), name);
+    }
+}
+
 } // namespace circa

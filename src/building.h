@@ -59,6 +59,8 @@ void resize_list(Branch& list, int numElements, Term* type);
 void set_step(Term* term, float step);
 float get_step(Term* term);
 
+
+
 } // namespace circa
 
 #endif
