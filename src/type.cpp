@@ -6,49 +6,6 @@
 
 namespace circa {
 
-void initialize_type_prototype(Branch& contents)
-{
-    // Type is not yet prototype-based, so this function isn't currently used.
-    
-    /* Type has the following layout:
-      {
-        [0] #attributes {
-          [0]  string name
-          [1]  bool isPointer
-          [2] List parameters
-          [3] void/any defaultValue
-          [4] List memberFunctions 
-          [5]  std_type_info cppTypeInfo
-          [6]  AllocFunc alloc
-          [7]  DeallocFunc dealloc
-          [8]  AllocFunc initialize
-          [9]  EqualsFunc equals
-          [10]  RemapPointersFunc remapPointers
-          [11]  ToStringFunc toString
-          [12]  CheckInvariantsFunc checkInvariants
-        }
-        [1..n-1] prototype
-      }
-    */
-
-    Term* attributesTerm = create_value(contents, BRANCH_TYPE, "#attributes");
-    set_source_hidden(attributesTerm, false);
-    Branch& attributes = as_branch(attributesTerm);
-    create_string(attributes, "", "name");
-    create_bool(attributes, false, "isPointer");
-    create_list(attributes, "parameters");
-    create_void(attributes, "defaultValue");
-    create_list(attributes, "memberFunctions");
-    create_value(attributes, STD_TYPE_INFO_TYPE, "cppTypeInfo");
-    create_value(attributes, ALLOC_THUNK_TYPE, "alloc");
-    create_value(attributes, DEALLOC_THUNK_TYPE, "dealloc");
-    create_value(attributes, ALLOC_THUNK_TYPE, "initialize");
-    create_value(attributes, EQUALS_THUNK_TYPE, "equals");
-    create_value(attributes, REMAP_POINTERS_THUNK_TYPE, "remapPointers");
-    create_value(attributes, TO_STRING_THUNK_TYPE, "toString");
-    create_value(attributes, CHECK_INVARIANTS_THUNK_TYPE, "checkInvariants");
-}
-
 namespace type_t {
     void alloc(Term* type, Term* term)
     {
@@ -132,10 +89,6 @@ namespace type_t {
     {
         return as_type(type).dealloc;
     }
-    AllocFunc& get_initialize_func(Term* type)
-    {
-        return as_type(type).initialize;
-    }
     AssignFunc& get_assign_func(Term* type)
     {
         return as_type(type).assign;
@@ -203,7 +156,7 @@ bool type_matches(Term *term, Term *type)
             && is_compound_type(type))
         return true;
 
-    if (!identity_equals(term->type, type))
+    if (term->type != type)
         return false;
 
     return true;
@@ -239,7 +192,7 @@ Type& as_type(Term *term)
 bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
 {
     // Always match if they have the same exact type
-    if (identity_equals(valueTerm->type, type))
+    if (valueTerm->type == type)
         return true;
 
     // Everything matches against 'any'
@@ -270,15 +223,15 @@ bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
     }
 
     // Every compound type matches against List or Branch
-    if (identity_equals(type, LIST_TYPE))
+    if (type == LIST_TYPE)
         return true;
-    if (identity_equals(type, BRANCH_TYPE))
+    if (type == BRANCH_TYPE)
         return true;
 
     // Special case hack, also accept any compound type against OverloadedFunction
     // (Need to have a way for a type to specify that it accepts a variable number of
     // items)
-    if (identity_equals(type, OVERLOADED_FUNCTION_TYPE))
+    if (type == OVERLOADED_FUNCTION_TYPE)
         return true;
 
     Branch& value = as_branch(valueTerm);
@@ -394,11 +347,6 @@ std::string compound_type_to_string(Term* caller)
 
     out << "]";
     return out.str();
-}
-
-bool identity_equals(Term* a, Term* b)
-{
-    return a->value == b->value;
 }
 
 bool equals(Term* a, Term* b)

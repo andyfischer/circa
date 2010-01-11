@@ -20,7 +20,7 @@ void create()
 
     test_assert(function_t::num_inputs(func) == 1);
     test_assert(function_t::get_input_type(func, 0) == INT_TYPE);
-    test_assert(identity_equals(function_t::get_output_type(func), STRING_TYPE));
+    test_assert(function_t::get_output_type(func) == STRING_TYPE);
 }
 
 void test_is_callable()
