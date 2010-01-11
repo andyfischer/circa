@@ -137,6 +137,8 @@ bool check_invariants(Term* term, std::string* failureMessage = NULL);
 
 Term* parse_type(Branch& branch, std::string const& decl);
 
+void type_set_nocopy(Term* type);
+
 namespace common_assign_funcs {
 
 void steal_value(Term* a, Term* b);

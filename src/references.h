@@ -62,7 +62,6 @@ struct Ref
     }
 
     static void remap_pointers(Term* term, ReferenceMap const& map);
-    static ReferenceIterator* start_reference_iterator(Term* term);
 };
 
 void delete_term(Term* term);

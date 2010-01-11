@@ -423,6 +423,11 @@ Term* parse_type(Branch& branch, std::string const& decl)
     return parser::compile(&branch, parser::type_decl, decl);
 }
 
+void type_set_nocopy(Term* type)
+{
+    as_type(type).assign = common_assign_funcs::steal_value;
+}
+
 namespace common_assign_funcs {
 
 void steal_value(Term* a, Term* b)

@@ -103,6 +103,7 @@ namespace set_t {
     void setup(Branch& kernel) {
         Term* set_type = create_compound_type(kernel, "Set");
         type_t::get_to_string_func(set_type) = set_t::to_string;
+
         Term* set_add = import_member_function(set_type, set_t::hosted_add, "add(Set, any) -> Set");
         function_t::get_input_placeholder(set_add, 0)->boolProp("use-as-output") = true;
         Term* set_remove = import_member_function(set_type, set_t::remove, "remove(Set, any) -> Set");
