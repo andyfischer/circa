@@ -32,7 +32,6 @@
 #include <typeinfo>
 #include <vector>
 
-
 namespace circa {
 
 struct Branch;

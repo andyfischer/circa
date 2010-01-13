@@ -69,7 +69,7 @@ void append_package_docs(std::stringstream& out, Branch& branch, std::string con
 void hide_from_docs(Term* term)
 {
     if (term == NULL) return;
-    term->boolProp("docs:hidden") = true;
+    term->setBoolProp("docs:hidden", true);
 }
 
 void initialize_kernel_documentation(Branch& KERNEL)

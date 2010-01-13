@@ -92,9 +92,13 @@ namespace function_t {
         return true;
     }
 
-    std::string& get_name(Term* function)
+    std::string const& get_name(Term* function)
     {
         return function->asBranch()[0]->asBranch()[0]->asString();
+    }
+    void set_name(Term* function, std::string const& name)
+    {
+        set_value_str(function->asBranch()[0]->asBranch()[0], name);
     }
 
     Term* get_output_type(Term* function)
@@ -112,9 +116,14 @@ namespace function_t {
         return function->asBranch()[0]->asBranch()[1]->asRef();
     }
 
-    bool& get_variable_args(Term* function)
+    bool get_variable_args(Term* function)
     {
         return function->asBranch()[0]->asBranch()[2]->asBool();
+    }
+
+    void set_variable_args(Term* function, bool value)
+    {
+        set_value_bool(function->asBranch()[0]->asBranch()[2], value);
     }
 
     int num_inputs(Term* function)
@@ -146,7 +155,7 @@ namespace function_t {
 
     void set_input_meta(Term* func, int index, bool value)
     {
-        function_t::get_input_placeholder(func, index)->boolProp("meta") = value;
+        function_t::get_input_placeholder(func, index)->setBoolProp("meta", value);
     }
 
     bool get_input_modified(Term* func, int index)
@@ -173,9 +182,13 @@ namespace function_t {
     {
         return as_to_source_string_thunk(func->asBranch()[0]->asBranch()[5]);
     }
-    std::string& get_exposed_name_path(Term* func)
+    std::string const& get_exposed_name_path(Term* func)
     {
         return as_string(func->asBranch()[0]->asBranch()[6]);
+    }
+    void set_exposed_name_path(Term* func, std::string const& value)
+    {
+        set_value_str(func->asBranch()[0]->asBranch()[6], value);
     }
     Ref& get_feedback_func(Term* func)
     {
@@ -185,7 +198,7 @@ namespace function_t {
     {
         return as_branch(func->asBranch()[0]->asBranch()[8]);
     }
-    std::string& get_description(Term* func)
+    std::string const& get_description(Term* func)
     {
         return as_string(func->asBranch()[0]->asBranch()[9]);
     }
@@ -285,6 +298,12 @@ Term* function_get_specialized_output_type(Term* function, Term* call)
     if (function_t::get_specialize_type(function) != NULL)
         outputType = function_t::get_specialize_type(function)(call);
     return outputType;
+}
+
+void function_set_use_input_as_output(Term* function, int index, bool value)
+{
+    Term* placeholder = function_t::get_input_placeholder(function, index);
+    placeholder->setBoolProp("use-as-output", value);
 }
 
 bool is_native_function(Term* func)

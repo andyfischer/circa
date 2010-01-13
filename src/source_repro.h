@@ -9,7 +9,9 @@
 
 namespace circa {
 
-std::string& get_input_syntax_hint(Term* term, int index, std::string const& field);
+std::string const& get_input_syntax_hint(Term* term, int index, std::string const& field);
+void set_input_syntax_hint(Term* term, int index, std::string const& field,
+        std::string const& value);
 bool has_source_location_defined(Term* term);
 std::string get_source_of_input(Term* term, int inputIndex);
 bool is_hidden(Term* term);

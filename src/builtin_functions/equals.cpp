@@ -24,7 +24,7 @@ namespace equals_function {
             return;
         }
 
-        as_bool(caller) = equals(lhs, rhs);
+        set_value_bool(caller, equals(lhs, rhs));
     }
 
     void evaluate_not(Term* caller)
@@ -32,7 +32,7 @@ namespace equals_function {
         evaluate(caller);
 
         if (!caller->hasError())
-            as_bool(caller) = !as_bool(caller);
+            set_value_bool(caller, !as_bool(caller));
     }
 
     void setup(Branch& kernel)

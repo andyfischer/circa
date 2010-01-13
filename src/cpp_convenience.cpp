@@ -4,9 +4,9 @@
 
 namespace circa {
 
-template <> int& as(Term* term) { return as_int(term); }
-template <> float& as(Term* term) { return as_float(term); }
-template <> bool& as(Term* term) { return as_bool(term); }
-template <> std::string& as(Term* term) { return as_string(term); }
+template <> int& as(Term* term) { throw std::runtime_error("as<int> disabled"); }
+template <> float& as(Term* term) { throw std::runtime_error("as<float> disabled"); }
+template <> bool& as(Term* term) { throw std::runtime_error("as<bool> disabled"); }
+template <> std::string& as(Term* term) { throw std::runtime_error("as<string> disabled"); }
 
 } // namespace circa

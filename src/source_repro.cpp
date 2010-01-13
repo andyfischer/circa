@@ -17,7 +17,7 @@ int get_first_visible_input_index(Term* term)
         return 0;
 }
 
-std::string& get_input_syntax_hint(Term* term, int index, std::string const& field)
+std::string const& get_input_syntax_hint(Term* term, int index, std::string const& field)
 {
     std::stringstream fieldName;
     fieldName << "syntax:input-" << index << ":" << field;
@@ -30,6 +30,14 @@ std::string get_input_syntax_hint_optional(Term* term, int index, std::string co
     std::stringstream fieldName;
     fieldName << "syntax:input-" << index << ":" << field;
     return term->stringPropOptional(fieldName.str(), defaultValue);
+}
+
+void set_input_syntax_hint(Term* term, int index, std::string const& field,
+        std::string const& value)
+{
+    std::stringstream fieldName;
+    fieldName << "syntax:input-" << index << ":" << field;
+    term->setStringProp(fieldName.str(), value);
 }
 
 bool has_source_location_defined(Term* term)

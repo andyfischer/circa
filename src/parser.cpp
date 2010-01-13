@@ -83,7 +83,7 @@ struct ListSyntaxHints {
     {
         std::vector<Input>::const_iterator it;
         for (it = mPending.begin(); it != mPending.end(); ++it)
-            get_input_syntax_hint(term, it->index, it->field) = it->value;
+            set_input_syntax_hint(term, it->index, it->field, it->value);
     }
 
     std::vector<Input> mPending;
@@ -97,7 +97,7 @@ void consume_branch(Branch& branch, TokenStream& tokens)
     if (tokens.nextIs(COLON)) {
         tokens.consume(COLON);
         if (branch.owningTerm != NULL)
-            branch.owningTerm->intProp("syntax:branchStyle") = BRANCH_SYNTAX_COLON;
+            branch.owningTerm->setIntProp("syntax:branchStyle", BRANCH_SYNTAX_COLON);
 
         consume_branch_with_significant_indentation(branch, tokens);
         post_parse_branch(branch);
@@ -137,7 +137,7 @@ void consume_branch(Branch& branch, TokenStream& tokens)
     }
 
     if (branch.owningTerm != NULL)
-        branch.owningTerm->intProp("syntax:branchStyle") = branchStyle;
+        branch.owningTerm->setIntProp("syntax:branchStyle", branchStyle);
 
     if (branchStyle == BRANCH_SYNTAX_BRACE) {
         if (!tokens.nextIs(RBRACE)) {
@@ -174,7 +174,7 @@ bool just_whitespace(Term* term)
     if (term->function != COMMENT_FUNC)
         return false;
 
-    std::string& commentStr = term->stringProp("comment");
+    std::string const& commentStr = term->stringProp("comment");
     return commentStr.find_first_of("--") == std::string::npos;
 }
 
@@ -188,7 +188,7 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
     while (!tokens.finished()) {
         Term* statement = parser::statement(branch, tokens);
 
-        std::string& lineEnding = statement->stringProp("syntax:lineEnding");
+        std::string const& lineEnding = statement->stringProp("syntax:lineEnding");
         bool hasNewline = lineEnding.find_first_of("\n") != std::string::npos;
 
         if (!just_whitespace(statement))
@@ -323,7 +323,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
     append_whitespace(result, possible_whitespace(tokens));
 
     // Consume a newline or ; or ,
-    result->stringProp("syntax:lineEnding") = possible_statement_ending(tokens);
+    result->setStringProp("syntax:lineEnding", possible_statement_ending(tokens));
 
     // Mark this term as a statement
     set_is_statement(result, true);
@@ -346,7 +346,7 @@ Term* comment(Branch& branch, TokenStream& tokens)
         commentText = tokens.consume();
 
     Term* result = apply(branch, COMMENT_FUNC, RefList());
-    result->stringProp("comment") = commentText;
+    result->setStringProp("comment", commentText);
 
     return result;
 }
@@ -393,7 +393,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     Term* result = create_value(branch, FUNCTION_TYPE, functionName);
 
-    result->stringProp("syntax:postNameWs") = possible_whitespace(tokens);
+    result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
 
     bool isNative = false;
 
@@ -409,7 +409,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
         qualifierName += possible_whitespace(tokens);
 
-        result->stringProp("syntax:properties") += "+" + qualifierName;
+        result->setStringProp("syntax:properties", result->stringProp("syntax:properties")
+                + "+" + qualifierName);
     }
 
     if (!tokens.nextIs(LPAREN))
@@ -419,7 +420,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     Branch& contents = as_branch(result);
 
-    function_t::get_name(result) = functionName;
+    function_t::set_name(result, functionName);
 
     // Consume input arguments
     while (!tokens.nextIs(RPAREN) && !tokens.finished())
@@ -456,14 +457,14 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         set_source_hidden(input, true);
 
         if (isHiddenStateArgument) {
-            input->boolProp("state") = true;
+            input->setBoolProp("state", true);
             function_t::get_hidden_state_type(result) = typeTerm;
         }
 
         // Variable args when ... is appended
         if (tokens.nextIs(ELLIPSIS)) {
             tokens.consume(ELLIPSIS);
-            function_t::get_variable_args(result) = true;
+            function_t::set_variable_args(result, true);
         }
 
         // Optional list of qualifiers
@@ -472,7 +473,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
             std::string qualifierName = tokens.consume(IDENTIFIER);
             // TODO: store syntax hint
             if (qualifierName == "ignore_error") {
-                input->boolProp("ignore_error") = true;
+                input->setBoolProp("ignore_error", true);
             } else {
                 return compile_error_for_line(branch, tokens, startPosition,
                     "Unrecognized qualifier: "+qualifierName);
@@ -496,9 +497,9 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     Term* outputType = VOID_TYPE;
 
     if (tokens.nextNonWhitespaceIs(RIGHT_ARROW)) {
-        result->stringProp("syntax:whitespacePreColon") = possible_whitespace(tokens);
+        result->setStringProp("syntax:whitespacePreColon", possible_whitespace(tokens));
         tokens.consume(RIGHT_ARROW);
-        result->stringProp("syntax:whitespacePostColon") = possible_whitespace(tokens);
+        result->setStringProp("syntax:whitespacePostColon", possible_whitespace(tokens));
 
         outputType = type_identifier_or_anonymous_type(branch, tokens);
         assert(outputType != NULL);
@@ -508,7 +509,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         return compile_error_for_line(result, tokens, startPosition,
                 outputType->name +" is not a type");
 
-    result->stringProp("syntax:postHeadingWs") = possible_statement_ending(tokens);
+    result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
     // If we're out of tokens, then stop here. This behavior is used when defining builtins.
     if (tokens.finished()) {
@@ -564,7 +565,8 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
     Term* result = create_value(branch, TYPE_TYPE);
     initialize_compound_type(result);
 
-    result->stringProp("syntax:preLBracketWhitespace") = possible_whitespace_or_newline(tokens);
+    result->setStringProp("syntax:preLBracketWhitespace",
+            possible_whitespace_or_newline(tokens));
 
     if (!tokens.nextIs(LBRACE) && !tokens.nextIs(LBRACKET))
         return compile_error_for_line(result, tokens, startPosition);
@@ -573,7 +575,8 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
 
     tokens.consume();
 
-    result->stringProp("syntax:postLBracketWhitespace") = possible_whitespace_or_newline(tokens);
+    result->setStringProp("syntax:postLBracketWhitespace",
+            possible_whitespace_or_newline(tokens));
 
     Branch& prototype = type_t::get_prototype(result);
 
@@ -599,9 +602,9 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
 
         Term* field = create_value(prototype, fieldType, fieldName);
 
-        field->stringProp("syntax:preWhitespace") = preWs;
-        field->stringProp("syntax:postNameWs") = postNameWs;
-        field->stringProp("syntax:postWhitespace") = possible_statement_ending(tokens);
+        field->setStringProp("syntax:preWhitespace", preWs);
+        field->setStringProp("syntax:postNameWs", postNameWs);
+        field->setStringProp("syntax:postWhitespace", possible_statement_ending(tokens));
     }
 
     tokens.consume(closingToken);
@@ -649,15 +652,16 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             recursively_mark_terms_as_occuring_inside_an_expression(condition);
 
             Term* block = apply(contents, IF_FUNC, RefList(condition));
-            block->stringProp("syntax:preWhitespace") = preKeywordWhitespace;
-            get_input_syntax_hint(block, 0, "postWhitespace") = possible_statement_ending(tokens);
+            block->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
+            set_input_syntax_hint(block, 0, "postWhitespace", possible_statement_ending(tokens));
 
             consume_branch(block->asBranch(), tokens);
         } else {
             // Create an 'else' block
             encounteredElse = true;
             Branch& elseBranch = create_branch(contents, "else");
-            (elseBranch.owningTerm)->stringProp("syntax:preWhitespace") = preKeywordWhitespace;
+            (elseBranch.owningTerm)->setStringProp("syntax:preWhitespace",
+                    preKeywordWhitespace);
             consume_branch(elseBranch, tokens);
         }
 
@@ -666,7 +670,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             return compile_error_for_line(result, tokens, startPosition);
 
         if (tokens.nextNonWhitespaceIs(END)) {
-            result->stringProp("syntax:whitespaceBeforeEnd") = possible_whitespace(tokens);
+            result->setStringProp("syntax:whitespaceBeforeEnd", possible_whitespace(tokens));
             tokens.consume(END);
             break;
         }
@@ -725,12 +729,12 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Branch& innerBranch = as_branch(forTerm);
     setup_for_loop_pre_code(forTerm);
 
-    get_for_loop_modify_list(forTerm) = foundAtOperator;
+    set_value_bool(get_for_loop_modify_list(forTerm), foundAtOperator);
 
     if (foundAtOperator)
-        forTerm->stringProp("syntax:rebindOperator") = listExpr->name;
+        forTerm->setStringProp("syntax:rebindOperator", listExpr->name);
 
-    forTerm->stringProp("syntax:postHeadingWs") = possible_statement_ending(tokens);
+    forTerm->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
     // Create iterator variable
     RefList listExprTypes;
@@ -757,7 +761,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
         branch.moveToEnd(forTerm);
     }
 
-    get_input_syntax_hint(forTerm, 0, "hidden") = "true";
+    set_input_syntax_hint(forTerm, 0, "hidden", "true");
 
     // Use the heading as this term's name, for introspection
     //TODO branch.bindName(forTerm, for_function::get_heading_source(forTerm));
@@ -773,7 +777,7 @@ Term* do_once_block(Branch& branch, TokenStream& tokens)
 
     Term* result = apply(branch, DO_ONCE_FUNC, RefList());
 
-    result->stringProp("syntax:postHeadingWs") = possible_statement_ending(tokens);
+    result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
     consume_branch(as_branch(result), tokens);
 
@@ -812,7 +816,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     Term* result = create_stateful_value(branch, type, name);
 
     if (typeName != "")
-        result->stringProp("syntax:explicitType") = typeName;
+        result->setStringProp("syntax:explicitType", typeName);
 
     if (tokens.nextIs(EQUALS)) {
         tokens.consume();
@@ -830,7 +834,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         if (result->type == ANY_TYPE)
             specialize_type(result, initialValue->type);
 
-        result->refProp("initializedBy") = initialValue;
+        result->setRefProp("initializedBy", initialValue);
     }
 
     set_source_location(result, startPosition, tokens);
@@ -876,7 +880,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
         if (pendingRebind != "") {
             branch.bindName(expr, pendingRebind);
-            expr->stringProp("syntax:rebindOperator") = pendingRebind;
+            expr->setStringProp("syntax:rebindOperator", pendingRebind);
         }
 
         return expr;
@@ -905,8 +909,8 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     if (rexpr->name != "")
         rexpr = apply_with_syntax(branch, COPY_FUNC, RefList(rexpr));
 
-    rexpr->stringProp("syntax:preEqualsSpace") = preEqualsSpace;
-    rexpr->stringProp("syntax:postEqualsSpace") = postEqualsSpace;
+    rexpr->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
+    rexpr->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
 
     // Now take a look at the lexpr.
     
@@ -931,8 +935,8 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         rexpr = apply_with_syntax(branch, SET_FIELD_FUNC, RefList(object, rexpr, field), name);
 
         set_source_hidden(field, true);
-        get_input_syntax_hint(rexpr, 0, "postWhitespace") = "";
-        get_input_syntax_hint(rexpr, 1, "postWhitespace") = "";
+        set_input_syntax_hint(rexpr, 0, "postWhitespace", "");
+        set_input_syntax_hint(rexpr, 1, "postWhitespace", "");
     }
 
     // Or, maybe it was parsed as an index-based access. Turn this into a set_index
@@ -1134,12 +1138,12 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
             result = find_and_apply(branch, functionName, inputs);
 
             if (result->function->name != functionName)
-                result->stringProp("syntax:functionName") = functionName;
+                result->setStringProp("syntax:functionName", functionName);
 
-            result->stringProp("syntax:declarationStyle") = "arrow-concat";
+            result->setStringProp("syntax:declarationStyle", "arrow-concat");
 
-            get_input_syntax_hint(result, 0, "postWhitespace") = preOperatorWhitespace;
-            get_input_syntax_hint(result, 1, "preWhitespace") = postOperatorWhitespace;
+            set_input_syntax_hint(result, 0, "postWhitespace", preOperatorWhitespace);
+            set_input_syntax_hint(result, 1, "preWhitespace", postOperatorWhitespace);
 
         } else {
             Term* rightExpr = infix_expression_nested(branch, tokens, precedence+1);
@@ -1154,11 +1158,11 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
                 throw std::runtime_error("Left side of " + functionName + " must be an identifier");
 
             result = find_and_apply(branch, functionName, RefList(leftExpr, rightExpr));
-            result->stringProp("syntax:declarationStyle") = "infix";
-            result->stringProp("syntax:functionName") = operatorStr;
+            result->setStringProp("syntax:declarationStyle", "infix");
+            result->setStringProp("syntax:functionName", operatorStr);
 
-            get_input_syntax_hint(result, 0, "postWhitespace") = preOperatorWhitespace;
-            get_input_syntax_hint(result, 1, "preWhitespace") = postOperatorWhitespace;
+            set_input_syntax_hint(result, 0, "postWhitespace", preOperatorWhitespace);
+            set_input_syntax_hint(result, 1, "preWhitespace", postOperatorWhitespace);
 
             if (isRebinding)
                 branch.bindName(result, leftExpr->name);
@@ -1184,13 +1188,13 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
         // rather than introduce a neg() operation.
         if (is_value(expr) && expr->name == "") {
             if (is_int(expr)) {
-                as_int(expr) *= -1;
+                set_value_int(expr, as_int(expr) * -1);
                 return expr;
             }
             else if (is_float(expr)) {
-                as_float(expr) *= -1.0f;
-                expr->stringProp("float:original-format") = "-" +
-                    expr->stringProp("float:original-format");
+                set_value_float(expr, as_float(expr) * -1.0f);
+                expr->setStringProp("float:original-format",
+                    "-" + expr->stringProp("float:original-format"));
                 return expr;
             }
         }
@@ -1230,7 +1234,7 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
     Term* originalFunctionTerm = function;
     Term* head = function->input(0);
     Term* fieldNameTerm = function->input(1);
-    std::string& fieldName = fieldNameTerm->asString();
+    std::string const& fieldName = fieldNameTerm->asString();
     std::string nameRebind;
 
     if (type_t::get_member_functions(head->type).contains(fieldName)) {
@@ -1247,16 +1251,16 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
         erase_term(originalFunctionTerm);
 
         Term* result = apply(branch, function, inputs, nameRebind);
-        get_input_syntax_hint(result, 0, "hidden") = "true";
-        result->stringProp("syntax:functionName") = originalName;
+        set_input_syntax_hint(result, 0, "hidden", "true");
+        result->setStringProp("syntax:functionName", originalName);
 
         if (nameRebind != "")
-            result->boolProp("syntax:implicitNameBinding") = true;
+            result->setBoolProp("syntax:implicitNameBinding", true);
 
         return result;
     } else {
         Term* result = apply(branch, UNKNOWN_FUNCTION, inputs);
-        result->stringProp("syntax:functionName") = originalName;
+        result->setStringProp("syntax:functionName", originalName);
         return result;
     }
 }
@@ -1312,7 +1316,7 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
     Term* result = apply(branch, function, arguments);
 
     if (result->function->name != originalName)
-        result->stringProp("syntax:functionName") = originalName;
+        result->setStringProp("syntax:functionName", originalName);
 
     inputHints.apply(result);
 
@@ -1347,7 +1351,7 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
         tokens.consume(RBRACKET);
 
         Term* result = apply(branch, GET_INDEX_FUNC, RefList(head, subscript));
-        get_input_syntax_hint(result, 1, "preWhitespace") = postLbracketWs;
+        set_input_syntax_hint(result, 1, "preWhitespace", postLbracketWs);
         set_source_location(result, startPosition, tokens);
         finished = false;
         return result;
@@ -1469,7 +1473,7 @@ Term* atom(Branch& branch, TokenStream& tokens)
         if (!tokens.nextIs(RPAREN))
             return compile_error_for_line(result, tokens, startPosition);
         tokens.consume(RPAREN);
-        result->intProp("syntax:parens") += 1;
+        result->setIntProp("syntax:parens", result->intProp("syntax:parens") + 1);
     }
     else {
         if (!tokens.finished())
@@ -1499,7 +1503,7 @@ Term* literal_hex(Branch& branch, TokenStream& tokens)
     std::string text = tokens.consume(HEX_INTEGER);
     int value = strtoul(text.c_str(), NULL, 0);
     Term* term = create_int(branch, value);
-    term->stringProp("syntax:integerFormat") = "hex";
+    term->setStringProp("syntax:integerFormat", "hex");
     set_source_location(term, startPosition, tokens);
     return term;
 }
@@ -1519,7 +1523,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     set_step(term, step);
 
     // Store the original string
-    term->stringProp("float:original-format") = text;
+    term->setStringProp("float:original-format", text);
 
     float mutability = 0.0;
 
@@ -1529,7 +1533,7 @@ Term* literal_float(Branch& branch, TokenStream& tokens)
     }
 
     if (mutability != 0.0)
-        term->addProperty("mutability", FLOAT_TYPE)->asFloat() = mutability;
+        term->setFloatProp("mutability", mutability);
 
     set_source_location(term, startPosition, tokens);
     return term;
@@ -1553,7 +1557,7 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     set_source_location(term, startPosition, tokens);
 
     if (quoteType != "'")
-        term->stringProp("syntax:quoteType") = quoteType;
+        term->setStringProp("syntax:quoteType", quoteType);
     return term;
 }
 
@@ -1626,12 +1630,12 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
             a = two_hex_digits_to_number(text[6], text[7]) / 255.0f;
     }
 
-    result[0]->asFloat() = r;
-    result[1]->asFloat() = g;
-    result[2]->asFloat() = b;
-    result[3]->asFloat() = a;
+    set_value_float(result[0], r);
+    set_value_float(result[1], g);
+    set_value_float(result[2], b);
+    set_value_float(result[3], a);
 
-    resultTerm->intProp("syntax:colorFormat") = (int) text.length();
+    resultTerm->setIntProp("syntax:colorFormat", (int) text.length());
 
     set_source_location(resultTerm, startPosition, tokens);
     return resultTerm;
@@ -1675,7 +1679,7 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 
     tokens.consume(RBRACKET);
 
-    result->boolProp("syntax:literal-list") = true;
+    result->setBoolProp("syntax:literal-list", true);
 
     branch.moveToEnd(result);
     set_source_location(result, startPosition, tokens);
@@ -1705,7 +1709,7 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
     Term* result = apply(branch, BRANCH_FUNC, RefList(), name);
     change_type(result, NAMESPACE_TYPE);
 
-    result->stringProp("syntax:postHeadingWs") = possible_statement_ending(tokens);
+    result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
     consume_branch(as_branch(result), tokens);
 
@@ -1716,7 +1720,7 @@ Term* unknown_identifier(Branch& branch, std::string const& name)
 {
     Term* term = apply(branch, UNKNOWN_IDENTIFIER_FUNC, RefList(), name);
     set_is_statement(term, false);
-    term->stringProp("message") = name;
+    term->setStringProp("message", name);
     return term;
 }
 

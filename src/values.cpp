@@ -7,14 +7,14 @@ namespace circa {
 bool is_value_alloced(Term* term)
 {
     if (term->type == NULL) {
-        assert(term->value == NULL);
+        assert(term->value.data.ptr == NULL);
         return false;
     }
 
     if (!type_t::get_is_pointer(term->type))
         return true;
     else
-        return term->value != NULL;
+        return term->value.data.ptr != NULL;
 }
 
 void alloc_value(Term* term)
@@ -25,7 +25,7 @@ void alloc_value(Term* term)
 
     if (alloc == NULL)
         // this happens while bootstrapping
-        term->value = NULL;
+        set_value_null(term->value);
     else {
         alloc(term->type, term);
 
@@ -46,14 +46,14 @@ void dealloc_value(Term* term)
 
     if (!is_value_alloced(term->type)) {
         std::cout << "warn: in dealloc_value, type is undefined" << std::endl;
-        term->value = NULL;
+        set_value_null(term->value);
         return;
     }
 
     if (dealloc != NULL)
         dealloc(term->type, term);
 
-    term->value = NULL;
+    set_value_null(term->value);
 }
 
 void assign_value(Term* source, Term* dest)

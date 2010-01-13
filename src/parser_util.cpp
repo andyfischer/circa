@@ -19,15 +19,15 @@ Term* apply_with_syntax(Branch& branch, Term* function, RefList inputs, std::str
 void prepend_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
-        term->stringProp("syntax:preWhitespace") = 
-            whitespace + term->stringProp("syntax:preWhitespace");
+        term->setStringProp("syntax:preWhitespace", 
+            whitespace + term->stringProp("syntax:preWhitespace"));
 }
 
 void append_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
-        term->stringProp("syntax:postWhitespace") = 
-            term->stringProp("syntax:postWhitespace") + whitespace;
+        term->setStringProp("syntax:postWhitespace",
+            term->stringProp("syntax:postWhitespace") + whitespace);
 }
 
 void set_source_location(Term* term, int start, TokenStream& tokens)
@@ -72,10 +72,10 @@ void set_source_location(Term* term, int start, TokenStream& tokens)
     }
 
     // Commit change
-    term->intProp("colStart") = colStart;
-    term->intProp("lineStart") = lineStart;
-    term->intProp("colEnd") = colEnd;
-    term->intProp("lineEnd") = lineEnd;
+    term->setIntProp("colStart", colStart);
+    term->setIntProp("lineStart", lineStart);
+    term->setIntProp("colEnd", colEnd);
+    term->setIntProp("lineEnd", lineEnd);
 }
 
 void push_pending_rebind(Branch& branch, std::string const& name)
@@ -190,7 +190,7 @@ Term* find_function(Branch& branch, std::string const& name)
 
 void set_source_hidden(Term* term, bool hidden)
 {
-    term->boolProp("syntax:hidden") = hidden;
+    term->setBoolProp("syntax:hidden", hidden);
 }
 
 std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient)
@@ -229,7 +229,7 @@ Term* insert_compile_error(Branch& branch, TokenStream& tokens,
         std::string const& message)
 {
     Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
-    result->stringProp("message") = message;
+    result->setStringProp("message", message);
     set_source_location(result, tokens.getPosition(), tokens);
     return result;
 }
@@ -249,9 +249,9 @@ Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start,
     std::string line = consume_line(tokens, start, existing);
 
     if (message == "")
-        existing->stringProp("message") = line;
+        existing->setStringProp("message", line);
     else
-        existing->stringProp("message") = message;
+        existing->setStringProp("message", message);
 
     assert(has_static_error(existing));
 

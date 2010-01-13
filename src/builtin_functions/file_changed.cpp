@@ -12,15 +12,15 @@ namespace file_changed_function {
             return false;
         }
         
-        std::string &sigFilename = fileSignature->asBranch()[0]->asString();
-        int &sigModified = fileSignature->asBranch()[1]->asInt();
+        Term* sigFilename = fileSignature->asBranch()[0];
+        Term* sigModified = fileSignature->asBranch()[1];
 
         time_t modifiedTime = get_modified_time(filename);
 
-        if (modifiedTime != sigModified
-                || filename != sigFilename) {
-            sigFilename = filename;
-            sigModified = (int) modifiedTime;
+        if (modifiedTime != as_int(sigModified)
+                || filename != as_string(sigFilename)) {
+            set_value_str(sigFilename, filename);
+            set_value_int(sigModified, (int) modifiedTime);
             return true;
         } else {
             return false;
@@ -31,7 +31,7 @@ namespace file_changed_function {
     {
         std::string actual_filename = get_path_relative_to_source(caller,
             caller->input(1)->asString());
-        as_bool(caller) = check(caller, caller->input(0), actual_filename);
+        set_value_bool(caller, check(caller, caller->input(0), actual_filename));
     }
 
     void setup(Branch& kernel)

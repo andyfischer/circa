@@ -72,7 +72,7 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     RemapPointersFunc remapPointers = type_t::get_remap_pointers_func(term->type);
 
     // Remap on value
-    if ((term->value != NULL)
+    if ((term->value.data.ptr != NULL)
             && term->type != NULL
             && (remapPointers)) {
 

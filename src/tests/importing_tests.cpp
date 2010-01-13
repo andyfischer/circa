@@ -12,7 +12,7 @@ namespace importing_tests {
 
 void my_imported_function(Term* term)
 {
-    as_int(term) = as_int(term->input(0)) + as_int(term->input(1));
+    set_value_int(term, as_int(term->input(0)) + as_int(term->input(1)));
 }
 
 void test_import_c()
@@ -28,27 +28,6 @@ void test_import_c()
 
     test_assert(as_int(result) == 9);
 }
-
-#if 0
-void test_expose_value()
-{
-    Branch branch;
-
-    int a = 1;
-
-    expose_value(branch, &a, "a");
-    Term* b = branch.eval("b = a + 2");
-
-    test_assert(b);
-    test_equals(to_float(b), 3);
-
-    a = 10;
-
-    evaluate_branch(branch);
-
-    test_equals(to_float(b), 12);
-}
-#endif
 
 void register_tests()
 {

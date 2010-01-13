@@ -7,11 +7,11 @@ namespace one_time_assign_function {
 
     void evaluate(Term* caller)
     {
-        bool &assigned = caller->input(0)->asBool();
+        Term* assigned = caller->input(0);
 
-        if (!assigned) {
+        if (!as_bool(assigned)) {
             assign_value(caller->input(1), caller);
-            assigned = true;
+            set_value_bool(assigned, true);
         }
     }
 

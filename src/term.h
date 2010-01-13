@@ -8,20 +8,17 @@
 #include "branch.h"
 #include "references.h"
 #include "ref_list.h"
+#include "tagged_value.h"
 
 namespace circa {
 
 const int TERM_FLAG_ERRORED = 0x1;
-const int TERM_FLAG_SHARED_VALUE = 0x2;
 
 struct List;
 
 struct Term
 {
-    // Our current value. In some situations, when someone refers to this term, they
-    // may be referring to this value. May be NULL. The type of this value is described
-    // by 'type'.
-    void* value;
+    TaggedValue value;
 
     // A Type term that describes our data type
     Ref type;
@@ -71,15 +68,21 @@ struct Term
     Term* addProperty(std::string const& name, Term* type);
     void removeProperty(std::string const& name);
 
-    bool& boolProp(std::string const& name);
-    int& intProp(std::string const& name);
-    float& floatProp(std::string const& name);
-    std::string& stringProp(std::string const& name);
-    Ref& refProp(std::string const& name);
+    int intProp(std::string const& name);
+    float floatProp(std::string const& name);
+    bool boolProp(std::string const& name);
+    std::string const& stringProp(std::string const& name);
+    Ref refProp(std::string const& name);
 
-    bool boolPropOptional(std::string const& name, bool defaultValue);
-    float floatPropOptional(std::string const& name, float defaultValue);
+    void setIntProp(std::string const& name, int i);
+    void setFloatProp(std::string const& name, float f);
+    void setBoolProp(std::string const& name, bool b);
+    void setStringProp(std::string const& name, std::string const& s);
+    void setRefProp(std::string const& name, Term* r);
+
     int intPropOptional(std::string const& name, int defaultValue);
+    float floatPropOptional(std::string const& name, float defaultValue);
+    bool boolPropOptional(std::string const& name, bool defaultValue);
     std::string stringPropOptional(std::string const& name, std::string const& defaultValue);
 
     // Flag accessors
@@ -87,14 +90,16 @@ struct Term
     void setHasError(bool error);
 
     // Convenience accessors
-    int& asInt();
-    float& asFloat();
+    int asInt();
+    float asFloat();
     float toFloat();
-    std::string& asString();
-    bool& asBool();
+    std::string const& asString();
+    bool asBool();
     Ref& asRef();
     Branch& asBranch();
 };
+
+void assert_term_invariants(Term* t);
 
 } // namespace circa
 

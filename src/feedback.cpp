@@ -54,7 +54,7 @@ bool is_trainable(Term* term)
 
 void set_trainable(Term* term, bool value)
 {
-    term->boolProp("trainable") = value;
+    term->setBoolProp("trainable", value);
 }
 
 void update_derived_trainable_properties(Branch& branch)
@@ -69,7 +69,7 @@ void update_derived_trainable_properties(Branch& branch)
             }
         }
 
-        it->boolProp("derived-trainable") = found;
+        it->setBoolProp("derived-trainable", found);
     }
 }
 
@@ -240,7 +240,7 @@ float get_feedback_weight(Term* term)
 
 void set_feedback_weight(Term* term, float weight)
 {
-    term->floatProp("feedback-weight") = weight;
+    term->setFloatProp("feedback-weight", weight);
 }
 
 void feedback_register_constants(Branch& kernel)

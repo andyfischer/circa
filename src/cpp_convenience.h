@@ -12,7 +12,7 @@
 namespace circa {
 
 template <class T>
-T& as(Term* term)
+T as(Term* term)
 {
     Term* type = term->type;
     const std::type_info* type_info = type_t::get_std_type_info(term->type);
@@ -24,15 +24,10 @@ T& as(Term* term)
         throw std::runtime_error(
                 "C++ type mismatch, existing data has type "+type_t::get_name(type));
 
-    return *((T*) term->value);
+    return *((T*) term->value.data.ptr);
 }
 
-// Specializations for primitive types:
-template <> int& as(Term* term);
-template <> float& as(Term* term);
-template <> bool& as(Term* term);
-template <> std::string& as(Term* term);
-
+#if 0
 template <class T, Term** type>
 class Accessor {
     Ref _term;
@@ -89,6 +84,7 @@ typedef Accessor<int, &INT_TYPE> Int;
 typedef Accessor<float, &FLOAT_TYPE> Float;
 typedef Accessor<bool, &BOOL_TYPE> Bool;
 typedef Accessor<std::string, &STRING_TYPE> String;
+#endif
 
 template <class T>
 T eval(std::string const& statement)

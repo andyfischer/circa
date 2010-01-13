@@ -29,7 +29,7 @@ void compound_types()
     Term* inst = branch.eval("inst = MyType()");
     test_assert(inst != NULL);
     test_assert(inst->type = MyType);
-    test_assert(inst->value != NULL);
+    test_assert(inst->value.data.ptr != NULL);
     test_assert(as_branch(inst)[0]->asInt() == 0);
     test_assert(as_branch(inst)[1]->asString() == "");
 
@@ -163,7 +163,7 @@ void test_default_values()
 
     Term* t_value = create_value(branch, t);
 
-    t_value->value = (void*) 5;
+    set_value_int(t_value->value, 5);
     type_t::enable_default_value(t);
     assign_value(t_value, type_t::get_default_value(t));
 
@@ -266,7 +266,7 @@ void test_find_common_type()
 
 void _evaluate_type_error(Term* term)
 {
-    as_float(term) = to_float(term->input(0));
+    set_value_float(term, to_float(term->input(0)));
 }
 
 void test_type_error_in_a_native_call()

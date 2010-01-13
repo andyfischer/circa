@@ -8,14 +8,6 @@
 namespace circa {
 namespace primitive_type_tests {
 
-void non_pointer_values()
-{
-    Branch branch;
-    Term* i = branch.eval("1");
-    test_assert((void*) &as_int(i) == &i->value);
-    test_assert((void*) &as<int>(i) == &i->value);
-}
-
 void strings()
 {
     Branch branch;
@@ -73,14 +65,14 @@ void float_to_string()
 
     // Try changing a value, make sure that new value is printed
     Term* b = branch.eval("a = .1");
-    b->asFloat() = .123456f;
+    set_value_float(b, .123456f);
     test_assert(to_string(b) == "0.123456");
 
     // Make sure that if we assign a float to a value which might get printed without
     // a decimal point, that we still do print the decimal point. Otherwise if the
     // string gets re-parsed, that value will have a different type.
     Term* c = branch.eval("a = 1.0");
-    c->asFloat() = 2.0;
+    set_value_float(c, 2.0);
     test_equals(to_string(c), "2.0");
 }
 
@@ -104,7 +96,6 @@ void test_ref_tweak()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(primitive_type_tests::non_pointer_values);
     REGISTER_TEST_CASE(primitive_type_tests::strings);
     REGISTER_TEST_CASE(primitive_type_tests::builtin_objects);
     REGISTER_TEST_CASE(primitive_type_tests::test_void);

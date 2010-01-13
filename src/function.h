@@ -18,20 +18,23 @@ namespace function_t {
     bool check_invariants(Term* term, std::string* failureMessage);
 
     // accessors
-    std::string& get_name(Term* function);
+    std::string const& get_name(Term* function);
+    void set_name(Term* function, std::string const& name);
     Term* get_output_type(Term* function);
     Ref& get_hidden_state_type(Term* function);
-    bool& get_variable_args(Term* function);
+    bool get_variable_args(Term* function);
+    void set_variable_args(Term* function, bool value);
     Term* get_input_placeholder(Term* function, int index);
     Term* get_input_type(Term* function, int index);
     std::string const& get_input_name(Term* function, int index);
     bool get_input_modified(Term* function, int index);
     bool get_input_meta(Term* function, int index);
     void set_input_meta(Term* function, int index, bool value);
-    std::string& get_exposed_name_path(Term* function);
+    std::string const& get_exposed_name_path(Term* function);
+    void set_exposed_name_path(Term* func, std::string const& value);
     Ref& get_feedback_func(Term* function);
     Branch& get_parameters(Term* function);
-    std::string& get_description(Term* function);
+    std::string const& get_description(Term* function);
 
     EvaluateFunc& get_evaluate(Term* function);
     SpecializeTypeFunc& get_specialize_type(Term* function);
@@ -50,6 +53,7 @@ bool is_callable(Term* term);
 bool inputs_fit_function(Term* function, RefList const& inputs);
 Term* create_overloaded_function(Branch& branch, std::string const& name);
 Term* function_get_specialized_output_type(Term* function, Term* call);
+void function_set_use_input_as_output(Term* function, int index, bool value);
 
 bool is_native_function(Term* function);
 

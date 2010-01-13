@@ -14,7 +14,7 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     if (is_type(function)) {
         if (inputs.length() == 0) {
             Term* result = create_value(branch, function);
-            result->boolProp("constructor") = true;
+            result->setBoolProp("constructor", true);
             return result;
         } else if (inputs.length() == 1) {
             Term* result = apply(branch, CAST_FUNC, inputs);
@@ -123,7 +123,7 @@ Term* create_duplicate(Branch& branch, Term* source, std::string const& name, bo
     Term* term = apply(branch, source->function, source->inputs, name);
     change_type(term, source->type);
 
-    if (source->value != NULL) {
+    if (source->value.data.ptr != NULL) {
         alloc_value(term);
         if (copyBranches || !is_branch(source))
             assign_value(source, term);
@@ -141,7 +141,7 @@ Term* apply(Branch& branch, std::string const& functionName, RefList const& inpu
         throw std::runtime_error("function not found: "+functionName);
 
     Term* result = apply(branch, function, inputs, name);
-    result->stringProp("syntax:functionName") = functionName;
+    result->setStringProp("syntax:functionName", functionName);
     return result;
 }
 
@@ -160,6 +160,7 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
     term->type = type;
     change_type(term, type);
     alloc_value(term);
+    assign_value_to_default(term);
 
     return term;
 }
@@ -186,35 +187,35 @@ Term* create_stateful_value(Branch& branch, Term* type, std::string const& name)
 Term* create_string(Branch& branch, std::string const& s, std::string const& name)
 {
     Term* term = create_value(branch, STRING_TYPE, name);
-    as_string(term) = s;
+    set_value_str(term->value, s);
     return term;
 }
 
 Term* create_int(Branch& branch, int i, std::string const& name)
 {
     Term* term = create_value(branch, INT_TYPE, name);
-    as_int(term) = i;
+    set_value_int(term->value, i);
     return term;
 }
 
 Term* create_float(Branch& branch, float f, std::string const& name)
 {
     Term* term = create_value(branch, FLOAT_TYPE, name);
-    as_float(term) = f;
+    set_value_float(term->value, f);
     return term;
 }
 
 Term* create_bool(Branch& branch, bool b, std::string const& name)
 {
     Term* term = create_value(branch, BOOL_TYPE, name);
-    as_bool(term) = b;
+    set_value_bool(term->value, b);
     return term;
 }
 
 Term* create_ref(Branch& branch, Term* ref, std::string const& name)
 {
     Term* term = create_value(branch, REF_TYPE, name);
-    as_ref(term) = ref;
+    set_value_ref(term, ref);
     return term;
 }
 Term* create_void(Branch& branch, std::string const& name)
@@ -283,21 +284,20 @@ Term* procure_value(Branch& branch, Term* type, std::string const& name)
     return existing;
 }
 
-int& procure_int(Branch& branch, std::string const& name)
+Term* procure_int(Branch& branch, std::string const& name)
 {
-    return as_int(procure_value(branch, INT_TYPE, name));
+    return procure_value(branch, INT_TYPE, name);
 }
 
-float& procure_float(Branch& branch, std::string const& name)
+Term* procure_float(Branch& branch, std::string const& name)
 {
-    return as_float(procure_value(branch, FLOAT_TYPE, name));
+    return procure_value(branch, FLOAT_TYPE, name);
 }
 
-bool& procure_bool(Branch& branch, std::string const& name)
+Term* procure_bool(Branch& branch, std::string const& name)
 {
-    return as_bool(procure_value(branch, BOOL_TYPE, name));
+    return procure_value(branch, BOOL_TYPE, name);
 }
-
 
 void resize_list(Branch& list, int numElements, Term* type)
 {
@@ -320,7 +320,7 @@ void resize_list(Branch& list, int numElements, Term* type)
 
 void set_step(Term* term, float step)
 {
-    term->floatProp("step") = step;
+    term->setFloatProp("step", step);
 }
 
 float get_step(Term* term)

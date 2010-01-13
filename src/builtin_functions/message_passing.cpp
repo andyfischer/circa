@@ -9,7 +9,7 @@ namespace message_passing_function {
 
     void evaluate_send(Term* caller)
     {
-        std::string& channelName = caller->input(0)->asString();
+        std::string channelName = caller->input(0)->asString();
         Branch& store = *messageStore;
 
         // check if we need to add a queue for this channelName
@@ -23,7 +23,7 @@ namespace message_passing_function {
 
     void evaluate_receive(Term* caller)
     {
-        std::string& channelName = caller->input(0)->asString();
+        std::string channelName = caller->input(0)->asString();
         Branch& store = *messageStore;
         Branch& output = caller->asBranch();
 

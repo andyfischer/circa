@@ -15,7 +15,7 @@ bool is_value(Term* term)
 
 void set_is_statement(Term* term, bool value)
 {
-    term->boolProp("statement") = value;
+    term->setBoolProp("statement", value);
 }
 
 bool is_statement(Term* term)

@@ -50,7 +50,7 @@ namespace if_block_function {
         // Update the #joining branch
         assert(contents[contents.length()-1]->name == "#joining");
         Branch& joining = as_branch(contents[contents.length()-1]);
-        joining["#satisfiedIndex"]->asInt() = satisfiedIndex;
+        set_value_int(joining["#satisfiedIndex"], satisfiedIndex);
         evaluate_branch(joining, caller);
     }
 
@@ -91,7 +91,7 @@ namespace if_block_function {
     {
         IF_BLOCK_FUNC = import_function(kernel, evaluate, "if_block() -> Code");
         function_t::get_to_source_string(IF_BLOCK_FUNC) = toSourceString;
-        function_t::get_exposed_name_path(IF_BLOCK_FUNC) = "#joining";
+        function_t::set_exposed_name_path(IF_BLOCK_FUNC, "#joining");
     }
 }
 }

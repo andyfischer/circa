@@ -36,6 +36,7 @@
 #include "stateful_code.h"
 #include "source_repro.h"
 #include "subroutine.h"
+#include "tagged_value_accessors.h"
 #include "term.h"
 #include "term_pool.h"
 #include "testing.h"

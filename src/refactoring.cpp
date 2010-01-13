@@ -48,6 +48,9 @@ void change_type(Term *term, Term *typeTerm)
         dealloc_value(term);
 
     term->type = typeTerm;
+
+    if (is_value_alloced(term))
+        assign_value_to_default(term);
 }
 
 void specialize_type(Term *term, Term *type)

@@ -24,7 +24,7 @@ void _test_equals_function(std::string a, std::string b,
         int line, const char* file);
 
 #define test_assert(c) _test_assert_function((c), __LINE__, __FILE__)
-#define test_fail() _test_fail_function( __LINE__, __FILE__)
+#define test_fail() _test_fail_function(__LINE__, __FILE__)
 #define test_equals(a,b) _test_equals_function(a,b,#a,#b,__LINE__,__FILE__)
 
 struct TestCase {
@@ -52,6 +52,7 @@ bool run_all_tests();
 std::vector<std::string> list_all_test_names();
 std::string get_current_test_name();
 void declare_current_test_failed();
+bool current_test_has_failed();
 
 } // namespace circa
 

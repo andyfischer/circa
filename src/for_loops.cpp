@@ -56,14 +56,14 @@ Term* get_for_loop_any_iterations(Term* forTerm)
     return as_branch(forTerm)[0]->asBranch()[1];
 }
 
-bool& get_for_loop_modify_list(Term* forTerm)
+Term* get_for_loop_modify_list(Term* forTerm)
 {
-    return as_branch(forTerm)[0]->asBranch()[2]->asBool();
+    return as_branch(forTerm)[0]->asBranch()[2];
 }
 
-bool& get_for_loop_discard_called(Term* forTerm)
+Term* get_for_loop_discard_called(Term* forTerm)
 {
-    return as_branch(forTerm)[0]->asBranch()[3]->asBool();
+    return as_branch(forTerm)[0]->asBranch()[3];
 }
 
 Ref& get_for_loop_state_type(Term* forTerm)
@@ -152,7 +152,7 @@ void setup_for_loop_post_code(Term* forTerm)
     }
 
     // Also, possibly rebind the list name.
-    if (get_for_loop_modify_list(forTerm) && listName != "") {
+    if (as_bool(get_for_loop_modify_list(forTerm)) && listName != "") {
         create_value(rebindsForOuter, LIST_TYPE, listName);
     }
 
@@ -179,8 +179,8 @@ void evaluate_for_loop(Term* forTerm)
     // Make sure state has the correct number of iterations
 
     int numIterations = as_branch(listTerm).length();
-    bool modifyList = get_for_loop_modify_list(forTerm);
-    bool& discardCalled = get_for_loop_discard_called(forTerm);
+    bool modifyList = get_for_loop_modify_list(forTerm)->asBool();
+    Term* discardCalled = get_for_loop_discard_called(forTerm);
 
     Term* listOutput = NULL;
     int listOutputWriteHead = 0;
@@ -205,14 +205,14 @@ void evaluate_for_loop(Term* forTerm)
     Term* isFirstIteration = get_for_loop_is_first_iteration(forTerm);
     assert(isFirstIteration->name == "#is_first_iteration");
     Term* iterator = get_for_loop_iterator(forTerm);
-    get_for_loop_any_iterations(forTerm)->asBool() = numIterations > 0;
+    set_value_bool(get_for_loop_any_iterations(forTerm), numIterations > 0);
 
     if (numIterations == 0)
         evaluate_branch(get_for_loop_rebinds_for_outer(forTerm));
 
     for (int i=0; i < numIterations; i++) {
-        as_bool(isFirstIteration) = i == 0;
-        discardCalled = false;
+        set_value_bool(isFirstIteration, i == 0);
+        set_value_bool(discardCalled, false);
 
         // Inject iterator value
         if (!value_fits_type(listTerm->asBranch()[i], iterator->type)) {
@@ -239,7 +239,7 @@ void evaluate_for_loop(Term* forTerm)
             persist_state_from_branch(codeBranch, stateBranch->get(i)->asBranch());
 
         // Possibly use this value to modify the list
-        if (listOutput != NULL && !discardCalled) {
+        if (listOutput != NULL && !as_bool(discardCalled)) {
             Term* iteratorResult = codeBranch[iterator->name];
             Branch& listOutputBr = listOutput->asBranch();
             if (listOutputWriteHead >= listOutputBr.length())

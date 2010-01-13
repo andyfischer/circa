@@ -17,9 +17,9 @@ namespace mod_function {
         int n = int_input(caller, 1);
 
         if (a >= 0)
-            as_int(caller) = a % n;
+            set_value_int(caller, a % n);
         else
-            as_int(caller) = a % n + n;
+            set_value_int(caller, a % n + n);
     }
 
     void evaluate_f(Term* caller)
@@ -28,9 +28,9 @@ namespace mod_function {
         float n = float_input(caller, 1);
 
         if (a >= 0)
-            as_float(caller) = fmodf(a, n);
+            set_value_float(caller, fmodf(a, n));
         else
-            as_float(caller) = fmodf(a, n) + n;
+            set_value_float(caller, fmodf(a, n) + n);
     }
 
     void setup(Branch& kernel)

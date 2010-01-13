@@ -7,8 +7,8 @@ namespace path_function {
 
     void evaluate(Term* caller)
     {
-        as_string(caller) =
-            get_path_relative_to_source(caller, as_string(caller->input(0)));
+        set_value_str(caller,
+            get_path_relative_to_source(caller, as_string(caller->input(0))));
     }
 
     void setup(Branch& kernel)

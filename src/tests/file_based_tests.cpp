@@ -103,7 +103,7 @@ void test_file_changed()
     test_assert(!as_bool(changed));
 
     // Change the filename
-    as_string(filename) = "y";
+    set_value_str(filename, "y");
     evaluate_term(changed);
     test_assert(as_bool(changed));
     evaluate_term(changed);

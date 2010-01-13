@@ -15,7 +15,7 @@ void error_occurred(Term* errorTerm, std::string const& message)
         throw std::runtime_error(message);
 
     errorTerm->setHasError(true);
-    errorTerm->stringProp("error") = message;
+    errorTerm->setStringProp("error", message);
 }
 
 void assert_type(Term* term, Term* type)

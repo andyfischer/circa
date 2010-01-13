@@ -280,7 +280,7 @@ namespace branch_t {
     void alloc(Term* typeTerm, Term* term)
     {
         Branch* branch = new Branch();
-        term->value = branch;
+        set_value_branch(term->value, branch);
 
         Branch& prototype = type_t::get_prototype(typeTerm);
 
@@ -295,7 +295,7 @@ namespace branch_t {
         Branch& branch = as_branch(term);
         branch._refCount--;
         if (branch._refCount <= 0)
-            delete (Branch*) term->value;
+            delete (Branch*) term->value.data.ptr;
     }
 
     void assign(Term* sourceTerm, Term* destTerm)
@@ -329,13 +329,6 @@ namespace branch_t {
         dest.removeNulls();
     }
 
-    void assign_reference(Term* source, Term* dest)
-    {
-        assert(!is_value_alloced(dest));
-        dest->value = source->value;
-        as_branch(dest)._refCount++;
-    }
-
     bool equals(Term* lhsTerm, Term* rhsTerm)
     {
         Branch& lhs = as_branch(lhsTerm);
@@ -364,7 +357,7 @@ Branch& as_branch(Term* term)
     assert(term != NULL);
     assert(is_branch(term));
     alloc_value(term);
-    return *((Branch*) term->value);
+    return *((Branch*) term->value.data.ptr);
 }
 
 bool is_namespace(Term* term)

@@ -49,9 +49,9 @@ Term* duplicate_value(Branch& branch, Term* term);
 // create it if it doesn't exist." Procure functions are idempotent.
 Term* procure_value(Branch& branch, Term* type, std::string const& name);
 
-int& procure_int(Branch& branch, std::string const& name);
-float& procure_float(Branch& branch, std::string const& name);
-bool& procure_bool(Branch& branch, std::string const& name);
+Term* procure_int(Branch& branch, std::string const& name);
+Term* procure_float(Branch& branch, std::string const& name);
+Term* procure_bool(Branch& branch, std::string const& name);
 
 // Resize this list term, making sure that each element is a type of 'type'.
 void resize_list(Branch& list, int numElements, Term* type);

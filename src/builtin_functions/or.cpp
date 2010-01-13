@@ -7,7 +7,7 @@ namespace or_function {
 
     void evaluate(Term* caller)
     {
-        as_bool(caller) = bool_input(caller,0) || bool_input(caller,1);
+        set_value_bool(caller, bool_input(caller,0) || bool_input(caller,1));
     }
 
     void setup(Branch& kernel)

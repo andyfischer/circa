@@ -250,4 +250,9 @@ void declare_current_test_failed()
     gCurrentTestCase.failed = true;
 }
 
+bool current_test_has_failed()
+{
+    return gCurrentTestCase.failed;
+}
+
 }

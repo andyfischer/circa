@@ -28,82 +28,76 @@ Term* SPECIALIZE_THUNK_TYPE = NULL;
 Term* TO_STRING_THUNK_TYPE = NULL;
 Term* CHECK_INVARIANTS_THUNK_TYPE = NULL;
 
-Ref& as_ref(Term* term)
-{
-    assert_type(term, REF_TYPE);
-    return *((Ref*) term->value);
-}
-
 AllocFunc& as_alloc_thunk(Term* term)
 {
     assert_type(term, ALLOC_THUNK_TYPE);
-    return ((AllocFunc&) term->value);
+    return ((AllocFunc&) term->value.data.ptr);
 }
 
 DeallocFunc& as_dealloc_thunk(Term* term)
 {
     assert_type(term, DEALLOC_THUNK_TYPE);
-    return ((DeallocFunc&) term->value);
+    return ((DeallocFunc&) term->value.data.ptr);
 }
 
 DuplicateFunc& as_duplicate_thunk(Term* term)
 {
     assert_type(term, DUPLICATE_THUNK_TYPE);
-    return ((DuplicateFunc&) term->value);
+    return ((DuplicateFunc&) term->value.data.ptr);
 }
 
 AssignFunc& as_assign_thunk(Term* term)
 {
     assert_type(term, ASSIGN_THUNK_TYPE);
-    return ((AssignFunc&) term->value);
+    return ((AssignFunc&) term->value.data.ptr);
 }
 
 EqualsFunc& as_equals_thunk(Term* term)
 {
     assert_type(term, EQUALS_THUNK_TYPE);
-    return ((EqualsFunc&) term->value);
+    return ((EqualsFunc&) term->value.data.ptr);
 }
 
 RemapPointersFunc& as_remap_pointers_thunk(Term* term)
 {
     assert_type(term, REMAP_POINTERS_THUNK_TYPE);
-    return ((RemapPointersFunc&) term->value);
+    return ((RemapPointersFunc&) term->value.data.ptr);
 }
 
 ToStringFunc& as_to_string_thunk(Term* term)
 {
     assert_type(term, TO_STRING_THUNK_TYPE);
-    return ((ToStringFunc&) term->value);
+    return ((ToStringFunc&) term->value.data.ptr);
 }
 
 const std::type_info*& as_std_type_info(Term* term)
 {
     assert_type(term, STD_TYPE_INFO_TYPE);
-    return ((const std::type_info*&) term->value);
+    return ((const std::type_info*&) term->value.data.ptr);
 }
 
 EvaluateFunc& as_evaluate_thunk(Term* term)
 {
     assert_type(term, EVALUATE_THUNK_TYPE);
-    return ((EvaluateFunc&) term->value);
+    return ((EvaluateFunc&) term->value.data.ptr);
 }
 
 SpecializeTypeFunc& as_specialize_type_thunk(Term* term)
 {
     assert_type(term, SPECIALIZE_THUNK_TYPE);
-    return ((SpecializeTypeFunc&) term->value);
+    return ((SpecializeTypeFunc&) term->value.data.ptr);
 }
 
 ToSourceStringFunc& as_to_source_string_thunk(Term* term)
 {
     assert_type(term, TO_STRING_THUNK_TYPE);
-    return ((ToSourceStringFunc&) term->value);
+    return ((ToSourceStringFunc&) term->value.data.ptr);
 }
 
 CheckInvariantsFunc& as_check_invariants_thunk(Term* term)
 {
     assert_type(term, CHECK_INVARIANTS_THUNK_TYPE);
-    return ((CheckInvariantsFunc&) term->value);
+    return ((CheckInvariantsFunc&) term->value.data.ptr);
 }
 
 bool is_ref(Term* term)
@@ -137,13 +131,6 @@ namespace int_t {
     }
 }
 
-int& as_int(Term* term)
-{
-    assert_type(term,INT_TYPE);
-    alloc_value(term);
-    return (int&) term->value;
-}
-
 bool is_int(Term* term)
 {
     return term->type == INT_TYPE;
@@ -153,8 +140,8 @@ namespace float_t {
 
     void assign(Term* source, Term* dest)
     {
-        // Allow coercion
-        as_float(dest) = to_float(source);
+        // Allow coersion
+        set_value_float(dest, to_float(source));
     }
 
     bool equals(Term* a, Term* b)
@@ -169,7 +156,7 @@ namespace float_t {
         // First, check if we know how the user typed this number. If this value
         // still has the exact same value, then use the original formatting.
         if (term->hasProperty("float:original-format")) {
-            std::string& originalFormat = term->stringProp("float:original-format");
+            std::string const& originalFormat = term->stringProp("float:original-format");
             float actual = as_float(term);
             float original = (float) atof(originalFormat.c_str());
             if (actual == original) {
@@ -199,13 +186,6 @@ namespace float_t {
     }
 }
 
-float& as_float(Term* term)
-{
-    assert_type(term, FLOAT_TYPE);
-    alloc_value(term);
-    return (float&) term->value;
-}
-
 bool is_float(Term* term)
 {
     return term->type == FLOAT_TYPE;
@@ -221,20 +201,13 @@ namespace string_t {
 
     void length(Term* term)
     {
-        as_int(term) = int(term->input(0)->asString().length());
+        set_value_int(term->value, int(term->input(0)->asString().length()));
     }
 
     void substr(Term* term)
     {
-        as_string(term) = as_string(term->input(0)).substr(int_input(term, 1), int_input(term, 2));
+        set_value_str(term, as_string(term->input(0)).substr(int_input(term, 1), int_input(term, 2)));
     }
-}
-
-std::string& as_string(Term* term)
-{
-    assert_type(term, STRING_TYPE);
-    alloc_value(term);
-    return *((std::string*) term->value);
 }
 
 bool is_string(Term* term)
@@ -250,13 +223,6 @@ namespace bool_t {
         else
             return "false";
     }
-}
-
-bool& as_bool(Term* term)
-{
-    assert_type(term, BOOL_TYPE);
-    alloc_value(term);
-    return (bool&) term->value;
 }
 
 bool is_bool(Term* term)
@@ -291,7 +257,7 @@ namespace ref_t {
             error_occurred(caller, "NULL reference");
             return;
         }
-        as_string(caller) = t->name;
+        set_value_str(caller, t->name);
     }
     void hosted_to_string(Term* caller)
     {
@@ -300,7 +266,7 @@ namespace ref_t {
             error_occurred(caller, "NULL reference");
             return;
         }
-        as_string(caller) = circa::to_string(t);
+        set_value_str(caller, circa::to_string(t));
     }
     void get_function(Term* caller)
     {
@@ -359,10 +325,11 @@ namespace ref_t {
             float step = get_step(t);
 
             // do the math like this so that rounding errors are not accumulated
-            as_float(t) = (round(as_float(t) / step) + steps) * step;
+            float new_value = (round(as_float(t) / step) + steps) * step;
+            set_value_float(t, new_value);
 
         } else if (is_int(t))
-            as_int(t) += steps;
+            set_value_int(t, as_int(t) + steps);
         else
             error_occurred(caller, "Ref is not an int or number");
     }
@@ -377,7 +344,7 @@ namespace ref_t {
             error_occurred(caller, "Not an int");
             return;
         }
-        as_int(caller) = as_int(t);
+        set_value_int(caller, as_int(t));
     }
     void asfloat(Term* caller)
     {
@@ -387,7 +354,7 @@ namespace ref_t {
             return;
         }
         
-        as_float(caller) = to_float(t);
+        set_value_float(caller, to_float(t));
     }
     void get_input(Term* caller)
     {
@@ -409,7 +376,7 @@ namespace ref_t {
             error_occurred(caller, "NULL reference");
             return;
         }
-        as_int(caller) = t->numInputs();
+        set_value_int(caller->value, t->numInputs());
     }
     void get_source_location(Term* caller)
     {
@@ -419,8 +386,8 @@ namespace ref_t {
             return;
         }
         Branch& output = as_branch(caller);
-        output[0]->asInt() = t->intPropOptional("colStart", 0);
-        output[1]->asInt() = t->intPropOptional("lineStart", 0);
+        set_value_int(output[0]->value, t->intPropOptional("colStart", 0));
+        set_value_int(output[1]->value, t->intPropOptional("lineStart", 0));
     }
 }
 

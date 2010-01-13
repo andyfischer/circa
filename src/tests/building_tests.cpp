@@ -13,8 +13,8 @@ void test_create_value()
     test_assert(is_value_alloced(term));
 
     term = create_value(branch, BRANCH_TYPE);
-    test_assert(term->value != NULL);
-    // test_assert(as_branch(term).owningTerm == term);
+    test_assert(is_value_branch(term->value));
+    test_assert(get_branch_value(term->value) != NULL);
 }
 
 void test_create_int()

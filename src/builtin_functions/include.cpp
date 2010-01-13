@@ -12,7 +12,7 @@ namespace include_function {
         Term* fileSignature = caller->input(0);
         Branch& contents = as_branch(caller);
 
-        std::string &requested_filename = caller->input(1)->asString();
+        std::string requested_filename = caller->input(1)->asString();
 
         std::string actual_filename =
             get_path_relative_to_source(caller, requested_filename);
@@ -75,12 +75,12 @@ namespace include_function {
         INCLUDE_FUNC = import_function(kernel, evaluate_include,
                 "include(state FileSignature, string filename) -> Branch");
 
-        function_t::get_exposed_name_path(INCLUDE_FUNC) = ".";
+        function_t::set_exposed_name_path(INCLUDE_FUNC, ".");
 
         Term* load_script_f = import_function(kernel, load_script,
             "load_script(state FileSignature, string filename) -> Branch");
 
-        function_t::get_exposed_name_path(load_script_f) = ".";
+        function_t::set_exposed_name_path(load_script_f, ".");
     }
 }
 } // namespace circa

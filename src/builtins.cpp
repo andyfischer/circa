@@ -94,7 +94,7 @@ void bootstrap_kernel()
     TYPE_TYPE->function = VALUE_FUNC;
     TYPE_TYPE->type = TYPE_TYPE;
     Type* typeType = new Type();
-    TYPE_TYPE->value = typeType;
+    set_value_type(TYPE_TYPE->value, typeType);
     typeType->name = "Type";
     typeType->alloc = type_t::alloc;
     typeType->dealloc = type_t::dealloc;
@@ -107,7 +107,7 @@ void bootstrap_kernel()
     ANY_TYPE = KERNEL->appendNew();
     ANY_TYPE->function = VALUE_FUNC;
     ANY_TYPE->type = TYPE_TYPE;
-    ANY_TYPE->value = new Type();
+    set_value_type(ANY_TYPE->value, new Type());
     type_t::get_name(ANY_TYPE) = "any";
     KERNEL->bindName(ANY_TYPE, "any");
 
@@ -188,7 +188,7 @@ void post_setup_builtin_functions(Branch& kernel)
     create_ref(as_branch(DIV_FUNC), div_s);
 
     function_t::get_feedback_func(VALUE_FUNC) = ASSIGN_FUNC;
-    VALUE_FUNC->boolProp("docs:hidden") = true;
+    hide_from_docs(VALUE_FUNC);
 }
 
 void initialize()

@@ -37,7 +37,6 @@ void unregister_good_pointer(Term* term);
 void assert_good_pointer(Term* term);
 bool is_bad_pointer(Term* term);
 
-
 // Spit out this branch's raw contents to std::cout
 void dump_branch(Branch& branch);
 void dump_branch_with_props(Branch& branch);

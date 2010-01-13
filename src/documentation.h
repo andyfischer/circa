@@ -7,6 +7,7 @@
 
 namespace circa {
 
+void hide_from_docs(Term* term);
 void append_package_docs(std::stringstream& out, Branch& branch, std::string const& package_name);
 void initialize_kernel_documentation(Branch& KERNEL);
 

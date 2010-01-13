@@ -81,11 +81,6 @@ void test_bool()
 
 void test_builtin_equals()
 {
-    test_assert(eval<bool>("equals(1,1)"));
-    test_assert(!eval<bool>("equals(1,2)"));
-    test_assert(eval<bool>("equals('hello','hello')"));
-    test_assert(!eval<bool>("equals('hello','goodbye')"));
-
     Branch branch;
     Term* term = branch.eval("equals(5.0, add)");
     test_assert(term->hasError());
@@ -277,7 +272,7 @@ void test_do_once()
     test_assert(as_int(x) == 2);
 
     // but if we call it again, it shouldn't do that any more
-    as_int(x) = 3;
+    set_value_int(x, 3);
     evaluate_branch(branch);
     test_assert(as_int(x) == 3);
 
@@ -298,7 +293,7 @@ void test_changed()
     evaluate_branch(branch);
     test_assert(changed->asBool() == false);
 
-    as_int(x) = 6;
+    set_value_int(x, 6);
     evaluate_branch(branch);
     test_assert(changed->asBool() == true);
     evaluate_branch(branch);

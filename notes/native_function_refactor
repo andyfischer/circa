@@ -1,0 +1,27 @@
+
+Want to refactor the API by which native functions are imported and made available.
+
+Goals:
+
+ 1) Separation of the code and stack-data. Stacks should be separate entities, but it should
+    still be simple for a function to access a value on the stack.
+ 2) Pass a single EvaluationContext object, to make it easier to add/remove things in the future.
+ 3) Use C macros to make it really easy to define an imported native function.
+
+Optional goals:
+ 4) Make it easier to call a hosted function without creating a bunch of throwaway terms.
+
+----
+
+Tagged values!
+
+ - Need to pass around values. Generally all values are passed around as 4-bytes, which is
+   either a pointer or a primitive.
+ - Dynamic typing is supported, so these values need to include type. (our current handling
+   of type information is actually quite flawed). Probably they will just include a 4-byte
+   type pointer.
+ - This is a good change regardless of the other stuff.
+
+----
+   
+

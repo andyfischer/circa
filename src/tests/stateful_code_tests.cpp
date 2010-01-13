@@ -74,7 +74,7 @@ void subroutine_expansion_during_migrate()
     test_assert(is_subroutine_state_expanded(sourceCallState));
     test_assert(!is_subroutine_state_expanded(destCallState));
 
-    sourceCallState->asBranch()[0]->asInt() = 111;
+    set_value_int(sourceCallState->asBranch()[0], 111);
 
     migrate_stateful_values(source, dest);
 
@@ -86,11 +86,11 @@ void test_load_and_save()
 {
     Branch branch;
     Term* statefulTerm = branch.eval("state int i");
-    as_int(statefulTerm) = 1;
+    set_value_int(statefulTerm, 1);
 
     Branch state;
     Term* value_i = create_value(state, INT_TYPE, "i");
-    as_int(value_i) = 5;
+    set_value_int(value_i, 5);
 
     test_assert(as_int(statefulTerm) == 1);
 
@@ -98,7 +98,7 @@ void test_load_and_save()
 
     test_assert(as_int(statefulTerm) == 5);
 
-    as_int(statefulTerm) = 11;
+    set_value_int(statefulTerm, 11);
 
     persist_state_from_branch(branch, state);
 
@@ -156,17 +156,17 @@ void one_time_assignment()
 
     // change value before evaluate_branch, to make sure it's not stored
     // at compile time.
-    as_int(a) = 5;
+    set_value_int(a, 5);
     evaluate_branch(branch);
     test_assert(s);
     test_assert(as_int(s) == 5);
 
     // now make sure a subsequent evaluation doesn't change 's'
-    as_int(a) = 7;
+    set_value_int(a, 7);
     evaluate_branch(branch);
     test_assert(s);
     test_assert(as_int(s) == 5);
-    as_int(a) = 9;
+    set_value_int(a, 9);
     evaluate_branch(branch);
     test_assert(s);
     test_assert(as_int(s) == 5);
@@ -176,7 +176,7 @@ int NEXT_UNIQUE_OUTPUT = 0;
 
 void _unique_output(Term* caller)
 {
-    as_int(caller) = NEXT_UNIQUE_OUTPUT;
+    set_value_int(caller, NEXT_UNIQUE_OUTPUT);
     NEXT_UNIQUE_OUTPUT++;
 }
 
@@ -316,7 +316,7 @@ void test_reset_state()
 
     test_assert(i->asInt() == 5);
 
-    as_int(i) = 11;
+    set_value_int(i, 11);
 
     test_assert(i->asInt() == 11);
 
@@ -332,11 +332,11 @@ void try_to_migrate_value_that_isnt_allocced()
     // This code once caused a crash
     Branch source, dest;
     Term* i = create_stateful_value(source, INT_TYPE, "i");
-    as_int(i) = 5;
+    set_value_int(i, 5);
     dealloc_value(i);
 
     Term* dest_i = create_stateful_value(dest, INT_TYPE, "i");
-    as_int(dest_i) = 4;
+    set_value_int(dest_i, 4);
 
     migrate_stateful_values(source, dest);
 }
@@ -355,7 +355,7 @@ void bug_where_stateful_function_wouldnt_update_inputs()
 
     test_assert(b_call->asInt() == 1);
 
-    x->asInt() = 2;
+    set_value_int(x, 2);
     evaluate_branch(branch);
 
     test_assert(b_call->asInt() == 2);

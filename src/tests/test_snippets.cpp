@@ -114,6 +114,10 @@ void test_equals_snippets()
     test_snippet("", "[1 1] == [1 1]");
     test_snippet("", "[1 1] != [1 2]");
     test_snippet("", "[1 1 1] != [1 1]");
+    test_snippet("", "equals(1,1)");
+    test_snippet("", "not(equals(1,2))");
+    test_snippet("", "equals('hello','hello')");
+    test_snippet("", "not(equals('hello','goodbye'))");
 }
 
 void test_abs()

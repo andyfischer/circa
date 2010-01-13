@@ -8,7 +8,7 @@ namespace term_to_source_function {
     void evaluate(Term* caller)
     {
         Term* term = caller->input(0);
-        as_string(caller) = get_term_source(term);
+        set_value_str(caller, get_term_source(term));
     }
 
     void setup(Branch& kernel)

@@ -15,7 +15,7 @@ namespace concat_function {
             else
                 out << to_string(t);
         }
-        as_string(caller) = out.str();
+        set_value_str(caller, out.str());
     }
 
     void setup(Branch& kernel)

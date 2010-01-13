@@ -35,7 +35,7 @@ namespace list_t {
 
     void count(Term* caller)
     {
-        as_int(caller) = as_branch(caller->input(0)).length();
+        set_value_int(caller->value, as_branch(caller->input(0)).length());
     }
 
 } // namespace list_t
@@ -69,7 +69,7 @@ namespace set_t {
     {
         Branch& contents = as_branch(caller->input(0));
         Term* target = caller->input(1);
-        as_bool(caller) = contains(contents, target);
+        set_value_bool(caller, contains(contents, target));
     }
 
     void remove(Term* caller)
@@ -105,9 +105,9 @@ namespace set_t {
         type_t::get_to_string_func(set_type) = set_t::to_string;
 
         Term* set_add = import_member_function(set_type, set_t::hosted_add, "add(Set, any) -> Set");
-        function_t::get_input_placeholder(set_add, 0)->boolProp("use-as-output") = true;
+        function_set_use_input_as_output(set_add, 0, true);
         Term* set_remove = import_member_function(set_type, set_t::remove, "remove(Set, any) -> Set");
-        function_t::get_input_placeholder(set_remove, 0)->boolProp("use-as-output") = true;
+        function_set_use_input_as_output(set_remove, 0, true);
         import_member_function(set_type, set_t::contains, "contains(Set, any) -> bool");
     }
 
@@ -167,7 +167,8 @@ namespace map_t {
 
     void contains(Term* caller)
     {
-        as_bool(caller) = find_key_index(caller->input(0)->asBranch(), caller->input(1)) != -1;
+        bool result = find_key_index(caller->input(0)->asBranch(), caller->input(1)) != -1;
+        set_value_bool(caller, result);
     }
 
     void insert(Term *caller)
@@ -394,22 +395,22 @@ namespace branch_mirror_t
             return;
         }
 
-        as_string(caller) = get_relative_name(target_branch, target);
+        set_value_str(caller, get_relative_name(target_branch, target));
     }
 
     void get_length(Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
-        as_int(caller) = target_branch.length();
+        set_value_int(caller->value, target_branch.length());
     }
     void get_index(Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
         int index = int_input(caller, 1);
         if (index >= target_branch.length())
-            as_ref(caller) = NULL;
+            set_value_ref(caller, NULL);
         else
-            as_ref(caller) = target_branch[index];
+            set_value_ref(caller, target_branch[index]);
     }
     void append_code(Term* caller)
     {
@@ -437,7 +438,7 @@ namespace branch_mirror_t
     {
         Branch& target_branch = get_target_branch(caller);
 
-        as_string(caller) = get_branch_raw(target_branch);
+        set_value_str(caller, get_branch_raw(target_branch));
     }
     void save(Term* caller)
     {
@@ -447,7 +448,7 @@ namespace branch_mirror_t
     void to_source(Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
-        as_string(caller) = get_branch_source(target_branch);
+        set_value_str(caller, get_branch_source(target_branch));
     }
 
 } // namespace branch_mirror_t
@@ -456,7 +457,7 @@ void setup_builtin_types(Branch& kernel)
 {
     Term* branch_append = 
         import_member_function(BRANCH_TYPE, list_t::append, "append(Branch, any) -> Branch");
-    function_t::get_input_placeholder(branch_append, 0)->boolProp("use-as-output") = true;
+    function_set_use_input_as_output(branch_append, 0, true);
 
     import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) -> string");
 
@@ -465,16 +466,16 @@ void setup_builtin_types(Branch& kernel)
     // LIST_TYPE was created in bootstrap_kernel
     Term* list_append =
         import_member_function(LIST_TYPE, list_t::append, "append(List, any) -> List");
-    function_t::get_input_placeholder(list_append, 0)->boolProp("use-as-output") = true;
+    function_set_use_input_as_output(list_append, 0, true);
     import_member_function(LIST_TYPE, list_t::count, "count(List) -> int");
 
     Term* map_type = create_compound_type(kernel, "Map");
     type_t::get_to_string_func(map_type) = map_t::to_string;
     Term* map_add = import_member_function(map_type, map_t::insert, "add(Map, any, any) -> Map");
-    function_t::get_input_placeholder(map_add, 0)->boolProp("use-as-output") = true;
+    function_set_use_input_as_output(map_add, 0, true);
     import_member_function(map_type, map_t::contains, "contains(Map, any) -> bool");
     Term* map_remove = import_member_function(map_type, map_t::remove, "remove(Map, any) -> Map");
-    function_t::get_input_placeholder(map_remove, 0)->boolProp("use-as-output") = true;
+    function_set_use_input_as_output(map_remove, 0, true);
     import_member_function(map_type, map_t::get, "get(Map, any) -> any");
 
     type_t::enable_default_value(map_type);

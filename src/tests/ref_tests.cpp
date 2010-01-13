@@ -103,7 +103,7 @@ void remap_properties()
     Branch branch;
     Term* a = create_int(branch, 1, "a");
     Term* b = create_int(branch, 2, "b");
-    b->refProp("test_property") = a;
+    b->setRefProp("test_property", a);
 
     Branch duplicate;
     duplicate_branch(branch, duplicate);

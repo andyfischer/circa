@@ -33,12 +33,12 @@ void shallow_assign(Term* a, Term* b)
 
 bool shallow_equals(Term* a, Term* b)
 {
-    return a->value == b->value;
+    return a->value.data.asint == b->value.data.asint;
 }
 
 void zero_alloc(Term *type, Term* t)
 {
-    t->value = 0;
+    t->value.data.asint = 0;
 }
 
 } // namespace circa

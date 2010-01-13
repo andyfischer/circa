@@ -19,7 +19,7 @@ namespace range_function {
         
         int val = start;
         for (int i=0; i < count; i++) {
-            as_int(branch[i]) = val;
+            set_value_int(branch[i], val);
             val += increment;
         }
     }

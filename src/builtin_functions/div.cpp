@@ -7,12 +7,12 @@ namespace div_function {
 
     void evaluate_f(Term* caller)
     {
-        as_float(caller) = float_input(caller,0) / float_input(caller,1);
+        set_value_float(caller, float_input(caller,0) / float_input(caller,1));
     }
 
     void evaluate_i(Term* caller)
     {
-        as_int(caller) = int_input(caller,0) / int_input(caller,1);
+        set_value_int(caller, int_input(caller,0) / int_input(caller,1));
     }
 
     void setup(Branch& kernel)

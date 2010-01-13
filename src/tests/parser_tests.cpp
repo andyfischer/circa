@@ -368,7 +368,7 @@ void test_semicolon_as_line_ending()
     test_assert(branch.contains("a"));
     test_assert(branch["a"]->asInt() == 1);
     test_assert(branch.contains("cond"));
-    branch["cond"]->asBool() = false;
+    set_value_bool(branch["cond"], false);
     evaluate_branch(branch);
     test_assert(branch["a"]->asInt() == 2);
 }

@@ -10,7 +10,7 @@ namespace add_function {
         int result = 0;
         for (int i=0; i < caller->numInputs(); i++)
             result += int_input(caller,i);
-        as_int(caller) = result;
+        set_value_int(caller, result);
     }
 
     void evaluate_f(Term* caller)
@@ -18,7 +18,7 @@ namespace add_function {
         float result = 0.0;
         for (int i=0; i < caller->numInputs(); i++)
             result += float_input(caller,i);
-        as_float(caller) = result;
+        set_value_float(caller, result);
     }
 
     void feedback_evaluate(Term* caller)
@@ -33,7 +33,7 @@ namespace add_function {
             Term* output = outputList[i];
             Term* outputTarget = target->input(i);
             float balanced_delta = delta * get_feedback_weight(output);
-            as_float(output) = to_float(outputTarget) + balanced_delta;
+            set_value_float(output, to_float(outputTarget) + balanced_delta);
         }
     }
 

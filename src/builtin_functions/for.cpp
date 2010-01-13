@@ -29,7 +29,8 @@ namespace for_function {
     void evaluate_discard(Term* caller)
     {
         Term* forTerm = caller->input(0);
-        get_for_loop_discard_called(forTerm) = true;
+        Term* discardCalled = get_for_loop_discard_called(forTerm);
+        set_value_bool(discardCalled, true);
     }
 
     std::string discard_to_source_string(Term* term)
@@ -42,13 +43,11 @@ namespace for_function {
         FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(any _state, List) -> Code");
         function_t::get_to_source_string(FOR_FUNC) = toSourceString;
         function_t::set_input_meta(FOR_FUNC, 0, true);
-        function_t::get_exposed_name_path(FOR_FUNC) = "#rebinds_for_outer";
+        function_t::set_exposed_name_path(FOR_FUNC, "#rebinds_for_outer");
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
         function_t::get_to_source_string(DISCARD_FUNC) = discard_to_source_string;
-        DISCARD_FUNC->boolProp("docs:hidden") = true;
-
-
+        hide_from_docs(DISCARD_FUNC);
     }
 }
 } // namespace circa

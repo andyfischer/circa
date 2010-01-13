@@ -9,7 +9,7 @@ namespace circa {
 namespace type_t {
     void alloc(Term* type, Term* term)
     {
-        term->value = new Type();
+        set_value_type(term->value, new Type());
     }
     void dealloc(Term* type, Term* term)
     {
@@ -47,13 +47,7 @@ namespace type_t {
 
     void assign(Term* source, Term* dest)
     {
-        Type* sourceValue = (Type*) source->value;
-        Type* destValue = (Type*) dest->value;
-
-        if (sourceValue == destValue)
-            return;
-
-        dest->value = sourceValue;
+        set_value_type(dest->value, get_type_value(source->value));
     }
 
     void remap_pointers(Term *type, ReferenceMap const& map)
@@ -66,7 +60,7 @@ namespace type_t {
 
     void name_accessor(Term* caller)
     {
-        as_string(caller) = type_t::get_name(caller->input(0));
+        set_value_str(caller, type_t::get_name(caller->input(0)));
     }
 
     std::string& get_name(Term* type)
@@ -181,12 +175,12 @@ bool is_compound_type(Term* type)
 Type& as_type(Term *term)
 {
     // don't call alloc_value because that calls as_type
-    assert(term->value != NULL);
+    assert(get_type_value(term->value) != NULL);
 
     // don't use assert_type here because assert_type uses as_type
     assert(term->type == TYPE_TYPE);
 
-    return *((Type*) term->value);
+    return *get_type_value(term->value);
 }
 
 bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
@@ -312,7 +306,8 @@ Term* find_common_type(RefList const& list)
 }
 
 namespace type_private {
-    void empty_allocate(Term* type, Term* term) { term->value = NULL; }
+    // TODO: remove this:
+    void empty_allocate(Term* type, Term* term) { set_value_null(term->value); }
     void empty_duplicate_function(Term*,Term*) {}
 }
 
@@ -370,7 +365,7 @@ std::string to_string(Term* term)
         // Generic to-string
         std::stringstream result;
         result << "<" << type_t::get_name(term->type) << " 0x";
-        result << std::hex << term->value << ">";
+        result << std::hex << get_type_value(term->value) << ">";
         return result.str();
     }
     else if (!is_value_alloced(term))
@@ -382,15 +377,15 @@ std::string to_string(Term* term)
 void assign_value_to_default(Term* term)
 {
     if (is_int(term))
-        as_int(term) = 0;
+        set_value_int(term->value, 0);
     else if (is_float(term))
-        as_float(term) = 0;
+        set_value_float(term, 0);
     else if (is_string(term))
-        as_string(term) = "";
+        set_value_str(term, "");
     else if (is_bool(term))
-        as_bool(term) = false;
+        set_value_bool(term, false);
     else if (is_ref(term))
-        as_ref(term) = NULL;
+        set_value_ref(term, NULL);
     else {
 
         // check if this type has a default value defined
@@ -433,8 +428,8 @@ namespace common_assign_funcs {
 void steal_value(Term* a, Term* b)
 {
     dealloc_value(b);
-    b->value = a;
-    a->value = NULL;
+    b->value = a->value;
+    set_value_null(a->value);
 }
 
 } // namespace common_assign_funcs

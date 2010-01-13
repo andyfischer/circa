@@ -7,11 +7,11 @@ namespace do_once_function {
 
     void evaluate(Term* caller)
     {
-        bool &done = caller->input(0)->asBool();
+        Term* done = caller->input(0);
 
-        if (!done) {
+        if (!as_bool(done)) {
             evaluate_branch(caller->asBranch(), caller);
-            done = true;
+            set_value_bool(done, true);
         }
     }
 

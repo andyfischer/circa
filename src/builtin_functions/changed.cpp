@@ -10,12 +10,14 @@ namespace changed_function {
         Term* state = caller->input(0);
         Term* current = caller->input(1);
 
+        bool result;
         if (!equals(state, current)) {
             assign_value(current, state);
-            as_bool(caller) = true;
+            result = true;
         } else {
-            as_bool(caller) = false;
+            result = false;
         }
+        set_value_bool(caller, result);
     }
 
     void setup(Branch& kernel)

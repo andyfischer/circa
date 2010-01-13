@@ -17,7 +17,7 @@ struct StringList {
         create_string(data, str);
     }
 
-    std::string& operator[](int index) {
+    std::string const& operator[](int index) {
         return as_string(data[index]);
     }
 

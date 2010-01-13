@@ -31,7 +31,7 @@ void test_if_joining_on_bool()
     Branch branch;
     Term* s = branch.eval("hey = true");
 
-    test_assert(s->value != NULL);
+    test_assert(s->value.data.ptr != NULL);
 
     branch.eval("if false\nhey = false\nend");
 

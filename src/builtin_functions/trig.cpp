@@ -10,39 +10,39 @@ namespace trig_function {
         float input = float_input(caller,0);
 
         // Convert input from 0..1 to 0..2pi
-        as_float(caller) = sin(float(input * 2 * M_PI));
+        set_value_float(caller, sin(float(input * 2 * M_PI)));
     }
     void evaluate_cos(Term* caller)
     {
         float input = float_input(caller,0);
 
         // Convert input from 0..1 to 0..2pi
-        as_float(caller) = cos(float(input * 2 * M_PI));
+        set_value_float(caller, cos(float(input * 2 * M_PI)));
     }
     void evaluate_tan(Term* caller)
     {
         float input = float_input(caller,0);
 
         // Convert input from 0..1 to 0..2pi
-        as_float(caller) = tan(float(input * 2 * M_PI));
+        set_value_float(caller, tan(float(input * 2 * M_PI)));
     }
     void evaluate_arcsin(Term* caller)
     {
         float input = float_input(caller,0);
         float result = asin(input);
-        as_float(caller) = result / float(2 * M_PI);
+        set_value_float(caller, result / float(2 * M_PI));
     }
     void evaluate_arccos(Term* caller)
     {
         float input = float_input(caller,0);
         float result = acos(input);
-        as_float(caller) = result / float(2 * M_PI);
+        set_value_float(caller, result / float(2 * M_PI));
     }
     void evaluate_arctan(Term* caller)
     {
         float input = float_input(caller,0);
         float result = atan(input);
-        as_float(caller) = result / float(2 * M_PI);
+        set_value_float(caller, result / float(2 * M_PI));
     }
 
     void feedback_evaluate_sin(Term* caller)
@@ -59,7 +59,7 @@ namespace trig_function {
         float result = std::asin(desired);
 
         // Map result from radians into range of 0..1
-        as_float(caller) = result / float(2 * M_PI);
+        set_value_float(caller, result / float(2 * M_PI));
     }
 
     void feedback_evaluate_cos(Term* caller)
@@ -76,7 +76,7 @@ namespace trig_function {
         float result = std::acos(desired);
 
         // Map result from radians into range of 0..1
-        as_float(caller) = result / float(2 * M_PI);
+        set_value_float(caller, result / float(2 * M_PI));
     }
 
     void setup(Branch& kernel)

@@ -12,7 +12,7 @@ namespace circa {
 static unsigned int gNextGlobalID = 1;
 
 Term::Term()
-  : value(NULL),
+  : value(),
     owningBranch(NULL),
     index(0),
     flags(0),
@@ -77,30 +77,60 @@ void Term::removeProperty(std::string const& name)
     properties.remove(name);
 }
 
-bool& Term::boolProp(std::string const& name)
+bool Term::boolProp(std::string const& name)
 {
     Term* t = addProperty(name, BOOL_TYPE);
     return as_bool(t);
 }
-int& Term::intProp(std::string const& name)
+int Term::intProp(std::string const& name)
 {
     Term* t = addProperty(name, INT_TYPE);
     return as_int(t);
 }
-float& Term::floatProp(std::string const& name)
+float Term::floatProp(std::string const& name)
 {
     Term* t = addProperty(name, FLOAT_TYPE);
     return as_float(t);
 }
-std::string& Term::stringProp(std::string const& name)
+std::string const& Term::stringProp(std::string const& name)
 {
     Term* t = addProperty(name, STRING_TYPE);
     return as_string(t);
 }
-Ref& Term::refProp(std::string const& name)
+Ref Term::refProp(std::string const& name)
 {
     Term* t = addProperty(name, REF_TYPE);
     return as_ref(t);
+}
+
+void Term::setIntProp(std::string const& name, int i)
+{
+    Term* t = addProperty(name, INT_TYPE);
+    set_value_int(t->value, i);
+}
+
+void Term::setFloatProp(std::string const& name, float f)
+{
+    Term* t = addProperty(name, FLOAT_TYPE);
+    set_value_float(t->value, f);
+}
+
+void Term::setBoolProp(std::string const& name, bool b)
+{
+    Term* t = addProperty(name, BOOL_TYPE);
+    set_value_bool(t->value, b);
+}
+
+void Term::setStringProp(std::string const& name, std::string const& s)
+{
+    Term* t = addProperty(name, STRING_TYPE);
+    set_value_str(t->value, s);
+}
+
+void Term::setRefProp(std::string const& name, Term* r)
+{
+    Term* t = addProperty(name, REF_TYPE);
+    set_value_ref(t->value, r);
 }
 
 bool Term::boolPropOptional(std::string const& name, bool defaultValue)
@@ -141,12 +171,12 @@ Term::setHasError(bool error)
         flags = flags & ~TERM_FLAG_ERRORED;
 }
 
-int& Term::asInt()
+int Term::asInt()
 {
     return as_int(this);
 }
 
-float& Term::asFloat()
+float Term::asFloat()
 {
     return as_float(this);
 }
@@ -156,12 +186,12 @@ float Term::toFloat()
     return to_float(this);
 }
 
-std::string& Term::asString()
+std::string const& Term::asString()
 {
     return as_string(this);
 }
 
-bool& Term::asBool()
+bool Term::asBool()
 {
     return as_bool(this);
 }
@@ -174,6 +204,16 @@ Ref& Term::asRef()
 Branch& Term::asBranch()
 {
     return as_branch(this);
+}
+
+void assert_term_invariants(Term* t)
+{
+    // Make sure the value type matches the declared type.
+    if (t->type == INT_TYPE)
+        assert(is_value_int(t->value));
+
+    if (t->type != INT_TYPE)
+        assert(!is_value_int(t->value));
 }
 
 } // namespace circa
