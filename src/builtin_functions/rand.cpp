@@ -20,7 +20,7 @@ namespace rand_function {
     void evaluate_f(Term* caller)
     {
         seed_if_needed();
-        set_value_float(caller, (float) rand() / RAND_MAX);
+        set_float(caller, (float) rand() / RAND_MAX);
     }
 
     void evaluate_f_range(Term* caller)
@@ -35,14 +35,14 @@ namespace rand_function {
             return;
         }
 
-        set_value_float(caller, min + r * (max - min));
+        set_float(caller, min + r * (max - min));
     }
 
     void evaluate_i(Term* caller)
     {
         seed_if_needed();
 
-        set_value_int(caller, rand());
+        set_int(caller, rand());
     }
 
     void evaluate_i_i(Term* caller)
@@ -51,7 +51,7 @@ namespace rand_function {
         int period = caller->input(0)->asInt();
 
         // TODO: replace this, builtin rand() does not have good randomness in lower bits.
-        set_value_int(caller, rand() % period);
+        set_int(caller, rand() % period);
     }
 
     void setup(Branch& kernel)

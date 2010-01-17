@@ -280,7 +280,7 @@ namespace branch_t {
     void alloc(Term* typeTerm, Term* term)
     {
         Branch* branch = new Branch();
-        set_value_branch(term->value, branch);
+        set_branch_value(term->value, branch);
 
         Branch& prototype = type_t::get_prototype(typeTerm);
 

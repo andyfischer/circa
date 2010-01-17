@@ -9,7 +9,7 @@ namespace pow_function {
 
     void evaluate(Term* caller)
     {
-        set_value_int(caller, (int) std::pow((float) int_input(caller,0), int_input(caller,1)));
+        set_int(caller, (int) std::pow((float) int_input(caller,0), int_input(caller,1)));
     }
 
     void setup(Branch& kernel)

@@ -7,12 +7,12 @@ namespace lang_function {
 
     void field(Term* caller)
     {
-        set_value_ref(caller, as_branch(caller->input(0))[caller->input(1)->asInt()]);
+        set_ref(caller, as_branch(caller->input(0))[caller->input(1)->asInt()]);
     }
 
     void num_fields(Term* caller)
     {
-        set_value_int(caller, as_branch(caller->input(0)).length());
+        set_int(caller, as_branch(caller->input(0)).length());
     }
 
     void setup(Branch& kernel)

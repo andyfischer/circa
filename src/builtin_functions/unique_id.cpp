@@ -8,7 +8,7 @@ namespace unique_id_function {
     void evaluate(Term* caller)
     {
         static int nextId = 1;
-        set_value_int(caller, nextId++);
+        set_int(caller, nextId++);
     }
 
     void setup(Branch& kernel)

@@ -35,7 +35,7 @@ namespace list_t {
 
     void count(Term* caller)
     {
-        set_value_int(caller->value, as_branch(caller->input(0)).length());
+        set_int(caller->value, as_branch(caller->input(0)).length());
     }
 
 } // namespace list_t
@@ -69,7 +69,7 @@ namespace set_t {
     {
         Branch& contents = as_branch(caller->input(0));
         Term* target = caller->input(1);
-        set_value_bool(caller, contains(contents, target));
+        set_bool(caller, contains(contents, target));
     }
 
     void remove(Term* caller)
@@ -168,7 +168,7 @@ namespace map_t {
     void contains(Term* caller)
     {
         bool result = find_key_index(caller->input(0)->asBranch(), caller->input(1)) != -1;
-        set_value_bool(caller, result);
+        set_bool(caller, result);
     }
 
     void insert(Term *caller)
@@ -395,22 +395,22 @@ namespace branch_mirror_t
             return;
         }
 
-        set_value_str(caller, get_relative_name(target_branch, target));
+        set_str(caller, get_relative_name(target_branch, target));
     }
 
     void get_length(Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
-        set_value_int(caller->value, target_branch.length());
+        set_int(caller->value, target_branch.length());
     }
     void get_index(Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
         int index = int_input(caller, 1);
         if (index >= target_branch.length())
-            set_value_ref(caller, NULL);
+            set_ref(caller, NULL);
         else
-            set_value_ref(caller, target_branch[index]);
+            set_ref(caller, target_branch[index]);
     }
     void append_code(Term* caller)
     {
@@ -438,7 +438,7 @@ namespace branch_mirror_t
     {
         Branch& target_branch = get_target_branch(caller);
 
-        set_value_str(caller, get_branch_raw(target_branch));
+        set_str(caller, get_branch_raw(target_branch));
     }
     void save(Term* caller)
     {
@@ -448,7 +448,7 @@ namespace branch_mirror_t
     void to_source(Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
-        set_value_str(caller, get_branch_source(target_branch));
+        set_str(caller, get_branch_source(target_branch));
     }
 
 } // namespace branch_mirror_t

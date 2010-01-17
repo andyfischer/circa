@@ -7,12 +7,12 @@ namespace mult_function {
 
     void evaluate_f(Term* caller)
     {
-        set_value_float(caller, float_input(caller,0) * float_input(caller,1));
+        set_float(caller, float_input(caller,0) * float_input(caller,1));
     }
 
     void evaluate_i(Term* caller)
     {
-        set_value_int(caller, int_input(caller,0) * int_input(caller,1));
+        set_int(caller, int_input(caller,0) * int_input(caller,1));
     }
 
     void feedback_evaluate(Term* caller)
@@ -34,12 +34,12 @@ namespace mult_function {
 
             // If this product is too close to 0 then give up. We can't solve x = a * 0
             if (fabs(divisor) < 0.0001) {
-                set_value_float(output, to_float(outputTarget));
+                set_float(output, to_float(outputTarget));
                 continue;
             }
 
             // Otherwise, to solve for x = a * b, tell a that it should be closer to x / b
-            set_value_float(output, to_float(outputTarget) + balanced_delta / divisor);
+            set_float(output, to_float(outputTarget) + balanced_delta / divisor);
         }
     }
 

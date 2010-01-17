@@ -73,8 +73,8 @@ void train_if_expr()
     test_assert(a->asInt() == 5);
 
     // try changing cond
-    set_value_int(a, 1);
-    set_value_bool(cond, false);
+    set_int(a, 1);
+    set_bool(cond, false);
 
     evaluate_branch(branch);
 

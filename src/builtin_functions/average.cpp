@@ -8,7 +8,7 @@ namespace average_function {
     void evaluate(Term* caller)
     {
         if (caller->numInputs() == 0) {
-            set_value_float(caller, 0);
+            set_float(caller, 0);
             return;
         }
 
@@ -16,7 +16,7 @@ namespace average_function {
         for (int i=0; i < caller->numInputs(); i++)
             sum += float_input(caller,i);
 
-        set_value_float(caller, sum / caller->numInputs());
+        set_float(caller, sum / caller->numInputs());
     }
 
     void setup(Branch& kernel)

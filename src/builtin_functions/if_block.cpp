@@ -50,7 +50,7 @@ namespace if_block_function {
         // Update the #joining branch
         assert(contents[contents.length()-1]->name == "#joining");
         Branch& joining = as_branch(contents[contents.length()-1]);
-        set_value_int(joining["#satisfiedIndex"], satisfiedIndex);
+        set_int(joining["#satisfiedIndex"], satisfiedIndex);
         evaluate_branch(joining, caller);
     }
 

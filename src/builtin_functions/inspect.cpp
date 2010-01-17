@@ -21,7 +21,7 @@ namespace inspect_function {
     void get_raw(Term* caller)
     {
         Term* input = caller->input(0);
-        set_value_str(caller, get_branch_raw(as_branch(input)));
+        set_str(caller, get_branch_raw(as_branch(input)));
     }
 
     void setup(Branch& kernel)

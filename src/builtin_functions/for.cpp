@@ -30,7 +30,7 @@ namespace for_function {
     {
         Term* forTerm = caller->input(0);
         Term* discardCalled = get_for_loop_discard_called(forTerm);
-        set_value_bool(discardCalled, true);
+        set_bool(discardCalled, true);
     }
 
     std::string discard_to_source_string(Term* term)

@@ -8,7 +8,7 @@ namespace sqr_function {
     void evaluate(Term* caller)
     {
         float in = float_input(caller,0);
-        set_value_float(caller, in * in);
+        set_float(caller, in * in);
     }
 
     void setup(Branch& kernel)

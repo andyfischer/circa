@@ -11,7 +11,7 @@ namespace do_once_function {
 
         if (!as_bool(done)) {
             evaluate_branch(caller->asBranch(), caller);
-            set_value_bool(done, true);
+            set_bool(done, true);
         }
     }
 

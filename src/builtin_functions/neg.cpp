@@ -7,12 +7,12 @@ namespace neg_function {
 
     void evaluate_f(Term* caller)
     {
-        set_value_float(caller, -float_input(caller,0));
+        set_float(caller, -float_input(caller,0));
     }
 
     void evaluate_i(Term* caller)
     {
-        set_value_int(caller, -int_input(caller,0));
+        set_int(caller, -int_input(caller,0));
     }
 
     std::string toSourceString(Term* term)

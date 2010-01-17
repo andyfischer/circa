@@ -141,7 +141,7 @@ namespace float_t {
     void assign(Term* source, Term* dest)
     {
         // Allow coersion
-        set_value_float(dest, to_float(source));
+        set_float(dest, to_float(source));
     }
 
     bool equals(Term* a, Term* b)
@@ -201,12 +201,12 @@ namespace string_t {
 
     void length(Term* term)
     {
-        set_value_int(term->value, int(term->input(0)->asString().length()));
+        set_int(term->value, int(term->input(0)->asString().length()));
     }
 
     void substr(Term* term)
     {
-        set_value_str(term, as_string(term->input(0)).substr(int_input(term, 1), int_input(term, 2)));
+        set_str(term, as_string(term->input(0)).substr(int_input(term, 1), int_input(term, 2)));
     }
 }
 
@@ -257,7 +257,7 @@ namespace ref_t {
             error_occurred(caller, "NULL reference");
             return;
         }
-        set_value_str(caller, t->name);
+        set_str(caller, t->name);
     }
     void hosted_to_string(Term* caller)
     {
@@ -266,7 +266,7 @@ namespace ref_t {
             error_occurred(caller, "NULL reference");
             return;
         }
-        set_value_str(caller, circa::to_string(t));
+        set_str(caller, circa::to_string(t));
     }
     void get_function(Term* caller)
     {
@@ -326,10 +326,10 @@ namespace ref_t {
 
             // do the math like this so that rounding errors are not accumulated
             float new_value = (round(as_float(t) / step) + steps) * step;
-            set_value_float(t, new_value);
+            set_float(t, new_value);
 
         } else if (is_int(t))
-            set_value_int(t, as_int(t) + steps);
+            set_int(t, as_int(t) + steps);
         else
             error_occurred(caller, "Ref is not an int or number");
     }
@@ -344,7 +344,7 @@ namespace ref_t {
             error_occurred(caller, "Not an int");
             return;
         }
-        set_value_int(caller, as_int(t));
+        set_int(caller, as_int(t));
     }
     void asfloat(Term* caller)
     {
@@ -354,7 +354,7 @@ namespace ref_t {
             return;
         }
         
-        set_value_float(caller, to_float(t));
+        set_float(caller, to_float(t));
     }
     void get_input(Term* caller)
     {
@@ -376,7 +376,7 @@ namespace ref_t {
             error_occurred(caller, "NULL reference");
             return;
         }
-        set_value_int(caller->value, t->numInputs());
+        set_int(caller->value, t->numInputs());
     }
     void get_source_location(Term* caller)
     {
@@ -386,8 +386,8 @@ namespace ref_t {
             return;
         }
         Branch& output = as_branch(caller);
-        set_value_int(output[0]->value, t->intPropOptional("colStart", 0));
-        set_value_int(output[1]->value, t->intPropOptional("lineStart", 0));
+        set_int(output[0]->value, t->intPropOptional("colStart", 0));
+        set_int(output[1]->value, t->intPropOptional("lineStart", 0));
     }
 }
 

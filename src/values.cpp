@@ -25,7 +25,7 @@ void alloc_value(Term* term)
 
     if (alloc == NULL)
         // this happens while bootstrapping
-        set_value_null(term->value);
+        set_null(term->value);
     else {
         alloc(term->type, term);
 
@@ -46,14 +46,14 @@ void dealloc_value(Term* term)
 
     if (!is_value_alloced(term->type)) {
         std::cout << "warn: in dealloc_value, type is undefined" << std::endl;
-        set_value_null(term->value);
+        set_null(term->value);
         return;
     }
 
     if (dealloc != NULL)
         dealloc(term->type, term);
 
-    set_value_null(term->value);
+    set_null(term->value);
 }
 
 void assign_value(Term* source, Term* dest)

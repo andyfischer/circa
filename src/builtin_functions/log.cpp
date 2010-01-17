@@ -7,7 +7,7 @@ namespace log_function {
 
     void evaluate(Term* caller)
     {
-        set_value_float(caller, std::log(float_input(caller,0)));
+        set_float(caller, std::log(float_input(caller,0)));
     }
 
     void setup(Branch& kernel)

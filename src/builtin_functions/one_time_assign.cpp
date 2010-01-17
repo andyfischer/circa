@@ -11,7 +11,7 @@ namespace one_time_assign_function {
 
         if (!as_bool(assigned)) {
             assign_value(caller->input(1), caller);
-            set_value_bool(assigned, true);
+            set_bool(assigned, true);
         }
     }
 

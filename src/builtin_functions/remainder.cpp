@@ -10,7 +10,7 @@ namespace remainder_function {
         int a = caller->input(0)->asInt();
         int n = caller->input(1)->asInt();
 
-        set_value_int(caller, a % n);
+        set_int(caller, a % n);
     }
 
     void evaluate_f(Term* caller)
@@ -18,7 +18,7 @@ namespace remainder_function {
         float a = caller->input(0)->toFloat();
         float n = caller->input(1)->toFloat();
 
-        set_value_float(caller, fmodf(a, n));
+        set_float(caller, fmodf(a, n));
     }
 
     void setup(Branch& kernel)

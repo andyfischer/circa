@@ -7,7 +7,7 @@ namespace length_function {
 
     void evaluate(Term* caller)
     {
-        set_value_int(caller, as_branch(caller->input(0)).length());
+        set_int(caller, as_branch(caller->input(0)).length());
     }
 
     void setup(Branch& kernel)

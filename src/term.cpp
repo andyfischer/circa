@@ -106,31 +106,31 @@ Ref Term::refProp(std::string const& name)
 void Term::setIntProp(std::string const& name, int i)
 {
     Term* t = addProperty(name, INT_TYPE);
-    set_value_int(t->value, i);
+    set_int(t->value, i);
 }
 
 void Term::setFloatProp(std::string const& name, float f)
 {
     Term* t = addProperty(name, FLOAT_TYPE);
-    set_value_float(t->value, f);
+    set_float(t->value, f);
 }
 
 void Term::setBoolProp(std::string const& name, bool b)
 {
     Term* t = addProperty(name, BOOL_TYPE);
-    set_value_bool(t->value, b);
+    set_bool(t->value, b);
 }
 
 void Term::setStringProp(std::string const& name, std::string const& s)
 {
     Term* t = addProperty(name, STRING_TYPE);
-    set_value_str(t->value, s);
+    set_str(t->value, s);
 }
 
 void Term::setRefProp(std::string const& name, Term* r)
 {
     Term* t = addProperty(name, REF_TYPE);
-    set_value_ref(t->value, r);
+    set_ref(t->value, r);
 }
 
 bool Term::boolPropOptional(std::string const& name, bool defaultValue)

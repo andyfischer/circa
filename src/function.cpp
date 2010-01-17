@@ -98,7 +98,7 @@ namespace function_t {
     }
     void set_name(Term* function, std::string const& name)
     {
-        set_value_str(function->asBranch()[0]->asBranch()[0], name);
+        set_str(function->asBranch()[0]->asBranch()[0], name);
     }
 
     Term* get_output_type(Term* function)
@@ -123,7 +123,7 @@ namespace function_t {
 
     void set_variable_args(Term* function, bool value)
     {
-        set_value_bool(function->asBranch()[0]->asBranch()[2], value);
+        set_bool(function->asBranch()[0]->asBranch()[2], value);
     }
 
     int num_inputs(Term* function)
@@ -188,7 +188,7 @@ namespace function_t {
     }
     void set_exposed_name_path(Term* func, std::string const& value)
     {
-        set_value_str(func->asBranch()[0]->asBranch()[6], value);
+        set_str(func->asBranch()[0]->asBranch()[6], value);
     }
     Ref& get_feedback_func(Term* func)
     {

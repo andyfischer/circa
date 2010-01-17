@@ -11,19 +11,19 @@ namespace round_function {
     {
         float input = float_input(caller, 0);
         if (input > 0.0)
-            set_value_int(caller, int(input + 0.5));
+            set_int(caller, int(input + 0.5));
         else
-            set_value_int(caller, int(input - 0.5));
+            set_int(caller, int(input - 0.5));
     }
 
     void evaluate_floor(Term* caller)
     {
-        set_value_int(caller, (int) std::floor(float_input(caller, 0)));
+        set_int(caller, (int) std::floor(float_input(caller, 0)));
     }
 
     void evaluate_ceil(Term* caller)
     {
-        set_value_int(caller, (int) std::ceil(float_input(caller, 0)));
+        set_int(caller, (int) std::ceil(float_input(caller, 0)));
     }
 
     void setup(Branch& kernel)

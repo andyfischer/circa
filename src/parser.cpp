@@ -729,7 +729,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Branch& innerBranch = as_branch(forTerm);
     setup_for_loop_pre_code(forTerm);
 
-    set_value_bool(get_for_loop_modify_list(forTerm), foundAtOperator);
+    set_bool(get_for_loop_modify_list(forTerm), foundAtOperator);
 
     if (foundAtOperator)
         forTerm->setStringProp("syntax:rebindOperator", listExpr->name);
@@ -1188,11 +1188,11 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
         // rather than introduce a neg() operation.
         if (is_value(expr) && expr->name == "") {
             if (is_int(expr)) {
-                set_value_int(expr, as_int(expr) * -1);
+                set_int(expr, as_int(expr) * -1);
                 return expr;
             }
             else if (is_float(expr)) {
-                set_value_float(expr, as_float(expr) * -1.0f);
+                set_float(expr, as_float(expr) * -1.0f);
                 expr->setStringProp("float:original-format",
                     "-" + expr->stringProp("float:original-format"));
                 return expr;
@@ -1630,10 +1630,10 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
             a = two_hex_digits_to_number(text[6], text[7]) / 255.0f;
     }
 
-    set_value_float(result[0], r);
-    set_value_float(result[1], g);
-    set_value_float(result[2], b);
-    set_value_float(result[3], a);
+    set_float(result[0], r);
+    set_float(result[1], g);
+    set_float(result[2], b);
+    set_float(result[3], a);
 
     resultTerm->setIntProp("syntax:colorFormat", (int) text.length());
 

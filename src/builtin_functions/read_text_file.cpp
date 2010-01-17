@@ -8,7 +8,7 @@ namespace read_text_file_function {
     void evaluate(Term* caller)
     {
         std::string filename = as_string(caller->input(0));
-        set_value_str(caller, read_text_file(filename));
+        set_str(caller, read_text_file(filename));
     }
 
     void setup(Branch& kernel)

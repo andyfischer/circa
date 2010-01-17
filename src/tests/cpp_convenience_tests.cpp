@@ -20,7 +20,7 @@ void test_accessor()
     test_assert(branch["a"]->asInt() == 3);
 
     Term* b = create_value(branch, INT_TYPE, "b");
-    set_value_int(b, 8);
+    set_int(b, 8);
     Int b_accessor(branch, "b", 3);
     test_assert(b_accessor == 8);
     test_assert(as_int(b) == 8);

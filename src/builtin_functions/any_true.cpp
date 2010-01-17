@@ -16,7 +16,7 @@ namespace any_true_function {
                 break;
             }
 
-        set_value_bool(caller, result);
+        set_bool(caller, result);
     }
 
     void setup(Branch& kernel)

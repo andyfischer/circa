@@ -13,70 +13,70 @@ void set_value(TaggedValue& value, TaggedValue const& source)
     value = source;
 }
 
-void set_value_branch(TaggedValue& value, Branch* branch)
+void set_branch_value(TaggedValue& value, Branch* branch)
 {
     value.type = (Type*) BRANCH_TYPE->value.data.ptr;
     value.data.ptr = branch;
 }
 
-void set_value_type(TaggedValue& value, Type* type)
+void set_type_value(TaggedValue& value, Type* type)
 {
     value.type = (Type*) TYPE_TYPE->value.data.ptr;
     value.data.ptr = type;
 }
 
-void set_value_int(TaggedValue& value, int i)
+void set_int(TaggedValue& value, int i)
 {
     value.type = (Type*) INT_TYPE->value.data.ptr;
     value.data.asint = i;
 }
 
-void set_value_float(TaggedValue& value, float f)
+void set_float(TaggedValue& value, float f)
 {
     value.type = (Type*) FLOAT_TYPE->value.data.ptr;
     value.data.asfloat = f;
 }
 
-void set_value_bool(TaggedValue& value, bool b)
+void set_bool(TaggedValue& value, bool b)
 {
     value.type = (Type*) BOOL_TYPE->value.data.ptr;
     value.data.asbool = b;
 }
 
-void set_value_str(TaggedValue& value, std::string const& s)
+void set_str(TaggedValue& value, std::string const& s)
 {
     value.type = (Type*) STRING_TYPE->value.data.ptr;
     *((std::string*) value.data.ptr) = s;
 }
 
-void set_value_str(TaggedValue& value, const char* s)
+void set_str(TaggedValue& value, const char* s)
 {
     value.type = (Type*) STRING_TYPE->value.data.ptr;
     *((std::string*) value.data.ptr) = s;
 }
 
-void set_value_ref(TaggedValue& value, Term* t)
+void set_ref(TaggedValue& value, Term* t)
 {
     value.type = (Type*) REF_TYPE->value.data.ptr;
     *((Ref*) value.data.ptr) = t;
 }
 
-void set_value_null(TaggedValue& value)
+void set_null(TaggedValue& value)
 {
     // TODO: a real Null type
     value.type = NULL;
     value.data.ptr = 0;
 }
 
-void set_value_branch(Term* term, Branch* branch) { set_value_branch(term->value, branch); }
-void set_value_type(Term* term, Type* type) { set_value_type(term->value, type); }
-void set_value_int(Term* term, int i) { set_value_int(term->value, i); }
-void set_value_float(Term* term, float f) { set_value_float(term->value, f); }
-void set_value_bool(Term* term, bool b) { set_value_bool(term->value, b); }
-void set_value_str(Term* term, std::string const& s) { set_value_str(term->value, s); }
-void set_value_str(Term* term, const char* s) { set_value_str(term->value, s); }
-void set_value_ref(Term* term, Term* t) { set_value_ref(term->value, t); }
-void set_value_null(Term* term) { set_value_null(term->value); }
+void set_branch_value(Term* term, Branch* branch) { set_branch_value(term->value, branch); }
+void set_type_value(Term* term, Type* type) { set_type_value(term->value, type); }
+void set_int(Term* term, int i) { set_int(term->value, i); }
+void set_float(Term* term, float f) { set_float(term->value, f); }
+void set_bool(Term* term, bool b) { set_bool(term->value, b); }
+void set_str(Term* term, std::string const& s) { set_str(term->value, s); }
+void set_str(Term* term, const char* s) { set_str(term->value, s); }
+void set_ref(Term* term, Term* t) { set_ref(term->value, t); }
+void set_null(Term* term) { set_null(term->value); }
 
 int as_int(TaggedValue const& value)
 {

@@ -7,12 +7,12 @@ namespace less_than_eq_function {
 
     void evaluate_i(Term* caller)
     {
-        set_value_bool(caller, int_input(caller,0) <= int_input(caller,1));
+        set_bool(caller, int_input(caller,0) <= int_input(caller,1));
     }
 
     void evaluate_f(Term* caller)
     {
-        set_value_bool(caller, float_input(caller,0) <= float_input(caller,1));
+        set_bool(caller, float_input(caller,0) <= float_input(caller,1));
     }
 
     void setup(Branch& kernel)

@@ -205,14 +205,14 @@ void evaluate_for_loop(Term* forTerm)
     Term* isFirstIteration = get_for_loop_is_first_iteration(forTerm);
     assert(isFirstIteration->name == "#is_first_iteration");
     Term* iterator = get_for_loop_iterator(forTerm);
-    set_value_bool(get_for_loop_any_iterations(forTerm), numIterations > 0);
+    set_bool(get_for_loop_any_iterations(forTerm), numIterations > 0);
 
     if (numIterations == 0)
         evaluate_branch(get_for_loop_rebinds_for_outer(forTerm));
 
     for (int i=0; i < numIterations; i++) {
-        set_value_bool(isFirstIteration, i == 0);
-        set_value_bool(discardCalled, false);
+        set_bool(isFirstIteration, i == 0);
+        set_bool(discardCalled, false);
 
         // Inject iterator value
         if (!value_fits_type(listTerm->asBranch()[i], iterator->type)) {

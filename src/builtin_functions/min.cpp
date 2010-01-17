@@ -9,7 +9,7 @@ namespace min_function {
 
     void evaluate(Term* caller)
     {
-        set_value_float(caller, std::min(float_input(caller,0), float_input(caller,1)));
+        set_float(caller, std::min(float_input(caller,0), float_input(caller,1)));
     }
 
     void setup(Branch& kernel)

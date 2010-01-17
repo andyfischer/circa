@@ -7,7 +7,7 @@ namespace not_function {
 
     void evaluate(Term* caller)
     {
-        set_value_bool(caller, !bool_input(caller,0));
+        set_bool(caller, !bool_input(caller,0));
     }
 
     void setup(Branch& kernel)

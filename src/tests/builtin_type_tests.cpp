@@ -90,7 +90,7 @@ void test_set()
     s = branch.eval("s.add(val)");
 
     test_assert(as_branch(s)[1]->asInt() == 5);
-    set_value_int(val, 6);
+    set_int(val, 6);
     test_assert(as_branch(s)[1]->asInt() == 5);
 }
 

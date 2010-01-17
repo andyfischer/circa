@@ -9,7 +9,7 @@ namespace circa {
 namespace type_t {
     void alloc(Term* type, Term* term)
     {
-        set_value_type(term->value, new Type());
+        set_type_value(term->value, new Type());
     }
     void dealloc(Term* type, Term* term)
     {
@@ -47,7 +47,7 @@ namespace type_t {
 
     void assign(Term* source, Term* dest)
     {
-        set_value_type(dest->value, get_type_value(source->value));
+        set_type_value(dest->value, get_type_value(source->value));
     }
 
     void remap_pointers(Term *type, ReferenceMap const& map)
@@ -60,7 +60,7 @@ namespace type_t {
 
     void name_accessor(Term* caller)
     {
-        set_value_str(caller, type_t::get_name(caller->input(0)));
+        set_str(caller, type_t::get_name(caller->input(0)));
     }
 
     std::string& get_name(Term* type)
@@ -307,7 +307,7 @@ Term* find_common_type(RefList const& list)
 
 namespace type_private {
     // TODO: remove this:
-    void empty_allocate(Term* type, Term* term) { set_value_null(term->value); }
+    void empty_allocate(Term* type, Term* term) { set_null(term->value); }
     void empty_duplicate_function(Term*,Term*) {}
 }
 
@@ -377,15 +377,15 @@ std::string to_string(Term* term)
 void assign_value_to_default(Term* term)
 {
     if (is_int(term))
-        set_value_int(term->value, 0);
+        set_int(term->value, 0);
     else if (is_float(term))
-        set_value_float(term, 0);
+        set_float(term, 0);
     else if (is_string(term))
-        set_value_str(term, "");
+        set_str(term, "");
     else if (is_bool(term))
-        set_value_bool(term, false);
+        set_bool(term, false);
     else if (is_ref(term))
-        set_value_ref(term, NULL);
+        set_ref(term, NULL);
     else {
 
         // check if this type has a default value defined
@@ -429,7 +429,7 @@ void steal_value(Term* a, Term* b)
 {
     dealloc_value(b);
     b->value = a->value;
-    set_value_null(a->value);
+    set_null(a->value);
 }
 
 } // namespace common_assign_funcs

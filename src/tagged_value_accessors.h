@@ -9,25 +9,25 @@ namespace circa {
 
 void set_value(TaggedValue& value, TaggedValue const& source);
 
-void set_value_branch(TaggedValue& value, Branch* branch);
-void set_value_type(TaggedValue& value, Type* type);
-void set_value_int(TaggedValue& value, int i);
-void set_value_float(TaggedValue& value, float f);
-void set_value_bool(TaggedValue& value, bool b);
-void set_value_str(TaggedValue& value, std::string const& s);
-void set_value_str(TaggedValue& value, const char* s);
-void set_value_ref(TaggedValue& value, Term* t);
-void set_value_null(TaggedValue& value);
+void set_branch_value(TaggedValue& value, Branch* branch);
+void set_type_value(TaggedValue& value, Type* type);
+void set_int(TaggedValue& value, int i);
+void set_float(TaggedValue& value, float f);
+void set_bool(TaggedValue& value, bool b);
+void set_str(TaggedValue& value, std::string const& s);
+void set_str(TaggedValue& value, const char* s);
+void set_ref(TaggedValue& value, Term* t);
+void set_null(TaggedValue& value);
 
-void set_value_branch(Term*, Branch* branch);
-void set_value_type(Term*, Type* type);
-void set_value_int(Term*, int i);
-void set_value_float(Term*, float f);
-void set_value_bool(Term*, bool b);
-void set_value_str(Term*, std::string const& s);
-void set_value_str(Term*, const char* s);
-void set_value_ref(Term*, Term* t);
-void set_value_null(Term*);
+void set_branch_value(Term*, Branch* branch);
+void set_type_value(Term*, Type* type);
+void set_int(Term*, int i);
+void set_float(Term*, float f);
+void set_bool(Term*, bool b);
+void set_str(Term*, std::string const& s);
+void set_str(Term*, const char* s);
+void set_ref(Term*, Term* t);
+void set_null(Term*);
 
 Type* get_type_value(TaggedValue const& value);
 Branch* get_branch_value(TaggedValue const& value);

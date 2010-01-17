@@ -10,7 +10,7 @@ std::vector<std::string> gSpyResults;
 void spy_function(Term* caller)
 {
     gSpyResults.push_back(as_string(caller->input(0)));
-    set_value_bool(caller, true);
+    set_bool(caller, true);
 }
 
 void i_only_throw_errors(Term* caller)
