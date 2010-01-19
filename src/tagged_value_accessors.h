@@ -30,6 +30,14 @@ void set_str(Term*, const char* s);
 void set_ref(Term*, Term* t);
 void set_null(Term*);
 
+TaggedValue tag_int(int v);
+TaggedValue tag_float(float v);
+TaggedValue tag_bool(bool b);
+TaggedValue tag_str(const char* s);
+TaggedValue tag_str(std::string const& s);
+TaggedValue tag_null();
+TaggedValue tag_pointer(Type* type, void* value);
+
 Type* get_type_value(TaggedValue const& value);
 Branch* get_branch_value(TaggedValue const& value);
 int as_int(TaggedValue const& value);

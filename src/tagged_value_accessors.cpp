@@ -86,6 +86,50 @@ void set_str(Term* term, const char* s) { set_str(term->value, s); }
 void set_ref(Term* term, Term* t) { set_ref(term->value, t); }
 void set_null(Term* term) { set_null(term->value); }
 
+TaggedValue tag_int(int v)
+{
+    TaggedValue result;
+    set_int(result, v);
+    return result;
+}
+
+TaggedValue tag_float(float f)
+{
+    TaggedValue result;
+    set_float(result, f);
+    return result;
+}
+TaggedValue tag_bool(bool b)
+{
+    TaggedValue result;
+    set_bool(result, b);
+    return result;
+}
+TaggedValue tag_str(const char* s)
+{
+    TaggedValue result;
+    set_str(result, s);
+    return result;
+}
+TaggedValue tag_str(std::string const& s)
+{
+    TaggedValue result;
+    set_str(result, s);
+    return result;
+}
+TaggedValue tag_null()
+{
+    TaggedValue result;
+    set_null(result);
+    return result;
+}
+TaggedValue tag_pointer(Type* type, void* value)
+{
+    TaggedValue result;
+    set_pointer(result, type, value);
+    return result;
+}
+
 int as_int(TaggedValue const& value)
 {
     assert(is_value_int(value));
