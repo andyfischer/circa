@@ -279,6 +279,22 @@ void test_type_error_in_a_native_call()
     test_assert(t->hasError());
 }
 
+class test_nativeType {};
+
+void test_imported_pointer_type()
+{
+    Branch branch;
+    Term* T = branch.eval("type T {}");
+
+
+    import_type<test_nativeType*>(branch["T"]);
+
+    Term* v = branch.eval("v = T()");
+
+    test_assert(is_value_of_type(v, &as_type(T)));
+    //fixme test_assert(get_pointer(v, &as_type(T)) == NULL);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
@@ -294,6 +310,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_missing_functions);
     REGISTER_TEST_CASE(type_tests::test_find_common_type);
     REGISTER_TEST_CASE(type_tests::test_type_error_in_a_native_call);
+    REGISTER_TEST_CASE(type_tests::test_imported_pointer_type);
 }
 
 } // namespace type_tests

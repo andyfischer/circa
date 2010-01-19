@@ -25,7 +25,7 @@ void handle_key_press(SDL_Event &event, int key);
 void key_down(Term* caller)
 {
     int i = caller->input(0)->asInt();
-    caller->asBool() = KEY_DOWN[i];
+    set_bool(caller, KEY_DOWN[i]);
 }
 
 void key_pressed(Term* caller)
@@ -34,16 +34,16 @@ void key_pressed(Term* caller)
         int key = as_int(caller->input(0));
         for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
             if (KEYS_JUST_PRESSED[index].sym == key) {
-                caller->asBool() = true;
+                set_bool(caller, true);
                 return;
             }
         }
-        caller->asBool() = false;
+        set_bool(caller, false);
         return;
     }
 
     if (is_string(caller->input(0))) {
-        std::string& key = caller->input(0)->asString();
+        std::string const& key = caller->input(0)->asString();
         if (key.length() != 1) {
             error_occurred(caller, "Expected a string of length 1");
             return;
@@ -51,12 +51,12 @@ void key_pressed(Term* caller)
 
         for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
             if (key[0] == KEYS_JUST_PRESSED[index].unicode) {
-                caller->asBool() = true;
+                set_bool(caller, true);
                 return;
             }
         }
             
-        caller->asBool() = false;
+        set_bool(caller, false);
         return;
     }
 }
@@ -120,8 +120,8 @@ void capture_events()
         }
     } // finish event loop
 
-    MOUSE_POSITION_TERM->asBranch()[0]->asFloat() = float(MOUSE_X);
-    MOUSE_POSITION_TERM->asBranch()[1]->asFloat() = float(MOUSE_Y);
+    set_float(MOUSE_POSITION_TERM->asBranch()[0], float(MOUSE_X));
+    set_float(MOUSE_POSITION_TERM->asBranch()[1], float(MOUSE_Y));
 }
 
 void handle_key_press(SDL_Event &event, int key)
@@ -219,36 +219,36 @@ bool mouse_in(Branch& box)
 
 void mouse_pressed(Term* caller)
 {
-    as_bool(caller) = LEFT_MOUSE_DOWN;
+    set_bool(caller, LEFT_MOUSE_DOWN);
 }
 
 void mouse_clicked(Term* caller)
 {
     if (caller->numInputs() == 0)
-        as_bool(caller) = RECENT_LEFT_MOUSE_DOWN;
+        set_bool(caller, RECENT_LEFT_MOUSE_DOWN);
     else
-        as_bool(caller) = RECENT_LEFT_MOUSE_DOWN && mouse_in(as_branch(caller->input(0)));
+        set_bool(caller, RECENT_LEFT_MOUSE_DOWN && mouse_in(as_branch(caller->input(0))));
 }
 
 void mouse_over(Term* caller)
 {
-    as_bool(caller) = mouse_in(as_branch(caller->input(0)));
+    set_bool(caller, mouse_in(as_branch(caller->input(0))));
 }
 
 void mouse_wheel_up(Term* caller)
 {
     if (caller->numInputs() == 0)
-        as_bool(caller) = RECENT_MOUSE_WHEEL_UP;
+        set_bool(caller, RECENT_MOUSE_WHEEL_UP);
     else
-        as_bool(caller) = RECENT_MOUSE_WHEEL_UP && mouse_in(as_branch(caller->input(0)));
+        set_bool(caller, RECENT_MOUSE_WHEEL_UP && mouse_in(as_branch(caller->input(0))));
 }
 
 void mouse_wheel_down(Term* caller)
 {
     if (caller->numInputs() == 0)
-        as_bool(caller) = RECENT_MOUSE_WHEEL_DOWN;
+        set_bool(caller, RECENT_MOUSE_WHEEL_DOWN);
     else
-        as_bool(caller) = RECENT_MOUSE_WHEEL_DOWN && mouse_in(as_branch(caller->input(0)));
+        set_bool(caller, RECENT_MOUSE_WHEEL_DOWN && mouse_in(as_branch(caller->input(0))));
 }
 
 void setup(Branch& branch)
@@ -272,13 +272,13 @@ void setup(Branch& branch)
     install_function(branch["mouse_wheel_down_anywhere"], mouse_wheel_down);
     install_function(branch["mouse_wheel_down_region"], mouse_wheel_down);
 
-    procure_int(branch, "UP") = SDLK_UP;
-    procure_int(branch, "DOWN") = SDLK_DOWN;
-    procure_int(branch, "LEFT") = SDLK_LEFT;
-    procure_int(branch, "RIGHT") = SDLK_RIGHT;
-    procure_int(branch, "SPACE") = SDLK_SPACE;
-    procure_int(branch, "KEY_B") = SDLK_b;
-    procure_int(branch, "DELETE") = SDLK_DELETE;
+    set_int(procure_int(branch, "UP"), SDLK_UP);
+    set_int(procure_int(branch, "DOWN"), SDLK_DOWN);
+    set_int(procure_int(branch, "LEFT"), SDLK_LEFT);
+    set_int(procure_int(branch, "RIGHT"), SDLK_RIGHT);
+    set_int(procure_int(branch, "SPACE"), SDLK_SPACE);
+    set_int(procure_int(branch, "KEY_B"), SDLK_b);
+    set_int(procure_int(branch, "DELETE"), SDLK_DELETE);
 }
 
 } // namespace input

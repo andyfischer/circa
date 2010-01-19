@@ -206,6 +206,11 @@ Branch& Term::asBranch()
     return as_branch(this);
 }
 
+Term* Term::field(int index)
+{
+    return as_branch(this)[index];
+}
+
 void assert_term_invariants(Term* t)
 {
     // Make sure the value type matches the declared type.

@@ -135,7 +135,7 @@ void hosted_load_mesh(Term* caller)
         glNewList(index, GL_COMPILE);
         draw_mesh_immediate(mesh);
         glEndList();
-        as_int(caller) = index;
+        set_int(caller, index);
     }
 }
 

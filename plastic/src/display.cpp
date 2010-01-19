@@ -61,8 +61,8 @@ bool resize_display(int width, int height)
     }
 
     // Write window width & height to runtime.ca
-    runtime_branch()["window"]->asBranch()["width"]->asInt() = width;
-    runtime_branch()["window"]->asBranch()["height"]->asInt() = height;
+    set_int(runtime_branch()["window"]->asBranch()["width"], width);
+    set_int(runtime_branch()["window"]->asBranch()["height"], height);
 
     // Initialize desired SDL subsystems
     if (SDL_Init(SDL_INIT_TIMER & SDL_INIT_VIDEO

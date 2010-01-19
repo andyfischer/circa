@@ -8,29 +8,24 @@ using namespace circa;
 
 namespace postprocess_functions
 {
-    struct Surface
-    {
-        int& tex_id;
-        int& fbo_id;
-        int& width;
-        int& height;
+    namespace surface_t {
+        int get_tex_id(Term* term) { return as_int(term->field(0)); }
+        int get_fbo_id(Term* term) { return as_int(term->field(1)); }
+        int get_width(Term* term) { return as_int(term->field(2)); }
+        int get_height(Term* term) { return as_int(term->field(3)); }
 
-        Surface(Term* term) :
-            tex_id(as_branch(term)[0]->asInt()),
-            fbo_id(as_branch(term)[1]->asInt()),
-            width(as_branch(term)[2]->asInt()),
-            height(as_branch(term)[3]->asInt())
-        {
-        }
-    };
+        void set_tex_id(Term* term, int id) { set_int(term->field(0), id); }
+        void set_fbo_id(Term* term, int id) { set_int(term->field(1), id); }
+        void set_width(Term* term, int w) { set_int(term->field(2), w); }
+        void set_height(Term* term, int h) { set_int(term->field(3), h); }
+    }
     
     void make_surface(Term* caller)
     {
         gl_clear_error();
+        Term* surface = caller->input(0);
 
-        Surface surface = Surface(caller->input(0));
-
-        if (surface.tex_id == 0) {
+        if (surface_t::get_tex_id(surface) == 0) {
             int desired_width = int_input(caller, 1);
             int desired_height = int_input(caller, 2);
 
@@ -39,29 +34,34 @@ namespace postprocess_functions
             GLenum filter = /*linear ? GL_LINEAR :*/ GL_NEAREST;
 
             // Create a color texture
-            glGenTextures(1, (GLuint*) &surface.tex_id);
-            glBindTexture(GL_TEXTURE_2D, surface.tex_id);
+            int tex_id;
+            glGenTextures(1, (GLuint*) &tex_id);
+            glBindTexture(GL_TEXTURE_2D, tex_id);
             glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, desired_width, desired_height,
                     0, GL_RGBA, type, 0);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
             glBindTexture(GL_TEXTURE_2D, 0);
+            surface_t::set_tex_id(surface, tex_id);
 
             if (gl_check_error(caller))
                 return;
 
             // Create FBO
-            glGenFramebuffersEXT(1, (GLuint*) &surface.fbo_id);
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surface.fbo_id);
+            int fbo_id;
+            glGenFramebuffersEXT(1, (GLuint*) &fbo_id);
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo_id);
             glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-                    GL_TEXTURE_2D, surface.tex_id, 0);
+                    GL_TEXTURE_2D, tex_id, 0);
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+            surface_t::set_fbo_id(surface, fbo_id);
 
             if (gl_check_error(caller))
                 return;
 
-            surface.width = desired_width;
-            surface.height = desired_height;
+
+            surface_t::set_width(surface, desired_width);
+            surface_t::set_width(surface, desired_height);
         }
 
         assign_value(caller->input(0), caller);
@@ -70,33 +70,35 @@ namespace postprocess_functions
     static int bound_surface_width = 0;
     static int bound_surface_height = 0;
 
-    void bind_surface(Surface& surface)
+    void bind_surface(Term* surface)
     {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surface.fbo_id);
-        glViewport(0, 0, surface.width, surface.height);
+        int width = surface_t::get_width(surface);
+        int height = surface_t::get_height(surface);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surface_t::get_fbo_id(surface));
+        glViewport(0, 0, width, height);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, surface.width, surface.height, 0, -1000.0f, 1000.0f);
+        glOrtho(0, width, height, 0, -1000.0f, 1000.0f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        bound_surface_width = surface.width;
-        bound_surface_height = surface.height;
+        bound_surface_width = width;
+        bound_surface_height = height;
     }
 
-    void bind_surface(Term* caller)
+    void bind_surface_hosted(Term* caller)
     {
-        Surface surface(caller->input(0));
-        bind_surface(surface);
+        bind_surface(caller->input(0));
         gl_check_error(caller);
     }
 
     void draw_surface(Term* caller)
     {
-        Surface source_surface(caller->input(0));
+        Term* source_surface = caller->input(0);
+        int tex_id = surface_t::get_tex_id(source_surface);
 
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, source_surface.tex_id);
+        glBindTexture(GL_TEXTURE_2D, tex_id);
 
         int width = bound_surface_width;
         int height = bound_surface_height;
@@ -117,19 +119,22 @@ namespace postprocess_functions
 
     void copy_surface(Term* caller)
     {
-        Surface source_surface(caller->input(0));
-        Surface dest_surface(caller->input(1));
+        Term* source_surface = caller->input(0);
+        Term* dest_surface = caller->input(1);
 
         bind_surface(dest_surface);
 
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, source_surface.tex_id);
+        glBindTexture(GL_TEXTURE_2D, surface_t::get_tex_id(source_surface));
+
+        int dest_width = surface_t::get_width(dest_surface);
+        int dest_height = surface_t::get_height(dest_surface);
 
         glBegin(GL_QUADS);
         glTexCoord2i(0, 1); glVertex2i(0, 0);
-        glTexCoord2i(1, 1); glVertex2i(dest_surface.width, 0);
-        glTexCoord2i(1, 0); glVertex2i(dest_surface.width, dest_surface.height);
-        glTexCoord2i(0, 0); glVertex2i(0, dest_surface.height);
+        glTexCoord2i(1, 1); glVertex2i(dest_width, 0);
+        glTexCoord2i(1, 0); glVertex2i(dest_width, dest_height);
+        glTexCoord2i(0, 0); glVertex2i(0, dest_height);
         glEnd();
 
         // Reset state
@@ -142,7 +147,7 @@ namespace postprocess_functions
         Branch& postprocess_ns = kernel["postprocess"]->asBranch();
         install_function(postprocess_ns["make_surface"], make_surface);
         install_function(postprocess_ns["draw_surface"], draw_surface);
-        install_function(postprocess_ns["bind_surface"], bind_surface);
+        install_function(postprocess_ns["bind_surface"], bind_surface_hosted);
         install_function(postprocess_ns["copy_surface"], copy_surface);
     }
 

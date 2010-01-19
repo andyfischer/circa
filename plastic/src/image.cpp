@@ -6,36 +6,31 @@
 
 using namespace circa;
 
-struct Image
-{
-    Term* _term;
-    Image(Term* term) : _term(term) {}
+namespace image_t {
+    std::string get_filename(Term* term) { return term->asBranch()[0]->asString(); }
+    int get_texid(Term* term) { return term->asBranch()[1]->asInt(); }
+    int get_width(Term* term) { return term->asBranch()[2]->asInt(); }
+    int get_height(Term* term) { return term->asBranch()[3]->asInt(); }
 
-    std::string& filename() { return _term->asBranch()[0]->asString(); }
-    int& texid() { return _term->asBranch()[1]->asInt(); }
-    int& width() { return _term->asBranch()[2]->asInt(); }
-    int& height() { return _term->asBranch()[3]->asInt(); }
-};
+    void set_filename(Term* term, std::string const& s) { set_str(term->asBranch()[0], s); }
+    void set_texid(Term* term, int id) { set_int(term->asBranch()[1], id); }
+    void set_width(Term* term, int w) { set_int(term->asBranch()[2], w); }
+    void set_height(Term* term, int h) { set_int(term->asBranch()[3], h); }
+}
 
-struct Point
-{
-    Term* _term;
-    Point(Term* term) : _term(term) {}
+namespace point_t {
+    float get_x(Term* term) { return term->asBranch()[0]->toFloat(); }
+    float get_y(Term* term) { return term->asBranch()[1]->toFloat(); }
+    void set_x(Term* term, float x) { set_float(term->asBranch()[0], x); }
+    void set_y(Term* term, float y) { set_float(term->asBranch()[1], y); }
+}
 
-    float x() { return _term->asBranch()[0]->toFloat(); }
-    float y() { return _term->asBranch()[1]->toFloat(); }
-};
-
-struct Rect
-{
-    Term* _term;
-    Rect(Term* term) : _term(term) {}
-
-    float x1() { return _term->asBranch()[0]->toFloat(); }
-    float y1() { return _term->asBranch()[1]->toFloat(); }
-    float x2() { return _term->asBranch()[2]->toFloat(); }
-    float y2() { return _term->asBranch()[3]->toFloat(); }
-};
+namespace rect_t {
+    float get_x1(Term* term) { return term->asBranch()[0]->toFloat(); }
+    float get_y1(Term* term) { return term->asBranch()[1]->toFloat(); }
+    float get_x2(Term* term) { return term->asBranch()[2]->toFloat(); }
+    float get_y2(Term* term) { return term->asBranch()[3]->toFloat(); }
+}
 
 GLenum get_texture_format(SDL_Surface *surface)
 {
@@ -147,8 +142,7 @@ SDL_Surface* convert_indexed_color_to_true_color(SDL_Surface* surface)
 
 void load_image(Term* caller)
 {
-    std::string& filename = caller->input(0)->asString();
-    Image result(caller);
+    std::string const& filename = caller->input(0)->asString();
 
     SDL_Surface* surface = IMG_Load(filename.c_str());
     if (surface == NULL) {
@@ -159,25 +153,25 @@ void load_image(Term* caller)
     if (has_indexed_color(surface))
         surface = convert_indexed_color_to_true_color(surface);
 
-    result.texid() = load_surface_to_texture(surface);
-    result.width() = surface->w;
-    result.height() = surface->h;
-    result.filename() = filename;
+    image_t::set_texid(caller, load_surface_to_texture(surface));
+    image_t::set_filename(caller, filename);
+    image_t::set_width(caller, surface->w);
+    image_t::set_height(caller, surface->h);
 
     SDL_FreeSurface(surface);
 }
 
 void draw_image(Term* caller)
 {
-    Image image(caller->input(0));
-    Point point(caller->input(1));
+    Term* image = caller->input(0);
+    Term* point = caller->input(1);
 
-    float x = point.x();
-    float y = point.y();
-    float width = float(image.width());
-    float height = float(image.height());
+    float x = point_t::get_x(point);
+    float y = point_t::get_y(point);
+    float width = float(image_t::get_width(image));
+    float height = float(image_t::get_height(image));
 
-    glBindTexture(GL_TEXTURE_2D, image.texid());
+    glBindTexture(GL_TEXTURE_2D, image_t::get_texid(image));
     glBegin(GL_QUADS);
     glTexCoord2d(0.0, 0.0);
     glVertex3f(x, y, 0);
@@ -195,12 +189,17 @@ void draw_image(Term* caller)
 
 void draw_image_clip(Term* caller)
 {
-    Image image(caller->input(0));
-    Rect clip(caller->input(1));
+    Term* image = caller->input(0);
+    Term* clip = caller->input(1);
 
     Branch& destination = caller->input(2)->asBranch();
     float dest_x = destination[0]->asFloat();
     float dest_y = destination[1]->asFloat();
+
+    float clip_x1 = rect_t::get_x1(clip);
+    float clip_y1 = rect_t::get_y1(clip);
+    float clip_x2 = rect_t::get_x2(clip);
+    float clip_y2 = rect_t::get_y2(clip);
 
     float dest_x2, dest_y2;
 
@@ -208,20 +207,20 @@ void draw_image_clip(Term* caller)
         dest_x2 = destination[2]->asFloat();
         dest_y2 = destination[3]->asFloat();
     } else {
-        dest_x2 = dest_x + clip.x2() - clip.x1();
-        dest_y2 = dest_y + clip.y2() - clip.y1();
+        dest_x2 = dest_x + clip_x2 - clip_x1;
+        dest_y2 = dest_y + clip_y2 - clip_y1;
     }
 
-    float tex_x1 = clip.x1() / image.width();
-    float tex_x2 = clip.x2() / image.width();
-    float tex_y1 = clip.y1() / image.height();
-    float tex_y2 = clip.y2() / image.height();
+    float tex_x1 = clip_x1 / image_t::get_width(image);
+    float tex_x2 = clip_x2 / image_t::get_width(image);
+    float tex_y1 = clip_y1 / image_t::get_height(image);
+    float tex_y2 = clip_y2 / image_t::get_height(image);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-    glBindTexture(GL_TEXTURE_2D, image.texid());
+    glBindTexture(GL_TEXTURE_2D, image_t::get_texid(image));
     glBegin(GL_QUADS);
     glTexCoord2d(tex_x1, tex_y1);
     glVertex3f(dest_x, dest_y, 0);

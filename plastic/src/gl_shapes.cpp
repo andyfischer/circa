@@ -205,7 +205,7 @@ void load_program(Term* caller)
 
     gl_check_error(caller);
 
-    as_int(caller) = program;
+    set_int(caller, program);
 }
 
 void use_program(Term* caller)

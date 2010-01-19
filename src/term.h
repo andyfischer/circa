@@ -97,6 +97,8 @@ struct Term
     bool asBool();
     Ref& asRef();
     Branch& asBranch();
+
+    Term* field(int index);
 };
 
 void assert_term_invariants(Term* t);

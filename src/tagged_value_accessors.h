@@ -18,6 +18,7 @@ void set_str(TaggedValue& value, std::string const& s);
 void set_str(TaggedValue& value, const char* s);
 void set_ref(TaggedValue& value, Term* t);
 void set_null(TaggedValue& value);
+void set_pointer(TaggedValue& value, Type* type, void* p);
 
 void set_branch_value(Term*, Branch* branch);
 void set_type_value(Term*, Type* type);
@@ -36,12 +37,14 @@ float as_float(TaggedValue const& value);
 std::string const& as_string(TaggedValue const& value);
 bool as_bool(TaggedValue const& value);
 Ref& as_ref(TaggedValue const& value);
+void* get_pointer(TaggedValue const& value, Type* expectedType);
 
 int as_int(Term*);
 float as_float(Term*);
 bool as_bool(Term*);
 std::string const& as_string(Term*);
 Ref& as_ref(Term*);
+void* get_pointer(Term*, Type* expectedType);
 
 bool is_value_int(TaggedValue const& value);
 bool is_value_float(TaggedValue const& value);
@@ -49,6 +52,7 @@ bool is_value_bool(TaggedValue const& value);
 bool is_value_string(TaggedValue const& value);
 bool is_value_ref(TaggedValue const& value);
 bool is_value_branch(TaggedValue const& value);
+bool is_value_of_type(TaggedValue const& value, Type* type);
 
 bool is_value_int(Term* t);
 bool is_value_float(Term* t);
@@ -56,6 +60,7 @@ bool is_value_bool(Term* t);
 bool is_value_string(Term* t);
 bool is_value_ref(Term* t);
 bool is_value_branch(Term* t);
+bool is_value_of_type(Term* t, Type* type);
 
 } // namespace circa
 

@@ -15,8 +15,8 @@ Branch* USERS_BRANCH = NULL;
 
 bool CONTINUE_MAIN_LOOP = true;
 
-Float TIME;
-Float TIME_DELTA;
+Term* TIME;
+Term* TIME_DELTA;
 long PREV_SDL_TICKS = 0;
 int TARGET_FPS = 60;
 
@@ -124,8 +124,8 @@ void main_loop()
     // Evaluate script
     if (!PAUSED) {
 
-        TIME_DELTA = (ticks - PREV_SDL_TICKS) / 1000.0f;
-        TIME = ticks / 1000.0f;
+        set_float(TIME_DELTA, (ticks - PREV_SDL_TICKS) / 1000.0f);
+        set_float(TIME, ticks / 1000.0f);
 
         PREV_SDL_TICKS = ticks;
     }
@@ -149,7 +149,7 @@ bool load_user_script_filename(std::string const& _filename)
 
     if (_filename != "") {
         std::string filename = get_absolute_path(_filename);
-        runtime_branch()["user_script_filename"]->asString() = filename;
+        set_str(runtime_branch()["user_script_filename"], filename);
         std::cout << "Loading script: " << filename << std::endl;
         
         include_function::load_script(users_branch);

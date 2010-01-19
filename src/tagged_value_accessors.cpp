@@ -68,6 +68,12 @@ void set_null(TaggedValue& value)
     value.data.ptr = 0;
 }
 
+void set_pointer(TaggedValue& value, Type* type, void* p)
+{
+    value.type = type;
+    value.data.ptr = p;
+}
+
 void set_branch_value(Term* term, Branch* branch) { set_branch_value(term->value, branch); }
 void set_type_value(Term* term, Type* type) { set_type_value(term->value, type); }
 void set_int(Term* term, int i) { set_int(term->value, i); }
@@ -120,11 +126,18 @@ Branch* get_branch_value(TaggedValue const& value)
     return (Branch*) value.data.ptr;
 }
 
+void* get_pointer(TaggedValue const& value, Type* expectedType)
+{
+    assert(value.type == expectedType);
+    return value.data.ptr;
+}
+
 int as_int(Term* t) { return as_int(t->value); }
 float as_float(Term* t) { return as_float(t->value); }
 std::string const& as_string(Term* t) { return as_string(t->value); }
 bool as_bool(Term* t) { return as_bool(t->value); }
 Ref& as_ref(Term* t) { return as_ref(t->value); }
+void* get_pointer(Term* term, Type* expectedType) { return get_pointer(term->value, expectedType); }
 
 bool is_value_int(TaggedValue const& value)
 {
@@ -156,11 +169,17 @@ bool is_value_branch(TaggedValue const& value)
     return value.type == (Type*) BRANCH_TYPE->value.data.ptr;
 }
 
+bool is_value_of_type(TaggedValue const& value, Type* type)
+{
+    return value.type == type;
+}
+
 bool is_value_int(Term* t) { return is_value_int(t->value); }
 bool is_value_float(Term* t) { return is_value_float(t->value); }
 bool is_value_bool(Term* t) { return is_value_bool(t->value); }
 bool is_value_string(Term* t) { return is_value_string(t->value); }
 bool is_value_ref(Term* t) { return is_value_ref(t->value); }
 bool is_value_branch(Term* t) { return is_value_branch(t->value); }
+bool is_value_of_type(Term* t, Type* type) { return is_value_of_type(t->value, type); }
 
 } // namespace circa
