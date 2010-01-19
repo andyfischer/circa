@@ -69,7 +69,7 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     if (is_branch(term))
         as_branch(term).remapPointers(map);
 
-    RemapPointersFunc remapPointers = type_t::get_remap_pointers_func(term->type);
+    Type::RemapPointersFunc remapPointers = type_t::get_remap_pointers_func(term->type);
 
     // Remap on value
     if ((term->value.data.ptr != NULL)

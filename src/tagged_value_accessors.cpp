@@ -43,16 +43,18 @@ void set_bool(TaggedValue& value, bool b)
     value.data.asbool = b;
 }
 
-void set_str(TaggedValue& value, std::string const& s)
+void set_str(TaggedValue& value, const char* s)
 {
-    value.type = (Type*) STRING_TYPE->value.data.ptr;
+    if (value.type != STRING_TYPE->value.data.ptr) {
+        value.type = (Type*) STRING_TYPE->value.data.ptr;
+        value.data.ptr = new std::string();
+    }
     *((std::string*) value.data.ptr) = s;
 }
 
-void set_str(TaggedValue& value, const char* s)
+void set_str(TaggedValue& value, std::string const& s)
 {
-    value.type = (Type*) STRING_TYPE->value.data.ptr;
-    *((std::string*) value.data.ptr) = s;
+    set_str(value, s.c_str());
 }
 
 void set_ref(TaggedValue& value, Term* t)

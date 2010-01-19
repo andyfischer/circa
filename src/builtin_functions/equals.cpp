@@ -15,7 +15,7 @@ namespace equals_function {
             return;
         }
 
-        EqualsFunc equals = type_t::get_equals_func(lhs->type);
+        Type::EqualsFunc equals = type_t::get_equals_func(lhs->type);
 
         if (equals == NULL) {
             std::stringstream error;

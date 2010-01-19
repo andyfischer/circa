@@ -21,7 +21,7 @@ void alloc_value(Term* term)
 {
     if (is_value_alloced(term)) return;
 
-    AllocFunc alloc = type_t::get_alloc_func(term->type);
+    Type::AllocFunc alloc = type_t::get_alloc_func(term->type);
 
     if (alloc == NULL)
         // this happens while bootstrapping
@@ -42,7 +42,7 @@ void dealloc_value(Term* term)
     if (term->type == NULL) return;
     if (!is_value_alloced(term)) return;
 
-    DeallocFunc dealloc = type_t::get_dealloc_func(term->type);
+    Type::DeallocFunc dealloc = type_t::get_dealloc_func(term->type);
 
     if (!is_value_alloced(term->type)) {
         std::cout << "warn: in dealloc_value, type is undefined" << std::endl;
@@ -78,12 +78,29 @@ void assign_value(Term* source, Term* dest)
     if (!is_value_alloced(dest))
         alloc_value(dest);
 
-    AssignFunc assign = type_t::get_assign_func(dest->type);
+    Type::AssignFunc assign = type_t::get_assign_func(dest->type);
 
     if (assign == NULL)
         throw std::runtime_error("type "+type_t::get_name(dest->type)+" has no assign function");
 
     assign(source, dest);
+}
+
+void initialize_value(Term* term)
+{
+    initialize_value(&as_type(term->type), term->value);
+}
+
+void initialize_value(Type* type, TaggedValue& value)
+{
+    Type::InitializeFunc initialize = type->initialize;
+
+    if (initialize != NULL) {
+        value = initialize(type);
+    } else {
+        // Default behavior if the type does not have 'initialize' defined.
+        set_pointer(value, type, NULL);
+    }
 }
 
 } // namespace circa

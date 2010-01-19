@@ -11,15 +11,6 @@ Term* INT_TYPE = NULL;
 Term* REF_TYPE = NULL;
 Term* STRING_TYPE = NULL;
 
-// thunks for Type:
-Term* ALLOC_THUNK_TYPE = NULL;
-Term* DEALLOC_THUNK_TYPE = NULL;
-Term* DUPLICATE_THUNK_TYPE = NULL;
-Term* ASSIGN_THUNK_TYPE = NULL;
-Term* EQUALS_THUNK_TYPE = NULL;
-Term* REMAP_POINTERS_THUNK_TYPE = NULL;
-Term* STD_TYPE_INFO_TYPE = NULL;
-
 // thunks for Function:
 Term* EVALUATE_THUNK_TYPE = NULL;
 Term* SPECIALIZE_THUNK_TYPE = NULL;
@@ -27,54 +18,6 @@ Term* SPECIALIZE_THUNK_TYPE = NULL;
 // common thunks:
 Term* TO_STRING_THUNK_TYPE = NULL;
 Term* CHECK_INVARIANTS_THUNK_TYPE = NULL;
-
-AllocFunc& as_alloc_thunk(Term* term)
-{
-    assert_type(term, ALLOC_THUNK_TYPE);
-    return ((AllocFunc&) term->value.data.ptr);
-}
-
-DeallocFunc& as_dealloc_thunk(Term* term)
-{
-    assert_type(term, DEALLOC_THUNK_TYPE);
-    return ((DeallocFunc&) term->value.data.ptr);
-}
-
-DuplicateFunc& as_duplicate_thunk(Term* term)
-{
-    assert_type(term, DUPLICATE_THUNK_TYPE);
-    return ((DuplicateFunc&) term->value.data.ptr);
-}
-
-AssignFunc& as_assign_thunk(Term* term)
-{
-    assert_type(term, ASSIGN_THUNK_TYPE);
-    return ((AssignFunc&) term->value.data.ptr);
-}
-
-EqualsFunc& as_equals_thunk(Term* term)
-{
-    assert_type(term, EQUALS_THUNK_TYPE);
-    return ((EqualsFunc&) term->value.data.ptr);
-}
-
-RemapPointersFunc& as_remap_pointers_thunk(Term* term)
-{
-    assert_type(term, REMAP_POINTERS_THUNK_TYPE);
-    return ((RemapPointersFunc&) term->value.data.ptr);
-}
-
-ToStringFunc& as_to_string_thunk(Term* term)
-{
-    assert_type(term, TO_STRING_THUNK_TYPE);
-    return ((ToStringFunc&) term->value.data.ptr);
-}
-
-const std::type_info*& as_std_type_info(Term* term)
-{
-    assert_type(term, STD_TYPE_INFO_TYPE);
-    return ((const std::type_info*&) term->value.data.ptr);
-}
 
 EvaluateFunc& as_evaluate_thunk(Term* term)
 {
@@ -120,6 +63,10 @@ float to_float(Term* term)
 }
 
 namespace int_t {
+    void initialize(Type* type, TaggedValue& value)
+    {
+        set_int(value, 0);
+    }
     std::string to_string(Term* term)
     {
         std::stringstream strm;
@@ -137,6 +84,10 @@ bool is_int(Term* term)
 }
 
 namespace float_t {
+    void initialize(Type* type, TaggedValue& value)
+    {
+        set_float(value, 0);
+    }
 
     void assign(Term* source, Term* dest)
     {
@@ -192,6 +143,10 @@ bool is_float(Term* term)
 }
 
 namespace string_t {
+    void initialize(Type* type, TaggedValue& value)
+    {
+        set_str(value, "");
+    }
     std::string to_string(Term* term)
     {
         std::string quoteType = term->stringPropOptional("syntax:quoteType", "'");
@@ -441,14 +396,6 @@ void initialize_primitive_types(Branch& kernel)
     VOID_TYPE = create_empty_type(kernel, "void");
     type_t::get_to_string_func(VOID_TYPE) = void_t::to_string;
     type_t::get_is_pointer(VOID_TYPE) = false;
-
-    //ALLOC_THUNK_TYPE = import_type<AllocFunc>(kernel, "AllocThunk");
-    //DEALLOC_THUNK_TYPE = import_type<DeallocFunc>(kernel, "DeallocThunk");
-    //DUPLICATE_THUNK_TYPE = import_type<DuplicateFunc>(kernel, "DuplicateThunk");
-    //ASSIGN_THUNK_TYPE = import_type<AssignFunc>(kernel, "AssignThunk");
-    //EQUALS_THUNK_TYPE = import_type<EqualsFunc>(kernel, "EqualsThunk");
-    //REMAP_POINTERS_THUNK_TYPE = import_type<RemapPointersFunc>(kernel, "RemapPointersThunk");
-    //TO_STRING_THUNK_TYPE = import_type<ToStringFunc>(kernel, "ToStringThunk");
 }
 
 void post_setup_primitive_types()

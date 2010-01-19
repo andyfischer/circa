@@ -27,7 +27,6 @@ SDL_Color unpack_sdl_color(Term* colorTerm)
 void load_font(Term* term)
 {
     Term* state = term->input(0);
-    
 
     if (as<TTF_Font*>(term->input(0)) != NULL) {
         as<TTF_Font*>(term) = as<TTF_Font*>(term->input(0));

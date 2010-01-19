@@ -75,31 +75,31 @@ namespace type_t {
     {
         return as_type(type).cppTypeInfo;
     }
-    AllocFunc& get_alloc_func(Term* type)
+    Type::AllocFunc& get_alloc_func(Term* type)
     {
         return as_type(type).alloc;
     }
-    DeallocFunc& get_dealloc_func(Term* type)
+    Type::DeallocFunc& get_dealloc_func(Term* type)
     {
         return as_type(type).dealloc;
     }
-    AssignFunc& get_assign_func(Term* type)
+    Type::AssignFunc& get_assign_func(Term* type)
     {
         return as_type(type).assign;
     }
-    EqualsFunc& get_equals_func(Term* type)
+    Type::EqualsFunc& get_equals_func(Term* type)
     {
         return as_type(type).equals;
     }
-    RemapPointersFunc& get_remap_pointers_func(Term* type)
+    Type::RemapPointersFunc& get_remap_pointers_func(Term* type)
     {
         return as_type(type).remapPointers;
     }
-    ToStringFunc& get_to_string_func(Term* type)
+    Type::ToStringFunc& get_to_string_func(Term* type)
     {
         return as_type(type).toString;
     }
-    CheckInvariantsFunc& get_check_invariants_func(Term* type)
+    Type::CheckInvariantsFunc& get_check_invariants_func(Term* type)
     {
         return as_type(type).checkInvariants;
     }
@@ -349,7 +349,7 @@ bool equals(Term* a, Term* b)
     if (a->type != b->type)
         return false;
 
-    EqualsFunc equals_func = type_t::get_equals_func(a->type);
+    Type::EqualsFunc equals_func = type_t::get_equals_func(a->type);
 
     if (equals_func == NULL)
         throw std::runtime_error("type "+type_t::get_name(a->type)+" has no equals function");
@@ -359,7 +359,7 @@ bool equals(Term* a, Term* b)
 
 std::string to_string(Term* term)
 {
-    ToStringFunc func = type_t::get_to_string_func(term->type);
+    Type::ToStringFunc func = type_t::get_to_string_func(term->type);
 
     if (func == NULL) {
         // Generic to-string

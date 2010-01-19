@@ -18,6 +18,19 @@ namespace circa {
 
 struct Type
 {
+    typedef void (*AllocFunc)(Term* type, Term* term);
+    typedef void (*DeallocFunc)(Term* type, Term* term);
+    typedef void (*DuplicateFunc)(Term* src, Term* dest);
+    typedef void (*AssignFunc)(Term* src, Term* dest);
+    typedef bool (*EqualsFunc)(Term* src, Term* dest);
+    typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
+    typedef std::string (*ToStringFunc)(Term* term);
+    typedef bool (*CheckInvariantsFunc)(Term* term, std::string* output);
+    
+    // new style:
+    typedef bool (*ValueFitsTypeFunc)(Type* type, TaggedValue const& value);
+    typedef TaggedValue (*InitializeFunc)(Type* type);
+
     std::string name;
 
     // Whether the term's value is a pointer. If it is, then we might check if its NULL to see if it
@@ -29,13 +42,15 @@ struct Type
     const std::type_info *cppTypeInfo;
 
     // Functions
-    AllocFunc alloc;
+    AllocFunc alloc; // deprecated
     DeallocFunc dealloc;
-    AssignFunc assign;
+    AssignFunc assign; // deprecated
     EqualsFunc equals;
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
     CheckInvariantsFunc checkInvariants;
+    ValueFitsTypeFunc valueFitsType;
+    InitializeFunc initialize;
     
     Branch prototype;
 
@@ -60,7 +75,9 @@ struct Type
         equals(NULL),
         remapPointers(NULL),
         toString(NULL),
-        checkInvariants(NULL)
+        checkInvariants(NULL),
+        valueFitsType(NULL),
+        initialize(NULL)
     {
     }
 
@@ -85,13 +102,13 @@ namespace type_t {
     std::string& get_name(Term* type);
     bool& get_is_pointer(Term* type);
     const std::type_info*& get_std_type_info(Term* type);
-    AllocFunc& get_alloc_func(Term* type);
-    DeallocFunc& get_dealloc_func(Term* type);
-    AssignFunc& get_assign_func(Term* type);
-    EqualsFunc& get_equals_func(Term* type);
-    RemapPointersFunc& get_remap_pointers_func(Term* type);
-    ToStringFunc& get_to_string_func(Term* type);
-    CheckInvariantsFunc& get_check_invariants_func(Term* type);
+    Type::AllocFunc& get_alloc_func(Term* type);
+    Type::DeallocFunc& get_dealloc_func(Term* type);
+    Type::AssignFunc& get_assign_func(Term* type);
+    Type::EqualsFunc& get_equals_func(Term* type);
+    Type::RemapPointersFunc& get_remap_pointers_func(Term* type);
+    Type::ToStringFunc& get_to_string_func(Term* type);
+    Type::CheckInvariantsFunc& get_check_invariants_func(Term* type);
     Branch& get_prototype(Term* type);
     Branch& get_attributes(Term* type);
     Branch& get_member_functions(Term* type);

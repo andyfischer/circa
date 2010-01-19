@@ -8,9 +8,12 @@
 namespace circa {
 
 bool is_value_alloced(Term* term);
-void alloc_value(Term* term);
-void dealloc_value(Term* term);
+void alloc_value(Term* term); // deprecated
+void dealloc_value(Term* term); // deprecated
 void assign_value(Term* source, Term* dest);
+
+void initialize_value(Term* term);
+void initialize_value(Type* type, TaggedValue& value);
 
 } // namespace circa
 

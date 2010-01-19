@@ -286,13 +286,11 @@ void test_imported_pointer_type()
     Branch branch;
     Term* T = branch.eval("type T {}");
 
-
     import_type<test_nativeType*>(branch["T"]);
 
     Term* v = branch.eval("v = T()");
 
     test_assert(is_value_of_type(v, &as_type(T)));
-    //fixme test_assert(get_pointer(v, &as_type(T)) == NULL);
 }
 
 void register_tests()
