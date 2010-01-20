@@ -249,10 +249,6 @@ void test_missing_functions()
 
     try { equals(a,b); } catch (std::runtime_error&) { threw = true; }
     test_assert(threw);
-
-    threw = false;
-    try { assign_value(a,b); } catch (std::runtime_error&) { threw = true; }
-    test_assert(threw);
 }
 
 void test_find_common_type()

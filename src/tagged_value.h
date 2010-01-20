@@ -17,7 +17,9 @@ struct TaggedValue
     TaggedValueData data;
     Type* type;
 
-    TaggedValue() : type(NULL) { data.ptr = 0; }
+    TaggedValue();
+    TaggedValue(TaggedValue const& copy);
+    TaggedValue& operator=(TaggedValue const& rhs);
 };
 
 } // namespace circa

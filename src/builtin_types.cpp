@@ -4,6 +4,8 @@
 
 namespace circa {
 
+Type* STRING_TYPE_2 = NULL;
+
 namespace list_t {
 
     std::string to_string(Term* caller)
@@ -452,6 +454,32 @@ namespace branch_mirror_t
     }
 
 } // namespace branch_mirror_t
+
+namespace string_t_2 {
+
+    void initialize(Type* type, TaggedValue* value)
+    {
+        set_pointer(*value, STRING_TYPE_2, new std::string());
+    }
+
+    void assign(TaggedValue* source, TaggedValue* dest)
+    {
+        *((std::string*) get_pointer(*dest, STRING_TYPE_2)) = as_string(*source);
+    }
+
+    bool equals(TaggedValue* lhs, TaggedValue* rhs)
+    {
+        return as_string(*lhs) == as_string(*rhs);
+    }
+}
+
+void initialize_builtin_types()
+{
+    STRING_TYPE_2 = new Type();
+    STRING_TYPE_2->initialize = string_t_2::initialize;
+    STRING_TYPE_2->assign2 = string_t_2::assign;
+    STRING_TYPE_2->equals2 = string_t_2::equals;
+}
 
 void setup_builtin_types(Branch& kernel)
 {

@@ -81,26 +81,9 @@ void assign_value(Term* source, Term* dest)
     Type::AssignFunc assign = type_t::get_assign_func(dest->type);
 
     if (assign == NULL)
-        throw std::runtime_error("type "+type_t::get_name(dest->type)+" has no assign function");
+        assign_value(source->value, dest->value);
 
     assign(source, dest);
-}
-
-void initialize_value(Term* term)
-{
-    initialize_value(&as_type(term->type), term->value);
-}
-
-void initialize_value(Type* type, TaggedValue& value)
-{
-    Type::InitializeFunc initialize = type->initialize;
-
-    if (initialize != NULL) {
-        value = initialize(type);
-    } else {
-        // Default behavior if the type does not have 'initialize' defined.
-        set_pointer(value, type, NULL);
-    }
 }
 
 } // namespace circa

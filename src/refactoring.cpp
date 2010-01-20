@@ -49,6 +49,8 @@ void change_type(Term *term, Term *typeTerm)
 
     term->type = typeTerm;
 
+    change_type(term->value, &as_type(typeTerm));
+
     if (is_value_alloced(term))
         assign_value_to_default(term);
 }

@@ -28,8 +28,11 @@ struct Type
     typedef bool (*CheckInvariantsFunc)(Term* term, std::string* output);
     
     // new style:
-    typedef bool (*ValueFitsTypeFunc)(Type* type, TaggedValue const& value);
-    typedef TaggedValue (*InitializeFunc)(Type* type);
+    typedef void (*InitializeFunc)(Type* type, TaggedValue* value);
+    typedef void (*DestroyFunc)(Type* type, TaggedValue* value);
+    typedef void (*AssignFunc2)(TaggedValue* source, TaggedValue* dest);
+    typedef bool (*EqualsFunc2)(TaggedValue* lhs, TaggedValue* rhs);
+    typedef bool (*ValueFitsTypeFunc)(Type* type, TaggedValue* value);
 
     std::string name;
 
@@ -50,7 +53,12 @@ struct Type
     ToStringFunc toString;
     CheckInvariantsFunc checkInvariants;
     ValueFitsTypeFunc valueFitsType;
+
+    // new stype:
     InitializeFunc initialize;
+    AssignFunc2 assign2;
+    DestroyFunc destroy;
+    EqualsFunc2 equals2;
     
     Branch prototype;
 
@@ -77,7 +85,9 @@ struct Type
         toString(NULL),
         checkInvariants(NULL),
         valueFitsType(NULL),
-        initialize(NULL)
+        initialize(NULL),
+        assign2(NULL),
+        destroy(NULL)
     {
     }
 

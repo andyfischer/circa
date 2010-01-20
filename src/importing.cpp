@@ -26,9 +26,11 @@ void install_function(Term* function, EvaluateFunc evaluate)
     function_t::get_evaluate(function) = evaluate;
 }
 
+// Deprecated:
 void shallow_assign(Term* a, Term* b)
 {
-    b->value = a->value;
+    assign_value(a->value, b->value);
+    //b->value = a->value;
 }
 
 bool shallow_equals(Term* a, Term* b)

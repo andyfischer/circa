@@ -8,9 +8,44 @@
 
 namespace circa {
 
-void set_value(TaggedValue& value, TaggedValue const& source)
+void assign_value(TaggedValue& source, TaggedValue& dest)
 {
-    value = source;
+    if (dest.type != source.type)
+        change_type(dest, source.type);
+
+    // check if the source type defines an assign function
+    Type::AssignFunc2 assign = NULL;
+    
+    if (source.type != NULL)
+        assign = source.type->assign2;
+
+    if (assign != NULL) {
+        assign(&source, &dest);
+    } else {
+        // Otherwise, default behavior is shallow assign
+        dest.data = source.data;
+    }
+}
+
+void change_type(TaggedValue& v, Type* type)
+{
+    if (v.type == type)
+        return;
+
+    if (v.type != NULL) {
+        Type::DestroyFunc destroy = v.type->destroy;
+        if (destroy != NULL)
+            destroy(v.type, &v);
+    }
+
+    v.type = type;
+    v.data.ptr = 0;
+
+    if (type != NULL) {
+        Type::InitializeFunc initialize = type->initialize;
+        if (initialize != NULL)
+            initialize(type, &v);
+    }
 }
 
 void set_branch_value(TaggedValue& value, Branch* branch)

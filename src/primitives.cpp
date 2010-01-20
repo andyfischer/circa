@@ -143,10 +143,6 @@ bool is_float(Term* term)
 }
 
 namespace string_t {
-    void initialize(Type* type, TaggedValue& value)
-    {
-        set_str(value, "");
-    }
     std::string to_string(Term* term)
     {
         std::string quoteType = term->stringPropOptional("syntax:quoteType", "'");
