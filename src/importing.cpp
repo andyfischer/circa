@@ -26,6 +26,16 @@ void install_function(Term* function, EvaluateFunc evaluate)
     function_t::get_evaluate(function) = evaluate;
 }
 
+Term* import_type(Branch& branch, Type* type)
+{
+    if (type->name == "")
+        throw std::runtime_error("In import_type, type must have a name");
+
+    Term* term = create_value(branch, TYPE_TYPE, type->name);
+    set_pointer(term->value, &as_type(TYPE_TYPE), type);
+    return term;
+}
+
 // Deprecated:
 void shallow_assign(Term* a, Term* b)
 {

@@ -60,6 +60,7 @@ bool raw_value_less_than(Term* a, Term* b);
 
 // Public functions
 
+// deprecated:
 template <class T>
 void import_type(Term* term)
 {
@@ -72,14 +73,6 @@ void import_type(Term* term)
     type->toString = NULL;
     type->remapPointers = NULL;
     type->checkInvariants = NULL;
-}
-
-template <class T>
-Term* import_type(Branch& branch, std::string name="")
-{
-    Term* term = create_type(branch, name);
-    import_type<T>(term);
-    return term;
 }
 
 template <class T>

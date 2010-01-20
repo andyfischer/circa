@@ -15,14 +15,13 @@ TaggedValue::TaggedValue()
 
 TaggedValue::TaggedValue(TaggedValue const& copy)
 {
-    std::cout << "tv copy" << std::endl;
+    assert(false);
 }
 
 TaggedValue&
 TaggedValue::operator=(TaggedValue const& rhs)
 {
     assert(false);
-    std::cout << "tv operator =" << std::endl;
     return *this;
 }
 

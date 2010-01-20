@@ -13,6 +13,22 @@ using namespace circa;
 
 namespace text {
 
+Type *TTF_Font_t = NULL;
+
+class TTF_Font_ptr
+{
+    TaggedValue* _value;
+
+public:
+    TTF_Font_ptr(TaggedValue* value) { _value = value; }
+    TTF_Font_ptr(Term* term) { _value = &term->value; }
+
+    operator TTF_Font*() { return (TTF_Font*) get_pointer(*_value, TTF_Font_t); }
+    TTF_Font_ptr& operator=(TTF_Font* rhs) { set_pointer(*_value, TTF_Font_t, rhs); return *this; }
+    TTF_Font* operator*() { return (TTF_Font*) get_pointer(*_value, TTF_Font_t); }
+    TTF_Font* operator->() { return (TTF_Font*) get_pointer(*_value, TTF_Font_t); }
+};
+
 SDL_Color unpack_sdl_color(Term* colorTerm)
 {
     Branch& color = as_branch(colorTerm);
@@ -26,19 +42,20 @@ SDL_Color unpack_sdl_color(Term* colorTerm)
 
 void load_font(Term* term)
 {
-    Term* state = term->input(0);
+    TTF_Font_ptr state = term->input(0);
+    TTF_Font_ptr output = term;
 
-    if (as<TTF_Font*>(term->input(0)) != NULL) {
-        as<TTF_Font*>(term) = as<TTF_Font*>(term->input(0));
+    if (*state != NULL) {
+        output = state;
         return;
     }
 
-    std::string path = term->input(1)->asString();
+    String path = term->input(1);
     int pointSize = term->input(2)->asInt();
 
     path = get_path_relative_to_source(term, path);
 
-    TTF_Font* result = TTF_OpenFont(path.c_str(), pointSize);
+    TTF_Font* result = TTF_OpenFont((const char*) path, pointSize);
     if (result == NULL) {
         std::stringstream err;
         err << "TTF_OpenFont failed to load " << path << " with error: " << TTF_GetError();
@@ -46,8 +63,8 @@ void load_font(Term* term)
         return;
     }
 
-    as<TTF_Font*>(term->input(0)) = result;
-    as<TTF_Font*>(term) = result;
+    state = result;
+    output = result;
 }
 
 struct RenderedText
@@ -56,17 +73,17 @@ struct RenderedText
 
     RenderedText(Term* term) : _term(term) {}
 
-    int& texid() { return _term->asBranch()[0]->asInt(); }
-    int& width() { return _term->asBranch()[1]->asInt(); }
-    int& height() { return _term->asBranch()[2]->asInt(); }
+    Int texid() { return Int(_term->asBranch()[0]); }
+    Int width() { return Int(_term->asBranch()[1]); }
+    Int height() { return Int(_term->asBranch()[2]); }
     Term* color() { return _term->asBranch()[3]; }
-    std::string& text() { return _term->asBranch()[4]->asString(); }
+    String text() { return String(_term->asBranch()[4]); }
 };
 
 void render_text(Term* caller)
 {
     RenderedText state(caller->input(0));
-    std::string text = caller->input(2)->asString();
+    String text = caller->input(2);
     Term* color = caller->input(3);
 
     bool changed_color = !branch_t::equals(state.color(), color);
@@ -86,11 +103,11 @@ void render_text(Term* caller)
         // Render the text to a new surface, upload it as a texture, destroy the surface,
         // save the texture id.
 
-        TTF_Font* font = as<TTF_Font*>(caller->input(1));
+        TTF_Font_ptr font = caller->input(1);
         //SDL_Color bgcolor = {0, 0, 0, 0}; // todo
 
         SDL_Color sdlColor = unpack_sdl_color(caller->input(3));
-        SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), sdlColor);
+        SDL_Surface *surface = TTF_RenderText_Blended(*font, (const char*) text, sdlColor);
 
         state.texid() = load_surface_to_texture(surface);
         state.width() = surface->w;
@@ -134,24 +151,20 @@ void draw_rendered_text(Term* caller)
     gl_check_error(caller);
 }
 
+void pre_setup(Branch& branch)
+{
+    TTF_Font_t = new Type();
+    initialize_simple_pointer_type(TTF_Font_t);
+    TTF_Font_t->name = "TTF_Font";
+    import_type(branch, TTF_Font_t);
+}
+
 void setup(Branch& branch)
 {
     if (TTF_Init() == -1) {
         std::cout << "TTF_Init failed with error: " << TTF_GetError();
         return;
     }
-
-    Term* TTF_Font_t = branch["TTF_Font"];
-
-    // Dealloc existing TTF_Font values before we modify the type. This should probably
-    // be done automatically inside import_type.
-    for (BranchIterator it(branch); !it.finished(); ++it) {
-        if (it->type == TTF_Font_t)
-            dealloc_value(*it);
-    }
-
-    // Update the TTF_Font type
-    import_type<TTF_Font*>(TTF_Font_t);
 
     Branch& text_ns = branch["text"]->asBranch();
 

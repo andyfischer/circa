@@ -62,6 +62,8 @@ extern Term* OVERLOADED_FUNCTION_TYPE;
 extern Term* TYPE_TYPE;
 extern Term* VOID_TYPE;
 
+extern Type* NULL_T;
+
 // Get a named term from the global namespace.
 Term* get_global(std::string name);
 

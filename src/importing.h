@@ -24,7 +24,10 @@ Term* import_member_function(Term* type, EvaluateFunc evaluate,
 // Install an evaluate function into an existing function object.
 void install_function(Term* function, EvaluateFunc evaluate);
 
+Term* import_type(Branch& branch, Type* type);
+
 // Some common thunks for imported types.
+// TODO: Delete or move to type.cpp
 void shallow_assign(Term* a, Term* b);
 bool shallow_equals(Term* a, Term* b);
 void zero_alloc(Term *type, Term* t);

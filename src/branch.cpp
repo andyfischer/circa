@@ -492,6 +492,7 @@ std::string get_source_file_location(Branch& branch)
 bool branch_check_invariants(Branch& branch, std::ostream* output)
 {
     bool success = true;
+
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
         if (term == NULL) continue;
@@ -499,15 +500,30 @@ bool branch_check_invariants(Branch& branch, std::ostream* output)
         // Check that the term's index is correct
         if (term->index != (unsigned) i) {
             success = false;
-            if (output != NULL)
-                *output<<"branch["<<i<<"] has wrong index ("<<term->index<<")" << std::endl;
+            if (output != NULL) {
+                *output << get_short_location(term) << " has wrong index: found "<<term->index
+                   << ", should be " << i << std::endl;
+            }
         }
 
         // Check that owningBranch is correct
         if (term->owningBranch != &branch) {
             success = false;
-            if (output != NULL)
-                *output<<"branch["<<i<<"] has wrong owningBranch"<<std::endl;
+            if (output != NULL) {
+                *output << get_short_location(term) << " has wrong owningBranch: found"
+                    << term->owningBranch << ", should be " << &branch << std::endl;
+            }
+        }
+
+        // Run check_invariants on the term
+        if (term != NULL) {
+            std::string str;
+            bool result = check_invariants(term, str);
+            if (!result) {
+                success = false;
+                if (output != NULL)
+                    *output << get_short_location(term) << " " << str << std::endl;
+            }
         }
     }
     return success;

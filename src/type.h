@@ -33,6 +33,7 @@ struct Type
     typedef void (*AssignFunc2)(TaggedValue* source, TaggedValue* dest);
     typedef bool (*EqualsFunc2)(TaggedValue* lhs, TaggedValue* rhs);
     typedef bool (*ValueFitsTypeFunc)(Type* type, TaggedValue* value);
+    typedef void (*CastFunc)(Type* type, TaggedValue* source, TaggedValue* dest);
 
     std::string name;
 
@@ -59,6 +60,7 @@ struct Type
     AssignFunc2 assign2;
     DestroyFunc destroy;
     EqualsFunc2 equals2;
+    CastFunc cast;
     
     Branch prototype;
 
@@ -87,7 +89,9 @@ struct Type
         valueFitsType(NULL),
         initialize(NULL),
         assign2(NULL),
-        destroy(NULL)
+        destroy(NULL),
+        equals2(NULL),
+        cast(NULL)
     {
     }
 
@@ -101,10 +105,7 @@ struct Type
 };
 
 namespace type_t {
-    void alloc(Term* type, Term* term);
-    void dealloc(Term* type, Term* term);
     std::string to_string(Term *caller);
-    void assign(Term* source, Term* dest);
     void remap_pointers(Term *term, ReferenceMap const& map);
     void name_accessor(Term* caller);
 
@@ -153,6 +154,7 @@ Term* find_common_type(RefList const& list);
 
 void initialize_empty_type(Term* term);
 void initialize_compound_type(Term* term);
+void initialize_simple_pointer_type(Type* type);
 
 std::string compound_type_to_string(Term* caller);
 
@@ -160,17 +162,8 @@ std::string compound_type_to_string(Term* caller);
 bool equals(Term* a, Term* b);
 std::string to_string(Term* term);
 void assign_value_to_default(Term* term);
-bool check_invariants(Term* term, std::string* failureMessage = NULL);
 
 Term* parse_type(Branch& branch, std::string const& decl);
-
-void type_set_nocopy(Term* type);
-
-namespace common_assign_funcs {
-
-void steal_value(Term* a, Term* b);
-
-}
 
 } // namespace circa
 

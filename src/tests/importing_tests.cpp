@@ -29,9 +29,22 @@ void test_import_c()
     test_assert(as_int(result) == 9);
 }
 
+void test_import_type()
+{
+    Branch branch;
+
+    Type type;
+    type.name = "A";
+
+    Term* term = import_type(branch, &type);
+    test_assert(term->type == TYPE_TYPE);
+    test_assert(term->name == "A");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(importing_tests::test_import_c);
+    REGISTER_TEST_CASE(importing_tests::test_import_type);
 }
 
 } // namespace importing_tests

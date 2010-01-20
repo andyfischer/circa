@@ -36,6 +36,7 @@ namespace circa {
 
 struct Branch;
 struct FeedbackOperation;
+struct TaggedValue;
 struct Term;
 struct Type;
 struct Ref;

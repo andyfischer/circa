@@ -18,21 +18,21 @@ namespace textures {
 
 void hosted_load_texture(Term* caller)
 {
-    int& texid = caller->input(0)->asInt();
+    Int texid = caller->input(0);
 
     if (texid == 0) {
         std::string filename = caller->input(1)->asString();
         GLuint id = load_image_to_texture(filename.c_str(), caller);
         texid = id;
     }
-    caller->asInt() = texid;
+    set_int(caller, texid);
 
     gl_check_error(caller);
 }
 
 void hosted_image(Term* caller)
 {
-    int& texid = caller->input(0)->asInt();
+    Int texid = caller->input(0);
     std::string filename = caller->input(1)->asString();
     float x1 = caller->input(2)->toFloat();
     float y1 = caller->input(3)->toFloat();

@@ -67,6 +67,9 @@ Term* OVERLOADED_FUNCTION_TYPE = NULL;
 Term* TYPE_TYPE = NULL;
 Term* VOID_TYPE = NULL;
 
+// New style: Type* pointers for builtins
+Type* NULL_T = NULL;
+
 Term* get_global(std::string name)
 {
     if (KERNEL->contains(name))
@@ -76,6 +79,11 @@ Term* get_global(std::string name)
 }
 
 void empty_evaluate_function(Term*) { }
+void create_builtin_types()
+{
+    NULL_T = new Type();
+    NULL_T->name = "null";
+}
 
 void bootstrap_kernel()
 {
@@ -96,9 +104,8 @@ void bootstrap_kernel()
     Type* typeType = new Type();
     set_type_value(TYPE_TYPE->value, typeType);
     typeType->name = "Type";
-    typeType->alloc = type_t::alloc;
-    typeType->dealloc = type_t::dealloc;
-    typeType->assign = type_t::assign;
+    typeType->initialize = type_t::initialize;
+    typeType->assign2 = type_t::assign;
     typeType->remapPointers = type_t::remap_pointers;
     typeType->toString = type_t::to_string;
     KERNEL->bindName(TYPE_TYPE, "Type");
@@ -193,6 +200,7 @@ void post_setup_builtin_functions(Branch& kernel)
 
 void initialize()
 {
+    create_builtin_types();
     bootstrap_kernel();
     initialize_primitive_types(*KERNEL);
     post_initialize_primitive_types(*KERNEL);

@@ -169,6 +169,7 @@ void print_runtime_errors(Branch& branch, std::ostream& output)
 std::string get_short_location(Term* term)
 {
     std::stringstream out;
+    out << "[";
     std::string filename = get_source_filename(term);
     if (filename != "")
         out << get_source_filename(term) << ":";
@@ -177,6 +178,7 @@ std::string get_short_location(Term* term)
     out << ",";
     if (term->hasProperty("colStart")) out << term->intProp("colStart");
     else out << "col?";
+    out << "]";
     return out.str();
 }
 

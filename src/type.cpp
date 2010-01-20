@@ -7,15 +7,6 @@
 namespace circa {
 
 namespace type_t {
-    void alloc(Term* type, Term* term)
-    {
-        set_type_value(term->value, new Type());
-    }
-    void dealloc(Term* type, Term* term)
-    {
-        // FIXME
-        // delete reinterpret_cast<Type*>(data);
-    }
     std::string to_string(Term* term)
     {
         if (is_native_type(term))
@@ -43,11 +34,6 @@ namespace type_t {
         out << "}";
 
         return out.str();
-    }
-
-    void assign(Term* source, Term* dest)
-    {
-        set_type_value(dest->value, get_type_value(source->value));
     }
 
     void remap_pointers(Term *type, ReferenceMap const& map)
@@ -326,6 +312,14 @@ void initialize_compound_type(Term* term)
     type_t::get_to_string_func(term) = compound_type_to_string;
 }
 
+void initialize_simple_pointer_type(Type* type)
+{
+    type->alloc = NULL;
+    type->dealloc = NULL;
+    type->initialize = NULL;
+    type->destroy = NULL;
+    type->assign = NULL;
+}
 
 std::string compound_type_to_string(Term* caller)
 {
@@ -346,15 +340,15 @@ std::string compound_type_to_string(Term* caller)
 
 bool equals(Term* a, Term* b)
 {
+    Type::EqualsFunc equals_func = type_t::get_equals_func(a->type);
+
+    if (equals_func != NULL)
+        return equals_func(a,b);
+
     if (a->type != b->type)
         return false;
 
-    Type::EqualsFunc equals_func = type_t::get_equals_func(a->type);
-
-    if (equals_func == NULL)
-        throw std::runtime_error("type "+type_t::get_name(a->type)+" has no equals function");
-
-    return equals_func(a,b);
+    return equals(a->value, b->value);
 }
 
 std::string to_string(Term* term)
@@ -397,41 +391,22 @@ void assign_value_to_default(Term* term)
 
         // Otherwise, if it's branched-based, use the prototype
         if (is_branch(term)) {
+
+            Branch& prototype = type_t::get_prototype(term->type);
+
             as_branch(term).clear();
-            duplicate_branch(type_t::get_prototype(term->type), as_branch(term));
+            if (prototype.length() > 0) {
+                //std::cout << "non-empty prototype for type: " << term->type->name << std::endl;
+                duplicate_branch(type_t::get_prototype(term->type), as_branch(term));
+            }
             return;
         }
     }
-}
-
-bool check_invariants(Term* term, std::string* failureMessage)
-{
-    CheckInvariantsFunc checkInvariants = type_t::get_check_invariants_func(term->type);
-    if (checkInvariants == NULL)
-        return true;
-
-    return checkInvariants(term, failureMessage);
 }
 
 Term* parse_type(Branch& branch, std::string const& decl)
 {
     return parser::compile(&branch, parser::type_decl, decl);
 }
-
-void type_set_nocopy(Term* type)
-{
-    as_type(type).assign = common_assign_funcs::steal_value;
-}
-
-namespace common_assign_funcs {
-
-void steal_value(Term* a, Term* b)
-{
-    dealloc_value(b);
-    b->value = a->value;
-    set_null(a->value);
-}
-
-} // namespace common_assign_funcs
 
 } // namespace circa

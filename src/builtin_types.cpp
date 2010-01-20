@@ -5,6 +5,86 @@
 namespace circa {
 
 Type* STRING_TYPE_2 = NULL;
+Type* REF_TYPE_2 = NULL;
+
+namespace int_t {
+    void initialize(Type* type, TaggedValue& value)
+    {
+        set_int(value, 0);
+    }
+    std::string to_string(Term* term)
+    {
+        std::stringstream strm;
+        if (term->stringPropOptional("syntax:integerFormat", "dec") == "hex")
+            strm << "0x" << std::hex;
+
+        strm << as_int(term);
+        return strm.str();
+    }
+}
+
+namespace float_t {
+    void initialize(Type* type, TaggedValue& value)
+    {
+        set_float(value, 0);
+    }
+
+    void cast(Type* type, TaggedValue* source, TaggedValue* dest)
+    {
+        set_float(*dest, to_float(*source));
+    }
+
+    bool equals(Term* a, Term* b)
+    {
+        return to_float(a) == to_float(b);
+    }
+
+    std::string to_string(Term* term)
+    {
+        // Correctly formatting floats is a tricky problem.
+
+        // First, check if we know how the user typed this number. If this value
+        // still has the exact same value, then use the original formatting.
+        if (term->hasProperty("float:original-format")) {
+            std::string const& originalFormat = term->stringProp("float:original-format");
+            float actual = as_float(term);
+            float original = (float) atof(originalFormat.c_str());
+            if (actual == original) {
+                return originalFormat;
+            }
+        }
+
+        // Otherwise, format the current value with naive formatting
+        std::stringstream strm;
+        strm << as_float(term);
+
+        if (term->floatPropOptional("mutability", 0.0) > 0.5)
+            strm << "?";
+
+        std::string result = strm.str();
+
+        // Check this string and make sure there is a decimal point. If not, append one.
+        bool decimalFound = false;
+        for (unsigned i=0; i < result.length(); i++)
+            if (result[i] == '.')
+                decimalFound = true;
+
+        if (!decimalFound)
+            return result + ".0";
+        else
+            return result;
+    }
+}
+
+namespace bool_t {
+    std::string to_string(Term* term)
+    {
+        if (as_bool(term))
+            return "true";
+        else
+            return "false";
+    }
+}
 
 namespace list_t {
 
@@ -455,10 +535,13 @@ namespace branch_mirror_t
 
 } // namespace branch_mirror_t
 
-namespace string_t_2 {
+namespace string_t {
 
     void initialize(Type* type, TaggedValue* value)
     {
+        // temp:
+        STRING_TYPE_2 = &as_type(STRING_TYPE);
+
         set_pointer(*value, STRING_TYPE_2, new std::string());
     }
 
@@ -471,14 +554,207 @@ namespace string_t_2 {
     {
         return as_string(*lhs) == as_string(*rhs);
     }
+
+    std::string to_string(Term* term)
+    {
+        std::string quoteType = term->stringPropOptional("syntax:quoteType", "'");
+        if (quoteType == "<") return "<<<" + as_string(term) + ">>>";
+        else return quoteType + as_string(term) + quoteType;
+    }
+
+    void length(Term* term)
+    {
+        set_int(term->value, int(term->input(0)->asString().length()));
+    }
+
+    void substr(Term* term)
+    {
+        set_str(term, as_string(term->input(0)).substr(int_input(term, 1), int_input(term, 2)));
+    }
+}
+
+namespace ref_t {
+    std::string to_string(Term* term)
+    {
+        Term* t = as_ref(term);
+        if (t == NULL)
+            return "NULL";
+        else
+            return format_global_id(t);
+    }
+    void initialize(Type* type, TaggedValue* value)
+    {
+        // Temp:
+        REF_TYPE_2 = &as_type(REF_TYPE);
+        set_pointer(*value, type, new Ref());
+    }
+    void assign(TaggedValue* source, TaggedValue* dest)
+    {
+        *((Ref*) get_pointer(*dest, REF_TYPE_2)) = as_ref(*source);
+    }
+    bool equals(Term* lhs, Term* rhs)
+    {
+        return as_ref(lhs) == as_ref(rhs);
+    }
+    void get_name(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+        set_str(caller, t->name);
+    }
+    void hosted_to_string(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+        set_str(caller, circa::to_string(t));
+    }
+    void get_function(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+        as_ref(caller) = t->function;
+    }
+    void hosted_typeof(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+        as_ref(caller) = t->type;
+    }
+    void assign(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+
+        Term* source = caller->input(1);
+
+        if (!is_assign_value_possible(source, t)) {
+            error_occurred(caller, "Can't assign (probably type mismatch)");
+            return;
+        }
+
+        assign_value(source, t);
+    }
+
+    int round(double a) {
+        return int(a + 0.5);
+    }
+
+    void tweak(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+
+        int steps = caller->input(1)->asInt();
+
+        if (steps == 0)
+            return;
+
+        if (is_float(t)) {
+            float step = get_step(t);
+
+            // do the math like this so that rounding errors are not accumulated
+            float new_value = (round(as_float(t) / step) + steps) * step;
+            set_float(t, new_value);
+
+        } else if (is_int(t))
+            set_int(t, as_int(t) + steps);
+        else
+            error_occurred(caller, "Ref is not an int or number");
+    }
+    void asint(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+        if (!is_int(t)) {
+            error_occurred(caller, "Not an int");
+            return;
+        }
+        set_int(caller, as_int(t));
+    }
+    void asfloat(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+        
+        set_float(caller, to_float(t));
+    }
+    void get_input(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+        int index = caller->input(1)->asInt();
+        if (index >= t->numInputs())
+            as_ref(caller) = NULL;
+        else
+            as_ref(caller) = t->input(index);
+    }
+    void num_inputs(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+        set_int(caller->value, t->numInputs());
+    }
+    void get_source_location(Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL) {
+            error_occurred(caller, "NULL reference");
+            return;
+        }
+        Branch& output = as_branch(caller);
+        set_int(output[0]->value, t->intPropOptional("colStart", 0));
+        set_int(output[1]->value, t->intPropOptional("lineStart", 0));
+    }
+}
+
+namespace type_t {
+    void initialize(Type* type, TaggedValue* value)
+    {
+        set_pointer(*value, type, new Type());
+    }
+    void assign(TaggedValue* source, TaggedValue* dest)
+    {
+        set_pointer(*dest, dest->type, get_pointer(*source, dest->type));
+    }
 }
 
 void initialize_builtin_types()
 {
+    // this function is not yet used
     STRING_TYPE_2 = new Type();
-    STRING_TYPE_2->initialize = string_t_2::initialize;
-    STRING_TYPE_2->assign2 = string_t_2::assign;
-    STRING_TYPE_2->equals2 = string_t_2::equals;
+    STRING_TYPE_2->initialize = string_t::initialize;
+    STRING_TYPE_2->assign2 = string_t::assign;
+    STRING_TYPE_2->equals2 = string_t::equals;
 }
 
 void setup_builtin_types(Branch& kernel)

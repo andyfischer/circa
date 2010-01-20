@@ -7,6 +7,7 @@
 #include "cpp_importing.h"
 #include "errors.h"
 #include "refactoring.h"
+#include "tagged_value_accessors.h"
 #include "primitives.h"
 
 namespace circa {
@@ -27,64 +28,28 @@ T as(Term* term)
     return *((T*) term->value.data.ptr);
 }
 
-#if 0
-template <class T, Term** type>
-class Accessor {
-    Ref _term;
+class Int {
+    TaggedValue* _value;
 
 public:
-    Accessor(Branch& branch, std::string const& name, T const& defaultValue)
-    {
-        if (branch.contains(name)) {
-            _term = branch[name];
-
-            if (_term->type != *type) {
-                change_type(_term, *type);
-                as<T>(_term) = defaultValue;
-            }
-        } else {
-            _term = create_value(branch, *type, name);
-            as<T>(_term) = defaultValue;
-        }
-    }
-
-    Accessor()
-    {
-    }
-
-    void reset(Term* term)
-    {
-        _term = term;
-    }
-
-    Accessor& operator=(Term* term)
-    {
-        reset(term);
-        return *this;
-    }
-
-    Accessor& operator=(T const& rhs)
-    {
-        as<T>(_term) = rhs;
-        return *this;
-    }
-
-    operator T&()
-    {
-        return as<T>(_term);
-    }
-
-    T& get()
-    {
-        return as<T>(_term);
-    }
+    Int(TaggedValue* value) { _value = value; }
+    Int(Term* term) { _value = &term->value; }
+    
+    Int& operator=(int rhs) { set_int(*_value, rhs); return *this; }
+    operator int() { return as_int(*_value); }
 };
 
-typedef Accessor<int, &INT_TYPE> Int;
-typedef Accessor<float, &FLOAT_TYPE> Float;
-typedef Accessor<bool, &BOOL_TYPE> Bool;
-typedef Accessor<std::string, &STRING_TYPE> String;
-#endif
+class String {
+    TaggedValue* _value;
+
+public:
+    String(TaggedValue* value) { _value = value; }
+    String(Term* term) { _value = &term->value; }
+    
+    String& operator=(std::string const& rhs) { set_str(*_value, rhs); return *this; }
+    operator std::string const&() { return as_string(*_value); }
+    operator const char*() { return as_string(*_value).c_str(); }
+};
 
 template <class T>
 T eval(std::string const& statement)

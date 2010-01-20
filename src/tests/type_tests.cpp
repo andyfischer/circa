@@ -159,6 +159,7 @@ void test_default_values()
     type_t::get_equals_func(t) = shallow_equals;
     type_t::get_is_pointer(t) = false;
 
+#if 0
     test_assert(type_t::get_default_value(t) == NULL);
 
     Term* t_value = create_value(branch, t);
@@ -172,6 +173,7 @@ void test_default_values()
     assign_value_to_default(t_value_2);
 
     test_assert(equals(t_value, t_value_2));
+#endif
 }
 
 void test_assign_compound_value_to_default()
@@ -231,26 +233,6 @@ void test_is_value_allocced()
     test_assert(!type_t::get_is_pointer(INT_TYPE));
 }
 
-void test_missing_functions()
-{
-    // Make sure we don't die if we call a function which tries to dispatch to
-    // a function which is missing.
-
-    Branch branch;
-
-    Term* t = create_type(branch);
-    type_t::get_equals_func(t) = NULL;
-    type_t::get_is_pointer(t) = false;
-
-    Term* a = create_value(branch, t);
-    Term* b = create_value(branch, t);
-
-    bool threw = false;
-
-    try { equals(a,b); } catch (std::runtime_error&) { threw = true; }
-    test_assert(threw);
-}
-
 void test_find_common_type()
 {
     test_assert(find_common_type(RefList(INT_TYPE,INT_TYPE)) == INT_TYPE);
@@ -289,6 +271,40 @@ void test_imported_pointer_type()
     test_assert(is_value_of_type(v, &as_type(T)));
 }
 
+namespace simple_pointer_test {
+
+Type* gType;
+void _evaluate(Term* caller)
+{
+    test_assert(is_value_of_type(caller->input(0), gType));
+    test_assert(is_value_of_type(caller, gType));
+
+    test_assert(get_pointer(caller->input(0)->value, gType) == NULL);
+    test_assert(get_pointer(caller->value, gType) == NULL);
+
+    set_pointer(caller->input(0)->value, gType, NULL);
+    set_pointer(caller->value, gType, NULL);
+}
+
+void test()
+{
+    gType = new Type();
+    gType->name = "T";
+    initialize_simple_pointer_type(gType);
+
+    Branch branch;
+    import_type(branch, gType);
+    import_function(branch, _evaluate, "f(T) -> T");
+
+    branch.eval("a = T()");
+    branch.eval("b = f(a)");
+
+    import_function(branch, _evaluate, "g(state T) -> T");
+    branch.eval("c = g()");
+}
+
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
@@ -301,10 +317,10 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);
     REGISTER_TEST_CASE(type_tests::test_is_value_allocced);
-    REGISTER_TEST_CASE(type_tests::test_missing_functions);
     REGISTER_TEST_CASE(type_tests::test_find_common_type);
     REGISTER_TEST_CASE(type_tests::test_type_error_in_a_native_call);
     REGISTER_TEST_CASE(type_tests::test_imported_pointer_type);
+    REGISTER_TEST_CASE(type_tests::simple_pointer_test::test);
 }
 
 } // namespace type_tests

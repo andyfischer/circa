@@ -60,6 +60,9 @@ bool initialize_plastic()
 
     RUNTIME_BRANCH = &create_branch(*circa::KERNEL, "plastic_main");
 
+    // Pre-setup
+    text::pre_setup(runtime_branch());
+
     // Load runtime.ca
     std::string runtime_ca_path = find_runtime_file();
     if (!file_exists(runtime_ca_path)) {
@@ -68,6 +71,8 @@ bool initialize_plastic()
         return false;
     }
     parse_script(runtime_branch(), runtime_ca_path);
+
+    assert(branch_check_invariants(runtime_branch(), &std::cout));
 
     // Fetch constants
     TIME = procure_value(runtime_branch(), FLOAT_TYPE, "time");

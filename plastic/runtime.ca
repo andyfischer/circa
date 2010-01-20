@@ -62,7 +62,6 @@ DELETE = 0
 KEY_B = 0
 
 -- Text rendering functions
-type TTF_Font {} -- native
 namespace text begin
     type RenderedText { int texid, int width, int height, Color color, string text }
     def load_font(state TTF_Font, string filename, int size) -> TTF_Font:

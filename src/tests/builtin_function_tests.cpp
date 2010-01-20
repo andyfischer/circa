@@ -27,7 +27,6 @@ void test_int()
 {
     Branch branch;
 
-    test_assert(type_t::get_equals_func(INT_TYPE) != NULL);
     test_assert(type_t::get_to_string_func(INT_TYPE) != NULL);
 
     Term* four = create_int(branch, 4);
@@ -62,13 +61,6 @@ void test_string()
     Branch branch;
 
     test_equals(as_string(branch.eval("concat(\"hello \", \"world\")")), "hello world");
-}
-
-void test_concat()
-{
-    Branch branch;
-
-    test_assert(eval<std::string>("concat('a ', 'b', ' c')") == "a b c");
 }
 
 void test_bool()
@@ -306,7 +298,6 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_float);
     REGISTER_TEST_CASE(builtin_function_tests::test_math);
     REGISTER_TEST_CASE(builtin_function_tests::test_string);
-    REGISTER_TEST_CASE(builtin_function_tests::test_concat);
     REGISTER_TEST_CASE(builtin_function_tests::test_bool);
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_list);

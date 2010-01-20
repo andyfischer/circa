@@ -78,7 +78,7 @@ bool has_runtime_error(Branch& branch)
 
 void print_runtime_error_formatted(Term* term, std::ostream& output)
 {
-    output << "[" << get_short_location(term) << "] ";
+    output << get_short_location(term);
 
     if (has_runtime_error(term) && has_runtime_error_message(term)) {
         output << get_runtime_error_message(term) << "\n";
@@ -300,8 +300,7 @@ bool has_static_errors(Branch& branch)
 
 void print_static_error_formatted(Term* term, std::ostream& output)
 {
-    output << "[" << get_short_location(term) << "] "
-        << get_static_error_message(term) << std::endl;
+    output << get_short_location(term) << get_static_error_message(term) << std::endl;
 }
 
 void print_static_errors_formatted(Branch& branch, std::ostream& output)

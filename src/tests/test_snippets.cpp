@@ -33,6 +33,15 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         return;
     }
 
+    std::stringstream checkInvariantsOutput;
+    if (!branch_check_invariants(code, &checkInvariantsOutput)) {
+        std::cout << "Failed invariant in code: " << get_current_test_name() << std::endl;
+        std::cout << checkInvariantsOutput.str();
+        print_branch_raw(std::cout, code);
+        declare_current_test_failed();
+        return;
+    }
+
     // Check that the input code had properly defined source locations
     for (BranchIterator it(code); !it.finished(); ++it) {
 
@@ -59,6 +68,15 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         std::cout << "Runtime error in: " << get_current_test_name() << std::endl;
         print_runtime_error_formatted(code, std::cout);
         std::cout << std::endl;
+        print_branch_raw(std::cout, code);
+        declare_current_test_failed();
+        return;
+    }
+
+    checkInvariantsOutput.clear();
+    if (!branch_check_invariants(assertions, &checkInvariantsOutput)) {
+        std::cout << "Failed invariant in assertions: " << get_current_test_name() << std::endl;
+        std::cout << checkInvariantsOutput.str();
         print_branch_raw(std::cout, code);
         declare_current_test_failed();
         return;
@@ -352,6 +370,11 @@ void test_significant_indentation()
     test_snippet("do once:\n a = 5", "");
 }
 
+void test_concat()
+{
+    test_snippet("", "concat('a' 'b' 'c') == 'abc'");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -378,6 +401,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_stateful_code);
     REGISTER_TEST_CASE(test_snippets::test_message_passing);
     REGISTER_TEST_CASE(test_snippets::test_significant_indentation);
+    REGISTER_TEST_CASE(test_snippets::test_concat);
 }
 
 } // namespace test_snippets

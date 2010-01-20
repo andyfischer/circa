@@ -5,6 +5,8 @@
 
 namespace text {
 
+void pre_setup(circa::Branch& branch);
+
 // called after loading runtime.ca
 void setup(circa::Branch& branch);
 

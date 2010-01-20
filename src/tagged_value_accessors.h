@@ -7,8 +7,16 @@
 
 namespace circa {
 
+// assign_value will attempt to assign the value of 'source' to 'dest'. The type
+// of 'dest' will not be changed; if the two values have different types then
+// we'll attempt to use the cast() function of 'dest'. If they have the same type
+// then we'll try to use the assign() function of this type, if none is defined
+// then we'll do a shallow copy.
 void assign_value(TaggedValue& source, TaggedValue& dest);
+
 void change_type(TaggedValue& v, Type* type);
+
+bool equals(TaggedValue& lhs, TaggedValue& rhs);
 
 void set_branch_value(TaggedValue& value, Branch* branch);
 void set_type_value(TaggedValue& value, Type* type);
@@ -45,8 +53,9 @@ int as_int(TaggedValue const& value);
 float as_float(TaggedValue const& value);
 std::string const& as_string(TaggedValue const& value);
 bool as_bool(TaggedValue const& value);
-Ref& as_ref(TaggedValue const& value);
 void* get_pointer(TaggedValue const& value, Type* expectedType);
+Ref& as_ref(TaggedValue const& value);
+Type& as_type(TaggedValue const& value);
 
 int as_int(Term*);
 float as_float(Term*);
@@ -54,6 +63,7 @@ bool as_bool(Term*);
 std::string const& as_string(Term*);
 Ref& as_ref(Term*);
 void* get_pointer(Term*, Type* expectedType);
+float to_float(TaggedValue const& value);
 
 bool is_value_int(TaggedValue const& value);
 bool is_value_float(TaggedValue const& value);
@@ -61,6 +71,7 @@ bool is_value_bool(TaggedValue const& value);
 bool is_value_string(TaggedValue const& value);
 bool is_value_ref(TaggedValue const& value);
 bool is_value_branch(TaggedValue const& value);
+bool is_value_type(TaggedValue const& value);
 bool is_value_of_type(TaggedValue const& value, Type* type);
 
 bool is_value_int(Term* t);

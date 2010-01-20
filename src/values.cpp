@@ -23,10 +23,7 @@ void alloc_value(Term* term)
 
     Type::AllocFunc alloc = type_t::get_alloc_func(term->type);
 
-    if (alloc == NULL)
-        // this happens while bootstrapping
-        set_null(term->value);
-    else {
+    if (alloc != NULL) {
         alloc(term->type, term);
 
         if (term->type != TYPE_TYPE)
@@ -80,8 +77,10 @@ void assign_value(Term* source, Term* dest)
 
     Type::AssignFunc assign = type_t::get_assign_func(dest->type);
 
-    if (assign == NULL)
+    if (assign == NULL) {
         assign_value(source->value, dest->value);
+        return;
+    }
 
     assign(source, dest);
 }

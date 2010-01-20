@@ -77,8 +77,12 @@ CIRCA_CL_ENV.Default(cl_binary)
 
 ########################### SDL-based targets ###############################
 
+DEBUG_PLASTIC = False
 
-SDL_ROOT = RELEASE.Clone()
+if DEBUG_PLASTIC:
+    SDL_ROOT = DEBUG.Clone()
+else:
+    SDL_ROOT = RELEASE.Clone()
 
 if POSIX:
     # import path so that we will find the correct sdl-config
@@ -111,7 +115,11 @@ if WINDOWS:
     SDL_ROOT.Append(LIBS=['plastic/deps/lib/glew32.lib'])
 
 SDL_ROOT.Append(CPPPATH=['#src'])
-SDL_ROOT.Append(LIBS = [circa_static_libs['release']])
+
+if DEBUG_PLASTIC:
+    SDL_ROOT.Append(LIBS = [circa_static_libs['debug']])
+else:
+    SDL_ROOT.Append(LIBS = [circa_static_libs['release']])
 
 Export('SDL_ROOT')
 

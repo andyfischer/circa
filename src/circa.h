@@ -24,6 +24,7 @@
 #include "if_block.h"
 #include "importing.h"
 #include "introspection.h"
+#include "invariants.h"
 #include "metaprogramming.h"
 #include "metrics.h"
 #include "names.h"

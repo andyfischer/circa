@@ -10,18 +10,30 @@ namespace branch_tests {
 void test_insert()
 {
     Branch branch;
+
+    test_assert(branch_check_invariants(branch, &std::cout)); // sanity check
+
     Term* a = create_void(branch);
 
+    test_assert(branch_check_invariants(branch, &std::cout));
+
     Term* b = alloc_term();
+    test_assert(b->value.type != NULL);
 
     test_assert(branch.length() == 1);
     test_assert(branch[0] == a);
     
+    test_assert(branch_check_invariants(branch, &std::cout));
+
     branch.insert(0, b);
+
+    test_assert(branch_check_invariants(branch, &std::cout));
 
     test_assert(branch.length() == 2);
     test_assert(branch[0] == b);
     test_assert(branch[1] == a);
+
+    test_assert(branch_check_invariants(branch, &std::cout));
 
     Term* c = alloc_term();
     branch.insert(2, c);
@@ -29,6 +41,8 @@ void test_insert()
     test_assert(branch[0] == b);
     test_assert(branch[1] == a);
     test_assert(branch[2] == c);
+
+    test_assert(branch_check_invariants(branch, &std::cout));
 
     Term* d = alloc_term();
     branch.insert(1, d);
@@ -319,9 +333,9 @@ void test_assign()
     Term* dest1 = as_branch(dest)[1];
 
     assign_value(source, dest);
-    test_assert(is_int(dest0));
+    test_assert(is_value_int(dest0));
     test_assert(as_int(dest0) == 3);
-    test_assert(is_float(dest1));
+    test_assert(is_value_float(dest1));
     test_equals(as_float(dest1), 4);
     // Verify that 'dest' has the same terms
     test_assert(dest0 == as_branch(dest)[0]);

@@ -15,15 +15,6 @@ namespace equals_function {
             return;
         }
 
-        Type::EqualsFunc equals = type_t::get_equals_func(lhs->type);
-
-        if (equals == NULL) {
-            std::stringstream error;
-            error << "type " << type_t::get_name(lhs->type) << " has no equals function";
-            error_occurred(caller, error.str());
-            return;
-        }
-
         set_bool(caller, equals(lhs, rhs));
     }
 

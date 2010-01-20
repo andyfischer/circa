@@ -41,15 +41,12 @@ void change_type(Term *term, Term *typeTerm)
     assert(typeTerm != NULL);
     assert_type(typeTerm, TYPE_TYPE);
 
+    change_type(term->value, &as_type(typeTerm));
+
     if (term->type == typeTerm)
         return;
 
-    if (term->type != NULL)
-        dealloc_value(term);
-
     term->type = typeTerm;
-
-    change_type(term->value, &as_type(typeTerm));
 
     if (is_value_alloced(term))
         assign_value_to_default(term);

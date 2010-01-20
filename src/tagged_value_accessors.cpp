@@ -10,14 +10,34 @@ namespace circa {
 
 void assign_value(TaggedValue& source, TaggedValue& dest)
 {
-    if (dest.type != source.type)
-        change_type(dest, source.type);
+    // Temp for compatibility: if either type is NULL then just do shallow assign
+    if (source.type == NULL || dest.type == NULL) {
+        dest.data = source.data;
+        return;
+    }
 
-    // check if the source type defines an assign function
+    if (source.type == NULL)
+        throw std::runtime_error("In assign_value, source.type is NULL");
+    if (dest.type == NULL)
+        throw std::runtime_error("In assign_value, dest.type is NULL");
+
+    // Check if they have different types. If so, try to cast.
+    if (dest.type != source.type) {
+        Type::CastFunc cast = dest.type->cast;
+        if (cast == NULL)
+            throw std::runtime_error("No cast function for type "
+                + dest.type->name + " (tried to assign value of type "
+                + source.type->name + ")");
+
+        cast(dest.type, &source, &dest);
+        return;
+    }
+
+    // Check if the type defines an assign function.
     Type::AssignFunc2 assign = NULL;
     
-    if (source.type != NULL)
-        assign = source.type->assign2;
+    if (dest.type != NULL)
+        assign = dest.type->assign2;
 
     if (assign != NULL) {
         assign(&source, &dest);
@@ -46,6 +66,22 @@ void change_type(TaggedValue& v, Type* type)
         if (initialize != NULL)
             initialize(type, &v);
     }
+}
+
+bool equals(TaggedValue& lhs, TaggedValue& rhs)
+{
+    if (lhs.type != rhs.type)
+        return false;
+
+    assert(lhs.type != NULL);
+
+    Type::EqualsFunc2 equals2 = lhs.type->equals2;
+
+    if (equals2 != NULL)
+        return equals2(&lhs, &rhs);
+
+    // Default behavior: shallow-comparison
+    return lhs.data.asint == rhs.data.asint;
 }
 
 void set_branch_value(TaggedValue& value, Branch* branch)
@@ -94,14 +130,13 @@ void set_str(TaggedValue& value, std::string const& s)
 
 void set_ref(TaggedValue& value, Term* t)
 {
-    value.type = (Type*) REF_TYPE->value.data.ptr;
+    assert(is_value_ref(value));
     *((Ref*) value.data.ptr) = t;
 }
 
 void set_null(TaggedValue& value)
 {
-    // TODO: a real Null type
-    value.type = NULL;
+    value.type = NULL_T;
     value.data.ptr = 0;
 }
 
@@ -124,6 +159,7 @@ void set_null(Term* term) { set_null(term->value); }
 TaggedValue tag_int(int v)
 {
     TaggedValue result;
+    change_type(result, (Type*) INT_TYPE->value.data.ptr);
     set_int(result, v);
     return result;
 }
@@ -131,6 +167,7 @@ TaggedValue tag_int(int v)
 TaggedValue tag_float(float f)
 {
     TaggedValue result;
+    change_type(result, (Type*) FLOAT_TYPE->value.data.ptr);
     set_float(result, f);
     return result;
 }
@@ -189,6 +226,12 @@ Ref& as_ref(TaggedValue const& value)
     return *((Ref*) value.data.ptr);
 }
 
+Type& as_type(TaggedValue const& value)
+{
+    assert(is_value_type(value));
+    return *((Type*) value.data.ptr);
+}
+
 std::string const& as_string(TaggedValue const& value)
 {
     assert(is_value_string(value));
@@ -207,9 +250,22 @@ Branch* get_branch_value(TaggedValue const& value)
     return (Branch*) value.data.ptr;
 }
 
+const char* get_name_for_type(Type* type)
+{
+    if (type == NULL)
+        return "<NULL>";
+    else return type->name.c_str();
+}
+
 void* get_pointer(TaggedValue const& value, Type* expectedType)
 {
-    assert(value.type == expectedType);
+    if (value.type != expectedType) {
+        std::stringstream strm;
+        strm << "Type mismatch in get_pointer, expected " << get_name_for_type(expectedType);
+        strm << ", but value has type " << get_name_for_type(value.type);
+        throw std::runtime_error(strm.str());
+    }
+
     return value.data.ptr;
 }
 
@@ -219,6 +275,16 @@ std::string const& as_string(Term* t) { return as_string(t->value); }
 bool as_bool(Term* t) { return as_bool(t->value); }
 Ref& as_ref(Term* t) { return as_ref(t->value); }
 void* get_pointer(Term* term, Type* expectedType) { return get_pointer(term->value, expectedType); }
+
+float to_float(TaggedValue const& value)
+{
+    if (value.type == INT_TYPE->value.data.ptr)
+        return as_int(value);
+    else if (value.type == FLOAT_TYPE->value.data.ptr)
+        return as_float(value);
+    else
+        throw std::runtime_error("In to_float, type is not an int or float");
+}
 
 bool is_value_int(TaggedValue const& value)
 {
@@ -248,6 +314,11 @@ bool is_value_ref(TaggedValue const& value)
 bool is_value_branch(TaggedValue const& value)
 {
     return value.type == (Type*) BRANCH_TYPE->value.data.ptr;
+}
+
+bool is_value_type(TaggedValue const& value)
+{
+    return value.type == (Type*) TYPE_TYPE->value.data.ptr;
 }
 
 bool is_value_of_type(TaggedValue const& value, Type* type)

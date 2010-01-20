@@ -24,25 +24,6 @@ void test_reference()
     test_assert(as_ref(r2) == a);
 }
 
-void builtin_types()
-{
-    test_assert(type_t::get_alloc_func(INT_TYPE) != NULL);
-    test_assert(type_t::get_equals_func(INT_TYPE) != NULL);
-    test_assert(type_t::get_alloc_func(FLOAT_TYPE) != NULL);
-    test_assert(type_t::get_equals_func(FLOAT_TYPE) != NULL);
-    test_assert(type_t::get_alloc_func(STRING_TYPE) != NULL);
-    test_assert(type_t::get_dealloc_func(STRING_TYPE) != NULL);
-    test_assert(type_t::get_equals_func(STRING_TYPE) != NULL);
-    test_assert(type_t::get_alloc_func(BOOL_TYPE) != NULL);
-    test_assert(type_t::get_equals_func(BOOL_TYPE) != NULL);
-    test_assert(type_t::get_alloc_func(TYPE_TYPE) != NULL);
-    test_assert(type_t::get_dealloc_func(TYPE_TYPE) != NULL);
-    test_assert(type_t::get_alloc_func(FUNCTION_TYPE) != NULL);
-    test_assert(type_t::get_dealloc_func(FUNCTION_TYPE) != NULL);
-    test_assert(type_t::get_alloc_func(REF_TYPE) != NULL);
-    test_assert(type_t::get_dealloc_func(REF_TYPE) != NULL);
-}
-
 void reference_type_deletion_bug()
 {
     // There used to be a bug where deleting a reference term would delete
@@ -160,7 +141,6 @@ void test_list2()
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_type_tests::test_reference);
-    REGISTER_TEST_CASE(builtin_type_tests::builtin_types);
     REGISTER_TEST_CASE(builtin_type_tests::reference_type_deletion_bug);
     REGISTER_TEST_CASE(builtin_type_tests::test_set);
     REGISTER_TEST_CASE(builtin_type_tests::test_list);
