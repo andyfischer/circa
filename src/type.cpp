@@ -291,18 +291,6 @@ Term* find_common_type(RefList const& list)
     return ANY_TYPE;
 }
 
-namespace type_private {
-    // TODO: remove this:
-    void empty_allocate(Term* type, Term* term) { set_null(term->value); }
-    void empty_duplicate_function(Term*,Term*) {}
-}
-
-void initialize_empty_type(Term* term)
-{
-    type_t::get_alloc_func(term) = type_private::empty_allocate;
-    type_t::get_assign_func(term) = type_private::empty_duplicate_function;
-}
-
 void initialize_compound_type(Term* term)
 {
     type_t::get_alloc_func(term) = branch_t::alloc;

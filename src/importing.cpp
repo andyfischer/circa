@@ -36,21 +36,4 @@ Term* import_type(Branch& branch, Type* type)
     return term;
 }
 
-// Deprecated:
-void shallow_assign(Term* a, Term* b)
-{
-    assign_value(a->value, b->value);
-    //b->value = a->value;
-}
-
-bool shallow_equals(Term* a, Term* b)
-{
-    return a->value.data.asint == b->value.data.asint;
-}
-
-void zero_alloc(Term *type, Term* t)
-{
-    t->value.data.asint = 0;
-}
-
 } // namespace circa

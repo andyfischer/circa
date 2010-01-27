@@ -7,7 +7,7 @@ namespace unknown_type_function {
 
     void evaluate(Term* caller)
     {
-        initialize_empty_type(caller);
+        //initialize_empty_type(caller);
     }
 
     void setup(Branch& kernel)

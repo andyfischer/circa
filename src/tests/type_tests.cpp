@@ -154,9 +154,6 @@ void test_default_values()
     test_assert(s->asString() == "");
 
     Term* t = create_type(branch, "T");
-    type_t::get_alloc_func(t) = zero_alloc;
-    type_t::get_assign_func(t) = shallow_assign;
-    type_t::get_equals_func(t) = shallow_equals;
     type_t::get_is_pointer(t) = false;
 
 #if 0

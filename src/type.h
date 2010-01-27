@@ -152,7 +152,6 @@ bool is_assign_value_possible(Term* source, Term* dest);
 // list. Currently, this is not very sophisticated.
 Term* find_common_type(RefList const& list);
 
-void initialize_empty_type(Term* term);
 void initialize_compound_type(Term* term);
 void initialize_simple_pointer_type(Type* type);
 

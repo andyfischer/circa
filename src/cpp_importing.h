@@ -79,8 +79,8 @@ template <class T>
 void import_pointer_type(Term* term)
 {
     type_t::get_alloc_func(term) = cpp_importing::pointer_alloc;
-    type_t::get_assign_func(term) = shallow_assign;
-    type_t::get_equals_func(term) = shallow_equals;
+    type_t::get_assign_func(term) = NULL;
+    type_t::get_equals_func(term) = NULL;
     type_t::get_std_type_info(term) = &typeid(T);
     type_t::get_to_string_func(term) = NULL;
     type_t::get_remap_pointers_func(term) = NULL;

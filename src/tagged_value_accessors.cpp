@@ -136,8 +136,7 @@ void set_ref(TaggedValue& value, Term* t)
 
 void set_null(TaggedValue& value)
 {
-    value.type = NULL_T;
-    value.data.ptr = 0;
+    change_type(value, NULL_T);
 }
 
 void set_pointer(TaggedValue& value, Type* type, void* p)
@@ -324,6 +323,11 @@ bool is_value_type(TaggedValue const& value)
 bool is_value_of_type(TaggedValue const& value, Type* type)
 {
     return value.type == type;
+}
+
+bool is_null(TaggedValue const& value)
+{
+    return value.type == NULL_T;
 }
 
 bool is_value_int(Term* t) { return is_value_int(t->value); }

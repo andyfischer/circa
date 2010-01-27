@@ -113,6 +113,124 @@ void test_constructor_syntax()
     test_assert(a->value.data.ptr == NULL);
 }
 
+namespace manual_memory_management_test {
+    
+    // toy memory pool:
+    const int pool_size = 5;
+    bool pool_allocated[pool_size];
+
+    // helper functions for pool:
+    void initialize_pool()
+    {
+        for (int i=0; i < pool_size; i++)
+            pool_allocated[i] = false;
+    }
+
+    int pool_allocate()
+    {
+        for (int i=0; i < pool_size; i++) {
+            if (!pool_allocated[i]) {
+                pool_allocated[i] = true;
+                return i;
+            }
+        }
+        assert(false);
+        return -1;
+    }
+
+    void pool_deallocate(int index)
+    {
+        assert(pool_allocated[index]);
+        pool_allocated[index] = false;
+    }
+
+    // Type functions:
+    void initialize(Type* type, TaggedValue* value)
+    {
+        value->data.asint = pool_allocate();
+    }
+
+    void destroy(Type* type, TaggedValue* value)
+    {
+        pool_deallocate(value->data.asint);
+    }
+
+    void test()
+    {
+        initialize_pool();
+
+        Type myType;
+        myType.initialize = initialize;
+        myType.destroy = destroy;
+
+        TaggedValue value;
+
+        test_assert(is_null(value));
+        test_assert(!pool_allocated[0]);
+        test_assert(!pool_allocated[1]);
+
+        change_type(value, &myType);
+
+        test_assert(pool_allocated[0]);
+        test_assert(!pool_allocated[1]);
+
+        set_null(value);
+
+        test_assert(!pool_allocated[0]);
+        test_assert(!pool_allocated[1]);
+
+        // scope 1:
+        {
+            TaggedValue scoped_value;
+            change_type(scoped_value, &myType);
+            test_assert(pool_allocated[0]);
+        }
+        test_assert(!pool_allocated[0]);
+
+        // scope 2
+        {
+            TaggedValue scoped_value;
+            change_type(scoped_value, &myType);
+            test_assert(pool_allocated[0]);
+            set_null(scoped_value);
+            test_assert(!pool_allocated[0]);
+        }
+        test_assert(!pool_allocated[0]);
+    }
+}
+
+namespace refcount_test {
+
+    // toy memory pool:
+    const int pool_size = 5;
+    int refcount[pool_size];
+
+    // helper functions for pool:
+    void initialize_pool()
+    {
+        for (int i=0; i < pool_size; i++)
+            refcount[i] = 0;
+    }
+
+    int pool_allocate()
+    {
+        for (int i=0; i < pool_size; i++) {
+            if (refcount[i] == 0) {
+                refcount[i]++;
+                return i;
+            }
+        }
+        assert(false);
+        return -1;
+    }
+
+    void pool_deallocate(int index)
+    {
+        assert(refcount[index]);
+        refcount[index] = false;
+    }
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(tagged_value_tests::test_int_simple);
@@ -122,6 +240,7 @@ void register_tests()
     REGISTER_TEST_CASE(tagged_value_tests::test_float);
     REGISTER_TEST_CASE(tagged_value_tests::test_assign_value_to_default);
     REGISTER_TEST_CASE(tagged_value_tests::test_constructor_syntax);
+    REGISTER_TEST_CASE(tagged_value_tests::manual_memory_management_test::test);
 }
 
 }

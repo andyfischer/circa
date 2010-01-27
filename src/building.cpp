@@ -256,7 +256,6 @@ Term* create_type(Branch& branch, std::string name)
 Term* create_empty_type(Branch& branch, std::string name)
 {
     Term* type = create_type(branch, name);
-    initialize_empty_type(type);
     return type;
 }
 

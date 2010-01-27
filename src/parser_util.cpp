@@ -168,7 +168,6 @@ Term* find_type(Branch& branch, std::string const& name)
     if (result == NULL) {
         result = apply(branch, UNKNOWN_TYPE_FUNC, RefList(), name);
         alloc_value(result);
-        initialize_empty_type(result);
         assert(result->type == TYPE_TYPE);
     }   
 

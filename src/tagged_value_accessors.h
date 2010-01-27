@@ -73,6 +73,7 @@ bool is_value_ref(TaggedValue const& value);
 bool is_value_branch(TaggedValue const& value);
 bool is_value_type(TaggedValue const& value);
 bool is_value_of_type(TaggedValue const& value, Type* type);
+bool is_null(TaggedValue const& value);
 
 bool is_value_int(Term* t);
 bool is_value_float(Term* t);

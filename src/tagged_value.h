@@ -18,6 +18,7 @@ struct TaggedValue
     Type* type;
 
     TaggedValue();
+    ~TaggedValue();
     TaggedValue(TaggedValue const& copy);
     TaggedValue& operator=(TaggedValue const& rhs);
 };
