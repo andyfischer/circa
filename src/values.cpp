@@ -32,6 +32,8 @@ void alloc_value(Term* term)
         if (is_branch(term))
             as_branch(term).owningTerm = term;
     }
+
+    term->value.type = &as_type(term->type);
 }
 
 void dealloc_value(Term* term)

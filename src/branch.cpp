@@ -303,7 +303,11 @@ namespace branch_t {
         Branch& source = as_branch(sourceTerm);
         Branch& dest = as_branch(destTerm);
         bool strictTypes = destTerm->type != BRANCH_TYPE && destTerm->type != LIST_TYPE;
+        assign(source, dest, strictTypes);
+    }
 
+    void assign(Branch& source, Branch& dest, bool strictTypes)
+    {
         // Assign terms as necessary
         int lengthToAssign = std::min(source.length(), dest.length());
 

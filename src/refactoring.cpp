@@ -110,8 +110,7 @@ void rewrite_as_value(Branch& branch, int index, Term* type)
 
         change_function(term, VALUE_FUNC);
         change_type(term, type);
-        term->inputs = RefList();
-        alloc_value(term);
+        set_inputs(term, RefList());
     }
 }
 

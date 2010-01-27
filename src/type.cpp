@@ -393,12 +393,7 @@ void assign_value_to_default(Term* term)
         if (is_branch(term)) {
 
             Branch& prototype = type_t::get_prototype(term->type);
-
-            as_branch(term).clear();
-            if (prototype.length() > 0) {
-                //std::cout << "non-empty prototype for type: " << term->type->name << std::endl;
-                duplicate_branch(type_t::get_prototype(term->type), as_branch(term));
-            }
+            branch_t::assign(prototype, as_branch(term), true);
             return;
         }
     }

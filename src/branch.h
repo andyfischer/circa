@@ -94,6 +94,8 @@ namespace branch_t {
     void dealloc(Term* type, Term* t);
     void assign(Term*, Term*);
     bool equals(Term*, Term*);
+
+    void assign(Branch& source, Branch& dest, bool strictTypes);
 }
 
 bool is_branch(Term* term);
