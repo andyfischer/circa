@@ -12,8 +12,7 @@ namespace circa {
 static unsigned int gNextGlobalID = 1;
 
 Term::Term()
-  : value(),
-    owningBranch(NULL),
+  : owningBranch(NULL),
     index(0),
     flags(0),
     refCount(0)
@@ -106,31 +105,31 @@ Ref Term::refProp(std::string const& name)
 void Term::setIntProp(std::string const& name, int i)
 {
     Term* t = addProperty(name, INT_TYPE);
-    set_int(t->value, i);
+    set_int(t, i);
 }
 
 void Term::setFloatProp(std::string const& name, float f)
 {
     Term* t = addProperty(name, FLOAT_TYPE);
-    set_float(t->value, f);
+    set_float(t, f);
 }
 
 void Term::setBoolProp(std::string const& name, bool b)
 {
     Term* t = addProperty(name, BOOL_TYPE);
-    set_bool(t->value, b);
+    set_bool(t, b);
 }
 
 void Term::setStringProp(std::string const& name, std::string const& s)
 {
     Term* t = addProperty(name, STRING_TYPE);
-    set_str(t->value, s);
+    set_str(t, s);
 }
 
 void Term::setRefProp(std::string const& name, Term* r)
 {
     Term* t = addProperty(name, REF_TYPE);
-    set_ref(t->value, r);
+    set_ref(t, r);
 }
 
 bool Term::boolPropOptional(std::string const& name, bool defaultValue)
@@ -215,10 +214,10 @@ void assert_term_invariants(Term* t)
 {
     // Make sure the value type matches the declared type.
     if (t->type == INT_TYPE)
-        assert(is_value_int(t->value));
+        assert(is_value_int(t));
 
     if (t->type != INT_TYPE)
-        assert(!is_value_int(t->value));
+        assert(!is_value_int(t));
 }
 
 } // namespace circa

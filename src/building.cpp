@@ -123,7 +123,7 @@ Term* create_duplicate(Branch& branch, Term* source, std::string const& name, bo
     Term* term = apply(branch, source->function, source->inputs, name);
     change_type(term, source->type);
 
-    if (source->value.data.ptr != NULL) {
+    if (source->value_data.ptr != NULL) {
         alloc_value(term);
         if (copyBranches || !is_branch(source))
             assign_value(source, term);
@@ -187,28 +187,28 @@ Term* create_stateful_value(Branch& branch, Term* type, std::string const& name)
 Term* create_string(Branch& branch, std::string const& s, std::string const& name)
 {
     Term* term = create_value(branch, STRING_TYPE, name);
-    set_str(term->value, s);
+    set_str(term, s);
     return term;
 }
 
 Term* create_int(Branch& branch, int i, std::string const& name)
 {
     Term* term = create_value(branch, INT_TYPE, name);
-    set_int(term->value, i);
+    set_int(term, i);
     return term;
 }
 
 Term* create_float(Branch& branch, float f, std::string const& name)
 {
     Term* term = create_value(branch, FLOAT_TYPE, name);
-    set_float(term->value, f);
+    set_float(term, f);
     return term;
 }
 
 Term* create_bool(Branch& branch, bool b, std::string const& name)
 {
     Term* term = create_value(branch, BOOL_TYPE, name);
-    set_bool(term->value, b);
+    set_bool(term, b);
     return term;
 }
 

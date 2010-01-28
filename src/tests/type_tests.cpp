@@ -29,7 +29,7 @@ void compound_types()
     Term* inst = branch.eval("inst = MyType()");
     test_assert(inst != NULL);
     test_assert(inst->type = MyType);
-    test_assert(inst->value.data.ptr != NULL);
+    test_assert(inst->value_data.ptr != NULL);
     test_assert(as_branch(inst)[0]->asInt() == 0);
     test_assert(as_branch(inst)[1]->asString() == "");
 
@@ -276,11 +276,11 @@ void _evaluate(Term* caller)
     test_assert(is_value_of_type(caller->input(0), gType));
     test_assert(is_value_of_type(caller, gType));
 
-    test_assert(get_pointer(caller->input(0)->value, gType) == NULL);
-    test_assert(get_pointer(caller->value, gType) == NULL);
+    test_assert(get_pointer(caller->input(0), gType) == NULL);
+    test_assert(get_pointer(caller, gType) == NULL);
 
-    set_pointer(caller->input(0)->value, gType, NULL);
-    set_pointer(caller->value, gType, NULL);
+    set_pointer(caller->input(0), gType, NULL);
+    set_pointer(caller, gType, NULL);
 }
 
 void test()

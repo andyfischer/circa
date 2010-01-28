@@ -22,25 +22,25 @@ Term* CHECK_INVARIANTS_THUNK_TYPE = NULL;
 EvaluateFunc& as_evaluate_thunk(Term* term)
 {
     assert_type(term, EVALUATE_THUNK_TYPE);
-    return ((EvaluateFunc&) term->value.data.ptr);
+    return ((EvaluateFunc&) term->value_data.ptr);
 }
 
 SpecializeTypeFunc& as_specialize_type_thunk(Term* term)
 {
     assert_type(term, SPECIALIZE_THUNK_TYPE);
-    return ((SpecializeTypeFunc&) term->value.data.ptr);
+    return ((SpecializeTypeFunc&) term->value_data.ptr);
 }
 
 ToSourceStringFunc& as_to_source_string_thunk(Term* term)
 {
     assert_type(term, TO_STRING_THUNK_TYPE);
-    return ((ToSourceStringFunc&) term->value.data.ptr);
+    return ((ToSourceStringFunc&) term->value_data.ptr);
 }
 
 CheckInvariantsFunc& as_check_invariants_thunk(Term* term)
 {
     assert_type(term, CHECK_INVARIANTS_THUNK_TYPE);
-    return ((CheckInvariantsFunc&) term->value.data.ptr);
+    return ((CheckInvariantsFunc&) term->value_data.ptr);
 }
 
 bool is_ref(Term* term)

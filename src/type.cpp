@@ -161,12 +161,12 @@ bool is_compound_type(Term* type)
 Type& as_type(Term *term)
 {
     // don't call alloc_value because that calls as_type
-    assert(get_type_value(term->value) != NULL);
+    assert(get_type_value(term) != NULL);
 
     // don't use assert_type here because assert_type uses as_type
     assert(term->type == TYPE_TYPE);
 
-    return *get_type_value(term->value);
+    return *get_type_value(term);
 }
 
 bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
@@ -336,7 +336,7 @@ bool equals(Term* a, Term* b)
     if (a->type != b->type)
         return false;
 
-    return equals(a->value, b->value);
+    return equals((TaggedValue*) a, (TaggedValue*) b);
 }
 
 std::string to_string(Term* term)
@@ -347,7 +347,7 @@ std::string to_string(Term* term)
         // Generic to-string
         std::stringstream result;
         result << "<" << type_t::get_name(term->type) << " 0x";
-        result << std::hex << get_type_value(term->value) << ">";
+        result << std::hex << get_type_value(term) << ">";
         return result.str();
     }
     else if (!is_value_alloced(term))
@@ -359,7 +359,7 @@ std::string to_string(Term* term)
 void assign_value_to_default(Term* term)
 {
     if (is_int(term))
-        set_int(term->value, 0);
+        set_int(term, 0);
     else if (is_float(term))
         set_float(term, 0);
     else if (is_string(term))

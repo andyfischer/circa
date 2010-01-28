@@ -14,8 +14,8 @@ union TaggedValueData {
 
 struct TaggedValue
 {
-    TaggedValueData data;
-    Type* type;
+    TaggedValueData value_data;
+    Type* value_type;
 
     TaggedValue();
     ~TaggedValue();

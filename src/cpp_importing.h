@@ -18,39 +18,39 @@ void templated_alloc(Term* type, Term* term)
     void* data = malloc(sizeof(T));
     memset(data, 0, sizeof(T));
     new(data) T();
-    term->value.type = &as_type(type);
-    term->value.data.ptr = data;
+    term->value_type = &as_type(type);
+    term->value_data.ptr = data;
 }
 
 template <class T>
 void templated_dealloc(Term* type, Term* term)
 {
     // Placement delete because we used placement new above.
-    reinterpret_cast<T*>(term->value.data.ptr)->~T();
-    free((void*) term->value.data.ptr);
-    term->value.data.ptr = 0;
-    term->value.type = 0;
+    reinterpret_cast<T*>(term->value_data.ptr)->~T();
+    free((void*) term->value_data.ptr);
+    term->value_data.ptr = 0;
+    term->value_type = 0;
 }
 
 template <class T>
 void templated_assign(Term* source, Term* dest)
 {
-    *reinterpret_cast<T*>(dest->value.data.ptr)
-        = *reinterpret_cast<T*>(source->value.data.ptr);
+    *reinterpret_cast<T*>(dest->value_data.ptr)
+        = *reinterpret_cast<T*>(source->value_data.ptr);
 }
 
 template <class T>
 bool templated_equals(Term* a, Term* b)
 {
-    return (*(reinterpret_cast<T*>(a->value.data.ptr)))
-        == (*(reinterpret_cast<T*>(b->value.data.ptr)));
+    return (*(reinterpret_cast<T*>(a->value_data.ptr)))
+        == (*(reinterpret_cast<T*>(b->value_data.ptr)));
 }
 
 template <class T>
 bool templated_lessThan(Term* a, Term* b)
 {
-    return (*(reinterpret_cast<T*>(a->value.data.ptr)))
-        < (*(reinterpret_cast<T*>(b->value.data.ptr)));
+    return (*(reinterpret_cast<T*>(a->value_data.ptr)))
+        < (*(reinterpret_cast<T*>(b->value_data.ptr)));
 }
 
 void pointer_alloc(Term* type, Term* term);

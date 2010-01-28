@@ -16,9 +16,11 @@ const int TERM_FLAG_ERRORED = 0x1;
 
 struct List;
 
-struct Term
+struct Term : TaggedValue
 {
-    TaggedValue value;
+    // Inherited from TaggedValue:
+    //   TaggedValueData value_data
+    //   Type* value_type
 
     // A Type term that describes our data type
     Ref type;

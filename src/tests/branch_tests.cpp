@@ -18,7 +18,7 @@ void test_insert()
     test_assert(branch_check_invariants(branch, &std::cout));
 
     Term* b = alloc_term();
-    test_assert(b->value.type != NULL);
+    test_assert(b->value_type != NULL);
 
     test_assert(branch.length() == 1);
     test_assert(branch[0] == a);

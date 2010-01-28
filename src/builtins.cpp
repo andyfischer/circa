@@ -102,7 +102,7 @@ void bootstrap_kernel()
     TYPE_TYPE->function = VALUE_FUNC;
     TYPE_TYPE->type = TYPE_TYPE;
     Type* typeType = new Type();
-    set_type_value(TYPE_TYPE->value, typeType);
+    set_type_value(TYPE_TYPE, typeType);
     typeType->name = "Type";
     typeType->initialize = type_t::initialize;
     typeType->assign2 = type_t::assign;
@@ -114,7 +114,7 @@ void bootstrap_kernel()
     ANY_TYPE = KERNEL->appendNew();
     ANY_TYPE->function = VALUE_FUNC;
     ANY_TYPE->type = TYPE_TYPE;
-    set_type_value(ANY_TYPE->value, new Type());
+    set_type_value(ANY_TYPE, new Type());
     type_t::get_name(ANY_TYPE) = "any";
     KERNEL->bindName(ANY_TYPE, "any");
 

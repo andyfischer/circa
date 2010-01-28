@@ -25,7 +25,7 @@ T as(Term* term)
         throw std::runtime_error(
                 "C++ type mismatch, existing data has type "+type_t::get_name(type));
 
-    return *((T*) term->value.data.ptr);
+    return *((T*) term->value_data.ptr);
 }
 
 class Int {
@@ -33,10 +33,9 @@ class Int {
 
 public:
     Int(TaggedValue* value) { _value = value; }
-    Int(Term* term) { _value = &term->value; }
     
-    Int& operator=(int rhs) { set_int(*_value, rhs); return *this; }
-    operator int() { return as_int(*_value); }
+    Int& operator=(int rhs) { set_int(_value, rhs); return *this; }
+    operator int() { return as_int(_value); }
 };
 
 class String {
@@ -44,11 +43,10 @@ class String {
 
 public:
     String(TaggedValue* value) { _value = value; }
-    String(Term* term) { _value = &term->value; }
     
-    String& operator=(std::string const& rhs) { set_str(*_value, rhs); return *this; }
-    operator std::string const&() { return as_string(*_value); }
-    operator const char*() { return as_string(*_value).c_str(); }
+    String& operator=(std::string const& rhs) { set_str(_value, rhs); return *this; }
+    operator std::string const&() { return as_string(_value); }
+    operator const char*() { return as_string(_value).c_str(); }
 };
 
 template <class T>

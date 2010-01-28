@@ -7,7 +7,7 @@ namespace typeof_function {
 
     void evaluate(Term* caller)
     {
-        caller->value = caller->input(0)->type->value;
+        //caller->value = caller->input(0)->type->value;
     }
 
     void setup(Branch& kernel)

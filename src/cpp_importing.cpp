@@ -7,13 +7,13 @@ namespace cpp_importing {
 
 void pointer_alloc(Term* type, Term* term)
 {
-    term->value.type = &as_type(type);
-    term->value.data.ptr = NULL;
+    term->value_type = &as_type(type);
+    term->value_data.ptr = NULL;
 }
 
 bool raw_value_less_than(Term* a, Term* b)
 {
-    return a->value.data.asint < b->value.data.asint;
+    return a->value_data.asint < b->value_data.asint;
 }
 
 } // namespace cpp_importing

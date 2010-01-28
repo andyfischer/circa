@@ -9,17 +9,17 @@ namespace circa {
 
 bool check_invariants(Term* term, std::string& result)
 {
-    if (term->value.type == NULL) {
+    if (term->value_type == NULL) {
         result = "TaggedValue has null type";
         assert(false);
         return false;
     }
 
     if (term->type != NULL
-            && (term->value.type != &as_type(term->type))
+            && (term->value_type != &as_type(term->type))
             && !is_branch(term)) {
         result = "Value has wrong type: term->type is " + term->type->name + ", tag is "
-            + term->value.type->name;
+            + term->value_type->name;
         assert(false);
         return false;
     }

@@ -8,7 +8,7 @@ Type* STRING_TYPE_2 = NULL;
 Type* REF_TYPE_2 = NULL;
 
 namespace int_t {
-    void initialize(Type* type, TaggedValue& value)
+    void initialize(Type* type, TaggedValue* value)
     {
         set_int(value, 0);
     }
@@ -24,14 +24,14 @@ namespace int_t {
 }
 
 namespace float_t {
-    void initialize(Type* type, TaggedValue& value)
+    void initialize(Type* type, TaggedValue* value)
     {
         set_float(value, 0);
     }
 
     void cast(Type* type, TaggedValue* source, TaggedValue* dest)
     {
-        set_float(*dest, to_float(*source));
+        set_float(dest, to_float(source));
     }
 
     bool equals(Term* a, Term* b)
@@ -117,7 +117,7 @@ namespace list_t {
 
     void count(Term* caller)
     {
-        set_int(caller->value, as_branch(caller->input(0)).length());
+        set_int(caller, as_branch(caller->input(0)).length());
     }
 
 } // namespace list_t
@@ -483,7 +483,7 @@ namespace branch_ref_t
     void get_length(Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
-        set_int(caller->value, target_branch.length());
+        set_int(caller, target_branch.length());
     }
     void get_index(Term* caller)
     {
@@ -542,17 +542,17 @@ namespace string_t {
         // temp:
         STRING_TYPE_2 = &as_type(STRING_TYPE);
 
-        set_pointer(*value, STRING_TYPE_2, new std::string());
+        set_pointer(value, STRING_TYPE_2, new std::string());
     }
 
     void assign(TaggedValue* source, TaggedValue* dest)
     {
-        *((std::string*) get_pointer(*dest, STRING_TYPE_2)) = as_string(*source);
+        *((std::string*) get_pointer(dest, STRING_TYPE_2)) = as_string(source);
     }
 
     bool equals(TaggedValue* lhs, TaggedValue* rhs)
     {
-        return as_string(*lhs) == as_string(*rhs);
+        return as_string(lhs) == as_string(rhs);
     }
 
     std::string to_string(Term* term)
@@ -564,7 +564,7 @@ namespace string_t {
 
     void length(Term* term)
     {
-        set_int(term->value, int(term->input(0)->asString().length()));
+        set_int(term, int(term->input(0)->asString().length()));
     }
 
     void substr(Term* term)
@@ -586,11 +586,11 @@ namespace ref_t {
     {
         // Temp:
         REF_TYPE_2 = &as_type(REF_TYPE);
-        set_pointer(*value, type, new Ref());
+        set_pointer(value, type, new Ref());
     }
     void assign(TaggedValue* source, TaggedValue* dest)
     {
-        *((Ref*) get_pointer(*dest, REF_TYPE_2)) = as_ref(*source);
+        *((Ref*) get_pointer(dest, REF_TYPE_2)) = as_ref(source);
     }
     bool equals(Term* lhs, Term* rhs)
     {
@@ -722,7 +722,7 @@ namespace ref_t {
             error_occurred(caller, "NULL reference");
             return;
         }
-        set_int(caller->value, t->numInputs());
+        set_int(caller, t->numInputs());
     }
     void get_source_location(Term* caller)
     {
@@ -732,19 +732,19 @@ namespace ref_t {
             return;
         }
         Branch& output = as_branch(caller);
-        set_int(output[0]->value, t->intPropOptional("colStart", 0));
-        set_int(output[1]->value, t->intPropOptional("lineStart", 0));
+        set_int(output[0], t->intPropOptional("colStart", 0));
+        set_int(output[1], t->intPropOptional("lineStart", 0));
     }
 }
 
 namespace type_t {
     void initialize(Type* type, TaggedValue* value)
     {
-        set_pointer(*value, type, new Type());
+        set_pointer(value, type, new Type());
     }
     void assign(TaggedValue* source, TaggedValue* dest)
     {
-        set_pointer(*dest, dest->type, get_pointer(*source, dest->type));
+        set_pointer(dest, dest->value_type, get_pointer(source, dest->value_type));
     }
 }
 

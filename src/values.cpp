@@ -7,14 +7,14 @@ namespace circa {
 bool is_value_alloced(Term* term)
 {
     if (term->type == NULL) {
-        assert(term->value.data.ptr == NULL);
+        assert(term->value_data.ptr == NULL);
         return false;
     }
 
     if (!type_t::get_is_pointer(term->type))
         return true;
     else
-        return term->value.data.ptr != NULL;
+        return term->value_data.ptr != NULL;
 }
 
 void alloc_value(Term* term)
@@ -33,7 +33,7 @@ void alloc_value(Term* term)
             as_branch(term).owningTerm = term;
     }
 
-    term->value.type = &as_type(term->type);
+    term->value_type = &as_type(term->type);
 }
 
 void dealloc_value(Term* term)
@@ -45,14 +45,14 @@ void dealloc_value(Term* term)
 
     if (!is_value_alloced(term->type)) {
         std::cout << "warn: in dealloc_value, type is undefined" << std::endl;
-        set_null(term->value);
+        set_null(term);
         return;
     }
 
     if (dealloc != NULL)
         dealloc(term->type, term);
 
-    set_null(term->value);
+    set_null(term);
 }
 
 void assign_value(Term* source, Term* dest)
@@ -80,7 +80,7 @@ void assign_value(Term* source, Term* dest)
     Type::AssignFunc assign = type_t::get_assign_func(dest->type);
 
     if (assign == NULL) {
-        assign_value(source->value, dest->value);
+        assign_value((TaggedValue*) source, (TaggedValue*) dest);
         return;
     }
 

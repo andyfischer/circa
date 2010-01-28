@@ -8,10 +8,10 @@ namespace tagged_value_tests {
 void test_int_simple()
 {
     TaggedValue v;
-    set_int(v, 4);
+    set_int(&v, 4);
 
-    test_assert(is_value_int(v));
-    test_assert(as_int(v) == 4);
+    test_assert(is_value_int(&v));
+    test_assert(as_int(&v) == 4);
 
     Branch branch;
     Term* a = branch.eval("a = 1");
@@ -24,24 +24,24 @@ void test_int_simple()
 void test_polymorphic()
 {
     TaggedValue v;
-    test_assert(!is_value_int(v));
-    test_assert(!is_value_float(v));
-    test_assert(!is_value_bool(v));
+    test_assert(!is_value_int(&v));
+    test_assert(!is_value_float(&v));
+    test_assert(!is_value_bool(&v));
 
-    set_int(v, 11);
-    test_assert(is_value_int(v));
-    test_assert(!is_value_float(v));
-    test_assert(!is_value_bool(v));
+    set_int(&v, 11);
+    test_assert(is_value_int(&v));
+    test_assert(!is_value_float(&v));
+    test_assert(!is_value_bool(&v));
 
-    set_float(v, 2.0);
-    test_assert(!is_value_int(v));
-    test_assert(is_value_float(v));
-    test_assert(!is_value_bool(v));
+    set_float(&v, 2.0);
+    test_assert(!is_value_int(&v));
+    test_assert(is_value_float(&v));
+    test_assert(!is_value_bool(&v));
 
-    set_bool(v, false);
-    test_assert(!is_value_int(v));
-    test_assert(!is_value_float(v));
-    test_assert(is_value_bool(v));
+    set_bool(&v, false);
+    test_assert(!is_value_int(&v));
+    test_assert(!is_value_float(&v));
+    test_assert(is_value_bool(&v));
 }
 
 void test_term_value()
@@ -49,7 +49,7 @@ void test_term_value()
     Branch branch;
     Term* i = create_int(branch, 5);
     test_assert(is_int(i));
-    test_assert(is_value_int(i->value));
+    test_assert(is_value_int(i));
 
     Term* a = branch.eval("a = [1 2 3]");
     test_assert(is_value_int(a->asBranch()[0]));
@@ -82,12 +82,14 @@ void subroutine_call_test()
 
 void test_float()
 {
+#if 0
     TaggedValue f = tag_float(5);
     TaggedValue i = tag_int(5);
-    test_assert(is_value_int(i));
-    test_assert(is_value_float(f));
-    assign_value(i, f);
-    test_assert(is_value_float(f));
+    test_assert(is_value_int(&i));
+    test_assert(is_value_float(&f));
+    assign_value(&i, &f);
+    test_assert(is_value_float(&f));
+#endif
 }
 
 void test_assign_value_to_default()
@@ -106,11 +108,11 @@ void test_constructor_syntax()
     myType.name = "T";
     import_type(branch, &myType);
     Term* a = branch.eval("a = T()");
-    test_assert(a->value.type == &myType);
-    test_assert(a->value.data.ptr == NULL);
+    test_assert(a->value_type == &myType);
+    test_assert(a->value_data.ptr == NULL);
     assign_value_to_default(a);
-    test_assert(a->value.type == &myType);
-    test_assert(a->value.data.ptr == NULL);
+    test_assert(a->value_type == &myType);
+    test_assert(a->value_data.ptr == NULL);
 }
 
 namespace manual_memory_management_test {
@@ -147,12 +149,12 @@ namespace manual_memory_management_test {
     // Type functions:
     void initialize(Type* type, TaggedValue* value)
     {
-        value->data.asint = pool_allocate();
+        value->value_data.asint = pool_allocate();
     }
 
     void destroy(Type* type, TaggedValue* value)
     {
-        pool_deallocate(value->data.asint);
+        pool_deallocate(value->value_data.asint);
     }
 
     void test()
@@ -165,16 +167,16 @@ namespace manual_memory_management_test {
 
         TaggedValue value;
 
-        test_assert(is_null(value));
+        test_assert(is_null(&value));
         test_assert(!pool_allocated[0]);
         test_assert(!pool_allocated[1]);
 
-        change_type(value, &myType);
+        change_type(&value, &myType);
 
         test_assert(pool_allocated[0]);
         test_assert(!pool_allocated[1]);
 
-        set_null(value);
+        set_null(&value);
 
         test_assert(!pool_allocated[0]);
         test_assert(!pool_allocated[1]);
@@ -182,7 +184,7 @@ namespace manual_memory_management_test {
         // scope 1:
         {
             TaggedValue scoped_value;
-            change_type(scoped_value, &myType);
+            change_type(&scoped_value, &myType);
             test_assert(pool_allocated[0]);
         }
         test_assert(!pool_allocated[0]);
@@ -190,9 +192,9 @@ namespace manual_memory_management_test {
         // scope 2
         {
             TaggedValue scoped_value;
-            change_type(scoped_value, &myType);
+            change_type(&scoped_value, &myType);
             test_assert(pool_allocated[0]);
-            set_null(scoped_value);
+            set_null(&scoped_value);
             test_assert(!pool_allocated[0]);
         }
         test_assert(!pool_allocated[0]);
@@ -228,6 +230,11 @@ namespace refcount_test {
     {
         assert(refcount[index]);
         refcount[index] = false;
+    }
+
+    void test()
+    {
+        // TODO
     }
 }
 

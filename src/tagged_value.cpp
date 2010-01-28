@@ -9,20 +9,21 @@
 namespace circa {
 
 TaggedValue::TaggedValue()
-    : type(NULL)
+    : value_type(NULL)
 {
-    type = NULL_T;
-    data.ptr = 0;
+    value_type = NULL_T;
+    value_data.ptr = 0;
 }
 
 TaggedValue::~TaggedValue()
 {
     // deallocate this value
-    change_type(*this, NULL_T);
+    change_type(this, NULL_T);
 }
 
 TaggedValue::TaggedValue(TaggedValue const& copy)
 {
+    // unsupported for now
     assert(false);
 }
 
