@@ -365,7 +365,7 @@ namespace color_t {
     }
 } // namespace color_t
 
-namespace branch_mirror_t
+namespace branch_ref_t
 {
     bool is_considered_config(Term* term)
     {
@@ -533,7 +533,7 @@ namespace branch_mirror_t
         set_str(caller, get_branch_source(target_branch));
     }
 
-} // namespace branch_mirror_t
+} // namespace branch_ref_t
 
 namespace string_t {
 
@@ -791,7 +791,7 @@ void setup_builtin_types(Branch& kernel)
     OVERLOADED_FUNCTION_TYPE = create_compound_type(kernel, "OverloadedFunction");
     CODE_TYPE = create_compound_type(kernel, "Code");
 
-    BRANCH_MIRROR_TYPE = parse_type(kernel, "type BranchMirror { Ref target }");
+    BRANCH_REF_TYPE = parse_type(kernel, "type BranchRef { Ref target }");
 }
 
 void parse_builtin_types(Branch& kernel)
@@ -803,26 +803,26 @@ void parse_builtin_types(Branch& kernel)
 
     type_t::get_to_string_func(COLOR_TYPE) = color_t::to_string;
 
-    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_configs,
-        "get_configs(BranchMirror) -> List");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_configs_nested,
-        "get_configs_nested(BranchMirror) -> List");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_relative_name,
-        "get_relative_name(BranchMirror, Ref) -> string");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_visible,
-        "get_visible(BranchMirror) -> List");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_length,
-        "length(BranchMirror) -> int");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::get_index,
-        "get_index(BranchMirror, int) -> Ref");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::append_code,
-        "append_code(BranchMirror, Branch)");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::print_raw,
-        "print_raw(BranchMirror) -> string");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::save,
-        "save(BranchMirror)");
-    import_member_function(BRANCH_MIRROR_TYPE, branch_mirror_t::to_source,
-        "to_source(BranchMirror) -> string");
+    import_member_function(BRANCH_REF_TYPE, branch_ref_t::get_configs,
+        "get_configs(BranchRef) -> List");
+    import_member_function(BRANCH_REF_TYPE, branch_ref_t::get_configs_nested,
+        "get_configs_nested(BranchRef) -> List");
+    import_member_function(BRANCH_REF_TYPE, branch_ref_t::get_relative_name,
+        "get_relative_name(BranchRef, Ref) -> string");
+    import_member_function(BRANCH_REF_TYPE, branch_ref_t::get_visible,
+        "get_visible(BranchRef) -> List");
+    import_member_function(BRANCH_REF_TYPE, branch_ref_t::get_length,
+        "length(BranchRef) -> int");
+    import_member_function(BRANCH_REF_TYPE, branch_ref_t::get_index,
+        "get_index(BranchRef, int) -> Ref");
+    import_member_function(BRANCH_REF_TYPE, branch_ref_t::append_code,
+        "append_code(BranchRef, Branch)");
+    import_member_function(BRANCH_REF_TYPE, branch_ref_t::print_raw,
+        "print_raw(BranchRef) -> string");
+    import_member_function(BRANCH_REF_TYPE, branch_ref_t::save,
+        "save(BranchRef)");
+    import_member_function(BRANCH_REF_TYPE, branch_ref_t::to_source,
+        "to_source(BranchRef) -> string");
 }
 
 } // namespace circa

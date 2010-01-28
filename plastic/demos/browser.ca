@@ -3,8 +3,8 @@ background(#ccc)
 
 script = load_script('browser_sample.ca')
 
-mirror = branch_mirror(script)
-contents = mirror.get_visible()
+bref = branch_ref(script)
+contents = bref.get_visible()
 
 term_to_location = Map()
 

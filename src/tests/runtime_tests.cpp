@@ -132,7 +132,7 @@ void function_that_ignores_errors()
 {
     Branch branch;
     Term* a = branch.eval("a = {}");
-    Term* mirror = branch.eval("branch_mirror(a)");
+    Term* mirror = branch.eval("branch_ref(a)");
 
     error_occurred(a, "test error");
 

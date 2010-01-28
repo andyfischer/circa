@@ -1,7 +1,7 @@
 
 background(#000)
 
-document = branch_mirror(include('drawing_document.ca'))
+document = branch_ref(include('drawing_document.ca'))
 
 def draw_circle(Point location)
     gl:circle(location, 15.0, #f00)

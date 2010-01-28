@@ -51,7 +51,7 @@ extern Term* UNRECOGNIZED_EXPRESSION_FUNC;
 extern Term* VALUE_FUNC;
 
 extern Term* BRANCH_TYPE;
-extern Term* BRANCH_MIRROR_TYPE;
+extern Term* BRANCH_REF_TYPE;
 extern Term* CODE_TYPE;
 extern Term* COLOR_TYPE;
 extern Term* FEEDBACK_TYPE;

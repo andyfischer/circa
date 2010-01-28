@@ -3,18 +3,18 @@
 #include "circa.h"
 
 namespace circa {
-namespace branch_mirror_function {
+namespace branch_ref_function {
 
     void evaluate(Term* caller)
     {
-        Branch& mirrorObject = as_branch(caller);
-        mirrorObject[0]->asRef() = caller->input(0);
+        Branch& refObject = as_branch(caller);
+        refObject[0]->asRef() = caller->input(0);
     }
 
     void setup(Branch& kernel)
     {
         import_function(kernel, evaluate,
-            "def branch_mirror(Branch branch +ignore_error) -> BranchMirror");
+            "def branch_ref(Branch branch +ignore_error) -> BranchRef");
     }
 }
 }

@@ -64,7 +64,7 @@ void repro_source_after_append_code()
 
     Term* target = branch.eval("target = {}");
 
-    branch.eval("bm = branch_mirror(target)");
+    branch.eval("bm = branch_ref(target)");
 
     branch.eval("bm.append_code({ 1  +  1 })");
 

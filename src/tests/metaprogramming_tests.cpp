@@ -37,7 +37,7 @@ void save_code_generated_with_reflection()
     Term* b = branch.eval("b = include('included.ca')");
     test_equals(b->asBranch()["#attr:source-file"]->asString(), "included.ca");
 
-    branch.eval("bm = branch_mirror(b)");
+    branch.eval("bm = branch_ref(b)");
     branch.eval("def my_function() end");
 
     test_assert(b->asBranch().contains("#attr:source-file"));
