@@ -5,7 +5,7 @@
 namespace circa {
 namespace term_to_source_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Term* term = caller->input(0);
         set_str(caller, get_term_source(term));

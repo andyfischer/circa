@@ -7,7 +7,7 @@ namespace circa {
 
 namespace subroutine_t {
     std::string to_string(Term* term);
-    void evaluate(Term* caller);
+    void evaluate(EvalContext*, Term* caller);
 }
 
 bool is_subroutine(Term* term);

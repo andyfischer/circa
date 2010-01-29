@@ -66,7 +66,7 @@ void test_term_value()
 }
 
 namespace subroutine_call_test_helper {
-    void assert_ints(Term* term)
+    void assert_ints(EvalContext*, Term* term)
     {
         test_assert(is_value_int(term->input(0)));
         test_assert(is_value_int(term));

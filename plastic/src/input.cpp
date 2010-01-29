@@ -22,13 +22,13 @@ Ref MOUSE_POSITION_TERM;
 
 void handle_key_press(SDL_Event &event, int key);
 
-void key_down(Term* caller)
+void key_down(EvalContext*, Term* caller)
 {
     int i = caller->input(0)->asInt();
     set_bool(caller, KEY_DOWN[i]);
 }
 
-void key_pressed(Term* caller)
+void key_pressed(EvalContext*, Term* caller)
 {
     if (is_int(caller->input(0))) {
         int key = as_int(caller->input(0));
@@ -182,7 +182,7 @@ void handle_key_press(SDL_Event &event, int key)
     }
 }
 
-void recent_key_presses(Term* caller)
+void recent_key_presses(EvalContext*, Term* caller)
 {
     Branch& output = as_branch(caller);
     output.clear();
@@ -217,12 +217,12 @@ bool mouse_in(Branch& box)
         && x2 >= MOUSE_X && y2 >= MOUSE_Y;
 }
 
-void mouse_pressed(Term* caller)
+void mouse_pressed(EvalContext*, Term* caller)
 {
     set_bool(caller, LEFT_MOUSE_DOWN);
 }
 
-void mouse_clicked(Term* caller)
+void mouse_clicked(EvalContext*, Term* caller)
 {
     if (caller->numInputs() == 0)
         set_bool(caller, RECENT_LEFT_MOUSE_DOWN);
@@ -230,12 +230,12 @@ void mouse_clicked(Term* caller)
         set_bool(caller, RECENT_LEFT_MOUSE_DOWN && mouse_in(as_branch(caller->input(0))));
 }
 
-void mouse_over(Term* caller)
+void mouse_over(EvalContext*, Term* caller)
 {
     set_bool(caller, mouse_in(as_branch(caller->input(0))));
 }
 
-void mouse_wheel_up(Term* caller)
+void mouse_wheel_up(EvalContext*, Term* caller)
 {
     if (caller->numInputs() == 0)
         set_bool(caller, RECENT_MOUSE_WHEEL_UP);
@@ -243,7 +243,7 @@ void mouse_wheel_up(Term* caller)
         set_bool(caller, RECENT_MOUSE_WHEEL_UP && mouse_in(as_branch(caller->input(0))));
 }
 
-void mouse_wheel_down(Term* caller)
+void mouse_wheel_down(EvalContext*, Term* caller)
 {
     if (caller->numInputs() == 0)
         set_bool(caller, RECENT_MOUSE_WHEEL_DOWN);

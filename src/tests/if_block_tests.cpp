@@ -81,7 +81,7 @@ void test_dont_always_rebind_inner_names()
 
 std::vector<std::string> gSpyResults;
 
-void spy_function(Term* caller)
+void spy_function(EvalContext*, Term* caller)
 {
     gSpyResults.push_back(as_string(caller->input(0)));
 }

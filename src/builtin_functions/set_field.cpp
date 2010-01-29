@@ -5,7 +5,7 @@
 namespace circa {
 namespace set_field_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         assign_value(caller->input(0), caller);
 

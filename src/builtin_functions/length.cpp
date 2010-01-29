@@ -5,7 +5,7 @@
 namespace circa {
 namespace length_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         set_int(caller, as_branch(caller->input(0)).length());
     }

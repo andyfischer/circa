@@ -5,12 +5,12 @@
 namespace circa {
 namespace sub_function {
 
-    void evaluate_i(Term* caller)
+    void evaluate_i(EvalContext*, Term* caller)
     {
         set_int(caller, int_input(caller,0) - int_input(caller,1));
     }
 
-    void evaluate_f(Term* caller)
+    void evaluate_f(EvalContext*, Term* caller)
     {
         set_float(caller, float_input(caller,0) - float_input(caller,1));
     }

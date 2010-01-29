@@ -7,7 +7,7 @@ namespace include_function {
 
     const bool PRINT_TIMING = false;
 
-    void load_script(Term* caller)
+    void load_script(EvalContext*, Term* caller)
     {
         Term* fileSignature = caller->input(0);
         Branch& contents = as_branch(caller);
@@ -59,9 +59,9 @@ namespace include_function {
         }
     }
 
-    void evaluate_include(Term* caller)
+    void evaluate_include(EvalContext* cxt, Term* caller)
     {
-        load_script(caller);
+        load_script(cxt, caller);
 
         if (caller->hasError())
             return;

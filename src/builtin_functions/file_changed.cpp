@@ -27,7 +27,7 @@ namespace file_changed_function {
         }
     }
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         std::string actual_filename = get_path_relative_to_source(caller,
             caller->input(1)->asString());

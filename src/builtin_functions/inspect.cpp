@@ -5,7 +5,7 @@
 namespace circa {
 namespace inspect_function {
 
-    void get_state(Term* caller)
+    void get_state(EvalContext*, Term* caller)
     {
         Term* input = caller->input(0);
         Term* hidden_state = get_hidden_state_for_call(input);
@@ -18,7 +18,7 @@ namespace inspect_function {
         }
     }
 
-    void get_raw(Term* caller)
+    void get_raw(EvalContext*, Term* caller)
     {
         Term* input = caller->input(0);
         set_str(caller, get_branch_raw(as_branch(input)));

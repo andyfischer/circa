@@ -5,7 +5,7 @@
 namespace circa {
 namespace print_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         for (int i = 0; i < caller->numInputs(); i++) {
             if (caller->input(i)->type == STRING_TYPE)

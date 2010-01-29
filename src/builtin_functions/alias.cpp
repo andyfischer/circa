@@ -9,7 +9,7 @@
 namespace circa {
 namespace alias_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         assign_value(caller->input(0), caller);
     }

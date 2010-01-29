@@ -5,7 +5,7 @@
 namespace circa {
 namespace list_function {
 
-    void evaluate(Term* caller) {
+    void evaluate(EvalContext*, Term* caller) {
         Branch& dest = as_branch(caller);
 
         int numToAssign = std::min(caller->numInputs(), dest.length());
@@ -37,7 +37,7 @@ namespace list_function {
         return out.str();
     }
 
-    void evaluate_repeat(Term* caller) {
+    void evaluate_repeat(EvalContext*, Term* caller) {
         Branch& dest = as_branch(caller);
 
         Term* sourceTerm = caller->input(0);

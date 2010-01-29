@@ -5,7 +5,7 @@
 namespace circa {
 namespace filter_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Branch& inputs = as_branch(caller->input(0));
         Branch& bools = as_branch(caller->input(1));

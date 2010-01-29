@@ -5,7 +5,7 @@
 namespace circa {
 namespace get_index_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         if (!is_branch(caller->input(0))) {
             error_occurred(caller, "Value is not indexable");

@@ -11,7 +11,7 @@ namespace mod_function {
     //
     // For a function that works the same as C's modulo, use remainder()
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         int a = int_input(caller, 0);
         int n = int_input(caller, 1);
@@ -22,7 +22,7 @@ namespace mod_function {
             set_int(caller, a % n + n);
     }
 
-    void evaluate_f(Term* caller)
+    void evaluate_f(EvalContext*, Term* caller)
     {
         float a = float_input(caller, 0);
         float n = float_input(caller, 1);

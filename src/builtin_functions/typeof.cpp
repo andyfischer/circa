@@ -5,7 +5,7 @@
 namespace circa {
 namespace typeof_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         //caller->value = caller->input(0)->type->value;
     }

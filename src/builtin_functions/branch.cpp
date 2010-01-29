@@ -5,7 +5,7 @@
 namespace circa {
 namespace branch_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Branch& branch = as_branch(caller);
         evaluate_branch(branch, caller);

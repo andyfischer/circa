@@ -5,7 +5,7 @@
 namespace circa {
 namespace get_field_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Term* head = caller->input(0);
 

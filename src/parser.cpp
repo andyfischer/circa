@@ -1003,7 +1003,7 @@ Term* include_statement(Branch& branch, TokenStream& tokens)
 
     Term* result = apply(branch, INCLUDE_FUNC, RefList(filenameTerm));
 
-    include_function::load_script(result);
+    include_function::load_script(NULL, result);
 
     return result;
 }
@@ -1322,7 +1322,7 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
 
     // Special case for include() function: expand the contents immediately.
     if (result->function == INCLUDE_FUNC && result->input(1)->asString() != "")
-        include_function::load_script(result);
+        include_function::load_script(NULL, result);
 
     return result;
 }

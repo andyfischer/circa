@@ -7,7 +7,7 @@
 namespace circa {
 namespace pow_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         set_int(caller, (int) std::pow((float) int_input(caller,0), int_input(caller,1)));
     }

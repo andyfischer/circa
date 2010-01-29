@@ -107,7 +107,7 @@ struct Type
 namespace type_t {
     std::string to_string(Term *caller);
     void remap_pointers(Term *term, ReferenceMap const& map);
-    void name_accessor(Term* caller);
+    void name_accessor(EvalContext*, Term* caller);
 
     // Accessors
     std::string& get_name(Term* type);

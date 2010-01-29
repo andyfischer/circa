@@ -13,7 +13,7 @@ namespace vectorize_vv_function {
         return LIST_TYPE;
     }
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Term* func = function_t::get_parameters(caller->function)[0]->asRef();
 

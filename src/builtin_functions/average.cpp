@@ -5,7 +5,7 @@
 namespace circa {
 namespace average_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         if (caller->numInputs() == 0) {
             set_float(caller, 0);

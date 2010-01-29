@@ -107,7 +107,7 @@ namespace list_t {
         assign_value(value, duplicated_value);
     }
 
-    void append(Term* caller)
+    void append(EvalContext*, Term* caller)
     {
         assign_value(caller->input(0), caller);
         Branch& branch = as_branch(caller);
@@ -115,7 +115,7 @@ namespace list_t {
         append(branch, value);
     }
 
-    void count(Term* caller)
+    void count(EvalContext*, Term* caller)
     {
         set_int(caller, as_branch(caller->input(0)).length());
     }
@@ -139,7 +139,7 @@ namespace set_t {
         create_duplicate(branch, value);
     }
 
-    void hosted_add(Term* caller)
+    void hosted_add(EvalContext*, Term* caller)
     {
         assign_value(caller->input(0), caller);
         Branch& contents = as_branch(caller);
@@ -147,14 +147,14 @@ namespace set_t {
         add(contents, value);
     }
 
-    void contains(Term* caller)
+    void contains(EvalContext*, Term* caller)
     {
         Branch& contents = as_branch(caller->input(0));
         Term* target = caller->input(1);
         set_bool(caller, contains(contents, target));
     }
 
-    void remove(Term* caller)
+    void remove(EvalContext*, Term* caller)
     {
         assign_value(caller->input(0), caller);
         Branch& contents = as_branch(caller);
@@ -247,25 +247,25 @@ namespace map_t {
             return values[index];
     }
 
-    void contains(Term* caller)
+    void contains(EvalContext*, Term* caller)
     {
         bool result = find_key_index(caller->input(0)->asBranch(), caller->input(1)) != -1;
         set_bool(caller, result);
     }
 
-    void insert(Term *caller)
+    void insert(EvalContext*, Term *caller)
     {
         assign_value(caller->input(0), caller);
         insert(caller->asBranch(), caller->input(1), caller->input(2));
     }
 
-    void remove(Term* caller)
+    void remove(EvalContext*, Term* caller)
     {
         assign_value(caller->input(0), caller);
         remove(caller->asBranch(), caller->input(1));
     }
 
-    void get(Term* caller)
+    void get(EvalContext*, Term* caller)
     {
         Term* key = caller->input(1);
         Term* value = get(caller->input(0)->asBranch(), key);
@@ -388,7 +388,7 @@ namespace branch_ref_t
         return mirrorObject[0]->asRef()->asBranch();
     }
 
-    void get_configs(Term* caller)
+    void get_configs(EvalContext*, Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
         Branch& output = caller->asBranch();
@@ -410,7 +410,7 @@ namespace branch_ref_t
         if (write < output.length())
             output.shorten(write);
     }
-    void get_configs_nested(Term* caller)
+    void get_configs_nested(EvalContext*, Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
         Branch& output = caller->asBranch();
@@ -444,7 +444,7 @@ namespace branch_ref_t
         if (write < output.length())
             output.shorten(write);
     }
-    void get_visible(Term* caller)
+    void get_visible(EvalContext*, Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
         Branch& output = caller->asBranch();
@@ -467,7 +467,7 @@ namespace branch_ref_t
             output.shorten(write);
     }
 
-    void get_relative_name(Term* caller)
+    void get_relative_name(EvalContext*, Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
         Term* target = caller->input(1)->asRef();
@@ -480,12 +480,12 @@ namespace branch_ref_t
         set_str(caller, get_relative_name(target_branch, target));
     }
 
-    void get_length(Term* caller)
+    void get_length(EvalContext*, Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
         set_int(caller, target_branch.length());
     }
-    void get_index(Term* caller)
+    void get_index(EvalContext*, Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
         int index = int_input(caller, 1);
@@ -494,7 +494,7 @@ namespace branch_ref_t
         else
             set_ref(caller, target_branch[index]);
     }
-    void append_code(Term* caller)
+    void append_code(EvalContext*, Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
         Branch& input = as_branch(caller->input(1));
@@ -516,18 +516,18 @@ namespace branch_ref_t
             target_branch[previousLast-1]->removeProperty("syntax:lineEnding");
         target_branch[target_branch.length()-1]->removeProperty("syntax:lineEnding");
     }
-    void print_raw(Term* caller)
+    void print_raw(EvalContext*, Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
 
         set_str(caller, get_branch_raw(target_branch));
     }
-    void save(Term* caller)
+    void save(EvalContext*, Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
         persist_branch_to_file(target_branch);
     }
-    void to_source(Term* caller)
+    void to_source(EvalContext*, Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
         set_str(caller, get_branch_source(target_branch));
@@ -562,12 +562,12 @@ namespace string_t {
         else return quoteType + as_string(term) + quoteType;
     }
 
-    void length(Term* term)
+    void length(EvalContext*, Term* term)
     {
         set_int(term, int(term->input(0)->asString().length()));
     }
 
-    void substr(Term* term)
+    void substr(EvalContext*, Term* term)
     {
         set_str(term, as_string(term->input(0)).substr(int_input(term, 1), int_input(term, 2)));
     }
@@ -596,7 +596,7 @@ namespace ref_t {
     {
         return as_ref(lhs) == as_ref(rhs);
     }
-    void get_name(Term* caller)
+    void get_name(EvalContext*, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
@@ -605,7 +605,7 @@ namespace ref_t {
         }
         set_str(caller, t->name);
     }
-    void hosted_to_string(Term* caller)
+    void hosted_to_string(EvalContext*, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
@@ -614,7 +614,7 @@ namespace ref_t {
         }
         set_str(caller, circa::to_string(t));
     }
-    void get_function(Term* caller)
+    void get_function(EvalContext*, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
@@ -623,7 +623,7 @@ namespace ref_t {
         }
         as_ref(caller) = t->function;
     }
-    void hosted_typeof(Term* caller)
+    void hosted_typeof(EvalContext*, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
@@ -632,7 +632,7 @@ namespace ref_t {
         }
         as_ref(caller) = t->type;
     }
-    void assign(Term* caller)
+    void assign(EvalContext*, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
@@ -654,7 +654,7 @@ namespace ref_t {
         return int(a + 0.5);
     }
 
-    void tweak(Term* caller)
+    void tweak(EvalContext*, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
@@ -679,7 +679,7 @@ namespace ref_t {
         else
             error_occurred(caller, "Ref is not an int or number");
     }
-    void asint(Term* caller)
+    void asint(EvalContext*, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
@@ -692,7 +692,7 @@ namespace ref_t {
         }
         set_int(caller, as_int(t));
     }
-    void asfloat(Term* caller)
+    void asfloat(EvalContext*, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
@@ -702,7 +702,7 @@ namespace ref_t {
         
         set_float(caller, to_float(t));
     }
-    void get_input(Term* caller)
+    void get_input(EvalContext*, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
@@ -715,7 +715,7 @@ namespace ref_t {
         else
             as_ref(caller) = t->input(index);
     }
-    void num_inputs(Term* caller)
+    void num_inputs(EvalContext*, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
@@ -724,7 +724,7 @@ namespace ref_t {
         }
         set_int(caller, t->numInputs());
     }
-    void get_source_location(Term* caller)
+    void get_source_location(EvalContext*, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {

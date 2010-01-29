@@ -5,7 +5,7 @@
 namespace circa {
 namespace any_true_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Branch& input = as_branch(caller->input(0));
 

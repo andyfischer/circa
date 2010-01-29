@@ -5,7 +5,7 @@
 namespace circa {
 namespace equals_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Term *lhs = caller->input(0);
         Term *rhs = caller->input(1);
@@ -18,9 +18,9 @@ namespace equals_function {
         set_bool(caller, equals(lhs, rhs));
     }
 
-    void evaluate_not(Term* caller)
+    void evaluate_not(EvalContext* cxt, Term* caller)
     {
-        evaluate(caller);
+        evaluate(cxt, caller);
 
         if (!caller->hasError())
             set_bool(caller, !as_bool(caller));

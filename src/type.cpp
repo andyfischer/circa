@@ -44,7 +44,7 @@ namespace type_t {
             prototype.set(field_i, map.getRemapped(prototype[field_i]));
     }
 
-    void name_accessor(Term* caller)
+    void name_accessor(EvalContext*, Term* caller)
     {
         set_str(caller, type_t::get_name(caller->input(0)));
     }

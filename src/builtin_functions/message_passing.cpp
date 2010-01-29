@@ -7,7 +7,7 @@ namespace message_passing_function {
 
     static Branch* messageStore = NULL;
 
-    void evaluate_send(Term* caller)
+    void evaluate_send(EvalContext*, Term* caller)
     {
         std::string channelName = caller->input(0)->asString();
         Branch& store = *messageStore;
@@ -21,7 +21,7 @@ namespace message_passing_function {
         duplicate_value(queue, caller->input(1));
     }
 
-    void evaluate_receive(Term* caller)
+    void evaluate_receive(EvalContext*, Term* caller)
     {
         std::string channelName = caller->input(0)->asString();
         Branch& store = *messageStore;

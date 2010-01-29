@@ -6,19 +6,19 @@ using namespace circa;
 
 namespace ide {
 
-void quit(Term* term)
+void quit(EvalContext*, Term* term)
 {
     CONTINUE_MAIN_LOOP = false;
 }
 
-void reset_state(Term* term)
+void reset_state(EvalContext*, Term* term)
 {
     reset_state(users_branch());
     if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
         PAUSED = false;
 }
 
-void reload(Term* term)
+void reload(EvalContext*, Term* term)
 {
     reload_branch_from_file(users_branch(), std::cout);
     if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)

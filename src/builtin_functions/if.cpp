@@ -5,7 +5,7 @@
 namespace circa {
 namespace if_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Branch& contents = caller->asBranch();
         bool cond = bool_input(caller,0);

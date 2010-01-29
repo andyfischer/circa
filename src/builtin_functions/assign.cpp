@@ -5,7 +5,7 @@
 namespace circa {
 namespace assign_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         // The thing we are changing is on the left, the desired value is on the right
         // This is a little confusing because the C function 'assign_value' is the other

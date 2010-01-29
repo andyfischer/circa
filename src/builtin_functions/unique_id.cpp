@@ -5,7 +5,7 @@
 namespace circa {
 namespace unique_id_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         static int nextId = 1;
         set_int(caller, nextId++);

@@ -140,7 +140,7 @@ SDL_Surface* convert_indexed_color_to_true_color(SDL_Surface* surface)
     return replacement;
 }
 
-void load_image(Term* caller)
+void load_image(EvalContext*, Term* caller)
 {
     std::string const& filename = caller->input(0)->asString();
 
@@ -161,7 +161,7 @@ void load_image(Term* caller)
     SDL_FreeSurface(surface);
 }
 
-void draw_image(Term* caller)
+void draw_image(EvalContext*, Term* caller)
 {
     Term* image = caller->input(0);
     Term* point = caller->input(1);
@@ -187,7 +187,7 @@ void draw_image(Term* caller)
     gl_check_error(caller);
 }
 
-void draw_image_clip(Term* caller)
+void draw_image_clip(EvalContext*, Term* caller)
 {
     Term* image = caller->input(0);
     Term* clip = caller->input(1);

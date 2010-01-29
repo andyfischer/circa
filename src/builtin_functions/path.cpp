@@ -5,7 +5,7 @@
 namespace circa {
 namespace path_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         set_str(caller,
             get_path_relative_to_source(caller, as_string(caller->input(0))));

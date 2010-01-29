@@ -5,7 +5,7 @@
 namespace circa {
 namespace assert_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         if (!bool_input(caller,0))
             error_occurred(caller, "Assert failed");

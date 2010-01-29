@@ -35,6 +35,7 @@
 namespace circa {
 
 struct Branch;
+struct EvalContext;
 struct FeedbackOperation;
 struct TaggedValue;
 struct Term;

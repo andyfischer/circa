@@ -5,7 +5,7 @@
 namespace circa {
 namespace branch_ref_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Branch& refObject = as_branch(caller);
         refObject[0]->asRef() = caller->input(0);

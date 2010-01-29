@@ -5,7 +5,7 @@
 namespace circa {
 namespace range_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         int start = int_input(caller, 0);
         int max = int_input(caller, 1);

@@ -16,7 +16,7 @@ using namespace circa;
 
 namespace textures {
 
-void hosted_load_texture(Term* caller)
+void hosted_load_texture(EvalContext*, Term* caller)
 {
     Int texid = caller->input(0);
 
@@ -30,7 +30,7 @@ void hosted_load_texture(Term* caller)
     gl_check_error(caller);
 }
 
-void hosted_image(Term* caller)
+void hosted_image(EvalContext*, Term* caller)
 {
     Int texid = caller->input(0);
     std::string filename = caller->input(1)->asString();

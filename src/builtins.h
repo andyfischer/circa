@@ -73,10 +73,10 @@ void shutdown();
 
 // this is implemented in builtin_functions/include.cpp
 namespace copy_function {
-    void evaluate(Term* caller);
+    void evaluate(EvalContext*, Term* caller);
 }
 namespace include_function {
-    void load_script(Term* caller);
+    void load_script(EvalContext*, Term* caller);
 }
 
 namespace file_changed_function {

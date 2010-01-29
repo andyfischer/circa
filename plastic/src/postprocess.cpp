@@ -20,7 +20,7 @@ namespace postprocess_functions
         void set_height(Term* term, int h) { set_int(term->field(3), h); }
     }
     
-    void make_surface(Term* caller)
+    void make_surface(EvalContext*, Term* caller)
     {
         gl_clear_error();
         Term* surface = caller->input(0);
@@ -86,13 +86,13 @@ namespace postprocess_functions
         bound_surface_height = height;
     }
 
-    void bind_surface_hosted(Term* caller)
+    void bind_surface_hosted(EvalContext*, Term* caller)
     {
         bind_surface(caller->input(0));
         gl_check_error(caller);
     }
 
-    void draw_surface(Term* caller)
+    void draw_surface(EvalContext*, Term* caller)
     {
         Term* source_surface = caller->input(0);
         int tex_id = surface_t::get_tex_id(source_surface);
@@ -117,7 +117,7 @@ namespace postprocess_functions
         gl_check_error(caller);
     }
 
-    void copy_surface(Term* caller)
+    void copy_surface(EvalContext*, Term* caller)
     {
         Term* source_surface = caller->input(0);
         Term* dest_surface = caller->input(1);

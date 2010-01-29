@@ -5,17 +5,17 @@
 namespace circa {
 namespace mult_function {
 
-    void evaluate_f(Term* caller)
+    void evaluate_f(EvalContext*, Term* caller)
     {
         set_float(caller, float_input(caller,0) * float_input(caller,1));
     }
 
-    void evaluate_i(Term* caller)
+    void evaluate_i(EvalContext*, Term* caller)
     {
         set_int(caller, int_input(caller,0) * int_input(caller,1));
     }
 
-    void feedback_evaluate(Term* caller)
+    void feedback_evaluate(EvalContext*, Term* caller)
     {
         Term* target = caller->input(0);
         float desired = float_input(caller,1);

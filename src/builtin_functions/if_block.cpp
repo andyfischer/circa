@@ -17,7 +17,7 @@ namespace if_block_function {
     //   [N-1] #joining = branch() 
     //
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         // Find the first if() call whose condition is true
         Branch& contents = as_branch(caller);

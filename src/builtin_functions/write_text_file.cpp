@@ -5,7 +5,7 @@
 namespace circa {
 namespace write_text_file_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         std::string filename = string_input(caller, 0);
         std::string contents = string_input(caller, 1);

@@ -126,7 +126,7 @@ void draw_mesh_immediate(Mesh& mesh)
     glEnd();
 }
 
-void hosted_load_mesh(Term* caller)
+void hosted_load_mesh(EvalContext*, Term* caller)
 {
     if (caller->asInt() == 0) {
         Mesh mesh;
@@ -139,7 +139,7 @@ void hosted_load_mesh(Term* caller)
     }
 }
 
-void hosted_draw_mesh(Term* caller)
+void hosted_draw_mesh(EvalContext*, Term* caller)
 {
     GLuint list = caller->input(0)->asInt();
     GLuint tex = caller->input(1)->asInt();

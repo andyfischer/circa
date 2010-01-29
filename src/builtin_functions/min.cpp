@@ -7,7 +7,7 @@
 namespace circa {
 namespace min_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         set_float(caller, std::min(float_input(caller,0), float_input(caller,1)));
     }

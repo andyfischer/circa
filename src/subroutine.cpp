@@ -21,7 +21,7 @@ namespace subroutine_t {
         return result.str();
     }
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Term* function = caller->function;
         Branch& functionBranch = as_branch(function);

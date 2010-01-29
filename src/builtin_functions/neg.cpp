@@ -5,12 +5,12 @@
 namespace circa {
 namespace neg_function {
 
-    void evaluate_f(Term* caller)
+    void evaluate_f(EvalContext*, Term* caller)
     {
         set_float(caller, -float_input(caller,0));
     }
 
-    void evaluate_i(Term* caller)
+    void evaluate_i(EvalContext*, Term* caller)
     {
         set_int(caller, -int_input(caller,0));
     }

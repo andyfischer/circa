@@ -5,7 +5,7 @@
 namespace circa {
 namespace if_expr_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         int index = bool_input(caller,0) ? 1 : 2;
         Term *result = caller->inputs[index];
@@ -27,7 +27,7 @@ namespace if_expr_function {
         return find_common_type(choices);
     }
 
-    void feedback_evaluate(Term* caller)
+    void feedback_evaluate(EvalContext*, Term* caller)
     {
         Term* target = caller->input(0);
         Term* desired = caller->input(1);

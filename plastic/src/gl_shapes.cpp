@@ -17,7 +17,7 @@ void _unpack_gl_color(Term* colorTerm)
                  color[2]->asFloat(), color[3]->asFloat());
 }
 
-void background(Term* caller)
+void background(EvalContext*, Term* caller)
 {
     gl_clear_error();
 
@@ -31,7 +31,7 @@ void background(Term* caller)
     gl_check_error(caller);
 }
 
-void gl_triangles(Term* caller)
+void gl_triangles(EvalContext*, Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
     Term* color = caller->input(1);
@@ -52,7 +52,7 @@ void gl_triangles(Term* caller)
     gl_check_error(caller);
 }
 
-void gl_line_strip(Term* caller)
+void gl_line_strip(EvalContext*, Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
     Term* color = caller->input(1);
@@ -72,7 +72,7 @@ void gl_line_strip(Term* caller)
     gl_check_error(caller);
 }
 
-void gl_line_loop(Term* caller)
+void gl_line_loop(EvalContext*, Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
     Term* color = caller->input(1);
@@ -92,7 +92,7 @@ void gl_line_loop(Term* caller)
     gl_check_error(caller);
 }
 
-void gl_points(Term* caller)
+void gl_points(EvalContext*, Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
     Term* color = caller->input(1);
@@ -112,7 +112,7 @@ void gl_points(Term* caller)
     gl_check_error(caller);
 }
 
-void gl_circle(Term* caller)
+void gl_circle(EvalContext*, Term* caller)
 {
     Branch& center = caller->input(0)->asBranch();
     float x = center[0]->toFloat();
@@ -142,7 +142,7 @@ void gl_circle(Term* caller)
     gl_check_error(caller);
 }
 
-void load_program(Term* caller)
+void load_program(EvalContext*, Term* caller)
 {
     std::string vertFilename =
         get_path_relative_to_source(caller, caller->input(0)->asString());
@@ -208,14 +208,14 @@ void load_program(Term* caller)
     set_int(caller, program);
 }
 
-void use_program(Term* caller)
+void use_program(EvalContext*, Term* caller)
 {
     current_program = int_input(caller, 0);
     glUseProgram(current_program);
     gl_check_error(caller);
 }
 
-void set_uniform(Term* caller)
+void set_uniform(EvalContext*, Term* caller)
 {
     const char* name = string_input(caller, 0);
     Term* input = caller->input(1);

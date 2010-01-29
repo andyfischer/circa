@@ -5,7 +5,7 @@
 namespace circa {
 namespace sqrt_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         set_float(caller, std::sqrt(float_input(caller,0)));
     }

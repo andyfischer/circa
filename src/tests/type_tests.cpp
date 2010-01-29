@@ -239,7 +239,7 @@ void test_find_common_type()
     test_assert(find_common_type(RefList(KERNEL->get("Point"),KERNEL->get("Rect"))) == BRANCH_TYPE);
 }
 
-void _evaluate_type_error(Term* term)
+void _evaluate_type_error(EvalContext*, Term* term)
 {
     set_float(term, to_float(term->input(0)));
 }
@@ -271,7 +271,7 @@ void test_imported_pointer_type()
 namespace simple_pointer_test {
 
 Type* gType;
-void _evaluate(Term* caller)
+void _evaluate(EvalContext*, Term* caller)
 {
     test_assert(is_value_of_type(caller->input(0), gType));
     test_assert(is_value_of_type(caller, gType));

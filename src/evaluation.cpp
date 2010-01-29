@@ -20,9 +20,11 @@ void evaluate_term(Term* term)
     if (!is_value_alloced(term))
         alloc_value(term);
 
+    EvalContext context;
+
     // Execute the function
     try {
-        evaluate(term);
+        evaluate(&context, term);
     }
     catch (std::exception const& err)
     {

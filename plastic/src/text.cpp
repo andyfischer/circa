@@ -21,12 +21,11 @@ class TTF_Font_ptr
 
 public:
     TTF_Font_ptr(TaggedValue* value) { _value = value; }
-    TTF_Font_ptr(Term* term) { _value = &term->value; }
 
-    operator TTF_Font*() { return (TTF_Font*) get_pointer(*_value, TTF_Font_t); }
-    TTF_Font_ptr& operator=(TTF_Font* rhs) { set_pointer(*_value, TTF_Font_t, rhs); return *this; }
-    TTF_Font* operator*() { return (TTF_Font*) get_pointer(*_value, TTF_Font_t); }
-    TTF_Font* operator->() { return (TTF_Font*) get_pointer(*_value, TTF_Font_t); }
+    operator TTF_Font*() { return (TTF_Font*) get_pointer(_value, TTF_Font_t); }
+    TTF_Font_ptr& operator=(TTF_Font* rhs) { set_pointer(_value, TTF_Font_t, rhs); return *this; }
+    TTF_Font* operator*() { return (TTF_Font*) get_pointer(_value, TTF_Font_t); }
+    TTF_Font* operator->() { return (TTF_Font*) get_pointer(_value, TTF_Font_t); }
 };
 
 SDL_Color unpack_sdl_color(Term* colorTerm)
@@ -40,7 +39,7 @@ SDL_Color unpack_sdl_color(Term* colorTerm)
     return c;
 }
 
-void load_font(Term* term)
+void load_font(EvalContext*, Term* term)
 {
     TTF_Font_ptr state = term->input(0);
     TTF_Font_ptr output = term;
@@ -80,7 +79,7 @@ struct RenderedText
     String text() { return String(_term->asBranch()[4]); }
 };
 
-void render_text(Term* caller)
+void render_text(EvalContext*, Term* caller)
 {
     RenderedText state(caller->input(0));
     String text = caller->input(2);
@@ -119,7 +118,7 @@ void render_text(Term* caller)
     assign_value(caller->input(0), caller);
 }
 
-void draw_rendered_text(Term* caller)
+void draw_rendered_text(EvalContext*, Term* caller)
 {
     RenderedText output(caller->input(0));
 

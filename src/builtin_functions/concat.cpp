@@ -5,7 +5,7 @@
 namespace circa {
 namespace concat_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         std::stringstream out;
         for (int index=0; index < caller->inputs.length(); index++) {

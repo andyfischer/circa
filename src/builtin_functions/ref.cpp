@@ -5,7 +5,7 @@
 namespace circa {
 namespace ref_function {
 
-    void to_ref(Term* caller)
+    void to_ref(EvalContext*, Term* caller)
     {
         as_ref(caller) = caller->input(0);
     }

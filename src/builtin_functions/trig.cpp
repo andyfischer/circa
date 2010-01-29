@@ -5,47 +5,47 @@
 namespace circa {
 namespace trig_function {
 
-    void evaluate_sin(Term* caller)
+    void evaluate_sin(EvalContext*, Term* caller)
     {
         float input = float_input(caller,0);
 
         // Convert input from 0..1 to 0..2pi
         set_float(caller, sin(float(input * 2 * M_PI)));
     }
-    void evaluate_cos(Term* caller)
+    void evaluate_cos(EvalContext*, Term* caller)
     {
         float input = float_input(caller,0);
 
         // Convert input from 0..1 to 0..2pi
         set_float(caller, cos(float(input * 2 * M_PI)));
     }
-    void evaluate_tan(Term* caller)
+    void evaluate_tan(EvalContext*, Term* caller)
     {
         float input = float_input(caller,0);
 
         // Convert input from 0..1 to 0..2pi
         set_float(caller, tan(float(input * 2 * M_PI)));
     }
-    void evaluate_arcsin(Term* caller)
+    void evaluate_arcsin(EvalContext*, Term* caller)
     {
         float input = float_input(caller,0);
         float result = asin(input);
         set_float(caller, result / float(2 * M_PI));
     }
-    void evaluate_arccos(Term* caller)
+    void evaluate_arccos(EvalContext*, Term* caller)
     {
         float input = float_input(caller,0);
         float result = acos(input);
         set_float(caller, result / float(2 * M_PI));
     }
-    void evaluate_arctan(Term* caller)
+    void evaluate_arctan(EvalContext*, Term* caller)
     {
         float input = float_input(caller,0);
         float result = atan(input);
         set_float(caller, result / float(2 * M_PI));
     }
 
-    void feedback_evaluate_sin(Term* caller)
+    void feedback_evaluate_sin(EvalContext*, Term* caller)
     {
         // Term* target = caller->input(0);
         float desired = float_input(caller, 1);
@@ -62,7 +62,7 @@ namespace trig_function {
         set_float(caller, result / float(2 * M_PI));
     }
 
-    void feedback_evaluate_cos(Term* caller)
+    void feedback_evaluate_cos(EvalContext*, Term* caller)
     {
         // Term* target = caller->input(0);
         float desired = caller->input(1)->toFloat();

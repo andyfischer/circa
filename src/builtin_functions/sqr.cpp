@@ -5,7 +5,7 @@
 namespace circa {
 namespace sqr_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         float in = float_input(caller,0);
         set_float(caller, in * in);

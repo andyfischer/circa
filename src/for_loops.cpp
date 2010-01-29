@@ -170,7 +170,7 @@ void setup_for_loop_post_code(Term* forTerm)
     get_for_loop_state_type(forTerm) = hasState ? BRANCH_TYPE : VOID_TYPE;
 }
 
-void evaluate_for_loop(Term* forTerm)
+void evaluate_for_loop(EvalContext*, Term* forTerm)
 {
     Term* listTerm = forTerm->input(1);
     Branch& codeBranch = as_branch(forTerm);

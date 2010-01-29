@@ -17,13 +17,13 @@ namespace rand_function {
         }
     }
 
-    void evaluate_f(Term* caller)
+    void evaluate_f(EvalContext*, Term* caller)
     {
         seed_if_needed();
         set_float(caller, (float) rand() / RAND_MAX);
     }
 
-    void evaluate_f_range(Term* caller)
+    void evaluate_f_range(EvalContext*, Term* caller)
     {
         seed_if_needed();
         float r = (float) rand() / RAND_MAX;
@@ -38,14 +38,14 @@ namespace rand_function {
         set_float(caller, min + r * (max - min));
     }
 
-    void evaluate_i(Term* caller)
+    void evaluate_i(EvalContext*, Term* caller)
     {
         seed_if_needed();
 
         set_int(caller, rand());
     }
 
-    void evaluate_i_i(Term* caller)
+    void evaluate_i_i(EvalContext*, Term* caller)
     {
         seed_if_needed();
         int period = caller->input(0)->asInt();

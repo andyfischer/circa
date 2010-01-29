@@ -42,8 +42,8 @@ namespace string_t {
     void assign(TaggedValue* source, TaggedValue* dest);
     bool equals(TaggedValue* lhs, TaggedValue* rhs);
     std::string to_string(Term* term);
-    void length(Term* term);
-    void substr(Term* term);
+    void length(EvalContext*, Term* term);
+    void substr(EvalContext*, Term* term);
 }
 
 namespace ref_t {
@@ -51,17 +51,17 @@ namespace ref_t {
     void initialize(Type* type, TaggedValue* value);
     void assign(TaggedValue* source, TaggedValue* dest);
     bool equals(Term* lhs, Term* rhs);
-    void get_name(Term* caller);
-    void hosted_to_string(Term* caller);
-    void get_function(Term* caller);
-    void hosted_typeof(Term* caller);
-    void assign(Term* caller);
-    void tweak(Term* caller);
-    void asint(Term* caller);
-    void asfloat(Term* caller);
-    void get_input(Term* caller);
-    void num_inputs(Term* caller);
-    void get_source_location(Term* caller);
+    void get_name(EvalContext*, Term* caller);
+    void hosted_to_string(EvalContext*, Term* caller);
+    void get_function(EvalContext*, Term* caller);
+    void hosted_typeof(EvalContext*, Term* caller);
+    void assign(EvalContext*, Term* caller);
+    void tweak(EvalContext*, Term* caller);
+    void asint(EvalContext*, Term* caller);
+    void asfloat(EvalContext*, Term* caller);
+    void get_input(EvalContext*, Term* caller);
+    void num_inputs(EvalContext*, Term* caller);
+    void get_source_location(EvalContext*, Term* caller);
 }
 
 namespace type_t {

@@ -14,7 +14,7 @@ Term* get_for_loop_iterator(Term* forTerm);
 Term* get_for_loop_modify_list(Term* forTerm);
 Term* get_for_loop_discard_called(Term* forTerm);
 Ref& get_for_loop_state_type(Term* forTerm);
-void evaluate_for_loop(Term* forTerm);
+void evaluate_for_loop(EvalContext*, Term* forTerm);
 void setup_for_loop_pre_code(Term* forTerm);
 void setup_for_loop_post_code(Term* forTerm);
 

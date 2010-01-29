@@ -5,7 +5,7 @@
 namespace circa {
 namespace not_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         set_bool(caller, !bool_input(caller,0));
     }

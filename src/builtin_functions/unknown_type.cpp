@@ -5,7 +5,7 @@
 namespace circa {
 namespace unknown_type_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         //initialize_empty_type(caller);
     }

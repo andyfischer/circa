@@ -5,7 +5,7 @@
 namespace circa {
 namespace unknown_field_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
     }
 

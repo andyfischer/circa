@@ -5,7 +5,7 @@
 namespace circa {
 namespace and_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         set_bool(caller, as_bool(caller->input(0)) && as_bool(caller->input(1)));
     }

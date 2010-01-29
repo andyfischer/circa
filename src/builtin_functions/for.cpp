@@ -26,7 +26,7 @@ namespace for_function {
         return result.str();
     }
 
-    void evaluate_discard(Term* caller)
+    void evaluate_discard(EvalContext*, Term* caller)
     {
         Term* forTerm = caller->input(0);
         Term* discardCalled = get_for_loop_discard_called(forTerm);

@@ -5,7 +5,7 @@
 namespace circa {
 namespace read_text_file_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         std::string filename = as_string(caller->input(0));
         set_str(caller, read_text_file(filename));

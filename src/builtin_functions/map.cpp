@@ -5,7 +5,7 @@
 namespace circa {
 namespace map_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Term* func = caller->input(0);
         Branch& inputs = as_branch(caller->input(1));

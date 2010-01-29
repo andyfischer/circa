@@ -5,7 +5,7 @@
 namespace circa {
 namespace to_string_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Term* term = caller->input(0);
         set_str(caller, to_string(term));

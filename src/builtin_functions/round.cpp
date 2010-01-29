@@ -7,7 +7,7 @@
 namespace circa {
 namespace round_function {
 
-    void evaluate_round(Term* caller)
+    void evaluate_round(EvalContext*, Term* caller)
     {
         float input = float_input(caller, 0);
         if (input > 0.0)
@@ -16,12 +16,12 @@ namespace round_function {
             set_int(caller, int(input - 0.5));
     }
 
-    void evaluate_floor(Term* caller)
+    void evaluate_floor(EvalContext*, Term* caller)
     {
         set_int(caller, (int) std::floor(float_input(caller, 0)));
     }
 
-    void evaluate_ceil(Term* caller)
+    void evaluate_ceil(EvalContext*, Term* caller)
     {
         set_int(caller, (int) std::ceil(float_input(caller, 0)));
     }

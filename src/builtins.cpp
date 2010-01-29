@@ -78,7 +78,7 @@ Term* get_global(std::string name)
     return NULL;
 }
 
-void empty_evaluate_function(Term*) { }
+void empty_evaluate_function(EvalContext*, Term*) { }
 void create_builtin_types()
 {
     NULL_T = new Type();

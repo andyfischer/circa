@@ -5,7 +5,7 @@
 namespace circa {
 namespace add_function {
 
-    void evaluate_i(Term* caller)
+    void evaluate_i(EvalContext*, Term* caller)
     {
         int result = 0;
         for (int i=0; i < caller->numInputs(); i++)
@@ -13,7 +13,7 @@ namespace add_function {
         set_int(caller, result);
     }
 
-    void evaluate_f(Term* caller)
+    void evaluate_f(EvalContext*, Term* caller)
     {
         float result = 0.0;
         for (int i=0; i < caller->numInputs(); i++)
@@ -21,7 +21,7 @@ namespace add_function {
         set_float(caller, result);
     }
 
-    void feedback_evaluate(Term* caller)
+    void feedback_evaluate(EvalContext*, Term* caller)
     {
         Term* target = caller->input(0);
         float desired = float_input(caller,1);

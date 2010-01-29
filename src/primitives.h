@@ -8,7 +8,7 @@
 namespace circa {
 
 // for Function:
-typedef void (*EvaluateFunc)(Term* caller);
+typedef void (*EvaluateFunc)(EvalContext* context, Term* caller);
 typedef Term* (*SpecializeTypeFunc)(Term* caller);
 
 typedef std::string (*ToSourceStringFunc)(Term* term);

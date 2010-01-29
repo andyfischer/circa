@@ -5,7 +5,7 @@
 namespace circa {
 namespace refactoring_tests {
 
-void _empty_evaluate(Term*) {}
+void _empty_evaluate(EvalContext*, Term*) {}
 
 void repro_source_after_rename()
 {

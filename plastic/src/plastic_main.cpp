@@ -157,7 +157,7 @@ bool load_user_script_filename(std::string const& _filename)
         set_str(runtime_branch()["user_script_filename"], filename);
         std::cout << "Loading script: " << filename << std::endl;
         
-        include_function::load_script(users_branch);
+        include_function::load_script(NULL, users_branch);
 
         if (has_error(users_branch)) {
             std::cout << "Error loading " << _filename << ":" << std::endl;

@@ -5,12 +5,12 @@
 namespace circa {
 namespace feedback_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         // No-op
     }
 
-    void evaluate_apply_feedback(Term* caller)
+    void evaluate_apply_feedback(EvalContext*, Term* caller)
     {
         Branch& input = caller->input(0)->asBranch();
         refresh_training_branch(input, as_branch(caller));

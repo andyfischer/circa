@@ -5,7 +5,7 @@
 namespace circa {
 namespace do_once_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Term* done = caller->input(0);
 

@@ -5,7 +5,7 @@
 namespace circa {
 namespace one_time_assign_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Term* assigned = caller->input(0);
 

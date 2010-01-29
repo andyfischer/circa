@@ -10,7 +10,7 @@ namespace meta_function {
         return term->input(0)->type;
     }
 
-    void lift_closure_evaluate(Term* caller)
+    void lift_closure_evaluate(EvalContext*, Term* caller)
     {
         assign_value(caller->input(0), caller);
         lift_closure(as_branch(caller));

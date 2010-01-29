@@ -5,7 +5,7 @@
 namespace circa {
 namespace cast_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         if (!value_fits_type(caller->input(0), caller->type, NULL)) {
             std::stringstream message;

@@ -5,7 +5,7 @@
 namespace circa {
 namespace changed_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Term* state = caller->input(0);
         Term* current = caller->input(1);

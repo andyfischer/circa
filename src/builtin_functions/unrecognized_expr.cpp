@@ -5,7 +5,7 @@
 namespace circa {
 namespace unrecognized_expr_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
     }
 

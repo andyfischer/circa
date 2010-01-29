@@ -10,7 +10,7 @@ namespace vectorize_vs_function {
         return caller->input(0)->type;
     }
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Term* func = function_t::get_parameters(caller->function)[0]->asRef();
 

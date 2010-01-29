@@ -5,7 +5,7 @@
 namespace circa {
 namespace set_union_function {
 
-    void evaluate(Term* caller)
+    void evaluate(EvalContext*, Term* caller)
     {
         Branch &result = as_branch(caller);
         result.clear();
