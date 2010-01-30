@@ -4,27 +4,18 @@
 
 namespace circa {
 
-void evaluate_term(Term* term)
+inline void evaluate_term(EvalContext* context, Term* term)
 {
-    if (term == NULL)
-        throw std::runtime_error("term is NULL");
-
     clear_error(term);
 
     EvaluateFunc evaluate = function_t::get_evaluate(term->function);
 
     if (evaluate == NULL)
         return;
-    
-    // Make sure we have an allocated value. Allocate one if necessary
-    if (!is_value_alloced(term))
-        alloc_value(term);
-
-    EvalContext context;
 
     // Execute the function
     try {
-        evaluate(&context, term);
+        evaluate(context, term);
     }
     catch (std::exception const& err)
     {
@@ -32,15 +23,23 @@ void evaluate_term(Term* term)
     }
 }
 
+void evaluate_term(Term* term)
+{
+    EvalContext context;
+    evaluate_term(&context, term);
+}
+
 void evaluate_branch(Branch& branch, Term* errorListener)
 {
+    EvalContext context;
+
     for (int index=0; index < branch.length(); index++) {
 		Term* term = branch.get(index);
-        evaluate_term(term);
+        evaluate_term(&context, term);
 
         if (term->hasError()) {
             nested_error_occurred(errorListener);
-            return;
+            break;
         }
     }
 }

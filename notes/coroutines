@@ -1,0 +1,38 @@
+
+
+how to do coroutines?
+
+function is going along..
+
+Branch 1:
+a();
+b();
+c():
+    Branch 2:
+    x()
+    y()  <-- decides to wait
+    z()
+d();
+e();
+
+Stop branches, all the way up until a run_coroutine() call.
+Preserve relevant pieces of stack, and save execution position.
+
+EvalContext has a 'interrupt' tagged_value.
+Functions can specify that they can catch an interrupt.
+
+subroutine_t::catch_interrupt:
+  If interrupt->type is 'return':
+      Reset interrupt, stop branch
+  If interrupt->type is 'coroutine_pause':
+      Preserve the stack and the instruction pointer somewhere
+      Preserve it on the CoroutinePause value, I guess
+      Propogate this interrupt upwards
+
+run_coroutine::catch_interrupt:
+  Catch everything
+  If interrupt type is CoroutinePause, then save this to state
+
+--
+
+Changing the definition of a function when there are existing CoroutinePause values?
