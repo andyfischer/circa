@@ -1,0 +1,2 @@
+
+ui_widgets:draw_vmenu([30 30] ['hello' 'hi' 'bye'])

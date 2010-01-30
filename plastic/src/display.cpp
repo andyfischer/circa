@@ -125,9 +125,8 @@ void render_frame()
     // Check for uncaught GL error
     Term errorListener;
     gl_check_error(&errorListener, " (uncaught)");
-    if (errorListener.hasError()) {
+    if (errorListener.hasError())
         std::cout << get_runtime_error_message(&errorListener) << std::endl;
-    }
 
     // Update the screen
     SDL_GL_SwapBuffers();

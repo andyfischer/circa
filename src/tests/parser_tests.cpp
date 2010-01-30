@@ -619,6 +619,26 @@ void test_significant_indentation()
                 "b = func()");
     test_assert(branch);
     test_assert(branch["b"]->asInt() == 5);
+
+    branch.clear();
+}
+
+void test_significant_indentation2()
+{
+    Branch branch;
+
+    // Test with indented comment line (comments should be ignored)
+    branch.eval("def func():\n"
+                "  a = 1\n"
+                "    --comment\n"
+                "  b = 2\n");
+    test_assert(branch);
+
+    Branch& func = as_branch(branch["func"]);
+    test_assert(func[1]->function == COMMENT_FUNC);
+    test_equals(func[2]->name, "a");
+    test_assert(func[3]->function == COMMENT_FUNC);
+    test_equals(func[4]->name, "b");
 }
 
 void test_sig_indent_one_liner()
@@ -698,6 +718,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_subscripted_atom);
     REGISTER_TEST_CASE(parser_tests::test_whitespace_after_statement);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation);
+    REGISTER_TEST_CASE(parser_tests::test_significant_indentation2);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_one_liner);
     REGISTER_TEST_CASE(parser_tests::test_qualified_identifier);
 }

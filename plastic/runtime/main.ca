@@ -351,8 +351,9 @@ namespace postprocess begin
     def bind_main_surface(): bind_surface(main_surface)
 end
 
--- Include some external files
-include('text_input.ca')
+-- Include other runtime scripts
+include(path('text_input.ca'))
+include(path('ui_widgets.ca'))
 
 -- Load the user's script
 

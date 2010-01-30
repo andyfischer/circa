@@ -93,7 +93,7 @@ void consume_branch(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
-    // If the next token is : then consume with significant whitespace.
+    // If the next token is : then consume with significant indentation.
     if (tokens.nextIs(COLON)) {
         tokens.consume(COLON);
         if (branch.owningTerm != NULL)
@@ -169,21 +169,12 @@ void consume_branch(Branch& branch, TokenStream& tokens)
     post_parse_branch(branch);
 }
 
-bool just_whitespace(Term* term)
-{
-    if (term->function != COMMENT_FUNC)
-        return false;
-
-    std::string const& commentStr = term->stringProp("comment");
-    return commentStr.find_first_of("--") == std::string::npos;
-}
-
 void consume_branch_with_significant_indentation(Branch& branch, TokenStream& tokens)
 {
     // Parse the line following the :
     // We will either find stuff on this line (making this a one-liner), or
-    // we'll find nothing but whitespace.
-    bool foundNonWhitespaceAfterColon = false;
+    // we'll find nothing but whitespace or a comment.
+    bool foundStatementAfterColon = false;
 
     while (!tokens.finished()) {
         Term* statement = parser::statement(branch, tokens);
@@ -191,33 +182,33 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
         std::string const& lineEnding = statement->stringProp("syntax:lineEnding");
         bool hasNewline = lineEnding.find_first_of("\n") != std::string::npos;
 
-        if (!just_whitespace(statement))
-            foundNonWhitespaceAfterColon = true;
+        if (statement->function != COMMENT_FUNC)
+            foundStatementAfterColon = true;
 
         // If we hit a newline then move on to the next step
-        if (hasNewline) {
+        if (hasNewline)
             break;
-        }
     }
 
     // If we found any expressions after the : then stop parsing here
     // Example:
     //    def f(): return 1 + 2
-    if (foundNonWhitespaceAfterColon)
+    if (foundStatementAfterColon)
         return;
 
-    // Next, keep parsing until we hit an expression that is not just whitespace.
-    // The first non-whitespace will tell us the indentation level. It might take
+    // Next, keep parsing until we hit a statement that is not comment/whitespace.
+    // This term will tell us the indentation level. It might take
     // a few lines until we find it. Example:
     //     def f():
     //
+    //             -- a misplaced comment
     //         return 1 + 2
 
     int indentationLevel = 0;
     while (!tokens.finished()) {
         Term* statement = parser::statement(branch, tokens);
 
-        if (!just_whitespace(statement)) {
+        if (statement->function != COMMENT_FUNC) {
             indentationLevel = int(statement->stringPropOptional(
                 "syntax:preWhitespace", "").length());
             break;
@@ -234,11 +225,11 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
         if (tokens.nextIs(WHITESPACE))
             nextIndent = (int) tokens.next().text.length();
 
-        // Check if the next line is just whitespace
-        bool justWhitespace = tokens.nextIs(NEWLINE)
-            || (tokens.nextIs(WHITESPACE) && tokens.nextIs(NEWLINE, 1));
+        // Check if the next line is just a comment/whitespace
+        bool ignore = lookahead_match_whitespace_statement(tokens)
+            || lookahead_match_comment_statement(tokens);
 
-        if ((indentationLevel != nextIndent) && !justWhitespace)
+        if (!ignore && (indentationLevel != nextIndent))
             break;
 
         parser::statement(branch, tokens);
@@ -1414,6 +1405,21 @@ std::string qualified_identifier_str(TokenStream& tokens)
     else if (tokens.nextIs(QUALIFIED_IDENTIFIER))
         return tokens.consume(QUALIFIED_IDENTIFIER);
     else return "";
+}
+
+bool lookahead_match_whitespace_statement(TokenStream& tokens)
+{
+    if (tokens.nextIs(NEWLINE)) return true;
+    if (tokens.nextIs(WHITESPACE) && tokens.nextIs(NEWLINE, 1)) return true;
+    return false;
+}
+
+bool lookahead_match_comment_statement(TokenStream& tokens)
+{
+    int lookahead = 0;
+    if (tokens.nextIs(WHITESPACE))
+        lookahead++;
+    return tokens.nextIs(COMMENT, lookahead);
 }
 
 Term* atom(Branch& branch, TokenStream& tokens)

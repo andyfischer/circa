@@ -1,0 +1,26 @@
+
+namespace ui_widgets {
+
+print('ui_widgets')
+
+def draw_vmenu(Point topleft, List items) -> int:
+
+    -- Get text sprites
+    for item in @items:
+        item = text:render_text(ui_font_medium, item, #000)
+
+    width = 0
+    --for item in items:
+        --if item.width > width:
+            --width = item.width
+
+    print('width = ' width)
+
+    index = 0
+    item_height = 25
+    --for item in items:
+        --draw_box([topleft.x topleft.y width item_height] #f00)
+
+    return -1
+
+}
