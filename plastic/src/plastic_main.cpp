@@ -45,7 +45,7 @@ std::string get_home_directory()
 
 std::string find_runtime_file()
 {
-    return get_home_directory() + "/runtime.ca";
+    return get_home_directory() + "/runtime/main.ca";
 }
 
 std::string find_asset_file(std::string const& filename)
