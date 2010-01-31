@@ -11,8 +11,7 @@ namespace text_input
                 st.cursor = st.cursor - 1
             end
         elif keypress.code == RIGHT
-            st_text = st.text -- need to do this b/c of a parser bug
-            if st.cursor < st_text.length()
+            if st.cursor < st.text.length()
                 st.cursor = st.cursor + 1
             end
         elif keypress.code == DELETE

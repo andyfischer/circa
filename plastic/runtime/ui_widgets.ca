@@ -1,26 +1,37 @@
 
-namespace ui_widgets {
+namespace ui_widgets
 
-print('ui_widgets')
 
-def draw_vmenu(Point topleft, List items) -> int:
+def draw_vmenu(Point topleft, List items) -> int
+
+    labels = []
+    for item in items:
+        labels.append(item[0])
 
     -- Get text sprites
-    for item in @items:
-        item = text:render_text(ui_font_medium, item, #000)
+    for label in @labels:
+        label = text:render_text(ui_font_medium, label, #fff)
 
     width = 0
-    --for item in items:
-        --if item.width > width:
-            --width = item.width
-
-    print('width = ' width)
+    for label in labels
+        if label.width > width
+            width = label.width
+        end
+    end
 
     index = 0
-    item_height = 25
-    --for item in items:
-        --draw_box([topleft.x topleft.y width item_height] #f00)
+    item_height = 20
+    h_gutter = 5
+    for label in labels
+        x = topleft.x
+        y = topleft.y + item_height * index
+        box_width = width + h_gutter*2
+        draw_box([x y x+box_width y+item_height] #666)
+        text:draw_rendered_text(label [x+h_gutter y])
+        index += 1
+    end
 
     return -1
+end
 
-}
+end

@@ -96,6 +96,8 @@ namespace gl begin
         "Render a list of points."
     def circle(Point loc, number radius, Color):
         "Render a circle."
+    def pie(Point loc, number angle_start, number angle_fin):
+        "Render a pie slice."
     def load_program(string vertFile, string fragFile) -> int {}
     def _use_program(int prog_id) {}
     def use_program(string vertexFilename, string fragFilename)
@@ -352,8 +354,8 @@ namespace postprocess begin
 end
 
 -- Include other runtime scripts
-include(path('text_input.ca'))
-include(path('ui_widgets.ca'))
+--include(path('text_input.ca'))
+include('ui_widgets.ca')
 
 -- Load the user's script
 

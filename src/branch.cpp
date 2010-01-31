@@ -112,6 +112,9 @@ Term* Branch::appendNew()
 
 void Branch::insert(int index, Term* term)
 {
+    assert(index >= 0);
+    assert(index <= _terms.length());
+
     _terms.append(NULL);
     for (int i=_terms.length()-1; i > index; i--) {
         _terms[i] = _terms[i-1];

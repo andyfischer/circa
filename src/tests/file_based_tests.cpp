@@ -110,12 +110,26 @@ void test_file_changed()
     test_assert(!as_bool(changed));
 }
 
+void test_include_namespace()
+{
+    Branch branch;
+    FakeFileSystem files;
+    files["file"] = "namespace ns a = 5 end";
+
+    branch.eval("include('file')");
+    Term* a = branch.eval("ns:a");
+
+    test_assert(branch);
+    test_assert(as_int(a) == 5);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(file_based_tests::test_the_test);
     REGISTER_TEST_CASE(file_based_tests::test_include_function);
     REGISTER_TEST_CASE(file_based_tests::test_include_static_error_after_reload);
     REGISTER_TEST_CASE(file_based_tests::test_file_changed);
+    REGISTER_TEST_CASE(file_based_tests::test_include_namespace);
 }
 
 } // namespace file_based_tests

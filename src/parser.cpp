@@ -631,7 +631,9 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             assert(leadingToken != IF);
 
         // Otherwise expect 'elif' or 'else'
-        assert(leadingToken == IF || leadingToken == ELIF || leadingToken == ELSE);
+        if (leadingToken != IF && leadingToken != ELIF && leadingToken != ELSE)
+            return compile_error_for_line(result, tokens, startPosition,
+                    "Expected 'if' or 'elif' or 'else'");
         tokens.consume();
 
         bool expectCondition = (leadingToken == IF || leadingToken == ELIF);
