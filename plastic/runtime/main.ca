@@ -359,7 +359,7 @@ include('ui_widgets.ca')
 
 -- Load the user's script
 
-default_script_filename = path("../demos/asteroids.ca")
+default_script_filename = path("../demos/demo_browser.ca")
 state string user_script_filename
 users_branch = include(user_script_filename)
 

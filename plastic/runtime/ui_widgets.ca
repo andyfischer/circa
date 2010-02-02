@@ -1,6 +1,7 @@
 
-namespace ui_widgets
+namespace ui_widgets {
 
+menu_font = ui_font_medium
 
 def draw_vmenu(Point topleft, List items) -> int
 
@@ -34,4 +35,4 @@ def draw_vmenu(Point topleft, List items) -> int
     return -1
 end
 
-end
+} -- namespace ui_widgets

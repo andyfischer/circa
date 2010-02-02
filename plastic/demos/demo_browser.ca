@@ -1,0 +1,4 @@
+
+
+background(#333)
+ui_widgets:draw_vmenu([30 30] [['Asteroids' 1] ['hi' 2] ['bye' 3]])

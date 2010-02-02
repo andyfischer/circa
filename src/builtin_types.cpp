@@ -748,6 +748,22 @@ namespace type_t {
     }
 }
 
+namespace point_t {
+
+    void read(Term* term, float* x, float* y)
+    {
+        Branch& branch = as_branch(term);
+        *x = as_float(branch[0]);
+        *y = as_float(branch[1]);
+    }
+    void write(Term* term, float x, float y)
+    {
+        Branch& branch = as_branch(term);
+        set_float(branch[0], x);
+        set_float(branch[1], y);
+    }
+}
+
 void initialize_builtin_types()
 {
     // this function is not yet used

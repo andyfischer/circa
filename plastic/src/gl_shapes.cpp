@@ -114,14 +114,15 @@ void gl_points(EvalContext*, Term* caller)
 
 void gl_circle(EvalContext*, Term* caller)
 {
-    Branch& center = caller->input(0)->asBranch();
-    float x = center[0]->toFloat();
-    float y = center[1]->toFloat();
+    float x = 0;
+    float y = 0;
+    circa::point_t::read(caller->input(0), &x, &y);
     float radius = caller->input(1)->toFloat();
     Term* color = caller->input(2);
 
     _unpack_gl_color(color);
 
+    // Dumb guess on how many polygons to use
     int control_points = int(radius/3) + 10;
     if (control_points < 15) control_points = 15;
 
@@ -140,6 +141,32 @@ void gl_circle(EvalContext*, Term* caller)
     glEnd();
 
     gl_check_error(caller);
+}
+
+void gl_pie(EvalContext*, Term* caller)
+{
+    float x = 0;
+    float y = 0;
+    circa::point_t::read(caller->input(0), &x, &y);
+    float angle_start = float_input(caller, 1);
+    float angle_fin = float_input(caller, 2);
+
+    // Dumb guess on how many polygons to use
+    int control_points = 15;
+
+    glBegin(GL_TRIANGLE_FAN);
+
+    glVertex3f(x,y,0);
+
+    for (int i=0; i <= control_points; i++) {
+        float angle_0 = float(float(i) / control_points * M_PI * 2);
+        float angle_1 = float(float(i+1) / control_points * M_PI * 2);
+
+        //glVertex3f(x + radius * std::cos(angle_0), y + radius * std::sin(angle_0), 0);
+        //glVertex3f(x + radius * std::cos(angle_1), y + radius * std::sin(angle_1), 0);
+    }
+
+    glEnd();
 }
 
 void load_program(EvalContext*, Term* caller)
@@ -279,6 +306,7 @@ void setup(Branch& branch)
     install_function(gl_ns["line_loop"], gl_line_loop);
     install_function(gl_ns["points"], gl_points);
     install_function(gl_ns["circle"], gl_circle);
+    install_function(gl_ns["pie"], gl_pie);
     install_function(gl_ns["load_program"], load_program);
     install_function(gl_ns["_use_program"], use_program);
     install_function(gl_ns["set_uniform"], set_uniform);

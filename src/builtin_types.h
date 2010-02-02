@@ -69,6 +69,13 @@ namespace type_t {
     void assign(TaggedValue* source, TaggedValue* dest);
 }
 
+namespace point_t {
+
+    // Helper functions:
+    void read(Term* term, float* x, float* y);
+    void write(Term* term, float x, float y);
+}
+
 void initialize_builtin_types();
 void setup_builtin_types(Branch& kernel);
 void parse_builtin_types(Branch& kernel);

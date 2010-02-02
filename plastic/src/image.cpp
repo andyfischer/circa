@@ -18,13 +18,6 @@ namespace image_t {
     void set_height(Term* term, int h) { set_int(term->asBranch()[3], h); }
 }
 
-namespace point_t {
-    float get_x(Term* term) { return term->asBranch()[0]->toFloat(); }
-    float get_y(Term* term) { return term->asBranch()[1]->toFloat(); }
-    void set_x(Term* term, float x) { set_float(term->asBranch()[0], x); }
-    void set_y(Term* term, float y) { set_float(term->asBranch()[1], y); }
-}
-
 namespace rect_t {
     float get_x1(Term* term) { return term->asBranch()[0]->toFloat(); }
     float get_y1(Term* term) { return term->asBranch()[1]->toFloat(); }
@@ -166,8 +159,9 @@ void draw_image(EvalContext*, Term* caller)
     Term* image = caller->input(0);
     Term* point = caller->input(1);
 
-    float x = point_t::get_x(point);
-    float y = point_t::get_y(point);
+    float x = 0;
+    float y = 0;
+    circa::point_t::read(point, &x, &y);
     float width = float(image_t::get_width(image));
     float height = float(image_t::get_height(image));
 
