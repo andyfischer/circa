@@ -3,7 +3,7 @@ namespace ui_widgets {
 
 menu_font = ui_font_medium
 
-def draw_vmenu(Point topleft, List items) -> int
+def draw_vmenu(Point topleft, List items) -> any
 
     labels = []
     for item in items:
@@ -13,26 +13,45 @@ def draw_vmenu(Point topleft, List items) -> int
     for label in @labels:
         label = text:render_text(ui_font_medium, label, #fff)
 
-    width = 0
+    text_width = 0
     for label in labels
-        if label.width > width
-            width = label.width
+        if label.width > text_width
+            text_width = label.width
         end
     end
 
     index = 0
-    item_height = 20
+    item_height = 21
     h_gutter = 5
+    result = 0
+
     for label in labels
         x = topleft.x
         y = topleft.y + item_height * index
-        box_width = width + h_gutter*2
-        draw_box([x y x+box_width y+item_height] #666)
-        text:draw_rendered_text(label [x+h_gutter y])
+        box_width = text_width + h_gutter*2
+        box = [x y x+box_width y+item_height]
+
+        highlight = 0.0
+        if mouse_in(box) highlight = 1.0 end
+        approach(@highlight, 5 * td)
+
+        box_color = #666 + #222 * highlight
+        draw_box(box box_color)
+        text:draw_rendered_text(label [x+h_gutter y+2])
+
+        if index != 0
+            line([x y] [x+box_width y] #888)
+        end
+
+        if mouse_clicked(box)
+            result = items[index][1]
+            print(result)
+        end
+
         index += 1
     end
 
-    return -1
+    return result
 end
 
 } -- namespace ui_widgets

@@ -209,6 +209,10 @@ def draw_box(Rect box, Color color):
     se = [box.x2 box.y2]
     gl:triangles([nw ne se se sw nw] color)
 
+def line(Point x, Point y, Color color)
+    gl:line_strip([x y] color)
+end
+
 def draw_thick_line(Point a, Point b, number width, Color color):
     "Draw a thick line with the given thickness."
     perp = perpendicular(norm(a - b)) * width

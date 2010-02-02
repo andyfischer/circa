@@ -1,4 +1,13 @@
 
 
 background(#333)
-ui_widgets:draw_vmenu([30 30] [['Asteroids' 1] ['hi' 2] ['bye' 3]])
+picked = ui_widgets:draw_vmenu([30 30]
+    [['Asteroids' 'asteroids.ca']
+    ['Buttons (ui test)' 'buttons.ca']
+    ['Drifting stars effect' 'drifting_stars.ca']
+    ['Space invaders (unfinished)' 'invaders.ca']
+    ['Mouse test' 'mouse.ca']
+    ['Moving stars effect' 'moving_stars.ca']
+    ['Pong' 'pong.ca']
+    ['Tic tac toe' 'tic_tac_toe.ca']
+    ['Ramps game' 'ramps.ca']])
