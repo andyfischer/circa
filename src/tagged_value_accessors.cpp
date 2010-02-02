@@ -229,6 +229,16 @@ std::string const& as_string(TaggedValue* value)
     return *((std::string*) value->value_data.ptr);
 }
 
+void* get_pointer(TaggedValue* value)
+{
+    return value->value_data.ptr;
+}
+
+void set_pointer(TaggedValue* value, void* ptr)
+{
+    value->value_data.ptr = ptr;
+}
+
 Type* get_type_value(TaggedValue* value)
 {
     //assert(value.value_type == &as_type(TYPE_TYPE));

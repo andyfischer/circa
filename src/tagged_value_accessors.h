@@ -39,6 +39,9 @@ TaggedValue tag_null();
 TaggedValue tag_pointer(Type* type, void* value);
 #endif
 
+void* get_pointer(TaggedValue* value);
+void set_pointer(TaggedValue* value, void* ptr);
+
 Type* get_type_value(TaggedValue* value);
 Branch* get_branch_value(TaggedValue* value);
 int as_int(TaggedValue* value);

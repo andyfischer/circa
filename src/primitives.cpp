@@ -111,6 +111,7 @@ void initialize_primitive_types(Branch& kernel)
     stringType->equals = NULL;
     stringType->toString = string_t::to_string;
     stringType->initialize = string_t::initialize;
+    stringType->destroy = string_t::destroy;
     stringType->assign2 = string_t::assign;
     stringType->equals2 = string_t::equals;
 

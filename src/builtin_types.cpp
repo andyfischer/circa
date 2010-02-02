@@ -544,6 +544,11 @@ namespace string_t {
 
         set_pointer(value, STRING_TYPE_2, new std::string());
     }
+    void destroy(Type* type, TaggedValue* value)
+    {
+        delete ((std::string*) get_pointer(value));
+        set_pointer(value, NULL);
+    }
 
     void assign(TaggedValue* source, TaggedValue* dest)
     {
@@ -769,6 +774,7 @@ void initialize_builtin_types()
     // this function is not yet used
     STRING_TYPE_2 = new Type();
     STRING_TYPE_2->initialize = string_t::initialize;
+    STRING_TYPE_2->destroy = string_t::destroy;
     STRING_TYPE_2->assign2 = string_t::assign;
     STRING_TYPE_2->equals2 = string_t::equals;
 }
