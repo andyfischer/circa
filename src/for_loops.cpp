@@ -111,7 +111,7 @@ void setup_for_loop_post_code(Term* forTerm)
             Term* outerVersion = find_named(outerScope, name);
             Term* innerVersion = forContents[name];
 
-            apply(rebinds, IF_EXPR_FUNC, RefList(get_for_loop_is_first_iteration(forTerm),
+            apply(rebinds, COND_FUNC, RefList(get_for_loop_is_first_iteration(forTerm),
                 outerVersion, innerVersion), name);
         }
     }
@@ -123,7 +123,7 @@ void setup_for_loop_post_code(Term* forTerm)
 
         remap_pointers(forContents, outerVersion, ifexpr);
 
-        // undo remap to the arguments of if_expr()
+        // undo remap to the arguments of cond()
         ifexpr->inputs[1] = outerVersion;
     }
 
@@ -146,7 +146,7 @@ void setup_for_loop_post_code(Term* forTerm)
             Term* outerVersion = find_named(outerScope, name);
             Term* innerVersion = forContents[name];
 
-            apply(rebindsForOuter, IF_EXPR_FUNC,
+            apply(rebindsForOuter, COND_FUNC,
                     RefList(anyIterations, innerVersion, outerVersion), name);
         }
     }

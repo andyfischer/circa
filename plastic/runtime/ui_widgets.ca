@@ -31,8 +31,7 @@ def draw_vmenu(Point topleft, List items) -> any
         box_width = text_width + h_gutter*2
         box = [x y x+box_width y+item_height]
 
-        highlight = 0.0
-        if mouse_in(box) highlight = 1.0 end
+        highlight = cond(mouse_in(box), 1.0, 0.0)
         approach(@highlight, 5 * td)
 
         box_color = #666 + #222 * highlight

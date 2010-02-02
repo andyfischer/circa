@@ -67,8 +67,8 @@ void test_bool()
 {
     Branch branch;
 
-    test_assert(as_string(branch.eval("if_expr(true, 'a', 'b')")) == "a");
-    test_assert(as_string(branch.eval("if_expr(false, 'a', 'b')")) == "b");
+    test_assert(as_string(branch.eval("cond(true, 'a', 'b')")) == "a");
+    test_assert(as_string(branch.eval("cond(false, 'a', 'b')")) == "b");
 }
 
 void test_builtin_equals()
@@ -204,14 +204,14 @@ void test_vectorized_funcs_with_points()
     test_equals(b->asBranch()[1]->toFloat(), 2);
 }
 
-void test_if_expr_with_int_and_float()
+void test_cond_with_int_and_float()
 {
     Branch branch;
 
     // This code once caused a bug
-    Term* a = branch.eval("if_expr(true, 1, 1.0)");
+    Term* a = branch.eval("cond(true, 1, 1.0)");
     test_assert(a->type != ANY_TYPE);
-    Term* b = branch.eval("if_expr(true, 1.0, 1)");
+    Term* b = branch.eval("cond(true, 1.0, 1)");
     test_assert(b->type != ANY_TYPE);
 }
 
@@ -305,7 +305,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_map);
     REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs);
     REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs_with_points);
-    REGISTER_TEST_CASE(builtin_function_tests::test_if_expr_with_int_and_float);
+    REGISTER_TEST_CASE(builtin_function_tests::test_cond_with_int_and_float);
     REGISTER_TEST_CASE(builtin_function_tests::test_get_index);
     REGISTER_TEST_CASE(builtin_function_tests::test_set_index);
     REGISTER_TEST_CASE(builtin_function_tests::test_do_once);

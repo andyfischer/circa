@@ -342,7 +342,7 @@ void create_rebind_branch(Branch& rebinds, Branch& source, Term* rebindCondition
 
         Term* pos = outsidePositive ? outerVersion : innerVersion;
         Term* neg = outsidePositive ? innerVersion : outerVersion ;
-        apply(rebinds, IF_EXPR_FUNC, RefList(rebindCondition, pos, neg), name);
+        apply(rebinds, COND_FUNC, RefList(rebindCondition, pos, neg), name);
     }
 }
 

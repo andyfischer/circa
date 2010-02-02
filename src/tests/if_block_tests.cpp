@@ -26,7 +26,7 @@ void test_if_joining()
 
 void test_if_joining_on_bool()
 {
-    // The following code once had a bug where if_expr wouldn't work
+    // The following code once had a bug where cond wouldn't work
     // if one of its inputs was missing value.
     Branch branch;
     Term* s = branch.eval("hey = true");

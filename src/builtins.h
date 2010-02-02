@@ -29,7 +29,7 @@ extern Term* GET_INDEX_FUNC;
 extern Term* GET_FIELD_FUNC;
 extern Term* IF_FUNC;
 extern Term* IF_BLOCK_FUNC;
-extern Term* IF_EXPR_FUNC;
+extern Term* COND_FUNC;
 extern Term* INCLUDE_FUNC;
 extern Term* INPUT_PLACEHOLDER_FUNC;
 extern Term* LIST_FUNC;

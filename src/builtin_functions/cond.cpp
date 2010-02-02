@@ -3,7 +3,7 @@
 #include "circa.h"
 
 namespace circa {
-namespace if_expr_function {
+namespace cond_function {
 
     void evaluate(EvalContext*, Term* caller)
     {
@@ -33,9 +33,9 @@ namespace if_expr_function {
         Term* desired = caller->input(1);
         Branch& output = as_branch(caller);
 
-        // if_expr(cond, pos, neg)
+        // cond(condition, pos, neg)
         //
-        // For cond, don't try to send feedback
+        // For condition, don't try to send feedback
         assign_value(target->input(0), output[0]);
 
         // For pos and neg, pass along the feedback that we have received,
@@ -52,12 +52,12 @@ namespace if_expr_function {
 
     void setup(Branch& kernel)
     {
-        IF_EXPR_FUNC = import_function(kernel, evaluate, "if_expr(bool condition, any pos, any neg) -> any; \"If 'condition' is true, returns 'pos'. Otherwise returns 'neg'. This function will probably get some special syntax in the future.\" end");
-        function_t::get_specialize_type(IF_EXPR_FUNC) = specializeType;
-        function_t::set_input_meta(IF_EXPR_FUNC, 1, true);
-        function_t::set_input_meta(IF_EXPR_FUNC, 2, true);
-        function_t::get_feedback_func(IF_EXPR_FUNC) =
-            import_function(kernel, feedback_evaluate, "if_expr_feedback(any, any) -> Branch");
+        COND_FUNC = import_function(kernel, evaluate, "cond(bool condition, any pos, any neg) -> any; \"If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.\" end");
+        function_t::get_specialize_type(COND_FUNC) = specializeType;
+        function_t::set_input_meta(COND_FUNC, 1, true);
+        function_t::set_input_meta(COND_FUNC, 2, true);
+        function_t::get_feedback_func(COND_FUNC) =
+            import_function(kernel, feedback_evaluate, "cond_feedback(any, any) -> Branch");
     }
 }
 }
