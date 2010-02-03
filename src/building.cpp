@@ -120,6 +120,8 @@ bool is_actually_using(Term* user, Term* usee)
 
 Term* create_duplicate(Branch& branch, Term* source, std::string const& name, bool copyBranches)
 {
+    assert(source != NULL);
+
     Term* term = apply(branch, source->function, source->inputs, name);
     change_type(term, source->type);
 
@@ -155,6 +157,8 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
 
     if (name != "")
         branch.bindName(term, name);
+
+    Term* oldType = term->type;
 
     term->function = VALUE_FUNC;
     term->type = type;

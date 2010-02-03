@@ -11,10 +11,14 @@ bool is_value_alloced(Term* term)
         return false;
     }
 
+    return true;
+
+#if 0
     if (!type_t::get_is_pointer(term->type))
         return true;
     else
         return term->value_data.ptr != NULL;
+#endif
 }
 
 void alloc_value(Term* term)
@@ -36,29 +40,11 @@ void alloc_value(Term* term)
     term->value_type = &as_type(term->type);
 }
 
-void dealloc_value(Term* term)
-{
-    if (term->type == NULL) return;
-    if (!is_value_alloced(term)) return;
-
-    Type::DeallocFunc dealloc = type_t::get_dealloc_func(term->type);
-
-    if (!is_value_alloced(term->type)) {
-        std::cout << "warn: in dealloc_value, type is undefined" << std::endl;
-        set_null(term);
-        return;
-    }
-
-    if (dealloc != NULL)
-        dealloc(term->type, term);
-
-    set_null(term);
-}
-
 void assign_value(Term* source, Term* dest)
 {
     if (!is_value_alloced(source)) {
-        dealloc_value(dest);
+        assert(false);
+        std::cout << "unsupported in assign_value" << std::endl;
         return;
     }
 
@@ -67,6 +53,14 @@ void assign_value(Term* source, Term* dest)
     if (dest->type == ANY_TYPE)
         specialize_type(dest, source->type);
 
+    Type::AssignFunc assign = type_t::get_assign_func(dest->type);
+
+    if (assign == NULL) {
+        assign_value((TaggedValue*) source, (TaggedValue*) dest);
+        return;
+    }
+
+    // Deprecated behavior:
     if (!value_fits_type(source, dest->type)) {
         std::stringstream err;
         err << "In assign_value, element of type " << source->type->name <<
@@ -77,12 +71,6 @@ void assign_value(Term* source, Term* dest)
     if (!is_value_alloced(dest))
         alloc_value(dest);
 
-    Type::AssignFunc assign = type_t::get_assign_func(dest->type);
-
-    if (assign == NULL) {
-        assign_value((TaggedValue*) source, (TaggedValue*) dest);
-        return;
-    }
 
     assign(source, dest);
 }

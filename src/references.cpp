@@ -33,9 +33,6 @@ void delete_term(Term* term)
 {
     assert_good_pointer(term);
 
-    if (term->boolPropOptional("owned-value", true))
-        dealloc_value(term);
-
     assert(term->refCount == 0);
 
     term->inputs.clear();

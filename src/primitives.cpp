@@ -106,7 +106,6 @@ void initialize_primitive_types(Branch& kernel)
     STRING_TYPE = create_type(kernel, "string");
     Type* stringType = &as_type(STRING_TYPE);
     stringType->alloc = NULL;
-    stringType->dealloc = NULL;
     stringType->assign = NULL;
     stringType->equals = NULL;
     stringType->toString = string_t::to_string;
@@ -135,7 +134,6 @@ void initialize_primitive_types(Branch& kernel)
     REF_TYPE = create_type(kernel, "Ref");
     Type* refType = &as_type(REF_TYPE);
     refType->alloc = NULL;
-    refType->dealloc = NULL;
     refType->remapPointers = Ref::remap_pointers;
     refType->toString = ref_t::to_string;
     refType->initialize = ref_t::initialize;

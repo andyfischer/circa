@@ -39,8 +39,12 @@ void test_get_relative_name()
     test_assert(get_relative_name(branch, a) == "A");
 
     Branch& ns = create_namespace(branch, "ns");
+    test_assert(ns.owningTerm != NULL);
     Term* b = create_int(ns, 5, "B");
 
+    test_assert(is_branch(branch["ns"]));
+    test_assert(ns.owningTerm != NULL);
+    test_assert(ns.owningTerm == branch["ns"]);
     test_assert(get_relative_name(ns, b) == "B");
     test_equals(get_relative_name(branch, b), "ns:B");
 

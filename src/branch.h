@@ -92,10 +92,14 @@ private:
 namespace branch_t {
     void alloc(Term* type, Term* t);
     void dealloc(Term* type, Term* t);
-    void assign(Term*, Term*);
+    void initialize(Type*, TaggedValue* value);
+    void destroy(Type*, TaggedValue* value);
+    void assign(TaggedValue*, TaggedValue*);
+    void cast(Type*, TaggedValue* source, TaggedValue* dest);
     bool equals(Term*, Term*);
 
-    void assign(Branch& source, Branch& dest, bool strictTypes);
+    void cross_type_assign(Branch& source, Branch& dest);
+    void assign(Branch& source, Branch& dest);
 }
 
 bool is_branch(Term* term);

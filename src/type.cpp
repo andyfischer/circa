@@ -65,10 +65,6 @@ namespace type_t {
     {
         return as_type(type).alloc;
     }
-    Type::DeallocFunc& get_dealloc_func(Term* type)
-    {
-        return as_type(type).dealloc;
-    }
     Type::AssignFunc& get_assign_func(Term* type)
     {
         return as_type(type).assign;
@@ -155,7 +151,7 @@ bool is_native_type(Term* type)
 
 bool is_compound_type(Term* type)
 {
-    return type_t::get_alloc_func(type) == branch_t::alloc;
+    return as_type(type).initialize == branch_t::initialize;
 }
 
 Type& as_type(Term *term)
@@ -291,19 +287,37 @@ Term* find_common_type(RefList const& list)
     return ANY_TYPE;
 }
 
+void reset_type(Type* type)
+{
+    type->alloc = NULL;
+    type->assign = NULL;
+    type->equals = NULL;
+    type->remapPointers = NULL;
+    type->toString = NULL;
+    type->checkInvariants = NULL;
+    type->valueFitsType = NULL;
+    type->initialize = NULL;
+    type->assign2 = NULL;
+    type->destroy = NULL;
+    type->equals2 = NULL;
+    type->cast = NULL;
+}
 void initialize_compound_type(Term* term)
 {
-    type_t::get_alloc_func(term) = branch_t::alloc;
-    type_t::get_dealloc_func(term) = branch_t::dealloc;
-    type_t::get_assign_func(term) = branch_t::assign;
-    type_t::get_equals_func(term) = branch_t::equals;
-    type_t::get_to_string_func(term) = compound_type_to_string;
+    Type* type = &as_type(term);
+
+    reset_type(type);
+    type->initialize = branch_t::initialize;
+    type->destroy = branch_t::destroy;
+    type->assign2 = branch_t::assign;
+    type->cast = branch_t::cast;
+    type->equals = branch_t::equals;
+    type->toString = compound_type_to_string;
 }
 
 void initialize_simple_pointer_type(Type* type)
 {
     type->alloc = NULL;
-    type->dealloc = NULL;
     type->initialize = NULL;
     type->destroy = NULL;
     type->assign = NULL;
@@ -381,7 +395,7 @@ void assign_value_to_default(Term* term)
         if (is_branch(term)) {
 
             Branch& prototype = type_t::get_prototype(term->type);
-            branch_t::assign(prototype, as_branch(term), true);
+            branch_t::assign(prototype, as_branch(term));
             return;
         }
     }

@@ -251,6 +251,12 @@ Branch* get_branch_value(TaggedValue* value)
     return (Branch*) value->value_data.ptr;
 }
 
+Branch& as_branch(TaggedValue* value)
+{
+    assert(is_branch(value));
+    return *((Branch*) value->value_data.ptr);
+}
+
 const char* get_name_for_type(Type* type)
 {
     if (type == NULL)
@@ -318,6 +324,11 @@ bool is_value_type(TaggedValue* value)
 bool is_value_of_type(TaggedValue* value, Type* type)
 {
     return value->value_type == type;
+}
+
+bool is_branch(TaggedValue* value)
+{
+    return value->value_type->initialize == branch_t::initialize;
 }
 
 bool is_null(TaggedValue* value)

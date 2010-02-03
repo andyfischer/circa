@@ -11,25 +11,23 @@ namespace circa {
 namespace cpp_importing {
 
 template <class T>
-void templated_alloc(Term* type, Term* term)
+void templated_initialize(Type* type, TaggedValue* value)
 {
     // Use malloc() and memset(), this allows us to make sure that the value's memory
     // is zeroed out before it is used.
     void* data = malloc(sizeof(T));
     memset(data, 0, sizeof(T));
     new(data) T();
-    term->value_type = &as_type(type);
-    term->value_data.ptr = data;
+    value->value_data.ptr = data;
 }
 
 template <class T>
-void templated_dealloc(Term* type, Term* term)
+void templated_destroy(Type*, TaggedValue* value)
 {
     // Placement delete because we used placement new above.
-    reinterpret_cast<T*>(term->value_data.ptr)->~T();
-    free((void*) term->value_data.ptr);
-    term->value_data.ptr = 0;
-    term->value_type = 0;
+    reinterpret_cast<T*>(value->value_data.ptr)->~T();
+    free((void*) value->value_data.ptr);
+    value->value_data.ptr = 0;
 }
 
 template <class T>
@@ -60,14 +58,15 @@ bool raw_value_less_than(Term* a, Term* b);
 
 // Public functions
 
-// deprecated:
 template <class T>
 void import_type(Term* term)
 {
     Type* type = &as_type(term);
 
-    type->alloc = cpp_importing::templated_alloc<T>;
-    type->dealloc = cpp_importing::templated_dealloc<T>;
+    reset_type(type);
+
+    type->initialize = cpp_importing::templated_initialize<T>;
+    type->destroy = cpp_importing::templated_destroy<T>;
     type->assign = cpp_importing::templated_assign<T>;
     type->cppTypeInfo = &typeid(T);
     type->toString = NULL;

@@ -138,7 +138,7 @@ struct RefList
     void removeNulls() { remove((Term*)NULL); }
     void clear() { _items.clear(); }
 
-    int length() const { return (int) _items.size(); }
+    int length() const;
     bool empty() const { return _items.empty(); }
     Term* get(unsigned int index) const
     {

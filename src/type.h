@@ -20,7 +20,6 @@ struct Type
 {
     typedef void (*AllocFunc)(Term* type, Term* term);
     typedef void (*DeallocFunc)(Term* type, Term* term);
-    typedef void (*DuplicateFunc)(Term* src, Term* dest);
     typedef void (*AssignFunc)(Term* src, Term* dest);
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
@@ -47,7 +46,6 @@ struct Type
 
     // Functions
     AllocFunc alloc; // deprecated
-    DeallocFunc dealloc;
     AssignFunc assign; // deprecated
     EqualsFunc equals;
     RemapPointersFunc remapPointers;
@@ -57,8 +55,8 @@ struct Type
 
     // new stype:
     InitializeFunc initialize;
-    AssignFunc2 assign2;
     DestroyFunc destroy;
+    AssignFunc2 assign2;
     EqualsFunc2 equals2;
     CastFunc cast;
     
@@ -80,7 +78,6 @@ struct Type
         isPointer(true),
         cppTypeInfo(NULL),
         alloc(NULL),
-        dealloc(NULL),
         assign(NULL),
         equals(NULL),
         remapPointers(NULL),
@@ -88,8 +85,8 @@ struct Type
         checkInvariants(NULL),
         valueFitsType(NULL),
         initialize(NULL),
-        assign2(NULL),
         destroy(NULL),
+        assign2(NULL),
         equals2(NULL),
         cast(NULL)
     {
@@ -114,7 +111,6 @@ namespace type_t {
     bool& get_is_pointer(Term* type);
     const std::type_info*& get_std_type_info(Term* type);
     Type::AllocFunc& get_alloc_func(Term* type);
-    Type::DeallocFunc& get_dealloc_func(Term* type);
     Type::AssignFunc& get_assign_func(Term* type);
     Type::EqualsFunc& get_equals_func(Term* type);
     Type::RemapPointersFunc& get_remap_pointers_func(Term* type);
@@ -152,6 +148,7 @@ bool is_assign_value_possible(Term* source, Term* dest);
 // list. Currently, this is not very sophisticated.
 Term* find_common_type(RefList const& list);
 
+void reset_type(Type* type);
 void initialize_compound_type(Term* term);
 void initialize_simple_pointer_type(Type* type);
 

@@ -6,6 +6,12 @@
 
 namespace circa {
 
+int RefList::length() const
+{
+    assert(_items.size() < 0x8ffffff);
+    return (int) _items.size();
+}
+
 void RefList::appendAll(RefList const& list)
 {
     assert(&list != this);

@@ -62,12 +62,13 @@ void type_declaration()
     test_assert(prototype[1]->name == "b");
     test_assert(prototype[1]->type == INT_TYPE);
 
-    test_assert(type_t::get_alloc_func(myType) != NULL);
-    test_assert(type_t::get_assign_func(myType) != NULL);
+    Type* type = &as_type(myType);
+    test_assert(type->initialize != NULL);
+    test_assert(type->assign2 != NULL);
 
-    Term* instance = branch.eval("mt = MyType()");
+    branch.eval("mt = MyType()");
 
-    test_assert(is_value_alloced(instance));
+    test_assert(branch);
 }
 
 void test_value_fits_type()

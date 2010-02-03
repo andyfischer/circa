@@ -280,6 +280,8 @@ Branch::eval(std::string const& code)
 }
 
 namespace branch_t {
+
+    // deprecated:
     void alloc(Term* typeTerm, Term* term)
     {
         Branch* branch = new Branch();
@@ -293,36 +295,75 @@ namespace branch_t {
         }
     }
 
-    void dealloc(Term* type, Term* term)
+    void initialize(Type*, TaggedValue* value)
     {
-        Branch& branch = as_branch(term);
-        branch._refCount--;
-        if (branch._refCount <= 0)
-            delete (Branch*) term->value_data.ptr;
+        set_pointer(value, new Branch());
     }
 
-    void assign(Term* sourceTerm, Term* destTerm)
+    void destroy(Type*, TaggedValue* value)
     {
-        Branch& source = as_branch(sourceTerm);
-        Branch& dest = as_branch(destTerm);
-        bool strictTypes = destTerm->type != BRANCH_TYPE && destTerm->type != LIST_TYPE;
-        assign(source, dest, strictTypes);
+        delete (Branch*) get_pointer(value);
     }
 
-    void assign(Branch& source, Branch& dest, bool strictTypes)
+    void assign(TaggedValue* sourceValue, TaggedValue* destValue)
+    {
+        Branch& source = as_branch(sourceValue);
+        Branch& dest = as_branch(destValue);
+
+        // For Branch or List type, overwrite existing shape
+        if ((destValue->value_type == &as_type(BRANCH_TYPE))
+                || (destValue->value_type == &as_type(LIST_TYPE)))
+            cross_type_assign(source, dest);
+        else
+            assign(source, dest);
+    }
+
+    void cast(Type*, TaggedValue* source, TaggedValue* dest)
+    {
+        assign(source, dest);
+    }
+
+    void cross_type_assign(Branch& source, Branch& dest)
     {
         // Assign terms as necessary
         int lengthToAssign = std::min(source.length(), dest.length());
 
         for (int i=0; i < lengthToAssign; i++) {
-            // Change type if necessary
-            if (!strictTypes && (source[i]->type != dest[i]->type))
-                change_type(dest[i], source[i]->type);
+            // Change type if needed
+            if (source[i]->type != dest[i]->type)
+                change_type(source[i], dest[i]->type);
             assign_value(source[i], dest[i]);
         }
 
         // Add terms if necessary
         for (int i=dest.length(); i < source.length(); i++) {
+            assert(source[i] != NULL);
+
+            Term* t = create_duplicate(dest, source[i]);
+            if (source[i]->name != "")
+                dest.bindName(t, source[i]->name);
+        }
+
+        // Remove terms if necessary
+        for (int i=source.length(); i < dest.length(); i++) {
+            dest.set(i, NULL);
+        }
+
+        dest.removeNulls();
+    }
+
+    void assign(Branch& source, Branch& dest)
+    {
+        // Assign terms as necessary
+        int lengthToAssign = std::min(source.length(), dest.length());
+
+        for (int i=0; i < lengthToAssign; i++)
+            assign_value(source[i], dest[i]);
+
+        // Add terms if necessary
+        for (int i=dest.length(); i < source.length(); i++) {
+            assert(source[i] != NULL);
+
             Term* t = create_duplicate(dest, source[i]);
             if (source[i]->name != "")
                 dest.bindName(t, source[i]->name);
@@ -356,7 +397,7 @@ namespace branch_t {
 bool is_branch(Term* term)
 {
     return (term->type != NULL) &&
-        (type_t::get_alloc_func(term->type) == branch_t::alloc);
+        as_type(term->type).initialize == branch_t::initialize;
 }
 
 Branch& as_branch(Term* term)

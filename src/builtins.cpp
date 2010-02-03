@@ -129,7 +129,7 @@ void bootstrap_kernel()
     // Initialize Value func
     VALUE_FUNC->type = FUNCTION_TYPE;
     VALUE_FUNC->function = VALUE_FUNC;
-    alloc_value(VALUE_FUNC);
+    change_type((TaggedValue*)VALUE_FUNC, (Type*)BRANCH_TYPE->value_data.ptr);
 
     // Initialize List type, it's needed soon
     LIST_TYPE = create_compound_type(*KERNEL, "List");

@@ -44,6 +44,7 @@ void set_pointer(TaggedValue* value, void* ptr);
 
 Type* get_type_value(TaggedValue* value);
 Branch* get_branch_value(TaggedValue* value);
+Branch& as_branch(TaggedValue* value);
 int as_int(TaggedValue* value);
 float as_float(TaggedValue* value);
 std::string const& as_string(TaggedValue* value);
@@ -61,6 +62,7 @@ bool is_value_ref(TaggedValue* value);
 bool is_value_branch(TaggedValue* value);
 bool is_value_type(TaggedValue* value);
 bool is_value_of_type(TaggedValue* value, Type* type);
+bool is_branch(TaggedValue* value);
 bool is_null(TaggedValue* value);
 
 } // namespace circa
