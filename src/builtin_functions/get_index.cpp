@@ -22,11 +22,6 @@ namespace get_index_function {
             return;
         }
 
-        if (!is_value_alloced(input[index])) {
-            error_occurred(caller, "Internal error: list element is not allocated");
-            return;
-        }
-    
         assign_value(input[index], caller);
     }
 

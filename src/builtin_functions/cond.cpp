@@ -10,13 +10,6 @@ namespace cond_function {
         int index = bool_input(caller,0) ? 1 : 2;
         Term *result = caller->inputs[index];
 
-        if (!is_value_alloced(result)) {
-            std::stringstream out;
-            out << "input " << index << " not ready";
-            error_occurred(caller, out.str());
-            return;
-        }
-
         change_type(caller, result->type);
         assign_value(caller->inputs[index], caller);
     }

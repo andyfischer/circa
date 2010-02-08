@@ -216,21 +216,6 @@ void type_inference_for_get_field()
     test_assert(b->type == FLOAT_TYPE);
 }
 
-void test_is_value_allocced()
-{
-    // This test was written while chasing a bug (although it turned out
-    // to not capture the bug)
-    Branch branch;
-    Term* a = branch.eval("a = 0");
-    test_assert(is_value_alloced(a));
-
-    Term* ns = branch.eval("namespace ns; a = 0; end");
-    a = ns->asBranch()[0];
-    test_assert(is_value_alloced(a));
-
-    test_assert(!type_t::get_is_pointer(INT_TYPE));
-}
-
 void test_find_common_type()
 {
     test_assert(find_common_type(RefList(INT_TYPE,INT_TYPE)) == INT_TYPE);
@@ -314,7 +299,6 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_assign_compound_value_to_default);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);
-    REGISTER_TEST_CASE(type_tests::test_is_value_allocced);
     REGISTER_TEST_CASE(type_tests::test_find_common_type);
     REGISTER_TEST_CASE(type_tests::test_type_error_in_a_native_call);
     REGISTER_TEST_CASE(type_tests::test_imported_pointer_type);

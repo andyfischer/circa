@@ -11,8 +11,6 @@ namespace list_function {
         int numToAssign = std::min(caller->numInputs(), dest.length());
 
         for (int i=0; i < numToAssign; i++) {
-            if (!is_value_alloced(caller->input(i)))
-                continue;
             assign_value(caller->input(i), dest[i]);
         }
 

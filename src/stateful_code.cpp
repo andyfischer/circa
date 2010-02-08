@@ -34,8 +34,7 @@ void load_state_into_branch(Branch& state, Branch& branch)
         if (read >= state.length())
             break;
 
-        if (is_value_alloced(state[read]))
-            assign_value(state[read], destTerm);
+        assign_value(state[read], destTerm);
 
         read++;
     }
@@ -61,8 +60,7 @@ void persist_state_from_branch(Branch& branch, Branch& state)
         rewrite_as_value(state, write, term->type);
         rename(state[write], term->name);
 
-        if (is_value_alloced(term))
-            assign_value(term, state[write]);
+        assign_value(term, state[write]);
 
         write++;
     }
@@ -204,8 +202,7 @@ void migrate_stateful_values(Branch& source, Branch& dest)
         
         // Stateful value migration
         else if (is_stateful(sourceTerm)
-                    && is_stateful(destTerm)
-                    && is_value_alloced(sourceTerm)) {
+                    && is_stateful(destTerm)) {
 
             if (MIGRATE_STATEFUL_VALUES_VERBOSE)
                 std::cout << "assigning value of " << to_string(sourceTerm) << std::endl;

@@ -191,8 +191,6 @@ void refresh_training_branch(Branch& branch, Branch& trainingBranch)
             // Inputs to feedback func are [originalTerm, desiredValue]
 
             Term* feedback = apply(trainingBranch, feedbackFunc, RefList(term, desiredValue));
-            alloc_value(feedback);
-
             // Resize the output of 'feedback' so that there is one output term per input
             resize_list(as_branch(feedback), term->numInputs(), ANY_TYPE);
 
@@ -205,7 +203,6 @@ void refresh_training_branch(Branch& branch, Branch& trainingBranch)
                 // Initialize this field
                 specialize_type(outgoingFeedback,
                         function_t::get_input_type(term->function, i));
-                alloc_value(outgoingFeedback);
 
                 if (!is_trainable(input))
                     continue;

@@ -51,7 +51,6 @@ bool templated_lessThan(Term* a, Term* b)
         < (*(reinterpret_cast<T*>(b->value_data.ptr)));
 }
 
-void pointer_alloc(Term* type, Term* term);
 bool raw_value_less_than(Term* a, Term* b);
 
 } // namespace cpp_importing
@@ -62,7 +61,6 @@ template <class T>
 void import_type(Term* term)
 {
     Type* type = &as_type(term);
-
     reset_type(type);
 
     type->initialize = cpp_importing::templated_initialize<T>;
@@ -77,13 +75,13 @@ void import_type(Term* term)
 template <class T>
 void import_pointer_type(Term* term)
 {
-    type_t::get_alloc_func(term) = cpp_importing::pointer_alloc;
-    type_t::get_assign_func(term) = NULL;
-    type_t::get_equals_func(term) = NULL;
-    type_t::get_std_type_info(term) = &typeid(T);
-    type_t::get_to_string_func(term) = NULL;
-    type_t::get_remap_pointers_func(term) = NULL;
-    type_t::get_check_invariants_func(term) = NULL;
+    Type* type = &as_type(term);
+    reset_type(type);
+
+    type->cppTypeInfo = &typeid(T);
+    type->toString = NULL;
+    type->remapPointers = NULL;
+    type->checkInvariants = NULL;
 }
 
 template <class T>

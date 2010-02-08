@@ -45,7 +45,6 @@ void BranchIterator::advance()
 
     // Check to start an inner branch.
     if (term != NULL && is_branch(term)
-            && is_value_alloced(term)
             && (as_branch(term).length() > 0)) {
         int firstIndex = _backwards ? as_branch(term).length() - 1 : 0;
         _stack.push_back(Frame(&as_branch(term), firstIndex));

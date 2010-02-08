@@ -61,10 +61,6 @@ namespace type_t {
     {
         return as_type(type).cppTypeInfo;
     }
-    Type::AllocFunc& get_alloc_func(Term* type)
-    {
-        return as_type(type).alloc;
-    }
     Type::AssignFunc& get_assign_func(Term* type)
     {
         return as_type(type).assign;
@@ -112,7 +108,6 @@ namespace type_t {
         if (get_default_value(type) == NULL)
             create_value(type_t::get_attributes(type), VOID_TYPE, "defaultValue");
         change_type(get_default_value(type), type);
-        alloc_value(get_default_value(type));
     }
 
 } // namespace type_t
@@ -156,7 +151,6 @@ bool is_compound_type(Term* type)
 
 Type& as_type(Term *term)
 {
-    // don't call alloc_value because that calls as_type
     assert(get_type_value(term) != NULL);
 
     // don't use assert_type here because assert_type uses as_type
@@ -289,7 +283,6 @@ Term* find_common_type(RefList const& list)
 
 void reset_type(Type* type)
 {
-    type->alloc = NULL;
     type->assign = NULL;
     type->equals = NULL;
     type->remapPointers = NULL;
@@ -317,7 +310,9 @@ void initialize_compound_type(Term* term)
 
 void initialize_simple_pointer_type(Type* type)
 {
-    type->alloc = NULL;
+    reset_type(type);
+
+    // Unnecessary but illustrative:
     type->initialize = NULL;
     type->destroy = NULL;
     type->assign = NULL;
@@ -355,19 +350,24 @@ bool equals(Term* a, Term* b)
 
 std::string to_string(Term* term)
 {
-    Type::ToStringFunc func = type_t::get_to_string_func(term->type);
-
-    if (func == NULL) {
-        // Generic to-string
-        std::stringstream result;
-        result << "<" << type_t::get_name(term->type) << " 0x";
-        result << std::hex << get_type_value(term) << ">";
-        return result.str();
-    }
-    else if (!is_value_alloced(term))
+    if (term->type == NULL)
         return "<NULL>";
-    else
+
+    Type* type = &as_type(term->type);
+
+    if (type == NULL)
+        return "<NULL>";
+
+    Type::ToStringFunc func = type->toString;
+
+    if (func != NULL)
         return func(term);
+
+    // Generic to-string
+    std::stringstream result;
+    result << "<" << type_t::get_name(term->type) << " 0x";
+    result << std::hex << get_type_value(term) << ">";
+    return result.str();
 }
 
 void assign_value_to_default(Term* term)

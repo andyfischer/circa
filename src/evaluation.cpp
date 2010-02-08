@@ -75,8 +75,8 @@ void evaluate_without_side_effects(Term* term)
 
 bool has_been_evaluated(Term* term)
 {
-    // Not the best way of checking:
-    return is_value_alloced(term);
+    // TODO
+    return true;
 }
 
 } // namespace circa

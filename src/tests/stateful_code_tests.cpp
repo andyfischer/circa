@@ -327,23 +327,6 @@ void test_reset_state()
     test_assert(i->asInt() == 5);
 }
 
-void try_to_migrate_value_that_isnt_allocced()
-{
-#if 0
-    TODO
-    // This code once caused a crash
-    Branch source, dest;
-    Term* i = create_stateful_value(source, INT_TYPE, "i");
-    set_int(i, 5);
-    dealloc_value(i);
-
-    Term* dest_i = create_stateful_value(dest, INT_TYPE, "i");
-    set_int(dest_i, 4);
-
-    migrate_stateful_values(source, dest);
-#endif
-}
-
 void bug_where_stateful_function_wouldnt_update_inputs()
 {
     Branch branch;
@@ -432,7 +415,6 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::migrate_subroutine_with_no_hidden_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_migrate_stateful_compound_value);
     REGISTER_TEST_CASE(stateful_code_tests::test_reset_state);
-    REGISTER_TEST_CASE(stateful_code_tests::try_to_migrate_value_that_isnt_allocced);
     REGISTER_TEST_CASE(stateful_code_tests::bug_where_stateful_function_wouldnt_update_inputs);
     REGISTER_TEST_CASE(stateful_code_tests::bug_where_state_wasnt_preserved_after_error);
     REGISTER_TEST_CASE(stateful_code_tests::test_load_state_into_branch);

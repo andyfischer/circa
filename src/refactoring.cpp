@@ -27,11 +27,6 @@ void unsafe_change_type(Term *term, Term *type)
 {
     assert(type != NULL);
 
-    if (!is_value_alloced(term)) {
-        change_type(term, type);
-        return;
-    }
-
     term->type = type;
 }
 
@@ -52,8 +47,7 @@ void change_type(Term *term, Term *typeTerm)
     if (oldType == typeTerm)
         return;
 
-    if (is_value_alloced(term))
-        assign_value_to_default(term);
+    assign_value_to_default(term);
 }
 
 void specialize_type(Term *term, Term *type)

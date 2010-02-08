@@ -77,13 +77,7 @@ void print_term_raw_string(std::ostream& out, Term* term)
 
     out << " -> " << typeName;
 
-    bool showValue = is_value_alloced(term);
-
-    if (term->type == NULL || is_branch(term))
-        showValue = false;
-
-    if (showValue)
-        out << " == " << term->toString();
+    out << " == " << term->toString();
 }
 
 void print_term_raw_string_with_properties(std::ostream& out, Term* term)

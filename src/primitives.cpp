@@ -50,7 +50,6 @@ bool is_ref(Term* term)
 
 float to_float(Term* term)
 {
-    alloc_value(term);
     if (term->type == FLOAT_TYPE)
         return as_float(term);
     else if (term->type == INT_TYPE)
@@ -105,7 +104,6 @@ void initialize_primitive_types(Branch& kernel)
 
     STRING_TYPE = create_type(kernel, "string");
     Type* stringType = &as_type(STRING_TYPE);
-    stringType->alloc = NULL;
     stringType->assign = NULL;
     stringType->equals = NULL;
     stringType->toString = string_t::to_string;
@@ -133,7 +131,6 @@ void initialize_primitive_types(Branch& kernel)
 
     REF_TYPE = create_type(kernel, "Ref");
     Type* refType = &as_type(REF_TYPE);
-    refType->alloc = NULL;
     refType->remapPointers = Ref::remap_pointers;
     refType->toString = ref_t::to_string;
     refType->initialize = ref_t::initialize;

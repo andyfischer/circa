@@ -18,17 +18,14 @@ namespace circa {
 
 struct Type
 {
-    typedef void (*AllocFunc)(Term* type, Term* term);
-    typedef void (*DeallocFunc)(Term* type, Term* term);
+    typedef void (*InitializeFunc)(Type* type, TaggedValue* value);
+    typedef void (*DestroyFunc)(Type* type, TaggedValue* value);
     typedef void (*AssignFunc)(Term* src, Term* dest);
     typedef bool (*EqualsFunc)(Term* src, Term* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
     typedef std::string (*ToStringFunc)(Term* term);
     typedef bool (*CheckInvariantsFunc)(Term* term, std::string* output);
     
-    // new style:
-    typedef void (*InitializeFunc)(Type* type, TaggedValue* value);
-    typedef void (*DestroyFunc)(Type* type, TaggedValue* value);
     typedef void (*AssignFunc2)(TaggedValue* source, TaggedValue* dest);
     typedef bool (*EqualsFunc2)(TaggedValue* lhs, TaggedValue* rhs);
     typedef bool (*ValueFitsTypeFunc)(Type* type, TaggedValue* value);
@@ -45,7 +42,6 @@ struct Type
     const std::type_info *cppTypeInfo;
 
     // Functions
-    AllocFunc alloc; // deprecated
     AssignFunc assign; // deprecated
     EqualsFunc equals;
     RemapPointersFunc remapPointers;
@@ -77,7 +73,6 @@ struct Type
         name(""),
         isPointer(true),
         cppTypeInfo(NULL),
-        alloc(NULL),
         assign(NULL),
         equals(NULL),
         remapPointers(NULL),
@@ -110,7 +105,6 @@ namespace type_t {
     std::string& get_name(Term* type);
     bool& get_is_pointer(Term* type);
     const std::type_info*& get_std_type_info(Term* type);
-    Type::AllocFunc& get_alloc_func(Term* type);
     Type::AssignFunc& get_assign_func(Term* type);
     Type::EqualsFunc& get_equals_func(Term* type);
     Type::RemapPointersFunc& get_remap_pointers_func(Term* type);

@@ -126,7 +126,6 @@ Term* create_duplicate(Branch& branch, Term* source, std::string const& name, bo
     change_type(term, source->type);
 
     if (source->value_data.ptr != NULL) {
-        alloc_value(term);
         if (copyBranches || !is_branch(source))
             assign_value(source, term);
     }
@@ -163,7 +162,6 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
     term->function = VALUE_FUNC;
     term->type = type;
     change_type(term, type);
-    alloc_value(term);
     assign_value_to_default(term);
 
     return term;
@@ -236,7 +234,6 @@ Branch& create_list(Branch& branch, std::string const& name)
 Branch& create_branch(Branch& owner, std::string const& name)
 {
     Term* term = apply(owner, BRANCH_FUNC, RefList(), name);
-    alloc_value(term);
     return as_branch(term);
 }
 
