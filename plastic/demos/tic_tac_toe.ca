@@ -153,7 +153,7 @@ for board_space in board_spaces
     playable = board_space.owner == player:none and not(game_is_finished)
 
     if playable and mouse_over(rect)
-        draw_box(rect, #fff4)
+        fill_rect(rect, #fff4)
     end
 
     if playable and mouse_clicked(rect)

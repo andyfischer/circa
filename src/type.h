@@ -20,7 +20,7 @@ struct Type
 {
     typedef void (*InitializeFunc)(Type* type, TaggedValue* value);
     typedef void (*DestroyFunc)(Type* type, TaggedValue* value);
-    typedef void (*AssignFunc)(Term* src, Term* dest);
+    typedef void (*AssignFunc)(Term* src, Term* dest); // deprecated
     typedef bool (*EqualsFunc)(TaggedValue* lhs, TaggedValue* rhs);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
     typedef std::string (*ToStringFunc)(Term* term);

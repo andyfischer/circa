@@ -79,8 +79,8 @@ if not(ball_is_being_introduced)
 end
 
 -- draw paddles
-draw_box(players_paddle, #fff)
-draw_box(ai_paddle, #fff)
+fill_rect(players_paddle, #fff)
+fill_rect(ai_paddle, #fff)
 
 -- draw ball
 show_ball = not(ball_is_being_introduced) or alternate_over_time(0.2)

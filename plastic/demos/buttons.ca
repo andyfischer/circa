@@ -37,7 +37,7 @@ for label in button_labels
     color = click_color
   end
 
-  draw_box([b.x1 b.y1 b.x2 b.y2] color)
+  fill_rect([b.x1 b.y1 b.x2 b.y2] color)
 
   text_sprite = text:render_text(ui_font_medium, label, #000)
   text:draw_rendered_text(text_sprite, [button_loc.x + 3,
@@ -66,7 +66,7 @@ end
 def draggable_box(Point initial_location)
     size = [100 50] -> Point
     location = draggable_rect(initial_location, size)
-    draw_box([location.x location.y location.x+size.x location.y+size.y] normal_color)
+    fill_rect([location.x location.y location.x+size.x location.y+size.y] normal_color)
     
     text_sprite = text:render_text(ui_font_medium, "Draggable", #000)
     text:draw_rendered_text(text_sprite, [location.x + (size.x - text_sprite.width)/2,

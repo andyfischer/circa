@@ -34,7 +34,7 @@ def draw_vmenu(Point topleft, List items) -> any
     gl:pie(topleft+[box_width-rounded_radius 0] rounded_radius 0 .25 bg_color)
     topbox_tl = topleft+[rounded_radius -rounded_radius]
     topbox_br = topleft+[box_width-rounded_radius 0]
-    draw_box([topbox_tl[0] topbox_tl[1] topbox_br[0] topbox_br[1]] bg_color)
+    fill_rect([topbox_tl[0] topbox_tl[1] topbox_br[0] topbox_br[1]] bg_color)
 
     -- Draw each label
     for label in labels
@@ -46,7 +46,7 @@ def draw_vmenu(Point topleft, List items) -> any
         approach(@highlight, 5 * td)
 
         box_color = bg_color + #222 * highlight
-        draw_box(box box_color)
+        fill_rect(box box_color)
         text:draw_rendered_text(label [x+h_gutter y+2])
 
         if index != 0

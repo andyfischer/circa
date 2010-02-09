@@ -1,0 +1,20 @@
+
+def fill_rect(Rect rect, Color color)
+    "Draw a filled rectangle."
+    nw = [rect.x1 rect.y1]
+    ne = [rect.x2 rect.y1]
+    sw = [rect.x1 rect.y2]
+    se = [rect.x2 rect.y2]
+    gl:triangles([nw ne se se sw nw] color)
+end
+
+def line(Point x, Point y, Color color)
+    "Draw a line."
+    gl:line_strip([x y] color)
+end
+
+def draw_thick_line(Point a, Point b, number width, Color color)
+    "Draw a thick line with the given thickness."
+    perp = perpendicular(norm(a - b)) * width
+    gl:triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
+end

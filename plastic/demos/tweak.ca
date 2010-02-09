@@ -6,6 +6,6 @@ background(#eee)
 
 x = 175
 y = 20
-draw_box([x,y,x+50,y+50] #000)
+fill_rect([x,y,x+50,y+50] #000)
 
 tweak:button(&y [10 200] "box y")

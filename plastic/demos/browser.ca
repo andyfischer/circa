@@ -75,6 +75,6 @@ def expand_rect_tl(Point tl, Point size) -> Rect:
 for ref in contents
     ref = ref -> Ref
     location = term_to_location.get(ref) -> Point
-    draw_box(expand_rect_tl(location, box_size), #00a)
+    fill_rect(expand_rect_tl(location, box_size), #00a)
     draw_text(ui_font_medium, ref.name(), #fff, location + [5 2])
 end
