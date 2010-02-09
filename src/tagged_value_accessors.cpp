@@ -286,6 +286,16 @@ float to_float(TaggedValue* value)
         throw std::runtime_error("In to_float, type is not an int or float");
 }
 
+int to_int(TaggedValue* value)
+{
+    if (value->value_type == INT_TYPE->value_data.ptr)
+        return as_int(value);
+    else if (value->value_type == FLOAT_TYPE->value_data.ptr)
+        return (int) as_float(value);
+    else
+        throw std::runtime_error("In to_int, type is not an int or float");
+}
+
 bool is_value_int(TaggedValue* value)
 {
     return value->value_type == (Type*) INT_TYPE->value_data.ptr;

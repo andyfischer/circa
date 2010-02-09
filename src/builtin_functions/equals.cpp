@@ -10,11 +10,6 @@ namespace equals_function {
         Term *lhs = caller->input(0);
         Term *rhs = caller->input(1);
 
-        if (!value_fits_type(rhs, lhs->type)) {
-            error_occurred(caller, "Type mismatch");
-            return;
-        }
-
         set_bool(caller, equals(lhs, rhs));
     }
 

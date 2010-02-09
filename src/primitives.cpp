@@ -113,6 +113,7 @@ void initialize_primitive_types(Branch& kernel)
 
     INT_TYPE = create_type(kernel, "int");
     Type* intType = &as_type(INT_TYPE);
+    intType->equals = int_t::equals;
     intType->toString = int_t::to_string;
     intType->isPointer = false;
 

@@ -53,6 +53,7 @@ void* get_pointer(TaggedValue* value, Type* expectedType);
 Ref& as_ref(TaggedValue* value);
 Type& as_type(TaggedValue* value);
 float to_float(TaggedValue* value);
+int to_int(TaggedValue* value);
 
 bool is_value_int(TaggedValue* value);
 bool is_value_float(TaggedValue* value);

@@ -122,6 +122,8 @@ void test_strings()
 void test_equals_snippets()
 {
     test_snippet("", "4 == 4");
+    test_snippet("", "4 == 4.0");
+    test_snippet("", "4.0 == 4");
     test_snippet("", "3 != 4");
     test_snippet("", "4.0 == 4.0");
     test_snippet("", "4.0 != 5.0");

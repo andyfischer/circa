@@ -12,6 +12,10 @@ namespace int_t {
     {
         set_int(value, 0);
     }
+    bool equals(TaggedValue* a, TaggedValue* b)
+    {
+        return to_int(a) == to_int(b);
+    }
     std::string to_string(Term* term)
     {
         std::stringstream strm;

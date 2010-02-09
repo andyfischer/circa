@@ -10,6 +10,7 @@ extern Type* REF_TYPE_2;
 
 namespace int_t {
     void initialize(Type* type, TaggedValue& value);
+    bool equals(TaggedValue* a, TaggedValue* b);
     std::string to_string(Term* term);
 }
 
