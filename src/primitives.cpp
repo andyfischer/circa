@@ -105,12 +105,11 @@ void initialize_primitive_types(Branch& kernel)
     STRING_TYPE = create_type(kernel, "string");
     Type* stringType = &as_type(STRING_TYPE);
     stringType->assign = NULL;
-    stringType->equals = NULL;
     stringType->toString = string_t::to_string;
     stringType->initialize = string_t::initialize;
     stringType->destroy = string_t::destroy;
     stringType->assign2 = string_t::assign;
-    stringType->equals2 = string_t::equals;
+    stringType->equals = string_t::equals;
 
     INT_TYPE = create_type(kernel, "int");
     Type* intType = &as_type(INT_TYPE);

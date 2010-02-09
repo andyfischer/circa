@@ -70,15 +70,15 @@ void change_type(TaggedValue* v, Type* type)
 
 bool equals(TaggedValue* lhs, TaggedValue* rhs)
 {
-    if (lhs->value_type != rhs->value_type)
-        return false;
-
     assert(lhs->value_type != NULL);
 
-    Type::EqualsFunc2 equals2 = lhs->value_type->equals2;
+    Type::EqualsFunc equals = lhs->value_type->equals;
 
-    if (equals2 != NULL)
-        return equals2(lhs, rhs);
+    if (equals != NULL)
+        return equals(lhs, rhs);
+
+    if (lhs->value_type != rhs->value_type)
+        return false;
 
     // Default behavior: shallow-comparison
     return lhs->value_data.asint == rhs->value_data.asint;

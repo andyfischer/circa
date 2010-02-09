@@ -90,15 +90,14 @@ private:
 
 // Hosted functions
 namespace branch_t {
-    void alloc(Term* type, Term* t);
-    void dealloc(Term* type, Term* t);
     void initialize(Type*, TaggedValue* value);
     void destroy(Type*, TaggedValue* value);
     void assign(TaggedValue*, TaggedValue*);
     void cast(Type*, TaggedValue* source, TaggedValue* dest);
     bool equals(Term*, Term*);
+    bool equals(TaggedValue*, TaggedValue*);
 
-    void cross_type_assign(Branch& source, Branch& dest);
+    void assign_overwriting_types(Branch& source, Branch& dest);
     void assign(Branch& source, Branch& dest);
 }
 

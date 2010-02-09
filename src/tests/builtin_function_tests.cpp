@@ -43,8 +43,10 @@ void test_float()
 {
     Branch branch;
 
-    test_assert(type_t::get_equals_func(FLOAT_TYPE) != NULL);
-    test_assert(type_t::get_to_string_func(FLOAT_TYPE) != NULL);
+    Type* floatType = &as_type(FLOAT_TYPE);
+
+    test_assert(floatType->equals != NULL);
+    test_assert(floatType->toString != NULL);
 
     Term* point_one = create_float(branch, .1f);
     Term* point_one_again = create_float(branch, .1f);

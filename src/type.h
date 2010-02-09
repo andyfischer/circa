@@ -21,13 +21,12 @@ struct Type
     typedef void (*InitializeFunc)(Type* type, TaggedValue* value);
     typedef void (*DestroyFunc)(Type* type, TaggedValue* value);
     typedef void (*AssignFunc)(Term* src, Term* dest);
-    typedef bool (*EqualsFunc)(Term* src, Term* dest);
+    typedef bool (*EqualsFunc)(TaggedValue* lhs, TaggedValue* rhs);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
     typedef std::string (*ToStringFunc)(Term* term);
     typedef bool (*CheckInvariantsFunc)(Term* term, std::string* output);
     
     typedef void (*AssignFunc2)(TaggedValue* source, TaggedValue* dest);
-    typedef bool (*EqualsFunc2)(TaggedValue* lhs, TaggedValue* rhs);
     typedef bool (*ValueFitsTypeFunc)(Type* type, TaggedValue* value);
     typedef void (*CastFunc)(Type* type, TaggedValue* source, TaggedValue* dest);
 
@@ -43,7 +42,6 @@ struct Type
 
     // Functions
     AssignFunc assign; // deprecated
-    EqualsFunc equals;
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
     CheckInvariantsFunc checkInvariants;
@@ -53,7 +51,7 @@ struct Type
     InitializeFunc initialize;
     DestroyFunc destroy;
     AssignFunc2 assign2;
-    EqualsFunc2 equals2;
+    EqualsFunc equals;
     CastFunc cast;
     
     Branch prototype;
@@ -74,7 +72,6 @@ struct Type
         isPointer(true),
         cppTypeInfo(NULL),
         assign(NULL),
-        equals(NULL),
         remapPointers(NULL),
         toString(NULL),
         checkInvariants(NULL),
@@ -82,7 +79,7 @@ struct Type
         initialize(NULL),
         destroy(NULL),
         assign2(NULL),
-        equals2(NULL),
+        equals(NULL),
         cast(NULL)
     {
     }
@@ -106,7 +103,6 @@ namespace type_t {
     bool& get_is_pointer(Term* type);
     const std::type_info*& get_std_type_info(Term* type);
     Type::AssignFunc& get_assign_func(Term* type);
-    Type::EqualsFunc& get_equals_func(Term* type);
     Type::RemapPointersFunc& get_remap_pointers_func(Term* type);
     Type::ToStringFunc& get_to_string_func(Term* type);
     Type::CheckInvariantsFunc& get_check_invariants_func(Term* type);
@@ -149,7 +145,6 @@ void initialize_simple_pointer_type(Type* type);
 std::string compound_type_to_string(Term* caller);
 
 // Functions which are dispatched based on type:
-bool equals(Term* a, Term* b);
 std::string to_string(Term* term);
 void assign_value_to_default(Term* term);
 

@@ -281,20 +281,6 @@ Branch::eval(std::string const& code)
 
 namespace branch_t {
 
-    // deprecated:
-    void alloc(Term* typeTerm, Term* term)
-    {
-        Branch* branch = new Branch();
-        set_branch_value(term, branch);
-
-        Branch& prototype = type_t::get_prototype(typeTerm);
-
-        for (int i=0; i < prototype.length(); i++) {
-            if (is_value(prototype[i]))
-                create_duplicate(*branch, prototype[i], prototype[i]->name);
-        }
-    }
-
     void initialize(Type*, TaggedValue* value)
     {
         set_pointer(value, new Branch());
@@ -313,7 +299,7 @@ namespace branch_t {
         // For Branch or List type, overwrite existing shape
         if ((destValue->value_type == &as_type(BRANCH_TYPE))
                 || (destValue->value_type == &as_type(LIST_TYPE)))
-            cross_type_assign(source, dest);
+            assign_overwriting_types(source, dest);
         else
             assign(source, dest);
     }
@@ -323,7 +309,7 @@ namespace branch_t {
         assign(source, dest);
     }
 
-    void cross_type_assign(Branch& source, Branch& dest)
+    void assign_overwriting_types(Branch& source, Branch& dest)
     {
         // Assign terms as necessary
         int lengthToAssign = std::min(source.length(), dest.length());
@@ -354,33 +340,35 @@ namespace branch_t {
 
     void assign(Branch& source, Branch& dest)
     {
-        // Assign terms as necessary
-        int lengthToAssign = std::min(source.length(), dest.length());
+        // Temporary special case, if the two branches have different sizes then
+        // do a assign_overwriting_types instead. This should be removed.
+        if (source.length() != dest.length())
+            return assign_overwriting_types(source, dest);
 
-        for (int i=0; i < lengthToAssign; i++)
+        for (int i=0; i < source.length(); i++)
             assign_value(source[i], dest[i]);
-
-        // Add terms if necessary
-        for (int i=dest.length(); i < source.length(); i++) {
-            assert(source[i] != NULL);
-
-            Term* t = create_duplicate(dest, source[i]);
-            if (source[i]->name != "")
-                dest.bindName(t, source[i]->name);
-        }
-
-        // Remove terms if necessary
-        for (int i=source.length(); i < dest.length(); i++) {
-            dest.set(i, NULL);
-        }
-
-        dest.removeNulls();
     }
 
     bool equals(Term* lhsTerm, Term* rhsTerm)
     {
         Branch& lhs = as_branch(lhsTerm);
         Branch& rhs = as_branch(rhsTerm);
+
+        if (lhs.length() != rhs.length())
+            return false;
+
+        for (int i=0; i < lhs.length(); i++) {
+            if (!circa::equals(lhs[i], rhs[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    bool equals(TaggedValue* lhsValue, TaggedValue* rhsValue)
+    {
+        Branch& lhs = as_branch(lhsValue);
+        Branch& rhs = as_branch(rhsValue);
 
         if (lhs.length() != rhs.length())
             return false;

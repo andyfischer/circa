@@ -34,7 +34,7 @@ namespace float_t {
         set_float(dest, to_float(source));
     }
 
-    bool equals(Term* a, Term* b)
+    bool equals(TaggedValue* a, TaggedValue* b)
     {
         return to_float(a) == to_float(b);
     }
@@ -597,7 +597,7 @@ namespace ref_t {
     {
         *((Ref*) get_pointer(dest, REF_TYPE_2)) = as_ref(source);
     }
-    bool equals(Term* lhs, Term* rhs)
+    bool equals(TaggedValue* lhs, TaggedValue* rhs)
     {
         return as_ref(lhs) == as_ref(rhs);
     }
@@ -776,7 +776,7 @@ void initialize_builtin_types()
     STRING_TYPE_2->initialize = string_t::initialize;
     STRING_TYPE_2->destroy = string_t::destroy;
     STRING_TYPE_2->assign2 = string_t::assign;
-    STRING_TYPE_2->equals2 = string_t::equals;
+    STRING_TYPE_2->equals = string_t::equals;
 }
 
 void setup_builtin_types(Branch& kernel)

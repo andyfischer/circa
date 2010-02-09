@@ -16,7 +16,7 @@ namespace int_t {
 namespace float_t {
     void initialize(Type* type, TaggedValue& value);
     void cast(Type* type, TaggedValue* source, TaggedValue* dest);
-    bool equals(Term* a, Term* b);
+    bool equals(TaggedValue* a, TaggedValue* b);
     std::string to_string(Term* term);
 }
 
@@ -51,7 +51,7 @@ namespace ref_t {
     std::string to_string(Term* term);
     void initialize(Type* type, TaggedValue* value);
     void assign(TaggedValue* source, TaggedValue* dest);
-    bool equals(Term* lhs, Term* rhs);
+    bool equals(TaggedValue* lhs, TaggedValue* rhs);
     void get_name(EvalContext*, Term* caller);
     void hosted_to_string(EvalContext*, Term* caller);
     void get_function(EvalContext*, Term* caller);

@@ -65,10 +65,6 @@ namespace type_t {
     {
         return as_type(type).assign;
     }
-    Type::EqualsFunc& get_equals_func(Term* type)
-    {
-        return as_type(type).equals;
-    }
     Type::RemapPointersFunc& get_remap_pointers_func(Term* type)
     {
         return as_type(type).remapPointers;
@@ -284,7 +280,6 @@ Term* find_common_type(RefList const& list)
 void reset_type(Type* type)
 {
     type->assign = NULL;
-    type->equals = NULL;
     type->remapPointers = NULL;
     type->toString = NULL;
     type->checkInvariants = NULL;
@@ -292,7 +287,7 @@ void reset_type(Type* type)
     type->initialize = NULL;
     type->assign2 = NULL;
     type->destroy = NULL;
-    type->equals2 = NULL;
+    type->equals = NULL;
     type->cast = NULL;
 }
 void initialize_compound_type(Term* term)
@@ -333,19 +328,6 @@ std::string compound_type_to_string(Term* caller)
 
     out << "]";
     return out.str();
-}
-
-bool equals(Term* a, Term* b)
-{
-    Type::EqualsFunc equals_func = type_t::get_equals_func(a->type);
-
-    if (equals_func != NULL)
-        return equals_func(a,b);
-
-    if (a->type != b->type)
-        return false;
-
-    return equals((TaggedValue*) a, (TaggedValue*) b);
 }
 
 std::string to_string(Term* term)
@@ -395,7 +377,7 @@ void assign_value_to_default(Term* term)
         if (is_branch(term)) {
 
             Branch& prototype = type_t::get_prototype(term->type);
-            branch_t::assign(prototype, as_branch(term));
+            branch_t::assign_overwriting_types(prototype, as_branch(term));
             return;
         }
     }
