@@ -48,7 +48,7 @@ for ref in contents
 end
 
 def draw_arrow(Point a, Point b)
-    draw_thick_line(a,b, 3.0, #000)
+    thick_line(a,b, 3.0, #000)
 end
 
 -- Draw arrows for each box

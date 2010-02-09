@@ -338,7 +338,7 @@ path = map(get_path_segment, 0..num_tiles_x)
 
 for segment in path
     segment = segment -> PathSegment
-    draw_thick_line(segment.l segment.r 2.0 #f00)
+    thick_line(segment.l segment.r 2.0 #f00)
 end
 
 -- Move creatures

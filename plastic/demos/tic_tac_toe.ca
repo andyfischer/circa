@@ -10,8 +10,8 @@ square_size = 70
 def draw_x(Point loc)
     thickness = 4.0 -- linear_fadein(5.0) * 4.0
     dist = square_size * 0.35
-    draw_thick_line(loc - [dist dist], loc + [dist dist], thickness, #fff)
-    draw_thick_line(loc + [-dist dist], loc + [dist -dist], thickness, #fff)
+    thick_line(loc - [dist dist], loc + [dist dist], thickness, #fff)
+    thick_line(loc + [-dist dist], loc + [dist -dist], thickness, #fff)
 end
 def draw_o(Point loc)
     radius = square_size * .35
@@ -26,13 +26,13 @@ board_top = board_center.y - square_size*3/2
 board_right = board_center.x + square_size*3/2
 board_bot = board_center.y + square_size*3/2
 
-draw_thick_line([board_left + square_size, board_top],
+thick_line([board_left + square_size, board_top],
     [board_left + square_size, board_bot], board_line_thickness, #fff)
-draw_thick_line([board_right - square_size, board_top],
+thick_line([board_right - square_size, board_top],
     [board_right - square_size, board_bot], board_line_thickness, #fff)
-draw_thick_line([board_left, board_top + square_size],
+thick_line([board_left, board_top + square_size],
     [board_right, board_top + square_size], board_line_thickness, #fff)
-draw_thick_line([board_left, board_bot - square_size],
+thick_line([board_left, board_bot - square_size],
     [board_right, board_bot - square_size], board_line_thickness, #fff)
 
 namespace player
@@ -191,7 +191,7 @@ def draw_thick_line_animated(Point a, Point b, number thickness, Color color, nu
     length = magnitude(b - a)
     n = norm(b - a)
     actual_b = a + n * linear_fadein(time) * length
-    draw_thick_line(a,actual_b,thickness,color)
+    thick_line(a,actual_b,thickness,color)
 end
 
 if winner_information.player != player:none
