@@ -190,6 +190,9 @@ def expand_rect(Point center, number width, number height) -> Rect:
 def to_rect(Point topLeft, Point size) -> Rect:
     return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
 
+def rect(Point topleft, Point bottomright) -> Rect:
+    return [topleft.x topleft.y bottomright.x bottomright.y]
+
 def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool:
     "Return whether the two rectangles intersect."
     intersects_on_x = (rect_a.x2 > rect_b.x1) and (rect_b.x2 > rect_a.x1)
@@ -342,8 +345,6 @@ namespace postprocess begin
 end
 
 -- Include other runtime scripts
---include(path('text_input.ca'))
-
 include('ui_widgets.ca')
 
 -- Load the user's script

@@ -19,3 +19,38 @@ def thick_line(Point a, Point b, number width, Color color)
     gl:triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
 end
 
+def fill_rounded_rect(Rect rect, number cornerRadius, Color color)
+    "Draw a rectangle with rounded corners"
+    width = rect.x2 - rect.x1
+    height = rect.y2 - rect.y1
+    r = cornerRadius
+    min(@r, width/2)
+    min(@r, height/2)
+
+    -- top left
+    gl:pie([rect.x1 + r, rect.y1 + r] r .75 1.0 color)
+
+    -- top right
+    gl:pie([rect.x2 - r, rect.y1 + r] r 0 .25 color)
+
+    -- top
+    fill_rect([rect.x1 + r, rect.y1, rect.x2 - r, rect.y1 + r] color)
+
+    -- left
+    fill_rect([rect.x1, rect.y1 + r, rect.x1 + r, rect.y2 - r] color)
+
+    -- middle
+    fill_rect([rect.x1+r,rect.y1+r,rect.x2 - r,rect.y2 - r] color)
+
+    -- right
+    fill_rect([rect.x2-r, rect.y1 + r, rect.x2, rect.y2 - r] color)
+
+    -- bottom left
+    gl:pie([rect.x1+r, rect.y2 - r] r .5 .75 color)
+
+    -- bottom 
+    fill_rect([rect.x1 + r, rect.y2-r, rect.x2 - r, rect.y2] color)
+
+    -- bottom right
+    gl:pie([rect.x2-r, rect.y2-r] r .25 .5 color)
+end

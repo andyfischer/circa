@@ -24,17 +24,16 @@ def draw_vmenu(Point topleft, List items) -> any
     index = 0
     item_height = 21
     h_gutter = 5
+    v_gutter = 5
     result = 0
     box_width = text_width + h_gutter*2
     bg_color = #666
+    box_height = length(labels) * item_height + v_gutter*2
 
     -- Draw rounded corners on top
     rounded_radius = 5.0
-    gl:pie(topleft+[rounded_radius 0] rounded_radius .75 1.0 bg_color)
-    gl:pie(topleft+[box_width-rounded_radius 0] rounded_radius 0 .25 bg_color)
-    topbox_tl = topleft+[rounded_radius -rounded_radius]
-    topbox_br = topleft+[box_width-rounded_radius 0]
-    fill_rect([topbox_tl[0] topbox_tl[1] topbox_br[0] topbox_br[1]] bg_color)
+    bgrect_topleft = topleft - [0 v_gutter]
+    fill_rounded_rect(to_rect(bgrect_topleft [box_width box_height]) rounded_radius bg_color)
 
     -- Draw each label
     for label in labels
