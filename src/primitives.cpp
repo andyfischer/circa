@@ -48,19 +48,6 @@ bool is_ref(Term* term)
     return term->type == REF_TYPE;
 }
 
-float to_float(Term* term)
-{
-    if (term->type == FLOAT_TYPE)
-        return as_float(term);
-    else if (term->type == INT_TYPE)
-        return (float) as_int(term);
-    else
-        native_type_mismatch("Type mismatch in to_float");
-
-    assert(false); // unreachable
-    return 0.0; // but msvc 7 complains
-}
-
 bool is_int(Term* term)
 {
     return term->type == INT_TYPE;

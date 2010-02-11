@@ -386,6 +386,9 @@ bool is_branch(Term* term)
 {
     return (term->type != NULL) &&
         as_type(term->type).initialize == branch_t::initialize;
+        //term->value_type->initialize == branch_t::initialize;
+
+    // FIXME
 }
 
 Branch& as_branch(Term* term)

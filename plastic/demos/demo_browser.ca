@@ -11,3 +11,7 @@ picked = ui_widgets:draw_vmenu([30 30]
     ['Pong' 'pong.ca']
     ['Tic tac toe' 'tic_tac_toe.ca']
     ['Ramps game' 'ramps.ca']])
+
+if picked != 0
+    load_user_script(picked)
+end

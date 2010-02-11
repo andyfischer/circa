@@ -39,20 +39,20 @@ def draw_vmenu(Point topleft, List items) -> any
     for label in labels
         x = topleft.x
         y = topleft.y + item_height * index
-        box = [x y x+box_width y+item_height]
+        rect = [x y x+box_width y+item_height]
 
-        highlight = cond(mouse_in(box), 1.0, 0.0)
+        highlight = cond(mouse_in(rect), 1.0, 0.0)
         approach(@highlight, 5 * td)
 
-        box_color = bg_color + #222 * highlight
-        fill_rect(box box_color)
+        color = bg_color + #222 * highlight
+        fill_rect(rect color)
         text:draw_rendered_text(label [x+h_gutter y+2])
 
         if index != 0
             line([x y] [x+box_width y] #888)
         end
 
-        if mouse_clicked(box)
+        if mouse_clicked_region(rect)
             result = items[index][1]
             print(result)
         end

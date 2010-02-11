@@ -58,6 +58,7 @@ namespace subroutine_t {
 
             assert(term->function == INPUT_PLACEHOLDER_FUNC);
 
+            //FIXME assign_overwriting_type(caller->inputs[input], term);
             assign_value(caller->inputs[input], term);
         }
 

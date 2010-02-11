@@ -5,43 +5,29 @@
 namespace circa {
 namespace message_passing_function {
 
-    static Branch* messageStore = NULL;
+    static Term* INBOX_FUNC = NULL;
+
+    void evaluate_inbox(EvalContext*, Term* caller)
+    {
+        assign_value(caller->input(0), caller);
+        as_branch(caller->input(0)).clear();
+    }
 
     void evaluate_send(EvalContext*, Term* caller)
     {
-        std::string channelName = caller->input(0)->asString();
-        Branch& store = *messageStore;
+        Term* inbox = caller->input(0);
+        Term* value = caller->input(1);
 
-        // check if we need to add a queue for this channelName
-        if (!store.contains(channelName)) {
-            create_list(store, channelName);
-        }
+        assert(inbox->function == INBOX_FUNC);
 
-        Branch& queue = store[channelName]->asBranch();
-        duplicate_value(queue, caller->input(1));
-    }
-
-    void evaluate_receive(EvalContext*, Term* caller)
-    {
-        std::string channelName = caller->input(0)->asString();
-        Branch& store = *messageStore;
-        Branch& output = caller->asBranch();
-
-        output.clear();
-
-        if (!store.contains(channelName))
-            return;
-
-        assign_value(store[channelName], caller);
-        store[channelName]->asBranch().clear();
+        create_duplicate(as_branch(get_hidden_state_for_call(inbox)), value);
     }
 
     void setup(Branch& kernel)
     {
-        messageStore = &create_branch(kernel, "#message_store");
-
-        import_function(kernel, evaluate_send, "def send(string channel, any)");
-        import_function(kernel, evaluate_receive, "def receive(string channel) -> List");
+        INBOX_FUNC =
+            import_function(kernel, evaluate_inbox, "def inbox(state List) -> List");
+        import_function(kernel, evaluate_send, "def send(List inbox, any)");
     }
 }
 }

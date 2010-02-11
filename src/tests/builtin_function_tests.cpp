@@ -294,6 +294,42 @@ void test_changed()
     test_assert(changed->asBool() == false);
 }
 
+void test_message_passing()
+{
+    Branch branch;
+    Term* i = branch.compile("i = inbox()");
+    Term* send = branch.compile("send(i, 1)");
+
+    // Before running, i should be empty
+    test_assert(as_branch(i).length() == 0);
+    test_assert(as_branch(get_hidden_state_for_call(i)).length() == 0);
+
+    // First run, i is still empty, but the hidden state has 1
+    evaluate_branch(branch);
+    test_assert(as_branch(i).length() == 0);
+    test_assert(as_branch(get_hidden_state_for_call(i)).length() == 1);
+
+    // Second run, i now returns 1
+    evaluate_branch(branch);
+    test_assert(as_branch(i).length() == 1);
+    test_assert(as_branch(i)[0]->asInt() == 1);
+    test_assert(as_branch(get_hidden_state_for_call(i)).length() == 1);
+
+    // Delete the send() call
+    branch.remove(send);
+
+    // Third run, i still returns 1 (from previous call), hidden state is empty
+    evaluate_branch(branch);
+    test_assert(as_branch(i).length() == 1);
+    test_assert(as_branch(i)[0]->asInt() == 1);
+    test_assert(as_branch(get_hidden_state_for_call(i)).length() == 0);
+
+    // Fourth run, i is empty again
+    evaluate_branch(branch);
+    test_assert(as_branch(i).length() == 0);
+    test_assert(as_branch(get_hidden_state_for_call(i)).length() == 0);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
@@ -312,6 +348,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_set_index);
     REGISTER_TEST_CASE(builtin_function_tests::test_do_once);
     REGISTER_TEST_CASE(builtin_function_tests::test_changed);
+    REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
 }
 
 } // namespace builtin_function_tests

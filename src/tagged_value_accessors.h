@@ -13,6 +13,7 @@ namespace circa {
 // then we'll try to use the assign() function of this type, if none is defined
 // then we'll do a shallow copy.
 void assign_value(TaggedValue* source, TaggedValue* dest);
+void assign_overwriting_type(TaggedValue* source, TaggedValue* dest);
 
 void change_type(TaggedValue* v, Type* type);
 

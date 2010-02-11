@@ -27,9 +27,9 @@ namespace if_block_function {
 
             bool satisfied = false;
 
-            if (call->function == BRANCH_FUNC)
+            if (call->function == BRANCH_FUNC) {
                 satisfied = true;
-            else {
+            } else {
                 Term* cond = call->input(0);
                 if (cond->asBool())
                     satisfied = true;
@@ -41,6 +41,7 @@ namespace if_block_function {
 
                 if (call->hasError()) {
                     nested_error_occurred(caller);
+
                     return;
                 }
                 break;

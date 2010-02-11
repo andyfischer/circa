@@ -18,12 +18,12 @@ void compound_types()
     test_assert(prototype.length() == 2);
     test_assert(prototype[0]->name == "myint");
     test_assert(prototype[0]->type == INT_TYPE);
-    test_assert(type_t::find_field_index(MyType,"myint") == 0);
+    test_assert(as_type(MyType).findFieldIndex("myint") == 0);
     test_assert(prototype[1]->name == "astr");
     test_assert(prototype[1]->type == STRING_TYPE);
-    test_assert(type_t::find_field_index(MyType,"astr") == 1);
+    test_assert(as_type(MyType).findFieldIndex("astr") == 1);
 
-    test_assert(type_t::find_field_index(MyType,"the_bodies") == -1);
+    test_assert(as_type(MyType).findFieldIndex("the_bodies") == -1);
 
     // instanciation
     Term* inst = branch.eval("inst = MyType()");

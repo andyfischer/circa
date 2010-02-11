@@ -11,6 +11,7 @@ namespace cond_function {
         Term *result = caller->inputs[index];
 
         change_type(caller, result->type);
+        //FIXME assign_overwriting_type(caller->inputs[index], caller);
         assign_value(caller->inputs[index], caller);
     }
 

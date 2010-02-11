@@ -8,6 +8,7 @@ namespace get_index_function {
     void evaluate(EvalContext*, Term* caller)
     {
         if (!is_branch(caller->input(0))) {
+            //assert(false);
             error_occurred(caller, "Value is not indexable");
             return;
         }
@@ -23,6 +24,7 @@ namespace get_index_function {
         }
 
         assign_value(input[index], caller);
+        //FIXME assign_overwriting_type(input[index], caller);
     }
 
     std::string toSourceString(Term* term)

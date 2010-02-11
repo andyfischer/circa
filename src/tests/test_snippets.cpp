@@ -322,8 +322,8 @@ void test_rebinding_operators()
 
 void test_get_field_and_set_field()
 {
-    test_snippet("type A{int z} type B{A y} type C{B x} w = [[[3]]]->C",
-            "w.x.y.z == 3; get_field(w, 'x', 'y', 'z') == 3");
+    //test_snippet("type A{int z} type B{A y} type C{B x} w = [[[3]]]->C",
+    //        "w.x.y.z == 3; get_field(w, 'x', 'y', 'z') == 3");
     //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]->C",
             //"set_field(w, 5, 'x', 'y', 'z') == [[[5 4]]]->C");
     //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]->C",
@@ -355,14 +355,6 @@ void test_stateful_code()
 {
     test_snippet("def hi() state int i end; c = hi()", "inspect:get_state(c) == [0]");
     test_snippet("def hi() state int i; i = 4 end; c = hi()", "inspect:get_state(c) == [4]");
-}
-
-void test_message_passing()
-{
-    test_snippet("send('test' 5) send('test' true) send('test' 2.0)",
-            "receive('test') == [5 true 2.0]");
-    test_snippet("send('test' 1) send('test2' 2) send('test' 3) send('test2', 4)",
-            "receive('test') == [1 3], receive('test2') == [2 4]");
 }
 
 void test_significant_indentation()
@@ -401,7 +393,6 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_repeat);
     REGISTER_TEST_CASE(test_snippets::test_range);
     REGISTER_TEST_CASE(test_snippets::test_stateful_code);
-    REGISTER_TEST_CASE(test_snippets::test_message_passing);
     REGISTER_TEST_CASE(test_snippets::test_significant_indentation);
     REGISTER_TEST_CASE(test_snippets::test_concat);
 }

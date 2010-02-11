@@ -107,8 +107,7 @@ namespace list_t {
 
     void append(Branch& branch, Term* value)
     {
-        Term* duplicated_value = create_value(branch, value->type);
-        assign_value(value, duplicated_value);
+        create_duplicate(branch, value);
     }
 
     void append(EvalContext*, Term* caller)
