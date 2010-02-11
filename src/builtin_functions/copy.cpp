@@ -7,8 +7,7 @@ namespace copy_function {
 
     void evaluate(EvalContext*, Term* caller)
     {
-        //FIXME assign_overwriting_type(caller->input(0), caller);
-        assign_value(caller->input(0), caller);
+        assign_overwriting_type(caller->input(0), caller);
     }
 
     Term* specializeType(Term* caller)

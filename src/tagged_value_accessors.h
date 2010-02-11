@@ -30,16 +30,6 @@ void set_ref(TaggedValue* value, Term* t);
 void set_null(TaggedValue* value);
 void set_pointer(TaggedValue* value, Type* type, void* p);
 
-#if 0
-TaggedValue tag_int(int v);
-TaggedValue tag_float(float v);
-TaggedValue tag_bool(bool b);
-TaggedValue tag_str(const char* s);
-TaggedValue tag_str(std::string const& s);
-TaggedValue tag_null();
-TaggedValue tag_pointer(Type* type, void* value);
-#endif
-
 void* get_pointer(TaggedValue* value);
 void set_pointer(TaggedValue* value, void* ptr);
 
@@ -56,11 +46,11 @@ Type& as_type(TaggedValue* value);
 float to_float(TaggedValue* value);
 int to_int(TaggedValue* value);
 
-bool is_value_int(TaggedValue* value);
-bool is_value_float(TaggedValue* value);
-bool is_value_bool(TaggedValue* value);
-bool is_value_string(TaggedValue* value);
-bool is_value_ref(TaggedValue* value);
+bool is_int(TaggedValue* value);
+bool is_float(TaggedValue* value);
+bool is_bool(TaggedValue* value);
+bool is_string(TaggedValue* value);
+bool is_ref(TaggedValue* value);
 bool is_value_branch(TaggedValue* value);
 bool is_value_type(TaggedValue* value);
 bool is_value_of_type(TaggedValue* value, Type* type);

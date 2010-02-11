@@ -24,7 +24,6 @@ namespace assign_function {
             return;
         }
 
-        //FIXME assign_overwriting_type(value, target);
         assign_value(value, target);
     }
 

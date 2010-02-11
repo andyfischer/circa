@@ -33,12 +33,6 @@ SpecializeTypeFunc& as_specialize_type_thunk(Term*);
 ToSourceStringFunc& as_to_source_string_thunk(Term*);
 CheckInvariantsFunc& as_check_invariants_thunk(Term*);
 
-bool is_ref(Term* term);
-bool is_int(Term* term);
-bool is_float(Term* term);
-bool is_bool(Term* term);
-bool is_string(Term* term);
-
 void initialize_primitive_types(Branch& kernel);
 
 // Do some more setup, after all the standard builtin types have been created.

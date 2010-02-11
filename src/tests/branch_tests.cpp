@@ -331,9 +331,9 @@ void test_assign()
     Term* dest1 = as_branch(dest)[1];
 
     assign_value(source, dest);
-    test_assert(is_value_int(dest0));
+    test_assert(is_int(dest0));
     test_assert(as_int(dest0) == 3);
-    //test_assert(is_value_float(dest1));
+    //test_assert(is_float(dest1));
     test_equals(as_float(dest1), 4);
     // Verify that 'dest' has the same terms
     test_assert(dest0 == as_branch(dest)[0]);

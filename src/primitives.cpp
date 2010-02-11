@@ -43,31 +43,6 @@ CheckInvariantsFunc& as_check_invariants_thunk(Term* term)
     return ((CheckInvariantsFunc&) term->value_data.ptr);
 }
 
-bool is_ref(Term* term)
-{
-    return term->type == REF_TYPE;
-}
-
-bool is_int(Term* term)
-{
-    return term->type == INT_TYPE;
-}
-
-bool is_float(Term* term)
-{
-    return term->type == FLOAT_TYPE;
-}
-
-bool is_string(Term* term)
-{
-    return term->type == STRING_TYPE;
-}
-
-bool is_bool(Term* term)
-{
-    return term->type == BOOL_TYPE;
-}
-
 namespace any_t {
     std::string to_string(Term* term)
     {

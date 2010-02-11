@@ -9,10 +9,7 @@ namespace cond_function {
     {
         int index = bool_input(caller,0) ? 1 : 2;
         Term *result = caller->inputs[index];
-
-        change_type(caller, result->type);
-        //FIXME assign_overwriting_type(caller->inputs[index], caller);
-        assign_value(caller->inputs[index], caller);
+        assign_overwriting_type(result, caller);
     }
 
     Term* specializeType(Term* caller)

@@ -23,8 +23,9 @@ namespace get_index_function {
             return;
         }
 
-        assign_value(input[index], caller);
-        //FIXME assign_overwriting_type(input[index], caller);
+        // TEMP:
+        change_type(caller, input[index]->type);
+        assign_overwriting_type(input[index], caller);
     }
 
     std::string toSourceString(Term* term)

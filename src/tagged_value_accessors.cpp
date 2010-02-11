@@ -136,7 +136,7 @@ void set_str(TaggedValue* value, std::string const& s)
 
 void set_ref(TaggedValue* value, Term* t)
 {
-    assert(is_value_ref(value));
+    assert(is_ref(value));
     *((Ref*) value->value_data.ptr) = t;
 }
 
@@ -151,75 +151,27 @@ void set_pointer(TaggedValue* value, Type* type, void* p)
     value->value_data.ptr = p;
 }
 
-#if 0
-TaggedValue tag_int(int v)
-{
-    TaggedValue result;
-    change_type(result, (Type*) INT_TYPE->value.data.ptr);
-    set_int(result, v);
-    return result;
-}
-
-TaggedValue tag_float(float f)
-{
-    TaggedValue result;
-    change_type(result, (Type*) FLOAT_TYPE->value.data.ptr);
-    set_float(result, f);
-    return result;
-}
-TaggedValue tag_bool(bool b)
-{
-    TaggedValue result;
-    set_bool(result, b);
-    return result;
-}
-TaggedValue tag_str(const char* s)
-{
-    TaggedValue result;
-    set_str(result, s);
-    return result;
-}
-TaggedValue tag_str(std::string const& s)
-{
-    TaggedValue result;
-    set_str(result, s);
-    return result;
-}
-TaggedValue tag_null()
-{
-    TaggedValue result;
-    set_null(result);
-    return result;
-}
-TaggedValue tag_pointer(Type* type, void* value)
-{
-    TaggedValue result;
-    set_pointer(result, type, value);
-    return result;
-}
-#endif
-
 int as_int(TaggedValue* value)
 {
-    assert(is_value_int(value));
+    assert(is_int(value));
     return value->value_data.asint;
 }
 
 float as_float(TaggedValue* value)
 {
-    assert(is_value_float(value));
+    assert(is_float(value));
     return value->value_data.asfloat;
 }
 
 bool as_bool(TaggedValue* value)
 {
-    assert(is_value_bool(value));
+    assert(is_bool(value));
     return value->value_data.asbool;
 }
 
 Ref& as_ref(TaggedValue* value)
 {
-    assert(is_value_ref(value));
+    assert(is_ref(value));
     return *((Ref*) value->value_data.ptr);
 }
 
@@ -231,7 +183,7 @@ Type& as_type(TaggedValue* value)
 
 std::string const& as_string(TaggedValue* value)
 {
-    assert(is_value_string(value));
+    assert(is_string(value));
     return *((std::string*) value->value_data.ptr);
 }
 
@@ -302,29 +254,34 @@ int to_int(TaggedValue* value)
         throw std::runtime_error("In to_int, type is not an int or float");
 }
 
-bool is_value_int(TaggedValue* value)
+bool is_int(TaggedValue* value)
 {
-    return value->value_type == (Type*) INT_TYPE->value_data.ptr;
+    return INT_TYPE != NULL
+        && value->value_type == (Type*) INT_TYPE->value_data.ptr;
 }
 
-bool is_value_float(TaggedValue* value)
+bool is_float(TaggedValue* value)
 {
-    return value->value_type == (Type*) FLOAT_TYPE->value_data.ptr;
+    return FLOAT_TYPE != NULL
+        && value->value_type == (Type*) FLOAT_TYPE->value_data.ptr;
 }
 
-bool is_value_bool(TaggedValue* value)
+bool is_bool(TaggedValue* value)
 {
-    return value->value_type == (Type*) BOOL_TYPE->value_data.ptr;
+    return BOOL_TYPE != NULL
+        && value->value_type == (Type*) BOOL_TYPE->value_data.ptr;
 }
 
-bool is_value_string(TaggedValue* value)
+bool is_string(TaggedValue* value)
 {
-    return value->value_type == (Type*) STRING_TYPE->value_data.ptr;
+    return STRING_TYPE != NULL
+        && value->value_type == (Type*) STRING_TYPE->value_data.ptr;
 }
 
-bool is_value_ref(TaggedValue* value)
+bool is_ref(TaggedValue* value)
 {
-    return value->value_type == (Type*) REF_TYPE->value_data.ptr;
+    return REF_TYPE != NULL
+        && value->value_type == (Type*) REF_TYPE->value_data.ptr;
 }
 
 bool is_value_branch(TaggedValue* value)
