@@ -12,8 +12,7 @@ namespace get_field_function {
         for (int nameIndex=1; nameIndex < caller->numInputs(); nameIndex++) {
             std::string const& name = caller->input(nameIndex)->asString();
 
-            //FIXME int fieldIndex = head->value_type->findFieldIndex(name);
-            int fieldIndex = type_t::find_field_index(head->type, name);
+            int fieldIndex = as_type(head->type).findFieldIndex(name);
 
             if (fieldIndex == -1) {
                 // assert(false);

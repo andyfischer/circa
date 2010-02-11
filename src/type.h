@@ -108,8 +108,6 @@ namespace type_t {
     Branch& get_member_functions(Term* type);
     Term* get_default_value(Term* type);
 
-    int find_field_index(Term* type, std::string const& name);
-
     void enable_default_value(Term* type);
 }
 

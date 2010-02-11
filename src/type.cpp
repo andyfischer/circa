@@ -95,10 +95,6 @@ namespace type_t {
         if (attributes.length() < 1) return NULL;
         return attributes[0];
     }
-    int find_field_index(Term* type, std::string const& name)
-    {
-        return type_t::get_prototype(type).findIndex(name);
-    }
     void enable_default_value(Term* type)
     {
         if (get_default_value(type) == NULL)
