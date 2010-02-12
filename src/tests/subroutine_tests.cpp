@@ -18,12 +18,13 @@ void test_return_from_conditional()
 
     test_assert(branch);
 
-    test_equals(branch.eval("my_max(3,8)")->asFloat(), 8);
-    test_equals(branch.eval("my_max(3,3)")->asFloat(), 3);
+    branch.eval("my_max(3,8)");
+    test_equals(branch.eval("my_max(3,8)")->toFloat(), 8);
+    test_equals(branch.eval("my_max(3,3)")->toFloat(), 3);
 
     branch.eval("my_max(11,0)");
 
-    test_equals(branch.eval("my_max(11,0)")->asFloat(), 11);
+    test_equals(branch.eval("my_max(11,0)")->toFloat(), 11);
 }
 
 void test_recursion()

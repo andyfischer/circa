@@ -101,8 +101,8 @@ namespace branch_t {
     void assign(Branch& source, Branch& dest);
 }
 
-bool is_branch(Term* term);
-Branch& as_branch(Term* term);
+bool is_branch(TaggedValue* term);
+Branch& as_branch(TaggedValue* term);
 bool is_namespace(Term* term);
 
 std::string get_branch_source_filename(Branch& branch);

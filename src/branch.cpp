@@ -382,20 +382,16 @@ namespace branch_t {
     }
 }
 
-bool is_branch(Term* term)
+bool is_branch(TaggedValue* value)
 {
-    return (term->type != NULL) &&
-        as_type(term->type).initialize == branch_t::initialize;
-        //term->value_type->initialize == branch_t::initialize;
-
-    // FIXME
+    return value->value_type->initialize == branch_t::initialize;
 }
 
-Branch& as_branch(Term* term)
+Branch& as_branch(TaggedValue* value)
 {
-    assert(term != NULL);
-    assert(is_branch(term));
-    return *((Branch*) term->value_data.ptr);
+    assert(value != NULL);
+    assert(is_branch(value));
+    return *((Branch*) value->value_data.ptr);
 }
 
 bool is_namespace(Term* term)

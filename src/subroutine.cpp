@@ -73,7 +73,7 @@ namespace subroutine_t {
             Term* output = functionBranch[functionBranch.length()-1];
             assert(output->name == "#out");
             if (output->type != VOID_TYPE)
-                assign_value(output, caller);
+                assign_overwriting_type(output, caller);
         }
 
         // Store state

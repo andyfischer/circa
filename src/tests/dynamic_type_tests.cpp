@@ -18,9 +18,32 @@ void test_copy()
     test_assert(is_string(copy));
 }
 
+void test_subroutine()
+{
+    Branch branch;
+    branch.compile("def f(any v) -> any return v end");
+    test_assert(branch);
+
+    Term* a = branch.eval("f('test')");
+
+    test_assert(is_string(a));
+    test_assert(as_string(a) == "test");
+
+    branch.clear();
+    branch.compile("def f(bool b, any v) -> any; if b return v else return 5 end end");
+
+    Term* b = branch.eval("f(true, 'test')");
+    test_assert(is_string(b));
+    test_assert(as_string(b) == "test");
+    Term* c = branch.eval("f(false, 'test')");
+    test_assert(is_int(c));
+    test_assert(as_int(c) == 5);
+}
+
 void register_tests()
 {
     test_copy();
+    test_subroutine();
 }
 
 } // namespace dynamic_type_tests

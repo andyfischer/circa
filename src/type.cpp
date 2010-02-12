@@ -328,10 +328,7 @@ std::string compound_type_to_string(Term* caller)
 
 std::string to_string(Term* term)
 {
-    if (term->type == NULL)
-        return "<NULL>";
-
-    Type* type = &as_type(term->type);
+    Type* type = term->value_type;
 
     if (type == NULL)
         return "<NULL>";
@@ -343,7 +340,7 @@ std::string to_string(Term* term)
 
     // Generic to-string
     std::stringstream result;
-    result << "<" << type_t::get_name(term->type) << " 0x";
+    result << "<" << type->name << " 0x";
     result << std::hex << get_type_value(term) << ">";
     return result.str();
 }
