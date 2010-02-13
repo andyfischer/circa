@@ -13,5 +13,5 @@ picked = ui_widgets:draw_vmenu([30 30]
     ['Ramps game' 'ramps.ca']])
 
 if picked != 0
-    load_user_script(picked)
+    load_user_script(path(picked))
 end

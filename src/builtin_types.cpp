@@ -560,6 +560,7 @@ namespace string_t {
 
     bool equals(TaggedValue* lhs, TaggedValue* rhs)
     {
+        if (!is_string(rhs)) return false;
         return as_string(lhs) == as_string(rhs);
     }
 

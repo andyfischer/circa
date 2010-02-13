@@ -348,8 +348,7 @@ end
 include('ui_widgets.ca')
 
 -- Load the user's script
-default_script_filename = path("../demos/demo_browser.ca")
-state string user_script_filename = default_script_filename
+state string user_script_filename = path("../demos/demo_browser.ca")
 
 -- Function to specify a different script
 load_user_script_request = inbox()
