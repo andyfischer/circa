@@ -124,8 +124,9 @@ void bootstrap_kernel()
 
     // Create Function type
     FUNCTION_TYPE = create_compound_type(*KERNEL, "Function");
-    type_t::get_to_string_func(FUNCTION_TYPE) = subroutine_t::to_string;
-    type_t::get_check_invariants_func(FUNCTION_TYPE)= function_t::check_invariants;
+    Type* functionType = &as_type(FUNCTION_TYPE);
+    functionType->toString = subroutine_t::to_string;
+    functionType->checkInvariants = function_t::check_invariants;
 
     // Initialize Value func
     VALUE_FUNC->type = FUNCTION_TYPE;
@@ -134,7 +135,8 @@ void bootstrap_kernel()
 
     // Initialize List type, it's needed soon
     LIST_TYPE = create_compound_type(*KERNEL, "List");
-    type_t::get_to_string_func(LIST_TYPE) = list_t::to_string;
+    Type* listType = &as_type(LIST_TYPE);
+    listType->toString = list_t::to_string;
 }
 
 void post_initialize_primitive_types(Branch& kernel)

@@ -27,7 +27,7 @@ void test_int()
 {
     Branch branch;
 
-    test_assert(type_t::get_to_string_func(INT_TYPE) != NULL);
+    test_assert(as_type(INT_TYPE).toString != NULL);
 
     Term* four = create_int(branch, 4);
     Term* another_four = create_int(branch, 4);

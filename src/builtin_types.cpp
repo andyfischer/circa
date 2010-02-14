@@ -191,7 +191,7 @@ namespace set_t {
 
     void setup(Branch& kernel) {
         Term* set_type = create_compound_type(kernel, "Set");
-        type_t::get_to_string_func(set_type) = set_t::to_string;
+        as_type(set_type).toString = set_t::to_string;
 
         Term* set_add = import_member_function(set_type, set_t::hosted_add, "add(Set, any) -> Set");
         function_set_use_input_as_output(set_add, 0, true);
@@ -804,7 +804,7 @@ void setup_builtin_types(Branch& kernel)
     import_member_function(LIST_TYPE, list_t::count, "count(List) -> int");
 
     Term* map_type = create_compound_type(kernel, "Map");
-    type_t::get_to_string_func(map_type) = map_t::to_string;
+    as_type(map_type).toString = map_t::to_string;
     Term* map_add = import_member_function(map_type, map_t::insert, "add(Map, any, any) -> Map");
     function_set_use_input_as_output(map_add, 0, true);
     import_member_function(map_type, map_t::contains, "contains(Map, any) -> bool");
@@ -831,7 +831,7 @@ void parse_builtin_types(Branch& kernel)
     parse_type(kernel, "type Rect { number x1, number y1, number x2, number y2 }");
     COLOR_TYPE = parse_type(kernel, "type Color { number r, number g, number b, number a }");
 
-    type_t::get_to_string_func(COLOR_TYPE) = color_t::to_string;
+    as_type(COLOR_TYPE).toString = color_t::to_string;
 
     import_member_function(BRANCH_REF_TYPE, branch_ref_t::get_configs,
         "get_configs(BranchRef) -> List");

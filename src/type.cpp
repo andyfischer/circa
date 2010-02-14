@@ -69,14 +69,6 @@ namespace type_t {
     {
         return as_type(type).remapPointers;
     }
-    Type::ToStringFunc& get_to_string_func(Term* type)
-    {
-        return as_type(type).toString;
-    }
-    Type::CheckInvariantsFunc& get_check_invariants_func(Term* type)
-    {
-        return as_type(type).checkInvariants;
-    }
     Branch& get_prototype(Term* type)
     {
         return as_type(type).prototype;

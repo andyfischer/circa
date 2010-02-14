@@ -101,8 +101,6 @@ namespace type_t {
     const std::type_info*& get_std_type_info(Term* type);
     Type::AssignFunc& get_assign_func(Term* type);
     Type::RemapPointersFunc& get_remap_pointers_func(Term* type);
-    Type::ToStringFunc& get_to_string_func(Term* type);
-    Type::CheckInvariantsFunc& get_check_invariants_func(Term* type);
     Branch& get_prototype(Term* type);
     Branch& get_attributes(Term* type);
     Branch& get_member_functions(Term* type);
