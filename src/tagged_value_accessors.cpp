@@ -83,10 +83,11 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
     if (equals != NULL)
         return equals(lhs, rhs);
 
+    // Default behavior for different types: return false
     if (lhs->value_type != rhs->value_type)
         return false;
 
-    // Default behavior: shallow-comparison
+    // Default behavor for same types: shallow comparison
     return lhs->value_data.asint == rhs->value_data.asint;
 }
 

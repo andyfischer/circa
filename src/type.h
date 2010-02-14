@@ -47,7 +47,7 @@ struct Type
     CheckInvariantsFunc checkInvariants;
     ValueFitsTypeFunc valueFitsType;
 
-    // new stype:
+    // new style:
     InitializeFunc initialize;
     DestroyFunc destroy;
     AssignFunc2 assign2;

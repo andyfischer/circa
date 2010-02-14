@@ -14,7 +14,11 @@ namespace int_t {
     }
     bool equals(TaggedValue* a, TaggedValue* b)
     {
-        return to_int(a) == to_int(b);
+        if (is_float(b))
+            return float_t::equals(a,b);
+        if (!is_int(b))
+            return false;
+        return as_int(a) == as_int(b);
     }
     std::string to_string(Term* term)
     {
