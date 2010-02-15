@@ -144,6 +144,26 @@ bool terms_match_for_migration(Term* left, Term* right)
     return true;
 }
 
+void mark_stateful_value_assigned(Term* term)
+{
+    // Check if this term has a "do once" block for assigning
+    if (term->owningBranch == NULL) return;
+    Branch* branch = term->owningBranch;
+    if (branch->length() < int(term->index + 2)) return;
+    Term* followingTerm = branch->get(term->index+1);
+    Term* secondTerm = branch->get(term->index+2);
+    if (followingTerm->function != STATEFUL_VALUE_FUNC) return;
+    if (secondTerm->function != DO_ONCE_FUNC) return;
+    Branch& doOnceBranch = as_branch(secondTerm);
+    if (doOnceBranch.length() == 0) return;
+    Term* assignTerm = doOnceBranch[doOnceBranch.length()-1];
+    if (assignTerm->function != ASSIGN_FUNC) return;
+    if (assignTerm->input(0) != term) return;
+
+    Term* doOnceHiddenState = followingTerm;
+    set_bool(doOnceHiddenState, true);
+}
+
 bool subroutines_match_for_migration(Term* leftFunc, Term* rightFunc)
 {
     if (!is_subroutine(leftFunc)) return false;

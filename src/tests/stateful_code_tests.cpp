@@ -398,6 +398,19 @@ void test_terms_match_for_migration()
     test_assert(!terms_match_for_migration(state1, state2));
 }
 
+void test_changing_stateful_value_externally()
+{
+    Branch branch;
+    branch.compile("state v = 'value'");
+
+    set_str(branch["v"], "new");
+    mark_stateful_value_assigned(branch["v"]);
+
+    evaluate_branch(branch);
+
+    test_equals(as_string(branch["v"]), "new");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_get_hidden_state_for_call);
@@ -419,6 +432,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::bug_where_state_wasnt_preserved_after_error);
     REGISTER_TEST_CASE(stateful_code_tests::test_load_state_into_branch);
     REGISTER_TEST_CASE(stateful_code_tests::test_terms_match_for_migration);
+    REGISTER_TEST_CASE(stateful_code_tests::test_changing_stateful_value_externally);
 }
 
 } // namespace stateful_code_tests

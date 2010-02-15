@@ -6,6 +6,7 @@ namespace circa {
 
 inline void evaluate_term(EvalContext* context, Term* term)
 {
+    assert(term != NULL);
     clear_error(term);
 
     EvaluateFunc evaluate = function_t::get_evaluate(term->function);

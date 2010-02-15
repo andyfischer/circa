@@ -155,11 +155,11 @@ bool load_user_script_filename(std::string const& _filename)
     if (_filename != "") {
         std::string filename = get_absolute_path(_filename);
 
-        // Big hack
-        Term* load_user_script_request = runtime_branch()["load_user_script_request"];
-        create_string(as_branch(get_hidden_state_for_call(load_user_script_request)),
-                filename);
+        Term* user_script_filename = runtime_branch().findFirstBinding("user_script_filename");
+        set_str(user_script_filename, filename);
+        mark_stateful_value_assigned(user_script_filename);
         std::cout << "Loading script: " << filename << std::endl;
+    }
         
 #if 0
         include_function::load_script(NULL, users_branch);
@@ -171,7 +171,6 @@ bool load_user_script_filename(std::string const& _filename)
             PAUSE_REASON = RUNTIME_ERROR;
         }
 #endif
-    }
 
     return true;
 }
@@ -219,11 +218,6 @@ int plastic_main(std::vector<std::string> args)
 
     // Normal operation, load the script file in argument 0.
     std::string filename = arg0;
-    if (filename == "") {
-        Term* default_script_filename = runtime_branch()["default_script_filename"];
-        evaluate_term(default_script_filename);
-        filename = default_script_filename->asString();
-    }
 
     if (!load_user_script_filename(filename))
         return 1;
