@@ -61,10 +61,6 @@ namespace type_t {
     {
         return as_type(type).cppTypeInfo;
     }
-    Type::AssignFunc& get_assign_func(Term* type)
-    {
-        return as_type(type).assign;
-    }
     Type::RemapPointersFunc& get_remap_pointers_func(Term* type)
     {
         return as_type(type).remapPointers;

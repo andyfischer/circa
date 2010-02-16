@@ -11,7 +11,7 @@ void assign_value(Term* source, Term* dest)
     if (dest->type == ANY_TYPE)
         specialize_type(dest, source->type);
 
-    Type::AssignFunc assign = type_t::get_assign_func(dest->type);
+    Type::AssignFunc assign = as_type(dest->type).assign;
 
     if (assign == NULL) {
         assign_value((TaggedValue*) source, (TaggedValue*) dest);
