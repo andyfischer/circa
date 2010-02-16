@@ -7,9 +7,11 @@ namespace circa {
 void assign_value(Term* source, Term* dest)
 {
     // Do a type specialization if dest has type 'any'.
-    // This might be removed once type inference rules are smarter.
-    if (dest->type == ANY_TYPE)
+    // (deprecated)
+    if (dest->type == ANY_TYPE) {
+        //assert(false);
         specialize_type(dest, source->type);
+    }
 
     Type::AssignFunc assign = as_type(dest->type).assign;
 
