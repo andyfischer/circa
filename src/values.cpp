@@ -6,6 +6,16 @@ namespace circa {
 
 void assign_value(Term* source, Term* dest)
 {
+#if 0
+    // New style
+    if (as_type(dest->type).assign == NULL) {
+        assign_value((TaggedValue*) source, (TaggedValue*) dest);
+        return;
+    }
+
+    assert(false);
+#endif
+
     // Do a type specialization if dest has type 'any'.
     // (deprecated)
     if (dest->type == ANY_TYPE) {

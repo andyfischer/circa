@@ -39,6 +39,9 @@ void evaluate_branch(Branch& branch, Term* errorListener)
         evaluate_term(&context, term);
 
         if (term->hasError()) {
+            if (errorListener == NULL)
+                throw std::runtime_error(get_runtime_error_message(term));
+
             nested_error_occurred(errorListener);
             break;
         }

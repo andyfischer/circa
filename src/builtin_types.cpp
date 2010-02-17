@@ -111,12 +111,13 @@ namespace list_t {
 
     void append(Branch& branch, Term* value)
     {
+        //duplicate_value(branch, value);
         create_duplicate(branch, value);
     }
 
     void append(EvalContext*, Term* caller)
     {
-        assign_value(caller->input(0), caller);
+        assign_overwriting_type(caller->input(0), caller);
         Branch& branch = as_branch(caller);
         Term* value = caller->input(1);
         append(branch, value);
@@ -148,7 +149,7 @@ namespace set_t {
 
     void hosted_add(EvalContext*, Term* caller)
     {
-        assign_value(caller->input(0), caller);
+        assign_overwriting_type(caller->input(0), caller);
         Branch& contents = as_branch(caller);
         Term* value = caller->input(1);
         add(contents, value);
@@ -163,7 +164,7 @@ namespace set_t {
 
     void remove(EvalContext*, Term* caller)
     {
-        assign_value(caller->input(0), caller);
+        assign_overwriting_type(caller->input(0), caller);
         Branch& contents = as_branch(caller);
         Term* value = caller->input(1);
 
@@ -224,7 +225,7 @@ namespace map_t {
             create_duplicate(keys, key);
             create_duplicate(values, value);
         } else {
-            assign_value(values[index], value);
+            assign_overwriting_type(values[index], value);
         }
     }
 
@@ -262,13 +263,13 @@ namespace map_t {
 
     void insert(EvalContext*, Term *caller)
     {
-        assign_value(caller->input(0), caller);
+        assign_overwriting_type(caller->input(0), caller);
         insert(caller->asBranch(), caller->input(1), caller->input(2));
     }
 
     void remove(EvalContext*, Term* caller)
     {
-        assign_value(caller->input(0), caller);
+        assign_overwriting_type(caller->input(0), caller);
         remove(caller->asBranch(), caller->input(1));
     }
 
@@ -281,7 +282,7 @@ namespace map_t {
             return;
         }
 
-        assign_value(value, caller);
+        assign_overwriting_type(value, caller);
     }
 
     std::string to_string(Term* term)

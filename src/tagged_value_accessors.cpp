@@ -21,13 +21,19 @@ void assign_value(TaggedValue* source, TaggedValue* dest)
     if (dest->value_type == NULL)
         throw std::runtime_error("In assign_value, dest.value_type is NULL");
 
+    // If dest type is any then just change it now. This should be removed.
+    if (dest->value_type == &as_type(ANY_TYPE))
+        change_type(dest, source->value_type);
+
     // Check if they have different types. If so, try to cast.
     if (dest->value_type != source->value_type) {
         Type::CastFunc cast = dest->value_type->cast;
-        if (cast == NULL)
+        if (cast == NULL) {
+            assert(false);
             throw std::runtime_error("No cast function for value_type "
                 + dest->value_type->name + " (tried to assign value of value_type "
                 + source->value_type->name + ")");
+        }
 
         cast(dest->value_type, source, dest);
         return;
