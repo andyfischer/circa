@@ -76,19 +76,16 @@ void initialize_primitive_types(Branch& kernel)
     Type* intType = &as_type(INT_TYPE);
     intType->equals = int_t::equals;
     intType->toString = int_t::to_string;
-    intType->isPointer = false;
 
     FLOAT_TYPE = create_type(kernel, "number");
     Type* floatType = &as_type(FLOAT_TYPE);
     floatType->cast = float_t::cast;
     floatType->equals = float_t::equals;
     floatType->toString = float_t::to_string;
-    floatType->isPointer = false;
 
     BOOL_TYPE = create_type(kernel, "bool");
     Type* boolType = &as_type(BOOL_TYPE);
     boolType->toString = bool_t::to_string;
-    boolType->isPointer = false;
 
     REF_TYPE = create_type(kernel, "Ref");
     Type* refType = &as_type(REF_TYPE);
@@ -105,7 +102,6 @@ void initialize_primitive_types(Branch& kernel)
     VOID_TYPE = create_empty_type(kernel, "void");
     Type* voidType = &as_type(VOID_TYPE);
     voidType->toString = void_t::to_string;
-    voidType->isPointer = false;
 }
 
 void post_setup_primitive_types()

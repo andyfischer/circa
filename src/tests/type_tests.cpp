@@ -154,8 +154,7 @@ void test_default_values()
     assign_value_to_default(s);
     test_assert(s->asString() == "");
 
-    Term* t = create_type(branch, "T");
-    type_t::get_is_pointer(t) = false;
+    //create_type(branch, "T");
 
 #if 0
     test_assert(type_t::get_default_value(t) == NULL);

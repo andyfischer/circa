@@ -31,10 +31,6 @@ struct Type
 
     std::string name;
 
-    // Whether the term's value is a pointer. If it is, then we might check if its NULL to see if it
-    // is allocated. (if not, we consider it to always be 'allocated')
-    bool isPointer;
-
     // C++ type info. This is only used to do runtime type checks, when the data
     // is accessed as a C++ type. Otherwise, this is optional.
     const std::type_info *cppTypeInfo;
@@ -67,7 +63,6 @@ struct Type
 
     Type() :
         name(""),
-        isPointer(true),
         cppTypeInfo(NULL),
         remapPointers(NULL),
         toString(NULL),

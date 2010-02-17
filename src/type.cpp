@@ -53,10 +53,6 @@ namespace type_t {
     {
         return as_type(type).name;
     }
-    bool& get_is_pointer(Term* type)
-    {
-        return as_type(type).isPointer;
-    }
     const std::type_info*& get_std_type_info(Term* type)
     {
         return as_type(type).cppTypeInfo;
