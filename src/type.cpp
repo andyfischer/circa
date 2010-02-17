@@ -263,13 +263,12 @@ Term* find_common_type(RefList const& list)
 
 void reset_type(Type* type)
 {
-    type->assign = NULL;
     type->remapPointers = NULL;
     type->toString = NULL;
     type->checkInvariants = NULL;
     type->valueFitsType = NULL;
     type->initialize = NULL;
-    type->assign2 = NULL;
+    type->assign = NULL;
     type->destroy = NULL;
     type->equals = NULL;
     type->cast = NULL;
@@ -281,7 +280,7 @@ void initialize_compound_type(Term* term)
     reset_type(type);
     type->initialize = branch_t::initialize;
     type->destroy = branch_t::destroy;
-    type->assign2 = branch_t::assign;
+    type->assign = branch_t::assign;
     type->cast = branch_t::cast;
     type->equals = branch_t::equals;
     type->toString = compound_type_to_string;

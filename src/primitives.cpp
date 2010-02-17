@@ -66,11 +66,10 @@ void initialize_primitive_types(Branch& kernel)
 
     STRING_TYPE = create_type(kernel, "string");
     Type* stringType = &as_type(STRING_TYPE);
-    stringType->assign = NULL;
     stringType->toString = string_t::to_string;
     stringType->initialize = string_t::initialize;
     stringType->destroy = string_t::destroy;
-    stringType->assign2 = string_t::assign;
+    stringType->assign = string_t::assign;
     stringType->equals = string_t::equals;
 
     INT_TYPE = create_type(kernel, "int");
@@ -96,7 +95,7 @@ void initialize_primitive_types(Branch& kernel)
     refType->remapPointers = Ref::remap_pointers;
     refType->toString = ref_t::to_string;
     refType->initialize = ref_t::initialize;
-    refType->assign2 = ref_t::assign;
+    refType->assign = ref_t::assign;
     refType->equals = ref_t::equals;
 
     // ANY_TYPE was created in bootstrap_kernel

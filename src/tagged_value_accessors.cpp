@@ -21,7 +21,7 @@ void assign_value(TaggedValue* source, TaggedValue* dest)
     if (dest->value_type == NULL)
         throw std::runtime_error("In assign_value, dest.value_type is NULL");
 
-    // If dest type is any then just change it now. This should be removed.
+    // If dest type is 'any' then just change it now. This should be removed.
     if (dest->value_type == &as_type(ANY_TYPE))
         change_type(dest, source->value_type);
 
@@ -40,10 +40,10 @@ void assign_value(TaggedValue* source, TaggedValue* dest)
     }
 
     // Check if the type defines an assign function.
-    Type::AssignFunc2 assign = NULL;
+    Type::AssignFunc assign = NULL;
     
     if (dest->value_type != NULL)
-        assign = dest->value_type->assign2;
+        assign = dest->value_type->assign;
 
     if (assign != NULL) {
         assign(source, dest);

@@ -31,7 +31,7 @@ void templated_destroy(Type*, TaggedValue* value)
 }
 
 template <class T>
-void templated_assign(Term* source, Term* dest)
+void templated_assign(TaggedValue* source, TaggedValue* dest)
 {
     *reinterpret_cast<T*>(dest->value_data.ptr)
         = *reinterpret_cast<T*>(source->value_data.ptr);

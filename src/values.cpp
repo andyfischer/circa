@@ -23,22 +23,8 @@ void assign_value(Term* source, Term* dest)
         specialize_type(dest, source->type);
     }
 
-    Type::AssignFunc assign = as_type(dest->type).assign;
-
-    if (assign == NULL) {
-        assign_value((TaggedValue*) source, (TaggedValue*) dest);
-        return;
-    }
-
-    // Deprecated behavior:
-    if (!value_fits_type(source, dest->type)) {
-        std::stringstream err;
-        err << "In assign_value, element of type " << source->type->name <<
-            " doesn't fit in type " << dest->type->name;
-        throw std::runtime_error(err.str());
-    }
-
-    assign(source, dest);
+    assign_value((TaggedValue*) source, (TaggedValue*) dest);
+    return;
 }
 
 } // namespace circa

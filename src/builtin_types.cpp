@@ -784,7 +784,7 @@ void initialize_builtin_types()
     STRING_TYPE_2 = new Type();
     STRING_TYPE_2->initialize = string_t::initialize;
     STRING_TYPE_2->destroy = string_t::destroy;
-    STRING_TYPE_2->assign2 = string_t::assign;
+    STRING_TYPE_2->assign = string_t::assign;
     STRING_TYPE_2->equals = string_t::equals;
 }
 

@@ -20,13 +20,12 @@ struct Type
 {
     typedef void (*InitializeFunc)(Type* type, TaggedValue* value);
     typedef void (*DestroyFunc)(Type* type, TaggedValue* value);
-    typedef void (*AssignFunc)(Term* src, Term* dest); // deprecated
+    typedef void (*AssignFunc)(TaggedValue* source, TaggedValue* dest);
     typedef bool (*EqualsFunc)(TaggedValue* lhs, TaggedValue* rhs);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
     typedef std::string (*ToStringFunc)(Term* term);
     typedef bool (*CheckInvariantsFunc)(Term* term, std::string* output);
     
-    typedef void (*AssignFunc2)(TaggedValue* source, TaggedValue* dest);
     typedef bool (*ValueFitsTypeFunc)(Type* type, TaggedValue* value);
     typedef void (*CastFunc)(Type* type, TaggedValue* source, TaggedValue* dest);
 
@@ -41,7 +40,6 @@ struct Type
     const std::type_info *cppTypeInfo;
 
     // Functions
-    AssignFunc assign; // deprecated
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
     CheckInvariantsFunc checkInvariants;
@@ -50,7 +48,7 @@ struct Type
     // new style:
     InitializeFunc initialize;
     DestroyFunc destroy;
-    AssignFunc2 assign2;
+    AssignFunc assign;
     EqualsFunc equals;
     CastFunc cast;
     
@@ -71,14 +69,13 @@ struct Type
         name(""),
         isPointer(true),
         cppTypeInfo(NULL),
-        assign(NULL),
         remapPointers(NULL),
         toString(NULL),
         checkInvariants(NULL),
         valueFitsType(NULL),
         initialize(NULL),
         destroy(NULL),
-        assign2(NULL),
+        assign(NULL),
         equals(NULL),
         cast(NULL)
     {

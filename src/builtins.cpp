@@ -106,7 +106,7 @@ void bootstrap_kernel()
     TYPE_TYPE->value_data.ptr = typeType;
     typeType->name = "Type";
     typeType->initialize = type_t::initialize;
-    typeType->assign2 = type_t::assign;
+    typeType->assign = type_t::assign;
     typeType->remapPointers = type_t::remap_pointers;
     typeType->toString = type_t::to_string;
     KERNEL->bindName(TYPE_TYPE, "Type");
