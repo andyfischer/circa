@@ -6,29 +6,29 @@ menu_font = ui_font_medium
 def draw_vmenu(Point topleft, List items) -> any
 
     labels = []
-    for item in items:
+    for item in items
         labels.append(item[0])
+    end
 
     -- Render text sprites
-    for label in @labels:
-        label = text:render_text(menu_font, label, #fff)
+    for label in @labels
+        text:render_text(menu_font, @label, #fff)
+    end
 
     -- Get maximum text width
     text_width = 0
     for label in labels
-        if label.width > text_width
-            text_width = label.width
-        end
+        max(@text_width, label.width)
     end
 
     index = 0
     item_height = 21
     h_gutter = 5
     v_gutter = 5
-    result = 0
     box_width = text_width + h_gutter*2
     bg_color = #666
     box_height = length(labels) * item_height + v_gutter*2
+    result = 0
 
     -- Draw rounded corners on top
     rounded_radius = 5.0
@@ -61,6 +61,36 @@ def draw_vmenu(Point topleft, List items) -> any
     end
 
     return result
+end
+
+def draw_hmenu(Point topleft, List items) -> any
+    labels = []
+    for item in items: labels.append(item[0])
+    for label in @labels: text:render_text(menu_font, @label, #fff)
+
+    index = 0
+    text_height = 18
+    h_gutter = 10
+    v_gutter = 3
+    item_height = text_height + v_gutter*2
+    right_x = 0
+    bg_color = #666
+
+    for label in labels
+        x = right_x
+        y = topleft.y
+        width = h_gutter*2 + label.width
+        rect = [x y x+width y+item_height]
+        right_x += width
+
+        highlight = cond(mouse_in(rect), 1.0, 0.0)
+        approach(@highlight, 5 * td)
+        color = bg_color + #222 * highlight
+        fill_rect(rect color)
+        text:draw_rendered_text(label [x+h_gutter, y+v_gutter])
+    end
+
+    return 0
 end
 
 } -- namespace ui_widgets

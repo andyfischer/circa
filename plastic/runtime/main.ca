@@ -361,6 +361,7 @@ for filename in load_user_script_request:
 users_branch = include(user_script_filename)
 
 -- Draw HUD
+include('mainmenu.ca')
 
 -- Draw fpses
 draw_fps = false
@@ -370,7 +371,7 @@ if draw_fps
 end
 
 -- Name selector
-if toggle(key_pressed(KEY_B))
+if toggle(key_pressed('b'))
   br = branch_ref(users_branch)
   x = 10, y = 10
   for r in br.get_configs_nested()
@@ -378,3 +379,4 @@ if toggle(key_pressed(KEY_B))
     y += 24
   end
 end
+

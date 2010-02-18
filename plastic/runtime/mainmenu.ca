@@ -1,0 +1,9 @@
+
+
+topmenu_picked = ui_widgets:draw_hmenu([0 0] [
+    ['File' 1]
+    ['Demos' 2]])
+
+if topmenu_picked != 0
+    print(topmenu_picked)
+end
