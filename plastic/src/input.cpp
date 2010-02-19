@@ -126,51 +126,55 @@ void capture_events()
 
 void handle_key_press(SDL_Event &event, int key)
 {
+    bool controlPressed = event.key.keysym.mod & KMOD_CTRL;
+
     // Unmodified keys
-    switch (key) {
-    case SDLK_ESCAPE:
-        CONTINUE_MAIN_LOOP = false;
-        break;
+    if (!controlPressed) {
+        switch (key) {
+        case SDLK_ESCAPE:
+            CONTINUE_MAIN_LOOP = false;
+            break;
 
-    case SDLK_e:
-        reset_state(users_branch());
-        if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
-            PAUSED = false;
-        break;
-
-    case SDLK_r:
-        if (event.key.keysym.mod & KMOD_SHIFT) {
-            reload_runtime();
-        } else {
-            reload_branch_from_file(users_branch(), std::cout);
+        case SDLK_e:
+            reset_state(users_branch());
             if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
                 PAUSED = false;
-        }
-        break;
+            break;
 
-    case SDLK_p:
-        if (PAUSED) {
-            std::cout << "Unpaused" << std::endl;
-            PAUSED = false;
-        } else {
-            std::cout << "Paused" << std::endl;
-            PAUSED = true;
-            PAUSE_REASON = USER_REQUEST;
-        }
-        break;
+        case SDLK_r:
+            if (event.key.keysym.mod & KMOD_SHIFT) {
+                reload_runtime();
+            } else {
+                reload_branch_from_file(users_branch(), std::cout);
+                if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
+                    PAUSED = false;
+            }
+            break;
 
-    // toggle low-power mode
-    case SDLK_l:
-        if (TARGET_FPS == 6)
-            TARGET_FPS = 60;
-        else
-            TARGET_FPS = 6;
-        std::cout << "target FPS = " << TARGET_FPS << std::endl;
-        break;
+        case SDLK_p:
+            if (PAUSED) {
+                std::cout << "Unpaused" << std::endl;
+                PAUSED = false;
+            } else {
+                std::cout << "Paused" << std::endl;
+                PAUSED = true;
+                PAUSE_REASON = USER_REQUEST;
+            }
+            break;
+
+        // toggle low-power mode
+        case SDLK_l:
+            if (TARGET_FPS == 6)
+                TARGET_FPS = 60;
+            else
+                TARGET_FPS = 6;
+            std::cout << "target FPS = " << TARGET_FPS << std::endl;
+            break;
+        }
     }
 
     // Control keys
-    if (event.key.keysym.mod & KMOD_CTRL) {
+    if (controlPressed) {
         switch (event.key.keysym.sym) {
         case SDLK_s:
             persist_branch_to_file(users_branch());

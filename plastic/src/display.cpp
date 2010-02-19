@@ -60,9 +60,6 @@ bool resize_display(int width, int height)
         return false;
     }
 
-    // Write window width & height to runtime.ca
-    set_int(runtime_branch()["window"]->asBranch()["width"], width);
-    set_int(runtime_branch()["window"]->asBranch()["height"], height);
 
     // Initialize desired SDL subsystems
     if (SDL_Init(SDL_INIT_TIMER & SDL_INIT_VIDEO
@@ -70,6 +67,10 @@ bool resize_display(int width, int height)
         std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
         return false;
     }
+
+    // Write window width & height
+    set_int(runtime_branch()["window"]->asBranch()["width"], WINDOW_WIDTH);
+    set_int(runtime_branch()["window"]->asBranch()["height"], WINDOW_HEIGHT);
 
     // Set window caption
     std::string windowTitle;

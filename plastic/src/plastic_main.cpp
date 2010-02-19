@@ -109,6 +109,12 @@ bool reload_runtime()
         return false;
     if (!setup_builtin_functions())
         return false;
+
+    // Write window width & height
+    set_int(runtime_branch()["window"]->asBranch()["width"], WINDOW_WIDTH);
+    set_int(runtime_branch()["window"]->asBranch()["height"], WINDOW_HEIGHT);
+
+    return true;
 }
 
 bool evaluate_main_script()
