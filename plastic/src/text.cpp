@@ -155,6 +155,7 @@ void pre_setup(Branch& branch)
     TTF_Font_t = new Type();
     initialize_simple_pointer_type(TTF_Font_t);
     TTF_Font_t->name = "TTF_Font";
+
     import_type(branch, TTF_Font_t);
 }
 

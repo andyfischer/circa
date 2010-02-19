@@ -25,12 +25,18 @@ void reload(EvalContext*, Term* term)
         PAUSED = false;
 }
 
+void hosted_reload_runtime(EvalContext*, Term* term)
+{
+    reload_runtime();
+}
+
 void setup(circa::Branch& branch)
 {
     Branch& ide_ns = branch["ide"]->asBranch();
     install_function(ide_ns["quit"], quit);
     install_function(ide_ns["reset_state"], reset_state);
     install_function(ide_ns["reload"], reload);
+    install_function(ide_ns["reload_runtime"], hosted_reload_runtime);
 }
 
 } // namespace ide

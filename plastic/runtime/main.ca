@@ -27,6 +27,7 @@ namespace ide
     def quit(): "Tell the IDE to shutdown"
     def reset_state(): "Reset state for the current script"
     def reload(): "Reload the current script immediately"
+    def reload_runtime(): "Reload the builtin runtime"
 end
 
 -- Input
@@ -379,4 +380,3 @@ if toggle(key_pressed('b'))
     y += 24
   end
 end
-

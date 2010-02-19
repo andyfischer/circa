@@ -53,13 +53,8 @@ std::string find_asset_file(std::string const& filename)
     return get_home_directory() + "/" + filename;
 }
 
-bool initialize_plastic()
+bool load_runtime()
 {
-    // Initialize Circa
-    circa::initialize();
-
-    RUNTIME_BRANCH = &create_branch(*circa::KERNEL, "plastic_main");
-
     // Pre-setup
     text::pre_setup(runtime_branch());
 
@@ -81,7 +76,13 @@ bool initialize_plastic()
     return true;
 }
 
-bool initialize_builtin_functions()
+bool initialize_plastic()
+{
+    RUNTIME_BRANCH = &create_branch(*circa::KERNEL, "plastic_main");
+    return load_runtime();
+}
+
+bool setup_builtin_functions()
 {
     postprocess_functions::setup(runtime_branch());
     ide::setup(runtime_branch());
@@ -95,11 +96,19 @@ bool initialize_builtin_functions()
     if (has_static_errors(runtime_branch())) {
         print_static_errors_formatted(runtime_branch(), std::cout);
         std::cout << std::endl;
-        //dump_branch(runtime_branch());
         return false;
     }
 
     return true;
+}
+
+bool reload_runtime()
+{
+    runtime_branch().clear();
+    if (!load_runtime())
+        return false;
+    if (!setup_builtin_functions())
+        return false;
 }
 
 bool evaluate_main_script()
@@ -115,6 +124,23 @@ bool evaluate_main_script()
         PAUSE_REASON = RUNTIME_ERROR;
         return false;
     }
+    return true;
+}
+
+bool load_user_script_filename(std::string const& _filename)
+{
+    Term* users_branch = runtime_branch()["users_branch"];
+    USERS_BRANCH = &users_branch->asBranch();
+
+    if (_filename != "") {
+        std::string filename = get_absolute_path(_filename);
+
+        Term* user_script_filename = runtime_branch().findFirstBinding("user_script_filename");
+        set_str(user_script_filename, filename);
+        mark_stateful_value_assigned(user_script_filename);
+        std::cout << "Loading script: " << filename << std::endl;
+    }
+        
     return true;
 }
 
@@ -147,36 +173,9 @@ void main_loop()
     }
 }
 
-bool load_user_script_filename(std::string const& _filename)
-{
-    Term* users_branch = runtime_branch()["users_branch"];
-    USERS_BRANCH = &users_branch->asBranch();
-
-    if (_filename != "") {
-        std::string filename = get_absolute_path(_filename);
-
-        Term* user_script_filename = runtime_branch().findFirstBinding("user_script_filename");
-        set_str(user_script_filename, filename);
-        mark_stateful_value_assigned(user_script_filename);
-        std::cout << "Loading script: " << filename << std::endl;
-    }
-        
-#if 0
-        include_function::load_script(NULL, users_branch);
-
-        if (has_error(users_branch)) {
-            std::cout << "Error loading " << _filename << ":" << std::endl;
-            std::cout << get_runtime_error_message(users_branch) << std::endl;
-            PAUSED = true;
-            PAUSE_REASON = RUNTIME_ERROR;
-        }
-#endif
-
-    return true;
-}
-
 int plastic_main(std::vector<std::string> args)
 {
+    circa::initialize();
     if (!initialize_plastic()) return 1;
 
     std::string arg0;
@@ -227,7 +226,7 @@ int plastic_main(std::vector<std::string> args)
         return 1;
     }
 
-    if (!initialize_builtin_functions()) return 1;
+    if (!setup_builtin_functions()) return 1;
     if (!initialize_display()) return 1;
 
     PREV_SDL_TICKS = SDL_GetTicks();
