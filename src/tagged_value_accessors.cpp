@@ -29,7 +29,6 @@ void assign_value(TaggedValue* source, TaggedValue* dest)
     if (dest->value_type != source->value_type) {
         Type::CastFunc cast = dest->value_type->cast;
         if (cast == NULL) {
-            assert(false);
             throw std::runtime_error("No cast function for value_type "
                 + dest->value_type->name + " (tried to assign value of value_type "
                 + source->value_type->name + ")");

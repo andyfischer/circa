@@ -60,7 +60,6 @@ bool resize_display(int width, int height)
         return false;
     }
 
-
     // Initialize desired SDL subsystems
     if (SDL_Init(SDL_INIT_TIMER & SDL_INIT_VIDEO
                 & SDL_INIT_JOYSTICK & SDL_INIT_EVENTTHREAD) == -1) {

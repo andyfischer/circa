@@ -34,7 +34,7 @@ for x in 0..num_tiles_x do
     box_br = box_tl + [tile_size, tile_size]
     box_tr = [box_br.x box_tl.y]
     box_bl = [box_tl.x box_br.y]
-    color = if_expr((x->int+y->int) % 2 == 1, #eee, #fff)
+    color = cond((x->int+y->int) % 2 == 1, #eee, #fff)
     gl:triangles([box_tl box_tr box_bl box_tr box_br box_bl] color)
   end
 end

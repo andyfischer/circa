@@ -3,8 +3,6 @@ desired_window_size = [500 400]
 
 background(#042304)
 
-print(window)
-
 def rect_intersects_circle(Rect rect, Point circle_loc, number circle_radius) -> bool
     -- lazy
     return rect_intersects_rect(rect, expand_rect(circle_loc, circle_radius, circle_radius))
@@ -25,15 +23,15 @@ state int ai_points = 0
 
 paddle_width = 60.0
 paddle_depth = 10.0
-ball_speed = 6.6
+ball_speed = 400.
 ball_radius = 8.5
 
 -- player's paddle on left
 players_paddle_loc = [50 mouse.y] -> Point
 players_paddle = expand_rect(players_paddle_loc, paddle_depth, paddle_width)
 
-ai_speed = 3.5
-ai_paddle_loc = [window.width - 50, approach(ball_loc.y, ai_speed)] -> Point
+ai_speed = 180
+ai_paddle_loc = [window.width - 50, approach(ball_loc.y, ai_speed*td)] -> Point
 ai_paddle = expand_rect(ai_paddle_loc, paddle_depth, paddle_width)
 
 ball_is_being_introduced = (time - round_start_time) < 2.0
@@ -78,7 +76,7 @@ end
 
 -- move ball
 if not(ball_is_being_introduced)
-    ball_loc = ball_loc + ball_direction * ball_speed
+    ball_loc = ball_loc + ball_direction * ball_speed * td
 end
 
 -- draw paddles

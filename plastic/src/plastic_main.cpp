@@ -159,13 +159,13 @@ void main_loop()
     gl_clear_error();
 
     // Evaluate script
-    if (!PAUSED) {
-
-        set_float(TIME_DELTA, (ticks - PREV_SDL_TICKS) / 1000.0f);
+    if (PAUSED) {
+        set_float(TIME_DELTA, 0.0f);
+    } else {
         set_float(TIME, ticks / 1000.0f);
-
-        PREV_SDL_TICKS = ticks;
+        set_float(TIME_DELTA, (ticks - PREV_SDL_TICKS) / 1000.0f);
     }
+    PREV_SDL_TICKS = ticks;
 
     render_frame();
 
