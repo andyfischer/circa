@@ -68,7 +68,7 @@ namespace function_t {
     std::string const& get_exposed_name_path(Term* function);
     void set_exposed_name_path(Term* func, std::string const& value);
     Ref& get_feedback_func(Term* function);
-    Branch& get_parameters(Term* function);
+    TaggedValue* get_parameters(Term* function);
     std::string const& get_description(Term* function);
 
     EvaluateFunc& get_evaluate(Term* function);

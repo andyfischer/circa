@@ -213,9 +213,9 @@ namespace function_t {
     {
         return as_ref(func->asBranch()[0]->asBranch()[7]);
     }
-    Branch& get_parameters(Term* func)
+    TaggedValue* get_parameters(Term* func)
     {
-        return as_branch(func->asBranch()[0]->asBranch()[8]);
+        return func->asBranch()[0]->asBranch()[8];
     }
     std::string const& get_description(Term* func)
     {

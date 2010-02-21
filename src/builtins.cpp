@@ -175,27 +175,27 @@ void pre_initialize_builtin_types(Branch& kernel)
 void post_setup_builtin_functions(Branch& kernel)
 {
     Term* add_v = create_duplicate(kernel, kernel["vectorize_vv"], "add_v");
-    create_ref(function_t::get_parameters(add_v), ADD_FUNC);
+    make_ref(function_t::get_parameters(add_v), ADD_FUNC);
     Term* add_s = create_duplicate(kernel, kernel["vectorize_vs"], "add_s");
-    create_ref(function_t::get_parameters(add_s), ADD_FUNC);
+    make_ref(function_t::get_parameters(add_s), ADD_FUNC);
 
     // Add to add() overloads
     create_ref(as_branch(ADD_FUNC), add_v);
     create_ref(as_branch(ADD_FUNC), add_s);
 
     Term* sub_v = create_duplicate(kernel, kernel["vectorize_vv"], "sub_v");
-    create_ref(function_t::get_parameters(sub_v), SUB_FUNC);
+    make_ref(function_t::get_parameters(sub_v), SUB_FUNC);
     Term* sub_s = create_duplicate(kernel, kernel["vectorize_vs"], "sub_s");
-    create_ref(function_t::get_parameters(sub_s), SUB_FUNC);
+    make_ref(function_t::get_parameters(sub_s), SUB_FUNC);
 
     // Add to sub() overloads
     create_ref(as_branch(SUB_FUNC), sub_v);
     create_ref(as_branch(SUB_FUNC), sub_s);
 
     Term* mult_v = create_duplicate(kernel, kernel["vectorize_vv"], "mult_v");
-    create_ref(function_t::get_parameters(mult_v), MULT_FUNC);
+    make_ref(function_t::get_parameters(mult_v), MULT_FUNC);
     Term* mult_s = create_duplicate(kernel, kernel["vectorize_vs"], "mult_s");
-    create_ref(function_t::get_parameters(mult_s), MULT_FUNC);
+    make_ref(function_t::get_parameters(mult_s), MULT_FUNC);
 
     // Add to mult() overloads
     create_ref(as_branch(MULT_FUNC), mult_v);
@@ -203,7 +203,7 @@ void post_setup_builtin_functions(Branch& kernel)
 
     Branch& div_overloads = as_branch(DIV_FUNC);
     Term* div_s = create_duplicate(div_overloads, kernel["vectorize_vs"], "div_s");
-    create_ref(function_t::get_parameters(div_s), DIV_FUNC);
+    make_ref(function_t::get_parameters(div_s), DIV_FUNC);
 
     // Add to div() overloads
     create_ref(as_branch(DIV_FUNC), div_s);

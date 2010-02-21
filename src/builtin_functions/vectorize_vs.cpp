@@ -12,7 +12,7 @@ namespace vectorize_vs_function {
 
     void evaluate(EvalContext*, Term* caller)
     {
-        Term* func = function_t::get_parameters(caller->function)[0]->asRef();
+        Term* func = as_ref(function_t::get_parameters(caller->function));
 
         Branch& left = as_branch(caller->input(0));
         Term* right = caller->input(1);

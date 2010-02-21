@@ -96,6 +96,12 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
     return lhs->value_data.asint == rhs->value_data.asint;
 }
 
+void make_ref(TaggedValue* value, Term* t)
+{
+    change_type(value, &as_type(REF_TYPE));
+    set_ref(value, t);
+}
+
 void set_branch_value(TaggedValue* value, Branch* branch)
 {
     value->value_type = (Type*) BRANCH_TYPE->value_data.ptr;
