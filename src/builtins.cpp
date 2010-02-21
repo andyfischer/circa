@@ -62,6 +62,7 @@ Term* CODE_TYPE = NULL;
 Term* COLOR_TYPE = NULL;
 Term* FEEDBACK_TYPE = NULL;
 Term* FUNCTION_TYPE = NULL;
+Term* FUNCTION_ATTRS_TYPE = NULL;
 Term* MAP_TYPE = NULL;
 Term* OVERLOADED_FUNCTION_TYPE = NULL;
 Term* TYPE_TYPE = NULL;
@@ -127,6 +128,16 @@ void bootstrap_kernel()
     Type* functionType = &as_type(FUNCTION_TYPE);
     functionType->toString = subroutine_t::to_string;
     functionType->checkInvariants = function_t::check_invariants;
+
+    // Create FunctionAttrs type
+    FUNCTION_ATTRS_TYPE = KERNEL->appendNew();
+    FUNCTION_ATTRS_TYPE->function = VALUE_FUNC;
+    FUNCTION_ATTRS_TYPE->type = TYPE_TYPE;
+    Type* functionAttrsType = new Type();
+    functionAttrsType->initialize = function_attrs_t::initialize;
+    functionAttrsType->assign = function_attrs_t::assign;
+    functionAttrsType->destroy = function_attrs_t::destroy;
+    KERNEL->bindName(FUNCTION_ATTRS_TYPE, "FunctionAttrs");
 
     // Initialize Value func
     VALUE_FUNC->type = FUNCTION_TYPE;

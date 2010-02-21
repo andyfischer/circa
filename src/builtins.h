@@ -56,6 +56,7 @@ extern Term* CODE_TYPE;
 extern Term* COLOR_TYPE;
 extern Term* FEEDBACK_TYPE;
 extern Term* FUNCTION_TYPE;
+extern Term* FUNCTION_ATTRS_TYPE;
 extern Term* LIST_TYPE;
 extern Term* NAMESPACE_TYPE;
 extern Term* OVERLOADED_FUNCTION_TYPE;

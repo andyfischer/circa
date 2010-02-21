@@ -4,6 +4,25 @@
 
 namespace circa {
 
+namespace function_attrs_t {
+
+    void initialize(Type* type, TaggedValue* value)
+    {
+        set_pointer(value, type, new FunctionAttrs());
+    }
+
+    void destroy(Type* type, TaggedValue* value)
+    {
+        delete (FunctionAttrs*) get_pointer(value);
+    }
+
+    void assign(TaggedValue* source, TaggedValue* dest)
+    {
+        *((FunctionAttrs*) get_pointer(dest)) = *((FunctionAttrs*) get_pointer(source));
+    }
+
+} // namespace function_attrs_t
+
 namespace function_t {
     std::string to_string(Term* term)
     {
