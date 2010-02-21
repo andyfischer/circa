@@ -109,12 +109,6 @@ bool type_matches(Term *term, Term *type)
     return true;
 }
 
-bool is_type(Term* term)
-{
-    assert(term != NULL);
-    return term->type == TYPE_TYPE;
-}
-
 bool is_native_type(Term* type)
 {
     return !is_compound_type(type);

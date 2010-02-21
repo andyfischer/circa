@@ -183,7 +183,7 @@ Ref& as_ref(TaggedValue* value)
 
 Type& as_type(TaggedValue* value)
 {
-    assert(is_value_type(value));
+    assert(is_type(value));
     return *((Type*) value->value_data.ptr);
 }
 
@@ -290,7 +290,7 @@ bool is_value_branch(TaggedValue* value)
         && value->value_type == (Type*) BRANCH_TYPE->value_data.ptr;
 }
 
-bool is_value_type(TaggedValue* value)
+bool is_type(TaggedValue* value)
 {
     return TYPE_TYPE != NULL
         && value->value_type == (Type*) TYPE_TYPE->value_data.ptr;

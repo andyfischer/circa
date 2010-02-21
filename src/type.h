@@ -22,12 +22,12 @@ struct Type
     typedef void (*DestroyFunc)(Type* type, TaggedValue* value);
     typedef void (*AssignFunc)(TaggedValue* source, TaggedValue* dest);
     typedef bool (*EqualsFunc)(TaggedValue* lhs, TaggedValue* rhs);
+    typedef void (*CastFunc)(Type* type, TaggedValue* source, TaggedValue* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
     typedef std::string (*ToStringFunc)(Term* term);
     typedef bool (*CheckInvariantsFunc)(Term* term, std::string* output);
     
     typedef bool (*ValueFitsTypeFunc)(Type* type, TaggedValue* value);
-    typedef void (*CastFunc)(Type* type, TaggedValue* source, TaggedValue* dest);
 
     std::string name;
 
@@ -36,17 +36,15 @@ struct Type
     const std::type_info *cppTypeInfo;
 
     // Functions
-    RemapPointersFunc remapPointers;
-    ToStringFunc toString;
-    CheckInvariantsFunc checkInvariants;
-    ValueFitsTypeFunc valueFitsType;
-
-    // new style:
     InitializeFunc initialize;
     DestroyFunc destroy;
     AssignFunc assign;
     EqualsFunc equals;
     CastFunc cast;
+    RemapPointersFunc remapPointers;
+    ToStringFunc toString;
+    CheckInvariantsFunc checkInvariants;
+    ValueFitsTypeFunc valueFitsType;
     
     Branch prototype;
 
@@ -64,15 +62,15 @@ struct Type
     Type() :
         name(""),
         cppTypeInfo(NULL),
-        remapPointers(NULL),
-        toString(NULL),
-        checkInvariants(NULL),
-        valueFitsType(NULL),
         initialize(NULL),
         destroy(NULL),
         assign(NULL),
         equals(NULL),
-        cast(NULL)
+        cast(NULL),
+        remapPointers(NULL),
+        toString(NULL),
+        checkInvariants(NULL),
+        valueFitsType(NULL)
     {
     }
 
@@ -100,9 +98,6 @@ namespace type_t {
     void enable_default_value(Term* type);
 }
 
-void initialize_type_prototype(Branch& contents);
-
-bool is_type(Term* term);
 Type& as_type(Term* term);
 bool is_compound_type(Term* type);
 bool is_native_type(Term* type);
