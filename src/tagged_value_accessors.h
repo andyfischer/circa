@@ -26,8 +26,8 @@ void set_type_value(TaggedValue* value, Type* type);
 void set_int(TaggedValue* value, int i);
 void set_float(TaggedValue* value, float f);
 void set_bool(TaggedValue* value, bool b);
-void set_str(TaggedValue* value, const char* s); // depr
-void set_str(TaggedValue* value, std::string const& s); // depr
+void set_str(TaggedValue* value, const char* s);
+void set_str(TaggedValue* value, std::string const& s);
 void set_ref(TaggedValue* value, Term* t);
 void set_null(TaggedValue* value);
 void set_pointer(TaggedValue* value, Type* type, void* p);

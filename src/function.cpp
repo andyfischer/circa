@@ -111,13 +111,18 @@ namespace function_t {
         return true;
     }
 
+    FunctionAttrs& get_attrs(Term* function)
+    {
+        return as_function_attrs(function->asBranch()[0]);
+    }
+
     std::string const& get_name(Term* function)
     {
-        return function->asBranch()[0]->asBranch()[0]->asString();
+        return get_attrs(function).name;
     }
     void set_name(Term* function, std::string const& name)
     {
-        set_str(function->asBranch()[0]->asBranch()[0], name);
+        get_attrs(function).name = name;
     }
 
     Term* get_output_type(Term* function)
@@ -132,17 +137,17 @@ namespace function_t {
 
     Ref& get_hidden_state_type(Term* function)
     {
-        return function->asBranch()[0]->asBranch()[1]->asRef();
+        return get_attrs(function).hiddenStateType;
     }
 
     bool get_variable_args(Term* function)
     {
-        return function->asBranch()[0]->asBranch()[2]->asBool();
+        return get_attrs(function).variableArgs;
     }
 
     void set_variable_args(Term* function, bool value)
     {
-        set_bool(function->asBranch()[0]->asBranch()[2], value);
+        get_attrs(function).variableArgs = value;
     }
 
     int num_inputs(Term* function)
@@ -191,41 +196,52 @@ namespace function_t {
     }
     EvaluateFunc& get_evaluate(Term* func)
     {
-        return as_evaluate_thunk(func->asBranch()[0]->asBranch()[3]);
+        return get_attrs(func).evaluate;
     }
     SpecializeTypeFunc& get_specialize_type(Term* func)
     {
-        return as_specialize_type_thunk(func->asBranch()[0]->asBranch()[4]);
+        return get_attrs(func).specializeType;
     }
     ToSourceStringFunc& get_to_source_string(Term* func)
     {
-        return as_to_source_string_thunk(func->asBranch()[0]->asBranch()[5]);
+        return get_attrs(func).toSource;
     }
     std::string const& get_exposed_name_path(Term* func)
     {
-        return as_string(func->asBranch()[0]->asBranch()[6]);
+        return get_attrs(func).exposedNamePath;
     }
     void set_exposed_name_path(Term* func, std::string const& value)
     {
-        set_str(func->asBranch()[0]->asBranch()[6], value);
+        get_attrs(func).exposedNamePath = value;
     }
     Ref& get_feedback_func(Term* func)
     {
-        return as_ref(func->asBranch()[0]->asBranch()[7]);
+        return get_attrs(func).feedbackFunc;
     }
     TaggedValue* get_parameters(Term* func)
     {
-        return func->asBranch()[0]->asBranch()[8];
+        return &get_attrs(func).parameter;
     }
     std::string const& get_description(Term* func)
     {
-        return as_string(func->asBranch()[0]->asBranch()[9]);
+        return get_attrs(func).description;
     }
 } // namespace function_t
 
 bool is_function(Term* term)
 {
     return term->type == FUNCTION_TYPE;
+}
+
+bool is_function_attrs(Term* term)
+{
+    return term->type == FUNCTION_ATTRS_TYPE;
+}
+
+FunctionAttrs& as_function_attrs(Term* term)
+{
+    assert(is_function_attrs(term));
+    return *((FunctionAttrs*) get_pointer(term));
 }
 
 std::string get_placeholder_name_for_index(int index)
@@ -239,18 +255,7 @@ void initialize_function_prototype(Branch& contents)
 {
     /* A function is a branch with the following structures:
       {
-        [0] #attributes {
-          [0] string name
-          [1] ref hidden_state_type
-          [2] bool variable_args
-          [3] EvaluateFunc native_evaluate
-          [4] SpecializeTypeFunc native_specialize_type
-          [5] ToSourceStringFunc native_to_source_string
-          [6] string exposed_name_path
-          [7] ref feedback_func
-          [8] List parameters
-          [9] string description
-        }
+        [0] FunctionAttrs #attributes
         [1..num_inputs] input terms
             .. each might have bool property 'modified' or 'meta'
         [...] body
@@ -265,19 +270,8 @@ void initialize_function_prototype(Branch& contents)
      * last. Probably should revisit this.
      */
 
-    Term* attributesTerm = create_value(contents, BRANCH_TYPE, "#attributes");
+    Term* attributesTerm = create_value(contents, FUNCTION_ATTRS_TYPE, "#attributes");
     set_source_hidden(attributesTerm, true);
-    Branch& attributes = as_branch(attributesTerm);
-    create_string(attributes, "", "name");
-    create_ref(attributes, NULL, "hidden_state_type");
-    create_bool(attributes, false, "variable_args");
-    create_value(attributes, EVALUATE_THUNK_TYPE, "native_evaluate");
-    create_value(attributes, SPECIALIZE_THUNK_TYPE, "native_specialize");
-    create_value(attributes, TO_STRING_THUNK_TYPE, "native_to_string");
-    create_string(attributes, "", "exposed_name_path");
-    create_ref(attributes, NULL, "feedback_func");
-    create_value(attributes, LIST_TYPE, "parameters");
-    create_value(attributes, STRING_TYPE, "description");
 }
 
 bool is_callable(Term* term)

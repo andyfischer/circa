@@ -123,21 +123,24 @@ void bootstrap_kernel()
     // Create Branch type
     BRANCH_TYPE = create_compound_type(*KERNEL, "Branch");
 
-    // Create Function type
-    FUNCTION_TYPE = create_compound_type(*KERNEL, "Function");
-    Type* functionType = &as_type(FUNCTION_TYPE);
-    functionType->toString = subroutine_t::to_string;
-    functionType->checkInvariants = function_t::check_invariants;
-
     // Create FunctionAttrs type
     FUNCTION_ATTRS_TYPE = KERNEL->appendNew();
     FUNCTION_ATTRS_TYPE->function = VALUE_FUNC;
     FUNCTION_ATTRS_TYPE->type = TYPE_TYPE;
     Type* functionAttrsType = new Type();
+    FUNCTION_ATTRS_TYPE->value_type = typeType;
+    FUNCTION_ATTRS_TYPE->value_data.ptr = functionAttrsType;
     functionAttrsType->initialize = function_attrs_t::initialize;
     functionAttrsType->assign = function_attrs_t::assign;
     functionAttrsType->destroy = function_attrs_t::destroy;
     KERNEL->bindName(FUNCTION_ATTRS_TYPE, "FunctionAttrs");
+    assert(is_type(FUNCTION_ATTRS_TYPE));
+
+    // Create Function type
+    FUNCTION_TYPE = create_compound_type(*KERNEL, "Function");
+    Type* functionType = &as_type(FUNCTION_TYPE);
+    functionType->toString = subroutine_t::to_string;
+    functionType->checkInvariants = function_t::check_invariants;
 
     // Initialize Value func
     VALUE_FUNC->type = FUNCTION_TYPE;

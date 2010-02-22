@@ -30,7 +30,8 @@ TaggedValue::TaggedValue(TaggedValue const& copy)
 TaggedValue&
 TaggedValue::operator=(TaggedValue const& rhs)
 {
-    assert(false);
+    Term* source = (Term*) &rhs;
+    assign_overwriting_type(source, this);
     return *this;
 }
 

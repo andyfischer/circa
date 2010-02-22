@@ -23,6 +23,7 @@ struct FunctionAttrs
     std::string exposedNamePath;
     Ref feedbackFunc;
     std::string description;
+    TaggedValue parameter;
 
     // Functions
     EvaluateFunc evaluate;
@@ -79,6 +80,8 @@ namespace function_t {
 }
 
 bool is_function(Term* term);
+bool is_function_attrs(Term* term);
+FunctionAttrs& as_function_attrs(Term* term);
 
 std::string get_placeholder_name_for_index(int index);
 
