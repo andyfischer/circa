@@ -23,8 +23,11 @@ TaggedValue::~TaggedValue()
 
 TaggedValue::TaggedValue(TaggedValue const& copy)
 {
-    // unsupported for now
-    assert(false);
+    value_type = NULL_T;
+    value_data.ptr = 0;
+
+    Term* source = (Term*) &copy;
+    assign_overwriting_type(source, this);
 }
 
 TaggedValue&

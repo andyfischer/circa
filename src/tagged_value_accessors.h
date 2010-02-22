@@ -19,6 +19,7 @@ void change_type(TaggedValue* v, Type* type);
 
 bool equals(TaggedValue* lhs, TaggedValue* rhs);
 
+void make_int(TaggedValue* value, int i);
 void make_ref(TaggedValue* value, Term* t);
 
 void set_branch_value(TaggedValue* value, Branch* branch);

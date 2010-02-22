@@ -96,6 +96,12 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
     return lhs->value_data.asint == rhs->value_data.asint;
 }
 
+void make_int(TaggedValue* value, int i)
+{
+    change_type(value, &as_type(INT_TYPE));
+    set_int(value, i);
+}
+
 void make_ref(TaggedValue* value, Term* t)
 {
     change_type(value, &as_type(REF_TYPE));
