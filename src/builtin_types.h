@@ -5,9 +5,6 @@
 
 namespace circa {
 
-extern Type* STRING_TYPE_2;
-extern Type* REF_TYPE_2;
-
 namespace int_t {
     void initialize(Type* type, TaggedValue& value);
     bool equals(TaggedValue* a, TaggedValue* b);
@@ -78,7 +75,6 @@ namespace point_t {
     void write(Term* term, float x, float y);
 }
 
-void initialize_builtin_types();
 void setup_builtin_types(Branch& kernel);
 void parse_builtin_types(Branch& kernel);
 

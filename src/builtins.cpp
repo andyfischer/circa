@@ -69,7 +69,12 @@ Term* TYPE_TYPE = NULL;
 Term* VOID_TYPE = NULL;
 
 // New style: Type* pointers for builtins
+Type* BOOL_T = NULL;
+Type* FLOAT_T = NULL;
+Type* INT_T = NULL;
 Type* NULL_T = NULL;
+Type* STRING_T = NULL;
+Type* REF_T = NULL;
 
 Term* get_global(std::string name)
 {
@@ -80,10 +85,42 @@ Term* get_global(std::string name)
 }
 
 void empty_evaluate_function(EvalContext*, Term*) { }
+
 void create_builtin_types()
 {
     NULL_T = new Type();
     NULL_T->name = "null";
+
+    STRING_T = new Type();
+    STRING_T->name = "string";
+    STRING_T->initialize = string_t::initialize;
+    STRING_T->destroy = string_t::destroy;
+    STRING_T->assign = string_t::assign;
+    STRING_T->equals = string_t::equals;
+    STRING_T->toString = string_t::to_string;
+
+    INT_T = new Type();
+    INT_T->name = "int";
+    INT_T->equals = int_t::equals;
+    INT_T->toString = int_t::to_string;
+
+    FLOAT_T = new Type();
+    FLOAT_T->name = "float";
+    FLOAT_T->cast = float_t::cast;
+    FLOAT_T->equals = float_t::equals;
+    FLOAT_T->toString = float_t::to_string;
+
+    BOOL_T = new Type();
+    BOOL_T->name = "bool";
+    BOOL_T->toString = bool_t::to_string;
+
+    REF_T = new Type();
+    REF_T->name = "ref";
+    REF_T->remapPointers = Ref::remap_pointers;
+    REF_T->toString = ref_t::to_string;
+    REF_T->initialize = ref_t::initialize;
+    REF_T->assign = ref_t::assign;
+    REF_T->equals = ref_t::equals;
 }
 
 void bootstrap_kernel()

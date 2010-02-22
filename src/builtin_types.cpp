@@ -4,9 +4,6 @@
 
 namespace circa {
 
-Type* STRING_TYPE_2 = NULL;
-Type* REF_TYPE_2 = NULL;
-
 namespace int_t {
     void initialize(Type* type, TaggedValue* value)
     {
@@ -548,9 +545,9 @@ namespace string_t {
     void initialize(Type* type, TaggedValue* value)
     {
         // temp:
-        STRING_TYPE_2 = &as_type(STRING_TYPE);
+        STRING_T = &as_type(STRING_TYPE);
 
-        set_pointer(value, STRING_TYPE_2, new std::string());
+        set_pointer(value, STRING_T, new std::string());
     }
     void destroy(Type* type, TaggedValue* value)
     {
@@ -560,7 +557,7 @@ namespace string_t {
 
     void assign(TaggedValue* source, TaggedValue* dest)
     {
-        *((std::string*) get_pointer(dest, STRING_TYPE_2)) = as_string(source);
+        *((std::string*) get_pointer(dest, STRING_T)) = as_string(source);
     }
 
     bool equals(TaggedValue* lhs, TaggedValue* rhs)
@@ -599,12 +596,12 @@ namespace ref_t {
     void initialize(Type* type, TaggedValue* value)
     {
         // Temp:
-        REF_TYPE_2 = &as_type(REF_TYPE);
+        REF_T = &as_type(REF_TYPE);
         set_pointer(value, type, new Ref());
     }
     void assign(TaggedValue* source, TaggedValue* dest)
     {
-        *((Ref*) get_pointer(dest, REF_TYPE_2)) = as_ref(source);
+        *((Ref*) get_pointer(dest, REF_T)) = as_ref(source);
     }
     bool equals(TaggedValue* lhs, TaggedValue* rhs)
     {
@@ -776,16 +773,6 @@ namespace point_t {
         set_float(branch[0], x);
         set_float(branch[1], y);
     }
-}
-
-void initialize_builtin_types()
-{
-    // this function is not yet used
-    STRING_TYPE_2 = new Type();
-    STRING_TYPE_2->initialize = string_t::initialize;
-    STRING_TYPE_2->destroy = string_t::destroy;
-    STRING_TYPE_2->assign = string_t::assign;
-    STRING_TYPE_2->equals = string_t::equals;
 }
 
 void setup_builtin_types(Branch& kernel)

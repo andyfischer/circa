@@ -65,35 +65,19 @@ void initialize_primitive_types(Branch& kernel)
     CHECK_INVARIANTS_THUNK_TYPE = import_pointer_type<CheckInvariantsFunc>(kernel, "CheckInvariantsThunk");
 
     STRING_TYPE = create_type(kernel, "string");
-    Type* stringType = &as_type(STRING_TYPE);
-    stringType->toString = string_t::to_string;
-    stringType->initialize = string_t::initialize;
-    stringType->destroy = string_t::destroy;
-    stringType->assign = string_t::assign;
-    stringType->equals = string_t::equals;
+    set_pointer(STRING_TYPE, STRING_T);
 
     INT_TYPE = create_type(kernel, "int");
-    Type* intType = &as_type(INT_TYPE);
-    intType->equals = int_t::equals;
-    intType->toString = int_t::to_string;
+    set_pointer(INT_TYPE, INT_T);
 
     FLOAT_TYPE = create_type(kernel, "number");
-    Type* floatType = &as_type(FLOAT_TYPE);
-    floatType->cast = float_t::cast;
-    floatType->equals = float_t::equals;
-    floatType->toString = float_t::to_string;
+    set_pointer(FLOAT_TYPE, FLOAT_T);
 
     BOOL_TYPE = create_type(kernel, "bool");
-    Type* boolType = &as_type(BOOL_TYPE);
-    boolType->toString = bool_t::to_string;
+    set_pointer(BOOL_TYPE, BOOL_T);
 
     REF_TYPE = create_type(kernel, "Ref");
-    Type* refType = &as_type(REF_TYPE);
-    refType->remapPointers = Ref::remap_pointers;
-    refType->toString = ref_t::to_string;
-    refType->initialize = ref_t::initialize;
-    refType->assign = ref_t::assign;
-    refType->equals = ref_t::equals;
+    set_pointer(REF_TYPE, REF_T);
 
     // ANY_TYPE was created in bootstrap_kernel
     Type* anyType = &as_type(ANY_TYPE);
