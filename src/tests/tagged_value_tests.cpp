@@ -228,13 +228,61 @@ namespace refcount_test {
 
     void pool_deallocate(int index)
     {
-        assert(refcount[index]);
-        refcount[index] = false;
+        assert(refcount[index] > 0);
+        refcount[index]--;
+    }
+
+    // Type functions:
+    void initialize(Type* type, TaggedValue* value)
+    {
+        value->value_data.asint = pool_allocate();
+    }
+
+    void destroy(Type* type, TaggedValue* value)
+    {
+        pool_deallocate(value->value_data.asint);
+    }
+
+    void assign(TaggedValue* source, TaggedValue* dest)
+    {
+        int prev = dest->value_data.asint;
+        dest->value_data.asint = source->value_data.asint;
+        refcount[dest->value_data.asint]++;
+        refcount[prev]--;
     }
 
     void test()
     {
-        // TODO
+        Type myType;
+        myType.initialize = initialize;
+        myType.destroy = destroy;
+        myType.assign = assign;
+
+        {
+            TaggedValue value;
+            change_type(&value, &myType);
+
+            test_assert(refcount[0] == 1);
+        }
+
+        test_assert(refcount[0] == 0);
+
+        {
+            TaggedValue value1, value2;
+            change_type(&value1, &myType);
+            change_type(&value2, &myType);
+
+            test_assert(refcount[0] == 1);
+
+            assign_value(&value1, &value2);
+
+            test_assert(value1.value_data.asint == 0);
+            test_assert(value2.value_data.asint == 0);
+
+            test_assert(refcount[0] == 2);
+        }
+
+        test_assert(refcount[0] == 0);
     }
 }
 
@@ -248,6 +296,7 @@ void register_tests()
     REGISTER_TEST_CASE(tagged_value_tests::test_assign_value_to_default);
     REGISTER_TEST_CASE(tagged_value_tests::test_constructor_syntax);
     REGISTER_TEST_CASE(tagged_value_tests::manual_memory_management_test::test);
+    REGISTER_TEST_CASE(tagged_value_tests::refcount_test::test);
 }
 
 }
