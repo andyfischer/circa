@@ -3,7 +3,6 @@
 #include "common_headers.h"
 
 #include "builtins.h"
-#include "primitives.h"
 #include "term.h"
 #include "type.h"
 

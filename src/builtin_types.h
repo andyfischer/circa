@@ -75,6 +75,11 @@ namespace point_t {
     void write(Term* term, float x, float y);
 }
 
+void initialize_primitive_types(Branch& kernel);
+
+// Do some more setup, after all the standard builtin types have been created.
+void post_setup_primitive_types();
+
 void setup_builtin_types(Branch& kernel);
 void parse_builtin_types(Branch& kernel);
 

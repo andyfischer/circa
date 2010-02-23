@@ -3,7 +3,6 @@
 #include "builtins.h"
 #include "tagged_value.h"
 #include "tagged_value_accessors.h"
-#include "primitives.h"
 #include "type.h"
 
 namespace circa {

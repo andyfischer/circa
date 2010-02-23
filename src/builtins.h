@@ -50,6 +50,12 @@ extern Term* UNKNOWN_TYPE_FUNC;
 extern Term* UNRECOGNIZED_EXPRESSION_FUNC;
 extern Term* VALUE_FUNC;
 
+extern Term* ANY_TYPE;
+extern Term* BOOL_TYPE;
+extern Term* FLOAT_TYPE;
+extern Term* INT_TYPE;
+extern Term* REF_TYPE;
+extern Term* STRING_TYPE;
 extern Term* BRANCH_TYPE;
 extern Term* BRANCH_REF_TYPE;
 extern Term* CODE_TYPE;
