@@ -29,4 +29,17 @@ TaggedValue* List::operator[](int index)
     return get(index);
 }
 
+#if 0
+bool is_list(TaggedValue* value)
+{
+    return value->value_type == LIST_T:
+}
+
+List& as_list(TaggedValue* value)
+{
+    assert(is_list(value));
+    return *((List*) get_pointer(value));
+}
+#endif
+
 }

@@ -317,7 +317,7 @@ std::string to_string(Term* term)
 
     // Generic to-string
     std::stringstream result;
-    result << "<" << type->name << " 0x";
+    result << type->name << "#";
     result << std::hex << get_type_value(term) << ">";
     return result.str();
 }

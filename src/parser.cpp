@@ -607,7 +607,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
-    Term* result = apply(branch, IF_BLOCK_FUNC, RefList());
+    Term* result = apply(branch, IF_BLOCK_FUNC, RefList(NULL));
     Branch& contents = as_branch(result);
 
     bool firstIteration = true;
@@ -676,7 +676,13 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         set_source_hidden(branch.owningTerm, true);
     }
 
-    // Move the if_block term to be after the condition terms
+    // Create a state term if necessary
+    if (if_block_contains_state(result)) {
+        Term* stateTerm = create_stateful_value(branch, LIST_TYPE);
+        set_input(result, 0, stateTerm);
+    }
+
+    // Move the if_block term to be after the condition and state terms
     branch.moveToEnd(result);
 
     update_if_block_joining_branch(result);

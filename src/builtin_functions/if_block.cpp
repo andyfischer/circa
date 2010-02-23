@@ -5,54 +5,9 @@
 namespace circa {
 namespace if_block_function {
 
-    // The format of if_block is as follows:
-    //
-    // N = branch length
-    //
-    // {
-    //   [0] if(cond0) : Branch
-    //   [1] if(cond1) : Branch
-    //   ...
-    //   [N-2] branch()  (this corresponds to the 'else' block)
-    //   [N-1] #joining = branch() 
-    //
-
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
-        // Find the first if() call whose condition is true
-        Branch& contents = as_branch(caller);
-        int satisfiedIndex = 0;
-        for (int i=0; i < contents.length()-1; i++) {
-            Term* call = contents[i];
-
-            bool satisfied = false;
-
-            if (call->function == BRANCH_FUNC) {
-                satisfied = true;
-            } else {
-                Term* cond = call->input(0);
-                if (cond->asBool())
-                    satisfied = true;
-            }
-
-            if (satisfied) {
-                evaluate_term(call);
-                satisfiedIndex = i;
-
-                if (call->hasError()) {
-                    nested_error_occurred(caller);
-
-                    return;
-                }
-                break;
-            }
-        }
-
-        // Update the #joining branch
-        assert(contents[contents.length()-1]->name == "#joining");
-        Branch& joining = as_branch(contents[contents.length()-1]);
-        set_int(joining["#satisfiedIndex"], satisfiedIndex);
-        evaluate_branch(joining, caller);
+        evaluate_if_block(cxt, caller);
     }
 
     std::string toSourceString(Term* term)
@@ -90,8 +45,9 @@ namespace if_block_function {
 
     void setup(Branch& kernel)
     {
-        IF_BLOCK_FUNC = import_function(kernel, evaluate, "if_block() -> Code");
+        IF_BLOCK_FUNC = import_function(kernel, evaluate, "if_block(List _state) -> Branch");
         function_t::get_to_source_string(IF_BLOCK_FUNC) = toSourceString;
+        function_t::set_input_meta(IF_BLOCK_FUNC, 0, true); // allow _state to be NULL
         function_t::set_exposed_name_path(IF_BLOCK_FUNC, "#joining");
     }
 }

@@ -220,6 +220,121 @@ void test_parse_with_no_line_endings()
     test_assert(branch["a"]->asInt() == 9);
 }
 
+void test_state_simple()
+{
+    Branch branch;
+
+    // Simple test, condition never changes
+    Term* block = branch.compile("if true; state i = 0; i += 1; end");
+    Term* i = get_if_condition_block(block, 0)->findFirstBinding("i");
+    test_assert(as_int(i) == 0);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 1);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 2);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 3);
+
+    // Same test with elif
+    block = branch.compile("if false; elif true; state i = 0; i += 1; end");
+    i = get_if_condition_block(block, 1)->findFirstBinding("i");
+    test_assert(as_int(i) == 0);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 1);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 2);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 3);
+
+    // Same test with else
+    block = branch.compile("if false; else state i = 0; i += 1; end");
+    i = get_if_block_else_block(block)->findFirstBinding("i");
+    test_assert(as_int(i) == 0);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 1);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 2);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 3);
+}
+
+void test_state_in_function()
+{
+    // Use state in an if block in a function, this should verify that state
+    // is being swapped in and out.
+    Branch branch;
+
+    branch.compile(
+    "def my_func() -> int; if true; state i = 0; i += 1; return i; else return 0 end end");
+
+    Term* call1 = branch.compile("my_func()");
+    Term* call2 = branch.compile("my_func()");
+
+    test_assert(as_int(call1) == 0);
+    test_assert(as_int(call2) == 0);
+
+    evaluate_term(call1);
+    evaluate_term(call1);
+    evaluate_term(call1);
+
+    test_equals(as_int(call1), 3);
+
+    evaluate_term(call2);
+
+    test_equals(as_int(call2), 1);
+}
+
+void test_state_is_reset_when_if_fails()
+{
+    Branch branch;
+
+    Term* c = branch.compile("c = true");
+    Term* ifBlock = branch.compile("if c; state i = 0; i += 1; end");
+    Term* i = get_if_condition_block(ifBlock, 0)->findFirstBinding("i");
+
+    test_assert(as_int(i) == 0);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 1);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 2);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 3);
+
+    set_bool(c, false);
+
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 0);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 0);
+
+    set_bool(c, true);
+
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 1);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 2);
+
+    // Same thing with state in the else() block
+    branch.clear();
+    c = branch.compile("c = true");
+    ifBlock = branch.compile("if c; else state i = 0; i += 1; end");
+    i = get_if_condition_block(ifBlock, 1)->findFirstBinding("i");
+
+    test_assert(as_int(i) == 0);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 0);
+    set_bool(c, false);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 1);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 2);
+    set_bool(c, true);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 0);
+    evaluate_branch(branch);
+    test_assert(as_int(i) == 0);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(if_block_tests::test_if_joining);
@@ -228,6 +343,9 @@ void register_tests()
     REGISTER_TEST_CASE(if_block_tests::test_execution);
     REGISTER_TEST_CASE(if_block_tests::test_execution_with_elif);
     REGISTER_TEST_CASE(if_block_tests::test_parse_with_no_line_endings);
+    REGISTER_TEST_CASE(if_block_tests::test_state_simple);
+    REGISTER_TEST_CASE(if_block_tests::test_state_in_function);
+    REGISTER_TEST_CASE(if_block_tests::test_state_is_reset_when_if_fails);
 }
 
 } // namespace if_block_tests

@@ -18,6 +18,11 @@ struct List
     TaggedValue* operator[](int index);
 };
 
+#if 0
+bool is_list(TaggedValue*);
+List& as_list(TaggedValue*);
+#endif
+
 }
 
 #endif

@@ -6,6 +6,18 @@
 
 namespace circa {
 
+// The format of if_block is as follows:
+//
+// N = branch length
+//
+// {
+//   [0] if(cond0) : Branch
+//   [1] if(cond1) : Branch
+//   ...
+//   [N-2] branch()  (this corresponds to the 'else' block)
+//   [N-1] #joining = branch() 
+//
+
 void update_if_block_joining_branch(Term* ifCall)
 {
     Branch& contents = ifCall->asBranch();
@@ -96,6 +108,118 @@ void update_if_block_joining_branch(Term* ifCall)
 
     // Expose all names in 'joining' branch.
     expose_all_names(joining, *outerScope);
+}
+
+Branch* get_if_condition_block(Term* ifCall, int index)
+{
+    assert(ifCall->function = IF_BLOCK_FUNC);
+    Branch& callContents = as_branch(ifCall);
+    assert(index < callContents.length());
+    return (&as_branch(callContents[index]));
+}
+
+Branch* get_if_block_else_block(Term* ifCall)
+{
+    assert(ifCall->function = IF_BLOCK_FUNC);
+    Branch& callContents = as_branch(ifCall);
+    assert(callContents.length() >= 2);
+    return (&as_branch(callContents[callContents.length()-2]));
+}
+
+Branch* get_if_block_state(Term* ifCall)
+{
+    Term* term = ifCall->input(0);
+    if (term == NULL)
+        return NULL;
+    return &as_branch(term);
+}
+
+bool if_block_contains_state(Term* ifCall)
+{
+    Branch& contents = as_branch(ifCall);
+    for (int cond=0; cond < contents.length(); cond++) {
+        Branch& condContents = as_branch(contents[cond]);
+        for (int i=0; i < condContents.length(); i++) {
+            if (is_stateful(condContents[i]))
+                return true;
+        }
+    }
+    return false;
+}
+
+void evaluate_if_block(EvalContext*, Term* caller)
+{
+    Branch& contents = as_branch(caller);
+    Branch* stateBranch = get_if_block_state(caller);
+
+    if (stateBranch != NULL) {
+        while (stateBranch->length() < contents.length()-1)
+            create_list(*stateBranch);
+    }
+
+    // Find the first if() call whose condition is true
+    int satisfiedIndex = 0;
+    for (int i=0; i < contents.length()-1; i++) {
+        Term* call = contents[i];
+
+        TaggedValue* stateElement = NULL;
+
+        if (stateBranch != NULL)
+            stateElement = stateBranch->get(i);
+
+        bool satisfied = false;
+
+        if (call->function == BRANCH_FUNC) {
+            satisfied = true;
+        } else {
+            Term* cond = call->input(0);
+            if (cond->asBool())
+                satisfied = true;
+        }
+
+        if (satisfied) {
+            // Load state, if it's found
+            if (stateElement != NULL)
+                load_state_into_branch(as_branch(stateElement), as_branch(call));
+
+            evaluate_term(call);
+            satisfiedIndex = i;
+
+            if (call->hasError())
+                nested_error_occurred(caller);
+
+            if (stateElement != NULL)
+                persist_state_from_branch(as_branch(call), as_branch(stateElement));
+
+            break;
+
+        } else {
+            // This condition wasn't executed, reset state.
+            if (stateElement != NULL) {
+                as_branch(stateElement).clear();
+                reset_state(as_branch(call));
+            }
+        }
+    }
+
+    // For any conditions after the successful one, reset state.
+    for (int i=satisfiedIndex+1; i < contents.length()-1; i++) {
+        TaggedValue* stateElement = NULL;
+        if (stateBranch != NULL) {
+            stateElement = stateBranch->get(i);
+        }
+        if (stateElement != NULL) {
+            as_branch(stateElement).clear();
+            Term* call = contents[i];
+            reset_state(as_branch(call));
+        }
+    }
+
+    // Update the #joining branch
+    assert(contents[contents.length()-1]->name == "#joining");
+    Branch& joining = as_branch(contents[contents.length()-1]);
+    set_int(joining["#satisfiedIndex"], satisfiedIndex);
+    evaluate_branch(joining, caller);
 }
 
 } // namespace circa
