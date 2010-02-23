@@ -75,7 +75,6 @@ bool has_runtime_error(Branch& branch)
     return false;
 }
 
-
 void print_runtime_error_formatted(Term* term, std::ostream& output)
 {
     output << get_short_location(term) << " ";
@@ -110,6 +109,13 @@ void print_runtime_error_formatted(Branch& branch, std::ostream& output)
     output << "(!!! no error found)" << std::endl;
 }
 
+std::string get_runtime_error_formatted(Branch& branch)
+{
+    std::stringstream out;
+    print_runtime_error_formatted(branch, out);
+    return out.str();
+}
+
 bool has_error(Term* term)
 {
     return has_static_error(term) || has_runtime_error(term);
@@ -117,9 +123,11 @@ bool has_error(Term* term)
 
 bool has_error(Branch& branch)
 {
-    for (int i=0; i < branch.length(); i++)
+    for (int i=0; i < branch.length(); i++) {
+        if (branch[i] == NULL) continue;
         if (has_error(branch[i]))
             return true;
+    }
     return false;
 }
 
@@ -129,6 +137,14 @@ std::string get_error_message(Term* term)
         return get_static_error_message(term);
     else
         return get_runtime_error_message(term);
+}
+
+std::string get_error_message(Branch& branch)
+{
+    if (has_static_errors(branch))
+        return get_static_errors_formatted(branch);
+    else
+        return get_runtime_error_formatted(branch);
 }
 
 bool has_static_error(Term* term)

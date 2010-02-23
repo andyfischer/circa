@@ -98,8 +98,20 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
 
 void make_int(TaggedValue* value, int i)
 {
-    change_type(value, &as_type(INT_TYPE));
+    change_type(value, INT_T);
     set_int(value, i);
+}
+
+void make_float(TaggedValue* value, float f)
+{
+    change_type(value, FLOAT_T);
+    set_float(value, f);
+}
+
+void make_string(TaggedValue* value, const char* s)
+{
+    change_type(value, STRING_T);
+    set_str(value, s);
 }
 
 void make_ref(TaggedValue* value, Term* t)

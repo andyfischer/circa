@@ -89,10 +89,10 @@ void _test_assert_function(Branch& branch, int line, const char* file)
         }
     }
 
-    if (has_static_errors(branch)) {
+    if (has_error(branch)) {
         std::stringstream msg;
         msg << "Branch has errors at " << file << ", line " << line << std::endl;
-        print_static_errors_formatted(branch, msg);
+        msg << get_error_message(branch);
         throw std::runtime_error(msg.str());
     }
 }

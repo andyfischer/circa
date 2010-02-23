@@ -38,6 +38,7 @@ std::string get_runtime_error_formatted(Branch& branch);
 std::string get_static_errors_formatted(Branch& branch);
 std::string get_static_error_message(Term* term);
 std::string get_error_message(Term* term);
+std::string get_error_message(Branch& branch);
 
 void print_runtime_error_formatted(Term* term, std::ostream& output);
 void print_runtime_error_formatted(Branch& branch, std::ostream& output);
