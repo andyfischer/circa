@@ -11,37 +11,6 @@ Term* INT_TYPE = NULL;
 Term* REF_TYPE = NULL;
 Term* STRING_TYPE = NULL;
 
-// thunks for Function:
-Term* EVALUATE_THUNK_TYPE = NULL;
-Term* SPECIALIZE_THUNK_TYPE = NULL;
-
-// common thunks:
-Term* TO_STRING_THUNK_TYPE = NULL;
-Term* CHECK_INVARIANTS_THUNK_TYPE = NULL;
-
-EvaluateFunc& as_evaluate_thunk(Term* term)
-{
-    assert_type(term, EVALUATE_THUNK_TYPE);
-    return ((EvaluateFunc&) term->value_data.ptr);
-}
-
-SpecializeTypeFunc& as_specialize_type_thunk(Term* term)
-{
-    assert_type(term, SPECIALIZE_THUNK_TYPE);
-    return ((SpecializeTypeFunc&) term->value_data.ptr);
-}
-
-ToSourceStringFunc& as_to_source_string_thunk(Term* term)
-{
-    assert_type(term, TO_STRING_THUNK_TYPE);
-    return ((ToSourceStringFunc&) term->value_data.ptr);
-}
-
-CheckInvariantsFunc& as_check_invariants_thunk(Term* term)
-{
-    assert_type(term, CHECK_INVARIANTS_THUNK_TYPE);
-    return ((CheckInvariantsFunc&) term->value_data.ptr);
-}
 
 namespace any_t {
     std::string to_string(Term* term)
@@ -59,11 +28,6 @@ namespace void_t {
 
 void initialize_primitive_types(Branch& kernel)
 {
-    EVALUATE_THUNK_TYPE = import_pointer_type<EvaluateFunc>(kernel, "EvaluateThunk");
-    SPECIALIZE_THUNK_TYPE = import_pointer_type<SpecializeTypeFunc>(kernel, "SpecializeThunk");
-    TO_STRING_THUNK_TYPE = import_pointer_type<ToSourceStringFunc>(kernel, "ToSourceStringThunk");
-    CHECK_INVARIANTS_THUNK_TYPE = import_pointer_type<CheckInvariantsFunc>(kernel, "CheckInvariantsThunk");
-
     STRING_TYPE = create_type(kernel, "string");
     set_pointer(STRING_TYPE, STRING_T);
 

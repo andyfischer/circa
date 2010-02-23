@@ -10,13 +10,13 @@
 
 namespace circa {
 
+typedef void (*EvaluateFunc)(EvalContext* context, Term* caller);
+typedef Term* (*SpecializeTypeFunc)(Term* caller);
+typedef std::string (*ToSourceStringFunc)(Term* term);
+typedef bool (*CheckInvariantsFunc)(Term* term, std::string* output);
+
 struct FunctionAttrs
 {
-    typedef void (*EvaluateFunc)(EvalContext* context, Term* caller);
-    typedef Term* (*SpecializeTypeFunc)(Term* caller);
-    typedef std::string (*ToSourceStringFunc)(Term* term);
-    typedef bool (*CheckInvariantsFunc)(Term* term, std::string* output);
-
     std::string name;
     Ref hiddenStateType;
     bool variableArgs;

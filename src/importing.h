@@ -7,6 +7,7 @@
 
 #include "common_headers.h"
 
+#include "function.h"
 #include "primitives.h"
 #include "token_stream.h"
 
