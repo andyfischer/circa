@@ -9,12 +9,6 @@ namespace circa {
 
 void assign_value(TaggedValue* source, TaggedValue* dest)
 {
-    // Temp for compatibility: if either type is NULL then just do shallow assign
-    if (source->value_type == NULL || dest->value_type == NULL) {
-        dest->value_data = source->value_data;
-        return;
-    }
-
     if (source->value_type == NULL)
         throw std::runtime_error("In assign_value, source.value_type is NULL");
     if (dest->value_type == NULL)
