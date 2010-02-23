@@ -8,7 +8,7 @@ namespace tagged_value_tests {
 void test_int_simple()
 {
     TaggedValue v;
-    set_int(&v, 4);
+    make_int(&v, 4);
 
     test_assert(is_int(&v));
     test_assert(as_int(&v) == 4);
@@ -28,17 +28,17 @@ void test_polymorphic()
     test_assert(!is_float(&v));
     test_assert(!is_bool(&v));
 
-    set_int(&v, 11);
+    make_int(&v, 11);
     test_assert(is_int(&v));
     test_assert(!is_float(&v));
     test_assert(!is_bool(&v));
 
-    set_float(&v, 2.0);
+    make_float(&v, 2.0);
     test_assert(!is_int(&v));
     test_assert(is_float(&v));
     test_assert(!is_bool(&v));
 
-    set_bool(&v, false);
+    make_bool(&v, false);
     test_assert(!is_int(&v));
     test_assert(!is_float(&v));
     test_assert(is_bool(&v));

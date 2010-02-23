@@ -16,16 +16,15 @@ void assign_value(TaggedValue* source, TaggedValue* dest);
 void assign_overwriting_type(TaggedValue* source, TaggedValue* dest);
 
 void change_type(TaggedValue* v, Type* type);
-
 bool equals(TaggedValue* lhs, TaggedValue* rhs);
 
 void make_int(TaggedValue* value, int i);
 void make_float(TaggedValue* value, float f);
 void make_string(TaggedValue* value, const char* s);
+void make_bool(TaggedValue* value, bool b);
 void make_ref(TaggedValue* value, Term* t);
+void make_type(TaggedValue* value, Type* type);
 
-void set_branch_value(TaggedValue* value, Branch* branch);
-void set_type_value(TaggedValue* value, Type* type);
 void set_int(TaggedValue* value, int i);
 void set_float(TaggedValue* value, float f);
 void set_bool(TaggedValue* value, bool b);

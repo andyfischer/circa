@@ -153,7 +153,7 @@ void bootstrap_kernel()
     ANY_TYPE = KERNEL->appendNew();
     ANY_TYPE->function = VALUE_FUNC;
     ANY_TYPE->type = TYPE_TYPE;
-    set_type_value(ANY_TYPE, new Type());
+    make_type(ANY_TYPE, new Type());
     type_t::get_name(ANY_TYPE) = "any";
     KERNEL->bindName(ANY_TYPE, "any");
 

@@ -61,7 +61,7 @@ void run()
     Term* refTarget2 = alloc_term();
     make_ref(refExamples.append(), refTarget1);
     make_ref(refExamples.append(), refTarget2);
-    run_test_for_type(REF_TYPE, refExamples);
+    test_assert(run_test_for_type(REF_TYPE, refExamples));
 }
 
 void register_tests()

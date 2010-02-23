@@ -114,19 +114,19 @@ void make_string(TaggedValue* value, const char* s)
     set_str(value, s);
 }
 
+void make_bool(TaggedValue* value, bool b)
+{
+    change_type(value, BOOL_T);
+    set_bool(value, b);
+}
+
 void make_ref(TaggedValue* value, Term* t)
 {
     change_type(value, &as_type(REF_TYPE));
     set_ref(value, t);
 }
 
-void set_branch_value(TaggedValue* value, Branch* branch)
-{
-    value->value_type = (Type*) BRANCH_TYPE->value_data.ptr;
-    value->value_data.ptr = branch;
-}
-
-void set_type_value(TaggedValue* value, Type* type)
+void make_type(TaggedValue* value, Type* type)
 {
     value->value_type = (Type*) TYPE_TYPE->value_data.ptr;
     value->value_data.ptr = type;
@@ -134,28 +134,25 @@ void set_type_value(TaggedValue* value, Type* type)
 
 void set_int(TaggedValue* value, int i)
 {
-    value->value_type = (Type*) INT_TYPE->value_data.ptr;
+    assert(is_int(value));
     value->value_data.asint = i;
 }
 
 void set_float(TaggedValue* value, float f)
 {
-    value->value_type = (Type*) FLOAT_TYPE->value_data.ptr;
+    assert(is_float(value));
     value->value_data.asfloat = f;
 }
 
 void set_bool(TaggedValue* value, bool b)
 {
-    value->value_type = (Type*) BOOL_TYPE->value_data.ptr;
+    assert(is_bool(value));
     value->value_data.asbool = b;
 }
 
 void set_str(TaggedValue* value, const char* s)
 {
-    if (value->value_type != STRING_TYPE->value_data.ptr) {
-        value->value_type = (Type*) STRING_TYPE->value_data.ptr;
-        value->value_data.ptr = new std::string();
-    }
+    assert(is_string(value));
     *((std::string*) value->value_data.ptr) = s;
 }
 
