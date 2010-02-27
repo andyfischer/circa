@@ -335,6 +335,18 @@ void test_state_is_reset_when_if_fails()
     test_assert(as_int(i) == 0);
 }
 
+void test_nested_state()
+{
+    Branch branch;
+    Term* block = branch.compile("if true; t = toggle(true); end");
+    Term* t = get_if_condition_block(block, 0)->findFirstBinding("t");
+
+    evaluate_branch(branch);
+    test_assert(as_bool(t) == true);
+    evaluate_branch(branch);
+    test_assert(as_bool(t) == false);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(if_block_tests::test_if_joining);
@@ -346,6 +358,7 @@ void register_tests()
     REGISTER_TEST_CASE(if_block_tests::test_state_simple);
     REGISTER_TEST_CASE(if_block_tests::test_state_in_function);
     REGISTER_TEST_CASE(if_block_tests::test_state_is_reset_when_if_fails);
+    REGISTER_TEST_CASE(if_block_tests::test_nested_state);
 }
 
 } // namespace if_block_tests
