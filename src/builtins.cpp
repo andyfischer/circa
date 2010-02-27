@@ -9,8 +9,11 @@
 
 namespace circa {
 
-// setup_builtin_functions is defined in setup_builtin_functions.cpp
+// setup_builtin_functions is defined in generated/setup_builtin_functions.cpp
 void setup_builtin_functions(Branch&);
+
+// BUILTIN_SCRIPT_TEXT is defined in generated/builtin_script_text.cpp
+extern const char* BUILTIN_SCRIPT_TEXT;
 
 Branch* KERNEL = NULL;
 
@@ -258,6 +261,11 @@ void post_setup_builtin_functions(Branch& kernel)
     hide_from_docs(VALUE_FUNC);
 }
 
+void parse_builtin_script(Branch& kernel)
+{
+    parser::compile(&kernel, parser::statement_list, BUILTIN_SCRIPT_TEXT);
+}
+
 void initialize()
 {
     create_builtin_types();
@@ -272,6 +280,7 @@ void initialize()
     parse_builtin_types(*KERNEL);
     post_setup_primitive_types();
     initialize_kernel_documentation(*KERNEL);
+    parse_builtin_script(*KERNEL);
 }
 
 void shutdown()

@@ -63,6 +63,11 @@ def main():
     write_text_file('src/generated/register_all_tests.cpp',
             generate_cpp_registration.do_register_all_tests('src/tests'))
 
+    # generate builtin_script_text.cpp
+    import text_file_to_c
+    write_text_file('src/generated/builtin_script_text.cpp',
+            text_file_to_c.generate("src/ca/builtins.ca", "BUILTIN_SCRIPT_TEXT"))
+
     def source_files(dir):
         for path in os.listdir(dir):
             if not os.path.isfile(os.path.join(dir,path)): continue

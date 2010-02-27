@@ -2,3 +2,4 @@ all_builtin_functions.cpp
 all_tests.cpp
 register_all_tests.cpp
 setup_builtin_functions.cpp
+builtin_script_text.cpp

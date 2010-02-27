@@ -223,15 +223,6 @@ def alternate_over_time(number period) -> bool:
     state number time_started = time
     return round((time - time_started) / period) % 2 == 0
 
-def toggle(bool tog) -> bool:
-    <<<
-    Stateful function, returns a boolean status. Every frame the function is called
-    with (true), the status flips. Starts out false.
-    >>>
-    state bool on = false
-    if tog; on = not(on); end
-    return on
-
 def linear_fadein(number total_time) -> number:
     <<<
     Stateful function, starts out at 0 and increases linearly. After 'total_time'

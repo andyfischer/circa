@@ -1,0 +1,10 @@
+
+def toggle(bool tog) -> bool
+    <<<
+    Stateful function, returns a boolean status. Every frame the function is called
+    with (true), the status flips. Starts out false.
+    >>>
+    state bool on = false
+    if tog; on = not(on); end
+    return on
+end
