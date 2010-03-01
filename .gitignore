@@ -1,5 +1,4 @@
 # submodules:
-gh-pages
 circa-web
 
 # build results:
@@ -24,31 +23,14 @@ circa-web
 *.pdb
 *.suo
 .sconsign.dblite
-.lock-wscript
-tools/.waf*
 
 # generated docs
-docs.json.temp
 docs/nanodoc/index.html
 
-# dependencies
-SDL_deps
-SDL_deps.zip
-
 # miscellaneous
-art_packs
-tags
-scratch.ca
-x
 x.ca
 .ca
 *.swp
 *.pyc
 .DS_Store
 *.os
-ptc
-assemblee
-Box2D
-bricks.ca
-video1*
-video_demo
