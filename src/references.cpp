@@ -98,6 +98,7 @@ void remap_pointers(Branch& branch, Term* original, Term* replacement)
     map[original] = replacement;
 
     for (int i=0; i < branch.length(); i++) {
+        if (branch[i] == NULL) continue;
         remap_pointers(branch[i], map);
     }
 }

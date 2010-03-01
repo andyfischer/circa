@@ -123,6 +123,14 @@ type Asteroid {
   number age
 }
 
+type Particle {
+  number age
+  Point location
+  Point vel
+}
+
+state List particles
+
 asteroid_collision_radius = 20.0
 asteroid_starting_size = 30.0
 asteroid_num_edges = 10
@@ -148,6 +156,11 @@ def generate_child_asteroid(Asteroid parent) -> Asteroid
     return [map(get_edge, 0..10), parent.location, random_norm_vector()*speed, 0, rotation size 0]
 end
 
+def generate_particle_burst(List particles, Point loc, Point vel) -> List
+    for i in 0..10
+        particles.append([0 loc vel + [rand() rand()])
+    end
+end
 
 state List asteroids = []
 state bool initialized = false
@@ -179,7 +192,7 @@ for asteroid in asteroids
     edges = map(pos_edge, asteroid.edges)
 
     gl:line_loop(edges, #fff)
-    --gl:circle(asteroid.location, asteroid_collision_radius, #f00)
+    gl:circle(asteroid.location, asteroid.size, #f00)
 end
 
 -- Check for collisions of asteroids and bullets

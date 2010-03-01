@@ -256,6 +256,18 @@ void test_for_loops()
     //test_snippet("a = [1 2 3];for i in @a; if i == 2 discard end end", "a == [1 3]");
     //test_snippet("a = [1 2 3];for i in @a; if i == 3 discard end end", "a == [1 2]");
     //test_snippet("a = [1 2 3];for i in @a; i += 1 if i == 3 discard end end", "a == [2 4]");
+
+#if 0
+    // this once caused a crash:
+    test_snippet("\n"
+        "state List particles\n"
+        "\n"
+        "def generate_particle_burst(List particles, Point loc, Point vel) -> List\n"
+        "    for i in 0..10\n"
+        "        particles.append([0 loc vel + [rand() rand()])\n"
+        "    end\n"
+        "end\n", "");
+#endif
 }
 
 void test_subscripting()
