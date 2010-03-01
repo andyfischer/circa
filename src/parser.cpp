@@ -140,17 +140,15 @@ void consume_branch(Branch& branch, TokenStream& tokens)
         branch.owningTerm->setIntProp("syntax:branchStyle", branchStyle);
 
     if (branchStyle == BRANCH_SYNTAX_BRACE) {
-        if (!tokens.nextIs(RBRACE)) {
+        if (tokens.nextIs(RBRACE))
+            tokens.consume(RBRACE);
+        else
             compile_error_for_line(branch, tokens, startPosition, "Expected: }");
-            return;
-        }
-        tokens.consume(RBRACE);
     } else if (branchStyle == BRANCH_SYNTAX_BEGIN || branchStyle == BRANCH_SYNTAX_DO) {
-        if (!tokens.nextIs(END)) {
+        if (tokens.nextIs(END))
+            tokens.consume(END);
+        else
             compile_error_for_line(branch, tokens, startPosition, "Expected: end");
-            return;
-        }
-        tokens.consume(END);
     } else {
         // Awful special case. Don't try to consume END while parsing an if-statement
         if (branch.owningTerm != NULL && branch.owningTerm->owningBranch != NULL
@@ -158,11 +156,10 @@ void consume_branch(Branch& branch, TokenStream& tokens)
             && branch.owningTerm->owningBranch->owningTerm->function == IF_BLOCK_FUNC)
             ; // blah
         else {
-            if (!tokens.nextIs(END)) {
+            if (tokens.nextIs(END))
+                tokens.consume(END);
+            else
                 compile_error_for_line(branch, tokens, startPosition);
-                return;
-            }
-            tokens.consume(END);
         }
     }
 
@@ -760,9 +757,6 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     }
 
     set_input_syntax_hint(forTerm, 0, "hidden", "true");
-
-    // Use the heading as this term's name, for introspection
-    //TODO branch.bindName(forTerm, for_function::get_heading_source(forTerm));
     
     return forTerm;
 }

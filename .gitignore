@@ -27,6 +27,10 @@ circa-web
 # generated docs
 docs/nanodoc/index.html
 
+# downloaded files
+/SDL_deps
+/SDL_deps.zip
+
 # miscellaneous
 x.ca
 .ca

@@ -158,7 +158,7 @@ end
 
 def generate_particle_burst(List particles, Point loc, Point vel) -> List
     for i in 0..10
-        particles.append([0 loc vel + [rand() rand()])
+        particles.append([0 loc vel + [rand() rand()]])
     end
 end
 
