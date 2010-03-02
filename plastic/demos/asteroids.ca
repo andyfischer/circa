@@ -125,7 +125,7 @@ type Asteroid {
 
 type Particle {
   number age
-  Point location
+  Point loc
   Point vel
 }
 
@@ -157,9 +157,10 @@ def generate_child_asteroid(Asteroid parent) -> Asteroid
 end
 
 def generate_particle_burst(List particles, Point loc, Point vel) -> List
-    for i in 0..10
-        particles.append([0 loc vel + [rand() rand()]])
+    for i in 0..6
+        particles.append([0.0 loc vel*[rand() rand()] + [(rand()-.5)*100 (rand()-.5)*100]] -> Particle)
     end
+    return particles
 end
 
 state List asteroids = []
@@ -206,6 +207,10 @@ for asteroid in @asteroids
         bullet = bullet -> Bullet
         if point_distance(asteroid.location, bullet.loc) < asteroid.size
             collides = true
+
+            bullet_vel = bullet.direction * bullet_speed
+            generate_particle_burst(@particles, asteroid.location, bullet_vel)
+
             discard
         end
     end
@@ -225,4 +230,24 @@ end
 
 for spawn in spawned
     asteroids.append(spawn)
+end
+
+max_particle_age = 3.0
+
+-- Draw/update particles
+for particle in @particles
+    particle = particle -> Particle
+
+    lifespan = particle.age / max_particle_age
+    max(@lifespan, 1.0)
+    color = #555 + #111 * (lifespan * 9)
+
+    gl:points([particle.loc], color)
+
+    particle.loc = particle.loc + particle.vel * td
+    particle.age = particle.age + td
+
+    if particle.age > max_particle_age
+        discard
+    end
 end
