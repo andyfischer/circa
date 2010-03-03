@@ -23,6 +23,7 @@ circa-web
 *.pdb
 *.suo
 .sconsign.dblite
+tags
 
 # generated docs
 docs/nanodoc/index.html

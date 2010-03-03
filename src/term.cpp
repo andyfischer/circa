@@ -20,13 +20,13 @@ Term::Term()
     globalID = gNextGlobalID++;
 
     METRIC_TERMS_CREATED++;
-
     register_good_pointer(this);
 }
 
 Term::~Term()
 {
     METRIC_TERMS_DESTROYED++;
+    unregister_good_pointer(this);
 }
 
 Term*

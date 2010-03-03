@@ -48,6 +48,11 @@ namespace include_function {
                 return;
             }
 
+            //std::cout << "### Previous:" << std::endl;
+            //dump_branch(previous_contents);
+            //std::cout << "### New:" << std::endl;
+            //dump_branch(contents);
+
             if (previous_contents.length() > 0)
                 migrate_stateful_values(previous_contents, contents);
 

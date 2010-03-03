@@ -17,14 +17,7 @@ namespace circa {
 //
 // It's recommended that you don't write code that calls is_bad_pointer,
 // because this would be easy to abuse. Instead, use assert_good_pointer.
-#define DEBUG_CHECK_FOR_BAD_POINTERS 0
-
-// Enabling this flag causes us to never actually delete Term objects.
-// This removes the possibility that a bad pointer will mistakenly be
-// deemed a good pointer, just because the new Term occupies the same
-// memory that a previous Term did. The drawback to this option is
-// of course, unbounded memory consumption.
-#define DEBUG_NEVER_DELETE_TERMS 0
+#define DEBUG_CHECK_FOR_BAD_POINTERS 1
 
 // Setting this to true will make us abort trap on the next name lookup.
 extern bool DEBUG_TRAP_NAME_LOOKUP;

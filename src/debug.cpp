@@ -10,31 +10,29 @@ bool DEBUG_TRAP_NAME_LOOKUP = false;
 bool DEBUG_TRAP_ERROR_OCCURRED = false;
 
 #if DEBUG_CHECK_FOR_BAD_POINTERS
-std::set<Term*> *DEBUG_GOOD_POINTER_SET = NULL;
+std::set<Term*> DEBUG_GOOD_POINTER_SET;
 #endif
 
 void register_good_pointer(Term* term)
 {
 #if DEBUG_CHECK_FOR_BAD_POINTERS
-    if (DEBUG_GOOD_POINTER_SET == NULL)
-        DEBUG_GOOD_POINTER_SET = new std::set<Term*>();
-    DEBUG_GOOD_POINTER_SET->insert(term);
+    assert(DEBUG_GOOD_POINTER_SET.find(term) == DEBUG_GOOD_POINTER_SET.end());
+    DEBUG_GOOD_POINTER_SET.insert(term);
 #endif
 }
 
 void unregister_good_pointer(Term* term)
 {
 #if DEBUG_CHECK_FOR_BAD_POINTERS
-    DEBUG_GOOD_POINTER_SET->erase(term);
+    assert(DEBUG_GOOD_POINTER_SET.find(term) != DEBUG_GOOD_POINTER_SET.end());
+    DEBUG_GOOD_POINTER_SET.erase(term);
 #endif
 }
 
 bool is_bad_pointer(Term* term)
 {
 #if DEBUG_CHECK_FOR_BAD_POINTERS
-    if (DEBUG_GOOD_POINTER_SET == NULL)
-        DEBUG_GOOD_POINTER_SET = new std::set<Term*>();
-    return DEBUG_GOOD_POINTER_SET->find(term) == DEBUG_GOOD_POINTER_SET->end();
+    return DEBUG_GOOD_POINTER_SET.find(term) == DEBUG_GOOD_POINTER_SET.end();
 #else
     return false;
 #endif
@@ -43,8 +41,7 @@ bool is_bad_pointer(Term* term)
 void assert_good_pointer(Term* term)
 {
 #if DEBUG_CHECK_FOR_BAD_POINTERS
-    if (is_bad_pointer(term))
-        throw std::runtime_error("assert_good_pointer failed (bad term pointer)");
+    assert(DEBUG_GOOD_POINTER_SET.find(term) != DEBUG_GOOD_POINTER_SET.end());
 #endif
 }
 

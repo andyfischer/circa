@@ -335,6 +335,7 @@ namespace branch_t {
     void destroy(Type*, TaggedValue* value)
     {
         delete (Branch*) get_pointer(value);
+        set_pointer(value, NULL);
     }
 
     void assign(TaggedValue* sourceValue, TaggedValue* destValue)
@@ -359,10 +360,16 @@ namespace branch_t {
 
     void assign_overwriting_types(Branch& source, Branch& dest)
     {
+        debug_assert_valid(&source);
+        debug_assert_valid(&dest);
+
         // Assign terms as necessary
         int lengthToAssign = std::min(source.length(), dest.length());
 
         for (int i=0; i < lengthToAssign; i++) {
+            assert_good_pointer(source[i]);
+            assert_good_pointer(dest[i]);
+
             // Change type if needed
             if (source[i]->type != dest[i]->type)
                 change_type(source[i], dest[i]->type);
@@ -372,6 +379,7 @@ namespace branch_t {
         // Add terms if necessary
         for (int i=dest.length(); i < source.length(); i++) {
             assert(source[i] != NULL);
+            assert_good_pointer(source[i]);
 
             Term* t = create_duplicate(dest, source[i]);
             if (source[i]->name != "")
@@ -496,6 +504,9 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
 
 void duplicate_branch(Branch& source, Branch& dest)
 {
+    debug_assert_valid(&source);
+    debug_assert_valid(&dest);
+
     ReferenceMap newTermMap;
 
     duplicate_branch_nested(newTermMap, source, dest);
@@ -517,6 +528,8 @@ void parse_script(Branch& branch, std::string const& filename)
     create_string(branch, filename, "#attr:source-file");
 
     std::string fileContents = read_text_file(filename);
+
+    //std::cout << "File contents = " << fileContents << std::endl;
 
     parser::compile(&branch, parser::statement_list, fileContents);
 }

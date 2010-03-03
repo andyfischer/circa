@@ -39,11 +39,7 @@ void delete_term(Term* term)
     term->type = NULL;
     term->function = NULL;
 
-    unregister_good_pointer(term);
-
-#if !DEBUG_NEVER_DELETE_TERMS
     delete term;
-#endif
 }
 
 void remap_pointers(Term* term, ReferenceMap const& map)
