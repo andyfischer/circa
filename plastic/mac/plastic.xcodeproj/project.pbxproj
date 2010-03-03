@@ -79,6 +79,13 @@
 		B617D3C810BA592700B217D0 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B617D3C710BA592700B217D0 /* main.cpp */; };
 		B617D41F10BA609A00B217D0 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B617D41E10BA609A00B217D0 /* SDL.framework */; };
 		B617D42210BA60A000B217D0 /* SDL.framework in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = B617D41E10BA609A00B217D0 /* SDL.framework */; };
+		B6B5AA9D113DFFD6000B1C34 /* eval_context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B5AA91113DFFD6000B1C34 /* eval_context.cpp */; };
+		B6B5AA9E113DFFD6000B1C34 /* invariants.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B5AA93113DFFD6000B1C34 /* invariants.cpp */; };
+		B6B5AA9F113DFFD6000B1C34 /* list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B5AA95113DFFD6000B1C34 /* list.cpp */; };
+		B6B5AAA0113DFFD6000B1C34 /* tagged_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B5AA97113DFFD6000B1C34 /* tagged_value.cpp */; };
+		B6B5AAA1113DFFD6000B1C34 /* tagged_value_accessors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B5AA99113DFFD6000B1C34 /* tagged_value_accessors.cpp */; };
+		B6B5AAA2113DFFD6000B1C34 /* values.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B5AA9B113DFFD6000B1C34 /* values.cpp */; };
+		B6B5AAA4113DFFE5000B1C34 /* builtin_script_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B5AAA3113DFFE5000B1C34 /* builtin_script_text.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -237,6 +244,19 @@
 		B617D3C210BA58DE00B217D0 /* plastic_main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = plastic_main.h; sourceTree = "<group>"; };
 		B617D3C710BA592700B217D0 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		B617D41E10BA609A00B217D0 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = Dependencies/SDL.framework; sourceTree = "<group>"; };
+		B6B5AA91113DFFD6000B1C34 /* eval_context.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = eval_context.cpp; sourceTree = "<group>"; };
+		B6B5AA92113DFFD6000B1C34 /* eval_context.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eval_context.h; sourceTree = "<group>"; };
+		B6B5AA93113DFFD6000B1C34 /* invariants.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = invariants.cpp; sourceTree = "<group>"; };
+		B6B5AA94113DFFD6000B1C34 /* invariants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = invariants.h; sourceTree = "<group>"; };
+		B6B5AA95113DFFD6000B1C34 /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list.cpp; sourceTree = "<group>"; };
+		B6B5AA96113DFFD6000B1C34 /* list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
+		B6B5AA97113DFFD6000B1C34 /* tagged_value.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tagged_value.cpp; sourceTree = "<group>"; };
+		B6B5AA98113DFFD6000B1C34 /* tagged_value.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tagged_value.h; sourceTree = "<group>"; };
+		B6B5AA99113DFFD6000B1C34 /* tagged_value_accessors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tagged_value_accessors.cpp; sourceTree = "<group>"; };
+		B6B5AA9A113DFFD6000B1C34 /* tagged_value_accessors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tagged_value_accessors.h; sourceTree = "<group>"; };
+		B6B5AA9B113DFFD6000B1C34 /* values.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = values.cpp; sourceTree = "<group>"; };
+		B6B5AA9C113DFFD6000B1C34 /* values.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = values.h; sourceTree = "<group>"; };
+		B6B5AAA3113DFFE5000B1C34 /* builtin_script_text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = builtin_script_text.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -330,6 +350,18 @@
 		B617D1D610BA500600B217D0 /* circa */ = {
 			isa = PBXGroup;
 			children = (
+				B6B5AA91113DFFD6000B1C34 /* eval_context.cpp */,
+				B6B5AA92113DFFD6000B1C34 /* eval_context.h */,
+				B6B5AA93113DFFD6000B1C34 /* invariants.cpp */,
+				B6B5AA94113DFFD6000B1C34 /* invariants.h */,
+				B6B5AA95113DFFD6000B1C34 /* list.cpp */,
+				B6B5AA96113DFFD6000B1C34 /* list.h */,
+				B6B5AA97113DFFD6000B1C34 /* tagged_value.cpp */,
+				B6B5AA98113DFFD6000B1C34 /* tagged_value.h */,
+				B6B5AA99113DFFD6000B1C34 /* tagged_value_accessors.cpp */,
+				B6B5AA9A113DFFD6000B1C34 /* tagged_value_accessors.h */,
+				B6B5AA9B113DFFD6000B1C34 /* values.cpp */,
+				B6B5AA9C113DFFD6000B1C34 /* values.h */,
 				B617D24C10BA500600B217D0 /* generated */,
 				B617D1D710BA500600B217D0 /* branch.cpp */,
 				B617D1D810BA500600B217D0 /* branch.h */,
@@ -427,6 +459,7 @@
 		B617D24C10BA500600B217D0 /* generated */ = {
 			isa = PBXGroup;
 			children = (
+				B6B5AAA3113DFFE5000B1C34 /* builtin_script_text.cpp */,
 				B617D24D10BA500600B217D0 /* all_builtin_functions.cpp */,
 				B617D24E10BA500600B217D0 /* all_tests.cpp */,
 				B617D24F10BA500600B217D0 /* register_all_tests.cpp */,
@@ -612,6 +645,13 @@
 				B617D38B10BA522C00B217D0 /* ttf.cpp in Sources */,
 				B617D3C310BA58DE00B217D0 /* plastic_main.cpp in Sources */,
 				B617D3C810BA592700B217D0 /* main.cpp in Sources */,
+				B6B5AA9D113DFFD6000B1C34 /* eval_context.cpp in Sources */,
+				B6B5AA9E113DFFD6000B1C34 /* invariants.cpp in Sources */,
+				B6B5AA9F113DFFD6000B1C34 /* list.cpp in Sources */,
+				B6B5AAA0113DFFD6000B1C34 /* tagged_value.cpp in Sources */,
+				B6B5AAA1113DFFD6000B1C34 /* tagged_value_accessors.cpp in Sources */,
+				B6B5AAA2113DFFD6000B1C34 /* values.cpp in Sources */,
+				B6B5AAA4113DFFE5000B1C34 /* builtin_script_text.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

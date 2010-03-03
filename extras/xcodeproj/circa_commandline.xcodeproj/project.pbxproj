@@ -40,7 +40,6 @@
 		B692430C1120820100BAB124 /* names.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69242C11120820100BAB124 /* names.cpp */; };
 		B692430D1120820100BAB124 /* parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69242C41120820100BAB124 /* parser.cpp */; };
 		B692430E1120820100BAB124 /* parser_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69242C61120820100BAB124 /* parser_util.cpp */; };
-		B692430F1120820100BAB124 /* primitives.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69242C81120820100BAB124 /* primitives.cpp */; };
 		B69243101120820100BAB124 /* ref_list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69242CA1120820100BAB124 /* ref_list.cpp */; };
 		B69243111120820100BAB124 /* refactoring.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69242CD1120820100BAB124 /* refactoring.cpp */; };
 		B69243121120820100BAB124 /* references.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B69242CF1120820100BAB124 /* references.cpp */; };
@@ -97,6 +96,11 @@
 		B6924376112082D900BAB124 /* type_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B692434F112082D900BAB124 /* type_tests.cpp */; };
 		B6924377112082D900BAB124 /* utils_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6924350112082D900BAB124 /* utils_tests.cpp */; };
 		B6924378112082D900BAB124 /* value_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6924351112082D900BAB124 /* value_tests.cpp */; };
+		B6B5AAB7113E00FB000B1C34 /* list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B5AAB5113E00FB000B1C34 /* list.cpp */; };
+		B6B5AABC113E0128000B1C34 /* builtin_script_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B5AABB113E0128000B1C34 /* builtin_script_text.cpp */; };
+		B6B5AAC0113E013C000B1C34 /* dynamic_type_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B5AABD113E013C000B1C34 /* dynamic_type_tests.cpp */; };
+		B6B5AAC1113E013C000B1C34 /* foreach_type_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B5AABE113E013C000B1C34 /* foreach_type_tests.cpp */; };
+		B6B5AAC2113E013C000B1C34 /* script_reload_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6B5AABF113E013C000B1C34 /* script_reload_tests.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -178,8 +182,6 @@
 		B69242C51120820100BAB124 /* parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = parser.h; path = ../../src/parser.h; sourceTree = SOURCE_ROOT; };
 		B69242C61120820100BAB124 /* parser_util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = parser_util.cpp; path = ../../src/parser_util.cpp; sourceTree = SOURCE_ROOT; };
 		B69242C71120820100BAB124 /* parser_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = parser_util.h; path = ../../src/parser_util.h; sourceTree = SOURCE_ROOT; };
-		B69242C81120820100BAB124 /* primitives.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = primitives.cpp; path = ../../src/primitives.cpp; sourceTree = SOURCE_ROOT; };
-		B69242C91120820100BAB124 /* primitives.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = primitives.h; path = ../../src/primitives.h; sourceTree = SOURCE_ROOT; };
 		B69242CA1120820100BAB124 /* ref_list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ref_list.cpp; path = ../../src/ref_list.cpp; sourceTree = SOURCE_ROOT; };
 		B69242CB1120820100BAB124 /* ref_list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ref_list.h; path = ../../src/ref_list.h; sourceTree = SOURCE_ROOT; };
 		B69242CC1120820100BAB124 /* ref_map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ref_map.h; path = ../../src/ref_map.h; sourceTree = SOURCE_ROOT; };
@@ -255,6 +257,12 @@
 		B692434F112082D900BAB124 /* type_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = type_tests.cpp; sourceTree = "<group>"; };
 		B6924350112082D900BAB124 /* utils_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utils_tests.cpp; sourceTree = "<group>"; };
 		B6924351112082D900BAB124 /* value_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = value_tests.cpp; sourceTree = "<group>"; };
+		B6B5AAB5113E00FB000B1C34 /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = list.cpp; path = ../../src/list.cpp; sourceTree = SOURCE_ROOT; };
+		B6B5AAB6113E00FB000B1C34 /* list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = list.h; path = ../../src/list.h; sourceTree = SOURCE_ROOT; };
+		B6B5AABB113E0128000B1C34 /* builtin_script_text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = builtin_script_text.cpp; sourceTree = "<group>"; };
+		B6B5AABD113E013C000B1C34 /* dynamic_type_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dynamic_type_tests.cpp; sourceTree = "<group>"; };
+		B6B5AABE113E013C000B1C34 /* foreach_type_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = foreach_type_tests.cpp; sourceTree = "<group>"; };
+		B6B5AABF113E013C000B1C34 /* script_reload_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = script_reload_tests.cpp; sourceTree = "<group>"; };
 		C6859E8B029090EE04C91782 /* circa_commandline.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = circa_commandline.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -282,6 +290,7 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				B69242AD1120820100BAB124 /* generated */,
 				B692432A112082D800BAB124 /* tests */,
 				B69242851120820100BAB124 /* branch.cpp */,
 				B69242861120820100BAB124 /* branch.h */,
@@ -323,7 +332,6 @@
 				B69242AA1120820100BAB124 /* for_loops.h */,
 				B69242AB1120820100BAB124 /* function.cpp */,
 				B69242AC1120820100BAB124 /* function.h */,
-				B69242AD1120820100BAB124 /* generated */,
 				B69242B31120820100BAB124 /* hosted_types.h */,
 				B69242B41120820100BAB124 /* if_block.cpp */,
 				B69242B51120820100BAB124 /* if_block.h */,
@@ -333,6 +341,8 @@
 				B69242B91120820100BAB124 /* introspection.h */,
 				B69242BA1120820100BAB124 /* invariants.cpp */,
 				B69242BB1120820100BAB124 /* invariants.h */,
+				B6B5AAB5113E00FB000B1C34 /* list.cpp */,
+				B6B5AAB6113E00FB000B1C34 /* list.h */,
 				B69242BC1120820100BAB124 /* main.cpp */,
 				B69242BD1120820100BAB124 /* metaprogramming.cpp */,
 				B69242BE1120820100BAB124 /* metaprogramming.h */,
@@ -345,8 +355,6 @@
 				B69242C51120820100BAB124 /* parser.h */,
 				B69242C61120820100BAB124 /* parser_util.cpp */,
 				B69242C71120820100BAB124 /* parser_util.h */,
-				B69242C81120820100BAB124 /* primitives.cpp */,
-				B69242C91120820100BAB124 /* primitives.h */,
 				B69242CA1120820100BAB124 /* ref_list.cpp */,
 				B69242CB1120820100BAB124 /* ref_list.h */,
 				B69242CC1120820100BAB124 /* ref_map.h */,
@@ -398,6 +406,7 @@
 		B69242AD1120820100BAB124 /* generated */ = {
 			isa = PBXGroup;
 			children = (
+				B6B5AABB113E0128000B1C34 /* builtin_script_text.cpp */,
 				B69242AF1120820100BAB124 /* all_builtin_functions.cpp */,
 				B69242B11120820100BAB124 /* register_all_tests.cpp */,
 				B69242B21120820100BAB124 /* setup_builtin_functions.cpp */,
@@ -409,6 +418,9 @@
 		B692432A112082D800BAB124 /* tests */ = {
 			isa = PBXGroup;
 			children = (
+				B6B5AABD113E013C000B1C34 /* dynamic_type_tests.cpp */,
+				B6B5AABE113E013C000B1C34 /* foreach_type_tests.cpp */,
+				B6B5AABF113E013C000B1C34 /* script_reload_tests.cpp */,
 				B692432B112082D800BAB124 /* branch_iterator_tests.cpp */,
 				B692432C112082D800BAB124 /* branch_tests.cpp */,
 				B692432D112082D800BAB124 /* building_tests.cpp */,
@@ -536,7 +548,6 @@
 				B692430C1120820100BAB124 /* names.cpp in Sources */,
 				B692430D1120820100BAB124 /* parser.cpp in Sources */,
 				B692430E1120820100BAB124 /* parser_util.cpp in Sources */,
-				B692430F1120820100BAB124 /* primitives.cpp in Sources */,
 				B69243101120820100BAB124 /* ref_list.cpp in Sources */,
 				B69243111120820100BAB124 /* refactoring.cpp in Sources */,
 				B69243121120820100BAB124 /* references.cpp in Sources */,
@@ -593,6 +604,11 @@
 				B6924376112082D900BAB124 /* type_tests.cpp in Sources */,
 				B6924377112082D900BAB124 /* utils_tests.cpp in Sources */,
 				B6924378112082D900BAB124 /* value_tests.cpp in Sources */,
+				B6B5AAB7113E00FB000B1C34 /* list.cpp in Sources */,
+				B6B5AABC113E0128000B1C34 /* builtin_script_text.cpp in Sources */,
+				B6B5AAC0113E013C000B1C34 /* dynamic_type_tests.cpp in Sources */,
+				B6B5AAC1113E013C000B1C34 /* foreach_type_tests.cpp in Sources */,
+				B6B5AAC2113E013C000B1C34 /* script_reload_tests.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

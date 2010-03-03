@@ -4,14 +4,52 @@
 
 namespace circa {
 
+#define DEBUG_CHECK_VALID_BRANCH_OBJECTS 1
+
+#if DEBUG_CHECK_VALID_BRANCH_OBJECTS
+
+std::set<Branch const*> gValidBranches;
+
+static void debug_register_object(Branch const* branch)
+{
+    assert(gValidBranches.find(branch) == gValidBranches.end());
+    gValidBranches.insert(branch);
+}
+
+static void debug_unregister_object(Branch const* branch)
+{
+    assert(gValidBranches.find(branch) != gValidBranches.end());
+    gValidBranches.erase(branch);
+}
+
+static void debug_assert_valid(Branch const* branch)
+{
+    assert(gValidBranches.find(branch) != gValidBranches.end());
+}
+
+#else
+
+#define debug_register_object(x)
+#define debug_unregister_object(x)
+#define debug_assert_valid(x)
+
+#endif
+
+Branch::Branch() : owningTerm(NULL), _refCount(0)
+{
+    debug_register_object(this);
+}
+
 Branch::~Branch()
 {
     names.clear();
     _terms.clear();
+    debug_unregister_object(this);
 }
 
 int Branch::length() const
 {
+    debug_assert_valid(this);
     return _terms.length();
 }
 
@@ -22,6 +60,7 @@ bool Branch::contains(std::string const& name) const
 
 Term* Branch::get(int index) const
 {
+    debug_assert_valid(this);
     assert(index <= length());
     return _terms[index];
 }
@@ -63,6 +102,7 @@ int Branch::findIndex(std::string const& name) const
 
 void Branch::set(int index, Term* term)
 {
+    debug_assert_valid(this);
     assert(index <= length());
     setNull(index);
     _terms[index] = term;
@@ -77,6 +117,7 @@ void Branch::set(int index, Term* term)
 
 void Branch::setNull(int index)
 {
+    debug_assert_valid(this);
     assert(index <= length());
     Term* term = _terms[index];
     if (term != NULL) {
@@ -92,6 +133,7 @@ void Branch::setNull(int index)
 
 void Branch::append(Term* term)
 {
+    debug_assert_valid(this);
     _terms.append(term);
     if (term != NULL) {
         assert(term->owningBranch == NULL);
@@ -102,6 +144,7 @@ void Branch::append(Term* term)
 
 Term* Branch::appendNew()
 {
+    debug_assert_valid(this);
     Term* term = alloc_term();
     assert(term != NULL);
     _terms.append(term);
@@ -112,6 +155,7 @@ Term* Branch::appendNew()
 
 void Branch::insert(int index, Term* term)
 {
+    debug_assert_valid(this);
     assert(index >= 0);
     assert(index <= _terms.length());
 
@@ -243,6 +287,8 @@ void Branch::remapPointers(ReferenceMap const& map)
 void
 Branch::clear()
 {
+    debug_assert_valid(this);
+
     for (int i=0; i < _terms.length(); i++) {
         _terms[i]->owningBranch = NULL;
         _terms[i]->index = 0;
@@ -295,6 +341,8 @@ namespace branch_t {
     {
         Branch& source = as_branch(sourceValue);
         Branch& dest = as_branch(destValue);
+        debug_assert_valid(&source);
+        debug_assert_valid(&dest);
 
         // For Branch or List type, overwrite existing shape
         if ((destValue->value_type == &as_type(BRANCH_TYPE))

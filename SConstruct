@@ -77,7 +77,7 @@ CIRCA_CL_ENV.Default(cl_binary)
 
 ########################### SDL-based targets ###############################
 
-DEBUG_PLASTIC = False
+DEBUG_PLASTIC = True
 
 if DEBUG_PLASTIC:
     SDL_ROOT = DEBUG.Clone()

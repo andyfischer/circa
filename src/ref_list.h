@@ -72,80 +72,26 @@ struct RefList
         append(term8);
     }
 
-    void append(Term* term)
-    {
-        _items.push_back(term);
-
-        // Check for a previous bug
-        if (_items.size() > 1000000)
-            throw std::runtime_error("too many items");
-    }
-
-    void prepend(Term* term)
-    {
-        _items.insert(_items.begin(), term);
-    }
+    void append(Term* term);
+    void prepend(Term* term);
+    void insert(int index, Term* term);
 
     // Add 'term' to this list, if it's not in the list already
-    void appendUnique(Term* term)
-    {
-        for (int i=0; i < length(); i++)
-            if (get(i) == term)
-                return;
-
-        append(term);
-    }
+    void appendUnique(Term* term);
 
     void appendAll(RefList const& list);
-
-    void insert(int index, Term* term)
-    {
-        _items.insert(_items.begin()+index, term);
-    }
-
-    void setAt(unsigned int index, Term* term)
-    {
-        // Check for a previous bug
-        assert(index < 1000000);
-
-        // Make sure there are enough blank elements in the list
-        while (_items.size() <= index) {
-            _items.push_back(NULL);
-        }
-
-        _items[index] = term;
-    }
+    void setAt(unsigned int index, Term* term);
 
     // Remove 'term' from this list. 'term' may be NULL.
-    void remove(Term* term)
-    {
-        std::vector<Ref>::iterator it;
-
-        for (it = _items.begin(); it != _items.end(); ) {
-
-            if (*it == term)
-                it = _items.erase(it);
-            else
-                ++it;
-        }
-    }
-
-    void remove(int index)
-    {
-        _items.erase(_items.begin() + index);
-    }
+    void remove(Term* term);
+    void remove(int index);
 
     void removeNulls() { remove((Term*)NULL); }
     void clear() { _items.clear(); }
 
     int length() const;
     bool empty() const { return _items.empty(); }
-    Term* get(unsigned int index) const
-    {
-        if (index >= _items.size())
-            return NULL;
-        return _items[index];
-    }
+    Term* get(unsigned int index) const;
 
     bool contains(Term* term) const
     {
@@ -155,8 +101,8 @@ struct RefList
         return false;
     }
 
-    Term* operator[](unsigned int index) const { return get(index); }
-    Ref& operator[](unsigned int index) { return _items[index]; }
+    Term* operator[](unsigned int index) const;
+    Ref& operator[](unsigned int index);
 
     bool operator==(RefList const& b)
     {
@@ -178,10 +124,7 @@ struct RefList
         return -1;
     }
 
-    void resize(int newLength)
-    {
-        _items.resize(newLength);
-    }
+    void resize(int newLength);
 
     void remapPointers(ReferenceMap const& map);
 };

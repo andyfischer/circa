@@ -245,7 +245,7 @@ for particle in @particles
     gl:points([particle.loc], color)
 
     particle.loc = particle.loc + particle.vel * td
-    particle.age = particle.age + td
+    particle.age = particle.age + td + 4
 
     if particle.age > max_particle_age
         discard

@@ -22,7 +22,7 @@ struct Branch
 
     int _refCount;
 
-    Branch() : owningTerm(NULL), _refCount(0) {}
+    Branch();
     ~Branch();
 
     int length() const;
