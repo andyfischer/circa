@@ -219,6 +219,8 @@ void evaluate_for_loop(EvalContext*, Term* forTerm)
             error_occurred(forTerm, "Internal error in evaluate_for_loop: can't assign this element to iterator");
             return;
         }
+
+        change_type(iterator, listTerm->asBranch()[i]->type);
         assign_value(listTerm->asBranch()[i], iterator);
 
         // Inject stateful terms
