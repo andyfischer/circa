@@ -77,7 +77,8 @@ void print_term_raw_string(std::ostream& out, Term* term)
 
     out << " -> " << typeName;
 
-    out << " == " << term->toString();
+    if (!is_branch(term))
+        out << " == " << term->toString();
 }
 
 void print_term_raw_string_with_properties(std::ostream& out, Term* term)

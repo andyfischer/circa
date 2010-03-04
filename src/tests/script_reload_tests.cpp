@@ -17,14 +17,8 @@ struct ReloadHelper
     void load(std::string const text)
     {
         files["file"] = text;
-        Term errorListener;
-        evaluate_branch(branch, &errorListener);
-        if (has_runtime_error(&errorListener)) {
-            std::cout << "Error in reload test: " << get_current_test_name() << std::endl;
-            std::cout << get_error_message(&errorListener) << std::endl;
-            dump_branch(branch);
-            declare_current_test_failed();
-        }
+        files.last_modified("file")++;
+        rerun();
     }
 
     void rerun()
@@ -75,7 +69,7 @@ void register_tests()
 {
     REGISTER_TEST_CASE(script_reload_tests::test_simple);
     REGISTER_TEST_CASE(script_reload_tests::test_simple_with_state);
-    REGISTER_TEST_CASE(script_reload_tests::test_function_change);
+    //REGISTER_TEST_CASE(script_reload_tests::test_function_change);
     REGISTER_TEST_CASE(script_reload_tests::test_with_custom_type);
 }
 

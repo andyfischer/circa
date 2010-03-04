@@ -197,15 +197,46 @@ void run_test_named(std::string const& testName)
     std::cout << "Couldn't find a test named: " << testName << std::endl;
 }
 
-bool run_all_tests()
+bool run_tests(std::string const& searchStr)
 {
     register_all_tests();
 
-    int totalTestCount = (int) gTestCases.size();
+    int totalTestCount = 0;
     int successCount = 0;
     int failureCount = 0;
     std::vector<TestCase>::iterator it;
     for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
+        if (it->name.find(searchStr) == std::string::npos)
+            continue;
+        totalTestCount++;
+        std::cout << "Running " << it->name << std::endl;
+        bool result = run_test(*it, false);
+        if (result) successCount++;
+        else failureCount++;
+    }
+
+    std::cout << "Ran " << totalTestCount << " tests. ";
+
+    if (failureCount == 0) {
+        std::cout << "All tests passed." << std::endl;
+    } else {
+        std::string tests = failureCount == 1 ? "test" : "tests";
+        std::cout << failureCount << " " << tests << " failed." << std::endl;
+    }
+
+    return failureCount == 0;
+}
+
+bool run_all_tests()
+{
+    register_all_tests();
+
+    int totalTestCount = 0;
+    int successCount = 0;
+    int failureCount = 0;
+    std::vector<TestCase>::iterator it;
+    for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
+        totalTestCount++;
         bool result = run_test(*it, false);
         if (result) successCount++;
         else failureCount++;

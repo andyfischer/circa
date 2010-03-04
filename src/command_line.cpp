@@ -10,6 +10,7 @@ void print_usage()
         "Usage:\n"
         "  circa <filename>      : Evaluate the given Circa source file\n"
         "  circa -test           : Run unit tests\n"
+        "  circa -test <name>    : Run unit test of a certain name\n"
         "  circa -e <expression> : Evaluate an expression on the command line\n"
         "  circa -list-tests     : List every unit test name\n"
         "  circa -p <filename>   : Show the raw display of a source file\n"
@@ -33,7 +34,10 @@ int run_command_line(std::vector<std::string> args)
 
     // Run unit tests
     if (args[0] == "-test") {
-        run_all_tests();
+        if (args.size() > 1)
+            run_tests(args[1]);
+        else
+            run_all_tests();
         shutdown();
         return 0;
     }

@@ -46,6 +46,8 @@ extern std::vector<TestCase> gTestCases;
 
 void run_test_named(std::string const& testName);
 
+bool run_tests(std::string const& searchStr);
+
 // Run all unit tests, returns true if all passed.
 bool run_all_tests();
 

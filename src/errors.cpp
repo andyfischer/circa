@@ -245,7 +245,7 @@ std::string get_static_error_message(Term* term)
         return "(no error)";
 
     case SERROR_NULL_FUNCTION:
-        return "Function is NULL";
+        return "Function is NULL: "+format_global_id(term);
 
     case SERROR_WRONG_NUMBER_OF_INPUTS: {
         int funcNumInputs = function_t::num_inputs(term->function);

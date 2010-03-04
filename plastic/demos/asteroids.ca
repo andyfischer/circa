@@ -193,7 +193,8 @@ for asteroid in asteroids
     edges = map(pos_edge, asteroid.edges)
 
     gl:line_loop(edges, #fff)
-    gl:circle(asteroid.location, asteroid.size, #f00)
+    
+    --gl:circle(asteroid.location, asteroid.size, #f00)
 end
 
 -- Check for collisions of asteroids and bullets
@@ -251,3 +252,4 @@ for particle in @particles
         discard
     end
 end
+
