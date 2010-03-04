@@ -40,8 +40,13 @@ namespace type_t {
     {
         Branch& prototype = type_t::get_prototype(type);
 
-        for (int field_i=0; field_i < prototype.length(); field_i++)
-            prototype.set(field_i, map.getRemapped(prototype[field_i]));
+        for (int field_i=0; field_i < prototype.length(); field_i++) {
+            Term* orig = prototype[field_i];
+            Term* remapped = map.getRemapped(orig);
+            assert_good_pointer(orig);
+            assert_good_pointer(remapped);
+            prototype.set(field_i, remapped);
+        }
     }
 
     void name_accessor(EvalContext*, Term* caller)

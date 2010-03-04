@@ -4,7 +4,7 @@
 
 namespace circa {
 
-#define DEBUG_CHECK_VALID_BRANCH_OBJECTS 1
+#define DEBUG_CHECK_VALID_BRANCH_OBJECTS 0
 
 #if DEBUG_CHECK_VALID_BRANCH_OBJECTS
 
@@ -75,6 +75,7 @@ int Branch::getIndex(Term* term) const
 {
     assert(term != NULL);
     assert(term->owningBranch == this);
+    assert_good_pointer(term);
 
     //assert(term->index == debugFindIndex(term));
 
@@ -104,9 +105,16 @@ void Branch::set(int index, Term* term)
 {
     debug_assert_valid(this);
     assert(index <= length());
+
+    // No-op if this is the same term. Need to check this because otherwise
+    // we decrement refcount on term.
+    if (_terms[index] == term)
+        return;
+
     setNull(index);
     _terms[index] = term;
     if (term != NULL) {
+        assert_good_pointer(term);
         assert(term->owningBranch == NULL || term->owningBranch == this);
         term->owningBranch = this;
         term->index = index;
@@ -136,6 +144,7 @@ void Branch::append(Term* term)
     debug_assert_valid(this);
     _terms.append(term);
     if (term != NULL) {
+        assert_good_pointer(term);
         assert(term->owningBranch == NULL);
         term->owningBranch = this;
         term->index = _terms.length()-1;
@@ -155,6 +164,7 @@ Term* Branch::appendNew()
 
 void Branch::insert(int index, Term* term)
 {
+    assert_good_pointer(term);
     debug_assert_valid(this);
     assert(index >= 0);
     assert(index <= _terms.length());
@@ -175,6 +185,7 @@ void Branch::insert(int index, Term* term)
 
 void Branch::moveToEnd(Term* term)
 {
+    assert_good_pointer(term);
     assert(term != NULL);
     assert(term->owningBranch == this);
     assert(term->index >= 0);
@@ -186,6 +197,7 @@ void Branch::moveToEnd(Term* term)
 
 void Branch::remove(Term* term)
 {
+    assert_good_pointer(term);
     assert(term != NULL);
     remove(getIndex(term));
 }
@@ -266,6 +278,7 @@ Term* Branch::findLastBinding(std::string const& name) const
 
 void Branch::bindName(Term* term, std::string name)
 {
+    assert_good_pointer(term);
     if (term->name != "" && term->name != name)
         throw std::runtime_error("term already has name: "+term->name);
 

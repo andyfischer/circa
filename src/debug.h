@@ -17,7 +17,7 @@ namespace circa {
 //
 // It's recommended that you don't write code that calls is_bad_pointer,
 // because this would be easy to abuse. Instead, use assert_good_pointer.
-#define DEBUG_CHECK_FOR_BAD_POINTERS 1
+#define DEBUG_CHECK_FOR_BAD_POINTERS 0
 
 // Setting this to true will make us abort trap on the next name lookup.
 extern bool DEBUG_TRAP_NAME_LOOKUP;
