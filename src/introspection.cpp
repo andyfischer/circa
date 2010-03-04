@@ -8,7 +8,7 @@ namespace circa {
 
 bool is_value(Term* term)
 {
-    assert_good_pointer(term);
+    assert_valid_term(term);
 
     return term->function == VALUE_FUNC || term->function == STATEFUL_VALUE_FUNC;
 }

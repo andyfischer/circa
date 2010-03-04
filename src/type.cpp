@@ -43,8 +43,8 @@ namespace type_t {
         for (int field_i=0; field_i < prototype.length(); field_i++) {
             Term* orig = prototype[field_i];
             Term* remapped = map.getRemapped(orig);
-            assert_good_pointer(orig);
-            assert_good_pointer(remapped);
+            assert_valid_term(orig);
+            assert_valid_term(remapped);
             prototype.set(field_i, remapped);
         }
     }

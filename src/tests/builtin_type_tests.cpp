@@ -36,7 +36,7 @@ void reference_type_deletion_bug()
 
     delete branch;
 
-    assert_good_pointer(INT_TYPE);
+    assert_valid_term(INT_TYPE);
     test_assert(INT_TYPE->type != NULL);
 }
 

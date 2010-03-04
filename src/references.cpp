@@ -17,7 +17,7 @@ void Ref::set(Term* target)
         t->refCount++;
 
     if (previousTarget != NULL) {
-        assert_good_pointer(previousTarget);
+        assert_valid_term(previousTarget);
         previousTarget->refCount--;
         if (previousTarget->refCount == 0)
             delete_term(previousTarget);
@@ -31,7 +31,7 @@ void Ref::remap_pointers(Term* term, ReferenceMap const& map)
 
 void delete_term(Term* term)
 {
-    assert_good_pointer(term);
+    assert_valid_term(term);
 
     assert(term->refCount == 0);
 
@@ -44,7 +44,7 @@ void delete_term(Term* term)
 
 void remap_pointers(Term* term, ReferenceMap const& map)
 {
-    assert_good_pointer(term);
+    assert_valid_term(term);
 
     // make sure this map doesn't try to remap NULL, because such a thing
     // would almost definitely lead to errors.
@@ -79,8 +79,8 @@ void remap_pointers(Term* term, ReferenceMap const& map)
 
 void remap_pointers(Term* term, Term* original, Term* replacement)
 {
-    assert_good_pointer(term);
-    assert_good_pointer(original);
+    assert_valid_term(term);
+    assert_valid_term(original);
     assert(original != NULL);
 
     ReferenceMap map;

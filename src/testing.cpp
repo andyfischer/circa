@@ -32,7 +32,7 @@ void _test_assert_function(Term* term, int line, const char* file)
         throw std::runtime_error(msg.str());
     }
 
-    if (is_bad_pointer(term)) {
+    if (!debug_is_term_pointer_valid(term)) {
         std::stringstream msg;
         msg << "Bad term pointer at " << file << ", line " << line;
         throw std::runtime_error(msg.str());

@@ -4,52 +4,52 @@
 
 namespace circa {
 
-#define DEBUG_CHECK_VALID_BRANCH_OBJECTS 0
+#define DEBUG_CHECK_VALID_BRANCH_POINTERS 0
 
-#if DEBUG_CHECK_VALID_BRANCH_OBJECTS
+#if DEBUG_CHECK_VALID_BRANCH_POINTERS
 
 std::set<Branch const*> gValidBranches;
 
-static void debug_register_object(Branch const* branch)
+static void debug_register_branch_pointer(Branch const* branch)
 {
     assert(gValidBranches.find(branch) == gValidBranches.end());
     gValidBranches.insert(branch);
 }
 
-static void debug_unregister_object(Branch const* branch)
+static void debug_unregister_branch_pointer(Branch const* branch)
 {
     assert(gValidBranches.find(branch) != gValidBranches.end());
     gValidBranches.erase(branch);
 }
 
-static void debug_assert_valid(Branch const* branch)
+static void assert_valid_branch(Branch const* branch)
 {
     assert(gValidBranches.find(branch) != gValidBranches.end());
 }
 
 #else
 
-#define debug_register_object(x)
-#define debug_unregister_object(x)
-#define debug_assert_valid(x)
+#define debug_register_branch_pointer(x)
+#define debug_unregister_branch_pointer(x)
+#define assert_valid_branch(x)
 
 #endif
 
 Branch::Branch() : owningTerm(NULL), _refCount(0)
 {
-    debug_register_object(this);
+    debug_register_branch_pointer(this);
 }
 
 Branch::~Branch()
 {
     names.clear();
     _terms.clear();
-    debug_unregister_object(this);
+    debug_unregister_branch_pointer(this);
 }
 
 int Branch::length() const
 {
-    debug_assert_valid(this);
+    assert_valid_branch(this);
     return _terms.length();
 }
 
@@ -60,7 +60,7 @@ bool Branch::contains(std::string const& name) const
 
 Term* Branch::get(int index) const
 {
-    debug_assert_valid(this);
+    assert_valid_branch(this);
     assert(index <= length());
     return _terms[index];
 }
@@ -75,7 +75,7 @@ int Branch::getIndex(Term* term) const
 {
     assert(term != NULL);
     assert(term->owningBranch == this);
-    assert_good_pointer(term);
+    assert_valid_term(term);
 
     //assert(term->index == debugFindIndex(term));
 
@@ -103,7 +103,7 @@ int Branch::findIndex(std::string const& name) const
 
 void Branch::set(int index, Term* term)
 {
-    debug_assert_valid(this);
+    assert_valid_branch(this);
     assert(index <= length());
 
     // No-op if this is the same term. Need to check this because otherwise
@@ -114,7 +114,7 @@ void Branch::set(int index, Term* term)
     setNull(index);
     _terms[index] = term;
     if (term != NULL) {
-        assert_good_pointer(term);
+        assert_valid_term(term);
         assert(term->owningBranch == NULL || term->owningBranch == this);
         term->owningBranch = this;
         term->index = index;
@@ -125,7 +125,7 @@ void Branch::set(int index, Term* term)
 
 void Branch::setNull(int index)
 {
-    debug_assert_valid(this);
+    assert_valid_branch(this);
     assert(index <= length());
     Term* term = _terms[index];
     if (term != NULL) {
@@ -141,10 +141,10 @@ void Branch::setNull(int index)
 
 void Branch::append(Term* term)
 {
-    debug_assert_valid(this);
+    assert_valid_branch(this);
     _terms.append(term);
     if (term != NULL) {
-        assert_good_pointer(term);
+        assert_valid_term(term);
         assert(term->owningBranch == NULL);
         term->owningBranch = this;
         term->index = _terms.length()-1;
@@ -153,7 +153,7 @@ void Branch::append(Term* term)
 
 Term* Branch::appendNew()
 {
-    debug_assert_valid(this);
+    assert_valid_branch(this);
     Term* term = alloc_term();
     assert(term != NULL);
     _terms.append(term);
@@ -164,8 +164,8 @@ Term* Branch::appendNew()
 
 void Branch::insert(int index, Term* term)
 {
-    assert_good_pointer(term);
-    debug_assert_valid(this);
+    assert_valid_term(term);
+    assert_valid_branch(this);
     assert(index >= 0);
     assert(index <= _terms.length());
 
@@ -185,7 +185,7 @@ void Branch::insert(int index, Term* term)
 
 void Branch::moveToEnd(Term* term)
 {
-    assert_good_pointer(term);
+    assert_valid_term(term);
     assert(term != NULL);
     assert(term->owningBranch == this);
     assert(term->index >= 0);
@@ -197,7 +197,7 @@ void Branch::moveToEnd(Term* term)
 
 void Branch::remove(Term* term)
 {
-    assert_good_pointer(term);
+    assert_valid_term(term);
     assert(term != NULL);
     remove(getIndex(term));
 }
@@ -278,7 +278,7 @@ Term* Branch::findLastBinding(std::string const& name) const
 
 void Branch::bindName(Term* term, std::string name)
 {
-    assert_good_pointer(term);
+    assert_valid_term(term);
     if (term->name != "" && term->name != name)
         throw std::runtime_error("term already has name: "+term->name);
 
@@ -300,7 +300,7 @@ void Branch::remapPointers(ReferenceMap const& map)
 void
 Branch::clear()
 {
-    debug_assert_valid(this);
+    assert_valid_branch(this);
 
     for (int i=0; i < _terms.length(); i++) {
         _terms[i]->owningBranch = NULL;
@@ -355,8 +355,8 @@ namespace branch_t {
     {
         Branch& source = as_branch(sourceValue);
         Branch& dest = as_branch(destValue);
-        debug_assert_valid(&source);
-        debug_assert_valid(&dest);
+        assert_valid_branch(&source);
+        assert_valid_branch(&dest);
 
         // For Branch or List type, overwrite existing shape
         if ((destValue->value_type == &as_type(BRANCH_TYPE))
@@ -373,15 +373,15 @@ namespace branch_t {
 
     void assign_overwriting_types(Branch& source, Branch& dest)
     {
-        debug_assert_valid(&source);
-        debug_assert_valid(&dest);
+        assert_valid_branch(&source);
+        assert_valid_branch(&dest);
 
         // Assign terms as necessary
         int lengthToAssign = std::min(source.length(), dest.length());
 
         for (int i=0; i < lengthToAssign; i++) {
-            assert_good_pointer(source[i]);
-            assert_good_pointer(dest[i]);
+            assert_valid_term(source[i]);
+            assert_valid_term(dest[i]);
 
             // Change type if needed
             if (source[i]->type != dest[i]->type)
@@ -392,7 +392,7 @@ namespace branch_t {
         // Add terms if necessary
         for (int i=dest.length(); i < source.length(); i++) {
             assert(source[i] != NULL);
-            assert_good_pointer(source[i]);
+            assert_valid_term(source[i]);
 
             Term* t = create_duplicate(dest, source[i]);
             if (source[i]->name != "")
@@ -517,8 +517,8 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
 
 void duplicate_branch(Branch& source, Branch& dest)
 {
-    debug_assert_valid(&source);
-    debug_assert_valid(&dest);
+    assert_valid_branch(&source);
+    assert_valid_branch(&dest);
 
     ReferenceMap newTermMap;
 

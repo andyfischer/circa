@@ -71,7 +71,7 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 
 void set_input(Term* term, int index, Term* input)
 {
-    assert_good_pointer(term);
+    assert_valid_term(term);
 
     Ref previousInput = NULL;
     if (index < term->numInputs())
@@ -90,7 +90,7 @@ void set_input(Term* term, int index, Term* input)
 
 void set_inputs(Term* term, RefList const& inputs)
 {
-    assert_good_pointer(term);
+    assert_valid_term(term);
 
     RefList previousInputs = term->inputs;
 
