@@ -255,7 +255,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
 
     // Comment (blank lines count as comments)
     if (tokens.nextIs(COMMENT) || tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON)
-        || (foundWhitespace && (tokens.nextIs(RBRACE) || tokens.nextIs(END)))) {
+        || (foundWhitespace && (tokens.nextIs(RBRACE) || tokens.nextIs(END) || tokens.finished()))) {
         result = comment(branch, tokens);
         assert(result != NULL);
     }
@@ -1485,10 +1485,11 @@ Term* atom(Branch& branch, TokenStream& tokens)
         result->setIntProp("syntax:parens", result->intProp("syntax:parens") + 1);
     }
     else {
+        std::string next;
         if (!tokens.finished())
-            tokens.consume();
+            next = tokens.consume();
         return compile_error_for_line(branch, tokens, startPosition,
-            "Unrecognized expression");
+            "Unrecognized expression, (next token = " + next + ")");
     }
 
     set_source_location(result, startPosition, tokens);

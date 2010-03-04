@@ -371,6 +371,15 @@ void test_concat()
     test_snippet("", "concat('a' 'b' 'c') == 'abc'");
 }
 
+void test_misc()
+{
+    test_snippet("    ", "");
+    // These snippets once caused parser errors:
+    test_snippet("add(1 1)    ", "");
+    test_snippet("add(1 1)\n    ", "");
+    test_snippet("l = []\nl.append([1])\n    ", "");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -397,6 +406,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_stateful_code);
     REGISTER_TEST_CASE(test_snippets::test_significant_indentation);
     REGISTER_TEST_CASE(test_snippets::test_concat);
+    REGISTER_TEST_CASE(test_snippets::test_misc);
 }
 
 } // namespace test_snippets
