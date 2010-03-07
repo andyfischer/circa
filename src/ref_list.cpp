@@ -99,7 +99,7 @@ void RefList::remove(int index)
 }
 
 
-void RefList::resize(int newLength)
+void RefList::resize(unsigned int newLength)
 {
     assert(newLength < MAX_REF_LIST_LENGTH);
     _items.resize(newLength);

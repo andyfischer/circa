@@ -121,7 +121,7 @@ void print_branch_raw(std::ostream& out, Branch& branch)
 
         for (int i=0; i < indent; i++) out << "  ";
 
-        print_term_raw_string(out, term);
+        print_term_to_string_extended(out, term);
         out << std::endl;
     }
 }
@@ -302,6 +302,25 @@ void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string
 
         names.push_back(name);
     }
+}
+
+void print_term_to_string_extended(std::ostream& out, Term* term)
+{
+    out << format_global_id(term);
+    if (term->name != "")
+        out << " '" << term->name << "'";
+    out << " [fun:" << term->function->name << format_global_id(term->function)
+        << " dt:" << term->type->name << format_global_id(term->type)
+        << " vt:" << term->value_type->name << "] ";
+    if (!is_branch(term))
+        out << to_string(term);
+}
+
+std::string get_term_to_string_extended(Term* term)
+{
+    std::stringstream out;
+    print_term_to_string_extended(out, term);
+    return out.str();
 }
 
 } // namespace circa

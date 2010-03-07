@@ -124,7 +124,7 @@ struct RefList
         return -1;
     }
 
-    void resize(int newLength);
+    void resize(unsigned int newLength);
 
     void remapPointers(ReferenceMap const& map);
 };

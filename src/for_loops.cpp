@@ -215,13 +215,7 @@ void evaluate_for_loop(EvalContext*, Term* forTerm)
         set_bool(discardCalled, false);
 
         // Inject iterator value
-        if (!value_fits_type(listTerm->asBranch()[i], iterator->type)) {
-            error_occurred(forTerm, "Internal error in evaluate_for_loop: can't assign this element to iterator");
-            return;
-        }
-
-        change_type(iterator, listTerm->asBranch()[i]->type);
-        assign_value(listTerm->asBranch()[i], iterator);
+        assign_overwriting_type(listTerm->asBranch()[i], iterator);
 
         // Inject stateful terms
         if (stateBranch != NULL)
@@ -243,10 +237,13 @@ void evaluate_for_loop(EvalContext*, Term* forTerm)
         // Possibly use this value to modify the list
         if (listOutput != NULL && !as_bool(discardCalled)) {
             Term* iteratorResult = codeBranch[iterator->name];
+
             Branch& listOutputBr = listOutput->asBranch();
             if (listOutputWriteHead >= listOutputBr.length())
                 create_value(listOutputBr, iteratorResult->type);
-            assign_value(iteratorResult, listOutputBr[listOutputWriteHead++]);
+            Term* outputElement = listOutputBr[listOutputWriteHead++];
+        
+            assign_overwriting_type(iteratorResult, outputElement);
         }
     }
 

@@ -125,10 +125,8 @@ Term* create_duplicate(Branch& branch, Term* source, std::string const& name, bo
     Term* term = apply(branch, source->function, source->inputs, name);
     change_type(term, source->type);
 
-    if (source->value_data.ptr != NULL) {
-        if (copyBranches || !is_branch(source))
-            assign_value(source, term);
-    }
+    if (copyBranches || !is_branch(source))
+        assign_value(source, term);
 
     duplicate_branch(source->properties, term->properties);
 

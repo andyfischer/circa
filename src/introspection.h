@@ -45,6 +45,10 @@ void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string
 // as descendants.
 RefList get_involved_terms(RefList inputs, RefList outputs);
 
+void print_term_to_string_extended(std::ostream& out, Term* term);
+
+std::string get_term_to_string_extended(Term*);
+
 }
 
 #endif
