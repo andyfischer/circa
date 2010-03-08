@@ -40,10 +40,44 @@ void test_subroutine()
     test_assert(as_int(c) == 5);
 }
 
+void test_field_access()
+{
+    Branch branch;
+
+    Term* T = branch.compile("type T { int a, string b }");
+    branch.compile("def f() -> any; return T([4, 's']); end");
+    Term* r = branch.compile("r = f()");
+    evaluate_branch(branch);
+    branch.compile("r.a");
+
+    test_assert(branch);
+    test_assert(branch.eval("r.a == 4"));
+    test_assert(branch.eval("r.b == 's'"));
+
+    test_assert(r->type == ANY_TYPE);
+    test_assert(r->value_type == get_pointer(T));
+
+    branch.eval("r.b = 's2'");
+    test_assert(branch);
+}
+
+void test_subroutine_inputs()
+{
+    Branch branch;
+
+    branch.compile("def f(Point p); p.x; end");
+    branch.compile("f([1 2])");
+
+    evaluate_branch(branch);
+    test_assert(branch);
+}
+
 void register_tests()
 {
-    test_copy();
-    test_subroutine();
+    REGISTER_TEST_CASE(dynamic_type_tests::test_copy);
+    REGISTER_TEST_CASE(dynamic_type_tests::test_subroutine);
+    REGISTER_TEST_CASE(dynamic_type_tests::test_field_access);
+    //REGISTER_TEST_CASE(dynamic_type_tests::test_subroutine_inputs);
 }
 
 } // namespace dynamic_type_tests

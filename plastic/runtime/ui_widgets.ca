@@ -18,6 +18,7 @@ def draw_vmenu(Point topleft, List items) -> any
     -- Get maximum text width
     text_width = 0
     for label in labels
+        
         max(@text_width, label.width)
     end
 

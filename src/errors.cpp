@@ -6,8 +6,6 @@ namespace circa {
 
 void error_occurred(Term* errorTerm, std::string const& message)
 {
-    //std::cout << "error: " << message << std::endl;
-
     if (DEBUG_TRAP_ERROR_OCCURRED)
         assert(false);
 
