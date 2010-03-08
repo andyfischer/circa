@@ -5,13 +5,13 @@
 namespace circa {
 namespace if_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         Branch& contents = caller->asBranch();
         bool cond = bool_input(caller,0);
 
         if (cond)
-            evaluate_branch(contents, caller);
+            evaluate_branch(cxt, contents);
     }
 
     void setup(Branch& kernel)

@@ -5,14 +5,14 @@
 namespace circa {
 namespace filter_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         Branch& inputs = as_branch(caller->input(0));
         Branch& bools = as_branch(caller->input(1));
         Branch& output = as_branch(caller);
 
         if (inputs.length() != bools.length()) {
-            error_occurred(caller, "Lists have different lengths");
+            error_occurred(cxt, caller, "Lists have different lengths");
             return;
         }
 

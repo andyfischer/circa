@@ -5,7 +5,8 @@
 namespace circa {
 
 EvalContext::EvalContext()
-  : interrupt_branch(false)
+  : interruptBranch(false),
+    errorOccurred(false)
 {
 }
 

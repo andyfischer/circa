@@ -5,14 +5,14 @@
 namespace circa {
 namespace map_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         Term* func = caller->input(0);
         Branch& inputs = as_branch(caller->input(1));
         Branch& output = as_branch(caller);
 
         if (is_function_stateful(func)) {
-            error_occurred(caller, "map() not yet supported on a stateful function");
+            error_occurred(cxt, caller, "map() not yet supported on a stateful function");
             return;
         }
 
@@ -26,7 +26,7 @@ namespace map_function {
 
         output.removeNulls();
 
-        evaluate_branch(output, caller);
+        evaluate_branch(cxt, output);
     }
 
     void setup(Branch& kernel)

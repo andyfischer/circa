@@ -5,10 +5,11 @@
 namespace circa {
 namespace file_changed_function {
 
-    bool check(Term* errorListener, Term* fileSignature, std::string const& filename)
+    bool check(EvalContext* cxt, Term* errorListener, Term* fileSignature,
+            std::string const& filename)
     {
         if (!file_exists(filename) && filename != "") {
-            error_occurred(errorListener, "File not found: " + filename);
+            error_occurred(cxt, errorListener, "File not found: " + filename);
             return false;
         }
         
@@ -27,11 +28,11 @@ namespace file_changed_function {
         }
     }
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         std::string actual_filename = get_path_relative_to_source(caller,
             caller->input(1)->asString());
-        set_bool(caller, check(caller, caller->input(0), actual_filename));
+        set_bool(caller, check(cxt, caller, caller->input(0), actual_filename));
     }
 
     void setup(Branch& kernel)

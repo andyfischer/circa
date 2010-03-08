@@ -147,7 +147,7 @@ bool if_block_contains_state(Term* ifCall)
     return false;
 }
 
-void evaluate_if_block(EvalContext*, Term* caller)
+void evaluate_if_block(EvalContext* cxt, Term* caller)
 {
     Branch& contents = as_branch(caller);
     Branch* stateBranch = get_if_block_state(caller);
@@ -182,7 +182,7 @@ void evaluate_if_block(EvalContext*, Term* caller)
             if (stateElement != NULL)
                 load_state_into_branch(as_branch(stateElement), as_branch(call));
 
-            evaluate_term(call);
+            evaluate_term(cxt, call);
             satisfiedIndex = i;
 
             if (call->hasError())
@@ -219,7 +219,7 @@ void evaluate_if_block(EvalContext*, Term* caller)
     assert(contents[contents.length()-1]->name == "#joining");
     Branch& joining = as_branch(contents[contents.length()-1]);
     set_int(joining["#satisfiedIndex"], satisfiedIndex);
-    evaluate_branch(joining, caller);
+    evaluate_branch(cxt, joining);
 }
 
 } // namespace circa

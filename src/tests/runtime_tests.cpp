@@ -13,9 +13,9 @@ void spy_function(EvalContext*, Term* caller)
     set_bool(caller, true);
 }
 
-void i_only_throw_errors(EvalContext*, Term* caller)
+void i_only_throw_errors(EvalContext* cxt, Term* caller)
 {
-    error_occurred(caller, "i only throw errors");
+    error_occurred(cxt, caller, "i only throw errors");
 }
 
 void init_test_functions(Branch& branch)
@@ -51,25 +51,26 @@ void blocked_by_error()
 
     gSpyResults.clear();
 
-    Term *spy_1 = branch.compile("spy('1')");
+    branch.compile("spy('1')");
     Term *error = branch.compile("e = i_only_throw_errors()");
     Term *spy_blocked = branch.compile("spy(e)");
 
     test_assert(gSpyResults.size() == 0);
 
-    Term errorListener;
-    evaluate_branch(branch, &errorListener);
-    test_assert(errorListener.hasError());
+    EvalContext result = evaluate_branch(branch);
+    test_assert(result.errorOccurred);
+    test_assert(result.errorTerm == error);
     test_assert(gSpyResults.size() == 1);
     test_assert(gSpyResults[0] == "1");
-    test_assert(!spy_1->hasError());
-    test_assert(error->hasError());
 
     test_assert(as_bool(spy_blocked) == false);
 }
 
 void error_message()
 {
+#if 0
+    Disabled, removed support for storing runtime errors on code.
+
     Branch branch;
     init_test_functions(branch);
 
@@ -89,6 +90,7 @@ void error_message()
         std::cout << out.str();
         declare_current_test_failed();
     }
+#endif
 }
 
 void test_misc()
@@ -130,16 +132,18 @@ void test_resize_list()
 
 void function_that_ignores_errors()
 {
+#if 0
     Branch branch;
-    Term* a = branch.eval("a = {}");
-    Term* mirror = branch.eval("branch_ref(a)");
+    init_test_functions(branch);
 
-    error_occurred(a, "test error");
+    branch.eval("a = i_only_throw_errors()");
+    Term* mirror = branch.eval("branch_ref(a)");
 
     test_assert(function_t::get_input_placeholder(mirror->function, 0)
             ->boolPropOptional("ignore_error", false));
 
     test_assert(!has_static_error(mirror));
+#endif
 }
 
 void register_tests()

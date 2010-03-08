@@ -170,8 +170,10 @@ void setup_for_loop_post_code(Term* forTerm)
     get_for_loop_state_type(forTerm) = hasState ? BRANCH_TYPE : VOID_TYPE;
 }
 
-void evaluate_for_loop(EvalContext*, Term* forTerm)
+void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
 {
+    assert(cxt != NULL);
+
     Term* listTerm = forTerm->input(1);
     Branch& codeBranch = as_branch(forTerm);
     Branch* stateBranch = get_for_loop_state(forTerm);
@@ -208,7 +210,7 @@ void evaluate_for_loop(EvalContext*, Term* forTerm)
     set_bool(get_for_loop_any_iterations(forTerm), numIterations > 0);
 
     if (numIterations == 0)
-        evaluate_branch(get_for_loop_rebinds_for_outer(forTerm));
+        evaluate_branch(cxt, get_for_loop_rebinds_for_outer(forTerm));
 
     for (int i=0; i < numIterations; i++) {
         set_bool(isFirstIteration, i == 0);
@@ -223,9 +225,9 @@ void evaluate_for_loop(EvalContext*, Term* forTerm)
 
         // Evaluate
         Term errorListener;
-        evaluate_branch(codeBranch, &errorListener);
+        evaluate_branch(cxt, codeBranch);
 
-        if (errorListener.hasError()) {
+        if (cxt->errorOccurred) {
             nested_error_occurred(forTerm);
             break;
         }

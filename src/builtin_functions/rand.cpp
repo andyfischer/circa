@@ -23,7 +23,7 @@ namespace rand_function {
         set_float(caller, (float) rand() / RAND_MAX);
     }
 
-    void evaluate_f_range(EvalContext*, Term* caller)
+    void evaluate_f_range(EvalContext* cxt, Term* caller)
     {
         seed_if_needed();
         float r = (float) rand() / RAND_MAX;
@@ -31,7 +31,7 @@ namespace rand_function {
         float max = caller->input(1)->toFloat();
 
         if (min >= max) {
-            error_occurred(caller, "min is >= max");
+            error_occurred(cxt, caller, "min is >= max");
             return;
         }
 

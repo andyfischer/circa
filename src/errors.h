@@ -6,7 +6,7 @@
 namespace circa {
 
 // Puts 'errorTerm' into an error state, with the given message.
-void error_occurred(Term* errorTerm, std::string const& message);
+void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message);
 
 // Signal that a type mismatch has occurred in native code.
 void native_type_mismatch(std::string const& message);
@@ -44,6 +44,9 @@ void print_runtime_error_formatted(Term* term, std::ostream& output);
 void print_runtime_error_formatted(Branch& branch, std::ostream& output);
 void print_static_error_formatted(Term* term, std::ostream& output);
 void print_static_errors_formatted(Branch& branch, std::ostream& output);
+
+// New style: runtime error is stored in EvalContext
+void print_runtime_error_formatted(EvalContext& context, std::ostream& output);
 
 bool has_error(Term* term);
 bool has_error(Branch& branch);

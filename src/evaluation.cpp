@@ -4,7 +4,7 @@
 
 namespace circa {
 
-inline void evaluate_term(EvalContext* context, Term* term)
+inline void evaluate_term(EvalContext* cxt, Term* term)
 {
     assert(term != NULL);
     clear_error(term);
@@ -16,11 +16,11 @@ inline void evaluate_term(EvalContext* context, Term* term)
 
     // Execute the function
     try {
-        evaluate(context, term);
+        evaluate(cxt, term);
     }
     catch (std::exception const& err)
     {
-        error_occurred(term, err.what());
+        error_occurred(cxt, term, err.what());
     }
 }
 
@@ -30,22 +30,24 @@ void evaluate_term(Term* term)
     evaluate_term(&context, term);
 }
 
-void evaluate_branch(Branch& branch, Term* errorListener)
+void evaluate_branch(EvalContext* context, Branch& branch)
 {
-    EvalContext context;
+    assert(context != NULL);
 
     for (int index=0; index < branch.length(); index++) {
 		Term* term = branch.get(index);
-        evaluate_term(&context, term);
+        evaluate_term(context, term);
 
-        if (term->hasError()) {
-            if (errorListener == NULL)
-                throw std::runtime_error(get_runtime_error_message(term));
-
-            nested_error_occurred(errorListener);
+        if (context->errorOccurred)
             break;
-        }
     }
+}
+
+EvalContext evaluate_branch(Branch& branch)
+{
+    EvalContext context;
+    evaluate_branch(&context, branch);
+    return context;
 }
 
 Term* apply_and_eval(Branch& branch, Term* function, RefList const& inputs)

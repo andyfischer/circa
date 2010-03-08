@@ -5,7 +5,7 @@
 namespace circa {
 namespace assign_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         // The thing we are changing is on the left, the desired value is on the right
         // This is a little confusing because the C function 'assign_value' is the other
@@ -19,7 +19,8 @@ namespace assign_function {
             change_type(target, FLOAT_TYPE);
 
         if (!value_fits_type(value, target->type)) {
-            error_occurred(caller, "Tried to assign a " + value->type->name + " to a "
+            error_occurred(cxt, caller,
+                    "Tried to assign a " + value->type->name + " to a "
                     + target->type->name);
             return;
         }

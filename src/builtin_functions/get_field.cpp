@@ -5,7 +5,7 @@
 namespace circa {
 namespace get_field_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         Term* head = caller->input(0);
 
@@ -16,7 +16,7 @@ namespace get_field_function {
 
             if (fieldIndex == -1) {
                 // assert(false);
-                error_occurred(caller, "field not found: " + name);
+                error_occurred(cxt, caller, "field not found: " + name);
                 return;
             }
 

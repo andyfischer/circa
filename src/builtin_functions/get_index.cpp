@@ -5,11 +5,11 @@
 namespace circa {
 namespace get_index_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         if (!is_branch(caller->input(0))) {
             //assert(false);
-            error_occurred(caller, "Value is not indexable");
+            error_occurred(cxt, caller, "Value is not indexable");
             return;
         }
 
@@ -19,7 +19,7 @@ namespace get_index_function {
         if (index >= input.length() || index < 0) {
             std::stringstream err;
             err << "Index out of range: " << index;
-            error_occurred(caller, err.str());
+            error_occurred(cxt, caller, err.str());
             return;
         }
 

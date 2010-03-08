@@ -18,10 +18,9 @@ void test_input(std::string const& in)
         return;
     }
 
-    Term errorListener;
-    evaluate_branch(branch, &errorListener);
+    EvalContext result = evaluate_branch(branch);
 
-    if (!errorListener.hasError()) {
+    if (!result.errorOccurred) {
         std::cout << "No runtime error: " << in << std::endl;
         dump_branch(branch);
         declare_current_test_failed();
@@ -29,7 +28,7 @@ void test_input(std::string const& in)
     }
     
     std::stringstream formattedError;
-    print_runtime_error_formatted(branch, formattedError);
+    print_runtime_error_formatted(result, formattedError);
 
     // Runtime error messages might contain this special string: !!!
     // which means that something happened which shouldn't happen.

@@ -13,7 +13,7 @@ namespace vectorize_vv_function {
         return LIST_TYPE;
     }
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         Term* func = as_ref(function_t::get_parameters(caller->function));
 
@@ -24,7 +24,7 @@ namespace vectorize_vv_function {
             std::stringstream msg;
             msg << "Input lists have different lengths (left has " << left.length();
             msg << ", right has " << right.length() << ")";
-            error_occurred(caller, msg.str());
+            error_occurred(cxt, caller, msg.str());
             return;
         }
 
@@ -40,7 +40,7 @@ namespace vectorize_vv_function {
                 apply(output, func, RefList(left[i], right[i]));
         }
 
-        evaluate_branch(output, caller);
+        evaluate_branch(cxt, output);
     }
 
     void setup(Branch& kernel)

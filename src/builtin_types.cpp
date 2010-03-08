@@ -270,12 +270,12 @@ namespace map_t {
         remove(caller->asBranch(), caller->input(1));
     }
 
-    void get(EvalContext*, Term* caller)
+    void get(EvalContext* cxt, Term* caller)
     {
         Term* key = caller->input(1);
         Term* value = get(caller->input(0)->asBranch(), key);
         if (value == NULL) {
-            error_occurred(caller, "Key not found: " + to_string(key));
+            error_occurred(cxt, caller, "Key not found: " + to_string(key));
             return;
         }
 
@@ -472,13 +472,13 @@ namespace branch_ref_t
             output.shorten(write);
     }
 
-    void get_relative_name(EvalContext*, Term* caller)
+    void get_relative_name(EvalContext* cxt, Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
         Term* target = caller->input(1)->asRef();
 
         if (target == NULL) {
-            error_occurred(caller, "term is NULL");
+            error_occurred(cxt, caller, "term is NULL");
             return;
         }
 
@@ -607,54 +607,54 @@ namespace ref_t {
     {
         return as_ref(lhs) == as_ref(rhs);
     }
-    void get_name(EvalContext*, Term* caller)
+    void get_name(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
-            error_occurred(caller, "NULL reference");
+            error_occurred(cxt, caller, "NULL reference");
             return;
         }
         set_str(caller, t->name);
     }
-    void hosted_to_string(EvalContext*, Term* caller)
+    void hosted_to_string(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
-            error_occurred(caller, "NULL reference");
+            error_occurred(cxt, caller, "NULL reference");
             return;
         }
         set_str(caller, circa::to_string(t));
     }
-    void get_function(EvalContext*, Term* caller)
+    void get_function(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
-            error_occurred(caller, "NULL reference");
+            error_occurred(cxt, caller, "NULL reference");
             return;
         }
         as_ref(caller) = t->function;
     }
-    void hosted_typeof(EvalContext*, Term* caller)
+    void hosted_typeof(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
-            error_occurred(caller, "NULL reference");
+            error_occurred(cxt, caller, "NULL reference");
             return;
         }
         as_ref(caller) = t->type;
     }
-    void assign(EvalContext*, Term* caller)
+    void assign(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
-            error_occurred(caller, "NULL reference");
+            error_occurred(cxt, caller, "NULL reference");
             return;
         }
 
         Term* source = caller->input(1);
 
         if (!is_assign_value_possible(source, t)) {
-            error_occurred(caller, "Can't assign (probably type mismatch)");
+            error_occurred(cxt, caller, "Can't assign (probably type mismatch)");
             return;
         }
 
@@ -665,11 +665,11 @@ namespace ref_t {
         return int(a + 0.5);
     }
 
-    void tweak(EvalContext*, Term* caller)
+    void tweak(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
-            error_occurred(caller, "NULL reference");
+            error_occurred(cxt, caller, "NULL reference");
             return;
         }
 
@@ -688,36 +688,36 @@ namespace ref_t {
         } else if (is_int(t))
             set_int(t, as_int(t) + steps);
         else
-            error_occurred(caller, "Ref is not an int or number");
+            error_occurred(cxt, caller, "Ref is not an int or number");
     }
-    void asint(EvalContext*, Term* caller)
+    void asint(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
-            error_occurred(caller, "NULL reference");
+            error_occurred(cxt, caller, "NULL reference");
             return;
         }
         if (!is_int(t)) {
-            error_occurred(caller, "Not an int");
+            error_occurred(cxt, caller, "Not an int");
             return;
         }
         set_int(caller, as_int(t));
     }
-    void asfloat(EvalContext*, Term* caller)
+    void asfloat(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
-            error_occurred(caller, "NULL reference");
+            error_occurred(cxt, caller, "NULL reference");
             return;
         }
         
         set_float(caller, to_float(t));
     }
-    void get_input(EvalContext*, Term* caller)
+    void get_input(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
-            error_occurred(caller, "NULL reference");
+            error_occurred(cxt, caller, "NULL reference");
             return;
         }
         int index = caller->input(1)->asInt();
@@ -726,20 +726,20 @@ namespace ref_t {
         else
             as_ref(caller) = t->input(index);
     }
-    void num_inputs(EvalContext*, Term* caller)
+    void num_inputs(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
-            error_occurred(caller, "NULL reference");
+            error_occurred(cxt, caller, "NULL reference");
             return;
         }
         set_int(caller, t->numInputs());
     }
-    void get_source_location(EvalContext*, Term* caller)
+    void get_source_location(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
         if (t == NULL) {
-            error_occurred(caller, "NULL reference");
+            error_occurred(cxt, caller, "NULL reference");
             return;
         }
         Branch& output = as_branch(caller);

@@ -4,16 +4,24 @@
 
 namespace circa {
 
-void error_occurred(Term* errorTerm, std::string const& message)
+void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message)
 {
     if (DEBUG_TRAP_ERROR_OCCURRED)
         assert(false);
 
-    if (errorTerm == NULL)
-        throw std::runtime_error(message);
+    assert(errorTerm != NULL);
 
     errorTerm->setHasError(true);
     errorTerm->setStringProp("error", message);
+
+    if (context == NULL)
+        throw std::runtime_error(message);
+
+    if (!context->errorOccurred) {
+        context->errorOccurred = true;
+        context->errorTerm = errorTerm;
+        context->errorMessage = message;
+    }
 }
 
 void assert_type(Term* term, Term* type)
@@ -34,11 +42,7 @@ void native_type_mismatch(std::string const& message)
 
 void nested_error_occurred(Term* errorTerm)
 {
-    if (errorTerm == NULL) {
-        assert(false);
-        throw std::runtime_error("nested_error_occurred, no error listener");
-    }
-
+    assert(errorTerm != NULL);
     errorTerm->setHasError(true);
 }
 
@@ -329,6 +333,12 @@ void print_static_errors_formatted(Branch& branch, std::ostream& output)
         if (has_static_error(*it))
             print_static_error_formatted(*it, output);
     } 
+}
+
+void print_runtime_error_formatted(EvalContext& context, std::ostream& output)
+{
+    output << get_short_location(context.errorTerm)
+        << " " << context.errorMessage;
 }
 
 std::string get_static_errors_formatted(Branch& branch)

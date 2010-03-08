@@ -7,7 +7,7 @@ namespace include_function {
 
     const bool PRINT_TIMING = false;
 
-    void load_script(EvalContext*, Term* caller)
+    void load_script(EvalContext* cxt, Term* caller)
     {
         Term* fileSignature = caller->input(0);
         Branch& contents = as_branch(caller);
@@ -18,7 +18,7 @@ namespace include_function {
             get_path_relative_to_source(caller, requested_filename);
 
         // Reload if the filename or modified-time has changed
-        if (file_changed_function::check(caller, fileSignature, actual_filename))
+        if (file_changed_function::check(cxt, caller, fileSignature, actual_filename))
         {
             Timer timer;
 
@@ -31,7 +31,7 @@ namespace include_function {
             contents.clear();
 
             if (!file_exists(actual_filename)) {
-                error_occurred(caller, "File not found: "+actual_filename);
+                error_occurred(cxt, caller, "File not found: "+actual_filename);
                 return;
             }
 
@@ -41,7 +41,7 @@ namespace include_function {
                 std::cout << "post parse: " << timer << std::endl;
 
             if (has_static_errors(contents)) {
-                error_occurred(caller, get_static_errors_formatted(contents));
+                error_occurred(cxt, caller, get_static_errors_formatted(contents));
                 // Revert to previous
                 contents.clear();
                 duplicate_branch(previous_contents, contents);
@@ -72,7 +72,7 @@ namespace include_function {
             return;
 
         Branch& contents = as_branch(caller);
-        evaluate_branch(contents, caller);
+        evaluate_branch(cxt, contents);
     }
 
     void setup(Branch& kernel)

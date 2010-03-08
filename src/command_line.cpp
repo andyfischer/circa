@@ -92,8 +92,7 @@ int run_command_line(std::vector<std::string> args)
         Branch branch;
         parse_script(branch, args[1]);
 
-        Term errorListener;
-        evaluate_branch(branch, &errorListener);
+        evaluate_branch(branch);
 
         print_branch_raw(std::cout, branch);
         return 0;
@@ -198,11 +197,11 @@ int run_command_line(std::vector<std::string> args)
 
         Term error_listener;
 
-        evaluate_branch(main_branch, &error_listener);
+        EvalContext result = evaluate_branch(main_branch);
 
-        if (error_listener.hasError()) {
+        if (result.errorOccurred) {
             std::cout << "Error occurred:\n";
-            print_runtime_error_formatted(main_branch, std::cout);
+            print_runtime_error_formatted(result, std::cout);
             std::cout << std::endl;
             return 1;
         }

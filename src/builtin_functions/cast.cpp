@@ -5,13 +5,13 @@
 namespace circa {
 namespace cast_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         if (!value_fits_type(caller->input(0), caller->type, NULL)) {
             std::stringstream message;
             message << "Value of type " << caller->input(0)->type->name;
             message << " doesn't fit in type " << caller->type->name << ".";
-            return error_occurred(caller, message.str());
+            return error_occurred(cxt, caller, message.str());
         }
         
         assign_value(caller->input(0), caller);

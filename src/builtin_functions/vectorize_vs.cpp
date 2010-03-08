@@ -10,7 +10,7 @@ namespace vectorize_vs_function {
         return caller->input(0)->type;
     }
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         Term* func = as_ref(function_t::get_parameters(caller->function));
 
@@ -29,7 +29,7 @@ namespace vectorize_vs_function {
                 apply(output, func, RefList(left[i], right));
         }
 
-        evaluate_branch(output, caller);
+        evaluate_branch(cxt, output);
     }
 
     void setup(Branch& kernel)

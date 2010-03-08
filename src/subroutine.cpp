@@ -21,7 +21,7 @@ namespace subroutine_t {
         return result.str();
     }
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         Term* function = caller->function;
         Branch& functionBranch = as_branch(function);
@@ -41,7 +41,7 @@ namespace subroutine_t {
             std::stringstream msg;
             msg << "Wrong number of inputs, expected: " << num_inputs
                 << ", found: " << caller->inputs.length();
-            error_occurred(caller, msg.str());
+            error_occurred(cxt, caller, msg.str());
             return;
         }
 
@@ -61,15 +61,10 @@ namespace subroutine_t {
             assign_overwriting_type(caller->inputs[input], term);
         }
 
-        Term errorListener;
-        evaluate_branch(functionBranch, &errorListener);
+        evaluate_branch(cxt, functionBranch);
 
-        if (errorListener.hasError()) {
-            nested_error_occurred(caller);
-        }
-
-        // No error occurred, copy output
-        else if (functionBranch.length() > 0) {
+        // Copy output if no error occurred
+        if (!cxt->errorOccurred && functionBranch.length() > 0) {
             Term* output = functionBranch[functionBranch.length()-1];
             assert(output->name == "#out");
             if (output->type != VOID_TYPE)

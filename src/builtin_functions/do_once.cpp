@@ -5,12 +5,12 @@
 namespace circa {
 namespace do_once_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         Term* done = caller->input(0);
 
         if (!as_bool(done)) {
-            evaluate_branch(caller->asBranch(), caller);
+            evaluate_branch(cxt, caller->asBranch());
             set_bool(done, true);
         }
     }

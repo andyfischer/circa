@@ -30,11 +30,10 @@ void test_migration(std::string sourceCode, std::string destinationCode,
         return;
     }
 
-    Term errorListener;
-    evaluate_branch(source, &errorListener);
-    if (errorListener.hasError()) {
+    EvalContext result = evaluate_branch(source);
+    if (result.errorOccurred) {
         std::cout << "In " << get_current_test_name() << std::endl;
-        print_runtime_error_formatted(source, std::cout);
+        print_runtime_error_formatted(result, std::cout);
         declare_current_test_failed();
         return;
     }
@@ -44,11 +43,11 @@ void test_migration(std::string sourceCode, std::string destinationCode,
     Branch& assertions = create_branch(destination, "assertions");
     parser::compile(&assertions, parser::statement_list, assertionsCode);
 
-    evaluate_branch(destination, &errorListener);
+    result = evaluate_branch(destination);
 
-    if (errorListener.hasError()) {
+    if (result.errorOccurred) {
         std::cout << "In " << get_current_test_name() << std::endl;
-        print_runtime_error_formatted(destination, std::cout);
+        print_runtime_error_formatted(result, std::cout);
         declare_current_test_failed();
         return;
     }

@@ -7,8 +7,12 @@
 
 namespace circa {
 
+void evaluate_term(EvalContext* cxt, Term* term);
 void evaluate_term(Term* term);
-void evaluate_branch(Branch& branch, Term* errorListener=NULL);
+void evaluate_branch(EvalContext* context, Branch& branch);
+
+// Shorthand to call evaluate_branch with a new EvalContext:
+EvalContext evaluate_branch(Branch& branch);
 
 // Perform 'apply' and then evaluate the result.
 Term* apply_and_eval(Branch& branch, Term* function, RefList const& inputs);

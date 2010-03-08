@@ -5,7 +5,7 @@
 namespace circa {
 namespace set_field_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         assign_value(caller->input(0), caller);
 
@@ -16,7 +16,7 @@ namespace set_field_function {
             int index = head->value_type->findFieldIndex(name);
 
             if (index == -1) {
-                error_occurred(caller, "field not found: "+name);
+                error_occurred(cxt, caller, "field not found: "+name);
                 return;
             }
 

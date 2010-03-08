@@ -61,12 +61,11 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     Branch& assertions = create_branch(code, "assertions");
     parser::compile(&assertions, parser::statement_list, assertionsStr);
 
-    Term errorListener;
-    evaluate_branch(code, &errorListener);
+    EvalContext result = evaluate_branch(code);
 
-    if (errorListener.hasError()) {
+    if (result.errorOccurred) {
         std::cout << "Runtime error in: " << get_current_test_name() << std::endl;
-        print_runtime_error_formatted(code, std::cout);
+        print_runtime_error_formatted(result, std::cout);
         std::cout << std::endl;
         print_branch_raw(std::cout, code);
         declare_current_test_failed();

@@ -5,10 +5,10 @@
 namespace circa {
 namespace branch_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate(EvalContext* cxt, Term* caller)
     {
         Branch& branch = as_branch(caller);
-        evaluate_branch(branch, caller);
+        evaluate_branch(cxt, branch);
     }
 
     std::string toSourceString(Term* term) {

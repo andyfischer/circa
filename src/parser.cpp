@@ -1315,8 +1315,10 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
     // Special case for include() function: expand the contents immediately.
     if (result->function == INCLUDE_FUNC
             && is_string(result->input(1))
-            && result->input(1)->asString() != "")
-        include_function::load_script(NULL, result);
+            && result->input(1)->asString() != "") {
+        EvalContext cxt;
+        include_function::load_script(&cxt, result);
+    }
 
     return result;
 }
