@@ -28,7 +28,7 @@ void key_down(EvalContext*, Term* caller)
     set_bool(caller, KEY_DOWN[i]);
 }
 
-void key_pressed(EvalContext*, Term* caller)
+void key_pressed(EvalContext* cxt, Term* caller)
 {
     if (is_int(caller->input(0))) {
         int key = as_int(caller->input(0));
@@ -45,7 +45,7 @@ void key_pressed(EvalContext*, Term* caller)
     if (is_string(caller->input(0))) {
         std::string const& key = caller->input(0)->asString();
         if (key.length() != 1) {
-            error_occurred(caller, "Expected a string of length 1");
+            error_occurred(cxt, caller, "Expected a string of length 1");
             return;
         }
 

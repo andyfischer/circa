@@ -119,12 +119,12 @@ bool reload_runtime()
 
 bool evaluate_main_script()
 {
-    Term errorListener;
-    evaluate_branch(runtime_branch(), &errorListener);
+    EvalContext context;
+    evaluate_branch(&context, runtime_branch());
 
-    if (errorListener.hasError()) {
+    if (context.errorOccurred) {
         std::cout << "Runtime error:" << std::endl;
-        print_runtime_error_formatted(runtime_branch(), std::cout);
+        print_runtime_error_formatted(context, std::cout);
         std::cout << std::endl;
         PAUSED = true;
         PAUSE_REASON = RUNTIME_ERROR;

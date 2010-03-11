@@ -20,7 +20,7 @@ namespace postprocess_functions
         void set_height(Term* term, int h) { set_int(term->field(3), h); }
     }
     
-    void make_surface(EvalContext*, Term* caller)
+    void make_surface(EvalContext* cxt, Term* caller)
     {
         gl_clear_error();
         Term* surface = caller->input(0);
@@ -44,7 +44,7 @@ namespace postprocess_functions
             glBindTexture(GL_TEXTURE_2D, 0);
             surface_t::set_tex_id(surface, tex_id);
 
-            if (gl_check_error(caller))
+            if (gl_check_error(cxt, caller))
                 return;
 
             // Create FBO
@@ -56,7 +56,7 @@ namespace postprocess_functions
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
             surface_t::set_fbo_id(surface, fbo_id);
 
-            if (gl_check_error(caller))
+            if (gl_check_error(cxt, caller))
                 return;
 
 
@@ -86,13 +86,13 @@ namespace postprocess_functions
         bound_surface_height = height;
     }
 
-    void bind_surface_hosted(EvalContext*, Term* caller)
+    void bind_surface_hosted(EvalContext* cxt, Term* caller)
     {
         bind_surface(caller->input(0));
-        gl_check_error(caller);
+        gl_check_error(cxt, caller);
     }
 
-    void draw_surface(EvalContext*, Term* caller)
+    void draw_surface(EvalContext* cxt, Term* caller)
     {
         Term* source_surface = caller->input(0);
         int tex_id = surface_t::get_tex_id(source_surface);
@@ -114,10 +114,10 @@ namespace postprocess_functions
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        gl_check_error(caller);
+        gl_check_error(cxt, caller);
     }
 
-    void copy_surface(EvalContext*, Term* caller)
+    void copy_surface(EvalContext* cxt, Term* caller)
     {
         Term* source_surface = caller->input(0);
         Term* dest_surface = caller->input(1);

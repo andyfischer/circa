@@ -49,13 +49,13 @@ GLenum get_texture_format(SDL_Surface *surface)
     }
 }
 
-GLuint load_image_to_texture(const char* filename, Term* errorListener)
+GLuint load_image_to_texture(EvalContext* cxt, Term* term, const char* filename)
 {
     SDL_Surface* surface = IMG_Load(filename);
     if (surface == NULL) {
         std::stringstream msg;
         msg << "Error loading " << filename << ": " << SDL_GetError();
-        error_occurred(errorListener, msg.str());
+        error_occurred(cxt, term, msg.str());
         return 0;
     }
 
@@ -133,13 +133,13 @@ SDL_Surface* convert_indexed_color_to_true_color(SDL_Surface* surface)
     return replacement;
 }
 
-void load_image(EvalContext*, Term* caller)
+void load_image(EvalContext* cxt, Term* caller)
 {
     std::string const& filename = caller->input(0)->asString();
 
     SDL_Surface* surface = IMG_Load(filename.c_str());
     if (surface == NULL) {
-        error_occurred(caller, "Error loading " + filename + ": " + SDL_GetError());
+        error_occurred(cxt, caller, "Error loading " + filename + ": " + SDL_GetError());
         return;
     }
 
@@ -154,7 +154,7 @@ void load_image(EvalContext*, Term* caller)
     SDL_FreeSurface(surface);
 }
 
-void draw_image(EvalContext*, Term* caller)
+void draw_image(EvalContext* cxt, Term* caller)
 {
     Term* image = caller->input(0);
     Term* point = caller->input(1);
@@ -178,10 +178,10 @@ void draw_image(EvalContext*, Term* caller)
     glEnd();
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 }
 
-void draw_image_clip(EvalContext*, Term* caller)
+void draw_image_clip(EvalContext* cxt, Term* caller)
 {
     Term* image = caller->input(0);
     Term* clip = caller->input(1);
@@ -227,7 +227,7 @@ void draw_image_clip(EvalContext*, Term* caller)
     glEnd();
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 }
 
 namespace image {

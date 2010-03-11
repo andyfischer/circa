@@ -103,12 +103,10 @@ bool resize_display(int width, int height)
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    Term errorListener;
-    gl_check_error(&errorListener, " (initialize display)");
+    char errorBuf[50];
 
-    if (errorListener.hasError()) {
-        std::cerr << "GL error during initialization: "
-            << get_runtime_error_message(&errorListener) << std::endl;
+    if (gl_check_error(errorBuf)) {
+        std::cerr << "GL error during initialization: " << errorBuf << std::endl;
         return false;
     }
 
@@ -123,10 +121,9 @@ void render_frame()
     evaluate_main_script();
 
     // Check for uncaught GL error
-    Term errorListener;
-    gl_check_error(&errorListener, " (uncaught)");
-    if (errorListener.hasError())
-        std::cout << get_runtime_error_message(&errorListener) << std::endl;
+    char errorBuf[50];
+    if (gl_check_error(errorBuf))
+        std::cout << errorBuf << " (uncaught in render_frame())" << std::endl;
 
     // Update the screen
     SDL_GL_SwapBuffers();

@@ -4,7 +4,7 @@
 #define PLASTIC_IMAGE_INCLUDED
 
 GLenum get_texture_format(SDL_Surface *surface);
-GLuint load_image_to_texture(const char* filename, circa::Term* errorListener);
+GLuint load_image_to_texture(circa::EvalContext* cxt, circa::Term* term, const char* filename);
 GLuint load_surface_to_texture(SDL_Surface *surface);
 
 bool has_indexed_color(SDL_Surface* surface);

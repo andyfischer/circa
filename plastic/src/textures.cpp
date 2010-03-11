@@ -16,21 +16,21 @@ using namespace circa;
 
 namespace textures {
 
-void hosted_load_texture(EvalContext*, Term* caller)
+void hosted_load_texture(EvalContext* cxt, Term* caller)
 {
     Int texid = caller->input(0);
 
     if (texid == 0) {
         std::string filename = caller->input(1)->asString();
-        GLuint id = load_image_to_texture(filename.c_str(), caller);
+        GLuint id = load_image_to_texture(cxt, caller, filename.c_str());
         texid = id;
     }
     set_int(caller, texid);
 
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 }
 
-void hosted_image(EvalContext*, Term* caller)
+void hosted_image(EvalContext* cxt, Term* caller)
 {
     Int texid = caller->input(0);
     std::string filename = caller->input(1)->asString();
@@ -40,7 +40,7 @@ void hosted_image(EvalContext*, Term* caller)
     float y2 = caller->input(5)->toFloat();
 
     if (texid == 0) {
-        texid = load_image_to_texture(filename.c_str(), caller);
+        texid = load_image_to_texture(cxt, caller, filename.c_str());
         if (caller->hasError()) return;
     }
 
@@ -62,7 +62,7 @@ void hosted_image(EvalContext*, Term* caller)
     // reset state
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 }
 
 void setup(circa::Branch& branch)

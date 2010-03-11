@@ -17,7 +17,7 @@ void _unpack_gl_color(Term* colorTerm)
                  color[2]->asFloat(), color[3]->asFloat());
 }
 
-void background(EvalContext*, Term* caller)
+void background(EvalContext* cxt, Term* caller)
 {
     gl_clear_error();
 
@@ -28,10 +28,10 @@ void background(EvalContext*, Term* caller)
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 }
 
-void gl_triangles(EvalContext*, Term* caller)
+void gl_triangles(EvalContext* cxt, Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
     Term* color = caller->input(1);
@@ -49,10 +49,10 @@ void gl_triangles(EvalContext*, Term* caller)
 
     glEnd();
 
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 }
 
-void gl_line_strip(EvalContext*, Term* caller)
+void gl_line_strip(EvalContext* cxt, Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
     Term* color = caller->input(1);
@@ -69,10 +69,10 @@ void gl_line_strip(EvalContext*, Term* caller)
     
     glEnd();
 
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 }
 
-void gl_line_loop(EvalContext*, Term* caller)
+void gl_line_loop(EvalContext* cxt, Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
     Term* color = caller->input(1);
@@ -89,10 +89,10 @@ void gl_line_loop(EvalContext*, Term* caller)
     
     glEnd();
 
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 }
 
-void gl_points(EvalContext*, Term* caller)
+void gl_points(EvalContext* cxt, Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
     Term* color = caller->input(1);
@@ -109,10 +109,10 @@ void gl_points(EvalContext*, Term* caller)
     
     glEnd();
 
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 }
 
-void gl_circle(EvalContext*, Term* caller)
+void gl_circle(EvalContext* cxt, Term* caller)
 {
     float x = 0;
     float y = 0;
@@ -139,10 +139,10 @@ void gl_circle(EvalContext*, Term* caller)
 
     glEnd();
 
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 }
 
-void gl_pie(EvalContext*, Term* caller)
+void gl_pie(EvalContext* cxt, Term* caller)
 {
     float x = 0;
     float y = 0;
@@ -184,7 +184,7 @@ void gl_pie(EvalContext*, Term* caller)
     glEnd();
 }
 
-void load_program(EvalContext*, Term* caller)
+void load_program(EvalContext* cxt, Term* caller)
 {
     std::string vertFilename =
         get_path_relative_to_source(caller, caller->input(0)->asString());
@@ -192,11 +192,11 @@ void load_program(EvalContext*, Term* caller)
         get_path_relative_to_source(caller, caller->input(1)->asString());
 
     if (!file_exists(vertFilename)) {
-        error_occurred(caller, "File not found: " + vertFilename);
+        error_occurred(cxt, caller, "File not found: " + vertFilename);
         return;
     }
     if (!file_exists(fragFilename)) {
-        error_occurred(caller, "File not found: " + fragFilename);
+        error_occurred(cxt, caller, "File not found: " + fragFilename);
         return;
     }
 
@@ -212,7 +212,7 @@ void load_program(EvalContext*, Term* caller)
     if (!success) {
         GLchar error[256];
         glGetShaderInfoLog(vertShader, sizeof(error), 0, error);
-        error_occurred(caller, error);
+        error_occurred(cxt, caller, error);
         return;
     }
 
@@ -227,7 +227,7 @@ void load_program(EvalContext*, Term* caller)
     if (!success) {
         GLchar error[256];
         glGetShaderInfoLog(fragShader, sizeof(error), 0, error);
-        error_occurred(caller, error);
+        error_occurred(cxt, caller, error);
         return;
     }
 
@@ -241,30 +241,30 @@ void load_program(EvalContext*, Term* caller)
     {
         GLchar error[256];
         glGetProgramInfoLog(program, sizeof(error), 0, error);
-        error_occurred(caller, error);
+        error_occurred(cxt, caller, error);
         return;
     }
 
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 
     set_int(caller, program);
 }
 
-void use_program(EvalContext*, Term* caller)
+void use_program(EvalContext* cxt, Term* caller)
 {
     current_program = int_input(caller, 0);
     glUseProgram(current_program);
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 }
 
-void set_uniform(EvalContext*, Term* caller)
+void set_uniform(EvalContext* cxt, Term* caller)
 {
     const char* name = string_input(caller, 0);
     Term* input = caller->input(1);
 
     GLint loc = glGetUniformLocation(current_program, name);
 
-    if (gl_check_error(caller))
+    if (gl_check_error(cxt, caller))
         return;
 
     if (input->type == INT_TYPE)
@@ -287,7 +287,7 @@ void set_uniform(EvalContext*, Term* caller)
             int item_length = contents[0]->asBranch().length();
 
             if (item_length != 2) {
-                error_occurred(caller, "Unsupported item length");
+                error_occurred(cxt, caller, "Unsupported item length");
                 return;
             }
 
@@ -305,11 +305,11 @@ void set_uniform(EvalContext*, Term* caller)
         }
 
     } else {
-        error_occurred(caller, "Unsupported type: " + input->type->name);
+        error_occurred(cxt, caller, "Unsupported type: " + input->type->name);
         return;
     }
 
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 }
 
 void setup(Branch& branch)

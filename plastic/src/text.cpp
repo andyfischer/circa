@@ -39,7 +39,7 @@ SDL_Color unpack_sdl_color(Term* colorTerm)
     return c;
 }
 
-void load_font(EvalContext*, Term* term)
+void load_font(EvalContext* cxt, Term* term)
 {
     TTF_Font_ptr state = term->input(0);
     TTF_Font_ptr output = term;
@@ -58,7 +58,7 @@ void load_font(EvalContext*, Term* term)
     if (result == NULL) {
         std::stringstream err;
         err << "TTF_OpenFont failed to load " << path << " with error: " << TTF_GetError();
-        error_occurred(term, err.str());
+        error_occurred(cxt, term, err.str());
         return;
     }
 
@@ -118,7 +118,7 @@ void render_text(EvalContext*, Term* caller)
     assign_value(caller->input(0), caller);
 }
 
-void draw_rendered_text(EvalContext*, Term* caller)
+void draw_rendered_text(EvalContext* cxt, Term* caller)
 {
     RenderedText output(caller->input(0));
 
@@ -147,7 +147,7 @@ void draw_rendered_text(EvalContext*, Term* caller)
     // reset state
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    gl_check_error(caller);
+    gl_check_error(cxt, caller);
 }
 
 void pre_setup(Branch& branch)

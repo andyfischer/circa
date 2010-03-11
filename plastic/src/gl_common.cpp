@@ -7,11 +7,8 @@ void gl_clear_error()
     glGetError();
 }
 
-bool gl_check_error(circa::Term* errorListener, const char* note)
+bool gl_check_error(char* buf)
 {
-    if (errorListener->hasError())
-        return true;
-
     // With thanks to Philip Rideout for example code. See: http://prideout.net/bloom/index.php
     char enums[][20] =
     {
@@ -28,11 +25,21 @@ bool gl_check_error(circa::Term* errorListener, const char* note)
         return false;
 
     errcode -= GL_INVALID_ENUM;
+    sprintf(buf, "OpenGL reported error: %s", enums[errcode]);
+    return true;
+}
+
+bool gl_check_error(circa::EvalContext* cxt, circa::Term* term)
+{
+    if (cxt->errorOccurred)
+        return true;
 
     char buf[50];
-    sprintf(buf, "OpenGL reported error: %s%s", enums[errcode], note);
+    bool error = gl_check_error(buf);
 
-    circa::error_occurred(errorListener, buf);
+    if (error) {
+        circa::error_occurred(cxt, term, buf);
+    }
 
-    return true;
+    return error;
 }
