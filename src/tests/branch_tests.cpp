@@ -304,10 +304,10 @@ void test_migrate2()
     Branch source, dest;
 
     Term* a = dest.eval("state a = 1");
-    /*Term* b =*/ dest.eval("state b = 2");
+    dest.eval("state b = 2");
 
-    /*Term* a2 =*/ source.eval("state a = 3");
-    /*Term* c =*/ source.eval("state c = 4");
+    source.eval("state a = 3");
+    source.eval("state c = 4");
 
     migrate_stateful_values(source, dest);
 
@@ -370,9 +370,7 @@ void test_get_source_file_location()
 {
     Branch branch;
     create_string(branch, "c:/a/b/something.ca", "attr:source-file");
-
     test_equals(get_source_file_location(branch), "c:/a/b");
-
     test_assert(branch);
 }
 

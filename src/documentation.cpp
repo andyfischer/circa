@@ -19,6 +19,19 @@ void escape_string_for_json(std::string s, std::stringstream& out)
     }
 }
 
+std::string escape_newlines(std::string s)
+{
+    std::stringstream out;
+
+    for (unsigned i=0; i < s.length(); i++) {
+        if (s[i] == '\n')
+            out << "\\n";
+        else
+            out << s[i];
+    }
+    return out.str();
+}
+
 bool hidden_from_documentation(Term* term)
 {
     if (is_hidden(term))

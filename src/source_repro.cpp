@@ -48,6 +48,9 @@ bool has_source_location_defined(Term* term)
 
 std::string get_source_of_input(Term* term, int inputIndex)
 {
+    Term* input = term->input(inputIndex);
+    bool memberCall = term->stringPropOptional("syntax:declarationStyle", "") == "member-function-call";
+
     int firstVisible = get_first_visible_input_index(term);
 
     if (inputIndex < firstVisible)
@@ -55,12 +58,16 @@ std::string get_source_of_input(Term* term, int inputIndex)
 
     int visibleIndex = inputIndex - firstVisible;
 
-    Term* input = term->input(inputIndex);
+    if (memberCall)
+        visibleIndex--;
 
     std::stringstream result;
 
     std::string defaultPre = visibleIndex > 0 ? " " : "";
     std::string defaultPost = (inputIndex+1 < term->numInputs()) ? "," : "";
+
+    if (memberCall && inputIndex == 0)
+        defaultPost = "";
 
     result << get_input_syntax_hint_optional(term, visibleIndex, "preWhitespace", defaultPre);
 
@@ -200,6 +207,21 @@ std::string get_term_source_default_formatting(Term* term)
             result << "(";
 
         for (int i=get_first_visible_input_index(term); i < term->numInputs(); i++)
+            result << get_source_of_input(term, i);
+
+        if (!term->boolPropOptional("syntax:no-parens", false))
+            result << ")";
+
+    } else if (declarationStyle == "member-function-call") {
+
+        result << get_source_of_input(term, 0);
+        result << ".";
+        result << functionName;
+
+        if (!term->boolPropOptional("syntax:no-parens", false))
+            result << "(";
+
+        for (int i=1; i < term->numInputs(); i++)
             result << get_source_of_input(term, i);
 
         if (!term->boolPropOptional("syntax:no-parens", false))

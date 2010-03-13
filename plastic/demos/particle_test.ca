@@ -1,0 +1,43 @@
+
+background(#000)
+
+type Particle {
+    number age
+    Point loc
+    Point vel
+}
+
+state List particles
+
+def generate_particle_burst(List particles, Point loc, Point vel) -> List
+    for i in 0..10
+        a = rand()
+        particles.append([0 loc vel + [cos(a) sin(a)] * 100*rand() ] -> Particle)
+    end
+    return particles
+end
+
+max_particle_age = 3.0
+
+for particle in @particles
+    particle = particle -> Particle
+
+    lifespan = particle.age / max_particle_age
+    max(@lifespan, 1.0)
+    color = #555 + #111 * (lifespan * 9)
+
+    gl:points([particle.loc], color)
+
+    particle.loc = particle.loc + particle.vel * td
+    particle.age = particle.age + td
+
+    if particle.age > max_particle_age
+        discard
+    end
+end
+
+if mouse_clicked()
+    generate_particle_burst(@particles, mouse, [0 0])
+end
+
+generate_particle_burst(@particles, [200 200], [10 0])

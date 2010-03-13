@@ -26,6 +26,9 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     Branch code;
     parser::compile(&code, parser::statement_list, codeStr);
 
+    // Reproduce source of 'code', checked later.
+    std::string codeSourceRepro = get_branch_source(code);
+
     if (has_static_errors(code)) {
         std::cout << "In code snippet: " << codeStr << std::endl;
         print_static_errors_formatted(code, std::cout);
@@ -56,6 +59,8 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
             it.skipNextBranch();
             continue;
         }
+
+        // (todo)
     }
 
     Branch& assertions = create_branch(code, "assertions");
@@ -106,7 +111,31 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         std::cout << "no boolean statements found in: " << assertionsStr << std::endl;
         print_branch_raw(std::cout, code);
         declare_current_test_failed();
+        return;
     }
+
+    // Check source reproduction
+#if 0
+    if (codeStr != codeSourceRepro) {
+        std::cout << "Source reproduction fail in: " << get_current_test_name() << std::endl;
+        std::cout << "Expected:\n  " << escape_newlines(codeStr) << "\n";
+        std::cout << "Observed:\n  " << escape_newlines(codeSourceRepro);
+        std::cout << std::endl;
+        declare_current_test_failed();
+        return;
+    }
+
+    std::string assertionsRepro = get_branch_source(assertions);
+    if (assertionsStr != assertionsRepro) {
+        std::cout << "Source reproduction fail in: " << get_current_test_name() << std::endl;
+        std::cout << "Expected: "
+            << escape_newlines(assertionsStr) << "\n";
+        std::cout << "Observed: " << escape_newlines(assertionsRepro);
+        std::cout << std::endl;
+        declare_current_test_failed();
+        return;
+    }
+#endif
 }
 
 void test_strings()
@@ -229,7 +258,7 @@ void test_rounding()
 
 void test_boolean_ops()
 {
-    test_snippet("", "true and true)");
+    test_snippet("", "true and true");
     test_snippet("", "not(true and false)");
     test_snippet("", "not(false and true)");
     test_snippet("", "not(false and false)");
@@ -239,6 +268,14 @@ void test_boolean_ops()
     test_snippet("", "not(false or false)");
     test_snippet("", "true and true or false");
     test_snippet("", "false and true or true");
+}
+
+void test_cond()
+{
+    test_snippet("", "cond(true, 'a', 'b') == 'a'");
+    test_snippet("", "cond(false, 'a', 'b') == 'b'");
+    test_snippet("", "cond(true, 5, true) == 5");
+    test_snippet("", "cond(false, 5, true) == true");
 }
 
 void test_for_loops()
@@ -253,10 +290,10 @@ void test_for_loops()
 
     test_snippet("a = []; if true a.append(1) a.append(2) end; for i in a; add(i,i) end", "");
 
-    //test_snippet("a = [1 2 3];for i in @a; if i == 1 discard end end", "a == [2 3]");
-    //test_snippet("a = [1 2 3];for i in @a; if i == 2 discard end end", "a == [1 3]");
-    //test_snippet("a = [1 2 3];for i in @a; if i == 3 discard end end", "a == [1 2]");
-    //test_snippet("a = [1 2 3];for i in @a; i += 1 if i == 3 discard end end", "a == [2 4]");
+    test_snippet("a = [1 2 3];for i in @a; if i == 1 discard end end", "a == [2 3]");
+    test_snippet("a = [1 2 3];for i in @a; if i == 2 discard end end", "a == [1 3]");
+    test_snippet("a = [1 2 3];for i in @a; if i == 3 discard end end", "a == [1 2]");
+    test_snippet("a = [1 2 3];for i in @a; i += 1 if i == 3 discard end end", "a == [2 4]");
 }
 
 void test_subscripting()
@@ -370,6 +407,9 @@ void test_significant_indentation()
 void test_concat()
 {
     test_snippet("", "concat('a' 'b' 'c') == 'abc'");
+    test_snippet("", "concat(\"hello \", \"world\") == \"hello world\"");
+    test_snippet("", "concat(1) == '1'");
+    test_snippet("", "concat() == ''");
 }
 
 void test_misc()
@@ -392,6 +432,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_blocks);
     REGISTER_TEST_CASE(test_snippets::test_rounding);
     REGISTER_TEST_CASE(test_snippets::test_boolean_ops);
+    REGISTER_TEST_CASE(test_snippets::test_cond);
     REGISTER_TEST_CASE(test_snippets::test_for_loops);
     REGISTER_TEST_CASE(test_snippets::test_subscripting);
     REGISTER_TEST_CASE(test_snippets::test_set);

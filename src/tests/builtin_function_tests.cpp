@@ -58,13 +58,6 @@ void test_float()
     test_equals(point_one->toString(), "0.1");
 }
 
-void test_string()
-{
-    Branch branch;
-
-    test_equals(as_string(branch.eval("concat(\"hello \", \"world\")")), "hello world");
-}
-
 void test_bool()
 {
     Branch branch;
@@ -335,7 +328,6 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
     REGISTER_TEST_CASE(builtin_function_tests::test_float);
     REGISTER_TEST_CASE(builtin_function_tests::test_math);
-    REGISTER_TEST_CASE(builtin_function_tests::test_string);
     REGISTER_TEST_CASE(builtin_function_tests::test_bool);
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_list);

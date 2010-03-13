@@ -83,7 +83,8 @@ void print_term_raw_string(std::ostream& out, Term* term)
 
 void print_term_raw_string_with_properties(std::ostream& out, Term* term)
 {
-    out << term_to_raw_string(term) + " " + dict_t::to_string(term->properties);
+    print_term_to_string_extended(out, term);
+    out << " " << dict_t::to_string(term->properties);
 }
 
 std::string term_to_raw_string(Term* term)
@@ -309,9 +310,16 @@ void print_term_to_string_extended(std::ostream& out, Term* term)
     out << format_global_id(term);
     if (term->name != "")
         out << " '" << term->name << "'";
-    out << " [fun:" << term->function->name << format_global_id(term->function)
+    out << " fun:" << term->function->name << format_global_id(term->function)
         << " dt:" << term->type->name << format_global_id(term->type)
-        << " vt:" << term->value_type->name << "] ";
+        << " vt:" << term->value_type->name
+        << " inputs:[";
+
+    for (int i=0; i < term->numInputs(); i++) {
+        if (i != 0) out << " ";
+        out << format_global_id(term->input(i));
+    }
+    out << "] ";
     if (!is_branch(term))
         out << to_string(term);
 }

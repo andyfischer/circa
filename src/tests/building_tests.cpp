@@ -37,6 +37,7 @@ void test_create_duplicate()
 
     test_assert(a->function == b->function);
     test_assert(a->type == b->type);
+    test_assert(a->value_type == b->value_type);
     test_assert(is_stateful(b));
 }
 
@@ -115,11 +116,6 @@ void test_set_input()
 
     test_assert(a->input(0) == b);
     test_assert(b->users[0] == a);
-}
-
-void test_user_list()
-{
-
 }
 
 void register_tests()

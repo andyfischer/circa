@@ -23,19 +23,6 @@ struct SourceReproResult {
 
 std::vector<SourceReproResult> gSourceReproResults;
 
-std::string convert_real_newlines_to_escaped(std::string s)
-{
-    std::stringstream out;
-
-    for (unsigned i=0; i < s.length(); i++) {
-        if (s[i] == '\n')
-            out << "\\n";
-        else
-            out << s[i];
-    }
-    return out.str();
-}
-
 void round_trip_source(std::string statement)
 {
     SourceReproResult result;
@@ -46,8 +33,8 @@ void round_trip_source(std::string statement)
 
     result.actual = get_branch_source(branch);
     result.passed = result.expected == result.actual;
-    result.actual = convert_real_newlines_to_escaped(result.actual);
-    result.expected = convert_real_newlines_to_escaped(result.expected);
+    result.actual = escape_newlines(result.actual);
+    result.expected = escape_newlines(result.expected);
     gSourceReproResults.push_back(result);
 }
 
@@ -166,6 +153,14 @@ void reproduce_infix() {
     //round_trip_source("complex =  (  4 + 3)  + 2.0");
     //round_trip_source("complex = (4 + 3  ) + 2.0");
     //round_trip_source("a.x");
+    finish_source_repro_category();
+}
+
+void reproduce_member_calls() {
+    round_trip_source("'string'.length()");
+    round_trip_source("Map().add(1,2)");
+    round_trip_source("Map().add(1, 2)");
+    round_trip_source("Point().x = 1.0");
     finish_source_repro_category();
 }
 
@@ -392,6 +387,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_stateful_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_function_calls);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_infix);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_member_calls);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebinding);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_if);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_lists);

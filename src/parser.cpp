@@ -1176,7 +1176,7 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
         tokens.consume(MINUS);
         Term* expr = subscripted_atom(branch, tokens);
 
-        // If the minus sign is on a literal number, then just negate it,
+        // If the minus sign is on a literal number, then just negate it in place,
         // rather than introduce a neg() operation.
         if (is_value(expr) && expr->name == "") {
             if (is_int(expr)) {
@@ -1243,8 +1243,9 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
         erase_term(originalFunctionTerm);
 
         Term* result = apply(branch, function, inputs, nameRebind);
-        set_input_syntax_hint(result, 0, "hidden", "true");
-        result->setStringProp("syntax:functionName", originalName);
+        set_input_syntax_hint(result, 0, "postWhitespace", "");
+        result->setStringProp("syntax:functionName", fieldName);
+        result->setStringProp("syntax:declarationStyle", "member-function-call");
 
         if (nameRebind != "")
             result->setBoolProp("syntax:implicitNameBinding", true);
@@ -1288,27 +1289,29 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
 
         index++;
     }
-    
-    //consume_list_arguments(branch, tokens, arguments, inputHints);
 
     if (!tokens.nextIs(RPAREN))
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
-
     tokens.consume(RPAREN);
     
-    std::string originalName = dotted_name_get_original_string(function);
+    //std::string originalName = dotted_name_get_original_string(function);
+    std::string originalName = function->name;
 
-    // Check if 'function' is a get_field. If so then parse this as a member function call.
-    if (function->function == GET_FIELD_FUNC)
-        return member_function_call(branch, function, arguments, originalName);
+    Term* result = NULL;
 
-    if (!is_callable(function))
-        function = UNKNOWN_FUNCTION;
-   
-    Term* result = apply(branch, function, arguments);
+    // Check if 'function' is a get_field term. If so, parse this as a member function call.
+    if (function->function == GET_FIELD_FUNC) {
+        result = member_function_call(branch, function, arguments, originalName);
+    } else {
 
-    if (result->function->name != originalName)
-        result->setStringProp("syntax:functionName", originalName);
+        if (!is_callable(function))
+            function = UNKNOWN_FUNCTION;
+       
+        result = apply(branch, function, arguments);
+
+        if (result->function->name != originalName)
+            result->setStringProp("syntax:functionName", originalName);
+    }
 
     inputHints.apply(result);
 
