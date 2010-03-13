@@ -45,7 +45,7 @@ namespace subroutine_t {
             return;
         }
 
-        // Implant inputs
+        // Load inputs
         for (int input=0; input < num_inputs; input++) {
 
             std::string inputName = function_t::get_input_name(function, input);
@@ -58,7 +58,11 @@ namespace subroutine_t {
 
             assert(term->function == INPUT_PLACEHOLDER_FUNC);
 
-            assign_overwriting_type(caller->inputs[input], term);
+            Term* incomingTerm = caller->input(input);
+            if (term->type == ANY_TYPE)
+                assign_overwriting_type(incomingTerm, term);
+            else
+                assign_value(incomingTerm, term);
         }
 
         evaluate_branch(cxt, functionBranch);

@@ -77,7 +77,7 @@ void register_tests()
     REGISTER_TEST_CASE(dynamic_type_tests::test_copy);
     REGISTER_TEST_CASE(dynamic_type_tests::test_subroutine);
     REGISTER_TEST_CASE(dynamic_type_tests::test_field_access);
-    //REGISTER_TEST_CASE(dynamic_type_tests::test_subroutine_inputs);
+    REGISTER_TEST_CASE(dynamic_type_tests::test_subroutine_inputs);
 }
 
 } // namespace dynamic_type_tests

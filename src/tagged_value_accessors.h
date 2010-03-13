@@ -14,6 +14,7 @@ namespace circa {
 // then we'll do a shallow copy.
 void assign_value(TaggedValue* source, TaggedValue* dest);
 void assign_overwriting_type(TaggedValue* source, TaggedValue* dest);
+void cast(Type* type, TaggedValue* source, TaggedValue* dest);
 
 void change_type(TaggedValue* v, Type* type);
 bool equals(TaggedValue* lhs, TaggedValue* rhs);
