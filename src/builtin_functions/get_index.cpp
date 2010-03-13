@@ -25,7 +25,7 @@ namespace get_index_function {
 
         // TEMP:
         change_type(caller, input[index]->type);
-        assign_overwriting_type(input[index], caller);
+        copy(input[index], caller);
     }
 
     std::string toSourceString(Term* term)

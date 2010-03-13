@@ -21,20 +21,20 @@ TaggedValue::~TaggedValue()
     change_type(this, NULL_T);
 }
 
-TaggedValue::TaggedValue(TaggedValue const& copy)
+TaggedValue::TaggedValue(TaggedValue const& original)
 {
     value_type = NULL_T;
     value_data.ptr = 0;
 
-    Term* source = (Term*) &copy;
-    assign_overwriting_type(source, this);
+    Term* source = (Term*) &original;
+    copy(source, this);
 }
 
 TaggedValue&
 TaggedValue::operator=(TaggedValue const& rhs)
 {
     Term* source = (Term*) &rhs;
-    assign_overwriting_type(source, this);
+    copy(source, this);
     return *this;
 }
 

@@ -386,7 +386,7 @@ namespace branch_t {
             // Change type if needed
             if (source[i]->type != dest[i]->type)
                 change_type(source[i], dest[i]->type);
-            assign_overwriting_type(source[i], dest[i]);
+            copy(source[i], dest[i]);
         }
 
         // Add terms if necessary

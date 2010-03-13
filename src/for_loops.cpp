@@ -217,7 +217,7 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
         set_bool(discardCalled, false);
 
         // Inject iterator value
-        assign_overwriting_type(listTerm->asBranch()[i], iterator);
+        copy(listTerm->asBranch()[i], iterator);
 
         // Inject stateful terms
         if (stateBranch != NULL)
@@ -245,7 +245,7 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
                 create_value(listOutputBr, iteratorResult->type);
             Term* outputElement = listOutputBr[listOutputWriteHead++];
         
-            assign_overwriting_type(iteratorResult, outputElement);
+            copy(iteratorResult, outputElement);
         }
     }
 

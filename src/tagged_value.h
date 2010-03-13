@@ -19,7 +19,7 @@ struct TaggedValue
 
     TaggedValue();
     ~TaggedValue();
-    TaggedValue(TaggedValue const& copy);
+    TaggedValue(TaggedValue const&);
     TaggedValue& operator=(TaggedValue const& rhs);
 };
 

@@ -7,7 +7,7 @@ namespace copy_function {
 
     void evaluate(EvalContext*, Term* caller)
     {
-        assign_overwriting_type(caller->input(0), caller);
+        copy(caller->input(0), caller);
     }
 
     Term* specializeType(Term* caller)

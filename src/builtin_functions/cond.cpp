@@ -9,7 +9,7 @@ namespace cond_function {
     {
         int index = bool_input(caller,0) ? 1 : 2;
         Term *result = caller->inputs[index];
-        assign_overwriting_type(result, caller);
+        copy(result, caller);
     }
 
     Term* specializeType(Term* caller)
@@ -27,7 +27,7 @@ namespace cond_function {
         // cond(condition, pos, neg)
         //
         // For condition, don't try to send feedback
-        assign_overwriting_type(target->input(0), output[0]);
+        copy(target->input(0), output[0]);
 
         // For pos and neg, pass along the feedback that we have received,
         // depending on the value of cond
@@ -37,7 +37,7 @@ namespace cond_function {
 
         for (int i=1; i < 2; i++) {
             Term* signal = (i == indexUsed) ? desired : target->input(i);
-            assign_overwriting_type(signal, output[i]);
+            copy(signal, output[i]);
         }
     }
 

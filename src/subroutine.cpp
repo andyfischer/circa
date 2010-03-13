@@ -60,7 +60,7 @@ namespace subroutine_t {
 
             Term* incomingTerm = caller->input(input);
             if (term->type == ANY_TYPE)
-                assign_overwriting_type(incomingTerm, term);
+                copy(incomingTerm, term);
             else
                 assign_value(incomingTerm, term);
         }
@@ -72,7 +72,7 @@ namespace subroutine_t {
             Term* output = functionBranch[functionBranch.length()-1];
             assert(output->name == "#out");
             if (output->type != VOID_TYPE)
-                assign_overwriting_type(output, caller);
+                copy(output, caller);
         }
 
         // Store state

@@ -46,7 +46,7 @@ void assign_value(TaggedValue* source, TaggedValue* dest)
     }
 }
 
-void assign_overwriting_type(TaggedValue* source, TaggedValue* dest)
+void copy(TaggedValue* source, TaggedValue* dest)
 {
     change_type(dest, source->value_type);
     assign_value(source, dest);

@@ -12,7 +12,7 @@ namespace changed_function {
 
         bool result;
         if (!equals(state, current)) {
-            assign_overwriting_type(current, state);
+            copy(current, state);
             result = true;
         } else {
             result = false;

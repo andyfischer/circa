@@ -23,7 +23,7 @@ namespace get_field_function {
             head = as_branch(head)[fieldIndex];
         }
 
-        assign_overwriting_type(head, caller);
+        copy(head, caller);
     }
 
     Term* specializeType(Term* caller)

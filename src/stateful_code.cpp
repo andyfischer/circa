@@ -60,7 +60,7 @@ void persist_state_from_branch(Branch& branch, Branch& state)
         rewrite_as_value(state, write, term->type);
         rename(state[write], term->name);
 
-        assign_overwriting_type(term, state[write]);
+        copy(term, state[write]);
 
         write++;
     }
