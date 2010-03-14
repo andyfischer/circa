@@ -61,12 +61,20 @@ void test_field_access()
     test_assert(branch);
 }
 
-void test_subroutine_inputs()
+void test_subroutine_input_and_output()
 {
     Branch branch;
 
     branch.compile("def f(Point p); p.x; end");
     branch.compile("f([1 2])");
+
+    evaluate_branch(branch);
+    test_assert(branch);
+
+    branch.compile("def f() -> any; return [1 1] -> Point end");
+    branch.compile("a = f()");
+    branch.compile("a.x");
+    branch.compile("f().y");
 
     evaluate_branch(branch);
     test_assert(branch);
@@ -77,7 +85,7 @@ void register_tests()
     REGISTER_TEST_CASE(dynamic_type_tests::test_copy);
     REGISTER_TEST_CASE(dynamic_type_tests::test_subroutine);
     REGISTER_TEST_CASE(dynamic_type_tests::test_field_access);
-    REGISTER_TEST_CASE(dynamic_type_tests::test_subroutine_inputs);
+    REGISTER_TEST_CASE(dynamic_type_tests::test_subroutine_input_and_output);
 }
 
 } // namespace dynamic_type_tests

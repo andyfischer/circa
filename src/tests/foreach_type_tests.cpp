@@ -35,6 +35,14 @@ bool run_test_for_type(Term* type, List& exampleValues)
     test_assert(branch);
     test_assert(equals(unbox1, x));
     test_assert(equals(unbox2, y));
+    branch.clear();
+
+    // Cast an integer to this type. This might cause an error but it shouldn't
+    // crash.
+    Term* cast = branch.compile("cast(1)");
+    change_type(cast, type);
+    evaluate_branch(branch);
+    branch.clear();
 
     return true;
 }
