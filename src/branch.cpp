@@ -345,7 +345,7 @@ namespace branch_t {
         set_pointer(value, new Branch());
     }
 
-    void destroy(Type*, TaggedValue* value)
+    void release(TaggedValue* value)
     {
         delete (Branch*) get_pointer(value);
         set_pointer(value, NULL);

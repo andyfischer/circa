@@ -152,7 +152,7 @@ namespace manual_memory_management_test {
         value->value_data.asint = pool_allocate();
     }
 
-    void destroy(Type* type, TaggedValue* value)
+    void release(TaggedValue* value)
     {
         pool_deallocate(value->value_data.asint);
     }
@@ -163,7 +163,7 @@ namespace manual_memory_management_test {
 
         Type myType;
         myType.initialize = initialize;
-        myType.destroy = destroy;
+        myType.release = release;
 
         TaggedValue value;
 
@@ -238,7 +238,7 @@ namespace refcount_test {
         value->value_data.asint = pool_allocate();
     }
 
-    void destroy(Type* type, TaggedValue* value)
+    void release(TaggedValue* value)
     {
         pool_deallocate(value->value_data.asint);
     }
@@ -255,7 +255,7 @@ namespace refcount_test {
     {
         Type myType;
         myType.initialize = initialize;
-        myType.destroy = destroy;
+        myType.release = release;
         myType.assign = assign;
 
         {

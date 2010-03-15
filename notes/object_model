@@ -1,0 +1,40 @@
+
+General purpose way to have first-class pluggable types
+
+Type
+TaggedValue
+
+Support different memory management:
+  No sharing
+    Initialize allocates
+    Release destroys
+  
+  RefCounting
+    Initialize increments count
+    Release decrements count, possibly deallocates
+
+  Garbage Collection
+    Type knows how to walk pointer lists
+    Master list of live objects
+
+Desired operations:
+  Create new empty object
+    Called: Initialize(Type*, TaggedValue* container)
+
+  Duplicate existing object
+    Not really duplicate for shared objects
+    Same as C++ copy constructor
+    Called: Copy(Type*, TaggedValue* source, TaggedValue* container)
+
+  Assign
+    Really just means assign; don't try to use this for duplication.
+    Ambiguous meaning, could be assigning contents or assigning references. (type can decide)
+  Cast
+    Cross-type assign
+
+  Other things
+    Equals & compare for some data structures
+
+  Cross-type initialize?
+  Cross-type copy?
+  Copy-on-write?

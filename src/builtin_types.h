@@ -37,7 +37,7 @@ namespace dict_t {
 
 namespace string_t {
     void initialize(Type* type, TaggedValue* value);
-    void destroy(Type* type, TaggedValue* value);
+    void release(TaggedValue* value);
     void assign(TaggedValue* source, TaggedValue* dest);
     bool equals(TaggedValue* lhs, TaggedValue* rhs);
     std::string to_string(Term* term);

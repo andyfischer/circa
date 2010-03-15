@@ -58,9 +58,9 @@ void change_type(TaggedValue* v, Type* type)
         return;
 
     if (v->value_type != NULL) {
-        Type::DestroyFunc destroy = v->value_type->destroy;
-        if (destroy != NULL)
-            destroy(v->value_type, v);
+        Type::ReleaseFunc release = v->value_type->release;
+        if (release != NULL)
+            release(v);
     }
 
     v->value_type = type;

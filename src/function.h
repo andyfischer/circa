@@ -42,7 +42,7 @@ struct FunctionAttrs
 
 namespace function_attrs_t {
     void initialize(Type* type, TaggedValue* value);
-    void destroy(Type* type, TaggedValue* value);
+    void release(TaggedValue* value);
     void assign(TaggedValue* source, TaggedValue* dest);
 }
 

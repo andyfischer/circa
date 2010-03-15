@@ -549,7 +549,7 @@ namespace string_t {
 
         set_pointer(value, STRING_T, new std::string());
     }
-    void destroy(Type* type, TaggedValue* value)
+    void release(TaggedValue* value)
     {
         delete ((std::string*) get_pointer(value));
         set_pointer(value, NULL);

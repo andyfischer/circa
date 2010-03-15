@@ -19,7 +19,7 @@ namespace circa {
 struct Type
 {
     typedef void (*InitializeFunc)(Type* type, TaggedValue* value);
-    typedef void (*DestroyFunc)(Type* type, TaggedValue* value);
+    typedef void (*ReleaseFunc)(TaggedValue* value);
     typedef void (*AssignFunc)(TaggedValue* source, TaggedValue* dest);
     typedef bool (*EqualsFunc)(TaggedValue* lhs, TaggedValue* rhs);
     typedef void (*CastFunc)(Type* type, TaggedValue* source, TaggedValue* dest);
@@ -37,7 +37,7 @@ struct Type
 
     // Functions
     InitializeFunc initialize;
-    DestroyFunc destroy;
+    ReleaseFunc release;
     AssignFunc assign;
     EqualsFunc equals;
     CastFunc cast;
@@ -63,7 +63,7 @@ struct Type
         name(""),
         cppTypeInfo(NULL),
         initialize(NULL),
-        destroy(NULL),
+        release(NULL),
         assign(NULL),
         equals(NULL),
         cast(NULL),

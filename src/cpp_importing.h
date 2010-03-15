@@ -22,7 +22,7 @@ void templated_initialize(Type* type, TaggedValue* value)
 }
 
 template <class T>
-void templated_destroy(Type*, TaggedValue* value)
+void templated_destroy(TaggedValue* value)
 {
     // Placement delete because we used placement new above.
     reinterpret_cast<T*>(value->value_data.ptr)->~T();
@@ -64,7 +64,7 @@ void import_type(Term* term)
     reset_type(type);
 
     type->initialize = cpp_importing::templated_initialize<T>;
-    type->destroy = cpp_importing::templated_destroy<T>;
+    type->release = cpp_importing::templated_destroy<T>;
     type->assign = cpp_importing::templated_assign<T>;
     type->cppTypeInfo = &typeid(T);
     type->toString = NULL;

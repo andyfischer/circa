@@ -11,7 +11,7 @@ namespace function_attrs_t {
         set_pointer(value, type, new FunctionAttrs());
     }
 
-    void destroy(Type* type, TaggedValue* value)
+    void release(TaggedValue* value)
     {
         delete (FunctionAttrs*) get_pointer(value);
     }

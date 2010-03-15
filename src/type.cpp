@@ -264,7 +264,7 @@ void reset_type(Type* type)
     type->valueFitsType = NULL;
     type->initialize = NULL;
     type->assign = NULL;
-    type->destroy = NULL;
+    type->release = NULL;
     type->equals = NULL;
     type->cast = NULL;
 }
@@ -274,7 +274,7 @@ void initialize_compound_type(Term* term)
 
     reset_type(type);
     type->initialize = branch_t::initialize;
-    type->destroy = branch_t::destroy;
+    type->release = branch_t::release;
     type->assign = branch_t::assign;
     type->cast = branch_t::cast;
     type->equals = branch_t::equals;
@@ -287,7 +287,7 @@ void initialize_simple_pointer_type(Type* type)
 
     // Unnecessary but illustrative:
     type->initialize = NULL;
-    type->destroy = NULL;
+    type->release = NULL;
     type->assign = NULL;
 }
 

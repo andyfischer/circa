@@ -91,7 +91,7 @@ private:
 // Hosted functions
 namespace branch_t {
     void initialize(Type*, TaggedValue* value);
-    void destroy(Type*, TaggedValue* value);
+    void release(TaggedValue* value);
     void assign(TaggedValue*, TaggedValue*);
     void cast(Type*, TaggedValue* source, TaggedValue* dest);
     bool equals(Term*, Term*);

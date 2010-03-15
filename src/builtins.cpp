@@ -103,7 +103,7 @@ void create_builtin_types()
     STRING_T = new Type();
     STRING_T->name = "string";
     STRING_T->initialize = string_t::initialize;
-    STRING_T->destroy = string_t::destroy;
+    STRING_T->release = string_t::release;
     STRING_T->assign = string_t::assign;
     STRING_T->equals = string_t::equals;
     STRING_T->toString = string_t::to_string;
@@ -178,7 +178,7 @@ void bootstrap_kernel()
     FUNCTION_ATTRS_TYPE->value_data.ptr = functionAttrsType;
     functionAttrsType->initialize = function_attrs_t::initialize;
     functionAttrsType->assign = function_attrs_t::assign;
-    functionAttrsType->destroy = function_attrs_t::destroy;
+    functionAttrsType->release = function_attrs_t::release;
     KERNEL->bindName(FUNCTION_ATTRS_TYPE, "FunctionAttrs");
     assert(is_type(FUNCTION_ATTRS_TYPE));
 
