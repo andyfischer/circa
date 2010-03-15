@@ -20,15 +20,15 @@ void assign_value(TaggedValue* source, TaggedValue* dest)
 
     // Check if they have different types. If so, try to cast.
     if (dest->value_type != source->value_type) {
-        Type::CastFunc cast = dest->value_type->cast;
-        if (cast == NULL) {
+        Type::CastFunc cast_func = dest->value_type->cast;
+        if (cast_func == NULL) {
             assert(false);
             throw std::runtime_error("No cast function for value_type "
                 + dest->value_type->name + " (tried to assign value of value_type "
                 + source->value_type->name + ")");
         }
 
-        cast(dest->value_type, source, dest);
+        cast_func(dest->value_type, source, dest);
         return;
     }
 
@@ -46,15 +46,30 @@ void assign_value(TaggedValue* source, TaggedValue* dest)
     }
 }
 
-bool cast_possible(TaggedValue* source, TaggedValue* dest)
+bool cast_possible(Type* type, TaggedValue* value)
 {
-    Type::CastPossibleFunc castPossible = dest->value_type->castPossible;
+    Type::CastPossibleFunc castPossible = type->castPossible;
 
     if (castPossible != NULL)
-        return castPossible(source, dest);
+        return castPossible(type, value);
 
     // Default behavior, only allow if types are exactly the same.
-    return source->value_type == dest->value_type;
+    return type == value->value_type;
+}
+
+void cast(Type* type, TaggedValue* source, TaggedValue* dest)
+{
+    if (type->cast == NULL) {
+        // If types are equal and there's no cast() function, just do a copy.
+        if (source->value_type == type) {
+            copy(source, dest);
+            return;
+        }
+
+        throw std::runtime_error("No cast function on type " + type->name);
+    }
+
+    type->cast(type, source, dest);
 }
 
 void copy(TaggedValue* source, TaggedValue* dest)

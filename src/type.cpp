@@ -277,6 +277,7 @@ void initialize_compound_type(Term* term)
     type->release = branch_t::release;
     type->assign = branch_t::assign;
     type->cast = branch_t::cast;
+    type->castPossible = branch_t::cast_possible;
     type->equals = branch_t::equals;
     type->toString = compound_type_to_string;
 }

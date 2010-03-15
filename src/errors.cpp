@@ -176,12 +176,6 @@ static StaticError get_static_error_for_input_index(Term* term, int index)
             return SERROR_NO_ERROR;
     }
 
-    bool inputIgnoresError = function_t::get_input_placeholder(term->function, effectiveIndex)
-            ->boolPropOptional("ignore_error", false);
-
-    if (input->hasError() && !meta && !inputIgnoresError)
-        return SERROR_INPUT_HAS_ERROR;
-    
     // Check type
     if (!value_fits_type(input, type))
         return SERROR_INPUT_TYPE_ERROR;
@@ -258,8 +252,6 @@ std::string get_static_error_message(Term* term)
 
     case SERROR_NULL_INPUT_TERM:
         return "(null input term)"; // TODO
-    case SERROR_INPUT_HAS_ERROR:
-        return "(input has error)"; // TODO
     case SERROR_INPUT_TYPE_ERROR:
     {
         int errorIndex = -1;

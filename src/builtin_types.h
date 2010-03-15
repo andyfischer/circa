@@ -14,7 +14,7 @@ namespace int_t {
 namespace float_t {
     void initialize(Type* type, TaggedValue& value);
     void cast(Type* type, TaggedValue* source, TaggedValue* dest);
-    bool cast_possible(TaggedValue* source, TaggedValue* dest);
+    bool cast_possible(Type* type, TaggedValue* dest);
     bool equals(TaggedValue* a, TaggedValue* b);
     std::string to_string(Term* term);
 }

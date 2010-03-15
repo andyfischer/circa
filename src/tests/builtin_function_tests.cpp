@@ -193,7 +193,7 @@ void test_vectorized_funcs_with_points()
 
     test_assert(a->type == point_t);
 
-    Term* b = branch.eval("a + [0 2]");
+    Term* b = branch.eval("b = a + [0 2]");
 
     test_equals(b->asBranch()[0]->toFloat(), 1);
     test_equals(b->asBranch()[1]->toFloat(), 2);

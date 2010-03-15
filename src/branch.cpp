@@ -353,10 +353,6 @@ namespace branch_t {
 
     void assign(TaggedValue* sourceValue, TaggedValue* destValue)
     {
-        // Abort if source is not a branch; should probably signal an error here.
-        if (!is_branch(sourceValue))
-            return;
-
         Branch& source = as_branch(sourceValue);
         Branch& dest = as_branch(destValue);
         assert_valid_branch(&source);
@@ -373,6 +369,11 @@ namespace branch_t {
     void cast(Type*, TaggedValue* source, TaggedValue* dest)
     {
         assign(source, dest);
+    }
+
+    bool cast_possible(Type*, TaggedValue* value)
+    {
+        return is_branch(value);
     }
 
     void assign_overwriting_types(Branch& source, Branch& dest)
