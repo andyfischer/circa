@@ -116,6 +116,7 @@ void create_builtin_types()
     FLOAT_T = new Type();
     FLOAT_T->name = "float";
     FLOAT_T->cast = float_t::cast;
+    FLOAT_T->castPossible = float_t::cast_possible;
     FLOAT_T->equals = float_t::equals;
     FLOAT_T->toString = float_t::to_string;
 

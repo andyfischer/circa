@@ -21,6 +21,7 @@ struct Type
     typedef void (*InitializeFunc)(Type* type, TaggedValue* value);
     typedef void (*ReleaseFunc)(TaggedValue* value);
     typedef void (*AssignFunc)(TaggedValue* source, TaggedValue* dest);
+    typedef bool (*CastPossibleFunc)(TaggedValue* source, TaggedValue* dest);
     typedef bool (*EqualsFunc)(TaggedValue* lhs, TaggedValue* rhs);
     typedef void (*CastFunc)(Type* type, TaggedValue* source, TaggedValue* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
@@ -39,6 +40,7 @@ struct Type
     InitializeFunc initialize;
     ReleaseFunc release;
     AssignFunc assign;
+    CastPossibleFunc castPossible;
     EqualsFunc equals;
     CastFunc cast;
     RemapPointersFunc remapPointers;
@@ -65,6 +67,7 @@ struct Type
         initialize(NULL),
         release(NULL),
         assign(NULL),
+        castPossible(NULL),
         equals(NULL),
         cast(NULL),
         remapPointers(NULL),

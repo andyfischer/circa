@@ -39,6 +39,11 @@ namespace float_t {
         set_float(dest, to_float(source));
     }
 
+    bool cast_possible(TaggedValue* source, TaggedValue* dest)
+    {
+        return is_int(source) || is_float(source);
+    }
+
     bool equals(TaggedValue* a, TaggedValue* b)
     {
         return to_float(a) == to_float(b);

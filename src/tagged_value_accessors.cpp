@@ -46,6 +46,17 @@ void assign_value(TaggedValue* source, TaggedValue* dest)
     }
 }
 
+bool cast_possible(TaggedValue* source, TaggedValue* dest)
+{
+    Type::CastPossibleFunc castPossible = dest->value_type->castPossible;
+
+    if (castPossible != NULL)
+        return castPossible(source, dest);
+
+    // Default behavior, only allow if types are exactly the same.
+    return source->value_type == dest->value_type;
+}
+
 void copy(TaggedValue* source, TaggedValue* dest)
 {
     change_type(dest, source->value_type);

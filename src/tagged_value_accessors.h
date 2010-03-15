@@ -7,12 +7,8 @@
 
 namespace circa {
 
-// assign_value will attempt to assign the value of 'source' to 'dest'. The type
-// of 'dest' will not be changed; if the two values have different types then
-// we'll attempt to use the cast() function of 'dest'. If they have the same type
-// then we'll try to use the assign() function of this type, if none is defined
-// then we'll do a shallow copy.
 void assign_value(TaggedValue* source, TaggedValue* dest);
+bool cast_possible(TaggedValue* source, TaggedValue* dest);
 void copy(TaggedValue* source, TaggedValue* dest);
 void cast(Type* type, TaggedValue* source, TaggedValue* dest);
 
