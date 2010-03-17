@@ -25,7 +25,8 @@ struct Type
     typedef bool (*EqualsFunc)(TaggedValue* lhs, TaggedValue* rhs);
     typedef void (*CastFunc)(Type* type, TaggedValue* source, TaggedValue* dest);
     typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
-    typedef std::string (*ToStringFunc)(Term* term);
+    typedef std::string (*ToStringFunc)(TaggedValue* value);
+    typedef std::string (*ToSourceStringFunc)(Term* term);
     typedef bool (*CheckInvariantsFunc)(Term* term, std::string* output);
     
     typedef bool (*ValueFitsTypeFunc)(Type* type, TaggedValue* value);
@@ -45,6 +46,7 @@ struct Type
     EqualsFunc equals;
     RemapPointersFunc remapPointers;
     ToStringFunc toString;
+    ToSourceStringFunc toSourceString;
     CheckInvariantsFunc checkInvariants;
     ValueFitsTypeFunc valueFitsType;
     
@@ -72,6 +74,7 @@ struct Type
         equals(NULL),
         remapPointers(NULL),
         toString(NULL),
+        toSourceString(NULL),
         checkInvariants(NULL),
         valueFitsType(NULL)
     {

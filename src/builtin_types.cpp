@@ -132,7 +132,7 @@ namespace old_list_t {
 
     void setup(Type* type)
     {
-        type->toString = to_string;
+        type->toSourceString = to_string;
     }
 
 } // namespace old_list_t
@@ -199,7 +199,7 @@ namespace set_t {
 
     void setup(Branch& kernel) {
         Term* set_type = create_compound_type(kernel, "Set");
-        as_type(set_type).toString = set_t::to_string;
+        as_type(set_type).toSourceString = set_t::to_string;
 
         Term* set_add = import_member_function(set_type, set_t::hosted_add, "add(Set, any) -> Set");
         function_set_use_input_as_output(set_add, 0, true);
@@ -819,11 +819,11 @@ void initialize_primitive_types(Branch& kernel)
 
     // ANY_TYPE was created in bootstrap_kernel
     Type* anyType = &as_type(ANY_TYPE);
-    anyType->toString = any_t::to_string;
+    anyType->toSourceString = any_t::to_string;
 
     VOID_TYPE = create_empty_type(kernel, "void");
     Type* voidType = &as_type(VOID_TYPE);
-    voidType->toString = void_t::to_string;
+    voidType->toSourceString = void_t::to_string;
 }
 
 void post_setup_primitive_types()
@@ -862,7 +862,7 @@ void setup_builtin_types(Branch& kernel)
     import_member_function(LIST_TYPE, old_list_t::count, "count(List) -> int");
 
     Term* map_type = create_compound_type(kernel, "Map");
-    as_type(map_type).toString = map_t::to_string;
+    as_type(map_type).toSourceString = map_t::to_string;
     Term* map_add = import_member_function(map_type, map_t::insert, "add(Map, any, any) -> Map");
     function_set_use_input_as_output(map_add, 0, true);
     import_member_function(map_type, map_t::contains, "contains(Map, any) -> bool");
@@ -889,7 +889,7 @@ void parse_builtin_types(Branch& kernel)
     parse_type(kernel, "type Rect { number x1, number y1, number x2, number y2 }");
     COLOR_TYPE = parse_type(kernel, "type Color { number r, number g, number b, number a }");
 
-    as_type(COLOR_TYPE).toString = color_t::to_string;
+    as_type(COLOR_TYPE).toSourceString = color_t::to_string;
 
     import_member_function(BRANCH_REF_TYPE, branch_ref_t::get_configs,
         "get_configs(BranchRef) -> List");

@@ -87,6 +87,18 @@ void swap(TaggedValue* left, TaggedValue* right)
     right->value_data = temp_data;
 }
 
+std::string to_string(TaggedValue* value)
+{
+    Type::ToStringFunc toString = value->value_type->toString;
+    if (toString == NULL) {
+        std::stringstream out;
+        out << "<" << value->value_type->name << " " << value->value_data.ptr << ">";
+        return out.str();
+    }
+
+    return toString(value);
+}
+
 void change_type(TaggedValue* v, Type* type)
 {
     if (v->value_type == type)
@@ -159,6 +171,11 @@ void make_type(TaggedValue* value, Type* type)
 {
     value->value_type = (Type*) TYPE_TYPE->value_data.ptr;
     value->value_data.ptr = type;
+}
+
+void make_null(TaggedValue* value)
+{
+    change_type(value, NULL_T);
 }
 
 void set_int(TaggedValue* value, int i)

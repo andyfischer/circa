@@ -67,9 +67,6 @@ void import_type(Term* term)
     type->release = cpp_importing::templated_destroy<T>;
     type->assign = cpp_importing::templated_assign<T>;
     type->cppTypeInfo = &typeid(T);
-    type->toString = NULL;
-    type->remapPointers = NULL;
-    type->checkInvariants = NULL;
 }
 
 template <class T>
@@ -79,9 +76,6 @@ void import_pointer_type(Term* term)
     reset_type(type);
 
     type->cppTypeInfo = &typeid(T);
-    type->toString = NULL;
-    type->remapPointers = NULL;
-    type->checkInvariants = NULL;
 }
 
 template <class T>

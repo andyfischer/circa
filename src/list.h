@@ -7,17 +7,20 @@
 
 namespace circa {
 
-    namespace list_t {
-        struct ListData;
-    }
+namespace list_t {
+    struct ListData;
+
+    void setup_type(Type*);
+}
 
 struct List
 {
     list_t::ListData* _data;
 
+    // Returns number of elements.
     int length() const;
 
-    // Append an element on the end, and returns the new element.
+    // Append a new element on the end, and returns the new element.
     TaggedValue* append();
 
     // Clear all elements.

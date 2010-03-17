@@ -260,6 +260,7 @@ void reset_type(Type* type)
 {
     type->remapPointers = NULL;
     type->toString = NULL;
+    type->toSourceString = NULL;
     type->checkInvariants = NULL;
     type->valueFitsType = NULL;
     type->initialize = NULL;
@@ -279,7 +280,7 @@ void initialize_compound_type(Term* term)
     type->cast = branch_t::cast;
     type->castPossible = branch_t::cast_possible;
     type->equals = branch_t::equals;
-    type->toString = compound_type_to_string;
+    type->toSourceString = compound_type_to_string;
 }
 
 void initialize_simple_pointer_type(Type* type)
@@ -316,7 +317,7 @@ std::string to_string(Term* term)
     if (type == NULL)
         return "<NULL>";
 
-    Type::ToStringFunc func = type->toString;
+    Type::ToSourceStringFunc func = type->toSourceString;
 
     if (func != NULL)
         return func(term);

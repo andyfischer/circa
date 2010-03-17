@@ -1,8 +1,12 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include <string>
+#include <sstream>
+
 #include "list.h"
 #include "tagged_value.h"
 #include "tagged_value_accessors.h"
+#include "type.h"
 
 namespace circa {
 
@@ -24,12 +28,12 @@ void decref(ListData* data)
 {
     assert(data->refCount > 0);
     data->refCount--;
-    if (data->refCount <= 0)
+    if (data->refCount == 0)
         free(data);
 }
 
 // Create a new list, starts off with 1 reference.
-ListData* create_list(int capacity)
+static ListData* create_list(int capacity)
 {
     ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(TaggedValue));
     result->refCount = 0;
@@ -42,7 +46,7 @@ ListData* create_list(int capacity)
 }
 
 // Returns a new list that has 2x the capacity of 'original', and decrefs 'original'.
-ListData* grow(ListData* original)
+static ListData* grow(ListData* original)
 {
     int new_capacity = original->capacity * 2;
     ListData* result = create_list(new_capacity);
@@ -52,6 +56,46 @@ ListData* grow(ListData* original)
         swap(&original->items[i], &result->items[i]);
     decref(original);
     return result;
+}
+
+static std::string to_string(ListData* value)
+{
+    if (value == NULL)
+        return "[]";
+
+    std::stringstream out;
+    out << "[";
+    for (int i=0; i < value->count; i++) {
+        if (i > 0) out << ",";
+        out << to_string(&value->items[i]);
+    }
+    out << "]";
+    return out.str();
+}
+
+void tv_initialize(Type* type, TaggedValue* value)
+{
+    set_pointer(value, NULL);
+}
+
+void tv_release(TaggedValue* value)
+{
+    ListData* data = (ListData*) get_pointer(value);
+    if (data == NULL) return;
+    decref(data);
+}
+
+std::string tv_to_string(TaggedValue* value)
+{
+    return to_string((ListData*) get_pointer(value));
+}
+
+void setup_type(Type* type)
+{
+    reset_type(type);
+    type->initialize = tv_initialize;
+    type->release = tv_release;
+    type->toString = tv_to_string;
 }
 
 } // namespace list_t

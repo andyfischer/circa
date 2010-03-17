@@ -106,28 +106,28 @@ void create_builtin_types()
     STRING_T->release = string_t::release;
     STRING_T->assign = string_t::assign;
     STRING_T->equals = string_t::equals;
-    STRING_T->toString = string_t::to_string;
+    STRING_T->toSourceString = string_t::to_string;
 
     INT_T = new Type();
     INT_T->name = "int";
     INT_T->equals = int_t::equals;
-    INT_T->toString = int_t::to_string;
+    INT_T->toSourceString = int_t::to_string;
 
     FLOAT_T = new Type();
     FLOAT_T->name = "float";
     FLOAT_T->cast = float_t::cast;
     FLOAT_T->castPossible = float_t::cast_possible;
     FLOAT_T->equals = float_t::equals;
-    FLOAT_T->toString = float_t::to_string;
+    FLOAT_T->toSourceString = float_t::to_string;
 
     BOOL_T = new Type();
     BOOL_T->name = "bool";
-    BOOL_T->toString = bool_t::to_string;
+    BOOL_T->toSourceString = bool_t::to_string;
 
     REF_T = new Type();
     REF_T->name = "ref";
     REF_T->remapPointers = Ref::remap_pointers;
-    REF_T->toString = ref_t::to_string;
+    REF_T->toSourceString = ref_t::to_string;
     REF_T->initialize = ref_t::initialize;
     REF_T->assign = ref_t::assign;
     REF_T->equals = ref_t::equals;
@@ -156,7 +156,7 @@ void bootstrap_kernel()
     typeType->initialize = type_t::initialize;
     typeType->assign = type_t::assign;
     typeType->remapPointers = type_t::remap_pointers;
-    typeType->toString = type_t::to_string;
+    typeType->toSourceString = type_t::to_string;
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Create Any type
@@ -186,7 +186,7 @@ void bootstrap_kernel()
     // Create Function type
     FUNCTION_TYPE = create_compound_type(*KERNEL, "Function");
     Type* functionType = &as_type(FUNCTION_TYPE);
-    functionType->toString = subroutine_t::to_string;
+    functionType->toSourceString = subroutine_t::to_string;
     functionType->checkInvariants = function_t::check_invariants;
 
     // Initialize Value func
