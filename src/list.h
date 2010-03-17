@@ -4,24 +4,31 @@
 #define CIRCA_LIST_INCLUDED
 
 #include "common_headers.h"
-#include "tagged_value.h"
 
 namespace circa {
 
+    namespace list_t {
+        struct ListData;
+    }
+
 struct List
 {
-    std::vector<TaggedValue> _items;
+    list_t::ListData* _data;
 
+    int length() const;
+
+    // Append an element on the end, and returns the new element.
     TaggedValue* append();
-    TaggedValue* append(Type* type);
-    TaggedValue* get(int index);
-    TaggedValue* operator[](int index);
-};
 
-#if 0
-bool is_list(TaggedValue*);
-List& as_list(TaggedValue*);
-#endif
+    // Clear all elements.
+    void clear();
+
+    // Access an element by index.
+    TaggedValue* operator[](int index);
+    
+    List() : _data(NULL) {}
+    ~List();
+};
 
 }
 

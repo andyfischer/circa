@@ -5,6 +5,8 @@
 
 #include "common_headers.h"
 
+#include <vector>
+
 namespace circa {
 
 class BranchIterator

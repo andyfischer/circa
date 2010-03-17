@@ -9,7 +9,12 @@
 namespace circa {
 
 TaggedValue::TaggedValue()
-    : value_type(NULL)
+{
+    init();
+}
+
+void
+TaggedValue::init()
 {
     value_type = NULL_T;
     value_data.ptr = 0;

@@ -197,7 +197,7 @@ void bootstrap_kernel()
     // Initialize List type, it's needed soon
     LIST_TYPE = create_compound_type(*KERNEL, "List");
     Type* listType = &as_type(LIST_TYPE);
-    listType->toString = list_t::to_string;
+    old_list_t::setup(listType);
 }
 
 void post_initialize_primitive_types(Branch& kernel)

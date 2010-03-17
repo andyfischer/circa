@@ -27,9 +27,8 @@ namespace set_t {
     void add(Branch& branch, Term* value);
 }
 
-namespace list_t {
-    void append(Branch& branch, Term* value);
-    std::string to_string(Term* caller);
+namespace old_list_t {
+    void setup(Type*);
 }
 
 namespace dict_t {

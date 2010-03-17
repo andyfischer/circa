@@ -22,7 +22,6 @@ void assign_value(TaggedValue* source, TaggedValue* dest)
     if (dest->value_type != source->value_type) {
         Type::CastFunc cast_func = dest->value_type->cast;
         if (cast_func == NULL) {
-            assert(false);
             throw std::runtime_error("No cast function for value_type "
                 + dest->value_type->name + " (tried to assign value of value_type "
                 + source->value_type->name + ")");
@@ -76,6 +75,16 @@ void copy(TaggedValue* source, TaggedValue* dest)
 {
     change_type(dest, source->value_type);
     assign_value(source, dest);
+}
+
+void swap(TaggedValue* left, TaggedValue* right)
+{
+    Type* temp_type = left->value_type;
+    TaggedValueData temp_data = left->value_data;
+    left->value_type = right->value_type;
+    left->value_data = right->value_data;
+    right->value_type = temp_type;
+    right->value_data = temp_data;
 }
 
 void change_type(TaggedValue* v, Type* type)

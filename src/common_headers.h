@@ -24,13 +24,10 @@
 #include <iostream>
 #include <map>
 #include <memory>
-#include <set>
-#include <stack>
 #include <stdexcept>
 #include <string>
 #include <sstream>
 #include <typeinfo>
-#include <vector>
 
 namespace circa {
 

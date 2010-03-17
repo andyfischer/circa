@@ -3,6 +3,8 @@
 #ifndef CIRCA_COMMAND_LINE_INCLUDED
 #define CIRCA_COMMAND_LINE_INCLUDED
 
+#include <vector>
+
 namespace circa {
 
 int run_command_line(std::vector<std::string> args);

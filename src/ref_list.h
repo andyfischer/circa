@@ -7,6 +7,8 @@
 //
 // A list of Term references
 
+#include <vector>
+
 #include "common_headers.h"
 #include "references.h"
 

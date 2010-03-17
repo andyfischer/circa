@@ -21,6 +21,8 @@ struct TaggedValue
     ~TaggedValue();
     TaggedValue(TaggedValue const&);
     TaggedValue& operator=(TaggedValue const& rhs);
+
+    void init();
 };
 
 } // namespace circa

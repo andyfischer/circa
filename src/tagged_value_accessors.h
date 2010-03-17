@@ -11,6 +11,7 @@ void assign_value(TaggedValue* source, TaggedValue* dest);
 bool cast_possible(Type* type, TaggedValue* dest);
 void cast(Type* type, TaggedValue* source, TaggedValue* dest);
 void copy(TaggedValue* source, TaggedValue* dest);
+void swap(TaggedValue* left, TaggedValue* right);
 
 void change_type(TaggedValue* v, Type* type);
 bool equals(TaggedValue* lhs, TaggedValue* rhs);

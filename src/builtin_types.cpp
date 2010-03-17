@@ -96,7 +96,7 @@ namespace bool_t {
     }
 }
 
-namespace list_t {
+namespace old_list_t {
 
     std::string to_string(Term* caller)
     {
@@ -130,7 +130,12 @@ namespace list_t {
         set_int(caller, as_branch(caller->input(0)).length());
     }
 
-} // namespace list_t
+    void setup(Type* type)
+    {
+        type->toString = to_string;
+    }
+
+} // namespace old_list_t
 
 namespace set_t {
     bool contains(Branch& branch, Term* value)
@@ -767,6 +772,7 @@ namespace void_t {
     }
 }
 
+
 namespace type_t {
     void initialize(Type* type, TaggedValue* value)
     {
@@ -842,7 +848,7 @@ void post_setup_primitive_types()
 void setup_builtin_types(Branch& kernel)
 {
     Term* branch_append = 
-        import_member_function(BRANCH_TYPE, list_t::append, "append(Branch, any) -> Branch");
+        import_member_function(BRANCH_TYPE, old_list_t::append, "append(Branch, any) -> Branch");
     function_set_use_input_as_output(branch_append, 0, true);
 
     import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) -> string");
@@ -851,9 +857,9 @@ void setup_builtin_types(Branch& kernel)
 
     // LIST_TYPE was created in bootstrap_kernel
     Term* list_append =
-        import_member_function(LIST_TYPE, list_t::append, "append(List, any) -> List");
+        import_member_function(LIST_TYPE, old_list_t::append, "append(List, any) -> List");
     function_set_use_input_as_output(list_append, 0, true);
-    import_member_function(LIST_TYPE, list_t::count, "count(List) -> int");
+    import_member_function(LIST_TYPE, old_list_t::count, "count(List) -> int");
 
     Term* map_type = create_compound_type(kernel, "Map");
     as_type(map_type).toString = map_t::to_string;

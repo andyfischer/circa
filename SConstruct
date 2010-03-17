@@ -66,7 +66,6 @@ def circa_static_library(env):
             ['generated/'+filename for filename in list_source_files('src/generated')])
     source_files = filter(lambda f: f != 'main.cpp', source_files)
 
-
     circa_static_libs[variant_name] = env.StaticLibrary('build/'+variant_name+'/circa',
         ['build/'+variant_name+'/src/'+filename for filename in source_files])
 
