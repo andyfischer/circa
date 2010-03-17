@@ -41,10 +41,6 @@ if WINDOWS:
     RELEASE.Append(CPPFLAGS='/EHsc /W3 /MD /Z7 /TP /O2'.split())
     RELEASE.Append(CPPDEFINES = ["NDEBUG"])
 
-Export('WINDOWS')
-Export('MAC')
-Export('POSIX')
-
 def list_source_files(dir):
     for path in os.listdir(dir):
         full_path = os.path.join(dir,path)
