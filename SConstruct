@@ -1,7 +1,5 @@
 
-import os, sys
-
-from tools import SconsHelper, prebuild
+import os, sys, SCons
 
 def fatal(msg):
     print "fatal:",msg
@@ -16,22 +14,27 @@ MAC = os.path.exists('/Library/Frameworks')
 
 DEBUG = Environment(tools = ["default"], toolpath=".")
 RELEASE = Environment(tools = ["default"], toolpath=".")
-COMMON = SconsHelper.EnvironmentSet(debug = DEBUG, release = RELEASE)
+DEBUG['variant_name'] = 'debug'
+RELEASE['variant_name'] = 'release'
+ALL = [DEBUG, RELEASE]
 
 if not os.path.exists('build'):
     os.mkdir('build')
 
 # Common build flags
 if POSIX:
-    COMMON.Append(CPPFLAGS=['-ggdb'])
-    COMMON.Append(CPPFLAGS=['-Wall'])
+    def common_flags(env):
+        env.Append(CPPFLAGS=['-ggdb', '-Wall'])
+        env.SetOption('num_jobs', 2)
+    map(common_flags, ALL)
     DEBUG.Append(CPPDEFINES = ["DEBUG"])
     RELEASE.Append(CPPFLAGS=['-O3'])
-    COMMON.SetOption('num_jobs', 2)
 
 if WINDOWS:
-    COMMON.Append(CPPDEFINES = ['WINDOWS'])
-    COMMON.Append(LINKFLAGS='/SUBSYSTEM:CONSOLE /MACHINE:X86 /DEBUG'.split())
+    def common_flags(env):
+        env.Append(CPPDEFINES = ['WINDOWS'])
+        env.Append(LINKFLAGS='/SUBSYSTEM:CONSOLE /MACHINE:X86 /DEBUG'.split())
+    map(common_flags, ALL)
     DEBUG.Append(CPPFLAGS='/EHsc /W3 /MDd /Z7 /TP /Od'.split())
     DEBUG.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrt.lib'])
     DEBUG.Append(CPPDEFINES = ["DEBUG", "_DEBUG"])
@@ -42,16 +45,6 @@ Export('WINDOWS')
 Export('MAC')
 Export('POSIX')
 
-# Build static library
-CIRCA_ENV = COMMON.Clone()
-CIRCA_ENV.BuildDir('build/$buildname/src', 'src')
-CIRCA_ENV.Append(CPPPATH = ['src'])
-
-BUILD_FILES = []
-
-from tools import prebuild
-prebuild.main()
-
 def list_source_files(dir):
     for path in os.listdir(dir):
         full_path = os.path.join(dir,path)
@@ -59,69 +52,99 @@ def list_source_files(dir):
         if not path.endswith('.cpp'): continue
         yield path
 
-library_source_files = (list(list_source_files('src')) + 
+# Run prebuild script, this generates some source code files.
+from tools import prebuild
+prebuild.main()
+
+circa_static_libs = {}
+
+# Define static library builds, save the results in circa_static_libs.
+def circa_static_library(env):
+    env = env.Clone()
+    variant_name = env['variant_name']
+
+    env.BuildDir('build/'+variant_name+'/src', 'src')
+    env.Append(CPPPATH = ['src'])
+
+    source_files = (list(list_source_files('src')) + 
             ['generated/'+filename for filename in list_source_files('src/generated')])
+    source_files = filter(lambda f: f != 'main.cpp', source_files)
 
-library_source_files = filter(lambda f: f != 'main.cpp', library_source_files)
 
-circa_static_libs = CIRCA_ENV.StaticLibrary('build/$buildname/circa',
-    ['build/$buildname/src/'+filename for filename in library_source_files])
+    circa_static_libs[variant_name] = env.StaticLibrary('build/'+variant_name+'/circa',
+        ['build/'+variant_name+'/src/'+filename for filename in source_files])
 
-# Build command-line app (using debug env)
-CIRCA_CL_ENV = CIRCA_ENV['debug']
+map(circa_static_library, ALL)
 
-cl_binary = CIRCA_CL_ENV.Program('build/bin/circa',
-    'build/debug/src/main.cpp', LIBS=[circa_static_libs['debug']])
+# Define command-line app builds, save the results in circa_cl_builds
+circa_cl_apps = {}
 
-CIRCA_CL_ENV.Default(cl_binary)
+def circa_command_line_app(env):
+    variant_name = env['variant_name']
+    result = env.Program('build/bin/circa',
+        'build/'+variant_name+'/src/main.cpp', LIBS=[circa_static_libs[variant_name]])
+    circa_cl_apps[variant_name] = result
+    return result
+    
+# Default build target is debug command-line binary.
+Default(circa_command_line_app(DEBUG))
 
 ########################### SDL-based targets ###############################
 
-DEBUG_PLASTIC = False
+def sdl_env(env):
+    if POSIX:
+        # import path so that we will find the correct sdl-config
+        env['ENV']['PATH'] = os.environ['PATH']
+        try:
+            env.ParseConfig('sdl-config --cflags')
+            env.ParseConfig('sdl-config --libs')
+        except OSError:
+            pass
+        env.Append(LIBS = ['SDL_gfx','SDL_image','SDL_ttf'])
 
-if DEBUG_PLASTIC:
-    SDL_ROOT = DEBUG.Clone()
-else:
-    SDL_ROOT = RELEASE.Clone()
+        if MAC: env['FRAMEWORKS'] = ['OpenGL']
+        else:   env.Append(LIBS = ['libGL'])
 
-if POSIX:
-    # import path so that we will find the correct sdl-config
-    SDL_ROOT['ENV']['PATH'] = os.environ['PATH']
-    try:
-        SDL_ROOT.ParseConfig('sdl-config --cflags')
-        SDL_ROOT.ParseConfig('sdl-config --libs')
-    except OSError:
-        pass
-    SDL_ROOT.Append(LIBS = ['SDL_gfx','SDL_image','SDL_ttf'])
+    if WINDOWS:
+        prebuild.sync_windows_sdl_deps()
 
-    if MAC: SDL_ROOT['FRAMEWORKS'] = ['OpenGL']
-    else:   SDL_ROOT.Append(LIBS = ['libGL'])
+        env.Append(LIBS=['opengl32.lib'])
 
-if WINDOWS:
-    prebuild.sync_windows_sdl_deps()
+        env.Append(CPPPATH=['#SDL_deps/SDL-1.2.13/include'])
+        env.Append(CPPPATH=['#SDL_deps/SDL_image-1.2.7/include'])
+        env.Append(CPPPATH=['#SDL_deps/SDL_mixer-2.0.9/include'])
+        env.Append(CPPPATH=['#SDL_deps/SDL_ttf-2.0.9/include'])
+        env.Append(CPPPATH=['#plastic/deps/include'])
+        env.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDL.lib'])
+        env.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDLmain.lib'])
+        env.Append(LIBS=['SDL_deps/SDL_image-1.2.7/lib/SDL_image.lib'])
+        env.Append(LIBS=['SDL_deps/SDL_mixer-1.2.8/lib/SDL_mixer.lib'])
+        env.Append(LIBS=['SDL_deps/SDL_ttf-2.0.9/lib/SDL_ttf.lib'])
+        env.Append(LIBS=['plastic/deps/lib/glew32.lib'])
 
-    SDL_ROOT.Append(LIBS=['opengl32.lib'])
+    env.Append(CPPPATH=['#src'])
 
-    SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL-1.2.13/include'])
-    SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL_image-1.2.7/include'])
-    SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL_mixer-2.0.9/include'])
-    SDL_ROOT.Append(CPPPATH=['#SDL_deps/SDL_ttf-2.0.9/include'])
-    SDL_ROOT.Append(CPPPATH=['#plastic/deps/include'])
-    SDL_ROOT.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDL.lib'])
-    SDL_ROOT.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDLmain.lib'])
-    SDL_ROOT.Append(LIBS=['SDL_deps/SDL_image-1.2.7/lib/SDL_image.lib'])
-    SDL_ROOT.Append(LIBS=['SDL_deps/SDL_mixer-1.2.8/lib/SDL_mixer.lib'])
-    SDL_ROOT.Append(LIBS=['SDL_deps/SDL_ttf-2.0.9/lib/SDL_ttf.lib'])
-    SDL_ROOT.Append(LIBS=['plastic/deps/lib/glew32.lib'])
+    variant_name = env['variant_name']
 
-SDL_ROOT.Append(CPPPATH=['#src'])
+    # Append appropriate circa lib
+    env.Append(LIBS = [circa_static_libs[variant_name]])
 
-if DEBUG_PLASTIC:
-    SDL_ROOT.Append(LIBS = [circa_static_libs['debug']])
-else:
-    SDL_ROOT.Append(LIBS = [circa_static_libs['release']])
+def build_plastic(env):
+    env = env.Clone()
+    env.BuildDir('build/plastic/src', 'plastic/src')
+    sdl_env(env)
 
-Export('SDL_ROOT')
+    source_files = list_source_files('plastic/src')
 
-# Build Plastic project
-SConscript('plastic/build.scons')
+    result = env.Program('#build/bin/plas',
+        source = ['build/plastic/src/'+f for f in source_files])
+
+    # On Windows, embed manifest
+    if WINDOWS:
+        env.AddPostAction(result,
+        'mt.exe -nologo -manifest plastic/windows/plastic.manifest.xml -outputresource:$TARGET;1')
+    return result
+    
+plastic = build_plastic(DEBUG)
+
+Alias('plastic', plastic)
