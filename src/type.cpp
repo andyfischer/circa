@@ -310,7 +310,7 @@ std::string compound_type_to_string(Term* caller)
     return out.str();
 }
 
-std::string to_string(Term* term)
+std::string to_source_string(Term* term)
 {
     Type* type = term->value_type;
 

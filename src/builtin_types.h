@@ -6,17 +6,11 @@
 namespace circa {
 
 namespace int_t {
-    void initialize(Type* type, TaggedValue& value);
-    bool equals(TaggedValue* a, TaggedValue* b);
-    std::string to_string(Term* term);
+    void setup_type(Type* type);
 }
 
 namespace float_t {
-    void initialize(Type* type, TaggedValue& value);
-    void cast(Type* type, TaggedValue* source, TaggedValue* dest);
-    bool cast_possible(Type* type, TaggedValue* dest);
-    bool equals(TaggedValue* a, TaggedValue* b);
-    std::string to_string(Term* term);
+    void setup_type(Type* type);
 }
 
 namespace bool_t {

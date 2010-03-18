@@ -10,6 +10,8 @@ namespace circa {
 namespace list_t {
     struct ListData;
 
+    TaggedValue* append(TaggedValue* list);
+    
     void setup_type(Type*);
 }
 

@@ -109,16 +109,10 @@ void create_builtin_types()
     STRING_T->toSourceString = string_t::to_string;
 
     INT_T = new Type();
-    INT_T->name = "int";
-    INT_T->equals = int_t::equals;
-    INT_T->toSourceString = int_t::to_string;
+    int_t::setup_type(INT_T);
 
     FLOAT_T = new Type();
-    FLOAT_T->name = "float";
-    FLOAT_T->cast = float_t::cast;
-    FLOAT_T->castPossible = float_t::cast_possible;
-    FLOAT_T->equals = float_t::equals;
-    FLOAT_T->toSourceString = float_t::to_string;
+    float_t::setup_type(FLOAT_T);
 
     BOOL_T = new Type();
     BOOL_T->name = "bool";

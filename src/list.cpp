@@ -58,6 +58,25 @@ static ListData* grow(ListData* original)
     return result;
 }
 
+TaggedValue* append(ListData** dataPtr)
+{
+    ListData* data = *dataPtr;
+    if (data == NULL) {
+        data = list_t::create_list(1);
+    } else if (data->count == (data)->capacity) {
+        data = list_t::grow(data);
+    }
+    *dataPtr = data;
+
+    data->count++;
+    return &data->items[data->count - 1];
+}
+
+TaggedValue* append(TaggedValue* list)
+{
+    return append((ListData**) &list->value_data);
+}
+
 static std::string to_string(ListData* value)
 {
     if (value == NULL)
@@ -66,7 +85,7 @@ static std::string to_string(ListData* value)
     std::stringstream out;
     out << "[";
     for (int i=0; i < value->count; i++) {
-        if (i > 0) out << ",";
+        if (i > 0) out << ", ";
         out << to_string(&value->items[i]);
     }
     out << "]";
@@ -115,14 +134,7 @@ List::length() const
 TaggedValue*
 List::append()
 {
-    if (_data == NULL) {
-        _data = list_t::create_list(1);
-    } else if (_data->count == _data->capacity) {
-        _data = list_t::grow(_data);
-    }
-
-    _data->count++;
-    return &_data->items[_data->count - 1];
+    return list_t::append(&_data);
 }
 
 void

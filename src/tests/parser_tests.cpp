@@ -54,7 +54,7 @@ void test_literal_float()
 
     Term* b = parser::compile(&branch, parser::statement_list, "5.200");
     test_assert(b->type == FLOAT_TYPE);
-    test_assert(to_string(b) == "5.200");
+    test_equals(to_source_string(b), "5.200");
     test_equals(get_step(b), .001f);
 }
 
@@ -386,7 +386,7 @@ void test_unary_minus()
     Term* c = branch.eval("-1");
     test_assert(is_value(c));
     test_assert(c->asInt() == -1);
-    test_assert(to_string(c) == "-1");
+    test_equals(to_source_string(c), "-1");
 
     // Sometimes, literals with a - sign are supposed to turn that into a minus operation
     // This is the case if there are no spaces around the -

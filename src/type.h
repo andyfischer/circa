@@ -130,7 +130,7 @@ void initialize_simple_pointer_type(Type* type);
 std::string compound_type_to_string(Term* caller);
 
 // Functions which are dispatched based on type:
-std::string to_string(Term* term);
+std::string to_source_string(Term* term);
 void assign_value_to_default(Term* term);
 
 Term* parse_type(Branch& branch, std::string const& decl);

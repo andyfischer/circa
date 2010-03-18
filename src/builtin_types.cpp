@@ -4,11 +4,9 @@
 
 namespace circa {
 
+namespace float_t { bool equals(TaggedValue* a, TaggedValue* b); }
+
 namespace int_t {
-    void initialize(Type* type, TaggedValue* value)
-    {
-        set_int(value, 0);
-    }
     bool equals(TaggedValue* a, TaggedValue* b)
     {
         if (is_float(b))
@@ -17,7 +15,13 @@ namespace int_t {
             return false;
         return as_int(a) == as_int(b);
     }
-    std::string to_string(Term* term)
+    std::string to_string(TaggedValue* value)
+    {
+        std::stringstream strm;
+        strm << as_int(value);
+        return strm.str();
+    }
+    std::string to_source_string(Term* term)
     {
         std::stringstream strm;
         if (term->stringPropOptional("syntax:integerFormat", "dec") == "hex")
@@ -25,6 +29,14 @@ namespace int_t {
 
         strm << as_int(term);
         return strm.str();
+    }
+    void setup_type(Type* type)
+    {
+        reset_type(type);
+        type->name = "int";
+        type->equals = equals;
+        type->toString = to_string;
+        type->toSourceString = to_source_string;
     }
 }
 
@@ -48,12 +60,18 @@ namespace float_t {
     {
         return to_float(a) == to_float(b);
     }
+    std::string to_string(TaggedValue* value)
+    {
+        std::stringstream out;
+        out << as_float(value);
+        return out.str();
+    }
 
-    std::string to_string(Term* term)
+    std::string to_source_string(Term* term)
     {
         // Correctly formatting floats is a tricky problem.
 
-        // First, check if we know how the user typed this number. If this value
+        // First, check if we know how the user formatted this number. If this value
         // still has the exact same value, then use the original formatting.
         if (term->hasProperty("float:original-format")) {
             std::string const& originalFormat = term->stringProp("float:original-format");
@@ -64,7 +82,8 @@ namespace float_t {
             }
         }
 
-        // Otherwise, format the current value with naive formatting
+        // Otherwise, format the current value with naive formatting. This could be
+        // improved; we could try harder to recreate some of the original formatting.
         std::stringstream strm;
         strm << as_float(term);
 
@@ -83,6 +102,16 @@ namespace float_t {
             return result + ".0";
         else
             return result;
+    }
+    void setup_type(Type* type)
+    {
+        reset_type(type);
+        type->name = "number";
+        type->cast = cast;
+        type->castPossible = cast_possible;
+        type->equals = equals;
+        type->toString = to_string;
+        type->toSourceString = to_source_string;
     }
 }
 

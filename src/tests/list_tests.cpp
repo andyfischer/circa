@@ -27,6 +27,11 @@ void test_tagged_value()
 
     test_assert(to_string(&value) == "[]");
 
+    make_int(list_t::append(&value), 1);
+    make_int(list_t::append(&value), 2);
+    make_int(list_t::append(&value), 3);
+
+    test_equals(to_string(&value), "[1, 2, 3]");
 }
 
 void register_tests()
