@@ -5,6 +5,60 @@
 namespace circa {
 namespace tagged_value_tests {
 
+namespace toy_refcounted_pool {
+    const int pool_size = 5;
+    int refcount[pool_size];
+
+    // helper functions for pool:
+    void initialize_pool()
+    {
+        for (int i=0; i < pool_size; i++)
+            refcount[i] = 0;
+    }
+
+    bool nothing_allocated()
+    {
+        for (int i=0; i < pool_size; i++)
+            if (refcount[i] != 0)
+                return false;
+        return true;
+    }
+
+    void initialize(Type*, TaggedValue* value)
+    {
+        for (int i=0; i < pool_size; i++) {
+            if (refcount[i] == 0) {
+                refcount[i]++;
+                value->value_data.asint = i;
+                return;
+            }
+        }
+        assert(false);
+    }
+
+    void release(TaggedValue* value)
+    {
+        int index = value->value_data.asint;
+        assert(refcount[index] > 0);
+        refcount[index]--;
+    }
+
+    void assign(TaggedValue* source, TaggedValue* dest)
+    {
+        int prev = dest->value_data.asint;
+        dest->value_data.asint = source->value_data.asint;
+        refcount[dest->value_data.asint]++;
+        refcount[prev]--;
+    }
+    void setup_type(Type* type)
+    {
+        type->initialize = initialize;
+        type->release = release;
+        type->assign = assign;
+    }
+}
+
+
 void test_int_simple()
 {
     TaggedValue v;
@@ -212,89 +266,37 @@ namespace manual_memory_management_test {
     }
 }
 
-namespace refcount_test {
+void refcount_test()
+{
+    toy_refcounted_pool::initialize_pool();
+    Type t;
+    toy_refcounted_pool::setup_type(&t);
 
-    // toy memory pool:
-    const int pool_size = 5;
-    int refcount[pool_size];
-
-    // helper functions for pool:
-    void initialize_pool()
     {
-        for (int i=0; i < pool_size; i++)
-            refcount[i] = 0;
+        TaggedValue value;
+        change_type(&value, &t);
+
+        test_assert(toy_refcounted_pool::refcount[0] == 1);
     }
 
-    int pool_allocate()
+    test_assert(toy_refcounted_pool::nothing_allocated());
+
     {
-        for (int i=0; i < pool_size; i++) {
-            if (refcount[i] == 0) {
-                refcount[i]++;
-                return i;
-            }
-        }
-        assert(false);
-        return -1;
+        TaggedValue value1, value2;
+        change_type(&value1, &t);
+        change_type(&value2, &t);
+
+        test_assert(toy_refcounted_pool::refcount[0] == 1);
+
+        assign_value(&value1, &value2);
+
+        test_assert(value1.value_data.asint == 0);
+        test_assert(value2.value_data.asint == 0);
+
+        test_assert(toy_refcounted_pool::refcount[0] == 2);
     }
 
-    void pool_deallocate(int index)
-    {
-        assert(refcount[index] > 0);
-        refcount[index]--;
-    }
-
-    // Type functions:
-    void initialize(Type* type, TaggedValue* value)
-    {
-        value->value_data.asint = pool_allocate();
-    }
-
-    void release(TaggedValue* value)
-    {
-        pool_deallocate(value->value_data.asint);
-    }
-
-    void assign(TaggedValue* source, TaggedValue* dest)
-    {
-        int prev = dest->value_data.asint;
-        dest->value_data.asint = source->value_data.asint;
-        refcount[dest->value_data.asint]++;
-        refcount[prev]--;
-    }
-
-    void test()
-    {
-        Type myType;
-        myType.initialize = initialize;
-        myType.release = release;
-        myType.assign = assign;
-
-        {
-            TaggedValue value;
-            change_type(&value, &myType);
-
-            test_assert(refcount[0] == 1);
-        }
-
-        test_assert(refcount[0] == 0);
-
-        {
-            TaggedValue value1, value2;
-            change_type(&value1, &myType);
-            change_type(&value2, &myType);
-
-            test_assert(refcount[0] == 1);
-
-            assign_value(&value1, &value2);
-
-            test_assert(value1.value_data.asint == 0);
-            test_assert(value2.value_data.asint == 0);
-
-            test_assert(refcount[0] == 2);
-        }
-
-        test_assert(refcount[0] == 0);
-    }
+    test_assert(toy_refcounted_pool::nothing_allocated());
 }
 
 void register_tests()
@@ -308,7 +310,7 @@ void register_tests()
     REGISTER_TEST_CASE(tagged_value_tests::test_assign_value_to_default);
     REGISTER_TEST_CASE(tagged_value_tests::test_constructor_syntax);
     REGISTER_TEST_CASE(tagged_value_tests::manual_memory_management_test::test);
-    REGISTER_TEST_CASE(tagged_value_tests::refcount_test::test);
+    REGISTER_TEST_CASE(tagged_value_tests::refcount_test);
 }
 
 }

@@ -13,6 +13,7 @@ namespace list_t {
     TaggedValue* append(TaggedValue* list);
     
     void setup_type(Type*);
+    void postponed_setup_type(Type*);
 }
 
 struct List

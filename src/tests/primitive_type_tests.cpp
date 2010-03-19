@@ -57,23 +57,23 @@ void float_to_string()
     // Assert that we retain the user's original string, no matter what ridiculous
     // formatting was used
     Term* a = branch.eval("a = -0.00000");
-    test_assert(to_string(a) == "-0.00000");
+    test_assert(to_source_string(a) == "-0.00000");
     a = branch.eval("a = .01020");
-    test_assert(to_string(a) == ".01020");
+    test_assert(to_source_string(a) == ".01020");
     a = branch.eval("a = 00.00");
-    test_assert(to_string(a) == "00.00");
+    test_assert(to_source_string(a) == "00.00");
 
     // Try changing a value, make sure that new value is printed
     Term* b = branch.eval("a = .1");
     set_float(b, .123456f);
-    test_assert(to_string(b) == "0.123456");
+    test_assert(to_source_string(b) == "0.123456");
 
     // Make sure that if we assign a float to a value which might get printed without
     // a decimal point, that we still do print the decimal point. Otherwise if the
     // string gets re-parsed, that value will have a different type.
     Term* c = branch.eval("a = 1.0");
     set_float(c, 2.0);
-    test_equals(to_string(c), "2.0");
+    test_equals(to_source_string(c), "2.0");
 }
 
 void test_ref_tweak()

@@ -18,6 +18,9 @@ namespace circa {
 // Example function header: "function do-something(int, string) -> int"
 Term* import_function(Branch& branch, EvaluateFunc func, std::string const& header);
 
+Term* import_member_function(Type* type, EvaluateFunc evaluate,
+        std::string const& headerText);
+
 Term* import_member_function(Term* type, EvaluateFunc evaluate,
         std::string const& headerText);
 

@@ -212,29 +212,28 @@ namespace set_t {
         }
     }
 
-    std::string to_string(Term* caller)
+    std::string to_string(TaggedValue* caller)
     {
         Branch &set = as_branch(caller);
         std::stringstream output;
         output << "{";
         for (int i=0; i < set.length(); i++) {
             if (i > 0) output << ", ";
-            output << set[i]->toString();
+            output << circa::to_string(set[i]);
         }
         output << "}";
 
         return output.str();
     }
 
-    void setup(Branch& kernel) {
-        Term* set_type = create_compound_type(kernel, "Set");
-        as_type(set_type).toSourceString = set_t::to_string;
+    void setup_type(Type* type) {
+        type->toString = set_t::to_string;
 
-        Term* set_add = import_member_function(set_type, set_t::hosted_add, "add(Set, any) -> Set");
+        Term* set_add = import_member_function(type, set_t::hosted_add, "add(Set, any) -> Set");
         function_set_use_input_as_output(set_add, 0, true);
-        Term* set_remove = import_member_function(set_type, set_t::remove, "remove(Set, any) -> Set");
+        Term* set_remove = import_member_function(type, set_t::remove, "remove(Set, any) -> Set");
         function_set_use_input_as_output(set_remove, 0, true);
-        import_member_function(set_type, set_t::contains, "contains(Set, any) -> bool");
+        import_member_function(type, set_t::contains, "contains(Set, any) -> bool");
     }
 
 } // namespace set_t
@@ -321,12 +320,12 @@ namespace map_t {
         copy(value, caller);
     }
 
-    std::string to_string(Term* term)
+    std::string to_string(TaggedValue* value)
     {
         std::stringstream out;
         out << "{";
 
-        Branch& contents = as_branch(term);
+        Branch& contents = as_branch(value);
         Branch& keys = contents[0]->asBranch();
         Branch& values = contents[1]->asBranch();
 
@@ -340,6 +339,18 @@ namespace map_t {
 
         out << "}";
         return out.str();
+    }
+
+    void setup_type(Type* type)
+    {
+        type->toString = map_t::to_string;
+        Term* map_add = import_member_function(type, map_t::insert, "add(Map, any, any) -> Map");
+        function_set_use_input_as_output(map_add, 0, true);
+        import_member_function(type, map_t::contains, "contains(Map, any) -> bool");
+        Term* map_remove = import_member_function(type, map_t::remove, "remove(Map, any) -> Map");
+        function_set_use_input_as_output(map_remove, 0, true);
+        import_member_function(type, map_t::get, "get(Map, any) -> any");
+
     }
 } // namespace map_t
 
@@ -649,37 +660,36 @@ namespace ref_t {
     void get_name(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
-        if (t == NULL) {
-            error_occurred(cxt, caller, "NULL reference");
-            return;
-        }
+        if (t == NULL)
+            return error_occurred(cxt, caller, "NULL reference");
         set_str(caller, t->name);
     }
     void hosted_to_string(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
-        if (t == NULL) {
-            error_occurred(cxt, caller, "NULL reference");
-            return;
-        }
+        if (t == NULL)
+            return error_occurred(cxt, caller, "NULL reference");
         set_str(caller, circa::to_string(t));
+    }
+    void hosted_to_source_string(EvalContext* cxt, Term* caller)
+    {
+        Term* t = caller->input(0)->asRef();
+        if (t == NULL)
+            return error_occurred(cxt, caller, "NULL reference");
+        set_str(caller, circa::to_source_string(t));
     }
     void get_function(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
-        if (t == NULL) {
-            error_occurred(cxt, caller, "NULL reference");
-            return;
-        }
+        if (t == NULL)
+            return error_occurred(cxt, caller, "NULL reference");
         as_ref(caller) = t->function;
     }
     void hosted_typeof(EvalContext* cxt, Term* caller)
     {
         Term* t = caller->input(0)->asRef();
-        if (t == NULL) {
-            error_occurred(cxt, caller, "NULL reference");
-            return;
-        }
+        if (t == NULL)
+            return error_occurred(cxt, caller, "NULL reference");
         as_ref(caller) = t->type;
     }
     void assign(EvalContext* cxt, Term* caller)
@@ -795,7 +805,7 @@ namespace any_t {
 }
 
 namespace void_t {
-    std::string to_string(Term*)
+    std::string to_string(TaggedValue*)
     {
         return "<void>";
     }
@@ -852,7 +862,7 @@ void initialize_primitive_types(Branch& kernel)
 
     VOID_TYPE = create_empty_type(kernel, "void");
     Type* voidType = &as_type(VOID_TYPE);
-    voidType->toSourceString = void_t::to_string;
+    voidType->toString = void_t::to_string;
 }
 
 void post_setup_primitive_types()
@@ -862,6 +872,8 @@ void post_setup_primitive_types()
 
     import_member_function(REF_TYPE, ref_t::get_name, "name(Ref) -> string");
     import_member_function(REF_TYPE, ref_t::hosted_to_string, "to_string(Ref) -> string");
+    import_member_function(REF_TYPE, ref_t::hosted_to_source_string,
+            "to_source_string(Ref) -> string");
     import_member_function(REF_TYPE, ref_t::hosted_typeof, "typeof(Ref) -> Ref");
     import_member_function(REF_TYPE, ref_t::get_function, "function(Ref) -> Ref");
     import_member_function(REF_TYPE, ref_t::assign, "assign(Ref, any)");
@@ -882,7 +894,8 @@ void setup_builtin_types(Branch& kernel)
 
     import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) -> string");
 
-    set_t::setup(kernel);
+    Term* set_type = create_compound_type(kernel, "Set");
+    set_t::setup_type(&as_type(set_type));
 
     // LIST_TYPE was created in bootstrap_kernel
     Term* list_append =
@@ -891,13 +904,7 @@ void setup_builtin_types(Branch& kernel)
     import_member_function(LIST_TYPE, old_list_t::count, "count(List) -> int");
 
     Term* map_type = create_compound_type(kernel, "Map");
-    as_type(map_type).toSourceString = map_t::to_string;
-    Term* map_add = import_member_function(map_type, map_t::insert, "add(Map, any, any) -> Map");
-    function_set_use_input_as_output(map_add, 0, true);
-    import_member_function(map_type, map_t::contains, "contains(Map, any) -> bool");
-    Term* map_remove = import_member_function(map_type, map_t::remove, "remove(Map, any) -> Map");
-    function_set_use_input_as_output(map_remove, 0, true);
-    import_member_function(map_type, map_t::get, "get(Map, any) -> any");
+    map_t::setup_type(&as_type(map_type));
 
     type_t::enable_default_value(map_type);
     Branch& map_default_value = type_t::get_default_value(map_type)->asBranch();

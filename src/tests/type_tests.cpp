@@ -129,11 +129,11 @@ void test_is_native_type()
 void test_to_string()
 {
     // Test on some native types
-    test_equals(to_string(INT_TYPE), "<NativeType int>");
-    test_equals(to_string(FLOAT_TYPE), "<NativeType number>");
-    test_equals(to_string(BOOL_TYPE), "<NativeType bool>");
-    test_equals(to_string(STRING_TYPE), "<NativeType string>");
-    test_equals(to_string(TYPE_TYPE), "<NativeType Type>");
+    //test_equals(to_string(INT_TYPE), "<NativeType int>");
+    //test_equals(to_string(FLOAT_TYPE), "<NativeType number>");
+    //test_equals(to_string(BOOL_TYPE), "<NativeType bool>");
+    //test_equals(to_string(STRING_TYPE), "<NativeType string>");
+    //test_equals(to_string(TYPE_TYPE), "<NativeType Type>");
 
     // to_string for compound types is handled in source_repro_tests.cpp
 }

@@ -117,6 +117,11 @@ void setup_type(Type* type)
     type->toString = tv_to_string;
 }
 
+void postponed_setup_type(Type*)
+{
+    // TODO: create append, count
+}
+
 } // namespace list_t
 
 List::~List()

@@ -19,6 +19,7 @@ namespace bool_t {
 
 namespace set_t {
     void add(Branch& branch, Term* value);
+    void setup_type(Type* type);
 }
 
 namespace old_list_t {
