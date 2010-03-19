@@ -14,8 +14,10 @@ namespace list_t {
     
     void setup_type(Type*);
     void postponed_setup_type(Type*);
+
 }
 
+// C++ wrapper over list_t
 struct List
 {
     list_t::ListData* _data;

@@ -22,7 +22,7 @@ TaggedValue::init()
 
 TaggedValue::~TaggedValue()
 {
-    // deallocate this value
+    // Deallocate this value
     change_type(this, NULL_T);
 }
 
@@ -41,6 +41,12 @@ TaggedValue::operator=(TaggedValue const& rhs)
     Term* source = (Term*) &rhs;
     copy(source, this);
     return *this;
+}
+
+TaggedValue::TaggedValue(Type* type)
+{
+    init();
+    change_type(this, type);
 }
 
 }

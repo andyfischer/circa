@@ -20,6 +20,7 @@ struct TaggedValue
     TaggedValue();
     ~TaggedValue();
     TaggedValue(TaggedValue const&);
+    TaggedValue(Type* type);
     TaggedValue& operator=(TaggedValue const& rhs);
 
     void init();

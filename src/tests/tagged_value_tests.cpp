@@ -268,13 +268,12 @@ namespace manual_memory_management_test {
 
 void refcount_test()
 {
-    toy_refcounted_pool::initialize_pool();
     Type t;
     toy_refcounted_pool::setup_type(&t);
+    toy_refcounted_pool::initialize_pool();
 
     {
-        TaggedValue value;
-        change_type(&value, &t);
+        TaggedValue value(&t);
 
         test_assert(toy_refcounted_pool::refcount[0] == 1);
     }
@@ -282,9 +281,7 @@ void refcount_test()
     test_assert(toy_refcounted_pool::nothing_allocated());
 
     {
-        TaggedValue value1, value2;
-        change_type(&value1, &t);
-        change_type(&value2, &t);
+        TaggedValue value1(&t), value2(&t);
 
         test_assert(toy_refcounted_pool::refcount[0] == 1);
 
@@ -295,6 +292,58 @@ void refcount_test()
 
         test_assert(toy_refcounted_pool::refcount[0] == 2);
     }
+
+    test_assert(toy_refcounted_pool::nothing_allocated());
+}
+
+void list_memory_management()
+{
+    List list;
+    Type t;
+    toy_refcounted_pool::setup_type(&t);
+    toy_refcounted_pool::initialize_pool();
+
+    TaggedValue v(&t);
+
+    test_assert(toy_refcounted_pool::refcount[0] == 1);
+
+    copy(&v, list.append());
+
+    test_assert(toy_refcounted_pool::refcount[0] == 2);
+
+    list.clear();
+
+    test_assert(toy_refcounted_pool::refcount[0] == 1);
+
+    swap(&v, list.append());
+
+    test_assert(toy_refcounted_pool::refcount[0] == 1);
+
+    list.clear();
+
+    test_assert(toy_refcounted_pool::refcount[0] == 0);
+
+    change_type(list.append(), &t);
+    change_type(list.append(), &t);
+    change_type(list.append(), &t);
+
+    test_assert(toy_refcounted_pool::refcount[0] == 1);
+    test_assert(toy_refcounted_pool::refcount[1] == 1);
+    test_assert(toy_refcounted_pool::refcount[2] == 1);
+
+    make_null(list[1]);
+
+    test_assert(toy_refcounted_pool::refcount[0] == 1);
+    test_assert(toy_refcounted_pool::refcount[1] == 0);
+    test_assert(toy_refcounted_pool::refcount[2] == 1);
+
+    copy(list[2], list[0]);
+
+    test_assert(toy_refcounted_pool::refcount[0] == 0);
+    test_assert(toy_refcounted_pool::refcount[1] == 0);
+    test_assert(toy_refcounted_pool::refcount[2] == 2);
+
+    list.clear();
 
     test_assert(toy_refcounted_pool::nothing_allocated());
 }
@@ -311,7 +360,8 @@ void register_tests()
     REGISTER_TEST_CASE(tagged_value_tests::test_constructor_syntax);
     REGISTER_TEST_CASE(tagged_value_tests::manual_memory_management_test::test);
     REGISTER_TEST_CASE(tagged_value_tests::refcount_test);
+    REGISTER_TEST_CASE(tagged_value_tests::list_memory_management);
 }
 
 }
-}
+} // namespace circa

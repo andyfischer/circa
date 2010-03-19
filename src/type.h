@@ -28,8 +28,10 @@ struct Type
     typedef std::string (*ToStringFunc)(TaggedValue* value);
     typedef std::string (*ToSourceStringFunc)(Term* term);
     typedef bool (*CheckInvariantsFunc)(Term* term, std::string* output);
-    
     typedef bool (*ValueFitsTypeFunc)(Type* type, TaggedValue* value);
+    typedef void (*BeginModifyFunc)(TaggedValue* value);
+    typedef TaggedValue* (*GetElementFunc)(TaggedValue* value);
+    typedef int (*NumElementsFunc)(TaggedValue* value);
 
     std::string name;
 
@@ -49,6 +51,9 @@ struct Type
     ToSourceStringFunc toSourceString;
     CheckInvariantsFunc checkInvariants;
     ValueFitsTypeFunc valueFitsType;
+    BeginModifyFunc beginModify;
+    GetElementFunc getElement;
+    NumElementsFunc numElements;
     
     Branch prototype;
 
@@ -76,7 +81,10 @@ struct Type
         toString(NULL),
         toSourceString(NULL),
         checkInvariants(NULL),
-        valueFitsType(NULL)
+        valueFitsType(NULL),
+        beginModify(NULL),
+        getElement(NULL),
+        numElements(NULL)
     {
     }
 

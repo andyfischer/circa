@@ -98,7 +98,7 @@ namespace branch_t {
     bool equals(Term*, Term*);
     bool equals(TaggedValue*, TaggedValue*);
 
-    void assign_overwriting_types(Branch& source, Branch& dest);
+    void copy(Branch& source, Branch& dest);
     void assign(Branch& source, Branch& dest);
 }
 

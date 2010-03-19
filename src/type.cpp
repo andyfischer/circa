@@ -354,7 +354,7 @@ void assign_value_to_default(Term* term)
         if (is_branch(term)) {
 
             Branch& prototype = type_t::get_prototype(term->type);
-            branch_t::assign_overwriting_types(prototype, as_branch(term));
+            branch_t::copy(prototype, as_branch(term));
             return;
         }
     }

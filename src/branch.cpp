@@ -361,7 +361,7 @@ namespace branch_t {
         // For Branch or List type, overwrite existing shape
         if ((destValue->value_type == &as_type(BRANCH_TYPE))
                 || (destValue->value_type == &as_type(LIST_TYPE)))
-            assign_overwriting_types(source, dest);
+            copy(source, dest);
         else
             assign(source, dest);
     }
@@ -376,7 +376,7 @@ namespace branch_t {
         return is_branch(value);
     }
 
-    void assign_overwriting_types(Branch& source, Branch& dest)
+    void copy(Branch& source, Branch& dest)
     {
         assert_valid_branch(&source);
         assert_valid_branch(&dest);
@@ -415,9 +415,9 @@ namespace branch_t {
     void assign(Branch& source, Branch& dest)
     {
         // Temporary special case, if the two branches have different sizes then
-        // do a assign_overwriting_types instead. This should be removed.
+        // do a copy instead. This should be removed.
         if (source.length() != dest.length())
-            return assign_overwriting_types(source, dest);
+            return copy(source, dest);
 
         for (int i=0; i < source.length(); i++)
             assign_value(source[i], dest[i]);

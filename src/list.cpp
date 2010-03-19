@@ -28,11 +28,15 @@ void decref(ListData* data)
 {
     assert(data->refCount > 0);
     data->refCount--;
-    if (data->refCount == 0)
+    if (data->refCount == 0) {
+        // Release all elements
+        for (int i=0; i < data->count; i++)
+            make_null(&data->items[i]);
         free(data);
+    }
 }
 
-// Create a new list, starts off with 1 reference.
+// Create a new list, starts off with 1 ref.
 static ListData* create_list(int capacity)
 {
     ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(TaggedValue));
@@ -45,8 +49,22 @@ static ListData* create_list(int capacity)
     return result;
 }
 
+// Creates a new list that is a duplicate of source. Starts off with 1 ref.
+static ListData* duplicate(ListData* source)
+{
+    if (source == NULL || source->count == 0)
+        return NULL;
+
+    ListData* result = create_list(source->count);
+
+    for (int i=0; i < source->count; i++)
+        copy(&source->items[i], &result->items[i]);
+
+    return result;
+}
+
 // Returns a new list that has 2x the capacity of 'original', and decrefs 'original'.
-static ListData* grow(ListData* original)
+static ListData* resize_larger(ListData* original)
 {
     int new_capacity = original->capacity * 2;
     ListData* result = create_list(new_capacity);
@@ -58,13 +76,20 @@ static ListData* grow(ListData* original)
     return result;
 }
 
+// Reset this list to have 0 elements.
+static void clear(ListData** data)
+{
+    decref(*data);
+    *data = NULL;
+}
+
 TaggedValue* append(ListData** dataPtr)
 {
     ListData* data = *dataPtr;
     if (data == NULL) {
         data = list_t::create_list(1);
     } else if (data->count == (data)->capacity) {
-        data = list_t::grow(data);
+        data = list_t::resize_larger(data);
     }
     *dataPtr = data;
 
@@ -76,6 +101,7 @@ TaggedValue* append(TaggedValue* list)
 {
     return append((ListData**) &list->value_data);
 }
+
 
 static std::string to_string(ListData* value)
 {
@@ -109,6 +135,7 @@ std::string tv_to_string(TaggedValue* value)
     return to_string((ListData*) get_pointer(value));
 }
 
+
 void setup_type(Type* type)
 {
     reset_type(type);
@@ -119,7 +146,7 @@ void setup_type(Type* type)
 
 void postponed_setup_type(Type*)
 {
-    // TODO: create append, count
+    // TODO: create member functions: append, count
 }
 
 } // namespace list_t
@@ -145,8 +172,7 @@ List::append()
 void
 List::clear()
 {
-    list_t::decref(_data);
-    _data = NULL;
+    list_t::clear(&_data);
 }
 
 TaggedValue*
