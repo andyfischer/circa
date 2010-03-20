@@ -280,6 +280,8 @@ void initialize_compound_type(Term* term)
     type->cast = branch_t::cast;
     type->castPossible = branch_t::cast_possible;
     type->equals = branch_t::equals;
+    type->getElement = branch_t::get_element;
+    type->numElements = branch_t::num_elements;
     type->toSourceString = compound_type_to_string;
 }
 

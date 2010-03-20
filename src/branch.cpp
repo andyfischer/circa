@@ -376,6 +376,20 @@ namespace branch_t {
         return is_branch(value);
     }
 
+    TaggedValue* get_element(TaggedValue* value, int index)
+    {
+        Branch& b = as_branch(value);
+        if (index >= b.length())
+            return NULL;
+        return b[index];
+    }
+
+    int num_elements(TaggedValue* value)
+    {
+        Branch& b = as_branch(value);
+        return b.length();
+    }
+
     void copy(Branch& source, Branch& dest)
     {
         assert_valid_branch(&source);
