@@ -20,6 +20,7 @@ struct Type
 {
     typedef void (*Initialize)(Type* type, TaggedValue* value);
     typedef void (*Release)(TaggedValue* value);
+    typedef void (*Copy)(TaggedValue* source, TaggedValue* dest);
     typedef void (*Assign)(TaggedValue* source, TaggedValue* dest);
     typedef bool (*CastPossible)(Type* type, TaggedValue* value);
     typedef bool (*Equals)(TaggedValue* lhs, TaggedValue* rhs);
@@ -42,6 +43,7 @@ struct Type
     // Functions
     Initialize initialize;
     Release release;
+    Copy copy;
     Assign assign;
     Cast cast;
     CastPossible castPossible;
@@ -73,6 +75,7 @@ struct Type
         cppTypeInfo(NULL),
         initialize(NULL),
         release(NULL),
+        copy(NULL),
         assign(NULL),
         cast(NULL),
         castPossible(NULL),

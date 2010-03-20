@@ -50,6 +50,7 @@ static ListData* create_list(int capacity)
 }
 
 // Creates a new list that is a duplicate of source. Starts off with 1 ref.
+// Does not decref source.
 static ListData* duplicate(ListData* source)
 {
     if (source == NULL || source->count == 0)
@@ -60,12 +61,17 @@ static ListData* duplicate(ListData* source)
     for (int i=0; i < source->count; i++)
         copy(&source->items[i], &result->items[i]);
 
+    result->count = source->count;
+
     return result;
 }
 
 // Returns a new list that has 2x the capacity of 'original', and decrefs 'original'.
-static ListData* resize_larger(ListData* original)
+static ListData* grow_capacity(ListData* original)
 {
+    if (original == NULL)
+        return create_list(1);
+
     int new_capacity = original->capacity * 2;
     ListData* result = create_list(new_capacity);
     result->capacity = new_capacity;
@@ -83,25 +89,41 @@ static void clear(ListData** data)
     *data = NULL;
 }
 
-TaggedValue* append(ListData** dataPtr)
+// Return a version of this list which is safe to modify. If this data has
+// multiple references, we'll return a new copy (and decref the original).
+ListData* begin_modify(ListData* data)
 {
-    ListData* data = *dataPtr;
-    if (data == NULL) {
-        data = list_t::create_list(1);
-    } else if (data->count == (data)->capacity) {
-        data = list_t::resize_larger(data);
-    }
-    *dataPtr = data;
+    assert(data->refCount > 0);
+    if (data->refCount == 1)
+        return data;
 
-    data->count++;
-    return &data->items[data->count - 1];
+    ListData* copy = duplicate(data);
+    decref(data);
+    return copy;
+}
+
+// Add a new blank element to the end of the list, resizing if necessary.
+// Returns the new element.
+TaggedValue* append(ListData** data)
+{
+    if (*data == NULL) {
+        *data = create_list(1);
+    } else {
+        *data = begin_modify(*data);
+        
+        if ((*data)->count == (*data)->capacity)
+            *data = grow_capacity(*data);
+    }
+
+    ListData* d = *data;
+    d->count++;
+    return &d->items[d->count - 1];
 }
 
 TaggedValue* append(TaggedValue* list)
 {
     return append((ListData**) &list->value_data);
 }
-
 
 static std::string to_string(ListData* value)
 {
@@ -130,18 +152,38 @@ void tv_release(TaggedValue* value)
     decref(data);
 }
 
+void tv_copy(TaggedValue* source, TaggedValue* dest)
+{
+    ListData* s = (ListData*) get_pointer(source);
+    ListData* d = (ListData*) get_pointer(dest);
+
+    if (s != NULL)
+        incref(s);
+    if (d != NULL)
+        decref(d);
+    
+    set_pointer(dest, s);
+}
+
 std::string tv_to_string(TaggedValue* value)
 {
     return to_string((ListData*) get_pointer(value));
 }
 
+void tv_begin_modify(TaggedValue* value)
+{
+    ListData* data = (ListData*) get_pointer(value);
+    set_pointer(value, begin_modify(data));
+}
 
 void setup_type(Type* type)
 {
     reset_type(type);
     type->initialize = tv_initialize;
     type->release = tv_release;
+    type->copy = tv_copy;
     type->toString = tv_to_string;
+    type->beginModify = tv_begin_modify;
 }
 
 void postponed_setup_type(Type*)
@@ -155,6 +197,26 @@ List::~List()
 {
     if (_data != NULL)
         decref(_data);
+}
+
+List::List(List const& copy)
+{
+    _data = copy._data;
+    if (_data != NULL)
+        incref(_data);
+}
+
+List const&
+List::operator=(List const& rhs)
+{
+    if (_data == rhs._data)
+        return *this;
+    if (_data != NULL)
+        decref(_data);
+    _data = rhs._data;
+    if (_data != NULL)
+        incref(_data);
+    return *this;
 }
 
 int

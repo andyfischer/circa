@@ -77,6 +77,14 @@ void copy(TaggedValue* source, TaggedValue* dest)
     assign_value(source, dest);
 }
 
+void copy_newstyle(TaggedValue* source, TaggedValue* dest)
+{
+    change_type(dest, source->value_type);
+    Type::Copy copy = source->value_type->copy;
+    assert(copy != NULL);
+    copy(source, dest);
+}
+
 void swap(TaggedValue* left, TaggedValue* right)
 {
     Type* temp_type = left->value_type;
@@ -97,6 +105,15 @@ std::string to_string(TaggedValue* value)
     }
 
     return toString(value);
+}
+
+void begin_modify(TaggedValue* value)
+{
+    Type::BeginModify beginModify = value->value_type->beginModify;
+    if (beginModify != NULL)
+        beginModify(value);
+
+    // Default behavior: no-op.
 }
 
 void change_type(TaggedValue* v, Type* type)
