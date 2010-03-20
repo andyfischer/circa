@@ -14,6 +14,8 @@ void copy(TaggedValue* source, TaggedValue* dest);
 void copy_newstyle(TaggedValue* source, TaggedValue* dest); // Temporary
 void swap(TaggedValue* left, TaggedValue* right);
 std::string to_string(TaggedValue* value);
+TaggedValue* get_element(TaggedValue* value, int index);
+int num_elements(TaggedValue* value);
 void begin_modify(TaggedValue* value);
 
 void change_type(TaggedValue* v, Type* type);

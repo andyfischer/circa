@@ -107,6 +107,28 @@ std::string to_string(TaggedValue* value)
     return toString(value);
 }
 
+TaggedValue* get_element(TaggedValue* value, int index)
+{
+    Type::GetElement getElement = value->value_type->getElement;
+
+    // Default behavior: return NULL
+    if (getElement == NULL)
+        return NULL;
+
+    return getElement(value, index);
+}
+
+int num_elements(TaggedValue* value)
+{
+    Type::NumElements numElements = value->value_type->numElements;
+
+    // Default behavior: return 0
+    if (numElements == NULL)
+        return 0;
+
+    return numElements(value);
+}
+
 void begin_modify(TaggedValue* value)
 {
     Type::BeginModify beginModify = value->value_type->beginModify;

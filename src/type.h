@@ -31,7 +31,7 @@ struct Type
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
     typedef void (*BeginModify)(TaggedValue* value);
-    typedef TaggedValue* (*GetElement)(TaggedValue* value);
+    typedef TaggedValue* (*GetElement)(TaggedValue* value, int index);
     typedef int (*NumElements)(TaggedValue* value);
 
     std::string name;

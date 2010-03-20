@@ -57,11 +57,10 @@ static ListData* duplicate(ListData* source)
         return NULL;
 
     ListData* result = create_list(source->count);
+    result->count = source->count;
 
     for (int i=0; i < source->count; i++)
         copy(&source->items[i], &result->items[i]);
-
-    result->count = source->count;
 
     return result;
 }
@@ -165,6 +164,21 @@ void tv_copy(TaggedValue* source, TaggedValue* dest)
     set_pointer(dest, s);
 }
 
+TaggedValue* tv_get_element(TaggedValue* value, int index)
+{
+    ListData* s = (ListData*) get_pointer(value);
+    if (s == NULL) return NULL;
+    if (index >= s->count) return NULL;
+    return &s->items[index];
+}
+
+int tv_num_elements(TaggedValue* value)
+{
+    ListData* s = (ListData*) get_pointer(value);
+    if (s == NULL) return 0;
+    return s->count;
+}
+
 std::string tv_to_string(TaggedValue* value)
 {
     return to_string((ListData*) get_pointer(value));
@@ -183,6 +197,8 @@ void setup_type(Type* type)
     type->release = tv_release;
     type->copy = tv_copy;
     type->toString = tv_to_string;
+    type->getElement = tv_get_element;
+    type->numElements = tv_num_elements;
     type->beginModify = tv_begin_modify;
 }
 

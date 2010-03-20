@@ -26,12 +26,17 @@ void test_tagged_value()
     change_type(&value, &list);
 
     test_equals(to_string(&value), "[]");
+    test_assert(get_element(&value, 1) == NULL);
+    test_assert(num_elements(&value) == 0);
 
     make_int(list_t::append(&value), 1);
     make_int(list_t::append(&value), 2);
     make_int(list_t::append(&value), 3);
 
     test_equals(to_string(&value), "[1, 2, 3]");
+
+    test_assert(as_int(get_element(&value, 1)) == 2);
+    test_assert(num_elements(&value) == 3);
 }
 
 void test_shallow_copy()
