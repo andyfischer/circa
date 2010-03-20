@@ -62,7 +62,7 @@ namespace type_t {
     {
         return as_type(type).cppTypeInfo;
     }
-    Type::RemapPointersFunc& get_remap_pointers_func(Term* type)
+    Type::RemapPointers& get_remap_pointers_func(Term* type)
     {
         return as_type(type).remapPointers;
     }
@@ -317,7 +317,7 @@ std::string to_source_string(Term* term)
     if (type == NULL)
         return "<NULL>";
 
-    Type::ToSourceStringFunc func = type->toSourceString;
+    Type::ToSourceString func = type->toSourceString;
 
     if (func != NULL)
         return func(term);

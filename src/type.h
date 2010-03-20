@@ -18,20 +18,20 @@ namespace circa {
 
 struct Type
 {
-    typedef void (*InitializeFunc)(Type* type, TaggedValue* value);
-    typedef void (*ReleaseFunc)(TaggedValue* value);
-    typedef void (*AssignFunc)(TaggedValue* source, TaggedValue* dest);
-    typedef bool (*CastPossibleFunc)(Type* type, TaggedValue* value);
-    typedef bool (*EqualsFunc)(TaggedValue* lhs, TaggedValue* rhs);
-    typedef void (*CastFunc)(Type* type, TaggedValue* source, TaggedValue* dest);
-    typedef void (*RemapPointersFunc)(Term* term, ReferenceMap const& map);
-    typedef std::string (*ToStringFunc)(TaggedValue* value);
-    typedef std::string (*ToSourceStringFunc)(Term* term);
-    typedef bool (*CheckInvariantsFunc)(Term* term, std::string* output);
-    typedef bool (*ValueFitsTypeFunc)(Type* type, TaggedValue* value);
-    typedef void (*BeginModifyFunc)(TaggedValue* value);
-    typedef TaggedValue* (*GetElementFunc)(TaggedValue* value);
-    typedef int (*NumElementsFunc)(TaggedValue* value);
+    typedef void (*Initialize)(Type* type, TaggedValue* value);
+    typedef void (*Release)(TaggedValue* value);
+    typedef void (*Assign)(TaggedValue* source, TaggedValue* dest);
+    typedef bool (*CastPossible)(Type* type, TaggedValue* value);
+    typedef bool (*Equals)(TaggedValue* lhs, TaggedValue* rhs);
+    typedef void (*Cast)(Type* type, TaggedValue* source, TaggedValue* dest);
+    typedef void (*RemapPointers)(Term* term, ReferenceMap const& map);
+    typedef std::string (*ToString)(TaggedValue* value);
+    typedef std::string (*ToSourceString)(Term* term);
+    typedef bool (*CheckInvariants)(Term* term, std::string* output);
+    typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
+    typedef void (*BeginModify)(TaggedValue* value);
+    typedef TaggedValue* (*GetElement)(TaggedValue* value);
+    typedef int (*NumElements)(TaggedValue* value);
 
     std::string name;
 
@@ -40,20 +40,20 @@ struct Type
     const std::type_info *cppTypeInfo;
 
     // Functions
-    InitializeFunc initialize;
-    ReleaseFunc release;
-    AssignFunc assign;
-    CastFunc cast;
-    CastPossibleFunc castPossible;
-    EqualsFunc equals;
-    RemapPointersFunc remapPointers;
-    ToStringFunc toString;
-    ToSourceStringFunc toSourceString;
-    CheckInvariantsFunc checkInvariants;
-    ValueFitsTypeFunc valueFitsType;
-    BeginModifyFunc beginModify;
-    GetElementFunc getElement;
-    NumElementsFunc numElements;
+    Initialize initialize;
+    Release release;
+    Assign assign;
+    Cast cast;
+    CastPossible castPossible;
+    Equals equals;
+    RemapPointers remapPointers;
+    ToString toString;
+    ToSourceString toSourceString;
+    CheckInvariants checkInvariants;
+    ValueFitsType valueFitsType;
+    BeginModify beginModify;
+    GetElement getElement;
+    NumElements numElements;
     
     Branch prototype;
 
@@ -103,7 +103,7 @@ namespace type_t {
     std::string& get_name(Term* type);
     bool& get_is_pointer(Term* type);
     const std::type_info*& get_std_type_info(Term* type);
-    Type::RemapPointersFunc& get_remap_pointers_func(Term* type);
+    Type::RemapPointers& get_remap_pointers_func(Term* type);
     Branch& get_prototype(Term* type);
     Branch& get_attributes(Term* type);
     Branch& get_member_functions(Term* type);

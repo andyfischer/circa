@@ -20,7 +20,7 @@ void assign_value(TaggedValue* source, TaggedValue* dest)
 
     // Check if they have different types. If so, try to cast.
     if (dest->value_type != source->value_type) {
-        Type::CastFunc cast_func = dest->value_type->cast;
+        Type::Cast cast_func = dest->value_type->cast;
         if (cast_func == NULL) {
             throw std::runtime_error("No cast function for value_type "
                 + dest->value_type->name + " (tried to assign value of value_type "
@@ -32,7 +32,7 @@ void assign_value(TaggedValue* source, TaggedValue* dest)
     }
 
     // Check if the type defines an assign function.
-    Type::AssignFunc assign = NULL;
+    Type::Assign assign = NULL;
     
     if (dest->value_type != NULL)
         assign = dest->value_type->assign;
@@ -47,7 +47,7 @@ void assign_value(TaggedValue* source, TaggedValue* dest)
 
 bool cast_possible(Type* type, TaggedValue* value)
 {
-    Type::CastPossibleFunc castPossible = type->castPossible;
+    Type::CastPossible castPossible = type->castPossible;
 
     if (castPossible != NULL)
         return castPossible(type, value);
@@ -89,7 +89,7 @@ void swap(TaggedValue* left, TaggedValue* right)
 
 std::string to_string(TaggedValue* value)
 {
-    Type::ToStringFunc toString = value->value_type->toString;
+    Type::ToString toString = value->value_type->toString;
     if (toString == NULL) {
         std::stringstream out;
         out << "<" << value->value_type->name << " " << value->value_data.ptr << ">";
@@ -105,7 +105,7 @@ void change_type(TaggedValue* v, Type* type)
         return;
 
     if (v->value_type != NULL) {
-        Type::ReleaseFunc release = v->value_type->release;
+        Type::Release release = v->value_type->release;
         if (release != NULL)
             release(v);
     }
@@ -114,7 +114,7 @@ void change_type(TaggedValue* v, Type* type)
     v->value_data.ptr = 0;
 
     if (type != NULL) {
-        Type::InitializeFunc initialize = type->initialize;
+        Type::Initialize initialize = type->initialize;
         if (initialize != NULL)
             initialize(type, v);
     }
@@ -124,7 +124,7 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
 {
     assert(lhs->value_type != NULL);
 
-    Type::EqualsFunc equals = lhs->value_type->equals;
+    Type::Equals equals = lhs->value_type->equals;
 
     if (equals != NULL)
         return equals(lhs, rhs);

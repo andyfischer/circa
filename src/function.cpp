@@ -202,7 +202,7 @@ namespace function_t {
     {
         return get_attrs(func).specializeType;
     }
-    ToSourceStringFunc& get_to_source_string(Term* func)
+    ToSourceString& get_to_source_string(Term* func)
     {
         return get_attrs(func).toSource;
     }
