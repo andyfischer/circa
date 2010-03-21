@@ -7,7 +7,7 @@ namespace length_function {
 
     void evaluate(EvalContext*, Term* caller)
     {
-        set_int(caller, as_branch(caller->input(0)).length());
+        set_int(caller, num_elements(caller->input(0)));
     }
 
     void setup(Branch& kernel)

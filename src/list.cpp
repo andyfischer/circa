@@ -9,8 +9,9 @@
 #include "type.h"
 
 namespace circa {
-
 namespace list_t {
+    
+bool is_list(TaggedValue* value);
 
 struct ListData {
     int refCount;
@@ -146,6 +147,7 @@ void tv_initialize(Type* type, TaggedValue* value)
 
 void tv_release(TaggedValue* value)
 {
+    assert(is_list(value));
     ListData* data = (ListData*) get_pointer(value);
     if (data == NULL) return;
     decref(data);
@@ -153,6 +155,8 @@ void tv_release(TaggedValue* value)
 
 void tv_copy(TaggedValue* source, TaggedValue* dest)
 {
+    assert(is_list(source));
+    assert(is_list(dest));
     ListData* s = (ListData*) get_pointer(source);
     ListData* d = (ListData*) get_pointer(dest);
 
@@ -166,6 +170,7 @@ void tv_copy(TaggedValue* source, TaggedValue* dest)
 
 TaggedValue* tv_get_element(TaggedValue* value, int index)
 {
+    assert(is_list(value));
     ListData* s = (ListData*) get_pointer(value);
     if (s == NULL) return NULL;
     if (index >= s->count) return NULL;
@@ -174,6 +179,7 @@ TaggedValue* tv_get_element(TaggedValue* value, int index)
 
 int tv_num_elements(TaggedValue* value)
 {
+    assert(is_list(value));
     ListData* s = (ListData*) get_pointer(value);
     if (s == NULL) return 0;
     return s->count;
@@ -181,13 +187,21 @@ int tv_num_elements(TaggedValue* value)
 
 std::string tv_to_string(TaggedValue* value)
 {
+    assert(is_list(value));
     return to_string((ListData*) get_pointer(value));
 }
 
 void tv_begin_modify(TaggedValue* value)
 {
+    assert(is_list(value));
     ListData* data = (ListData*) get_pointer(value);
     set_pointer(value, begin_modify(data));
+}
+
+bool is_list(TaggedValue* value)
+{
+    assert(is_list(value));
+    return value->value_type->initialize == tv_initialize;
 }
 
 void setup_type(Type* type)
