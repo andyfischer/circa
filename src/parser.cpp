@@ -551,7 +551,7 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
 
     Term* result = create_value(branch, TYPE_TYPE);
-    initialize_compound_type(result);
+    initizalize_branch_based_type(result);
 
     result->setStringProp("syntax:preLBracketWhitespace",
             possible_whitespace_or_newline(tokens));

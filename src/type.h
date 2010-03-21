@@ -116,7 +116,7 @@ namespace type_t {
 }
 
 Type& as_type(Term* term);
-bool is_compound_type(Term* type);
+bool is_branch_based_type(Term* type);
 bool is_native_type(Term* type);
 
 bool type_matches(Term *term, Term *type);
@@ -135,7 +135,7 @@ bool is_assign_value_possible(Term* source, Term* dest);
 Term* find_common_type(RefList const& list);
 
 void reset_type(Type* type);
-void initialize_compound_type(Term* term);
+void initizalize_branch_based_type(Term* term);
 void initialize_simple_pointer_type(Type* type);
 
 std::string compound_type_to_string(Term* caller);

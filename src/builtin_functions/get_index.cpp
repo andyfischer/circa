@@ -7,25 +7,16 @@ namespace get_index_function {
 
     void evaluate(EvalContext* cxt, Term* caller)
     {
-        if (!is_branch(caller->input(0))) {
-            //assert(false);
-            error_occurred(cxt, caller, "Value is not indexable");
-            return;
-        }
+        int index = as_int(caller->input(1));
+        TaggedValue* result = get_element(caller->input(0), index);
 
-        Branch& input = caller->input(0)->asBranch();
-        int index = caller->input(1)->asInt();
-
-        if (index >= input.length() || index < 0) {
+        if (result == NULL) {
             std::stringstream err;
             err << "Index out of range: " << index;
-            error_occurred(cxt, caller, err.str());
-            return;
+            return error_occurred(cxt, caller, err.str());
         }
 
-        // TEMP:
-        change_type(caller, input[index]->type);
-        copy(input[index], caller);
+        copy_newstyle(result, caller);
     }
 
     std::string toSourceString(Term* term)

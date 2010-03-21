@@ -259,7 +259,7 @@ Term* create_empty_type(Branch& branch, std::string name)
 Term* create_compound_type(Branch& branch, std::string const& name)
 {
     Term* term = create_type(branch, name);
-    initialize_compound_type(term);
+    initizalize_branch_based_type(term);
     return term;
 }
 

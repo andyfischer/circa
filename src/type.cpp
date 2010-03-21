@@ -104,8 +104,8 @@ bool type_matches(Term *term, Term *type)
     // Allow for compound types to be considered the same.
     // Later there can be more complicated type checking.
 
-    if (type != NULL && is_compound_type(term->type)
-            && is_compound_type(type))
+    if (type != NULL && is_branch_based_type(term->type)
+            && is_branch_based_type(type))
         return true;
 
     if (term->type != type)
@@ -116,10 +116,10 @@ bool type_matches(Term *term, Term *type)
 
 bool is_native_type(Term* type)
 {
-    return !is_compound_type(type);
+    return !is_branch_based_type(type);
 }
 
-bool is_compound_type(Term* type)
+bool is_branch_based_type(Term* type)
 {
     return as_type(type).initialize == branch_t::initialize;
 }
@@ -154,14 +154,14 @@ bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
 
     // Otherwise, primitive types must fit exactly.
     // So if this is a primitive type, reject it.
-    if (!is_compound_type(type)) {
+    if (!is_branch_based_type(type)) {
         if (errorReason != NULL)
             *errorReason = "type is primitive, expected exact match";
         return false;
     }
 
     // If 'type' is a compound type, make sure value is too
-    if (!is_compound_type(valueTerm->type)) {
+    if (!is_branch_based_type(valueTerm->type)) {
         if (errorReason != NULL)
             *errorReason = "value is primitive, type is compound";
         return false;
@@ -246,7 +246,7 @@ Term* find_common_type(RefList const& list)
     // Another special case, if all types are branch based then use BRANCH_TYPE
     bool all_are_compound = true;
     for (int i=0; i < list.length(); i++)
-        if (!is_compound_type(list[i]))
+        if (!is_branch_based_type(list[i]))
             all_are_compound = false;
 
     if (all_are_compound)
@@ -269,7 +269,7 @@ void reset_type(Type* type)
     type->equals = NULL;
     type->cast = NULL;
 }
-void initialize_compound_type(Term* term)
+void initizalize_branch_based_type(Term* term)
 {
     Type* type = &as_type(term);
 

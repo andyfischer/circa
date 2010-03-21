@@ -81,8 +81,12 @@ void copy_newstyle(TaggedValue* source, TaggedValue* dest)
 {
     change_type(dest, source->value_type);
     Type::Copy copy = source->value_type->copy;
-    assert(copy != NULL);
-    copy(source, dest);
+
+    if (copy != NULL)
+        copy(source, dest);
+
+    // Backwards compat, use assign() if copy is not found.
+    assign_value(source, dest);
 }
 
 void swap(TaggedValue* left, TaggedValue* right)
