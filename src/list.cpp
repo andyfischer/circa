@@ -200,7 +200,6 @@ void tv_begin_modify(TaggedValue* value)
 
 bool is_list(TaggedValue* value)
 {
-    assert(is_list(value));
     return value->value_type->initialize == tv_initialize;
 }
 
