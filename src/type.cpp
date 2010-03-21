@@ -119,11 +119,6 @@ bool is_native_type(Term* type)
     return !is_branch_based_type(type);
 }
 
-bool is_branch_based_type(Term* type)
-{
-    return as_type(type).initialize == branch_t::initialize;
-}
-
 Type& as_type(Term *term)
 {
     assert(get_type_value(term) != NULL);
@@ -269,21 +264,6 @@ void reset_type(Type* type)
     type->equals = NULL;
     type->cast = NULL;
 }
-void initizalize_branch_based_type(Term* term)
-{
-    Type* type = &as_type(term);
-
-    reset_type(type);
-    type->initialize = branch_t::initialize;
-    type->release = branch_t::release;
-    type->assign = branch_t::assign;
-    type->cast = branch_t::cast;
-    type->castPossible = branch_t::cast_possible;
-    type->equals = branch_t::equals;
-    type->getElement = branch_t::get_element;
-    type->numElements = branch_t::num_elements;
-    type->toSourceString = compound_type_to_string;
-}
 
 void initialize_simple_pointer_type(Type* type)
 {
@@ -293,23 +273,6 @@ void initialize_simple_pointer_type(Type* type)
     type->initialize = NULL;
     type->release = NULL;
     type->assign = NULL;
-}
-
-std::string compound_type_to_string(Term* caller)
-{
-    std::stringstream out;
-    out << "[";
-
-    Branch& value = as_branch(caller);
-
-    for (int i=0; i < value.length(); i++) {
-        if (i != 0)
-            out << ", ";
-        out << to_string(value[i]);
-    }
-
-    out << "]";
-    return out.str();
 }
 
 std::string to_source_string(Term* term)

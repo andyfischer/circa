@@ -164,6 +164,7 @@ def generate_particle_burst(List particles, Point loc, Point vel) -> List
 end
 
 state List asteroids = []
+
 state bool initialized = false
 if not(initialized)
     for i in 0..3
@@ -230,6 +231,7 @@ for asteroid in @asteroids
 end
 
 for spawn in spawned
+    spawn = spawn -> Asteroid
     asteroids.append(spawn)
 end
 

@@ -152,17 +152,22 @@ std::string get_term_source(Term* term)
         if (term->type != FUNCTION_TYPE && term->type != TYPE_TYPE)
             prepend_name_binding(term, result);
 
-        if (as_type(term->type).toSourceString == NULL) {
-            std::stringstream out;
-            out << "Type " << term->type->name << " doesn't have a toSourceString function";
-            throw std::runtime_error(out.str());
-        }
 
         // Special constructor syntax
-        if (term->boolPropOptional("constructor", false))
+        if (term->boolPropOptional("constructor", false)) {
             result << term->type->name << "()";
-        else 
+
+        // Otherwise use toSourceString on type
+        } else {
+            if (as_type(term->type).toSourceString == NULL) {
+                std::stringstream out;
+                out << "Type " << term->type->name <<
+                    " doesn't have a toSourceString function";
+                throw std::runtime_error(out.str());
+            }
+
             result << as_type(term->type).toSourceString(term);
+        }
 
         result << term->stringPropOptional("syntax:postWhitespace", "");
         return result.str();

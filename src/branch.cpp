@@ -482,6 +482,44 @@ Branch& as_branch(TaggedValue* value)
     return *((Branch*) value->value_data.ptr);
 }
 
+std::string compound_type_to_string(TaggedValue* value)
+{
+    std::stringstream out;
+    out << "[";
+
+    Branch& branch = as_branch(value);
+
+    for (int i=0; i < branch.length(); i++) {
+        if (i != 0)
+            out << ", ";
+        out << to_string(branch[i]);
+    }
+
+    out << "]";
+    return out.str();
+}
+
+bool is_branch_based_type(Term* type)
+{
+    return as_type(type).initialize == branch_t::initialize;
+}
+
+void initizalize_branch_based_type(Term* term)
+{
+    Type* type = &as_type(term);
+
+    reset_type(type);
+    type->initialize = branch_t::initialize;
+    type->release = branch_t::release;
+    type->assign = branch_t::assign;
+    type->cast = branch_t::cast;
+    type->castPossible = branch_t::cast_possible;
+    type->equals = branch_t::equals;
+    type->getElement = branch_t::get_element;
+    type->numElements = branch_t::num_elements;
+    type->toString = compound_type_to_string;
+}
+
 bool is_namespace(Term* term)
 {
     return is_branch(term) && term->type == NAMESPACE_TYPE;

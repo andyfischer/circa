@@ -106,6 +106,10 @@ namespace branch_t {
 
 bool is_branch(TaggedValue* term);
 Branch& as_branch(TaggedValue* term);
+
+bool is_branch_based_type(Term* type);
+void initizalize_branch_based_type(Term* term);
+
 bool is_namespace(Term* term);
 
 std::string get_branch_source_filename(Branch& branch);
