@@ -812,6 +812,15 @@ namespace ref_t {
         set_int(output[0], t->intPropOptional("colStart", 0));
         set_int(output[1], t->intPropOptional("lineStart", 0));
     }
+    void setup_type(Type* type)
+    {
+        type->name = "ref";
+        type->remapPointers = Ref::remap_pointers;
+        type->toSourceString = to_string;
+        type->initialize = initialize;
+        type->assign = assign;
+        type->equals = equals;
+    }
 }
 
 namespace any_t {

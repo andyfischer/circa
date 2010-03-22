@@ -14,6 +14,11 @@ namespace comment_function {
         return get_comment_string(term);
     }
 
+    void formatSource(RichSource* source, Term* term)
+    {
+        append_phrase(source, get_comment_string(term).c_str(), term, richsource::COMMENT);
+    }
+
     void setup(Branch& kernel)
     {
         COMMENT_FUNC = import_function(kernel, evaluate, "comment()");

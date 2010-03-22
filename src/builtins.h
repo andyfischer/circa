@@ -75,6 +75,7 @@ extern Type* INT_T;
 extern Type* NULL_T;
 extern Type* STRING_T;
 extern Type* REF_T;
+extern Type* LIST_T;
 
 // Get a named term from the global namespace.
 Term* get_global(std::string name);

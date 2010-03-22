@@ -35,6 +35,7 @@
 #include "refactoring.h"
 #include "references.h"
 #include "repl.h"
+#include "richsource.h"
 #include "stateful_code.h"
 #include "source_repro.h"
 #include "subroutine.h"

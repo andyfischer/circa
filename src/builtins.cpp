@@ -84,6 +84,7 @@ Type* INT_T = NULL;
 Type* NULL_T = NULL;
 Type* STRING_T = NULL;
 Type* REF_T = NULL;
+Type* LIST_T = NULL;
 
 Term* get_global(std::string name)
 {
@@ -114,12 +115,10 @@ void create_builtin_types()
     BOOL_T->toSourceString = bool_t::to_string;
 
     REF_T = new Type();
-    REF_T->name = "ref";
-    REF_T->remapPointers = Ref::remap_pointers;
-    REF_T->toSourceString = ref_t::to_string;
-    REF_T->initialize = ref_t::initialize;
-    REF_T->assign = ref_t::assign;
-    REF_T->equals = ref_t::equals;
+    ref_t::setup_type(REF_T);
+
+    LIST_T = new Type();
+    list_t::setup_type(LIST_T);
 }
 
 void bootstrap_kernel()

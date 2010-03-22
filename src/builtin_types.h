@@ -36,10 +36,6 @@ namespace string_t {
 }
 
 namespace ref_t {
-    std::string to_string(Term* term);
-    void initialize(Type* type, TaggedValue* value);
-    void assign(TaggedValue* source, TaggedValue* dest);
-    bool equals(TaggedValue* lhs, TaggedValue* rhs);
     void get_name(EvalContext*, Term* caller);
     void hosted_to_string(EvalContext*, Term* caller);
     void get_function(EvalContext*, Term* caller);
@@ -51,6 +47,7 @@ namespace ref_t {
     void get_input(EvalContext*, Term* caller);
     void num_inputs(EvalContext*, Term* caller);
     void get_source_location(EvalContext*, Term* caller);
+    void setup_type(Type* type);
 }
 
 namespace type_t {

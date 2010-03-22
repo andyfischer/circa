@@ -9,11 +9,20 @@ Goals:
  - Section rewriting is efficient.
 
 
-Every formatted source item should have:
- - Ref to relevant term
+Every item should have:
  - String contents
+ - Ref to relevant term
  - Highlight class
 
-Style:
+Data format:
+  Block = List<Line>
+  Line = [Ref term, List<Phrase>] (each term from source branch corresponds to 1 line)
+  Phrase = [String contents, Ref term, PhraseType type]
 
+Internal api:
 
+Block create_block()
+
+Line Block.append_line(Block, Term* term)
+
+Line.append_phrase(String str, PhraseType type, Term* term)
