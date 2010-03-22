@@ -16,7 +16,7 @@ void swap(TaggedValue* left, TaggedValue* right);
 std::string to_string(TaggedValue* value);
 TaggedValue* get_element(TaggedValue* value, int index);
 int num_elements(TaggedValue* value);
-void begin_modify(TaggedValue* value);
+void mutate(TaggedValue* value);
 
 void change_type(TaggedValue* v, Type* type);
 bool equals(TaggedValue* lhs, TaggedValue* rhs);

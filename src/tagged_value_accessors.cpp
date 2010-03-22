@@ -133,11 +133,11 @@ int num_elements(TaggedValue* value)
     return numElements(value);
 }
 
-void begin_modify(TaggedValue* value)
+void mutate(TaggedValue* value)
 {
-    Type::BeginModify beginModify = value->value_type->beginModify;
-    if (beginModify != NULL)
-        beginModify(value);
+    Type::Mutate mutate = value->value_type->mutate;
+    if (mutate != NULL)
+        mutate(value);
 
     // Default behavior: no-op.
 }

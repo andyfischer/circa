@@ -90,7 +90,7 @@ static void clear(ListData** data)
 
 // Return a version of this list which is safe to modify. If this data has
 // multiple references, we'll return a new copy (and decref the original).
-ListData* begin_modify(ListData* data)
+ListData* mutate(ListData* data)
 {
     assert(data->refCount > 0);
     if (data->refCount == 1)
@@ -108,7 +108,7 @@ TaggedValue* append(ListData** data)
     if (*data == NULL) {
         *data = create_list(1);
     } else {
-        *data = begin_modify(*data);
+        *data = mutate(*data);
         
         if ((*data)->count == (*data)->capacity)
             *data = grow_capacity(*data);
@@ -190,11 +190,11 @@ std::string tv_to_string(TaggedValue* value)
     return to_string((ListData*) get_pointer(value));
 }
 
-void tv_begin_modify(TaggedValue* value)
+void tv_mutate(TaggedValue* value)
 {
     assert(is_list(value));
     ListData* data = (ListData*) get_pointer(value);
-    set_pointer(value, begin_modify(data));
+    set_pointer(value, mutate(data));
 }
 
 bool is_list(TaggedValue* value)
@@ -211,7 +211,7 @@ void setup_type(Type* type)
     type->toString = tv_to_string;
     type->getElement = tv_get_element;
     type->numElements = tv_num_elements;
-    type->beginModify = tv_begin_modify;
+    type->mutate = tv_mutate;
 }
 
 void postponed_setup_type(Type*)

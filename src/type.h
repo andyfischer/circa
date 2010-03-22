@@ -30,7 +30,7 @@ struct Type
     typedef std::string (*ToSourceString)(Term* term);
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
-    typedef void (*BeginModify)(TaggedValue* value);
+    typedef void (*Mutate)(TaggedValue* value);
     typedef TaggedValue* (*GetElement)(TaggedValue* value, int index);
     typedef int (*NumElements)(TaggedValue* value);
 
@@ -53,7 +53,7 @@ struct Type
     ToSourceString toSourceString;
     CheckInvariants checkInvariants;
     ValueFitsType valueFitsType;
-    BeginModify beginModify;
+    Mutate mutate;
     GetElement getElement;
     NumElements numElements;
     
@@ -85,7 +85,7 @@ struct Type
         toSourceString(NULL),
         checkInvariants(NULL),
         valueFitsType(NULL),
-        beginModify(NULL),
+        mutate(NULL),
         getElement(NULL),
         numElements(NULL)
     {
