@@ -41,10 +41,9 @@ void decref(ListData* data)
 static ListData* create_list(int capacity)
 {
     ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(TaggedValue));
-    result->refCount = 0;
+    result->refCount = 1;
     result->count = 0;
     result->capacity = capacity;
-    incref(result);
     for (int i=0; i < capacity; i++)
         result->items[i].init();
     return result;

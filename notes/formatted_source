@@ -1,0 +1,19 @@
+
+Need to rewrite all the existing source-reproduction stuff, but allow for rich formatting.
+
+Goals:
+ - Easy conversion from rich-text to plain source. Eventually replace the plain source version.
+ - No wasteful string duplication.
+ - Each text snippet can be colored, hovered over, and clicked.
+ - Ability to add more annotations as needed.
+ - Section rewriting is efficient.
+
+
+Every formatted source item should have:
+ - Ref to relevant term
+ - String contents
+ - Highlight class
+
+Style:
+
+

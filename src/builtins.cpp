@@ -101,12 +101,7 @@ void create_builtin_types()
     NULL_T->name = "null";
 
     STRING_T = new Type();
-    STRING_T->name = "string";
-    STRING_T->initialize = string_t::initialize;
-    STRING_T->release = string_t::release;
-    STRING_T->assign = string_t::assign;
-    STRING_T->equals = string_t::equals;
-    STRING_T->toSourceString = string_t::to_string;
+    string_t::setup_type(STRING_T);
 
     INT_T = new Type();
     int_t::setup_type(INT_T);

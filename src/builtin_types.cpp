@@ -632,6 +632,23 @@ namespace string_t {
     {
         set_str(term, as_string(term->input(0)).substr(int_input(term, 1), int_input(term, 2)));
     }
+
+    void setup_type(Type* type)
+    {
+        reset_type(type);
+        STRING_T->name = "string";
+        STRING_T->initialize = initialize;
+        STRING_T->release = release;
+        STRING_T->assign = assign;
+        STRING_T->equals = equals;
+        STRING_T->toSourceString = to_string;
+    }
+
+    void postponed_setup_type(Type* type)
+    {
+        import_member_function(type, length, "length(string) -> int");
+        import_member_function(type, substr, "substr(string,int,int) -> string");
+    }
 }
 
 namespace ref_t {
@@ -867,8 +884,7 @@ void initialize_primitive_types(Branch& kernel)
 
 void post_setup_primitive_types()
 {
-    import_member_function(STRING_TYPE, string_t::length, "length(string) -> int");
-    import_member_function(STRING_TYPE, string_t::substr, "substr(string,int,int) -> string");
+    string_t::postponed_setup_type(&as_type(STRING_TYPE));
 
     import_member_function(REF_TYPE, ref_t::get_name, "name(Ref) -> string");
     import_member_function(REF_TYPE, ref_t::hosted_to_string, "to_string(Ref) -> string");
