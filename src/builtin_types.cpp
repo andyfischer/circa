@@ -116,12 +116,22 @@ namespace float_t {
 }
 
 namespace bool_t {
-    std::string to_string(Term* term)
+    std::string to_string(TaggedValue* value)
     {
-        if (as_bool(term))
+        if (as_bool(value))
             return "true";
         else
             return "false";
+    }
+    std::string to_source_string(Term* term)
+    {
+        return bool_t::to_string(term);
+    }
+    void setup_type(Type* type)
+    {
+        type->name = "bool";
+        type->toString = to_string;
+        type->toSourceString = to_source_string;
     }
 }
 

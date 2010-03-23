@@ -14,7 +14,7 @@ namespace float_t {
 }
 
 namespace bool_t {
-    std::string to_string(Term* term);
+    void setup_type(Type* type);
 }
 
 namespace set_t {

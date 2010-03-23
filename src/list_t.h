@@ -1,7 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_LIST_INCLUDED
-#define CIRCA_LIST_INCLUDED
+#ifndef CIRCA_LIST_T_INCLUDED
+#define CIRCA_LIST_T_INCLUDED
 
 #include "common_headers.h"
 
@@ -11,9 +11,11 @@ namespace list_t {
     struct ListData;
 
     TaggedValue* append(TaggedValue* list);
-    
+
     void setup_type(Type*);
     void postponed_setup_type(Type*);
+    
+    int get_refcount(ListData* data);
 }
 
 // C++ wrapper over list_t
@@ -38,6 +40,8 @@ struct List
 
     List(List const& copy);
     List const& operator=(List const& rhs);
+
+    List(TaggedValue* value);
 };
 
 }

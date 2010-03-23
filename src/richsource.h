@@ -5,8 +5,6 @@
 
 #include "common_headers.h"
 
-#include "list.h"
-
 namespace circa {
 
 namespace richsource {

@@ -3,7 +3,7 @@
 #include <string>
 #include <sstream>
 
-#include "list.h"
+#include "list_t.h"
 #include "tagged_value.h"
 #include "tagged_value_accessors.h"
 #include "type.h"
@@ -219,6 +219,11 @@ void postponed_setup_type(Type*)
     // TODO: create member functions: append, count
 }
 
+int get_refcount(ListData* data)
+{
+    return data->refCount;
+}
+
 } // namespace list_t
 
 List::~List()
@@ -232,6 +237,14 @@ List::List(List const& copy)
     _data = copy._data;
     if (_data != NULL)
         incref(_data);
+}
+
+List::List(TaggedValue* value)
+{
+    assert(list_t::is_list(value));
+    _data = (list_t::ListData*) get_pointer(value);
+    if (_data != NULL)
+        list_t::incref(_data);
 }
 
 List const&

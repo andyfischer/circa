@@ -210,10 +210,11 @@ void make_ref(TaggedValue* value, Term* t)
     set_ref(value, t);
 }
 
-void make_list(TaggedValue* value)
+TaggedValue* make_list(TaggedValue* value)
 {
     change_type(value, NULL_T); // substitute for 'reset'
     change_type(value, LIST_T);
+    return value;
 }
 
 void make_type(TaggedValue* value, Type* type)

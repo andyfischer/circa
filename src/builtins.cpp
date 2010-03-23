@@ -111,8 +111,7 @@ void create_builtin_types()
     float_t::setup_type(FLOAT_T);
 
     BOOL_T = new Type();
-    BOOL_T->name = "bool";
-    BOOL_T->toSourceString = bool_t::to_string;
+    bool_t::setup_type(BOOL_T);
 
     REF_T = new Type();
     ref_t::setup_type(REF_T);
