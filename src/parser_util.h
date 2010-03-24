@@ -6,6 +6,7 @@
 #define CIRCA_PARSER_UTIL_INCLUDED
 
 #include "common_headers.h"
+#include "token_stream.h"
 
 namespace circa {
 

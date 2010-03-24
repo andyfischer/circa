@@ -152,7 +152,6 @@ std::string get_term_source(Term* term)
         if (term->type != FUNCTION_TYPE && term->type != TYPE_TYPE)
             prepend_name_binding(term, result);
 
-
         // Special constructor syntax
         if (term->boolPropOptional("constructor", false)) {
             result << term->type->name << "()";

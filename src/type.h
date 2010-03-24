@@ -28,6 +28,7 @@ struct Type
     typedef void (*RemapPointers)(Term* term, ReferenceMap const& map);
     typedef std::string (*ToString)(TaggedValue* value);
     typedef std::string (*ToSourceString)(Term* term);
+    typedef void (*FormatSource)(RichSource*, Term* term);
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
     typedef void (*Mutate)(TaggedValue* value);
@@ -51,6 +52,7 @@ struct Type
     RemapPointers remapPointers;
     ToString toString;
     ToSourceString toSourceString;
+    FormatSource formatSource;
     CheckInvariants checkInvariants;
     ValueFitsType valueFitsType;
     Mutate mutate;
@@ -83,6 +85,7 @@ struct Type
         remapPointers(NULL),
         toString(NULL),
         toSourceString(NULL),
+        formatSource(NULL),
         checkInvariants(NULL),
         valueFitsType(NULL),
         mutate(NULL),

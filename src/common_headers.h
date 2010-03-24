@@ -42,6 +42,7 @@ struct Type;
 struct Ref;
 struct RefList;
 struct ReferenceMap;
+struct RichSource;
 
 } // namespace circa
 

@@ -22,7 +22,8 @@ namespace comment_function {
     void setup(Branch& kernel)
     {
         COMMENT_FUNC = import_function(kernel, evaluate, "comment()");
-        function_t::get_to_source_string(COMMENT_FUNC) = toSourceString;
+        function_t::get_attrs(COMMENT_FUNC).toSource = toSourceString;
+        function_t::get_attrs(COMMENT_FUNC).formatSource = formatSource;
     }
 }
 }
