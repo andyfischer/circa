@@ -84,6 +84,7 @@ static ListData* grow_capacity(ListData* original)
 // Reset this list to have 0 elements.
 static void clear(ListData** data)
 {
+    if (*data == NULL) return;
     decref(*data);
     *data = NULL;
 }
@@ -121,7 +122,14 @@ TaggedValue* append(ListData** data)
 
 TaggedValue* append(TaggedValue* list)
 {
+    assert(is_list(list));
     return append((ListData**) &list->value_data);
+}
+
+void clear(TaggedValue* list)
+{
+    assert(is_list(list));
+    clear((ListData**) &list->value_data);
 }
 
 static std::string to_string(ListData* value)
@@ -226,64 +234,34 @@ int get_refcount(ListData* data)
 
 } // namespace list_t
 
-List::~List()
+List::List()
+  : TaggedValue()
 {
-    if (_data != NULL)
-        decref(_data);
-}
-
-List::List(List const& copy)
-{
-    _data = copy._data;
-    if (_data != NULL)
-        incref(_data);
-}
-
-List::List(TaggedValue* value)
-{
-    assert(list_t::is_list(value));
-    _data = (list_t::ListData*) get_pointer(value);
-    if (_data != NULL)
-        list_t::incref(_data);
-}
-
-List const&
-List::operator=(List const& rhs)
-{
-    if (_data == rhs._data)
-        return *this;
-    if (_data != NULL)
-        decref(_data);
-    _data = rhs._data;
-    if (_data != NULL)
-        incref(_data);
-    return *this;
-}
-
-int
-List::length() const
-{
-    return _data == NULL ? 0 : _data->count;
+    change_type(this, LIST_T);
 }
 
 TaggedValue*
 List::append()
 {
-    return list_t::append(&_data);
+    return list_t::append((TaggedValue*) this);
 }
 
 void
 List::clear()
 {
-    list_t::clear(&_data);
+    list_t::clear((TaggedValue*) this);
+}
+
+int
+List::length()
+{
+    return list_t::tv_num_elements((TaggedValue*) this);
 }
 
 TaggedValue*
 List::operator[](int index)
 {
-    assert(_data != NULL);
-    assert(index < _data->count);
-    return &_data->items[index];
+    return list_t::tv_get_element((TaggedValue*) this, index);
 }
 
 }

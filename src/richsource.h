@@ -9,36 +9,29 @@
 
 namespace circa {
 
-namespace richsource {
-    enum PhraseType {
-        UNDEFINED=0,
-        COMMENT,
-        NEWLINE,
-        WHITESPACE,
-        BOOL_VALUE,
-        INT_VALUE,
-        FLOAT_VALUE,
-        FUNCTION_CALL,
-        INFIX_OPERATOR,
-        PREFIX_OPERATOR,
-        FUNCTION_NAME,
-        LPAREN,
-        RPAREN,
-        FOR,
-        IF,
-        END
-    };
+namespace phrase_type {
+    // Token enumerations are valid as phrase types.
+    // This list has some types which are not tokens.
+    const int UNDEFINED = 200;
+    const int INFIX_OPERATOR = 201;
+    const int FUNCTION_NAME = 202;
 }
 
 struct RichSource
 {
     List _phrases;
+
+    std::string toString();
 };
 
-void format_branch_source(Branch& branch, RichSource* source);
+void append_branch_source(RichSource* source, Branch& branch);
 
-void append_phrase(RichSource* source, const char* str, Term* term, richsource::PhraseType type);
+void append_phrase(RichSource* source, const char* str, Term* term, int type);
 void append_leading_name_binding(RichSource* source, Term* term);
+void append_source_for_input(RichSource* source, Term* term, int inputIndex);
+void append_term_source(RichSource* source, Term* term);
+
+std::string unformat_rich_source(RichSource* source);
 
 }
 

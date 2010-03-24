@@ -7,7 +7,7 @@
 namespace circa {
 namespace parser {
 
-using namespace circa::tokenizer;
+using namespace circa::token;
 
 Ref compile(Branch* branch, ParsingStep step, std::string const& input)
 {
@@ -1023,35 +1023,35 @@ const int HIGHEST_INFIX_PRECEDENCE = 8;
 int get_infix_precedence(int match)
 {
     switch(match) {
-        case tokenizer::TWO_DOTS:
-        case tokenizer::RIGHT_ARROW:
+        case token::TWO_DOTS:
+        case token::RIGHT_ARROW:
             return 8;
-        case tokenizer::STAR:
-        case tokenizer::SLASH:
-        case tokenizer::DOUBLE_SLASH:
-        case tokenizer::PERCENT:
+        case token::STAR:
+        case token::SLASH:
+        case token::DOUBLE_SLASH:
+        case token::PERCENT:
             return 7;
-        case tokenizer::PLUS:
-        case tokenizer::MINUS:
+        case token::PLUS:
+        case token::MINUS:
             return 6;
             //return 5;
-        case tokenizer::LTHAN:
-        case tokenizer::LTHANEQ:
-        case tokenizer::GTHAN:
-        case tokenizer::GTHANEQ:
-        case tokenizer::DOUBLE_EQUALS:
-        case tokenizer::NOT_EQUALS:
+        case token::LTHAN:
+        case token::LTHANEQ:
+        case token::GTHAN:
+        case token::GTHANEQ:
+        case token::DOUBLE_EQUALS:
+        case token::NOT_EQUALS:
             return 4;
-        case tokenizer::AND:
-        case tokenizer::OR:
+        case token::AND:
+        case token::OR:
             return 3;
-        case tokenizer::PLUS_EQUALS:
-        case tokenizer::MINUS_EQUALS:
-        case tokenizer::STAR_EQUALS:
-        case tokenizer::SLASH_EQUALS:
+        case token::PLUS_EQUALS:
+        case token::MINUS_EQUALS:
+        case token::STAR_EQUALS:
+        case token::SLASH_EQUALS:
             return 2;
-        case tokenizer::COLON_EQUALS:
-        case tokenizer::LEFT_ARROW:
+        case token::COLON_EQUALS:
+        case token::LEFT_ARROW:
             return 0;
         default:
             return -1;

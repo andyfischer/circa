@@ -7,7 +7,11 @@ namespace richsource_tests {
 
 void starter_test()
 {
-
+    Branch branch;
+    branch.compile("a = 1");
+    RichSource source;
+    append_branch_source(&source, branch);
+    //std::cout << source.toString() << std::endl;
 }
 
 void register_tests()

@@ -5,13 +5,13 @@
 
 #include <set>
 
-#include "tokenizer.h"
+#include "token.h"
 
 namespace circa {
 
 struct TokenStream
 {
-    tokenizer::TokenList tokens;
+    token::TokenList tokens;
     unsigned int _position;
 
     TokenStream()
@@ -20,7 +20,7 @@ struct TokenStream
 
     }
 
-    TokenStream(tokenizer::TokenList const& _tokens)
+    TokenStream(token::TokenList const& _tokens)
       : tokens(_tokens), _position(0)
     {
     }
@@ -28,24 +28,24 @@ struct TokenStream
     TokenStream(std::string const& input)
       : _position(0)
     {
-        tokenizer::tokenize(input, tokens);
+        token::tokenize(input, tokens);
     }
 
-    tokenizer::Token operator[](int index) {
+    token::Token operator[](int index) {
         return tokens[index];
     }
 
     void reset(std::string const& input)
     {
         tokens.clear();
-        tokenizer::tokenize(input, tokens);
+        token::tokenize(input, tokens);
         _position = 0;
     }
 
     int length() const { return (int) tokens.size(); }
     int remaining() const { return (int) tokens.size() - _position; }
 
-    tokenizer::Token const& next(int lookahead=0) const;
+    token::Token const& next(int lookahead=0) const;
 
     int nextNonWhitespace(int lookahead=0) const;
 

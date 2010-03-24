@@ -35,6 +35,14 @@ namespace list_function {
         return out.str();
     }
 
+    void list_formatSource(RichSource* source, Term* caller) {
+        append_leading_name_binding(source, caller);
+        append_phrase(source, "[", caller, token::LBRACKET);
+        for (int i=0; i < caller->numInputs(); i++)
+            append_source_for_input(source, caller, i);
+        append_phrase(source, "]", caller, token::LBRACKET);
+    }
+
     void evaluate_repeat(EvalContext*, Term* caller) {
         Branch& dest = as_branch(caller);
 
@@ -59,7 +67,8 @@ namespace list_function {
     void setup(Branch& kernel)
     {
         LIST_FUNC = import_function(kernel, evaluate, "list(any...) -> List");
-        function_t::get_to_source_string(LIST_FUNC) = list_toSource;
+        function_t::get_attrs(LIST_FUNC).toSource = list_toSource;
+        function_t::get_attrs(LIST_FUNC).formatSource = list_formatSource;
 
         import_function(kernel, evaluate_repeat, "repeat(any, int) -> List");
     }

@@ -31,7 +31,16 @@ void round_trip_source(std::string statement)
     Branch branch;
     parser::compile(&branch, parser::statement_list, statement);
 
+#if 0
+    RichSource richSource;
+    append_branch_source(&richSource, branch);
+
+    result.actual = unformat_rich_source(&richSource);
+#else
+
     result.actual = get_branch_source(branch);
+#endif
+
     result.passed = result.expected == result.actual;
     result.actual = escape_newlines(result.actual);
     result.expected = escape_newlines(result.expected);

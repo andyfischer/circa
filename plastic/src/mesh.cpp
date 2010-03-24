@@ -7,7 +7,7 @@
 #include "mesh.h"
 
 using namespace circa;
-using namespace circa::tokenizer;
+using namespace circa::token;
 
 namespace mesh {
 

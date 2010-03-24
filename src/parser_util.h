@@ -10,7 +10,7 @@
 
 namespace circa {
 
-namespace tokenizer { struct Token; }
+namespace token { struct Token; }
 
 Term* apply_with_syntax(Branch& branch, Term* function, RefList inputs, std::string name="");
 

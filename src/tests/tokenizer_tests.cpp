@@ -4,7 +4,7 @@
 
 #include "circa.h"
 
-namespace token = circa::tokenizer;
+namespace token = circa::token;
 
 namespace circa {
 namespace tokenizer_tests {
@@ -251,9 +251,9 @@ void test_token_stream()
 {
     TokenStream tstream("1 2.0");
 
-    test_assert(tstream.nextIs(tokenizer::INTEGER));
-    test_assert(tstream.nextIs(tokenizer::WHITESPACE, 1));
-    test_assert(tstream.nextNonWhitespaceIs(tokenizer::FLOAT_TOKEN, 1));
+    test_assert(tstream.nextIs(token::INTEGER));
+    test_assert(tstream.nextIs(token::WHITESPACE, 1));
+    test_assert(tstream.nextNonWhitespaceIs(token::FLOAT_TOKEN, 1));
 }
 
 void token_stream_to_string()

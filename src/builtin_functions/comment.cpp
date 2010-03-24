@@ -16,7 +16,7 @@ namespace comment_function {
 
     void formatSource(RichSource* source, Term* term)
     {
-        append_phrase(source, get_comment_string(term).c_str(), term, richsource::COMMENT);
+        append_phrase(source, get_comment_string(term).c_str(), term, token::COMMENT);
     }
 
     void setup(Branch& kernel)

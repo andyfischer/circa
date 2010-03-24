@@ -5,6 +5,8 @@
 
 #include "common_headers.h"
 
+#include "tagged_value.h"
+
 namespace circa {
 
 namespace list_t {
@@ -18,30 +20,14 @@ namespace list_t {
     int get_refcount(ListData* data);
 }
 
-// C++ wrapper over list_t
-struct List
+struct List : TaggedValue
 {
-    list_t::ListData* _data;
+    List();
 
-    // Returns number of elements.
-    int length() const;
-
-    // Append a new element on the end, and returns the new element.
     TaggedValue* append();
-
-    // Clear all elements.
     void clear();
-
-    // Access an element by index.
+    int length();
     TaggedValue* operator[](int index);
-    
-    List() : _data(NULL) {}
-    ~List();
-
-    List(List const& copy);
-    List const& operator=(List const& rhs);
-
-    List(TaggedValue* value);
 };
 
 }

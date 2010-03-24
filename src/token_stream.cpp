@@ -6,7 +6,7 @@
 
 namespace circa {
 
-tokenizer::Token const&
+token::Token const&
 TokenStream::next(int lookahead) const
 {
     int i = this->_position + lookahead;
@@ -28,9 +28,9 @@ TokenStream::nextNonWhitespace(int lookahead) const
     while (true) {
 
         if (index >= (int) tokens.size())
-            return tokenizer::EOF_TOKEN;
+            return token::EOF_TOKEN;
 
-        if (tokens[index].match == tokenizer::WHITESPACE) {
+        if (tokens[index].match == token::WHITESPACE) {
             index++;
             continue;
         }
@@ -56,12 +56,12 @@ TokenStream::consume(int match)
 {
     if (finished())
         throw std::runtime_error(std::string("Unexpected EOF while looking for ")
-                + tokenizer::get_token_text(match));
+                + token::get_token_text(match));
 
     if ((match != -1) && next().match != match) {
         std::stringstream msg;
-        msg << "Unexpected token (expected " << tokenizer::get_token_text(match)
-            << ", found " << tokenizer::get_token_text(next().match)
+        msg << "Unexpected token (expected " << token::get_token_text(match)
+            << ", found " << token::get_token_text(next().match)
             << " '" << next().text << "')";
         throw std::runtime_error(msg.str());
     }
@@ -111,7 +111,7 @@ void print_remaining_tokens(std::ostream& out, TokenStream& tokens)
 {
     for (int i=0; i < tokens.remaining(); i++) {
         if (i != 0) out << " ";
-        out << tokenizer::get_token_text(tokens.next(i).match);
+        out << token::get_token_text(tokens.next(i).match);
         out << "(" << tokens.next(i).text << ")";
     }
 }

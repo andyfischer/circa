@@ -30,6 +30,10 @@ namespace int_t {
         strm << as_int(term);
         return strm.str();
     }
+    void format_source(RichSource* source, Term* term)
+    {
+        append_phrase(source, int_t::to_source_string(term).c_str(), term, token::INTEGER);
+    }
     void setup_type(Type* type)
     {
         reset_type(type);
@@ -37,6 +41,7 @@ namespace int_t {
         type->equals = equals;
         type->toString = to_string;
         type->toSourceString = to_source_string;
+        type->formatSource = format_source;
     }
 }
 
@@ -103,6 +108,10 @@ namespace float_t {
         else
             return result;
     }
+    void format_source(RichSource* source, Term* term)
+    {
+        append_phrase(source, float_t::to_source_string(term).c_str(), term, token::FLOAT_TOKEN);
+    }
     void setup_type(Type* type)
     {
         reset_type(type);
@@ -112,6 +121,7 @@ namespace float_t {
         type->equals = equals;
         type->toString = to_string;
         type->toSourceString = to_source_string;
+        type->formatSource = format_source;
     }
 }
 
@@ -127,11 +137,16 @@ namespace bool_t {
     {
         return bool_t::to_string(term);
     }
+    void format_source(RichSource* source, Term* term)
+    {
+        append_phrase(source, bool_t::to_source_string(term).c_str(), term, token::BOOL);
+    }
     void setup_type(Type* type)
     {
         type->name = "bool";
         type->toString = to_string;
         type->toSourceString = to_source_string;
+        type->formatSource = format_source;
     }
 }
 
@@ -428,6 +443,18 @@ namespace color_t {
 
         return out.str();
     }
+
+    void format_source(RichSource* source, Term* term)
+    {
+        append_phrase(source, color_t::to_string(term).c_str(), term, token::COLOR);
+    }
+
+    void setup_type(Type* type)
+    {
+        type->toSourceString = to_string;
+        type->formatSource = format_source;
+    }
+
 } // namespace color_t
 
 namespace branch_ref_t
@@ -626,11 +653,24 @@ namespace string_t {
         return as_string(lhs) == as_string(rhs);
     }
 
-    std::string to_string(Term* term)
+    std::string to_string(TaggedValue* value)
+    {
+        std::stringstream result;
+        result << "'" << as_string(value) << "'";
+        return result.str();
+    }
+
+    std::string to_source_string(Term* term)
     {
         std::string quoteType = term->stringPropOptional("syntax:quoteType", "'");
         if (quoteType == "<") return "<<<" + as_string(term) + ">>>";
         else return quoteType + as_string(term) + quoteType;
+    }
+
+    void format_source(RichSource* source, Term* term)
+    {
+        append_phrase(source, string_t::to_source_string(term).c_str(),
+                term, token::STRING);
     }
 
     void length(EvalContext*, Term* term)
@@ -651,7 +691,9 @@ namespace string_t {
         STRING_T->release = release;
         STRING_T->assign = assign;
         STRING_T->equals = equals;
-        STRING_T->toSourceString = to_string;
+        STRING_T->toString = to_string;
+        STRING_T->toSourceString = to_source_string;
+        STRING_T->formatSource = format_source;
     }
 
     void postponed_setup_type(Type* type)
@@ -662,7 +704,7 @@ namespace string_t {
 }
 
 namespace ref_t {
-    std::string to_string(Term* term)
+    std::string to_string(TaggedValue* term)
     {
         Term* t = as_ref(term);
         if (t == NULL)
@@ -826,7 +868,7 @@ namespace ref_t {
     {
         type->name = "ref";
         type->remapPointers = Ref::remap_pointers;
-        type->toSourceString = to_string;
+        type->toString = to_string;
         type->initialize = initialize;
         type->assign = assign;
         type->equals = equals;
@@ -958,9 +1000,10 @@ void parse_builtin_types(Branch& kernel)
     parse_type(kernel, "type Point { number x, number y }");
     parse_type(kernel, "type Point_i { int x, int y }");
     parse_type(kernel, "type Rect { number x1, number y1, number x2, number y2 }");
+
     COLOR_TYPE = parse_type(kernel, "type Color { number r, number g, number b, number a }");
 
-    as_type(COLOR_TYPE).toSourceString = color_t::to_string;
+    color_t::setup_type(&as_type(COLOR_TYPE));
 
     import_member_function(BRANCH_REF_TYPE, branch_ref_t::get_configs,
         "get_configs(BranchRef) -> List");

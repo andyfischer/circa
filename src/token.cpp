@@ -2,10 +2,10 @@
 
 #include "common_headers.h"
 
-#include "tokenizer.h"
+#include "token.h"
 
 namespace circa {
-namespace tokenizer {
+namespace token {
 
 const char* get_token_text(int match)
 {

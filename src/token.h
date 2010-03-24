@@ -1,14 +1,14 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_TOKENIZER_INCLUDED
-#define CIRCA_TOKENIZER_INCLUDED
+#ifndef CIRCA_TOKEN_INCLUDED
+#define CIRCA_TOKEN_INCLUDED
 
 #include "common_headers.h"
 
 #include <vector>
 
 namespace circa {
-namespace tokenizer {
+namespace token {
 
 struct Token
 {
@@ -34,6 +34,7 @@ const int HEX_INTEGER = 4;
 const int FLOAT_TOKEN = 5;
 const int STRING = 6;
 const int COLOR = 7;
+const int BOOL = 8;
 
 const int LPAREN = 10;
 const int RPAREN = 11;
@@ -108,7 +109,7 @@ const char* get_token_text(int match);
 void tokenize(std::string const &input, TokenList &results);
 
 
-} // namespace tokenizer
+} // namespace token
 } // namespace circa
 
 #endif

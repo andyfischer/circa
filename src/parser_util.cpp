@@ -2,7 +2,7 @@
 
 #include "circa.h"
 
-using namespace circa::tokenizer;
+using namespace circa::token;
 
 namespace circa {
 
@@ -204,7 +204,7 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
 
         // If we've passed our originalPosition and reached a newline, then stop
         if (tokens.getPosition() > originalPosition
-                && (tokens.nextIs(tokenizer::NEWLINE) || tokens.nextIs(tokenizer::SEMICOLON)))
+                && (tokens.nextIs(token::NEWLINE) || tokens.nextIs(token::SEMICOLON)))
             break;
 
         line << tokens.consume();

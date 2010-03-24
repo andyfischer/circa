@@ -570,7 +570,7 @@ void test_whitespace_after_statement()
     Term* term = parser::statement(branch, tokens);
     test_assert(term->function == VALUE_FUNC);
     test_assert(term->name == "a");
-    test_assert(tokens.nextIs(tokenizer::NEWLINE));
+    test_assert(tokens.nextIs(token::NEWLINE));
     tokens.consume();
     test_assert(tokens.finished());
 }
@@ -671,7 +671,7 @@ void test_qualified_identifier()
 
     tokens.reset("apple:");
     test_equals(parser::qualified_identifier_str(tokens), "apple");
-    test_assert(tokens.nextIs(tokenizer::COLON));
+    test_assert(tokens.nextIs(token::COLON));
 
     tokens.reset("");
     test_equals(parser::qualified_identifier_str(tokens), "");

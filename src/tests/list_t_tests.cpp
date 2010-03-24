@@ -41,6 +41,7 @@ void test_tagged_value()
 
 void test_shallow_copy()
 {
+#if 0
     List a, b;
   
     make_int(a.append(), 3);
@@ -50,6 +51,7 @@ void test_shallow_copy()
     b = a;
     
     test_assert(a._data == b._data);
+#endif
 }
 
 void test_tagged_value_copy()
@@ -76,36 +78,11 @@ void test_tagged_value_copy()
     test_equals(to_string(&value2), "[1, 2, 3, 4]");
 }
 
-void test_cpp_wrapper()
-{
-    List list;
-    test_assert(list._data == NULL);
-    list.append();
-    list.append();
-    list.append();
-    test_assert(list._data != NULL);
-    test_assert(list_t::get_refcount(list._data) == 1);
-
-    {
-        List list2(list);
-        test_assert(list_t::get_refcount(list._data) == 2);
-    }
-    test_assert(list_t::get_refcount(list._data) == 1);
-
-    list.clear();
-
-    {
-        List list2(list);
-        test_assert(list2._data == NULL);
-    }
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(list_t_tests::test_simple);
     REGISTER_TEST_CASE(list_t_tests::test_tagged_value);
     REGISTER_TEST_CASE(list_t_tests::test_tagged_value_copy);
-    REGISTER_TEST_CASE(list_t_tests::test_cpp_wrapper);
 }
 
 }

@@ -49,4 +49,22 @@ TaggedValue::TaggedValue(Type* type)
     change_type(this, type);
 }
 
+std::string
+TaggedValue::toString()
+{
+    return to_string(this);
+}
+
+TaggedValue*
+TaggedValue::operator[](int index)
+{
+    return get_element(this, index);
+}
+
+int
+TaggedValue::numElements()
+{
+    return num_elements(this);
+}
+
 }

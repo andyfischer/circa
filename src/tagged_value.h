@@ -24,6 +24,10 @@ struct TaggedValue
     TaggedValue& operator=(TaggedValue const& rhs);
 
     void init();
+
+    std::string toString();
+    TaggedValue* operator[](int index);
+    int numElements();
 };
 
 } // namespace circa
