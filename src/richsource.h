@@ -15,6 +15,8 @@ namespace phrase_type {
     const int UNDEFINED = 200;
     const int INFIX_OPERATOR = 201;
     const int FUNCTION_NAME = 202;
+    const int TYPE_NAME = 203;
+    const int TERM_NAME = 204;
 }
 
 struct RichSource
@@ -27,6 +29,9 @@ struct RichSource
 void append_branch_source(RichSource* source, Branch& branch);
 
 void append_phrase(RichSource* source, const char* str, Term* term, int type);
+// Convenient overload:
+void append_phrase(RichSource* source, std::string const& str, Term* term, int type);
+
 void append_leading_name_binding(RichSource* source, Term* term);
 void append_source_for_input(RichSource* source, Term* term, int inputIndex);
 void append_term_source(RichSource* source, Term* term);

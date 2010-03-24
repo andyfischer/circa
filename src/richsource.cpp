@@ -113,7 +113,43 @@ void append_leading_name_binding(RichSource* source, Term* term)
 
 void append_source_for_input(RichSource* source, Term* term, int inputIndex)
 {
-    //TODO
+    Term* input = term->input(inputIndex);
+    bool memberCall = term->stringPropOptional("syntax:declarationStyle", "") == "member-function-call";
+
+    int firstVisible = get_first_visible_input_index(term);
+
+    if (inputIndex < firstVisible)
+        return;
+
+    int visibleIndex = inputIndex - firstVisible;
+    if (memberCall) visibleIndex--;
+
+    std::string defaultPre = visibleIndex > 0 ? " " : "";
+    std::string defaultPost = (inputIndex+1 < term->numInputs()) ? "," : "";
+
+    if (memberCall && inputIndex == 0)
+        defaultPost = "";
+
+    append_phrase(source,
+            get_input_syntax_hint_optional(term, visibleIndex, "preWhitespace", defaultPre), 
+            input, token::WHITESPACE);
+
+    // possibly insert the @ operator. This is pretty flawed, it should be stored by index.
+    if (input->name != ""
+            && input->name == term->stringPropOptional("syntax:rebindOperator",""))
+        append_phrase(source, "@", input, token::AT_SIGN);
+
+    bool byValue = input->name == "";
+
+    if (byValue) {
+        append_term_source(source, input);
+    } else {
+        append_phrase(source, get_relative_name(term, input), input, phrase_type::TERM_NAME);
+    }
+
+    append_phrase(source,
+            get_input_syntax_hint_optional(term, visibleIndex, "postWhitespace", defaultPost), 
+            input, token::WHITESPACE);
 }
 
 void append_term_source_default_formatting(RichSource* source, Term* term)
@@ -191,6 +227,11 @@ void append_phrase(RichSource* source, const char* str, Term* term, int type)
     make_string(list_t::append(list), str);
     make_ref(list_t::append(list), term);
     make_int(list_t::append(list), type);
+}
+
+void append_phrase(RichSource* source, std::string const& str, Term* term, int type)
+{
+    return append_phrase(source, str.c_str(), term, type);
 }
 
 std::string unformat_rich_source(RichSource* source)

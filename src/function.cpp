@@ -76,6 +76,62 @@ namespace function_t {
         return out.str();
     }
 
+    void format_header_source(RichSource* source, Term* term)
+    {
+        append_phrase(source, term->name, term, phrase_type::TERM_NAME);
+
+        append_phrase(source, term->stringPropOptional("syntax:postNameWs", ""),
+                term, token::WHITESPACE);
+        append_phrase(source, term->stringPropOptional("syntax:properties", ""),
+                term, phrase_type::UNDEFINED);
+
+        append_phrase(source, "(", term, token::LPAREN);
+
+        bool first = true;
+        int numInputs = function_t::num_inputs(term);
+        for (int i=0; i < numInputs; i++) {
+            std::string name = function_t::get_input_name(term, i);
+
+            if (name == "#state")
+                continue;
+
+            Term* input = function_t::get_input_placeholder(term, i);
+
+            if (input->boolPropOptional("state", false))
+                append_phrase(source, "state ", term, phrase_type::UNDEFINED);
+
+            if (!first)
+                append_phrase(source, ", ", term, phrase_type::UNDEFINED);
+            first = false;
+
+            if (!first)
+                append_phrase(source, function_t::get_input_type(term, i)->name,
+                        term, phrase_type::TYPE_NAME);
+
+            if (name != "" && name[0] != '#') {
+                append_phrase(source, " ", term, token::WHITESPACE);
+                append_phrase(source, name, term, phrase_type::UNDEFINED);
+            }
+        }
+
+#if 0
+        TODO
+        if (function_t::get_variable_args(term))
+            out << "...";
+
+        out << ")";
+
+        if (function_t::get_output_type(term) != VOID_TYPE) {
+            out << term->stringPropOptional("syntax:whitespacePreColon", "");
+            out << "->";
+            out << term->stringPropOptional("syntax:whitespacePostColon", " ");
+            out << function_t::get_output_type(term)->name;
+        }
+
+        return out.str();
+#endif
+    }
+
     std::string get_documentation(Term* term)
     {
         // A function can optionally have a documentation string. If present,

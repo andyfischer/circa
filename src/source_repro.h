@@ -11,6 +11,8 @@ namespace circa {
 
 int get_first_visible_input_index(Term* term);
 std::string const& get_input_syntax_hint(Term* term, int index, std::string const& field);
+std::string get_input_syntax_hint_optional(Term* term, int index, std::string const& field,
+        std::string const& defaultValue);
 void set_input_syntax_hint(Term* term, int index, std::string const& field,
         std::string const& value);
 bool has_source_location_defined(Term* term);

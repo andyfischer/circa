@@ -21,6 +21,19 @@ namespace subroutine_t {
         return result.str();
     }
 
+    void format_source(RichSource* source, Term* term)
+    {
+        append_phrase(source, "def ", term, token::DEF);
+
+        function_t::format_header_source(source, term);
+
+        append_phrase(source, term->stringPropOptional("syntax:postHeadingWs", "\n"),
+                term, token::WHITESPACE);
+
+        if (!is_native_function(term))
+            append_branch_source(source, as_branch(term));
+    }
+
     void evaluate(EvalContext* cxt, Term* caller)
     {
         Term* function = caller->function;
