@@ -16,7 +16,7 @@ void repro_source_after_rename()
 
     rename(a, "apple");
 
-    test_equals(get_term_source(a), "apple = 1");
+    test_equals(get_term_source_text(a), "apple = 1");
 
     // Rename a function argument
     Term* b = branch.eval("b = 5");
@@ -24,7 +24,7 @@ void repro_source_after_rename()
 
     rename(b, "banana");
 
-    test_equals(get_term_source(add), "add( banana , 10)");
+    test_equals(get_term_source_text(add), "add( banana , 10)");
 
     // Rename a function
     Term* myfunc = import_function(branch, _empty_evaluate, "def myfunc(int)");
@@ -32,7 +32,7 @@ void repro_source_after_rename()
 
     rename(myfunc, "my_renamed_func");
 
-    test_equals(get_term_source(myfunc_call), "my_renamed_func(555)");
+    test_equals(get_term_source_text(myfunc_call), "my_renamed_func(555)");
 }
 
 void test_change_function()
@@ -68,7 +68,7 @@ void repro_source_after_append_code()
 
     branch.eval("bm.append_code({ 1  +  1 })");
 
-    test_equals(get_branch_source(as_branch(target)), " 1  +  1 ");
+    test_equals(get_branch_source_text(as_branch(target)), " 1  +  1 ");
 }
 
 void register_tests()

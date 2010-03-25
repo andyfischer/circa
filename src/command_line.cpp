@@ -110,7 +110,7 @@ int run_command_line(std::vector<std::string> args)
     if (args[0] == "-s") {
         Branch branch;
         parse_script(branch, args[1]);
-        std::cout << get_branch_source(branch) << std::endl;
+        std::cout << get_branch_source_text(branch) << std::endl;
         return 0;
     }
 
@@ -142,7 +142,7 @@ int run_command_line(std::vector<std::string> args)
 
         std::cout << std::endl;
         std::cout << "-- Code result:" << std::endl;
-        std::cout << get_branch_source(branch) << std::endl;
+        std::cout << get_branch_source_text(branch) << std::endl;
 
         return 0;
     }

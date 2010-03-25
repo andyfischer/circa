@@ -7,7 +7,9 @@
 
 #include <sys/stat.h>
 
-#include "circa.h"
+#include "branch.h"
+#include "file_io.h"
+#include "term.h"
 
 namespace circa {
 

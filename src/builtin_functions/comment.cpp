@@ -9,20 +9,14 @@ namespace comment_function {
     {
     }
 
-    std::string toSourceString(Term* term)
-    {
-        return get_comment_string(term);
-    }
-
     void formatSource(RichSource* source, Term* term)
     {
-        append_phrase(source, get_comment_string(term).c_str(), term, token::COMMENT);
+        append_phrase(source, term->stringProp("comment"), term, token::COMMENT);
     }
 
     void setup(Branch& kernel)
     {
         COMMENT_FUNC = import_function(kernel, evaluate, "comment()");
-        function_t::get_attrs(COMMENT_FUNC).toSource = toSourceString;
         function_t::get_attrs(COMMENT_FUNC).formatSource = formatSource;
     }
 }

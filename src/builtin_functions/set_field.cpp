@@ -31,27 +31,16 @@ namespace set_field_function {
         return caller->input(0)->type;
     }
 
-    std::string toSourceString(Term* term)
-    {
-        std::stringstream out;
-        out << get_source_of_input(term, 0);
-        for (int i=2; i < term->numInputs(); i++)
-            out << "." << term->input(i)->asString();
-        out << " =";
-        out << get_source_of_input(term, 1);
-        return out.str();
-    }
-
     void formatSource(RichSource* source, Term* term)
     {
-        append_source_for_input(source, term, 0);
+        format_source_for_input(source, term, 0);
         for (int i=2; i < term->numInputs(); i++) {
             append_phrase(source, ".", term, phrase_type::UNDEFINED);
             append_phrase(source, term->input(i)->asString().c_str(),
                     term, phrase_type::UNDEFINED);
         }
         append_phrase(source, " =", term, phrase_type::UNDEFINED);
-        append_source_for_input(source, term, 1);
+        format_source_for_input(source, term, 1);
     }
 
     void setup(Branch& kernel)
@@ -59,7 +48,6 @@ namespace set_field_function {
         SET_FIELD_FUNC = import_function(kernel, evaluate,
                 "set_field(any, any, string...) -> any");
         function_t::get_attrs(SET_FIELD_FUNC).specializeType = specializeType;
-        function_t::get_attrs(SET_FIELD_FUNC).toSource = toSourceString;
         function_t::get_attrs(SET_FIELD_FUNC).formatSource = formatSource;
     }
 }

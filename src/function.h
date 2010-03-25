@@ -12,7 +12,6 @@ namespace circa {
 
 typedef void (*EvaluateFunc)(EvalContext* context, Term* caller);
 typedef Term* (*SpecializeTypeFunc)(Term* caller);
-typedef std::string (*ToSourceString)(Term* term);
 typedef void (*FormatSource)(RichSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
 
@@ -29,7 +28,6 @@ struct FunctionAttrs
     // Functions
     EvaluateFunc evaluate;
     SpecializeTypeFunc specializeType;
-    ToSourceString toSource;
     FormatSource formatSource;
     CheckInvariants checkInvariants;
 
@@ -37,7 +35,6 @@ struct FunctionAttrs
       : variableArgs(false),
         evaluate(NULL),
         specializeType(NULL),
-        toSource(NULL),
         formatSource(NULL),
         checkInvariants(NULL)
     {}
@@ -80,7 +77,6 @@ namespace function_t {
 
     EvaluateFunc& get_evaluate(Term* function);
     SpecializeTypeFunc& get_specialize_type(Term* function);
-    ToSourceString& get_to_source_string(Term* function);
 
     int num_inputs(Term* function);
 }

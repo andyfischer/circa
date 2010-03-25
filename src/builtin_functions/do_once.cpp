@@ -15,24 +15,12 @@ namespace do_once_function {
         }
     }
 
-    std::string toSourceString(Term* term)
-    {
-        std::stringstream result;
-        result << "do once";
-        result << term->stringPropOptional("syntax:postHeadingWs", "\n");
-        result << get_branch_source(as_branch(term));
-        result << term->stringPropOptional("syntax:preEndWs", "");
-        result << "end";
-
-        return result.str();
-    }
-
     void formatSource(RichSource* source, Term* term)
     {
         append_phrase(source, "do once", term, phrase_type::KEYWORD);
         append_phrase(source, term->stringPropOptional("syntax:postHeadingWs", "\n"),
                 term, token::WHITESPACE);
-        append_branch_source(source, as_branch(term), NULL);
+        format_branch_source(source, as_branch(term), NULL);
         append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
                 term, token::WHITESPACE);
                 
@@ -42,7 +30,6 @@ namespace do_once_function {
     void setup(Branch& kernel)
     {
         DO_ONCE_FUNC = import_function(kernel, evaluate, "do_once(state bool) -> Code");
-        function_t::get_attrs(DO_ONCE_FUNC).toSource = toSourceString;
         function_t::get_attrs(DO_ONCE_FUNC).formatSource = formatSource;
     }
 }

@@ -33,7 +33,7 @@ void round_trip_source(std::string statement)
 
 #if 1
     RichSource richSource;
-    append_branch_source(&richSource, branch);
+    format_branch_source(&richSource, branch);
     result.actual = unformat_rich_source(&richSource);
 #else
 

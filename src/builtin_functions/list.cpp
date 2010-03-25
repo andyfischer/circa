@@ -25,21 +25,11 @@ namespace list_function {
         dest.removeNulls();
     }
 
-    std::string list_toSource(Term* caller) {
-        std::stringstream out;
-        prepend_name_binding(caller, out);
-        out << "[";
-        for (int i=0; i < caller->numInputs(); i++)
-            out << get_source_of_input(caller, i);
-        out << "]";
-        return out.str();
-    }
-
     void list_formatSource(RichSource* source, Term* caller) {
-        append_leading_name_binding(source, caller);
+        format_name_binding(source, caller);
         append_phrase(source, "[", caller, token::LBRACKET);
         for (int i=0; i < caller->numInputs(); i++)
-            append_source_for_input(source, caller, i);
+            format_source_for_input(source, caller, i);
         append_phrase(source, "]", caller, token::LBRACKET);
     }
 
@@ -67,7 +57,6 @@ namespace list_function {
     void setup(Branch& kernel)
     {
         LIST_FUNC = import_function(kernel, evaluate, "list(any...) -> List");
-        function_t::get_attrs(LIST_FUNC).toSource = list_toSource;
         function_t::get_attrs(LIST_FUNC).formatSource = list_formatSource;
 
         import_function(kernel, evaluate_repeat, "repeat(any, int) -> List");

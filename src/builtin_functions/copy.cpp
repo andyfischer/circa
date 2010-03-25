@@ -15,17 +15,9 @@ namespace copy_function {
         return caller->input(0)->type;
     }
 
-    std::string toSourceString(Term* term)
-    {
-        std::stringstream result;
-        prepend_name_binding(term, result);
-        result << get_relative_name(term, term->input(0));
-        return result.str();
-    }
-
     void formatSource(RichSource* source, Term* term)
     {
-        append_leading_name_binding(source, term);
+        format_name_binding(source, term);
         append_phrase(source, get_relative_name(term, term->input(0)),
                 term, token::IDENTIFIER);
     }
@@ -34,7 +26,6 @@ namespace copy_function {
     {
         COPY_FUNC = import_function(kernel, evaluate, "copy(any) -> any");
         function_t::get_attrs(COPY_FUNC).specializeType = specializeType;
-        function_t::get_attrs(COPY_FUNC).toSource = toSourceString;
         function_t::get_attrs(COPY_FUNC).formatSource = formatSource;
     }
 }

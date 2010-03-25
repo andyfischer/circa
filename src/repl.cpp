@@ -2,6 +2,13 @@
 
 #include "circa.h"
 
+#include "branch.h"
+#include "errors.h"
+#include "evaluation.h"
+#include "introspection.h"
+#include "parser.h"
+#include "term.h"
+
 namespace circa {
 
 void repl_evaluate_line(Branch& branch, std::string const& input, std::ostream& output)

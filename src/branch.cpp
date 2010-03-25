@@ -504,7 +504,7 @@ bool is_branch_based_type(Term* type)
     return as_type(type).initialize == branch_t::initialize;
 }
 
-void initizalize_branch_based_type(Term* term)
+void initialize_branch_based_type(Term* term)
 {
     Type* type = &as_type(term);
 
@@ -633,7 +633,7 @@ bool reload_branch_from_file(Branch& branch, std::ostream &errors)
 void persist_branch_to_file(Branch& branch)
 {
     std::string filename = get_branch_source_filename(branch);
-    write_text_file(filename, get_branch_source(branch) + "\n");
+    write_text_file(filename, get_branch_source_text(branch) + "\n");
 }
 
 std::string get_source_file_location(Branch& branch)

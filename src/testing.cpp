@@ -56,7 +56,7 @@ void _test_assert_function(Term* term, int line, const char* file)
 
     if (is_bool(term) && !as_bool(term)) {
         std::stringstream msg;
-        msg << "Assertion failed: " << get_term_source(term) << std::endl;
+        msg << "Assertion failed: " << get_term_source_text(term) << std::endl;
         msg << "Occurred in " << file << ", line " << line << std::endl;
         throw std::runtime_error(msg.str());
 

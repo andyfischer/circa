@@ -9,28 +9,6 @@ namespace stateful_value_function {
     {
     }
 
-    std::string toSourceString(Term* term)
-    {
-        std::stringstream out;
-        out << "state ";
-
-        if (term->hasProperty("syntax:explicitType"))
-            out << term->stringProp("syntax:explicitType") << " ";
-
-        out << term->name;
-
-        if (term->hasProperty("initializedBy")) {
-            Term* initializedBy = term->refProp("initializedBy");
-            out << " = ";
-            if (initializedBy->name != "")
-                out << get_relative_name(term, initializedBy);
-            else
-                out << get_term_source(initializedBy);
-        }
-
-        return out.str();
-    }
-
     void formatSource(RichSource* source, Term* term)
     {
         append_phrase(source, "state ", term, token::STATE);
@@ -50,14 +28,13 @@ namespace stateful_value_function {
                 append_phrase(source, get_relative_name(term, initializedBy),
                         term, phrase_type::TERM_NAME);
             else
-                append_term_source(source, initializedBy);
+                format_term_source(source, initializedBy);
         }
     }
 
     void setup(Branch& kernel)
     {
         STATEFUL_VALUE_FUNC = import_function(kernel, evaluate, "stateful_value() -> any");
-        function_t::get_attrs(STATEFUL_VALUE_FUNC).toSource = toSourceString;
         function_t::get_attrs(STATEFUL_VALUE_FUNC).formatSource = formatSource;
     }
 }

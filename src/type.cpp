@@ -7,34 +7,6 @@
 namespace circa {
 
 namespace type_t {
-    std::string to_string(Term* term)
-    {
-        if (is_native_type(term))
-            return "<NativeType " + term->name + ">";
-
-        // Generate source for a Type declaration
-        std::stringstream out;
-
-        out << "type " << term->name;
-        out << term->stringPropOptional("syntax:preLBracketWhitespace", " ");
-        out << "{";
-        out << term->stringPropOptional("syntax:postLBracketWhitespace", " ");
-
-        Branch& prototype = type_t::get_prototype(term);
-
-        for (int i=0; i < prototype.length(); i++) {
-            Term* field = prototype[i];
-            assert(field != NULL);
-            out << field->stringPropOptional("syntax:preWhitespace","");
-            out << field->type->name;
-            out << field->stringPropOptional("syntax:postNameWs"," ");
-            out << field->name;
-            out << field->stringPropOptional("syntax:postWhitespace","");
-        }
-        out << "}";
-
-        return out.str();
-    }
 
     void formatSource(RichSource* source, Term* term)
     {
@@ -282,7 +254,6 @@ void reset_type(Type* type)
 {
     type->remapPointers = NULL;
     type->toString = NULL;
-    type->toSourceString = NULL;
     type->checkInvariants = NULL;
     type->valueFitsType = NULL;
     type->initialize = NULL;
@@ -300,25 +271,6 @@ void initialize_simple_pointer_type(Type* type)
     type->initialize = NULL;
     type->release = NULL;
     type->assign = NULL;
-}
-
-std::string to_source_string(Term* term)
-{
-    Type* type = term->value_type;
-
-    if (type == NULL)
-        return "<NULL>";
-
-    Type::ToSourceString func = type->toSourceString;
-
-    if (func != NULL)
-        return func(term);
-
-    // Generic to-string
-    std::stringstream result;
-    result << type->name << "#";
-    result << std::hex << get_type_value(term) << ">";
-    return result.str();
 }
 
 void assign_value_to_default(Term* term)

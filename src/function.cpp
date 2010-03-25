@@ -256,10 +256,6 @@ namespace function_t {
     {
         return get_attrs(func).specializeType;
     }
-    ToSourceString& get_to_source_string(Term* func)
-    {
-        return get_attrs(func).toSource;
-    }
     std::string const& get_exposed_name_path(Term* func)
     {
         return get_attrs(func).exposedNamePath;

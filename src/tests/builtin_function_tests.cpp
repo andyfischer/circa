@@ -27,7 +27,7 @@ void test_int()
 {
     Branch branch;
 
-    test_assert(as_type(INT_TYPE).toSourceString != NULL);
+    test_assert(as_type(INT_TYPE).formatSource != NULL);
 
     Term* four = create_int(branch, 4);
     Term* another_four = create_int(branch, 4);
@@ -46,7 +46,7 @@ void test_float()
     Type* floatType = &as_type(FLOAT_TYPE);
 
     test_assert(floatType->equals != NULL);
-    test_assert(floatType->toSourceString != NULL);
+    test_assert(floatType->formatSource != NULL);
 
     Term* point_one = create_float(branch, .1f);
     Term* point_one_again = create_float(branch, .1f);

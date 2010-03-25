@@ -27,7 +27,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     parser::compile(&code, parser::statement_list, codeStr);
 
     // Reproduce source of 'code', checked later.
-    std::string codeSourceRepro = get_branch_source(code);
+    std::string codeSourceRepro = get_branch_source_text(code);
 
     if (has_static_errors(code)) {
         std::cout << "In code snippet: " << codeStr << std::endl;
@@ -98,7 +98,8 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
 
         if (!as_bool(assertions[i])) {
             std::cout << "In " << get_current_test_name() << std::endl;
-            std::cout << "assertion failed: " << get_term_source(assertions[i]) << std::endl;
+            std::cout << "assertion failed: "
+                << get_term_source_text(assertions[i]) << std::endl;
             std::cout << "Compiled code: " << std::endl;
             print_branch_raw(std::cout, code);
             declare_current_test_failed();

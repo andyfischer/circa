@@ -27,7 +27,6 @@ struct Type
     typedef void (*Cast)(Type* type, TaggedValue* source, TaggedValue* dest);
     typedef void (*RemapPointers)(Term* term, ReferenceMap const& map);
     typedef std::string (*ToString)(TaggedValue* value);
-    typedef std::string (*ToSourceString)(Term* term);
     typedef void (*FormatSource)(RichSource*, Term* term);
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
@@ -51,7 +50,6 @@ struct Type
     Equals equals;
     RemapPointers remapPointers;
     ToString toString;
-    ToSourceString toSourceString;
     FormatSource formatSource;
     CheckInvariants checkInvariants;
     ValueFitsType valueFitsType;
@@ -84,7 +82,6 @@ struct Type
         equals(NULL),
         remapPointers(NULL),
         toString(NULL),
-        toSourceString(NULL),
         formatSource(NULL),
         checkInvariants(NULL),
         valueFitsType(NULL),
@@ -143,7 +140,6 @@ void initialize_simple_pointer_type(Type* type);
 std::string compound_type_to_string(Term* caller);
 
 // Functions which are dispatched based on type:
-std::string to_source_string(Term* term);
 void assign_value_to_default(Term* term);
 
 Term* parse_type(Branch& branch, std::string const& decl);

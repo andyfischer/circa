@@ -5,21 +5,6 @@
 namespace circa {
 
 namespace subroutine_t {
-    std::string to_string(Term* term)
-    {
-        std::stringstream result;
-
-        result << "def ";
-
-        result << function_t::get_header_source(term);
-
-        result << term->stringPropOptional("syntax:postHeadingWs", "\n");
-
-        if (!is_native_function(term))
-            print_branch_source(result, term);
-
-        return result.str();
-    }
 
     void format_source(RichSource* source, Term* term)
     {
@@ -31,7 +16,7 @@ namespace subroutine_t {
                 term, token::WHITESPACE);
 
         if (!is_native_function(term))
-            append_branch_source(source, as_branch(term), term);
+            format_branch_source(source, as_branch(term), term);
     }
 
     void evaluate(EvalContext* cxt, Term* caller)

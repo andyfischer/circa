@@ -1,7 +1,5 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "circa.h"
-
 namespace circa {
 
 int METRIC_NAMESPACE_LOOKUPS = 0;

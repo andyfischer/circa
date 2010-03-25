@@ -159,7 +159,7 @@ void to_source_string()
     branch.eval("def f() end");
     Term* c = branch.eval("f()");
 
-    test_equals(get_term_source(c), "f()");
+    test_equals(get_term_source_text(c), "f()");
 }
 
 void register_tests()

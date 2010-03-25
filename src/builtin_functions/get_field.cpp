@@ -44,19 +44,9 @@ namespace get_field_function {
         return head->type;
     }
 
-    std::string toSourceString(Term* term)
-    {
-        std::stringstream out;
-        prepend_name_binding(term, out);
-        out << get_relative_name(term, term->input(0));
-        for (int i=1; i < term->numInputs(); i++)
-            out << "." << term->input(i)->asString();
-        return out.str();
-    }
-
     void formatSource(RichSource* source, Term* term)
     {
-        append_leading_name_binding(source, term);
+        format_name_binding(source, term);
         append_phrase(source, get_relative_name(term, term->input(0)),
                 term, phrase_type::UNDEFINED);
         for (int i=1; i < term->numInputs(); i++) {
@@ -71,7 +61,6 @@ namespace get_field_function {
         GET_FIELD_FUNC = import_function(kernel, evaluate,
                 "get_field(any, string...) -> any");
         function_t::get_attrs(GET_FIELD_FUNC).specializeType = specializeType;
-        function_t::get_attrs(GET_FIELD_FUNC).toSource = toSourceString;
         function_t::get_attrs(GET_FIELD_FUNC).formatSource = formatSource;
     }
 }

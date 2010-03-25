@@ -21,18 +21,14 @@ namespace int_t {
         strm << as_int(value);
         return strm.str();
     }
-    std::string to_source_string(Term* term)
+    void format_source(RichSource* source, Term* term)
     {
         std::stringstream strm;
         if (term->stringPropOptional("syntax:integerFormat", "dec") == "hex")
             strm << "0x" << std::hex;
 
         strm << as_int(term);
-        return strm.str();
-    }
-    void format_source(RichSource* source, Term* term)
-    {
-        append_phrase(source, int_t::to_source_string(term).c_str(), term, token::INTEGER);
+        append_phrase(source, strm.str(), term, token::INTEGER);
     }
     void setup_type(Type* type)
     {
@@ -40,7 +36,6 @@ namespace int_t {
         type->name = "int";
         type->equals = equals;
         type->toString = to_string;
-        type->toSourceString = to_source_string;
         type->formatSource = format_source;
     }
 }
@@ -120,7 +115,6 @@ namespace float_t {
         type->castPossible = cast_possible;
         type->equals = equals;
         type->toString = to_string;
-        type->toSourceString = to_source_string;
         type->formatSource = format_source;
     }
 }
@@ -133,19 +127,14 @@ namespace bool_t {
         else
             return "false";
     }
-    std::string to_source_string(Term* term)
-    {
-        return bool_t::to_string(term);
-    }
     void format_source(RichSource* source, Term* term)
     {
-        append_phrase(source, bool_t::to_source_string(term).c_str(), term, token::BOOL);
+        append_phrase(source, bool_t::to_string(term), term, token::BOOL);
     }
     void setup_type(Type* type)
     {
         type->name = "bool";
         type->toString = to_string;
-        type->toSourceString = to_source_string;
         type->formatSource = format_source;
     }
 }
@@ -163,6 +152,18 @@ namespace old_list_t {
         }
         out << "]";
         return out.str();
+    }
+
+    void formatSource(RichSource* source, Term* term)
+    {
+        append_phrase(source, "[", term, token::LBRACKET);
+        Branch& branch = as_branch(term);
+        for (int i=0; i < branch.length(); i++) {
+            if (i > 0)
+                append_phrase(source, ",", term, token::COMMA);
+            format_term_source(source, branch[i]);
+        }
+        append_phrase(source, "]", term, token::RBRACKET);
     }
 
     void append(Branch& branch, Term* value)
@@ -186,7 +187,7 @@ namespace old_list_t {
 
     void setup(Type* type)
     {
-        type->toSourceString = to_string;
+        type->formatSource = formatSource;
     }
 
 } // namespace old_list_t
@@ -446,12 +447,11 @@ namespace color_t {
 
     void format_source(RichSource* source, Term* term)
     {
-        append_phrase(source, color_t::to_string(term).c_str(), term, token::COLOR);
+        append_phrase(source, color_t::to_string(term), term, token::COLOR);
     }
 
     void setup_type(Type* type)
     {
-        type->toSourceString = to_string;
         type->formatSource = format_source;
     }
 
@@ -622,7 +622,7 @@ namespace branch_ref_t
     void to_source(EvalContext*, Term* caller)
     {
         Branch& target_branch = get_target_branch(caller);
-        set_str(caller, get_branch_source(target_branch));
+        set_str(caller, get_branch_source_text(target_branch));
     }
 
 } // namespace branch_ref_t
@@ -660,17 +660,16 @@ namespace string_t {
         return result.str();
     }
 
-    std::string to_source_string(Term* term)
-    {
-        std::string quoteType = term->stringPropOptional("syntax:quoteType", "'");
-        if (quoteType == "<") return "<<<" + as_string(term) + ">>>";
-        else return quoteType + as_string(term) + quoteType;
-    }
-
     void format_source(RichSource* source, Term* term)
     {
-        append_phrase(source, string_t::to_source_string(term).c_str(),
-                term, token::STRING);
+        std::string quoteType = term->stringPropOptional("syntax:quoteType", "'");
+        std::string result;
+        if (quoteType == "<")
+            result = "<<<" + as_string(term) + ">>>";
+        else
+            result = quoteType + as_string(term) + quoteType;
+
+        append_phrase(source, result, term, token::STRING);
     }
 
     void length(EvalContext*, Term* term)
@@ -692,7 +691,6 @@ namespace string_t {
         STRING_T->assign = assign;
         STRING_T->equals = equals;
         STRING_T->toString = to_string;
-        STRING_T->toSourceString = to_source_string;
         STRING_T->formatSource = format_source;
     }
 
@@ -745,7 +743,7 @@ namespace ref_t {
         Term* t = caller->input(0)->asRef();
         if (t == NULL)
             return error_occurred(cxt, caller, "NULL reference");
-        set_str(caller, circa::to_source_string(t));
+        set_str(caller, circa::get_term_source_text(t));
     }
     void get_function(EvalContext* cxt, Term* caller)
     {
@@ -935,8 +933,6 @@ void initialize_primitive_types(Branch& kernel)
     set_pointer(REF_TYPE, REF_T);
 
     // ANY_TYPE was created in bootstrap_kernel
-    Type* anyType = &as_type(ANY_TYPE);
-    anyType->toSourceString = any_t::to_string;
 
     VOID_TYPE = create_empty_type(kernel, "void");
     Type* voidType = &as_type(VOID_TYPE);

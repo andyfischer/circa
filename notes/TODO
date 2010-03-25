@@ -1,5 +1,6 @@
 
-Tests/bugs:
+Short todos:
+ - Remove special syntax for to_ref, rename to ref()
 
 Bugs:
 
@@ -17,7 +18,6 @@ Bugs:
 Tasks:
  - Value sharing
  - Lambdas
- - Type should be branch-based
  - How to support introspection inside blocks (for, if, include). Should the user need to provide
    names or can we provide default names? Can the user provide a name if they want?
  - Store whether a function is pure

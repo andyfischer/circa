@@ -19,24 +19,13 @@ namespace get_index_function {
         copy_newstyle(result, caller);
     }
 
-    std::string toSourceString(Term* term)
-    {
-        std::stringstream out;
-        prepend_name_binding(term, out);
-        out << get_relative_name(term, term->input(0));
-        out << "[";
-        out << get_source_of_input(term, 1);
-        out << "]";
-        return out.str();
-    }
-
     void formatSource(RichSource* source, Term* term)
     {
-        append_leading_name_binding(source, term);
+        format_name_binding(source, term);
         append_phrase(source, get_relative_name(term, term->input(0)),
                 term, token::IDENTIFIER);
         append_phrase(source, "[", term, token::LBRACKET);
-        append_source_for_input(source, term, 1);
+        format_source_for_input(source, term, 1);
         append_phrase(source, "]", term, token::LBRACKET);
     }
 
@@ -60,7 +49,6 @@ namespace get_index_function {
     {
         GET_INDEX_FUNC = import_function(kernel, evaluate, "get_index(Branch, int) -> any");
         function_t::get_attrs(GET_INDEX_FUNC).specializeType = specializeType;
-        function_t::get_attrs(GET_INDEX_FUNC).toSource = toSourceString;
         function_t::get_attrs(GET_INDEX_FUNC).formatSource = formatSource;
     }
 }
