@@ -5,6 +5,7 @@
 #include "function.h"
 #include "introspection.h"
 #include "list_t.h"
+#include "parser.h"
 #include "parser_util.h"
 #include "richsource.h"
 #include "source_repro.h"
@@ -23,10 +24,34 @@ RichSource::toString()
     return _phrases.toString();
 }
 
-void append_branch_source(RichSource* source, Branch& branch)
+void append_branch_source(RichSource* source, Branch& branch, Term* format)
 {
-    bool newlineNeeded = false;
+    parser::BranchSyntax branchSyntax = parser::BRANCH_SYNTAX_UNDEF;
 
+    if (format != NULL) {
+        branchSyntax = (parser::BranchSyntax)
+            format->intPropOptional("syntax:branchStyle", parser::BRANCH_SYNTAX_UNDEF);
+
+        switch (branchSyntax) {
+        case parser::BRANCH_SYNTAX_COLON:
+            append_phrase(source, ":", format, phrase_type::UNDEFINED);
+            break;
+        case parser::BRANCH_SYNTAX_BRACE:
+            append_phrase(source, "{", format, token::LBRACE);
+            break;
+        case parser::BRANCH_SYNTAX_BEGIN:
+            append_phrase(source, "begin", format, token::BEGIN);
+            break;
+        case parser::BRANCH_SYNTAX_DO:
+            append_phrase(source, "do", format, token::DO);
+            break;
+        case parser::BRANCH_SYNTAX_UNDEF:
+        case parser::BRANCH_SYNTAX_IMPLICIT_BEGIN:
+            break;
+        }
+    }
+
+    bool newlineNeeded = false;
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
 
@@ -45,6 +70,25 @@ void append_branch_source(RichSource* source, Branch& branch)
                 term, phrase_type::UNDEFINED);
         else
             newlineNeeded = true;
+    }
+
+    if (format != NULL) {
+        append_phrase(source, format->stringPropOptional("syntax:preEndWs", ""),
+                format, token::WHITESPACE);
+
+        switch (branchSyntax) {
+        case parser::BRANCH_SYNTAX_UNDEF:
+        case parser::BRANCH_SYNTAX_BEGIN:
+        case parser::BRANCH_SYNTAX_IMPLICIT_BEGIN:
+        case parser::BRANCH_SYNTAX_DO:
+            append_phrase(source, "end", format, phrase_type::UNDEFINED);
+            break;
+        case parser::BRANCH_SYNTAX_BRACE:
+            append_phrase(source, "}", format, phrase_type::UNDEFINED);
+            break;
+        case parser::BRANCH_SYNTAX_COLON:
+            break;
+        }
     }
 }
 
@@ -114,6 +158,9 @@ void append_leading_name_binding(RichSource* source, Term* term)
 void append_source_for_input(RichSource* source, Term* term, int inputIndex)
 {
     Term* input = term->input(inputIndex);
+
+    if (input == NULL) return;
+
     bool memberCall = term->stringPropOptional("syntax:declarationStyle", "") == "member-function-call";
 
     int firstVisible = get_first_visible_input_index(term);
@@ -157,7 +204,8 @@ void append_term_source_default_formatting(RichSource* source, Term* term)
     std::string declarationStyle = term->stringPropOptional("syntax:declarationStyle",
             "function-call");
     bool infix = declarationStyle == "infix";
-    std::string functionName = term->stringProp("syntax:functionName");
+    std::string functionName = term->stringPropOptional("syntax:functionName",
+            term->function->name);
 
     // Check for an infix operator with implicit rebinding (like +=).
     if (infix && is_infix_operator_rebinding(functionName)) {
@@ -173,7 +221,7 @@ void append_term_source_default_formatting(RichSource* source, Term* term)
     // possibly add parens
     int numParens = term->intPropOptional("syntax:parens", 0);
     for (int p=0; p < numParens; p++)
-        append_phrase(source, "{", term, token::LPAREN);
+        append_phrase(source, "(", term, token::LPAREN);
 
     if (declarationStyle == "function-call") {
         append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
@@ -212,9 +260,13 @@ void append_term_source_default_formatting(RichSource* source, Term* term)
     } else if (declarationStyle == "arrow-concat") {
         append_source_for_input(source, term, 0);
         append_phrase(source, "->", term, phrase_type::UNDEFINED);
-        append_source_for_input(source, term, 1);
-        append_phrase(source, functionName.c_str(), term, phrase_type::INFIX_OPERATOR);
+        append_phrase(source, get_input_syntax_hint(term, 1, "preWhitespace"),
+                term, token::WHITESPACE);
+        append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
     }
+
+    for (int p=0; p < numParens; p++)
+        append_phrase(source, ")", term, token::RPAREN);
 }
 
 void append_phrase(RichSource* source, const char* str, Term* term, int type)

@@ -10,13 +10,16 @@
 namespace circa {
 
 namespace phrase_type {
-    // Token enumerations are valid as phrase types.
-    // This list has some types which are not tokens.
+    // Token enumerations are valid as phrase types. This list has some addtional
+    // types which are not tokens.
     const int UNDEFINED = 200;
     const int INFIX_OPERATOR = 201;
     const int FUNCTION_NAME = 202;
     const int TYPE_NAME = 203;
     const int TERM_NAME = 204;
+    const int KEYWORD = 205;
+
+    const int UNKNOWN_IDENTIFIER = 220;
 }
 
 struct RichSource
@@ -26,7 +29,7 @@ struct RichSource
     std::string toString();
 };
 
-void append_branch_source(RichSource* source, Branch& branch);
+void append_branch_source(RichSource* source, Branch& branch, Term* format=NULL);
 
 void append_phrase(RichSource* source, const char* str, Term* term, int type);
 // Convenient overload:

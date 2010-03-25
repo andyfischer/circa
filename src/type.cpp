@@ -36,6 +36,33 @@ namespace type_t {
         return out.str();
     }
 
+    void formatSource(RichSource* source, Term* term)
+    {
+        append_phrase(source, "type ", term, phrase_type::KEYWORD);
+        append_phrase(source, term->name, term, phrase_type::TYPE_NAME);
+        append_phrase(source, term->stringPropOptional("syntax:preLBracketWhitespace", " "),
+                term, token::WHITESPACE);
+        append_phrase(source, "{", term, token::LBRACKET);
+        append_phrase(source, term->stringPropOptional("syntax:postLBracketWhitespace", " "),
+                term, token::WHITESPACE);
+
+        Branch& prototype = type_t::get_prototype(term);
+
+        for (int i=0; i < prototype.length(); i++) {
+            Term* field = prototype[i];
+            assert(field != NULL);
+            append_phrase(source, field->stringPropOptional("syntax:preWhitespace",""),
+                    term, token::WHITESPACE);
+            append_phrase(source, field->type->name, term, phrase_type::TYPE_NAME);
+            append_phrase(source, field->stringPropOptional("syntax:postNameWs"," "),
+                    term, token::WHITESPACE);
+            append_phrase(source, field->name, term, token::IDENTIFIER);
+            append_phrase(source, field->stringPropOptional("syntax:postWhitespace",""),
+                    term, token::WHITESPACE);
+        }
+        append_phrase(source, "}", term, token::RBRACKET);
+    }
+
     void remap_pointers(Term *type, ReferenceMap const& map)
     {
         Branch& prototype = type_t::get_prototype(type);

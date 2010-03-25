@@ -54,12 +54,25 @@ namespace get_field_function {
         return out.str();
     }
 
+    void formatSource(RichSource* source, Term* term)
+    {
+        append_leading_name_binding(source, term);
+        append_phrase(source, get_relative_name(term, term->input(0)),
+                term, phrase_type::UNDEFINED);
+        for (int i=1; i < term->numInputs(); i++) {
+            append_phrase(source, ".", term, token::DOT);
+            append_phrase(source, term->input(i)->asString(),
+                    term, token::IDENTIFIER);
+        }
+    }
+
     void setup(Branch& kernel)
     {
         GET_FIELD_FUNC = import_function(kernel, evaluate,
                 "get_field(any, string...) -> any");
-        function_t::get_specialize_type(GET_FIELD_FUNC) = specializeType;
-        function_t::get_to_source_string(GET_FIELD_FUNC) = toSourceString;
+        function_t::get_attrs(GET_FIELD_FUNC).specializeType = specializeType;
+        function_t::get_attrs(GET_FIELD_FUNC).toSource = toSourceString;
+        function_t::get_attrs(GET_FIELD_FUNC).formatSource = formatSource;
     }
 }
 }

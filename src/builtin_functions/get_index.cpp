@@ -30,6 +30,16 @@ namespace get_index_function {
         return out.str();
     }
 
+    void formatSource(RichSource* source, Term* term)
+    {
+        append_leading_name_binding(source, term);
+        append_phrase(source, get_relative_name(term, term->input(0)),
+                term, token::IDENTIFIER);
+        append_phrase(source, "[", term, token::LBRACKET);
+        append_source_for_input(source, term, 1);
+        append_phrase(source, "]", term, token::LBRACKET);
+    }
+
     Term* specializeType(Term* caller)
     {
         if (!is_branch(caller->input(0)))
@@ -49,8 +59,9 @@ namespace get_index_function {
     void setup(Branch& kernel)
     {
         GET_INDEX_FUNC = import_function(kernel, evaluate, "get_index(Branch, int) -> any");
-        function_t::get_specialize_type(GET_INDEX_FUNC) = specializeType;
-        function_t::get_to_source_string(GET_INDEX_FUNC) = toSourceString;
+        function_t::get_attrs(GET_INDEX_FUNC).specializeType = specializeType;
+        function_t::get_attrs(GET_INDEX_FUNC).toSource = toSourceString;
+        function_t::get_attrs(GET_INDEX_FUNC).formatSource = formatSource;
     }
 }
 }

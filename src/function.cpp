@@ -114,22 +114,20 @@ namespace function_t {
             }
         }
 
-#if 0
-        TODO
         if (function_t::get_variable_args(term))
-            out << "...";
+            append_phrase(source, "...", term, phrase_type::UNDEFINED);
 
-        out << ")";
+        append_phrase(source, ")", term, token::LPAREN);
 
         if (function_t::get_output_type(term) != VOID_TYPE) {
-            out << term->stringPropOptional("syntax:whitespacePreColon", "");
-            out << "->";
-            out << term->stringPropOptional("syntax:whitespacePostColon", " ");
-            out << function_t::get_output_type(term)->name;
+            append_phrase(source, term->stringPropOptional("syntax:whitespacePreColon", ""),
+                    term, token::WHITESPACE);
+            append_phrase(source, "->", term, phrase_type::UNDEFINED);
+            append_phrase(source, term->stringPropOptional("syntax:whitespacePostColon", ""),
+                    term, token::WHITESPACE);
+            append_phrase(source, function_t::get_output_type(term)->name,
+                    term, phrase_type::TYPE_NAME);
         }
-
-        return out.str();
-#endif
     }
 
     std::string get_documentation(Term* term)

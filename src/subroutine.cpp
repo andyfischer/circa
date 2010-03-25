@@ -31,7 +31,7 @@ namespace subroutine_t {
                 term, token::WHITESPACE);
 
         if (!is_native_function(term))
-            append_branch_source(source, as_branch(term));
+            append_branch_source(source, as_branch(term), term);
     }
 
     void evaluate(EvalContext* cxt, Term* caller)

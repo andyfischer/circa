@@ -144,6 +144,7 @@ void bootstrap_kernel()
     typeType->assign = type_t::assign;
     typeType->remapPointers = type_t::remap_pointers;
     typeType->toSourceString = type_t::to_string;
+    typeType->formatSource = type_t::formatSource;
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Create Any type
@@ -174,6 +175,7 @@ void bootstrap_kernel()
     FUNCTION_TYPE = create_compound_type(*KERNEL, "Function");
     Type* functionType = &as_type(FUNCTION_TYPE);
     functionType->toSourceString = subroutine_t::to_string;
+    functionType->formatSource = subroutine_t::format_source;
     functionType->checkInvariants = function_t::check_invariants;
 
     // Initialize Value func

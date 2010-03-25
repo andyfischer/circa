@@ -42,12 +42,25 @@ namespace set_field_function {
         return out.str();
     }
 
+    void formatSource(RichSource* source, Term* term)
+    {
+        append_source_for_input(source, term, 0);
+        for (int i=2; i < term->numInputs(); i++) {
+            append_phrase(source, ".", term, phrase_type::UNDEFINED);
+            append_phrase(source, term->input(i)->asString().c_str(),
+                    term, phrase_type::UNDEFINED);
+        }
+        append_phrase(source, " =", term, phrase_type::UNDEFINED);
+        append_source_for_input(source, term, 1);
+    }
+
     void setup(Branch& kernel)
     {
         SET_FIELD_FUNC = import_function(kernel, evaluate,
                 "set_field(any, any, string...) -> any");
-        function_t::get_specialize_type(SET_FIELD_FUNC) = specializeType;
-        function_t::get_to_source_string(SET_FIELD_FUNC) = toSourceString;
+        function_t::get_attrs(SET_FIELD_FUNC).specializeType = specializeType;
+        function_t::get_attrs(SET_FIELD_FUNC).toSource = toSourceString;
+        function_t::get_attrs(SET_FIELD_FUNC).formatSource = formatSource;
     }
 }
 }

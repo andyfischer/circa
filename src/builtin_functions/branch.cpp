@@ -50,20 +50,19 @@ namespace branch_function {
 
             append_phrase(source, "]", term, token::RBRACKET);
         } else if (term->type == NAMESPACE_TYPE) {
-#if 0
-            out << "namespace ";
-            out << term->name;
-            out << term->stringPropOptional("syntax:postHeadingWs", "\n");
-            out << get_branch_source(as_branch(term));
-            out << term->stringPropOptional("syntax:preEndWs", "");
-            out << "end";
-#endif
+            append_phrase(source, "namespace ", term, phrase_type::KEYWORD);
+            append_phrase(source, term->name, term, phrase_type::TERM_NAME);
+            append_phrase(source, term->stringPropOptional("syntax:postHeadingWs", "\n"),
+                    term, token::WHITESPACE);
+            append_branch_source(source, as_branch(term), NULL);
+            append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
+                    term, token::WHITESPACE);
+                    
+            append_phrase(source, "end", term, phrase_type::KEYWORD);
             
         } else {
-#if 0
-            prepend_name_binding(term, out);
-            print_branch_source(out, term);
-#endif
+            append_leading_name_binding(source, term);
+            append_branch_source(source, as_branch(term), term);
         }
     }
 
