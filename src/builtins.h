@@ -42,7 +42,7 @@ extern Term* SET_FIELD_FUNC;
 extern Term* SET_INDEX_FUNC;
 extern Term* STATEFUL_VALUE_FUNC;
 extern Term* SUB_FUNC;
-extern Term* TO_REF_FUNC;
+extern Term* REF_FUNC;
 extern Term* UNKNOWN_FUNCTION;
 extern Term* UNKNOWN_FIELD_FUNC;
 extern Term* UNKNOWN_IDENTIFIER_FUNC;

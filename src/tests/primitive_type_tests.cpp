@@ -83,7 +83,7 @@ void test_ref_tweak()
     test_assert(as_float(v) == 1.0); // sanity check
     
     // Check that no rounding errors are introduced
-    branch.eval("r = &v");
+    branch.eval("r = ref(v)");
     branch.eval("r.tweak(1)");
     branch.eval("r.tweak(-1)");
     test_assert(as_float(v) == 1.0);

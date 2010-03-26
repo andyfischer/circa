@@ -1,4 +1,9 @@
 
+-- Used in source_repro, don't change this type without changing it there:
+type FormattedSourcePhrase {
+
+}
+
 def toggle(bool tog) -> bool
     <<<
     Stateful function, returns a boolean status. Every frame the function is called

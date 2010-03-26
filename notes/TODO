@@ -1,6 +1,4 @@
 
-Short todos:
- - Remove special syntax for to_ref, rename to ref()
 
 Bugs:
 

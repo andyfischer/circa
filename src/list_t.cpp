@@ -81,6 +81,10 @@ static ListData* grow_capacity(ListData* original)
     return result;
 }
 
+static ListData* resize(ListData* original, int count)
+{
+}
+
 // Reset this list to have 0 elements.
 static void clear(ListData** data)
 {

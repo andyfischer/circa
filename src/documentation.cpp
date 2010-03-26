@@ -111,7 +111,7 @@ void initialize_kernel_documentation(Branch& KERNEL)
     hide_from_docs(KERNEL["input_placeholder"]);
     hide_from_docs(KERNEL["cond_feedback"]);
     hide_from_docs(KERNEL["term_to_source"]);
-    hide_from_docs(KERNEL["to_ref"]);
+    hide_from_docs(KERNEL["ref"]);
     hide_from_docs(KERNEL["one_time_assign"]);
     hide_from_docs(KERNEL["unique_id"]);
     hide_from_docs(KERNEL["unknown_field"]);

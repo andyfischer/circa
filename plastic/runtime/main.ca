@@ -39,19 +39,19 @@ type Keypress {
 def key_down(int key) -> bool {}
 def key_pressed_code(int key) -> bool {}
 def key_pressed_char(string key) -> bool {}
-key_pressed = [&key_pressed_code &key_pressed_char] -> OverloadedFunction
+key_pressed = [ref(key_pressed_code) ref(key_pressed_char)] -> OverloadedFunction
 def mouse_pressed() -> bool {}
 def mouse_over(Rect region) -> bool {}
 def recent_key_presses() -> List {}
 def mouse_clicked_anywhere () -> bool {}
 def mouse_clicked_region (Rect region) -> bool {}
-mouse_clicked = [&mouse_clicked_anywhere &mouse_clicked_region] -> OverloadedFunction
+mouse_clicked = [ref(mouse_clicked_anywhere) ref(mouse_clicked_region)] -> OverloadedFunction
 def mouse_wheel_up_anywhere () -> bool {}
 def mouse_wheel_up_region (Rect region) -> bool {}
-mouse_wheel_up = [&mouse_wheel_up_anywhere &mouse_wheel_up_region] -> OverloadedFunction
+mouse_wheel_up = [ref(mouse_wheel_up_anywhere) ref(mouse_wheel_up_region)] -> OverloadedFunction
 def mouse_wheel_down_anywhere () -> bool {}
 def mouse_wheel_down_region (Rect region) -> bool {}
-mouse_wheel_down = [&mouse_wheel_down_anywhere &mouse_wheel_down_region] -> OverloadedFunction
+mouse_wheel_down = [ref(mouse_wheel_down_anywhere) ref(mouse_wheel_down_region)] -> OverloadedFunction
 
 -- These are assigned in input.cpp
 UP = 0
@@ -133,7 +133,7 @@ namespace image begin
     def draw_clip_p(Image image, Rect clip, Point destination) {}
     def draw_clip_resized(Image image, Rect clip, Rect destination) {}
 
-    draw_clip = [&draw_clip_p &draw_clip_resized] -> OverloadedFunction
+    draw_clip = [ref(draw_clip_p) ref(draw_clip_resized)] -> OverloadedFunction
 end
 
 def load_texture(state int, string) -> int {}

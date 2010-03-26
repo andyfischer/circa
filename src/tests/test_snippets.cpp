@@ -204,8 +204,8 @@ void test_modulo()
 
 void test_references()
 {
-    test_snippet("a = 1; ra = &a", "ra.name() == 'a'");
-    test_snippet("a = 1; ra = &a; rb = &a", "ra == rb");
+    test_snippet("a = 1; ra = ref(a)", "ra.name() == 'a'");
+    test_snippet("a = 1; ra = ref(a); rb = ref(a)", "ra == rb");
 
     test_snippet("br = begin; a = 1; state b = 2; 3; end;"
                  "bm = branch_ref(br); cons = bm.get_configs();"
@@ -213,8 +213,8 @@ void test_references()
                  "length(cons) == 1; cons_0.name() == 'a'");
 
     // test .input
-    test_snippet("a = 1; b = 2; c = add(a,b); c_ref = &c",
-            "c_ref.input(0) == &a; c_ref.input(1) == &b");
+    test_snippet("a = 1; b = 2; c = add(a,b); c_ref = ref(c)",
+            "c_ref.input(0) == ref(a); c_ref.input(1) == ref(b)");
 
     // test .length
     test_snippet("br = [1 2]; mir = branch_ref(br)",
@@ -225,7 +225,7 @@ void test_references()
             "mir_0 = mir.get_index(0); mir_1 = mir.get_index(1)",
             "mir_0.asint() == 1; mir_1.asint() == 2");
 
-    test_snippet("a = add(1 2 3); a_ref = &a", "a_ref.num_inputs() == 3");
+    test_snippet("a = add(1 2 3); a_ref = ref(a)", "a_ref.num_inputs() == 3");
 }
 
 void test_blocks()

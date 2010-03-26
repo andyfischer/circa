@@ -31,14 +31,9 @@ void round_trip_source(std::string statement)
     Branch branch;
     parser::compile(&branch, parser::statement_list, statement);
 
-#if 1
     RichSource richSource;
     format_branch_source(&richSource, branch);
     result.actual = unformat_rich_source(&richSource);
-#else
-
-    result.actual = get_branch_source(branch);
-#endif
 
     result.passed = result.expected == result.actual;
     result.actual = escape_newlines(result.actual);
@@ -331,9 +326,9 @@ void reproduce_with_parse_errors() {
 }
 
 void reproduce_dot_expressions() {
-    round_trip_source("r = &1; r.name()");
-    round_trip_source("r = &1; r.asint()");
-    round_trip_source("r = &1; r.asint() + 5");
+    round_trip_source("r = ref(1); r.name()");
+    round_trip_source("r = ref(1); r.asint()");
+    round_trip_source("r = ref(1); r.asint() + 5");
     round_trip_source("l = []; l.append(1)");
     round_trip_source("t = Point(); t.x");
     round_trip_source("t = Point(); t.x = 1.0");
