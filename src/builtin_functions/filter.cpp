@@ -7,24 +7,24 @@ namespace filter_function {
 
     void evaluate(EvalContext* cxt, Term* caller)
     {
-        Branch& inputs = as_branch(caller->input(0));
-        Branch& bools = as_branch(caller->input(1));
+        TaggedValue* inputs = caller->input(0);
+        TaggedValue* bools = caller->input(1);
         Branch& output = as_branch(caller);
 
-        if (inputs.length() != bools.length()) {
-            error_occurred(cxt, caller, "Lists have different lengths");
-            return;
-        }
+        int numInputs = inputs->numElements();
+        int numBools = bools->numElements();
+
+        if (numInputs != numBools)
+            return error_occurred(cxt, caller, "Lists have different lengths");
 
         int write = 0;
 
-        for (int i=0; i < inputs.length(); i++) {
-            if (bools[i]->asBool()) {
-                if (output.length() <= i) {
-                    create_value(output, inputs[i]->type);
-                }
+        for (int i=0; i < numInputs; i++) {
+            if (as_bool((*bools)[i])) {
+                if (output.length() <= i)
+                    output.appendNew();
 
-                assign_value(inputs[i], output[write]);
+                copy((*inputs)[i], output[write]);
                 write++;
             }
         }
