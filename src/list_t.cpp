@@ -65,24 +65,30 @@ static ListData* duplicate(ListData* source)
     return result;
 }
 
+// Returns a possibly new list with the given capacity.
+static ListData* resize(ListData* original, int new_capacity)
+{
+    if (original == NULL)
+        return create_list(new_capacity);
+
+    if (original->capacity == new_capacity)
+        return original;
+
+    ListData* result = create_list(new_capacity);
+    result->count = new_capacity < original->count ? new_capacity : original->count;
+    for (int i=0; i < result->count; i++)
+        swap(&original->items[i], &result->items[i]);
+    decref(original);
+    return result;
+}
+
 // Returns a new list that has 2x the capacity of 'original', and decrefs 'original'.
 static ListData* grow_capacity(ListData* original)
 {
     if (original == NULL)
         return create_list(1);
 
-    int new_capacity = original->capacity * 2;
-    ListData* result = create_list(new_capacity);
-    result->capacity = new_capacity;
-    result->count = original->count;
-    for (int i=0; i < original->count; i++)
-        swap(&original->items[i], &result->items[i]);
-    decref(original);
-    return result;
-}
-
-static ListData* resize(ListData* original, int count)
-{
+    return resize(original, original->capacity * 2);
 }
 
 // Reset this list to have 0 elements.
@@ -128,6 +134,12 @@ TaggedValue* append(TaggedValue* list)
 {
     assert(is_list(list));
     return append((ListData**) &list->value_data);
+}
+
+void resize(TaggedValue* list, int newSize)
+{
+    assert(is_list(list));
+    set_pointer(list, resize((ListData*) get_pointer(list), newSize));
 }
 
 void clear(TaggedValue* list)

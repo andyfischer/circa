@@ -287,6 +287,7 @@ void append_phrase(RichSource* source, const char* str, Term* term, int type)
         return;
 
     TaggedValue* list = make_list(source->_phrases.append());
+    list_t::resize(list, 3);
     make_string(list_t::append(list), str);
     make_ref(list_t::append(list), term);
     make_int(list_t::append(list), type);

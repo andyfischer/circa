@@ -13,6 +13,7 @@ namespace list_t {
     struct ListData;
 
     TaggedValue* append(TaggedValue* list);
+    void resize(TaggedValue* list, int newSize);
 
     void setup_type(Type*);
     void postponed_setup_type(Type*);
