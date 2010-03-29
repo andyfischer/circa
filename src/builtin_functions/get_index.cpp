@@ -19,7 +19,7 @@ namespace get_index_function {
         copy_newstyle(result, caller);
     }
 
-    void formatSource(RichSource* source, Term* term)
+    void formatSource(StyledSource* source, Term* term)
     {
         format_name_binding(source, term);
         append_phrase(source, get_relative_name(term, term->input(0)),

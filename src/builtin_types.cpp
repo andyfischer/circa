@@ -21,7 +21,7 @@ namespace int_t {
         strm << as_int(value);
         return strm.str();
     }
-    void format_source(RichSource* source, Term* term)
+    void format_source(StyledSource* source, Term* term)
     {
         std::stringstream strm;
         if (term->stringPropOptional("syntax:integerFormat", "dec") == "hex")
@@ -103,7 +103,7 @@ namespace float_t {
         else
             return result;
     }
-    void format_source(RichSource* source, Term* term)
+    void format_source(StyledSource* source, Term* term)
     {
         append_phrase(source, float_t::to_source_string(term).c_str(), term, token::FLOAT_TOKEN);
     }
@@ -127,7 +127,7 @@ namespace bool_t {
         else
             return "false";
     }
-    void format_source(RichSource* source, Term* term)
+    void format_source(StyledSource* source, Term* term)
     {
         append_phrase(source, bool_t::to_string(term), term, token::BOOL);
     }
@@ -154,7 +154,7 @@ namespace old_list_t {
         return out.str();
     }
 
-    void formatSource(RichSource* source, Term* term)
+    void formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, "[", term, token::LBRACKET);
         Branch& branch = as_branch(term);
@@ -445,7 +445,7 @@ namespace color_t {
         return out.str();
     }
 
-    void format_source(RichSource* source, Term* term)
+    void format_source(StyledSource* source, Term* term)
     {
         append_phrase(source, color_t::to_string(term), term, token::COLOR);
     }
@@ -660,7 +660,7 @@ namespace string_t {
         return result.str();
     }
 
-    void format_source(RichSource* source, Term* term)
+    void format_source(StyledSource* source, Term* term)
     {
         std::string quoteType = term->stringPropOptional("syntax:quoteType", "'");
         std::string result;

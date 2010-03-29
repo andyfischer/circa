@@ -15,15 +15,15 @@
 
 namespace circa {
 
-void format_term_source_default_formatting(RichSource* source, Term* term);
+void format_term_source_default_formatting(StyledSource* source, Term* term);
 
 std::string
-RichSource::toString()
+StyledSource::toString()
 {
     return _phrases.toString();
 }
 
-void format_branch_source(RichSource* source, Branch& branch, Term* format)
+void format_branch_source(StyledSource* source, Branch& branch, Term* format)
 {
     parser::BranchSyntax branchSyntax = parser::BRANCH_SYNTAX_UNDEF;
 
@@ -91,7 +91,7 @@ void format_branch_source(RichSource* source, Branch& branch, Term* format)
     }
 }
 
-std::string unformat_rich_source(RichSource* source)
+std::string unformat_rich_source(StyledSource* source)
 {
     std::stringstream strm;
 
@@ -102,7 +102,7 @@ std::string unformat_rich_source(RichSource* source)
     return strm.str();
 }
 
-void format_term_source(RichSource* source, Term* term)
+void format_term_source(StyledSource* source, Term* term)
 {
     assert(term != NULL);
 
@@ -145,7 +145,7 @@ void format_term_source(RichSource* source, Term* term)
             term, token::WHITESPACE);
 }
 
-void format_term_source_default_formatting(RichSource* source, Term* term)
+void format_term_source_default_formatting(StyledSource* source, Term* term)
 {
     std::string declarationStyle = term->stringPropOptional("syntax:declarationStyle",
             "function-call");
@@ -215,7 +215,7 @@ void format_term_source_default_formatting(RichSource* source, Term* term)
         append_phrase(source, ")", term, token::RPAREN);
 }
 
-void format_source_for_input(RichSource* source, Term* term, int inputIndex)
+void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
 {
     Term* input = term->input(inputIndex);
 
@@ -260,7 +260,7 @@ void format_source_for_input(RichSource* source, Term* term, int inputIndex)
             input, token::WHITESPACE);
 }
 
-void format_name_binding(RichSource* source, Term* term)
+void format_name_binding(StyledSource* source, Term* term)
 {
     if (term->name == "#out")
         append_phrase(source, "return ", term, phrase_type::UNDEFINED);
@@ -280,7 +280,7 @@ void format_name_binding(RichSource* source, Term* term)
     }
 }
 
-void append_phrase(RichSource* source, const char* str, Term* term, int type)
+void append_phrase(StyledSource* source, const char* str, Term* term, int type)
 {
     // No-op if string is empty
     if (str[0] == 0)
@@ -293,28 +293,28 @@ void append_phrase(RichSource* source, const char* str, Term* term, int type)
     make_int((*list)[2], type);
 }
 
-void append_phrase(RichSource* source, std::string const& str, Term* term, int type)
+void append_phrase(StyledSource* source, std::string const& str, Term* term, int type)
 {
     return append_phrase(source, str.c_str(), term, type);
 }
 
 std::string get_branch_source_text(Branch& branch)
 {
-    RichSource source;
+    StyledSource source;
     format_branch_source(&source, branch);
     return unformat_rich_source(&source);
 }
 
 std::string get_term_source_text(Term* term)
 {
-    RichSource source;
+    StyledSource source;
     format_term_source(&source, term);
     return unformat_rich_source(&source);
 }
 
 std::string get_input_source_text(Term* term, int index)
 {
-    RichSource source;
+    StyledSource source;
     format_source_for_input(&source, term, index);
     return unformat_rich_source(&source);
 }

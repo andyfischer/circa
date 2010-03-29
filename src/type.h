@@ -27,7 +27,7 @@ struct Type
     typedef void (*Cast)(Type* type, TaggedValue* source, TaggedValue* dest);
     typedef void (*RemapPointers)(Term* term, ReferenceMap const& map);
     typedef std::string (*ToString)(TaggedValue* value);
-    typedef void (*FormatSource)(RichSource*, Term* term);
+    typedef void (*FormatSource)(StyledSource*, Term* term);
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
     typedef void (*Mutate)(TaggedValue* value);
@@ -99,7 +99,7 @@ struct Type
 
 namespace type_t {
     std::string to_string(Term *caller);
-    void formatSource(RichSource* source, Term* term);
+    void formatSource(StyledSource* source, Term* term);
     void remap_pointers(Term *term, ReferenceMap const& map);
     void name_accessor(EvalContext*, Term* caller);
 

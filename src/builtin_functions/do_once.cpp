@@ -15,7 +15,7 @@ namespace do_once_function {
         }
     }
 
-    void formatSource(RichSource* source, Term* term)
+    void formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, "do once", term, phrase_type::KEYWORD);
         append_phrase(source, term->stringPropOptional("syntax:postHeadingWs", "\n"),

@@ -25,7 +25,7 @@ namespace list_function {
         dest.removeNulls();
     }
 
-    void list_formatSource(RichSource* source, Term* caller) {
+    void list_formatSource(StyledSource* source, Term* caller) {
         format_name_binding(source, caller);
         append_phrase(source, "[", caller, token::LBRACKET);
         for (int i=0; i < caller->numInputs(); i++)

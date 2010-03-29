@@ -9,7 +9,7 @@ namespace stateful_value_function {
     {
     }
 
-    void formatSource(RichSource* source, Term* term)
+    void formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, "state ", term, token::STATE);
 

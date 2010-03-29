@@ -8,7 +8,7 @@ namespace circa {
 
 namespace type_t {
 
-    void formatSource(RichSource* source, Term* term)
+    void formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, "type ", term, phrase_type::KEYWORD);
         append_phrase(source, term->name, term, phrase_type::TYPE_NAME);

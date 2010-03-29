@@ -15,7 +15,7 @@ namespace neg_function {
         set_int(caller, -int_input(caller,0));
     }
 
-    void formatSource(RichSource* source, Term* term)
+    void formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, "-", term, phrase_type::INFIX_OPERATOR);
         format_source_for_input(source, term, 0);

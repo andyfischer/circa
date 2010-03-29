@@ -76,7 +76,7 @@ namespace function_t {
         return out.str();
     }
 
-    void format_header_source(RichSource* source, Term* term)
+    void format_header_source(StyledSource* source, Term* term)
     {
         append_phrase(source, term->name, term, phrase_type::TERM_NAME);
 

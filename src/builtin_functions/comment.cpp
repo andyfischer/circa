@@ -9,7 +9,7 @@ namespace comment_function {
     {
     }
 
-    void formatSource(RichSource* source, Term* term)
+    void formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, term->stringProp("comment"), term, token::COMMENT);
     }

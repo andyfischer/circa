@@ -6,7 +6,7 @@ namespace circa {
 
 namespace subroutine_t {
 
-    void format_source(RichSource* source, Term* term)
+    void format_source(StyledSource* source, Term* term)
     {
         append_phrase(source, "def ", term, token::DEF);
 

@@ -11,7 +11,7 @@ namespace branch_function {
         evaluate_branch(cxt, branch);
     }
 
-    void format_source(RichSource* source, Term* term)
+    void format_source(StyledSource* source, Term* term)
     {
         if (term->boolPropOptional("syntax:literal-list", false)) {
             format_name_binding(source, term);

@@ -5,7 +5,7 @@
 namespace circa {
 namespace for_function {
 
-    void format_heading(RichSource* source, Term* term)
+    void format_heading(StyledSource* source, Term* term)
     {
         append_phrase(source, "for ", term, phrase_type::KEYWORD);
         append_phrase(source, get_for_loop_iterator(term)->name.c_str(),
@@ -14,7 +14,7 @@ namespace for_function {
         format_source_for_input(source, term, 1);
     }
 
-    void formatSource(RichSource* source, Term* term)
+    void formatSource(StyledSource* source, Term* term)
     {
         format_heading(source, term);
         append_phrase(source, term->stringPropOptional("syntax:postHeadingWs", "\n"),
@@ -31,7 +31,7 @@ namespace for_function {
         set_bool(discardCalled, true);
     }
 
-    void discard_formatSource(RichSource* source, Term* term)
+    void discard_formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, "discard", term, phrase_type::KEYWORD);
     }

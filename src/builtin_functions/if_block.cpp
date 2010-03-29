@@ -10,7 +10,7 @@ namespace if_block_function {
         evaluate_if_block(cxt, caller);
     }
 
-    void formatSource(RichSource* source, Term* term)
+    void formatSource(StyledSource* source, Term* term)
     {
         Branch& contents = as_branch(term);
 
