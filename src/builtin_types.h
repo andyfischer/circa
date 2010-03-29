@@ -51,6 +51,8 @@ namespace ref_t {
     void setup_type(Type* type);
 }
 
+namespace branch_ref_t { void setup_type(Type* type); }
+
 namespace type_t {
     void initialize(Type* type, TaggedValue* value);
     void assign(TaggedValue* source, TaggedValue* dest);

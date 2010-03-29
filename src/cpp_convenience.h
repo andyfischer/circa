@@ -37,17 +37,6 @@ public:
     operator int() { return as_int(_value); }
 };
 
-class String {
-    TaggedValue* _value;
-
-public:
-    String(TaggedValue* value) { _value = value; }
-    
-    String& operator=(std::string const& rhs) { set_str(_value, rhs); return *this; }
-    operator std::string const&() { return as_string(_value); }
-    operator const char*() { return as_string(_value).c_str(); }
-};
-
 template <class T>
 T eval(std::string const& statement)
 {

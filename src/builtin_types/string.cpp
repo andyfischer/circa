@@ -3,7 +3,6 @@
 #include "string_t.h"
 
 namespace circa {
-
 namespace string_t {
 
 struct StringData {
