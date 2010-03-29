@@ -54,12 +54,25 @@ namespace list_function {
         dest.removeNulls();
     }
 
+    void evaluate_newlist(EvalContext*, Term* caller) {
+
+        List* result = (List*) caller;
+
+        result->resize(caller->numInputs());
+
+        for (int i=0; i < caller->numInputs(); i++) {
+            copy(caller->input(i), (*result)[i]);
+        }
+    }
+
     void setup(Branch& kernel)
     {
         LIST_FUNC = import_function(kernel, evaluate, "list(any...) -> List");
         function_t::get_attrs(LIST_FUNC).formatSource = list_formatSource;
 
         import_function(kernel, evaluate_repeat, "repeat(any, int) -> List");
+        
+        import_function(kernel, evaluate_newlist, "newlist(any...) -> List");
     }
 }
 }

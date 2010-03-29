@@ -52,6 +52,7 @@ def sync_windows_sdl_deps():
         unzip_file('SDL_deps.zip', '.')
 
 def main():
+
     if not os.path.exists('src/generated'):
         os.mkdir('src/generated')
 

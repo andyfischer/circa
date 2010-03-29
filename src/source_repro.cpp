@@ -286,11 +286,11 @@ void append_phrase(RichSource* source, const char* str, Term* term, int type)
     if (str[0] == 0)
         return;
 
-    TaggedValue* list = make_list(source->_phrases.append());
-    list_t::resize(list, 3);
-    make_string(list_t::append(list), str);
-    make_ref(list_t::append(list), term);
-    make_int(list_t::append(list), type);
+    List* list = (List*) make_list(source->_phrases.append());
+    list->resize(3);
+    make_string((*list)[0], str);
+    make_ref((*list)[1], term);
+    make_int((*list)[2], type);
 }
 
 void append_phrase(RichSource* source, std::string const& str, Term* term, int type)

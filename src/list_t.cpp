@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 
+#include "debug_valid_objects.h"
 #include "list_t.h"
 #include "tagged_value.h"
 #include "tagged_value_accessors.h"
@@ -10,8 +11,9 @@
 
 namespace circa {
 namespace list_t {
-    
+
 bool is_list(TaggedValue* value);
+static ListData* mutate(ListData* data);
 
 struct ListData {
     int refCount;
@@ -20,20 +22,31 @@ struct ListData {
     TaggedValue items[0];
 };
 
+void assert_valid_list(ListData* list)
+{
+    if (list == NULL) return;
+    assert(list->refCount > 0);
+    debug_assert_valid_object(list, LIST_OBJECT);
+}
+
 void incref(ListData* data)
 {
+    assert_valid_list(data);
     data->refCount++;
 }
 
 void decref(ListData* data)
 {
+    assert_valid_list(data);
     assert(data->refCount > 0);
     data->refCount--;
+
     if (data->refCount == 0) {
         // Release all elements
         for (int i=0; i < data->count; i++)
             make_null(&data->items[i]);
         free(data);
+        debug_unregister_valid_object(data);
     }
 }
 
@@ -41,6 +54,8 @@ void decref(ListData* data)
 static ListData* create_list(int capacity)
 {
     ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(TaggedValue));
+    debug_register_valid_object(result, LIST_OBJECT);
+
     result->refCount = 1;
     result->count = 0;
     result->capacity = capacity;
@@ -56,7 +71,10 @@ static ListData* duplicate(ListData* source)
     if (source == NULL || source->count == 0)
         return NULL;
 
-    ListData* result = create_list(source->count);
+    assert_valid_list(source);
+
+    ListData* result = create_list(source->capacity);
+
     result->count = source->count;
 
     for (int i=0; i < source->count; i++)
@@ -65,19 +83,19 @@ static ListData* duplicate(ListData* source)
     return result;
 }
 
-// Returns a possibly new list with the given capacity.
-static ListData* resize(ListData* original, int new_capacity)
+// Returns a new list with the given capacity.
+static ListData* increase_capacity(ListData* original, int new_capacity)
 {
     if (original == NULL)
         return create_list(new_capacity);
 
-    if (original->capacity == new_capacity)
-        return original;
-
+    assert_valid_list(original);
     ListData* result = create_list(new_capacity);
-    result->count = new_capacity < original->count ? new_capacity : original->count;
+
+    result->count = original->count;
     for (int i=0; i < result->count; i++)
-        swap(&original->items[i], &result->items[i]);
+        copy(&original->items[i], &result->items[i]);
+
     decref(original);
     return result;
 }
@@ -88,8 +106,48 @@ static ListData* grow_capacity(ListData* original)
     if (original == NULL)
         return create_list(1);
 
-    return resize(original, original->capacity * 2);
+    ListData* result = increase_capacity(original, original->capacity * 2);
+    return result;
 }
+
+// Modify a list so that it has the given number of elements.
+static ListData* resize(ListData* original, int numElements)
+{
+    if (original == NULL) {
+        if (numElements == 0)
+            return NULL;
+        ListData* result = create_list(numElements);
+        result->count = numElements;
+        return result;
+    }
+
+    if (numElements == 0) {
+        decref(original);
+        return NULL;
+    }
+
+    // Check for not enough capacity
+    if (numElements > original->capacity) {
+        ListData* result = increase_capacity(original, numElements);
+        result->count = numElements;
+        return result;
+    }
+
+    if (original->count == numElements)
+        return original;
+
+    // Capacity is good, will need to modify 'count' on list and possibly
+    // set some items to null. This counts as a modification.
+    ListData* result = mutate(original);
+
+    // Possibly set extra elements to null, if we are shrinking.
+    for (int i=numElements; i < result->count; i++)
+        make_null(&result->items[i]);
+    result->count = numElements;
+
+    return result;
+}
+
 
 // Reset this list to have 0 elements.
 static void clear(ListData** data)
@@ -101,7 +159,7 @@ static void clear(ListData** data)
 
 // Return a version of this list which is safe to modify. If this data has
 // multiple references, we'll return a new copy (and decref the original).
-ListData* mutate(ListData* data)
+static ListData* mutate(ListData* data)
 {
     assert(data->refCount > 0);
     if (data->refCount == 1)
@@ -172,6 +230,7 @@ void tv_release(TaggedValue* value)
 {
     assert(is_list(value));
     ListData* data = (ListData*) get_pointer(value);
+    assert_valid_list(data);
     if (data == NULL) return;
     decref(data);
 }
@@ -182,6 +241,11 @@ void tv_copy(TaggedValue* source, TaggedValue* dest)
     assert(is_list(dest));
     ListData* s = (ListData*) get_pointer(source);
     ListData* d = (ListData*) get_pointer(dest);
+
+    assert_valid_list(s);
+    assert_valid_list(d);
+
+    set_pointer(dest, duplicate(s));
 
     if (s != NULL)
         incref(s);
@@ -278,6 +342,12 @@ TaggedValue*
 List::operator[](int index)
 {
     return list_t::tv_get_element((TaggedValue*) this, index);
+}
+
+void
+List::resize(int newSize)
+{
+    list_t::resize(this, newSize); 
 }
 
 }

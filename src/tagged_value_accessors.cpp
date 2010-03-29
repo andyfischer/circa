@@ -74,6 +74,14 @@ void cast(Type* type, TaggedValue* source, TaggedValue* dest)
 void copy(TaggedValue* source, TaggedValue* dest)
 {
     change_type(dest, source->value_type);
+
+    Type::Copy copy = source->value_type->copy;
+
+    if (copy != NULL) {
+        copy(source, dest);
+        return;
+    }
+
     assign_value(source, dest);
 }
 
@@ -82,8 +90,10 @@ void copy_newstyle(TaggedValue* source, TaggedValue* dest)
     change_type(dest, source->value_type);
     Type::Copy copy = source->value_type->copy;
 
-    if (copy != NULL)
+    if (copy != NULL) {
         copy(source, dest);
+        return;
+    }
 
     // Backwards compat, use assign() if copy is not found.
     assign_value(source, dest);

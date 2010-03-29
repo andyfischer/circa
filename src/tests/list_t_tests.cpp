@@ -68,6 +68,7 @@ void test_tagged_value_copy()
     test_equals(to_string(&value), "[1, 2, 3]");
 
     TaggedValue value2;
+    test_assert(value.value_type->copy != NULL);
     copy_newstyle(&value, &value2);
 
     test_equals(to_string(&value2), "[1, 2, 3]");

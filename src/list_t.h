@@ -29,6 +29,7 @@ struct List : TaggedValue
     void clear();
     int length();
     TaggedValue* operator[](int index);
+    void resize(int size);
 };
 
 }

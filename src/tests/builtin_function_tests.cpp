@@ -36,7 +36,7 @@ void test_int()
     test_assert(equals(four, another_four));
     test_assert(!equals(four, five));
 
-    test_assert(four->toString() == "4");
+    test_equals(four->toString(), "4");
 }
 
 void test_float()

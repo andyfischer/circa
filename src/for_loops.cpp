@@ -180,7 +180,7 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
 
     // Make sure state has the correct number of iterations
 
-    int numIterations = as_branch(listTerm).length();
+    int numIterations = listTerm->numElements();
     bool modifyList = get_for_loop_modify_list(forTerm)->asBool();
     Term* discardCalled = get_for_loop_discard_called(forTerm);
 
@@ -217,7 +217,7 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
         set_bool(discardCalled, false);
 
         // Inject iterator value
-        copy(listTerm->asBranch()[i], iterator);
+        copy((*listTerm)[i], iterator);
 
         // Inject stateful terms
         if (stateBranch != NULL)
