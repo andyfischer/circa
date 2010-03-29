@@ -7,11 +7,13 @@ namespace any_true_function {
 
     void evaluate(EvalContext*, Term* caller)
     {
-        Branch& input = as_branch(caller->input(0));
+        TaggedValue* input = caller->input(0);
+
+        int numElements = input->numElements();
 
         bool result = false;
-        for (int i=0; i < input.length(); i++)
-            if (input[i]->asBool()) {
+        for (int i=0; i < numElements; i++)
+            if (as_bool((*input)[i])) {
                 result = true;
                 break;
             }
