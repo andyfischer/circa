@@ -17,8 +17,6 @@ namespace list_t {
 
     void setup_type(Type*);
     void postponed_setup_type(Type*);
-    
-    int get_refcount(ListData* data);
 }
 
 struct List : TaggedValue

@@ -4,8 +4,6 @@
 
 namespace circa {
 
-namespace float_t { bool equals(TaggedValue* a, TaggedValue* b); }
-
 namespace int_t {
     bool equals(TaggedValue* a, TaggedValue* b)
     {
@@ -625,6 +623,11 @@ namespace branch_ref_t
         set_str(caller, get_branch_source_text(target_branch));
     }
 
+    void postponed_setup_type(Type* type)
+    {
+
+    }
+
 } // namespace branch_ref_t
 
 namespace string_t {
@@ -989,6 +992,8 @@ void setup_builtin_types(Branch& kernel)
     CODE_TYPE = create_compound_type(kernel, "Code");
 
     BRANCH_REF_TYPE = parse_type(kernel, "type BranchRef { Ref target }");
+
+    parse_type(kernel, "type StyledSource { List phrases }");
 }
 
 void parse_builtin_types(Branch& kernel)

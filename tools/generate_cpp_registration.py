@@ -47,6 +47,30 @@ def do_builtin_functions(directory):
 
     return output
 
+def do_builtin_types(directory):
+    (files, typeNames) = list_cpp_files(directory)
+
+    namespaces = typeNames
+
+    def makePredeclaration(namespace):
+        return "namespace "+namespace+" { void setup_type(Type* type); }"
+
+    def makeCall(namespace):
+        return namespace+"::setup_type(type);"
+
+    predeclarations = map(makePredeclaration, namespaces)
+    calls = map(makeCall, namespaces)
+
+    predeclarations.sort()
+    calls.sort()
+
+    output = substitute(BUILTIN_TYPES_TEMPLATE,
+        predeclarations="\n".join(predeclarations),
+        calls="\n    ".join(calls))
+
+    return output
+
+
 def do_register_all_tests(directory):
     (files, names) = list_cpp_files(directory)
 
@@ -68,7 +92,7 @@ def do_register_all_tests(directory):
     return output
 
 BUILTIN_FUNCTIONS_TEMPLATE = """
-// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
+// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 // This file is generated during the build process.
 // You should probably not edit this file manually.
@@ -89,8 +113,23 @@ void setup_builtin_functions(Branch& kernel)
 } // namespace circa
 """
 
+BUILTIN_TYPES_TEMPLATE = """
+// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
+
+// This file is generated during the build process.
+// You should probably not edit this file manually.
+
+#include "common_headers.h"
+
+namespace circa {
+
+$predeclarations
+
+} // namespace circa
+"""
+
 REGISTER_ALL_TESTS_TEMPLATE = """
-// Copyright (c) 2007-2009 Paul Hodge. All rights reserved.
+// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 // This file is generated during the build process.
 // You should probably not edit this file manually.

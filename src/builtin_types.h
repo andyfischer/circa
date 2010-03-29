@@ -10,6 +10,7 @@ namespace int_t {
 }
 
 namespace float_t {
+    bool equals(TaggedValue* a, TaggedValue* b);
     void setup_type(Type* type);
 }
 

@@ -60,7 +60,6 @@ def main():
     import generate_cpp_registration
     write_text_file('src/generated/setup_builtin_functions.cpp',
             generate_cpp_registration.do_builtin_functions('src/builtin_functions'))
-
     write_text_file('src/generated/register_all_tests.cpp',
             generate_cpp_registration.do_register_all_tests('src/tests'))
 
@@ -95,6 +94,8 @@ def main():
     write_text_file('src/generated/all_tests.cpp', include_list(test_cpps()))
     write_text_file('src/generated/all_builtin_functions.cpp',
             include_list(builtin_function_cpps()))
+    write_text_file('src/generated/all_builtin_types.cpp',
+        include_list(['builtin_types/'+file for file in source_files('src/builtin_types')]))
             
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 all_builtin_functions.cpp
+all_builtin_types.cpp
 all_tests.cpp
 register_all_tests.cpp
 setup_builtin_functions.cpp
