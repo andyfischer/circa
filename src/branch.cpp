@@ -61,7 +61,8 @@ bool Branch::contains(std::string const& name) const
 Term* Branch::get(int index) const
 {
     assert_valid_branch(this);
-    assert(index <= length());
+    if (index > length())
+        throw std::runtime_error("index out of range");
     return _terms[index];
 }
 
