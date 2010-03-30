@@ -816,10 +816,11 @@ void setup_builtin_types(Branch& kernel)
     OVERLOADED_FUNCTION_TYPE = create_compound_type(kernel, "OverloadedFunction");
     CODE_TYPE = create_compound_type(kernel, "Code");
 
-    BRANCH_REF_TYPE = parse_type(kernel, "type BranchRef { Ref target }");
-    branch_ref_t::setup_type(&as_type(BRANCH_REF_TYPE));
+    Term* branchRefType = parse_type(kernel, "type BranchRef { Ref target }");
+    branch_ref_t::setup_type(&as_type(branchRefType));
 
-    parse_type(kernel, "type StyledSource { List phrases }");
+    Term* styledSourceType = parse_type(kernel, "type StyledSource;");
+    styled_source_t::setup_type(&as_type(styledSourceType));
 }
 
 void parse_builtin_types(Branch& kernel)

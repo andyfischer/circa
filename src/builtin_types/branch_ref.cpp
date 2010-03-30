@@ -20,15 +20,15 @@ namespace branch_ref_t {
         return true;
     }
 
-    Branch& get_target_branch(Term* caller)
+    Branch& get_target_branch(TaggedValue* value)
     {
-        Branch& mirrorObject = caller->input(0)->asBranch();
-        return mirrorObject[0]->asRef()->asBranch();
+        Branch& branch = as_branch(value);
+        return branch[0]->asRef()->asBranch();
     }
 
     void get_configs(EvalContext*, Term* caller)
     {
-        Branch& target_branch = get_target_branch(caller);
+        Branch& target_branch = get_target_branch(caller->input(0));
         Branch& output = caller->asBranch();
 
         int write = 0;
@@ -50,7 +50,7 @@ namespace branch_ref_t {
     }
     void get_configs_nested(EvalContext*, Term* caller)
     {
-        Branch& target_branch = get_target_branch(caller);
+        Branch& target_branch = get_target_branch(caller->input(0));
         Branch& output = caller->asBranch();
 
         int write = 0;
@@ -84,7 +84,7 @@ namespace branch_ref_t {
     }
     void get_visible(EvalContext*, Term* caller)
     {
-        Branch& target_branch = get_target_branch(caller);
+        Branch& target_branch = get_target_branch(caller->input(0));
         Branch& output = caller->asBranch();
 
         int write = 0;
@@ -107,7 +107,7 @@ namespace branch_ref_t {
 
     void get_relative_name(EvalContext* cxt, Term* caller)
     {
-        Branch& target_branch = get_target_branch(caller);
+        Branch& target_branch = get_target_branch(caller->input(0));
         Term* target = caller->input(1)->asRef();
 
         if (target == NULL) {
@@ -120,12 +120,12 @@ namespace branch_ref_t {
 
     void get_length(EvalContext*, Term* caller)
     {
-        Branch& target_branch = get_target_branch(caller);
+        Branch& target_branch = get_target_branch(caller->input(0));
         set_int(caller, target_branch.length());
     }
     void get_index(EvalContext*, Term* caller)
     {
-        Branch& target_branch = get_target_branch(caller);
+        Branch& target_branch = get_target_branch(caller->input(0));
         int index = int_input(caller, 1);
         if (index >= target_branch.length())
             set_ref(caller, NULL);
@@ -134,7 +134,7 @@ namespace branch_ref_t {
     }
     void append_code(EvalContext*, Term* caller)
     {
-        Branch& target_branch = get_target_branch(caller);
+        Branch& target_branch = get_target_branch(caller->input(0));
         Branch& input = as_branch(caller->input(1));
 
         if (input.length() == 0)
@@ -156,18 +156,18 @@ namespace branch_ref_t {
     }
     void print_raw(EvalContext*, Term* caller)
     {
-        Branch& target_branch = get_target_branch(caller);
+        Branch& target_branch = get_target_branch(caller->input(0));
 
         set_str(caller, get_branch_raw(target_branch));
     }
     void save(EvalContext*, Term* caller)
     {
-        Branch& target_branch = get_target_branch(caller);
+        Branch& target_branch = get_target_branch(caller->input(0));
         persist_branch_to_file(target_branch);
     }
     void to_source(EvalContext*, Term* caller)
     {
-        Branch& target_branch = get_target_branch(caller);
+        Branch& target_branch = get_target_branch(caller->input(0));
         set_str(caller, get_branch_source_text(target_branch));
     }
 

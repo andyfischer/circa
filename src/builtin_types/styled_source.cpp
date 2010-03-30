@@ -3,7 +3,9 @@
 namespace circa {
 namespace styled_source_t {
 
-
-
+    void setup_type(Type* type)
+    {
+        list_t::setup_type(type);
+    }
 }
 }

@@ -109,6 +109,13 @@ void swap(TaggedValue* left, TaggedValue* right)
     right->value_data = temp_data;
 }
 
+void reset(TaggedValue* value)
+{
+    Type* t = value->value_type;
+    change_type(value, NULL_T);
+    change_type(value, t);
+}
+
 std::string to_string(TaggedValue* value)
 {
     Type::ToString toString = value->value_type->toString;

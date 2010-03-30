@@ -5,7 +5,11 @@ namespace styled_source_function {
 
     void format_source(EvalContext*, Term* caller)
     {
-        // TODO
+        Branch& branch = branch_ref_t::get_target_branch(caller->input(0));
+
+        caller->reset();
+
+        format_branch_source((StyledSource*) caller, branch);
     }
 
     void setup(Branch& kernel)

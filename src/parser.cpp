@@ -556,6 +556,10 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
     result->setStringProp("syntax:preLBracketWhitespace",
             possible_whitespace_or_newline(tokens));
 
+    // if there's a semicolon, then don't parse a prototype
+    if (tokens.nextIs(SEMICOLON))
+        return result;
+
     if (!tokens.nextIs(LBRACE) && !tokens.nextIs(LBRACKET))
         return compile_error_for_line(result, tokens, startPosition);
 

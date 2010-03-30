@@ -49,6 +49,11 @@ TaggedValue::TaggedValue(Type* type)
     change_type(this, type);
 }
 
+void TaggedValue::reset()
+{
+    circa::reset(this);
+}
+
 std::string
 TaggedValue::toString()
 {

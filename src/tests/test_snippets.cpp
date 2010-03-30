@@ -352,6 +352,7 @@ void test_color_arithmetic()
 void test_branch_value()
 {
     test_snippet("b = { 1 2 3 }", "b[0] == 1, b[1] == 2, b[2] == 3");
+    test_snippet("", "{ 1 } != 1"); // once caused a crash
     //test_snippet("b = { apple = 1, bees = 2 }", "b.apple == 1, b.bees == 2");
 }
 
@@ -422,6 +423,11 @@ void test_misc()
     test_snippet("l = []\nl.append([1])\n    ", "");
 }
 
+void test_styled_source()
+{
+    test_snippet("styled_source = { 1 } -> branch_ref -> format_source", "");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -450,6 +456,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_significant_indentation);
     REGISTER_TEST_CASE(test_snippets::test_concat);
     REGISTER_TEST_CASE(test_snippets::test_misc);
+    REGISTER_TEST_CASE(test_snippets::test_styled_source);
 }
 
 } // namespace test_snippets

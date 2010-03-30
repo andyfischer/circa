@@ -13,6 +13,7 @@ void cast(Type* type, TaggedValue* source, TaggedValue* dest);
 void copy(TaggedValue* source, TaggedValue* dest);
 void copy_newstyle(TaggedValue* source, TaggedValue* dest); // Temporary
 void swap(TaggedValue* left, TaggedValue* right);
+void reset(TaggedValue* value);
 std::string to_string(TaggedValue* value);
 TaggedValue* get_element(TaggedValue* value, int index);
 int num_elements(TaggedValue* value);

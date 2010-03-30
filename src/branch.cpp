@@ -440,6 +440,9 @@ namespace branch_t {
 
     bool equals(Term* lhsTerm, Term* rhsTerm)
     {
+        if (!is_branch(rhsTerm))
+            return false;
+
         Branch& lhs = as_branch(lhsTerm);
         Branch& rhs = as_branch(rhsTerm);
 
@@ -456,6 +459,9 @@ namespace branch_t {
 
     bool equals(TaggedValue* lhsValue, TaggedValue* rhsValue)
     {
+        if (!is_branch(rhsValue))
+            return false;
+
         Branch& lhs = as_branch(lhsValue);
         Branch& rhs = as_branch(rhsValue);
 

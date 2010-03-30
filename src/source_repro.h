@@ -49,7 +49,6 @@ bool is_hidden(Term* term);
 int get_first_visible_input_index(Term* term);
 bool has_source_location_defined(Term* term); // deprecated, should be built in to Term
 
-
 std::string const& get_input_syntax_hint(Term* term, int index, std::string const& file);
 std::string get_input_syntax_hint_optional(Term* term, int index, std::string const& file,
         std::string const& defaultValue);
