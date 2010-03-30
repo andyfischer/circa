@@ -11,7 +11,7 @@ namespace list_function {
         int numToAssign = std::min(caller->numInputs(), dest.length());
 
         for (int i=0; i < numToAssign; i++) {
-            assign_value(caller->input(i), dest[i]);
+            copy(caller->input(i), dest[i]);
         }
 
         // Add terms if necessary
@@ -41,7 +41,7 @@ namespace list_function {
         int numToAssign = std::min(repeatCount, dest.length());
 
         for (int i=0; i < numToAssign; i++)
-            assign_value(sourceTerm, dest[i]);
+            copy(sourceTerm, dest[i]);
 
         // Add terms if necessary
         for (int i=dest.length(); i < repeatCount; i++)

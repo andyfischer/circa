@@ -10,7 +10,7 @@ namespace one_time_assign_function {
         Term* assigned = caller->input(0);
 
         if (!as_bool(assigned)) {
-            assign_value(caller->input(1), caller);
+            cast(caller->input(1), caller);
             set_bool(assigned, true);
         }
     }

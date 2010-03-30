@@ -10,7 +10,7 @@ bool run_test_for_type(Term* type, List& exampleValues)
     Branch branch;
 
     Term* x = create_value(branch, type, "x");
-    assign_value(exampleValues[0], x);
+    copy(exampleValues[0], x);
 
     test_assert(branch.eval("x == x"));
 
@@ -19,7 +19,7 @@ bool run_test_for_type(Term* type, List& exampleValues)
     test_assert(equals(x, cpy));
 
     Term* y = create_value(branch, type, "y");
-    assign_value(exampleValues[1], x);
+    copy(exampleValues[1], x);
     test_assert(!equals(x,y));
     test_assert(branch.eval("x != y"));
 

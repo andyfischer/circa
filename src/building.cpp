@@ -266,7 +266,7 @@ Term* create_compound_type(Branch& branch, std::string const& name)
 Term* duplicate_value(Branch& branch, Term* term)
 {
     Term* dup = create_value(branch, term->type);
-    assign_value(term, dup);
+    copy(term, dup);
     return dup;
 }
 

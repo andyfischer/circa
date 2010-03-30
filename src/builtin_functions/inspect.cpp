@@ -14,7 +14,7 @@ namespace inspect_function {
             change_type(caller, VOID_TYPE);
         else {
             change_type(caller, hidden_state->type);
-            assign_value(hidden_state, caller);
+            copy(hidden_state, caller);
         }
     }
 

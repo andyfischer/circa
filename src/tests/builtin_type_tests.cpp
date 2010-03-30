@@ -19,7 +19,7 @@ void test_reference()
 
     test_assert(as_ref(r1) == a);
 
-    assign_value(r1, r2);
+    copy(r1, r2);
 
     test_assert(as_ref(r2) == a);
 }

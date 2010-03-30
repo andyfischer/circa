@@ -21,7 +21,6 @@ struct Type
     typedef void (*Initialize)(Type* type, TaggedValue* value);
     typedef void (*Release)(TaggedValue* value);
     typedef void (*Copy)(TaggedValue* source, TaggedValue* dest);
-    typedef void (*Assign)(TaggedValue* source, TaggedValue* dest);
     typedef bool (*CastPossible)(Type* type, TaggedValue* value);
     typedef bool (*Equals)(TaggedValue* lhs, TaggedValue* rhs);
     typedef void (*Cast)(Type* type, TaggedValue* source, TaggedValue* dest);
@@ -44,7 +43,6 @@ struct Type
     Initialize initialize;
     Release release;
     Copy copy;
-    Assign assign;
     Cast cast;
     CastPossible castPossible;
     Equals equals;
@@ -76,7 +74,6 @@ struct Type
         initialize(NULL),
         release(NULL),
         copy(NULL),
-        assign(NULL),
         cast(NULL),
         castPossible(NULL),
         equals(NULL),

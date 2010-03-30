@@ -7,10 +7,10 @@ namespace set_index_function {
 
     void evaluate(EvalContext*, Term* caller)
     {
-        assign_value(caller->input(0), caller);
+        copy(caller->input(0), caller);
 
         int index = caller->input(1)->asInt();
-        assign_value(caller->input(2), as_branch(caller)[index]);
+        cast(caller->input(2), as_branch(caller)[index]);
     }
 
     Term* specializeType(Term* caller)

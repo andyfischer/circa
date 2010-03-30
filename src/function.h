@@ -43,7 +43,7 @@ struct FunctionAttrs
 namespace function_attrs_t {
     void initialize(Type* type, TaggedValue* value);
     void release(TaggedValue* value);
-    void assign(TaggedValue* source, TaggedValue* dest);
+    void copy(TaggedValue* source, TaggedValue* dest);
 }
 
 namespace function_t {

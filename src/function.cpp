@@ -16,7 +16,7 @@ namespace function_attrs_t {
         delete (FunctionAttrs*) get_pointer(value);
     }
 
-    void assign(TaggedValue* source, TaggedValue* dest)
+    void copy(TaggedValue* source, TaggedValue* dest)
     {
         *((FunctionAttrs*) get_pointer(dest)) = *((FunctionAttrs*) get_pointer(source));
     }

@@ -7,11 +7,10 @@
 
 namespace circa {
 
-void assign_value(TaggedValue* source, TaggedValue* dest);
 bool cast_possible(Type* type, TaggedValue* dest);
 void cast(Type* type, TaggedValue* source, TaggedValue* dest);
+void cast(TaggedValue* source, TaggedValue* dest);
 void copy(TaggedValue* source, TaggedValue* dest);
-void copy_newstyle(TaggedValue* source, TaggedValue* dest); // Temporary
 void swap(TaggedValue* left, TaggedValue* right);
 void reset(TaggedValue* value);
 std::string to_string(TaggedValue* value);

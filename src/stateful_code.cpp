@@ -34,7 +34,7 @@ void load_state_into_branch(Branch& state, Branch& branch)
         if (read >= state.length())
             break;
 
-        assign_value(state[read], destTerm);
+        cast(state[read], destTerm);
 
         read++;
     }
@@ -227,7 +227,7 @@ void migrate_stateful_values(Branch& source, Branch& dest)
             if (MIGRATE_STATEFUL_VALUES_VERBOSE)
                 std::cout << "assigning value of " << to_string(sourceTerm) << std::endl;
 
-            assign_value(sourceTerm, destTerm);
+            cast(sourceTerm, destTerm);
         } else {
             if (MIGRATE_STATEFUL_VALUES_VERBOSE)
                 std::cout << "nothing to do" << std::endl;

@@ -62,7 +62,7 @@ namespace styled_source_t {
 
 namespace type_t {
     void initialize(Type* type, TaggedValue* value);
-    void assign(TaggedValue* source, TaggedValue* dest);
+    void copy(TaggedValue* source, TaggedValue* dest);
 }
 
 namespace point_t {

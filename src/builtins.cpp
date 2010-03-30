@@ -140,7 +140,7 @@ void bootstrap_kernel()
     TYPE_TYPE->value_data.ptr = typeType;
     typeType->name = "Type";
     typeType->initialize = type_t::initialize;
-    typeType->assign = type_t::assign;
+    typeType->copy = type_t::copy;
     typeType->remapPointers = type_t::remap_pointers;
     typeType->formatSource = type_t::formatSource;
     KERNEL->bindName(TYPE_TYPE, "Type");
@@ -163,8 +163,9 @@ void bootstrap_kernel()
     Type* functionAttrsType = new Type();
     FUNCTION_ATTRS_TYPE->value_type = typeType;
     FUNCTION_ATTRS_TYPE->value_data.ptr = functionAttrsType;
+    functionAttrsType->name = "FunctionAttrs";
     functionAttrsType->initialize = function_attrs_t::initialize;
-    functionAttrsType->assign = function_attrs_t::assign;
+    functionAttrsType->copy = function_attrs_t::copy;
     functionAttrsType->release = function_attrs_t::release;
     KERNEL->bindName(FUNCTION_ATTRS_TYPE, "FunctionAttrs");
     assert(is_type(FUNCTION_ATTRS_TYPE));

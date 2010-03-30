@@ -43,7 +43,7 @@ namespace toy_refcounted_pool {
         refcount[index]--;
     }
 
-    void assign(TaggedValue* source, TaggedValue* dest)
+    void copy(TaggedValue* source, TaggedValue* dest)
     {
         int prev = dest->value_data.asint;
         dest->value_data.asint = source->value_data.asint;
@@ -54,7 +54,7 @@ namespace toy_refcounted_pool {
     {
         type->initialize = initialize;
         type->release = release;
-        type->assign = assign;
+        type->copy = copy;
     }
 }
 
@@ -152,7 +152,7 @@ void test_float()
     TaggedValue i = tag_int(5);
     test_assert(is_int(&i));
     test_assert(is_float(&f));
-    assign_value(&i, &f);
+    copy(&i, &f);
     test_assert(is_float(&f));
 #endif
 }
@@ -285,7 +285,7 @@ void refcount_test()
 
         test_assert(toy_refcounted_pool::refcount[0] == 1);
 
-        assign_value(&value1, &value2);
+        copy(&value1, &value2);
 
         test_assert(value1.value_data.asint == 0);
         test_assert(value2.value_data.asint == 0);

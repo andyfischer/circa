@@ -25,7 +25,7 @@ namespace assign_function {
             return;
         }
 
-        assign_value(value, target);
+        cast(value, target);
     }
 
     void setup(Branch& kernel)

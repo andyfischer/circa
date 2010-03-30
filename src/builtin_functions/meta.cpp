@@ -12,7 +12,7 @@ namespace meta_function {
 
     void lift_closure_evaluate(EvalContext*, Term* caller)
     {
-        assign_value(caller->input(0), caller);
+        copy(caller->input(0), caller);
         lift_closure(as_branch(caller));
     }
 

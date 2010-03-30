@@ -31,7 +31,7 @@ void templated_destroy(TaggedValue* value)
 }
 
 template <class T>
-void templated_assign(TaggedValue* source, TaggedValue* dest)
+void templated_copy(TaggedValue* source, TaggedValue* dest)
 {
     *reinterpret_cast<T*>(dest->value_data.ptr)
         = *reinterpret_cast<T*>(source->value_data.ptr);
@@ -65,7 +65,7 @@ void import_type(Term* term)
 
     type->initialize = cpp_importing::templated_initialize<T>;
     type->release = cpp_importing::templated_destroy<T>;
-    type->assign = cpp_importing::templated_assign<T>;
+    type->copy = cpp_importing::templated_copy<T>;
     type->cppTypeInfo = &typeid(T);
 }
 

@@ -470,7 +470,7 @@ namespace string_t {
         set_pointer(value, NULL);
     }
 
-    void assign(TaggedValue* source, TaggedValue* dest)
+    void copy(TaggedValue* source, TaggedValue* dest)
     {
         *((std::string*) get_pointer(dest, STRING_T)) = as_string(source);
     }
@@ -516,7 +516,7 @@ namespace string_t {
         STRING_T->name = "string";
         STRING_T->initialize = initialize;
         STRING_T->release = release;
-        STRING_T->assign = assign;
+        STRING_T->copy = copy;
         STRING_T->equals = equals;
         STRING_T->toString = to_string;
         STRING_T->formatSource = format_source;
@@ -544,7 +544,7 @@ namespace ref_t {
         REF_T = &as_type(REF_TYPE);
         set_pointer(value, type, new Ref());
     }
-    void assign(TaggedValue* source, TaggedValue* dest)
+    void copy(TaggedValue* source, TaggedValue* dest)
     {
         *((Ref*) get_pointer(dest, REF_T)) = as_ref(source);
     }
@@ -602,7 +602,7 @@ namespace ref_t {
             return;
         }
 
-        assign_value(source, t);
+        cast(source, t);
     }
 
     int round(double a) {
@@ -696,7 +696,7 @@ namespace ref_t {
         type->remapPointers = Ref::remap_pointers;
         type->toString = to_string;
         type->initialize = initialize;
-        type->assign = assign;
+        type->copy = copy;
         type->equals = equals;
     }
 }
@@ -721,7 +721,7 @@ namespace type_t {
     {
         set_pointer(value, type, new Type());
     }
-    void assign(TaggedValue* source, TaggedValue* dest)
+    void copy(TaggedValue* source, TaggedValue* dest)
     {
         set_pointer(dest, dest->value_type, get_pointer(source, dest->value_type));
     }

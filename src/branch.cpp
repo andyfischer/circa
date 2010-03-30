@@ -352,7 +352,17 @@ namespace branch_t {
         set_pointer(value, NULL);
     }
 
-    void assign(TaggedValue* sourceValue, TaggedValue* destValue)
+    void copy(TaggedValue* sourceValue, TaggedValue* destValue)
+    {
+        Branch& source = as_branch(sourceValue);
+        Branch& dest = as_branch(destValue);
+        assert_valid_branch(&source);
+        assert_valid_branch(&dest);
+
+        copy(source, dest);
+    }
+
+    void cast(Type*, TaggedValue* sourceValue, TaggedValue* destValue)
     {
         Branch& source = as_branch(sourceValue);
         Branch& dest = as_branch(destValue);
@@ -365,11 +375,6 @@ namespace branch_t {
             copy(source, dest);
         else
             assign(source, dest);
-    }
-
-    void cast(Type*, TaggedValue* source, TaggedValue* dest)
-    {
-        assign(source, dest);
     }
 
     bool cast_possible(Type*, TaggedValue* value)
@@ -406,7 +411,7 @@ namespace branch_t {
             // Change type if needed
             if (source[i]->type != dest[i]->type)
                 change_type(source[i], dest[i]->type);
-            copy(source[i], dest[i]);
+            circa::copy(source[i], dest[i]);
         }
 
         // Add terms if necessary
@@ -435,7 +440,7 @@ namespace branch_t {
             return copy(source, dest);
 
         for (int i=0; i < source.length(); i++)
-            assign_value(source[i], dest[i]);
+            cast(source[i], dest[i]);
     }
 
     bool equals(Term* lhsTerm, Term* rhsTerm)
@@ -516,9 +521,10 @@ void initialize_branch_based_type(Term* term)
     Type* type = &as_type(term);
 
     reset_type(type);
+    type->name = "Branch";
     type->initialize = branch_t::initialize;
     type->release = branch_t::release;
-    type->assign = branch_t::assign;
+    type->copy = branch_t::copy;
     type->cast = branch_t::cast;
     type->castPossible = branch_t::cast_possible;
     type->equals = branch_t::equals;

@@ -64,7 +64,7 @@ void type_declaration()
 
     Type* type = &as_type(myType);
     test_assert(type->initialize != NULL);
-    test_assert(type->assign != NULL);
+    test_assert(type->copy != NULL);
 
     branch.eval("mt = MyType()");
 

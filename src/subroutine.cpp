@@ -60,7 +60,7 @@ namespace subroutine_t {
             if (term->type == ANY_TYPE)
                 copy(incomingTerm, term);
             else
-                assign_value(incomingTerm, term);
+                cast(incomingTerm, term);
         }
 
         evaluate_branch(cxt, functionBranch);

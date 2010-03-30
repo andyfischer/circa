@@ -257,7 +257,7 @@ void reset_type(Type* type)
     type->checkInvariants = NULL;
     type->valueFitsType = NULL;
     type->initialize = NULL;
-    type->assign = NULL;
+    //type->assign = NULL;
     type->release = NULL;
     type->equals = NULL;
     type->cast = NULL;
@@ -266,11 +266,6 @@ void reset_type(Type* type)
 void initialize_simple_pointer_type(Type* type)
 {
     reset_type(type);
-
-    // Unnecessary but illustrative:
-    type->initialize = NULL;
-    type->release = NULL;
-    type->assign = NULL;
 }
 
 void assign_value_to_default(Term* term)
@@ -290,7 +285,7 @@ void assign_value_to_default(Term* term)
         // check if this type has a default value defined
         Term* defaultValue = type_t::get_default_value(term->type);
         if (defaultValue != NULL && defaultValue->type != VOID_TYPE) {
-            assign_value(defaultValue, term);
+            copy(defaultValue, term);
             return;
         }
 

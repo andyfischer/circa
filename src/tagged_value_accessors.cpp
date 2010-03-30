@@ -7,45 +7,6 @@
 
 namespace circa {
 
-void assign_value(TaggedValue* source, TaggedValue* dest)
-{
-    if (source->value_type == NULL)
-        throw std::runtime_error("In assign_value, source.value_type is NULL");
-    if (dest->value_type == NULL)
-        throw std::runtime_error("In assign_value, dest.value_type is NULL");
-
-    // If dest type is 'any' then just change it now. This should be removed.
-    //if (dest->value_type == &as_type(ANY_TYPE))
-    //    change_type(dest, source->value_type);
-
-    // Check if they have different types. If so, try to cast.
-    if (dest->value_type != source->value_type) {
-        Type::Cast cast_func = dest->value_type->cast;
-        if (cast_func == NULL) {
-            assert(false);
-            throw std::runtime_error("No cast function for value_type "
-                + dest->value_type->name + " (tried to assign value of value_type "
-                + source->value_type->name + ")");
-        }
-
-        cast_func(dest->value_type, source, dest);
-        return;
-    }
-
-    // Check if the type defines an assign function.
-    Type::Assign assign = NULL;
-    
-    if (dest->value_type != NULL)
-        assign = dest->value_type->assign;
-
-    if (assign != NULL) {
-        assign(source, dest);
-    } else {
-        // Otherwise, default behavior is shallow assign
-        dest->value_data = source->value_data;
-    }
-}
-
 bool cast_possible(Type* type, TaggedValue* value)
 {
     Type::CastPossible castPossible = type->castPossible;
@@ -72,32 +33,27 @@ void cast(Type* type, TaggedValue* source, TaggedValue* dest)
     type->cast(type, source, dest);
 }
 
+void cast(TaggedValue* source, TaggedValue* dest)
+{
+    return cast(dest->value_type, source, dest);
+}
+
 void copy(TaggedValue* source, TaggedValue* dest)
 {
     change_type(dest, source->value_type);
+    Type::Copy copyFunc = source->value_type->copy;
 
-    Type::Copy copy = source->value_type->copy;
+    if (copyFunc == copy)
+        throw std::runtime_error("Circular usage of copy() in type "
+                + source->value_type->name);
 
-    if (copy != NULL) {
-        copy(source, dest);
+    if (copyFunc != NULL) {
+        copyFunc(source, dest);
         return;
     }
 
-    assign_value(source, dest);
-}
-
-void copy_newstyle(TaggedValue* source, TaggedValue* dest)
-{
-    change_type(dest, source->value_type);
-    Type::Copy copy = source->value_type->copy;
-
-    if (copy != NULL) {
-        copy(source, dest);
-        return;
-    }
-
-    // Backwards compat, use assign() if copy is not found.
-    assign_value(source, dest);
+    // Default behavior, shallow assign.
+    dest->value_data = source->value_data;
 }
 
 void swap(TaggedValue* left, TaggedValue* right)

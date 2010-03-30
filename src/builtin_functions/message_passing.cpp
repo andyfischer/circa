@@ -9,7 +9,7 @@ namespace message_passing_function {
 
     void evaluate_inbox(EvalContext*, Term* caller)
     {
-        assign_value(caller->input(0), caller);
+        copy(caller->input(0), caller);
         as_branch(caller->input(0)).clear();
     }
 

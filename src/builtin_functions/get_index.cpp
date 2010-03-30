@@ -16,7 +16,7 @@ namespace get_index_function {
             return error_occurred(cxt, caller, err.str());
         }
 
-        copy_newstyle(result, caller);
+        copy(result, caller);
     }
 
     void formatSource(StyledSource* source, Term* term)
