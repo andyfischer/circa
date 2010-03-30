@@ -126,7 +126,7 @@ Term* create_duplicate(Branch& branch, Term* source, std::string const& name, bo
     change_type(term, source->type);
 
     if (copyBranches || !is_branch(source))
-        assign_value(source, term);
+        copy(source, term);
 
     duplicate_branch(source->properties, term->properties);
 

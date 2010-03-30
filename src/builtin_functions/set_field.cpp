@@ -7,7 +7,7 @@ namespace set_field_function {
 
     void evaluate(EvalContext* cxt, Term* caller)
     {
-        assign_value(caller->input(0), caller);
+        copy(caller->input(0), caller);
 
         Term* head = caller;
 
@@ -23,7 +23,10 @@ namespace set_field_function {
             head = as_branch(head)[index];
         }
 
-        assign_value(caller->input(1), head);
+        if (head->type == ANY_TYPE)
+            copy(caller->input(1), head);
+        else
+            cast(head->value_type, caller->input(1), head);
     }
 
     Term* specializeType(Term* caller)
