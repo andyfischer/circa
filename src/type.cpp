@@ -138,6 +138,10 @@ bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
     if (type == ANY_TYPE)
         return true;
 
+    // 'any' fits in anything
+    if (valueTerm->type == ANY_TYPE)
+        return true;
+
     // Coercion: ints fit in floats
     if ((valueTerm->value_type == INT_T) && type == FLOAT_TYPE)
         return true;
@@ -158,10 +162,9 @@ bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
     }
 
     // Every compound type matches against List or Branch
-    if (type == LIST_TYPE)
-        return true;
-    if (type == BRANCH_TYPE)
-        return true;
+    if (type == LIST_TYPE) return true;
+    if (type == BRANCH_TYPE) return true;
+    if (&as_type(type) == LIST_T) return true;
 
     // Special case hack, also accept any compound type against OverloadedFunction
     // (Need to have a way for a type to specify that it accepts a variable number of

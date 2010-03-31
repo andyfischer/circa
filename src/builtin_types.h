@@ -27,6 +27,10 @@ namespace old_list_t {
     void setup(Type*);
 }
 
+namespace list_t {
+    bool is_list(TaggedValue*);
+}
+
 namespace dict_t {
     std::string to_string(Branch& branch);
 }

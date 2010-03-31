@@ -318,7 +318,7 @@ void print_term_to_string_extended(std::ostream& out, Term* term)
         << " vt:" << term->value_type->name;
 
     if (!is_value(term)) {
-        out << " inputs:[";
+        out << " [";
 
         for (int i=0; i < term->numInputs(); i++) {
             if (i != 0) out << " ";

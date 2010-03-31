@@ -38,3 +38,33 @@ end
 Then we could take advantage of function-introspection. For example, if we had a general-
 purpose "why is this false" function, that could be used to explain why a type did not
 fit a declaration.
+
+# Implementation #
+
+Static type checks
+ - If it's known that a value will only have one type, then:
+     Use checking function on that one type
+ - If a value can be one of multiple types
+     Use checking on each variant
+ - If less is known about the type
+     May need to default to runtime type check
+
+Static type information
+ - Store as a list of assertions?
+     branch {
+       t = input()
+       is_type(t, X)
+       ...
+     }
+   This list could have a 'normal form', where it just asserts to be one type.
+
+void solve_static_types()
+void clear_static_types()
+     
+Runtime type checks
+ - Execute a type checking function
+     branch {
+       t = input()
+       has_function(t, 'get_element')
+       has_function(t, 'num_elements')
+     }
