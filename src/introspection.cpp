@@ -310,18 +310,24 @@ void print_term_to_string_extended(std::ostream& out, Term* term)
     out << format_global_id(term);
     if (term->name != "")
         out << " '" << term->name << "'";
-    out << " fun:" << term->function->name << format_global_id(term->function)
-        << " dt:" << term->type->name << format_global_id(term->type)
-        << " vt:" << term->value_type->name
-        << " inputs:[";
+    if (term->function == VALUE_FUNC)
+        out << " value";
+    else
+        out << " fun:" << term->function->name << format_global_id(term->function);
+    out << " dt:" << term->type->name << format_global_id(term->type)
+        << " vt:" << term->value_type->name;
 
-    for (int i=0; i < term->numInputs(); i++) {
-        if (i != 0) out << " ";
-        out << format_global_id(term->input(i));
+    if (!is_value(term)) {
+        out << " inputs:[";
+
+        for (int i=0; i < term->numInputs(); i++) {
+            if (i != 0) out << " ";
+            out << format_global_id(term->input(i));
+        }
+        out << "]";
     }
-    out << "] ";
     if (!is_branch(term))
-        out << to_string(term);
+        out << " " << to_string(term);
 }
 
 std::string get_term_to_string_extended(Term* term)

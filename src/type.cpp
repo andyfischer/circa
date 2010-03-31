@@ -131,19 +131,15 @@ Type& as_type(Term *term)
 bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
 {
     // Always match if they have the same exact type
-    if (valueTerm->type == type)
-        return true;
+    if (valueTerm->value_type == &as_type(type)) return true;
+    if (valueTerm->type == type) return true;
 
     // Everything matches against 'any'
     if (type == ANY_TYPE)
         return true;
 
-    // Also, 'any' matches anything.
-    if (valueTerm->type == ANY_TYPE)
-        return true;
-
     // Coercion: ints fit in floats
-    if ((valueTerm->type == INT_TYPE) && type == FLOAT_TYPE)
+    if ((valueTerm->value_type == INT_T) && type == FLOAT_TYPE)
         return true;
 
     // Otherwise, primitive types must fit exactly.

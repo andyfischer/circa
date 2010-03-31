@@ -35,7 +35,7 @@ namespace cond_function {
 
         int indexUsed = cond ? 1 : 2;
 
-        for (int i=1; i < 2; i++) {
+        for (int i=1; i <= 2; i++) {
             Term* signal = (i == indexUsed) ? desired : target->input(i);
             copy(signal, output[i]);
         }

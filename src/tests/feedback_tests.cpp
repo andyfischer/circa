@@ -70,7 +70,7 @@ void train_cond()
     refresh_training_branch(branch);
     evaluate_branch(branch);
 
-    test_assert(a->asInt() == 5);
+    test_equals(a->asInt(), 5);
 
     // try changing cond
     set_int(a, 1);

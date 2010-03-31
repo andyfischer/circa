@@ -281,15 +281,15 @@ void test_cond()
 
 void test_for_loops()
 {
-    test_snippet("l = []; for i in 0..3; l.append(i); end", "l == [0 1 2]");
+    test_snippet("l = []; for i in 0..3; int(@i), l.append(i); end", "l == [0 1 2]");
     test_snippet("a = [3 2 1]; b = [];for item in a; b.append(item); end", "b == [3 2 1]");
     test_snippet("a = [2 4]; b = [1 3];for item in a; b.append(item); end", "b == [1 3 2 4]");
     test_snippet("a = [1 2];for item in []; a.append(item); end", "a == [1 2]");
-    test_snippet("a = [1 2];for i in a; i += 1; end", "a == [1 2]");
-    test_snippet("a = [1 2];for i in @a; i += 1; end", "a == [2 3]");
+    test_snippet("a = [1 2];for i in a; int(@i); i += 1; end", "a == [1 2]");
+    test_snippet("a = [1 2];for i in @a; int(@i); i += 1; end", "a == [2 3]");
     test_snippet("a = [1 2 3];for i in @a; discard; end", "a == []");
 
-    test_snippet("a = []; if true a.append(1) a.append(2) end; for i in a; add(i,i) end", "");
+    test_snippet("a = []; if true a.append(1) a.append(2) end; for i in a; int(@i); add(i,i) end", "");
 
     test_snippet("a = [1 2 3];for i in @a; if i == 1 discard end end", "a == [2 3]");
     test_snippet("a = [1 2 3];for i in @a; if i == 2 discard end end", "a == [1 3]");
@@ -402,7 +402,7 @@ void test_stateful_code()
 void test_significant_indentation()
 {
     test_snippet("namespace a:\n  b = 5", "a:b == 5");
-    test_snippet("l = 0..3, for i in @l:\n  i += 3", "l == [3 4 5]");
+    test_snippet("l = 0..3, for i in @l:\n int(@i); i += 3", "l == [3 4 5]");
     test_snippet("do once:\n a = 5", "");
 }
 
