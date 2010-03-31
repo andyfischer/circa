@@ -50,16 +50,7 @@ namespace type_t {
 
     void name_accessor(EvalContext*, Term* caller)
     {
-        set_str(caller, type_t::get_name(caller->input(0)));
-    }
-
-    std::string& get_name(Term* type)
-    {
-        return as_type(type).name;
-    }
-    const std::type_info*& get_std_type_info(Term* type)
-    {
-        return as_type(type).cppTypeInfo;
+        set_str(caller, as_type(caller->input(0)).name);
     }
     Type::RemapPointers& get_remap_pointers_func(Term* type)
     {

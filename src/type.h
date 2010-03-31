@@ -101,9 +101,6 @@ namespace type_t {
     void name_accessor(EvalContext*, Term* caller);
 
     // Accessors
-    std::string& get_name(Term* type);
-    bool& get_is_pointer(Term* type);
-    const std::type_info*& get_std_type_info(Term* type);
     Type::RemapPointers& get_remap_pointers_func(Term* type);
     Branch& get_prototype(Term* type);
     Branch& get_attributes(Term* type);

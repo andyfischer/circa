@@ -14,15 +14,15 @@ namespace circa {
 template <class T>
 T as(Term* term)
 {
-    Term* type = term->type;
-    const std::type_info* type_info = type_t::get_std_type_info(term->type);
+    Type* type = &as_type(term->type);
+    const std::type_info* type_info = type->cppTypeInfo;
 
     if (type_info == NULL)
-        throw std::runtime_error("No type info found for type "+type_t::get_name(type));
+        throw std::runtime_error("No type info found for type "+type->name);
 
     if (*type_info != typeid(T))
         throw std::runtime_error(
-                "C++ type mismatch, existing data has type "+type_t::get_name(type));
+                "C++ type mismatch, existing data has type "+type->name);
 
     return *((T*) term->value_data.ptr);
 }

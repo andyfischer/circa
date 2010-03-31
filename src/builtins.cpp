@@ -150,7 +150,7 @@ void bootstrap_kernel()
     ANY_TYPE->function = VALUE_FUNC;
     ANY_TYPE->type = TYPE_TYPE;
     make_type(ANY_TYPE, new Type());
-    type_t::get_name(ANY_TYPE) = "any";
+    as_type(ANY_TYPE).name = "any";
     KERNEL->bindName(ANY_TYPE, "any");
 
     // Create Branch type

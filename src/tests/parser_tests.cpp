@@ -139,7 +139,7 @@ void test_type_decl()
     Term* typeTerm = parser::compile(&branch, parser::statement,
             "type Mytype {\nint a\nnumber b\n}");
 
-    test_equals(type_t::get_name(typeTerm), "Mytype");
+    test_equals(as_type(typeTerm).name, "Mytype");
     test_equals(typeTerm->name, "Mytype");
 
     Branch& prototype = type_t::get_prototype(typeTerm);

@@ -580,13 +580,6 @@ namespace ref_t {
             return error_occurred(cxt, caller, "NULL reference");
         as_ref(caller) = t->function;
     }
-    void hosted_typeof(EvalContext* cxt, Term* caller)
-    {
-        Term* t = caller->input(0)->asRef();
-        if (t == NULL)
-            return error_occurred(cxt, caller, "NULL reference");
-        as_ref(caller) = t->type;
-    }
     void assign(EvalContext* cxt, Term* caller)
     {
         Term* target = caller->input(0)->asRef();
@@ -775,7 +768,6 @@ void post_setup_primitive_types()
     import_member_function(REF_TYPE, ref_t::hosted_to_string, "to_string(Ref) -> string");
     import_member_function(REF_TYPE, ref_t::hosted_to_source_string,
             "to_source_string(Ref) -> string");
-    import_member_function(REF_TYPE, ref_t::hosted_typeof, "typeof(Ref) -> Ref");
     import_member_function(REF_TYPE, ref_t::get_function, "function(Ref) -> Ref");
     import_member_function(REF_TYPE, ref_t::assign, "assign(Ref, any)");
     import_member_function(REF_TYPE, ref_t::tweak, "tweak(Ref, int steps)");

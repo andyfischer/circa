@@ -541,7 +541,7 @@ Term* type_decl(Branch& branch, TokenStream& tokens)
     branch.moveToEnd(result);
 
     branch.bindName(result, name);
-    type_t::get_name(result) = name;
+    as_type(result).name = name;
 
     return result;
 }
