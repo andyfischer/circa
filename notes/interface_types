@@ -1,0 +1,40 @@
+
+Want to support interface types, because they are rad.
+
+Don't support subclassing/inheritance though, because it is annoying. Prefer ways to
+grow code horizontally (as in, more types) rather than vertically (as in, extensions
+and patches on existing types).
+
+Would like to go further than interfaces. An interface is just a promise, it says that
+I promise these inputs will have these methods.
+
+It's possible to have more complicated promises, like in SAGE. Such as, "this thing will
+never be null", or "it'll be more than 5", or "such-and-such a function will always be true".
+Promises can't always be statically resolved, so we do runtime checks for the ones that
+can't be statically resolved.
+
+# Efficiency of runtime checks #
+
+Overusing runtime checks could lead to lots of churn, constantly rechecking the same things.
+Could have optimizations to reduce these checks.
+
+# Function equivalence #
+
+So a type promise could be stored as a function which returns true or false. This:
+
+interface type X {
+  int func1()
+  string func2(float, float)
+}
+
+could translate to:
+
+def fits_type_X(Type t) -> bool
+  c1 = t.implements('func1', int)
+  c2 = t.implements('func2', string, float, float)
+  return and(c1, c2)
+end
+
+Then we could take advantage of function-introspection. For example, if we had a general-
+purpose "why is this false" function, that could be used to explain why a type did not
+fit a declaration.

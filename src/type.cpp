@@ -204,11 +204,6 @@ bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
     return true;
 }
 
-bool is_assign_value_possible(Term* source, Term* dest)
-{
-    return value_fits_type(source, dest->type);
-}
-
 Term* find_common_type(RefList const& list)
 {
     if (list.length() == 0)

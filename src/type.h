@@ -125,8 +125,6 @@ bool type_matches(Term *term, Term *type);
 // we'll assign a descriptive message to errorReason.
 bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason=NULL);
 
-bool is_assign_value_possible(Term* source, Term* dest);
-
 // Returns a common type, which is guaranteed to hold all the types in this
 // list. Currently, this is not very sophisticated.
 Term* find_common_type(RefList const& list);

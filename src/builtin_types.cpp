@@ -589,20 +589,20 @@ namespace ref_t {
     }
     void assign(EvalContext* cxt, Term* caller)
     {
-        Term* t = caller->input(0)->asRef();
-        if (t == NULL) {
+        Term* target = caller->input(0)->asRef();
+        if (target == NULL) {
             error_occurred(cxt, caller, "NULL reference");
             return;
         }
 
         Term* source = caller->input(1);
 
-        if (!is_assign_value_possible(source, t)) {
+        if (!value_fits_type(source, target->type)) {
             error_occurred(cxt, caller, "Can't assign (probably type mismatch)");
             return;
         }
 
-        cast(source, t);
+        cast(source, target);
     }
 
     int round(double a) {
