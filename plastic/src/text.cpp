@@ -49,12 +49,12 @@ void load_font(EvalContext* cxt, Term* term)
         return;
     }
 
-    String path = term->input(1);
+    std::string path = as_string(term->input(1));
     int pointSize = term->input(2)->asInt();
 
-    path = get_path_relative_to_source(term, path);
+    path = get_path_relative_to_source(term, path.c_str());
 
-    TTF_Font* result = TTF_OpenFont((const char*) path, pointSize);
+    TTF_Font* result = TTF_OpenFont(path.c_str(), pointSize);
     if (result == NULL) {
         std::stringstream err;
         err << "TTF_OpenFont failed to load " << path << " with error: " << TTF_GetError();
@@ -76,20 +76,21 @@ struct RenderedText
     Int width() { return Int(_term->asBranch()[1]); }
     Int height() { return Int(_term->asBranch()[2]); }
     Term* color() { return _term->asBranch()[3]; }
-    String text() { return String(_term->asBranch()[4]); }
+    std::string const& text() { return as_string(_term->asBranch()[4]); }
+    void set_text(const char* s) { set_str(_term->asBranch()[4], s); }
 };
 
 void render_text(EvalContext*, Term* caller)
 {
     RenderedText state(caller->input(0));
-    String text = caller->input(2);
+    std::string const& text = as_string(caller->input(2));
     Term* color = caller->input(3);
 
     bool changed_color = !branch_t::equals(state.color(), color);
 
     if (state.texid() == 0 || state.text() != text || changed_color) {
 
-        state.text() = text;
+        state.set_text(text.c_str());
 
         // Clear results if text is empty
         if (text == "") {
@@ -106,16 +107,16 @@ void render_text(EvalContext*, Term* caller)
         //SDL_Color bgcolor = {0, 0, 0, 0}; // todo
 
         SDL_Color sdlColor = unpack_sdl_color(caller->input(3));
-        SDL_Surface *surface = TTF_RenderText_Blended(*font, (const char*) text, sdlColor);
+        SDL_Surface *surface = TTF_RenderText_Blended(*font, text.c_str(), sdlColor);
 
         state.texid() = load_surface_to_texture(surface);
         state.width() = surface->w;
         state.height() = surface->h;
-        assign_value(color, state.color());
+        copy(color, state.color());
 
         SDL_FreeSurface(surface);
     }
-    assign_value(caller->input(0), caller);
+    copy(caller->input(0), caller);
 }
 
 void draw_rendered_text(EvalContext* cxt, Term* caller)

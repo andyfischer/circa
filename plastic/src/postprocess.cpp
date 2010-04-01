@@ -64,7 +64,7 @@ namespace postprocess_functions
             surface_t::set_width(surface, desired_height);
         }
 
-        assign_value(caller->input(0), caller);
+        copy(caller->input(0), caller);
     }
 
     static int bound_surface_width = 0;
