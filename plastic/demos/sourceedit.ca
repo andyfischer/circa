@@ -1,0 +1,14 @@
+background(#eef)
+
+def example()
+  offset = [3 3]
+  angle = time % 1
+  loc = [cos(angle) sin(angle)] * 5 + offset
+  print(loc)
+end
+
+source = example -> branch_ref -> format_source
+
+for phrase in source
+    print(phrase)
+end

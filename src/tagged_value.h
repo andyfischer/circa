@@ -27,7 +27,8 @@ struct TaggedValue
 
     void reset();
     std::string toString();
-    TaggedValue* operator[](int index);
+    inline TaggedValue* operator[](int index) { return getElement(index); }
+    TaggedValue* getElement(int index);
     int numElements();
 };
 

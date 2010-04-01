@@ -61,7 +61,7 @@ TaggedValue::toString()
 }
 
 TaggedValue*
-TaggedValue::operator[](int index)
+TaggedValue::getElement(int index)
 {
     return get_element(this, index);
 }

@@ -721,9 +721,6 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Term* listExpr = infix_expression(branch, tokens);
     recursively_mark_terms_as_occuring_inside_an_expression(listExpr);
 
-    if (!is_branch(listExpr))
-        return compile_error_for_line(branch, tokens, startPosition, "Expected a list after 'in'");
-
     Term* forTerm = apply(branch, FOR_FUNC, RefList(NULL, listExpr));
     Branch& innerBranch = as_branch(forTerm);
     setup_for_loop_pre_code(forTerm);
@@ -735,12 +732,18 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     forTerm->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
-    // Create iterator variable
-    RefList listExprTypes;
-    for (int i=0; i < as_branch(listExpr).length(); i++)
-        listExprTypes.append(as_branch(listExpr)[i]->type);
+    // Create iterator variable. Make a vague, flawed attempt to figure out what the 
+    // type should be.
+    Term* iterator_type = ANY_TYPE;
 
-    Term* iterator_type = find_common_type(listExprTypes);
+    if (is_branch(listExpr)) {
+        RefList listExprTypes;
+
+        for (int i=0; i < as_branch(listExpr).length(); i++)
+            listExprTypes.append(as_branch(listExpr)[i]->type);
+
+        iterator_type = find_common_type(listExprTypes);
+    }
 
     Term* iterator = create_value(innerBranch, iterator_type, iterator_name);
     set_source_hidden(iterator, true);
