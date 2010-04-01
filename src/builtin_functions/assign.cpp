@@ -14,7 +14,7 @@ namespace assign_function {
         Term* target = caller->input(0);
         Term* source = caller->input(1);
 
-        if (!value_fits_type(source, target->type)) {
+        if (!matches_type(declared_type(target), source)) {
             error_occurred(cxt, caller,
                     "Tried to assign a " + source->type->name + " to a "
                     + target->type->name);

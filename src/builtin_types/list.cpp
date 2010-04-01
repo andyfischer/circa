@@ -285,6 +285,11 @@ void tv_mutate(TaggedValue* value)
     set_pointer(value, mutate(data));
 }
 
+bool tv_matches_type(Type* type, Term* term)
+{
+    return as_type(term->type).initialize == tv_initialize;
+}
+
 bool is_list(TaggedValue* value)
 {
     return value->value_type->initialize == tv_initialize;
@@ -300,6 +305,7 @@ void setup_type(Type* type)
     type->getElement = tv_get_element;
     type->numElements = tv_num_elements;
     type->mutate = tv_mutate;
+    type->matchesType = tv_matches_type;
 }
 
 void postponed_setup_type(Type*)

@@ -359,8 +359,8 @@ void test_cast()
     Term* a = branch.eval("a = [1 2.0 'hi']");
     Term* b = branch.eval("b = ['bye' 4 1.0]");
 
-    test_assert(value_fits_type(a,b->type));
-    test_assert(value_fits_type(b,a->type));
+    test_assert(matches_type(declared_type(b), a));
+    test_assert(matches_type(declared_type(a), b));
     cast(a, b);
 
     test_assert(branch);

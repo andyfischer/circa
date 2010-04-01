@@ -343,7 +343,7 @@ bool inputs_fit_function(Term* func, RefList const& inputs)
         Term* type = function_t::get_input_type(func, i);
         if (inputs[i] == NULL)
             continue;
-        if (!value_fits_type(inputs[i], type))
+        if (!matches_type(&as_type(type), inputs[i]))
             return false;
     }
 

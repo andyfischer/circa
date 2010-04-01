@@ -76,45 +76,45 @@ void test_value_fits_type()
     Branch branch;
 
     Term* a = create_int(branch, 5);
-    test_assert(value_fits_type(a, INT_TYPE));
-    test_assert(value_fits_type(a, FLOAT_TYPE));
-    test_assert(!value_fits_type(a, STRING_TYPE));
-    test_assert(value_fits_type(a, ANY_TYPE));
+    test_assert(matches_type(&as_type(INT_TYPE), a));
+    test_assert(matches_type(&as_type(FLOAT_TYPE), a));
+    test_assert(!matches_type(&as_type(STRING_TYPE), a));
+    test_assert(matches_type(&as_type(ANY_TYPE), a));
 
-    Term* t1 = branch.eval("type t1 { int a, number b }");
-    Term* t2 = branch.eval("type t2 { int a }");
-    Term* t3 = branch.eval("type t3 { int a, number b, string c }");
-    Term* t4 = branch.eval("type t4 { number a, int b }");
+    Type* t1 = &as_type(branch.eval("type t1 { int a, number b }"));
+    Type* t2 = &as_type(branch.eval("type t2 { int a }"));
+    Type* t3 = &as_type(branch.eval("type t3 { int a, number b, string c }"));
+    Type* t4 = &as_type(branch.eval("type t4 { number a, int b }"));
 
     Term* v1 = branch.eval("[1, 2.0]");
-    test_assert(value_fits_type(v1, t1));
-    test_assert(!value_fits_type(v1, t2));
-    test_assert(!value_fits_type(v1, t3));
-    test_assert(!value_fits_type(v1, t4));
+    test_assert(matches_type(t1, v1));
+    test_assert(!matches_type(t2, v1));
+    test_assert(!matches_type(t3, v1));
+    test_assert(!matches_type(t4, v1));
 
     Term* v2 = branch.eval("['hello' 2.0]");
-    test_assert(!value_fits_type(v2, t1));
-    test_assert(!value_fits_type(v2, t2));
-    test_assert(!value_fits_type(v2, t3));
-    test_assert(!value_fits_type(v2, t4));
+    test_assert(!matches_type(t1, v2));
+    test_assert(!matches_type(t2, v2));
+    test_assert(!matches_type(t3, v2));
+    test_assert(!matches_type(t4, v2));
 
     Term* v3 = branch.eval("[1]");
-    test_assert(!value_fits_type(v3, t1));
-    test_assert(value_fits_type(v3, t2));
-    test_assert(!value_fits_type(v3, t3));
-    test_assert(!value_fits_type(v3, t4));
+    test_assert(!matches_type(t1, v3));
+    test_assert(matches_type(t2, v3));
+    test_assert(!matches_type(t3, v3));
+    test_assert(!matches_type(t4, v3));
     
     Term* v4 = branch.eval("[]");
-    test_assert(!value_fits_type(v4, t1));
-    test_assert(!value_fits_type(v4, t2));
-    test_assert(!value_fits_type(v4, t3));
-    test_assert(!value_fits_type(v4, t4));
+    test_assert(!matches_type(t1, v4));
+    test_assert(!matches_type(t2, v4));
+    test_assert(!matches_type(t3, v4));
+    test_assert(!matches_type(t4, v4));
 
     Term* v5 = branch.eval("[1 2]");
-    test_assert(value_fits_type(v5, t1)); // coercion into a compound value
-    test_assert(!value_fits_type(v5, t2));
-    test_assert(!value_fits_type(v5, t3));
-    test_assert(value_fits_type(v5, t4)); // coercion again
+    test_assert(matches_type(t1, v5)); // coercion into a compound value
+    test_assert(!matches_type(t2, v5));
+    test_assert(!matches_type(t3, v5));
+    test_assert(matches_type(t4, v5)); // coercion again
 }
 
 void test_is_native_type()

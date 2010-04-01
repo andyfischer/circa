@@ -55,6 +55,11 @@ namespace ref_t {
     void setup_type(Type* type);
 }
 
+namespace any_t {
+    std::string to_string(TaggedValue*);
+    bool matches_type(Type* type, Term* term);
+}
+
 namespace branch_ref_t {
     void setup_type(Type* type);
     Branch& get_target_branch(TaggedValue* value);

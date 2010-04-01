@@ -151,6 +151,8 @@ void bootstrap_kernel()
     ANY_TYPE->type = TYPE_TYPE;
     make_type(ANY_TYPE, new Type());
     as_type(ANY_TYPE).name = "any";
+    as_type(ANY_TYPE).toString = any_t::to_string;
+    as_type(ANY_TYPE).matchesType = any_t::matches_type;
     KERNEL->bindName(ANY_TYPE, "any");
 
     // Create Branch type

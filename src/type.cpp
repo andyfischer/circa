@@ -83,30 +83,16 @@ namespace type_t {
 
 } // namespace type_t
 
-bool type_matches(Term *term, Term *type)
-{
-    assert(term != NULL);
-
-    // any type matches anything
-    if (type == ANY_TYPE)
-        return true;
-
-    // Allow for compound types to be considered the same.
-    // Later there can be more complicated type checking.
-
-    if (type != NULL && is_branch_based_type(term->type)
-            && is_branch_based_type(type))
-        return true;
-
-    if (term->type != type)
-        return false;
-
-    return true;
-}
-
 bool is_native_type(Term* type)
 {
     return !is_branch_based_type(type);
+}
+
+Type* declared_type(Term* term)
+{
+    // Today this is a handy way to avoid writing &as_type
+    // In the future, Term->type will be going away, so use this function.
+    return &as_type(term->type);
 }
 
 Type& as_type(Term *term)
@@ -119,79 +105,23 @@ Type& as_type(Term *term)
     return *get_type_value(term);
 }
 
-bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason)
+bool matches_type(Type* type, Term* term)
 {
-    // Always match if they have the same exact type
-    if (valueTerm->value_type == &as_type(type)) return true;
-    if (valueTerm->type == type) return true;
-
-    // Everything matches against 'any'
-    if (type == ANY_TYPE)
+    // Don't check if term outputs ANY. This should trigger a runtime check.
+    if (term->type == ANY_TYPE)
         return true;
 
-    // 'any' fits in anything
-    if (valueTerm->type == ANY_TYPE)
+    // Return true if types are the same
+    if (&as_type(term->type) == type)
         return true;
 
-    // Coercion: ints fit in floats
-    if ((valueTerm->value_type == INT_T) && type == FLOAT_TYPE)
-        return true;
+    Type::MatchesType matchesType = type->matchesType;
 
-    // Otherwise, primitive types must fit exactly.
-    // So if this is a primitive type, reject it.
-    if (!is_branch_based_type(type)) {
-        if (errorReason != NULL)
-            *errorReason = "type is primitive, expected exact match";
-        return false;
-    }
+    if (matchesType != NULL)
+        return matchesType(type, term);
 
-    // If 'type' is a compound type, make sure value is too
-    if (!is_branch_based_type(valueTerm->type)) {
-        if (errorReason != NULL)
-            *errorReason = "value is primitive, type is compound";
-        return false;
-    }
-
-    // Every compound type matches against List or Branch
-    if (type == LIST_TYPE) return true;
-    if (type == BRANCH_TYPE) return true;
-    if (&as_type(type) == LIST_T) return true;
-
-    // Special case hack, also accept any compound type against OverloadedFunction
-    // (Need to have a way for a type to specify that it accepts a variable number of
-    // items)
-    if (type == OVERLOADED_FUNCTION_TYPE)
-        return true;
-
-    Branch& value = as_branch(valueTerm);
-
-    // Check if the # of elements matches
-    // TODO: Relax this check for lists
-    if (value.length() != type_t::get_prototype(type).length()) {
-        if (errorReason != NULL) {
-            std::stringstream error;
-            error << "value has " << value.length() << " elements, type has "
-                << type_t::get_prototype(type).length();
-            *errorReason = error.str();
-        }
-        return false;
-    }
-
-    // Check each element
-    for (int i=0; i < value.length(); i++) {
-        if (!value_fits_type(value[i], type_t::get_prototype(type)[i]->type, errorReason)) {
-
-            if (errorReason != NULL) {
-                std::stringstream error;
-                error << "element " << i << " did not fit:\n" << *errorReason;
-                *errorReason = error.str();
-            }
-
-            return false;
-        }
-    }
-
-    return true;
+    // Default behavior, if the above checks didn't pass then return false.
+    return false;
 }
 
 Term* find_common_type(RefList const& list)

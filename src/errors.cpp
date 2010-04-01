@@ -177,7 +177,7 @@ static StaticError get_static_error_for_input_index(Term* term, int index)
     }
 
     // Check type
-    if (!value_fits_type(input, type))
+    if (!matches_type(&as_type(type), input))
         return SERROR_INPUT_TYPE_ERROR;
 
     return SERROR_NO_ERROR;

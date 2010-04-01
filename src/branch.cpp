@@ -382,6 +382,32 @@ namespace branch_t {
         return is_branch(value);
     }
 
+    bool matches_type(Type* type, Term* term)
+    {
+        if (!is_branch(term))
+            return false;
+
+        Branch& prototype = type->prototype;
+
+        // Check if our type defines a prototype. If there's no prototype
+        // then we can be satisfied with the value just being a branch.
+        if (prototype.length() == 0)
+            return true;
+
+        Branch& value = as_branch(term);
+
+        if (prototype.length() != value.length())
+            return false;
+
+        // Check each element
+        for (int i=0; i < prototype.length(); i++) {
+            if (!circa::matches_type(&as_type(prototype[i]->type), value[i]))
+                return false;
+        }
+
+        return true;
+    }
+
     TaggedValue* get_element(TaggedValue* value, int index)
     {
         Branch& b = as_branch(value);
@@ -528,6 +554,7 @@ void initialize_branch_based_type(Term* term)
     type->cast = branch_t::cast;
     type->castPossible = branch_t::cast_possible;
     type->equals = branch_t::equals;
+    type->matchesType = branch_t::matches_type;
     type->getElement = branch_t::get_element;
     type->numElements = branch_t::num_elements;
     type->toString = compound_type_to_string;

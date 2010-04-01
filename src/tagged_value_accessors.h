@@ -14,6 +14,7 @@ void copy(TaggedValue* source, TaggedValue* dest);
 void swap(TaggedValue* left, TaggedValue* right);
 void reset(TaggedValue* value);
 std::string to_string(TaggedValue* value);
+bool matches_type(Type* type, Term* term);
 TaggedValue* get_element(TaggedValue* value, int index);
 int num_elements(TaggedValue* value);
 void mutate(TaggedValue* value);

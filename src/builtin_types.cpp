@@ -64,6 +64,10 @@ namespace float_t {
         out << as_float(value);
         return out.str();
     }
+    bool matches_type(Type* type, Term* term)
+    {
+        return term->type == FLOAT_TYPE || term->type == INT_TYPE;
+    }
 
     std::string to_source_string(Term* term)
     {
@@ -112,6 +116,7 @@ namespace float_t {
         type->cast = cast;
         type->castPossible = cast_possible;
         type->equals = equals;
+        type->matchesType = matches_type;
         type->toString = to_string;
         type->formatSource = format_source;
     }
@@ -590,8 +595,8 @@ namespace ref_t {
 
         Term* source = caller->input(1);
 
-        if (!value_fits_type(source, target->type)) {
-            error_occurred(cxt, caller, "Can't assign (probably type mismatch)");
+        if (!matches_type(declared_type(target), source)) {
+            error_occurred(cxt, caller, "Can't assign, type mismatch");
             return;
         }
 
@@ -695,9 +700,13 @@ namespace ref_t {
 }
 
 namespace any_t {
-    std::string to_string(Term* term)
+    std::string to_string(TaggedValue*)
     {
         return "<any>";
+    }
+    bool matches_type(Type*, Term*)
+    {
+        return true;
     }
 }
 

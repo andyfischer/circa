@@ -120,10 +120,10 @@ bool terms_match_for_migration(Term* left, Term* right)
         return false;
     }
 
+    // todo: this is unnecessary:
     bool typesFit = left->type == right->type;
-
     if (!typesFit && is_branch(left))
-        typesFit = value_fits_type(left, right->type);
+        typesFit = matches_type(declared_type(right), left);
       
     if (!typesFit) {
         if (MIGRATE_STATEFUL_VALUES_VERBOSE)

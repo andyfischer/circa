@@ -29,6 +29,7 @@ struct Type
     typedef void (*FormatSource)(StyledSource*, Term* term);
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
+    typedef bool (*MatchesType)(Type* type, Term* term);
     typedef void (*Mutate)(TaggedValue* value);
     typedef TaggedValue* (*GetElement)(TaggedValue* value, int index);
     typedef int (*NumElements)(TaggedValue* value);
@@ -51,6 +52,7 @@ struct Type
     FormatSource formatSource;
     CheckInvariants checkInvariants;
     ValueFitsType valueFitsType;
+    MatchesType matchesType;
     Mutate mutate;
     GetElement getElement;
     NumElements numElements;
@@ -82,6 +84,7 @@ struct Type
         formatSource(NULL),
         checkInvariants(NULL),
         valueFitsType(NULL),
+        matchesType(NULL),
         mutate(NULL),
         getElement(NULL),
         numElements(NULL)
@@ -112,15 +115,10 @@ namespace type_t {
 
 Type& as_type(Term* term);
 bool is_native_type(Term* type);
+Type* declared_type(Term* term);
 
-bool type_matches(Term *term, Term *type);
-
-// Returns whether the value in valueTerm fits this type.
-// This function allows for coercion (ints fit in floats)
-// We also allow for compound types to be reinterpreted.
-// If errorReason is not null, and if this function returns false, then
-// we'll assign a descriptive message to errorReason.
-bool value_fits_type(Term* valueTerm, Term* type, std::string* errorReason=NULL);
+// New version, other versions are deprecated
+bool matches_type(Type* type, Term* term);
 
 // Returns a common type, which is guaranteed to hold all the types in this
 // list. Currently, this is not very sophisticated.
