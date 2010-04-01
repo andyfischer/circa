@@ -287,7 +287,7 @@ void tv_mutate(TaggedValue* value)
 
 bool tv_matches_type(Type* type, Term* term)
 {
-    return as_type(term->type).initialize == tv_initialize;
+    return declared_type(term)->initialize == tv_initialize;
 }
 
 bool is_list(TaggedValue* value)

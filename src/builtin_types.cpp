@@ -704,6 +704,9 @@ void setup_builtin_types(Branch& kernel)
 
     Term* styledSourceType = parse_type(kernel, "type StyledSource;");
     styled_source_t::setup_type(&as_type(styledSourceType));
+
+    Term* indexableType = parse_type(kernel, "type Indexable;");
+    indexable_t::setup_type(&as_type(indexableType));
 }
 
 void parse_builtin_types(Branch& kernel)
