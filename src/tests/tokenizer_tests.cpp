@@ -360,6 +360,20 @@ void test_keyword_followed_by_lparen()
     test_assert(tokens.finished());
 }
 
+void test_escaped_string()
+{
+    TokenStream tokens("'\\''");
+    test_assert(tokens.nextIs(token::STRING));
+    test_equals(tokens.consume(), "'''");
+
+    tokens.reset("\"\\\"\"");
+    test_assert(tokens.nextIs(token::STRING));
+    test_equals(tokens.consume(), "\"\"\"");
+    tokens.reset("'\\n'");
+    test_assert(tokens.nextIs(token::STRING));
+    test_equals(tokens.consume(), "'\n'");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers);
@@ -379,6 +393,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_consume_line);
     REGISTER_TEST_CASE(tokenizer_tests::test_color_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_keyword_followed_by_lparen);
+    REGISTER_TEST_CASE(tokenizer_tests::test_escaped_string);
 }
 
 } // namespace tokenizer_tests
