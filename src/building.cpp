@@ -118,17 +118,18 @@ bool is_actually_using(Term* user, Term* usee)
     return false;
 }
 
-Term* create_duplicate(Branch& branch, Term* source, std::string const& name, bool copyBranches)
+Term* create_duplicate(Branch& branch, Term* original, std::string const& name, bool copyBranches)
 {
-    assert(source != NULL);
+    assert(original != NULL);
 
-    Term* term = apply(branch, source->function, source->inputs, name);
-    change_type(term, source->type);
+    Term* term = apply(branch, original->function, original->inputs, name);
+    change_type(term, original->type);
 
-    if (copyBranches || !is_branch(source))
-        copy(source, term);
+    if (copyBranches || !is_branch(original))
+        copy(original, term);
 
-    duplicate_branch(source->properties, term->properties);
+    term->sourceLoc = original->sourceLoc;
+    duplicate_branch(original->properties, term->properties);
 
     return term;
 }

@@ -35,47 +35,25 @@ void set_source_location(Term* term, int start, TokenStream& tokens)
     assert(term != NULL);
     assert(tokens.length() != 0);
 
-    int colStart = 0;
-    int lineStart = 0;
-    int colEnd = 0;
-    int lineEnd = 0;
+    TermSourceLocation loc;
 
     if (start >= tokens.length()) {
         // 'start' is at the end of the stream
-        colStart = tokens[start-1].colEnd+1;
-        lineStart = tokens[start-1].lineEnd;
+        loc.col = tokens[start-1].colEnd+1;
+        loc.line = tokens[start-1].lineEnd;
 
     } else {
-        colStart = tokens[start].colStart;
-        lineStart = tokens[start].lineStart;
+        loc.col = tokens[start].colStart;
+        loc.line = tokens[start].lineStart;
     }
 
     int end = tokens.getPosition();
     if (end >= tokens.length()) end = tokens.length()-1;
 
-    colEnd = tokens[end].colEnd;
-    lineEnd = tokens[end].lineEnd;
+    loc.colEnd = tokens[end].colEnd;
+    loc.lineEnd = tokens[end].lineEnd;
 
-    // Check if this term has an existing source location, and whether this
-    // new location includes the old location. If it doesn't, then leave
-    // the term untouched.
-
-    if (has_source_location_defined(term)) {
-        bool newStartPositionBeforeOld = lineStart < term->intProp("lineStart")
-            || (lineStart == term->intProp("lineStart")
-                    && colStart <= term->intProp("colStart"));
-        bool newEndPositionAfterOld = lineEnd > term->intProp("lineEnd")
-            || (lineEnd == term->intProp("lineEnd")
-                    && colEnd >= term->intProp("colEnd"));
-        if (!newStartPositionBeforeOld || !newEndPositionAfterOld)
-            return;
-    }
-
-    // Commit change
-    term->setIntProp("colStart", colStart);
-    term->setIntProp("lineStart", lineStart);
-    term->setIntProp("colEnd", colEnd);
-    term->setIntProp("lineEnd", lineEnd);
+    term->sourceLoc.grow(loc);
 }
 
 void push_pending_rebind(Branch& branch, std::string const& name)

@@ -9,6 +9,7 @@
 #include "references.h"
 #include "ref_list.h"
 #include "tagged_value.h"
+#include "term_source_location.h"
 
 namespace circa {
 
@@ -54,6 +55,9 @@ struct Term : TaggedValue
 
     // Terms which are using this term as an input.
     RefList users;
+
+    // Location in source code
+    TermSourceLocation sourceLoc;
 
     Term();
     ~Term();

@@ -18,28 +18,25 @@ namespace source_location_snippets {
 
 bool source_location_sanity_check(Term* term, std::string& failureReason)
 {
-    if (!has_source_location_defined(term)) {
+    TermSourceLocation& loc = term->sourceLoc;
+
+    if (!loc.defined()) {
         failureReason = "no source location defined";
         return false;
     }
 
-    int colStart = term->intProp("colStart");
-    int lineStart = term->intProp("lineStart");
-    int colEnd = term->intProp("colEnd");
-    int lineEnd = term->intProp("lineEnd");
-
     // make sure that the 'end' location is past the 'start' location.
-    if (colEnd < colStart) {
-        failureReason = "colEnd is before colStart";
+    if (loc.lineEnd < loc.line) {
+        failureReason = "lineEnd is before line";
         return false;
     }
 
-    if (colEnd == colStart && lineEnd < lineStart) {
-        failureReason = "lineEnd is before lineStart";
+    if (loc.line == loc.lineEnd && loc.colEnd < loc.col) {
+        failureReason = "colEnd is before col";
         return false;
     }
         
-    if (colEnd == colStart && lineStart == lineEnd) {
+    if (loc.line == loc.lineEnd && loc.col == loc.colEnd) {
         failureReason = "start and end are same location";
         return false;
     }
@@ -75,17 +72,14 @@ struct SourceCodePainter
 
     bool paint(Term* term, std::string& failureMessage)
     {
-        int colStart = term->intProp("colStart");
-        int lineStart = term->intProp("lineStart");
-
         std::string termSource = get_term_source_text(term)
             + term->stringPropOptional("syntax:lineEnding", "");
 
         bool encounteredError = false;
 
         for (unsigned i=0; i < termSource.length(); i++) {
-            int row = lineStart;
-            int col = colStart+i;
+            int row = term->sourceLoc.line;
+            int col = term->sourceLoc.col+i;
             char c = termSource[i];
 
             initialize(col,row);

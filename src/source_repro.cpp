@@ -349,12 +349,6 @@ int get_first_visible_input_index(Term* term)
         return 0;
 }
 
-bool has_source_location_defined(Term* term)
-{
-    return term->hasProperty("colStart") && term->hasProperty("lineStart")
-        && term->hasProperty("colEnd") && term->hasProperty("lineEnd");
-}
-
 std::string const& get_input_syntax_hint(Term* term, int index, std::string const& field)
 {
     std::stringstream fieldName;

@@ -169,11 +169,10 @@ std::string get_short_location(Term* term)
     std::string filename = get_source_filename(term);
     if (filename != "")
         out << get_source_filename(term) << ":";
-    if (term->hasProperty("lineStart")) out << term->intProp("lineStart");
-    else out << "line?";
-    out << ",";
-    if (term->hasProperty("colStart")) out << term->intProp("colStart");
-    else out << "col?";
+    if (term->sourceLoc.defined())
+        out << term->sourceLoc.line << "," << term->sourceLoc.col;
+    else
+        out << "loc?";
     out << "]";
     return out.str();
 }

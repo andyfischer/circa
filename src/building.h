@@ -16,7 +16,7 @@ Term* apply(Branch& branch, std::string const& functionName,
 // Create a duplicate of the given term.
 // If 'copyBranches' is false, don't copy branch state. It's assumed that the
 // caller will do this. This functionality is used by duplicate_branch
-Term* create_duplicate(Branch& branch, Term* source, std::string const& name="",
+Term* create_duplicate(Branch& branch, Term* original, std::string const& name="",
         bool copyBranches=true);
 
 void set_input(Term* term, int index, Term* input);

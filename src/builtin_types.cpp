@@ -567,8 +567,14 @@ namespace ref_t {
             return;
         }
         Branch& output = as_branch(caller);
-        set_int(output[0], t->intPropOptional("colStart", 0));
-        set_int(output[1], t->intPropOptional("lineStart", 0));
+
+        if (t->sourceLoc.defined()) {
+            set_int(output[0], t->sourceLoc.col);
+            set_int(output[1], t->sourceLoc.line);
+        } else {
+            set_int(output[0], 0);
+            set_int(output[1], 0);
+        }
     }
     void setup_type(Type* type)
     {

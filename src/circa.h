@@ -40,6 +40,7 @@
 #include "subroutine.h"
 #include "tagged_value_accessors.h"
 #include "term.h"
+#include "term_source_location.h"
 #include "term_pool.h"
 #include "testing.h"
 #include "timer.h"
