@@ -256,8 +256,8 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
     }
 
     append_phrase(source,
-            get_input_syntax_hint_optional(term, visibleIndex, "postWhitespace", defaultPost), 
-            input, token::WHITESPACE);
+        get_input_syntax_hint_optional(term, visibleIndex, "postWhitespace", defaultPost), 
+        input, token::WHITESPACE);
 }
 
 void format_name_binding(StyledSource* source, Term* term)
@@ -285,6 +285,17 @@ void append_phrase(StyledSource* source, const char* str, Term* term, int type)
     // No-op if string is empty
     if (str[0] == 0)
         return;
+
+    // If there are any newlines, break them up into multiple phrases.
+    for (unsigned i=0; i < strlen(str); i++) {
+        if (str[i] == '\n' && i != 0) {
+            std::string leadingStr;
+            leadingStr.assign(str, i);
+            append_phrase(source, leadingStr.c_str(), term, type);
+            append_phrase(source, "\n", term, type);
+            return append_phrase(source, &str[i + 1], term, type);
+        }
+    }
 
     List* list = (List*) make_list(source->_phrases.append());
     list->resize(3);
