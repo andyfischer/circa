@@ -9,13 +9,28 @@ end
 
 source = example -> branch_ref -> format_source
 
-h = 19
+letter_width = 8
+letter_height = 14
 
+current_line = 0
+current_col = 0
 i = 0
+
 for phrase in source
-    loc = [10 100 + i * h]
-    draw_text(ui_font_medium, phrase[0], #000, loc)
+    r = phrase[1] -> Ref
+    s = phrase[0] -> string
+
+    loc = [current_col*letter_width current_line*letter_height]
+    loc += [0 100]
+
+
+    draw_text(ui_font_medium, s, #000, loc -> Point)
 
     --print(phrase)
     i += 1
+    current_col += s.length()
+    if (s == '\n')
+        current_col = 0
+        current_line += 1
+    end
 end
