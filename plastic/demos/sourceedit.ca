@@ -9,6 +9,13 @@ end
 
 source = example -> branch_ref -> format_source
 
+h = 19
+
+i = 0
 for phrase in source
-    print(phrase)
+    loc = [10 100 + i * h]
+    draw_text(ui_font_medium, phrase[0], #000, loc)
+
+    --print(phrase)
+    i += 1
 end
