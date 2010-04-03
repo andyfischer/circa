@@ -646,31 +646,6 @@ void consume_hex_number(TokenizeContext &context)
     context.push(HEX_INTEGER, text.str());
 }
 
-void consume_escaped_string_letter(TokenizeContext &context, std::stringstream &out)
-{
-    char c = context.consume();
-
-    if (c == '\\') {
-        if (context.next() == 'n') {
-            out << '\n';
-            context.consume();
-
-        } else if (context.next() == '\'') {
-            out << '\'';
-            context.consume();
-        } else if (context.next() == '\"') {
-            out << '\"';
-            context.consume();
-        } else if (context.next() == '\\') {
-            out << '\\';
-            context.consume();
-        } else {
-            out << c;
-        }
-    } else
-        out << c;
-}
-
 void consume_string_literal(TokenizeContext &context)
 {
     std::stringstream text;
@@ -679,8 +654,19 @@ void consume_string_literal(TokenizeContext &context)
     char quote_type = context.consume();
     text << quote_type;
 
-    while (context.next() != quote_type && !context.finished())
-        consume_escaped_string_letter(context, text);
+    bool escapedNext = false;
+    while (!context.finished()) {
+        char c = context.next();
+
+        if (c == quote_type && !escapedNext)
+            break;
+
+        escapedNext = false;
+        if (c == '\\')
+            escapedNext = true;
+
+        text << context.consume();
+    }
 
     // consume ending quote
     text << context.consume();
@@ -699,7 +685,7 @@ void consume_triple_quoted_string_literal(TokenizeContext &context)
 
     while (!context.finished() &&
             !(context.next() == '>' && context.next(1) == '>' && context.next(2) == '>'))
-        consume_escaped_string_letter(context, text);
+        text << context.consume();
 
     // Consume closing >>>
     text << context.consume();

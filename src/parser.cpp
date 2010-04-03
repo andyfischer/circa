@@ -1572,16 +1572,55 @@ Term* literal_string(Branch& branch, TokenStream& tokens)
     std::string quoteType = text.substr(0,1);
 
     // strip quote marks
+    int quoteSize = 1;
     if (quoteType == "<")
-        text = text.substr(3, text.length()-6);
-    else
-        text = text.substr(1, text.length()-2);
+        quoteSize = 3;
 
-    Term* term = create_string(branch, text);
+    int end = text.length() - quoteSize;
+    bool anyEscaped = false;
+
+    std::stringstream escapedStrm;
+    for (int i=quoteSize; i < end; i++) {
+        char c = text[i];
+        char next = 0;
+        if (i + 1 < end)
+            next = text[i+1];
+
+        if (c == '\\') {
+            if (next == 'n') {
+                escapedStrm << '\n';
+                i++;
+                anyEscaped = true;
+            } else if (next == '\'') {
+                escapedStrm << '\'';
+                i++;
+                anyEscaped = true;
+            } else if (next == '\"') {
+                escapedStrm << '\"';
+                i++;
+                anyEscaped = true;
+            } else if (next == '\\') {
+                escapedStrm << '\\';
+                i++;
+                anyEscaped = true;
+            } else {
+                escapedStrm << c;
+            }
+        } else {
+            escapedStrm << c;
+        }
+    }
+
+    std::string escaped = escapedStrm.str();
+
+    Term* term = create_string(branch, escaped);
     set_source_location(term, startPosition, tokens);
 
     if (quoteType != "'")
         term->setStringProp("syntax:quoteType", quoteType);
+    if (text != escaped)
+        term->setStringProp("syntax:originalString", text);
+
     return term;
 }
 

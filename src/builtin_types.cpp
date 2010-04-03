@@ -377,6 +377,12 @@ namespace string_t {
 
     void format_source(StyledSource* source, Term* term)
     {
+        if (term->hasProperty("syntax:originalString")) {
+            append_phrase(source, term->stringProp("syntax:originalString"),
+                    term, token::STRING);
+            return;
+        }
+
         std::string quoteType = term->stringPropOptional("syntax:quoteType", "'");
         std::string result;
         if (quoteType == "<")

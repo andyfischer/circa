@@ -78,9 +78,13 @@ void reproduce_simple_values() {
     round_trip_source("-.123");
     round_trip_source("5.2");
     round_trip_source("5.200");
+}
+
+void reproduce_string_literal() {
     round_trip_source("'string with single quotes'");
     round_trip_source("\"string with double quotes\"");
     round_trip_source("<<<multiline string>>>");
+    round_trip_source("\"string with escaped \\\"\\n\\' characters\"");
     finish_source_repro_category();
 }
 
@@ -385,6 +389,7 @@ void reproduce_type_cast() {
 
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_string_literal);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_color_literal);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_stateful_values);

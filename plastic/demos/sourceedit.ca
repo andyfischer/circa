@@ -10,7 +10,7 @@ end
 source = example -> branch_ref -> format_source
 
 letter_width = 8
-letter_height = 14
+letter_height = 17
 
 current_line = 0
 current_col = 0
@@ -23,8 +23,13 @@ for phrase in source
     loc = [current_col*letter_width current_line*letter_height]
     loc += [0 100]
 
+    visable_s = s
+    if s == '\n'
+        visable_s = ""
+    end
 
-    draw_text(ui_font_medium, s, #000, loc -> Point)
+
+    draw_text(ui_font_medium, visable_s, #000, loc -> Point)
 
     --print(phrase)
     i += 1
