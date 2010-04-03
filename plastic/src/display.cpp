@@ -103,10 +103,9 @@ bool resize_display(int width, int height)
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    char errorBuf[50];
-
-    if (gl_check_error(errorBuf)) {
-        std::cerr << "GL error during initialization: " << errorBuf << std::endl;
+    const char* err = gl_check_error();
+    if (err != NULL) {
+        std::cerr << "GL error during initialization: " << err << std::endl;
         return false;
     }
 
@@ -121,9 +120,10 @@ void render_frame()
     evaluate_main_script();
 
     // Check for uncaught GL error
-    char errorBuf[50];
-    if (gl_check_error(errorBuf))
-        std::cout << errorBuf << " (uncaught in render_frame())" << std::endl;
+    const char* err = gl_check_error();
+    if (err != NULL) {
+        std::cerr << "Uncaught GL error (in render_frame): " << err << std::endl;
+    }
 
     // Update the screen
     SDL_GL_SwapBuffers();

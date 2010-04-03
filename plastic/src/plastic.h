@@ -6,7 +6,7 @@
 
 #include "display.h"
 #include "docs.h"
-#include "gl_common.h"
+#include "gl_util.h"
 #include "gl_shapes.h"
 #include "image.h"
 #include "input.h"

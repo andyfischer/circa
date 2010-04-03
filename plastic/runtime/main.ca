@@ -73,10 +73,11 @@ namespace text begin
         "Draw a sprite created with render_text."
 end
 
-def draw_text(TTF_Font font, string str, Color color, Point location)
+def draw_text(TTF_Font font, string str, Color color, Point location) -> Rect
     "Render and draw a string."
     sprite = text:render_text(font, str, color)
     text:draw_rendered_text(sprite, location)
+    return to_rect(location, [sprite.width sprite.height])
 end
 
 def draw_text_centered(TTF_Font font, string str, Color color, Point location)
@@ -190,9 +191,6 @@ def expand_rect(Point center, number width, number height) -> Rect:
     "Return a rectangle with the given center, width, and height."
     return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
 
-def to_rect(Point topLeft, Point size) -> Rect
-    return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
-end
 
 def rect(Point topleft, Point bottomright) -> Rect
     return [topleft.x topleft.y bottomright.x bottomright.y]
@@ -258,6 +256,7 @@ def draggable_rect(Point initial_location, Point size) -> Point:
     return location
 
 ui_font_medium = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 16)
+coding_font = text:load_font("../assets/inconsolata.otf", 32)
 
 namespace fps_counter
     state int framesElapsed = 0
@@ -357,7 +356,7 @@ for filename in load_user_script_request:
 users_branch = include(user_script_filename)
 
 -- Draw HUD
-include('mainmenu.ca')
+--include('mainmenu.ca')
 
 -- Draw fpses
 draw_fps = false

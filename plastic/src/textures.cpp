@@ -8,7 +8,7 @@
 
 #include <circa.h>
 
-#include "gl_common.h"
+#include "gl_util.h"
 #include "image.h"
 #include "textures.h"
 

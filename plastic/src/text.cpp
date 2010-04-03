@@ -5,7 +5,7 @@
 #include <SDL_opengl.h>
 #include <SDL_ttf.h>
 
-#include "gl_common.h"
+#include "gl_util.h"
 #include "image.h"
 #include "text.h"
 
@@ -97,6 +97,7 @@ void render_text(EvalContext*, Term* caller)
             state.texid() = 0;
             state.width() = 0;
             state.height() = 0;
+            copy(caller->input(0), caller);
             return;
         }
 
@@ -104,7 +105,6 @@ void render_text(EvalContext*, Term* caller)
         // save the texture id.
 
         TTF_Font_ptr font = caller->input(1);
-        //SDL_Color bgcolor = {0, 0, 0, 0}; // todo
 
         SDL_Color sdlColor = unpack_sdl_color(caller->input(3));
         SDL_Surface *surface = TTF_RenderText_Blended(*font, text.c_str(), sdlColor);
@@ -113,6 +113,8 @@ void render_text(EvalContext*, Term* caller)
         state.width() = surface->w;
         state.height() = surface->h;
         copy(color, state.color());
+
+        SDL_SaveBMP(surface, "hello.bmp");
 
         SDL_FreeSurface(surface);
     }

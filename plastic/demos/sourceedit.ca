@@ -16,22 +16,46 @@ current_line = 0
 current_col = 0
 i = 0
 
+def get_fg_color(int highlight_type) -> Color
+    if highlight_type == styled_source:literal_string
+        return #884c03
+    elif highlight_type == styled_source:literal_number
+        return #2f2be2
+    elif highlight_type == styled_source:paren
+        return #003366
+    elif highlight_type == styled_source:comment
+        return #505050
+    elif highlight_type == styled_source:name
+        return #003366
+    elif highlight_type == styled_source:type_name
+        return #003366
+    elif highlight_type == styled_source:function_name
+        return #aa3366
+    elif highlight_type == styled_source:infix_operator
+        return #aa3366
+    elif highlight_type == styled_source:keyword
+        return #000000
+    else
+        return #003366
+    end
+end
+
 for phrase in source
-    r = phrase[1] -> Ref
     s = phrase[0] -> string
+    r = phrase[1] -> Ref
+    t = phrase[2] -> int
 
     loc = [current_col*letter_width current_line*letter_height]
     loc += [0 100]
 
     visable_s = s
-    if s == '\n'
-        visable_s = ""
-    end
+    if s == '\n' visable_s = "" end
+
+    color = get_fg_color(t)
+
+    rect = draw_text(coding_font, visable_s, color, loc -> Point)
 
 
-    draw_text(ui_font_medium, visable_s, #000, loc -> Point)
-
-    --print(phrase)
     i += 1
     current_col += s.length()
     if (s == '\n')

@@ -1,9 +1,4 @@
 
--- Used in source_repro, don't change this type without changing it there:
-type FormattedSourcePhrase {
-
-}
-
 def toggle(bool tog) -> bool
     <<<
     Stateful function, returns a boolean status. Every frame the function is called
@@ -13,3 +8,21 @@ def toggle(bool tog) -> bool
     if tog; on = not(on); end
     return on
 end
+
+namespace styled_source
+    literal_string = 1
+    literal_number = 4
+    paren = 2
+    comment = 3
+    name = 5
+    keyword = 205
+    type_name = 203
+    function_name = 202
+    infix_operator = 201
+end
+
+def to_rect(Point topLeft, Point size) -> Rect
+    return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
+end
+
+
