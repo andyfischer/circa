@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef PLASTIC_COMMON_HEADERS_INCLUDED
-#define PLASTIC_COMMON_HEADERS_INCLUDED
+#pragma once
 
 #ifdef WINDOWS
 
@@ -38,6 +37,7 @@
 namespace circa {
 
 struct Branch;
+struct EvalContext;
 struct FeedbackOperation;
 struct Function;
 class ReferenceIterator;
@@ -59,7 +59,5 @@ struct ReferenceMap;
 
 #include <OpenGL/glu.h>
 #include <OpenGL/glext.h>
-
-#endif
 
 #endif

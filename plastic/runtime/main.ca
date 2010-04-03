@@ -256,7 +256,7 @@ def draggable_rect(Point initial_location, Point size) -> Point:
     return location
 
 ui_font_medium = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 16)
-coding_font = text:load_font("../assets/inconsolata.otf", 32)
+coding_font = text:load_font("../assets/inconsolata.otf", 16)
 
 namespace fps_counter
     state int framesElapsed = 0

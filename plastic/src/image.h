@@ -1,9 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved
 
-#ifndef PLASTIC_IMAGE_INCLUDED
-#define PLASTIC_IMAGE_INCLUDED
+#pragma once
 
-GLenum get_texture_format(SDL_Surface *surface);
 GLuint load_image_to_texture(circa::EvalContext* cxt, circa::Term* term, const char* filename);
 GLuint load_surface_to_texture(SDL_Surface *surface);
 
@@ -17,6 +15,3 @@ namespace image {
 void setup(circa::Branch& branch);
 
 } // namespace image
-
-#endif
-

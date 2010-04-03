@@ -7,6 +7,7 @@
 
 #include "gl_util.h"
 #include "image.h"
+#include "sdl_util.h"
 #include "text.h"
 
 using namespace circa;
@@ -114,7 +115,7 @@ void render_text(EvalContext*, Term* caller)
         state.height() = surface->h;
         copy(color, state.color());
 
-        SDL_SaveBMP(surface, "hello.bmp");
+        //SDL_SaveBMP(surface, "hello.bmp");
 
         SDL_FreeSurface(surface);
     }
@@ -147,7 +148,7 @@ void draw_rendered_text(EvalContext* cxt, Term* caller)
 
     glEnd();
 
-    // reset state
+    // Clean up state
     glBindTexture(GL_TEXTURE_2D, 0);
 
     gl_check_error(cxt, caller);

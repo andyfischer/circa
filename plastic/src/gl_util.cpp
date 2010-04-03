@@ -31,7 +31,7 @@ bool gl_check_error(circa::EvalContext* cxt, circa::Term* term)
     return false;
 }
 
-const char* gl_to_string(int glenum)
+const char* gl_to_string(GLenum glenum)
 {
     switch (glenum) {
         case GL_INVALID_ENUM: return "GL_INVALID_ENUM";

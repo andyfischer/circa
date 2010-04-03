@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef PLASTIC_MESH_INCLUDED
-#define PLASTIC_MESH_INCLUDED
+#pragma once
 
 struct Vertex2f
 {
@@ -46,5 +45,3 @@ void draw_mesh_immediate(Mesh& mesh);
 void setup(circa::Branch& branch);
 
 }
-
-#endif

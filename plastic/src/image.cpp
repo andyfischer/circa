@@ -25,30 +25,6 @@ namespace rect_t {
     float get_y2(Term* term) { return term->asBranch()[3]->toFloat(); }
 }
 
-GLenum get_texture_format(SDL_Surface *surface)
-{
-    assert(surface);
-    int nColors = surface->format->BytesPerPixel;
-    if (nColors == 4) {
-        // contains alpha channel
-        if (surface->format->Rmask == 0x000000ff) {
-            return GL_RGBA;
-        } else {
-            return GL_BGRA;
-        }
-    } else if (nColors == 3) {
-        // no alpha channel
-        if (surface->format->Rmask == 0x000000ff) {
-            return GL_RGB;
-        } else {
-            return GL_BGR;
-        }
-    } else {
-        std::cout << "warning: get_texture_format failed, nColors = " << nColors << std::endl;
-        return GL_RGBA;
-    }
-}
-
 GLuint load_image_to_texture(EvalContext* cxt, Term* term, const char* filename)
 {
     SDL_Surface* surface = IMG_Load(filename);
