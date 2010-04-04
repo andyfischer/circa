@@ -77,13 +77,14 @@ Term* TYPE_TYPE = NULL;
 Term* VOID_TYPE = NULL;
 
 // New style: Type* pointers for builtins
-Type* BOOL_T = NULL;
-Type* FLOAT_T = NULL;
-Type* INT_T = NULL;
-Type* NULL_T = NULL;
-Type* STRING_T = NULL;
-Type* REF_T = NULL;
-Type* LIST_T = NULL;
+TypeRef TYPE_T;
+TypeRef BOOL_T;
+TypeRef FLOAT_T;
+TypeRef INT_T;
+TypeRef NULL_T;
+TypeRef STRING_T;
+TypeRef REF_T;
+TypeRef LIST_T;
 
 Term* get_global(std::string name)
 {
@@ -97,25 +98,25 @@ void empty_evaluate_function(EvalContext*, Term*) { }
 
 void create_builtin_types()
 {
-    NULL_T = new Type();
+    NULL_T = Type::create();
     NULL_T->name = "null";
 
-    STRING_T = new Type();
+    STRING_T = Type::create();
     string_t::setup_type(STRING_T);
 
-    INT_T = new Type();
+    INT_T = Type::create();
     int_t::setup_type(INT_T);
 
-    FLOAT_T = new Type();
+    FLOAT_T = Type::create();
     float_t::setup_type(FLOAT_T);
 
-    BOOL_T = new Type();
+    BOOL_T = Type::create();
     bool_t::setup_type(BOOL_T);
 
-    REF_T = new Type();
+    REF_T = Type::create();
     ref_t::setup_type(REF_T);
 
-    LIST_T = new Type();
+    LIST_T = Type::create();
     list_t::setup_type(LIST_T);
 }
 
@@ -135,21 +136,22 @@ void bootstrap_kernel()
     TYPE_TYPE = KERNEL->appendNew();
     TYPE_TYPE->function = VALUE_FUNC;
     TYPE_TYPE->type = TYPE_TYPE;
-    Type* typeType = new Type();
-    TYPE_TYPE->value_type = typeType;
-    TYPE_TYPE->value_data.ptr = typeType;
-    typeType->name = "Type";
-    typeType->initialize = type_t::initialize;
-    typeType->copy = type_t::copy;
-    typeType->remapPointers = type_t::remap_pointers;
-    typeType->formatSource = type_t::formatSource;
+    TYPE_T = Type::create();
+    TYPE_TYPE->value_type = TYPE_T;
+    TYPE_TYPE->value_data.ptr = TYPE_T;
+    TYPE_T->name = "Type";
+    TYPE_T->initialize = type_t::initialize;
+    TYPE_T->release = type_t::release;
+    TYPE_T->copy = type_t::copy;
+    TYPE_T->remapPointers = type_t::remap_pointers;
+    TYPE_T->formatSource = type_t::formatSource;
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Create Any type
     ANY_TYPE = KERNEL->appendNew();
     ANY_TYPE->function = VALUE_FUNC;
     ANY_TYPE->type = TYPE_TYPE;
-    make_type(ANY_TYPE, new Type());
+    change_type(ANY_TYPE, TYPE_T);
     as_type(ANY_TYPE).name = "any";
     as_type(ANY_TYPE).toString = any_t::to_string;
     as_type(ANY_TYPE).matchesType = any_t::matches_type;
@@ -162,13 +164,11 @@ void bootstrap_kernel()
     FUNCTION_ATTRS_TYPE = KERNEL->appendNew();
     FUNCTION_ATTRS_TYPE->function = VALUE_FUNC;
     FUNCTION_ATTRS_TYPE->type = TYPE_TYPE;
-    Type* functionAttrsType = new Type();
-    FUNCTION_ATTRS_TYPE->value_type = typeType;
-    FUNCTION_ATTRS_TYPE->value_data.ptr = functionAttrsType;
-    functionAttrsType->name = "FunctionAttrs";
-    functionAttrsType->initialize = function_attrs_t::initialize;
-    functionAttrsType->copy = function_attrs_t::copy;
-    functionAttrsType->release = function_attrs_t::release;
+    change_type(FUNCTION_ATTRS_TYPE, TYPE_T);
+    as_type(FUNCTION_ATTRS_TYPE).name = "FunctionAttrs";
+    as_type(FUNCTION_ATTRS_TYPE).initialize = function_attrs_t::initialize;
+    as_type(FUNCTION_ATTRS_TYPE).copy = function_attrs_t::copy;
+    as_type(FUNCTION_ATTRS_TYPE).release = function_attrs_t::release;
     KERNEL->bindName(FUNCTION_ATTRS_TYPE, "FunctionAttrs");
     assert(is_type(FUNCTION_ATTRS_TYPE));
 

@@ -2,6 +2,22 @@
 
 #include "circa.h"
 
+namespace circa {
+
+void temp_test()
+{
+    TaggedValue value;
+    TypeRef type = Type::create();
+
+    Branch branch;
+    branch.appendNew();
+    branch.appendNew();
+    branch.appendNew();
+    branch.appendNew();
+}
+}
+
+
 int main(int argc, const char * args[])
 {
     std::vector<std::string> argv;
@@ -11,7 +27,10 @@ int main(int argc, const char * args[])
 
     circa::initialize();
 
-    int result = circa::run_command_line(argv);
+    //circa::temp_test();
+
+    int result = 0;
+    result = circa::run_command_line(argv);
 
     circa::shutdown();
     

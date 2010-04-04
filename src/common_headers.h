@@ -39,6 +39,7 @@ struct FunctionAttrs;
 struct TaggedValue;
 struct Term;
 struct Type;
+struct TypeRef;
 struct Ref;
 struct RefList;
 struct ReferenceMap;

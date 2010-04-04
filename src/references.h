@@ -14,52 +14,17 @@ struct Ref
     Term* t;
 
     Ref() : t(NULL) {}
-
-    Ref(Term *initialValue) : t(NULL)
-    {
-        set(initialValue);
-    }
-
-    // Copy constructor
-    Ref(Ref const& copy) : t(NULL)
-    {
-        set(copy.t);
-    }
-
-    ~Ref()
-    {
-        set(NULL);
-    }
-
-    // Assignment copy
-    Ref& operator=(Ref const& rhs)
-    {
-        set(rhs.t);
-        return *this;
-    }
+    Ref(Term *initial) : t(NULL) { set(initial); }
+    Ref(Ref const& copy) : t(NULL) { set(copy.t); }
+    ~Ref() { set(NULL); }
 
     void set(Term* target);
 
-    Ref& operator=(Term* target)
-    {
-        set(target);
-        return *this;
-    }
-
-    bool operator==(Term* _t) const
-    {
-        return _t == t;
-    }
-
-    operator Term*() const
-    {
-        return t;
-    }
-
-    Term* operator->()
-    {
-        return t;
-    }
+    Ref& operator=(Ref const& rhs) { set(rhs.t); return *this; }
+    Ref& operator=(Term* target) { set(target); return *this; }
+    bool operator==(Term* _t) const { return _t == t; }
+    operator Term*() const { return t; }
+    Term* operator->() { return t; }
 
     static void remap_pointers(Term* term, ReferenceMap const& map);
 };

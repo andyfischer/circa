@@ -191,12 +191,6 @@ TaggedValue* make_list(TaggedValue* value)
     return value;
 }
 
-void make_type(TaggedValue* value, Type* type)
-{
-    value->value_type = (Type*) TYPE_TYPE->value_data.ptr;
-    value->value_data.ptr = type;
-}
-
 void make_null(TaggedValue* value)
 {
     change_type(value, NULL_T);

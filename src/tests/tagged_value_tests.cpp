@@ -169,14 +169,14 @@ void test_assign_value_to_default()
 void test_constructor_syntax()
 {
     Branch branch;
-    Type myType;
-    myType.name = "T";
-    import_type(branch, &myType);
+    TypeRef myType = Type::create();
+    myType->name = "T";
+    import_type(branch, myType);
     Term* a = branch.eval("a = T()");
-    test_assert(a->value_type == &myType);
+    test_assert(a->value_type == myType);
     test_assert(a->value_data.ptr == NULL);
     assign_value_to_default(a);
-    test_assert(a->value_type == &myType);
+    test_assert(a->value_type == myType);
     test_assert(a->value_data.ptr == NULL);
 }
 
@@ -226,9 +226,9 @@ namespace manual_memory_management_test {
     {
         initialize_pool();
 
-        Type myType;
-        myType.initialize = initialize;
-        myType.release = release;
+        TypeRef myType = Type::create();
+        myType->initialize = initialize;
+        myType->release = release;
 
         TaggedValue value;
 
@@ -236,7 +236,7 @@ namespace manual_memory_management_test {
         test_assert(!pool_allocated[0]);
         test_assert(!pool_allocated[1]);
 
-        change_type(&value, &myType);
+        change_type(&value, myType);
 
         test_assert(pool_allocated[0]);
         test_assert(!pool_allocated[1]);
@@ -249,7 +249,7 @@ namespace manual_memory_management_test {
         // scope 1:
         {
             TaggedValue scoped_value;
-            change_type(&scoped_value, &myType);
+            change_type(&scoped_value, myType);
             test_assert(pool_allocated[0]);
         }
         test_assert(!pool_allocated[0]);
@@ -257,7 +257,7 @@ namespace manual_memory_management_test {
         // scope 2
         {
             TaggedValue scoped_value;
-            change_type(&scoped_value, &myType);
+            change_type(&scoped_value, myType);
             test_assert(pool_allocated[0]);
             set_null(&scoped_value);
             test_assert(!pool_allocated[0]);
@@ -268,12 +268,12 @@ namespace manual_memory_management_test {
 
 void refcount_test()
 {
-    Type t;
-    toy_refcounted_pool::setup_type(&t);
+    TypeRef t = Type::create();
+    toy_refcounted_pool::setup_type(t);
     toy_refcounted_pool::initialize_pool();
 
     {
-        TaggedValue value(&t);
+        TaggedValue value(t);
 
         test_assert(toy_refcounted_pool::refcount[0] == 1);
     }
@@ -281,7 +281,7 @@ void refcount_test()
     test_assert(toy_refcounted_pool::nothing_allocated());
 
     {
-        TaggedValue value1(&t), value2(&t);
+        TaggedValue value1(t), value2(t);
 
         test_assert(toy_refcounted_pool::refcount[0] == 1);
 
@@ -299,11 +299,11 @@ void refcount_test()
 void list_memory_management()
 {
     List list;
-    Type t;
-    toy_refcounted_pool::setup_type(&t);
+    TypeRef t = Type::create();
+    toy_refcounted_pool::setup_type(t);
     toy_refcounted_pool::initialize_pool();
 
-    TaggedValue v(&t);
+    TaggedValue v(t);
 
     test_assert(toy_refcounted_pool::refcount[0] == 1);
 
@@ -323,9 +323,9 @@ void list_memory_management()
 
     test_assert(toy_refcounted_pool::refcount[0] == 0);
 
-    change_type(list.append(), &t);
-    change_type(list.append(), &t);
-    change_type(list.append(), &t);
+    change_type(list.append(), t);
+    change_type(list.append(), t);
+    change_type(list.append(), t);
 
     test_assert(toy_refcounted_pool::refcount[0] == 1);
     test_assert(toy_refcounted_pool::refcount[1] == 1);

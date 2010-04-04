@@ -1,1 +1,0 @@
-valgrind --leak-check=full --num-callers=40 circa $*

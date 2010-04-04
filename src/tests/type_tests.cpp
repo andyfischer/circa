@@ -255,7 +255,7 @@ void test_imported_pointer_type()
 
 namespace simple_pointer_test {
 
-Type* gType;
+TypeRef gType;
 void _evaluate(EvalContext*, Term* caller)
 {
     test_assert(is_value_of_type(caller->input(0), gType));
@@ -270,7 +270,7 @@ void _evaluate(EvalContext*, Term* caller)
 
 void test()
 {
-    gType = new Type();
+    gType = Type::create();
     gType->name = "T";
     initialize_simple_pointer_type(gType);
 

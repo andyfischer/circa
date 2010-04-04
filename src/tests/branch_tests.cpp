@@ -81,7 +81,6 @@ void test_setNull()
 
     branch.setNull(0);
     test_assert(!branch.contains("a"));
-    test_assert(t->owningBranch == NULL);
     test_assert(branch[0] == NULL);
 
     test_assert(branch);

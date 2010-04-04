@@ -37,7 +37,7 @@ Term* import_type(Branch& branch, Type* type)
         throw std::runtime_error("In import_type, type must have a name");
 
     Term* term = create_value(branch, TYPE_TYPE, type->name);
-    set_pointer(term, &as_type(TYPE_TYPE), type);
+    type_t::copy(type, term);
     return term;
 }
 

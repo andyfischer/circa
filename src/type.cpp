@@ -8,6 +8,31 @@ namespace circa {
 
 namespace type_t {
 
+    void decref(Type* type)
+    {
+        assert(type->refCount > 0);
+        type->refCount--;
+        if (type->refCount == 0)
+            delete type;
+    }
+
+    void initialize(Type*, TaggedValue* value)
+    {
+        Type* type = Type::create();
+        type->refCount++;
+        set_pointer(value, type);
+    }
+    void release(TaggedValue* value)
+    {
+        assert(is_type(value));
+        decref((Type*) get_pointer(value));
+    }
+    void copy(TaggedValue* source, TaggedValue* dest)
+    {
+        assert(is_type(source));
+        copy((Type*) get_pointer(source), dest);
+    }
+
     void formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, "type ", term, phrase_type::KEYWORD);
@@ -52,6 +77,19 @@ namespace type_t {
     {
         set_str(caller, as_type(caller->input(0)).name);
     }
+
+    void copy(Type* value, TaggedValue* dest)
+    {
+        Type* oldType = (Type*) get_pointer(dest);
+
+        if (value == oldType)
+            return;
+
+        set_pointer(dest, value);
+        value->refCount++;
+        decref(oldType);
+    }
+
     Type::RemapPointers& get_remap_pointers_func(Term* type)
     {
         return as_type(type).remapPointers;
@@ -217,6 +255,23 @@ void assign_value_to_default(Term* term)
 Term* parse_type(Branch& branch, std::string const& decl)
 {
     return parser::compile(&branch, parser::type_decl, decl);
+}
+
+void
+TypeRef::set(Type* target)
+{
+    if (t == target)
+        return;
+
+    Type* previousTarget = t;
+
+    t = target;
+
+    if (t != NULL)
+        t->refCount++;
+
+    if (previousTarget != NULL)
+        type_t::decref(previousTarget);
 }
 
 } // namespace circa

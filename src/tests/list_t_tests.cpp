@@ -19,11 +19,11 @@ void test_simple()
 
 void test_tagged_value()
 {
-    Type list;
-    list_t::setup_type(&list);
+    TypeRef list = Type::create();
+    list_t::setup_type(list);
 
     TaggedValue value;
-    change_type(&value, &list);
+    change_type(&value, list);
 
     test_equals(to_string(&value), "[]");
     test_assert(get_element(&value, 1) == NULL);
@@ -56,10 +56,10 @@ void test_shallow_copy()
 
 void test_tagged_value_copy()
 {
-    Type list;
-    list_t::setup_type(&list);
+    TypeRef list = Type::create();
+    list_t::setup_type(list);
 
-    TaggedValue value(&list);
+    TaggedValue value(list);
 
     make_int(list_t::append(&value), 1);
     make_int(list_t::append(&value), 2);

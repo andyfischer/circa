@@ -437,6 +437,10 @@ namespace ref_t {
         REF_T = &as_type(REF_TYPE);
         set_pointer(value, type, new Ref());
     }
+    void release(TaggedValue* value)
+    {
+        delete (Ref*) get_pointer(value);
+    }
     void copy(TaggedValue* source, TaggedValue* dest)
     {
         *((Ref*) get_pointer(dest, REF_T)) = as_ref(source);
@@ -588,6 +592,7 @@ namespace ref_t {
         type->remapPointers = Ref::remap_pointers;
         type->toString = to_string;
         type->initialize = initialize;
+        type->release = release;
         type->copy = copy;
         type->equals = equals;
     }
@@ -608,18 +613,6 @@ namespace void_t {
     std::string to_string(TaggedValue*)
     {
         return "<void>";
-    }
-}
-
-
-namespace type_t {
-    void initialize(Type* type, TaggedValue* value)
-    {
-        set_pointer(value, type, new Type());
-    }
-    void copy(TaggedValue* source, TaggedValue* dest)
-    {
-        set_pointer(dest, dest->value_type, get_pointer(source, dest->value_type));
     }
 }
 

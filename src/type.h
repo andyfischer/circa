@@ -70,6 +70,9 @@ struct Type
     // argument.
     Branch memberFunctions;
 
+    int refCount;
+
+private:
     Type() :
         name(""),
         cppTypeInfo(NULL),
@@ -87,21 +90,53 @@ struct Type
         matchesType(NULL),
         mutate(NULL),
         getElement(NULL),
-        numElements(NULL)
+        numElements(NULL),
+        refCount(0)
     {
     }
 
+public:
     int findFieldIndex(std::string const& name)
     {
         return prototype.findIndex(name);
     }
+
+    static Type* create()
+    {
+        Type* t = new Type();
+        //t->refCount = 1;
+        return t;
+    }
+};
+
+struct TypeRef
+{
+    Type* t;
+
+    TypeRef() : t(NULL) {}
+    TypeRef(Type* initial) : t(NULL) { set(initial); }
+    TypeRef(TypeRef const& copy) : t(NULL) { set(copy.t); }
+    ~TypeRef() { set(NULL); }
+
+    void set(Type* target);
+
+    TypeRef& operator=(TypeRef const& rhs) { set(rhs.t); return *this; }
+    TypeRef& operator=(Type* target) { set(target); return *this; }
+    bool operator==(Type* _t) const { return _t == t; }
+    operator Type*() const { return t; }
+    Type* operator->() { return t; }
 };
 
 namespace type_t {
+    void initialize(Type* type, TaggedValue* value);
+    void release(TaggedValue* value);
+    void copy(TaggedValue* source, TaggedValue* dest);
     std::string to_string(Term *caller);
     void formatSource(StyledSource* source, Term* term);
     void remap_pointers(Term *term, ReferenceMap const& map);
     void name_accessor(EvalContext*, Term* caller);
+
+    void copy(Type* value, TaggedValue* dest);
 
     // Accessors
     Type::RemapPointers& get_remap_pointers_func(Term* type);

@@ -68,11 +68,6 @@ namespace branch_ref_t {
 namespace styled_source_t { void setup_type(Type* type); }
 namespace indexable_t { void setup_type(Type* type); }
 
-namespace type_t {
-    void initialize(Type* type, TaggedValue* value);
-    void copy(TaggedValue* source, TaggedValue* dest);
-}
-
 namespace point_t {
 
     // Helper functions:

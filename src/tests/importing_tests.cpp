@@ -31,12 +31,12 @@ void test_import_c()
 
 void test_import_type()
 {
+    TypeRef type = Type::create();
     Branch branch;
 
-    Type type;
-    type.name = "A";
+    type->name = "A";
 
-    Term* term = import_type(branch, &type);
+    Term* term = import_type(branch, type);
     test_assert(term->type == TYPE_TYPE);
     test_assert(term->name == "A");
 }

@@ -14,7 +14,7 @@ using namespace circa;
 
 namespace text {
 
-Type *TTF_Font_t = NULL;
+TypeRef TTF_Font_t;
 
 class TTF_Font_ptr
 {
@@ -156,7 +156,7 @@ void draw_rendered_text(EvalContext* cxt, Term* caller)
 
 void pre_setup(Branch& branch)
 {
-    TTF_Font_t = new Type();
+    TTF_Font_t = Type::create();
     initialize_simple_pointer_type(TTF_Font_t);
     TTF_Font_t->name = "TTF_Font";
 
