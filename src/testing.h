@@ -44,8 +44,6 @@ extern std::vector<TestCase> gTestCases;
 
 #define REGISTER_TEST_CASE(f) gTestCases.push_back(TestCase(#f,f))
 
-void run_test_named(std::string const& testName);
-
 bool run_tests(std::string const& searchStr);
 
 // Run all unit tests, returns true if all passed.

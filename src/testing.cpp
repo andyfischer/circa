@@ -180,23 +180,6 @@ bool run_test(TestCase& testCase, bool catch_exceptions)
     return !gCurrentTestCase.failed;
 }
 
-void run_test_named(std::string const& testName)
-{
-    register_all_tests();
-
-    std::vector<TestCase>::iterator it;
-    for (it = gTestCases.begin(); it != gTestCases.end(); ++it) {
-        if (it->name == testName) {
-            bool result = run_test(*it, true);
-            if (result)
-                std::cout << testName << " succeeded" << std::endl;
-            return;
-        }
-    }
-
-    std::cout << "Couldn't find a test named: " << testName << std::endl;
-}
-
 bool run_tests(std::string const& searchStr)
 {
     register_all_tests();

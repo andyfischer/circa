@@ -9,5 +9,11 @@ int main(int argc, const char * args[])
     for (int i = 1; i < argc; i++)
         argv.push_back(args[i]);
 
-    return circa::run_command_line(argv);
+    circa::initialize();
+
+    int result = circa::run_command_line(argv);
+
+    circa::shutdown();
+    
+    return result;
 }

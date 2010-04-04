@@ -23,12 +23,9 @@ void print_usage()
 
 int run_command_line(std::vector<std::string> args)
 {
-    initialize();
-
     // No arguments, run tests
     if (args.size() == 0) {
         run_all_tests();
-        shutdown();
         return 0;
     }
 
@@ -38,14 +35,12 @@ int run_command_line(std::vector<std::string> args)
             run_tests(args[1]);
         else
             run_all_tests();
-        shutdown();
         return 0;
     }
 
     // Print help
     if (args[0] == "-help") {
         print_usage();
-        shutdown();
         return 0;
     }
 
@@ -64,7 +59,6 @@ int run_command_line(std::vector<std::string> args)
         Branch workspace;
         Term* result = workspace.eval(command.str());
         std::cout << result->toString() << std::endl;
-        shutdown();
         return 0;
     }
 
@@ -75,7 +69,6 @@ int run_command_line(std::vector<std::string> args)
         for (it = testNames.begin(); it != testNames.end(); ++it) {
             std::cout << *it << std::endl;
         }
-        shutdown();
         return 0;
     }
 
@@ -207,7 +200,6 @@ int run_command_line(std::vector<std::string> args)
         }
     }
 
-    shutdown();
     return 0;
 }
 
