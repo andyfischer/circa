@@ -3,7 +3,6 @@
 #pragma once
 
 GLuint load_image_to_texture(circa::EvalContext* cxt, circa::Term* term, const char* filename);
-GLuint load_surface_to_texture(SDL_Surface *surface);
 
 bool has_indexed_color(SDL_Surface* surface);
 

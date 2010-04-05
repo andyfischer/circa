@@ -45,34 +45,6 @@ GLuint load_image_to_texture(EvalContext* cxt, Term* term, const char* filename)
     return texid;
 }
 
-GLuint load_surface_to_texture(SDL_Surface *surface)
-{
-    GLuint texid;
-    glGenTextures(1, &texid);
-    glBindTexture(GL_TEXTURE_2D, texid);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    GLenum pixelFormat = get_texture_format(surface);
-
-    GLenum internalFormat = (GLenum) surface->format->BytesPerPixel;
-
-    // Specify a particular format because Leopard decided to compress to GL_RGB5_A1.
-    switch (pixelFormat) {
-        case GL_RGB: case GL_BGR: internalFormat = GL_RGB; break;
-        case GL_RGBA: case GL_BGRA: internalFormat = GL_RGBA; break;
-        default: break;
-    }
-
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat,
-            surface->w, surface->h, 0,
-            pixelFormat, GL_UNSIGNED_BYTE, surface->pixels);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return texid;
-}
-
 bool has_indexed_color(SDL_Surface* surface)
 {
     return surface->format->BitsPerPixel == 8;
