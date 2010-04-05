@@ -64,9 +64,8 @@ global_version_name = 'alpha2-2'
 
 def deploy_assets(target_dir):
     copy_tree('plastic/assets', target_dir+'/assets')
-    copy_file('plastic/runtime.ca', target_dir)
+    copy_tree('plastic/runtime', target_dir)
     copy_tree('plastic/demos', target_dir+'/demos')
-    copy_tree('plastic/stdlib', target_dir+'/stdlib')
 
     # remove some demos that aren't ready yet
     unready_demos = ['browser.ca', 'invaders.ca', 'meshtest.ca', 'text.ca', 'tree.ca']
@@ -131,28 +130,29 @@ def deploy_mac_plastic_cl():
 
     mkdir(target_dir+'/bin')
 
-    dylibs = ['libSDL-1.2.0.dylib',
-        'libSDL_gfx.0.dylib',
-        'libSDL_image-1.2.0.dylib',
-        'libSDL_ttf-2.0.0.dylib',
-        'libfreetype.6.dylib',
-        'libz.1.dylib']
+    if False:
+        dylibs = ['libSDL-1.2.0.dylib',
+            'libSDL_gfx.0.dylib',
+            'libSDL_image-1.2.0.dylib',
+            'libSDL_ttf-2.0.0.dylib',
+            'libfreetype.6.dylib',
+            'libz.1.dylib']
 
-    def dylib_mappings():
-        for dylib in dylibs:
-            old = '/opt/local/lib/'+dylib
-            new = target_dir+'/bin/'+dylib
-            yield (old, new)
+        def dylib_mappings():
+            for dylib in dylibs:
+                old = '/opt/local/lib/'+dylib
+                new = target_dir+'/bin/'+dylib
+                yield (old, new)
 
-    def update_paths_in_dylib(file):
+        def update_paths_in_dylib(file):
+            for (old, new) in dylib_mappings():
+                system('install_name_tool -change %s %s %s' % (old, new, file))
+
         for (old, new) in dylib_mappings():
-            system('install_name_tool -change %s %s %s' % (old, new, file))
+            copy_file(old, new)
+            update_paths_in_dylib(new)
 
-    for (old, new) in dylib_mappings():
-        copy_file(old, new)
-        update_paths_in_dylib(new)
-
-    update_paths_in_dylib(target_dir+'/plastic')
+        update_paths_in_dylib(target_dir+'/plastic')
 
     zip(target_dir, prefix='deploy/')
 

@@ -135,6 +135,9 @@ void draw_rendered_text(EvalContext* cxt, Term* caller)
     glBindTexture(GL_TEXTURE_2D, output.texid());
     glColor4f(1,1,1,1);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     glBegin(GL_QUADS);
 
     glTexCoord2d(0.0, 0.0);
