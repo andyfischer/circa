@@ -88,8 +88,9 @@ def draw_text_centered(TTF_Font font, string str, Color color, Point location)
 end
 
 -- GL functions
-def background(Color):
+def background(Color)
     "Fill the screen with the given color."
+end
 
 namespace gl begin
     def triangles(List, Color):
@@ -343,6 +344,7 @@ namespace postprocess begin
 end
 
 -- Include other runtime scripts
+include('code_editor.ca')
 include('ui_widgets.ca')
 
 -- Load the user's script
