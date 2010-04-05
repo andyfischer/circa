@@ -67,10 +67,12 @@ namespace text begin
     type RenderedText { int texid, int width, int height, Color color, string text }
     def load_font(state TTF_Font, string filename, int size) -> TTF_Font:
         "Load the given font"
-    def render_text(state RenderedText, TTF_Font font, string text, Color color) -> RenderedText:
+    def render_text(state RenderedText, TTF_Font font, string text, Color color) -> RenderedText
         "Render text and return a sprite that can be drawn with draw_rendered_text. This is useful if you want to know the width or height of the rendered text before drawing it."
-    def draw_rendered_text(RenderedText, Point loc):
+    end
+    def draw_rendered_text(RenderedText, Point loc)
         "Draw a sprite created with render_text."
+    end
 end
 
 def draw_text(TTF_Font font, string str, Color color, Point location) -> Rect
@@ -234,10 +236,11 @@ def linear_fadein(number total_time) -> number:
     elapsed = (time - time_started) / total_time
     return min(elapsed, 1.0)
 
-def elapsed() -> number:
+def elapsed() -> number
     "Stateful function, returns the number of seconds that has passed since this function was first called"
     state number time_started = time
     return time - time_started
+end
 
 def draggable_rect(Point initial_location, Point size) -> Point:
     state Point location = initial_location

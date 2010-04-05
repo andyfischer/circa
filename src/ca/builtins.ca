@@ -19,6 +19,7 @@ namespace styled_source
     type_name = 203
     function_name = 202
     infix_operator = 201
+    whitespace = 206
 end
 
 def to_rect(Point topLeft, Point size) -> Rect

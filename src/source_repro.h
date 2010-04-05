@@ -18,6 +18,7 @@ namespace phrase_type {
     const int TYPE_NAME = 203;
     const int TERM_NAME = 204;
     const int KEYWORD = 205;
+    const int WHITESPACE = 206;
 
     const int UNKNOWN_IDENTIFIER = 220;
 }

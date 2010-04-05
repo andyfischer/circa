@@ -73,7 +73,7 @@ void format_branch_source(StyledSource* source, Branch& branch, Term* format)
 
     if (format != NULL) {
         append_phrase(source, format->stringPropOptional("syntax:preEndWs", ""),
-                format, token::WHITESPACE);
+                format, phrase_type::WHITESPACE);
 
         switch (branchSyntax) {
         case parser::BRANCH_SYNTAX_UNDEF:
@@ -108,7 +108,7 @@ void format_term_source(StyledSource* source, Term* term)
 
     // Pre whitespace
     append_phrase(source, term->stringPropOptional("syntax:preWhitespace", ""),
-            term, token::WHITESPACE);
+            term, phrase_type::WHITESPACE);
 
     // If the function has a formatSource function, use that.
     if (function_t::get_attrs(term->function).formatSource != NULL) {
@@ -142,7 +142,7 @@ void format_term_source(StyledSource* source, Term* term)
 
     // Post whitespace
     append_phrase(source, term->stringPropOptional("syntax:postWhitespace", ""),
-            term, token::WHITESPACE);
+            term, phrase_type::WHITESPACE);
 }
 
 void format_term_source_default_formatting(StyledSource* source, Term* term)
@@ -156,7 +156,7 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
     // Check for an infix operator with implicit rebinding (like +=).
     if (infix && is_infix_operator_rebinding(functionName)) {
         append_phrase(source, term->name.c_str(), term, phrase_type::UNDEFINED);
-        append_phrase(source, " ", term, token::WHITESPACE);
+        append_phrase(source, " ", term, phrase_type::WHITESPACE);
         append_phrase(source, functionName.c_str(), term, phrase_type::INFIX_OPERATOR);
         format_source_for_input(source, term, 1);
         return;
@@ -207,7 +207,7 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         format_source_for_input(source, term, 0);
         append_phrase(source, "->", term, phrase_type::UNDEFINED);
         append_phrase(source, get_input_syntax_hint(term, 1, "preWhitespace"),
-                term, token::WHITESPACE);
+                term, phrase_type::WHITESPACE);
         append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
     }
 
@@ -240,7 +240,7 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
 
     append_phrase(source,
             get_input_syntax_hint_optional(term, visibleIndex, "preWhitespace", defaultPre), 
-            input, token::WHITESPACE);
+            input, phrase_type::WHITESPACE);
 
     // possibly insert the @ operator. This is pretty flawed, it should be stored by index.
     if (input->name != ""
@@ -257,7 +257,7 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
 
     append_phrase(source,
         get_input_syntax_hint_optional(term, visibleIndex, "postWhitespace", defaultPost), 
-        input, token::WHITESPACE);
+        input, phrase_type::WHITESPACE);
 }
 
 void format_name_binding(StyledSource* source, Term* term)
@@ -273,10 +273,10 @@ void format_name_binding(StyledSource* source, Term* term)
     else {
         append_phrase(source, term->name.c_str(), term, phrase_type::UNDEFINED);
         append_phrase(source, term->stringPropOptional("syntax:preEqualsSpace", " "),
-                term, token::WHITESPACE);
+                term, phrase_type::WHITESPACE);
         append_phrase(source, "=", term, token::EQUALS);
         append_phrase(source, term->stringPropOptional("syntax:postEqualsSpace", " "),
-                term, token::WHITESPACE);
+                term, phrase_type::WHITESPACE);
     }
 }
 

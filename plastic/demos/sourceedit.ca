@@ -45,16 +45,28 @@ for phrase in source
     r = phrase[1] -> Ref
     t = phrase[2] -> int
 
-    loc = [current_col*letter_width current_line*letter_height]
+    loc = [current_col*letter_width current_line*letter_height] -> Point
     loc += [0 100]
-
-    visable_s = s
-    if s == '\n' visable_s = "" end
 
     color = get_fg_color(t)
 
-    rect = draw_text(coding_font, visable_s, color, loc -> Point)
+    visable_s = cond(s == '\n', "", s)
+    text_sprite = text:render_text(coding_font, visable_s, color)
 
+    rect = to_rect(loc, [text_sprite.width text_sprite.height])
+
+    bg_color = #fff0
+    cond(mouse_over(rect) #ffe @bg_color)
+
+    draw_highlight_rect = t != styled_source:whitespace
+
+    if draw_highlight_rect
+        fill_rect(rect, bg_color)
+    end
+
+    text:draw_rendered_text(text_sprite, loc -> Point)
+    if mouse_clicked(rect)
+    end
 
     i += 1
     current_col += s.length()
