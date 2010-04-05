@@ -41,18 +41,8 @@ namespace string_t {
 }
 
 namespace ref_t {
-    void get_name(EvalContext*, Term* caller);
-    void hosted_to_string(EvalContext*, Term* caller);
-    void get_function(EvalContext*, Term* caller);
-    void hosted_typeof(EvalContext*, Term* caller);
-    void assign(EvalContext*, Term* caller);
-    void tweak(EvalContext*, Term* caller);
-    void asint(EvalContext*, Term* caller);
-    void asfloat(EvalContext*, Term* caller);
-    void get_input(EvalContext*, Term* caller);
-    void num_inputs(EvalContext*, Term* caller);
-    void get_source_location(EvalContext*, Term* caller);
     void setup_type(Type* type);
+    void postponed_setup_type(Type* type);
 }
 
 namespace any_t {
