@@ -10,6 +10,8 @@ namespace type_t {
 
     void decref(Type* type)
     {
+        if (type->permanent)
+            return;
         assert(type->refCount > 0);
         type->refCount--;
         if (type->refCount == 0)
@@ -210,7 +212,6 @@ void reset_type(Type* type)
     type->checkInvariants = NULL;
     type->valueFitsType = NULL;
     type->initialize = NULL;
-    //type->assign = NULL;
     type->release = NULL;
     type->equals = NULL;
     type->cast = NULL;

@@ -523,6 +523,8 @@ void setup_builtin_types(Branch& kernel)
 
     Term* indexableType = parse_type(kernel, "type Indexable;");
     indexable_t::setup_type(&as_type(indexableType));
+
+    callable_t::setup_type(&as_type(parse_type(kernel, "type Callable;")));
 }
 
 void parse_builtin_types(Branch& kernel)

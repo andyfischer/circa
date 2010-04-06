@@ -134,6 +134,10 @@ void change_type(TaggedValue* v, Type* type)
         Type::Initialize initialize = type->initialize;
         if (initialize != NULL)
             initialize(type, v);
+
+        // Any types that are actually used become permanent
+        if (!type->permanent)
+            type->permanent = true;
     }
 }
 

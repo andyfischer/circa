@@ -13,6 +13,11 @@ namespace refactor_function {
         rename(as_ref(INPUT(0)), as_string(INPUT(1)));
     }
 
+    CA_DEFINE_FUNCTION(change_function, "change_function(Ref r, Callable func)")
+    {
+        change_function(as_ref(INPUT(0)), INPUT(1));
+    }
+
     void setup(Branch& kernel)
     {
         Branch& ns = create_namespace(kernel, "refactor");

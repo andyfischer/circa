@@ -57,6 +57,7 @@ namespace branch_ref_t {
 
 namespace styled_source_t { void setup_type(Type* type); }
 namespace indexable_t { void setup_type(Type* type); }
+namespace callable_t { void setup_type(Type* type); }
 
 namespace point_t {
 

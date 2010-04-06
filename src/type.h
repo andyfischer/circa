@@ -71,6 +71,7 @@ struct Type
     Branch memberFunctions;
 
     int refCount;
+    bool permanent;
 
 private:
     Type() :
@@ -91,7 +92,8 @@ private:
         mutate(NULL),
         getElement(NULL),
         numElements(NULL),
-        refCount(0)
+        refCount(0),
+        permanent(false)
     {
     }
 
@@ -128,6 +130,7 @@ struct TypeRef
 };
 
 namespace type_t {
+
     void initialize(Type* type, TaggedValue* value);
     void release(TaggedValue* value);
     void copy(TaggedValue* source, TaggedValue* dest);

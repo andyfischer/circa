@@ -4,20 +4,24 @@
 
 namespace circa {
 
-void change_function(Term* term, Term* newFunction)
+void change_function(Term* term, Term* function)
 {
-    if (term->function == newFunction)
+    if (term->function == function)
         return;
 
-    assert(newFunction->type == FUNCTION_TYPE);
+    if (!is_callable(function))
+        throw std::runtime_error("Term "+function->name+" is not callable");
 
-    term->function = newFunction;
+    // Check to specialize function
+    function = specialize_function(function, term->inputs);
+
+    term->function = function;
 
     // Check if we need to change the # of inputs
-    if (!function_t::get_variable_args(newFunction))
-        term->inputs.resize(function_t::num_inputs(newFunction));
+    if (!function_t::get_variable_args(function))
+        term->inputs.resize(function_t::num_inputs(function));
 
-    Term* newType = function_get_specialized_output_type(newFunction, term);
+    Term* newType = function_get_specialized_output_type(function, term);
 
     if (newType != ANY_TYPE)
         change_type(term, newType);
