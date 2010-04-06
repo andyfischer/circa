@@ -9,6 +9,21 @@ def toggle(bool tog) -> bool
     return on
 end
 
+def approach(number target, number step) -> number:
+    <<<
+    Stateful function, returns a result which approaches 'target'. Each frame, this function
+    will change at most by 'step'
+    >>>
+    state current = target
+    if target > current
+        current += min(step, target - current)
+    elif target < current
+        current -= min(step, current - target)
+    end
+    return current
+end
+
+
 namespace styled_source
     literal_string = 1
     literal_number = 4
@@ -22,8 +37,72 @@ namespace styled_source
     whitespace = 206
 end
 
+-- Math utility functions
 def to_rect(Point topLeft, Point size) -> Rect
     return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
+end
+
+def polar(number angle) -> Point
+    return [cos(angle) sin(angle)]
+end
+
+def magnitude(Point point) -> number
+    "Returns the magnitude, or the distance from [0,0] to this point."
+    return sqrt(sqr(point.x) + sqr(point.y))
+end
+
+def point_distance(Point a, Point b) -> number
+    "Returns the distance between a and b."
+    return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
+end
+
+def rotate_point(Point p, number rotation) -> Point
+    "Rotate p around [0,0] by the given angle. Angles are specified in the range 0..1."
+    return [p.x*cos(rotation) - p.y*sin(rotation),
+        p.x*sin(rotation)+p.y*cos(rotation)]
+end
+
+def random_location() -> Point
+    "Return a random point that is inside the boundaries of the window."
+    return [rand() * window.width, rand() * window.height]
+end
+
+def random_norm_vector() -> Point
+    "Return a random normalized vector"
+    angle = rand()
+    return [cos(angle) sin(angle)]
+end
+
+def norm(Point v) -> Point
+    "Returns v normalized to be along the unit circle."
+    m = magnitude(v)
+    return [v.x / m, v.y / m]
+end
+
+def perpendicular(Point v) -> Point
+    "Returns a vector that is perpendicular to v, rotated clockwise."
+    return [v.y -v.x]
+end
+
+def expand_rect(Point center, number width, number height) -> Rect
+    "Return a rectangle with the given center, width, and height."
+    return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
+end
+
+
+def rect(Point topleft, Point bottomright) -> Rect
+    return [topleft.x topleft.y bottomright.x bottomright.y]
+end
+
+def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool
+    "Return whether the two rectangles intersect."
+    intersects_on_x = (rect_a.x2 > rect_b.x1) and (rect_b.x2 > rect_a.x1)
+    intersects_on_y = (rect_a.y2 > rect_b.y1) and (rect_b.y2 > rect_a.y1)
+    return intersects_on_x and intersects_on_y
+end
+
+def random_color() -> Color
+    return [rand() rand() rand() 1.0]
 end
 
 

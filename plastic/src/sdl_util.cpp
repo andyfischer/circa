@@ -40,7 +40,8 @@ GLuint load_surface_to_texture(SDL_Surface *surface)
 
     GLenum internalFormat = (GLenum) surface->format->BytesPerPixel;
 
-    // Specify a particular format because Leopard decided to compress to GL_RGB5_A1.
+    // Specify a particular format in some cases, otherwise gl might interpret 4
+    // as GL_RGB5_A1.
     switch (pixelFormat) {
         case GL_RGB: case GL_BGR: internalFormat = GL_RGB; break;
         case GL_RGBA: case GL_BGRA: internalFormat = GL_RGBA; break;

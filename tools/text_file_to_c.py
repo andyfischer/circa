@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+def escape_line(line):
+    out = []
+    for c in line:
+        if c == '"': out.append('\\"')
+        elif c == '\\': out.append('\\\\')
+        else: out.append(c)
+    return "".join(out)
+
 def generate(sourceFile, variableName):
     source = open(sourceFile)
     out = []
@@ -14,6 +22,7 @@ def generate(sourceFile, variableName):
         line = source.readline()
         if line == "": break
         line = line[:-1]
+        line = escape_line(line)
         out.append('    "' + line + '\\n"')
 
     out[-1] += ";"
