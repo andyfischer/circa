@@ -3,7 +3,7 @@
 #include "string_t.h"
 
 namespace circa {
-namespace string_t {
+namespace new_string_t {
 
 struct StringData {
     int refCount;
@@ -56,4 +56,86 @@ StringData* mutate(StringData* original)
 }
 
 } // namespace string_t
+
+namespace string_t {
+
+    void initialize(Type* type, TaggedValue* value)
+    {
+        // temp:
+        STRING_T = &as_type(STRING_TYPE);
+
+        set_pointer(value, STRING_T, new std::string());
+    }
+    void release(TaggedValue* value)
+    {
+        delete ((std::string*) get_pointer(value));
+        set_pointer(value, NULL);
+    }
+
+    void copy(TaggedValue* source, TaggedValue* dest)
+    {
+        *((std::string*) get_pointer(dest, STRING_T)) = as_string(source);
+    }
+
+    bool equals(TaggedValue* lhs, TaggedValue* rhs)
+    {
+        if (!is_string(rhs)) return false;
+        return as_string(lhs) == as_string(rhs);
+    }
+
+    std::string to_string(TaggedValue* value)
+    {
+        std::stringstream result;
+        result << "'" << as_string(value) << "'";
+        return result.str();
+    }
+
+    void format_source(StyledSource* source, Term* term)
+    {
+        if (term->hasProperty("syntax:originalString")) {
+            append_phrase(source, term->stringProp("syntax:originalString"),
+                    term, token::STRING);
+            return;
+        }
+
+        std::string quoteType = term->stringPropOptional("syntax:quoteType", "'");
+        std::string result;
+        if (quoteType == "<")
+            result = "<<<" + as_string(term) + ">>>";
+        else
+            result = quoteType + as_string(term) + quoteType;
+
+        append_phrase(source, result, term, token::STRING);
+    }
+
+    void length(EvalContext*, Term* term)
+    {
+        set_int(term, int(term->input(0)->asString().length()));
+    }
+
+    void substr(EvalContext*, Term* term)
+    {
+        set_str(term, as_string(term->input(0)).substr(int_input(term, 1), int_input(term, 2)));
+    }
+
+    void setup_type(Type* type)
+    {
+        reset_type(type);
+        STRING_T->name = "string";
+        STRING_T->initialize = initialize;
+        STRING_T->release = release;
+        STRING_T->copy = copy;
+        STRING_T->equals = equals;
+        STRING_T->toString = to_string;
+        STRING_T->formatSource = format_source;
+    }
+
+    void postponed_setup_type(Type* type)
+    {
+        import_member_function(type, length, "length(string) -> int");
+        import_member_function(type, substr, "substr(string,int,int) -> string");
+    }
+}
+
+
 } // namespace circa
