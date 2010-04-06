@@ -791,7 +791,8 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     if (!tokens.nextIs(IDENTIFIER))
-        return compile_error_for_line(branch, tokens, startPosition, "Expected identifier after 'state'");
+        return compile_error_for_line(branch, tokens, startPosition,
+                "Expected identifier after 'state'");
 
     std::string name = tokens.consume(IDENTIFIER);
     possible_whitespace(tokens);
@@ -1255,9 +1256,6 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
         set_input_syntax_hint(result, 0, "postWhitespace", "");
         result->setStringProp("syntax:functionName", fieldName);
         result->setStringProp("syntax:declarationStyle", "member-function-call");
-
-        if (nameRebind != "")
-            result->setBoolProp("syntax:implicitNameBinding", true);
 
         return result;
     } else {

@@ -260,13 +260,28 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
         input, phrase_type::WHITESPACE);
 }
 
+bool is_member_function_call(Term* term)
+{
+    return term->stringPropOptional("syntax:declarationStyle", "") == "member-function-call";
+}
+
+bool has_implicit_name_binding(Term* term)
+{
+    if (term->name == "")
+        return false;
+    if (!is_member_function_call(term))
+        return false;
+    return function_t::get_input_placeholder(term->function, 0)
+        ->boolPropOptional("use-as-output", false);
+}
+
 void format_name_binding(StyledSource* source, Term* term)
 {
     if (term->name == "#out")
         append_phrase(source, "return ", term, phrase_type::UNDEFINED);
     else if (term->name == "")
         return;
-    else if (term->boolPropOptional("syntax:implicitNameBinding", false))
+    else if (has_implicit_name_binding(term))
         return;
     else if (term->hasProperty("syntax:rebindOperator"))
         return;

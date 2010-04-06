@@ -13,6 +13,7 @@ void change_function(Term* term, Term* function)
         throw std::runtime_error("Term "+function->name+" is not callable");
 
     // Check to specialize function
+    Term* originalFunction = function;
     function = specialize_function(function, term->inputs);
 
     term->function = function;
@@ -25,6 +26,8 @@ void change_function(Term* term, Term* function)
 
     if (newType != ANY_TYPE)
         change_type(term, newType);
+
+    term->setStringProp("syntax:functionName", get_relative_name(term, originalFunction));
 }
 
 void unsafe_change_type(Term *term, Term *type)

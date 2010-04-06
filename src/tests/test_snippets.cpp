@@ -428,6 +428,14 @@ void test_styled_source()
     test_snippet("styled_source = { 1 } -> branch_ref -> format_source", "");
 }
 
+void test_refactoring()
+{
+    test_snippet("s = { x = 1 } -> branch_ref; refactor:rename(s.get_index(0), 'y')",
+            "s.to_source() == ' y = 1 '");
+    test_snippet("s = { add(1 1) } -> branch_ref; refactor:change_function(s.get_index(2), sub)",
+            "s.to_source() == ' sub(1 1) '");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -457,6 +465,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_concat);
     REGISTER_TEST_CASE(test_snippets::test_misc);
     REGISTER_TEST_CASE(test_snippets::test_styled_source);
+    REGISTER_TEST_CASE(test_snippets::test_refactoring);
 }
 
 } // namespace test_snippets

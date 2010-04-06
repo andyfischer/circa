@@ -7,13 +7,9 @@ namespace text_input
 
     def input_character(TextInputState st, Keypress keypress) -> TextInputState
         if keypress.code == LEFT
-            if st.cursor > 0
-                st.cursor = st.cursor - 1
-            end
+            st.cursor = max(0, st.cursor - 1)
         elif keypress.code == RIGHT
-            if st.cursor < st.text.length()
-                st.cursor = st.cursor + 1
-            end
+            st.cursor = min(st.text.length(), st.cursor - 1)
         elif keypress.code == DELETE
 
         else
@@ -37,5 +33,8 @@ namespace text_input
             input_character(@tis, key)
         end
         print(tis)
+    end
+
+    def draw(TextInputState st, TTF_Font font, Point location)
     end
 end
