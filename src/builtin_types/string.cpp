@@ -113,9 +113,28 @@ namespace string_t {
         set_int(term, int(term->input(0)->asString().length()));
     }
 
-    void substr(EvalContext*, Term* term)
+    void substr(EvalContext* cxt, Term* term)
     {
-        set_str(term, as_string(term->input(0)).substr(int_input(term, 1), int_input(term, 2)));
+        int start = int_input(term, 1);
+        int end = int_input(term, 2);
+        std::string const& s = as_string(term->input(0));
+
+        // Negative indexes are relatve to end of string
+        if (start < 0) start = s.length() + start;
+        if (end < 0) end = s.length() + end;
+
+        if (start < 0) return error_occurred(cxt, term, "Index too far negative");
+        if (end < 0) return error_occurred(cxt, term, "Index too far negative");
+
+        if ((unsigned) start >= s.length())
+            return error_occurred(cxt, term, "Index out of bounds");
+        if ((unsigned) end >= s.length())
+            return error_occurred(cxt, term, "Index out of bounds");
+
+        if (end < start)
+            return set_str(term, "");
+
+        set_str(term, s.substr(start, start - end));
     }
 
     void setup_type(Type* type)

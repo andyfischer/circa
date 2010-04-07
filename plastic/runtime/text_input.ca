@@ -6,25 +6,19 @@ namespace text_input
     }
 
     def input_character(TextInputState st, Keypress keypress) -> TextInputState
+        text = st.text -> string
         if keypress.code == LEFT
-            st.cursor = max(0, st.cursor - 1)
+            st.cursor = round(max(0, st.cursor - 1))
         elif keypress.code == RIGHT
-            st.cursor = min(st.text.length(), st.cursor - 1)
+            st.cursor = round(min(text.length(), st.cursor + 1))
         elif keypress.code == DELETE
-
+            print('delete')
+            st.text = concat(text.substr(0, st.cursor), text.substr(st.cursor, text.length()))
         else
-            st.text = concat(st.text, keypress.character)
+            st.text = concat(text, keypress.character)
+            st.cursor = st.cursor + 1
         end
         return st
-    end
-
-    def buffer(bool clear)
-        state string current_text
-        if clear
-            current_text = ""
-        else
-
-        end
     end
 
     def test()
@@ -35,6 +29,4 @@ namespace text_input
         print(tis)
     end
 
-    def draw(TextInputState st, TTF_Font font, Point location)
-    end
 end

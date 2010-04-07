@@ -278,6 +278,7 @@ end
 
 -- Include other runtime scripts
 include('code_editor.ca')
+include('text_input.ca')
 include('ui_widgets.ca')
 
 -- Load the user's script
