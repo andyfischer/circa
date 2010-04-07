@@ -565,6 +565,11 @@ bool is_namespace(Term* term)
     return is_branch(term) && term->type == NAMESPACE_TYPE;
 }
 
+bool is_namespace(Branch& branch)
+{
+    return branch.owningTerm != NULL && is_namespace(branch.owningTerm);
+}
+
 std::string get_branch_source_filename(Branch& branch)
 {
     Term* attr = branch["#attr:source-file"];

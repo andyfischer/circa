@@ -62,11 +62,6 @@ def rotate_point(Point p, number rotation) -> Point
         p.x*sin(rotation)+p.y*cos(rotation)]
 end
 
-def random_location() -> Point
-    "Return a random point that is inside the boundaries of the window."
-    return [rand() * window.width, rand() * window.height]
-end
-
 def random_norm_vector() -> Point
     "Return a random normalized vector"
     angle = rand()

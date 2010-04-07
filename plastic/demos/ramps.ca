@@ -193,15 +193,15 @@ end
 
 -- User's movement of falling group
 users_movement = [0 0 0] -> FallingGroupPosition
-if key_pressed(DOWN)
+if key_pressed(key:down)
   users_movement.rot = -1
 end
-if key_pressed(UP)
+if key_pressed(key:up)
   users_movement.rot = users_movement.rot + 1
 end
 
-if key_pressed(LEFT); users_movement.x = -1 end
-if key_pressed(RIGHT); users_movement.x = users_movement.x + 1 end
+if key_pressed(key:left); users_movement.x = -1 end
+if key_pressed(key:right); users_movement.x = users_movement.x + 1 end
 
 users_requested_position = falling_group_pos + users_movement
 
@@ -441,4 +441,3 @@ for creature in @dying_creatures
 
     creature = [creature.loc creature.age+td]
 end
-

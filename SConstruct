@@ -28,7 +28,7 @@ if POSIX:
         env.SetOption('num_jobs', 2)
     map(common_flags, ALL)
     DEBUG.Append(CPPDEFINES = ["DEBUG"])
-    RELEASE.Append(CPPFLAGS=['-O2'])
+    RELEASE.Append(CPPFLAGS=['-O1'])
 
 if WINDOWS:
     def common_flags(env):

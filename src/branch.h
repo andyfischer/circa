@@ -111,6 +111,7 @@ bool is_branch_based_type(Term* type);
 void initialize_branch_based_type(Term* term);
 
 bool is_namespace(Term* term);
+bool is_namespace(Branch& branch);
 
 std::string get_branch_source_filename(Branch& branch);
 Branch* get_outer_scope(Branch const& branch);

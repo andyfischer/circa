@@ -7,11 +7,11 @@ namespace text_input
 
     def input_character(TextInputState st, Keypress keypress) -> TextInputState
         text = st.text -> string
-        if keypress.code == LEFT
+        if keypress.code == key:left
             st.cursor = round(max(0, st.cursor - 1))
-        elif keypress.code == RIGHT
+        elif keypress.code == key:right
             st.cursor = round(min(text.length(), st.cursor + 1))
-        elif keypress.code == DELETE
+        elif keypress.code == key:delete
             print('delete')
             st.text = concat(text.substr(0, st.cursor), text.substr(st.cursor, text.length()))
         else

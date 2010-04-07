@@ -47,9 +47,9 @@ namespace draw_ship
 end
 
 -- Keyboard controls for rotation
-if key_down(LEFT)
+if key_down(key:left)
     rotation = -1
-elif key_down(RIGHT)
+elif key_down(key:right)
     rotation = 1
 else
     rotation = 0
@@ -57,9 +57,9 @@ end
 ship.facing = ship.facing + rotation * rotation_speed * time_delta
 
 -- Keyboard controls for acceleration
-if key_down(UP)
+if key_down(key:up)
     thrust = 1
-elif key_down(DOWN)
+elif key_down(key:down)
     thrust = -1
 else
     thrust = 0
@@ -81,7 +81,7 @@ ship.loc = ship.loc + ship.momentum
 ship.loc = wrap_around(ship.loc)
 
 -- Press space to shoot a bullet
-if key_pressed(SPACE)
+if key_pressed(key:space)
     bullets.append([0, ship.loc [cos(ship.facing) sin(ship.facing)]] -> Bullet)
 end
 

@@ -280,13 +280,18 @@ void setup(Branch& branch)
     install_function(branch["mouse_wheel_down_anywhere"], mouse_wheel_down);
     install_function(branch["mouse_wheel_down_region"], mouse_wheel_down);
 
-    set_int(procure_int(branch, "UP"), SDLK_UP);
-    set_int(procure_int(branch, "DOWN"), SDLK_DOWN);
-    set_int(procure_int(branch, "LEFT"), SDLK_LEFT);
-    set_int(procure_int(branch, "RIGHT"), SDLK_RIGHT);
-    set_int(procure_int(branch, "SPACE"), SDLK_SPACE);
-    set_int(procure_int(branch, "KEY_B"), SDLK_b);
-    set_int(procure_int(branch, "DELETE"), SDLK_DELETE);
+    // Initialize key constants
+    Branch& key = as_branch(branch["key"]);
+    assert(is_namespace(key));
+
+    set_int(key["up"], SDLK_UP);
+    set_int(key["down"], SDLK_DOWN);
+    set_int(key["left"], SDLK_LEFT);
+    set_int(key["right"], SDLK_RIGHT);
+    set_int(key["space"], SDLK_SPACE);
+    set_int(key["delete"], SDLK_DELETE);
+    set_int(key["enter"], SDLK_RETURN);
+    set_int(key["escape"], SDLK_ESCAPE);
 }
 
 } // namespace input
