@@ -841,21 +841,6 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     return result;
 }
 
-int search_line_for_token(TokenStream& tokens, int target)
-{
-    int lookahead = 0;
-
-    while (!tokens.nextIs(NEWLINE, lookahead) && lookahead < tokens.length())
-    {
-        if (tokens.nextIs(target, lookahead))
-            return lookahead;
-
-        lookahead++;
-    }
-
-    return -1;
-}
-
 Term* expression_statement(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();

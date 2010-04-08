@@ -1,0 +1,21 @@
+
+# Implicit curry #
+
+This expression:
+
+add(^, 2)
+
+would be turned into a function:
+
+{ add(input(0), 2) }
+
+By default, ^ is limited to one expression. To enclose multiple, use {}s
+
+call_with_func({x = add(2,3), mult(^ x)})
+
+call_with_func() with
+  x = add(2,3)
+  mult(^ x)
+end
+
+

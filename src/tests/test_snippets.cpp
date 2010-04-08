@@ -70,6 +70,8 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
 
     if (result.errorOccurred) {
         std::cout << "Runtime error in: " << get_current_test_name() << std::endl;
+        std::cout << "setup: " << codeStr << std::endl;
+        std::cout << "assertion: " << assertionsStr << std::endl;
         print_runtime_error_formatted(result, std::cout);
         std::cout << std::endl;
         print_branch_raw(std::cout, code);
@@ -126,7 +128,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         return;
     }
 
-    std::string assertionsRepro = get_branch_source(assertions);
+    std::string assertionsRepro = get_branch_source_text(assertions);
     if (assertionsStr != assertionsRepro) {
         std::cout << "Source reproduction fail in: " << get_current_test_name() << std::endl;
         std::cout << "Expected: "
@@ -139,13 +141,49 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
 #endif
 }
 
+void test_snippet_runtime_error(std::string const& str)
+{
+    Branch code;
+    parser::compile(&code, parser::statement_list, str);
+
+    // Reproduce source of 'code', checked later.
+    std::string codeSourceRepro = get_branch_source_text(code);
+
+    if (has_static_errors(code)) {
+        std::cout << "In code snippet: " << str << std::endl;
+        print_static_errors_formatted(code, std::cout);
+        declare_current_test_failed();
+        return;
+    }
+
+    EvalContext result = evaluate_branch(code);
+
+    if (!result.errorOccurred) {
+        std::cout << "No runtime error occured: " << get_current_test_name() << std::endl;
+        std::cout << str << std::endl;
+        print_branch_raw(std::cout, code);
+        declare_current_test_failed();
+        return;
+    }
+}
+
 void test_strings()
 {
     test_snippet("", "''.length() == 0");
     test_snippet("", "'abc'.length() == 3");
     test_snippet("", "'abc'.substr(0,0) == ''");
     test_snippet("", "'abc'.substr(0,1) == 'a'");
-    test_snippet("", "'abc'.substr(1,3) == 'bc'");
+    test_snippet("", "'abc'.substr(1,2) == 'bc'");
+    test_snippet_runtime_error("'abc'.substr(-1,0)");
+    test_snippet_runtime_error("'abc'.substr(0,-1)");
+    test_snippet_runtime_error("'abc'.substr(4,0)");
+    test_snippet("", "'abc'.slice(0,-1) == 'ab'");
+    test_snippet("", "'abc'.slice(1,-1) == 'b'");
+    test_snippet("", "'abc'.slice(0,1) == 'a'");
+    test_snippet("", "'abc'.slice(0,3) == 'abc'");
+    test_snippet_runtime_error("'abc'.slice(4,0)");
+    test_snippet_runtime_error("'abc'.slice(0,5)");
+    test_snippet_runtime_error("'abc'.slice(0,-5)");
 }
 
 void test_equals_snippets()

@@ -119,6 +119,23 @@ namespace string_t {
         int end = int_input(term, 2);
         std::string const& s = as_string(term->input(0));
 
+        if (start < 0) return error_occurred(cxt, term, "Negative index");
+        if (end < 0) return error_occurred(cxt, term, "Negative index");
+
+        if ((unsigned) start >= s.length())
+            return error_occurred(cxt, term, "Index out of bounds");
+        if ((unsigned) (start+end) > s.length())
+            return error_occurred(cxt, term, "Index out of bounds");
+
+        set_str(term, s.substr(start, end));
+    }
+
+    void slice(EvalContext* cxt, Term* term)
+    {
+        int start = int_input(term, 1);
+        int end = int_input(term, 2);
+        std::string const& s = as_string(term->input(0));
+
         // Negative indexes are relatve to end of string
         if (start < 0) start = s.length() + start;
         if (end < 0) end = s.length() + end;
@@ -128,13 +145,13 @@ namespace string_t {
 
         if ((unsigned) start >= s.length())
             return error_occurred(cxt, term, "Index out of bounds");
-        if ((unsigned) end >= s.length())
+        if ((unsigned) end > s.length())
             return error_occurred(cxt, term, "Index out of bounds");
 
         if (end < start)
             return set_str(term, "");
 
-        set_str(term, s.substr(start, start - end));
+        set_str(term, s.substr(start, end - start));
     }
 
     void setup_type(Type* type)
@@ -153,6 +170,7 @@ namespace string_t {
     {
         import_member_function(type, length, "length(string) -> int");
         import_member_function(type, substr, "substr(string,int,int) -> string");
+        import_member_function(type, slice,  "slice(string,int,int) -> string");
     }
 }
 
