@@ -7,26 +7,33 @@ namespace assign_function {
 
     void evaluate(EvalContext* cxt, Term* caller)
     {
-        // The thing we are changing is on the left, the desired value is on the right
-        // This is a little confusing because the C function 'cast' is the other
-        // way around. The reason we have this order is because the infix operator :=
-        // arranges its inputs as target := source.
-        Term* target = caller->input(0);
-        Term* source = caller->input(1);
+        Term* lexpr = caller->input(0);
+        TaggedValue* value = caller->input(1);
 
-        if (!matches_type(declared_type(target), source)) {
-            error_occurred(cxt, caller,
-                    "Tried to assign a " + source->type->name + " to a "
-                    + target->type->name);
-            return;
+        // Check for get index expression: a[i]
+        if (lexpr->function == GET_INDEX_FUNC) {
+            Term* root = lexpr->input(0);
+            int index = lexpr->input(1)->asInt();
+            copy(root, caller);
+            copy(value, as_branch(caller)[index]);
+
+        // Check for get field expression: a.f
+        } else if (lexpr->function == GET_FIELD_FUNC) {
+            Term* root = lexpr->input(0);
+            std::string const& fieldName = lexpr->input(1)->asString();
+            int index = root->value_type->findFieldIndex(fieldName);
+
+            if (index == -1)
+                return error_occurred(cxt, caller, "field not found: "+fieldName);
+
+            copy(root, caller);
+            copy(value, as_branch(caller)[index]);
         }
-
-        cast(source, target);
     }
 
     void setup(Branch& kernel)
     {
-        ASSIGN_FUNC = import_function(kernel, evaluate, "assign(any, any)");
+        import_function(kernel, evaluate, "assign(any, any) -> any");
     }
 }
 }

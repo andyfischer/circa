@@ -1066,7 +1066,7 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "==") return "equals";
     else if (infix == "or") return "or";
     else if (infix == "and") return "and";
-    else if (infix == ":=") return "assign";
+    else if (infix == ":=") return "unsafe_assign";
     else if (infix == "+=") return "add";
     else if (infix == "-=") return "sub";
     else if (infix == "*=") return "mult";

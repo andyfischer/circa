@@ -250,7 +250,7 @@ void test_do_once()
     Branch branch;
     Term* x = branch.eval("x = 1");
     Term* t = branch.compile("do_once()");
-    t->asBranch().compile("assign(x,2)");
+    t->asBranch().compile("unsafe_assign(x,2)");
 
     test_assert(as_int(x) == 1);
 
