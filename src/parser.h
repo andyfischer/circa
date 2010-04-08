@@ -61,7 +61,6 @@ Term* identifier_with_rebind(Branch& branch, TokenStream& tokens);
 // Helper functions:
 void consume_branch(Branch& branch, TokenStream& tokens);
 void consume_branch_with_significant_indentation(Branch& branch, TokenStream& tokens);
-std::string qualified_identifier_str(TokenStream& tokens);
 bool lookahead_match_whitespace_statement(TokenStream& tokens);
 bool lookahead_match_comment_statement(TokenStream& tokens);
 

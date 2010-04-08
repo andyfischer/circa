@@ -1163,8 +1163,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
 Term* unary_expression(Branch& branch, TokenStream& tokens)
 {
-    // int startPosition = tokens.getPosition();
-
+    // Unary minus
     if (tokens.nextIs(MINUS)) {
         tokens.consume(MINUS);
         Term* expr = subscripted_atom(branch, tokens);
@@ -1187,30 +1186,7 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
         return apply(branch, NEG_FUNC, RefList(expr));
     }
 
-#if 0
-    if (tokens.nextIs(AMPERSAND)) {
-        tokens.consume(AMPERSAND);
-        Term* expr = subscripted_atom(branch, tokens);
-        return apply(branch, REF_FUNC, RefList(expr));
-    }
-#endif
-
     return subscripted_atom(branch, tokens);
-}
-
-std::string dotted_name_get_original_string(Term* gfTerm)
-{
-    if (gfTerm->function != GET_FIELD_FUNC)
-        return gfTerm->name;
-
-    if (gfTerm->numInputs() == 0)
-        return "";
-
-    std::stringstream out;
-    out << gfTerm->input(0)->name;
-    for (int i=1; i < gfTerm->numInputs(); i++)
-        out << "." << gfTerm->input(i)->asString();
-    return out.str();
 }
 
 Term* member_function_call(Branch& branch, Term* function, RefList const& _inputs,
@@ -1286,7 +1262,6 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
     tokens.consume(RPAREN);
     
-    //std::string originalName = dotted_name_get_original_string(function);
     std::string originalName = function->name;
 
     Term* result = NULL;
@@ -1395,16 +1370,6 @@ Term* subscripted_atom(Branch& branch, TokenStream& tokens)
     };
 
     return result;
-}
-
-std::string qualified_identifier_str(TokenStream& tokens)
-{
-    // this function is not very useful any more
-    if (tokens.nextIs(IDENTIFIER))
-        return tokens.consume(IDENTIFIER);
-    else if (tokens.nextIs(QUALIFIED_IDENTIFIER))
-        return tokens.consume(QUALIFIED_IDENTIFIER);
-    else return "";
 }
 
 bool lookahead_match_whitespace_statement(TokenStream& tokens)

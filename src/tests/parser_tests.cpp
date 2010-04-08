@@ -461,13 +461,6 @@ void test_literal_list()
     test_assert(as_branch(l)[2]->function->name == "sqrt");
 }
 
-void test_anonymous_type_in_subroutine_decl()
-{
-    Branch branch;
-    //branch.eval("def myfunc([int] a) : int\nend");
-    // TODO
-}
-
 void test_namespace()
 {
     Branch branch;
@@ -504,31 +497,6 @@ void test_member_function_calls()
     Term* s = branch.eval("r.name()");
     test_assert(branch);
     test_assert(s->asString() == "x");
-}
-
-void test_dot_separated_identifier()
-{
-#if 0
-    Branch branch;
-    Term* x = branch.eval("x = 1");
-    branch.eval("namespace a namespace b y = 44 end end");
-    branch.eval("type T { int w }");
-    branch.eval("namespace c v = T() end");
-
-    int branchLength = branch.length();
-
-    test_assert(x == parser::compile(&branch, parser::dot_separated_identifier, "x"));
-    test_assert(branchLength == branch.length());
-
-    Term* y = parser::compile(&branch, parser::dot_separated_identifier, "a.b.y");
-    test_assert(is_int(y));
-    test_assert(as_int(y) == 44);
-    test_assert(branchLength == branch.length());
-
-    Term* v = parser::compile(&branch, parser::dot_separated_identifier, "c.v.w");
-    test_assert(is_branch(v));
-    test_assert(branchLength == branch.length());
-#endif
 }
 
 void test_subscripted_atom()
@@ -648,27 +616,6 @@ void test_sig_indent_one_liner()
     test_equals(branch[1]->asInt(), 4);
 }
 
-void test_qualified_identifier()
-{
-    TokenStream tokens;
-
-    tokens.reset("apple");
-    test_equals(parser::qualified_identifier_str(tokens), "apple");
-    tokens.reset("apple:pear");
-    test_equals(parser::qualified_identifier_str(tokens), "apple:pear");
-    tokens.reset("apple:pear:banana");
-    test_equals(parser::qualified_identifier_str(tokens), "apple:pear:banana");
-
-    tokens.reset("apple:");
-    test_equals(parser::qualified_identifier_str(tokens), "apple");
-    test_assert(tokens.nextIs(token::COLON));
-
-    tokens.reset("");
-    test_equals(parser::qualified_identifier_str(tokens), "");
-    tokens.reset("1");
-    test_equals(parser::qualified_identifier_str(tokens), "");
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -699,16 +646,13 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_float_division);
     REGISTER_TEST_CASE(parser_tests::test_integer_division);
     REGISTER_TEST_CASE(parser_tests::test_literal_list);
-    REGISTER_TEST_CASE(parser_tests::test_anonymous_type_in_subroutine_decl);
     REGISTER_TEST_CASE(parser_tests::test_namespace);
     REGISTER_TEST_CASE(parser_tests::test_member_function_calls);
-    REGISTER_TEST_CASE(parser_tests::test_dot_separated_identifier);
     REGISTER_TEST_CASE(parser_tests::test_subscripted_atom);
     REGISTER_TEST_CASE(parser_tests::test_whitespace_after_statement);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation2);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_one_liner);
-    REGISTER_TEST_CASE(parser_tests::test_qualified_identifier);
 }
 
 } // namespace parser_tests
