@@ -1,8 +1,6 @@
 
 
 Bugs:
- - Need min() and max() for integers
-
  - This field access doesn't work:
    type T { string s }
    v = T()

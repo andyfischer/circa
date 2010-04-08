@@ -45,9 +45,7 @@ namespace add_function {
         function_t::get_feedback_func(add_f) =
             import_function(kernel, feedback_evaluate, "add_feedback(any, number) -> Branch");
 
-        ADD_FUNC = create_overloaded_function(kernel, "add");
-        create_ref(as_branch(ADD_FUNC), add_i);
-        create_ref(as_branch(ADD_FUNC), add_f);
+        ADD_FUNC = create_overloaded_function(kernel, "add", RefList(add_i, add_f));
     }
 } // namespace add_function
 } // namespace circa

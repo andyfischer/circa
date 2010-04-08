@@ -350,9 +350,13 @@ bool inputs_fit_function(Term* func, RefList const& inputs)
     return true;
 }
 
-Term* create_overloaded_function(Branch& branch, std::string const& name)
+Term* create_overloaded_function(Branch& branch, std::string const& name,
+        RefList const& overloads)
 {
-    return create_value(branch, OVERLOADED_FUNCTION_TYPE, name);
+    Term* result = create_value(branch, OVERLOADED_FUNCTION_TYPE, name);
+    for (int i=0; i < overloads.length(); i++)
+        create_ref(as_branch(result), overloads[i]);
+    return result;
 }
 
 Term* function_get_specialized_output_type(Term* function, Term* call)

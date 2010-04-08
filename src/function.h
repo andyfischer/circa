@@ -91,7 +91,8 @@ void initialize_function_prototype(Branch& contents);
 
 bool is_callable(Term* term);
 bool inputs_fit_function(Term* function, RefList const& inputs);
-Term* create_overloaded_function(Branch& branch, std::string const& name);
+Term* create_overloaded_function(Branch& branch, std::string const& name,
+        RefList const& overloads=RefList());
 Term* function_get_specialized_output_type(Term* function, Term* call);
 void function_set_use_input_as_output(Term* function, int index, bool value);
 
