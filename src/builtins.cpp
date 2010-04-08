@@ -57,6 +57,7 @@ Term* UNKNOWN_FIELD_FUNC = NULL;
 Term* UNKNOWN_IDENTIFIER_FUNC = NULL;
 Term* UNKNOWN_TYPE_FUNC = NULL;
 Term* UNRECOGNIZED_EXPRESSION_FUNC = NULL;
+Term* UNSAFE_ASSIGN_FUNC = NULL;
 Term* VALUE_FUNC = NULL;
 
 Term* ANY_TYPE = NULL;
@@ -247,7 +248,7 @@ void post_setup_builtin_functions(Branch& kernel)
     // Add to div() overloads
     create_ref(as_branch(DIV_FUNC), div_s);
 
-    function_t::get_feedback_func(VALUE_FUNC) = ASSIGN_FUNC;
+    function_t::get_feedback_func(VALUE_FUNC) = UNSAFE_ASSIGN_FUNC;
     hide_from_docs(VALUE_FUNC);
 }
 

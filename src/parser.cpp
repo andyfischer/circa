@@ -300,6 +300,11 @@ Term* statement(Branch& branch, TokenStream& tokens)
         result = discard_statement(branch, tokens);
     }
 
+    // Namespace block
+    else if (tokens.nextIs(NAMESPACE)) {
+        result = namespace_block(branch, tokens);
+    }
+
     // Otherwise, expression statement
     else {
         result = expression_statement(branch, tokens);
@@ -829,7 +834,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
         post_parse_branch(as_branch(initialization));
 
-        apply(as_branch(initialization), ASSIGN_FUNC, RefList(result, initialValue));
+        apply(as_branch(initialization), UNSAFE_ASSIGN_FUNC, RefList(result, initialValue));
 
         if (result->type == ANY_TYPE)
             specialize_type(result, initialValue->type);
@@ -845,69 +850,56 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
+    // Lookahead for a name binding.
+    std::string nameBinding;
+    std::string preEqualsSpace;
+    std::string postEqualsSpace;
+    if (lookahead_match_leading_name_binding(tokens)) {
+        nameBinding = tokens.consume(IDENTIFIER);
+        preEqualsSpace = possible_whitespace(tokens);
+        tokens.consume(EQUALS);
+        postEqualsSpace = possible_whitespace(tokens);
+    }
+
+    // Parse an infix expression
     int originalBranchLength = branch.length();
+
     Term* expr = infix_expression(branch, tokens);
+    assert(expr != NULL);
+
     bool expr_is_new = branch.length() != originalBranchLength;
 
     for (int i=0; i < expr->numInputs(); i++)
         recursively_mark_terms_as_occuring_inside_an_expression(expr->input(i));
 
-    assert(expr != NULL);
+    expr->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
+    expr->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
 
-    // If the next thing is not an = operator, then finish up.
-    if (!tokens.nextNonWhitespaceIs(EQUALS)) {
+    // If the expr is just an identifier, then create an implicit copy()
+    if (expr->name != "" && !expr_is_new)
+        expr = apply_with_syntax(branch, COPY_FUNC, RefList(expr));
 
-        std::string pendingRebind = pop_pending_rebind(branch);
-
-        // If the expr is just an identifier, then create an implicit copy()
-        if (expr->name != "" && !expr_is_new)
-            expr = apply(branch, COPY_FUNC, RefList(expr));
-
-        if (pendingRebind != "") {
-            branch.bindName(expr, pendingRebind);
-            expr->setStringProp("syntax:rebindOperator", pendingRebind);
-        }
-
-        return expr;
-    }
-
-    // Otherwise, this is an assignment statement.
-    Term* lexpr = expr; // rename for clarity
-
-    // If the name wasn't recognized, then it will create a call to unknown_identifier().
-    // Delete this before parsing the rexpr.
-    std::string new_name_binding = "";
-    if ((lexpr->function == UNKNOWN_IDENTIFIER_FUNC) && expr_is_new) {
-        new_name_binding = lexpr->name;
-        branch.remove(lexpr);
-    }
-
-    std::string preEqualsSpace = possible_whitespace(tokens);
-    tokens.consume(EQUALS);
-    std::string postEqualsSpace = possible_whitespace(tokens);
-
-    Term* rexpr = infix_expression(branch, tokens);
-    for (int i=0; i < rexpr->numInputs(); i++)
-        recursively_mark_terms_as_occuring_inside_an_expression(rexpr->input(i));
-
-    // If the rexpr is just an identifier, then create an implicit copy()
-    if (rexpr->name != "")
-        rexpr = apply_with_syntax(branch, COPY_FUNC, RefList(rexpr));
-
-    rexpr->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
-    rexpr->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
-
-    // Now take a look at the lexpr.
-    
     // Check to bind a new name
-    if (new_name_binding != "") {
-        branch.bindName(rexpr, new_name_binding);
+    if (nameBinding != "")
+        branch.bindName(expr, nameBinding);
+
+    // Apply a pending rebind
+    std::string pendingRebind = pop_pending_rebind(branch);
+
+    if (pendingRebind != "") {
+        branch.bindName(expr, pendingRebind);
+        expr->setStringProp("syntax:rebindOperator", pendingRebind);
     }
 
-    // Or, maybe the name already exists
-    else if (lexpr->name != "") {
-        branch.bindName(rexpr, lexpr->name);
+    // If the term was an assign() term, then we may need to rebind the root name.
+    if (expr->function == ASSIGN_FUNC) {
+        Term* lexprRoot = find_lexpr_root(expr->input(0));
+        if (lexprRoot != NULL && lexprRoot->name != "") {
+            branch.bindName(expr, lexprRoot->name);
+        }
     }
+
+#if 0
 
     // Or, maybe it was parsed as a field access. Turn this into a set_field
     else if (lexpr->function == GET_FIELD_FUNC) {
@@ -941,10 +933,11 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     else {
         return compile_error_for_line(rexpr, tokens, startPosition);
     }
+#endif
 
-    set_source_location(rexpr, startPosition, tokens);
+    set_source_location(expr, startPosition, tokens);
 
-    return rexpr;
+    return expr;
 }
 
 Term* return_statement(Branch& branch, TokenStream& tokens)
@@ -1027,7 +1020,6 @@ int get_infix_precedence(int match)
         case token::PLUS:
         case token::MINUS:
             return 6;
-            //return 5;
         case token::LTHAN:
         case token::LTHANEQ:
         case token::GTHAN:
@@ -1045,6 +1037,7 @@ int get_infix_precedence(int match)
             return 2;
         case token::COLON_EQUALS:
         case token::LEFT_ARROW:
+        case token::EQUALS:
             return 0;
         default:
             return -1;
@@ -1066,6 +1059,7 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "==") return "equals";
     else if (infix == "or") return "or";
     else if (infix == "and") return "and";
+    else if (infix == "=") return "assign";
     else if (infix == ":=") return "unsafe_assign";
     else if (infix == "+=") return "add";
     else if (infix == "-=") return "sub";
@@ -1339,6 +1333,7 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
         } else {
             head = apply(branch, GET_FIELD_FUNC, RefList(head, create_string(branch, ident)));
             set_source_location(head, startPosition, tokens);
+            set_input_syntax_hint(head, 0, "postWhitespace", "");
         }
         finished = false;
         return head;
@@ -1387,6 +1382,27 @@ bool lookahead_match_comment_statement(TokenStream& tokens)
     return tokens.nextIs(COMMENT, lookahead);
 }
 
+bool lookahead_match_leading_name_binding(TokenStream& tokens)
+{
+    int lookahead = 0;
+    if (!tokens.nextIs(IDENTIFIER, lookahead++))
+        return false;
+    if (tokens.nextIs(WHITESPACE, lookahead))
+        lookahead++;
+    if (!tokens.nextIs(EQUALS, lookahead++))
+        return false;
+    return true;
+}
+
+Term* find_lexpr_root(Term* term)
+{
+    if (term->function == GET_FIELD_FUNC)
+        return find_lexpr_root(term->input(0));
+    if (term->function == GET_INDEX_FUNC)
+        return find_lexpr_root(term->input(0));
+    return term;
+}
+
 Term* atom(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
@@ -1431,10 +1447,6 @@ Term* atom(Branch& branch, TokenStream& tokens)
     // plain branch?
     else if (tokens.nextIs(BEGIN) || tokens.nextIs(LBRACE))
         result = plain_branch(branch, tokens);
-
-    // namespace?
-    else if (tokens.nextIs(NAMESPACE))
-        result = namespace_block(branch, tokens);
 
     // parenthesized expression?
     else if (tokens.nextIs(LPAREN)) {

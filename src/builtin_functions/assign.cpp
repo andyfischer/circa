@@ -31,9 +31,15 @@ namespace assign_function {
         }
     }
 
+    Term* specializeType(Term* term)
+    {
+        return parser::find_lexpr_root(term->input(0))->type;
+    }
+
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "assign(any, any) -> any");
+        ASSIGN_FUNC = import_function(kernel, evaluate, "assign(any, any) -> any");
+        function_t::get_attrs(ASSIGN_FUNC).specializeType = specializeType;
     }
 }
 }

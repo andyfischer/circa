@@ -105,7 +105,7 @@ void post_parse_branch(Branch& branch)
             if (result == term)
                 continue;
 
-            Term* assign = apply(branch, ASSIGN_FUNC, RefList(term, result));
+            Term* assign = apply(branch, UNSAFE_ASSIGN_FUNC, RefList(term, result));
             set_source_hidden(assign, true);
         }
     }

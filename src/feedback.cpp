@@ -84,7 +84,7 @@ void normalize_feedback_branch(Branch& branch)
 
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
-        if (term->function == ASSIGN_FUNC) {
+        if (term->function == UNSAFE_ASSIGN_FUNC) {
             Term* target = term->input(0);
             termToAssignTerms[target].push_back(i);
         }
@@ -115,7 +115,7 @@ void normalize_feedback_branch(Branch& branch)
             Term* accumulator = apply(branch, AVERAGE_FUNC, accumulatorInputs);
 
             // assign() this
-            apply(branch, ASSIGN_FUNC, RefList(accumulator, target));
+            apply(branch, UNSAFE_ASSIGN_FUNC, RefList(accumulator, target));
         }
     }
 

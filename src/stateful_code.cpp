@@ -157,7 +157,7 @@ void mark_stateful_value_assigned(Term* term)
     Branch& doOnceBranch = as_branch(secondTerm);
     if (doOnceBranch.length() == 0) return;
     Term* assignTerm = doOnceBranch[doOnceBranch.length()-1];
-    if (assignTerm->function != ASSIGN_FUNC) return;
+    if (assignTerm->function != UNSAFE_ASSIGN_FUNC) return;
     if (assignTerm->input(0) != term) return;
 
     Term* doOnceHiddenState = followingTerm;

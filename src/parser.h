@@ -63,6 +63,8 @@ void consume_branch(Branch& branch, TokenStream& tokens);
 void consume_branch_with_significant_indentation(Branch& branch, TokenStream& tokens);
 bool lookahead_match_whitespace_statement(TokenStream& tokens);
 bool lookahead_match_comment_statement(TokenStream& tokens);
+bool lookahead_match_leading_name_binding(TokenStream& tokens);
+Term* find_lexpr_root(Term* term);
 
 } // namespace parser
 } // namespace circa

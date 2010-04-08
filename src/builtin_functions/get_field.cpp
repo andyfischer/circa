@@ -47,8 +47,9 @@ namespace get_field_function {
     void formatSource(StyledSource* source, Term* term)
     {
         format_name_binding(source, term);
-        append_phrase(source, get_relative_name(term, term->input(0)),
-                term, phrase_type::UNDEFINED);
+        //append_phrase(source, get_relative_name(term, term->input(0)),
+        //        term, phrase_type::UNDEFINED);
+        format_source_for_input(source, term, 0);
         for (int i=1; i < term->numInputs(); i++) {
             append_phrase(source, ".", term, token::DOT);
             append_phrase(source, term->input(i)->asString(),

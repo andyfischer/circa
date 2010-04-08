@@ -48,6 +48,7 @@ extern Term* UNKNOWN_FIELD_FUNC;
 extern Term* UNKNOWN_IDENTIFIER_FUNC;
 extern Term* UNKNOWN_TYPE_FUNC;
 extern Term* UNRECOGNIZED_EXPRESSION_FUNC;
+extern Term* UNSAFE_ASSIGN_FUNC;
 extern Term* VALUE_FUNC;
 
 extern Term* ANY_TYPE;

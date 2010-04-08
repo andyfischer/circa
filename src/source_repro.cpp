@@ -154,7 +154,8 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
             term->function->name);
 
     // Check for an infix operator with implicit rebinding (like +=).
-    if (infix && is_infix_operator_rebinding(functionName)) {
+    if (infix && 
+            is_infix_operator_rebinding(functionName)) {
         append_phrase(source, term->name.c_str(), term, phrase_type::UNDEFINED);
         append_phrase(source, " ", term, phrase_type::WHITESPACE);
         append_phrase(source, functionName.c_str(), term, phrase_type::INFIX_OPERATOR);
@@ -162,7 +163,9 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         return;
     }
 
-    format_name_binding(source, term);
+    // Don't prepend name binding for certain functions
+    if (term->function != ASSIGN_FUNC)
+        format_name_binding(source, term);
 
     // possibly add parens
     int numParens = term->intPropOptional("syntax:parens", 0);
