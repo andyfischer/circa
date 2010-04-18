@@ -96,6 +96,38 @@ TaggedValue* get_element(TaggedValue* value, int index)
     return getElement(value, index);
 }
 
+void set_element(TaggedValue* value, int index, TaggedValue* element)
+{
+    Type::SetElement setElement = value->value_type->setElement;
+
+    if (setElement == NULL)
+        assert(false);
+        //throw std::runtime_error("No setElement function available on type "
+        //        + value->value_type->name);
+
+    setElement(value, index, element);
+}
+
+TaggedValue* get_field(TaggedValue* value, const char* field)
+{
+    Type::GetField getField = value->value_type->getField;
+
+    if (getField == NULL)
+        throw std::runtime_error("No getField function available");
+
+    return getField(value, field);
+}
+
+void set_field(TaggedValue* value, const char* field, TaggedValue* element)
+{
+    Type::SetField setField = value->value_type->setField;
+
+    if (setField == NULL)
+        throw std::runtime_error("No setField function available");
+
+    setField(value, field, element);
+}
+
 int num_elements(TaggedValue* value)
 {
     Type::NumElements numElements = value->value_type->numElements;

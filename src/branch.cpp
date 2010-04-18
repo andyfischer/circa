@@ -340,7 +340,6 @@ Branch::eval(std::string const& code)
 }
 
 namespace branch_t {
-
     void initialize(Type*, TaggedValue* value)
     {
         set_pointer(value, new Branch());
@@ -359,7 +358,7 @@ namespace branch_t {
         assert_valid_branch(&source);
         assert_valid_branch(&dest);
 
-        copy(source, dest);
+        branch_copy(source, dest);
     }
 
     void cast(Type*, TaggedValue* sourceValue, TaggedValue* destValue)
@@ -372,7 +371,7 @@ namespace branch_t {
         // For Branch or List type, overwrite existing shape
         if ((destValue->value_type == &as_type(BRANCH_TYPE))
                 || (destValue->value_type == &as_type(LIST_TYPE)))
-            copy(source, dest);
+            branch_copy(source, dest);
         else
             assign(source, dest);
     }
@@ -416,13 +415,29 @@ namespace branch_t {
         return b[index];
     }
 
+    void set_element(TaggedValue* value, int index, TaggedValue* element)
+    {
+        circa::copy(element, as_branch(value)[index]);
+    }
+
+    TaggedValue* get_field(TaggedValue* value, const char* name)
+    {
+        Branch& b = as_branch(value);
+        return b[name];
+    }
+
+    void set_field(TaggedValue* value, const char* name, TaggedValue* element)
+    {
+        circa::copy(value, as_branch(value)[name]);
+    }
+
     int num_elements(TaggedValue* value)
     {
         Branch& b = as_branch(value);
         return b.length();
     }
 
-    void copy(Branch& source, Branch& dest)
+    void branch_copy(Branch& source, Branch& dest)
     {
         assert_valid_branch(&source);
         assert_valid_branch(&dest);
@@ -463,7 +478,7 @@ namespace branch_t {
         // Temporary special case, if the two branches have different sizes then
         // do a copy instead. This should be removed.
         if (source.length() != dest.length())
-            return copy(source, dest);
+            return branch_copy(source, dest);
 
         for (int i=0; i < source.length(); i++)
             cast(source[i], dest[i]);
@@ -556,6 +571,9 @@ void initialize_branch_based_type(Term* term)
     type->equals = branch_t::equals;
     type->matchesType = branch_t::matches_type;
     type->getElement = branch_t::get_element;
+    type->setElement = branch_t::set_element;
+    type->getField = branch_t::get_field;
+    type->setField = branch_t::set_field;
     type->numElements = branch_t::num_elements;
     type->toString = compound_type_to_string;
 }

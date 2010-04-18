@@ -16,6 +16,9 @@ void reset(TaggedValue* value);
 std::string to_string(TaggedValue* value);
 bool matches_type(Type* type, Term* term);
 TaggedValue* get_element(TaggedValue* value, int index);
+void set_element(TaggedValue* value, int index, TaggedValue* element);
+TaggedValue* get_field(TaggedValue* value, const char* field);
+void set_field(TaggedValue* value, const char* field, TaggedValue* element);
 int num_elements(TaggedValue* value);
 void mutate(TaggedValue* value);
 

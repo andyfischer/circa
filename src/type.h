@@ -32,6 +32,9 @@ struct Type
     typedef bool (*MatchesType)(Type* type, Term* term);
     typedef void (*Mutate)(TaggedValue* value);
     typedef TaggedValue* (*GetElement)(TaggedValue* value, int index);
+    typedef void (*SetElement)(TaggedValue* value, int index, TaggedValue* element);
+    typedef TaggedValue* (*GetField)(TaggedValue* value, const char* field);
+    typedef void (*SetField)(TaggedValue* value, const char* field, TaggedValue* element);
     typedef int (*NumElements)(TaggedValue* value);
 
     std::string name;
@@ -55,6 +58,9 @@ struct Type
     MatchesType matchesType;
     Mutate mutate;
     GetElement getElement;
+    SetElement setElement;
+    GetField getField;
+    SetField setField;
     NumElements numElements;
     
     Branch prototype;
@@ -91,6 +97,9 @@ private:
         matchesType(NULL),
         mutate(NULL),
         getElement(NULL),
+        setElement(NULL),
+        getField(NULL),
+        setField(NULL),
         numElements(NULL),
         refCount(0),
         permanent(false)

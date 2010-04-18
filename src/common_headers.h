@@ -36,14 +36,15 @@ struct EvalContext;
 struct FeedbackOperation;
 struct Function;
 struct FunctionAttrs;
-struct TaggedValue;
-struct Term;
-struct Type;
-struct TypeRef;
+struct PathExpression;
 struct Ref;
 struct RefList;
 struct ReferenceMap;
 struct StyledSource;
+struct TaggedValue;
+struct Term;
+struct Type;
+struct TypeRef;
 
 } // namespace circa
 

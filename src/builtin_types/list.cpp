@@ -13,6 +13,7 @@ namespace circa {
 namespace list_t {
 
 bool is_list(TaggedValue* value);
+void tv_mutate(TaggedValue* value);
 static ListData* mutate(ListData* data);
 
 struct ListData {
@@ -264,6 +265,17 @@ TaggedValue* tv_get_element(TaggedValue* value, int index)
     return &s->items[index];
 }
 
+void tv_set_element(TaggedValue* value, int index, TaggedValue* element)
+{
+    assert(is_list(value));
+    ListData* s = (ListData*) get_pointer(value);
+    assert(s);
+    assert(s->count > index);
+
+    tv_mutate(value);
+    copy(element, &s->items[index]);
+}
+
 int tv_num_elements(TaggedValue* value)
 {
     assert(is_list(value));
@@ -303,6 +315,7 @@ void setup_type(Type* type)
     type->copy = tv_copy;
     type->toString = tv_to_string;
     type->getElement = tv_get_element;
+    type->setElement = tv_set_element;
     type->numElements = tv_num_elements;
     type->mutate = tv_mutate;
     type->matchesType = tv_matches_type;

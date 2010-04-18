@@ -1,4 +1,8 @@
 
+ - Test branch get field & set field
+ - Test list's set index; make sure it doesn't leak changes
+
+
 
 Bugs:
  - This field access doesn't work:

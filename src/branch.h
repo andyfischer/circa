@@ -100,7 +100,7 @@ namespace branch_t {
     TaggedValue* get_element(TaggedValue* value, int index);
     int num_elements(TaggedValue* value);
 
-    void copy(Branch& source, Branch& dest);
+    void branch_copy(Branch& source, Branch& dest);
     void assign(Branch& source, Branch& dest);
 }
 
