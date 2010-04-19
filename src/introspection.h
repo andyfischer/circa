@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_INTROSPECTION_INCLUDED
-#define CIRCA_INTROSPECTION_INCLUDED
+#pragma once
 
 // introspection.h
 //
@@ -50,5 +49,3 @@ void print_term_to_string_extended(std::ostream& out, Term* term);
 std::string get_term_to_string_extended(Term*);
 
 }
-
-#endif

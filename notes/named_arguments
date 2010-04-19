@@ -1,0 +1,19 @@
+
+Need to support named arguments.
+
+Example:
+
+def get_distance(Point a, Point b)
+end
+
+can be called like:
+
+get_distance(b: [1 0], a: [5 3])
+
+In compiled code, the inputs should be arranged in the correct order. Reasons:
+ - Faster for the executing function
+ - Easier for introspection, avoids confusion
+
+Argument name is a source-code-level concern. Need to store their usage of argument names:
+
+  syntax:input-X:argument_name

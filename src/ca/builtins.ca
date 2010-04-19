@@ -9,7 +9,7 @@ def toggle(bool tog) -> bool
     return on
 end
 
-def approach(number target, number step) -> number:
+def approach(number target, number step) -> number
     <<<
     Stateful function, returns a result which approaches 'target'. Each frame, this function
     will change at most by 'step'
@@ -22,7 +22,6 @@ def approach(number target, number step) -> number:
     end
     return current
 end
-
 
 namespace styled_source
     literal_string = 1
@@ -99,5 +98,3 @@ end
 def random_color() -> Color
     return [rand() rand() rand() 1.0]
 end
-
-
