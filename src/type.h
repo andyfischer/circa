@@ -31,8 +31,8 @@ struct Type
     typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
     typedef bool (*MatchesType)(Type* type, Term* term);
     typedef void (*Mutate)(TaggedValue* value);
-    typedef TaggedValue* (*GetElement)(TaggedValue* value, int index);
-    typedef void (*SetElement)(TaggedValue* value, int index, TaggedValue* element);
+    typedef TaggedValue* (*GetIndex)(TaggedValue* value, int index);
+    typedef void (*SetIndex)(TaggedValue* value, int index, TaggedValue* element);
     typedef TaggedValue* (*GetField)(TaggedValue* value, const char* field);
     typedef void (*SetField)(TaggedValue* value, const char* field, TaggedValue* element);
     typedef int (*NumElements)(TaggedValue* value);
@@ -57,8 +57,8 @@ struct Type
     ValueFitsType valueFitsType;
     MatchesType matchesType;
     Mutate mutate;
-    GetElement getElement;
-    SetElement setElement;
+    GetIndex getIndex;
+    SetIndex setIndex;
     GetField getField;
     SetField setField;
     NumElements numElements;
@@ -96,8 +96,8 @@ private:
         valueFitsType(NULL),
         matchesType(NULL),
         mutate(NULL),
-        getElement(NULL),
-        setElement(NULL),
+        getIndex(NULL),
+        setIndex(NULL),
         getField(NULL),
         setField(NULL),
         numElements(NULL),

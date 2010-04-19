@@ -7,7 +7,7 @@ namespace indexable_t {
 
     bool matches_type(Type* type, Term* term)
     {
-        return declared_type(term)->getElement != NULL
+        return declared_type(term)->getIndex != NULL
             && declared_type(term)->numElements != NULL;
     }
     void setup_type(Type* type)

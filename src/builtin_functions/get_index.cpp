@@ -8,7 +8,7 @@ namespace get_index_function {
     void evaluate(EvalContext* cxt, Term* caller)
     {
         int index = as_int(caller->input(1));
-        TaggedValue* result = get_element(caller->input(0), index);
+        TaggedValue* result = get_index(caller->input(0), index);
 
         if (result == NULL) {
             std::stringstream err;

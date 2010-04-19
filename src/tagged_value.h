@@ -28,8 +28,8 @@ struct TaggedValue
 
     void reset();
     std::string toString();
-    inline TaggedValue* operator[](int index) { return getElement(index); }
-    TaggedValue* getElement(int index);
+    inline TaggedValue* operator[](int index) { return getIndex(index); }
+    TaggedValue* getIndex(int index);
     int numElements();
 };
 
@@ -41,8 +41,8 @@ void swap(TaggedValue* left, TaggedValue* right);
 void reset(TaggedValue* value);
 std::string to_string(TaggedValue* value);
 bool matches_type(Type* type, Term* term);
-TaggedValue* get_element(TaggedValue* value, int index);
-void set_element(TaggedValue* value, int index, TaggedValue* element);
+TaggedValue* get_index(TaggedValue* value, int index);
+void set_index(TaggedValue* value, int index, TaggedValue* element);
 TaggedValue* get_field(TaggedValue* value, const char* field);
 void set_field(TaggedValue* value, const char* field, TaggedValue* element);
 int num_elements(TaggedValue* value);

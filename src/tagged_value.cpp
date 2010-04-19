@@ -60,9 +60,9 @@ TaggedValue::toString()
 }
 
 TaggedValue*
-TaggedValue::getElement(int index)
+TaggedValue::getIndex(int index)
 {
-    return get_element(this, index);
+    return get_index(this, index);
 }
 
 int
@@ -149,27 +149,27 @@ std::string to_string(TaggedValue* value)
     return toString(value);
 }
 
-TaggedValue* get_element(TaggedValue* value, int index)
+TaggedValue* get_index(TaggedValue* value, int index)
 {
-    Type::GetElement getElement = value->value_type->getElement;
+    Type::GetIndex getIndex = value->value_type->getIndex;
 
     // Default behavior: return NULL
-    if (getElement == NULL)
+    if (getIndex == NULL)
         return NULL;
 
-    return getElement(value, index);
+    return getIndex(value, index);
 }
 
-void set_element(TaggedValue* value, int index, TaggedValue* element)
+void set_index(TaggedValue* value, int index, TaggedValue* element)
 {
-    Type::SetElement setElement = value->value_type->setElement;
+    Type::SetIndex setIndex = value->value_type->setIndex;
 
-    if (setElement == NULL)
+    if (setIndex == NULL)
         assert(false);
-        //throw std::runtime_error("No setElement function available on type "
+        //throw std::runtime_error("No setIndex function available on type "
         //        + value->value_type->name);
 
-    setElement(value, index, element);
+    setIndex(value, index, element);
 }
 
 TaggedValue* get_field(TaggedValue* value, const char* field)

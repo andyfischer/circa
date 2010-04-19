@@ -255,7 +255,7 @@ void tv_copy(TaggedValue* source, TaggedValue* dest)
     set_pointer(dest, s);
 }
 
-TaggedValue* tv_get_element(TaggedValue* value, int index)
+TaggedValue* tv_get_index(TaggedValue* value, int index)
 {
     assert(is_list(value));
     ListData* s = (ListData*) get_pointer(value);
@@ -264,7 +264,7 @@ TaggedValue* tv_get_element(TaggedValue* value, int index)
     return &s->items[index];
 }
 
-void tv_set_element(TaggedValue* value, int index, TaggedValue* element)
+void tv_set_index(TaggedValue* value, int index, TaggedValue* element)
 {
     assert(is_list(value));
     ListData* s = (ListData*) get_pointer(value);
@@ -313,8 +313,8 @@ void setup_type(Type* type)
     type->release = tv_release;
     type->copy = tv_copy;
     type->toString = tv_to_string;
-    type->getElement = tv_get_element;
-    type->setElement = tv_set_element;
+    type->getIndex = tv_get_index;
+    type->setIndex = tv_set_index;
     type->numElements = tv_num_elements;
     type->mutate = tv_mutate;
     type->matchesType = tv_matches_type;
@@ -359,7 +359,7 @@ List::length()
 TaggedValue*
 List::operator[](int index)
 {
-    return list_t::tv_get_element((TaggedValue*) this, index);
+    return list_t::tv_get_index((TaggedValue*) this, index);
 }
 
 void

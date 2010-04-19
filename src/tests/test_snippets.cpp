@@ -349,6 +349,7 @@ void test_field_syntax()
 
 void test_lexprs()
 {
+    // test index access
     test_snippet("l = [[[1]]]; l[0][0][0] = 2", "l == [[[2]]]");
     test_snippet("l = [[[1]]]; l[0][0] = 2", "l == [[2]]");
     test_snippet("l = [1]; l[0] = [[2]]", "l == [[[2]]]");
@@ -357,6 +358,8 @@ void test_lexprs()
     test_snippet("a = [1]; b = a; b[0] = 5", "a == [1]");
     test_snippet("a = [[1]]; b = a; b[0] = 5", "a == [[1]]");
     test_snippet("a = [[1]]; b = a[0]; b[0] = 5", "a == [[1]]");
+
+    // test field access
 }
 
 void test_vectorized_funcs()

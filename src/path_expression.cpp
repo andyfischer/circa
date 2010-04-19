@@ -46,7 +46,7 @@ TaggedValue* step_path(TaggedValue* obj, PathExpression::Element const& element)
 {
     TaggedValue* result = NULL;
     if (element.isIndex())
-        result = get_element(obj, element.index);
+        result = get_index(obj, element.index);
     else if (element.isField())
         result = get_field(obj, element.field.c_str());
     assert(result != obj);
@@ -68,7 +68,7 @@ void assign_using_path(TaggedValue* head, PathExpression const& path, TaggedValu
 
         if (i == (numElements-1)) {
             if (element.isIndex())
-                set_element(head, element.index, newValue);
+                set_index(head, element.index, newValue);
             else if (element.isField())
                 set_field(head, element.field.c_str(), newValue);
         } else {

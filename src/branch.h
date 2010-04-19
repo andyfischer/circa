@@ -97,7 +97,7 @@ namespace branch_t {
     bool cast_possible(Type*, TaggedValue* value);
     bool equals(Term*, Term*);
     bool equals(TaggedValue*, TaggedValue*);
-    TaggedValue* get_element(TaggedValue* value, int index);
+    TaggedValue* get_index(TaggedValue* value, int index);
     int num_elements(TaggedValue* value);
 
     void branch_copy(Branch& source, Branch& dest);

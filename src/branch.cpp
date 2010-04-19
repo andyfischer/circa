@@ -407,7 +407,7 @@ namespace branch_t {
         return true;
     }
 
-    TaggedValue* get_element(TaggedValue* value, int index)
+    TaggedValue* get_index(TaggedValue* value, int index)
     {
         Branch& b = as_branch(value);
         if (index >= b.length())
@@ -415,7 +415,7 @@ namespace branch_t {
         return b[index];
     }
 
-    void set_element(TaggedValue* value, int index, TaggedValue* element)
+    void set_index(TaggedValue* value, int index, TaggedValue* element)
     {
         assert(value != element);
         circa::copy(element, as_branch(value)[index]);
@@ -575,8 +575,8 @@ void initialize_branch_based_type(Term* term)
     type->castPossible = branch_t::cast_possible;
     type->equals = branch_t::equals;
     type->matchesType = branch_t::matches_type;
-    type->getElement = branch_t::get_element;
-    type->setElement = branch_t::set_element;
+    type->getIndex = branch_t::get_index;
+    type->setIndex = branch_t::set_index;
     type->getField = branch_t::get_field;
     type->setField = branch_t::set_field;
     type->numElements = branch_t::num_elements;
