@@ -1,5 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include <cassert>
+
 #include "circa.h"
 
 namespace circa {
@@ -22,6 +24,12 @@ void error_occurred(EvalContext* context, Term* errorTerm, std::string const& me
         context->errorTerm = errorTerm;
         context->errorMessage = message;
     }
+}
+
+void internal_error(const char* message)
+{
+    std::cerr << "internal error: " << message << std::endl;
+    assert(false);
 }
 
 void assert_type(Term* term, Term* type)

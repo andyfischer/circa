@@ -8,6 +8,10 @@ namespace circa {
 // Puts 'errorTerm' into an error state, with the given message.
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message);
 
+// Signal that an unexpected Circa error has occurred. Depending on debug settings, these
+// will either throw an exception or trigger an assert.
+void internal_error(const char* message);
+
 // Signal that a type mismatch has occurred in native code.
 void native_type_mismatch(std::string const& message);
 

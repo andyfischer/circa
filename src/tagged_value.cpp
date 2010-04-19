@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "errors.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -91,7 +92,8 @@ void cast(Type* type, TaggedValue* source, TaggedValue* dest)
             return;
         }
 
-        throw std::runtime_error("No cast function on type " + type->name);
+        std::string msg = "No cast function on type " + type->name;
+        internal_error(msg.c_str());
     }
 
     type->cast(type, source, dest);
@@ -107,9 +109,10 @@ void copy(TaggedValue* source, TaggedValue* dest)
     change_type(dest, source->value_type);
     Type::Copy copyFunc = source->value_type->copy;
 
-    if (copyFunc == copy)
-        throw std::runtime_error("Circular usage of copy() in type "
-                + source->value_type->name);
+    if (copyFunc == copy) {
+        std::string msg = "Circular usage of copy() in type " + source->value_type->name;
+        internal_error(msg.c_str());
+    }
 
     if (copyFunc != NULL) {
         copyFunc(source, dest);
@@ -164,10 +167,10 @@ void set_index(TaggedValue* value, int index, TaggedValue* element)
 {
     Type::SetIndex setIndex = value->value_type->setIndex;
 
-    if (setIndex == NULL)
-        assert(false);
-        //throw std::runtime_error("No setIndex function available on type "
-        //        + value->value_type->name);
+    if (setIndex == NULL) {
+        std::string msg = "No setIndex function available on type " + value->value_type->name;
+        internal_error(msg.c_str());
+    }
 
     setIndex(value, index, element);
 }
@@ -177,7 +180,7 @@ TaggedValue* get_field(TaggedValue* value, const char* field)
     Type::GetField getField = value->value_type->getField;
 
     if (getField == NULL)
-        throw std::runtime_error("No getField function available");
+        internal_error("No getField function available");
 
     return getField(value, field);
 }
@@ -187,7 +190,7 @@ void set_field(TaggedValue* value, const char* field, TaggedValue* element)
     Type::SetField setField = value->value_type->setField;
 
     if (setField == NULL)
-        throw std::runtime_error("No setField function available");
+        internal_error("No setField function available");
 
     setField(value, field, element);
 }
@@ -413,7 +416,7 @@ void* get_pointer(TaggedValue* value, Type* expectedType)
         std::stringstream strm;
         strm << "Type mismatch in get_pointer, expected " << get_name_for_type(expectedType);
         strm << ", but value has type " << get_name_for_type(value->value_type);
-        throw std::runtime_error(strm.str());
+        internal_error(strm.str().c_str());
     }
 
     return value->value_data.ptr;
@@ -436,7 +439,7 @@ int to_int(TaggedValue* value)
     else if (value->value_type == FLOAT_TYPE->value_data.ptr)
         return (int) as_float(value);
     else
-        throw std::runtime_error("In to_int, type is not an int or float");
+        throw std::runtime_error("In to_float, type is not an int or float");
 }
 
 bool is_int(TaggedValue* value)
