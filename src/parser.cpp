@@ -1396,11 +1396,10 @@ bool lookahead_match_leading_name_binding(TokenStream& tokens)
 
 Term* find_lexpr_root(Term* term)
 {
-    if (term->function == GET_FIELD_FUNC)
-        return find_lexpr_root(term->input(0));
-    if (term->function == GET_INDEX_FUNC)
-        return find_lexpr_root(term->input(0));
-    return term;
+    Term* result = get_lexpr_path_expression(term)._head;
+    if (result == NULL)
+        return term;
+    return result;
 }
 
 Term* atom(Branch& branch, TokenStream& tokens)

@@ -1,6 +1,16 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include "builtins.h"
+#include "external_api.h"
+#include "importing.h"
+#include "errors.h"
+#include "evaluation.h"
+#include "source_repro.h"
 #include "string_t.h"
+#include "tagged_value.h"
+#include "tagged_value_accessors.h"
+#include "token.h"
+#include "type.h"
 
 namespace circa {
 namespace new_string_t {

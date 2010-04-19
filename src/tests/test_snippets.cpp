@@ -45,24 +45,6 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         return;
     }
 
-    // Check that the input code had properly defined source locations
-    for (BranchIterator it(code); !it.finished(); ++it) {
-
-        Term* term = *it;
-
-        if (is_hidden(term)) {
-            it.skipNextBranch();
-            continue;
-        }
-
-        if (is_value(term) && is_branch(term) && !is_function(term)) {
-            it.skipNextBranch();
-            continue;
-        }
-
-        // (todo)
-    }
-
     Branch& assertions = create_branch(code, "assertions");
     parser::compile(&assertions, parser::statement_list, assertionsStr);
 
@@ -365,6 +347,18 @@ void test_field_syntax()
     test_snippet("p = Point(); p.x = 5.0; p.y = 3.0", "p == [5.0 3.0]");
 }
 
+void test_lexprs()
+{
+    test_snippet("l = [[[1]]]; l[0][0][0] = 2", "l == [[[2]]]");
+    test_snippet("l = [[[1]]]; l[0][0] = 2", "l == [[2]]");
+    test_snippet("l = [1]; l[0] = [[2]]", "l == [[[2]]]");
+
+    // make sure listdatas are not improperly shared
+    test_snippet("a = [1]; b = a; b[0] = 5", "a == [1]");
+    test_snippet("a = [[1]]; b = a; b[0] = 5", "a == [[1]]");
+    test_snippet("a = [[1]]; b = a[0]; b[0] = 5", "a == [[1]]");
+}
+
 void test_vectorized_funcs()
 {
     test_snippet("", "[1 2] + 3 == [4 5]");
@@ -398,18 +392,6 @@ void test_rebinding_operators()
 {
     test_snippet("a = 1, a += 2", "a == 3");
     test_snippet("a = [1 1]->Point, a += [4 4]","a == [5.0 5.0]");
-}
-
-void test_get_field_and_set_field()
-{
-    //test_snippet("type A{int z} type B{A y} type C{B x} w = [[[3]]]->C",
-    //        "w.x.y.z == 3; get_field(w, 'x', 'y', 'z') == 3");
-    //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]->C",
-            //"set_field(w, 5, 'x', 'y', 'z') == [[[5 4]]]->C");
-    //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]->C",
-            //"w.x.y.z = 5; w == [[[5 4]]]->C");
-    //test_snippet("type A{int z, int q} type B{A y} type C{B x} w = [[[3 4]]]->C",
-            //"w.x.y.z += 1; w == [[[4 4]]]->C");
 }
 
 void test_repeat()
@@ -491,11 +473,11 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_set);
     REGISTER_TEST_CASE(test_snippets::test_map);
     REGISTER_TEST_CASE(test_snippets::test_field_syntax);
+    REGISTER_TEST_CASE(test_snippets::test_lexprs);
     REGISTER_TEST_CASE(test_snippets::test_vectorized_funcs);
     REGISTER_TEST_CASE(test_snippets::test_color_arithmetic);
     REGISTER_TEST_CASE(test_snippets::test_branch_value);
     REGISTER_TEST_CASE(test_snippets::test_rebinding_operators);
-    REGISTER_TEST_CASE(test_snippets::test_get_field_and_set_field);
     REGISTER_TEST_CASE(test_snippets::test_repeat);
     REGISTER_TEST_CASE(test_snippets::test_range);
     REGISTER_TEST_CASE(test_snippets::test_stateful_code);

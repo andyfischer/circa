@@ -39,21 +39,6 @@ void test_tagged_value()
     test_assert(num_elements(&value) == 3);
 }
 
-void test_shallow_copy()
-{
-#if 0
-    List a, b;
-  
-    make_int(a.append(), 3);
-
-    test_assert(a._data != b._data);
-
-    b = a;
-    
-    test_assert(a._data == b._data);
-#endif
-}
-
 void test_tagged_value_copy()
 {
     TypeRef list = Type::create();
@@ -79,11 +64,30 @@ void test_tagged_value_copy()
     test_equals(to_string(&value2), "[1, 2, 3, 4]");
 }
 
+void test_mutate()
+{
+    TypeRef list = Type::create();
+    list_t::setup_type(list);
+
+    TaggedValue value(list);
+
+    make_int(list_t::append(&value), 1);
+    make_int(list_t::append(&value), 2);
+
+    TaggedValue value2(list);
+    copy(&value, &value2);
+
+    test_assert(get_pointer(&value) == get_pointer(&value2));
+    mutate(&value2);
+    test_assert(get_pointer(&value) != get_pointer(&value2));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(list_t_tests::test_simple);
     REGISTER_TEST_CASE(list_t_tests::test_tagged_value);
     REGISTER_TEST_CASE(list_t_tests::test_tagged_value_copy);
+    REGISTER_TEST_CASE(list_t_tests::test_mutate);
 }
 
 }

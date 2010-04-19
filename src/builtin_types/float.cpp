@@ -1,5 +1,11 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include "source_repro.h"
+#include "tagged_value.h"
+#include "tagged_value_accessors.h"
+#include "token.h"
+#include "type.h"
+
 namespace circa {
 namespace float_t {
     void initialize(Type* type, TaggedValue* value)

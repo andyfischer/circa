@@ -26,6 +26,8 @@ PathExpression get_lexpr_path_expression(Term* term)
     Term* head = term;
 
     while (true) {
+        if (head->name != "")
+            break;
         if (head->function == GET_INDEX_FUNC) {
             result.appendIndex(head->input(1)->asInt());
             head = head->input(0);
@@ -42,22 +44,28 @@ PathExpression get_lexpr_path_expression(Term* term)
 
 TaggedValue* step_path(TaggedValue* obj, PathExpression::Element const& element)
 {
+    TaggedValue* result = NULL;
     if (element.isIndex())
-        return get_element(obj, element.index);
+        result = get_element(obj, element.index);
     else if (element.isField())
-        return get_field(obj, element.field.c_str());
-    return NULL;
+        result = get_field(obj, element.field.c_str());
+    assert(result != obj);
+    return result;
 }
     
-void assign_using_path(TaggedValue* target, PathExpression const& path, TaggedValue* newValue)
+void assign_using_path(TaggedValue* head, PathExpression const& path, TaggedValue* newValue)
 {
     assert(path.length() > 0);
-    
-    TaggedValue* head = target;
+    assert(head != newValue);
+
     int numElements = path._elements.size();
     for (int i=0; i < numElements; i++) {
         PathExpression::Element const& element = path._elements[i];
+
         TaggedValue* next = step_path(head, element);
+        mutate(next);
+        assert(head != newValue);
+
         if (i == (numElements-1)) {
             if (element.isIndex())
                 set_element(head, element.index, newValue);

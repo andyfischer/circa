@@ -3,6 +3,8 @@
 #ifndef CIRCA_BUILTIN_TYPES_INCLUDED
 #define CIRCA_BUILTIN_TYPES_INCLUDED
 
+#include "common_headers.h"
+
 namespace circa {
 
 namespace int_t {

@@ -417,6 +417,7 @@ namespace branch_t {
 
     void set_element(TaggedValue* value, int index, TaggedValue* element)
     {
+        assert(value != element);
         circa::copy(element, as_branch(value)[index]);
     }
 
@@ -428,7 +429,11 @@ namespace branch_t {
 
     void set_field(TaggedValue* value, const char* name, TaggedValue* element)
     {
-        circa::copy(value, as_branch(value)[name]);
+        TaggedValue* destination = as_branch(value)[name];
+        if (destination == NULL)
+            return;
+        assert(destination != value);
+        circa::copy(element, as_branch(value)[name]);
     }
 
     int num_elements(TaggedValue* value)

@@ -1,5 +1,9 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include "common_headers.h"
+#include "list_t.h"
+#include "type.h"
+
 namespace circa {
 namespace styled_source_t {
 

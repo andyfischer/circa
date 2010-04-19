@@ -1,5 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include "type.h"
+
 namespace circa {
 namespace indexable_t {
 

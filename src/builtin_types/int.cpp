@@ -1,5 +1,12 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include "builtin_types.h"
+#include "source_repro.h"
+#include "tagged_value.h"
+#include "tagged_value_accessors.h"
+#include "token.h"
+#include "type.h"
+
 namespace circa {
 namespace int_t {
     bool equals(TaggedValue* a, TaggedValue* b)
