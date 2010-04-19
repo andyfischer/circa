@@ -26,7 +26,8 @@ struct List : TaggedValue
     TaggedValue* append();
     void clear();
     int length();
-    TaggedValue* operator[](int index);
+    TaggedValue* get(int index);
+    TaggedValue* operator[](int index) { return get(index); }
     void resize(int size);
 };
 

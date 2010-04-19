@@ -10,11 +10,6 @@
 
 namespace circa {
 
-typedef void (*EvaluateFunc)(EvalContext* context, Term* caller);
-typedef Term* (*SpecializeTypeFunc)(Term* caller);
-typedef void (*FormatSource)(StyledSource* source, Term* term);
-typedef bool (*CheckInvariants)(Term* term, std::string* output);
-
 struct FunctionAttrs
 {
     std::string name;

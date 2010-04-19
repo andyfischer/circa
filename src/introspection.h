@@ -30,6 +30,8 @@ std::string branch_namespace_to_string(Branch& branch);
 void print_branch_raw(std::ostream& out, Branch& branch);
 void print_branch_raw_with_properties(std::ostream& out, Branch& branch);
 std::string get_branch_raw(Branch& branch);
+void print_term_to_string_extended(std::ostream& out, Term* term);
+std::string get_term_to_string_extended(Term*);
 
 // Print a short source-code location for this term.
 std::string get_short_location(Term* term);
@@ -37,15 +39,13 @@ std::string get_short_location(Term* term);
 // Print the source file that this term came from, if any.
 std::string get_source_filename(Term* term);
 
-RefList get_influencing_values(Term* term);
 void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string> &names);
 
 // Get a list of the set of terms which descend from 'inputs', and which have 'outputs'
 // as descendants.
 RefList get_involved_terms(RefList inputs, RefList outputs);
 
-void print_term_to_string_extended(std::ostream& out, Term* term);
-
-std::string get_term_to_string_extended(Term*);
+typedef bool (*NamedTermVisitor) (Term* term, const char* name, TaggedValue* context);
+void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, TaggedValue* context);
 
 }

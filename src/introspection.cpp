@@ -196,33 +196,6 @@ std::string get_source_filename(Term* term)
     return "";
 }
 
-void recursive_append_influencing_values(Term* term, RefList& list)
-{
-    for (int i=0; i < term->numInputs(); i++) {
-        Term* input = term->input(i);
-
-        if (input == NULL)
-            continue;
-
-        if (list.contains(input))
-            continue;
-
-        if (is_value(input) || is_stateful(input))
-            list.append(input);
-        else
-            recursive_append_influencing_values(input, list);
-    }
-}
-
-RefList get_influencing_values(Term* term)
-{
-    RefList result;
-
-    recursive_append_influencing_values(term, result);
-
-    return result;
-}
-
 RefList get_involved_terms(RefList inputs, RefList outputs)
 {
     std::vector<RefList> stack;
@@ -334,6 +307,28 @@ std::string get_term_to_string_extended(Term* term)
     std::stringstream out;
     print_term_to_string_extended(out, term);
     return out.str();
+}
+
+void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, TaggedValue* context)
+{
+    if (location->owningBranch == NULL)
+        return;
+
+    Branch& branch = *location->owningBranch;
+
+    // Iterate upwards through all the terms that are above 'location' in this branch
+    for (int index=location->index - 1; index >= 0; index--) {
+        Term* t = branch[index];
+        if (t == NULL) continue;
+        if (t->name == "") continue;
+        bool stop = visitor(t, t->name.c_str(), context);
+        if (stop) return;
+
+        // TODO: Iterate inside namespaces, providing the correct name
+    }
+
+    if (branch.owningTerm != NULL)
+        visit_name_accessible_terms(branch.owningTerm, visitor, context);
 }
 
 } // namespace circa

@@ -83,8 +83,9 @@ struct Branch
 
     std::string toString();
 
-// Assignment operator is disabled
 private:
+    // Disabled calls
+    Branch(Branch const& copy) {}
     Branch& operator=(Branch const& b) { return *this; }
 };
 

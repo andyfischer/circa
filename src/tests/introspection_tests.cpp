@@ -42,11 +42,40 @@ void test_term_to_raw_string()
     delete term;
 }
 
+bool name_visitor_that_appends_to_list(Term* term, const char* name, TaggedValue* list)
+{
+    make_ref(((List*)list)->append(), term);
+    return false;
+}
+
+void test_visit_name_accessible_terms()
+{
+    Branch branch;
+    Term* a = branch.eval("a = 1");
+    Term* b = branch.eval("b = 1");
+    Branch& ns = create_namespace(branch, "ns");
+    Term* c = ns.eval("c = 1");
+    Term* d = ns.eval("d = 1");
+    /*Term* e =*/ ns.eval("e = 1");
+    branch.eval("f = 1");
+
+    TaggedValue results;
+    make_list(&results);
+    visit_name_accessible_terms(d, name_visitor_that_appends_to_list, &results);
+
+    List* list = (List*) &results;
+    test_assert(list->length() == 3);
+    test_assert(as_ref(list->get(0)) == c);
+    test_assert(as_ref(list->get(1)) == b);
+    test_assert(as_ref(list->get(2)) == a);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(introspection_tests::test_is_value);
     REGISTER_TEST_CASE(introspection_tests::test_get_involved_terms);
     REGISTER_TEST_CASE(introspection_tests::test_term_to_raw_string);
+    REGISTER_TEST_CASE(introspection_tests::test_visit_name_accessible_terms);
 }
 
 } // namespace introspection_tests

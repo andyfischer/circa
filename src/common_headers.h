@@ -27,7 +27,6 @@
 #include <stdexcept>
 #include <string>
 #include <sstream>
-#include <typeinfo>
 
 namespace circa {
 
@@ -45,6 +44,14 @@ struct TaggedValue;
 struct Term;
 struct Type;
 struct TypeRef;
+
+typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
+
+// Function-related typedefs:
+typedef void (*EvaluateFunc)(EvalContext* context, Term* caller);
+typedef Term* (*SpecializeTypeFunc)(Term* caller);
+typedef void (*FormatSource)(StyledSource* source, Term* term);
+typedef bool (*CheckInvariants)(Term* term, std::string* output);
 
 } // namespace circa
 

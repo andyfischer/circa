@@ -357,7 +357,7 @@ List::length()
 }
 
 TaggedValue*
-List::operator[](int index)
+List::get(int index)
 {
     return list_t::tv_get_index((TaggedValue*) this, index);
 }
