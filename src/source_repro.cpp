@@ -9,7 +9,7 @@
 #include "parser_util.h"
 #include "source_repro.h"
 #include "stateful_code.h"
-#include "tagged_value_accessors.h"
+#include "tagged_value.h"
 #include "term.h"
 #include "type.h"
 

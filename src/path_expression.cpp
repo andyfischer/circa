@@ -2,7 +2,7 @@
 
 #include "builtins.h"
 #include "path_expression.h"
-#include "tagged_value_accessors.h"
+#include "tagged_value.h"
 #include "term.h"
 
 namespace circa {

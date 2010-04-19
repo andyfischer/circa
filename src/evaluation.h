@@ -7,6 +7,18 @@
 
 namespace circa {
 
+struct EvalContext
+{
+    bool interruptBranch;
+
+    // Error information:
+    bool errorOccurred;
+    Ref errorTerm;
+    std::string errorMessage;
+
+    EvalContext() : interruptBranch(false), errorOccurred(false) {}
+};
+
 void evaluate_term(EvalContext* cxt, Term* term);
 void evaluate_term(Term* term);
 void evaluate_branch(EvalContext* context, Branch& branch);

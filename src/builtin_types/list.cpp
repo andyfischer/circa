@@ -6,7 +6,6 @@
 #include "debug_valid_objects.h"
 #include "list_t.h"
 #include "tagged_value.h"
-#include "tagged_value_accessors.h"
 #include "type.h"
 
 namespace circa {

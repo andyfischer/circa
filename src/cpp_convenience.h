@@ -7,7 +7,7 @@
 #include "cpp_importing.h"
 #include "errors.h"
 #include "refactoring.h"
-#include "tagged_value_accessors.h"
+#include "tagged_value.h"
 
 namespace circa {
 

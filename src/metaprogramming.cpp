@@ -1,6 +1,10 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved
 
-#include "circa.h"
+#include "branch.h"
+#include "builtins.h"
+#include "evaluation.h"
+#include "refactoring.h"
+#include "term.h"
 
 namespace circa {
 

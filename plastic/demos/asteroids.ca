@@ -46,13 +46,6 @@ namespace draw_ship
                   ship_point(-ship_wing_rot ship_wing_size)] #fff)
 end
 
--- Keyboard controls for rotation
-rotation = switch key_down(^)
-  key:left -> -1
-  key:right -> 1
-  _ -> 0
-end
-
 if key_down(key:left)
     rotation = -1
 elif key_down(key:right)

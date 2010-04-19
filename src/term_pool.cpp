@@ -3,7 +3,7 @@
 #include "common_headers.h"
 
 #include "term.h"
-#include "tagged_value_accessors.h"
+#include "tagged_value.h"
 
 namespace circa {
 

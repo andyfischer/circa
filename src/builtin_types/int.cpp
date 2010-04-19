@@ -3,7 +3,6 @@
 #include "builtin_types.h"
 #include "source_repro.h"
 #include "tagged_value.h"
-#include "tagged_value_accessors.h"
 #include "token.h"
 #include "type.h"
 

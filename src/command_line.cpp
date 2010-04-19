@@ -1,6 +1,16 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "circa.h"
+#include "common_headers.h"
+#include "branch.h"
+#include "codegen.h"
+#include "errors.h"
+#include "evaluation.h"
+#include "feedback.h"
+#include "introspection.h"
+#include "parser.h"
+#include "repl.h"
+#include "source_repro.h"
+#include "testing.h"
 
 namespace circa {
 
