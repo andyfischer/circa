@@ -81,23 +81,18 @@ void print_term_raw_string(std::ostream& out, Term* term)
         out << " == " << term->toString();
 }
 
+#if 0
 void print_term_raw_string_with_properties(std::ostream& out, Term* term)
 {
     print_term_to_string_extended(out, term);
     out << " " << dict_t::to_string(term->properties);
 }
+#endif
 
 std::string term_to_raw_string(Term* term)
 {
     std::stringstream out;
     print_term_raw_string(out, term);
-    return out.str();
-}
-
-std::string term_to_raw_string_with_properties(Term* term)
-{
-    std::stringstream out;
-    print_term_raw_string_with_properties(out, term);
     return out.str();
 }
 
@@ -113,7 +108,7 @@ std::string branch_namespace_to_string(Branch& branch)
     return out.str();
 }
 
-void print_branch_raw(std::ostream& out, Branch& branch)
+void print_branch_raw(std::ostream& out, Branch& branch, RawOutputPrefs* prefs)
 {
     for (BranchIterator it(branch); !it.finished(); it.advance()) {
         Term* term = it.current();
@@ -122,29 +117,16 @@ void print_branch_raw(std::ostream& out, Branch& branch)
 
         for (int i=0; i < indent; i++) out << "  ";
 
-        print_term_to_string_extended(out, term);
-        out << std::endl;
-    }
-}
-
-void print_branch_raw_with_properties(std::ostream& out, Branch& branch)
-{
-    for (BranchIterator it(branch); !it.finished(); it.advance()) {
-        Term* term = it.current();
-
-        int indent = it.depth();
-
-        for (int i=0; i < indent; i++) out << "  ";
-
-        print_term_raw_string_with_properties(out, term);
+        print_term_to_string_extended(out, term, prefs);
         out << std::endl;
     }
 }
 
 std::string get_branch_raw(Branch& branch)
 {
+    RawOutputPrefs prefs;
     std::stringstream out;
-    print_branch_raw(out, branch);
+    print_branch_raw(out, branch, &prefs);
     return out.str();
 }
 
@@ -277,17 +259,37 @@ void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string
     }
 }
 
-void print_term_to_string_extended(std::ostream& out, Term* term)
+void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs* prefs)
 {
+    if (term == NULL) {
+        out << "<NULL>";
+        return;
+    }
+
     out << format_global_id(term);
     if (term->name != "")
         out << " '" << term->name << "'";
-    if (term->function == VALUE_FUNC)
-        out << " value";
-    else
-        out << " fun:" << term->function->name << format_global_id(term->function);
-    out << " dt:" << term->type->name << format_global_id(term->type)
-        << " vt:" << term->value_type->name;
+
+    if (term->function == NULL) {
+        out << " <NULL function>";
+    } else {
+        out << " " << term->function->name;
+        if (prefs->showAllIDs)
+           out << format_global_id(term->function);
+        out << "()";
+    }
+
+    if (term->type == NULL)
+        out << " <NULL type>";
+    else {
+        out << " " << term->type->name;
+
+        if (prefs->showAllIDs)
+            out << format_global_id(term->type);
+
+        if (&as_type(term->type) != term->value_type)
+            out << " vt:" << term->value_type->name;
+    }
 
     if (!is_value(term)) {
         out << " [";
@@ -300,12 +302,38 @@ void print_term_to_string_extended(std::ostream& out, Term* term)
     }
     if (!is_branch(term))
         out << " " << to_string(term);
+
+    if (prefs->showProperties)
+        out << " " << dict_t::to_string(term->properties);
+}
+
+void print_branch_raw(std::ostream& out, Branch& branch)
+{
+    RawOutputPrefs prefs;
+    print_branch_raw(out, branch, &prefs);
+}
+
+void print_branch_raw_with_properties(std::ostream& out, Branch& branch)
+{
+    RawOutputPrefs prefs;
+    prefs.showProperties = true;
+    print_branch_raw(out, branch, &prefs);
 }
 
 std::string get_term_to_string_extended(Term* term)
 {
+    RawOutputPrefs prefs;
     std::stringstream out;
-    print_term_to_string_extended(out, term);
+    print_term_to_string_extended(out, term, &prefs);
+    return out.str();
+}
+
+std::string get_term_to_string_extended_with_props(Term* term)
+{
+    RawOutputPrefs prefs;
+    prefs.showProperties = true;
+    std::stringstream out;
+    print_term_to_string_extended(out, term, &prefs);
     return out.str();
 }
 

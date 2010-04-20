@@ -37,7 +37,7 @@ void test_term_to_raw_string()
     // Test that term_to_raw_string doesn't die if a term has a NULL function or type.
     Term* term = new Term();
 
-    term_to_raw_string(term);
+    get_term_to_string_extended(term);
 
     delete term;
 }

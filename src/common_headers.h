@@ -36,6 +36,7 @@ struct FeedbackOperation;
 struct Function;
 struct FunctionAttrs;
 struct PathExpression;
+struct RawOutputPrefs;
 struct Ref;
 struct RefList;
 struct ReferenceMap;

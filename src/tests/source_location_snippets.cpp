@@ -164,7 +164,7 @@ void test_snippet(std::string const& text)
         if (!source_location_sanity_check(term, failureReason)) {
             std::cout << "Source location test failed: " << failureReason << std::endl;
             std::cout << "<<<" << std::endl;
-            std::cout << term_to_raw_string_with_properties(term);
+            std::cout << get_term_to_string_extended_with_props(term);
             std::cout << ">>>" << std::endl;
             declare_current_test_failed();
             return;

@@ -8,6 +8,13 @@
 
 namespace circa {
 
+struct RawOutputPrefs
+{
+    bool showAllIDs;
+    bool showProperties;
+    RawOutputPrefs() : showAllIDs(false), showProperties(false) {}
+};
+
 bool is_value(Term* term);
 
 // Check the function and inputs of 'user', returns whether they are actually
@@ -22,16 +29,19 @@ bool is_statement(Term* term);
 std::string format_global_id(Term* term);
 
 std::string get_short_local_name(Term* term);
-void print_term_raw_string(std::ostream& out, Term* term);
-void print_term_raw_string_with_properties(std::ostream& out, Term* term);
-std::string term_to_raw_string(Term* term);
-std::string term_to_raw_string_with_properties(Term* term);
+
 std::string branch_namespace_to_string(Branch& branch);
+
+// Print compiled code in a raw format
+void print_branch_raw(std::ostream& out, Branch& branch, RawOutputPrefs* prefs);
+void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs* prefs);
+
+// Convenient overloads for raw format printing
 void print_branch_raw(std::ostream& out, Branch& branch);
 void print_branch_raw_with_properties(std::ostream& out, Branch& branch);
 std::string get_branch_raw(Branch& branch);
-void print_term_to_string_extended(std::ostream& out, Term* term);
 std::string get_term_to_string_extended(Term*);
+std::string get_term_to_string_extended_with_props(Term*);
 
 // Print a short source-code location for this term.
 std::string get_short_location(Term* term);
