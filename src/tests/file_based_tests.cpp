@@ -8,7 +8,6 @@ namespace file_based_tests {
 void test_the_test()
 {
     // Make sure that the file IO redirection thingy is working.
-
     FakeFileSystem files;
 
     files["a.txt"] = "hello";
@@ -122,6 +121,20 @@ void test_include_namespace()
     test_assert(as_int(a) == 5);
 }
 
+void test_include_with_error()
+{
+    // If we include a file, and this file has a static error, then make sure
+    // that this error is not hidden. In previous code, the include() function
+    // would reject the errorred code, and then we'd never know an error happened.
+
+    Branch branch;
+    FakeFileSystem files;
+    files["file"] = "eyjafjallajokull";
+
+    branch.eval("include('file')");
+    test_assert(has_static_errors(branch));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(file_based_tests::test_the_test);
@@ -129,6 +142,7 @@ void register_tests()
     REGISTER_TEST_CASE(file_based_tests::test_include_static_error_after_reload);
     REGISTER_TEST_CASE(file_based_tests::test_file_changed);
     REGISTER_TEST_CASE(file_based_tests::test_include_namespace);
+    REGISTER_TEST_CASE(file_based_tests::test_include_with_error);
 }
 
 } // namespace file_based_tests

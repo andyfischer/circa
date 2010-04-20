@@ -35,8 +35,7 @@ namespace text_input
         for key in recent_key_presses()
             input_character(@tis, key)
         end
-        text = tis.text -> string
-        draw_text(font, text, color, loc)
+        draw_text(font, tis.text, color, loc)
         fill_rect(to_rect([loc.x + tis.cursor loc.y] [2 15]), color)
         return tis.text
     end
