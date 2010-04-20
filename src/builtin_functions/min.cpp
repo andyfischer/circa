@@ -13,7 +13,7 @@ namespace min_function {
     }
     void evaluate_i(EvalContext*, Term* caller)
     {
-        set_float(caller, std::min(float_input(caller,0), float_input(caller,1)));
+        set_int(caller, std::min(int_input(caller,0), int_input(caller,1)));
     }
 
     void setup(Branch& kernel)

@@ -11,7 +11,7 @@ namespace mod_function {
     //
     // For a function that works the same as C's modulo, use remainder()
 
-    void evaluate(EvalContext*, Term* caller)
+    void evaluate_i(EvalContext*, Term* caller)
     {
         int a = int_input(caller, 0);
         int n = int_input(caller, 1);
@@ -35,7 +35,7 @@ namespace mod_function {
 
     void setup(Branch& kernel)
     {
-        Term* mod_i = import_function(kernel, evaluate, "mod_i(int,int) -> int");
+        Term* mod_i = import_function(kernel, evaluate_i, "mod_i(int,int) -> int");
         Term* mod_f = import_function(kernel, evaluate_f, "mod_f(number,number) -> number");
 
         Term* main = create_overloaded_function(kernel, "mod");

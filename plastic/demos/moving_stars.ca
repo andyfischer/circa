@@ -20,7 +20,7 @@ for i in 0..num_stars
 
     speed = 8.8
 
-    y = star.position.y
+    y = star.position.y -> int
     add(@y, speed*time_delta * length)
     mod(@y, window.height)
 

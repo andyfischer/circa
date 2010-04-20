@@ -38,8 +38,9 @@ end
 
 -- Input
 type Keypress {
-  string character
-  int code
+    string character
+    int code
+    int modifier
 }
 
 def key_down(int key) -> bool {}
@@ -315,10 +316,10 @@ end
 
 -- Name selector
 if toggle(key_pressed('b'))
-  br = branch_ref(users_branch)
-  x = 10, y = 10
-  for r in br.get_configs_nested()
-    tweak:button(r, [x y], br.get_relative_name(r))
-    y += 24
-  end
+    br = branch_ref(users_branch)
+    x = 10, y = 10
+    for r in br.get_configs_nested()
+        tweak:button(r, [x y], br.get_relative_name(r))
+        y += 24
+    end
 end

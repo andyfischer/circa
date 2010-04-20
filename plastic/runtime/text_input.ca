@@ -21,12 +21,11 @@ namespace text_input
         return st
     end
 
-    def test()
+    def get_input() -> string
         state TextInputState tis
         for key in recent_key_presses()
             input_character(@tis, key)
         end
-        print(tis)
+        return tis.text
     end
-
 end

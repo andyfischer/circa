@@ -134,6 +134,19 @@ void handle_key_press(SDL_Event &event, int key)
         case SDLK_ESCAPE:
             CONTINUE_MAIN_LOOP = false;
             break;
+    }
+
+    // Control keys
+    if (controlPressed) {
+        switch (event.key.keysym.sym) {
+        case SDLK_s:
+            persist_branch_to_file(users_branch());
+            std::cout << "saved to " << get_branch_source_filename(users_branch()) << std::endl;
+            break;
+
+        case SDLK_p:
+            print_branch_raw(std::cout, users_branch());
+            break;
 
         case SDLK_e:
             reset_state(users_branch());
@@ -171,19 +184,6 @@ void handle_key_press(SDL_Event &event, int key)
             std::cout << "target FPS = " << TARGET_FPS << std::endl;
             break;
         }
-    }
-
-    // Control keys
-    if (controlPressed) {
-        switch (event.key.keysym.sym) {
-        case SDLK_s:
-            persist_branch_to_file(users_branch());
-            std::cout << "saved to " << get_branch_source_filename(users_branch()) << std::endl;
-            break;
-
-        case SDLK_p:
-            print_branch_raw(std::cout, users_branch());
-            break;
 
         default: break;
         }
@@ -207,11 +207,9 @@ void recent_key_presses(EvalContext*, Term* caller)
         else
             keyStr[0] = char(key);
 
-        // when pressing some special characters, SDL gives us some low numbers
-        // for the characters (such as 1 for up). Not sure of the 
-
         create_string(item, std::string(keyStr));
         create_int(item, KEYS_JUST_PRESSED[index].sym);
+        create_int(item, KEYS_JUST_PRESSED[index].sym.mod);
     }
 }
 
