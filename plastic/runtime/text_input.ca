@@ -12,10 +12,11 @@ namespace text_input
         elif keypress.code == key:right
             st.cursor = round(min(text.length(), st.cursor + 1))
         elif keypress.code == key:delete
-            print('delete')
-            st.text = concat(text.substr(0, st.cursor), text.substr(st.cursor, text.length()))
+            st.text = concat(text.slice(0, st.cursor - 1), text.slice(st.cursor, text.length()))
+            st.cursor = round(max(0, st.cursor - 1))
         else
-            st.text = concat(text, keypress.character)
+            st.text = concat(text.slice(0, st.cursor), keypress.character,
+                text.slice(st.cursor, text.length()))
             st.cursor = st.cursor + 1
         end
         return st
@@ -26,6 +27,17 @@ namespace text_input
         for key in recent_key_presses()
             input_character(@tis, key)
         end
+        return tis.text
+    end
+
+    def draw_input(TTF_Font font, Color color, Point loc) -> string
+        state TextInputState tis
+        for key in recent_key_presses()
+            input_character(@tis, key)
+        end
+        text = tis.text -> string
+        draw_text(font, text, color, loc)
+        fill_rect(to_rect([loc.x + tis.cursor loc.y] [2 15]), color)
         return tis.text
     end
 end

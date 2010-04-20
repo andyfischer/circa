@@ -131,10 +131,16 @@ namespace string_t {
         if (start < 0) return error_occurred(cxt, term, "Negative index");
         if (end < 0) return error_occurred(cxt, term, "Negative index");
 
-        if ((unsigned) start >= s.length())
-            return error_occurred(cxt, term, "Index out of bounds");
-        if ((unsigned) (start+end) > s.length())
-            return error_occurred(cxt, term, "Index out of bounds");
+        if ((unsigned) start > s.length()) {
+            std::stringstream msg;
+            msg << "Start index is too high: " << start;
+            return error_occurred(cxt, term, msg.str().c_str());
+        }
+        if ((unsigned) (start+end) > s.length()) {
+            std::stringstream msg;
+            msg << "End index is too high: " << start;
+            return error_occurred(cxt, term, msg.str().c_str());
+        }
 
         set_str(term, s.substr(start, end));
     }
@@ -149,13 +155,19 @@ namespace string_t {
         if (start < 0) start = s.length() + start;
         if (end < 0) end = s.length() + end;
 
-        if (start < 0) return error_occurred(cxt, term, "Index too far negative");
-        if (end < 0) return error_occurred(cxt, term, "Index too far negative");
+        if (start < 0) return set_str(term, "");
+        if (end < 0) return set_str(term, "");
 
-        if ((unsigned) start >= s.length())
-            return error_occurred(cxt, term, "Index out of bounds");
-        if ((unsigned) end > s.length())
-            return error_occurred(cxt, term, "Index out of bounds");
+        if ((unsigned) start > s.length()) {
+            std::stringstream msg;
+            msg << "Start index is too high: " << start;
+            return error_occurred(cxt, term, msg.str().c_str());
+        }
+        if ((unsigned) end > s.length()) {
+            std::stringstream msg;
+            msg << "End index is too high: " << start;
+            return error_occurred(cxt, term, msg.str().c_str());
+        }
 
         if (end < start)
             return set_str(term, "");

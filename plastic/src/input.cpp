@@ -44,10 +44,8 @@ void key_pressed(EvalContext* cxt, Term* caller)
 
     if (is_string(caller->input(0))) {
         std::string const& key = caller->input(0)->asString();
-        if (key.length() != 1) {
-            error_occurred(cxt, caller, "Expected a string of length 1");
-            return;
-        }
+        if (key.length() != 1)
+            return error_occurred(cxt, caller, "Expected a string of length 1");
 
         for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
             if (key[0] == KEYS_JUST_PRESSED[index].unicode) {
@@ -134,6 +132,8 @@ void handle_key_press(SDL_Event &event, int key)
         case SDLK_ESCAPE:
             CONTINUE_MAIN_LOOP = false;
             break;
+        default: break;
+        }
     }
 
     // Control keys
@@ -142,10 +142,6 @@ void handle_key_press(SDL_Event &event, int key)
         case SDLK_s:
             persist_branch_to_file(users_branch());
             std::cout << "saved to " << get_branch_source_filename(users_branch()) << std::endl;
-            break;
-
-        case SDLK_p:
-            print_branch_raw(std::cout, users_branch());
             break;
 
         case SDLK_e:
@@ -176,7 +172,7 @@ void handle_key_press(SDL_Event &event, int key)
             break;
 
         // toggle low-power mode
-        case SDLK_l:
+        case SDLK_l: {
             if (TARGET_FPS == 6)
                 TARGET_FPS = 60;
             else
@@ -209,7 +205,7 @@ void recent_key_presses(EvalContext*, Term* caller)
 
         create_string(item, std::string(keyStr));
         create_int(item, KEYS_JUST_PRESSED[index].sym);
-        create_int(item, KEYS_JUST_PRESSED[index].sym.mod);
+        create_int(item, KEYS_JUST_PRESSED[index].mod);
     }
 }
 
@@ -287,7 +283,7 @@ void setup(Branch& branch)
     set_int(key["left"], SDLK_LEFT);
     set_int(key["right"], SDLK_RIGHT);
     set_int(key["space"], SDLK_SPACE);
-    set_int(key["delete"], SDLK_DELETE);
+    set_int(key["delete"], SDLK_BACKSPACE);
     set_int(key["enter"], SDLK_RETURN);
     set_int(key["escape"], SDLK_ESCAPE);
 }

@@ -34,6 +34,7 @@ namespace ide
     def reset_state(): "Reset state for the current script"
     def reload(): "Reload the current script immediately"
     def reload_runtime(): "Reload the builtin runtime"
+    def paused() -> bool : "Returns whether the current script is paused"
 end
 
 -- Input
@@ -312,6 +313,11 @@ draw_fps = false
 if draw_fps
     text_sprite = text:render_text(ui_font_medium, concat('fps: ' fps), #fff)
     text:draw_rendered_text(text_sprite, [10 280])
+end
+
+-- Draw pause indicator
+if ide:paused()
+    draw_text(ui_font_medium, "Paused", #fff, window - [100 40])
 end
 
 -- Name selector
