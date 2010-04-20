@@ -1,11 +1,6 @@
 
 
 Bugs:
- - This field access doesn't work:
-   type T { string s }
-   v = T()
-   v.s.length()
-
  - If there's an error in a script included in Plastic, then nothing is printed but
    the script is unavailable.
 

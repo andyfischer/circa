@@ -899,42 +899,6 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         }
     }
 
-#if 0
-
-    // Or, maybe it was parsed as a field access. Turn this into a set_field
-    else if (lexpr->function == GET_FIELD_FUNC) {
-        Term* object = lexpr->input(0);
-        Term* field = lexpr->input(1);
-        std::string name = object->name;
-
-        branch.remove(lexpr);
-
-        rexpr = apply_with_syntax(branch, SET_FIELD_FUNC, RefList(object, rexpr, field), name);
-
-        set_source_hidden(field, true);
-        set_input_syntax_hint(rexpr, 0, "postWhitespace", "");
-        set_input_syntax_hint(rexpr, 1, "postWhitespace", "");
-    }
-
-    // Or, maybe it was parsed as an index-based access. Turn this into a set_index
-    else if (lexpr->function == GET_INDEX_FUNC) {
-        Term* object = lexpr->input(0);
-        Term* index = lexpr->input(1);
-        std::string name = object->name;
-
-        branch.remove(lexpr);
-        
-        rexpr = apply(branch, SET_INDEX_FUNC, RefList(object, index, rexpr));
-
-        branch.bindName(rexpr, name);
-    }
-
-    // If lexpr got parsed as something else, then it's an error
-    else {
-        return compile_error_for_line(rexpr, tokens, startPosition);
-    }
-#endif
-
     set_source_location(expr, startPosition, tokens);
 
     return expr;
@@ -1325,16 +1289,10 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
 
         std::string ident = tokens.consume(IDENTIFIER);
         
-        // If 'head' is already a get_field() term, then append this name.
-        if (head->function == GET_FIELD_FUNC) {
-            head->inputs.append(create_string(branch, ident));
-
-        // Otherwise, start a new get_field()
-        } else {
-            head = apply(branch, GET_FIELD_FUNC, RefList(head, create_string(branch, ident)));
-            set_source_location(head, startPosition, tokens);
-            set_input_syntax_hint(head, 0, "postWhitespace", "");
-        }
+        head = apply(branch, GET_FIELD_FUNC, RefList(head, create_string(branch, ident)));
+        set_source_location(head, startPosition, tokens);
+        set_input_syntax_hint(head, 0, "postWhitespace", "");
+        
         finished = false;
         return head;
 

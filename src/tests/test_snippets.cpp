@@ -459,6 +459,13 @@ void test_refactoring()
             "s.to_source() == ' sub(1 1) '");
 }
 
+void test_member_functions()
+{
+    test_snippet("s = '123'; s.length()", "");
+    test_snippet("type T { string s }; v = T(); v.s.length()", "");
+    test_snippet("type T { string s }; T().s.length()", "");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -489,6 +496,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_misc);
     REGISTER_TEST_CASE(test_snippets::test_styled_source);
     REGISTER_TEST_CASE(test_snippets::test_refactoring);
+    REGISTER_TEST_CASE(test_snippets::test_member_functions);
 }
 
 } // namespace test_snippets
