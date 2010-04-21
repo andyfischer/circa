@@ -10,7 +10,6 @@
 #include "gl_shapes.h"
 #include "image.h"
 #include "input.h"
-#include "logs.h"
 #include "mesh.h"
 #include "plastic_main.h"
 #include "postprocess.h"

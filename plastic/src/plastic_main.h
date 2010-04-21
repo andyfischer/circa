@@ -21,5 +21,8 @@ bool evaluate_main_script();
 // the filename of this binary, passed in as args[0]
 extern std::string BINARY_NAME;
 
+// Logging:
+void error(std::string const& msg);
+
 bool reload_runtime();
 int plastic_main(std::vector<std::string> args);

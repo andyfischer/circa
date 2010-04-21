@@ -4,7 +4,6 @@ background(#333)
 picked = ui_widgets:draw_vmenu([30 30]
     [['Asteroids' 'asteroids.ca']
     ['Buttons (ui test)' 'buttons.ca']
-    ['Browser' 'browser.ca']
     ['Code editor' 'code_editor.ca']
     ['Drifting stars effect' 'drifting_stars.ca']
     ['Space invaders (unfinished)' 'invaders.ca']

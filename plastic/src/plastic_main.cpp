@@ -23,6 +23,11 @@ int TARGET_FPS = 60;
 bool PAUSED = false;
 PauseReason PAUSE_REASON;
 
+void error(std::string const& msg)
+{
+    std::cout << "error: " << msg << std::endl;
+}
+
 circa::Branch& runtime_branch()
 {
     return *RUNTIME_BRANCH;
