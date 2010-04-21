@@ -77,6 +77,7 @@ extern TypeRef NULL_T;
 extern TypeRef STRING_T;
 extern TypeRef REF_T;
 extern TypeRef LIST_T;
+extern TypeRef VOID_T;
 
 // Get a named term from the global namespace.
 Term* get_global(std::string name);

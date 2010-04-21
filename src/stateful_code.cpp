@@ -44,7 +44,7 @@ void load_state_into_branch(Branch& state, Branch& branch)
 
     for (; write < branch.length(); write++) {
         if (is_stateful(branch[write]))
-            assign_value_to_default(branch[write]);
+            reset(branch[write]);
     }
 }
 
@@ -239,7 +239,7 @@ void reset_state(Branch& branch)
 {
     for (BranchIterator it(branch); !it.finished(); ++it)
         if (is_stateful(*it))
-            assign_value_to_default(*it);
+            reset(*it);
 }
 
 } // namespace circa

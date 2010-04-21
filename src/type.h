@@ -21,6 +21,7 @@ struct Type
     typedef void (*Initialize)(Type* type, TaggedValue* value);
     typedef void (*Release)(TaggedValue* value);
     typedef void (*Copy)(TaggedValue* source, TaggedValue* dest);
+    typedef void (*Reset)(TaggedValue* value);
     typedef bool (*CastPossible)(Type* type, TaggedValue* value);
     typedef bool (*Equals)(TaggedValue* lhs, TaggedValue* rhs);
     typedef void (*Cast)(Type* type, TaggedValue* source, TaggedValue* dest);
@@ -47,6 +48,7 @@ struct Type
     Initialize initialize;
     Release release;
     Copy copy;
+    Reset reset;
     Cast cast;
     CastPossible castPossible;
     Equals equals;
@@ -86,6 +88,7 @@ private:
         initialize(NULL),
         release(NULL),
         copy(NULL),
+        reset(NULL),
         cast(NULL),
         castPossible(NULL),
         equals(NULL),
@@ -156,6 +159,7 @@ namespace type_t {
     Branch& get_attributes(Term* type);
     Branch& get_member_functions(Term* type);
     Term* get_default_value(Term* type);
+    TaggedValue* get_default_value(Type* type);
 
     void enable_default_value(Term* type);
 }
@@ -164,7 +168,6 @@ Type& as_type(Term* term);
 bool is_native_type(Term* type);
 Type* declared_type(Term* term);
 
-// New version, other versions are deprecated
 bool matches_type(Type* type, Term* term);
 
 // Returns a common type, which is guaranteed to hold all the types in this
@@ -175,9 +178,6 @@ void reset_type(Type* type);
 void initialize_simple_pointer_type(Type* type);
 
 std::string compound_type_to_string(Term* caller);
-
-// Functions which are dispatched based on type:
-void assign_value_to_default(Term* term);
 
 Term* parse_type(Branch& branch, std::string const& decl);
 

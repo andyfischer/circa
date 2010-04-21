@@ -351,6 +351,12 @@ namespace branch_t {
         set_pointer(value, NULL);
     }
 
+    void reset_to_prototype(TaggedValue* value)
+    {
+        Branch& prototype = value->value_type->prototype;
+        branch_t::branch_copy(prototype, as_branch(value));
+    }
+
     void copy(TaggedValue* sourceValue, TaggedValue* destValue)
     {
         Branch& source = as_branch(sourceValue);
@@ -571,6 +577,7 @@ void initialize_branch_based_type(Term* term)
     type->initialize = branch_t::initialize;
     type->release = branch_t::release;
     type->copy = branch_t::copy;
+    type->reset = branch_t::reset_to_prototype;
     type->cast = branch_t::cast;
     type->castPossible = branch_t::cast_possible;
     type->equals = branch_t::equals;

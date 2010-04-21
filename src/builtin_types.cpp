@@ -5,6 +5,10 @@
 namespace circa {
 
 namespace bool_t {
+    void reset(TaggedValue* value)
+    {
+        set_bool(value, false);
+    }
     std::string to_string(TaggedValue* value)
     {
         if (as_bool(value))
@@ -19,6 +23,7 @@ namespace bool_t {
     void setup_type(Type* type)
     {
         type->name = "bool";
+        type->reset = reset;
         type->toString = to_string;
         type->formatSource = format_source;
     }
@@ -358,6 +363,10 @@ namespace void_t {
     {
         return "<void>";
     }
+    void setup_type(Type* type)
+    {
+        type->toString = to_string;
+    }
 }
 
 namespace point_t {
@@ -393,11 +402,10 @@ void initialize_primitive_types(Branch& kernel)
     REF_TYPE = create_type(kernel, "Ref");
     set_pointer(REF_TYPE, REF_T);
 
-    // ANY_TYPE was created in bootstrap_kernel
+    VOID_TYPE = create_type(kernel, "void");
+    set_pointer(VOID_TYPE, VOID_T);
 
-    VOID_TYPE = create_empty_type(kernel, "void");
-    Type* voidType = &as_type(VOID_TYPE);
-    voidType->toString = void_t::to_string;
+    // ANY_TYPE was created in bootstrap_kernel
 }
 
 void post_setup_primitive_types()

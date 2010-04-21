@@ -85,6 +85,10 @@ namespace string_t {
     {
         *((std::string*) get_pointer(dest, STRING_T)) = as_string(source);
     }
+    void reset(TaggedValue* v)
+    {
+        set_str(v, "");
+    }
 
     bool equals(TaggedValue* lhs, TaggedValue* rhs)
     {

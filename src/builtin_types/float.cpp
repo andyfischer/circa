@@ -7,7 +7,7 @@
 
 namespace circa {
 namespace float_t {
-    void initialize(Type* type, TaggedValue* value)
+    void reset(TaggedValue* value)
     {
         set_float(value, 0);
     }
@@ -81,6 +81,7 @@ namespace float_t {
     {
         reset_type(type);
         type->name = "number";
+        type->reset = reset;
         type->cast = cast;
         type->castPossible = cast_possible;
         type->equals = equals;

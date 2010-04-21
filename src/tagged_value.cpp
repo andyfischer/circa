@@ -135,9 +135,25 @@ void swap(TaggedValue* left, TaggedValue* right)
 
 void reset(TaggedValue* value)
 {
-    Type* t = value->value_type;
+    Type* type = value->value_type;
+
+    // Check if there is a default value defined
+    TaggedValue* defaultValue = type_t::get_default_value(type);
+    if (defaultValue != NULL
+            && defaultValue->value_type != VOID_T) {
+        copy(defaultValue, value);
+        return;
+    }
+
+    // Check if the reset() function is defined
+    if (type->reset != NULL) {
+        type->reset(value);
+        return;
+    }
+
+    // No default value, just change type to null and back
     change_type(value, NULL_T);
-    change_type(value, t);
+    change_type(value, type);
 }
 
 std::string to_string(TaggedValue* value)

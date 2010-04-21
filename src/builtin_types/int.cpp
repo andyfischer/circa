@@ -8,6 +8,8 @@
 
 namespace circa {
 namespace int_t {
+    void reset(TaggedValue* v) { set_int(v, 0); }
+
     bool equals(TaggedValue* a, TaggedValue* b)
     {
         if (is_float(b))
@@ -35,6 +37,7 @@ namespace int_t {
     {
         reset_type(type);
         type->name = "int";
+        type->reset = reset;
         type->equals = equals;
         type->toString = to_string;
         type->formatSource = format_source;

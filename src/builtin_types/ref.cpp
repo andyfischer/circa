@@ -23,6 +23,10 @@ namespace ref_t {
     {
         delete (Ref*) get_pointer(value);
     }
+    void reset(TaggedValue* value)
+    {
+        set_ref(value, NULL);
+    }
     void copy(TaggedValue* source, TaggedValue* dest)
     {
         *((Ref*) get_pointer(dest, REF_T)) = as_ref(source);
@@ -175,6 +179,7 @@ namespace ref_t {
         type->toString = to_string;
         type->initialize = initialize;
         type->release = release;
+        type->reset = reset;
         type->copy = copy;
         type->equals = equals;
     }

@@ -160,7 +160,7 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
     term->function = VALUE_FUNC;
     term->type = type;
     change_type(term, type);
-    assign_value_to_default(term);
+    reset(term);
 
     return term;
 }

@@ -114,6 +114,12 @@ namespace type_t {
         if (attributes.length() < 1) return NULL;
         return attributes[0];
     }
+    TaggedValue* get_default_value(Type* type)
+    {
+        Branch& attributes = type->attributes;
+        if (attributes.length() < 1) return NULL;
+        return attributes[0];
+    }
     void enable_default_value(Term* type)
     {
         if (get_default_value(type) == NULL)
@@ -207,50 +213,32 @@ Term* find_common_type(RefList const& list)
 
 void reset_type(Type* type)
 {
-    type->remapPointers = NULL;
-    type->toString = NULL;
     type->checkInvariants = NULL;
     type->valueFitsType = NULL;
     type->initialize = NULL;
     type->release = NULL;
-    type->equals = NULL;
+    type->copy = NULL;
+    type->reset = NULL;
     type->cast = NULL;
+    type->castPossible = NULL;
+    type->equals = NULL;
+    type->remapPointers = NULL;
+    type->toString = NULL;
+    type->formatSource = NULL;
+    type->checkInvariants = NULL;
+    type->valueFitsType = NULL;
+    type->matchesType = NULL;
+    type->mutate = NULL;
+    type->getIndex = NULL;
+    type->setIndex = NULL;
+    type->getField = NULL;
+    type->setField = NULL;
+    type->numElements = NULL;
 }
 
 void initialize_simple_pointer_type(Type* type)
 {
     reset_type(type);
-}
-
-void assign_value_to_default(Term* term)
-{
-    if (is_int(term))
-        set_int(term, 0);
-    else if (is_float(term))
-        set_float(term, 0);
-    else if (is_string(term))
-        set_str(term, "");
-    else if (is_bool(term))
-        set_bool(term, false);
-    else if (is_ref(term))
-        set_ref(term, NULL);
-    else {
-
-        // check if this type has a default value defined
-        Term* defaultValue = type_t::get_default_value(term->type);
-        if (defaultValue != NULL && defaultValue->type != VOID_TYPE) {
-            copy(defaultValue, term);
-            return;
-        }
-
-        // Otherwise, if it's branched-based, use the prototype
-        if (is_branch(term)) {
-
-            Branch& prototype = type_t::get_prototype(term->type);
-            branch_t::branch_copy(prototype, as_branch(term));
-            return;
-        }
-    }
 }
 
 Term* parse_type(Branch& branch, std::string const& decl)

@@ -57,6 +57,7 @@ namespace branch_ref_t {
     Branch& get_target_branch(TaggedValue* value);
 }
 
+namespace void_t { void setup_type(Type* type); }
 namespace styled_source_t { void setup_type(Type* type); }
 namespace indexable_t { void setup_type(Type* type); }
 namespace callable_t { void setup_type(Type* type); }

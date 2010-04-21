@@ -143,15 +143,15 @@ void test_default_values()
     Branch branch;
 
     Term* i = create_int(branch, 5, "i");
-    assign_value_to_default(i);
+    reset(i);
     test_assert(i->asInt() == 0);
 
     Term* f = create_float(branch, 5);
-    assign_value_to_default(f);
+    reset(f);
     test_assert(f->asFloat() == 0);
 
     Term* s = create_string(branch, "hello");
-    assign_value_to_default(s);
+    reset(s);
     test_assert(s->asString() == "");
 
     //create_type(branch, "T");
@@ -167,7 +167,7 @@ void test_default_values()
 
     Term* t_value_2 = create_value(branch, t);
 
-    assign_value_to_default(t_value_2);
+    reset(t_value_2);
 
     test_assert(equals(t_value, t_value_2));
 #endif
@@ -178,7 +178,7 @@ void test_assign_compound_value_to_default()
     Branch branch;
 
     Term* t = branch.eval("[1 2 3]");
-    assign_value_to_default(t);
+    reset(t);
 
     test_assert(as_branch(t).length() == 0);
 }

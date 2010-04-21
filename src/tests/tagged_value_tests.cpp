@@ -157,12 +157,12 @@ void test_float()
 #endif
 }
 
-void test_assign_value_to_default()
+void test_reset()
 {
     Branch branch;
     Term* a = create_int(branch, 5);
     test_assert(as_int(a) == 5);
-    assign_value_to_default(a);
+    reset(a);
     test_assert(as_int(a) == 0);
 }
 
@@ -175,7 +175,7 @@ void test_constructor_syntax()
     Term* a = branch.eval("a = T()");
     test_assert(a->value_type == myType);
     test_assert(a->value_data.ptr == NULL);
-    assign_value_to_default(a);
+    reset(a);
     test_assert(a->value_type == myType);
     test_assert(a->value_data.ptr == NULL);
 }
@@ -356,7 +356,7 @@ void register_tests()
     REGISTER_TEST_CASE(tagged_value_tests::test_term_value);
     REGISTER_TEST_CASE(tagged_value_tests::subroutine_call_test);
     REGISTER_TEST_CASE(tagged_value_tests::test_float);
-    REGISTER_TEST_CASE(tagged_value_tests::test_assign_value_to_default);
+    REGISTER_TEST_CASE(tagged_value_tests::test_reset);
     REGISTER_TEST_CASE(tagged_value_tests::test_constructor_syntax);
     REGISTER_TEST_CASE(tagged_value_tests::manual_memory_management_test::test);
     REGISTER_TEST_CASE(tagged_value_tests::refcount_test);

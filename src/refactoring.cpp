@@ -54,7 +54,7 @@ void change_type(Term *term, Term *typeTerm)
     if (oldType == typeTerm)
         return;
 
-    assign_value_to_default(term);
+    reset(term);
 }
 
 void specialize_type(Term *term, Term *type)

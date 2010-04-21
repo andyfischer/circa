@@ -86,6 +86,7 @@ TypeRef NULL_T;
 TypeRef STRING_T;
 TypeRef REF_T;
 TypeRef LIST_T;
+TypeRef VOID_T;
 
 Term* get_global(std::string name)
 {
@@ -119,6 +120,9 @@ void create_builtin_types()
 
     LIST_T = Type::create();
     list_t::setup_type(LIST_T);
+
+    VOID_T = Type::create();
+    void_t::setup_type(VOID_T);
 }
 
 void bootstrap_kernel()
