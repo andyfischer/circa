@@ -264,6 +264,16 @@ void test_duplicate_get_field_by_name()
     test_assert(dupe);
 }
 
+void test_duplicate_destination_has_different_type()
+{
+    Branch source, dest;
+    Term* a = source.eval("a = any()");
+    Term* p = source.eval("p = Point()");
+    copy(p,a);
+    // This once tripped an assert:
+    duplicate_branch(source, dest);
+}
+
 void find_name_in_outer_branch()
 {
     Branch branch;
@@ -413,6 +423,7 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_duplicate_nested_dont_make_extra_terms);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_subroutine);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_get_field_by_name);
+    REGISTER_TEST_CASE(branch_tests::test_duplicate_destination_has_different_type);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
     REGISTER_TEST_CASE(branch_tests::test_migrate);
     REGISTER_TEST_CASE(branch_tests::test_migrate2);

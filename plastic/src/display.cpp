@@ -54,6 +54,7 @@ bool resize_display(int width, int height)
 
     SCREEN = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 16,
             SDL_OPENGL | SDL_SWSURFACE | SDL_RESIZABLE);
+            //SDL_OPENGL | SDL_SWSURFACE | SDL_FULLSCREEN);
 
     if (SCREEN == NULL) {
         std::cerr << "SDL_SetVideoMode failed: " << SDL_GetError() << std::endl;

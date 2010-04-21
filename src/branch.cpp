@@ -634,6 +634,7 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
 
         // if output is a branch, duplicate it
         if (is_branch(source_term)) {
+            assert(is_branch(dest_term));
             as_branch(dest_term).clear();
             duplicate_branch_nested(newTermMap, as_branch(source_term), as_branch(dest_term));
         }
@@ -648,8 +649,6 @@ void duplicate_branch(Branch& source, Branch& dest)
     ReferenceMap newTermMap;
 
     duplicate_branch_nested(newTermMap, source, dest);
-
-    Timer timer;
 
     // Remap pointers
     for (int i=0; i < dest.length(); i++)

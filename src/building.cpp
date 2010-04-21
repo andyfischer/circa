@@ -124,6 +124,7 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
 
     Term* term = apply(branch, original->function, original->inputs, name);
     change_type(term, original->type);
+    change_type((TaggedValue*) term, original->value_type);
 
     if (copyBranches || !is_branch(original))
         copy(original, term);

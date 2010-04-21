@@ -1,7 +1,7 @@
 
 background(#ccc)
 
-script = load_script('browser_sample.ca')
+script = load_script('drifting_stars.ca')
 
 bref = branch_ref(script)
 contents = bref.get_visible()
