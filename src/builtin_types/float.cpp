@@ -30,7 +30,18 @@ namespace float_t {
     {
         std::stringstream out;
         out << as_float(value);
-        return out.str();
+        std::string result = out.str();
+
+        // Check this string and make sure there is a decimal point. If not, append one.
+        bool decimalFound = false;
+        for (unsigned i=0; i < result.length(); i++)
+            if (result[i] == '.')
+                decimalFound = true;
+
+        if (!decimalFound)
+            return result + ".0";
+        else
+            return result;
     }
     bool matches_type(Type* type, Term* term)
     {

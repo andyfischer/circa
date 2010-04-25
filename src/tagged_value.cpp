@@ -317,13 +317,15 @@ void make_null(TaggedValue* value)
 
 void set_int(TaggedValue* value, int i)
 {
-    assert(is_int(value));
+    if (!is_int(value))
+        internal_error("Value is not an int");
     value->value_data.asint = i;
 }
 
 void set_float(TaggedValue* value, float f)
 {
-    assert(is_float(value));
+    if (!is_float(value))
+        internal_error("Value is not a float");
     value->value_data.asfloat = f;
 }
 

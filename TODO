@@ -1,6 +1,12 @@
 
 
-Bugs:
+Bugs/tasks:
+
+ - List syntax [] should just call list(), shouldn't try to create a branch
+
+ - Remaining things using branch-based types should use list_t
+
+ - Add dictionary_t and map_t
 
  - Can't use a namespace qualifier on a type name in function declaration
 
@@ -11,12 +17,10 @@ Bugs:
      Doesn't work: something.field[i] = x
 
  - When reloading a branch, we need to search the whole world for references to the 
-   old state, and update those references.
+   old branch, and update those references.
 
  - 'do once' needs to export name bindings. Maybe just make this syntactic sugar for if() ?
 
-Tasks:
- - Value sharing
  - Lambdas
  - How to support introspection inside blocks (for, if, include). Should the user need to provide
    names or can we provide default names? Can the user provide a name if they want?

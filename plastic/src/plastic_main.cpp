@@ -15,8 +15,9 @@ Branch* USERS_BRANCH = NULL;
 
 bool CONTINUE_MAIN_LOOP = true;
 
-Term* TIME;
-Term* TIME_DELTA;
+Term* TIME = NULL;
+Term* TIME_DELTA = NULL;
+Term* RENDER_DURATION = NULL;
 long PREV_SDL_TICKS = 0;
 int TARGET_FPS = 60;
 
@@ -77,6 +78,7 @@ bool load_runtime()
     // Fetch constants
     TIME = procure_value(runtime_branch(), FLOAT_TYPE, "time");
     TIME_DELTA = procure_value(runtime_branch(), FLOAT_TYPE, "time_delta");
+    RENDER_DURATION = procure_value(runtime_branch(), FLOAT_TYPE, "render_duration");
 
     return true;
 }
@@ -175,6 +177,8 @@ void main_loop()
     render_frame();
 
     long new_ticks = SDL_GetTicks();
+
+    set_float(RENDER_DURATION, (new_ticks - ticks));
 
     // Delay to limit framerate
     const long ticks_per_second = long(1.0 / TARGET_FPS * 1000);

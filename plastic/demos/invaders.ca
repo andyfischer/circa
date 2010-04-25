@@ -10,9 +10,9 @@ state PlayerShip player = [window.width/2]
 
 -- Keyboard control for player's ship
 horiz_thrust = 0
-if key_down(LEFT)
+if key_down(key:left)
     horiz_thrust = -1
-elif key_down(RIGHT)
+elif key_down(key:right)
     horiz_thrust = 1
 end
 
@@ -40,7 +40,7 @@ type Bullet {
 -- Bullets
 state bullets = []
 
-if key_pressed(SPACE)
+if key_pressed(key:space)
     bullets.append([[player.x player_y - ship_height]])
 end
 
@@ -48,7 +48,8 @@ end
 bullet_speed = 200.0
 for bullet in @bullets
     bullet = bullet -> Bullet
-    bullet = [ [bullet.loc.x bullet.loc.y - bullet_speed * time_delta ]]
+    -- TODO: Fix a mysterious bug, this code complains about a type error:
+    bullet = [[bullet.loc.x, bullet.loc.y - bullet_speed * time_delta ]]
 end
 
 -- Draw bullets

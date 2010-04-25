@@ -26,10 +26,16 @@ void error_occurred(EvalContext* context, Term* errorTerm, std::string const& me
     }
 }
 
+const bool ASSERT_INTERNAL_ERROR = false;
+
 void internal_error(const char* message)
 {
-    std::cerr << "internal error: " << message << std::endl;
-    assert(false);
+    if (ASSERT_INTERNAL_ERROR) {
+        std::cerr << "internal error: " << message << std::endl;
+        assert(false);
+    } else {
+        throw std::runtime_error(message);
+    }
 }
 
 void assert_type(Term* term, Term* type)
