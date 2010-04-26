@@ -875,13 +875,19 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     expr->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
     expr->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
 
-    // If the expr is just an identifier, then create an implicit copy()
+    // If the expr is an identifier, then create an implicit copy()
     if (expr->name != "" && !expr_is_new)
         expr = apply_with_syntax(branch, COPY_FUNC, RefList(expr));
 
     // Check to bind a new name
-    if (nameBinding != "")
+    if (nameBinding != "") {
+        // If the term already has a name (this is the case for member-function syntax
+        // and for unknown_identifier), then make a copy.
+        if (expr->name != "")
+            expr = apply_with_syntax(branch, COPY_FUNC, RefList(expr));
+
         branch.bindName(expr, nameBinding);
+    }
 
     // Apply a pending rebind
     std::string pendingRebind = pop_pending_rebind(branch);

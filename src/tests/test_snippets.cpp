@@ -464,6 +464,9 @@ void test_member_functions()
     test_snippet("s = '123'; s.length()", "");
     test_snippet("type T { string s }; v = T(); v.s.length()", "");
     test_snippet("type T { string s }; T().s.length()", "");
+
+    // This once caused a failed assert in parser.cpp
+    test_snippet("s = Set(); x = s.add(1)", "");
 }
 
 void register_tests()

@@ -21,7 +21,10 @@ def wrap_around(Point p) -> Point
     return [mod(p.x, window.width) mod(p.y, window.height)]
 end
 
-state Ship ship = [[window.width/2 window.height/2] [0 0] 0]
+def reset_ship() -> Ship
+    return [[window.width/2 window.height/2] [0 0] 0]
+end
+state Ship ship = reset_ship()
 state List bullets = []
 
 accelration_per_s = 5.0
@@ -36,6 +39,14 @@ ship_front = 10.0
 ship_back = 6.4
 ship_wing_size = 11.4
 ship_wing_rot = .40
+ship_radius = ship_size * ship_front
+
+namespace game_state
+    playing = 0
+    dying = 1
+end
+
+state int gstate = game_state:playing
 
 def draw_ship(Point loc, number facing)
     def ship_point(number rot, number dist) -> Point
@@ -48,26 +59,23 @@ def draw_ship(Point loc, number facing)
                   ship_point(-ship_wing_rot ship_wing_size)] #fff)
 end
 
+-- Ship control
+if gstate == game_state:playing
+    rotation = cond(key_down(key:left), -1, 0)
+    cond(key_down(key:right), 1, @rotation)
+    ship.facing = ship.facing + rotation * rotation_speed * time_delta
 
-if key_down(key:left)
-    rotation = -1
-elif key_down(key:right)
-    rotation = 1
-else
-    rotation = 0
+    -- Keyboard controls for acceleration
+    thrust = cond(key_down(key:up), 1, 0)
+    cond(key_down(key:down), -1, @thrust)
+
+    ship.momentum = ship.momentum + [cos(ship.facing) sin(ship.facing)] * thrust * accelration_per_s * time_delta
+
+    -- Press space to shoot a bullet
+    if key_pressed(key:space)
+        bullets.append([0, ship.loc [cos(ship.facing) sin(ship.facing)]] -> Bullet)
+    end
 end
-ship.facing = ship.facing + rotation * rotation_speed * time_delta
-
--- Keyboard controls for acceleration
-if key_down(key:up)
-    thrust = 1
-elif key_down(key:down)
-    thrust = -1
-else
-    thrust = 0
-end
-
-ship.momentum = ship.momentum + [cos(ship.facing) sin(ship.facing)] * thrust * accelration_per_s * time_delta
 
 -- Add drag
 ship.momentum = ship.momentum * ship_drag
@@ -82,10 +90,6 @@ end
 ship.loc = ship.loc + ship.momentum
 ship.loc = wrap_around(ship.loc)
 
--- Press space to shoot a bullet
-if key_pressed(key:space)
-    bullets.append([0, ship.loc [cos(ship.facing) sin(ship.facing)]] -> Bullet)
-end
 
 -- Move bullets
 def move_bullet(Bullet bullet) -> Bullet
@@ -234,6 +238,24 @@ end
 for spawn in spawned
     spawn = spawn -> Asteroid
     asteroids.append(spawn)
+end
+
+-- Check for collisions of asteroids and ship
+for asteroid in asteroids
+    asteroid -> Asteroid
+    if point_distance(asteroid.location, ship.loc) < (asteroid.size + ship_radius)
+        gstate = game_state:dying
+    end
+end
+
+-- Draw & update the dying state
+if gstate = game_state:dying
+    death_time = elapsed()
+
+    if death_time > 3.0
+        gstate = game_state:playing
+        ship = reset_ship()
+    end
 end
 
 max_particle_age = 3.0
