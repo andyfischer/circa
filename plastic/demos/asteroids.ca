@@ -17,8 +17,9 @@ type Bullet {
 }
 
 -- Return a point that is wrapped around the playable area
-def wrap_around(Point p) -> Point:
+def wrap_around(Point p) -> Point
     return [mod(p.x, window.width) mod(p.y, window.height)]
+end
 
 state Ship ship = [[window.width/2 window.height/2] [0 0] 0]
 state List bullets = []
@@ -36,15 +37,17 @@ ship_back = 6.4
 ship_wing_size = 11.4
 ship_wing_rot = .40
 
-namespace draw_ship
-    def ship_point(number rot, number dist) -> Point:
-        return polar(rot + ship.facing) * dist*ship_size + ship.loc
+def draw_ship(Point loc, number facing)
+    def ship_point(number rot, number dist) -> Point
+        return polar(rot + facing) * dist*ship_size + loc
+    end
 
     gl:line_loop([ship_point(0 ship_front)
                   ship_point(ship_wing_rot ship_wing_size)
                   ship_point(.5 ship_back)
                   ship_point(-ship_wing_rot ship_wing_size)] #fff)
 end
+
 
 if key_down(key:left)
     rotation = -1
@@ -167,7 +170,8 @@ state List asteroids = []
 state bool initialized = false
 if not(initialized)
     for i in 0..3
-        asteroids.append(generate_asteroid(asteroid_starting_size))
+        as = generate_asteroid(asteroid_starting_size)
+        asteroids.append(as)
     end
     initialized = true
 end
@@ -193,8 +197,6 @@ for asteroid in asteroids
     edges = map(pos_edge, asteroid.edges)
 
     gl:line_loop(edges, #fff)
-    
-    --gl:circle(asteroid.location, asteroid.size, #f00)
 end
 
 -- Check for collisions of asteroids and bullets
@@ -254,3 +256,4 @@ for particle in @particles
     end
 end
 
+draw_ship(ship.loc, ship.facing)

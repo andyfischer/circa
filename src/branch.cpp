@@ -684,26 +684,6 @@ void evaluate_script(Branch& branch, std::string const& filename)
     evaluate_branch(branch);
 }
 
-bool reload_branch_from_file(Branch& branch, std::ostream &errors)
-{
-    std::string filename = get_branch_source_filename(branch);
-
-    Branch replacement;
-    replacement.owningTerm = branch.owningTerm;
-    parse_script(replacement, filename);
-
-    if (has_static_errors(replacement)) {
-        print_static_errors_formatted(replacement, errors);
-        return false;
-    }
-
-    migrate_stateful_values(branch, replacement);
-
-    branch.clear();
-    duplicate_branch(replacement, branch);
-    return true;
-}
-
 void persist_branch_to_file(Branch& branch)
 {
     std::string filename = get_branch_source_filename(branch);

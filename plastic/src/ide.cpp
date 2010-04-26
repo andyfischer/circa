@@ -19,13 +19,6 @@ void reset_state(EvalContext*, Term* term)
         PAUSED = false;
 }
 
-void reload(EvalContext*, Term* term)
-{
-    reload_branch_from_file(users_branch(), std::cout);
-    if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
-        PAUSED = false;
-}
-
 void hosted_reload_runtime(EvalContext*, Term* term)
 {
     reload_runtime();
@@ -41,7 +34,6 @@ void setup(circa::Branch& branch)
     Branch& ide_ns = branch["ide"]->asBranch();
     install_function(ide_ns["quit"], quit);
     install_function(ide_ns["reset_state"], reset_state);
-    install_function(ide_ns["reload"], reload);
     install_function(ide_ns["reload_runtime"], hosted_reload_runtime);
     install_function(ide_ns["paused"], paused);
 }

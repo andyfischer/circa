@@ -101,7 +101,7 @@ void migrate_across_user_defined_types()
 
 void dont_migrate_across_different_types()
 {
-    //test_migration("state int i = 5", "state number f = 10", "f == 10"); TODO
+    //test_migration("state int i = 5", "state number f = 10", "f == 10");
     test_migration("state int i; i = 5", "state number i", "i == 0");
     test_migration("state Point p; p = [3 3]", "state Rect p", "p == [.0 .0 .0 .0]");
 
@@ -109,6 +109,13 @@ void dont_migrate_across_different_types()
                    "def f2(int i) state number n end; f1()",
                    "def f1()->int state int i; return i; end;"
                    "def f2(int i) state number n end; f2(f1())", "");
+}
+
+void migrate_complex_types()
+{
+    test_migration("state List asteroids = []; asteroids = [[[3.0 2.9] [[true false] 1 0 2]]]",
+            "state List asteroids = []",
+            "asteroids == [[[3.0 2.9] [[true false] 1 0 2]]]");
 }
 
 void migrate_misc()
@@ -134,6 +141,7 @@ void register_tests()
     REGISTER_TEST_CASE(migration_snippets::migrate_simple);
     REGISTER_TEST_CASE(migration_snippets::migrate_across_user_defined_types);
     REGISTER_TEST_CASE(migration_snippets::dont_migrate_across_different_types);
+    REGISTER_TEST_CASE(migration_snippets::migrate_complex_types);
     REGISTER_TEST_CASE(migration_snippets::migrate_misc);
 }
 

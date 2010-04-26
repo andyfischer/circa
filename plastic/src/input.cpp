@@ -151,13 +151,7 @@ void handle_key_press(SDL_Event &event, int key)
             break;
 
         case SDLK_r:
-            if (event.key.keysym.mod & KMOD_SHIFT) {
-                reload_runtime();
-            } else {
-                reload_branch_from_file(users_branch(), std::cout);
-                if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
-                    PAUSED = false;
-            }
+            reload_runtime();
             break;
 
         case SDLK_p:

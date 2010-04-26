@@ -237,9 +237,11 @@ void migrate_stateful_values(Branch& source, Branch& dest)
 
 void reset_state(Branch& branch)
 {
-    for (BranchIterator it(branch); !it.finished(); ++it)
-        if (is_stateful(*it))
+    for (BranchIterator it(branch); !it.finished(); ++it) {
+        if (is_stateful(*it)) {
             reset(*it);
+        }
+    }
 }
 
 } // namespace circa

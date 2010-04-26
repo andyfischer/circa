@@ -27,6 +27,9 @@ bool is_statement(Term* term)
 
 std::string format_global_id(Term* term)
 {
+    if (term == NULL)
+        return "<NULL>";
+
     std::stringstream out;
     out << "$" << std::hex << term->globalID;
     return out.str();
@@ -80,14 +83,6 @@ void print_term_raw_string(std::ostream& out, Term* term)
     if (!is_branch(term))
         out << " == " << term->toString();
 }
-
-#if 0
-void print_term_raw_string_with_properties(std::ostream& out, Term* term)
-{
-    print_term_to_string_extended(out, term);
-    out << " " << dict_t::to_string(term->properties);
-}
-#endif
 
 std::string term_to_raw_string(Term* term)
 {

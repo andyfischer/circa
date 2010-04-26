@@ -124,7 +124,6 @@ void evaluate_script(Branch& branch, std::string const& filename);
 
 Term* find_term_by_id(Branch& branch, unsigned int id);
 
-bool reload_branch_from_file(Branch& branch, std::ostream& errors);
 void persist_branch_to_file(Branch& branch);
 std::string get_source_file_location(Branch& branch);
 
