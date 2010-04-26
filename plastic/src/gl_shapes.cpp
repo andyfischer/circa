@@ -92,6 +92,26 @@ void gl_line_loop(EvalContext* cxt, Term* caller)
     gl_check_error(cxt, caller);
 }
 
+void gl_lines(EvalContext* cxt, Term* caller)
+{
+    Branch& list = caller->input(0)->asBranch();
+    Term* color = caller->input(1);
+
+    _unpack_gl_color(color);
+
+    glBegin(GL_LINES);
+
+    for (int i=0; i < list.length(); i++) {
+        float x = list[i]->asBranch()[0]->toFloat();
+        float y = list[i]->asBranch()[1]->toFloat();
+        glVertex3f(x,y,0);
+    }
+    
+    glEnd();
+
+    gl_check_error(cxt, caller);
+}
+
 void gl_points(EvalContext* cxt, Term* caller)
 {
     Branch& list = caller->input(0)->asBranch();
@@ -319,6 +339,7 @@ void setup(Branch& branch)
     install_function(gl_ns["triangles"], gl_triangles);
     install_function(gl_ns["line_strip"], gl_line_strip);
     install_function(gl_ns["line_loop"], gl_line_loop);
+    install_function(gl_ns["lines"], gl_lines);
     install_function(gl_ns["points"], gl_points);
     install_function(gl_ns["circle"], gl_circle);
     install_function(gl_ns["pie"], gl_pie);

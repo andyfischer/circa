@@ -110,6 +110,8 @@ namespace gl begin
         "Render a list of points as a line strip."
     def line_loop(List, Color):
         "Render a list of points as a line loop."
+    def lines(List, Color):
+        "Render a list of points as a line list."
     def points(List, Color):
         "Render a list of points."
     def circle(Point loc, number radius, Color):

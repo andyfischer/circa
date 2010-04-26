@@ -41,6 +41,8 @@ ship_wing_size = 11.4
 ship_wing_rot = .40
 ship_radius = ship_size * ship_front
 
+draw_intersection_circles = true
+
 namespace game_state
     playing = 0
     dying = 1
@@ -48,15 +50,47 @@ end
 
 state int gstate = game_state:playing
 
+def srand() -> number
+    state value = rand()
+    return value
+end
+
 def draw_ship(Point loc, number facing)
     def ship_point(number rot, number dist) -> Point
         return polar(rot + facing) * dist*ship_size + loc
     end
 
-    gl:line_loop([ship_point(0 ship_front)
+    points = [ship_point(0 ship_front)
                   ship_point(ship_wing_rot ship_wing_size)
                   ship_point(.5 ship_back)
-                  ship_point(-ship_wing_rot ship_wing_size)] #fff)
+                  ship_point(-ship_wing_rot ship_wing_size)]
+
+    sides = []
+    for i in 0..4
+        sides.append([points[i] points[(i+1)%4]])
+    end
+
+    -- If we're dying then the ship is coming apart
+    if gstate == game_state:dying
+        for side in @sides
+            a = side[0] -> Point
+            b = side[1] -> Point
+            drift = srand()*elapsed()*30
+            side = [a+drift b+drift]
+        end
+    end
+
+    line_points = []
+    for side in sides
+        line_points.append(side[0])
+        line_points.append(side[1])
+    end
+
+    gl:lines(line_points #fff)
+
+    if draw_intersection_circles
+        gl:circle(loc, ship_radius, #f00)
+    end
 end
 
 -- Ship control
@@ -248,8 +282,10 @@ for asteroid in asteroids
     end
 end
 
--- Draw & update the dying state
-if gstate = game_state:dying
+draw_ship(ship.loc, ship.facing)
+
+-- Update the dying state
+if gstate == game_state:dying
     death_time = elapsed()
 
     if death_time > 3.0
@@ -257,6 +293,7 @@ if gstate = game_state:dying
         ship = reset_ship()
     end
 end
+
 
 max_particle_age = 3.0
 
@@ -278,4 +315,3 @@ for particle in @particles
     end
 end
 
-draw_ship(ship.loc, ship.facing)
