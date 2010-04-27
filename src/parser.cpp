@@ -1190,18 +1190,12 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
     }
 }
 
-Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
+void function_call_inputs(Branch& branch, TokenStream& tokens,
+        RefList& arguments, ListSyntaxHints& inputHints)
 {
-    int startPosition = tokens.getPosition();
-
-    tokens.consume(LPAREN);
-
-    RefList arguments;
-    ListSyntaxHints inputHints;
-
     // Parse function arguments
     int index = 0;
-    while (!tokens.nextIs(RPAREN) && !tokens.finished()) {
+    while (!tokens.nextIs(RPAREN) && !tokens.nextIs(RBRACKET) && !tokens.finished()) {
 
         inputHints.set(index, "preWhitespace", possible_whitespace_or_newline(tokens));
         int origBranchLength = branch.length();
@@ -1221,6 +1215,18 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
 
         index++;
     }
+}
+
+Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(LPAREN);
+
+    RefList arguments;
+    ListSyntaxHints inputHints;
+
+    function_call_inputs(branch, tokens, arguments, inputHints);
 
     if (!tokens.nextIs(RPAREN))
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
@@ -1627,6 +1633,33 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
     return resultTerm;
 }
 
+#if 0
+Term* literal_list(Branch& branch, TokenStream& tokens)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(LBRACKET);
+
+    RefList inputs;
+    ListSyntaxHints listHints;
+
+    function_call_inputs(branch, tokens, inputs, listHints);
+
+    if (!tokens.nextIs(RBRACKET))
+        return compile_error_for_line(branch, tokens, startPosition, "Expected: ]");
+    tokens.consume(RBRACKET);
+
+    Term* result = apply(branch, LIST_FUNC, inputs);
+    listHints.apply(result);
+
+    result->setBoolProp("syntax:literal-list", true);
+    set_source_location(result, startPosition, tokens);
+
+    return result;
+}
+
+#else
+
 Term* literal_list(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
@@ -1671,6 +1704,8 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
     set_source_location(result, startPosition, tokens);
     return result;
 }
+#endif
+
 
 Term* plain_branch(Branch& branch, TokenStream& tokens)
 {

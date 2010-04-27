@@ -138,14 +138,16 @@ void test_map()
     // Test shrinking the input list
     resize_list(as_branch(input_list), 3, INT_TYPE);
     evaluate_branch(branch);
-    test_assert(as_branch(map_sqr).length() == 3);
-    test_assert(as_branch(map_myfunc).length() == 3);
+    //test_assert(as_branch(map_sqr).length() == 3);
+    //test_assert(as_branch(map_myfunc).length() == 3);
+    test_assert(map_sqr->numElements() == 3);
+    test_assert(map_myfunc->numElements() == 3);
 
     // Test growing the input list
     resize_list(as_branch(input_list), 6, INT_TYPE);
     evaluate_branch(branch);
-    test_assert(as_branch(map_sqr).length() == 6);
-    test_assert(as_branch(map_myfunc).length() == 6);
+    test_assert(map_sqr->numElements() == 6);
+    test_assert(map_myfunc->numElements() == 6);
 }
 
 void test_vectorized_funcs()
