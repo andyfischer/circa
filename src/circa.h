@@ -25,7 +25,6 @@
 #include "importing.h"
 #include "introspection.h"
 #include "invariants.h"
-#include "list_t.h"
 #include "metaprogramming.h"
 #include "metrics.h"
 #include "names.h"

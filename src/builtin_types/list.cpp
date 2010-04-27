@@ -3,8 +3,8 @@
 #include <string>
 #include <sstream>
 
+#include "builtin_types.h"
 #include "debug_valid_objects.h"
-#include "list_t.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -13,14 +13,51 @@ namespace list_t {
 
 bool is_list(TaggedValue* value);
 void tv_mutate(TaggedValue* value);
-static ListData* mutate(ListData* data);
 
+///////// Internal data structure /////////
 struct ListData {
     int refCount;
     int count;
     int capacity;
     TaggedValue items[0];
 };
+
+///////// Internally used functions /////////
+
+// Increment refcount on this list
+static void incref(ListData* data);
+
+// Decrement refcount. This might cause this list to be deleted, don't
+// use this data after you have given up your reference.
+static void decref(ListData* data);
+
+// Create a new list, starts off with 1 ref.
+static ListData* create_list(int capacity);
+
+// Creates a new list that is a duplicate of source. Starts off with 1 ref.
+// Does not decref source.
+static ListData* duplicate(ListData* source);
+
+// Returns a new list with the given capacity. Decrefs original.
+static ListData* increase_capacity(ListData* original, int new_capacity);
+
+// Returns a new list that has 2x the capacity of 'original', and decrefs 'original'.
+static ListData* grow_capacity(ListData* original);
+
+// Modify a list so that it has the given number of elements, returns the new
+// list data.
+static ListData* resize(ListData* original, int numElements);
+
+// Reset this list to have 0 elements.
+static void clear(ListData** data);
+
+// Return a version of this list which is safe to modify. If this data has
+// multiple references, we'll return a new copy (and decref the original).
+static ListData* mutate(ListData* data);
+
+// Add a new blank element to the end of the list, resizing if necessary.
+// Returns the new element.
+static TaggedValue* append(ListData** data);
 
 void assert_valid_list(ListData* list)
 {
@@ -29,13 +66,13 @@ void assert_valid_list(ListData* list)
     debug_assert_valid_object(list, LIST_OBJECT);
 }
 
-void incref(ListData* data)
+static void incref(ListData* data)
 {
     assert_valid_list(data);
     data->refCount++;
 }
 
-void decref(ListData* data)
+static void decref(ListData* data)
 {
     assert_valid_list(data);
     assert(data->refCount > 0);
@@ -50,7 +87,6 @@ void decref(ListData* data)
     }
 }
 
-// Create a new list, starts off with 1 ref.
 static ListData* create_list(int capacity)
 {
     ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(TaggedValue));
@@ -64,8 +100,6 @@ static ListData* create_list(int capacity)
     return result;
 }
 
-// Creates a new list that is a duplicate of source. Starts off with 1 ref.
-// Does not decref source.
 static ListData* duplicate(ListData* source)
 {
     if (source == NULL || source->count == 0)
@@ -83,7 +117,6 @@ static ListData* duplicate(ListData* source)
     return result;
 }
 
-// Returns a new list with the given capacity.
 static ListData* increase_capacity(ListData* original, int new_capacity)
 {
     if (original == NULL)
@@ -100,7 +133,6 @@ static ListData* increase_capacity(ListData* original, int new_capacity)
     return result;
 }
 
-// Returns a new list that has 2x the capacity of 'original', and decrefs 'original'.
 static ListData* grow_capacity(ListData* original)
 {
     if (original == NULL)
@@ -110,7 +142,6 @@ static ListData* grow_capacity(ListData* original)
     return result;
 }
 
-// Modify a list so that it has the given number of elements.
 static ListData* resize(ListData* original, int numElements)
 {
     if (original == NULL) {
@@ -148,8 +179,6 @@ static ListData* resize(ListData* original, int numElements)
     return result;
 }
 
-
-// Reset this list to have 0 elements.
 static void clear(ListData** data)
 {
     if (*data == NULL) return;
@@ -157,8 +186,6 @@ static void clear(ListData** data)
     *data = NULL;
 }
 
-// Return a version of this list which is safe to modify. If this data has
-// multiple references, we'll return a new copy (and decref the original).
 static ListData* mutate(ListData* data)
 {
     assert(data->refCount > 0);
@@ -170,9 +197,7 @@ static ListData* mutate(ListData* data)
     return copy;
 }
 
-// Add a new blank element to the end of the list, resizing if necessary.
-// Returns the new element.
-TaggedValue* append(ListData** data)
+static TaggedValue* append(ListData** data)
 {
     if (*data == NULL) {
         *data = create_list(1);
@@ -367,5 +392,95 @@ List::resize(int newSize)
 {
     list_t::resize(this, newSize); 
 }
+
+namespace list_t_tests {
+
+    void test_simple()
+    {
+        List list;
+        test_assert(list.length() == 0);
+        list.append();
+        test_assert(list.length() == 1);
+        list.append();
+        test_assert(list.length() == 2);
+        list.clear();
+        test_assert(list.length() == 0);
+    }
+
+    void test_tagged_value()
+    {
+        TypeRef list = Type::create();
+        list_t::setup_type(list);
+
+        TaggedValue value;
+        change_type(&value, list);
+
+        test_equals(to_string(&value), "[]");
+        test_assert(get_index(&value, 1) == NULL);
+        test_assert(num_elements(&value) == 0);
+
+        make_int(list_t::append(&value), 1);
+        make_int(list_t::append(&value), 2);
+        make_int(list_t::append(&value), 3);
+
+        test_equals(to_string(&value), "[1, 2, 3]");
+
+        test_assert(as_int(get_index(&value, 1)) == 2);
+        test_assert(num_elements(&value) == 3);
+    }
+
+    void test_tagged_value_copy()
+    {
+        TypeRef list = Type::create();
+        list_t::setup_type(list);
+
+        TaggedValue value(list);
+
+        make_int(list_t::append(&value), 1);
+        make_int(list_t::append(&value), 2);
+        make_int(list_t::append(&value), 3);
+
+        test_equals(to_string(&value), "[1, 2, 3]");
+
+        TaggedValue value2;
+        test_assert(value.value_type->copy != NULL);
+        copy(&value, &value2);
+
+        test_equals(to_string(&value2), "[1, 2, 3]");
+
+        make_int(list_t::append(&value2), 4);
+
+        test_equals(to_string(&value), "[1, 2, 3]");
+        test_equals(to_string(&value2), "[1, 2, 3, 4]");
+    }
+
+    void test_mutate()
+    {
+        TypeRef list = Type::create();
+        list_t::setup_type(list);
+
+        TaggedValue value(list);
+
+        make_int(list_t::append(&value), 1);
+        make_int(list_t::append(&value), 2);
+
+        TaggedValue value2(list);
+        copy(&value, &value2);
+
+        test_assert(get_pointer(&value) == get_pointer(&value2));
+        mutate(&value2);
+        test_assert(get_pointer(&value) != get_pointer(&value2));
+    }
+
+    void register_tests()
+    {
+        REGISTER_TEST_CASE(list_t_tests::test_simple);
+        REGISTER_TEST_CASE(list_t_tests::test_tagged_value);
+        REGISTER_TEST_CASE(list_t_tests::test_tagged_value_copy);
+        REGISTER_TEST_CASE(list_t_tests::test_mutate);
+    }
+
+} // namespace list_t_tests
+
 
 }

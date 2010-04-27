@@ -4,6 +4,7 @@
 #define CIRCA_BUILTIN_TYPES_INCLUDED
 
 #include "common_headers.h"
+#include "tagged_value.h"
 
 namespace circa {
 
@@ -31,6 +32,8 @@ namespace old_list_t {
 
 namespace list_t {
     bool is_list(TaggedValue*);
+    void setup_type(Type*);
+    void postponed_setup_type(Type*);
 }
 
 namespace dict_t {
@@ -76,6 +79,18 @@ void post_setup_primitive_types();
 
 void setup_builtin_types(Branch& kernel);
 void parse_builtin_types(Branch& kernel);
+
+struct List : TaggedValue
+{
+    List();
+
+    TaggedValue* append();
+    void clear();
+    int length();
+    TaggedValue* get(int index);
+    TaggedValue* operator[](int index) { return get(index); }
+    void resize(int size);
+};
 
 }
 

@@ -2,9 +2,9 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "builtin_types.h"
 #include "function.h"
 #include "introspection.h"
-#include "list_t.h"
 #include "parser.h"
 #include "parser_util.h"
 #include "source_repro.h"

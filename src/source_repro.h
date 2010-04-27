@@ -4,8 +4,7 @@
 #define CIRCA_RICHSOURCE_INCLUDED
 
 #include "common_headers.h"
-
-#include "list_t.h"
+#include "builtin_types.h"
 
 namespace circa {
 
