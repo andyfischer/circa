@@ -441,26 +441,6 @@ void test_integer_division()
     test_assert(a->asInt() == 1);
 }
 
-void test_literal_list()
-{
-    Branch branch;
-    Term* a = branch.eval("a = 1");
-    Term* l = branch.eval("l = [1+2, a, sqrt(sqr(a))]");
-
-    // Make sure that the extra values are created outside of the list
-    // and in the proper order.
-    test_assert(branch[0] == a);
-    test_assert(branch[1]->asInt() == 1);
-    test_assert(branch[2]->asInt() == 2);
-    test_assert(branch[3]->function->name == "sqr");
-    test_assert(branch[4] == l);
-
-    // Look at the list contents
-    test_assert(as_branch(l)[0]->function->name == "add_i");
-    test_assert(as_branch(l)[1]->function->name == "copy");
-    test_assert(as_branch(l)[2]->function->name == "sqrt");
-}
-
 void test_namespace()
 {
     Branch branch;
@@ -645,7 +625,6 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_array_index_access);
     REGISTER_TEST_CASE(parser_tests::test_float_division);
     REGISTER_TEST_CASE(parser_tests::test_integer_division);
-    REGISTER_TEST_CASE(parser_tests::test_literal_list);
     REGISTER_TEST_CASE(parser_tests::test_namespace);
     REGISTER_TEST_CASE(parser_tests::test_member_function_calls);
     REGISTER_TEST_CASE(parser_tests::test_subscripted_atom);

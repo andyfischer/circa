@@ -1633,7 +1633,7 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
     return resultTerm;
 }
 
-#if 0
+#if 1
 Term* literal_list(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();

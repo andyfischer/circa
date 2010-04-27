@@ -469,6 +469,11 @@ void test_member_functions()
     test_snippet("s = Set(); x = s.add(1)", "");
 }
 
+void test_lists()
+{
+    test_snippet("to_rect([0 0] [5.0 10.0])", "");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -500,6 +505,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_styled_source);
     REGISTER_TEST_CASE(test_snippets::test_refactoring);
     REGISTER_TEST_CASE(test_snippets::test_member_functions);
+    REGISTER_TEST_CASE(test_snippets::test_lists);
 }
 
 } // namespace test_snippets

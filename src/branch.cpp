@@ -399,16 +399,27 @@ namespace branch_t {
         if (prototype.length() == 0)
             return true;
 
+        // Inspect a call to list(), look at inputs instead of looking at the result.
+        if (term->function == LIST_FUNC) {
+            if (term->numInputs() != prototype.length())
+                return false;
+
+            for (int i=0; i < prototype.length(); i++)
+                if (!circa::matches_type(&as_type(prototype[i]->type), term->input(i)))
+                    return false;
+
+            return true;
+        }
+
         Branch& value = as_branch(term);
 
         if (prototype.length() != value.length())
             return false;
 
         // Check each element
-        for (int i=0; i < prototype.length(); i++) {
+        for (int i=0; i < prototype.length(); i++)
             if (!circa::matches_type(&as_type(prototype[i]->type), value[i]))
                 return false;
-        }
 
         return true;
     }
