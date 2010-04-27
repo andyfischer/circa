@@ -55,6 +55,8 @@ namespace list_function {
     }
 
     void evaluate_newlist(EvalContext*, Term* caller) {
+        // Temporary function for making a non-branch based list. This will
+        // replace list()
 
         List* result = (List*) caller;
 
@@ -72,7 +74,7 @@ namespace list_function {
 
         import_function(kernel, evaluate_repeat, "repeat(any, int) -> List");
         
-        import_function(kernel, evaluate_newlist, "newlist(any...) -> List");
+        import_function(kernel, evaluate_newlist, "newlist(any...) -> NewList");
     }
 }
 }

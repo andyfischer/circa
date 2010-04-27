@@ -405,6 +405,9 @@ void initialize_primitive_types(Branch& kernel)
     VOID_TYPE = create_type(kernel, "void");
     set_pointer(VOID_TYPE, VOID_T);
 
+    Term* newListType = create_type(kernel, "NewList");
+    set_pointer(newListType, LIST_T);
+
     // ANY_TYPE was created in bootstrap_kernel
 }
 
@@ -453,6 +456,8 @@ void setup_builtin_types(Branch& kernel)
     indexable_t::setup_type(&as_type(indexableType));
 
     callable_t::setup_type(&as_type(parse_type(kernel, "type Callable;")));
+
+
 }
 
 void parse_builtin_types(Branch& kernel)

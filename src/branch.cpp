@@ -369,38 +369,42 @@ namespace branch_t {
 
     void cast(Type*, TaggedValue* sourceValue, TaggedValue* destValue)
     {
-        Branch& source = as_branch(sourceValue);
         Branch& dest = as_branch(destValue);
-        assert_valid_branch(&source);
         assert_valid_branch(&dest);
 
-        // For Branch or List type, overwrite existing shape
-        if ((destValue->value_type == &as_type(BRANCH_TYPE))
-                || (destValue->value_type == &as_type(LIST_TYPE)))
-            branch_copy(source, dest);
-        else
-            assign(source, dest);
+        if (is_branch(sourceValue)) {
+            Branch& source = as_branch(sourceValue);
+            assert_valid_branch(&source);
+
+            // For Branch or List type, overwrite existing shape
+            if ((destValue->value_type == &as_type(BRANCH_TYPE))
+                    || (destValue->value_type == &as_type(LIST_TYPE)))
+                branch_copy(source, dest);
+            else
+                assign(source, dest);
+        } else {
+            dest.clear();
+            int numElements = sourceValue->numElements();
+            for (int i=0; i < numElements; i++) {
+                Term* v = create_value(dest, ANY_TYPE);
+                circa::copy(sourceValue->getIndex(i), v);
+            }
+        }
     }
 
     bool cast_possible(Type*, TaggedValue* value)
     {
-        return is_branch(value);
+        return is_branch(value) || list_t::is_list(value);
     }
 
     bool matches_type(Type* type, Term* term)
     {
-        if (!is_branch(term))
-            return false;
-
         Branch& prototype = type->prototype;
 
-        // Check if our type defines a prototype. If there's no prototype
-        // then we can be satisfied with the value just being a branch.
-        if (prototype.length() == 0)
-            return true;
-
         // Inspect a call to list(), look at inputs instead of looking at the result.
-        if (term->function == LIST_FUNC) {
+        if (term->function == LIST_FUNC
+                || term->function->name == "newlist") // <-- TEMP
+        {
             if (term->numInputs() != prototype.length())
                 return false;
 
@@ -410,6 +414,14 @@ namespace branch_t {
 
             return true;
         }
+
+        if (!is_branch(term))
+            return false;
+
+        // Check if our type defines a prototype. If there's no prototype
+        // then we can be satisfied with the value just being a branch.
+        if (prototype.length() == 0)
+            return true;
 
         Branch& value = as_branch(term);
 

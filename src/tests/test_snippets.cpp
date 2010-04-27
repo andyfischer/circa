@@ -237,11 +237,11 @@ void test_references()
             "c_ref.input(0) == ref(a); c_ref.input(1) == ref(b)");
 
     // test .length
-    test_snippet("br = [1 2]; mir = branch_ref(br)",
+    test_snippet("br = {1 2}; mir = branch_ref(br)",
             "mir.length() == 2");
 
     // test .get_index
-    test_snippet("a = 1; b = 2; br = [a b]; mir = branch_ref(br);"
+    test_snippet("a = 1; b = 2; br = {a b}; mir = branch_ref(br);"
             "mir_0 = mir.get_index(0); mir_1 = mir.get_index(1)",
             "mir_0.asint() == 1; mir_1.asint() == 2");
 
@@ -472,6 +472,9 @@ void test_member_functions()
 void test_lists()
 {
     test_snippet("to_rect([0 0] [5.0 10.0])", "");
+
+    test_snippet("to_rect(newlist(0 0) newlist(5.0 10.0))", "");
+    test_snippet("", "filter(newlist(1 2 3) newlist(true false true)) == [1 3]");
 }
 
 void register_tests()
