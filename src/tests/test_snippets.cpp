@@ -48,6 +48,13 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     Branch& assertions = create_branch(code, "assertions");
     parser::compile(&assertions, parser::statement_list, assertionsStr);
 
+    if (has_static_errors(assertions)) {
+        std::cout << "In code snippet: " << assertionsStr << std::endl;
+        print_static_errors_formatted(assertions, std::cout);
+        declare_current_test_failed();
+        return;
+    }
+
     EvalContext result = evaluate_branch(code);
 
     if (result.errorOccurred) {
@@ -474,7 +481,7 @@ void test_lists()
     test_snippet("to_rect([0 0] [5.0 10.0])", "");
 
     test_snippet("to_rect(newlist(0 0) newlist(5.0 10.0))", "");
-    test_snippet("", "filter(newlist(1 2 3) newlist(true false true)) == [1 3]");
+    test_snippet("filter(newlist(1 2 3) newlist(true false true))", "");
 }
 
 void register_tests()
