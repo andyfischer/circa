@@ -185,9 +185,6 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
             evaluate_term(cxt, call);
             satisfiedIndex = i;
 
-            if (call->hasError())
-                nested_error_occurred(caller);
-
             if (stateElement != NULL)
                 persist_state_from_branch(as_branch(call), as_branch(stateElement));
 

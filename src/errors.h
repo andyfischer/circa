@@ -18,11 +18,6 @@ void native_type_mismatch(std::string const& message);
 // Check if term has the given type, calls native_type_mismatch if not.
 void assert_type(Term* term, Term* type);
 
-// Puts 'errorTerm' into an error state, with no message. This term should contain a 
-// branch, and somewhere inside that branch there should be an errored term with
-// a message.
-void nested_error_occurred(Term* errorTerm);
-
 // Remove an error status.
 void clear_error(Term* term);
 

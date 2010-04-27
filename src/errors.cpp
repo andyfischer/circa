@@ -54,12 +54,6 @@ void native_type_mismatch(std::string const& message)
     throw std::runtime_error(message);
 }
 
-void nested_error_occurred(Term* errorTerm)
-{
-    assert(errorTerm != NULL);
-    errorTerm->setHasError(true);
-}
-
 void clear_error(Term* term)
 {
     if (has_runtime_error(term)) {

@@ -178,8 +178,6 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
     Branch& codeBranch = as_branch(forTerm);
     Branch* stateBranch = get_for_loop_state(forTerm);
 
-    // Make sure state has the correct number of iterations
-
     int numIterations = listTerm->numElements();
     bool modifyList = get_for_loop_modify_list(forTerm)->asBool();
     Term* discardCalled = get_for_loop_discard_called(forTerm);
@@ -198,9 +196,8 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
 
             Branch& iterationBranch = get_for_loop_iteration_state(forTerm, i);
             
-            if (iterationBranch.length() == 0) {
+            if (iterationBranch.length() == 0)
                 get_type_from_branches_stateful_terms(codeBranch, iterationBranch);
-            }
         }
     }
 
@@ -224,13 +221,10 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
             load_state_into_branch(stateBranch->get(i)->asBranch(), codeBranch);
 
         // Evaluate
-        Term errorListener;
         evaluate_branch(cxt, codeBranch);
 
-        if (cxt->errorOccurred) {
-            nested_error_occurred(forTerm);
+        if (cxt->errorOccurred)
             break;
-        }
 
         // Persist stateful terms
         if (stateBranch != NULL)
