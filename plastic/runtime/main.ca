@@ -314,10 +314,10 @@ if draw_main_menu
 end
 
 -- Draw fpses
-draw_fps = false
+draw_fps = true
 if draw_fps
     text_sprite = text:render_text(ui_font_medium, concat('fps: ' fps), #fff)
-    text:draw_rendered_text(text_sprite, [10 280])
+    text:draw_rendered_text(text_sprite, [10 window.height - 30])
 end
 
 -- Draw pause indicator

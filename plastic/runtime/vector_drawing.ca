@@ -19,6 +19,19 @@ def thick_line(Point a, Point b, number width, Color color)
     gl:triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
 end
 
+def draw_circle(Point p, number radius, Color color)
+    -- Dumb guess on how many points to use
+    steps = (round(radius / 3) + 10)
+    min(@steps, 15)
+
+    points = []
+    for step in 0..steps
+        points.append([cos(step / steps), sin(step / steps)] * radius + p)
+    end
+
+    gl:line_loop(points, color)
+end
+
 def fill_rounded_rect(Rect rect, number cornerRadius, Color color)
     "Draw a rectangle with rounded corners"
     width = rect.x2 - rect.x1
@@ -40,7 +53,7 @@ def fill_rounded_rect(Rect rect, number cornerRadius, Color color)
     fill_rect([rect.x1, rect.y1 + r, rect.x1 + r, rect.y2 - r] color)
 
     -- middle
-    fill_rect([rect.x1+r,rect.y1+r,rect.x2 - r,rect.y2 - r] color)
+    fill_rect([rect.x1+r,rect.y1+r, rect.x2 - r,rect.y2 - r] color)
 
     -- right
     fill_rect([rect.x2-r, rect.y1 + r, rect.x2, rect.y2 - r] color)
