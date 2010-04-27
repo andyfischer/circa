@@ -8,13 +8,32 @@ namespace map_function {
     void evaluate(EvalContext* cxt, Term* caller)
     {
         Term* func = caller->input(0);
-        Branch& inputs = as_branch(caller->input(1));
+        List* inputs = (List*) caller->input(1);
         Branch& output = as_branch(caller);
 
         if (is_function_stateful(func)) {
             error_occurred(cxt, caller, "map() not yet supported on a stateful function");
             return;
         }
+
+        int numInputs = inputs->numElements();
+
+        Branch evaluationBranch;
+        Term* evalInput = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
+        Term* evalResult = apply(evaluationBranch, func, RefList(evalInput));
+
+        output.clear();
+
+        for (int i=0; i < numInputs; i++) {
+            copy(inputs->getIndex(i), evalInput);
+            evaluate_branch(evaluationBranch);
+
+            Term* outputElement = create_value(output, evalResult->type);
+            copy(evalResult, outputElement);
+        }
+
+#if 0
+        Old branch-based version:
 
         // Create term if necessary
         for (int i=output.length(); i < inputs.length(); i++)
@@ -27,6 +46,7 @@ namespace map_function {
         output.removeNulls();
 
         evaluate_branch(cxt, output);
+#endif
     }
 
     void setup(Branch& kernel)
