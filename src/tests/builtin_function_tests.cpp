@@ -143,9 +143,6 @@ void test_vectorized_funcs()
     Branch& result = as_branch(t);
     
     test_assert(result.length() == 3);
-    test_equals(result[0]->function->name, "add_i");
-    test_equals(result[1]->function->name, "add_i");
-    test_equals(result[2]->function->name, "add_i");
     test_assert(result[0]->asInt() == 5);
     test_assert(result[1]->asInt() == 7);
     test_assert(result[2]->asInt() == 9);
@@ -154,9 +151,6 @@ void test_vectorized_funcs()
     t = branch.eval("[10 20 30] * 1.1");
     Branch& mult_result = as_branch(t);
     test_assert(mult_result.length() == 3);
-    test_equals(mult_result[0]->function->name, "mult_f");
-    test_equals(mult_result[1]->function->name, "mult_f");
-    test_equals(mult_result[2]->function->name, "mult_f");
     test_equals(mult_result[0]->asFloat(), 11);
     test_equals(mult_result[1]->asFloat(), 22);
     test_equals(mult_result[2]->asFloat(), 33);

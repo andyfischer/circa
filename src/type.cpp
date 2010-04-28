@@ -151,9 +151,10 @@ Type& as_type(Term *term)
     return *get_type_value(term);
 }
 
+// Should rename this to type_is_superset
 bool matches_type(Type* type, Term* term)
 {
-    // Don't check if term outputs ANY. This should trigger a runtime check.
+    // Temp: Allow matches to Any
     if (term->type == ANY_TYPE)
         return true;
 

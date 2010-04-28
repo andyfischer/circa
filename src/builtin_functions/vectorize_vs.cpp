@@ -14,6 +14,27 @@ namespace vectorize_vs_function {
     {
         Term* func = as_ref(function_t::get_parameters(caller->function));
 
+#if 0
+        List* left = (List*) caller->input(0);
+        Term* right = caller->input(1);
+        Branch& output = as_branch(caller);
+        int numInputs = left->numElements();
+
+        Branch evaluationBranch;
+        Term* input0 = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
+        Term* evalResult = apply(evaluationBranch, func, RefList(input0, right));
+
+        output.clear();
+
+        for (int i=0; i < numInputs; i++) {
+            copy(left->getIndex(i), input0);
+            evaluate_branch(evaluationBranch);
+
+            Term* outputElement = create_value(output, evalResult->type);
+            copy(evalResult, outputElement);
+        }
+
+#else
         Branch& left = as_branch(caller->input(0));
         Term* right = caller->input(1);
 
@@ -30,11 +51,13 @@ namespace vectorize_vs_function {
         }
 
         evaluate_branch(cxt, output);
+#endif
     }
 
     void setup(Branch& kernel)
     {
-        Term* func = import_function(kernel, evaluate, "vectorize_vs(List,any) -> List");
+        Term* func = import_function(kernel, evaluate,
+                "vectorize_vs(List,any) -> List");
         function_t::get_specialize_type(func) = specializeType;
     }
 }

@@ -17,6 +17,38 @@ namespace vectorize_vv_function {
     {
         Term* func = as_ref(function_t::get_parameters(caller->function));
 
+#if 0
+        Term* left = caller->input(0);
+        Term* right = caller->input(1);
+        Branch& output = as_branch(caller);
+        int numInputs = left->numElements();
+
+        if (numInputs != right->numElements()) {
+            std::stringstream msg;
+            msg << "Input lists have different lengths (left has " << numInputs;
+            msg << ", right has " << right->numElements() << ")";
+            error_occurred(cxt, caller, msg.str());
+            return;
+        }
+
+        Branch evaluationBranch;
+        Term* input0 = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
+        Term* input1 = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
+
+        Term* evalResult = apply(evaluationBranch, func, RefList(input0, input1));
+        dump_branch(evaluationBranch);
+
+        output.clear();
+
+        for (int i=0; i < numInputs; i++) {
+            copy(left->getIndex(i), input0);
+            copy(right->getIndex(i), input1);
+            evaluate_branch(evaluationBranch);
+
+            Term* outputElement = create_value(output, evalResult->type);
+            copy(evalResult, outputElement);
+        }
+#else
         Branch& left = as_branch(caller->input(0));
         Branch& right = as_branch(caller->input(1));
 
@@ -41,11 +73,13 @@ namespace vectorize_vv_function {
         }
 
         evaluate_branch(cxt, output);
+#endif
     }
 
     void setup(Branch& kernel)
     {
-        Term* func = import_function(kernel, evaluate, "vectorize_vv(List,List) -> List");
+        Term* func = import_function(kernel, evaluate,
+                "vectorize_vv(List,List) -> List");
         function_t::get_specialize_type(func) = specializeType;
     }
 }
