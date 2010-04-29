@@ -38,14 +38,6 @@ void _test_assert_function(Term* term, int line, const char* file)
         throw std::runtime_error(msg.str());
     }
 
-    if (term->hasError()) {
-        std::stringstream msg;
-        msg << "Runtime error on term " << format_global_id(term) << std::endl;
-        msg << get_error_message(term) << std::endl;
-        msg << "Occurred in " << file << ", line " << line << std::endl;
-        throw std::runtime_error(msg.str());
-    }
-
     if (has_static_error(term)) {
         std::stringstream msg;
         msg << "Compile error on term " << format_global_id(term) << std::endl;
@@ -89,10 +81,10 @@ void _test_assert_function(Branch& branch, int line, const char* file)
         }
     }
 
-    if (has_error(branch)) {
+    if (has_static_errors(branch)) {
         std::stringstream msg;
         msg << "Branch has errors at " << file << ", line " << line << std::endl;
-        msg << get_error_message(branch);
+        msg << get_static_errors_formatted(branch);
         throw std::runtime_error(msg.str());
     }
 }

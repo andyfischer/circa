@@ -44,9 +44,6 @@ T eval(std::string const& statement)
 
     Term* result = branch.eval(statement);
 
-    if (result->hasError())
-        throw std::runtime_error(get_error_message(result));
-
     return as<T>(result);
 }
 
@@ -54,9 +51,6 @@ template <class T>
 T eval(Branch &branch, std::string const& statement)
 {
     Term* result = branch.eval(statement);
-
-    if (result->hasError())
-        throw std::runtime_error(get_error_message(result));
 
     return as<T>(result);
 }

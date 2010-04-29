@@ -13,7 +13,7 @@
 
 namespace circa {
 
-const int TERM_FLAG_ERRORED = 0x1;
+//const int TERM_FLAG_ERRORED = 0x1;
 
 struct List;
 
@@ -90,10 +90,6 @@ struct Term : TaggedValue
     float floatPropOptional(std::string const& name, float defaultValue);
     bool boolPropOptional(std::string const& name, bool defaultValue);
     std::string stringPropOptional(std::string const& name, std::string const& defaultValue);
-
-    // Flag accessors
-    bool hasError() const;
-    void setHasError(bool error);
 
     // Convenience accessors
     int asInt();

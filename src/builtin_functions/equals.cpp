@@ -17,7 +17,7 @@ namespace equals_function {
     {
         evaluate(cxt, caller);
 
-        if (!caller->hasError())
+        if (!cxt->errorOccurred)
             set_bool(caller, !as_bool(caller));
     }
 

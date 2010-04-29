@@ -18,37 +18,16 @@ void native_type_mismatch(std::string const& message);
 // Check if term has the given type, calls native_type_mismatch if not.
 void assert_type(Term* term, Term* type);
 
-// Remove an error status.
-void clear_error(Term* term);
-
-// Check if this term is marked with a runtime error.
-bool has_runtime_error(Term* term);
-
-bool has_runtime_error_message(Term* term);
-std::string get_runtime_error_message(Term* term);
-
-// Check if there is an errorred term inside this branch.
-bool has_runtime_error(Branch& branch);
-
 bool has_static_error(Term* term);
 bool has_static_errors(Branch& branch);
 
-std::string get_runtime_error_formatted(Branch& branch);
 std::string get_static_errors_formatted(Branch& branch);
 std::string get_static_error_message(Term* term);
-std::string get_error_message(Term* term);
-std::string get_error_message(Branch& branch);
 
-void print_runtime_error_formatted(Term* term, std::ostream& output);
-void print_runtime_error_formatted(Branch& branch, std::ostream& output);
 void print_static_error_formatted(Term* term, std::ostream& output);
 void print_static_errors_formatted(Branch& branch, std::ostream& output);
 
-// New style: runtime error is stored in EvalContext
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output);
-
-bool has_error(Term* term);
-bool has_error(Branch& branch);
 
 enum StaticError {
     SERROR_NO_ERROR = 0,

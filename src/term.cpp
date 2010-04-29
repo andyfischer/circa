@@ -184,21 +184,6 @@ std::string Term::stringPropOptional(std::string const& name, std::string const&
     else return defaultValue;
 }
 
-bool
-Term::hasError() const
-{
-    return flags & TERM_FLAG_ERRORED;
-}
-
-void
-Term::setHasError(bool error)
-{
-    if (error)
-        flags = flags | TERM_FLAG_ERRORED;
-    else
-        flags = flags & ~TERM_FLAG_ERRORED;
-}
-
 int Term::asInt()
 {
     return as_int(this);

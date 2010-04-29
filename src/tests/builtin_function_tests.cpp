@@ -69,8 +69,10 @@ void test_bool()
 void test_builtin_equals()
 {
     Branch branch;
-    Term* term = branch.eval("equals(5.0, add)");
-    test_assert(term->hasError());
+    EvalContext context;
+    branch.compile("equals(5.0, add)");
+    evaluate_branch(&context, branch);
+    test_assert(context.errorOccurred);
 }
 
 void test_list()
@@ -157,7 +159,9 @@ void test_vectorized_funcs()
 
     // Test error handling
     t = branch.eval("[1 1 1] + [1 1]");
-    test_assert(t->hasError());
+    EvalContext context;
+    evaluate_term(&context, t);
+    test_assert(context.errorOccurred);
 }
 
 void test_vectorized_funcs_with_points()
@@ -202,7 +206,9 @@ void test_get_index()
 
     branch.eval("l = []");
     get = branch.eval("get_index(l, 5)");
-    test_assert(get->hasError());
+    EvalContext context;
+    evaluate_term(&context, get);
+    test_assert(context.errorOccurred);
 }
 
 void test_set_index()

@@ -59,7 +59,7 @@ namespace include_function {
     {
         load_script(cxt, caller);
 
-        if (caller->hasError())
+        if (cxt->errorOccurred)
             return;
 
         Branch& contents = as_branch(caller);

@@ -9,8 +9,6 @@ inline void evaluate_term(EvalContext* cxt, Term* term)
     assert(cxt != NULL);
     if (term == NULL) internal_error("evaluate_term(term = NULL)");
 
-    clear_error(term);
-
     EvaluateFunc evaluate = function_t::get_evaluate(term->function);
 
     if (evaluate == NULL)

@@ -22,16 +22,18 @@ void repl_evaluate_line(Branch& branch, std::string const& input, std::ostream& 
     for (int i=previousHead; i < newHead; i++) {
         Term* result = branch[i];
 
-        if (has_error(result)) {
-            output << "error: " << get_error_message(result) << std::endl;
+        if (has_static_error(result)) {
+            output << "error: " << get_static_error_message(result) << std::endl;
             anyErrors = true;
             break;
         }
 
-        evaluate_term(result);
+        EvalContext context;
+        evaluate_term(&context, result);
 
-        if (has_error(result)) {
-            output << "error: " << get_error_message(result) << std::endl;
+        if (context.errorOccurred) {
+            output << "error: ";
+            print_runtime_error_formatted(context, std::cout);
             anyErrors = true;
             break;
         }

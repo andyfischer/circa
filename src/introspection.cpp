@@ -125,20 +125,6 @@ std::string get_branch_raw(Branch& branch)
     return out.str();
 }
 
-void print_runtime_errors(Branch& branch, std::ostream& output)
-{
-    for (BranchIterator it(branch); !it.finished(); ++it) {
-        Term *term = *it;
-
-        if (term == NULL)
-            continue;
-
-        if (term->hasError()) {
-            output << "error on " << term->name << ": " << get_error_message(term) << std::endl;
-        }
-    }
-}
-
 std::string get_short_location(Term* term)
 {
     std::stringstream out;
