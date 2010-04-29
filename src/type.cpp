@@ -151,7 +151,11 @@ Type& as_type(Term *term)
     return *get_type_value(term);
 }
 
-// Should rename this to type_is_superset
+Type* type_contents(Term* type)
+{
+    return &as_type(type);
+}
+
 bool matches_type(Type* type, Term* term)
 {
     // Temp: Allow matches to Any
@@ -159,7 +163,7 @@ bool matches_type(Type* type, Term* term)
         return true;
 
     // Return true if types are the same
-    if (&as_type(term->type) == type)
+    if (type_contents(term->type) == type)
         return true;
 
     Type::MatchesType matchesType = type->matchesType;
@@ -168,6 +172,15 @@ bool matches_type(Type* type, Term* term)
         return matchesType(type, term);
 
     // Default behavior, if the above checks didn't pass then return false.
+    return false;
+}
+
+bool value_matches_type(Type* type, TaggedValue* value)
+{
+    if (type == value->value_type)
+        return true;
+
+    // TODO
     return false;
 }
 

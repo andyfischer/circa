@@ -350,6 +350,24 @@ bool inputs_fit_function(Term* func, RefList const& inputs)
     return true;
 }
 
+bool inputs_fit_function_dynamic(Term* func, RefList const& inputs)
+{
+    bool varArgs = function_t::get_variable_args(func);
+
+    // Fail if wrong # of inputs
+    if (!varArgs && (function_t::num_inputs(func) != inputs.length()))
+        return false;
+
+    for (int i=0; i < inputs.length(); i++) {
+        Term* type = function_t::get_input_type(func, i);
+        if (inputs[i] == NULL)
+            continue;
+        if (!value_matches_type(type_contents(type), inputs[i]))
+            return false;
+    }
+    return true;
+}
+
 Term* create_overloaded_function(Branch& branch, std::string const& name,
         RefList const& overloads)
 {
@@ -392,9 +410,6 @@ Term* specialize_function(Term* func, RefList const& inputs)
 
         return UNKNOWN_FUNCTION;
     }
-
-    if (inputs_fit_function(func, inputs))
-        return func;
 
     return func;
 }

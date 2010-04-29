@@ -165,10 +165,12 @@ namespace type_t {
 }
 
 Type& as_type(Term* term);
+Type* type_contents(Term* type);
 bool is_native_type(Term* type);
 Type* declared_type(Term* term);
 
 bool matches_type(Type* type, Term* term);
+bool value_matches_type(Type* type, TaggedValue* value);
 
 // Returns a common type, which is guaranteed to hold all the types in this
 // list. Currently, this is not very sophisticated.

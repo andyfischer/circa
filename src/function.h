@@ -5,8 +5,9 @@
 
 #include "common_headers.h"
 
-#include "term.h"
+#include "builtin_types.h" // for List
 #include "branch.h"
+#include "term.h"
 
 namespace circa {
 
@@ -25,6 +26,8 @@ struct FunctionAttrs
     SpecializeTypeFunc specializeType;
     FormatSource formatSource;
     CheckInvariants checkInvariants;
+
+    List parameters;
 
     FunctionAttrs()
       : variableArgs(false),
@@ -86,6 +89,8 @@ void initialize_function_prototype(Branch& contents);
 
 bool is_callable(Term* term);
 bool inputs_fit_function(Term* function, RefList const& inputs);
+bool inputs_fit_function_dynamic(Term* func, RefList const& inputs);
+
 Term* create_overloaded_function(Branch& branch, std::string const& name,
         RefList const& overloads=RefList());
 Term* function_get_specialized_output_type(Term* function, Term* call);
