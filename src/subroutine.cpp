@@ -68,9 +68,10 @@ namespace subroutine_t {
         // Copy output if no error occurred
         if (!cxt->errorOccurred && functionBranch.length() > 0) {
             Term* output = functionBranch[functionBranch.length()-1];
-            assert(output->name == "#out");
-            if (output->type != VOID_TYPE)
+            if (output->type != VOID_TYPE) {
+                assert(output->name == "#out");
                 copy(output, caller);
+            }
         }
 
         // Store state

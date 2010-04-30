@@ -38,6 +38,7 @@ extern Term* MULT_FUNC;
 extern Term* NEG_FUNC;
 extern Term* NOT_FUNC;
 extern Term* ONE_TIME_ASSIGN_FUNC;
+extern Term* OVERLOADED_FUNCTION_FUNC;
 extern Term* SET_FIELD_FUNC;
 extern Term* SET_INDEX_FUNC;
 extern Term* STATEFUL_VALUE_FUNC;
@@ -101,6 +102,10 @@ namespace file_changed_function {
 
 namespace for_function {
     std::string get_heading_source(Term* term);
+}
+
+namespace overloaded_function {
+    Term* statically_specialize_function(Term* func, RefList const& inputs);
 }
 
 } // namespace circa

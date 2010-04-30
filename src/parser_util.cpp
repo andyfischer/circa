@@ -91,9 +91,9 @@ void post_parse_branch(Branch& branch)
     // Remove NULLs
     branch.removeNulls();
 
-    // For every stateful value, create assign() terms that persist the results
-    // onto the next iteration.
     for (int i=0; i < branch.length(); i++) {
+        // For every stateful value, create assign() terms that persist the results
+        // onto the next iteration.
         if (is_stateful(branch[i])) {
             Term* term = branch[i];
 

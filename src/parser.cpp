@@ -1258,6 +1258,11 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
             && result->input(1)->asString() != "") {
         EvalContext cxt;
         include_function::load_script(&cxt, result);
+
+    // Special case for overloaded_function, evaluate this immediately
+    } else if (result->function == OVERLOADED_FUNCTION_FUNC) {
+        EvalContext cxt;
+        evaluate_term(&cxt, result);
     }
 
     return result;
