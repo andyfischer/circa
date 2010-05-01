@@ -331,6 +331,7 @@ bool is_callable(Term* term)
             || term->type == TYPE_TYPE);
 }
 
+// Depcrecated in favor of inputs_statically_fit_function
 bool inputs_fit_function(Term* func, RefList const& inputs)
 {
     bool varArgs = function_t::get_variable_args(func);
@@ -343,7 +344,26 @@ bool inputs_fit_function(Term* func, RefList const& inputs)
         Term* type = function_t::get_input_type(func, i);
         if (inputs[i] == NULL)
             continue;
-        if (!matches_type(&as_type(type), inputs[i]))
+        if (!matches_type(type_contents(type), inputs[i]))
+            return false;
+    }
+
+    return true;
+}
+
+bool inputs_statically_fit_function(Term* func, RefList const& inputs)
+{
+    bool varArgs = function_t::get_variable_args(func);
+
+    // Fail if wrong # of inputs
+    if (!varArgs && (function_t::num_inputs(func) != inputs.length()))
+        return false;
+
+    for (int i=0; i < inputs.length(); i++) {
+        Term* type = function_t::get_input_type(func, i);
+        if (inputs[i] == NULL)
+            continue;
+        if (!term_statically_satisfies_type(inputs[i], type_contents(type)))
             return false;
     }
 

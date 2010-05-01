@@ -89,6 +89,7 @@ void initialize_function_prototype(Branch& contents);
 
 bool is_callable(Term* term);
 bool inputs_fit_function(Term* function, RefList const& inputs);
+bool inputs_statically_fit_function(Term* func, RefList const& inputs);
 bool inputs_fit_function_dynamic(Term* func, RefList const& inputs);
 
 Term* create_overloaded_function(Branch& branch, std::string const& name,

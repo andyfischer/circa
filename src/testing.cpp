@@ -89,6 +89,16 @@ void _test_assert_function(Branch& branch, int line, const char* file)
     }
 }
 
+void _test_assert_function(EvalContext& context, int line, const char* file)
+{
+    if (context.errorOccurred) {
+        std::stringstream msg;
+        msg << "Runtime error at " << file << ", line " << line << std::endl;
+        print_runtime_error_formatted(context, msg);
+        throw std::runtime_error(msg.str());
+    }
+}
+
 void _test_fail_function(int line, const char* file)
 {
     std::stringstream msg;

@@ -37,7 +37,7 @@ namespace overloaded_function {
         for (int i=0; i < overloads.length(); i++) {
             Term* overload = as_ref(overloads[i]);
 
-            if (inputs_fit_function(overload, inputs))
+            if (inputs_statically_fit_function(overload, inputs))
                 return overload;
         }
 
@@ -48,6 +48,35 @@ namespace overloaded_function {
     bool is_overloaded_function(Term* func)
     {
         return function_t::get_attrs(func).evaluate == evaluate_overloaded;
+    }
+
+    void setup_overloaded_function(Term* term, std::string const& name,
+            RefList const& overloads)
+    {
+        function_t::set_name(term, name);
+        function_t::get_attrs(term).evaluate = evaluate_overloaded;
+
+        List& parameters = function_t::get_attrs(term).parameters;
+        parameters.clear();
+        parameters.resize(overloads.length());
+
+        assert(overloads.length() > 0);
+        int argumentCount = function_t::num_inputs(overloads[0]);
+
+        for (int i=0; i < overloads.length(); i++) {
+            make_ref(parameters[i], overloads[i]);
+
+            if (argumentCount != function_t::num_inputs(overloads[i])) {
+                std::cout << "Functions must have the same # of inputs" << std::endl;
+                assert(false);
+            }
+        }
+
+        Branch& result = as_branch(term);
+        result.shorten(1);
+        for (int i=0; i < argumentCount; i++)
+            apply(result, INPUT_PLACEHOLDER_FUNC, RefList());
+        create_value(result, VOID_TYPE, "#out");
     }
 
     void evaluate(EvalContext* cxt, Term* caller)

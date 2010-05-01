@@ -14,7 +14,8 @@ namespace unsafe_assign_function {
         Term* target = caller->input(0);
         Term* source = caller->input(1);
 
-        if (!matches_type(declared_type(target), source)) {
+        if (!matches_type(declared_type(target), source)
+                && !value_matches_type(declared_type(target), source)) {
             error_occurred(cxt, caller,
                     "Tried to assign a " + source->type->name + " to a "
                     + target->type->name);

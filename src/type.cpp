@@ -136,8 +136,6 @@ bool is_native_type(Term* type)
 
 Type* declared_type(Term* term)
 {
-    // Today this is a handy way to avoid writing &as_type
-    // In the future, Term->type will be going away, so use this function.
     return &as_type(term->type);
 }
 
@@ -156,11 +154,10 @@ Type* type_contents(Term* type)
     return &as_type(type);
 }
 
+// Deprecated in favor of term_statically_satisfies_type
 bool matches_type(Type* type, Term* term)
 {
-    // Temp: Allow matches to Any
-    if (term->type == ANY_TYPE)
-        return true;
+    if (term->type == ANY_TYPE) return true;
 
     // Return true if types are the same
     if (type_contents(term->type) == type)
@@ -181,6 +178,21 @@ bool value_matches_type(Type* type, TaggedValue* value)
         return true;
 
     // TODO
+    return false;
+}
+
+bool term_statically_satisfies_type(Term* term, Type* type)
+{
+    // Return true if types are the same
+    if (type_contents(term->type) == type)
+        return true;
+
+    Type::MatchesType matchesType = type->matchesType;
+
+    if (matchesType != NULL)
+        return matchesType(type, term);
+
+    // Default behavior, if the above checks didn't pass then return false.
     return false;
 }
 

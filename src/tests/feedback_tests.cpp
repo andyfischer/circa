@@ -68,7 +68,10 @@ void train_cond()
     set_trainable(a, true);
 
     refresh_training_branch(branch);
-    evaluate_branch(branch);
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+    test_assert(context);
 
     test_equals(a->asInt(), 5);
 

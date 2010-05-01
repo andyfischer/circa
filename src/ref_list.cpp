@@ -6,7 +6,7 @@
 
 namespace circa {
 
-const size_t MAX_REF_LIST_LENGTH = 1000000;
+const size_t MAX_REF_LIST_LENGTH = 10000000;
 
 void RefList::append(Term* term)
 {
