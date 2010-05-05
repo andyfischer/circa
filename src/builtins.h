@@ -105,7 +105,12 @@ namespace for_function {
 }
 
 namespace overloaded_function {
+
+    bool is_overloaded_function(Term* func);
+    Term* create_overloaded_function(Branch& branch, std::string const& name,
+        RefList const& overloads);
     Term* statically_specialize_function(Term* func, RefList const& inputs);
+    void append_overload(Term* overloadedFunction, Term* overload);
 }
 
 } // namespace circa

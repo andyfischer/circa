@@ -52,10 +52,7 @@ namespace mult_function {
         function_t::get_feedback_func(mult_f) = 
             import_function(kernel, feedback_evaluate, "mult_feedback(any, number) -> Branch");
 
-        MULT_FUNC = create_overloaded_function(kernel, "mult");
-
-        create_ref(as_branch(MULT_FUNC), mult_i);
-        create_ref(as_branch(MULT_FUNC), mult_f);
+        MULT_FUNC = create_overloaded_function(kernel, "mult", RefList(mult_i, mult_f));
     }
 }
 } // namespace circa

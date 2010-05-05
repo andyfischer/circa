@@ -140,7 +140,6 @@ void test_vectorized_funcs()
     Branch branch;
     Term* t = branch.eval("[1 2 3] + [4 5 6]");
     test_assert(t);
-    test_assert(is_branch(t));
 
     Branch& result = as_branch(t);
     

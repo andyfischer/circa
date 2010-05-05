@@ -18,8 +18,9 @@ namespace overloaded_function {
 
             if (inputs_fit_function_dynamic(overload, caller->inputs)) {
                 Branch tempBranch;
-                apply(tempBranch, overload, caller->inputs);
+                Term* tempTerm = apply(tempBranch, overload, caller->inputs);
                 evaluate_branch(cxt, tempBranch);
+                copy(tempTerm, caller);
                 return;
             }
         }
@@ -62,21 +63,28 @@ namespace overloaded_function {
 
         assert(overloads.length() > 0);
         int argumentCount = function_t::num_inputs(overloads[0]);
+        bool variableArgs = false;
+        RefList outputTypes;
 
         for (int i=0; i < overloads.length(); i++) {
             make_ref(parameters[i], overloads[i]);
 
-            if (argumentCount != function_t::num_inputs(overloads[i])) {
-                std::cout << "Functions must have the same # of inputs" << std::endl;
-                assert(false);
-            }
+            if (argumentCount != function_t::num_inputs(overloads[i]))
+                variableArgs = true;
+            if (function_t::get_variable_args(overloads[i]))
+                variableArgs = true;
+            outputTypes.append(function_t::get_output_type(overloads[i]));
         }
+
 
         Branch& result = as_branch(term);
         result.shorten(1);
         for (int i=0; i < argumentCount; i++)
             apply(result, INPUT_PLACEHOLDER_FUNC, RefList());
-        create_value(result, VOID_TYPE, "#out");
+        Term* outputType = find_common_type(outputTypes);
+        create_value(result, outputType, "#out");
+
+        function_t::set_variable_args(term, variableArgs);
     }
 
     void evaluate(EvalContext* cxt, Term* caller)
@@ -84,6 +92,9 @@ namespace overloaded_function {
         if (caller->numInputs() == 0)
             return error_occurred(cxt, caller, "Number of inputs must be >0");
 
+        setup_overloaded_function(caller, caller->name, caller->inputs);
+
+#if 0
         function_t::set_name(caller, caller->name);
         function_t::get_attrs(caller).evaluate = evaluate_overloaded;
 
@@ -105,6 +116,23 @@ namespace overloaded_function {
         for (int i=0; i < argumentCount; i++)
             apply(result, INPUT_PLACEHOLDER_FUNC, RefList());
         create_value(result, VOID_TYPE, "#out");
+#endif
+    }
+
+    Term* create_overloaded_function(Branch& branch, std::string const& name,
+        RefList const& overloads)
+    {
+        Term* result = create_value(branch, FUNCTION_TYPE, name);
+        setup_overloaded_function(result, name, overloads);
+        return result;
+    }
+
+    void append_overload(Term* overloadedFunction, Term* overload)
+    {
+        assert(is_overloaded_function(overloadedFunction));
+
+        List& parameters = function_t::get_attrs(overloadedFunction).parameters;
+        make_ref(parameters.append(), overload);
     }
 
     void setup(Branch& kernel)

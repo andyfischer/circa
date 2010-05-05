@@ -126,6 +126,7 @@ void initialize_kernel_documentation(Branch& KERNEL)
     hide_from_docs(KERNEL["unknown_type"]);
     hide_from_docs(KERNEL["vectorize_vs"]);
     hide_from_docs(KERNEL["vectorize_vv"]);
+    hide_from_docs(VALUE_FUNC);
 }
 
 } // namespace circa

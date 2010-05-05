@@ -20,10 +20,7 @@ namespace sub_function {
         Term* sub_i = import_function(kernel, evaluate_i, "sub_i(int,int) -> int");
         Term* sub_f = import_function(kernel, evaluate_f, "sub_f(number,number) -> number");
 
-        SUB_FUNC = create_overloaded_function(kernel, "sub");
-
-        create_ref(as_branch(SUB_FUNC), sub_i);
-        create_ref(as_branch(SUB_FUNC), sub_f);
+        SUB_FUNC = create_overloaded_function(kernel, "sub", RefList(sub_i, sub_f));
     }
 }
 } // namespace circa

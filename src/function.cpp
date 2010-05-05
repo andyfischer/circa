@@ -391,10 +391,13 @@ bool inputs_fit_function_dynamic(Term* func, RefList const& inputs)
 Term* create_overloaded_function(Branch& branch, std::string const& name,
         RefList const& overloads)
 {
+    return overloaded_function::create_overloaded_function(branch, name, overloads);
+#if 0
     Term* result = create_value(branch, OVERLOADED_FUNCTION_TYPE, name);
     for (int i=0; i < overloads.length(); i++)
         create_ref(as_branch(result), overloads[i]);
     return result;
+#endif
 }
 
 Term* function_get_specialized_output_type(Term* function, Term* call)

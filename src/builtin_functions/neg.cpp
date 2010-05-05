@@ -29,9 +29,7 @@ namespace neg_function {
         function_t::get_attrs(neg_i).formatSource = formatSource;
         function_t::get_attrs(neg_f).formatSource = formatSource;
 
-        NEG_FUNC = create_overloaded_function(kernel, "neg");
-        create_ref(as_branch(NEG_FUNC), neg_i);
-        create_ref(as_branch(NEG_FUNC), neg_f);
+        NEG_FUNC = create_overloaded_function(kernel, "neg", RefList(neg_i, neg_f));
     }
 }
 }

@@ -62,11 +62,7 @@ namespace rand_function {
         import_function(kernel, evaluate_i, "rand_i() -> int");
         //import_function(kernel, evaluate_i_i, "rand_i(int) : int");
         
-        Term* rand_func = create_overloaded_function(kernel, "rand");
-
-        create_ref(as_branch(rand_func), rand_f);
-        create_ref(as_branch(rand_func), rand_range);
-
+        create_overloaded_function(kernel, "rand", RefList(rand_f, rand_range));
     }
 }
 } // namespace circa

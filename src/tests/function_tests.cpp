@@ -102,11 +102,11 @@ void test_call_copied_function()
 
     evaluate_without_side_effects(add_copy);
 
-    test_assert(add_copy->type == OVERLOADED_FUNCTION_TYPE);
+    test_assert(overloaded_function::is_overloaded_function(add_copy));
     test_assert(inputs_fit_function(KERNEL->get("add_i"), inputs));
-    test_assert(as_branch(add_copy)[0]->asRef() == KERNEL->get("add_i"));
 
-    test_assert(specialize_function(add_copy, inputs) != UNKNOWN_FUNCTION);
+    test_assert(overloaded_function::statically_specialize_function(add_copy, inputs)
+            != UNKNOWN_FUNCTION);
 
     Term* a = branch.compile("a = add_copy(2 2)");
     test_assert(branch);
