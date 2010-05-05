@@ -126,7 +126,7 @@ void test_call_copied_function()
 void test_calling_manual_overloaded_function()
 {
     Branch branch;
-    Term* my_add = branch.eval("my_add = [ref(add_f) ref(add_i)] -> OverloadedFunction");
+    Term* my_add = branch.eval("my_add = overloaded_function(add_f add_i)");
 
     Term* two = branch.compile("2");
     RefList inputs(two, two);
@@ -134,10 +134,8 @@ void test_calling_manual_overloaded_function()
     test_assert(is_callable(my_add));
     evaluate_without_side_effects(my_add);
     test_assert(branch);
-    test_assert(my_add->type == OVERLOADED_FUNCTION_TYPE);
+    test_assert(my_add->function == OVERLOADED_FUNCTION_FUNC);
     test_assert(inputs_fit_function(KERNEL->get("add_f"), inputs));
-    test_assert(as_branch(my_add).length() == 2);
-    test_assert(as_branch(my_add)[0]->asRef() == KERNEL->get("add_f"));
 }
 
 void register_tests()

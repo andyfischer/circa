@@ -8,7 +8,6 @@ namespace callable_t {
     bool matches_type(Type* type, Term* term)
     {
         return term->type == FUNCTION_TYPE
-            || term->type == OVERLOADED_FUNCTION_TYPE
             || term->type == TYPE_TYPE;
     }
     void setup_type(Type* type)

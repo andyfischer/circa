@@ -327,7 +327,6 @@ void initialize_function_prototype(Branch& contents)
 bool is_callable(Term* term)
 {
     return (term->type == FUNCTION_TYPE
-            || term->type == OVERLOADED_FUNCTION_TYPE
             || term->type == TYPE_TYPE);
 }
 
@@ -392,12 +391,6 @@ Term* create_overloaded_function(Branch& branch, std::string const& name,
         RefList const& overloads)
 {
     return overloaded_function::create_overloaded_function(branch, name, overloads);
-#if 0
-    Term* result = create_value(branch, OVERLOADED_FUNCTION_TYPE, name);
-    for (int i=0; i < overloads.length(); i++)
-        create_ref(as_branch(result), overloads[i]);
-    return result;
-#endif
 }
 
 Term* function_get_specialized_output_type(Term* function, Term* call)
@@ -417,24 +410,6 @@ void function_set_use_input_as_output(Term* function, int index, bool value)
 bool is_native_function(Term* func)
 {
     return function_t::get_evaluate(func) != subroutine_t::evaluate;
-}
-
-Term* specialize_function(Term* func, RefList const& inputs)
-{
-    if (func->type == OVERLOADED_FUNCTION_TYPE) {
-        // Find a match among possible overloads
-        Branch& overloads = as_branch(func);
-        for (int i=0; i < overloads.length(); i++) {
-            Term* overload = overloads[i];
-            if (is_ref(overload)) overload = as_ref(overload);
-            if (inputs_fit_function(overload, inputs))
-                return overload;
-        }
-
-        return UNKNOWN_FUNCTION;
-    }
-
-    return func;
 }
 
 } // namespace circa

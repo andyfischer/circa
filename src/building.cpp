@@ -27,7 +27,6 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
         throw std::runtime_error("Term "+function->name+" is not callable");
 
     // Try to specialize an overloaded function
-    function = specialize_function(function, inputs);
     function = overloaded_function::statically_specialize_function(function, inputs);
 
     // If 'function' has hidden state, create the necessary state.

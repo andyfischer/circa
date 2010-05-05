@@ -14,7 +14,7 @@ void change_function(Term* term, Term* function)
 
     // Check to specialize function
     Term* originalFunction = function;
-    function = specialize_function(function, term->inputs);
+    function = overloaded_function::statically_specialize_function(function, term->inputs);
 
     term->function = function;
 

@@ -93,30 +93,6 @@ namespace overloaded_function {
             return error_occurred(cxt, caller, "Number of inputs must be >0");
 
         setup_overloaded_function(caller, caller->name, caller->inputs);
-
-#if 0
-        function_t::set_name(caller, caller->name);
-        function_t::get_attrs(caller).evaluate = evaluate_overloaded;
-
-        List& parameters = function_t::get_attrs(caller).parameters;
-        parameters.clear();
-        parameters.resize(caller->numInputs());
-
-        int argumentCount = function_t::num_inputs(caller->input(0));
-
-        for (int i=0; i < caller->numInputs(); i++) {
-            make_ref(parameters[i], caller->input(i));
-
-            if (argumentCount != function_t::num_inputs(caller->input(i)))
-                return error_occurred(cxt, caller, "Functions must have the same # of inputs");
-        }
-
-        Branch& result = as_branch(caller);
-        result.shorten(1);
-        for (int i=0; i < argumentCount; i++)
-            apply(result, INPUT_PLACEHOLDER_FUNC, RefList());
-        create_value(result, VOID_TYPE, "#out");
-#endif
     }
 
     Term* create_overloaded_function(Branch& branch, std::string const& name,

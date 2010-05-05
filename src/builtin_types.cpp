@@ -443,7 +443,6 @@ void setup_builtin_types(Branch& kernel)
     create_list(map_default_value);
 
     NAMESPACE_TYPE = create_compound_type(kernel, "Namespace");
-    OVERLOADED_FUNCTION_TYPE = create_compound_type(kernel, "OverloadedFunction");
     CODE_TYPE = create_compound_type(kernel, "Code");
 
     Term* branchRefType = parse_type(kernel, "type BranchRef { Ref target }");

@@ -99,10 +99,6 @@ void function_set_use_input_as_output(Term* function, int index, bool value);
 
 bool is_native_function(Term* function);
 
-// If function is overloaded, this returns an overload which is appropriate for 'inputs'.
-// May return UNKNOWN_FUNCTION if none is found.
-Term* specialize_function(Term* function, RefList const& inputs);
-
 } // namespace circa
 
 #endif
