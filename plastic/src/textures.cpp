@@ -41,7 +41,7 @@ void hosted_image(EvalContext* cxt, Term* caller)
 
     if (texid == 0) {
         texid = load_image_to_texture(cxt, caller, filename.c_str());
-        if (caller->hasError()) return;
+        if (cxt->errorOccurred) return;
     }
 
     glBindTexture(GL_TEXTURE_2D, texid);
