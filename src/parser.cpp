@@ -737,19 +737,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     forTerm->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
-    // Create iterator variable. Make a vague, flawed attempt to figure out what the 
-    // type should be.
-    Term* iterator_type = ANY_TYPE;
-
-    if (is_branch(listExpr)) {
-        RefList listExprTypes;
-
-        for (int i=0; i < as_branch(listExpr).length(); i++)
-            listExprTypes.append(as_branch(listExpr)[i]->type);
-
-        iterator_type = find_common_type(listExprTypes);
-    }
-
+    Term* iterator_type = find_type_of_get_index(listExpr);
     Term* iterator = create_value(innerBranch, iterator_type, iterator_name);
     set_source_hidden(iterator, true);
 

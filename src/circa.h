@@ -46,3 +46,4 @@
 #include "token.h"
 #include "token_stream.h"
 #include "type.h"
+#include "type_inference.h"
