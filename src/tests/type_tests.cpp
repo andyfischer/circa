@@ -215,15 +215,6 @@ void type_inference_for_get_field()
     test_assert(b->type == FLOAT_TYPE);
 }
 
-void test_find_common_type()
-{
-    test_assert(find_common_type(RefList(INT_TYPE,INT_TYPE)) == INT_TYPE);
-    test_assert(find_common_type(RefList(FLOAT_TYPE,FLOAT_TYPE)) == FLOAT_TYPE);
-    test_assert(find_common_type(RefList(INT_TYPE,FLOAT_TYPE)) == FLOAT_TYPE);
-    test_assert(find_common_type(RefList(BOOL_TYPE,STRING_TYPE)) == ANY_TYPE);
-    test_assert(find_common_type(RefList(KERNEL->get("Point"),KERNEL->get("Rect"))) == BRANCH_TYPE);
-}
-
 void _evaluate_type_error(EvalContext*, Term* term)
 {
     set_float(term, to_float(term->input(0)));
@@ -300,7 +291,6 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_assign_compound_value_to_default);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);
-    REGISTER_TEST_CASE(type_tests::test_find_common_type);
     REGISTER_TEST_CASE(type_tests::test_type_error_in_a_native_call);
     REGISTER_TEST_CASE(type_tests::test_imported_pointer_type);
     REGISTER_TEST_CASE(type_tests::simple_pointer_test::test);

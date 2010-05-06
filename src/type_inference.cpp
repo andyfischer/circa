@@ -7,6 +7,47 @@
 
 namespace circa {
 
+Term* find_common_type(RefList const& list)
+{
+    if (list.length() == 0)
+        return ANY_TYPE;
+
+    bool all_equal = true;
+    for (int i=1; i < list.length(); i++) {
+        if (list[0] != list[i]) {
+            all_equal = false;
+            break;
+        }
+    }
+
+    if (all_equal)
+        return list[0];
+
+    // Special case, allow ints to go into floats
+    bool all_are_ints_or_floats = true;
+    for (int i=0; i < list.length(); i++) {
+        if ((list[i] != INT_TYPE) && (list[i] != FLOAT_TYPE)) {
+            all_are_ints_or_floats = false;
+            break;
+        }
+    }
+
+    if (all_are_ints_or_floats)
+        return FLOAT_TYPE;
+
+    // Another special case, if all types are branch based then use BRANCH_TYPE
+    bool all_are_compound = true;
+    for (int i=0; i < list.length(); i++)
+        if (!is_branch_based_type(list[i]))
+            all_are_compound = false;
+
+    if (all_are_compound)
+        return BRANCH_TYPE;
+
+    // Otherwise give up
+    return ANY_TYPE;
+}
+
 Term* find_type_of_get_index(Term* listTerm)
 {
     if (listTerm->function == RANGE_FUNC)

@@ -173,10 +173,6 @@ bool matches_type(Type* type, Term* term);
 bool value_matches_type(Type* type, TaggedValue* value);
 bool term_statically_satisfies_type(Term* term, Type* type);
 
-// Returns a common type, which is guaranteed to hold all the types in this
-// list. Currently, this is not very sophisticated.
-Term* find_common_type(RefList const& list);
-
 void reset_type(Type* type);
 void initialize_simple_pointer_type(Type* type);
 
