@@ -1,16 +1,18 @@
 #!/usr/bin/env ruby
 
-def each_cpp_file(dir)
+def cpp_files_in_dir(dir)
+    result = []
     Dir.foreach(dir) do |path|
         if path.end_with?('.cpp')
-            yield path
+            result << path
         end
     end
+    result.sort
 end
 
 def get_cpp_file_names(dir)
     out = []
-    each_cpp_file(dir) do |path|
+    cpp_files_in_dir(dir).each do |path|
         path =~ /(.*?)\.cpp/
         out << $1
     end
@@ -24,11 +26,21 @@ def make_dir(dir)
 end
 
 def read_text_file(path)
+    File.open(path, 'r') { |f|
+        return f.read
+    }
 end
 
 def write_text_file(path, contents)
     # Check if the file already has these contents, don't write if so. This prevents
     # us from changing the modified-time, which is checked by some build systems.
+    if read_text_file(path) == contents
+        return
+    end
+
+    File.open(path, 'w') { |f|
+        f.write(contents)
+    }
 end
 
 def setup_builtin_functions(dir)
@@ -85,8 +97,8 @@ end
 
 def include_cpps(baseDir, targetDir)
     out = []
-    each_cpp_file(File.join(baseDir,targetDir)) do |path|
-        out << "#include \"../#{File.join(targetDir,path)}\""
+    cpp_files_in_dir(File.join(baseDir,targetDir)).each do |path|
+        out << "#include \"#{File.join(targetDir,path)}\""
     end
     out * "\n" + "\n"
 end
@@ -125,17 +137,17 @@ end
 
 # Create files in src/generated/
 make_dir('src/generated')
-File.new('src/generated/setup_builtin_functions.cpp', 'w').write(
+write_text_file('src/generated/setup_builtin_functions.cpp',
         setup_builtin_functions('src/builtin_functions'))
-File.new('src/generated/register_all_tests.cpp', 'w').write(
+write_text_file('src/generated/register_all_tests.cpp',
         register_all_tests('src/tests'))
-File.new('src/generated/all_tests.cpp', 'w').write(
+write_text_file('src/generated/all_tests.cpp',
         include_cpps('src','tests'))
-File.new('src/generated/all_builtin_functions.cpp', 'w').write(
+write_text_file('src/generated/all_builtin_functions.cpp',
         include_cpps('src','builtin_functions'))
-File.new('src/generated/all_builtin_types.cpp', 'w').write(
+write_text_file('src/generated/all_builtin_types.cpp',
         include_cpps('src','builtin_types'))
-File.new('src/generated/builtin_script_text.cpp', 'w').write(
+write_text_file('src/generated/builtin_script_text.cpp',
         circa_source_to_c('src/ca/builtins.ca', 'BUILTIN_SCRIPT_TEXT'))
 
 # Setup build/

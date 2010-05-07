@@ -472,7 +472,8 @@ namespace branch_t {
             return true;
 
         int numElements = value->numElements();
-        if (prototype.length() != numElements);
+        if (prototype.length() != numElements)
+            return false;
 
         for (int i=0; i < numElements; i++)
             if (!circa::value_fits_type(value->getIndex(i),

@@ -7,8 +7,7 @@
 // Prevent warnings on getenv()
 #define _CRT_SECURE_NO_WARNINGS 1
 
-#undef max
-#undef min
+#define NOMINMAX // Don't use windows' versions of min() and max()
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -49,17 +48,10 @@ struct ReferenceMap;
 
 } // namespace circa
 
-#ifdef PLASTIC_OSX
-    #define PLASTIC_USE_SDL
-#endif
-
-
 #ifdef PLASTIC_USE_SDL
     #define NO_SDL_GLEXT
 
     #include <SDL.h>
-    #include <SDL_opengl.h>
-    #include <SDL_image.h>
 
 #endif // PLASTIC_USE_SDL
 

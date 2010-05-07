@@ -1197,8 +1197,8 @@ void function_call_inputs(Branch& branch, TokenStream& tokens,
 
         // Check if we just parsed a qualified identifier. If so, record the actual
         // identifier string that was used.
-        if (branch.length() == origBranchLength)
-            ; // TODO, not needed yet
+        // TODO, not needed yet
+        //if (branch.length() == origBranchLength)
 
         inputHints.set(index, "postWhitespace", possible_whitespace_or_newline(tokens));
 

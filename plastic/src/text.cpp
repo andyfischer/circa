@@ -1,9 +1,10 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "circa.h"
-#include <importing_macros.h>
+#include "plastic_common_headers.h"
 
-#include <SDL_opengl.h>
+#include "circa.h"
+#include "importing_macros.h"
+
 #include <SDL_ttf.h>
 
 #include "gl_util.h"

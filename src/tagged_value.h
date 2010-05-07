@@ -6,7 +6,6 @@
 
 namespace circa {
 
-
 struct TaggedValue
 {
     union Data {

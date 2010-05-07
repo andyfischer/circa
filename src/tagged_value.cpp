@@ -501,7 +501,7 @@ void* get_pointer(TaggedValue* value, Type* expectedType)
 float to_float(TaggedValue* value)
 {
     if (value->value_type == INT_TYPE->value_data.ptr)
-        return as_int(value);
+        return (float) as_int(value);
     else if (value->value_type == FLOAT_TYPE->value_data.ptr)
         return as_float(value);
     else

@@ -1,5 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved
 
+#include <SDL_image.h>
+
 #include <importing_macros.h>
 #include <circa.h>
 

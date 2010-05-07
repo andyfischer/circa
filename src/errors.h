@@ -13,7 +13,7 @@ void internal_error(const char* message);
 
 // Trigger internal_error() with a string that describes the current line of code
 #define circa_assert(x) circa_assert_unmacro((x), #x, __LINE__, __FILE__)
-void circa_assert_unmacro(bool expr, const char* expr, int line, const char* file);
+void circa_assert_unmacro(bool expr, const char* exprStr, int line, const char* file);
 
 // Signal that a type mismatch has occurred in native code.
 void native_type_mismatch(std::string const& message);

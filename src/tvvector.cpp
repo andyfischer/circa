@@ -6,6 +6,10 @@
 #include "tagged_value.h"
 #include "tvvector.h"
 
+#ifdef WINDOWS
+    #pragma warning( disable: 4200 ) // zero-sized array in struct
+#endif
+
 namespace circa {
 namespace tvvector {
 
@@ -14,6 +18,7 @@ struct ListData {
     int count;
     int capacity;
     TaggedValue items[0];
+    // List of TaggedValues will follow in memory.
 };
 
 void assert_valid_list(ListData* list)

@@ -99,8 +99,6 @@ def sdl_env(env):
         else:   env.Append(LIBS = ['libGL'])
 
     if WINDOWS:
-        prebuild.sync_windows_sdl_deps()
-
         env.Append(LIBS=['opengl32.lib'])
 
         env.Append(CPPPATH=['build/deps/include'])
@@ -133,7 +131,7 @@ def build_plastic(env):
     # On Windows, embed manifest
     if WINDOWS:
         env.AddPostAction(result,
-        'mt.exe -nologo -manifest plastic/windows/plastic.manifest.xml -outputresource:$TARGET;1')
+        'mt.exe -nologo -manifest plastic/windows/plastic.manifest -outputresource:$TARGET;1')
     return result
     
 plastic_variant = config.get('plastic', 'variant')
