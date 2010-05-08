@@ -80,6 +80,8 @@ extern TypeRef REF_T;
 extern TypeRef LIST_T;
 extern TypeRef VOID_T;
 
+Branch& kernel();
+
 // Get a named term from the global namespace.
 Term* get_global(std::string name);
 

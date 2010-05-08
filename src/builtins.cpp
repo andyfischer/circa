@@ -89,6 +89,11 @@ TypeRef REF_T;
 TypeRef LIST_T;
 TypeRef VOID_T;
 
+Branch& kernel()
+{
+    return *KERNEL;
+}
+
 Term* get_global(std::string name)
 {
     if (KERNEL->contains(name))

@@ -2,6 +2,8 @@
 
 #include "common_headers.h"
 #include "branch.h"
+#include "building.h"
+#include "builtins.h"
 #include "codegen.h"
 #include "errors.h"
 #include "evaluation.h"
@@ -190,7 +192,7 @@ int run_command_line(std::vector<std::string> args)
     }
 
     // Otherwise, run script
-    Branch main_branch;
+    Branch& main_branch = create_branch(kernel());
     parse_script(main_branch, args[0]);
 
     if (has_static_errors(main_branch)) {

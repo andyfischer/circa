@@ -5,6 +5,12 @@
 namespace circa {
 namespace branch_ref_t {
 
+    void set_from_ref(TaggedValue* value, Term* ref)
+    {
+        Branch& branch = as_branch(value);
+        branch[0]->asRef() = ref;
+    }
+    
     bool is_considered_config(Term* term)
     {
         if (term == NULL) return false;

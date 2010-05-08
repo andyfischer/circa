@@ -2,22 +2,6 @@
 
 #include "circa.h"
 
-namespace circa {
-
-void temp_test()
-{
-    TaggedValue value;
-    TypeRef type = Type::create();
-
-    Branch branch;
-    branch.appendNew();
-    branch.appendNew();
-    branch.appendNew();
-    branch.appendNew();
-}
-}
-
-
 int main(int argc, const char * args[])
 {
     std::vector<std::string> argv;
