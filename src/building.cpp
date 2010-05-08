@@ -20,6 +20,8 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
             Term* result = apply(branch, CAST_FUNC, inputs);
             change_type(result, function);
             return result;
+        } else {
+            throw std::runtime_error("Constructors with multiple arguments not yet supported.");
         }
     }
 

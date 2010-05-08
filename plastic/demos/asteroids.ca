@@ -80,6 +80,8 @@ def draw_ship(Point loc, number facing)
         end
     end
 
+    print(sides)
+
     line_points = []
     for side in sides
         line_points.append(side[0])

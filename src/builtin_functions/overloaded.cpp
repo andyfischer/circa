@@ -30,6 +30,8 @@ namespace overloaded_function {
 
     Term* statically_specialize_function(Term* func, RefList const& inputs)
     {
+        if (!is_function(func))
+            return func;
         if (!is_overloaded_function(func))
             return func;
 
@@ -48,6 +50,7 @@ namespace overloaded_function {
 
     bool is_overloaded_function(Term* func)
     {
+        assert(is_function(func));
         return function_t::get_attrs(func).evaluate == evaluate_overloaded;
     }
 

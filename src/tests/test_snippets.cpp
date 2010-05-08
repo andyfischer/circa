@@ -486,6 +486,11 @@ void test_lists()
     //test_snippet("", "add_s(newlist(1 2 3) 2) == [3 4 5]");
 }
 
+void test_constructor()
+{
+    //test_snippet_runtime_error("Point(1 1)");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -518,6 +523,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_refactoring);
     REGISTER_TEST_CASE(test_snippets::test_member_functions);
     REGISTER_TEST_CASE(test_snippets::test_lists);
+    REGISTER_TEST_CASE(test_snippets::test_constructor);
 }
 
 } // namespace test_snippets

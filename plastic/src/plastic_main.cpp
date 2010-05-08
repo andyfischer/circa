@@ -209,6 +209,10 @@ int plastic_main(std::vector<std::string> args)
     if (arg0 == "-p") {
         if (!load_user_script_filename(args[1]))
             return 1;
+
+        EvalContext cxt;
+        include_function::load_script(&cxt, users_branch().owningTerm);
+
         print_branch_raw(std::cout, users_branch());
         return 0;
     }

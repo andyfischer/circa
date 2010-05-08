@@ -140,6 +140,6 @@ def build_plastic(env):
         'mt.exe -nologo -manifest plastic/windows/plastic.manifest.xml -outputresource:$TARGET;1')
     return result
     
-plastic = build_plastic(DEBUG)
+plastic = build_plastic(RELEASE)
 
 Alias('plastic', plastic)
