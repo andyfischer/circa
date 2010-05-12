@@ -1,6 +1,4 @@
 
-### Inlined State ###
-
 # Overview #
 
 "Inlined State" is the name of a language-level feature in Circa, which allows for persisted state
@@ -9,12 +7,12 @@ an author to declare persisted state.
 
 The benefits of using inlined state are:
 
-1) Convenience for the author
-2) Introspection; the system is able to understand exactly which data is stateful.
+1. Convenience for the author
+2. Introspection; the system is able to understand exactly which data is stateful.
 
 # Syntax #
 
-State is declared with the 'state' keyword, with one of the following syntaxes:
+State is declared with the `state` keyword, with one of the following syntaxes:
 
     state <name>
     state <name> = <initial value expression>
@@ -35,7 +33,8 @@ value is provided, then the value starts off with the type's default value.
 # Behavior #
 
 Inlined state is mainly for preserving *short-term* state: values that persist between
-frames. It's planned to also use this construct for long-term state (values that persist
+frames. In the future, it's planned to also use this feature for long-term state
+(values that persist
 between program invocations), but this hasn't been implemented.
 
 A simple example is:
@@ -45,12 +44,11 @@ A simple example is:
         button_presses += 1
     end
 
-Every time this script is run (in Circa world this is probably once per frame), if button_pressed() is true then the button_presses count will go up.
+Every time this script is run, if `button_pressed()` is true then the `button_presses` count will go up.
 
 # Nesting #
 
-Inlined state really begins to be useful when it's nested inside function definitions. A simple
-example is:
+State can be nested in function definitions. An example:
 
     def my_counting_func(bool trigger) -> int
         state int count
@@ -60,22 +58,65 @@ example is:
         return count
     end
 
-When this function is used, there is a separate 'count' for *every* different call to this function.
-(So, don't confuse this feature with C's static local variables). If a function includes inlined
-state, then any function which has a call to this function also has inlined state, and so on,
-all the way up the call stack. For any block of code, the Circa compiler knows the data type of its inlined state (if any).
+    def function_that_has_three_counts()
+        my_counting_func()
+        my_counting_func()
+        my_counting_func()
+    end
 
-This does not mean that recursion is impossible. Inlined state is lazily created, so a recursive
-function with inlined state would have a recursive data type.
+If a piece of code calls a function with inlined state, that code also becomes stateful. Also,
+there is a separate piece of state for each call to a stateful function. In the above example,
+`function_that_has_three_counts` has three different ints in its state, one for each call.
+(So, don't confuse this feature with C's static local variables).
+
+The structure of state data can have many levels of nesting, if the function call graph is nested.
+It's also possible to have a recursive function with inlined state (although this doesn't
+work in the current implementation). Each recursive call will lazily initialize its state,
+so the state data acts like a recursive data type.
 
 # Encapsulation #
 
-Since inlined state is builtin to the language, an author might not know or care if the functions
-they use have inlined state. Or they may know that some code has state, but they
-might not care about the details. This has the advantage of encapsulation: the author can take
-advantage of prewritten functions, without worrying about the internal details of how those
-functions manage their state. This style of programming feels similar to object-oriented
-programming, but it tends to be simpler.
+When writing a function call, the author might not know or care if that function
+has inlined state. Or, they may know that a function is stateful, but they
+might not care about the details. This has the advantage of encapsulation: an author can take
+advantage of prewritten functions without worrying about the internal details of how those
+functions manage their state.
+
+# Interaction with control-flow constructs #
+
+When there's inlined state inside a control flow construct, special things need to happen.
+
+*for loops (bounded over a list)*
+
+A separate instance of state data is created for every iteration of the loop.
+So the following loop would have 100 different strings in its state:
+
+    for i in 0..100
+        state string a_string
+    end
+
+*unbounded loops (such as the `while` loop)*
+
+Circa doesn't currently have any unbounded loops. If added, there would need to be
+some way that it avoids unbounded memory usage when using inlined state. Most likely,
+the entire loop would share one instance of state, not have a separate instance for
+each iteration.
+
+*if/else blocks*
+
+Each branch of an if/else chain can have its own state. One feature that might be unexpected
+is that when a condition is evaluated to be
+false, all state in that branch is reset. This behavior might not be right
+for every situation, but in practice it tends to be the most convenient thing to do.
+
+An example: the following code keeps track of how long a button has been held down. Every time
+that `button_down()` returns false, the state inside the elapsed() call is reset, so it
+starts out at 0 again.
+
+    duration_button_held = 0.0
+    if button_down()
+        duration_button_held = elapsed()
+    end
 
 # Helpful stateful functions #
 
@@ -103,7 +144,7 @@ approach() will return a result that approaches a target over time:
         return current
     end
 
-elapsed() returns the total time since the function was first called, using the 'time'
+elapsed() returns the total time since the function was first called, using the `time`
 global variable.
 
     def elapsed() -> number
@@ -111,48 +152,8 @@ global variable.
         return time - time_started
     end
 
-fade() will go from 0.0 to 1.0 over the course of 'total_time' seconds.
+fade() will go from 0.0 to 1.0 over the course of `total_time` seconds.
 
     def fade(number total_time) -> number
         return min(elapsed() / total_time, 1.0)
-    end
-
-# Interaction with control-flow constructs #
-
-When there's inlined state inside a control flow construct, special things need to happen.
-
-for loops (bounded over a list)
-
-A separate copy of state data is created for every iteration of the loop.
-So the following loop would have 100 different strings in its state:
-
-    for i in 0..100
-        state string a_string
-    end
-
-unbounded loops (such as the 'while' loop)
-
-Circa doesn't currently have any unbounded loops, but if added, there would need to be
-some way that it avoids unbounded memory usage when using inlined state. The most
-likely solution is that the loop would only use one instance of its state, not a
-separate instance for each iteration as with the for-loop.
-
-if/else blocks:
-
-Each branch of an if/else chain can have its own state. One feature that might be unexpected,
-is that when a condition is evaluated to be
-false, all state in that branch is reset to defaults. This behavior might not be correct
-for every situation, but in practice it tends to be the most convenient thing to do. It was
-a design decision to make if-blocks always behave a certain way, rather than let the author specify
-whether if-block state should be reset. If the author doesn't want state to be reset, there
-are easy ways to write the code differently (such as by declaring the state variable outside
-of the if-block).
-
-An example: the following code keeps track of how long a button has been held down. Every time
-that 'button_pressed()' returns false, the state inside the elapsed() call is reset, so it
-starts out at 0 again.
-
-    duration_button_held = 0.0
-    if button_pressed()
-        duration_button_held = elapsed()
     end

@@ -3,13 +3,17 @@
 
 Example:
 
-def get_distance(Point a, Point b)
-end
+    def get_distance(Point a, Point b)
+        ...
+    end
 
-can be called like:
+can be called with:
 
-get_distance(b: [1 0], a: [5 3])
+    get_distance(b: [1 0], a: [5 3])
 
+or maybe:
+
+    get_distance(b = [1 0], a = [5 3])
 
 # Implementation notes #
 
