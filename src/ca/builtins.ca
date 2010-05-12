@@ -23,6 +23,16 @@ def approach(number target, number maximum_change) -> number
     return current
 end
 
+def once() -> bool
+    <<<
+    Stateful function, returns true the first time it's called, and false thereafter.
+    >>>
+    state bool s = true
+    result = s
+    s = false
+    return result
+end
+
 namespace styled_source
     literal_string = 1
     literal_number = 4
