@@ -47,24 +47,19 @@ void generate_source_for_function_calls() {
 }
 
 void generate_source_for_literal_list() {
+#ifdef NEWLIST
     Branch branch;
-    
-    Branch& a = create_list(branch, "a");
+    List* a = (List*) create_list(branch, "a");
 
     test_equals(get_branch_source_text(branch), "a = []");
 
-    create_int(a, 5);
+    make_int(a->append(), 5);
     test_equals(get_branch_source_text(branch), "a = [5]");
 
-    create_int(a, 100);
+    make_int(a->append(), 100);
     test_equals(get_branch_source_text(branch), "a = [5,100]");
-
-/*
-    branch.clear();
-    Term* apple = create_int(branch, 12, "apple");
-    create_list(&branch, "b").append(apple);
-    test_equals(get_branch_source_text(branch), "apple = 12\nb = [apple]");
-*/
+#else
+#endif
 }
 
 void bug_reproducing_list_after_eval()

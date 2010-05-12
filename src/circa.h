@@ -9,6 +9,7 @@
 #include "builtins.h"
 #include "codegen.h"
 #include "command_line.h"
+#include "compound_type.h"
 #include "cpp_importing.h"
 #include "cpp_convenience.h"
 #include "debug.h"

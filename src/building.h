@@ -37,12 +37,15 @@ Term* create_float(Branch& branch, float f, std::string const& name="");
 Term* create_bool(Branch& branch, bool b, std::string const& name="");
 Term* create_ref(Branch& branch, Term* ref, std::string const& name="");
 Term* create_void(Branch& branch, std::string const& name="");
-Branch& create_list(Branch& branch, std::string const& name="");
+Term* create_list(Branch& branch, std::string const& name="");
 Branch& create_branch(Branch& owner, std::string const& name="");
 Branch& create_namespace(Branch&, std::string const& name);
 Term* create_type(Branch& branch, std::string name="");
 Term* create_empty_type(Branch& branch, std::string name);
+#ifndef NEWLIST
 Term* create_compound_type(Branch& branch, std::string const& name);
+#endif
+Term* create_branch_based_type(Branch& branch, std::string const& name);
 Term* duplicate_value(Branch& branch, Term* term);
 
 // In this context, "procure" means "return the existing thing if it already exists, and

@@ -249,6 +249,18 @@ static std::string to_string(ListData* value)
 void tv_initialize(Type* type, TaggedValue* value)
 {
     set_pointer(value, NULL);
+
+#ifdef NEWLIST
+    // If type has a prototype then initialize to that.
+    Branch& prototype = type->prototype;
+    if (prototype.length() > 0) {
+        List* list = (List*) value;
+        list->resize(prototype.length());
+
+        for (int i=0; i < prototype.length(); i++)
+            change_type(list->get(i), type_contents(prototype[i]->type));
+    }
+#endif
 }
 
 void tv_release(TaggedValue* value)

@@ -336,8 +336,14 @@ void test_cast()
     // Cast a value that will require coercion
     Term* dest = branch.eval("Mytype()");
     Term* source = branch.eval("[3 4]");
+    //dump_branch(branch);
+#ifdef NEWLIST
+    TaggedValue* dest0 = dest->getIndex(0);
+    TaggedValue* dest1 = dest->getIndex(1);
+#else
     Term* dest0 = as_branch(dest)[0];
     Term* dest1 = as_branch(dest)[1];
+#endif
 
     cast(source, dest);
     test_assert(is_int(dest0));

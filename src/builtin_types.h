@@ -26,14 +26,17 @@ namespace set_t {
     void setup_type(Type* type);
 }
 
+#ifndef NEWLIST
 namespace old_list_t {
     void setup(Type*);
 }
+#endif
 
 namespace list_t {
     bool is_list(TaggedValue*);
     void setup_type(Type*);
     void postponed_setup_type(Type*);
+    void tv_initialize(Type*, TaggedValue*);
 }
 
 namespace dict_t {

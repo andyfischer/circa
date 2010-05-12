@@ -169,7 +169,7 @@ void bootstrap_kernel()
     KERNEL->bindName(ANY_TYPE, "any");
 
     // Create Branch type
-    BRANCH_TYPE = create_compound_type(*KERNEL, "Branch");
+    BRANCH_TYPE = create_branch_based_type(*KERNEL, "Branch");
 
     // Create FunctionAttrs type
     FUNCTION_ATTRS_TYPE = KERNEL->appendNew();
@@ -184,7 +184,7 @@ void bootstrap_kernel()
     assert(is_type(FUNCTION_ATTRS_TYPE));
 
     // Create Function type
-    FUNCTION_TYPE = create_compound_type(*KERNEL, "Function");
+    FUNCTION_TYPE = create_branch_based_type(*KERNEL, "Function");
     Type* functionType = &as_type(FUNCTION_TYPE);
     functionType->formatSource = subroutine_t::format_source;
     functionType->checkInvariants = function_t::check_invariants;
@@ -195,9 +195,11 @@ void bootstrap_kernel()
     change_type((TaggedValue*)VALUE_FUNC, (Type*)BRANCH_TYPE->value_data.ptr);
 
     // Initialize List type, it's needed soon
-    LIST_TYPE = create_compound_type(*KERNEL, "List");
+#ifndef NEWLIST
+    LIST_TYPE = create_branch_based_type(*KERNEL, "List");
     Type* listType = &as_type(LIST_TYPE);
     old_list_t::setup(listType);
+#endif
 }
 
 void post_initialize_primitive_types(Branch& kernel)

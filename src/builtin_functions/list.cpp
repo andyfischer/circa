@@ -6,6 +6,15 @@ namespace circa {
 namespace list_function {
 
     void evaluate(EvalContext*, Term* caller) {
+#ifdef NEWLIST
+        List* result = (List*) caller;
+
+        result->resize(caller->numInputs());
+
+        for (int i=0; i < caller->numInputs(); i++) {
+            copy(caller->input(i), (*result)[i]);
+        }
+#else
         Branch& dest = as_branch(caller);
 
         int numToAssign = std::min(caller->numInputs(), dest.length());
@@ -23,6 +32,7 @@ namespace list_function {
             dest.set(i, NULL);
 
         dest.removeNulls();
+#endif
     }
 
     void list_formatSource(StyledSource* source, Term* caller) {
@@ -34,6 +44,17 @@ namespace list_function {
     }
 
     void evaluate_repeat(EvalContext*, Term* caller) {
+#ifdef NEWLIST
+        List* result = (List*) caller;
+        TaggedValue* source = caller->input(0);
+        int repeatCount = int_input(caller, 1);
+
+        result->resize(repeatCount);
+
+        for (int i=0; i < repeatCount; i++)
+            copy(source, result->get(i));
+
+#else
         Branch& dest = as_branch(caller);
 
         Term* sourceTerm = caller->input(0);
@@ -52,6 +73,7 @@ namespace list_function {
             dest.set(i, NULL);
 
         dest.removeNulls();
+#endif
     }
 
     void evaluate_newlist(EvalContext*, Term* caller) {
@@ -74,7 +96,9 @@ namespace list_function {
 
         import_function(kernel, evaluate_repeat, "repeat(any, int) -> List");
         
+#ifndef NEWLIST
         import_function(kernel, evaluate_newlist, "newlist(any...) -> NewList");
+#endif
     }
 }
 }

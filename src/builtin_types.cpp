@@ -29,6 +29,23 @@ namespace bool_t {
     }
 }
 
+namespace list_t {
+
+    void append(EvalContext*, Term* caller)
+    {
+        List* result = (List*) caller;
+        copy(caller->input(0), caller);
+        Term* value = caller->input(1);
+        copy(value, result->append());
+    }
+
+    void count(EvalContext*, Term* caller)
+    {
+        List* list = (List*) caller->input(0);
+        set_int(caller, list->length());
+    }
+}
+
 namespace old_list_t {
 
     std::string to_string(Term* caller)
@@ -405,8 +422,13 @@ void initialize_primitive_types(Branch& kernel)
     VOID_TYPE = create_type(kernel, "void");
     set_pointer(VOID_TYPE, VOID_T);
 
+#ifdef NEWLIST
+    LIST_TYPE = create_type(kernel, "List");
+    set_pointer(LIST_TYPE, LIST_T);
+#else
     Term* newListType = create_type(kernel, "NewList");
     set_pointer(newListType, LIST_T);
+#endif
 
     // ANY_TYPE was created in bootstrap_kernel
 }
@@ -429,21 +451,34 @@ void setup_builtin_types(Branch& kernel)
     set_t::setup_type(&as_type(set_type));
 
     // LIST_TYPE was created in bootstrap_kernel
+#ifdef NEWLIST
+    Term* list_append =
+        import_member_function(LIST_TYPE, list_t::append, "append(List, any) -> List");
+    function_set_use_input_as_output(list_append, 0, true);
+    import_member_function(LIST_TYPE, list_t::count, "count(List) -> int");
+#else
     Term* list_append =
         import_member_function(LIST_TYPE, old_list_t::append, "append(List, any) -> List");
     function_set_use_input_as_output(list_append, 0, true);
     import_member_function(LIST_TYPE, old_list_t::count, "count(List) -> int");
+#endif
 
     Term* map_type = create_compound_type(kernel, "Map");
     map_t::setup_type(&as_type(map_type));
 
     type_t::enable_default_value(map_type);
+#ifndef NEWLIST
     Branch& map_default_value = type_t::get_default_value(map_type)->asBranch();
     create_list(map_default_value);
     create_list(map_default_value);
+#else
+    List* map_default_value = (List*) type_t::get_default_value(map_type);
+    make_list(map_default_value->append());
+    make_list(map_default_value->append());
+#endif
 
-    NAMESPACE_TYPE = create_compound_type(kernel, "Namespace");
-    CODE_TYPE = create_compound_type(kernel, "Code");
+    NAMESPACE_TYPE = create_branch_based_type(kernel, "Namespace");
+    CODE_TYPE = create_branch_based_type(kernel, "Code");
 
     Term* branchRefType = parse_type(kernel, "type BranchRef { Ref target }");
     branch_ref_t::setup_type(&as_type(branchRefType));
@@ -455,8 +490,6 @@ void setup_builtin_types(Branch& kernel)
     indexable_t::setup_type(&as_type(indexableType));
 
     callable_t::setup_type(&as_type(parse_type(kernel, "type Callable;")));
-
-
 }
 
 void parse_builtin_types(Branch& kernel)

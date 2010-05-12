@@ -225,10 +225,10 @@ Term* create_void(Branch& branch, std::string const& name)
     return create_value(branch, VOID_TYPE, name);
 }
 
-Branch& create_list(Branch& branch, std::string const& name)
+Term* create_list(Branch& branch, std::string const& name)
 {
     Term* term = create_value(branch, LIST_TYPE, name);
-    return as_branch(term);
+    return term;
 }
 
 Branch& create_branch(Branch& owner, std::string const& name)
@@ -260,7 +260,16 @@ Term* create_empty_type(Branch& branch, std::string name)
     return type;
 }
 
+#ifndef NEWLIST
 Term* create_compound_type(Branch& branch, std::string const& name)
+{
+    Term* term = create_type(branch, name);
+    initialize_branch_based_type(term);
+    return term;
+}
+#endif
+
+Term* create_branch_based_type(Branch& branch, std::string const& name)
 {
     Term* term = create_type(branch, name);
     initialize_branch_based_type(term);
