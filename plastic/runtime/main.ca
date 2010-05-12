@@ -174,7 +174,7 @@ def alternate_over_time(number period) -> bool:
     state number time_started = time
     return round((time - time_started) / period) % 2 == 0
 
-def linear_fadein(number total_time) -> number:
+def linear_fadein(number total_time) -> number
     <<<
     Stateful function, starts out at 0 and increases linearly. After 'total_time'
     has passed, it will return 1.0 and stay there.
@@ -182,6 +182,7 @@ def linear_fadein(number total_time) -> number:
     state number time_started = time
     elapsed = (time - time_started) / total_time
     return min(elapsed, 1.0)
+end
 
 def elapsed() -> number
     "Stateful function, returns the number of seconds that has passed since this function was first called"
@@ -189,7 +190,7 @@ def elapsed() -> number
     return time - time_started
 end
 
-def draggable_rect(Point initial_location, Point size) -> Point:
+def draggable_rect(Point initial_location, Point size) -> Point
     state Point location = initial_location
     rect = [location.x, location.y, location.x+size.x, location.y+size.y]
     state currently_dragging = false
@@ -204,6 +205,7 @@ def draggable_rect(Point initial_location, Point size) -> Point:
         mouse_offset = location - mouse
     end
     return location
+end
 
 ui_font_medium = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 16)
 coding_font = text:load_font("../assets/inconsolata.otf", 16)

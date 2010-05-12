@@ -1,5 +1,5 @@
 
-This page lists goals for future releases
+This page lists goals for future releases.
 
 # Alpha 3 Goals #
  - Basic code visualization

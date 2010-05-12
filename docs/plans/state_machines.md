@@ -66,3 +66,4 @@ next(b,input) := if (input == 'c')
                  else
                    fail
 
+

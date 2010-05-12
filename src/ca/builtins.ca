@@ -9,16 +9,16 @@ def toggle(bool tog) -> bool
     return on
 end
 
-def approach(number target, number step) -> number
+def approach(number target, number maximum_change) -> number
     <<<
     Stateful function, returns a result which approaches 'target'. Each frame, this function
-    will change at most by 'step'
+    will change at most by 'maximum_change'
     >>>
     state current = target
     if target > current
-        current += min(step, target - current)
+        current += min(maximum_change, target - current)
     elif target < current
-        current -= min(step, current - target)
+        current -= min(maximum_change, current - target)
     end
     return current
 end
