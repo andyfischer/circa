@@ -22,17 +22,20 @@ How is the FSM executed?
 Data structure notes:
 
 Things that users need:
+
  * Refer to states by name
  * Check if we are in a certain state
  * Ask what state we are in
 
 Normal execution:
+
  * Every state has an 'iterate' method
  * Call 'iterate'
  * 'iterate' might change our state
  * Then we call 'iterate' again on the new state
 
 Traditional state machine has 'edges'. Edges can be:
+
  * Pieces of input, such as an RE
  * Conditions
    * Problem: multiple conditions might be true, then what do we do?

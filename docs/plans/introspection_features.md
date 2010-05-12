@@ -12,11 +12,11 @@ Usually this will just be True
 
 Example:
 
-if a:
-  if b:
-    c = f()
+    if a
+      if b
+        c = f()
 
-The execution condition of `c` would be and(a,b)
+The execution condition of `c` would be `and(a,b)`
 
 How to solve this in a for-loop?
 How to solve this if `return`, `break`, or `continue` are added?
@@ -26,13 +26,13 @@ Also need to know if an error would occur before that term
 
 Example, if I had this code:
 
-def some_bool_func(bool a, bool b, bool c) -> bool
-  return a and (b or c)
-end
+    def some_bool_func(bool a, bool b, bool c) -> bool
+      return a and (b or c)
+    end
 
 Then let's say I called the function like this:
 
-some_bool_func(false, true, false)
+    some_bool_func(false, true, false)
 
 And then it returns false. I want to be able to ask the system, hey, why did you return
 false instead of true? In this case, it could just tell me that it's because I called it
@@ -56,11 +56,12 @@ only two values can restrict the search space. This is also useful when dealing 
 a certain output.
 
 *Why did (or didn't) you execute this term?* - To answer this one, need to know:
+
  1. if there were any enclosing if() statements, why was their condition false?
  2. did an error occur?
  3. was a break/return statement triggered?
 
-'When does this return X' - Similar to the why questions, but with no context information.
+*When does this return X?* - Similar to the why questions, but with no context information.
 This just attempts to provide a generic view on code. See the Nesting section below.
 
 ### Recursion ###
