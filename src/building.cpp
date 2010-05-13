@@ -265,6 +265,7 @@ Term* create_compound_type(Branch& branch, std::string const& name)
 {
     Term* term = create_type(branch, name);
     initialize_branch_based_type(term);
+    type_contents(term)->name = name;
     return term;
 }
 #endif

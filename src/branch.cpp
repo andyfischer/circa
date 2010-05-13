@@ -340,9 +340,12 @@ Branch::eval(std::string const& code)
 }
 
 namespace branch_t {
-    void initialize(Type*, TaggedValue* value)
+    void initialize(Type* type, TaggedValue* value)
     {
         set_pointer(value, new Branch());
+
+        Branch& prototype = type->prototype;
+        branch_t::branch_copy(prototype, as_branch(value));
     }
 
     void release(TaggedValue* value)
@@ -353,6 +356,8 @@ namespace branch_t {
 
     void reset_to_prototype(TaggedValue* value)
     {
+        Branch& branch = as_branch(value);
+        branch.clear();
         Branch& prototype = value->value_type->prototype;
         branch_t::branch_copy(prototype, as_branch(value));
     }

@@ -167,6 +167,7 @@ namespace set_t {
         Term* set_remove = import_member_function(type, set_t::remove, "remove(Set, any) -> Set");
         function_set_use_input_as_output(set_remove, 0, true);
         import_member_function(type, set_t::contains, "contains(Set, any) -> bool");
+
     }
 
 } // namespace set_t
@@ -284,6 +285,8 @@ namespace map_t {
         function_set_use_input_as_output(map_remove, 0, true);
         import_member_function(type, map_t::get, "get(Map, any) -> any");
 
+        create_list(type->prototype);
+        create_list(type->prototype);
     }
 } // namespace map_t
 
@@ -448,7 +451,7 @@ void setup_builtin_types(Branch& kernel)
     import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) -> string");
 
     Term* set_type = create_compound_type(kernel, "Set");
-    set_t::setup_type(&as_type(set_type));
+    set_t::setup_type(type_contents(set_type));
 
     // LIST_TYPE was created in bootstrap_kernel
 #ifdef NEWLIST
@@ -464,18 +467,7 @@ void setup_builtin_types(Branch& kernel)
 #endif
 
     Term* map_type = create_compound_type(kernel, "Map");
-    map_t::setup_type(&as_type(map_type));
-
-    type_t::enable_default_value(map_type);
-#ifndef NEWLIST
-    Branch& map_default_value = type_t::get_default_value(map_type)->asBranch();
-    create_list(map_default_value);
-    create_list(map_default_value);
-#else
-    List* map_default_value = (List*) type_t::get_default_value(map_type);
-    make_list(map_default_value->append());
-    make_list(map_default_value->append());
-#endif
+    map_t::setup_type(type_contents(map_type));
 
     NAMESPACE_TYPE = create_branch_based_type(kernel, "Namespace");
     CODE_TYPE = create_branch_based_type(kernel, "Code");
