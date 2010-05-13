@@ -5,7 +5,7 @@
 namespace circa {
 namespace callable_t {
 
-    bool matches_type(Type* type, Term* term)
+    bool static_type_match(Type* type, Term* term)
     {
         return term->type == FUNCTION_TYPE
             || term->type == TYPE_TYPE;
@@ -13,7 +13,7 @@ namespace callable_t {
     void setup_type(Type* type)
     {
         reset_type(type);
-        type->matchesType = matches_type;
+        type->staticTypeMatch = static_type_match;
     }
 }
 }

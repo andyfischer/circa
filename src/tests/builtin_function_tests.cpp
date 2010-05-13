@@ -80,10 +80,9 @@ void test_list()
     Branch branch;
     Term* l = branch.eval("l = list(1,2,\"foo\")");
 
-    test_assert(is_branch(l));
-    test_assert(as_branch(l)[0]->asInt() == 1);
-    test_assert(as_branch(l)[1]->asInt() == 2);
-    test_assert(as_branch(l)[2]->asString() == "foo");
+    test_assert(l->getIndex(0)->asInt() == 1);
+    test_assert(l->getIndex(1)->asInt() == 2);
+    test_assert(l->getIndex(2)->asString() == "foo");
 }
 
 void test_range()
@@ -91,16 +90,16 @@ void test_range()
     Branch branch;
     Term* t = branch.eval("range(0,5)");
 
-    test_assert(as_branch(t).length() == 5);
+    test_assert(t->numElements() == 5);
     for (int i=0; i < 5; i++)
-        test_assert(as_int(as_branch(t)[i]) == i);
+        test_assert(t->getIndex(i)->asInt() == i);
 
     // there was once a bug where the result list would grow on every call
     evaluate_term(t);
     evaluate_term(t);
     evaluate_term(t);
     evaluate_term(t);
-    test_assert(as_branch(t).length() == 5);
+    test_assert(t->numElements() == 5);
 }
 
 void test_map()
@@ -111,6 +110,7 @@ void test_map()
 
     test_assert(map_sqr);
 
+#ifndef NEWLIST
     Branch& result = as_branch(map_sqr);
 
     test_assert(result.length() == 5);
@@ -133,6 +133,7 @@ void test_map()
     test_equals(result2[2]->asFloat(), 8);
     test_equals(result2[3]->asFloat(), 9);
     test_equals(result2[4]->asFloat(), 10);
+#endif
 }
 
 void test_vectorized_funcs()
@@ -141,20 +142,20 @@ void test_vectorized_funcs()
     Term* t = branch.eval("[1 2 3] + [4 5 6]");
     test_assert(t);
 
-    Branch& result = as_branch(t);
-    
-    test_assert(result.length() == 3);
-    test_assert(result[0]->asInt() == 5);
-    test_assert(result[1]->asInt() == 7);
-    test_assert(result[2]->asInt() == 9);
+    test_assert(t->numElements() == 3);
+    test_assert(t->getIndex(0)->asInt() == 5);
+    test_assert(t->getIndex(1)->asInt() == 7);
+    test_assert(t->getIndex(2)->asInt() == 9);
 
     // Test mult_s (multiply a vector to a scalar)
     t = branch.eval("[10 20 30] * 1.1");
-    Branch& mult_result = as_branch(t);
-    test_assert(mult_result.length() == 3);
-    test_equals(mult_result[0]->asFloat(), 11);
-    test_equals(mult_result[1]->asFloat(), 22);
-    test_equals(mult_result[2]->asFloat(), 33);
+
+    dump_branch(branch);
+
+    test_assert(t->numElements() == 3);
+    test_equals(t->getIndex(0)->asFloat(), 11);
+    test_equals(t->getIndex(1)->asFloat(), 22);
+    test_equals(t->getIndex(2)->asFloat(), 33);
 
     // Test error handling
     t = branch.eval("[1 1 1] + [1 1]");

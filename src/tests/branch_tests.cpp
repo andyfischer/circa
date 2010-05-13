@@ -337,37 +337,27 @@ void test_cast()
     Term* dest = branch.eval("Mytype()");
     Term* source = branch.eval("[3 4]");
     //dump_branch(branch);
-#ifdef NEWLIST
     TaggedValue* dest0 = dest->getIndex(0);
     TaggedValue* dest1 = dest->getIndex(1);
-#else
-    Term* dest0 = as_branch(dest)[0];
-    Term* dest1 = as_branch(dest)[1];
-#endif
 
     cast(source, dest);
     test_assert(is_int(dest0));
     test_assert(as_int(dest0) == 3);
     //test_assert(is_float(dest1));
     test_equals(as_float(dest1), 4);
-    // Verify that 'dest' has the same terms
-    test_assert(dest0 == as_branch(dest)[0]);
-    test_assert(dest1 == as_branch(dest)[1]);
 
     // Cast a value with more elements
     dest = branch.eval("[1]");
-    dest0 = as_branch(dest)[0];
-    test_assert(as_int(dest0) == 1);
+    test_assert(as_int(dest->getIndex(0)) == 1);
 
     source = branch.eval("[7 8 9]");
 
     cast(source, dest);
 
-    test_assert(as_branch(dest).length() == 3);
-    test_assert(dest0 == as_branch(dest)[0]);
-    test_assert(as_int(dest0) == 7);
-    test_assert(as_int(as_branch(dest)[1]) == 8);
-    test_assert(as_int(as_branch(dest)[2]) == 9);
+    test_assert(dest->numElements() == 3);
+    test_assert(as_int(dest->getIndex(0)) == 7);
+    test_assert(as_int(dest->getIndex(1)) == 8);
+    test_assert(as_int(dest->getIndex(2)) == 9);
 
     // Cast one list to another list- make sure that it doesn't type check
     // the fields.

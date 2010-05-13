@@ -9,7 +9,6 @@ namespace map_function {
     {
         Term* func = caller->input(0);
         List* inputs = (List*) caller->input(1);
-        Branch& output = as_branch(caller);
 
         if (is_function_stateful(func)) {
             error_occurred(cxt, caller, "map() not yet supported on a stateful function");
@@ -22,6 +21,18 @@ namespace map_function {
         Term* evalInput = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
         Term* evalResult = apply(evaluationBranch, func, RefList(evalInput));
 
+#ifdef NEWLIST
+        List* list = (List*) caller;
+        list->resize(numInputs);
+
+        for (int i=0; i < numInputs; i++) {
+            copy(inputs->getIndex(i), evalInput);
+            evaluate_branch(evaluationBranch);
+
+            copy(evalResult, list->get(i));
+        }
+#else
+        Branch& output = as_branch(caller);
         output.clear();
 
         for (int i=0; i < numInputs; i++) {
@@ -31,6 +42,8 @@ namespace map_function {
             Term* outputElement = create_value(output, evalResult->type);
             copy(evalResult, outputElement);
         }
+#endif
+
 
 #if 0
         Old branch-based version:

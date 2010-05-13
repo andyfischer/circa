@@ -13,7 +13,7 @@ namespace indexable_t {
     void setup_type(Type* type)
     {
         reset_type(type);
-        type->matchesType = matches_type;
+        type->staticTypeMatch = matches_type;
     }
 }
 }

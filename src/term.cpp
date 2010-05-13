@@ -184,40 +184,6 @@ std::string Term::stringPropOptional(std::string const& name, std::string const&
     else return defaultValue;
 }
 
-int Term::asInt()
-{
-    return as_int(this);
-}
-
-float Term::asFloat()
-{
-    return as_float(this);
-}
-
-float Term::toFloat()
-{
-    return to_float(this);
-}
-
-std::string const& Term::asString()
-{
-    return as_string(this);
-}
-
-bool Term::asBool()
-{
-    return as_bool(this);
-}
-
-Ref& Term::asRef()
-{
-    return as_ref(this);
-}
-
-Branch& Term::asBranch()
-{
-    return as_branch(this);
-}
 
 Term* Term::field(int index)
 {

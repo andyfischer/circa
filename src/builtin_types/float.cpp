@@ -43,9 +43,10 @@ namespace float_t {
         else
             return result;
     }
-    bool matches_type(Type* type, Term* term)
+    bool type_matches(Type* type, Type* otherType)
     {
-        return term->type == FLOAT_TYPE || term->type == INT_TYPE;
+        return otherType == type_contents(FLOAT_TYPE)
+            || otherType == type_contents(INT_TYPE);
     }
 
     std::string to_source_string(Term* term)
@@ -96,7 +97,7 @@ namespace float_t {
         type->cast = cast;
         type->castPossible = cast_possible;
         type->equals = equals;
-        type->matchesType = matches_type;
+        type->typeMatches = type_matches;
         type->toString = to_string;
         type->formatSource = format_source;
     }

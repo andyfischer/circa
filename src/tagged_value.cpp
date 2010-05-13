@@ -72,6 +72,41 @@ TaggedValue::numElements()
     return num_elements(this);
 }
 
+int TaggedValue::asInt()
+{
+    return as_int(this);
+}
+
+float TaggedValue::asFloat()
+{
+    return as_float(this);
+}
+
+float TaggedValue::toFloat()
+{
+    return to_float(this);
+}
+
+std::string const& TaggedValue::asString()
+{
+    return as_string(this);
+}
+
+bool TaggedValue::asBool()
+{
+    return as_bool(this);
+}
+
+Ref& TaggedValue::asRef()
+{
+    return as_ref(this);
+}
+
+Branch& TaggedValue::asBranch()
+{
+    return as_branch(this);
+}
+
 bool cast_possible(Type* type, TaggedValue* value)
 {
     Type::CastPossible castPossible = type->castPossible;

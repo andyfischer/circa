@@ -22,15 +22,16 @@ struct Type
     typedef void (*Release)(TaggedValue* value);
     typedef void (*Copy)(TaggedValue* source, TaggedValue* dest);
     typedef void (*Reset)(TaggedValue* value);
-    typedef bool (*CastPossible)(Type* type, TaggedValue* value);
     typedef bool (*Equals)(TaggedValue* lhs, TaggedValue* rhs);
+    typedef bool (*CastPossible)(Type* type, TaggedValue* value);
     typedef void (*Cast)(Type* type, TaggedValue* source, TaggedValue* dest);
     typedef void (*RemapPointers)(Term* term, ReferenceMap const& map);
     typedef std::string (*ToString)(TaggedValue* value);
     typedef void (*FormatSource)(StyledSource*, Term* term);
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
-    typedef bool (*MatchesType)(Type* type, Term* term);
+    typedef bool (*TypeMatches)(Type* type, Type* otherType);
+    typedef bool (*StaticTypeMatch)(Type* type, Term* term);
     typedef void (*Mutate)(TaggedValue* value);
     typedef TaggedValue* (*GetIndex)(TaggedValue* value, int index);
     typedef void (*SetIndex)(TaggedValue* value, int index, TaggedValue* element);
@@ -57,7 +58,8 @@ struct Type
     FormatSource formatSource;
     CheckInvariants checkInvariants;
     ValueFitsType valueFitsType;
-    MatchesType matchesType;
+    TypeMatches typeMatches;
+    StaticTypeMatch staticTypeMatch;
     Mutate mutate;
     GetIndex getIndex;
     SetIndex setIndex;
@@ -97,7 +99,8 @@ private:
         formatSource(NULL),
         checkInvariants(NULL),
         valueFitsType(NULL),
-        matchesType(NULL),
+        typeMatches(NULL),
+        staticTypeMatch(NULL),
         mutate(NULL),
         getIndex(NULL),
         setIndex(NULL),

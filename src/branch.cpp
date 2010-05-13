@@ -402,7 +402,7 @@ namespace branch_t {
         return is_branch(value) || list_t::is_list(value);
     }
 
-    bool matches_type(Type* type, Term* term)
+    bool static_matches_type(Type* type, Term* term)
     {
         Branch& prototype = type->prototype;
 
@@ -609,7 +609,7 @@ void initialize_branch_based_type(Term* term)
     type->cast = branch_t::cast;
     type->castPossible = branch_t::cast_possible;
     type->equals = branch_t::equals;
-    type->matchesType = branch_t::matches_type;
+    type->staticTypeMatch = branch_t::static_matches_type;
     type->getIndex = branch_t::get_index;
     type->setIndex = branch_t::set_index;
     type->getField = branch_t::get_field;

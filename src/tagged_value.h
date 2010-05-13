@@ -31,6 +31,15 @@ struct TaggedValue
     inline TaggedValue* operator[](int index) { return getIndex(index); }
     TaggedValue* getIndex(int index);
     int numElements();
+
+    // Convenience accessors
+    int asInt();
+    float asFloat();
+    float toFloat();
+    std::string const& asString();
+    bool asBool();
+    Ref& asRef();
+    Branch& asBranch();
 };
 
 bool cast_possible(Type* type, TaggedValue* dest);

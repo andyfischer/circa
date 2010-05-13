@@ -292,6 +292,53 @@ void tv_copy(TaggedValue* source, TaggedValue* dest)
     set_pointer(dest, s);
 }
 
+bool tv_equals(TaggedValue* leftValue, TaggedValue* rightValue)
+{
+    if (!is_list(leftValue) || !is_list(rightValue))
+        return false;
+
+    List* left = (List*) leftValue;
+    List* right = (List*) rightValue;
+
+    int leftCount = left->numElements();
+    int rightCount = right->numElements();
+
+    if (leftCount != rightCount)
+        return false;
+
+    for (int i=0; i < leftCount; i++) {
+        if (!circa::equals(left->get(i), right->get(i)))
+            return false;
+    }
+    return true;
+}
+
+bool tv_cast_possible(Type*, TaggedValue* value)
+{
+    return is_list(value);
+}
+
+void tv_cast(Type*, TaggedValue* source, TaggedValue* dest)
+{
+    if (!is_list(source)) return;
+    if (!is_list(dest)) return;
+
+    bool keep_existing_shape = dest->value_type->prototype.length() != 0;
+
+    if (keep_existing_shape) {
+        List* s = (List*) source;
+        List* d = (List*) dest;
+
+        int count = std::min(s->numElements(), d->numElements());
+
+        for (int i=0; i < count; i++)
+            cast(s->get(i), d->get(i));
+
+    } else {
+        tv_copy(source, dest);
+    }
+}
+
 TaggedValue* tv_get_index(TaggedValue* value, int index)
 {
     assert(is_list(value));
@@ -350,11 +397,14 @@ void setup_type(Type* type)
     type->release = tv_release;
     type->copy = tv_copy;
     type->toString = tv_to_string;
+    type->equals = tv_equals;
+    type->castPossible = tv_cast_possible;
+    type->cast = tv_cast;
     type->getIndex = tv_get_index;
     type->setIndex = tv_set_index;
     type->numElements = tv_num_elements;
     type->mutate = tv_mutate;
-    type->matchesType = tv_matches_type;
+    type->staticTypeMatch = tv_matches_type;
 }
 
 void postponed_setup_type(Type*)

@@ -163,12 +163,15 @@ bool matches_type(Type* type, Term* term)
     if (type_contents(term->type) == type)
         return true;
 
-    Type::MatchesType matchesType = type->matchesType;
+    Type::StaticTypeMatch staticTypeMatch = type->staticTypeMatch;
 
-    if (matchesType != NULL)
-        return matchesType(type, term);
+    if (staticTypeMatch != NULL)
+        return staticTypeMatch(type, term);
 
-    // Default behavior, if the above checks didn't pass then return false.
+    Type::TypeMatches typeMatches = type->typeMatches;
+    if (typeMatches != NULL)
+        return typeMatches(type, type_contents(term->type));
+
     return false;
 }
 
@@ -177,7 +180,10 @@ bool value_matches_type(Type* type, TaggedValue* value)
     if (type == value->value_type)
         return true;
 
-    // TODO
+    Type::TypeMatches typeMatches = type->typeMatches;
+    if (typeMatches != NULL)
+        return typeMatches(type, value->value_type);
+
     return false;
 }
 
@@ -187,12 +193,15 @@ bool term_statically_satisfies_type(Term* term, Type* type)
     if (type_contents(term->type) == type)
         return true;
 
-    Type::MatchesType matchesType = type->matchesType;
+    Type::StaticTypeMatch staticTypeMatch = type->staticTypeMatch;
 
-    if (matchesType != NULL)
-        return matchesType(type, term);
+    if (staticTypeMatch != NULL)
+        return staticTypeMatch(type, term);
 
-    // Default behavior, if the above checks didn't pass then return false.
+    Type::TypeMatches typeMatches = type->typeMatches;
+    if (typeMatches != NULL)
+        return typeMatches(type, type_contents(term->type));
+
     return false;
 }
 
@@ -212,7 +221,8 @@ void reset_type(Type* type)
     type->formatSource = NULL;
     type->checkInvariants = NULL;
     type->valueFitsType = NULL;
-    type->matchesType = NULL;
+    type->typeMatches = NULL;
+    type->staticTypeMatch = NULL;
     type->mutate = NULL;
     type->getIndex = NULL;
     type->setIndex = NULL;

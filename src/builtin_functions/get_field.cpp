@@ -7,7 +7,7 @@ namespace get_field_function {
 
     void evaluate(EvalContext* cxt, Term* caller)
     {
-        Term* head = caller->input(0);
+        TaggedValue* head = caller->input(0);
 
         for (int nameIndex=1; nameIndex < caller->numInputs(); nameIndex++) {
             std::string const& name = caller->input(nameIndex)->asString();
@@ -20,7 +20,7 @@ namespace get_field_function {
                 return;
             }
 
-            head = as_branch(head)[fieldIndex];
+            head = head->getIndex(fieldIndex);
         }
 
         copy(head, caller);

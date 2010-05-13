@@ -17,10 +17,10 @@ namespace vectorize_vv_function {
     {
         Term* func = as_ref(function_t::get_parameters(caller->function));
 
-#if 0
+#ifdef NEWLIST
         Term* left = caller->input(0);
         Term* right = caller->input(1);
-        Branch& output = as_branch(caller);
+        List* output = (List*) caller;
         int numInputs = left->numElements();
 
         if (numInputs != right->numElements()) {
@@ -38,15 +38,14 @@ namespace vectorize_vv_function {
         Term* evalResult = apply(evaluationBranch, func, RefList(input0, input1));
         dump_branch(evaluationBranch);
 
-        output.clear();
+        output->resize(numInputs);
 
         for (int i=0; i < numInputs; i++) {
             copy(left->getIndex(i), input0);
             copy(right->getIndex(i), input1);
             evaluate_branch(evaluationBranch);
 
-            Term* outputElement = create_value(output, evalResult->type);
-            copy(evalResult, outputElement);
+            copy(evalResult, output->get(i));
         }
 #else
         Branch& left = as_branch(caller->input(0));

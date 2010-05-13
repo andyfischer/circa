@@ -91,15 +91,6 @@ struct Term : TaggedValue
     bool boolPropOptional(std::string const& name, bool defaultValue);
     std::string stringPropOptional(std::string const& name, std::string const& defaultValue);
 
-    // Convenience accessors
-    int asInt();
-    float asFloat();
-    float toFloat();
-    std::string const& asString();
-    bool asBool();
-    Ref& asRef();
-    Branch& asBranch();
-
     Term* field(int index);
 };
 
