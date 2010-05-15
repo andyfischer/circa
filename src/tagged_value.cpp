@@ -345,6 +345,12 @@ TaggedValue* make_list(TaggedValue* value)
     return value;
 }
 
+void make_branch(TaggedValue* value)
+{
+    change_type(value, NULL_T); // substitute for 'reset'
+    change_type(value, type_contents(BRANCH_TYPE));
+}
+
 void make_null(TaggedValue* value)
 {
     change_type(value, NULL_T);

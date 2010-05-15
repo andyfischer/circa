@@ -5,7 +5,7 @@
 
 #include "common_headers.h"
 
-#include "builtin_types.h" // for List
+#include "builtin_types/list.h"
 #include "branch.h"
 #include "term.h"
 

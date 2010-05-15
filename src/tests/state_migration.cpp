@@ -5,7 +5,7 @@
 #include <circa.h>
 
 namespace circa {
-namespace migration_snippets {
+namespace state_migration {
 
 void test_migration(std::string sourceCode, std::string destinationCode,
     std::string assertionsCode)
@@ -138,11 +138,11 @@ void migrate_misc()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(migration_snippets::migrate_simple);
-    REGISTER_TEST_CASE(migration_snippets::migrate_across_user_defined_types);
-    REGISTER_TEST_CASE(migration_snippets::dont_migrate_across_different_types);
-    REGISTER_TEST_CASE(migration_snippets::migrate_complex_types);
-    REGISTER_TEST_CASE(migration_snippets::migrate_misc);
+    REGISTER_TEST_CASE(state_migration::migrate_simple);
+    REGISTER_TEST_CASE(state_migration::migrate_across_user_defined_types);
+    REGISTER_TEST_CASE(state_migration::dont_migrate_across_different_types);
+    REGISTER_TEST_CASE(state_migration::migrate_complex_types);
+    REGISTER_TEST_CASE(state_migration::migrate_misc);
 }
 
 } // namespace migration_snippets

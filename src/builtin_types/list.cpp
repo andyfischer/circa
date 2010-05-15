@@ -6,7 +6,11 @@
 #include "builtin_types.h"
 #include "debug_valid_objects.h"
 #include "tagged_value.h"
+#include "testing.h"
+
 #include "type.h"
+
+#include "list.h"
 
 namespace circa {
 namespace list_t {
@@ -58,6 +62,10 @@ static ListData* mutate(ListData* data);
 // Add a new blank element to the end of the list, resizing if necessary.
 // Returns the new element.
 static TaggedValue* append(ListData** data);
+
+// Remove the element at index and replace the empty spot with the last
+// element in the list.
+static void remove_and_replace_with_back(ListData** data, int index);
 
 void assert_valid_list(ListData* list)
 {
@@ -188,6 +196,8 @@ static void clear(ListData** data)
 
 static ListData* mutate(ListData* data)
 {
+    if (data == NULL)
+        return NULL;
     assert(data->refCount > 0);
     if (data->refCount == 1)
         return data;
@@ -213,22 +223,18 @@ static TaggedValue* append(ListData** data)
     return &d->items[d->count - 1];
 }
 
-TaggedValue* append(TaggedValue* list)
+static void remove_and_replace_with_back(ListData** data, int index)
 {
-    assert(is_list(list));
-    return append((ListData**) &list->value_data);
-}
+    *data = mutate(*data);
+    assert(index < (*data)->count);
 
-void resize(TaggedValue* list, int newSize)
-{
-    assert(is_list(list));
-    set_pointer(list, resize((ListData*) get_pointer(list), newSize));
-}
+    make_null(&(*data)->items[index]);
 
-void clear(TaggedValue* list)
-{
-    assert(is_list(list));
-    clear((ListData**) &list->value_data);
+    int lastElement = (*data)->count - 1;
+    if (index < lastElement)
+        swap(&(*data)->items[index], &(*data)->items[lastElement]);
+
+    (*data)->count--;
 }
 
 static std::string to_string(ListData* value)
@@ -246,6 +252,23 @@ static std::string to_string(ListData* value)
     return out.str();
 }
 
+TaggedValue* append(TaggedValue* list)
+{
+    assert(is_list(list));
+    return append((ListData**) &list->value_data);
+}
+
+void resize(TaggedValue* list, int newSize)
+{
+    assert(is_list(list));
+    set_pointer(list, resize((ListData*) get_pointer(list), newSize));
+}
+
+void clear(TaggedValue* list)
+{
+    assert(is_list(list));
+    clear((ListData**) &list->value_data);
+}
 void tv_initialize(Type* type, TaggedValue* value)
 {
     set_pointer(value, NULL);
@@ -292,22 +315,22 @@ void tv_copy(TaggedValue* source, TaggedValue* dest)
     set_pointer(dest, s);
 }
 
-bool tv_equals(TaggedValue* leftValue, TaggedValue* rightValue)
+bool tv_equals(TaggedValue* leftValue, TaggedValue* right)
 {
-    if (!is_list(leftValue) || !is_list(rightValue))
+    assert(is_list(leftValue));
+    Type* rhsType = right->value_type;
+    if (rhsType->numElements == NULL || rhsType->getIndex == NULL)
         return false;
 
     List* left = (List*) leftValue;
-    List* right = (List*) rightValue;
 
     int leftCount = left->numElements();
-    int rightCount = right->numElements();
 
-    if (leftCount != rightCount)
+    if (leftCount != right->numElements())
         return false;
 
     for (int i=0; i < leftCount; i++) {
-        if (!circa::equals(left->get(i), right->get(i)))
+        if (!circa::equals(left->get(i), right->getIndex(i)))
             return false;
     }
     return true;
@@ -385,9 +408,22 @@ bool tv_matches_type(Type* type, Term* term)
     return declared_type(term)->initialize == tv_initialize;
 }
 
+void remove_and_replace_with_back(TaggedValue* value, int index)
+{
+    assert(is_list(value));
+    ListData* data = (ListData*) get_pointer(value);
+    remove_and_replace_with_back(&data, index);
+    set_pointer(value, data);
+}
+
 bool is_list(TaggedValue* value)
 {
-    return value->value_type->initialize == tv_initialize;
+    return is_list_based_type(value->value_type);
+}
+
+bool is_list_based_type(Type* type)
+{
+    return type->initialize == tv_initialize;
 }
 
 void setup_type(Type* type)

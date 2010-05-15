@@ -152,9 +152,8 @@ void setup_for_loop_post_code(Term* forTerm)
     }
 
     // Also, possibly rebind the list name.
-    if (as_bool(get_for_loop_modify_list(forTerm)) && listName != "") {
+    if (as_bool(get_for_loop_modify_list(forTerm)) && listName != "")
         create_value(rebindsForOuter, LIST_TYPE, listName);
-    }
 
     expose_all_names(rebindsForOuter, outerScope);
 
@@ -233,18 +232,28 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
         // Possibly use this value to modify the list
         if (listOutput != NULL && !as_bool(discardCalled)) {
             Term* iteratorResult = codeBranch[iterator->name];
-
+#ifndef NEWLIST
             Branch& listOutputBr = listOutput->asBranch();
-            if (listOutputWriteHead >= listOutputBr.length())
+#endif
+
+            if (listOutputWriteHead >= listOutput->numElements())
+#ifdef NEWLIST
+                ((List*) listOutput)->append();
+#else
                 create_value(listOutputBr, iteratorResult->type);
-            Term* outputElement = listOutputBr[listOutputWriteHead++];
+#endif
+            TaggedValue* outputElement = listOutput->getIndex(listOutputWriteHead++);
         
             copy(iteratorResult, outputElement);
         }
     }
 
-    if (listOutput != NULL && as_branch(listOutput).length() > listOutputWriteHead)
+    if (listOutput != NULL && listOutput->numElements() > listOutputWriteHead)
+#ifdef NEWLIST
+        ((List*)listOutput)->resize(listOutputWriteHead);
+#else
         as_branch(listOutput).shorten(listOutputWriteHead);
+#endif
 }
 
 Term* find_enclosing_for_loop(Term* term)

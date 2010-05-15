@@ -1,10 +1,9 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_RICHSOURCE_INCLUDED
-#define CIRCA_RICHSOURCE_INCLUDED
+#pragma once
 
 #include "common_headers.h"
-#include "builtin_types.h"
+#include "builtin_types/list.h"
 
 namespace circa {
 
@@ -55,5 +54,3 @@ void set_input_syntax_hint(Term* term, int index, std::string const& field,
         std::string const& value);
 
 }
-
-#endif

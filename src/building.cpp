@@ -260,16 +260,6 @@ Term* create_empty_type(Branch& branch, std::string name)
     return type;
 }
 
-#ifndef NEWLIST
-Term* create_compound_type(Branch& branch, std::string const& name)
-{
-    Term* term = create_type(branch, name);
-    initialize_branch_based_type(term);
-    type_contents(term)->name = name;
-    return term;
-}
-#endif
-
 Term* create_branch_based_type(Branch& branch, std::string const& name)
 {
     Term* term = create_type(branch, name);

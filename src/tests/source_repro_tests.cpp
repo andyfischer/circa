@@ -46,22 +46,6 @@ void generate_source_for_function_calls() {
     */
 }
 
-void generate_source_for_literal_list() {
-#ifdef NEWLIST
-    Branch branch;
-    List* a = (List*) create_list(branch, "a");
-
-    test_equals(get_branch_source_text(branch), "a = []");
-
-    make_int(a->append(), 5);
-    test_equals(get_branch_source_text(branch), "a = [5]");
-
-    make_int(a->append(), 100);
-    test_equals(get_branch_source_text(branch), "a = [5,100]");
-#else
-#endif
-}
-
 void bug_reproducing_list_after_eval()
 {
     // There once was a bug where source repro would fail when using a list
@@ -102,7 +86,6 @@ void death_reproducing_builtin_functions()
 
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_tests::generate_source_for_function_calls);
-    REGISTER_TEST_CASE(source_repro_tests::generate_source_for_literal_list);
     REGISTER_TEST_CASE(source_repro_tests::bug_reproducing_list_after_eval);
     REGISTER_TEST_CASE(source_repro_tests::death_reproducing_builtin_functions);
 }

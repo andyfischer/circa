@@ -4,7 +4,7 @@
 
 #include "builtins.h"
 #include "function.h"
-#include "source_repro.cpp"
+#include "source_repro.h"
 #include "term.h"
 
 namespace circa {

@@ -6,6 +6,8 @@
 
 namespace circa {
 
+const bool ASSERT_INTERNAL_ERROR = true;
+
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message)
 {
     if (DEBUG_TRAP_ERROR_OCCURRED)
@@ -22,8 +24,6 @@ void error_occurred(EvalContext* context, Term* errorTerm, std::string const& me
         context->errorMessage = message;
     }
 }
-
-const bool ASSERT_INTERNAL_ERROR = false;
 
 void internal_error(const char* message)
 {

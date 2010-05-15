@@ -22,7 +22,11 @@ namespace bool_t {
 }
 
 namespace set_t {
+#ifdef NEWLIST
+    void add(List* list, TaggedValue* value);
+#else
     void add(Branch& branch, Term* value);
+#endif
     void setup_type(Type* type);
 }
 
@@ -31,13 +35,6 @@ namespace old_list_t {
     void setup(Type*);
 }
 #endif
-
-namespace list_t {
-    bool is_list(TaggedValue*);
-    void setup_type(Type*);
-    void postponed_setup_type(Type*);
-    void tv_initialize(Type*, TaggedValue*);
-}
 
 namespace dict_t {
     std::string to_string(Branch& branch);
@@ -83,18 +80,6 @@ void post_setup_primitive_types();
 
 void setup_builtin_types(Branch& kernel);
 void parse_builtin_types(Branch& kernel);
-
-struct List : TaggedValue
-{
-    List();
-
-    TaggedValue* append();
-    void clear();
-    int length();
-    TaggedValue* get(int index);
-    TaggedValue* operator[](int index) { return get(index); }
-    void resize(int size);
-};
 
 }
 

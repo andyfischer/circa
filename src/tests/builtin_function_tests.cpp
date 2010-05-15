@@ -150,7 +150,7 @@ void test_vectorized_funcs()
     // Test mult_s (multiply a vector to a scalar)
     t = branch.eval("[10 20 30] * 1.1");
 
-    dump_branch(branch);
+    //dump_branch(branch);
 
     test_assert(t->numElements() == 3);
     test_equals(t->getIndex(0)->asFloat(), 11);
@@ -178,8 +178,8 @@ void test_vectorized_funcs_with_points()
 
     Term* b = branch.eval("b = a + [0 2]");
 
-    test_equals(b->asBranch()[0]->toFloat(), 1);
-    test_equals(b->asBranch()[1]->toFloat(), 2);
+    test_equals(b->getIndex(0)->toFloat(), 1);
+    test_equals(b->getIndex(1)->toFloat(), 2);
 }
 
 void test_cond_with_int_and_float()
@@ -201,7 +201,7 @@ void test_get_index()
     Term* get = branch.eval("get_index(l, 0)");
 
     test_assert(get);
-    test_assert(get->type == INT_TYPE);
+    test_assert(get->value_type == type_contents(INT_TYPE));
     test_assert(get->asInt() == 1);
 
     branch.eval("l = []");
@@ -219,15 +219,15 @@ void test_set_index()
     Term* l2 = branch.eval("set_index(@l, 1, 5)");
 
     test_assert(l2);
-    test_assert(l2->asBranch()[0]->asInt() == 1);
-    test_assert(l2->asBranch()[1]->asInt() == 5);
-    test_assert(l2->asBranch()[2]->asInt() == 3);
+    test_assert(l2->getIndex(0)->asInt() == 1);
+    test_assert(l2->getIndex(1)->asInt() == 5);
+    test_assert(l2->getIndex(2)->asInt() == 3);
 
     Term* l3 = branch.eval("l[2] = 9");
     test_assert(l3);
-    test_assert(l3->asBranch()[0]->asInt() == 1);
-    test_assert(l3->asBranch()[1]->asInt() == 5);
-    test_assert(l3->asBranch()[2]->asInt() == 9);
+    test_assert(l3->getIndex(0)->asInt() == 1);
+    test_assert(l3->getIndex(1)->asInt() == 5);
+    test_assert(l3->getIndex(2)->asInt() == 9);
 }
 
 void test_do_once()
@@ -279,33 +279,33 @@ void test_message_passing()
     Term* send = branch.compile("send(i, 1)");
 
     // Before running, i should be empty
-    test_assert(as_branch(i).length() == 0);
-    test_assert(as_branch(get_hidden_state_for_call(i)).length() == 0);
+    test_assert(i->numElements() == 0);
+    test_assert(get_hidden_state_for_call(i)->numElements() == 0);
 
     // First run, i is still empty, but the hidden state has 1
     evaluate_branch(branch);
-    test_assert(as_branch(i).length() == 0);
-    test_assert(as_branch(get_hidden_state_for_call(i)).length() == 1);
+    test_assert(i->numElements() == 0);
+    test_assert(get_hidden_state_for_call(i)->numElements() == 1);
 
     // Second run, i now returns 1
     evaluate_branch(branch);
-    test_assert(as_branch(i).length() == 1);
-    test_assert(as_branch(i)[0]->asInt() == 1);
-    test_assert(as_branch(get_hidden_state_for_call(i)).length() == 1);
+    test_assert(i->numElements() == 1);
+    test_assert(i->getIndex(0)->asInt() == 1);
+    test_assert(get_hidden_state_for_call(i)->numElements() == 1);
 
     // Delete the send() call
     branch.remove(send);
 
     // Third run, i still returns 1 (from previous call), hidden state is empty
     evaluate_branch(branch);
-    test_assert(as_branch(i).length() == 1);
-    test_assert(as_branch(i)[0]->asInt() == 1);
-    test_assert(as_branch(get_hidden_state_for_call(i)).length() == 0);
+    test_assert(i->numElements() == 1);
+    test_assert(i->getIndex(0)->asInt() == 1);
+    test_assert(get_hidden_state_for_call(i)->numElements() == 0);
 
     // Fourth run, i is empty again
     evaluate_branch(branch);
-    test_assert(as_branch(i).length() == 0);
-    test_assert(as_branch(get_hidden_state_for_call(i)).length() == 0);
+    test_assert(i->numElements() == 0);
+    test_assert(get_hidden_state_for_call(i)->numElements() == 0);
 }
 
 void register_tests()

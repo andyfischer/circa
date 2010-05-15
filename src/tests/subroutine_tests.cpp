@@ -138,9 +138,9 @@ void specialization_to_output_type()
 
     // Make sure that the return value is preserved. This had a bug too
     Term* call = branch.eval("a()");
-    test_assert(as_branch(call).length() == 2);
-    test_equals(call->asBranch()[0]->toFloat(), 1.0);
-    test_equals(call->asBranch()[1]->toFloat(), 2.0);
+    test_assert(call->numElements() == 2);
+    test_equals(call->getIndex(0)->toFloat(), 1.0);
+    test_equals(call->getIndex(1)->toFloat(), 2.0);
 }
 
 void stateful_function_with_arguments()

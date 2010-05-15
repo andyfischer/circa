@@ -172,9 +172,10 @@ Type* type_contents(Term* type);
 bool is_native_type(Term* type);
 Type* declared_type(Term* term);
 
-bool matches_type(Type* type, Term* term);
+bool matches_type(Type* type, Term* term); // <-- deprecated
 bool value_matches_type(Type* type, TaggedValue* value);
 bool term_statically_satisfies_type(Term* term, Type* type);
+bool type_matches(Type* type, Type* otherType);
 
 void reset_type(Type* type);
 void initialize_simple_pointer_type(Type* type);

@@ -523,38 +523,19 @@ namespace branch_t {
             cast(source[i], dest[i]);
     }
 
-    bool equals(Term* lhsTerm, Term* rhsTerm)
+    bool equals(TaggedValue* lhsValue, TaggedValue* rhs)
     {
-        if (!is_branch(rhsTerm))
-            return false;
-
-        Branch& lhs = as_branch(lhsTerm);
-        Branch& rhs = as_branch(rhsTerm);
-
-        if (lhs.length() != rhs.length())
-            return false;
-
-        for (int i=0; i < lhs.length(); i++) {
-            if (!circa::equals(lhs[i], rhs[i]))
-                return false;
-        }
-
-        return true;
-    }
-
-    bool equals(TaggedValue* lhsValue, TaggedValue* rhsValue)
-    {
-        if (!is_branch(rhsValue))
+        if (rhs->value_type->numElements == NULL
+            || rhs->value_type->getIndex == NULL)
             return false;
 
         Branch& lhs = as_branch(lhsValue);
-        Branch& rhs = as_branch(rhsValue);
-
-        if (lhs.length() != rhs.length())
+    
+        if (lhs.length() != rhs->numElements())
             return false;
 
         for (int i=0; i < lhs.length(); i++) {
-            if (!circa::equals(lhs[i], rhs[i]))
+            if (!circa::equals(lhs[i], rhs->getIndex(i)))
                 return false;
         }
 

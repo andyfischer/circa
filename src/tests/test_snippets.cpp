@@ -479,11 +479,7 @@ void test_member_functions()
 void test_lists()
 {
     test_snippet("to_rect([0 0] [5.0 10.0])", "");
-
-    test_snippet("to_rect(newlist(0 0) newlist(5.0 10.0))", "");
-    test_snippet("", "filter(newlist(1 2 3) newlist(true false true)) == [1 3]");
-    //test_snippet("", "add_v(newlist(1 2 3) newlist(1 2 3)) == [2 4 6]");
-    //test_snippet("", "add_s(newlist(1 2 3) 2) == [3 4 5]");
+    test_snippet("", "filter([1 2 3] [true false true]) == [1 3]");
 }
 
 void test_constructor()

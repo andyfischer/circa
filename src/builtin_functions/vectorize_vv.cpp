@@ -36,7 +36,7 @@ namespace vectorize_vv_function {
         Term* input1 = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
 
         Term* evalResult = apply(evaluationBranch, func, RefList(input0, input1));
-        dump_branch(evaluationBranch);
+        //dump_branch(evaluationBranch);
 
         output->resize(numInputs);
 

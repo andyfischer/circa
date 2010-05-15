@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "builtins.h"
+#include "builtin_types/list.h"
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
@@ -36,13 +37,20 @@ Term* find_common_type(RefList const& list)
         return FLOAT_TYPE;
 
     // Another special case, if all types are branch based then use BRANCH_TYPE
-    bool all_are_compound = true;
-    for (int i=0; i < list.length(); i++)
+    bool all_are_branch_based = true;
+    bool all_are_lists = true;
+    for (int i=0; i < list.length(); i++) {
         if (!is_branch_based_type(list[i]))
-            all_are_compound = false;
+            all_are_branch_based = false;
+        if (!list_t::is_list_based_type(type_contents(list[i])))
+            all_are_lists = false;
+    }
 
-    if (all_are_compound)
+    if (all_are_branch_based)
         return BRANCH_TYPE;
+
+    if (all_are_lists)
+        return LIST_TYPE;
 
     // Otherwise give up
     return ANY_TYPE;

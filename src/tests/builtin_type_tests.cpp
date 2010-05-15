@@ -46,33 +46,31 @@ void test_set()
 
     Term* s = branch.eval("s = Set()");
 
-    test_assert(is_branch(s));
-    test_assert(as_branch(s).length() == 0);
+    test_assert(s->numElements() == 0);
 
     s = branch.eval("s.add(1)");
 
-    test_assert(branch);
-    test_assert(as_branch(s).length() == 1);
-    test_assert(as_branch(s)[0]->asInt() == 1);
+    test_assert(s->numElements() == 1);
+    test_assert(s->getIndex(0)->asInt() == 1);
 
     s = branch.eval("s.add(1)");
-    test_assert(as_branch(s).length() == 1);
+    test_assert(s->numElements() == 1);
 
     s = branch.eval("s.add(2)");
     test_assert(branch);
-    test_assert(as_branch(s).length() == 2);
+    test_assert(s->numElements() == 2);
 
     s = branch.eval("s.remove(1)");
-    test_assert(as_branch(s).length() == 1);
-    test_assert(as_branch(s)[0]->asInt() == 2);
+    test_assert(s->numElements() == 1);
+    test_assert(s->getIndex(0)->asInt() == 2);
 
     // check that things are copied by value
     Term* val = branch.eval("val = 5");
     s = branch.eval("s.add(val)");
 
-    test_assert(as_branch(s)[1]->asInt() == 5);
+    test_assert(s->getIndex(1)->asInt() == 5);
     set_int(val, 6);
-    test_assert(as_branch(s)[1]->asInt() == 5);
+    test_assert(s->getIndex(1)->asInt() == 5);
 }
 
 void test_list()
@@ -81,12 +79,14 @@ void test_list()
 
     Term* l = branch.eval("l = List()");
 
-    test_assert(is_branch(l));
-    test_assert(as_branch(l).length() == 0);
+#ifdef NEWLIST
+    test_assert(list_t::is_list(l));
+#endif
+    test_assert(l->numElements() == 0);
 
     l = branch.eval("l.append(2)");
-    test_assert(as_branch(l).length() == 1);
-    test_assert(as_branch(l)[0]->asInt() == 2);
+    test_assert(l->numElements() == 1);
+    test_assert(l->getIndex(0)->asInt() == 2);
 }
 
 void test_namespace()

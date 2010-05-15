@@ -205,6 +205,18 @@ bool term_statically_satisfies_type(Term* term, Type* type)
     return false;
 }
 
+bool type_matches(Type* type, Type* otherType)
+{
+    if (type == otherType)
+        return true;
+
+    Type::TypeMatches typeMatches = type->typeMatches;
+    if (typeMatches == NULL)
+        return false;
+
+    return typeMatches(type, otherType);
+}
+
 void reset_type(Type* type)
 {
     type->checkInvariants = NULL;

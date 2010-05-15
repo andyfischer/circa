@@ -4,7 +4,7 @@
 
 namespace circa {
 
-bool MIGRATE_STATEFUL_VALUES_VERBOSE = false;
+#define VERBOSE_LOG(f, ...) ; // disabled
 
 bool subroutines_match_for_migration(Term* leftFunc, Term* rightFunc);
 
@@ -116,8 +116,7 @@ bool functions_match_for_migration(Term* left, Term* right)
 bool terms_match_for_migration(Term* left, Term* right)
 {
     if (left->name != right->name) {
-        if (MIGRATE_STATEFUL_VALUES_VERBOSE)
-            std::cout << "reject, names don't match" << std::endl;
+        VERBOSE_LOG("reject, names don't match");
         return false;
     }
 
@@ -127,8 +126,7 @@ bool terms_match_for_migration(Term* left, Term* right)
         typesFit = matches_type(declared_type(right), left);
       
     if (!typesFit) {
-        if (MIGRATE_STATEFUL_VALUES_VERBOSE)
-            std::cout << "reject, types aren't equal" << std::endl;
+        VERBOSE_LOG("reject, types aren't equal");
         return false;
     }
 
@@ -137,8 +135,7 @@ bool terms_match_for_migration(Term* left, Term* right)
 
     if (leftCall != NULL && rightCall != NULL
             && !functions_match_for_migration(leftCall, rightCall)) {
-        if (MIGRATE_STATEFUL_VALUES_VERBOSE)
-            std::cout << "reject, assoiciated calls have mismatched functions" << std::endl;
+        VERBOSE_LOG("reject, assoiciated calls have mismatched functions");
         return false;
     }
 
@@ -182,8 +179,7 @@ void migrate_stateful_values(Branch& source, Branch& dest)
     // iterate and check matching indexes.
     
     for (int index=0; index < source.length(); index++) {
-        if (MIGRATE_STATEFUL_VALUES_VERBOSE)
-            std::cout << "checking index: " << index << std::endl;
+        VERBOSE_LOG("checking index: %d", index);
 
         if (index >= dest.length())
             break;
@@ -225,13 +221,11 @@ void migrate_stateful_values(Branch& source, Branch& dest)
         else if (is_stateful(sourceTerm)
                     && is_stateful(destTerm)) {
 
-            if (MIGRATE_STATEFUL_VALUES_VERBOSE)
-                std::cout << "assigning value of " << to_string(sourceTerm) << std::endl;
+            VERBOSE_LOG("assigning value of %s", to_string(sourceTerm).c_str());
 
             cast(sourceTerm, destTerm);
         } else {
-            if (MIGRATE_STATEFUL_VALUES_VERBOSE)
-                std::cout << "nothing to do" << std::endl;
+            VERBOSE_LOG("nothing to do");
         }
     }
 }

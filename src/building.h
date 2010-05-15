@@ -42,9 +42,6 @@ Branch& create_branch(Branch& owner, std::string const& name="");
 Branch& create_namespace(Branch&, std::string const& name);
 Term* create_type(Branch& branch, std::string name="");
 Term* create_empty_type(Branch& branch, std::string name);
-#ifndef NEWLIST
-Term* create_compound_type(Branch& branch, std::string const& name);
-#endif
 Term* create_branch_based_type(Branch& branch, std::string const& name);
 Term* duplicate_value(Branch& branch, Term* term);
 

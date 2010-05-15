@@ -29,12 +29,12 @@ namespace vectorize_vs_function {
         for (int i=0; i < numInputs; i++) {
             copy(left->getIndex(i), input0);
 
-            std::cout << "pre:" <<std::endl;
-            dump_branch(evaluationBranch);
+            //std::cout << "pre:" <<std::endl;
+            //dump_branch(evaluationBranch);
             evaluate_branch(evaluationBranch);
             
-            std::cout << "post:" <<std::endl;
-            dump_branch(evaluationBranch);
+            //std::cout << "post:" <<std::endl;
+            //dump_branch(evaluationBranch);
 
             copy(evalResult, output->get(i));
         }

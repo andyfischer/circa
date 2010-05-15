@@ -100,6 +100,66 @@ namespace old_list_t {
 } // namespace old_list_t
 
 namespace set_t {
+#ifdef NEWLIST
+    bool contains(List* list, TaggedValue* value)
+    {
+        int numElements = list->numElements();
+        for (int i=0; i < numElements; i++) {
+            if (equals(value, list->get(i)))
+                return true;
+        }
+        return false;
+    }
+    void add(List* list, TaggedValue* value)
+    {
+        if (contains(list, value))
+            return;
+        copy(value, list->append());
+    }
+    void hosted_add(EvalContext*, Term* caller)
+    {
+        copy(caller->input(0), caller);
+        List* output = (List*) caller;
+        Term* value = caller->input(1);
+        if (!contains(output, value))
+            copy(value, output->append());
+    }
+
+    void contains(EvalContext*, Term* caller)
+    {
+        List* list = (List*) caller->input(0);
+        Term* value = caller->input(1);
+        set_bool(caller, contains(list, value));
+    }
+
+    void remove(EvalContext*, Term* caller)
+    {
+        copy(caller->input(0), caller);
+        List* list = (List*) caller;
+        Term* value = caller->input(1);
+
+        int numElements = list->numElements();
+        for (int index=0; index < numElements; index++) {
+            if (equals(value, list->get(index))) {
+                list_t::remove_and_replace_with_back(list, index);
+                return;
+            }
+        }
+    }
+    std::string to_string(TaggedValue* value)
+    {
+        List* list = (List*) value;
+        std::stringstream output;
+        output << "{";
+        for (int i=0; i < list->length(); i++) {
+            if (i > 0) output << ", ";
+            output << circa::to_string(list->get(i));
+        }
+        output << "}";
+
+        return output.str();
+    }
+#else
     bool contains(Branch& branch, Term* value)
     {
         for (int i=0; i < branch.length(); i++)
@@ -123,14 +183,14 @@ namespace set_t {
         Term* value = caller->input(1);
         add(contents, value);
     }
-
+ 
     void contains(EvalContext*, Term* caller)
     {
         Branch& contents = as_branch(caller->input(0));
         Term* target = caller->input(1);
         set_bool(caller, contains(contents, target));
     }
-
+ 
     void remove(EvalContext*, Term* caller)
     {
         copy(caller->input(0), caller);
@@ -144,7 +204,6 @@ namespace set_t {
             }
         }
     }
-
     std::string to_string(TaggedValue* caller)
     {
         Branch &set = as_branch(caller);
@@ -158,6 +217,8 @@ namespace set_t {
 
         return output.str();
     }
+#endif
+
 
     void setup_type(Type* type) {
         type->toString = set_t::to_string;
@@ -173,6 +234,105 @@ namespace set_t {
 } // namespace set_t
 
 namespace map_t {
+#ifdef NEWLIST
+    int find_key_index(TaggedValue* contents, TaggedValue* key)
+    {
+        List* keys = (List*) contents->getIndex(0);
+
+        for (int i=0; i < keys->length(); i++)
+            if (equals(keys->get(i), key))
+                return i;
+        return -1;
+    }
+
+    void insert(TaggedValue* contents, TaggedValue* key, TaggedValue* value)
+    {
+        List* keys = (List*) contents->getIndex(0);
+        List* values = (List*) contents->getIndex(1);
+
+        int index = find_key_index(contents, key);
+
+        if (index == -1) {
+            copy(key, keys->append());
+            copy(value, values->append());
+        } else {
+            mutate(values);
+            copy(value, values->get(index));
+        }
+    }
+
+    void remove(TaggedValue* contents, TaggedValue* key)
+    {
+        List* keys = (List*) contents->getIndex(0);
+        List* values = (List*) contents->getIndex(1);
+
+        int index = find_key_index(contents, key);
+
+        if (index != -1) {
+            list_t::remove_and_replace_with_back(keys, index);
+            list_t::remove_and_replace_with_back(values, index);
+        }
+    }
+
+    TaggedValue* get(TaggedValue* contents, TaggedValue* key)
+    {
+        List* values = (List*) contents->getIndex(1);
+        int index = find_key_index(contents, key);
+
+        if (index == -1)
+            return NULL;
+        else
+            return values->get(index);
+    }
+    void contains(EvalContext*, Term* caller)
+    {
+        bool result = find_key_index(caller->input(0), caller->input(1)) != -1;
+        set_bool(caller, result);
+    }
+
+    void insert(EvalContext*, Term *caller)
+    {
+        copy(caller->input(0), caller);
+        mutate(caller);
+        insert(caller, caller->input(1), caller->input(2));
+    }
+
+    void remove(EvalContext*, Term* caller)
+    {
+        copy(caller->input(0), caller);
+        mutate(caller);
+        remove(caller, caller->input(1));
+    }
+    void get(EvalContext* cxt, Term* caller)
+    {
+        Term* key = caller->input(1);
+        TaggedValue* value = get(caller->input(0), key);
+        if (value == NULL)
+            return error_occurred(cxt, caller, "Key not found: " + to_string(key));
+
+        copy(value, caller);
+    }
+
+    std::string to_string(TaggedValue* value)
+    {
+        std::stringstream out;
+        out << "{";
+
+        List* keys = (List*) value->getIndex(0);
+        List* values = (List*) value->getIndex(1);
+
+        for (int i=0; i < keys->length(); i++) {
+            if (i != 0)
+                out << ", ";
+            out << keys->get(i)->toString();
+            out << ": ";
+            out << values->get(i)->toString();
+        }
+
+        out << "}";
+        return out.str();
+    }
+#else
     int find_key_index(Branch& contents, Term* key)
     {
         Branch& keys = contents[0]->asBranch();
@@ -274,6 +434,7 @@ namespace map_t {
         out << "}";
         return out.str();
     }
+#endif
 
     void setup_type(Type* type)
     {
@@ -324,9 +485,9 @@ namespace color_t {
 
     std::string to_string(Term* term)
     {
-        Branch& value = as_branch(term);
+        TaggedValue* value = term;
 
-        bool valueHasAlpha = value[3]->asFloat() < 1.0;
+        bool valueHasAlpha = value->getIndex(3)->asFloat() < 1.0;
 
         int specifiedDigits = term->intPropOptional("syntax:colorFormat", 6);
 
@@ -341,7 +502,7 @@ namespace color_t {
             if (c == 3 && !specifyAlpha)
                 break;
 
-            double channel = std::min((double) value[c]->asFloat(), 1.0);
+            double channel = std::min((double) value->getIndex(c)->asFloat(), 1.0);
 
             if (digitsPerChannel == 1)
                 out << number_to_hex_digit(int(channel * 15.0));

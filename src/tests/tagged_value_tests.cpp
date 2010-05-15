@@ -117,10 +117,12 @@ void test_term_value()
     test_assert(is_int(i));
 
     Term* a = branch.eval("a = [1 2 3]");
-    test_assert(is_int(a->asBranch()[0]));
+    test_assert(a->numElements() == 3);
+    test_assert(a->getIndex(1)->asInt() == 2);
 
     Term* b = branch.eval("b = a");
-    test_assert(is_int(b->asBranch()[0]));
+    test_assert(b->numElements() == 3);
+    test_assert(b->getIndex(1)->asInt() == 2);
     
     Term* c = create_value(branch, INT_TYPE);
     test_assert(is_int(c));

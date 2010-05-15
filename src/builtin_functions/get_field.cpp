@@ -14,11 +14,8 @@ namespace get_field_function {
 
             int fieldIndex = head->value_type->findFieldIndex(name);
 
-            if (fieldIndex == -1) {
-                // assert(false);
-                error_occurred(cxt, caller, "field not found: " + name);
-                return;
-            }
+            if (fieldIndex == -1)
+                return error_occurred(cxt, caller, "field not found: " + name);
 
             head = head->getIndex(fieldIndex);
         }

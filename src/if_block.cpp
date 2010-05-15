@@ -126,6 +126,15 @@ Branch* get_if_block_else_block(Term* ifCall)
     return (&as_branch(callContents[callContents.length()-2]));
 }
 
+#ifdef NEWLIST
+List* get_if_block_state(Term* ifCall)
+{
+    Term* term = ifCall->input(0);
+    if (term == NULL)
+        return NULL;
+    return (List*) term;
+}
+#else
 Branch* get_if_block_state(Term* ifCall)
 {
     Term* term = ifCall->input(0);
@@ -133,6 +142,7 @@ Branch* get_if_block_state(Term* ifCall)
         return NULL;
     return &as_branch(term);
 }
+#endif
 
 bool if_block_contains_state(Term* ifCall)
 {
@@ -150,12 +160,24 @@ bool if_block_contains_state(Term* ifCall)
 void evaluate_if_block(EvalContext* cxt, Term* caller)
 {
     Branch& contents = as_branch(caller);
-    Branch* stateBranch = get_if_block_state(caller);
+#ifdef NEWLIST
+    List* state = get_if_block_state(caller);
 
-    if (stateBranch != NULL) {
-        while (stateBranch->length() < contents.length()-1)
-            create_list(*stateBranch);
+    if (state != NULL) {
+        int numElements = contents.length() - 1;
+        int actualElements = state->numElements();
+        state->resize(numElements);
+        for (int i=actualElements; i < numElements; i++)
+            make_branch(state->get(i));
     }
+#else
+    Branch* state = get_if_block_state(caller);
+
+    if (state != NULL) {
+        while (state->length() < contents.length()-1)
+            create_list(*state);
+    }
+#endif
 
     // Find the first if() call whose condition is true
     int satisfiedIndex = 0;
@@ -163,9 +185,8 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
         Term* call = contents[i];
 
         TaggedValue* stateElement = NULL;
-
-        if (stateBranch != NULL)
-            stateElement = stateBranch->get(i);
+        if (state != NULL)
+            stateElement = state->get(i);
 
         bool satisfied = false;
 
@@ -202,8 +223,8 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
     // For any conditions after the successful one, reset state.
     for (int i=satisfiedIndex+1; i < contents.length()-1; i++) {
         TaggedValue* stateElement = NULL;
-        if (stateBranch != NULL) {
-            stateElement = stateBranch->get(i);
+        if (state != NULL) {
+            stateElement = state->get(i);
         }
         if (stateElement != NULL) {
             as_branch(stateElement).clear();

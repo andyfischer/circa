@@ -66,6 +66,7 @@ void make_string(TaggedValue* value, const char* s);
 void make_bool(TaggedValue* value, bool b);
 void make_ref(TaggedValue* value, Term* t);
 TaggedValue* make_list(TaggedValue* value);
+void make_branch(TaggedValue* value);
 void make_null(TaggedValue* value);
 
 void set_int(TaggedValue* value, int i);

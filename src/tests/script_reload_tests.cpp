@@ -48,8 +48,8 @@ void test_simple_with_state()
     ReloadHelper helper;
     helper.load("state List l; l.append(1)");
     helper.load("state List l; l.append(2)");
-    test_assert(as_int(as_branch(helper.branch["l"])[0]) == 1);
-    test_assert(as_int(as_branch(helper.branch["l"])[1]) == 2);
+    test_assert(helper.branch["l"]->getIndex(0)->asInt() == 1);
+    test_assert(helper.branch["l"]->getIndex(1)->asInt() == 2);
 }
 
 void test_function_change()

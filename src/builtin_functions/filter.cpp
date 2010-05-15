@@ -9,7 +9,6 @@ namespace filter_function {
     {
         TaggedValue* inputs = caller->input(0);
         TaggedValue* bools = caller->input(1);
-        Branch& output = as_branch(caller);
 
         int numInputs = inputs->numElements();
         int numBools = bools->numElements();
@@ -17,23 +16,40 @@ namespace filter_function {
         if (numInputs != numBools)
             return error_occurred(cxt, caller, "Lists have different lengths");
 
-        int write = 0;
+        // Run through once to count # of trues
+        int count = 0;
+        for (int i=0; i < numInputs; i++)
+            if (bools->getIndex(i)->asBool())
+                count++;
 
+        
+#ifdef NEWLIST
+        List* output = (List*) caller;
+        output->resize(count);
+        mutate(output);
+#else
+        Branch& output = as_branch(caller);
+#endif
+
+        int write = 0;
         for (int i=0; i < numInputs; i++) {
-            if (as_bool((*bools)[i])) {
+            if (bools->getIndex(i)->asBool()) {
+#ifndef NEWLIST
                 if (output.length() <= i)
                     output.appendNew();
+#endif
 
-                copy((*inputs)[i], output[write]);
-                write++;
+                copy((*inputs)[i], caller->getIndex(write++));
             }
         }
 
+#ifndef NEWLIST
         // Remove extra elements
         for (int i=write; i < output.length(); i++)
             output.set(i, NULL);
 
         output.removeNulls();
+#endif
     }
 
     void setup(Branch& kernel)

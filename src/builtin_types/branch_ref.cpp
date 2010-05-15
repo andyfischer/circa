@@ -7,8 +7,14 @@ namespace branch_ref_t {
 
     void set_from_ref(TaggedValue* value, Term* ref)
     {
+#ifdef NEWLIST
+        List* list = (List*) value;
+        mutate(list);
+        make_ref(list->getIndex(0), ref);
+#else
         Branch& branch = as_branch(value);
         branch[0]->asRef() = ref;
+#endif
     }
     
     bool is_considered_config(Term* term)
@@ -28,13 +34,42 @@ namespace branch_ref_t {
 
     Branch& get_target_branch(TaggedValue* value)
     {
+#ifdef NEWLIST
+        List* list = (List*) value;
+        return as_branch(list->get(0)->asRef());
+#else
         Branch& branch = as_branch(value);
         return branch[0]->asRef()->asBranch();
+#endif
     }
 
     void get_configs(EvalContext*, Term* caller)
     {
         Branch& target_branch = get_target_branch(caller->input(0));
+
+#ifdef NEWLIST
+        // One pass through to get count
+        int count = 0;
+        for (int i=0; i < target_branch.length(); i++) {
+            Term* t = target_branch[i];
+            if (!is_considered_config(t))
+                continue;
+            count++;
+        }
+
+        List* output = (List*) caller;
+        output->resize(count);
+
+        int write = 0;
+        for (int i=0; i < target_branch.length(); i++) {
+            Term* t = target_branch[i];
+            if (!is_considered_config(t))
+                continue;
+
+            assert(write < count);
+            make_ref(output->get(write++), t);
+        }
+#else
         Branch& output = caller->asBranch();
 
         int write = 0;
@@ -53,6 +88,7 @@ namespace branch_ref_t {
 
         if (write < output.length())
             output.shorten(write);
+#endif
     }
     void get_configs_nested(EvalContext*, Term* caller)
     {

@@ -30,8 +30,8 @@ void compound_types()
     test_assert(inst != NULL);
     test_assert(inst->type = MyType);
     test_assert(inst->value_data.ptr != NULL);
-    test_assert(as_branch(inst)[0]->asInt() == 0);
-    test_assert(as_branch(inst)[1]->asString() == "");
+    test_assert(inst->getIndex(0)->asInt() == 0);
+    test_assert(inst->getIndex(1)->asString() == "");
 
     // field access on a brand new type
     Term* astr = branch.eval("inst.astr");
@@ -41,7 +41,7 @@ void compound_types()
     // field assignment
     Term *inst2 = branch.eval("inst.astr = 'hello'");
     test_assert(inst2);
-    test_assert(as_branch(inst2)[1]->asString() == "hello");
+    test_assert(inst2->getIndex(1)->asString() == "hello");
     test_assert(inst2->type == MyType); // type specialization
 
     // field access of recently assigned value
@@ -81,10 +81,10 @@ void test_value_fits_type()
     test_assert(!matches_type(&as_type(STRING_TYPE), a));
     test_assert(matches_type(&as_type(ANY_TYPE), a));
 
-    Type* t1 = &as_type(branch.eval("type t1 { int a, number b }"));
-    Type* t2 = &as_type(branch.eval("type t2 { int a }"));
-    Type* t3 = &as_type(branch.eval("type t3 { int a, number b, string c }"));
-    Type* t4 = &as_type(branch.eval("type t4 { number a, int b }"));
+    Type* t1 = type_contents(branch.eval("type t1 { int a, number b }"));
+    Type* t2 = type_contents(branch.eval("type t2 { int a }"));
+    Type* t3 = type_contents(branch.eval("type t3 { int a, number b, string c }"));
+    Type* t4 = type_contents(branch.eval("type t4 { number a, int b }"));
 
     Term* v1 = branch.eval("[1, 2.0]");
     test_assert(matches_type(t1, v1));

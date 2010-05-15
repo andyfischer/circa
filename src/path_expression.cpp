@@ -1,9 +1,11 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "builtins.h"
+#include "errors.h"
 #include "path_expression.h"
 #include "tagged_value.h"
 #include "term.h"
+#include "type.h"
 
 namespace circa {
     
@@ -45,10 +47,19 @@ PathExpression get_lexpr_path_expression(Term* term)
 TaggedValue* step_path(TaggedValue* obj, PathExpression::Element const& element)
 {
     TaggedValue* result = NULL;
-    if (element.isIndex())
+    if (element.isIndex()) {
         result = get_index(obj, element.index);
-    else if (element.isField())
-        result = get_field(obj, element.field.c_str());
+    } else if (element.isField()) {
+
+        if (obj->value_type->getField != NULL) {
+            result = get_field(obj, element.field.c_str());
+        } else {
+            int fieldIndex = obj->value_type->findFieldIndex(element.field.c_str());
+            if (fieldIndex == -1)
+                internal_error("field not found");
+            result = obj->getIndex(fieldIndex);
+        }
+    }
     assert(result != obj);
     return result;
 }
@@ -67,10 +78,18 @@ void assign_using_path(TaggedValue* head, PathExpression const& path, TaggedValu
         assert(head != newValue);
 
         if (i == (numElements-1)) {
-            if (element.isIndex())
+            if (element.isIndex()) {
                 set_index(head, element.index, newValue);
-            else if (element.isField())
-                set_field(head, element.field.c_str(), newValue);
+            } else if (element.isField()) {
+                if (head->value_type->setField != NULL) {
+                    set_field(head, element.field.c_str(), newValue);
+                } else {
+                    int fieldIndex = head->value_type->findFieldIndex(element.field.c_str());
+                    if (fieldIndex == -1)
+                        internal_error("field not found");
+                    set_index(head, fieldIndex, newValue);
+                }
+            }
         } else {
             head = next;
         }

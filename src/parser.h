@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_PARSER_INCLUDED
-#define CIRCA_PARSER_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -68,5 +67,3 @@ Term* find_lexpr_root(Term* term);
 
 } // namespace parser
 } // namespace circa
-
-#endif

@@ -13,8 +13,8 @@ namespace file_changed_function {
             return false;
         }
         
-        Term* sigFilename = fileSignature->asBranch()[0];
-        Term* sigModified = fileSignature->asBranch()[1];
+        TaggedValue* sigFilename = fileSignature->getIndex(0);
+        TaggedValue* sigModified = fileSignature->getIndex(1);
 
         time_t modifiedTime = get_modified_time(filename);
 

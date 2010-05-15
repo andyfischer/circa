@@ -7,8 +7,7 @@ namespace branch_ref_function {
 
     void evaluate(EvalContext*, Term* caller)
     {
-        Branch& refObject = as_branch(caller);
-        refObject[0]->asRef() = caller->input(0);
+        branch_ref_t::set_from_ref(caller, caller->input(0));
     }
 
     void setup(Branch& kernel)
