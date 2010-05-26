@@ -210,7 +210,6 @@
 
 /* Begin PBXFileReference section */
 		8DD76F6C0486A84900D96B5E /* circa_commandline */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = circa_commandline; sourceTree = BUILT_PRODUCTS_DIR; };
-		B63E924C11602886009D6F23 /* list_t.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = list_t.h; path = ../../src/list_t.h; sourceTree = SOURCE_ROOT; };
 		B63E924E11602886009D6F23 /* string_t.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = string_t.h; path = ../../src/string_t.h; sourceTree = SOURCE_ROOT; };
 		B63E924F11602886009D6F23 /* token.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = token.cpp; path = ../../src/token.cpp; sourceTree = SOURCE_ROOT; };
 		B63E925011602886009D6F23 /* token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = token.h; path = ../../src/token.h; sourceTree = SOURCE_ROOT; };
@@ -559,7 +558,6 @@
 				B66A765D117C076A00A6A699 /* importing_macros.h */,
 				B69242B91120820100BAB124 /* introspection.h */,
 				B69242BB1120820100BAB124 /* invariants.h */,
-				B63E924C11602886009D6F23 /* list_t.h */,
 				B69242BE1120820100BAB124 /* metaprogramming.h */,
 				B69242C01120820100BAB124 /* metrics.h */,
 				B69242C21120820100BAB124 /* names.h */,

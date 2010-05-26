@@ -55,10 +55,25 @@ void overloaded_function()
 {
     Branch branch;
 
-    Term* i = branch.eval("add(1 2)");
-    test_equals(i->function->name, "add_i");
-    Term* f = branch.eval("add(1.0 2)");
-    test_equals(f->function->name, "add_f");
+    Term* floatInput = branch.eval("5.2");
+    Term* intInput = branch.eval("11");
+
+    test_assert(overloaded_function::is_overloaded_function(MULT_FUNC));
+
+    // Test statically_specialize_function
+    test_equals(overloaded_function::statically_specialize_function(
+                    MULT_FUNC, RefList(floatInput, intInput))
+            ->name, "mult_f");
+
+    Term* add_i = branch.eval("add(1 2)");
+    test_equals(add_i->function->name, "add_i");
+    Term* add_f = branch.eval("add(1.0 2)");
+    test_equals(add_f->function->name, "add_f");
+
+    Term* mult_f = branch.eval("mult(1.0 3)");
+    test_equals(mult_f->function->name, "mult_f");
+    Term* mult_f_2 = branch.eval("mult(3 1.0)");
+    test_equals(mult_f_2->function->name, "mult_f");
 }
 
 void test_is_native_function()

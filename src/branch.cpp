@@ -402,25 +402,40 @@ namespace branch_t {
         return is_branch(value) || list_t::is_list(value);
     }
 
-    bool static_matches_type(Type* type, Term* term)
+    void static_type_query(Type* type, StaticTypeQueryResult* result)
     {
+        Term* term = result->targetTerm;
         Branch& prototype = type->prototype;
 
         // Inspect a call to list(), look at inputs instead of looking at the result.
         if (term->function == LIST_FUNC
-                || term->function->name == "newlist") // <-- TEMP
+#ifndef NEWLIST
+                || term->function->name == "newlist"
+#endif
+           )
         {
             if (term->numInputs() != prototype.length())
-                return false;
+                return result->fail();
 
             for (int i=0; i < prototype.length(); i++)
-                if (!circa::matches_type(&as_type(prototype[i]->type), term->input(i)))
-                    return false;
+                if (!circa::term_output_always_satisfies_type(
+                            term->input(i), type_contents(prototype[i]->type)))
+                    return result->fail();
 
-            return true;
+            return result->succeed();
         }
 
-        if (!is_branch(term))
+        if (is_subtype(type, type_contents(term->type)))
+            return result->succeed();
+        else
+            return result->fail();
+    }
+
+    bool is_subtype(Type* type, Type* otherType)
+    {
+        Branch& prototype = type->prototype;
+
+        if (!is_branch_based_type(otherType))
             return false;
 
         // Check if our type defines a prototype. If there's no prototype
@@ -428,16 +443,36 @@ namespace branch_t {
         if (prototype.length() == 0)
             return true;
 
-        Branch& value = as_branch(term);
+        Branch& otherPrototype = otherType->prototype;
 
-        if (prototype.length() != value.length())
+        if (prototype.length() != otherPrototype.length())
             return false;
 
         // Check each element
         for (int i=0; i < prototype.length(); i++)
-            if (!circa::matches_type(&as_type(prototype[i]->type), value[i]))
+            if (!circa::is_subtype(type_contents(prototype[i]->type),
+                        type_contents(otherPrototype[i]->type)))
                 return false;
 
+        return true;
+    }
+
+    bool value_fits_type(Type* type, TaggedValue* value)
+    {
+        if (!is_branch(value))
+            return false;
+
+        Branch& prototype = type->prototype;
+        if (prototype.length() == 0)
+            return true;
+
+        int numElements = value->numElements();
+        if (prototype.length() != numElements);
+
+        for (int i=0; i < numElements; i++)
+            if (!circa::value_fits_type(value->getIndex(i),
+                        type_contents(prototype[i]->type)))
+                return false;
         return true;
     }
 
@@ -545,7 +580,7 @@ namespace branch_t {
 
 bool is_branch(TaggedValue* value)
 {
-    return value->value_type->initialize == branch_t::initialize;
+    return is_branch_based_type(value->value_type);
 }
 
 Branch& as_branch(TaggedValue* value)
@@ -577,6 +612,11 @@ bool is_branch_based_type(Term* type)
     return as_type(type).initialize == branch_t::initialize;
 }
 
+bool is_branch_based_type(Type* type)
+{
+    return type->initialize == branch_t::initialize;
+}
+
 void initialize_branch_based_type(Term* term)
 {
     Type* type = &as_type(term);
@@ -590,7 +630,9 @@ void initialize_branch_based_type(Term* term)
     type->cast = branch_t::cast;
     type->castPossible = branch_t::cast_possible;
     type->equals = branch_t::equals;
-    type->staticTypeMatch = branch_t::static_matches_type;
+    type->staticTypeQuery = branch_t::static_type_query;
+    type->isSubtype = branch_t::is_subtype;
+    type->valueFitsType = branch_t::value_fits_type;
     type->getIndex = branch_t::get_index;
     type->setIndex = branch_t::set_index;
     type->getField = branch_t::get_field;

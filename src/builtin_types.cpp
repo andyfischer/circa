@@ -533,9 +533,13 @@ namespace any_t {
     {
         return "<any>";
     }
-    bool matches_type(Type*, Term*)
+    bool matches_type(Type*, Type*)
     {
         return true;
+    }
+    void static_type_query(Type*, StaticTypeQueryResult* result)
+    {
+        // TODO
     }
 }
 

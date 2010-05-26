@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_TYPE_INCLUDED
-#define CIRCA_TYPE_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -31,7 +30,7 @@ struct Type
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
     typedef bool (*TypeMatches)(Type* type, Type* otherType);
-    typedef bool (*StaticTypeMatch)(Type* type, Term* term);
+    typedef void (*StaticTypeQuery)(Type* type, StaticTypeQueryResult* query);
     typedef void (*Mutate)(TaggedValue* value);
     typedef TaggedValue* (*GetIndex)(TaggedValue* value, int index);
     typedef void (*SetIndex)(TaggedValue* value, int index, TaggedValue* element);
@@ -58,8 +57,8 @@ struct Type
     FormatSource formatSource;
     CheckInvariants checkInvariants;
     ValueFitsType valueFitsType;
-    TypeMatches typeMatches;
-    StaticTypeMatch staticTypeMatch;
+    TypeMatches isSubtype;
+    StaticTypeQuery staticTypeQuery;
     Mutate mutate;
     GetIndex getIndex;
     SetIndex setIndex;
@@ -99,8 +98,8 @@ private:
         formatSource(NULL),
         checkInvariants(NULL),
         valueFitsType(NULL),
-        typeMatches(NULL),
-        staticTypeMatch(NULL),
+        isSubtype(NULL),
+        staticTypeQuery(NULL),
         mutate(NULL),
         getIndex(NULL),
         setIndex(NULL),
@@ -144,6 +143,28 @@ struct TypeRef
     Type* operator->() { return t; }
 };
 
+struct StaticTypeQueryResult
+{
+    enum Result {
+        NULL_RESULT,
+        SUCCEED,
+        FAIL,
+        UNABLE_TO_DETERMINE
+    };
+        
+    // Inputs
+    Term* targetTerm;
+    
+    // Outputs
+    Result result;
+
+    StaticTypeQueryResult() : targetTerm(NULL), result(NULL_RESULT) {}
+
+    void fail() { result = FAIL; }
+    void succeed() { result = SUCCEED; }
+    void unableToDetermine() { result = UNABLE_TO_DETERMINE; }
+};
+
 namespace type_t {
 
     void initialize(Type* type, TaggedValue* value);
@@ -172,10 +193,10 @@ Type* type_contents(Term* type);
 bool is_native_type(Term* type);
 Type* declared_type(Term* term);
 
-bool matches_type(Type* type, Term* term); // <-- deprecated
-bool value_matches_type(Type* type, TaggedValue* value);
-bool term_statically_satisfies_type(Term* term, Type* type);
-bool type_matches(Type* type, Type* otherType);
+bool value_fits_type(TaggedValue* value, Type* type);
+bool term_output_always_satisfies_type(Term* term, Type* type);
+bool term_output_never_satisfies_type(Term* term, Type* type);
+bool is_subtype(Type* type, Type* subType);
 
 void reset_type(Type* type);
 void initialize_simple_pointer_type(Type* type);
@@ -185,5 +206,3 @@ std::string compound_type_to_string(Term* caller);
 Term* parse_type(Branch& branch, std::string const& decl);
 
 } // namespace circa
-
-#endif

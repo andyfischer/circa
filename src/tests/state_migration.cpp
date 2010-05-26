@@ -14,8 +14,9 @@ void test_migration(std::string sourceCode, std::string destinationCode,
     parser::compile(&source, parser::statement_list, sourceCode);
 
     if (has_static_errors(source)) {
-        std::cout << "In code: " << sourceCode << std::endl;
+        std::cout << "Static error in code: " << sourceCode << std::endl;
         print_static_errors_formatted(source, std::cout);
+        std::cout << std::endl;
         declare_current_test_failed();
         return;
     }
@@ -24,16 +25,18 @@ void test_migration(std::string sourceCode, std::string destinationCode,
     parser::compile(&destination, parser::statement_list, destinationCode);
 
     if (has_static_errors(destination)) {
-        std::cout << "In code: " << destinationCode << std::endl;
+        std::cout << "Static error in code: " << destinationCode << std::endl;
         print_static_errors_formatted(destination, std::cout);
+        std::cout << std::endl;
         declare_current_test_failed();
         return;
     }
 
     EvalContext result = evaluate_branch(source);
     if (result.errorOccurred) {
-        std::cout << "In " << get_current_test_name() << std::endl;
+        std::cout << "Runtime error in " << get_current_test_name() << std::endl;
         print_runtime_error_formatted(result, std::cout);
+        std::cout << std::endl;
         declare_current_test_failed();
         return;
     }
@@ -48,6 +51,7 @@ void test_migration(std::string sourceCode, std::string destinationCode,
     if (result.errorOccurred) {
         std::cout << "In " << get_current_test_name() << std::endl;
         print_runtime_error_formatted(result, std::cout);
+        std::cout << std::endl;
         declare_current_test_failed();
         return;
     }
@@ -88,6 +92,12 @@ void migrate_simple()
 
 void migrate_across_user_defined_types()
 {
+    // Pre-test work, make sure that 'state T t = [1]' works
+    Branch branch;
+    Term* typeT = branch.eval("type T { int x }");
+    Term* x = branch.eval("x = [1]");
+    test_assert(value_fits_type(x, type_contents(typeT)));
+
     // Type T is defined the same way
     test_migration("type T { int x } \n state T t = [1]",
         "type T { int x } \n state T t = [2]",

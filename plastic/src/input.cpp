@@ -186,7 +186,7 @@ void recent_key_presses(EvalContext*, Term* caller)
     output.clear();
 
     for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++) {
-        Branch& item = create_list(output);
+        Branch& item = as_branch(create_list(output));
         Uint16 key = KEYS_JUST_PRESSED[index].unicode;
         char keyStr[2];
         keyStr[1] = 0;

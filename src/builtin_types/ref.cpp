@@ -73,7 +73,7 @@ namespace ref_t {
 
         Term* source = caller->input(1);
 
-        if (!matches_type(declared_type(target), source)) {
+        if (!is_subtype(source->value_type, declared_type(target))) {
             error_occurred(cxt, caller, "Can't assign, type mismatch");
             return;
         }

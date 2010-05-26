@@ -364,8 +364,8 @@ void test_cast()
     Term* a = branch.eval("a = [1 2.0 'hi']");
     Term* b = branch.eval("b = ['bye' 4 1.0]");
 
-    test_assert(matches_type(declared_type(b), a));
-    test_assert(matches_type(declared_type(a), b));
+    test_assert(term_output_always_satisfies_type(a, declared_type(b)));
+    test_assert(term_output_always_satisfies_type(b, declared_type(a)));
     cast(a, b);
 
     test_assert(branch);

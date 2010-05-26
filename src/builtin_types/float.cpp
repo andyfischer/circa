@@ -43,7 +43,7 @@ namespace float_t {
         else
             return result;
     }
-    bool type_matches(Type* type, Type* otherType)
+    bool is_subtype(Type* type, Type* otherType)
     {
         return otherType == type_contents(FLOAT_TYPE)
             || otherType == type_contents(INT_TYPE);
@@ -97,7 +97,7 @@ namespace float_t {
         type->cast = cast;
         type->castPossible = cast_possible;
         type->equals = equals;
-        type->typeMatches = type_matches;
+        type->isSubtype = is_subtype;
         type->toString = to_string;
         type->formatSource = format_source;
     }

@@ -154,73 +154,69 @@ Type* type_contents(Term* type)
     return &as_type(type);
 }
 
-// Deprecated in favor of term_statically_satisfies_type
-bool matches_type(Type* type, Term* term)
+bool value_fits_type(TaggedValue* value, Type* type)
 {
-    if (term->type == ANY_TYPE) return true;
-
-    // Return true if types are the same
-    if (type_contents(term->type) == type)
+    if (is_subtype(type, value->value_type))
         return true;
 
-    Type::StaticTypeMatch staticTypeMatch = type->staticTypeMatch;
-
-    if (staticTypeMatch != NULL)
-        return staticTypeMatch(type, term);
-
-    Type::TypeMatches typeMatches = type->typeMatches;
-    if (typeMatches != NULL)
-        return typeMatches(type, type_contents(term->type));
+    Type::ValueFitsType func = type->valueFitsType;
+    if (func != NULL)
+        return func(type, value);
 
     return false;
 }
 
-bool value_matches_type(Type* type, TaggedValue* value)
+static void run_static_type_query(Type* type, Term* outputTerm, StaticTypeQueryResult* result)
 {
-    if (type == value->value_type)
-        return true;
+    // Always succeed if types are the same
+    if (declared_type(outputTerm) == type)
+        return result->succeed();
 
-    Type::TypeMatches typeMatches = type->typeMatches;
-    if (typeMatches != NULL)
-        return typeMatches(type, value->value_type);
+    // If output term is ANY then we cannot determine.
+    if (outputTerm->type == ANY_TYPE)
+        return result->unableToDetermine();
 
-    return false;
+    Type::StaticTypeQuery staticTypeQueryFunc = type->staticTypeQuery;
+
+    if (staticTypeQueryFunc == NULL) {
+        if (is_subtype(type, type_contents(outputTerm->type)))
+            return result->succeed();
+        else
+            return result->fail();
+    }
+
+    result->targetTerm = outputTerm;
+    staticTypeQueryFunc(type, result);
 }
 
-bool term_statically_satisfies_type(Term* term, Type* type)
+bool term_output_always_satisfies_type(Term* term, Type* type)
 {
-    // Return true if types are the same
-    if (type_contents(term->type) == type)
-        return true;
-
-    Type::StaticTypeMatch staticTypeMatch = type->staticTypeMatch;
-
-    if (staticTypeMatch != NULL)
-        return staticTypeMatch(type, term);
-
-    Type::TypeMatches typeMatches = type->typeMatches;
-    if (typeMatches != NULL)
-        return typeMatches(type, type_contents(term->type));
-
-    return false;
+    StaticTypeQueryResult obj;
+    run_static_type_query(type, term, &obj);
+    return obj.result == StaticTypeQueryResult::SUCCEED;
 }
 
-bool type_matches(Type* type, Type* otherType)
+bool term_output_never_satisfies_type(Term* term, Type* type)
 {
-    if (type == otherType)
+    StaticTypeQueryResult obj;
+    run_static_type_query(type, term, &obj);
+    return obj.result == StaticTypeQueryResult::FAIL;
+}
+
+bool is_subtype(Type* type, Type* subType)
+{
+    if (type == subType)
         return true;
 
-    Type::TypeMatches typeMatches = type->typeMatches;
-    if (typeMatches == NULL)
+    Type::TypeMatches isSubtype = type->isSubtype;
+    if (isSubtype == NULL)
         return false;
 
-    return typeMatches(type, otherType);
+    return isSubtype(type, subType);
 }
 
 void reset_type(Type* type)
 {
-    type->checkInvariants = NULL;
-    type->valueFitsType = NULL;
     type->initialize = NULL;
     type->release = NULL;
     type->copy = NULL;
@@ -233,8 +229,8 @@ void reset_type(Type* type)
     type->formatSource = NULL;
     type->checkInvariants = NULL;
     type->valueFitsType = NULL;
-    type->typeMatches = NULL;
-    type->staticTypeMatch = NULL;
+    type->isSubtype = NULL;
+    type->staticTypeQuery = NULL;
     type->mutate = NULL;
     type->getIndex = NULL;
     type->setIndex = NULL;

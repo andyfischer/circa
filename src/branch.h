@@ -96,7 +96,6 @@ namespace branch_t {
     void assign(TaggedValue*, TaggedValue*);
     void cast(Type*, TaggedValue* source, TaggedValue* dest);
     bool cast_possible(Type*, TaggedValue* value);
-    bool equals(Term*, Term*);
     bool equals(TaggedValue*, TaggedValue*);
     TaggedValue* get_index(TaggedValue* value, int index);
     int num_elements(TaggedValue* value);
@@ -109,6 +108,7 @@ bool is_branch(TaggedValue* term);
 Branch& as_branch(TaggedValue* term);
 
 bool is_branch_based_type(Term* type);
+bool is_branch_based_type(Type* type);
 void initialize_branch_based_type(Term* term);
 
 bool is_namespace(Term* term);

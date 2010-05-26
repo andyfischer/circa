@@ -5,15 +5,15 @@
 namespace circa {
 namespace callable_t {
 
-    bool static_type_match(Type* type, Term* term)
+    bool is_subtype(Type* type, Type* otherType)
     {
-        return term->type == FUNCTION_TYPE
-            || term->type == TYPE_TYPE;
+        return otherType == type_contents(FUNCTION_TYPE)
+            || otherType == type_contents(TYPE_TYPE);
     }
     void setup_type(Type* type)
     {
         reset_type(type);
-        type->staticTypeMatch = static_type_match;
+        type->isSubtype = is_subtype;
     }
 }
 }

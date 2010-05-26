@@ -38,10 +38,23 @@ void test_find_type_of_get_index()
     test_assert(find_type_of_get_index(list4) == FLOAT_TYPE);
 }
 
+void compare_builtin_types()
+{
+    Branch branch;
+    Term* aFloat = branch.eval("1.2");
+    test_assert(term_output_always_satisfies_type(aFloat, type_contents(FLOAT_TYPE)));
+    test_assert(term_output_never_satisfies_type(aFloat, type_contents(INT_TYPE)));
+
+    Term* anInt = branch.eval("1");
+    test_assert(term_output_always_satisfies_type(anInt, type_contents(FLOAT_TYPE)));
+    test_assert(term_output_always_satisfies_type(anInt, type_contents(INT_TYPE)));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_inference_tests::test_find_common_type);
     REGISTER_TEST_CASE(type_inference_tests::test_find_type_of_get_index);
+    REGISTER_TEST_CASE(type_inference_tests::compare_builtin_types);
 }
 
 }

@@ -5,15 +5,15 @@
 namespace circa {
 namespace indexable_t {
 
-    bool matches_type(Type* type, Term* term)
+    bool is_subtype(Type* type, Type* otherType)
     {
-        return declared_type(term)->getIndex != NULL
-            && declared_type(term)->numElements != NULL;
+        return otherType->getIndex != NULL
+            && otherType->numElements != NULL;
     }
     void setup_type(Type* type)
     {
         reset_type(type);
-        type->staticTypeMatch = matches_type;
+        type->isSubtype = is_subtype;
     }
 }
 }

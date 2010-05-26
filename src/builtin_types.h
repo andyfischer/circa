@@ -52,7 +52,7 @@ namespace ref_t {
 
 namespace any_t {
     std::string to_string(TaggedValue*);
-    bool matches_type(Type* type, Term* term);
+    bool matches_type(Type* type, Type* otherType);
 }
 
 namespace branch_ref_t {

@@ -403,9 +403,73 @@ void tv_mutate(TaggedValue* value)
     set_pointer(value, mutate(data));
 }
 
-bool tv_matches_type(Type* type, Term* term)
+void tv_static_type_query(Type* type, StaticTypeQueryResult* result)
 {
-    return declared_type(term)->initialize == tv_initialize;
+    Term* term = result->targetTerm;
+    Branch& prototype = type->prototype;
+
+    // Inspect a call to list(), look at inputs instead of looking at the result.
+    if (term->function == LIST_FUNC)
+    {
+        if (term->numInputs() != prototype.length())
+            return result->fail();
+
+        for (int i=0; i < prototype.length(); i++)
+            if (!circa::term_output_always_satisfies_type(
+                        term->input(i), type_contents(prototype[i]->type)))
+                return result->fail();
+
+        return result->succeed();
+    }
+
+    if (is_subtype(type, type_contents(term->type)))
+        return result->succeed();
+    else
+        return result->fail();
+}
+
+bool tv_is_subtype(Type* type, Type* otherType)
+{
+    if (!is_list_based_type(otherType))
+        return false;
+
+    // Check if our type has a prototype. If there's no prototype
+    // then any list can be a subtype.
+    Branch& prototype = type->prototype;
+
+    if (prototype.length() == 0)
+        return true;
+
+    Branch& otherPrototype = otherType->prototype;
+    if (prototype.length() != otherType->prototype.length())
+        return false;
+
+    // Check each element
+    for (int i=0; i < prototype.length(); i++)
+        if (!circa::is_subtype(type_contents(prototype[i]->type),
+                    type_contents(otherPrototype[i]->type)))
+            return false;
+
+    return true;
+}
+
+bool tv_value_fits_type(Type* type, TaggedValue* value)
+{
+    if (!is_list(value))
+        return false;
+
+    Branch& prototype = type->prototype;
+    if (prototype.length() == 0)
+        return true;
+
+    int numElements = value->numElements();
+    if (prototype.length() != numElements);
+
+    for (int i=0; i < numElements; i++)
+        if (!circa::value_fits_type(value->getIndex(i),
+                    type_contents(prototype[i]->type)))
+            return false;
+    return true;
 }
 
 void remove_and_replace_with_back(TaggedValue* value, int index)
@@ -440,7 +504,9 @@ void setup_type(Type* type)
     type->setIndex = tv_set_index;
     type->numElements = tv_num_elements;
     type->mutate = tv_mutate;
-    type->staticTypeMatch = tv_matches_type;
+    type->staticTypeQuery = tv_static_type_query;
+    type->isSubtype = tv_is_subtype;
+    type->valueFitsType = tv_value_fits_type;
 }
 
 void postponed_setup_type(Type*)
@@ -579,6 +645,5 @@ namespace list_t_tests {
     }
 
 } // namespace list_t_tests
-
 
 }

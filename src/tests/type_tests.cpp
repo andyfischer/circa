@@ -71,15 +71,15 @@ void type_declaration()
     test_assert(branch);
 }
 
-void test_value_fits_type()
+void test_term_output_always_satisfies_type()
 {
     Branch branch;
 
     Term* a = create_int(branch, 5);
-    test_assert(matches_type(&as_type(INT_TYPE), a));
-    test_assert(matches_type(&as_type(FLOAT_TYPE), a));
-    test_assert(!matches_type(&as_type(STRING_TYPE), a));
-    test_assert(matches_type(&as_type(ANY_TYPE), a));
+    test_assert(term_output_always_satisfies_type(a, type_contents(INT_TYPE)));
+    test_assert(term_output_always_satisfies_type(a, type_contents(FLOAT_TYPE)));
+    test_assert(!term_output_always_satisfies_type(a, type_contents(STRING_TYPE)));
+    test_assert(term_output_always_satisfies_type(a, type_contents(ANY_TYPE)));
 
     Type* t1 = type_contents(branch.eval("type t1 { int a, number b }"));
     Type* t2 = type_contents(branch.eval("type t2 { int a }"));
@@ -87,34 +87,34 @@ void test_value_fits_type()
     Type* t4 = type_contents(branch.eval("type t4 { number a, int b }"));
 
     Term* v1 = branch.eval("[1, 2.0]");
-    test_assert(matches_type(t1, v1));
-    test_assert(!matches_type(t2, v1));
-    test_assert(!matches_type(t3, v1));
-    test_assert(!matches_type(t4, v1));
+    test_assert(term_output_always_satisfies_type(v1, t1));
+    test_assert(!term_output_always_satisfies_type(v1, t2));
+    test_assert(!term_output_always_satisfies_type(v1, t3));
+    test_assert(!term_output_always_satisfies_type(v1, t4));
 
     Term* v2 = branch.eval("['hello' 2.0]");
-    test_assert(!matches_type(t1, v2));
-    test_assert(!matches_type(t2, v2));
-    test_assert(!matches_type(t3, v2));
-    test_assert(!matches_type(t4, v2));
+    test_assert(!term_output_always_satisfies_type(v2, t1));
+    test_assert(!term_output_always_satisfies_type(v2, t2));
+    test_assert(!term_output_always_satisfies_type(v2, t3));
+    test_assert(!term_output_always_satisfies_type(v2, t4));
 
     Term* v3 = branch.eval("[1]");
-    test_assert(!matches_type(t1, v3));
-    test_assert(matches_type(t2, v3));
-    test_assert(!matches_type(t3, v3));
-    test_assert(!matches_type(t4, v3));
+    test_assert(!term_output_always_satisfies_type(v3, t1));
+    test_assert(term_output_always_satisfies_type(v3, t2));
+    test_assert(!term_output_always_satisfies_type(v3, t3));
+    test_assert(!term_output_always_satisfies_type(v3, t4));
     
     Term* v4 = branch.eval("[]");
-    test_assert(!matches_type(t1, v4));
-    test_assert(!matches_type(t2, v4));
-    test_assert(!matches_type(t3, v4));
-    test_assert(!matches_type(t4, v4));
+    test_assert(!term_output_always_satisfies_type(v4, t1));
+    test_assert(!term_output_always_satisfies_type(v4, t2));
+    test_assert(!term_output_always_satisfies_type(v4, t3));
+    test_assert(!term_output_always_satisfies_type(v4, t4));
 
     Term* v5 = branch.eval("[1 2]");
-    test_assert(matches_type(t1, v5)); // coercion into a compound value
-    test_assert(!matches_type(t2, v5));
-    test_assert(!matches_type(t3, v5));
-    test_assert(matches_type(t4, v5)); // coercion again
+    test_assert(term_output_always_satisfies_type(v5, t1));  // coercion into a compound value
+    test_assert(!term_output_always_satisfies_type(v5, t2));
+    test_assert(!term_output_always_satisfies_type(v5, t3));
+    test_assert(term_output_always_satisfies_type(v5, t4));  // coercion again
 }
 
 void test_is_native_type()
@@ -180,7 +180,7 @@ void test_assign_compound_value_to_default()
     Term* t = branch.eval("[1 2 3]");
     reset(t);
 
-    test_assert(as_branch(t).length() == 0);
+    test_assert(t->numElements() == 0);
 }
 
 void type_inference_for_get_index()
@@ -280,11 +280,20 @@ void test()
 
 }
 
+void test_list_based_types()
+{
+    Branch branch;
+    Term* l = branch.compile("[1 2]");
+
+    test_assert(term_output_always_satisfies_type(l, type_contents(LIST_TYPE)));
+    test_assert(term_output_always_satisfies_type(l, type_contents(get_global("Point"))));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
     REGISTER_TEST_CASE(type_tests::type_declaration);
-    REGISTER_TEST_CASE(type_tests::test_value_fits_type);
+    REGISTER_TEST_CASE(type_tests::test_term_output_always_satisfies_type);
     REGISTER_TEST_CASE(type_tests::test_is_native_type);
     REGISTER_TEST_CASE(type_tests::test_to_string);
     REGISTER_TEST_CASE(type_tests::test_default_values);
@@ -294,6 +303,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_type_error_in_a_native_call);
     REGISTER_TEST_CASE(type_tests::test_imported_pointer_type);
     REGISTER_TEST_CASE(type_tests::simple_pointer_test::test);
+    REGISTER_TEST_CASE(type_tests::test_list_based_types);
 }
 
 } // namespace type_tests

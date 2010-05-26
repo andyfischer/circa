@@ -54,6 +54,16 @@ namespace overloaded_function {
         return function_t::get_attrs(func).evaluate == evaluate_overloaded;
     }
 
+    int num_overloads(Term* func)
+    {
+        return function_t::get_attrs(func).parameters.length();
+    }
+
+    Term* get_overload(Term* func, int index)
+    {
+        return function_t::get_attrs(func).parameters[index]->asRef();
+    }
+
     void setup_overloaded_function(Term* term, std::string const& name,
             RefList const& overloads)
     {

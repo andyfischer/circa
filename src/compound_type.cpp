@@ -10,7 +10,8 @@ namespace circa {
 
 namespace compound_t {
 
-bool type_matches(Type* type, Type* otherType)
+/*
+bool is_subtype(Type* type, Type* otherType)
 {
     if (!list_t::is_list_based_type(otherType))
         return false;
@@ -23,19 +24,19 @@ bool type_matches(Type* type, Type* otherType)
     Branch& rightPrototype = otherType->prototype;
 
     for (int i=0; i < numElements; i++) {
-        if (!circa::type_matches(type_contents(leftPrototype[i]->type),
+        if (!circa::is_subtype(type_contents(leftPrototype[i]->type),
                 type_contents(rightPrototype[i]->type)))
             return false;
     }
     return true;
-}
+}*/
 
 }
 
 void initialize_compound_type(Type* type)
 {
     list_t::setup_type(type);
-    type->typeMatches = compound_t::type_matches;
+  //  type->isSubtype = compound_t::is_subtype;
 }
 
 void initialize_compound_type(Term* term)

@@ -31,6 +31,21 @@ namespace get_index_function {
 
     Term* specializeType(Term* caller)
     {
+#ifdef NEWLIST
+        if (caller->input(0)->function == LIST_FUNC) {
+            // Type inference is hacky due to the lack of parametrized list types.
+
+            Term* listTerm = caller->input(0);
+            RefList inputTypes;
+
+            for (int i=0; i < listTerm->numInputs(); i++)
+                inputTypes.append(listTerm->input(i)->type);
+
+            return find_common_type(inputTypes);
+        }
+
+        return ANY_TYPE;
+#else
         if (!is_branch(caller->input(0)))
             return ANY_TYPE;
 
@@ -43,6 +58,7 @@ namespace get_index_function {
             inputTypes.append(inputList[i]->type);
 
         return find_common_type(inputTypes);
+#endif
     }
 
     void setup(Branch& kernel)

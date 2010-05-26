@@ -82,12 +82,39 @@ void test_subroutine_input_and_output()
     test_assert(branch);
 }
 
+void test_dynamic_overload()
+{
+    Branch branch;
+    Term* a = create_value(branch, ANY_TYPE, "a");
+    Term* b = create_value(branch, ANY_TYPE, "b");
+    Term* result = branch.compile("add(a, b)");
+
+    make_int(a, 5);
+    make_int(b, 3);
+
+    Term* add_i = get_global("add_i");
+    test_assert(add_i == overloaded_function::get_overload(ADD_FUNC, 0));
+
+    test_assert(value_fits_type(a, type_contents(INT_TYPE)));
+
+    RefList inputs(a,b);
+    test_assert(inputs_fit_function_dynamic(add_i, inputs));
+
+    evaluate_branch(branch);
+    test_assert(result->asInt() == 8);
+
+    make_float(b, 3.0);
+    evaluate_branch(branch);
+    test_assert(result->asFloat() == 8.0);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(dynamic_type_tests::test_copy);
     REGISTER_TEST_CASE(dynamic_type_tests::test_subroutine);
     REGISTER_TEST_CASE(dynamic_type_tests::test_field_access);
     REGISTER_TEST_CASE(dynamic_type_tests::test_subroutine_input_and_output);
+    REGISTER_TEST_CASE(dynamic_type_tests::test_dynamic_overload);
 }
 
 } // namespace dynamic_type_tests

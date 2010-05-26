@@ -41,6 +41,7 @@ struct RawOutputPrefs;
 struct Ref;
 struct RefList;
 struct ReferenceMap;
+struct StaticTypeQueryResult;
 struct StyledSource;
 struct TaggedValue;
 struct Term;
@@ -55,7 +56,7 @@ typedef Term* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
 
-//#define NEWLIST 1
+#define NEWLIST 1
 
 } // namespace circa
 

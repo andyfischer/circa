@@ -11,11 +11,11 @@ namespace circa {
 struct PathExpression
 {
     struct Element {
-        enum Type { UNKNOWN, INDEX, FIELD };
+        enum ElementType { UNKNOWN, INDEX, FIELD };
 
         int index;
         std::string field;
-        Type type;
+        ElementType type;
 
         bool isIndex() const { return type == INDEX; }
         bool isField() const { return type == FIELD; }

@@ -120,12 +120,7 @@ bool terms_match_for_migration(Term* left, Term* right)
         return false;
     }
 
-    // todo: this is unnecessary:
-    bool typesFit = left->type == right->type;
-    if (!typesFit && is_branch(left))
-        typesFit = matches_type(declared_type(right), left);
-      
-    if (!typesFit) {
+    if (!is_subtype(left->value_type, right->value_type)) {
         VERBOSE_LOG("reject, types aren't equal");
         return false;
     }
