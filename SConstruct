@@ -1,9 +1,14 @@
+# 1.359, 1.105, 1.162, 1.101
 
-import os, sys, SCons
+import os, sys, ConfigParser, SCons
 
 def fatal(msg):
     print "fatal:",msg
     exit(1)
+
+# Load build.config
+config = ConfigParser.ConfigParser()
+config.read('build.config')
 
 POSIX = os.name == 'posix'
 WINDOWS = os.name == 'nt'
@@ -140,6 +145,13 @@ def build_plastic(env):
         'mt.exe -nologo -manifest plastic/windows/plastic.manifest.xml -outputresource:$TARGET;1')
     return result
     
-plastic = build_plastic(RELEASE)
+plastic_variant = config.get('plastic', 'variant')
+if plastic_variant == "release":
+    plastic_env = RELEASE
+elif plastic_variant == "debug":
+    plastic_env = DEBUG
+else:
+    fatal("Unrecognzied variant under [plastic]: " + plastic_variant)
+plastic = build_plastic(plastic_env)
 
 Alias('plastic', plastic)
