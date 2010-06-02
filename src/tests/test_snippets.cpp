@@ -381,6 +381,9 @@ void test_vectorized_funcs()
     test_snippet("a = [2.0 2.0]; b = [4.0 4.0]", "a + b == [6.0 6.0]");
     test_snippet("a = [2.0 2.0]; b = [4.0 4.0] -> Point", "a + b == [6.0 6.0]");
     test_snippet("", "[1 1]*[1 1] == [1 1]");
+
+    // This will cause an error if a - b can't be statically resolved to be a Point
+    test_snippet("a = [1 1], b = [2 2]", "norm(a - b)");
 }
 
 void test_color_arithmetic()
@@ -482,11 +485,6 @@ void test_lists()
     test_snippet("", "filter([1 2 3] [true false true]) == [1 3]");
 }
 
-void test_constructor()
-{
-    //test_snippet_runtime_error("Point(1 1)");
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -519,7 +517,6 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_refactoring);
     REGISTER_TEST_CASE(test_snippets::test_member_functions);
     REGISTER_TEST_CASE(test_snippets::test_lists);
-    REGISTER_TEST_CASE(test_snippets::test_constructor);
 }
 
 } // namespace test_snippets

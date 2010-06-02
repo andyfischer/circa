@@ -1,0 +1,37 @@
+
+
+with this expression: [1] + [1]
+
+we know that the output is a [int]
+
+How to solve and record this type inferrence?
+
+Possible method: All lists record their whole known type
+
+[1] :: [int]
+[3 'hello' 3.0] :: [int string number]
+
+would this work:
+if_expr(bool, [1], ['hi']) :: [int or string]
+
+Can we do better? Have a whole type-solving engine?
+
+
+x = [1 2 [3 4]]
+y = [7 8]
+z = x[1] + y
+w = norm(z)
+
+system asks:
+does input 0 of norm(z) fit?
+ - does z[0] fit Point[0]
+   - does x[1][0] + y[0] fit Point[0]
+     - y[0] is a int
+     - x[1][0] is a int
+     - yes it fits
+ - does z[1] fit Point[1]
+   - does x[1][1] + y[1] fit Point[1]
+     - x[1][1] is a int
+     - y[1] is a int
+     - yes it fits
+

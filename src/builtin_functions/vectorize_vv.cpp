@@ -7,6 +7,7 @@ namespace vectorize_vv_function {
 
     Term* specializeType(Term* caller)
     {
+        // 
         if (is_branch(caller->input(0)))
             return caller->input(0)->type;
 
