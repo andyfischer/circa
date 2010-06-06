@@ -41,7 +41,7 @@ struct RawOutputPrefs;
 struct Ref;
 struct RefList;
 struct ReferenceMap;
-struct StaticTypeQueryResult;
+struct StaticTypeQuery;
 struct StyledSource;
 struct TaggedValue;
 struct Term;

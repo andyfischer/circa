@@ -402,7 +402,7 @@ namespace branch_t {
         return is_branch(value) || list_t::is_list(value);
     }
 
-    void static_type_query(Type* type, StaticTypeQueryResult* result)
+    void static_type_query(Type* type, StaticTypeQuery* result)
     {
         Term* term = result->targetTerm;
         Branch& prototype = type->prototype;

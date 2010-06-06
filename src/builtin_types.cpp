@@ -537,10 +537,6 @@ namespace any_t {
     {
         return true;
     }
-    void static_type_query(Type*, StaticTypeQueryResult* result)
-    {
-        // TODO
-    }
 }
 
 namespace void_t {
@@ -601,12 +597,6 @@ void initialize_primitive_types(Branch& kernel)
     // ANY_TYPE was created in bootstrap_kernel
 }
 
-void post_setup_primitive_types()
-{
-    string_t::postponed_setup_type(&as_type(STRING_TYPE));
-    ref_t::postponed_setup_type(&as_type(REF_TYPE));
-}
-
 void setup_builtin_types(Branch& kernel)
 {
     Term* branch_append = 
@@ -658,7 +648,13 @@ void parse_builtin_types(Branch& kernel)
     COLOR_TYPE = parse_type(kernel, "type Color { number r, number g, number b, number a }");
 
     color_t::setup_type(&as_type(COLOR_TYPE));
-
 }
+
+void post_setup_builtin_types()
+{
+    string_t::postponed_setup_type(&as_type(STRING_TYPE));
+    ref_t::postponed_setup_type(&as_type(REF_TYPE));
+}
+
 
 } // namespace circa

@@ -13,6 +13,8 @@ namespace circa {
 
 struct FunctionAttrs
 {
+    typedef void (*StaticTypeQueryFunc)(StaticTypeQuery* query);
+
     std::string name;
     Ref hiddenStateType;
     bool variableArgs;
@@ -26,6 +28,7 @@ struct FunctionAttrs
     SpecializeTypeFunc specializeType;
     FormatSource formatSource;
     CheckInvariants checkInvariants;
+    StaticTypeQueryFunc staticTypeQuery;
 
     List parameters;
 
@@ -34,7 +37,8 @@ struct FunctionAttrs
         evaluate(NULL),
         specializeType(NULL),
         formatSource(NULL),
-        checkInvariants(NULL)
+        checkInvariants(NULL),
+        staticTypeQuery(NULL)
     {}
 };
 

@@ -403,7 +403,7 @@ void tv_mutate(TaggedValue* value)
     set_pointer(value, mutate(data));
 }
 
-void tv_static_type_query(Type* type, StaticTypeQueryResult* result)
+void tv_static_type_query(Type* type, StaticTypeQuery* result)
 {
     Term* term = result->targetTerm;
     Branch& prototype = type->prototype;

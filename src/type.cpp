@@ -166,41 +166,43 @@ bool value_fits_type(TaggedValue* value, Type* type)
     return false;
 }
 
-static void run_static_type_query(Type* type, Term* outputTerm, StaticTypeQueryResult* result)
+static void run_static_type_query(Type* type, Term* outputTerm, StaticTypeQuery* result)
 {
     // Always succeed if types are the same
     if (declared_type(outputTerm) == type)
         return result->succeed();
 
-    // If output term is ANY then we cannot determine.
+    // If output term is ANY type then we cannot statically determine.
     if (outputTerm->type == ANY_TYPE)
         return result->unableToDetermine();
 
-    Type::StaticTypeQuery staticTypeQueryFunc = type->staticTypeQuery;
-
-    if (staticTypeQueryFunc == NULL) {
-        if (is_subtype(type, type_contents(outputTerm->type)))
-            return result->succeed();
-        else
-            return result->fail();
+    // Try using the type's static query func
+    Type::StaticTypeQueryFunc staticTypeQueryFunc = type->staticTypeQuery;
+    if (staticTypeQueryFunc != NULL) {
+        result->targetTerm = outputTerm;
+        staticTypeQueryFunc(type, result);
+        return;
     }
 
-    result->targetTerm = outputTerm;
-    staticTypeQueryFunc(type, result);
+    // Finally, use is_subtype
+    if (is_subtype(type, type_contents(outputTerm->type)))
+        return result->succeed();
+    else
+        return result->fail();
 }
 
 bool term_output_always_satisfies_type(Term* term, Type* type)
 {
-    StaticTypeQueryResult obj;
+    StaticTypeQuery obj;
     run_static_type_query(type, term, &obj);
-    return obj.result == StaticTypeQueryResult::SUCCEED;
+    return obj.result == StaticTypeQuery::SUCCEED;
 }
 
 bool term_output_never_satisfies_type(Term* term, Type* type)
 {
-    StaticTypeQueryResult obj;
+    StaticTypeQuery obj;
     run_static_type_query(type, term, &obj);
-    return obj.result == StaticTypeQueryResult::FAIL;
+    return obj.result == StaticTypeQuery::FAIL;
 }
 
 bool is_subtype(Type* type, Type* subType)

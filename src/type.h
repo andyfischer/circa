@@ -30,7 +30,7 @@ struct Type
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
     typedef bool (*TypeMatches)(Type* type, Type* otherType);
-    typedef void (*StaticTypeQuery)(Type* type, StaticTypeQueryResult* query);
+    typedef void (*StaticTypeQueryFunc)(Type* type, StaticTypeQuery* query);
     typedef void (*Mutate)(TaggedValue* value);
     typedef TaggedValue* (*GetIndex)(TaggedValue* value, int index);
     typedef void (*SetIndex)(TaggedValue* value, int index, TaggedValue* element);
@@ -58,7 +58,7 @@ struct Type
     CheckInvariants checkInvariants;
     ValueFitsType valueFitsType;
     TypeMatches isSubtype;
-    StaticTypeQuery staticTypeQuery;
+    StaticTypeQueryFunc staticTypeQuery;
     Mutate mutate;
     GetIndex getIndex;
     SetIndex setIndex;
@@ -143,7 +143,7 @@ struct TypeRef
     Type* operator->() { return t; }
 };
 
-struct StaticTypeQueryResult
+struct StaticTypeQuery
 {
     enum Result {
         NULL_RESULT,
@@ -158,7 +158,7 @@ struct StaticTypeQueryResult
     // Outputs
     Result result;
 
-    StaticTypeQueryResult() : targetTerm(NULL), result(NULL_RESULT) {}
+    StaticTypeQuery() : targetTerm(NULL), result(NULL_RESULT) {}
 
     void fail() { result = FAIL; }
     void succeed() { result = SUCCEED; }

@@ -226,38 +226,38 @@ void pre_initialize_builtin_types(Branch& kernel)
 
 void post_setup_builtin_functions(Branch& kernel)
 {
+    // Create vectorized add() functions
     Term* add_v = create_duplicate(kernel, kernel["vectorize_vv"], "add_v");
     make_ref(function_t::get_parameters(add_v), ADD_FUNC);
     Term* add_s = create_duplicate(kernel, kernel["vectorize_vs"], "add_s");
     make_ref(function_t::get_parameters(add_s), ADD_FUNC);
 
-    // Add to add() overloads
     overloaded_function::append_overload(ADD_FUNC, add_v);
     overloaded_function::append_overload(ADD_FUNC, add_s);
 
+    // Create vectorized sub() functions
     Term* sub_v = create_duplicate(kernel, kernel["vectorize_vv"], "sub_v");
     make_ref(function_t::get_parameters(sub_v), SUB_FUNC);
     Term* sub_s = create_duplicate(kernel, kernel["vectorize_vs"], "sub_s");
     make_ref(function_t::get_parameters(sub_s), SUB_FUNC);
 
-    // Add to sub() overloads
     overloaded_function::append_overload(SUB_FUNC, sub_v);
     overloaded_function::append_overload(SUB_FUNC, sub_s);
 
+    // Create vectorized mult() functions
     Term* mult_v = create_duplicate(kernel, kernel["vectorize_vv"], "mult_v");
     make_ref(function_t::get_parameters(mult_v), MULT_FUNC);
     Term* mult_s = create_duplicate(kernel, kernel["vectorize_vs"], "mult_s");
     make_ref(function_t::get_parameters(mult_s), MULT_FUNC);
 
-    // Add to mult() overloads
     overloaded_function::append_overload(MULT_FUNC, mult_v);
     overloaded_function::append_overload(MULT_FUNC, mult_s);
 
+    // Create vectorized div() function
     Branch& div_overloads = as_branch(DIV_FUNC);
     Term* div_s = create_duplicate(div_overloads, kernel["vectorize_vs"], "div_s");
     make_ref(function_t::get_parameters(div_s), DIV_FUNC);
 
-    // Add to div() overloads
     overloaded_function::append_overload(DIV_FUNC, div_s);
 
     function_t::get_feedback_func(VALUE_FUNC) = UNSAFE_ASSIGN_FUNC;
@@ -280,7 +280,7 @@ void initialize()
     setup_builtin_functions(*KERNEL);
     post_setup_builtin_functions(*KERNEL);
     parse_builtin_types(*KERNEL);
-    post_setup_primitive_types();
+    post_setup_builtin_types();
     initialize_kernel_documentation(*KERNEL);
     parse_builtin_script(*KERNEL);
 }

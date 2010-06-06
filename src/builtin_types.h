@@ -75,11 +75,9 @@ namespace point_t {
 
 void initialize_primitive_types(Branch& kernel);
 
-// Do some more setup, after all the standard builtin types have been created.
-void post_setup_primitive_types();
-
 void setup_builtin_types(Branch& kernel);
 void parse_builtin_types(Branch& kernel);
+void post_setup_builtin_types();
 
 }
 
