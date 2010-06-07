@@ -382,8 +382,7 @@ namespace branch_t {
             assert_valid_branch(&source);
 
             // For Branch or List type, overwrite existing shape
-            if ((destValue->value_type == &as_type(BRANCH_TYPE))
-                    || (destValue->value_type == &as_type(LIST_TYPE)))
+            if (is_branch(destValue) || (list_t::is_list(destValue)))
                 branch_copy(source, dest);
             else
                 assign(source, dest);

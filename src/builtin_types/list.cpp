@@ -407,6 +407,13 @@ void tv_static_type_query(Type* type, StaticTypeQuery* result)
 {
     Term* term = result->targetTerm;
     Branch& prototype = type->prototype;
+    
+    // If prototype is empty then accept any list
+    if (prototype.length() == 0)
+        if (is_list_based_type(type_contents(term->type)))
+            return result->succeed();
+        else
+            return result->fail();
 
     // Inspect a call to list(), look at inputs instead of looking at the result.
     if (term->function == LIST_FUNC)

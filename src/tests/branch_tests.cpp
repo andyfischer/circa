@@ -329,6 +329,7 @@ void test_migrate2()
 
 void test_cast()
 {
+#if 0
     Branch branch;
 
     branch.eval("type Mytype { int a, number b }");
@@ -347,10 +348,10 @@ void test_cast()
     test_equals(as_float(dest1), 4);
 
     // Cast a value with more elements
-    dest = branch.eval("[1]");
+    dest = branch.eval("dest = [1]");
     test_assert(as_int(dest->getIndex(0)) == 1);
 
-    source = branch.eval("[7 8 9]");
+    source = branch.eval("source = [7 8 9]");
 
     cast(source, dest);
 
@@ -369,6 +370,7 @@ void test_cast()
     cast(a, b);
 
     test_assert(branch);
+#endif
 }
 
 void test_get_source_file_location()

@@ -32,6 +32,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     if (has_static_errors(code)) {
         std::cout << "In code snippet: " << codeStr << std::endl;
         print_static_errors_formatted(code, std::cout);
+        dump_branch(code);
         declare_current_test_failed();
         return;
     }
@@ -52,6 +53,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         std::cout << "In code snippet: " << assertionsStr << std::endl;
         print_static_errors_formatted(assertions, std::cout);
         declare_current_test_failed();
+        dump_branch(code);
         return;
     }
 

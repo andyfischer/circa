@@ -78,7 +78,6 @@ Term* MAP_TYPE = NULL;
 Term* TYPE_TYPE = NULL;
 Term* VOID_TYPE = NULL;
 
-// New style: Type* pointers for builtins
 TypeRef TYPE_T;
 TypeRef BOOL_T;
 TypeRef FLOAT_T;
