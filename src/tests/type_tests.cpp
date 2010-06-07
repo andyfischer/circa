@@ -289,6 +289,19 @@ void test_list_based_types()
     test_assert(term_output_always_satisfies_type(l, type_contents(get_global("Point"))));
 }
 
+void test_create_implicit_tuple_type()
+{
+    Branch branch;
+    RefList types(INT_TYPE, FLOAT_TYPE, STRING_TYPE);
+    Term* result = create_implicit_tuple_type(types);
+
+    Term* a = branch.eval("[1, 3.0, 'hi']");
+    Term* b = branch.eval("['hi', 3.0, 1]");
+
+    test_assert(value_fits_type(a, type_contents(result)));
+    test_assert(!value_fits_type(b, type_contents(result)));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
@@ -304,6 +317,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_imported_pointer_type);
     REGISTER_TEST_CASE(type_tests::simple_pointer_test::test);
     REGISTER_TEST_CASE(type_tests::test_list_based_types);
+    REGISTER_TEST_CASE(type_tests::test_create_implicit_tuple_type);
 }
 
 } // namespace type_tests

@@ -281,6 +281,7 @@ void initialize()
     post_setup_builtin_functions(*KERNEL);
     parse_builtin_types(*KERNEL);
     post_setup_builtin_types();
+    type_initialize_kernel(*KERNEL);
     initialize_kernel_documentation(*KERNEL);
     parse_builtin_script(*KERNEL);
 }

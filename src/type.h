@@ -15,6 +15,8 @@
 
 namespace circa {
 
+extern Term* IMPLICIT_TYPES;
+
 struct Type
 {
     typedef void (*Initialize)(Type* type, TaggedValue* value);
@@ -201,7 +203,8 @@ bool is_subtype(Type* type, Type* subType);
 void reset_type(Type* type);
 void initialize_simple_pointer_type(Type* type);
 
-std::string compound_type_to_string(Term* caller);
+void type_initialize_kernel(Branch& kernel);
+Term* create_implicit_tuple_type(RefList const& types);
 
 Term* parse_type(Branch& branch, std::string const& decl);
 

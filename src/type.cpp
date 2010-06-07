@@ -6,6 +6,8 @@
 
 namespace circa {
 
+Term* IMPLICIT_TYPES = NULL;
+
 namespace type_t {
 
     void decref(Type* type)
@@ -244,6 +246,33 @@ void reset_type(Type* type)
 void initialize_simple_pointer_type(Type* type)
 {
     reset_type(type);
+}
+
+void type_initialize_kernel(Branch& kernel)
+{
+    IMPLICIT_TYPES = create_branch(kernel, "#implicit_types").owningTerm;
+}
+
+Term* create_implicit_tuple_type(RefList const& types)
+{
+    std::stringstream typeName;
+    typeName << "Tuple<";
+    for (int i=0; i < types.length(); i++) {
+        if (i != 0) typeName << ",";
+        typeName << type_contents(types[i])->name;
+    }
+    typeName << ">";
+
+    Term* result = create_type(as_branch(IMPLICIT_TYPES), typeName.str());
+    list_t::setup_type(type_contents(result));
+    Branch& prototype = type_contents(result)->prototype;
+
+    for (int i=0; i < types.length(); i++) {
+        assert(is_type(types[i]));
+        create_value(prototype, types[i]);
+    }
+    
+    return result;
 }
 
 Term* parse_type(Branch& branch, std::string const& decl)

@@ -5,6 +5,15 @@
 namespace circa {
 namespace list_function {
 
+    Term* specializeType(Term* term)
+    {
+        RefList inputTypes;
+        for (int i=0; i < term->numInputs(); i++)
+            inputTypes.append(term->input(i)->type);
+
+        return create_implicit_tuple_type(inputTypes);
+    }
+
     void evaluate(EvalContext*, Term* caller) {
 #ifdef NEWLIST
         List* result = (List*) caller;
@@ -92,6 +101,7 @@ namespace list_function {
     void setup(Branch& kernel)
     {
         LIST_FUNC = import_function(kernel, evaluate, "list(any...) -> List");
+        //function_t::get_attrs(LIST_FUNC).specializeType = specializeType;
         function_t::get_attrs(LIST_FUNC).formatSource = list_formatSource;
 
         import_function(kernel, evaluate_repeat, "repeat(any, int) -> List");
