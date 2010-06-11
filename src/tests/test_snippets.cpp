@@ -385,7 +385,7 @@ void test_vectorized_funcs()
     test_snippet("", "[1 1]*[1 1] == [1 1]");
 
     // This will cause an error if a - b can't be statically resolved to be a Point
-    test_snippet("a = [1 1], b = [2 2]", "norm(a - b)");
+    test_snippet("a = [1 1], b = [2 2]; norm(a - b)", "");
 }
 
 void test_color_arithmetic()

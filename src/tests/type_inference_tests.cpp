@@ -50,23 +50,11 @@ void compare_builtin_types()
     test_assert(term_output_always_satisfies_type(anInt, type_contents(INT_TYPE)));
 }
 
-void specialize_type_vectorize_vv()
-{
-    Branch branch;
-
-    // Unshaped lists should output a List
-    Term* a = branch.compile("[1] + [1]");
-    test_assert(a->type == LIST_TYPE);
-
-
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(type_inference_tests::test_find_common_type);
     REGISTER_TEST_CASE(type_inference_tests::test_find_type_of_get_index);
     REGISTER_TEST_CASE(type_inference_tests::compare_builtin_types);
-    REGISTER_TEST_CASE(type_inference_tests::specialize_type_vectorize_vv);
 }
 
 }

@@ -106,10 +106,6 @@ namespace type_t {
     {
         return as_type(type).attributes;
     }
-    Branch& get_member_functions(Term* type)
-    {
-        return as_type(type).memberFunctions;
-    }
     Term* get_default_value(Term* type)
     {
         Branch& attributes = as_type(type).attributes;
@@ -266,6 +262,7 @@ Term* create_implicit_tuple_type(RefList const& types)
     Term* result = create_type(as_branch(IMPLICIT_TYPES), typeName.str());
     list_t::setup_type(type_contents(result));
     Branch& prototype = type_contents(result)->prototype;
+    type_contents(result)->parent = type_contents(LIST_TYPE);
 
     for (int i=0; i < types.length(); i++) {
         assert(is_type(types[i]));
@@ -273,6 +270,17 @@ Term* create_implicit_tuple_type(RefList const& types)
     }
     
     return result;
+}
+
+Term* find_member_function(Type* type, std::string const& name)
+{
+    if (type->memberFunctions.contains(name))
+        return type->memberFunctions[name];
+
+    if (type->parent != NULL)
+        return find_member_function(type->parent, name);
+
+    return NULL;
 }
 
 Term* parse_type(Branch& branch, std::string const& decl)

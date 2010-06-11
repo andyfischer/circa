@@ -17,6 +17,24 @@ namespace circa {
 
 extern Term* IMPLICIT_TYPES;
 
+struct TypeRef
+{
+    Type* t;
+
+    TypeRef() : t(NULL) {}
+    TypeRef(Type* initial) : t(NULL) { set(initial); }
+    TypeRef(TypeRef const& copy) : t(NULL) { set(copy.t); }
+    ~TypeRef() { set(NULL); }
+
+    void set(Type* target);
+
+    TypeRef& operator=(TypeRef const& rhs) { set(rhs.t); return *this; }
+    TypeRef& operator=(Type* target) { set(target); return *this; }
+    bool operator==(Type* _t) const { return _t == t; }
+    operator Type*() const { return t; }
+    Type* operator->() { return t; }
+};
+
 struct Type
 {
     typedef void (*Initialize)(Type* type, TaggedValue* value);
@@ -67,6 +85,9 @@ struct Type
     GetField getField;
     SetField setField;
     NumElements numElements;
+
+    // Parent type, may be null.
+    TypeRef parent;
     
     Branch prototype;
 
@@ -127,23 +148,6 @@ public:
     }
 };
 
-struct TypeRef
-{
-    Type* t;
-
-    TypeRef() : t(NULL) {}
-    TypeRef(Type* initial) : t(NULL) { set(initial); }
-    TypeRef(TypeRef const& copy) : t(NULL) { set(copy.t); }
-    ~TypeRef() { set(NULL); }
-
-    void set(Type* target);
-
-    TypeRef& operator=(TypeRef const& rhs) { set(rhs.t); return *this; }
-    TypeRef& operator=(Type* target) { set(target); return *this; }
-    bool operator==(Type* _t) const { return _t == t; }
-    operator Type*() const { return t; }
-    Type* operator->() { return t; }
-};
 
 struct StaticTypeQuery
 {
@@ -183,7 +187,6 @@ namespace type_t {
     Type::RemapPointers& get_remap_pointers_func(Term* type);
     Branch& get_prototype(Term* type);
     Branch& get_attributes(Term* type);
-    Branch& get_member_functions(Term* type);
     Term* get_default_value(Term* type);
     TaggedValue* get_default_value(Type* type);
 
@@ -205,6 +208,7 @@ void initialize_simple_pointer_type(Type* type);
 
 void type_initialize_kernel(Branch& kernel);
 Term* create_implicit_tuple_type(RefList const& types);
+Term* find_member_function(Type* type, std::string const& name);
 
 Term* parse_type(Branch& branch, std::string const& decl);
 

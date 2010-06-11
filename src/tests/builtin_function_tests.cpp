@@ -186,8 +186,6 @@ void test_vectorized_funcs_with_points()
             
     test_equals(b->function->name, "add_v");
 
-    dump_branch(branch);
-
     test_equals(b->getIndex(0)->toFloat(), 1);
     test_equals(b->getIndex(1)->toFloat(), 2);
 }

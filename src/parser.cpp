@@ -1156,10 +1156,11 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
     std::string const& fieldName = fieldNameTerm->asString();
     std::string nameRebind;
 
-    if (type_t::get_member_functions(head->type).contains(fieldName)) {
-        inputs.prepend(head);
+    Term* memberFunction = find_member_function(type_contents(head->type), fieldName);
 
-        function = type_t::get_member_functions(head->type)[fieldName];
+    if (memberFunction != NULL) {
+        inputs.prepend(head);
+        function = memberFunction;
 
         if (head->name != ""
                 && function_t::get_input_placeholder(function, 0)
