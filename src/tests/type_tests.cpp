@@ -129,6 +129,7 @@ void test_is_native_type()
 void test_to_string()
 {
     // Test on some native types
+    // FIXME
     //test_equals(to_string(INT_TYPE), "<NativeType int>");
     //test_equals(to_string(FLOAT_TYPE), "<NativeType number>");
     //test_equals(to_string(BOOL_TYPE), "<NativeType bool>");
@@ -157,6 +158,7 @@ void test_default_values()
     //create_type(branch, "T");
 
 #if 0
+    // FIXME
     test_assert(type_t::get_default_value(t) == NULL);
 
     Term* t_value = create_value(branch, t);
@@ -180,6 +182,7 @@ void test_assign_compound_value_to_default()
     Term* t = branch.eval("[1 2 3]");
     reset(t);
 
+    //FIXME
     //test_assert(t->numElements() == 0);
 }
 

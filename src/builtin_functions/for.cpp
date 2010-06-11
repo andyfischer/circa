@@ -39,7 +39,7 @@ namespace for_function {
     void setup(Branch& kernel)
     {
         FOR_FUNC = import_function(kernel, evaluate_for_loop,
-                "for(List _state, Indexable) -> Branch");
+                "for(Branch _state, Indexable) -> Branch");
         function_t::get_attrs(FOR_FUNC).formatSource = formatSource;
         function_t::set_input_meta(FOR_FUNC, 0, true); // allow _state to be NULL
         function_t::set_exposed_name_path(FOR_FUNC, "#rebinds_for_outer");

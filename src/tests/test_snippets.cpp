@@ -324,6 +324,9 @@ void test_for_loops()
     test_snippet("a = [1 2 3];for i in @a; if i == 2 discard end end", "a == [1 3]");
     test_snippet("a = [1 2 3];for i in @a; if i == 3 discard end end", "a == [1 2]");
     test_snippet("a = [1 2 3];for i in @a; i += 1 if i == 3 discard end end", "a == [2 4]");
+
+    // For loop with state
+    test_snippet("for i in [1 2 3]; state s = i; end", "");
 }
 
 void test_subscripting()
@@ -401,6 +404,7 @@ void test_branch_value()
     test_snippet("b = { 1 2 3 }", "b[0] == 1, b[1] == 2, b[2] == 3");
     test_snippet("", "{ 1 } != 1"); // once caused a crash
     //test_snippet("b = { apple = 1, bees = 2 }", "b.apple == 1, b.bees == 2");
+    test_snippet("br = { 1 2 3 }; sum = 0; for i in br; sum += i end", "sum == 6");
 }
 
 void test_rebinding_operators()
