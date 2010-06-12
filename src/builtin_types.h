@@ -69,8 +69,8 @@ namespace callable_t { void setup_type(Type* type); }
 namespace point_t {
 
     // Helper functions:
-    void read(Term* term, float* x, float* y);
-    void write(Term* term, float x, float y);
+    void read(TaggedValue* value, float* x, float* y);
+    void write(TaggedValue* value, float x, float y);
 }
 
 void initialize_primitive_types(Branch& kernel);

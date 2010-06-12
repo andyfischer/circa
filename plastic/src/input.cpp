@@ -118,8 +118,8 @@ void capture_events()
         }
     } // finish event loop
 
-    set_float(MOUSE_POSITION_TERM->asBranch()[0], float(MOUSE_X));
-    set_float(MOUSE_POSITION_TERM->asBranch()[1], float(MOUSE_Y));
+    set_float(MOUSE_POSITION_TERM->getIndex(0), float(MOUSE_X));
+    set_float(MOUSE_POSITION_TERM->getIndex(1), float(MOUSE_Y));
 }
 
 void handle_key_press(SDL_Event &event, int key)
@@ -182,11 +182,11 @@ void handle_key_press(SDL_Event &event, int key)
 
 void recent_key_presses(EvalContext*, Term* caller)
 {
-    Branch& output = as_branch(caller);
-    output.clear();
+    List* output = (List*) caller;
+    output->clear();
 
     for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++) {
-        Branch& item = as_branch(create_list(output));
+        List* item = (List*) make_list(output->append());
         Uint16 key = KEYS_JUST_PRESSED[index].unicode;
         char keyStr[2];
         keyStr[1] = 0;
@@ -197,18 +197,18 @@ void recent_key_presses(EvalContext*, Term* caller)
         else
             keyStr[0] = char(key);
 
-        create_string(item, std::string(keyStr));
-        create_int(item, KEYS_JUST_PRESSED[index].sym);
-        create_int(item, KEYS_JUST_PRESSED[index].mod);
+        make_string(item->append(), keyStr);
+        make_int(item->append(), KEYS_JUST_PRESSED[index].sym);
+        make_int(item->append(), KEYS_JUST_PRESSED[index].mod);
     }
 }
 
-bool mouse_in(Branch& box)
+bool mouse_in(TaggedValue* box)
 {
-    float x1 = box[0]->toFloat();
-    float y1 = box[1]->toFloat();
-    float x2 = box[2]->toFloat();
-    float y2 = box[3]->toFloat();
+    float x1 = box->getIndex(0)->toFloat();
+    float y1 = box->getIndex(1)->toFloat();
+    float x2 = box->getIndex(2)->toFloat();
+    float y2 = box->getIndex(3)->toFloat();
     return x1 <= MOUSE_X && y1 <= MOUSE_Y
         && x2 >= MOUSE_X && y2 >= MOUSE_Y;
 }
@@ -223,12 +223,12 @@ void mouse_clicked(EvalContext*, Term* caller)
     if (caller->numInputs() == 0)
         set_bool(caller, RECENT_LEFT_MOUSE_DOWN);
     else
-        set_bool(caller, RECENT_LEFT_MOUSE_DOWN && mouse_in(as_branch(caller->input(0))));
+        set_bool(caller, RECENT_LEFT_MOUSE_DOWN && mouse_in(caller->input(0)));
 }
 
 void mouse_over(EvalContext*, Term* caller)
 {
-    set_bool(caller, mouse_in(as_branch(caller->input(0))));
+    set_bool(caller, mouse_in(caller->input(0)));
 }
 
 void mouse_wheel_up(EvalContext*, Term* caller)
@@ -236,7 +236,7 @@ void mouse_wheel_up(EvalContext*, Term* caller)
     if (caller->numInputs() == 0)
         set_bool(caller, RECENT_MOUSE_WHEEL_UP);
     else
-        set_bool(caller, RECENT_MOUSE_WHEEL_UP && mouse_in(as_branch(caller->input(0))));
+        set_bool(caller, RECENT_MOUSE_WHEEL_UP && mouse_in(caller->input(0)));
 }
 
 void mouse_wheel_down(EvalContext*, Term* caller)
@@ -244,7 +244,7 @@ void mouse_wheel_down(EvalContext*, Term* caller)
     if (caller->numInputs() == 0)
         set_bool(caller, RECENT_MOUSE_WHEEL_DOWN);
     else
-        set_bool(caller, RECENT_MOUSE_WHEEL_DOWN && mouse_in(as_branch(caller->input(0))));
+        set_bool(caller, RECENT_MOUSE_WHEEL_DOWN && mouse_in(caller->input(0)));
 }
 
 void setup(Branch& branch)

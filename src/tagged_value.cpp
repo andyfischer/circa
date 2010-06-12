@@ -66,10 +66,28 @@ TaggedValue::getIndex(int index)
     return get_index(this, index);
 }
 
+TaggedValue*
+TaggedValue::getField(const char* fieldName)
+{
+    return get_field(this, fieldName);
+}
+
+TaggedValue*
+TaggedValue::getField(std::string const& fieldName)
+{
+    return get_field(this, fieldName.c_str());
+}
+
 int
 TaggedValue::numElements()
 {
     return num_elements(this);
+}
+
+bool
+TaggedValue::equals(TaggedValue* rhs)
+{
+    return circa::equals(this, rhs);
 }
 
 int TaggedValue::asInt()

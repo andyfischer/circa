@@ -552,17 +552,16 @@ namespace void_t {
 
 namespace point_t {
 
-    void read(Term* term, float* x, float* y)
+    void read(TaggedValue* value, float* x, float* y)
     {
-        Branch& branch = as_branch(term);
-        *x = to_float(branch[0]);
-        *y = to_float(branch[1]);
+        *x = value->getIndex(0)->toFloat();
+        *y = value->getIndex(1)->toFloat();
     }
-    void write(Term* term, float x, float y)
+    void write(TaggedValue* value, float x, float y)
     {
-        Branch& branch = as_branch(term);
-        set_float(branch[0], x);
-        set_float(branch[1], y);
+        mutate(value);
+        set_float(value->getIndex(0), x);
+        set_float(value->getIndex(1), y);
     }
 }
 

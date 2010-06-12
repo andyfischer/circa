@@ -29,14 +29,13 @@ public:
     TTF_Font* operator->() { return (TTF_Font*) get_pointer(_value, TTF_Font_t); }
 };
 
-SDL_Color unpack_sdl_color(Term* colorTerm)
+SDL_Color unpack_sdl_color(TaggedValue* color)
 {
-    Branch& color = as_branch(colorTerm);
     SDL_Color c = {};
-    c.r = Uint8(color[0]->asFloat() * 255.0);
-    c.g = Uint8(color[1]->asFloat() * 255.0);
-    c.b = Uint8(color[2]->asFloat() * 255.0);
-    // c.a = color[3]->asFloat() * 255.0;
+    c.r = Uint8(color->getIndex(0)->asFloat() * 255.0);
+    c.g = Uint8(color->getIndex(1)->asFloat() * 255.0);
+    c.b = Uint8(color->getIndex(2)->asFloat() * 255.0);
+    // c.a = colorTerm->getIndex(3)->asFloat() * 255.0;
     return c;
 }
 
@@ -73,12 +72,12 @@ struct RenderedText
 
     RenderedText(Term* term) : _term(term) {}
 
-    Int texid() { return Int(_term->asBranch()[0]); }
-    Int width() { return Int(_term->asBranch()[1]); }
-    Int height() { return Int(_term->asBranch()[2]); }
-    Term* color() { return _term->asBranch()[3]; }
-    std::string const& text() { return as_string(_term->asBranch()[4]); }
-    void set_text(const char* s) { set_str(_term->asBranch()[4], s); }
+    Int texid() { return Int(_term->getIndex(0)); }
+    Int width() { return Int(_term->getIndex(1)); }
+    Int height() { return Int(_term->getIndex(2)); }
+    TaggedValue* color() { return _term->getIndex(3); }
+    std::string const& text() { return as_string(_term->getIndex(4)); }
+    void set_text(const char* s) { set_str(_term->getIndex(4), s); }
 };
 
 void render_text(EvalContext*, Term* caller)
@@ -87,7 +86,7 @@ void render_text(EvalContext*, Term* caller)
     std::string const& text = as_string(caller->input(2));
     Term* color = caller->input(3);
 
-    bool changed_color = !branch_t::equals(state.color(), color);
+    bool changed_color = !state.color()->equals(color);
 
     if (state.texid() == 0 || state.text() != text || changed_color) {
 
@@ -129,8 +128,8 @@ void draw_rendered_text(EvalContext* cxt, Term* caller)
     if (output.texid() == 0)
         return;
 
-    int x = int(caller->input(1)->asBranch()[0]->toFloat());
-    int y = int(caller->input(1)->asBranch()[1]->toFloat());
+    int x = int(caller->input(1)->getIndex(0)->toFloat());
+    int y = int(caller->input(1)->getIndex(1)->toFloat());
 
     glBindTexture(GL_TEXTURE_2D, output.texid());
     glColor4f(1,1,1,1);

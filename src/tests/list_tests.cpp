@@ -25,9 +25,25 @@ void test_equals_branch()
     test_assert(!equals(a,e));
 }
 
+void test_tagged_value()
+{
+    Branch branch;
+
+    branch.eval("type MyType { string s, int i }");
+    Term* val = branch.eval("MyType()");
+
+    test_assert(is_string(val->getIndex(0)));
+    test_assert(is_int(val->getIndex(1)));
+
+    test_assert(is_string(val->getField("s")));
+    test_assert(is_int(val->getField("i")));
+    test_assert(val->getField("x") == NULL);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(list_tests::test_equals_branch);
+    REGISTER_TEST_CASE(list_tests::test_tagged_value);
 }
 
 }

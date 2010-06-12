@@ -118,8 +118,8 @@ bool reload_runtime()
         return false;
 
     // Write window width & height
-    set_int(runtime_branch()["window"]->asBranch()["width"], WINDOW_WIDTH);
-    set_int(runtime_branch()["window"]->asBranch()["height"], WINDOW_HEIGHT);
+    set_int(runtime_branch()["window"]->getField("width"), WINDOW_WIDTH);
+    set_int(runtime_branch()["window"]->getField("height"), WINDOW_HEIGHT);
 
     return true;
 }

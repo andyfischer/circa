@@ -10,21 +10,24 @@ namespace gl_shapes {
 
 GLint current_program = 0;
 
-void _unpack_gl_color(Term* colorTerm)
+void _unpack_gl_color(TaggedValue* color)
 {
-    Branch& color = as_branch(colorTerm);
-    glColor4f(color[0]->asFloat(), color[1]->asFloat(),
-                 color[2]->asFloat(), color[3]->asFloat());
+    glColor4f(color->getIndex(0)->asFloat(),
+              color->getIndex(1)->asFloat(),
+              color->getIndex(2)->asFloat(),
+              color->getIndex(3)->asFloat());
 }
 
 void background(EvalContext* cxt, Term* caller)
 {
     gl_clear_error();
 
-    Branch& color = caller->input(0)->asBranch();
+    Term* color = caller->input(0);
 
-    glClearColor(color[0]->asFloat(), color[1]->asFloat(),
-            color[2]->asFloat(), color[3]->asFloat());
+    glClearColor(color->getIndex(0)->asFloat(),
+            color->getIndex(1)->asFloat(),
+            color->getIndex(2)->asFloat(),
+            color->getIndex(3)->asFloat());
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -33,16 +36,17 @@ void background(EvalContext* cxt, Term* caller)
 
 void gl_triangles(EvalContext* cxt, Term* caller)
 {
-    Branch& list = caller->input(0)->asBranch();
+    Term* list = caller->input(0);
     Term* color = caller->input(1);
 
     _unpack_gl_color(color);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBegin(GL_TRIANGLES);
 
-    for (int i=0; i < list.length(); i++) {
-        float x = list[i]->asBranch()[0]->toFloat();
-        float y = list[i]->asBranch()[1]->toFloat();
+    int numElements = list->numElements();
+    for (int i=0; i < numElements; i++) {
+        float x = list->getIndex(i)->getIndex(0)->toFloat();
+        float y = list->getIndex(i)->getIndex(1)->toFloat();
 
         glVertex3f(x,y,0);
     }
@@ -54,16 +58,17 @@ void gl_triangles(EvalContext* cxt, Term* caller)
 
 void gl_line_strip(EvalContext* cxt, Term* caller)
 {
-    Branch& list = caller->input(0)->asBranch();
+    Term* list = caller->input(0);
     Term* color = caller->input(1);
 
     _unpack_gl_color(color);
 
     glBegin(GL_LINE_STRIP);
 
-    for (int i=0; i < list.length(); i++) {
-        float x = list[i]->asBranch()[0]->toFloat();
-        float y = list[i]->asBranch()[1]->toFloat();
+    int numElements = list->numElements();
+    for (int i=0; i < numElements; i++) {
+        float x = list->getIndex(i)->getIndex(0)->toFloat();
+        float y = list->getIndex(i)->getIndex(1)->toFloat();
         glVertex3f(x,y,0);
     }
     
@@ -74,16 +79,17 @@ void gl_line_strip(EvalContext* cxt, Term* caller)
 
 void gl_line_loop(EvalContext* cxt, Term* caller)
 {
-    Branch& list = caller->input(0)->asBranch();
+    Term* list = caller->input(0);
     Term* color = caller->input(1);
 
     _unpack_gl_color(color);
 
     glBegin(GL_LINE_LOOP);
 
-    for (int i=0; i < list.length(); i++) {
-        float x = list[i]->asBranch()[0]->toFloat();
-        float y = list[i]->asBranch()[1]->toFloat();
+    int numElements = list->numElements();
+    for (int i=0; i < numElements; i++) {
+        float x = list->getIndex(i)->getIndex(0)->toFloat();
+        float y = list->getIndex(i)->getIndex(1)->toFloat();
         glVertex3f(x,y,0);
     }
     
@@ -94,16 +100,17 @@ void gl_line_loop(EvalContext* cxt, Term* caller)
 
 void gl_lines(EvalContext* cxt, Term* caller)
 {
-    Branch& list = caller->input(0)->asBranch();
+    Term* list = caller->input(0);
     Term* color = caller->input(1);
 
     _unpack_gl_color(color);
 
     glBegin(GL_LINES);
 
-    for (int i=0; i < list.length(); i++) {
-        float x = list[i]->asBranch()[0]->toFloat();
-        float y = list[i]->asBranch()[1]->toFloat();
+    int numElements = list->numElements();
+    for (int i=0; i < numElements; i++) {
+        float x = list->getIndex(i)->getIndex(0)->toFloat();
+        float y = list->getIndex(i)->getIndex(1)->toFloat();
         glVertex3f(x,y,0);
     }
     
@@ -114,16 +121,17 @@ void gl_lines(EvalContext* cxt, Term* caller)
 
 void gl_points(EvalContext* cxt, Term* caller)
 {
-    Branch& list = caller->input(0)->asBranch();
+    Term* list = caller->input(0);
     Term* color = caller->input(1);
 
     _unpack_gl_color(color);
 
     glBegin(GL_POINTS);
 
-    for (int i=0; i < list.length(); i++) {
-        float x = list[i]->asBranch()[0]->toFloat();
-        float y = list[i]->asBranch()[1]->toFloat();
+    int numElements = list->numElements();
+    for (int i=0; i < numElements; i++) {
+        float x = list->getIndex(i)->getIndex(0)->toFloat();
+        float y = list->getIndex(i)->getIndex(1)->toFloat();
         glVertex3f(x + 0.5f, y + 0.5f, 0);
     }
     

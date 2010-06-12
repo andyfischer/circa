@@ -382,6 +382,14 @@ void tv_set_index(TaggedValue* value, int index, TaggedValue* element)
     copy(element, &s->items[index]);
 }
 
+TaggedValue* tv_get_field(TaggedValue* value, const char* fieldName)
+{
+    int index = value->value_type->findFieldIndex(fieldName);
+    if (index < 0)
+        return NULL;
+    return tv_get_index(value, index);
+}
+
 int tv_num_elements(TaggedValue* value)
 {
     assert(is_list(value));
@@ -509,6 +517,7 @@ void setup_type(Type* type)
     type->cast = tv_cast;
     type->getIndex = tv_get_index;
     type->setIndex = tv_set_index;
+    type->getField = tv_get_field;
     type->numElements = tv_num_elements;
     type->mutate = tv_mutate;
     type->staticTypeQuery = tv_static_type_query;

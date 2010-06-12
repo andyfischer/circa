@@ -30,7 +30,10 @@ struct TaggedValue
     std::string toString();
     inline TaggedValue* operator[](int index) { return getIndex(index); }
     TaggedValue* getIndex(int index);
+    TaggedValue* getField(const char* fieldName);
+    TaggedValue* getField(std::string const& fieldName);
     int numElements();
+    bool equals(TaggedValue* rhs);
 
     // Convenience accessors
     int asInt();
