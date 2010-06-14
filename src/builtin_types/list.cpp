@@ -6,257 +6,20 @@
 #include "builtin_types.h"
 #include "debug_valid_objects.h"
 #include "tagged_value.h"
+#include "tagged_value_vector.h"
 #include "testing.h"
 
 #include "type.h"
 
 #include "list.h"
 
+using namespace circa::tagged_value_vector;
+
 namespace circa {
 namespace list_t {
 
 bool is_list(TaggedValue* value);
 void tv_mutate(TaggedValue* value);
-
-///////// Internal data structure /////////
-struct ListData {
-    int refCount;
-    int count;
-    int capacity;
-    TaggedValue items[0];
-};
-
-///////// Internally used functions /////////
-
-// Increment refcount on this list
-static void incref(ListData* data);
-
-// Decrement refcount. This might cause this list to be deleted, don't
-// use this data after you have given up your reference.
-static void decref(ListData* data);
-
-// Create a new list, starts off with 1 ref.
-static ListData* create_list(int capacity);
-
-// Creates a new list that is a duplicate of source. Starts off with 1 ref.
-// Does not decref source.
-static ListData* duplicate(ListData* source);
-
-// Returns a new list with the given capacity. Decrefs original.
-static ListData* increase_capacity(ListData* original, int new_capacity);
-
-// Returns a new list that has 2x the capacity of 'original', and decrefs 'original'.
-static ListData* grow_capacity(ListData* original);
-
-// Modify a list so that it has the given number of elements, returns the new
-// list data.
-static ListData* resize(ListData* original, int numElements);
-
-// Reset this list to have 0 elements.
-static void clear(ListData** data);
-
-// Return a version of this list which is safe to modify. If this data has
-// multiple references, we'll return a new copy (and decref the original).
-static ListData* mutate(ListData* data);
-
-// Add a new blank element to the end of the list, resizing if necessary.
-// Returns the new element.
-static TaggedValue* append(ListData** data);
-
-// Remove the element at index and replace the empty spot with the last
-// element in the list.
-static void remove_and_replace_with_back(ListData** data, int index);
-
-void assert_valid_list(ListData* list)
-{
-    if (list == NULL) return;
-    assert(list->refCount > 0);
-    debug_assert_valid_object(list, LIST_OBJECT);
-}
-
-static void incref(ListData* data)
-{
-    assert_valid_list(data);
-    data->refCount++;
-}
-
-static void decref(ListData* data)
-{
-    assert_valid_list(data);
-    assert(data->refCount > 0);
-    data->refCount--;
-
-    if (data->refCount == 0) {
-        // Release all elements
-        for (int i=0; i < data->count; i++)
-            make_null(&data->items[i]);
-        free(data);
-        debug_unregister_valid_object(data);
-    }
-}
-
-static ListData* create_list(int capacity)
-{
-    ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(TaggedValue));
-    debug_register_valid_object(result, LIST_OBJECT);
-
-    result->refCount = 1;
-    result->count = 0;
-    result->capacity = capacity;
-    for (int i=0; i < capacity; i++)
-        result->items[i].init();
-    return result;
-}
-
-static ListData* duplicate(ListData* source)
-{
-    if (source == NULL || source->count == 0)
-        return NULL;
-
-    assert_valid_list(source);
-
-    ListData* result = create_list(source->capacity);
-
-    result->count = source->count;
-
-    for (int i=0; i < source->count; i++)
-        copy(&source->items[i], &result->items[i]);
-
-    return result;
-}
-
-static ListData* increase_capacity(ListData* original, int new_capacity)
-{
-    if (original == NULL)
-        return create_list(new_capacity);
-
-    assert_valid_list(original);
-    ListData* result = create_list(new_capacity);
-
-    result->count = original->count;
-    for (int i=0; i < result->count; i++)
-        copy(&original->items[i], &result->items[i]);
-
-    decref(original);
-    return result;
-}
-
-static ListData* grow_capacity(ListData* original)
-{
-    if (original == NULL)
-        return create_list(1);
-
-    ListData* result = increase_capacity(original, original->capacity * 2);
-    return result;
-}
-
-static ListData* resize(ListData* original, int numElements)
-{
-    if (original == NULL) {
-        if (numElements == 0)
-            return NULL;
-        ListData* result = create_list(numElements);
-        result->count = numElements;
-        return result;
-    }
-
-    if (numElements == 0) {
-        decref(original);
-        return NULL;
-    }
-
-    // Check for not enough capacity
-    if (numElements > original->capacity) {
-        ListData* result = increase_capacity(original, numElements);
-        result->count = numElements;
-        return result;
-    }
-
-    if (original->count == numElements)
-        return original;
-
-    // Capacity is good, will need to modify 'count' on list and possibly
-    // set some items to null. This counts as a modification.
-    ListData* result = mutate(original);
-
-    // Possibly set extra elements to null, if we are shrinking.
-    for (int i=numElements; i < result->count; i++)
-        make_null(&result->items[i]);
-    result->count = numElements;
-
-    return result;
-}
-
-static void clear(ListData** data)
-{
-    if (*data == NULL) return;
-    decref(*data);
-    *data = NULL;
-}
-
-static ListData* mutate(ListData* data)
-{
-    if (data == NULL)
-        return NULL;
-    assert(data->refCount > 0);
-    if (data->refCount == 1)
-        return data;
-
-    ListData* copy = duplicate(data);
-    decref(data);
-    return copy;
-}
-
-static TaggedValue* append(ListData** data)
-{
-    if (*data == NULL) {
-        *data = create_list(1);
-    } else {
-        *data = mutate(*data);
-        
-        if ((*data)->count == (*data)->capacity)
-            *data = grow_capacity(*data);
-    }
-
-    ListData* d = *data;
-    d->count++;
-    return &d->items[d->count - 1];
-}
-
-static void remove_and_replace_with_back(ListData** data, int index)
-{
-    *data = mutate(*data);
-    assert(index < (*data)->count);
-
-    make_null(&(*data)->items[index]);
-
-    int lastElement = (*data)->count - 1;
-    if (index < lastElement)
-        swap(&(*data)->items[index], &(*data)->items[lastElement]);
-
-    (*data)->count--;
-}
-
-static std::string to_string(ListData* value)
-{
-    if (value == NULL)
-        return "[]";
-
-    std::stringstream out;
-    out << "[";
-    for (int i=0; i < value->count; i++) {
-        if (i > 0) out << ", ";
-        out << to_string(&value->items[i]);
-    }
-    out << "]";
-    return out.str();
-}
-
-TaggedValue* append(TaggedValue* list)
-{
-    assert(is_list(list));
-    return append((ListData**) &list->value_data);
-}
 
 void resize(TaggedValue* list, int newSize)
 {
@@ -269,11 +32,17 @@ void clear(TaggedValue* list)
     assert(is_list(list));
     clear((ListData**) &list->value_data);
 }
+
+TaggedValue* append(TaggedValue* list)
+{
+    assert(is_list(list));
+    return append((ListData**) &list->value_data);
+}
+
 void tv_initialize(Type* type, TaggedValue* value)
 {
     set_pointer(value, NULL);
 
-#ifdef NEWLIST
     // If type has a prototype then initialize to that.
     Branch& prototype = type->prototype;
     if (prototype.length() > 0) {
@@ -283,7 +52,6 @@ void tv_initialize(Type* type, TaggedValue* value)
         for (int i=0; i < prototype.length(); i++)
             change_type(list->get(i), type_contents(prototype[i]->type));
     }
-#endif
 }
 
 void tv_release(TaggedValue* value)
@@ -366,20 +134,15 @@ TaggedValue* tv_get_index(TaggedValue* value, int index)
 {
     assert(is_list(value));
     ListData* s = (ListData*) get_pointer(value);
-    if (s == NULL) return NULL;
-    if (index >= s->count) return NULL;
-    return &s->items[index];
+    return get_index(s, index);
 }
 
 void tv_set_index(TaggedValue* value, int index, TaggedValue* element)
 {
     assert(is_list(value));
     ListData* s = (ListData*) get_pointer(value);
-    assert(s);
-    assert(s->count > index);
-
-    tv_mutate(value);
-    copy(element, &s->items[index]);
+    set_index(&s, index, element);
+    set_pointer(value, s);
 }
 
 TaggedValue* tv_get_field(TaggedValue* value, const char* fieldName)
@@ -394,8 +157,7 @@ int tv_num_elements(TaggedValue* value)
 {
     assert(is_list(value));
     ListData* s = (ListData*) get_pointer(value);
-    if (s == NULL) return 0;
-    return s->count;
+    return num_elements(s);
 }
 
 std::string tv_to_string(TaggedValue* value)
@@ -528,11 +290,6 @@ void setup_type(Type* type)
 void postponed_setup_type(Type*)
 {
     // TODO: create member functions: append, count
-}
-
-int get_refcount(ListData* data)
-{
-    return data->refCount;
 }
 
 } // namespace list_t
