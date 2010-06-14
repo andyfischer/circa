@@ -7,7 +7,10 @@ namespace vectorize_vv_function {
 
     Term* specializeType(Term* caller)
     {
-        return caller->input(0)->type;
+        Term* lhsType = caller->input(0)->type;
+        if (list_t::is_list_based_type(type_contents(lhsType)))
+            return lhsType;
+        return LIST_TYPE;
     }
 
     void evaluate(EvalContext* cxt, Term* caller)

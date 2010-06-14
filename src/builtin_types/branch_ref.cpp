@@ -5,16 +5,35 @@
 namespace circa {
 namespace branch_ref_t {
 
+    bool check_valid(EvalContext* cxt, Term* caller, TaggedValue* value)
+    {
+        if (!list_t::is_list(value)) {
+            error_occurred(cxt, caller, "Input is not a BranchRef");
+            return false;
+        }
+
+        TaggedValue* ref = value->getIndex(0);
+
+        if (!is_ref(ref)) {
+            error_occurred(cxt, caller, "Input is not a BranchRef (index 0 is not Ref)");
+            return false;
+        }
+        
+        Term* target = as_ref(ref);
+
+        if (!is_branch(target)) {
+            error_occurred(cxt, caller, "Input is not a BranchRef (target is not Branch)");
+            return false;
+        }
+        
+        return true;
+    }
+
     void set_from_ref(TaggedValue* value, Term* ref)
     {
-#ifdef NEWLIST
         List* list = (List*) value;
         mutate(list);
         make_ref(list->getIndex(0), ref);
-#else
-        Branch& branch = as_branch(value);
-        branch[0]->asRef() = ref;
-#endif
     }
     
     bool is_considered_config(Term* term)
@@ -34,21 +53,18 @@ namespace branch_ref_t {
 
     Branch& get_target_branch(TaggedValue* value)
     {
-#ifdef NEWLIST
         List* list = (List*) value;
         return as_branch(list->get(0)->asRef());
-#else
-        Branch& branch = as_branch(value);
-        return branch[0]->asRef()->asBranch();
-#endif
     }
 
-    void get_configs(EvalContext*, Term* caller)
+    void get_configs(EvalContext* cxt, Term* caller)
     {
-        Branch& target_branch = get_target_branch(caller->input(0));
+        TaggedValue* value = caller->input(0);
+        if (!check_valid(cxt, caller, value))
+            return;
+        Branch& target_branch = get_target_branch(value);
 
-#ifdef NEWLIST
-        // One pass through to get count
+        // One pass-through to get count
         int count = 0;
         for (int i=0; i < target_branch.length(); i++) {
             Term* t = target_branch[i];
@@ -69,31 +85,15 @@ namespace branch_ref_t {
             assert(write < count);
             make_ref(output->get(write++), t);
         }
-#else
-        Branch& output = caller->asBranch();
-
-        int write = 0;
-        for (int i=0; i < target_branch.length(); i++) {
-            Term* t = target_branch[i];
-            if (!is_considered_config(t))
-                continue;
-
-            if (write >= output.length())
-                create_ref(output, t);
-            else
-                output[write]->asRef() = t;
-
-            write++;
-        }
-
-        if (write < output.length())
-            output.shorten(write);
-#endif
     }
-    void get_configs_nested(EvalContext*, Term* caller)
+    void get_configs_nested(EvalContext* cxt, Term* caller)
     {
-        Branch& target_branch = get_target_branch(caller->input(0));
-        Branch& output = caller->asBranch();
+        TaggedValue* value = caller->input(0);
+        if (!check_valid(cxt, caller, value))
+            return;
+
+        Branch& target_branch = get_target_branch(value);
+        List* output = (List*) caller;
 
         int write = 0;
         for (BranchIterator it(target_branch); !it.finished(); it.advance()) {
@@ -113,16 +113,16 @@ namespace branch_ref_t {
             if (!is_considered_config(t))
                 continue;
 
-            if (write >= output.length())
-                create_ref(output, t);
+            if (write >= output->length())
+                make_ref(output->append(), t);
             else
-                output[write]->asRef() = t;
+                make_ref(output->get(write), t);
 
             write++;
         }
 
-        if (write < output.length())
-            output.shorten(write);
+        if (write < output->length())
+            output->resize(write);
     }
     void get_visible(EvalContext*, Term* caller)
     {
