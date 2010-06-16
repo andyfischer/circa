@@ -43,6 +43,15 @@ Branch::Branch() : owningTerm(NULL), _refCount(0)
 Branch::~Branch()
 {
     names.clear();
+
+    // Turn all our terms into orphans
+    for (int i=0; i < _terms.length(); i++) {
+        Term* term = _terms[i];
+        if (term == NULL) continue;
+        clear_all_users(term);
+        term->owningBranch = NULL;
+    }
+
     _terms.clear();
     debug_unregister_branch_pointer(this);
 }

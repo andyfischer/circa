@@ -221,5 +221,11 @@ std::string to_string(ListData* value)
     return out.str();
 }
 
+int refcount(ListData* value)
+{
+    if (value == NULL) return 0;
+    return value->refCount;
+}
+
 }
 }

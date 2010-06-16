@@ -41,7 +41,7 @@ TaggedValue* append(TaggedValue* list)
 
 void tv_initialize(Type* type, TaggedValue* value)
 {
-    set_pointer(value, NULL);
+    assert(value->value_data.ptr == NULL);
 
     // If type has a prototype then initialize to that.
     Branch& prototype = type->prototype;
@@ -73,13 +73,10 @@ void tv_copy(TaggedValue* source, TaggedValue* dest)
     assert_valid_list(s);
     assert_valid_list(d);
 
-    set_pointer(dest, duplicate(s));
-
-    if (s != NULL)
-        incref(s);
-    if (d != NULL)
-        decref(d);
+    // to prevent value sharing, change this code
     
+    if (s != NULL) incref(s);
+    if (d != NULL) decref(d);
     set_pointer(dest, s);
 }
 
@@ -322,6 +319,12 @@ TaggedValue*
 List::get(int index)
 {
     return list_t::tv_get_index((TaggedValue*) this, index);
+}
+
+void
+List::set(int index, TaggedValue* value)
+{
+    list_t::tv_set_index((TaggedValue*) this, index, value);
 }
 
 void

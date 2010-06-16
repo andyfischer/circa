@@ -24,6 +24,10 @@ void set_inputs(Term* term, RefList const& inputs);
 
 bool is_actually_using(Term* user, Term* usee);
 
+// This finds all the terms which have this term as a user, and removes it from
+// their user list. This is appropriate when you want to delete 'term'.
+bool clear_all_users(Term* term);
+
 // Create a new value term with the given type.
 Term* create_value(Branch& branch, Term* type, std::string const& name="");
 Term* create_value(Branch& branch, std::string const& typeName, std::string const& name="");

@@ -58,5 +58,7 @@ void remove_and_replace_with_back(ListData** data, int index);
 
 std::string to_string(ListData* value);
 
+int refcount(ListData* value);
+
 }
 }

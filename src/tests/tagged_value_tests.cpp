@@ -7,15 +7,9 @@ namespace tagged_value_tests {
 
 namespace toy_refcounted_pool {
     const int pool_size = 5;
-    int refcount[pool_size];
+    int refcount[pool_size] = {0,};
 
     // helper functions for pool:
-    void initialize_pool()
-    {
-        for (int i=0; i < pool_size; i++)
-            refcount[i] = 0;
-    }
-
     bool nothing_allocated()
     {
         for (int i=0; i < pool_size; i++)
@@ -186,14 +180,9 @@ namespace manual_memory_management_test {
     
     // toy memory pool:
     const int pool_size = 5;
-    bool pool_allocated[pool_size];
+    bool pool_allocated[pool_size] = {false,};
 
     // helper functions for pool:
-    void initialize_pool()
-    {
-        for (int i=0; i < pool_size; i++)
-            pool_allocated[i] = false;
-    }
 
     int pool_allocate()
     {
@@ -226,8 +215,6 @@ namespace manual_memory_management_test {
 
     void test()
     {
-        initialize_pool();
-
         TypeRef myType = Type::create();
         myType->initialize = initialize;
         myType->release = release;
@@ -272,7 +259,6 @@ void refcount_test()
 {
     TypeRef t = Type::create();
     toy_refcounted_pool::setup_type(t);
-    toy_refcounted_pool::initialize_pool();
 
     {
         TaggedValue value(t);
@@ -303,7 +289,6 @@ void list_memory_management()
     List list;
     TypeRef t = Type::create();
     toy_refcounted_pool::setup_type(t);
-    toy_refcounted_pool::initialize_pool();
 
     TaggedValue v(t);
 

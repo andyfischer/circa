@@ -120,6 +120,15 @@ bool is_actually_using(Term* user, Term* usee)
     return false;
 }
 
+bool clear_all_users(Term* term)
+{
+    for (int i=0; i < term->numInputs(); i++) {
+        Term* user = term->input(i);
+        if (user == NULL) continue;
+        user->users.remove(term);
+    }
+}
+
 Term* create_duplicate(Branch& branch, Term* original, std::string const& name, bool copyBranches)
 {
     assert(original != NULL);
