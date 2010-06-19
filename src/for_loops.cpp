@@ -237,11 +237,7 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
 #endif
 
             if (listOutputWriteHead >= listOutput->numElements())
-#ifdef NEWLIST
                 ((List*) listOutput)->append();
-#else
-                create_value(listOutputBr, iteratorResult->type);
-#endif
             TaggedValue* outputElement = listOutput->getIndex(listOutputWriteHead++);
         
             copy(iteratorResult, outputElement);
@@ -249,11 +245,7 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
     }
 
     if (listOutput != NULL && listOutput->numElements() > listOutputWriteHead)
-#ifdef NEWLIST
         ((List*)listOutput)->resize(listOutputWriteHead);
-#else
-        as_branch(listOutput).shorten(listOutputWriteHead);
-#endif
 }
 
 Term* find_enclosing_for_loop(Term* term)

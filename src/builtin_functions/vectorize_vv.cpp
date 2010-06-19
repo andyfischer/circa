@@ -17,7 +17,6 @@ namespace vectorize_vv_function {
     {
         Term* func = as_ref(function_t::get_parameters(caller->function));
 
-#ifdef NEWLIST
         Term* left = caller->input(0);
         Term* right = caller->input(1);
         List* output = (List*) caller;
@@ -47,32 +46,6 @@ namespace vectorize_vv_function {
 
             copy(evalResult, output->get(i));
         }
-#else
-        Branch& left = as_branch(caller->input(0));
-        Branch& right = as_branch(caller->input(1));
-
-        if (left.length() != right.length()) {
-            std::stringstream msg;
-            msg << "Input lists have different lengths (left has " << left.length();
-            msg << ", right has " << right.length() << ")";
-            error_occurred(cxt, caller, msg.str());
-            return;
-        }
-
-        Branch& output = as_branch(caller);
-
-        // Check if our output value has been precreated but not initialized by us.
-        if (output.length() > 0 && output[0]->function == VALUE_FUNC)
-            output.clear();
-
-        if (output.length() == 0) {
-            output.clear();
-            for (int i=0; i < left.length(); i++)
-                apply(output, func, RefList(left[i], right[i]));
-        }
-
-        evaluate_branch(cxt, output);
-#endif
     }
 
     void setup(Branch& kernel)

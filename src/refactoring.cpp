@@ -69,6 +69,9 @@ void specialize_type(Term *term, Term *type)
 
 void rename(Term* term, std::string const& name)
 {
+    if (term->name == name)
+        return;
+
     if ((term->owningBranch != NULL) &&
             (term->owningBranch->get(term->name) == term)) {
         term->owningBranch->names.remove(term->name);
