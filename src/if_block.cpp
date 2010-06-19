@@ -126,7 +126,6 @@ Branch* get_if_block_else_block(Term* ifCall)
     return (&as_branch(callContents[callContents.length()-2]));
 }
 
-#ifdef NEWLIST
 List* get_if_block_state(Term* ifCall)
 {
     Term* term = ifCall->input(0);
@@ -134,15 +133,6 @@ List* get_if_block_state(Term* ifCall)
         return NULL;
     return (List*) term;
 }
-#else
-Branch* get_if_block_state(Term* ifCall)
-{
-    Term* term = ifCall->input(0);
-    if (term == NULL)
-        return NULL;
-    return &as_branch(term);
-}
-#endif
 
 bool if_block_contains_state(Term* ifCall)
 {
@@ -160,7 +150,6 @@ bool if_block_contains_state(Term* ifCall)
 void evaluate_if_block(EvalContext* cxt, Term* caller)
 {
     Branch& contents = as_branch(caller);
-#ifdef NEWLIST
     List* state = get_if_block_state(caller);
 
     if (state != NULL) {
@@ -170,14 +159,6 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
         for (int i=actualElements; i < numElements; i++)
             make_branch(state->get(i));
     }
-#else
-    Branch* state = get_if_block_state(caller);
-
-    if (state != NULL) {
-        while (state->length() < contents.length()-1)
-            create_list(*state);
-    }
-#endif
 
     // Find the first if() call whose condition is true
     int satisfiedIndex = 0;

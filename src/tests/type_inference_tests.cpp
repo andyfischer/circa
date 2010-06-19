@@ -11,11 +11,7 @@ void test_find_common_type()
     test_assert(find_common_type(RefList(FLOAT_TYPE,FLOAT_TYPE)) == FLOAT_TYPE);
     test_assert(find_common_type(RefList(INT_TYPE,FLOAT_TYPE)) == FLOAT_TYPE);
     test_assert(find_common_type(RefList(BOOL_TYPE,STRING_TYPE)) == ANY_TYPE);
-#ifdef NEWLIST
     test_assert(find_common_type(RefList(KERNEL->get("Point"),KERNEL->get("Rect"))) == LIST_TYPE);
-#else
-    test_assert(find_common_type(RefList(KERNEL->get("Point"),KERNEL->get("Rect"))) == BRANCH_TYPE);
-#endif
 }
 
 void test_find_type_of_get_index()

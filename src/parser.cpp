@@ -556,11 +556,7 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
 
     Term* result = create_value(branch, TYPE_TYPE);
-#ifdef NEWLIST
     initialize_compound_type(result);
-#else
-    initialize_branch_based_type(result);
-#endif
 
     result->setStringProp("syntax:preLBracketWhitespace",
             possible_whitespace_or_newline(tokens));
@@ -1591,11 +1587,7 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
     text = text.substr(1, text.length()-1);
 
     Term* resultTerm = create_value(branch, COLOR_TYPE);
-#ifdef NEWLIST
     List* result = (List*) resultTerm;
-#else
-    Branch& result = as_branch(resultTerm);
-#endif
 
     float r = 0;
     float g = 0;
@@ -1624,17 +1616,10 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
             a = two_hex_digits_to_number(text[6], text[7]) / 255.0f;
     }
 
-#ifdef NEWLIST
     set_float(result->getIndex(0), r);
     set_float(result->getIndex(1), g);
     set_float(result->getIndex(2), b);
     set_float(result->getIndex(3), a);
-#else
-    set_float(result[0], r);
-    set_float(result[1], g);
-    set_float(result[2], b);
-    set_float(result[3], a);
-#endif
 
     resultTerm->setIntProp("syntax:colorFormat", (int) text.length());
 

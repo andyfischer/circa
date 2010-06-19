@@ -286,7 +286,6 @@ void migrate_subroutine_with_no_hidden_state()
 
 void test_migrate_stateful_compound_value()
 {
-#ifdef NEWLIST
     Branch source;
     Term* l_source = source.eval("state l = []");
 
@@ -307,28 +306,6 @@ void test_migrate_stateful_compound_value()
     test_assert(l_dest_list->getIndex(1)->asInt() == 2);
     test_assert(l_dest_list->getIndex(2)->asInt() == 3);
 
-#else
-    Branch source;
-    Term* l_source = source.eval("state l = []");
-
-    create_int(as_branch(l_source), 1);
-    create_int(as_branch(l_source), 2);
-    create_int(as_branch(l_source), 3);
-
-    Branch dest;
-    Term* l = dest.eval("state l = []");
-
-    test_assert(terms_match_for_migration(l_source, l));
-
-    migrate_stateful_values(source, dest);
-
-    test_assert(is_branch(l_source));
-    test_assert(is_branch(l));
-    test_assert(as_branch(l).length() == 3);
-    test_assert(as_branch(l)[0]->asInt() == 1);
-    test_assert(as_branch(l)[1]->asInt() == 2);
-    test_assert(as_branch(l)[2]->asInt() == 3);
-#endif
 }
 
 void test_reset_state()

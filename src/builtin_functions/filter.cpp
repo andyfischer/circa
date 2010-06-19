@@ -23,13 +23,9 @@ namespace filter_function {
                 count++;
 
         
-#ifdef NEWLIST
         List* output = (List*) caller;
         output->resize(count);
         mutate(output);
-#else
-        Branch& output = as_branch(caller);
-#endif
 
         int write = 0;
         for (int i=0; i < numInputs; i++) {

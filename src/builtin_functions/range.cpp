@@ -7,7 +7,6 @@ namespace range_function {
 
     void evaluate(EvalContext*, Term* caller)
     {
-#ifdef NEWLIST
         int start = int_input(caller, 0);
         int max = int_input(caller, 1);
 
@@ -22,23 +21,6 @@ namespace range_function {
             val += increment;
         }
 
-#else
-        int start = int_input(caller, 0);
-        int max = int_input(caller, 1);
-        
-        Branch& branch = as_branch(caller);
-
-        int count = abs(max-start);
-        resize_list(branch, count, INT_TYPE);
-
-        int increment = start < max ? 1 : -1;
-        
-        int val = start;
-        for (int i=0; i < count; i++) {
-            set_int(branch[i], val);
-            val += increment;
-        }
-#endif
     }
 
     void setup(Branch& kernel)

@@ -22,11 +22,7 @@ namespace bool_t {
 }
 
 namespace set_t {
-#ifdef NEWLIST
     void add(List* list, TaggedValue* value);
-#else
-    void add(Branch& branch, Term* value);
-#endif
     void setup_type(Type* type);
 }
 

@@ -100,7 +100,6 @@ namespace old_list_t {
 } // namespace old_list_t
 
 namespace set_t {
-#ifdef NEWLIST
     bool contains(List* list, TaggedValue* value)
     {
         int numElements = list->numElements();
@@ -159,65 +158,6 @@ namespace set_t {
 
         return output.str();
     }
-#else
-    bool contains(Branch& branch, Term* value)
-    {
-        for (int i=0; i < branch.length(); i++)
-            if (equals(value, branch[i]))
-                return true;
-        return false;
-    }
-
-    void add(Branch& branch, Term* value)
-    {
-        if (contains(branch, value))
-            return;
-
-        create_duplicate(branch, value);
-    }
-
-    void hosted_add(EvalContext*, Term* caller)
-    {
-        copy(caller->input(0), caller);
-        Branch& contents = as_branch(caller);
-        Term* value = caller->input(1);
-        add(contents, value);
-    }
- 
-    void contains(EvalContext*, Term* caller)
-    {
-        Branch& contents = as_branch(caller->input(0));
-        Term* target = caller->input(1);
-        set_bool(caller, contains(contents, target));
-    }
- 
-    void remove(EvalContext*, Term* caller)
-    {
-        copy(caller->input(0), caller);
-        Branch& contents = as_branch(caller);
-        Term* value = caller->input(1);
-
-        for (int index=0; index < contents.length(); index++) {
-            if (equals(value, contents[index])) {
-                contents.remove(index);
-                return;
-            }
-        }
-    }
-    std::string to_string(TaggedValue* caller)
-    {
-        Branch &set = as_branch(caller);
-        std::stringstream output;
-        output << "{";
-        for (int i=0; i < set.length(); i++) {
-            if (i > 0) output << ", ";
-            output << circa::to_string(set[i]);
-        }
-        output << "}";
-
-        return output.str();
-    }
-#endif
 
 
     void setup_type(Type* type) {
@@ -234,7 +174,6 @@ namespace set_t {
 } // namespace set_t
 
 namespace map_t {
-#ifdef NEWLIST
     int find_key_index(TaggedValue* contents, TaggedValue* key)
     {
         List* keys = (List*) contents->getIndex(0);
@@ -332,109 +271,6 @@ namespace map_t {
         out << "}";
         return out.str();
     }
-#else
-    int find_key_index(Branch& contents, Term* key)
-    {
-        Branch& keys = contents[0]->asBranch();
-
-        for (int i=0; i < keys.length(); i++)
-            if (equals(keys[i], key))
-                return i;
-        return -1;
-    }
-
-    void insert(Branch& contents, Term* key, Term* value)
-    {
-        Branch& keys = contents[0]->asBranch();
-        Branch& values = contents[1]->asBranch();
-
-        int index = find_key_index(contents, key);
-
-        if (index == -1) {
-            create_duplicate(keys, key);
-            create_duplicate(values, value);
-        } else {
-            copy(values[index], value);
-        }
-    }
-
-    void remove(Branch& contents, Term* key)
-    {
-        Branch& keys = contents[0]->asBranch();
-        Branch& values = contents[1]->asBranch();
-
-        int index = find_key_index(contents, key);
-
-        if (index != -1) {
-            keys.set(index, NULL);
-            keys.removeNulls();
-            values.set(index, NULL);
-            values.removeNulls();
-        }
-    }
-
-    Term* get(Branch& contents, Term* key)
-    {
-        Branch& values = contents[1]->asBranch();
-        int index = find_key_index(contents, key);
-
-        if (index == -1)
-            return NULL;
-        else
-            return values[index];
-    }
-
-    void contains(EvalContext*, Term* caller)
-    {
-        bool result = find_key_index(caller->input(0)->asBranch(), caller->input(1)) != -1;
-        set_bool(caller, result);
-    }
-
-    void insert(EvalContext*, Term *caller)
-    {
-        copy(caller->input(0), caller);
-        insert(caller->asBranch(), caller->input(1), caller->input(2));
-    }
-
-    void remove(EvalContext*, Term* caller)
-    {
-        copy(caller->input(0), caller);
-        remove(caller->asBranch(), caller->input(1));
-    }
-
-    void get(EvalContext* cxt, Term* caller)
-    {
-        Term* key = caller->input(1);
-        Term* value = get(caller->input(0)->asBranch(), key);
-        if (value == NULL) {
-            error_occurred(cxt, caller, "Key not found: " + to_string(key));
-            return;
-        }
-
-        copy(value, caller);
-    }
-
-    std::string to_string(TaggedValue* value)
-    {
-        std::stringstream out;
-        out << "{";
-
-        Branch& contents = as_branch(value);
-        Branch& keys = contents[0]->asBranch();
-        Branch& values = contents[1]->asBranch();
-
-        for (int i=0; i < keys.length(); i++) {
-            if (i != 0)
-                out << ", ";
-            out << keys[i]->toString();
-            out << ": ";
-            out << values[i]->toString();
-        }
-
-        out << "}";
-        return out.str();
-    }
-#endif
 
     void setup_type(Type* type)
     {
@@ -585,13 +421,8 @@ void initialize_primitive_types(Branch& kernel)
     VOID_TYPE = create_type(kernel, "void");
     set_pointer(VOID_TYPE, VOID_T);
 
-#ifdef NEWLIST
     LIST_TYPE = create_type(kernel, "List");
     set_pointer(LIST_TYPE, LIST_T);
-#else
-    Term* newListType = create_type(kernel, "NewList");
-    set_pointer(newListType, LIST_T);
-#endif
 
     // ANY_TYPE was created in bootstrap_kernel
 }
@@ -608,17 +439,10 @@ void setup_builtin_types(Branch& kernel)
     set_t::setup_type(type_contents(set_type));
 
     // LIST_TYPE was created in bootstrap_kernel
-#ifdef NEWLIST
     Term* list_append =
         import_member_function(LIST_TYPE, list_t::append, "append(List, any) -> List");
     function_set_use_input_as_output(list_append, 0, true);
     import_member_function(LIST_TYPE, list_t::count, "count(List) -> int");
-#else
-    Term* list_append =
-        import_member_function(LIST_TYPE, old_list_t::append, "append(List, any) -> List");
-    function_set_use_input_as_output(list_append, 0, true);
-    import_member_function(LIST_TYPE, old_list_t::count, "count(List) -> int");
-#endif
 
     Term* map_type = create_compound_type(kernel, "Map");
     map_t::setup_type(type_contents(map_type));

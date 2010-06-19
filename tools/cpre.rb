@@ -3,6 +3,10 @@
 require 'set'
 require 'optparse'
 
+def matches_if(line)
+    return line =~ /^ *#if (\w+) *$/ 
+end
+
 def matches_ifdef(line)
     if line =~ /^ *#ifdef (\w+) *$/ 
         $1
@@ -25,6 +29,10 @@ def matches_else(line)
     line =~ /^ *#else *$/ 
 end
 
+def openingBranch(line)
+    return (matches_ifdef(line) or matches_ifndef(line) or matches_if(line))
+end
+
 class StateBasedParser
     attr_accessor :defineOn, :defineOff
     def initialize()
@@ -37,7 +45,7 @@ class StateBasedParser
         state = @stack.last
 
         if state == :rejectUnprocessed
-            if matches_ifdef(line) or matches_ifndef(line)
+            if openingBranch(line)
                 @stack << :rejectUnprocessed
             elsif matches_endif(line)
                 @stack.pop
@@ -46,7 +54,7 @@ class StateBasedParser
         end
 
         if state == :reject
-            if matches_ifdef(line) or matches_ifndef(line)
+            if openingBranch(line)
                 @stack << :rejectUnprocessed
             elsif matches_else(line)
                 @stack.pop
@@ -60,6 +68,8 @@ class StateBasedParser
         if state == :acceptUnprocessed
             if matches_endif(line)
                 @stack.pop
+                return true
+            elsif matches_else(line)
                 return true
             end
         end
@@ -92,6 +102,11 @@ class StateBasedParser
             end
         end
 
+        if matches_if(line)
+            @stack << :acceptUnprocessed
+            return true
+        end
+
         if matches_endif(line)
             @stack.pop
             return false
@@ -104,6 +119,8 @@ class StateBasedParser
             elsif state == :reject
                 @stack.pop
                 @stack << :accept
+            elsif state == :acceptUnprocessed
+                return true
             end
             return false
         end
@@ -120,9 +137,10 @@ class StateBasedParser
         @stack = [:acceptUnprocessed]
         while not file.eof?
             line = file.readline
-            puts @stack * ", "
-            puts line
             accept = iterate(line)
+
+            #puts "[#{@stack * ", "}] #{line}"
+
             if accept
                 output << line
             end
@@ -131,26 +149,32 @@ class StateBasedParser
     end
 end
 
-parser = StateBasedParser.new
+$parser = StateBasedParser.new
 
 optparse = OptionParser.new do |opts|
     #opts.banner =  "Usage.."
     opts.on('-d', '--define FLAG', '') do |d|
-        parser.defineOn.add(d)
+        $parser.defineOn.add(d)
     end
     opts.on('-u', '--undefine FLAG', '') do |d|
-        parser.defineOff.add(d)
+        $parser.defineOff.add(d)
     end
 end
 
 optparse.parse!
 
-
-def process_file(parser, path)
-    output = parser.run(File.new(path, 'r'))
-    File.new(path, 'w').write(output * "")
+def process_file(path)
+    puts "processing file: #{path}"
+    if File.directory?(path)
+        Dir.foreach(path) do |file|
+            if file == "." or file == ".." then next end
+            file = File.join(path, file)
+            process_file(file)
+        end
+    else
+        output = $parser.run(File.new(path, 'r'))
+        File.new(path, 'w').write(output * "")
+    end
 end
 
-process_file(parser, ARGV[0])
-
-
+ARGV.each { |path| process_file(path) }

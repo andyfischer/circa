@@ -10,11 +10,7 @@ namespace message_passing_function {
     void evaluate_inbox(EvalContext*, Term* caller)
     {
         copy(caller->input(0), caller);
-#ifdef NEWLIST
         ((List*) caller->input(0))->resize(0);
-#else
-        as_branch(caller->input(0)).clear();
-#endif
     }
 
     void evaluate_send(EvalContext*, Term* caller)
@@ -24,12 +20,8 @@ namespace message_passing_function {
 
         assert(inbox->function == INBOX_FUNC);
 
-#ifdef NEWLIST
         List* inboxState = (List*) get_hidden_state_for_call(inbox);
         copy(input, inboxState->append());
-#else
-        create_duplicate(as_branch(get_hidden_state_for_call(inbox)), input);
-#endif
     }
 
     void setup(Branch& kernel)

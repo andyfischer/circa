@@ -79,9 +79,7 @@ void test_list()
 
     Term* l = branch.eval("l = List()");
 
-#ifdef NEWLIST
     test_assert(list_t::is_list(l));
-#endif
     test_assert(l->numElements() == 0);
 
     l = branch.eval("l.append(2)");

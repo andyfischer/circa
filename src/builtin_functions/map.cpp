@@ -21,7 +21,6 @@ namespace map_function {
         Term* evalInput = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
         Term* evalResult = apply(evaluationBranch, func, RefList(evalInput));
 
-#ifdef NEWLIST
         List* list = (List*) caller;
         list->resize(numInputs);
 
@@ -31,18 +30,6 @@ namespace map_function {
 
             copy(evalResult, list->get(i));
         }
-#else
-        Branch& output = as_branch(caller);
-        output.clear();
-
-        for (int i=0; i < numInputs; i++) {
-            copy(inputs->getIndex(i), evalInput);
-            evaluate_branch(evaluationBranch);
-
-            Term* outputElement = create_value(output, evalResult->type);
-            copy(evalResult, outputElement);
-        }
-#endif
 
 
 #if 0

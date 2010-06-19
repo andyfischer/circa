@@ -77,7 +77,7 @@ struct RenderedText
     Int height() { return Int(_term->getIndex(2)); }
     TaggedValue* color() { return _term->getIndex(3); }
     std::string const& text() { return as_string(_term->getIndex(4)); }
-    void set_text(const char* s) { set_str(_term->getIndex(4), s); }
+    void set_text(const char* s) { mutate(_term); make_string(_term->getIndex(4), s); }
 };
 
 void render_text(EvalContext*, Term* caller)
@@ -85,7 +85,6 @@ void render_text(EvalContext*, Term* caller)
     RenderedText state(caller->input(0));
     std::string const& text = as_string(caller->input(2));
     Term* color = caller->input(3);
-
     bool changed_color = !state.color()->equals(color);
 
     if (state.texid() == 0 || state.text() != text || changed_color) {

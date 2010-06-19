@@ -47,11 +47,7 @@ void initialize_compound_type(Term* term)
 Term* create_compound_type(Branch& branch, std::string const& name)
 {
     Term* term = create_type(branch, name);
-#ifdef NEWLIST
     initialize_compound_type(term);
-#else
-    initialize_branch_based_type(term);
-#endif
     type_contents(term)->name = name;
     return term;
 }
