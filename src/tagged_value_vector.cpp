@@ -125,7 +125,7 @@ ListData* resize(ListData* original, int numElements)
 
     // Capacity is good, will need to modify 'count' on list and possibly
     // set some items to null. This counts as a modification.
-    ListData* result = mutate(original);
+    ListData* result = touch(original);
 
     // Possibly set extra elements to null, if we are shrinking.
     for (int i=numElements; i < result->count; i++)
@@ -142,7 +142,7 @@ void clear(ListData** data)
     *data = NULL;
 }
 
-ListData* mutate(ListData* data)
+ListData* touch(ListData* data)
 {
     if (data == NULL)
         return NULL;
@@ -160,7 +160,7 @@ TaggedValue* append(ListData** data)
     if (*data == NULL) {
         *data = create_list(1);
     } else {
-        *data = mutate(*data);
+        *data = touch(*data);
         
         if ((*data)->count == (*data)->capacity)
             *data = grow_capacity(*data);
@@ -182,7 +182,7 @@ TaggedValue* get_index(ListData* data, int index)
 
 void set_index(ListData** data, int index, TaggedValue* v)
 {
-    *data = mutate(*data);
+    *data = touch(*data);
     copy(v, get_index(*data, index));
 }
 
@@ -194,7 +194,7 @@ int num_elements(ListData* data)
 
 void remove_and_replace_with_back(ListData** data, int index)
 {
-    *data = mutate(*data);
+    *data = touch(*data);
     assert(index < (*data)->count);
 
     make_null(&(*data)->items[index]);

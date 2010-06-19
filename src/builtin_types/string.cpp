@@ -54,7 +54,7 @@ StringData* duplicate(StringData* original)
 
 // Return a version of this string which is safe to modify. If this data has
 // multiple references, we'll return a new copy (and decref the original).
-StringData* mutate(StringData* original)
+StringData* touch(StringData* original)
 {
     assert(original->refCount > 0);
     if (original->refCount == 1)

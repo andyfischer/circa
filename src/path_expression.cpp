@@ -74,7 +74,7 @@ void assign_using_path(TaggedValue* head, PathExpression const& path, TaggedValu
         PathExpression::Element const& element = path._elements[i];
 
         TaggedValue* next = step_path(head, element);
-        mutate(next);
+        touch(next);
         assert(head != newValue);
 
         if (i == (numElements-1)) {

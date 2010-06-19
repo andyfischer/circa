@@ -25,7 +25,7 @@ namespace filter_function {
         
         List* output = (List*) caller;
         output->resize(count);
-        mutate(output);
+        touch(output);
 
         int write = 0;
         for (int i=0; i < numInputs; i++) {

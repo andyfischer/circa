@@ -58,7 +58,7 @@ void set_index(TaggedValue* value, int index, TaggedValue* element);
 TaggedValue* get_field(TaggedValue* value, const char* field);
 void set_field(TaggedValue* value, const char* field, TaggedValue* element);
 int num_elements(TaggedValue* value);
-void mutate(TaggedValue* value);
+void touch(TaggedValue* value);
 
 void change_type(TaggedValue* v, Type* type);
 bool equals(TaggedValue* lhs, TaggedValue* rhs);

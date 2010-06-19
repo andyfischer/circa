@@ -275,11 +275,11 @@ int num_elements(TaggedValue* value)
     return numElements(value);
 }
 
-void mutate(TaggedValue* value)
+void touch(TaggedValue* value)
 {
-    Type::Mutate mutate = value->value_type->mutate;
-    if (mutate != NULL)
-        mutate(value);
+    Type::Mutate touch = value->value_type->touch;
+    if (touch != NULL)
+        touch(value);
 
     // Default behavior: no-op.
 }

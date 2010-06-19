@@ -77,7 +77,7 @@ struct RenderedText
     Int height() { return Int(_term->getIndex(2)); }
     TaggedValue* color() { return _term->getIndex(3); }
     std::string const& text() { return as_string(_term->getIndex(4)); }
-    void set_text(const char* s) { mutate(_term); make_string(_term->getIndex(4), s); }
+    void set_text(const char* s) { touch(_term); make_string(_term->getIndex(4), s); }
 };
 
 void render_text(EvalContext*, Term* caller)

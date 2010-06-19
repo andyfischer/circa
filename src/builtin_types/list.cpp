@@ -19,7 +19,7 @@ namespace circa {
 namespace list_t {
 
 bool is_list(TaggedValue* value);
-void tv_mutate(TaggedValue* value);
+void tv_touch(TaggedValue* value);
 
 void resize(TaggedValue* list, int newSize)
 {
@@ -163,11 +163,11 @@ std::string tv_to_string(TaggedValue* value)
     return to_string((ListData*) get_pointer(value));
 }
 
-void tv_mutate(TaggedValue* value)
+void tv_touch(TaggedValue* value)
 {
     assert(is_list(value));
     ListData* data = (ListData*) get_pointer(value);
-    set_pointer(value, mutate(data));
+    set_pointer(value, touch(data));
 }
 
 void tv_static_type_query(Type* type, StaticTypeQuery* result)
@@ -278,7 +278,7 @@ void setup_type(Type* type)
     type->setIndex = tv_set_index;
     type->getField = tv_get_field;
     type->numElements = tv_num_elements;
-    type->mutate = tv_mutate;
+    type->touch = tv_touch;
     type->staticTypeQuery = tv_static_type_query;
     type->isSubtype = tv_is_subtype;
     type->valueFitsType = tv_value_fits_type;
@@ -394,7 +394,7 @@ namespace list_t_tests {
         test_equals(to_string(&value2), "[1, 2, 3, 4]");
     }
 
-    void test_mutate()
+    void test_touch()
     {
         TypeRef list = Type::create();
         list_t::setup_type(list);
@@ -408,7 +408,7 @@ namespace list_t_tests {
         copy(&value, &value2);
 
         test_assert(get_pointer(&value) == get_pointer(&value2));
-        mutate(&value2);
+        touch(&value2);
         test_assert(get_pointer(&value) != get_pointer(&value2));
     }
 
@@ -417,7 +417,7 @@ namespace list_t_tests {
         REGISTER_TEST_CASE(list_t_tests::test_simple);
         REGISTER_TEST_CASE(list_t_tests::test_tagged_value);
         REGISTER_TEST_CASE(list_t_tests::test_tagged_value_copy);
-        REGISTER_TEST_CASE(list_t_tests::test_mutate);
+        REGISTER_TEST_CASE(list_t_tests::test_touch);
     }
 
 } // namespace list_t_tests

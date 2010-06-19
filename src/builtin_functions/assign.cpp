@@ -14,7 +14,7 @@ namespace assign_function {
         TaggedValue* value = caller->input(1);
 
         copy(root, caller);
-        mutate(caller);
+        touch(caller);
         assign_using_path(caller, path, value);
     }
 

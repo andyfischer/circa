@@ -195,7 +195,7 @@ namespace map_t {
             copy(key, keys->append());
             copy(value, values->append());
         } else {
-            mutate(values);
+            touch(values);
             copy(value, values->get(index));
         }
     }
@@ -232,14 +232,14 @@ namespace map_t {
     void insert(EvalContext*, Term *caller)
     {
         copy(caller->input(0), caller);
-        mutate(caller);
+        touch(caller);
         insert(caller, caller->input(1), caller->input(2));
     }
 
     void remove(EvalContext*, Term* caller)
     {
         copy(caller->input(0), caller);
-        mutate(caller);
+        touch(caller);
         remove(caller, caller->input(1));
     }
     void get(EvalContext* cxt, Term* caller)
@@ -395,7 +395,7 @@ namespace point_t {
     }
     void write(TaggedValue* value, float x, float y)
     {
-        mutate(value);
+        touch(value);
         set_float(value->getIndex(0), x);
         set_float(value->getIndex(1), y);
     }

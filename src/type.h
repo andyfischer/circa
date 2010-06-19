@@ -79,7 +79,7 @@ struct Type
     ValueFitsType valueFitsType;
     TypeMatches isSubtype;
     StaticTypeQueryFunc staticTypeQuery;
-    Mutate mutate;
+    Mutate touch;
     GetIndex getIndex;
     SetIndex setIndex;
     GetField getField;
@@ -123,7 +123,7 @@ private:
         valueFitsType(NULL),
         isSubtype(NULL),
         staticTypeQuery(NULL),
-        mutate(NULL),
+        touch(NULL),
         getIndex(NULL),
         setIndex(NULL),
         getField(NULL),

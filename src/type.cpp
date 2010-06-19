@@ -231,7 +231,7 @@ void reset_type(Type* type)
     type->valueFitsType = NULL;
     type->isSubtype = NULL;
     type->staticTypeQuery = NULL;
-    type->mutate = NULL;
+    type->touch = NULL;
     type->getIndex = NULL;
     type->setIndex = NULL;
     type->getField = NULL;

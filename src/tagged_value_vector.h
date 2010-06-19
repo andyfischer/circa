@@ -40,7 +40,7 @@ void clear(ListData** data);
 
 // Return a version of this list which is safe to modify. If this data has
 // multiple references, we'll return a new copy (and decref the original).
-ListData* mutate(ListData* data);
+ListData* touch(ListData* data);
 
 // Add a new blank element to the end of the list, resizing if necessary.
 // Returns the new element.

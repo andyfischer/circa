@@ -32,7 +32,7 @@ namespace branch_ref_t {
     void set_from_ref(TaggedValue* value, Term* ref)
     {
         List* list = (List*) value;
-        mutate(list);
+        touch(list);
         make_ref(list->getIndex(0), ref);
     }
     
