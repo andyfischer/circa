@@ -184,10 +184,12 @@ std::string Term::stringPropOptional(std::string const& name, std::string const&
     else return defaultValue;
 }
 
-
-Term* Term::field(int index)
+Term* alloc_term()
 {
-    return as_branch(this)[index];
+    // This function is not very useful now, but we may switch to using a memory
+    // pool in the future.
+    Term* term = new Term();
+    return term;
 }
 
 void assert_term_invariants(Term* t)

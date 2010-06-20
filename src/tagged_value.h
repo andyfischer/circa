@@ -6,16 +6,17 @@
 
 namespace circa {
 
-union TaggedValueData {
-    int asint;
-    float asfloat;
-    bool asbool;
-    void* ptr;
-};
 
 struct TaggedValue
 {
-    TaggedValueData value_data;
+    union Data {
+        int asint;
+        float asfloat;
+        bool asbool;
+        void* ptr;
+    };
+
+    Data value_data;
     Type* value_type;
 
     TaggedValue();
@@ -25,7 +26,6 @@ struct TaggedValue
     TaggedValue& operator=(TaggedValue const& rhs);
 
     void init();
-
     void reset();
     std::string toString();
     inline TaggedValue* operator[](int index) { return getIndex(index); }
@@ -35,7 +35,7 @@ struct TaggedValue
     int numElements();
     bool equals(TaggedValue* rhs);
 
-    // Convenience accessors
+    // Convenient accessors
     int asInt();
     float asFloat();
     float toFloat();

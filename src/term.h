@@ -12,14 +12,10 @@
 
 namespace circa {
 
-//const int TERM_FLAG_ERRORED = 0x1;
-
-struct List;
-
 struct Term : TaggedValue
 {
     // Inherited from TaggedValue:
-    //   TaggedValueData value_data
+    //   TaggedValue::Data value_data
     //   Type* value_type
 
     // A Type term that describes our data type
@@ -49,13 +45,13 @@ struct Term : TaggedValue
     // Dynamic properties
     Branch properties;
 
-    // Reference count
+    // Reference count.
     int refCount;
 
     // Terms which are using this term as an input.
     RefList users;
 
-    // Location in source code
+    // Location in textual source code.
     TermSourceLocation sourceLoc;
 
     Term();
@@ -89,9 +85,10 @@ struct Term : TaggedValue
     float floatPropOptional(std::string const& name, float defaultValue);
     bool boolPropOptional(std::string const& name, bool defaultValue);
     std::string stringPropOptional(std::string const& name, std::string const& defaultValue);
-
-    Term* field(int index);
 };
+
+// Allocate a new Term object.
+Term* alloc_term();
 
 void assert_term_invariants(Term* t);
 

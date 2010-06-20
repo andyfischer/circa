@@ -179,7 +179,7 @@ void copy(TaggedValue* source, TaggedValue* dest)
 void swap(TaggedValue* left, TaggedValue* right)
 {
     Type* temp_type = left->value_type;
-    TaggedValueData temp_data = left->value_data;
+    TaggedValue::Data temp_data = left->value_data;
     left->value_type = right->value_type;
     left->value_data = right->value_data;
     right->value_type = temp_type;

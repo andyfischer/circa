@@ -43,7 +43,6 @@
 #include "tagged_value.h"
 #include "term.h"
 #include "term_source_location.h"
-#include "term_pool.h"
 #include "testing.h"
 #include "timer.h"
 #include "token.h"
