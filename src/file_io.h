@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_FILE_IO_INCLUDED
-#define CIRCA_FILE_IO_INCLUDED
+#pragma once
 
 // Miscellaneous functions for reading to disk.
 
@@ -55,5 +54,3 @@ struct FakeFileSystem : FileIORedirector
 };
 
 } // namespace circa
-
-#endif

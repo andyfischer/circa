@@ -2,8 +2,7 @@
 
 // parser_util.cpp : Various utility functions used by the parser
 
-#ifndef CIRCA_PARSER_UTIL_INCLUDED
-#define CIRCA_PARSER_UTIL_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 #include "token_stream.h"
@@ -64,5 +63,3 @@ std::string possible_statement_ending(TokenStream& tokens);
 int get_number_of_decimal_figures(std::string const& str);
 
 } // namespace circa
-
-#endif

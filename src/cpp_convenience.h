@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_CPP_CONVENIENCE_INCLUDED
-#define CIRCA_CPP_CONVENIENCE_INCLUDED
+#pragma once
 
 #include "builtins.h"
 #include "cpp_importing.h"
@@ -56,5 +55,3 @@ T eval(Branch &branch, std::string const& statement)
 }
 
 } // namespace circa
-
-#endif

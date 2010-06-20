@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_TRAINING_INCLUDED
-#define CIRCA_TRAINING_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -48,5 +47,3 @@ float get_feedback_weight(Term* term);
 void set_feedback_weight(Term* term, float weight);
 
 } // namespace circa
-
-#endif

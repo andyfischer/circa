@@ -6,14 +6,14 @@
 #include "builtin_types.h"
 #include "debug_valid_objects.h"
 #include "tagged_value.h"
-#include "tagged_value_vector.h"
+#include "tvvector.h"
 #include "testing.h"
 
 #include "type.h"
 
 #include "list.h"
 
-using namespace circa::tagged_value_vector;
+using namespace circa::tvvector;
 
 namespace circa {
 namespace list_t {
@@ -58,7 +58,6 @@ void tv_release(TaggedValue* value)
 {
     assert(is_list(value));
     ListData* data = (ListData*) get_pointer(value);
-    assert_valid_list(data);
     if (data == NULL) return;
     decref(data);
 }
@@ -69,9 +68,6 @@ void tv_copy(TaggedValue* source, TaggedValue* dest)
     assert(is_list(dest));
     ListData* s = (ListData*) get_pointer(source);
     ListData* d = (ListData*) get_pointer(dest);
-
-    assert_valid_list(s);
-    assert_valid_list(d);
 
     // to prevent value sharing, change this code
     

@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_REF_LIST_INCLUDED
-#define CIRCA_REF_LIST_INCLUDED
+#pragma once
 
 // RefList
 //
@@ -134,5 +133,3 @@ struct RefList
 void sort_by_name(RefList& list);
 
 } // namespace circa
-
-#endif

@@ -1,7 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include <circa.h>
-#include "tagged_value_vector.h"
+#include "tvvector.h"
 
 namespace circa {
 namespace list_tests {
@@ -33,13 +33,13 @@ namespace memory_management_for_each_operation
         make_list(&value);
         make_int(((List*) &value)->append(), 0);
 
-        tagged_value_vector::ListData* origData = (tagged_value_vector::ListData*)
+        tvvector::ListData* origData = (tvvector::ListData*)
             get_pointer(&value);
-        test_assert(tagged_value_vector::refcount(origData) == 1);
+        test_assert(tvvector::refcount(origData) == 1);
 
         // Keep a ref on origData, so that it's not deleted
-        tagged_value_vector::incref(origData);
-        test_assert(tagged_value_vector::refcount(origData) == 2);
+        tvvector::incref(origData);
+        test_assert(tvvector::refcount(origData) == 2);
 
         operation((List*) &value);
 
@@ -47,13 +47,13 @@ namespace memory_management_for_each_operation
         // If value has new data, then the original data should be down
         // to 1 refcount.
 
-        tagged_value_vector::ListData* newData = (tagged_value_vector::ListData*)
+        tvvector::ListData* newData = (tvvector::ListData*)
             get_pointer(&value);
         if (origData == newData) {
-            test_assert(tagged_value_vector::refcount(origData) == 2);
+            test_assert(tvvector::refcount(origData) == 2);
         } else {
-            test_assert(tagged_value_vector::refcount(origData) == 1);
-            test_assert(tagged_value_vector::refcount(newData) == 1);
+            test_assert(tvvector::refcount(origData) == 1);
+            test_assert(tvvector::refcount(newData) == 1);
         }
     }
 

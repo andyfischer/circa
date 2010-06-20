@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_TOKEN_STREAM_INCLUDED
-#define CIRCA_TOKEN_STREAM_INCLUDED
+#pragma once
 
 #include <set>
 
@@ -72,5 +71,3 @@ struct TokenStream
 void print_remaining_tokens(std::ostream& stream, TokenStream& tokens);
 
 } // namespace circa
-
-#endif

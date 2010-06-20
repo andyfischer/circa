@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA__METRICS__INCLUDED
-#define CIRCA__METRICS__INCLUDED
+#pragma once
 
 namespace circa {
 
@@ -11,5 +10,3 @@ extern int METRIC_TERMS_CREATED;
 extern int METRIC_TERMS_DESTROYED;
 
 } // namespace circa
-
-#endif

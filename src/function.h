@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_FUNCTION_INCLUDED
-#define CIRCA_FUNCTION_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -104,5 +103,3 @@ void function_set_use_input_as_output(Term* function, int index, bool value);
 bool is_native_function(Term* function);
 
 } // namespace circa
-
-#endif

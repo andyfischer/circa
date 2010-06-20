@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_TOKEN_INCLUDED
-#define CIRCA_TOKEN_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -108,8 +107,5 @@ const int UNRECOGNIZED = 90;
 const char* get_token_text(int match);
 void tokenize(std::string const &input, TokenList &results);
 
-
 } // namespace token
 } // namespace circa
-
-#endif

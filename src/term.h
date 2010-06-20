@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_TERM_INCLUDED
-#define CIRCA_TERM_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -97,5 +96,3 @@ struct Term : TaggedValue
 void assert_term_invariants(Term* t);
 
 } // namespace circa
-
-#endif

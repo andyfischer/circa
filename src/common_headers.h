@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_COMMON_HEADERS_INCLUDED
-#define CIRCA_COMMON_HEADERS_INCLUDED
+#pragma once
 
 #ifdef WINDOWS
 
@@ -59,5 +58,3 @@ typedef bool (*CheckInvariants)(Term* term, std::string* output);
 #define NEWLIST 1
 
 } // namespace circa
-
-#endif

@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_HOSTED_TYPES_INCLUDED
-#define CIRCA_HOSTED_TYPES_INCLUDED
+#pragma once
 
 #include "circa.h"
 
@@ -27,5 +26,3 @@ struct StringList {
 };
 
 }
-
-#endif

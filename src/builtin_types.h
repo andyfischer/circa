@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_BUILTIN_TYPES_INCLUDED
-#define CIRCA_BUILTIN_TYPES_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 #include "tagged_value.h"
@@ -76,5 +75,3 @@ void parse_builtin_types(Branch& kernel);
 void post_setup_builtin_types();
 
 }
-
-#endif

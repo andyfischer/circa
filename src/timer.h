@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_TIMER_INCLUDED
-#define CIRCA_TIMER_INCLUDED
+#pragma once
 
 #include <ctime>
 #include <iostream>
@@ -38,5 +37,3 @@ public:
 std::ostream &operator<<(std::ostream &stream, Timer timer);
 
 } // namespace circa
-
-#endif

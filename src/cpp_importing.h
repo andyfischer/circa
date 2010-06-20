@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_CPP_INTERFACE_INCLUDED
-#define CIRCA_CPP_INTERFACE_INCLUDED
+#pragma once
 
 #include "importing.h"
 #include "term.h"
@@ -87,5 +86,3 @@ Term* import_pointer_type(Branch& branch, std::string name="")
 }
 
 } // namespace circa
-
-#endif

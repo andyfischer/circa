@@ -2,8 +2,7 @@
 
 // testing.cpp : A mini-framework for running unit tests.
 
-#ifndef CIRCA_TESTING_INCLUDED
-#define CIRCA_TESTING_INCLUDED
+#pragma once
 
 #include "ref_list.h"
 #include "term.h"
@@ -56,5 +55,3 @@ void declare_current_test_failed();
 bool current_test_has_failed();
 
 } // namespace circa
-
-#endif

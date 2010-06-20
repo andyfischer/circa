@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_EXTERNAL_API_INCLUDED
-#define CIRCA_EXTERNAL_API_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -13,5 +12,3 @@ bool bool_input(Term* term, int index);
 const char* string_input(Term* term, int index);
 
 } // namespace circa
-
-#endif

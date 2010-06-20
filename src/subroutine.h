@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_SUBROUTINE_INCLUDED
-#define CIRCA_SUBROUTINE_INCLUDED
+#pragma once
 
 namespace circa {
 
@@ -21,5 +20,3 @@ bool is_subroutine_state_expanded(Term* term);
 void expand_subroutines_hidden_state(Term* call, Term* state);
 
 } // namespace circa
-
-#endif // CIRCA_SUBROUTINE_INCLUDED

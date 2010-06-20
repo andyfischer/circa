@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_BRANCH_INCLUDED
-#define CIRCA_BRANCH_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -130,5 +129,3 @@ std::string get_source_file_location(Branch& branch);
 bool branch_check_invariants(Branch& branch, std::ostream* output=NULL);
 
 } // namespace circa
-
-#endif

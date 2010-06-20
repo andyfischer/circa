@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_ERRORS_INCLUDED
-#define CIRCA_ERRORS_INCLUDED
+#pragma once
 
 namespace circa {
 
@@ -46,5 +45,3 @@ StaticError get_static_error(Term* term);
 int count_static_errors(Branch& branch);
 
 } // namespace circa
-
-#endif

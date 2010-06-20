@@ -37,10 +37,8 @@ std::string read_text_file(std::string const& filename)
 
 void write_text_file(std::string const& filename, std::string const& contents)
 {
-    if (FAKE_FILE_IO != NULL) {
-        FAKE_FILE_IO->write_text_file(filename, contents);
-        return;
-    }
+    if (FAKE_FILE_IO != NULL)
+        return FAKE_FILE_IO->write_text_file(filename, contents);
 
     std::ofstream file;
     file.open(filename.c_str(), std::ios::out | std::ios::binary);
@@ -57,7 +55,6 @@ time_t get_modified_time(std::string const& filename)
         return FAKE_FILE_IO->get_modified_time(filename);
 
     struct stat s;
-
     s.st_mtime = 0;
 
     stat(filename.c_str(), &s);

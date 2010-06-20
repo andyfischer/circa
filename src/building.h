@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_BUILDING_INCLUDED
-#define CIRCA_BUILDING_INCLUDED
+#pragma once
 
 namespace circa {
 
@@ -26,7 +25,7 @@ bool is_actually_using(Term* user, Term* usee);
 
 // This finds all the terms which have this term as a user, and removes it from
 // their user list. This is appropriate when you want to delete 'term'.
-bool clear_all_users(Term* term);
+void clear_all_users(Term* term);
 
 // Create a new value term with the given type.
 Term* create_value(Branch& branch, Term* type, std::string const& name="");
@@ -63,8 +62,4 @@ void resize_list(Branch& list, int numElements, Term* type);
 void set_step(Term* term, float step);
 float get_step(Term* term);
 
-
-
 } // namespace circa
-
-#endif

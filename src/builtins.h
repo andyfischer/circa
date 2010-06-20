@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_BUILTINS_INCLUDED
-#define CIRCA_BUILTINS_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -119,5 +118,3 @@ namespace overloaded_function {
 }
 
 } // namespace circa
-
-#endif

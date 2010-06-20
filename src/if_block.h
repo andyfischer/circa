@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA__IF_BLOCK__INCLUDED
-#define CIRCA__IF_BLOCK__INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -16,5 +15,3 @@ bool if_block_contains_state(Term* ifCall);
 void evaluate_if_block(EvalContext*, Term* caller);
 
 } // namespace circa
-
-#endif

@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_REFERENCES_INCLUDED
-#define CIRCA_REFERENCES_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -35,5 +34,3 @@ void remap_pointers(Term* term, Term* original, Term* replacement);
 void remap_pointers(Branch& branch, Term* original, Term* replacement);
 
 } // namespace circa
-
-#endif // CIRCA_REFERENCE_INCLUDED

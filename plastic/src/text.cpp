@@ -66,36 +66,42 @@ void load_font(EvalContext* cxt, Term* term)
     output = result;
 }
 
-struct RenderedText
+struct RenderedText : TaggedValue
 {
-    Term* _term;
-
-    RenderedText(Term* term) : _term(term) {}
-
-    Int texid() { return Int(_term->getIndex(0)); }
-    Int width() { return Int(_term->getIndex(1)); }
-    Int height() { return Int(_term->getIndex(2)); }
-    TaggedValue* color() { return _term->getIndex(3); }
-    std::string const& text() { return as_string(_term->getIndex(4)); }
-    void set_text(const char* s) { touch(_term); make_string(_term->getIndex(4), s); }
+    int texid() { return getIndex(0)->asInt(); }
+    int width() { return getIndex(1)->asInt(); }
+    int height() { return getIndex(2)->asInt(); }
+    TaggedValue* texidContainer() { return getIndex(0); }
+    TaggedValue* widthContainer() { return getIndex(1); }
+    TaggedValue* heightContainer() { return getIndex(2); }
+    TaggedValue* color() { return getIndex(3); }
+    std::string const& text() { return getIndex(4)->asString(); }
+    TaggedValue* textContainer() { return getIndex(4); }
 };
 
 void render_text(EvalContext*, Term* caller)
 {
-    RenderedText state(caller->input(0));
-    std::string const& text = as_string(caller->input(2));
-    Term* color = caller->input(3);
-    bool changed_color = !state.color()->equals(color);
+    RenderedText* state = (RenderedText*) caller->input(0);
+    touch(state);
 
-    if (state.texid() == 0 || state.text() != text || changed_color) {
+    std::string const& inputText = as_string(caller->input(2));
+    Term* inputColor = caller->input(3);
+    bool changed_color = !state->color()->equals(inputColor);
 
-        state.set_text(text.c_str());
+    std::cout << "texid = " << state->texid() << std::endl;
+    std::cout << "inputText = " << inputText << std::endl;
+    std::cout << "state->text = " << state->text() << std::endl;
+
+    if (state->texid() == 0 || state->text() != inputText || changed_color) {
+
+        copy(caller->input(2), state->textContainer());
 
         // Clear results if text is empty
-        if (text == "") {
-            state.texid() = 0;
-            state.width() = 0;
-            state.height() = 0;
+        if (inputText == "") {
+            std::cout << "text is empty" << std::endl;
+            set_int(state->texidContainer(), 0);
+            set_int(state->widthContainer(), 0);
+            set_int(state->heightContainer(), 0);
             copy(caller->input(0), caller);
             return;
         }
@@ -106,31 +112,31 @@ void render_text(EvalContext*, Term* caller)
         TTF_Font_ptr font = caller->input(1);
 
         SDL_Color sdlColor = unpack_sdl_color(caller->input(3));
-        SDL_Surface *surface = TTF_RenderText_Blended(*font, text.c_str(), sdlColor);
+        SDL_Surface *surface = TTF_RenderText_Blended(*font, inputText.c_str(), sdlColor);
 
-        state.texid() = load_surface_to_texture(surface);
-        state.width() = surface->w;
-        state.height() = surface->h;
-        copy(color, state.color());
+        set_int(state->texidContainer(), load_surface_to_texture(surface));
+        set_int(state->widthContainer(), surface->w);
+        set_int(state->heightContainer(), surface->h);
+        copy(inputColor, state->color());
 
         //SDL_SaveBMP(surface, "hello.bmp");
 
         SDL_FreeSurface(surface);
     }
-    copy(caller->input(0), caller);
+    copy(state, caller);
 }
 
 void draw_rendered_text(EvalContext* cxt, Term* caller)
 {
-    RenderedText output(caller->input(0));
+    RenderedText* obj = (RenderedText*) caller->input(0);
 
-    if (output.texid() == 0)
+    if (obj->texid() == 0)
         return;
 
     int x = int(caller->input(1)->getIndex(0)->toFloat());
     int y = int(caller->input(1)->getIndex(1)->toFloat());
 
-    glBindTexture(GL_TEXTURE_2D, output.texid());
+    glBindTexture(GL_TEXTURE_2D, obj->texid());
     glColor4f(1,1,1,1);
 
     glEnable(GL_BLEND);
@@ -141,11 +147,11 @@ void draw_rendered_text(EvalContext* cxt, Term* caller)
     glTexCoord2d(0.0, 0.0);
     glVertex3i(x, y, 0);
     glTexCoord2d(1.0, 0.0);
-    glVertex3i(x + output.width(), y,0);
+    glVertex3i(x + obj->width(), y,0);
     glTexCoord2d(1.0, 1.0);
-    glVertex3i(x + output.width(), y + output.height(),0);
+    glVertex3i(x + obj->width(), y + obj->height(),0);
     glTexCoord2d(0.0, 1.0);
-    glVertex3i(x, y + output.height(),0);
+    glVertex3i(x, y + obj->height(),0);
 
     glEnd();
 

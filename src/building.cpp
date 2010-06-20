@@ -120,7 +120,7 @@ bool is_actually_using(Term* user, Term* usee)
     return false;
 }
 
-bool clear_all_users(Term* term)
+void clear_all_users(Term* term)
 {
     for (int i=0; i < term->numInputs(); i++) {
         Term* user = term->input(i);

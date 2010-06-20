@@ -208,6 +208,13 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
     if (numIterations == 0)
         evaluate_branch(cxt, get_for_loop_rebinds_for_outer(forTerm));
 
+    if (stateBranch != NULL) {
+        //std::cout << "state branch = " << std::endl;
+        //dump_branch(*stateBranch);
+    }
+
+    //std::cout << "Num iterations = " << numIterations << std::endl;
+
     for (int i=0; i < numIterations; i++) {
         set_bool(isFirstIteration, i == 0);
         set_bool(discardCalled, false);
@@ -219,22 +226,31 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
         if (stateBranch != NULL)
             load_state_into_branch(stateBranch->get(i)->asBranch(), codeBranch);
 
+        //std::cout << "pre evaluate = " << std::endl;
+        //dump_branch(codeBranch);
+
         // Evaluate
         evaluate_branch(cxt, codeBranch);
 
-        if (cxt->errorOccurred)
+        //std::cout << "post evaluate = " << std::endl;
+        //dump_branch(codeBranch);
+
+        if (cxt->errorOccurred) {
+            //std::cout << "Error occurred" << std::endl;
             break;
+        }
 
         // Persist stateful terms
-        if (stateBranch != NULL)
+        if (stateBranch != NULL) {
             persist_state_from_branch(codeBranch, stateBranch->get(i)->asBranch());
+
+            //std::cout << "Persisted = " << std::endl;
+            //dump_branch(*stateBranch);
+        }
 
         // Possibly use this value to modify the list
         if (listOutput != NULL && !as_bool(discardCalled)) {
             Term* iteratorResult = codeBranch[iterator->name];
-#ifndef NEWLIST
-            Branch& listOutputBr = listOutput->asBranch();
-#endif
 
             if (listOutputWriteHead >= listOutput->numElements())
                 ((List*) listOutput)->append();

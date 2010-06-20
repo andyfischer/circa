@@ -3,8 +3,7 @@
 // Various code for debugging purposes. This code shouldn't have an effect on a
 // release build.
 
-#ifndef CIRCA_DEBUG_INCLUDED
-#define CIRCA_DEBUG_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -38,5 +37,3 @@ void dump_branch(Branch& branch);
 void dump_branch_with_props(Branch& branch);
 
 } // namespace circa
-
-#endif

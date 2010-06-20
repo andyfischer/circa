@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_FOR_LOOPS_INCLUDED
-#define CIRCA_FOR_LOOPS_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -21,5 +20,3 @@ void setup_for_loop_post_code(Term* forTerm);
 Term* find_enclosing_for_loop(Term* term);
 
 } // namespace circa
-
-#endif // CIRCA_FOR_LOOPS_INCLUDED

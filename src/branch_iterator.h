@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#ifndef CIRCA_BRANCH_ITERATOR_INCLUDED
-#define CIRCA_BRANCH_ITERATOR_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -40,5 +39,3 @@ public:
 };
     
 } // namespace circa
-
-#endif

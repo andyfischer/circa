@@ -3,10 +3,10 @@
 #include "builtin_types/list.h"
 #include "debug_valid_objects.h"
 #include "tagged_value.h"
-#include "tagged_value_vector.h"
+#include "tvvector.h"
 
 namespace circa {
-namespace tagged_value_vector {
+namespace tvvector {
 
 struct ListData {
     int refCount;
@@ -89,7 +89,7 @@ ListData* increase_capacity(ListData* original, int new_capacity)
     return result;
 }
 
-ListData* grow_capacity(ListData* original)
+ListData* double_capacity(ListData* original)
 {
     if (original == NULL)
         return create_list(1);
@@ -142,16 +142,16 @@ void clear(ListData** data)
     *data = NULL;
 }
 
-ListData* touch(ListData* data)
+ListData* touch(ListData* original)
 {
-    if (data == NULL)
+    if (original == NULL)
         return NULL;
-    assert(data->refCount > 0);
-    if (data->refCount == 1)
-        return data;
+    assert(original->refCount > 0);
+    if (original->refCount == 1)
+        return original;
 
-    ListData* copy = duplicate(data);
-    decref(data);
+    ListData* copy = duplicate(original);
+    decref(original);
     return copy;
 }
 
@@ -163,7 +163,7 @@ TaggedValue* append(ListData** data)
         *data = touch(*data);
         
         if ((*data)->count == (*data)->capacity)
-            *data = grow_capacity(*data);
+            *data = double_capacity(*data);
     }
 
     ListData* d = *data;
@@ -171,13 +171,13 @@ TaggedValue* append(ListData** data)
     return &d->items[d->count - 1];
 }
 
-TaggedValue* get_index(ListData* data, int index)
+TaggedValue* get_index(ListData* list, int index)
 {
-    if (data == NULL)
+    if (list == NULL)
         return NULL;
-    if (index >= data->count)
+    if (index >= list->count)
         return NULL;
-    return &data->items[index];
+    return &list->items[index];
 }
 
 void set_index(ListData** data, int index, TaggedValue* v)
@@ -186,10 +186,16 @@ void set_index(ListData** data, int index, TaggedValue* v)
     copy(v, get_index(*data, index));
 }
 
-int num_elements(ListData* data)
+int num_elements(ListData* list)
 {
-    if (data == NULL) return 0;
-    return data->count;
+    if (list == NULL) return 0;
+    return list->count;
+}
+
+int refcount(ListData* value)
+{
+    if (value == NULL) return 0;
+    return value->refCount;
 }
 
 void remove_and_replace_with_back(ListData** data, int index)
@@ -219,12 +225,6 @@ std::string to_string(ListData* value)
     }
     out << "]";
     return out.str();
-}
-
-int refcount(ListData* value)
-{
-    if (value == NULL) return 0;
-    return value->refCount;
 }
 
 }

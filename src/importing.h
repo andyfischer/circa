@@ -2,8 +2,7 @@
 
 // importing.cpp : Functions to help import C functions into Circa.
 
-#ifndef CIRCA_IMPORTING_INCLUDED
-#define CIRCA_IMPORTING_INCLUDED
+#pragma once
 
 #include "common_headers.h"
 
@@ -30,5 +29,3 @@ void install_function(Term* function, EvaluateFunc evaluate);
 Term* import_type(Branch& branch, Type* type);
 
 } // namespace circa
-
-#endif

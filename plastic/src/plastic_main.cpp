@@ -137,6 +137,7 @@ bool evaluate_main_script()
         PAUSE_REASON = RUNTIME_ERROR;
         return false;
     }
+
     return true;
 }
 
