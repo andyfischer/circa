@@ -15,6 +15,7 @@ const int LIST_OBJECT = 2;
 
 #else
 
+// No-op these calls
 #define debug_register_valid_object(...)
 #define debug_unregister_valid_object(...)
 #define debug_assert_valid_object(...)

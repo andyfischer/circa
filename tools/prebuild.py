@@ -51,8 +51,8 @@ def sync_windows_sdl_deps():
 
         unzip_file('SDL_deps.zip', '.')
 
-def main():
 
+def main():
     if not os.path.exists('src/generated'):
         os.mkdir('src/generated')
 
@@ -68,12 +68,12 @@ def main():
     write_text_file('src/generated/builtin_script_text.cpp',
             text_file_to_c.generate("src/ca/builtins.ca", "BUILTIN_SCRIPT_TEXT"))
 
+    # generate all_tests.cpp, all_builtin_functions.cpp, and all_builtin_types.cpp
     def source_files(dir):
         for path in os.listdir(dir):
             if not os.path.isfile(os.path.join(dir,path)): continue
             if not path.endswith('.cpp'): continue
             yield path
-
     def builtin_function_cpps():
         for file in source_files('src/builtin_functions'):
             yield "builtin_functions/"+file

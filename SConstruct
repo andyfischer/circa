@@ -53,10 +53,6 @@ def list_source_files(dir):
         if not path.endswith('.cpp'): continue
         yield path
 
-# Run prebuild script, this generates some source code files.
-from tools import prebuild
-prebuild.main()
-
 circa_static_libs = {}
 
 # Define static library builds, save the results in circa_static_libs.
