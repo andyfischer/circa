@@ -1,19 +1,22 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved
 
 #include <circa.h>
+#include "importing_macros.h"
 
 namespace circa {
 namespace abs_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_START_FUNCTIONS;
+
+    CA_DEFINE_FUNCTION(abs, "abs(number n) -> number;"
+                "'Absolute value' end")
     {
-        set_float(caller, std::abs(float_input(caller,0)));
+        set_float(OUTPUT, std::abs(FLOAT_INPUT(0)));
     }
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "abs(number n) -> number;"
-                "'Absolute value' end");
+        CA_SETUP_FUNCTIONS(kernel);
     }
 }
 }

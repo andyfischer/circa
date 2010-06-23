@@ -1,27 +1,30 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 namespace concat_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_START_FUNCTIONS;
+
+    CA_DEFINE_FUNCTION(concat, "concat(any...) -> string;"
+            "'Concatenate each input (converting to a string if necessary).' end")
     {
         std::stringstream out;
-        for (int index=0; index < caller->inputs.length(); index++) {
-            Term* t = caller->inputs[index];
-            if (is_string(t))
-                out << as_string(caller->inputs[index]);
+        for (int index=0; index < NUM_INPUTS; index++) {
+            TaggedValue* v = INPUT(index);
+            if (is_string(v))
+                out << as_string(v);
             else
-                out << to_string(t);
+                out << to_string(v);
         }
-        set_str(caller, out.str());
+        set_str(OUTPUT, out.str());
     }
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "concat(any...) -> string;"
-            "'Concatenate each input (converting to a string if necessary).' end");
+        CA_SETUP_FUNCTIONS(kernel);
     }
 }
 }

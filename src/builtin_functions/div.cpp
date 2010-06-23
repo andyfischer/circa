@@ -1,26 +1,27 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 namespace div_function {
 
-    void evaluate_f(EvalContext*, Term* caller)
+    CA_START_FUNCTIONS;
+
+    CA_DEFINE_FUNCTION(div_f, "div_f(number,number) -> number")
     {
-        set_float(caller, float_input(caller,0) / float_input(caller,1));
+        set_float(OUTPUT, FLOAT_INPUT(0) / FLOAT_INPUT(1));
     }
 
-    void evaluate_i(EvalContext*, Term* caller)
+    CA_DEFINE_FUNCTION(div_i, "div_i(int,int) -> int")
     {
-        set_int(caller, int_input(caller,0) / int_input(caller,1));
+        set_int(OUTPUT, INT_INPUT(0) / INT_INPUT(1));
     }
 
     void setup(Branch& kernel)
     {
-        Term* div_f = import_function(kernel, evaluate_f, "div_f(number,number) -> number");
-        import_function(kernel, evaluate_i, "div_i(int,int) -> int");
-
-        DIV_FUNC = create_overloaded_function(kernel, "div", RefList(div_f));
+        CA_SETUP_FUNCTIONS(kernel);
+        DIV_FUNC = create_overloaded_function(kernel, "div", RefList(kernel["div_f"]));
     }
 }
 } // namespace circa

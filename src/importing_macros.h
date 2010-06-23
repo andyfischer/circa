@@ -14,13 +14,19 @@
     };
 
 #define CA_DEFINE_FUNCTION(fname, header) \
-    void evaluate_##fname(EvalContext* _circa_ec, Term* _circa_caller); \
+    void evaluate_##fname(EvalContext* _circa_cxt, Term* _circa_caller); \
     static _circa_StaticFuncDeclaration _static_decl_for_##fname(header, evaluate_##fname); \
-    void evaluate_##fname(EvalContext* _circa_ec, Term* _circa_caller)
+    void evaluate_##fname(EvalContext* _circa_cxt, Term* _circa_caller)
 
 #define INT_INPUT(index) int_input(_circa_caller, index)
-#define INPUT(index) (_circa_caller->input(index))
-
+#define FLOAT_INPUT(index) float_input(_circa_caller, index)
+#define BOOL_INPUT(index) bool_input(_circa_caller, index)
+#define INPUT(index) ((TaggedValue*) _circa_caller->input(index))
+#define NUM_INPUTS (_circa_caller->numInputs())
+#define INPUT_TERM(index) (_circa_caller->input(index))
+#define OUTPUT ((TaggedValue*) _circa_caller)
+#define CONTEXT (_circa_cxt)
+#define CALLER (_circa_caller)
 
 #define CA_SETUP_FUNCTIONS(branch) {\
     for (size_t i=0; i < _circa_START_FUNCTIONS.size(); i++) \

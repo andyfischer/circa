@@ -15,7 +15,7 @@ namespace refactor_function {
 
     CA_DEFINE_FUNCTION(change_function, "change_function(Ref r, Callable func)")
     {
-        change_function(as_ref(INPUT(0)), INPUT(1));
+        change_function(as_ref(INPUT_TERM(0)), INPUT_TERM(1));
     }
 
     void setup(Branch& kernel)

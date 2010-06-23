@@ -1,14 +1,19 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 namespace changed_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_START_FUNCTIONS;
+
+    CA_DEFINE_FUNCTION(changed, "changed(state any, any input) -> bool;"
+        "'Stateful function, returns whether the given input has changed since the "
+        "last call.' end")
     {
-        Term* state = caller->input(0);
-        Term* current = caller->input(1);
+        TaggedValue* state = INPUT(0);
+        TaggedValue* current = INPUT(1);
 
         bool result;
         if (!equals(state, current)) {
@@ -17,12 +22,12 @@ namespace changed_function {
         } else {
             result = false;
         }
-        set_bool(caller, result);
+        set_bool(OUTPUT, result);
     }
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "changed(state any, any input) -> bool; 'Stateful function, returns whether the given input has changed since the last call.' end");
+        CA_SETUP_FUNCTIONS(kernel);
     }
 }
 }

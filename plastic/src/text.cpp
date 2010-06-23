@@ -94,7 +94,6 @@ void render_text(EvalContext*, Term* caller)
 
         // Clear results if text is empty
         if (inputText == "") {
-            std::cout << "text is empty" << std::endl;
             set_int(state->texidContainer(), 0);
             set_int(state->widthContainer(), 0);
             set_int(state->heightContainer(), 0);

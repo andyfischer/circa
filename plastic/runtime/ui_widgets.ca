@@ -10,8 +10,6 @@ def draw_vmenu(Point topleft, List items) -> any
         labels.append(item[0])
     end
 
-    print('labels = ' labels)
-
     -- Render text sprites
     for label in @labels
         text:render_text(menu_font, @label, #fff)

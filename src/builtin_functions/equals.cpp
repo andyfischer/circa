@@ -1,30 +1,26 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 namespace equals_function {
 
-    void evaluate(EvalContext*, Term* caller)
-    {
-        Term *lhs = caller->input(0);
-        Term *rhs = caller->input(1);
+    CA_START_FUNCTIONS;
 
-        set_bool(caller, equals(lhs, rhs));
+    CA_DEFINE_FUNCTION(equals, "equals(any,any) -> bool")
+    {
+        set_bool(OUTPUT, equals(INPUT(0), INPUT(1)));
     }
 
-    void evaluate_not(EvalContext* cxt, Term* caller)
+    CA_DEFINE_FUNCTION(not_equals, "not_equals(any,any) -> bool")
     {
-        evaluate(cxt, caller);
-
-        if (!cxt->errorOccurred)
-            set_bool(caller, !as_bool(caller));
+        set_bool(OUTPUT, !equals(INPUT(0), INPUT(1)));
     }
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "equals(any,any) -> bool");
-        import_function(kernel, evaluate_not, "not_equals(any,any) -> bool");
+        CA_SETUP_FUNCTIONS(kernel);
     }
 }
 }
