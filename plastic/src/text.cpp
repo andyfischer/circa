@@ -88,10 +88,6 @@ void render_text(EvalContext*, Term* caller)
     Term* inputColor = caller->input(3);
     bool changed_color = !state->color()->equals(inputColor);
 
-    std::cout << "texid = " << state->texid() << std::endl;
-    std::cout << "inputText = " << inputText << std::endl;
-    std::cout << "state->text = " << state->text() << std::endl;
-
     if (state->texid() == 0 || state->text() != inputText || changed_color) {
 
         copy(caller->input(2), state->textContainer());
@@ -107,7 +103,7 @@ void render_text(EvalContext*, Term* caller)
         }
 
         // Render the text to a new surface, upload it as a texture, destroy the surface,
-        // save the texture id.
+        // record the texture id.
 
         TTF_Font_ptr font = caller->input(1);
 

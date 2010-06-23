@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+#include "build_options.h"
 #include "debug_valid_objects.h"
 
 #if ENABLE_VALID_OBJECT_CHECKING

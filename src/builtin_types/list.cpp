@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 
+#include "build_options.h"
 #include "builtin_types.h"
 #include "debug_valid_objects.h"
 #include "tagged_value.h"
@@ -69,11 +70,14 @@ void tv_copy(TaggedValue* source, TaggedValue* dest)
     ListData* s = (ListData*) get_pointer(source);
     ListData* d = (ListData*) get_pointer(dest);
 
-    // to prevent value sharing, change this code
-    
+#if DISABLE_LIST_VALUE_SHARING
+    if (d != NULL) decref(d);
+    set_pointer(dest, tvvector::duplicate(s));
+#else
     if (s != NULL) incref(s);
     if (d != NULL) decref(d);
     set_pointer(dest, s);
+#endif
 }
 
 bool tv_equals(TaggedValue* leftValue, TaggedValue* right)

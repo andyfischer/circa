@@ -9,15 +9,15 @@ using namespace circa;
 namespace postprocess_functions
 {
     namespace surface_t {
-        int get_tex_id(Term* term) { return as_int(term->field(0)); }
-        int get_fbo_id(Term* term) { return as_int(term->field(1)); }
-        int get_width(Term* term) { return as_int(term->field(2)); }
-        int get_height(Term* term) { return as_int(term->field(3)); }
+        int get_tex_id(Term* term) { return as_int(term->getIndex(0)); }
+        int get_fbo_id(Term* term) { return as_int(term->getIndex(1)); }
+        int get_width(Term* term) { return as_int(term->getIndex(2)); }
+        int get_height(Term* term) { return as_int(term->getIndex(3)); }
 
-        void set_tex_id(Term* term, int id) { set_int(term->field(0), id); }
-        void set_fbo_id(Term* term, int id) { set_int(term->field(1), id); }
-        void set_width(Term* term, int w) { set_int(term->field(2), w); }
-        void set_height(Term* term, int h) { set_int(term->field(3), h); }
+        void set_tex_id(Term* term, int id) { set_int(term->getIndex(0), id); }
+        void set_fbo_id(Term* term, int id) { set_int(term->getIndex(1), id); }
+        void set_width(Term* term, int w) { set_int(term->getIndex(2), w); }
+        void set_height(Term* term, int h) { set_int(term->getIndex(3), h); }
     }
     
     void make_surface(EvalContext* cxt, Term* caller)

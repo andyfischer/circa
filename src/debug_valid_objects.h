@@ -2,7 +2,7 @@
 
 #pragma once
 
-#define ENABLE_VALID_OBJECT_CHECKING 0
+#include "build_options.h"
 
 #if ENABLE_VALID_OBJECT_CHECKING
 
