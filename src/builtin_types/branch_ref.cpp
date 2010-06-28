@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 namespace branch_ref_t {
@@ -57,10 +58,10 @@ namespace branch_ref_t {
         return as_branch(list->get(0)->asRef());
     }
 
-    void get_configs(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(get_configs)
     {
-        TaggedValue* value = caller->input(0);
-        if (!check_valid(cxt, caller, value))
+        TaggedValue* value = INPUT(0);
+        if (!check_valid(CONTEXT, CALLER, value))
             return;
         Branch& target_branch = get_target_branch(value);
 
@@ -73,7 +74,7 @@ namespace branch_ref_t {
             count++;
         }
 
-        List* output = (List*) caller;
+        List* output = (List*) OUTPUT;
         output->resize(count);
 
         int write = 0;
@@ -86,14 +87,14 @@ namespace branch_ref_t {
             make_ref(output->get(write++), t);
         }
     }
-    void get_configs_nested(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(get_configs_nested)
     {
-        TaggedValue* value = caller->input(0);
-        if (!check_valid(cxt, caller, value))
+        TaggedValue* value = INPUT(0);
+        if (!check_valid(CONTEXT, CALLER, value))
             return;
 
         Branch& target_branch = get_target_branch(value);
-        List* output = (List*) caller;
+        List* output = (List*) OUTPUT;
 
         int write = 0;
         for (BranchIterator it(target_branch); !it.finished(); it.advance()) {
@@ -124,10 +125,10 @@ namespace branch_ref_t {
         if (write < output->length())
             output->resize(write);
     }
-    void get_visible(EvalContext*, Term* caller)
+    CA_FUNCTION(get_visible)
     {
-        Branch& target_branch = get_target_branch(caller->input(0));
-        Branch& output = caller->asBranch();
+        Branch& target_branch = get_target_branch(INPUT(0));
+        Branch& output = OUTPUT->asBranch();
 
         int write = 0;
         for (int i=0; i < target_branch.length(); i++) {
@@ -147,37 +148,39 @@ namespace branch_ref_t {
             output.shorten(write);
     }
 
-    void get_relative_name(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(get_relative_name)
     {
-        Branch& target_branch = get_target_branch(caller->input(0));
-        Term* target = caller->input(1)->asRef();
+        Branch& target_branch = get_target_branch(INPUT(0));
+        Term* target = INPUT(1)->asRef();
 
         if (target == NULL) {
-            error_occurred(cxt, caller, "term is NULL");
+            error_occurred(CONTEXT, CALLER, "term is NULL");
             return;
         }
 
-        set_str(caller, get_relative_name(target_branch, target));
+        set_str(OUTPUT, get_relative_name(target_branch, target));
     }
 
-    void get_length(EvalContext*, Term* caller)
+    CA_FUNCTION(get_length)
     {
-        Branch& target_branch = get_target_branch(caller->input(0));
-        set_int(caller, target_branch.length());
+        Branch& target_branch = get_target_branch(INPUT(0));
+        set_int(OUTPUT, target_branch.length());
     }
-    void get_index(EvalContext*, Term* caller)
+
+    CA_FUNCTION(get_index)
     {
-        Branch& target_branch = get_target_branch(caller->input(0));
-        int index = int_input(caller, 1);
+        Branch& target_branch = get_target_branch(INPUT(0));
+        int index = INT_INPUT(1);
         if (index >= target_branch.length())
-            set_ref(caller, NULL);
+            set_ref(OUTPUT, NULL);
         else
-            set_ref(caller, target_branch[index]);
+            set_ref(OUTPUT, target_branch[index]);
     }
-    void append_code(EvalContext*, Term* caller)
+
+    CA_FUNCTION(append_code)
     {
-        Branch& target_branch = get_target_branch(caller->input(0));
-        Branch& input = as_branch(caller->input(1));
+        Branch& target_branch = get_target_branch(INPUT(0));
+        Branch& input = as_branch(INPUT(1));
 
         if (input.length() == 0)
             return;
@@ -196,21 +199,24 @@ namespace branch_ref_t {
             target_branch[previousLast-1]->removeProperty("syntax:lineEnding");
         target_branch[target_branch.length()-1]->removeProperty("syntax:lineEnding");
     }
-    void print_raw(EvalContext*, Term* caller)
-    {
-        Branch& target_branch = get_target_branch(caller->input(0));
 
-        set_str(caller, get_branch_raw(target_branch));
-    }
-    void save(EvalContext*, Term* caller)
+    CA_FUNCTION(print_raw)
     {
-        Branch& target_branch = get_target_branch(caller->input(0));
+        Branch& target_branch = get_target_branch(INPUT(0));
+
+        set_str(OUTPUT, get_branch_raw(target_branch));
+    }
+
+    CA_FUNCTION(save)
+    {
+        Branch& target_branch = get_target_branch(INPUT(0));
         persist_branch_to_file(target_branch);
     }
-    void to_source(EvalContext*, Term* caller)
+
+    CA_FUNCTION(to_source)
     {
-        Branch& target_branch = get_target_branch(caller->input(0));
-        set_str(caller, get_branch_source_text(target_branch));
+        Branch& target_branch = get_target_branch(INPUT(0));
+        set_str(OUTPUT, get_branch_source_text(target_branch));
     }
 
     void setup_type(Type* type)

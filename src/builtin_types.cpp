@@ -63,27 +63,28 @@ namespace set_t {
             return;
         copy(value, list->append());
     }
-    void hosted_add(EvalContext*, Term* caller)
+
+    CA_FUNCTION(hosted_add)
     {
-        copy(caller->input(0), caller);
-        List* output = (List*) caller;
-        Term* value = caller->input(1);
+        copy(INPUT(0), OUTPUT);
+        List* output = (List*) OUTPUT;
+        TaggedValue* value = INPUT(1);
         if (!contains(output, value))
             copy(value, output->append());
     }
 
-    void contains(EvalContext*, Term* caller)
+    CA_FUNCTION(contains)
     {
-        List* list = (List*) caller->input(0);
-        Term* value = caller->input(1);
-        set_bool(caller, contains(list, value));
+        List* list = (List*) INPUT(0);
+        TaggedValue* value = INPUT(1);
+        set_bool(OUTPUT, contains(list, value));
     }
 
-    void remove(EvalContext*, Term* caller)
+    CA_FUNCTION(remove)
     {
-        copy(caller->input(0), caller);
-        List* list = (List*) caller;
-        Term* value = caller->input(1);
+        copy(INPUT(0), OUTPUT);
+        List* list = (List*) OUTPUT;
+        TaggedValue* value = INPUT(1);
 
         int numElements = list->numElements();
         for (int index=0; index < numElements; index++) {
@@ -171,33 +172,34 @@ namespace map_t {
         else
             return values->get(index);
     }
-    void contains(EvalContext*, Term* caller)
+    CA_FUNCTION(contains)
     {
-        bool result = find_key_index(caller->input(0), caller->input(1)) != -1;
-        set_bool(caller, result);
+        bool result = find_key_index(INPUT(0), INPUT(1)) != -1;
+        set_bool(OUTPUT, result);
     }
 
-    void insert(EvalContext*, Term *caller)
+    CA_FUNCTION(insert)
     {
-        copy(caller->input(0), caller);
-        touch(caller);
-        insert(caller, caller->input(1), caller->input(2));
+        copy(INPUT(0), OUTPUT);
+        touch(OUTPUT);
+        insert(OUTPUT, INPUT(1), INPUT(2));
     }
 
-    void remove(EvalContext*, Term* caller)
+    CA_FUNCTION(remove)
     {
-        copy(caller->input(0), caller);
-        touch(caller);
-        remove(caller, caller->input(1));
+        copy(INPUT(0), OUTPUT);
+        touch(OUTPUT);
+        remove(OUTPUT, INPUT(1));
     }
-    void get(EvalContext* cxt, Term* caller)
+
+    CA_FUNCTION(get)
     {
-        Term* key = caller->input(1);
-        TaggedValue* value = get(caller->input(0), key);
+        TaggedValue* key = INPUT(1);
+        TaggedValue* value = get(INPUT(0), key);
         if (value == NULL)
-            return error_occurred(cxt, caller, "Key not found: " + to_string(key));
+            return error_occurred(CONTEXT, CALLER, "Key not found: " + to_string(key));
 
-        copy(value, caller);
+        copy(value, OUTPUT);
     }
 
     std::string to_string(TaggedValue* value)
