@@ -90,10 +90,10 @@ class StateBasedParser
 
         ifndef = matches_ifndef(line)
         if ifndef
-            if @defineOn.member?(ifdef)
+            if @defineOn.member?(ifndef)
                 @stack << :reject
                 return false
-            elsif @defineOff.member?(ifdef)
+            elsif @defineOff.member?(ifndef)
                 @stack << :accept
                 return false
             else
@@ -139,7 +139,9 @@ class StateBasedParser
             line = file.readline
             accept = iterate(line)
 
-            #puts "[#{@stack * ", "}] #{line}"
+            if $debug_output
+                puts "[#{@stack * ", "}] #{line}"
+            end
 
             if accept
                 output << line
@@ -150,14 +152,21 @@ class StateBasedParser
 end
 
 $parser = StateBasedParser.new
+$tostdout = false
+$debug_outut = false
 
 optparse = OptionParser.new do |opts|
     #opts.banner =  "Usage.."
     opts.on('-d', '--define FLAG', '') do |d|
+        puts "Defining #{d}"
         $parser.defineOn.add(d)
     end
     opts.on('-u', '--undefine FLAG', '') do |d|
+        puts "Undefining #{d}"
         $parser.defineOff.add(d)
+    end
+    opts.on('', '--stdout', '') do |d|
+        $tostdout = true
     end
 end
 
@@ -173,7 +182,11 @@ def process_file(path)
         end
     else
         output = $parser.run(File.new(path, 'r'))
-        File.new(path, 'w').write(output * "")
+        if $tostdout
+            puts output
+        else
+            File.new(path, 'w').write(output * "")
+        end
     end
 end
 

@@ -110,30 +110,6 @@ void test_map()
 
     test_assert(map_sqr);
 
-#ifndef NEWLIST
-    Branch& result = as_branch(map_sqr);
-
-    test_assert(result.length() == 5);
-    test_equals(result[0]->asFloat(), 1);
-    test_equals(result[1]->asFloat(), 4);
-    test_equals(result[2]->asFloat(), 9);
-    test_equals(result[3]->asFloat(), 16);
-    test_equals(result[4]->asFloat(), 25);
-
-    // Test with subroutines
-    branch.eval("def myfunc(number x) -> number\nreturn x + 5\nend");
-    Term* map_myfunc = branch.eval("map(myfunc, input_list)");
-
-    test_assert(map_myfunc);
-
-    Branch& result2 = as_branch(map_myfunc);
-    test_assert(result2.length() == 5);
-    test_equals(result2[0]->asFloat(), 6);
-    test_equals(result2[1]->asFloat(), 7);
-    test_equals(result2[2]->asFloat(), 8);
-    test_equals(result2[3]->asFloat(), 9);
-    test_equals(result2[4]->asFloat(), 10);
-#endif
 }
 
 void test_vectorized_funcs()

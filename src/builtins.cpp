@@ -194,11 +194,6 @@ void bootstrap_kernel()
     change_type((TaggedValue*)VALUE_FUNC, (Type*)BRANCH_TYPE->value_data.ptr);
 
     // Initialize List type, it's needed soon
-#ifndef NEWLIST
-    LIST_TYPE = create_branch_based_type(*KERNEL, "List");
-    Type* listType = &as_type(LIST_TYPE);
-    old_list_t::setup(listType);
-#endif
 }
 
 void post_initialize_primitive_types(Branch& kernel)

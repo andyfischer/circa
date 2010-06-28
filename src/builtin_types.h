@@ -25,11 +25,6 @@ namespace set_t {
     void setup_type(Type* type);
 }
 
-#ifndef NEWLIST
-namespace old_list_t {
-    void setup(Type*);
-}
-#endif
 
 namespace dict_t {
     std::string to_string(Branch& branch);

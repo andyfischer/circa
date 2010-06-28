@@ -30,22 +30,11 @@ namespace filter_function {
         int write = 0;
         for (int i=0; i < numInputs; i++) {
             if (bools->getIndex(i)->asBool()) {
-#ifndef NEWLIST
-                if (output.length() <= i)
-                    output.appendNew();
-#endif
 
                 copy((*inputs)[i], caller->getIndex(write++));
             }
         }
 
-#ifndef NEWLIST
-        // Remove extra elements
-        for (int i=write; i < output.length(); i++)
-            output.set(i, NULL);
-
-        output.removeNulls();
-#endif
     }
 
     void setup(Branch& kernel)
