@@ -88,7 +88,6 @@ private:
     Branch& operator=(Branch const& b) { return *this; }
 };
 
-// Hosted functions
 namespace branch_t {
     void initialize(Type*, TaggedValue* value);
     void release(TaggedValue* value);
@@ -101,6 +100,7 @@ namespace branch_t {
 
     void branch_copy(Branch& source, Branch& dest);
     void assign(Branch& source, Branch& dest);
+    void append(EvalContext*, Term* caller);
 }
 
 bool is_branch(TaggedValue* term);

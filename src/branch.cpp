@@ -580,6 +580,13 @@ namespace branch_t {
 
         return true;
     }
+    void append(EvalContext*, Term* caller)
+    {
+        circa::copy(caller->input(0), caller);
+        Branch& branch = as_branch(caller);
+        Term* value = caller->input(1);
+        create_duplicate(branch, value);
+    }
 }
 
 bool is_branch(TaggedValue* value)

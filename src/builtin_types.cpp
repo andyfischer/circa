@@ -47,59 +47,6 @@ namespace list_t {
     }
 }
 
-namespace old_list_t {
-
-    std::string to_string(Term* caller)
-    {
-        std::stringstream out;
-        out << "[";
-        Branch& branch = as_branch(caller);
-        for (int i=0; i < branch.length(); i++) {
-            if (i > 0) out << ",";
-            out << branch[i]->toString();
-        }
-        out << "]";
-        return out.str();
-    }
-
-    void formatSource(StyledSource* source, Term* term)
-    {
-        append_phrase(source, "[", term, token::LBRACKET);
-        Branch& branch = as_branch(term);
-        for (int i=0; i < branch.length(); i++) {
-            if (i > 0)
-                append_phrase(source, ",", term, token::COMMA);
-            format_term_source(source, branch[i]);
-        }
-        append_phrase(source, "]", term, token::RBRACKET);
-    }
-
-    void append(Branch& branch, Term* value)
-    {
-        //duplicate_value(branch, value);
-        create_duplicate(branch, value);
-    }
-
-    void append(EvalContext*, Term* caller)
-    {
-        copy(caller->input(0), caller);
-        Branch& branch = as_branch(caller);
-        Term* value = caller->input(1);
-        append(branch, value);
-    }
-
-    void count(EvalContext*, Term* caller)
-    {
-        set_int(caller, as_branch(caller->input(0)).length());
-    }
-
-    void setup(Type* type)
-    {
-        type->formatSource = formatSource;
-    }
-
-} // namespace old_list_t
-
 namespace set_t {
     bool contains(List* list, TaggedValue* value)
     {
@@ -431,7 +378,7 @@ void initialize_primitive_types(Branch& kernel)
 void setup_builtin_types(Branch& kernel)
 {
     Term* branch_append = 
-        import_member_function(BRANCH_TYPE, old_list_t::append, "append(Branch, any) -> Branch");
+        import_member_function(BRANCH_TYPE, branch_t::append, "append(Branch, any) -> Branch");
     function_set_use_input_as_output(branch_append, 0, true);
 
     import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) -> string");
