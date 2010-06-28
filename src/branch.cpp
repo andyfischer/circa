@@ -416,11 +416,7 @@ namespace branch_t {
         Branch& prototype = type->prototype;
 
         // Inspect a call to list(), look at inputs instead of looking at the result.
-        if (term->function == LIST_FUNC
-#ifndef NEWLIST
-                || term->function->name == "newlist"
-#endif
-           )
+        if (term->function == LIST_FUNC)
         {
             if (term->numInputs() != prototype.length())
                 return result->fail();

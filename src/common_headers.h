@@ -57,6 +57,4 @@ typedef Term* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
 
-#define NEWLIST 1
-
 } // namespace circa

@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 
@@ -31,18 +32,18 @@ namespace bool_t {
 
 namespace list_t {
 
-    void append(EvalContext*, Term* caller)
+    CA_FUNCTION(append)
     {
-        List* result = (List*) caller;
-        copy(caller->input(0), caller);
-        Term* value = caller->input(1);
+        List* result = (List*) OUTPUT;
+        copy(INPUT(0), OUTPUT);
+        TaggedValue* value = INPUT(1);
         copy(value, result->append());
     }
 
-    void count(EvalContext*, Term* caller)
+    CA_FUNCTION(count)
     {
-        List* list = (List*) caller->input(0);
-        set_int(caller, list->length());
+        List* list = (List*) INPUT(0);
+        set_int(OUTPUT, list->length());
     }
 }
 
