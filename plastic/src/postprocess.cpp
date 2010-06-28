@@ -2,6 +2,7 @@
 
 // With thanks to Philip Rideout for example code. See: http://prideout.net/bloom/index.php
 
+#include "importing_macros.h"
 #include "plastic.h"
 
 using namespace circa;
@@ -9,25 +10,25 @@ using namespace circa;
 namespace postprocess_functions
 {
     namespace surface_t {
-        int get_tex_id(Term* term) { return as_int(term->getIndex(0)); }
-        int get_fbo_id(Term* term) { return as_int(term->getIndex(1)); }
-        int get_width(Term* term) { return as_int(term->getIndex(2)); }
-        int get_height(Term* term) { return as_int(term->getIndex(3)); }
+        int get_tex_id(TaggedValue* v) { return as_int(v->getIndex(0)); }
+        int get_fbo_id(TaggedValue* v) { return as_int(v->getIndex(1)); }
+        int get_width(TaggedValue* v) { return as_int(v->getIndex(2)); }
+        int get_height(TaggedValue* v) { return as_int(v->getIndex(3)); }
 
-        void set_tex_id(Term* term, int id) { set_int(term->getIndex(0), id); }
-        void set_fbo_id(Term* term, int id) { set_int(term->getIndex(1), id); }
-        void set_width(Term* term, int w) { set_int(term->getIndex(2), w); }
-        void set_height(Term* term, int h) { set_int(term->getIndex(3), h); }
+        void set_tex_id(TaggedValue* v, int id) { touch(v); set_int(v->getIndex(0), id); }
+        void set_fbo_id(TaggedValue* v, int id) { touch(v); set_int(v->getIndex(1), id); }
+        void set_width(TaggedValue* v, int w) { touch(v); set_int(v->getIndex(2), w); }
+        void set_height(TaggedValue* v, int h) { touch(v); set_int(v->getIndex(3), h); }
     }
     
-    void make_surface(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(make_surface)
     {
         gl_clear_error();
-        Term* surface = caller->input(0);
+        TaggedValue* surface = INPUT(0);
 
         if (surface_t::get_tex_id(surface) == 0) {
-            int desired_width = int_input(caller, 1);
-            int desired_height = int_input(caller, 2);
+            int desired_width = INT_INPUT(1);
+            int desired_height = INT_INPUT(2);
 
             GLenum internalFormat = /*fp ? GL_RGBA16F_ARB :*/ GL_RGBA;
             GLenum type = /*fp ? GL_HALF_FLOAT_ARB :*/ GL_UNSIGNED_BYTE;
@@ -44,7 +45,7 @@ namespace postprocess_functions
             glBindTexture(GL_TEXTURE_2D, 0);
             surface_t::set_tex_id(surface, tex_id);
 
-            if (gl_check_error(cxt, caller))
+            if (gl_check_error(CONTEXT_AND_CALLER))
                 return;
 
             // Create FBO
@@ -56,7 +57,7 @@ namespace postprocess_functions
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
             surface_t::set_fbo_id(surface, fbo_id);
 
-            if (gl_check_error(cxt, caller))
+            if (gl_check_error(CONTEXT_AND_CALLER))
                 return;
 
 
@@ -64,13 +65,13 @@ namespace postprocess_functions
             surface_t::set_width(surface, desired_height);
         }
 
-        copy(caller->input(0), caller);
+        copy(INPUT(0), OUTPUT);
     }
 
     static int bound_surface_width = 0;
     static int bound_surface_height = 0;
 
-    void bind_surface(Term* surface)
+    void bind_surface(TaggedValue* surface)
     {
         int width = surface_t::get_width(surface);
         int height = surface_t::get_height(surface);
@@ -86,15 +87,15 @@ namespace postprocess_functions
         bound_surface_height = height;
     }
 
-    void bind_surface_hosted(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(bind_surface_hosted)
     {
-        bind_surface(caller->input(0));
-        gl_check_error(cxt, caller);
+        bind_surface(INPUT(0));
+        gl_check_error(CONTEXT_AND_CALLER);
     }
 
-    void draw_surface(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(draw_surface)
     {
-        Term* source_surface = caller->input(0);
+        TaggedValue* source_surface = INPUT(0);
         int tex_id = surface_t::get_tex_id(source_surface);
 
         glEnable(GL_TEXTURE_2D);
@@ -114,13 +115,13 @@ namespace postprocess_functions
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        gl_check_error(cxt, caller);
+        gl_check_error(CONTEXT_AND_CALLER);
     }
 
-    void copy_surface(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(copy_surface)
     {
-        Term* source_surface = caller->input(0);
-        Term* dest_surface = caller->input(1);
+        TaggedValue* source_surface = INPUT(0);
+        TaggedValue* dest_surface = INPUT(1);
 
         bind_surface(dest_surface);
 

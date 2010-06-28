@@ -1,5 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved
 
+#include <importing_macros.h>
 #include <circa.h>
 
 #include "plastic.h"
@@ -7,31 +8,31 @@
 using namespace circa;
 
 namespace image_t {
-    std::string get_filename(Term* term) { return term->asBranch()[0]->asString(); }
-    int get_texid(Term* term) { return term->asBranch()[1]->asInt(); }
-    int get_width(Term* term) { return term->asBranch()[2]->asInt(); }
-    int get_height(Term* term) { return term->asBranch()[3]->asInt(); }
+    std::string get_filename(TaggedValue* v) { return v->getIndex(0)->asString(); }
+    int get_texid(TaggedValue* v) { return v->getIndex(1)->asInt(); }
+    int get_width(TaggedValue* v) { return v->getIndex(2)->asInt(); }
+    int get_height(TaggedValue* v) { return v->getIndex(3)->asInt(); }
 
-    void set_filename(Term* term, std::string const& s) { set_str(term->asBranch()[0], s); }
-    void set_texid(Term* term, int id) { set_int(term->asBranch()[1], id); }
-    void set_width(Term* term, int w) { set_int(term->asBranch()[2], w); }
-    void set_height(Term* term, int h) { set_int(term->asBranch()[3], h); }
+    void set_filename(TaggedValue* v, std::string const& s) { touch(v); set_str(v->getIndex(0), s); }
+    void set_texid(TaggedValue* v, int id) { touch(v); set_int(v->getIndex(1), id); }
+    void set_width(TaggedValue* v, int w) { touch(v); set_int(v->getIndex(2), w); }
+    void set_height(TaggedValue* v, int h) { touch(v); set_int(v->getIndex(3), h); }
 }
 
 namespace rect_t {
-    float get_x1(Term* term) { return term->asBranch()[0]->toFloat(); }
-    float get_y1(Term* term) { return term->asBranch()[1]->toFloat(); }
-    float get_x2(Term* term) { return term->asBranch()[2]->toFloat(); }
-    float get_y2(Term* term) { return term->asBranch()[3]->toFloat(); }
+    float get_x1(TaggedValue* v) { return v->getIndex(0)->toFloat(); }
+    float get_y1(TaggedValue* v) { return v->getIndex(1)->toFloat(); }
+    float get_x2(TaggedValue* v) { return v->getIndex(2)->toFloat(); }
+    float get_y2(TaggedValue* v) { return v->getIndex(3)->toFloat(); }
 }
 
-GLuint load_image_to_texture(EvalContext* cxt, Term* term, const char* filename)
+GLuint load_image_to_texture(EvalContext* cxt, Term* caller, const char* filename)
 {
     SDL_Surface* surface = IMG_Load(filename);
     if (surface == NULL) {
         std::stringstream msg;
         msg << "Error loading " << filename << ": " << SDL_GetError();
-        error_occurred(cxt, term, msg.str());
+        error_occurred(cxt, caller, msg.str());
         return 0;
     }
 
@@ -93,31 +94,31 @@ SDL_Surface* convert_indexed_color_to_true_color(SDL_Surface* surface)
     return replacement;
 }
 
-void load_image(EvalContext* cxt, Term* caller)
+CA_FUNCTION(load_image)
 {
-    std::string const& filename = caller->input(0)->asString();
+    std::string const& filename = INPUT(0)->asString();
 
     SDL_Surface* surface = IMG_Load(filename.c_str());
     if (surface == NULL) {
-        error_occurred(cxt, caller, "Error loading " + filename + ": " + SDL_GetError());
+        error_occurred(CONTEXT_AND_CALLER, "Error loading " + filename + ": " + SDL_GetError());
         return;
     }
 
     if (has_indexed_color(surface))
         surface = convert_indexed_color_to_true_color(surface);
 
-    image_t::set_texid(caller, load_surface_to_texture(surface));
-    image_t::set_filename(caller, filename);
-    image_t::set_width(caller, surface->w);
-    image_t::set_height(caller, surface->h);
+    image_t::set_texid(OUTPUT, load_surface_to_texture(surface));
+    image_t::set_filename(OUTPUT, filename);
+    image_t::set_width(OUTPUT, surface->w);
+    image_t::set_height(OUTPUT, surface->h);
 
     SDL_FreeSurface(surface);
 }
 
-void draw_image(EvalContext* cxt, Term* caller)
+CA_FUNCTION(draw_image)
 {
-    Term* image = caller->input(0);
-    Term* point = caller->input(1);
+    TaggedValue* image = INPUT(0);
+    TaggedValue* point = INPUT(1);
 
     float x = 0;
     float y = 0;
@@ -138,15 +139,15 @@ void draw_image(EvalContext* cxt, Term* caller)
     glEnd();
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    gl_check_error(cxt, caller);
+    gl_check_error(CONTEXT_AND_CALLER);
 }
 
-void draw_image_clip(EvalContext* cxt, Term* caller)
+CA_FUNCTION(draw_image_clip)
 {
-    Term* image = caller->input(0);
-    Term* clip = caller->input(1);
+    TaggedValue* image = INPUT(0);
+    TaggedValue* clip = INPUT(1);
 
-    Branch& destination = caller->input(2)->asBranch();
+    Branch& destination = INPUT(2)->asBranch();
     float dest_x = destination[0]->asFloat();
     float dest_y = destination[1]->asFloat();
 
@@ -187,7 +188,7 @@ void draw_image_clip(EvalContext* cxt, Term* caller)
     glEnd();
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    gl_check_error(cxt, caller);
+    gl_check_error(CONTEXT_AND_CALLER);
 }
 
 namespace image {

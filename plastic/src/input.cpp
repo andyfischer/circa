@@ -1,5 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include <importing_macros.h>
 #include "circa.h"
 
 #include "plastic.h"
@@ -22,39 +23,39 @@ Ref MOUSE_POSITION_TERM;
 
 void handle_key_press(SDL_Event &event, int key);
 
-void key_down(EvalContext*, Term* caller)
+CA_FUNCTION(key_down)
 {
-    int i = caller->input(0)->asInt();
-    set_bool(caller, KEY_DOWN[i]);
+    int i = INT_INPUT(0);
+    set_bool(OUTPUT, KEY_DOWN[i]);
 }
 
-void key_pressed(EvalContext* cxt, Term* caller)
+CA_FUNCTION(key_pressed)
 {
-    if (is_int(caller->input(0))) {
-        int key = as_int(caller->input(0));
+    if (is_int(INPUT(0))) {
+        int key = as_int(INPUT(0));
         for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
             if (KEYS_JUST_PRESSED[index].sym == key) {
-                set_bool(caller, true);
+                set_bool(OUTPUT, true);
                 return;
             }
         }
-        set_bool(caller, false);
+        set_bool(OUTPUT, false);
         return;
     }
 
-    if (is_string(caller->input(0))) {
-        std::string const& key = caller->input(0)->asString();
+    if (is_string(INPUT(0))) {
+        std::string const& key = INPUT(0)->asString();
         if (key.length() != 1)
-            return error_occurred(cxt, caller, "Expected a string of length 1");
+            return error_occurred(CONTEXT_AND_CALLER, "Expected a string of length 1");
 
         for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
             if (key[0] == KEYS_JUST_PRESSED[index].unicode) {
-                set_bool(caller, true);
+                set_bool(OUTPUT, true);
                 return;
             }
         }
             
-        set_bool(caller, false);
+        set_bool(OUTPUT, false);
         return;
     }
 }
@@ -180,9 +181,9 @@ void handle_key_press(SDL_Event &event, int key)
     }
 }
 
-void recent_key_presses(EvalContext*, Term* caller)
+CA_FUNCTION(recent_key_presses)
 {
-    List* output = (List*) caller;
+    List* output = (List*) OUTPUT;
     output->clear();
 
     for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++) {
@@ -213,38 +214,38 @@ bool mouse_in(TaggedValue* box)
         && x2 >= MOUSE_X && y2 >= MOUSE_Y;
 }
 
-void mouse_pressed(EvalContext*, Term* caller)
+CA_FUNCTION(mouse_pressed)
 {
-    set_bool(caller, LEFT_MOUSE_DOWN);
+    set_bool(OUTPUT, LEFT_MOUSE_DOWN);
 }
 
-void mouse_clicked(EvalContext*, Term* caller)
+CA_FUNCTION(mouse_clicked)
 {
-    if (caller->numInputs() == 0)
-        set_bool(caller, RECENT_LEFT_MOUSE_DOWN);
+    if (NUM_INPUTS == 0)
+        set_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN);
     else
-        set_bool(caller, RECENT_LEFT_MOUSE_DOWN && mouse_in(caller->input(0)));
+        set_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN && mouse_in(INPUT(0)));
 }
 
-void mouse_over(EvalContext*, Term* caller)
+CA_FUNCTION(mouse_over)
 {
-    set_bool(caller, mouse_in(caller->input(0)));
+    set_bool(OUTPUT, mouse_in(INPUT(0)));
 }
 
-void mouse_wheel_up(EvalContext*, Term* caller)
+CA_FUNCTION(mouse_wheel_up)
 {
-    if (caller->numInputs() == 0)
-        set_bool(caller, RECENT_MOUSE_WHEEL_UP);
+    if (NUM_INPUTS == 0)
+        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP);
     else
-        set_bool(caller, RECENT_MOUSE_WHEEL_UP && mouse_in(caller->input(0)));
+        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP && mouse_in(INPUT(0)));
 }
 
-void mouse_wheel_down(EvalContext*, Term* caller)
+CA_FUNCTION(mouse_wheel_down)
 {
-    if (caller->numInputs() == 0)
-        set_bool(caller, RECENT_MOUSE_WHEEL_DOWN);
+    if (NUM_INPUTS == 0)
+        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN);
     else
-        set_bool(caller, RECENT_MOUSE_WHEEL_DOWN && mouse_in(caller->input(0)));
+        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN && mouse_in(INPUT(0)));
 }
 
 void setup(Branch& branch)

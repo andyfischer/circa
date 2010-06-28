@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include <importing_macros.h>
 
 #include <SDL_opengl.h>
 #include <SDL_ttf.h>
@@ -35,30 +36,29 @@ SDL_Color unpack_sdl_color(TaggedValue* color)
     c.r = Uint8(color->getIndex(0)->asFloat() * 255.0);
     c.g = Uint8(color->getIndex(1)->asFloat() * 255.0);
     c.b = Uint8(color->getIndex(2)->asFloat() * 255.0);
-    // c.a = colorTerm->getIndex(3)->asFloat() * 255.0;
     return c;
 }
 
-void load_font(EvalContext* cxt, Term* term)
+CA_FUNCTION(load_font)
 {
-    TTF_Font_ptr state = term->input(0);
-    TTF_Font_ptr output = term;
+    TTF_Font_ptr state = INPUT(0);
+    TTF_Font_ptr output = OUTPUT;
 
     if (*state != NULL) {
         output = state;
         return;
     }
 
-    std::string path = as_string(term->input(1));
-    int pointSize = term->input(2)->asInt();
+    std::string path = as_string(INPUT(1));
+    int pointSize = INT_INPUT(1);
 
-    path = get_path_relative_to_source(term, path.c_str());
+    path = get_path_relative_to_source(CALLER, path.c_str());
 
     TTF_Font* result = TTF_OpenFont(path.c_str(), pointSize);
     if (result == NULL) {
         std::stringstream err;
         err << "TTF_OpenFont failed to load " << path << " with error: " << TTF_GetError();
-        error_occurred(cxt, term, err.str());
+        error_occurred(CONTEXT_AND_CALLER, err.str());
         return;
     }
 
@@ -79,34 +79,34 @@ struct RenderedText : TaggedValue
     TaggedValue* textContainer() { return getIndex(4); }
 };
 
-void render_text(EvalContext*, Term* caller)
+CA_FUNCTION(render_text)
 {
-    RenderedText* state = (RenderedText*) caller->input(0);
+    RenderedText* state = (RenderedText*) INPUT(0);
     touch(state);
 
-    std::string const& inputText = as_string(caller->input(2));
-    Term* inputColor = caller->input(3);
+    std::string const& inputText = as_string(INPUT(2));
+    TaggedValue* inputColor = INPUT(3);
     bool changed_color = !state->color()->equals(inputColor);
 
     if (state->texid() == 0 || state->text() != inputText || changed_color) {
 
-        copy(caller->input(2), state->textContainer());
+        copy(INPUT(2), state->textContainer());
 
         // Clear results if text is empty
         if (inputText == "") {
             set_int(state->texidContainer(), 0);
             set_int(state->widthContainer(), 0);
             set_int(state->heightContainer(), 0);
-            copy(caller->input(0), caller);
+            copy(INPUT(0), OUTPUT);
             return;
         }
 
         // Render the text to a new surface, upload it as a texture, destroy the surface,
         // record the texture id.
 
-        TTF_Font_ptr font = caller->input(1);
+        TTF_Font_ptr font = INPUT(1);
 
-        SDL_Color sdlColor = unpack_sdl_color(caller->input(3));
+        SDL_Color sdlColor = unpack_sdl_color(INPUT(3));
         SDL_Surface *surface = TTF_RenderText_Blended(*font, inputText.c_str(), sdlColor);
 
         set_int(state->texidContainer(), load_surface_to_texture(surface));
@@ -118,18 +118,18 @@ void render_text(EvalContext*, Term* caller)
 
         SDL_FreeSurface(surface);
     }
-    copy(state, caller);
+    copy(state, OUTPUT);
 }
 
-void draw_rendered_text(EvalContext* cxt, Term* caller)
+CA_FUNCTION(draw_rendered_text)
 {
-    RenderedText* obj = (RenderedText*) caller->input(0);
+    RenderedText* obj = (RenderedText*) INPUT(0);
 
     if (obj->texid() == 0)
         return;
 
-    int x = int(caller->input(1)->getIndex(0)->toFloat());
-    int y = int(caller->input(1)->getIndex(1)->toFloat());
+    int x = int(INPUT(1)->getIndex(0)->toFloat());
+    int y = int(INPUT(1)->getIndex(1)->toFloat());
 
     glBindTexture(GL_TEXTURE_2D, obj->texid());
     glColor4f(1,1,1,1);
@@ -153,7 +153,7 @@ void draw_rendered_text(EvalContext* cxt, Term* caller)
     // Clean up state
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    gl_check_error(cxt, caller);
+    gl_check_error(CONTEXT_AND_CALLER);
 }
 
 void pre_setup(Branch& branch)

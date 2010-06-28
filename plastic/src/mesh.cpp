@@ -2,6 +2,7 @@
 
 #include "SDL_opengl.h"
 
+#include <importing_macros.h>
 #include "circa.h"
 
 #include "mesh.h"
@@ -126,8 +127,10 @@ void draw_mesh_immediate(Mesh& mesh)
     glEnd();
 }
 
-void hosted_load_mesh(EvalContext*, Term* caller)
+#if 0
+CA_FUNCTION(hosted_load_mesh)
 {
+    // Broken, this needs to use state
     if (caller->asInt() == 0) {
         Mesh mesh;
         load_obj_file(caller->input(0)->asString(), mesh);
@@ -138,15 +141,16 @@ void hosted_load_mesh(EvalContext*, Term* caller)
         set_int(caller, index);
     }
 }
+#endif
 
-void hosted_draw_mesh(EvalContext*, Term* caller)
+CA_FUNCTION(hosted_draw_mesh)
 {
-    GLuint list = caller->input(0)->asInt();
-    GLuint tex = caller->input(1)->asInt();
+    GLuint list = INT_INPUT(0);
+    GLuint tex = INT_INPUT(1);
     glBindTexture(GL_TEXTURE_2D, tex);
-    Branch& translation = caller->input(2)->asBranch();
-    Branch& scale = caller->input(3)->asBranch();
-    Branch& rotation = caller->input(4)->asBranch();
+    Branch& translation = INPUT(2)->asBranch();
+    Branch& scale = INPUT(3)->asBranch();
+    Branch& rotation = INPUT(4)->asBranch();
 
     glPushMatrix();
     glTranslatef(translation[0]->toFloat(),translation[1]->toFloat(),translation[2]->toFloat());
@@ -160,7 +164,7 @@ void hosted_draw_mesh(EvalContext*, Term* caller)
 
 void setup(circa::Branch& branch)
 {
-    install_function(branch["load_mesh"], hosted_load_mesh);
+    //install_function(branch["load_mesh"], hosted_load_mesh);
     install_function(branch["draw_mesh"], hosted_draw_mesh);
 }
 

@@ -1,5 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include <importing_macros.h>
+
 #include "plastic.h"
 #include "plastic_main.h"
 
@@ -7,26 +9,26 @@ using namespace circa;
 
 namespace ide {
 
-void quit(EvalContext*, Term* term)
+CA_FUNCTION(quit)
 {
     CONTINUE_MAIN_LOOP = false;
 }
 
-void reset_state(EvalContext*, Term* term)
+CA_FUNCTION(reset_state)
 {
     reset_state(users_branch());
     if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
         PAUSED = false;
 }
 
-void hosted_reload_runtime(EvalContext*, Term* term)
+CA_FUNCTION(hosted_reload_runtime)
 {
     reload_runtime();
 }
 
-void paused(EvalContext*, Term* term)
+CA_FUNCTION(paused)
 {
-    set_bool(term, PAUSED);
+    set_bool(OUTPUT, PAUSED);
 }
 
 void setup(circa::Branch& branch)

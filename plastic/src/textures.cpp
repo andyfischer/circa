@@ -7,6 +7,7 @@
 #include <SDL_opengl.h>
 
 #include <circa.h>
+#include <importing_macros.h>
 
 #include "gl_util.h"
 #include "image.h"
@@ -16,32 +17,32 @@ using namespace circa;
 
 namespace textures {
 
-void hosted_load_texture(EvalContext* cxt, Term* caller)
+CA_FUNCTION(hosted_load_texture)
 {
-    Int texid = caller->input(0);
+    Int texid = INPUT(0);
 
     if (texid == 0) {
-        std::string filename = caller->input(1)->asString();
-        GLuint id = load_image_to_texture(cxt, caller, filename.c_str());
+        std::string filename = INPUT(1)->asString();
+        GLuint id = load_image_to_texture(CONTEXT, CALLER, filename.c_str());
         texid = id;
     }
-    set_int(caller, texid);
+    set_int(OUTPUT, texid);
 
-    gl_check_error(cxt, caller);
+    gl_check_error(CONTEXT_AND_CALLER);
 }
 
-void hosted_image(EvalContext* cxt, Term* caller)
+CA_FUNCTION(hosted_image)
 {
-    Int texid = caller->input(0);
-    std::string filename = caller->input(1)->asString();
-    float x1 = caller->input(2)->toFloat();
-    float y1 = caller->input(3)->toFloat();
-    float x2 = caller->input(4)->toFloat();
-    float y2 = caller->input(5)->toFloat();
+    Int texid = INPUT(0);
+    std::string filename = INPUT(1)->asString();
+    float x1 = FLOAT_INPUT(2);
+    float y1 = FLOAT_INPUT(3);
+    float x2 = FLOAT_INPUT(4);
+    float y2 = FLOAT_INPUT(5);
 
     if (texid == 0) {
-        texid = load_image_to_texture(cxt, caller, filename.c_str());
-        if (cxt->errorOccurred) return;
+        texid = load_image_to_texture(CONTEXT_AND_CALLER, filename.c_str());
+        if (CONTEXT->errorOccurred) return;
     }
 
     glBindTexture(GL_TEXTURE_2D, texid);
@@ -62,7 +63,7 @@ void hosted_image(EvalContext* cxt, Term* caller)
     // reset state
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    gl_check_error(cxt, caller);
+    gl_check_error(CONTEXT_AND_CALLER);
 }
 
 void setup(circa::Branch& branch)
