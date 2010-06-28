@@ -5,15 +5,17 @@
 namespace circa {
 namespace length_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_START_FUNCTIONS;
+
+    CA_DEFINE_FUNCTION(length,  "length(List) -> int;"
+            "'Return the number of items in the given list' end")
     {
-        set_int(caller, num_elements(caller->input(0)));
+        set_int(OUTPUT, num_elements(INPUT(0)));
     }
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "length(List) -> int;"
-            "'Return the number of items in the given list' end");
+        CA_SETUP_FUNCTIONS(kernel);
     }
 }
 }

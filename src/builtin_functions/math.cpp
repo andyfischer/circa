@@ -44,6 +44,34 @@ namespace math_function {
         set_float(OUTPUT, fmodf(FLOAT_INPUT(0), FLOAT_INPUT(1)));
     }
 
+    // We compute mod() using floored division. This is different than C and many
+    // C-like languages. See this page for an explanation of the difference:
+    // http://en.wikipedia.org/wiki/Modulo_operation
+    //
+    // For a function that works the same as C's modulo, use remainder()
+
+    CA_DEFINE_FUNCTION(mod_i, "mod_i(int,int) -> int")
+    {
+        int a = INT_INPUT(0);
+        int n = INT_INPUT(1);
+
+        if (a >= 0)
+            set_int(OUTPUT, a % n);
+        else
+            set_int(OUTPUT, a % n + n);
+    }
+
+    CA_DEFINE_FUNCTION(mod_f, "mod_f(number,number) -> number")
+    {
+        float a = FLOAT_INPUT(0);
+        float n = FLOAT_INPUT(1);
+
+        if (a >= 0)
+            set_float(OUTPUT, fmodf(a, n));
+        else
+            set_float(OUTPUT, fmodf(a, n) + n);
+    }
+
     CA_DEFINE_FUNCTION(round, "round(number n) -> int;"
         "'Return the integer that is closest to n' end")
     {
@@ -81,6 +109,22 @@ namespace math_function {
         set_float(OUTPUT, sum / NUM_INPUTS);
     }
 
+    CA_DEFINE_FUNCTION(pow, "pow(int i, int x) -> int; 'Returns i to the power of x' end")
+    {
+        set_int(OUTPUT, (int) std::pow((float) INT_INPUT(0), INT_INPUT(1)));
+    }
+
+    CA_DEFINE_FUNCTION(sqr, "sqr(number) -> number; 'Square function' end")
+    {
+        float in = FLOAT_INPUT(0);
+        set_float(OUTPUT, in * in);
+    }
+
+    CA_DEFINE_FUNCTION(sqrt, "sqrt(number) -> number; 'Square root' end")
+    {
+        set_float(OUTPUT, std::sqrt(FLOAT_INPUT(0)));
+    }
+
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
@@ -91,6 +135,9 @@ namespace math_function {
                 RefList(kernel["min_i"], kernel["min_f"]));
         create_overloaded_function(kernel, "remainder",
                 RefList(kernel["remainder_i"], kernel["remainder_f"]));
+
+        create_overloaded_function(kernel, "mod",
+                RefList(kernel["mod_i"], kernel["mod_f"]));
     }
 }
 } // namespace circa

@@ -3,7 +3,7 @@
 #include "circa.h"
 
 namespace circa {
-namespace neg_function {
+namespace neg_function  {
 
     void evaluate_f(EvalContext*, Term* caller)
     {
