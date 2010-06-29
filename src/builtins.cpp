@@ -2,6 +2,8 @@
 
 #include "common_headers.h"
 
+#include "importing_macros.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -101,7 +103,7 @@ Term* get_global(std::string name)
     return NULL;
 }
 
-void empty_evaluate_function(EvalContext*, Term*) { }
+CA_FUNCTION(empty_evaluate_function) {}
 
 void create_builtin_types()
 {

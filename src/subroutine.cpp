@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 
@@ -19,31 +20,31 @@ namespace subroutine_t {
             format_branch_source(source, as_branch(term), term);
     }
 
-    void evaluate(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        Term* function = caller->function;
+        Term* function = FUNCTION;
         Branch& functionBranch = as_branch(function);
 
         // Load values into this function's stateful values. If this state has never been
         // saved then this function will reset this function's stateful values.
-        Term* hiddenState = get_hidden_state_for_call(caller);
+        Term* hiddenState = get_hidden_state_for_call(CALLER);
 
         if (hiddenState != NULL) {
             load_state_into_branch(as_branch(hiddenState), functionBranch);
         }
 
-        bool varArgs = function_t::get_variable_args(caller->function);
-        int num_inputs = function_t::num_inputs(caller->function);
+        bool varArgs = function_t::get_variable_args(function);
+        int num_inputs = function_t::num_inputs(function);
 
-        if (!varArgs && (num_inputs != caller->inputs.length())) {
+        if (!varArgs && (num_inputs != NUM_INPUTS)) {
             std::stringstream msg;
             msg << "Wrong number of inputs, expected: " << num_inputs
-                << ", found: " << caller->inputs.length();
-            error_occurred(cxt, caller, msg.str());
+                << ", found: " << NUM_INPUTS;
+            error_occurred(CONTEXT, CALLER, msg.str());
             return;
         }
 
-        // Load inputs
+        // Load inputs.
         for (int input=0; input < num_inputs; input++) {
 
             std::string inputName = function_t::get_input_name(function, input);
@@ -56,21 +57,21 @@ namespace subroutine_t {
 
             assert(term->function == INPUT_PLACEHOLDER_FUNC);
 
-            Term* incomingTerm = caller->input(input);
+            Term* incomingTerm = INPUT_TERM(input);
             if (term->type == ANY_TYPE)
                 copy(incomingTerm, term);
             else
                 cast(incomingTerm, term);
         }
 
-        evaluate_branch(cxt, functionBranch);
+        evaluate_branch(CONTEXT, functionBranch);
 
         // Copy output if no error occurred
-        if (!cxt->errorOccurred && functionBranch.length() > 0) {
+        if (!CONTEXT->errorOccurred && functionBranch.length() > 0) {
             Term* output = functionBranch[functionBranch.length()-1];
             if (output->type != VOID_TYPE) {
                 assert(output->name == "#out");
-                copy(output, caller);
+                copy(output, OUTPUT);
             }
         }
 

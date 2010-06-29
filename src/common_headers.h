@@ -32,7 +32,6 @@ namespace circa {
 struct Branch;
 struct EvalContext;
 struct FeedbackOperation;
-struct Function;
 struct FunctionAttrs;
 struct List;
 struct PathExpression;
@@ -53,7 +52,7 @@ typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
 
 // Function-related typedefs:
 #ifdef NEW_EVALUATE
-typedef void (*EvaluateFunc)(EvalContext* cxt, Term* term, Function* f,
+typedef void (*EvaluateFunc)(EvalContext* cxt, Term* term, Term* func,
         RefList const& inputs, TaggedValue* output);
 #else
 typedef void (*EvaluateFunc)(EvalContext* context, Term* caller);

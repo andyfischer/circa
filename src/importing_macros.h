@@ -15,15 +15,17 @@
         { _circa_START_FUNCTIONS.push_back(this); } \
     };
 
+
+#ifdef NEW_EVALUATE
+
+#define CA_FUNCTION(fname) \
+    void fname(EvalContext* _circa_cxt, Term* _circa_caller, Term* circa_func, \
+            RefList const& _circa_inputs, TaggedValue* _circa_output)
+
 #define CA_DEFINE_FUNCTION(fname, header) \
     void evaluate_##fname(EvalContext* _circa_cxt, Term* _circa_caller); \
     static _circa_StaticFuncDeclaration _static_decl_for_##fname(header, evaluate_##fname); \
     void evaluate_##fname(EvalContext* _circa_cxt, Term* _circa_caller)
-
-#ifdef NEW_EVALUATE
-#define CA_FUNCTION(fname) \
-    void fname(EvalContext* _circa_cxt, Term* _circa_caller, Function* circa_func, \
-            RefList const& _circa_inputs, TaggedValue* _circa_output)
 
 #define INPUT(index) ((TaggedValue*) _circa_inputs[index])
 #define FLOAT_INPUT(index) as_float(INPUT(index))
@@ -34,6 +36,7 @@
 #define INPUT_TERM(index) (_circa_caller->input(index))
 #define OUTPUT ((TaggedValue*) _circa_output)
 #define CONTEXT (_circa_cxt)
+#define FUNCTION (_circa_func)
 #define CALLER (_circa_caller)
 #define CONTEXT_AND_CALLER _circa_cxt, _circa_caller
 
@@ -41,6 +44,11 @@
 
 #define CA_FUNCTION(fname) \
     void fname(EvalContext* _circa_cxt, Term* _circa_caller)
+
+#define CA_DEFINE_FUNCTION(fname, header) \
+    CA_FUNCTION(evaluate_##fname); \
+    static _circa_StaticFuncDeclaration _static_decl_for_##fname(header, evaluate_##fname); \
+    CA_FUNCTION(evaluate_##fname)
  
 #define INT_INPUT(index) int_input(_circa_caller, index)
 #define FLOAT_INPUT(index) float_input(_circa_caller, index)
@@ -51,6 +59,7 @@
 #define INPUT_TERM(index) (_circa_caller->input(index))
 #define OUTPUT ((TaggedValue*) _circa_caller)
 #define CONTEXT (_circa_cxt)
+#define FUNCTION (_circa_caller->function)
 #define CALLER (_circa_caller)
 #define CONTEXT_AND_CALLER _circa_cxt, _circa_caller
 

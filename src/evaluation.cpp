@@ -7,7 +7,7 @@ namespace circa {
 inline void evaluate_term(EvalContext* cxt, Term* term)
 {
     assert(cxt != NULL);
-    if (term == NULL) internal_error("evaluate_term(term = NULL)");
+    assert(term != NULL);
 
     EvaluateFunc evaluate = function_t::get_evaluate(term->function);
 
@@ -16,7 +16,11 @@ inline void evaluate_term(EvalContext* cxt, Term* term)
 
     // Execute the function
     try {
+#ifdef NEW_EVALUATE
+        evaluate(cxt, term, term->function, term->inputs, term);
+#else
         evaluate(cxt, term);
+#endif
     }
     catch (std::exception const& err)
     {
