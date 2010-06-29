@@ -165,7 +165,7 @@ optparse = OptionParser.new do |opts|
         puts "Undefining #{d}"
         $parser.defineOff.add(d)
     end
-    opts.on('', '--stdout', '') do |d|
+    opts.on('', '--stdout', '') do
         $tostdout = true
     end
 end
