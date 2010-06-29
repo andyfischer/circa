@@ -379,9 +379,7 @@ void initialize_primitive_types(Branch& kernel)
 
 void setup_builtin_types(Branch& kernel)
 {
-    Term* branch_append = 
-        import_member_function(BRANCH_TYPE, branch_t::append, "append(Branch, any) -> Branch");
-    function_set_use_input_as_output(branch_append, 0, true);
+    branch_t::setup_type(BRANCH_TYPE);
 
     import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) -> string");
 

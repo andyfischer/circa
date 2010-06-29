@@ -24,7 +24,6 @@ struct FunctionAttrs
 
     // Functions
     EvaluateFunc evaluate;
-    EvaluateFunc2 evaluate2;
     SpecializeTypeFunc specializeType;
     FormatSource formatSource;
     CheckInvariants checkInvariants;
@@ -35,7 +34,6 @@ struct FunctionAttrs
     FunctionAttrs()
       : variableArgs(false),
         evaluate(NULL),
-        evaluate2(NULL),
         specializeType(NULL),
         formatSource(NULL),
         checkInvariants(NULL),

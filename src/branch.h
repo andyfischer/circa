@@ -100,7 +100,8 @@ namespace branch_t {
 
     void branch_copy(Branch& source, Branch& dest);
     void assign(Branch& source, Branch& dest);
-    void append(EvalContext*, Term* caller);
+
+    void setup_type(Term* type);
 }
 
 bool is_branch(TaggedValue* term);

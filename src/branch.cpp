@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 
@@ -580,12 +581,18 @@ namespace branch_t {
 
         return true;
     }
-    void append(EvalContext*, Term* caller)
+    CA_FUNCTION(append)
     {
-        circa::copy(caller->input(0), caller);
-        Branch& branch = as_branch(caller);
-        Term* value = caller->input(1);
-        create_duplicate(branch, value);
+        circa::copy(INPUT(0), OUTPUT);
+        Branch& branch = as_branch(OUTPUT);
+        Term* t = INPUT_TERM(1);
+        create_duplicate(branch, t);
+    }
+    void setup_type(Term* type)
+    {
+        Term* branch_append = 
+            import_member_function(type, append, "append(Branch, any) -> Branch");
+        function_set_use_input_as_output(branch_append, 0, true);
     }
 }
 

@@ -50,8 +50,11 @@ struct TypeRef;
 typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
 
 // Function-related typedefs:
-typedef void (*EvaluateFunc)(EvalContext* context, Term* caller, Function* func,
+typedef void (*EvaluateFunc)(EvalContext* context, Term* caller);
+#if 0
+typedef void (*EvaluateFunc2)(EvalContext* cxt, Term* term, Function* f,
         RefList const& inputs, TaggedValue* output);
+#endif
 typedef Term* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
