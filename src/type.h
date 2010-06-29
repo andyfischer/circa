@@ -179,7 +179,7 @@ namespace type_t {
     std::string to_string(Term *caller);
     void formatSource(StyledSource* source, Term* term);
     void remap_pointers(Term *term, ReferenceMap const& map);
-    void name_accessor(EvalContext*, Term* caller);
+    void setup_type(Term* type);
 
     void copy(Type* value, TaggedValue* dest);
 

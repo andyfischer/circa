@@ -284,9 +284,26 @@ void setup_type(Type* type)
     type->valueFitsType = tv_value_fits_type;
 }
 
-void postponed_setup_type(Type*)
+CA_FUNCTION(append)
 {
-    // TODO: create member functions: append, count
+    List* result = (List*) OUTPUT;
+    copy(INPUT(0), OUTPUT);
+    TaggedValue* value = INPUT(1);
+    copy(value, result->append());
+}
+
+CA_FUNCTION(count)
+{
+    List* list = (List*) INPUT(0);
+    set_int(OUTPUT, list->length());
+}
+
+void postponed_setup_type(Term* type)
+{
+    Term* list_append =
+        import_member_function(type, append, "append(List, any) -> List");
+    function_set_use_input_as_output(list_append, 0, true);
+    import_member_function(type, count, "count(List) -> int");
 }
 
 } // namespace list_t

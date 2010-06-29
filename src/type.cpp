@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 
@@ -77,9 +78,14 @@ namespace type_t {
         }
     }
 
-    void name_accessor(EvalContext*, Term* caller)
+    CA_FUNCTION(name_accessor)
     {
-        set_str(caller, as_type(caller->input(0)).name);
+        set_str(OUTPUT, as_type(INPUT(0)).name);
+    }
+
+    void setup_type(Term* type)
+    {
+        import_member_function(type, name_accessor, "name(Type) -> string");
     }
 
     void copy(Type* value, TaggedValue* dest)

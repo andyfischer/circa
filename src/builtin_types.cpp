@@ -30,23 +30,6 @@ namespace bool_t {
     }
 }
 
-namespace list_t {
-
-    CA_FUNCTION(append)
-    {
-        List* result = (List*) OUTPUT;
-        copy(INPUT(0), OUTPUT);
-        TaggedValue* value = INPUT(1);
-        copy(value, result->append());
-    }
-
-    CA_FUNCTION(count)
-    {
-        List* list = (List*) INPUT(0);
-        set_int(OUTPUT, list->length());
-    }
-}
-
 namespace set_t {
     bool contains(List* list, TaggedValue* value)
     {
@@ -107,7 +90,6 @@ namespace set_t {
 
         return output.str();
     }
-
 
     void setup_type(Type* type) {
         type->toString = set_t::to_string;
@@ -380,17 +362,13 @@ void initialize_primitive_types(Branch& kernel)
 void setup_builtin_types(Branch& kernel)
 {
     branch_t::setup_type(BRANCH_TYPE);
-
-    import_member_function(TYPE_TYPE, type_t::name_accessor, "name(Type) -> string");
+    type_t::setup_type(TYPE_TYPE);
 
     Term* set_type = create_compound_type(kernel, "Set");
     set_t::setup_type(type_contents(set_type));
 
     // LIST_TYPE was created in bootstrap_kernel
-    Term* list_append =
-        import_member_function(LIST_TYPE, list_t::append, "append(List, any) -> List");
-    function_set_use_input_as_output(list_append, 0, true);
-    import_member_function(LIST_TYPE, list_t::count, "count(List) -> int");
+    list_t::postponed_setup_type(LIST_TYPE);
 
     Term* map_type = create_compound_type(kernel, "Map");
     map_t::setup_type(type_contents(map_type));

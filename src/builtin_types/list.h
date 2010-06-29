@@ -10,7 +10,7 @@ namespace list_t {
     bool is_list(TaggedValue*);
     bool is_list_based_type(Type*);
     void setup_type(Type*);
-    void postponed_setup_type(Type*);
+    void postponed_setup_type(Term*);
     void tv_initialize(Type*, TaggedValue*);
     void remove_and_replace_with_back(TaggedValue* list, int index);
 }
