@@ -19,20 +19,20 @@
 #ifdef NEW_EVALUATE
 
 #define CA_FUNCTION(fname) \
-    void fname(EvalContext* _circa_cxt, Term* _circa_caller, Term* circa_func, \
+    void fname(EvalContext* _circa_cxt, Term* _circa_caller, Term* _circa_func, \
             RefList const& _circa_inputs, TaggedValue* _circa_output)
 
 #define CA_DEFINE_FUNCTION(fname, header) \
-    void evaluate_##fname(EvalContext* _circa_cxt, Term* _circa_caller); \
+    CA_FUNCTION(evaluate_##fname); \
     static _circa_StaticFuncDeclaration _static_decl_for_##fname(header, evaluate_##fname); \
-    void evaluate_##fname(EvalContext* _circa_cxt, Term* _circa_caller)
+    CA_FUNCTION(evaluate_##fname)
 
 #define INPUT(index) ((TaggedValue*) _circa_inputs[index])
 #define FLOAT_INPUT(index) as_float(INPUT(index))
 #define BOOL_INPUT(index) as_bool(INPUT(index))
 #define STRING_INPUT(index) as_string(INPUT(index))
 #define INT_INPUT(index) as_int(INPUT(index))
-#define NUM_INPUTS (_circa_inputs->length())
+#define NUM_INPUTS (_circa_inputs.length())
 #define INPUT_TERM(index) (_circa_caller->input(index))
 #define OUTPUT ((TaggedValue*) _circa_output)
 #define CONTEXT (_circa_cxt)

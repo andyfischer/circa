@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 namespace ref_t {
@@ -35,46 +36,47 @@ namespace ref_t {
     {
         return as_ref(lhs) == as_ref(rhs);
     }
-    void get_name(EvalContext* cxt, Term* caller)
+
+    CA_FUNCTION(get_name)
     {
-        Term* t = caller->input(0)->asRef();
+        Term* t = INPUT(0)->asRef();
         if (t == NULL)
-            return error_occurred(cxt, caller, "NULL reference");
-        set_str(caller, t->name);
+            return error_occurred(CONTEXT, CALLER, "NULL reference");
+        set_str(OUTPUT, t->name);
     }
-    void hosted_to_string(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(hosted_to_string)
     {
-        Term* t = caller->input(0)->asRef();
+        Term* t = INPUT(0)->asRef();
         if (t == NULL)
-            return error_occurred(cxt, caller, "NULL reference");
-        set_str(caller, circa::to_string(t));
+            return error_occurred(CONTEXT, CALLER, "NULL reference");
+        set_str(OUTPUT, circa::to_string(t));
     }
-    void hosted_to_source_string(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(hosted_to_source_string)
     {
-        Term* t = caller->input(0)->asRef();
+        Term* t = INPUT(0)->asRef();
         if (t == NULL)
-            return error_occurred(cxt, caller, "NULL reference");
-        set_str(caller, circa::get_term_source_text(t));
+            return error_occurred(CONTEXT, CALLER, "NULL reference");
+        set_str(OUTPUT, circa::get_term_source_text(t));
     }
-    void get_function(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(get_function)
     {
-        Term* t = caller->input(0)->asRef();
+        Term* t = INPUT(0)->asRef();
         if (t == NULL)
-            return error_occurred(cxt, caller, "NULL reference");
-        as_ref(caller) = t->function;
+            return error_occurred(CONTEXT, CALLER, "NULL reference");
+        as_ref(OUTPUT) = t->function;
     }
-    void assign(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(assign)
     {
-        Term* target = caller->input(0)->asRef();
+        Term* target = INPUT(0)->asRef();
         if (target == NULL) {
-            error_occurred(cxt, caller, "NULL reference");
+            error_occurred(CONTEXT, CALLER, "NULL reference");
             return;
         }
 
-        Term* source = caller->input(1);
+        TaggedValue* source = INPUT(1);
 
         if (!is_subtype(source->value_type, declared_type(target))) {
-            error_occurred(cxt, caller, "Can't assign, type mismatch");
+            error_occurred(CONTEXT, CALLER, "Can't assign, type mismatch");
             return;
         }
 
@@ -85,15 +87,15 @@ namespace ref_t {
         return int(a + 0.5);
     }
 
-    void tweak(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(tweak)
     {
-        Term* t = caller->input(0)->asRef();
+        Term* t = INPUT(0)->asRef();
         if (t == NULL) {
-            error_occurred(cxt, caller, "NULL reference");
+            error_occurred(CONTEXT, CALLER, "NULL reference");
             return;
         }
 
-        int steps = caller->input(1)->asInt();
+        int steps = INPUT(1)->asInt();
 
         if (steps == 0)
             return;
@@ -108,61 +110,63 @@ namespace ref_t {
         } else if (is_int(t))
             set_int(t, as_int(t) + steps);
         else
-            error_occurred(cxt, caller, "Ref is not an int or number");
+            error_occurred(CONTEXT, CALLER, "Ref is not an int or number");
     }
-    void asint(EvalContext* cxt, Term* caller)
+
+    CA_FUNCTION(asint)
     {
-        Term* t = caller->input(0)->asRef();
+        Term* t = INPUT(0)->asRef();
         if (t == NULL) {
-            error_occurred(cxt, caller, "NULL reference");
+            error_occurred(CONTEXT, CALLER, "NULL reference");
             return;
         }
         if (!is_int(t)) {
-            error_occurred(cxt, caller, "Not an int");
+            error_occurred(CONTEXT, CALLER, "Not an int");
             return;
         }
-        set_int(caller, as_int(t));
+        set_int(OUTPUT, as_int(t));
     }
-    void asfloat(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(asfloat)
     {
-        Term* t = caller->input(0)->asRef();
+        Term* t = INPUT(0)->asRef();
         if (t == NULL) {
-            error_occurred(cxt, caller, "NULL reference");
+            error_occurred(CONTEXT, CALLER, "NULL reference");
             return;
         }
         
-        set_float(caller, to_float(t));
+        set_float(OUTPUT, to_float(t));
     }
-    void get_input(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(get_input)
     {
-        Term* t = caller->input(0)->asRef();
+        Term* t = INPUT(0)->asRef();
         if (t == NULL) {
-            error_occurred(cxt, caller, "NULL reference");
+            error_occurred(CONTEXT, CALLER, "NULL reference");
             return;
         }
-        int index = caller->input(1)->asInt();
+        int index = INPUT(1)->asInt();
         if (index >= t->numInputs())
-            as_ref(caller) = NULL;
+            as_ref(OUTPUT) = NULL;
         else
-            as_ref(caller) = t->input(index);
+            as_ref(OUTPUT) = t->input(index);
     }
-    void num_inputs(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(num_inputs)
     {
-        Term* t = caller->input(0)->asRef();
+        Term* t = INPUT(0)->asRef();
         if (t == NULL) {
-            error_occurred(cxt, caller, "NULL reference");
+            error_occurred(CONTEXT, CALLER, "NULL reference");
             return;
         }
-        set_int(caller, t->numInputs());
+        set_int(OUTPUT, t->numInputs());
     }
-    void get_source_location(EvalContext* cxt, Term* caller)
+
+    CA_FUNCTION(get_source_location)
     {
-        Term* t = caller->input(0)->asRef();
+        Term* t = INPUT(0)->asRef();
         if (t == NULL) {
-            error_occurred(cxt, caller, "NULL reference");
+            error_occurred(CONTEXT, CALLER, "NULL reference");
             return;
         }
-        Branch& output = as_branch(caller);
+        Branch& output = as_branch(OUTPUT);
 
         if (t->sourceLoc.defined()) {
             set_int(output[0], t->sourceLoc.col);

@@ -121,62 +121,62 @@ namespace string_t {
         append_phrase(source, result, term, token::STRING);
     }
 
-    void length(EvalContext*, Term* term)
+    CA_FUNCTION(length)
     {
-        set_int(term, int(term->input(0)->asString().length()));
+        set_int(OUTPUT, int(INPUT(0)->asString().length()));
     }
 
-    void substr(EvalContext* cxt, Term* term)
+    CA_FUNCTION(substr)
     {
-        int start = int_input(term, 1);
-        int end = int_input(term, 2);
-        std::string const& s = as_string(term->input(0));
+        int start = INT_INPUT(1);
+        int end = INT_INPUT(2);
+        std::string const& s = as_string(INPUT(0));
 
-        if (start < 0) return error_occurred(cxt, term, "Negative index");
-        if (end < 0) return error_occurred(cxt, term, "Negative index");
+        if (start < 0) return error_occurred(CONTEXT, CALLER, "Negative index");
+        if (end < 0) return error_occurred(CONTEXT, CALLER, "Negative index");
 
         if ((unsigned) start > s.length()) {
             std::stringstream msg;
             msg << "Start index is too high: " << start;
-            return error_occurred(cxt, term, msg.str().c_str());
+            return error_occurred(CONTEXT, CALLER, msg.str().c_str());
         }
         if ((unsigned) (start+end) > s.length()) {
             std::stringstream msg;
             msg << "End index is too high: " << start;
-            return error_occurred(cxt, term, msg.str().c_str());
+            return error_occurred(CONTEXT, CALLER, msg.str().c_str());
         }
 
-        set_str(term, s.substr(start, end));
+        set_str(OUTPUT, s.substr(start, end));
     }
 
-    void slice(EvalContext* cxt, Term* term)
+    CA_FUNCTION(slice)
     {
-        int start = int_input(term, 1);
-        int end = int_input(term, 2);
-        std::string const& s = as_string(term->input(0));
+        int start = INT_INPUT(1);
+        int end = INT_INPUT(2);
+        std::string const& s = as_string(INPUT(0));
 
         // Negative indexes are relatve to end of string
         if (start < 0) start = s.length() + start;
         if (end < 0) end = s.length() + end;
 
-        if (start < 0) return set_str(term, "");
-        if (end < 0) return set_str(term, "");
+        if (start < 0) return set_str(OUTPUT, "");
+        if (end < 0) return set_str(OUTPUT, "");
 
         if ((unsigned) start > s.length()) {
             std::stringstream msg;
             msg << "Start index is too high: " << start;
-            return error_occurred(cxt, term, msg.str().c_str());
+            return error_occurred(CONTEXT, CALLER, msg.str().c_str());
         }
         if ((unsigned) end > s.length()) {
             std::stringstream msg;
             msg << "End index is too high: " << start;
-            return error_occurred(cxt, term, msg.str().c_str());
+            return error_occurred(CONTEXT, CALLER, msg.str().c_str());
         }
 
         if (end < start)
-            return set_str(term, "");
+            return set_str(OUTPUT, "");
 
-        set_str(term, s.substr(start, end - start));
+        set_str(OUTPUT, s.substr(start, end - start));
     }
 
     void setup_type(Type* type)
