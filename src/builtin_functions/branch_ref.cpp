@@ -5,14 +5,14 @@
 namespace circa {
 namespace branch_ref_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(branch_ref)
     {
-        branch_ref_t::set_from_ref(caller, caller->input(0));
+        branch_ref_t::set_from_ref(OUTPUT, INPUT_TERM(0));
     }
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate,
+        import_function(kernel, branch_ref,
             "def branch_ref(Branch branch +ignore_error) -> BranchRef");
     }
 }

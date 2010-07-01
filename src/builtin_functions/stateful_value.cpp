@@ -5,7 +5,7 @@
 namespace circa {
 namespace stateful_value_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
     }
 

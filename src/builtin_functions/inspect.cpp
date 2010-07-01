@@ -5,23 +5,22 @@
 namespace circa {
 namespace inspect_function {
 
-    void get_state(EvalContext*, Term* caller)
+    CA_FUNCTION(get_state)
     {
-        Term* input = caller->input(0);
+        Term* input = INPUT_TERM(0);
         Term* hidden_state = get_hidden_state_for_call(input);
 
         if (hidden_state == NULL)
-            change_type(caller, VOID_TYPE);
+            change_type(CALLER, VOID_TYPE);
         else {
-            change_type(caller, hidden_state->type);
-            copy(hidden_state, caller);
+            change_type(CALLER, hidden_state->type);
+            copy(hidden_state, OUTPUT);
         }
     }
 
-    void get_raw(EvalContext*, Term* caller)
+    CA_FUNCTION(get_raw)
     {
-        Term* input = caller->input(0);
-        set_str(caller, get_branch_raw(as_branch(input)));
+        set_str(OUTPUT, get_branch_raw(as_branch(INPUT(0))));
     }
 
     void setup(Branch& kernel)

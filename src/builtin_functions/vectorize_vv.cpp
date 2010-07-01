@@ -13,20 +13,20 @@ namespace vectorize_vv_function {
         return LIST_TYPE;
     }
 
-    void evaluate(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        Term* func = as_ref(function_t::get_parameters(caller->function));
+        Term* func = as_ref(function_t::get_parameters(FUNCTION));
 
-        Term* left = caller->input(0);
-        Term* right = caller->input(1);
-        List* output = (List*) caller;
+        TaggedValue* left = INPUT(0);
+        TaggedValue* right = INPUT(1);
+        List* output = (List*) OUTPUT;
         int numInputs = left->numElements();
 
         if (numInputs != right->numElements()) {
             std::stringstream msg;
             msg << "Input lists have different lengths (left has " << numInputs;
             msg << ", right has " << right->numElements() << ")";
-            error_occurred(cxt, caller, msg.str());
+            error_occurred(CONTEXT, CALLER, msg.str());
             return;
         }
 

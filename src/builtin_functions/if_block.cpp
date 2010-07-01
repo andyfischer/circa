@@ -5,9 +5,9 @@
 namespace circa {
 namespace if_block_function {
 
-    void evaluate(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        evaluate_if_block(cxt, caller);
+        evaluate_if_block(CONTEXT, CALLER);
     }
 
     void formatSource(StyledSource* source, Term* term)

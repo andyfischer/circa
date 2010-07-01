@@ -10,10 +10,11 @@ namespace meta_function {
         return term->input(0)->type;
     }
 
-    void lift_closure_evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(lift_closure_evaluate)
     {
-        copy(caller->input(0), caller);
-        lift_closure(as_branch(caller));
+        copy(INPUT(0), OUTPUT);
+        touch(OUTPUT);
+        lift_closure(as_branch(OUTPUT));
     }
 
     void setup(Branch& kernel)

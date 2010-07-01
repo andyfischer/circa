@@ -14,14 +14,14 @@ namespace list_function {
         return create_implicit_tuple_type(inputTypes);
     }
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        List* result = (List*) caller;
+        List* result = (List*) OUTPUT;
 
-        result->resize(caller->numInputs());
+        result->resize(NUM_INPUTS);
 
-        for (int i=0; i < caller->numInputs(); i++)
-            copy(caller->input(i), (*result)[i]);
+        for (int i=0; i < NUM_INPUTS; i++)
+            copy(INPUT(i), (*result)[i]);
     }
 
     void list_formatSource(StyledSource* source, Term* caller)
@@ -33,11 +33,11 @@ namespace list_function {
         append_phrase(source, "]", caller, token::LBRACKET);
     }
 
-    void evaluate_repeat(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_repeat)
     {
-        List* result = (List*) caller;
-        TaggedValue* source = caller->input(0);
-        int repeatCount = int_input(caller, 1);
+        List* result = (List*) OUTPUT;
+        TaggedValue* source = INPUT(0);
+        int repeatCount = INT_INPUT(1);
 
         result->resize(repeatCount);
 

@@ -7,25 +7,25 @@ namespace overloaded_function {
 
     bool is_overloaded_function(Term* func);
 
-    void evaluate_overloaded(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(evaluate_overloaded)
     {
-        Term* func = caller->function;
+        Term* func = FUNCTION;
         List& overloads = function_t::get_attrs(func).parameters;
 
         // Dynamically find the right overload.
         for (int i=0; i < overloads.length(); i++) {
             Term* overload = as_ref(overloads[i]);
 
-            if (inputs_fit_function_dynamic(overload, caller->inputs)) {
+            if (inputs_fit_function_dynamic(overload, INPUTS)) {
                 Branch tempBranch;
-                Term* tempTerm = apply(tempBranch, overload, caller->inputs);
-                evaluate_branch(cxt, tempBranch);
-                copy(tempTerm, caller);
+                Term* tempTerm = apply(tempBranch, overload, INPUTS);
+                evaluate_branch(CONTEXT, tempBranch);
+                copy(tempTerm, OUTPUT);
                 return;
             }
         }
 
-        error_occurred(cxt, caller, "No usable overload found");
+        error_occurred(CONTEXT, CALLER, "No usable overload found");
     }
 
     Term* statically_specialize_function(Term* func, RefList const& inputs)
@@ -110,12 +110,12 @@ namespace overloaded_function {
         function_t::set_variable_args(term, variableArgs);
     }
 
-    void evaluate(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        if (caller->numInputs() == 0)
-            return error_occurred(cxt, caller, "Number of inputs must be >0");
+        if (NUM_INPUTS == 0)
+            return error_occurred(CONTEXT, CALLER, "Number of inputs must be >0");
 
-        setup_overloaded_function(caller, caller->name, caller->inputs);
+        setup_overloaded_function(CALLER, CALLER->name, INPUTS);
     }
 
     Term* create_overloaded_function(Branch& branch, std::string const& name,

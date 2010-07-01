@@ -5,13 +5,13 @@
 namespace circa {
 namespace print_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        for (int i = 0; i < caller->numInputs(); i++) {
-            if (caller->input(i)->type == STRING_TYPE)
-                std::cout << as_string(caller->input(i));
+        for (int i = 0; i < NUM_INPUTS; i++) {
+            if (INPUT(i)->value_type == type_contents(STRING_TYPE))
+                std::cout << as_string(INPUT(i));
             else
-                std::cout << caller->input(i)->toString();
+                std::cout << INPUT(i)->toString();
         }
         std::cout << std::endl;
     }

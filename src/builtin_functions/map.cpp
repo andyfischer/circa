@@ -5,13 +5,14 @@
 namespace circa {
 namespace map_function {
 
-    void evaluate(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        Term* func = caller->input(0);
-        List* inputs = (List*) caller->input(1);
+        Term* func = INPUT_TERM(0);
+        List* inputs = (List*) INPUT(1);
 
         if (is_function_stateful(func)) {
-            error_occurred(cxt, caller, "map() not yet supported on a stateful function");
+            error_occurred(CONTEXT, CALLER,
+                    "map() not yet supported on a stateful function");
             return;
         }
 
@@ -21,7 +22,7 @@ namespace map_function {
         Term* evalInput = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
         Term* evalResult = apply(evaluationBranch, func, RefList(evalInput));
 
-        List* list = (List*) caller;
+        List* list = (List*) OUTPUT;
         list->resize(numInputs);
 
         for (int i=0; i < numInputs; i++) {
@@ -30,23 +31,6 @@ namespace map_function {
 
             copy(evalResult, list->get(i));
         }
-
-
-#if 0
-        Old branch-based version:
-
-        // Create term if necessary
-        for (int i=output.length(); i < inputs.length(); i++)
-            apply(output, func, RefList(inputs[i]));
-
-        // Remove extra terms if necessary
-        for (int i=inputs.length(); i < output.length(); i++)
-            output.set(i, NULL);
-
-        output.removeNulls();
-
-        evaluate_branch(cxt, output);
-#endif
     }
 
     void setup(Branch& kernel)

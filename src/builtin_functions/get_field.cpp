@@ -5,22 +5,22 @@
 namespace circa {
 namespace get_field_function {
 
-    void evaluate(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        TaggedValue* head = caller->input(0);
+        TaggedValue* head = INPUT(0);
 
-        for (int nameIndex=1; nameIndex < caller->numInputs(); nameIndex++) {
-            std::string const& name = caller->input(nameIndex)->asString();
+        for (int nameIndex=1; nameIndex < NUM_INPUTS; nameIndex++) {
+            std::string const& name = INPUT(nameIndex)->asString();
 
             int fieldIndex = head->value_type->findFieldIndex(name);
 
             if (fieldIndex == -1)
-                return error_occurred(cxt, caller, "field not found: " + name);
+                return error_occurred(CONTEXT, CALLER, "field not found: " + name);
 
             head = head->getIndex(fieldIndex);
         }
 
-        copy(head, caller);
+        copy(head, OUTPUT);
     }
 
     Term* specializeType(Term* caller)

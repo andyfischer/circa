@@ -27,6 +27,8 @@
     static _circa_StaticFuncDeclaration _static_decl_for_##fname(header, evaluate_##fname); \
     CA_FUNCTION(evaluate_##fname)
 
+#define EVALUATION_ARGS _circa_cxt, _circa_caller, _circa_func, _circa_inputs, _circa_output
+
 #define INPUT(index) ((TaggedValue*) _circa_inputs[index])
 #define FLOAT_INPUT(index) as_float(INPUT(index))
 #define BOOL_INPUT(index) as_bool(INPUT(index))
@@ -34,6 +36,7 @@
 #define INT_INPUT(index) as_int(INPUT(index))
 #define NUM_INPUTS (_circa_inputs.length())
 #define INPUT_TERM(index) (_circa_caller->input(index))
+#define INPUTS (_circa_inputs)
 #define OUTPUT ((TaggedValue*) _circa_output)
 #define CONTEXT (_circa_cxt)
 #define FUNCTION (_circa_func)
@@ -50,6 +53,7 @@
     static _circa_StaticFuncDeclaration _static_decl_for_##fname(header, evaluate_##fname); \
     CA_FUNCTION(evaluate_##fname)
  
+#define EVALUATION_ARGS _circa_cxt, _circa_caller
 #define INT_INPUT(index) int_input(_circa_caller, index)
 #define FLOAT_INPUT(index) float_input(_circa_caller, index)
 #define BOOL_INPUT(index) bool_input(_circa_caller, index)
@@ -57,6 +61,7 @@
 #define INPUT(index) ((TaggedValue*) _circa_caller->input(index))
 #define NUM_INPUTS (_circa_caller->numInputs())
 #define INPUT_TERM(index) (_circa_caller->input(index))
+#define INPUTS (_circa_caller->inputs)
 #define OUTPUT ((TaggedValue*) _circa_caller)
 #define CONTEXT (_circa_cxt)
 #define FUNCTION (_circa_caller->function)

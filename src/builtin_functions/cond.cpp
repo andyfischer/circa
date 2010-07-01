@@ -5,11 +5,10 @@
 namespace circa {
 namespace cond_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(cond_evaluate)
     {
-        int index = bool_input(caller,0) ? 1 : 2;
-        Term *result = caller->inputs[index];
-        copy(result, caller);
+        int index = BOOL_INPUT(0) ? 1 : 2;
+        copy(INPUT(index), OUTPUT);
     }
 
     Term* specializeType(Term* caller)
@@ -18,11 +17,11 @@ namespace cond_function {
         return find_common_type(choices);
     }
 
-    void feedback_evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(feedback)
     {
-        Term* target = caller->input(0);
-        Term* desired = caller->input(1);
-        Branch& output = as_branch(caller);
+        Term* target = INPUT_TERM(0);
+        Term* desired = INPUT_TERM(1);
+        Branch& output = as_branch(OUTPUT);
 
         // cond(condition, pos, neg)
         //
@@ -43,12 +42,12 @@ namespace cond_function {
 
     void setup(Branch& kernel)
     {
-        COND_FUNC = import_function(kernel, evaluate, "cond(bool condition, any pos, any neg) -> any; \"If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.\" end");
+        COND_FUNC = import_function(kernel, cond_evaluate, "cond(bool condition, any pos, any neg) -> any; \"If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.\" end");
         function_t::get_specialize_type(COND_FUNC) = specializeType;
         function_t::set_input_meta(COND_FUNC, 1, true);
         function_t::set_input_meta(COND_FUNC, 2, true);
         function_t::get_feedback_func(COND_FUNC) =
-            import_function(kernel, feedback_evaluate, "cond_feedback(any, any) -> Branch");
+            import_function(kernel, feedback, "cond_feedback(any, any) -> Branch");
     }
 }
 }

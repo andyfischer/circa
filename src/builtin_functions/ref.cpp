@@ -5,9 +5,9 @@
 namespace circa {
 namespace ref_function {
 
-    void ref(EvalContext*, Term* caller)
+    CA_FUNCTION(ref)
     {
-        as_ref(caller) = caller->input(0);
+        as_ref(OUTPUT) = INPUT_TERM(0);
     }
 
     void setup(Branch& kernel)

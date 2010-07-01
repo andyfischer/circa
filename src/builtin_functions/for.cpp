@@ -24,9 +24,9 @@ namespace for_function {
             term, token::WHITESPACE);
     }
 
-    void evaluate_discard(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_discard)
     {
-        Term* forTerm = caller->input(0);
+        Term* forTerm = INPUT_TERM(0);
         Term* discardCalled = get_for_loop_discard_called(forTerm);
         set_bool(discardCalled, true);
     }

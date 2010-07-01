@@ -5,18 +5,18 @@
 namespace circa {
 namespace set_field_function {
 
-    void evaluate(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        copy(caller->input(0), caller);
+        copy(INPUT(0), OUTPUT);
 
-        Term* head = caller;
+        Term* head = CALLER;
 
-        for (int nameIndex=2; nameIndex < caller->numInputs(); nameIndex++) {
-            std::string name = caller->input(nameIndex)->asString();
+        for (int nameIndex=2; nameIndex < NUM_INPUTS; nameIndex++) {
+            std::string name = INPUT(nameIndex)->asString();
             int index = head->value_type->findFieldIndex(name);
 
             if (index == -1) {
-                error_occurred(cxt, caller, "field not found: "+name);
+                error_occurred(CONTEXT, CALLER, "field not found: "+name);
                 return;
             }
 
@@ -24,9 +24,9 @@ namespace set_field_function {
         }
 
         if (head->type == ANY_TYPE)
-            copy(caller->input(1), head);
+            copy(INPUT(1), head);
         else
-            cast(head->value_type, caller->input(1), head);
+            cast(head->value_type, INPUT(1), head);
     }
 
     Term* specializeType(Term* caller)

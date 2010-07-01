@@ -5,18 +5,18 @@
 namespace circa {
 namespace lookup_branch_ref_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        std::string name = as_string(caller->input(0));
+        std::string name = as_string(INPUT(0));
         Term* term = get_global(name);
 
         if (term == NULL)
-            return branch_ref_t::set_from_ref(caller, NULL);
+            return branch_ref_t::set_from_ref(OUTPUT, NULL);
 
         if (!is_branch(term))
-            return branch_ref_t::set_from_ref(caller, NULL);
+            return branch_ref_t::set_from_ref(OUTPUT, NULL);
 
-        return branch_ref_t::set_from_ref(caller, term);
+        return branch_ref_t::set_from_ref(OUTPUT, term);
     }
 
     void setup(Branch& kernel)

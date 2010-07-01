@@ -97,7 +97,7 @@ namespace include_function {
 }
 
 namespace file_changed_function {
-    bool check(EvalContext*, Term* caller, Term* fileSignature,
+    bool check(EvalContext*, Term* caller, TaggedValue* fileSignature,
             std::string const& filename);
 }
 

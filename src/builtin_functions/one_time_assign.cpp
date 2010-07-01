@@ -5,13 +5,11 @@
 namespace circa {
 namespace one_time_assign_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        Term* assigned = caller->input(0);
-
-        if (!as_bool(assigned)) {
-            cast(caller->input(1), caller);
-            set_bool(assigned, true);
+        if (!BOOL_INPUT(0)) {
+            cast(INPUT(1), OUTPUT);
+            set_bool(INPUT(0), true);
         }
     }
 

@@ -5,13 +5,12 @@
 namespace circa {
 namespace styled_source_function {
 
-    void format_source(EvalContext*, Term* caller)
+    CA_FUNCTION(format_source)
     {
-        Branch& branch = branch_ref_t::get_target_branch(caller->input(0));
+        Branch& branch = branch_ref_t::get_target_branch(INPUT(0));
 
-        caller->reset();
-
-        format_branch_source((StyledSource*) caller, branch);
+        OUTPUT->reset();
+        format_branch_source((StyledSource*) OUTPUT, branch);
     }
 
     void setup(Branch& kernel)

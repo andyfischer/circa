@@ -5,27 +5,27 @@
 namespace circa {
 namespace cast_function {
 
-    void evaluate(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(cast_evaluate)
     {
-        TaggedValue* source = caller->input(0);
+        TaggedValue* source = INPUT(0);
 
-        if (caller->type == ANY_TYPE)
-            return copy(source, caller);
+        if (CALLER->type == ANY_TYPE)
+            return copy(source, OUTPUT);
 
-        Type* type = &as_type(caller->type);
+        Type* type = &as_type(CALLER->type);
         if (!cast_possible(type, source)) {
             std::stringstream message;
             message << "Can't cast from type " << source->value_type->name
                 << " to type " << type->name;
-            return error_occurred(cxt, caller, message.str());
+            return error_occurred(CONTEXT, CALLER, message.str());
         }
 
-        cast(type, source, caller);
+        cast(type, source, OUTPUT);
     }
 
     void setup(Branch& kernel)
     {
-        CAST_FUNC = import_function(kernel, evaluate, "cast(any) -> any");
+        CAST_FUNC = import_function(kernel, cast_evaluate, "cast(any) -> any");
     }
 }
 }

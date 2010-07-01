@@ -1,14 +1,15 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 namespace branch_function {
 
-    void evaluate(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(branch_evaluate)
     {
-        Branch& branch = as_branch(caller);
-        evaluate_branch(cxt, branch);
+        Branch& branch = as_branch(OUTPUT);
+        evaluate_branch(CONTEXT, branch);
     }
 
     void format_source(StyledSource* source, Term* term)
@@ -43,7 +44,7 @@ namespace branch_function {
 
     void setup(Branch& kernel)
     {
-        BRANCH_FUNC = import_function(kernel, evaluate, "branch() -> Branch");
+        BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch() -> Branch");
         function_t::get_attrs(BRANCH_FUNC).formatSource = format_source;
     }
 }

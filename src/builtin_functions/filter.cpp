@@ -5,16 +5,16 @@
 namespace circa {
 namespace filter_function {
 
-    void evaluate(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        TaggedValue* inputs = caller->input(0);
-        TaggedValue* bools = caller->input(1);
+        TaggedValue* inputs = INPUT(0);
+        TaggedValue* bools = INPUT(1);
 
         int numInputs = inputs->numElements();
         int numBools = bools->numElements();
 
         if (numInputs != numBools)
-            return error_occurred(cxt, caller, "Lists have different lengths");
+            return error_occurred(CONTEXT, CALLER, "Lists have different lengths");
 
         // Run through once to count # of trues
         int count = 0;
@@ -23,18 +23,16 @@ namespace filter_function {
                 count++;
 
         
-        List* output = (List*) caller;
+        List* output = (List*) OUTPUT;
         output->resize(count);
         touch(output);
 
         int write = 0;
         for (int i=0; i < numInputs; i++) {
             if (bools->getIndex(i)->asBool()) {
-
-                copy((*inputs)[i], caller->getIndex(write++));
+                copy((*inputs)[i], output->getIndex(write++));
             }
         }
-
     }
 
     void setup(Branch& kernel)

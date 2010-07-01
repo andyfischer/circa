@@ -6,16 +6,16 @@ namespace circa {
 
 namespace assign_function {
 
-    void evaluate(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(assign)
     {
-        Term* root = caller->input(0);
+        Term* root = INPUT_TERM(0);
         PathExpression path = get_lexpr_path_expression(root);
         root = path._head;
-        TaggedValue* value = caller->input(1);
+        TaggedValue* value = INPUT(1);
 
-        copy(root, caller);
-        touch(caller);
-        assign_using_path(caller, path, value);
+        copy(root, OUTPUT);
+        touch(OUTPUT);
+        assign_using_path(OUTPUT, path, value);
     }
 
     Term* specializeType(Term* term)
@@ -25,7 +25,7 @@ namespace assign_function {
 
     void setup(Branch& kernel)
     {
-        ASSIGN_FUNC = import_function(kernel, evaluate, "assign(any, any) -> any");
+        ASSIGN_FUNC = import_function(kernel, assign, "assign(any, any) -> any");
         function_t::get_attrs(ASSIGN_FUNC).specializeType = specializeType;
     }
 }

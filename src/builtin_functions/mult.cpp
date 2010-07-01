@@ -5,25 +5,25 @@
 namespace circa {
 namespace mult_function {
 
-    void evaluate_f(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_f)
     {
-        set_float(caller, float_input(caller,0) * float_input(caller,1));
+        set_float(OUTPUT, FLOAT_INPUT(0) * FLOAT_INPUT(1));
     }
 
-    void evaluate_i(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_i)
     {
-        set_int(caller, int_input(caller,0) * int_input(caller,1));
+        set_int(OUTPUT, INT_INPUT(0) * INT_INPUT(1));
     }
 
-    void feedback_evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(feedback_evaluate)
     {
-        Term* target = caller->input(0);
-        float desired = float_input(caller,1);
+        Term* target = INPUT_TERM(0);
+        float desired = FLOAT_INPUT(1);
 
         float delta = desired - to_float(target);
 
         // for each input, send a delta divided by the product of all other inputs
-        Branch& outputList = as_branch(caller);
+        Branch& outputList = as_branch(OUTPUT);
         for (int i=0; i < outputList.length(); i++) {
             Term* output = outputList[i];
             Term* outputTarget = target->input(i);

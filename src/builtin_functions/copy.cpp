@@ -5,9 +5,9 @@
 namespace circa {
 namespace copy_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        copy(caller->input(0), caller);
+        copy(INPUT(0), OUTPUT);
     }
 
     Term* specializeType(Term* caller)

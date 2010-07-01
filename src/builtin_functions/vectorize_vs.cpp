@@ -13,13 +13,13 @@ namespace vectorize_vs_function {
         return LIST_TYPE;
     }
 
-    void evaluate(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        Term* func = as_ref(function_t::get_parameters(caller->function));
+        Term* func = as_ref(function_t::get_parameters(FUNCTION));
 
-        List* left = (List*) caller->input(0);
-        Term* right = caller->input(1);
-        List* output = (List*) caller;
+        List* left = (List*) INPUT(0);
+        Term* right = INPUT_TERM(1);
+        List* output = (List*) OUTPUT;
         int numInputs = left->numElements();
 
         Branch evaluationBranch;

@@ -5,10 +5,10 @@
 namespace circa {
 namespace path_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        set_str(caller,
-            get_path_relative_to_source(caller, as_string(caller->input(0))));
+        set_str(OUTPUT,
+            get_path_relative_to_source(CALLER, as_string(INPUT(0))));
     }
 
     void setup(Branch& kernel)

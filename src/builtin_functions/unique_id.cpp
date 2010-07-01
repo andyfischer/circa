@@ -5,10 +5,10 @@
 namespace circa {
 namespace unique_id_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
         static int nextId = 1;
-        set_int(caller, nextId++);
+        set_int(OUTPUT, nextId++);
     }
 
     void setup(Branch& kernel)

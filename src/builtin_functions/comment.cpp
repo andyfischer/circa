@@ -5,10 +5,6 @@
 namespace circa {
 namespace comment_function {
 
-    void evaluate(EvalContext*, Term* caller)
-    {
-    }
-
     void formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, term->stringProp("comment"), term, token::COMMENT);
@@ -16,7 +12,7 @@ namespace comment_function {
 
     void setup(Branch& kernel)
     {
-        COMMENT_FUNC = import_function(kernel, evaluate, "comment()");
+        COMMENT_FUNC = import_function(kernel, NULL, "comment()");
         function_t::get_attrs(COMMENT_FUNC).formatSource = formatSource;
     }
 }

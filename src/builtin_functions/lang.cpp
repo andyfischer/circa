@@ -5,14 +5,14 @@
 namespace circa {
 namespace lang_function {
 
-    void field(EvalContext*, Term* caller)
+    CA_FUNCTION(field)
     {
-        set_ref(caller, as_branch(caller->input(0))[caller->input(1)->asInt()]);
+        set_ref(OUTPUT, as_branch(INPUT(0))[INPUT(1)->asInt()]);
     }
 
-    void num_fields(EvalContext*, Term* caller)
+    CA_FUNCTION(num_fields)
     {
-        set_int(caller, as_branch(caller->input(0)).length());
+        set_int(OUTPUT, as_branch(INPUT(0)).length());
     }
 
     void setup(Branch& kernel)

@@ -5,13 +5,13 @@
 namespace circa {
 namespace set_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        List* result = (List*) caller;
+        List* result = (List*) OUTPUT;
         result->clear();
 
-        for (int index=0; index < caller->numInputs(); index++) {
-            set_t::add(result, caller->input(index));
+        for (int index=0; index < NUM_INPUTS; index++) {
+            set_t::add(result, INPUT(index));
         }
     }
 

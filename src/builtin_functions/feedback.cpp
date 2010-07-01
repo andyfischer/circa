@@ -5,7 +5,7 @@
 namespace circa {
 namespace feedback_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
         // No-op
     }

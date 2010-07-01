@@ -7,16 +7,16 @@ namespace message_passing_function {
 
     static Term* INBOX_FUNC = NULL;
 
-    void evaluate_inbox(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_inbox)
     {
-        copy(caller->input(0), caller);
-        ((List*) caller->input(0))->resize(0);
+        copy(INPUT(0), OUTPUT);
+        ((List*) INPUT(0))->resize(0);
     }
 
-    void evaluate_send(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_send)
     {
-        Term* inbox = caller->input(0);
-        Term* input = caller->input(1);
+        Term* inbox = INPUT_TERM(0);
+        Term* input = INPUT_TERM(1);
 
         assert(inbox->function == INBOX_FUNC);
 

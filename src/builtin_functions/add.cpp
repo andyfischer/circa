@@ -5,30 +5,30 @@
 namespace circa {
 namespace add_function {
 
-    void evaluate_i(EvalContext*, Term* caller)
+    CA_FUNCTION(add_i_evaluate)
     {
         int result = 0;
-        for (int i=0; i < caller->numInputs(); i++)
-            result += int_input(caller,i);
-        set_int(caller, result);
+        for (int i=0; i < NUM_INPUTS; i++)
+            result += INT_INPUT(i);
+        set_int(OUTPUT, result);
     }
 
-    void evaluate_f(EvalContext*, Term* caller)
+    CA_FUNCTION(add_f_evaluate)
     {
         float result = 0.0;
-        for (int i=0; i < caller->numInputs(); i++)
-            result += float_input(caller,i);
-        set_float(caller, result);
+        for (int i=0; i < NUM_INPUTS; i++)
+            result += FLOAT_INPUT(i);
+        set_float(OUTPUT, result);
     }
 
-    void feedback_evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(add_feedback)
     {
-        Term* target = caller->input(0);
-        float desired = float_input(caller,1);
+        Term* target = INPUT_TERM(0);
+        float desired = FLOAT_INPUT(1);
 
         float delta = desired - to_float(target);
 
-        Branch& outputList = as_branch(caller);
+        Branch& outputList = as_branch(OUTPUT);
         for (int i=0; i < outputList.length(); i++) {
             Term* output = outputList[i];
             Term* outputTarget = target->input(i);
@@ -39,11 +39,11 @@ namespace add_function {
 
     void setup(Branch& kernel)
     {
-        Term* add_i = import_function(kernel, evaluate_i, "add_i(int...) -> int");
-        Term* add_f = import_function(kernel, evaluate_f, "add_f(number...) -> number");
+        Term* add_i = import_function(kernel, add_i_evaluate, "add_i(int...) -> int");
+        Term* add_f = import_function(kernel, add_f_evaluate, "add_f(number...) -> number");
 
         function_t::get_feedback_func(add_f) =
-            import_function(kernel, feedback_evaluate, "add_feedback(any, number) -> Branch");
+            import_function(kernel, add_feedback, "add_feedback(any, number) -> Branch");
 
         ADD_FUNC = create_overloaded_function(kernel, "add", RefList(add_i, add_f));
     }

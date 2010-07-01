@@ -5,50 +5,50 @@
 namespace circa {
 namespace trig_function {
 
-    void evaluate_sin(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_sin)
     {
-        float input = float_input(caller,0);
+        float input = FLOAT_INPUT(0);
 
         // Convert input from 0..1 to 0..2pi
-        set_float(caller, sin(float(input * 2 * M_PI)));
+        set_float(OUTPUT, sin(float(input * 2 * M_PI)));
     }
-    void evaluate_cos(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_cos)
     {
-        float input = float_input(caller,0);
+        float input = FLOAT_INPUT(0);
 
         // Convert input from 0..1 to 0..2pi
-        set_float(caller, cos(float(input * 2 * M_PI)));
+        set_float(OUTPUT, cos(float(input * 2 * M_PI)));
     }
-    void evaluate_tan(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_tan)
     {
-        float input = float_input(caller,0);
+        float input = FLOAT_INPUT(0);
 
         // Convert input from 0..1 to 0..2pi
-        set_float(caller, tan(float(input * 2 * M_PI)));
+        set_float(OUTPUT, tan(float(input * 2 * M_PI)));
     }
-    void evaluate_arcsin(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_arcsin)
     {
-        float input = float_input(caller,0);
+        float input = FLOAT_INPUT(0);
         float result = asin(input);
-        set_float(caller, result / float(2 * M_PI));
+        set_float(OUTPUT, result / float(2 * M_PI));
     }
-    void evaluate_arccos(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_arccos)
     {
-        float input = float_input(caller,0);
+        float input = FLOAT_INPUT(0);
         float result = acos(input);
-        set_float(caller, result / float(2 * M_PI));
+        set_float(OUTPUT, result / float(2 * M_PI));
     }
-    void evaluate_arctan(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_arctan)
     {
-        float input = float_input(caller,0);
+        float input = FLOAT_INPUT(0);
         float result = atan(input);
-        set_float(caller, result / float(2 * M_PI));
+        set_float(OUTPUT, result / float(2 * M_PI));
     }
 
-    void feedback_evaluate_sin(EvalContext*, Term* caller)
+    CA_FUNCTION(feedback_evaluate_sin)
     {
-        // Term* target = caller->input(0);
-        float desired = float_input(caller, 1);
+        // Term* target = INPUT(0);
+        float desired = FLOAT_INPUT( 1);
 
         // restrict input to -1..1
         if (desired > 1)
@@ -59,13 +59,13 @@ namespace trig_function {
         float result = std::asin(desired);
 
         // Map result from radians into range of 0..1
-        set_float(caller, result / float(2 * M_PI));
+        set_float(OUTPUT, result / float(2 * M_PI));
     }
 
-    void feedback_evaluate_cos(EvalContext*, Term* caller)
+    CA_FUNCTION(feedback_evaluate_cos)
     {
-        // Term* target = caller->input(0);
-        float desired = caller->input(1)->toFloat();
+        // Term* target = INPUT(0);
+        float desired = INPUT(1)->toFloat();
 
         // restrict input to -1..1
         if (desired > 1)
@@ -76,7 +76,7 @@ namespace trig_function {
         float result = std::acos(desired);
 
         // Map result from radians into range of 0..1
-        set_float(caller, result / float(2 * M_PI));
+        set_float(OUTPUT, result / float(2 * M_PI));
     }
 
     void setup(Branch& kernel)

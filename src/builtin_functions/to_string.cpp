@@ -5,10 +5,9 @@
 namespace circa {
 namespace to_string_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        Term* term = caller->input(0);
-        set_str(caller, to_string(term));
+        set_str(OUTPUT, to_string(INPUT(0)));
     }
 
     void setup(Branch& kernel)

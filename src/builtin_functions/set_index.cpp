@@ -5,12 +5,12 @@
 namespace circa {
 namespace set_index_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        copy(caller->input(0), caller);
-
-        int index = caller->input(1)->asInt();
-        cast(caller->input(2), caller->getIndex(index));
+        copy(INPUT(0), OUTPUT);
+        touch(OUTPUT);
+        int index = INPUT(1)->asInt();
+        cast(INPUT(2), OUTPUT->getIndex(index));
     }
 
     Term* specializeType(Term* caller)

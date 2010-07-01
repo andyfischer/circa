@@ -9,9 +9,9 @@
 namespace circa {
 namespace alias_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(alias)
     {
-        copy(caller->input(0), caller);
+        copy(INPUT(0), OUTPUT);
     }
 
     Term* specializeType(Term* caller)
@@ -21,7 +21,7 @@ namespace alias_function {
 
     void setup(Branch& kernel)
     {
-        ALIAS_FUNC = import_function(kernel, evaluate, "alias(any) -> any");
+        ALIAS_FUNC = import_function(kernel, alias, "alias(any) -> any");
         function_t::get_specialize_type(ALIAS_FUNC) = specializeType;
         hide_from_docs(ALIAS_FUNC);
     }

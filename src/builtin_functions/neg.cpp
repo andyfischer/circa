@@ -5,14 +5,14 @@
 namespace circa {
 namespace neg_function  {
 
-    void evaluate_f(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_f)
     {
-        set_float(caller, -float_input(caller,0));
+        set_float(OUTPUT, -FLOAT_INPUT(0));
     }
 
-    void evaluate_i(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_i)
     {
-        set_int(caller, -int_input(caller,0));
+        set_int(OUTPUT, -INT_INPUT(0));
     }
 
     void formatSource(StyledSource* source, Term* term)

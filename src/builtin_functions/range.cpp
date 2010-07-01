@@ -5,13 +5,13 @@
 namespace circa {
 namespace range_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        int start = int_input(caller, 0);
-        int max = int_input(caller, 1);
+        int start = INT_INPUT(0);
+        int max = INT_INPUT(1);
 
         int count = abs(max-start);
-        List* list = (List*) caller;
+        List* list = (List*) OUTPUT;
         list->resize(count);
 
         int val = start;
@@ -20,7 +20,6 @@ namespace range_function {
             make_int(list->get(i), val);
             val += increment;
         }
-
     }
 
     void setup(Branch& kernel)

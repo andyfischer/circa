@@ -5,10 +5,10 @@
 namespace circa {
 namespace write_text_file_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        std::string filename = string_input(caller, 0);
-        std::string contents = string_input(caller, 1);
+        std::string filename = STRING_INPUT(0);
+        std::string contents = STRING_INPUT(1);
         std::ofstream file;
         file.open(filename.c_str(), std::ios::out);
         file << contents;

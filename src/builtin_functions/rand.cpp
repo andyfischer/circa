@@ -17,41 +17,40 @@ namespace rand_function {
         }
     }
 
-    void evaluate_f(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_f)
     {
         seed_if_needed();
-        set_float(caller, (float) rand() / RAND_MAX);
+        set_float(CALLER, (float) rand() / RAND_MAX);
     }
 
-    void evaluate_f_range(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(evaluate_f_range)
     {
         seed_if_needed();
         float r = (float) rand() / RAND_MAX;
-        float min = caller->input(0)->toFloat();
-        float max = caller->input(1)->toFloat();
+        float min = INPUT(0)->toFloat();
+        float max = INPUT(1)->toFloat();
 
         if (min >= max) {
-            error_occurred(cxt, caller, "min is >= max");
+            error_occurred(CONTEXT, CALLER, "min is >= max");
             return;
         }
 
-        set_float(caller, min + r * (max - min));
+        set_float(CALLER, min + r * (max - min));
     }
 
-    void evaluate_i(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_i)
     {
         seed_if_needed();
-
-        set_int(caller, rand());
+        set_int(OUTPUT, rand());
     }
 
-    void evaluate_i_i(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_i_i)
     {
         seed_if_needed();
-        int period = caller->input(0)->asInt();
+        int period = INPUT(0)->asInt();
 
         // TODO: replace this, builtin rand() does not have good randomness in lower bits.
-        set_int(caller, rand() % period);
+        set_int(OUTPUT, rand() % period);
     }
 
     void setup(Branch& kernel)

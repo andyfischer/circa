@@ -5,13 +5,13 @@
 namespace circa {
 namespace set_union_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
-        List* list = (List*) caller;
+        List* list = (List*) OUTPUT;
         list->clear();
 
-        for (int inputIndex=0; inputIndex < caller->numInputs(); inputIndex++) {
-            List* input = (List*) caller->input(inputIndex);
+        for (int inputIndex=0; inputIndex < NUM_INPUTS; inputIndex++) {
+            List* input = (List*) INPUT(inputIndex);
             int numElements = input->numElements();
             for (int i=0; i < numElements; i++)
                 set_t::add(list, input->get(i));

@@ -5,9 +5,9 @@
 namespace circa {
 namespace any_true_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(any_true)
     {
-        TaggedValue* input = caller->input(0);
+        TaggedValue* input = INPUT(0);
 
         int numElements = input->numElements();
 
@@ -18,12 +18,12 @@ namespace any_true_function {
                 break;
             }
 
-        set_bool(caller, result);
+        set_bool(OUTPUT, result);
     }
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "any_true(List l) -> bool;"
+        import_function(kernel, any_true, "any_true(List l) -> bool;"
                 "'Return whether any of the items in l are true' end");
     }
 }

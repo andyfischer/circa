@@ -5,14 +5,14 @@
 namespace circa {
 namespace sub_function {
 
-    void evaluate_i(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_i)
     {
-        set_int(caller, int_input(caller,0) - int_input(caller,1));
+        set_int(OUTPUT, INT_INPUT(0) - INT_INPUT(1));
     }
 
-    void evaluate_f(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_f)
     {
-        set_float(caller, float_input(caller,0) - float_input(caller,1));
+        set_float(OUTPUT, FLOAT_INPUT(0) - FLOAT_INPUT(1));
     }
 
     void setup(Branch& kernel)

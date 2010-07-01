@@ -5,17 +5,17 @@
 namespace circa {
 namespace unsafe_assign_function {
 
-    void evaluate(EvalContext* cxt, Term* caller)
+    CA_FUNCTION(evaluate)
     {
         // The thing we are changing is on the left, the desired value is on the right
         // This is a little confusing because the C function 'cast' is the other
         // way around. The reason we have this order is because the infix operator :=
         // arranges its inputs as destination := source.
-        Term* destination = caller->input(0);
-        Term* source = caller->input(1);
+        Term* destination = INPUT_TERM(0);
+        Term* source = INPUT_TERM(1);
 
         if (!value_fits_type(source, declared_type(destination))) {
-            error_occurred(cxt, caller,
+            error_occurred(CONTEXT, CALLER,
                     "Tried to assign a " + source->type->name + " to a "
                     + destination->type->name);
             return;

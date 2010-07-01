@@ -6,7 +6,7 @@
 namespace circa {
 namespace unknown_function_function {
 
-    void evaluate(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate)
     {
     }
 
