@@ -16,11 +16,7 @@ inline void evaluate_term(EvalContext* cxt, Term* term)
 
     // Execute the function
     try {
-#ifdef NEW_EVALUATE
         evaluate(cxt, term, term->function, term->inputs, term);
-#else
-        evaluate(cxt, term);
-#endif
     }
     catch (std::exception const& err)
     {
