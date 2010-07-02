@@ -10,10 +10,10 @@ namespace feedback_function {
         // No-op
     }
 
-    void evaluate_apply_feedback(EvalContext*, Term* caller)
+    CA_FUNCTION(evaluate_apply_feedback)
     {
-        Branch& input = caller->input(0)->asBranch();
-        refresh_training_branch(input, as_branch(caller));
+        Branch& input = INPUT(0)->asBranch();
+        refresh_training_branch(input, as_branch(OUTPUT));
     }
 
     void setup(Branch& kernel)

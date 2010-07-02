@@ -18,10 +18,6 @@
 
 #ifdef NEW_EVALUATE
 
-#define CA_FUNCTION(fname) \
-    void fname(EvalContext* _circa_cxt, Term* _circa_caller, Term* _circa_func, \
-            RefList const& _circa_inputs, TaggedValue* _circa_output)
-
 #define CA_DEFINE_FUNCTION(fname, header) \
     CA_FUNCTION(evaluate_##fname); \
     static _circa_StaticFuncDeclaration _static_decl_for_##fname(header, evaluate_##fname); \
@@ -45,8 +41,6 @@
 
 #else
 
-#define CA_FUNCTION(fname) \
-    void fname(EvalContext* _circa_cxt, Term* _circa_caller)
 
 #define CA_DEFINE_FUNCTION(fname, header) \
     CA_FUNCTION(evaluate_##fname); \

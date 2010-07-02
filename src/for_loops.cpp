@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 
@@ -169,23 +170,21 @@ void setup_for_loop_post_code(Term* forTerm)
     get_for_loop_state_type(forTerm) = hasState ? BRANCH_TYPE : VOID_TYPE;
 }
 
-void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
+CA_FUNCTION(evaluate_for_loop)
 {
-    assert(cxt != NULL);
-
-    Term* listTerm = forTerm->input(1);
-    Branch& codeBranch = as_branch(forTerm);
-    Branch* stateBranch = get_for_loop_state(forTerm);
+    Term* listTerm = INPUT_TERM(1);
+    Branch& codeBranch = as_branch(OUTPUT);
+    Branch* stateBranch = get_for_loop_state(CALLER);
 
     int numIterations = listTerm->numElements();
-    bool modifyList = get_for_loop_modify_list(forTerm)->asBool();
-    Term* discardCalled = get_for_loop_discard_called(forTerm);
+    bool modifyList = get_for_loop_modify_list(CALLER)->asBool();
+    Term* discardCalled = get_for_loop_discard_called(CALLER);
 
     Term* listOutput = NULL;
     int listOutputWriteHead = 0;
 
     if (modifyList)
-        listOutput = get_for_loop_rebinds_for_outer(forTerm)[listTerm->name];
+        listOutput = get_for_loop_rebinds_for_outer(CALLER)[listTerm->name];
 
     if (stateBranch != NULL) {
         resize_list(*stateBranch, numIterations, BRANCH_TYPE);
@@ -193,20 +192,20 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
         // Initialize state for any uninitialized slots
         for (int i=0; i < numIterations; i++) {
 
-            Branch& iterationBranch = get_for_loop_iteration_state(forTerm, i);
+            Branch& iterationBranch = get_for_loop_iteration_state(CALLER, i);
             
             if (iterationBranch.length() == 0)
                 get_type_from_branches_stateful_terms(codeBranch, iterationBranch);
         }
     }
 
-    Term* isFirstIteration = get_for_loop_is_first_iteration(forTerm);
+    Term* isFirstIteration = get_for_loop_is_first_iteration(CALLER);
     assert(isFirstIteration->name == "#is_first_iteration");
-    Term* iterator = get_for_loop_iterator(forTerm);
-    set_bool(get_for_loop_any_iterations(forTerm), numIterations > 0);
+    Term* iterator = get_for_loop_iterator(CALLER);
+    set_bool(get_for_loop_any_iterations(CALLER), numIterations > 0);
 
     if (numIterations == 0)
-        evaluate_branch(cxt, get_for_loop_rebinds_for_outer(forTerm));
+        evaluate_branch(CONTEXT, get_for_loop_rebinds_for_outer(CALLER));
 
     if (stateBranch != NULL) {
         //std::cout << "state branch = " << std::endl;
@@ -230,12 +229,12 @@ void evaluate_for_loop(EvalContext* cxt, Term* forTerm)
         //dump_branch(codeBranch);
 
         // Evaluate
-        evaluate_branch(cxt, codeBranch);
+        evaluate_branch(CONTEXT, codeBranch);
 
         //std::cout << "post evaluate = " << std::endl;
         //dump_branch(codeBranch);
 
-        if (cxt->errorOccurred) {
+        if (CONTEXT->errorOccurred) {
             //std::cout << "Error occurred" << std::endl;
             break;
         }

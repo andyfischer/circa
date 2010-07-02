@@ -48,14 +48,23 @@ struct TypeRef;
 
 typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
 
-//#define NEW_EVALUATE
+#define NEW_EVALUATE
 
 // Function-related typedefs:
 #ifdef NEW_EVALUATE
+
+#define CA_FUNCTION(fname) \
+    void fname(EvalContext* _circa_cxt, Term* _circa_caller, Term* _circa_func, \
+            RefList const& _circa_inputs, TaggedValue* _circa_output)
+
 typedef void (*EvaluateFunc)(EvalContext* cxt, Term* term, Term* func,
         RefList const& inputs, TaggedValue* output);
 #else
 typedef void (*EvaluateFunc)(EvalContext* context, Term* caller);
+
+#define CA_FUNCTION(fname) \
+    void fname(EvalContext* _circa_cxt, Term* _circa_caller)
+
 #endif
 typedef Term* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
