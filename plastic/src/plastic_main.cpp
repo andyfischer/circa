@@ -212,7 +212,7 @@ int plastic_main(std::vector<std::string> args)
             return 1;
 
         EvalContext cxt;
-        include_function::load_script(&cxt, users_branch().owningTerm);
+        include_function::preload_script(&cxt, users_branch().owningTerm);
 
         print_branch_raw(std::cout, users_branch());
         return 0;

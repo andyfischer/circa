@@ -5,18 +5,18 @@
 namespace circa {
 namespace include_function {
 
-    CA_FUNCTION(load_script)
+    void preload_script(EvalContext* cxt, Term* term)
     {
-        TaggedValue* fileSignature = INPUT(0);
-        Branch& contents = as_branch(CALLER);
+        TaggedValue* fileSignature = term->input(0);
+        Branch& contents = as_branch(term);
 
-        std::string requested_filename = INPUT(1)->asString();
+        std::string requested_filename = term->input(1)->asString();
 
         std::string actual_filename =
-            get_path_relative_to_source(CALLER, requested_filename);
+            get_path_relative_to_source(term, requested_filename);
 
         // Reload if the filename or modified-time has changed
-        if (file_changed_function::check(CONTEXT, CALLER, fileSignature, actual_filename))
+        if (file_changed_function::check(cxt, term, fileSignature, actual_filename))
         {
             Branch previous_contents;
             duplicate_branch(contents, previous_contents);
@@ -24,14 +24,14 @@ namespace include_function {
             contents.clear();
 
             if (!file_exists(actual_filename)) {
-                error_occurred(CONTEXT, CALLER, "File not found: "+actual_filename);
+                error_occurred(cxt, term, "File not found: "+actual_filename);
                 return;
             }
 
             parse_script(contents, actual_filename);
 
             if (has_static_errors(contents)) {
-                error_occurred(CONTEXT, CALLER, get_static_errors_formatted(contents));
+                error_occurred(cxt, term, get_static_errors_formatted(contents));
 
                 // New script has errors. If we have an existing script, then revert
                 // to that.
@@ -50,20 +50,25 @@ namespace include_function {
             if (previous_contents.length() > 0)
                 migrate_stateful_values(previous_contents, contents);
 
-            if (CALLER->owningBranch != NULL)
-                expose_all_names(contents, *CALLER->owningBranch);
+            if (term->owningBranch != NULL)
+                expose_all_names(contents, *term->owningBranch);
         }
     }
 
     CA_FUNCTION(evaluate_include)
     {
-        load_script(EVALUATION_ARGS);
+        preload_script(CONTEXT, CALLER);
 
         if (CONTEXT->errorOccurred)
             return;
 
         Branch& contents = as_branch(CALLER);
         evaluate_branch(CONTEXT, contents);
+    }
+
+    CA_FUNCTION(load_script)
+    {
+        preload_script(CONTEXT, CALLER);
     }
 
     void setup(Branch& kernel)

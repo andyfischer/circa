@@ -27,7 +27,7 @@
 #define INPUT(index) ((TaggedValue*) _circa_inputs[index])
 #define FLOAT_INPUT(index) to_float(INPUT(index))
 #define BOOL_INPUT(index) as_bool(INPUT(index))
-#define STRING_INPUT(index) as_string(INPUT(index))
+#define STRING_INPUT(index) as_string(INPUT(index)).c_str()
 #define INT_INPUT(index) as_int(INPUT(index))
 #define NUM_INPUTS (_circa_inputs.length())
 #define INPUT_TERM(index) (_circa_caller->input(index))

@@ -89,11 +89,8 @@ void initialize();
 void shutdown();
 
 // this is implemented in builtin_functions/include.cpp
-namespace copy_function {
-    CA_FUNCTION(evaluate);
-}
 namespace include_function {
-    CA_FUNCTION(load_script);
+    void preload_script(EvalContext*, Term* term);
 }
 
 namespace file_changed_function {

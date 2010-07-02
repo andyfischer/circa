@@ -50,7 +50,7 @@ CA_FUNCTION(load_font)
     }
 
     std::string path = as_string(INPUT(1));
-    int pointSize = INT_INPUT(1);
+    int pointSize = INT_INPUT(2);
 
     path = get_path_relative_to_source(CALLER, path.c_str());
 
