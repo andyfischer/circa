@@ -19,4 +19,7 @@ void subroutine_update_hidden_state_type(Term* sub);
 bool is_subroutine_state_expanded(Term* term);
 void expand_subroutines_hidden_state(Term* call, Term* state);
 
+void store_locals(Branch& branch, TaggedValue* storage);
+void restore_locals(TaggedValue* storage, Branch& branch);
+
 } // namespace circa

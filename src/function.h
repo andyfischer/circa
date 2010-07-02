@@ -21,6 +21,7 @@ struct FunctionAttrs
     Ref feedbackFunc;
     std::string description;
     TaggedValue parameter;
+    bool currentlyEvaluating; // for subroutines
 
     // Functions
     EvaluateFunc evaluate;
@@ -33,6 +34,7 @@ struct FunctionAttrs
 
     FunctionAttrs()
       : variableArgs(false),
+        currentlyEvaluating(false),
         evaluate(NULL),
         specializeType(NULL),
         formatSource(NULL),

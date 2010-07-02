@@ -25,14 +25,6 @@ namespace subroutine_t {
         Term* function = FUNCTION;
         Branch& functionBranch = as_branch(function);
 
-        // Load values into this function's stateful values. If this state has never been
-        // saved then this function will reset this function's stateful values.
-        Term* hiddenState = get_hidden_state_for_call(CALLER);
-
-        if (hiddenState != NULL) {
-            load_state_into_branch(as_branch(hiddenState), functionBranch);
-        }
-
         bool varArgs = function_t::get_variable_args(function);
         int num_inputs = function_t::num_inputs(function);
 
@@ -44,7 +36,22 @@ namespace subroutine_t {
             return;
         }
 
-        // Load inputs.
+        // If the subroutine is currently being evaluated, temporarily store all the
+        // existing local values, so that we can restore them later.
+        TaggedValue previousLocals;
+        if (function_t::get_attrs(function).currentlyEvaluating)
+            store_locals(functionBranch, &previousLocals);
+        else
+            function_t::get_attrs(function).currentlyEvaluating = true;
+
+        // Load values into this function's stateful values. If this state has never been
+        // saved then this function will reset this function's stateful values.
+        Term* hiddenState = get_hidden_state_for_call(CALLER);
+
+        if (hiddenState != NULL)
+            load_state_into_branch(as_branch(hiddenState), functionBranch);
+
+        // Load inputs into input placeholders.
         for (int input=0; input < num_inputs; input++) {
 
             std::string inputName = function_t::get_input_name(function, input);
@@ -79,6 +86,12 @@ namespace subroutine_t {
         if (hiddenState != NULL) {
             persist_state_from_branch(functionBranch, as_branch(hiddenState));
         }
+
+        // Restore locals, if needed
+        if (is_null(&previousLocals))
+            function_t::get_attrs(function).currentlyEvaluating = false;
+        else
+            restore_locals(&previousLocals, functionBranch);
     }
 }
 
@@ -164,6 +177,26 @@ void expand_subroutines_hidden_state(Term* call, Term* state)
     assert(is_subroutine(call->function));
     assert(state != NULL);
     duplicate_branch(as_branch(call->function), as_branch(state));
+}
+
+void store_locals(Branch& branch, TaggedValue* storageTv)
+{
+    std::cout << "storing " << branch.length() << " locals" << std::endl;
+    make_list(storageTv);
+    List* storage = (List*) storageTv;
+    storage->resize(branch.length());
+    for (int i=0; i < branch.length(); i++) {
+        copy(branch[i], storage->get(i));
+    }
+}
+
+void restore_locals(TaggedValue* storageTv, Branch& branch)
+{
+    std::cout << "restoring " << branch.length() << " locals" << std::endl;
+    List* storage = (List*) storageTv;
+    for (int i=0; i < branch.length(); i++) {
+        copy(storage->get(i), branch[i]);
+    }
 }
 
 } // namespace circa
