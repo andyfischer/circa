@@ -48,7 +48,7 @@ struct TypeRef;
 
 typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
 
-#define NEW_EVALUATE
+//#define NEW_EVALUATE
 
 // Function-related typedefs:
 #ifdef NEW_EVALUATE

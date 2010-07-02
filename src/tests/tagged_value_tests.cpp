@@ -127,10 +127,10 @@ void test_term_value()
 }
 
 namespace subroutine_call_test_helper {
-    void assert_ints(EvalContext*, Term* term)
+    CA_FUNCTION(assert_ints)
     {
-        test_assert(is_int(term->input(0)));
-        test_assert(is_int(term));
+        test_assert(is_int(INPUT(0)));
+        test_assert(is_int(OUTPUT));
     }
 }
 

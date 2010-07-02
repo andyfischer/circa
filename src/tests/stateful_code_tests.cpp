@@ -33,7 +33,7 @@ void test_simple()
     test_assert(j->type == INT_TYPE);
 }
 
-void _empty_evaluate(EvalContext*, Term*) {}
+CA_FUNCTION(_empty_evaluate) {}
 
 void function_with_hidden_state_term()
 {
@@ -174,17 +174,16 @@ void one_time_assignment()
 
 int NEXT_UNIQUE_OUTPUT = 0;
 
-void _unique_output(EvalContext*, Term* caller)
+CA_FUNCTION(_unique_output)
 {
-    set_int(caller, NEXT_UNIQUE_OUTPUT);
-    NEXT_UNIQUE_OUTPUT++;
+    set_int(OUTPUT, NEXT_UNIQUE_OUTPUT++);
 }
 
 std::vector<int> SPY_RESULTS;
 
-void _spy(EvalContext*, Term* caller)
+CA_FUNCTION(_spy)
 {
-    SPY_RESULTS.push_back(as_int(caller->input(0)));
+    SPY_RESULTS.push_back(as_int(INPUT(0)));
 }
 
 void one_time_assignment_inside_for_loop()

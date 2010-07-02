@@ -1,11 +1,12 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include <circa.h>
+#include "importing_macros.h"
 
 namespace circa {
 namespace refactoring_tests {
 
-void _empty_evaluate(EvalContext*, Term*) {}
+CA_FUNCTION(_empty_evaluate) {}
 
 void repro_source_after_rename()
 {

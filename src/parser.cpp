@@ -939,7 +939,11 @@ Term* include_statement(Branch& branch, TokenStream& tokens)
 
     Term* result = apply(branch, INCLUDE_FUNC, RefList(filenameTerm));
 
+#ifdef NEW_EVALUATE
+    include_function::load_script(NULL, result, result->function, result->inputs, result);
+#else
     include_function::load_script(NULL, result);
+#endif
 
     return result;
 }
@@ -1246,7 +1250,11 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
             && is_string(result->input(1))
             && result->input(1)->asString() != "") {
         EvalContext cxt;
+#ifdef NEW_EVALUATE
+        include_function::load_script(&cxt, result, result->function, result->inputs, result);
+#else
         include_function::load_script(&cxt, result);
+#endif
 
     // Special case for overloaded_function, evaluate this immediately
     } else if (result->function == OVERLOADED_FUNCTION_FUNC) {

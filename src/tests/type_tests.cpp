@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 namespace type_tests {
@@ -218,9 +219,9 @@ void type_inference_for_get_field()
     test_assert(b->type == FLOAT_TYPE);
 }
 
-void _evaluate_type_error(EvalContext*, Term* term)
+CA_FUNCTION(_evaluate_type_error)
 {
-    set_float(term, to_float(term->input(0)));
+    set_float(OUTPUT, to_float(INPUT(0)));
 }
 
 void test_type_error_in_a_native_call()
@@ -252,16 +253,16 @@ void test_imported_pointer_type()
 namespace simple_pointer_test {
 
 TypeRef gType;
-void _evaluate(EvalContext*, Term* caller)
+CA_FUNCTION(_evaluate)
 {
-    test_assert(is_value_of_type(caller->input(0), gType));
-    test_assert(is_value_of_type(caller, gType));
+    test_assert(is_value_of_type(INPUT(0), gType));
+    test_assert(is_value_of_type(OUTPUT, gType));
 
-    test_assert(get_pointer(caller->input(0), gType) == NULL);
-    test_assert(get_pointer(caller, gType) == NULL);
+    test_assert(get_pointer(INPUT(0), gType) == NULL);
+    test_assert(get_pointer(OUTPUT, gType) == NULL);
 
-    set_pointer(caller->input(0), gType, NULL);
-    set_pointer(caller, gType, NULL);
+    set_pointer(INPUT(0), gType, NULL);
+    set_pointer(OUTPUT, gType, NULL);
 }
 
 void test()

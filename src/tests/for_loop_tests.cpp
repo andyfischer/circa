@@ -11,9 +11,9 @@ namespace for_loop_tests {
 
 std::vector<int> gSpyResults;
 
-void spy_function(EvalContext*, Term* caller)
+CA_FUNCTION(spy_function)
 {
-    gSpyResults.push_back(as_int(caller->input(0)));
+    gSpyResults.push_back(as_int(INPUT(0)));
 }
 
 void test_simple()

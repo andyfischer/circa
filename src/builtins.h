@@ -90,10 +90,10 @@ void shutdown();
 
 // this is implemented in builtin_functions/include.cpp
 namespace copy_function {
-    void evaluate(EvalContext*, Term* caller);
+    CA_FUNCTION(evaluate);
 }
 namespace include_function {
-    void load_script(EvalContext*, Term* caller);
+    CA_FUNCTION(load_script);
 }
 
 namespace file_changed_function {

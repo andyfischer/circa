@@ -7,15 +7,15 @@ namespace runtime_tests {
 
 std::vector<std::string> gSpyResults;
 
-void spy_function(EvalContext*, Term* caller)
+CA_FUNCTION(spy_function)
 {
-    gSpyResults.push_back(as_string(caller->input(0)));
-    set_bool(caller, true);
+    gSpyResults.push_back(as_string(INPUT(0)));
+    set_bool(OUTPUT, true);
 }
 
-void i_only_throw_errors(EvalContext* cxt, Term* caller)
+CA_FUNCTION(i_only_throw_errors)
 {
-    error_occurred(cxt, caller, "i only throw errors");
+    error_occurred(CONTEXT, CALLER, "i only throw errors");
 }
 
 void init_test_functions(Branch& branch)

@@ -81,9 +81,9 @@ void test_dont_always_rebind_inner_names()
 
 std::vector<std::string> gSpyResults;
 
-void spy_function(EvalContext*, Term* caller)
+CA_FUNCTION(spy_function)
 {
-    gSpyResults.push_back(as_string(caller->input(0)));
+    gSpyResults.push_back(as_string(INPUT(0)));
 }
 
 void test_execution()

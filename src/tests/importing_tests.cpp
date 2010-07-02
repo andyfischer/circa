@@ -10,9 +10,9 @@
 namespace circa {
 namespace importing_tests {
 
-void my_imported_function(EvalContext*, Term* term)
+CA_FUNCTION(my_imported_function)
 {
-    set_int(term, as_int(term->input(0)) + as_int(term->input(1)));
+    set_int(OUTPUT, as_int(INPUT(0)) + as_int(INPUT(1)));
 }
 
 void test_import_c()

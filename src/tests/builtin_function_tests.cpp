@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include <circa.h>
+#include "importing_macros.h"
 
 namespace circa {
 namespace builtin_function_tests {
