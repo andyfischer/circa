@@ -17,19 +17,41 @@ namespace vectorize_vv_function {
     {
         Term* func = as_ref(function_t::get_parameters(FUNCTION));
 
-        TaggedValue* left = INPUT(0);
-        TaggedValue* right = INPUT(1);
+        List* left = (List*) INPUT(0);
+        List* right = (List*) INPUT(1);
         List* output = (List*) OUTPUT;
+        Type* funcOutputType = type_contents(function_t::get_output_type(func));
         int numInputs = left->numElements();
 
         if (numInputs != right->numElements()) {
             std::stringstream msg;
             msg << "Input lists have different lengths (left has " << numInputs;
             msg << ", right has " << right->numElements() << ")";
-            error_occurred(CONTEXT, CALLER, msg.str());
-            return;
+            return error_occurred(CONTEXT, CALLER, msg.str());
         }
 
+        output->resize(numInputs);
+
+        Term leftTerm, rightTerm;
+        leftTerm.refCount++;
+        rightTerm.refCount++;
+
+        {
+            RefList inputs(&leftTerm, &rightTerm);
+
+            for (int i=0; i < numInputs; i++) {
+                TaggedValue* item = output->getIndex(i);
+                change_type(item, funcOutputType);
+                copy(left->get(i), &leftTerm);
+                copy(right->get(i), &rightTerm);
+                evaluate_term(CONTEXT, CALLER, func, inputs, item);
+            }
+        }
+        
+        assert(leftTerm.refCount == 1);
+        assert(rightTerm.refCount == 1);
+
+#if 0
         Branch evaluationBranch;
         Term* input0 = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
         Term* input1 = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
@@ -46,6 +68,7 @@ namespace vectorize_vv_function {
 
             copy(evalResult, output->get(i));
         }
+#endif
     }
 
     void setup(Branch& kernel)

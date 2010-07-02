@@ -17,10 +17,8 @@ namespace overloaded_function {
             Term* overload = as_ref(overloads[i]);
 
             if (inputs_fit_function_dynamic(overload, INPUTS)) {
-                Branch tempBranch;
-                Term* tempTerm = apply(tempBranch, overload, INPUTS);
-                evaluate_branch(CONTEXT, tempBranch);
-                copy(tempTerm, OUTPUT);
+                change_type(OUTPUT, type_contents(function_t::get_output_type(overload)));
+                evaluate_term(CONTEXT, CALLER, overload, INPUTS, OUTPUT);
                 return;
             }
         }

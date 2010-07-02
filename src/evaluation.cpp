@@ -4,6 +4,22 @@
 
 namespace circa {
 
+void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const& inputs, TaggedValue* output)
+{
+    EvaluateFunc evaluate = function_t::get_evaluate(function);
+
+    if (evaluate == NULL)
+        return;
+
+    try {
+        evaluate(cxt, caller, function, inputs, output);
+    }
+    catch (std::exception const& err)
+    {
+        error_occurred(cxt, caller, err.what());
+    }
+}
+
 inline void evaluate_term(EvalContext* cxt, Term* term)
 {
     assert(cxt != NULL);

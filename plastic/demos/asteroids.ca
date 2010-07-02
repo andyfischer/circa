@@ -41,7 +41,7 @@ ship_wing_size = 11.4
 ship_wing_rot = .40
 ship_radius = ship_size * ship_front
 
-draw_intersection_circles = true
+draw_intersection_circles = false
 
 namespace game_state
     playing = 0
@@ -80,7 +80,7 @@ def draw_ship(Point loc, number facing)
         end
     end
 
-    print(sides)
+    --print(sides)
 
     line_points = []
     for side in sides

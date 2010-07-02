@@ -18,6 +18,7 @@ struct EvalContext
     EvalContext() : interruptBranch(false), errorOccurred(false) {}
 };
 
+void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const& inputs, TaggedValue* output);
 void evaluate_term(EvalContext* cxt, Term* term);
 void evaluate_term(Term* term);
 void evaluate_branch(EvalContext* context, Branch& branch);
