@@ -125,6 +125,11 @@ namespace math_function {
         set_float(OUTPUT, std::sqrt(FLOAT_INPUT(0)));
     }
 
+    CA_DEFINE_FUNCTION(log, "log(number) -> number; 'Natural log function' end")
+    {
+        set_float(OUTPUT, std::log(FLOAT_INPUT(0)));
+    }
+
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);

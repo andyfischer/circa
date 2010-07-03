@@ -491,6 +491,20 @@ void test_lists()
     test_snippet("", "filter([1 2 3] [true false true]) == [1 3]");
 }
 
+void test_type_check_functions()
+{
+    test_snippet("", "is_int(1)");
+    test_snippet("", "not(is_int(1.0))");
+    test_snippet("", "is_float(1.0)");
+    test_snippet("", "not(is_float(1))");
+    test_snippet("", "is_bool(true)");
+    test_snippet("", "not(is_bool(1.0))");
+    test_snippet("", "is_string('hello')");
+    test_snippet("", "not(is_string(true))");
+    test_snippet("", "is_list([1 2 3])");
+    test_snippet("", "not(is_list(1.0))");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -523,6 +537,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_refactoring);
     REGISTER_TEST_CASE(test_snippets::test_member_functions);
     REGISTER_TEST_CASE(test_snippets::test_lists);
+    REGISTER_TEST_CASE(test_snippets::test_type_check_functions);
 }
 
 } // namespace test_snippets
