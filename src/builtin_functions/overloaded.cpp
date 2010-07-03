@@ -103,8 +103,7 @@ namespace overloaded_function {
         for (int i=0; i < argumentCount; i++)
             apply(result, INPUT_PLACEHOLDER_FUNC, RefList());
         Term* outputType = find_common_type(outputTypes);
-        create_value(result, outputType, "#out");
-
+        function_t::set_output_type(term, outputType);
         function_t::set_variable_args(term, variableArgs);
     }
 

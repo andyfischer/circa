@@ -73,25 +73,38 @@ namespace subroutine_t {
 
         evaluate_branch(CONTEXT, functionBranch);
 
+        // Hold a copy of output for now
+        TaggedValue outputValue;
+
         // Copy output if no error occurred
         if (!CONTEXT->errorOccurred && functionBranch.length() > 0) {
             Term* output = functionBranch[functionBranch.length()-1];
-            if (output->type != VOID_TYPE) {
-                assert(output->name == "#out");
-                copy(output, OUTPUT);
-            }
+            copy(output, &outputValue);
         }
 
         // Store state
-        if (hiddenState != NULL) {
+        if (hiddenState != NULL)
             persist_state_from_branch(functionBranch, as_branch(hiddenState));
-        }
 
         // Restore locals, if needed
-        if (is_null(&previousLocals))
+        if (is_null(&previousLocals)) {
             function_t::get_attrs(function).currentlyEvaluating = false;
-        else
-            restore_locals(&previousLocals, functionBranch);
+        } else {
+            //std::cout << "restoring " << branch.length() << " locals" << std::endl;
+            List* storage = (List*) &previousLocals;
+
+            if (storage->length() != functionBranch.length())
+                internal_error("storage size doesn't match function length"
+                        " (maybe the function was modified)");
+
+            for (int i=1; i < functionBranch.length(); i++) {
+                // Don't clobber the term we just output
+                if (functionBranch[i] == OUTPUT) continue;
+                copy(storage->get(i), functionBranch[i]);
+            }
+        }
+
+        copy(&outputValue, OUTPUT);
     }
 }
 
@@ -181,22 +194,11 @@ void expand_subroutines_hidden_state(Term* call, Term* state)
 
 void store_locals(Branch& branch, TaggedValue* storageTv)
 {
-    std::cout << "storing " << branch.length() << " locals" << std::endl;
     make_list(storageTv);
     List* storage = (List*) storageTv;
     storage->resize(branch.length());
-    for (int i=0; i < branch.length(); i++) {
+    for (int i=1; i < branch.length(); i++)
         copy(branch[i], storage->get(i));
-    }
-}
-
-void restore_locals(TaggedValue* storageTv, Branch& branch)
-{
-    std::cout << "restoring " << branch.length() << " locals" << std::endl;
-    List* storage = (List*) storageTv;
-    for (int i=0; i < branch.length(); i++) {
-        copy(storage->get(i), branch[i]);
-    }
 }
 
 } // namespace circa

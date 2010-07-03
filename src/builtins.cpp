@@ -205,7 +205,7 @@ void post_initialize_primitive_types(Branch& kernel)
 
     // Value function was created before we had a prototype
     initialize_function_prototype(as_branch(VALUE_FUNC));
-    create_value(as_branch(VALUE_FUNC), ANY_TYPE, "#out");
+    function_t::get_attrs(VALUE_FUNC).outputType = ANY_TYPE;
 
     assert(function_t::get_output_type(VALUE_FUNC) == ANY_TYPE);
 }

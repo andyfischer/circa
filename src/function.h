@@ -15,6 +15,7 @@ struct FunctionAttrs
     typedef void (*StaticTypeQueryFunc)(StaticTypeQuery* query);
 
     std::string name;
+    Ref outputType;
     Ref hiddenStateType;
     bool variableArgs;
     std::string exposedNamePath;
@@ -63,6 +64,7 @@ namespace function_t {
     std::string const& get_name(Term* function);
     void set_name(Term* function, std::string const& name);
     Term* get_output_type(Term* function);
+    void set_output_type(Term* funciton, Term* type);
     Ref& get_hidden_state_type(Term* function);
     bool get_variable_args(Term* function);
     void set_variable_args(Term* function, bool value);

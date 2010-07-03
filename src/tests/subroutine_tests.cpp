@@ -165,7 +165,7 @@ void to_source_string()
 void register_tests()
 {
     REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
-    //TODO REGISTER_TEST_CASE(subroutine_tests::test_recursion);
+    REGISTER_TEST_CASE(subroutine_tests::test_recursion);
     REGISTER_TEST_CASE(subroutine_tests::subroutine_stateful_term);
     REGISTER_TEST_CASE(subroutine_tests::initialize_state_type);
     REGISTER_TEST_CASE(subroutine_tests::shadow_input);

@@ -502,6 +502,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         return compile_error_for_line(result, tokens, startPosition,
                 outputType->name +" is not a type");
 
+    function_t::set_output_type(result, outputType);
+
     result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
     // If we're out of tokens, then stop here. This behavior is used when defining builtins.
