@@ -385,6 +385,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     std::string functionName = tokens.consume();
 
     Term* result = create_value(branch, FUNCTION_TYPE, functionName);
+    function_t::get_hidden_state_type(result) = VOID_TYPE;
 
     result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
 

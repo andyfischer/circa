@@ -18,6 +18,8 @@ Term* apply(Branch& branch, std::string const& functionName,
 Term* create_duplicate(Branch& branch, Term* original, std::string const& name="",
         bool copyBranches=true);
 
+std::string default_name_for_hidden_state(const std::string& termName);
+
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, RefList const& inputs);
 

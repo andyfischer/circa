@@ -136,6 +136,8 @@ std::string get_short_location(Term* term)
         out << term->sourceLoc.line << "," << term->sourceLoc.col;
     else
         out << "loc?";
+    out << " ";
+    out << format_global_id(term);
     out << "]";
     return out.str();
 }
@@ -272,7 +274,7 @@ void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs
             out << " vt:" << term->value_type->name;
     }
 
-    if (!is_value(term)) {
+    if (term->numInputs() > 0) {
         out << " [";
 
         for (int i=0; i < term->numInputs(); i++) {

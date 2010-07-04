@@ -30,6 +30,13 @@ void test_return_from_conditional()
 void test_recursion()
 {
     Branch branch;
+
+    // I think this is the simplest possible recursive function. Evaluate it
+    // just to make sure that nothing crashes.
+    branch.eval("def recr(bool r) if r recr(false) end end");
+    branch.eval("recr(true)");
+
+    // Factorial
     branch.eval("def factorial(int n) -> int\n"
                 "  if (n < 2)\n"
                 "    return 1\n"
@@ -54,6 +61,37 @@ void test_recursion()
     Term* fact_4 = branch.eval("factorial(4)");
     test_assert(fact_4);
     test_assert(fact_4->asInt() == 24);
+
+    branch.eval("def recr(int n) -> int\n"
+                "  if (n == 1)\n"
+                "    return 1\n"
+                "  else\n"
+                "    return recr(n - 1) + 1\n"
+                "  end\n"
+                "end\n");
+    
+    test_assert(branch.eval("recr(1)")->asInt() == 1);
+    test_assert(branch.eval("recr(2)")->asInt() == 2);
+    test_assert(branch.eval("recr(3)")->asInt() == 3);
+    test_assert(branch.eval("recr(4)")->asInt() == 4);
+}
+
+void test_recursion_with_state()
+{
+    Branch branch;
+    branch.eval("def recr(int i) -> int\n"
+                "  state s\n"
+                "  if i == 1\n"
+                "    return 1\n"
+                "  else\n"
+                "    return recr(i - 1) + 1\n"
+                "  end\n"
+                "end\n");
+
+    test_assert(branch);
+
+    Term* recr_4 = branch.eval("recr(4)");
+    test_assert(as_int(recr_4) == 4);
 }
 
 void subroutine_stateful_term()
@@ -166,6 +204,7 @@ void register_tests()
 {
     REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
     REGISTER_TEST_CASE(subroutine_tests::test_recursion);
+    REGISTER_TEST_CASE(subroutine_tests::test_recursion_with_state);
     REGISTER_TEST_CASE(subroutine_tests::subroutine_stateful_term);
     REGISTER_TEST_CASE(subroutine_tests::initialize_state_type);
     REGISTER_TEST_CASE(subroutine_tests::shadow_input);

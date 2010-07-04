@@ -35,12 +35,9 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     if (is_function_stateful(function)
             && (inputs.length() < function_t::num_inputs(function)))
     {
-        std::stringstream new_value_name;
-        new_value_name << "#hidden_state";
-        if (name != "") new_value_name << "_for_" << name;
         Term* stateContainer = create_stateful_value(branch,
                 function_t::get_hidden_state_type(function),
-                new_value_name.str());
+                default_name_for_hidden_state(name));
 
         RefList newInputs(stateContainer);
         for (int i=0; i < inputs.length(); i++)
@@ -144,6 +141,14 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
     duplicate_branch(original->properties, term->properties);
 
     return term;
+}
+
+std::string default_name_for_hidden_state(const std::string& termName)
+{
+    std::stringstream new_value_name;
+    new_value_name << "#hidden_state";
+    if (termName != "") new_value_name << "_for_" << termName;
+    return new_value_name.str();
 }
 
 Term* apply(Branch& branch, std::string const& functionName, RefList const& inputs, std::string const& name)

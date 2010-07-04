@@ -1,0 +1,2 @@
+
+BranchIterator could be better behaved when a term is inserted. Currently, inserting a term before the iterator will cause it->current() to return something else.

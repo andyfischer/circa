@@ -39,10 +39,11 @@ namespace subroutine_t {
         // If the subroutine is currently being evaluated, temporarily store all the
         // existing local values, so that we can restore them later.
         TaggedValue previousLocals;
-        if (function_t::get_attrs(function).currentlyEvaluating)
+        if (function_t::get_attrs(function).currentlyEvaluating) {
             store_locals(functionBranch, &previousLocals);
-        else
-            function_t::get_attrs(function).currentlyEvaluating = true;
+        }
+
+        function_t::get_attrs(function).currentlyEvaluating = true;
 
         // Load values into this function's stateful values. If this state has never been
         // saved then this function will reset this function's stateful values.
@@ -90,18 +91,7 @@ namespace subroutine_t {
         if (is_null(&previousLocals)) {
             function_t::get_attrs(function).currentlyEvaluating = false;
         } else {
-            //std::cout << "restoring " << branch.length() << " locals" << std::endl;
-            List* storage = (List*) &previousLocals;
-
-            if (storage->length() != functionBranch.length())
-                internal_error("storage size doesn't match function length"
-                        " (maybe the function was modified)");
-
-            for (int i=1; i < functionBranch.length(); i++) {
-                // Don't clobber the term we just output
-                if (functionBranch[i] == OUTPUT) continue;
-                copy(storage->get(i), functionBranch[i]);
-            }
+            restore_locals(&previousLocals, functionBranch);
         }
 
         copy(&outputValue, OUTPUT);
@@ -140,15 +130,15 @@ void finish_building_subroutine(Term* sub, Term* outputType)
     // Install evaluate function
     function_t::get_evaluate(sub) = subroutine_t::evaluate;
 
-    subroutine_update_hidden_state_type(sub);
+    subroutine_update_hidden_state_type_from_contents(sub);
 }
 
-void subroutine_update_hidden_state_type(Term* func)
+void subroutine_update_hidden_state_type_from_contents(Term* func)
 {
     // Check if a stateful argument was declared
     Term* firstInput = function_t::get_input_placeholder(func, 0);
     if (firstInput != NULL && firstInput->boolPropOptional("state", false)) {
-        function_t::get_hidden_state_type(func) = firstInput->type;
+        // already updated state
         return;
     }
 
@@ -164,18 +154,52 @@ void subroutine_update_hidden_state_type(Term* func)
                 hasState = true;
     }
 
-    if (hasState) {
-        function_t::get_hidden_state_type(func) = BRANCH_TYPE;
-        bool alreadyHasStateInput = (function_t::num_inputs(func) > 0)
-            && (function_t::get_input_name(func, 0) == "#state");
-        if (!alreadyHasStateInput) {
-            // Insert an input for state
-            contents.insert(1, alloc_term());
-            rewrite(contents[1], INPUT_PLACEHOLDER_FUNC, RefList());
-            contents.bindName(contents[1], "#state");
+    if (hasState)
+        subroutine_change_state_type(func, BRANCH_TYPE);
+}
+
+void subroutine_change_state_type(Term* func, Term* newType)
+{
+    Term* previousType = function_t::get_hidden_state_type(func);
+    if (previousType == newType)
+        return;
+
+    Branch& contents = as_branch(func);
+    function_t::get_attrs(func).hiddenStateType = newType;
+
+    bool hasStateInput = (function_t::num_inputs(func) > 0)
+        && (function_t::get_input_name(func, 0) == "#state");
+
+    // create a stateful input if needed
+    if (newType != VOID_TYPE && !hasStateInput) {
+        contents.insert(1, alloc_term());
+        rewrite(contents[1], INPUT_PLACEHOLDER_FUNC, RefList());
+        contents.bindName(contents[1], "#state");
+    }
+
+    // If state was added, find all the calls to this function and insert
+    // a state argument.
+    if (previousType == VOID_TYPE && newType != VOID_TYPE) {
+        for (BranchIterator it(contents); !it.finished(); ++it) {
+            Term* term = *it;
+
+            if (term->function == func) {
+                Branch* branch = term->owningBranch;
+                Term* stateContainer = alloc_term();
+                branch->insert(term->index, stateContainer);
+                change_type(stateContainer, function_t::get_hidden_state_type(func));
+                change_function(stateContainer, STATEFUL_VALUE_FUNC);
+                branch->bindName(stateContainer, default_name_for_hidden_state(term->name));
+
+                RefList inputs = term->inputs;
+                inputs.prepend(stateContainer);
+                set_inputs(term, inputs);
+
+                // We just inserted a term, so the next iteration will hit the
+                // term we just checked. So, advance past this.
+                ++it;
+            }
         }
-    } else {
-        function_t::get_hidden_state_type(func) = VOID_TYPE;
     }
 }
 
@@ -194,11 +218,43 @@ void expand_subroutines_hidden_state(Term* call, Term* state)
 
 void store_locals(Branch& branch, TaggedValue* storageTv)
 {
+    touch(storageTv);
     make_list(storageTv);
     List* storage = (List*) storageTv;
     storage->resize(branch.length());
-    for (int i=1; i < branch.length(); i++)
-        copy(branch[i], storage->get(i));
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+
+        if (term->type == FUNCTION_ATTRS_TYPE)
+            continue;
+
+        if (is_branch(term))
+            store_locals(as_branch(term), storage->get(i));
+        else
+            copy(term, storage->get(i));
+    }
+}
+
+void restore_locals(TaggedValue* storageTv, Branch& branch)
+{
+    if (!list_t::is_list(storageTv))
+        internal_error("storageTv is not a list");
+
+    List* storage = (List*) storageTv;
+
+    // The function branch may be longer than our list of locals. 
+    int numItems = storage->length();
+    for (int i=0; i < numItems; i++) {
+        Term* term = branch[i];
+
+        if (term->type == FUNCTION_ATTRS_TYPE)
+            continue;
+
+        if (is_branch(term))
+            restore_locals(storage->get(i), as_branch(term));
+        else
+            copy(storage->get(i), term);
+    }
 }
 
 } // namespace circa
