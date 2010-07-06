@@ -181,14 +181,20 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
 
         if (satisfied) {
             // Load state, if it's found
-            if (stateElement != NULL)
+            if (stateElement != NULL) {
+                stateElement = state->get(i);
                 load_state_into_branch(as_branch(stateElement), as_branch(call));
+            }
 
             evaluate_term(cxt, call);
             satisfiedIndex = i;
 
-            if (stateElement != NULL)
+            if (stateElement != NULL) {
+                // State elements may have moved during evaluate_term,
+                // so call state->get again.
+                stateElement = state->get(i);
                 persist_state_from_branch(as_branch(call), as_branch(stateElement));
+            }
 
             break;
 

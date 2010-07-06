@@ -225,6 +225,8 @@ void store_locals(Branch& branch, TaggedValue* storageTv)
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
 
+        if (term == NULL) continue;
+
         if (term->type == FUNCTION_ATTRS_TYPE)
             continue;
 
@@ -246,6 +248,8 @@ void restore_locals(TaggedValue* storageTv, Branch& branch)
     int numItems = storage->length();
     for (int i=0; i < numItems; i++) {
         Term* term = branch[i];
+
+        if (term == NULL) continue;
 
         if (term->type == FUNCTION_ATTRS_TYPE)
             continue;

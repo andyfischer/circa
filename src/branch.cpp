@@ -628,6 +628,7 @@ std::string compound_type_to_string(TaggedValue* value)
 bool is_branch_based_type(Term* type)
 {
     assert(type != NULL);
+    assert(type_contents(type) != NULL);
     return type_contents(type)->initialize == branch_t::initialize;
 }
 
