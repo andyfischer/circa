@@ -14,7 +14,11 @@ def line(Point x, Point y, Color color)
 end
 
 def draw_rect(Rect rect, Color color)
-    gl:line_loop([[rect.x1 rect.y1] [rect.x2 rect.y1] [rect.x2 rect.y2] [rect.x1 rect.y2]] color)
+    gl:line_strip([[rect.x1 rect.y1]
+        [rect.x2 rect.y1]
+        [rect.x2 rect.y2]
+        [rect.x1 rect.y2]
+        [rect.x1 rect.y1-1]] color)
 end
 
 def thick_line(Point a, Point b, number width, Color color)

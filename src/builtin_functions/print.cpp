@@ -20,6 +20,10 @@ namespace print_function {
     {
         import_function(kernel, evaluate, "print(any...) "
                 "'Prints a line of text output to the console' end");
+
+        // Alias
+        import_function(kernel, evaluate, "trace(any...) "
+                "'Prints a line of text output to the console' end");
     }
 }
 } // namespace circa
