@@ -50,7 +50,7 @@ namespace set_t {
     CA_FUNCTION(hosted_add)
     {
         copy(INPUT(0), OUTPUT);
-        List* output = (List*) OUTPUT;
+        List* output = List::checkCast(OUTPUT);
         TaggedValue* value = INPUT(1);
         if (!contains(output, value))
             copy(value, output->append());
@@ -58,7 +58,7 @@ namespace set_t {
 
     CA_FUNCTION(contains)
     {
-        List* list = (List*) INPUT(0);
+        List* list = List::checkCast(INPUT(0));
         TaggedValue* value = INPUT(1);
         set_bool(OUTPUT, contains(list, value));
     }
@@ -66,7 +66,7 @@ namespace set_t {
     CA_FUNCTION(remove)
     {
         copy(INPUT(0), OUTPUT);
-        List* list = (List*) OUTPUT;
+        List* list = List::checkCast(OUTPUT);
         TaggedValue* value = INPUT(1);
 
         int numElements = list->numElements();
@@ -79,7 +79,7 @@ namespace set_t {
     }
     std::string to_string(TaggedValue* value)
     {
-        List* list = (List*) value;
+        List* list = List::checkCast(value);
         std::stringstream output;
         output << "{";
         for (int i=0; i < list->length(); i++) {
@@ -107,7 +107,7 @@ namespace set_t {
 namespace map_t {
     int find_key_index(TaggedValue* contents, TaggedValue* key)
     {
-        List* keys = (List*) contents->getIndex(0);
+        List* keys = List::checkCast(contents->getIndex(0));
 
         for (int i=0; i < keys->length(); i++)
             if (equals(keys->get(i), key))
@@ -117,8 +117,8 @@ namespace map_t {
 
     void insert(TaggedValue* contents, TaggedValue* key, TaggedValue* value)
     {
-        List* keys = (List*) contents->getIndex(0);
-        List* values = (List*) contents->getIndex(1);
+        List* keys = List::checkCast(contents->getIndex(0));
+        List* values = List::checkCast(contents->getIndex(1));
 
         int index = find_key_index(contents, key);
 
@@ -133,8 +133,8 @@ namespace map_t {
 
     void remove(TaggedValue* contents, TaggedValue* key)
     {
-        List* keys = (List*) contents->getIndex(0);
-        List* values = (List*) contents->getIndex(1);
+        List* keys = List::checkCast(contents->getIndex(0));
+        List* values = List::checkCast(contents->getIndex(1));
 
         int index = find_key_index(contents, key);
 
@@ -146,7 +146,7 @@ namespace map_t {
 
     TaggedValue* get(TaggedValue* contents, TaggedValue* key)
     {
-        List* values = (List*) contents->getIndex(1);
+        List* values = List::checkCast(contents->getIndex(1));
         int index = find_key_index(contents, key);
 
         if (index == -1)
@@ -189,8 +189,8 @@ namespace map_t {
         std::stringstream out;
         out << "{";
 
-        List* keys = (List*) value->getIndex(0);
-        List* values = (List*) value->getIndex(1);
+        List* keys = List::checkCast(value->getIndex(0));
+        List* values = List::checkCast(value->getIndex(1));
 
         for (int i=0; i < keys->length(); i++) {
             if (i != 0)

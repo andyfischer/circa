@@ -16,7 +16,7 @@ namespace list_function {
 
     CA_FUNCTION(evaluate)
     {
-        List* result = (List*) OUTPUT;
+        List* result = List::checkCast(OUTPUT);
 
         result->resize(NUM_INPUTS);
 
@@ -35,7 +35,7 @@ namespace list_function {
 
     CA_FUNCTION(evaluate_repeat)
     {
-        List* result = (List*) OUTPUT;
+        List* result = List::checkCast(OUTPUT);
         TaggedValue* source = INPUT(0);
         int repeatCount = INT_INPUT(1);
 

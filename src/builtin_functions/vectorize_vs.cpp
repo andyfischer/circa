@@ -17,9 +17,9 @@ namespace vectorize_vs_function {
     {
         Term* func = as_ref(function_t::get_parameters(FUNCTION));
 
-        List* left = (List*) INPUT(0);
+        List* left = List::checkCast(INPUT(0));
         Term* right = INPUT_TERM(1);
-        List* output = (List*) OUTPUT;
+        List* output = List::checkCast(OUTPUT);
         Type* funcOutputType = type_contents(function_t::get_output_type(func));
 
         int numInputs = left->numElements();
@@ -41,32 +41,6 @@ namespace vectorize_vs_function {
         }
 
         assert(leftTerm.refCount == 1);
-#if 0
-
-        List* left = (List*) INPUT(0);
-        Term* right = INPUT_TERM(1);
-        List* output = (List*) OUTPUT;
-        int numInputs = left->numElements();
-
-        Branch evaluationBranch;
-        Term* input0 = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
-        Term* evalResult = apply(evaluationBranch, func, RefList(input0, right));
-
-        output->resize(numInputs);
-
-        for (int i=0; i < numInputs; i++) {
-            copy(left->getIndex(i), input0);
-
-            //std::cout << "pre:" <<std::endl;
-            //dump_branch(evaluationBranch);
-            evaluate_branch(evaluationBranch);
-            
-            //std::cout << "post:" <<std::endl;
-            //dump_branch(evaluationBranch);
-
-            copy(evalResult, output->get(i));
-        }
-#endif
     }
 
     void setup(Branch& kernel)

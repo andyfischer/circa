@@ -8,7 +8,7 @@ namespace map_function {
     CA_FUNCTION(evaluate)
     {
         Term* func = INPUT_TERM(0);
-        List* inputs = (List*) INPUT(1);
+        List* inputs = List::checkCast(INPUT(1));
 
         if (is_function_stateful(func)) {
             error_occurred(CONTEXT, CALLER,
@@ -22,7 +22,7 @@ namespace map_function {
         Term* evalInput = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
         Term* evalResult = apply(evaluationBranch, func, RefList(evalInput));
 
-        List* list = (List*) OUTPUT;
+        List* list = List::checkCast(OUTPUT);
         list->resize(numInputs);
 
         for (int i=0; i < numInputs; i++) {

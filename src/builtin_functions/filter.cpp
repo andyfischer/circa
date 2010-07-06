@@ -23,7 +23,7 @@ namespace filter_function {
                 count++;
 
         
-        List* output = (List*) OUTPUT;
+        List* output = List::checkCast(OUTPUT);
         output->resize(count);
         touch(output);
 

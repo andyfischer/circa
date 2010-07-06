@@ -7,12 +7,11 @@ namespace set_function {
 
     CA_FUNCTION(evaluate)
     {
-        List* result = (List*) OUTPUT;
+        List* result = List::checkCast(OUTPUT);
         result->clear();
 
-        for (int index=0; index < NUM_INPUTS; index++) {
+        for (int index=0; index < NUM_INPUTS; index++)
             set_t::add(result, INPUT(index));
-        }
     }
 
     void setup(Branch& kernel)

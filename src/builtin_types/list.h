@@ -26,6 +26,8 @@ struct List : TaggedValue
     void set(int index, TaggedValue* value);
     TaggedValue* operator[](int index) { return get(index); }
     void resize(int size);
+
+    static List* checkCast(TaggedValue* v);
 };
 
 }

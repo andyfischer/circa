@@ -47,7 +47,7 @@ void tv_initialize(Type* type, TaggedValue* value)
     // If type has a prototype then initialize to that.
     Branch& prototype = type->prototype;
     if (prototype.length() > 0) {
-        List* list = (List*) value;
+        List* list = List::checkCast(value);
         list->resize(prototype.length());
 
         for (int i=0; i < prototype.length(); i++)
@@ -87,7 +87,7 @@ bool tv_equals(TaggedValue* leftValue, TaggedValue* right)
     if (rhsType->numElements == NULL || rhsType->getIndex == NULL)
         return false;
 
-    List* left = (List*) leftValue;
+    List* left = List::checkCast(leftValue);
 
     int leftCount = left->numElements();
 
@@ -114,8 +114,8 @@ void tv_cast(Type*, TaggedValue* source, TaggedValue* dest)
     bool keep_existing_shape = dest->value_type->prototype.length() != 0;
 
     if (keep_existing_shape) {
-        List* s = (List*) source;
-        List* d = (List*) dest;
+        List* s = List::checkCast(source);
+        List* d = List::checkCast(dest);
 
         int count = std::min(s->numElements(), d->numElements());
 
@@ -286,7 +286,7 @@ void setup_type(Type* type)
 
 CA_FUNCTION(append)
 {
-    List* result = (List*) OUTPUT;
+    List* result = List::checkCast(OUTPUT);
     copy(INPUT(0), OUTPUT);
     TaggedValue* value = INPUT(1);
     copy(value, result->append());
@@ -294,7 +294,7 @@ CA_FUNCTION(append)
 
 CA_FUNCTION(count)
 {
-    List* list = (List*) INPUT(0);
+    List* list = List::checkCast(INPUT(0));
     set_int(OUTPUT, list->length());
 }
 
@@ -348,6 +348,15 @@ void
 List::resize(int newSize)
 {
     list_t::resize(this, newSize); 
+}
+
+List*
+List::checkCast(TaggedValue* v)
+{
+    if (list_t::is_list(v))
+        return (List*) v;
+    else
+        return NULL;
 }
 
 namespace list_t_tests {

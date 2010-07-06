@@ -31,7 +31,7 @@ namespace memory_management_for_each_operation
     {
         TaggedValue value;
         make_list(&value);
-        make_int(((List*) &value)->append(), 0);
+        make_int(List::checkCast(&value)->append(), 0);
 
         tvvector::ListData* origData = (tvvector::ListData*)
             get_pointer(&value);
@@ -41,7 +41,7 @@ namespace memory_management_for_each_operation
         tvvector::incref(origData);
         test_assert(tvvector::refcount(origData) == 2);
 
-        operation((List*) &value);
+        operation(List::checkCast(&value));
 
         // If value has the same data, then refcount should be unchanged.
         // If value has new data, then the original data should be down

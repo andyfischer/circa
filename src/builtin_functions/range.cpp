@@ -11,7 +11,7 @@ namespace range_function {
         int max = INT_INPUT(1);
 
         int count = abs(max-start);
-        List* list = (List*) OUTPUT;
+        List* list = List::checkCast(OUTPUT);
         list->resize(count);
 
         int val = start;

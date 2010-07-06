@@ -252,7 +252,7 @@ CA_FUNCTION(evaluate_for_loop)
             Term* iteratorResult = codeBranch[iterator->name];
 
             if (listOutputWriteHead >= listOutput->numElements())
-                ((List*) listOutput)->append();
+                (List::checkCast(listOutput))->append();
             TaggedValue* outputElement = listOutput->getIndex(listOutputWriteHead++);
         
             copy(iteratorResult, outputElement);
@@ -260,7 +260,7 @@ CA_FUNCTION(evaluate_for_loop)
     }
 
     if (listOutput != NULL && listOutput->numElements() > listOutputWriteHead)
-        ((List*)listOutput)->resize(listOutputWriteHead);
+        (List::checkCast(listOutput))->resize(listOutputWriteHead);
 }
 
 Term* find_enclosing_for_loop(Term* term)

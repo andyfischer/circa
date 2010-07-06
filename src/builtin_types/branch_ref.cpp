@@ -32,7 +32,7 @@ namespace branch_ref_t {
 
     void set_from_ref(TaggedValue* value, Term* ref)
     {
-        List* list = (List*) value;
+        List* list = List::checkCast(value);
         touch(list);
         make_ref(list->getIndex(0), ref);
     }
@@ -54,7 +54,7 @@ namespace branch_ref_t {
 
     Branch& get_target_branch(TaggedValue* value)
     {
-        List* list = (List*) value;
+        List* list = List::checkCast(value);
         return as_branch(list->get(0)->asRef());
     }
 
@@ -74,7 +74,7 @@ namespace branch_ref_t {
             count++;
         }
 
-        List* output = (List*) OUTPUT;
+        List* output = List::checkCast(OUTPUT);
         output->resize(count);
 
         int write = 0;
@@ -94,7 +94,7 @@ namespace branch_ref_t {
             return;
 
         Branch& target_branch = get_target_branch(value);
-        List* output = (List*) OUTPUT;
+        List* output = List::checkCast(OUTPUT);
 
         int write = 0;
         for (BranchIterator it(target_branch); !it.finished(); it.advance()) {

@@ -17,9 +17,9 @@ namespace vectorize_vv_function {
     {
         Term* func = as_ref(function_t::get_parameters(FUNCTION));
 
-        List* left = (List*) INPUT(0);
-        List* right = (List*) INPUT(1);
-        List* output = (List*) OUTPUT;
+        List* left = List::checkCast(INPUT(0));
+        List* right = List::checkCast(INPUT(1));
+        List* output = List::checkCast(OUTPUT);
         Type* funcOutputType = type_contents(function_t::get_output_type(func));
         int numInputs = left->numElements();
 

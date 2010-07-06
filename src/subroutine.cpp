@@ -220,7 +220,7 @@ void store_locals(Branch& branch, TaggedValue* storageTv)
 {
     touch(storageTv);
     make_list(storageTv);
-    List* storage = (List*) storageTv;
+    List* storage = List::checkCast(storageTv);
     storage->resize(branch.length());
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
@@ -240,7 +240,7 @@ void restore_locals(TaggedValue* storageTv, Branch& branch)
     if (!list_t::is_list(storageTv))
         internal_error("storageTv is not a list");
 
-    List* storage = (List*) storageTv;
+    List* storage = List::checkCast(storageTv);
 
     // The function branch may be longer than our list of locals. 
     int numItems = storage->length();

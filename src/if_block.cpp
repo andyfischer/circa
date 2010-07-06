@@ -131,7 +131,7 @@ List* get_if_block_state(Term* ifCall)
     Term* term = ifCall->input(0);
     if (term == NULL)
         return NULL;
-    return (List*) term;
+    return List::checkCast(term);
 }
 
 bool if_block_contains_state(Term* ifCall)

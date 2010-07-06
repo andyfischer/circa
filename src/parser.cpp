@@ -1590,7 +1590,7 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
     text = text.substr(1, text.length()-1);
 
     Term* resultTerm = create_value(branch, COLOR_TYPE);
-    List* result = (List*) resultTerm;
+    List* result = List::checkCast(resultTerm);
 
     float r = 0;
     float g = 0;

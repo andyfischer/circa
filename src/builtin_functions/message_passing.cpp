@@ -10,7 +10,7 @@ namespace message_passing_function {
     CA_FUNCTION(evaluate_inbox)
     {
         copy(INPUT(0), OUTPUT);
-        ((List*) INPUT(0))->resize(0);
+        (List::checkCast(INPUT(0)))->resize(0);
     }
 
     CA_FUNCTION(evaluate_send)
@@ -20,7 +20,7 @@ namespace message_passing_function {
 
         assert(inbox->function == INBOX_FUNC);
 
-        List* inboxState = (List*) get_hidden_state_for_call(inbox);
+        List* inboxState = List::checkCast(get_hidden_state_for_call(inbox));
         copy(input, inboxState->append());
     }
 
