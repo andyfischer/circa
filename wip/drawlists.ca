@@ -1,0 +1,33 @@
+
+def expand_rect(Rect rect, Point size) -> Rect
+    return [rect.x1 - size.x, rect.y1 - size.y, rect.x2 + size.x, rect.y2 + size.y]
+end
+
+
+background(#fff)
+
+def draw_lists(Point loc, any val) -> Rect
+    if is_list(val)
+        bottom_y = loc.y
+        rightmost_x = 0
+        for item in val
+            rect = draw_lists([loc.x bottom_y]+[5 5] item)
+            bottom_y = rect.y2 + 10.0
+            max(@rightmost_x, rect.x2)
+        end
+        content_size = to_rect(loc [rightmost_x bottom_y] - loc)
+        border_box = expand_rect(content_size [5 5])
+        draw_rect(border_box, #000)
+        return border_box
+    else
+        rect = draw_text(ui_font_medium, concat(val), #000, loc)
+
+        border_box = expand_rect(rect, [5 5])
+
+        draw_rect(border_box, #000)
+        return border_box
+    end
+end
+
+input = [1 2 3 [1 2 [1 2]]]
+draw_lists([10 10] input)
