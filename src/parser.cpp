@@ -1209,7 +1209,7 @@ void function_call_inputs(Branch& branch, TokenStream& tokens,
     }
 }
 
-Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
+Term* function_call(Branch& branch, Term* function, std::string const& nameUsed, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
@@ -1224,7 +1224,11 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
     tokens.consume(RPAREN);
     
-    std::string originalName = function->name;
+    std::string originalName;
+    if (nameUsed != "")
+        originalName = nameUsed;
+    else
+        originalName = function->name;
 
     Term* result = NULL;
 
@@ -1266,8 +1270,8 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
 //   a[0]
 // Field access example:
 //   a.b 
-static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
-    bool& finished)
+static Term* possible_subscript(Branch& branch, TokenStream& tokens,
+        std::string const& possibleIdentifierStr, Term* head, bool& finished)
 {
     int startPosition = tokens.getPosition();
 
@@ -1308,7 +1312,7 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
     } else if (tokens.nextIs(LPAREN)) {
 
         // Function call
-        Term* result = function_call(branch, head, tokens);
+        Term* result = function_call(branch, head, possibleIdentifierStr, tokens);
         finished = false;
         return result;
 
@@ -1321,11 +1325,18 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
 
 Term* subscripted_atom(Branch& branch, TokenStream& tokens)
 {
-    Term* result = atom(branch, tokens);
+    std::string identifierStr;
+    Term* result = NULL;
+
+    // Check for an identifier so that we can remember the actual string used.
+    if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(QUALIFIED_IDENTIFIER))
+        result = identifier(branch, tokens, identifierStr);
+    else
+        result = atom(branch, tokens);
 
     bool finished = false;
     while (!finished) {
-        result = possible_subscript(branch, tokens, result, finished);
+        result = possible_subscript(branch, tokens, identifierStr, result, finished);
 
         if (has_static_error(result))
             return result;
@@ -1745,16 +1756,21 @@ Term* unknown_identifier(Branch& branch, std::string const& name)
 Term* identifier(Branch& branch, TokenStream& tokens)
 {
     std::string id;
+    return identifier(branch, tokens, id);
+}
+
+Term* identifier(Branch& branch, TokenStream& tokens, std::string& idStrOut)
+{
     if (tokens.nextIs(IDENTIFIER))
-        id = tokens.consume(IDENTIFIER);
+        idStrOut = tokens.consume(IDENTIFIER);
     else if (tokens.nextIs(QUALIFIED_IDENTIFIER))
-        id = tokens.consume(QUALIFIED_IDENTIFIER);
+        idStrOut = tokens.consume(QUALIFIED_IDENTIFIER);
     else 
         throw std::runtime_error("identifier() expected ident");
 
-    Term* result = find_named(branch, id);
+    Term* result = find_named(branch, idStrOut);
     if (result == NULL)
-        return unknown_identifier(branch, id);
+        return unknown_identifier(branch, idStrOut);
 
     return result;
 }

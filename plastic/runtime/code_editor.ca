@@ -1,33 +1,34 @@
 
-def get_highlight_color(int highlight_type) -> Color
-    if highlight_type == styled_source:literal_string
-        return #884c03
-    elif highlight_type == styled_source:literal_number
-        return #2f2be2
-    elif highlight_type == styled_source:paren
-        return #003366
-    elif highlight_type == styled_source:comment
-        return #505050
-    elif highlight_type == styled_source:name
-        return #003366
-    elif highlight_type == styled_source:type_name
-        return #003366
-    elif highlight_type == styled_source:function_name
-        return #aa3366
-    elif highlight_type == styled_source:infix_operator
-        return #aa3366
-    elif highlight_type == styled_source:keyword
-        return #000000
-    else
-        return #003366
-    end
-end
+def draw_code_editor(BranchRef branch)
 
-def draw_code_editor(Point topleft, BranchRef branch)
     source = format_source(branch)
 
     letter_width = 8
     letter_height = 17
+
+    def get_fg_color(int highlight_type) -> Color
+        if highlight_type == styled_source:literal_string
+            return #884c03
+        elif highlight_type == styled_source:literal_number
+            return #2f2be2
+        elif highlight_type == styled_source:paren
+            return #003366
+        elif highlight_type == styled_source:comment
+            return #505050
+        elif highlight_type == styled_source:name
+            return #003366
+        elif highlight_type == styled_source:type_name
+            return #003366
+        elif highlight_type == styled_source:function_name
+            return #aa3366
+        elif highlight_type == styled_source:infix_operator
+            return #aa3366
+        elif highlight_type == styled_source:keyword
+            return #000000
+        else
+            return #003366
+        end
+    end
 
     current_line = 0
     current_col = 0
@@ -38,11 +39,10 @@ def draw_code_editor(Point topleft, BranchRef branch)
         t = phrase[2] -> int
 
         loc = [current_col*letter_width current_line*letter_height] -> Point
-        loc += topleft
+        loc += [0 100]
 
-        color = get_highlight_color(t)
+        color = get_fg_color(t)
 
-        -- don't draw newline characters
         visable_s = cond(s == '\n', "", s)
         text_sprite = text:render_text(coding_font, visable_s, color)
 
@@ -73,13 +73,3 @@ def draw_code_editor(Point topleft, BranchRef branch)
     end
 end
 
-background(#fff)
-
-sample_code = begin
-    a = 1
-    b = 2
-    c = a + b
-    d = c * 5
-end
-
-draw_code_editor([10 10] draw_code_editor -> branch_ref)

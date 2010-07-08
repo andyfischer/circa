@@ -23,7 +23,7 @@ def get_highlight_color(int highlight_type) -> Color
     end
 end
 
-def draw_code_editor(BranchRef branch)
+def draw_code_editor(Point topleft, BranchRef branch)
     source = format_source(branch)
 
     letter_width = 8
@@ -38,10 +38,11 @@ def draw_code_editor(BranchRef branch)
         t = phrase[2] -> int
 
         loc = [current_col*letter_width current_line*letter_height] -> Point
-        loc += [0 100]
+        loc += topleft
 
         color = get_highlight_color(t)
 
+        -- don't draw newline characters
         visable_s = cond(s == '\n', "", s)
         text_sprite = text:render_text(coding_font, visable_s, color)
 
@@ -72,3 +73,13 @@ def draw_code_editor(BranchRef branch)
     end
 end
 
+background(#fff)
+
+sample_code = begin
+    a = 1
+    b = 2
+    c = a + b
+    d = c * 5
+end
+
+draw_code_editor([10 10] draw_code_editor -> branch_ref)

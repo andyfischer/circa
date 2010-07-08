@@ -362,6 +362,12 @@ void reproduce_identifiers_inside_namespaces() {
     finish_source_repro_category();
 }
 
+void reproduce_namespaced_function() {
+    round_trip_source("namespace ns def func() end end; ns:func()");
+    //round_trip_source("namespace ns def func(int i) end end; 1 -> ns:func");
+    finish_source_repro_category();
+}
+
 void reproduce_rebind_operator() {
     round_trip_source("a = 1; add(@a, 2)");
     finish_source_repro_category();
@@ -410,6 +416,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_unary);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_bracket_syntax);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_identifiers_inside_namespaces);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_namespaced_function);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebind_operator);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_discard_statement);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_branch_styles);

@@ -55,6 +55,7 @@ Term* literal_list(Branch& branch, TokenStream& tokens);
 Term* plain_branch(Branch& branch, TokenStream& tokens);
 Term* namespace_block(Branch& branch, TokenStream& tokens);
 Term* identifier(Branch& branch, TokenStream& tokens);
+Term* identifier(Branch& branch, TokenStream& tokens, std::string& idStrOut);
 Term* identifier_with_rebind(Branch& branch, TokenStream& tokens);
 
 // Helper functions:
