@@ -18,9 +18,6 @@ const char* gl_check_error()
 
 bool gl_check_error(circa::EvalContext* cxt, circa::Term* term)
 {
-    if (cxt->errorOccurred)
-        return true;
-
     const char* err = gl_check_error();
 
     if (err != NULL) {

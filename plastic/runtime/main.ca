@@ -284,6 +284,7 @@ namespace postprocess begin
     def make_surface(state Surface _state, int width, int height) -> Surface {}
     def bind_surface(Surface surface) {}
     def draw_surface(Surface source) {}
+    def draw_surface_at(Surface source, Rect rect) {}
     def copy_surface(Surface source, Surface dest) {}
 
     main_surface = [0 0 window.width window.height] -> Surface
@@ -318,7 +319,7 @@ def post_game_stuff()
     end
 
     -- Draw fpses
-    draw_fps = true
+    draw_fps = false
     if draw_fps
         text_sprite = text:render_text(ui_font_medium, concat('fps: ' fps), #fff)
         text:draw_rendered_text(text_sprite, [10 window.height - 40])

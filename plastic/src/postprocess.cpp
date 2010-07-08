@@ -45,7 +45,7 @@ namespace postprocess_functions
             glBindTexture(GL_TEXTURE_2D, 0);
             surface_t::set_tex_id(surface, tex_id);
 
-            if (gl_check_error(CONTEXT_AND_CALLER))
+            if (gl_check_error(CONTEXT, CALLER))
                 return;
 
             // Create FBO
@@ -57,12 +57,11 @@ namespace postprocess_functions
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
             surface_t::set_fbo_id(surface, fbo_id);
 
-            if (gl_check_error(CONTEXT_AND_CALLER))
+            if (gl_check_error(CONTEXT, CALLER))
                 return;
 
-
             surface_t::set_width(surface, desired_width);
-            surface_t::set_width(surface, desired_height);
+            surface_t::set_height(surface, desired_height);
         }
 
         copy(INPUT(0), OUTPUT);
@@ -71,11 +70,23 @@ namespace postprocess_functions
     static int bound_surface_width = 0;
     static int bound_surface_height = 0;
 
-    void bind_surface(TaggedValue* surface)
+    void bind_surface(EvalContext* cxt, Term* caller, TaggedValue* surface)
     {
         int width = surface_t::get_width(surface);
         int height = surface_t::get_height(surface);
+
+        if (width <= 0)
+            return error_occurred(cxt, caller, "width must be > 0");
+        if (height <= 0)
+            return error_occurred(cxt, caller, "height must be > 0");
+
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surface_t::get_fbo_id(surface));
+
+        if (gl_check_error(cxt, caller)) {
+            cxt->errorMessage = "glBindFramebufferEXT failed";
+            return;
+        }
+
         glViewport(0, 0, width, height);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -89,14 +100,15 @@ namespace postprocess_functions
 
     CA_FUNCTION(bind_surface_hosted)
     {
-        bind_surface(INPUT(0));
-        gl_check_error(CONTEXT_AND_CALLER);
+        bind_surface(CONTEXT, CALLER, INPUT(0));
+        if (!CONTEXT->errorOccurred)
+            gl_check_error(CONTEXT, CALLER);
     }
 
     CA_FUNCTION(draw_surface)
     {
-        TaggedValue* source_surface = INPUT(0);
-        int tex_id = surface_t::get_tex_id(source_surface);
+        TaggedValue* surface = INPUT(0);
+        int tex_id = surface_t::get_tex_id(surface);
 
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, tex_id);
@@ -118,12 +130,39 @@ namespace postprocess_functions
         gl_check_error(CONTEXT_AND_CALLER);
     }
 
+    CA_FUNCTION(draw_surface_at)
+    {
+        TaggedValue* surface = INPUT(0);
+        List* location = List::checkCast(INPUT(1));
+        int tex_id = surface_t::get_tex_id(surface);
+
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, tex_id);
+
+        float destX1 = location->getIndex(0)->toFloat();
+        float destY1 = location->getIndex(1)->toFloat();
+        float destX2 = location->getIndex(2)->toFloat();
+        float destY2 = location->getIndex(3)->toFloat();
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glBegin(GL_QUADS);
+        glTexCoord2i(0, 1); glVertex2f(destX1, destY1);
+        glTexCoord2i(1, 1); glVertex2f(destX2, destY1);
+        glTexCoord2i(1, 0); glVertex2f(destX2, destY2);
+        glTexCoord2i(0, 0); glVertex2f(destX1, destY2);
+        glEnd();
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
     CA_FUNCTION(copy_surface)
     {
         TaggedValue* source_surface = INPUT(0);
         TaggedValue* dest_surface = INPUT(1);
 
-        bind_surface(dest_surface);
+        bind_surface(CONTEXT, CALLER, dest_surface);
 
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, surface_t::get_tex_id(source_surface));
@@ -148,6 +187,7 @@ namespace postprocess_functions
         Branch& postprocess_ns = kernel["postprocess"]->asBranch();
         install_function(postprocess_ns["make_surface"], make_surface);
         install_function(postprocess_ns["draw_surface"], draw_surface);
+        install_function(postprocess_ns["draw_surface_at"], draw_surface_at);
         install_function(postprocess_ns["bind_surface"], bind_surface_hosted);
         install_function(postprocess_ns["copy_surface"], copy_surface);
     }

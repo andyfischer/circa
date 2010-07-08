@@ -4,30 +4,35 @@ def expand_rect(Rect rect, Point size) -> Rect
 end
 
 
-background(#fff)
+background(#00f)
 
 def draw_lists(Point loc, any val) -> Rect
+
+    gutter = 8
     if is_list(val)
         bottom_y = loc.y
         rightmost_x = 0
         for item in val
-            rect = draw_lists([loc.x bottom_y]+[5 5] item)
-            bottom_y = rect.y2 + 10.0
+            rect = draw_lists([loc.x bottom_y]+[gutter gutter] item)
+            bottom_y = rect.y2 + gutter
             max(@rightmost_x, rect.x2)
         end
+        
         content_size = to_rect(loc [rightmost_x bottom_y] - loc)
-        border_box = expand_rect(content_size [5 5])
+        border_box = expand_rect(content_size [gutter gutter])
         draw_rect(border_box, #000)
         return border_box
     else
         rect = draw_text(ui_font_medium, concat(val), #000, loc)
 
-        border_box = expand_rect(rect, [5 5])
+        border_box = expand_rect(rect, [gutter gutter])
 
         draw_rect(border_box, #000)
         return border_box
     end
 end
 
-input = [1 2 3 [1 2 [1 2]]]
+input = ["int" "string" 3 ["int" "float" ["int" "int"]]]
+
 draw_lists([10 10] input)
+

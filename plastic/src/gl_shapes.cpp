@@ -19,6 +19,11 @@ void _unpack_gl_color(TaggedValue* color)
               color->getIndex(3)->asFloat());
 }
 
+void reset_gl_color()
+{
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+}
+
 CA_FUNCTION(background)
 {
     gl_clear_error();
@@ -54,6 +59,7 @@ CA_FUNCTION(gl_triangles)
 
     glEnd();
 
+    reset_gl_color();
     gl_check_error(CONTEXT_AND_CALLER);
 }
 
@@ -74,6 +80,8 @@ CA_FUNCTION(gl_line_strip)
     }
     
     glEnd();
+
+    reset_gl_color();
 
     gl_check_error(CONTEXT_AND_CALLER);
 }
@@ -96,6 +104,7 @@ CA_FUNCTION(gl_line_loop)
     
     glEnd();
 
+    reset_gl_color();
     gl_check_error(CONTEXT_AND_CALLER);
 }
 
@@ -117,6 +126,7 @@ CA_FUNCTION(gl_lines)
     
     glEnd();
 
+    reset_gl_color();
     gl_check_error(CONTEXT_AND_CALLER);
 }
 
@@ -138,6 +148,7 @@ CA_FUNCTION(gl_points)
     
     glEnd();
 
+    reset_gl_color();
     gl_check_error(CONTEXT_AND_CALLER);
 }
 
@@ -168,6 +179,7 @@ CA_FUNCTION(gl_circle)
 
     glEnd();
 
+    reset_gl_color();
     gl_check_error(CONTEXT_AND_CALLER);
 }
 
@@ -211,6 +223,8 @@ CA_FUNCTION(gl_pie)
     }
 
     glEnd();
+    reset_gl_color();
+    gl_check_error(CONTEXT_AND_CALLER);
 }
 
 CA_FUNCTION(load_program)

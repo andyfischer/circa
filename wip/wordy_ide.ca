@@ -1,0 +1,15 @@
+
+filename = path('drawlists.ca')
+
+background(#ccc)
+
+script_surface = postprocess:make_surface(300, 300)
+postprocess:bind_surface(script_surface)
+
+script = include(filename)
+
+postprocess:bind_main_surface()
+
+rect = to_rect([0 0], mouse)
+postprocess:draw_surface_at(script_surface, rect)
+draw_rect(rect, #f00)
