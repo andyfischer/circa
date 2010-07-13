@@ -25,10 +25,11 @@ namespace postprocess_functions
     {
         gl_clear_error();
         TaggedValue* surface = INPUT(0);
+        List* size = List::checkCast(INPUT(1));
 
         if (surface_t::get_tex_id(surface) == 0) {
-            int desired_width = INT_INPUT(1);
-            int desired_height = INT_INPUT(2);
+            int desired_width = size->getIndex(0)->asInt();
+            int desired_height = size->getIndex(1)->asInt();
 
             GLenum internalFormat = /*fp ? GL_RGBA16F_ARB :*/ GL_RGBA;
             GLenum type = /*fp ? GL_HALF_FLOAT_ARB :*/ GL_UNSIGNED_BYTE;

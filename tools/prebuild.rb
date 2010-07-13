@@ -72,7 +72,7 @@ end
 def include_cpps(baseDir, targetDir)
     out = []
     each_cpp_file(File.join(baseDir,targetDir)) do |path|
-        out << "#include \"#{File.join(targetDir,path)}\""
+        out << "#include \"../#{File.join(targetDir,path)}\""
     end
     out * "\n" + "\n"
 end

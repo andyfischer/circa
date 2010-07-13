@@ -281,7 +281,7 @@ namespace postprocess begin
         int height
     }
 
-    def make_surface(state Surface _state, int width, int height) -> Surface {}
+    def make_surface(state Surface _state, Point size) -> Surface {}
     def bind_surface(Surface surface) {}
     def draw_surface(Surface source) {}
     def draw_surface_at(Surface source, Rect rect) {}
@@ -293,7 +293,6 @@ namespace postprocess begin
 end
 
 -- Include other runtime scripts
-include('code_editor.ca')
 include('text_input.ca')
 include('ui_widgets.ca')
 

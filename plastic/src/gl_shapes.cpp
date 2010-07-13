@@ -9,9 +9,39 @@ using namespace circa;
 
 namespace gl_shapes {
 
+struct MultipurposeBuffer
+{
+    static const int staticMemorySize = 5000;
+    static GLfloat staticArray[staticMemorySize];
+    GLfloat *heapArray;
+
+    MultipurposeBuffer(int size)
+    {
+        if (size <= staticMemorySize)
+            heapArray = NULL;
+        else
+            heapArray = new GLfloat(size);
+    }
+    ~MultipurposeBuffer()
+    {
+        if (heapArray)
+            delete heapArray;
+    }
+    GLfloat* get()
+    {
+        if (heapArray)
+            return heapArray;
+        else
+            return staticArray;
+    }
+    GLfloat& operator[] (int index) { return get()[index]; }
+};
+
+GLfloat MultipurposeBuffer::staticArray[MultipurposeBuffer::staticMemorySize];
+
 GLint current_program = 0;
 
-void _unpack_gl_color(TaggedValue* color)
+void set_gl_color(TaggedValue* color)
 {
     glColor4f(color->getIndex(0)->asFloat(),
               color->getIndex(1)->asFloat(),
@@ -19,9 +49,23 @@ void _unpack_gl_color(TaggedValue* color)
               color->getIndex(3)->asFloat());
 }
 
-void reset_gl_color()
+void clear_gl_color()
 {
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+}
+
+void load_2d_vector_list_to_buffer(TaggedValue* list, GLfloat* buffer)
+{
+    int numElements = list->numElements();
+    int write = 0;
+    for (int i=0; i < numElements; i++) {
+        float x = list->getIndex(i)->getIndex(0)->toFloat();
+        float y = list->getIndex(i)->getIndex(1)->toFloat();
+
+        buffer[write++] = x;
+        buffer[write++] = y;
+        buffer[write++] = 0;
+    }
 }
 
 CA_FUNCTION(background)
@@ -45,21 +89,20 @@ CA_FUNCTION(gl_triangles)
     TaggedValue* list = INPUT(0);
     TaggedValue* color = INPUT(1);
 
-    _unpack_gl_color(color);
+    set_gl_color(color);
     glBindTexture(GL_TEXTURE_2D, 0);
-    glBegin(GL_TRIANGLES);
 
     int numElements = list->numElements();
-    for (int i=0; i < numElements; i++) {
-        float x = list->getIndex(i)->getIndex(0)->toFloat();
-        float y = list->getIndex(i)->getIndex(1)->toFloat();
+    MultipurposeBuffer buffer(numElements * 3);
 
-        glVertex3f(x,y,0);
-    }
+    load_2d_vector_list_to_buffer(list, buffer.get());
 
-    glEnd();
+    glVertexPointer(3, GL_FLOAT, 0, buffer.get());
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glDrawArrays(GL_TRIANGLES, 0, numElements);
 
-    reset_gl_color();
+    clear_gl_color();
+    glDisableClientState(GL_VERTEX_ARRAY);
     gl_check_error(CONTEXT_AND_CALLER);
 }
 
@@ -68,21 +111,19 @@ CA_FUNCTION(gl_line_strip)
     TaggedValue* list = INPUT(0);
     TaggedValue* color = INPUT(1);
 
-    _unpack_gl_color(color);
-
-    glBegin(GL_LINE_STRIP);
+    set_gl_color(color);
 
     int numElements = list->numElements();
-    for (int i=0; i < numElements; i++) {
-        float x = list->getIndex(i)->getIndex(0)->toFloat();
-        float y = list->getIndex(i)->getIndex(1)->toFloat();
-        glVertex3f(x,y,0);
-    }
+    MultipurposeBuffer buffer(numElements * 3);
+
+    load_2d_vector_list_to_buffer(list, buffer.get());
     
-    glEnd();
+    glVertexPointer(3, GL_FLOAT, 0, buffer.get());
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glDrawArrays(GL_LINE_STRIP, 0, numElements);
 
-    reset_gl_color();
-
+    clear_gl_color();
+    glDisableClientState(GL_VERTEX_ARRAY);
     gl_check_error(CONTEXT_AND_CALLER);
 }
 
@@ -91,20 +132,19 @@ CA_FUNCTION(gl_line_loop)
     TaggedValue* list = INPUT(0);
     TaggedValue* color = INPUT(1);
 
-    _unpack_gl_color(color);
-
-    glBegin(GL_LINE_LOOP);
+    set_gl_color(color);
 
     int numElements = list->numElements();
-    for (int i=0; i < numElements; i++) {
-        float x = list->getIndex(i)->getIndex(0)->toFloat();
-        float y = list->getIndex(i)->getIndex(1)->toFloat();
-        glVertex3f(x,y,0);
-    }
-    
-    glEnd();
+    MultipurposeBuffer buffer(numElements * 3);
 
-    reset_gl_color();
+    load_2d_vector_list_to_buffer(list, buffer.get());
+    
+    glVertexPointer(3, GL_FLOAT, 0, buffer.get());
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glDrawArrays(GL_LINE_LOOP, 0, numElements);
+
+    clear_gl_color();
+    glDisableClientState(GL_VERTEX_ARRAY);
     gl_check_error(CONTEXT_AND_CALLER);
 }
 
@@ -113,20 +153,19 @@ CA_FUNCTION(gl_lines)
     TaggedValue* list = INPUT(0);
     TaggedValue* color = INPUT(1);
 
-    _unpack_gl_color(color);
-
-    glBegin(GL_LINES);
+    set_gl_color(color);
 
     int numElements = list->numElements();
-    for (int i=0; i < numElements; i++) {
-        float x = list->getIndex(i)->getIndex(0)->toFloat();
-        float y = list->getIndex(i)->getIndex(1)->toFloat();
-        glVertex3f(x,y,0);
-    }
-    
-    glEnd();
+    MultipurposeBuffer buffer(numElements * 3);
 
-    reset_gl_color();
+    load_2d_vector_list_to_buffer(list, buffer.get());
+    
+    glVertexPointer(3, GL_FLOAT, 0, buffer.get());
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glDrawArrays(GL_LINE_LOOP, 0, numElements);
+
+    clear_gl_color();
+    glDisableClientState(GL_VERTEX_ARRAY);
     gl_check_error(CONTEXT_AND_CALLER);
 }
 
@@ -135,20 +174,19 @@ CA_FUNCTION(gl_points)
     TaggedValue* list = INPUT(0);
     TaggedValue* color = INPUT(1);
 
-    _unpack_gl_color(color);
-
-    glBegin(GL_POINTS);
+    set_gl_color(color);
 
     int numElements = list->numElements();
-    for (int i=0; i < numElements; i++) {
-        float x = list->getIndex(i)->getIndex(0)->toFloat();
-        float y = list->getIndex(i)->getIndex(1)->toFloat();
-        glVertex3f(x + 0.5f, y + 0.5f, 0);
-    }
-    
-    glEnd();
+    MultipurposeBuffer buffer(numElements * 3);
 
-    reset_gl_color();
+    load_2d_vector_list_to_buffer(list, buffer.get());
+
+    glVertexPointer(3, GL_FLOAT, 0, buffer.get());
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glDrawArrays(GL_POINTS, 0, numElements);
+
+    clear_gl_color();
+    glDisableClientState(GL_VERTEX_ARRAY);
     gl_check_error(CONTEXT_AND_CALLER);
 }
 
@@ -159,27 +197,38 @@ CA_FUNCTION(gl_circle)
     circa::point_t::read(INPUT(0), &x, &y);
     float radius = FLOAT_INPUT(1);
     TaggedValue* color = INPUT(2);
-    _unpack_gl_color(color);
+    set_gl_color(color);
 
     // Dumb guess on how many polygons to use
     int control_points = int(radius/3) + 10;
     if (control_points < 15) control_points = 15;
 
-    glBegin(GL_TRIANGLE_FAN);
+    MultipurposeBuffer buffer(control_points * 3);
+    int write = 0;
 
-    glVertex3f(x,y,0);
+    buffer[write++] = x;
+    buffer[write++] = y;
+    buffer[write++] = 0;
 
     for (int i=0; i <= control_points; i++) {
         float angle_0 = float(float(i) / control_points * M_PI * 2);
         float angle_1 = float(float(i+1) / control_points * M_PI * 2);
 
-        glVertex3f(x + radius * std::cos(angle_0), y + radius * std::sin(angle_0), 0);
-        glVertex3f(x + radius * std::cos(angle_1), y + radius * std::sin(angle_1), 0);
+        buffer[write++] = x + radius * std::cos(angle_0);
+        buffer[write++] = y + radius * std::sin(angle_0);
+        buffer[write++] = 0;
+
+        buffer[write++] = x + radius * std::cos(angle_1);
+        buffer[write++] = y + radius * std::sin(angle_1);
+        buffer[write++] = 0;
     }
 
-    glEnd();
+    glVertexPointer(3, GL_FLOAT, 0, buffer.get());
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, control_points);
 
-    reset_gl_color();
+    clear_gl_color();
+    glDisableClientState(GL_VERTEX_ARRAY);
     gl_check_error(CONTEXT_AND_CALLER);
 }
 
@@ -192,38 +241,49 @@ CA_FUNCTION(gl_pie)
     float angle_start = FLOAT_INPUT(2);
     float angle_fin = FLOAT_INPUT(3);
     TaggedValue* color = INPUT(4);
-    _unpack_gl_color(color);
+    set_gl_color(color);
 
     if (angle_start > angle_fin) {
         float swap = angle_start; angle_start = angle_fin; angle_fin = swap;
     }
-    if (angle_start < 0) angle_start = 0;
-    if (angle_fin > 1) angle_fin = 1;
-
     float angle_span = angle_fin - angle_start;
 
     // Dumb guess on how many polygons to use
-    int control_points = 15;
+    int control_points = int(radius/3) + 10;
+    if (control_points < 15) control_points = 15;
 
-    glBegin(GL_TRIANGLE_FAN);
+    MultipurposeBuffer buffer(control_points * 3);
+    int write = 0;
 
-    glVertex3f(x,y,0);
+    buffer[write++] = x;
+    buffer[write++] = y;
+    buffer[write++] = 0;
 
-    for (int i=0; i <= control_points; i++) {
+    for (int i=0; i < control_points; i++) {
+
         float angle_0 = float(float(i) / control_points * angle_span + angle_start);
         float angle_1 = float(float(i+1) / control_points * angle_span + angle_start);
 
         // Convert from 0..1 to radians
         angle_0 *= M_PI * 2;
         angle_1 *= M_PI * 2;
-        
+
         // Use (sin,-cos) so that angle 0 starts at the top and increases clockwise.
-        glVertex3f(x + radius * std::sin(angle_0), y + radius * -std::cos(angle_0), 0);
-        glVertex3f(x + radius * std::sin(angle_1), y + radius * -std::cos(angle_1), 0);
+        buffer[write++] = x + radius * std::sin(angle_0);
+        buffer[write++] = y + radius * -std::cos(angle_0);
+        buffer[write++] = 0;
+
+        buffer[write++] = x + radius * std::sin(angle_1);
+        buffer[write++] = y + radius * -std::cos(angle_1);
+        buffer[write++] = 0;
     }
 
-    glEnd();
-    reset_gl_color();
+    glVertexPointer(3, GL_FLOAT, 0, buffer.get());
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, control_points*2 + 1);
+
+    clear_gl_color();
+    glDisableClientState(GL_VERTEX_ARRAY);
     gl_check_error(CONTEXT_AND_CALLER);
 }
 

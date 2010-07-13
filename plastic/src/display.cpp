@@ -22,8 +22,8 @@ bool initialize_display()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     // Create the surface
-    int desiredWidth = 640;
-    int desiredHeight = 480;
+    int desiredWidth = 1024;
+    int desiredHeight = 768;
 
     if (users_branch().contains("desired_window_size")) {
         desiredWidth = users_branch()["desired_window_size"]->asBranch()[0]->asInt();

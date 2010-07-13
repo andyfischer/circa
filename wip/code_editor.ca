@@ -73,13 +73,15 @@ def draw_code_editor(Point topleft, BranchRef branch)
     end
 end
 
-background(#fff)
+def main()
+    background(#fff)
 
-sample_code = begin
-    a = 1
-    b = 2
-    c = a + b
-    d = c * 5
+    sample_code = begin
+        a = 1
+        b = 2
+        c = a + b
+        d = c * 5
+    end
+
+    draw_code_editor([10 10] draw_code_editor -> branch_ref)
 end
-
-draw_code_editor([10 10] draw_code_editor -> branch_ref)
